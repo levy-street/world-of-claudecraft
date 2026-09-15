@@ -223,6 +223,7 @@ const UI_PURE_CORES = [
   'src/ui/map_marker_semantics_core.ts',
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
+  'src/ui/map_pan_core.ts',
   'src/ui/mouseover_cast_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
@@ -258,6 +259,7 @@ const UI_PURE_CORES = [
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
+  'src/ui/party_target_hotkeys_core.ts',
   'src/ui/party_below_target_core.ts',
   'src/ui/party_collapse.ts',
   'src/ui/guild_hide_offline.ts',
@@ -294,11 +296,13 @@ const UI_PURE_CORES = [
   'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
+  'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
   'src/ui/keybind_transfer_core.ts',
   'src/ui/keyboard_map_core.ts',
   'src/ui/keybind_conflict_prompt_core.ts',
   'src/ui/keybind_action_names_core.ts',
+  'src/ui/keybind_device_notes_core.ts',
   'src/ui/keyboard_layout_pref_core.ts',
   'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
@@ -310,6 +314,7 @@ const UI_PURE_CORES = [
   'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bank_filter.ts',
@@ -320,6 +325,7 @@ const UI_PURE_CORES = [
   'src/ui/entity_display_core.ts',
   'src/ui/hud/professions/disenchant_yield_view.ts',
   'src/ui/hud/professions/material_hint_view.ts',
+  'src/ui/hud/professions/reagent_suffix_view.ts',
   'src/ui/hud/professions/material_profession_hint_view.ts',
   'src/ui/hud/professions/craft_denial_line_view.ts',
   'src/ui/hud/professions/elixir_tooltip_view.ts',
@@ -377,6 +383,8 @@ const UI_PURE_CORES = [
   // The Machine Stable's section / card markup (the store-mount strip), the
   // armory_card_view twin for the account-mount SKUs.
   'src/ui/store_mount_card_view.ts',
+  'src/ui/mount_inspect_view.ts',
+  'src/ui/daily_rewards_reason_view.ts',
   // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
   // phase 17). The overlay ELEMENT lives in the thin painter beside it.
   'src/ui/daily_rewards_spin_view.ts',
@@ -473,6 +481,7 @@ const UI_PURE_CORES = [
   'src/ui/market_search_localized_core.ts',
   'src/ui/bank_item_name_core.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/market_sweep_core.ts',
   'src/ui/usd_text.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/woc_log_tones.ts',
@@ -546,11 +555,13 @@ const UI_PURE_CORES = [
   'src/ui/reliquary_sheet_view.ts',
   'src/ui/character_progression_view.ts',
   'src/ui/reliquary_tracker_view.ts',
+  'src/ui/recipe_tracker_view.ts',
   'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/target_frame_descriptor.ts',
   'src/ui/hud_frames.ts',
   'src/ui/stance_bar_view.ts',
   'src/ui/hud/stance/stance_radial_core.ts',
@@ -663,6 +674,7 @@ const RENDER_PURE_CORES = [
   'src/render/wall_backface_cull_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/nythraxis_bound_cage_core.ts',
   'src/render/nythraxis_grave_core.ts',
@@ -674,6 +686,7 @@ const RENDER_PURE_CORES = [
   'src/render/varkhul_assembly_focus_core.ts',
   'src/render/delve_interior_cache_core.ts',
   'src/render/entity_gate_stand_in_core.ts',
+  'src/render/entity_ground_sample_core.ts',
   'src/render/entity_view_policy_core.ts',
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
@@ -687,6 +700,8 @@ const RENDER_PURE_CORES = [
   'src/render/characters/anim_state_entity_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/entry_detail_horizon_core.ts',
+  'src/render/gather_batch_reach_core.ts',
+  'src/render/zone_feature_cells_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/quest_beacon_core.ts',
@@ -697,7 +712,10 @@ const RENDER_PURE_CORES = [
   'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
+  'src/render/view_vfx_pose_core.ts',
   'src/render/live_program_watch_core.ts',
+  'src/render/mount_preview_framing_core.ts',
+  'src/render/gpu_timer_probe_core.ts',
   'src/render/post_reveal_links_core.ts',
   'src/render/program_key_ledger_core.ts',
   'src/render/renderer_extensions.ts',
@@ -983,6 +1001,7 @@ const BARE_NAMED = [
   'src/ui/system_text_i18n.ts',
   'src/ui/target_frame_pos.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/target_frame_descriptor.ts',
   'src/ui/hud_frames.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/fct_event.ts',
@@ -2076,6 +2095,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/store_purchase_intent.ts',
   'src/ui/swing_timer.ts',
   'src/ui/system_text_i18n.ts',
+  'src/ui/target_frame_descriptor.ts',
   'src/ui/target_frame_pos.ts',
   'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
@@ -2383,6 +2403,8 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
 const UI_PAINTER_HELPERS = [
+  // The Show Absorb Shields root-class gate (one classList.toggle on an injected host).
+  'src/ui/absorb_overlay_gate.ts',
   'src/ui/continent_land_mask.ts',
   'src/ui/text_sprite_cache.ts',
   // Detached tt-desc / tt-sub line mint (createElement + textContent only).
@@ -2418,6 +2440,7 @@ const UI_DOM_MODULES = [
   'src/ui/appearance_customizer.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
+  'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
   'src/ui/bank_buy_prompt.ts',
@@ -2449,6 +2472,7 @@ const UI_DOM_MODULES = [
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',
+  'src/ui/touch_peek.ts',
   'src/ui/hud/professions/crafting_window.ts',
   'src/ui/hud/professions/commission_order_window.ts',
   // The spin celebration's live element: created, listened to, mounted on
@@ -2528,6 +2552,7 @@ const UI_DOM_MODULES = [
   // on the injected root plus an innerHTML swap) and reads document.activeElement
   // so the focused chip or quest row survives that swap.
   'src/ui/map_sidebar_controller.ts',
+  'src/ui/market_sweep_panel.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
   'src/ui/material_sources_dialog.ts',
@@ -2578,6 +2603,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/professions/professions_window.ts',
   'src/ui/raid_boss_guide_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
+  'src/ui/hud/chat/ready_check_leader_window.ts',
   // The binder that gives a purchase-intent ledger a durable half. It reaches
   // localStorage (through the safe_local_storage seam, the one sanctioned door)
   // and the clock, which is precisely why it is not in the pure record core it

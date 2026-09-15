@@ -62,6 +62,7 @@ export const zh_CN: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "地下城",
+      "town": "镇",
       "difficulty": "难度",
       "name": "名称",
       "spec": "专精",
@@ -159,6 +160,10 @@ export const zh_CN: EnTranslations = {
       "teleport": {
         "label": "传送",
         "description": "移动到精确的世界坐标。"
+      },
+      "town": {
+        "label": "城镇中心",
+        "description": "按名字传送到城镇中心。"
       },
       "dungeon": {
         "label": "进入地下城",
@@ -348,12 +353,25 @@ export const zh_CN: EnTranslations = {
       "banner": "正在观察 {name}"
     },
     "readyCheck": {
+      "title": "就绪确认",
+      "close": "关闭",
       "prompt": "{name} 发起了准备确认。你准备好了吗？",
       "ready": "准备就绪",
       "notReady": "未准备",
+      "status": "已就绪：{ready}/{total}",
+      "waiting": "等待回应...",
+      "memberReady": "{name} 已准备就绪。",
+      "memberNotReady": "{name} 尚未准备好。",
+      "memberPending": "{name} 尚未回应。",
       "result": "准备确认：{ready} 人就绪，{notReady} 人未准备，{noResponse} 人未响应。",
       "notInPartyError": "你必须加入队伍才能发起就绪确认。",
       "inProgressError": "就绪确认已在进行中。"
+    },
+    "pullTimer": {
+      "start": "拉入 {seconds} 秒！",
+      "cancel": "开怪倒计时已取消。",
+      "countdown": "{seconds}",
+      "pull": "拉！"
     },
     "death": {
       "resurrectAtCorpse": "在尸体旁复活",
@@ -578,6 +596,11 @@ export const zh_CN: EnTranslations = {
       "mountsTitle": "机械马厩",
       "mountBuyAria": "购买{item}",
       "mountSkinType": "坐骑皮肤",
+      "mountInspectAria": "预览{item}",
+      "mountRideIt": "骑上试试",
+      "mountOnly": "仅坐骑",
+      "mountBuy": "购买坐骑皮肤",
+      "mountScopeLine": "账号通用皮肤。同一时间只能由一名角色穿戴。",
       "loading": "正在加载 WOC 商店…",
       "error": "WOC 商店暂时不可用，请稍后再试。",
       "balance": "Claudium 余额",
@@ -1402,6 +1425,7 @@ export const zh_CN: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "战场夺旗动作",
       "sheathe": "收起/拔出武器",
+      "hideInterface": "隐藏界面",
       "dive": "下潜",
       "categoryPet": "宠物",
       "petAttack": "宠物：攻击",
@@ -1410,8 +1434,22 @@ export const zh_CN: EnTranslations = {
       "petDefensive": "宠物：防御",
       "petAggressive": "宠物：攻击性",
       "targetPet": "宠物：选中",
+      "targetSelf": "选中自己",
+      "targetParty1": "选中队友1",
+      "targetParty2": "选中队友2",
+      "targetParty3": "选中队友3",
+      "targetParty4": "选中队友4",
+      "targetParty5": "选中队友5",
+      "targetParty6": "选中队友6",
+      "targetParty7": "选中队友7",
+      "targetParty8": "选中队友8",
+      "targetParty9": "选中队友9",
       "mount": "骑乘 / 下骑",
-      "mouseHint": "鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。"
+      "mouseHint": "鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。",
+      "zoomIn": "拉近镜头",
+      "zoomOut": "拉远镜头",
+      "wheelHint": "鼠标滚轮也可以绑定：绑定时向上或向下滚动滚轮，也可以同时按住 Ctrl、Alt 或 Shift。拉近镜头和拉远镜头默认占用裸滚轮，把它们移到 Ctrl+滚轮之类的组合上，就能把滚轮留给技能使用。",
+      "wheelHeldRefused": "滚轮的一格无法驱动移动这类需要按住的操作。请为它选择一个按键或鼠标按钮。"
     },
     "actionBar": {
       "editKeys": "编辑动作条按键",
@@ -1682,6 +1720,8 @@ export const zh_CN: EnTranslations = {
       "showReliquaryTracker": "显示圣物库追踪器",
       "confirmVendorSell": "出售前确认",
       "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
+      "confirmVendorSellMinQuality": "确认出售的最低品质",
+      "confirmVendorSellMinQualityNote": "低于此品质的物品单击即可出售；误售的物品仍可从商人处回购。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
@@ -3248,7 +3288,30 @@ export const zh_CN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暂离",
       "cheaterTag": "< 作弊者 >",
-      "pledgeTag": "{guild}的宣誓者"
+      "pledgeTag": "{guild}的宣誓者",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "拍卖师",
+        "banker": "银行职员",
+        "riftForgemaster": "裂隙锻造大师",
+        "cardMaster": "牌局大师",
+        "crucibleQuartermaster": "熔炉军需官",
+        "heroicQuartermaster": "英雄军需官",
+        "pvpVendor": "PvP商人",
+        "weaponsmithTrainer": "锻造训练师",
+        "cookingTrainer": "烹饪训练师",
+        "tailoringTrainer": "裁缝训练师",
+        "engineeringTrainer": "工程学训练师",
+        "leatherworkingTrainer": "制皮训练师",
+        "alchemyTrainer": "炼金术训练师",
+        "weaponVendor": "武器商人",
+        "armorVendor": "护甲商人",
+        "armsDealer": "军械商人",
+        "foodVendor": "食物和饮料商人",
+        "potionVendor": "药水商人",
+        "stableMaster": "马厩管理员",
+        "generalGoods": "杂货商人"
+      }
     },
     "mobTooltip": {
       "levelFamily": "等级 {level} {family}",
@@ -3482,6 +3545,7 @@ export const zh_CN: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。",
+      "fineFarmGrade": "优质品级。收获时部分产物会成为优质品，农艺技能越高，或装有充能的匠人之眼时更常出现。需要优质品级时普通农产品一律不算数，需要普通农产品时优质品级也一律不算数。",
       "cookingCatch": "烹饪材料。必须先烹饪后才能食用。",
       "usedBy": "用于制作{crafts}。",
       "arcaneDust": "制作材料。分解普通和优秀品质的装备可得。",
@@ -4022,6 +4086,25 @@ export const zh_CN: EnTranslations = {
       "lastSeenNever": "从未",
       "ignoredTab": "已忽略",
       "blockedTab": "屏蔽",
+      "who": {
+        "tab": "WHO",
+        "searchPlaceholder": "名字、区域或公会",
+        "search": "搜索",
+        "loading": "正在向服务器查询在线玩家...",
+        "empty": "没有匹配的玩家。",
+        "count": "{total} 人在线",
+        "countFiltered": "{shown} / {total} 人在线",
+        "capped": "仅显示前 {delivered} 位。缩小搜索范围以查看其余玩家。",
+        "classFilter": "按职业筛选",
+        "allClasses": "所有职业",
+        "colStatus": "状态",
+        "colName": "姓名",
+        "colLevel": "等级",
+        "colClass": "职业",
+        "colZone": "区",
+        "colGuild": "公会",
+        "sortTitle": "按{column}排序"
+      },
       "ignoredEmpty": "你没有忽略任何人。",
       "blockedEmpty": "你没有屏蔽任何人。",
       "blockSearchPlaceholder": "玩家名称",
@@ -4143,6 +4226,7 @@ export const zh_CN: EnTranslations = {
           "farming": "放在背包里即可，在田畦种植作物时自动生效。"
         },
         "speed": "在低于{tier}阶的节点采集速度更快。",
+        "wieldDegrade": "技能不足时，它仍可当作较低阶的工具使用。",
         "rodRequired": "钓鱼所需。",
         "rodBite": "鱼上钩最多可提前{seconds}秒。",
         "rodReel": "收线时限延长{seconds}秒。",
@@ -4418,6 +4502,18 @@ export const zh_CN: EnTranslations = {
       "retentionFooter": "重置专业后保留60%的技能。",
       "tutorialLink": "专业教程"
     },
+    "recipeTracker": {
+      "trackerLabel": "配方",
+      "collapseHint": "收起配方追踪器",
+      "expandHint": "展开配方追踪器",
+      "pin": "固定",
+      "unpin": "取消固定",
+      "pinFull": "配方追踪器已满（最多 {cap} 个配方）",
+      "pinAria": "将{name}固定到HUD追踪器",
+      "unpinAria": "从HUD追踪器取消固定{name}",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "制作",
       "close": "关闭制作",
@@ -4448,6 +4544,7 @@ export const zh_CN: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 个优质品级）",
       "reagentVaultDraw": "（从材料仓库取用 {count}）",
+      "reagentOrdinaryHeld": "（持有{name} {count} 个，但此处只有优质品级才算数）",
       "vaultUnreachable": "此处无法使用材料仓库。",
       "craftFeeLine": "制作费：每件 {fee}",
       "empty": "尚无已知配方。",
@@ -4541,8 +4638,8 @@ export const zh_CN: EnTranslations = {
       "attunedBanner": "已调谐：{title}",
       "tierTutorial": {
         "title": "你的第一个阶级",
-        "tierCap": "一门技艺在技能 {skill} 时达到第一个阶级，每提升一个阶级都会改善其制作能力。但只有当某门技艺成为你两门主修之一时，才能制作超越稀有品质的作品。",
-        "radar": "你的专业构成一个环轮。调谐到相邻的一对，这两门技艺便成为无上限的主修；环轮对面的一门技艺成为上限为稀有的爱好；其余技艺则进入休眠：知识仍会保留，但在你重新拾起之前上限为普通。",
+        "tierCap": "一项专业在技能 {skill} 时达到第一个阶级，每提升一个阶级都会改善其产出或可制作的内容。不过，具体到你的制造类专业，只有当某门技艺成为你的两门主修之一后，才能提升到超越稀有品质的作品。",
+        "radar": "你的制造类专业构成一个环轮。调谐到相邻的一对，这两门技艺便成为无上限的主修；环轮对面的一门技艺成为上限为稀有的爱好；其余技艺则进入休眠：知识仍会保留，但在你重新拾起之前上限为普通。",
         "masters": "各城镇的工艺大师提供调谐任务。准备好后去拜访他们，选择你的组合。你所学到的一切都不会失去。",
         "dismiss": "明白了"
       },
@@ -4836,6 +4933,7 @@ export const zh_CN: EnTranslations = {
       "roleDps": "输出",
       "freeRoles": "不限职责",
       "lockoutDaily": "最终首领每日锁定",
+      "lockoutWeekly": "每个首领每周锁定",
       "lockoutNone": "无锁定",
       "lockedFor": "锁定约 {minutes} 分钟",
       "attunement": "需要完成前置任务：{quest}",
@@ -4849,6 +4947,8 @@ export const zh_CN: EnTranslations = {
       "lootMaybe": "以下物品至多掉落其一：",
       "lootChance": "额外概率掉落：",
       "lootHeroic": "英雄奖励，以下物品必掉其一：",
+      "lootHeroicMaybe": "英雄奖励，以下物品至多掉落其一：",
+      "lootHeroicChance": "英雄奖励，额外概率掉落：",
       "pct": "{pct}%",
       "blockedLevel": "仅限等级 {min} 至 {max}",
       "blockedSpec": "需要选择专精",
@@ -4922,7 +5022,33 @@ export const zh_CN: EnTranslations = {
         "kings_wrath": "国王之怒（30%时触发：永久伤害加成，地面机制加快）",
         "bone_storm": "白骨风暴（他无视仇恨，旋转攻击并冲向团队）",
         "crown_endures": "王冠不朽（6:00时触发强制狂暴，英雄难度为5:00）",
-        "deathless_court": "不死王庭（仅英雄难度，不死之怒后王庭众魂会苏醒）"
+        "deathless_court": "不死王庭（仅英雄难度，不死之怒后王庭众魂会苏醒）",
+        "bloodmane_rend": "血鬃撕裂（流血，注意目标切换）",
+        "tusk_sweep": "獠牙横扫（正面顺劈）",
+        "ancestral_sap": "祖灵汁液（治疗其盟友）",
+        "call_of_the_hunt": "狩猎召唤（加速附近盟友）",
+        "thickhide_ward": "厚皮护盾（护盾附近盟友）",
+        "beast_pit_quake": "兽坑震击（范围伤害）",
+        "wildheart_pulse": "狂野之心脉冲（周期性范围伤害）",
+        "jaguar_roar": "美洲豹咆哮（击退）",
+        "brand_of_the_pyre": "柴堆烙印（叠加的火焰标记，在导水管的水中洗净）",
+        "forge_strike": "熔炉打击（叠加的坦克换位减益）",
+        "rain_of_cinders": "余烬之雨（三道火焰锥形，站在其间）",
+        "falling_cinders": "坠落余烬（玩家脚下的陨石圈，移出）",
+        "revolving_inferno": "回旋炼狱（旋转的火焰射线，穿过缺口）",
+        "forge_wave": "熔炉之波（扩散的火墙，利用两条安全通道）",
+        "apocalypse_add": "伊格尼瓦的唤灰者（施放天启的优先目标，速杀）",
+        "judgment_of_the_forge": "熔炉审判（过渡阶段，共享唯一的安全庇护）",
+        "last_inferno": "最后炼狱（生命值20%时的45秒狂暴）",
+        "chains_of_the_forge": "熔炉锁链（仅英雄难度，紧靠被链接的同伴）",
+        "makers_brand": "造物主烙印（叠加的坦克换位减益）",
+        "forgefathers_sweep": "熔炉之父横扫（对非坦克的宽正面锥形）",
+        "tempering_ray": "淬火射线（射向被标记玩家的直线，上前拦截）",
+        "cinder_orbs": "余烬宝珠（被标记的玩家散开至房间边缘）",
+        "forgestorm": "熔炉风暴（坠落的陨石圈，移出）",
+        "shared_pyre": "共享柴堆（集合圈，分摊伤害）",
+        "anvils_decree": "铁砧法令（三次全团锤击，用治疗撑过）",
+        "masters_assembly": "大师装配（阻挡熔炉光束，轮换阻挡者）"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const zh_CN: EnTranslations = {
       "applied": "已应用",
       "owned": "已拥有",
       "storeOnly": "可在 WOC 商店购买",
+      "preview": "预览",
+      "previewAria": "预览{name}",
       "cardAria": "{name}，{rarity}",
       "mountsIntro": "坐骑皮肤会覆盖在此角色骑乘的任何坐骑上，绝不改变速度。",
       "mountsNoMount": "先拥有一匹坐骑：皮肤需要可骑乘的对象。",
@@ -5252,11 +5380,11 @@ export const zh_CN: EnTranslations = {
       "colBuyNow": "一口价",
       "colTimeLeft": "剩余时间",
       "colBuyer": "买家",
-      "colSoldAt": "Sold",
+      "colSoldAt": "卖",
       "colSalePrice": "成交价",
-      "colSaleType": "Type",
+      "colSaleType": "类型",
       "saleTypeAuction": "拍卖",
-      "saleTypeBuyNow": "Buy now",
+      "saleTypeBuyNow": "立即购买",
       "saleTypeDirected": "定向出售",
       "saleTypeUnknown": "未知",
       "historyEmpty": "暂无销售记录。",
@@ -5933,6 +6061,7 @@ export const zh_CN: EnTranslations = {
       "deeds": "功绩之书",
       "reliquary": "圣物库",
       "sheathe": "收起/拔出武器",
+      "hideInterface": "隐藏界面（用于截图和录像）",
       "crafting": "制作",
       "mount": "骑乘 / 下骑",
       "calendar": "活动日历",
@@ -5962,6 +6091,8 @@ export const zh_CN: EnTranslations = {
       "attackMove": "攻击移动（需先在选项中开启）",
       "meters": "伤害统计（伤害、治疗与威胁）",
       "petMark": "宠物：标记，选中你自己的宠物（等同于点击它的头像框）",
+      "targetSelf": "选中你自己",
+      "targetParty": "选中队友1至9（按队伍框架从上到下的显示顺序）",
       "onBarBinding": "你也可以直接在动作条上绑定按键：在“按键绑定”面板中选择“编辑动作条按键”，然后点击动作条上的某个格子，再按下你想要的键。设置完毕后点击“完成”。这一项仅限桌面端，因为它需要一块实体键盘。",
       "clickMoveNote": "点击移动默认是关着的，要你自己打开：在游戏菜单中打开“按键绑定”面板，开启“点击移动”，再用它下方的“点击移动按键”一行挑选由哪个鼠标键负责走路（默认是左键，也可以选右键）。开启之后，点一下地面上的某处，你便会朝那里走去，地上还会有一个标记指出你的去向。点击一只生物或另一位玩家，你会走到对方近前、在够得着的距离停下，而这一次点击照样完成它平常的选中或交互；如果你点的东西本来就在身边，那就直接交互，人不必挪窝。任何一个移动按键都会立刻把控制权收回、结束这趟行程，按住鼠标键环顾四周也一样。跳跃不会，所以你可以一路蹦着继续赶路；而打开游戏菜单只是让行程暂停，关掉菜单后它会接着走完。"
     },
@@ -6099,7 +6230,8 @@ export const zh_CN: EnTranslations = {
       "ifLockBars": "锁定你的技能栏，免得不小心把技能从格子里拖出来。",
       "keybindsHeading": "“按键绑定”面板",
       "keybindsBody": "按键列表只是那个面板的一半。它上面还有一排开关，决定你的鼠标如何驾驭这个游戏：鼠标镜头、旋转视角时是否锁定光标、点击移动以及由哪个鼠标键触发、攻击移动、左手触控布局，还有聊天的脏话过滤。",
-      "keybindsMouseBody": "那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。"
+      "keybindsMouseBody": "那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。",
+      "keybindsWheelBody": "滚轮本身也可以绑定。拉近镜头和拉远镜头是普通绑定，默认占用裸滚轮，因此你可以把它们移到 Ctrl+滚轮或按键上，再用空出来的滚轮触发动作条格位。滚轮的一格没有松开动作，所以无法驱动向前移动这类需要按住的操作。"
     },
     "combat": {
       "intro": "战斗遵循经典 MMO 中熟悉的规则。你完全不必钻研这些就能玩得很好,这里只是介绍一下战斗大致的运作方式。",
@@ -7489,7 +7621,7 @@ export const zh_CN: EnTranslations = {
         "bonusFmt": "+{value}{stat}",
         "enchantsNoteOffhand": "附魔分四个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。强效层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有三个去处：两个护符配方各要五个，工具效果充能的最高一档，以及莹光层级（其中武器附魔与胸甲附魔各要一个，灌注要两个），所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文利刃（武器，力量，消耗共鸣钢材），符文印记（武器，智力，共鸣木材），符文织纹（胸甲，精神，共鸣丝线），符文兽皮（护腿，敏捷，共鸣兽皮），符文锁环（头盔，耐力，共鸣锁环）。每件还各需两个铃音精华；对于同时拥有基础与强效附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文兽皮则是唯一的护腿敏捷附魔。确切加成详见下方表格。\n\n凌驾于三者之上的是莹光层级，本行当的巅峰之作，也是唯一对技能本身提出要求的附魔：那四件需要附魔100，莹光灌注需要125，见下方表格的“技能”一列。每一件都需要一份莹光试剂，并在武器（威力与法术强度两种选择）、胸甲与长靴各自的槽位上再迈出一级。其中最后一件莹光灌注，只会在臻至完美的物品上生效，而目前还没有任何物品能臻至完美：它是先于自己所等待的完美化工序写就的。",
         "enchantsNoteInfusionLive": "附魔分四个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。强效层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有三个去处：两个护符配方各要五个，工具效果充能的最高一档，以及莹光层级（其中武器附魔与胸甲附魔各要一个，灌注要两个），所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文利刃（武器，力量，消耗共鸣钢材），符文印记（武器，智力，共鸣木材），符文织纹（胸甲，精神，共鸣丝线），符文兽皮（护腿，敏捷，共鸣兽皮），符文锁环（头盔，耐力，共鸣锁环）。每件还各需两个铃音精华；对于同时拥有基础与强效附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文兽皮则是唯一的护腿敏捷附魔。确切加成详见下方表格。\n\n凌驾于三者之上的是莹光层级，本行当的巅峰之作，也是唯一对技能本身提出要求的附魔：那四件需要附魔100，莹光灌注需要125，见下方表格的“技能”一列。每一件都需要一份莹光试剂，并在武器（威力与法术强度两种选择）、胸甲与长靴各自的槽位上再迈出一级。其中最后一件莹光灌注，只会在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔师的，物品如何走到那一步由专业页面讲述。",
-        "enchantsNoteRaidFormula": "附魔分四个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。强效层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有三个去处：两个护符配方各要五个，工具效果充能的最高一档，以及莹光层级（其中武器附魔与胸甲附魔各要一个，灌注要两个），所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文利刃（武器，力量，消耗共鸣钢材），符文印记（武器，智力，共鸣木材），符文织纹（胸甲，精神，共鸣丝线），符文兽皮（护腿，敏捷，共鸣兽皮），符文锁环（头盔，耐力，共鸣锁环）。每件还各需两个铃音精华；对于同时拥有基础与强效附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文兽皮则是唯一的护腿敏捷附魔。确切加成详见下方表格。\n\n在普通低阶附魔之上的是莹光层级，即本行当普通附魔的巅峰之作：那四件需要附魔100，莹光灌注需要125，见下方表格的“技能”一列。每一件都需要一份莹光试剂，并在武器（威力与法术强度两种选择）、胸甲与长靴各自的槽位上再迈出一级。其中最后一件莹光灌注，只会在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔师的，物品如何走到那一步由专业页面讲述。\n\n末焰热忱是独立的团队副本配方，并非免费掌握的普通附魔。施加之前，须在附魔技能100时学习这张可交易的配方。每次附魔消耗3个末焰之核和2个铃音碎片；配方可在熔炉掉落，也可向熔炉军需官支付1个末焰之核购买。其近战触发效果与武器速度规则完整列于下方。",
+        "enchantsNoteRaidFormula": "附魔分四个层级。基础层级消耗铃音之尘（高端配方还需少量铃音精华），覆盖武器槽、副手以及每一个护甲槽，属性轴选项之丰令每种配装都能在每个槽位找到合适的附魔：盾牌与施法者手持副手有属于自己的耐力附魔，因此没有哪个装备槽是附魔的死角。强效层级每件消耗一个铃音碎片加若干铃音精华：对影响最大的槽位给出更强的加成。碎片此外还有三个去处：两个护符配方各要一个（护符其余的材料是精华和粉尘），工具效果充能的最高一档，以及莹光层级（其中武器附魔与胸甲附魔各要一个，灌注要两个），所以动手花用之前先攒下几个。\n\n夹在两者之间的是五种符文附魔，各对应一种定向副产物，确保你磨出的任何材料都不会白费：符文利刃（武器，力量，消耗共鸣钢材），符文印记（武器，智力，共鸣木材），符文织纹（胸甲，精神，共鸣丝线），符文兽皮（护腿，敏捷，共鸣兽皮），符文锁环（头盔，耐力，共鸣锁环）。每件还各需两个铃音精华；对于同时拥有基础与强效附魔的槽位和属性，符文附魔的加成介于两者之间，唯有符文织纹是迄今最强的胸甲精神附魔，符文兽皮则是唯一的护腿敏捷附魔。确切加成详见下方表格。\n\n在普通低阶附魔之上的是莹光层级，即本行当普通附魔的巅峰之作：那四件需要附魔100，莹光灌注需要125，见下方表格的“技能”一列。每一件都需要一份莹光试剂，并在武器（威力与法术强度两种选择）、胸甲与长靴各自的槽位上再迈出一级。其中最后一件莹光灌注，只会在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔师的，物品如何走到那一步由专业页面讲述。\n\n末焰热忱是独立的团队副本配方，并非免费掌握的普通附魔。施加之前，须在附魔技能100时学习这张可交易的配方。每次附魔消耗3个末焰之核和2个铃音碎片；配方可在熔炉掉落，也可向熔炉军需官支付1个末焰之核购买。其近战触发效果与武器速度规则完整列于下方。",
         "charmsHeading": "给采集者工具的护符",
         "formulaRequired": "需要配方",
         "charmsBody": "采集者的护符也出自附魔。你的附魔技能达到 25 后，Tinker Gizzel会在Eastbrook的工具工坊传授两者：为一次采集多加一个单位产出的采集者储囊，以及提升采上来之物品级的匠人之眼。每一枚都只制作一次，然后嵌进采矿镐、斧或镰刀，只在真正被它改善的采集上消耗一次充能。\n\n补充充能才是这门手艺持续赚钱的地方。充能由工具的主人恢复，而不是由上门的附魔师来做；当那位主人正是署名这枚护符的附魔师时，补充只需一半材料，若还带着附魔专精则更少。因此隔着柜台卖出的护符只是一锤子买卖，而嵌在你自己工具上的那些，才是养起来便宜的。完整的充能与材料阶梯见任意一门采集专业页面的“工具效果”一节。"
@@ -7558,7 +7690,7 @@ export const zh_CN: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "耕作节奏",
-        "rhythmBody": "播种才是那段短暂而看得见的施法：每一级都固定是{plant}秒，因为锄头开放的是土地，而不是买来速度。拔起成熟的作物则是瞬发。没有可打断的施法，也没有背包检查会把它挡回来，而一畦成熟的作物你放多久它等多久，所以背包装满对农夫的代价，不过是走一趟把它腾空。\n\n一次收成付给你的是农产品和耕作熟练度。与一处矿脉不同，它完全不给角色经验，所以田畦是一门去经营的手艺，而不是一条升级的路。",
+        "rhythmBody": "播种是瞬发的，因为锄头开放的是土地，而不是买来速度：没有需要等待的施法，所以转身走开的农夫也一样已经种下了。拔起成熟的作物同样是瞬发。没有可打断的施法，也没有背包检查会把它挡回来，而一畦成熟的作物你放多久它等多久，所以背包装满对农夫的代价，不过是走一趟把它腾空。\n\n一次收成付给你的是农产品和耕作熟练度。与一处矿脉不同，它完全不给角色经验，所以田畦是一门去经营的手艺，而不是一条升级的路。",
         "gainHeading": "一次收成教会什么",
         "gainBody": "技能成长是确定的，而且只看你自己的计数，不看作物：熟练度在{p1}以下时，一次收成给{g1}点，在{p2}以下给{g2}点，在{p3}以下给{g3}点，此后直到{cap}的上限一律{g4}点。它从不掷技能提升的骰子，所以这段攀登有多长，全由这笔算术说了算。\n\n作物的阶决定的是一畦田能把你带到多远。第1阶作物教到{c1}便在那里变灰，第2阶作物教到{c2}，第3阶及以上一路教到上限，所以只有往上换田畦，计数才会继续往前走。",
         "yieldsHeading": "一次收成的产出",
@@ -10148,6 +10280,7 @@ export const zh_CN: EnTranslations = {
       "templates": {
         "battleground": "[战场] {name}：{message}",
         "party": "[队伍] {name}：{message}",
+        "raidWarning": "[团队警告] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄说：{message}",
         "toWhisper": "对{name}说：{message}",
@@ -10286,6 +10419,7 @@ export const zh_CN: EnTranslations = {
       "stunned": "你被击晕了！",
       "silenced": "你已被沉默！",
       "busy": "你正忙。",
+      "cannotCastWhileMoving": "你无法在移动时施法。",
       "abilityNotReady": "该技能尚未准备好。",
       "notEnoughRage": "怒气不足！",
       "notEnoughEnergy": "能量不足！",
@@ -10634,7 +10768,6 @@ export const zh_CN: EnTranslations = {
     },
     "cast": {
       "fishing": "钓鱼",
-      "farming": "播种",
       "gathering": "采集",
       "crafting": "制作",
       "disenchanting": "分解",
@@ -10978,6 +11111,19 @@ export const zh_CN: EnTranslations = {
       "buyConfirmAccept": "购买",
       "buyConfirmCancel": "取消",
       "buyChanged": "该上架在你确认前发生了变化。请核对价格后重试。",
+      "sweep": "扫货",
+      "sweepAria": "在市场扫货购买{item}",
+      "sweepTitle": "市场扫货：{item}",
+      "sweepClose": "关闭",
+      "sweepNote": "按单价从低到高整批买下其他卖家的上架，直到凑够你要的数量。你可能会比要求的多收到几件。",
+      "sweepQuantity": "需要数量",
+      "sweepQuoteNone": "没有可扫货的该物品上架。",
+      "sweepQuoteLine": "{listings}条上架共{units}件，合计{total}（每件{each}）",
+      "sweepQuoteShort": "仅有{listings}条上架共{units}件可购，合计{total}（每件{each}）",
+      "sweepButton": "扫货",
+      "sweepConfirmTitle": "确认市场扫货",
+      "sweepConfirmBody": "以{total}（每件{each}）从{listings}条上架购买{item} x{units}？",
+      "sweepChanged": "扫货报价在你确认前已变化。请核对总价后重试。",
       "sellNote": "从背包上架货物。物品售出时商人抽取 {cut}%。你正在使用 {used}/{max} 个上架位。",
       "sellPickEmpty": "点击背包中的物品来选择要出售的货物。",
       "quantity": "数量",
@@ -11017,7 +11163,9 @@ export const zh_CN: EnTranslations = {
       "ownListing": "这是你自己的上架。取消即可取回。",
       "cannotAfford": "你买不起。",
       "notYourListing": "这不是你的上架。",
-      "nothingToCollect": "你没有可领取内容。"
+      "nothingToCollect": "你没有可领取内容。",
+      "sweepNoListings": "没有可扫货的该物品上架。",
+      "sweepPriceChanged": "扫货送达前价格已变化。请核对报价后重试。"
     },
     "loot": {
       "takeAll": "全部拾取",
@@ -16506,6 +16654,21 @@ export const zh_CN: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "治疗假人"
+      },
+      "healing_dummy_tank": {
+        "name": "受伤的先锋假人"
+      },
+      "healing_dummy_soldier": {
+        "name": "受伤的士兵假人"
+      },
+      "healing_dummy_scout": {
+        "name": "危急的斥候假人"
+      },
+      "healing_dummy_caster": {
+        "name": "负伤的施法者假人"
+      },
+      "healing_dummy_ranger": {
+        "name": "伤痕累累的游侠假人"
       },
       "ridge_stalker": {
         "name": "山脊潜猎者"

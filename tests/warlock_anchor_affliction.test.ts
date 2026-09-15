@@ -34,9 +34,11 @@ describe('affliction 200 DPS anchors at 120 seconds', () => {
     // owner target, not a ceiling to restore: the Crucible wave introduces a
     // new power level, so when the Phase B set bonuses land
     // (docs/prd/ignivar-set-bonus-final.md), re-anchor these to whatever the
-    // new-tier kit actually measures, above 200 included.
+    // new-tier kit actually measures, above 200 included. #4048 lets the
+    // off-GCD Possess/Hour openers fire without a primary Eye target and the
+    // heroic four-seed mean rises to 193.51, still below the old 200 target.
     expect(mean('dps')).toBeGreaterThanOrEqual(163);
-    expect(mean('dps')).toBeLessThanOrEqual(190);
+    expect(mean('dps')).toBeLessThanOrEqual(196);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 

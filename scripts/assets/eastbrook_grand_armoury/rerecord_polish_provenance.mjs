@@ -52,6 +52,8 @@ async function derive() {
     mailboxRuntimeSha256: await fileSha256(inputs.mailboxRuntime),
     noticeboardRuntimeSha256: await fileSha256(inputs.noticeboardRuntime),
     rendererIntegrationSha256: await fileSha256(inputs.rendererIntegration),
+    entityGroundSampleSha256: await fileSha256(inputs.entityGroundSample),
+    entityGroundSampleCoreSha256: await fileSha256(inputs.entityGroundSampleCore),
     entityViewPolicySha256: await fileSha256(inputs.entityViewPolicy),
     viewPriorityPolicySha256: await fileSha256(inputs.viewPriorityPolicy),
     mailboxSourceFingerprint: eastbrookMailboxSourceFingerprint(),

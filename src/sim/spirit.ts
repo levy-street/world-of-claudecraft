@@ -36,6 +36,8 @@ import {
   dungeonAt,
   isDelvePos,
   isRiftPos,
+  LAST_KEEP_GRAVEYARD_ID,
+  LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   OVERWORLD_GRAVEYARDS,
   PLAYER_START,
   RIFT_REGION_HALF_X,
@@ -519,11 +521,29 @@ export function applyUnstuckSickness(ctx: SimContext, p: Entity, remaining?: num
 
 // --- spawning the angels ----------------------------------------------------
 
+interface SpiritHealerGraveyard {
+  id?: string;
+  x: number;
+  z: number;
+}
+
+function reservedOverworldSpiritHealerEntityId(graveyard: SpiritHealerGraveyard): number | null {
+  return graveyard.id === LAST_KEEP_GRAVEYARD_ID ? LAST_KEEP_SPIRIT_HEALER_ENTITY_ID : null;
+}
+
 // Spawn one Spirit Healer at a world position, returning its entity id. Reused by
 // the overworld ctor pass and by the per-instance dungeon/raid spawn. createNpc
-// draws no rng, so call order is determinism-neutral.
-export function spawnSpiritHealerAt(ctx: SimContext, x: number, z: number): number {
-  const npc = createNpc(ctx.nextId++, SPIRIT_HEALER, ctx.groundPos(x, z));
+// draws no rng, so call order is determinism-neutral. `entityId` is for reserved
+// world-service healers that must not consume the ordinary nextId stream.
+export function spawnSpiritHealerAt(
+  ctx: SimContext,
+  x: number,
+  z: number,
+  entityId?: number,
+): number {
+  const id = entityId ?? ctx.nextId++;
+  if (ctx.entities.has(id)) throw new Error(`Duplicate Spirit Healer entity id: ${id}`);
+  const npc = createNpc(id, SPIRIT_HEALER, ctx.groundPos(x, z));
   ctx.addEntity(npc);
   return npc.id;
 }
@@ -531,9 +551,9 @@ export function spawnSpiritHealerAt(ctx: SimContext, x: number, z: number): numb
 // Place an angel at every overworld graveyard. Called once from the Sim ctor.
 export function spawnOverworldSpiritHealers(
   ctx: SimContext,
-  graveyards: readonly { x: number; z: number }[] = OVERWORLD_GRAVEYARDS,
+  graveyards: readonly SpiritHealerGraveyard[] = OVERWORLD_GRAVEYARDS,
 ): void {
   for (const g of graveyards) {
-    spawnSpiritHealerAt(ctx, g.x, g.z);
+    spawnSpiritHealerAt(ctx, g.x, g.z, reservedOverworldSpiritHealerEntityId(g) ?? undefined);
   }
 }

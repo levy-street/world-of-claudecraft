@@ -370,6 +370,7 @@ describe('warmupExtensionsMatch', () => {
 describe('warmupApplies', () => {
   const ready = {
     enabled: true,
+    gpuTimer: false,
     iosWebKit: false,
     parallelCompile: true,
     hasCorpus: true,
@@ -385,6 +386,10 @@ describe('warmupApplies', () => {
     expect(warmupApplies({ ...ready, enabled: false })).toEqual({
       applies: false,
       reason: 'disabled',
+    });
+    expect(warmupApplies({ ...ready, gpuTimer: true })).toEqual({
+      applies: false,
+      reason: 'gpu-timer',
     });
     expect(warmupApplies({ ...ready, iosWebKit: true })).toEqual({
       applies: false,
@@ -412,6 +417,7 @@ describe('warmupApplies', () => {
     expect(
       warmupApplies({
         enabled: false,
+        gpuTimer: true,
         iosWebKit: true,
         parallelCompile: false,
         hasCorpus: false,

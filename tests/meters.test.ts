@@ -468,4 +468,70 @@ describe('combat meters', () => {
     expect(m.current!.tallies.has(2)).toBe(false);
     expect(m.history.length).toBe(1); // pull 1 alone, still in history
   });
+  describe('PvP hits on a player target (duel, arena, battleground)', () => {
+    // Duel opponent: a player entity that is NOT in the party set.
+    const pvpWorld = (): IWorld => {
+      const w = fakeWorld();
+      w.entities.set(3, { id: 3, kind: 'player', name: 'Rival', templateId: 'rogue' } as never);
+      return w;
+    };
+
+    it('tallies party damage dealt to a player target and labels the segment after the opponent', () => {
+      const w = pvpWorld();
+      const party = new Set([1, 2]);
+      const m = new MeterData(0);
+      m.onEvent(dmg(1, 3, 40, 'Mortal Strike'), w, party, 1000);
+      m.onEvent(dmg(1, 3, 25), w, party, 1500);
+      expect(m.current).not.toBeNull();
+      expect(m.current!.tallies.get(1)!.dmg).toBe(65);
+      expect([...m.current!.tallies.get(1)!.dmgByAbility.values()]).toEqual([
+        { ability: 'Mortal Strike', petName: null, amount: 40 },
+        { ability: null, petName: null, amount: 25 },
+      ]);
+      expect(m.allTime.tallies.get(1)!.dmg).toBe(65);
+      expect(m.current!.label).toBe('Rival');
+      // A player target is never a threat subject: the Threat tab stays mob-only.
+      expect(m.current!.mainMobId).toBeNull();
+      expect(m.current!.mainMobTemplateId).toBeNull();
+      expect(m.current!.threatSnapshotByMob.size).toBe(0);
+    });
+
+    it('does not credit the opponent hitting a party member, and keeps a mob label over a duel label', () => {
+      const w = pvpWorld();
+      const party = new Set([1, 2]);
+      const m = new MeterData(0);
+      m.onEvent(dmg(3, 1, 80), w, party, 1000); // opponent hits me: keeps the segment alive, no row
+      expect(m.current).not.toBeNull();
+      expect(m.current!.tallies.has(3)).toBe(false);
+      m.onEvent(dmg(1, 50, 10), w, party, 1200); // a mob joins the fight
+      m.onEvent(dmg(1, 3, 30), w, party, 1400);
+      expect(m.current!.tallies.get(1)!.dmg).toBe(40);
+      expect(m.current!.label).toBe('Wolf');
+      expect(m.current!.mainMobId).toBe(50);
+    });
+
+    it('never credits a self-sourced DoT tick or a hit on a party member, and keeps the default label', () => {
+      const w = pvpWorld();
+      const party = new Set([1, 2]);
+      const m = new MeterData(0);
+      m.onEvent(dmg(1, 1, 3, 'Bad Air'), w, party, 1000); // delve affix ticking on myself
+      m.onEvent(dmg(1, 2, 12, 'Whirlwind'), w, party, 1200); // party member as the target
+      expect(m.current).not.toBeNull();
+      expect(m.current!.tallies.has(1)).toBe(false);
+      expect(m.current!.label).toBe('Combat');
+      m.onEvent(dmg(1, 999, 40), w, party, 1400); // target missing from the world
+      expect(m.current!.tallies.has(1)).toBe(false);
+    });
+
+    it('latches the first opponent as the label instead of flipping per hit', () => {
+      const w = pvpWorld();
+      w.entities.set(4, { id: 4, kind: 'player', name: 'Second', templateId: 'mage' } as never);
+      const party = new Set([1, 2]);
+      const m = new MeterData(0);
+      m.onEvent(dmg(1, 3, 10), w, party, 1000);
+      m.onEvent(dmg(1, 4, 50), w, party, 1100);
+      expect(m.current!.tallies.get(1)!.dmg).toBe(60);
+      expect(m.current!.label).toBe('Rival');
+    });
+  });
 });

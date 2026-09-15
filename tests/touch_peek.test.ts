@@ -1,5 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import { TouchPeekGuard, TOOLTIP_PEEK_MS } from '../src/ui/touch_peek';
+import { describe, expect, it } from 'vitest';
+import {
+  exceedsPeekMoveTolerance,
+  TOOLTIP_PEEK_MOVE_TOLERANCE_PX,
+  TOOLTIP_PEEK_MS,
+  TouchPeekGuard,
+} from '../src/ui/touch_peek';
 
 describe('TouchPeekGuard', () => {
   it('a quick tap (no peek) activates the control', () => {
@@ -54,5 +59,29 @@ describe('TouchPeekGuard', () => {
   it('exposes a sane default hold threshold', () => {
     expect(TOOLTIP_PEEK_MS).toBeGreaterThan(300);
     expect(TOOLTIP_PEEK_MS).toBeLessThan(2000);
+  });
+});
+
+describe('exceedsPeekMoveTolerance', () => {
+  it('tolerates small jitter while the finger is effectively still', () => {
+    expect(exceedsPeekMoveTolerance(100, 100, 100, 100)).toBe(false);
+    expect(exceedsPeekMoveTolerance(100, 100, 103, 101)).toBe(false);
+    expect(exceedsPeekMoveTolerance(100, 100, 100 + TOOLTIP_PEEK_MOVE_TOLERANCE_PX, 100)).toBe(
+      false,
+    );
+  });
+
+  it('treats movement past the tolerance as scroll intent', () => {
+    expect(exceedsPeekMoveTolerance(100, 100, 100 + TOOLTIP_PEEK_MOVE_TOLERANCE_PX + 1, 100)).toBe(
+      true,
+    );
+    expect(exceedsPeekMoveTolerance(100, 100, 100, 250)).toBe(true);
+  });
+
+  it('measures straight-line distance, not per-axis drift', () => {
+    // A diagonal move whose per-axis components are each under tolerance can
+    // still exceed it in combined distance.
+    const half = TOOLTIP_PEEK_MOVE_TOLERANCE_PX;
+    expect(exceedsPeekMoveTolerance(0, 0, half, half)).toBe(true);
   });
 });

@@ -19,9 +19,11 @@ import {
   appearanceSignature,
   type PreviewAppearance,
   previewAppearanceVisual,
+  previewTryOnMainhand,
 } from './characters/preview_appearance';
 import { disposeOwnedWeaponSkinMaterials } from './characters/weapon_skin_materials';
 import { trackWebGLContext } from './context_release';
+import { previewPixelRatio } from './preview_pixel_ratio';
 import { shaderDebugRequested } from './shader_debug_flag';
 import {
   createWeaponVfx,
@@ -85,7 +87,7 @@ export function createArmoryPreview(
 ): ArmoryPreviewHandle {
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
   renderer.debug.checkShaderErrors = shaderDebugRequested();
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(previewPixelRatio(window.devicePixelRatio));
   renderer.setSize(Math.max(1, container.clientWidth), Math.max(1, container.clientHeight), false);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -155,12 +157,16 @@ export function createArmoryPreview(
 
   function createCharacterRig(nextSkinId: string | null): CharacterVisual {
     const nextAppearance = previewAppearanceVisual(currentAppearance);
+    // The try-on holds the real hands, and the offhand rides along so a skin
+    // whose type sits in the offhand previews on that hand (the same mirror the
+    // world draws); a skin neither hand can show dresses a stand-in mainhand.
     const rig = new CharacterVisual(
       nextAppearance.visualKey,
       0xffffff,
       currentAppearance.skin,
-      nextAppearance.weaponItemId,
+      previewTryOnMainhand(nextSkinId, nextAppearance.weaponItemId, nextAppearance.offhandItemId),
       nextAppearance.weaponOverride,
+      nextAppearance.offhandItemId,
     );
     rig.setWeaponVfxCameraFov(35);
     if (nextSkinId) rig.setWeaponSkin(nextSkinId);

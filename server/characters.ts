@@ -44,6 +44,7 @@
 import type * as http from 'node:http';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
+import { savedZoneId } from '../src/sim/saved_pos_exit';
 import type { CharacterState } from '../src/sim/sim';
 import type { PlayerClass } from '../src/sim/types';
 // The shared, host-agnostic bounds check for an untrusted look (the
@@ -390,7 +391,7 @@ export function buildCharacterList(
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
       offhandItemId: c.state?.equipment?.offhand ?? null,
       // The account's active Armory weapon skin for THIS character's class and
-      // held mainhand (the same shared rule the world and paperdoll use), so
+      // held hands (the same shared rule the world and paperdoll use), so
       // the char-select turntable matches the in-world render. Loadout is
       // account state; resolution is per character.
       weaponSkinId: resolveActiveWeaponSkin(
@@ -398,6 +399,7 @@ export function buildCharacterList(
         c.state?.equipment?.mainhand ?? null,
         weaponSkinLoadout,
         c.state?.skinCatalog === 'mech' ? 'mech' : 'class',
+        c.state?.equipment?.offhand ?? null,
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts
@@ -415,6 +417,11 @@ export function buildCharacterList(
       // Server-decided (cutoff + unspent token): the roster's one-shot
       // redesign button renders exactly when this is true.
       appearanceRerollAvailable: appearanceRerollAvailable(c),
+      // The zone this character stands in on login (the same rejoin rule
+      // addPlayer applies, so an instance save reads as its door's zone; null
+      // for a mid-match battleground save that resumes at the world start).
+      // Character select labels the roster row with it.
+      zoneId: savedZoneId(c.state?.pos),
     })),
   };
 }

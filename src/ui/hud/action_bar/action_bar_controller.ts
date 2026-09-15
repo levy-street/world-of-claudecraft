@@ -471,13 +471,17 @@ export class ActionBarController {
     // are the precedent that riding useItem does not imply a slot, though their
     // reason differs): a pattern is a one-shot unlock consumed on its first
     // successful use, so a hotbar slot would hold a dead button from the first
-    // press on; the bags are its home. Elixirs, scrolls, and flasks live on the
-    // mobile consumable tray instead.
+    // press on; the bags are its home. Scrolls and flasks live on the mobile
+    // consumable tray instead.
+    // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
+    // combat with no shared potion cooldown, so they are placeable exactly
+    // like a potion; the view paints no cooldown swipe on their slot.
     const item = ITEMS[itemId];
     return (
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||
+      item?.kind === 'elixir' ||
       item?.kind === 'mount' ||
       item?.use?.type === 'fishing' ||
       item?.use?.type === 'gatherTool' ||

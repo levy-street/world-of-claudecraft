@@ -23,6 +23,7 @@ import {
 } from '../src/render/shader_warm_client';
 import {
   holdForWarm,
+  holdRootWarm,
   type RootWarmRequest,
   SHADER_WARM_LANE_HOLD_CAP_MS,
   type WarmLaneRun,
@@ -211,6 +212,16 @@ describe('holdForWarm', () => {
     };
     return request;
   }
+
+  it('tells the client a hold a release ended, so no expiry rule reads it', async () => {
+    resetShaderWarmForTest();
+    const request = { ...requestOf(Promise.resolve(false)), released: () => true };
+    await holdRootWarm(request, 5_000, clockOf([0, 12]), () => () => {});
+    expect(shaderWarmSnapshot()).toMatchObject({ held: 1, heldReleased: 1, heldTimedOut: 0 });
+    resetShaderWarmForTest();
+    await holdRootWarm(requestOf(Promise.resolve(false)), 5_000, clockOf([0, 12]), () => () => {});
+    expect(shaderWarmSnapshot()).toMatchObject({ held: 1, heldReleased: 0 });
+  });
 
   it('resolves warm, with the time the hold actually took', async () => {
     const request = requestOf(Promise.resolve(true));

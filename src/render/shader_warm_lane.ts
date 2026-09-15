@@ -67,6 +67,9 @@ export interface RootWarmRequest {
    *  cannot-serve rule). Absent on a caller's own stand-in: the hold then
    *  starts its clock itself. */
   startedAtMs?: number;
+  /** A cannot-serve release ended the request's hold: the note must not feed
+   *  the expiry rules. Absent on a caller's own stand-in. */
+  released?: () => boolean;
 }
 
 function defaultSchedule(callback: () => void, ms: number): () => void {
@@ -172,6 +175,7 @@ function requestDecidedRootWarm(
       () => false,
     ),
     abandon: hold.abandon,
+    released: hold.wasReleased,
     startedAtMs,
   };
 }
@@ -185,7 +189,12 @@ export async function holdRootWarm(
 ): Promise<HoldOutcome> {
   const outcome = await holdForWarm(request, holdCapMs, now, schedule);
   try {
-    noteShaderWarmHold(outcome.warm, outcome.timedOut, outcome.holdMs);
+    noteShaderWarmHold(
+      outcome.warm,
+      outcome.timedOut,
+      outcome.holdMs,
+      request.released?.() === true,
+    );
   } catch {
     // The readout (and the breaker it may trip) never reaches the lane.
   }

@@ -13,7 +13,7 @@
 
 import { audio } from '../game/audio';
 import { ITEMS } from '../sim/data';
-import { itemInstancePayloadsEqual } from '../sim/item_instance_merge';
+import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../sim/item_instance_merge';
 import { isTransferLockedInstance } from '../sim/item_instance_transfer';
 import type { MaterialComposition } from '../sim/material_sources';
 import type { InvSlot, ItemInstancePayload } from '../sim/types';
@@ -138,13 +138,49 @@ export class MailboxWindow {
   }
 
   /** Stage a bag stack as a parcel (called by the bags window on click).
-   *  `instance` is the clicked slot's payload (issue 1165): an instanced copy
-   *  stages as ITSELF, a fixed single-copy parcel (the qty stepper stays
-   *  fungible-only); a plain stack stages fungibly exactly as before. */
+   *  `instance` is the clicked slot's payload (issue 1165): a MERGEABLE
+   *  instanced copy (item_instance_merge.ts isMergeableInstancePayload, e.g. a
+   *  rare-quality crafted potion whose only payload field is the crafter's
+   *  signature) stages the WHOLE owned unlocked stock as one slot, exactly
+   *  like a plain stack; a non-mergeable instanced copy (a unique rolled
+   *  item, a locked or charge-bearing one) still stages as ITSELF, a fixed
+   *  single-copy parcel; a plain stack stages fungibly exactly as before. */
   stageParcel(itemId: string, instance?: ItemInstancePayload): void {
     if (!this.isSendTab) return;
     const info = this.deps.world().mailInfo;
     const max = info?.maxAttachments ?? 3;
+    const materialCount = appendableMailParcelCount(
+      this.deps.world().inventory,
+      this.attachments,
+      itemId,
+      instance,
+    );
+    if (instance && materialCount === null && isMergeableInstancePayload(instance)) {
+      // Already staged: the first click already grabbed every owned unlocked
+      // copy, so a re-click is a no-op, exactly like the fungible dedupe
+      // below rather than a second, redundant slot.
+      if (
+        this.attachments.some(
+          (s) =>
+            s.itemId === itemId && !!s.instance && itemInstancePayloadsEqual(s.instance, instance),
+        )
+      )
+        return;
+      const owned = this.ownedInstancedCountFor(itemId, instance);
+      if (owned < 1) return;
+      if (this.attachments.length >= max) {
+        this.deps.showError(
+          t('hudChrome.mailbox.result.tooManyParcels', {
+            count: formatNumber(max, { maximumFractionDigits: 0 }),
+          }),
+        );
+        return;
+      }
+      this.attachments.push({ itemId, count: owned, instance });
+      audio.click();
+      this.renderParcels();
+      return;
+    }
     if (this.attachments.length >= max) {
       this.deps.showError(
         t('hudChrome.mailbox.result.tooManyParcels', {
@@ -153,16 +189,11 @@ export class MailboxWindow {
       );
       return;
     }
-    const materialCount = appendableMailParcelCount(
-      this.deps.world().inventory,
-      this.attachments,
-      itemId,
-      instance,
-    );
     if (instance) {
       // Material payloads can be reconstructed from source descriptors, so the
       // shared planner decides how many matching units remain after earlier
-      // chips. Other items retain the established byte-equal copy rule.
+      // chips. Other non-mergeable items retain the established one-copy
+      // one-slot rule.
       if (
         materialCount !== null
           ? materialCount < 1
@@ -229,16 +260,33 @@ export class MailboxWindow {
   private parcelCountCeiling(index: number): number {
     const slot = this.attachments[index];
     if (slot === undefined) return 0;
-    return (
-      mailParcelCountCeiling(this.deps.world().inventory, this.attachments, index) ??
-      this.ownedCountFor(slot.itemId)
+    const materialCeiling = mailParcelCountCeiling(
+      this.deps.world().inventory,
+      this.attachments,
+      index,
     );
+    if (materialCeiling !== null) return materialCeiling;
+    // A mergeable instanced slot (a signed potion, say) has its own owned
+    // count: ownedCountFor filters instanced slots out entirely, so it would
+    // wrongly floor this stepper at 0.
+    return slot.instance
+      ? this.ownedInstancedCountFor(slot.itemId, slot.instance)
+      : this.ownedCountFor(slot.itemId);
+  }
+
+  /** Whether a staged slot's quantity may move at all: every plain stack, plus
+   *  a MERGEABLE instanced one (item_instance_merge.ts
+   *  isMergeableInstancePayload), which stages as a single count-N slot the
+   *  same as a plain stack. A non-mergeable instanced slot (unique rolled,
+   *  locked, charge-bearing) stays fixed at its single copy. */
+  private parcelQtyAdjustable(slot: InvSlot): boolean {
+    return !slot.instance || isMergeableInstancePayload(slot.instance);
   }
 
   /** Nudge a staged parcel's quantity from the +/- stepper (#1444). */
   private adjustParcelQty(index: number, delta: number): void {
     const slot = this.attachments[index];
-    if (!slot || slot.instance) return;
+    if (!slot || !this.parcelQtyAdjustable(slot)) return;
     const next = clampParcelQty(slot.count, delta, this.parcelCountCeiling(index));
     if (next === slot.count) return;
     slot.count = next;
@@ -251,7 +299,7 @@ export class MailboxWindow {
    *  ("007", "", "999" over stock) snaps the field back to the real value. */
   private setParcelQty(index: number, raw: string): void {
     const slot = this.attachments[index];
-    if (!slot || slot.instance) return;
+    if (!slot || !this.parcelQtyAdjustable(slot)) return;
     const next = parseParcelQty(raw, this.parcelCountCeiling(index), slot.count);
     if (next !== slot.count) {
       slot.count = next;
@@ -875,7 +923,7 @@ export class MailboxWindow {
         qty?: HTMLInputElement;
         remove?: HTMLButtonElement;
       } = {};
-      if (!slot.instance && owned > 1) {
+      if (this.parcelQtyAdjustable(slot) && owned > 1) {
         const step = document.createElement('span');
         step.className = 'mail-parcel-qty';
         const minus = document.createElement('button');

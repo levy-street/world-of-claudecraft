@@ -185,6 +185,7 @@ import {
   varkhulWorldfireStage,
 } from '../varkhul_worldfire';
 import { resolveEncounterWipe } from './encounter_wipe';
+import { resolveLivingTarget } from './living_target';
 import { walkEncounterActorTo } from './scripted_walk';
 import { VARKHUL_DIALOGUE } from './varkhul_dialogue';
 
@@ -493,16 +494,6 @@ function initVarkhulEncounter(boss: Entity): VarkhulEncounterState {
     };
   }
   return boss.varkhul;
-}
-
-function resolveLivingTarget(boss: Entity, players: readonly Entity[]): Entity | null {
-  const current =
-    boss.aggroTargetId === null
-      ? null
-      : (players.find((player) => player.id === boss.aggroTargetId && !player.dead) ?? null);
-  const target = current ?? players.find((player) => !player.dead) ?? null;
-  boss.aggroTargetId = target?.id ?? null;
-  return target;
 }
 
 function clearBossCast(boss: Entity): void {

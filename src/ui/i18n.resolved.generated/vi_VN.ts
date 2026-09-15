@@ -62,6 +62,7 @@ export const vi_VN: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Hầm Ngục",
+      "town": "Thị trấn/thị xã",
       "difficulty": "Độ Khó",
       "name": "Tên",
       "spec": "Chuyên Môn",
@@ -159,6 +160,10 @@ export const vi_VN: EnTranslations = {
       "teleport": {
         "label": "Dịch chuyển",
         "description": "Di chuyển đến tọa độ chính xác trong thế giới."
+      },
+      "town": {
+        "label": "Trung tâm thị trấn",
+        "description": "Dịch chuyển tức thời đến trung tâm thành phố theo tên."
       },
       "dungeon": {
         "label": "Vào hầm ngục",
@@ -348,12 +353,25 @@ export const vi_VN: EnTranslations = {
       "banner": "Đang xem {name}"
     },
     "readyCheck": {
+      "title": "Kiểm tra sẵn sàng",
+      "close": "Đóng",
       "prompt": "{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?",
       "ready": "Sẵn Sàng",
       "notReady": "Chưa Sẵn Sàng",
+      "status": "Sẵn sàng: {ready}/{total}",
+      "waiting": "Đang chờ phản hồi...",
+      "memberReady": "{name} đã sẵn sàng.",
+      "memberNotReady": "{name} chưa sẵn sàng.",
+      "memberPending": "{name} chưa phản hồi.",
       "result": "Kiểm tra sẵn sàng: {ready} sẵn sàng, {notReady} chưa sẵn sàng, {noResponse} không phản hồi.",
       "notInPartyError": "Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.",
       "inProgressError": "Một lượt kiểm tra sẵn sàng đang diễn ra."
+    },
+    "pullTimer": {
+      "start": "Kéo vào {seconds} giây!",
+      "cancel": "Đã hủy kéo.",
+      "countdown": "{seconds}",
+      "pull": "Kéo!"
     },
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
@@ -578,6 +596,11 @@ export const vi_VN: EnTranslations = {
       "mountsTitle": "Máy ổn định",
       "mountBuyAria": "Mua {item}",
       "mountSkinType": "Ngoại hình thú cưỡi",
+      "mountInspectAria": "Xem trước {item}",
+      "mountRideIt": "Đi xe",
+      "mountOnly": "Chỉ lắp đặt",
+      "mountBuy": "Mua ngoại trang Mount",
+      "mountScopeLine": "Toàn bộ tài khoản. Được mặc bởi một nhân vật tại một thời điểm.",
       "loading": "Đang tải Cửa hàng WOC...",
       "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
       "balance": "Số dư Claudium",
@@ -1271,7 +1294,7 @@ export const vi_VN: EnTranslations = {
       "runSummary": "{total} trong {time}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Hội thoại"
     },
     "hubLesson": {
       "target": "Nhắm vào hình nộm để bắt đầu.",
@@ -1402,6 +1425,7 @@ export const vi_VN: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "Hành Động Cờ Chiến Trường",
       "sheathe": "Tra/Rút Vũ Khí",
+      "hideInterface": "Ẩn giao diện",
       "dive": "Lặn Xuống",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
@@ -1410,8 +1434,22 @@ export const vi_VN: EnTranslations = {
       "petDefensive": "Thú Cưng: Phòng Thủ",
       "petAggressive": "Thú Cưng: Hung Hăng",
       "targetPet": "Thú Cưng: Chọn",
+      "targetSelf": "Bản thân mục tiêu",
+      "targetParty1": "Thành viên bên mục tiêu 1",
+      "targetParty2": "Thành viên bên mục tiêu 2",
+      "targetParty3": "Thành viên bên mục tiêu 3",
+      "targetParty4": "Thành viên bên mục tiêu 4",
+      "targetParty5": "Thành viên bên mục tiêu 5",
+      "targetParty6": "Thành viên bên mục tiêu 6",
+      "targetParty7": "Thành viên bên mục tiêu 7",
+      "targetParty8": "Thành viên bên mục tiêu 8",
+      "targetParty9": "Thành viên bên mục tiêu 9",
       "mount": "Cưỡi Thú / Xuống Thú",
-      "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới."
+      "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới.",
+      "zoomIn": "Phóng to máy ảnh",
+      "zoomOut": "Thu nhỏ camera",
+      "wheelHint": "Bánh xe chuột cũng liên kết: cuộn lên hoặc xuống trong khi liên kết, với Ctrl, Alt hoặc Shift được giữ nếu bạn muốn. Zoom Camera In và Out ngồi trên bánh xe trần theo mặc định; di chuyển chúng đến một hợp âm như Ctrl+bánh xe để giải phóng bánh xe cho các khả năng.",
+      "wheelHeldRefused": "Một notch bánh xe không thể điều khiển một hành động được tổ chức như chuyển động. Chọn một phím hoặc một nút chuột cho nó."
     },
     "actionBar": {
       "editKeys": "Sửa phím thanh hành động",
@@ -1682,6 +1720,8 @@ export const vi_VN: EnTranslations = {
       "showReliquaryTracker": "Hiển thị Trình theo dõi Thánh tích",
       "confirmVendorSell": "Xác Nhận Trước Khi Bán",
       "confirmVendorSellNote": "Tắt tùy chọn này sẽ bán vật phẩm chỉ với một cú nhấp và không cần xác nhận, nên một ô túi bị xê dịch có thể khiến bạn bán nhầm vật phẩm.",
+      "confirmVendorSellMinQuality": "Xác nhận bán hàng từ chất lượng",
+      "confirmVendorSellMinQualityNote": "Các mặt hàng dưới chất lượng này được bán chỉ với một cú nhấp chuột; một mặt hàng bị bán sai vẫn có thể được mua lại từ nhà cung cấp.",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
@@ -1735,9 +1775,9 @@ export const vi_VN: EnTranslations = {
     },
     "controller": {
       "title": "Tay Cầm",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Thiết bị Được Kết nối",
+      "deviceConnected": "Đã kết nối",
+      "deviceDisconnected": "Không phát hiện bộ điều khiển",
       "glyphStyle": "Nhãn Nút",
       "glyphStyleAuto": "Tự Động",
       "glyphStyleXbox": "Xbox",
@@ -2125,20 +2165,20 @@ export const vi_VN: EnTranslations = {
       "hidePlaytimeAria": "Ẩn thời gian chơi"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
-      "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
-      "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "label": "Chi tiết ký tự",
+      "subtitle": "Cấp {level} {className}. {archetype}. Sở thích: {hobby}",
+      "subtitleNoHobby": "Cấp {level} {className}. {archetype}",
+      "stats": "Thống kê",
+      "progression": "Những người tôi quản lý",
+      "skills": "Kỹ năng",
+      "gathering": "Quy tụ",
+      "crafting": "Chế tạo",
+      "openProfessions": "Nghề nghiệp đang mở"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Hoàn thành",
+      "zoneSummary": "{count} ({ready} sẵn sàng)",
+      "shiftHint": "Shift-click vào một nhiệm vụ để liên kết nó trong cuộc trò chuyện."
     },
     "statInfo": {
       "fromYour": "Từ {value} {stat} của bạn:",
@@ -2388,7 +2428,7 @@ export const vi_VN: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Báo Cáo Lỗi",
-      "online": "Online",
+      "online": "Trực tuyến",
       "realm": "Thế Giới",
       "character": "Nhân vật",
       "position": "Vị Trí",
@@ -3248,7 +3288,30 @@ export const vi_VN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
       "cheaterTag": "< Kẻ Gian Lận >",
-      "pledgeTag": "Trung Thành Với {guild}"
+      "pledgeTag": "Trung Thành Với {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Đấu giá",
+        "banker": "Nhà cái",
+        "riftForgemaster": "Thợ rèn Rift",
+        "cardMaster": "Bậc thầy về thẻ",
+        "crucibleQuartermaster": "Crucible Quartermaster",
+        "heroicQuartermaster": "Hiệu trưởng quân khu anh hùng",
+        "pvpVendor": "Nhà cung cấp PvP",
+        "weaponsmithTrainer": "Giảng viên thợ rèn",
+        "cookingTrainer": "Huấn luyện viên nấu ăn",
+        "tailoringTrainer": "Huấn luyện viên may đo",
+        "engineeringTrainer": "Giảng viên kỹ thuật",
+        "leatherworkingTrainer": "Huấn luyện viên gia công da",
+        "alchemyTrainer": "Alchemy Trainer",
+        "weaponVendor": "Nhà cung cấp vũ khí",
+        "armorVendor": "Nhà cung cấp áo giáp",
+        "armsDealer": "người buôn bán vũ khí",
+        "foodVendor": "Nhà cung cấp Thực phẩm & Đồ uống",
+        "potionVendor": "Nhà cung cấp thuốc",
+        "stableMaster": "Bậc thầy ổn định",
+        "generalGoods": "Hàng Tổng Hợp"
+      }
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -3267,7 +3330,7 @@ export const vi_VN: EnTranslations = {
       "lock": "Khóa khung người chơi"
     },
     "partyFrames": {
-      "header": "Party",
+      "header": "Tiệc tùng",
       "section": "Khung Tổ Đội và Raid",
       "optionsSection": "Tùy Chọn Khung Tổ Đội",
       "unlock": "Di chuyển khung tổ đội và raid",
@@ -3482,6 +3545,7 @@ export const vi_VN: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
+      "fineFarmGrade": "Chất lượng tốt. Một số vụ thu hoạch diễn ra tốt đẹp, thường xuyên hơn ở kỹ năng Nông nghiệp cao hơn hoặc với Artisan's Eye bị tính phí. Sản phẩm thông thường không bao giờ được tính ở những nơi yêu cầu chất lượng tốt.",
       "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
       "usedBy": "Được dùng bởi {crafts}.",
       "arcaneDust": "Nguyên liệu chế tác. Thu được khi giải phép trang bị phổ thông và khác thường.",
@@ -4022,6 +4086,25 @@ export const vi_VN: EnTranslations = {
       "lastSeenNever": "chưa bao giờ",
       "ignoredTab": "Đã bỏ qua",
       "blockedTab": "Đã chặn",
+      "who": {
+        "tab": "Đối tượng",
+        "searchPlaceholder": "Tên, khu vực hoặc bang hội",
+        "search": "Tìm kiếm",
+        "loading": "Hỏi vương quốc đang trực tuyến...",
+        "empty": "Không có người chơi nào phù hợp.",
+        "count": "{total} trực tuyến",
+        "countFiltered": "{shown} trong tổng số {total} trực tuyến",
+        "capped": "Hiển thị {delivered} đầu tiên. Thu hẹp tìm kiếm để xem phần còn lại.",
+        "classFilter": "Lọc theo lớp",
+        "allClasses": "Mọi hạng",
+        "colStatus": "Trạng thái",
+        "colName": "Tên",
+        "colLevel": "Trình độ",
+        "colClass": "Class",
+        "colZone": "Phân vùng",
+        "colGuild": "Liên minh",
+        "sortTitle": "Sắp xếp theo {column}"
+      },
       "ignoredEmpty": "Bạn không bỏ qua ai.",
       "blockedEmpty": "Bạn chưa chặn ai.",
       "blockSearchPlaceholder": "Tên người chơi",
@@ -4143,6 +4226,7 @@ export const vi_VN: EnTranslations = {
           "farming": "Hoạt động từ túi khi bạn trồng ở luống."
         },
         "speed": "Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.",
+        "wieldDegrade": "Dưới kỹ năng đó, nó vẫn hoạt động như một công cụ cấp thấp hơn.",
         "rodRequired": "Cần thiết để câu cá.",
         "rodBite": "Cá cắn câu sớm hơn tới {seconds} giây.",
         "rodReel": "Kéo dài thời gian thu dây thêm {seconds} giây.",
@@ -4415,8 +4499,20 @@ export const vi_VN: EnTranslations = {
       "majorsLabel": "Chuyên ngành: {a} và {b}",
       "pairsHeld": "Các cặp được tổ chức: {count}",
       "returnsLabel": "Trả về: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
-      "tutorialLink": "Profession tutorial"
+      "retentionFooter": "Lợi nhuận trên respec: 60% kỹ năng được giữ lại.",
+      "tutorialLink": "Hướng dẫn chuyên môn"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Công thức",
+      "collapseHint": "Thu gọn công cụ theo dõi công thức",
+      "expandHint": "Mở rộng công cụ theo dõi công thức",
+      "pin": "Chấu",
+      "unpin": "Bỏ ghim",
+      "pinFull": "Trình theo dõi công thức đã đầy (tối đa {cap} công thức)",
+      "pinAria": "Ghim {name} vào trình theo dõi HUD",
+      "unpinAria": "Bỏ ghim {name} khỏi trình theo dõi HUD",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Chế tạo",
@@ -4448,10 +4544,11 @@ export const vi_VN: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(tiêu tốn {count} hảo hạng)",
       "reagentVaultDraw": "(lấy {count} từ kho của bạn)",
+      "reagentOrdinaryHeld": "({name} giữ: {count}, nhưng chỉ tính điểm tốt ở đây)",
       "vaultUnreachable": "Kho Nguyên Liệu không thể tiếp cận được ở đây.",
       "craftFeeLine": "Phí chế tạo: {fee} mỗi món",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Vật liệu trong hầm của bạn được rút ra tự động. Tìm hiểu thêm công thức nấu ăn tại nhà ga.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
       "craftedToastQty": "Đã chế tác: {name} x{qty}",
@@ -4541,8 +4638,8 @@ export const vi_VN: EnTranslations = {
       "attunedBanner": "Đã Thụ Ngộ: {title}",
       "tierTutorial": {
         "title": "Bậc Đầu Tiên Của Bạn",
-        "tierCap": "Một nghề thủ công đạt bậc đầu tiên ở kỹ năng {skill}, và mỗi bậc cải thiện những gì nó có thể làm. Nhưng một nghề chỉ vượt qua công việc hiếm khi nó là một trong những chuyên ngành của bạn.",
-        "radar": "Các nghề thủ công của bạn tạo thành một bánh xe. Hãy thụ ngộ với một đôi lân cận và hai nghề đó trở thành chuyên ngành không giới hạn, một nghề đối diện trên bánh xe trở thành sở thích bị giới hạn ở mức hiếm.",
+        "tierCap": "Một nghề thủ công đạt đến cấp độ đầu tiên với kỹ năng {skill} và mỗi cấp độ cải thiện những gì nó có thể tạo ra. Nhưng một nghề thủ công chỉ vượt qua công việc hiếm hoi một khi nó là một trong hai chuyên ngành của bạn.",
+        "radar": "Nghề nghiệp của bạn tạo thành một bánh xe. Tập trung vào một cặp liền kề và hai nghề thủ công đó trở thành những chuyên ngành chưa được khai phá, một nghề thủ công trên bánh xe trở thành một sở thích hiếm có, và phần còn lại nằm im: kiến thức của họ được lưu giữ, nhưng được giới hạn chung cho đến khi bạn tiếp nhận chúng một lần nữa.",
         "masters": "Các bậc thầy thủ công trong thị trấn cung cấp nhiệm vụ thụ ngộ. Hãy thăm một người để chọn đôi khi bạn sẵn sàng. Những gì bạn đã học sẽ không bao giờ mất.",
         "dismiss": "Đã hiểu"
       },
@@ -4555,7 +4652,7 @@ export const vi_VN: EnTranslations = {
       "commissionBound": "Đồ ủy thác: đã ràng buộc với người nhận"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Người bán bổ sung hàng hóa thông thường; danh sách người chơi ngồi bên cạnh họ với mức giá chào bán."
     },
     "itemMenu": {
       "use": "Sử Dụng",
@@ -4836,6 +4933,7 @@ export const vi_VN: EnTranslations = {
       "roleDps": "Gây Sát Thương",
       "freeRoles": "Chào đón mọi vai trò",
       "lockoutDaily": "Khóa hàng ngày trên trùm cuối",
+      "lockoutWeekly": "Khóa cửa hàng tuần đối với mỗi ông chủ",
       "lockoutNone": "Không có khóa",
       "lockedFor": "Bị khóa khoảng {minutes} phút",
       "attunement": "Yêu cầu điều chỉnh: {quest}",
@@ -4849,6 +4947,8 @@ export const vi_VN: EnTranslations = {
       "lootMaybe": "Tối đa một trong số này có thể rơi:",
       "lootChance": "Cơ hội rơi thêm:",
       "lootHeroic": "Thưởng anh hùng, luôn rơi một trong số này:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Chỉ dành cho cấp độ {min} đến {max}",
       "blockedSpec": "Yêu cầu chuyên môn hóa",
@@ -4922,7 +5022,33 @@ export const vi_VN: EnTranslations = {
         "kings_wrath": "Cơn Thịnh Nộ Của Vua (30%: cộng sát thương vĩnh viễn, bẫy sàn nhanh hơn)",
         "bone_storm": "Bão Xương (hắn bỏ qua thù hận, xoáy và lao vào raid)",
         "crown_endures": "Vương Miện Trường Tồn (cuồng nộ cứng ở 6:00, heroic 5:00)",
-        "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)"
+        "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)",
+        "bloodmane_rend": "Bloodmane Rend (chảy máu, theo dõi các giao dịch hoán đổi mục tiêu)",
+        "tusk_sweep": "Quét ngà (khe hở trán)",
+        "ancestral_sap": "Sap tổ tiên (chữa lành các đồng minh của nó)",
+        "call_of_the_hunt": "Call of the Hunt (đẩy nhanh các đồng minh gần đó)",
+        "thickhide_ward": "Thickhide Ward (khiên chắn cho các đồng minh gần đó)",
+        "beast_pit_quake": "Động đất Beast Pit (thiệt hại khu vực)",
+        "wildheart_pulse": "Wildheart Pulse (sát thương vùng xung)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Thương hiệu của Pyre (xếp dấu lửa, rửa sạch trong nước ống dẫn)",
+        "forge_strike": "Forge Strike (xếp chồng lên nhau)",
+        "rain_of_cinders": "Mưa xi măng (ba nón lửa, đứng giữa chúng)",
+        "falling_cinders": "Chất kết dính rơi xuống (vòng tròn thiên thạch trên người chơi, di chuyển ra ngoài)",
+        "revolving_inferno": "Địa ngục quay tròn (xoay tia lửa, di chuyển qua các khoảng trống)",
+        "forge_wave": "Làn sóng rèn (mở rộng tường lửa, sử dụng hai làn đường an toàn)",
+        "apocalypse_add": "Ignivar Ashcaller (ưu tiên thêm casting Apocalypse, kill it fast)",
+        "judgment_of_the_forge": "Phán quyết của Forge (tạm dừng, chia sẻ một nơi trú ẩn an toàn)",
+        "last_inferno": "Địa ngục cuối cùng (đốt cháy 45 giây ở mức 20% máu)",
+        "chains_of_the_forge": "Chains of the Forge (chỉ anh hùng, ở gần đối tác được liên kết của bạn)",
+        "makers_brand": "Thương hiệu của nhà sản xuất (xếp chồng lên nhau)",
+        "forgefathers_sweep": "Forgefather's Sweep (hình nón phía trước rộng ở một chiếc xe tăng)",
+        "tempering_ray": "Tia nhiệt (dòng đến một người chơi được đánh dấu, chặn nó)",
+        "cinder_orbs": "Cinder Orbs (người chơi được đánh dấu trải rộng đến các cạnh phòng)",
+        "forgestorm": "Forgestorm (vòng tròn sao băng rơi xuống, di chuyển ra ngoài)",
+        "shared_pyre": "Dãy Pyre Chung (tập hợp vòng tròn, chia sẻ sát thương)",
+        "anvils_decree": "Nghị định của Anvil (ba cuộc tấn công búa toàn diện, chữa lành)",
+        "masters_assembly": "Hội đồng tổng thể (chặn dầm rèn, xoay chặn)"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const vi_VN: EnTranslations = {
       "applied": "Đã áp dụng",
       "owned": "Đã sở hữu",
       "storeOnly": "Có tại Cửa hàng WOC",
+      "preview": "Xem trước",
+      "previewAria": "Xem trước {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Ngoại hình thú cưỡi phủ lên thú cưỡi mà nhân vật này đang cưỡi. Nó không bao giờ thay đổi tốc độ.",
       "mountsNoMount": "Trước hết hãy sở hữu một thú cưỡi: ngoại hình cần có thứ để cưỡi.",
@@ -5182,30 +5310,30 @@ export const vi_VN: EnTranslations = {
       "levels": "Cấp {min} đến {max}"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Cấp {level}",
+      "landmarkCount": "{count} mốc",
+      "filtersAria": "Các Tầng Lớp Ánh Xạ UV",
       "filters": {
-        "quests": "Quests",
-        "gather": "Gather",
-        "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "quests": "Nhiệm Vụ",
+        "gather": "Tập họp",
+        "dungeons": "Hầm ngục",
+        "services": "Các dịch vụ",
+        "players": "Cầu thủ"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
-      "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "trackedQuests": "Nhiệm vụ được theo dõi",
+      "noTrackedQuests": "Không có nhiệm vụ được theo dõi",
+      "availableNearby": "Có sẵn gần đó",
+      "noNearbyQuests": "Không có nhiệm vụ gần đó",
+      "distance": "{distance} yard",
+      "showRoute": "Hiển thị lộ trình",
+      "untrack": "Bỏ theo dõi",
+      "track": "Bám",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
+        "dungeon": "Hầm ngục",
+        "ore": "Quặng",
+        "herb": "RAU THƠM",
         "mail": "Mail",
-        "passage": "Passage"
+        "passage": "lối đi; ngõ; hành lang đi qua"
       }
     },
     "arenaGate": {
@@ -5226,7 +5354,7 @@ export const vi_VN: EnTranslations = {
       "tabBrowse": "Duyệt",
       "tabSell": "Bán",
       "tabActivity": "Hoạt Động Của Tôi",
-      "tabHistory": "Sales History",
+      "tabHistory": "Lịch sử bán hàng",
       "tabsLabel": "Các mục của Sàn Giao Dịch $WOC",
       "loading": "Đang tải Sàn Giao Dịch...",
       "loadFailed": "Không thể kết nối tới Sàn Giao Dịch. Hãy thử lại sau ít phút.",
@@ -5251,16 +5379,16 @@ export const vi_VN: EnTranslations = {
       "colCurrentBid": "Giá Thầu Hiện Tại",
       "colBuyNow": "Mua Ngay",
       "colTimeLeft": "Thời Gian Còn Lại",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
-      "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "colBuyer": "Người mua",
+      "colSoldAt": "Đã bán",
+      "colSalePrice": "Giá giảm",
+      "colSaleType": "Loại",
+      "saleTypeAuction": "Đấu giá",
+      "saleTypeBuyNow": "Chọn mua",
+      "saleTypeDirected": "Được định hướng",
+      "saleTypeUnknown": "Không xác định",
+      "historyEmpty": "Chưa có doanh số nào được ghi nhận.",
+      "historyError": "Không thể tải lịch sử bán hàng.",
       "reserveMet": "Đã đạt giá dự trữ",
       "reserveNotMet": "Chưa đạt giá dự trữ",
       "yourListing": "Tin rao của bạn",
@@ -5933,6 +6061,7 @@ export const vi_VN: EnTranslations = {
       "deeds": "Sách Kỳ Công",
       "reliquary": "Kỳ Trân Các",
       "sheathe": "Tra/Rút Vũ Khí",
+      "hideInterface": "Ẩn giao diện (ảnh chụp màn hình và video)",
       "crafting": "Chế Tác",
       "mount": "Cưỡi Thú / Xuống Thú",
       "calendar": "Lịch Sự Kiện",
@@ -5962,6 +6091,8 @@ export const vi_VN: EnTranslations = {
       "attackMove": "Di Chuyển Tấn Công (chỉ khi bạn đã bật tùy chọn này)",
       "meters": "Bảng thống kê (sát thương, hồi máu, và đe dọa)",
       "petMark": "Thú Cưng: Đánh Dấu, chọn thú cưng của chính bạn (giống hệt việc bấm vào khung của nó)",
+      "targetSelf": "Nhắm mục tiêu cho chính bạn",
+      "targetParty": "Nhắm mục tiêu vào các thành viên trong nhóm từ 1 đến 9, từ trên xuống dưới khi khung nhóm hiển thị cho họ",
       "onBarBinding": "Bạn cũng có thể gán phím trực tiếp từ thanh hành động: chọn Sửa phím thanh hành động trong bảng Gán Phím, rồi bấm vào một ô trên thanh đang hiển thị và nhấn phím bạn muốn. Bấm Xong khi hoàn tất. Cách này chỉ dùng được trên máy tính, vì nó cần một bàn phím vật lý.",
       "clickMoveNote": "Bấm Để Di Chuyển mặc định tắt cho đến khi bạn bật nó lên: mở bảng Gán Phím trong menu trò chơi, bật Bấm Để Di Chuyển, rồi dùng dòng Nút Bấm Để Di Chuyển bên dưới để chọn nút chuột nào đảm nhận việc đi bộ (Nhấp Trái theo mặc định, hoặc Nhấp Phải). Khi đã bật, bấm vào một điểm trên mặt đất sẽ đưa bạn đi bộ tới đó, kèm một dấu hiệu trên mặt đất cho biết bạn đang hướng tới đâu. Bấm vào một sinh vật hoặc người chơi khác sẽ đưa bạn đi tới gần họ rồi dừng lại trong tầm, trong khi cú bấm đó vẫn làm nhiệm vụ thường lệ là chọn mục tiêu hoặc tương tác; nếu bạn đã đủ gần để chạm tới thứ vừa bấm, bạn chỉ đơn giản tương tác và đứng nguyên tại chỗ. Bất kỳ phím di chuyển nào cũng lập tức giành lại quyền điều khiển và kết thúc chuyến đi, và giữ nút chuột để nhìn quanh cũng vậy. Nhảy thì không, nên bạn vẫn tiếp tục di chuyển xuyên qua cú nhảy, còn mở menu trò chơi chỉ tạm dừng chuyến đi, và nó tiếp tục khi bạn đóng menu lại."
     },
@@ -6099,7 +6230,8 @@ export const vi_VN: EnTranslations = {
       "ifLockBars": "Khóa các thanh của bạn để bạn không vô tình kéo một kỹ năng ra khỏi ô.",
       "keybindsHeading": "Bảng Gán Phím",
       "keybindsBody": "Danh sách phím chỉ là một nửa của bảng đó. Phía trên nó là các công tắc quyết định cách con chuột của bạn điều khiển trò chơi: Camera Chuột, con trỏ có khóa lại khi bạn xoay hay không, Bấm Để Di Chuyển và nút chuột nào kích hoạt nó, Di Chuyển Tấn Công, bố cục cảm ứng thuận tay trái, và bộ lọc lời tục tĩu cho khung chat.",
-      "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn."
+      "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn.",
+      "keybindsWheelBody": "Bản thân bánh xe cũng bị ràng buộc. Zoom Camera In và Zoom Camera Out là các liên kết thông thường nằm trên bánh xe trần theo mặc định, vì vậy bạn có thể di chuyển chúng đến Ctrl cộng với bánh xe hoặc tới các phím, sau đó cuộn bánh xe tự do để kích hoạt các khe thanh hành động. Một rãnh bánh xe không có cơ cấu nhả nên nó không thể điều khiển một hành động được giữ lại như di chuyển về phía trước."
     },
     "combat": {
       "intro": "Chiến đấu tuân theo những quy tắc MMO cổ điển quen thuộc. Bạn không bao giờ cần nghiên cứu bất kỳ điều gì để chơi tốt, đây chỉ là hình dáng cách các trận đấu vận hành.",
@@ -6153,7 +6285,7 @@ export const vi_VN: EnTranslations = {
       "framesMoveBodyEditFrames": "Khung của bạn, khung mục tiêu và khung tổ đội đều di chuyển được. Mỗi khung có nút di chuyển nhỏ ở góc: mở khóa, kéo đến nơi muốn đặt rồi khóa lại để cú bấm nhầm không làm nó xê dịch. Chỉnh Khung ở đầu thẻ Khung trong tùy chọn Giao Diện mở khóa phần còn lại của giao diện cùng lúc, gồm cả ba khung trên: thanh hành động, thanh niệm phép, thanh đòn đánh, thanh kinh nghiệm, bản đồ nhỏ, dãy nút, khung thú cưng, thanh tư thế, hàng bùa lợi và bùa hại, cùng nhãn Nhắc Danh Sách Mong Muốn. Mỗi thành phần hiện tên khi mở khóa. Nếu đặt nhầm, Khôi Phục Mặc Định ở cuối cùng thẻ Khung đó đưa tất cả về vị trí ban đầu.",
       "framesGovernedExtra": "Chỉnh Khung cũng mở khóa cụm theo dõi phía dưới (nhiệm vụ và mục tiêu đang theo dõi, tiến độ chiến công, trang Thánh Tích, hang thám hiểm hiện tại, khe nứt đang tham gia, và công thức hoặc đơn đặt chế tác đang theo dõi), thanh hành động cạnh khung thú cưng, khung hiệu ứng theo thời gian trên mục tiêu để xem bùa hại của bạn trên kẻ địch gần đó, huy hiệu Tận Hiến của Thánh Kỵ Sĩ, thanh Thống Khổ của Thuật Sĩ, lớp hiển thị phép được kích hoạt, thanh đếm đòn tay phụ cho người dùng hai vũ khí và cửa sổ thống kê sát thương có thẻ. Mỗi thành phần hiện nhãn tên riêng khi mở khóa.",
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",
@@ -7489,7 +7621,7 @@ export const vi_VN: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Bùa phép có bốn bậc. Bậc cơ bản dùng Bụi Thanh Âm, thêm ít Tinh Chất ở đầu trên, và phủ lên ô vũ khí, tay phụ cùng mọi ô giáp, với đủ lựa chọn trục chỉ số để mọi cách xây dựng có thứ cho từng ô: khiên và tay phụ pháp sư cầm trên tay có bùa Thể Lực riêng, nên không ô trang bị nào bị bỏ trống. Bậc Cường Hóa tốn một Mảnh Thanh Âm và Tinh Chất, cho bonus mạnh hơn ở các ô quan trọng nhất. Mảnh còn có ba nơi tiêu khác: hai công thức lá bùa, mỗi công thức năm mảnh; bậc cao nhất của nạp hiệu ứng công cụ; và bậc Quang, trong đó bùa vũ khí và ngực mỗi loại tốn một mảnh còn Truyền Lực tốn hai, nên hãy để dành vài mảnh.\n\nỞ giữa là năm bùa Khắc, mỗi bùa dùng một chỉ số phụ riêng, để không thứ gì bạn nghiền thành mực bị lãng phí: Cạnh Khắc cho vũ khí và Sức Mạnh, dùng Thép Cộng Hưởng; Dấu Khắc cho vũ khí và Trí Tuệ, dùng Gỗ Cộng Hưởng; Dệt Khắc cho ngực và Tinh Thần, dùng Chỉ Cộng Hưởng; Da Khắc cho chân và Nhanh Nhẹn, dùng Da Cộng Hưởng; Liên Kết Khắc cho mũ và Thể Lực, dùng Liên Kết Cộng Hưởng. Mỗi loại còn cần hai Tinh Chất Thanh Âm; khi một ô và chỉ số có cả bùa cơ bản lẫn Cường Hóa, bonus Khắc nằm giữa hai mức, còn Dệt Khắc là bùa Tinh Thần ngực mạnh nhất hoàn toàn và Da Khắc là bùa Nhanh Nhẹn chân duy nhất. Bảng dưới có bonus chính xác.\n\nTrên các bậc thấp thông thường là bậc Quang, đỉnh cao của công việc thường: Phù Phép 100 cho bốn loại, 125 cho Truyền Lực, như cột Kỹ Năng bên dưới. Mỗi loại cần Chất Dẫn Quang và thêm một bước cho ô của mình: vũ khí có lựa chọn Sức Mạnh và Phép Lực, ngực và giày. Cuối cùng, Truyền Lực Quang chỉ bám được vào món đã Hoàn Thiện: Hoàn Thiện là việc của người mặc, không phải thợ pháp khắc, và trang Nghề Nghiệp giải thích cách món đồ đạt trạng thái đó.\n\nNhiệt Huyết Ngọn Lửa Cuối Cùng là công thức raid riêng, không phải bùa thường miễn phí. Học công thức có thể giao dịch ở Phù Phép 100 trước khi áp dụng. Mỗi lần dùng cần 3 Lõi Ngọn Lửa Cuối Cùng và 2 Mảnh Thanh Âm; công thức có thể rơi trong Lò Luyện hoặc mua từ quân nhu trưởng với một lõi. Quy tắc proc cận chiến và tốc độ vũ khí được trình bày đầy đủ bên dưới.",
+        "enchantsNoteRaidFormula": "Bùa phép có bốn bậc. Bậc cơ bản dùng Bụi Thanh Âm, thêm ít Tinh Chất ở đầu trên, và phủ lên ô vũ khí, tay phụ cùng mọi ô giáp, với đủ lựa chọn trục chỉ số để mọi cách xây dựng có thứ cho từng ô: khiên và tay phụ pháp sư cầm trên tay có bùa Thể Lực riêng, nên không ô trang bị nào bị bỏ trống. Bậc Cường Hóa tốn một Mảnh Thanh Âm và Tinh Chất, cho bonus mạnh hơn ở các ô quan trọng nhất. Mảnh còn có ba nơi tiêu khác: hai công thức lá bùa, mỗi công thức một mảnh (phần còn lại của giá lá bùa là tinh chất và bụi); bậc cao nhất của nạp hiệu ứng công cụ; và bậc Quang, trong đó bùa vũ khí và ngực mỗi loại tốn một mảnh còn Truyền Lực tốn hai, nên hãy để dành vài mảnh.\n\nỞ giữa là năm bùa Khắc, mỗi bùa dùng một chỉ số phụ riêng, để không thứ gì bạn nghiền thành mực bị lãng phí: Cạnh Khắc cho vũ khí và Sức Mạnh, dùng Thép Cộng Hưởng; Dấu Khắc cho vũ khí và Trí Tuệ, dùng Gỗ Cộng Hưởng; Dệt Khắc cho ngực và Tinh Thần, dùng Chỉ Cộng Hưởng; Da Khắc cho chân và Nhanh Nhẹn, dùng Da Cộng Hưởng; Liên Kết Khắc cho mũ và Thể Lực, dùng Liên Kết Cộng Hưởng. Mỗi loại còn cần hai Tinh Chất Thanh Âm; khi một ô và chỉ số có cả bùa cơ bản lẫn Cường Hóa, bonus Khắc nằm giữa hai mức, còn Dệt Khắc là bùa Tinh Thần ngực mạnh nhất hoàn toàn và Da Khắc là bùa Nhanh Nhẹn chân duy nhất. Bảng dưới có bonus chính xác.\n\nTrên các bậc thấp thông thường là bậc Quang, đỉnh cao của công việc thường: Phù Phép 100 cho bốn loại, 125 cho Truyền Lực, như cột Kỹ Năng bên dưới. Mỗi loại cần Chất Dẫn Quang và thêm một bước cho ô của mình: vũ khí có lựa chọn Sức Mạnh và Phép Lực, ngực và giày. Cuối cùng, Truyền Lực Quang chỉ bám được vào món đã Hoàn Thiện: Hoàn Thiện là việc của người mặc, không phải thợ pháp khắc, và trang Nghề Nghiệp giải thích cách món đồ đạt trạng thái đó.\n\nNhiệt Huyết Ngọn Lửa Cuối Cùng là công thức raid riêng, không phải bùa thường miễn phí. Học công thức có thể giao dịch ở Phù Phép 100 trước khi áp dụng. Mỗi lần dùng cần 3 Lõi Ngọn Lửa Cuối Cùng và 2 Mảnh Thanh Âm; công thức có thể rơi trong Lò Luyện hoặc mua từ quân nhu trưởng với một lõi. Quy tắc proc cận chiến và tốc độ vũ khí được trình bày đầy đủ bên dưới.",
         "charmsHeading": "Bùa cho công cụ của người thu hoạch",
         "formulaRequired": "Cần công thức",
         "charmsBody": "Pháp Khắc cũng là nơi những lá bùa của người thu hoạch ra đời. Thợ máy Gizzel dạy cả hai tại xưởng dụng cụ ở Đông Khê một khi Pháp Khắc của bạn đạt 25: Túi Trữ Của Thợ Thu Thập, thứ cộng thêm một đơn vị vào một lần thu hoạch, và Con Mắt Nghệ Nhân, thứ nâng bậc của những gì thu được. Mỗi loại được chế tạo một lần, rồi gắn vào một cây cuốc, rìu, hoặc liềm, nơi nó chỉ tiêu một lượt nạp trên những lần thu hoạch mà nó thực sự cải thiện được.\n\nViệc nạp lại là nơi nghề này tiếp tục kiếm tiền. Lượt nạp được khôi phục bởi bất kỳ ai sở hữu công cụ, không phải bởi một thợ pháp khắc ghé qua, và việc nạp lại tốn một nửa nguyên liệu khi chủ công cụ đó chính là thợ pháp khắc đã ký lên lá bùa, ít hơn nữa nếu có chuyên ngành Pháp Khắc. Vậy nên một lá bùa bán qua quầy là một lần bán duy nhất, trong khi những lá bùa gắn trên chính công cụ của bạn là những lá bùa rẻ để tiếp tục vận hành. Toàn bộ thang lượt nạp và nguyên liệu có trên bất kỳ trang nghề thu hoạch nào, dưới mục Hiệu Ứng Công Cụ."
@@ -7558,7 +7690,7 @@ export const vi_VN: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Nhịp điệu canh tác",
-        "rhythmBody": "Gieo là lượt đúc ngắn có thể thấy: đúng {plant} giây ở mọi bậc, vì cuốc mở đất chứ không mua tốc độ. Nhổ cây chín là tức thì. Không có lượt đúc để ngắt, không có kiểm tra túi để từ chối, và luống đã sẵn sàng chờ mãi nếu bạn để đó, nên túi đầy chỉ tốn một chuyến đi đổ đồ.\n\nThu hoạch trả nông sản và kỹ năng Nông Nghiệp. Không như mạch quặng, nó không cho XP nhân vật, nên luống là nghề để làm chứ không phải cách lên cấp.",
+        "rhythmBody": "Gieo là tức thì, vì cuốc mở đất chứ không mua tốc độ: không có lượt đúc nào phải chờ, nên nông dân bỏ đi ngay vẫn đã gieo xong. Nhổ cây chín cũng tức thì. Không có lượt đúc để ngắt, không có kiểm tra túi để từ chối, và luống đã sẵn sàng chờ mãi nếu bạn để đó, nên túi đầy chỉ tốn một chuyến đi đổ đồ.\n\nThu hoạch trả nông sản và kỹ năng Nông Nghiệp. Không như mạch quặng, nó không cho XP nhân vật, nên luống là nghề để làm chứ không phải cách lên cấp.",
         "gainHeading": "Thu hoạch dạy điều gì",
         "gainBody": "Điểm tăng là tất định và dựa vào bộ đếm của bạn, không dựa vào cây: {g1} kỹ năng cho lần thu hoạch dưới {p1}, {g2} dưới {p2}, {g3} dưới {p3}, rồi {g4} cho phần còn lại đến giới hạn {cap}. Đây không phải lượt gieo kỹ năng, nên độ dài chặng đường đúng theo phép tính.\n\nBậc cây quyết định luống đưa bạn đi xa đến đâu. Cây bậc 1 dạy tới {c1} rồi chuyển xám, cây bậc 2 tới {c2}, còn bậc 3 trở lên tới giới hạn, nên chuyển lên luống là cách duy nhất giữ bộ đếm chạy.",
         "yieldsHeading": "Thu hoạch cho gì",
@@ -10148,6 +10280,7 @@ export const vi_VN: EnTranslations = {
       "templates": {
         "battleground": "[Chiến Trường] {name}: {message}",
         "party": "[Tổ Đội] {name}: {message}",
+        "raidWarning": "[Cảnh báo đột kích] {name}: {message}",
         "yell": "{name} hét: {message}",
         "whisper": "{name} nhắn riêng: {message}",
         "toWhisper": "Gửi {name}: {message}",
@@ -10286,6 +10419,7 @@ export const vi_VN: EnTranslations = {
       "stunned": "Bạn đang bị choáng!",
       "silenced": "Bạn đang bị câm lặng!",
       "busy": "Bạn đang bận.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Kỹ năng đó chưa sẵn sàng.",
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
@@ -10634,7 +10768,6 @@ export const vi_VN: EnTranslations = {
     },
     "cast": {
       "fishing": "Câu Cá",
-      "farming": "Trồng trọt",
       "gathering": "Thu Thập",
       "crafting": "Chế Tác",
       "disenchanting": "Hủy Pháp Khắc",
@@ -10978,6 +11111,19 @@ export const vi_VN: EnTranslations = {
       "buyConfirmAccept": "Mua",
       "buyConfirmCancel": "Hủy",
       "buyChanged": "Rao bán đó đã thay đổi trước khi bạn xác nhận. Hãy kiểm tra giá và thử lại.",
+      "sweep": "Quét",
+      "sweepAria": "Quét thị trường cho {item}",
+      "sweepTitle": "Quét thị trường: {item}",
+      "sweepClose": "Đóng",
+      "sweepNote": "Mua toàn bộ nhà/phòng cho thuê từ những người bán khác, rẻ nhất trên mỗi căn hộ trước, cho đến khi số lượng của bạn được chi trả. Quý vị có thể nhận được nhiều hơn một chút so với những gì quý vị yêu cầu.",
+      "sweepQuantity": "Đơn vị cần",
+      "sweepQuoteNone": "Không có nhà/phòng cho thuê của mặt hàng này để quét.",
+      "sweepQuoteLine": "{units} đơn vị trên {listings} danh sách với giá {total} ({each} mỗi danh sách)",
+      "sweepQuoteShort": "Chỉ có {units} đơn vị trên {listings} danh sách có sẵn, với giá {total} ({each} mỗi đơn vị)",
+      "sweepButton": "Quét",
+      "sweepConfirmTitle": "Xác nhận Market Sweep",
+      "sweepConfirmBody": "Mua {item} x{units} trên {listings} danh sách với giá {total} ({each} mỗi danh sách)?",
+      "sweepChanged": "Báo giá điều chuyển vốn đã thay đổi trước khi bạn xác nhận. Kiểm tra tổng số và thử lại.",
       "sellNote": "Rao bán hàng hóa từ túi của bạn. Thương Nhân thu {cut}% phí khi vật phẩm được bán. Bạn đang dùng {used}/{max} ô rao bán.",
       "sellPickEmpty": "Nhấp vào một vật phẩm trong túi để chọn món muốn bán.",
       "quantity": "Số lượng",
@@ -11017,7 +11163,9 @@ export const vi_VN: EnTranslations = {
       "ownListing": "Đó là mặt hàng rao của chính bạn. Hủy nó để nhận lại.",
       "cannotAfford": "Bạn không đủ tiền mua thứ đó.",
       "notYourListing": "Đó không phải mặt hàng rao của bạn.",
-      "nothingToCollect": "Bạn không có gì để thu về."
+      "nothingToCollect": "Bạn không có gì để thu về.",
+      "sweepNoListings": "Không có nhà/phòng cho thuê nào của mặt hàng đó có sẵn để quét.",
+      "sweepPriceChanged": "Giá đã thay đổi trước khi lệnh càn quét của bạn hạ cánh. Kiểm tra báo giá và thử lại."
     },
     "loot": {
       "takeAll": "Lấy Tất Cả",
@@ -16506,6 +16654,21 @@ export const vi_VN: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Hình Nhân Hồi Máu"
+      },
+      "healing_dummy_tank": {
+        "name": "Hình nộm tiên phong bị thương"
+      },
+      "healing_dummy_soldier": {
+        "name": "Người lính bị thương"
+      },
+      "healing_dummy_scout": {
+        "name": "Hình nộm trinh sát quan trọng"
+      },
+      "healing_dummy_caster": {
+        "name": "Hình nộm pháp sư bị thương"
+      },
+      "healing_dummy_ranger": {
+        "name": "Kiểm lâm bị đánh đập"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"

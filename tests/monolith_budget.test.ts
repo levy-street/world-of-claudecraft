@@ -452,14 +452,17 @@ const MONOLITHS: MonolithRow[] = [
     // measured combined count is below both parent pins (18574 / 18489).
     // Re-measured at the release/v0.43.0 sync: the review-fix batches
     // and the release's own extractions both landed; wc -l on the merged tree.
+    // LOWERED 18350 -> 18336 at the sell-confirm policy: actionBarIconBg moved
+    // out to src/ui/hud/action_bar/action_bar_icon_bg.ts (a pure key-to-url
+    // resolver), paying for the policy import. Exact count, zero slack.
     // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
     // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
     // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
-    // Re-measured at the second release/v0.43.0 sync of the account-wide Book
-    // of Deeds / Reliquary change: the release's interface-redesign merge and
-    // this branch's charSheetRefreshSigFor extraction compose to 18343 by
-    // wc -l, below both parent pins (18455 / 18350). Exact count, zero slack.
-    ceiling: 18343,
+    // Re-measured resolving PR #3978 into the current v0.43 batch head: the
+    // batch's screenshot and HUD extractions compose with the account-wide Book
+    // of Deeds / Reliquary work below both parent pins. `wc -l <
+    // src/ui/hud.ts` on the resolved tree is 18318. Exact count, zero slack.
+    ceiling: 18318,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -855,10 +858,33 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
+    // Lowered again after extracting the per-frame zone-feature sweep (fog rule,
+    // apparent-size reach, shadow-range flip) into src/render/zone_feature_sweep.ts.
+    // Lowered again for the gather-node shadow shed and reach hide, after the
+    // combined tree measured 12815 lines in src/render/renderer.ts.
+    // Lowered again when the gather-node shadow shed and reach hide moved
+    // behind GatherNodesView.update (the two guard blocks collapsed to one
+    // call each and the shadowLightDirection scratch left the renderer).
+    // PR #4017's mounted-rider buff VFX fix extracted view_vfx_pose.ts and
+    // rider_anchor.ts, so its body-attached aura wiring composes with the batch
+    // extraction instead of loosening this row. The resolved tree measures
+    // 12814 lines in src/render/renderer.ts. Exact merged count, zero slack.
+    // GPU timer probe: the bug-report screenshot readback moved to
+    // src/render/screenshot_capture.ts, and the current release-side renderer
+    // leaves combine with the probe hooks at 12811 lines. Exact merged count,
+    // zero slack.
+    // LOWERED after extracting the remote-body standing-surface sample (the
+    // terrain, rift-lift and prop-top read behind the airborne heuristic) into
+    // src/render/entity_ground_sample.ts over the entity_ground_sample_core.ts
+    // cadence, together with the terrain-lean gradient stencil, so a standing
+    // body no longer samples the terrain on every frame or every interval.
+    // Reviewer cadence fix kept that extraction and the current resolved tree
+    // measures 12798 lines. Exact merged count, zero slack.
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
-    // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12850,
+    // which drops the coordinator's own admission call. Resolved with the
+    // rider-anchor and ground-sample extractions at 12797 lines. Exact count.
+    ceiling: 12797,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1031,14 +1057,11 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    // Down 11879 -> 11843: the CPU-hygiene lot moved the rift floor descriptor
-    // builder to src/sim/rift/rift_floor_view.ts, the Wildfang kit pass 2 moved
-    // the charge route constants to combat/charge_route.ts (11856 together), and
-    // the account-wide Book of Deeds / Reliquary change moved the deeds restore
-    // and join-retro passes into src/sim/deeds_restore.ts and the ownership
-    // union into accountReliquaryOwnershipOpts (src/sim/reliquary.ts). Exact
-    // count, zero slack.
-    ceiling: 11843,
+    // Re-measured resolving PR #3978 into the current v0.43 batch head: the
+    // CPU-hygiene, Wildfang, Market Sweep, Who tab, and account-wide Book of
+    // Deeds / Reliquary extractions compose below both parent pins. `wc -l <
+    // src/sim/sim.ts` is 11827. Exact count, zero slack.
+    ceiling: 11827,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1237,7 +1260,30 @@ const MONOLITHS: MonolithRow[] = [
     // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
-    ceiling: 11321,
+    // Lowered to the exact resolved count after the boot-time graphics capture
+    // moved into graphics_rebuild_core.captureGraphicsSettingsSnapshot.
+    // The targeting callbacks and the pad targeting arm moved to
+    // src/game/targeting_actions.ts with the party target hotkeys (18 lines
+    // out), re-measured on the merged tree after the release sync: 11303,
+    // zero headroom.
+    // Incoming arm lowered 11321 -> 11318: the roster hint lines (zone +
+    // in-world) moved to src/ui/charselect_hints.ts. Resolved together on the
+    // release/v0.43 line: both changes compose, and the merged tree measures
+    // 11300. Exact count, zero headroom.
+    // LOWERED 11321 -> 11313 when the pet-bar routing (keyboard onPet and
+    // the five controller pet cases) moved into src/game/pet_commands.ts,
+    // which also paid for the Hide Interface wiring (interface_visibility_*).
+    // Resolved together on the release/v0.43 line with the targeting, roster
+    // hint, pet command, and Hide Interface extractions: `wc -l < src/main.ts`
+    // measures 11292. Exact count, zero headroom.
+    // Lowered to 11320 by the root-anchored :has() fix: the click-move marker's
+    // DOM writes moved to src/game/click_move_marker.ts and the composer's
+    // focus-mirrored classes to src/ui/chat_composer_focus_controller.ts, which
+    // paid for the start-screen class drop and the two new imports.
+    // Resolved together on the v0.43 line after the current release-side
+    // extractions above; `wc -l < src/main.ts` measures 11290. Exact merged
+    // count, zero headroom.
+    ceiling: 11290,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1452,13 +1498,13 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    // LOWERED 10095 -> 10082 at the account-wide Book of Deeds / Reliquary change:
-    // the Book heavy keys moved into server/deeds_wire.ts and the Curator
-    // standing stamp into server/curator_standing.ts.
+    // Re-measured resolving PR #3978 into the current v0.43 batch head: the
+    // Who tab and Market Sweep server extractions compose with the account-wide
+    // Book of Deeds / Reliquary server split.
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
-    // account-wide books extraction above; exact merged count, zero slack.
-    ceiling: 10076,
+    // batch work above; `wc -l < server/game.ts` is 9996. Exact count, zero slack.
+    ceiling: 9996,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1601,14 +1647,14 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    // Down 5540 -> 5506: the CPU-hygiene lot moved the interest-boundary despawn
-    // grace to src/net/despawn_grace.ts (5523), and the account-wide Book of Deeds /
-    // Reliquary change moved the deeds / Reliquary / account-ledger self-decode
-    // into src/net/book_wire.ts. Exact count, zero slack.
+    // Re-measured resolving PR #3978 into the current v0.43 batch head: the
+    // Who tab, Market Sweep, CPU-hygiene, and account-wide book-wire
+    // extractions compose below both parent pins.
     // Guild board categories: the board path builder, the page decode and the
     // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
-    // with the book_wire extraction above; exact merged count, zero slack.
-    ceiling: 5498,
+    // with the book_wire extraction above; `wc -l < src/net/online.ts` is 5446.
+    // Exact count, zero slack.
+    ceiling: 5446,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1757,15 +1803,14 @@ const MONOLITHS: MonolithRow[] = [
     // reach it directly), unlike createCharacterCapped's pure re-export.
     // Exact count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
-    // LOWERED 4744 -> 4715 at the account-wide Book of Deeds / Reliquary change:
-    // the character_deeds DDL moved into DEEDS_SCHEMA (server/deeds_db.ts) and
-    // the new account_relic_finds DDL landed as ACCOUNT_LEDGER_SCHEMA
-    // (server/account_ledger_db.ts), both applied by ensureSchema.
+    // Re-measured resolving PR #3978 into the current v0.43 batch head: the
+    // perf-report DB extraction composes with the Deeds and account-ledger DDL
+    // splits.
     // Guild board categories: topGuilds and its GuildLeaderRow moved whole to
     // server/guild_board_db.ts beside the new officer-roster read. Merged with
-    // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
-    // zero slack.
-    ceiling: 4641,
+    // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; `wc -l < server/db.ts`
+    // is 4495. Exact count, zero slack.
+    ceiling: 4495,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -1837,7 +1882,8 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered after extracting the world trees' camera-occluder fade (the
     // hideable records, the trunk hit test, the gated instance/ghost swap)
     // into src/render/tree_hide_fade.ts.
-    ceiling: 3996,
+    // Lowered after moving the field tree URL table into src/render/foliage_field_models.ts.
+    ceiling: 3969,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -1905,7 +1951,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 2548,
+    // Lowered with the Saintless Hall delve LOS fix: the procedural rift-region
+    // registry (RiftRegion, allocRiftCollisionToken/setRiftRegion/clearRiftRegion/
+    // riftRegionAt) extracted to rift_regions.ts, re-exported from here so every
+    // existing importer keeps its './colliders' path. Paid for the height-aware
+    // delve line-of-sight fix added in the same change. Exact count, zero slack.
+    ceiling: 2486,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
@@ -1937,13 +1988,8 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.41.0 base sync into the
     // raid branch: both arms extracted and added independently, so neither
     // parent pin fits the combined file; the merged count is the honest bound.
-    // RE-PINNED at the merge of release/v0.41.0 (tip 3e801dc925, the Ignivar
-    // raid span) into feature/masterwrought (base e19d832b47): this row did not
-    // conflict, and that is exactly why it is measured (a conflict marks
-    // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
-    // the record: ours 2804, the release 2433. Measured on the merged tree,
-    // never reconciled by arithmetic. Exact merged count, zero slack.
-    ceiling: 2432,
+    // Lowered after the rift sanctum slab plan moved to rift_platform_core.ts.
+    ceiling: 2424,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {
@@ -2025,7 +2071,14 @@ const MONOLITHS: MonolithRow[] = [
     // src/ui/store_mount_purchase.ts (the spend controller), the store body's
     // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
     // controllers now build over one seam object (store_spend_controllers.ts).
-    ceiling: 1262,
+    //
+    // LOWERED 1262 -> 1258 by the mount-skin preview (feature/store-mount-preview):
+    // the two inspect overlays' deps moved to src/ui/store_inspect_deps.ts and
+    // the eligibility text to src/ui/daily_rewards_reason_view.ts, which paid for
+    // the mount inspect's own lifecycle lines with room to spare (the review
+    // round's close / relocalize / graphics-restore seams for the mount panel
+    // spent part of that room).
+    ceiling: 1258,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {
@@ -2151,8 +2204,11 @@ const MONOLITHS: MonolithRow[] = [
     file: 'src/ui/hud/professions/crafting_window.ts',
     // LOWERED 771 -> 747 on the redesign review: the difficulty label table and
     // the cast-duration chip text moved to
-    // src/ui/hud/professions/craft_row_chip_text.ts. Exact count, zero slack.
-    ceiling: 747,
+    // src/ui/hud/professions/craft_row_chip_text.ts.
+    // LOWERED 747 -> 738 at the Bronze Hoe ordinary-grade note: the three
+    // reagent-line suffix formatters moved to reagent_suffix_view.ts.
+    // Exact count, zero slack.
+    ceiling: 738,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
 ];

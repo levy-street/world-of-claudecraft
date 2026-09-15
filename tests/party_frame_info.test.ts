@@ -8,6 +8,7 @@ import { describe, expect, it } from 'vitest';
 import {
   partyFrameAuras,
   partyFrameAurasForViewer,
+  partyFrameRole,
   preparePartyFrameAuras,
 } from '../src/sim/party_frame_info';
 import type { Aura } from '../src/sim/types';
@@ -115,5 +116,31 @@ describe('partyFrameAuras', () => {
   it('returns no summaries when the caller sets a zero cap', () => {
     const prepared = preparePartyFrameAuras([aura({ id: 'renew', kind: 'hot', value: 20 })]);
     expect(partyFrameAurasForViewer(prepared, 1, 0)).toEqual([]);
+  });
+});
+
+describe('partyFrameRole', () => {
+  // A Wildfang (feral) druid declares the tank spec role, but while wearing the
+  // Wolf Form shapeshift (the `form_cat` aura) it is a melee damage dealer:
+  // raid frames sorted by role must group it with the damage dealers so the
+  // real tanks sit next to each other.
+  it('reports a Wolf Form druid tank as damage', () => {
+    expect(partyFrameRole('tank', 'druid', [aura({ id: 'cat_form', kind: 'form_cat' })])).toBe(
+      'dps',
+    );
+  });
+
+  it('keeps the tank role in Bruin Form and in caster form', () => {
+    expect(partyFrameRole('tank', 'druid', [aura({ id: 'bear_form', kind: 'form_bear' })])).toBe(
+      'tank',
+    );
+    expect(partyFrameRole('tank', 'druid', [])).toBe('tank');
+  });
+
+  it('never demotes a non-tank spec and defaults an unknown role to damage', () => {
+    expect(partyFrameRole('healer', 'druid', [aura({ id: 'cat_form', kind: 'form_cat' })])).toBe(
+      'healer',
+    );
+    expect(partyFrameRole(null, 'warrior', [])).toBe('dps');
   });
 });

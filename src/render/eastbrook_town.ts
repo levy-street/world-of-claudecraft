@@ -1247,7 +1247,15 @@ function buildFromTemplates(
   // per-building materials are not shared with any batch, so a building
   // outside the roots linked cold on the frame its own fog cull first showed
   // it (the Fenbridge shape, same fix).
-  const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];
+  // The monument rides the reveal roots too: its body and its FX (beam, halos,
+  // embers, name) are not shared with any batch, so they linked six programs
+  // cold on the frame the fog cull first showed them (2026-09-12 hunt).
+  const monumentRoots: THREE.Object3D[] = [monumentBody.group, monumentFx.group];
+  const staticRevealRoots: THREE.Object3D[] = [
+    ...staticCullTargets,
+    ...buildingGroups,
+    ...monumentRoots,
+  ];
   // Piecewise reveal anchors, in staticRevealRoots order: a batch spans the
   // whole town so it anchors at the centre (Eastbrook sits on the world
   // origin), a building at its own footprint. roofHideTargets is built in the
@@ -1261,6 +1269,11 @@ function buildFromTemplates(
   for (const target of roofHideTargets) {
     rootX.push(target.x);
     rootZ.push(target.z);
+    rootFootprint.push(true);
+  }
+  for (const _root of monumentRoots) {
+    rootX.push(monumentSeat.x);
+    rootZ.push(monumentSeat.z);
     rootFootprint.push(true);
   }
   const staticPiecewise = newTownPiecewiseReveal(

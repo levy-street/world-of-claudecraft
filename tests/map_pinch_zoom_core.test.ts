@@ -8,6 +8,7 @@ import {
   mapPinchZoomFactor,
   nextMapZoom,
   zoomOutExitsZoneLevel,
+  zoomOutLevelExit,
 } from '../src/ui/map_pinch_zoom_core';
 import { MAP_MAX_ZOOM } from '../src/ui/map_window_view';
 
@@ -57,20 +58,42 @@ describe('map pinch zoom core', () => {
     expect(zoomOutExitsZoneLevel(Number.NaN, 0.9)).toBe(false);
   });
 
-  it('is wired into every world-map zoom-out path, and never runs on an instance plan', () => {
+  it('turns a zoom-out on the instance plan into the zone map, and keeps the zone rule', () => {
+    // The reported gap: inside a raid or dungeon the map showed the floor plan
+    // and every zoom-out (minus button, wheel-down, pinch) was swallowed, so the
+    // world map was unreachable by the gesture players reach for first. The plan
+    // has no zoom of its own, so ANY zoom-out there leaves for the zone map,
+    // whatever the stale zone zoom value happens to be.
+    expect(zoomOutLevelExit('instance', MAP_MIN_ZOOM, 1 / 1.4)).toBe('zone');
+    expect(zoomOutLevelExit('instance', MAP_MAX_ZOOM, 1 / 1.2)).toBe('zone');
+    expect(zoomOutLevelExit('instance', Number.NaN, 0.9)).toBe('zone');
+    // Zoom-in and a deadzone pinch (factor exactly 1) never leave the plan.
+    expect(zoomOutLevelExit('instance', MAP_MIN_ZOOM, 1.4)).toBeNull();
+    expect(zoomOutLevelExit('instance', MAP_MIN_ZOOM, 1)).toBeNull();
+    // The zone map keeps its own rule: only a zoom-out at full extent leaves.
+    expect(zoomOutLevelExit('zone', MAP_MIN_ZOOM, 1 / 1.4)).toBe('continent');
+    expect(zoomOutLevelExit('zone', 1.4, 1 / 1.4)).toBeNull();
+    expect(zoomOutLevelExit('zone', MAP_MIN_ZOOM, 1.4)).toBeNull();
+    // The continent overview is the top: nothing to zoom out to.
+    expect(zoomOutLevelExit('continent', MAP_MIN_ZOOM, 1 / 1.4)).toBeNull();
+  });
+
+  it('is wired into every world-map zoom-out path, including the instance plan', () => {
     // The rule lives in Hud.zoomMap, which the minus button, the wheel and the
     // pinch gesture all funnel through, so all three inherit it from one place.
     // The guard is on the painted LEVEL, not the player's position: the zone map
-    // is now reachable from inside an instance (map_surface_core.ts) and zooms
-    // there too, while the instance plan itself stays inert.
+    // is reachable from inside an instance (map_surface_core.ts) and zooms there
+    // too, and the instance plan's only zoom is the zoom-out that leaves it.
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(hud).toContain("$('#map-zoom-out')?.addEventListener('click', () => this.zoomMap(");
     expect(hud).toContain('onZoom: (factor) => this.zoomMap(factor)');
     expect(hud).toMatch(
-      /private zoomMap\(factor: number\): void \{\s*if \(this\.mapLevel !== 'zone' && this\.mapLevel !== 'continent'\) return;/,
+      /private zoomMap\(factor: number\): void \{(?:\s*\/\/[^\n]*)*\s*const exit = zoomOutLevelExit\(this\.mapLevel, this\.mapZoom, factor\);\s*if \(exit\) \{\s*this\.setMapLevel\(exit\);\s*return;\s*\}\s*if \(this\.mapLevel !== 'zone'\) return;/,
     );
-    expect(hud).toMatch(
-      /zoomOutExitsZoneLevel\(this\.mapZoom, factor\)\s*\) \{\s*this\.setMapLevel\('continent'\);/,
+    // The wheel handler no longer pre-filters on the zone level (that filter
+    // would have swallowed the instance zoom-out before zoomMap saw it).
+    expect(hud).not.toContain(
+      "if (this.mapLevel !== 'zone') return; // no per-zone zoom on the overview",
     );
   });
 

@@ -68,6 +68,8 @@ const current = deriveEastbrookPolishCompositeProvenance({
   mailboxRuntimeSha256: await sha256(INPUTS.mailboxRuntime),
   noticeboardRuntimeSha256: await sha256(INPUTS.noticeboardRuntime),
   rendererIntegrationSha256: await sha256(INPUTS.rendererIntegration),
+  entityGroundSampleSha256: await sha256(INPUTS.entityGroundSample),
+  entityGroundSampleCoreSha256: await sha256(INPUTS.entityGroundSampleCore),
   entityViewPolicySha256: await sha256(INPUTS.entityViewPolicy),
   viewPriorityPolicySha256: await sha256(INPUTS.viewPriorityPolicy),
   mailboxSourceFingerprint: mailbox.eastbrookMailboxSourceFingerprint(),

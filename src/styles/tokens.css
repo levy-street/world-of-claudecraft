@@ -860,6 +860,25 @@
        src/ui/prompt_dialog.ts is the same duration and dismisses the prompt;
        tests/prompt_timeout_duration.test.ts pins the two equal. */
     --prompt-timeout-dur: 28s;
+    --color-raid-warning-text: #ff5500;
+    --color-raid-warning-border: rgb(255 85 0 / 45%);
+    --color-raid-warning-bg: rgb(20 10 5 / 80%);
+    --shadow-raid-warning-glow: 0 0 18px rgb(255 85 0 / 35%);
+    --shadow-raid-warning-text: 0 0 16px rgb(255 85 0 / 85%), 2px 2px 6px var(--color-keyline);
+    --color-ready-check-bg: rgb(14 18 24 / 95%);
+    --color-ready-check-border: #d4af37;
+    --shadow-ready-check: 0 6px 20px rgb(0 0 0 / 75%), 0 0 10px rgb(212 175 55 / 25%);
+    --color-ready-check-text: #e8e8e8;
+    --color-ready-check-title: var(--gold);
+    --color-ready-check-muted: #999999;
+    --color-ready-check-muted-soft: #aaaaaa;
+    --color-ready-check-row: rgb(255 255 255 / 3%);
+    --color-ready-check-rule: rgb(212 175 55 / 30%);
+    --color-ready-check-rule-muted: rgb(255 255 255 / 8%);
+    --color-ready-check-yes: #2ed573;
+    --color-ready-check-no: #ff4757;
+    --shadow-ready-check-yes: 0 0 8px rgb(46 213 115 / 70%);
+    --shadow-ready-check-no: 0 0 8px rgb(255 71 87 / 70%);
     /* Dim the live world while the modal options family is open. */
     --color-options-scrim: color-mix(in srgb, var(--color-keyline) 74%, transparent);
 

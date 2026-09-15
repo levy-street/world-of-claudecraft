@@ -13,7 +13,7 @@ const rogueBuilderAbilityIds = [
   'ghostly_strike',
 ];
 
-const rogueFinisherAbilityIds = [
+const _rogueFinisherAbilityIds = [
   'eviscerate',
   'rupture',
   'kidney_shot',
@@ -1601,10 +1601,10 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_curse_of_exhaustion',
           name: 'Leaden Hex',
           description:
-            'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+            'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
           icon: 'wlk_r8_curse_of_exhaustion',
           effect: {
-            global: { warlockLeadenHex: 0.05 },
+            global: { warlockLeadenHex: 0.1 },
             tuning: {
               maxStacks: 3,
               slowDuration: 5,

@@ -163,6 +163,7 @@ const GUARDED_SCRIPTS = [
   'scripts/bank_guild_pane_seed.mjs',
   'scripts/admin_professions_shot.mjs',
   'scripts/catalog_program_census.mjs',
+  'scripts/charselect_zone_shot.mjs',
   'scripts/chat_mute_resume_shot.mjs',
   'scripts/geared_arrival_bench.mjs',
   'scripts/guild_pledge_shot.mjs',

@@ -94,7 +94,7 @@ describe('social_window: WAI-ARIA tabs', () => {
     expect(painter).toContain("stripClass: 'soc-tabs ui-tabs'");
     expect(painter).toContain("tabClass: 'soc-tab ui-tab'");
     expect(painter).toContain("selectedClass: 'on'");
-    for (const id of ['friends', 'guild', 'ignore', 'block', 'raid']) {
+    for (const id of ['friends', 'guild', 'who', 'ignore', 'block', 'raid']) {
       expect(painter).toContain(`{ id: '${id}',`);
     }
   });

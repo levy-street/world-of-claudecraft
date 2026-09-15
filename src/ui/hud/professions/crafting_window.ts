@@ -22,7 +22,6 @@
 // Announcements ride the static #crafting-live region via deps.announce (a
 // region inside the rebuilt subtree is wiped by the same task that writes
 // it, so assistive tech never sees the text).
-
 import type { StationType } from '../../../sim/professions/stations';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, tEntity } from '../../entity_i18n';
@@ -51,6 +50,7 @@ import {
   DURATION_FRACTION_DIGITS,
   durationChipText,
 } from './craft_row_chip_text';
+import { type CraftingPinChipDeps, renderCraftingPinChip } from './crafting_pin_chip';
 import {
   type CraftingView,
   type CraftLearnHint,
@@ -61,6 +61,7 @@ import { renderGatheringGoalTrackRow, type TrackRowDeps } from './gathering_goal
 import { professionImageUrl } from './profession_art';
 import { renderProfessionIdentityCard } from './profession_identity_card';
 import type { ProfessionIdentityModel } from './profession_identity_view';
+import { fineSubText, ordinaryHeldText, vaultDrawText } from './reagent_suffix_view';
 
 // Station display names (Professions 2.0): StationType id -> the
 // localized station name, same id-to-key table shape as craftNameText
@@ -79,8 +80,10 @@ const STATION_NAME_KEY: Record<StationType, TranslationKey> = {
 export function stationNameText(type: StationType): string {
   return t(STATION_NAME_KEY[type]);
 }
-
-export interface CraftingWindowDeps extends PainterHostPresentation, TrackRowDeps {
+export interface CraftingWindowDeps
+  extends PainterHostPresentation,
+    TrackRowDeps,
+    CraftingPinChipDeps {
   hideTooltip(): void;
   /** Start a craft (or batch) for `recipeId` with the given count (clamped in sim). */
   onCraft(recipeId: string, count: number): void;
@@ -324,23 +327,8 @@ export function renderCraftingWindow(
       const item = document.createElement('div');
       item.className = 'vendor-item crafting-recipe-item ui-card';
       const resultName = row.result ? itemDisplayName(row.result) : row.resultItemId;
-      // The fine-substitution suffix (the UX pass): stated in words on both
-      // the visible line and the aria fold, never color alone.
-      const fineSubText = (count: number): string =>
-        count > 0
-          ? ` ${t('hudChrome.crafting.reagentFineSub', {
-              count: formatNumber(count, { maximumFractionDigits: 0 }),
-            })}`
-          : '';
-      // The vault-draw suffix (Bank Storage Phase 04): stated in words beside
-      // the fine-substitution one, on the visible line AND the aria fold,
-      // never color alone (the same fairness rule).
-      const vaultDrawText = (count: number): string =>
-        count > 0
-          ? ` ${t('hudChrome.crafting.reagentVaultDraw', {
-              count: formatNumber(count, { maximumFractionDigits: 0 }),
-            })}`
-          : '';
+      // The three reagent suffixes (reagent_suffix_view.ts): words on the
+      // visible line, the aria fold, and the tooltip alike.
       const reagentLines = row.reagents
         .map(
           (r) =>
@@ -350,7 +338,8 @@ export function renderCraftingWindow(
               required: formatNumber(r.required, { maximumFractionDigits: 0 }),
             }) +
             fineSubText(r.fineSubstituted) +
-            vaultDrawText(r.vaultDrawn),
+            vaultDrawText(r.vaultDrawn) +
+            ordinaryHeldText(r),
         )
         .join(', ');
       // The inline reagent list marks each unsatisfied reagent (a class the
@@ -372,6 +361,10 @@ export function renderCraftingWindow(
             }${
               r.vaultDrawn > 0
                 ? `<span class="crafting-vault-draw">${esc(vaultDrawText(r.vaultDrawn))}</span>`
+                : ''
+            }${
+              r.ordinaryHeld > 0
+                ? `<span class="crafting-ordinary-held">${esc(ordinaryHeldText(r))}</span>`
                 : ''
             }</span>`,
         )
@@ -603,10 +596,8 @@ export function renderCraftingWindow(
         deps.onCraft(row.recipeId, all);
       });
       batchRow.appendChild(createAllBtn);
-      // The subtle Perfecting affordance on apex GEAR rows (deliverable C):
-      // its own control in the batch row, never nested inside the craft
-      // button (a nested interactive is the axe violation the party slivers
-      // already document).
+      // The subtle Perfecting affordance on apex GEAR rows: its own control in
+      // the batch row, never nested inside the craft button.
       if (apex.perfectingTrack && deps.onOpenPerfecting) {
         const perfectingLink = document.createElement('button');
         perfectingLink.type = 'button';
@@ -618,17 +609,11 @@ export function renderCraftingWindow(
         perfectingLink.addEventListener('click', () => deps.onOpenPerfecting?.());
         batchRow.appendChild(perfectingLink);
       }
+      batchRow.appendChild(renderCraftingPinChip(document, row.recipeId, resultName, deps));
       item.appendChild(batchRow);
       renderGatheringGoalTrackRow(item, row.recipeId, resultName, deps);
-      // Commission opt-in (the Maker's Bond): a per-recipe pill toggle-chip
-      // in the card's chip language, right-aligned in the card footer so it
-      // stacks under the gold Craft chip as one action column. Rendered ONLY
-      // for the ruled-in equipment output kinds (crafting_view.ts
-      // commissionEligible, the sim's own predicate). An aria-pressed toggle
-      // button: the accessible name stays the commission label and the state
-      // rides the toggle semantics. Armed state lives with the HUD
-      // (deps.commissionChecked) so a staleness repaint never unticks it;
-      // the click handler mirrors the flip locally instead of repainting.
+      // Commission opt-in: a per-recipe pill toggle-chip for eligible equipment
+      // outputs. HUD-held state survives stale repaints; the click mirrors locally.
       if (row.commissionEligible) {
         const commissionRow = document.createElement('div');
         commissionRow.className = 'crafting-commission-row';

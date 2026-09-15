@@ -60,11 +60,11 @@ const BEFORE_COLLAPSE: readonly (readonly [string, string])[] = [
   ],
   [
     'gather:iron_mining_pick',
-    '<div class="tt-sub">Mining tool (tier 2)</div><div class="tt-desc">Required to mine ore veins up to tier 2.</div><div class="tt-desc">Use: Mine a nearby ore vein.</div><div class="tt-desc">Requires Mining 40</div><div class="tt-desc">Gathers faster at nodes below tier 2.</div>',
+    '<div class="tt-sub">Mining tool (tier 2)</div><div class="tt-desc">Required to mine ore veins up to tier 2.</div><div class="tt-desc">Use: Mine a nearby ore vein.</div><div class="tt-desc">Requires Mining 40</div><div class="tt-desc">Below that skill it still works as a lower-tier tool.</div><div class="tt-desc">Gathers faster at nodes below tier 2.</div>',
   ],
   [
     'gather:mithril_mining_pick',
-    '<div class="tt-sub">Mining tool (tier 3)</div><div class="tt-desc">Required to mine ore veins up to tier 3.</div><div class="tt-desc">Use: Mine a nearby ore vein.</div><div class="tt-desc">Requires Mining 70</div><div class="tt-desc">Gathers faster at nodes below tier 3.</div>',
+    '<div class="tt-sub">Mining tool (tier 3)</div><div class="tt-desc">Required to mine ore veins up to tier 3.</div><div class="tt-desc">Use: Mine a nearby ore vein.</div><div class="tt-desc">Requires Mining 70</div><div class="tt-desc">Below that skill it still works as a lower-tier tool.</div><div class="tt-desc">Gathers faster at nodes below tier 3.</div>',
   ],
   [
     'gather:garden_hoe',
@@ -72,7 +72,7 @@ const BEFORE_COLLAPSE: readonly (readonly [string, string])[] = [
   ],
   [
     'gather:evergarden_hoe',
-    '<div class="tt-sub">Farming tool (tier 5)</div><div class="tt-desc">Required to plant crops up to tier 5.</div><div class="tt-desc">Works from your bags when you plant a crop bed.</div><div class="tt-desc">Requires Farming 100</div><div class="tt-desc">Gathers faster at nodes below tier 5.</div>',
+    '<div class="tt-sub">Farming tool (tier 5)</div><div class="tt-desc">Required to plant crops up to tier 5.</div><div class="tt-desc">Works from your bags when you plant a crop bed.</div><div class="tt-desc">Requires Farming 100</div><div class="tt-desc">Below that skill it still works as a lower-tier tool.</div><div class="tt-desc">Gathers faster at nodes below tier 5.</div>',
   ],
   [
     'gather:simple_fishing_pole',

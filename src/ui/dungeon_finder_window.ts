@@ -449,7 +449,9 @@ export class DungeonFinderWindow {
         : esc(
             d.lockout === 'daily'
               ? t('hudChrome.finder.lockoutDaily')
-              : t('hudChrome.finder.lockoutNone'),
+              : d.lockout === 'weekly'
+                ? t('hudChrome.finder.lockoutWeekly')
+                : t('hudChrome.finder.lockoutNone'),
           );
     const attunement = d.attunementQuestId
       ? `<div class="df-meta-row">${esc(
@@ -511,9 +513,14 @@ export class DungeonFinderWindow {
             .map((i) => this.lootItemHtml(i, true))
             .join('')}`
         : '',
-      ...e.heroicGroups.map((g) => this.lootGroupHtml(g, 'hudChrome.finder.lootHeroic')),
+      ...e.heroicGroups.map((g) =>
+        this.lootGroupHtml(
+          g,
+          g.guaranteed ? 'hudChrome.finder.lootHeroic' : 'hudChrome.finder.lootHeroicMaybe',
+        ),
+      ),
       e.heroicSingles.length > 0
-        ? `<div class="df-loot-sub">${esc(t('hudChrome.finder.lootHeroic'))}</div>${e.heroicSingles
+        ? `<div class="df-loot-sub">${esc(t('hudChrome.finder.lootHeroicChance'))}</div>${e.heroicSingles
             .map((i) => this.lootItemHtml(i, true))
             .join('')}`
         : '',

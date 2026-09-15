@@ -36,6 +36,15 @@ describe('render dev flags: layer kill switches', () => {
   });
 });
 
+describe('render dev flags: the GPU timer probe gate', () => {
+  it('is off by default, off in a headless host, and only on under ?gputimer=1', async () => {
+    expect((await loadFlags('?perf')).gpuTimerRequested()).toBe(false);
+    expect((await loadFlags(null)).gpuTimerRequested()).toBe(false);
+    expect((await loadFlags('?gputimer=on')).gpuTimerRequested()).toBe(false);
+    expect((await loadFlags('?perf&gputimer=1')).gpuTimerRequested()).toBe(true);
+  });
+});
+
 describe('render dev flags: the character cull A/B arm', () => {
   // ?charcull=off has to restore the WHOLE pre-cull submission, not just the
   // renderer's group cull: a skinned caster that keeps three's frustum test on
@@ -72,6 +81,28 @@ describe('render dev flags: the character cull A/B arm', () => {
     applySkinnedCullBounds(mesh, root, 1.8);
     expect(mesh.frustumCulled).toBe(true);
     expect(mesh.boundingSphere?.radius).toBeGreaterThan(0);
+  });
+});
+
+describe('render dev flags: the gather-node coarse key A/B arm', () => {
+  // ?gathercoarse=off restores the (zone, type, z-band) InstancedMesh key and
+  // draws every batch to the far plane; gather_nodes.ts resolves the mode
+  // once at build through gatherBatchKeyMode.
+  it('names the flag the gather-node build reads', async () => {
+    const { renderLayerDisabled } = await loadFlags('?gathercoarse=off');
+    expect(renderLayerDisabled('gathercoarse')).toBe(true);
+  });
+
+  it('resolves the band key under the flag and the coarse key otherwise', async () => {
+    await loadFlags('?gathercoarse=off');
+    expect((await import('../src/render/gather_nodes')).gatherBatchKeyMode()).toBe('band');
+    await loadFlags('');
+    expect((await import('../src/render/gather_nodes')).gatherBatchKeyMode()).toBe('coarse');
+  });
+
+  it('keeps the coarse key in a headless host with no location', async () => {
+    await loadFlags(null);
+    expect((await import('../src/render/gather_nodes')).gatherBatchKeyMode()).toBe('coarse');
   });
 });
 

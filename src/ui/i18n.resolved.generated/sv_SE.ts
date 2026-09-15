@@ -62,6 +62,7 @@ export const sv_SE: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Fängelsehåla",
+      "town": "Stad",
       "difficulty": "Svårighetsgrad",
       "name": "Namn",
       "spec": "Specialisering",
@@ -159,6 +160,10 @@ export const sv_SE: EnTranslations = {
       "teleport": {
         "label": "Teleportera",
         "description": "Flytta till exakta världskoordinater."
+      },
+      "town": {
+        "label": "Stadsnav",
+        "description": "Teleportera till en stadshubb med namn."
       },
       "dungeon": {
         "label": "Gå in i fängelsehåla",
@@ -348,12 +353,25 @@ export const sv_SE: EnTranslations = {
       "banner": "Åskådar {name}"
     },
     "readyCheck": {
+      "title": "Klar kontroll",
+      "close": "Stäng",
       "prompt": "{name} har startat en beredskapskontroll. Är du redo?",
       "ready": "Redo",
       "notReady": "Inte redo",
+      "status": "Klar: {ready}/{total}",
+      "waiting": "Väntar på svar...",
+      "memberReady": "{name} är klar.",
+      "memberNotReady": "{name} är inte klar.",
+      "memberPending": "{name} har inte svarat än.",
       "result": "Beredskapskontroll: {ready} redo, {notReady} inte redo, {noResponse} inget svar.",
       "notInPartyError": "Du måste vara med i en grupp för att starta en beredskapskontroll.",
       "inProgressError": "En beredskapskontroll pågår redan."
+    },
+    "pullTimer": {
+      "start": "Dra in {seconds} sek!",
+      "cancel": "Dragning avbruten.",
+      "countdown": "{seconds}",
+      "pull": "DRA"
     },
     "death": {
       "resurrectAtCorpse": "Återuppstå vid liket",
@@ -578,6 +596,11 @@ export const sv_SE: EnTranslations = {
       "mountsTitle": "Maskinstabil",
       "mountBuyAria": "Köp {item}",
       "mountSkinType": "Riddjursskinn",
+      "mountInspectAria": "Förhandsgranska {item}",
+      "mountRideIt": "Res den",
+      "mountOnly": "Endast montering",
+      "mountBuy": "Köp Mount Skin",
+      "mountScopeLine": "Kontotäckande hud. Bärs av en karaktär i taget.",
       "loading": "Laddar WOC-butiken...",
       "error": "WOC-butiken är inte tillgänglig just nu. Försök igen om en stund.",
       "balance": "Claudium-saldo",
@@ -1271,7 +1294,7 @@ export const sv_SE: EnTranslations = {
       "runSummary": "{total} på {time}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Dialog"
     },
     "hubLesson": {
       "target": "Välj träningsdockan som mål för att börja.",
@@ -1402,6 +1425,7 @@ export const sv_SE: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "Slagfältets flaggåtgärd",
       "sheathe": "Slida/Ta fram vapen",
+      "hideInterface": "Dölj gränssnitt",
       "dive": "Simma nedåt",
       "categoryPet": "Djur",
       "petAttack": "Djur: Anfall",
@@ -1410,8 +1434,22 @@ export const sv_SE: EnTranslations = {
       "petDefensive": "Djur: Defensivt",
       "petAggressive": "Djur: Aggressivt",
       "targetPet": "Djur: Måltavla",
+      "targetSelf": "Mål själv",
+      "targetParty1": "Målpartsmedlem 1",
+      "targetParty2": "Målpartsmedlem 2",
+      "targetParty3": "Målpartsmedlem 3",
+      "targetParty4": "Målpartimedlem 4",
+      "targetParty5": "Målpartimedlem 5",
+      "targetParty6": "Målpartimedlem 6",
+      "targetParty7": "Målpartimedlem 7",
+      "targetParty8": "Målpartimedlem 8",
+      "targetParty9": "Målpartimedlem 9",
       "mount": "Sitt upp / Stig av",
-      "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen."
+      "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen.",
+      "zoomIn": "Zooma in kameran",
+      "zoomOut": "Zooma ut kameran",
+      "wheelHint": "Mushjulet binder också: rulla det upp eller ner medan du binder, med Ctrl, Alt eller Shift om du vill. Zoomkamera in och ut sitter på det nakna hjulet som standard; flytta dem till ett ackord som Ctrl+hjul för att frigöra hjulet för förmågor.",
+      "wheelHeldRefused": "Ett hjulspår kan inte driva en hållen åtgärd som rörelse. Välj en nyckel eller en musknapp för den."
     },
     "actionBar": {
       "editKeys": "Redigera handlingsfältets tangenter",
@@ -1682,6 +1720,8 @@ export const sv_SE: EnTranslations = {
       "showReliquaryTracker": "Visa Relikviespårare",
       "confirmVendorSell": "Bekräfta innan försäljning",
       "confirmVendorSellNote": "Om du stänger av det här säljs föremål med ett enda klick utan bekräftelse, så en förskjuten väskplats skulle kunna sälja fel föremål.",
+      "confirmVendorSellMinQuality": "Bekräfta försäljning från kvalitet",
+      "confirmVendorSellMinQualityNote": "Artiklar under denna kvalitet säljs med ett enda klick; en felaktigt såld artikel kan fortfarande köpas tillbaka från säljaren.",
       "itemLevelLine": "Föremålsnivå {level}",
       "itemScoreLine": "Poäng {score}",
       "showSecondaryActionBar": "Visa sekundärt handlingsfält",
@@ -1735,9 +1775,9 @@ export const sv_SE: EnTranslations = {
     },
     "controller": {
       "title": "Handkontroll",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Ingen ansluten enhet.",
+      "deviceConnected": "Ansluten",
+      "deviceDisconnected": "Ingen styrenhet upptäckt",
       "glyphStyle": "Knappsymboler",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,20 +2165,20 @@ export const sv_SE: EnTranslations = {
       "hidePlaytimeAria": "Dölj tid spelad"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
-      "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
+      "label": "Karaktärsdetaljer",
+      "subtitle": "Nivå {level} {className}. {archetype}. Hobby: {hobby}",
+      "subtitleNoHobby": "Nivå {level} {className}. {archetype}",
+      "stats": "Statistik",
+      "progression": "Förlopp",
+      "skills": "Färdigheter",
+      "gathering": "anfångning",
       "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "openProfessions": "Öppna yrken"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Slutförd",
+      "zoneSummary": "{count} ({ready} redo)",
+      "shiftHint": "Skift-klicka på ett uppdrag för att länka det i chatten."
     },
     "statInfo": {
       "fromYour": "Från dina {value} {stat}:",
@@ -3248,7 +3288,30 @@ export const sv_SE: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "BV",
       "cheaterTag": "< Fuskare >",
-      "pledgeTag": "Trogen {guild}"
+      "pledgeTag": "Trogen {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Auktion",
+        "banker": "Banktjänsteman",
+        "riftForgemaster": "Rift Forgemaster",
+        "cardMaster": "Kortmästare",
+        "crucibleQuartermaster": "Degelkvartermästare",
+        "heroicQuartermaster": "Heroisk kvartersmästare",
+        "pvpVendor": "PvP-leverantör",
+        "weaponsmithTrainer": "Smedtränare",
+        "cookingTrainer": "Matlagningstränare",
+        "tailoringTrainer": "Skräddarsy utbildare",
+        "engineeringTrainer": "Ingenjörsutbildare",
+        "leatherworkingTrainer": "Läderbearbetningstränare",
+        "alchemyTrainer": "Alkemitränare",
+        "weaponVendor": "Vapensäljare",
+        "armorVendor": "Försäljare av rustning",
+        "armsDealer": "Vapenhandlare",
+        "foodVendor": "Säljare av mat och dryck",
+        "potionVendor": "Trylledryckssäljare",
+        "stableMaster": "Stabil mästare",
+        "generalGoods": "Allmänna varor"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Nivå {level} {family}",
@@ -3482,6 +3545,7 @@ export const sv_SE: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
+      "fineFarmGrade": "Fin kvalitet. Vissa val av en skörd kommer upp bra, oftare vid högre jordbruksskicklighet eller med ett laddat hantverksöga. Vanliga råvaror räknas aldrig där den fina betyget krävs.",
       "cookingCatch": "Ingrediens för matlagning. Måste tillagas innan den kan ätas.",
       "usedBy": "Används av {crafts}.",
       "arcaneDust": "Hantverksreagens. Förtrollas fram från vanlig och ovanlig utrustning.",
@@ -4022,6 +4086,25 @@ export const sv_SE: EnTranslations = {
       "lastSeenNever": "aldrig",
       "ignoredTab": "Ignorerade",
       "blockedTab": "Blockerade",
+      "who": {
+        "tab": "Som.",
+        "searchPlaceholder": "Namn, zon eller gille",
+        "search": "Sök",
+        "loading": "Frågar riket vem som är online...",
+        "empty": "Inga spelare matchar.",
+        "count": "{total} online",
+        "countFiltered": "{shown} av {total} online",
+        "capped": "Visar den första {delivered}. Begränsa sökningen för att se resten.",
+        "classFilter": "Filtrera efter klass",
+        "allClasses": "Alla klasser",
+        "colStatus": "Status",
+        "colName": "Namn",
+        "colLevel": "Nivå",
+        "colClass": "Klass",
+        "colZone": "Zon",
+        "colGuild": "Skråväsende",
+        "sortTitle": "Sortera efter {column}"
+      },
       "ignoredEmpty": "Du ignorerar ingen.",
       "blockedEmpty": "Du har inte blockerat någon.",
       "blockSearchPlaceholder": "Spelarnamn",
@@ -4143,6 +4226,7 @@ export const sv_SE: EnTranslations = {
           "farming": "Fungerar från dina väskor när du planterar i en odlingsbädd."
         },
         "speed": "Samlar snabbare vid noder under tier {tier}.",
+        "wieldDegrade": "Under den färdigheten fungerar det fortfarande som ett verktyg på lägre nivå.",
         "rodRequired": "Krävs för att fiska.",
         "rodBite": "Fisken nappar upp till {seconds}s tidigare.",
         "rodReel": "Förlänger indragningsfönstret med {seconds}s.",
@@ -4415,8 +4499,20 @@ export const sv_SE: EnTranslations = {
       "majorsLabel": "Huvudämnen: {a} och {b}",
       "pairsHeld": "Par som hålls: {count}",
       "returnsLabel": "Returnerar: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
-      "tutorialLink": "Profession tutorial"
+      "retentionFooter": "Avkastning på respec: 60% av skickligheten behålls.",
+      "tutorialLink": "Yrkeshandledning"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Recept",
+      "collapseHint": "Komprimera receptspårare",
+      "expandHint": "Expandera receptspårare",
+      "pin": "Stift",
+      "unpin": "Lossa",
+      "pinFull": "Receptspåraren är full (upp till {cap} recept)",
+      "pinAria": "Fäst {name} på hud spåraren",
+      "unpinAria": "Lossa {name} från hud tracker",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Hantverk",
@@ -4448,10 +4544,11 @@ export const sv_SE: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(förbrukar {count} av fin kvalitet)",
       "reagentVaultDraw": "(hämtar {count} från ditt valv)",
+      "reagentOrdinaryHeld": "({name} höll: {count}, men endast det fina betyget räknas här)",
       "vaultUnreachable": "Materialvalvet är utom räckhåll här.",
       "craftFeeLine": "Hantverksavgift: {fee} styck",
       "empty": "Inga recept kända än.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Material i ditt valv dras automatiskt. Läs fler recept på stationen.",
       "resultAria": "Hantverk {name}",
       "craftedToast": "Tillverkad: {name}",
       "craftedToastQty": "Tillverkad: {name} x{qty}",
@@ -4541,8 +4638,8 @@ export const sv_SE: EnTranslations = {
       "attunedBanner": "Inriktad: {title}",
       "tierTutorial": {
         "title": "Din första nivå",
-        "tierCap": "Ett hantverk når sin första nivå vid {skill} skicklighet, och varje nivå förbättrar vad det kan tillverka. Men ett hantverk klättrar bara förbi sällsynt arbete när det är ett av dina två ämnen.",
-        "radar": "Dina yrken bildar ett hjul. Inrikta dig på ett angränsande par och de två hantverken blir obegränsade ämnen, ett hantverk tvärsöver hjulet blir en sällsynt-begränsad hobby, och resten ligger vilande: deras kunskap bevarad, men begränsad till vanlig tills du tar upp dem igen.",
+        "tierCap": "Ett hantverk når sin första nivå vid {skill} skicklighet, och varje nivå förbättrar vad det kan göra. Men ett hantverk klättrar bara förbi sällsynt arbete när det är en av dina två majors.",
+        "radar": "Dina yrken bildar ett hjul. Justera till ett angränsande par och de två hantverken blir obegränsade majors, ett hantverk över hjulet blir en sällsynt begränsad hobby, och resten ligger vilande: deras kunskap hålls, men begränsas till vanligt tills du tar upp dem igen.",
         "masters": "Hantverksmästare i städerna erbjuder inriktningsuppdrag. Besök en för att välja ditt par när du är redo. Ingenting du lärt dig går någonsin förlorat.",
         "dismiss": "Förstått"
       },
@@ -4555,7 +4652,7 @@ export const sv_SE: EnTranslations = {
       "commissionBound": "Beställningsstycke: bundet till sin mottagare"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Handlaren fyller på vanliga varor; spelarannonser sitter bredvid dem till deras begärda pris."
     },
     "itemMenu": {
       "use": "Använd",
@@ -4836,6 +4933,7 @@ export const sv_SE: EnTranslations = {
       "roleDps": "Skada",
       "freeRoles": "Alla roller välkomna",
       "lockoutDaily": "Daglig spärr på slutbossen",
+      "lockoutWeekly": "Veckovis lockout på varje chef",
       "lockoutNone": "Ingen spärr",
       "lockedFor": "Låst i ungefär {minutes} min",
       "attunement": "Kräver länkning: {quest}",
@@ -4849,6 +4947,8 @@ export const sv_SE: EnTranslations = {
       "lootMaybe": "Högst ett av dessa kan falla:",
       "lootChance": "Extra chans till föremål:",
       "lootHeroic": "Heroisk bonus, ett av dessa faller alltid:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Endast nivåerna {min} till {max}",
       "blockedSpec": "Kräver en specialisering",
@@ -4922,7 +5022,33 @@ export const sv_SE: EnTranslations = {
         "kings_wrath": "Kungens Vrede (30%: permanent skadebonus, snabbare golvfaror)",
         "bone_storm": "Benstorm (han ignorerar hot, virvlar och rusar mot raiden)",
         "crown_endures": "Kronan består (hård raseri vid 6:00, heroic 5:00)",
-        "deathless_court": "Det Dödslösa Hovet (endast heroic, kungahovet reser sig efter Dödslöst Raseri)"
+        "deathless_court": "Det Dödslösa Hovet (endast heroic, kungahovet reser sig efter Dödslöst Raseri)",
+        "bloodmane_rend": "Bloodmane Rend (blöda, titta efter målbyten)",
+        "tusk_sweep": "Tusk Sweep (frontal klyva)",
+        "ancestral_sap": "Ancestral Sap (läker sina allierade)",
+        "call_of_the_hunt": "Call of the Hunt (påskyndar allierade i närheten)",
+        "thickhide_ward": "Thickhide Ward (sköldar för allierade i närheten)",
+        "beast_pit_quake": "Beast Pit Quake (områdeskada)",
+        "wildheart_pulse": "Vildhjärtspuls (skada på pulserande område)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Bålets märke (stapling av brandmärke, tvätta bort det i ledningsvatten)",
+        "forge_strike": "Smide strejk (stapling tank-swap debuff)",
+        "rain_of_cinders": "Cinderregn (tre eldkottar, stå mellan dem)",
+        "falling_cinders": "Fallande slagg (meteorcirklar på spelare, flytta ut)",
+        "revolving_inferno": "Roterande Inferno (roterande brandstrålar, rör dig genom luckorna)",
+        "forge_wave": "Smidvåg (expanderande brandvägg, använd de två säkra körfälten)",
+        "apocalypse_add": "Ignivar Ashcaller (prioritet lägg till casting Apocalypse, döda det snabbt)",
+        "judgment_of_the_forge": "Smedjans dom (paus, dela den enda säkra tillflykten)",
+        "last_inferno": "Sista Inferno (45 sekunders bränning vid 20 % hälsa)",
+        "chains_of_the_forge": "Chains of the Forge (endast heroiskt, håll dig nära din länkade partner)",
+        "makers_brand": "Maker's Brand (stapling tank-swap debuff)",
+        "forgefathers_sweep": "Forgefather's Sweep (bred frontalkon vid en icke-tank)",
+        "tempering_ray": "Härdningsstråle (linje till en markerad spelare, avlyssna den)",
+        "cinder_orbs": "Cinder Orbs (markerade spelare sprids till rummets kanter)",
+        "forgestorm": "Forgestorm (fallande meteorcirklar, flytta ut)",
+        "shared_pyre": "Delat bål (insamlingscirkel, dela skadan)",
+        "anvils_decree": "Anvil's Decree (tre raid-breda hammare slår, läker igenom)",
+        "masters_assembly": "Mästarenheten (blockera smidesbalkarna, rotera blockerare)"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const sv_SE: EnTranslations = {
       "applied": "Tillämpad",
       "owned": "Ägs",
       "storeOnly": "Tillgängligt i WOC-butiken",
+      "preview": "Förhandsvisning",
+      "previewAria": "Förhandsgranska {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Ett riddjursskinn ritas över det riddjur som karaktären rider. Det ändrar aldrig farten.",
       "mountsNoMount": "Skaffa först ett riddjur: ett skinn behöver något att rida på.",
@@ -5182,29 +5310,29 @@ export const sv_SE: EnTranslations = {
       "levels": "Nivåer {min} till {max}"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Nivå {level}",
+      "landmarkCount": "{count} landmärken",
+      "filtersAria": "Kartlager",
       "filters": {
-        "quests": "Quests",
-        "gather": "Gather",
-        "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "quests": "Uppdrag",
+        "gather": "Samla",
+        "dungeons": "Fängelsehålor",
+        "services": "Tjänster",
+        "players": "Spelare"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
-      "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "trackedQuests": "Spårade uppdrag",
+      "noTrackedQuests": "Inga spårade uppdrag",
+      "availableNearby": "Tillgänglig i närheten",
+      "noNearbyQuests": "Inga uppdrag i närheten",
+      "distance": "{distance} meter",
+      "showRoute": "Visa rutt",
+      "untrack": "Spåra inte",
+      "track": "Spår",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
-        "mail": "Mail",
+        "dungeon": "Fängelsehåla",
+        "ore": "Malm",
+        "herb": "Ört",
+        "mail": "E-post",
         "passage": "Passage"
       }
     },
@@ -5226,7 +5354,7 @@ export const sv_SE: EnTranslations = {
       "tabBrowse": "Bläddra",
       "tabSell": "Sälj",
       "tabActivity": "Mina aktiviteter",
-      "tabHistory": "Sales History",
+      "tabHistory": "Försäljningshistorik",
       "tabsLabel": "Delar av $WOC-börsen",
       "loading": "Laddar $WOC-börsen...",
       "loadFailed": "$WOC-börsen kunde inte nås. Försök igen om en liten stund.",
@@ -5251,16 +5379,16 @@ export const sv_SE: EnTranslations = {
       "colCurrentBid": "Aktuellt bud",
       "colBuyNow": "Köp nu",
       "colTimeLeft": "Tid kvar",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
-      "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "colBuyer": "Inköpare",
+      "colSoldAt": "Sålda",
+      "colSalePrice": "Reapris",
+      "colSaleType": "Art",
+      "saleTypeAuction": "Auktion",
+      "saleTypeBuyNow": "Köp nu",
+      "saleTypeDirected": "Riktad",
+      "saleTypeUnknown": "Nepoznato",
+      "historyEmpty": "Ingen försäljning registrerad ännu.",
+      "historyError": "Försäljningshistorik kunde inte laddas.",
       "reserveMet": "Reservationspris uppnått",
       "reserveNotMet": "Reservationspris inte uppnått",
       "yourListing": "Din annons",
@@ -5933,6 +6061,7 @@ export const sv_SE: EnTranslations = {
       "deeds": "Bedrifternas bok",
       "reliquary": "Relikvariet",
       "sheathe": "Slida/Ta fram vapen",
+      "hideInterface": "Dölj gränssnittet (skärmdumpar och videor)",
       "crafting": "Hantverk",
       "mount": "Sitt upp / Stig av",
       "calendar": "Händelsekalender",
@@ -5962,6 +6091,8 @@ export const sv_SE: EnTranslations = {
       "attackMove": "Anfallsförflyttning (bara sedan du slår på alternativet)",
       "meters": "Skademätare (skada, läkning och hot)",
       "petMark": "Djur: Markera, välj ditt eget djur (samma som att klicka på dess ram)",
+      "targetSelf": "Rikta in dig på",
+      "targetParty": "Målpartimedlemmar 1 till 9, uppifrån och ned som partiramar visar dem",
       "onBarBinding": "Du kan också binda direkt från fältet: välj Redigera handlingsfältets tangenter i panelen Tangentbindningar, klicka sedan på en plats på det aktiva fältet och tryck på tangenten du vill ha. Klicka på Klar när du är färdig. Det här alternativet är bara för dator, eftersom det kräver ett fysiskt tangentbord.",
       "clickMoveNote": "Klicka för att flytta är avstängt tills du slår på det: öppna panelen Tangentbindningar i spelmenyn, slå på Klicka för att flytta, och använd sedan raden Klickflyttningsknapp under den för att välja vilken musknapp som sköter gåendet (Vänsterklick som standard, eller Högerklick). När det är på skickar ett klick på en punkt på marken iväg dig gåendes dit, med en markör på marken som visar vart du är på väg. Att klicka på en varelse eller en annan spelare får dig att gå fram till dem och stanna inom räckhåll, medan det klicket ändå gör sitt vanliga jobb med att sikta på eller interagera; om du redan är tillräckligt nära för att nå det du klickade på interagerar du bara och stannar kvar där du är. Vilken som helst av förflyttningstangenterna tar direkt tillbaka kontrollen och avslutar resan, och det gör även att hålla nere musknappen för att titta runt. Att hoppa gör det inte, så du fortsätter färden genom hoppet, och att öppna spelmenyn pausar bara resan, som fortsätter när du stänger menyn."
     },
@@ -6099,7 +6230,8 @@ export const sv_SE: EnTranslations = {
       "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
       "keybindsHeading": "Panelen Tangentbindningar",
       "keybindsBody": "Tangentlistan är bara halva den panelen. Ovanför den sitter brytarna som avgör hur din mus styr spelet: muskamera, om pekaren låses medan du roterar, klicka för att flytta och vilken musknapp som utlöser det, anfallsförflyttning, den vänsterhänta pekstyrningen, och svordomsfiltret för chatten.",
-      "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha."
+      "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha.",
+      "keybindsWheelBody": "Själva hjulet binder också. Zoom Camera In och Zoom Camera Out är vanliga bindningar som sitter på det nakna hjulet som standard, så att du kan flytta dem till Ctrl plus hjulet, eller till tangenterna, och sedan rulla det frigjorda hjulet för att skjuta action bar slots. Ett hjulspår har ingen frigöring, så det kan inte driva en hållen åtgärd som att gå framåt."
     },
     "combat": {
       "intro": "Strid följer välbekanta klassiska MMO-regler. Du behöver aldrig studera något av det för att spela bra, detta är bara formen för hur strider fungerar.",
@@ -6153,7 +6285,7 @@ export const sv_SE: EnTranslations = {
       "framesMoveBodyEditFrames": "Din ram, din målram och dina gruppmedlemsramar kan alla flyttas. Varje ram har en liten flyttknapp i hörnet: lås upp den, dra ramen dit du vill och lås den igen så att ett felklick inte kan flytta den. Redigera ramar, högst upp på ramfliken i gränssnittsalternativen, frigör resten av gränssnittet på en gång, tillsammans med dessa tre ramar: åtgärdsraderna, kastningsraden, svängraden, erfarenhetsraden, minimap, knappraden, husdjursramen, stansraden, raderna för förstärkningar och försvagningar samt namnmarkeringen för önskelistepåminnelsen. Var och en får en namnmarkering när den är frigjord. Om de hamnar någonstans du ångrar återställer Återställ standardvärden längst ned på samma ramflik dem alla till där de började.",
       "framesGovernedExtra": "Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.",
       "framesGovernedAuraTracks": "Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
       "barsTitle": "Mätare, timer och stridstext",
       "barsBody": "Din besvärjelsemätare visas mitt på skärmen, precis ovanför dina handlingsfält, närhelst du kastar eller kanaliserar, och bär besvärjelsens namn och tiden som återstår. Ditt mål får en egen besvärjelsemätare på sin ram, så du kan se vad som kommer och svara på det.\n\nEn tunn svingmätare sitter under din besvärjelsemätare och fylls mellan dina vapensvingar, så en närstrids- eller distansanfallare kan se när nästa automatiska träff landar.\n\nDin erfarenhetsmätare löper i full bredd under dina handlingsfält, uppdelad i segment, med en ljusare sträcka som visar den vilade erfarenhet du har sparat.\n\nSimma under vatten så visas en blå andningsmätare högst upp på skärmen. Den tappas medan huvudet är under ytan, blinkar rött när den tar slut och du börjar drunkna, och fylls snabbt på igen så fort du dyker upp. Blanksteg simmar dig upp, och tangenten Simma ner, Ctrl som standard, tar dig djupare.\n\nSkada och läkning flyter upp över det de landade på som små siffror, så du kan läsa en strid utan att läsa text. Fliken Stridslogg i din chattruta håller den fullständiga skriftliga redogörelsen.",
       "aurasTitle": "Buffar och debuffar",
@@ -7489,7 +7621,7 @@ export const sv_SE: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Förtrollningar finns i fyra nivåer. Basnivån använder Klingdamm (med lite Klingessens i den övre änden) och täcker vapenplatsen, andra handen och varje rustningsplats, med nog många egenskapsalternativ för att varje bygge ska hitta något till varje plats: sköldar och burna kastarföremål i andra handen får en egen Uthållighetsförtrollning, så ingen utrustad plats saknar förtrollning. Den Högre nivån kostar en Klingskarva plus Klingessens: starkare bonusar på platserna med störst genomslag. Skärvorna förser dessutom tre andra sänkor: de två berlockrecepten med fem vardera, det översta steget för omladdning av verktygseffekter och den Lysande nivån, där vapen- och bröstförtrollningarna tar en var och Infusionen två, så lägg undan några innan du förbrukar dem.\n\nMellan dem finns de fem Runristade förtrollningarna, en förbrukare för varje typad sekundär egenskap, så inget du maler blir en återvändsgränd: Runristad egg (vapen, Styrka, förbrukar Resonant stål), Runat sigill (vapen, Intelligens, Resonant timmer), Runvävnad (bröst, Ande, Resonant tråd), Runhud (ben, Smidighet, Resonant skinn) och Runlänkar (hjälm, Uthållighet, Resonanta länkar). Var och en tar dessutom två Klingessenser; där en plats och egenskap har både en bas- och en Högre-förtrollning hamnar den runristade bonusen mellan dem, medan Runvävnad är den starkaste Ande-förtrollningen för bröstet och Runhud är den enda Smidighetsförtrollningen för benen. De exakta bonusarna finns i tabellen nedan.\n\nOvanför de vanliga lägre nivåerna ligger den Lysande nivån, hantverkets höjdpunkt för vanlig tillverkning: Förtrollning 100 för de fyra och 125 för Infusionen, som visas i kolumnen Skicklighet nedan. Var och en använder ett lysande reagens och lägger till ett steg på sin plats: vapnet (ett alternativ för Styrka och ett för Besvärjelsekraft), bröstet och stövlarna. Den sista, Lysande infusion, fäster bara på en del som har fulländats: fulländning är bärarens eget arbete, inte förtrollarens, och sidan Yrken förklarar hur en del får det.\n\nSista lågans iver är en separat raidformel, inte en gratis vanlig förtrollning. Lär dig dess handelsbara formel vid Förtrollning 100 innan du använder den. Varje applicering använder 3 Kärnor från Sista lågan och 2 Klingskarvor; formeln kan falla i Smältdegeln eller köpas av dess kvartersmästare för en kärna. Dess närstridsproc och regler för vapenhastighet visas i sin helhet nedan.",
+        "enchantsNoteRaidFormula": "Förtrollningar finns i fyra nivåer. Basnivån använder Klingdamm (med lite Klingessens i den övre änden) och täcker vapenplatsen, andra handen och varje rustningsplats, med nog många egenskapsalternativ för att varje bygge ska hitta något till varje plats: sköldar och burna kastarföremål i andra handen får en egen Uthållighetsförtrollning, så ingen utrustad plats saknar förtrollning. Den Högre nivån kostar en Klingskarva plus Klingessens: starkare bonusar på platserna med störst genomslag. Skärvorna förser dessutom tre andra sänkor: de två berlockrecepten med en vardera (resten av en berlocks pris är essens och stoft), det översta steget för omladdning av verktygseffekter och den Lysande nivån, där vapen- och bröstförtrollningarna tar en var och Infusionen två, så lägg undan några innan du förbrukar dem.\n\nMellan dem finns de fem Runristade förtrollningarna, en förbrukare för varje typad sekundär egenskap, så inget du maler blir en återvändsgränd: Runristad egg (vapen, Styrka, förbrukar Resonant stål), Runat sigill (vapen, Intelligens, Resonant timmer), Runvävnad (bröst, Ande, Resonant tråd), Runhud (ben, Smidighet, Resonant skinn) och Runlänkar (hjälm, Uthållighet, Resonanta länkar). Var och en tar dessutom två Klingessenser; där en plats och egenskap har både en bas- och en Högre-förtrollning hamnar den runristade bonusen mellan dem, medan Runvävnad är den starkaste Ande-förtrollningen för bröstet och Runhud är den enda Smidighetsförtrollningen för benen. De exakta bonusarna finns i tabellen nedan.\n\nOvanför de vanliga lägre nivåerna ligger den Lysande nivån, hantverkets höjdpunkt för vanlig tillverkning: Förtrollning 100 för de fyra och 125 för Infusionen, som visas i kolumnen Skicklighet nedan. Var och en använder ett lysande reagens och lägger till ett steg på sin plats: vapnet (ett alternativ för Styrka och ett för Besvärjelsekraft), bröstet och stövlarna. Den sista, Lysande infusion, fäster bara på en del som har fulländats: fulländning är bärarens eget arbete, inte förtrollarens, och sidan Yrken förklarar hur en del får det.\n\nSista lågans iver är en separat raidformel, inte en gratis vanlig förtrollning. Lär dig dess handelsbara formel vid Förtrollning 100 innan du använder den. Varje applicering använder 3 Kärnor från Sista lågan och 2 Klingskarvor; formeln kan falla i Smältdegeln eller köpas av dess kvartersmästare för en kärna. Dess närstridsproc och regler för vapenhastighet visas i sin helhet nedan.",
         "charmsHeading": "Amuletter för en samlares verktyg",
         "formulaRequired": "Formel krävs",
         "charmsBody": "Förtrollning är också där en samlares amuletter kommer ifrån. Fixare Gizzel lär ut båda vid verktygsverkstaden i Östbäck så snart din Förtrollning når 25: Samlarens gömma, som lägger till en enhet till en skörd, och Hantverkarens öga, som höjer graden på det som kommer upp. Var och en tillverkas en gång, monteras sedan på en hacka, yxa eller skära, där den förbrukar en laddning bara på de skördar den faktiskt förbättrar.\n\nOmladdningen är där hantverket fortsätter tjäna. Laddningar återställs av den som äger verktyget, inte av en besökande förtrollare, och omladdningen kostar hälften av materialen när den ägaren är förtrollaren som signerade amuletten, ännu mindre med en specialisering i Förtrollning. Så en amulett såld över disk är en enda försäljning, medan amuletterna som rider på dina egna verktyg är de billiga att hålla i gång. Den fullständiga laddnings- och materialstegen finns på varje insamlingsyrkes sida, under Verktygseffekter."
@@ -7558,7 +7690,7 @@ export const sv_SE: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Jordbrukets rytm",
-        "rhythmBody": "Planteringen är det korta synliga kastet: alltid {plant} sekunder på varje steg, eftersom en hacka öppnar jord i stället för att köpa fart. Att dra upp en mogen gröda sker genast. Det finns inget kast att avbryta och ingen väskkontroll som kan neka det, och en färdig bädd väntar hur länge du än lämnar den, så en full packning kostar bonden endast promenaden för att tömma den.\n\nEn skörd ger grödor och färdighet i Jordbruk. Till skillnad från en åder ger den ingen karaktärs-XP, så bäddarna är ett yrke att arbeta med, inte ett sätt att levla.",
+        "rhythmBody": "Planteringen sker genast, eftersom en hacka öppnar jord i stället för att köpa fart: det finns inget kast att vänta ut, så en bonde som går därifrån har ändå planterat. Att dra upp en mogen gröda sker också genast. Det finns inget kast att avbryta och ingen väskkontroll som kan neka det, och en färdig bädd väntar hur länge du än lämnar den, så en full packning kostar bonden endast promenaden för att tömma den.\n\nEn skörd ger grödor och färdighet i Jordbruk. Till skillnad från en åder ger den ingen karaktärs-XP, så bäddarna är ett yrke att arbeta med, inte ett sätt att levla.",
         "gainHeading": "Vad en skörd lär dig",
         "gainBody": "Vinsten är deterministisk och knuten till din egen räknare, inte grödan: {g1} färdighet per skörd under {p1}, {g2} under {p2}, {g3} under {p3}, och {g4} resten av vägen till taket på {cap}. Det är aldrig ett kast för färdighetshöjning, så klättringen är exakt så lång som matematiken säger.\n\nGrödans nivå avgör hur långt en bädd kan bära dig. En gröda på nivå 1 lär ut till {c1} och grånar där, en på nivå 2 till {c2}, och nivå 3 och högre till taket, så högre bäddar håller räknaren i rörelse.",
         "yieldsHeading": "Vad en skörd ger",
@@ -10148,6 +10280,7 @@ export const sv_SE: EnTranslations = {
       "templates": {
         "battleground": "[Slagfält] {name}: {message}",
         "party": "[Grupp] {name}: {message}",
+        "raidWarning": "[RAID-varning] {name}: {message}",
         "yell": "{name} ropar: {message}",
         "whisper": "{name} viskar: {message}",
         "toWhisper": "Till {name}: {message}",
@@ -10286,6 +10419,7 @@ export const sv_SE: EnTranslations = {
       "stunned": "Du är bedövad!",
       "silenced": "Du är tystad!",
       "busy": "Du är upptagen.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Den förmågan är inte redo än.",
       "notEnoughRage": "Inte tillräckligt med raseri!",
       "notEnoughEnergy": "Inte tillräckligt med energi!",
@@ -10634,7 +10768,6 @@ export const sv_SE: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiske",
-      "farming": "Plantering",
       "gathering": "Insamling",
       "crafting": "Hantverk",
       "disenchanting": "Avförtrollning",
@@ -10978,6 +11111,19 @@ export const sv_SE: EnTranslations = {
       "buyConfirmAccept": "Köp",
       "buyConfirmCancel": "Avbryt",
       "buyChanged": "Den listningen ändrades innan du bekräftade. Kontrollera priset och försök igen.",
+      "sweep": "Rensa",
+      "sweepAria": "Sopa marknaden för {item}",
+      "sweepTitle": "Marknadssvep: {item}",
+      "sweepClose": "Stäng",
+      "sweepNote": "Köper hela boenden från andra säljare, billigaste per enhet först, tills ditt antal är täckt. Du kan få några fler än du bad om.",
+      "sweepQuantity": "Enheter önskas",
+      "sweepQuoteNone": "Inga annonser av denna artikel att sopa.",
+      "sweepQuoteLine": "{units} enheter i {listings} annonser för {total} ({each} vardera)",
+      "sweepQuoteShort": "Endast {units} enheter i {listings} annonser är tillgängliga för {total} ({each} vardera)",
+      "sweepButton": "Rensa",
+      "sweepConfirmTitle": "Bekräfta marknadssvep",
+      "sweepConfirmBody": "Köp {item} x{units} i {listings} annonser för {total} ({each} vardera)?",
+      "sweepChanged": "Sweep-offerten ändrades innan du bekräftade. Kontrollera totalsumman och försök igen.",
       "sellNote": "Lägg upp varor från dina väskor. Köpmannen tar {cut}% i provision när ett föremål säljs. Du använder {used}/{max} listningsplatser.",
       "sellPickEmpty": "Klicka på ett föremål i dina väskor för att välja vad du vill sälja.",
       "quantity": "Antal",
@@ -11017,7 +11163,9 @@ export const sv_SE: EnTranslations = {
       "ownListing": "Det är din egen annons. Avbryt den för att återta den.",
       "cannotAfford": "Du har inte råd med det.",
       "notYourListing": "Det är inte din annons.",
-      "nothingToCollect": "Du har inget att hämta."
+      "nothingToCollect": "Du har inget att hämta.",
+      "sweepNoListings": "Inga annonser för det objektet är tillgängliga att sopa.",
+      "sweepPriceChanged": "Priserna ändrades innan ditt svep landade. Kontrollera offerten och försök igen."
     },
     "loot": {
       "takeAll": "Ta allt",
@@ -16506,6 +16654,21 @@ export const sv_SE: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Läkningsdocka"
+      },
+      "healing_dummy_tank": {
+        "name": "Skadad förtruppsdocka"
+      },
+      "healing_dummy_soldier": {
+        "name": "Skadad soldatdocka"
+      },
+      "healing_dummy_scout": {
+        "name": "Kritisk scoutdocka"
+      },
+      "healing_dummy_caster": {
+        "name": "Sårad trollformelsdocka"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Åssmygare"

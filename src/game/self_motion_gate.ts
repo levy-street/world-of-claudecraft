@@ -37,6 +37,7 @@ export interface SelfMotionGateArgs {
   playerImmobilized: boolean;
   posX: number;
   climbing: boolean | undefined;
+  leaping: boolean | undefined;
   riftFloor?: RiftFloorView | null;
 }
 
@@ -54,6 +55,10 @@ export function selfMotionPredictionEnabled(args: SelfMotionGateArgs): boolean {
     // A ledge climb is a server-owned scripted move the client does
     // not re-simulate: predicting a fall through it would fight the
     // authoritative pull-up and show the correction as a stutter.
-    args.climbing !== true
+    args.climbing !== true &&
+    // A Vaulting Charge (heroic_leap) arc is server-owned too. The local
+    // kernel only predicts grounded input, so it must stand down while the
+    // authoritative flight is active.
+    args.leaping !== true
   );
 }

@@ -98,10 +98,10 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
     reason:
       "the armory store preview's own secondary GL context: key/fill/rim in its own scene, built once at mount and only re-aimed per preset",
   },
-  'wildheart_props.ts': {
-    kinds: ['HemisphereLight', 'DirectionalLight'],
+  'mount_preview.ts': {
+    kinds: ['DirectionalLight'],
     reason:
-      'THE NAMED EXCEPTION: the Wildheart caldera interior rig adds a hemisphere and a directional light to the world scene when the interior builds, which is why its buildInterior arm is a deliberate ungated scene.add (pinned in tests/renderer_compile_gate.test.ts); pre-linking a scene-wide light census is backlog, not a precedent',
+      "the mount skin store preview's own secondary GL context: key/fill/rim in its own scene, built once at mount and only re-aimed per preset",
   },
 };
 
@@ -177,8 +177,8 @@ describe('the src/render light census', () => {
       'characters/portrait.ts',
       'characters/preview.ts',
       'foliage_impostor.ts',
+      'mount_preview.ts',
       'renderer.ts',
-      'wildheart_props.ts',
     ]);
   });
 
@@ -225,15 +225,21 @@ describe('the src/render light census', () => {
     }
   });
 
-  it('names the world rig, the secondary contexts, and the one exception', () => {
+  it('names the world rig and the secondary contexts, and nothing else', () => {
     // The shape of the list is itself the rule: a light belongs to the boot
-    // constructor, to a context that is not the world, or to the one arm that
-    // is already documented as a defect with a backlog item.
+    // constructor or to a context that is not the world. The Wildheart caldera
+    // rig was the one named exception (a fill pair added to the world scene at
+    // interior build, never removed, relinking every material drawn after a
+    // Palm Reach visit); its grade moved into interior_light_rig.ts.
     expect(ALLOWED['renderer.ts'].reason).toContain('constructor');
-    for (const context of ['characters/preview.ts', 'characters/portrait.ts', 'armory_preview.ts'])
+    for (const context of [
+      'characters/preview.ts',
+      'characters/portrait.ts',
+      'armory_preview.ts',
+      'mount_preview.ts',
+    ])
       expect(ALLOWED[context].reason).toContain('secondary GL context');
-    expect(ALLOWED['wildheart_props.ts'].reason).toContain('NAMED EXCEPTION');
-    expect(ALLOWED['wildheart_props.ts'].reason).toContain('backlog');
+    expect(ALLOWED['wildheart_props.ts']).toBeUndefined();
   });
 
   it('constructs a census-keyed light outside src/render only where allowlisted', () => {

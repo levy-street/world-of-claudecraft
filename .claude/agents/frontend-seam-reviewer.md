@@ -146,6 +146,25 @@ logic grown onto a coordinator as a finding.
    `esc()`, and reuses the shared `PainterHost` writers rather than a second write cache.
    Contract: `src/ui/hud/CLAUDE.md`.
 
+9. **Selector invalidation reach.** For EVERY added or changed CSS selector under
+   `src/styles/`, flag: a `:has()` whose anchor compound is `body`, `:root`, `html` or `#ui`
+   (the compound the `:has(` is attached to, whatever follows it); an attribute selector on
+   inline `style` at one of those roots (`#ui[style*="display"]`, `body[style]`); a
+   universal or deep-descendant selector whose invalidation set includes the HUD subtree
+   (`body.some-state *`, `:root[data-x] *`, `#ui *`, `body.x ::before`); and any selector
+   keyed on a value that changes per frame (an inline `style` value, a `data-*` the HUD
+   writes per frame, `:hover` on an element the HUD moves under the pointer). Blink's `:has()`
+   invalidation set for a root anchor is the whole subtree, so the first per-frame leaf
+   write re-resolves style for every visible HUD element. Severity anchor, measured
+   2026-09-14: about 580 elements re-resolved per frame, 6.5 ms on a 4-core Intel HD 530
+   PC, 31 percent of the frame (about 2.9 ms on a modern desktop iGPU), from five such rules.
+   A root-anchored `:has()` or root `[style]` selector is BLOCKING; the other two classes are
+   SHOULD-FIX unless the author shows the subtree is small or the key is static. The fix is
+   a state class toggled by the code that owns the state, on the nearest static ancestor
+   (`src/ui/root_state_classes.ts`, the contract entry in `src/styles/CLAUDE.md`). Gate:
+   `npx vitest run tests/css_root_anchored_has.test.ts` (covers the root-anchored `:has()`
+   and root `[style]` classes only; the reach and per-frame-key classes are your judgment).
+
 ## How to work
 
 - Start from the diff (`git diff`, or `git diff <base>...HEAD` if given a base). Read

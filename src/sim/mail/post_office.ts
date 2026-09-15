@@ -27,7 +27,7 @@ import {
 } from '../content/letters';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
-import { itemInstancePayloadsEqual } from '../item_instance_merge';
+import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   countMatchingUnlocked,
   grantCopies,
@@ -36,7 +36,7 @@ import {
   removeMatchingInstance,
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
-import { removeVendorSellUnits } from '../items';
+import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../items';
 import { isMaterialItemId } from '../material_ids';
 import { rekeyMaterialSignature } from '../material_signatures';
 import { validateMaterialSlotSourcesOnLoad } from '../material_slot_load';
@@ -80,6 +80,53 @@ export const MAIL_SUBJECT_MAX = 64;
 export const MAIL_BODY_MAX = 600;
 
 export type MailKind = 'player' | 'system' | 'npc';
+
+function mailEscrowCountCap(def: (typeof ITEMS)[string] | undefined, slot: InvSlot): number {
+  if (!slot.instance) return Number.POSITIVE_INFINITY;
+  if (isMergeableInstancePayload(slot.instance)) return Number.POSITIVE_INFINITY;
+  return instancedCountCap(def, slot.instance);
+}
+
+function countRecipeBuckets(units: readonly { craftedRecipeId?: string }[]): number {
+  const buckets = new Set<string | undefined>();
+  for (const unit of units) buckets.add(unit.craftedRecipeId);
+  return buckets.size;
+}
+
+function projectedMailParcelRows(
+  inventory: readonly InvSlot[],
+  attachments: readonly InvSlot[],
+  materialRowsByAttachment: readonly (readonly InvSlot[] | null)[],
+): number | null {
+  const scratch = inventory.map(cloneInvSlot);
+  let rows = 0;
+  for (const [attachmentIndex, s] of attachments.entries()) {
+    const materialRows = materialRowsByAttachment[attachmentIndex];
+    if (materialRows !== null) {
+      rows += materialRows.length;
+      continue;
+    }
+    const count = Math.floor(s.count);
+    if (s.instance && typeof s.instance === 'object') {
+      const consumed = removeSellUnitsFromInventory(
+        scratch,
+        s.itemId,
+        count,
+        (instance) =>
+          isTransferLockedInstance(instance) || !itemInstancePayloadsEqual(instance, s.instance),
+        undefined,
+        true,
+      );
+      if (consumed.length !== count) return null;
+      rows += countRecipeBuckets(consumed);
+    } else {
+      const consumed = removeSellUnitsFromInventory(scratch, s.itemId, count, () => true);
+      if (consumed.length !== count) return null;
+      rows += countRecipeBuckets(consumed);
+    }
+  }
+  return rows;
+}
 
 export interface MailMessage {
   id: number;
@@ -468,7 +515,11 @@ export class PostOffice {
       return;
     }
     const wanted = new Map<string, number>();
-    const instancedWanted: { itemId: string; instance: NonNullable<InvSlot['instance']> }[] = [];
+    const instancedWanted: {
+      itemId: string;
+      instance: NonNullable<InvSlot['instance']>;
+      count: number;
+    }[] = [];
     for (const s of items) {
       const def = ITEMS[s.itemId];
       const count = Math.floor(s.count);
@@ -482,20 +533,25 @@ export class PostOffice {
         return;
       }
       if (s.instance && typeof s.instance === 'object') {
-        // Instanced parcels (the #1165 completion): single-copy by design (the
-        // qty stepper stays fungible-only), named by payload so a bag reshuffle
-        // can never redirect the escrow. A count other than exactly 1 is a
-        // malformed request and refuses like any other malformed entry, never
-        // silently truncates. Transfer-locked copies (bindOnTrade armed or
-        // boundTo bound, the shared market rule) never ride a raven: a
-        // bind-on-trade windfall must not be mail-launderable.
-        if (count !== 1) return;
+        // Instanced parcels (the #1165 completion): single-copy per slot by
+        // design UNLESS the payload is MERGEABLE (Professions 2.0,
+        // item_instance_merge.ts isMergeableInstancePayload): a byte-equal
+        // signed consumable (a rare-quality crafted potion, say) already
+        // stacks in bags/bank/trade, so a letter may bundle several as one
+        // attachment the same way instead of burning one of the letter's
+        // MAIL_MAX_ATTACHMENTS slots per copy. A non-mergeable payload
+        // (charge-bearing, player-locked, or otherwise one-per-slot) still
+        // refuses anything but exactly 1: a malformed request, never a
+        // silent truncation. Transfer-locked copies (bindOnTrade armed or
+        // boundTo bound, the shared market rule) never ride a raven either
+        // way: a bind-on-trade windfall must not be mail-launderable.
+        if (count !== 1 && !isMergeableInstancePayload(s.instance)) return;
         if (isTransferLockedInstance(s.instance)) {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
         if (!isMaterialItemId(s.itemId)) {
-          instancedWanted.push({ itemId: s.itemId, instance: s.instance });
+          instancedWanted.push({ itemId: s.itemId, instance: s.instance, count });
         }
       } else if (!isMaterialItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
@@ -510,14 +566,15 @@ export class PostOffice {
         return;
       }
     }
-    // Each instanced entry needs a matching UNLOCKED held copy, counting every
-    // entry that names the same payload (byte-equal copies are interchangeable;
-    // a stripped-lock forgery simply fails to match and lands here too).
+    // Each instanced entry needs that many matching UNLOCKED held copies,
+    // summing every entry that names the same payload (byte-equal copies are
+    // interchangeable; a stripped-lock forgery simply fails to match and
+    // lands here too).
     for (const w of instancedWanted) {
       let need = 0;
       for (const other of instancedWanted) {
         if (other.itemId === w.itemId && itemInstancePayloadsEqual(other.instance, w.instance))
-          need += 1;
+          need += other.count;
       }
       if (countMatchingUnlocked(meta, w.itemId, w.instance) < need) {
         this.result(meta.entityId, 'notEnoughItems');
@@ -539,6 +596,19 @@ export class PostOffice {
       if (materialPlan.error === 'insufficient') {
         this.result(meta.entityId, 'notEnoughItems');
       }
+      return;
+    }
+    const projectedRows = projectedMailParcelRows(
+      meta.inventory,
+      items,
+      materialPlan.value.rowsByAttachment,
+    );
+    if (projectedRows === null) {
+      this.result(meta.entityId, 'notEnoughItems');
+      return;
+    }
+    if (projectedRows > MAIL_MAX_ATTACHMENTS) {
+      this.result(meta.entityId, 'tooManyParcels', { value: MAIL_MAX_ATTACHMENTS });
       return;
     }
     if (meta.copper < coin + MAIL_POSTAGE) {
@@ -570,22 +640,48 @@ export class PostOffice {
         continue;
       }
       if (s.instance && typeof s.instance === 'object') {
-        const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
-        // The craft marker rides alongside the payload: an instanced parcel can
-        // be crafted too (a masterwork proc, an enchanted crafted piece), so it
-        // is carried rather than assumed absent on this arm.
-        if (escrowed)
+        // A mergeable attachment's copies can have arrived from more than one
+        // physical stack (an overflow split at the item's stack cap), so
+        // remove them one at a time and bucket by craftedRecipeId, exactly
+        // like the plain-fungible arm below: a bundled parcel must never
+        // silently blend provenance from two differently-crafted stacks that
+        // merely staged as one byte-equal attachment. Runs exactly once for
+        // the ordinary count-1 case, so that shape is untouched.
+        const want = Math.floor(s.count);
+        const byRecipe = new Map<
+          string | undefined,
+          {
+            count: number;
+            instance: InvSlot['instance'];
+            materialSources: InvSlot['materialSources'];
+          }
+        >();
+        for (let i = 0; i < want; i++) {
+          const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
+          if (!escrowed) break;
+          const bucket = byRecipe.get(escrowed.craftedRecipeId);
+          if (bucket) bucket.count += 1;
+          else
+            byRecipe.set(escrowed.craftedRecipeId, {
+              count: 1,
+              // The craft marker rides alongside the payload: an instanced
+              // parcel can be crafted too (a masterwork proc, an enchanted
+              // crafted piece), so it is carried rather than assumed absent.
+              instance: escrowed.instance,
+              materialSources: escrowed.materialSources,
+            });
+        }
+        for (const [craftedRecipeId, bucket] of byRecipe) {
           parcels.push({
             itemId: s.itemId,
-            count: 1,
-            ...(escrowed.instance === undefined ? {} : { instance: escrowed.instance }),
-            ...(escrowed.materialSources === undefined
+            count: bucket.count,
+            ...(bucket.instance === undefined ? {} : { instance: bucket.instance }),
+            ...(bucket.materialSources === undefined
               ? {}
-              : { materialSources: escrowed.materialSources }),
-            ...(escrowed.craftedRecipeId === undefined
-              ? {}
-              : { craftedRecipeId: escrowed.craftedRecipeId }),
+              : { materialSources: bucket.materialSources }),
+            ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
           });
+        }
       } else {
         const count = Math.floor(s.count);
         const consumed = removeVendorSellUnits(
@@ -1235,7 +1331,10 @@ export class PostOffice {
       // Keep letters whose attached item id is no longer in ITEMS (a content
       // edit): dormant, recoverable data, exactly like market listings.
       // sanitizeEscrowSlot preserves an instanced parcel's payload and clamps
-      // its count to the identical-payload merge cap (the character-load rule).
+      // non-mergeable instance rows to the identical-payload merge cap (the
+      // character-load rule). Mergeable mail rows deliberately preserve their
+      // count: a single Ravenpost parcel may bundle byte-equal copies pulled
+      // from several physical bag rows, including stackSize-1 crafted items.
       // A plain parcel's craftedRecipeId marker rides alongside it (dropped by
       // sanitizeEscrowSlot, which is instance-only), so a mail restart never
       // strips a crafted item's provenance out of an in-flight attachment.
@@ -1243,7 +1342,7 @@ export class PostOffice {
         .filter((s) => s && typeof s.itemId === 'string')
         .map((s) => {
           const slot: InvSlot = {
-            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+            ...sanitizeEscrowSlot(s, mailEscrowCountCap(ITEMS[s.itemId], s), escrowDrops),
             ...(typeof s.craftedRecipeId === 'string'
               ? { craftedRecipeId: s.craftedRecipeId }
               : {}),

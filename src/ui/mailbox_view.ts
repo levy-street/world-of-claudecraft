@@ -135,14 +135,20 @@ export function stagedInstancedCopies(
   return n;
 }
 
-/** True when one more copy of this exact instanced payload may be staged.
- *  Bounded by BOTH what the player actually holds unlocked and the letter's
- *  parcel limit, mirroring the sim's own escrow validation
+/** True when one more copy of this exact instanced payload may be staged, ONE
+ *  PER SLOT. Bounded by BOTH what the player actually holds unlocked and the
+ *  letter's parcel limit, mirroring the sim's own escrow validation
  *  (mail/post_office.ts counts every entry naming the same payload against
  *  countMatchingUnlocked). The sim has always accepted several byte-equal
  *  instanced entries in one letter; the window used to dedupe them down to
  *  one, which made a stack of signed rare materials mailable only one copy per
- *  letter, at full postage each. */
+ *  letter, at full postage each. A MERGEABLE, non-material payload (item_
+ *  instance_merge.ts isMergeableInstancePayload, e.g. a rare-quality crafted
+ *  potion) no longer routes through this one-per-slot path at all: it stages
+ *  the whole owned stock as a single count-N slot in mailbox_window.ts
+ *  stageParcel, the same as a plain stack. This helper still governs
+ *  material instanced attachments and genuinely non-mergeable copies
+ *  (unique rolled items, locked or charge-bearing ones). */
 export function canStageInstancedCopy(
   staged: readonly InvSlot[],
   itemId: string,

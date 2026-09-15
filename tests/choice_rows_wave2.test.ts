@@ -137,7 +137,7 @@ describe('warlock wave 2 choice rows', () => {
     expect(leadenHex).toMatchObject({
       effect: { tuning: { rootDuration: 3.5 } },
       description:
-        'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+        'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
     });
     if (!improvedAbyssalGag) throw new Error('Missing Improved Abyssal Gag talent');
     setLanguage('zh_CN');

@@ -668,6 +668,32 @@ interface AttributionTargetFixture {
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// PR fen-features-subcull: remint after merging release/v0.43.0 into the branch.
+// The renderer leaf differs from the release tree by the zone-feature sweep
+// extraction; captures, performance measurements and capture identity are unchanged.
+// Re-minted for the v0.43.0 merge of the gather coarse key after the
+// zone-feature sweep extraction: the merged runtimeRender.renderer leaf
+// matches neither parent. No capture was retaken.
+// Re-minted for the PR #4023 merge after the v0.43.0 batch: the existing
+// runtimeRender leaves and the monument impostor civicShader leaf combine in
+// one tree, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the PR #4024 merge after PR #4023: the monument impostor
+// civicShader leaf and shader-prefix diagnostic remint evidence land in one
+// tree, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the PR #4025 merge after PR #4024: the monument impostor
+// civicShader leaf, shader-prefix diagnostic evidence, Eastbrook monument
+// reveal roots and gated live-program renderer changes land in one tree. No
+// capture was retaken.
+// Re-minted for the v0.43 release repair after Ascension/mount ordering moved
+// renderer.ts. No capture was retaken.
+// Re-minted for the PR #4036 GPU timer probe merge after PR #4032 through
+// #4035: the renderer probe hooks, screenshot-readback extraction and current
+// release-side renderer leaves combine in one tree. No capture was retaken.
+// Re-minted after extracting the remote-body standing-surface sample and
+// terrain-lean stencil out of renderer.ts, and after adding both sampler
+// modules as explicit provenance leaves. No capture was retaken.
+// Re-minted for the v0.43 release repair after the merged renderer sampling
+// imports and frame-cap probe cleanup moved renderer.ts. No capture was retaken.
 // Re-minted for the CPU-hygiene lot: the view-candidate scan and the drop
 // half of the view policy moved out of renderer.ts, and the rift ambience,
 // fishing bobber and Nythraxis painter consumers changed there, so the
@@ -675,8 +701,11 @@ interface AttributionTargetFixture {
 // Re-minted again for its review round: the ranked and required view
 // candidates now share the scan module's liveViewCandidate check, so the
 // same leaf moved once more. No capture was retaken.
+// Re-minted for the release-side CPU-hygiene lot over the current v0.43 batch:
+// the merged renderer leaf includes rider anchors, ground sampling, rift
+// ambience and shared view-candidate scans. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf';
+  'a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -983,6 +1012,12 @@ describe('Eastbrook polish capture contract', () => {
       rendererIntegrationSha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
       ),
+      entityGroundSampleSha256: await fileSha256(
+        EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSample,
+      ),
+      entityGroundSampleCoreSha256: await fileSha256(
+        EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSampleCore,
+      ),
       entityViewPolicySha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy),
       viewPriorityPolicySha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.viewPriorityPolicy,
@@ -999,6 +1034,16 @@ describe('Eastbrook polish capture contract', () => {
     });
     expect(policyOnlyChange.fingerprint).not.toBe(provenance.fingerprint);
     expect(policyOnlyChange.components.runtimeRender.entityViewPolicy.sha256).toBe('0'.repeat(64));
+    const samplerChange = deriveEastbrookPolishCompositeProvenance({
+      ...provenanceInputs,
+      entityGroundSampleSha256: '1'.repeat(64),
+    });
+    const samplerCoreChange = deriveEastbrookPolishCompositeProvenance({
+      ...provenanceInputs,
+      entityGroundSampleCoreSha256: '2'.repeat(64),
+    });
+    expect(samplerChange.fingerprint).not.toBe(provenance.fingerprint);
+    expect(samplerCoreChange.fingerprint).not.toBe(provenance.fingerprint);
     // On a mismatch the diagnostics module names the moved leaf against the
     // committed evidence seal, reports whether any fingerprinted input is
     // dirty vs HEAD (the stale-mint hazard: the 2026-08-05 craft-cast pin
@@ -1040,6 +1085,14 @@ describe('Eastbrook polish capture contract', () => {
           sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
         },
         runtimeRender: {
+          entityGroundSample: {
+            path: 'src/render/entity_ground_sample.ts',
+            sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          },
+          entityGroundSampleCore: {
+            path: 'src/render/entity_ground_sample_core.ts',
+            sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          },
           entityViewPolicy: {
             path: 'src/render/entity_view_policy_core.ts',
             sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
@@ -1913,6 +1966,8 @@ describe('Eastbrook polish capture contract', () => {
       'npcFacings:',
       'polishProvenance',
       'deriveEastbrookPolishCompositeProvenance({',
+      'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSample',
+      'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSampleCore',
       'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy',
       'TOWN_CONTRACT',
     ]) {

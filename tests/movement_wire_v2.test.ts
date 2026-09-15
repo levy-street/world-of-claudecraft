@@ -248,6 +248,42 @@ describe('movement wire v2', () => {
     }
   });
 
+  it('suspends and resumes self prediction during a live Vaulting Charge arc', () => {
+    const harness = createOnlineHarness({ latency: link(50, 0), movementWire: 2 });
+    try {
+      harness.server.sim.setPlayerLevel(6, harness.pid);
+      const run = harness.runScript({
+        durationMs: 1400,
+        actions: [
+          {
+            atMs: 100,
+            run: () => {
+              harness.serverEntity.gcdRemaining = 0;
+              harness.server.sim.castAbility('heroic_leap', harness.pid, {
+                x: harness.serverEntity.pos.x + 10,
+                z: harness.serverEntity.pos.z,
+              });
+            },
+          },
+        ],
+      });
+
+      const before = run.frames.filter((frame) => frame.tMs < 100);
+      expect(before.length).toBeGreaterThan(0);
+      expect(before.every((frame) => frame.predictionEnabled)).toBe(true);
+
+      const airborne = run.frames.filter((frame) => !frame.predictionEnabled);
+      expect(airborne.length).toBeGreaterThan(0);
+      expect(airborne.some((frame) => frame.mirrorY > run.frames[0].mirrorY + 0.25)).toBe(true);
+
+      const recovered = run.frames.filter((frame) => frame.tMs > 900);
+      expect(recovered.length).toBeGreaterThan(0);
+      expect(recovered.every((frame) => frame.predictionEnabled)).toBe(true);
+    } finally {
+      harness.dispose();
+    }
+  });
+
   it('keeps the harness option to force the legacy v1 display path', () => {
     const harness = createOnlineHarness({ latency: link(50, 0), movementWire: 1 });
     try {

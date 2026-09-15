@@ -11,7 +11,13 @@ import {
   ECHO_CONVERT_AOE,
   ECHO_CONVERT_SINGLE,
   ECHO_ROTATION_CONVERSION_MULT,
+  TEMPORAL_AEGIS_ID,
+  TEMPORAL_AEGIS_NAME,
 } from '../src/sim/combat/chronomancy';
+import {
+  TEMPORAL_AEGIS_CAP_MAX_HP_FRACTION,
+  TEMPORAL_AEGIS_DURATION_SECONDS,
+} from '../src/sim/content/chronomancy_tuning';
 import { ABILITIES, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -442,5 +448,126 @@ describe('Temporal Echo: determinism and enemy-free healing', () => {
     sim.castAbility('temporal_barrier'); // self
     sim.tick();
     expect(p.auras.some((a) => a.id === 'temporal_barrier' && a.kind === 'absorb')).toBe(true);
+  });
+});
+
+describe('Temporal Echo: overheal-to-shield (Temporal Aegis)', () => {
+  it('creates a Temporal Aegis shield when dealing Arcane damage while the ally is at full health', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'Escudado');
+    const mob = addHostile(sim);
+    markEcho(sim, ally);
+    expect(ally.hp).toBe(ally.maxHp); // Full health
+
+    // 100 Arcane damage with 40% single-target conversion -> 40 heal.
+    // Ally is already at maxHp -> 40 overheal converted into Temporal Aegis shield.
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
+
+    const shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield).toBeDefined();
+    expect(shield?.kind).toBe('absorb');
+    expect(shield?.name).toBe(TEMPORAL_AEGIS_NAME);
+    expect(shield?.value).toBe(40);
+    expect(shield?.duration).toBe(TEMPORAL_AEGIS_DURATION_SECONDS);
+    expect(shield?.remaining).toBe(TEMPORAL_AEGIS_DURATION_SECONDS);
+  });
+
+  it('accumulates shield on repeated hits up to the 20% max health cap and refreshes duration', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'Acumulador');
+    const mob = addHostile(sim);
+    markEcho(sim, ally);
+    expect(ally.hp).toBe(ally.maxHp);
+
+    const cap = Math.round(ally.maxHp * TEMPORAL_AEGIS_CAP_MAX_HP_FRACTION);
+    expect(cap).toBeGreaterThan(0);
+
+    // Hit multiple times to stack shield
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit'); // +40
+    let shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield?.value).toBe(40);
+
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit'); // +40 -> 80
+    shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield?.value).toBe(80);
+
+    // Now deal massive Arcane damage to hit the cap
+    deal(sim, p, mob, 10000, false, 'arcane', 'Arcane Bolt', 'hit');
+    shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield?.value).toBe(cap); // Capped at exactly 20% maxHp
+
+    // Let some time elapse
+    for (let i = 0; i < 60; i++) sim.tick(); // 3s elapsed
+    expect(shield?.remaining).toBeLessThan(TEMPORAL_AEGIS_DURATION_SECONDS);
+
+    // Another hit refreshes the duration back to full 15s without exceeding cap
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
+    shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield?.value).toBe(cap);
+    expect(shield?.remaining).toBe(TEMPORAL_AEGIS_DURATION_SECONDS);
+  });
+
+  it('heals missing health first, and only routes the excess into shield', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'Mitad');
+    const mob = addHostile(sim);
+    markEcho(sim, ally);
+
+    // Put ally 20 HP below max
+    ally.hp = ally.maxHp - 20;
+
+    // 100 Arcane damage -> 40 heal. 20 fills missing HP to max, 20 converts to shield.
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
+
+    expect(ally.hp).toBe(ally.maxHp);
+    const shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield).toBeDefined();
+    expect(shield?.value).toBe(20);
+  });
+
+  it('soaks incoming damage as an absorb shield', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'Protegido');
+    const mob = addHostile(sim);
+    markEcho(sim, ally);
+
+    // Build 40 shield
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
+    let shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield?.value).toBe(40);
+
+    // Mob attacks ally for 25 damage: shield soaks 25, leaves 15 shield, ally hp stays full
+    deal(sim, mob, ally, 25, false, 'physical', null, 'hit');
+    expect(ally.hp).toBe(ally.maxHp);
+    shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield?.value).toBe(15);
+
+    // Mob attacks ally for 30 damage: shield absorbs remaining 15 and breaks, remaining 15 damages ally
+    deal(sim, mob, ally, 30, false, 'physical', null, 'hit');
+    expect(ally.hp).toBe(ally.maxHp - 15);
+    shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield).toBeUndefined(); // Depleted and removed
+  });
+
+  it('group echo from Temporal Cascade also converts overheal into Temporal Aegis', () => {
+    const { sim, p } = chronoMage();
+    const ally = addAlly(sim, 'CascadaEscudo');
+    const mob = addHostile(sim);
+
+    sim.partyInvite(ally.id, p.id);
+    sim.partyAccept(ally.id);
+    sim.targetEntity(ally.id);
+    sim.castAbility('temporal_cascade');
+    for (let i = 0; i < 35; i++) sim.tick(); // Complete 1.5s cast
+
+    const groupMark = ally.auras.find((a) => a.kind === 'temporal_echo' && a.echoGroup);
+    expect(groupMark).toBeDefined();
+
+    // Ally is at full HP. Deal 100 single-target Arcane damage (13% conversion -> 13 heal).
+    deal(sim, p, mob, 100, false, 'arcane', 'Arcane Bolt', 'hit');
+
+    const shield = ally.auras.find((a) => a.id === TEMPORAL_AEGIS_ID);
+    expect(shield).toBeDefined();
+    expect(shield?.value).toBe(13);
   });
 });

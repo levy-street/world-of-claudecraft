@@ -2104,7 +2104,7 @@
     text-shadow: 0 1px var(--text-outline-color);
     box-shadow: 0 0 calc(6px * var(--fx-shadow, 1)) var(--color-primary-glow-heavy);
   }
-  body.mobile-touch:has(.paladin-devotion.last-charge) #mobile-action-ring button.empowered {
+  body.mobile-touch.devotion-last-charge #mobile-action-ring button.empowered {
     animation-duration: 0.55s;
     filter: brightness(1.18);
   }
@@ -3527,6 +3527,10 @@
     height: max(40px, var(--party-frame-height, 42px));
     min-height: 40px;
     padding: 0;
+    box-shadow: none;
+  }
+  body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
+    background-image: none;
   }
   body.mobile-touch #party-frames.party-style-raid .party-frame .bar.hp {
     height: auto;
@@ -5482,11 +5486,14 @@
      Keyed on the open marker the Hud stamps on every visible window (no new
      wiring): while BOTH are open they split the sheet like the vendor and
      bank docks (trade left, bags right), and a bags close returns the trade
-     sheet to full width on its own. */
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-  #trade-window,
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #bags {
+     sheet to full width on its own. body.trade-and-bags-open is stamped by
+     the window-open mirror (src/ui/window_open_state.ts) from those markers;
+     it replaced a body-anchored :has() pair (src/ui/root_state_classes.ts).
+     The #ui hop is specificity, not reach: (2,2,1) keeps the split above the
+     later (1,2,1) char-bags-paired / vendor-open / bank-open / market-open
+     #bags pins, as the old double-:has() form did. */
+  body.mobile-touch.trade-and-bags-open #ui #trade-window,
+  body.mobile-touch.trade-and-bags-open #ui #bags {
     position: fixed;
     /* Divided by the UI scale like the un-split pins above: authored inside
        #ui's zoom, a raw inset shrinks with the scale and stops clearing the
@@ -5501,21 +5508,17 @@
     box-sizing: border-box;
     z-index: 95 !important;
   }
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #trade-window {
+  body.mobile-touch.trade-and-bags-open #ui #trade-window {
     left: calc(max(10px, env(safe-area-inset-left)) / var(--ui-scale, 1));
     right: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
     overflow-y: auto;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #trade-window
-    .trade-cols {
+  body.mobile-touch.trade-and-bags-open #ui #trade-window .trade-cols {
     flex-direction: column;
   }
-  body.mobile-touch:has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])
-    #bags {
+  body.mobile-touch.trade-and-bags-open #ui #bags {
     left: calc(var(--app-vw) / var(--ui-scale, 1) / 2);
     right: calc(max(10px, env(safe-area-inset-right)) / var(--ui-scale, 1));
     overflow: hidden;
@@ -5598,6 +5601,54 @@
   body.mobile-touch .raid-groups {
     grid-template-columns: 1fr;
   }
+  /* Who tab on a touch-narrow window: three tracks (dot, name, level), and
+     the class / zone / guild trio (.soc-who-meta, display: contents on the
+     desktop grid) becomes ONE wrapped line under the name, so no column is
+     hidden and nothing scrolls sideways. The row's divider moves to that
+     second line; the header's three extra sort buttons wrap the same way. */
+  body.mobile-touch .soc-who-list {
+    grid-template-columns: auto 1fr 3em;
+  }
+  body.mobile-touch .soc-who-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 12px;
+    grid-column: 2 / -1;
+    min-width: 0;
+    padding: 0 2px 6px;
+    border-bottom: 1px solid var(--color-border-showcase);
+  }
+  body.mobile-touch .soc-who-header .soc-who-meta {
+    padding-bottom: 4px;
+    border-bottom-color: var(--gold-dim);
+  }
+  body.mobile-touch .soc-who-meta .soc-who-cell {
+    padding: 0;
+    border-bottom: 0;
+    font-size: 12px;
+  }
+  /* The five sort buttons and the class chip are the tab's only interactive
+     controls outside the shared .btn / .soc-tab floor: hold them at the 40px
+     touch target like the rest of the social chrome. */
+  body.mobile-touch .soc-who-sort,
+  body.mobile-touch .soc-who-cls {
+    min-height: 40px;
+    box-sizing: border-box;
+  }
+  body.mobile-touch .soc-who-cell.who-dot,
+  body.mobile-touch .soc-who-cell.who-name,
+  body.mobile-touch .soc-who-cell.who-level {
+    border-bottom: 0;
+    padding-bottom: 2px;
+  }
+  /* Each row is now two grid rows (name line + meta line): the dot spans both
+     so auto-placement keeps every dot beside its own name rather than sliding
+     into the previous row's meta line. */
+  body.mobile-touch .soc-who-cell.who-dot {
+    grid-row: span 2;
+    align-self: center;
+  }
   body.mobile-touch .raid-group {
     border-top: 1px solid var(--color-border-showcase);
     padding-top: 6px;
@@ -5632,6 +5683,9 @@
   body.mobile-touch .bag-item,
   body.mobile-touch .mkt-tab,
   body.mobile-touch .mkt-btn,
+  body.mobile-touch .mkt-sweep-btn,
+  body.mobile-touch .mkt-sweep-go,
+  body.mobile-touch .mkt-sweep-close,
   body.mobile-touch .mkt-list-btn,
   body.mobile-touch #loot-window .btn,
   body.mobile-touch .loot-roll-btn,
@@ -6767,6 +6821,17 @@
      the More tray's #mobile-reliquary button, so nothing loses its only entry
      point (the compact-tier header tap that opened it was a second one). */
   body.mobile-touch #reliquary-tracker {
+    display: none;
+  }
+  /* The pinned-recipe tracker follows the Reliquary tracker off the touch HUD
+     for the same crowding reason; the crafting window's pin chips still work
+     and the list is waiting on desktop. */
+  body.mobile-touch #recipe-tracker {
+    display: none;
+  }
+  /* And its feeder: a pin chip on the touch crafting window would promise a
+     surface this tier never shows. */
+  body.mobile-touch .crafting-pin-chip {
     display: none;
   }
   /* ---------- mobile tracker chips (compact) ---------- */
@@ -9225,5 +9290,40 @@
   body.mobile-touch .material-sources-dialog {
     width: min(460px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
     max-height: calc(var(--app-vh, 100dvh) / var(--ui-scale, 1) - 20px);
+  }
+
+  body.mobile-touch .crafting-reagent-line,
+  body.mobile-touch .crafting-fee-line,
+  body.mobile-touch .crafting-skill-line {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  /* Raid Warning alert stack (raid_warning_banner.ts) on mobile touch */
+  body.mobile-touch #raid-warning-banner {
+    top: 6%;
+    max-width: calc(100vw - 24px);
+  }
+  body.mobile-touch .raid-warning-line {
+    font-size: 20px;
+    padding: 5px 14px;
+    letter-spacing: 0.4px;
+  }
+
+  /* Ready Check Leader Window (ready_check_leader_window.ts) touch layout:
+     compact popup centered at the upper-middle of the touch viewport. */
+  body.mobile-touch #ready-check-leader-window {
+    top: 28%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(220px, calc(100vw - 32px));
+    max-height: calc(var(--app-vh, 100dvh) - 120px);
+  }
+  body.mobile-touch #ready-check-leader-window .rck-close {
+    min-width: 36px;
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

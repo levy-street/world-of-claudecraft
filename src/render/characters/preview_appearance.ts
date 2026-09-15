@@ -1,4 +1,9 @@
-import type { PlayerClass } from '../../sim/types';
+import {
+  mainhandShowsWeaponSkin,
+  offhandMirrorsWeaponSkin,
+} from '../../sim/content/weapon_skin_rules';
+import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
+import type { PlayerClass, WeaponSkinType } from '../../sim/types';
 import type { WeaponLayoutOverride } from './manifest';
 import { mechHeldWeaponOverride } from './manifest';
 
@@ -38,6 +43,38 @@ export function previewAppearanceVisual(a: PreviewAppearance): PreviewVisual {
     weaponOverride: mech ? mechHeldWeaponOverride(a.cls) : null,
   };
 }
+
+/** The mainhand item the Armory inspect turntable should hold while trying on
+ *  `skinId`: the real mainhand when either hand already shows that skin (the
+ *  offhand mirror covers a mace held in the offhand), otherwise a stand-in
+ *  item of the skin's own type so the try-on still dresses the mainhand, the
+ *  way it always did before the mainhand type gate (mainhandShowsWeaponSkin).
+ *  The stand-in is the first catalog item of that type, so it is stable. Pure. */
+export function previewTryOnMainhand(
+  skinId: string | null,
+  mainhandItemId: string | null | undefined,
+  offhandItemId: string | null | undefined,
+): string | null {
+  const mainhand = mainhandItemId ?? null;
+  const def = skinId ? WEAPON_SKINS[skinId] : null;
+  if (!def) return mainhand;
+  if (mainhandShowsWeaponSkin(skinId, mainhand) || offhandMirrorsWeaponSkin(skinId, offhandItemId))
+    return mainhand;
+  return TRY_ON_STAND_IN[def.weaponType] ?? mainhand;
+}
+
+/** The named stand-in item per melee skin type (each a starter weapon that
+ *  classifies to that type in WEAPON_TYPE_BY_ITEM, pinned by test), so the
+ *  try-on never depends on the data table's declaration order. Ranged skins
+ *  never need one (they dress the mainhand attach whatever it holds). */
+export const TRY_ON_STAND_IN: Partial<Record<WeaponSkinType, string>> = {
+  sword: 'worn_sword',
+  axe: 'rusty_hatchet',
+  mace: 'training_mace',
+  dagger: 'rusty_dagger',
+  staff: 'gnarled_staff',
+  wand: 'palecoil_rod',
+};
 
 /** Stable identity of an appearance, so an async mech re-apply can bail out if a
  *  newer selection superseded it. */

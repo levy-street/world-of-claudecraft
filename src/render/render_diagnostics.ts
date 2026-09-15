@@ -200,7 +200,12 @@ export class RenderDiagnostics {
         const hasPoints = Boolean(renderable.isPoints);
         const hasSprite = Boolean(renderable.isSprite);
         const hasLine = Boolean(renderable.isLine || renderable.isLineSegments);
-        if (hasMesh || hasPoints || hasSprite || hasLine) {
+        // A count-0 InstancedMesh is skipped by three's render list before
+        // any program binds (the gather-node reach hide, the props far bake):
+        // neither a draw nor an object here, so the census agrees with
+        // renderer.info.render.calls.
+        const drawsNothing = Boolean(renderable.isInstancedMesh) && renderable.count === 0;
+        if (!drawsNothing && (hasMesh || hasPoints || hasSprite || hasLine)) {
           const geometry = renderable.geometry;
           const material = renderable.material;
           const stat = categoryStats(category);

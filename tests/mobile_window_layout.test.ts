@@ -221,6 +221,15 @@ describe('mobile window layout CSS', () => {
     expect(mobileCss).not.toContain('body.mobile-touch .mkt-filters {');
   });
 
+  it('bumps the crafting reagent/fee/skill sub-lines off the 10px .vi-sub floor on touch', () => {
+    // The reagent list is the part of the recipe card a player actually reads
+    // to tell what a recipe needs; unlike the rest of this window it had no
+    // touch override at all and stayed at the vendor row's 10px base.
+    expect(mobileCss).toMatch(
+      /body\.mobile-touch \.crafting-reagent-line,\s*body\.mobile-touch \.crafting-fee-line,\s*body\.mobile-touch \.crafting-skill-line \{\s*font-size: 13px;\s*overflow-wrap: anywhere;/,
+    );
+  });
+
   it('floors the money-surface consent controls and the bid field on touch (the Exchange and the trade arm)', () => {
     // A checkbox cannot be 40px without looking broken, so the LABEL is the
     // tap target and carries the floor; the terms link beside it is the
@@ -299,7 +308,7 @@ describe('mobile window layout CSS', () => {
       // #social-window, which sets exactly that for itself.
       for (const other of mobileCss.split('\n  }')) {
         if (!other.includes(`${id} {`) && !other.includes(`${id},`)) continue;
-        if (other.includes(':has(#trade-window')) continue; // the split dock, below
+        if (other.includes('trade-and-bags-open')) continue; // the split dock, below
         expect(other, `no block may pin ${id}'s bottom edge`).not.toMatch(/\n\s*bottom: (?!auto)/);
       }
     }
@@ -307,7 +316,9 @@ describe('mobile window layout CSS', () => {
     // meant to be full height. That is the other half of the same decision.
     const split = mobileCss
       .split('\n  }')
-      .find((b) => b.includes(':has(#trade-window') && b.includes('position: fixed'));
+      .find(
+        (b) => b.includes('trade-and-bags-open #ui #trade-window') && b.includes('position: fixed'),
+      );
     expect(split, 'the side-by-side split rule exists').toBeDefined();
     expect(split ?? '', 'the split dock pins both edges').toMatch(/\n\s*bottom: calc\(max\(10px/);
   });
@@ -323,15 +334,21 @@ describe('mobile window layout CSS', () => {
   });
 
   it('the split dock marker is the one the HUD actually stamps', () => {
-    // The split rule keys on [data-window-open="1"] on BOTH #trade-window and
-    // #bags, and the stamp lives in hud.ts as dataset.windowOpen. Renaming
-    // either side alone would silently restore "bags covers the trade window
-    // entirely" (the blocking mobile defect this pass fixed), and only the
-    // manual BAGS_OVER E2E arm could see it; this cross-file pin is the cheap
-    // in-gate guard.
-    expect(mobileCss).toContain(
-      ':has(#trade-window[data-window-open="1"]):has(#bags[data-window-open="1"])',
-    );
+    // The split rule keys on body.trade-and-bags-open, which the window-open
+    // mirror (src/ui/window_open_state.ts) derives from [data-window-open="1"]
+    // on BOTH #trade-window and #bags, and the stamp lives in hud.ts as
+    // dataset.windowOpen. Renaming any link alone would silently restore "bags
+    // covers the trade window entirely" (the blocking mobile defect this pass
+    // fixed), and only the manual BAGS_OVER E2E arm could see it; this
+    // cross-file pin is the cheap in-gate guard.
+    expect(mobileCss).toContain('body.mobile-touch.trade-and-bags-open #ui #trade-window,');
+    expect(mobileCss).toContain('body.mobile-touch.trade-and-bags-open #ui #bags {');
+    const openState = readFileSync(
+      new URL('../src/ui/window_open_state.ts', import.meta.url),
+      'utf8',
+    ).replace(/\/\*[\s\S]*?\*\/|(?<!:)\/\/[^\n]*/g, '');
+    expect(openState).toContain("getAttribute('data-window-open') === '1'");
+    expect(openState).toContain("windowOpenMarked('trade-window') && windowOpenMarked('bags')");
     // Comment-stripped like the CSS read above: a commented-out stamp left by
     // a refactor must not keep this green.
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8').replace(

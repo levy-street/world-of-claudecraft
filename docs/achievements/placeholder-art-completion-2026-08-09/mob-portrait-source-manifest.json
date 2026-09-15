@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "a5570569a067278741f78c499fcb011ee35994966bb580d2e478660307dddb32",
+  "rendererFingerprint": "28d300f06cd09a7c9df8c8b1d275eb66a49c89e641525d114aa335a0a88cd135",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "linux",
-    "arch": "x64",
+    "arch": "arm64",
     "gpuVendor": "Google Inc. (Google)",
-    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "152",
-    "browserVersion": "Chrome/152.0.7977.82",
+    "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+    "browserMajor": "149",
+    "browserVersion": "Chrome/149.0.7827.0",
     "requestedBackend": "swiftshader",
-    "fingerprint": "9b8a5174625ffd9f2dfa2d6d72599c3e5e71bbc0bef8e8831715f3141701ffa2"
+    "fingerprint": "cb08ceedfd91198593683837f1f08cf58a01b9c7475e9f8342c0db6a6df18b5a"
   },
   "renderer": {
     "trackedFiles": [
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4864529,
-      "sha256": "1d10073657417c627d0bffdd39c3f58953aff57ef821dfa5a6ee70079369caed",
+      "bytes": 4903700,
+      "sha256": "98acb7ca805a747e1cc5b9f66fd90991933cf76224fb6bd2da19ce44c2bd66b3",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 245,
+  "portraitCount": 250,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -2936,6 +2936,176 @@
       }
     },
     {
+      "id": "healing_dummy_caster",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_caster.webp",
+        "bytes": 1756,
+        "sha256": "33ef1c8e61d073935273c5aebcf6d16cd756996ce5cb7872b2645ddbd9f0d053"
+      }
+    },
+    {
+      "id": "healing_dummy_ranger",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_ranger.webp",
+        "bytes": 1756,
+        "sha256": "33ef1c8e61d073935273c5aebcf6d16cd756996ce5cb7872b2645ddbd9f0d053"
+      }
+    },
+    {
+      "id": "healing_dummy_scout",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_scout.webp",
+        "bytes": 1756,
+        "sha256": "33ef1c8e61d073935273c5aebcf6d16cd756996ce5cb7872b2645ddbd9f0d053"
+      }
+    },
+    {
+      "id": "healing_dummy_soldier",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_soldier.webp",
+        "bytes": 1756,
+        "sha256": "33ef1c8e61d073935273c5aebcf6d16cd756996ce5cb7872b2645ddbd9f0d053"
+      }
+    },
+    {
+      "id": "healing_dummy_tank",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#55aa55",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "55d10c68776144c21a92c3422b2cb0deb1bd71397381f8c38bdc888153796f5d",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_tank.webp",
+        "bytes": 1772,
+        "sha256": "22ca53181508b487ef20d33f46df93aac20ab3b1cea152d738fec30fb0834ea3"
+      }
+    },
+    {
       "id": "hedge_gnome",
       "family": "burrower",
       "finderEncounter": false,
@@ -3380,7 +3550,7 @@
     {
       "id": "ignivar_herald_of_the_last_flame",
       "family": "elemental",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_ignivar",
       "renderSpec": {
         "model": {
@@ -3407,8 +3577,8 @@
       "sourceFingerprint": "c108d109f45326ad6a09a91f13991b30927d84a3273d5454e52118f9cad4f44f",
       "output": {
         "path": "public/ui/mobs/ignivar_herald_of_the_last_flame.webp",
-        "bytes": 2396,
-        "sha256": "80ee4a4a99665cc3086c6aa510e158015c1d664428273a2ed457f28f5d92b289"
+        "bytes": 2414,
+        "sha256": "1c0a946c66f821f1773d82920468b64d262eb3141aeb1960e30e3f849283e91e"
       }
     },
     {
@@ -7983,7 +8153,7 @@
     {
       "id": "varkhul_forgefather_of_the_last_flame",
       "family": "elemental",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_varkhul_forgefather",
       "renderSpec": {
         "model": {
@@ -8010,8 +8180,8 @@
       "sourceFingerprint": "a1b01f3bd947684ddc20c92d46e4c7c96b25b7422ec0690f4cccb5bdafd27d3e",
       "output": {
         "path": "public/ui/mobs/varkhul_forgefather_of_the_last_flame.webp",
-        "bytes": 3518,
-        "sha256": "dbb650626d73cd0baa886df465819b139a9e67940379ded07a700b77b79da0b0"
+        "bytes": 3506,
+        "sha256": "122c80fe8c0e4b9a57578302548370ed3c652ab29bbbc8251cd6caf31040f641"
       }
     },
     {
@@ -8648,7 +8818,7 @@
     {
       "id": "wildheart_beastmaster",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_beastmaster",
       "renderSpec": {
         "model": {
@@ -8675,14 +8845,14 @@
       "sourceFingerprint": "3c3b9c0c15aa5b1061dd6ebccde693527bd9c86c45be51cd26da658de0e0ff7e",
       "output": {
         "path": "public/ui/mobs/wildheart_beastmaster.webp",
-        "bytes": 3316,
-        "sha256": "15f49f4edd97ddde548ee5fe9533357b75546c154ba6f6c7c4f1fd1915b7e41a"
+        "bytes": 3264,
+        "sha256": "0f9437039e40650b5b17e36dc4938b4544363ec0bff78ef477317eabcafb93f3"
       }
     },
     {
       "id": "wildheart_hexcaller",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_hexcaller",
       "renderSpec": {
         "model": {
@@ -8709,14 +8879,14 @@
       "sourceFingerprint": "429116bbd70dc6c987264887d3677dd52cb3ed503d364ebc5da64e4b869e2360",
       "output": {
         "path": "public/ui/mobs/wildheart_hexcaller.webp",
-        "bytes": 3284,
-        "sha256": "a27aab09f2dc2048aee2c9dc294747c792c1b852e581adefb072acacd7d55e9d"
+        "bytes": 3276,
+        "sha256": "2c511ab73bfdcf3a5b80279da23168ac04fb9d035ae1cdaf690fac48ba72ab55"
       }
     },
     {
       "id": "wildheart_high_priest",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_high_priest",
       "renderSpec": {
         "model": {
@@ -8743,14 +8913,14 @@
       "sourceFingerprint": "119fe85f7e322bd33f8a8dfe2aa8447ca8ff6a9422ed7841d286bdda21cd85dd",
       "output": {
         "path": "public/ui/mobs/wildheart_high_priest.webp",
-        "bytes": 3542,
-        "sha256": "cb3553d0e55b2bc9371e3e815e01cd02c2484ef46ddbca0fb1bd7e26f932645c"
+        "bytes": 3516,
+        "sha256": "0a5a6a33e3682ab4a6b9630afdc5e5b858c7c1f1a64930bfdd2385dbb635e847"
       }
     },
     {
       "id": "wildheart_ravager",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_ravager",
       "renderSpec": {
         "model": {
@@ -8778,13 +8948,13 @@
       "output": {
         "path": "public/ui/mobs/wildheart_ravager.webp",
         "bytes": 3438,
-        "sha256": "9eb1589e570269d11d70689eed37070c16c675cd4e5d1a6e83f2d1ee97ee40ad"
+        "sha256": "920473c888f897077f5f910a482c2a58c866324c7ecb08c5b6d3e5079db82abd"
       }
     },
     {
       "id": "wildheart_stalker",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_stalker",
       "renderSpec": {
         "model": {
@@ -8811,8 +8981,8 @@
       "sourceFingerprint": "8566b5949a1b9a4f6cfe84d3f07a6d78a8bc35220e964b9080cbf5e797c1dbed",
       "output": {
         "path": "public/ui/mobs/wildheart_stalker.webp",
-        "bytes": 2162,
-        "sha256": "d10532b0172ae46b7a689cf3b986330e085f4cd5abfe5080a704076cabd403c0"
+        "bytes": 2180,
+        "sha256": "de84e863f85fba24ab4c863301b6e80014e7812403f20c7a74831dcf1b575317"
       }
     },
     {

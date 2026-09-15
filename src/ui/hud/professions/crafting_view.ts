@@ -24,6 +24,7 @@ import {
   holdsSelfSignedInstance,
   requiredReagentCountFor,
 } from '../../../sim/professions/crafting';
+import { ordinaryGradeFor } from '../../../sim/professions/fine_grade_base';
 import { countAcrossGrades, materialGradeIds } from '../../../sim/professions/material_grades';
 import {
   countMinusPlanned,
@@ -101,6 +102,18 @@ export interface CraftingReagentRow {
    *  the vault counts in both: one warns about grade value, this one about
    *  source). */
   vaultDrawn: number;
+  /** Units of the ORDINARY grade the player holds (carried plus drawable
+   *  vault) while this row asks for a FINE grade and is unsatisfied. A fine
+   *  reagent is never satisfied by its plain twin (the one-directional gate
+   *  for node grades, no substitution at all for farm twins), and a player
+   *  holding Vale Wheat against a Fine Vale Wheat bill otherwise reads a bare
+   *  0/4 with no reason (the Bronze Hoe report). 0 for a reagent with no
+   *  ordinary twin, and 0 once the row is satisfied (nothing to explain). */
+  ordinaryHeld: number;
+  /** The ordinary twin's id and def (for the note's name); both absent when
+   *  ordinaryHeld is 0, the id alone when the catalog lacks the def. */
+  ordinaryItemId?: string;
+  ordinaryItem?: ItemDef;
 }
 
 export interface CraftingRecipeRow {
@@ -336,6 +349,12 @@ export function buildCraftingView(
             .reduce((sum, take) => sum + take.count, 0)
         : 0;
       const vaultDrawn = satisfied ? plan.vault.reduce((sum, take) => sum + take.count, 0) : 0;
+      const ordinaryId = satisfied ? undefined : ordinaryGradeFor(reagent.itemId);
+      const ordinaryHeld =
+        ordinaryId === undefined
+          ? 0
+          : countInInventory(inventory, ordinaryId) +
+            (vaultCount === null ? 0 : vaultCount(ordinaryId));
       return {
         itemId: reagent.itemId,
         item: items[reagent.itemId],
@@ -344,6 +363,10 @@ export function buildCraftingView(
         satisfied,
         fineSubstituted,
         vaultDrawn,
+        ordinaryHeld,
+        ...(ordinaryHeld > 0 && ordinaryId !== undefined
+          ? { ordinaryItemId: ordinaryId, ordinaryItem: items[ordinaryId] }
+          : {}),
       };
     });
     const combo = recipe.comboRequirement;
@@ -422,9 +445,19 @@ export function buildCraftingView(
 // reagents in NO recipe, so a declared-id-only set would let a player gather
 // them all afternoon without the open window ever re-converging, which is the
 // #2375 failure mode this signature exists to close.
+// Ordinary twins included too (the Bronze Hoe note): ordinaryHeld is a third
+// bag fact the view reads, the plain twin of every fine reagent, so the
+// window must re-converge when the player picks one up or sells the stack.
+// Every shipped twin is itself a reagent today; folding the lookup in keeps
+// the set complete by construction rather than by coincidence.
 const REAGENT_ITEM_IDS: ReadonlySet<string> = new Set(
   ALL_RECIPES.flatMap((recipe) =>
-    recipe.reagents.flatMap((reagent) => materialGradeIds(reagent.itemId)),
+    recipe.reagents.flatMap((reagent) => [
+      ...materialGradeIds(reagent.itemId),
+      ...(ordinaryGradeFor(reagent.itemId) === undefined
+        ? []
+        : [ordinaryGradeFor(reagent.itemId) as string]),
+    ]),
   ),
 );
 

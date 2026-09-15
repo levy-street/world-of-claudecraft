@@ -323,6 +323,7 @@ const hudStringsEn = {
       templates: {
         battleground: '[Battleground] {name}: {message}',
         party: '[Party] {name}: {message}',
+        raidWarning: '[Raid Warning] {name}: {message}',
         yell: '{name} yells: {message}',
         whisper: '{name} whispers: {message}',
         toWhisper: 'To {name}: {message}',
@@ -470,6 +471,7 @@ const hudStringsEn = {
       stunned: 'You are stunned!',
       silenced: 'You are silenced!',
       busy: 'You are busy.',
+      cannotCastWhileMoving: "You can't cast while moving.",
       abilityNotReady: 'That ability is not ready yet.',
       notEnoughRage: 'Not enough rage!',
       notEnoughEnergy: 'Not enough energy!',

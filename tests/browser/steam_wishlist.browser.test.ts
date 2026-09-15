@@ -54,6 +54,11 @@ function mountHeader(labels: string[], desktopExit = false): HTMLElement {
   const actions = element('div', 'header-actions');
   actions.appendChild(element('button', 'homepage-music-btn'));
   if (desktopExit) actions.appendChild(element('button', 'desktop-login-exit', 'Spiel beenden'));
+  // The shell reveals the button through src/game/desktop_login_exit.ts, which
+  // stamps body.desktop-login-exit-shown with the reveal; the header re-flow rule
+  // in shell.css keys on that class (src/ui/root_state_classes.ts), so mounting a
+  // revealed button here mirrors the stamp.
+  document.body.classList.toggle('desktop-login-exit-shown', desktopExit);
   const wishlist = element('a', 'steam-wishlist steam-wishlist-cta');
   wishlist.appendChild(icon());
   wishlist.appendChild(element('span', '', 'Auf Steam-Wunschliste setzen'));

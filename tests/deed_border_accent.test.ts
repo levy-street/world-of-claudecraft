@@ -851,7 +851,11 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       expect(html.match(/class="deed-heraldry-pattern"/g)).toHaveLength(2);
     }
     const hud = read('src/ui/hud.ts');
-    expect(hud).toContain('targetFrame.borderSlug = deedTargetBorderSlug(');
+    // The target fill moved to src/ui/target_frame_descriptor.ts; the Hud calls it.
+    expect(hud).toContain('const targetFrame = fillTargetFrameDescriptor(');
+    expect(read('src/ui/target_frame_descriptor.ts')).toContain(
+      'd.borderSlug = deedTargetBorderSlug(',
+    );
     expect(hud.match(/heraldry:\s*\{/g)).toHaveLength(2);
     expect(hud.slice(hud.indexOf('private readonly totFramePainter'))).not.toContain(
       'totf-heraldry',
@@ -1137,11 +1141,13 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
         }
       }
     }
+    // 96 -> 97: the target frame's raid-marker badge (.uf-raid-marker) scales its
+    // drop-shadow bloom by the tier token; the symbol itself renders at every tier.
     expect(
       allTierShadowDeclarations,
       // Shipped uses plus the two library glow composites in tokens.css.
-      'the style graph owns 96 reviewed tier-shadow uses',
-    ).toHaveLength(96);
+      'the style graph owns 97 reviewed tier-shadow uses',
+    ).toHaveLength(97);
 
     for (const [name, body] of [
       [
@@ -1247,12 +1253,17 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     // fxTier everywhere else. Scan a small window around each `borderSlug =`
     // assignment so a future edit that gated it behind a tier (inline or a
     // wrapping if) is caught without whole-file false positives.
+    // The target site now lives in the extracted fill module (which reads no
+    // tier at all: scan it whole), the self site stays in hud.ts.
+    const fill = read('src/ui/target_frame_descriptor.ts');
+    expect(fill).toContain('d.borderSlug = deedTargetBorderSlug(');
+    for (const token of [...PROFILE_TOKENS, 'fxTier']) expect(fill).not.toContain(token);
     const hud = read('src/ui/hud.ts').split('\n');
     const sites = hud.reduce<number[]>((acc, line, i) => {
       if (line.includes('Frame.borderSlug = deed')) acc.push(i);
       return acc;
     }, []);
-    expect(sites.length, 'expected both borderSlug assignments (self + target)').toBe(2);
+    expect(sites.length, 'expected the self borderSlug assignment').toBe(1);
     for (const i of sites) {
       const window = hud.slice(Math.max(0, i - 3), i + 2).join('\n');
       for (const token of [...PROFILE_TOKENS, 'fxTier']) {

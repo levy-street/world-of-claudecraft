@@ -237,16 +237,40 @@ describe('destruction progression', () => {
 
   it('pins the siege tuning anchors and the shared major-offense/capstone choices', () => {
     expect(ABILITIES.chaos_bolt).toMatchObject({
-      castTime: 2.5,
+      castTime: 2.3,
       cooldown: 0,
       ruinCost: 3,
       effects: [{ type: 'directDamage', min: 192, max: 235 }],
     });
     expect(ABILITIES.shadow_bolt.effects).toEqual([{ type: 'directDamage', min: 36, max: 50 }]);
     expect(ABILITIES.shadow_bolt.ranks?.map((rank) => rank.effects)).toEqual([
-      [{ type: 'directDamage', min: 67, max: 87 }],
-      [{ type: 'directDamage', min: 118, max: 148 }],
-      [{ type: 'directDamage', min: 126, max: 156 }],
+      [
+        {
+          type: 'directDamage',
+          min: 67,
+          max: 87,
+          damageMult: 0.8,
+          spellPowerCoeff: (2.2 * 0.97) / 3.5,
+        },
+      ],
+      [
+        {
+          type: 'directDamage',
+          min: 118,
+          max: 148,
+          damageMult: 0.8,
+          spellPowerCoeff: (2.7 * 0.97) / 3.5,
+        },
+      ],
+      [
+        {
+          type: 'directDamage',
+          min: 126,
+          max: 156,
+          damageMult: 0.8,
+          spellPowerCoeff: (3.0 * 0.97) / 3.5,
+        },
+      ],
     ]);
     expect(ABILITIES.immolate.effects).toEqual([
       { type: 'directDamage', min: 31, max: 31 },
@@ -683,7 +707,7 @@ describe('Destruction finishers and target switching', () => {
     // rolls (the capped hit roll) to succeed; crit and damage rolls stay real.
     p.hitBonus = 1;
     const realChance = sim.rng.chance.bind(sim.rng);
-    sim.rng.chance = (chance: number) => (chance >= 0.98 ? true : realChance(chance));
+    sim.rng.chance = (chance: number) => (chance >= 0.9 ? true : realChance(chance));
 
     sim.targetEntity(branded.id);
     castAndLand(sim, 'ruinous_brand', 1);
@@ -692,11 +716,26 @@ describe('Destruction finishers and target switching', () => {
 
     sim.targetEntity(primary.id);
     for (let cast = 0; cast < 3; cast++) {
-      const primaryBefore = primary.hp;
-      const brandedBefore = branded.hp;
-      castAndLand(sim, 'shadow_bolt');
-      const primaryDamage = primaryBefore - primary.hp;
-      const brandDamage = brandedBefore - branded.hp;
+      const events = castAndLand(sim, 'shadow_bolt');
+      const primaryDamage = events.reduce(
+        (sum, event) =>
+          event.type === 'damage' &&
+          event.targetId === primary.id &&
+          event.ability === 'Gloom Bolt' &&
+          event.amount > 0
+            ? sum + event.amount
+            : sum,
+        0,
+      );
+      const brandDamage = events.reduce(
+        (sum, event) =>
+          event.type === 'damage' &&
+          event.targetId === branded.id &&
+          event.ability === 'Ruinous Brand'
+            ? sum + event.amount
+            : sum,
+        0,
+      );
       expect(brandDamage).toBe(Math.round(primaryDamage * 0.5));
       resetGcd(p);
       p.resource = p.maxResource;
@@ -789,7 +828,7 @@ describe('Destruction finishers and target switching', () => {
     });
 
     const brandedBeforeSelfCast = branded.hp;
-    const selfEvents = castAndLand(sim, 'shadow_bolt');
+    const selfEvents = castAndLand(sim, 'shadow_bolt', 2.5);
     const directSelfHit = selfEvents.find(
       (event) =>
         event.type === 'damage' && event.targetId === branded.id && event.ability === 'Gloom Bolt',
@@ -827,7 +866,7 @@ describe('Destruction finishers and target switching', () => {
     });
     const primaryHp = primary.hp;
     const brandedHp = branded.hp;
-    castAndLand(sim, 'shadow_bolt');
+    castAndLand(sim, 'shadow_bolt', 2.5);
     const resolvedPrimary = primaryHp - primary.hp;
     expect(brandedHp - branded.hp).toBe(Math.round(resolvedPrimary * 0.5));
     expect(branded.auras.find((aura) => aura.id === 'test_brand_absorb')?.value).toBe(10_000);
@@ -855,7 +894,7 @@ describe('Destruction finishers and target switching', () => {
     });
     sim.targetEntity(primary.id);
     const brandedHp = branded.hp;
-    const events = castAndLand(sim, 'shadow_bolt');
+    const events = castAndLand(sim, 'shadow_bolt', 2.5);
     const landed = events.find(
       (event) =>
         event.type === 'damage' && event.targetId === primary.id && event.ability === 'Gloom Bolt',
@@ -878,7 +917,7 @@ describe('Destruction finishers and target switching', () => {
     resetGcd(p);
     p.resource = p.maxResource;
     const hpBeforeAbsorb = branded.hp;
-    castAndLand(sim, 'shadow_bolt');
+    castAndLand(sim, 'shadow_bolt', 2.5);
     expect(branded.hp).toBe(hpBeforeAbsorb);
     expect(branded.auras.find((aura) => aura.id === 'ruinous_brand')?.stacks).toBe(1);
   });

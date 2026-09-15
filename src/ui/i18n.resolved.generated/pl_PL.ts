@@ -62,6 +62,7 @@ export const pl_PL: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Loch",
+      "town": "Miasto",
       "difficulty": "Poziom trudności",
       "name": "Nazwa",
       "spec": "Specjalizacja",
@@ -159,6 +160,10 @@ export const pl_PL: EnTranslations = {
       "teleport": {
         "label": "Teleportuj",
         "description": "Przenieś się do dokładnych współrzędnych świata."
+      },
+      "town": {
+        "label": "Centrum miasta",
+        "description": "Teleportuj się do centrum miasta według nazwy."
       },
       "dungeon": {
         "label": "Wejdź do lochu",
@@ -348,12 +353,25 @@ export const pl_PL: EnTranslations = {
       "banner": "Obserwujesz {name}"
     },
     "readyCheck": {
+      "title": "Gotowe sprawdzenie",
+      "close": "Zamknąć",
       "prompt": "{name} rozpoczyna sprawdzenie gotowości. Czy wszystko gotowe?",
       "ready": "Gotowość",
       "notReady": "Brak gotowości",
+      "status": "Gotowy: {ready}/{total}",
+      "waiting": "Czekam na odpowiedzi...",
+      "memberReady": "{name} jest gotowy.",
+      "memberNotReady": "{name} nie jest gotowy.",
+      "memberPending": "{name} jeszcze nie odpowiedział.",
       "result": "Sprawdzenie gotowości: {ready} gotowych, {notReady} niegotowych, {noResponse} bez odpowiedzi.",
       "notInPartyError": "Aby rozpocząć sprawdzenie gotowości, musisz należeć do grupy.",
       "inProgressError": "Sprawdzenie gotowości już trwa."
+    },
+    "pullTimer": {
+      "start": "Pociągnij {seconds} s!",
+      "cancel": "Wyciągnięcie anulowane.",
+      "countdown": "{seconds}",
+      "pull": "CIĄGNĄĆ!"
     },
     "death": {
       "resurrectAtCorpse": "Odrodź się przy zwłokach",
@@ -578,6 +596,11 @@ export const pl_PL: EnTranslations = {
       "mountsTitle": "Maszyna stabilna",
       "mountBuyAria": "Kup {item}",
       "mountSkinType": "Skórka wierzchowca",
+      "mountInspectAria": "Podgląd {item}",
+      "mountRideIt": "Jeździj",
+      "mountOnly": "Tylko do montażu",
+      "mountBuy": "Kup skórkę wierzchowca",
+      "mountScopeLine": "Skórka obejmująca całe konto. Noszony przez jedną postać na raz.",
       "loading": "Ładowanie sklepu WOC...",
       "error": "Sklep WOC jest obecnie niedostępny. Spróbuj ponownie wkrótce.",
       "balance": "Saldo Claudium",
@@ -1271,7 +1294,7 @@ export const pl_PL: EnTranslations = {
       "runSummary": "{total} w {time}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Dialog"
     },
     "hubLesson": {
       "target": "Wybierz manekina jako cel, aby zacząć.",
@@ -1402,6 +1425,7 @@ export const pl_PL: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "Akcja flagi pola bitwy",
       "sheathe": "Schowaj/Wyciągnij Broń",
+      "hideInterface": "Ukryj interfejs",
       "dive": "Nurkowanie w dół",
       "categoryPet": "Zwierzę",
       "petAttack": "Zwierzę: Atak",
@@ -1410,8 +1434,22 @@ export const pl_PL: EnTranslations = {
       "petDefensive": "Zwierzę: Obronne",
       "petAggressive": "Zwierzę: Agresywne",
       "targetPet": "Zwierzę: Obierz",
+      "targetSelf": "Celuj w siebie",
+      "targetParty1": "Członek grupy docelowej 1",
+      "targetParty2": "Członek grupy docelowej 2",
+      "targetParty3": "Członek grupy docelowej 3",
+      "targetParty4": "Członek grupy docelowej 4",
+      "targetParty5": "Członek grupy docelowej 5",
+      "targetParty6": "Członek grupy docelowej 6",
+      "targetParty7": "Członek grupy docelowej 7",
+      "targetParty8": "Członek grupy docelowej 8",
+      "targetParty9": "Członek grupy docelowej 9",
       "mount": "Dosiądź / Zsiądź",
-      "mouseHint": "Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie."
+      "mouseHint": "Przyciski myszy też działają: podczas przypisywania naciśnij środkowy przycisk (M3) lub boczny przycisk (M4, M5). Lewy i prawy przycisk pozostają zarezerwowane dla kamery, ruchu kliknięciem i klikania obiektów w świecie.",
+      "zoomIn": "Przybliż kamerę",
+      "zoomOut": "Pomniejsz kamerę",
+      "wheelHint": "Kółko myszy również się wiąże: obracaj je w górę lub w dół podczas wiązania, przytrzymując klawisz Ctrl, Alt lub Shift, jeśli chcesz. Zoom i oddalanie kamery domyślnie znajdują się na gołym kole; przesuń je do akordu, np. Ctrl+koło, aby zwolnić koło dla umiejętności.",
+      "wheelHeldRefused": "Nacięcie koła nie może sterować wstrzymaną akcją, taką jak ruch. Wybierz dla niego klawisz lub przycisk myszy."
     },
     "actionBar": {
       "editKeys": "Edytuj klawisze paska akcji",
@@ -1682,6 +1720,8 @@ export const pl_PL: EnTranslations = {
       "showReliquaryTracker": "Pokaż narzędzie do śledzenia relikwiarzy",
       "confirmVendorSell": "Potwierdzaj przed sprzedażą",
       "confirmVendorSellNote": "Wyłączenie tego sprawia, że przedmioty sprzedają się jednym kliknięciem bez potwierdzenia, więc przesunięty slot w torbie może sprzedać niewłaściwy przedmiot.",
+      "confirmVendorSellMinQuality": "Potwierdź sprzedaż z jakości",
+      "confirmVendorSellMinQualityNote": "Przedmioty poniżej tej jakości można sprzedać jednym kliknięciem; błędnie sprzedany przedmiot nadal można odkupić od sprzedawcy.",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
@@ -1735,9 +1775,9 @@ export const pl_PL: EnTranslations = {
     },
     "controller": {
       "title": "Kontroler",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Podłączone urządzenie",
+      "deviceConnected": "Połączony",
+      "deviceDisconnected": "Nie wykryto kontrolera",
       "glyphStyle": "Etykiety przycisków",
       "glyphStyleAuto": "Automatyczne",
       "glyphStyleXbox": "Xbox",
@@ -2125,20 +2165,20 @@ export const pl_PL: EnTranslations = {
       "hidePlaytimeAria": "Ukryj czas gry"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
-      "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
-      "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "label": "Szczegóły postaci",
+      "subtitle": "Poziom {level} {className}. {archetype}. Hobby: {hobby}",
+      "subtitleNoHobby": "Poziom {level} {className}. {archetype}",
+      "stats": "Statystyki",
+      "progression": "Postęp",
+      "skills": "Umiejętności",
+      "gathering": "Zgromadzenie",
+      "crafting": "Rzemiosło",
+      "openProfessions": "Otwarte zawody"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Zakończony",
+      "zoneSummary": "{count} ({ready} gotowy)",
+      "shiftHint": "Kliknij zadanie, przytrzymując klawisz Shift, aby połączyć je na czacie."
     },
     "statInfo": {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
@@ -2388,7 +2428,7 @@ export const pl_PL: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Zgłoś błąd",
-      "online": "Online",
+      "online": "W Internecie",
       "realm": "Świat",
       "character": "Postać",
       "position": "Pozycja",
@@ -3248,7 +3288,30 @@ export const pl_PL: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Oszust >",
-      "pledgeTag": "Ślubowanie: {guild}"
+      "pledgeTag": "Ślubowanie: {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Licytator",
+        "banker": "Bankier",
+        "riftForgemaster": "Mistrz Kuźni Szczeliny",
+        "cardMaster": "Mistrz kart",
+        "crucibleQuartermaster": "Kwatermistrz Tygla",
+        "heroicQuartermaster": "Bohaterski kwatermistrz",
+        "pvpVendor": "Sprzedawca PvP",
+        "weaponsmithTrainer": "Trener kowalstwa",
+        "cookingTrainer": "Trener gotowania",
+        "tailoringTrainer": "Trener krawiectwa",
+        "engineeringTrainer": "Trener Inżynierii",
+        "leatherworkingTrainer": "Trener obróbki skóry",
+        "alchemyTrainer": "Trener Alchemii",
+        "weaponVendor": "Sprzedawca broni",
+        "armorVendor": "Sprzedawca zbroi",
+        "armsDealer": "Handlarz bronią",
+        "foodVendor": "Sprzedawca żywności i napojów",
+        "potionVendor": "Sprzedawca eliksirów",
+        "stableMaster": "Stabilny Mistrz",
+        "generalGoods": "Towary ogólne"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Poziom {level}: {family}",
@@ -3267,7 +3330,7 @@ export const pl_PL: EnTranslations = {
       "lock": "Zablokuj ramkę gracza"
     },
     "partyFrames": {
-      "header": "Party",
+      "header": "Impreza",
       "section": "Ramki grupy i rajdu",
       "optionsSection": "Opcje ramek drużyny",
       "unlock": "Przenieś ramki grupy i rajdu",
@@ -3482,6 +3545,7 @@ export const pl_PL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Gatunek wyborny. Zebrany z żyły o pełnym poziomie narzędziem wyższej rangi niż sam materiał; liczy się jako zwykła wersja wszędzie tam, gdzie jest ona wymagana.",
+      "fineFarmGrade": "Dobra ocena. Niektóre zbiory wychodzą dobrze, częściej przy wyższych umiejętnościach Rolnictwa lub naładowanym Oku Rzemieślnika. Zwykłe produkty nigdy się nie liczą tam, gdzie wymagana jest najwyższa jakość.",
       "cookingCatch": "Składnik kuchenny. Wymaga ugotowania przed zjedzeniem.",
       "usedBy": "Używane w: {crafts}.",
       "arcaneDust": "Odczynnik rzemieślniczy. Oczarowany z pospolitego i niezwykłego wyposażenia.",
@@ -4022,6 +4086,25 @@ export const pl_PL: EnTranslations = {
       "lastSeenNever": "nigdy",
       "ignoredTab": "Ignorowani",
       "blockedTab": "Zablokowani",
+      "who": {
+        "tab": "Kto",
+        "searchPlaceholder": "Nazwa, strefa lub gildia",
+        "search": "Szukaj",
+        "loading": "Zapytanie królestwa, kto jest online...",
+        "empty": "Żaden gracz nie pasuje.",
+        "count": "{total} online",
+        "countFiltered": "{shown} z {total} online",
+        "capped": "Wyświetlam pierwszy {delivered}. Zawęź wyszukiwanie, aby zobaczyć resztę.",
+        "classFilter": "Filtruj według zajęć",
+        "allClasses": "Wszystkie zajęcia",
+        "colStatus": "Status",
+        "colName": "Nazwa",
+        "colLevel": "Poziom",
+        "colClass": "Klasa",
+        "colZone": "Strefa",
+        "colGuild": "Gildia",
+        "sortTitle": "Sortuj według {column}"
+      },
       "ignoredEmpty": "Nikogo nie ignorujesz.",
       "blockedEmpty": "Nikogo nie zablokowałeś.",
       "blockSearchPlaceholder": "Nazwa gracza",
@@ -4143,6 +4226,7 @@ export const pl_PL: EnTranslations = {
           "farming": "Działa z twoich toreb podczas sadzenia na grządce."
         },
         "speed": "Szybciej zbiera z węzłów poniżej poziomu {tier}.",
+        "wieldDegrade": "Poniżej tej umiejętności nadal działa jako narzędzie niższego poziomu.",
         "rodRequired": "Wymagana do łowienia ryb.",
         "rodBite": "Ryby biorą nawet o {seconds} s wcześniej.",
         "rodReel": "Wydłuża czas na wyciągnięcie ryby o {seconds} s.",
@@ -4415,8 +4499,20 @@ export const pl_PL: EnTranslations = {
       "majorsLabel": "Kierunki: {a} i {b}",
       "pairsHeld": "Posiadane pary: {count}",
       "returnsLabel": "Zwroty: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
-      "tutorialLink": "Profession tutorial"
+      "retentionFooter": "Zwroty z respec: 60% umiejętności zachowanych.",
+      "tutorialLink": "Poradnik dotyczący zawodu"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Przepisy",
+      "collapseHint": "Zwiń moduł śledzenia przepisów",
+      "expandHint": "Rozwiń moduł śledzenia przepisów",
+      "pin": "Szpilka",
+      "unpin": "Odpiąć",
+      "pinFull": "Moduł śledzenia przepisów jest pełny (do {cap} przepisów)",
+      "pinAria": "Przypnij {name} do modułu śledzącego HUD",
+      "unpinAria": "Odepnij {name} od trackera HUD",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Rzemiosło",
@@ -4448,10 +4544,11 @@ export const pl_PL: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(zużywa {count} gatunku wybornego)",
       "reagentVaultDraw": "(pobiera {count} ze skarbca)",
+      "reagentOrdinaryHeld": "({name} utrzymany: {count}, ale tutaj liczy się tylko ocena dobra)",
       "vaultUnreachable": "Skarbiec Materiałów jest tu poza zasięgiem.",
       "craftFeeLine": "Opłata za wytworzenie: {fee} za sztukę",
       "empty": "Nie są jeszcze znane żadne przepisy.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Materiały w skarbcu są pobierane automatycznie. Więcej przepisów znajdziesz na stacji.",
       "resultAria": "Craft {name}",
       "craftedToast": "Wykonane: {name}",
       "craftedToastQty": "Wykonane: {name} x{qty}",
@@ -4541,8 +4638,8 @@ export const pl_PL: EnTranslations = {
       "attunedBanner": "Dostrojony: {title}",
       "tierTutorial": {
         "title": "Twój Pierwszy Poziom",
-        "tierCap": "Rzemiosło osiąga swój pierwszy poziom przy umiejętności {skill}, a każdy poziom poprawia to, co może wytworzyć. Ale rzemiosło wspina się poza rzadką pracę tylko wtedy, gdy jest jedną z twoich dwóch specjalizacji.",
-        "radar": "Twoje profesje tworzą koło. Dostrojenie do sąsiadującej pary sprawia, że te dwa rzemiosła stają się nieograniczonymi specjalizacjami, jedno rzemiosło po drugiej stronie koła staje się hobby z pułapem rzadkości, a reszta leży uśpiona: wiedza zachowana, lecz ograniczona do pospolitej, dopóki ponownie jej nie podejmiesz.",
+        "tierCap": "Jednostka osiąga swój pierwszy poziom z umiejętnością {skill}, a każdy poziom ulepsza to, co może wytworzyć. Ale rzemiosło może pokonać rzadkie prace tylko wtedy, gdy jest jedną z twoich dwóch specjalizacji.",
+        "radar": "Twoje zawody tworzą koło. Dostosuj się do sąsiedniej pary, a te dwa rzemiosła staną się nieograniczonymi specjalizacjami, jedno rzemiosło na kole stanie się hobby z rzadkim ograniczeniem, a reszta pozostaje uśpiona: ich wiedza zostaje zachowana, ale ograniczona wspólnie, dopóki nie podejmiesz ich ponownie.",
         "masters": "Mistrzowie rzemiosła w miastach oferują zadania dostrojenia. Odwiedź jednego, by wybrać swoją parę, gdy będziesz gotowy. Niczego, czego się nauczyłeś, nigdy nie tracisz.",
         "dismiss": "Rozumiem"
       },
@@ -4555,7 +4652,7 @@ export const pl_PL: EnTranslations = {
       "commissionBound": "Wyrób na zamówienie: przywiązany do odbiorcy"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Kupiec uzupełnia zapasy towarów powszechnych; Listy graczy znajdują się obok nich po cenie wywoławczej."
     },
     "itemMenu": {
       "use": "Użyj",
@@ -4836,6 +4933,7 @@ export const pl_PL: EnTranslations = {
       "roleDps": "Obrażenia",
       "freeRoles": "Wszystkie role mile widziane",
       "lockoutDaily": "Dzienny blokada na ostatniego bossa",
+      "lockoutWeekly": "Cotygodniowa blokada każdego bossa",
       "lockoutNone": "Brak blokady",
       "lockedFor": "Zablokowany na około {minutes} min",
       "attunement": "Wymaga dostrojenia: {quest}",
@@ -4849,6 +4947,8 @@ export const pl_PL: EnTranslations = {
       "lootMaybe": "Co najwyżej jeden z tych może wypaść:",
       "lootChance": "Losowe przedmioty do zdobycia:",
       "lootHeroic": "Bonus heroiczny, jeden z tych zawsze wypada:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct} %",
       "blockedLevel": "Tylko poziomy {min} do {max}",
       "blockedSpec": "Wymaga specjalizacji",
@@ -4922,7 +5022,33 @@ export const pl_PL: EnTranslations = {
         "kings_wrath": "Gniew Króla (30%: stały bonus obrażeń, szybsze zagrożenia na podłodze)",
         "bone_storm": "Kościana Burza (ignoruje zagrożenie, wiruje i szarżuje na rajd)",
         "crown_endures": "Korona Trwa (twardy enrage o 6:00, Heroic 5:00)",
-        "deathless_court": "Nieśmiertelny Dwór (tylko Heroic, królewski dwór powstaje po Nieśmiertelnym Szału)"
+        "deathless_court": "Nieśmiertelny Dwór (tylko Heroic, królewski dwór powstaje po Nieśmiertelnym Szału)",
+        "bloodmane_rend": "Rozdzieranie Krwawej Grzywy (krwawienie, uważaj na zamianę celów)",
+        "tusk_sweep": "Zamiatanie kłami (rozcięcie czołowe)",
+        "ancestral_sap": "Ancestral Sap (leczy sojuszników)",
+        "call_of_the_hunt": "Zew Polowania (przyspiesza pobliskich sojuszników)",
+        "thickhide_ward": "Totem Grubej Skóry (osłania pobliskich sojuszników)",
+        "beast_pit_quake": "Trzęsienie Bestii (obrażenia obszarowe)",
+        "wildheart_pulse": "Puls Dzikiego Serca (pulsujące obrażenia obszarowe)",
+        "jaguar_roar": "Ryk Jaguara (odrzut)",
+        "brand_of_the_pyre": "Znak Stosu (układający się znak ognia, zmyć go w wodzie z przewodu)",
+        "forge_strike": "Forge Strike (kumulujące się osłabienie podczas zmiany czołgu)",
+        "rain_of_cinders": "Deszcz Popiołów (trzy ogniste stożki, stań pomiędzy nimi)",
+        "falling_cinders": "Falling Cinders (kręgi meteorytów na graczach, wyjdź)",
+        "revolving_inferno": "Obrotowe Piekło (rotujące promienie ognia, poruszają się przez szczeliny)",
+        "forge_wave": "Forge Wave (rozszerzająca się ściana ognia, skorzystaj z dwóch bezpiecznych pasów)",
+        "apocalypse_add": "Ignivar Popielnik (priorytet dodaj rzucenie Apokalipsy, zabij go szybko)",
+        "judgment_of_the_forge": "Sąd Kuźni (przerwa, podziel się jedynym bezpiecznym schronieniem)",
+        "last_inferno": "Ostatnie piekło (45 sekund spalania przy 20% zdrowia)",
+        "chains_of_the_forge": "Łańcuchy Kuźni (tylko w trybie heroicznym, trzymaj się blisko połączonego partnera)",
+        "makers_brand": "Marka Twórcy (kumulujące się osłabienie przy wymianie czołgów)",
+        "forgefathers_sweep": "Zamiatanie Ojca Kuźniarza (szeroki stożek czołowy u osób niebędących czołgami)",
+        "tempering_ray": "Promień Hartowania (linia do oznaczonego gracza, przechwyć go)",
+        "cinder_orbs": "Kule Cinder (oznaczeni gracze rozproszeni po krawędziach pomieszczenia)",
+        "forgestorm": "Forgestorm (spadające kręgi meteorytów, wyjdź)",
+        "shared_pyre": "Wspólny stos (krąg gromadzenia, podziel obrażenia)",
+        "anvils_decree": "Dekret Anvila (trzy uderzenia młotem na cały najazd, leczenie poprzez)",
+        "masters_assembly": "Zgromadzenie Mistrza (blokuj belki kuźni, obracaj blokery)"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const pl_PL: EnTranslations = {
       "applied": "Zastosowano",
       "owned": "Posiadane",
       "storeOnly": "Dostępne w Sklepie WOC",
+      "preview": "Zapowiedź",
+      "previewAria": "Podgląd {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Skórka wierzchowca jest rysowana na wierzch wierzchowca, na którym jedzie ta postać. Nigdy nie zmienia szybkości.",
       "mountsNoMount": "Najpierw zdobądź wierzchowca: skórka potrzebuje czegoś do jazdy.",
@@ -5182,30 +5310,30 @@ export const pl_PL: EnTranslations = {
       "levels": "Poziomy od {min} do {max}"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Poziom {level}",
+      "landmarkCount": "{count} punkty orientacyjne",
+      "filtersAria": "Warstwy mapy",
       "filters": {
-        "quests": "Quests",
-        "gather": "Gather",
-        "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "quests": "Zadania",
+        "gather": "Zebrać",
+        "dungeons": "Lochy",
+        "services": "Usługi",
+        "players": "Gracze"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
-      "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "trackedQuests": "Śledzone zadania",
+      "noTrackedQuests": "Brak śledzonych zadań",
+      "availableNearby": "Dostępne w pobliżu",
+      "noNearbyQuests": "Brak zadań w pobliżu",
+      "distance": "{distance} jardów",
+      "showRoute": "Pokaż trasę",
+      "untrack": "Nieśledzone",
+      "track": "Ścieżka",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
-        "mail": "Mail",
-        "passage": "Passage"
+        "dungeon": "Loch",
+        "ore": "Ruda",
+        "herb": "Ziele",
+        "mail": "Poczta",
+        "passage": "Przejście"
       }
     },
     "arenaGate": {
@@ -5226,7 +5354,7 @@ export const pl_PL: EnTranslations = {
       "tabBrowse": "Przeglądaj",
       "tabSell": "Sprzedaj",
       "tabActivity": "Moja aktywność",
-      "tabHistory": "Sales History",
+      "tabHistory": "Historia sprzedaży",
       "tabsLabel": "Sekcje Giełdy $WOC",
       "loading": "Wczytywanie Giełdy...",
       "loadFailed": "Nie udało się połączyć z Giełdą. Spróbuj ponownie za chwilę.",
@@ -5251,16 +5379,16 @@ export const pl_PL: EnTranslations = {
       "colCurrentBid": "Obecna oferta",
       "colBuyNow": "Kup teraz",
       "colTimeLeft": "Pozostały czas",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
-      "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "colBuyer": "Kupujący",
+      "colSoldAt": "Sprzedany",
+      "colSalePrice": "Cena sprzedaży",
+      "colSaleType": "Typ",
+      "saleTypeAuction": "Aukcja",
+      "saleTypeBuyNow": "Kup teraz",
+      "saleTypeDirected": "Skierowany",
+      "saleTypeUnknown": "Nieznany",
+      "historyEmpty": "Nie odnotowano jeszcze żadnej sprzedaży.",
+      "historyError": "Nie można wczytać historii sprzedaży.",
       "reserveMet": "Cena minimalna osiągnięta",
       "reserveNotMet": "Cena minimalna nieosiągnięta",
       "yourListing": "Twoje wystawienie",
@@ -5933,6 +6061,7 @@ export const pl_PL: EnTranslations = {
       "deeds": "Księga Czynów",
       "reliquary": "Relikwiarz",
       "sheathe": "Chowaj / dobywaj broń",
+      "hideInterface": "Ukryj interfejs (zrzuty ekranu i filmy)",
       "crafting": "Wytwarzanie",
       "mount": "Dosiądź / zsiądź z wierzchowca",
       "calendar": "Kalendarz wydarzeń",
@@ -5962,6 +6091,8 @@ export const pl_PL: EnTranslations = {
       "attackMove": "Ruch z atakiem (dopiero po włączeniu tej opcji)",
       "meters": "Liczniki obrażeń (obrażenia, leczenie i zagrożenie)",
       "petMark": "Zwierzę: Zaznacz, wybierz własne zwierzę (to samo co kliknięcie jego ramki)",
+      "targetSelf": "Celuj w siebie",
+      "targetParty": "Celuj w członków drużyny od 1 do 9, od góry do dołu, tak jak pokazują to ramki drużyny",
       "onBarBinding": "Możesz też przypisywać klawisze wprost z paska: wybierz Edytuj klawisze paska akcji w panelu Przypisań klawiszy, a następnie kliknij slot na aktywnym pasku i naciśnij klawisz, którego chcesz użyć. Po zakończeniu kliknij Gotowe. Ta metoda działa tylko na komputerze, ponieważ wymaga fizycznej klawiatury.",
       "clickMoveNote": "Ruch kliknięciem jest wyłączony, dopóki go nie włączysz: otwórz panel Przypisań klawiszy w menu gry, włącz Ruch kliknięciem, a następnie w wierszu Przycisk ruchu kliknięciem poniżej wybierz, który przycisk myszy odpowiada za chodzenie (domyślnie Lewy przycisk, albo Prawy przycisk). Gdy jest włączony, kliknięcie punktu na ziemi wysyła cię tam pieszo, ze znacznikiem na ziemi pokazującym cel. Kliknięcie stworzenia lub innego gracza prowadzi cię do niego i zatrzymuje w zasięgu, podczas gdy to samo kliknięcie wciąż wykonuje swoją zwykłą pracę namierzania lub interakcji; jeśli jesteś już wystarczająco blisko tego, co kliknąłeś, po prostu wchodzisz w interakcję i zostajesz na miejscu. Każdy z klawiszy ruchu natychmiast przejmuje kontrolę i kończy podróż, podobnie jak przytrzymanie przycisku myszy, by się rozglądać. Skakanie tego nie robi, więc kontynuujesz podróż przez podskok, a otwarcie menu gry tylko wstrzymuje podróż, która wraca po zamknięciu menu."
     },
@@ -6099,7 +6230,8 @@ export const pl_PL: EnTranslations = {
       "ifLockBars": "Blokuje twoje paski, żebyś przypadkiem nie wyciągnął umiejętności z pola.",
       "keybindsHeading": "Panel Przypisań Klawiszy",
       "keybindsBody": "Lista klawiszy to tylko połowa tego panelu. Nad nią siedzą przełączniki, które decydują, jak twoja mysz prowadzi grę: kamera myszy, czy kursor blokuje się podczas obracania, ruch kliknięciem i to, który przycisk myszy go wywołuje, ruch z atakiem, układ leworęczny dla sterowania dotykowego oraz filtr wulgaryzmów na czacie.",
-      "keybindsMouseBody": "Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać."
+      "keybindsMouseBody": "Dwie rzeczy łatwo tam przeoczyć. Przyciski myszy przypisuje się jak klawisze, więc kliknięcie kółkiem i boczne przyciski mogą nosić umiejętności, podczas gdy lewy i prawy przycisk pozostają zarezerwowane dla kamery i klikania w świecie. Możesz też przypisywać klawisze bezpośrednio z paska akcji: włącz tu tryb przypisywania na pasku, kliknij pole i naciśnij klawisz, który chcesz przypisać.",
+      "keybindsWheelBody": "Samo koło też wiąże. Powiększ kamerę i pomniejsz kamerę to zwykłe powiązania, które domyślnie znajdują się na gołym kole, więc możesz przesunąć je do Ctrl plus kółko lub do klawiszy, a następnie obrócić uwolnione koło, aby uruchomić szczeliny paska akcji. Nacięcie w kole nie ma zwolnienia, więc nie może napędzać wstrzymanej akcji, takiej jak ruch do przodu."
     },
     "combat": {
       "intro": "Walka rządzi się znajomymi zasadami klasycznych MMO. Nigdy nie musisz tego zgłębiać, by dobrze grać, to tylko zarys tego, jak działają starcia.",
@@ -6153,7 +6285,7 @@ export const pl_PL: EnTranslations = {
       "framesMoveBodyEditFrames": "Możesz przesuwać własną ramkę, ramkę celu i ramki drużyny. Każda ma w rogu mały przycisk przesuwania: odblokuj ją, przeciągnij w wybrane miejsce i zablokuj ponownie, aby przypadkowe kliknięcie jej nie przesunęło. Edycja ramek na górze karty Ramki w opcjach interfejsu odblokowuje naraz resztę interfejsu, w tym te trzy ramki: paski akcji, pasek rzucania, pasek uderzeń, pasek doświadczenia, minimapę, szynę przycisków, ramkę pupila, pasek postawy, wiersze premii i osłabień oraz etykietę przypomnienia listy życzeń. Jeśli trafią w miejsce, którego żałujesz, przycisk Przywróć domyślne na dole tej samej karty Ramki przywraca je wszystkie.",
       "framesGovernedExtra": "Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.",
       "framesGovernedAuraTracks": "Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
       "aurasTitle": "Wzmocnienia i osłabienia",
@@ -7489,7 +7621,7 @@ export const pl_PL: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Enchanty mają cztery poziomy. Podstawowy korzysta z Pyłu dzwonu, z odrobiną Esencji na wysokim końcu, i obejmuje miejsce broni, broń podręczną oraz każdą część pancerza. Opcji osi statystyk jest dość, aby każda konfiguracja znalazła coś dla każdego miejsca: tarcze i podręczne przedmioty czarujących mają własny enchant Wytrzymałości, więc żadne wyposażone miejsce nie jest martwe dla enchantów. Poziom Większy kosztuje jeden Odłamek dzwonu i Esencję, dając silniejsze premie w najbardziej wpływowych miejscach. Odłamki mają jeszcze trzy wydatki: dwie receptury uroków po pięć sztuk, najwyższy poziom ładowania efektów narzędzi oraz poziom Świetlisty, gdzie enchant broni i pancerza klatki biorą po jednym, a Infuzja dwa. Zachowaj kilka przed wydaniem.\n\nPomiędzy nimi znajduje się pięć enchantów Runicznych, po jednym odbiorcy dla każdego typowanego drugorzędnego statystyk, więc nic z tego, co zmielisz, nie jest ślepą uliczką: Runiczne ostrze, broń, Siła, zużywa Stal rezonującą; Runiczny sygnet, broń, Intelekt, Drewno rezonujące; Runiczny splot, klatka, Duch, Nić rezonująca; Runiczna skóra, nogi, Zręczność, Skóra rezonująca; oraz Runiczne ogniwa, hełm, Wytrzymałość, Ogniwa rezonujące. Każdy bierze też dwie Esencje dzwonu. Gdy miejsce i statystyka mają enchant podstawowy oraz Większy, premia Runiczna leży między nimi, a Runiczny splot jest bezwzględnie najmocniejszym enchantem Ducha klatki, zaś Runiczna skóra jedynym enchantem Zręczności nóg. Dokładne premie są w tabeli poniżej.\n\nNad zwykłymi niższymi poziomami znajduje się Świetlisty, szczytowa zwykła praca profesji: Zaklinanie 100 dla czterech enchantów i 125 dla Infuzji, jak pokazuje kolumna Umiejętność. Każdy wymaga Świetlistego reagenta i dodaje kolejny krok na własnym miejscu: broń z opcją Mocy i Mocy zaklęć, klatka oraz buty. Ostatnia, Świetlista infuzja, działa tylko na części Udoskonalonej: Udoskonalanie jest pracą noszącego, nie zaklinacza, a strona Profesje wyjaśnia, jak część je zdobywa.\n\nZapał Ostatniego Płomienia jest osobną recepturą raidową, nie darmowym zwykłym enchantem. Naucz się jego wymienialnej formuły przy Zaklinaniu 100 przed użyciem. Każde zastosowanie zużywa 3 rdzenie Ostatniego Płomienia i 2 Odłamki dzwonu. Formuła może wypaść w Tyglu albo zostać kupiona u jego kwatermistrza za jeden rdzeń. Zasady wyzwalacza wręcz i szybkości broni są w całości poniżej.",
+        "enchantsNoteRaidFormula": "Enchanty mają cztery poziomy. Podstawowy korzysta z Pyłu dzwonu, z odrobiną Esencji na wysokim końcu, i obejmuje miejsce broni, broń podręczną oraz każdą część pancerza. Opcji osi statystyk jest dość, aby każda konfiguracja znalazła coś dla każdego miejsca: tarcze i podręczne przedmioty czarujących mają własny enchant Wytrzymałości, więc żadne wyposażone miejsce nie jest martwe dla enchantów. Poziom Większy kosztuje jeden Odłamek dzwonu i Esencję, dając silniejsze premie w najbardziej wpływowych miejscach. Odłamki mają jeszcze trzy wydatki: dwie receptury uroków po jednej sztuce (resztę kosztu uroku stanowią esencja i pył), najwyższy poziom ładowania efektów narzędzi oraz poziom Świetlisty, gdzie enchant broni i pancerza klatki biorą po jednym, a Infuzja dwa. Zachowaj kilka przed wydaniem.\n\nPomiędzy nimi znajduje się pięć enchantów Runicznych, po jednym odbiorcy dla każdego typowanego drugorzędnego statystyk, więc nic z tego, co zmielisz, nie jest ślepą uliczką: Runiczne ostrze, broń, Siła, zużywa Stal rezonującą; Runiczny sygnet, broń, Intelekt, Drewno rezonujące; Runiczny splot, klatka, Duch, Nić rezonująca; Runiczna skóra, nogi, Zręczność, Skóra rezonująca; oraz Runiczne ogniwa, hełm, Wytrzymałość, Ogniwa rezonujące. Każdy bierze też dwie Esencje dzwonu. Gdy miejsce i statystyka mają enchant podstawowy oraz Większy, premia Runiczna leży między nimi, a Runiczny splot jest bezwzględnie najmocniejszym enchantem Ducha klatki, zaś Runiczna skóra jedynym enchantem Zręczności nóg. Dokładne premie są w tabeli poniżej.\n\nNad zwykłymi niższymi poziomami znajduje się Świetlisty, szczytowa zwykła praca profesji: Zaklinanie 100 dla czterech enchantów i 125 dla Infuzji, jak pokazuje kolumna Umiejętność. Każdy wymaga Świetlistego reagenta i dodaje kolejny krok na własnym miejscu: broń z opcją Mocy i Mocy zaklęć, klatka oraz buty. Ostatnia, Świetlista infuzja, działa tylko na części Udoskonalonej: Udoskonalanie jest pracą noszącego, nie zaklinacza, a strona Profesje wyjaśnia, jak część je zdobywa.\n\nZapał Ostatniego Płomienia jest osobną recepturą raidową, nie darmowym zwykłym enchantem. Naucz się jego wymienialnej formuły przy Zaklinaniu 100 przed użyciem. Każde zastosowanie zużywa 3 rdzenie Ostatniego Płomienia i 2 Odłamki dzwonu. Formuła może wypaść w Tyglu albo zostać kupiona u jego kwatermistrza za jeden rdzeń. Zasady wyzwalacza wręcz i szybkości broni są w całości poniżej.",
         "charmsHeading": "Talizmany do narzędzi zbierackich",
         "formulaRequired": "Wymagana formuła",
         "charmsBody": "Zaklinanie to też źródło talizmanów dla zbieraczy. Majsterkowicz Gizzel uczy obu w narzędziowni Eastbrook, gdy twoje Zaklinanie osiągnie 25: Skrytki Zbieracza, która dodaje jednostkę do zbioru, oraz Oka Rzemieślnika, które podnosi gatunek tego, co wychodzi. Każdy z nich wytwarza się raz, a potem osadza w kilofie, siekierze lub sierpie, gdzie zużywa ładunek tylko przy zbiorach, które faktycznie poprawia.\n\nTo ładowanie jest tym, na czym rzemiosło wciąż zarabia. Ładunki odnawia właściciel narzędzia, a nie odwiedzający zaklinacz, a ładowanie kosztuje połowę materiałów, gdy tym właścicielem jest zaklinacz, który podpisał talizman, i jeszcze mniej ze specjalizacją w Zaklinaniu. Talizman sprzedany przez ladę to więc jednorazowa sprzedaż, podczas gdy talizmany osadzone na twoich własnych narzędziach są tymi tanimi w utrzymaniu. Pełna drabinka ładunków i materiałów znajduje się na stronie każdej profesji zbierackiej, w części Efekty narzędzi."
@@ -7558,7 +7690,7 @@ export const pl_PL: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Rytm rolnictwa",
-        "rhythmBody": "Sadzenie jest krótkim widocznym rzucaniem: dokładnie {plant} sekundy na każdym szczeblu, bo motyka otwiera ziemię, a nie kupuje szybkość. Wyciągnięcie dojrzałej uprawy jest natychmiastowe. Nie ma rzucania do przerwania ani kontroli torby, która mogłaby odmówić zbioru, a gotowa grządka czeka tak długo, jak ją zostawisz, więc pełna torba kosztuje farmera tylko spacer, by ją opróżnić.\n\nZbiór płaci plonem i biegłością Rolnictwa. W przeciwieństwie do żyły nie daje w ogóle doświadczenia postaci, więc grządki są profesją do pracy, nie sposobem na poziomy.",
+        "rhythmBody": "Sadzenie jest natychmiastowe, bo motyka otwiera ziemię, a nie kupuje szybkość: nie ma rzucania, na które trzeba czekać, więc farmer, który odejdzie, i tak zasadził. Wyciągnięcie dojrzałej uprawy też jest natychmiastowe. Nie ma rzucania do przerwania ani kontroli torby, która mogłaby odmówić zbioru, a gotowa grządka czeka tak długo, jak ją zostawisz, więc pełna torba kosztuje farmera tylko spacer, by ją opróżnić.\n\nZbiór płaci plonem i biegłością Rolnictwa. W przeciwieństwie do żyły nie daje w ogóle doświadczenia postaci, więc grządki są profesją do pracy, nie sposobem na poziomy.",
         "gainHeading": "Czego uczy zbiór",
         "gainBody": "Przyrost jest deterministyczny i zależy od własnego licznika, nie od uprawy: {g1} biegłości za zbiór poniżej {p1}, {g2} poniżej {p2}, {g3} poniżej {p3} i {g4} przez resztę drogi do limitu {cap}. Nigdy nie jest to rzut na rozwój, więc wspinaczka trwa dokładnie tyle, ile wynika z rachunku.\n\nPoziom uprawy decyduje, jak daleko grządka może cię prowadzić. Uprawa poziomu 1 uczy do {c1}, po czym szarzeje, uprawa poziomu 2 do {c2}, a poziom 3 i wyższe do limitu. To przechodzenie na wyższe grządki utrzymuje ruch licznika.",
         "yieldsHeading": "Co daje zbiór",
@@ -10148,6 +10280,7 @@ export const pl_PL: EnTranslations = {
       "templates": {
         "battleground": "[Pole bitwy] {name}: {message}",
         "party": "[Drużyna] {name}: {message}",
+        "raidWarning": "[Ostrzeżenie o nalocie] {name}: {message}",
         "yell": "{name} krzyczy: {message}",
         "whisper": "{name} szepcze: {message}",
         "toWhisper": "Do {name}: {message}",
@@ -10286,6 +10419,7 @@ export const pl_PL: EnTranslations = {
       "stunned": "Jesteś ogłuszony!",
       "silenced": "Jesteś uciszony!",
       "busy": "Jesteś zajęty.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Ta umiejętność nie jest jeszcze gotowa.",
       "notEnoughRage": "Za mało wściekłości!",
       "notEnoughEnergy": "Za mało energii!",
@@ -10634,7 +10768,6 @@ export const pl_PL: EnTranslations = {
     },
     "cast": {
       "fishing": "Wędkarstwo",
-      "farming": "Sadzenie",
       "gathering": "Zbieranie",
       "crafting": "Wytwarzanie",
       "disenchanting": "Rozbrajanie",
@@ -10978,6 +11111,19 @@ export const pl_PL: EnTranslations = {
       "buyConfirmAccept": "Kup",
       "buyConfirmCancel": "Anuluj",
       "buyChanged": "Ta oferta zmieniła się, zanim zdążyłeś potwierdzić. Sprawdź cenę i spróbuj ponownie.",
+      "sweep": "Zamiatać",
+      "sweepAria": "Przeszukaj rynek w poszukiwaniu {item}",
+      "sweepTitle": "Przegląd rynku: {item}",
+      "sweepClose": "Zamknąć",
+      "sweepNote": "Kupuje całe aukcje od innych sprzedawców, najpierw najtaniej za jednostkę, aż do wyczerpania liczby. Możesz otrzymać o kilka więcej, niż prosiłeś.",
+      "sweepQuantity": "Poszukiwane jednostki",
+      "sweepQuoteNone": "Brak aukcji tego przedmiotu do przeszukania.",
+      "sweepQuoteLine": "{units} jednostek w {listings} aukcjach dla {total} ({each} każdy)",
+      "sweepQuoteShort": "Dostępnych jest tylko {units} jednostek w {listings} aukcjach, dla {total} ({each} każda)",
+      "sweepButton": "Zamiatać",
+      "sweepConfirmTitle": "Potwierdź przeszukanie rynku",
+      "sweepConfirmBody": "Kupić {item} x{units} w {listings} aukcjach za {total} ({each} każdy)?",
+      "sweepChanged": "Wycena została zmieniona przed potwierdzeniem. Sprawdź sumę i spróbuj ponownie.",
       "sellNote": "Wystaw towary ze swoich toreb. Kupiec pobiera {cut}% prowizji przy sprzedaży przedmiotu. Wykorzystujesz {used}/{max} slotów na oferty.",
       "sellPickEmpty": "Kliknij przedmiot w swoich torbach, aby wybrać, co sprzedać.",
       "quantity": "Ilość",
@@ -11017,7 +11163,9 @@ export const pl_PL: EnTranslations = {
       "ownListing": "To twoja własna oferta. Anuluj ją, aby ją odzyskać.",
       "cannotAfford": "Nie stać cię na to.",
       "notYourListing": "To nie jest twoja oferta.",
-      "nothingToCollect": "Nie masz nic do odebrania."
+      "nothingToCollect": "Nie masz nic do odebrania.",
+      "sweepNoListings": "Żadne aukcje tego przedmiotu nie są dostępne do przeszukania.",
+      "sweepPriceChanged": "Ceny zmieniły się przed wylądowaniem Twojej loterii. Sprawdź wycenę i spróbuj ponownie."
     },
     "loot": {
       "takeAll": "Weź wszystko",
@@ -16506,6 +16654,21 @@ export const pl_PL: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Manekin leczenia"
+      },
+      "healing_dummy_tank": {
+        "name": "Ranny manekin Straży Przedniej"
+      },
+      "healing_dummy_soldier": {
+        "name": "Ranny manekin żołnierza"
+      },
+      "healing_dummy_scout": {
+        "name": "Krytyczny manekin skauta"
+      },
+      "healing_dummy_caster": {
+        "name": "Ranny manekin czarodzieja"
+      },
+      "healing_dummy_ranger": {
+        "name": "Poobijany manekin Rangera"
       },
       "ridge_stalker": {
         "name": "Grzbietowy Tropiciel"

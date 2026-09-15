@@ -103,6 +103,37 @@ function cornerHash(primitive, vertexIndex) {
   return hash.digest('hex');
 }
 
+function canonicalTriangles(primitive, label) {
+  if (primitive.getMode() !== Primitive.Mode.TRIANGLES) {
+    throw new Error(`${label} is not TRIANGLES`);
+  }
+  const indices = primitive.getIndices()?.getArray();
+  const position = primitive.getAttribute('POSITION');
+  if (!position) throw new Error(`${label} has no POSITION`);
+  const cornerCount = indices?.length ?? position.getCount();
+  if (cornerCount % 3 !== 0) {
+    throw new Error(`${label} has partial triangles`);
+  }
+  const triangles = [];
+  for (let corner = 0; corner < cornerCount; corner += 3) {
+    const a = indices ? indices[corner] : corner;
+    const b = indices ? indices[corner + 1] : corner + 1;
+    const c = indices ? indices[corner + 2] : corner + 2;
+    const corners = [cornerHash(primitive, a), cornerHash(primitive, b), cornerHash(primitive, c)];
+    // EXT_meshopt's index codec may rotate (a,b,c) to (b,c,a) while
+    // retaining winding. Canonicalize only cyclic rotations, never the
+    // reversed order.
+    triangles.push(
+      [
+        `${corners[0]}:${corners[1]}:${corners[2]}`,
+        `${corners[1]}:${corners[2]}:${corners[0]}`,
+        `${corners[2]}:${corners[0]}:${corners[1]}`,
+      ].sort()[0],
+    );
+  }
+  return triangles.sort();
+}
+
 /**
  * Fingerprint the winding-preserving corner attributes of every triangle
  * while ignoring triangle submission order, cyclic corner rotation, and
@@ -113,39 +144,10 @@ export function triangleAttributeFingerprint(document) {
   const hash = createHash('sha256');
   for (const [meshIndex, mesh] of document.getRoot().listMeshes().entries()) {
     for (const [primitiveIndex, primitive] of mesh.listPrimitives().entries()) {
-      if (primitive.getMode() !== Primitive.Mode.TRIANGLES) {
-        throw new Error(`Mesh ${meshIndex} primitive ${primitiveIndex} is not TRIANGLES`);
-      }
-      const indices = primitive.getIndices()?.getArray();
-      const position = primitive.getAttribute('POSITION');
-      if (!position)
-        throw new Error(`Mesh ${meshIndex} primitive ${primitiveIndex} has no POSITION`);
-      const cornerCount = indices?.length ?? position.getCount();
-      if (cornerCount % 3 !== 0) {
-        throw new Error(`Mesh ${meshIndex} primitive ${primitiveIndex} has partial triangles`);
-      }
-      const triangles = [];
-      for (let corner = 0; corner < cornerCount; corner += 3) {
-        const a = indices ? indices[corner] : corner;
-        const b = indices ? indices[corner + 1] : corner + 1;
-        const c = indices ? indices[corner + 2] : corner + 2;
-        const corners = [
-          cornerHash(primitive, a),
-          cornerHash(primitive, b),
-          cornerHash(primitive, c),
-        ];
-        // EXT_meshopt's index codec may rotate (a,b,c) to (b,c,a) while
-        // retaining winding. Canonicalize only cyclic rotations, never the
-        // reversed order.
-        triangles.push(
-          [
-            `${corners[0]}:${corners[1]}:${corners[2]}`,
-            `${corners[1]}:${corners[2]}:${corners[0]}`,
-            `${corners[2]}:${corners[0]}:${corners[1]}`,
-          ].sort()[0],
-        );
-      }
-      triangles.sort();
+      const triangles = canonicalTriangles(
+        primitive,
+        `Mesh ${meshIndex} primitive ${primitiveIndex}`,
+      );
       hashField(
         hash,
         `mesh:${meshIndex}:primitive:${primitiveIndex}:triangles:${triangles.length}`,
@@ -153,6 +155,15 @@ export function triangleAttributeFingerprint(document) {
       for (const triangle of triangles) hashField(hash, triangle);
     }
   }
+  return hash.digest('hex');
+}
+
+/** The same fingerprint over one primitive, independent of its mesh or index. */
+export function primitiveTriangleAttributeFingerprint(primitive) {
+  const hash = createHash('sha256');
+  const triangles = canonicalTriangles(primitive, 'Primitive');
+  hashField(hash, `triangles:${triangles.length}`);
+  for (const triangle of triangles) hashField(hash, triangle);
   return hash.digest('hex');
 }
 

@@ -74,6 +74,12 @@ function deps(qty = 1) {
       qtyMap.set(recipeId, n);
     }),
     selectedCraft: () => null as string | null,
+    recipePinned: () => false,
+    onToggleRecipePin: (recipeId: string) => ({
+      pinned: new Set([recipeId]),
+      full: false,
+      changed: true,
+    }),
     onSelectCraft: vi.fn(),
   };
 }
@@ -537,7 +543,7 @@ describe('renderCraftingWindow vault-draw suffix (Phase 04)', () => {
     // duplicates (divergence hooks under the rule of three); each is pinned
     // to the same token so a silent drop of either one reds by name.
     const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
-    for (const cls of ['.crafting-fine-sub', '.crafting-vault-draw']) {
+    for (const cls of ['.crafting-fine-sub', '.crafting-vault-draw', '.crafting-ordinary-held']) {
       const at = css.indexOf(`${cls} {`);
       expect(at, `${cls} rule missing from components.css`).toBeGreaterThan(-1);
       const body = css.slice(at, css.indexOf('}', at));

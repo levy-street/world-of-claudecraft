@@ -197,7 +197,7 @@ describe('headless environment protocol validation', () => {
     expect(encodeObs(necromancy)[13]).toBeCloseTo(0.6);
   });
 
-  it('marks Sentence, Possess, and Hour ready only on the owned primary Evil Eye', () => {
+  it('marks Sentence only on the owned primary Evil Eye while Possess and Hour stay targetless', () => {
     const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true });
     sim.setPlayerLevel(20);
     sim.setSpec('affliction');
@@ -220,8 +220,8 @@ describe('headless environment protocol validation', () => {
     const hourReadyIndex = 16 + hourSlot * 2;
 
     expect(encodeObs(sim)[readyIndex]).toBe(0);
-    expect(encodeObs(sim)[possessReadyIndex]).toBe(0);
-    expect(encodeObs(sim)[hourReadyIndex]).toBe(0);
+    expect(encodeObs(sim)[possessReadyIndex]).toBe(1);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(1);
     gainDoom(sim as unknown as SimContext, sim.player, 20);
     expect(encodeObs(sim)[readyIndex]).toBe(0);
     const eye: Aura = {
@@ -236,8 +236,8 @@ describe('headless environment protocol validation', () => {
     };
     target.auras.push(eye);
     expect(encodeObs(sim)[readyIndex]).toBe(0);
-    expect(encodeObs(sim)[possessReadyIndex]).toBe(0);
-    expect(encodeObs(sim)[hourReadyIndex]).toBe(0);
+    expect(encodeObs(sim)[possessReadyIndex]).toBe(1);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(1);
 
     eye.kind = 'affliction_eye';
     expect(encodeObs(sim)[readyIndex]).toBe(1);
@@ -246,8 +246,8 @@ describe('headless environment protocol validation', () => {
 
     eye.sourceId = sim.playerId + 1;
     expect(encodeObs(sim)[readyIndex]).toBe(0);
-    expect(encodeObs(sim)[possessReadyIndex]).toBe(0);
-    expect(encodeObs(sim)[hourReadyIndex]).toBe(0);
+    expect(encodeObs(sim)[possessReadyIndex]).toBe(1);
+    expect(encodeObs(sim)[hourReadyIndex]).toBe(1);
   });
 
   it('reports a Forbidden Reflection copy as ready despite the original cooldown', () => {

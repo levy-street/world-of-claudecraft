@@ -65,8 +65,11 @@ export function playerDummyVitals(): PlayerDummyVitals {
 }
 
 /** The health a friendly dummy settles back to. At least 1: it never dies of rest. */
-export function playerDummyRestHp(maxHp: number): number {
-  return Math.max(1, Math.round(maxHp * PLAYER_DUMMY_REST_HP_FRACTION));
+export function playerDummyRestHp(
+  maxHp: number,
+  fraction: number = PLAYER_DUMMY_REST_HP_FRACTION,
+): number {
+  return Math.max(1, Math.round(maxHp * fraction));
 }
 
 /**
@@ -74,8 +77,13 @@ export function playerDummyRestHp(maxHp: number): number {
  * past it; health at or below it is left alone, so a heal in progress is what
  * moves the bar rather than this. Pure.
  */
-export function playerDummyShedHp(hp: number, maxHp: number, dt: number): number {
-  const rest = playerDummyRestHp(maxHp);
+export function playerDummyShedHp(
+  hp: number,
+  maxHp: number,
+  dt: number,
+  fraction: number = PLAYER_DUMMY_REST_HP_FRACTION,
+): number {
+  const rest = playerDummyRestHp(maxHp, fraction);
   if (hp <= rest) return hp;
   // Whole points, and never fewer than one per call: health elsewhere in the sim
   // is integral, and a rounded-to-zero step would strand a small pool above rest

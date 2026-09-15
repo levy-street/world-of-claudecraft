@@ -16,7 +16,6 @@ import { requiredReagentCountFor } from '../src/sim/professions/crafting';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/disenchant_reagents';
 import { isSignableMaterialRarity, NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import {
-  NO_TOOL_OWNED,
   normalizeToolEffectSlots,
   RECHARGE_CHARGES_PER_MATERIAL,
   rarityLadderIndex,
@@ -28,7 +27,7 @@ import {
 } from '../src/sim/professions/wield_gate';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
-import { completeRechargeCast, runRecharge } from './helpers/enchant_family_cast';
+import { runRecharge } from './helpers/enchant_family_cast';
 import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
@@ -316,10 +315,11 @@ describe('the recharge command: price, consume, refill', () => {
 
   it('R47/R30 read the best tool OWNED: an unwieldable pick still sets the price rung', () => {
     // The ruling boundary, stated: the wield gate (professions/wield_gate.ts)
-    // filters ACCESS, so a tier-4 pick under its 85 requirement works no node
-    // at all, while the R47/R30 price family reads the best tool OWNED. They
-    // price, they do not gate. A wieldability read here would answer no_tool
-    // and price nothing, which is why the rung below is the assertion.
+    // filters ACCESS, so a tier-4 pick under its 85 requirement works only
+    // the tier-1 ground it degrades to, while the R47/R30 price family reads
+    // the best tool OWNED. They price, they do not gate. A wieldability read
+    // here would answer the degraded tier 1 and price the common rung, which
+    // is why the rare rung below is the assertion.
     const run = (miningProficiency: number) => {
       const sim = makeSim();
       sim.addItem('copper_mining_pick', 1);
@@ -339,13 +339,14 @@ describe('the recharge command: price, consume, refill', () => {
       return { sim, slot, events: sim.tick() };
     };
     const { sim, slot, events } = run(0);
-    // POSITIVE CONTROL: the wield filter really refuses this pick at mining 0
-    // and really admits it at its requirement, so the recharge below is
-    // resolving off a tool the player genuinely cannot swing.
+    // POSITIVE CONTROL: the wield scan really degrades this pick to the
+    // entry tier at mining 0 and really admits its full tier at its
+    // requirement, so the recharge below is resolving off a tool the player
+    // genuinely cannot swing at its rung.
     expect(
       bestWieldableGatherToolTierOrNone(metaOf(sim).inventory, 'mining', 0, ITEMS),
-      'the fixture pick must be unwieldable at mining 0',
-    ).toBe(NO_TOOL_OWNED);
+      'the fixture pick must degrade to the entry tier at mining 0',
+    ).toBe(1);
     expect(
       bestWieldableGatherToolTierOrNone(
         metaOf(sim).inventory,
@@ -599,10 +600,15 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
 
   it('pins the shipped constants so a one-sided retune cannot drift silently', () => {
     for (const recipe of TOOL_EFFECT_RECIPES) {
-      // 5 shards (55) + 4 essence (18) + 6 dust (6) = 383 copper listed,
-      // 4 + 3 + 4 = 298 for a specialized enchanter.
-      expect(mintValue(recipe, {})).toBe(383);
-      expect(mintValue(recipe, { enchanting: 125 })).toBe(298);
+      // 1 shard (55) + 14 essence (18) + 10 dust (6) = 367 copper listed,
+      // 1 + 11 + 8 = 301 for a specialized enchanter.
+      expect(mintValue(recipe, {})).toBe(367);
+      expect(mintValue(recipe, { enchanting: 125 })).toBe(301);
+      // The scarce-material cap: a charm asks for at most ONE shard (one
+      // epic disenchant), never the five-shard bill the original mint
+      // carried, which priced a charm far above what its recharges cost.
+      const shard = recipe.reagents.find((reagent) => reagent.itemId === 'arcane_shard');
+      expect(shard?.count).toBe(1);
     }
     // The worst generic recharge a shipped tool can price: an epic tool's
     // 50-charge fill at 5 shards.
@@ -612,16 +618,20 @@ describe('the R39 economics inequality: a fresh mint always out-costs a generic 
       275,
     );
     // The self-signed reduction (crafting.ts, one unit off before the
-    // multiplier) would drop the specialized mint to 225 and break the bound,
-    // and it is unreachable ONLY because no path mints a signed arcane
+    // multiplier) is unreachable today because no path mints a signed arcane
     // material: the disenchant primary grants plain, and node yields are
-    // never arcane. Pinned so a future signed-material source has to face
-    // this bound rather than quietly slipping under it.
+    // never arcane. Under the original five-shard bill it would have dropped
+    // the specialized mint to 225 and broken the bound; the essence-heavy
+    // bill clears it even on that arm (277), by a margin of two copper.
+    // Pinned as a literal so a future signed-material source, or a retune of
+    // either side, has to face this bound rather than quietly slipping
+    // under it.
     const selfSigned = TOOL_EFFECT_RECIPES[0].reagents.reduce((total, reagent) => {
       const { count } = requiredReagentCountFor(true, reagent, { enchanting: 125 }, 'enchanting');
       return total + count * unitValue(reagent.itemId);
     }, 0);
-    expect(selfSigned).toBeLessThan(275);
+    expect(selfSigned).toBe(277);
+    expect(selfSigned).toBeGreaterThan(275);
     for (const reagent of TOOL_EFFECT_RECIPES[0].reagents) {
       expect(
         Object.values(ITEMS).some(

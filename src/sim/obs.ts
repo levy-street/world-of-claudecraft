@@ -208,11 +208,7 @@ export function encodeObs(sim: Sim): number[] {
           aura.kind === known.def.requiresAuraKind &&
           (aura.stacks ?? 1) >= (known.def.requiresAuraStacks ?? 1),
       );
-    const requiresPrimaryEye =
-      known.def.id === 'sentence' ||
-      known.def.id === 'coven' ||
-      known.def.id === 'possess_evil_eye' ||
-      known.def.id === 'hour_of_judgment';
+    const requiresPrimaryEye = known.def.id === 'sentence' || known.def.id === 'coven';
     const afflictionEyeReady =
       !requiresPrimaryEye ||
       !!selectedTarget?.auras.some(

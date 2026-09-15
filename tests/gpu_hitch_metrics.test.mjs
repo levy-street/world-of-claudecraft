@@ -39,6 +39,7 @@ function capture(overrides = {}) {
       modular: null,
       modularpeers: null,
       gfx: 'ultra',
+      gputimer: null,
     },
     effective: {
       schemaVersion: GPU_HITCH_SCHEMA_VERSION,
@@ -265,6 +266,7 @@ describe('gpu hitch metrics', () => {
         modular: 'on',
         modularpeers: 'on',
         gfx: 'ultra',
+        gputimer: 0,
       },
       // A stated requested knob nulls its own effective readback for the
       // comparison (the request already carries that dimension), so the two
@@ -328,6 +330,7 @@ describe('gpu hitch metrics', () => {
     }),
     'requested.modular': (base) => ({ requested: { ...base.requested, modular: 'off' } }),
     'requested.modularpeers': (base) => ({ requested: { ...base.requested, modularpeers: 'off' } }),
+    'requested.gputimer': (base) => ({ requested: { ...base.requested, gputimer: 1 } }),
     'effective.prewarmPacing': (base) => ({
       effective: {
         ...base.effective,

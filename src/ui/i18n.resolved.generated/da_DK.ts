@@ -62,6 +62,7 @@ export const da_DK: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Fangekælder",
+      "town": "By",
       "difficulty": "Sværhedsgrad",
       "name": "Navn",
       "spec": "Specialisering",
@@ -159,6 +160,10 @@ export const da_DK: EnTranslations = {
       "teleport": {
         "label": "Teleportér",
         "description": "Flyt til præcise verdenskoordinater."
+      },
+      "town": {
+        "label": "Byens knudepunkt",
+        "description": "Teleporter til et byknudepunkt ved navn."
       },
       "dungeon": {
         "label": "Gå ind i fangekælder",
@@ -348,12 +353,25 @@ export const da_DK: EnTranslations = {
       "banner": "Tilskuer til {name}"
     },
     "readyCheck": {
+      "title": "Klar check",
+      "close": "Tæt",
       "prompt": "{name} har startet et klar-tjek. Er du klar?",
       "ready": "Klar",
       "notReady": "Ikke klar",
+      "status": "Klar: {ready}/{total}",
+      "waiting": "Venter på svar...",
+      "memberReady": "{name} er klar.",
+      "memberNotReady": "{name} er ikke klar.",
+      "memberPending": "{name} har ikke svaret endnu.",
       "result": "Klar-tjek: {ready} klar, {notReady} ikke klar, {noResponse} uden svar.",
       "notInPartyError": "Du skal være i en gruppe for at starte et klar-tjek.",
       "inProgressError": "Et klar-tjek er allerede i gang."
+    },
+    "pullTimer": {
+      "start": "Træk {seconds} sek.",
+      "cancel": "Træk annulleret.",
+      "countdown": "{seconds}",
+      "pull": "TRÆK!"
     },
     "death": {
       "resurrectAtCorpse": "Genopstå ved liget",
@@ -578,6 +596,11 @@ export const da_DK: EnTranslations = {
       "mountsTitle": "Maskinstabil",
       "mountBuyAria": "Køb {item}",
       "mountSkinType": "Ridedyrsskind",
+      "mountInspectAria": "Forhåndsvisning {item}",
+      "mountRideIt": "Kør den",
+      "mountOnly": "Kun montering",
+      "mountBuy": "Køb Mount Skin",
+      "mountScopeLine": "Konto-dækkende hud. Båret af én karakter ad gangen.",
       "loading": "Indlæser WOC-butikken...",
       "error": "WOC-butikken er ikke tilgængelig lige nu. Prøv igen om lidt.",
       "balance": "Claudium-saldo",
@@ -1271,7 +1294,7 @@ export const da_DK: EnTranslations = {
       "runSummary": "{total} på {time}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Dialog"
     },
     "hubLesson": {
       "target": "Vælg træningsdukken som mål for at begynde.",
@@ -1402,6 +1425,7 @@ export const da_DK: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "Flaghandling på slagmarken",
       "sheathe": "Gem/fremvis våben",
+      "hideInterface": "Skjul grænseflade",
       "dive": "Svøm ned",
       "categoryPet": "Kæledyr",
       "petAttack": "Kæledyr: Angrib",
@@ -1410,8 +1434,22 @@ export const da_DK: EnTranslations = {
       "petDefensive": "Kæledyr: Defensiv",
       "petAggressive": "Kæledyr: Aggressiv",
       "targetPet": "Kæledyr: Sigt",
+      "targetSelf": "Mål Self",
+      "targetParty1": "Målpartimedlem 1",
+      "targetParty2": "Målpartimedlem 2",
+      "targetParty3": "Målpartimedlem 3",
+      "targetParty4": "Målpartimedlem 4",
+      "targetParty5": "Målpartimedlem 5",
+      "targetParty6": "Målpartimedlem 6",
+      "targetParty7": "Målpartimedlem 7",
+      "targetParty8": "Målpartimedlem 8",
+      "targetParty9": "Målpartimedlem 9",
       "mount": "Stig op / Stig af",
-      "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden."
+      "mouseHint": "Museknapper virker også: tryk på midterknappen (M3) eller en tommelfingerknap (M4, M5), mens du binder. Venstre og højre er fortsat forbeholdt kameraet, klik for at flytte og at klikke på ting i verden.",
+      "zoomIn": "Zoom kamera ind",
+      "zoomOut": "Zoom kamera ud",
+      "wheelHint": "Musehjulet binder også: rul det op eller ned, mens du binder, med Ctrl, Alt eller Shift nede, hvis du vil. Zoom kamera ind og ud sidder som standard på det bare hjul; flyt dem til en akkord såsom Ctrl+hjul for at frigøre hjulet for evner.",
+      "wheelHeldRefused": "Et hjulhak kan ikke drive en fastholdt handling såsom bevægelse. Vælg en nøgle eller en museknap til det."
     },
     "actionBar": {
       "editKeys": "Rediger handlingslinjens taster",
@@ -1682,6 +1720,8 @@ export const da_DK: EnTranslations = {
       "showReliquaryTracker": "Vis Relikviesporer",
       "confirmVendorSell": "Bekræft før salg",
       "confirmVendorSellNote": "Slår du dette fra, sælges genstande med ét klik uden bekræftelse, så en flyttet taskeplads kan sælge den forkerte genstand til den handlende.",
+      "confirmVendorSellMinQuality": "Bekræft salg fra kvalitet",
+      "confirmVendorSellMinQualityNote": "Varer under denne kvalitet sælges med et enkelt klik; en fejlsolgt vare kan stadig købes tilbage fra sælgeren.",
       "itemLevelLine": "Genstandsniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Vis sekundær handlingslinje",
@@ -1735,9 +1775,9 @@ export const da_DK: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Tilsluttet enhed",
+      "deviceConnected": "Forbundet",
+      "deviceDisconnected": "Ingen controller fundet",
       "glyphStyle": "Knapikoner",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -2125,20 +2165,20 @@ export const da_DK: EnTranslations = {
       "hidePlaytimeAria": "Skjul spilletid"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
+      "label": "Karakter detaljer",
+      "subtitle": "Niveau {level} {className}. {archetype}. Hobby: {hobby}",
+      "subtitleNoHobby": "Niveau {level} {className}. {archetype}",
+      "stats": "Statistik",
       "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
-      "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "skills": "Færdigheder",
+      "gathering": "Indsamling",
+      "crafting": "Håndværk",
+      "openProfessions": "Åbne erhverv"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Færdiggjort",
+      "zoneSummary": "{count} ({ready} klar)",
+      "shiftHint": "Shift-klik på en quest for at linke den i chat."
     },
     "statInfo": {
       "fromYour": "Fra din {value} {stat}:",
@@ -3248,7 +3288,30 @@ export const da_DK: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Snyder >",
-      "pledgeTag": "Løfte til {guild}"
+      "pledgeTag": "Løfte til {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Auktionsholder",
+        "banker": "Bankmand",
+        "riftForgemaster": "Rift Forgemaster",
+        "cardMaster": "Kortmester",
+        "crucibleQuartermaster": "Digelkvartermester",
+        "heroicQuartermaster": "Heroisk kvartermester",
+        "pvpVendor": "PvP leverandør",
+        "weaponsmithTrainer": "Smedetræner",
+        "cookingTrainer": "Madlavnings træner",
+        "tailoringTrainer": "Skrædderlærer",
+        "engineeringTrainer": "Ingeniør træner",
+        "leatherworkingTrainer": "Træner til læderbearbejdning",
+        "alchemyTrainer": "Alkymi træner",
+        "weaponVendor": "Våben sælger",
+        "armorVendor": "Panserforhandler",
+        "armsDealer": "Våbenhandler",
+        "foodVendor": "Leverandør af mad og drikke",
+        "potionVendor": "Drikforhandler",
+        "stableMaster": "Staldmester",
+        "generalGoods": "Generelle varer"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3267,7 +3330,7 @@ export const da_DK: EnTranslations = {
       "lock": "Lås spillerrammen"
     },
     "partyFrames": {
-      "header": "Party",
+      "header": "Parti",
       "section": "Gruppe- og raidrammer",
       "optionsSection": "Indstillinger for gruppens rammer",
       "unlock": "Flyt gruppe- og raidrammer",
@@ -3482,6 +3545,7 @@ export const da_DK: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Indsamlet fra en åre på fuldt niveau med et værktøj, der rangerer over materialet, og tæller som den ordinære version, hvor end en sådan kræves.",
+      "fineFarmGrade": "Fin karakter. Nogle plukker af en høst kommer fint, oftere ved højere Farming-færdigheder eller med et ladet Artisan's Eye. Almindelige produkter tæller aldrig, hvor den fine karakter er påkrævet.",
       "cookingCatch": "Madlavningsingrediens. Skal tilberedes, før den kan spises.",
       "usedBy": "Bruges af {crafts}.",
       "arcaneDust": "Håndværksreagens. Fortryllet frem fra almindeligt og ualmindeligt udstyr.",
@@ -4022,6 +4086,25 @@ export const da_DK: EnTranslations = {
       "lastSeenNever": "aldrig",
       "ignoredTab": "Ignorerede",
       "blockedTab": "Blokerede",
+      "who": {
+        "tab": "WHO",
+        "searchPlaceholder": "Navn, zone eller guild",
+        "search": "Søge",
+        "loading": "Spørger riget, hvem der er online...",
+        "empty": "Ingen spillere matcher.",
+        "count": "{total} online",
+        "countFiltered": "{shown} af {total} online",
+        "capped": "Viser den første {delivered}. Indsnævre søgningen for at se resten.",
+        "classFilter": "Filtrer efter klasse",
+        "allClasses": "Alle klasser",
+        "colStatus": "Status",
+        "colName": "Navn",
+        "colLevel": "Niveau",
+        "colClass": "klasse",
+        "colZone": "Zone",
+        "colGuild": "Guild",
+        "sortTitle": "Sorter efter {column}"
+      },
       "ignoredEmpty": "Du ignorerer ingen.",
       "blockedEmpty": "Du har ikke blokeret nogen.",
       "blockSearchPlaceholder": "Spillernavn",
@@ -4143,6 +4226,7 @@ export const da_DK: EnTranslations = {
           "farming": "Virker fra dine tasker, når du planter i et havebed."
         },
         "speed": "Indsamler hurtigere ved ressourcekilder under niveau {tier}.",
+        "wieldDegrade": "Under den færdighed fungerer det stadig som et værktøj på lavere niveau.",
         "rodRequired": "Kræves for at fiske.",
         "rodBite": "Fisk bider op til {seconds}s tidligere.",
         "rodReel": "Forlænger indhivningsvinduet med {seconds}s.",
@@ -4415,8 +4499,20 @@ export const da_DK: EnTranslations = {
       "majorsLabel": "Hovedfag: {a} og {b}",
       "pairsHeld": "Afholdte par: {count}",
       "returnsLabel": "Returnerer: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "retentionFooter": "Afkast af hhv.: 60% af færdighed bevaret.",
       "tutorialLink": "Profession tutorial"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Opskrifter",
+      "collapseHint": "Skjul opskriftsporing",
+      "expandHint": "Udvid opskriftstracker",
+      "pin": "Stift",
+      "unpin": "Frigør",
+      "pinFull": "Opskriftssporingen er fuld (op til {cap} opskrifter)",
+      "pinAria": "Fastgør {name} til HUD-trackeren",
+      "unpinAria": "Frigør {name} fra HUD-trackeren",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Håndværk",
@@ -4448,10 +4544,11 @@ export const da_DK: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(bruger {count} af fin kvalitet)",
       "reagentVaultDraw": "(henter {count} fra dit hvælv)",
+      "reagentOrdinaryHeld": "({name} holdt: {count}, men kun den fine karakter tæller her)",
       "vaultUnreachable": "Materialehvælvet er uden for rækkevidde her.",
       "craftFeeLine": "Gebyr: {fee} pr. stk.",
       "empty": "Ingen opskrifter kendt endnu.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Materialer i din boks trækkes automatisk. Lær flere opskrifter på stationen.",
       "resultAria": "Håndværk {name}",
       "craftedToast": "Udformet: {name}",
       "craftedToastQty": "Udformet: {name} x{qty}",
@@ -4541,8 +4638,8 @@ export const da_DK: EnTranslations = {
       "attunedBanner": "Indstillet: {title}",
       "tierTutorial": {
         "title": "Dit første niveau",
-        "tierCap": "Et håndværk når sit første niveau ved {skill} færdighed, og hvert niveau forbedrer, hvad det kan lave. Men et håndværk kan kun klatre forbi sjældent arbejde, når det er et af dine to hovedfag.",
-        "radar": "Dine erhverv danner et hjul. Indstil dig på et nabobpar, og de to håndværk bliver ubegrænsede hovedfag, et håndværk på den anden side af hjulet bliver et sjældent-begrænset hobby, og resten er inaktive: viden bevaret, men begrænset til almindelig, indtil du tager dem op igen.",
+        "tierCap": "Et fartøj når sit første niveau ved {skill} færdigheder, og hvert niveau forbedrer, hvad det kan lave. Men et fartøj klatrer kun forbi sjældent arbejde, når det er en af ​​dine to hovedfag.",
+        "radar": "Dine erhverv danner et hjul. Tilpas dig til et tilstødende par, og de to håndværk bliver store store, et håndværk på tværs af hjulet bliver en sjælden hobby, og resten ligger i dvale: deres viden bevares, men begrænset til fælles, indtil du tager dem op igen.",
         "masters": "Håndværksmestre i byerne tilbyder indstillingsquests. Besøg en for at vælge dit par, når du er klar. Intet du har lært, går nogensinde tabt.",
         "dismiss": "Forstået"
       },
@@ -4555,7 +4652,7 @@ export const da_DK: EnTranslations = {
       "commissionBound": "Kommissionsstykke: bundet til modtageren"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Købmanden genopretter almindelige goder; spillerlister sidder ved siden af ​​dem til deres prisforlangende."
     },
     "itemMenu": {
       "use": "Brug",
@@ -4836,6 +4933,7 @@ export const da_DK: EnTranslations = {
       "roleDps": "Skade",
       "freeRoles": "Alle roller velkomne",
       "lockoutDaily": "Daglig låsning på den endelige chef",
+      "lockoutWeekly": "Ugentlig lockout på hver chef",
       "lockoutNone": "Ingen låsning",
       "lockedFor": "Låst i ca. {minutes} min.",
       "attunement": "Kræver indstilling: {quest}",
@@ -4849,6 +4947,8 @@ export const da_DK: EnTranslations = {
       "lootMaybe": "Højst et af disse kan falde:",
       "lootChance": "Chancedråb ekstra:",
       "lootHeroic": "Heroisk bonus, et af disse falder altid:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct} pct.",
       "blockedLevel": "Kun niveau {min} til {max}",
       "blockedSpec": "Kræver en specialisering",
@@ -4922,7 +5022,33 @@ export const da_DK: EnTranslations = {
         "kings_wrath": "Kongens vrede (30%: permanent skadebonus, hurtigere gulvfarer)",
         "bone_storm": "Knoglestorm (han ignorerer trussel, hvirvler og stormer mod raidet)",
         "crown_endures": "Kronen holder stand (hård rasen ved 6:00, heroic 5:00)",
-        "deathless_court": "Det Dødsløse Hof (kun heroic, kongehofet rejser sig efter Dødsløs Rasen)"
+        "deathless_court": "Det Dødsløse Hof (kun heroic, kongehofet rejser sig efter Dødsløs Rasen)",
+        "bloodmane_rend": "Bloodmane Rend (blødning, hold øje med målbytte)",
+        "tusk_sweep": "Tusk Sweep (frontal spalte)",
+        "ancestral_sap": "Ancestral Sap (helbreder sine allierede)",
+        "call_of_the_hunt": "Call of the Hunt (fremskynder nærliggende allierede)",
+        "thickhide_ward": "Thickhide Ward (skjolder nærliggende allierede)",
+        "beast_pit_quake": "Beast Pit Quake (områdeskade)",
+        "wildheart_pulse": "Wildheart Pulse (skade på pulserende område)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Brand of the Pyre (stabling brandmærke, vask det af i ledningsvand)",
+        "forge_strike": "Forge Strike (stable tank-bytte debuff)",
+        "rain_of_cinders": "Regn af aske (tre ildkegler, stå imellem dem)",
+        "falling_cinders": "Falling Cinders (meteorcirkler på spillere, flyt ud)",
+        "revolving_inferno": "Revolving Inferno (roterende ildstråler, bevæg dig gennem hullerne)",
+        "forge_wave": "Forge Wave (udvidende brandmur, brug de to sikre baner)",
+        "apocalypse_add": "Ignivar Ashcaller (prioritet tilføj casting Apocalypse, dræb det hurtigt)",
+        "judgment_of_the_forge": "Judgment of the Forge (pause, del det ene sikre tilflugtssted)",
+        "last_inferno": "Last Inferno (45 sekunders forbrænding ved 20 % helbred)",
+        "chains_of_the_forge": "Chains of the Forge (kun heroisk, hold dig tæt på din tilknyttede partner)",
+        "makers_brand": "Maker's Brand (stabling tank-swap debuff)",
+        "forgefathers_sweep": "Forgefather's Sweep (bred frontal kegle på en ikke-tank)",
+        "tempering_ray": "Tempering Ray (linje til en markeret spiller, opsnappe den)",
+        "cinder_orbs": "Cinder Orbs (markerede spillere spredt til rummets kanter)",
+        "forgestorm": "Forgestorm (faldende meteorcirkler, flyt ud)",
+        "shared_pyre": "Delt Pyre (samlingskreds, del skaden)",
+        "anvils_decree": "Ambolt's Decreet (tre hammerslag over hele raid, heles igennem)",
+        "masters_assembly": "Mesterens forsamling (bloker smedebjælkerne, drej blokeringer)"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const da_DK: EnTranslations = {
       "applied": "Anvendt",
       "owned": "Ejet",
       "storeOnly": "Tilgængelig i WOC-butikken",
+      "preview": "Forhåndsvisning",
+      "previewAria": "Forhåndsvisning {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Et ridedyrsskind tegnes over det ridedyr, denne figur rider på. Det ændrer aldrig hastigheden.",
       "mountsNoMount": "Få først et ridedyr: et skind behøver noget at ride på.",
@@ -5182,29 +5310,29 @@ export const da_DK: EnTranslations = {
       "levels": "Niveauer {min} til {max}"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Niveau {level}",
+      "landmarkCount": "{count} vartegn",
+      "filtersAria": "Kortlag",
       "filters": {
         "quests": "Quests",
-        "gather": "Gather",
+        "gather": "Samle",
         "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "services": "Tjenester",
+        "players": "Spillere"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
+      "trackedQuests": "Sporede quests",
+      "noTrackedQuests": "Ingen sporede quests",
+      "availableNearby": "Tilgængelig i nærheden",
+      "noNearbyQuests": "Ingen quests i nærheden",
       "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "showRoute": "Vis rute",
+      "untrack": "Afspor",
+      "track": "Spore",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
-        "mail": "Mail",
+        "dungeon": "Fangehul",
+        "ore": "Malm",
+        "herb": "Urt",
+        "mail": "Post",
         "passage": "Passage"
       }
     },
@@ -5226,7 +5354,7 @@ export const da_DK: EnTranslations = {
       "tabBrowse": "Gennemse",
       "tabSell": "Sælg",
       "tabActivity": "Mine aktiviteter",
-      "tabHistory": "Sales History",
+      "tabHistory": "Salgshistorie",
       "tabsLabel": "Sektioner i $WOC-Børsen",
       "loading": "Indlæser Børsen...",
       "loadFailed": "Børsen kunne ikke nås. Prøv igen om lidt.",
@@ -5251,16 +5379,16 @@ export const da_DK: EnTranslations = {
       "colCurrentBid": "Nuværende bud",
       "colBuyNow": "Køb nu",
       "colTimeLeft": "Tid tilbage",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
+      "colBuyer": "Køber",
+      "colSoldAt": "Solgt",
+      "colSalePrice": "Udsalgspris",
       "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "saleTypeAuction": "Auktion",
+      "saleTypeBuyNow": "Køb nu",
+      "saleTypeDirected": "Instrueret",
+      "saleTypeUnknown": "Ukendt",
+      "historyEmpty": "Der er ikke registreret salg endnu.",
+      "historyError": "Salgshistorik kunne ikke indlæses.",
       "reserveMet": "Mindstepris nået",
       "reserveNotMet": "Mindstepris ikke nået",
       "yourListing": "Din notering",
@@ -5933,6 +6061,7 @@ export const da_DK: EnTranslations = {
       "deeds": "Bedrifternes Bog",
       "reliquary": "Relikvariet",
       "sheathe": "Gem/fremvis våben",
+      "hideInterface": "Skjul grænsefladen (skærmbilleder og videoer)",
       "crafting": "Håndværk",
       "mount": "Stig op / Stig af",
       "calendar": "Begivenhedskalender",
@@ -5962,6 +6091,8 @@ export const da_DK: EnTranslations = {
       "attackMove": "Angrebsbevægelse (kun når du har slået indstillingen til)",
       "meters": "Skadesmålere (skade, helbredelse og trussel)",
       "petMark": "Kæledyr: Marker, vælg dit eget kæledyr (det samme som at klikke på dets ramme)",
+      "targetSelf": "Mål dig selv",
+      "targetParty": "Målret partimedlemmer 1 til 9, top til bund, som partirammerne viser dem",
       "onBarBinding": "Du kan også binde direkte fra bjælken: vælg Rediger handlingsbjælkens taster i panelet Tastebindinger, klik derefter på en plads på den aktive bjælke, og tryk på den tast, du ønsker. Klik på Færdig, når du er færdig. Denne er kun til computer, da den kræver et fysisk tastatur.",
       "clickMoveNote": "Klik for at flytte er slået fra, indtil du slår det til: åbn panelet Tastebindinger i spilmenuen, slå Klik for at flytte til, og brug så rækken Museknap til klikflytning nedenunder til at vælge, hvilken museknap der klarer gangen (venstreklik som standard, eller højreklik). Når det er slået til, sender et klik på et sted på jorden dig gående derhen, med en markør på jorden, der viser, hvor du er på vej hen. At klikke på en skabning eller en anden spiller går dig hen til dem og stopper inden for rækkevidde, mens klikket stadig gør sit sædvanlige arbejde med at målrette eller interagere; er du allerede tæt nok på til at nå det, du klikkede på, interagerer du blot og bliver stående. Enhver af bevægelsestasterne tager straks kontrollen tilbage og afslutter turen, og det samme gør det at holde museknappen nede for at kigge rundt. Det gør et hop ikke, så du fortsætter rejsen gennem hoppet, og det kun at åbne spilmenuen sætter turen på pause, som fortsætter, når du lukker menuen."
     },
@@ -6099,7 +6230,8 @@ export const da_DK: EnTranslations = {
       "ifLockBars": "Låser dine bjælker, så du ikke ved et uheld kan trække en evne ud af et felt.",
       "keybindsHeading": "Tastebindings-panelet",
       "keybindsBody": "Tastelisten er kun halvdelen af det panel. Over den sidder de kontakter, der afgør, hvordan din mus styrer spillet: musekamera, hvorvidt markøren låses, mens du drejer, klik for at flytte og hvilken museknap der udløser det, angrebsbevægelse, det venstrehåndede touch-layout og bandeordsfilteret til chatten.",
-      "keybindsMouseBody": "To ting der er lette at overse. Museknapper bindes som taster, så hjulklikket og tommelfingerknapperne kan bære evner, mens venstre- og højreklik forbliver reserveret til kameraet og til at klikke på verden. Og du kan binde direkte fra handlingsbjælken: slå bindingstilstanden på bjælken til her, klik derefter på et felt, og tryk på den tast, du ønsker."
+      "keybindsMouseBody": "To ting der er lette at overse. Museknapper bindes som taster, så hjulklikket og tommelfingerknapperne kan bære evner, mens venstre- og højreklik forbliver reserveret til kameraet og til at klikke på verden. Og du kan binde direkte fra handlingsbjælken: slå bindingstilstanden på bjælken til her, klik derefter på et felt, og tryk på den tast, du ønsker.",
+      "keybindsWheelBody": "Selve hjulet binder også. Zoom kamera ind og zoom kamera ud er almindelige bindinger, der som standard sidder på det bare hjul, så du kan flytte dem til Ctrl plus hjulet eller til tasterne og derefter rulle det frigjorte hjul for at skyde action bar slots. Et hjulhak har ingen udløsning, så det kan ikke drive en fastholdt handling som at bevæge sig fremad."
     },
     "combat": {
       "intro": "Kamp følger velkendte klassiske MMO-regler. Du behøver aldrig at studere noget af det for at spille godt, dette er bare formen på hvordan kampe fungerer.",
@@ -6153,7 +6285,7 @@ export const da_DK: EnTranslations = {
       "framesMoveBodyEditFrames": "Din ramme, din målramme og dine gruppesrammer kan alle flyttes. Hver har en lille flyt-knap i hjørnet: lås den op, træk rammen derhen, hvor du vil have den, og lås den igen, så et fejlagtigt klik ikke kan flytte den. Rediger rammer øverst på Rammer-fanen i grænsefladeindstillingerne løsner resten af grænsefladen på én gang, inklusive de tre rammer: handlingslinjerne, besværgelseslinjen, svinglinjen, erfaringslinjen, minikortet, knaprækken, kæledyrsrammen, stillingslinjen, fordel- og debuffrækkerne samt Påmindelse om ønskeliste-brikken, hver med sin egen navnebrik, mens den er løsnet. Hvis de ender et sted, du fortryder, sætter Gendan standarder nederst på samme Rammer-fane dem alle tilbage, hvor de startede.",
       "framesGovernedExtra": "Rediger rammer løsner også sporingsstakken nedenunder (dine sporede opgaver og deres mål, din bedriftstatus, dine Relikvarium-sider, den udgravning du er i, enhver rift du deltager i, og opskriften eller bestillingen du sporer), kæledyrets handlingslinje ved siden af kæledyrsrammen, Mål-prikkerammen for dine debuffs på fjender i nærheden, paladinens Hengivenhedsmedaljon, troldmandens Affektionslinje, besværgelsesproc-overlayet, svingtimeren for sekundærhånd for dobbelthåndsbrugere og det fanebladede skademålervindue, hver med sin egen navnebrik, mens den er løsnet.",
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
       "aurasTitle": "Forstærkninger og svækkelser",
@@ -7489,7 +7621,7 @@ export const da_DK: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Fortryllelser kommer i fire niveauer. Grundniveauet bruger Klokkestøv (med lidt essens i den høje ende) og dækker våbenpladsen, sekundærhånden og alle rustningspladser, med nok egenskabsakser til at ethvert byg finder noget til hver plads. Skjolde og holdte troldmandssekundærhænder får hver sin udholdenhedsfortryllelse, så ingen udstyret plads er fortryllelsesdød. Det større niveau koster én klokkesplint plus essens: stærkere bonusser på de pladser, der påvirker mest. Splinter føder også tre andre udgifter: de to amuletopskrifter til fem hver, det øverste trin af værktøjseffekt-genopladninger og det Lysende niveau, hvor våben- og brystfortryllelserne tager én hver og infusionen to. Gem derfor nogle, før du bruger dem.\n\nMellem dem ligger de fem runede fortryllelser, én forbruger per type sekundæregenskab, så intet du maler, nogensinde er en blindgyde: Runet kant (våben, styrke, bruger resonansstål), runet segl (våben, intellekt, resonanstræ), runet væv (bryst, ånd, resonanstråd), runet skind (ben, smidighed, resonansskind) og runede led (hjelm, udholdenhed, resonansled). Hver tager også to klokkeessenser. Hvor en plads og egenskab har både en grund- og større fortryllelse, lander den runede bonus mellem dem, mens runet væv er den stærkeste brystfortryllelse for ånd direkte, og runet skind er den eneste benfortryllelse for smidighed overhovedet. De nøjagtige bonusser står alle i tabellen nedenfor.\n\nOver de almindelige lavere niveauer ligger det Lysende niveau, fagets almindelige topværk: fortryllelse 100 for de fire og 125 for infusionen, vist i færdighedskolonnen nedenfor. Hver bruger et Lysende reagens, og hver tilføjer ét trin mere på sin egen plads: Våbnet (en styrke- og en besværgelseskraftmulighed), brystet og støvlerne. Den sidste, Lysende infusion, tager kun fat på en del, der er Perfektioneret. Perfektionering er bærerens eget arbejde, ikke fortryllerens, og Erhverv-siden fortæller, hvordan en del tjener den.\n\nDen Sidste Flammes Iver er en separat raidformel, ikke en gratis almindelig fortryllelse. Lær dens omsættelige formel ved fortryllelse 100, før du anvender den. Hver anvendelse bruger 3 Kerner af Den Sidste Flamme og 2 klokkesplinter. Formlen kan falde i Diglen eller købes hos dets kvartermester for én kerne. Dens nærkampsproc og regler for våbenhastighed vises fuldt ud nedenfor.",
+        "enchantsNoteRaidFormula": "Fortryllelser kommer i fire niveauer. Grundniveauet bruger Klokkestøv (med lidt essens i den høje ende) og dækker våbenpladsen, sekundærhånden og alle rustningspladser, med nok egenskabsakser til at ethvert byg finder noget til hver plads. Skjolde og holdte troldmandssekundærhænder får hver sin udholdenhedsfortryllelse, så ingen udstyret plads er fortryllelsesdød. Det større niveau koster én klokkesplint plus essens: stærkere bonusser på de pladser, der påvirker mest. Splinter føder også tre andre udgifter: de to amuletopskrifter til én hver (resten af en amulets pris er essens og støv), det øverste trin af værktøjseffekt-genopladninger og det Lysende niveau, hvor våben- og brystfortryllelserne tager én hver og infusionen to. Gem derfor nogle, før du bruger dem.\n\nMellem dem ligger de fem runede fortryllelser, én forbruger per type sekundæregenskab, så intet du maler, nogensinde er en blindgyde: Runet kant (våben, styrke, bruger resonansstål), runet segl (våben, intellekt, resonanstræ), runet væv (bryst, ånd, resonanstråd), runet skind (ben, smidighed, resonansskind) og runede led (hjelm, udholdenhed, resonansled). Hver tager også to klokkeessenser. Hvor en plads og egenskab har både en grund- og større fortryllelse, lander den runede bonus mellem dem, mens runet væv er den stærkeste brystfortryllelse for ånd direkte, og runet skind er den eneste benfortryllelse for smidighed overhovedet. De nøjagtige bonusser står alle i tabellen nedenfor.\n\nOver de almindelige lavere niveauer ligger det Lysende niveau, fagets almindelige topværk: fortryllelse 100 for de fire og 125 for infusionen, vist i færdighedskolonnen nedenfor. Hver bruger et Lysende reagens, og hver tilføjer ét trin mere på sin egen plads: Våbnet (en styrke- og en besværgelseskraftmulighed), brystet og støvlerne. Den sidste, Lysende infusion, tager kun fat på en del, der er Perfektioneret. Perfektionering er bærerens eget arbejde, ikke fortryllerens, og Erhverv-siden fortæller, hvordan en del tjener den.\n\nDen Sidste Flammes Iver er en separat raidformel, ikke en gratis almindelig fortryllelse. Lær dens omsættelige formel ved fortryllelse 100, før du anvender den. Hver anvendelse bruger 3 Kerner af Den Sidste Flamme og 2 klokkesplinter. Formlen kan falde i Diglen eller købes hos dets kvartermester for én kerne. Dens nærkampsproc og regler for våbenhastighed vises fuldt ud nedenfor.",
         "charmsHeading": "Amuletter til en indsamlers værktøj",
         "formulaRequired": "Formel kræves",
         "charmsBody": "Fortryllelse er også, hvor en indsamlers amuletter kommer fra. Tinker Gizel lærer begge dele fra sig ved værktøjsværket i Østbæk, når din Fortryllelse når 25: Indsamlerens Gemme, som lægger en enhed til en høst, og Håndværkerens Øje, som hæver graden af det, der kommer op. Hver af dem fremstilles én gang og sættes derefter i en hakke, økse eller segl, hvor den kun bruger en ladning på de høster, den rent faktisk forbedrer.\n\nGenopladningen er, hvor faget bliver ved med at give afkast. Ladninger genoprettes af den, der ejer værktøjet, ikke af en tilrejsende fortryller, og genopladningen koster halvdelen af materialerne, når ejeren er den fortryller, der signerede amuletten, mindre igen med en specialisering i Fortryllelse. Så en amulet solgt over disken er ét enkelt salg, mens amuletterne på dine egne værktøjer er dem, det er billigst at holde kørende. Den fulde stige for ladninger og materialer står på enhver indsamlingsprofessions side, under Værktøjseffekter."
@@ -7558,7 +7690,7 @@ export const da_DK: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Landbrugets rytme",
-        "rhythmBody": "Plantning er det korte synlige kast: {plant} sekunder fladt på hvert trin, fordi en hakke åbner jord i stedet for at købe hastighed. At trække en moden afgrøde op er øjeblikkeligt. Der er intet kast at afbryde og ingen taskekontrol til at afvise det, og et bed, der er blevet klar, venter så længe du lader det, så en fuld taske kun koster bonden turen til at tømme den.\n\nDet, en høst betaler, er udbytte og landbrugsfærdighed. I modsætning til en åre giver den slet ingen figur-XP, så bedene er et fag at arbejde i, ikke en måde at stige i niveau på.",
+        "rhythmBody": "Plantning sker øjeblikkeligt, fordi en hakke åbner jord i stedet for at købe hastighed: der er intet kast at vente på, så en bonde, der går sin vej, har plantet alligevel. At trække en moden afgrøde op er også øjeblikkeligt. Der er intet kast at afbryde og ingen taskekontrol til at afvise det, og et bed, der er blevet klar, venter så længe du lader det, så en fuld taske kun koster bonden turen til at tømme den.\n\nDet, en høst betaler, er udbytte og landbrugsfærdighed. I modsætning til en åre giver den slet ingen figur-XP, så bedene er et fag at arbejde i, ikke en måde at stige i niveau på.",
         "gainHeading": "Hvad en høst lærer",
         "gainBody": "Gevinsten er deterministisk og knyttet til din egen tæller i stedet for afgrøden: {g1} færdighed for en høst under {p1}, {g2} under {p2}, {g3} under {p3} og {g4} resten af vejen til loftet på {cap}. Det er aldrig et færdighedskast, så klatringen er præcis så lang, som regnestykket gør den.\n\nDet, afgrødens niveau bestemmer, er hvor langt et bed kan føre dig. En afgrøde på niveau 1 lærer til {c1} og bliver grå der, en afgrøde på niveau 2 til {c2}, og niveau 3 og derover til loftet, så det er at flytte op mellem bedene, der holder tælleren i gang overhovedet.",
         "yieldsHeading": "Hvad en høst giver",
@@ -10148,6 +10280,7 @@ export const da_DK: EnTranslations = {
       "templates": {
         "battleground": "[Slagmark] {name}: {message}",
         "party": "[Gruppe] {name}: {message}",
+        "raidWarning": "[Raidadvarsel] {name}: {message}",
         "yell": "{name} råber: {message}",
         "whisper": "{name} hvisker: {message}",
         "toWhisper": "Til {name}: {message}",
@@ -10286,6 +10419,7 @@ export const da_DK: EnTranslations = {
       "stunned": "Du er lammet!",
       "silenced": "Du er bragt til tavshed!",
       "busy": "Du er optaget.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "Den evne er ikke klar endnu.",
       "notEnoughRage": "Ikke nok raseri!",
       "notEnoughEnergy": "Ikke nok energi!",
@@ -10634,7 +10768,6 @@ export const da_DK: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiskeri",
-      "farming": "Plantning",
       "gathering": "Indsamling",
       "crafting": "Håndværk",
       "disenchanting": "Affortryllelse",
@@ -10978,6 +11111,19 @@ export const da_DK: EnTranslations = {
       "buyConfirmAccept": "Køb",
       "buyConfirmCancel": "Annullér",
       "buyChanged": "Den vare ændrede sig, før du bekræftede. Tjek prisen, og prøv igen.",
+      "sweep": "Feje",
+      "sweepAria": "Gennemse markedet for {item}",
+      "sweepTitle": "Markedsgennemgang: {item}",
+      "sweepClose": "Tæt",
+      "sweepNote": "Køber hele fortegnelser fra andre sælgere, billigst pr. enhed først, indtil dit antal er dækket. Du får muligvis nogle flere, end du bad om.",
+      "sweepQuantity": "Enheder søges",
+      "sweepQuoteNone": "Ingen fortegnelser over denne vare at feje.",
+      "sweepQuoteLine": "{units} enheder på tværs af {listings} fortegnelser for {total} ({each} hver)",
+      "sweepQuoteShort": "Kun {units} enheder på tværs af {listings} fortegnelser er tilgængelige for {total} ({each} hver)",
+      "sweepButton": "Feje",
+      "sweepConfirmTitle": "Bekræft Market Sweep",
+      "sweepConfirmBody": "Købe {item} x{units} på tværs af {listings} fortegnelser for {total} ({each} hver)?",
+      "sweepChanged": "Sweep-citatet ændrede sig, før du bekræftede. Tjek totalen og prøv igen.",
       "sellNote": "Sæt varer fra dine tasker til salg. Købmanden tager {cut}% i afgift, når en genstand sælges. Du bruger {used}/{max} salgspladser.",
       "sellPickEmpty": "Klik på en genstand i dine tasker for at vælge, hvad du vil sælge.",
       "quantity": "Antal",
@@ -11017,7 +11163,9 @@ export const da_DK: EnTranslations = {
       "ownListing": "Det er din egen vare. Annuller den for at tage den tilbage.",
       "cannotAfford": "Det har du ikke råd til.",
       "notYourListing": "Det er ikke din vare.",
-      "nothingToCollect": "Du har intet at hente."
+      "nothingToCollect": "Du har intet at hente.",
+      "sweepNoListings": "Der er ingen lister over den pågældende vare, der kan gennemses.",
+      "sweepPriceChanged": "Priserne ændrede sig før dit sweep landede. Tjek tilbuddet, og prøv igen."
     },
     "loot": {
       "takeAll": "Tag alt",
@@ -16506,6 +16654,21 @@ export const da_DK: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Helbredelsesdukke"
+      },
+      "healing_dummy_tank": {
+        "name": "Skadet Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Kvæstet Soldat Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Kritisk spejderdummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Såret Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Voldsramte Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Bjergkamssniger"

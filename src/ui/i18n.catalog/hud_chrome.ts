@@ -46,12 +46,25 @@ export const hudChromeStrings = {
   // Raid/party ready-check prompt (the leader ran /ready). The buttons answer the
   // yes/no prompt; the outcome is announced in chat by the sim.
   readyCheck: {
+    title: 'Ready Check',
+    close: 'Close',
     prompt: '{name} has started a ready check. Are you ready?',
     ready: 'Ready',
     notReady: 'Not Ready',
+    status: 'Ready: {ready}/{total}',
+    waiting: 'Waiting for responses...',
+    memberReady: '{name} is ready.',
+    memberNotReady: '{name} is not ready.',
+    memberPending: '{name} has not responded yet.',
     result: 'Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.',
     notInPartyError: 'You must be in a party to start a ready check.',
     inProgressError: 'A ready check is already in progress.',
+  },
+  pullTimer: {
+    start: 'Pull in {seconds} sec!',
+    cancel: 'Pull cancelled.',
+    countdown: '{seconds}',
+    pull: 'PULL!',
   },
   // WoW-style death loop overlay (release -> ghost run -> resurrect). The release
   // button and "You have died." title reuse the hud.core.* keys; these are the
@@ -388,6 +401,14 @@ export const hudChromeStrings = {
     mountsTitle: 'Machine Stable',
     mountBuyAria: 'Purchase {item}',
     mountSkinType: 'Mount skin',
+    // The mount skin inspect panel (src/ui/mount_inspect_controller.ts): a live preview of
+    // the player's own character riding the skin, opened from a store card or
+    // the Cosmetics window, so nobody buys a look they have not seen.
+    mountInspectAria: 'Preview {item}',
+    mountRideIt: 'Ride it',
+    mountOnly: 'Mount only',
+    mountBuy: 'Purchase Mount Skin',
+    mountScopeLine: 'Account-wide skin. Worn by one character at a time.',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',
@@ -1622,6 +1643,8 @@ export const hudChromeStrings = {
     discord: 'Discord',
     bgFlag: 'Battleground Flag Action',
     sheathe: 'Sheathe/Unsheathe Weapon',
+    // Hides the whole HUD for a clean screenshot or video (Alt+Z by default).
+    hideInterface: 'Hide Interface',
     // Swimming: Jump swims up, this swims down.
     dive: 'Swim Down',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.
@@ -1635,6 +1658,19 @@ export const hudChromeStrings = {
     // "Mark" is this catalog's own term for the target (unitFrame.targetLabel,
     // targetAnnounce), which also keeps the value NON-WORDY for the M16 guard.
     targetPet: 'Pet: Mark',
+    // The party target hotkeys (F1..F10 by default): yourself, then the party
+    // frame rows top to bottom. Wordy (M16): the five non-Latin fills land in
+    // this same change.
+    targetSelf: 'Target Self',
+    targetParty1: 'Target Party Member 1',
+    targetParty2: 'Target Party Member 2',
+    targetParty3: 'Target Party Member 3',
+    targetParty4: 'Target Party Member 4',
+    targetParty5: 'Target Party Member 5',
+    targetParty6: 'Target Party Member 6',
+    targetParty7: 'Target Party Member 7',
+    targetParty8: 'Target Party Member 8',
+    targetParty9: 'Target Party Member 9',
     // Rideable mounts: the Z toggle (opens the stable while nothing is picked).
     mount: 'Mount / Dismount',
     // Mouse buttons are bindable pseudo-keys (src/game/mouse_binds.ts). The note
@@ -1644,6 +1680,16 @@ export const hudChromeStrings = {
     // this same change.
     mouseHint:
       'Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.',
+    // The wheel is a pair of bindable pseudo-keys too (src/game/wheel_binds.ts):
+    // the two zoom rows below hold it by default. Wordy (M16): the five
+    // non-Latin fills land in this same change.
+    zoomIn: 'Zoom Camera In',
+    zoomOut: 'Zoom Camera Out',
+    wheelHint:
+      'The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.',
+    // A wheel notch has no release, so bind() refuses it on a held action.
+    wheelHeldRefused:
+      'A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it.',
   },
   // On-bar action-bar key-binding mode (issue #1238): the Key Bindings menu's
   // single "Edit action bar keys" entry (replacing the wall of per-slot rebind
@@ -2121,6 +2167,12 @@ export const hudChromeStrings = {
     confirmVendorSell: 'Confirm Before Selling',
     confirmVendorSellNote:
       'Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.',
+    // Interface panel choice row under the toggle: the lowest item quality a
+    // vendor sale still confirms for; anything below sells instantly (wordy,
+    // M16: the five non-Latin fills land in the same change).
+    confirmVendorSellMinQuality: 'Confirm Sales From Quality',
+    confirmVendorSellMinQualityNote:
+      'Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.',
     itemLevelLine: 'Item Level {level}',
     itemScoreLine: 'Score {score}',
     // Interface panel toggle that reveals the optional second action bar row (off
@@ -4470,6 +4522,35 @@ export const hudChromeStrings = {
     // is the VALUE (no wrapper added in code), so a locale owns its own shape.
     // Wordy (M16), so the five non-Latin fills ship in this same change.
     pledgeTag: 'Pledge of {guild}',
+    // The functional role line under an NPC's name (src/sim/npc_role.ts): the
+    // classic `<Weapon Vendor>` tag that says what the NPC DOES, drawn on the
+    // same line a player's `<Guild>` uses. The wrapper is the VALUE (the
+    // cheaterTag precedent) so a locale owns its own brackets; {role} is one of
+    // the npcRole.* labels below, or the authored flavor title when an NPC has
+    // no functional role. Wordy (M16): the five non-Latin fills ship here too.
+    npcRoleTag: '<{role}>',
+    npcRole: {
+      auctioneer: 'Auctioneer',
+      banker: 'Banker',
+      riftForgemaster: 'Rift Forgemaster',
+      cardMaster: 'Card Master',
+      crucibleQuartermaster: 'Crucible Quartermaster',
+      heroicQuartermaster: 'Heroic Quartermaster',
+      pvpVendor: 'PvP Vendor',
+      weaponsmithTrainer: 'Blacksmithing Trainer',
+      cookingTrainer: 'Cooking Trainer',
+      tailoringTrainer: 'Tailoring Trainer',
+      engineeringTrainer: 'Engineering Trainer',
+      leatherworkingTrainer: 'Leatherworking Trainer',
+      alchemyTrainer: 'Alchemy Trainer',
+      weaponVendor: 'Weapon Vendor',
+      armorVendor: 'Armor Vendor',
+      armsDealer: 'Arms Dealer',
+      foodVendor: 'Food & Drink Vendor',
+      potionVendor: 'Potion Vendor',
+      stableMaster: 'Stable Master',
+      generalGoods: 'General Goods',
+    },
   },
   // World mouseover tooltip shown when hovering a mob (mob_tooltip_view.ts):
   // name (colored by the nameplate con-color), then "Level N <type>" ({family}
@@ -4911,6 +4992,15 @@ export const hudChromeStrings = {
     // One key shared by every raw fishing catch (RAW_COOKING_CATCH_IDS): cooking
     // reagents only; never edible raw. Painted via createTooltipLine, not the
     // materialHintLine HTML-string path.
+    // One key shared by the twelve farm fine twins (content/farm_crops.ts
+    // fineProduceItemId), the farming counterpart of fineGrade above. Written
+    // from the live mechanic (src/sim/professions/farming.ts harvest roll:
+    // FARM_FINE_CHANCE_BASE plus the skill scale, and the charged Artisan's
+    // Eye bump). The second sentence is the rule stated beside fine_vale_wheat
+    // in content/items.ts: no substitution in either direction, unlike the
+    // node grades.
+    fineFarmGrade:
+      "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
     cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
     // Profession affinity for honest materials (material_profession_hint_view.ts).
     // {crafts} is a locale-aware conjunction list of localized craft names
@@ -5756,6 +5846,31 @@ export const hudChromeStrings = {
     // Blocked also stops whispers, invites and mail. (Neither is the admin mute.)
     ignoredTab: 'Ignored',
     blockedTab: 'Blocked',
+    // The Who tab: the realm's online roster as a searchable, sortable table
+    // (the classic /who command's home in the UI; typing /who opens it). The
+    // search runs server-side over name, zone, and guild; the class chip and
+    // the column sort are local. {total} is the uncapped match count, {shown}
+    // the rows on screen after the class chip, {delivered} the server's cap.
+    // Wordy, M16: the five non-Latin fills land in this same change.
+    who: {
+      tab: 'Who',
+      searchPlaceholder: 'Name, zone, or guild',
+      search: 'Search',
+      loading: 'Asking the realm who is online...',
+      empty: 'No players match.',
+      count: '{total} online',
+      countFiltered: '{shown} of {total} online',
+      capped: 'Showing the first {delivered}. Narrow the search to see the rest.',
+      classFilter: 'Filter by class',
+      allClasses: 'All classes',
+      colStatus: 'Status',
+      colName: 'Name',
+      colLevel: 'Level',
+      colClass: 'Class',
+      colZone: 'Zone',
+      colGuild: 'Guild',
+      sortTitle: 'Sort by {column}',
+    },
     ignoredEmpty: 'You are not ignoring anyone.',
     blockedEmpty: 'You have not blocked anyone.',
     blockSearchPlaceholder: 'Player name',
@@ -5999,6 +6114,10 @@ export const hudChromeStrings = {
         farming: 'Works from your bags when you plant a crop bed.',
       },
       speed: 'Gathers faster at nodes below tier {tier}.',
+      // Rides directly under the "Requires {craft} {skill}" line on every
+      // land tool above tier 1: the wield gate degrades an unearned tool to
+      // the best tier the counter allows rather than refusing it outright.
+      wieldDegrade: 'Below that skill it still works as a lower-tier tool.',
       rodRequired: 'Required to fish.',
       rodBite: 'Fish bite up to {seconds}s sooner.',
       rodReel: 'Extends the reel window by {seconds}s.',
@@ -6565,6 +6684,20 @@ export const hudChromeStrings = {
   },
   // Crafting window (#1127): the minimal common-tier crafting action, one row
   // per known recipe, a Craft button enabled only when every reagent is held.
+  // The pinned-recipe HUD tracker (#recipe-tracker) and the crafting window's
+  // pin chip that fills it. The collapsed tally reuses hudChrome.questTracker.count.
+  recipeTracker: {
+    trackerLabel: 'Recipes',
+    collapseHint: 'Collapse recipe tracker',
+    expandHint: 'Expand recipe tracker',
+    pin: 'Pin',
+    unpin: 'Unpin',
+    pinFull: 'The recipe tracker is full (up to {cap} recipes)',
+    pinAria: 'Pin {name} to the HUD tracker',
+    unpinAria: 'Unpin {name} from the HUD tracker',
+    haveNeed: '{have}/{need}',
+    resultCount: '{name} x{count}',
+  },
   crafting: {
     title: 'Crafting',
     close: 'Close crafting',
@@ -6620,6 +6753,13 @@ export const hudChromeStrings = {
     // fine-substitution suffix above. Rendered only while the world reports
     // vault draw available here (craftVaultStock non-null).
     reagentVaultDraw: '(draws {count} from your vault)',
+    // The ordinary-grade note (the Bronze Hoe report, "doesn't recognize
+    // that I am holding wheat"): appended to an UNSATISFIED reagent line when
+    // the recipe asks for a fine grade and the player holds its plain twin.
+    // A fine reagent is never met by the ordinary grade (one-directional for
+    // node grades, no substitution at all for farm produce), and the bare
+    // 0/4 said nothing about why. {name} is the ordinary twin's localized name.
+    reagentOrdinaryHeld: '({name} held: {count}, but only the fine grade counts here)',
     // The place-blocked note (Phase 04 QA): rendered once at the top of the
     // recipe list when the world reports vault draw BLOCKED here
     // (craftVaultStock null: an instanced context) AND some reagent row is
@@ -7349,6 +7489,9 @@ export const hudChromeStrings = {
     roleDps: 'Damage',
     freeRoles: 'Any roles welcome',
     lockoutDaily: 'Daily lockout on the final boss',
+    // The Ignivar raid rooms lock on the weekly reset, one lock per boss room
+    // (wordy, M16: the five non-Latin fills land in this same change).
+    lockoutWeekly: 'Weekly lockout on each boss',
     lockoutNone: 'No lockout',
     lockedFor: 'Locked for about {minutes} min',
     attunement: 'Requires attunement: {quest}',
@@ -7362,6 +7505,8 @@ export const hudChromeStrings = {
     lootMaybe: 'At most one of these may drop:',
     lootChance: 'Additional chance drops:',
     lootHeroic: 'Heroic bonus, one of these always drops:',
+    lootHeroicMaybe: 'Heroic bonus, at most one of these may drop:',
+    lootHeroicChance: 'Heroic bonus, additional chance drops:',
     pct: '{pct}%',
     blockedLevel: 'Levels {min} to {max} only',
     blockedSpec: 'Requires a specialization',
@@ -7442,6 +7587,34 @@ export const hudChromeStrings = {
       crown_endures: 'The Crown Endures (hard enrage at 6:00, heroic 5:00)',
       deathless_court:
         'The Deathless Court (heroic only, the royal court rises after Deathless Rage)',
+      bloodmane_rend: 'Bloodmane Rend (bleed, watch for target swaps)',
+      tusk_sweep: 'Tusk Sweep (frontal cleave)',
+      ancestral_sap: 'Ancestral Sap (heals its allies)',
+      call_of_the_hunt: 'Call of the Hunt (hastens nearby allies)',
+      thickhide_ward: 'Thickhide Ward (shields nearby allies)',
+      beast_pit_quake: 'Beast Pit Quake (area damage)',
+      wildheart_pulse: 'Wildheart Pulse (pulsing area damage)',
+      jaguar_roar: 'Jaguar Roar (knockback)',
+      // Crucible of the Last Spring (docs/prd/ignivar-raid.md), Ignivar then
+      // Varkhul; each names the live mechanic and the one response it asks for.
+      brand_of_the_pyre: 'Brand of the Pyre (stacking fire mark, wash it off in conduit water)',
+      forge_strike: 'Forge Strike (stacking tank-swap debuff)',
+      rain_of_cinders: 'Rain of Cinders (three fire cones, stand between them)',
+      falling_cinders: 'Falling Cinders (meteor circles on players, move out)',
+      revolving_inferno: 'Revolving Inferno (rotating fire rays, move through the gaps)',
+      forge_wave: 'Forge Wave (expanding fire wall, use the two safe lanes)',
+      apocalypse_add: 'Ignivar Ashcaller (priority add casting Apocalypse, kill it fast)',
+      judgment_of_the_forge: 'Judgment of the Forge (intermission, share the one safe refuge)',
+      last_inferno: 'Last Inferno (45-second burn at 20% health)',
+      chains_of_the_forge: 'Chains of the Forge (heroic only, stay close to your linked partner)',
+      makers_brand: "Maker's Brand (stacking tank-swap debuff)",
+      forgefathers_sweep: "Forgefather's Sweep (wide frontal cone at a non-tank)",
+      tempering_ray: 'Tempering Ray (line to a marked player, intercept it)',
+      cinder_orbs: 'Cinder Orbs (marked players spread to the room edges)',
+      forgestorm: 'Forgestorm (falling meteor circles, move out)',
+      shared_pyre: 'Shared Pyre (gathering circle, split the damage)',
+      anvils_decree: "Anvil's Decree (three raid-wide hammer strikes, heal through)",
+      masters_assembly: "The Master's Assembly (block the forge beams, rotate blockers)",
     },
   },
   // The Book of Deeds window: the deed catalog browser (summary strip,

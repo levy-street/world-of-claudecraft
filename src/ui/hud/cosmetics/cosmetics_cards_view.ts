@@ -75,6 +75,9 @@ function mountCardHtml(card: MountSkinCard): string {
       : card.action === 'takeOff'
         ? actionButton('takeoff-mount', card.id, t('hudChrome.cosmetics.takeOff'))
         : '';
+  // Every mount card previews, owned or store-only: the preview is where a
+  // player sees the skin on their own character before buying it.
+  const preview = previewButton('preview-mount', card.id, name);
   return (
     `<article class="cos-card rarity-${esc(card.rarity)}${card.owned ? ' owned' : ''}${card.worn ? ' worn' : ''}" ` +
     `data-card="${esc(card.id)}" aria-label="${esc(t('hudChrome.cosmetics.cardAria', { name, rarity: mountRarityLabel(card.rarity) }))}">` +
@@ -82,7 +85,19 @@ function mountCardHtml(card: MountSkinCard): string {
     `<span class="cos-rarity q-${esc(card.rarity)}">${esc(mountRarityLabel(card.rarity))}</span></div>` +
     `<h3 class="cos-card-name">${esc(name)}</h3>` +
     (desc ? `<p class="cos-card-desc">${esc(desc)}</p>` : '') +
-    `<div class="cos-card-actions">${state}${action}</div></article>`
+    `<div class="cos-card-actions">${state}${preview}${action}</div></article>`
+  );
+}
+
+/** The preview action: its own class, NEVER `.cos-action`, so the wear /
+ *  apply expectations (one `.cos-action` per card, and the browser suite's
+ *  Enter target `.cos-action[data-id]`) can never land on Preview, and the
+ *  focus key stays distinct. components.css gives `.cos-preview` the same
+ *  40px touch floor as `.cos-action`. */
+function previewButton(act: 'preview-mount' | 'preview-skin', id: string, name: string): string {
+  return (
+    `<button type="button" class="cos-preview" data-act="${esc(act)}" data-id="${esc(id)}"${focusKeyAttr(`cosmetic-preview:${id}`)} ` +
+    `aria-label="${esc(t('hudChrome.cosmetics.previewAria', { name }))}">${esc(t('hudChrome.cosmetics.preview'))}</button>`
   );
 }
 
@@ -114,7 +129,7 @@ function weaponGroupHtml(group: WeaponSkinGroup): string {
         `<div class="cos-card-head">${scopeBadge(row.ownershipScope, false)}${row.applied ? scopeBadge(row.appliedScope, true) : ''}` +
         `<span class="cos-rarity q-${esc(row.rarity)}">${esc(rarityLabel(row.rarity))}</span></div>` +
         `<h3 class="cos-card-name">${esc(name)}</h3>${hint}` +
-        `<div class="cos-card-actions">${state}${action}</div></article>`
+        `<div class="cos-card-actions">${state}${previewButton('preview-skin', row.id, name)}${action}</div></article>`
       );
     })
     .join('');
@@ -181,6 +196,8 @@ export function cosmeticsPanelHtml(s: CosmeticsSnapshot): string {
 
 /** The action a delegated click resolves to, from the button's data attributes. */
 export type CosmeticsAction =
+  | { kind: 'preview-mount'; id: string }
+  | { kind: 'preview-skin'; id: string }
   | { kind: 'wear-mount'; id: string }
   | { kind: 'takeoff-mount' }
   | { kind: 'apply-skin'; id: string }
@@ -196,6 +213,10 @@ export function cosmeticsActionFrom(dataset: {
 }): CosmeticsAction | null {
   const id = dataset.id ?? '';
   switch (dataset.act) {
+    case 'preview-mount':
+      return id ? { kind: 'preview-mount', id } : null;
+    case 'preview-skin':
+      return id ? { kind: 'preview-skin', id } : null;
     case 'wear-mount':
       return id ? { kind: 'wear-mount', id } : null;
     case 'takeoff-mount':

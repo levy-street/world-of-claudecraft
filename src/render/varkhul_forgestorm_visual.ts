@@ -184,9 +184,10 @@ export class VarkhulForgestormVisuals {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    compileGate?: (target: THREE.Object3D) => Promise<unknown>,
   ) {
     this.cinderOrbVisuals = new VarkhulCinderOrbVisuals(scene, groundY);
-    this.forgeBeamVisuals = new VarkhulForgeBeamVisuals(scene, groundY);
+    this.forgeBeamVisuals = new VarkhulForgeBeamVisuals(scene, groundY, compileGate);
     this.interceptBeamVisuals = new VarkhulInterceptBeamVisuals(scene, groundY);
     this.worldfireVisuals = new VarkhulWorldfireVisuals(scene, groundY);
     this.assemblyVisuals = new VarkhulAssemblyVisuals(scene, groundY);

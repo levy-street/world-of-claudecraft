@@ -1,6 +1,8 @@
 // @vitest-environment happy-dom
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { ZONES } from '../src/sim/data';
+import { devTownTargets } from '../src/sim/dev/town_teleport';
 import { DevCommandWindow, type DevCommandWindowDeps } from '../src/ui/dev_command_window';
 
 function makeWindow(available = true, accountAdmin = true) {
@@ -56,6 +58,25 @@ describe('developer command window', () => {
     expect(document.querySelector('.dev-command-footer output')?.textContent).toContain(
       '/dev heal',
     );
+  });
+
+  it('offers every zone hub on the town card and sends the chosen slug', () => {
+    const { chat, window } = makeWindow();
+    window.toggle();
+    document.querySelector<HTMLButtonElement>('[data-dev-category="travel"]')?.click();
+
+    const select = document.querySelector<HTMLSelectElement>(
+      '[data-dev-action="town"] select[data-dev-field="town"]',
+    );
+    expect(select).not.toBeNull();
+    const values = [...(select?.options ?? [])].map((option) => option.value);
+    expect(values).toEqual(expect.arrayContaining(devTownTargets(ZONES).map((town) => town.id)));
+    expect(values.length).toBe(ZONES.length);
+    expect(select?.querySelector('option[value="highwatch"]')?.textContent).toContain('Highwatch');
+
+    if (select) select.value = 'highwatch';
+    document.querySelector<HTMLButtonElement>('[data-dev-run="town"]')?.click();
+    expect(chat).toHaveBeenCalledWith('/dev town highwatch');
   });
 
   it('preserves focus on the selected category after rebuilding its command list', () => {

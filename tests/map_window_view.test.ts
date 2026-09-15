@@ -1188,15 +1188,16 @@ describe('zone-map gather nodes', () => {
     const wields = build([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 40 });
     expect(lockOf(wields, 'ore_mirefen_1')).toBe(false);
     expect(lockOf(wields, 'ore_mirefen_t2')).toBe(false);
-    // ...and is wield-filtered out at 39: no usable tool at all, so even the
-    // tier-1 veins lock (the wield arm, not the tier compare).
+    // ...and degrades at 39: the same owned pick still works as the best
+    // lower tier the counter can wield, so tier-1 veins open while tier-2
+    // veins stay locked (the wield arm, not the tier compare).
     const under = build([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 39 });
-    expect(lockOf(under, 'ore_mirefen_1')).toBe(true);
+    expect(lockOf(under, 'ore_mirefen_1')).toBe(false);
     expect(lockOf(under, 'ore_mirefen_t2')).toBe(true);
     // A client mirror before its first gprof delta has NO proficiency map at
-    // all: the read fails closed (coerced to 0), never open.
+    // all: the read coerces to 0, so an owned higher tool degrades to tier 1.
     const preGprof = build([{ itemId: 'iron_mining_pick', count: 1 }], undefined);
-    expect(lockOf(preGprof, 'ore_mirefen_1')).toBe(true);
+    expect(lockOf(preGprof, 'ore_mirefen_1')).toBe(false);
     expect(lockOf(preGprof, 'ore_mirefen_t2')).toBe(true);
   });
 

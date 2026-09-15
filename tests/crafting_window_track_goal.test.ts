@@ -48,6 +48,8 @@ function baseDeps(overrides: Partial<CraftingWindowDeps> = {}): CraftingWindowDe
     attachTooltip: vi.fn(),
     commissionChecked: () => false,
     onToggleCommission: () => {},
+    recipePinned: () => false,
+    onToggleRecipePin: () => ({ pinned: new Set<string>(), full: false, changed: false }),
     selectedCraft: () => null,
     onSelectCraft: () => {},
     ...overrides,

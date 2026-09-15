@@ -279,8 +279,12 @@ describe('post-entry mob-body streaming', () => {
     // then falls back to the item model. Two statements rather than one `??`
     // because a DISPLAYED ranged skin also relocates the bone on that arm (a
     // bow moves to the left handslot on the mech), which the fallback must not.
+    // The mainhand takes the skin url only while it shows the skin (a melee
+    // skin held in the offhand alone leaves the mainhand on its item model).
     expect(assetsSource).toContain(
-      'const skinUrl = residentOrEnsure(weaponSkinModelUrl(weaponSkinId));',
+      'const skinUrl = mainhandShowsWeaponSkin(weaponSkinId, weaponItemId)\n' +
+        '    ? residentOrEnsure(weaponSkinModelUrl(weaponSkinId))\n' +
+        '    : null;',
     );
     expect(assetsSource).toContain('const url = itemWeaponModelUrl(weaponItemId);');
     expect(assetsSource).toContain(

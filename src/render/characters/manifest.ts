@@ -3744,6 +3744,11 @@ const MOB_KEYS: Record<string, string> = {
   // the template's `hostile`/`friendlyPracticeTarget` fields.
   hub_training_dummy: 'mob_training_dummy',
   hub_healing_dummy: 'mob_training_dummy',
+  healing_dummy_tank: 'mob_training_dummy',
+  healing_dummy_soldier: 'mob_training_dummy',
+  healing_dummy_scout: 'mob_training_dummy',
+  healing_dummy_caster: 'mob_training_dummy',
+  healing_dummy_ranger: 'mob_training_dummy',
   emberkin: 'mob_emberkin',
   gloomshade: 'mob_gloomshade',
   pyre_colossus: 'mob_pyre_colossus',

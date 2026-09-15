@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { shaderWarmToken } from '../server/perf_report_entry_blocks';
+import { RAW_SUMMARY_KNOWN_KEYS } from '../server/perf_report_shed';
 import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
 import { SHADER_WARM_BEACON_TEXT_MAX } from '../src/game/perf_shader_warm_core';
 import { Settings } from '../src/game/settings';
+import { GPU_TIMER_UNAVAILABLE } from '../src/render/gpu_timer_probe_core';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
 import { shaderWarmSnapshot } from '../src/render/shader_warm_client';
@@ -297,6 +299,7 @@ function prewarmStats(): NonNullable<NonNullable<PerfSnapshot['renderer']>['prew
         submittedUnits: 2,
         settledUnits: 1,
         failedUnits: 0,
+        rejectedUnits: 0,
         backoffCount: 0,
         noProgressCount: 0,
         lastSettlementMs: 120,
@@ -341,6 +344,7 @@ function foliageCostStats(): Pick<
 function snapshot(): PerfSnapshot {
   return {
     seconds: 80,
+    visibleSeconds: 78,
     frames: 4800,
     fps: 60,
     hiddenPresentSkips: 0,
@@ -475,6 +479,7 @@ function snapshot(): PerfSnapshot {
         },
       },
       nightAmount: 0,
+      gpuTimer: GPU_TIMER_UNAVAILABLE,
       gpuPrep: {
         budget: {
           frameEmaMs: 16.7,
@@ -725,12 +730,20 @@ describe('perf reporter payload', () => {
     expect(body.source).toBe('benchmark');
     expect(body.zoneOrScenario).toBe('bench_dense_foliage');
     expect(JSON.stringify(body.rawSummary)).not.toContain('Safari/605');
+    // The GPU timer probe's table (perfStats().gpuTimer) is a dev diagnostic
+    // that never leaves the machine: the snapshot above carries the field, so
+    // a reporter that started spreading renderer stats would ship it here.
+    expect(JSON.stringify(body)).not.toContain('gpuTimer');
     // hiddenPresentSkips ships in rawSummary (review reversal of the phase 4
     // decision): sends are skipped while hidden, but an after-restore session
     // still beacons cumulative numbers whose spans included minimized time,
     // and the counter is the only fleet-visible evidence of that residue. It
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
+    // The fps denominator rides beside `seconds`: a reader can tell a session
+    // whose fps was discounted for hidden time from one that was diluted.
+    expect((body.rawSummary as { seconds?: number }).seconds).toBe(80);
+    expect((body.rawSummary as { visibleSeconds?: number }).visibleSeconds).toBe(78);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
     // The 3D drawing buffer rides in rawSummary (the no-DDL home): the report's
     // own columns cannot say what a session rasterizes, because `dpr` is the raw
@@ -1470,6 +1483,45 @@ describe('perf reporter suggestion ids', () => {
     expect(body.suggestionIds).toEqual(['hardware-acceleration']);
   });
 
+  it('sends only raw summary keys the server ladder knows, so no field is shed as unlisted', () => {
+    // The ingest sheds an unknown key first on every oversized report, and
+    // nearly every first report is oversized: a client field added without
+    // its server-side entry would vanish from the fleet under the anonymous
+    // 'unlisted' rung. This is the lockstep pin.
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      new Settings(),
+      'sess1',
+      42,
+    )!;
+    for (const key of Object.keys(body.rawSummary as Record<string, unknown>)) {
+      expect(RAW_SUMMARY_KNOWN_KEYS, key).toContain(key);
+    }
+  });
+
+  it('carries the desktop shell flag as a top-level field, false for a browser tab', () => {
+    // The shell is Chromium loading the same bundle: browserFamily and buildId
+    // read identical to a Chrome tab, so this flag is the fleet's only
+    // desktop-versus-browser marker (stored as the desktop_shell column).
+    const settings = new Settings();
+    const shell = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+      null,
+      true,
+    )!;
+    expect(shell.desktopShell).toBe(true);
+    const tab = perfReporterInternalsForTest.payloadFromSnapshot(
+      snapshot(),
+      settings,
+      'sess1',
+      42,
+    )!;
+    expect(tab.desktopShell).toBe(false);
+  });
+
   it('emits integrated-gpu on a bad-frames iGPU session only outside the desktop shell', () => {
     (globalThis as any).location = { search: '' };
     const badSnap = (): PerfSnapshot => {
@@ -1544,6 +1596,13 @@ describe('perf reporter worst-window drain', () => {
       expect(fetchImpl).not.toHaveBeenCalled();
       await vi.advanceTimersByTimeAsync(1);
       expect(fetchImpl).toHaveBeenCalledTimes(1);
+      // The URL, not only the count and the body: this harness drives the real
+      // startPerfReporter, and the beacon posting to the wrong origin is what
+      // kept every desktop session out of the fleet (tests/client_api_origin.test.ts).
+      expect(fetchImpl).toHaveBeenCalledWith(
+        '/api/perf-report',
+        expect.objectContaining({ method: 'POST' }),
+      );
       await Promise.resolve();
       await Promise.resolve();
     } finally {
@@ -2032,6 +2091,9 @@ describe('perf reporter world-entry blocks', () => {
       heldWarm: 3,
       heldTimedOut: 1,
       holdMs: 120,
+      holdWallMs: 90,
+      releases: 0,
+      abArm: 'on',
       workerStats: {
         pending: 2,
         inFlight: 1,
@@ -2072,6 +2134,10 @@ describe('perf reporter world-entry blocks', () => {
       warmed: 8,
       held: 4,
       heldTimedOut: 1,
+      holdMs: 120,
+      holdWallMs: 90,
+      releases: 0,
+      abArm: 'on',
     });
     // The two typed fields the server stores as columns.
     expect(body.shaderWarmWorkerActive).toBe(true);

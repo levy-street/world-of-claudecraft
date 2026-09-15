@@ -13232,10 +13232,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.tierTutorial.dismiss': 'Capito',
   'hudChrome.crafting.tierTutorial.masters':
     'I maestri artigiani nelle citta offrono missioni di sintonizzazione. Visita uno quando sei pronto a scegliere la tua coppia. Niente di cio che hai imparato va mai perduto.',
-  'hudChrome.crafting.tierTutorial.radar':
-    "Le tue professioni formano una ruota. Sintonizzati a una coppia adiacente e quei due mestieri diventano specializzazioni principali senza limiti, un mestiere dall'altra parte della ruota diventa un passatempo con limite raro, e gli altri rimangono dormienti: la loro conoscenza e conservata, ma limitata al comune finche non li riprendi.",
-  'hudChrome.crafting.tierTutorial.tierCap':
-    'Un mestiere raggiunge il suo primo livello a {skill} di competenza, e ogni livello migliora cio che puo produrre. Ma un mestiere sale oltre il lavoro raro solo quando e una delle tue due specializzazioni principali.',
   'hudChrome.crafting.tierTutorial.title': 'Il tuo primo livello',
   'hudChrome.crafting.trendNudge':
     'Le tue mani tendono verso {archetype}. La sua sintonizzazione attende con {master}.',
@@ -13785,7 +13781,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono',
   'hudChrome.auraEffect.oldBlood':
     'Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Lupo e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma',
-  'abilityUi.cast.farming': 'Piantare',
   'abilityUi.cast.sundering': 'Frantumare',
   'hud.core.mapMarkerLabels.farmPatch': 'Aiuole',
   'hud.logs.keptLockedMany': 'Conservate {count} copie bloccate.',
@@ -17146,7 +17141,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.effectWellFed': 'Ben Nutrito: per {minutes} min aumenta {stat} di {value}.',
   'guide.profPages.effectWellFedAura': '{aura}: Ben Nutrito per {minutes} min.',
   'guide.profPages.ench.enchantsNoteRaidFormula':
-    'Gli incantamenti hanno quattro gradini. Quello base usa Polvere di Rintocco, con un po’ di Essenza ai livelli alti, e copre lo slot dell’arma, la mano secondaria e ogni slot dell’armatura, con abbastanza varianti per asse di statistiche perché ogni configurazione trovi qualcosa per ogni slot: scudi e mani secondarie da incantatore tenute in mano ricevono un incantamento di Tempra dedicato, quindi nessuno slot equipaggiato resta privo di incantamento. Il gradino Superiore costa un Frammento di Rintocco più Essenza e offre bonus più forti negli slot di maggiore impatto. I frammenti hanno anche altri tre impieghi: le due ricette dei ciondoli, cinque ciascuna, il gradino superiore delle ricariche degli effetti degli strumenti e il gradino Lucente, dove gli incantamenti dell’arma e del petto ne prendono uno ciascuno e l’Infusione ne prende due, quindi mettine da parte alcuni prima di spenderli.\n\nFra questi si trovano i cinque incantamenti Runici, uno per ogni statistica secondaria tipizzata, così nulla di ciò che macini finisce inutilizzato: Bordo Runico, arma e Forza, consuma Acciaio Risonante; Sigillo Runico, arma e Intelletto, Legno Risonante; Trama Runica, petto e Spirito, Filo Risonante; Pelle Runica, gambe e Agilità, Pelle Risonante; Legami Runici, elmo e Tempra, Legami Risonanti. Ognuno usa anche due Essenze di Rintocco; dove uno slot e una statistica hanno sia un incantamento base sia uno Superiore, il bonus Runico cade fra i due, mentre Trama Runica è in assoluto il più forte incantamento di Spirito per il petto e Pelle Runica è l’unico incantamento di Agilità per le gambe. I bonus esatti sono tutti nella tabella seguente.\n\nSopra i gradini ordinari inferiori siede il gradino Lucente, il culmine del lavoro ordinario della professione: Incantamento 100 per i quattro incantamenti e 125 per l’Infusione, come indicato nella colonna Competenza. Ognuno usa un Reagente Lucente e aggiunge un altro gradino al proprio slot: l’arma, con un’opzione Potere e una Potere Magico, il petto e gli stivali. L’ultimo, l’Infusione Lucente, si applica solo a un pezzo Perfezionato: la Perfezione è opera di chi indossa il pezzo, non dell’incantatore, e la pagina delle Professioni spiega come ottenerla.\n\nLo Zelo dell’Ultima Fiamma è una formula separata da incursione, non un incantamento ordinario gratuito. Impara la sua formula commerciabile a Incantamento 100 prima di applicarla. Ogni applicazione usa 3 Nuclei dell’Ultima Fiamma e 2 Frammenti di Rintocco; la formula può cadere nel Crogiolo o essere comprata dal suo quartiermastro per un nucleo. Le regole del proc da mischia e della velocità dell’arma sono mostrate per intero qui sotto.',
+    'Gli incantamenti hanno quattro gradini. Quello base usa Polvere di Rintocco, con un po’ di Essenza ai livelli alti, e copre lo slot dell’arma, la mano secondaria e ogni slot dell’armatura, con abbastanza varianti per asse di statistiche perché ogni configurazione trovi qualcosa per ogni slot: scudi e mani secondarie da incantatore tenute in mano ricevono un incantamento di Tempra dedicato, quindi nessuno slot equipaggiato resta privo di incantamento. Il gradino Superiore costa un Frammento di Rintocco più Essenza e offre bonus più forti negli slot di maggiore impatto. I frammenti hanno anche altri tre impieghi: le due ricette dei ciondoli, uno ciascuna (il resto del costo di un ciondolo è essenza e polvere), il gradino superiore delle ricariche degli effetti degli strumenti e il gradino Lucente, dove gli incantamenti dell’arma e del petto ne prendono uno ciascuno e l’Infusione ne prende due, quindi mettine da parte alcuni prima di spenderli.\n\nFra questi si trovano i cinque incantamenti Runici, uno per ogni statistica secondaria tipizzata, così nulla di ciò che macini finisce inutilizzato: Bordo Runico, arma e Forza, consuma Acciaio Risonante; Sigillo Runico, arma e Intelletto, Legno Risonante; Trama Runica, petto e Spirito, Filo Risonante; Pelle Runica, gambe e Agilità, Pelle Risonante; Legami Runici, elmo e Tempra, Legami Risonanti. Ognuno usa anche due Essenze di Rintocco; dove uno slot e una statistica hanno sia un incantamento base sia uno Superiore, il bonus Runico cade fra i due, mentre Trama Runica è in assoluto il più forte incantamento di Spirito per il petto e Pelle Runica è l’unico incantamento di Agilità per le gambe. I bonus esatti sono tutti nella tabella seguente.\n\nSopra i gradini ordinari inferiori siede il gradino Lucente, il culmine del lavoro ordinario della professione: Incantamento 100 per i quattro incantamenti e 125 per l’Infusione, come indicato nella colonna Competenza. Ognuno usa un Reagente Lucente e aggiunge un altro gradino al proprio slot: l’arma, con un’opzione Potere e una Potere Magico, il petto e gli stivali. L’ultimo, l’Infusione Lucente, si applica solo a un pezzo Perfezionato: la Perfezione è opera di chi indossa il pezzo, non dell’incantatore, e la pagina delle Professioni spiega come ottenerla.\n\nLo Zelo dell’Ultima Fiamma è una formula separata da incursione, non un incantamento ordinario gratuito. Impara la sua formula commerciabile a Incantamento 100 prima di applicarla. Ogni applicazione usa 3 Nuclei dell’Ultima Fiamma e 2 Frammenti di Rintocco; la formula può cadere nel Crogiolo o essere comprata dal suo quartiermastro per un nucleo. Le regole del proc da mischia e della velocità dell’arma sono mostrate per intero qui sotto.',
   'guide.profPages.ench.formulaRequired':
     'Questa formula richiede il modello corretto e la competenza necessaria.',
   'guide.profPages.ench.perfectedOnly':
@@ -17175,7 +17170,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il guadagno è deterministico e dipende dal tuo contatore, non dal raccolto: {g1} di competenza per un raccolto sotto {p1}, {g2} sotto {p2}, {g3} sotto {p3} e {g4} fino al limite di {cap}. Non è mai un tiro di aumento, quindi la scalata dura esattamente quanto stabilisce l’aritmetica.\n\nIl grado del raccolto decide quanto lontano può portarti un’aiuola. Un raccolto di grado 1 insegna fino a {c1} e poi diventa grigio, un raccolto di grado 2 fino a {c2}, mentre il grado 3 e oltre arriva al limite: salire fra le aiuole è ciò che mantiene attivo il contatore.',
   'guide.profPages.farm.gainHeading': 'Guadagnare competenza',
   'guide.profPages.farm.rhythmBody':
-    'La semina è il lancio visibile breve: {plant} secondi netti a ogni gradino, perché una zappa apre il terreno invece di comprare velocità. Raccogliere una coltura matura è istantaneo. Non c’è lancio da interrompere né controllo delle borse che possa rifiutare l’azione, e un’aiuola pronta aspetta finché la lasci, quindi una borsa piena costa all’agricoltore solo la camminata per svuotarla.\n\nUn raccolto paga prodotti e competenza agricola. A differenza di un filone, non concede alcuna esperienza al personaggio, quindi le aiuole sono un mestiere da lavorare, non un modo per salire di livello.',
+    'La semina è istantanea, perché una zappa apre il terreno invece di comprare velocità: non c’è alcun lancio da attendere, quindi un agricoltore che si allontana ha comunque seminato. Anche raccogliere una coltura matura è istantaneo. Non c’è lancio da interrompere né controllo delle borse che possa rifiutare l’azione, e un’aiuola pronta aspetta finché la lasci, quindi una borsa piena costa all’agricoltore solo la camminata per svuotarla.\n\nUn raccolto paga prodotti e competenza agricola. A differenza di un filone, non concede alcuna esperienza al personaggio, quindi le aiuole sono un mestiere da lavorare, non un modo per salire di livello.',
   'guide.profPages.farm.rhythmHeading': 'Il ritmo dell’agricoltura',
   'guide.profPages.farm.tableBodyOneMeal':
     'Le cucine sono dove una stagione restituisce il suo valore. Oltre ai piatti agricoli quotidiani, ogni grado di coltura ha un piatto più ricco che ti lascia Ben Nutrito: termina il pasto e un beneficio duraturo resta con te, il tipo di vantaggio che un gruppo vuole consumare prima della porta del dungeon. È attivo un solo effetto Ben Nutrito alla volta, e un pasto più recente lo sostituisce. A coronare il set c’è il Banchetto del Raccolto, una tavola che il cuoco prepara direttamente nel mondo: ogni persona vicina prende la propria porzione, una ciascuno, e ogni pasto terminato concede lo stesso beneficio Ben Nutrito, così la stagione di un agricoltore può apparecchiare per un intero gruppo. La cima della scala, i due piatti più ricchi e il banchetto, si appoggia alle colture montane e della parterre, i cui semi vendono i contadini accanto alle aiuole. Le ricette sono un’altra questione: i gradini superiori della scala agricola non vengono più insegnati da alcun banco, ma si trovano a fine gioco o si comprano con Marchi Eroici come ogni altra ricetta di fine gioco. La scala dei piatti è opera della Cucina: la pagina della Cucina contiene ogni gradino.\n\nAnche la fortuna trova posto a tavola. Ogni raccolto che porti a casa tira la stessa probabilità di bottino extra degli altri mestieri di raccolta e, ogni tanto, una coltura diventa dorata: la resa supera di molto un raccolto normale, arriva qualcosa in più, un seme per un terreno più fine di quello che stai lavorando o talvolta una di quelle ricette di fine gioco, l’intera zona sente l’annuncio del ritrovamento per nome e Raccolto Dorato viene registrato nel tuo Libro delle Gesta.',
@@ -17273,4 +17268,242 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch custodisce la muraglia. il Crinale del Predatore e le Gallerie della Roccaprofonda appartengono a felini e scavatori; le Pendici degli Ogre e il Campo di Guerra di Drogmar a bruti mercenari. Stormcrag crepita di elementali e sotto di esso brilla Glimmermere, il lago la cui riva custodisce la porta di luce pallida verso il Tempio Annegato. Le Tende dei Broodsworn e i Campi dei Redivivi circondano l’altura del culto, con il Santuario del Gravewyrm in cima.',
   'worldContent.farmPatchName': 'Aiuole da Giardino',
+  'hud.chat.templates.raidWarning': '[Avviso raid] {name}: {message}',
+  'hudChrome.bugReport.online': 'In linea',
+  'hudChrome.charSidebar.crafting': 'Creazione',
+  'hudChrome.charSidebar.gathering': 'Assembramento',
+  'hudChrome.charSidebar.label': 'Dettagli del personaggio',
+  'hudChrome.charSidebar.openProfessions': 'Professioni aperte',
+  'hudChrome.charSidebar.progression': 'Progressione',
+  'hudChrome.charSidebar.skills': 'Competenze',
+  'hudChrome.charSidebar.stats': 'Statistiche',
+  'hudChrome.charSidebar.subtitle': 'Livello {level} {className}. {archetype}. Hobby: {hobby}',
+  'hudChrome.charSidebar.subtitleNoHobby': 'Livello {level} {className}. {archetype}',
+  'hudChrome.controller.device': 'Dispositivo connesso',
+  'hudChrome.controller.deviceConnected': 'Collegato',
+  'hudChrome.controller.deviceDisconnected': 'Nessun controller rilevato',
+  'hudChrome.cosmetics.preview': 'Anteprima',
+  'hudChrome.cosmetics.previewAria': 'Anteprima {name}',
+  'hudChrome.crafting.materialsFooter':
+    'I materiali nel tuo caveau vengono estratti automaticamente. Scopri altre ricette alla stazione.',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} ha tenuto: {count}, ma qui conta solo il voto buono)',
+  'hudChrome.crafting.tierTutorial.radar':
+    'Le tue professioni formano una ruota. Attune to an adjacent pair and those two crafts become uncapped majors, one craft across the wheel becomes a rare-capped hobby, and the rest lie dormant: their knowledge kept, but capped at common until you take them up again.',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    "Un mestiere raggiunge il suo primo livello con l'abilità {skill} e ogni livello migliora ciò che può fare. Ma un mestiere supera i lavori rari solo quando è una delle tue due specializzazioni.",
+  'hudChrome.finder.lockoutWeekly': 'Blocco settimanale su ciascun boss',
+  'hudChrome.finder.mech.ancestral_sap': 'Linfa ancestrale (cura i suoi alleati)',
+  'hudChrome.finder.mech.anvils_decree':
+    "Decreto dell'incudine (tre colpi di martello in tutto il raid, guarigione)",
+  'hudChrome.finder.mech.apocalypse_add':
+    'Ignivar Ashcaller (aggiunta prioritaria al lancio di Apocalisse, uccidilo velocemente)',
+  'hudChrome.finder.mech.beast_pit_quake': 'Beast Pit Quake (danno ad area)',
+  'hudChrome.finder.mech.bloodmane_rend':
+    'Bloodmane Rend (sanguinamento, attenzione agli scambi di bersagli)',
+  'hudChrome.finder.mech.brand_of_the_pyre':
+    "Marchio della Pira (impilare il marchio del fuoco, lavarlo via con l'acqua del condotto)",
+  'hudChrome.finder.mech.call_of_the_hunt': 'Richiamo della caccia (accelera gli alleati vicini)',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    'Catene della Forgia (solo eroica, resta vicino al tuo partner collegato)',
+  'hudChrome.finder.mech.cinder_orbs':
+    'Sfere di cenere (i giocatori contrassegnati si diffondono ai bordi della stanza)',
+  'hudChrome.finder.mech.falling_cinders':
+    'Ceneri cadenti (cerchi di meteoriti sui giocatori, allontanati)',
+  'hudChrome.finder.mech.forge_strike':
+    'Forge Strike (debuff cumulativo di scambio di carri armati)',
+  'hudChrome.finder.mech.forge_wave':
+    'Forge Wave (espandendo il muro di fuoco, usa le due corsie sicure)',
+  'hudChrome.finder.mech.forgefathers_sweep':
+    'Spazzata del Forgefather (ampio cono frontale in un non-tank)',
+  'hudChrome.finder.mech.forgestorm': 'Forgestorm (cerchi di meteoriti che cadono, allontanati)',
+  'hudChrome.finder.mech.jaguar_roar': 'Ruggito del giaguaro (respinta)',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    "Il giudizio della forgia (intervallo, condividi l'unico rifugio sicuro)",
+  'hudChrome.finder.mech.last_inferno':
+    'Ultimo Inferno (bruciatura di 45 secondi al 20% di salute)',
+  'hudChrome.finder.mech.makers_brand':
+    'Marchio del creatore (debuff cumulativo di scambio di carri armati)',
+  'hudChrome.finder.mech.masters_assembly':
+    "L'Assemblea del Maestro (blocca le travi della forgia, ruota i bloccanti)",
+  'hudChrome.finder.mech.rain_of_cinders':
+    'Pioggia di cenere (tre coni di fuoco, posizionati in mezzo a loro)',
+  'hudChrome.finder.mech.revolving_inferno':
+    'Inferno rotante (raggi di fuoco rotanti, muoviti attraverso gli spazi vuoti)',
+  'hudChrome.finder.mech.shared_pyre': 'Pira condivisa (cerchio di raccolta, divide il danno)',
+  'hudChrome.finder.mech.tempering_ray':
+    'Raggio Temprante (linea verso un giocatore marcato, intercettalo)',
+  'hudChrome.finder.mech.thickhide_ward': 'Protezione di Pellespessa (protegge gli alleati vicini)',
+  'hudChrome.finder.mech.tusk_sweep': 'Zanna spazzata (fendente frontale)',
+  'hudChrome.finder.mech.wildheart_pulse': 'Impulso del cuore selvaggio (danno ad area pulsante)',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'Al di sotto di tale abilità funziona ancora come uno strumento di livello inferiore.',
+  'hudChrome.keybinds.hideInterface': 'Nascondi interfaccia',
+  'hudChrome.keybinds.targetParty1': 'Membro del partito bersaglio 1',
+  'hudChrome.keybinds.targetParty2': 'Membro del partito bersaglio 2',
+  'hudChrome.keybinds.targetParty3': 'Membro del partito bersaglio 3',
+  'hudChrome.keybinds.targetParty4': 'Membro del partito bersaglio 4',
+  'hudChrome.keybinds.targetParty5': 'Membro del partito bersaglio 5',
+  'hudChrome.keybinds.targetParty6': 'Membro del partito bersaglio 6',
+  'hudChrome.keybinds.targetParty7': 'Membro del partito bersaglio 7',
+  'hudChrome.keybinds.targetParty8': 'Membro del partito bersaglio 8',
+  'hudChrome.keybinds.targetParty9': 'Membro del partito bersaglio 9',
+  'hudChrome.keybinds.targetSelf': 'Obiettivo Sé',
+  'hudChrome.keybinds.wheelHeldRefused':
+    "Una tacca della ruota non può guidare un'azione trattenuta come il movimento. Scegli un tasto o un pulsante del mouse per questo.",
+  'hudChrome.keybinds.wheelHint':
+    "Anche la rotellina del mouse si vincola: ruotala verso l'alto o verso il basso durante la rilegatura, tenendo premuto Ctrl, Alt o Maiusc, se lo desideri. Lo zoom avanti e indietro della telecamera si trova sulla ruota nuda per impostazione predefinita; spostali su un accordo come Ctrl+rotella per liberare la ruota per le abilità.",
+  'hudChrome.keybinds.zoomIn': 'Ingrandisci la fotocamera',
+  'hudChrome.keybinds.zoomOut': 'Rimpicciolisci la fotocamera',
+  'hudChrome.mapAtlas.availableNearby': 'Disponibile nelle vicinanze',
+  'hudChrome.mapAtlas.distance': '{distance} iarde',
+  'hudChrome.mapAtlas.filters.dungeons': 'Dungeon',
+  'hudChrome.mapAtlas.filters.gather': 'Raccogliere',
+  'hudChrome.mapAtlas.filters.players': 'Giocatori',
+  'hudChrome.mapAtlas.filters.quests': 'Missioni',
+  'hudChrome.mapAtlas.filters.services': 'Servizi',
+  'hudChrome.mapAtlas.filtersAria': 'Livelli della mappa',
+  'hudChrome.mapAtlas.landmarkCount': '{count} punti di riferimento',
+  'hudChrome.mapAtlas.legend.dungeon': 'Dungeon',
+  'hudChrome.mapAtlas.legend.herb': 'Erba',
+  'hudChrome.mapAtlas.legend.mail': 'Posta',
+  'hudChrome.mapAtlas.legend.ore': 'Minerale',
+  'hudChrome.mapAtlas.legend.passage': 'Passaggio',
+  'hudChrome.mapAtlas.level': 'Livello {level}',
+  'hudChrome.mapAtlas.noNearbyQuests': 'Nessuna missione nelle vicinanze',
+  'hudChrome.mapAtlas.noTrackedQuests': 'Nessuna missione tracciata',
+  'hudChrome.mapAtlas.showRoute': 'Mostra percorso',
+  'hudChrome.mapAtlas.track': 'Traccia',
+  'hudChrome.mapAtlas.trackedQuests': 'Missioni monitorate',
+  'hudChrome.mapAtlas.untrack': 'Annulla traccia',
+  'hudChrome.marketWindow.mixedListingsFooter':
+    'Il Mercante rifornisce i beni comuni; gli elenchi dei giocatori si trovano accanto a loro al prezzo richiesto.',
+  'hudChrome.materialHint.fineFarmGrade':
+    "Grado eccellente. Alcune raccolte di un raccolto danno buoni risultati, più spesso con un'abilità di agricoltura più elevata o con un occhio dell'artigiano carico. I prodotti ordinari non contano mai dove è richiesta la qualità fine.",
+  'hudChrome.nameplate.npcRole.alchemyTrainer': 'Allenatore di alchimia',
+  'hudChrome.nameplate.npcRole.armorVendor': 'Venditore di armature',
+  'hudChrome.nameplate.npcRole.armsDealer': "Commerciante d'armi",
+  'hudChrome.nameplate.npcRole.auctioneer': 'Banditore',
+  'hudChrome.nameplate.npcRole.banker': 'Banchiere',
+  'hudChrome.nameplate.npcRole.cardMaster': 'Maestro delle carte',
+  'hudChrome.nameplate.npcRole.cookingTrainer': 'Formatore di cucina',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'Quartiermastro del Crogiolo',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': 'Formatore di ingegneria',
+  'hudChrome.nameplate.npcRole.foodVendor': 'Venditore di cibo e bevande',
+  'hudChrome.nameplate.npcRole.generalGoods': 'Beni generali',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': 'Quartiermastro eroico',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': 'Formatore per la lavorazione della pelle',
+  'hudChrome.nameplate.npcRole.potionVendor': 'Venditore di pozioni',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'Venditore PvP',
+  'hudChrome.nameplate.npcRole.riftForgemaster': 'Mastro Forgiatore della Spaccatura',
+  'hudChrome.nameplate.npcRole.stableMaster': 'Maestro di stalla',
+  'hudChrome.nameplate.npcRole.tailoringTrainer': 'Formatore di sartoria',
+  'hudChrome.nameplate.npcRole.weaponVendor': 'Venditore di armi',
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': 'Istruttore di fabbro',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.options.confirmVendorSellMinQuality': 'Conferma le vendite dalla qualità',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'Gli articoli di qualità inferiore a questa vengono venduti con un solo clic; un articolo venduto erroneamente può ancora essere riacquistato dal venditore.',
+  'hudChrome.partyFrames.header': 'Festa',
+  'hudChrome.professions.retentionFooter': "Rendimento in rispetto: 60% dell'abilità mantenuta.",
+  'hudChrome.professions.tutorialLink': 'Tutorial sulla professione',
+  'hudChrome.pullTimer.cancel': 'Tirata annullata.',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': 'TIRO!',
+  'hudChrome.pullTimer.start': 'Tira in {seconds} secondi!',
+  'hudChrome.questLog.completed': 'Completato',
+  'hudChrome.questLog.shiftHint':
+    'Fai clic tenendo premuto il tasto Maiusc su una missione per collegarla nella chat.',
+  'hudChrome.questLog.zoneSummary': '{count} ({ready} pronto)',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.readyCheck.close': 'Vicino',
+  'hudChrome.readyCheck.memberNotReady': '{name} non è pronto.',
+  'hudChrome.readyCheck.memberPending': '{name} non ha ancora risposto.',
+  'hudChrome.readyCheck.memberReady': '{name} è pronto.',
+  'hudChrome.readyCheck.status': 'Pronto: {ready}/{total}',
+  'hudChrome.readyCheck.title': 'Controllo pronto',
+  'hudChrome.readyCheck.waiting': 'In attesa di risposte...',
+  'hudChrome.recipeTracker.collapseHint': 'Comprimi il tracker delle ricette',
+  'hudChrome.recipeTracker.expandHint': 'Espandi il tracker delle ricette',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.pin': 'Spillo',
+  'hudChrome.recipeTracker.pinAria': 'Blocca {name} sul tracker HUD',
+  'hudChrome.recipeTracker.pinFull': 'Il tracker delle ricette è pieno (fino a {cap} ricette)',
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.recipeTracker.trackerLabel': 'Ricette',
+  'hudChrome.recipeTracker.unpin': 'Sblocca',
+  'hudChrome.recipeTracker.unpinAria': 'Sblocca {name} dal tracker HUD',
+  'hudChrome.social.who.allClasses': 'Tutte le classi',
+  'hudChrome.social.who.capped':
+    'Mostra il primo {delivered}. Restringi la ricerca per vedere il resto.',
+  'hudChrome.social.who.classFilter': 'Filtra per classe',
+  'hudChrome.social.who.colClass': 'Classe',
+  'hudChrome.social.who.colGuild': 'Gilda',
+  'hudChrome.social.who.colLevel': 'Livello',
+  'hudChrome.social.who.colName': 'Nome',
+  'hudChrome.social.who.colStatus': 'Stato',
+  'hudChrome.social.who.colZone': 'Zona',
+  'hudChrome.social.who.count': '{total} in linea',
+  'hudChrome.social.who.countFiltered': '{shown} di {total} online',
+  'hudChrome.social.who.empty': 'Nessun giocatore corrisponde.',
+  'hudChrome.social.who.loading': 'Chiedendo al regno chi è online...',
+  'hudChrome.social.who.search': 'Ricerca',
+  'hudChrome.social.who.searchPlaceholder': 'Nome, zona o gilda',
+  'hudChrome.social.who.sortTitle': 'Ordina per {column}',
+  'hudChrome.social.who.tab': 'Chi',
+  'hudChrome.talkingHead.label': 'Dialogo',
+  'hudChrome.wocMarket.colBuyer': 'Acquirente',
+  'hudChrome.wocMarket.colSalePrice': 'Prezzo di vendita',
+  'hudChrome.wocMarket.colSaleType': 'Tipo',
+  'hudChrome.wocMarket.colSoldAt': 'Venduto',
+  'hudChrome.wocMarket.historyEmpty': 'Nessuna vendita ancora registrata.',
+  'hudChrome.wocMarket.historyError': 'Impossibile caricare la cronologia delle vendite.',
+  'hudChrome.wocMarket.saleTypeAuction': 'Asta',
+  'hudChrome.wocMarket.saleTypeBuyNow': 'Acquista ora',
+  'hudChrome.wocMarket.saleTypeDirected': 'Diretto',
+  'hudChrome.wocMarket.saleTypeUnknown': 'Sconosciuto',
+  'hudChrome.wocMarket.tabHistory': 'Cronologia delle vendite',
+  'hudChrome.wocStore.mountBuy': 'Acquista la skin della cavalcatura',
+  'hudChrome.wocStore.mountInspectAria': 'Anteprima {item}',
+  'hudChrome.wocStore.mountOnly': 'Solo montaggio',
+  'hudChrome.wocStore.mountRideIt': 'Guidalo',
+  'hudChrome.wocStore.mountScopeLine':
+    'Skin a livello di account. Indossato da un personaggio alla volta.',
+  'itemUi.errors.sweepNoListings': "Nessun elenco di quell'articolo disponibile per lo screening.",
+  'itemUi.errors.sweepPriceChanged':
+    'I prezzi sono cambiati prima che arrivasse il tuo sondaggio. Controlla il preventivo e riprova.',
+  'itemUi.market.sweep': 'Spazzare',
+  'itemUi.market.sweepAria': 'Conquista il mercato per {item}',
+  'itemUi.market.sweepButton': 'Spazzare',
+  'itemUi.market.sweepChanged':
+    'La citazione è cambiata prima della tua conferma. Controlla il totale e riprova.',
+  'itemUi.market.sweepClose': 'Vicino',
+  'itemUi.market.sweepConfirmBody':
+    'Acquistare {item} x{units} in {listings} inserzioni per {total} ({each} ciascuno)?',
+  'itemUi.market.sweepConfirmTitle': 'Conferma la scansione del mercato',
+  'itemUi.market.sweepNote':
+    'Acquista intere inserzioni da altri venditori, prima per unità più economica, finché il conteggio non viene coperto. Potresti riceverne qualcuno in più di quanto hai chiesto.',
+  'itemUi.market.sweepQuantity': 'Cercasi unità',
+  'itemUi.market.sweepQuoteLine':
+    '{units} unità in {listings} elenchi per {total} ({each} ciascuno)',
+  'itemUi.market.sweepQuoteNone': 'Nessuna inserzione di questo oggetto da analizzare.',
+  'itemUi.market.sweepQuoteShort':
+    'Sono disponibili solo {units} unità negli elenchi di {listings}, per {total} ({each} ciascuno)',
+  'itemUi.market.sweepTitle': 'Spazzata di mercato: {item}',
+  'devCommand.actions.town.description': 'Teletrasportarsi in un hub cittadino per nome.',
+  'devCommand.actions.town.label': 'Centro cittadino',
+  'devCommand.fields.town': 'Città',
+  'entities.mobs.healing_dummy_caster.name': "Manichino dell'incantatore ferito",
+  'entities.mobs.healing_dummy_ranger.name': 'Manichino Ranger malconcio',
+  'entities.mobs.healing_dummy_scout.name': 'Manichino da scout critico',
+  'entities.mobs.healing_dummy_soldier.name': 'Manichino del soldato ferito',
+  'entities.mobs.healing_dummy_tank.name': "Manichino dell'Avanguardia ferito",
+  'guide.controls.hideInterface': "Nascondi l'interfaccia (screenshot e video)",
+  'guide.controls.targetParty':
+    "Scegli come target i membri del party da 1 a 9, dall'alto verso il basso come li mostrano i riquadri del party",
+  'guide.controls.targetSelf': 'Prendi di mira te stesso',
+  'guide.interfacePage.framesGovernedTalkingHead':
+    "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
+  'guide.settingsPage.keybindsWheelBody':
+    "Anche la ruota stessa si lega. Zoom telecamera avanti e Zoom telecamera indietro sono normali collegamenti che si trovano sulla ruota nuda per impostazione predefinita, quindi puoi spostarli su Ctrl più la ruota o sui tasti, quindi ruotare la ruota liberata per attivare gli slot della barra delle azioni. Una tacca della ruota non ha rilascio, quindi non può eseguire un'azione trattenuta come andare avanti.",
 };

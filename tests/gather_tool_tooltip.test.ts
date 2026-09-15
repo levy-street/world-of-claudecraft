@@ -50,8 +50,18 @@ describe('gatherToolTooltipLines: picks, axes, sickles', () => {
     expect(gatherToolTooltipLines(ITEMS.ironbark_axe)).toContain(
       '<div class="tt-desc">Requires Logging 70</div>',
     );
-    // Tier 1 asks nothing; rods are exempt at every tier.
+    // The degrade rule rides directly under the requirement it softens (the
+    // farming-tools report): under the skill the tool is not a brick.
+    const degrade =
+      '<div class="tt-desc">Below that skill it still works as a lower-tier tool.</div>';
+    expect(gatherToolTooltipLines(ITEMS.iron_mining_pick)).toContain(
+      `<div class="tt-desc">Requires Mining 40</div>${degrade}`,
+    );
+    // Tier 1 asks nothing (and so has nothing to degrade); rods are exempt at
+    // every tier.
     expect(gatherToolTooltipLines(ITEMS.copper_mining_pick)).not.toContain('Requires Mining');
+    expect(gatherToolTooltipLines(ITEMS.copper_mining_pick)).not.toContain(degrade);
+    expect(gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod)).not.toContain(degrade);
     expect(gatherToolTooltipLines(ITEMS.tidewrought_fishing_rod)).not.toContain('Requires');
     expect(gatherToolTooltipLines(ITEMS.simple_fishing_pole)).not.toContain('Requires');
   });
@@ -259,9 +269,14 @@ describe('gatherToolTooltipLines: farming', () => {
   it('carries the wield requirement, which proves the shared name table covers farming', () => {
     // Without GATHERING_PROFESSION_NAME_KEYS.farming this line does not render
     // wrong, it renders NOT AT ALL (the painter drops it rather than print
-    // "Requires Farming tool 40"), so its absence is the silent miss.
+    // "Requires Farming tool 25"), so its absence is the silent miss. The
+    // number is farming's OWN ladder (the crop band, 25 for tier 2), not the
+    // node trades' 40: the farming-tools report's seed-says-25-hoe-says-40.
     expect(gatherToolTooltipLines(hoe(2))).toContain(
-      '<div class="tt-desc">Requires Farming 40</div>',
+      '<div class="tt-desc">Requires Farming 25</div>',
+    );
+    expect(gatherToolTooltipLines(hoe(3))).toContain(
+      '<div class="tt-desc">Requires Farming 50</div>',
     );
     // Tier 1 asks nothing, the same contract the picks and axes above hold to.
     expect(gatherToolTooltipLines(hoe(1))).not.toContain('Requires Farming');

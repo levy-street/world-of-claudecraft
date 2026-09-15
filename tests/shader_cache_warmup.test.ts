@@ -458,6 +458,13 @@ describe('startShaderWarmup', () => {
     expect(ctx.storeGets()).toBe(0);
   });
 
+  it('is off under ?gputimer=1, where the probe changes the extension set it would key for', async () => {
+    const ctx = await run({ record: corpusRecord([program(1)]), search: '?gputimer=1' });
+    expect(shaderWarmupStats().skipped).toBe('gpu-timer');
+    expect(ctx.contexts()).toBe(0);
+    expect(ctx.storeGets()).toBe(0);
+  });
+
   it('is off under the worker grammar too: ?shaderwarm=off silences both arms', async () => {
     const ctx = await run({ record: corpusRecord([program(1)]), search: '?shaderwarm=off' });
     expect(shaderWarmupStats().skipped).toBe('disabled');

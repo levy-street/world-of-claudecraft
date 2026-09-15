@@ -18,11 +18,28 @@
 // the class flips without constructing a Hud.
 
 import { isMobileFullscreenWindowOpen } from './mobile_fullscreen_window_core';
+import { OPTIONS_OPEN_CLASS, TRADE_AND_BAGS_OPEN_CLASS } from './root_state_classes';
 import { recordStoreStackSample } from './store_stack_diag';
 import { stackedWindowsVisible } from './window_stack_state_core';
 
+// The open marker Hud stamps on every visible window (syncWindowOpenState), the
+// same one the trade-and-bags split dock used to read through a body :has().
+const windowOpenMarked = (id: string): boolean =>
+  document.getElementById(id)?.getAttribute('data-window-open') === '1';
+
 export function syncWindowOpenBodyClasses(isWindowVisible: (el: HTMLElement) => boolean): void {
   const windows = [...document.querySelectorAll<HTMLElement>('.window.panel')];
+  // Two more classes ride this scan, the states two root-anchored :has() rules
+  // used to derive (src/ui/root_state_classes.ts): the Esc menu scrim on #ui
+  // and the touch split dock for the trade window beside the bags.
+  const optionsMenu = document.getElementById('options-menu');
+  document
+    .getElementById('ui')
+    ?.classList.toggle(OPTIONS_OPEN_CLASS, !!optionsMenu && isWindowVisible(optionsMenu));
+  document.body.classList.toggle(
+    TRADE_AND_BAGS_OPEN_CLASS,
+    windowOpenMarked('trade-window') && windowOpenMarked('bags'),
+  );
   const anyOpen = windows
     .filter((win) => win.id !== 'mobile-extra-controls')
     .some((win) => isWindowVisible(win));

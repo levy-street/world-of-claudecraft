@@ -12,8 +12,7 @@
 // sets. The two differ only in their options, never in a branch on "which bar":
 //   - `resolveCastLabel` localizes the cast id. The player resolves it through
 //     castDisplayName (the ability's localized name); the target resolves through
-//     targetCastDisplayLabel (farming localized, every other id raw as its
-//     inline block was; the class-wide localization is a maintainer call).
+//     abilityDisplayNameFromSource (hud.ts).
 //   - the eat/drink overlay is PLAYER-ONLY: the target never eats/drinks, so its
 //     paint input simply omits `consume` and the consume branch is unreachable for
 //     it (the generic-Entity cast path stays the target's whole story).
@@ -73,8 +72,7 @@ export interface CastBarElements {
 /** Per-instance options that are not DOM element refs. */
 export interface CastBarOptions {
   /** Resolve the cast id into the visible label. The player localizes it
-   *  (castDisplayName); the target resolves through targetCastDisplayLabel
-   *  (farming localized, every other id raw as its inline block was). */
+   *  (castDisplayName); the target through abilityDisplayNameFromSource. */
   resolveCastLabel: (state: CastBarState) => string;
   /** Clear the inner fill/label/timer + channel class when the bar is hidden (the
    *  player's inline block did; the target only set display:none). */

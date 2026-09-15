@@ -338,7 +338,13 @@ describe('both Cheater-tag surfaces resolve through the shared label', () => {
   // source-pin idiom tests/nameplate_ai_tag.test.ts uses for the guild writer.
 
   it('neither surface reaches for the catalog key itself', () => {
-    for (const rel of ['../src/render/nameplate_painter.ts', '../src/ui/hud.ts']) {
+    // The target-frame surface is the extracted fill (src/ui/target_frame_descriptor.ts,
+    // called from hud.ts); hud.ts itself must still not inline the key.
+    expect(read('../src/ui/hud.ts')).not.toContain('nameplate.cheaterTag');
+    for (const rel of [
+      '../src/render/nameplate_painter.ts',
+      '../src/ui/target_frame_descriptor.ts',
+    ]) {
       const src = read(rel);
       expect(src, `${rel} must resolve the tag through cheaterTagLabel`).toContain(
         'cheaterTagLabel(',

@@ -325,9 +325,23 @@ describe('reveal gate wiring (source pins)', () => {
       // every building group: a building outside the roots links its
       // unshared materials cold on its own first fog reveal. The piecewise
       // anchors are built in the SAME order, so root index i is root i.
+      // Eastbrook's monument (body plus FX) rides the roots after the
+      // buildings: it shares no material with any batch and linked six
+      // programs cold on its first fog reveal before it did (2026-09-12 hunt).
       expect(source).toContain(
-        'const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];',
+        _town === 'eastbrook'
+          ? 'const staticRevealRoots: THREE.Object3D[] = [\n' +
+              '    ...staticCullTargets,\n' +
+              '    ...buildingGroups,\n' +
+              '    ...monumentRoots,\n' +
+              '  ];'
+          : 'const staticRevealRoots: THREE.Object3D[] = [...staticCullTargets, ...buildingGroups];',
       );
+      if (_town === 'eastbrook') {
+        expect(source).toContain(
+          'const monumentRoots: THREE.Object3D[] = [monumentBody.group, monumentFx.group];',
+        );
+      }
       expect(source).toContain('buildingGroups.push(built.group);');
       expect(source).toContain('staticRevealRoots(): readonly THREE.Object3D[] {');
       // The gate asks for the roots inside the consult that fires the request,

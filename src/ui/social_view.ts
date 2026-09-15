@@ -23,7 +23,7 @@ import type {
   SocialInfo,
 } from '../world_api';
 
-export type SocialTab = 'friends' | 'guild' | 'pledges' | 'ignore' | 'block' | 'raid';
+export type SocialTab = 'friends' | 'guild' | 'who' | 'pledges' | 'ignore' | 'block' | 'raid';
 
 /** Structural identity of the panel: which tab, online or not, and the guild
  *  membership/rank (which changes the footer AND the officer-only Pledges tab)

@@ -629,8 +629,13 @@
     margin-right: 3px;
     border-radius: 3px;
   }
-  /* Hide all other UI components while the start screen is visible to prevent keyboard focus leakage */
-  body:has(#start-screen:not([style*="display: none"])) #ui {
+  /* Hide all other UI components while the start screen is visible to prevent
+     keyboard focus leakage. The class ships in the HTML and the world entry
+     drops it as it hides #start-screen (src/main.ts enterLoadingState); never
+     key this on #start-screen's inline style through a body :has(), which made
+     every inline-style write in the HUD re-style the whole HUD
+     (src/ui/root_state_classes.ts). */
+  body.start-screen-open #ui {
     display: none !important;
   }
 
@@ -674,7 +679,7 @@
   }
   /* The skip links target the in-game HUD, so hide them while the pre-game start
      screen is up (they would otherwise sit ahead of the login / char-select flow). */
-  body:has(#start-screen:not([style*="display: none"])) .hud-skip {
+  body.start-screen-open .hud-skip {
     display: none;
   }
 

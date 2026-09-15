@@ -777,6 +777,8 @@ const GENERAL_KEYS = [
   'showPlayerNameplates',
   'confirmVendorSell',
   'note:hudChrome.options.confirmVendorSellNote',
+  'confirmVendorSellMinQuality',
+  'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
@@ -926,6 +928,11 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     });
     expect(desktop.filter((c) => c.control === 'note')).toEqual([
       { control: 'note', textKey: 'hudChrome.options.confirmVendorSellNote', category: 'general' },
+      {
+        control: 'note',
+        textKey: 'hudChrome.options.confirmVendorSellMinQualityNote',
+        category: 'general',
+      },
       { control: 'note', textKey: 'hudChrome.options.forceHighPerfGpuNote', category: 'general' },
     ]);
 

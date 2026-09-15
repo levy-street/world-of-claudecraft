@@ -300,11 +300,39 @@ function isFrozenCorpse(p: Entity): boolean {
   return p.dead && !p.ghost;
 }
 
+function overlapsBattlegroundWall(match: BgMatch, pos: Vec3): boolean {
+  const location = battlegroundLocation(match, pos);
+  if (!location) return false;
+  for (const collider of battlegroundColliders()) {
+    if (collider.standable) continue;
+    if (collider.type === 'circle') {
+      const distance = Math.hypot(
+        location.point.localX - collider.x,
+        location.point.localZ - collider.z,
+      );
+      if (distance < collider.r + PLAYER_BODY_RADIUS - POSITION_EPS) {
+        return true;
+      }
+      continue;
+    }
+    const dx = location.point.localX - collider.x;
+    const dz = location.point.localZ - collider.z;
+    const cos = Math.cos(collider.rot);
+    const sin = Math.sin(collider.rot);
+    const localX = dx * cos - dz * sin;
+    const localZ = dx * sin + dz * cos;
+    const beyondX = Math.max(Math.abs(localX) - collider.hw, 0);
+    const beyondZ = Math.max(Math.abs(localZ) - collider.hd, 0);
+    if (Math.hypot(beyondX, beyondZ) < PLAYER_BODY_RADIUS - POSITION_EPS) return true;
+  }
+  return false;
+}
+
 function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
   if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
   const match = ctx.bgMatches.get(p.id);
   if (!match) return false;
-  if (!battlegroundLocation(match, p.pos)) return false;
+  if (overlapsBattlegroundWall(match, p.pos)) return true;
   const resolved = resolvePosition(
     ctx.cfg.seed,
     p.pos.x,
@@ -322,6 +350,14 @@ function battlegroundBlockedWallPress(ctx: SimContext, meta: PlayerMeta, p: Enti
   const wish = moveInputVector(meta, p);
   if (!wish) return false;
   return battlegroundBlockedProbe(ctx, p, wish);
+}
+
+function battlegroundBlockedVelocityPress(ctx: SimContext, meta: PlayerMeta, p: Entity): boolean {
+  if (hasAnyMovementInput(meta)) return false;
+  if (!activeBattlegroundAt(ctx, p)) return false;
+  const speed = Math.hypot(p.vx, p.vz);
+  if (speed <= POSITION_EPS) return false;
+  return battlegroundBlockedProbe(ctx, p, { x: p.vx / speed, z: p.vz / speed });
 }
 
 export function noteBattlegroundWallPressure(
@@ -379,6 +415,7 @@ function battlegroundGeometryTrap(ctx: SimContext, meta: PlayerMeta, p: Entity):
   return (
     battlegroundWallTrap(ctx, p) ||
     battlegroundBlockedWallPress(ctx, meta, p) ||
+    battlegroundBlockedVelocityPress(ctx, meta, p) ||
     (!hasAnyMovementInput(meta) && activeBattlegroundAt(ctx, p) && wallPressUntil >= ctx.time)
   );
 }
@@ -475,15 +512,17 @@ function cancelReason(
   p: Entity,
   pending: PendingUnstuck,
 ): UnstuckCancelReason | null {
+  const bgGeometryTrap = battlegroundGeometryTrap(ctx, meta, p);
+  const movedFromOrigin =
+    Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
+    Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE;
   if (meta.counters.damageTaken > pending.damageTaken) return 'damaged';
   if (p.inCombat || p.combatTimer < 5) return 'combat';
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (
-    (hasMoveInput(meta) && !battlegroundGeometryTrap(ctx, meta, p)) ||
-    (pending.area.kind !== 'battleground' &&
-      (Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
-        Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE))
+    (hasMoveInput(meta) && !bgGeometryTrap) ||
+    (movedFromOrigin && (pending.area.kind !== 'battleground' || !bgGeometryTrap))
   )
     return 'moved';
   // Crossing the life/death line either way invalidates the attempt: a living player who

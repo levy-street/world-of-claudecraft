@@ -15,7 +15,6 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
-import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
@@ -47,7 +46,7 @@ import {
 } from '../src/sim/jail';
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
-import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
+import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import {
   partyFrameAbsorb,
@@ -277,6 +276,10 @@ import { githubForAccount } from './github_db';
 import { groundTelegraphWireJson, groundTelegraphWorld } from './ground_telegraph_wire';
 import { forEachGuarded, runGuarded } from './guarded_iter';
 import { handleGuildBankEscrowRefusal as handleEscrowRefusal } from './guild_bank_escrow_refusal';
+import {
+  broadcastGuildBankGoldNotice,
+  type GuildBankGoldNoticePort,
+} from './guild_bank_gold_notice';
 import { createGuildBankLazyLoader, type GuildBankLazyLoader } from './guild_bank_lazy_loader';
 import { bustGuildBankLog, GUILD_BANK_LOG_VISIBLE_OPS } from './guild_bank_log';
 import { deliverGuildBankLog } from './guild_bank_log_delivery';
@@ -301,6 +304,7 @@ import {
   type GuildBankWriteResult,
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
+import { dispatchGuildBankCommand } from './guild_bank_wire';
 import { GuildBookHolderIndex, requestGuildBookFlush } from './guild_book_holders';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
@@ -332,8 +336,7 @@ import {
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
-import { buyWithSoldVolume } from './market_sold_volume';
-import { readMaterialSourceTransferWire } from './material_source_transfer_wire';
+import { dispatchMarketCommand } from './market_commands';
 import { dispatchInventoryGroupingCommand } from './material_stack_wire';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
@@ -450,6 +453,16 @@ import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
+import {
+  buildWhoRosterEntries,
+  canShowInWho,
+  normalizeWhoFilter,
+  visibleWhoRows,
+  type WhoRosterEntry,
+  type WhoRosterRow,
+  whoChatLines,
+  whoFrame,
+} from './who_roster';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { isBackpressureExceeded } from './ws_backpressure';
@@ -495,7 +508,6 @@ const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
 const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
 const CHAT_COOLDOWN_SECONDS = 20;
 const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
-const WHO_RESULT_LIMIT = 50;
 // One live session per account: Ravenpost mail (v0.20.0) moves coin and goods
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
@@ -692,6 +704,8 @@ const MARKET_WIRE_PROMPT_CMDS = new Set<string>([
   'market_list',
   'market_list_instance',
   'market_buy',
+  'market_sweep_quote',
+  'market_sweep',
   'market_cancel',
   'market_collect',
 ]);
@@ -1006,6 +1020,9 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // marketQuery precedent: a primitive, so a plain !== value compare is its own
   // change signal (no identity trick needed).
   lastSellPriceItemIdRef: string | null;
+  // The Market Sweep quote request last built for, the marketQuery precedent: the
+  // sim replaces the object on every marketSweepQuote, so identity is the signal.
+  lastSweepQuoteRef: PlayerMeta['sweepQuote'];
   lastMarketRebuildTick: number;
   // Commission order board readout, same recipe at its own cadence
   // (CORDER_WIRE_HZ): the board revision last built for plus the backstop
@@ -1231,14 +1248,6 @@ export interface RestartCountdownStatus {
   remainingSeconds: number;
 }
 
-interface WhoRosterRow {
-  name: string;
-  cls: string;
-  level: number;
-  zone: string;
-  status: PresenceStatus;
-}
-
 type RememberedChat =
   | {
       channel:
@@ -1427,13 +1436,13 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.riftSliding) out.sld = 1; // ice-slide: render a frozen gliding pose
   // Ledge climb: quantized progress (1..99), not the arc. The client never
   // re-simulates the pull (the server owns it and streams the resulting
-  // positions); it needs to know a climb is running, to stop predicting a
-  // fall, and how far through it is so the pull-up pose tracks the motion.
-  // Any non-zero value reads as "climbing" on older clients.
+  // positions); it needs the movement bit to stop predicting a fall, plus
+  // progress so the pull-up pose tracks the motion.
   if (e.climb) {
     const t = e.climb.elapsed / e.climb.duration;
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
+  if (e.leap) out.lp = 1; // Vaulting Charge: server-owned movement arc
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.helmHidden) out.hh = 1; // paperdoll eye toggle: kit helm left off the composed body
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
@@ -1657,6 +1666,8 @@ export class GameServer {
   // rules call a defect. Built once per broadcast pass and handed to every
   // bgInfoFor call in that pass instead.
   private readonly bgLadderReadout = createRealmReadoutMemo<BgLadderEntry[]>();
+  // The /who roster (chat command and the Who tab), rebuilt at most once per tick.
+  private readonly whoRosterReadout = createRealmReadoutMemo<WhoRosterEntry<ClientSession>[]>();
   // When the realm-wide Vale Cup readout is next due, tracked realm-global (not
   // per session) so every viewer still gates together in one pass and the memo
   // above builds once. `>=` against this, never `tickCount % interval`:
@@ -2115,6 +2126,7 @@ export class GameServer {
     moderator.lastMarketBrowseRev = null;
     moderator.lastMarketQueryRef = null;
     moderator.lastSellPriceItemIdRef = null;
+    moderator.lastSweepQuoteRef = null;
     moderator.lastMarketRebuildTick = 0;
     moderator.lastCorderWireTick = -CORDER_WIRE_INTERVAL_TICKS;
     moderator.lastCorderBoardRev = null;
@@ -2594,7 +2606,7 @@ export class GameServer {
         // membership), so this tracked id can stay in socialTrackedIds long
         // after a block either way. Refuse to leak live position across it,
         // the same bidirectional rule canShowInWho already applies to /who.
-        if (!this.canShowInWho(session, other)) continue;
+        if (!canShowInWho(session, other)) continue;
         const loc = this.presenceOf(other);
         if (loc.x === undefined || loc.z === undefined) continue;
         // The live Book of Deeds title (sim meta, no DB read); the `social`
@@ -3528,6 +3540,7 @@ export class GameServer {
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
       lastSellPriceItemIdRef: null,
+      lastSweepQuoteRef: null,
       lastMarketRebuildTick: 0,
       lastCorderWireTick: -CORDER_WIRE_INTERVAL_TICKS,
       lastCorderBoardRev: null,
@@ -4891,6 +4904,15 @@ export class GameServer {
           this.flushGuildBookHolders(guildId, session, dependency),
         recordGuildBankIncident: (kind) => gameMetricsCounters().guildBankIncident(kind),
         logError: (message) => console.error(message),
+        notifyGuildGoldMovement: (guildId, goldOp, copper) =>
+          void broadcastGuildBankGoldNotice(
+            this.guildBankGoldNoticePort,
+            guildId,
+            goldOp,
+            session.name,
+            copper,
+            (message, error) => console.error(message, error),
+          ),
       },
       session,
       target,
@@ -4899,6 +4921,18 @@ export class GameServer {
       request,
     );
   }
+
+  /** The transport the guild gold notice fans out over: the cached per-guild
+   *  roster read, live presence, and the events frame (the same three closures
+   *  SocialTransport hands the social service). */
+  private readonly guildBankGoldNoticePort: GuildBankGoldNoticePort = {
+    guildMembers: (guildId) => this.socialDb.guildMembers(guildId),
+    isOnline: (id) => this.sessionsByCharacterId.has(id),
+    deliver: (id, events) => {
+      const s = this.sessionsByCharacterId.get(id);
+      if (s) this.send(s, { t: 'events', list: [...events] });
+    },
+  };
 
   /** Answer one history request; authority is re-checked after the awaited read. */
   private sendGuildBankLog(session: ClientSession, pid: number, request: unknown): void {
@@ -6969,17 +7003,10 @@ export class GameServer {
         if (!this.consumeChatToken(session)) break;
         const whoMatch = /^\/who(?:\s+([\s\S]+))?$/i.exec(text);
         if (whoMatch) {
-          // Optional filter: "/who Mr" lists only players whose name OR zone
-          // contains "Mr" (case-insensitive). Zone names carry spaces
-          // ("Thornpeak Heights"), so keep spaces: strip only double-quotes
-          // and control chars, collapse internal whitespace, and cap the
-          // length, so the echoed query stays a clean, single-line token.
-          const filter = (whoMatch[1] ?? '')
-            .replace(/[\p{Cc}"]/gu, '')
-            .trim()
-            .replace(/\s+/g, ' ')
-            .slice(0, 32);
-          this.sendWhoRoster(session, filter || undefined);
+          // Optional filter: "/who Mr" lists only players whose name, zone, or
+          // guild contains "Mr" (case-insensitive); server/who_roster.ts owns
+          // the sanitizer and the projection.
+          this.sendWhoRoster(session, normalizeWhoFilter(whoMatch[1]) || undefined);
           break;
         }
         // Hard-word + mute enforcement gate, applied to every channel before the
@@ -7203,6 +7230,15 @@ export class GameServer {
         break;
       case 'duel_decline':
         sim.duelDecline(pid);
+        break;
+      // The Social window's Who tab: the /who roster as a structured frame
+      // (server/who_roster.ts), metered on the list-read guard (a readout, never
+      // the chat lane). Silent while the viewer's own block list is still
+      // loading: the client re-asks on its slow tick.
+      case 'who':
+        if (!this.consumeListRead(session, receivedAtMs / 1000)) break;
+        if (!session.blockListLoaded) break;
+        this.send(session, whoFrame(this.whoRosterFor(session), normalizeWhoFilter(msg.filter)));
         break;
       // social: friends / ignore / guild (persistent, account-scoped)
       case 'friend_add':
@@ -7529,60 +7565,24 @@ export class GameServer {
         if (index !== null) sim.deleteLoadout(index, pid);
         break;
       }
-      // World Market (the Merchant's auction house)
+      // World Market (the Merchant's auction house). The command bodies live
+      // whole in server/market_commands.ts (the farming_commands precedent);
+      // the labels stay HERE because the command-schema suite scans this
+      // switch for the dispatch universe.
       case 'market_search':
-        sim.marketSearch(
-          sanitizeMarketQuery({
-            search: typeof msg.q === 'string' ? msg.q : '',
-            itemType: msg.itemType,
-            subtype: msg.subtype,
-            armorClass: msg.armorClass,
-            primaryStat: msg.primaryStat,
-            rarity: msg.rarity,
-            sort: msg.sort,
-            page: typeof msg.page === 'number' ? msg.page : 0,
-            collapseLowest: msg.collapseLowest,
-          }),
-          pid,
-        );
-        break;
       case 'market_sell_price_check':
-        sim.marketSellPriceCheck(typeof msg.item === 'string' ? msg.item : null, pid);
-        break;
       case 'market_list':
-        if (
-          typeof msg.item === 'string' &&
-          typeof msg.count === 'number' &&
-          Number.isFinite(msg.count) &&
-          typeof msg.price === 'number' &&
-          Number.isFinite(msg.price)
-        ) {
-          sim.marketList(msg.item, msg.count, msg.price, pid);
-        }
-        break;
       case 'market_list_instance':
-        // The instance object is only an equality needle: the sim re-resolves
-        // it against the sender's own bags and escrows the actual held copy's
-        // payload, so no wire-supplied field ever enters the book directly.
-        if (
-          typeof msg.item === 'string' &&
-          typeof msg.price === 'number' &&
-          Number.isFinite(msg.price) &&
-          typeof msg.instance === 'object' &&
-          msg.instance !== null &&
-          !Array.isArray(msg.instance)
-        ) {
-          sim.marketListInstance(msg.item, msg.price, msg.instance as ItemInstancePayload, pid);
-        }
-        break;
       case 'market_buy':
-        if (typeof msg.id === 'number') buyWithSoldVolume(sim, msg.id, pid);
-        break;
+      case 'market_sweep_quote':
+      case 'market_sweep':
       case 'market_cancel':
-        if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);
-        break;
       case 'market_collect':
-        sim.marketCollect(pid);
+        // Arm-marked heavy-self members (market_sweep) mark only when the frame
+        // reached the sim, the farming precedent above.
+        if (dispatchMarketCommand(sim, msg, pid) && heavySelfMarkOnAccept(command)) {
+          session.selfHeavyDirty = true;
+        }
         break;
       case 'mail_send': {
         if (
@@ -7741,69 +7741,26 @@ export class GameServer {
           this.scheduleBankLedgerHighWaterSave(session);
         }
         break;
-      // Guild Bank: the officer-plus shared treasury + item store. Shape-only
-      // checks here (the bank_* idiom): the Sim owns every gameplay rule
-      // (banker proximity, officer-plus rank via the session membership stamp,
-      // quest-bind, treasury cap, table price, capacity). `slot` is a container
-      // index, `count` optional (omit = whole stack), `amount` copper. Every op
-      // runs through runGuildBankOp: the before/after guildBankInfoFor diff is
-      // the ONE success signal, pre-reserving the bank_ledger rows
-      // (container='guild') and marking the book dirty. The later fenced save
-      // commits those rows atomically with the character and book; a refusal
-      // diffs empty and stages neither row nor mark.
+      // Guild Bank: the five officer-plus book mutations, dispatched by
+      // server/guild_bank_wire.ts (shape checks) through runGuildBankOp
+      // (ledger evidence + the guild gold notice). The guard token is drawn
+      // here, once per frame, before the shape check.
       case 'guild_bank_deposit_gold':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.amount === 'number') {
-          const amount = msg.amount;
-          this.runGuildBankOp(session, { pid }, 'deposit_gold', () =>
-            sim.guildBankDepositGoldFor(pid, amount),
-          );
-        }
-        break;
       case 'guild_bank_withdraw_gold':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.amount === 'number') {
-          const amount = msg.amount;
-          this.runGuildBankOp(
-            session,
-            { pid },
-            'withdraw_gold',
-            () => sim.guildBankWithdrawGoldFor(pid, amount),
-            { amount },
-          );
-        }
-        break;
       case 'guild_bank_deposit':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.slot === 'number') {
-          const slot = msg.slot;
-          const transfer = readMaterialSourceTransferWire(msg, slot);
-          if (transfer === null) break;
-          const { count, selection } = transfer;
-          this.runGuildBankOp(session, { pid }, 'deposit', () =>
-            sim.guildBankDepositFor(pid, slot, count, selection),
-          );
-        }
-        break;
       case 'guild_bank_withdraw':
-        if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        if (typeof msg.slot === 'number') {
-          const slot = msg.slot;
-          const transfer = readMaterialSourceTransferWire(msg, slot);
-          if (transfer === null) break;
-          const { count, selection } = transfer;
-          this.runGuildBankOp(
-            session,
-            { pid },
-            'withdraw',
-            () => sim.guildBankWithdrawFor(pid, slot, count, selection),
-            { slot, count, selection },
-          );
-        }
-        break;
       case 'guild_bank_buy_slots':
         if (!this.consumeGuildBankOp(session, receivedAtMs / 1000)) break;
-        this.runGuildBankOp(session, { pid }, 'buy_slots', () => sim.guildBankBuySlotsFor(pid));
+        dispatchGuildBankCommand(
+          {
+            sim,
+            run: (op, mutate, request) =>
+              this.runGuildBankOp(session, { pid }, op, mutate, request),
+          },
+          command,
+          msg,
+          pid,
+        );
         break;
       // The history READ (no mutation, no sim call), on its OWN read bucket:
       // a chip press or Show older is a request, and reads must never drain
@@ -8734,10 +8691,12 @@ export class GameServer {
         browseRev !== session.lastMarketBrowseRev ||
         meta.marketQuery !== session.lastMarketQueryRef ||
         meta.sellPriceItemId !== session.lastSellPriceItemIdRef ||
+        meta.sweepQuote !== session.lastSweepQuoteRef ||
         this.sim.tickCount - session.lastMarketRebuildTick >= MARKET_BROWSE_REFRESH_TICKS
       ) {
         session.lastMarketQueryRef = meta.marketQuery;
         session.lastSellPriceItemIdRef = meta.sellPriceItemId;
+        session.lastSweepQuoteRef = meta.sweepQuote;
         session.lastMarketRebuildTick = this.sim.tickCount;
         maybe('market', this.sim.marketInfoFor(anchorSession.pid));
         // Stamp AFTER the rebuild: marketInfoFor can advance the revision as a
@@ -9024,7 +8983,7 @@ export class GameServer {
             inCombat: e.inCombat ? 1 : 0,
             group: party.raidGroups.get(mPid) ?? 1,
             absorb: partyFrameAbsorb(e.auras),
-            role: partyFrameRole(meta.talentMods.role),
+            role: partyFrameRole(meta.talentMods.role, meta.cls, e.auras),
             // Effective health Rewind could currently restore to this member
             // (combat/rewind.ts); 0 for members with no recent recorded loss.
             rewind: rewindHealAmount(damageTakenWithin(e, this.sim.tickCount), e.hp, e.maxHp),
@@ -9622,7 +9581,7 @@ export class GameServer {
         if (sent.target) {
           this.rememberChatChannel(session, { channel: 'whisper', target: sent.target });
         }
-      } else {
+      } else if (sent.channel !== 'raidWarning') {
         this.rememberChatChannel(session, { channel: sent.channel });
       }
     }
@@ -9949,71 +9908,32 @@ export class GameServer {
       });
       return;
     }
-    let rows = this.whoRosterFor(session);
-    if (filter) {
-      const q = filter.toLowerCase();
-      rows = rows.filter(
-        (row) => row.name.toLowerCase().includes(q) || row.zone.toLowerCase().includes(q),
-      );
-    }
-    const total = rows.length;
-    const header = filter
-      ? `Who: ${total} ${total === 1 ? 'player' : 'players'} matching "${filter}" on ${REALM}.`
-      : `Who: ${total} ${total === 1 ? 'player' : 'players'} online on ${REALM}.`;
-    const list: { type: 'log'; text: string; color: string }[] = [
-      {
-        type: 'log',
-        text: header,
-        color: '#7fd4ff',
-      },
-    ];
-    for (const row of rows.slice(0, WHO_RESULT_LIMIT)) {
-      const status = row.status === 'online' ? '' : ` (${row.status})`;
-      list.push({
-        type: 'log',
-        text: `${row.name} - level ${row.level} ${row.cls} - ${row.zone}${status}`,
-        color: '#c9b27a',
-      });
-    }
-    if (total > WHO_RESULT_LIMIT) {
-      list.push({
-        type: 'log',
-        text: `...and ${total - WHO_RESULT_LIMIT} more.`,
-        color: '#998d6a',
-      });
-    }
-    this.send(session, { t: 'events', list });
+    this.send(session, {
+      t: 'events',
+      list: whoChatLines(this.whoRosterFor(session), filter ?? '', REALM),
+    });
   }
 
+  // The realm-wide roster, built and name-sorted at most ONCE per sim tick for
+  // every viewer (the realm-readout memo seam), each entry keeping a live
+  // session handle for the per-viewer visibility rule. Zone + status only:
+  // presenceOf also carries the live x/z, which the Who tab's frame must never
+  // ship realm-wide (positions stay friend/guild-gated on the socialpos frame).
+  private whoRosterEntries(): readonly WhoRosterEntry<ClientSession>[] {
+    return realmReadoutObject(this.whoRosterReadout, this.sim.tickCount, () =>
+      buildWhoRosterEntries(this.clients.values(), (session) => {
+        const e = this.sim.entities.get(session.pid);
+        const meta = this.sim.meta(session.pid);
+        if (!e || !meta) return null;
+        const { zone, status } = this.presenceOf(session);
+        return { name: session.name, cls: meta.cls, level: e.level, guild: e.guild, zone, status };
+      }),
+    );
+  }
+
+  // The rows THIS viewer may see (canShowInWho: bidirectional blocks, fail-closed).
   private whoRosterFor(viewer: ClientSession): WhoRosterRow[] {
-    const rows: WhoRosterRow[] = [];
-    for (const session of this.clients.values()) {
-      if (!this.canShowInWho(viewer, session)) continue;
-      const e = this.sim.entities.get(session.pid);
-      const meta = this.sim.meta(session.pid);
-      if (!e || !meta) continue;
-      rows.push({
-        name: session.name,
-        cls: meta.cls,
-        level: e.level,
-        ...this.presenceOf(session),
-      });
-    }
-    return rows.sort((a, b) => a.name.localeCompare(b.name));
-  }
-
-  private canShowInWho(viewer: ClientSession, candidate: ClientSession): boolean {
-    // Fail closed while the candidate's block list is still loading: showing
-    // them in /who before we know their blocks could leak presence to
-    // someone they've blocked.
-    if (!candidate.blockListLoaded) return false;
-    if (viewer.blockedIds.has(candidate.characterId)) return false;
-    if (
-      candidate.characterId !== viewer.characterId &&
-      candidate.blockedIds.has(viewer.characterId)
-    )
-      return false;
-    return true;
+    return visibleWhoRows(this.whoRosterEntries(), viewer);
   }
 
   private broadcastSystem(text: string): void {

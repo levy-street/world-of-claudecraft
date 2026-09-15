@@ -112,7 +112,12 @@ function buildSolarCrown(material: THREE.Material): THREE.Group {
 }
 
 export class PaladinAscensionVisual {
+  /** The ground seal: parented to the view group, so it stays at the feet
+   *  (under the mount) while the rider sits a saddle higher. */
   readonly group = new THREE.Group();
+  /** The solar crown: parented to the rider anchor (rider_anchor.ts), so it
+   *  crowns the head wherever the seat carries it. */
+  readonly crown: THREE.Group;
   private readonly groundSeal: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
   private readonly solarCrown: THREE.Group;
   private readonly solarCrownMaterial: THREE.Material;
@@ -139,7 +144,10 @@ export class PaladinAscensionVisual {
     this.crownBaseY = characterHeight + 0.2 * this.size;
     this.solarCrown.position.y = this.crownBaseY;
     this.solarCrown.scale.setScalar(0.94 * this.size);
-    this.group.add(this.solarCrown);
+    this.crown = new THREE.Group();
+    this.crown.name = 'paladin-ascension-crown-anchor';
+    this.crown.visible = false;
+    this.crown.add(this.solarCrown);
   }
 
   update(
@@ -150,6 +158,7 @@ export class PaladinAscensionVisual {
   ): void {
     this.setHoverTarget(hoverTarget);
     this.group.visible = plan.active;
+    this.crown.visible = plan.active;
     const hoverOffset = plan.active ? HOVER_HEIGHT * this.size : 0;
     if (this.hoverTarget) this.hoverTarget.position.y = this.hoverBaseY + hoverOffset;
     this.solarCrown.position.y = this.crownBaseY + hoverOffset;
@@ -157,6 +166,8 @@ export class PaladinAscensionVisual {
 
   dispose(): void {
     this.restoreHoverTarget();
+    this.group.removeFromParent();
+    this.crown.removeFromParent();
     this.groundSeal.material.dispose();
     this.solarCrownMaterial.dispose();
   }
@@ -177,6 +188,7 @@ export class PaladinAscensionVisual {
 export function syncPaladinAscensionVisual(
   visual: PaladinAscensionVisual | null,
   parent: THREE.Group,
+  riderParent: THREE.Group,
   characterHeight: number,
   plan: PaladinAscensionVisualPlan,
   dt: number,
@@ -187,6 +199,7 @@ export function syncPaladinAscensionVisual(
   if (plan.active && !current) {
     current = new PaladinAscensionVisual(characterHeight);
     parent.add(current.group);
+    riderParent.add(current.crown);
   }
   current?.update(plan, dt, reducedMotion, hoverTarget);
   return current;

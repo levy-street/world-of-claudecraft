@@ -14,3 +14,12 @@ export const TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER = 4;
 // much more on top of it. Cast as preparation on a healthy group the ability is
 // unchanged; only the reactive case scales. See combat/chronomancy_echo_distribution.
 export const TEMPORAL_CASCADE_RELIEF_MAX_BONUS = 3;
+
+// Discipline-style overheal-to-shield conversion (Temporal Aegis): excess healing
+// from Echo conversion generates an absorb shield capped at 20% of max health,
+// refreshed on each application for 15 seconds.
+export const TEMPORAL_AEGIS_CAP_MAX_HP_FRACTION = 0.2;
+export const TEMPORAL_AEGIS_DURATION_SECONDS = 15;
+
+// Perfect Moment: 20% increased Aether Darts damage for the 10s window.
+export const PERFECT_MOMENT_DARTS_DAMAGE_MULT = 1.2;

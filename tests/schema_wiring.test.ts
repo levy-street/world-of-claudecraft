@@ -996,6 +996,11 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(first).toContain(
       "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_refusal TEXT NOT NULL DEFAULT ''",
     );
+    // The desktop-shell marker: FALSE by default, which is also the honest
+    // answer for every row older than the column.
+    expect(first).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS desktop_shell BOOLEAN NOT NULL DEFAULT FALSE',
+    );
     // Never a rewrite of the existing rows' meaning: no DROP, no NOT NULL
     // added without a default, no type change on a shipped column.
     expect(first).not.toContain('ALTER TABLE client_perf_reports DROP COLUMN');

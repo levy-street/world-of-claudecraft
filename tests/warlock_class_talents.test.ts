@@ -69,14 +69,14 @@ describe('warlock class talent tree', () => {
     expect(player.auras.some((aura) => aura.id === 'sacrilegious_march')).toBe(false);
   });
 
-  it('makes Leaden Hex a 15% maximum snare followed by a 3.5 sec root', () => {
+  it('makes Leaden Hex a 30% maximum snare followed by a 3.5 sec root', () => {
     const { sim, player } = rig({ 8: 'wlk_r8_curse_of_exhaustion' });
     const target = addTarget(sim);
 
     for (let i = 0; i < 3; i++) onCastCompleted(ctxOf(sim), player, 'shadow_bolt', target);
     expect(target.auras.find((aura) => aura.id === 'wlk_leaden_hex_slow')).toMatchObject({
       kind: 'slow',
-      value: 0.85,
+      value: 0.7,
       stacks: 3,
     });
 

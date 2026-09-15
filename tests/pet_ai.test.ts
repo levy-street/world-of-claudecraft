@@ -513,6 +513,73 @@ describe('pet proximity pull: a pet drags idle wild mobs like its owner', () => 
     expect(egg.aggroTargetId).toBe(pet.id);
     expect(egg.aiState).not.toBe('idle');
   });
+
+  it('never body-pulls a boss from its proximity scan; deliberate orders still engage it', () => {
+    // Field report (v0.42.1): a DEFENSIVE pet attacked the raid boss as the group
+    // walked into the room. The pet-side pull and the boss's own idle scan share the
+    // max(4, min(20, aggroRadius + level delta)) formula (Nythraxis: aggroRadius 22,
+    // clamped to 20), so a heeling pet standing a few yards ahead of its owner sits
+    // inside that radius before any player does. Before this guard the pet pulled
+    // the boss, the boss targeted the pet, and the defensive stance then "defended"
+    // against a fight the pet itself started.
+    const { sim, pid, owner } = world();
+    const pet = adopt(sim, pid);
+    const boss = wildHostile(sim, [pet.id]);
+    boss.templateId = 'nythraxis_scourge_of_thornpeak';
+    boss.level = 40;
+    pet.level = 40;
+    boss.aiState = 'idle';
+    boss.aggroTargetId = null;
+    boss.inCombat = false;
+    isolate(sim, [owner.id, pet.id, boss.id]);
+    // Owner a step OUTSIDE the boss's 20 yd cap; the heeling pet two yards ahead, INSIDE.
+    place(owner, 100, 100);
+    place(pet, 102, 100);
+    place(boss, 121, 100);
+    syncGrid(sim);
+    expect(pet.petMode).toBe('defensive');
+
+    updatePet(sim.ctx, pet);
+    expect(boss.aiState).toBe('idle');
+    expect(boss.aggroTargetId).toBeNull();
+    expect(pet.aggroTargetId).toBeNull();
+    expect(pet.inCombat).toBe(false);
+
+    // Closer still (15 yd, inside the 18 yd aggressive reach): the defensive pet's
+    // proximity scan stays silent at any range.
+    place(boss, 117, 100);
+    syncGrid(sim);
+    updatePet(sim.ctx, pet);
+    expect(boss.aiState).toBe('idle');
+    expect(pet.aggroTargetId).toBeNull();
+
+    // Control 1: AGGRESSIVE stance is the opt-in "attack anything in reach" order, so
+    // the same pet in the same spot DOES acquire the boss (owner active, inside
+    // PET_AGGRESSIVE_RANGE). Pinned so the surviving path reads as deliberate.
+    const meta = expectDefined(sim.players.get(pid));
+    meta.lastActiveTick = sim.tickCount;
+    pet.petMode = 'aggressive';
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(boss.id);
+    pet.petMode = 'defensive';
+    expect(petPickTarget(sim.ctx, pet, owner)).toBeNull();
+
+    // Control 2: a deliberate assist order still engages the boss for real. The owner
+    // targeting it and swinging is the assist signal; the next pet tick must not only
+    // pick the boss but drive the engagement through to the boss's hate table.
+    owner.targetId = boss.id;
+    owner.autoAttack = true;
+    expect(petPickTarget(sim.ctx, pet, owner)?.id).toBe(boss.id);
+    updatePet(sim.ctx, pet);
+    expect(pet.aggroTargetId).toBe(boss.id);
+    expect(pet.inCombat).toBe(true);
+    // The pet walks in from 15 yd, so a few more ticks close the gap and land the swing.
+    for (let i = 0; i < 200 && boss.aiState === 'idle'; i++) {
+      sim.grid.refresh(sim.entities.values());
+      updatePet(sim.ctx, pet);
+    }
+    expect(boss.aiState).not.toBe('idle');
+    expect(boss.threat.has(pet.id)).toBe(true);
+  });
 });
 
 // petPickTarget now iterates the spatial grid within PET_ASSIST_RANGE instead of the

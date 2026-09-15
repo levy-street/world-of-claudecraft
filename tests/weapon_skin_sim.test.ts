@@ -93,3 +93,49 @@ describe('weapon skin sim behavior', () => {
     expect(e.weaponSkinLoadout).toEqual({ dagger: 'astravyr_dagger', sword: 'ice_fang_sword' });
   });
 });
+
+// Reported from live play: a dual-wielder whose only mace sits in the OFFHAND
+// (a rogue keeps the dagger mainhand and the equip resolver parks a mace in the
+// offhand) owned the legendary mace skin, saw it as owned in the store, and
+// could never apply it. The rules read the mainhand alone, so the offhand mace
+// never counted as "a mace equipped". Both hands count now.
+describe('weapon skin on an offhand-only weapon type', () => {
+  it('lets a rogue apply a mace skin when the mace is held in the offhand', () => {
+    const { sim, pid, e } = newSim('rogue');
+    sim.setPlayerLevel(30, pid);
+    sim.addItem('forgefathers_warhammer', 1, pid);
+    sim.equipItemToSlot('forgefathers_warhammer', 'offhand', pid);
+    expect(e.mainhandItemId).toBe('rusty_dagger');
+    expect(e.offhandItemId).toBe('forgefathers_warhammer');
+    expect(sim.setWeaponSkin(pid, 'starfall_mace')).toBe(true);
+    expect(e.weaponSkinId).toBe('starfall_mace');
+    expect(e.weaponSkinLoadout.mace).toBe('starfall_mace');
+  });
+
+  it('prefers the mainhand type when both hands carry an applied skin', () => {
+    const { sim, pid, e } = newSim('rogue');
+    sim.setPlayerLevel(30, pid);
+    sim.addItem('forgefathers_warhammer', 1, pid);
+    sim.equipItemToSlot('forgefathers_warhammer', 'offhand', pid);
+    sim.setWeaponSkin(pid, 'starfall_mace');
+    expect(sim.setWeaponSkin(pid, 'astravyr_dagger')).toBe(true);
+    expect(e.weaponSkinId).toBe('astravyr_dagger');
+    // The mace skin stays parked and returns once the dagger skin is detached.
+    expect(e.weaponSkinLoadout).toEqual({ dagger: 'astravyr_dagger', mace: 'starfall_mace' });
+    expect(sim.setWeaponSkin(pid, null, 'dagger')).toBe(true);
+    expect(e.weaponSkinId).toBe('starfall_mace');
+  });
+
+  it('re-resolves the offhand-held skin when the offhand is swapped out', () => {
+    const { sim, pid, e } = newSim('rogue');
+    sim.setPlayerLevel(30, pid);
+    sim.addItem('forgefathers_warhammer', 1, pid);
+    sim.equipItemToSlot('forgefathers_warhammer', 'offhand', pid);
+    sim.setWeaponSkin(pid, 'starfall_mace');
+    expect(e.weaponSkinId).toBe('starfall_mace');
+    sim.unequipItem('offhand', pid);
+    expect(e.offhandItemId).toBeNull();
+    expect(e.weaponSkinId).toBeNull(); // dormant, not lost
+    expect(e.weaponSkinLoadout.mace).toBe('starfall_mace');
+  });
+});

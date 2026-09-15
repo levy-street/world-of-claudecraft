@@ -9,6 +9,7 @@ vi.mock('../src/ui/app_version', () => ({
   appVersionInfo: () => ({ version: 'test', build: 'test' }),
 }));
 
+import { ClientWorld } from '../src/net/online';
 import { t } from '../src/ui/i18n';
 import { OptionsWindow } from '../src/ui/options_window';
 
@@ -86,6 +87,31 @@ describe('options window unstuck action', () => {
     button?.click();
 
     expect(unstuck).toHaveBeenCalledOnce();
+    expect(root.style.display).toBe('none');
+  });
+
+  it('routes the rendered button through the client unstuck wire command', () => {
+    const root = new FakeElement();
+    const cmd = vi.fn();
+    const clientWorld = {
+      unstuck: () => ClientWorld.prototype.unstuck.call({ cmd } as never),
+    };
+    vi.stubGlobal('document', {
+      createElement: () => new FakeElement(),
+    });
+    const window = new OptionsWindow({
+      root: () => root as unknown as HTMLElement,
+      world: () => clientWorld as never,
+      options: () => null,
+      bugReport: () => null,
+      hideTooltip: vi.fn(),
+      restoreFocus: vi.fn(),
+    } as never);
+
+    (window as unknown as { renderMain(): void }).renderMain();
+    root.findButton(t('hudChrome.unstuck.menuButton'))?.click();
+
+    expect(cmd).toHaveBeenCalledWith({ cmd: 'unstuck' });
     expect(root.style.display).toBe('none');
   });
 });

@@ -68,3 +68,38 @@ export function absorbBarViewInto(out: AbsorbBarView, input: AbsorbBarInput): Ab
   out.overshield = overshield;
   return out;
 }
+
+/**
+ * The CSS transform that places the shield overlay as a SEGMENT: it starts at
+ * the current-health edge (or is right-aligned when overshielded) and spans only
+ * the shield's own width, so a bar with no shield carries no hatch at all and a
+ * 10% shield hatches 10% of the bar, never the whole health fill. Percent
+ * translate is relative to the overlay's own width (100% of the bar); the scale
+ * is applied about the left edge after the translate (CSS lists transforms in
+ * application order), so the segment occupies [start, start + size]. The scale
+ * writer is injectable so a party row keeps its quantized `scaleX(0.250)` form.
+ */
+export function absorbSegmentTransform(
+  startFrac: number,
+  sizeFrac: number,
+  scaleX: (frac: number) => string = defaultScaleX,
+): string {
+  // Constant two-function shape even when empty: `.bar-absorb` transitions its
+  // transform, and a list-shape flip (one function vs two) would force matrix
+  // interpolation through a singular scaleX(0) endpoint (a visible sweep).
+  const size = sizeFrac > 0 ? sizeFrac : 0;
+  return `translateX(${absorbTranslatePercent(startFrac)}%) ${scaleX(size)}`;
+}
+
+// The translate is quantized to three decimals so the elided setTransform cache
+// key stays stable frame to frame (a raw float such as 41.666666666666664 would
+// miss the write-elision seam on every frame a shield is up).
+function absorbTranslatePercent(startFrac: number): number {
+  return Number((startFrac * 100).toFixed(3));
+}
+
+// The byte-faithful player / target scale writer; a party row supplies its own
+// quantizing formatter (fixed decimals) through the painter's formatScaleX option.
+function defaultScaleX(frac: number): string {
+  return `scaleX(${frac})`;
+}

@@ -5,7 +5,21 @@
 // from its own card to #ui, so riding the ferry off the island deleted the
 // entire HUD subtree and every later Hud.update() threw on a null lookup.
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The reroute test exercises Bootcamp's Talking Head wiring, not the 3D
+// portrait pipeline. Importing the real portrait renderer starts GLB fetches
+// that can outlive happy-dom teardown and surface Three FileLoader
+// ProgressEvent rejections after otherwise green assertions.
+vi.mock('../src/render/characters/portrait', () => ({
+  modularPortraitDataUrl: vi.fn(() => null),
+  onPortraitsReady: vi.fn(),
+  onPortraitUpdate: vi.fn(),
+  playerPortraitDataUrl: vi.fn(() => null),
+  portraitsReady: vi.fn(() => false),
+  visualPortraitDataUrl: vi.fn(() => null),
+}));
+
 import type { CrossHotbarAction } from '../src/game/cross_hotbar';
 import { GAMEPAD_CONFIRM, GAMEPAD_CYCLE_HUD, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
 import { Keybinds } from '../src/game/keybinds';

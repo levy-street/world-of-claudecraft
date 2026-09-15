@@ -9,6 +9,10 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
 import {
+  HEALING_DUMMY_IDS,
+  HEALING_TRAINING_ENTITY_IDS,
+} from '../src/sim/content/healing_training';
+import {
   HUB_PRACTICE_DUMMY_CAMPS,
   HUB_PRACTICE_NPCS,
   HUB_TRAINING_DUMMY_ID,
@@ -64,7 +68,8 @@ describe('Eastbrook hub training dummy', () => {
     expect(CAMPS.some((camp) => camp.center.z === HUB_TRAINING_DUMMY_POS.z)).toBe(false);
     expect(HUB_PRACTICE_DUMMY_CAMPS[0].mobId).toBe(HUB_TRAINING_DUMMY_ID);
     // With the yard and without it, the player and every earlier entity keep
-    // their ids; the yard's own three entities trail the player.
+    // their ids; Hale's local practice yard adds the original three hub
+    // entities plus the five high-id healing training allies.
     const withYard = new Sim({ seed: SEED, playerClass: 'warrior', world: BUILTIN_WORLD });
     const { drillmaster_hale: _hale, ...npcsWithoutHale } = BUILTIN_WORLD.npcs;
     const withoutYard = new Sim({
@@ -73,8 +78,12 @@ describe('Eastbrook hub training dummy', () => {
       world: { ...BUILTIN_WORLD, npcs: npcsWithoutHale },
     });
     expect(withYard.playerId).toBe(withoutYard.playerId);
-    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3);
+    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3 + HEALING_DUMMY_IDS.length);
     expect(dummyOf(withYard).id).toBeGreaterThan(withYard.playerId);
+    for (const id of HEALING_DUMMY_IDS) {
+      const dummy = [...withYard.entities.values()].find((e) => e.templateId === id && !e.dead);
+      expect(dummy?.id).toBe(HEALING_TRAINING_ENTITY_IDS[id]);
+    }
     expect(
       [...withoutYard.entities.values()].some((e) => e.templateId === 'drillmaster_hale'),
     ).toBe(false);

@@ -21,7 +21,19 @@ export function boundedPrewarmVisibility(wasVisible: boolean, retained: boolean)
   return wasVisible && retained;
 }
 
-/** Keeps newly attached scene groups hidden for an entire awaited compile window. */
+/**
+ * Keeps newly attached scene groups hidden for an entire awaited compile
+ * window, then restores each group's prior visibility.
+ *
+ * A reveal that lands DURING the window is kept. A lazily built zone feature
+ * arrives here hidden by its own gated attach (attachSceneGroupGated), and
+ * that gate reveals the group when its programs link, which can happen inside
+ * this window; restoring the captured "hidden" over that reveal left the
+ * group invisible for good (the Willowfen dressing, once its parent group
+ * stopped being written by the per-frame distance cull). This pass only ever
+ * writes false, so a group found visible at the end was revealed by someone
+ * else, and that decision stands.
+ */
 export async function withHiddenPrewarmGroups<T>(
   groups: readonly PrewarmGroupLike[],
   work: () => T | Promise<T>,
@@ -31,7 +43,9 @@ export async function withHiddenPrewarmGroups<T>(
   try {
     return await work();
   } finally {
-    for (let index = 0; index < groups.length; index++) groups[index].visible = visibility[index];
+    for (let index = 0; index < groups.length; index++) {
+      groups[index].visible = visibility[index] || groups[index].visible;
+    }
   }
 }
 

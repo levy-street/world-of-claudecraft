@@ -3799,10 +3799,14 @@ describe('the outcome log stays observability-only', () => {
     // is only safe while nothing gameplay-facing reads it, which no type can
     // express, so the reference set is pinned here.
     const root = new URL('..', import.meta.url);
-    const hits = execFileSync('grep', ['-rl', 'bgOutcomes', 'src', 'server', 'headless'], {
-      cwd: fileURLToPath(root),
-      encoding: 'utf8',
-    })
+    const hits = execFileSync(
+      'git',
+      ['grep', '-l', 'bgOutcomes', '--', 'src', 'server', 'headless'],
+      {
+        cwd: fileURLToPath(root),
+        encoding: 'utf8',
+      },
+    )
       .split('\n')
       .filter(Boolean)
       .sort();

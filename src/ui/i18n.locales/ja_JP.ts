@@ -24,7 +24,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.specializationBodyUndiscounted':
     '技能{at}でこの職に特化し、クエストは不要です。以後、割引対象のレシピ素材は必要量が{pct}%減り、傑作率にも特化ボーナスが加わります。レイドの核の必要量は割引されません。\n\n特化した職人は工房を持ち歩くこともできます。野外に10分間の移動製作所を設置し、町に戻らず鉱山の入口で製作所が必要なレシピを作れます。ただし、師匠からの訓練や依頼品の帰属解除には使えず、使ったかどうかにかかわらず時間切れで消えます。',
   'guide.profPages.ench.enchantsNoteRaidFormula':
-    'エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各5個、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\n通常の低位エンチャントの上に立つのが光輝段階、この職の通常エンチャントの頂点です。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。完全化はエンチャンターではなく持ち主自身の仕事であり、品がそこへ至る道は生産職のページが語ります。\n\n最後の炎の熱情は独立したレイド製法であり、無料で使える通常エンチャントではありません。付与するには、エンチャント技能100で取引可能な製法書を先に習得してください。1回の付与に最後の炎の核3個と鈴音のかけら2個を消費します。製法書は坩堝でドロップするほか、その補給官から核1個で購入できます。近接攻撃での発動と武器速度の規則は下にすべて記載されています。',
+    'エンチャントは四段階あります。基礎段階は鈴音の粉塵（高位は精髄も少量使用）を消費し、武器スロット、副手、そしてすべての防具スロットをカバーします。各ビルドがすべてのスロットに合った選択肢を見つけられるだけの能力値の軸が揃っており、盾と術者が持つ副手には専用のスタミナエンチャントがあるので、装備スロットにエンチャントの死角はありません。上位段階はGreaterと呼ばれ、鈴音のかけら1個と精髄を消費します。より影響の大きいスロットに強力なボーナスを付与します。かけらの使い道はほかに三つ、二種の護符レシピが各1個（護符の残りの材料は精髄と粉）、道具効果の再充填の最上段、そして光輝段階です。光輝段階では武器と胸のエンチャントが1個ずつ、注入が2個を求めます。使う前に少し蓄えておきましょう。\n\nその間に五つのルーンエンチャントが挟まります。種別副産物を一個ずつ使う構成で、砕いた素材が無駄になりません。ルーンの刃（武器、筋力、共鳴の鋼）、ルーンの印章（武器、知力、共鳴の木材）、ルーン織り（胸、精神、共鳴の糸）、ルーンの革（脚、敏捷、共鳴の革）、ルーンの鎖（兜、スタミナ、共鳴の鎖）の五種。いずれも鈴音の精髄2個を必要とします。同じスロットと能力値に基礎とGreaterの両方がある場合、ルーンのボーナスはその中間に収まります。その一方でルーン織りは胸の精神エンチャントとして端的に最強であり、ルーンの革は脚の敏捷エンチャントとして唯一の存在です。詳細なボーナスは下の表を参照してください。\n\n通常の低位エンチャントの上に立つのが光輝段階、この職の通常エンチャントの頂点です。四種にはエンチャント100、注入には125が必要で、下の表の「スキル」の欄に示されています。いずれも光輝の試薬を必要とし、武器（剛力と呪文威力の二種）、胸、足という各スロットの階段をもう一段だけ上げます。その最後の一つ、光輝の注入は、完全化された品にしか宿りません。完全化はエンチャンターではなく持ち主自身の仕事であり、品がそこへ至る道は生産職のページが語ります。\n\n最後の炎の熱情は独立したレイド製法であり、無料で使える通常エンチャントではありません。付与するには、エンチャント技能100で取引可能な製法書を先に習得してください。1回の付与に最後の炎の核3個と鈴音のかけら2個を消費します。製法書は坩堝でドロップするほか、その補給官から核1個で購入できます。近接攻撃での発動と武器速度の規則は下にすべて記載されています。',
   'guide.profPages.ench.formulaRequired': '製法書が必要',
   'guide.profPages.econ.provenanceBodyUndiscounted':
     '名前を持つ品があります。素材の入手元の行にはその区分の単位を集めた採集者が記され、プレミアムな署名者がいる場合は別の署名マークがそれを示します。この二つは独立した事実です。通常の採集素材は採集者を記録しますが署名を得るとは限らず、旧来の署名済みの在庫は採集者が記録されなかったと正直に示しつつ署名者の名だけを示すこともあります。完成品はかわりに誰が製作したかを示します。これらの記録は取引、銀行、郵便、ワールドマーケット、そして商人からの買い戻しを経ても品に付いて回り、決して薄れません。\n\n採集は最高の成果に自動で署名します。レア以上の判定になった収穫はすべて署名され、希少な発見はその5倍のまるごとの追加収穫全体に署名します。死体採集の幸運な判定は、その種類に渡せる標本がない場合は収穫そのものに署名し、標本がある場合は収穫を無署名のままにして、署名入りの完璧な標本を別に生成します。製作も同じ原則に従います。レア以上の産出物はすべての個体が署名入りとなり、傑作はその品質にかかわらず必ず署名されるため、どの品でも最上の個体には必ず作り手の名が記されます。通常素材の署名は単位そのものに付随しており、互換性のあるスタックにすでに別の採集者や署名者が含まれているという理由だけで失われることはありません。個別の完璧な標本は別のアイテムであり、なお空き枠を必要とします。収まらない場合、通常の死体収穫は残りますが標本は失われます。\n\n完成品は厳密に一つの個体情報を保つため、二つの個体はすべての印が完全に一致した場合にのみ合流します。同じ品、同じ署名者、同じ傑作の能力値、同じエンチャント、同じ帰属です。互換性のある素材は採集者や署名者が異なっても枠を共有しつつ、各入手元ごとの個数を保持します。ホバー時のツールチップは入手元を要約し、すべての一覧を見るには「入手元」を開いてください。採集者別に分けるを選ぶとバッグ内でそれらのスタックが分かれたままになり、並べ替えもその選択を尊重します。譲渡された素材は受け取り手の素材と通常どおりスタックできます。\n\n署名は職人にも利益をもたらします。製作台のそばで必要な素材の署名入りの個体を一つでも持っていれば、誰が署名したかにかかわらず傑作率が2パーセントポイント上がります。自分自身の手で署名した素材を持っていれば、その素材の必要量が1個減りますが、最低でも1個は必要です。ただし、その素材が割引不可と指定されている場合は例外で、レイドの核は常に全量を消費します。自分が署名したレア以上の作品は、今のところ製作したポーションに限り、なお技能を教え続けてくれます。自分で調合し署名したレアな飲み薬を飲むと、その職が有効な主専攻の一つである限り、それを作った職にわずかな技能が還元されます。これは本当にポーションの領域だけの効果であり、エリクサー、巻物、頂点のフラスコはどれほど見事に署名されていても技能を還元しません。',
@@ -244,6 +244,27 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.nameplate.afkTag': '退席',
   'hudChrome.nameplate.cheaterTag': '< チーター >',
   'hudChrome.nameplate.pledgeTag': '{guild}への誓約者',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.nameplate.npcRole.auctioneer': '競売人',
+  'hudChrome.nameplate.npcRole.banker': '銀行員',
+  'hudChrome.nameplate.npcRole.riftForgemaster': '裂け目の鍛冶頭',
+  'hudChrome.nameplate.npcRole.cardMaster': 'カードマスター',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'るつぼの補給官',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': '英雄の補給官',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'PvP商人',
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': '鍛冶の教官',
+  'hudChrome.nameplate.npcRole.cookingTrainer': '料理の教官',
+  'hudChrome.nameplate.npcRole.tailoringTrainer': '裁縫の教官',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': '工学の教官',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': '革細工の教官',
+  'hudChrome.nameplate.npcRole.alchemyTrainer': '錬金術の教官',
+  'hudChrome.nameplate.npcRole.weaponVendor': '武器商人',
+  'hudChrome.nameplate.npcRole.armorVendor': '防具商人',
+  'hudChrome.nameplate.npcRole.armsDealer': '武具商人',
+  'hudChrome.nameplate.npcRole.foodVendor': '飲食物商人',
+  'hudChrome.nameplate.npcRole.potionVendor': 'ポーション商人',
+  'hudChrome.nameplate.npcRole.stableMaster': '厩舎長',
+  'hudChrome.nameplate.npcRole.generalGoods': '雑貨商人',
   'hudChrome.pledge.open': '誓約受付中',
   'hudChrome.pledge.closed': '誓約停止中',
   'hudChrome.pledge.minLevel': 'レベル{level}以上',
@@ -874,6 +895,15 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.readyCheck.notReady': '準備未完了',
   'hudChrome.readyCheck.result':
     '準備確認：{ready} 人準備完了、{notReady} 人準備未完了、{noResponse} 人未回答。',
+  'hudChrome.readyCheck.title': '準備確認',
+  'hudChrome.readyCheck.close': '閉じる',
+  'hudChrome.readyCheck.status': '準備完了：{ready}/{total}',
+  'hudChrome.readyCheck.waiting': '応答を待っています...',
+  'hudChrome.readyCheck.memberReady': '{name} は準備完了です。',
+  'hudChrome.readyCheck.memberNotReady': '{name} は準備未完了です。',
+  'hudChrome.readyCheck.memberPending': '{name} はまだ応答していません。',
+  'hudChrome.pullTimer.cancel': 'プルタイマーをキャンセルしました。',
+  'hud.chat.templates.raidWarning': '[レイド警告] {name}: {message}',
   'hudChrome.loot.chestTitle': '宝箱',
   'hudChrome.loot.takeLootButton': '戦利品を取る',
   'hudChrome.loot.takeLootTooltip':
@@ -1228,6 +1258,21 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.social.blockAction': 'ブロック',
   'hudChrome.social.nowBlocking': '{name} をブロックしました。',
   'hudChrome.social.blockedTab': 'ブロック',
+  'hudChrome.social.who.searchPlaceholder': '名前、ゾーン、またはギルド',
+  'hudChrome.social.who.search': '検索',
+  'hudChrome.social.who.loading': 'オンラインのプレイヤーを確認しています...',
+  'hudChrome.social.who.empty': '該当するプレイヤーはいません。',
+  'hudChrome.social.who.count': '{total}人がオンライン',
+  'hudChrome.social.who.countFiltered': '{shown} / {total}人がオンライン',
+  'hudChrome.social.who.capped':
+    '先頭の{delivered}人のみ表示中。残りを見るには検索を絞り込んでください。',
+  'hudChrome.social.who.classFilter': 'クラスで絞り込む',
+  'hudChrome.social.who.allClasses': 'すべてのクラス',
+  'hudChrome.social.who.colStatus': '状態',
+  'hudChrome.social.who.colLevel': 'レベル',
+  'hudChrome.social.who.colClass': 'クラス',
+  'hudChrome.social.who.colGuild': 'ギルド',
+  'hudChrome.social.who.sortTitle': '{column}で並べ替え',
   'hudChrome.social.stopBlockingTitle': '{name} のブロックを解除',
   'hudChrome.social.onlineHeader': 'オンライン ({n})',
   'hudChrome.social.offlineHeader': 'オフライン ({n})',
@@ -1687,6 +1732,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.failed': 'バグ報告を送信できませんでした。もう一度お試しください。',
   'hudChrome.keybinds.emoteWheel': 'エモートホイール',
   'hudChrome.keybinds.sheathe': '武器を納刀/抜刀',
+  'hudChrome.keybinds.hideInterface': 'インターフェースを隠す',
   'hudChrome.keybinds.targetFriendly': '最も近い味方をターゲット',
   'hudChrome.keybinds.targetFriendlyNext': '味方ターゲットを順に切り替え',
   'hudChrome.keybinds.targetPrev': 'ターゲットを逆順に切り替え',
@@ -1786,6 +1832,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.confirmVendorSell': '売却前に確認する',
   'hudChrome.options.confirmVendorSellNote':
     'オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。',
+  'hudChrome.options.confirmVendorSellMinQuality': '確認する売却品質の下限',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'この品質未満のアイテムはワンクリックで売却されます。誤って売却したアイテムは商人から買い戻せます。',
   'hudChrome.options.showSecondaryActionBar': 'セカンダリアクションバーを表示',
   'hudChrome.options.showThirdActionBar': '3本目のアクションバーを表示',
   'hudChrome.options.hideUnusedActionSlots': '未使用のアクションスロットを非表示',
@@ -2772,6 +2821,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '{name}が灰の闘技場であなたを破りました。レート {rating}（{delta}）。',
   'hud.errors.stunned': 'スタン中です！',
   'hud.errors.busy': '現在行動中です。',
+  'hud.errors.cannotCastWhileMoving': '移動中は詠唱できません。',
   'hud.errors.abilityNotReady': 'その能力はまだ準備できていません。',
   'hud.errors.notEnoughRage': '怒りが足りません！',
   'hud.errors.notEnoughEnergy': 'エネルギーが足りません！',
@@ -3046,7 +3096,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.forms.bear': '熊',
   'abilityUi.forms.cat': '狼',
   'abilityUi.cast.fishing': '釣り',
-  'abilityUi.cast.farming': '種まき',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '嵐の呼び声',
   'abilityUi.cast.demonHeal': '悪魔の治癒',
@@ -3407,6 +3456,26 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.errors.cannotAfford': '購入するお金が足りません。',
   'itemUi.errors.notYourListing': 'それはあなたの出品ではありません。',
   'itemUi.errors.nothingToCollect': '受け取るものはありません。',
+  'itemUi.market.sweep': '一括購入',
+  'itemUi.market.sweepAria': '{item}を市場から一括購入',
+  'itemUi.market.sweepTitle': '一括購入: {item}',
+  'itemUi.market.sweepClose': '閉じる',
+  'itemUi.market.sweepNote':
+    '他の出品者の出品を単価の安い順にまるごと購入し、指定数に達するまで続けます。指定数より少し多く受け取ることがあります。',
+  'itemUi.market.sweepQuantity': '希望数量',
+  'itemUi.market.sweepQuoteNone': 'このアイテムに一括購入できる出品はありません。',
+  'itemUi.market.sweepQuoteLine': '{listings}件の出品から{units}個、合計{total}（各{each}）',
+  'itemUi.market.sweepQuoteShort':
+    '入手可能なのは{listings}件の出品から{units}個のみ、合計{total}（各{each}）',
+  'itemUi.market.sweepButton': '一括購入',
+  'itemUi.market.sweepConfirmTitle': '一括購入の確認',
+  'itemUi.market.sweepConfirmBody':
+    '{listings}件の出品から{item} x{units}を合計{total}（各{each}）で購入しますか？',
+  'itemUi.market.sweepChanged':
+    '確認前に一括購入の見積もりが変わりました。合計を確認してもう一度お試しください。',
+  'itemUi.errors.sweepNoListings': 'このアイテムに一括購入できる出品はありません。',
+  'itemUi.errors.sweepPriceChanged':
+    '一括購入が届く前に価格が変わりました。見積もりを確認してもう一度お試しください。',
   'itemUi.loot.takeAll': 'すべて取る',
   'itemUi.loot.close': '戦利品を閉じる',
   'itemUi.lootRoll.title': '戦利品ロール',
@@ -4287,6 +4356,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.heroic_boss_dummy.name': 'ヒロイックボスダミー',
   'entities.mobs.hub_training_dummy.name': '訓練用ダミー',
   'entities.mobs.hub_healing_dummy.name': '治療用ダミー',
+  'entities.mobs.healing_dummy_tank.name': '負傷した前衛ダミー',
+  'entities.mobs.healing_dummy_soldier.name': '負傷した兵士ダミー',
+  'entities.mobs.healing_dummy_scout.name': '重傷の斥候ダミー',
+  'entities.mobs.healing_dummy_caster.name': '傷ついた術者ダミー',
+  'entities.mobs.healing_dummy_ranger.name': '打ちのめされたレンジャーダミー',
   'entities.mobs.ridge_stalker.name': '尾根の追跡者',
   'entities.mobs.deeprock_kobold.name': 'ディープロックの坑夫',
   'entities.mobs.thornpeak_ogre.name': 'ソーンピーク・オーガ',
@@ -6915,6 +6989,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.controls.reliquary': '聖遺物庫',
   'guide.controls.harvestJournal': '収穫日誌',
   'guide.controls.sheathe': '武器を納刀/抜刀',
+  'guide.controls.hideInterface': 'インターフェースを隠す（スクリーンショットと動画用）',
   'guide.controls.crafting': '製作',
   'guide.controls.mount': '騎乗 / 降車',
   'guide.controls.calendar': 'イベントカレンダー',
@@ -10511,6 +10586,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.toolTooltip.use.farming':
     'バッグに入れておけば、作物畑に植え付ける際に使われます。',
   'hudChrome.gathering.toolTooltip.speed': 'ティア{tier}未満のノードでの採集が速くなります。',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'その熟練度に満たなくても、下位ティアの道具として使えます。',
   'hudChrome.gathering.toolTooltip.rodRequired': '釣りに必要です。',
   'hudChrome.gathering.toolTooltip.rodBite':
     '魚が食いつくまでの時間が最大{seconds}秒短くなります。',
@@ -10773,6 +10850,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '（上質な等級を{count}個消費）',
   'hudChrome.crafting.reagentVaultDraw': '（素材保管庫から{count}個使用）',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '（{name}を{count}個所持していますが、ここでは上質な等級のみが数えられます）',
   'hudChrome.crafting.vaultUnreachable': 'ここでは素材保管庫を利用できません。',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumiのバーを折りたたむ',
@@ -10814,9 +10893,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.attunedBanner': '調律完了：{title}',
   'hudChrome.crafting.tierTutorial.title': '最初のティア',
   'hudChrome.crafting.tierTutorial.tierCap':
-    '技は技能 {skill} で最初のティアに達し、ティアが上がるごとに作れる物が向上します。ただし技がレアを超える作品を作れるのは、それがあなたの二つの主専攻の一つである場合だけです。',
+    '職能は技能 {skill} で最初のティアに達し、ティアが上がるごとに得られるものや作れるものが向上します。ただし製作系の職能に限っては、レアを超える作品へ進めるのは、それがあなたの二つの主専攻の一つになってからです。',
   'hudChrome.crafting.tierTutorial.radar':
-    'あなたの専門は輪を成します。隣り合う一対に調律すると、その二つの技は上限のない主専攻になり、輪の反対側の一つの技はレア上限の趣味になり、残りは休眠します。その知識は保持されますが、再び手に取るまではコモン上限です。',
+    'あなたの製作系職能は輪を成します。隣り合う一対に調律すると、その二つの技は上限のない主専攻になり、輪の反対側の一つの技はレア上限の趣味になり、残りは休眠します。その知識は保持されますが、再び手に取るまではコモン上限です。',
   'hudChrome.crafting.tierTutorial.masters':
     '町の工芸の師匠が調律の依頼を出しています。準備ができたら訪ねて、あなたの組み合わせを選びましょう。学んだことが失われることは決してありません。',
   'hudChrome.crafting.tierTutorial.dismiss': '了解',
@@ -10877,6 +10956,16 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.keybinds.petAttack': 'ペット：攻撃',
   'hudChrome.keybinds.petStop': 'ペット：停止',
   'hudChrome.keybinds.targetPet': 'ペット：ターゲット',
+  'hudChrome.keybinds.targetSelf': '自分をターゲット',
+  'hudChrome.keybinds.targetParty1': 'パーティメンバー1をターゲット',
+  'hudChrome.keybinds.targetParty2': 'パーティメンバー2をターゲット',
+  'hudChrome.keybinds.targetParty3': 'パーティメンバー3をターゲット',
+  'hudChrome.keybinds.targetParty4': 'パーティメンバー4をターゲット',
+  'hudChrome.keybinds.targetParty5': 'パーティメンバー5をターゲット',
+  'hudChrome.keybinds.targetParty6': 'パーティメンバー6をターゲット',
+  'hudChrome.keybinds.targetParty7': 'パーティメンバー7をターゲット',
+  'hudChrome.keybinds.targetParty8': 'パーティメンバー8をターゲット',
+  'hudChrome.keybinds.targetParty9': 'パーティメンバー9をターゲット',
   'hudChrome.keybinds.petTaunt': 'ペット：挑発',
   'hudChrome.keybinds.petDefensive': 'ペット：防御',
   'hudChrome.keybinds.petAggressive': 'ペット：攻撃的',
@@ -11285,6 +11374,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.roleDps': 'ダメージ',
   'hudChrome.finder.freeRoles': 'ロール自由',
   'hudChrome.finder.lockoutDaily': '最終ボスにデイリーロックアウト',
+  'hudChrome.finder.lockoutWeekly': '各ボスに週間ロックアウト',
   'hudChrome.finder.lockoutNone': 'ロックアウトなし',
   'hudChrome.finder.lockedFor': '約 {minutes} 分ロック中',
   'hudChrome.finder.attunement': '前提クエストが必要：{quest}',
@@ -11298,6 +11388,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.lootMaybe': '以下のうち最大 1 つがドロップ：',
   'hudChrome.finder.lootChance': '追加の低確率ドロップ：',
   'hudChrome.finder.lootHeroic': 'ヒロイック報酬、以下のいずれかが必ずドロップ：',
+  'hudChrome.finder.lootHeroicMaybe': 'ヒロイック報酬、以下のうち最大 1 つがドロップ：',
+  'hudChrome.finder.lootHeroicChance': 'ヒロイック報酬、追加の低確率ドロップ：',
   'hudChrome.finder.pct': '{pct}%',
   'hudChrome.finder.blockedLevel': 'レベル {min} ～ {max} 限定',
   'hudChrome.finder.blockedSpec': '特性の選択が必要',
@@ -11384,6 +11476,39 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.crown_endures': '王冠不滅（6:00でハードエンレイジ、英雄は5:00）',
   'hudChrome.finder.mech.deathless_court':
     '不死の宮廷（英雄限定、不死の憤怒の後に王家の廷臣が蘇る）',
+  'hudChrome.finder.mech.bloodmane_rend': 'ブラッドメインレンド（出血、対象交代に注意）',
+  'hudChrome.finder.mech.tusk_sweep': 'タスクスイープ（前方クリーブ）',
+  'hudChrome.finder.mech.ancestral_sap': 'アンセストラルサップ（味方を回復）',
+  'hudChrome.finder.mech.call_of_the_hunt': 'コール・オブ・ザ・ハント（周囲の味方を加速）',
+  'hudChrome.finder.mech.thickhide_ward': 'シックハイドウォード（周囲の味方を守護）',
+  'hudChrome.finder.mech.beast_pit_quake': 'ビーストピットクエイク（範囲ダメージ）',
+  'hudChrome.finder.mech.wildheart_pulse': 'ワイルドハートパルス（周期的な範囲ダメージ）',
+  'hudChrome.finder.mech.jaguar_roar': 'ジャガーロア（ノックバック）',
+  'hudChrome.finder.mech.brand_of_the_pyre': '火葬の烙印（重複する火の刻印、導水管の水で洗い流す）',
+  'hudChrome.finder.mech.forge_strike': 'フォージストライク（重複するタンク交代デバフ）',
+  'hudChrome.finder.mech.rain_of_cinders': '燃えさしの雨（三方向の火炎コーン、その間に立つ）',
+  'hudChrome.finder.mech.falling_cinders': '降り注ぐ燃えさし（プレイヤーへの隕石円、範囲外へ移動）',
+  'hudChrome.finder.mech.revolving_inferno':
+    '回転するインフェルノ（回転する火炎光線、隙間を抜ける）',
+  'hudChrome.finder.mech.forge_wave': 'フォージウェーブ（広がる火の壁、二つの安全な通路を使う）',
+  'hudChrome.finder.mech.apocalypse_add':
+    'イグニヴァルの灰呼び（アポカリプスを詠唱する優先討伐対象、素早く倒す）',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    '鍛冶場の裁き（中間フェーズ、唯一の安全地帯に集合）',
+  'hudChrome.finder.mech.last_inferno': 'ラストインフェルノ（体力20%で45秒のバーン）',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    '鍛冶場の鎖（ヒロイック限定、繋がれた相手の近くに留まる）',
+  'hudChrome.finder.mech.makers_brand': '創造主の烙印（重複するタンク交代デバフ）',
+  'hudChrome.finder.mech.forgefathers_sweep':
+    'フォージファーザーの薙ぎ払い（非タンクへの広い前方コーン）',
+  'hudChrome.finder.mech.tempering_ray':
+    '焼き入れの光線（マークされたプレイヤーへの直線、割り込んで受ける）',
+  'hudChrome.finder.mech.cinder_orbs': '燃えさしの宝珠（マークされたプレイヤーは部屋の端へ散開）',
+  'hudChrome.finder.mech.forgestorm': 'フォージストーム（降り注ぐ隕石円、範囲外へ移動）',
+  'hudChrome.finder.mech.shared_pyre': '共有の火葬（集合円、ダメージを分担）',
+  'hudChrome.finder.mech.anvils_decree': '金床の勅令（全体への三連ハンマー打撃、回復で耐える）',
+  'hudChrome.finder.mech.masters_assembly': '匠の組立（鍛冶場の光線を遮る、遮る役を交代）',
+
   'hudChrome.steam.link': 'Steamと連携',
   'hudChrome.steam.unlink': 'Steam連携を解除',
   'hudChrome.steam.linked': 'Steamアカウント {id} と連携済み',
@@ -11506,6 +11631,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.tips.reliquary': 'ヒント：聖遺物庫は集めたユニークな戦利品を棚ごとに記録します。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  // Wheel pseudo-keys + the zoom rows that hold them by default. M16 wordy fills.
+  'hudChrome.keybinds.zoomIn': 'カメラをズームイン',
+  'hudChrome.keybinds.zoomOut': 'カメラをズームアウト',
+  'hudChrome.keybinds.wheelHint':
+    'マウスホイールも割り当てられます。割り当て中にホイールを上か下に回してください。Ctrl、Alt、Shift を押しながらでも構いません。「カメラをズームイン」と「カメラをズームアウト」は初期状態で素のホイールに置かれています。Ctrl+ホイールなどの組み合わせに移せば、ホイールをアビリティ用に空けられます。',
+  'hudChrome.keybinds.wheelHeldRefused':
+    'ホイールの1目盛りでは移動などの押し続ける操作を動かせません。キーかマウスボタンを選んでください。',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
   'hudChrome.keybinds.mouseHint':
     'マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。',
@@ -12796,6 +12928,14 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.pinFull': 'トラッカーが満杯です（最大 {cap} ページ）',
   'hudChrome.reliquary.pinAria': '{name}をHUDトラッカーにピン留め',
   'hudChrome.reliquary.unpinAria': '{name}のピン留めを解除',
+  'hudChrome.recipeTracker.trackerLabel': 'レシピ',
+  'hudChrome.recipeTracker.collapseHint': 'レシピトラッカーを折りたたむ',
+  'hudChrome.recipeTracker.expandHint': 'レシピトラッカーを展開',
+  'hudChrome.recipeTracker.pin': 'ピン留め',
+  'hudChrome.recipeTracker.unpin': 'ピン解除',
+  'hudChrome.recipeTracker.pinFull': 'レシピトラッカーが満杯です（最大 {cap} レシピ）',
+  'hudChrome.recipeTracker.pinAria': '{name}をHUDトラッカーにピン留め',
+  'hudChrome.recipeTracker.unpinAria': '{name}のピン留めをHUDトラッカーから解除',
   'hudChrome.reliquary.trackerToggleLabel': 'HUDトラッカー',
   'hudChrome.reliquary.trackerToggleShowHint': '聖遺物庫トラッカーを画面に表示する',
   'hudChrome.reliquary.trackerToggleHideHint': '聖遺物庫トラッカーを画面から隠す',
@@ -13477,7 +13617,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '厨房は、一季の実りが報いに変わる場所です。日々の農家料理に加えて、作物の各段にはより豪華な一皿があり、食べれば満腹が残ります。食事を終えると長持ちする恵みが身に残り、ダンジョンの扉の前でパーティーが先に済ませておきたい一手です。締めくくりはHarvest Feast。料理人が世界そのものに広げるごちそうで、居合わせた皆が一人前ずつ、一人一度だけ取り分け、食べ終えた食事はどれも同じ満腹の恵みを支払います。一人の農夫の一季が、パーティー全員の食卓を整えるのです。その梯子の頂、最も豪華な二皿とごちそうそのものは山と花壇の作物に頼り、その種は畑のそばの農夫の店に並んでいます。レシピのほうは別の話です。農耕の梯子の上の段はもうどの店でも教わらず、他の終盤レシピと同じように、終盤コンテンツで見つけるか、ヒーローの記章で買うことになります。\n\nその食卓には運の席もあります。持ち帰るどの収穫も、他の採集職と同じ思わぬ実りの機会を転がし、時おり作物が黄金に実ります。実りは並の収穫をはるかに超え、おまけがもう一つ付いてきて（今耕している土地より上の段の種、あるいはたまにあの終盤レシピの一つ）、地方全体がその発見をあなたの名とともに耳にし、Golden Harvestが功績の書に記されます。',
   'guide.profPages.farm.rhythmHeading': '農耕のリズム',
   'guide.profPages.farm.rhythmBody':
-    '目に見える詠唱があるのは植え付けだけです。どの段でも一律{plant}秒。鍬は速さを買う道具ではなく、耕せる土地を開く道具だからです。熟した作物を引き抜くのは一瞬で、中断される詠唱もなければ、バッグがいっぱいだからと断られることもありません。実った畑はいつまでも待っていてくれるので、荷物が満杯でも農夫が払う代償は、空けに戻る道のりだけです。\n\n収穫が支払うのは農作物と農耕の熟練度です。鉱脈と違い、キャラクターの経験値はまったく入りません。畑はレベルを上げる手段ではなく、腰を据えて働く職なのです。',
+    '植え付けは一瞬で終わります。鍬は速さを買う道具ではなく、耕せる土地を開く道具だからです。待つべき詠唱はなく、その場を離れた農夫でも植え付けは済んでいます。熟した作物を引き抜くのも一瞬で、中断される詠唱もなければ、バッグがいっぱいだからと断られることもありません。実った畑はいつまでも待っていてくれるので、荷物が満杯でも農夫が払う代償は、空けに戻る道のりだけです。\n\n収穫が支払うのは農作物と農耕の熟練度です。鉱脈と違い、キャラクターの経験値はまったく入りません。畑はレベルを上げる手段ではなく、腰を据えて働く職なのです。',
   'guide.profPages.farm.gainHeading': '収穫が教えること',
   'guide.profPages.farm.gainBody':
     '熟練度の伸びは決定的で、作物ではなく自分のカウンターで決まります。熟練度{p1}未満なら収穫ごとに{g1}、{p2}未満なら{g2}、{p3}未満なら{g3}、そこから上限{cap}までは{g4}です。スキルアップの抽選は一切ないので、登りの長さは計算どおりぴったりです。\n\n作物のティアが決めるのは、その畑がどこまで連れて行ってくれるかです。ティア1の作物は{c1}まで教えてそこで灰色になり、ティア2の作物は{c2}まで、ティア3以上は上限まで教えてくれます。カウンターを動かし続けるには、上の畑へ移ることが欠かせません。',
@@ -13624,6 +13764,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.meat': '肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（エンチャント）',
   'hudChrome.materialHint.cookingCatch': '料理材料。食べる前に調理が必要です。',
+  'hudChrome.materialHint.fineFarmGrade':
+    '上質な等級。収穫の一部が上質として実り、農業スキルが高いほど、または職人の眼をチャージしているほど出やすくなります。上質な等級が必要な場面で通常の農作物は決して数えられず、通常の農作物が必要な場面で上質な等級も決して数えられません。',
   'hudChrome.materialHint.fineGrade':
     '上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。',
   'hudChrome.materialHint.arcaneDust': '生産の材料。一般と良質の装備を魔力分解して得られる。',
@@ -14686,6 +14828,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'アクションバーから直接割り当てることもできます。キー設定パネルで「アクションバーのキーを編集」を選び、実際のバーのスロットをクリックして、割り当てたいキーを押すだけです。終わったら「完了」をクリックします。物理キーボードが必要なため、これはデスクトップ専用です。',
   'guide.controls.petMark':
     'ペット：マーク。自分のペットを選択します（フレームをクリックするのと同じです）',
+  'guide.controls.targetSelf': '自分自身をターゲットにする',
+  'guide.controls.targetParty':
+    'パーティメンバー1から9をターゲットにする（パーティフレームに表示される順に上から下へ）',
   'guide.controls.swimDown': '水中で潜る（長押し）',
   'guide.controls.swimNote':
     '水泳では2つのキーを使います。スペースを押し続けると浮上し、左Ctrlで沈みます。泳ぎながらカメラを下に向けても潜れるので、視点で深さを操れます。左Ctrlは初期設定の中で唯一それ自体が修飾キーであり、キー割り当て中に修飾キー単体の入力は無視されるため、「潜る」を割り当て直すときは修飾キー以外を選んでください。',
@@ -15203,6 +15348,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.keybindsHeading': '「キー割り当て」パネル',
   'guide.settingsPage.keybindsMouseBody':
     '見落としやすい点が2つあります。まず、マウスボタンはキーと同じように割り当てられるので、ホイールクリックやサムボタンにアビリティを載せられます。左右のクリックは、カメラと世界のクリック操作のために予約されたままです。もう一つ、アクションバーから直接割り当てることもできます。ここでバー上での割り当てモードをオンにし、スロットをクリックして、割り当てたいキーを押すだけです。',
+  'guide.settingsPage.keybindsWheelBody':
+    'ホイール自体も割り当てられます。「カメラをズームイン」と「カメラをズームアウト」は通常の割り当てで、初期状態では素のホイールに置かれています。Ctrl+ホイールやキーに移してから、空いたホイールを回してアクションバーのスロットを発動できます。ホイールの目盛りには離す動作がないため、前進のような押し続ける操作には使えません。',
   'guide.settingsPage.panelsMoreBody':
     'このページで表にしていない2つのパネルも、目を通しておく価値があります。「オーラ」は、クラスの発動が来たときに画面へ大きく出るアラートを整えるところです。どれを表示するか、その大きさ、色、不透明度、画面上の位置を決められます。「パフォーマンスオーバーレイ」は、このページの設定を調整するあいだだけ出しておき、終わったらまた隠す読み取り表示です。',
   'guide.settingsPage.rowAmbientOcclusion':
@@ -16817,6 +16964,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.passage': '通路',
 
   'hudChrome.wocStore.mountSkinType': 'マウントスキン',
+  'hudChrome.wocStore.mountInspectAria': '{item}をプレビュー',
+  'hudChrome.wocStore.mountRideIt': '騎乗する',
+  'hudChrome.wocStore.mountOnly': 'マウントのみ',
+  'hudChrome.wocStore.mountBuy': 'マウントスキンを購入',
+  'hudChrome.wocStore.mountScopeLine':
+    'アカウント共通のスキン。同時に装着できるのは1キャラクターのみです。',
   'hudChrome.cosmetics.title': 'コスメティック',
   'hudChrome.cosmetics.close': 'コスメティックを閉じる',
   'hudChrome.cosmetics.tabsLabel': 'コスメティックの区分',
@@ -16835,6 +16988,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.cosmetics.applied': '適用中',
   'hudChrome.cosmetics.owned': '所持',
   'hudChrome.cosmetics.storeOnly': 'WOCストアで入手可能',
+  'hudChrome.cosmetics.preview': 'プレビュー',
+  'hudChrome.cosmetics.previewAria': '{name}をプレビュー',
   'hudChrome.cosmetics.cardAria': '{name}、{rarity}',
   'hudChrome.cosmetics.mountsNoMount':
     'まずマウントを入手してください。スキンには乗るものが必要です。',
@@ -16872,4 +17027,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '作物を成熟させる',
   'devCommand.fields.bed': '畝のID（任意）',
   'guide.profPages.oncePerDay': '1日1回',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': '引く！',
+  'hudChrome.pullTimer.start': '{seconds} 秒以内に押してください!',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.social.who.colName': '名前',
+  'hudChrome.social.who.colZone': 'ゾーン',
+  'hudChrome.social.who.tab': '誰が',
+  'hudChrome.wocMarket.colSaleType': 'タイプ',
+  'hudChrome.wocMarket.colSoldAt': '販売済み',
+  'hudChrome.wocMarket.saleTypeBuyNow': '今すぐ購入',
+  'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
+  'devCommand.actions.town.label': 'タウンハブ',
+  'devCommand.fields.town': '町',
 };

@@ -13,7 +13,6 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
-  'abilityUi.cast.farming': 'Plantar',
   'hudChrome.barEditor.armed': 'Toca una ranura para colocar {name}.',
   'hudChrome.barEditor.buttonHeader': 'Botón {button}',
   'hudChrome.barEditor.cellAria': 'Botón {button}, {direction}: {action}',
@@ -13500,10 +13499,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.tierTutorial.dismiss': 'Entendido',
   'hudChrome.crafting.tierTutorial.masters':
     'Los maestros artesanos de los pueblos ofrecen misiones de sintonización. Visita uno para elegir tu camino.',
-  'hudChrome.crafting.tierTutorial.radar':
-    'Tus profesiones forman una rueda. Sintonízate con un par adyacente y esos dos oficios podrán superar el trabajo raro.',
-  'hudChrome.crafting.tierTutorial.tierCap':
-    'Un oficio alcanza su primer nivel con {skill} de habilidad, y cada nivel mejora lo que puede producir.',
   'hudChrome.crafting.tierTutorial.title': 'Tu primer nivel',
   'hudChrome.crafting.trendNudge':
     'Tus manos se inclinan hacia el {archetype}. Su sintonización te espera con {master}.',
@@ -17139,7 +17134,7 @@ Las firmas devuelven algo a los artesanos: si sostienes en el banco una copia fi
   'guide.profPages.effectWellFed':
     'Bien alimentado al terminar de comer: +{value} de {stat} durante {minutes} min.',
   'guide.profPages.effectWellFedAura': 'Otorga {aura} durante {minutes} min al terminar de comer.',
-  'guide.profPages.ench.enchantsNoteRaidFormula': `Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a cinco cada una, la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.
+  'guide.profPages.ench.enchantsNoteRaidFormula': `Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a uno cada una (el resto del coste de un talismán es esencia y polvo), la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.
 
 Entre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.
 
@@ -17174,9 +17169,8 @@ La ganancia de habilidad se desvanece como en fabricación: una veta se vuelve g
 
 Lo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.`,
   'guide.profPages.farm.gainHeading': 'Qué enseña una cosecha',
-  'guide.profPages.farm.rhythmBody': `Plantar es el lanzamiento visible y corto: dura exactamente {plant} segundos en todos los peldaños, porque la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.
-
-Una cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.`,
+  'guide.profPages.farm.rhythmBody':
+    'Plantar es instantáneo, porque la azada abre la tierra en vez de comprar velocidad: no hay lanzamiento que esperar, así que un agricultor que se aleja ha plantado igualmente. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.',
   'guide.profPages.farm.rhythmHeading': 'El ritmo de la agricultura',
   'guide.profPages.farm.tableBodyOneMeal': `Las cocinas son donde una temporada da sus frutos. Además de los platos cotidianos de la granja, cada nivel de cultivo tiene un plato más rico que deja el beneficio Bien alimentado: terminas la comida y una mejora duradera permanece contigo, justo la ventaja que un grupo quiere consumir antes de la puerta de la mazmorra. Solo puede haber un efecto Bien alimentado; una comida nueva reemplaza al anterior. El broche de la colección es el Festín de la Cosecha, una bandeja que el cocinero coloca en el propio mundo: cada persona cercana recibe su propia ración, una por persona, y cada comida terminada concede el mismo beneficio Bien alimentado. Así, la temporada de un agricultor puede poner la mesa para todo un grupo. La cima, con los dos platos más ricos y el festín, usa cultivos de montaña y de parterre, cuyas semillas venden los agricultores junto a esos bancales. Las recetas son otra cuestión: los peldaños superiores de la escala agrícola ya no se enseñan en ningún mostrador, sino que se encuentran en el contenido final o se compran con Marcas Heroicas como cualquier otra receta final. La escala de platos pertenece a Cocina; la página de Cocina contiene todos sus peldaños.
 
@@ -17294,4 +17288,242 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch sostiene la muralla. Stalker Ridge y las Madrigueras de Roca Profunda pertenecen a felinos y excavadores; las Estribaciones de Ogro y el Campamento de guerra de Drogmar a mercenarios. Stormcrag chisporrotea de elementales y bajo él brilla Glimmermere, cuya orilla guarda la puerta de luz pálida al Templo Ahogado. Las Tiendas de los Juramentados y los Campos de los Renacidos rodean las alturas del culto, con el Santuario del Gravewyrm en la cima.',
   'worldContent.farmPatchName': 'Bancales de jardín',
+  'hud.chat.templates.raidWarning': '[Advertencia de incursión] {name}: {message}',
+  'hudChrome.bugReport.online': 'En línea',
+  'hudChrome.charSidebar.crafting': 'Elaboración',
+  'hudChrome.charSidebar.gathering': 'Reunión',
+  'hudChrome.charSidebar.label': 'Detalles del personaje',
+  'hudChrome.charSidebar.openProfessions': 'Profesiones abiertas',
+  'hudChrome.charSidebar.progression': 'Progresión',
+  'hudChrome.charSidebar.skills': 'Habilidades',
+  'hudChrome.charSidebar.stats': 'Estadísticas',
+  'hudChrome.charSidebar.subtitle': 'Nivel {level} {className}. {archetype}. Pasatiempo: {hobby}',
+  'hudChrome.charSidebar.subtitleNoHobby': 'Nivel {level} {className}. {archetype}',
+  'hudChrome.controller.device': 'Dispositivo conectado',
+  'hudChrome.controller.deviceConnected': 'Conectado',
+  'hudChrome.controller.deviceDisconnected': 'No se detectó ningún controlador',
+  'hudChrome.cosmetics.preview': 'Avance',
+  'hudChrome.cosmetics.previewAria': 'Vista previa {name}',
+  'hudChrome.crafting.materialsFooter':
+    'Los materiales en su bóveda se extraen automáticamente. Conoce más recetas en la estación.',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} retenido: {count}, pero aquí solo cuenta la calificación fina)',
+  'hudChrome.crafting.tierTutorial.radar':
+    'Tus profesiones forman una rueda. Sintonícese con un par adyacente y esos dos oficios se convierten en especialidades sin límites, un oficio al otro lado de la rueda se convierte en un pasatiempo poco común y el resto permanece inactivo: sus conocimientos se mantienen, pero limitados en común hasta que los retome nuevamente.',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    'Una nave alcanza su primer nivel con la habilidad {skill} y cada nivel mejora lo que puede hacer. Pero un oficio sólo supera los trabajos raros una vez que es una de tus dos especialidades.',
+  'hudChrome.finder.lockoutWeekly': 'Bloqueo semanal de cada jefe',
+  'hudChrome.finder.mech.ancestral_sap': 'Savia Ancestral (cura a sus aliados)',
+  'hudChrome.finder.mech.anvils_decree':
+    'Decreto del Yunque (tres golpes de martillo en toda la banda, curación completa)',
+  'hudChrome.finder.mech.apocalypse_add':
+    'Ignivar Ashcaller (prioridad agrega lanzar Apocalipsis, mátalo rápido)',
+  'hudChrome.finder.mech.beast_pit_quake': 'Beast Pit Quake (daño de área)',
+  'hudChrome.finder.mech.bloodmane_rend':
+    'Bloodmane Rend (sangrado, atento a los cambios de objetivos)',
+  'hudChrome.finder.mech.brand_of_the_pyre':
+    'Brand of the Pyre (marca de fuego apilable, lávela con agua corriente)',
+  'hudChrome.finder.mech.call_of_the_hunt': 'Call of the Hunt (acelera a los aliados cercanos)',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    'Chains of the Forge (solo heroico, mantente cerca de tu compañero vinculado)',
+  'hudChrome.finder.mech.cinder_orbs':
+    'Orbes de ceniza (los jugadores marcados se extienden hasta los bordes de la habitación)',
+  'hudChrome.finder.mech.falling_cinders':
+    'Falling Cinders (círculos de meteoritos sobre los jugadores, muévete)',
+  'hudChrome.finder.mech.forge_strike':
+    'Forge Strike (desventaja acumulable de intercambio de tanques)',
+  'hudChrome.finder.mech.forge_wave':
+    'Forge Wave (muro cortafuegos en expansión, use los dos carriles seguros)',
+  'hudChrome.finder.mech.forgefathers_sweep': "Forgefather's Sweep (cono frontal ancho sin tanque)",
+  'hudChrome.finder.mech.forgestorm': 'Forgestorm (círculos de meteoritos que caen, muévete)',
+  'hudChrome.finder.mech.jaguar_roar': 'Rugido de jaguar (retroceso)',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    'Juicio de la Forja (intermedio, compartir el único refugio seguro)',
+  'hudChrome.finder.mech.last_inferno':
+    'Last Inferno (quemadura de 45 segundos con un 20% de salud)',
+  'hudChrome.finder.mech.makers_brand':
+    "Maker's Brand (desventaja de intercambio de tanques acumulable)",
+  'hudChrome.finder.mech.masters_assembly':
+    'La Asamblea del Maestro (bloquear las vigas de forja, rotar los bloqueadores)',
+  'hudChrome.finder.mech.rain_of_cinders':
+    'Lluvia de cenizas (tres conos de fuego, párate entre ellos)',
+  'hudChrome.finder.mech.revolving_inferno':
+    'Infierno giratorio (rayos de fuego giratorios que se mueven a través de los huecos)',
+  'hudChrome.finder.mech.shared_pyre': 'Pira compartida (círculo de reunión, divide el daño)',
+  'hudChrome.finder.mech.tempering_ray':
+    'Tempering Ray (línea a un jugador marcado, interceptarlo)',
+  'hudChrome.finder.mech.thickhide_ward': 'Thickhide Ward (protege a los aliados cercanos)',
+  'hudChrome.finder.mech.tusk_sweep': 'Barrido de colmillo (hendidura frontal)',
+  'hudChrome.finder.mech.wildheart_pulse': 'Wildheart Pulse (daño en el área pulsante)',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'Por debajo de esa habilidad, todavía funciona como una herramienta de nivel inferior.',
+  'hudChrome.keybinds.hideInterface': 'Ocultar interfaz',
+  'hudChrome.keybinds.targetParty1': 'Miembro del grupo objetivo 1',
+  'hudChrome.keybinds.targetParty2': 'Miembro del grupo objetivo 2',
+  'hudChrome.keybinds.targetParty3': 'Miembro del grupo objetivo 3',
+  'hudChrome.keybinds.targetParty4': 'Miembro del grupo objetivo 4',
+  'hudChrome.keybinds.targetParty5': 'Miembro del grupo objetivo 5',
+  'hudChrome.keybinds.targetParty6': 'Miembro del grupo objetivo 6',
+  'hudChrome.keybinds.targetParty7': 'Miembro del grupo objetivo 7',
+  'hudChrome.keybinds.targetParty8': 'Miembro del grupo objetivo 8',
+  'hudChrome.keybinds.targetParty9': 'Miembro del grupo objetivo 9',
+  'hudChrome.keybinds.targetSelf': 'Yo objetivo',
+  'hudChrome.keybinds.wheelHeldRefused':
+    'Una muesca de rueda no puede impulsar una acción retenida como el movimiento. Elija una tecla o un botón del mouse.',
+  'hudChrome.keybinds.wheelHint':
+    'La rueda del mouse también se vincula: gírela hacia arriba o hacia abajo mientras se vincula, manteniendo presionadas las teclas Ctrl, Alt o Shift si lo desea. Zoom Camera In y Out se ubican en el volante desnudo de forma predeterminada; muévalos a un acorde como Ctrl+rueda para liberar la rueda para habilidades.',
+  'hudChrome.keybinds.zoomIn': 'Acercar la cámara',
+  'hudChrome.keybinds.zoomOut': 'Alejar la cámara',
+  'hudChrome.mapAtlas.availableNearby': 'Disponible cerca',
+  'hudChrome.mapAtlas.distance': '{distance} yardas',
+  'hudChrome.mapAtlas.filters.dungeons': 'Mazmorras',
+  'hudChrome.mapAtlas.filters.gather': 'Recolectar',
+  'hudChrome.mapAtlas.filters.players': 'Jugadores',
+  'hudChrome.mapAtlas.filters.quests': 'Misiones',
+  'hudChrome.mapAtlas.filters.services': 'Servicios',
+  'hudChrome.mapAtlas.filtersAria': 'Capas de mapa',
+  'hudChrome.mapAtlas.landmarkCount': '{count} puntos de referencia',
+  'hudChrome.mapAtlas.legend.dungeon': 'Mazmorra',
+  'hudChrome.mapAtlas.legend.herb': 'Hierba',
+  'hudChrome.mapAtlas.legend.mail': 'Correo',
+  'hudChrome.mapAtlas.legend.ore': 'Mineral',
+  'hudChrome.mapAtlas.legend.passage': 'Paso',
+  'hudChrome.mapAtlas.level': 'Nivel {level}',
+  'hudChrome.mapAtlas.noNearbyQuests': 'No hay misiones cercanas',
+  'hudChrome.mapAtlas.noTrackedQuests': 'No hay misiones rastreadas',
+  'hudChrome.mapAtlas.showRoute': 'Mostrar ruta',
+  'hudChrome.mapAtlas.track': 'Pista',
+  'hudChrome.mapAtlas.trackedQuests': 'Misiones rastreadas',
+  'hudChrome.mapAtlas.untrack': 'Dejar de rastrear',
+  'hudChrome.marketWindow.mixedListingsFooter':
+    'El Mercader reabastece los bienes comunes; Los listados de jugadores se encuentran junto a ellos al precio de venta.',
+  'hudChrome.materialHint.fineFarmGrade':
+    'Buen grado. Algunas selecciones de una cosecha salen bien, más a menudo con una habilidad agrícola superior o con un ojo de artesano cargado. Los productos comunes nunca cuentan cuando se requiere la calidad fina.',
+  'hudChrome.nameplate.npcRole.alchemyTrainer': 'Entrenador de alquimia',
+  'hudChrome.nameplate.npcRole.armorVendor': 'Vendedor de armaduras',
+  'hudChrome.nameplate.npcRole.armsDealer': 'Traficante de armas',
+  'hudChrome.nameplate.npcRole.auctioneer': 'Subastador',
+  'hudChrome.nameplate.npcRole.banker': 'Banquero',
+  'hudChrome.nameplate.npcRole.cardMaster': 'Maestro de cartas',
+  'hudChrome.nameplate.npcRole.cookingTrainer': 'Entrenador de cocina',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'Intendente del Crisol',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': 'Formador de ingeniería',
+  'hudChrome.nameplate.npcRole.foodVendor': 'Vendedor de comida y bebida',
+  'hudChrome.nameplate.npcRole.generalGoods': 'Bienes Generales',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': 'Intendente heroico',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': 'Entrenador de peletería',
+  'hudChrome.nameplate.npcRole.potionVendor': 'Vendedor de pociones',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'Vendedor PvP',
+  'hudChrome.nameplate.npcRole.riftForgemaster': 'Maestro de falsificación de la grieta',
+  'hudChrome.nameplate.npcRole.stableMaster': 'Maestro estable',
+  'hudChrome.nameplate.npcRole.tailoringTrainer': 'Entrenador de sastrería',
+  'hudChrome.nameplate.npcRole.weaponVendor': 'vendedor de armas',
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': 'Entrenador de herrería',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.options.confirmVendorSellMinQuality': 'Confirmar ventas de calidad',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'Los artículos por debajo de esta calidad se venden con un solo clic; un artículo mal vendido aún se puede volver a comprar al vendedor.',
+  'hudChrome.partyFrames.header': 'Fiesta',
+  'hudChrome.professions.retentionFooter':
+    'Devoluciones según respeto: se mantiene el 60% de la habilidad.',
+  'hudChrome.professions.tutorialLink': 'tutorial de profesion',
+  'hudChrome.pullTimer.cancel': 'Tirada cancelada.',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': '¡JALAR!',
+  'hudChrome.pullTimer.start': '¡Detén {seconds} segundos!',
+  'hudChrome.questLog.completed': 'Terminado',
+  'hudChrome.questLog.shiftHint':
+    'Presione Mayús y haga clic en una misión para vincularla en el chat.',
+  'hudChrome.questLog.zoneSummary': '{count} ({ready} listo)',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.readyCheck.close': 'Cerca',
+  'hudChrome.readyCheck.memberNotReady': '{name} no está listo.',
+  'hudChrome.readyCheck.memberPending': '{name} aún no ha respondido.',
+  'hudChrome.readyCheck.memberReady': '{name} está listo.',
+  'hudChrome.readyCheck.status': 'Listo: {ready}/{total}',
+  'hudChrome.readyCheck.title': 'Listo cheque',
+  'hudChrome.readyCheck.waiting': 'Esperando respuestas...',
+  'hudChrome.recipeTracker.collapseHint': 'Contraer rastreador de recetas',
+  'hudChrome.recipeTracker.expandHint': 'Ampliar el rastreador de recetas',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.pin': 'Alfiler',
+  'hudChrome.recipeTracker.pinAria': 'Fija {name} al rastreador HUD',
+  'hudChrome.recipeTracker.pinFull': 'El rastreador de recetas está lleno (hasta {cap} recetas)',
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.recipeTracker.trackerLabel': 'Recetas',
+  'hudChrome.recipeTracker.unpin': 'Desprender',
+  'hudChrome.recipeTracker.unpinAria': 'Desanclar {name} del rastreador HUD',
+  'hudChrome.social.who.allClasses': 'Todas las clases',
+  'hudChrome.social.who.capped':
+    'Mostrando el primer {delivered}. Limita la búsqueda para ver el resto.',
+  'hudChrome.social.who.classFilter': 'Filtrar por clase',
+  'hudChrome.social.who.colClass': 'Clase',
+  'hudChrome.social.who.colGuild': 'Gremio',
+  'hudChrome.social.who.colLevel': 'Nivel',
+  'hudChrome.social.who.colName': 'Nombre',
+  'hudChrome.social.who.colStatus': 'Estado',
+  'hudChrome.social.who.colZone': 'Zona',
+  'hudChrome.social.who.count': '{total} en línea',
+  'hudChrome.social.who.countFiltered': '{shown} de {total} en línea',
+  'hudChrome.social.who.empty': 'Ningún jugador coincide.',
+  'hudChrome.social.who.loading': 'Preguntando al reino quién está en línea...',
+  'hudChrome.social.who.search': 'Buscar',
+  'hudChrome.social.who.searchPlaceholder': 'Nombre, zona o gremio',
+  'hudChrome.social.who.sortTitle': 'Ordenar por {column}',
+  'hudChrome.social.who.tab': 'OMS',
+  'hudChrome.talkingHead.label': 'Diálogo',
+  'hudChrome.wocMarket.colBuyer': 'Comprador',
+  'hudChrome.wocMarket.colSalePrice': 'Precio de venta',
+  'hudChrome.wocMarket.colSaleType': 'Tipo',
+  'hudChrome.wocMarket.colSoldAt': 'Vendido',
+  'hudChrome.wocMarket.historyEmpty': 'Aún no se han registrado ventas.',
+  'hudChrome.wocMarket.historyError': 'No se pudo cargar el historial de ventas.',
+  'hudChrome.wocMarket.saleTypeAuction': 'Subasta',
+  'hudChrome.wocMarket.saleTypeBuyNow': 'Comprar ahora',
+  'hudChrome.wocMarket.saleTypeDirected': 'Dirigido',
+  'hudChrome.wocMarket.saleTypeUnknown': 'Desconocido',
+  'hudChrome.wocMarket.tabHistory': 'Historial de ventas',
+  'hudChrome.wocStore.mountBuy': 'Comprar diseño de montura',
+  'hudChrome.wocStore.mountInspectAria': 'Vista previa {item}',
+  'hudChrome.wocStore.mountOnly': 'Sólo montaje',
+  'hudChrome.wocStore.mountRideIt': 'montarlo',
+  'hudChrome.wocStore.mountScopeLine':
+    'Aspecto para toda la cuenta. Usado por un personaje a la vez.',
+  'itemUi.errors.sweepNoListings': 'No hay listados de ese artículo disponibles para barrer.',
+  'itemUi.errors.sweepPriceChanged':
+    'Los precios cambiaron antes de que llegara su barrido. Consulta la cotización y vuelve a intentarlo.',
+  'itemUi.market.sweep': 'Barrer',
+  'itemUi.market.sweepAria': 'Barrer el mercado para {item}',
+  'itemUi.market.sweepButton': 'Barrer',
+  'itemUi.market.sweepChanged':
+    'La cotización del barrido cambió antes de que usted confirmara. Verifica el total y vuelve a intentarlo.',
+  'itemUi.market.sweepClose': 'Cerca',
+  'itemUi.market.sweepConfirmBody':
+    '¿Comprar {item} x{units} en {listings} listados por {total} ({each} cada uno)?',
+  'itemUi.market.sweepConfirmTitle': 'Confirmar barrido de mercado',
+  'itemUi.market.sweepNote':
+    'Compra listados completos de otros vendedores, primero el más barato por unidad, hasta cubrir el total. Es posible que recibas algunos más de los que pediste.',
+  'itemUi.market.sweepQuantity': 'Se buscan unidades',
+  'itemUi.market.sweepQuoteLine':
+    '{units} unidades en {listings} listados para {total} ({each} cada uno)',
+  'itemUi.market.sweepQuoteNone': 'No hay listados de este artículo para barrer.',
+  'itemUi.market.sweepQuoteShort':
+    'Solo están disponibles {units} unidades en {listings} listados, para {total} ({each} cada una)',
+  'itemUi.market.sweepTitle': 'Barrido de mercado: {item}',
+  'devCommand.actions.town.description': 'Teletransportarse al centro de una ciudad por su nombre.',
+  'devCommand.actions.town.label': 'Centro de la ciudad',
+  'devCommand.fields.town': 'Ciudad',
+  'entities.mobs.healing_dummy_caster.name': 'Maniquí de lanzador de conjuros herido',
+  'entities.mobs.healing_dummy_ranger.name': 'Muñeco de guardabosques maltratado',
+  'entities.mobs.healing_dummy_scout.name': 'Maniquí de exploración crítica',
+  'entities.mobs.healing_dummy_soldier.name': 'Maniquí de soldado herido',
+  'entities.mobs.healing_dummy_tank.name': 'Maniquí de vanguardia herido',
+  'guide.controls.hideInterface': 'Ocultar la interfaz (capturas de pantalla y vídeos)',
+  'guide.controls.targetParty':
+    'Apunte a los miembros del grupo del 1 al 9, de arriba a abajo como los muestran los marcos del grupo.',
+  'guide.controls.targetSelf': 'Apunta a ti mismo',
+  'guide.interfacePage.framesGovernedTalkingHead':
+    'Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.',
+  'guide.settingsPage.keybindsWheelBody':
+    'La rueda misma también se atasca. Zoom Camera In y Zoom Camera Out son enlaces comunes que se ubican en la rueda desnuda de forma predeterminada, por lo que puedes moverlos a Ctrl más la rueda, o a las teclas, y luego girar la rueda liberada para activar las ranuras de la barra de acción. Una muesca de rueda no tiene liberación, por lo que no puede impulsar una acción retenida como avanzar.',
 };

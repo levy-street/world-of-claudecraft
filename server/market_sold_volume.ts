@@ -70,6 +70,17 @@ export interface SoldVolumeSim {
   marketBuy(listingId: number, pid?: number): void;
 }
 
+/** The sim surface sweepWithSoldVolume reads; `Sim` satisfies it. */
+export interface SoldVolumeSweepSim {
+  readonly marketListings: readonly SoldVolumeListing[];
+  marketSweep(
+    itemId: string,
+    count: number,
+    maxCopper: number,
+    pid?: number,
+  ): readonly SoldVolumeListing[];
+}
+
 /**
  * The sale a buy completed, or null. Pure: `before` is the listing row as it
  * stood ahead of the call and `after` the same id looked up again.
@@ -286,4 +297,28 @@ export function buyWithSoldVolume(sim: SoldVolumeSim, listingId: number, pid: nu
   if (entry === null) return;
   if (classifyMarketMetricsItem(entry.itemId) === null) return;
   enqueue(entry);
+}
+
+/**
+ * The Market Sweep twin of buyWithSoldVolume. A sweep splices MANY rows, so the
+ * single-buy "length dropped, therefore this one row sold" premise does not
+ * carry; instead the sim RETURNS the rows it settled (empty on any refusal),
+ * and each one is one sale (marketSaleFromBuy with `after` null: a row the sim
+ * reports settled has left the book by construction). No before/after diff of
+ * the book, so a refused frame costs the observer nothing.
+ */
+export function sweepWithSoldVolume(
+  sim: SoldVolumeSweepSim,
+  itemId: string,
+  count: number,
+  maxCopper: number,
+  pid: number,
+): void {
+  const settled = sim.marketSweep(itemId, count, maxCopper, pid);
+  if (settled.length === 0) return;
+  if (classifyMarketMetricsItem(itemId) === null) return;
+  for (const row of settled) {
+    const entry = marketSaleFromBuy(row, null);
+    if (entry !== null) enqueue(entry);
+  }
 }

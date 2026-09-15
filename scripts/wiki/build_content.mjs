@@ -76,7 +76,7 @@ const entrySource = `
   export {
     TIER_SKILL_STEP, tierForSkill, REDUCED_TIER_MULTIPLIER, MINIMAL_TIER_MULTIPLIER,
   } from './src/sim/professions/wheel.ts';
-  export { WIELD_REQUIREMENT_BY_TIER } from './src/sim/professions/wield_gate.ts';
+  export { wieldRequirementFor } from './src/sim/professions/wield_gate.ts';
   export { TRAINING_FEE_BY_TIER, trainingFeeFor } from './src/sim/professions/training.ts';
   export {
     NODE_HARVEST_TABLE, NODE_MATERIAL_TABLE, GATHER_CAST_BASE_SEC, GATHER_CAST_FLOOR_SEC,
@@ -94,8 +94,7 @@ const entrySource = `
   export {
     GATHER_RARE_EVENT_CHANCE, GATHER_RARE_EVENT_YIELD_MULT, gatherRareEventFlavor,
   } from './src/sim/professions/gather_events.ts';
-  export {
-    FARM_PLANT_CAST_SEC, FARM_HARVEST_LIFE_FLOOR, FARM_KEEP_CHANCE_BASE,
+  export { FARM_HARVEST_LIFE_FLOOR, FARM_KEEP_CHANCE_BASE,
     FARM_KEEP_CHANCE_SKILL_SCALE, FARM_FINE_CHANCE_BASE, FARM_FINE_CHANCE_SKILL_SCALE,
     FARM_FINE_CHANCE_EFFECT_BONUS, FARM_TONIC_BONUS_CHANCE, FARM_TONIC_BONUS_PICKS,
     FARM_EFFECT_BONUS_PICK_CAP, FARMING_GAIN_SCHEDULE, farmingTeachingCeilingFor,
@@ -190,7 +189,7 @@ const {
   FISHING_TABLES_BY_BAND,
   FISHING_RARE_ID,
   TIER_SKILL_STEP,
-  WIELD_REQUIREMENT_BY_TIER,
+  wieldRequirementFor,
   tierForSkill,
   REDUCED_TIER_MULTIPLIER,
   MINIMAL_TIER_MULTIPLIER,
@@ -218,7 +217,6 @@ const {
   GATHER_RARE_EVENT_CHANCE,
   GATHER_RARE_EVENT_YIELD_MULT,
   gatherRareEventFlavor,
-  FARM_PLANT_CAST_SEC,
   FARM_HARVEST_LIFE_FLOOR,
   FARM_KEEP_CHANCE_BASE,
   FARM_KEEP_CHANCE_SKILL_SCALE,
@@ -1016,7 +1014,7 @@ const toolRow = (itemId, tier, professionId) => {
   const craftedBy = craftedByCraft(itemId);
   // R22: land tools above tier 1 carry a wield requirement; rods are the
   // structural exemption and every rod row omits the field.
-  const wieldReq = professionId === 'fishing' ? 0 : (WIELD_REQUIREMENT_BY_TIER[tier] ?? 0);
+  const wieldReq = wieldRequirementFor(professionId, tier);
   return {
     name: def.name,
     tier,
@@ -1173,7 +1171,6 @@ const profCurve = {
   // Every number is DERIVED from src/sim/professions/farming.ts here so the prose
   // and its pins cannot drift from the model.
   farm: {
-    plantCastSec: FARM_PLANT_CAST_SEC,
     lifeFloor: FARM_HARVEST_LIFE_FLOOR,
     keepChancePctAtZero: pct(FARM_KEEP_CHANCE_BASE),
     keepChancePctAtCap: pct(FARM_KEEP_CHANCE_BASE + FARM_KEEP_CHANCE_SKILL_SCALE),
@@ -1662,7 +1659,6 @@ export interface GuideProfCurve {
   rareEvent: { oneIn: number; yieldMult: number; flavors: { ore: string; wood: string; herb: string } };
   specimenChancePct: number;
   farm: {
-    plantCastSec: number;
     lifeFloor: number;
     keepChancePctAtZero: number;
     keepChancePctAtCap: number;

@@ -11,11 +11,11 @@
     "mode": "composite-sha256",
     "algorithm": "sha256",
     "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-    "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+    "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
     "components": {
       "townAsset": {
         "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-        "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+        "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
       },
       "authoritativeLayout": {
         "path": "src/sim/eastbrook_layout.ts",
@@ -23,12 +23,12 @@
       },
       "civicShader": {
         "path": "src/render/realm_builder_monument_fx.ts",
-        "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+        "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
       },
       "runtimeRender": {
         "town": {
           "path": "src/render/eastbrook_town.ts",
-          "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+          "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
         },
         "mailbox": {
           "path": "src/render/mailbox.ts",
@@ -40,7 +40,15 @@
         },
         "renderer": {
           "path": "src/render/renderer.ts",
-          "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+          "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+        },
+        "entityGroundSample": {
+          "path": "src/render/entity_ground_sample.ts",
+          "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+        },
+        "entityGroundSampleCore": {
+          "path": "src/render/entity_ground_sample_core.ts",
+          "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
         },
         "entityViewPolicy": {
           "path": "src/render/entity_view_policy_core.ts",
@@ -53,23 +61,23 @@
       },
       "mailbox": {
         "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-        "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+        "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
         "glb": {
           "path": "public/models/props/mailbox_pillar.glb",
-          "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+          "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
         }
       },
       "noticeboard": {
         "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-        "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+        "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
         "glb": {
           "path": "public/models/props/eastbrook_noticeboard.glb",
-          "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+          "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
         }
       },
       "captureContract": {
         "id": "polish-v2",
-        "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+        "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
       }
     }
   },
@@ -89,11 +97,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -101,12 +109,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -118,7 +126,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -131,23 +147,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -1385,11 +1401,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -1397,12 +1413,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -1414,7 +1430,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -1427,23 +1451,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -2681,11 +2705,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -2693,12 +2717,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -2710,7 +2734,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -2723,23 +2755,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -3977,11 +4009,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -3989,12 +4021,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -4006,7 +4038,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -4019,23 +4059,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -5273,11 +5313,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -5285,12 +5325,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -5302,7 +5342,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -5315,23 +5363,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -6569,11 +6617,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -6581,12 +6629,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -6598,7 +6646,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -6611,23 +6667,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -7865,11 +7921,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -7877,12 +7933,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -7894,7 +7950,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -7907,23 +7971,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -9161,11 +9225,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -9173,12 +9237,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -9190,7 +9254,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -9203,23 +9275,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -10457,11 +10529,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -10469,12 +10541,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -10486,7 +10558,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -10499,23 +10579,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -11753,11 +11833,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -11765,12 +11845,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -11782,7 +11862,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -11795,23 +11883,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -13049,11 +13137,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -13061,12 +13149,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -13078,7 +13166,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -13091,23 +13187,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -14345,11 +14441,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -14357,12 +14453,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -14374,7 +14470,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -14387,23 +14491,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -15641,11 +15745,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -15653,12 +15757,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -15670,7 +15774,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -15683,23 +15795,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -16937,11 +17049,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -16949,12 +17061,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -16966,7 +17078,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -16979,23 +17099,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -19198,11 +19318,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -19210,12 +19330,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -19227,7 +19347,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -19240,23 +19368,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -20494,11 +20622,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -20506,12 +20634,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -20523,7 +20651,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -20536,23 +20672,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -21790,11 +21926,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -21802,12 +21938,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -21819,7 +21955,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -21832,23 +21976,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -23086,11 +23230,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -23098,12 +23242,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -23115,7 +23259,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -23128,23 +23280,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -24382,11 +24534,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -24394,12 +24546,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -24411,7 +24563,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -24424,23 +24584,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -25678,11 +25838,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -25690,12 +25850,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -25707,7 +25867,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -25720,23 +25888,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -26974,11 +27142,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -26986,12 +27154,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -27003,7 +27171,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -27016,23 +27192,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -28323,11 +28499,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -28335,12 +28511,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -28352,7 +28528,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -28365,23 +28549,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },
@@ -29619,11 +29803,11 @@
         "mode": "composite-sha256",
         "algorithm": "sha256",
         "baselineRevision": "3ab740db453bd8b5858a52c304edc811c9d520ca",
-        "fingerprint": "07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf",
+        "fingerprint": "a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534",
         "components": {
           "townAsset": {
             "source": "scripts/assets/eastbrook_town/source_fingerprint.mjs",
-            "sourceFingerprint": "f895ff4381930b5f114196c24b7f06092b18458f50ef52b696c9449063291613"
+            "sourceFingerprint": "5bba7913d07e478ece5453c06a171f456717bfb3ddddc4243a1a0269dba1e724"
           },
           "authoritativeLayout": {
             "path": "src/sim/eastbrook_layout.ts",
@@ -29631,12 +29815,12 @@
           },
           "civicShader": {
             "path": "src/render/realm_builder_monument_fx.ts",
-            "sha256": "d8db29ba7f4f433f645306fe732aeb3d59e8e7f81ce2e824a34b94042b0e3a2f"
+            "sha256": "58495d4a7dbc0a476302f17c652cf50a27fea3c8f08efa091477ba7be9314019"
           },
           "runtimeRender": {
             "town": {
               "path": "src/render/eastbrook_town.ts",
-              "sha256": "428e2ec295d73c7bce9e63b1f8c2d840d2807a24571096e198a36d4151641e93"
+              "sha256": "73a4f5fbf6d4831dd481547f578e50339a5ec699569ed1bfc42699e42b2afa6a"
             },
             "mailbox": {
               "path": "src/render/mailbox.ts",
@@ -29648,7 +29832,15 @@
             },
             "renderer": {
               "path": "src/render/renderer.ts",
-              "sha256": "80112b4792e6e6d7120b68c3c9c7a8561e4690575e023a1bed59a965c351eae2"
+              "sha256": "2aa899a48f88902e865c3d2e7269c4cd143758158df2488d24a85eaf9f1a6ead"
+            },
+            "entityGroundSample": {
+              "path": "src/render/entity_ground_sample.ts",
+              "sha256": "676ba7f417398c3ce63bb47239ced9482dcc40a40993e8da3faf24b113b1d8c3"
+            },
+            "entityGroundSampleCore": {
+              "path": "src/render/entity_ground_sample_core.ts",
+              "sha256": "aae239cbb2d84f111cbeda11b8e2436c233a7333f34b5ec5f0795855c7cb09cf"
             },
             "entityViewPolicy": {
               "path": "src/render/entity_view_policy_core.ts",
@@ -29661,23 +29853,23 @@
           },
           "mailbox": {
             "source": "scripts/assets/eastbrook_mailbox/source_fingerprint.mjs",
-            "sourceFingerprint": "0101a6a3bae249475bfff80a7563bcb16365738abe04c8cf829c2f59c1c240a1",
+            "sourceFingerprint": "879c43318cb4f191792de6735d07d952437fe1c6f6050c40000afb78e5e6e529",
             "glb": {
               "path": "public/models/props/mailbox_pillar.glb",
-              "sha256": "9dda29971047d273a491f2ca4b61035e243e291f7b284753603231ec23634316"
+              "sha256": "4ead6decb61514e08338ffcae278003e0e14c1e020edeaff1f98ce0055f18b3d"
             }
           },
           "noticeboard": {
             "source": "scripts/assets/eastbrook_noticeboard/source_fingerprint.mjs",
-            "sourceFingerprint": "b2803e2ccc12987ef16d263a711aad28e8e542ef539bc5c13d63744831c49bcd",
+            "sourceFingerprint": "09d34879f65d96d8a33dc02111f4a3f79c67a8d53c709c1f5f5f918f564b1a57",
             "glb": {
               "path": "public/models/props/eastbrook_noticeboard.glb",
-              "sha256": "2ac0ba06f475895c08cd14debd850642b3c6c1a162c28427de64335a613da485"
+              "sha256": "3ab98bcebb1f20175c76203354a84032924c01830737b3947534f8c5c4bc6c70"
             }
           },
           "captureContract": {
             "id": "polish-v2",
-            "sha256": "067cb0668d24548e80ebf0c5cc6bef57ffcf1d7e562748c54cc002de5081a881"
+            "sha256": "aae8df2f7113ec2f5dc4814d7899aa7a62ced1fc0d617e637510d13e116f8861"
           }
         }
       },

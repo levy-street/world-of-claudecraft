@@ -188,15 +188,23 @@ function tick(): void {
     return;
   }
   // Settle what completed, oldest first. A link past its deadline is failed
-  // and dropped, so one wedged link cannot close the window for good.
+  // and dropped, so one wedged link cannot close the window for good; the
+  // client is told it was the deadline, with the wall the link had run, so a
+  // machine whose links never settle still produces link evidence. The
+  // program is not kept: a link that never completed put nothing in the
+  // driver's cache, and holding its object in this context would retain GPU
+  // memory for no measured gain. Only the deadline backs the window off: a
+  // program the context refused is a text that does not link, not a sign of
+  // load, and halving on it once turned a window of three into one on a cold
+  // RTX 3060 entry and cost the worker its session.
   const nowMs = performance.now();
   for (const [id, flight] of inFlight) {
     let result = parallel
       ? pollWarmProgram(gl, flight.handle)
       : resolveWarmProgram(gl, flight.handle);
-    if (result === 'pending' && nowMs - flight.startedAt >= SHADER_WARM_LINK_DEADLINE_MS) {
-      result = 'failed';
-    }
+    const ranMs = nowMs - flight.startedAt;
+    const deadline = result === 'pending' && ranMs >= SHADER_WARM_LINK_DEADLINE_MS;
+    if (deadline) result = 'failed';
     if (result === 'pending') continue;
     inFlight.delete(id);
     releaseWarmShaders(gl, flight.handle);
@@ -206,10 +214,12 @@ function tick(): void {
       retain(flight.handle);
       post({ kind: 'warmed', id, linkMs: performance.now() - flight.startedAt });
     } else {
-      scheduler.markFailed(id);
+      if (deadline) scheduler.markFailed(id);
+      else scheduler.markRejected(id);
       failed++;
       deleteWarmProgram(gl, flight.handle);
-      post({ kind: 'failed', id, reason: 'link-failed' });
+      if (deadline) post({ kind: 'failed', id, reason: 'link-deadline', linkMs: ranMs });
+      else post({ kind: 'failed', id, reason: 'link-failed' });
     }
   }
   // Submit what the window allows.
@@ -229,7 +239,7 @@ function tick(): void {
     }
     const handle = submitWarmProgram(gl, source);
     if (!handle) {
-      scheduler.markFailed(next.id);
+      scheduler.markRejected(next.id);
       failed++;
       post({ kind: 'failed', id: next.id, reason: 'link-failed' });
       continue;

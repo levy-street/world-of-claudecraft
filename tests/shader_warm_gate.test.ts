@@ -364,6 +364,50 @@ describe('a gate that holds for the worker', () => {
     expect(await gate).toEqual({ failed: true, timedOut: true });
   });
 
+  it('notes a hold a cannot-serve release ended as released, and still submits the piece', async () => {
+    // The worker's own wall says the queue ahead of this piece cannot fit its
+    // cap: the release ends the hold, the piece links cold now, and the note
+    // must not read that as a worker that answered nothing.
+    const worker = armedWorker();
+    const sources = Array.from({ length: 32 }, (_, index) => dry(`k${index}`, `v${index}`));
+    const { arms } = armsRig({ sources: { a: sources } });
+    const rig = submitRig();
+    const gate = runPiecesWarmed(arms, rootOf(['a']), piecesOf(['a']), {
+      priority: COSMETIC,
+      imminent: false,
+      submit: rig.submit,
+    });
+    worker.ready();
+    await flush();
+    worker.emit({
+      kind: 'stats',
+      pending: 29,
+      inFlight: 1,
+      windowLinks: 1,
+      state: 'backoff',
+      warmed: 0,
+      failed: 0,
+      retained: 0,
+      cancelled: 0,
+      backoffCount: 1,
+      maxWindowObserved: 1,
+      etalonMsPerKchar: null,
+      soloSamples: 1,
+    });
+    for (let id = 1; id <= 3; id++) worker.emit({ kind: 'warmed', id, linkMs: 600 });
+
+    expect(await gate).toEqual(SETTLED);
+    expect(rig.log).toEqual(['assemble@0', 'a@0']);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'ready',
+      releases: 1,
+      held: 1,
+      heldReleased: 1,
+      heldWarm: 0,
+      heldTimedOut: 0,
+    });
+  });
+
   it('counts a piece the worker could not warm as held, and submits it anyway', async () => {
     // A failed warm is a cold link, not a dropped piece: the gate still runs.
     const worker = armedWorker();

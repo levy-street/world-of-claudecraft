@@ -117,6 +117,12 @@ function deps(overrides: Record<string, unknown> = {}) {
     selectedCraft: () => null as string | null,
     onSelectCraft: vi.fn(),
     ...overrides,
+    recipePinned: () => false,
+    onToggleRecipePin: (recipeId: string) => ({
+      pinned: new Set<string>(),
+      full: false,
+      changed: false,
+    }),
   };
 }
 

@@ -96,13 +96,17 @@ describe('Perfecting rank exchange inside the existing window', () => {
     action().click();
     const prompt = document.querySelector<HTMLElement>('.pf-swap-prompt')!;
     // The input's bubbling click handler runs AFTER the opener focused Cancel.
-    // A dialog without a focusable root drops that focus to body, allowing
-    // Escape to reach the game dispatcher and close the underlying window.
+    // The click target (the action button) is outside the aria-modal prompt, so
+    // the release recognizes a modal the handler opened and leaves that
+    // keyboard-owned focus alone (src/game/click_claimed_focus.ts); Escape then
+    // reaches the prompt, never the game dispatcher under it.
+    const focused = document.activeElement;
     const input = Input.prototype as unknown as {
-      releaseMouseActivatedFocus(event: { type: string; detail: number }): void;
+      releaseMouseActivatedFocus(event: { type: string; detail: number; target: unknown }): void;
     };
-    input.releaseMouseActivatedFocus({ type: 'click', detail: 1 });
-    expect(document.activeElement).toBe(prompt);
+    input.releaseMouseActivatedFocus({ type: 'click', detail: 1, target: action() });
+    expect(document.activeElement).toBe(focused);
+    expect(prompt.contains(document.activeElement)).toBe(true);
     prompt.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true }),
     );

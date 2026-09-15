@@ -3484,10 +3484,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.tierTutorial.dismiss': 'Rozumiem',
   'hudChrome.crafting.tierTutorial.masters':
     'Mistrzowie rzemiosła w miastach oferują zadania dostrojenia. Odwiedź jednego, by wybrać swoją parę, gdy będziesz gotowy. Niczego, czego się nauczyłeś, nigdy nie tracisz.',
-  'hudChrome.crafting.tierTutorial.radar':
-    'Twoje profesje tworzą koło. Dostrojenie do sąsiadującej pary sprawia, że te dwa rzemiosła stają się nieograniczonymi specjalizacjami, jedno rzemiosło po drugiej stronie koła staje się hobby z pułapem rzadkości, a reszta leży uśpiona: wiedza zachowana, lecz ograniczona do pospolitej, dopóki ponownie jej nie podejmiesz.',
-  'hudChrome.crafting.tierTutorial.tierCap':
-    'Rzemiosło osiąga swój pierwszy poziom przy umiejętności {skill}, a każdy poziom poprawia to, co może wytworzyć. Ale rzemiosło wspina się poza rzadką pracę tylko wtedy, gdy jest jedną z twoich dwóch specjalizacji.',
   'hudChrome.crafting.tierTutorial.title': 'Twój Pierwszy Poziom',
   'hudChrome.crafting.trendNudge':
     'Twoje ręce skłaniają się ku {archetype}. Jego dostrojenie czeka u {master}.',
@@ -15825,7 +15821,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.soulfireSummary':
     'Każda detonacja Rozdarcia Duszy zostawia kałużę fioletowego ognia o promieniu {radius} jardów tam, gdzie stał każdy znak, płonącą przez {seconds} sek. za {tickNormal} maksymalnego zdrowia co sekundę. Stanie tam, gdzie kałuże się nakładają, zadaje tik z każdej z nich. Kałuże nigdy nie powstają w promieniu {clearance} jardów od kamienia ochronnego.',
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Sople lodu',
-  'abilityUi.cast.farming': 'Sadzenie',
   'abilityUi.cast.sundering': 'Rozdarcie',
   'hud.core.mapMarkerLabels.farmPatch': 'Grządki',
   'hud.logs.keptLockedMany': 'Zachowano {count} zablokowanych kopii.',
@@ -16969,7 +16964,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.provenanceBodyUndiscounted':
     'Niektóre przedmioty noszą nazwę. Linie źródła materiału mówią, kto zebrał każdą grupę sztuk, a osobna marka Podpisano przez wskazuje podpisującego wyższej jakości, gdy taki istnieje. Te fakty są niezależne: zwykły zebrany materiał zapisuje zbieracza bez zyskania podpisu, a stary podpisany zapas może podać podpisującego i uczciwie mówić, że nie zapisano zbieracza. Ukończona część podaje zamiast tego twórcę. Zapisy podróżują z przedmiotem przez wymianę, bank, pocztę, Światowy rynek i nawet odkupienie u sprzedawcy, nigdy nie blaknąc.\n\nZbieranie automatycznie podpisuje najlepszą pracę: każdy zbiór, który wylosuje jakość rzadką albo lepszą, przychodzi podpisany, a rzadkie odkrycia podpisują cały pięciokrotny łup. Szczęśliwy zbiór z ciała podpisuje plon, gdy dana rodzina nie ma okazu do oddania, a gdy ma, pozostawia plon zwykły i tworzy obok podpisany doskonały okaz. Rzemiosło działa tak samo: każda kopia rzadkiego albo lepszego wyniku otrzymuje podpis, a mistrzowskie wykonanie zawsze podpisuje wynik, niezależnie od jakości, więc najlepsza wersja zawsze nazywa twórcę. Podpis zwykłego materiału jedzie na samych sztukach i nie ginie tylko dlatego, że zgodny stos ma już innego zbieracza lub podpisującego. Osobny doskonały okaz jest oddzielnym przedmiotem i nadal potrzebuje miejsca; jeśli się nie mieści, zwykły plon z ciała zostaje, lecz okaz przepada.\n\nUkończone przedmioty zachowują jedną ścisłą tożsamość, więc dwie kopie łączą się tylko przy dokładnej zgodności każdej marki: ten sam przedmiot, podpisujący, statystyki mistrzowskie, enchant i związanie. Zgodne materiały dzielą miejsce między zbieraczami i podpisującymi, zachowując liczbę z każdego źródła. Podpowiedź podsumowuje źródła; otwórz Źródła dla pełnej listy. Rozdzielenie według zbieracza trzyma stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.\n\nPodpisy zwracają się rzemieślnikom: trzymanie przy stanowisku dowolnej podpisanej kopii wymaganego reagenta, niezależnie od podpisującego, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Reagent podpisany własną ręką zmniejsza wymaganą ilość tego reagenta o 1, nigdy poniżej 1, chyba że ma oznaczenie bez zniżki; rdzenie raidowe zawsze zachowują pełny koszt. Własna podpisana praca rzadka albo lepsza może nadal cię uczyć, dziś wyłącznie przez wykonane mikstury: wypij rzadką miksturę, którą uwarzyłeś i podpisałeś, a mały strumień umiejętności wróci do profesji, która ją stworzyła, jeśli jest jedną z twoich aktywnych głównych. Naprawdę dotyczy to tylko mikstur, więc eliksir, zwój albo flakon szczytowy nie uczy cię niczego, choćby podpisano je najstaranniej.',
   'guide.profPages.ench.enchantsNoteRaidFormula':
-    'Enchanty mają cztery poziomy. Podstawowy korzysta z Pyłu dzwonu, z odrobiną Esencji na wysokim końcu, i obejmuje miejsce broni, broń podręczną oraz każdą część pancerza. Opcji osi statystyk jest dość, aby każda konfiguracja znalazła coś dla każdego miejsca: tarcze i podręczne przedmioty czarujących mają własny enchant Wytrzymałości, więc żadne wyposażone miejsce nie jest martwe dla enchantów. Poziom Większy kosztuje jeden Odłamek dzwonu i Esencję, dając silniejsze premie w najbardziej wpływowych miejscach. Odłamki mają jeszcze trzy wydatki: dwie receptury uroków po pięć sztuk, najwyższy poziom ładowania efektów narzędzi oraz poziom Świetlisty, gdzie enchant broni i pancerza klatki biorą po jednym, a Infuzja dwa. Zachowaj kilka przed wydaniem.\n\nPomiędzy nimi znajduje się pięć enchantów Runicznych, po jednym odbiorcy dla każdego typowanego drugorzędnego statystyk, więc nic z tego, co zmielisz, nie jest ślepą uliczką: Runiczne ostrze, broń, Siła, zużywa Stal rezonującą; Runiczny sygnet, broń, Intelekt, Drewno rezonujące; Runiczny splot, klatka, Duch, Nić rezonująca; Runiczna skóra, nogi, Zręczność, Skóra rezonująca; oraz Runiczne ogniwa, hełm, Wytrzymałość, Ogniwa rezonujące. Każdy bierze też dwie Esencje dzwonu. Gdy miejsce i statystyka mają enchant podstawowy oraz Większy, premia Runiczna leży między nimi, a Runiczny splot jest bezwzględnie najmocniejszym enchantem Ducha klatki, zaś Runiczna skóra jedynym enchantem Zręczności nóg. Dokładne premie są w tabeli poniżej.\n\nNad zwykłymi niższymi poziomami znajduje się Świetlisty, szczytowa zwykła praca profesji: Zaklinanie 100 dla czterech enchantów i 125 dla Infuzji, jak pokazuje kolumna Umiejętność. Każdy wymaga Świetlistego reagenta i dodaje kolejny krok na własnym miejscu: broń z opcją Mocy i Mocy zaklęć, klatka oraz buty. Ostatnia, Świetlista infuzja, działa tylko na części Udoskonalonej: Udoskonalanie jest pracą noszącego, nie zaklinacza, a strona Profesje wyjaśnia, jak część je zdobywa.\n\nZapał Ostatniego Płomienia jest osobną recepturą raidową, nie darmowym zwykłym enchantem. Naucz się jego wymienialnej formuły przy Zaklinaniu 100 przed użyciem. Każde zastosowanie zużywa 3 rdzenie Ostatniego Płomienia i 2 Odłamki dzwonu. Formuła może wypaść w Tyglu albo zostać kupiona u jego kwatermistrza za jeden rdzeń. Zasady wyzwalacza wręcz i szybkości broni są w całości poniżej.',
+    'Enchanty mają cztery poziomy. Podstawowy korzysta z Pyłu dzwonu, z odrobiną Esencji na wysokim końcu, i obejmuje miejsce broni, broń podręczną oraz każdą część pancerza. Opcji osi statystyk jest dość, aby każda konfiguracja znalazła coś dla każdego miejsca: tarcze i podręczne przedmioty czarujących mają własny enchant Wytrzymałości, więc żadne wyposażone miejsce nie jest martwe dla enchantów. Poziom Większy kosztuje jeden Odłamek dzwonu i Esencję, dając silniejsze premie w najbardziej wpływowych miejscach. Odłamki mają jeszcze trzy wydatki: dwie receptury uroków po jednej sztuce (resztę kosztu uroku stanowią esencja i pył), najwyższy poziom ładowania efektów narzędzi oraz poziom Świetlisty, gdzie enchant broni i pancerza klatki biorą po jednym, a Infuzja dwa. Zachowaj kilka przed wydaniem.\n\nPomiędzy nimi znajduje się pięć enchantów Runicznych, po jednym odbiorcy dla każdego typowanego drugorzędnego statystyk, więc nic z tego, co zmielisz, nie jest ślepą uliczką: Runiczne ostrze, broń, Siła, zużywa Stal rezonującą; Runiczny sygnet, broń, Intelekt, Drewno rezonujące; Runiczny splot, klatka, Duch, Nić rezonująca; Runiczna skóra, nogi, Zręczność, Skóra rezonująca; oraz Runiczne ogniwa, hełm, Wytrzymałość, Ogniwa rezonujące. Każdy bierze też dwie Esencje dzwonu. Gdy miejsce i statystyka mają enchant podstawowy oraz Większy, premia Runiczna leży między nimi, a Runiczny splot jest bezwzględnie najmocniejszym enchantem Ducha klatki, zaś Runiczna skóra jedynym enchantem Zręczności nóg. Dokładne premie są w tabeli poniżej.\n\nNad zwykłymi niższymi poziomami znajduje się Świetlisty, szczytowa zwykła praca profesji: Zaklinanie 100 dla czterech enchantów i 125 dla Infuzji, jak pokazuje kolumna Umiejętność. Każdy wymaga Świetlistego reagenta i dodaje kolejny krok na własnym miejscu: broń z opcją Mocy i Mocy zaklęć, klatka oraz buty. Ostatnia, Świetlista infuzja, działa tylko na części Udoskonalonej: Udoskonalanie jest pracą noszącego, nie zaklinacza, a strona Profesje wyjaśnia, jak część je zdobywa.\n\nZapał Ostatniego Płomienia jest osobną recepturą raidową, nie darmowym zwykłym enchantem. Naucz się jego wymienialnej formuły przy Zaklinaniu 100 przed użyciem. Każde zastosowanie zużywa 3 rdzenie Ostatniego Płomienia i 2 Odłamki dzwonu. Formuła może wypaść w Tyglu albo zostać kupiona u jego kwatermistrza za jeden rdzeń. Zasady wyzwalacza wręcz i szybkości broni są w całości poniżej.',
   'guide.profPages.faq.a6ThreeRods':
     'Dziewięć zwykłych receptur polowych i sześć receptur wytwarzanych narzędzi lądowych każdy zna od początku. Tak samo jest z trzema recepturami związanymi ze stanowiskiem, Płaszczem z łuskokuźni, Kapturem ochronnego splotu i Owijaczami mrocznej skóry, które nie potrzebują trenera, tylko własnego stanowiska. Wszystkiego innego uczą rezydujący mistrzowie przy stanowiskach w trzech miastach hubach: większość stoi w Eastbrook, garbarz prowadzi garbarnię w Fenbridge, a alchemik aptekę w Highwatch.\n\nReceptury trenera biegną szczeblami: umiejętność 0, 25 i 50 dla rzemiosł sprzętu i materiałów użytkowych, z jednorazowymi opłatami 0, 25 srebra i 1 złota. Każda profesja dodaje pośredni szczebel 75 przy swoim stanowisku, w Zaklinaniu jest nim Świetlisty reagent obok dwóch receptur uroków na szczeblu 25. Narzędziarz uczy także dwóch z trzech wytwarzanych wędek przy 75 i 125 za 4 i 16 złota. Szczytowego szczebla uczy schemat, więc trener nie podaje dla niego opłaty. Mistrz uczy receptury, gdy twój przedział w profesji osiągnie własny przedział receptury, a ty musisz stać przy jego stanowisku. Stanowisko mobilne się nie liczy.',
   'guide.profPages.faq.a7RetunedTaper':
@@ -16986,7 +16981,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.farm.gainBody':
     'Przyrost jest deterministyczny i zależy od własnego licznika, nie od uprawy: {g1} biegłości za zbiór poniżej {p1}, {g2} poniżej {p2}, {g3} poniżej {p3} i {g4} przez resztę drogi do limitu {cap}. Nigdy nie jest to rzut na rozwój, więc wspinaczka trwa dokładnie tyle, ile wynika z rachunku.\n\nPoziom uprawy decyduje, jak daleko grządka może cię prowadzić. Uprawa poziomu 1 uczy do {c1}, po czym szarzeje, uprawa poziomu 2 do {c2}, a poziom 3 i wyższe do limitu. To przechodzenie na wyższe grządki utrzymuje ruch licznika.',
   'guide.profPages.farm.rhythmBody':
-    'Sadzenie jest krótkim widocznym rzucaniem: dokładnie {plant} sekundy na każdym szczeblu, bo motyka otwiera ziemię, a nie kupuje szybkość. Wyciągnięcie dojrzałej uprawy jest natychmiastowe. Nie ma rzucania do przerwania ani kontroli torby, która mogłaby odmówić zbioru, a gotowa grządka czeka tak długo, jak ją zostawisz, więc pełna torba kosztuje farmera tylko spacer, by ją opróżnić.\n\nZbiór płaci plonem i biegłością Rolnictwa. W przeciwieństwie do żyły nie daje w ogóle doświadczenia postaci, więc grządki są profesją do pracy, nie sposobem na poziomy.',
+    'Sadzenie jest natychmiastowe, bo motyka otwiera ziemię, a nie kupuje szybkość: nie ma rzucania, na które trzeba czekać, więc farmer, który odejdzie, i tak zasadził. Wyciągnięcie dojrzałej uprawy też jest natychmiastowe. Nie ma rzucania do przerwania ani kontroli torby, która mogłaby odmówić zbioru, a gotowa grządka czeka tak długo, jak ją zostawisz, więc pełna torba kosztuje farmera tylko spacer, by ją opróżnić.\n\nZbiór płaci plonem i biegłością Rolnictwa. W przeciwieństwie do żyły nie daje w ogóle doświadczenia postaci, więc grządki są profesją do pracy, nie sposobem na poziomy.',
   'guide.profPages.farm.tableBodyOneMeal':
     'Kuchnie są miejscem, w którym sezon płaci dalej. Poza codziennymi daniami rolnymi każdy poziom uprawy ma bogatsze danie pozostawiające efekt Dobrze najedzony: dokończ posiłek, a trwała premia zostanie z tobą, dokładnie ten rodzaj przewagi, który grupa chce zjeść przed drzwiami lochu. Jednocześnie działa tylko jeden efekt Dobrze najedzony, nowszy posiłek go zastępuje. Zestaw wieńczy Uczta plonów, półmisek, który kucharz rozstawia w świecie: każda obecna osoba bierze własną porcję, po jednej, a każdy ukończony posiłek daje tę samą premię. Jeden sezon farmera może nakryć stół dla całej drużyny. Szczyt drabiny, dwa najbogatsze dania i sama uczta, opiera się na uprawach górskich i parterowych, których nasiona sprzedają farmerzy przy tych grządkach. Receptury to inna sprawa: wyższe szczeble drabiny rolnej nie są już nauczane przy żadnej ladzie, lecz znajdują się w końcu gry albo kupuje się je za Bohaterskie znaki jak każdą inną recepturę końca gry. Sama drabina dań należy do Gotowania i strona Gotowanie zawiera każdy szczebel.\n\nSzczęście również zasiada przy tym stole. Każdy przyniesiony zbiór losuje tę samą szansę dodatkowego łupu co inne profesje zbierackie, a od czasu do czasu uprawa staje się złota: plon jest znacznie większy niż zwykły zbiór, pojawia się coś dodatkowego, nasiono lepszej ziemi albo czasem jedna z receptur końca gry, cała strefa słyszy ogłoszenie z nazwą, a Złoty zbiór trafia do Księgi dokonań.',
   'guide.profPages.farm.yieldsBody':
@@ -17057,4 +17052,240 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
 
   'guide.professions.endgameHeading': 'Końcowa faza Mistrzowsko kute',
   'guide.professions.perfectingHeading': 'Doskonalenie i pomarańczowa promocja',
+  'hud.chat.templates.raidWarning': '[Ostrzeżenie o nalocie] {name}: {message}',
+  'hudChrome.bugReport.online': 'W Internecie',
+  'hudChrome.charSidebar.crafting': 'Rzemiosło',
+  'hudChrome.charSidebar.gathering': 'Zgromadzenie',
+  'hudChrome.charSidebar.label': 'Szczegóły postaci',
+  'hudChrome.charSidebar.openProfessions': 'Otwarte zawody',
+  'hudChrome.charSidebar.progression': 'Postęp',
+  'hudChrome.charSidebar.skills': 'Umiejętności',
+  'hudChrome.charSidebar.stats': 'Statystyki',
+  'hudChrome.charSidebar.subtitle': 'Poziom {level} {className}. {archetype}. Hobby: {hobby}',
+  'hudChrome.charSidebar.subtitleNoHobby': 'Poziom {level} {className}. {archetype}',
+  'hudChrome.controller.device': 'Podłączone urządzenie',
+  'hudChrome.controller.deviceConnected': 'Połączony',
+  'hudChrome.controller.deviceDisconnected': 'Nie wykryto kontrolera',
+  'hudChrome.cosmetics.preview': 'Zapowiedź',
+  'hudChrome.cosmetics.previewAria': 'Podgląd {name}',
+  'hudChrome.crafting.materialsFooter':
+    'Materiały w skarbcu są pobierane automatycznie. Więcej przepisów znajdziesz na stacji.',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} utrzymany: {count}, ale tutaj liczy się tylko ocena dobra)',
+  'hudChrome.crafting.tierTutorial.radar':
+    'Twoje zawody tworzą koło. Dostosuj się do sąsiedniej pary, a te dwa rzemiosła staną się nieograniczonymi specjalizacjami, jedno rzemiosło na kole stanie się hobby z rzadkim ograniczeniem, a reszta pozostaje uśpiona: ich wiedza zostaje zachowana, ale ograniczona wspólnie, dopóki nie podejmiesz ich ponownie.',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    'Jednostka osiąga swój pierwszy poziom z umiejętnością {skill}, a każdy poziom ulepsza to, co może wytworzyć. Ale rzemiosło może pokonać rzadkie prace tylko wtedy, gdy jest jedną z twoich dwóch specjalizacji.',
+  'hudChrome.finder.lockoutWeekly': 'Cotygodniowa blokada każdego bossa',
+  'hudChrome.finder.mech.ancestral_sap': 'Ancestral Sap (leczy sojuszników)',
+  'hudChrome.finder.mech.anvils_decree':
+    'Dekret Anvila (trzy uderzenia młotem na cały najazd, leczenie poprzez)',
+  'hudChrome.finder.mech.apocalypse_add':
+    'Ignivar Popielnik (priorytet dodaj rzucenie Apokalipsy, zabij go szybko)',
+  'hudChrome.finder.mech.beast_pit_quake': 'Trzęsienie Bestii (obrażenia obszarowe)',
+  'hudChrome.finder.mech.bloodmane_rend':
+    'Rozdzieranie Krwawej Grzywy (krwawienie, uważaj na zamianę celów)',
+  'hudChrome.finder.mech.brand_of_the_pyre':
+    'Znak Stosu (układający się znak ognia, zmyć go w wodzie z przewodu)',
+  'hudChrome.finder.mech.call_of_the_hunt': 'Zew Polowania (przyspiesza pobliskich sojuszników)',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    'Łańcuchy Kuźni (tylko w trybie heroicznym, trzymaj się blisko połączonego partnera)',
+  'hudChrome.finder.mech.cinder_orbs':
+    'Kule Cinder (oznaczeni gracze rozproszeni po krawędziach pomieszczenia)',
+  'hudChrome.finder.mech.falling_cinders': 'Falling Cinders (kręgi meteorytów na graczach, wyjdź)',
+  'hudChrome.finder.mech.forge_strike':
+    'Forge Strike (kumulujące się osłabienie podczas zmiany czołgu)',
+  'hudChrome.finder.mech.forge_wave':
+    'Forge Wave (rozszerzająca się ściana ognia, skorzystaj z dwóch bezpiecznych pasów)',
+  'hudChrome.finder.mech.forgefathers_sweep':
+    'Zamiatanie Ojca Kuźniarza (szeroki stożek czołowy u osób niebędących czołgami)',
+  'hudChrome.finder.mech.forgestorm': 'Forgestorm (spadające kręgi meteorytów, wyjdź)',
+  'hudChrome.finder.mech.jaguar_roar': 'Ryk Jaguara (odrzut)',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    'Sąd Kuźni (przerwa, podziel się jedynym bezpiecznym schronieniem)',
+  'hudChrome.finder.mech.last_inferno': 'Ostatnie piekło (45 sekund spalania przy 20% zdrowia)',
+  'hudChrome.finder.mech.makers_brand':
+    'Marka Twórcy (kumulujące się osłabienie przy wymianie czołgów)',
+  'hudChrome.finder.mech.masters_assembly':
+    'Zgromadzenie Mistrza (blokuj belki kuźni, obracaj blokery)',
+  'hudChrome.finder.mech.rain_of_cinders':
+    'Deszcz Popiołów (trzy ogniste stożki, stań pomiędzy nimi)',
+  'hudChrome.finder.mech.revolving_inferno':
+    'Obrotowe Piekło (rotujące promienie ognia, poruszają się przez szczeliny)',
+  'hudChrome.finder.mech.shared_pyre': 'Wspólny stos (krąg gromadzenia, podziel obrażenia)',
+  'hudChrome.finder.mech.tempering_ray':
+    'Promień Hartowania (linia do oznaczonego gracza, przechwyć go)',
+  'hudChrome.finder.mech.thickhide_ward': 'Totem Grubej Skóry (osłania pobliskich sojuszników)',
+  'hudChrome.finder.mech.tusk_sweep': 'Zamiatanie kłami (rozcięcie czołowe)',
+  'hudChrome.finder.mech.wildheart_pulse': 'Puls Dzikiego Serca (pulsujące obrażenia obszarowe)',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'Poniżej tej umiejętności nadal działa jako narzędzie niższego poziomu.',
+  'hudChrome.keybinds.hideInterface': 'Ukryj interfejs',
+  'hudChrome.keybinds.targetParty1': 'Członek grupy docelowej 1',
+  'hudChrome.keybinds.targetParty2': 'Członek grupy docelowej 2',
+  'hudChrome.keybinds.targetParty3': 'Członek grupy docelowej 3',
+  'hudChrome.keybinds.targetParty4': 'Członek grupy docelowej 4',
+  'hudChrome.keybinds.targetParty5': 'Członek grupy docelowej 5',
+  'hudChrome.keybinds.targetParty6': 'Członek grupy docelowej 6',
+  'hudChrome.keybinds.targetParty7': 'Członek grupy docelowej 7',
+  'hudChrome.keybinds.targetParty8': 'Członek grupy docelowej 8',
+  'hudChrome.keybinds.targetParty9': 'Członek grupy docelowej 9',
+  'hudChrome.keybinds.targetSelf': 'Celuj w siebie',
+  'hudChrome.keybinds.wheelHeldRefused':
+    'Nacięcie koła nie może sterować wstrzymaną akcją, taką jak ruch. Wybierz dla niego klawisz lub przycisk myszy.',
+  'hudChrome.keybinds.wheelHint':
+    'Kółko myszy również się wiąże: obracaj je w górę lub w dół podczas wiązania, przytrzymując klawisz Ctrl, Alt lub Shift, jeśli chcesz. Zoom i oddalanie kamery domyślnie znajdują się na gołym kole; przesuń je do akordu, np. Ctrl+koło, aby zwolnić koło dla umiejętności.',
+  'hudChrome.keybinds.zoomIn': 'Przybliż kamerę',
+  'hudChrome.keybinds.zoomOut': 'Pomniejsz kamerę',
+  'hudChrome.mapAtlas.availableNearby': 'Dostępne w pobliżu',
+  'hudChrome.mapAtlas.distance': '{distance} jardów',
+  'hudChrome.mapAtlas.filters.dungeons': 'Lochy',
+  'hudChrome.mapAtlas.filters.gather': 'Zebrać',
+  'hudChrome.mapAtlas.filters.players': 'Gracze',
+  'hudChrome.mapAtlas.filters.quests': 'Zadania',
+  'hudChrome.mapAtlas.filters.services': 'Usługi',
+  'hudChrome.mapAtlas.filtersAria': 'Warstwy mapy',
+  'hudChrome.mapAtlas.landmarkCount': '{count} punkty orientacyjne',
+  'hudChrome.mapAtlas.legend.dungeon': 'Loch',
+  'hudChrome.mapAtlas.legend.herb': 'Ziele',
+  'hudChrome.mapAtlas.legend.mail': 'Poczta',
+  'hudChrome.mapAtlas.legend.ore': 'Ruda',
+  'hudChrome.mapAtlas.legend.passage': 'Przejście',
+  'hudChrome.mapAtlas.level': 'Poziom {level}',
+  'hudChrome.mapAtlas.noNearbyQuests': 'Brak zadań w pobliżu',
+  'hudChrome.mapAtlas.noTrackedQuests': 'Brak śledzonych zadań',
+  'hudChrome.mapAtlas.showRoute': 'Pokaż trasę',
+  'hudChrome.mapAtlas.track': 'Ścieżka',
+  'hudChrome.mapAtlas.trackedQuests': 'Śledzone zadania',
+  'hudChrome.mapAtlas.untrack': 'Nieśledzone',
+  'hudChrome.marketWindow.mixedListingsFooter':
+    'Kupiec uzupełnia zapasy towarów powszechnych; Listy graczy znajdują się obok nich po cenie wywoławczej.',
+  'hudChrome.materialHint.fineFarmGrade':
+    'Dobra ocena. Niektóre zbiory wychodzą dobrze, częściej przy wyższych umiejętnościach Rolnictwa lub naładowanym Oku Rzemieślnika. Zwykłe produkty nigdy się nie liczą tam, gdzie wymagana jest najwyższa jakość.',
+  'hudChrome.nameplate.npcRole.alchemyTrainer': 'Trener Alchemii',
+  'hudChrome.nameplate.npcRole.armorVendor': 'Sprzedawca zbroi',
+  'hudChrome.nameplate.npcRole.armsDealer': 'Handlarz bronią',
+  'hudChrome.nameplate.npcRole.auctioneer': 'Licytator',
+  'hudChrome.nameplate.npcRole.banker': 'Bankier',
+  'hudChrome.nameplate.npcRole.cardMaster': 'Mistrz kart',
+  'hudChrome.nameplate.npcRole.cookingTrainer': 'Trener gotowania',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'Kwatermistrz Tygla',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': 'Trener Inżynierii',
+  'hudChrome.nameplate.npcRole.foodVendor': 'Sprzedawca żywności i napojów',
+  'hudChrome.nameplate.npcRole.generalGoods': 'Towary ogólne',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': 'Bohaterski kwatermistrz',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': 'Trener obróbki skóry',
+  'hudChrome.nameplate.npcRole.potionVendor': 'Sprzedawca eliksirów',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'Sprzedawca PvP',
+  'hudChrome.nameplate.npcRole.riftForgemaster': 'Mistrz Kuźni Szczeliny',
+  'hudChrome.nameplate.npcRole.stableMaster': 'Stabilny Mistrz',
+  'hudChrome.nameplate.npcRole.tailoringTrainer': 'Trener krawiectwa',
+  'hudChrome.nameplate.npcRole.weaponVendor': 'Sprzedawca broni',
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': 'Trener kowalstwa',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.options.confirmVendorSellMinQuality': 'Potwierdź sprzedaż z jakości',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'Przedmioty poniżej tej jakości można sprzedać jednym kliknięciem; błędnie sprzedany przedmiot nadal można odkupić od sprzedawcy.',
+  'hudChrome.partyFrames.header': 'Impreza',
+  'hudChrome.professions.retentionFooter': 'Zwroty z respec: 60% umiejętności zachowanych.',
+  'hudChrome.professions.tutorialLink': 'Poradnik dotyczący zawodu',
+  'hudChrome.pullTimer.cancel': 'Wyciągnięcie anulowane.',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': 'CIĄGNĄĆ!',
+  'hudChrome.pullTimer.start': 'Pociągnij {seconds} s!',
+  'hudChrome.questLog.completed': 'Zakończony',
+  'hudChrome.questLog.shiftHint':
+    'Kliknij zadanie, przytrzymując klawisz Shift, aby połączyć je na czacie.',
+  'hudChrome.questLog.zoneSummary': '{count} ({ready} gotowy)',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.readyCheck.close': 'Zamknąć',
+  'hudChrome.readyCheck.memberNotReady': '{name} nie jest gotowy.',
+  'hudChrome.readyCheck.memberPending': '{name} jeszcze nie odpowiedział.',
+  'hudChrome.readyCheck.memberReady': '{name} jest gotowy.',
+  'hudChrome.readyCheck.status': 'Gotowy: {ready}/{total}',
+  'hudChrome.readyCheck.title': 'Gotowe sprawdzenie',
+  'hudChrome.readyCheck.waiting': 'Czekam na odpowiedzi...',
+  'hudChrome.recipeTracker.collapseHint': 'Zwiń moduł śledzenia przepisów',
+  'hudChrome.recipeTracker.expandHint': 'Rozwiń moduł śledzenia przepisów',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.pin': 'Szpilka',
+  'hudChrome.recipeTracker.pinAria': 'Przypnij {name} do modułu śledzącego HUD',
+  'hudChrome.recipeTracker.pinFull': 'Moduł śledzenia przepisów jest pełny (do {cap} przepisów)',
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.recipeTracker.trackerLabel': 'Przepisy',
+  'hudChrome.recipeTracker.unpin': 'Odpiąć',
+  'hudChrome.recipeTracker.unpinAria': 'Odepnij {name} od trackera HUD',
+  'hudChrome.social.who.allClasses': 'Wszystkie zajęcia',
+  'hudChrome.social.who.capped':
+    'Wyświetlam pierwszy {delivered}. Zawęź wyszukiwanie, aby zobaczyć resztę.',
+  'hudChrome.social.who.classFilter': 'Filtruj według zajęć',
+  'hudChrome.social.who.colClass': 'Klasa',
+  'hudChrome.social.who.colGuild': 'Gildia',
+  'hudChrome.social.who.colLevel': 'Poziom',
+  'hudChrome.social.who.colName': 'Nazwa',
+  'hudChrome.social.who.colStatus': 'Status',
+  'hudChrome.social.who.colZone': 'Strefa',
+  'hudChrome.social.who.count': '{total} online',
+  'hudChrome.social.who.countFiltered': '{shown} z {total} online',
+  'hudChrome.social.who.empty': 'Żaden gracz nie pasuje.',
+  'hudChrome.social.who.loading': 'Zapytanie królestwa, kto jest online...',
+  'hudChrome.social.who.search': 'Szukaj',
+  'hudChrome.social.who.searchPlaceholder': 'Nazwa, strefa lub gildia',
+  'hudChrome.social.who.sortTitle': 'Sortuj według {column}',
+  'hudChrome.social.who.tab': 'Kto',
+  'hudChrome.talkingHead.label': 'Dialog',
+  'hudChrome.wocMarket.colBuyer': 'Kupujący',
+  'hudChrome.wocMarket.colSalePrice': 'Cena sprzedaży',
+  'hudChrome.wocMarket.colSaleType': 'Typ',
+  'hudChrome.wocMarket.colSoldAt': 'Sprzedany',
+  'hudChrome.wocMarket.historyEmpty': 'Nie odnotowano jeszcze żadnej sprzedaży.',
+  'hudChrome.wocMarket.historyError': 'Nie można wczytać historii sprzedaży.',
+  'hudChrome.wocMarket.saleTypeAuction': 'Aukcja',
+  'hudChrome.wocMarket.saleTypeBuyNow': 'Kup teraz',
+  'hudChrome.wocMarket.saleTypeDirected': 'Skierowany',
+  'hudChrome.wocMarket.saleTypeUnknown': 'Nieznany',
+  'hudChrome.wocMarket.tabHistory': 'Historia sprzedaży',
+  'hudChrome.wocStore.mountBuy': 'Kup skórkę wierzchowca',
+  'hudChrome.wocStore.mountInspectAria': 'Podgląd {item}',
+  'hudChrome.wocStore.mountOnly': 'Tylko do montażu',
+  'hudChrome.wocStore.mountRideIt': 'Jeździj',
+  'hudChrome.wocStore.mountScopeLine':
+    'Skórka obejmująca całe konto. Noszony przez jedną postać na raz.',
+  'itemUi.errors.sweepNoListings': 'Żadne aukcje tego przedmiotu nie są dostępne do przeszukania.',
+  'itemUi.errors.sweepPriceChanged':
+    'Ceny zmieniły się przed wylądowaniem Twojej loterii. Sprawdź wycenę i spróbuj ponownie.',
+  'itemUi.market.sweep': 'Zamiatać',
+  'itemUi.market.sweepAria': 'Przeszukaj rynek w poszukiwaniu {item}',
+  'itemUi.market.sweepButton': 'Zamiatać',
+  'itemUi.market.sweepChanged':
+    'Wycena została zmieniona przed potwierdzeniem. Sprawdź sumę i spróbuj ponownie.',
+  'itemUi.market.sweepClose': 'Zamknąć',
+  'itemUi.market.sweepConfirmBody':
+    'Kupić {item} x{units} w {listings} aukcjach za {total} ({each} każdy)?',
+  'itemUi.market.sweepConfirmTitle': 'Potwierdź przeszukanie rynku',
+  'itemUi.market.sweepNote':
+    'Kupuje całe aukcje od innych sprzedawców, najpierw najtaniej za jednostkę, aż do wyczerpania liczby. Możesz otrzymać o kilka więcej, niż prosiłeś.',
+  'itemUi.market.sweepQuantity': 'Poszukiwane jednostki',
+  'itemUi.market.sweepQuoteLine':
+    '{units} jednostek w {listings} aukcjach dla {total} ({each} każdy)',
+  'itemUi.market.sweepQuoteNone': 'Brak aukcji tego przedmiotu do przeszukania.',
+  'itemUi.market.sweepQuoteShort':
+    'Dostępnych jest tylko {units} jednostek w {listings} aukcjach, dla {total} ({each} każda)',
+  'itemUi.market.sweepTitle': 'Przegląd rynku: {item}',
+  'devCommand.actions.town.description': 'Teleportuj się do centrum miasta według nazwy.',
+  'devCommand.actions.town.label': 'Centrum miasta',
+  'devCommand.fields.town': 'Miasto',
+  'entities.mobs.healing_dummy_caster.name': 'Ranny manekin czarodzieja',
+  'entities.mobs.healing_dummy_ranger.name': 'Poobijany manekin Rangera',
+  'entities.mobs.healing_dummy_scout.name': 'Krytyczny manekin skauta',
+  'entities.mobs.healing_dummy_soldier.name': 'Ranny manekin żołnierza',
+  'entities.mobs.healing_dummy_tank.name': 'Ranny manekin Straży Przedniej',
+  'guide.controls.hideInterface': 'Ukryj interfejs (zrzuty ekranu i filmy)',
+  'guide.controls.targetParty':
+    'Celuj w członków drużyny od 1 do 9, od góry do dołu, tak jak pokazują to ramki drużyny',
+  'guide.controls.targetSelf': 'Celuj w siebie',
+  'guide.interfacePage.framesGovernedTalkingHead':
+    'Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.',
+  'guide.settingsPage.keybindsWheelBody':
+    'Samo koło też wiąże. Powiększ kamerę i pomniejsz kamerę to zwykłe powiązania, które domyślnie znajdują się na gołym kole, więc możesz przesunąć je do Ctrl plus kółko lub do klawiszy, a następnie obrócić uwolnione koło, aby uruchomić szczeliny paska akcji. Nacięcie w kole nie ma zwolnienia, więc nie może napędzać wstrzymanej akcji, takiej jak ruch do przodu.',
 };

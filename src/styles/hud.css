@@ -2466,6 +2466,25 @@
       stroke: CanvasText;
     }
   }
+  /* The target's raid marker badge (index.html #tf-raid-marker): the party mark
+     symbol at the portrait's top-right, mirroring the level chip's bottom-left
+     corner so the two never contend. The unit_frame painter writes the symbol
+     image url and toggles display; hidden by default so an unmarked target
+     shows no empty well. z-index 3 sits with the chip, above the deed ring. */
+  .uf-raid-marker {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    display: none;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    filter: drop-shadow(0 1px calc(2px * var(--fx-shadow, 1)) var(--color-art-shadow));
+    pointer-events: none;
+    z-index: 3;
+  }
   /* painted combat-status crest on the player portrait (classic style) */
   .combat-flash {
     display: none;
@@ -2620,7 +2639,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-shadow: 1px 1px 2px #000;
+    text-shadow: 1px 1px 2px var(--text-outline-color);
   }
   /* Book of Deeds title decoration inside the name line: muted gold, INLINE in
      the same nowrap ellipsized line (the frame keeps its single-line height;
@@ -2667,6 +2686,19 @@
   .hp {
     --bar-color: var(--color-hp);
   }
+  .bar-text {
+    position: absolute;
+    inset: 0;
+    text-align: center;
+    font-size: 11px;
+    /* Tracks the var-driven bar thickness above so the text stays vertically
+       centred at any playerFrameHeight / targetFrameHeight. */
+    line-height: var(--uf-bar-height, 15px);
+    color: var(--color-white);
+    text-shadow: 1px 1px 1px var(--color-keyline);
+    font-weight: bold;
+    z-index: 4;
+  }
   .mana {
     --bar-color: var(--color-mana);
   }
@@ -2695,14 +2727,21 @@
     box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.4);
     pointer-events: none;
     transition: transform 0.12s linear;
+    z-index: 1;
   }
   .bar-absorb.overshield {
+    z-index: 3;
     background: repeating-linear-gradient(
       115deg,
       rgba(255, 236, 160, 0.55) 0 5px,
       rgba(255, 214, 90, 0.24) 5px 10px
     );
     box-shadow: inset 0 0 7px rgba(255, 225, 140, 0.6);
+  }
+  /* The Show Absorb Shields option (absorb_overlay_gate.ts) hides every unit-frame
+     shield hatch through one root class; the painter keeps the segment current. */
+  .absorb-shields-hidden .bar-absorb {
+    display: none;
   }
   /* Low-mana/energy warning: the resource fill pulses brighter and a short
      caption appears at the end of the bar. Driven by --lr-opacity / --lr-pulse
@@ -4357,7 +4396,9 @@
       box-shadow: none;
     }
   }
-  body:has(.paladin-devotion.last-charge) .action-btn.empowered {
+  /* body.devotion-last-charge is stamped by PaladinDevotionPainter beside the
+     medallion's own last-charge class (src/ui/root_state_classes.ts). */
+  body.devotion-last-charge .action-btn.empowered {
     animation-duration: 0.55s;
     filter: brightness(1.18);
   }
@@ -5482,6 +5523,95 @@
     animation: none;
     color: var(--color-text-light);
     text-shadow: 0 0 6px var(--color-tracker-reliquary);
+  }
+
+  /* ---------- pinned-recipe tracker ---------- */
+  /* The recipes the player pinned from the crafting window, each over its
+     reagent have/need lines. Header chrome is the shared dt-* tracker
+     vocabulary (fit-content width, the #reliquary-tracker rail rationale);
+     the rt-* rows are this strip's own shape. */
+  #recipe-tracker {
+    width: 100%;
+    font-size: 12px;
+    color: var(--color-text-overlay);
+    text-shadow: 1px 1px 2px var(--text-outline-color);
+    pointer-events: none;
+  }
+  #recipe-tracker .dt-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    font-family: var(--title-font);
+    font-size: 14px;
+    color: var(--color-text-overlay);
+    text-align: left;
+    background: none;
+    border: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold) 27%, transparent);
+    margin: 0 0 4px;
+    padding: 0 0 2px;
+    cursor: pointer;
+    pointer-events: auto;
+    text-shadow: 1px 1px 2px #000;
+  }
+  #recipe-tracker .dt-header:hover {
+    color: var(--color-quality-default);
+  }
+  #recipe-tracker .dt-header:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+  #recipe-tracker .dt-chevron {
+    font-size: 10px;
+    line-height: 1;
+  }
+  #recipe-tracker .dt-tally {
+    color: var(--color-text-overlay);
+    font-weight: 400;
+    opacity: 0.85;
+  }
+  @media (pointer: coarse) {
+    #recipe-tracker .dt-header {
+      min-height: 40px;
+    }
+  }
+  #recipe-tracker .rt-recipe {
+    margin-top: 4px;
+  }
+  #recipe-tracker .rt-name {
+    font-weight: bold;
+    font-family: var(--title-font);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #recipe-tracker .rt-ready .rt-name {
+    color: var(--color-quest);
+  }
+  #recipe-tracker .rt-mat {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding-left: 10px;
+    font-size: 11px;
+    opacity: 0.9;
+  }
+  #recipe-tracker .rt-mat-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  #recipe-tracker .rt-mat-count {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+  }
+  #recipe-tracker .rt-mat.done {
+    color: var(--color-quest);
+    opacity: 0.75;
   }
 
   /* ---------- delve tracker ---------- */
@@ -7339,10 +7469,13 @@
         100%
     );
   }
+  /* The desktop composer is a body-level sibling of #ui, so its hover and focus
+     reach the frame as classes on the wrap (src/ui/chat_composer_focus_controller.ts),
+     never through a body :has() (src/ui/root_state_classes.ts). */
   #chatlog-wrap:hover #chatlog-frame,
   #chatlog-wrap:focus-within #chatlog-frame,
-  body:has(#chat-input:hover) #chatlog-frame,
-  body:has(#chat-input:focus) #chatlog-frame {
+  #chatlog-wrap.chat-composer-hover #chatlog-frame,
+  #chatlog-wrap.chat-composer-focus #chatlog-frame {
     --chat-soft: 1;
   }
   /* HUD Opacity (--hud-opacity), fades frames/windows as a whole. */
@@ -8273,6 +8406,145 @@
   #banner.banner-skill .banner-art {
     width: 52px;
     height: 52px;
+  }
+  /* Raid Warning alert stack (raid_warning_banner.ts).
+     High-contrast vibrant orange banners in the upper area of the screen,
+     mirroring the classic MMO raid warning presentation. */
+  #raid-warning-banner {
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+    z-index: 100;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
+  }
+  .raid-warning-line {
+    color: var(--color-raid-warning-text);
+    font-size: 34px;
+    font-weight: bold;
+    font-family: var(--title-font);
+    letter-spacing: 0.8px;
+    padding: 8px 26px;
+    border: 1px solid var(--color-raid-warning-border);
+    border-radius: 8px;
+    background: var(--color-raid-warning-bg);
+    box-shadow:
+      var(--shadow-raid-warning-glow),
+      0 4px 18px var(--color-art-shadow);
+    text-shadow: var(--shadow-raid-warning-text);
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    opacity: 1;
+    transition:
+      opacity 0.4s ease,
+      transform 0.3s ease;
+  }
+  .raid-warning-line.fade {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  /* Ready Check Leader Window (ready_check_leader_window.ts).
+     Compact square window displaying member ready statuses for the party leader. */
+  #ready-check-leader-window {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    transform: translateX(-50%);
+    width: 220px;
+    min-height: 140px;
+    background: var(--color-ready-check-bg);
+    border: 1.5px solid var(--color-ready-check-border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-ready-check);
+    padding: 10px 14px;
+    z-index: 120;
+    pointer-events: auto;
+    font-family: var(--font-ui, sans-serif);
+    color: var(--color-ready-check-text);
+    box-sizing: border-box;
+  }
+  #ready-check-leader-window .rck-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--color-ready-check-rule);
+    padding-bottom: 6px;
+    margin-bottom: 8px;
+  }
+  #ready-check-leader-window .rck-title {
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--color-ready-check-title);
+    letter-spacing: 0.5px;
+    font-family: var(--title-font, sans-serif);
+  }
+  #ready-check-leader-window .rck-close {
+    background: none;
+    border: none;
+    color: var(--color-ready-check-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+  }
+  #ready-check-leader-window .rck-close:hover {
+    color: var(--color-white);
+  }
+  #ready-check-leader-window .rck-roster {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+  }
+  #ready-check-leader-window .rck-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 6px;
+    background: var(--color-ready-check-row);
+    border-radius: 4px;
+  }
+  #ready-check-leader-window .rck-name {
+    font-size: 13px;
+    font-weight: 500;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #ready-check-leader-window .rck-status {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  #ready-check-leader-window .rck-status.rck-yes {
+    color: var(--color-ready-check-yes);
+    text-shadow: var(--shadow-ready-check-yes);
+  }
+  #ready-check-leader-window .rck-status.rck-no {
+    color: var(--color-ready-check-no);
+    text-shadow: var(--shadow-ready-check-no);
+  }
+  #ready-check-leader-window .rck-status-line {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--color-ready-check-rule-muted);
+    font-size: 11px;
+    color: var(--color-ready-check-muted-soft);
+    text-align: center;
   }
   /* Reduced-motion celebrations (hud.ts showBanner motion=false): the banner
      appears and clears instantly, same text and duration, no fade. */
@@ -9247,7 +9519,19 @@
   }
   #party-frames.party-style-raid .party-frame .bar.hp .bar-fill {
     background-color: var(--cls);
+    background-image: none;
     filter: saturate(0.82) brightness(0.82);
+    z-index: 2;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-absorb {
+    z-index: 1;
+    background: rgba(255, 255, 255, 0.28);
+    box-shadow: none;
+  }
+  #party-frames.party-style-raid .party-frame .bar.hp .bar-absorb.overshield {
+    z-index: 3;
+    background: rgba(255, 225, 140, 0.35);
+    box-shadow: none;
   }
   #party-frames.party-style-raid .party-frame > .bar:not(.hp) {
     position: absolute;
@@ -12544,5 +12828,30 @@
    keycaps straight back. */
   body.xhb-mode.pad-active:not(.mobile-touch) #side-buttons .keybind {
     display: none;
+  }
+
+  /* ---------- Hide Interface (Alt+Z, interface_visibility_core.ts) ---------- */
+  /* One body class hides every HUD surface for a clean screenshot or video:
+     each #ui child except the visually-hidden a11y live regions (screen readers
+     keep their combat/target/chat announcements), plus the body-level siblings
+     of #ui: the nameplate and aura layers, the Discord panel and banner, the
+     touch controls, and the pad cursor. The developer perf overlay is a #ui child, so
+     it hides with the rest. Three properties on purpose: `visibility` drops the
+     frames from the focus order and the accessibility tree, `opacity` closes
+     the hole a descendant that re-declares `visibility: visible` would open
+     (the raid boss guide's model hint, the Minimal-preset cross-hotbar rail),
+     and `pointer-events` hands every click to the game canvas. Not `display`,
+     so no HUD measurement (minimap canvas sizing, frame layout, tooltip anchors)
+     changes underneath a hidden frame. */
+  body.interface-hidden #ui > :not(.visually-hidden),
+  body.interface-hidden #nameplates,
+  body.interface-hidden #aura-overlays,
+  body.interface-hidden #discord-window,
+  body.interface-hidden #discord-cta-banner,
+  body.interface-hidden #mobile-controls,
+  body.interface-hidden #pad-mouse-cursor {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 }

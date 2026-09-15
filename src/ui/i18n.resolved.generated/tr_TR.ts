@@ -62,6 +62,7 @@ export const tr_TR: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Zindan",
+      "town": "Şehir",
       "difficulty": "Zorluk",
       "name": "Ad",
       "spec": "Uzmanlık",
@@ -159,6 +160,10 @@ export const tr_TR: EnTranslations = {
       "teleport": {
         "label": "Işınlan",
         "description": "Kesin dünya koordinatlarına git."
+      },
+      "town": {
+        "label": "Şehir merkezi",
+        "description": "Bir şehir merkezine isme göre ışınlanın."
       },
       "dungeon": {
         "label": "Zindana gir",
@@ -348,12 +353,25 @@ export const tr_TR: EnTranslations = {
       "banner": "{name} izleniyor"
     },
     "readyCheck": {
+      "title": "Hazır Kontrolü",
+      "close": "Kapalı",
       "prompt": "{name} bir hazır kontrolü başlattı. Hazır mısın?",
       "ready": "Hazır",
       "notReady": "Hazır Değil",
+      "status": "Hazır: {ready}/{total}",
+      "waiting": "Yanıtları bekliyorum...",
+      "memberReady": "{name} hazır.",
+      "memberNotReady": "{name} hazır değil.",
+      "memberPending": "{name} henüz yanıt vermedi.",
       "result": "Hazır kontrolü: {ready} hazır, {notReady} hazır değil, {noResponse} yanıt vermedi.",
       "notInPartyError": "Hazır kontrolü başlatmak için bir grupta olmalısın.",
       "inProgressError": "Bir hazır kontrolü zaten sürüyor."
+    },
+    "pullTimer": {
+      "start": "{seconds} saniye içinde içeri girin!",
+      "cancel": "Çekme iptal edildi.",
+      "countdown": "{seconds}",
+      "pull": "ÇEKMEK!"
     },
     "death": {
       "resurrectAtCorpse": "Cesedinin Başında Diril",
@@ -578,6 +596,11 @@ export const tr_TR: EnTranslations = {
       "mountsTitle": "Makine Stabil",
       "mountBuyAria": "{item}'yi satın alın",
       "mountSkinType": "Binek görünümü",
+      "mountInspectAria": "ÖNİZLEME {item}",
+      "mountRideIt": "ONU SÜR!",
+      "mountOnly": "Sadece binek",
+      "mountBuy": "Binek Derisi Satın Al",
+      "mountScopeLine": "Hesap çapında görünüm. Her seferinde bir karakter tarafından giyilir.",
       "loading": "WOC Mağazası yükleniyor...",
       "error": "WOC Mağazası şu anda kullanılamıyor. Lütfen kısa süre sonra tekrar deneyin.",
       "balance": "Claudium Bakiyesi",
@@ -1271,7 +1294,7 @@ export const tr_TR: EnTranslations = {
       "runSummary": "{time} içinde {total}"
     },
     "talkingHead": {
-      "label": "Dialogue"
+      "label": "Diyalog"
     },
     "hubLesson": {
       "target": "Başlamak için kuklayı hedefle.",
@@ -1402,6 +1425,7 @@ export const tr_TR: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "Savaş Alanı Sancak Eylemi",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
+      "hideInterface": "Arayüzü Gizle",
       "dive": "Aşağı Yüz",
       "categoryPet": "Yoldaş",
       "petAttack": "Yoldaş: Saldır",
@@ -1410,8 +1434,22 @@ export const tr_TR: EnTranslations = {
       "petDefensive": "Yoldaş: Savunmacı",
       "petAggressive": "Yoldaş: Saldırgan",
       "targetPet": "Yoldaş: Hedefle",
+      "targetSelf": "Kendini Hedefle",
+      "targetParty1": "Hedef Parti Üyesi 1",
+      "targetParty2": "Hedef Parti Üyesi 2",
+      "targetParty3": "Hedef Parti Üyesi 3",
+      "targetParty4": "Hedef Parti Üyesi 4",
+      "targetParty5": "Hedef Parti Üyesi 5",
+      "targetParty6": "Hedef Parti Üyesi 6",
+      "targetParty7": "Hedef Parti Üyesi 7",
+      "targetParty8": "Hedef Parti Üyesi 8",
+      "targetParty9": "Hedef Parti Üyesi 9",
       "mount": "Bin / İn",
-      "mouseHint": "Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır."
+      "mouseHint": "Fare düğmeleri de işe yarar: atama yaparken orta düğmeye (M3) veya bir yan düğmeye (M4, M5) bas. Sol ve sağ düğmeler kamera, tıklayarak hareket ve dünyadaki nesnelere tıklamak için ayrılmıştır.",
+      "zoomIn": "Kamerayı Yakınlaştır",
+      "zoomOut": "Kamerayı Uzaklaştır",
+      "wheelHint": "Fare tekerleği de bağlanır: İsterseniz Ctrl, Alt veya Shift tuşunu basılı tutarak bağlama sırasında yukarı veya aşağı doğru yuvarlayın. Kamerayı Yakınlaştır ve Uzaklaştır, varsayılan olarak çıplak tekerleğin üzerinde bulunur; Tekerleği yeteneklere serbest bırakmak için bunları Ctrl+tekerlek gibi bir akora taşıyın.",
+      "wheelHeldRefused": "Bir tekerlek çentiği, hareket gibi tutulan bir eylemi gerçekleştiremez. Bunun için bir anahtar veya fare düğmesi seçin."
     },
     "actionBar": {
       "editKeys": "Eylem çubuğu tuşlarını düzenle",
@@ -1682,6 +1720,8 @@ export const tr_TR: EnTranslations = {
       "showReliquaryTracker": "Emanet Takibini Göster",
       "confirmVendorSell": "Satmadan Önce Onayla",
       "confirmVendorSellNote": "Bunu kapatmak eşyaları tek tıkla ve onaysız satar, bu yüzden kayan bir çanta yuvası yanlış eşyayı satıcıya satabilir.",
+      "confirmVendorSellMinQuality": "Satışları Kaliteden Onaylayın",
+      "confirmVendorSellMinQualityNote": "Bu kalitenin altındaki ürünler tek tıkla satılıyor; Yanlış satılan bir ürün yine de satıcıdan geri alınabilir.",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
@@ -1735,9 +1775,9 @@ export const tr_TR: EnTranslations = {
     },
     "controller": {
       "title": "Oyun Kolu",
-      "device": "Connected Device",
-      "deviceConnected": "Connected",
-      "deviceDisconnected": "No controller detected",
+      "device": "Bağlı Cihaz",
+      "deviceConnected": "Bağlı",
+      "deviceDisconnected": "Denetleyici algılanmadı",
       "glyphStyle": "Düğme Etiketleri",
       "glyphStyleAuto": "Otomatik",
       "glyphStyleXbox": "Xbox",
@@ -2125,20 +2165,20 @@ export const tr_TR: EnTranslations = {
       "hidePlaytimeAria": "Oynama süresini gizle"
     },
     "charSidebar": {
-      "label": "Character details",
-      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
-      "subtitleNoHobby": "Level {level} {className} . {archetype}",
-      "stats": "Stats",
-      "progression": "Progression",
-      "skills": "Skills",
-      "gathering": "Gathering",
-      "crafting": "Crafting",
-      "openProfessions": "Open Professions"
+      "label": "Karakter ayrıntıları",
+      "subtitle": "Düzey {level} {className}. {archetype}. Hobi: {hobby}",
+      "subtitleNoHobby": "Düzey {level} {className}. {archetype}",
+      "stats": "İstatistikler",
+      "progression": "İlerleme",
+      "skills": "Yetenekler",
+      "gathering": "Toplama",
+      "crafting": "işçiliği",
+      "openProfessions": "Açık Meslekler"
     },
     "questLog": {
-      "completed": "Completed",
-      "zoneSummary": "{count} ({ready} ready)",
-      "shiftHint": "Shift-click a quest to link it in chat."
+      "completed": "Tamamlanmış",
+      "zoneSummary": "{count} ({ready} hazır)",
+      "shiftHint": "Sohbete bağlamak için bir göreve Shift tuşunu basılı tutarak tıklayın."
     },
     "statInfo": {
       "fromYour": "{value} {stat} değerinden:",
@@ -2388,7 +2428,7 @@ export const tr_TR: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Hata Bildir",
-      "online": "Online",
+      "online": "Çevrimiçi",
       "realm": "Dünya",
       "character": "Karakter",
       "position": "Konum",
@@ -3248,7 +3288,30 @@ export const tr_TR: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "UZAKTA",
       "cheaterTag": "< Hileci >",
-      "pledgeTag": "{guild} Yeminlisi"
+      "pledgeTag": "{guild} Yeminlisi",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Mezatçı",
+        "banker": "Bankacı",
+        "riftForgemaster": "Yarık Demirci Ustası",
+        "cardMaster": "Kart Ustası",
+        "crucibleQuartermaster": "Pota Malzeme Sorumlusu",
+        "heroicQuartermaster": "Kahraman Malzeme Sorumlusu",
+        "pvpVendor": "PvP Satıcısı",
+        "weaponsmithTrainer": "Demircilik Eğitmenliği",
+        "cookingTrainer": "Aşçılık Eğitmeni",
+        "tailoringTrainer": "Terzilik Eğitmeni",
+        "engineeringTrainer": "Mühendislik Eğitmeni",
+        "leatherworkingTrainer": "Deri İşleme Eğitmeni",
+        "alchemyTrainer": "Simya Eğitmeni",
+        "weaponVendor": "Silah Satıcısı",
+        "armorVendor": "Zırh Satıcısı",
+        "armsDealer": "Silah Satıcısı",
+        "foodVendor": "Yiyecek ve İçecek Satıcısı",
+        "potionVendor": "İksir Satıcısı",
+        "stableMaster": "Kararlı Usta",
+        "generalGoods": "Genel Ürünler"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Seviye {level} {family}",
@@ -3267,7 +3330,7 @@ export const tr_TR: EnTranslations = {
       "lock": "Oyuncu çerçevesini kilitle"
     },
     "partyFrames": {
-      "header": "Party",
+      "header": "Parti",
       "section": "Grup ve Akın Çerçeveleri",
       "optionsSection": "Grup Çerçevesi Seçenekleri",
       "unlock": "Grup ve akın çerçevelerini taşı",
@@ -3482,6 +3545,7 @@ export const tr_TR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
+      "fineFarmGrade": "İyi derece. Bazı hasatlar iyi sonuç verir, çoğunlukla daha yüksek Çiftçilik becerilerinde veya yüklü Zanaatkar Gözüyle. Sıradan ürünler, iyi kalitenin gerekli olduğu durumlarda asla sayılmaz.",
       "cookingCatch": "Pişirme malzemesi. Yemeden önce pişirilmelidir.",
       "usedBy": "{crafts} tarafından kullanılır.",
       "arcaneDust": "Üretim malzemesi. Sıradan ve sıra dışı teçhizatın büyüsü bozulunca elde edilir.",
@@ -4022,6 +4086,25 @@ export const tr_TR: EnTranslations = {
       "lastSeenNever": "hiç",
       "ignoredTab": "Yok sayılanlar",
       "blockedTab": "Engellenenler",
+      "who": {
+        "tab": "Kim",
+        "searchPlaceholder": "İsim, bölge veya lonca",
+        "search": "Arama",
+        "loading": "Diyara kimin çevrimiçi olduğu soruluyor...",
+        "empty": "Hiçbir oyuncu eşleşmiyor.",
+        "count": "{total} çevrimiçi",
+        "countFiltered": "{shown}/{total} çevrimiçi",
+        "capped": "İlk {delivered} gösteriliyor. Geri kalanını görmek için aramayı daraltın.",
+        "classFilter": "Sınıfa göre filtrele",
+        "allClasses": "Tüm sınıflar",
+        "colStatus": "Durum",
+        "colName": "Adı",
+        "colLevel": "Seviye",
+        "colClass": "Sınıf",
+        "colZone": "Zone",
+        "colGuild": "Lonca",
+        "sortTitle": "Sıralama ölçütü: {column}"
+      },
       "ignoredEmpty": "Kimseyi yok saymıyorsun.",
       "blockedEmpty": "Kimseyi engellemedin.",
       "blockSearchPlaceholder": "Oyuncu adı",
@@ -4143,6 +4226,7 @@ export const tr_TR: EnTranslations = {
           "farming": "Ürün yatağı ekerken çantandan çalışır."
         },
         "speed": "Kademe {tier} altındaki düğümlerde daha hızlı toplar.",
+        "wieldDegrade": "Bu becerinin altında hala daha düşük seviyeli bir araç olarak çalışıyor.",
         "rodRequired": "Balık tutmak için gereklidir.",
         "rodBite": "Balıklar {seconds} sn'ye kadar daha erken oltaya vurur.",
         "rodReel": "Olta çekme süresini {seconds} sn uzatır.",
@@ -4415,8 +4499,20 @@ export const tr_TR: EnTranslations = {
       "majorsLabel": "Ana dallar: {a} ve {b}",
       "pairsHeld": "Düzenlenen çiftler: {count}",
       "returnsLabel": "İade: {count}",
-      "retentionFooter": "Returns on respec: 60% of skill kept.",
-      "tutorialLink": "Profession tutorial"
+      "retentionFooter": "Saygının getirisi: Tutulan becerinin %60'ı.",
+      "tutorialLink": "Meslek öğreticisi"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Tarifler",
+      "collapseHint": "Yemek tarifi izleyiciyi daralt",
+      "expandHint": "Tarif izleyiciyi genişlet",
+      "pin": "Sabitle",
+      "unpin": "Sabitlemeyi Kaldır",
+      "pinFull": "Tarif izleyici dolu (en fazla {cap} tarif)",
+      "pinAria": "{name} öğesini Hud izleyicisine sabitleyin",
+      "unpinAria": "{name} öğesinin Hud izleyicisinden sabitlemesini kaldır",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "işçiliği",
@@ -4448,10 +4544,11 @@ export const tr_TR: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "({count} adet kaliteli harcar)",
       "reagentVaultDraw": "(kasandan {count} çeker)",
+      "reagentOrdinaryHeld": "({name} düzenlendi: {count}, ancak burada yalnızca iyi not sayılır)",
       "vaultUnreachable": "Malzeme Kasası burada erişilemez durumda.",
       "craftFeeLine": "Üretim ücreti: her biri {fee}",
       "empty": "Henüz bilinen bir tarif yok.",
-      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
+      "materialsFooter": "Kasanızdaki malzemeler otomatik olarak çizilir. İstasyonda daha fazla tarif öğrenin.",
       "resultAria": "{name} zanaatı",
       "craftedToast": "Hazırlanma Tarihi: {name}",
       "craftedToastQty": "Hazırlandı: {name} x{qty}",
@@ -4541,8 +4638,8 @@ export const tr_TR: EnTranslations = {
       "attunedBanner": "Uyumlu: {title}",
       "tierTutorial": {
         "title": "İlk Kademenz",
-        "tierCap": "Bir zanaat ilk kademesine {skill} beceride ulaşır ve her kademe yapabileceklerini geliştirir. Ama bir zanaat, yalnızca iki ana dalınızdan biri olduğunda nadir işin ötesine geçer.",
-        "radar": "Meslekleriniz bir tekerlek oluşturur. Bitişik bir çifte uyumlanın ve bu iki zanaat sınırsız ana dal olur; tekerin karşısındaki bir zanaat nadir sınırlı hobi olur ve gerisini dormant bırakır: bilgileri korunur ama yeniden alana kadar sıradan seviyede sınırlı kalır.",
+        "tierCap": "Bir zanaat, ilk aşamasına {skill} becerisiyle ulaşır ve her aşama, yapabileceğini geliştirir. Ancak bir zanaat ancak iki daldan biri olduğunda nadir işlerden geçebilir.",
+        "radar": "Meslekleriniz bir çark oluşturur. Bitişik bir çifte uyum sağladığınızda, bu iki zanaat sınırsız ana dallara dönüşür, çarkın karşısındaki bir zanaat nadir bulunan bir hobi haline gelir ve geri kalanı hareketsiz kalır: bilgileri korunur, ancak siz onları tekrar ele alana kadar ortak olarak sınırlandırılır.",
         "masters": "Kasabalardaki zanaat ustaları uyum görevleri sunar. Hazır olduğunuzda çiftinizi seçmek için birini ziyaret edin. Öğrendiğiniz hiçbir şey asla kaybolmaz.",
         "dismiss": "Anladım"
       },
@@ -4555,7 +4652,7 @@ export const tr_TR: EnTranslations = {
       "commissionBound": "Sipariş parçası: alıcısına bağlı"
     },
     "marketWindow": {
-      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
+      "mixedListingsFooter": "Tüccar ortak malları yeniden stoklar; oyuncu listeleri istedikleri fiyatla yanlarında duruyor."
     },
     "itemMenu": {
       "use": "Kullan",
@@ -4836,6 +4933,7 @@ export const tr_TR: EnTranslations = {
       "roleDps": "Hasar",
       "freeRoles": "Her rol kabul edilir",
       "lockoutDaily": "Son canavarla günlük kilitlenme",
+      "lockoutWeekly": "Her boss için haftalık lokavt",
       "lockoutNone": "Kilitlenme yok",
       "lockedFor": "Yaklaşık {minutes} dakika kilitli",
       "attunement": "Uyum gerektirir: {quest}",
@@ -4849,6 +4947,8 @@ export const tr_TR: EnTranslations = {
       "lootMaybe": "En fazla bunlardan biri düşebilir:",
       "lootChance": "Ek düşme şansı:",
       "lootHeroic": "Heroik bonusu, bunlardan biri her zaman düşer:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Yalnızca {min} ile {max} arasındaki seviyeler",
       "blockedSpec": "Uzmanlaşma gerektirir",
@@ -4922,7 +5022,33 @@ export const tr_TR: EnTranslations = {
         "kings_wrath": "Kralın Gazabı (30%: kalıcı hasar bonusu, daha hızlı zemin tehlikeleri)",
         "bone_storm": "Kemik Fırtınası (tehdidi yok sayar, döner ve akına hücum eder)",
         "crown_endures": "Taç Dayanır (6:00’da sert öfke, heroic 5:00)",
-        "deathless_court": "Ölümsüz Saray (yalnız heroic, kraliyet sarayı Ölümsüz Öfke’den sonra ayağa kalkar)"
+        "deathless_court": "Ölümsüz Saray (yalnız heroic, kraliyet sarayı Ölümsüz Öfke’den sonra ayağa kalkar)",
+        "bloodmane_rend": "Bloodmane Rend (kanama, hedef değişimlerine dikkat edin)",
+        "tusk_sweep": "Tusk Sweep (önden bölünme)",
+        "ancestral_sap": "Ata Bitki Özü (müttefiklerini iyileştirir)",
+        "call_of_the_hunt": "Avın Çağrısı (yakındaki müttefikleri hızlandırır)",
+        "thickhide_ward": "Thickhide Ward (yakındaki müttefikleri korur)",
+        "beast_pit_quake": "Canavar Çukuru Depremi (bölge hasarı)",
+        "wildheart_pulse": "Wildheart Pulse (nabız atan alan hasarı)",
+        "jaguar_roar": "Jaguar Roar (geri tepme)",
+        "brand_of_the_pyre": "Ateşin Markası (ateş izini istifleyin, boru suyunda yıkayın)",
+        "forge_strike": "Forge Strike (istiflenen tank değiştirme zayıflatması)",
+        "rain_of_cinders": "Köz Yağmuru (üç ateş konisi, aralarında durun)",
+        "falling_cinders": "Düşen Küller (oyuncuların üzerinde meteor halkaları, dışarı çıkın)",
+        "revolving_inferno": "Dönen Cehennem (dönen ateş ışınları, boşluklardan geçer)",
+        "forge_wave": "Forge Wave (ateş duvarını genişleterek iki güvenli şeridi kullanın)",
+        "apocalypse_add": "Ignivar Ashcaller (öncelik Apocalypse'i yayınlamayı ekleyin, hemen sonlandırın)",
+        "judgment_of_the_forge": "Demirhanenin Kararı (müdahale, tek güvenli sığınağı paylaşmak)",
+        "last_inferno": "Son Cehennem (%20 sağlıkta 45 saniyelik yanma)",
+        "chains_of_the_forge": "Ocak Zincirleri (sadece kahramanca, bağlantılı ortağınıza yakın kalın)",
+        "makers_brand": "Maker's Brand (istiflenen tank değiştirme zayıflatması)",
+        "forgefathers_sweep": "Forgefather's Sweep (tank dışında geniş ön koni)",
+        "tempering_ray": "Temperleme Işını (işaretli bir oyuncuya hat çizin, onu durdurun)",
+        "cinder_orbs": "Kül Küreleri (işaretli oyuncular odanın kenarlarına yayılır)",
+        "forgestorm": "Forgestorm (düşen meteor çemberleri, dışarı çıkın)",
+        "shared_pyre": "Paylaşılan Ateş (daire toplanıyor, hasarı paylaştırılıyor)",
+        "anvils_decree": "Anvil'in Kararnamesi (baskın çapında üç çekiç darbesi, iyileşir)",
+        "masters_assembly": "Usta Meclisi (dövme kirişlerini bloke edin, engelleyicileri döndürün)"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const tr_TR: EnTranslations = {
       "applied": "Uygulandı",
       "owned": "Sahip olunan",
       "storeOnly": "WOC Mağazasında mevcut",
+      "preview": "Önizleme",
+      "previewAria": "Önizleme {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Binek görünümü, bu karakterin bindiği bineğin üzerine çizilir. Hızı asla değiştirmez.",
       "mountsNoMount": "Önce bir binek edin: görünümün üzerine uygulanacağı bir binek gerekir.",
@@ -5182,30 +5310,30 @@ export const tr_TR: EnTranslations = {
       "levels": "Seviye {min} ile {max} arası"
     },
     "mapAtlas": {
-      "level": "Level {level}",
-      "landmarkCount": "{count} landmarks",
-      "filtersAria": "Map layers",
+      "level": "Seviye {level}",
+      "landmarkCount": "{count} önemli noktalar",
+      "filtersAria": "Harita katmanları",
       "filters": {
-        "quests": "Quests",
-        "gather": "Gather",
-        "dungeons": "Dungeons",
-        "services": "Services",
-        "players": "Players"
+        "quests": "Görevler",
+        "gather": "Toplamak",
+        "dungeons": "Zindanlar",
+        "services": "Hizmetler",
+        "players": "Oyuncular"
       },
-      "trackedQuests": "Tracked quests",
-      "noTrackedQuests": "No tracked quests",
-      "availableNearby": "Available nearby",
-      "noNearbyQuests": "No nearby quests",
-      "distance": "{distance} yards",
-      "showRoute": "Show Route",
-      "untrack": "Untrack",
-      "track": "Track",
+      "trackedQuests": "Takip edilen görevler",
+      "noTrackedQuests": "Takip edilen görev yok",
+      "availableNearby": "Yakında mevcut",
+      "noNearbyQuests": "Yakınlarda görev yok",
+      "distance": "{distance} yarda",
+      "showRoute": "Rotayı Göster",
+      "untrack": "Takibi kaldır",
+      "track": "İzlemek",
       "legend": {
-        "dungeon": "Dungeon",
-        "ore": "Ore",
-        "herb": "Herb",
-        "mail": "Mail",
-        "passage": "Passage"
+        "dungeon": "Zindan",
+        "ore": "cevher",
+        "herb": "Bitki",
+        "mail": "Posta",
+        "passage": "Geçit"
       }
     },
     "arenaGate": {
@@ -5226,7 +5354,7 @@ export const tr_TR: EnTranslations = {
       "tabBrowse": "Göz At",
       "tabSell": "Sat",
       "tabActivity": "Hareketlerim",
-      "tabHistory": "Sales History",
+      "tabHistory": "Satış Geçmişi",
       "tabsLabel": "$WOC Borsası bölümleri",
       "loading": "Borsa yükleniyor...",
       "loadFailed": "Borsa'ya ulaşılamadı. Kısa süre sonra tekrar dene.",
@@ -5251,16 +5379,16 @@ export const tr_TR: EnTranslations = {
       "colCurrentBid": "Güncel teklif",
       "colBuyNow": "Hemen satın al",
       "colTimeLeft": "Kalan süre",
-      "colBuyer": "Buyer",
-      "colSoldAt": "Sold",
-      "colSalePrice": "Sale price",
-      "colSaleType": "Type",
-      "saleTypeAuction": "Auction",
-      "saleTypeBuyNow": "Buy now",
-      "saleTypeDirected": "Directed",
-      "saleTypeUnknown": "Unknown",
-      "historyEmpty": "No sales recorded yet.",
-      "historyError": "Sales history could not be loaded.",
+      "colBuyer": "Alıcı",
+      "colSoldAt": "Satıldı",
+      "colSalePrice": "İndirimli satış fiyatı",
+      "colSaleType": "Tür",
+      "saleTypeAuction": "Açık Artırma",
+      "saleTypeBuyNow": "Şimdi satın alın",
+      "saleTypeDirected": "Yönetmen",
+      "saleTypeUnknown": "Bilinmiyor",
+      "historyEmpty": "Henüz satış kaydedilmedi.",
+      "historyError": "Satış geçmişi yüklenemedi.",
       "reserveMet": "Rezerv karşılandı",
       "reserveNotMet": "Rezerv karşılanmadı",
       "yourListing": "İlanın",
@@ -5933,6 +6061,7 @@ export const tr_TR: EnTranslations = {
       "deeds": "Yiğitlikler Kitabı",
       "reliquary": "Yadigârlık",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
+      "hideInterface": "Arayüzü gizle (ekran görüntüleri ve videolar)",
       "crafting": "Üretim",
       "mount": "Bin / İn",
       "calendar": "Etkinlik Takvimi",
@@ -5962,6 +6091,8 @@ export const tr_TR: EnTranslations = {
       "attackMove": "Saldır-Yürü (yalnızca seçenek açıkken)",
       "meters": "Hasar sayaçları (hasar, iyileştirme ve tehdit)",
       "petMark": "Yoldaş: Hedefle, kendi yoldaşını seç (çerçevesine tıklamakla aynı)",
+      "targetSelf": "Kendinizi hedefleyin",
+      "targetParty": "Parti çerçevelerinde gösterildiği gibi, yukarıdan aşağıya doğru 1&#39;den 9&#39;a kadar olan parti üyelerini hedefleyin.",
       "onBarBinding": "Doğrudan çubuktan da atama yapabilirsiniz: Tuş Atamaları panelinde Eylem çubuğu tuşlarını düzenle’yi seçin, ardından canlı çubukta bir yuvaya tıklayıp istediğiniz tuşa basın. Bitirdiğinizde Bitti’ye tıklayın. Bu, fiziksel bir klavye gerektirdiğinden yalnızca masaüstünde kullanılabilir.",
       "clickMoveNote": "Tıklayarak Hareket, siz açana kadar kapalıdır: oyun menüsündeki Tuş Atamaları panelini açın, Tıklayarak Hareket’i açın, ardından hangi fare düğmesinin yürüteceğini seçmek için altındaki Tıkla-Hareket Et Düğmesi satırını kullanın (varsayılan olarak Sol Tık, ya da Sağ Tık). Açık olduğunda, yerdeki bir noktaya tıklamak sizi oraya doğru yürütür ve yerde nereye gittiğinizi gösteren bir işaretçi belirir. Bir yaratığa ya da başka bir oyuncuya tıklamak sizi onlara doğru yürütüp menzilde durdurur, ve bu tıklama yine de hedefleme ya da etkileşim gibi olağan işini yapar; tıkladığınız şeye zaten yeterince yakınsanız, sadece etkileşime girer ve olduğunuz yerde kalırsınız. Hareket tuşlarından herhangi biri kontrolü doğrudan geri alır ve yolculuğu sonlandırır, etrafa bakmak için fare düğmesini basılı tutmak da öyle. Zıplamak bunu yapmaz, bu yüzden sıçrama boyunca yolculuğa devam edersiniz, ve oyun menüsünü açmak yalnızca yolculuğu duraklatır, menüyü kapattığınızda ise devam eder."
     },
@@ -6099,7 +6230,8 @@ export const tr_TR: EnTranslations = {
       "ifLockBars": "Çubukları kilitler, böylece bir yetenek yanlışlıkla bir yuvadan sürüklenip çıkarılamaz.",
       "keybindsHeading": "Tuş Atamaları paneli",
       "keybindsBody": "Tuş listesi o panelin yalnızca yarısıdır. Üstünde, farenizin oyunu nasıl yönettiğine karar veren anahtarlar bulunur: fare kamerası, döndürürken imlecin kilitlenip kilitlenmeyeceği, tıklayarak hareket ve bunu hangi fare düğmesinin tetiklediği, saldırı hareketi, solaklar için dokunmatik yerleşim ve sohbet için küfür filtresi.",
-      "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın."
+      "keybindsMouseBody": "Orada gözden kaçması kolay iki şey var. Fare düğmeleri tuşlar gibi atanır, bu yüzden tekerlek tıklaması ve baş parmak düğmeleri yetenek taşıyabilir; sol ve sağ tık ise kamera ve dünyaya tıklamak için ayrılmış kalır. Ayrıca doğrudan eylem çubuğundan da atama yapabilirsiniz: buradan çubuk üzerinden atama kipini açın, ardından bir yuvaya tıklayıp istediğiniz tuşa basın.",
+      "keybindsWheelBody": "Tekerleğin kendisi de bağlanır. Zoom Camera In ve Zoom Camera Out, varsayılan olarak çıplak tekerleğe oturan sıradan bağlantılardır, böylece bunları Ctrl artı tekerleğe veya tuşlara taşıyabilir ve ardından eylem çubuğu yuvalarını ateşlemek için serbest tekerleği yuvarlayabilirsiniz. Bir tekerlek çentiğinde serbest bırakma yoktur, bu nedenle ileriye doğru hareket etmek gibi tutulan bir hareketi sürdüremez."
     },
     "combat": {
       "intro": "Dövüş, tanıdık klasik MMO kurallarını izler. İyi oynamak için bunların hiçbirini incelemen gerekmez, bu yalnızca dövüşlerin nasıl işlediğinin şeklidir.",
@@ -6153,7 +6285,7 @@ export const tr_TR: EnTranslations = {
       "framesMoveBodyEditFrames": "Çerçeven, hedef çerçeven ve grup çerçevelerin tümü taşınabilir. Her birinin köşesinde küçük bir taşıma düğmesi vardır: kilidini aç, çerçeveyi istediğin yere sürükle ve yanlış bir tıklamanın yerini değiştirememesi için yeniden kilitle. Arayüz seçeneklerindeki Çerçeveler sekmesinin üstündeki Çerçeveleri Düzenle, bu üç çerçeveyle birlikte arayüzün geri kalanını da tek seferde gevşetir: eylem çubuklarını, okuma çubuğunu, savurma çubuğunu, deneyim çubuğunu, mini haritayı, düğme şeridini, evcil hayvan çerçevesini, duruş çubuğunu, takviye ve zayıflatma satırlarını ve İstek Listesi Hatırlatıcısı çipini. Bir yere pişman olursan aynı Çerçeveler sekmesinin altındaki Varsayılanlara Sıfırla hepsini başladıkları yere geri getirir.",
       "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
-      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",
@@ -7489,7 +7621,7 @@ export const tr_TR: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Büyüler dört kademede gelir. Temel kademe Çan Tozu ile çalışır, üst uçta biraz Öz kullanır ve silah yuvasını, yardımcı eli ve tüm zırh yuvalarını kapsar; istatistik ekseni seçenekleri her yapının her yuva için bir şey bulacağı kadar çoktur. Kalkanlar ve elde tutulan büyücü yardımcı elleri kendi Dayanıklılık büyüsünü alır, böylece kuşanılmış hiçbir yuva büyüsüz kalmaz. Daha İyi kademe bir Çan Kırığı ile Öz'e mal olur ve en etkili yuvalarda daha güçlü bonuslar verir. Kırıklar ayrıca üç yere harcanır: tanesi beş olan iki tılsım tarifi, alet etkisi yenilemelerinin en üst basamağı ve Işıldayan kademe. Bu son kademede silah ve göğüs büyüleri birer, Infusion ise iki kırık ister; harcamadan önce birkaçını bankaya koy.\n\nAralarında beş Rünlü büyü bulunur; yazılan her ikincil istatistik için bir tüketici vardır, bu yüzden öğüttüğün hiçbir şey çıkmaz sokak olmaz: Rünlü Ağız (silah, Güç, Rezonant Çelik tüketir), Rünlü Mühür (silah, Zekâ, Rezonant Kereste), Rünlü Doku (göğüs, Ruh, Rezonant İplik), Rünlü Post (bacaklar, Çeviklik, Rezonant Deri) ve Rünlü Halkalar (miğfer, Dayanıklılık, Rezonant Halkalar). Her biri ayrıca iki Çan Özü ister. Bir yuva ve istatistik için hem temel hem Daha İyi büyü varsa Rünlü bonus ikisinin arasına yerleşir. Rünlü Doku doğrudan göğüs için en güçlü Ruh büyüsüdür ve Rünlü Post bacaklar için mevcut tek Çeviklik büyüsüdür. Kesin bonusların tümü aşağıdaki tabloda bulunur.\n\nSıradan alt kademelerin üstünde, zanaatın sıradan son basamağı olan Işıldayan kademe durur: aşağıdaki Beceri sütununda gösterildiği gibi dört büyü için Büyüleme 100, Infusion için 125. Her biri bir Işıldayan Reaktif kullanır ve kendi yuvasına bir adım daha ekler: silaha (Kudret veya Büyü Gücü seçeneği), göğse ve çizmeye. Sonuncusu olan Işıldayan Infusion yalnızca Kusursuzlaştırılmış bir parçaya işler. Kusursuzlaştırma büyücünün değil, giyenin işidir; bir parçanın bunu nasıl kazandığını Meslekler sayfası anlatır.\n\nSon Alevin Coşkusu ayrı bir raid formülüdür, ücretsiz sıradan büyü değildir. Uygulamadan önce takas edilebilir formülünü Büyüleme 100'de öğren. Her uygulama 3 Son Alev Çekirdeği ve 2 Çan Kırığı kullanır; formül Pota'dan düşebilir veya çeyrek ustasından bir çekirdek karşılığında satın alınabilir. Yakın dövüş tetiklenmesi ve silah hızı kuralları aşağıda bütünüyle gösterilir.",
+        "enchantsNoteRaidFormula": "Büyüler dört kademede gelir. Temel kademe Çan Tozu ile çalışır, üst uçta biraz Öz kullanır ve silah yuvasını, yardımcı eli ve tüm zırh yuvalarını kapsar; istatistik ekseni seçenekleri her yapının her yuva için bir şey bulacağı kadar çoktur. Kalkanlar ve elde tutulan büyücü yardımcı elleri kendi Dayanıklılık büyüsünü alır, böylece kuşanılmış hiçbir yuva büyüsüz kalmaz. Daha İyi kademe bir Çan Kırığı ile Öz'e mal olur ve en etkili yuvalarda daha güçlü bonuslar verir. Kırıklar ayrıca üç yere harcanır: tanesi bir olan iki tılsım tarifi (bir tılsımın kalan bedeli öz ve tozdur), alet etkisi yenilemelerinin en üst basamağı ve Işıldayan kademe. Bu son kademede silah ve göğüs büyüleri birer, Infusion ise iki kırık ister; harcamadan önce birkaçını bankaya koy.\n\nAralarında beş Rünlü büyü bulunur; yazılan her ikincil istatistik için bir tüketici vardır, bu yüzden öğüttüğün hiçbir şey çıkmaz sokak olmaz: Rünlü Ağız (silah, Güç, Rezonant Çelik tüketir), Rünlü Mühür (silah, Zekâ, Rezonant Kereste), Rünlü Doku (göğüs, Ruh, Rezonant İplik), Rünlü Post (bacaklar, Çeviklik, Rezonant Deri) ve Rünlü Halkalar (miğfer, Dayanıklılık, Rezonant Halkalar). Her biri ayrıca iki Çan Özü ister. Bir yuva ve istatistik için hem temel hem Daha İyi büyü varsa Rünlü bonus ikisinin arasına yerleşir. Rünlü Doku doğrudan göğüs için en güçlü Ruh büyüsüdür ve Rünlü Post bacaklar için mevcut tek Çeviklik büyüsüdür. Kesin bonusların tümü aşağıdaki tabloda bulunur.\n\nSıradan alt kademelerin üstünde, zanaatın sıradan son basamağı olan Işıldayan kademe durur: aşağıdaki Beceri sütununda gösterildiği gibi dört büyü için Büyüleme 100, Infusion için 125. Her biri bir Işıldayan Reaktif kullanır ve kendi yuvasına bir adım daha ekler: silaha (Kudret veya Büyü Gücü seçeneği), göğse ve çizmeye. Sonuncusu olan Işıldayan Infusion yalnızca Kusursuzlaştırılmış bir parçaya işler. Kusursuzlaştırma büyücünün değil, giyenin işidir; bir parçanın bunu nasıl kazandığını Meslekler sayfası anlatır.\n\nSon Alevin Coşkusu ayrı bir raid formülüdür, ücretsiz sıradan büyü değildir. Uygulamadan önce takas edilebilir formülünü Büyüleme 100'de öğren. Her uygulama 3 Son Alev Çekirdeği ve 2 Çan Kırığı kullanır; formül Pota'dan düşebilir veya çeyrek ustasından bir çekirdek karşılığında satın alınabilir. Yakın dövüş tetiklenmesi ve silah hızı kuralları aşağıda bütünüyle gösterilir.",
         "charmsHeading": "Toplayıcı aletleri için tılsımlar",
         "formulaRequired": "Formül gerekli",
         "charmsBody": "Büyüleme aynı zamanda bir toplayıcının tılsımlarının da kaynağıdır. Büyülemeniz 25'e ulaştığında Tamirci Gizzel, Doğudere'deki alet atölyesinde ikisini de öğretir: bir hasada bir birim ekleyen Toplayıcının Zulası'nı ve çıkanın derecesini yükselten Zanaatkârın Gözü'nü. Her biri bir kez üretilir, sonra bir kazmaya, baltaya ya da orağa takılır; orada yalnızca gerçekten iyileştirdiği hasatlarda bir şarj harcar.\n\nZanaatın kazanmaya devam ettiği yer yeniden doldurmadır. Şarjlar, ziyaret eden bir büyücü tarafından değil, aletin sahibi tarafından geri kazandırılır, ve o sahip tılsımı imzalayan büyücüyse yeniden doldurma malzemelerin yarısına mal olur, Büyülemede uzmanlaşmışsa daha da ucuza. Yani tezgahtan satılan bir tılsım tek bir satıştır, kendi aletlerinizde taşıdığınız tılsımlar ise çalıştırmaya devam etmesi ucuz olanlardır. Tam şarj ve malzeme merdiveni, herhangi bir toplama mesleği sayfasında, Alet etkileri başlığı altındadır."
@@ -7558,7 +7690,7 @@ export const tr_TR: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Tarımın ritmi",
-        "rhythmBody": "Ekim, her kademede düz {plant} saniyelik kısa ve görünür cast’tir; çapa toprağı açar, hızı satın almaz. Olgun ürünü çekmek anlıktır. Kesilecek cast veya reddedecek çanta kontrolü yoktur; hazır olan yatak siz alana kadar bekler, bu yüzden dolu çanta çiftçiye boşaltma yürüyüşünden başka maliyet çıkarmaz.\n\nHasadın ödediği ürün ve Çiftçilik yeterliliğidir. Damardan farklı olarak karakter XP’si vermez; yataklar seviye atlama yolu değil, çalışılacak bir ticarettir.",
+        "rhythmBody": "Ekim anlıktır; çapa toprağı açar, hızı satın almaz: beklenecek bir cast yoktur, bu yüzden uzaklaşan çiftçi yine de ekmiş olur. Olgun ürünü çekmek de anlıktır. Kesilecek cast veya reddedecek çanta kontrolü yoktur; hazır olan yatak siz alana kadar bekler, bu yüzden dolu çanta çiftçiye boşaltma yürüyüşünden başka maliyet çıkarmaz.\n\nHasadın ödediği ürün ve Çiftçilik yeterliliğidir. Damardan farklı olarak karakter XP’si vermez; yataklar seviye atlama yolu değil, çalışılacak bir ticarettir.",
         "gainHeading": "Bir hasat ne öğretir",
         "gainBody": "Kazanç ürününüze değil kendi sayacınıza bağlı ve belirleyicidir: {p1} altındaki hasat {g1} yeterlilik, {p2} altı {g2}, {p3} altı {g3}, {cap} tavanına kadar kalan bölüm {g4} verir. Bu bir beceri atışı değildir; tırmanışın uzunluğu tam olarak aritmetiğin söylediğidir.\n\nÜrün kademesi yatağın sizi ne kadar taşıyacağını belirler. Kademe 1 ürün {c1}’e kadar öğretir ve orada griye döner, kademe 2 {c2}’ye kadar, kademe 3 ve üstü tavana kadar öğretir; bu yüzden sayacı hareket ettiren şey yataklar arasında ilerlemektir.",
         "yieldsHeading": "Bir hasat ne verir",
@@ -10148,6 +10280,7 @@ export const tr_TR: EnTranslations = {
       "templates": {
         "battleground": "[Savaş Alanı] {name}: {message}",
         "party": "[Grup] {name}: {message}",
+        "raidWarning": "[Baskın Uyarısı] {name}: {message}",
         "yell": "{name} bağırıyor: {message}",
         "whisper": "{name} fısıldıyor: {message}",
         "toWhisper": "{name} kişisine: {message}",
@@ -10286,6 +10419,7 @@ export const tr_TR: EnTranslations = {
       "stunned": "Sersemledin!",
       "silenced": "Susturuldun!",
       "busy": "Meşgulsün.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "O yetenek henüz hazır değil.",
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",
@@ -10634,7 +10768,6 @@ export const tr_TR: EnTranslations = {
     },
     "cast": {
       "fishing": "Balık Tutma",
-      "farming": "Ekim",
       "gathering": "Toplama",
       "crafting": "Üretim",
       "disenchanting": "Büyü Bozma",
@@ -10978,6 +11111,19 @@ export const tr_TR: EnTranslations = {
       "buyConfirmAccept": "Satın Al",
       "buyConfirmCancel": "İptal",
       "buyChanged": "Bu ilan sen onaylamadan önce değişti. Fiyatı kontrol et ve tekrar dene.",
+      "sweep": "Temizle",
+      "sweepAria": "{item} için piyasayı tarayın",
+      "sweepTitle": "Pazar Taraması: {item}",
+      "sweepClose": "Kapalı",
+      "sweepNote": "Sayınız karşılanana kadar, önce birim başına en ucuz olan tüm listeleri diğer satıcılardan satın alır. İstediğinizden birkaç tane daha alabilirsiniz.",
+      "sweepQuantity": "İstenen birimler",
+      "sweepQuoteNone": "Bu öğenin taranacak kaydı yok.",
+      "sweepQuoteLine": "{units} birim, {listings} kayıt genelinde {total} ({each} her biri)",
+      "sweepQuoteShort": "Yalnızca {units} birim {listings} kayıt mevcuttur, {total} için ({each} her biri)",
+      "sweepButton": "Temizle",
+      "sweepConfirmTitle": "Pazar Taramasını Onayla",
+      "sweepConfirmBody": "{item} x{units} için {listings} kayıt boyunca {total} satın alın (her biri {each})?",
+      "sweepChanged": "Siz onaylamadan önce süpürme teklifi değişti. Toplam tutarı kontrol edin ve tekrar deneyin.",
       "sellNote": "Çantalarınızdaki malları satışa koyun. Bir eşya satıldığında Tüccar %{cut} pay alır. {max} ilan yuvasından {used} tanesini kullanıyorsunuz.",
       "sellPickEmpty": "Satılacak eşyayı seçmek için çantalarınızdaki bir eşyaya tıklayın.",
       "quantity": "Miktar",
@@ -11017,7 +11163,9 @@ export const tr_TR: EnTranslations = {
       "ownListing": "O kendi ilanın. Geri almak için iptal et.",
       "cannotAfford": "Buna paran yetmez.",
       "notYourListing": "O senin ilanın değil.",
-      "nothingToCollect": "Toplayacak bir şeyin yok."
+      "nothingToCollect": "Toplayacak bir şeyin yok.",
+      "sweepNoListings": "Bu öğenin taranacak kaydı yok.",
+      "sweepPriceChanged": "Taramanız inmeden önce fiyatlar değişti. Teklifi kontrol edin ve tekrar deneyin."
     },
     "loot": {
       "takeAll": "Hepsini Al",
@@ -16506,6 +16654,21 @@ export const tr_TR: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "İyileştirme Talim Mankeni"
+      },
+      "healing_dummy_tank": {
+        "name": "Yaralı Öncü Mankeni"
+      },
+      "healing_dummy_soldier": {
+        "name": "Yaralı Asker Kuklası"
+      },
+      "healing_dummy_scout": {
+        "name": "Kritik Keşif Kuklası"
+      },
+      "healing_dummy_caster": {
+        "name": "Yaralı Büyücü Kukla"
+      },
+      "healing_dummy_ranger": {
+        "name": "Hırpalanmış Korucu Kuklası"
       },
       "ridge_stalker": {
         "name": "Sırt Sinsisi"

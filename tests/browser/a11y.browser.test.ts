@@ -798,6 +798,7 @@ function marketInfo(shape: WorldShape): MarketInfo {
     myListingCount: 0,
     sellPriceItemId: null,
     sellLowestPrice: null,
+    sweepQuote: null,
   };
   // The sim shape may carry extra server-only fields the view ignores; the client mirror
   // carries only the decoded fields (the offline-only-shape trap catches).
@@ -894,6 +895,7 @@ describe('axe: market window (Sim + ClientWorld shapes)', () => {
                 ...marketInfo(shape),
                 sellPriceItemId: 'worn_sword',
                 sellLowestPrice: null,
+                sweepQuote: null,
               },
               inventory: [{ itemId: 'worn_sword', count: 3 }],
               copper: 0,

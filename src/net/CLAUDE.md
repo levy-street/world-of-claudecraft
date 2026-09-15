@@ -102,7 +102,8 @@ See `server/CLAUDE.md` for server conventions; read `server/game.ts` directly fo
 - **Server to client**: the live frame list is the `msg.t` branches in `onMessage`
   (`online.ts`). Semantics worth knowing: `hello` carries pid/seed/realm and resets
   a reconnected transport; `events` push to `eventQueue` (drained by `drainEvents`);
-  `social` sets `socialInfo` and flips `socialDirty`; `censor` live-updates the
+  `social` sets `socialInfo` and flips `socialDirty`; `who` answers one `whoRequest` with
+  the roster mirror `whoInfo` (`who_frame_wire.ts`); `censor` live-updates the
   soft-profanity word list; an `error` frame ends the session (subject to
   `reconnect_policy.ts`).
 - **Client to server**: versioned world auth (`ONLINE_WORLD_AUTH_TYPE`, built by

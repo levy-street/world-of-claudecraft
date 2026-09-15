@@ -942,6 +942,32 @@ describe('ledge climb over the wire (cl progress)', () => {
     expect(client.entities.get(e.id)!.climbing).toBe(false);
     expect(client.entities.get(e.id)!.climbProgress).toBeUndefined();
   });
+
+  it('mirrors active Vaulting Charge flight and clears when the leap is absent', () => {
+    const { e } = climbingPlayer();
+    expect(wireEntity(e)).not.toHaveProperty('lp');
+
+    e.leap = {
+      from: { x: e.pos.x, y: e.pos.y, z: e.pos.z },
+      to: { x: e.pos.x + 8, y: e.pos.y, z: e.pos.z + 12 },
+      elapsed: 0.1,
+      duration: 0.5,
+      apex: 4,
+      landingAoe: { min: 1, max: 2, radius: 3 },
+      abilityName: 'Vaulting Charge',
+      abilityId: 'heroic_leap',
+      school: 'physical',
+    };
+    expect(wireEntity(e).lp).toBe(1);
+
+    const client = bareClient(9);
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.leaping).toBe(true);
+
+    e.leap = null;
+    (client as any).applySnapshot({ t: 'snap', ents: [wireEntity(e)] });
+    expect(client.entities.get(e.id)!.leaping).toBe(false);
+  });
 });
 
 // Loot owner-lock lapse (FFA) over the wire. The rights-aware corpse picker
@@ -2097,6 +2123,34 @@ describe('raid party wire', () => {
       role: 'healer',
       connected: 0,
     });
+  });
+
+  it('wires a Wildfang druid in Wolf Form as damage so role-sorted raid frames keep the tanks adjacent', () => {
+    const entity = server.sim.entities.get(member.pid)!;
+    const meta = server.sim.meta(member.pid)!;
+    meta.cls = 'druid';
+    meta.talentMods.role = 'tank';
+    entity.auras.push({
+      id: 'cat_form',
+      name: 'Wolf Form',
+      kind: 'form_cat',
+      remaining: 999,
+      duration: 999,
+      value: 1,
+      sourceId: member.pid,
+      school: 'physical',
+    });
+
+    broadcast(server);
+    const wolf = lastSnap(fcLeader.sent).self.party.members.find((m: any) => m.pid === member.pid);
+    expect(wolf.role).toBe('dps');
+
+    entity.auras.length = 0;
+    broadcast(server);
+    const caster = lastSnap(fcLeader.sent).self.party.members.find(
+      (m: any) => m.pid === member.pid,
+    );
+    expect(caster.role).toBe('tank');
   });
 
   it('projects common party member history once per broadcast and refreshes same-tick broadcasts', () => {

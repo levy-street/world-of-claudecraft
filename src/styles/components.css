@@ -6773,6 +6773,11 @@
   .crafting-vault-draw {
     color: var(--gold-dim);
   }
+  /* The ordinary-grade note (the Bronze Hoe report): same rule again, a
+     tint over words that already carry the signal. */
+  .crafting-ordinary-held {
+    color: var(--gold-dim);
+  }
   /* The Create affordance is decoration inside the row-button; the whole row
      remains the target and disabled rows inherit the shared disabled state. */
   .crafting-craft-chip {
@@ -7218,6 +7223,30 @@
   .crafting-commission-chip[aria-pressed="true"] .crafting-commission-pip {
     border-color: var(--gold-dim);
     background: var(--gold);
+  }
+  /* The HUD-tracker pin chip in the batch row: the commission chip's pill
+     language, pressed = pinned. */
+  .crafting-pin-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 26px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-border-showcase);
+    border-radius: 999px;
+    background: var(--color-card-inset);
+    color: var(--color-text-muted);
+    font-family: var(--title-font);
+    font-size: 11px;
+    cursor: var(--cursor-point);
+  }
+  .crafting-pin-chip:hover {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+  }
+  .crafting-pin-chip[aria-pressed="true"] {
+    color: var(--gold);
+    border-color: var(--gold-dim);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
   }
   .train-row.train-known {
     cursor: default;
@@ -10089,6 +10118,7 @@
   }
   .cos-card-actions {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--spacing-sm);
@@ -10101,7 +10131,8 @@
   .cos-state.worn {
     color: var(--gold);
   }
-  .cos-action {
+  .cos-action,
+  .cos-preview {
     min-height: 40px;
     min-width: 40px;
     padding: 0 var(--spacing-md);
@@ -10112,13 +10143,16 @@
     font: inherit;
     cursor: pointer;
   }
-  .cos-action:hover {
+  .cos-action:hover,
+  .cos-preview:hover {
     border-color: var(--gold);
   }
-  .cos-action:active {
+  .cos-action:active,
+  .cos-preview:active {
     transform: translateY(1px);
   }
-  .cos-action:focus-visible {
+  .cos-action:focus-visible,
+  .cos-preview:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
   }
@@ -12482,6 +12516,104 @@
   .soc-group-head:first-of-type {
     border-top: 0;
   }
+  /* Who tab: the count line + class chip band, then a sortable table. Both
+     escape the responsive two-column .soc-body grid (grid-column: 1 / -1) and
+     the table keeps its own column tracks so the header buttons and every
+     row's cells line up; rows use display: contents so the cells are the grid
+     items. The dot and name cells reuse the friend-row look. */
+  .soc-who-head {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 4px 6px;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .soc-who-count {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .soc-who-capped {
+    color: var(--color-text-muted);
+  }
+  .soc-who-cls {
+    flex: 0 0 auto;
+    max-width: 12em;
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  .soc-who-list {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: auto minmax(7em, 1.4fr) 3em minmax(5em, 1fr) minmax(6em, 1.4fr) minmax(
+        5em,
+        1fr
+      );
+    align-items: center;
+    column-gap: 8px;
+  }
+  .soc-who-row,
+  .soc-who-meta {
+    display: contents;
+  }
+  .soc-who-cell {
+    min-width: 0;
+    padding: 6px 2px;
+    border-bottom: 1px solid var(--color-border-showcase);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .soc-who-cell.who-level {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .soc-who-cell.who-cls,
+  .soc-who-cell.who-zone,
+  .soc-who-cell.who-guild {
+    color: var(--color-text-muted);
+  }
+  .soc-who-cell .soc-name {
+    display: inline;
+  }
+  /* The dot is a flex item in the friend rows; here it sits in an inline cell,
+     so it needs an inline-block box to keep its width and height. */
+  .soc-who-cell .soc-dot {
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .soc-who-header .soc-who-cell {
+    padding: 2px 2px 4px;
+    border-bottom: 1px solid var(--gold-dim);
+  }
+  .soc-who-sort {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--title-font);
+    font-size: 12px;
+    color: var(--color-text-muted);
+    cursor: var(--cursor-point);
+  }
+  .soc-who-sort:hover,
+  .soc-who-sort.on {
+    color: var(--gold);
+  }
+  .soc-who-sort:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .soc-who-dir svg {
+    width: 10px;
+    height: 10px;
+    fill: currentColor;
+  }
   /* Raid tab: the two groups sit side by side in the landscape window (falling
      back to stacked on mobile-touch). It escapes the `.soc-body` grid flow
      above with `grid-column: 1 / -1` so it keeps its own explicit grid instead
@@ -14662,6 +14794,54 @@
     text-align: center;
   }
   /* The staged item uses the shared card surface so Sell matches Browse. */
+  /* The Market Sweep card (market_sweep_panel.ts) heads the Browse list while a
+     sweep is staged. It spans the whole grid like the range note, reuses the Sell
+     tab's .mkt-price-row field shape for the count, and keeps the quote line
+     muted like the Sell tab's price reference so the number the player is about
+     to agree to (in the confirm prompt) stays the emphasis. */
+  .mkt-sweep {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 6px;
+  }
+  .mkt-sweep-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .mkt-sweep-title {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .mkt-sweep-note,
+  .mkt-sweep-quote {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+  }
+  .mkt-sweep-quote:empty {
+    display: none;
+  }
+  .mkt-sweep-go {
+    align-self: flex-start;
+    padding: 4px 14px;
+  }
+  .mkt-sweep-btn {
+    cursor: var(--cursor-point);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  /* A row that offers Sweep carries a fifth cell; without it the button wraps
+     under the icon on a second grid row. */
+  .mkt-row:has(.mkt-sweep-btn) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+  }
   .mkt-sell-pick {
     display: flex;
     gap: 10px;
@@ -14823,8 +15003,10 @@
     pointer-events: none;
     background: var(--color-options-scrim);
   }
-  #ui:has(> #options-menu[style*="display: block"])::before,
-  #ui:has(> #options-menu[style*="display: flex"])::before {
+  /* Stamped by the window-open mirror (src/ui/window_open_state.ts) while
+     #options-menu is visible; a :has() on #ui over the menu's inline style
+     re-styled the whole HUD on every inline write. */
+  #ui.options-open::before {
     display: block;
   }
   #options-menu {

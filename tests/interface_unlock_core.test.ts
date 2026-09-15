@@ -43,6 +43,7 @@ describe('HUD_FRAME_SPECS', () => {
       'targetDots',
       'questTracker',
       'reliquaryTracker',
+      'recipeTracker',
       'paladinDevotion',
       'doomMeter',
       'procOverlay',
@@ -80,6 +81,7 @@ describe('HUD_FRAME_SPECS', () => {
       'target-dots',
       'quest-tracker',
       'reliquary-tracker',
+      'recipe-tracker',
       'paladin-devotion-frame',
       'warlock-doom-frame',
       'proc-overlay',
@@ -138,6 +140,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_target_dots',
       'woc_hud_frame_quest_tracker',
       'woc_hud_frame_reliquary_tracker',
+      'woc_hud_frame_recipe_tracker',
       'woc_hud_frame_paladin_devotion',
       // The doom meter joined the registry AFTER shipping its own mover, so
       // its row keeps the key that mover persisted under (movable frame
@@ -185,6 +188,7 @@ describe('HUD_FRAME_SPECS', () => {
       'debuffBar',
       'questTracker',
       'reliquaryTracker',
+      'recipeTracker',
       'doomMeter',
       'damageMeter',
       'deedTracker',

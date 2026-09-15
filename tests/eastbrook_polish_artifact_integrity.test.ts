@@ -1362,15 +1362,44 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
+// PR fen-features-subcull: remint after merging release/v0.43.0 into the branch.
+// The renderer leaf differs from the release tree by the zone-feature sweep
+// extraction; captures, performance measurements and capture identity are unchanged.
+// Re-minted for the v0.43.0 merge of the gather coarse key after the
+// zone-feature sweep extraction: the merged runtimeRender.renderer leaf
+// matches neither parent. No capture was retaken.
+// Re-minted for the PR #4023 merge after the v0.43.0 batch: the existing
+// runtimeRender leaves and the monument impostor civicShader leaf combine in
+// one tree, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the PR #4024 merge after PR #4023: the monument impostor
+// civicShader leaf and shader-prefix diagnostic remint evidence land in one
+// tree, so the composite matches neither parent. No capture was retaken.
+// Re-minted for the PR #4025 merge after PR #4024: the monument impostor
+// civicShader leaf, shader-prefix diagnostic evidence, Eastbrook monument
+// reveal roots and gated live-program renderer changes land in one tree. No
+// capture was retaken.
+// Re-minted for the v0.43 release repair after Ascension/mount ordering moved
+// renderer.ts. No capture was retaken.
+// Re-minted for the PR #4036 GPU timer probe merge after PR #4032 through
+// #4035: the renderer probe hooks, screenshot-readback extraction and current
+// release-side renderer leaves combine in one tree. No capture was retaken.
+// Re-minted after extracting the remote-body standing-surface sample and the
+// terrain-lean stencil out of renderer.ts, and after adding both sampler
+// modules as explicit provenance leaves. No capture was retaken.
+// Re-minted for the v0.43 release repair after the merged renderer sampling
+// imports and frame-cap probe cleanup moved renderer.ts. No capture was retaken.
 // Re-minted for the CPU-hygiene lot (renderer.ts consumer edits and the
 // view-candidate scan extraction): the composite first, then this metadata
 // seal from the swept file. No capture was retaken.
 // Re-minted again for the lot's review round (the shared liveViewCandidate
 // check moved the renderer leaf once more). No capture was retaken.
+// Re-minted for the release-side CPU-hygiene lot over the current v0.43 batch:
+// the merged renderer leaf includes rider anchors, ground sampling, rift
+// ambience and shared view-candidate scans. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'b08ec4d5faedd769c536a6c7aa1437861e7ff7906bf8d545a3a77106a458c099';
+  'f12823f6a56408c8766cbc93e21a52f84f57b8fe5d7603b86364047d677ad5f9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '07b43fcb404bb316c61f8efff90e4e54755fe3392de832f2aee8e09fbcaa8abf';
+  'a92d7eb0dfec48dec8baa595edfee596191c033c4ef9148438b88e6237bc7534';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2729,11 +2758,31 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // canonical re-sealed evidence files. Capture pixels and scores did not change.
       // v0.42.0 dependency-floor bump: recomputed LAST over the swept evidence
       // after the lockfile-driven GLB re-mint. No capture was retaken.
+      // Re-minted for the v0.43.0 merge of the gather coarse key, recomputed
+      // LAST over the swept evidence. No capture was retaken.
+      // Re-minted for the PR #4023 merge after the v0.43.0 batch: same order,
+      // the composite first, then this seal. No capture was retaken.
+      // Re-minted for the PR #4024 merge after PR #4023: same order, the
+      // composite first, then this seal. No capture was retaken.
+      // Re-minted for the PR #4025 merge after PR #4024: same order, the
+      // composite first, then this seal. No capture was retaken.
+      // Re-minted for the v0.43 release repair after Ascension/mount ordering
+      // moved renderer.ts. No capture was retaken.
+      // PR #4036 GPU timer probe merge after PR #4032 through #4035:
+      // recomputed LAST over the swept evidence. No capture was retaken.
+      // Remote-body ground-sample extraction (entity_ground_sample.ts and
+      // entity_ground_sample_core.ts): recomputed LAST over the swept evidence.
+      // No capture was retaken.
+      // v0.43 release repair after the merged renderer sampling imports and
+      // frame-cap probe cleanup: recomputed LAST over the swept evidence. No
+      // capture was retaken.
       // Re-minted for the CPU-hygiene lot: the composite first, then this
       // second-order seal over the swept evidence bytes. No capture was retaken.
       // Review round of the same lot: recomputed LAST again over the re-swept
       // evidence. No capture was retaken.
-    ).toBe('8d2ecd6e9546a3bdb6361ab02b5f7052905f1aff45937b2338b49108f46c1ad4');
+      // v0.43 batch plus CPU-hygiene lot: recomputed LAST over the swept
+      // evidence. No capture was retaken.
+    ).toBe('b7eab2cedfb63cfe391d1b1a54eb5205c320d5ac05c98a065d0ee58a9002c431');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

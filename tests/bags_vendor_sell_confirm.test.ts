@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
+import { QUALITY_RANK } from '../src/sim/loot_master';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
 import { ItemDragState } from '../src/ui/item_drag_state';
@@ -70,7 +71,12 @@ interface MenuOpen {
 
 function harness(
   inventory: InvSlot[],
-  opts?: { touch?: boolean; vendor?: boolean; confirmVendorSell?: boolean },
+  opts?: {
+    touch?: boolean;
+    vendor?: boolean;
+    confirmVendorSell?: boolean;
+    minQualityRank?: number;
+  },
 ): Harness {
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const calls: string[] = [];
@@ -146,7 +152,10 @@ function harness(
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
     isTouchHud: () => opts?.touch === true,
-    confirmVendorSell: () => opts?.confirmVendorSell ?? true,
+    sellConfirmPolicy: () => ({
+      enabled: opts?.confirmVendorSell ?? true,
+      minQualityRank: opts?.minQualityRank ?? 1,
+    }),
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,
@@ -569,5 +578,35 @@ describe('confirmVendorSell setting off: every vendor sale skips confirmation', 
     expect(h.calls).toEqual([
       `sellItem:${junkId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
     ]);
+  });
+});
+
+describe('confirmVendorSellMinQuality threshold: cheap loot bypasses the confirm', () => {
+  const valuableRank = QUALITY_RANK[ITEMS[valuableId].quality ?? 'common'];
+
+  it('a plain click on an item BELOW the threshold sells instantly, no prompt', () => {
+    const h = harness([{ itemId: valuableId, count: 1 }], { minQualityRank: valuableRank + 1 });
+    clickCellFor(h.root, valuableId);
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([
+      `sellItem:${valuableId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
+    ]);
+  });
+
+  it('a plain click on an item AT the threshold still confirms', () => {
+    const h = harness([{ itemId: valuableId, count: 1 }], { minQualityRank: valuableRank });
+    clickCellFor(h.root, valuableId);
+    expect(confirmPrompt()).not.toBeNull();
+    expect(h.calls).toEqual([]);
+  });
+
+  it('Sell All on a below-threshold stack sells the whole stack instantly', () => {
+    const stackRank = QUALITY_RANK[ITEMS[stackableValuableId].quality ?? 'common'];
+    const h = harness([{ itemId: stackableValuableId, count: 5 }], {
+      minQualityRank: stackRank + 1,
+    });
+    clickCellFor(h.root, stackableValuableId, { ctrl: true });
+    expect(quantityPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},5`]);
   });
 });

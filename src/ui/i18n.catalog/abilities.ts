@@ -1087,7 +1087,7 @@ const classAbilityNamesEn = {
       [
         'hex_of_violence',
         'Hex of Violence',
-        'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
+        'Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
       ],
       [
         'cruel_pact',
@@ -1132,7 +1132,7 @@ const classAbilityNamesEn = {
       [
         'ruinous_brand',
         'Ruinous Brand',
-        'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target.',
+        'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target. Ruinbolt echoes also count as critical hits, without another critical damage multiplier.',
       ],
       [
         'wrath',
@@ -1816,7 +1816,7 @@ const classAbilityNamesEn = {
       [
         'chaos_bolt',
         'Ruinbolt',
-        'Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%.',
+        'Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage before critical damage is applied. Always critically strikes when it hits. Desolation shortens its cast by 30%.',
       ],
       [
         'dark_pact',
@@ -1989,7 +1989,7 @@ const classAbilityNamesEn = {
       [
         'perfect_moment',
         'Perfect Moment',
-        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)',
+        'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancy)',
       ],
       [
         'arcane_surge',

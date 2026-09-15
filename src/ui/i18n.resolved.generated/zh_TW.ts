@@ -62,6 +62,7 @@ export const zh_TW: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "地城",
+      "town": "鎮",
       "difficulty": "難度",
       "name": "名稱",
       "spec": "專精",
@@ -159,6 +160,10 @@ export const zh_TW: EnTranslations = {
       "teleport": {
         "label": "傳送",
         "description": "移動到精確的世界座標。"
+      },
+      "town": {
+        "label": "城鎮中心",
+        "description": "按名字傳送到城鎮中心。"
       },
       "dungeon": {
         "label": "進入地城",
@@ -348,12 +353,25 @@ export const zh_TW: EnTranslations = {
       "banner": "正在觀察 {name}"
     },
     "readyCheck": {
+      "title": "就緒確認",
+      "close": "關閉",
       "prompt": "{name} 發起了準備確認。你準備好了嗎？",
       "ready": "準備就緒",
       "notReady": "未準備",
+      "status": "已就緒：{ready}/{total}",
+      "waiting": "等待回應...",
+      "memberReady": "{name} 已準備就緒。",
+      "memberNotReady": "{name} 尚未準備好。",
+      "memberPending": "{name} 尚未回應。",
       "result": "準備確認：{ready} 人就緒，{notReady} 人未準備，{noResponse} 人未回應。",
       "notInPartyError": "你必須加入隊伍才能發起就緒確認。",
       "inProgressError": "就緒確認已在進行中。"
+    },
+    "pullTimer": {
+      "start": "拉入 {seconds} 秒！",
+      "cancel": "開怪倒數已取消。",
+      "countdown": "{seconds}",
+      "pull": "拉！"
     },
     "death": {
       "resurrectAtCorpse": "在屍體旁復活",
@@ -578,6 +596,11 @@ export const zh_TW: EnTranslations = {
       "mountsTitle": "機械馬廄",
       "mountBuyAria": "購買{item}",
       "mountSkinType": "坐騎造型",
+      "mountInspectAria": "預覽{item}",
+      "mountRideIt": "騎上試試",
+      "mountOnly": "僅坐騎",
+      "mountBuy": "購買坐騎造型",
+      "mountScopeLine": "帳號通用造型。同一時間只能由一名角色穿戴。",
       "loading": "正在載入 WOC 商店…",
       "error": "WOC 商店目前無法使用，請稍後再試。",
       "balance": "Claudium 餘額",
@@ -1402,6 +1425,7 @@ export const zh_TW: EnTranslations = {
       "discord": "Discord",
       "bgFlag": "戰場奪旗動作",
       "sheathe": "收起/拔出武器",
+      "hideInterface": "隱藏介面",
       "dive": "下潛",
       "categoryPet": "寵物",
       "petAttack": "寵物：攻擊",
@@ -1410,8 +1434,22 @@ export const zh_TW: EnTranslations = {
       "petDefensive": "寵物：防禦",
       "petAggressive": "寵物：攻擊性",
       "targetPet": "寵物：選取",
+      "targetSelf": "選取自己",
+      "targetParty1": "選取隊友1",
+      "targetParty2": "選取隊友2",
+      "targetParty3": "選取隊友3",
+      "targetParty4": "選取隊友4",
+      "targetParty5": "選取隊友5",
+      "targetParty6": "選取隊友6",
+      "targetParty7": "選取隊友7",
+      "targetParty8": "選取隊友8",
+      "targetParty9": "選取隊友9",
       "mount": "騎乘 / 下騎",
-      "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。"
+      "mouseHint": "滑鼠按鍵同樣可用：綁定時按下中鍵 (M3) 或拇指鍵 (M4、M5)。左鍵與右鍵保留給鏡頭、點擊移動與點擊世界中的目標使用。",
+      "zoomIn": "拉近鏡頭",
+      "zoomOut": "拉遠鏡頭",
+      "wheelHint": "滑鼠滾輪也可以綁定：綁定時向上或向下滾動滾輪，也可以同時按住 Ctrl、Alt 或 Shift。拉近鏡頭和拉遠鏡頭預設佔用裸滾輪，把它們移到 Ctrl+滾輪之類的組合上，就能把滾輪留給技能使用。",
+      "wheelHeldRefused": "滾輪的一格無法驅動移動這類需要按住的操作。請為它選擇一個按鍵或滑鼠按鈕。"
     },
     "actionBar": {
       "editKeys": "編輯動作列按鍵",
@@ -1682,6 +1720,8 @@ export const zh_TW: EnTranslations = {
       "showReliquaryTracker": "顯示聖物庫追蹤器",
       "confirmVendorSell": "出售前確認",
       "confirmVendorSellNote": "關閉後，出售物品只需單擊即可完成，不再確認；如果背包格位發生變化，可能會賣錯物品。",
+      "confirmVendorSellMinQuality": "確認出售的最低品質",
+      "confirmVendorSellMinQualityNote": "低於此品質的物品單擊即可出售；誤售的物品仍可從商人處買回。",
       "itemLevelLine": "物品等級 {level}",
       "itemScoreLine": "評分 {score}",
       "showSecondaryActionBar": "顯示副動作列",
@@ -3248,7 +3288,30 @@ export const zh_TW: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "暫離",
       "cheaterTag": "< 作弊者 >",
-      "pledgeTag": "{guild}的宣誓者"
+      "pledgeTag": "{guild}的宣誓者",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "拍賣師",
+        "banker": "銀行職員",
+        "riftForgemaster": "裂隙鍛造大師",
+        "cardMaster": "牌局大師",
+        "crucibleQuartermaster": "熔爐軍需官",
+        "heroicQuartermaster": "英雄軍需官",
+        "pvpVendor": "PvP商人",
+        "weaponsmithTrainer": "鍛造訓練師",
+        "cookingTrainer": "烹飪訓練師",
+        "tailoringTrainer": "裁縫訓練師",
+        "engineeringTrainer": "工程學訓練師",
+        "leatherworkingTrainer": "製皮訓練師",
+        "alchemyTrainer": "煉金術訓練師",
+        "weaponVendor": "武器商人",
+        "armorVendor": "護甲商人",
+        "armsDealer": "軍械商人",
+        "foodVendor": "食物和飲料商人",
+        "potionVendor": "藥水商人",
+        "stableMaster": "馬廄管理員",
+        "generalGoods": "雜貨商人"
+      }
     },
     "mobTooltip": {
       "levelFamily": "等級 {level} {family}",
@@ -3482,6 +3545,7 @@ export const zh_TW: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "優質品級。以等級高於該材料的工具在滿級礦脈採集所得，在任何需要普通版本的地方均可替代使用。",
+      "fineFarmGrade": "優質品級。收穫時部分產物會成為優質品，農藝技能越高，或裝有充能的匠人之眼時更常出現。需要優質品級時普通農產品一律不算數，需要普通農產品時優質品級也一律不算數。",
       "cookingCatch": "烹飪材料。必須先烹飪後才能食用。",
       "usedBy": "用於 {crafts}。",
       "arcaneDust": "製作材料。分解普通和優秀品質的裝備可得。",
@@ -4022,6 +4086,25 @@ export const zh_TW: EnTranslations = {
       "lastSeenNever": "從未",
       "ignoredTab": "已忽略",
       "blockedTab": "封鎖",
+      "who": {
+        "tab": "世界衛生組織",
+        "searchPlaceholder": "名字、區域或公會",
+        "search": "搜尋",
+        "loading": "正在向伺服器查詢線上玩家...",
+        "empty": "沒有符合的玩家。",
+        "count": "{total} 人線上",
+        "countFiltered": "{shown} / {total} 人線上",
+        "capped": "僅顯示前 {delivered} 位。縮小搜尋範圍以查看其餘玩家。",
+        "classFilter": "依職業篩選",
+        "allClasses": "所有職業",
+        "colStatus": "狀態",
+        "colName": "姓名",
+        "colLevel": "等級",
+        "colClass": "職業",
+        "colZone": "區",
+        "colGuild": "公會",
+        "sortTitle": "依{column}排序"
+      },
       "ignoredEmpty": "你沒有忽略任何人。",
       "blockedEmpty": "你沒有封鎖任何人。",
       "blockSearchPlaceholder": "玩家名稱",
@@ -4143,6 +4226,7 @@ export const zh_TW: EnTranslations = {
           "farming": "放在背包裡即可，在田畦種植作物時自動生效。"
         },
         "speed": "在低於{tier}階的節點採集速度更快。",
+        "wieldDegrade": "技能不足時，它仍可當作較低階的工具使用。",
         "rodRequired": "釣魚所需。",
         "rodBite": "魚上鉤最多可提前{seconds}秒。",
         "rodReel": "收線時限延長{seconds}秒。",
@@ -4418,6 +4502,18 @@ export const zh_TW: EnTranslations = {
       "retentionFooter": "重置專業後保留60%的技能。",
       "tutorialLink": "專業教學"
     },
+    "recipeTracker": {
+      "trackerLabel": "配方",
+      "collapseHint": "收合配方追蹤器",
+      "expandHint": "展開配方追蹤器",
+      "pin": "釘選",
+      "unpin": "取消釘選",
+      "pinFull": "配方追蹤器已滿（最多 {cap} 個配方）",
+      "pinAria": "將{name}釘選到HUD追蹤器",
+      "unpinAria": "從HUD追蹤器取消釘選{name}",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
+    },
     "crafting": {
       "title": "製作",
       "close": "關閉製作",
@@ -4448,6 +4544,7 @@ export const zh_TW: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（消耗 {count} 個優質品級）",
       "reagentVaultDraw": "（從材料倉庫取用 {count}）",
+      "reagentOrdinaryHeld": "（持有{name} {count} 個，但此處只有優質品級才算數）",
       "vaultUnreachable": "此處無法使用材料倉庫。",
       "craftFeeLine": "製作費：每件 {fee}",
       "empty": "尚無已知配方。",
@@ -4541,8 +4638,8 @@ export const zh_TW: EnTranslations = {
       "attunedBanner": "已調諧：{title}",
       "tierTutorial": {
         "title": "你的第一個階級",
-        "tierCap": "一門技藝在技能 {skill} 時達到第一個階級，每提升一個階級都會改善其製作能力。但只有當某門技藝成為你兩門主修之一時，才能製作超越稀有品質的作品。",
-        "radar": "你的專業構成一個環輪。調諧到相鄰的一對，這兩門技藝便成為無上限的主修；環輪對面的一門技藝成為上限為稀有的嗜好；其餘技藝則進入休眠：知識仍會保留，但在你重新拾起之前上限為普通。",
+        "tierCap": "一項專業在技能 {skill} 時達到第一個階級，每提升一個階級都會改善其產出或可製作的內容。不過，具體到你的製造類專業，只有當某門技藝成為你的兩門主修之一後，才能提升到超越稀有品質的作品。",
+        "radar": "你的製造類專業構成一個環輪。調諧到相鄰的一對，這兩門技藝便成為無上限的主修；環輪對面的一門技藝成為上限為稀有的嗜好；其餘技藝則進入休眠：知識仍會保留，但在你重新拾起之前上限為普通。",
         "masters": "各城鎮的工藝大師提供調諧任務。準備好後去拜訪他們，選擇你的組合。你所學到的一切都不會失去。",
         "dismiss": "明白了"
       },
@@ -4836,6 +4933,7 @@ export const zh_TW: EnTranslations = {
       "roleDps": "輸出",
       "freeRoles": "不限職責",
       "lockoutDaily": "最終首領每日鎖定",
+      "lockoutWeekly": "每個首領每週鎖定",
       "lockoutNone": "無鎖定",
       "lockedFor": "鎖定約 {minutes} 分鐘",
       "attunement": "需要完成前置任務：{quest}",
@@ -4849,6 +4947,8 @@ export const zh_TW: EnTranslations = {
       "lootMaybe": "以下物品至多掉落其一：",
       "lootChance": "額外機率掉落：",
       "lootHeroic": "英雄獎勵，以下物品必掉其一：",
+      "lootHeroicMaybe": "英雄獎勵，以下物品至多掉落其一：",
+      "lootHeroicChance": "英雄獎勵，額外機率掉落：",
       "pct": "{pct}%",
       "blockedLevel": "僅限等級 {min} 至 {max}",
       "blockedSpec": "需要選擇專精",
@@ -4922,7 +5022,33 @@ export const zh_TW: EnTranslations = {
         "kings_wrath": "國王之怒（30%：永久傷害加成，地面威脅加速）",
         "bone_storm": "骨風暴（無視仇恨，橫掃並衝撞團隊）",
         "crown_endures": "王冠永存（6:00 硬狂暴，英雄難度 5:00）",
-        "deathless_court": "不死宮廷（僅英雄難度，不死之怒後王庭崛起）"
+        "deathless_court": "不死宮廷（僅英雄難度，不死之怒後王庭崛起）",
+        "bloodmane_rend": "血鬃撕裂（流血，注意目標切換）",
+        "tusk_sweep": "獠牙橫掃（正面順劈）",
+        "ancestral_sap": "祖靈汁液（治療其盟友）",
+        "call_of_the_hunt": "狩獵召喚（加速附近盟友）",
+        "thickhide_ward": "厚皮護盾（護盾附近盟友）",
+        "beast_pit_quake": "獸坑震擊（範圍傷害）",
+        "wildheart_pulse": "狂野之心脈衝（週期性範圍傷害）",
+        "jaguar_roar": "美洲豹咆哮（擊退）",
+        "brand_of_the_pyre": "柴堆烙印（疊加的火焰標記，在導水管的水中洗淨）",
+        "forge_strike": "熔爐打擊（疊加的坦克換位減益）",
+        "rain_of_cinders": "餘燼之雨（三道火焰錐形，站在其間）",
+        "falling_cinders": "墜落餘燼（玩家腳下的隕石圈，移出）",
+        "revolving_inferno": "迴旋煉獄（旋轉的火焰射線，穿過缺口）",
+        "forge_wave": "熔爐之波（擴散的火牆，利用兩條安全通道）",
+        "apocalypse_add": "伊格尼瓦的喚灰者（施放天啟的優先目標，速殺）",
+        "judgment_of_the_forge": "熔爐審判（過渡階段，共享唯一的安全庇護）",
+        "last_inferno": "最後煉獄（生命值20%時的45秒狂暴）",
+        "chains_of_the_forge": "熔爐鎖鏈（僅英雄難度，緊靠被鏈接的同伴）",
+        "makers_brand": "造物主烙印（疊加的坦克換位減益）",
+        "forgefathers_sweep": "熔爐之父橫掃（對非坦克的寬正面錐形）",
+        "tempering_ray": "淬火射線（射向被標記玩家的直線，上前攔截）",
+        "cinder_orbs": "餘燼寶珠（被標記的玩家散開至房間邊緣）",
+        "forgestorm": "熔爐風暴（墜落的隕石圈，移出）",
+        "shared_pyre": "共享柴堆（集合圈，分攤傷害）",
+        "anvils_decree": "鐵砧法令（三次全團鎚擊，用治療撐過）",
+        "masters_assembly": "大師裝配（阻擋熔爐光束，輪換阻擋者）"
       }
     },
     "cosmetics": {
@@ -4943,6 +5069,8 @@ export const zh_TW: EnTranslations = {
       "applied": "已套用",
       "owned": "已擁有",
       "storeOnly": "可在 WOC 商店購買",
+      "preview": "預覽",
+      "previewAria": "預覽{name}",
       "cardAria": "{name}，{rarity}",
       "mountsIntro": "坐騎造型會覆蓋在此角色騎乘的任何坐騎上，絕不改變速度。",
       "mountsNoMount": "先擁有一匹坐騎：造型需要可騎乘的對象。",
@@ -5252,11 +5380,11 @@ export const zh_TW: EnTranslations = {
       "colBuyNow": "直購價",
       "colTimeLeft": "剩餘時間",
       "colBuyer": "買家",
-      "colSoldAt": "Sold",
+      "colSoldAt": "賣",
       "colSalePrice": "成交價",
-      "colSaleType": "Type",
+      "colSaleType": "類型",
       "saleTypeAuction": "拍賣",
-      "saleTypeBuyNow": "Buy now",
+      "saleTypeBuyNow": "立即購買",
       "saleTypeDirected": "定向出售",
       "saleTypeUnknown": "未知",
       "historyEmpty": "暫無銷售記錄。",
@@ -5933,6 +6061,7 @@ export const zh_TW: EnTranslations = {
       "deeds": "功績之書",
       "reliquary": "聖物庫",
       "sheathe": "收起/拔出武器",
+      "hideInterface": "隱藏介面（用於截圖和錄影）",
       "crafting": "製作",
       "mount": "騎乘 / 下騎",
       "calendar": "活動日曆",
@@ -5962,6 +6091,8 @@ export const zh_TW: EnTranslations = {
       "attackMove": "攻擊移動（需先在選項中開啟）",
       "meters": "戰鬥統計（傷害、治療與仇恨）",
       "petMark": "寵物：標記，選取你自己的寵物（與點擊牠的頭像框相同）",
+      "targetSelf": "選取你自己",
+      "targetParty": "選取隊友1至9（依隊伍框架由上而下的顯示順序）",
       "onBarBinding": "你也可以直接在動作列上設定按鍵：在「按鍵設定」面板中選擇「編輯動作列按鍵」，接著點擊動作列上的一個格子，再按下你想要的按鍵。完成後點擊「完成」。這一項僅限電腦版，因為它需要實體鍵盤。",
       "clickMoveNote": "點擊移動預設是關閉的，得由你親自開啟：在遊戲選單中打開「按鍵設定」面板，開啟「點擊移動」，再用它下方的「點擊移動按鍵」一列，選擇要由哪一顆滑鼠按鍵負責走路（預設是左鍵，也可以改成右鍵）。開啟之後，點擊地面上的某一處，你就會朝那裡走去，地上還會有一個標記指出你的去向。點擊一隻生物或另一位玩家，你會走到對方身邊並停在距離之內，而這一次點擊仍然照常完成它原本的工作，也就是鎖定目標或互動；若你點擊的東西本來就在你伸手可及之處，你便直接互動，站在原地不動。任何一個移動按鍵都會立刻把控制權收回並結束這趟路程，按住滑鼠按鍵環顧四周也一樣。跳躍則不會，所以你可以一邊跳一邊繼續前進；而打開遊戲選單只是讓這趟路程暫停，等你關上選單，它就會繼續走完。"
     },
@@ -6099,7 +6230,8 @@ export const zh_TW: EnTranslations = {
       "ifLockBars": "鎖定你的動作列，讓你不會不小心把技能拖出格子。",
       "keybindsHeading": "「按鍵設定」面板",
       "keybindsBody": "按鍵清單只是那個面板的一半。清單上方是決定滑鼠如何驅動遊戲的那些開關：滑鼠鏡頭、旋轉視角時游標是否鎖定、點擊移動以及用哪個滑鼠鍵觸發、攻擊移動、左撇子的觸控佈局，還有聊天的髒話過濾。",
-      "keybindsMouseBody": "那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。"
+      "keybindsMouseBody": "那裡有兩件事很容易錯過。滑鼠鍵和一般按鍵一樣可以綁定，因此滾輪按下與拇指鍵都能承載技能，而左鍵與右鍵則保留給鏡頭以及點擊世界。另外，你也可以直接從動作列綁定：在這裡開啟列上綁定模式，然後點一個格子，再按下你想要的按鍵。",
+      "keybindsWheelBody": "滾輪本身也可以綁定。拉近鏡頭和拉遠鏡頭是普通綁定，預設佔用裸滾輪，因此你可以把它們移到 Ctrl+滾輪或按鍵上，再用空出來的滾輪觸發動作列格位。滾輪的一格沒有放開動作，所以無法驅動向前移動這類需要按住的操作。"
     },
     "combat": {
       "intro": "戰鬥遵循熟悉的經典MMO規則。你完全不需要研究這些就能玩得很好，這只是讓你了解戰鬥運作的大致樣貌。",
@@ -7489,7 +7621,7 @@ export const zh_TW: EnTranslations = {
         "bonusFmt": "+{value}{stat}",
         "enchantsNoteOffhand": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。強效層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有三個去處：兩種符物配方各需五個，工具效果補充的最高一階，以及瑩光層級（其中武器與胸部附魔各需一個，瑩光灌注需兩個），所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼材）、符文印記（武器，智力，共鳴木材）、符文織紋（胸部，精神，共鳴絲線）、符文獸皮（腿部，敏捷，共鳴獸皮）、符文鎖環（頭部，耐力，共鳴鎖環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與強效附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文獸皮則是腿部唯一的敏捷附魔。確切加成數值見下表。\n\n凌駕於三者之上的是瑩光層級，本行當的巔峰之作，也是唯一對技能本身提出要求的附魔：其中四件需要附魔100，瑩光灌注需要125，數值見下方的技能欄。每一件都需要一份瑩光試劑，並在武器（威力與法術強度兩種選擇）、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效，而目前還沒有任何物品能臻至完美：它是搶在它所等待的臻至完美工程之前就先寫就的。",
         "enchantsNoteInfusionLive": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。強效層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有三個去處：兩種符物配方各需五個，工具效果補充的最高一階，以及瑩光層級（其中武器與胸部附魔各需一個，瑩光灌注需兩個），所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼材）、符文印記（武器，智力，共鳴木材）、符文織紋（胸部，精神，共鳴絲線）、符文獸皮（腿部，敏捷，共鳴獸皮）、符文鎖環（頭部，耐力，共鳴鎖環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與強效附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文獸皮則是腿部唯一的敏捷附魔。確切加成數值見下表。\n\n凌駕於三者之上的是瑩光層級，本行當的巔峰之作，也是唯一對技能本身提出要求的附魔：其中四件需要附魔100，瑩光灌注需要125，數值見下方的技能欄。每一件都需要一份瑩光試劑，並在武器（威力與法術強度兩種選擇）、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔師的，物品如何走到那一步由專業頁面講述。",
-        "enchantsNoteRaidFormula": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。強效層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有三個去處：兩種符物配方各需五個，工具效果補充的最高一階，以及瑩光層級（其中武器與胸部附魔各需一個，瑩光灌注需兩個），所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼材）、符文印記（武器，智力，共鳴木材）、符文織紋（胸部，精神，共鳴絲線）、符文獸皮（腿部，敏捷，共鳴獸皮）、符文鎖環（頭部，耐力，共鳴鎖環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與強效附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文獸皮則是腿部唯一的敏捷附魔。確切加成數值見下表。\n\n在普通低階附魔之上的是瑩光層級，即本行當普通附魔的巔峰之作：其中四件需要附魔100，瑩光灌注需要125，數值見下方的技能欄。每一件都需要一份瑩光試劑，並在武器（威力與法術強度兩種選擇）、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔師的，物品如何走到那一步由專業頁面講述。\n\n末焰熱忱是獨立的團隊副本配方，並非免費掌握的普通附魔。施加之前，須在附魔技能100時學習這張可交易的配方。每次附魔消耗3個末焰之核和2個鈴音碎片；配方可在熔爐掉落，也可向熔爐軍需官支付1個末焰之核購買。其近戰觸發效果與武器速度規則完整列於下方。",
+        "enchantsNoteRaidFormula": "附魔分四個層級。基礎層以鈴音之塵（高端配方加少量鈴音精華）驅動，涵蓋武器槽、副手與全部護甲槽，屬性軸選項豐富，每種配裝都能為每個槽位找到合適的附魔：盾牌與法系手持副手另有專屬的耐力附魔，因此沒有任何已裝備的槽位是附魔死角。強效層消耗一個鈴音碎片加鈴音精華：為高價值槽位提供更強的加成。鈴音碎片另外還有三個去處：兩種符物配方各需一個（符物其餘的材料是精華與粉塵），工具效果補充的最高一階，以及瑩光層級（其中武器與胸部附魔各需一個，瑩光灌注需兩個），所以動用之前先存幾個起來。\n\n兩層之間另有五種符文附魔，每種消耗一個定向副產物，確保研磨所得無一浪費：符文鋒刃（武器，力量，消耗共鳴鋼材）、符文印記（武器，智力，共鳴木材）、符文織紋（胸部，精神，共鳴絲線）、符文獸皮（腿部，敏捷，共鳴獸皮）、符文鎖環（頭部，耐力，共鳴鎖環）。每種符文附魔還需要兩個鈴音精華；若某槽位同時有基礎與強效附魔，符文加成落在兩者之間，但符文織紋是胸部最強的精神附魔，符文獸皮則是腿部唯一的敏捷附魔。確切加成數值見下表。\n\n在普通低階附魔之上的是瑩光層級，即本行當普通附魔的巔峰之作：其中四件需要附魔100，瑩光灌注需要125，數值見下方的技能欄。每一件都需要一份瑩光試劑，並在武器（威力與法術強度兩種選擇）、胸部與腳部各自的階梯上再邁出一級。其中最後一件瑩光灌注，只會在臻至完美的物品上生效：臻至完美是佩戴者自己的工作，而非附魔師的，物品如何走到那一步由專業頁面講述。\n\n末焰熱忱是獨立的團隊副本配方，並非免費掌握的普通附魔。施加之前，須在附魔技能100時學習這張可交易的配方。每次附魔消耗3個末焰之核和2個鈴音碎片；配方可在熔爐掉落，也可向熔爐軍需官支付1個末焰之核購買。其近戰觸發效果與武器速度規則完整列於下方。",
         "charmsHeading": "給採集者工具的符物",
         "formulaRequired": "需要配方",
         "charmsBody": "附魔也是採集者的符物的來源。你的附魔技能達到 25 之後，Tinker Gizzel 會在 Eastbrook 工坊把兩者都教給你：採集者儲囊，讓一次採收多出一個單位；以及匠人之眼，提升採上來之物的品級。兩者各製作一次，然後插進鎬、斧或鐮刀裡，在那裡它只有在確實改善了採收時才會消耗一次充能。\n\n補充充能才是這門手藝持續賺錢的地方。充能由工具的持有者恢復，而不是由來訪的附魔師恢復；當那位持有者就是簽下符物的附魔師時，補充只需一半的材料，有附魔專精則更少。所以隔著櫃台賣出的符物只是一筆買賣，而插在你自己工具上的符物，才是最便宜的長期用品。完整的充能與材料階梯，可在任何一門採集專業的頁面上、「工具效果」一節查看。"
@@ -7558,7 +7690,7 @@ export const zh_TW: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "耕作節奏",
-        "rhythmBody": "播種才是那段短暫可見的施法：每一階都固定{plant}秒，因為鋤頭開放的是新的地形，而不是買來速度。拔起成熟的作物則是瞬間完成，沒有施法可打斷，也沒有背包檢查會攔下它；已經成熟的田畦你放多久它就等多久，所以行囊裝滿對農夫來說，代價不過是走一趟去清空而已。\n\n一次收成付的是農產品與耕作熟練。與礦脈不同，它完全不給角色經驗，因此田畦是一門用來經營的手藝，而不是升級的途徑。",
+        "rhythmBody": "播種是瞬間完成的，因為鋤頭開放的是新的地形，而不是買來速度：沒有需要等待的施法，所以轉身離開的農夫也一樣已經種下了。拔起成熟的作物同樣是瞬間完成，沒有施法可打斷，也沒有背包檢查會攔下它；已經成熟的田畦你放多久它就等多久，所以行囊裝滿對農夫來說，代價不過是走一趟去清空而已。\n\n一次收成付的是農產品與耕作熟練。與礦脈不同，它完全不給角色經驗，因此田畦是一門用來經營的手藝，而不是升級的途徑。",
         "gainHeading": "一次收成教會什麼",
         "gainBody": "成長是確定的，取決於你自己的計數而非作物：計數在{p1}以下時，每次收成{g1}點熟練，{p2}以下{g2}點，{p3}以下{g3}點，其後一路到{cap}的上限都是{g4}點。它從來不是一次技能提升的擲骰，所以這段攀登有多長，全由算術決定。\n\n作物落在哪一階，決定的是一畦田能帶你走多遠：第1階作物教到{c1}便在那裡變灰，第2階教到{c2}，第3階及以上一路教到上限，所以往上換田畦，才是讓計數持續前進的關鍵。",
         "yieldsHeading": "一次收成的收穫",
@@ -10148,6 +10280,7 @@ export const zh_TW: EnTranslations = {
       "templates": {
         "battleground": "[戰場] {name}：{message}",
         "party": "[隊伍] {name}：{message}",
+        "raidWarning": "[團隊警告] {name}：{message}",
         "yell": "{name}大喊：{message}",
         "whisper": "{name}悄悄說：{message}",
         "toWhisper": "對{name}說：{message}",
@@ -10286,6 +10419,7 @@ export const zh_TW: EnTranslations = {
       "stunned": "你被擊暈了！",
       "silenced": "你已被沉默！",
       "busy": "你正忙。",
+      "cannotCastWhileMoving": "你無法在移動時施法。",
       "abilityNotReady": "該技能尚未準備好。",
       "notEnoughRage": "怒氣不足！",
       "notEnoughEnergy": "能量不足！",
@@ -10634,7 +10768,6 @@ export const zh_TW: EnTranslations = {
     },
     "cast": {
       "fishing": "釣魚",
-      "farming": "播種",
       "gathering": "採集",
       "crafting": "製作",
       "disenchanting": "分解",
@@ -10978,6 +11111,19 @@ export const zh_TW: EnTranslations = {
       "buyConfirmAccept": "購買",
       "buyConfirmCancel": "取消",
       "buyChanged": "該上架在你確認前已變更。請核對價格後再試一次。",
+      "sweep": "掃貨",
+      "sweepAria": "在市場掃貨購買{item}",
+      "sweepTitle": "市場掃貨：{item}",
+      "sweepClose": "關閉",
+      "sweepNote": "依單價由低到高整批買下其他賣家的上架，直到湊足你要的數量。你可能會比要求的多收到幾件。",
+      "sweepQuantity": "需要數量",
+      "sweepQuoteNone": "沒有可掃貨的該物品上架。",
+      "sweepQuoteLine": "{listings}筆上架共{units}件，合計{total}（每件{each}）",
+      "sweepQuoteShort": "僅有{listings}筆上架共{units}件可購，合計{total}（每件{each}）",
+      "sweepButton": "掃貨",
+      "sweepConfirmTitle": "確認市場掃貨",
+      "sweepConfirmBody": "以{total}（每件{each}）從{listings}筆上架購買{item} x{units}？",
+      "sweepChanged": "掃貨報價在你確認前已變更。請核對總價後再試一次。",
       "sellNote": "從背包上架貨物。物品售出時商人抽取 {cut}%。你正在使用 {used}/{max} 個上架位。",
       "sellPickEmpty": "點擊背包中的物品來選擇要出售的貨物。",
       "quantity": "數量",
@@ -11017,7 +11163,9 @@ export const zh_TW: EnTranslations = {
       "ownListing": "這是你自己的上架。取消即可取回。",
       "cannotAfford": "你買不起。",
       "notYourListing": "這不是你的上架。",
-      "nothingToCollect": "你沒有可領取內容。"
+      "nothingToCollect": "你沒有可領取內容。",
+      "sweepNoListings": "沒有可掃貨的該物品上架。",
+      "sweepPriceChanged": "掃貨送達前價格已變更。請核對報價後再試一次。"
     },
     "loot": {
       "takeAll": "全部拾取",
@@ -16506,6 +16654,21 @@ export const zh_TW: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "治療假人"
+      },
+      "healing_dummy_tank": {
+        "name": "受傷的先鋒假人"
+      },
+      "healing_dummy_soldier": {
+        "name": "受傷的士兵假人"
+      },
+      "healing_dummy_scout": {
+        "name": "危急的斥候假人"
+      },
+      "healing_dummy_caster": {
+        "name": "負傷的施法者假人"
+      },
+      "healing_dummy_ranger": {
+        "name": "傷痕累累的遊俠假人"
       },
       "ridge_stalker": {
         "name": "山脊潛獵者"

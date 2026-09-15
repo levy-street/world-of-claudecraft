@@ -188,7 +188,7 @@ function farmRhythmSections(g: GuideProfGathering): string {
     formatNumber(f.teachingCeilingByCropTier.find((r) => r.tier === tier)?.ceiling ?? 0);
   return `<section class="guide-block" id="prof-rhythm">
       <h2>${esc(t('guide.profPages.farm.rhythmHeading'))}</h2>
-      ${paras('guide.profPages.farm.rhythmBody', { plant: formatNumber(f.plantCastSec) })}
+      ${paras('guide.profPages.farm.rhythmBody')}
     </section>
     <section class="guide-block" id="prof-gain">
       <h2>${esc(t('guide.profPages.farm.gainHeading'))}</h2>

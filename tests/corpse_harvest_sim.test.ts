@@ -74,7 +74,10 @@ import {
   bestOwnedAnyGatherToolTier,
   canHarvestMonsterMaterial,
 } from '../src/sim/professions/tools';
-import { TIER3_TOOL_WIELD_PROFICIENCY } from '../src/sim/professions/wield_gate';
+import {
+  TIER2_TOOL_WIELD_PROFICIENCY,
+  TIER3_TOOL_WIELD_PROFICIENCY,
+} from '../src/sim/professions/wield_gate';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import { DT, type Entity, type WorldContent } from '../src/sim/types';
@@ -2001,11 +2004,16 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
     expect(mob.harvestClaimedBy).toBe(a);
   });
 
-  it('R50: the same tool BELOW its wield requirement restores nothing, and names the rung (seed 15)', () => {
+  it('R50: the same tool BELOW the TARGET tier requirement restores nothing, and names that rung (seed 15)', () => {
+    // Under the degrade rule a tier-3 pick at mining 39 works as a tier-1
+    // pick, so the tier-2 hide is still out of reach and the denial names
+    // the 40 that would open tier 2 (the pick's own 70 unlocks nothing the
+    // player is asking for). At 40 the same pick harvests it (the sibling
+    // arm below).
     const { sim, internals, a, mob } = soloRig(15);
     const meta = mustPlayer(internals, a);
     sim.addItem('mithril_mining_pick', 1, a);
-    meta.gatheringProficiency.mining = TIER3_TOOL_WIELD_PROFICIENCY - 1;
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY - 1;
     sim.drainEvents();
     let draws = 0;
     withTier('hide', 2, () => {
@@ -2027,9 +2035,25 @@ describe('corpse premium-arm tool gating (Professions 2.0)', () => {
         pid: a,
         surface: 'corpse',
         requiredTier: 2,
-        wieldProficiency: TIER3_TOOL_WIELD_PROFICIENCY,
+        wieldProficiency: TIER2_TOOL_WIELD_PROFICIENCY,
       },
     ]);
+  });
+
+  it('R50 degrade: the same tier-3 pick at the TIER-2 requirement harvests a tier-2 hide (seed 15)', () => {
+    // The anti-vacuous twin of the arm above: 40 is what the denial named,
+    // and 40 is where the degraded pick reads tier 2 and the premium arm
+    // opens, though the pick is still 30 points short of its own tier.
+    const { sim, internals, a, mob } = soloRig(15);
+    const meta = mustPlayer(internals, a);
+    sim.addItem('mithril_mining_pick', 1, a);
+    meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
+    sim.drainEvents();
+    withTier('hide', 2, () => {
+      grantCorpseHarvestOnMob(sim, mob, meta, ['hide']);
+    });
+    expect(sim.drainEvents().filter((e) => e.type === 'gatherDenied')).toEqual([]);
+    expect(sim.countItem('pristine_hide', a) + premiumMaterialUnits(meta)).toBeGreaterThan(0);
   });
 
   it('at most ONE gatherDenied per harvest command, even with several denied families (seed 23)', () => {
@@ -2509,8 +2533,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // 191, not 189: the Eastbrook hub practice dummies (src/sim/content/practice_dummies.ts,
     // hub_training_dummy and hub_healing_dummy) ship untagged too, the same shape as the
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
-    // without touching `tagged` either.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(191);
+    // without touching `tagged` either. Plus the five Eastbrook healing-training
+    // role dummies (src/sim/content/healing_training.ts), which are friendly
+    // practice targets, not corpses to butcher: 196.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(196);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

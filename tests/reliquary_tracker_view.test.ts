@@ -919,43 +919,27 @@ describe('tracker chrome', () => {
     }
   });
 
-  it('arms Enter/Space on #reliquary-tracker, stopped before the game binds hijack them', () => {
+  it('wires #reliquary-tracker through the shared tracker-header delegation', () => {
+    // The click plus Enter/Space arms (header-only guard, preventDefault +
+    // stopPropagation before the game binds) live in
+    // src/ui/tracker_header_wiring.ts and are pinned behaviorally in
+    // tests/tracker_header_wiring.test.ts; hud.ts hands it the two actions.
+    // Ordered: the compact-touch chip opens the window, the desktop header
+    // toggles the collapse.
     const arm = hud.match(
-      /\$\('#reliquary-tracker'\)\.addEventListener\('keydown',[\s\S]*?\n {4}\}\);/,
-    )?.[0] as string;
-    expect(arm).toBeTruthy();
-    expect(arm).toContain("if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;");
-    expect(arm).toContain('e.preventDefault();');
-    expect(arm).toContain('e.stopPropagation();');
-    // Keys landing anywhere else in the strip (a row, the bar) must not toggle
-    // the collapse: only the header is the control. The WHOLE guard statement,
-    // comment-stripped, so a prose mention or a captured-but-unused closest()
-    // cannot satisfy it.
-    expect(stripComments(arm)).toContain(
-      "if (!(e.target as HTMLElement).closest('.dt-header')) return;",
-    );
-    // The same compact-touch branch as the click delegation: the count chip
-    // opens the window, the desktop header toggles the collapse. Ordered, so
-    // nothing says openReliquary merely appears somewhere in the arm.
-    expect(arm).toMatch(
-      /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openReliquary\(\);/,
-    );
-    expect(arm).toContain('this.toggleReliquaryTrackerCollapsed();');
-  });
-
-  it('routes the compact-touch tap to the window rather than the invisible collapse', () => {
-    const arm = hud.match(
-      /\$\('#reliquary-tracker'\)\.addEventListener\('click',[\s\S]*?\n {4}\}\);/,
+      /wireTrackerHeader\(\$\('#reliquary-tracker'\), \{[\s\S]*?\n {4}\}\);/,
     )?.[0] as string;
     expect(arm).toBeTruthy();
     expect(arm).toMatch(
-      /body\.contains\('mobile-touch'\) && body\.contains\('hud-mobile-compact'\)[\s\S]{0,80}?this\.openReliquary\(\);/,
+      /toggle: \(\) => this\.toggleReliquaryTrackerCollapsed\(\),\s*isCompact: compactTouch,\s*openCompact: \(\) => this\.openReliquary\(\),/,
     );
-    // Clicks landing anywhere else in the strip must not toggle the collapse:
-    // the whole guard statement, comment-stripped (see the keydown arm).
-    expect(stripComments(arm)).toContain(
-      "if (!(e.target as HTMLElement).closest('.dt-header')) return;",
+    const wiring = read('../src/ui/tracker_header_wiring.ts');
+    expect(stripComments(wiring)).toContain(
+      "if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;",
     );
+    expect(wiring).toContain('e.preventDefault();');
+    expect(wiring).toContain('e.stopPropagation();');
+    expect(stripComments(wiring)).toContain("target.closest(wiring.header ?? '.dt-header')");
   });
 
   it('persists the tracker collapse as its own settings row', () => {

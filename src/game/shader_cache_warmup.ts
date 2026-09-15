@@ -71,6 +71,7 @@ import {
   type WarmupSkipReason,
   warmupApplies,
   warmupExtensionsMatch,
+  warmupGpuTimerPinned,
   warmupRefusedOnPlatform,
 } from '../render/shader_warmup_core';
 import {
@@ -478,13 +479,16 @@ function resolveCompletedLinks(gl: WarmupGl): void {
 }
 
 async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
+  const search = options.search ?? currentSearch();
   const query = readWarmupQuery(
-    options.search ?? currentSearch(),
+    search,
     options.stored !== undefined ? options.stored : storedShaderWarmSetting(),
   );
   const refused = warmupRefusedOnPlatform(options.platform ?? currentPlatform());
-  // Off and a refused platform read no storage and mint no context.
-  const admitted = query.enabled && !refused;
+  const gpuTimer = warmupGpuTimerPinned(search);
+  // Off, a refused platform and the GPU timer probe read no storage and mint
+  // no context.
+  const admitted = query.enabled && !refused && !gpuTimer;
   const store = options.store ?? createIndexedDbStore();
   const record = admitted ? await decodeCorpus(await store.get(CORPUS_KEY)) : null;
   // The player can have clicked through to the world while the corpus loaded.
@@ -506,6 +510,7 @@ async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
       : '';
   const decision = warmupApplies({
     enabled: query.enabled,
+    gpuTimer,
     iosWebKit: refused,
     parallelCompile: sweep?.parallelCompile ?? false,
     hasCorpus,

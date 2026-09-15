@@ -154,8 +154,10 @@ describe('steam wishlist markup', () => {
 
   it('starts both entries fail-closed until the Steam-distribution probe settles', () => {
     for (const file of ENTRIES) {
-      expect(entry(file), `${file} boot body class`).toContain(
-        `<body class="${STEAM_WISHLIST_PENDING_BODY_CLASS}"`,
+      // The boot class list also carries start-screen-open (the pre-game HUD
+      // hide, src/ui/root_state_classes.ts), so match the token, not the whole list.
+      expect(entry(file), `${file} boot body class`).toMatch(
+        new RegExp(`<body class="[^"]*\\b${STEAM_WISHLIST_PENDING_BODY_CLASS}\\b`),
       );
     }
   });

@@ -266,6 +266,14 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 240, h: 120 },
     detachToUiRoot: true,
   },
+  {
+    id: 'recipeTracker',
+    elementId: 'recipe-tracker',
+    storageKey: 'woc_hud_frame_recipe_tracker',
+    labelKey: 'hudChrome.recipeTracker.trackerLabel',
+    fallbackSize: { w: 240, h: 140 },
+    detachToUiRoot: true,
+  },
   // The class resource bars, previously movable outside this option (the
   // devotion medallion's grab-drag, the doom meter's own corner button), now
   // ordinary governed frames so they hide and resize like everything else.

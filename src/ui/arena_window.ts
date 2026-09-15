@@ -17,6 +17,7 @@
 // constants. The window redraws while open from hud.update()'s
 // mediumHud band, skipping the DOM rebuild when the content signature is unchanged.
 
+import { apiUrl } from '../client_origin';
 import { audio } from '../game/audio';
 import type { ArenaMapId } from '../sim/dungeon_layout';
 import { ARENA_MIN_LEVEL } from '../sim/social/arena';
@@ -187,7 +188,7 @@ export class ArenaWindow {
     const now = performance.now();
     if (now - (this.lbFetchedAt[format] ?? 0) < LEADERBOARD_REFETCH_MS) return;
     this.lbFetchedAt[format] = now;
-    fetch(`/api/arena/leaderboard?format=${encodeURIComponent(format)}`)
+    fetch(apiUrl(`/api/arena/leaderboard?format=${encodeURIComponent(format)}`))
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d && Array.isArray(d.leaders)) {
@@ -204,7 +205,7 @@ export class ArenaWindow {
     const now = performance.now();
     if (now - this.bgLbFetchedAt < LEADERBOARD_REFETCH_MS) return;
     this.bgLbFetchedAt = now;
-    fetch('/api/battleground/leaderboard')
+    fetch(apiUrl('/api/battleground/leaderboard'))
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (d && Array.isArray(d.leaders)) {

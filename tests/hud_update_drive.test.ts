@@ -1428,6 +1428,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the always-on gathering goal tracker (Intentional Gathering PR4, not gated on a window): a projection change has no dedicated event, so it rides the same slow poll; the module itself signature-gates the rebuild so an unchanged goal touches no DOM (a chrome row carries no guard field, same as updateDeedTracker/updateReliquaryTracker beside it)',
   },
   {
+    call: 'this.updateRecipeTracker',
+    band: 'slow',
+    gate: '',
+    surface: 'chrome',
+    why: 'the always-on pinned-recipe tracker (not gated on a window): reagents arrive from gathering and loot with no craft event to repaint on',
+  },
+  {
     call: 'this.trackerStackAnchor.apply',
     band: 'slow',
     gate: '',
@@ -1786,7 +1793,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 88 -> 89 at the aura-tracks sync (PR #3925): this branch adds
       // the aura tracks' one chrome call on top of the release's 88; the
       // release's window 48 carries over untouched.
-    ).toEqual({ window: 49, chrome: 90, none: 17 });
+      // chrome 90 -> 91: the always-on pinned-recipe tracker
+      // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
+      // tracker's exact slow-band row shape.
+    ).toEqual({ window: 49, chrome: 91, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

@@ -375,6 +375,15 @@ describe('browse rows: the display payload is trimmed to the public allowlist', 
     const row = sim.marketInfoFor(pid)!.listings.find((l) => l.instance);
     expect(row?.instance).toEqual({ signer: 'Lister' });
   });
+
+  it('wires craftedRecipeId on crafted plain listings for client sweep eligibility', () => {
+    const { sim, pid } = marketSetup();
+    sim.addItem(HIDE, 2, pid, { craftedRecipeId: 'recipe_pristine_hide' });
+    sim.marketList(HIDE, 2, 80, pid);
+    const row = sim.marketInfoFor(pid)!.listings.find((l) => l.itemId === HIDE);
+    expect(row?.craftedRecipeId).toBe('recipe_pristine_hide');
+    expect(row !== undefined && 'instance' in row).toBe(false);
+  });
 });
 
 describe('persistence: instanced listings and collections round-trip the JSONB save', () => {

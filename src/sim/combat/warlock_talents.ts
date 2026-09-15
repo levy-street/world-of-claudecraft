@@ -30,7 +30,7 @@ const WARLOCK_DAMAGING_SPELLS = new Set([
 const LEADEN_SLOW_ID = 'wlk_leaden_hex_slow';
 const LEADEN_ROOT_ID = 'wlk_leaden_hex_root';
 const LEADEN_ROOT_LOCK_ID = 'wlk_leaden_hex_root_lock';
-const LEADEN_SLOW_PER_STACK = 0.05;
+const LEADEN_SLOW_PER_STACK = 0.1;
 const LEADEN_MAX_STACKS = 3;
 const LEADEN_DURATION = 5;
 const LEADEN_ROOT_DURATION = 3.5;
@@ -167,10 +167,12 @@ export function applyLeadenHex(
     return;
   }
 
+  const slowPerStack =
+    mods.global.warlockLeadenHex > 0 ? mods.global.warlockLeadenHex : LEADEN_SLOW_PER_STACK;
   const stacks = Math.min(LEADEN_MAX_STACKS, (slow?.stacks ?? 0) + 1);
   if (slow) {
     slow.stacks = stacks;
-    slow.value = 1 - stacks * LEADEN_SLOW_PER_STACK;
+    slow.value = 1 - stacks * slowPerStack;
     slow.remaining = LEADEN_DURATION;
     slow.duration = LEADEN_DURATION;
   } else {
@@ -178,7 +180,7 @@ export function applyLeadenHex(
       id: LEADEN_SLOW_ID,
       name: 'Leaden Hex',
       kind: 'slow',
-      value: 1 - LEADEN_SLOW_PER_STACK,
+      value: 1 - slowPerStack,
       stacks: 1,
       remaining: LEADEN_DURATION,
       duration: LEADEN_DURATION,

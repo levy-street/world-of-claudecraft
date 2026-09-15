@@ -1,8 +1,8 @@
 // Tests for the pure unitFrameCurrentMaxText formatter (hud_frames.ts), which
-// the player / target / target-of-target unit frames in hud.ts use for their
-// "current / max" hp and resource text, replacing the raw template-literal
-// interpolation those five sites used to bypass formatNumber with (unlike
-// party frames, which already routed through it via partyFrameHealthText).
+// the player / target / target-of-target unit frames use for their "current / max"
+// hp and resource text, replacing the raw template-literal interpolation those
+// sites used to bypass formatNumber with (unlike party frames, which already
+// routed through it via partyFrameHealthText).
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -157,6 +157,10 @@ describe('healthTextForMode', () => {
 // passes after it.
 describe('hud.ts unit-frame text sites route through unitFrameCurrentMaxText', () => {
   const src = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+  const targetDescriptor = readFileSync(
+    new URL('../src/ui/target_frame_descriptor.ts', import.meta.url),
+    'utf8',
+  );
 
   it("imports the formatters from './hud_frames'", () => {
     expect(src).toContain(
@@ -164,12 +168,13 @@ describe('hud.ts unit-frame text sites route through unitFrameCurrentMaxText', (
     );
   });
 
-  // Player resource + target resource keep the always-on "current / max"; the
-  // three hp sites (player, target, target-of-target) route through the
-  // mode-aware formatter so the Health Text settings apply.
+  // Player resource lives in hud.ts; target resource lives in the extracted target
+  // descriptor. Both keep the always-on "current / max". The three hp sites still
+  // route through the mode-aware formatter so the Health Text settings apply.
   it('calls unitFrameCurrentMaxText at the two resource sites', () => {
-    const calls = src.match(/unitFrameCurrentMaxText\(/g) ?? [];
-    expect(calls.length).toBe(2);
+    const hudCalls = src.match(/unitFrameCurrentMaxText\(Math\.round/g) ?? [];
+    const targetCalls = targetDescriptor.match(/unitFrameCurrentMaxText\(Math\.round/g) ?? [];
+    expect(hudCalls.length + targetCalls.length).toBe(2);
   });
 
   it('calls unitFrameHealthText at the three player/target/target-of-target hp sites', () => {

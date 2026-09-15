@@ -788,12 +788,11 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     const pid = (rec.sim as any).playerId as number;
     const meta = (rec.sim as any).players.get(pid);
 
-    // All five plants landed, in drive order, and each started the flavor
-    // cast. The second one is the load-bearing half of the busy gate (it only
-    // lands because the drive waits out the first cast); the third is the
-    // knobbed plant on the freed bed; the fourth is the tier-3 barley at the
-    // Thornpeak patch; the fifth is the Phase 8 ready-notice beat back on the
-    // freed northern bed.
+    // All five plants landed, in drive order, each instantly (no cast). The
+    // second lands inside the tick window the drive still keeps between
+    // plants; the third is the knobbed plant on the freed bed; the fourth is
+    // the tier-3 barley at the Thornpeak patch; the fifth is the Phase 8
+    // ready-notice beat back on the freed northern bed.
     expect(ev.filter((e) => e.type === 'farmPlanted').map((e) => e.bedId)).toEqual([
       'bed_eastbrook_1',
       'bed_eastbrook_2',
@@ -811,14 +810,20 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       'bed_eastbrook_2',
       'bed_thornpeak_1',
     ]);
-    // One flavor cast per plant, composed from the beats rather than a bare
-    // literal: the five scripted plants, one per padding cycle, the golden-win
-    // plant, the final padding cycle, and the paying barley.
+    // One farmPlanted per plant and NO cast at all (the farming-tools report
+    // retired the flavor cast: planting is instant), composed from the beats
+    // rather than a bare literal: the five scripted plants, one per padding
+    // cycle, the golden-win plant, the final padding cycle, and the paying
+    // barley.
     const PLANTS = 5 + FARM_GOLDEN_PADDING_CYCLES + 1 + 1 + 1;
     expect(
-      ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
-      'every plant started the FARMING_CAST_ID flavor cast',
+      ev.filter((e) => e.type === 'farmPlanted'),
+      'every plant landed as a farmPlanted event',
     ).toHaveLength(PLANTS);
+    expect(
+      ev.filter((e) => e.type === 'castStart' && e.ability === 'farming'),
+      'no plant starts a cast any more',
+    ).toHaveLength(0);
     expect(PLANTS, 'the session plants 44 crops').toBe(44);
 
     // THE READY NOTICE (Phase 8): the fifth plant is left standing across two

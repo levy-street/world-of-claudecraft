@@ -2566,9 +2566,8 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'arcane',
     requiresTarget: true,
     targetType: 'friendly',
-    // Group/raid-only: the cast is refused (no cost/cooldown) on a friendly that is
-    // not the caster or a party/raid member, so an out-of-group target never wastes it.
-    partyOnlyTarget: true,
+    // Targets any friendly ally or self. Prioritizes group/raid members, but can be
+    // cast solo or on friendly allies/practice targets outside a group.
     effects: [
       {
         type: 'massTemporalEcho',
@@ -2751,7 +2750,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [{ type: 'perfectMoment' }],
     description:
-      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancer)',
+      'Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancer)',
   },
   temporal_acceleration: {
     id: 'temporal_acceleration',
@@ -5222,6 +5221,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 30,
     school: 'shadow',
     requiresTarget: true,
+    projectile: false,
     effects: [
       {
         type: 'afflictionViolence',
@@ -5229,10 +5229,12 @@ export const ABILITIES: Record<string, AbilityDef> = {
         charges: 3,
         doomPerProc: 7,
         damage: 16,
+        interval: 2,
+        tickDoom: 2,
       },
     ],
     description:
-      'Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
+      'Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage.',
   },
   cruel_pact: {
     id: 'cruel_pact',
@@ -5289,9 +5291,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // without this the busy guard rejected the press and the player gained no
     // Condemnation.
     usableWhileCasting: true,
-    range: 30,
+    range: 0,
     school: 'shadow',
-    requiresTarget: true,
+    requiresTarget: false,
     projectile: false,
     effects: [{ type: 'afflictionPossession', duration: 15, doom: 35 }],
     description:
@@ -5310,9 +5312,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Off-GCD burst opener, pressable through a running cast or channel; see
     // possess_evil_eye above.
     usableWhileCasting: true,
-    range: 30,
+    range: 0,
     school: 'shadow',
-    requiresTarget: true,
+    requiresTarget: false,
     projectile: false,
     effects: [{ type: 'afflictionJudgment', duration: 15, doom: 40, refund: 50 }],
     description:
@@ -5348,27 +5350,53 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'shadow',
     requiresTarget: true,
     effects: [{ type: 'directDamage', min: 36, max: 50 }],
+    // Preserve the former rank coefficients after the Destruction cast passive.
+    // The faster casts reduce the entire hit once, including Spell Power.
     ranks: [
       {
         rank: 2,
         level: 8,
         cost: 38,
-        castTime: 2.2,
-        effects: [{ type: 'directDamage', min: 67, max: 87 }],
+        castTime: 2.0,
+        effects: [
+          {
+            type: 'directDamage',
+            min: 67,
+            max: 87,
+            damageMult: 0.8,
+            spellPowerCoeff: (2.2 * 0.97) / 3.5,
+          },
+        ],
       },
       {
         rank: 3,
         level: 14,
         cost: 55,
-        castTime: 2.7,
-        effects: [{ type: 'directDamage', min: 118, max: 148 }],
+        castTime: 2.0,
+        effects: [
+          {
+            type: 'directDamage',
+            min: 118,
+            max: 148,
+            damageMult: 0.8,
+            spellPowerCoeff: (2.7 * 0.97) / 3.5,
+          },
+        ],
       },
       {
         rank: 4,
         level: 20,
         cost: 80,
-        castTime: 3.0,
-        effects: [{ type: 'directDamage', min: 126, max: 156 }],
+        castTime: 2.0,
+        effects: [
+          {
+            type: 'directDamage',
+            min: 126,
+            max: 156,
+            damageMult: 0.8,
+            spellPowerCoeff: (3.0 * 0.97) / 3.5,
+          },
+        ],
       },
     ],
     description: 'Sends a shadowy bolt at the enemy for $d Shadow damage.',
@@ -5750,7 +5778,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     specs: ['destruction'],
     effects: [{ type: 'ruinousBrand', duration: 15, charges: 3 }],
     description:
-      'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target.',
+      'Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target. Ruinbolt echoes also count as critical hits, without another critical damage multiplier.',
   },
   // Ruination's personal defensive. It is the siege caster's only active
   // mitigation: Fiendhide is passive armor and Sanguine Covenant costs a

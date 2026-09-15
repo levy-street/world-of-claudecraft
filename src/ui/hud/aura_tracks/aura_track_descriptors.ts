@@ -99,13 +99,22 @@ export const AURA_TRACKS: readonly AuraTrackDescriptor[] = [
     // "What is boosting me, and how long have I got." Output windows, including
     // the ones you put on someone else: the question is about damage done, and
     // the protective tracks are about damage taken.
+    //
+    // The one exception is a GROUP-WIDE burst (Temporal Acceleration, Storm
+    // Chorus, Thieves' Chorus): one cast lands an identical copy on every member
+    // in a 30 to 40 yd radius, all expiring on the same tick, so an ally's row
+    // carries nothing the caster's own row does not. Without the gate a raid
+    // press fills the whole track to AURA_TRACK_ROW_CAP with copies of one buff
+    // and pushes the caster's real cooldowns into the overflow line, which is the
+    // opposite of what a glanceable tracker is for. A buff you put on ONE ally is
+    // still shown: it is the identical-copies case that is noise, not the ally.
     id: 'power',
     elementId: 'aura-track-power',
     storageKey: 'woc_hud_frame_track_power',
     settingKey: 'showOffensiveTrack',
     labelKey: 'hudChrome.auraTracks.power',
     shape: 'timer',
-    accepts: (entry) => entry.category === 'power',
+    accepts: (entry, onSelf) => entry.category === 'power' && (onSelf || entry.groupWide !== true),
   },
   {
     // "How am I moving, and am I hidden." The one track with two row shapes: a

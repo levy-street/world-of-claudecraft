@@ -51,6 +51,7 @@ export const SOURCE_INDEPENDENT_GROUP_BUFF_AURA_IDS: ReadonlySet<string> = new S
   'soulwell',
   'trueshot_aura_ap', // Sureflight Aura (hunter aoeAllyAttackPower)
   'temporal_hourglass',
+  'temporal_aegis',
   'aura_mastery',
 ]);
 

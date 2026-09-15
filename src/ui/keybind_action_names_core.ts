@@ -29,6 +29,9 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   // English-only chrome key, like every keybind row added since the `hud`
   // domain was tsc-locked to inline per-locale blocks.
   dive: 'hudChrome.keybinds.dive',
+  // Camera zoom rows (the bare wheel by default; src/game/wheel_binds.ts).
+  zoomIn: 'hudChrome.keybinds.zoomIn',
+  zoomOut: 'hudChrome.keybinds.zoomOut',
   autorun: 'hud.keybinds.actions.autorun',
   target: 'hud.keybinds.actions.target',
   attackMove: 'hud.keybinds.actions.attackMove',
@@ -54,12 +57,23 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   discord: 'hudChrome.keybinds.discord',
   bgFlag: 'hudChrome.keybinds.bgFlag',
   sheathe: 'hudChrome.keybinds.sheathe',
+  hideInterface: 'hudChrome.keybinds.hideInterface',
   petAttack: 'hudChrome.keybinds.petAttack',
   petStop: 'hudChrome.keybinds.petStop',
   petTaunt: 'hudChrome.keybinds.petTaunt',
   petDefensive: 'hudChrome.keybinds.petDefensive',
   petAggressive: 'hudChrome.keybinds.petAggressive',
   targetPet: 'hudChrome.keybinds.targetPet',
+  targetSelf: 'hudChrome.keybinds.targetSelf',
+  targetParty1: 'hudChrome.keybinds.targetParty1',
+  targetParty2: 'hudChrome.keybinds.targetParty2',
+  targetParty3: 'hudChrome.keybinds.targetParty3',
+  targetParty4: 'hudChrome.keybinds.targetParty4',
+  targetParty5: 'hudChrome.keybinds.targetParty5',
+  targetParty6: 'hudChrome.keybinds.targetParty6',
+  targetParty7: 'hudChrome.keybinds.targetParty7',
+  targetParty8: 'hudChrome.keybinds.targetParty8',
+  targetParty9: 'hudChrome.keybinds.targetParty9',
 
   // Reuse the existing window/feature names so these labels localize everywhere
   // without duplicating strings (these two ids were previously absent from the
