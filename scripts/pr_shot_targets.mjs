@@ -14970,6 +14970,97 @@ export const TARGETS = [
     },
   },
   {
+    key: 'mailbox-potion-stacking',
+    label:
+      'Mailbox Send tab: several byte-equal signed potions bundle into one stacked slot instead of burning every attachment slot one-per-copy',
+    when: ['sim/mail/post_office', 'ui/mailbox_window', 'ui/mailbox_view'],
+    // On a base checkout, a rare-quality crafted consumable (a #1149 signed
+    // instance) already merges into one bag stack, but the compose window
+    // still staged one attachment slot PER COPY: clicking the bag cell three
+    // times fills all three of the letter's attachment slots with the same
+    // potion, leaving no room to also attach anything else. On the fix, one
+    // click stages the whole owned stock as a single slot with a working
+    // quantity stepper, so the letter still has two free slots.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'no sim' };
+        document.getElementById('tutorial-greeting')?.remove();
+        // Stand at a real raven pillar first: mailInfo (and so isSendTab's
+        // window) is null away from one, and the window auto-closes a few
+        // seconds after opening with no mailInfo (MAIL_INFO_GRACE_MS,
+        // mailbox_window.ts refreshIfChanged), which a slow capture host can
+        // trip well before this recipe's several clicks finish.
+        const box = sim.entities.get(sim.postOffice.mailboxIds[0]);
+        const p = sim.player;
+        if (!box || !p) return { ok: false, reason: 'no mailbox or player' };
+        p.pos.x = box.pos.x;
+        p.pos.y = box.pos.y;
+        p.pos.z = box.pos.z;
+        p.prevPos = { ...p.pos };
+        sim.rebucket?.(p);
+        // Three units of the same signed potion: the real shape a rare-tier
+        // alchemy craft mints (professions/crafting.ts mintsSignedCraftOutput),
+        // byte-equal so they already share one bag stack.
+        sim.addItemInstance(
+          'sunpetal_healing_draught',
+          { signer: sim.player.name ?? 'You' },
+          undefined,
+          3,
+        );
+        sim.addItem('wolf_fang', 2);
+        sim.addItem('linen_scrap', 2);
+        game.hud.openMailbox();
+        document.querySelector('.mail-tab[data-tab="send"]')?.click();
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`mailbox setup failed: ${setup.reason}`);
+      // The teleport above can re-raise the loading veil (asset streaming).
+      await awaitWorldPainted(page);
+      if (!(await pollForSize(page, '#mailbox-window'))) {
+        throw new Error('mailbox window did not open');
+      }
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(300);
+      // Click the potion cell three times, the way a player reasonably would
+      // trying to attach all three; then try the two other stacks. On a base
+      // checkout the potion clicks alone exhaust every attachment slot and
+      // the two later clicks are refused (a toast may show); on the fix all
+      // three land.
+      const clicks = [
+        'Sunpetal Healing Draught',
+        'Sunpetal Healing Draught',
+        'Sunpetal Healing Draught',
+        'Wolf Fang',
+        'Linen Scrap',
+      ];
+      for (const label of clicks) {
+        const clicked = await page.evaluate((l) => {
+          document.getElementById('tutorial-greeting')?.remove();
+          const cell = [...document.querySelectorAll('#bags .bag-item:not(.empty)')].find((b) =>
+            (b.getAttribute('aria-label') ?? '').includes(l),
+          );
+          cell?.click();
+          return !!cell;
+        }, label);
+        if (!clicked) throw new Error(`${label} bag cell not found`);
+        await wait(150);
+      }
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'vendor-sell-confirm-stacking',
     label:
       'Vendor sell-confirm prompt stays above the vendor window once its z-index has climbed past the old fixed 80',

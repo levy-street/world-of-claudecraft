@@ -27,7 +27,7 @@ import {
 } from '../content/letters';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
-import { itemInstancePayloadsEqual } from '../item_instance_merge';
+import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   countMatchingUnlocked,
   grantCopies,
@@ -468,7 +468,11 @@ export class PostOffice {
       return;
     }
     const wanted = new Map<string, number>();
-    const instancedWanted: { itemId: string; instance: NonNullable<InvSlot['instance']> }[] = [];
+    const instancedWanted: {
+      itemId: string;
+      instance: NonNullable<InvSlot['instance']>;
+      count: number;
+    }[] = [];
     for (const s of items) {
       const def = ITEMS[s.itemId];
       const count = Math.floor(s.count);
@@ -482,20 +486,25 @@ export class PostOffice {
         return;
       }
       if (s.instance && typeof s.instance === 'object') {
-        // Instanced parcels (the #1165 completion): single-copy by design (the
-        // qty stepper stays fungible-only), named by payload so a bag reshuffle
-        // can never redirect the escrow. A count other than exactly 1 is a
-        // malformed request and refuses like any other malformed entry, never
-        // silently truncates. Transfer-locked copies (bindOnTrade armed or
-        // boundTo bound, the shared market rule) never ride a raven: a
-        // bind-on-trade windfall must not be mail-launderable.
-        if (count !== 1) return;
+        // Instanced parcels (the #1165 completion): single-copy per slot by
+        // design UNLESS the payload is MERGEABLE (Professions 2.0,
+        // item_instance_merge.ts isMergeableInstancePayload): a byte-equal
+        // signed consumable (a rare-quality crafted potion, say) already
+        // stacks in bags/bank/trade, so a letter may bundle several as one
+        // attachment the same way instead of burning one of the letter's
+        // MAIL_MAX_ATTACHMENTS slots per copy. A non-mergeable payload
+        // (charge-bearing, player-locked, or otherwise one-per-slot) still
+        // refuses anything but exactly 1: a malformed request, never a
+        // silent truncation. Transfer-locked copies (bindOnTrade armed or
+        // boundTo bound, the shared market rule) never ride a raven either
+        // way: a bind-on-trade windfall must not be mail-launderable.
+        if (count !== 1 && !isMergeableInstancePayload(s.instance)) return;
         if (isTransferLockedInstance(s.instance)) {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
         if (!isMaterialItemId(s.itemId)) {
-          instancedWanted.push({ itemId: s.itemId, instance: s.instance });
+          instancedWanted.push({ itemId: s.itemId, instance: s.instance, count });
         }
       } else if (!isMaterialItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
@@ -510,14 +519,15 @@ export class PostOffice {
         return;
       }
     }
-    // Each instanced entry needs a matching UNLOCKED held copy, counting every
-    // entry that names the same payload (byte-equal copies are interchangeable;
-    // a stripped-lock forgery simply fails to match and lands here too).
+    // Each instanced entry needs that many matching UNLOCKED held copies,
+    // summing every entry that names the same payload (byte-equal copies are
+    // interchangeable; a stripped-lock forgery simply fails to match and
+    // lands here too).
     for (const w of instancedWanted) {
       let need = 0;
       for (const other of instancedWanted) {
         if (other.itemId === w.itemId && itemInstancePayloadsEqual(other.instance, w.instance))
-          need += 1;
+          need += other.count;
       }
       if (countMatchingUnlocked(meta, w.itemId, w.instance) < need) {
         this.result(meta.entityId, 'notEnoughItems');
@@ -570,22 +580,48 @@ export class PostOffice {
         continue;
       }
       if (s.instance && typeof s.instance === 'object') {
-        const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
-        // The craft marker rides alongside the payload: an instanced parcel can
-        // be crafted too (a masterwork proc, an enchanted crafted piece), so it
-        // is carried rather than assumed absent on this arm.
-        if (escrowed)
+        // A mergeable attachment's copies can have arrived from more than one
+        // physical stack (an overflow split at the item's stack cap), so
+        // remove them one at a time and bucket by craftedRecipeId, exactly
+        // like the plain-fungible arm below: a bundled parcel must never
+        // silently blend provenance from two differently-crafted stacks that
+        // merely staged as one byte-equal attachment. Runs exactly once for
+        // the ordinary count-1 case, so that shape is untouched.
+        const want = Math.floor(s.count);
+        const byRecipe = new Map<
+          string | undefined,
+          {
+            count: number;
+            instance: InvSlot['instance'];
+            materialSources: InvSlot['materialSources'];
+          }
+        >();
+        for (let i = 0; i < want; i++) {
+          const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
+          if (!escrowed) break;
+          const bucket = byRecipe.get(escrowed.craftedRecipeId);
+          if (bucket) bucket.count += 1;
+          else
+            byRecipe.set(escrowed.craftedRecipeId, {
+              count: 1,
+              // The craft marker rides alongside the payload: an instanced
+              // parcel can be crafted too (a masterwork proc, an enchanted
+              // crafted piece), so it is carried rather than assumed absent.
+              instance: escrowed.instance,
+              materialSources: escrowed.materialSources,
+            });
+        }
+        for (const [craftedRecipeId, bucket] of byRecipe) {
           parcels.push({
             itemId: s.itemId,
-            count: 1,
-            ...(escrowed.instance === undefined ? {} : { instance: escrowed.instance }),
-            ...(escrowed.materialSources === undefined
+            count: bucket.count,
+            ...(bucket.instance === undefined ? {} : { instance: bucket.instance }),
+            ...(bucket.materialSources === undefined
               ? {}
-              : { materialSources: escrowed.materialSources }),
-            ...(escrowed.craftedRecipeId === undefined
-              ? {}
-              : { craftedRecipeId: escrowed.craftedRecipeId }),
+              : { materialSources: bucket.materialSources }),
+            ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
           });
+        }
       } else {
         const count = Math.floor(s.count);
         const consumed = removeVendorSellUnits(
