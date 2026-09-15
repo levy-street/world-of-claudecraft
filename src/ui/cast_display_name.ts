@@ -59,6 +59,10 @@ export const castDisplayName = (id: string): string => {
   if (id === TOOL_RECHARGE_CAST_ID) return t('abilityUi.cast.tool_recharge');
   if (id === 'demon_heal') return t('abilityUi.cast.demonHeal');
   if (id === 'thunzharr_stormcall') return t('abilityUi.cast.thunzharrStormcall');
+  // The nythraxis wardstone channel sets p.castingAbility to this mechanic id,
+  // which is not an ABILITIES key. Resolve it to a friendly label like the
+  // other bespoke cast arms, so the player's channel bar never shows the raw id.
+  if (id === 'nythraxis_ward_channel') return t('abilityUi.cast.nythraxisWardChannel');
   const riftKey = `abilityUi.cast.${id}` as TranslationKey;
   if (riftKey in RIFT_CAST_DISPLAY_KEYS) return t(riftKey);
   const ability = ABILITIES[id];

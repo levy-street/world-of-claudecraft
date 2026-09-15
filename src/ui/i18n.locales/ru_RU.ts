@@ -3078,6 +3078,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.farming': 'Посадка',
   'abilityUi.cast.gathering': 'Сбор ресурсов',
   'abilityUi.cast.thunzharrStormcall': 'Зов бури',
+  'abilityUi.cast.nythraxisWardChannel': 'Защита столпа',
   'abilityUi.cast.demonHeal': 'Исцеление демона',
   'abilityUi.cast.rift_arcane_execution': 'Разлом пустоты',
   'abilityUi.cast.rift_arcane_strike': 'Тайное уничтожение',

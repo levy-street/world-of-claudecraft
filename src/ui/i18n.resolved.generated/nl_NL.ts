@@ -10627,6 +10627,7 @@ export const nl_NL: EnTranslations = {
       "tool_recharge": "Opladen",
       "demonHeal": "Demonengenezing",
       "thunzharrStormcall": "Stormroep",
+      "nythraxisWardChannel": "Warding the Pillar",
       "rift_frost_execution": "IJzig Graf",
       "rift_frost_strike": "Absoluut Nulpunt",
       "rift_ember_execution": "Magmabron",

@@ -526,6 +526,10 @@ const mergeStringsEn = {
       tool_recharge: 'Recharging',
       demonHeal: 'Demon Heal',
       thunzharrStormcall: 'Stormcall',
+      // The player's wardstone channel during the nythraxis encounter: the
+      // mechanic id rides p.castingAbility directly, so this label is what
+      // keeps the cast bar player-friendly instead of showing the raw id.
+      nythraxisWardChannel: 'Warding the Pillar',
       rift_frost_execution: 'Glacial Grave',
       rift_frost_strike: 'Absolute Zero',
       rift_ember_execution: 'Magma Well',

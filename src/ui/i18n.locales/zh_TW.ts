@@ -2913,6 +2913,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.farming': '播種',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '風暴召喚',
+  'abilityUi.cast.nythraxisWardChannel': '守護石柱',
   'abilityUi.cast.demonHeal': '惡魔治療',
   'abilityUi.cast.rift_arcane_execution': '虛空裂隙',
   'abilityUi.cast.rift_arcane_strike': '奧術湮滅',
