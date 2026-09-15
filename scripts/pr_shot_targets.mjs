@@ -3924,6 +3924,66 @@ export const TARGETS = [
     },
   },
   {
+    key: 'farming-hoe-ladder',
+    label: 'The hoe ladder in the bags, with the tier-2 Bronze Hoe hovered',
+    // The wield gate's farming ladder and the degrade line both render on the
+    // hoe tooltip, which is where the "seed says 25, hoe says 40" report lived.
+    when: ['professions/wield_gate', 'content/farm_crops'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        for (const id of [
+          'garden_hoe',
+          'bronze_hoe',
+          'skysilver_hoe',
+          'osmium_hoe',
+          'evergarden_hoe',
+          'marsh_rice_seed',
+        ]) {
+          try {
+            sim?.addItem(id, id === 'marsh_rice_seed' ? 4 : 1);
+          } catch {}
+        }
+        document.getElementById('tutorial-greeting')?.remove();
+        const el = document.querySelector('#bags');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleBags?.();
+      });
+      await wait(500);
+      // Hover the tier-2 rung through the REAL pointer path so the tooltip is
+      // the one a player sees, not a hand-built string.
+      await page.evaluate(() => {
+        const cells = [...document.querySelectorAll('#bags *')];
+        const el = cells.find((c) => {
+          const bg = c instanceof HTMLElement ? c.style.backgroundImage : '';
+          const img = c.querySelector?.('img');
+          return bg?.includes('bronze_hoe') || img?.getAttribute('src')?.includes('bronze_hoe');
+        });
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        for (const type of [
+          'pointerenter',
+          'pointerover',
+          'mouseenter',
+          'mouseover',
+          'pointermove',
+          'mousemove',
+        ]) {
+          el.dispatchEvent(
+            new MouseEvent(type, {
+              bubbles: true,
+              clientX: r.left + r.width / 2,
+              clientY: r.top + r.height / 2,
+            }),
+          );
+        }
+      });
+      await wait(600);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'fishing-rod-ladder',
     label: 'The rod ladder in the bags, with the top rung hovered',
     when: ['professions/fishing', 'fishing_zones', 'gather_tool_tooltip', 'content/recipes'],

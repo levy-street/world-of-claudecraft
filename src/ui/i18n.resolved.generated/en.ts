@@ -4125,6 +4125,7 @@ export const en: EnTranslations = {
           "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Gathers faster at nodes below tier {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Required to fish.",
         "rodBite": "Fish bite up to {seconds}s sooner.",
         "rodReel": "Extends the reel window by {seconds}s.",
@@ -7531,7 +7532,7 @@ export const en: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "The farming rhythm",
-        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
+        "rhythmBody": "Planting is instant, because a hoe opens ground rather than buying speed: there is no cast to wait out, so a farmer who walks off has planted all the same. Pulling a ripe crop is instant too. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
         "gainHeading": "What a harvest teaches",
         "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
         "yieldsHeading": "What a harvest yields",
@@ -10607,7 +10608,6 @@ export const en: EnTranslations = {
     },
     "cast": {
       "fishing": "Fishing",
-      "farming": "Planting",
       "gathering": "Gathering",
       "crafting": "Crafting",
       "disenchanting": "Disenchanting",

@@ -4125,6 +4125,7 @@ export const sv_SE: EnTranslations = {
           "farming": "Fungerar från dina väskor när du planterar i en odlingsbädd."
         },
         "speed": "Samlar snabbare vid noder under tier {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Krävs för att fiska.",
         "rodBite": "Fisken nappar upp till {seconds}s tidigare.",
         "rodReel": "Förlänger indragningsfönstret med {seconds}s.",
@@ -7531,7 +7532,7 @@ export const sv_SE: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Jordbrukets rytm",
-        "rhythmBody": "Planteringen är det korta synliga kastet: alltid {plant} sekunder på varje steg, eftersom en hacka öppnar jord i stället för att köpa fart. Att dra upp en mogen gröda sker genast. Det finns inget kast att avbryta och ingen väskkontroll som kan neka det, och en färdig bädd väntar hur länge du än lämnar den, så en full packning kostar bonden endast promenaden för att tömma den.\n\nEn skörd ger grödor och färdighet i Jordbruk. Till skillnad från en åder ger den ingen karaktärs-XP, så bäddarna är ett yrke att arbeta med, inte ett sätt att levla.",
+        "rhythmBody": "Planteringen sker genast, eftersom en hacka öppnar jord i stället för att köpa fart: det finns inget kast att vänta ut, så en bonde som går därifrån har ändå planterat. Att dra upp en mogen gröda sker också genast. Det finns inget kast att avbryta och ingen väskkontroll som kan neka det, och en färdig bädd väntar hur länge du än lämnar den, så en full packning kostar bonden endast promenaden för att tömma den.\n\nEn skörd ger grödor och färdighet i Jordbruk. Till skillnad från en åder ger den ingen karaktärs-XP, så bäddarna är ett yrke att arbeta med, inte ett sätt att levla.",
         "gainHeading": "Vad en skörd lär dig",
         "gainBody": "Vinsten är deterministisk och knuten till din egen räknare, inte grödan: {g1} färdighet per skörd under {p1}, {g2} under {p2}, {g3} under {p3}, och {g4} resten av vägen till taket på {cap}. Det är aldrig ett kast för färdighetshöjning, så klättringen är exakt så lång som matematiken säger.\n\nGrödans nivå avgör hur långt en bädd kan bära dig. En gröda på nivå 1 lär ut till {c1} och grånar där, en på nivå 2 till {c2}, och nivå 3 och högre till taket, så högre bäddar håller räknaren i rörelse.",
         "yieldsHeading": "Vad en skörd ger",
@@ -10607,7 +10608,6 @@ export const sv_SE: EnTranslations = {
     },
     "cast": {
       "fishing": "Fiske",
-      "farming": "Plantering",
       "gathering": "Insamling",
       "crafting": "Hantverk",
       "disenchanting": "Avförtrollning",

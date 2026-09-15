@@ -94,8 +94,7 @@ const entrySource = `
   export {
     GATHER_RARE_EVENT_CHANCE, GATHER_RARE_EVENT_YIELD_MULT, gatherRareEventFlavor,
   } from './src/sim/professions/gather_events.ts';
-  export {
-    FARM_PLANT_CAST_SEC, FARM_HARVEST_LIFE_FLOOR, FARM_KEEP_CHANCE_BASE,
+  export { FARM_HARVEST_LIFE_FLOOR, FARM_KEEP_CHANCE_BASE,
     FARM_KEEP_CHANCE_SKILL_SCALE, FARM_FINE_CHANCE_BASE, FARM_FINE_CHANCE_SKILL_SCALE,
     FARM_FINE_CHANCE_EFFECT_BONUS, FARM_TONIC_BONUS_CHANCE, FARM_TONIC_BONUS_PICKS,
     FARM_EFFECT_BONUS_PICK_CAP, FARMING_GAIN_SCHEDULE, farmingTeachingCeilingFor,
@@ -218,7 +217,6 @@ const {
   GATHER_RARE_EVENT_CHANCE,
   GATHER_RARE_EVENT_YIELD_MULT,
   gatherRareEventFlavor,
-  FARM_PLANT_CAST_SEC,
   FARM_HARVEST_LIFE_FLOOR,
   FARM_KEEP_CHANCE_BASE,
   FARM_KEEP_CHANCE_SKILL_SCALE,
@@ -1173,7 +1171,6 @@ const profCurve = {
   // Every number is DERIVED from src/sim/professions/farming.ts here so the prose
   // and its pins cannot drift from the model.
   farm: {
-    plantCastSec: FARM_PLANT_CAST_SEC,
     lifeFloor: FARM_HARVEST_LIFE_FLOOR,
     keepChancePctAtZero: pct(FARM_KEEP_CHANCE_BASE),
     keepChancePctAtCap: pct(FARM_KEEP_CHANCE_BASE + FARM_KEEP_CHANCE_SKILL_SCALE),
@@ -1662,7 +1659,6 @@ export interface GuideProfCurve {
   rareEvent: { oneIn: number; yieldMult: number; flavors: { ore: string; wood: string; herb: string } };
   specimenChancePct: number;
   farm: {
-    plantCastSec: number;
     lifeFloor: number;
     keepChancePctAtZero: number;
     keepChancePctAtCap: number;

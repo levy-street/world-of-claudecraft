@@ -5965,6 +5965,10 @@ export const hudChromeStrings = {
         farming: 'Works from your bags when you plant a crop bed.',
       },
       speed: 'Gathers faster at nodes below tier {tier}.',
+      // Rides directly under the "Requires {craft} {skill}" line on every
+      // land tool above tier 1: the wield gate degrades an unearned tool to
+      // the best tier the counter allows rather than refusing it outright.
+      wieldDegrade: 'Below that skill it still works as a lower-tier tool.',
       rodRequired: 'Required to fish.',
       rodBite: 'Fish bite up to {seconds}s sooner.',
       rodReel: 'Extends the reel window by {seconds}s.',

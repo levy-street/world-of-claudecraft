@@ -4125,6 +4125,7 @@ export const cs_CZ: EnTranslations = {
           "farming": "Při sázení záhonu funguje z tvých brašen."
         },
         "speed": "Rychleji sbírá na nalezištích pod {tier}. úrovní.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Nutný k rybaření.",
         "rodBite": "Ryby zabírají až o {seconds} s dříve.",
         "rodReel": "Prodlužuje čas na navíjení o {seconds} s.",
@@ -7531,7 +7532,7 @@ export const cs_CZ: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Rytmus zemědělství",
-        "rhythmBody": "Sázení je krátké viditelné seslání: přesně {plant} sekund na každé příčce, protože motyka otevírá půdu, ale nekupuje rychlost. Zralou plodinu sklidíš okamžitě. Není co přerušit a žádná kontrola brašny sklizeň neodmítne; připravený záhon čeká, jak dlouho ho necháš, takže plná brašna stojí farmáře jen cestu k vyprázdnění.\n\nSklizeň odměňuje výnosem a zemědělskou zdatností. Na rozdíl od žíly nedává vůbec žádné zkušenosti postavy, takže záhony jsou řemeslo, na kterém pracuješ, ne způsob, jak zvyšovat úroveň.",
+        "rhythmBody": "Sázení je okamžité, protože motyka otevírá půdu, ale nekupuje rychlost: není žádné seslání, které by bylo třeba vyčkat, takže farmář, který odejde, má přesto zaseto. Zralou plodinu sklidíš také okamžitě. Není co přerušit a žádná kontrola brašny sklizeň neodmítne; připravený záhon čeká, jak dlouho ho necháš, takže plná brašna stojí farmáře jen cestu k vyprázdnění.\n\nSklizeň odměňuje výnosem a zemědělskou zdatností. Na rozdíl od žíly nedává vůbec žádné zkušenosti postavy, takže záhony jsou řemeslo, na kterém pracuješ, ne způsob, jak zvyšovat úroveň.",
         "gainHeading": "Co sklizeň naučí",
         "gainBody": "Zisk je deterministický a řídí se tvým vlastním počítadlem, nikoli plodinou: {g1} zdatnosti sklizeň pod {p1}, {g2} pod {p2}, {g3} pod {p3} a {g4} po zbytek cesty ke stropu {cap}. Nikdy nejde o hod na zvýšení dovednosti, takže délka postupu je přesně taková, jakou určuje aritmetika.\n\nStupeň plodiny určuje, jak daleko tě záhon může nést. Plodina stupně 1 učí do {c1} a tam zešedne, plodina stupně 2 do {c2} a plodiny stupně 3 a výše ke stropu, takže právě přesun na vyšší záhony udrží počítadlo v pohybu.",
         "yieldsHeading": "Co sklizeň přinese",
@@ -10607,7 +10608,6 @@ export const cs_CZ: EnTranslations = {
     },
     "cast": {
       "fishing": "Rybaření",
-      "farming": "Sázení",
       "gathering": "Sběr",
       "crafting": "Výroba",
       "disenchanting": "Rozzačarování",

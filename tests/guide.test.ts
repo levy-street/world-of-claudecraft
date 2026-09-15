@@ -119,7 +119,6 @@ import {
   FARM_HARVEST_LIFE_FLOOR,
   FARM_KEEP_CHANCE_BASE,
   FARM_KEEP_CHANCE_SKILL_SCALE,
-  FARM_PLANT_CAST_SEC,
   FARM_TONIC_BONUS_CHANCE,
   FARM_TONIC_BONUS_PICKS,
   FARMING_GAIN_SCHEDULE,
@@ -2585,10 +2584,11 @@ describe('Guide professions gathering accuracy', () => {
       expect(miningHtml, `a node page must still carry "${clause}"`).toContain(clause);
     }
 
-    // The rhythm: planting is the live cast constant, harvesting is instant,
-    // and nothing is refused for bag room (harvestCrop guards on dead, bed,
-    // range, plot and readiness only).
-    expect(html).toContain(`${formatNumber(FARM_PLANT_CAST_SEC)} seconds flat at every rung`);
+    // The rhythm: planting and harvesting are both instant (the farming-tools
+    // report retired the plant cast), and nothing is refused for bag room
+    // (harvestCrop guards on dead, bed, range, plot and readiness only).
+    expect(html).toContain('Planting is instant');
+    expect(html).not.toContain('seconds flat at every rung');
     expect(html).toContain('Pulling a ripe crop is instant');
     expect(html).toContain('no bag check to refuse it');
     expect(html).toContain('it grants no character XP at all');

@@ -191,7 +191,7 @@ import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { castDisplayName, targetCastDisplayLabel } from './cast_display_name';
+import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSig } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
@@ -4746,8 +4746,7 @@ export class Hud {
   // castBarState core. Both instances localize cast ids: the PLAYER instance
   // resolves through castDisplayName, layers the eat/drink overlay
   // (consumeBarState, player-only), and clears the bar on hide (its inline
-  // block did). The TARGET instance resolves the farming cast through
-  // targetCastDisplayLabel and every other id through
+  // block did). The TARGET instance resolves every id through
   // abilityDisplayNameFromSource, has no eat/drink (the target never
   // eats/drinks, so its paint omits `consume`), and hides with only
   // display:none (no inline-block clear).
@@ -4770,15 +4769,11 @@ export class Hud {
       timer: this.targetCastbarTimerEl,
     },
     {
-      // Union of two label fixes: this branch's Phase 14 farming arm
-      // (targetCastDisplayLabel localizes the FARMING cast and hands every
-      // other id back raw) and the release's Ignivar raid pass, which
-      // localizes every other cast through abilityDisplayNameFromSource (the
-      // boss mechanic names ride the aura/mechanic matcher there).
-      resolveCastLabel: (s) => {
-        const farming = targetCastDisplayLabel(s.label);
-        return farming === s.label ? abilityDisplayNameFromSource(s.label) : farming;
-      },
+      // The release's Ignivar raid pass localizes every cast through
+      // abilityDisplayNameFromSource (the boss mechanic names ride the
+      // aura/mechanic matcher there). The Phase 14 farming arm that used to
+      // sit in front of it went with the farming plant cast itself.
+      resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label),
     },
   );
   // Second unit-frame painter instance; heraldry hosts are player identity only.

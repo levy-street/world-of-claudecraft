@@ -4125,6 +4125,7 @@ export const tr_TR: EnTranslations = {
           "farming": "Ürün yatağı ekerken çantandan çalışır."
         },
         "speed": "Kademe {tier} altındaki düğümlerde daha hızlı toplar.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Balık tutmak için gereklidir.",
         "rodBite": "Balıklar {seconds} sn'ye kadar daha erken oltaya vurur.",
         "rodReel": "Olta çekme süresini {seconds} sn uzatır.",
@@ -7531,7 +7532,7 @@ export const tr_TR: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Tarımın ritmi",
-        "rhythmBody": "Ekim, her kademede düz {plant} saniyelik kısa ve görünür cast’tir; çapa toprağı açar, hızı satın almaz. Olgun ürünü çekmek anlıktır. Kesilecek cast veya reddedecek çanta kontrolü yoktur; hazır olan yatak siz alana kadar bekler, bu yüzden dolu çanta çiftçiye boşaltma yürüyüşünden başka maliyet çıkarmaz.\n\nHasadın ödediği ürün ve Çiftçilik yeterliliğidir. Damardan farklı olarak karakter XP’si vermez; yataklar seviye atlama yolu değil, çalışılacak bir ticarettir.",
+        "rhythmBody": "Ekim anlıktır; çapa toprağı açar, hızı satın almaz: beklenecek bir cast yoktur, bu yüzden uzaklaşan çiftçi yine de ekmiş olur. Olgun ürünü çekmek de anlıktır. Kesilecek cast veya reddedecek çanta kontrolü yoktur; hazır olan yatak siz alana kadar bekler, bu yüzden dolu çanta çiftçiye boşaltma yürüyüşünden başka maliyet çıkarmaz.\n\nHasadın ödediği ürün ve Çiftçilik yeterliliğidir. Damardan farklı olarak karakter XP’si vermez; yataklar seviye atlama yolu değil, çalışılacak bir ticarettir.",
         "gainHeading": "Bir hasat ne öğretir",
         "gainBody": "Kazanç ürününüze değil kendi sayacınıza bağlı ve belirleyicidir: {p1} altındaki hasat {g1} yeterlilik, {p2} altı {g2}, {p3} altı {g3}, {cap} tavanına kadar kalan bölüm {g4} verir. Bu bir beceri atışı değildir; tırmanışın uzunluğu tam olarak aritmetiğin söylediğidir.\n\nÜrün kademesi yatağın sizi ne kadar taşıyacağını belirler. Kademe 1 ürün {c1}’e kadar öğretir ve orada griye döner, kademe 2 {c2}’ye kadar, kademe 3 ve üstü tavana kadar öğretir; bu yüzden sayacı hareket ettiren şey yataklar arasında ilerlemektir.",
         "yieldsHeading": "Bir hasat ne verir",
@@ -10607,7 +10608,6 @@ export const tr_TR: EnTranslations = {
     },
     "cast": {
       "fishing": "Balık Tutma",
-      "farming": "Ekim",
       "gathering": "Toplama",
       "crafting": "Üretim",
       "disenchanting": "Büyü Bozma",
