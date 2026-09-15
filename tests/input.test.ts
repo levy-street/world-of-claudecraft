@@ -81,6 +81,7 @@ function makeInput(userAgent?: string) {
     onCycleFriendly: vi.fn(),
     onPet: vi.fn(),
     onTargetPet: vi.fn(),
+    onTargetParty: vi.fn(),
     onAbility: vi.fn(),
     onAbilityDown: vi.fn(),
     onAbilityUp: vi.fn(),
@@ -91,8 +92,10 @@ function makeInput(userAgent?: string) {
     canUseGameKeys: () => gameKeysAllowed,
     isCameraLocked: () => cameraLocked,
   };
-  const input = new Input(canvas as any, cb, new Keybinds());
+  const keybinds = new Keybinds();
+  const input = new Input(canvas as any, cb, keybinds);
   return {
+    keybinds,
     canvas,
     canvasListeners,
     windowListeners,
@@ -352,6 +355,60 @@ describe('Input pet bar chords', () => {
     });
     expect(cb.onTabPrev).toHaveBeenCalledTimes(1);
     expect(cb.onTab).toHaveBeenCalledTimes(1);
+  });
+
+  it('routes the F-row to the party target hotkeys and keeps the browser off them', () => {
+    const { input, windowListeners, cb } = makeInput();
+    void input;
+    const f1 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F1', repeat: false, preventDefault: f1 });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(0);
+    // F1 opens browser help and F5 reloads the page: a bound press cancels that.
+    expect(f1).toHaveBeenCalledTimes(1);
+    const f5 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F5', repeat: false, preventDefault: f5 });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(4);
+    expect(f5).toHaveBeenCalledTimes(1);
+    const f10 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F10', repeat: false, preventDefault: f10 });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(9);
+    expect(f10).toHaveBeenCalledTimes(1);
+    expect(cb.onTargetParty).toHaveBeenCalledTimes(3);
+    // An unbound F-key stays the browser's.
+    const f12 = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F12', repeat: false, preventDefault: f12 });
+    expect(f12).not.toHaveBeenCalled();
+    expect(cb.onTargetParty).toHaveBeenCalledTimes(3);
+  });
+
+  it("keeps cancelling a held F-key's auto-repeats without re-firing the action", () => {
+    const { windowListeners, cb } = makeInput();
+    // Keyboard repetition emits further keydown events with repeat=true; each
+    // one would reach the browser's F5 reload unless cancelled, but the target
+    // pick itself fires once per press.
+    const repeat = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F5', repeat: true, preventDefault: repeat });
+    windowListeners.get('keydown')!({ code: 'F5', repeat: true, preventDefault: repeat });
+    expect(repeat).toHaveBeenCalledTimes(2);
+    expect(cb.onTargetParty).not.toHaveBeenCalled();
+    // A repeated unbound F-key is still the browser's.
+    const unbound = vi.fn();
+    windowListeners.get('keydown')!({ code: 'F12', repeat: true, preventDefault: unbound });
+    expect(unbound).not.toHaveBeenCalled();
+  });
+
+  it('follows a rebind of a party target hotkey off the F-row', () => {
+    const { keybinds, windowListeners, cb } = makeInput();
+    expect(keybinds.bind('targetParty9', 0, 'Shift+KeyG')).toBe(true);
+    windowListeners.get('keydown')!({ code: 'F10', repeat: false, preventDefault: vi.fn() });
+    expect(cb.onTargetParty).not.toHaveBeenCalled();
+    windowListeners.get('keydown')!({
+      code: 'KeyG',
+      shiftKey: true,
+      repeat: false,
+      preventDefault: vi.fn(),
+    });
+    expect(cb.onTargetParty).toHaveBeenLastCalledWith(9);
   });
 
   it('does not fire a pet action for a bare digit (that stays an action-bar slot)', () => {

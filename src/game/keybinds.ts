@@ -186,6 +186,27 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyJ'],
   },
+  // The party target hotkeys, the classic F-row: F1 is always yourself, F2..F10
+  // are the party frames top to bottom in the order they paint (sort mode and
+  // raid groups included; src/ui/party_target_hotkeys_core.ts resolves the row).
+  // No other default sits on the F-row, and input.ts cancels the browser's own
+  // F-key accelerators (F1 help, F3 find, F5 reload) for a bound press.
+  {
+    id: 'targetSelf',
+    label: 'Target Self',
+    category: 'Targeting',
+    kind: 'edge',
+    defaults: ['F1'],
+  },
+  ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map(
+    (n): BindAction => ({
+      id: `targetParty${n}`,
+      label: `Target Party Member ${n}`,
+      category: 'Targeting',
+      kind: 'edge',
+      defaults: [`F${n + 1}`],
+    }),
+  ),
   {
     id: 'interact',
     label: 'Interact / Loot',
@@ -623,6 +644,19 @@ export function canonicalCombo(raw: string): string | null {
  *  display-name table uses for an action it does not know). */
 export function bindActionLabel(id: string): string | undefined {
   return ACTION_BY_ID.get(id)?.label;
+}
+
+/** How many ally slots the party target F-row carries (F2..F10); F1 is slot 0. */
+export const PARTY_TARGET_HOTKEY_SLOTS = 9;
+
+/** The party target hotkey slot an action id names: 0 for Target Self, 1..9 for
+ *  Target Party Member N, null for every other action. */
+export function partyTargetActionSlot(actionId: string): number | null {
+  if (actionId === 'targetSelf') return 0;
+  const m = /^targetParty([1-9])$/.exec(actionId);
+  if (!m) return null;
+  const slot = Number(m[1]);
+  return slot <= PARTY_TARGET_HOTKEY_SLOTS ? slot : null;
 }
 
 // Read a stored bindings blob, returning a plain object map or null. A missing,

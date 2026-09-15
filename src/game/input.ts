@@ -8,7 +8,13 @@ import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
 import { cursorForHover, type HoverCursorKind } from './cursors';
-import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
+import {
+  comboCode,
+  isModifierCode,
+  type Keybinds,
+  makeCombo,
+  partyTargetActionSlot,
+} from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
 import {
   inForcedPointerLockCooldown,
@@ -70,6 +76,9 @@ export interface InputCallbacks {
   // Select your own pet (Ctrl+6 by default). Separate from onPet: this targets the
   // pet rather than commanding it, so it belongs with the targeting callbacks above.
   onTargetPet(): void;
+  // A party target hotkey (F1..F10 by default): slot 0 is yourself, 1..9 the
+  // party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts).
+  onTargetParty(slot: number): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -967,6 +976,11 @@ export class Input {
   }
 
   private onKeyDown(e: KeyboardEvent): void {
+    // A bound F-key belongs to the game on EVERY keydown, auto-repeats included:
+    // the repeat early return below would otherwise hand a held key's repeats
+    // back to the browser (F5 reload, F1 help, F3 find, F10 menu focus). Unbound
+    // F-keys stay the browser's; the action itself still fires once per press.
+    if (this.isBoundFKey(e)) e.preventDefault?.();
     if (e.repeat) return;
     if (this.captureCb) {
       e.preventDefault();
@@ -1079,6 +1093,20 @@ export class Input {
     }
   }
 
+  /** True for an F-row key that some action holds, as a held key (bare code) or
+   *  as an edge chord; onKeyDown cancels the browser default for those. */
+  private isBoundFKey(e: KeyboardEvent): boolean {
+    if (!/^F\d{1,2}$/.test(e.code)) return false;
+    if (this.keybinds.heldActionForCode(e.code) !== null) return true;
+    const combo = makeCombo(e.code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    return this.keybinds.edgeActionForCombo(combo) !== null;
+  }
+
   private onKeyUp(e: KeyboardEvent): void {
     if (this.releaseBoundCode(e.code)) e.preventDefault();
   }
@@ -1115,6 +1143,11 @@ export class Input {
   private dispatchEdge(action: string): void {
     if (action.startsWith('slot')) {
       this.cb.onAbility(Number(action.slice(4)));
+      return;
+    }
+    const partySlot = partyTargetActionSlot(action);
+    if (partySlot !== null) {
+      this.cb.onTargetParty(partySlot);
       return;
     }
     switch (action) {
