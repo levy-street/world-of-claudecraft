@@ -6,6 +6,7 @@
 
 import type { Entity } from '../sim/types';
 import {
+  SELF_MOTION_SNAP_DIST_SQ,
   type SelfMotionFrame,
   SelfMotionPredictor,
   updateSelfRenderFallback,
@@ -27,6 +28,32 @@ function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE
   offset.x *= 1 - appliedShare;
   offset.y *= 1 - appliedShare;
   offset.z *= 1 - appliedShare;
+}
+
+// A handoff gap is a few yards at most (the predictor lead is latency-capped,
+// SELF_MOTION_CAP_MAX_MS at run speed). Anything past the shared 6 yd teleport
+// rule is the server moving the body outright (a delve, dungeon, arena or
+// graveyard teleport landing on the same snapshot the predictor gate flips),
+// and must snap: captured as an offset it would be rewound at
+// MAX_SELF_REWIND_YD_PER_SEC, walking the camera across the world for hours
+// (the delve "sent flying across the map" report).
+function exceedsSnapDistance(gap: Vec3Like): boolean {
+  return gap.x * gap.x + gap.y * gap.y + gap.z * gap.z > SELF_MOTION_SNAP_DIST_SQ;
+}
+
+function captureHandoffOffset(offset: Vec3Like, from: Vec3Like, to: Vec3Like): void {
+  const dx = from.x - to.x;
+  const dy = from.y - to.y;
+  const dz = from.z - to.z;
+  if (exceedsSnapDistance({ x: dx, y: dy, z: dz })) {
+    offset.x = 0;
+    offset.y = 0;
+    offset.z = 0;
+    return;
+  }
+  offset.x = dx;
+  offset.y = dy;
+  offset.z = dz;
 }
 
 export interface ReconciledSelfPrediction {
@@ -121,14 +148,15 @@ export function updateSelfRenderPosition(
         state.offset.y = 0;
         state.offset.z = 0;
       } else if (state.ready && !state.active) {
-        state.offset.x = state.position.x - predicted.x;
-        state.offset.y = state.position.y - predicted.y;
-        state.offset.z = state.position.z - predicted.z;
+        captureHandoffOffset(state.offset, state.position, predicted);
       }
-      if (reconciled.kind === 'reconciled' && reconciled.residual) {
-        state.offset.x += reconciled.residual.x;
-        state.offset.y += reconciled.residual.y;
-        state.offset.z += reconciled.residual.z;
+      // A replay residual is the same kind of gap: a teleport-scale one is
+      // dropped rather than glided (same rule as captureHandoffOffset).
+      const residual = reconciled.kind === 'reconciled' ? reconciled.residual : null;
+      if (residual && !exceedsSnapDistance(residual)) {
+        state.offset.x += residual.x;
+        state.offset.y += residual.y;
+        state.offset.z += residual.z;
       }
       decayOffset(state.offset, dt);
       state.position.x = predicted.x + state.offset.x;
@@ -150,9 +178,7 @@ export function updateSelfRenderPosition(
     state.offset.y = 0;
     state.offset.z = 0;
   } else if (state.ready && predictorWasActive) {
-    state.offset.x = state.position.x - px;
-    state.offset.y = state.position.y - py;
-    state.offset.z = state.position.z - pz;
+    captureHandoffOffset(state.offset, state.position, { x: px, y: py, z: pz });
   }
   if (
     !authoritativeDiscontinuity &&
