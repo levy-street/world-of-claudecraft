@@ -105,6 +105,7 @@ export interface InputCallbacks {
       | 'cosmetics'
       | 'crafting'
       | 'sheathe'
+      | 'hideInterface'
       | 'mount',
   ): void;
   onEmoteWheel(open: boolean): void;
@@ -1235,6 +1236,9 @@ export class Input {
         return;
       case 'sheathe':
         this.cb.onUiKey('sheathe');
+        return;
+      case 'hideInterface':
+        this.cb.onUiKey('hideInterface');
         return;
     }
   }

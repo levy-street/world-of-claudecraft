@@ -1618,6 +1618,8 @@ export const hudChromeStrings = {
     discord: 'Discord',
     bgFlag: 'Battleground Flag Action',
     sheathe: 'Sheathe/Unsheathe Weapon',
+    // Hides the whole HUD for a clean screenshot or video (Alt+Z by default).
+    hideInterface: 'Hide Interface',
     // Swimming: Jump swims up, this swims down.
     dive: 'Swim Down',
     // Pet bar (Ctrl+1..5 by default) key-binding rows + category header.

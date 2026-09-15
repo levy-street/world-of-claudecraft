@@ -1519,6 +1519,39 @@ export const TARGETS = [
     },
   },
   {
+    key: 'hide-interface',
+    label: 'Hide Interface (Alt+Z): the whole HUD hidden for a clean screenshot',
+    when: ['ui/interface_visibility', 'game/pet_commands'],
+    // Two legs on the lowest preset: the HUD as it stands, then the REAL bound
+    // key (Alt+Z through the keyboard, never the debug hook) hiding it.
+    variants: [
+      { key: 'shown', beforeLoad: seedLowGraphicsPreset },
+      { key: 'hidden', beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, variant) {
+      await dismissArrivalGreeting(page);
+      await awaitVeilSettled(page);
+      if (variant?.key === 'hidden') {
+        await page.keyboard.down('Alt');
+        await page.keyboard.press('KeyZ');
+        await page.keyboard.up('Alt');
+        // The first #ui children are the visually-hidden a11y live regions,
+        // which the hide set deliberately leaves alone: probe a real frame.
+        const state = await page.evaluate(() => ({
+          bodyClass: document.body.classList.contains('interface-hidden'),
+          frame: getComputedStyle(document.querySelector('#ui > :not(.visually-hidden)'))
+            .visibility,
+          plates: getComputedStyle(document.getElementById('nameplates')).visibility,
+        }));
+        if (!state.bodyClass || state.frame !== 'hidden' || state.plates !== 'hidden') {
+          throw new Error(`Alt+Z did not hide the interface: ${JSON.stringify(state)}`);
+        }
+        await wait(600);
+      }
+      return { clip: null };
+    },
+  },
+  {
     key: 'event-calendar',
     label: 'Event Calendar window: recurring system-event rows',
     when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],

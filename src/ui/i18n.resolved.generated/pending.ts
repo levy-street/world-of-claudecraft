@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -25,6 +26,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -68,6 +70,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "es_ES": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -83,6 +86,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -126,6 +130,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "fr_FR": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -141,6 +146,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -184,6 +190,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "fr_CA": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -199,6 +206,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -243,6 +251,7 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -258,6 +267,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -301,6 +311,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "de_DE": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -316,6 +327,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -383,6 +395,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow"
   ],
   "pt_BR": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -398,6 +411,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -447,6 +461,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.saleTypeBuyNow"
   ],
   "cs_CZ": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -462,6 +477,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -505,6 +521,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "nl_NL": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -520,6 +537,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -563,6 +581,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "pl_PL": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -578,6 +597,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -621,6 +641,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "id_ID": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -636,6 +657,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -679,6 +701,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "tr_TR": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -694,6 +717,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -737,6 +761,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "sv_SE": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -752,6 +777,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -795,6 +821,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "vi_VN": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -810,6 +837,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",
@@ -853,6 +881,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.wocMarket.tabHistory"
   ],
   "da_DK": [
+    "guide.controls.hideInterface",
     "guide.interfacePage.framesGovernedTalkingHead",
     "hudChrome.bugReport.online",
     "hudChrome.charSidebar.crafting",
@@ -868,6 +897,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.controller.deviceConnected",
     "hudChrome.controller.deviceDisconnected",
     "hudChrome.crafting.materialsFooter",
+    "hudChrome.keybinds.hideInterface",
     "hudChrome.mapAtlas.availableNearby",
     "hudChrome.mapAtlas.distance",
     "hudChrome.mapAtlas.filters.dungeons",

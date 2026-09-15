@@ -387,6 +387,16 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyZ'],
   },
+  // Hides every HUD surface for a clean screenshot or video (the classic
+  // Alt+Z); Escape always brings it back. Routed by
+  // src/ui/interface_visibility_core.ts from both the keyboard and the pad.
+  {
+    id: 'hideInterface',
+    label: 'Hide Interface',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Alt+KeyZ'],
+  },
   // Pet bar (hunter/warlock pet commands). Bound to Ctrl + 1..5 by default, so the
   // action-bar 1..5 stay free; every one is rebindable like any other action. The
   // handlers live in main.ts (onPet -> the IWorld pet commands).

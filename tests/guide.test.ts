@@ -1711,6 +1711,7 @@ describe('Guide controls reference completeness', () => {
     expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
     expect(defaults.get('mount')).toEqual(['Backquote']);
     expect(defaults.get('sheathe')).toEqual(['KeyZ']);
+    expect(defaults.get('hideInterface')).toEqual(['Alt+KeyZ']);
   });
 });
 
