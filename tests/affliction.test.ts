@@ -483,8 +483,8 @@ describe('Affliction Warlock', () => {
       castTime: 0,
       cooldown: 90,
       offGcd: true,
-      range: 30,
-      requiresTarget: true,
+      range: 0,
+      requiresTarget: false,
       effects: [{ type: 'afflictionJudgment', duration: 15, doom: 40, refund: 50 }],
     });
 
@@ -677,7 +677,7 @@ describe('Affliction Warlock', () => {
     expect(sentenceHit(true) / sentenceHit(false)).toBe(1.2);
   });
 
-  it('refuses Hour of Judgment unless the selected enemy bears the primary Evil Eye', () => {
+  it('allows Hour of Judgment even when targeting an enemy without the primary Evil Eye or with no target', () => {
     const sim = makeAffliction();
     const marked = addTarget(sim, 8);
     const unmarked = addTarget(sim, 10);
@@ -687,12 +687,14 @@ describe('Affliction Warlock', () => {
 
     sim.castAbility('hour_of_judgment');
 
-    expect(sim.player.cooldowns.has('hour_of_judgment')).toBe(false);
-    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_judgment')).toBe(false);
-    expect(doomValue(sim.player)).toBe(0);
+    expect(sim.player.cooldowns.has('hour_of_judgment')).toBe(true);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_judgment')).toBe(true);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_possession')).toBe(true);
+    expect(ownedFateThreads(sim.player)).toBe(3);
+    expect(doomValue(sim.player)).toBe(40);
   });
 
-  it('refuses possession unless the selected enemy bears the primary Evil Eye', () => {
+  it('allows possession even when targeting an enemy without the primary Evil Eye or with no target', () => {
     const sim = makeAffliction();
     const marked = addTarget(sim, 8);
     const unmarked = addTarget(sim, 10);
@@ -704,9 +706,39 @@ describe('Affliction Warlock', () => {
     sim.targetEntity(unmarked.id);
     sim.castAbility('possess_evil_eye');
 
-    expect(sim.player.resource).toBe(mana);
-    expect(sim.player.cooldowns.has('possess_evil_eye')).toBe(false);
-    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_possession')).toBe(false);
+    expect(sim.player.resource).toBe(mana - 75);
+    expect(sim.player.cooldowns.has('possess_evil_eye')).toBe(true);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_possession')).toBe(true);
+    expect(doomValue(sim.player)).toBe(35);
+  });
+
+  it('lets Hour of Judgment fire during an opening Needle of Fate cast before Evil Eye exists', () => {
+    const sim = makeAffliction();
+    const target = addTarget(sim, 8);
+    sim.player.resource = sim.player.maxResource;
+    sim.targetEntity(target.id);
+    // Opening combat with Needle of Fate: at cast start, target does not have affliction_eye.
+    sim.castAbility('needle_of_fate');
+    for (let i = 0; i < 4; i++) sim.tick();
+    expect(sim.player.castingAbility).toBe('needle_of_fate');
+    expect(eye(target, sim.player.id)).toBe(false);
+
+    // Fire Hour of Judgment mid-cast
+    sim.castAbility('hour_of_judgment');
+    const events = sim.tick();
+
+    expect(events.filter((event) => event.type === 'error')).toEqual([]);
+    expect(doomValue(sim.player)).toBe(40);
+    expect(ownedFateThreads(sim.player)).toBe(3);
+    expect(sim.player.cooldowns.get('hour_of_judgment')).toBeCloseTo(90 - 1 / 20, 6);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_judgment')).toBe(true);
+    expect(sim.player.auras.some((aura) => aura.kind === 'affliction_possession')).toBe(true);
+
+    // Finish needle cast: needle applies eye on completion and doubles generation under HoJ
+    for (let i = 0; i < 20 * 5 && sim.player.castingAbility; i++) sim.tick();
+    for (let i = 0; i < 200 && ctx(sim).pendingProjectiles.length > 0; i++) sim.tick();
+    expect(eye(target, sim.player.id)).toBe(true);
+    expect(doomValue(sim.player)).toBe(58);
   });
 
   it('accelerates Needle of Fate and grants 2 extra Condemnation while possessed', () => {

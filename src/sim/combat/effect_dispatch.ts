@@ -4076,7 +4076,7 @@ export function runEffects(
         break;
       }
       case 'afflictionJudgment': {
-        if (target) applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
+        applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
         break;
       }
       case 'afflictionLitany': {

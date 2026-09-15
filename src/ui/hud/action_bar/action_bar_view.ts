@@ -707,11 +707,7 @@ export function createActionBarView(
         const devotionReady =
           def.devotionCost === undefined ||
           (player.paladinDevotion?.value ?? 0) >= def.devotionCost;
-        const requiresPrimaryEye =
-          def.id === 'sentence' ||
-          def.id === 'coven' ||
-          def.id === 'possess_evil_eye' ||
-          def.id === 'hour_of_judgment';
+        const requiresPrimaryEye = def.id === 'sentence' || def.id === 'coven';
         const primaryEyeReady =
           !requiresPrimaryEye ||
           target?.auras.some(

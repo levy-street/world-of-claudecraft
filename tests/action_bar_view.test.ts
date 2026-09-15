@@ -712,7 +712,7 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
     const view = createActionBarView(
       descriptor(
         slot(1, {
-          ability: ability('hour_of_judgment', { requiresTarget: true, range: 30 }),
+          ability: ability('coven', { requiresTarget: true, range: 30, cost: 0 }),
         }),
       ),
       fakeDeps(),
@@ -738,6 +738,24 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
         }),
       ).slots[0].usable,
     ).toBe(true);
+  });
+
+  it('leaves Possess and Hour of Judgment usable without targeting the primary Eye', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(1, {
+          ability: ability('hour_of_judgment', { requiresTarget: false, cost: 0 }),
+        }),
+        slot(2, {
+          ability: ability('possess_evil_eye', { requiresTarget: false, cost: 75 }),
+        }),
+      ),
+      fakeDeps(),
+    );
+
+    const withoutTarget = view.tick(world({ playerId: 7, resource: 100 }));
+    expect(withoutTarget.slots[0].usable).toBe(true);
+    expect(withoutTarget.slots[1].usable).toBe(true);
   });
 
   it('dims duplicate and over-cap Dominion summons without hiding valid composition choices', () => {

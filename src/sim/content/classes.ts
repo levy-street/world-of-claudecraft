@@ -5289,9 +5289,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // without this the busy guard rejected the press and the player gained no
     // Condemnation.
     usableWhileCasting: true,
-    range: 30,
+    range: 0,
     school: 'shadow',
-    requiresTarget: true,
+    requiresTarget: false,
     projectile: false,
     effects: [{ type: 'afflictionPossession', duration: 15, doom: 35 }],
     description:
@@ -5310,9 +5310,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // Off-GCD burst opener, pressable through a running cast or channel; see
     // possess_evil_eye above.
     usableWhileCasting: true,
-    range: 30,
+    range: 0,
     school: 'shadow',
-    requiresTarget: true,
+    requiresTarget: false,
     projectile: false,
     effects: [{ type: 'afflictionJudgment', duration: 15, doom: 40, refund: 50 }],
     description:
