@@ -10,7 +10,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import {
   applyBootRenderScaleDefault,
   applyFirstRunGraphicsPreset,
-  GRAPHICS_PRESET_LOW,
 } from '../src/game/boot_graphics_defaults';
 import {
   bootRenderScaleDefault,
@@ -18,7 +17,7 @@ import {
   WEAK_GPU_LOW_RENDER_SCALE,
 } from '../src/game/render_scale_default_core';
 import { BOOL_SETTINGS, SETTING_RANGES, Settings } from '../src/game/settings';
-import { GFX_BUDGETS, tierFromHints } from '../src/render/gfx';
+import { GFX_BUDGETS, PRESET_LOW, tierFromHints } from '../src/render/gfx';
 import { stripComments } from './helpers/strip_comments';
 
 const STOCK = SETTING_RANGES.renderScale.def;
@@ -29,7 +28,6 @@ const IRIS_XE = 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics Direct3D11 vs_5_0 ps
 const RADEON_IGPU = 'ANGLE (AMD, AMD Radeon(TM) Graphics Direct3D11 vs_5_0 ps_5_0)';
 const RTX = 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0)';
 const SWIFTSHADER = 'Google SwiftShader';
-const PRESET_LOW = GRAPHICS_PRESET_LOW;
 const PRESET_MEDIUM = PRESET_LOW + 1;
 
 function installStorage(): void {
@@ -221,12 +219,6 @@ describe('boot_graphics_defaults: the applier over the live settings store', () 
     expect(first.settings.get('renderScaleTouched')).toBe(false);
     const second = new Settings();
     expect(applyBootRenderScaleDefault(second, HD_530)).toBe(WEAK_GPU_LOW_RENDER_SCALE);
-  });
-
-  it('the mirrored LOW ordinal is the one gfx.ts resolves to the low tier', () => {
-    const desktop = { search: '', maxTouchPoints: 0, coarsePointer: false, narrowViewport: false };
-    expect(tierFromHints({ ...desktop, graphicsPreset: GRAPHICS_PRESET_LOW }, false)).toBe('low');
-    expect(tierFromHints({ ...desktop, graphicsPreset: PRESET_MEDIUM }, false)).toBe('medium');
   });
 
   it('the moved first-run preset step still leaves an inconclusive (Node, no GPU) device unmarked', () => {

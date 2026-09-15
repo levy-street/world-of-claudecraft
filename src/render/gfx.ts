@@ -348,7 +348,8 @@ export interface GfxRuntimeBudget {
   readonly cooldownSeconds: number;
 }
 
-const PRESET_LOW = 1;
+/** The Low preset ordinal (the boot-time render scale default keys on it). */
+export const PRESET_LOW = 1;
 const PRESET_MEDIUM = 2;
 const PRESET_HIGH = 3;
 const PRESET_ULTRA = 4;

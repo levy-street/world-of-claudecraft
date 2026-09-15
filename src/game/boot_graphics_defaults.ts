@@ -5,13 +5,14 @@
 // the FPS governor. Thin host glue over the pure cores; the decision tables live
 // in gfx.ts (resolveDefaultGraphicsPreset) and render_scale_default_core.ts.
 
-import { activeGpuRendererName, classifyGpuRenderer, firstRunGraphicsPreset } from '../render/gfx';
+import {
+  activeGpuRendererName,
+  classifyGpuRenderer,
+  firstRunGraphicsPreset,
+  PRESET_LOW,
+} from '../render/gfx';
 import { bootRenderScaleDefault } from './render_scale_default_core';
 import { SETTING_RANGES, type Settings } from './settings';
-
-/** Mirrors gfx.ts PRESET_LOW (1 low, 2 medium, 3 high, 4 ultra, 5 advanced, 6 insane);
- *  tests/render_scale_default.test.ts pins the mirror through tierFromHints. */
-export const GRAPHICS_PRESET_LOW = 1;
 
 /**
  * First-run graphics default: until a device default has been applied (the
@@ -46,7 +47,7 @@ export function applyBootRenderScaleDefault(
 ): number | null {
   const next = bootRenderScaleDefault({
     weakGpu: classifyGpuRenderer(gpuRenderer) === 'weak',
-    lowPreset: settings.get('graphicsPreset') === GRAPHICS_PRESET_LOW,
+    lowPreset: settings.get('graphicsPreset') === PRESET_LOW,
     renderScaleTouched: settings.get('renderScaleTouched'),
     storedRenderScale: settings.get('renderScale'),
     stockRenderScale: SETTING_RANGES.renderScale.def,
