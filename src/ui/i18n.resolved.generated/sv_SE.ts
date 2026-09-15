@@ -1409,7 +1409,11 @@ export const sv_SE: EnTranslations = {
       "petAggressive": "Djur: Aggressivt",
       "targetPet": "Djur: Måltavla",
       "mount": "Sitt upp / Stig av",
-      "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen."
+      "mouseHint": "Musknappar fungerar också: tryck på mittenknappen (M3) eller en tumknapp (M4, M5) medan du binder. Vänster och höger knapp är reserverade för kameran, Klicka för att flytta och att klicka på saker i världen.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Redigera handlingsfältets tangenter",
@@ -6073,7 +6077,8 @@ export const sv_SE: EnTranslations = {
       "ifLockBars": "Låser dina handlingsfält så att du inte råkar dra ut en förmåga ur en plats av misstag.",
       "keybindsHeading": "Panelen Tangentbindningar",
       "keybindsBody": "Tangentlistan är bara halva den panelen. Ovanför den sitter brytarna som avgör hur din mus styr spelet: muskamera, om pekaren låses medan du roterar, klicka för att flytta och vilken musknapp som utlöser det, anfallsförflyttning, den vänsterhänta pekstyrningen, och svordomsfiltret för chatten.",
-      "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha."
+      "keybindsMouseBody": "Två saker där är lätta att missa. Musknappar binds som tangenter, så klick på hjulet och tumknapparna kan bära förmågor, medan vänster- och högerklick förblir reserverade för kameran och för att klicka i världen. Och du kan binda direkt från handlingsfältet: slå på läget för att binda från fältet här, klicka sedan på en plats och tryck på tangenten du vill ha.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Strid följer välbekanta klassiska MMO-regler. Du behöver aldrig studera något av det för att spela bra, detta är bara formen för hur strider fungerar.",

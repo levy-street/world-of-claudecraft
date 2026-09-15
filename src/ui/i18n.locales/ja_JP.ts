@@ -11481,6 +11481,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.tips.reliquary': 'ヒント：聖遺物庫は集めたユニークな戦利品を棚ごとに記録します。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '騎乗 / 降車',
+  // Wheel pseudo-keys + the zoom rows that hold them by default. M16 wordy fills.
+  'hudChrome.keybinds.zoomIn': 'カメラをズームイン',
+  'hudChrome.keybinds.zoomOut': 'カメラをズームアウト',
+  'hudChrome.keybinds.wheelHint':
+    'マウスホイールも割り当てられます。割り当て中にホイールを上か下に回してください。Ctrl、Alt、Shift を押しながらでも構いません。「カメラをズームイン」と「カメラをズームアウト」は初期状態で素のホイールに置かれています。Ctrl+ホイールなどの組み合わせに移せば、ホイールをアビリティ用に空けられます。',
+  'hudChrome.keybinds.wheelHeldRefused':
+    'ホイールの1目盛りでは移動などの押し続ける操作を動かせません。キーかマウスボタンを選んでください。',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
   'hudChrome.keybinds.mouseHint':
     'マウスボタンも使えます。割り当て中に中ボタン (M3) やサイドボタン (M4、M5) を押してください。左右のボタンはカメラ操作、クリック移動、ワールド内のクリックに予約されています。',
@@ -15171,6 +15178,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.keybindsHeading': '「キー割り当て」パネル',
   'guide.settingsPage.keybindsMouseBody':
     '見落としやすい点が2つあります。まず、マウスボタンはキーと同じように割り当てられるので、ホイールクリックやサムボタンにアビリティを載せられます。左右のクリックは、カメラと世界のクリック操作のために予約されたままです。もう一つ、アクションバーから直接割り当てることもできます。ここでバー上での割り当てモードをオンにし、スロットをクリックして、割り当てたいキーを押すだけです。',
+  'guide.settingsPage.keybindsWheelBody':
+    'ホイール自体も割り当てられます。「カメラをズームイン」と「カメラをズームアウト」は通常の割り当てで、初期状態では素のホイールに置かれています。Ctrl+ホイールやキーに移してから、空いたホイールを回してアクションバーのスロットを発動できます。ホイールの目盛りには離す動作がないため、前進のような押し続ける操作には使えません。',
   'guide.settingsPage.panelsMoreBody':
     'このページで表にしていない2つのパネルも、目を通しておく価値があります。「オーラ」は、クラスの発動が来たときに画面へ大きく出るアラートを整えるところです。どれを表示するか、その大きさ、色、不透明度、画面上の位置を決められます。「パフォーマンスオーバーレイ」は、このページの設定を調整するあいだだけ出しておき、終わったらまた隠す読み取り表示です。',
   'guide.settingsPage.rowAmbientOcclusion':

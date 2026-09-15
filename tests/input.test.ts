@@ -26,7 +26,7 @@ function installStorage(): void {
   };
 }
 
-function makeInput(userAgent?: string) {
+function makeInput(userAgent?: string, keybinds = new Keybinds()) {
   vi.stubGlobal('navigator', {
     userAgent: userAgent ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/126.0.0.0',
   });
@@ -91,7 +91,7 @@ function makeInput(userAgent?: string) {
     canUseGameKeys: () => gameKeysAllowed,
     isCameraLocked: () => cameraLocked,
   };
-  const input = new Input(canvas as any, cb, new Keybinds());
+  const input = new Input(canvas as any, cb, keybinds);
   return {
     canvas,
     canvasListeners,
@@ -143,6 +143,118 @@ describe('Input camera zoom', () => {
 
     expect(preventDefault).toHaveBeenCalled();
     expect(input.camDist).toBe(12);
+  });
+
+  it('zooms one step per notch from a key bound to the zoom actions too', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('zoomOut', 0, 'KeyO')).toBe(true);
+    expect(kb.bind('zoomIn', 0, 'KeyI')).toBe(true);
+    const { windowListeners, input } = makeInput(undefined, kb);
+
+    windowListeners.get('keydown')?.({ code: 'KeyO', preventDefault: vi.fn() });
+    expect(input.camDist).toBeCloseTo(13.4);
+    windowListeners.get('keydown')?.({ code: 'KeyI', preventDefault: vi.fn() });
+    windowListeners.get('keydown')?.({ code: 'KeyI', preventDefault: vi.fn() });
+    expect(input.camDist).toBeCloseTo(10.6);
+  });
+});
+
+// The wheel is a pair of bindable pseudo-keys (src/game/wheel_binds.ts): the
+// bare notches drive zoomIn / zoomOut by default, and once those move to a
+// chord the freed notches carry whatever a key would.
+describe('Input wheel bindings', () => {
+  it('fires an action-bar slot as a complete tap when its notch is bound to it', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'WheelDown')).toBe(true); // evicts zoomOut's default
+    const { canvasListeners, cb, input } = makeInput(undefined, kb);
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+
+    expect(cb.onAbility).toHaveBeenCalledWith(3);
+    expect(cb.onAbilityDown).not.toHaveBeenCalled(); // a notch never charges
+    expect(input.camDist).toBe(12); // the notch no longer zooms
+    expect(kb.codeAt('zoomOut', 0)).toBeNull();
+  });
+
+  it('zooms from Ctrl+wheel once zoom is rebound there, and leaves the bare notch to its slot', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('zoomOut', 0, 'Ctrl+WheelDown')).toBe(true);
+    expect(kb.bind('zoomIn', 0, 'Ctrl+WheelUp')).toBe(true);
+    expect(kb.bind('slot4', 0, 'WheelUp')).toBe(true);
+    const { canvasListeners, cb, input } = makeInput(undefined, kb);
+
+    canvasListeners.get('wheel')?.({ deltaY: 100, ctrlKey: true, preventDefault: vi.fn() });
+    expect(input.camDist).toBeCloseTo(13.4);
+    canvasListeners.get('wheel')?.({ deltaY: -100, ctrlKey: true, preventDefault: vi.fn() });
+    expect(input.camDist).toBeCloseTo(12);
+
+    canvasListeners.get('wheel')?.({ deltaY: -100, preventDefault: vi.fn() });
+    expect(cb.onAbility).toHaveBeenCalledWith(4);
+    expect(input.camDist).toBeCloseTo(12);
+    // The bare down notch is now unbound: nothing fires and nothing zooms.
+    cb.onAbility.mockClear();
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+    expect(cb.onAbility).not.toHaveBeenCalled();
+    expect(input.camDist).toBeCloseTo(12);
+  });
+
+  it('does nothing for a notch with no vertical travel', () => {
+    const { canvasListeners, cb, input } = makeInput();
+    canvasListeners.get('wheel')?.({ deltaY: 0, preventDefault: vi.fn() });
+    expect(input.camDist).toBe(12);
+    expect(cb.onAbility).not.toHaveBeenCalled();
+  });
+
+  it('honors the same guards as a bound key: a focused text field and a menu that owns the keys', () => {
+    const kb = new Keybinds();
+    expect(kb.bind('slot3', 0, 'WheelDown')).toBe(true);
+    const { canvasListeners, cb, setGameKeysAllowed } = makeInput(undefined, kb);
+
+    (globalThis as any).document.activeElement = { tagName: 'INPUT' };
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+    expect(cb.onAbility).not.toHaveBeenCalled();
+
+    (globalThis as any).document.activeElement = null;
+    setGameKeysAllowed(false);
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+    expect(cb.onAbility).not.toHaveBeenCalled();
+
+    setGameKeysAllowed(true);
+    canvasListeners.get('wheel')?.({ deltaY: 100, preventDefault: vi.fn() });
+    expect(cb.onAbility).toHaveBeenCalledWith(3);
+  });
+
+  it('delivers a notch to an armed rebind capture from anywhere in the window, chord included', () => {
+    const { windowListeners, canvasListeners, cb, input } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+    const preventDefault = vi.fn();
+    const stopPropagation = vi.fn();
+
+    // Rolled over the Key Bindings panel: the window capture listener sees it
+    // first and must stop the panel's own scroll from swallowing it.
+    windowListeners.get('wheel')?.({ deltaY: 100, ctrlKey: true, preventDefault, stopPropagation });
+
+    expect(captured).toEqual(['Ctrl+WheelDown']);
+    expect(preventDefault).toHaveBeenCalled();
+    expect(stopPropagation).toHaveBeenCalled();
+    // The capture is one-shot: the next notch over the canvas is gameplay again.
+    canvasListeners.get('wheel')?.({ deltaY: -100, preventDefault: vi.fn() });
+    expect(captured).toHaveLength(1);
+    expect(input.camDist).toBeCloseTo(10.6);
+    expect(cb.onAbility).not.toHaveBeenCalled();
+  });
+
+  it('ignores a travel-less notch while capturing so it cannot end the capture', () => {
+    const { windowListeners, input } = makeInput();
+    const captured: (string | null)[] = [];
+    input.captureNextKey((code) => captured.push(code));
+    windowListeners.get('wheel')?.({
+      deltaY: 0,
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+    });
+    expect(captured).toEqual([]);
   });
 });
 

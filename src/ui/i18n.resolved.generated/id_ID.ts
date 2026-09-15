@@ -1409,7 +1409,11 @@ export const id_ID: EnTranslations = {
       "petAggressive": "Peliharaan: Agresif",
       "targetPet": "Peliharaan: Bidik",
       "mount": "Naiki / Turun",
-      "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia."
+      "mouseHint": "Tombol tetikus juga berfungsi: tekan tombol tengah (M3) atau tombol ibu jari (M4, M5) saat mengikat. Tombol kiri dan kanan tetap dicadangkan untuk kamera, Klik untuk Bergerak, dan mengeklik sesuatu di dunia.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Ubah tombol bilah aksi",
@@ -6073,7 +6077,8 @@ export const id_ID: EnTranslations = {
       "ifLockBars": "Mengunci bilah Anda sehingga Anda tidak bisa menyeret sebuah kemampuan keluar dari slotnya secara tidak sengaja.",
       "keybindsHeading": "Panel Pengaturan Tombol",
       "keybindsBody": "Daftar tombol hanyalah separuh dari panel itu. Di atasnya ada sakelar-sakelar yang menentukan bagaimana mouse Anda mengendalikan permainan: kamera mouse, apakah kursor terkunci saat Anda memutar pandangan, klik untuk bergerak dan tombol mouse mana yang memicunya, serang sambil bergerak, tata letak sentuh untuk tangan kiri, dan penyaring kata kasar untuk obrolan.",
-      "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan."
+      "keybindsMouseBody": "Ada dua hal di sana yang mudah terlewat. Tombol mouse bisa diikat seperti tombol papan ketik, sehingga klik roda dan tombol jempol bisa membawa kemampuan, sementara klik kiri dan kanan tetap dicadangkan untuk kamera dan untuk mengeklik dunia. Dan Anda bisa mengikat langsung dari bilah aksi: aktifkan mode pengikatan pada-bilah di sini, lalu klik sebuah slot dan tekan tombol yang Anda inginkan.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Pertarungan mengikuti aturan MMO klasik yang familier. Kamu tak perlu mempelajari semuanya untuk bermain baik, ini sekadar gambaran cara kerja pertarungan.",

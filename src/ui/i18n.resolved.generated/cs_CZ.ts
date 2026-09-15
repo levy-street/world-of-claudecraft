@@ -1409,7 +1409,11 @@ export const cs_CZ: EnTranslations = {
       "petAggressive": "Mazlíček: Agresivní",
       "targetPet": "Mazlíček: Zacílit",
       "mount": "Nasednout / Sesednout",
-      "mouseHint": "Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě."
+      "mouseHint": "Fungují i tlačítka myši: při přiřazování stiskni prostřední tlačítko (M3) nebo boční tlačítko (M4, M5). Levá a pravá tlačítka zůstávají vyhrazena pro kameru, kliknutí k pohybu a klikání na věci ve světě.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Upravit klávesy akční lišty",
@@ -6073,7 +6077,8 @@ export const cs_CZ: EnTranslations = {
       "ifLockBars": "Uzamkne tvé lišty, abys omylem nevytáhl schopnost ze slotu.",
       "keybindsHeading": "Panel Klávesové zkratky",
       "keybindsBody": "Seznam kláves je jen polovina tohoto panelu. Nad ním sedí přepínače, které rozhodují, jak myš ovládá hru: kamera myší, jestli se kurzor při otáčení uzamkne, kliknutím k pohybu a které tlačítko myši ho spouští, útok pohybem, rozvržení pro leváky na dotyku a filtr vulgarit pro chat.",
-      "keybindsMouseBody": "Dvě věci se tam snadno přehlédnou. Tlačítka myši se váží jako klávesy, takže kliknutí kolečkem i palcová tlačítka mohou nést schopnosti, zatímco levé a pravé tlačítko zůstávají vyhrazená kameře a klikání do světa. A vázat můžeš rovnou z akční lišty: zapni si tu režim vázání přímo na liště, pak klikni na slot a stiskni klávesu, kterou chceš."
+      "keybindsMouseBody": "Dvě věci se tam snadno přehlédnou. Tlačítka myši se váží jako klávesy, takže kliknutí kolečkem i palcová tlačítka mohou nést schopnosti, zatímco levé a pravé tlačítko zůstávají vyhrazená kameře a klikání do světa. A vázat můžeš rovnou z akční lišty: zapni si tu režim vázání přímo na liště, pak klikni na slot a stiskni klávesu, kterou chceš.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Boj se řídí známými pravidly klasických MMO. Nemusíš je studovat, abys hrál dobře, tady je jen tvar toho, jak souboje fungují.",

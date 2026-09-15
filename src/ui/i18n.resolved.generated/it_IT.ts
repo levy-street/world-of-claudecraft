@@ -1409,7 +1409,11 @@ export const it_IT: EnTranslations = {
       "petAggressive": "Famiglio: aggressivo",
       "targetPet": "Famiglio: bersaglia",
       "mount": "Monta / Smonta",
-      "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
+      "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Modifica i tasti della barra delle azioni",
@@ -6073,7 +6077,8 @@ export const it_IT: EnTranslations = {
       "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
       "keybindsHeading": "Il pannello Comandi da tastiera",
       "keybindsBody": "L'elenco dei tasti è solo metà di quel pannello. Sopra di esso si trovano gli interruttori che decidono come il mouse guida il gioco: telecamera con mouse, se il cursore si blocca durante la rotazione, clic per muoversi e quale pulsante del mouse lo attiva, movimento d'attacco, il layout touch per mancini, e il filtro del linguaggio per la chat.",
-      "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi."
+      "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Il combattimento segue le familiari regole degli MMO classici. Non hai mai bisogno di studiarne nulla per giocare bene, questa è solo la forma di come funzionano gli scontri.",

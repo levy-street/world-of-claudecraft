@@ -298,6 +298,7 @@ const UI_PURE_CORES = [
   'src/ui/keyboard_map_core.ts',
   'src/ui/keybind_conflict_prompt_core.ts',
   'src/ui/keybind_action_names_core.ts',
+  'src/ui/keybind_device_notes_core.ts',
   'src/ui/keyboard_layout_pref_core.ts',
   'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',

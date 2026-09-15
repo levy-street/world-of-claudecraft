@@ -10916,6 +10916,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.tips.reliquary': '提示：圣物库逐架记录你收集的独特战利品。',
   // Rideable mounts: the Z keybind + the Mounts window (the stable).
   'hudChrome.keybinds.mount': '骑乘 / 下骑',
+  // Wheel pseudo-keys + the zoom rows that hold them by default. M16 wordy fills.
+  'hudChrome.keybinds.zoomIn': '拉近镜头',
+  'hudChrome.keybinds.zoomOut': '拉远镜头',
+  'hudChrome.keybinds.wheelHint':
+    '鼠标滚轮也可以绑定：绑定时向上或向下滚动滚轮，也可以同时按住 Ctrl、Alt 或 Shift。拉近镜头和拉远镜头默认占用裸滚轮，把它们移到 Ctrl+滚轮之类的组合上，就能把滚轮留给技能使用。',
+  'hudChrome.keybinds.wheelHeldRefused':
+    '滚轮的一格无法驱动移动这类需要按住的操作。请为它选择一个按键或鼠标按钮。',
   // Bindable mouse buttons. M16 wordy fill; M3/M4/M5 are keycap labels and stay as-is.
   'hudChrome.keybinds.mouseHint':
     '鼠标按键同样可用：绑定时按下中键 (M3) 或拇指键 (M4、M5)。左键和右键保留给镜头、点击移动和点击世界中的目标使用。',
@@ -14448,6 +14455,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.keybindsHeading': '“按键绑定”面板',
   'guide.settingsPage.keybindsMouseBody':
     '那里有两件事很容易被忽略。鼠标按键可以像键盘按键一样绑定，所以滚轮点击和拇指键都能承载技能，而左右键则保留给镜头和点击世界。此外，你可以直接从动作条上绑定：在这里打开条上绑定模式，然后点一个格子，按下你想要的键。',
+  'guide.settingsPage.keybindsWheelBody':
+    '滚轮本身也可以绑定。拉近镜头和拉远镜头是普通绑定，默认占用裸滚轮，因此你可以把它们移到 Ctrl+滚轮或按键上，再用空出来的滚轮触发动作条格位。滚轮的一格没有松开动作，所以无法驱动向前移动这类需要按住的操作。',
   'guide.settingsPage.panelsMoreBody':
     '本页没有列表说明的那两个面板，同样值得一看。“光环”是你调整那些大幅屏幕提示的地方，它们会在你职业的触发效果就绪时亮起：哪些要显示、大小、颜色、不透明度，以及摆在屏幕的什么位置。“性能监视器”则是你调校本页选项时打开、调完再隐藏的那个读数。',
   'guide.settingsPage.rowAmbientOcclusion':

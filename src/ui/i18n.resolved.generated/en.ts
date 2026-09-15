@@ -1409,7 +1409,11 @@ export const en: EnTranslations = {
       "petAggressive": "Pet: Aggressive",
       "targetPet": "Pet: Mark",
       "mount": "Mount / Dismount",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -6073,7 +6077,8 @@ export const en: EnTranslations = {
       "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
       "keybindsHeading": "The Key Bindings panel",
       "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
-      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want."
+      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",

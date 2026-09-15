@@ -14,6 +14,7 @@
 import { repairStoredBindings } from './keybinds_repair';
 import { parseStoredJson } from './local_storage_json';
 import { isReservedMouseCode, mouseCodeLabel } from './mouse_binds';
+import { isWheelCode, wheelCodeAllowedFor, wheelCodeLabel } from './wheel_binds';
 
 export type BindKind = 'held' | 'edge';
 
@@ -146,6 +147,23 @@ export const BIND_ACTIONS: BindAction[] = [
     category: 'Movement',
     kind: 'held',
     defaults: ['ControlLeft'],
+  },
+  // Camera zoom, on the bare wheel by default (wheel_binds.ts). Edge actions,
+  // so a chord (Ctrl+WheelDown) or a plain key can carry them instead and free
+  // the wheel notches for action-bar slots.
+  {
+    id: 'zoomIn',
+    label: 'Zoom Camera In',
+    category: 'Movement',
+    kind: 'edge',
+    defaults: ['WheelUp'],
+  },
+  {
+    id: 'zoomOut',
+    label: 'Zoom Camera Out',
+    category: 'Movement',
+    kind: 'edge',
+    defaults: ['WheelDown'],
   },
   {
     id: 'autorun',
@@ -545,10 +563,31 @@ export function isReservedCode(combo: string): boolean {
   return code === 'Escape' || isReservedMouseCode(code);
 }
 
+/**
+ * True when `value` (a stored-shape combo) may never land on `id`: a reserved
+ * code (Escape, the left/right buttons), or a wheel notch on a held action (a
+ * notch has no release; see wheel_binds.ts). The one predicate bind(), its
+ * conflict look-ahead, and the load sweep all share, so a refused value can
+ * neither be stored nor evict another binding.
+ */
+export function isRefusedCodeFor(id: string, value: string): boolean {
+  return bindRefusalReason(id, value) !== null;
+}
+
+/** Why bind() refuses `value` on `id`, or null when it would accept it. */
+export type BindRefusalReason = 'reserved' | 'wheelHeld';
+export function bindRefusalReason(id: string, value: string): BindRefusalReason | null {
+  if (isReservedCode(value)) return 'reserved';
+  if (isWheelCode(comboCode(value)) && !wheelCodeAllowedFor(actionKind(id))) return 'wheelHeld';
+  return null;
+}
+
 // short on-screen label for a single e.code (the keycap glyph)
 function codeLabel(code: string): string {
   const mouse = mouseCodeLabel(code); // "Mouse4" -> "M4"
   if (mouse !== null) return mouse;
+  const wheel = wheelCodeLabel(code); // "WheelUp" -> "Wh↑"
+  if (wheel !== null) return wheel;
   if (/^Digit\d$/.test(code)) return code.slice(5);
   if (/^Key[A-Z]$/.test(code)) return code.slice(3);
   if (/^F\d{1,2}$/.test(code)) return code;
@@ -730,7 +769,7 @@ export class Keybinds {
         // modifier on one (only a hand-edited import can carry it) is dropped
         // so the poll and the eviction sweep keep matching.
         const v = a.kind === 'held' ? comboCode(combo) : combo;
-        if (isReservedCode(v)) continue;
+        if (isRefusedCodeFor(a.id, v)) continue;
         // Shared actions keep their code even if another action already claimed
         // it, and never claim it themselves, so the overlap survives a round-trip.
         if (!shared && claimed.has(v)) continue;
@@ -859,7 +898,7 @@ export class Keybinds {
     // them bare so the poll keeps matching; only edge actions keep the full
     // modifier combo.
     const value = actionKind(id) === 'held' ? comboCode(combo) : combo;
-    if (isReservedCode(value)) return false;
+    if (isRefusedCodeFor(id, value)) return false;
     // A shared action (or rebinding one) is allowed to overlap, so skip the
     // mutual-eviction sweep whenever either side opts into sharing. The sweep
     // compares the full combo string, so "Shift+Digit1" and "Digit1" are
@@ -890,9 +929,9 @@ export class Keybinds {
     const codes = this.map.get(id);
     if (!codes || index < 0 || index >= SLOTS_PER_ACTION) return null;
     const value = actionKind(id) === 'held' ? comboCode(combo) : combo;
-    // A reserved code never binds at all, so it can never steal anything; the
+    // A refused code never binds at all, so it can never steal anything; the
     // caller reports that refusal on its own.
-    if (isReservedCode(value) || actionAllowsShared(id)) return null;
+    if (isRefusedCodeFor(id, value) || actionAllowsShared(id)) return null;
     for (const [otherId, otherCodes] of this.map) {
       if (actionAllowsShared(otherId)) continue;
       for (let i = 0; i < otherCodes.length; i++) {

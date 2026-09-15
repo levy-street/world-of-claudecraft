@@ -1068,6 +1068,23 @@ async function triggerRowBreakdown(page, rowSelector, variant) {
   }
 }
 
+// Rebind camera zoom onto Ctrl+wheel and hand the freed bare notches to the
+// first two ability slots, through the live Keybinds the Input owns (the same
+// object the Key Bindings panel writes). On a base tree without the zoom
+// actions the two zoom binds are no-ops and the notch codes label raw, which is
+// exactly the BEFORE picture.
+async function stageWheelBinds(page) {
+  await page.evaluate(() => {
+    const kb = window.__game?.input?.keybinds;
+    if (!kb) return;
+    kb.bind('zoomIn', 0, 'Ctrl+WheelUp');
+    kb.bind('zoomOut', 0, 'Ctrl+WheelDown');
+    kb.bind('slot1', 0, 'WheelUp');
+    kb.bind('slot2', 0, 'WheelDown');
+    window.__game?.hud?.optionsWindow?.repaintKeyboardWindow?.();
+  });
+}
+
 export const TARGETS = [
   ...masterwroughtReviewTargets({
     beforeLoad: lowGraphicsSeed,
@@ -2957,6 +2974,43 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
+    key: 'keybinds-wheel-zoom-rows',
+    label:
+      'Key Bindings panel: the Zoom Camera rows moved to Ctrl+wheel, the bare notches on slots',
+    when: ['game/wheel_binds', 'game/keybinds', 'ui/keybind_device_notes_core'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await stageWheelBinds(page);
+      await page.evaluate(() => {
+        document.querySelector('#tutorial-greeting button')?.click();
+        const el = document.querySelector('#options-menu');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleOptionsMenu?.();
+      });
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelectorAll('#options-menu .opt-btn')[0]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .kb-cols');
+      return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
+    key: 'actionbar-wheel-keycaps',
+    label: 'Action bar: slots 1 and 2 wearing the wheel-notch keycaps',
+    when: ['game/wheel_binds', 'game/keybinds'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await stageWheelBinds(page);
+      await page.evaluate(() => {
+        document.querySelector('#tutorial-greeting button')?.click();
+      });
+      // The per-frame ActionBarPainter rewrites the keycaps on the next update().
+      await wait(600);
+      return { clip: '#actionbar' };
     },
   },
   {
