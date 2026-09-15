@@ -10224,6 +10224,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '（消耗 {count} 个优质品级）',
   'hudChrome.crafting.reagentVaultDraw': '（从材料仓库取用 {count}）',
+  'hudChrome.crafting.reagentOrdinaryHeld': '（持有{name} {count} 个，但此处只有优质品级才算数）',
   'hudChrome.crafting.vaultUnreachable': '此处无法使用材料仓库。',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': '折叠Protect Yumi血条',
@@ -12946,6 +12947,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.meat': '兽肉',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat}（附魔）',
   'hudChrome.materialHint.cookingCatch': '烹饪材料。必须先烹饪后才能食用。',
+  'hudChrome.materialHint.fineFarmGrade':
+    '优质品级。收获时部分产物会成为优质品，农艺技能越高，或装有充能的匠人之眼时更常出现。需要优质品级时普通农产品一律不算数，需要普通农产品时优质品级也一律不算数。',
   'hudChrome.materialHint.fineGrade':
     '优质品级。以等级高于该材料的工具在满级矿脉采集所得，在任何需要普通版本的地方均可替代使用。',
   'hudChrome.materialHint.arcaneDust': '制作材料。分解普通和优秀品质的装备可得。',

@@ -3473,6 +3473,7 @@ export const pt_BR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Ingrediente de culinária. Deve ser cozido antes de comer.",
       "usedBy": "Usado por {crafts}.",
       "arcaneDust": "Reagente de criação. Desencantado de equipamentos comuns e incomuns.",
@@ -4430,6 +4431,7 @@ export const pt_BR: EnTranslations = {
       "reagentLine": "{name}x{have}/{required}",
       "reagentFineSub": "(gasta {count} de grau fino)",
       "reagentVaultDraw": "(retira {count} do seu depósito)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "O Depósito de Materiais está fora de alcance aqui.",
       "craftFeeLine": "Taxa de criação: {fee} cada",
       "empty": "Nenhuma receita conhecida ainda.",

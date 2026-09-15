@@ -3473,6 +3473,7 @@ export const tr_TR: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Pişirme malzemesi. Yemeden önce pişirilmelidir.",
       "usedBy": "{crafts} tarafından kullanılır.",
       "arcaneDust": "Üretim malzemesi. Sıradan ve sıra dışı teçhizatın büyüsü bozulunca elde edilir.",
@@ -4430,6 +4431,7 @@ export const tr_TR: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "({count} adet kaliteli harcar)",
       "reagentVaultDraw": "(kasandan {count} çeker)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "Malzeme Kasası burada erişilemez durumda.",
       "craftFeeLine": "Üretim ücreti: her biri {fee}",
       "empty": "Henüz bilinen bir tarif yok.",

@@ -460,3 +460,47 @@ describe('crafting window repaint preserves the player position', () => {
     el.remove();
   });
 });
+
+describe('the ordinary-grade note renders on BOTH claimed surfaces', () => {
+  it('paints the note span and folds the same text into the row aria name', () => {
+    // The Bronze Hoe report: the player holds the plain grade of a fine-only
+    // reagent. The window must say so in words beside the 0/n count, on the
+    // visible line AND the composed aria name (never color alone).
+    const el = document.createElement('div');
+    document.body.appendChild(el);
+    const hoe: RecipeDefLike = {
+      id: 'recipe_note_hoe',
+      professionId: 'engineering',
+      resultItemId: 'bronze_hoe',
+      resultCount: 1,
+      reagents: [{ itemId: 'fine_vale_wheat', count: 4 }],
+      skillReq: 0,
+    };
+    renderCraftingWindow(
+      el,
+      buildCraftingView(
+        [hoe],
+        [{ itemId: 'vale_wheat', count: 7 }],
+        {
+          ...ITEMS,
+          vale_wheat: { ...item('vale_wheat'), name: 'Vale Wheat' },
+          fine_vale_wheat: item('fine_vale_wheat'),
+        },
+        {},
+        undefined,
+        undefined,
+        VIEWER,
+      ),
+      craftingDeps(),
+    );
+    const note = el.querySelector('.crafting-ordinary-held');
+    expect(note?.textContent?.trim()).toBe(
+      '(Vale Wheat held: 7, but only the fine grade counts here)',
+    );
+    expect(
+      el.querySelector('[aria-label*="Vale Wheat held: 7, but only the fine grade counts here"]'),
+    ).not.toBeNull();
+    expect(el.querySelector('.crafting-reagent.unsat')).not.toBeNull();
+    el.remove();
+  });
+});

@@ -3473,6 +3473,7 @@ export const ja_JP: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
+      "fineFarmGrade": "上質な等級。収穫の一部が上質として実り、農業スキルが高いほど、または職人の眼をチャージしているほど出やすくなります。上質な等級が必要な場面で通常の農作物は決して数えられず、通常の農作物が必要な場面で上質な等級も決して数えられません。",
       "cookingCatch": "料理材料。食べる前に調理が必要です。",
       "usedBy": "{crafts}で使用されます。",
       "arcaneDust": "生産の材料。一般と良質の装備を魔力分解して得られる。",
@@ -4430,6 +4431,7 @@ export const ja_JP: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "（上質な等級を{count}個消費）",
       "reagentVaultDraw": "（素材保管庫から{count}個使用）",
+      "reagentOrdinaryHeld": "（{name}を{count}個所持していますが、ここでは上質な等級のみが数えられます）",
       "vaultUnreachable": "ここでは素材保管庫を利用できません。",
       "craftFeeLine": "製作手数料：1個あたり {fee}",
       "empty": "既知のレシピはありません。",

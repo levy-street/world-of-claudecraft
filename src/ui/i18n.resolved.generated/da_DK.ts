@@ -3473,6 +3473,7 @@ export const da_DK: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Indsamlet fra en åre på fuldt niveau med et værktøj, der rangerer over materialet, og tæller som den ordinære version, hvor end en sådan kræves.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Madlavningsingrediens. Skal tilberedes, før den kan spises.",
       "usedBy": "Bruges af {crafts}.",
       "arcaneDust": "Håndværksreagens. Fortryllet frem fra almindeligt og ualmindeligt udstyr.",
@@ -4430,6 +4431,7 @@ export const da_DK: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(bruger {count} af fin kvalitet)",
       "reagentVaultDraw": "(henter {count} fra dit hvælv)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "Materialehvælvet er uden for rækkevidde her.",
       "craftFeeLine": "Gebyr: {fee} pr. stk.",
       "empty": "Ingen opskrifter kendt endnu.",

@@ -3473,6 +3473,7 @@ export const nl_NL: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Kookingrediënt. Moet worden gekookt voordat het gegeten wordt.",
       "usedBy": "Gebruikt door {crafts}.",
       "arcaneDust": "Vervaardigingsreagens. Verkregen door gewone en ongebruikelijke uitrusting te onttoveren.",
@@ -4430,6 +4431,7 @@ export const nl_NL: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbruikt {count} van fijne kwaliteit)",
       "reagentVaultDraw": "(haalt {count} uit je Materialenkluis)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "De Materialenkluis is hier niet bereikbaar.",
       "craftFeeLine": "Ambachtskosten: {fee} per stuk",
       "empty": "Nog geen recepten bekend.",

@@ -6565,6 +6565,11 @@
   .crafting-vault-draw {
     color: var(--gold-dim);
   }
+  /* The ordinary-grade note (the Bronze Hoe report): same rule again, a
+     tint over words that already carry the signal. */
+  .crafting-ordinary-held {
+    color: var(--gold-dim);
+  }
   /* The Create affordance is decoration inside the row-button; the whole row
      remains the target and disabled rows inherit the shared disabled state. */
   .crafting-craft-chip {

@@ -4894,6 +4894,15 @@ export const hudChromeStrings = {
     // One key shared by every raw fishing catch (RAW_COOKING_CATCH_IDS): cooking
     // reagents only; never edible raw. Painted via createTooltipLine, not the
     // materialHintLine HTML-string path.
+    // One key shared by the twelve farm fine twins (content/farm_crops.ts
+    // fineProduceItemId), the farming counterpart of fineGrade above. Written
+    // from the live mechanic (src/sim/professions/farming.ts harvest roll:
+    // FARM_FINE_CHANCE_BASE plus the skill scale, and the charged Artisan's
+    // Eye bump). The second sentence is the rule stated beside fine_vale_wheat
+    // in content/items.ts: no substitution in either direction, unlike the
+    // node grades.
+    fineFarmGrade:
+      "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
     cookingCatch: 'Cooking ingredient. Must be cooked before eating.',
     // Profession affinity for honest materials (material_profession_hint_view.ts).
     // {crafts} is a locale-aware conjunction list of localized craft names
@@ -6586,6 +6595,13 @@ export const hudChromeStrings = {
     // fine-substitution suffix above. Rendered only while the world reports
     // vault draw available here (craftVaultStock non-null).
     reagentVaultDraw: '(draws {count} from your vault)',
+    // The ordinary-grade note (the Bronze Hoe report, "doesn't recognize
+    // that I am holding wheat"): appended to an UNSATISFIED reagent line when
+    // the recipe asks for a fine grade and the player holds its plain twin.
+    // A fine reagent is never met by the ordinary grade (one-directional for
+    // node grades, no substitution at all for farm produce), and the bare
+    // 0/4 said nothing about why. {name} is the ordinary twin's localized name.
+    reagentOrdinaryHeld: '({name} held: {count}, but only the fine grade counts here)',
     // The place-blocked note (Phase 04 QA): rendered once at the top of the
     // recipe list when the world reports vault draw BLOCKED here
     // (craftVaultStock null: an instanced context) AND some reagent row is

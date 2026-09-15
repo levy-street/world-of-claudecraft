@@ -3473,6 +3473,7 @@ export const en: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "usedBy": "Used by {crafts}.",
       "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
@@ -4430,6 +4431,7 @@ export const en: EnTranslations = {
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spends {count} fine-grade)",
       "reagentVaultDraw": "(draws {count} from your vault)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "The Materials Vault is out of reach here.",
       "craftFeeLine": "Craft fee: {fee} each",
       "empty": "No recipes known yet.",

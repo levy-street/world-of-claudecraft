@@ -959,6 +959,75 @@ describe('buildCraftingView spans material grades', () => {
     expect(view.recipes[0].craftable).toBe(false);
   });
 
+  it('ordinaryHeld names the plain stock a fine-only row is NOT met by (the Bronze Hoe report)', () => {
+    // The player holds Vale Wheat against a Fine Vale Wheat bill: the row is
+    // unsatisfied (farm twins never substitute in either direction), and the
+    // note carries what they hold and which item it is, so the 0/4 has a
+    // reason beside it.
+    const WHEAT_ITEMS = table(
+      item('vale_wheat'),
+      item('fine_vale_wheat'),
+      item('recipe_hoe_result'),
+    );
+    const hoe = recipe('recipe_hoe', [{ itemId: 'fine_vale_wheat', count: 4 }]);
+    const plainWheat: InvSlot[] = [{ itemId: 'vale_wheat', count: 7 }];
+    const view = buildCraftingView([hoe], plainWheat, WHEAT_ITEMS);
+    expect(view.recipes[0].reagents[0]).toMatchObject({
+      have: 0,
+      satisfied: false,
+      ordinaryHeld: 7,
+      ordinaryItemId: 'vale_wheat',
+      ordinaryItem: item('vale_wheat'),
+    });
+    expect(view.recipes[0].craftable).toBe(false);
+    // The node ladder reads the same way: plain copper against a fine-only bill.
+    const fineRecipe = recipe('recipe_fine_only', [{ itemId: 'fine_copper_ore', count: 4 }]);
+    const plainOnly: InvSlot[] = [{ itemId: 'copper_ore', count: 8 }];
+    const copperView = buildCraftingView([fineRecipe], plainOnly, GRADE_ITEMS);
+    expect(copperView.recipes[0].reagents[0]).toMatchObject({ ordinaryHeld: 8 });
+    expect(copperView.recipes[0].reagents[0].ordinaryItem).toEqual(item('copper_ore'));
+    // Drawable vault stock of the plain grade is counted too (it is what the
+    // player HAS, the same fold the have column uses).
+    const vaultView = buildCraftingView(
+      [hoe],
+      [],
+      WHEAT_ITEMS,
+      {},
+      gradeIdentity,
+      new Set(),
+      null,
+      { vale_wheat: 3 },
+    );
+    expect(vaultView.recipes[0].reagents[0].ordinaryHeld).toBe(3);
+  });
+
+  it('ordinaryHeld is 0 once the row is satisfied, and for a reagent with no fine twin', () => {
+    // Satisfied: fine wheat covers the bill, the plain stack beside it needs
+    // no explaining (no note, no ordinaryItem key at all).
+    const WHEAT_ITEMS = table(
+      item('vale_wheat'),
+      item('fine_vale_wheat'),
+      item('recipe_hoe_result'),
+    );
+    const hoe = recipe('recipe_hoe', [{ itemId: 'fine_vale_wheat', count: 4 }]);
+    const covered: InvSlot[] = [
+      { itemId: 'vale_wheat', count: 7 },
+      { itemId: 'fine_vale_wheat', count: 4 },
+    ];
+    const coveredRow = buildCraftingView([hoe], covered, WHEAT_ITEMS).recipes[0].reagents[0];
+    expect(coveredRow).toMatchObject({ satisfied: true, ordinaryHeld: 0 });
+    expect('ordinaryItem' in coveredRow).toBe(false);
+    expect('ordinaryItemId' in coveredRow).toBe(false);
+    // A base reagent short of stock has no twin to point at: 0.
+    const short: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
+    expect(
+      buildCraftingView([gradeRecipe], short, GRADE_ITEMS).recipes[0].reagents[0],
+    ).toMatchObject({
+      satisfied: false,
+      ordinaryHeld: 0,
+    });
+  });
+
   it('a self-signed FINE copy earns the displayed discount, matching what the sim charges', () => {
     // The divergence this closes: the sim widened hasSelfSignedInstance across
     // grades, so a window reading the declared id alone would show 4 while the
@@ -1072,6 +1141,7 @@ describe('buildCraftingView craft-from-vault fold (Phase 04)', () => {
         satisfied: false,
         fineSubstituted: 0,
         vaultDrawn: 0,
+        ordinaryHeld: 0,
       },
     ]);
     expect(row.craftable).toBe(false);

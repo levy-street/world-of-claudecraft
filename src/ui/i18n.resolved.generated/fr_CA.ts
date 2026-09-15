@@ -3473,6 +3473,7 @@ export const fr_CA: EnTranslations = {
     },
     "materialHint": {
       "fineGrade": "Qualité fine. Récolté sur un filon de plein palier avec un outil de rang supérieur au matériau, et compte comme la version ordinaire partout où celle-ci est requise.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Ingrédient de cuisine. Doit être cuit avant d'être consommé.",
       "usedBy": "Utilisé par {crafts}.",
       "arcaneDust": "Composant d’artisanat. Désenchanté depuis l’équipement commun et inhabituel.",
@@ -4430,6 +4431,7 @@ export const fr_CA: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(dépense {count} de qualité fine)",
       "reagentVaultDraw": "(puise {count} dans votre réserve)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "La Réserve de matériaux est hors de portée ici.",
       "craftFeeLine": "Frais de fabrication : {fee} chacun",
       "empty": "Aucune recette connue pour l'instant.",

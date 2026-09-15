@@ -10723,6 +10723,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.reagentLine': '{name}: {have}/{required}',
   'hudChrome.crafting.reagentFineSub': '(상급 등급 {count}개 소모)',
   'hudChrome.crafting.reagentVaultDraw': '(재료 보관소에서 {count}개 사용)',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} {count}개 보유 중이지만 여기서는 상급 등급만 인정됩니다)',
   'hudChrome.crafting.vaultUnreachable': '여기에서는 재료 보관소를 사용할 수 없습니다.',
   // Protect Yumi locale fill (M16 wordy-key floor).
   'yumi.hud.collapse': 'Protect Yumi 게이지 접기',
@@ -13563,6 +13565,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.corpseHarvest.components.meat': '고기',
   'hudChrome.itemTooltip.statEnchanted': '+{value} {stat} (마법부여)',
   'hudChrome.materialHint.cookingCatch': '요리 재료. 먹기 전에 먼저 요리해야 합니다.',
+  'hudChrome.materialHint.fineFarmGrade':
+    '상급 등급. 수확물 일부가 상급으로 나오며, 농사 숙련도가 높거나 충전된 장인의 눈이 있으면 더 자주 나옵니다. 상급 등급이 필요한 곳에서는 일반 농산물이 절대 인정되지 않고, 일반 농산물이 필요한 곳에서는 상급 등급도 절대 인정되지 않습니다.',
   'hudChrome.materialHint.fineGrade':
     '상급 등급입니다. 해당 재료보다 높은 등급의 도구로 만렙 채집지에서 캐낸 것이며, 일반 등급이 필요한 곳 어디에서나 대신 사용됩니다.',
   'hudChrome.materialHint.arcaneDust': '제작 재료. 일반과 고급 장비의 마력을 추출해 얻습니다.',

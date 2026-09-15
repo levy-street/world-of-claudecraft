@@ -61,6 +61,7 @@ import { renderGatheringGoalTrackRow, type TrackRowDeps } from './gathering_goal
 import { professionImageUrl } from './profession_art';
 import { renderProfessionIdentityCard } from './profession_identity_card';
 import type { ProfessionIdentityModel } from './profession_identity_view';
+import { fineSubText, ordinaryHeldText, vaultDrawText } from './reagent_suffix_view';
 
 // Station display names (Professions 2.0): StationType id -> the
 // localized station name, same id-to-key table shape as craftNameText
@@ -324,23 +325,8 @@ export function renderCraftingWindow(
       const item = document.createElement('div');
       item.className = 'vendor-item crafting-recipe-item ui-card';
       const resultName = row.result ? itemDisplayName(row.result) : row.resultItemId;
-      // The fine-substitution suffix (the UX pass): stated in words on both
-      // the visible line and the aria fold, never color alone.
-      const fineSubText = (count: number): string =>
-        count > 0
-          ? ` ${t('hudChrome.crafting.reagentFineSub', {
-              count: formatNumber(count, { maximumFractionDigits: 0 }),
-            })}`
-          : '';
-      // The vault-draw suffix (Bank Storage Phase 04): stated in words beside
-      // the fine-substitution one, on the visible line AND the aria fold,
-      // never color alone (the same fairness rule).
-      const vaultDrawText = (count: number): string =>
-        count > 0
-          ? ` ${t('hudChrome.crafting.reagentVaultDraw', {
-              count: formatNumber(count, { maximumFractionDigits: 0 }),
-            })}`
-          : '';
+      // The three reagent suffixes (reagent_suffix_view.ts): words on the
+      // visible line, the aria fold, and the tooltip alike.
       const reagentLines = row.reagents
         .map(
           (r) =>
@@ -350,7 +336,8 @@ export function renderCraftingWindow(
               required: formatNumber(r.required, { maximumFractionDigits: 0 }),
             }) +
             fineSubText(r.fineSubstituted) +
-            vaultDrawText(r.vaultDrawn),
+            vaultDrawText(r.vaultDrawn) +
+            ordinaryHeldText(r),
         )
         .join(', ');
       // The inline reagent list marks each unsatisfied reagent (a class the
@@ -372,6 +359,10 @@ export function renderCraftingWindow(
             }${
               r.vaultDrawn > 0
                 ? `<span class="crafting-vault-draw">${esc(vaultDrawText(r.vaultDrawn))}</span>`
+                : ''
+            }${
+              r.ordinaryHeld > 0
+                ? `<span class="crafting-ordinary-held">${esc(ordinaryHeldText(r))}</span>`
                 : ''
             }</span>`,
         )
