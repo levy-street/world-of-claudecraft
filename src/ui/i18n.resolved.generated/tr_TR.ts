@@ -332,15 +332,15 @@ export const tr_TR: EnTranslations = {
   },
   "hudChrome": {
     "professionTrainers": {
-      "blacksmithing": "Blacksmithing Trainer",
-      "cooking": "Cooking Trainer",
-      "tailoring": "Tailoring Trainer",
-      "engineering": "Engineering Trainer",
-      "leatherworking": "Leatherworking Trainer",
-      "alchemy": "Alchemy Trainer",
-      "farming": "Farming Trainer",
-      "mining": "Mining Trainer",
-      "hobby": "Hobby Trainer",
+      "blacksmithing": "Demircilik Eğitmeni",
+      "cooking": "Aşçılık Eğitmeni",
+      "tailoring": "Terzilik Eğitmeni",
+      "engineering": "Mühendislik Eğitmeni",
+      "leatherworking": "Deri İşleme Eğitmeni",
+      "alchemy": "Simya Eğitmeni",
+      "farming": "Çiftçilik Eğitmeni",
+      "mining": "Madencilik Eğitmeni",
+      "hobby": "Hobi Eğitmeni",
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Bu malzeme seçimi artık kullanılamıyor.",
@@ -1077,10 +1077,10 @@ export const tr_TR: EnTranslations = {
       "clearArmed": "Temizlemek için bir yuvaya dokun."
     },
     "tutorialGreeting": {
-      "eastbrookGuidanceNote": "Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.",
-      "guidanceOn": "Turn guidance on",
-      "guidanceOff": "Turn guidance off",
-      "guidanceSetting": "Eastbrook golden guidance",
+      "eastbrookGuidanceNote": "Doğudere'ye hoş geldin! Mareşal Redbrook'un meydanda senin için bir işi var. Onu bulmak ve Kapıdaki Kurtlar'ı takip etmek için altın rehberliği aç, ya da kendi başına keşfet. Bunu daha sonra Seçenekler, Arayüz, Savaş bölümünden değiştirebilirsin.",
+      "guidanceOn": "Rehberliği aç",
+      "guidanceOff": "Rehberliği kapat",
+      "guidanceSetting": "Doğudere altın rehberliği",
       "bellHomeNote": "Kıyıdan bu kadar çabuk mu döndün? Çaldığın o feribot çanıydı. Onun eşi tam şurada, Kuzgun Postası kutusunun yanında asılı: istediğin an çal, geçiş seni yeniden Sınav Kıyısı'na taşır. Hangi yöne gidersen git, bir sakıncası yok.",
       "islandArrivalNote": "Sınav Kıyısı'na hoş geldin. Muhafız Tam kıyı boyunca az ileride seni bekliyor: git ve onunla görüş. Ayrılmak istediğinde iskelemin yanındaki çanı çal; seni istediğin zaman vadiye götürür.",
       "noteClose": "Anladım"
@@ -1261,9 +1261,9 @@ export const tr_TR: EnTranslations = {
       "devTierCol": "Rozet",
       "mergedPrs": "Birleştirilen PR'ler",
       "devEmpty": "Henüz sıralı katkıcı yok.",
-      "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed",
-      "prestigeTitle": "Prestige {rank}"
+      "podiumLabel": "İlk üç",
+      "unclaimed": "Sahipsiz",
+      "prestigeTitle": "Prestij {rank}"
     },
     "pledge": {
       "open": "Başvuru kabul ediliyor",
@@ -1286,8 +1286,8 @@ export const tr_TR: EnTranslations = {
       "noteLabel": "Pano notu",
       "notePlaceholder": "Adaylara loncanın ne aradığını anlat",
       "save": "Kaydet",
-      "newPlayerFriendlyLabel": "New player friendly",
-      "newPlayerFriendlyHint": "Shown on the recruits' board at the Proving Shore signpost.",
+      "newPlayerFriendlyLabel": "Yeni oyunculara uygun",
+      "newPlayerFriendlyHint": "Sınav Kıyısı tabelasındaki acemi panosunda gösterilir.",
       "yourPledge": "Başvurun: {guild}",
       "since": "{date} tarihinde başvurdu",
       "withdraw": "Başvuruyu geri çek"
@@ -1443,7 +1443,7 @@ export const tr_TR: EnTranslations = {
       "targetPrev": "Hedefler Arasında Geri Geç",
       "discord": "Discord",
       "bgFlag": "Savaş Alanı Sancak Eylemi",
-      "friendlyNameplates": "Toggle Friendly Nameplates",
+      "friendlyNameplates": "Dost İsim Levhalarını Aç/Kapat",
       "sheathe": "Silahı Kın'a Tak / Çıkar",
       "hideInterface": "Arayüzü Gizle",
       "dive": "Aşağı Yüz",
@@ -1822,7 +1822,7 @@ export const tr_TR: EnTranslations = {
       "crossHotbarHelp": "D-pad ve yüz düğmelerindeki sekiz işlem çubuğu yuvasını yakmak için tetiği basılı tutun. İkinci sete geçmek için diğer tetiğe dokunun.",
       "crossHotbarResetLayout": "Çapraz Hotbar'ı sıfırla",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Tetikleyiciler ve yön tuşları, açıkken çapraz kısayol çubuğuna aittir, dolayısıyla burası yerine aşağıda ayarlanırlar.",
+      "crossHotbarOwnsButtons": "Tetikleyiciler açıkken çapraz kısayol çubuğunu değiştirir. Yön tuşları, menüler ve hareket için burada düzenlenebilir kalır.",
       "cancelAction": "İptal / Geri",
       "subcommandsAction": "Alt komutlar / Harita",
       "cycleHudAction": "Döngü Arayüzü",
@@ -1833,7 +1833,7 @@ export const tr_TR: EnTranslations = {
       "crossHotbarDisplayMinimal": "Yalnızca Tutulurken",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "{action} taşıma: hücreye yerleştirmeyi onaylayın, geri takmak için iptal edin.",
-      "crossHotbarEditHint": "Düzenleme: Bir hücreden veya büyü kitabından alımları onaylayın ve bir hücreye bırakın, iptal birini siler.",
+      "crossHotbarEditHint": "Düzenleme · yön tuşları taşır · onayla alıp yerleştirir · iptal bir hücreyi temizler",
       "crossHotbarEditHelp": "Çubuğu kontrol cihazıyla ayarlamak için sol tamponu tutun ve üst taraftaki düğmeye basın."
     },
     "perf": {
@@ -2112,51 +2112,51 @@ export const tr_TR: EnTranslations = {
       "spellOrder": "Büyü sırası",
       "reset": "Konumu Sıfırla",
       "spellPosition": "Büyü sırası {position} / {count}",
-      "watchlist": "Watched Spells",
-      "watchlistHint": "Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.",
-      "watchlistEmpty": "No other spell in your spellbook puts a buff on you.",
-      "watchlistWatch": "Watch {spell}",
-      "watchlistUnwatch": "Stop watching {spell}",
-      "watchlistCount": "{count} watched",
-      "sound": "Alert Sound",
-      "soundNone": "No sound",
-      "soundVolume": "Sound Volume",
-      "soundPreview": "Play",
-      "soundPreviewAria": "Preview the {sound} alert sound",
-      "soundHint": "A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.",
-      "readyGlow": "Hotbar Glow",
-      "readyGlowHint": "Lights this spell on your action bar while its buff is up.",
-      "reticleTick": "Reticle Tick",
-      "reticleTickHint": "Adds a mark near the centre of the screen that lights when this spell procs.",
-      "haptic": "Rumble",
-      "hapticNone": "Off",
-      "hapticHint": "Vibrates a connected controller, or your phone. Ignored where the device has no haptics.",
+      "watchlist": "İzlenen Büyüler",
+      "watchlistHint": "Sana etki veren herhangi bir büyüyü seçerek ona kendi aurasını ver. Seçilen büyüler aşağıda kendi simgesi, rengi, konumu ve yer halkasıyla tam bir kart alır.",
+      "watchlistEmpty": "Büyü kitabındaki başka hiçbir büyü sana etki koymuyor.",
+      "watchlistWatch": "{spell} izle",
+      "watchlistUnwatch": "{spell} izlemeyi durdur",
+      "watchlistCount": "{count} izleniyor",
+      "sound": "Uyarı Sesi",
+      "soundNone": "Ses yok",
+      "soundVolume": "Ses Düzeyi",
+      "soundPreview": "Çal",
+      "soundPreviewAria": "{sound} uyarı sesini önizle",
+      "soundHint": "Bu büyü her tetiklendiğinde bir ses çalar. Yalnızca sesin haber vermesini istiyorsan simgeyi, hilalleri ve yer halkasını kapat.",
+      "readyGlow": "Kısayol Çubuğu Işıması",
+      "readyGlowHint": "Etkisi aktifken bu büyüyü eylem çubuğunda ışıtır.",
+      "reticleTick": "Nişangah İşareti",
+      "reticleTickHint": "Bu büyü tetiklendiğinde ışıyan, ekranın merkezine yakın bir işaret ekler.",
+      "haptic": "Titreşim",
+      "hapticNone": "Kapalı",
+      "hapticHint": "Bağlı bir kumandayı veya telefonunu titretir. Cihazda dokunsal geri bildirim yoksa yok sayılır.",
       "haptics": {
-        "tap": "Tap",
-        "double": "Double",
-        "long": "Long"
+        "tap": "Vuruş",
+        "double": "Çift",
+        "long": "Uzun"
       },
       "cues": {
-        "softChime": "Soft Chime",
-        "musicBox": "Music Box",
-        "glassPing": "Glass Ping",
-        "waterDrop": "Water Drop",
-        "bubblePop": "Bubble Pop",
-        "hardBell": "Hard Bell",
-        "templeGong": "Temple Gong",
-        "anvilStrike": "Anvil Strike",
-        "coinDrop": "Coin Drop",
-        "swordDraw": "Sword Draw",
-        "blaringHorn": "Blaring Horn",
-        "carKlaxon": "Car Klaxon",
-        "sonarPing": "Sonar Ping",
-        "electricZap": "Electric Zap",
-        "catMeow": "Cat Meow",
-        "owlHoot": "Owl Hoot",
-        "wolfHowl": "Wolf Howl",
-        "frogCroak": "Frog Croak",
-        "windWhoosh": "Wind Whoosh",
-        "steamHiss": "Steam Hiss"
+        "softChime": "Yumuşak Çan Sesi",
+        "musicBox": "Müzik Kutusu",
+        "glassPing": "Cam Tınlaması",
+        "waterDrop": "Su Damlası",
+        "bubblePop": "Kabarcık Patlaması",
+        "hardBell": "Sert Çan",
+        "templeGong": "Tapınak Gongu",
+        "anvilStrike": "Örs Vuruşu",
+        "coinDrop": "Madeni Para Düşüşü",
+        "swordDraw": "Kılıç Çekme",
+        "blaringHorn": "Gürleyen Boru",
+        "carKlaxon": "Araba Kornası",
+        "sonarPing": "Sonar Sinyali",
+        "electricZap": "Elektrik Çarpması",
+        "catMeow": "Kedi Miyavlaması",
+        "owlHoot": "Baykuş Uğultusu",
+        "wolfHowl": "Kurt Uluması",
+        "frogCroak": "Kurbağa Vıraklaması",
+        "windWhoosh": "Rüzgar Uğultusu",
+        "steamHiss": "Buhar Tıslaması"
       },
       "procs": {
         "revenge": "İntikam!",
@@ -2360,10 +2360,10 @@ export const tr_TR: EnTranslations = {
     },
     "plurals": {
       "guildBoardShown": {
-        "one": "{count} guild shown",
-        "few": "{count} guilds shown",
-        "many": "{count} guilds shown",
-        "other": "{count} guilds shown"
+        "one": "{count} lonca gösteriliyor",
+        "few": "{count} lonca gösteriliyor",
+        "many": "{count} lonca gösteriliyor",
+        "other": "{count} lonca gösteriliyor"
       },
       "commissionMasterworks": {
         "one": "{count} şaheser",
@@ -3192,7 +3192,7 @@ export const tr_TR: EnTranslations = {
       "coldsightRead": "Sonraki Uzun Çekişin %{longDrawPct} daha fazla hasar verir veya sonraki Düşüş Atışın %{fellShotPct} daha fazla verir",
       "duskEconomy": "Yetenekler {pct}% daha az enerji harcar",
       "moontide": "Ay Gelgiti: aşama {stacks} / {max}. Yaban Oku, Gök Düşüşü ve Ay Tohumu büyüleri Aykuşu Formunda onu doldurur; {max} olduğunda Ay Tohumu Ay Kabarışına, Gök Düşüşü Güneş İzine dönüşür ve ikisi de onu harcar",
-      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kurt ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
+      "oldBlood": "Kadim Kan: aşama {stacks} / {max}. İsabet eden Kedi ve Bruin vuruşları bu birikimi paylaşır; {max} olduğunda Kanlı Isırık veya Kemik Kıran dönüşür",
       "verdance": "Yeşillik: aşama {stacks} / {max}. Ektiğin her YENİ Yaban Çiçeği veya İkinci Çiçeklenme 1 ekler. {max} olduğunda Hızlı İyileştirme Taşkın Çiçeklenmeye dönüşür",
       "freeExecute": "Uygun bir sonraki infaz yeteneğin hiçbir şeye mal olmaz",
       "resourceSap": "Her {interval} sn'de mevcut kaynağının {value} kadarını geri kazandırır",
@@ -3257,7 +3257,7 @@ export const tr_TR: EnTranslations = {
       "elementalTrance": "Alınan hasar {pct}% azalır. Verdiğin tüm hasarın {mana}%'i manaya dönüşür",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Bruin Formu: can ve zırh artışı",
-      "wolfForm": "Cat Form: melee damage and energy; movement speed increased by {pct}%",
+      "wolfForm": "Kedi Formu: yakın dövüş hasarı ve enerji; hareket hızı %{pct} artar",
       "formTravel": "Fleet Formu: hareket hızı {pct}% artar",
       "formFireball": "Kor Formu: hareket hızı {pct}% artırıldı; saldırılar ve büyüler devre dışı",
       "formMoonkin": "Aykuşu Formu: büyü hasarı {pct}% ve zırh {armorPct}% artar",
@@ -3600,10 +3600,10 @@ export const tr_TR: EnTranslations = {
       "quantityAria": "{source} kaynağındaki birimler, en fazla {count}",
       "decreaseAria": "{source} kaynağındaki birimleri azalt",
       "increaseAria": "{source} kaynağındaki birimleri artır",
-      "decreaseByAria": "Decrease units from {source} by {count}",
-      "increaseByAria": "Increase units from {source} by {count}",
-      "moveAll": "Move all units",
-      "fits": "Up to {units} fit right now"
+      "decreaseByAria": "{source} kaynağından birimleri {count} azalt",
+      "increaseByAria": "{source} kaynağından birimleri {count} artır",
+      "moveAll": "Tüm birimleri taşı",
+      "fits": "Şu anda en fazla {units} sığar"
     },
     "materialHint": {
       "fineGrade": "Kaliteli derece. Malzemenin üstünde kademelenmiş bir aletle tam kademeli bir damardan toplanır ve sıradan sürümün gerektiği her yerde onun yerine sayılır.",
@@ -3892,14 +3892,14 @@ export const tr_TR: EnTranslations = {
       "subtitle": "Diyarın loncaları",
       "rosterTitle": "{guild} loncasının üye listesini gör",
       "back": "Geri",
-      "filters": "Board filters",
-      "newPlayerFriendly": "New player friendly",
-      "newPlayerFriendlyTitle": "This guild welcomes new players",
-      "filterNewPlayersTitle": "Show only guilds that welcome new players",
-      "filterEmpty": "No guild has opened its doors to new players yet.",
-      "showAll": "Show all guilds",
-      "officersOnline": "Officers online",
-      "officersOnlineLabel": "Officers online: {names}",
+      "filters": "Pano filtreleri",
+      "newPlayerFriendly": "Yeni oyunculara uygun",
+      "newPlayerFriendlyTitle": "Bu lonca yeni oyuncuları karşılıyor",
+      "filterNewPlayersTitle": "Yalnızca yeni oyuncuları karşılayan loncaları göster",
+      "filterEmpty": "Henüz hiçbir lonca kapılarını yeni oyunculara açmadı.",
+      "showAll": "Tüm loncaları göster",
+      "officersOnline": "Çevrimiçi subaylar",
+      "officersOnlineLabel": "Çevrimiçi subaylar: {names}",
       "officerEntry": "{name} ({rank})",
       "popupTitle": "Lonca Tabelası",
       "close": "Kapat"
@@ -3957,8 +3957,8 @@ export const tr_TR: EnTranslations = {
       "withdrawQuantityTitle": "{item} çek",
       "withdrawQuantityInput": "Çekilecek miktar",
       "withdrawQuantityConfirm": "Çek",
-      "quantityStepDownAria": "Decrease the quantity by {count}",
-      "quantityStepUpAria": "Increase the quantity by {count}",
+      "quantityStepDownAria": "Miktarı {count} azalt",
+      "quantityStepUpAria": "Miktarı {count} artır",
       "vaultRowWithdrawName": "{item} Çek",
       "priceChanged": "Satın alma tamamlanmadan önce fiyat değişti. Yenilenen fiyatı gözden geçirip tekrar onayla.",
       "withdrawQuantityAction": "Çekilecek miktar: {item}",
@@ -5011,8 +5011,8 @@ export const tr_TR: EnTranslations = {
       "lootMaybe": "En fazla bunlardan biri düşebilir:",
       "lootChance": "Ek düşme şansı:",
       "lootHeroic": "Heroik bonusu, bunlardan biri her zaman düşer:",
-      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
-      "lootHeroicChance": "Heroic bonus, additional chance drops:",
+      "lootHeroicMaybe": "Heroik bonusu, en fazla bunlardan biri düşebilir:",
+      "lootHeroicChance": "Heroik bonusu, ek düşme şansı:",
       "pct": "{pct}%",
       "blockedLevel": "Yalnızca {min} ile {max} arasındaki seviyeler",
       "blockedSpec": "Uzmanlaşma gerektirir",
@@ -5181,10 +5181,10 @@ export const tr_TR: EnTranslations = {
       "ownedTooltipStatus": "Yadigârlık'ta kataloglandı",
       "missingTooltipStatus": "Henüz bulunmadı",
       "firstFindClears": "İlk kez {count}. tamamlamada bulundu",
-      "foundBy": "Found by {names}",
+      "foundBy": "{names} tarafından bulundu",
       "finderWithDate": "{name} ({date})",
-      "sharedScopeNote": "Shared by every character on your account",
-      "sharedScopeHint": "A relic found by any character on your account fills the page here too.",
+      "sharedScopeNote": "Hesabındaki her karakter tarafından paylaşılır",
+      "sharedScopeHint": "Hesabındaki herhangi bir karakterin bulduğu bir yadigâr burada da sayfayı doldurur.",
       "unlockToast": "Yadigâr kataloglandı: {name}",
       "illuminateBanner": "Sayfa tezhiplendi: {name}",
       "illuminateToast": "{name} sayfasındaki her yadigâr doldu.",
@@ -5318,10 +5318,10 @@ export const tr_TR: EnTranslations = {
       "progressAria": "İlerleme: {target} üzerinden {current}",
       "renownChip": "{renown} Ün",
       "earnedDate": "{date} tarihinde kazanıldı",
-      "earnedBy": "Earned by {names}",
+      "earnedBy": "{names} tarafından kazanıldı",
       "earnerWithDate": "{name} ({date})",
-      "accountScopeNote": "Shared by every character on your account",
-      "accountScopeHint": "A deed any character on your account accomplishes is earned here too, and the Book names who earned it.",
+      "accountScopeNote": "Hesabındaki her karakter tarafından paylaşılır",
+      "accountScopeHint": "Hesabındaki herhangi bir karakterin başardığı bir yiğitlik burada da kazanılmış sayılır ve Yiğitlikler Kitabı onu kimin kazandığını adlandırır.",
       "featRibbon": "Destan",
       "hiddenBadge": "Gizli",
       "titleChip": "Unvan ödülü",
@@ -6314,7 +6314,7 @@ export const tr_TR: EnTranslations = {
       "deathTitle": "Düştüğünde",
       "deathBody": "Canın sıfıra ulaşırsa olduğun yerde devrilirsin ve bedenin orada kalır. Ruhunu serbest bırak, en yakın mezarlıkta bir hayalet olarak yüksel: yaşayanlardan daha hızlı adımlarsın, düşmanlarının erişemeyeceği yerdesin, ama dövüşemez, yağmalayamaz ya da taşların üzerinde süzülen Solgun Bekçi dışında kimseyle konuşamazsın. Bundan sonrası senin seçimin. Hayaletini bedenine geri koştur, canının ve mananın bir kısmı geri gelmiş olarak, hiçbir ceza olmadan olduğun yerde dirilirsin. Ya da Solgun Bekçi'nin sunduğu anında dirilişi kabul et ve olduğun yerde kalk; bunun bedeli Bekçinin Bedeli'dir: ne kadar deneyimliysen o kadar uzun süren, tüm varlığını geçici olarak zayıflatan ve yepyeni karakterleri büsbütün muaf tutan bir güçsüzlük. Bir zindanın içinde düşersen ruhun dışarıdaki mezarlıkta bekler; hayaletini kapıdan geri yürüt, girişte dirilirsin. Mağara seferleri istisnadır: orada düşersen basitçe seferin girişinde ayağa kaldırılırsın, ancak ikinci bir düşüş seferi sona erdirir. Hangi yolu seçersen seç, ne deneyim, ne teçhizat, ne de para kaybedersin. Dövüşler arasında oturup yemek ye ve iç, böylece bir sonrakine tam güçle başlarsın.",
       "threatTitle": "Düşman kime vurur",
-      "threatBody": "Her düşman, kendisini en çok kimin sinirlendirdiğine dair özel bir hesap tutar. Hasar bu hesaba eklenir, iyileştirme de öyle: bir iyileştirme, iyileştirdiğin kişiyle zaten dövüşen düşmanların üzerine, aralarında paylaştırılmış şekilde tehdit koyar, bu yüzden en güvenli iyileştirme tankın zaten tuttuğu birine yapılandır. Tanklar, ürettikleri her şeyi katlayan bir koruma duruşu ya da koruyucu bir form açar, druidin Kurt Formu ise bunun yerine tehdidi düşürür, ve bir tahrik, büyüyü okuyanı hesabın tepesine dosdoğru çıkarıp düşmanı birkaç saniyeliğine ona kilitler. Biri tankı geçtiği anda düşmanlar hemen hedef değiştirmez: birini çekmek net bir fark gerektirir, ve bu fark menzilde yakın dövüşe göre daha büyüktür, bu yüzden bir çekişin başında biraz sabır dövüşü olması gereken yerde tutar.",
+      "threatBody": "Her düşman, kendisini en çok kimin sinirlendirdiğine dair özel bir hesap tutar. Hasar bu hesaba eklenir, iyileştirme de öyle: bir iyileştirme, iyileştirdiğin kişiyle zaten dövüşen düşmanların üzerine, aralarında paylaştırılmış şekilde tehdit koyar, bu yüzden en güvenli iyileştirme tankın zaten tuttuğu birine yapılandır. Tanklar, ürettikleri her şeyi katlayan bir koruma duruşu ya da koruyucu bir form açar, druidin Kedi Formu ise bunun yerine tehdidi düşürür, ve bir tahrik, büyüyü okuyanı hesabın tepesine dosdoğru çıkarıp düşmanı birkaç saniyeliğine ona kilitler. Biri tankı geçtiği anda düşmanlar hemen hedef değiştirmez: birini çekmek net bir fark gerektirir, ve bu fark menzilde yakın dövüşe göre daha büyüktür, bu yüzden bir çekişin başında biraz sabır dövüşü olması gereken yerde tutar.",
       "hazardsTitle": "Su seni öldürebilir",
       "breathBody": "Derin sular yüzülebilir, ve altına dalabilirsin. Başın su altındayken ekranın üst kısmına yakın mavi bir nefes çubuğu belirir ve azalır; yüzeye çıktığında ise boşaldığından çok daha hızlı dolar. Hâlâ su altındayken boşalmasına izin verirsen boğulmaya başlarsın ve havaya ulaşana kadar her saniye canından önemli bir parça kaybedersin, o yüzden uzun bir dalışta çubuğu göz önünde tut. Ölüm onu sıfırlar, bu yüzden bir ceset koşusu her zaman tam dolu ciğerlerle başlar.",
       "fatigueBody": "Denizin duvarı yoktur. Dünyanın yüzerek geçmeni istediği geçitler, bir kara parçası ile bir diğeri arasındaki boğazlar ve göllük sular, ayrıca iç göller, ne kadar sürerse sürsün güvenle geçilir. Bunun yerine kıyıyı geride bırakıp gerçek anlamda açık sulara çıkarsan gücün tükenmeye başlar: bir uyarı belirir, dönmen için gerçek bir pencere tanınır, ve bundan sonra deniz, kıyıya dönene kadar hiçbir şeyin engelleyemeyeceği, giderek ağırlaşan bir hasar verir. Kıyıdan bu kadar uzakta boğulur ya da bitkin düşersen, herhangi bir ölüm gibi serbest kalırsın, o yüzden ufku bir varış noktası değil, bir manzara olarak gör.",
@@ -6345,7 +6345,7 @@ export const tr_TR: EnTranslations = {
       "framePetBody": "Avcılar, Karabüyücüler ve dışarıda bir evcili olan herkes, kendi çerçevesinin yanında evcili için adı, seviyesi ve canıyla küçük bir çerçeve alır. O çerçeveye tıklamak evcilini seçer, klavyeden Ctrl+6 de aynısını yapar.",
       "framesMoveBody": "Çerçeven, hedef çerçeven ve grup çerçevelerinin hepsi taşınabilir. Her biri köşesinde küçük bir taşıma düğmesi taşır: kilidini aç, çerçeveyi istediğin yere sürükle ve başıboş bir tıklamanın onu kaydırmaması için tekrar kilitle. Pişman olacağın bir yerde son bulurlarsa, seçeneklerdeki Çerçeve Konumlarını Sıfırla hepsini başladıkları yere geri döndürür.",
       "framesMoveBodyEditFrames": "Çerçeven, hedef çerçeven ve grup çerçevelerin tümü taşınabilir. Her birinin köşesinde küçük bir taşıma düğmesi vardır: kilidini aç, çerçeveyi istediğin yere sürükle ve yanlış bir tıklamanın yerini değiştirememesi için yeniden kilitle. Arayüz seçeneklerindeki Çerçeveler sekmesinin üstündeki Çerçeveleri Düzenle, bu üç çerçeveyle birlikte arayüzün geri kalanını da tek seferde gevşetir: eylem çubuklarını, okuma çubuğunu, savurma çubuğunu, deneyim çubuğunu, mini haritayı, düğme şeridini, evcil hayvan çerçevesini, duruş çubuğunu, takviye ve zayıflatma satırlarını ve İstek Listesi Hatırlatıcısı çipini. Bir yere pişman olursan aynı Çerçeveler sekmesinin altındaki Varsayılanlara Sıfırla hepsini başladıkları yere geri getirir.",
-      "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
+      "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, üretimden sabitlediğin tarifler, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
@@ -6358,7 +6358,7 @@ export const tr_TR: EnTranslations = {
       "minimapBody": "Sağ üst: üzerinde bölge adı, altında koordinatların bulunan ve günün saatini boyayan bir kadranla çevrili yuvarlak bir mini harita.\n\nDisk, arazi çiziminden fazlasını taşır. Kendi okun merkezde durur ve baktığın yönü gösterir; etrafında grubun sınıf renkli noktalar olarak ve haritanın dışına sarkmış olanlar için bir kenar oku vardır. Görev verenler orada da dünyadakiyle aynı işaretleri taşır ve ayrıca toplama düğümlerini ve zanaat istasyonlarını, seyahat portallarını, yağmalanabilir cesetleri ve kasaları, ilgisini çekmiş herhangi bir düşmanı, yakınlardaki arkadaşlarını ve lonca üyelerini, bir de hayalet olarak geri koşarken kendi bedenini seçebilirsin.\n\nSöyleyecek bir şeyleri olduğunda üzerinde küçük göstergeler belirir: okunmamış mektupların beklerken bir zarf, Tüccar'da satış geliri ya da iade edilen mallar beklerken bir sikke ve akın kilitlerini listeleyen bir düğme.",
       "mapTitle": "Dünya haritası ve takipçilerin",
       "mapBody": "M, dünya haritasını açar: kıtanın tamamı çizilmiş halde, üzerinde kendi okun, bölgeler ve adları, çevrendeki ilgi noktaları, seyahat portalları ve bulduğun toplama düğümleriyle birlikte. Grubun da üzerinde görünür. Bir mağara seferinin içindeyken harita, şimdiye kadar keşfettiğin odaların bir şemasına döner.\n\nSağ tarafta, mini haritanın altında, hiçbir şey açmadan güncel işlerini gözünün önünde tutan bir yığın takipçi bulunur: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, içinde bulunduğun mağara seferi ve katıldığın herhangi bir yarık. Görev takipçisi, ekranı geri istediğinde daralır.",
-      "mapBodyZoneFirst": "M, üzerinde bulunduğun bölgenin dünya haritasını açar; kendi okun, çevrendeki ilgi noktaları, işaretleri olan görev verenler ve hedeflerinin bulunduğu alanlar, üretim istasyonları, posta kutuları, ilan panoları ve bahçe yatakları, zindan girişleri ve bölgedeki tüm toplama düğümleri görünür. Yenilenirken gri, aletlerin yetersiz kaldığında işaretli olurlar. Grubun da haritada görünür. Haritaya sağ tıkla veya Dünya haritası düğmesine bas; harita kıtaya çekilir, her bölge adıyla çizilir ve bir bölgeye tıklamak onun haritasını açar. Bir delveye, zindana, yarığa veya kale burcuna girdiğinde harita bulunduğun yerin kat planına geçer; Dikenkuyu Tarlaları savaş alanı da kendine ait bir saha haritasına sahip olur.\n\nMini haritanın altında sağ tarafta duran takipçi yığını, hiçbir şey açmadan mevcut işlerini görünür tutar: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, içinde bulunduğun delve ve katıldığın her yarık. Ekranı geri istediğinde görev takipçisi kapanır.",
+      "mapBodyZoneFirst": "M, üzerinde bulunduğun bölgenin dünya haritasını açar; kendi okun, çevrendeki ilgi noktaları, işaretleri olan görev verenler ve hedeflerinin bulunduğu alanlar, üretim istasyonları, posta kutuları, ilan panoları ve bahçe yatakları, zindan girişleri ve bölgedeki tüm toplama düğümleri görünür. Yenilenirken gri, aletlerin yetersiz kaldığında işaretli olurlar. Grubun da haritada görünür. Haritaya sağ tıkla veya Dünya haritası düğmesine bas; harita kıtaya çekilir, her bölge adıyla çizilir ve bir bölgeye tıklamak onun haritasını açar. Bir delveye, zindana, yarığa veya kale burcuna girdiğinde harita bulunduğun yerin kat planına geçer; Dikenkuyu Tarlaları savaş alanı da kendine ait bir saha haritasına sahip olur.\n\nMini haritanın altında sağ tarafta duran takipçi yığını, hiçbir şey açmadan mevcut işlerini görünür tutar: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, üretimden sabitlediğin tarifler, içinde bulunduğun delve ve katıldığın her yarık. Ekranı geri istediğinde görev takipçisi kapanır.",
       "gatheringGoalTrackerBody": "Üretim penceresinde bir tarifi veya panoda bir komisyonu Takip ettiğinde yığına bir toplama hedef takipçisi katılır: takip ettiğin tarif veya komisyonu, kaç tane topladığını ve yanında veya depoda tuttuğun malzemelerin seni hedefe ne kadar yaklaştırdığını adlandırır. Takip mevcut hedefinin yerini alır, Temizle ise onu açıkça kaldırır; ikisi de hasat tercihini asla değiştirmez.",
       "hubPracticeTrackerBody": "Doğudere merkezi yakınında, rehberli talim derslerini aldıktan sonra yığına bir talim takipçisi katılır: talim mankenlerine karşı en iyi denemelerini görünür tutar. Ders etkinken yanındaki koç şeridi, Hasar Sayaçlarını açmaktan ikinci denemeyi karşılaştırmaya kadar dersin mevcut adımında sana yol gösterir.",
       "chatTitle": "Sohbet kutusu",
@@ -6714,7 +6714,7 @@ export const tr_TR: EnTranslations = {
       "mageEleSummon": "Elementali yanına çağıran ve onu hedefine yönlendiren bir Ayaz büyüsü.",
       "formName": {
         "form_bear": "Bruin Formu",
-        "form_cat": "Kurt Formu",
+        "form_cat": "Kedi Formu",
         "form_travel": "Fleet Formu"
       }
     },
@@ -7235,7 +7235,7 @@ export const tr_TR: EnTranslations = {
     "deedsPage": {
       "intro": "Yiğitlikler Kitabı, dünyanın yaptığın her şeyin hesabını tuttuğu yerdir; başlangıç vadisinden attığın ilk adımlardan diyarın sunabileceği en çetin dövüşlere kadar. Oynadıkça yiğitlikler kazan, verdikleri unvanları taşı ve Ününün tırmanışını izle.",
       "howHeading": "Yiğitlikler nasıl işler",
-      "howBody": "Yiğitlikler her seferinde tek bir karakterle kazanılır ve o karakterde saklanır; yani oynadığın her kahraman kendi Kitabını oluşturur. Ününü oynadığın tüm karakterler boyunca yalnızca diyarın Lider Tablosu bir araya getirir ve her yiğitliği yalnızca bir kez sayar. Her yiğitlik senden ne istediğini oyun içindeki Yiğitlikler Kitabı'nda açık açık yazar, böylece neyin peşine düşeceğini her zaman bilirsin; üstelik peşinde olduklarını takibe alarak oynarken gözünün önünde tutabilirsin. Küçük bir kısmı ise gizli kalır ve kendini ancak sen kazandıktan sonra gösterir. Kitap kendini dürüst de tutar: geçmiş sicilinin kanıtlayabildiği ne varsa anında hanene yazar, böylece bir kıdemli onu asla boş bir sayfayla açmaz; yalnızca sayım yapan yiğitlikler tutanaklarına sıfırdan başlar.",
+      "howBody": "Yiğitlikler her seferinde tek bir karakterle kazanılır, ama Yiğitlikler Kitabı hesabındaki her karakter tarafından paylaşılır: herhangi birinin başardığı bir yiğitlik hepsi için kazanılmış sayılır, Kitap onu kimin ve ne zaman kazandığını adlandırır, ve ödül olarak verdiği bir unvan veya çerçeve herhangi bir karakter tarafından takılabilir. Diyarın Lider Tablosu Ününü aynı şekilde bir araya getirir ve her yiğitliği yalnızca bir kez sayar. Her yiğitlik senden ne istediğini oyun içindeki Yiğitlikler Kitabı'nda açık açık yazar, böylece neyin peşine düşeceğini her zaman bilirsin; üstelik peşinde olduklarını takibe alarak oynarken gözünün önünde tutabilirsin. Küçük bir kısmı ise gizli kalır ve kendini ancak sen kazandıktan sonra gösterir. Kitap kendini dürüst de tutar: geçmiş sicilinin kanıtlayabildiği ne varsa anında hanene yazar, böylece bir kıdemli onu asla boş bir sayfayla açmaz; yalnızca sayım yapan yiğitlikler tutanaklarına sıfırdan başlar.",
       "renownHeading": "Ün",
       "renownBody": "Ün, Kitap'ın ardındaki puandır. Kazandığın her yiğitlik belirli bir değer taşır ve toplamın yalnızca yükselir, dolayısıyla sakin bir hafta sana asla zemin kaybettirmez. Bir avuç yiğitlik beceriden çok şansa dayanır, başka koleksiyon yiğitlikleri kendi ödülüdür ve Marifetler ayrı bir şereftir, dolayısıyla bunların hiçbiri Ün taşımaz. Ün taşımayan yiğitlikler Kitap'ının tamamlanmasına yine de sayılır; yalnızca asla puan vermezler. Marifetler tek istisnadır, sayımın tümüyle dışında tutulur.",
       "rewardsHeading": "Unvanlar ve çerçeveler",
@@ -7359,7 +7359,7 @@ export const tr_TR: EnTranslations = {
       "groupClasses": "Sınıflar",
       "groupForms": "Druid Formları",
       "formBear": "Bruin Formu",
-      "formCat": "Kurt Formu",
+      "formCat": "Kedi Formu",
       "formTravel": "Fleet Formu",
       "groupCreatures": "Yaratıklar",
       "groupPets": "Karabüyücü İblisleri",
@@ -7795,7 +7795,7 @@ export const tr_TR: EnTranslations = {
         "commissionsBody": "Komisyon, başkası için yapılan bir zanaattır. Bir silah, zırh parçası veya elde tutulan yan eşya üretirken (bir iksir bağ taşıyamaz), üretici üretimi komisyon olarak işaretleyebilir: bitmiş parça üreticinin elinde normal davranır, ancak bir ticaret el değiştirdiği anda onu alanın üstüne bağlanır. Bu Ustanın Bağı'dır: alıcı parçasını alır ve parça başkasına aktarılamaz ya da yeniden satılamaz.\n\nBağlar sonsuza kadar sürmez, sadece pahalıdır. Herhangi bir tezgah ustası, istasyonunda dururken bağlı bir parçayı bağdan kurtarır (taşınabilir bir tezgah bu hizmeti hiçbir zaman sunmaz), eşyanın kalitesine göre belirlenen bir ücret karşılığında: 25 gümüş sıradan dışı, 1 altın nadir, 4 altın destansı; bir efsanevi destansı oranını öder, komisyonlu sıradan bir parça ise sıradan dışı oranını öder.\n\nÜcret temiz bir sayfa satın alır, çözüm değil: parça hala bir komisyondur, bu nedenle bir sonraki ticarette kimin alacağına yeniden bağlanır ve imza, şaheser ile büyüler dahil her şey dokunulmadan kalır.",
         "provenanceHeading": "İmzalı işler",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Bazı eşyalar bir isim taşır. Malzemenin kaynak satırları her birim grubunu kimin topladığını, ayrı imzalayan işareti ise varsa premium imzacıyı gösterir. Bu bilgiler bağımsızdır: sıradan toplanmış malzeme imza kazanmadan toplayıcıyı kaydeder; eski imzalı stok, toplayıcı kaydedilmediğini dürüstçe söylerken imzacısını belirtebilir. Bitmiş parça ise onu kimin ürettiğini söyler. Bu kayıtlar takas, banka, posta, Dünya Pazarı ve satıcı geri alımı boyunca eşyayla taşınır ve hiç solmaz.\n\nToplama en iyi işini otomatik imzalar: nadir veya daha iyi çıkan her hasat imzalı gelir ve nadir buluntular beş katlı talih payının tamamını imzalar. Ceset hasadının şanslı atışı, ailede örnek verilemediğinde çıktısını imzalar; örnek verilebildiğinde çıktıyı sade bırakır ve yanına imzalı kusursuz örnek basar. Üretim de aynı çizgidedir: nadir veya daha iyi çıktının her kopyası imzalı doğar, şaheser ise kalitesi ne olursa olsun daima imza taşır; böylece her parçanın en iyi sürümü üreticisini adlandırır. Sıradan malzemenin imzası birimlerin kendisini izler ve uyumlu bir yığın başka bir toplayıcı veya imzacı içeriyor diye kaybolmaz. Ayrı kusursuz örnek ayrı eşyadır ve yine yer ister; sığmazsa sıradan ceset çıktısı kalır, örnek kaybolur.\n\nBitmiş eşyanın kimliği katıdır: iki kopya ancak her işaret birebir aynıysa birleşir; aynı eşya, aynı imzacı, aynı şaheser istatistikleri, aynı büyü ve aynı bağ. Uyumlu malzemeler toplayıcı ve imzacılar arasında bir yuvayı paylaşır, fakat her kaynak için sayıyı korur. Üzerine gelme ipucu kaynakları özetler; tam liste için Sources’u açın. Toplayıcıya göre ayır seçeneği çantalarda yığınları ayrı tutar ve sıralama bu seçime uyar. Aktarılmış malzeme alıcının malzemesiyle normal biçimde yığınlanabilir.\n\nİmzalar üreticiyi geri öder: tezgâhta gereken bir reaktifin imzalı kopyasını tutmak, imzalayan kim olursa olsun, şaheser şansına 2 yüzde puan ekler; kendi elinizle imzaladığınız reaktif, işaretlenmiş indirimsiz bir reaktif olmadığı sürece gereken miktarı bir azaltır (asla birin altına inmez). Baskın çekirdekleri maliyetinin tamamını korur. Kendi imzalı nadir veya daha iyi işiniz, bugün yalnızca üretilmiş iksirler yoluyla sizi öğretmeye devam eder: demleyip imzaladığınız nadir iksiri için ve bu meslek aktif büyük mesleklerinizden biriyse küçük bir beceri akışı geri döner. Gerçekten yalnızca iksir koludur; eliksir, parşömen veya zirve şişesi ne kadar ince imzalanmış olursa olsun size beceri öğretmez.",
+        "provenanceBodyUndiscounted": "Bazı eşyalar bir isim taşır. Malzemenin kaynak satırları her birim grubunu kimin topladığını, ayrı imzalayan işareti ise varsa premium imzacıyı gösterir. Bu bilgiler bağımsızdır: sıradan toplanmış malzeme imza kazanmadan toplayıcıyı kaydeder; eski imzalı stok, toplayıcı kaydedilmediğini dürüstçe söylerken imzacısını belirtebilir. Bitmiş parça ise onu kimin ürettiğini söyler. Bu kayıtlar takas, banka, posta, Dünya Pazarı ve satıcı geri alımı boyunca eşyayla taşınır ve hiç solmaz.\n\nToplama en iyi işini otomatik imzalar: nadir veya daha iyi çıkan her hasat imzalı gelir ve nadir buluntular beş katlı talih payının tamamını imzalar. Ceset hasadının şanslı atışı, ailede örnek verilemediğinde çıktısını imzalar; örnek verilebildiğinde çıktıyı sade bırakır ve yanına imzalı kusursuz örnek basar. Üretim de aynı çizgidedir: nadir veya daha iyi çıktının her kopyası imzalı doğar, şaheser ise kalitesi ne olursa olsun daima imza taşır; böylece her parçanın en iyi sürümü üreticisini adlandırır. Sıradan malzemenin imzası birimlerin kendisini izler ve uyumlu bir yığın başka bir toplayıcı veya imzacı içeriyor diye kaybolmaz. Ayrı kusursuz örnek ayrı eşyadır ve yine yer ister; sığmazsa sıradan ceset çıktısı kalır, örnek kaybolur.\n\nBitmiş eşyanın kimliği katıdır: iki kopya ancak her işaret birebir aynıysa birleşir; aynı eşya, aynı imzacı, aynı şaheser istatistikleri, aynı büyü ve aynı bağ. Uyumlu malzemeler toplayıcı ve imzacılar arasında bir yuvayı paylaşır, fakat her kaynak için sayıyı korur. Üzerine gelme ipucu kaynakları özetler; tam liste için yığına sağ tıkla (dokunmatikte Kaynaklar düğmesini kullan). Toplayıcıya göre ayır seçeneği çantalarda yığınları ayrı tutar ve sıralama bu seçime uyar. Aktarılmış malzeme alıcının malzemesiyle normal biçimde yığınlanabilir.\n\nİmzalar üreticiyi geri öder: tezgâhta gereken bir reaktifin imzalı kopyasını tutmak, imzalayan kim olursa olsun, şaheser şansına 2 yüzde puan ekler; kendi elinizle imzaladığınız reaktif, işaretlenmiş indirimsiz bir reaktif olmadığı sürece gereken miktarı bir azaltır (asla birin altına inmez). Baskın çekirdekleri maliyetinin tamamını korur. Kendi imzalı nadir veya daha iyi işiniz, bugün yalnızca üretilmiş iksirler yoluyla sizi öğretmeye devam eder: demleyip imzaladığınız nadir iksiri için ve bu meslek aktif büyük mesleklerinizden biriyse küçük bir beceri akışı geri döner. Gerçekten yalnızca iksir koludur; eliksir, parşömen veya zirve şişesi ne kadar ince imzalanmış olursa olsun size beceri öğretmez.",
         "collectorsHeading": "Koleksiyoncular, kupalar ve bir hikayenin bedeli",
         "collectorsBody": "Satıcılar kaynağa kördür: imzalı bir eşya NPC'ye tam fiyatına satılır. İmzanın getirdiği prim yalnızca oyuncular arasında mevcuttur; bu da onu ilginç kılan şeydir: ünlü bir toplayıcı tarafından imzalanmış bir yığın beklenmedik cevher, şanslı bir hasattan gelen Prime Cut, o zamandan beri emekli olmuş bir ustanın adını taşıyan şaheser bir bıçak, bunların hepsi birinin belleğinin değer biçtiği kadar değerlidir.\n\nDeeds Kitabı da aynı içgüdüye yaslanır: Bozulmamış Damar, Kadim Kalp Ağacı, Ay Işığı Çiçeği, Mükemmel Numune ve Umut Işıltısı, tamamen bir anın sizinle gerçekleştiğini kanıtlamak için var olan sıfır Şöhretli koleksiyoncu işaretleridir. Görevi kazandıran eşyayı elinizde tutun, elinizde makbuzu tutarsınız. Bunların hiçbiri güç değildir; köken istatistik satın almaz ve savaş kazanmaz, sadece iyi günlerin oyunun kağıt izi olur.",
         "castPaceHeading": "Okuma süresi ve altın gideri",
@@ -7838,7 +7838,7 @@ export const tr_TR: EnTranslations = {
         "title": "Meslekler SSS",
         "intro": "Ustaların en sık sorduğu sorulara hızlı yanıtlar.",
         "q1": "İmzalı eşyalarım neden yığınlanmıyor?",
-        "a1": "Bitmiş eşyalar hâlâ katı kimlik kuralına uyar: iki kopya yalnızca imzacıları, atılmış özellikleri, şaheser istatistikleri, büyüleri, bağları ve diğer kimlikleri bütünüyle aynıysa birleşir. Bu yüzden imzalı bir bıçak düz bir bıçaktan ayrı kalır.\n\nMalzemeler istisnadır. Aynı malzemenin uyumlu yığınları, toplayıcıları veya imzacıları farklı olsa bile birleşebilir; çünkü yığın her kaynak için ayrı sayı tutar. Üzerine gelme araç ipucu kaynakları özetler; tam liste için Kaynaklar'ı aç. Toplayıcıya göre ayırmak bu yığınları çantalarında ayrı tutar ve sıralama bu seçime uyar. Aktarılan malzeme alıcının malzemeleriyle normal şekilde yığınlanabilir.",
+        "a1": "Bitmiş eşyalar hâlâ katı kimlik kuralına uyar: iki kopya yalnızca imzacıları, atılmış özellikleri, şaheser istatistikleri, büyüleri, bağları ve diğer kimlikleri bütünüyle aynıysa birleşir. Bu yüzden imzalı bir bıçak düz bir bıçaktan ayrı kalır.\n\nMalzemeler istisnadır. Aynı malzemenin uyumlu yığınları, toplayıcıları veya imzacıları farklı olsa bile birleşebilir; çünkü yığın her kaynak için ayrı sayı tutar. Üzerine gelme araç ipucu kaynakları özetler; tam liste için yığına sağ tıkla (dokunmatikte Kaynaklar düğmesini kullan). Toplayıcıya göre ayırmak bu yığınları çantalarında ayrı tutar ve sıralama bu seçime uyar. Aktarılan malzeme alıcının malzemeleriyle normal şekilde yığınlanabilir.",
         "q2": "Sıradan tarifler becerimi sonsuza kadar yükseltir mi?",
         "a2": "Hayır. Her tarif, o zanaatta mevcut aralığının ne kadar altında olduğuna göre puanlanır; klasik turuncu, sarı, yeşil ve gri okuması budur: kendi aralığında veya üstünde tam kazanım, bir kademe aşağıda yarım, iki kademe aşağıda çeyrek ve üç veya daha fazla kademe aşağıda hiç kazanım yoktur. Aralıklar her 25 beceridedir; bu yüzden ücretsiz beceri 0 tarifleri 75 beceride artık hiçbir şey öğretmez.\n\nTavanlar da bekleyebileceğin klasik 300'den düşüktür: kazanılabilir on zanaatın her biri 125'te, Madencilik, Odun Kesimi ve Bitkicilik 100'de, Balıkçılık ise 200'de tavan yapar. Tırmanmak, en ucuz tarifi öğütmek değil, kendi aralığındaki tariflere geçmektir.",
         "q3": "Bir cesedi yağmalamak ile hasat etmek arasındaki fark nedir?",
@@ -10481,7 +10481,7 @@ export const tr_TR: EnTranslations = {
       "stunned": "Sersemledin!",
       "silenced": "Susturuldun!",
       "busy": "Meşgulsün.",
-      "cannotCastWhileMoving": "You can't cast while moving.",
+      "cannotCastWhileMoving": "Hareket ederken büyü yapamazsın.",
       "abilityNotReady": "O yetenek henüz hazır değil.",
       "notEnoughRage": "Yeterli öfke yok!",
       "notEnoughEnergy": "Yeterli enerji yok!",
@@ -10494,7 +10494,7 @@ export const tr_TR: EnTranslations = {
       "requiresForm": "{form} Formunda olmalısın.",
       "cantInForm": "{form} Formunda bunu yapamazsın.",
       "bear": "Bruin",
-      "cat": "Kurt",
+      "cat": "Kedi",
       "travel": "Fleet",
       "shapeshifted": "Şekil değiştirmişken bunu yapamazsın.",
       "stealthed": "Gizlenmiş olmalısın.",
@@ -10825,8 +10825,8 @@ export const tr_TR: EnTranslations = {
       "devotion": "Adanmışlık"
     },
     "forms": {
-      "bear": "Ayı",
-      "cat": "Kurt"
+      "bear": "Bruin",
+      "cat": "Kedi"
     },
     "cast": {
       "fishing": "Balık Tutma",
@@ -12065,7 +12065,7 @@ export const tr_TR: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Şiddet Büyüsü",
-        "description": "Düşmanı 8 sn boyunca büyüler. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 17 Gölge hasarı vurur."
+        "description": "Düşmanı 8 sn boyunca büyüler, Gölge hasarı verir ve her 2 sn'de 2 Mahkûmiyet üretir. Sonraki 3 hasar veren eylemi her seferinde 7 Mahkûmiyet üretir ve ona 17 Gölge hasarı vurur."
       },
       "cruel_pact": {
         "name": "Zalim Ahit",
@@ -12101,7 +12101,7 @@ export const tr_TR: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Yıkıcı Damga",
-        "description": "Bir düşmanı 15 sn süreyle damgalar. Sonraki 3 doğrudan büyün, damgalı düşmana karşı %25 hasarla yankılanır ya da başka bir hedefe atıldığında ona %50 hasar kopyalar."
+        "description": "Bir düşmanı 15 sn süreyle damgalar. Sonraki 3 doğrudan büyün, damgalı düşmana karşı %25 hasarla yankılanır ya da başka bir hedefe atıldığında ona %50 hasar kopyalar. Yıkım Oku yankıları da başka bir kritik hasar çarpanı olmadan kritik vuruş sayılır."
       },
       "wrath": {
         "name": "Yaban Oku",
@@ -12140,7 +12140,7 @@ export const tr_TR: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Formu",
-        "description": "Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Büyücü formuna dönmek için tekrar kullan."
+        "description": "Bir ayıya dönüş: zırh +%110, azami sağlık +%30, saldırı gücü büyük ölçüde artar, saldırıların öfke biriktirir ve %30 daha fazla tehdit üretir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır. Büyücü formuna dönmek için tekrar kullan."
       },
       "maul": {
         "name": "Kemik Kıran",
@@ -12156,17 +12156,17 @@ export const tr_TR: EnTranslations = {
         "description": "Uğursuz bir kükreme: 10 yarda içindeki her düşman kışkırtılır, tehdidi onun en nefret ettiği düşmanla eşitlenir ve 3 saniye boyunca sana saldırmaya zorlanır. Yalnızca Bruin Formu."
       },
       "cat_form": {
-        "name": "Kurt Formu",
+        "name": "Kedi Formu",
         "description": "Seni bir kurda dönüştürür: çeviklik seviyenle yükselir, saldırı gücü +8 artı seviye başına 2, saldırıların enerji ve kombo puanı kullanır ve %29 daha az tehdit üretirsin. Herhangi bir biçime geçmek Ağır Aksak Adım kazandırır: 3 sn boyunca %60 hareket hızı, her 20 saniyede bir kez. Büyücü biçimine dönmek için yeniden kullan."
       },
       "claw": {
         "name": "Yırtan Pençe",
-        "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.",
+        "description": "Düşmanı silah hasarı artı {damage} ile pençele. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.",
         "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "ferocious_bite": {
         "name": "Kanlı Isırık",
-        "description": "{damage} veren bitirici hamle. Yalnızca Kurt Formu.",
+        "description": "{damage} veren bitirici hamle. Yalnızca Kedi Formu.",
         "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler; 3 Kadim Kanda bu düğme Kızıl Hasata dönüşür: Kadim Kanı harcayarak daha güçlü bir ısırık gerçekleştirir, ayrıca Deri Yüzme ve Parçalamanın kalan tüm hasarını anında vurur ve enerji geri kazandırır."
       },
       "swipe": {
@@ -12198,7 +12198,7 @@ export const tr_TR: EnTranslations = {
       },
       "travel_form": {
         "name": "Fleet Formu",
-        "description": "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir."
+        "description": "Anında hızlı bir Fleet Formu'na bürünerek hareket hızını %40 artırır ve kırılabilir kök tuzaklarını ve yavaşlatmaları kaldırır. Bürünmüşken diğer yetenekleri kullanamazsın, ancak dövüşte ya da dövüş dışında bürünebilirsin; kaçmak için idealdir. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır."
       },
       "enrage": {
         "name": "Körükleme",
@@ -12218,7 +12218,7 @@ export const tr_TR: EnTranslations = {
       },
       "dash": {
         "name": "Atılma",
-        "description": "İleri atılarak hareket hızını 15 saniye boyunca %50 artırır. Yalnızca Kurt Formu."
+        "description": "İleri atılarak hareket hızını 15 saniye boyunca %50 artırır. Yalnızca Kedi Formu."
       },
       "pounce": {
         "name": "Sinsi Darbe",
@@ -12237,12 +12237,12 @@ export const tr_TR: EnTranslations = {
         "description": "Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır."
       },
       "tigers_fury": {
-        "name": "Kurt Kanı",
-        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kurt Formu."
+        "name": "Vaşak Kanı",
+        "description": "Anında {rage} enerji kazandırır ve saldırı gücünü {duration} saniye boyunca {buff} artırır. Yalnızca Kedi Formu."
       },
       "rip": {
         "name": "Kanlı Yarık",
-        "description": "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici hamle: 36 hasar artı harcanan kombo puanı başına 24 (5 kombo puanı: toplam {damage}). Yalnızca Kurt Formu.",
+        "description": "Hedefi 24 sn boyunca her 2 sn'de kanatan bitirici hamle: 36 hasar artı harcanan kombo puanı başına 24 (5 kombo puanı: toplam {damage}). Yalnızca Kedi Formu.",
         "specNote_feral": "İsabet eden vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "mortal_strike": {
@@ -12439,11 +12439,11 @@ export const tr_TR: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Aykuşu Formu",
-        "description": "Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Normal forma dönmek için tekrar kullan. (Denge imzası)"
+        "description": "Aykuşu formuna girer, geri dönene kadar büyü yapmayı güçlendirirsin. Herhangi bir forma bürünmek, kısa bir hareket hızı patlaması olan Sekme Adımı kazandırır. Normal forma dönmek için tekrar kullan. (Denge imzası)"
       },
       "feral_charge": {
         "name": "İlkel Dalga",
-        "description": "İlkel bir dalga salar. Kurt Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)"
+        "description": "İlkel bir dalga salar. Kedi Formunda Enerji yenilenmesi 10 sn boyunca %100 artar. Bruin Formunda anında 50 Öfke üretir. (Yabanilik imzası)"
       },
       "swiftmend": {
         "name": "Hızlı İyileştirme",
@@ -12663,7 +12663,7 @@ export const tr_TR: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Yıkım Oku",
-        "description": "3 Tahribat harcayarak {damage} Ateş hasarı veren ağır bir kaotik ateş oku savurur. Harabiyet büyü süresini %30 kısaltır."
+        "description": "3 Tahribat harcayarak, kritik hasar uygulanmadan önce {damage} Ateş hasarı veren ağır bir kaotik ateş oku savurur. İsabet ettiğinde her zaman kritik vurur. Harabiyet büyü süresini %30 kısaltır."
       },
       "dark_pact": {
         "name": "Kanlı Ahit",
@@ -12807,7 +12807,7 @@ export const tr_TR: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Mükemmel An",
-        "description": "Mükemmel anını yakala: anında 4 Gizemli Yük kazan ve 10 saniye boyunca Aether Okları onları tüketmez. (Kronomansi)"
+        "description": "Mükemmel anını yakala: anında 4 Gizemli Yük kazan ve 10 saniye boyunca Aether Okları onları tüketmez ve %20 daha fazla hasar verir. (Kronomansi)"
       },
       "arcane_surge": {
         "name": "Aether Dalgası",
@@ -12956,7 +12956,7 @@ export const tr_TR: EnTranslations = {
       },
       "rake": {
         "name": "Deri Yüzme",
-        "description": "Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca kanatır. 1 kombo puanı kazandırır. Yalnızca Kurt Formu.",
+        "description": "Düşmanın derisini silah hasarı artı {damage} ile yüz, 18 sn boyunca kanatır. 1 kombo puanı kazandırır. Yalnızca Kedi Formu.",
         "specNote_feral": "İsabet eden her vuruş 1 Kadim Kan ekler (en fazla 3)."
       },
       "revive_pet": {

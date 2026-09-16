@@ -2,6 +2,110 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const sv_SE: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.cannotCastWhileMoving': 'Du kan inte kasta besvärjelser medan du rör dig.',
+  'hudChrome.auraEffect.wolfForm':
+    'Kattform: närstridsskada och energi; ökar förflyttningshastigheten med {pct}%',
+  'hudChrome.auraOverlay.cues.anvilStrike': 'Städslag',
+  'hudChrome.auraOverlay.cues.blaringHorn': 'Tutande horn',
+  'hudChrome.auraOverlay.cues.bubblePop': 'Bubbelplopp',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Biltuta',
+  'hudChrome.auraOverlay.cues.catMeow': 'Kattmjau',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Myntklirr',
+  'hudChrome.auraOverlay.cues.electricZap': 'Elstöt',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Grodkvack',
+  'hudChrome.auraOverlay.cues.glassPing': 'Glasklang',
+  'hudChrome.auraOverlay.cues.hardBell': 'Hård klocka',
+  'hudChrome.auraOverlay.cues.musicBox': 'Speldosa',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Uggleläte',
+  'hudChrome.auraOverlay.cues.softChime': 'Mjukt pling',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Ekopip',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Ångsus',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Svärdsdrag',
+  'hudChrome.auraOverlay.cues.templeGong': 'Tempelgong',
+  'hudChrome.auraOverlay.cues.waterDrop': 'Vattendroppe',
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Vindsus',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Vargtjut',
+  'hudChrome.auraOverlay.haptic': 'Vibration',
+  'hudChrome.auraOverlay.hapticHint':
+    'Vibrerar en ansluten kontroll, eller din telefon. Ignoreras om enheten saknar vibrationsfunktion.',
+  'hudChrome.auraOverlay.hapticNone': 'Av',
+  'hudChrome.auraOverlay.haptics.double': 'Dubbel',
+  'hudChrome.auraOverlay.haptics.long': 'Lång',
+  'hudChrome.auraOverlay.haptics.tap': 'Kort',
+  'hudChrome.auraOverlay.readyGlow': 'Handlingsfältsglöd',
+  'hudChrome.auraOverlay.readyGlowHint':
+    'Lyser upp den här besvärjelsen på ditt handlingsfält medan dess buff är aktiv.',
+  'hudChrome.auraOverlay.reticleTick': 'Riktmedelspuls',
+  'hudChrome.auraOverlay.reticleTickHint':
+    'Lägger till en markering nära skärmens mitt som lyser upp när den här besvärjelsen proccar.',
+  'hudChrome.auraOverlay.sound': 'Varningsljud',
+  'hudChrome.auraOverlay.soundHint':
+    'Ett ljud spelas varje gång den här besvärjelsen proccar. Stäng av ikonen, halvmånarna och markringen för att låta ljudet ensamt avisera det.',
+  'hudChrome.auraOverlay.soundNone': 'Inget ljud',
+  'hudChrome.auraOverlay.soundPreview': 'Spela upp',
+  'hudChrome.auraOverlay.soundPreviewAria': 'Förhandslyssna på varningsljudet {sound}',
+  'hudChrome.auraOverlay.soundVolume': 'Ljudvolym',
+  'hudChrome.auraOverlay.watchlist': 'Bevakade besvärjelser',
+  'hudChrome.auraOverlay.watchlistCount': '{count} bevakade',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    'Ingen annan besvärjelse i din trollformelsbok ger dig en buff.',
+  'hudChrome.auraOverlay.watchlistHint':
+    'Välj vilken besvärjelse som helst som ger dig en buff för att ge den sin egen aura. Valda besvärjelser får ett fullständigt kort nedan, med egen ikon, färg, position och markring.',
+  'hudChrome.auraOverlay.watchlistUnwatch': 'Sluta bevaka {spell}',
+  'hudChrome.auraOverlay.watchlistWatch': 'Bevaka {spell}',
+  'hudChrome.bank.quantityStepDownAria': 'Minska antalet med {count}',
+  'hudChrome.bank.quantityStepUpAria': 'Öka antalet med {count}',
+  'hudChrome.deeds.accountScopeHint':
+    'En bedrift som en karaktär på ditt konto fullbordar räknas som fullbordad här också, och Boken anger vem som fullbordade den.',
+  'hudChrome.deeds.accountScopeNote': 'Delas av alla karaktärer på ditt konto.',
+  'hudChrome.deeds.earnedBy': 'Fullbordad av {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} ({date})',
+  'hudChrome.finder.lootHeroicChance': 'Heroisk bonus, extra chans till föremål:',
+  'hudChrome.finder.lootHeroicMaybe': 'Heroisk bonus, högst ett av dessa kan falla:',
+  'hudChrome.keybinds.friendlyNameplates': 'Växla vänliga namnskyltar',
+  'hudChrome.leaderboard.podiumLabel': 'Topp tre',
+  'hudChrome.leaderboard.prestigeTitle': 'Prestige {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Ohämtad',
+  'hudChrome.materialSources.decreaseByAria': 'Minska enheter från {source} med {count}',
+  'hudChrome.materialSources.fits': 'Upp till {units} får plats just nu',
+  'hudChrome.materialSources.increaseByAria': 'Öka enheter från {source} med {count}',
+  'hudChrome.materialSources.moveAll': 'Flytta alla enheter',
+  'hudChrome.noticeboard.filterEmpty': 'Inget gille har öppnat sina dörrar för nya spelare än.',
+  'hudChrome.noticeboard.filterNewPlayersTitle': 'Visa endast gillen som välkomnar nya spelare',
+  'hudChrome.noticeboard.filters': 'Anslagstavlans filter',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Nybörjarvänligt',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Det här gillet välkomnar nya spelare',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Officerare online',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Officerare online: {names}',
+  'hudChrome.noticeboard.showAll': 'Visa alla gillen',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    'Visas på rekryteringstavlan vid Prövostrandens anslagstavla.',
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Nybörjarvänligt',
+  'hudChrome.plurals.guildBoardShown.few': '{count} gillen visas',
+  'hudChrome.plurals.guildBoardShown.many': '{count} gillen visas',
+  'hudChrome.plurals.guildBoardShown.one': '{count} gille visas',
+  'hudChrome.plurals.guildBoardShown.other': '{count} gillen visas',
+  'hudChrome.professionTrainers.alchemy': 'Alkemitränare',
+  'hudChrome.professionTrainers.blacksmithing': 'Smidestränare',
+  'hudChrome.professionTrainers.cooking': 'Matlagningstränare',
+  'hudChrome.professionTrainers.engineering': 'Ingenjörskonsttränare',
+  'hudChrome.professionTrainers.farming': 'Odlingstränare',
+  'hudChrome.professionTrainers.hobby': 'Hobbytränare',
+  'hudChrome.professionTrainers.leatherworking': 'Läderhantverkeritränare',
+  'hudChrome.professionTrainers.mining': 'Gruvdriftstränare',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Skrädderitränare',
+  'hudChrome.reliquary.finderWithDate': '{name} ({date})',
+  'hudChrome.reliquary.foundBy': 'Funnen av {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    'En relik som hittas av vilken karaktär som helst på ditt konto fyller sidan här också.',
+  'hudChrome.reliquary.sharedScopeNote': 'Delas av alla karaktärer på ditt konto.',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Välkommen till Eastbrook! Marskalk Redbrook har arbete åt dig på torget. Slå på gyllene vägledning för att hitta honom och följa Vargar vid dörren, eller utforska på egen hand. Du kan ändra detta senare under Alternativ, Gränssnitt, Strid.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Stäng av vägledningen',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Slå på vägledningen',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'Eastbrooks gyllene vägledning',
   'hudChrome.barEditor.armed': 'Tryck på en plats för att placera {name}.',
   'hudChrome.barEditor.buttonHeader': 'Knapp {button}',
   'hudChrome.barEditor.cellAria': 'Knapp {button}, {direction}: {action}',
@@ -943,7 +1047,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     'Reseformen: betydligt snabbare över mark, men inga andra förmågor förrän du skiftar ur.',
   'guide.classPage.formName.form_bear': 'Bruinform',
-  'guide.classPage.formName.form_cat': 'Vargform',
+  'guide.classPage.formName.form_cat': 'Kattform',
   'guide.classPage.formName.form_travel': 'Fleetform',
   'guide.classPage.formsHeading': 'Formskiftning',
   'guide.classPage.formsMoonwing':
@@ -973,7 +1077,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Havet har ingen vägg. Överfarterna världen är tänkt att du ska simma, sunden och tjärnarna mellan en landremsa och nästa, samt insjöarna, är säkra att korsa hur lång tid det än tar. Ge dig i stället ut förbi stranden i genuint öppet vatten och det börjar tära på din kraft: en varning visas, du får ett verkligt fönster att vända om, och därefter vållar havet stadigt tyngre skada som ingenting kan förhindra förrän du vänder tillbaka mot land. Drunknar du eller sliter du ut dig så långt från stranden släpper du din ande precis som vid vilken annan död, så behandla horisonten som utsikt snarare än ett resmål.',
   'guide.combat.hazardsTitle': 'Vattnet kan döda dig',
   'guide.combat.threatBody':
-    'Varje fiende håller räkning på vem som har retat den mest. Skada bygger på den, och det gör läkning också: en läkning lägger hot på de fiender som redan slåss mot personen du läkte, uppdelat mellan dem, så den säkraste läkningen är en på någon som tanken redan har tag i. Tankar aktiverar en Gardställning eller en skyddande form som mångdubblar allt hot de genererar, medan druidens Vargform i stället gör sig av med hot, och en hån lyfter besvärjaren rakt till toppen av listan och håller fast fienden på dem i några sekunder. Fiender byter inte mål i samma stund som någon går om tanken: det krävs ett tydligt försprång för att lyckas, och ett större försprång på avstånd än i närstrid, så lite tålamod i början av en pull håller striden där den hör hemma.',
+    'Varje fiende håller räkning på vem som har retat den mest. Skada bygger på den, och det gör läkning också: en läkning lägger hot på de fiender som redan slåss mot personen du läkte, uppdelat mellan dem, så den säkraste läkningen är en på någon som tanken redan har tag i. Tankar aktiverar en Gardställning eller en skyddande form som mångdubblar allt hot de genererar, medan druidens Kattform i stället gör sig av med hot, och en hån lyfter besvärjaren rakt till toppen av listan och håller fast fienden på dem i några sekunder. Fiender byter inte mål i samma stund som någon går om tanken: det krävs ett tydligt försprång för att lyckas, och ett större försprång på avstånd än i närstrid, så lite tålamod i början av en pull håller striden där den hör hemma.',
   'guide.combat.threatTitle': 'Vem fienden anfaller',
   'guide.combat.unstuckBody':
     'Om världen fångar dig någonstans du inte kan ta dig ut ifrån, skriv /unstuck. Du måste vara utanför strid och stå stilla, inte hållen av en bedövning eller en rot, och inte i en duell eller en arenamatch: en kort nedräkning löper, och att röra dig eller ta skada avbryter den. När den är klar sätts du ner vid närmaste kyrkogård. Den dödar dig aldrig och lämnar inget lik efter sig, och om du redan låg nere återupplivar den dig där i stället. Priset är Räddningssjuka, en tillfällig försvagning av allt du är som har klingat av innan du kan använda kommandot igen, och precis som Väktartullen skonar den helt nya karaktärer helt och hållet.',
@@ -3177,7 +3281,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Kastar en isbit som orsakar {damage} Frost-skada, trefaldigt mot ett fryst mål. Förbrukar Fingers of Frost, eller en laddning av Vinterkyla, för att behandla målet som fryst. (Frost)',
   'entities.abilities.ice_lance.name': 'Islans',
   'entities.abilities.perfect_moment.description':
-    'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)',
+    'Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte och vållar 20% ökad skada. (Kronomantik)',
   'entities.abilities.perfect_moment.name': 'Perfekt ögonblick',
   'entities.abilities.shatter.name': 'Sprött fördärv',
   'entities.abilities.temporal_acceleration.description':
@@ -4793,7 +4897,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.rift_venom_execution': 'Giftpölen',
   'abilityUi.cast.rift_venom_strike': 'Kullmoderns märke',
   'abilityUi.forms.bear': 'Björn',
-  'abilityUi.forms.cat': 'Varg',
+  'abilityUi.forms.cat': 'Katt',
   'abilityUi.resources.energy': 'Energi',
   'abilityUi.resources.mana': 'Mana',
   'abilityUi.resources.rage': 'Raseri',
@@ -5153,7 +5257,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Storma en fiende, generera 9 raseri och bedöva den i 1 sek. I 3 sek därefter är Vargform gratis och håller fast målet, vilket saktar ner det med 50% i 4 sek. 8-25 m räckvidd. Endast i Bruinform.',
   'entities.abilities.bear_charge.name': 'Bruinrusning',
   'entities.abilities.bear_form.description':
-    'Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform.',
+    'Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform.',
   'entities.abilities.bear_form.name': 'Bruinform',
   'entities.abilities.berserker_rage.description':
     'Gå in i ett sjudande raseri och generera 20 raseri. (Krigartalang)',
@@ -5171,7 +5275,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Åderlåtning',
   'entities.abilities.cat_form.description':
     'Förvandlar er till en varg: smidigheten stiger med er nivå, anfallskraft +8 plus 2 per nivå, era anfall använder energi och kombopoäng, och ni alstrar 29% mindre hot. Att skifta till vilken gestalt som helst ger Lunkande steg: 60% förflyttningshastighet i 3 sek, en gång var 20:e sek. Besvärj igen för att återgå till besvärjarskepnaden.',
-  'entities.abilities.cat_form.name': 'Vargform',
+  'entities.abilities.cat_form.name': 'Kattform',
   'entities.abilities.charge.description':
     'Stormar en fiende, genererar 9 raseri och bedövar den i 1 sek. 8-25 m räckvidd.',
   'entities.abilities.charge.name': 'Anstormning',
@@ -5202,7 +5306,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbannar målet med plåga: {damage} skuggskada över 24 sek.',
   'entities.abilities.curse_of_agony.name': 'Våndans häxkonst',
   'entities.abilities.dash.description':
-    'Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i vargform.',
+    'Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i kattform.',
   'entities.abilities.dash.name': 'Rusa',
   'entities.abilities.deadly_poison.description':
     'Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg lägger till en giftstapling på målet, upp till 5, och förnyar varaktigheten på 12 sekunder. Varje stapling vållar {damage} naturskada varannan sekund.',
@@ -5508,10 +5612,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Spränger närliggande fiender för {damage} skada och saktar ner deras attacker med 10 % i 10 sek.',
   'entities.abilities.thunder_clap.name': 'Skälvande slag',
   'entities.abilities.tigers_fury.description':
-    'Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast vargform.',
-  'entities.abilities.tigers_fury.name': 'Vargblod',
+    'Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast kattform.',
+  'entities.abilities.tigers_fury.name': 'Lodjursblod',
   'entities.abilities.travel_form.description':
-    'Skiftar omedelbart till en snabb Fleetform och ökar förflyttningshastigheten med 40 %. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt.',
+    'Skiftar omedelbart till en snabb Fleetform, ökar förflyttningshastigheten med 40 % och tar bort brytbara rotbindningar och nedsaktningar. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet.',
   'entities.abilities.travel_form.name': 'Fleetform',
   'entities.abilities.vanish.description':
     'Försvinn ur sikte och gå in i Duskveil även i strid. Du rör dig 50 % långsammare medan du är dold. Varar i upp till 10 sek.',
@@ -5567,10 +5671,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'För fram ett kommande tick av er Brinnande pakt och antänder sedan målet för {damage} Eldskada. Alstrar 1 Förödelse och 1 Ödeläggelse. Rymmer {charges} laddningar. (Signatur för Förstörelse)',
   'entities.abilities.moonkin_form.name': 'Månugglaform',
   'entities.abilities.moonkin_form.description':
-    'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)',
+    'Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till normal form. (Balanssignatur)',
   'entities.abilities.feral_charge.name': 'Urvåg',
   'entities.abilities.feral_charge.description':
-    'Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)',
+    'Släpp lös en urvåg. I Kattform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)',
   'entities.abilities.swiftmend.name': 'Snabb läkning',
   'entities.abilities.crusader_strike.description':
     'Träffar målet med vapenskada plus {damage} Helig skada. (paladintalang)',
@@ -8349,7 +8453,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.busy': 'Du är upptagen.',
   'hud.errors.cannotTaunt': 'Du kan inte håna det.',
   'hud.errors.cantInForm': 'Du kan inte göra det i {form}-form.',
-  'hud.errors.cat': 'Varg',
+  'hud.errors.cat': 'Katt',
   'hud.errors.challengeExpired': 'Utmaningen har gått ut.',
   'hud.errors.chatCooldown': 'Chatten har nedkylning i {seconds}s.',
   'hud.errors.chatLocked':
@@ -10609,7 +10713,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Bragder står på en hylla för sig: uppteckningar av arv och av att vara först i världen, bedrifter knutna till en svunnen era eller ett ögonblick som bara inträffar en enda gång. De ger ingen ryktbarhet och räknas inte in i fullbordandet, utan bevaras för alltid som ett minne av det som uträttades.',
   'guide.deedsPage.featsHeading': 'Bragder',
   'guide.deedsPage.howBody':
-    'Bedrifter fullbordas och bevaras en karaktär i taget, så varje hjälte du spelar bygger en egen Bok; bara rikets topplista samlar din Ryktbarhet över alla karaktärer du spelar, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.',
+    'Bedrifter fullbordas en karaktär i taget, men Bedrifternas bok delas av alla karaktärer på ditt konto: en bedrift som någon av dem fullbordar räknas som fullbordad för alla, Boken anger vem som fullbordade den och när, och en titel eller ram den ger kan bäras av vilken av dina karaktärer som helst. Rikets topplista samlar din Ryktbarhet på samma sätt, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.',
   'guide.deedsPage.howHeading': 'Så fungerar bedrifter',
   'guide.deedsPage.intro':
     'Bedrifternas bok är där världen håller räkning på allt du har uträttat, från dina första steg ut ur startdalen till de hårdaste strider riket kan bjuda. Fullborda bedrifter medan du spelar, bär titlarna de skänker och se din ryktbarhet stiga.',
@@ -11494,7 +11598,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'En boss av raidstyrka som reser sig i den öppna världen i en jämn rytm, bekämpad av vem som än samlas för att svara snarare än av en fast grupp.',
   'guide.glossary.worldBossTerm': 'Världsboss',
   'guide.models.formBear': 'Bruinform',
-  'guide.models.formCat': 'Vargform',
+  'guide.models.formCat': 'Kattform',
   'guide.models.formTravel': 'Fleetform',
   'guide.models.groupForms': 'Druidformer',
   'guide.nav.sidebarLabel': 'Guideämnen',
@@ -11967,7 +12071,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Träffar upp till 3 fiender inom 10 m för {damage} Naturskada var. Elementär: en träff ger 1 Åska. Skadan ökar med Besvärjelsekraft.',
   'entities.abilities.chaos_bolt.description':
-    'Förbrukar 3 Förödelse för att slunga en tung kaotisk eldblixt som vållar {damage} Eldskada. Ödeläggelse kortar dess besvärjelse med 30%.',
+    'Förbrukar 3 Förödelse för att slunga en tung kaotisk eldblixt som vållar {damage} Eldskada innan kritisk skada tillämpas. Slår alltid kritiskt vid träff. Ödeläggelse kortar dess besvärjelse med 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Sveper in dig i skuggor och absorberar 420 skada i 5 sek. (skurktalang)',
   'entities.abilities.cone_of_cold.description':
@@ -13485,7 +13589,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den',
   'hudChrome.auraEffect.oldBlood':
-    'Gammalt Blod: steg {stacks} av {max}. Träffande Varg- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
+    'Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross',
   'hudChrome.auraEffect.verdance':
     'Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning',
   'hudChrome.continentMap.levels': 'Nivåer {min} till {max}',
@@ -13694,7 +13798,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Härdar din hud till svalnande slagg i 10 sek, vilket minskar all mottagen skada med 25%.',
   'entities.abilities.cinderhide.name': 'Cinderhide',
   'entities.abilities.claw.description':
-    'Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Vargform.',
+    'Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.claw.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.cold_blood.description':
@@ -13729,7 +13833,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Avslutande drag som exponerar målet i 30 sek: varje förbrukat kombopoäng minskar dess rustning med 2% (5 kombopoäng: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Minskar målets rustning med {damage}% i 40 sek.',
   'entities.abilities.ferocious_bite.description':
-    'Avslutande drag som orsakar {damage}. Endast i Vargform.',
+    'Avslutande drag som orsakar {damage}. Endast i Kattform.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi.',
   'entities.abilities.funeral_harvest.description':
@@ -13744,7 +13848,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     'Slår fienden för vapenskada plus {damage}, orsakar blödningsskada under 12 sek och ökar mottagen blödningsskada med 40%. Ger 1 kombopoäng. Var 2:a användning lägger till 1 Skymningsförråd (max 3). (Skulduggery-motorn)',
   'entities.abilities.hex_of_violence.description':
-    'Förhäxar fienden i 8 sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada.',
+    'Förhäxar fienden i 8 sek, vållar skuggskada och genererar 2 Fördömelse var 2:e sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada.',
   'entities.abilities.hex_of_violence.name': 'Hex of Violence',
   'entities.abilities.hour_of_judgment.description':
     'Kallar fram dom över ditt primära Evil Eye i 15 sek, vilket ger 40 Fördömelse och 3 Ödestrådar, aktiverar Possession, fördubblar Fördömelse genererad genom det primära Eye, och ökar Sentence-skada med 20%. Den första Sentence återbetalar 50 Fördömelse.',
@@ -13787,7 +13891,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Förbrukar 1 Själfragment för att lägga till en beständig Skeletal Warrior i ditt Herravälde med 2 platser. Endast en kan tjäna dig. Den klyver närliggande fiender för 45% skada var 6:e sek, och Reaping Command förlångsammar dess mål med 40% i 4 sek.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Vargform.',
+    'Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.',
   'entities.abilities.rake.specNote_feral':
     'Varje träffande slag lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.reaping_command.description':
@@ -13801,10 +13905,10 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Att plantera en NY blomning lägger till 1 Grönska (max 5). Vid 5 Grönska blir Snabb läkning Överblomning.',
   'entities.abilities.rip.description':
-    'Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Vargform.',
+    'Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Kattform.',
   'entities.abilities.rip.specNote_feral': 'Det landade slaget lägger till 1 Gammalt Blod (max 3).',
   'entities.abilities.ruinous_brand.description':
-    'Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål.',
+    'Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål. Fördärvsbult-ekon räknas också som kritiska träffar, utan ytterligare multiplikator för kritisk skada.',
   'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
   'entities.abilities.rupture.description':
     'Avslutande drag som sårar målet: det blöder var 2:e sek, i 6 sek plus 2 sek per kombopoäng (5 kombopoäng: 16 sek och {damage} total skada).',
@@ -14310,13 +14414,13 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Håll i den vänstra stötfångaren och tryck på den övre ansiktsknappen för att placera stången med kontrollen.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Ordna: bekräfta plockar upp från en cell eller stavningsboken och släpper på en cell, avbryt rensar en.',
+    'Ordnar · d-paden flyttar · bekräfta plockar upp och placerar · avbryt rensar en cell',
   'hudChrome.controller.crossHotbarEnable': 'Aktivera Cross Hotbar',
   'hudChrome.controller.crossHotbarExpand': 'Double Cross Hotbar',
   'hudChrome.controller.crossHotbarHelp':
     'Håll en avtryckare för att tända åtta action-bar-fack på d-pad- och ansiktsknapparna. Tryck på den andra utlösaren för att byta till den andra uppsättningen.',
   'hudChrome.controller.crossHotbarOwnsButtons':
-    'Triggarna och d-paden tillhör cross hotbar medan den är på, så de ställs in nedan istället för här.',
+    'Triggarna ändrar cross hotbar medan den är på. D-padens riktningar förblir redigerbara här, för menyer och förflyttning.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Återställ Cross Hotbar',
   'hudChrome.controller.cycleHudAction': 'Cykelgränssnitt',
@@ -16687,7 +16791,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.',
   'guide.interfacePage.framesGovernedExtra':
-    'Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.',
+    'Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, recept du fäst vid tillverkning, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.',
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Din ram, din målram och dina gruppmedlemsramar kan alla flyttas. Varje ram har en liten flyttknapp i hörnet: lås upp den, dra ramen dit du vill och lås den igen så att ett felklick inte kan flytta den. Redigera ramar, högst upp på ramfliken i gränssnittsalternativen, frigör resten av gränssnittet på en gång, tillsammans med dessa tre ramar: åtgärdsraderna, kastningsraden, svängraden, erfarenhetsraden, minimap, knappraden, husdjursramen, stansraden, raderna för förstärkningar och försvagningar samt namnmarkeringen för önskelistepåminnelsen. Var och en får en namnmarkering när den är frigjord. Om de hamnar någonstans du ångrar återställer Återställ standardvärden längst ned på samma ramflik dem alla till där de började.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -16695,7 +16799,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.hubPracticeTrackerBody':
     'Nära navet i Östbäck läggs en övningsspårare till i stacken när du tar de vägledda övningslektionerna där: den håller dina bästa försök mot övningsdockorna synliga. Medan en lektion är aktiv visar en coachningsrad bredvid den det aktuella steget i lektionen, från att öppna Skademätare till att jämföra ett andra försök.',
   'guide.interfacePage.mapBodyZoneFirst':
-    'M öppnar världskartan över zonen där du står, med din egen pil, sevärdheterna omkring dig, uppdragsgivarna med sina markeringar och områdena där dina mål finns, tillverkningsstationerna, brevlådorna, anslagstavlorna och odlingsbäddarna, ingångarna till fängelsehålorna och varje insamlingsnod i zonen. Noder är gråtonade medan de växer tillbaka och markerade när dina verktyg inte räcker till. Din grupp visas också på kartan. Högerklicka på kartan eller tryck på dess knapp Världskarta så zoomar den ut till kontinenten, där varje zon ritas med sitt namn och ett klick på en zon öppnar dess karta. Kliv in i ett djup, en fängelsehåla, en spricka eller ett slottsfäste så växlar kartan till en planritning över platsen där du står; slagfältet Törnhålefälten har en egen fältkarta.\n\nLängs höger sida, under minimappen, håller en stack av spårare din aktuella verksamhet synlig utan att något behöver öppnas: dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i och varje spricka du deltar i. Uppdragsspåraren kan fällas ihop när du vill ha tillbaka skärmen.',
+    'M öppnar världskartan över zonen där du står, med din egen pil, sevärdheterna omkring dig, uppdragsgivarna med sina markeringar och områdena där dina mål finns, tillverkningsstationerna, brevlådorna, anslagstavlorna och odlingsbäddarna, ingångarna till fängelsehålorna och varje insamlingsnod i zonen. Noder är gråtonade medan de växer tillbaka och markerade när dina verktyg inte räcker till. Din grupp visas också på kartan. Högerklicka på kartan eller tryck på dess knapp Världskarta så zoomar den ut till kontinenten, där varje zon ritas med sitt namn och ett klick på en zon öppnar dess karta. Kliv in i ett djup, en fängelsehåla, en spricka eller ett slottsfäste så växlar kartan till en planritning över platsen där du står; slagfältet Törnhålefälten har en egen fältkarta.\n\nLängs höger sida, under minimappen, håller en stack av spårare din aktuella verksamhet synlig utan att något behöver öppnas: dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, recept du fäst vid tillverkning, djupet du befinner dig i och varje spricka du deltar i. Uppdragsspåraren kan fällas ihop när du vill ha tillbaka skärmen.',
   'guide.interfacePage.mobileBodyTwoPages':
     'Pekkontroller visas av sig själva och layouten anpassar sin storlek efter din skärm: kompakt på en liten telefon, normal på en större telefon och rymligare på en surfplatta.\n\nDina förmågor ligger i en ring i stället för på en sifferrad: attackknappen med fyra åtgärdsknappar intill sig och en sidväxlare som byter ringen mellan dess {pages} sidor. Tillsammans når de alla {slots} av dina förmågeplatser, oavsett om de extra skrivbordsraderna är påslagna eller inte. Ringens femte bågposition är platsen för dina förbrukningsvaror: tryck på den för att använda det som ligger där, eller håll kvar fingret eller svep inåt för att öppna en rad som fylls av det du bär med dig. Runt ringen finns knapparna en pekspelare oftast behöver: byt mål, använd det som står framför dig och hoppa.\n\nEn kontroll för Snabbåtgärder sitter vid nederkanten i stället för en knapprad. Den öppnar allt annat: riddjur, chatt, karta, väskor, socialt, uppdrag, karaktär, besvärjelsebok, spelmeny och posten Mer, som bland annat rymmer resten av dina fönster, fängelsehålesökaren, PvP, emoter och wikin. Fönster fyller skärmen här i stället för att sväva ovanpå den.\n\nAtt flytta dina enhetsramar hör till skrivbordet: med pekstyrning placerar layouten dem åt dig.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -16773,7 +16877,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Hur mynt rör sig genom yrkena: de exakta avgifterna och sänkorna, vad som faktiskt säljer, Världsmarknadens regler, arbetsordrar, beställningar och raidfinansierade samlingars plats vid sidan av vanlig tillverkning.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; öppna Källor för hela listan. Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.',
+    'Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.',
   'guide.profPages.effectFeast':
     'Dukar upp en festmåltid som andra kan äta av, en portion var: {servings} portioner, varar i {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -16789,7 +16893,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.perfectedOnly': 'Endast fulländad',
   'guide.profPages.ench.tier.lucent': 'Lysande',
   'guide.profPages.faq.a1':
-    'Färdiga föremål följer fortfarande den strikta instansregeln: två kopior slås bara ihop när undertecknare, rullade egenskaper, mästerverksegenskaper, förtrollning, bindning och all annan identitet matchar exakt. En signerad klinga hålls därför isär från en vanlig.\n\nMaterial är undantaget. Kompatibla staplar av samma material kan slås ihop även när deras samlare eller undertecknare skiljer sig, eftersom stapeln behåller ett antal för varje källa. Verktygstipset vid hovring sammanfattar källorna; öppna Källor för hela listan. Separera efter samlare håller staplarna isär i väskorna och sortering respekterar valet. Överfört material kan staplas normalt med mottagarens material.',
+    'Färdiga föremål följer fortfarande den strikta instansregeln: två kopior slås bara ihop när undertecknare, rullade egenskaper, mästerverksegenskaper, förtrollning, bindning och all annan identitet matchar exakt. En signerad klinga hålls därför isär från en vanlig.\n\nMaterial är undantaget. Kompatibla staplar av samma material kan slås ihop även när deras samlare eller undertecknare skiljer sig, eftersom stapeln behåller ett antal för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller staplarna isär i väskorna och sortering respekterar valet. Överfört material kan staplas normalt med mottagarens material.',
   'guide.profPages.faq.a11Promotion':
     'Tillverka eller köp en Mästersmidd toppdel och fullända den: med 125 i skicklighet i yrket som skapade den förbrukar varje försök en Skaparens glöd, en Söndrad essens och en Prismglasinfattning, lyckas fyra gånger av fem och skadar aldrig delen när det misslyckas. Det första försöket binder delen till dig, och fyra lyckade ranghöjningar gör den fulländad. Använd sedan en Skapandets bedrift, en skrivarehandling på skicklighet 125 som vem som helst kan köpa eller beställa, för att befordra den fulländade kopian till en legendarisk del med vilket namn du väljer. Befordran är deterministisk: ingen rullning, egenskaperna ändras inte och bara namn och färg ändras.',
   'guide.profPages.faq.a2':

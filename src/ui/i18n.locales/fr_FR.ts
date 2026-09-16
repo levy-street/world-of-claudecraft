@@ -13,6 +13,112 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.cannotCastWhileMoving': 'Vous ne pouvez pas lancer de sort en vous déplaçant.',
+  'hudChrome.auraEffect.wolfForm':
+    'Forme de chat : dégâts de mêlée et énergie ; vitesse de déplacement augmentée de {pct}%',
+  'hudChrome.auraOverlay.cues.anvilStrike': "Coup d'enclume",
+  'hudChrome.auraOverlay.cues.blaringHorn': "Corne d'alarme",
+  'hudChrome.auraOverlay.cues.bubblePop': 'Éclatement de bulle',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Klaxon de voiture',
+  'hudChrome.auraOverlay.cues.catMeow': 'Miaulement de chat',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Chute de pièce',
+  'hudChrome.auraOverlay.cues.electricZap': 'Décharge électrique',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Coassement de grenouille',
+  'hudChrome.auraOverlay.cues.glassPing': 'Tintement de verre',
+  'hudChrome.auraOverlay.cues.hardBell': 'Cloche métallique',
+  'hudChrome.auraOverlay.cues.musicBox': 'Boîte à musique',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Hululement de chouette',
+  'hudChrome.auraOverlay.cues.softChime': 'Carillon doux',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Écho de sonar',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Sifflement de vapeur',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Épée dégainée',
+  'hudChrome.auraOverlay.cues.templeGong': 'Gong de temple',
+  'hudChrome.auraOverlay.cues.waterDrop': "Goutte d'eau",
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Souffle du vent',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Hurlement de loup',
+  'hudChrome.auraOverlay.haptic': 'Vibration',
+  'hudChrome.auraOverlay.hapticHint':
+    "Fait vibrer une manette connectée, ou votre téléphone. Ignoré si l'appareil ne prend pas en charge les vibrations.",
+  'hudChrome.auraOverlay.hapticNone': 'Désactivé',
+  'hudChrome.auraOverlay.haptics.double': 'Doublée',
+  'hudChrome.auraOverlay.haptics.long': 'Longue',
+  'hudChrome.auraOverlay.haptics.tap': 'Brève',
+  'hudChrome.auraOverlay.readyGlow': "Lueur de barre d'action",
+  'hudChrome.auraOverlay.readyGlowHint':
+    "Fait s'illuminer ce sort sur votre barre d'action tant que son amélioration est active.",
+  'hudChrome.auraOverlay.reticleTick': 'Marque de réticule',
+  'hudChrome.auraOverlay.reticleTickHint':
+    "Ajoute une marque près du centre de l'écran qui s'illumine quand ce sort se déclenche.",
+  'hudChrome.auraOverlay.sound': "Son d'alerte",
+  'hudChrome.auraOverlay.soundHint':
+    "Un son se joue chaque fois que ce sort se déclenche. Désactivez l'icône, les croissants latéraux et l'anneau au sol pour que seul le son l'annonce.",
+  'hudChrome.auraOverlay.soundNone': 'Aucun son',
+  'hudChrome.auraOverlay.soundPreview': 'Écouter',
+  'hudChrome.auraOverlay.soundPreviewAria': "Écouter le son d'alerte {sound}",
+  'hudChrome.auraOverlay.soundVolume': 'Volume du son',
+  'hudChrome.auraOverlay.watchlist': 'Sorts surveillés',
+  'hudChrome.auraOverlay.watchlistCount': '{count} surveillés',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    "Aucun autre sort de votre grimoire ne vous accorde d'amélioration.",
+  'hudChrome.auraOverlay.watchlistHint':
+    "Choisissez n'importe quel sort qui vous améliore pour lui donner sa propre aura. Les sorts choisis reçoivent une fiche complète ci-dessous, avec leur propre icône, couleur, position et anneau au sol.",
+  'hudChrome.auraOverlay.watchlistUnwatch': 'Arrêter de surveiller {spell}',
+  'hudChrome.auraOverlay.watchlistWatch': 'Surveiller {spell}',
+  'hudChrome.bank.quantityStepDownAria': 'Diminuer la quantité de {count}',
+  'hudChrome.bank.quantityStepUpAria': 'Augmenter la quantité de {count}',
+  'hudChrome.deeds.accountScopeHint':
+    "Un haut fait accompli par n'importe quel personnage de votre compte est aussi acquis ici, et le Livre indique qui l'a accompli.",
+  'hudChrome.deeds.accountScopeNote': 'Partagé par tous les personnages de votre compte',
+  'hudChrome.deeds.earnedBy': 'Obtenu par {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} ({date})',
+  'hudChrome.finder.lootHeroicChance': 'Bonus héroïque, butins supplémentaires possibles :',
+  'hudChrome.finder.lootHeroicMaybe': 'Bonus héroïque, au plus un de ces objets peut apparaître :',
+  'hudChrome.keybinds.friendlyNameplates': 'Basculer les plaques de nom amies',
+  'hudChrome.leaderboard.podiumLabel': 'Les trois premiers',
+  'hudChrome.leaderboard.prestigeTitle': 'Rang Prestige {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Non réclamé',
+  'hudChrome.materialSources.decreaseByAria': 'Retirer {count} unités de {source}',
+  'hudChrome.materialSources.fits': "Jusqu'à {units} peuvent tenir pour l'instant",
+  'hudChrome.materialSources.increaseByAria': 'Ajouter {count} unités de {source}',
+  'hudChrome.materialSources.moveAll': 'Déplacer toutes les unités',
+  'hudChrome.noticeboard.filterEmpty':
+    "Aucune guilde n'a encore ouvert ses portes aux nouveaux joueurs.",
+  'hudChrome.noticeboard.filterNewPlayersTitle':
+    'Afficher uniquement les guildes qui accueillent les nouveaux joueurs',
+  'hudChrome.noticeboard.filters': 'Filtres du tableau',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Ouverte aux nouveaux joueurs',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Cette guilde accueille les nouveaux joueurs',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Officiers en ligne',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Officiers en ligne : {names}',
+  'hudChrome.noticeboard.showAll': 'Afficher toutes les guildes',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    "Affiché sur le tableau des recrues, au poteau indicateur du Rivage de l'Épreuve.",
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Ouverte aux nouveaux joueurs',
+  'hudChrome.plurals.guildBoardShown.few': '{count} guildes affichées',
+  'hudChrome.plurals.guildBoardShown.many': '{count} guildes affichées',
+  'hudChrome.plurals.guildBoardShown.one': '{count} guilde affichée',
+  'hudChrome.plurals.guildBoardShown.other': '{count} guildes affichées',
+  'hudChrome.professionTrainers.alchemy': 'Maître alchimiste',
+  'hudChrome.professionTrainers.blacksmithing': 'Maître forgeron',
+  'hudChrome.professionTrainers.cooking': 'Maître cuisinier',
+  'hudChrome.professionTrainers.engineering': 'Maître ingénieur',
+  'hudChrome.professionTrainers.farming': 'Maître jardinier',
+  'hudChrome.professionTrainers.hobby': 'Maître des loisirs',
+  'hudChrome.professionTrainers.leatherworking': 'Maître tanneur',
+  'hudChrome.professionTrainers.mining': 'Maître mineur',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Maître tailleur',
+  'hudChrome.reliquary.finderWithDate': '{name} ({date})',
+  'hudChrome.reliquary.foundBy': 'Trouvée par {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    "Une relique trouvée par n'importe quel personnage de votre compte remplit aussi la page ici.",
+  'hudChrome.reliquary.sharedScopeNote': 'Partagé par tous les personnages de votre compte',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Bienvenue à Eastbrook ! Le maréchal Redbrook a du travail pour vous sur la place du village. Activez le guidage doré pour le trouver et suivre Des loups à la porte, ou explorez par vous-même. Vous pouvez modifier ce réglage plus tard dans Options, Interface, Combat.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Désactiver le guidage',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Activer le guidage',
+  'hudChrome.tutorialGreeting.guidanceSetting': "Guidage doré d'Eastbrook",
   'devCommand.actions.farmgrow.description':
     'Amène vos parcelles plantées à leur maturité, ou une parcelle par identifiant. Rien d’autre ne change : le résultat a été tiré au moment de la plantation.',
   'devCommand.actions.farmgrow.label': 'Faire mûrir les cultures',
@@ -1024,7 +1130,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     "La forme de déplacement : bien plus rapide au sol, mais sans aucune autre capacité tant que vous n'en changez pas.",
   'guide.classPage.formName.form_bear': 'Forme de Bruin',
-  'guide.classPage.formName.form_cat': 'Forme de loup',
+  'guide.classPage.formName.form_cat': 'Forme de chat',
   'guide.classPage.formName.form_travel': 'Forme de Fleet',
   'guide.classPage.formsHeading': 'Changement de forme',
   'guide.classPage.formsMoonwing':
@@ -1054,7 +1160,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "La mer n'a pas de mur. Les traversées que le monde attend de vous, les détroits et les étendues d'eau entre deux bandes de terre, ainsi que les lacs intérieurs, se traversent en toute sécurité, quel que soit le temps que cela prenne. Aventurez-vous en revanche au-delà du rivage, en pleine mer ouverte, et cela commence à drainer vos forces : un avertissement apparaît, vous disposez d'une réelle marge pour faire demi-tour, et après cela la mer inflige des dégâts de plus en plus lourds que rien ne peut empêcher tant que vous ne revenez pas vers la terre. Vous noyer ou vous épuiser aussi loin du rivage vous libère comme n'importe quelle autre mort, alors traitez l'horizon comme un décor plutôt que comme une destination.",
   'guide.combat.hazardsTitle': "L'eau peut vous tuer",
   'guide.combat.threatBody':
-    "Chaque ennemi tient un décompte privé de qui l'a le plus agacé. Les dégâts s'y ajoutent, et les soins aussi : un soin place de la menace sur les ennemis qui combattent déjà la personne soignée, répartie entre eux, si bien que le soin le plus sûr est celui porté sur quelqu'un que le tank tient déjà. Les tanks activent une posture de garde ou une forme protectrice qui multiplie tout ce qu'ils génèrent, tandis que la Forme de loup du druide dissipe la menace au lieu d'en accumuler, et une provocation propulse d'un coup le lanceur en tête du décompte et force l'ennemi à s'acharner sur lui pendant quelques secondes. Les ennemis ne changent pas de cible à l'instant même où quelqu'un dépasse le tank : il faut une avance nette pour en détourner un, et une avance plus grande à distance qu'au corps à corps, si bien qu'un peu de patience au début d'un pull garde le combat là où il doit être.",
+    "Chaque ennemi tient un décompte privé de qui l'a le plus agacé. Les dégâts s'y ajoutent, et les soins aussi : un soin place de la menace sur les ennemis qui combattent déjà la personne soignée, répartie entre eux, si bien que le soin le plus sûr est celui porté sur quelqu'un que le tank tient déjà. Les tanks activent une posture de garde ou une forme protectrice qui multiplie tout ce qu'ils génèrent, tandis que la Forme de chat du druide dissipe la menace au lieu d'en accumuler, et une provocation propulse d'un coup le lanceur en tête du décompte et force l'ennemi à s'acharner sur lui pendant quelques secondes. Les ennemis ne changent pas de cible à l'instant même où quelqu'un dépasse le tank : il faut une avance nette pour en détourner un, et une avance plus grande à distance qu'au corps à corps, si bien qu'un peu de patience au début d'un pull garde le combat là où il doit être.",
   'guide.combat.threatTitle': "Qui l'ennemi frappe",
   'guide.combat.unstuckBody':
     "Si le monde vous piège quelque part dont vous ne pouvez pas sortir, tapez /unstuck. Vous devez être hors combat et immobile, non entravé par un étourdissement ou une immobilisation, et non engagé dans un duel ou un match d'arène : un court compte à rebours démarre, et bouger ou subir des dégâts l'annule. Une fois terminé, vous êtes déposé au cimetière le plus proche. Cela ne vous tue jamais et ne laisse aucun cadavre, et si vous étiez déjà tombé, cela vous relève sur place à la place. Le prix en est le Mal de déblocage, un affaiblissement temporaire de tout ce que vous êtes qui s'est dissipé le temps que vous puissiez réutiliser la commande, et comme le Glas du Veilleur, il épargne entièrement les personnages tout neufs.",
@@ -3339,7 +3445,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Lancez un éclat de glace infligeant {damage} points de dégâts de Givre, triplés contre une cible gelée. Dépense Fingers of Frost ou une charge de Morsure de l'hiver pour traiter la cible comme gelée. (Givre)",
   'entities.abilities.ice_lance.name': 'Lance de glace',
   'entities.abilities.perfect_moment.description':
-    "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas. (Chromancie)",
+    "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas et infligent 20% de dégâts supplémentaires. (Chromancie)",
   'entities.abilities.perfect_moment.name': 'Moment parfait',
   'entities.abilities.shatter.name': 'Ruine fragile',
   'entities.abilities.temporal_acceleration.description':
@@ -6667,7 +6773,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresCombo': 'Cette technique requiert des points de combo.',
   'hud.errors.requiresForm': 'Vous devez être en forme de {form}.',
   'hud.errors.bear': 'Bruin',
-  'hud.errors.cat': 'loup',
+  'hud.errors.cat': 'chat',
   'hud.errors.travel': 'Fleet',
   'hud.errors.cantInForm': 'Vous ne pouvez pas faire cela en forme de {form}.',
   'hud.errors.shapeshifted': 'Vous ne pouvez pas faire cela en forme changeante.',
@@ -6920,8 +7026,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'mana',
   'abilityUi.resources.rage': 'rage',
   'abilityUi.resources.energy': 'énergie',
-  'abilityUi.forms.bear': 'ours',
-  'abilityUi.forms.cat': 'loup',
+  'abilityUi.forms.bear': 'Bruin',
+  'abilityUi.forms.cat': 'chat',
   'abilityUi.cast.fishing': 'Pêche',
   'abilityUi.cast.gathering': 'Collecte',
   'abilityUi.cast.thunzharrStormcall': 'Appel de la tempête',
@@ -7562,12 +7668,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Enracine la cible sur place pendant un maximum de 12 s.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
-    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
+    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Brise-os',
   'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
     'Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement.',
-  'entities.abilities.cat_form.name': 'Forme de loup',
+  'entities.abilities.cat_form.name': 'Forme de chat',
   'entities.abilities.cat_form.description':
     "Vous transforme en loup : l'agilité monte avec votre niveau, puissance d'attaque +8 plus 2 par niveau, vos attaques utilisent de l'énergie et des points de combo, et vous générez 29% de menace en moins. Passer sous une forme quelconque octroie Foulée bondissante : 60% de vitesse de déplacement pendant 3 s, une fois toutes les 20 s. Lancez de nouveau pour revenir en forme de lanceur de sorts.",
   'entities.abilities.claw.name': 'Griffe lacérante',
@@ -7580,7 +7686,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Chute céleste',
   'entities.abilities.travel_form.name': 'Forme de Fleet',
   'entities.abilities.travel_form.description':
-    "Adopte instantanément une forme de Fleet rapide, augmentant la vitesse de déplacement de 40%. Vous ne pouvez pas utiliser d'autres capacités sous cette forme, mais vous pouvez l'adopter ou la quitter en combat, idéale pour fuir.",
+    "Adopte instantanément une forme de Fleet rapide, augmentant la vitesse de déplacement de 40% et supprimant les racines et ralentissements brisables. Vous ne pouvez pas utiliser d'autres capacités sous cette forme, mais vous pouvez l'adopter ou la quitter en combat, idéale pour fuir. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement.",
   'entities.abilities.enrage.name': 'Attiser',
   'entities.abilities.enrage.description':
     'Génère 20 points de rage instantanément. Forme de Bruin uniquement.',
@@ -7593,7 +7699,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Plonge la cible dans un sommeil profond pendant 8 s maximum. Tout dégât la réveille.',
   'entities.abilities.dash.name': 'Sprint',
   'entities.abilities.dash.description':
-    'Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de loup uniquement.',
+    'Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de chat uniquement.',
   'entities.abilities.pounce.name': 'Frappe furtive',
   'entities.abilities.lunge.description':
     "Bondit sur un ennemi jusqu'à 12 m, inflige 60% des dégâts de l'arme et octroie 1 point de combo. Forme de loup uniquement.",
@@ -7606,9 +7712,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.insect_swarm.name': 'Nuée cinglante',
   'entities.abilities.insect_swarm.description':
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
-  'entities.abilities.tigers_fury.name': 'Sang de loup',
+  'entities.abilities.tigers_fury.name': 'Sang de lynx',
   'entities.abilities.tigers_fury.description':
-    "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
+    "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de chat uniquement.",
   'entities.abilities.rip.name': 'Faille sanglante',
   'entities.abilities.mortal_strike.name': 'Frappe mutilante',
   'entities.abilities.mortal_strike.description':
@@ -7704,10 +7810,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient {charges} charges. (Signature Destruction)',
   'entities.abilities.moonkin_form.name': 'Forme de sélénien',
   'entities.abilities.moonkin_form.description':
-    'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
+    "Adopte la forme de sélénien, renforçant l'incantation jusqu'à ce que vous changiez de nouveau. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)",
   'entities.abilities.feral_charge.name': 'Déferlante primordiale',
   'entities.abilities.feral_charge.description':
-    "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
+    "Libère une déferlante primordiale. En Forme de chat, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
   'entities.abilities.swiftmend.name': 'Prompte guérison',
   'entities.abilities.crusader_strike.description':
     'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
@@ -11620,7 +11726,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les Prouesses forment une étagère à part: les annales de l'héritage et des premières mondiales, ces hauts faits liés à une époque révolue ou à un instant qui ne se produira qu'une seule fois. Elles ne rapportent aucune Renommée et restent hors du compte d'achèvement, conservées à jamais en mémoire de ce qui fut accompli.",
   'guide.deedsPage.featsHeading': 'Prouesses',
   'guide.deedsPage.howBody':
-    "Les hauts faits s'obtiennent et se conservent personnage par personnage, si bien que chaque héros que vous jouez se bâtit son propre Livre ; seul le Classement du royaume rassemble votre Renommée sur l'ensemble des personnages que vous jouez, en ne comptant chaque haut fait qu'une seule fois. Chaque haut fait énonce clairement ce qu'il attend de vous, directement dans le Livre des hauts faits en jeu, si bien que vous savez toujours quoi viser, et vous pouvez suivre ceux que vous convoitez pour les garder sous les yeux en jouant. Une petite poignée restent secrets et ne se dévoilent qu'une fois obtenus. Le Livre se tient aussi honnête : tout ce que votre passé peut prouver, il vous le crédite sur-le-champ, si bien qu'un vétéran ne l'ouvre jamais sur une page vide ; seuls les hauts faits à décompte commencent leur comptage de zéro.",
+    "Les hauts faits s'obtiennent personnage par personnage, mais le Livre des hauts faits est partagé par tous les personnages de votre compte : un haut fait accompli par l'un d'eux est acquis pour tous, le Livre indique qui l'a accompli et quand, et un titre ou une bordure qu'il octroie peut être porté par n'importe lequel de vos personnages. Le Classement du royaume rassemble votre Renommée de la même façon, en ne comptant chaque haut fait qu'une seule fois. Chaque haut fait énonce clairement ce qu'il attend de vous, directement dans le Livre des hauts faits en jeu, si bien que vous savez toujours quoi viser, et vous pouvez suivre ceux que vous convoitez pour les garder sous les yeux en jouant. Une petite poignée restent secrets et ne se dévoilent qu'une fois obtenus. Le Livre se tient aussi honnête : tout ce que votre passé peut prouver, il vous le crédite sur-le-champ, si bien qu'un vétéran ne l'ouvre jamais sur une page vide ; seuls les hauts faits à décompte commencent leur comptage de zéro.",
   'guide.deedsPage.howHeading': 'Comment fonctionnent les hauts faits',
   'guide.deedsPage.intro':
     "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",
@@ -12561,7 +12667,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un boss de la puissance d'un raid qui surgit dans le monde ouvert à un rythme régulier, affronté par quiconque se rassemble pour répondre à l'appel plutôt que par un groupe fixe.",
   'guide.glossary.worldBossTerm': 'Boss de monde',
   'guide.models.formBear': 'Forme de Bruin',
-  'guide.models.formCat': 'Forme de loup',
+  'guide.models.formCat': 'Forme de chat',
   'guide.models.formTravel': 'Forme de Fleet',
   'guide.models.groupForms': 'Formes de druide',
   'guide.nav.sidebarLabel': 'Rubriques du guide',
@@ -12696,7 +12802,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     "Frappe jusqu'à 3 ennemis dans un rayon de 10 m pour {damage} points de dégâts de Nature chacun. Élémentaire : un coup au but accorde 1 Tonnerre. Les dégâts augmentent avec la puissance des sorts.",
   'entities.abilities.chaos_bolt.description':
-    'Dépense 3 Dévastation pour lancer un lourd trait de feu chaotique infligeant {damage} points de dégâts de Feu. Ruine raccourcit son incantation de 30%.',
+    'Dépense 3 Dévastation pour lancer un lourd trait de feu chaotique infligeant {damage} points de dégâts de Feu avant application des dégâts critiques. Assène toujours un coup critique en cas de touche. Ruine raccourcit son incantation de 30%.',
   'entities.abilities.cloak_of_shadows.description':
     "Vous enveloppe d'ombres et absorbe 420 points de dégâts pendant 5 s. (talent de Voleur)",
   'entities.abilities.cone_of_cold.description':
@@ -14113,7 +14219,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
   'hudChrome.auraEffect.oldBlood':
-    'Sang ancien : cran {stacks} sur {max}. Les frappes portées en loup et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
+    'Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
   'hudChrome.auraEffect.verdance':
     'Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison',
   'hudChrome.riftTracker.title': 'Faille',
@@ -14224,7 +14330,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Durcit votre peau en scorie refroidissante pendant 10 s, réduisant tous les dégâts subis de 25%.',
   'entities.abilities.cinderhide.name': 'Peau de braise',
   'entities.abilities.claw.description':
-    "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement.",
+    "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.claw.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.cold_blood.description':
     'Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)',
@@ -14259,7 +14365,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description':
     "Réduit l'armure de la cible de {damage}% pendant 40 s.",
   'entities.abilities.ferocious_bite.description':
-    'Technique de finition qui inflige {damage}. Forme de loup uniquement.',
+    'Technique de finition qui inflige {damage}. Forme de chat uniquement.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie.',
   'entities.abilities.funeral_harvest.description':
@@ -14274,7 +14380,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Fourberie)",
   'entities.abilities.hex_of_violence.description':
-    "Maudit l'ennemi pendant 8 s. Ses 3 prochaines actions offensives génèrent chacune 7 Condamnation et lui infligent 17 points de dégâts d'Ombre.",
+    "Maudit l'ennemi pendant 8 s, lui infligeant des dégâts d'Ombre et générant 2 Condamnation toutes les 2 s. Ses 3 prochaines actions offensives génèrent chacune 7 Condamnation et lui infligent 17 points de dégâts d'Ombre.",
   'entities.abilities.hex_of_violence.name': 'Malédiction de violence',
   'entities.abilities.hour_of_judgment.description':
     "Appelle le jugement sur votre Mauvais œil principal pendant 15 s, accordant 40 Condamnation et 3 Fils du destin, activant la Possession, doublant la Condamnation générée par l'Œil principal, et augmentant les dégâts de Sentence de 20%. La première Sentence rembourse 50 Condamnation.",
@@ -14317,7 +14423,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Dépense 1 Fragment d'âme pour ajouter un Guerrier squelette permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s.",
   'entities.abilities.raise_skeletal_warrior.name': 'Relever un Guerrier squelette',
   'entities.abilities.rake.description':
-    "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et cause des dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de loup uniquement.",
+    "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et cause des dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.rake.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.reaping_command.description':
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
@@ -14330,10 +14436,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5). À 5 Verdoyance, Prompte guérison devient Surfloraison.',
   'entities.abilities.rip.description':
-    'Technique de finition qui fait saigner la cible toutes les 2 s pendant 24 s : 36 dégâts plus 24 par point de combo dépensé (5 points de combo : {damage} au total). Forme de loup uniquement.',
+    'Technique de finition qui fait saigner la cible toutes les 2 s pendant 24 s : 36 dégâts plus 24 par point de combo dépensé (5 points de combo : {damage} au total). Forme de chat uniquement.',
   'entities.abilities.rip.specNote_feral': 'Le coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.ruinous_brand.description':
-    "Marque un ennemi pendant 15 s. Vos 3 prochains sorts directs se répercutent pour 25% de dégâts contre l'ennemi marqué, ou lui recopient 50% de dégâts quand ils sont lancés sur une autre cible.",
+    "Marque un ennemi pendant 15 s. Vos 3 prochains sorts directs se répercutent pour 25% de dégâts contre l'ennemi marqué, ou lui recopient 50% de dégâts quand ils sont lancés sur une autre cible. Les répercussions de Trait de ruine comptent aussi comme coups critiques, sans multiplicateur de dégâts critiques supplémentaire.",
   'entities.abilities.ruinous_brand.name': 'Marque ruineuse',
   'entities.abilities.rupture.description':
     'Technique de finition qui blesse la cible : elle saigne toutes les 2 s, pendant 6 s plus 2 s par point de combo (5 points de combo : 16 s et {damage} dégâts au total).',
@@ -14872,13 +14978,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Organisation : confirmer le prélèvement dans une cellule ou le livre de sorts et le dépôt sur une cellule, annuler en efface un.',
+    'Organisation · le D-pad déplace · confirmer prend et pose · annuler vide une cellule',
   'hudChrome.controller.crossHotbarEnable': 'Activer la barre de raccourcis croisée',
   'hudChrome.controller.crossHotbarExpand': 'Barre de raccourcis double croix',
   'hudChrome.controller.crossHotbarHelp':
     "Maintenez une gâchette enfoncée pour allumer huit emplacements de barre d'action sur le pavé directionnel et les boutons du visage. Appuyez sur l'autre déclencheur pour passer au deuxième ensemble.",
   'hudChrome.controller.crossHotbarOwnsButtons':
-    "Les déclencheurs et le D-pad appartiennent à la barre de raccourcis croisée lorsqu'elle est activée, ils sont donc configurés ci-dessous plutôt qu'ici.",
+    "Les déclencheurs modifient la barre de raccourcis croisée lorsqu'elle est activée. Les directions du D-pad restent modifiables ici pour les menus et les déplacements.",
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Réinitialiser la barre de raccourcis croisée',
   'hudChrome.controller.cycleHudAction': 'Interface de cycles',
@@ -17110,7 +17216,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Modifier les cadres déverrouille aussi les six pistes d’auras facultatives après leur activation dans l’onglet Combat des mêmes options d’interface : Mes améliorations, Temps de recharge défensifs, Mes boucliers, Temps de recharge offensifs, Déplacement et furtivité, et Mes améliorations sur les alliés. Chaque piste est désactivée par défaut et porte sa propre étiquette lorsqu’elle est déverrouillée.',
   'guide.interfacePage.framesGovernedExtra':
-    'Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, l’exploration, la faille et la recette ou commission suivies), la barre d’action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d’affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu’il est déverrouillé.',
+    "Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, l'exploration, la faille et la recette ou commission suivies), la barre d'action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d'affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu'il est déverrouillé.",
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Votre cadre, votre cadre de cible et vos cadres de groupe peuvent tous être déplacés. Chacun possède un petit bouton de déplacement dans un coin : déverrouillez-le, faites glisser le cadre où vous le souhaitez, puis verrouillez-le afin qu’un clic égaré ne le déplace pas. Modifier les cadres, en haut de l’onglet Cadres des options d’interface, déverrouille tout le reste en même temps : barres d’action, barre d’incantation, barre de frappe, barre d’expérience, minicarte, rail de boutons, cadre du familier, barre de posture, lignes d’améliorations et d’affaiblissements et étiquette de rappel de liste de souhaits. Si le résultat ne vous convient pas, Réinitialiser par défaut, en bas du même onglet, remet tout à sa place.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -17118,7 +17224,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.hubPracticeTrackerBody':
     'Près du hub d’Eastbrook, un suivi d’entraînement rejoint la pile lorsque vous prenez les leçons guidées : il garde vos meilleurs résultats contre les mannequins d’entraînement. Pendant une leçon, une bande de coaching vous guide à travers l’étape actuelle, de l’ouverture des compteurs de dégâts à la comparaison d’un deuxième résultat.',
   'guide.interfacePage.mapBodyZoneFirst':
-    'M ouvre la carte de la zone où vous vous trouvez, avec votre flèche, les points d’intérêt, les donneurs de quêtes, les zones de vos objectifs, les stations d’artisanat, boîtes aux lettres, tableaux et parcelles, les entrées de donjons et tous les nœuds de récolte, grisés pendant leur repousse ou marqués lorsque vos outils sont insuffisants. Votre groupe apparaît aussi. Faites un clic droit sur la carte ou appuyez sur le bouton Carte du monde pour reculer jusqu’au continent ; chaque zone porte son nom et un clic ouvre sa carte. Entrez dans une exploration, un donjon, une faille ou une forteresse pour passer au plan de l’étage ; le champ de bataille des Champs de Thornhollow possède sa propre carte.\n\nÀ droite, sous la minicarte, une pile de suivis garde vos activités visibles : quêtes et objectifs, hauts faits, pages du Reliquaire, exploration et faille en cours. Le suivi de quête se réduit quand vous voulez récupérer de l’espace.',
+    "M ouvre la carte de la zone où vous vous trouvez, avec votre flèche, les points d'intérêt, les donneurs de quêtes, les zones de vos objectifs, les stations d'artisanat, boîtes aux lettres, tableaux et parcelles, les entrées de donjons et tous les nœuds de récolte, grisés pendant leur repousse ou marqués lorsque vos outils sont insuffisants. Votre groupe apparaît aussi. Faites un clic droit sur la carte ou appuyez sur le bouton Carte du monde pour reculer jusqu'au continent ; chaque zone porte son nom et un clic ouvre sa carte. Entrez dans une exploration, un donjon, une faille ou une forteresse pour passer au plan de l'étage ; le champ de bataille des Champs de Thornhollow possède sa propre carte.\n\nÀ droite, sous la minicarte, une pile de suivis garde vos activités visibles : quêtes et objectifs, hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, exploration et faille en cours. Le suivi de quête se réduit quand vous voulez récupérer de l'espace.",
   'guide.interfacePage.mobileBodyTwoPages':
     'Les commandes tactiles apparaissent automatiquement et la disposition s’adapte à l’écran : compacte sur un petit téléphone, standard sur un grand téléphone et plus spacieuse sur une tablette.\n\nVos compétences sont disposées en anneau plutôt qu’en ligne de chiffres : bouton d’attaque et quatre boutons d’action, avec un bouton de page qui fait tourner l’anneau entre ses {pages} pages et couvre vos {slots} emplacements, même si les barres de bureau supplémentaires sont activées. Le cinquième arc accueille les consommables : touchez-le pour utiliser l’objet installé, maintenez-le ou faites-le glisser vers l’intérieur pour ouvrir une rangée remplie depuis vos sacs. Autour de l’anneau se trouvent les boutons essentiels au tactile : changer de cible, utiliser ce qui est devant vous et sauter.\n\nUn bouton Actions rapides se trouve au bord inférieur. Il ouvre le reste : monture, discussion, carte, sacs, social, quêtes, personnage, grimoire, menu et une entrée Plus contenant les autres fenêtres, dont le chercheur de donjons, le JcJ, les emotes et le wiki. Les fenêtres occupent tout l’écran au tactile.\n\nLe déplacement des cadres d’unités est réservé au bureau ; en tactile, la disposition les place automatiquement.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -17196,7 +17302,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'L’économie des métiers : frais et sources de pièces, objets vendus, règles du Marché mondial, commandes, commissions et place des collections financées par les raids.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Certains objets portent un nom. Les lignes de provenance d’un matériau indiquent qui a récolté chaque groupe d’unités, tandis qu’une marque distincte de signature identifie le signataire de qualité lorsqu’il y en a un. Ces faits sont indépendants : un matériau récolté ordinaire enregistre son collecteur sans recevoir de signature, et un stock ancien signé peut nommer son signataire tout en indiquant honnêtement qu’aucun récolteur n’a été enregistré. Une pièce terminée indique plutôt qui l’a fabriquée. Ces données voyagent avec l’objet lors des échanges, au coffre, par courrier, au Marché mondial et même lors d’un rachat chez un vendeur, sans jamais disparaître.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte de qualité rare ou supérieure arrive signée, et les trouvailles rares signent toute leur manne multipliée par cinq. Un butin de cadavre chanceux signe son rendement quand la famille n’a aucun spécimen à fournir ; lorsqu’elle en a un, le rendement reste ordinaire et le spécimen immaculé signé apparaît à côté. L’artisanat suit la même règle : chaque exemplaire d’une sortie rare ou supérieure reçoit une signature, et un chef-d’œuvre est toujours signé quelle que soit sa qualité, si bien que la meilleure version d’une pièce nomme toujours son créateur. La signature d’un matériau ordinaire accompagne les unités elles-mêmes et ne se perd pas simplement parce qu’une pile compatible contient déjà un autre collecteur ou signataire. Un spécimen immaculé distinct est un objet séparé qui demande toujours de la place ; s’il ne peut pas entrer dans le sac, le rendement ordinaire du cadavre reste mais le spécimen est perdu.\n\nLes objets terminés gardent une identité stricte : deux exemplaires ne fusionnent que si chaque marque correspond exactement, avec le même objet, le même signataire, les mêmes statistiques de chef-d’œuvre, le même enchantement et le même lien. Les matériaux compatibles partagent un emplacement entre collecteurs et signataires tout en gardant un compte pour chaque source. L’infobulle résume les sources ; ouvrez Sources pour la liste complète. Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s’empiler normalement avec ceux de son destinataire.\n\nLes signatures remboursent les artisans : tenir à la station un exemplaire signé d’un réactif requis, quel que soit son signataire, ajoute 2 points de pourcentage aux chances de chef-d’œuvre. Tenir un réactif signé de votre propre main réduit de 1 la quantité requise pour ce réactif, jamais sous 1, sauf s’il porte la marque sans remise ; les noyaux de raid gardent toujours leur coût complet. Votre propre travail rare ou supérieur signé peut même continuer à vous enseigner, aujourd’hui uniquement par les potions fabriquées : buvez une potion rare que vous avez brassée et signée, et un petit gain de compétence revient au métier qui l’a produite tant que ce métier est l’un de vos métiers majeurs actifs. C’est uniquement la branche des potions : un élixir, un parchemin ou un flacon d’apogée ne vous enseigne rien, quelle que soit la finesse de sa signature.',
+    "Certains objets portent un nom. Les lignes de provenance d'un matériau indiquent qui a récolté chaque groupe d'unités, tandis qu'une marque distincte de signature identifie le signataire de qualité lorsqu'il y en a un. Ces faits sont indépendants : un matériau récolté ordinaire enregistre son collecteur sans recevoir de signature, et un stock ancien signé peut nommer son signataire tout en indiquant honnêtement qu'aucun récolteur n'a été enregistré. Une pièce terminée indique plutôt qui l'a fabriquée. Ces données voyagent avec l'objet lors des échanges, au coffre, par courrier, au Marché mondial et même lors d'un rachat chez un vendeur, sans jamais disparaître.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte de qualité rare ou supérieure arrive signée, et les trouvailles rares signent toute leur manne multipliée par cinq. Un butin de cadavre chanceux signe son rendement quand la famille n'a aucun spécimen à fournir ; lorsqu'elle en a un, le rendement reste ordinaire et le spécimen immaculé signé apparaît à côté. L'artisanat suit la même règle : chaque exemplaire d'une sortie rare ou supérieure reçoit une signature, et un chef-d'œuvre est toujours signé quelle que soit sa qualité, si bien que la meilleure version d'une pièce nomme toujours son créateur. La signature d'un matériau ordinaire accompagne les unités elles-mêmes et ne se perd pas simplement parce qu'une pile compatible contient déjà un autre collecteur ou signataire. Un spécimen immaculé distinct est un objet séparé qui demande toujours de la place ; s'il ne peut pas entrer dans le sac, le rendement ordinaire du cadavre reste mais le spécimen est perdu.\n\nLes objets terminés gardent une identité stricte : deux exemplaires ne fusionnent que si chaque marque correspond exactement, avec le même objet, le même signataire, les mêmes statistiques de chef-d'œuvre, le même enchantement et le même lien. Les matériaux compatibles partagent un emplacement entre collecteurs et signataires tout en gardant un compte pour chaque source. L'infobulle résume les sources ; faites un clic droit sur la pile pour la liste complète (sur écran tactile, utilisez son bouton Sources). Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s'empiler normalement avec ceux de son destinataire.\n\nLes signatures remboursent les artisans : tenir à la station un exemplaire signé d'un réactif requis, quel que soit son signataire, ajoute 2 points de pourcentage aux chances de chef-d'œuvre. Tenir un réactif signé de votre propre main réduit de 1 la quantité requise pour ce réactif, jamais sous 1, sauf s'il porte la marque sans remise ; les noyaux de raid gardent toujours leur coût complet. Votre propre travail rare ou supérieur signé peut même continuer à vous enseigner, aujourd'hui uniquement par les potions fabriquées : buvez une potion rare que vous avez brassée et signée, et un petit gain de compétence revient au métier qui l'a produite tant que ce métier est l'un de vos métiers majeurs actifs. C'est uniquement la branche des potions : un élixir, un parchemin ou un flacon d'apogée ne vous enseigne rien, quelle que soit la finesse de sa signature.",
   'guide.profPages.effectFeast':
     'Dresse un festin dont les autres peuvent se servir : {servings} portions pendant {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -17214,7 +17320,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.perfectedOnly': 'Perfectionné uniquement',
   'guide.profPages.ench.tier.lucent': 'Lumineux',
   'guide.profPages.faq.a1':
-    'Les objets finis suivent toujours une règle d’identité stricte : deux copies ne fusionnent que si leur signataire, leurs propriétés tirées, leurs statistiques de chef-d’œuvre, leur enchantement, leur lien et toute autre marque d’identité correspondent exactement. Une lame signée reste donc séparée d’une lame ordinaire.\n\nLes matériaux font exception. Les piles compatibles d’un même matériau peuvent fusionner même lorsque leurs collecteurs ou leurs signataires diffèrent, car la pile conserve un compte pour chaque source. L’infobulle résume les sources ; ouvrez Sources pour la liste complète. Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s’empiler normalement avec ceux de son destinataire.',
+    "Les objets finis suivent toujours une règle d'identité stricte : deux copies ne fusionnent que si leur signataire, leurs propriétés tirées, leurs statistiques de chef-d'œuvre, leur enchantement, leur lien et toute autre marque d'identité correspondent exactement. Une lame signée reste donc séparée d'une lame ordinaire.\n\nLes matériaux font exception. Les piles compatibles d'un même matériau peuvent fusionner même lorsque leurs collecteurs ou leurs signataires diffèrent, car la pile conserve un compte pour chaque source. L'infobulle résume les sources ; faites un clic droit sur la pile pour la liste complète (sur écran tactile, utilisez son bouton Sources). Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s'empiler normalement avec ceux de son destinataire.",
   'guide.profPages.faq.a11Promotion':
     'Fabriquez ou achetez une pièce forgée de maître d’apogée, puis perfectionnez-la avec 125 dans le métier qui l’a créée. Chaque tentative coûte une braise de créateur, une essence fracturée et une monture de verre prismatique, réussit quatre fois sur cinq et n’endommage jamais la pièce en cas d’échec. La première tentative vous la lie et quatre rangs réussis la rendent perfectionnée. Dépensez ensuite un acte de création, une commande d’inscription à 125 achetable ou commissionnable, pour promouvoir la copie en légendaire et lui donner le nom de votre choix. La promotion est déterministe : les statistiques ne changent pas, seuls le nom et la couleur changent.',
   'guide.profPages.faq.a2':

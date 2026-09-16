@@ -332,15 +332,15 @@ export const pt_BR: EnTranslations = {
   },
   "hudChrome": {
     "professionTrainers": {
-      "blacksmithing": "Blacksmithing Trainer",
-      "cooking": "Cooking Trainer",
-      "tailoring": "Tailoring Trainer",
-      "engineering": "Engineering Trainer",
-      "leatherworking": "Leatherworking Trainer",
-      "alchemy": "Alchemy Trainer",
-      "farming": "Farming Trainer",
-      "mining": "Mining Trainer",
-      "hobby": "Hobby Trainer",
+      "blacksmithing": "Instrutor de Ferraria",
+      "cooking": "Instrutor de Culinária",
+      "tailoring": "Instrutor de Alfaiataria",
+      "engineering": "Instrutor de Engenharia",
+      "leatherworking": "Instrutor de Couraria",
+      "alchemy": "Instrutor de Alquimia",
+      "farming": "Instrutor de Agricultura",
+      "mining": "Instrutor de Mineração",
+      "hobby": "Instrutor de Passatempo",
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Essa seleção de material não está mais disponível.",
@@ -1077,10 +1077,10 @@ export const pt_BR: EnTranslations = {
       "clearArmed": "Toque em um espaço para limpá-lo."
     },
     "tutorialGreeting": {
-      "eastbrookGuidanceNote": "Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.",
-      "guidanceOn": "Turn guidance on",
-      "guidanceOff": "Turn guidance off",
-      "guidanceSetting": "Eastbrook golden guidance",
+      "eastbrookGuidanceNote": "Bem-vindo a Eastbrook! O Marechal Redbrook tem trabalho para você na praça de Eastbrook. Ative a orientação dourada para encontrá-lo e seguir Lobos à porta, ou explore por conta própria. Você pode mudar isso depois em Opções, Interface, Combate.",
+      "guidanceOn": "Ativar orientação",
+      "guidanceOff": "Desativar orientação",
+      "guidanceSetting": "Orientação dourada de Eastbrook",
       "bellHomeNote": "De volta da costa tão cedo? Foi o sino da balsa que você tocou. O gêmeo dele está pendurado bem ali, perto da caixa de correio do Correio dos Corvos: toque-o quando quiser, e a travessia vai te levar de volta à Costa da Provação. Não há problema nenhum de qualquer jeito.",
       "islandArrivalNote": "Bem-vindo à Costa da Provação. O Guardião Tam está esperando logo ali na praia: vá falar com ele. Quando quiser partir, toque o sino junto ao meu píer e ele levará você ao vale a qualquer hora.",
       "noteClose": "Entendido"
@@ -1261,9 +1261,9 @@ export const pt_BR: EnTranslations = {
       "devTierCol": "Insígnia",
       "mergedPrs": "PRs integrados",
       "devEmpty": "Nenhum colaborador classificado ainda.",
-      "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed",
-      "prestigeTitle": "Prestige {rank}"
+      "podiumLabel": "Os três primeiros",
+      "unclaimed": "Não reivindicado",
+      "prestigeTitle": "Prestígio {rank}"
     },
     "pledge": {
       "open": "Aceitando candidaturas",
@@ -1286,8 +1286,8 @@ export const pt_BR: EnTranslations = {
       "noteLabel": "Nota do quadro",
       "notePlaceholder": "Diga aos aspirantes o que sua guilda está procurando",
       "save": "Salvar",
-      "newPlayerFriendlyLabel": "New player friendly",
-      "newPlayerFriendlyHint": "Shown on the recruits' board at the Proving Shore signpost.",
+      "newPlayerFriendlyLabel": "Amigável a novos jogadores",
+      "newPlayerFriendlyHint": "Exibido no quadro de recrutas junto ao letreiro da Costa da Provação.",
       "yourPledge": "Sua candidatura: {guild}",
       "since": "Candidatou-se em {date}",
       "withdraw": "Retirar candidatura"
@@ -1443,7 +1443,7 @@ export const pt_BR: EnTranslations = {
       "targetPrev": "Alternar alvo para trás",
       "discord": "Discord",
       "bgFlag": "Ação da Bandeira do Campo de Batalha",
-      "friendlyNameplates": "Toggle Friendly Nameplates",
+      "friendlyNameplates": "Alternar placas de nome de aliados",
       "sheathe": "Embainhar/Desembainhar Arma",
       "hideInterface": "Ocultar interface",
       "dive": "Nadar para Baixo",
@@ -1822,7 +1822,7 @@ export const pt_BR: EnTranslations = {
       "crossHotbarHelp": "Segure um gatilho para acender oito slots de barra de ação no d-pad e nos botões frontais. Toque no outro gatilho para mudar para o segundo conjunto.",
       "crossHotbarResetLayout": "Redefinir barra de atalho cruzada",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Os gatilhos e o d-pad pertencem à barra de atalho cruzada enquanto ela está ligada, portanto, eles são configurados abaixo e não aqui.",
+      "crossHotbarOwnsButtons": "Os gatilhos alteram a barra de atalho cruzada enquanto ela está ativa. As direções do d-pad continuam editáveis aqui, para menus e movimento.",
       "cancelAction": "Cancelar/Voltar",
       "subcommandsAction": "Subcomandos/Mapa",
       "cycleHudAction": "Interface de ciclo",
@@ -1833,7 +1833,7 @@ export const pt_BR: EnTranslations = {
       "crossHotbarDisplayMinimal": "Somente enquanto mantido",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Carregando {action}: confirme em uma célula para colocá-la, cancele para colocá-la de volta.",
-      "crossHotbarEditHint": "Organizando: confirme pega de uma célula ou do livro de feitiços e cai em uma célula, cancele limpa uma.",
+      "crossHotbarEditHint": "Organizando · o d-pad move a seleção · confirmar pega e posiciona · cancelar limpa uma célula",
       "crossHotbarEditHelp": "Segure o pára-choque esquerdo e pressione o botão superior para organizar a barra com o controlador."
     },
     "perf": {
@@ -2112,51 +2112,51 @@ export const pt_BR: EnTranslations = {
       "spellOrder": "Ordem das magias",
       "reset": "Redefinir Posição",
       "spellPosition": "Ordem das magias {position} / {count}",
-      "watchlist": "Watched Spells",
-      "watchlistHint": "Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.",
-      "watchlistEmpty": "No other spell in your spellbook puts a buff on you.",
-      "watchlistWatch": "Watch {spell}",
-      "watchlistUnwatch": "Stop watching {spell}",
-      "watchlistCount": "{count} watched",
-      "sound": "Alert Sound",
-      "soundNone": "No sound",
-      "soundVolume": "Sound Volume",
-      "soundPreview": "Play",
-      "soundPreviewAria": "Preview the {sound} alert sound",
-      "soundHint": "A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.",
-      "readyGlow": "Hotbar Glow",
-      "readyGlowHint": "Lights this spell on your action bar while its buff is up.",
-      "reticleTick": "Reticle Tick",
-      "reticleTickHint": "Adds a mark near the centre of the screen that lights when this spell procs.",
-      "haptic": "Rumble",
-      "hapticNone": "Off",
-      "hapticHint": "Vibrates a connected controller, or your phone. Ignored where the device has no haptics.",
+      "watchlist": "Feitiços Observados",
+      "watchlistHint": "Escolha qualquer feitiço que concede um benefício a você para atribuir a ele sua própria aura. Feitiços escolhidos recebem um cartão completo abaixo, com ícone, cor, posição e anel no solo próprios.",
+      "watchlistEmpty": "Nenhum outro feitiço do seu grimório concede um benefício a você.",
+      "watchlistWatch": "Observar {spell}",
+      "watchlistUnwatch": "Parar de observar {spell}",
+      "watchlistCount": "{count} observados",
+      "sound": "Som de Alerta",
+      "soundNone": "Sem som",
+      "soundVolume": "Volume do Som",
+      "soundPreview": "Reproduzir",
+      "soundPreviewAria": "Pré-visualizar o som de alerta {sound}",
+      "soundHint": "Um som toca cada vez que este feitiço ativa. Desative o ícone, os crescentes e o anel no solo para que só o som avise.",
+      "readyGlow": "Brilho da Barra de Ação",
+      "readyGlowHint": "Ilumina este feitiço na sua barra de ação enquanto o benefício dele estiver ativo.",
+      "reticleTick": "Marca da Retícula",
+      "reticleTickHint": "Adiciona uma marca perto do centro da tela que se ilumina quando este feitiço ativa.",
+      "haptic": "Vibração",
+      "hapticNone": "Desativado",
+      "hapticHint": "Faz vibrar um controle conectado, ou o seu celular. Ignorado em dispositivos sem vibração.",
       "haptics": {
-        "tap": "Tap",
-        "double": "Double",
-        "long": "Long"
+        "tap": "Toque",
+        "double": "Duplo",
+        "long": "Longo"
       },
       "cues": {
-        "softChime": "Soft Chime",
-        "musicBox": "Music Box",
-        "glassPing": "Glass Ping",
-        "waterDrop": "Water Drop",
-        "bubblePop": "Bubble Pop",
-        "hardBell": "Hard Bell",
-        "templeGong": "Temple Gong",
-        "anvilStrike": "Anvil Strike",
-        "coinDrop": "Coin Drop",
-        "swordDraw": "Sword Draw",
-        "blaringHorn": "Blaring Horn",
-        "carKlaxon": "Car Klaxon",
-        "sonarPing": "Sonar Ping",
-        "electricZap": "Electric Zap",
-        "catMeow": "Cat Meow",
-        "owlHoot": "Owl Hoot",
-        "wolfHowl": "Wolf Howl",
-        "frogCroak": "Frog Croak",
-        "windWhoosh": "Wind Whoosh",
-        "steamHiss": "Steam Hiss"
+        "softChime": "Sino Suave",
+        "musicBox": "Caixa de Música",
+        "glassPing": "Tinido de Vidro",
+        "waterDrop": "Gota de Água",
+        "bubblePop": "Estouro de Bolha",
+        "hardBell": "Sino Forte",
+        "templeGong": "Gongo de Templo",
+        "anvilStrike": "Golpe de Bigorna",
+        "coinDrop": "Queda de Moeda",
+        "swordDraw": "Saque de Espada",
+        "blaringHorn": "Buzina Estridente",
+        "carKlaxon": "Buzina de Carro",
+        "sonarPing": "Sinal de Sonar",
+        "electricZap": "Choque Elétrico",
+        "catMeow": "Miado de Gato",
+        "owlHoot": "Pio de Coruja",
+        "wolfHowl": "Uivo de Lobo",
+        "frogCroak": "Coaxar de Sapo",
+        "windWhoosh": "Sopro de Vento",
+        "steamHiss": "Silvo de Vapor"
       },
       "procs": {
         "revenge": "Vingança!",
@@ -2360,10 +2360,10 @@ export const pt_BR: EnTranslations = {
     },
     "plurals": {
       "guildBoardShown": {
-        "one": "{count} guild shown",
-        "few": "{count} guilds shown",
-        "many": "{count} guilds shown",
-        "other": "{count} guilds shown"
+        "one": "{count} guilda mostrada",
+        "few": "{count} guildas mostradas",
+        "many": "{count} guildas mostradas",
+        "other": "{count} guildas mostradas"
       },
       "commissionMasterworks": {
         "one": "{count} obra-prima",
@@ -3192,7 +3192,7 @@ export const pt_BR: EnTranslations = {
       "coldsightRead": "Seu próximo Tiro longo causa {longDrawPct}% a mais de dano, ou seu próximo Tiro funesto causa {fellShotPct}% a mais",
       "duskEconomy": "As habilidades custam {pct}% menos energia",
       "moontide": "Maré Lunar: estágio {stacks} de {max}. Lançamentos de Raio Selvagem, Queda Celeste e Semente Lunar a enchem na Forma de Luniscante; com {max}, Semente Lunar vira Onda Lunar e Queda Celeste vira Esteira Solar, e qualquer uma a gasta",
-      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Lobo e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma",
+      "oldBlood": "Sangue Antigo: estágio {stacks} de {max}. Golpes conectados de Gato e Bruin compartilham este banco; com {max}, Mordida Sanguinária ou Esmaga-Ossos se transforma",
       "verdance": "Verdance {stacks}/{max}. Cada Florescer Selvagem ou Segundo Florescer NOVO que você plantar adiciona 1. Em {max}, Recuperação Rápida vira Superflorescência",
       "freeExecute": "Sua próxima habilidade de execução elegível não custa nada",
       "resourceSap": "Restaura {value} do seu recurso atual a cada {interval} s",
@@ -3257,7 +3257,7 @@ export const pt_BR: EnTranslations = {
       "elementalTrance": "Dano sofrido reduzido em {pct}%. {mana}% de todo o dano que você causa é convertido em mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Forma de Bruin: vida e armadura aumentadas",
-      "wolfForm": "Cat Form: melee damage and energy; movement speed increased by {pct}%",
+      "wolfForm": "Forma de Gato: dano corpo a corpo e energia; velocidade de movimento aumentada em {pct}%",
       "formTravel": "Forma de Fleet: velocidade de movimento aumentada em {pct}%",
       "formFireball": "Forma de Brasa: velocidade de movimento aumentada em {pct}%; ataques e feitiços desativados",
       "formMoonkin": "Forma de Luniscante: dano de feitiço aumentado em {pct}% e armadura aumentada em {armorPct}%",
@@ -3600,10 +3600,10 @@ export const pt_BR: EnTranslations = {
       "quantityAria": "Unidades de {source}, até {count}",
       "decreaseAria": "Diminuir unidades de {source}",
       "increaseAria": "Aumentar unidades de {source}",
-      "decreaseByAria": "Decrease units from {source} by {count}",
-      "increaseByAria": "Increase units from {source} by {count}",
-      "moveAll": "Move all units",
-      "fits": "Up to {units} fit right now"
+      "decreaseByAria": "Diminuir unidades de {source} em {count}",
+      "increaseByAria": "Aumentar unidades de {source} em {count}",
+      "moveAll": "Mover todas as unidades",
+      "fits": "Cabem até {units} agora"
     },
     "materialHint": {
       "fineGrade": "Grau fino. Coletado de um veio de nível pleno com uma ferramenta de nível acima do material, e conta como a versão comum sempre que uma for exigida.",
@@ -3892,14 +3892,14 @@ export const pt_BR: EnTranslations = {
       "subtitle": "Guildas do reino",
       "rosterTitle": "Ver a lista de membros de {guild}",
       "back": "Voltar",
-      "filters": "Board filters",
-      "newPlayerFriendly": "New player friendly",
-      "newPlayerFriendlyTitle": "This guild welcomes new players",
-      "filterNewPlayersTitle": "Show only guilds that welcome new players",
-      "filterEmpty": "No guild has opened its doors to new players yet.",
-      "showAll": "Show all guilds",
-      "officersOnline": "Officers online",
-      "officersOnlineLabel": "Officers online: {names}",
+      "filters": "Filtros do quadro",
+      "newPlayerFriendly": "Amigável a novos jogadores",
+      "newPlayerFriendlyTitle": "Esta guilda recebe novos jogadores",
+      "filterNewPlayersTitle": "Mostrar apenas guildas que recebem novos jogadores",
+      "filterEmpty": "Nenhuma guilda abriu as portas para novos jogadores ainda.",
+      "showAll": "Mostrar todas as guildas",
+      "officersOnline": "Oficiais online",
+      "officersOnlineLabel": "Oficiais online: {names}",
       "officerEntry": "{name} ({rank})",
       "popupTitle": "Placa da Guilda",
       "close": "Fechar"
@@ -3957,8 +3957,8 @@ export const pt_BR: EnTranslations = {
       "withdrawQuantityTitle": "Retirar {item}",
       "withdrawQuantityInput": "Quantidade a retirar",
       "withdrawQuantityConfirm": "Retirar",
-      "quantityStepDownAria": "Decrease the quantity by {count}",
-      "quantityStepUpAria": "Increase the quantity by {count}",
+      "quantityStepDownAria": "Diminuir a quantidade em {count}",
+      "quantityStepUpAria": "Aumentar a quantidade em {count}",
       "vaultRowWithdrawName": "Retirar {item}",
       "priceChanged": "O preço mudou antes da compra ser concluída. Revise o preço atualizado e confirme novamente.",
       "withdrawQuantityAction": "Quantidade a retirar: {item}",
@@ -5011,8 +5011,8 @@ export const pt_BR: EnTranslations = {
       "lootMaybe": "No máximo um destes pode cair:",
       "lootChance": "Chance adicional de drops:",
       "lootHeroic": "Bônus heroico, um destes cai sempre:",
-      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
-      "lootHeroicChance": "Heroic bonus, additional chance drops:",
+      "lootHeroicMaybe": "Bônus heroico, no máximo um destes pode cair:",
+      "lootHeroicChance": "Bônus heroico, chance adicional de drops:",
       "pct": "{pct}%",
       "blockedLevel": "Apenas níveis {min} a {max}",
       "blockedSpec": "Requer uma especialização",
@@ -5181,10 +5181,10 @@ export const pt_BR: EnTranslations = {
       "ownedTooltipStatus": "Catalogada n'O Relicário",
       "missingTooltipStatus": "Ainda não encontrada",
       "firstFindClears": "Encontrada pela primeira vez na conquista {count}",
-      "foundBy": "Found by {names}",
+      "foundBy": "Encontrado por {names}",
       "finderWithDate": "{name} ({date})",
-      "sharedScopeNote": "Shared by every character on your account",
-      "sharedScopeHint": "A relic found by any character on your account fills the page here too.",
+      "sharedScopeNote": "Compartilhado por todos os personagens da sua conta",
+      "sharedScopeHint": "Uma relíquia encontrada por qualquer personagem da sua conta também preenche a página aqui.",
       "unlockToast": "Relíquia catalogada: {name}",
       "illuminateBanner": "Página iluminada: {name}",
       "illuminateToast": "Todas as relíquias de {name} estão preenchidas.",
@@ -5318,10 +5318,10 @@ export const pt_BR: EnTranslations = {
       "progressAria": "Progresso: {current} de {target}",
       "renownChip": "{renown} de Renome",
       "earnedDate": "Conquistado em {date}",
-      "earnedBy": "Earned by {names}",
+      "earnedBy": "Conquistado por {names}",
       "earnerWithDate": "{name} ({date})",
-      "accountScopeNote": "Shared by every character on your account",
-      "accountScopeHint": "A deed any character on your account accomplishes is earned here too, and the Book names who earned it.",
+      "accountScopeNote": "Compartilhado por todos os personagens da sua conta",
+      "accountScopeHint": "Um feito realizado por qualquer personagem da sua conta também é conquistado aqui, e o Livro registra quem o conquistou.",
       "featRibbon": "Proeza",
       "hiddenBadge": "Oculto",
       "titleChip": "Recompensa de título",
@@ -6314,7 +6314,7 @@ export const pt_BR: EnTranslations = {
       "deathTitle": "Quando você cai",
       "deathBody": "Se sua vida chegar a zero, você é derrubado onde está, e seu corpo fica ali. Liberte seu espírito e você se ergue como um fantasma no cemitério mais próximo: mais veloz que os vivos, fora do alcance dos seus inimigos, mas incapaz de lutar, saquear ou falar com quem quer que seja, exceto o Guardião Pálido que paira sobre as lápides. Dali você escolhe. Leve seu fantasma de volta até o corpo e você revive ali mesmo, com parte da sua vida e mana restauradas e nenhuma penalidade. Ou aceite do Guardião Pálido um ressurgimento imediato onde está, ao preço do Tributo do Guardião: um enfraquecimento temporário de tudo o que você é, que dura mais quanto mais experiente você for, e poupa por completo os personagens recém-criados. Caia dentro de uma masmorra e seu espírito aguarda no cemitério do lado de fora; leve seu fantasma de volta pela porta e você revive na entrada. As incursões são a exceção: caia nelas e você é simplesmente reposto de pé na entrada da incursão, embora uma segunda queda encerre a jornada. Por qualquer caminho, você não perde experiência, equipamento nem dinheiro. Entre lutas, sente-se para comer e beber, assim você começa a próxima com força total.",
       "threatTitle": "Quem o inimigo ataca",
-      "threatBody": "Cada inimigo mantém sua própria contagem de quem mais o irritou. O dano soma a ela, e a cura também: uma cura gera ameaça nos inimigos que já estão lutando contra a pessoa curada, dividida entre eles, então a cura mais segura é aquela em alguém que o tanque já capturou. Tanques ativam uma postura de guarda ou uma forma protetora que multiplica tudo o que geram, enquanto a Forma de Lobo do druida reduz a ameaça em vez disso, e uma provocação eleva quem a lança direto ao topo da contagem e prende o inimigo nele por alguns segundos. Os inimigos não trocam de alvo no instante em que alguém ultrapassa o tanque: é preciso uma vantagem clara para arrancar um deles, e uma vantagem maior à distância do que corpo a corpo, então um pouco de paciência no início do combate mantém a luta onde ela deve estar.",
+      "threatBody": "Cada inimigo mantém sua própria contagem de quem mais o irritou. O dano soma a ela, e a cura também: uma cura gera ameaça nos inimigos que já estão lutando contra a pessoa curada, dividida entre eles, então a cura mais segura é aquela em alguém que o tanque já capturou. Tanques ativam uma postura de guarda ou uma forma protetora que multiplica tudo o que geram, enquanto a Forma de Gato do druida reduz a ameaça em vez disso, e uma provocação eleva quem a lança direto ao topo da contagem e prende o inimigo nele por alguns segundos. Os inimigos não trocam de alvo no instante em que alguém ultrapassa o tanque: é preciso uma vantagem clara para arrancar um deles, e uma vantagem maior à distância do que corpo a corpo, então um pouco de paciência no início do combate mantém a luta onde ela deve estar.",
       "hazardsTitle": "A água pode matá-lo",
       "breathBody": "Água funda pode ser nadada, e você pode mergulhar embaixo dela. Enquanto sua cabeça estiver submersa, uma barra azul de fôlego aparece perto do topo da tela e se esvazia; volte à superfície e ela se enche bem mais rápido do que esvaziou. Deixe-a esvaziar enquanto você ainda está submerso e você começa a se afogar, perdendo uma boa parte da sua vida a cada segundo até alcançar o ar, então fique de olho na barra num mergulho longo. A morte a limpa, então uma corrida até o corpo sempre começa com os pulmões cheios.",
       "fatigueBody": "O mar não tem parede. As travessias que o mundo espera que você nade, os estreitos e lagunas entre uma extensão de terra e a próxima, e os lagos internos, são seguros de atravessar não importa quanto tempo levem. Já se aventurar além da costa rumo a mar aberto de verdade começa a drenar suas forças: um aviso aparece, você tem uma janela real para dar meia-volta, e depois disso o mar causa dano cada vez mais pesado que nada pode evitar até você voltar para a terra. Afogue-se ou se esgote tão longe da costa e você se liberta como em qualquer outra morte, então trate o horizonte como paisagem, não como destino.",
@@ -6345,7 +6345,7 @@ export const pt_BR: EnTranslations = {
       "framePetBody": "Caçadores, bruxos e qualquer um que tenha um mascote convocado ganham um pequeno quadro para ele ao lado do próprio, com nome, nível e vida. Clicar nesse quadro seleciona seu mascote, e Ctrl+6 faz o mesmo pelo teclado.",
       "framesMoveBody": "Seu quadro, o quadro do seu alvo e os quadros do seu grupo podem todos ser movidos. Cada um tem um pequeno botão de mover no canto: destrave-o, arraste o quadro para onde você quiser, e trave-o de novo para que um clique acidental não o desloque. Se eles acabarem num lugar do qual você se arrependa, Redefinir Posições dos Quadros nas opções os traz todos de volta para onde começaram.",
       "framesMoveBodyEditFrames": "Seu quadro, o quadro do alvo e os quadros do grupo podem ser movidos. Cada um traz um pequeno botão de mover no canto: desbloqueie-o, arraste o quadro para onde quiser e bloqueie-o outra vez para que um clique perdido não o desloque. Editar Quadros, no alto da aba Quadros nas opções de Interface, libera o restante da interface de uma vez, junto com esses três quadros: barras de ação, barra de lançamento, barra de golpe, barra de experiência, minimapa, trilho de botões, quadro do mascote, barra de postura, linhas de benefícios e debilitações e chip de Lembrete da Lista de Desejos, cada um usando um chip de nome enquanto está liberado. Se eles acabarem em um lugar que você não queira, Restaurar Padrões, no rodapé da mesma aba Quadros, devolve todos ao ponto inicial.",
-      "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
+      "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
       "barsTitle": "Barras, temporizadores e texto de combate",
@@ -6358,7 +6358,7 @@ export const pt_BR: EnTranslations = {
       "minimapBody": "No canto superior direito: um minimapa redondo com o nome da zona acima dele e suas coordenadas abaixo, cercado por um mostrador que pinta a hora do dia.\n\nO disco carrega mais do que terreno. Sua própria seta fica no centro, apontando para onde você olha, com seu grupo ao redor como pontos coloridos por classe e uma seta na borda para quem tiver se afastado dele. Quem dá missões usa ali as mesmas marcas que usa no mundo, e você também vai identificar nós de coleta e estações de criação, portais de viagem, corpos e contêineres saqueáveis, qualquer hostil que tenha se interessado por você, amigos e companheiros de guilda por perto, e o seu próprio corpo enquanto você corre de volta como fantasma.\n\nPequenos indicadores aparecem nele quando têm algo a dizer: um envelope enquanto há cartas não lidas esperando por você, uma moeda enquanto rendimentos de venda ou mercadorias devolvidas esperam pelo Mercador, e um botão listando seus bloqueios de raide.",
       "mapTitle": "O mapa do mundo e seus rastreadores",
       "mapBody": "M abre o mapa do mundo: o continente desenhado por completo, com sua própria seta nele, as zonas e seus nomes, os pontos de interesse ao seu redor, os portais de viagem e os nós de coleta que você já encontrou. Seu grupo também aparece nele. Dentro de uma incursão, o mapa muda para um esquema das salas que você já explorou.\n\nDescendo pelo lado direito, sob o minimapa, uma pilha de rastreadores mantém seus afazeres atuais à vista sem que você precise abrir nada: suas missões acompanhadas e os objetivos delas, seu progresso em feitos, a incursão em que você está e qualquer fenda da qual você esteja participando. O rastreador de missões se recolhe quando você quiser a tela de volta.",
-      "mapBodyZoneFirst": "M abre o mapa-múndi na zona onde você está, com sua própria seta, os pontos de interesse ao redor, os doadores de missão com suas marcas, as áreas dos seus objetivos, estações de criação, caixas de correio, quadros de avisos e canteiros, entradas de masmorra e cada nó de coleta da zona, acinzentado enquanto se recupera e marcado quando suas ferramentas não dão conta. Seu grupo também aparece. Clique com o botão direito no mapa, ou pressione o botão Mapa-múndi, para recuar até o continente, com cada zona desenhada e seu nome, e clique em uma zona para abrir seu mapa. Entre em uma incursão, masmorra, fenda ou fortaleza e o mapa muda para uma planta do andar onde você está; o campo de batalha dos Campos de Thornhollow tem seu próprio mapa de campo.\n\nNo lado direito, sob o minimapa, uma pilha de rastreadores mantém seu trabalho atual à vista sem abrir nada: suas missões e objetivos rastreados, seu progresso de feitos, suas páginas do Relicário, a incursão em que está e qualquer fenda da qual participa. O rastreador de missões se recolhe quando você quer recuperar a tela.",
+      "mapBodyZoneFirst": "M abre o mapa-múndi na zona onde você está, com sua própria seta, os pontos de interesse ao redor, os doadores de missão com suas marcas, as áreas dos seus objetivos, estações de criação, caixas de correio, quadros de avisos e canteiros, entradas de masmorra e cada nó de coleta da zona, acinzentado enquanto se recupera e marcado quando suas ferramentas não dão conta. Seu grupo também aparece. Clique com o botão direito no mapa, ou pressione o botão Mapa-múndi, para recuar até o continente, com cada zona desenhada e seu nome, e clique em uma zona para abrir seu mapa. Entre em uma incursão, masmorra, fenda ou fortaleza e o mapa muda para uma planta do andar onde você está; o campo de batalha dos Campos de Thornhollow tem seu próprio mapa de campo.\n\nNo lado direito, sob o minimapa, uma pilha de rastreadores mantém seu trabalho atual à vista sem abrir nada: suas missões e objetivos rastreados, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que está e qualquer fenda da qual participa. O rastreador de missões se recolhe quando você quer recuperar a tela.",
       "gatheringGoalTrackerBody": "Um rastreador de meta de coleta entra na pilha quando você acompanha uma receita na janela de criação ou uma encomenda no quadro: ele mostra a receita ou encomenda acompanhada, quantos itens você está reunindo e até onde os materiais guardados e armazenados levam você. Acompanhar substitui sua meta atual, e Limpar a remove explicitamente; nenhuma das duas ações muda sua preferência de coleta.",
       "hubPracticeTrackerBody": "Perto do centro de Eastbrook, um rastreador de prática entra na pilha quando você aceita as lições guiadas de prática dali: ele mantém à vista seus melhores resultados contra os bonecos de prática. Enquanto uma lição está ativa, uma faixa de instruções ao lado guia você pelo passo atual, desde abrir os Medidores de Dano até comparar uma segunda tentativa.",
       "chatTitle": "A janela de chat",
@@ -6714,7 +6714,7 @@ export const pt_BR: EnTranslations = {
       "mageEleSummon": "Uma magia de Gelo que chama o elemental para o seu lado e o coloca no seu alvo.",
       "formName": {
         "form_bear": "Forma de Bruin",
-        "form_cat": "Forma de Lobo",
+        "form_cat": "Forma de Gato",
         "form_travel": "Forma de Fleet"
       }
     },
@@ -7235,7 +7235,7 @@ export const pt_BR: EnTranslations = {
     "deedsPage": {
       "intro": "O Livro dos Feitos é onde o mundo anota tudo o que você já fez, dos primeiros passos fora do vale inicial às lutas mais duras que o reino pode oferecer. Conquiste feitos enquanto joga, ostente os títulos que eles concedem e veja seu Renome subir.",
       "howHeading": "Como funcionam os feitos",
-      "howBody": "Os feitos são conquistados e guardados um personagem de cada vez, então cada herói que você joga forma um Livro só seu; só o Placar do reino reúne o seu Renome por todos os personagens que você joga, e conta cada feito uma única vez. Cada feito diz com clareza o que pede de você, ali mesmo no Livro dos Feitos dentro do jogo, então você sempre sabe o que perseguir, e pode acompanhar os que estiver caçando para mantê-los à vista enquanto joga. Uns poucos permanecem secretos e só se revelam depois de conquistados. O Livro também se mantém honesto: tudo o que o seu histórico passado puder comprovar, ele credita na hora, então um veterano nunca o abre numa página vazia; só os feitos de contagem começam sua conta do zero.",
+      "howBody": "Os feitos são conquistados um personagem de cada vez, mas o Livro dos Feitos é compartilhado por todos os personagens da sua conta: um feito que qualquer um deles realiza é conquistado para todos, o Livro registra quem o conquistou e quando, e um título ou moldura que ele concede pode ser usado por qualquer um dos seus personagens. O Placar do reino reúne o seu Renome do mesmo jeito, contando cada feito uma única vez. Cada feito diz com clareza o que pede de você, ali mesmo no Livro dos Feitos dentro do jogo, então você sempre sabe o que perseguir, e pode acompanhar os que estiver caçando para mantê-los à vista enquanto joga. Uns poucos permanecem secretos e só se revelam depois de conquistados. O Livro também se mantém honesto: tudo o que o seu histórico passado puder comprovar, ele credita na hora, então um veterano nunca o abre numa página vazia; só os feitos de contagem começam sua conta do zero.",
       "renownHeading": "Renome",
       "renownBody": "O Renome é a pontuação por trás do Livro. Cada feito que você conquista vale uma quantia fixa, e seu total só sobe, então uma semana calma nunca custa terreno a você. Um punhado depende mais de sorte do que de habilidade, outros feitos de coleção são a própria recompensa, e as Proezas são uma honra à parte, então nenhum desses vale Renome algum. Feitos sem Renome ainda contam para a conclusão do seu Livro; eles simplesmente nunca pontuam. As Proezas são a única exceção, mantidas inteiramente fora da contagem.",
       "rewardsHeading": "Títulos e molduras",
@@ -7359,7 +7359,7 @@ export const pt_BR: EnTranslations = {
       "groupClasses": "Classes",
       "groupForms": "Formas de Druida",
       "formBear": "Forma de Bruin",
-      "formCat": "Forma de Lobo",
+      "formCat": "Forma de Gato",
       "formTravel": "Forma de Fleet",
       "groupCreatures": "Criaturas",
       "groupPets": "Demônios do Bruxo",
@@ -7795,7 +7795,7 @@ export const pt_BR: EnTranslations = {
         "commissionsBody": "Uma encomenda é uma criação feita para alguém. Ao criar uma arma, uma peça de armadura ou um item secundário sustentado (uma poção não pode carregar um vínculo), o artesão pode marcar a criação como encomenda: a peça acabada se comporta normalmente nas mãos de quem a fez, mas no momento em que troca de mãos em uma negociação ela se vincula à pessoa que a recebeu. É o Vínculo do Artesão: o comprador recebe sua peça, e a peça não pode ser repassada nem revendida.\n\nOs vínculos não são eternos, apenas caros. Qualquer mestre de posto desvincular uma peça vinculada enquanto você estiver na estação (uma estação móvel nunca oferece o serviço), por uma taxa definida pela qualidade do item: 25 pratas para incomum, 1 ouro para raro, 4 ouros para épico, com um lendário pagando a taxa épica e uma peça comum encomendada a taxa de incomum.\n\nA taxa compra uma lousa limpa, não uma cura: a peça ainda é uma encomenda, então ela se vincula novamente a quem a receber na próxima negociação, e todo o resto, assinatura, obra-prima e encantamentos, permanece intacto.",
         "provenanceHeading": "Trabalho assinado",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Alguns itens carregam um nome. As linhas de origem de um material dizem quem coletou cada grupo de unidades, enquanto uma marca separada de assinatura identifica o artesão premium quando existe um. Esses fatos são independentes: um material comum coletado registra o coletor sem ganhar assinatura, e um estoque antigo assinado pode nomear seu assinante dizendo honestamente que nenhum coletor foi registrado. Uma peça pronta, por sua vez, informa quem a criou. Esses registros viajam com o item por trocas, banco, correio, Mercado Mundial e até recompra de vendedor, e nunca desaparecem.\n\nA coleta assina automaticamente seu melhor trabalho: qualquer colheita que role rara ou superior chega assinada, e achados raros assinam todo o ganho de cinco unidades. A rolagem de sorte de uma coleta de cadáver assina seu rendimento quando a família não tem um espécime, e, quando tem, mantém o rendimento comum e cria ao lado dele o espécime imaculado assinado. A criação assina do mesmo modo: toda cópia de uma saída rara ou superior cria uma versão assinada, e uma obra-prima sempre assina qualquer qualidade, então a melhor versão de qualquer peça sempre nomeia seu criador. A assinatura de um material comum acompanha as próprias unidades e não pode ser perdida só porque uma pilha compatível já contém outro coletor ou assinante. Um espécime imaculado distinto é um item separado e ainda precisa de espaço; se não couber, o rendimento comum do cadáver fica, mas o espécime se perde.\n\nItens prontos mantêm uma identidade estrita, então duas cópias só se juntam quando todas as marcas coincidem exatamente: mesmo item, mesmo assinante, mesmos atributos de obra-prima, mesmo encantamento e mesmo vínculo. Materiais compatíveis compartilham um espaço entre coletores e assinantes, mantendo uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; abra Origens para a lista completa. Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.\n\nAssinaturas retribuem artesãos: manter na bancada qualquer cópia assinada de um reagente necessário, independentemente de quem a assinou, adiciona 2 pontos percentuais à chance de obra-prima, e manter um reagente assinado por você reduz em um a quantidade necessária daquele reagente, nunca abaixo de um, a menos que ele esteja marcado sem desconto; núcleos de raide sempre mantêm o custo completo. Seu próprio trabalho raro ou superior assinado também continua ensinando, hoje apenas por meio de poções criadas: beba uma poção rara que você preparou e assinou e um pequeno fluxo de habilidade volta à profissão que a criou, desde que ela seja uma das suas principais ativas. É realmente apenas o braço das poções: um elixir, um pergaminho ou um frasco de ápice não ensina nada de volta, por mais fina que seja sua assinatura.",
+        "provenanceBodyUndiscounted": "Alguns itens carregam um nome. As linhas de origem de um material dizem quem coletou cada grupo de unidades, enquanto uma marca separada de assinatura identifica o artesão premium quando existe um. Esses fatos são independentes: um material comum coletado registra o coletor sem ganhar assinatura, e um estoque antigo assinado pode nomear seu assinante dizendo honestamente que nenhum coletor foi registrado. Uma peça pronta, por sua vez, informa quem a criou. Esses registros viajam com o item por trocas, banco, correio, Mercado Mundial e até recompra de vendedor, e nunca desaparecem.\n\nA coleta assina automaticamente seu melhor trabalho: qualquer colheita que role rara ou superior chega assinada, e achados raros assinam todo o ganho de cinco unidades. A rolagem de sorte de uma coleta de cadáver assina seu rendimento quando a família não tem um espécime, e, quando tem, mantém o rendimento comum e cria ao lado dele o espécime imaculado assinado. A criação assina do mesmo modo: toda cópia de uma saída rara ou superior cria uma versão assinada, e uma obra-prima sempre assina qualquer qualidade, então a melhor versão de qualquer peça sempre nomeia seu criador. A assinatura de um material comum acompanha as próprias unidades e não pode ser perdida só porque uma pilha compatível já contém outro coletor ou assinante. Um espécime imaculado distinto é um item separado e ainda precisa de espaço; se não couber, o rendimento comum do cadáver fica, mas o espécime se perde.\n\nItens prontos mantêm uma identidade estrita, então duas cópias só se juntam quando todas as marcas coincidem exatamente: mesmo item, mesmo assinante, mesmos atributos de obra-prima, mesmo encantamento e mesmo vínculo. Materiais compatíveis compartilham um espaço entre coletores e assinantes, mantendo uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; clique com o botão direito na pilha para a lista completa (no toque, use o botão Origens). Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.\n\nAssinaturas retribuem artesãos: manter na bancada qualquer cópia assinada de um reagente necessário, independentemente de quem a assinou, adiciona 2 pontos percentuais à chance de obra-prima, e manter um reagente assinado por você reduz em um a quantidade necessária daquele reagente, nunca abaixo de um, a menos que ele esteja marcado sem desconto; núcleos de raide sempre mantêm o custo completo. Seu próprio trabalho raro ou superior assinado também continua ensinando, hoje apenas por meio de poções criadas: beba uma poção rara que você preparou e assinou e um pequeno fluxo de habilidade volta à profissão que a criou, desde que ela seja uma das suas principais ativas. É realmente apenas o braço das poções: um elixir, um pergaminho ou um frasco de ápice não ensina nada de volta, por mais fina que seja sua assinatura.",
         "collectorsHeading": "Colecionadores, troféus e o preço de uma história",
         "collectorsBody": "Os vendedores são cegos à proveniência: um item assinado é vendido a um PNJ exatamente pelo seu preço comum. O prêmio de uma assinatura existe apenas entre jogadores, o que é precisamente o que o torna interessante: uma pilha de minério inesperado assinada por um coletor famoso, um Corte Principal de uma colheita sortuda, uma lâmina obra-prima com o nome de um artesão aposentado, todos custam o que a memória de alguém diz que valem.\n\nO Livro dos Feitos apoia o mesmo instinto: Veia Imaculada, Cerne Ancião, Flor ao Luar, Um Espécime Perfeito e Lampejo de Esperança são marcas de colecionador com zero de Renome que existem apenas para provar que um momento aconteceu com você. Guarde o item que conquistou o feito e você tem o recibo. Nada disso é poder; a proveniência não compra atributos nem vence batalhas, é o rastro de papel do jogo para dias felizes.",
         "castPaceHeading": "Tempo de conjuração e o dreno de ouro",
@@ -7838,7 +7838,7 @@ export const pt_BR: EnTranslations = {
         "title": "Perguntas Frequentes sobre Profissões",
         "intro": "Respostas rápidas para as perguntas que os artesãos fazem com mais frequência.",
         "q1": "Por que meus itens assinados não formam pilha?",
-        "a1": "Itens prontos ainda seguem a regra estrita de identidade: duas cópias só se fundem quando assinante, propriedades roladas, atributos de obra-prima, encantamento, vínculo e toda outra identidade coincidem exatamente. Uma lâmina assinada, portanto, permanece separada de uma comum.\n\nMateriais são a exceção. Pilhas compatíveis do mesmo material podem se juntar mesmo quando coletores ou assinantes diferem, pois a pilha mantém uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; abra Origens para a lista completa. Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.",
+        "a1": "Itens prontos ainda seguem a regra estrita de identidade: duas cópias só se fundem quando assinante, propriedades roladas, atributos de obra-prima, encantamento, vínculo e toda outra identidade coincidem exatamente. Uma lâmina assinada, portanto, permanece separada de uma comum.\n\nMateriais são a exceção. Pilhas compatíveis do mesmo material podem se juntar mesmo quando coletores ou assinantes diferem, pois a pilha mantém uma contagem para cada origem. O tooltip ao passar o mouse resume as origens; clique com o botão direito na pilha para a lista completa (no toque, use o botão Origens). Separar por coletor mantém essas pilhas distintas nas bolsas, e a ordenação respeita essa escolha. Material transferido pode formar pilha normalmente com os materiais do destinatário.",
         "q2": "As receitas comuns aumentam minha perícia para sempre?",
         "a2": "Não. Toda receita é avaliada pela distância abaixo do seu nível atual na profissão, na leitura clássica laranja, amarela, verde e cinza: ganho completo no seu nível ou acima, metade um nível abaixo, um quarto dois níveis abaixo e nada três ou mais níveis abaixo. Os níveis avançam a cada 25 de habilidade, então as receitas grátis de habilidade 0 param de ensinar em habilidade 75.\n\nOs limites também são menores que os 300 clássicos que você pode esperar: cada uma das dez profissões que podem ser assumidas chega a 125, Mineração, Corte de Madeira e Herbalismo chegam a 100 e Pesca vai até 200. Subir significa passar a receitas do seu próprio nível, não repetir a mais barata.",
         "q3": "Qual é a diferença entre saquear e colher um cadáver?",
@@ -10481,7 +10481,7 @@ export const pt_BR: EnTranslations = {
       "stunned": "Você está atordoado!",
       "silenced": "Você está silenciado!",
       "busy": "Você está ocupado.",
-      "cannotCastWhileMoving": "You can't cast while moving.",
+      "cannotCastWhileMoving": "Você não pode conjurar enquanto se move.",
       "abilityNotReady": "Essa habilidade ainda não está pronta.",
       "notEnoughRage": "Raiva insuficiente!",
       "notEnoughEnergy": "Energia insuficiente!",
@@ -10494,7 +10494,7 @@ export const pt_BR: EnTranslations = {
       "requiresForm": "Você precisa estar na Forma de {form}.",
       "cantInForm": "Você não pode fazer isso na Forma de {form}.",
       "bear": "Bruin",
-      "cat": "Lobo",
+      "cat": "Gato",
       "travel": "Fleet",
       "shapeshifted": "Você não pode fazer isso transformado.",
       "stealthed": "Você precisa estar furtivo.",
@@ -10826,7 +10826,7 @@ export const pt_BR: EnTranslations = {
     },
     "forms": {
       "bear": "urso",
-      "cat": "lobo"
+      "cat": "gato"
     },
     "cast": {
       "fishing": "Pesca",
@@ -12065,7 +12065,7 @@ export const pt_BR: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Amaldiçoa o inimigo por 8 s. Suas próximas 3 ações de dano geram 7 de Condenação cada uma e o açoitam com 17 de dano das Sombras."
+        "description": "Amaldiçoa o inimigo por 8 s, causando dano das Sombras e gerando 2 de Condenação a cada 2 s. Suas próximas 3 ações de dano geram 7 de Condenação cada uma e o açoitam com 17 de dano das Sombras."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -12101,7 +12101,7 @@ export const pt_BR: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Marca um inimigo por 15 s. Seus próximos 3 feitiços diretos ecoam por 25% de dano contra o inimigo marcado, ou copiam 50% de dano para ele quando conjurados contra outro alvo."
+        "description": "Marca um inimigo por 15 s. Seus próximos 3 feitiços diretos ecoam por 25% de dano contra o inimigo marcado, ou copiam 50% de dano para ele quando conjurados contra outro alvo. Ecos de Seta da Ruína também contam como acertos críticos, sem outro multiplicador de dano crítico."
       },
       "wrath": {
         "name": "Raio Selvagem",
@@ -12140,7 +12140,7 @@ export const pt_BR: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Lance de novo para voltar à forma de conjurador."
+        "description": "Assume a forma de urso: armadura +110%, vida máxima +30%, poder de ataque muito aumentado, seus ataques geram raiva e 30% mais ameaça. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Lance de novo para voltar à forma de conjurador."
       },
       "maul": {
         "name": "Esmaga-Ossos",
@@ -12156,17 +12156,17 @@ export const pt_BR: EnTranslations = {
         "description": "Um rugido funesto: todos os inimigos em um raio de 10 m são provocados, sua ameaça subindo para igualar a do inimigo mais odiado por eles, e são forçados a atacar você por 3 s. Apenas Forma de Bruin."
       },
       "cat_form": {
-        "name": "Forma de Lobo",
+        "name": "Forma de Gato",
         "description": "Transforma-vos em lobo: a agilidade sobe com vosso nível, poder de ataque +8 mais 2 por nível, vossos ataques usam energia e pontos de combo, e gerais 29% menos ameaça. Mudar para qualquer forma concede Passo ligeiro: 60% de velocidade de movimento por 3 s, uma vez a cada 20 s. Conjurai novamente para voltar à forma de conjurador."
       },
       "claw": {
         "name": "Garra Dilacerante",
-        "description": "Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Lobo.",
+        "description": "Ataca o inimigo com garras por dano da arma mais {damage}. Concede 1 ponto de combo. Apenas Forma de Gato.",
         "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "ferocious_bite": {
         "name": "Mordida Sanguinária",
-        "description": "Movimento finalizador que causa {damage}. Apenas Forma de Lobo.",
+        "description": "Movimento finalizador que causa {damage}. Apenas Forma de Gato.",
         "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo; em 3 de Sangue Antigo, este botão se torna Colheita Vermelha, que consome o Sangue Antigo em uma mordida mais forte que também causa instantaneamente todo o dano que seus Esfolar e Rasgar ainda causariam, e restaura energia."
       },
       "swipe": {
@@ -12198,7 +12198,7 @@ export const pt_BR: EnTranslations = {
       },
       "travel_form": {
         "name": "Forma de Fleet",
-        "description": "Assume instantaneamente uma rápida forma de Fleet, aumentando a velocidade de movimento em 40%. Você não pode usar outras habilidades enquanto transformado, mas pode ativar ou cancelar a forma dentro ou fora de combate: ideal para fugir."
+        "description": "Assume instantaneamente uma rápida forma de Fleet, aumentando a velocidade de movimento em 40% e removendo enraizamentos rompíveis e lentidões. Você não pode usar outras habilidades enquanto transformado, mas pode ativar ou cancelar a forma dentro ou fora de combate: ideal para fugir. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento."
       },
       "enrage": {
         "name": "Atiçar",
@@ -12218,7 +12218,7 @@ export const pt_BR: EnTranslations = {
       },
       "dash": {
         "name": "Corrida",
-        "description": "Dispara para a frente, aumentando a velocidade de movimento em 50% por 15 s. Apenas Forma de Lobo."
+        "description": "Dispara para a frente, aumentando a velocidade de movimento em 50% por 15 s. Apenas Forma de Gato."
       },
       "pounce": {
         "name": "Bote Furtivo",
@@ -12237,12 +12237,12 @@ export const pt_BR: EnTranslations = {
         "description": "O inimigo é atacado por um enxame de insetos, sofrendo {damage} de dano de Natureza ao longo de 12 s."
       },
       "tigers_fury": {
-        "name": "Sangue de Lobo",
-        "description": "Gera {rage} de energia e aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Lobo."
+        "name": "Sangue de Lince",
+        "description": "Gera {rage} de energia e aumenta o poder de ataque em {buff} por {duration} s. Apenas Forma de Gato."
       },
       "rip": {
         "name": "Fenda Sangrenta",
-        "description": "Movimento finalizador que faz o alvo sangrar a cada 2 s por 24 s: 36 de dano mais 24 por ponto de combo gasto (5 pontos de combo: {damage} no total). Apenas Forma de Lobo.",
+        "description": "Movimento finalizador que faz o alvo sangrar a cada 2 s por 24 s: 36 de dano mais 24 por ponto de combo gasto (5 pontos de combo: {damage} no total). Apenas Forma de Gato.",
         "specNote_feral": "O acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "mortal_strike": {
@@ -12439,11 +12439,11 @@ export const pt_BR: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Forma de Luniscante",
-        "description": "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)"
+        "description": "Assume Forma de Luniscante, fortalecendo a conjuração até você voltar. Transformar-se em qualquer forma concede Passada Solta, um breve aumento de velocidade de movimento. Lance novamente para retornar à forma normal. (assinatura Equilíbrio)"
       },
       "feral_charge": {
         "name": "Surto Primevo",
-        "description": "Libera um surto primevo. Na Forma de Lobo, a regeneração de energia aumenta em 100% por 10 s. Na Forma de Bruin, gera instantaneamente 50 de raiva. (assinatura Feral)"
+        "description": "Libera um surto primevo. Na Forma de Gato, a regeneração de energia aumenta em 100% por 10 s. Na Forma de Bruin, gera instantaneamente 50 de raiva. (assinatura Feral)"
       },
       "swiftmend": {
         "name": "Recuperação Rápida",
@@ -12663,7 +12663,7 @@ export const pt_BR: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Seta da Ruína",
-        "description": "Gasta 3 de Devastação para arremessar um pesado projétil de fogo caótico que causa {damage} de dano de Fogo. Ruína encurta sua conjuração em 30%."
+        "description": "Gasta 3 de Devastação para arremessar um pesado projétil de fogo caótico que causa {damage} de dano de Fogo antes de aplicar o dano crítico. Sempre acerta criticamente quando atinge o alvo. Ruína encurta sua conjuração em 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -12807,7 +12807,7 @@ export const pt_BR: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Momento Perfeito",
-        "description": "Aproveite o momento perfeito: ganhe instantaneamente 4 Cargas Arcanas e, por 10 s, Dardos Etéreos não as consome. (Cronomancia)"
+        "description": "Aproveite o momento perfeito: ganhe instantaneamente 4 Cargas Arcanas e, por 10 s, Dardos Etéreos não as consome e causa 20% mais dano. (Cronomancia)"
       },
       "arcane_surge": {
         "name": "Onda de Éter",
@@ -12956,7 +12956,7 @@ export const pt_BR: EnTranslations = {
       },
       "rake": {
         "name": "Esfolar",
-        "description": "Esfola o inimigo por dano da arma mais {damage} e causa dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Lobo.",
+        "description": "Esfola o inimigo por dano da arma mais {damage} e causa dano de sangramento ao longo de 18 s. Concede 1 ponto de combo. Apenas Forma de Gato.",
         "specNote_feral": "Cada acerto adiciona 1 de Sangue Antigo (máx. 3)."
       },
       "revive_pet": {

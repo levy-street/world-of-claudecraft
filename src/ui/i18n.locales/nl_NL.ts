@@ -2,6 +2,113 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const nl_NL: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.cannotCastWhileMoving': 'Je kunt geen spreuken uitspreken terwijl je beweegt.',
+  'hudChrome.auraEffect.wolfForm':
+    'Katgedaante: melee-schade en energie; bewegingssnelheid verhoogd met {pct}%',
+  'hudChrome.auraOverlay.cues.anvilStrike': 'Aanbeeldslag',
+  'hudChrome.auraOverlay.cues.blaringHorn': 'Schallende hoorn',
+  'hudChrome.auraOverlay.cues.bubblePop': 'Belknal',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Autoclaxon',
+  'hudChrome.auraOverlay.cues.catMeow': 'Kattenmiauw',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Muntval',
+  'hudChrome.auraOverlay.cues.electricZap': 'Elektrische schok',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Kikkerkwaak',
+  'hudChrome.auraOverlay.cues.glassPing': 'Glastik',
+  'hudChrome.auraOverlay.cues.hardBell': 'Harde bel',
+  'hudChrome.auraOverlay.cues.musicBox': 'Muziekdoos',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Uilenroep',
+  'hudChrome.auraOverlay.cues.softChime': 'Zacht klokje',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Sonarping',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Stoomsissen',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Zwaardtrek',
+  'hudChrome.auraOverlay.cues.templeGong': 'Tempelgong',
+  'hudChrome.auraOverlay.cues.waterDrop': 'Waterdruppel',
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Windgeruis',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Wolvengehuil',
+  'hudChrome.auraOverlay.haptic': 'Trilling',
+  'hudChrome.auraOverlay.hapticHint':
+    'Laat een verbonden controller of je telefoon trillen. Wordt genegeerd op apparaten zonder trilfunctie.',
+  'hudChrome.auraOverlay.hapticNone': 'Uit',
+  'hudChrome.auraOverlay.haptics.double': 'Dubbel',
+  'hudChrome.auraOverlay.haptics.long': 'Lang',
+  'hudChrome.auraOverlay.haptics.tap': 'Tik',
+  'hudChrome.auraOverlay.readyGlow': 'Hotbar-gloed',
+  'hudChrome.auraOverlay.readyGlowHint':
+    'Verlicht deze spreuk op je actiebalk zolang de buff ervan actief is.',
+  'hudChrome.auraOverlay.reticleTick': 'Vizierstip',
+  'hudChrome.auraOverlay.reticleTickHint':
+    'Voegt een markering toe nabij het midden van het scherm die oplicht wanneer deze spreuk proct.',
+  'hudChrome.auraOverlay.sound': 'Waarschuwingsgeluid',
+  'hudChrome.auraOverlay.soundHint':
+    'Er klinkt een geluid elke keer dat deze spreuk proct. Schakel het pictogram, de maansikkels en de grondring uit om het alleen met geluid aan te kondigen.',
+  'hudChrome.auraOverlay.soundNone': 'Geen geluid',
+  'hudChrome.auraOverlay.soundPreview': 'Afspelen',
+  'hudChrome.auraOverlay.soundPreviewAria':
+    'Speel een voorbeeld van het waarschuwingsgeluid {sound} af',
+  'hudChrome.auraOverlay.soundVolume': 'Geluidsvolume',
+  'hudChrome.auraOverlay.watchlist': 'Gevolgde spreuken',
+  'hudChrome.auraOverlay.watchlistCount': '{count} gevolgd',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    'Geen andere spreuk in je spreukenboek geeft jou een buff.',
+  'hudChrome.auraOverlay.watchlistHint':
+    'Kies een spreuk die jou buffs geeft om er een eigen aura aan toe te kennen. Gekozen spreuken krijgen hieronder een volledige kaart, met hun eigen pictogram, kleur, positie en grondring.',
+  'hudChrome.auraOverlay.watchlistUnwatch': 'Stop met het volgen van {spell}',
+  'hudChrome.auraOverlay.watchlistWatch': 'Volg {spell}',
+  'hudChrome.bank.quantityStepDownAria': 'Verlaag de hoeveelheid met {count}',
+  'hudChrome.bank.quantityStepUpAria': 'Verhoog de hoeveelheid met {count}',
+  'hudChrome.deeds.accountScopeHint':
+    'Een daad die een van je personages behaalt, telt ook hier mee, en het Boek vermeldt wie hem heeft behaald.',
+  'hudChrome.deeds.accountScopeNote': 'Gedeeld door alle personages op je account',
+  'hudChrome.deeds.earnedBy': 'Behaald door {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} ({date})',
+  'hudChrome.finder.lootHeroicChance': 'Heroïsche bonus, extra kansdrops:',
+  'hudChrome.finder.lootHeroicMaybe': 'Heroïsche bonus, hoogstens één hiervan kan droppen:',
+  'hudChrome.keybinds.friendlyNameplates': 'Naamplaatjes van bondgenoten omschakelen',
+  'hudChrome.leaderboard.podiumLabel': 'Top drie',
+  'hudChrome.leaderboard.prestigeTitle': 'Prestige {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Niet opgeëist',
+  'hudChrome.materialSources.decreaseByAria': 'Verlaag eenheden van {source} met {count}',
+  'hudChrome.materialSources.fits': 'Er passen momenteel tot {units}',
+  'hudChrome.materialSources.increaseByAria': 'Verhoog eenheden van {source} met {count}',
+  'hudChrome.materialSources.moveAll': 'Verplaats alle eenheden',
+  'hudChrome.noticeboard.filterEmpty':
+    'Nog geen gilde heeft haar deuren geopend voor nieuwe spelers.',
+  'hudChrome.noticeboard.filterNewPlayersTitle':
+    'Toon alleen gilden die nieuwe spelers verwelkomen',
+  'hudChrome.noticeboard.filters': 'Bordfilters',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Vriendelijk voor nieuwe spelers',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Deze gilde verwelkomt nieuwe spelers',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Officieren online',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Officieren online: {names}',
+  'hudChrome.noticeboard.showAll': 'Toon alle gilden',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    'Wordt getoond op het rekruteringsbord bij de wegwijzer van De Beproevingskust.',
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Vriendelijk voor nieuwe spelers',
+  'hudChrome.plurals.guildBoardShown.few': '{count} gilden getoond',
+  'hudChrome.plurals.guildBoardShown.many': '{count} gilden getoond',
+  'hudChrome.plurals.guildBoardShown.one': '{count} gilde getoond',
+  'hudChrome.plurals.guildBoardShown.other': '{count} gilden getoond',
+  'hudChrome.professionTrainers.alchemy': 'Alchemietrainer',
+  'hudChrome.professionTrainers.blacksmithing': 'Smeedtrainer',
+  'hudChrome.professionTrainers.cooking': 'Kooktrainer',
+  'hudChrome.professionTrainers.engineering': 'Knutseltrainer',
+  'hudChrome.professionTrainers.farming': 'Landbouwtrainer',
+  'hudChrome.professionTrainers.hobby': 'Hobbytrainer',
+  'hudChrome.professionTrainers.leatherworking': 'Leerbewerkingstrainer',
+  'hudChrome.professionTrainers.mining': 'Mijnbouwtrainer',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Kleermaaktrainer',
+  'hudChrome.reliquary.finderWithDate': '{name} ({date})',
+  'hudChrome.reliquary.foundBy': 'Gevonden door {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    'Een reliek die een van je personages vindt, vult de bladzijde ook hier.',
+  'hudChrome.reliquary.sharedScopeNote': 'Gedeeld door alle personages op je account',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Welkom in Oostbeek! Maarschalk Redbrook heeft werk voor je op het stadsplein. Zet de gouden gids aan om hem te vinden en Wolven voor de deur te volgen, of verken zelf. Je kunt dit later wijzigen bij Opties, Interface, Gevecht.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Zet de gids uit',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Zet de gids aan',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'Gouden gids van Oostbeek',
   'hudChrome.barEditor.armed': 'Tik op een vak om {name} te plaatsen.',
   'hudChrome.barEditor.buttonHeader': 'Knop {button}',
   'hudChrome.barEditor.cellAria': 'Knop {button}, {direction}: {action}',
@@ -960,7 +1067,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     'De reisgedaante: veel sneller over de grond, maar geen andere vaardigheden totdat je terugverandert.',
   'guide.classPage.formName.form_bear': 'Bruingedaante',
-  'guide.classPage.formName.form_cat': 'Wolfsgedaante',
+  'guide.classPage.formName.form_cat': 'Katgedaante',
   'guide.classPage.formName.form_travel': 'Fleetgedaante',
   'guide.classPage.formsHeading': 'Gedaanteverwisseling',
   'guide.classPage.formsMoonwing':
@@ -990,7 +1097,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De zee heeft geen muur. De oversteken die de wereld bedoelt dat je zwemt, de zee-engtes en meren tussen het ene stuk land en het volgende, en de binnenmeren, zijn veilig over te steken hoe lang het ook duurt. Waag je voorbij de kust het echt open water in, dan begint het je krachten uit te putten: er verschijnt een waarschuwing, je krijgt een echt tijdvenster om terug te keren, en daarna doet de zee gestaag zwaardere schade die niets kan voorkomen totdat je weer richting land gaat. Verdrink je of raak je zo ver van de kust uitgeput, dan laat je je geest los zoals bij elke andere dood, dus behandel de horizon als decor in plaats van een bestemming.',
   'guide.combat.hazardsTitle': 'Het water kan je doden',
   'guide.combat.threatBody':
-    'Elke vijand houdt een eigen lijst bij van wie hem het meest heeft geïrriteerd. Schade voegt daaraan toe, en genezing ook: een genezing legt dreiging op de vijanden die al vechten tegen de persoon die je genas, verdeeld over hen, dus de veiligste genezing is er een op iemand die de tank al vasthoudt. Tanks zetten een Bewaakte Houding of een beschermende gedaante aan die alles wat ze opwekken vermenigvuldigt, terwijl de Wolfsgedaante van de druïde juist dreiging afwerpt, en een provocatie tilt de aanroeper meteen naar de top van de lijst en pint de vijand een paar seconden op diegene vast. Vijanden wisselen niet meteen zodra iemand de tank voorbijstreeft: er is een duidelijke voorsprong nodig om er een los te trekken, en een grotere voorsprong op afstand dan in melee, dus een beetje geduld aan het begin van een pull houdt het gevecht waar het hoort.',
+    'Elke vijand houdt een eigen lijst bij van wie hem het meest heeft geïrriteerd. Schade voegt daaraan toe, en genezing ook: een genezing legt dreiging op de vijanden die al vechten tegen de persoon die je genas, verdeeld over hen, dus de veiligste genezing is er een op iemand die de tank al vasthoudt. Tanks zetten een Bewaakte Houding of een beschermende gedaante aan die alles wat ze opwekken vermenigvuldigt, terwijl de Katgedaante van de druïde juist dreiging afwerpt, en een provocatie tilt de aanroeper meteen naar de top van de lijst en pint de vijand een paar seconden op diegene vast. Vijanden wisselen niet meteen zodra iemand de tank voorbijstreeft: er is een duidelijke voorsprong nodig om er een los te trekken, en een grotere voorsprong op afstand dan in melee, dus een beetje geduld aan het begin van een pull houdt het gevecht waar het hoort.',
   'guide.combat.threatTitle': 'Wie de vijand raakt',
   'guide.combat.unstuckBody':
     'Als de wereld je ergens vastzet waar je niet uit kunt komen, typ dan /unstuck. Je moet buiten gevecht zijn en stilstaan, niet vastgehouden door een verdoving of een wortel, en niet in een duel of een arenawedstrijd zitten: er loopt een korte aftelling, en bewegen of schade oplopen annuleert hem. Wanneer hij afloopt, word je bij de dichtstbijzijnde begraafplaats neergezet. Het doodt je nooit en laat geen lijk achter, en als je al was neergevallen, herrijst het je daar in plaats daarvan. De prijs is de Loskomingsziekte, een tijdelijke verzwakking van alles wat je bent, die is uitgewerkt tegen de tijd dat je het commando weer kunt gebruiken, en net als de Tol van de Hoeder blijft die gloednieuwe personages helemaal bespaard.',
@@ -3243,7 +3350,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Slingert een ijsscherf die {damage} Vorstschade toebrengt, verdrievoudigd tegen een bevroren doelwit. Verbruikt Fingers of Frost of een lading Winterskil om het doelwit als bevroren te behandelen. (Vorst)',
   'entities.abilities.ice_lance.name': 'IJslans',
   'entities.abilities.perfect_moment.description':
-    'Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)',
+    'Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet en brengt het 20% meer schade toe. (Chronomantie)',
   'entities.abilities.perfect_moment.name': 'Volmaakt Ogenblik',
   'entities.abilities.shatter.name': 'Broze Ondergang',
   'entities.abilities.temporal_acceleration.description':
@@ -5039,8 +5146,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.rift_tide_strike': 'Verpletterende Diepte',
   'abilityUi.cast.rift_venom_execution': 'Gifpoel',
   'abilityUi.cast.rift_venom_strike': 'Merkteken van de Broedmoeder',
-  'abilityUi.forms.bear': 'Beer',
-  'abilityUi.forms.cat': 'Wolf',
+  'abilityUi.forms.bear': 'Bruin',
+  'abilityUi.forms.cat': 'Kat',
   'abilityUi.resources.energy': 'Energie',
   'abilityUi.resources.mana': 'Mana',
   'abilityUi.resources.rage': 'Woede',
@@ -5404,7 +5511,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Gedurende 3 sec daarna is Wolfsgedaante gratis en pint het doelwit vast, wat het 4 sec lang 50% vertraagt. Bereik 8-25 m. Alleen in Bruingedaante.',
   'entities.abilities.bear_charge.name': 'Bruin-stormloop',
   'entities.abilities.bear_form.description':
-    'Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
+    'Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante.',
   'entities.abilities.bear_form.name': 'Bruingedaante',
   'entities.abilities.berserker_rage.description':
     'Ga in een kolkende woede en genereer 20 woede. (Krijger-talent)',
@@ -5422,7 +5529,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Aderlating',
   'entities.abilities.cat_form.description':
     'Verandert u in een wolf: behendigheid stijgt met uw niveau, aanvalskracht +8 plus 2 per niveau, uw aanvallen gebruiken energie en combopunten, en u wekt 29% minder dreiging op. Wisselen naar welke gedaante ook verleent Hobbelende pas: 3 sec lang 60% bewegingssnelheid, eenmaal per 20 sec. Werp de spreuk opnieuw om naar de spreukengedaante terug te keren.',
-  'entities.abilities.cat_form.name': 'Wolfsgedaante',
+  'entities.abilities.cat_form.name': 'Katgedaante',
   'entities.abilities.charge.description':
     'Stormt op een vijand af, genereert 9 woede en verdooft hem gedurende 1 sec. Bereik 8-25 m.',
   'entities.abilities.charge.name': 'Bestorming',
@@ -5453,7 +5560,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Vervloekt het doelwit met pijn: {damage} Schaduwschade gedurende 24 sec.',
   'entities.abilities.curse_of_agony.name': 'Ban van Kwelling',
   'entities.abilities.dash.description':
-    'Spurt vooruit en verhoogt de bewegingssnelheid met 50% gedurende 15 sec. Alleen in Wolfsgedaante.',
+    'Spurt vooruit en verhoogt de bewegingssnelheid met 50% gedurende 15 sec. Alleen in Katgedaante.',
   'entities.abilities.dash.name': 'Spurt',
   'entities.abilities.deadly_poison.description':
     'Bestrijkt je wapen gedurende 30 min. Elke slag van wapen voegt een gifstapeling toe aan het doelwit, tot 5, en vernieuwt de duur van 12 seconden. Elke stapeling richt elke 2 seconden {damage} natuurschade aan.',
@@ -5765,10 +5872,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Treft nabije vijanden voor {damage} schade en vertraagt hun aanvallen met 10% gedurende 10 sec.',
   'entities.abilities.thunder_clap.name': 'Schuddende Klap',
   'entities.abilities.tigers_fury.description':
-    'Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante.',
-  'entities.abilities.tigers_fury.name': 'Wolvenbloed',
+    'Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Katgedaante.',
+  'entities.abilities.tigers_fury.name': 'Lynxbloed',
   'entities.abilities.travel_form.description':
-    'Verander ogenblikkelijk in een snelle Fleetgedaante en verhoog je bewegingssnelheid met 40%. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen.',
+    'Verander ogenblikkelijk in een snelle Fleetgedaante, verhoog je bewegingssnelheid met 40% en verwijder breekbare wortels en vertragingen. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid.',
   'entities.abilities.travel_form.name': 'Fleetgedaante',
   'entities.abilities.vanish.description':
     'Verdwijn uit het zicht en betreed Duskveil zelfs in gevecht. Je beweegt 50% trager terwijl je verborgen bent. Duurt tot 10 sec.',
@@ -5824,10 +5931,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Haalt een toekomstige tik van uw Brandpact naar voren en ontsteekt dan het doelwit voor {damage} Vuurschade. Wekt 1 Verwoesting en 1 Ondergang op. Houdt {charges} ladingen. (Kenmerk van Vernietiging)',
   'entities.abilities.moonkin_form.name': 'Maanuilvorm',
   'entities.abilities.moonkin_form.description':
-    'Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)',
+    'Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)',
   'entities.abilities.feral_charge.name': 'Oerkrachtgolf',
   'entities.abilities.feral_charge.description':
-    'Ontketent een golf van oerkracht. In Wolfsgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)',
+    'Ontketent een golf van oerkracht. In Katgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)',
   'entities.abilities.swiftmend.name': 'Snelle genezing',
   'entities.abilities.crusader_strike.description':
     'Treft het doel voor wapenschade plus {damage} Heilige schade. (paladijntalent)',
@@ -8544,7 +8651,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.busy': 'Je bent bezig.',
   'hud.errors.cannotTaunt': 'Dat kun je niet provoceren.',
   'hud.errors.cantInForm': 'Dat kun je niet doen in {form}-gedaante.',
-  'hud.errors.cat': 'Wolf',
+  'hud.errors.cat': 'Kat',
   'hud.errors.challengeExpired': 'De uitdaging is verlopen.',
   'hud.errors.chatCooldown': 'Chat heeft een afkoeltijd van {seconds}s.',
   'hud.errors.chatLocked':
@@ -10767,7 +10874,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Wapenfeiten staan op een plank apart: getuigenissen van nalatenschap en wereldprimeurs, de daden die horen bij een vervlogen tijdperk of een moment dat maar één keer zal plaatsvinden. Ze leveren geen Roem op en tellen niet mee voor de voltooiing, maar worden voor altijd bewaard als herinnering aan wat er is verricht.',
   'guide.deedsPage.featsHeading': 'Wapenfeiten',
   'guide.deedsPage.howBody':
-    'Daden behaal en bewaar je met één personage tegelijk, dus elke held die je speelt bouwt een eigen Boek op; alleen de ranglijst van het rijk bundelt je Roem over alle personages die je speelt, en telt elke daad maar één keer. Elke daad zegt in duidelijke taal wat er van je wordt gevraagd, direct in het Boek der Daden in het spel, zodat je altijd weet waar je op jaagt, en de daden waar je achteraan zit kun je op de volglijst zetten om ze tijdens het spelen in het oog te houden. Een klein aantal blijft geheim en onthult zich pas wanneer je ze hebt behaald. Het Boek houdt zichzelf ook eerlijk: alles wat je verleden kan bewijzen, wordt je meteen toegekend, zodat een veteraan het nooit op een lege bladzijde opent; alleen de tellende daden beginnen hun telling opnieuw.',
+    'Daden behaal je met één personage tegelijk, maar het Boek der Daden wordt gedeeld door elk personage op je account: een daad die een van hen volbrengt, is voor allemaal behaald, het Boek vermeldt wie hem behaalde en wanneer, en een titel of rand die hij oplevert kan door elk van je personages worden gedragen. De ranglijst van het rijk bundelt je Roem op dezelfde manier, en telt elke daad maar één keer. Elke daad zegt in duidelijke taal wat er van je wordt gevraagd, direct in het Boek der Daden in het spel, zodat je altijd weet waar je op jaagt, en de daden waar je achteraan zit kun je op de volglijst zetten om ze tijdens het spelen in het oog te houden. Een klein aantal blijft geheim en onthult zich pas wanneer je ze hebt behaald. Het Boek houdt zichzelf ook eerlijk: alles wat je verleden kan bewijzen, wordt je meteen toegekend, zodat een veteraan het nooit op een lege bladzijde opent; alleen de tellende daden beginnen hun telling opnieuw.',
   'guide.deedsPage.howHeading': 'Hoe daden werken',
   'guide.deedsPage.intro':
     'In het Boek der Daden houdt de wereld de stand bij van alles wat je hebt verricht, van je eerste stappen buiten het dal waar je begon tot de zwaarste gevechten die het rijk te bieden heeft. Behaal daden terwijl je speelt, draag de titels die ze schenken en zie je Roem stijgen.',
@@ -11610,7 +11717,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Een baas met de kracht van een raid die in de open wereld verrijst met een vast ritme, bevochten door wie zich verzamelt om de roep te beantwoorden, niet door een vaste groep.',
   'guide.glossary.worldBossTerm': 'Wereldbaas',
   'guide.models.formBear': 'Bruingedaante',
-  'guide.models.formCat': 'Wolfsgedaante',
+  'guide.models.formCat': 'Katgedaante',
   'guide.models.formTravel': 'Fleetgedaante',
   'guide.models.groupForms': 'Druïdengedaanten',
   'guide.nav.sidebarLabel': 'Gidsonderwerpen',
@@ -12029,7 +12136,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Treft tot 3 vijanden binnen 10 m voor elk {damage} Natuurschade. Elementair: een treffer verleent 1 Donder. De schade stijgt met de Spreukkracht.',
   'entities.abilities.chaos_bolt.description':
-    'Verbruikt 3 Verwoesting om een zware bout chaotisch vuur te werpen die {damage} Vuurschade toebrengt. Ondergang verkort de bezwering met 30%.',
+    'Verbruikt 3 Verwoesting om een zware bout chaotisch vuur te werpen die {damage} Vuurschade toebrengt voordat kritieke schade wordt toegepast. Treft altijd kritiek raak. Ondergang verkort de bezwering met 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Hult je in schaduwen en absorbeert 420 schade gedurende 5 sec. (schurkentalent)',
   'entities.abilities.cone_of_cold.description':
@@ -13486,7 +13593,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit',
   'hudChrome.auraEffect.oldBlood':
-    'Oud Bloed: stadium {stacks} van {max}. Gelande Wolfs- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
+    'Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen',
   'hudChrome.auraEffect.verdance':
     'Groenkracht: stadium {stacks} van {max}. Voltooide Wildbloei- en Tweede Bloei-spreuken vullen haar; bij {max} wordt Snelle genezing Overbloei',
   'sim.rift.allUnstable': 'Alle rifts zijn op dit moment onstabiel. Probeer het straks opnieuw.',
@@ -13846,7 +13953,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Verhardt je huid tot afkoelende sintels gedurende 10 sec, waardoor alle opgelopen schade met 25% afneemt.',
   'entities.abilities.cinderhide.name': 'Cinderhide',
   'entities.abilities.claw.description':
-    'Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
+    'Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.',
   'entities.abilities.claw.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
   'entities.abilities.cold_blood.description':
     'Focust je moordlust zodat je volgende aanval een kritieke treffer is. (Knifework-motor)',
@@ -13881,7 +13988,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description':
     'Vermindert het pantser van het doelwit met {damage}% gedurende 40 sec.',
   'entities.abilities.ferocious_bite.description':
-    'Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.',
+    'Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt.',
   'entities.abilities.funeral_harvest.description':
@@ -13896,7 +14003,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     'Slaat de vijand voor wapenschade plus {damage}, veroorzaakt bloedende schade over 12 sec, en verhoogt de opgelopen bloedingsschade met 40%. Levert 1 combopunt op. Elk 2e gebruik voegt 1 Schemer toe (max 3). (Skulduggery-motor)',
   'entities.abilities.hex_of_violence.description':
-    'Betovert de vijand gedurende 8 sec. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade.',
+    'Betovert de vijand gedurende 8 sec, waarbij Schaduwschade wordt toegebracht en elke 2 sec 2 Verdoemenis wordt gegenereerd. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade.',
   'entities.abilities.hex_of_violence.name': 'Hex of Violence',
   'entities.abilities.hour_of_judgment.description':
     'Roept oordeel af over je primaire Evil Eye gedurende 15 sec, wat 40 Verdoemenis en 3 Lotsdraden toekent, Possession activeert, de Verdoemenis die via het primaire Oog wordt gegenereerd verdubbelt, en de schade van Sentence met 20% verhoogt. De eerste Sentence geeft 50 Verdoemenis terug.',
@@ -13939,7 +14046,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Besteedt 1 Zielfragment om een blijvende Skeletkrijger toe te voegen aan je Heerschappij met 2 vakken. Slechts één mag je dienen. Het klieft nabije vijanden voor 45% schade elke 6 sec, en Reaping Command zet zijn doelwit 4 sec lang vast met een vertraging van 40%.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Vilt de vijand voor wapenschade plus {damage} en veroorzaakt bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.',
+    'Vilt de vijand voor wapenschade plus {damage} en veroorzaakt bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Katgedaante.',
   'entities.abilities.rake.specNote_feral': 'Elke slag die raakt voegt 1 Oud Bloed toe (max 3).',
   'entities.abilities.reaping_command.description':
     'Besteedt 2 Zielfragmenten om elke ondode dienaar te bevelen gelijktijdig toe te slaan. Grafwachten tarten en schrap zich, Skeletkrijgers zetten vast, Botmagiërs stellen magische verdediging bloot, en Grafvleugels verscheuren alle geraakte vijanden.',
@@ -13952,10 +14059,10 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Het planten van een NIEUWE bloei voegt 1 Groenkracht toe (max 5). Bij 5 Groenkracht wordt Snelle genezing Overbloei.',
   'entities.abilities.rip.description':
-    'Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Wolfsgedaante.',
+    'Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Katgedaante.',
   'entities.abilities.rip.specNote_feral': 'De gelande treffer voegt 1 Oud Bloed toe (max 3).',
   'entities.abilities.ruinous_brand.description':
-    'Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt.',
+    "Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt. Ruinenschicht-echo's gelden ook als kritieke treffers, zonder een extra kritieke-schademultiplier.",
   'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
   'entities.abilities.rupture.description':
     'Afmaakactie die het doelwit verwondt: het bloedt elke 2 sec, gedurende 6 sec plus 2 sec per combopunt (5 combopunten: 16 sec en {damage} totale schade).',
@@ -14473,13 +14580,13 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Houd de linkerbumper vast en druk op de bovenste gezichtsknop om de balk met de controller te rangschikken.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Schikken: bevestig het ophalen van een cel of het spreukenboek en laat het op een cel vallen, annuleren wist er één.',
+    'Schikken · d-pad verplaatst · bevestigen pakt op en plaatst · annuleren wist een cel',
   'hudChrome.controller.crossHotbarEnable': 'Cross-hotbar inschakelen',
   'hudChrome.controller.crossHotbarExpand': 'Dubbele Cross-hotbar',
   'hudChrome.controller.crossHotbarHelp':
     'Houd een trekker ingedrukt om acht actiebalkgleuven op de d-pad en gezichtsknoppen te laten oplichten. Tik op de andere trigger om naar de tweede set te wisselen.',
   'hudChrome.controller.crossHotbarOwnsButtons':
-    'De triggers en de d-pad behoren tot de cross-hotbar terwijl deze is ingeschakeld, dus ze zijn hieronder ingesteld in plaats van hier.',
+    "De triggers wijzigen de cross-hotbar terwijl deze is ingeschakeld. D-pad-richtingen blijven hier bewerkbaar voor menu's en beweging.",
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Cross-hotbar opnieuw instellen',
   'hudChrome.controller.cycleHudAction': 'Cyclusinterface',
@@ -16897,7 +17004,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.',
   'guide.interfacePage.framesGovernedExtra':
-    "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
+    "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Je eigen frame, je doelraam en je groepsframes kunnen allemaal worden verplaatst. Elk heeft een kleine verplaatsknop in de hoek: ontgrendel hem, sleep het frame naar de gewenste plek en vergrendel hem weer zodat een verdwaalde klik niets kan verschuiven. Frames bewerken bovenaan het tabblad Frames in de Interface-opties maakt de rest van de interface in één keer los, samen met die drie frames: de actiebar, de werpbalk, de zwaaibalk, de ervaringsbalk, de minimap, de knoppenrail, het huisdierframe, de houdingsbalk, de buff- en debuffrijen en het label Herinnering voor verlanglijst. Als ze op een plek belanden waar je spijt van krijgt, zet Herstellen naar standaard onderaan hetzelfde tabblad Frames ze allemaal terug naar hun oorspronkelijke plek.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -16905,7 +17012,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.hubPracticeTrackerBody':
     'Bij de Oostbeek-hub komt een oefentracker in de stapel zodra je daar de begeleide oefenlessen volgt. Hij houdt je beste pogingen tegen de oefenpoppen in beeld. Terwijl een les actief is, leidt een coachingsbalk ernaast je door de huidige stap, van het openen van de Schademeters tot het vergelijken van een tweede poging.',
   'guide.interfacePage.mapBodyZoneFirst':
-    "M opent de wereldkaart op de zone waarin je staat, met je eigen pijl erop, de interessante plekken om je heen, de queestgevers met hun markeringen en de gebieden waarin je doelen liggen, de ambachtsstations, brievenbussen, mededelingenborden en tuinbedden, de kerkeringangen en elk verzamelpunt in de zone. Punten die opnieuw groeien zijn grijs en punten waarvoor je gereedschap niet goed genoeg is, gemarkeerd. Je groep staat er ook op. Klik met rechts op de kaart of druk op de knop Wereldkaart om uit te zoomen naar het continent, met elke zone en haar naam. Klik op een zone om haar kaart te openen. Stap een delve, kerker, rift of kasteel in en de kaart verandert in een plattegrond van de plek waar je staat. Het slagveld Doornholte-Velden krijgt zijn eigen veldkaart.\n\nAan de rechterkant, onder de minimap, houdt een stapel trackers je huidige zaken in beeld zonder iets te openen: je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, de delve waarin je zit en elke rift waaraan je deelneemt. De queesttracker klapt in wanneer je het scherm terug wilt.",
+    "M opent de wereldkaart op de zone waarin je staat, met je eigen pijl erop, de interessante plekken om je heen, de queestgevers met hun markeringen en de gebieden waarin je doelen liggen, de ambachtsstations, brievenbussen, mededelingenborden en tuinbedden, de kerkeringangen en elk verzamelpunt in de zone. Punten die opnieuw groeien zijn grijs en punten waarvoor je gereedschap niet goed genoeg is, gemarkeerd. Je groep staat er ook op. Klik met rechts op de kaart of druk op de knop Wereldkaart om uit te zoomen naar het continent, met elke zone en haar naam. Klik op een zone om haar kaart te openen. Stap een delve, kerker, rift of kasteel in en de kaart verandert in een plattegrond van de plek waar je staat. Het slagveld Doornholte-Velden krijgt zijn eigen veldkaart.\n\nAan de rechterkant, onder de minimap, houdt een stapel trackers je huidige zaken in beeld zonder iets te openen: je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit en elke rift waaraan je deelneemt. De queesttracker klapt in wanneer je het scherm terug wilt.",
   'guide.interfacePage.mobileBodyTwoPages':
     "Aanraakbediening verschijnt vanzelf en de indeling past zich aan je scherm aan: een compacte indeling op een kleine telefoon, een standaardindeling op een grotere telefoon en een ruimere indeling op een tablet.\n\nJe vaardigheden staan in een ring in plaats van een nummerrij: de aanvalsknop met vier actieknoppen ernaast en een paginawisselknop die de ring tussen zijn {pages} pagina's wisselt. Samen bereiken die alle {slots} vaardigheidsslots, ongeacht of de extra desktopbalken aanstaan. De vijfde boogpositie van de ring is voor verbruiksartikelen. Tik erop om wat daar ligt te gebruiken, houd hem vast of veeg hem naar binnen om een rij te openen die zichzelf vult met wat je bij je draagt. Rond de ring staan de knoppen waar een aanraakspeler het vaakst naar grijpt: doel wisselen, gebruiken wat voor je staat en springen.\n\nEén bediening voor Snelle acties staat aan de onderrand in plaats van een rij knoppen. Hij opent al het overige: rijdier, chat, kaart, tassen, sociaal, queesten, personage, spreukenboek, spelmenu en een menu Meer met onder andere de rest van je vensters, de Kerkerzoeker, PvP, emotes en de wiki. Vensters vullen hier het scherm in plaats van eroverheen te zweven.\n\nJe eenheidsframes verplaatsen is iets voor de desktop. Op aanraking plaatst de indeling ze voor je.",
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -16983,7 +17090,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Hoe munten door de ambachten bewegen: de exacte bijdragen en afvoer, wat werkelijk verkoopt, de regels van de Wereldmarkt, werkopdrachten, commissies en de plaats van door raids gefinancierde collecties naast gewoon ambacht.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Sommige items dragen een naam. De bronregels van een materiaal zeggen wie elke groep eenheden verzamelde, terwijl een aparte handtekeningmarkering de premiumondertekenaar aanwijst als die er is. Die feiten staan los van elkaar: gewoon verzameld materiaal registreert een verzamelaar zonder handtekening, en oude ondertekende voorraad kan de ondertekenaar noemen terwijl eerlijk staat dat geen verzamelaar is geregistreerd. Een voltooid stuk zegt in plaats daarvan wie het maakte. Deze registraties reizen met het item mee door handel, bank, post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervagen nooit.\n\nVerzamelen ondertekent het beste werk automatisch: elke oogst die zeldzaam of beter rolt, komt ondertekend aan en zeldzame vondsten ondertekenen hun volledige vijfvoudige meevaller. Een gelukkige rol bij het oogsten van een lijk ondertekent de opbrengst wanneer de familie geen specimen heeft om te geven. Waar dat wel kan, blijft de opbrengst gewoon en wordt daarnaast het ondertekende zuivere specimen gemaakt. Ambacht ondertekent op dezelfde manier: elke kopie van zeldzame of betere uitvoer maakt een handtekening en een Meesterwerk ondertekent altijd, ongeacht zijn kwaliteit. De beste versie van elk stuk noemt dus altijd zijn maker. De handtekening van gewoon materiaal zit op de eenheden zelf en kan niet verloren gaan alleen omdat een passende stapel al een andere verzamelaar of ondertekenaar bevat. Een afzonderlijk zuiver specimen is een apart item en heeft nog steeds ruimte nodig. Als het niet past, blijft de gewone lijkopbrengst maar gaat het specimen verloren.\n\nVoltooide items houden één strikte identiteit. Twee kopieën voegen alleen samen als elk merkteken exact overeenkomt: hetzelfde item, dezelfde ondertekenaar, dezelfde Meesterwerkstatistieken, dezelfde betovering en dezelfde binding. Compatibele materialen delen een plek tussen verzamelaars en ondertekenaars maar houden per bron een telling bij. De tooltip bij aanwijzen vat de bronnen samen; open Bronnen voor de volledige lijst. Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.\n\nHandtekeningen betalen makers terug: als je aan de werkbank een ondertekende kopie van een benodigde grondstof vasthoudt, door wie die ook is ondertekend, krijg je 2 procentpunten extra Meesterwerkkans. Een grondstof die door je eigen hand is ondertekend verlaagt de vereiste hoeveelheid van die grondstof met één, nooit onder één, tenzij de grondstof als niet-kortbaar is gemarkeerd. Raidkernen behouden altijd hun volledige kost. Je eigen ondertekende werk van zeldzame of betere kwaliteit blijft je vandaag zelfs onderwijzen via gemaakte drankjes alleen. Drink een zeldzame drank die je zelf hebt gebrouwen en ondertekend en een klein beetje vaardigheid stroomt terug naar het ambacht dat haar maakte, zolang dat ambacht één van je actieve hoofdambachten is. Het geldt echt alleen voor de dranktak. Een elixer, rol of topflacon leert je niets terug, hoe fijn het ook is ondertekend.',
+    'Sommige items dragen een naam. De bronregels van een materiaal zeggen wie elke groep eenheden verzamelde, terwijl een aparte handtekeningmarkering de premiumondertekenaar aanwijst als die er is. Die feiten staan los van elkaar: gewoon verzameld materiaal registreert een verzamelaar zonder handtekening, en oude ondertekende voorraad kan de ondertekenaar noemen terwijl eerlijk staat dat geen verzamelaar is geregistreerd. Een voltooid stuk zegt in plaats daarvan wie het maakte. Deze registraties reizen met het item mee door handel, bank, post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervagen nooit.\n\nVerzamelen ondertekent het beste werk automatisch: elke oogst die zeldzaam of beter rolt, komt ondertekend aan en zeldzame vondsten ondertekenen hun volledige vijfvoudige meevaller. Een gelukkige rol bij het oogsten van een lijk ondertekent de opbrengst wanneer de familie geen specimen heeft om te geven. Waar dat wel kan, blijft de opbrengst gewoon en wordt daarnaast het ondertekende zuivere specimen gemaakt. Ambacht ondertekent op dezelfde manier: elke kopie van zeldzame of betere uitvoer maakt een handtekening en een Meesterwerk ondertekent altijd, ongeacht zijn kwaliteit. De beste versie van elk stuk noemt dus altijd zijn maker. De handtekening van gewoon materiaal zit op de eenheden zelf en kan niet verloren gaan alleen omdat een passende stapel al een andere verzamelaar of ondertekenaar bevat. Een afzonderlijk zuiver specimen is een apart item en heeft nog steeds ruimte nodig. Als het niet past, blijft de gewone lijkopbrengst maar gaat het specimen verloren.\n\nVoltooide items houden één strikte identiteit. Twee kopieën voegen alleen samen als elk merkteken exact overeenkomt: hetzelfde item, dezelfde ondertekenaar, dezelfde Meesterwerkstatistieken, dezelfde betovering en dezelfde binding. Compatibele materialen delen een plek tussen verzamelaars en ondertekenaars maar houden per bron een telling bij. De tooltip bij aanwijzen vat de bronnen samen; klik met rechts op de stapel voor de volledige lijst (gebruik op een touchscreen de knop Bronnen). Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.\n\nHandtekeningen betalen makers terug: als je aan de werkbank een ondertekende kopie van een benodigde grondstof vasthoudt, door wie die ook is ondertekend, krijg je 2 procentpunten extra Meesterwerkkans. Een grondstof die door je eigen hand is ondertekend verlaagt de vereiste hoeveelheid van die grondstof met één, nooit onder één, tenzij de grondstof als niet-kortbaar is gemarkeerd. Raidkernen behouden altijd hun volledige kost. Je eigen ondertekende werk van zeldzame of betere kwaliteit blijft je vandaag zelfs onderwijzen via gemaakte drankjes alleen. Drink een zeldzame drank die je zelf hebt gebrouwen en ondertekend en een klein beetje vaardigheid stroomt terug naar het ambacht dat haar maakte, zolang dat ambacht één van je actieve hoofdambachten is. Het geldt echt alleen voor de dranktak. Een elixer, rol of topflacon leert je niets terug, hoe fijn het ook is ondertekend.',
   'guide.profPages.effectFeast':
     'Zet een feestmaal klaar waar anderen van eten, één portie per persoon: {servings} porties, gedurende {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -17002,7 +17109,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.ench.perfectedOnly': 'Alleen Volmaakt',
   'guide.profPages.ench.tier.lucent': 'Lichtend',
   'guide.profPages.faq.a1':
-    'Voltooide items volgen nog steeds de strikte instantieregel: twee kopieën voegen alleen samen als hun ondertekenaar, gerolde eigenschappen, Meesterwerkstatistieken, betovering, binding en andere identiteit exact overeenkomen. Een ondertekend zwaard blijft dus apart van een gewoon zwaard.\n\nMaterialen zijn de uitzondering. Compatibele stapels van hetzelfde materiaal kunnen samengaan, zelfs als hun verzamelaars of ondertekenaars verschillen, omdat de stapel per bron een telling bewaart. De tooltip bij aanwijzen vat de bronnen samen; open Bronnen voor de volledige lijst. Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.',
+    'Voltooide items volgen nog steeds de strikte instantieregel: twee kopieën voegen alleen samen als hun ondertekenaar, gerolde eigenschappen, Meesterwerkstatistieken, betovering, binding en andere identiteit exact overeenkomen. Een ondertekend zwaard blijft dus apart van een gewoon zwaard.\n\nMaterialen zijn de uitzondering. Compatibele stapels van hetzelfde materiaal kunnen samengaan, zelfs als hun verzamelaars of ondertekenaars verschillen, omdat de stapel per bron een telling bewaart. De tooltip bij aanwijzen vat de bronnen samen; klik met rechts op de stapel voor de volledige lijst (gebruik op een touchscreen de knop Bronnen). Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.',
   'guide.profPages.faq.a11Promotion':
     'Maak of koop een topstuk van Meestergesmeed en volmaak het. Met vaardigheid 125 in het ambacht dat het maakte, kost elke poging één Sintel van de maker, één Gespleten essentie en één Prismaglaszetting, slaagt vier van de vijf keer en beschadigt het stuk nooit bij een misser. De eerste poging bindt het stuk aan je en vier geslaagde rangen maken het Volmaakt. Besteed daarna één Scheppingsakte, een vaardigheid-125-schrift van een inscriptist dat iedereen kan kopen of in opdracht kan laten maken, om de Volmaakte kopie te promoveren tot een legendarisch stuk met de naam die je kiest. De promotie is deterministisch: geen rol, statistieken onveranderd, alleen naam en kleur veranderen.',
   'guide.profPages.faq.a2':

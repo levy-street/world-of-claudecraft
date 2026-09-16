@@ -332,15 +332,15 @@ export const sv_SE: EnTranslations = {
   },
   "hudChrome": {
     "professionTrainers": {
-      "blacksmithing": "Blacksmithing Trainer",
-      "cooking": "Cooking Trainer",
-      "tailoring": "Tailoring Trainer",
-      "engineering": "Engineering Trainer",
-      "leatherworking": "Leatherworking Trainer",
-      "alchemy": "Alchemy Trainer",
-      "farming": "Farming Trainer",
-      "mining": "Mining Trainer",
-      "hobby": "Hobby Trainer",
+      "blacksmithing": "Smidestränare",
+      "cooking": "Matlagningstränare",
+      "tailoring": "Skrädderitränare",
+      "engineering": "Ingenjörskonsttränare",
+      "leatherworking": "Läderhantverkeritränare",
+      "alchemy": "Alkemitränare",
+      "farming": "Odlingstränare",
+      "mining": "Gruvdriftstränare",
+      "hobby": "Hobbytränare",
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Det materialvalet är inte längre tillgängligt.",
@@ -1077,10 +1077,10 @@ export const sv_SE: EnTranslations = {
       "clearArmed": "Tryck på en plats för att rensa den."
     },
     "tutorialGreeting": {
-      "eastbrookGuidanceNote": "Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.",
-      "guidanceOn": "Turn guidance on",
-      "guidanceOff": "Turn guidance off",
-      "guidanceSetting": "Eastbrook golden guidance",
+      "eastbrookGuidanceNote": "Välkommen till Eastbrook! Marskalk Redbrook har arbete åt dig på torget. Slå på gyllene vägledning för att hitta honom och följa Vargar vid dörren, eller utforska på egen hand. Du kan ändra detta senare under Alternativ, Gränssnitt, Strid.",
+      "guidanceOn": "Slå på vägledningen",
+      "guidanceOff": "Stäng av vägledningen",
+      "guidanceSetting": "Eastbrooks gyllene vägledning",
       "bellHomeNote": "Redan tillbaka från stranden? Det var färjeklockan du ringde i. Dess tvilling hänger där borta vid Korppostens brevlåda: ring i den när som helst, så bär överfarten dig tillbaka till Prövostranden. Ingen skada skedd, hur du än väljer.",
       "islandArrivalNote": "Välkommen till Prövostranden. Väktaren Tam väntar strax uppe på stranden: gå och hälsa på honom. Om du hellre vill ge dig av kan du när som helst ringa i klockan vid min brygga, så tar den dig över till dalen.",
       "noteClose": "Förstått"
@@ -1261,8 +1261,8 @@ export const sv_SE: EnTranslations = {
       "devTierCol": "Märke",
       "mergedPrs": "Sammanslagna PR:er",
       "devEmpty": "Inga rankade bidragsgivare ännu.",
-      "podiumLabel": "Top three",
-      "unclaimed": "Unclaimed",
+      "podiumLabel": "Topp tre",
+      "unclaimed": "Ohämtad",
       "prestigeTitle": "Prestige {rank}"
     },
     "pledge": {
@@ -1286,8 +1286,8 @@ export const sv_SE: EnTranslations = {
       "noteLabel": "Anslag",
       "notePlaceholder": "Berätta för blivande medlemmar vad ditt gille söker",
       "save": "Spara",
-      "newPlayerFriendlyLabel": "New player friendly",
-      "newPlayerFriendlyHint": "Shown on the recruits' board at the Proving Shore signpost.",
+      "newPlayerFriendlyLabel": "Nybörjarvänligt",
+      "newPlayerFriendlyHint": "Visas på rekryteringstavlan vid Prövostrandens anslagstavla.",
       "yourPledge": "Ditt löfte: {guild}",
       "since": "Lovade {date}",
       "withdraw": "Dra tillbaka löfte"
@@ -1443,7 +1443,7 @@ export const sv_SE: EnTranslations = {
       "targetPrev": "Växla mål bakåt",
       "discord": "Discord",
       "bgFlag": "Slagfältets flaggåtgärd",
-      "friendlyNameplates": "Toggle Friendly Nameplates",
+      "friendlyNameplates": "Växla vänliga namnskyltar",
       "sheathe": "Slida/Ta fram vapen",
       "hideInterface": "Dölj gränssnitt",
       "dive": "Simma nedåt",
@@ -1822,7 +1822,7 @@ export const sv_SE: EnTranslations = {
       "crossHotbarHelp": "Håll en avtryckare för att tända åtta action-bar-fack på d-pad- och ansiktsknapparna. Tryck på den andra utlösaren för att byta till den andra uppsättningen.",
       "crossHotbarResetLayout": "Återställ Cross Hotbar",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Triggarna och d-paden tillhör cross hotbar medan den är på, så de ställs in nedan istället för här.",
+      "crossHotbarOwnsButtons": "Triggarna ändrar cross hotbar medan den är på. D-padens riktningar förblir redigerbara här, för menyer och förflyttning.",
       "cancelAction": "Avbryt / Tillbaka",
       "subcommandsAction": "Underkommandon / Karta",
       "cycleHudAction": "Cykelgränssnitt",
@@ -1833,7 +1833,7 @@ export const sv_SE: EnTranslations = {
       "crossHotbarDisplayMinimal": "Endast medan den hålls",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Bär {action}: bekräfta på en cell för att placera den, avbryt för att sätta tillbaka den.",
-      "crossHotbarEditHint": "Ordna: bekräfta plockar upp från en cell eller stavningsboken och släpper på en cell, avbryt rensar en.",
+      "crossHotbarEditHint": "Ordnar · d-paden flyttar · bekräfta plockar upp och placerar · avbryt rensar en cell",
       "crossHotbarEditHelp": "Håll i den vänstra stötfångaren och tryck på den övre ansiktsknappen för att placera stången med kontrollen."
     },
     "perf": {
@@ -2112,51 +2112,51 @@ export const sv_SE: EnTranslations = {
       "spellOrder": "Besvärjelseordning",
       "reset": "Återställ position",
       "spellPosition": "Besvärjelseordning {position} / {count}",
-      "watchlist": "Watched Spells",
-      "watchlistHint": "Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.",
-      "watchlistEmpty": "No other spell in your spellbook puts a buff on you.",
-      "watchlistWatch": "Watch {spell}",
-      "watchlistUnwatch": "Stop watching {spell}",
-      "watchlistCount": "{count} watched",
-      "sound": "Alert Sound",
-      "soundNone": "No sound",
-      "soundVolume": "Sound Volume",
-      "soundPreview": "Play",
-      "soundPreviewAria": "Preview the {sound} alert sound",
-      "soundHint": "A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.",
-      "readyGlow": "Hotbar Glow",
-      "readyGlowHint": "Lights this spell on your action bar while its buff is up.",
-      "reticleTick": "Reticle Tick",
-      "reticleTickHint": "Adds a mark near the centre of the screen that lights when this spell procs.",
-      "haptic": "Rumble",
-      "hapticNone": "Off",
-      "hapticHint": "Vibrates a connected controller, or your phone. Ignored where the device has no haptics.",
+      "watchlist": "Bevakade besvärjelser",
+      "watchlistHint": "Välj vilken besvärjelse som helst som ger dig en buff för att ge den sin egen aura. Valda besvärjelser får ett fullständigt kort nedan, med egen ikon, färg, position och markring.",
+      "watchlistEmpty": "Ingen annan besvärjelse i din trollformelsbok ger dig en buff.",
+      "watchlistWatch": "Bevaka {spell}",
+      "watchlistUnwatch": "Sluta bevaka {spell}",
+      "watchlistCount": "{count} bevakade",
+      "sound": "Varningsljud",
+      "soundNone": "Inget ljud",
+      "soundVolume": "Ljudvolym",
+      "soundPreview": "Spela upp",
+      "soundPreviewAria": "Förhandslyssna på varningsljudet {sound}",
+      "soundHint": "Ett ljud spelas varje gång den här besvärjelsen proccar. Stäng av ikonen, halvmånarna och markringen för att låta ljudet ensamt avisera det.",
+      "readyGlow": "Handlingsfältsglöd",
+      "readyGlowHint": "Lyser upp den här besvärjelsen på ditt handlingsfält medan dess buff är aktiv.",
+      "reticleTick": "Riktmedelspuls",
+      "reticleTickHint": "Lägger till en markering nära skärmens mitt som lyser upp när den här besvärjelsen proccar.",
+      "haptic": "Vibration",
+      "hapticNone": "Av",
+      "hapticHint": "Vibrerar en ansluten kontroll, eller din telefon. Ignoreras om enheten saknar vibrationsfunktion.",
       "haptics": {
-        "tap": "Tap",
-        "double": "Double",
-        "long": "Long"
+        "tap": "Kort",
+        "double": "Dubbel",
+        "long": "Lång"
       },
       "cues": {
-        "softChime": "Soft Chime",
-        "musicBox": "Music Box",
-        "glassPing": "Glass Ping",
-        "waterDrop": "Water Drop",
-        "bubblePop": "Bubble Pop",
-        "hardBell": "Hard Bell",
-        "templeGong": "Temple Gong",
-        "anvilStrike": "Anvil Strike",
-        "coinDrop": "Coin Drop",
-        "swordDraw": "Sword Draw",
-        "blaringHorn": "Blaring Horn",
-        "carKlaxon": "Car Klaxon",
-        "sonarPing": "Sonar Ping",
-        "electricZap": "Electric Zap",
-        "catMeow": "Cat Meow",
-        "owlHoot": "Owl Hoot",
-        "wolfHowl": "Wolf Howl",
-        "frogCroak": "Frog Croak",
-        "windWhoosh": "Wind Whoosh",
-        "steamHiss": "Steam Hiss"
+        "softChime": "Mjukt pling",
+        "musicBox": "Speldosa",
+        "glassPing": "Glasklang",
+        "waterDrop": "Vattendroppe",
+        "bubblePop": "Bubbelplopp",
+        "hardBell": "Hård klocka",
+        "templeGong": "Tempelgong",
+        "anvilStrike": "Städslag",
+        "coinDrop": "Myntklirr",
+        "swordDraw": "Svärdsdrag",
+        "blaringHorn": "Tutande horn",
+        "carKlaxon": "Biltuta",
+        "sonarPing": "Ekopip",
+        "electricZap": "Elstöt",
+        "catMeow": "Kattmjau",
+        "owlHoot": "Uggleläte",
+        "wolfHowl": "Vargtjut",
+        "frogCroak": "Grodkvack",
+        "windWhoosh": "Vindsus",
+        "steamHiss": "Ångsus"
       },
       "procs": {
         "revenge": "Hämnd!",
@@ -2360,10 +2360,10 @@ export const sv_SE: EnTranslations = {
     },
     "plurals": {
       "guildBoardShown": {
-        "one": "{count} guild shown",
-        "few": "{count} guilds shown",
-        "many": "{count} guilds shown",
-        "other": "{count} guilds shown"
+        "one": "{count} gille visas",
+        "few": "{count} gillen visas",
+        "many": "{count} gillen visas",
+        "other": "{count} gillen visas"
       },
       "commissionMasterworks": {
         "one": "{count} mästerverk",
@@ -3192,7 +3192,7 @@ export const sv_SE: EnTranslations = {
       "coldsightRead": "Ditt nästa Långdrag orsakar {longDrawPct}% mer skada, eller ditt nästa Olycksskott orsakar {fellShotPct}% mer",
       "duskEconomy": "Förmågor kostar {pct}% mindre energi",
       "moontide": "Månflod: steg {stacks} av {max}. Vildbult-, Himlafall- och Månfrö-besvärjelser fyller den i Månugglaform; vid {max} blir Månfrö Månsvall och Himlafall Solspår, och båda tär på den",
-      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Varg- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
+      "oldBlood": "Gammalt Blod: steg {stacks} av {max}. Träffande Katt- och Bruin-slag delar detta förråd; vid {max} förvandlas Blodsbett eller Benkross",
       "verdance": "Grönska {stacks}/{max}. Varje NY Vildblomning eller Andra blomningen du planterar ger 1. Vid {max} blir Snabb läkning Överblomning",
       "freeExecute": "Din nästa kvalificerade avrättningsförmåga kostar ingenting",
       "resourceSap": "Återställer {value} av din nuvarande resurs var {interval}:e sek",
@@ -3257,7 +3257,7 @@ export const sv_SE: EnTranslations = {
       "elementalTrance": "Mottagen skada minskad med {pct}%. {mana}% av all skada du vållar omvandlas till mana",
       "stealth": "Verborgen; Bewegungstempo um {pct}% verringert",
       "formBear": "Bruinform: ökad hälsa och rustning",
-      "wolfForm": "Cat Form: melee damage and energy; movement speed increased by {pct}%",
+      "wolfForm": "Kattform: närstridsskada och energi; ökar förflyttningshastigheten med {pct}%",
       "formTravel": "Fleetform: förflyttningshastighet ökad med {pct}%",
       "formFireball": "Ember Form: rörelsehastigheten ökad med {pct}%; attacker och besvärjelser är inaktiverade",
       "formMoonkin": "Månugglaform: besvärjelseskada ökad med {pct}% och rustning ökad med {armorPct}%",
@@ -3600,10 +3600,10 @@ export const sv_SE: EnTranslations = {
       "quantityAria": "Enheter från {source}, upp till {count}",
       "decreaseAria": "Minska enheter från {source}",
       "increaseAria": "Öka enheter från {source}",
-      "decreaseByAria": "Decrease units from {source} by {count}",
-      "increaseByAria": "Increase units from {source} by {count}",
-      "moveAll": "Move all units",
-      "fits": "Up to {units} fit right now"
+      "decreaseByAria": "Minska enheter från {source} med {count}",
+      "increaseByAria": "Öka enheter från {source} med {count}",
+      "moveAll": "Flytta alla enheter",
+      "fits": "Upp till {units} får plats just nu"
     },
     "materialHint": {
       "fineGrade": "Fin kvalitet. Bruten ur en åder av full nivå med ett verktyg som rankar över materialet, och räknas som den vanliga versionen varhelst en sådan krävs.",
@@ -3892,14 +3892,14 @@ export const sv_SE: EnTranslations = {
       "subtitle": "Rikets gillen",
       "rosterTitle": "Visa medlemslistan för {guild}",
       "back": "Tillbaka",
-      "filters": "Board filters",
-      "newPlayerFriendly": "New player friendly",
-      "newPlayerFriendlyTitle": "This guild welcomes new players",
-      "filterNewPlayersTitle": "Show only guilds that welcome new players",
-      "filterEmpty": "No guild has opened its doors to new players yet.",
-      "showAll": "Show all guilds",
-      "officersOnline": "Officers online",
-      "officersOnlineLabel": "Officers online: {names}",
+      "filters": "Anslagstavlans filter",
+      "newPlayerFriendly": "Nybörjarvänligt",
+      "newPlayerFriendlyTitle": "Det här gillet välkomnar nya spelare",
+      "filterNewPlayersTitle": "Visa endast gillen som välkomnar nya spelare",
+      "filterEmpty": "Inget gille har öppnat sina dörrar för nya spelare än.",
+      "showAll": "Visa alla gillen",
+      "officersOnline": "Officerare online",
+      "officersOnlineLabel": "Officerare online: {names}",
       "officerEntry": "{name} ({rank})",
       "popupTitle": "Gillesskylt",
       "close": "Stäng"
@@ -3957,8 +3957,8 @@ export const sv_SE: EnTranslations = {
       "withdrawQuantityTitle": "Ta ut {item}",
       "withdrawQuantityInput": "Antal att ta ut",
       "withdrawQuantityConfirm": "Ta ut",
-      "quantityStepDownAria": "Decrease the quantity by {count}",
-      "quantityStepUpAria": "Increase the quantity by {count}",
+      "quantityStepDownAria": "Minska antalet med {count}",
+      "quantityStepUpAria": "Öka antalet med {count}",
       "vaultRowWithdrawName": "Ta ut {item}",
       "priceChanged": "Priset ändrades innan köpet slutfördes. Granska det uppdaterade priset och bekräfta igen.",
       "withdrawQuantityAction": "Antal att ta ut: {item}",
@@ -5011,8 +5011,8 @@ export const sv_SE: EnTranslations = {
       "lootMaybe": "Högst ett av dessa kan falla:",
       "lootChance": "Extra chans till föremål:",
       "lootHeroic": "Heroisk bonus, ett av dessa faller alltid:",
-      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
-      "lootHeroicChance": "Heroic bonus, additional chance drops:",
+      "lootHeroicMaybe": "Heroisk bonus, högst ett av dessa kan falla:",
+      "lootHeroicChance": "Heroisk bonus, extra chans till föremål:",
       "pct": "{pct}%",
       "blockedLevel": "Endast nivåerna {min} till {max}",
       "blockedSpec": "Kräver en specialisering",
@@ -5181,10 +5181,10 @@ export const sv_SE: EnTranslations = {
       "ownedTooltipStatus": "Katalogiserad i Relikvariet",
       "missingTooltipStatus": "Ännu inte funnen",
       "firstFindClears": "Först funnen vid klarning {count}",
-      "foundBy": "Found by {names}",
+      "foundBy": "Funnen av {names}",
       "finderWithDate": "{name} ({date})",
-      "sharedScopeNote": "Shared by every character on your account",
-      "sharedScopeHint": "A relic found by any character on your account fills the page here too.",
+      "sharedScopeNote": "Delas av alla karaktärer på ditt konto.",
+      "sharedScopeHint": "En relik som hittas av vilken karaktär som helst på ditt konto fyller sidan här också.",
       "unlockToast": "Relik katalogiserad: {name}",
       "illuminateBanner": "Sida illuminerad: {name}",
       "illuminateToast": "Varje relik på {name} är fylld.",
@@ -5318,10 +5318,10 @@ export const sv_SE: EnTranslations = {
       "progressAria": "Framsteg: {current} av {target}",
       "renownChip": "{renown} ryktbarhet",
       "earnedDate": "Fullbordad {date}",
-      "earnedBy": "Earned by {names}",
+      "earnedBy": "Fullbordad av {names}",
       "earnerWithDate": "{name} ({date})",
-      "accountScopeNote": "Shared by every character on your account",
-      "accountScopeHint": "A deed any character on your account accomplishes is earned here too, and the Book names who earned it.",
+      "accountScopeNote": "Delas av alla karaktärer på ditt konto.",
+      "accountScopeHint": "En bedrift som en karaktär på ditt konto fullbordar räknas som fullbordad här också, och Boken anger vem som fullbordade den.",
       "featRibbon": "Bragd",
       "hiddenBadge": "Dold",
       "titleChip": "Titelbelöning",
@@ -6314,7 +6314,7 @@ export const sv_SE: EnTranslations = {
       "deathTitle": "När du faller",
       "deathBody": "Om din hälsa når noll blir du nedlagd där du står, och din kropp ligger kvar. Släpp din ande, så reser du dig som en gengångare vid närmaste kyrkogård: snabbare till fots än de levande, utom räckhåll för dina fiender, men oförmögen att slåss, plundra eller tala med någon annan än Den bleka väktaren som svävar över stenarna. Därifrån väljer du. Spring med din gengångare tillbaka till din kropp, så återupplivas du på fläcken med en del av din hälsa och mana återställd och helt utan påföljd. Eller anta Den bleka väktarens omedelbara uppståndelse där du står, till priset av Väktartullen: en tillfällig försvagning av allt du är, som varar längre ju mer luttrad du är och som skonar helt nya karaktärer helt och hållet. Faller du inne i en fängelsehåla väntar din ande vid kyrkogården utanför; gå med din gengångare tillbaka genom dörren, så återupplivas du vid ingången. Delver är undantaget: faller du där sätts du helt enkelt på fötter igen vid delvens ingång, men ett andra fall avslutar passet. Vilken väg du än väljer förlorar du ingen erfarenhet, utrustning eller mynt. Mellan strider, sätt dig ner och ät och drick så att du börjar nästa vid full styrka.",
       "threatTitle": "Vem fienden anfaller",
-      "threatBody": "Varje fiende håller räkning på vem som har retat den mest. Skada bygger på den, och det gör läkning också: en läkning lägger hot på de fiender som redan slåss mot personen du läkte, uppdelat mellan dem, så den säkraste läkningen är en på någon som tanken redan har tag i. Tankar aktiverar en Gardställning eller en skyddande form som mångdubblar allt hot de genererar, medan druidens Vargform i stället gör sig av med hot, och en hån lyfter besvärjaren rakt till toppen av listan och håller fast fienden på dem i några sekunder. Fiender byter inte mål i samma stund som någon går om tanken: det krävs ett tydligt försprång för att lyckas, och ett större försprång på avstånd än i närstrid, så lite tålamod i början av en pull håller striden där den hör hemma.",
+      "threatBody": "Varje fiende håller räkning på vem som har retat den mest. Skada bygger på den, och det gör läkning också: en läkning lägger hot på de fiender som redan slåss mot personen du läkte, uppdelat mellan dem, så den säkraste läkningen är en på någon som tanken redan har tag i. Tankar aktiverar en Gardställning eller en skyddande form som mångdubblar allt hot de genererar, medan druidens Kattform i stället gör sig av med hot, och en hån lyfter besvärjaren rakt till toppen av listan och håller fast fienden på dem i några sekunder. Fiender byter inte mål i samma stund som någon går om tanken: det krävs ett tydligt försprång för att lyckas, och ett större försprång på avstånd än i närstrid, så lite tålamod i början av en pull håller striden där den hör hemma.",
       "hazardsTitle": "Vattnet kan döda dig",
       "breathBody": "Djupt vatten går att simma i, och du kan dyka under det. Medan ditt huvud är under vattnet visas en blå andningsmätare nära skärmens topp och den töms; bryt ytan och den fylls på mycket snabbare än den tömdes. Låter du den tömmas helt medan du fortfarande är under börjar du drunkna och förlorar en bit av din hälsa varje sekund tills du når luft, så håll ett öga på mätaren vid en lång dykning. Döden nollställer den, så en likfärd börjar alltid med fulla lungor.",
       "fatigueBody": "Havet har ingen vägg. Överfarterna världen är tänkt att du ska simma, sunden och tjärnarna mellan en landremsa och nästa, samt insjöarna, är säkra att korsa hur lång tid det än tar. Ge dig i stället ut förbi stranden i genuint öppet vatten och det börjar tära på din kraft: en varning visas, du får ett verkligt fönster att vända om, och därefter vållar havet stadigt tyngre skada som ingenting kan förhindra förrän du vänder tillbaka mot land. Drunknar du eller sliter du ut dig så långt från stranden släpper du din ande precis som vid vilken annan död, så behandla horisonten som utsikt snarare än ett resmål.",
@@ -6345,7 +6345,7 @@ export const sv_SE: EnTranslations = {
       "framePetBody": "Jägare, häxmästare och alla andra som har ett djur framme får en liten ram för det bredvid sin egen, med dess namn, nivå och hälsa. Att klicka på den ramen markerar ditt djur, och Ctrl+6 gör detsamma från tangentbordet.",
       "framesMoveBody": "Din ram, din målram och dina gruppramar kan alla flyttas. Var och en bär en liten flyttknapp i sitt hörn: lås upp den, dra ramen dit du vill ha den, och lås den igen så att ett felklick inte kan flytta den. Om de hamnar någonstans du ångrar finns Återställ ramarnas positioner i inställningarna, som slänger tillbaka dem alla dit de började.",
       "framesMoveBodyEditFrames": "Din ram, din målram och dina gruppmedlemsramar kan alla flyttas. Varje ram har en liten flyttknapp i hörnet: lås upp den, dra ramen dit du vill och lås den igen så att ett felklick inte kan flytta den. Redigera ramar, högst upp på ramfliken i gränssnittsalternativen, frigör resten av gränssnittet på en gång, tillsammans med dessa tre ramar: åtgärdsraderna, kastningsraden, svängraden, erfarenhetsraden, minimap, knappraden, husdjursramen, stansraden, raderna för förstärkningar och försvagningar samt namnmarkeringen för önskelistepåminnelsen. Var och en får en namnmarkering när den är frigjord. Om de hamnar någonstans du ångrar återställer Återställ standardvärden längst ned på samma ramflik dem alla till där de började.",
-      "framesGovernedExtra": "Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.",
+      "framesGovernedExtra": "Redigera ramar frigör också spårarstacken nedanför (dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, recept du fäst vid tillverkning, djupet du befinner dig i, varje spricka du deltar i samt receptet eller beställningen du följer), husdjurets åtgärdsrad bredvid dess ram, Målprickar-ramen för dina försvagningar på fiender i närheten, paladinens Andaktsmedaljong, häxmästarens Lidelsefält, överlägget för besvärjelseprocs, timern för vapenhandens svingar för den som använder två vapen och fönstret med flikar för skademätaren. Var och en får sin egen namnmarkering när den är frigjord.",
       "framesGovernedAuraTracks": "Redigera ramar frigör också de sex frivilliga auraraderna när du har slagit på dem på stridsfliken i samma gränssnittsalternativ: raden Mina förstärkningar, raden Defensiva nedkylningar, raden Mina sköldar, raden Offensiva nedkylningar, raden Rörelse och Smygande samt raden Mina förstärkningar på allierade. Varje rad är avstängd från början och får sin egen namnmarkering när den är frigjord.",
       "framesGovernedTalkingHead": "Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.",
       "barsTitle": "Mätare, timer och stridstext",
@@ -6358,7 +6358,7 @@ export const sv_SE: EnTranslations = {
       "minimapBody": "Uppe till höger: en rund minikarta med zonens namn ovanför och dina koordinater under, omringad av en urtavla som målar dygnets timme.\n\nSkivan bär mer än terräng. Din egen pil sitter i mitten och pekar dit du är vänd, med din grupp runt omkring dig som klassfärgade prickar och en kantpil för den som har vandrat utanför den. Uppdragsgivare bär samma märken där som de gör ute i världen, och du kommer också att upptäcka insamlingsnoder och hantverksstationer, reseportaler, plundringsbara kroppar och behållare, alla fientliga som fattat intresse för dig, vänner och gillesmedlemmar i närheten, och din egen kropp medan du springer tillbaka som en gengångare.\n\nSmå indikatorer dyker upp på den när de har något att säga: ett kuvert medan olästa brev väntar på dig, ett mynt medan försäljningsintäkter eller returnerade varor väntar hos Köpmannen, och en knapp med lista över dina Raidlåsningar.",
       "mapTitle": "Världskartan och dina spårare",
       "mapBody": "M öppnar världskartan: kontinenten uppritad, med din egen pil på den, zonerna och deras namn, intressepunkterna runt dig, reseportalerna och de insamlingsnoder du har hittat. Din grupp visas också på den. Inne i en delve växlar kartan till en skiss över de rum du har utforskat hittills.\n\nNer längs högerkanten, under minikartan, håller en stapel spårare din pågående verksamhet i sikte utan att du behöver öppna något: dina spårade uppdrag och deras mål, dina bedriftsframsteg, den delve du befinner dig i, och den reva du deltar i. Uppdragsspåraren fälls ihop när du vill ha skärmen tillbaka.",
-      "mapBodyZoneFirst": "M öppnar världskartan över zonen där du står, med din egen pil, sevärdheterna omkring dig, uppdragsgivarna med sina markeringar och områdena där dina mål finns, tillverkningsstationerna, brevlådorna, anslagstavlorna och odlingsbäddarna, ingångarna till fängelsehålorna och varje insamlingsnod i zonen. Noder är gråtonade medan de växer tillbaka och markerade när dina verktyg inte räcker till. Din grupp visas också på kartan. Högerklicka på kartan eller tryck på dess knapp Världskarta så zoomar den ut till kontinenten, där varje zon ritas med sitt namn och ett klick på en zon öppnar dess karta. Kliv in i ett djup, en fängelsehåla, en spricka eller ett slottsfäste så växlar kartan till en planritning över platsen där du står; slagfältet Törnhålefälten har en egen fältkarta.\n\nLängs höger sida, under minimappen, håller en stack av spårare din aktuella verksamhet synlig utan att något behöver öppnas: dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, djupet du befinner dig i och varje spricka du deltar i. Uppdragsspåraren kan fällas ihop när du vill ha tillbaka skärmen.",
+      "mapBodyZoneFirst": "M öppnar världskartan över zonen där du står, med din egen pil, sevärdheterna omkring dig, uppdragsgivarna med sina markeringar och områdena där dina mål finns, tillverkningsstationerna, brevlådorna, anslagstavlorna och odlingsbäddarna, ingångarna till fängelsehålorna och varje insamlingsnod i zonen. Noder är gråtonade medan de växer tillbaka och markerade när dina verktyg inte räcker till. Din grupp visas också på kartan. Högerklicka på kartan eller tryck på dess knapp Världskarta så zoomar den ut till kontinenten, där varje zon ritas med sitt namn och ett klick på en zon öppnar dess karta. Kliv in i ett djup, en fängelsehåla, en spricka eller ett slottsfäste så växlar kartan till en planritning över platsen där du står; slagfältet Törnhålefälten har en egen fältkarta.\n\nLängs höger sida, under minimappen, håller en stack av spårare din aktuella verksamhet synlig utan att något behöver öppnas: dina följda uppdrag och deras mål, dina bedriftframsteg, dina reliksamlingssidor, recept du fäst vid tillverkning, djupet du befinner dig i och varje spricka du deltar i. Uppdragsspåraren kan fällas ihop när du vill ha tillbaka skärmen.",
       "gatheringGoalTrackerBody": "En spårare för insamlingsmål läggs till i stacken när du väljer Följ för ett recept i tillverkningsfönstret eller en beställning på anslagstavlan: den visar receptet eller beställningen du följer, hur mycket du samlar till och hur långt dina burna och lagrade material räcker. Följ ersätter ditt nuvarande mål och Rensa tar bort det uttryckligen; inget av dem ändrar någonsin din skördeinställning.",
       "hubPracticeTrackerBody": "Nära navet i Östbäck läggs en övningsspårare till i stacken när du tar de vägledda övningslektionerna där: den håller dina bästa försök mot övningsdockorna synliga. Medan en lektion är aktiv visar en coachningsrad bredvid den det aktuella steget i lektionen, från att öppna Skademätare till att jämföra ett andra försök.",
       "chatTitle": "Chattrutan",
@@ -6714,7 +6714,7 @@ export const sv_SE: EnTranslations = {
       "mageEleSummon": "En Frost-besvärjelse som kallar elementaren till din sida och sätter den på ditt mål.",
       "formName": {
         "form_bear": "Bruinform",
-        "form_cat": "Vargform",
+        "form_cat": "Kattform",
         "form_travel": "Fleetform"
       }
     },
@@ -7235,7 +7235,7 @@ export const sv_SE: EnTranslations = {
     "deedsPage": {
       "intro": "Bedrifternas bok är där världen håller räkning på allt du har uträttat, från dina första steg ut ur startdalen till de hårdaste strider riket kan bjuda. Fullborda bedrifter medan du spelar, bär titlarna de skänker och se din ryktbarhet stiga.",
       "howHeading": "Så fungerar bedrifter",
-      "howBody": "Bedrifter fullbordas och bevaras en karaktär i taget, så varje hjälte du spelar bygger en egen Bok; bara rikets topplista samlar din Ryktbarhet över alla karaktärer du spelar, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.",
+      "howBody": "Bedrifter fullbordas en karaktär i taget, men Bedrifternas bok delas av alla karaktärer på ditt konto: en bedrift som någon av dem fullbordar räknas som fullbordad för alla, Boken anger vem som fullbordade den och när, och en titel eller ram den ger kan bäras av vilken av dina karaktärer som helst. Rikets topplista samlar din Ryktbarhet på samma sätt, och räknar varje bedrift bara en gång. Varje bedrift berättar rakt på sak vad den kräver av dig, direkt i Bedrifternas bok i spelet, så du vet alltid vad du ska jaga, och du kan bevaka dem du är ute efter för att hålla dem i sikte medan du spelar. Ett litet fåtal förblir hemliga och visar sig först när du har fullbordat dem. Boken håller sig också ärlig: allt som ditt tidigare facit kan bevisa krediterar den på fläcken, så en veteran öppnar den aldrig till en tom sida; bara de räknande bedrifterna börjar sin räkning från noll.",
       "renownHeading": "Ryktbarhet",
       "renownBody": "Ryktbarhet är poängen bakom Boken. Varje bedrift du vinner är värd en bestämd summa, och din totalsumma stiger bara, så en lugn vecka kostar dig aldrig mark. En handfull hänger på tur snarare än skicklighet, andra samlarbedrifter är sin egen belöning, och Stordåd är en ära för sig, så ingen av dem är värd någon Ryktbarhet. Bedrifter utan Ryktbarhet räknas ändå mot att fullborda din Bok; de ger bara aldrig poäng. Stordåd är det enda undantaget, hållna helt utanför räkningen.",
       "rewardsHeading": "Titlar och ramar",
@@ -7359,7 +7359,7 @@ export const sv_SE: EnTranslations = {
       "groupClasses": "Klasser",
       "groupForms": "Druidformer",
       "formBear": "Bruinform",
-      "formCat": "Vargform",
+      "formCat": "Kattform",
       "formTravel": "Fleetform",
       "groupCreatures": "Varelser",
       "groupPets": "Häxmästardemoner",
@@ -7795,7 +7795,7 @@ export const sv_SE: EnTranslations = {
         "commissionsBody": "En beställning är ett hantverk skapat för någon. När ett vapen, en rustningspjäs eller ett hållet off-hand tillverkas (en dryck kan inte bära en band), kan hantverkaren flagga hantverket som en beställning: det färdiga stycket beter sig normalt i tillverkarens egna händer, men det ögonblick det byter händer i en handel binds det till personen som tog emot det. Det är Tillverkarens Band: köparen får sin pjäs, och pjäsen kan inte lämnas vidare eller säljas.\n\nBand är inte för evigt, bara dyra. En stationsmästare kan lösa upp ett bundet stycke när du står vid deras station (en mobil station erbjuder aldrig den tjänsten), mot en avgift satt av föremålets kvalitet: 25 silver ovanlig, 1 guld sällsynt, 4 guld episk, med en legendarisk som betalar den episka taxan och ett beställt vanligt stycke den ovanliga.\n\nAvgiften köper en ren tavla, inte ett botemedel: stycket är fortfarande en beställning, så det binds igen till vem som tar emot det i nästa handel, och allt annat om det, signatur, mästerverk och förtrollningar, förblir orört.",
         "provenanceHeading": "Signerat arbete",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; öppna Källor för hela listan. Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.",
+        "provenanceBodyUndiscounted": "Vissa föremål bär ett namn. Ett materials källrader anger vem som samlade varje grupp av enheter, medan en separat markering för signerad av anger den särskilda undertecknaren när det finns en. De uppgifterna är oberoende: vanligt insamlat material registrerar en samlare utan att få en signatur, och äldre signerat lager kan ange sin undertecknare samtidigt som det ärligt säger att ingen samlare registrerades. En färdig pjäs anger i stället vem som tillverkade den. Dessa uppgifter följer föremålet genom handel, banken, posten, Världsmarknaden och till och med en handlares återköp, och de bleknar aldrig.\n\nInsamling signerar automatiskt sitt bästa arbete: varje skörd som blir sällsynt eller bättre kommer signerad, och sällsynta fynd signerar hela sin femdubbla vinst. En lyckad kroppsskördsrullning signerar sin avkastning där familjen inte har något specimen att ge, och där den har det behålls avkastningen vanlig medan ett signerat orört specimen skapas bredvid. Tillverkning följer samma linje: varje kopia av ett sällsynt eller bättre resultat skapas signerad, och ett mästerverk signeras alltid oavsett kvalitet, så den finaste versionen av varje pjäs anger alltid sin tillverkare. Ett vanligt materials signatur följer själva enheterna och kan inte försvinna bara för att en kompatibel stapel redan innehåller en annan samlare eller undertecknare. Ett särskilt orört specimen är ett eget föremål och behöver fortfarande plats; om det inte får rum kvarstår den vanliga kroppsskörden men specimenet går förlorat.\n\nFärdiga föremål behåller en strikt identitet, så två kopior slås bara ihop när varje markering är exakt lika: samma föremål, samma undertecknare, samma mästerverksegenskaper, samma förtrollning, samma bindning. Kompatibla material delar en plats mellan samlare och undertecknare samtidigt som de behåller en räkning för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller de staplarna isär i dina väskor, och sortering respekterar det valet. Överfört material kan staplas normalt med mottagarens material.\n\nSignaturer betalar tillbaka till hantverkare: att hålla en signerad kopia av ett nödvändigt reagens vid bänken, vem som än signerade det, lägger till 2 procentenheter till mästerverkschansen, och att hålla ett reagens signerat av din egen hand minskar den reagensens erforderliga mängd med en (aldrig under en), såvida reagensen inte är markerad som utan rabatt; raidkärnor behåller alltid sin fulla kostnad. Ditt eget signerade sällsynta eller bättre arbete fortsätter till och med att lära dig, i dag bara genom tillverkade drycker: drick en sällsynt brygd som du själv bryggt och signerat så återgår en liten strimma skicklighet till yrket som gjorde den, så länge yrket är ett av dina aktiva huvudyrken. Det är verkligen bara dryckesgrenen och inget annat, så ett elixir, en skrift eller en toppflaska lär dig inget tillbaka hur fint den än var signerad.",
         "collectorsHeading": "Samlare, trofeer, och priset pa en historia",
         "collectorsBody": "Handlare är blinda för ursprung: ett signerat föremål säljs till ett NPC för exakt sitt ordinarie pris. Premiumet på en signatur finns bara mellan spelare, vilket är precis vad som gör det intressant: en stapel vindfallsmalm signerad av en berömd samlare, ett Primärsnitt från en lycklig insamling, ett mästerverk-svärd som namnger en hantverkare som sedan gått i pension, alla kostar vad någons minne säger att de är värda.\n\nBedrifternas bok lutar sig mot samma instinkt: Oskadd åder, Urgammalt hjärtved, Månlyst blomma, Ett perfekt exemplar och Glimmer av hopp är noll-ryktbarhetens samlarmärken som finns enbart för att bevisa att ett ögonblick hände dig. Behåll föremålet som förtjänade bedriften och du har kvittot. Inget av detta är styrka; ursprung köper inga egenskaper och vinner inga strider, det är spelets pappersspår av goda dagar.",
         "castPaceHeading": "Kasttid och guldslukaren",
@@ -7838,7 +7838,7 @@ export const sv_SE: EnTranslations = {
         "title": "Yrkens FAQ",
         "intro": "Snabba svar på de frågor hantverkare ställer oftast.",
         "q1": "Varför staplas inte mina signerade föremål?",
-        "a1": "Färdiga föremål följer fortfarande den strikta instansregeln: två kopior slås bara ihop när undertecknare, rullade egenskaper, mästerverksegenskaper, förtrollning, bindning och all annan identitet matchar exakt. En signerad klinga hålls därför isär från en vanlig.\n\nMaterial är undantaget. Kompatibla staplar av samma material kan slås ihop även när deras samlare eller undertecknare skiljer sig, eftersom stapeln behåller ett antal för varje källa. Verktygstipset vid hovring sammanfattar källorna; öppna Källor för hela listan. Separera efter samlare håller staplarna isär i väskorna och sortering respekterar valet. Överfört material kan staplas normalt med mottagarens material.",
+        "a1": "Färdiga föremål följer fortfarande den strikta instansregeln: två kopior slås bara ihop när undertecknare, rullade egenskaper, mästerverksegenskaper, förtrollning, bindning och all annan identitet matchar exakt. En signerad klinga hålls därför isär från en vanlig.\n\nMaterial är undantaget. Kompatibla staplar av samma material kan slås ihop även när deras samlare eller undertecknare skiljer sig, eftersom stapeln behåller ett antal för varje källa. Verktygstipset vid hovring sammanfattar källorna; högerklicka på stapeln för hela listan (på touch, använd dess Källor-knapp). Separera efter samlare håller staplarna isär i väskorna och sortering respekterar valet. Överfört material kan staplas normalt med mottagarens material.",
         "q2": "Höjer vanliga recept min skicklighet for evigt?",
         "a2": "Nej. Varje recept bedöms efter hur långt det ligger under din nuvarande nivå i hantverket, den klassiska läsningen orange, gul, grön, grå: full vinst vid eller över din nivå, halv ett steg under, en fjärdedel två steg under och ingen vinst tre eller fler steg under. Nivåerna ligger var 25:e skicklighet, så de fria recepten vid skicklighet 0 slutar lära dig något vid 75.\n\nTaken är också lägre än de klassiska 300 du kanske väntar dig: vart och ett av de tio möjliga hantverken har taket 125, Gruvdrift, Skogsavverkning och Örtkunskap har 100 och Fiske går till 200. Att klättra innebär att gå vidare till recept på din egen nivå, inte att slipa det billigaste.",
         "q3": "Vad är skillnaden mellan att plundra och skörda en kropp?",
@@ -10481,7 +10481,7 @@ export const sv_SE: EnTranslations = {
       "stunned": "Du är bedövad!",
       "silenced": "Du är tystad!",
       "busy": "Du är upptagen.",
-      "cannotCastWhileMoving": "You can't cast while moving.",
+      "cannotCastWhileMoving": "Du kan inte kasta besvärjelser medan du rör dig.",
       "abilityNotReady": "Den förmågan är inte redo än.",
       "notEnoughRage": "Inte tillräckligt med raseri!",
       "notEnoughEnergy": "Inte tillräckligt med energi!",
@@ -10494,7 +10494,7 @@ export const sv_SE: EnTranslations = {
       "requiresForm": "Du måste vara i {form}-form.",
       "cantInForm": "Du kan inte göra det i {form}-form.",
       "bear": "Bruin",
-      "cat": "Varg",
+      "cat": "Katt",
       "travel": "Fleet",
       "shapeshifted": "Du kan inte göra det medan du är förvandlad.",
       "stealthed": "Du måste smyga.",
@@ -10826,7 +10826,7 @@ export const sv_SE: EnTranslations = {
     },
     "forms": {
       "bear": "Björn",
-      "cat": "Varg"
+      "cat": "Katt"
     },
     "cast": {
       "fishing": "Fiske",
@@ -12065,7 +12065,7 @@ export const sv_SE: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Förhäxar fienden i 8 sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada."
+        "description": "Förhäxar fienden i 8 sek, vållar skuggskada och genererar 2 Fördömelse var 2:e sek. Dess nästa 3 skadegörande handlingar genererar vardera 7 Fördömelse och piskar den för 17 skuggskada."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -12101,7 +12101,7 @@ export const sv_SE: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål."
+        "description": "Märker en fiende i 15 sek. Dina nästa 3 direkta besvärjelser ekar för 25% skada mot det märkta målet, eller kopierar 50% skada till det när de kastas mot ett annat mål. Fördärvsbult-ekon räknas också som kritiska träffar, utan ytterligare multiplikator för kritisk skada."
       },
       "wrath": {
         "name": "Vildbult",
@@ -12140,7 +12140,7 @@ export const sv_SE: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruinform",
-        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Kasta igen för att återgå till besvärjarform."
+        "description": "Skiftar gestalt till en björn: rustning +110 %, maximal hälsa +30 %, kraftigt ökad attackkraft, dina attacker bygger raseri och genererar 30 % mer hot. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till besvärjarform."
       },
       "maul": {
         "name": "Benkross",
@@ -12156,17 +12156,17 @@ export const sv_SE: EnTranslations = {
         "description": "Ett olycksbådande vrål: varje fiende inom 10 meter eggas, dess hot mot dig stiger till nivån hos dess mest hatade fiende, och den tvingas anfalla dig i 3 sek. Endast i Bruinform."
       },
       "cat_form": {
-        "name": "Vargform",
+        "name": "Kattform",
         "description": "Förvandlar er till en varg: smidigheten stiger med er nivå, anfallskraft +8 plus 2 per nivå, era anfall använder energi och kombopoäng, och ni alstrar 29% mindre hot. Att skifta till vilken gestalt som helst ger Lunkande steg: 60% förflyttningshastighet i 3 sek, en gång var 20:e sek. Besvärj igen för att återgå till besvärjarskepnaden."
       },
       "claw": {
         "name": "Rivklo",
-        "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Vargform.",
+        "description": "Klösa fienden för vapenskada plus {damage}. Ger 1 kombopoäng. Endast i Kattform.",
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "ferocious_bite": {
         "name": "Blodsbett",
-        "description": "Avslutande drag som orsakar {damage}. Endast i Vargform.",
+        "description": "Avslutande drag som orsakar {damage}. Endast i Kattform.",
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod; vid 3 Gammalt Blod blir denna knapp Röd Skörd, som förbrukar ditt Gamla Blod för ett kraftigare slag som också omedelbart ger all skada som dina Flå och Riv upp ännu skulle ha gett, och återställer energi."
       },
       "swipe": {
@@ -12198,7 +12198,7 @@ export const sv_SE: EnTranslations = {
       },
       "travel_form": {
         "name": "Fleetform",
-        "description": "Skiftar omedelbart till en snabb Fleetform och ökar förflyttningshastigheten med 40 %. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt."
+        "description": "Skiftar omedelbart till en snabb Fleetform, ökar förflyttningshastigheten med 40 % och tar bort brytbara rotbindningar och nedsaktningar. Du kan inte använda andra förmågor i skepnaden, men kan skifta in eller ut i strid, idealiskt för flykt. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet."
       },
       "enrage": {
         "name": "Elda på",
@@ -12218,7 +12218,7 @@ export const sv_SE: EnTranslations = {
       },
       "dash": {
         "name": "Rusa",
-        "description": "Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i vargform."
+        "description": "Spurta framåt och öka förflyttningshastigheten med 50 % i 15 sek. Endast i kattform."
       },
       "pounce": {
         "name": "Smyghugg",
@@ -12237,12 +12237,12 @@ export const sv_SE: EnTranslations = {
         "description": "Fienden svärmas av insekter och tar {damage} naturskada över 12 sek."
       },
       "tigers_fury": {
-        "name": "Vargblod",
-        "description": "Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast vargform."
+        "name": "Lodjursblod",
+        "description": "Frigör {rage} energi och ökar attackstyrkan med {buff} i {duration} sek. Endast kattform."
       },
       "rip": {
         "name": "Blodsspricka",
-        "description": "Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Vargform.",
+        "description": "Avslutande drag som får målet att blöda var 2:e sek, i 24 sek: 36 skada plus 24 per förbrukat kombopoäng (5 kombopoäng: {damage} totalt). Endast i Kattform.",
         "specNote_feral": "Det landade slaget lägger till 1 Gammalt Blod (max 3)."
       },
       "mortal_strike": {
@@ -12439,11 +12439,11 @@ export const sv_SE: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Månugglaform",
-        "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Kasta igen för att återgå till normal form. (Balanssignatur)"
+        "description": "Anta månugglaform och stärk besvärjelser tills du skiftar tillbaka. Att skifta till valfri gestalt ger Språngsteg, en kort skur av förflyttningshastighet. Kasta igen för att återgå till normal form. (Balanssignatur)"
       },
       "feral_charge": {
         "name": "Urvåg",
-        "description": "Släpp lös en urvåg. I Vargform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)"
+        "description": "Släpp lös en urvåg. I Kattform ökar er energiregenerering med 100% i 10 sek. I Bruinform får ni omedelbart 50 raseri. (Vildhetssignatur)"
       },
       "swiftmend": {
         "name": "Snabb läkning",
@@ -12663,7 +12663,7 @@ export const sv_SE: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Fördärvsbult",
-        "description": "Förbrukar 3 Förödelse för att slunga en tung kaotisk eldblixt som vållar {damage} Eldskada. Ödeläggelse kortar dess besvärjelse med 30%."
+        "description": "Förbrukar 3 Förödelse för att slunga en tung kaotisk eldblixt som vållar {damage} Eldskada innan kritisk skada tillämpas. Slår alltid kritiskt vid träff. Ödeläggelse kortar dess besvärjelse med 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -12807,7 +12807,7 @@ export const sv_SE: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Perfekt ögonblick",
-        "description": "Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte. (Kronomantik)"
+        "description": "Grip ditt perfekta ögonblick: vinn genast 4 Arkanska Laddningar, och under 10 sek förbrukar Eterpilar dem inte och vållar 20% ökad skada. (Kronomantik)"
       },
       "arcane_surge": {
         "name": "Etersvall",
@@ -12956,7 +12956,7 @@ export const sv_SE: EnTranslations = {
       },
       "rake": {
         "name": "Flå",
-        "description": "Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Vargform.",
+        "description": "Flå fienden för vapenskada plus {damage} och orsaka blödningsskada under 18 sek. Ger 1 kombopoäng. Endast i Kattform.",
         "specNote_feral": "Varje träffande slag lägger till 1 Gammalt Blod (max 3)."
       },
       "revive_pet": {

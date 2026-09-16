@@ -2,6 +2,112 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.cannotCastWhileMoving': 'Nie możesz rzucać zaklęć podczas ruchu.',
+  'hudChrome.auraEffect.wolfForm':
+    'Postać kota: obrażenia w zwarciu i energia; prędkość ruchu zwiększona o {pct}%',
+  'hudChrome.auraOverlay.cues.anvilStrike': 'Uderzenie kowadła',
+  'hudChrome.auraOverlay.cues.blaringHorn': 'Ryk rogu',
+  'hudChrome.auraOverlay.cues.bubblePop': 'Pęknięcie bańki',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Klakson samochodu',
+  'hudChrome.auraOverlay.cues.catMeow': 'Miauczenie kota',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Brzęk monety',
+  'hudChrome.auraOverlay.cues.electricZap': 'Trzask elektryczny',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Rechot żaby',
+  'hudChrome.auraOverlay.cues.glassPing': 'Brzdęk szkła',
+  'hudChrome.auraOverlay.cues.hardBell': 'Ostry dzwonek',
+  'hudChrome.auraOverlay.cues.musicBox': 'Pozytywka',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Pohukiwanie sowy',
+  'hudChrome.auraOverlay.cues.softChime': 'Delikatny dzwoneczek',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Sygnał sonaru',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Syk pary',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Szczęk miecza',
+  'hudChrome.auraOverlay.cues.templeGong': 'Gong świątynny',
+  'hudChrome.auraOverlay.cues.waterDrop': 'Kropla wody',
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Świst wiatru',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Wycie wilka',
+  'hudChrome.auraOverlay.haptic': 'Wibracje',
+  'hudChrome.auraOverlay.hapticHint':
+    'Wprawia w wibracje podłączony kontroler albo telefon. Ignorowane, gdy urządzenie nie ma wibracji.',
+  'hudChrome.auraOverlay.hapticNone': 'Wyłączone',
+  'hudChrome.auraOverlay.haptics.double': 'Podwójne',
+  'hudChrome.auraOverlay.haptics.long': 'Długie',
+  'hudChrome.auraOverlay.haptics.tap': 'Stuk',
+  'hudChrome.auraOverlay.readyGlow': 'Podświetlenie paska akcji',
+  'hudChrome.auraOverlay.readyGlowHint':
+    'Podświetla to zaklęcie na pasku akcji, gdy jego wzmocnienie jest aktywne.',
+  'hudChrome.auraOverlay.reticleTick': 'Znacznik celownika',
+  'hudChrome.auraOverlay.reticleTickHint':
+    'Dodaje znacznik blisko środka ekranu, który zapala się, gdy to zaklęcie procuje.',
+  'hudChrome.auraOverlay.sound': 'Sygnał dźwiękowy',
+  'hudChrome.auraOverlay.soundHint':
+    'Dźwięk odtwarza się każdym razem, gdy to zaklęcie procuje. Wyłącz ikonę, półksiężyce i pierścień na ziemi, aby dźwięk sam o tym informował.',
+  'hudChrome.auraOverlay.soundNone': 'Brak dźwięku',
+  'hudChrome.auraOverlay.soundPreview': 'Odtwórz',
+  'hudChrome.auraOverlay.soundPreviewAria': 'Odsłuchaj sygnał dźwiękowy {sound}',
+  'hudChrome.auraOverlay.soundVolume': 'Głośność dźwięku',
+  'hudChrome.auraOverlay.watchlist': 'Śledzone zaklęcia',
+  'hudChrome.auraOverlay.watchlistCount': '{count} śledzonych',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    'Żadne inne zaklęcie w twojej księdze zaklęć nie nakłada na ciebie wzmocnienia.',
+  'hudChrome.auraOverlay.watchlistHint':
+    'Wybierz dowolne zaklęcie, które cię wzmacnia, aby dać mu własną aurę. Wybrane zaklęcia otrzymują poniżej pełną kartę, z własną ikoną, kolorem, pozycją i pierścieniem na ziemi.',
+  'hudChrome.auraOverlay.watchlistUnwatch': 'Przestań śledzić {spell}',
+  'hudChrome.auraOverlay.watchlistWatch': 'Śledź {spell}',
+  'hudChrome.bank.quantityStepDownAria': 'Zmniejsz liczbę o {count}',
+  'hudChrome.bank.quantityStepUpAria': 'Zwiększ liczbę o {count}',
+  'hudChrome.deeds.accountScopeHint':
+    'Czyn dokonany przez którąkolwiek postać na twoim koncie zostaje zdobyty także tutaj, a Księga podaje, kto go zdobył.',
+  'hudChrome.deeds.accountScopeNote': 'Współdzielone przez każdą postać na twoim koncie',
+  'hudChrome.deeds.earnedBy': 'Zdobyty przez {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} ({date})',
+  'hudChrome.finder.lootHeroicChance': 'Bonus heroiczny, dodatkowe losowe przedmioty do zdobycia:',
+  'hudChrome.finder.lootHeroicMaybe': 'Bonus heroiczny, co najwyżej jeden z tych może wypaść:',
+  'hudChrome.keybinds.friendlyNameplates': 'Przełącz plakietki sojuszników',
+  'hudChrome.leaderboard.podiumLabel': 'Podium',
+  'hudChrome.leaderboard.prestigeTitle': 'Prestiż {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Nieodebrane',
+  'hudChrome.materialSources.decreaseByAria': 'Zmniejsz liczbę sztuk z {source} o {count}',
+  'hudChrome.materialSources.fits': 'W tej chwili zmieści się do {units}',
+  'hudChrome.materialSources.increaseByAria': 'Zwiększ liczbę sztuk z {source} o {count}',
+  'hudChrome.materialSources.moveAll': 'Przenieś wszystkie sztuki',
+  'hudChrome.noticeboard.filterEmpty':
+    'Żadna gildia nie otworzyła jeszcze swoich drzwi nowym graczom.',
+  'hudChrome.noticeboard.filterNewPlayersTitle':
+    'Pokaż tylko gildie, które mile widzą nowych graczy',
+  'hudChrome.noticeboard.filters': 'Filtry tablicy',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Przyjazne dla nowych graczy',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Ta gildia mile widzi nowych graczy',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Oficerowie online',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Oficerowie online: {names}',
+  'hudChrome.noticeboard.showAll': 'Pokaż wszystkie gildie',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    'Wyświetlane na tablicy rekrutów przy drogowskazie na Wybrzeżu Prób.',
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Przyjazne dla nowych graczy',
+  'hudChrome.plurals.guildBoardShown.few': '{count} gildie',
+  'hudChrome.plurals.guildBoardShown.many': '{count} gildii',
+  'hudChrome.plurals.guildBoardShown.one': '{count} gildia',
+  'hudChrome.plurals.guildBoardShown.other': '{count} gildii',
+  'hudChrome.professionTrainers.alchemy': 'Trener Alchemii',
+  'hudChrome.professionTrainers.blacksmithing': 'Trener Kowalstwa',
+  'hudChrome.professionTrainers.cooking': 'Trener Gotowania',
+  'hudChrome.professionTrainers.engineering': 'Trener Inżynierii',
+  'hudChrome.professionTrainers.farming': 'Trener Uprawy',
+  'hudChrome.professionTrainers.hobby': 'Trener Hobby',
+  'hudChrome.professionTrainers.leatherworking': 'Trener Garbarstwa',
+  'hudChrome.professionTrainers.mining': 'Trener Górnictwa',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Trener Krawiectwa',
+  'hudChrome.reliquary.finderWithDate': '{name} ({date})',
+  'hudChrome.reliquary.foundBy': 'Znaleziona przez {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    'Relikwia znaleziona przez którąkolwiek postać na twoim koncie wypełnia kartę także tutaj.',
+  'hudChrome.reliquary.sharedScopeNote': 'Współdzielone przez każdą postać na twoim koncie',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Witaj w Eastbrook! Marszałek Redbrook ma dla ciebie zadanie na miejskim placu. Włącz złote naprowadzanie, aby go znaleźć i podjąć zadanie Wilki u wrót, albo zwiedzaj samodzielnie. Możesz to później zmienić w: Opcje, Interfejs, Walka.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Wyłącz naprowadzanie',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Włącz naprowadzanie',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'Złote naprowadzanie w Eastbrook',
   'hudChrome.barEditor.armed': 'Dotknij slotu, aby umieścić w nim {name}.',
   'hudChrome.barEditor.buttonHeader': 'Przycisk {button}',
   'hudChrome.barEditor.cellAria': 'Przycisk {button}, {direction}: {action}',
@@ -953,7 +1059,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     'Postać do podróżowania: znacznie szybsza po lądzie, ale bez innych zdolności, dopóki z niej nie wyjdziesz.',
   'guide.classPage.formName.form_bear': 'Postać Bruina',
-  'guide.classPage.formName.form_cat': 'Postać wilka',
+  'guide.classPage.formName.form_cat': 'Postać kota',
   'guide.classPage.formName.form_travel': 'Postać Fleet',
   'guide.classPage.formsHeading': 'Zmiana kształtu',
   'guide.classPage.formsMoonwing':
@@ -983,7 +1089,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Morze nie ma muru. Przeprawy, które świat przewidział do przepłynięcia: cieśniny i rozlewiska między jednym skrawkiem lądu a drugim oraz jeziora śródlądowe, można przemierzać bezpiecznie, bez względu na to, jak długo to trwa. Wypłyń jednak poza brzeg na naprawdę otwarte wody, a woda zacznie wyczerpywać twoje siły: pojawia się ostrzeżenie, dostajesz realną chwilę, by zawrócić, a potem morze zadaje coraz cięższe obrażenia, których nic nie powstrzyma, dopóki nie ruszysz z powrotem ku lądowi. Utoń albo wyczerp się tak daleko od brzegu, a uwolnisz ducha jak przy każdej innej śmierci, więc traktuj horyzont jako krajobraz, a nie cel podróży.',
   'guide.combat.hazardsTitle': 'Woda może cię zabić',
   'guide.combat.threatBody':
-    'Każdy wróg prowadzi własną, prywatną listę tego, kto najbardziej go rozzłościł. Dokładają się do niej obrażenia, podobnie jak leczenie: leczenie nakłada zagrożenie na wrogów już walczących z uleczoną osobą, rozłożone między nimi, więc najbezpieczniejsze leczenie trafia w kogoś, kogo tank już trzyma na sobie. Tankowie włączają czujną postawę albo ochronną postać, która mnoży wszystko, co generują, podczas gdy Postać wilka druida zamiast tego zrzuca zagrożenie, a prowokacja podnosi rzucającego prosto na szczyt listy i przypina do niego wroga na kilka sekund. Wrogowie nie zmieniają celu w chwili, gdy ktoś wyprzedzi tanka: potrzeba wyraźnej przewagi, by go przejąć, i większej przewagi na dystansie niż w zwarciu, więc odrobina cierpliwości na początku starcia utrzymuje walkę tam, gdzie powinna być.',
+    'Każdy wróg prowadzi własną, prywatną listę tego, kto najbardziej go rozzłościł. Dokładają się do niej obrażenia, podobnie jak leczenie: leczenie nakłada zagrożenie na wrogów już walczących z uleczoną osobą, rozłożone między nimi, więc najbezpieczniejsze leczenie trafia w kogoś, kogo tank już trzyma na sobie. Tankowie włączają czujną postawę albo ochronną postać, która mnoży wszystko, co generują, podczas gdy Postać kota druida zamiast tego zrzuca zagrożenie, a prowokacja podnosi rzucającego prosto na szczyt listy i przypina do niego wroga na kilka sekund. Wrogowie nie zmieniają celu w chwili, gdy ktoś wyprzedzi tanka: potrzeba wyraźnej przewagi, by go przejąć, i większej przewagi na dystansie niż w zwarciu, więc odrobina cierpliwości na początku starcia utrzymuje walkę tam, gdzie powinna być.',
   'guide.combat.threatTitle': 'Kogo atakuje wróg',
   'guide.combat.unstuckBody':
     'Jeśli świat uwięzi cię gdzieś, skąd nie możesz się wydostać, wpisz /unstuck. Musisz być poza walką i stać nieruchomo, nie trzymany przez ogłuszenie ani unieruchomienie, i nie być w pojedynku ani meczu na arenie: rusza krótkie odliczanie, a poruszenie się lub otrzymanie obrażeń je anuluje. Gdy dobiegnie końca, zostajesz postawiony na najbliższym cmentarzu. Nigdy cię nie zabija i nie zostawia zwłok, a jeśli już leżałeś powalony, zamiast tego cię tam wskrzesza. Ceną jest Choroba Wyzwolenia, chwilowe osłabienie wszystkiego, czym jesteś, które zdąży minąć, zanim będziesz mógł ponownie użyć tego polecenia, i tak jak Opłata Strażnika, oszczędza całkiem nowe postacie.',
@@ -3207,7 +3313,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Ciska odłamkiem lodu, zadając {damage} obrażeń od Mrozu, potrojonych przeciwko zamrożonemu celowi. Wydaje Palce Mrozu lub ładunek Winterowego Chłodu, traktując cel jako zamrożony. (Mróz)',
   'entities.abilities.ice_lance.name': 'Lodowa lanca',
   'entities.abilities.perfect_moment.description':
-    'Uchwyć swój doskonały moment: natychmiast zyskujesz 4 Eteryczne Ładunki i przez 10 sek. Eteryczne strzały ich nie wydają. (Chronomancja)',
+    'Uchwyć swój doskonały moment: natychmiast zyskujesz 4 Eteryczne Ładunki i przez 10 sek. Eteryczne strzały ich nie wydają i zadają 20% więcej obrażeń. (Chronomancja)',
   'entities.abilities.perfect_moment.name': 'Idealna chwila',
   'entities.abilities.shatter.name': 'Krucha ruina',
   'entities.abilities.temporal_acceleration.description':
@@ -4975,8 +5081,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'abilityUi.cast.rift_tide_strike': 'Miażdżąca Głębia',
   'abilityUi.cast.rift_venom_execution': 'Kałuża Jadu',
   'abilityUi.cast.rift_venom_strike': 'Znamię Matki Roju',
-  'abilityUi.forms.bear': 'Niedźwiedź',
-  'abilityUi.forms.cat': 'Wilk',
+  'abilityUi.forms.bear': 'Bruin',
+  'abilityUi.forms.cat': 'Kot',
   'abilityUi.resources.energy': 'Energia',
   'abilityUi.resources.mana': 'Mana',
   'abilityUi.resources.rage': 'Wściekłość',
@@ -5337,7 +5443,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Przez 3 sek. potem Postać wilka jest darmowa i przygważdża cel, spowalniając go o 50% na 4 sek. Zasięg 8-25 jardów. Tylko w postaci Bruina.',
   'entities.abilities.bear_charge.name': 'Szarża Bruina',
   'entities.abilities.bear_form.description':
-    'Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Rzuć ponownie, aby wrócić do postaci rzucającego.',
+    'Zmień postać w niedźwiedzia: pancerz +110%, maksymalne zdrowie +30%, znacznie zwiększona moc ataku, twoje ataki budują wściekłość i generują 30% więcej zagrożenia. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do postaci rzucającego.',
   'entities.abilities.bear_form.name': 'Postać Bruina',
   'entities.abilities.berserker_rage.description':
     'Wpadnij w kipiącą furię, generując 20 wściekłości. (Talent wojownika)',
@@ -5355,7 +5461,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.bloodthirst.name': 'Upust krwi',
   'entities.abilities.cat_form.description':
     'Zmienia cię w wilka: zręczność rośnie z twoim poziomem, moc ataku +8 plus 2 na poziom, twoje ataki używają energii i punktów kombinacji, a ty generujesz o 29% mniejsze zagrożenie. Zmiana w dowolną postać przyznaje Długi krok: 60% prędkości ruchu na 3 sekundy, raz na 20 sekund. Rzuć ponownie, by wrócić do postaci rzucającego zaklęcia.',
-  'entities.abilities.cat_form.name': 'Postać wilka',
+  'entities.abilities.cat_form.name': 'Postać kota',
   'entities.abilities.charge.description':
     'Szarżuj na wroga, generując 9 wściekłości i ogłuszając go na 1 sek. Zasięg 8-25 jardów.',
   'entities.abilities.charge.name': 'Natarcie',
@@ -5386,7 +5492,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przeklina cel agonią: {damage} obrażeń od cienia w ciągu 24 sek.',
   'entities.abilities.curse_of_agony.name': 'Urok udręki',
   'entities.abilities.dash.description':
-    'Rusza naprzód susem, zwiększając prędkość ruchu o 50% na 15 sek. Tylko w postaci wilka.',
+    'Rusza naprzód susem, zwiększając prędkość ruchu o 50% na 15 sek. Tylko w postaci kota.',
   'entities.abilities.dash.name': 'Sus',
   'entities.abilities.deadly_poison.description':
     'Pokrywa twój oręż na 30 min. Każde uderzenie wręcz dodaje celowi warstwę trucizny, do 5, i odnawia czas trwania 12 sek. Każda warstwa zadaje {damage} obrażeń natury co 2 sek.',
@@ -5694,10 +5800,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Razi pobliskich wrogów za {damage} obrażeń i spowalnia ich ataki o 10% na 10 sek.',
   'entities.abilities.thunder_clap.name': 'Trzęsący cios',
   'entities.abilities.tigers_fury.description':
-    'Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci wilka.',
-  'entities.abilities.tigers_fury.name': 'Wilcza krew',
+    'Natychmiast przywraca {rage} energii i zwiększa moc ataku o {buff} na {duration} sek. Tylko w Postaci kota.',
+  'entities.abilities.tigers_fury.name': 'Rysia krew',
   'entities.abilities.travel_form.description':
-    'Natychmiast przemienia cię w szybką, rączą postać, zwiększając szybkość poruszania się o 40%. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki.',
+    'Natychmiast przemienia cię w szybką, rączą postać, zwiększając szybkość poruszania się o 40% i usuwając zrywalne unieruchomienia i spowolnienia. Po przemianie nie możesz używać innych zdolności, ale możesz się przemieniać w walce i poza nią, co czyni ją idealną do ucieczki. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu.',
   'entities.abilities.travel_form.name': 'Postać Fleet',
   'entities.abilities.vanish.description':
     'Znikasz z pola widzenia, wchodząc w Duskveil nawet w walce. Ukryty poruszasz się o 50% wolniej. Trwa do 10 sek.',
@@ -5753,10 +5859,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Przyspiesza przyszłe tyknięcie twojego Płonącego paktu, a następnie podpala cel za {damage} obrażeń od ognia. Generuje 1 Spustoszenie i 1 Ruinę. Mieści {charges} ładunki. (Znak Zniszczenia)',
   'entities.abilities.moonkin_form.name': 'Postać księżycowej sowy',
   'entities.abilities.moonkin_form.description':
-    'Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)',
+    'Przyjmujesz postać księżycowej sowy, wzmacniając rzucanie zaklęć do czasu powrotu. Przemiana w każdą postać przyznaje Chyży Krok, krótki przyrost prędkości ruchu. Rzuć ponownie, aby wrócić do zwykłej postaci. (specjalizacja Równowaga)',
   'entities.abilities.feral_charge.name': 'Pierwotny przypływ',
   'entities.abilities.feral_charge.description':
-    'Wyzwalasz pierwotny przypływ. W Postaci wilka regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)',
+    'Wyzwalasz pierwotny przypływ. W Postaci kota regeneracja energii wzrasta o 100% na 10 sek. W Postaci Bruina natychmiast zyskujesz 50 pkt. wściekłości. (specjalizacja Dzikość)',
   'entities.abilities.swiftmend.name': 'Szybkie uzdrowienie',
   'entities.abilities.crusader_strike.description':
     'Uderza cel za obrażenia broni plus {damage} obrażeń od Świętości. (talent paladyna)',
@@ -8501,7 +8607,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hud.errors.busy': 'Jesteś zajęty.',
   'hud.errors.cannotTaunt': 'Nie możesz tego sprowokować.',
   'hud.errors.cantInForm': 'Nie możesz tego zrobić w postaci: {form}.',
-  'hud.errors.cat': 'Wilk',
+  'hud.errors.cat': 'Kot',
   'hud.errors.challengeExpired': 'Wyzwanie wygasło.',
   'hud.errors.chatCooldown': 'Czat ma czas odnowienia: {seconds}s.',
   'hud.errors.chatLocked':
@@ -10796,7 +10902,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wyczyny to osobna półka: zapisy dziedzictwa i dokonań pierwszych na świecie, czyny związane z minioną erą albo chwilą, która wydarzy się tylko raz. Nie niosą Renomy i nie wliczają się do licznika ukończenia, przechowywane na zawsze jako pamiątka tego, czego dokonano.',
   'guide.deedsPage.featsHeading': 'Wyczyny',
   'guide.deedsPage.howBody':
-    'Czyny zdobywasz i przechowujesz jedną postacią naraz, więc każdy bohater, którym grasz, buduje własną Księgę; dopiero ranking królestwa zbiera twoją Renomę ze wszystkich postaci, którymi grasz, i liczy każdy czyn tylko raz. Każdy czyn jasno opisuje, czego od ciebie wymaga, wprost w Księdze Czynów w grze, więc zawsze wiesz, za czym gonić, a te, na których ci zależy, możesz zacząć śledzić, by mieć je na oku podczas gry. Nieliczne pozostają tajemnicą i ujawniają się dopiero wtedy, gdy je zdobędziesz. Księga dba też o rzetelność: cokolwiek zdoła potwierdzić twoja dotychczasowa historia, zalicza od razu, więc weteran nigdy nie otwiera jej na pustej stronie; jedynie czyny zliczające zaczynają swój rachunek od nowa.',
+    'Czyny zdobywasz jedną postacią naraz, ale Księga Czynów jest współdzielona przez każdą postać na twoim koncie: czyn dokonany przez którąkolwiek z nich zostaje zdobyty dla wszystkich, Księga podaje, kto i kiedy go zdobył, a przyznany tytuł lub obramowanie może nosić każda z twoich postaci. Ranking królestwa zbiera twoją Renomę w ten sam sposób, licząc każdy czyn tylko raz. Każdy czyn jasno opisuje, czego od ciebie wymaga, wprost w Księdze Czynów w grze, więc zawsze wiesz, za czym gonić, a te, na których ci zależy, możesz zacząć śledzić, by mieć je na oku podczas gry. Nieliczne pozostają tajemnicą i ujawniają się dopiero wtedy, gdy je zdobędziesz. Księga dba też o rzetelność: cokolwiek zdoła potwierdzić twoja dotychczasowa historia, zalicza od razu, więc weteran nigdy nie otwiera jej na pustej stronie; jedynie czyny zliczające zaczynają swój rachunek od nowa.',
   'guide.deedsPage.howHeading': 'Jak działają czyny',
   'guide.deedsPage.intro':
     'Księga Czynów to miejsce, w którym świat prowadzi rachunek wszystkiego, czego dokonałeś: od pierwszych kroków poza początkową doliną po najtrudniejsze starcia, jakie królestwo ma do zaoferowania. Zdobywaj czyny podczas gry, noś tytuły, które przyznają, i patrz, jak twoja Renoma rośnie.',
@@ -11664,7 +11770,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Boss o sile rajdowej, który powstaje w otwartym świecie w stałym rytmie, zwalczany przez każdego, kto się zbierze, by odpowiedzieć na wezwanie, a nie przez ustaloną drużynę.',
   'guide.glossary.worldBossTerm': 'Boss świata',
   'guide.models.formBear': 'Postać Bruina',
-  'guide.models.formCat': 'Postać wilka',
+  'guide.models.formCat': 'Postać kota',
   'guide.models.formTravel': 'Postać Fleet',
   'guide.models.groupForms': 'Postacie druida',
   'guide.nav.sidebarLabel': 'Tematy przewodnika',
@@ -12147,7 +12253,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Uderza do 3 wrogów w promieniu 10 m za {damage} obrażeń od natury każdego. Żywioły: trafienie daje 1 Grom. Obrażenia rosną z mocą zaklęć.',
   'entities.abilities.chaos_bolt.description':
-    'Wydaje 3 Spustoszenia, by cisnąć ciężkim pociskiem chaotycznego ognia zadającym {damage} obrażeń od ognia. Ruina skraca jego rzucanie o 30%.',
+    'Wydaje 3 Spustoszenia, by cisnąć ciężkim pociskiem chaotycznego ognia zadającym {damage} obrażeń od ognia przed zastosowaniem obrażeń krytycznych. Zawsze trafia krytycznie. Ruina skraca jego rzucanie o 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Otacza cię cieniami i pochłania 420 obrażeń przez 5 sek. (talent Łotrzyka)',
   'entities.abilities.cone_of_cold.description':
@@ -13588,7 +13694,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Księżycowy przypływ: stopień {stacks} z {max}. Rzucenia Dzikiego pocisku, Spadającego nieba i Księżycowego nasienia napełniają go w Postaci księżycowej sowy; przy {max} Księżycowe nasienie staje się Księżycowym przyborem, a Spadające niebo Słonecznym śladem, i oba go zużywają',
   'hudChrome.auraEffect.oldBlood':
-    'Stara Krew: stopień {stacks} z {max}. Trafione ciosy wilka i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości',
+    'Stara Krew: stopień {stacks} z {max}. Trafione ciosy kota i Bruina dzielą tę rezerwę; przy {max} przemienia się Krwawe ukąszenie lub Kruszenie kości',
   'hudChrome.auraEffect.verdance':
     'Zieleń {stacks}/{max}. Każdy NOWO zasadzony Dziki rozkwit lub Drugi rozkwit dodaje 1. Przy {max} Szybkie uzdrowienie zmienia się w Nadrozkwit',
   'hudChrome.continentMap.levels': 'Poziomy od {min} do {max}',
@@ -13799,7 +13905,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Utwardza twoją skórę w stygnący żużel na 10 sekund, zmniejszając wszystkie otrzymywane obrażenia o 25%.',
   'entities.abilities.cinderhide.name': 'Cinderhide',
   'entities.abilities.claw.description':
-    'Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci wilka.',
+    'Rozerwij wroga pazurami za obrażenia broni plus {damage}. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
   'entities.abilities.claw.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.cold_blood.description':
     'Skupia twój morderczy zamiar, dzięki czemu twój następny atak jest trafieniem krytycznym. (silnik Knifework)',
@@ -13833,7 +13939,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Umiejętność kończąca, która obnaża cel na 30 sekund: każdy wydany punkt combo zmniejsza jego pancerz o 2% (5 punktów combo: {damage}%).',
   'entities.abilities.faerie_fire.description': 'Zmniejsza pancerz celu o {damage}% na 40 sekund.',
   'entities.abilities.ferocious_bite.description':
-    'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci wilka.',
+    'Umiejętność kończąca, która zadaje {damage}. Tylko w Postaci kota.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Każdy trafiony cios dodaje 1 Starą Krew; przy 3 Starej Krwi ten przycisk zmienia się w Czerwone Żniwa, które zużywają Starą Krew na silniejszy cios, dodatkowo natychmiast zadają wszystkie obrażenia, jakie zadałyby jeszcze twoje Zdzieranie i Rozszarpanie, i przywracają energię.',
   'entities.abilities.funeral_harvest.description':
@@ -13848,7 +13954,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     'Uderza wroga za obrażenia broni plus {damage}, zadaje obrażenia od krwawienia przez 12 sekund i zwiększa otrzymywane obrażenia od krwawienia o 40%. Przyznaje 1 punkt combo. Co drugie użycie dodaje 1 Mrok (maks. 3). (silnik Skulduggery)',
   'entities.abilities.hex_of_violence.description':
-    'Rzuca urok na wroga na 8 sekund. Jego następne 3 zadające obrażenia działania generują po 7 Potępienia i smagają go za 17 obrażeń od Cienia.',
+    'Rzuca urok na wroga na 8 sekund, zadając obrażenia od Cienia i generując 2 Potępienia co 2 sekundy. Jego następne 3 zadające obrażenia działania generują po 7 Potępienia i smagają go za 17 obrażeń od Cienia.',
   'entities.abilities.hex_of_violence.name': 'Hex of Violence',
   'entities.abilities.hour_of_judgment.description':
     'Przywołuje sąd nad twoim głównym Evil Eye na 15 sekund, przyznając 40 Potępienia i 3 Nici Przeznaczenia, aktywując Opętanie, podwajając Potępienie generowane przez główne oko i zwiększając obrażenia Sentence o 20%. Pierwsze Sentence zwraca 50 Potępienia.',
@@ -13891,7 +13997,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Zużywa 1 Odłamek Duszy, aby dodać trwałego Szkieletowego Wojownika do twojej Władzy z 2 miejscami. Może ci służyć tylko jeden. Co 6 sekund rozcina pobliskich wrogów za 45% obrażeń, a Reaping Command przygważdża jego cel spowolnieniem o 40% na 4 sekundy.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj obrażenia od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci wilka.',
+    'Zedrzyj skórę wroga za obrażenia broni plus {damage} i zadaj obrażenia od krwawienia przez 18 sekund. Przyznaje 1 punkt combo. Tylko w Postaci kota.',
   'entities.abilities.rake.specNote_feral': 'Każdy trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.reaping_command.description':
     'Zużywa 2 Odłamki Duszy, rozkazując wszystkim nieumarłym sługom uderzyć jednocześnie. Grobowi Strażnicy prowokują i przygotowują się na cios, Wojownicy przygważdżają, Kościani Magowie obnażają magiczne osłony, a Grobowe Skrzydło rozrywa wszystkich trafionych wrogów.',
@@ -13904,10 +14010,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Zasadzenie NOWEGO rozkwitu dodaje 1 Zieleń (maks. 5). Przy 5 Zieleni, Szybkie uzdrowienie zmienia się w Nadrozkwit.',
   'entities.abilities.rip.description':
-    'Umiejętność kończąca, która sprawia, że cel krwawi co 2 sekundy przez 24 sekundy: 36 obrażeń plus 24 za wydany punkt combo (5 punktów combo: {damage} łącznie). Tylko w Postaci wilka.',
+    'Umiejętność kończąca, która sprawia, że cel krwawi co 2 sekundy przez 24 sekundy: 36 obrażeń plus 24 za wydany punkt combo (5 punktów combo: {damage} łącznie). Tylko w Postaci kota.',
   'entities.abilities.rip.specNote_feral': 'Trafiony cios dodaje 1 Starą Krew (maks. 3).',
   'entities.abilities.ruinous_brand.description':
-    'Naznacza wroga na 15 sekund. Twoje następne 3 bezpośrednie zaklęcia odbijają się za 25% obrażeń w naznaczonego wroga, albo kopiują na niego 50% obrażeń, gdy rzucone są na inny cel.',
+    'Naznacza wroga na 15 sekund. Twoje następne 3 bezpośrednie zaklęcia odbijają się za 25% obrażeń w naznaczonego wroga, albo kopiują na niego 50% obrażeń, gdy rzucone są na inny cel. Echa Pocisku Ruiny również liczą się jako trafienia krytyczne, bez dodatkowego mnożnika obrażeń krytycznych.',
   'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
   'entities.abilities.rupture.description':
     'Umiejętność kończąca, która rani cel: krwawi on co 2 sekundy, przez 6 sekund plus 2 sekundy za punkt combo (5 punktów combo: 16 sekund i {damage} obrażeń łącznie).',
@@ -14419,13 +14525,13 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Przytrzymaj lewy zderzak i wciśnij górny przycisk na twarzy, aby ułożyć drążek z kontrolerem.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Organizowanie: potwierdź odbiór z komórki lub księgi zaklęć i upuść na komórkę, anuluj czyści jedną.',
+    'Organizowanie · pad kierunkowy przesuwa · potwierdź podnosi i umieszcza · anuluj czyści komórkę',
   'hudChrome.controller.crossHotbarEnable': 'Włącz krzyżowy pasek skrótów',
   'hudChrome.controller.crossHotbarExpand': 'Pasek skrótów Double Cross',
   'hudChrome.controller.crossHotbarHelp':
     'Przytrzymaj spust, aby podświetlić osiem miejsc na pasku akcji na padzie kierunkowym i przyciskach twarzowych. Naciśnij drugi spust, aby przejść do drugiego zestawu.',
   'hudChrome.controller.crossHotbarOwnsButtons':
-    'Wyzwalacze i pad kierunkowy należą do krzyżowego paska skrótów, gdy jest on włączony, więc są ustawione poniżej, a nie tutaj.',
+    'Gdy krzyżowy pasek skrótów jest włączony, wyzwalacze zmieniają jego zestaw. Kierunki pada kierunkowego pozostają tutaj edytowalne, do obsługi menu i ruchu.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Zresetuj krzyżowy pasek skrótów',
   'hudChrome.controller.cycleHudAction': 'Interfejs rowerowy',
@@ -16760,7 +16866,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.',
   'guide.interfacePage.framesGovernedExtra':
-    'Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.',
+    'Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, przypięte receptury rzemieślnicze, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.',
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Możesz przesuwać własną ramkę, ramkę celu i ramki drużyny. Każda ma w rogu mały przycisk przesuwania: odblokuj ją, przeciągnij w wybrane miejsce i zablokuj ponownie, aby przypadkowe kliknięcie jej nie przesunęło. Edycja ramek na górze karty Ramki w opcjach interfejsu odblokowuje naraz resztę interfejsu, w tym te trzy ramki: paski akcji, pasek rzucania, pasek uderzeń, pasek doświadczenia, minimapę, szynę przycisków, ramkę pupila, pasek postawy, wiersze premii i osłabień oraz etykietę przypomnienia listy życzeń. Jeśli trafią w miejsce, którego żałujesz, przycisk Przywróć domyślne na dole tej samej karty Ramki przywraca je wszystkie.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -16815,7 +16921,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Dobrze najedzony po ukończeniu jedzenia: +{value} {stat} przez {minutes} min.',
   'guide.profPages.effectWellFedAura': 'Po ukończeniu jedzenia daje {aura} przez {minutes} min.',
   'guide.profPages.faq.a1':
-    'Ukończone przedmioty nadal podlegają ścisłej zasadzie instancji: dwie kopie łączą się tylko wtedy, gdy ich podpisujący, wylosowane właściwości, statystyki mistrzowskiego wykonania, zaklęcie, związanie i pozostała tożsamość pasują dokładnie. Podpisane ostrze pozostaje więc osobno od zwykłego.\n\nMateriały są wyjątkiem. Zgodne stosy tego samego materiału mogą się łączyć, nawet gdy ich zbieracze lub podpisujący się różnią, bo stos przechowuje liczbę z każdego źródła. Podpowiedź po najechaniu podsumowuje źródła; otwórz Źródła, aby zobaczyć pełną listę. Rozdzielenie według zbieracza trzyma te stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.',
+    'Ukończone przedmioty nadal podlegają ścisłej zasadzie instancji: dwie kopie łączą się tylko wtedy, gdy ich podpisujący, wylosowane właściwości, statystyki mistrzowskiego wykonania, zaklęcie, związanie i pozostała tożsamość pasują dokładnie. Podpisane ostrze pozostaje więc osobno od zwykłego.\n\nMateriały są wyjątkiem. Zgodne stosy tego samego materiału mogą się łączyć, nawet gdy ich zbieracze lub podpisujący się różnią, bo stos przechowuje liczbę z każdego źródła. Podpowiedź po najechaniu podsumowuje źródła; kliknij stos prawym przyciskiem, aby zobaczyć pełną listę (na urządzeniach dotykowych użyj przycisku Źródła). Rozdzielenie według zbieracza trzyma te stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.',
   'guide.profPages.faq.a11Promotion':
     'Wykonaj albo kup szczytową mistrzowsko kutą część, a następnie ją Udoskonal: przy 125 umiejętności w profesji, która ją stworzyła, każda próba zużywa jeden Żar wytwórcy, jedną Rozszczepioną esencję i jedną Oprawę pryzmatycznego szkła, udaje się cztery razy na pięć i nigdy nie uszkadza przedmiotu przy porażce. Pierwsza próba wiąże część z tobą, a cztery udane rangi czynią ją Udoskonaloną. Następnie wydaj jeden Akt stworzenia, akt inskrypcjonisty na poziomie umiejętności 125, który każdy może kupić albo zamówić, aby awansować Udoskonaloną kopię do legendy o wybranej nazwie. Awans jest deterministyczny: bez rzutu, statystyki pozostają bez zmian, zmieniają się tylko nazwa i kolor.',
   'guide.profPages.faq.a2':
@@ -16875,7 +16981,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.wyrmhide_cording.name': 'Sznur ze skóry Żmija',
 
   'guide.interfacePage.mapBodyZoneFirst':
-    'M otwiera mapę świata w strefie, w której stoisz, z własną strzałką, pobliskimi punktami zainteresowania, zleceniodawcami z oznaczeniami i obszarami celów, stanowiskami rzemieślniczymi, skrzynkami pocztowymi, tablicami ogłoszeń i grządkami, wejściami do lochów oraz każdym węzłem zbioru w strefie. Węzły są wyszarzone podczas odrastania i oznaczone, gdy twoje narzędzia są za słabe. Widać na niej także twoją drużynę. Kliknij mapę prawym przyciskiem albo naciśnij przycisk Mapy świata, aby oddalić widok do kontynentu, gdzie każda strefa jest narysowana z nazwą, a kliknięcie otwiera jej mapę. Wejdź do wyprawy, lochu, szczeliny albo twierdzy, a mapa przełączy się na plan piętra w miejscu, w którym stoisz; pole bitwy Thornhollow Fields ma własną mapę pola.\n\nPo prawej stronie, pod minimapą, stos śledzików pokazuje bieżące sprawy bez otwierania czegokolwiek: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, aktywną wyprawę i każdą szczelinę, w której uczestniczysz. Śledzik zadań zwija się, gdy chcesz odzyskać miejsce na ekranie.',
+    'M otwiera mapę świata w strefie, w której stoisz, z własną strzałką, pobliskimi punktami zainteresowania, zleceniodawcami z oznaczeniami i obszarami celów, stanowiskami rzemieślniczymi, skrzynkami pocztowymi, tablicami ogłoszeń i grządkami, wejściami do lochów oraz każdym węzłem zbioru w strefie. Węzły są wyszarzone podczas odrastania i oznaczone, gdy twoje narzędzia są za słabe. Widać na niej także twoją drużynę. Kliknij mapę prawym przyciskiem albo naciśnij przycisk Mapy świata, aby oddalić widok do kontynentu, gdzie każda strefa jest narysowana z nazwą, a kliknięcie otwiera jej mapę. Wejdź do wyprawy, lochu, szczeliny albo twierdzy, a mapa przełączy się na plan piętra w miejscu, w którym stoisz; pole bitwy Thornhollow Fields ma własną mapę pola.\n\nPo prawej stronie, pod minimapą, stos śledzików pokazuje bieżące sprawy bez otwierania czegokolwiek: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, przypięte receptury rzemieślnicze, aktywną wyprawę i każdą szczelinę, w której uczestniczysz. Śledzik zadań zwija się, gdy chcesz odzyskać miejsce na ekranie.',
   'guide.interfacePage.mobileBodyTwoPages':
     'Sterowanie dotykowe pojawia się samo, a układ dopasowuje się do ekranu: zwarty układ na małym telefonie, standardowy na większym i przestronniejszy na tablecie.\n\nUmiejętności są w pierścieniu zamiast w szeregu liczb: przycisk ataku i cztery przyciski akcji obok oraz przełącznik stron, który zmienia pierścień między jego {pages} stronami. Razem docierają do wszystkich {slots} miejsc umiejętności, niezależnie od tego, czy dodatkowe paski pulpitu są włączone. Piąte miejsce łuku pierścienia jest miejscem przedmiotów użytkowych: dotknij go, aby użyć umieszczonego przedmiotu, przytrzymaj albo przesuń do środka, aby otworzyć rząd wypełniany z noszonych rzeczy. Wokół pierścienia są przyciski najczęściej używane przez gracza dotykowego: zmiana celu, użycie rzeczy przed tobą i skok.\n\nJedna kontrolka Szybkich akcji znajduje się przy dolnej krawędzi zamiast szeregu przycisków. Otwiera wszystko inne: wierzchowca, czat, mapę, torby, społeczność, zadania, postać, księgę zaklęć, menu gry oraz pozycję Więcej z resztą okien, w tym Szukaczem lochów, PvP, emotkami i wiki. Okna wypełniają tutaj ekran zamiast unosić się nad nim.\n\nPrzesuwanie ramek jednostki jest funkcją pulpitu. Na dotyku układ umieszcza je za ciebie.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -16944,7 +17050,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.doctrineBodyRaidCollections':
     'Gospodarka rzemiosła opiera się na jednym pomyśle: gracze zaopatrują graczy. Zbieracze karmią rzemieślników, rzemieślnicy karmią wykonujących zadania i raiderów, a rozbijający karmią zaklinaczy. Sprzedawcy i mistrzowie stanowisk stoją na obrzeżach, by pochłaniać śmieci i monety, a nie konkurować z tobą. Jeśli chcesz zarabiać na profesji, twoim klientem jest człowiek: dowiedz się, co inni gracze zużywają, wyceniaj względem Światowego rynku i traktuj systemy NPC jako dolną granicę własnych cen, nie jako sam rynek.\n\nZwykły wykonany sprzęt wspiera wspinaczkę do końca gry. Finansowane przez raidy kolekcje Tygla oferują też alternatywę dla obecnych łupów raidowych: materiały pochodzą z raidów, a rzemiosło zmienia je w wybrany profil pancerza i roli. Trzy wybory miejsc i premia za dowolne dwie części pozwalają łączyć je ze sprzętem raidowym. Nadal dzielą globalny limit dwóch mistrzowsko kutych części, więc rzemiosło uzupełnia resztę zestawu raidowego, nie dostarczając całego zastępczego kompletu.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Niektóre przedmioty noszą nazwę. Linie źródła materiału mówią, kto zebrał każdą grupę sztuk, a osobna marka Podpisano przez wskazuje podpisującego wyższej jakości, gdy taki istnieje. Te fakty są niezależne: zwykły zebrany materiał zapisuje zbieracza bez zyskania podpisu, a stary podpisany zapas może podać podpisującego i uczciwie mówić, że nie zapisano zbieracza. Ukończona część podaje zamiast tego twórcę. Zapisy podróżują z przedmiotem przez wymianę, bank, pocztę, Światowy rynek i nawet odkupienie u sprzedawcy, nigdy nie blaknąc.\n\nZbieranie automatycznie podpisuje najlepszą pracę: każdy zbiór, który wylosuje jakość rzadką albo lepszą, przychodzi podpisany, a rzadkie odkrycia podpisują cały pięciokrotny łup. Szczęśliwy zbiór z ciała podpisuje plon, gdy dana rodzina nie ma okazu do oddania, a gdy ma, pozostawia plon zwykły i tworzy obok podpisany doskonały okaz. Rzemiosło działa tak samo: każda kopia rzadkiego albo lepszego wyniku otrzymuje podpis, a mistrzowskie wykonanie zawsze podpisuje wynik, niezależnie od jakości, więc najlepsza wersja zawsze nazywa twórcę. Podpis zwykłego materiału jedzie na samych sztukach i nie ginie tylko dlatego, że zgodny stos ma już innego zbieracza lub podpisującego. Osobny doskonały okaz jest oddzielnym przedmiotem i nadal potrzebuje miejsca; jeśli się nie mieści, zwykły plon z ciała zostaje, lecz okaz przepada.\n\nUkończone przedmioty zachowują jedną ścisłą tożsamość, więc dwie kopie łączą się tylko przy dokładnej zgodności każdej marki: ten sam przedmiot, podpisujący, statystyki mistrzowskie, enchant i związanie. Zgodne materiały dzielą miejsce między zbieraczami i podpisującymi, zachowując liczbę z każdego źródła. Podpowiedź podsumowuje źródła; otwórz Źródła dla pełnej listy. Rozdzielenie według zbieracza trzyma stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.\n\nPodpisy zwracają się rzemieślnikom: trzymanie przy stanowisku dowolnej podpisanej kopii wymaganego reagenta, niezależnie od podpisującego, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Reagent podpisany własną ręką zmniejsza wymaganą ilość tego reagenta o 1, nigdy poniżej 1, chyba że ma oznaczenie bez zniżki; rdzenie raidowe zawsze zachowują pełny koszt. Własna podpisana praca rzadka albo lepsza może nadal cię uczyć, dziś wyłącznie przez wykonane mikstury: wypij rzadką miksturę, którą uwarzyłeś i podpisałeś, a mały strumień umiejętności wróci do profesji, która ją stworzyła, jeśli jest jedną z twoich aktywnych głównych. Naprawdę dotyczy to tylko mikstur, więc eliksir, zwój albo flakon szczytowy nie uczy cię niczego, choćby podpisano je najstaranniej.',
+    'Niektóre przedmioty noszą nazwę. Linie źródła materiału mówią, kto zebrał każdą grupę sztuk, a osobna marka Podpisano przez wskazuje podpisującego wyższej jakości, gdy taki istnieje. Te fakty są niezależne: zwykły zebrany materiał zapisuje zbieracza bez zyskania podpisu, a stary podpisany zapas może podać podpisującego i uczciwie mówić, że nie zapisano zbieracza. Ukończona część podaje zamiast tego twórcę. Zapisy podróżują z przedmiotem przez wymianę, bank, pocztę, Światowy rynek i nawet odkupienie u sprzedawcy, nigdy nie blaknąc.\n\nZbieranie automatycznie podpisuje najlepszą pracę: każdy zbiór, który wylosuje jakość rzadką albo lepszą, przychodzi podpisany, a rzadkie odkrycia podpisują cały pięciokrotny łup. Szczęśliwy zbiór z ciała podpisuje plon, gdy dana rodzina nie ma okazu do oddania, a gdy ma, pozostawia plon zwykły i tworzy obok podpisany doskonały okaz. Rzemiosło działa tak samo: każda kopia rzadkiego albo lepszego wyniku otrzymuje podpis, a mistrzowskie wykonanie zawsze podpisuje wynik, niezależnie od jakości, więc najlepsza wersja zawsze nazywa twórcę. Podpis zwykłego materiału jedzie na samych sztukach i nie ginie tylko dlatego, że zgodny stos ma już innego zbieracza lub podpisującego. Osobny doskonały okaz jest oddzielnym przedmiotem i nadal potrzebuje miejsca; jeśli się nie mieści, zwykły plon z ciała zostaje, lecz okaz przepada.\n\nUkończone przedmioty zachowują jedną ścisłą tożsamość, więc dwie kopie łączą się tylko przy dokładnej zgodności każdej marki: ten sam przedmiot, podpisujący, statystyki mistrzowskie, enchant i związanie. Zgodne materiały dzielą miejsce między zbieraczami i podpisującymi, zachowując liczbę z każdego źródła. Podpowiedź podsumowuje źródła; kliknij stos prawym przyciskiem, aby zobaczyć pełną listę (na urządzeniach dotykowych użyj przycisku Źródła). Rozdzielenie według zbieracza trzyma stosy osobno w torbach, a sortowanie respektuje ten wybór. Przeniesiony materiał może normalnie łączyć się z materiałami odbiorcy.\n\nPodpisy zwracają się rzemieślnikom: trzymanie przy stanowisku dowolnej podpisanej kopii wymaganego reagenta, niezależnie od podpisującego, dodaje 2 punkty procentowe do szansy mistrzowskiego wykonania. Reagent podpisany własną ręką zmniejsza wymaganą ilość tego reagenta o 1, nigdy poniżej 1, chyba że ma oznaczenie bez zniżki; rdzenie raidowe zawsze zachowują pełny koszt. Własna podpisana praca rzadka albo lepsza może nadal cię uczyć, dziś wyłącznie przez wykonane mikstury: wypij rzadką miksturę, którą uwarzyłeś i podpisałeś, a mały strumień umiejętności wróci do profesji, która ją stworzyła, jeśli jest jedną z twoich aktywnych głównych. Naprawdę dotyczy to tylko mikstur, więc eliksir, zwój albo flakon szczytowy nie uczy cię niczego, choćby podpisano je najstaranniej.',
   'guide.profPages.ench.enchantsNoteRaidFormula':
     'Enchanty mają cztery poziomy. Podstawowy korzysta z Pyłu dzwonu, z odrobiną Esencji na wysokim końcu, i obejmuje miejsce broni, broń podręczną oraz każdą część pancerza. Opcji osi statystyk jest dość, aby każda konfiguracja znalazła coś dla każdego miejsca: tarcze i podręczne przedmioty czarujących mają własny enchant Wytrzymałości, więc żadne wyposażone miejsce nie jest martwe dla enchantów. Poziom Większy kosztuje jeden Odłamek dzwonu i Esencję, dając silniejsze premie w najbardziej wpływowych miejscach. Odłamki mają jeszcze trzy wydatki: dwie receptury uroków po jednej sztuce (resztę kosztu uroku stanowią esencja i pył), najwyższy poziom ładowania efektów narzędzi oraz poziom Świetlisty, gdzie enchant broni i pancerza klatki biorą po jednym, a Infuzja dwa. Zachowaj kilka przed wydaniem.\n\nPomiędzy nimi znajduje się pięć enchantów Runicznych, po jednym odbiorcy dla każdego typowanego drugorzędnego statystyk, więc nic z tego, co zmielisz, nie jest ślepą uliczką: Runiczne ostrze, broń, Siła, zużywa Stal rezonującą; Runiczny sygnet, broń, Intelekt, Drewno rezonujące; Runiczny splot, klatka, Duch, Nić rezonująca; Runiczna skóra, nogi, Zręczność, Skóra rezonująca; oraz Runiczne ogniwa, hełm, Wytrzymałość, Ogniwa rezonujące. Każdy bierze też dwie Esencje dzwonu. Gdy miejsce i statystyka mają enchant podstawowy oraz Większy, premia Runiczna leży między nimi, a Runiczny splot jest bezwzględnie najmocniejszym enchantem Ducha klatki, zaś Runiczna skóra jedynym enchantem Zręczności nóg. Dokładne premie są w tabeli poniżej.\n\nNad zwykłymi niższymi poziomami znajduje się Świetlisty, szczytowa zwykła praca profesji: Zaklinanie 100 dla czterech enchantów i 125 dla Infuzji, jak pokazuje kolumna Umiejętność. Każdy wymaga Świetlistego reagenta i dodaje kolejny krok na własnym miejscu: broń z opcją Mocy i Mocy zaklęć, klatka oraz buty. Ostatnia, Świetlista infuzja, działa tylko na części Udoskonalonej: Udoskonalanie jest pracą noszącego, nie zaklinacza, a strona Profesje wyjaśnia, jak część je zdobywa.\n\nZapał Ostatniego Płomienia jest osobną recepturą raidową, nie darmowym zwykłym enchantem. Naucz się jego wymienialnej formuły przy Zaklinaniu 100 przed użyciem. Każde zastosowanie zużywa 3 rdzenie Ostatniego Płomienia i 2 Odłamki dzwonu. Formuła może wypaść w Tyglu albo zostać kupiona u jego kwatermistrza za jeden rdzeń. Zasady wyzwalacza wręcz i szybkości broni są w całości poniżej.',
   'guide.profPages.faq.a6ThreeRods':
