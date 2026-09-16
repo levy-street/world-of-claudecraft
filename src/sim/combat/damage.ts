@@ -38,6 +38,10 @@ import { isImmuneInPlace } from '../instances/instance_combat_hold';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
+import {
+  NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE,
+  nythraxisBoneSpikeWardHit,
+} from '../nythraxis_bone_spike';
 import { grantAbilityDevotion } from '../paladin_devotion';
 import { snapshotPetOnOwnerDeath } from '../pet/pet_owner_revive';
 import {
@@ -208,8 +212,31 @@ export function dealDamage(
 ): number {
   if (resolution) resolution.landedHpLoss = 0;
   if (resolvedHpLoss) alreadyFinal = true;
+  // Provenance for proc accounting (crafted collections): a copy or redirect
+  // share must never earn a second charge, but a ward-normalized ORIGINAL hit
+  // below is still the player's own attack. Captured before the ward rule
+  // turns on the modifier bypass, so the two decisions stay separate.
+  const copiedHit = alreadyFinal;
+  // The same split for the crit EFFECTS a resolved copy must not re-fire
+  // (Ignition banking, spell-crit talent procs): an exact copy of a critical
+  // (a Brand echo) already fired them on the original, so its copy is silent;
+  // a ward-normalized hit is the player's own critical and still fires them,
+  // rng draw included. Captured before the ward rule for the same reason.
+  const copiedResolvedHit = resolvedHpLoss;
   if (target.dead) return 0;
   if (target.damageImmune) return 0;
+  // A Nythraxis Bone Spike is a ward (nythraxis_bone_spike.ts): any player or
+  // pet hit lands exactly one point, whatever it would have dealt, and the
+  // spike's pool is its hit count. Resolved like an exact copy so no source
+  // mod, target amp, absorb, or crit multiplier can move it off one; the
+  // crit ROLL itself is kept, and the hit keeps its original-attack
+  // provenance (copiedHit above), so proc accounting still sees the
+  // player's own hit.
+  if (nythraxisBoneSpikeWardHit(source, target)) {
+    amount = NYTHRAXIS_BONE_SPIKE_HIT_DAMAGE;
+    resolvedHpLoss = true;
+    alreadyFinal = true;
+  }
   // Quest-gated destructible (e.g. Broodmother eggs): only a player (or pet) whose
   // owner has the gating quest active/ready may harm it; other hits are a no-op.
   if (questGateBlocksDamage(ctx.players, source, target)) return 0;
@@ -552,7 +579,9 @@ export function dealDamage(
   // Ignition (fire mage mastery, combat/fire_mage.ts): a Fire-school ABILITY
   // crit banks a stacking burn of the RESOLVED amount. Guards inside; a burn
   // tick carries crit=false so it can never re-ignite itself. Draws no rng.
-  if (!resolvedHpLoss) igniteOnCrit(ctx, source, target, amount, crit, school, ability);
+  // An exact copy of a critical (copiedResolvedHit) banks nothing a second
+  // time; a ward-normalized original critical still banks its one point.
+  if (!copiedResolvedHit) igniteOnCrit(ctx, source, target, amount, crit, school, ability);
 
   // Debt of Light answers BEFORE the generic shields: it is a deliberately armed
   // single-hit answer, so it must be the thing that eats the blow the paladin
@@ -1064,7 +1093,7 @@ export function dealDamage(
   }
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
-  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, alreadyFinal);
+  onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, copiedHit);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's
@@ -1146,8 +1175,12 @@ export function dealDamage(
     // Elemental Trance (shaman Warspirit signature): the trance returns a
     // fifth of all damage dealt as mana. Deterministic, no rng, no events.
     elementalTranceManaFromDamage(ctx, source, amount);
-    // Talent procs listening for spell crits (deterministic, no rng draw).
-    if (!resolvedHpLoss && crit && school !== 'physical' && ability) {
+    // Talent procs listening for spell crits (a chance trigger draws the
+    // shared stream, talent_procs.ts). An exact copy of a critical
+    // (copiedResolvedHit) fired them on the original and stays silent; a
+    // ward-normalized original critical still fires them, so the draw order
+    // matches any other landed critical.
+    if (!copiedResolvedHit && crit && school !== 'physical' && ability) {
       onSpellCrit(ctx, source, abilityId, target);
     }
     if (source.resourceType === 'rage' && !noRage && school === 'physical' && !ability) {

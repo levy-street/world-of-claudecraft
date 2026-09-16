@@ -31,8 +31,7 @@ export type MountSkinId =
   | 'mech_bird'
   | 'chimeglass_tortoise'
   | 'rickshaw_mount'
-  | 'goblin_rocket_sled'
-  | 'rallycart_rxt';
+  | 'goblin_rocket_sled';
 
 export interface MountSkinDef {
   /** Store SKU / economy-service item id (kind 'skin'). */
@@ -89,14 +88,17 @@ export const MOUNT_SKINS: Record<MountSkinId, MountSkinDef> = {
     visualKey: 'mount_goblin_rocket_sled',
     season: 1,
   },
-  rallycart_rxt: {
-    id: 'rallycart_rxt',
-    name: 'Rallycart RXT',
-    rarity: 'epic',
-    visualKey: 'mount_rallycart_rxt',
-    season: 1,
-  },
 };
+
+/** Skins withdrawn from the game. Their assets, audio, legacy reins items and
+ *  locale rows stay in the tree as dormant data (a load never destroys what a
+ *  save carries), but nothing here sells, grants, wears, lists, or renders
+ *  them: `isMountSkinId` is false, so the store and Cosmetics screen omit the
+ *  card, the account mirror filters the grant, `normalizeMountSkinId` refuses
+ *  the wear, the join reconcile takes a worn one off, and the renderer falls
+ *  back to the ridden mount's own look. The Rallycart RXT (2026-09-10) was
+ *  pulled after player feedback; its economy catalog row went first. */
+export const RETIRED_MOUNT_SKIN_IDS: readonly string[] = ['rallycart_rxt'];
 
 /** Catalog order (see MOUNT_SKINS). */
 export const MOUNT_SKIN_IDS = Object.keys(MOUNT_SKINS) as readonly MountSkinId[];

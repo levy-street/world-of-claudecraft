@@ -27,14 +27,21 @@
 // negative to show overload depth. Account refusals still ride the fixed
 // woc_ws_messages_dropped_total{cause="bank_vault"} series.
 //
-// vault_deposit_all is the legitimate bulk exception. Plain stacks collapse by
-// material id, but signed/crafted materials retain a distinct ledger identity
-// per carried slot. Its exact committed maximum is therefore the 112-slot
-// carried-inventory ceiling, not the smaller material-id set. The account row
-// burst admits nine ordinary single-row actions followed by a full sweep in the
-// same 10-command human burst. Both buckets reserve worst case before mutation,
-// then refund unused rows after the journal accepts the exact immutable batch.
-// Craft/enchant vault draws reserve their exact take count.
+// VAULT ROW SHAPES. The count ledger keys a vault row per distinct (material,
+// identity), and since carried material stacks combine while preserving their
+// per-unit sources, ONE stack can hold units signed by several premium
+// crafters beside unsigned units. So no vault command is a fixed-row action
+// any more: vault_wire.ts reserves, per command, the distinct ledger keys the
+// touched stack(s) can produce (server/vault_ledger_row_bound.ts), never below
+// the COMMAND_MAX_ROWS floor. The floor still records the legacy shape (one
+// row per targeted op, the 112-slot carried-inventory ceiling for the sweep),
+// and the account row burst is sized as nine single-row actions plus a full
+// sweep in one 10-command human burst; that burst is also the ceiling any one
+// reservation may ask for on the vault surface (reservationShapeIsKnown), and
+// a command whose bound exceeds it is refused before mutation. Both buckets
+// reserve worst case before mutation, then refund unused rows after the
+// journal accepts the exact immutable batch. Craft/enchant vault draws
+// reserve their exact take count.
 
 import type { VaultConsumptionReservation } from '../src/sim/types';
 import type {
@@ -423,7 +430,15 @@ function reservationShapeIsKnown(
 ): boolean {
   if (maxGuildEffectDeltas !== 0) return false;
   if (surface === 'personal') return maxRows === 1 || maxRows === 2;
-  if (surface === 'vault') return maxRows === 1 || maxRows === VAULT_DEPOSIT_ALL_LEDGER_MAX_ROWS;
+  // Vault commands reserve a per-command bound read from the pre-mutation
+  // state (server/vault_ledger_row_bound.ts): one row per distinct ledger
+  // identity the command's stack(s) can touch, never below the table floor.
+  // So the known shape is a RANGE, positive up to the account row burst the
+  // bucket can hold at all; the dispatcher refuses anything above it before
+  // mutating rather than asking for a reservation that could never be granted.
+  if (surface === 'vault') {
+    return Number.isSafeInteger(maxRows) && maxRows >= 1 && maxRows <= BANK_VAULT_LEDGER_ROW_BURST;
+  }
   return false;
 }
 

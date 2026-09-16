@@ -348,11 +348,14 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(damage.some((e) => e.ability === 'Bone Spike')).toBe(true);
     expect(damage.some((e) => e.ability === 'Grave Eruption')).toBe(true);
     expect(damage.some((e) => e.ability === 'Grave Flame')).toBe(true);
-    // Slice 2: Soulfire burned the stacked mages after the Soul Rend detonation,
-    // Gravefire ran at the mages, and the sigil flared and was bound.
-    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(true);
-    expect(damage.some((e) => e.ability === 'Gravefire')).toBe(true);
-    expect(callouts.some((e) => e.call === 'gravefireTarget')).toBe(true);
+    // Slice 2: the Soul Rend detonation left no fire (Soulfire retired in
+    // v0.42.2, so no Soulfire tick may appear in the trace), and the sigil
+    // flared beside the boss and was bound.
+    expect(damage.some((e) => e.ability === 'Soulfire')).toBe(false);
+    // Gravefire retired in v0.42.2: the due timer in the scenario lights no
+    // line, so no Gravefire tick and no target callout may appear.
+    expect(damage.some((e) => e.ability === 'Gravefire')).toBe(false);
+    expect(callouts.some((e) => e.call === 'gravefireTarget')).toBe(false);
     expect(callouts.some((e) => e.call === 'sigilAppears')).toBe(true);
     expect(callouts.some((e) => e.call === 'sigilBound')).toBe(true);
     expect(callouts.some((e) => e.call === 'kingsWrath')).toBe(true);
@@ -1904,5 +1907,13 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     // ...and the stamina family it replaced is gone entirely, so the strip
     // shed the aura rather than leaving a stale second one behind.
     expect((p.auras as any[]).filter((a) => a.kind === 'buff_sta')).toEqual([]);
+  });
+
+  it('bop_party_trade_eligibility: a leaving drop-mate stays on the awarded copy', () => {
+    const rec = run('bop_party_trade_eligibility');
+    expect(rec.notes.eligibleCharacterIds).toEqual([101, 102]);
+    const alice = [...rec.sim.ctx.players.values()].find((meta) => meta.name === 'AliceParity');
+    const awarded = alice?.inventory.find((slot) => slot.itemId === 'sigil_anvil_helmet');
+    expect(awarded?.instance?.partyTrade?.eligibleIds).toEqual([101, 102]);
   });
 });

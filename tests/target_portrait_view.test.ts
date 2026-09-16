@@ -75,7 +75,7 @@ const CORRECTED_PORTRAITS = {
   training_dummy: [
     'mob_training_dummy',
     'models/creatures/training_dummy.glb',
-    '66efb4999739669201bd44e21aca2d6e222ba8dfeb410d018c1e5e7d156e0e65',
+    'ff36c52017c5e7361602e61e9c1ea224519ed2d90f77cc911cffe2b71e3914ba',
   ],
 } as const;
 
@@ -88,42 +88,42 @@ const CORRECTED_TINTED_PORTRAITS = {
     'models/chars/players/rogue.glb',
     0x8a7a5a,
     0.35,
-    '074e53c4715efc8139889b3232968c6ee54baefb984cb01ed571714b81b5d365',
+    'ba0f0bcf7b9f33b6a0236087517b902f292964f0bca37cf1855da6ac9d71073b',
   ],
   castaway_navigator: [
     'npc_villager',
     'models/chars/players/rogue.glb',
     0x4a7a9c,
     0.35,
-    '6711572931e5cfc6ed2d0aca599aa70c4ec92c6163b098bf3f222d90317cbe26',
+    'd4f0bf6105904dd5ddaa573e09d8cdf6da1fc17db0ab2c4b9106f7052d1e0f78',
   ],
   fisher_bram: [
     'npc_villager',
     'models/chars/players/rogue.glb',
     0x4a6a8a,
     0.35,
-    '8f18935329142987a17c888b39dfd6bd30413fd0528933829e0b3e0f3c6f6fe5',
+    '4e4961e7e5f7b1ee42892ebc11667ba3a3bc114680fad339d9fac56eb3c890fd',
   ],
   cindraleth_maw_matriarch: [
     'mob_dragonkin_matriarch',
     'models/creatures/dragonkin_elite.glb',
     0xf0b040,
     0.12,
-    '7d8d2dad0b160e147bb719fc48db4fe092bfc2a789cf0ee21993cfa683d72a65',
+    '39bafb97c82172605678ebc755f420536c26b91c5f388d992f5359c4a877a15c',
   ],
   grubjaw: [
     'mob_grubjaw',
     'models/creatures/grubjaw.glb',
     0x145a32,
     0.04,
-    'cd9810cbb956c043fe6d1a514c20d3a941afa19910b5fc005c460e66d1a2d2b1',
+    'de48a90c28d1fa473856186aba8119eb2458e4cc99cc0f3ebd5aedc606704a69',
   ],
   the_wreck_warden: [
     'mob_bruiser',
     'models/chars/players/barbarian.glb',
     0x7a8a86,
     0.3,
-    'e11030bfe58ca95bfa73670c6b35ae3004253f501352bac37c47152190b57006',
+    '43aa6f55256d34afc6130b9497c2d9fb96fa20981dce1c433e741b9632e3766e',
   ],
 } as const;
 

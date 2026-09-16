@@ -1,22 +1,34 @@
 import type { FarmPlotView } from '../world_api/farming';
 import { handleEscortPress } from './escort_interact';
+import {
+  type GatherEffectConfirmGate,
+  type GatherNodeToolGate,
+  handleGatherNodeInteract,
+} from './gather_node_interact';
 import { HARVEST_CHOICE_NO_POINTER } from './harvest_body_pick';
 import type { InteractionOutcome } from './interaction_autorun';
 import {
+  type NearbyGatherNode,
   type NearbyInteractionScanWorld,
   resolveNearbyInteractionCandidate,
 } from './nearby_interaction_core';
 
 // Intentional gathering: the generic nearby press is ORDINARY interaction
-// only. It never sends harvestCorpse, harvestNode, or harvestCrop; those are
-// explicit actions (node/tool/crop click, the corpse picker) with their own
-// entry points. The world slice below therefore names no gathering command.
+// for bodies and crops. It never sends harvestCorpse or harvestCrop; those are
+// explicit choices (the corpse picker's Harvest, the bed sheet's Harvest)
+// with their own entry points, because a loot or bed press must not strip a
+// body or pull a crop the player only meant to look at. A gathering NODE is
+// different: an ore vein, herb, or tree has no ordinary half to confuse the
+// press with, so walking up to one and pressing Interact IS the intent, and
+// the node arm (restored in v0.42.1 after the PR1 split took it away by
+// accident) harvests it through the same core as the node click and the tool
+// press, whenever the caller offers a node list (`gather`).
 // The one corpse-harvest thing the press does is OPEN the corpse picker (the
 // last rung of the ladder, for a Field Kit carrier on a harvest-only body),
 // exactly as the bed press opens the bed sheet: a window, never a harvest.
-// The scan half (player, party roster, entities, quest log, garden beds) is
-// the shared candidate-resolver slice, so the prompt and the press can never
-// read a different world.
+// The scan half (player, party roster, entities, quest log, garden beds, the
+// offered nodes) is the shared candidate-resolver slice, so the prompt and the
+// press can never read a different world.
 export interface NearbyInteractionWorld extends NearbyInteractionScanWorld {
   targetEntity(id: number | null): void;
   interact(): void;
@@ -25,6 +37,11 @@ export interface NearbyInteractionWorld extends NearbyInteractionScanWorld {
   enterDungeon(dungeonId: string): InteractionOutcome;
   leaveDungeon(): InteractionOutcome;
   pickUpObject(id: number): InteractionOutcome;
+  // The gather-node arm: per-viewer readiness and the harvest command, both
+  // consumed through handleGatherNodeInteract (the node click's core), never
+  // called here directly. IWorld satisfies both structurally.
+  nodeHarvestableByMe(nodeId: string): boolean;
+  harvestNode(nodeId: string, confirmEffectUse?: boolean): InteractionOutcome;
   // The garden-bed arm (Phase 9b). The static bed content rides the scan slice
   // above; this half is the caller's own plots. IWorld satisfies both
   // structurally, so the live call site (main.ts interactKey passing the world
@@ -57,6 +74,22 @@ export interface NearbyInteractionHud {
   openLoot(mobId: number, screenX: number, screenY: number): void;
 }
 
+/** Everything the gather-node arm needs, bundled so the press keeps its
+ *  ordinary-interaction signature (the live call site still closes on the
+ *  nothing-to-interact string, then preferNpcId) and a caller that has no
+ *  nodes to offer (the fixtures, the browser rig) simply omits it. */
+export interface NearbyGatherOptions {
+  nodes: readonly NearbyGatherNode[];
+  /** Resolves the tool-tier access gate + localized denial line for the
+   *  node about to be harvested (Professions 2.0); null keeps the
+   *  tier-agnostic shape. */
+  toolGateFor: ((node: NearbyGatherNode) => GatherNodeToolGate) | null;
+  tooFarText: string;
+  notReadyText: string;
+  /** The R40 per-use effect confirm gate, threaded to the node dispatch. */
+  effectConfirm?: GatherEffectConfirmGate;
+}
+
 /** Find and dispatch one eligible nearby interaction in stable priority order.
  *  `escortAwayText` sits before the nothing-to-interact string so the live
  *  call site (main.ts interactKey) still closes on that string, as pinned by
@@ -73,8 +106,15 @@ export function tryNearbyInteraction(
   // this, pressing talk answered whoever happened to be standing closer. Only ever
   // promotes an npc the scan would already have accepted, so no rule is bypassed.
   preferNpcId?: number | null,
+  // The gather-node arm's inputs; absent means the press knows no nodes.
+  gather?: NearbyGatherOptions,
 ): InteractionOutcome {
-  const candidate = resolveNearbyInteractionCandidate(world, harvestStateReliable, preferNpcId);
+  const candidate = resolveNearbyInteractionCandidate(
+    world,
+    harvestStateReliable,
+    preferNpcId,
+    gather?.nodes,
+  );
   if (candidate?.kind === 'corpse') {
     // Ordinary loot only. Harvesting a corpse is an explicit action with its
     // own entry point (the corpse picker), never a side effect of this press.
@@ -116,12 +156,35 @@ export function tryNearbyInteraction(
     return true;
   }
   // STARTING an escort sits below the npc arm (an escortee is mob-kind, so the
-  // two can never compete). Corpses still win, so looting the ambush wave is
-  // never swallowed.
+  // two can never compete) and above gather nodes: an escortee standing in
+  // front of you beats the node you happen to be over. Corpses still win, so
+  // looting the ambush wave is never swallowed.
   if (candidate?.kind === 'escort') {
     return handleEscortPress(world, hud, { kind: 'start', entityId: candidate.id }, escortAwayText);
   }
-  // The feast arm sits ABOVE the garden-bed arm (ruling 11b-R3c-1: a PLACED
+  // The gather-node arm: the nearest node in reach, through the SAME core
+  // the node click and the gathering-tool press use (range, tool tier,
+  // readiness, then the R40 confirm), so the three entry points cannot drift.
+  // A corpse WITH ordinary loot above still wins the press (the shipped
+  // corpses-over-nodes order); a harvest-only or blocked corpse is no
+  // candidate up there and cannot shadow the node beside it. The resolver
+  // only ever names a node the caller offered, so `gather` is set whenever
+  // this arm fires; the guard is for the type narrowing alone.
+  if (candidate?.kind === 'node' && gather) {
+    return handleGatherNodeInteract(
+      world,
+      hud,
+      world.player.pos,
+      candidate.node.id,
+      candidate.node.pos,
+      gather.tooFarText,
+      gather.notReadyText,
+      gather.toolGateFor?.(candidate.node),
+      gather.effectConfirm,
+    );
+  }
+  // The feast arm sits below gather nodes (a node in reach keeps winning the
+  // press) and ABOVE the garden-bed arm (ruling 11b-R3c-1: a PLACED
   // TRANSIENT wins over permanent world furniture; a feast despawns on a
   // timer and is what the player just walked to, so it outranks the bed that
   // is always there). The press just sends the entity id: an already-fed

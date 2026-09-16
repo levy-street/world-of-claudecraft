@@ -21,8 +21,6 @@ import {
   nythraxisGraveEruptionDamageMaxHp,
   nythraxisGraveFlameTickMaxHp,
 } from '../src/sim/nythraxis_grave_eruption';
-import { nythraxisGravefireTickMaxHp } from '../src/sim/nythraxis_gravefire';
-import { nythraxisSoulfireTickMaxHp } from '../src/sim/nythraxis_soulfire';
 import {
   varkhulCinderFireDamageMaxHp,
   varkhulCinderOrbDamageMaxHp,
@@ -67,29 +65,26 @@ describe('raid avoidable damage tuning', () => {
     // Grave Eruption burst, Grave Flame per second, the impale drain per second
     // (answered by shattering the spike), and the Dread Curse per-stack step
     // (answered by the tank swap). Every mechanic runs on both difficulties.
+    // Soulfire and Gravefire left this table with their mechanics (retired in v0.42.2).
     expect([
       nythraxisGraveEruptionDamageMaxHp('normal'),
       nythraxisGraveFlameTickMaxHp('normal'),
       nythraxisImpaledTickMaxHp('normal'),
       nythraxisDreadCursePerStack('normal'),
-      nythraxisSoulfireTickMaxHp('normal'),
-      nythraxisGravefireTickMaxHp('normal'),
       nythraxisUnboundHitMaxHp('normal'),
       nythraxisBoneSlamDamageMaxHp('normal'),
       nythraxisBoneStormOpeningSlamMaxHp('normal'),
       nythraxisBoneStormWhirlTickMaxHp('normal'),
-    ]).toEqual([0.45, 0.06, 0.08, 0.35, 0.08, 0.1, 0.4, 0.35, 0.23, 0.1]);
+    ]).toEqual([0.45, 0.06, 0.08, 0.35, 0.4, 0.35, 0.23, 0.1]);
     expect([
       nythraxisGraveEruptionDamageMaxHp('heroic'),
       nythraxisGraveFlameTickMaxHp('heroic'),
       nythraxisImpaledTickMaxHp('heroic'),
       nythraxisDreadCursePerStack('heroic'),
-      nythraxisSoulfireTickMaxHp('heroic'),
-      nythraxisGravefireTickMaxHp('heroic'),
       nythraxisUnboundHitMaxHp('heroic'),
       nythraxisBoneSlamDamageMaxHp('heroic'),
       nythraxisBoneStormOpeningSlamMaxHp('heroic'),
       nythraxisBoneStormWhirlTickMaxHp('heroic'),
-    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.12, 0.15, 0.6, 0.55, 0.37, 0.2]);
+    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.6, 0.55, 0.37, 0.2]);
   });
 });

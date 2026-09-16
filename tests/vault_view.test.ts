@@ -19,6 +19,7 @@ import {
   hasVaultDepositable,
   predictVaultDepositAll,
   vaultDepositAllSummaryKey,
+  vaultMaterialHeadroom,
   vaultRowAction,
   vaultSpecialContentKey,
   vaultWithdrawFit,
@@ -115,7 +116,8 @@ describe('buildVaultView', () => {
         partialMax,
       })),
     ).toEqual([
-      { itemId: 'ashwood_log', canChooseQuantity: false, partialMax: null },
+      // A one-unit row offers the action too, so it reads alike on every row.
+      { itemId: 'ashwood_log', canChooseQuantity: true, partialMax: 1 },
       { itemId: 'copper_ore', canChooseQuantity: true, partialMax: 7 },
     ]);
   });
@@ -139,11 +141,14 @@ describe('buildVaultView', () => {
     const recipeRow = copper.find(
       (row) => row.kind === 'special' && row.craftedRecipeId === 'smelt_copper',
     );
+    // A signer is a mergeable payload (the bags already hold it as counted
+    // stacks), so the row splits like a plain one; only a charge-bearing or
+    // locked payload pins a row to whole moves (the sim's vaultRowMovesWhole).
     expect(signedRow).toMatchObject({
       kind: 'special',
       count: 2,
-      canChooseQuantity: false,
-      partialMax: null,
+      canChooseQuantity: true,
+      partialMax: 2,
       specialRef: { index: 1, instance: { signer: 'Ada' } },
     });
     expect(recipeRow).toMatchObject({
@@ -306,14 +311,26 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
     expect(p).toEqual({ stacks: 4, items: 36, full: true, notableItemId: null });
   });
 
-  it('counts existing special stock against the shared cap and never splits an instance', () => {
+  it('counts existing special stock against the shared cap and never splits a whole-move payload', () => {
     const info = vinfo({ copper_ore: 30 }, 1, 40, 50000, [
       slot('copper_ore', 8, { craftedRecipeId: 'smelt_copper' }),
     ]);
-    const inv = [slot('copper_ore', 5, { instance: { signer: 'Ada' } })];
-    expect(predictVaultDepositAll(inv, info, MATERIALS, lookup)).toEqual({
+    // Headroom 2. A locked payload moves whole or not at all (the sim's
+    // vaultRowMovesWhole), so the replay leaves it carried and reports the
+    // ceiling, exactly as the sweep does.
+    const locked = [slot('copper_ore', 5, { instance: { locked: true } })];
+    expect(predictVaultDepositAll(locked, info, MATERIALS, lookup)).toEqual({
       stacks: 0,
       items: 0,
+      full: true,
+      notableItemId: null,
+    });
+    // A signer or bind-on-trade payload partially fills like plain stock, the
+    // same two units the sweep and the targeted deposit both move.
+    const signed = [slot('copper_ore', 5, { instance: { signer: 'Ada' } })];
+    expect(predictVaultDepositAll(signed, info, MATERIALS, lookup)).toEqual({
+      stacks: 0,
+      items: 2,
       full: true,
       notableItemId: null,
     });
@@ -527,11 +544,14 @@ describe('vaultWithdrawFit + vaultWithdrawNotice (the shortfall explanation)', (
     expect(fit).toBe(25);
   });
 
-  it('passes identity/provenance into countFit and keeps instances all-or-nothing', () => {
+  it('passes identity/provenance into countFit and keeps whole-move payloads all-or-nothing', () => {
     const inv = Array.from({ length: 15 }, (_, i) => slot(`gear_${i}`, 1));
     const bags = [null, null, null, null];
+    // One free slot: a locked payload that cannot land whole fits nothing,
+    // while a signer (mergeable, the bags split it) and a plain row fit 20.
+    expect(vaultWithdrawFit(inv, bags, 'copper_ore', 30, { locked: true }, 'smelt_copper')).toBe(0);
     expect(vaultWithdrawFit(inv, bags, 'copper_ore', 30, { signer: 'Ada' }, 'smelt_copper')).toBe(
-      0,
+      20,
     );
     expect(vaultWithdrawFit(inv, bags, 'copper_ore', 30, undefined, 'smelt_copper')).toBe(20);
   });
@@ -582,5 +602,48 @@ describe('no client-side price constant (source scan)', () => {
     }
     // The loop above walks the live ladder: prove it saw the whole table.
     expect(VAULT_UPGRADE_PRICES.length).toBe(5);
+  });
+});
+
+describe('vaultMaterialHeadroom (the picker ceiling for a vault deposit)', () => {
+  it('is the ceiling less pooled and identity-row units, from the wire snapshot', () => {
+    const info = vinfo({ copper_ore: 30 }, 1, 40, 50000, [
+      slot('copper_ore', 6, { materialSources: [{ source: {}, count: 6 }] }),
+      slot('iron_ore', 3),
+    ]);
+    expect(vaultMaterialHeadroom(info, 'copper_ore')).toBe(4);
+    expect(vaultMaterialHeadroom(info, 'iron_ore')).toBe(37);
+    expect(vaultMaterialHeadroom(info, 'frost_lotus')).toBe(40);
+  });
+
+  it('floors an over-cap tolerated holding at zero and has no answer away or locked', () => {
+    expect(vaultMaterialHeadroom(vinfo({ copper_ore: 45 }), 'copper_ore')).toBe(0);
+    expect(vaultMaterialHeadroom(null, 'copper_ore')).toBeUndefined();
+    expect(vaultMaterialHeadroom(vinfo({}, 0, 0, 20000), 'copper_ore')).toBeUndefined();
+  });
+
+  it('never reads a prototype-named id off the stock record', () => {
+    expect(vaultMaterialHeadroom(vinfo({}), 'constructor')).toBe(40);
+  });
+});
+
+describe('the chosen-quantity action follows the whole-move rule at the seam', () => {
+  it('withholds it from a locked row only, one-unit rows included', () => {
+    const model = buildVaultView(
+      vinfo({}, 1, 40, 50000, [
+        slot('copper_ore', 3, { instance: { locked: true } }),
+        slot('copper_ore', 1, { instance: { signer: 'Ada' } }),
+        slot('iron_ore', 2, { instance: { bindOnTrade: true } }),
+      ]),
+      lookup,
+    );
+    if (model.kind !== 'vault') throw new Error('expected vault');
+    expect(
+      model.rows.map((row) => [row.itemId, row.count, row.canChooseQuantity, row.partialMax]),
+    ).toEqual([
+      ['copper_ore', 3, false, null],
+      ['copper_ore', 1, true, 1],
+      ['iron_ore', 2, true, 2],
+    ]);
   });
 });

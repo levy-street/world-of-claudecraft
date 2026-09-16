@@ -58,7 +58,6 @@ export const MOUNT_SKIN_NAME_KEYS: Record<MountSkinId, TranslationKey> = {
   mech_bird: 'hudChrome.mounts.name_mech_bird',
   chimeglass_tortoise: 'hudChrome.mounts.name_chimeglass_tortoise',
   rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
-  rallycart_rxt: 'hudChrome.mounts.name_rallycart_rxt',
   goblin_rocket_sled: 'hudChrome.mounts.name_goblin_rocket_sled',
 };
 
@@ -66,7 +65,6 @@ export const MOUNT_SKIN_DESC_KEYS: Record<MountSkinId, TranslationKey> = {
   mech_bird: 'hudChrome.mounts.desc_mech_bird',
   chimeglass_tortoise: 'hudChrome.mounts.desc_chimeglass_tortoise',
   rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
-  rallycart_rxt: 'hudChrome.mounts.desc_rallycart_skin',
   goblin_rocket_sled: 'hudChrome.mounts.desc_goblin_rocket_sled',
 };
 

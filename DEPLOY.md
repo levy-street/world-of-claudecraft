@@ -401,6 +401,16 @@ For off-box safety, sync the directory to S3 occasionally:
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
   owes its own caveat here.
+- **Vault identity rows over the bag stack size (v0.43.0)**: the Materials Vault now
+  packs one row per material identity at the vault's own row size, so a row can hold
+  more than the 20-unit bag stack (four legacy rows of twenty fold into one row of
+  eighty on load). Rolling back to a build before this change keeps such a row intact
+  through the material exemption in `src/sim/material_slot_load.ts`, with one
+  exception: a row whose item id has since LEFT the material taxonomy, carrying a
+  mergeable payload and no source buckets, clips back to the bag stack size on the old
+  build's load (`instancedCountCap`) and persists the clipped count on its next save.
+  No shipped material id has left the taxonomy; if one does, roll back only after
+  splitting such rows, or accept that clip.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates

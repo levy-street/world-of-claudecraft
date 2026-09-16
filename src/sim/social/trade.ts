@@ -27,7 +27,13 @@ import {
 import { partyTradeWindowAllows } from '../loot/bop_trade_window';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
-import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayload } from '../types';
+import {
+  cloneItemInstancePayload,
+  dist2d,
+  type InvSlot,
+  type ItemInstancePayload,
+  TICK_RATE,
+} from '../types';
 import {
   carriersReadable,
   mergedUnitSources,
@@ -991,6 +997,10 @@ export function updateTradesAndInvites(ctx: SimContext): void {
   }
   // cancel trades when the parties drift apart
   const seen = new Set<TradeSession>();
+  // Once a second, re-check every staged bind-on-pickup copy against the
+  // lockout clock: a window can expire while the offer sits on the table.
+  const revalidatePartyTradeOffers = ctx.tickCount % TICK_RATE === 0;
+  const nowMs = revalidatePartyTradeOffers ? ctx.lockoutNowMs() : 0;
   for (const session of ctx.trades.values()) {
     if (seen.has(session)) continue;
     seen.add(session);
@@ -998,6 +1008,19 @@ export function updateTradesAndInvites(ctx: SimContext): void {
     const eb = ctx.entities.get(session.b);
     if (!ea || !eb || dist2d(ea.pos, eb.pos) > TRADE_RANGE + 4 || ea.dead || eb.dead) {
       tradeCancel(ctx, session.a);
+      continue;
+    }
+    if (!revalidatePartyTradeOffers) continue;
+    for (const [pid, otherPid, offer] of [
+      [session.a, session.b, session.offerA],
+      [session.b, session.a, session.offerB],
+    ] as const) {
+      if (!offer.items.some((slot) => ITEMS[slot.itemId]?.soulbound)) continue;
+      if (offerCovered(ctx, offer.items, pid, otherPid, () => nowMs)) continue;
+      // Re-run the authoritative staging walk to remove only copies that are
+      // no longer valid. This also resets both acceptances, so a reconnecting
+      // client never sees an expired line as already agreed.
+      tradeSetOffer(ctx, offer.items, offer.copper, pid);
     }
   }
 }

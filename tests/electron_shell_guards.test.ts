@@ -5,6 +5,8 @@ import {
   buildContentSecurityPolicy,
   CSP_ORIGINS,
   deriveOrigin,
+  EMBEDDED_SUBFRAME_HOST_SUFFIXES,
+  EMBEDDED_SUBFRAME_ORIGINS,
   extractInlineScriptHashes,
   isDevToolsToggleShortcut,
   isSoftwareRenderer,
@@ -83,6 +85,38 @@ describe('navigationAllowed', () => {
     expect(navigationAllowed(verify, true, main)).toBe(false);
     expect(navigationAllowed(verify, false, main)).toBe(true);
   });
+  // The Claudium store mounts Stripe Embedded Checkout in iframes. Stripe starts some
+  // of them on per-session subdomains (Stripe's CSP guidance names *.js.stripe.com and
+  // *.link.com), so the guard admits the exact Stripe origins and those host suffixes,
+  // in subframes only, and never a look-alike host.
+  it('allows the Stripe checkout frames only as embedded subframes', () => {
+    const app = new Set(['app://worldofclaudecraft']);
+    for (const url of [
+      'https://js.stripe.com/v3/embedded-checkout-inner.html',
+      'https://b.js.stripe.com/v3/controller.html',
+      'https://checkout.stripe.com/c/pay/cs_test_123',
+      'https://hooks.stripe.com/three_d_secure/authenticate',
+      'https://link.com/login',
+      'https://checkout.link.com/login',
+    ]) {
+      expect(navigationAllowed(url, false, app)).toBe(true);
+      expect(navigationAllowed(url, true, app)).toBe(false);
+    }
+  });
+
+  it('denies look-alike and non-HTTPS Stripe hosts even in a subframe', () => {
+    const app = new Set(['app://worldofclaudecraft']);
+    for (const url of [
+      'https://evil-js.stripe.com/v3/',
+      'https://js.stripe.com.evil.com/v3/',
+      'https://notlink.com/login',
+      'http://b.js.stripe.com/v3/',
+      'https://api.stripe.com/v1/tokens',
+    ]) {
+      expect(navigationAllowed(url, false, app)).toBe(false);
+    }
+  });
+
   it('denies a malformed navigation URL', () => {
     expect(navigationAllowed('::: not a url', true, main)).toBe(false);
   });
@@ -203,6 +237,33 @@ describe('buildContentSecurityPolicy', () => {
     expect(directive('img-src')).toContain('https://secure.walletconnect.com');
     expect(directive('font-src')).toContain('https://fonts.reown.com');
     expect(directive('frame-src')).toContain('https://verify.walletconnect.com');
+  });
+
+  // The Claudium store's card rail loads https://js.stripe.com/v3/ and mounts Stripe's
+  // Embedded Checkout iframes (src/net/stripe_checkout.ts). The desktop shell is the only
+  // host with a CSP, so without these every card purchase there failed with
+  // "Checkout could not be loaded" while the browser build worked (v0.42.0 report).
+  it('allows Stripe.js, the Checkout frames, and the Stripe API on the desktop shell', () => {
+    expect(directive('script-src')).toContain('https://js.stripe.com');
+    expect(directive('script-src')).toContain('https://*.js.stripe.com');
+    expect(directive('frame-src')).toContain('https://js.stripe.com');
+    expect(directive('frame-src')).toContain('https://*.js.stripe.com');
+    expect(directive('frame-src')).toContain('https://hooks.stripe.com');
+    expect(directive('frame-src')).toContain('https://checkout.stripe.com');
+    expect(directive('frame-src')).toContain('https://*.link.com');
+    expect(directive('connect-src')).toContain('https://api.stripe.com');
+    expect(directive('img-src')).toContain('https://*.stripe.com');
+    // The frame allowance and the navigation guard must agree, or the CSP admits a frame
+    // the guard then cancels: every exact Stripe frame origin is also an embedded subframe.
+    for (const origin of CSP_ORIGINS.stripe.frame) {
+      const wildcard = origin.match(/^https:\/\/\*\.(.+)$/);
+      if (wildcard) {
+        // A wildcard frame origin is covered by the suffix list, or the guard cancels it.
+        expect(EMBEDDED_SUBFRAME_HOST_SUFFIXES).toContain(`.${wildcard[1]}`);
+        continue;
+      }
+      expect(EMBEDDED_SUBFRAME_ORIGINS.has(origin)).toBe(true);
+    }
   });
 
   // Desktop is the only host that ships a CSP. Linked Discord avatars load from

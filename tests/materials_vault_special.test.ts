@@ -152,14 +152,18 @@ describe('identity-preserving Materials Vault stacks', () => {
     ]);
   });
 
-  it('moves instance stacks whole but permits partial recipe-only moves', () => {
+  it('moves whole-move payload stacks whole but permits partial recipe-only moves', () => {
     const sim = makeSim();
     const meta = metaOf(sim);
     meta.vault.stock.copper_ore = 39;
+    // A LOCKED payload is one identity per unit (vault_slot_ops.ts
+    // vaultRowMovesWhole), so it deposits whole or not at all; a signer or
+    // bind-on-trade payload splits like a plain stack now
+    // (tests/materials_vault_row_packing.test.ts pins that arm).
     const instance: InvSlot = {
       itemId: 'copper_ore',
       count: 2,
-      instance: { signer: 'Ada' },
+      instance: { locked: true },
     };
     meta.inventory.push(instance);
 

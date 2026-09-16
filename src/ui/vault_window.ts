@@ -21,6 +21,7 @@
 // reach them.
 
 import { audio } from '../game/audio';
+import { stackSizeOf } from '../sim/bags';
 import { ITEMS } from '../sim/data';
 import { isItemLocked } from '../sim/item_lock';
 import type { MaterialComposition } from '../sim/material_sources';
@@ -51,10 +52,11 @@ import {
   appendMaterialSourcesActionAfter,
   attachMaterialSourcesContextMenu,
   type MaterialSourcesDialogOptions,
+  materialSourcesButtonShown,
+  openMaterialSourcesForRow,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import { StorageRungEchoLatch } from './storage_rung_echo_core';
-import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import {
   buildVaultView,
@@ -419,21 +421,32 @@ export class VaultTab {
         : '';
       return `${body}<div class="tt-sub">${esc(t('hudChrome.bank.withdrawHint'))}</div>${partial}`;
     });
-    attachMaterialSourcesContextMenu(row, name, displayedSources, this.deps.openMaterialSources);
-    if (displayedSources) wrap.classList.add('material-source-item');
-    wrap.appendChild(row);
-    appendMaterialSourcesActionAfter(
-      row,
-      name,
-      displayedSources,
-      this.deps.openMaterialSources,
+    // The exact-source withdraw session rides both doors into the dialog:
+    // desktop right-click and the touch-only Sources button.
+    const withdrawSelection =
       model.kind === 'special'
         ? vaultMaterialWithdrawSelection(this.deps.world(), itemId, model.specialRef.index, () => {
             this.deps.hideTooltip();
             this.deps.onInventoryChanged();
             this.deps.requestRender();
           })
-        : undefined,
+        : undefined;
+    attachMaterialSourcesContextMenu(
+      row,
+      name,
+      displayedSources,
+      this.deps.openMaterialSources,
+      withdrawSelection,
+    );
+    if (displayedSources && materialSourcesButtonShown())
+      wrap.classList.add('material-source-item');
+    wrap.appendChild(row);
+    appendMaterialSourcesActionAfter(
+      row,
+      name,
+      displayedSources,
+      this.deps.openMaterialSources,
+      withdrawSelection,
     );
     if (model.canChooseQuantity && model.partialMax !== null) {
       // A visible sibling action gives touch and switch users the same partial
@@ -451,23 +464,36 @@ export class VaultTab {
       partial.setAttribute('aria-label', partialLabel);
       // The shared tooltip, not a native title (every sibling control's rule);
       // re-resolved at show time so a language switch relocalizes it. TWO
-      // lines: the action sentence AND the chip's own visible label. The 72px
-      // chip ellipsis-caps that label in EVERY locale (the English text
-      // already overflows the cap at 11px), and in a locale whose action
+      // lines: the action sentence AND the button's own visible label. The
+      // button now grows to its full label, but in a locale whose action
       // translation is still pending the first line falls back to English, so
-      // the second line is what guarantees the elided TRANSLATED label stays
-      // recoverable from the tooltip.
+      // the second line keeps the TRANSLATED label in the tooltip too.
       this.deps.attachTooltip(
         partial,
         () =>
           `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawQuantityAction', { item: name }))}</div>` +
           `<div class="tt-sub">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</div>`,
       );
-      partial.innerHTML =
-        svgIcon('more') +
-        `<span class="vault-row-partial-label">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</span>`;
+      partial.innerHTML = `<span class="vault-row-partial-label">${esc(t('hudChrome.bank.withdrawQuantityInput'))}</span>`;
       const partialMax = model.partialMax;
-      partial.addEventListener('click', () => this.showWithdrawQuantityPrompt(model, partialMax));
+      partial.addEventListener('click', () => {
+        // A sourced special row's chosen-quantity door is the exact-source
+        // picker (per-source counts, the same session the row's right-click
+        // and the touch Sources button open); a compact row has no sources to
+        // choose between and keeps the plain quantity prompt.
+        if (displayedSources && withdrawSelection && this.deps.openMaterialSources) {
+          this.deps.hideTooltip();
+          openMaterialSourcesForRow(
+            this.deps.openMaterialSources,
+            name,
+            displayedSources,
+            partial,
+            withdrawSelection,
+          );
+          return;
+        }
+        this.showWithdrawQuantityPrompt(model, partialMax);
+      });
       wrap.appendChild(partial);
     }
     list.appendChild(wrap);
@@ -547,6 +573,10 @@ export class VaultTab {
     const itemName = item ? itemDisplayName(item) : itemId;
     let resolvedSpecial: { slot: InvSlot; ref: VaultSpecialRef } | null =
       model.kind === 'special' ? this.liveSpecialRow(model) : null;
+    // One press moves a whole carried stack (the item's bag stack size), so a
+    // pooled row of eighty is four presses rather than a typed count.
+    const stepSize = stackSizeOf(item);
+    const stepCount = formatCount(stepSize);
     showQuantityPrompt(
       {
         installPromptDialog: (prompt, opener, close) =>
@@ -556,6 +586,13 @@ export class VaultTab {
       {
         // The bank family's teardown selector reaches this via the first class.
         className: 'bank-quantity-prompt vault-quantity-prompt',
+        step: {
+          size: stepSize,
+          downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: stepCount }),
+          upAriaText: t('hudChrome.bank.quantityStepUpAria', { count: stepCount }),
+          unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: formatCount(1) }),
+          unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: formatCount(1) }),
+        },
         titleText: t('hudChrome.bank.withdrawQuantityTitle', { item: itemName }),
         inputAriaText: t('hudChrome.bank.withdrawQuantityInput'),
         confirmText: t('hudChrome.bank.withdrawQuantityConfirm'),

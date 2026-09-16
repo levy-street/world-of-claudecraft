@@ -46,16 +46,26 @@ import {
   materialSourceTransferSelectionMatches,
   readMaterialSourceTransferSelection,
 } from '../src/sim/material_source_transfer_selection';
+import type { InvSlot } from '../src/sim/types';
 import type { VaultInfo, VaultSpecialRef } from '../src/world_api';
 import { buildVaultLedgerRows, recordVaultOp } from './bank_ledger';
 import type { BankLedgerAdmission, BankLedgerAdmissionHandle } from './bank_ledger_admission';
 import { bankVaultLedgerMaxRows } from './bank_vault_ledger_guard';
+import { gameMetricsCounters } from './http/game_signals';
+import {
+  VAULT_LEDGER_ROW_BOUND_MAX,
+  vaultDepositAllLedgerRowBound,
+  vaultDepositLedgerRowBound,
+  vaultWithdrawLedgerRowBound,
+} from './vault_ledger_row_bound';
 
 /** The slice of Sim the vault dispatch bodies call; a narrow host interface
- *  so a Vitest drives the bodies without a GameServer. */
+ *  so a Vitest drives the bodies without a GameServer. `inventory` is read
+ *  ONLY to bound a deposit's ledger rows before the reservation (see
+ *  vault_ledger_row_bound.ts); the Sim still owns every deposit rule. */
 export interface VaultSim {
   ctx: {
-    resolve(pid?: number): { meta: { entityId: number } } | null;
+    resolve(pid?: number): { meta: { entityId: number; inventory: readonly InvSlot[] } } | null;
     error(id: number, text: string): void;
   };
   vaultInfoFor(pid?: number): VaultInfo | null;
@@ -203,15 +213,41 @@ function refuseLedgerAdmission(sim: VaultSim, pid: number): void {
 }
 
 /** Undefined preserves the temporary legacy observer path. Null means the
- *  live session has no admission owner and must refuse before mutation. */
+ *  live session has no admission owner and must refuse before mutation.
+ *
+ *  `rowBound` is the command's OWN worst case, read from the pre-mutation state
+ *  (vault_ledger_row_bound.ts): one row per distinct ledger identity the
+ *  stack(s) it touches can produce. The table entry stays the floor. The two
+ *  must be combined here, because a commit whose rows exceed the reservation
+ *  is a post-mutation failure that quarantines and disconnects the session; a
+ *  bound the guard cannot reserve at all is refused up front instead. */
 function reserveLedgerRows(
   admission: BankLedgerAdmission | null | undefined,
   sim: VaultSim,
+  who: { characterId: number },
   pid: number,
   command: VaultCommandName,
+  rowBound: number,
 ): BankLedgerAdmissionHandle | null | undefined {
   if (admission === undefined) return undefined;
-  const reservation = admission?.tryReserve(bankVaultLedgerMaxRows(command), 0, 'vault') ?? null;
+  const maxRows = Math.max(bankVaultLedgerMaxRows(command), rowBound);
+  if (maxRows > VAULT_LEDGER_ROW_BOUND_MAX) {
+    // Refused before the guard ever sees it, so the guard's own refusal
+    // telemetry cannot record this arm; count it here or a player whose
+    // sweep is refused every time (more distinct material/signer keys carried
+    // than the burst can hold) leaves no server-side trace at all. The log
+    // line names the character because the metric never does (character id
+    // is unbounded, so it is banned as a label): it IS the identifying detail
+    // the counter's docblock promises an operator. Volume is bounded by the
+    // command lane, so no dedupe is needed.
+    gameMetricsCounters().vaultLedgerIncident('row_bound_exceeded');
+    console.warn(
+      `bank_ledger vault ${command} refused for character ${who.characterId}: row bound ${maxRows} exceeds the ${VAULT_LEDGER_ROW_BOUND_MAX}-row reservation ceiling`,
+    );
+    refuseLedgerAdmission(sim, pid);
+    return null;
+  }
+  const reservation = admission?.tryReserve(maxRows, 0, 'vault') ?? null;
   if (!reservation) refuseLedgerAdmission(sim, pid);
   return reservation;
 }
@@ -275,7 +311,19 @@ export function dispatchVaultCommand(
         const transfer = readMaterialSourceTransferWire(msg, slot);
         if (transfer === null) break;
         const { count, selection } = transfer;
-        const reservation = reserveLedgerRows(admission, sim, pid, 'vault_deposit');
+        // The carried stack is read only to BOUND the rows; the Sim re-reads
+        // and validates it inside vaultDeposit. A slot index the Sim will
+        // refuse bounds to the table's single row.
+        const carried = sim.ctx.resolve(pid)?.meta.inventory;
+        const slotIndex = Number.isInteger(slot) && slot >= 0 ? slot : -1;
+        const reservation = reserveLedgerRows(
+          admission,
+          sim,
+          who,
+          pid,
+          'vault_deposit',
+          vaultDepositLedgerRowBound(slotIndex < 0 ? undefined : carried?.[slotIndex]),
+        );
         if (reservation === null) break;
         const before = runReservedSimCall(
           reservation,
@@ -304,11 +352,26 @@ export function dispatchVaultCommand(
           })
         )
           break;
-        const reservation = reserveLedgerRows(admission, sim, pid, 'vault_withdraw');
+        // The pre-mutation snapshot is read ONCE, ahead of the reservation: it
+        // bounds the rows an identity-row withdrawal can write, then serves
+        // as the diff's before-state. Nothing mutates between the two uses
+        // (this whole dispatch is one synchronous turn).
+        const snapshot = sim.vaultInfoFor(pid);
+        const reservation = reserveLedgerRows(
+          admission,
+          sim,
+          who,
+          pid,
+          'vault_withdraw',
+          vaultWithdrawLedgerRowBound(snapshot, itemId, special),
+        );
         if (reservation === null) break;
+        // readBefore is inert here (the snapshot is already taken), so a
+        // future throwing read must NOT be slipped back into it expecting the
+        // reservation-cancel guard: take it before the reservation as above.
         const before = runReservedSimCall(
           reservation,
-          () => sim.vaultInfoFor(pid),
+          () => snapshot,
           () => {
             if (special === undefined) sim.vaultWithdraw(itemId, count, pid);
             else sim.vaultWithdraw(itemId, count, special, pid);
@@ -325,8 +388,17 @@ export function dispatchVaultCommand(
       // Argument-free (the sweep takes the whole carried inventory), so no
       // shape guard; the Sim owns every per-slot rule. ONE before/after diff
       // spans the whole batch, so recordVaultOp writes the sweep's rows (one
-      // per material moved) as ONE batched insert.
-      const reservation = reserveLedgerRows(admission, sim, pid, 'vault_deposit_all');
+      // per material moved) as ONE batched insert. The row bound is the
+      // distinct (material, identity) keys across the whole carried inventory,
+      // never below the table's 112-slot floor.
+      const reservation = reserveLedgerRows(
+        admission,
+        sim,
+        who,
+        pid,
+        'vault_deposit_all',
+        vaultDepositAllLedgerRowBound(sim.ctx.resolve(pid)?.meta.inventory ?? []),
+      );
       if (reservation === null) break;
       const before = runReservedSimCall(
         reservation,
@@ -341,7 +413,8 @@ export function dispatchVaultCommand(
       break;
     }
     case 'vault_buy_upgrade': {
-      const reservation = reserveLedgerRows(admission, sim, pid, 'vault_buy_upgrade');
+      // A rung purchase writes exactly one copper row; the table floor is exact.
+      const reservation = reserveLedgerRows(admission, sim, who, pid, 'vault_buy_upgrade', 1);
       if (reservation === null) break;
       const before = runReservedSimCall(
         reservation,

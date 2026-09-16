@@ -683,7 +683,11 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
   // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
   // the ground-sample leaves compose in one tree. No capture was retaken.
-  'a77d55afde1a24af015bbb5de84f5e7ebcb0ae52210c48b92a6bb64bdbb1206f';
+  // Re-minted for the v0.42.2 hotfix line forward merge into release/v0.43.0:
+  // the merged renderer leaf (main's flanking-platform ground lift and
+  // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
+  // leaves) matches neither parent. No capture was retaken.
+  'f429f724ca7ab90873b4a86950c0046585ef66bec7c2052cda12ae578ecee3d0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -9581,9 +9581,10 @@
   }
   .vault-row-partial {
     display: inline-flex;
+    flex: none; /* sized by its full label; the row name is what shrinks */
     align-items: center;
     justify-content: center;
-    gap: 5px;
+    gap: 6px;
     min-width: 40px;
     min-height: 40px;
     padding: 4px 8px;
@@ -9595,6 +9596,9 @@
     border-color: var(--color-primary-dim);
     filter: brightness(1.12);
   }
+  .vault-row-partial:active {
+    filter: brightness(0.95);
+  }
   .vault-row-partial:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
@@ -9605,9 +9609,8 @@
     height: 14px;
   }
   .vault-row-partial-label {
-    max-width: 72px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    /* The full label, never elided: the button grows to fit it in every
+       locale and the row name beside it is what gives way. */
     white-space: nowrap;
   }
   @media (pointer: coarse) {
@@ -9630,8 +9633,30 @@
   body.mobile-touch .vault-footer button {
     min-height: 44px;
   }
+  /* On a phone the two row actions (the touch-only Sources button and the
+     quantity button) sit on their own line UNDER the row, so the item name
+     keeps its full width instead of eliding beside them. */
+  body.mobile-touch .vault-row-wrap {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .vault-row-wrap .vault-row {
+    flex: 1 0 100%;
+  }
   body.mobile-touch .vault-row-partial {
+    /* Shrinkable (unlike desktop) with a wrapping label, so a long localized
+       label still fits beside the Sources button on the actions line. */
+    flex: 0 1 auto;
     min-width: 44px;
+  }
+  body.mobile-touch .vault-row-partial-label {
+    white-space: normal;
+    text-align: center;
+  }
+  /* The touch-only Sources button in the same row keeps its word whole; the
+     row name and the wrapping quantity button are what give way. */
+  body.mobile-touch .vault-row-wrap .material-sources-action {
+    flex: none;
+    white-space: nowrap;
   }
   .vault-locked-intro {
     flex: none;
@@ -20242,10 +20267,14 @@
   }
   .material-sources-quantity {
     display: grid;
-    grid-template-columns: 40px 64px 40px;
+    /* Bag-stack step, unit step, the count, unit step, bag-stack step. */
+    grid-template-columns: 46px 40px 64px 40px 46px;
     gap: 4px;
     align-items: stretch;
     flex: none;
+  }
+  .material-sources-step-big {
+    font-size: 12px;
   }
   .material-sources-step {
     margin: 0;
@@ -20296,8 +20325,28 @@
       min-width: 44px;
     }
     .material-sources-quantity {
-      grid-template-columns: 44px 64px 44px;
+      grid-template-columns: 48px 44px 64px 44px 48px;
     }
+  }
+  /* The touch sheet is 340px wide (hud.mobile.css, the #prompt-stack .prompt
+     rule outranks the dialog's 460px), and the five coarse-target columns are
+     264px, which would leave the source label a sliver. Each row wraps: the
+     label takes the first line and the stepper centres on its own line below,
+     every target keeping its 44px. */
+  body.mobile-touch .material-sources-row {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .material-sources-quantity {
+    flex: 1 0 100%;
+    justify-content: center;
+  }
+  /* Three footer verbs do not fit one 340px line: let them wrap, each taking
+     the full width when it does (the mobile prompt-actions rule's idiom). */
+  body.mobile-touch .material-sources-footer {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .material-sources-footer .btn {
+    flex: 1 1 auto;
   }
   @media (forced-colors: active) {
     .material-sources-action:focus-visible,

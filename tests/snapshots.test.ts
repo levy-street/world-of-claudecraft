@@ -56,6 +56,7 @@ import {
   priestMarkerStateForAuras,
 } from '../src/sim/combat/priest/presentation';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_RACE_START_PLATFORM, type MountKey } from '../src/sim/content/mounts';
 import { CRAFT_RING, STATION_RADIUS } from '../src/sim/content/professions';
 import { COMBO_RECIPES } from '../src/sim/content/recipes';
@@ -9325,42 +9326,51 @@ describe('negotiated stable timer wire v3', () => {
 });
 
 describe('mount skin identity round trip', () => {
-  it.each([
-    'mech_bird',
-    'chimeglass_tortoise',
-    'rickshaw_mount',
-    'goblin_rocket_sled',
-    'rallycart_rxt',
-  ])('ships %s to another client and clears it on takeoff', (skin) => {
-    const server = new GameServer();
-    const fc = fakeWs();
-    const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
-    const observer = joinServer(server, fc, 2, 'Observer');
-    const rider = server.sim.entities.get(wearer.pid)!;
-    wearer.accountCosmetics.mountSkinIds = [skin];
-    server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
-    expect(rider.mountSkinId).toBe(skin);
-    expect(rider.mountKey).toBe('');
-    const viewer = bareClient(observer.pid);
-    server.sim.tick();
-    broadcast(server);
-    (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
-    expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBe(skin);
-    server.handleMessage(
-      wearer,
-      JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin: null }),
-    );
-    server.sim.tick();
-    broadcast(server);
-    (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
-    expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBeNull();
-  });
+  it.each(['mech_bird', 'chimeglass_tortoise', 'rickshaw_mount', 'goblin_rocket_sled'])(
+    'ships %s to another client and clears it on takeoff',
+    (skin) => {
+      const server = new GameServer();
+      const fc = fakeWs();
+      const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
+      const observer = joinServer(server, fc, 2, 'Observer');
+      const rider = server.sim.entities.get(wearer.pid)!;
+      wearer.accountCosmetics.mountSkinIds = [skin];
+      server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
+      expect(rider.mountSkinId).toBe(skin);
+      expect(rider.mountKey).toBe('');
+      const viewer = bareClient(observer.pid);
+      server.sim.tick();
+      broadcast(server);
+      (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
+      expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBe(skin);
+      server.handleMessage(
+        wearer,
+        JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin: null }),
+      );
+      server.sim.tick();
+      broadcast(server);
+      (viewer as unknown as SnapshotApplier).applySnapshot(lastSnap(fc.sent));
+      expect(viewer.entities.get(wearer.pid)?.mountSkinId).toBeNull();
+    },
+  );
+  it.each([...RETIRED_MOUNT_SKIN_IDS])(
+    'refuses to wear the retired %s even when the account row grants it',
+    (skin) => {
+      const server = new GameServer();
+      const wearer = joinServer(server, fakeWs(), 1, 'Skinned');
+      const rider = server.sim.entities.get(wearer.pid)!;
+      wearer.accountCosmetics.mountSkinIds = [skin];
+      server.handleMessage(wearer, JSON.stringify({ t: 'cmd', cmd: 'change_mount_skin', skin }));
+      expect(rider.mountSkinId).toBeNull();
+      expect(server.sim.meta(wearer.pid)?.mountSkinId ?? null).toBeNull();
+    },
+  );
   it('shares the identity-update rate limit with other cosmetics', () => {
     const now = vi.spyOn(Date, 'now').mockReturnValue(1_700_000_000_000);
     try {
       const server = new GameServer();
       const session = joinServer(server, fakeWs(), 1, 'Limiter');
-      session.accountCosmetics.mountSkinIds = ['rallycart_rxt'];
+      session.accountCosmetics.mountSkinIds = ['goblin_rocket_sled'];
       const setter = vi.spyOn(server.sim, 'setMountSkin');
       for (let i = 0; i < COSMETIC_OP_BURST + 5; i++) {
         server.handleMessage(
@@ -9368,7 +9378,7 @@ describe('mount skin identity round trip', () => {
           JSON.stringify({
             t: 'cmd',
             cmd: 'change_mount_skin',
-            skin: i % 2 ? null : 'rallycart_rxt',
+            skin: i % 2 ? null : 'goblin_rocket_sled',
           }),
         );
       }

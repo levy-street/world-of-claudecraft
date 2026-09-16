@@ -116,6 +116,25 @@ export function boundCraftedRecipeIdOnLoad(
   }
 }
 
+/**
+ * The per-slot payload bound for a loaded container row (bags, buyback): the
+ * whole-payload sanitize below, the dropped-path report under `containerLabel`,
+ * and the empty-payload removal (an empty `{}` payload can never stack again,
+ * so the field goes rather than the copy), one arm shared by the sim.ts load
+ * loops instead of restated per container. Mutates the caller-owned clone.
+ */
+export function sanitizeSlotInstanceOnLoad(
+  slot: { itemId: string; instance?: unknown },
+  dropped: string[],
+  containerLabel: string,
+): void {
+  if (!slot.instance) return;
+  const { payload, dropped: droppedKeys } = sanitizeItemInstancePayloadOnLoad(slot.instance);
+  for (const d of droppedKeys) dropped.push(`${containerLabel}.${slot.itemId}.${d}`);
+  if (payload) slot.instance = payload;
+  else delete slot.instance;
+}
+
 export interface SanitizedItemInstancePayload {
   /** The cleaned payload, or undefined when nothing usable survives (the
    *  caller then removes the field entirely: an empty `{}` payload is worse

@@ -13,6 +13,13 @@
 
 import { describe, expect, it } from 'vitest';
 import {
+  NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
+  NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+  NYTHRAXIS_BONE_SPIKE_TINT,
+  NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
+  VISUALS,
+} from '../src/render/characters/manifest';
+import {
   NYTHRAXIS_GRAVE_ERUPTION_PALETTE,
   NYTHRAXIS_GRAVE_FLAME_PALETTE,
   NYTHRAXIS_SOUL_FLAME_PALETTE,
@@ -22,6 +29,24 @@ import { NYTHRAXIS_SIGIL_PALETTE } from '../src/render/nythraxis_sigil_core';
 import { NYTHRAXIS_SOFT_FIRE_RAMPS } from '../src/render/nythraxis_soft_fire_core';
 
 describe('Nythraxis hazard palette acceptance pins', () => {
+  it('recolours the Bone Spike ember orange, the one hue no other Nythraxis surface uses', () => {
+    // v0.42.2: the authored bone-and-flagstone atlas read as the boss and the
+    // floor under violet torchlight. Orange is the complement of the hall's
+    // purple offensive palette, is not the sigil's friendly blue, and is not
+    // Soul Rend's red/green, so a spike is unmistakably the thing to kill.
+    expect(NYTHRAXIS_BONE_SPIKE_TINT).toBe(0xff7a1a);
+    expect(NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH).toBe(1);
+    expect(NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION).toBe(0.35);
+    // The click capsule is about twice the footprint-derived default (1.29),
+    // above the 2.2 cap ordinary defs get.
+    expect(NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS).toBe(2.6);
+    expect(VISUALS.mob_nythraxis_bone_spike).toMatchObject({
+      tint: 0xff7a1a,
+      tintStrength: 1,
+      selfIllumination: 0.35,
+    });
+  });
+
   it('keeps the travelling Gravefire footprint purple', () => {
     expect(NYTHRAXIS_GRAVEFIRE_PALETTE).toEqual({
       underlay: 0x1a0a2a,

@@ -1124,7 +1124,7 @@ describe('registerGameStateMetrics: throughput counters via the returned sink', 
     expect(WOC_VAULT_LEDGER_INCIDENTS_TOTAL).not.toBe(WOC_GUILD_BANK_INCIDENTS_TOTAL);
     // The whole vocabulary, pinned as literals, for the guild set's reason: a
     // rename must fail here rather than silently retire an alert rule.
-    expect(VAULT_LEDGER_INCIDENTS).toEqual(['ledger_write_failed']);
+    expect(VAULT_LEDGER_INCIDENTS).toEqual(['ledger_write_failed', 'row_bound_exceeded']);
 
     // Scrape BEFORE any increment: an alert rule cannot fire on a series that
     // does not exist yet, so every kind must expose an explicit 0 from boot.

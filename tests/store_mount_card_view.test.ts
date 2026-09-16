@@ -11,7 +11,11 @@
 // reaches these arms instead of sailing past a fixture.
 
 import { describe, expect, it } from 'vitest';
-import { MOUNT_SKIN_IDS, MOUNT_SKINS } from '../src/sim/content/mount_skins';
+import {
+  MOUNT_SKIN_IDS,
+  MOUNT_SKINS,
+  RETIRED_MOUNT_SKIN_IDS,
+} from '../src/sim/content/mount_skins';
 import { t } from '../src/ui/i18n';
 import {
   STORE_MOUNT_INSPECT_ATTR,
@@ -117,11 +121,22 @@ describe('storeMountsSectionHtml', () => {
     expect(html).toContain('<div class="armory-grid"><article class="armory-card');
   });
 
-  it('groups all five paid skins in one epic Machine Stable section', () => {
+  it('groups all four live paid skins in one epic Machine Stable section', () => {
     const html = storeMountsSectionHtml(buildStoreMountRows(10000, [], []));
     expect(html.match(/<section /g)).toHaveLength(1);
     expect(html).toContain('store-mounts rarity-epic');
-    expect(html.match(/armory-card rarity-epic/g)).toHaveLength(5);
+    expect(html.match(/armory-card rarity-epic/g)).toHaveLength(4);
+  });
+
+  it('projects no card for a retired skin even when the service still prices it', () => {
+    // The economy catalog row went first; should a stale service snapshot ever
+    // hand the id back, the projection is registry-first and drops it.
+    const stale = RETIRED_MOUNT_SKIN_IDS.map((id) =>
+      service({ itemId: id, kind: 'skin', costClaudium: 2000 }),
+    );
+    const rows = buildStoreMountRows(10000, stale, [...RETIRED_MOUNT_SKIN_IDS]);
+    expect(rows.map((r) => r.skinId)).toEqual([...MOUNT_SKIN_IDS]);
+    expect(storeMountsSectionHtml(rows)).not.toContain('rallycart');
   });
 
   it('is empty with no rows, so the store paints no empty strip', () => {

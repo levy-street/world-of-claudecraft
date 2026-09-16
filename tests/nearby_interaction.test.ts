@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { tryNearbyInteraction } from '../src/game/nearby_interaction';
+import { type NearbyGatherOptions, tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ITEMS } from '../src/sim/data';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../src/world_api/farming';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
@@ -18,11 +18,31 @@ function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entit
   } as Entity;
 }
 
-// Every gathering command the generic press must never send (intentional
-// gathering: nodes, corpse components and crops are explicit actions only).
-const GATHERING_COMMANDS = /^(harvest|harvestCorpse|harvestCrop):/;
+// Every gathering command the generic press must never send on its own
+// (intentional gathering: corpse components and crops are explicit choices
+// only). A gather NODE is the deliberate exception: the press harvests it
+// through the node arm when the caller offers a node list (`gatherOpts`).
+const GATHERING_COMMANDS = /^(harvestCorpse|harvestCrop):/;
 const gatheringCalls = (calls: readonly string[]) =>
   calls.filter((call) => GATHERING_COMMANDS.test(call));
+
+const ORE_NODE = {
+  id: 'ore_1',
+  zoneId: 'zone',
+  type: 'ore',
+  pos: { x: 1, z: 0 },
+  level: 1,
+  tier: 1,
+} as const satisfies GatherNodeDef;
+
+// The node bundle the live call site (main.ts interactKey) passes; null
+// toolGateFor is the tier-agnostic shape (the gate arm has its own test).
+function gatherOpts(
+  nodes: readonly GatherNodeDef[],
+  toolGateFor: NearbyGatherOptions['toolGateFor'] = null,
+): NearbyGatherOptions {
+  return { nodes, toolGateFor, tooFarText: 'too far', notReadyText: 'not ready' };
+}
 
 function rig(targets: Entity[] = []) {
   const player = entity({ id: 1, kind: 'player' });
@@ -104,8 +124,16 @@ function rig(targets: Entity[] = []) {
   return { world, hud, calls, player };
 }
 
-function interact(r: ReturnType<typeof rig>) {
-  return tryNearbyInteraction(r.world, r.hud, 'escort away', 'nothing');
+function interact(r: ReturnType<typeof rig>, gather?: NearbyGatherOptions) {
+  return tryNearbyInteraction(
+    r.world,
+    r.hud,
+    'escort away',
+    'nothing',
+    undefined,
+    undefined,
+    gather,
+  );
 }
 
 describe('tryNearbyInteraction', () => {
@@ -241,10 +269,20 @@ describe('tryNearbyInteraction', () => {
     expect(r.calls).toEqual([expected]);
   });
 
-  it('never reads node readiness or sends harvestNode: the press knows no nodes', () => {
-    // The generic press takes no node list at all; a ready node underfoot is
-    // gathered only through the explicit node click. So nothing here can
-    // consult readiness, show the not-ready line, or send the harvest.
+  it('harvests a ready node and preserves movement for a not-ready node', () => {
+    const ready = rig();
+    expect(interact(ready, gatherOpts([ORE_NODE]))).toBe(true);
+    expect(ready.calls).toEqual(['harvest:ore_1']);
+
+    const coolingDown = rig();
+    coolingDown.world.nodeHarvestableByMe.mockReturnValue(false);
+    expect(interact(coolingDown, gatherOpts([ORE_NODE]))).toBe(false);
+    expect(coolingDown.calls).toEqual(['error:not ready']);
+  });
+
+  it('never reads node readiness or sends harvestNode when the press is offered no nodes', () => {
+    // A caller without a node list (the browser rig, the fixtures) gets the
+    // ordinary press: nothing here consults readiness or sends a harvest.
     const r = rig();
     expect(interact(r)).toBe(false);
     expect(r.calls).toEqual(['error:nothing']);
@@ -252,7 +290,52 @@ describe('tryNearbyInteraction', () => {
     expect(gatheringCalls(r.calls)).toEqual([]);
   });
 
-  it('keeps corpse, delve, object, npc priority stable and ends at the nothing line', () => {
+  it('a node out of reach is no target: the press ends at the nothing line', () => {
+    const farNode = { ...ORE_NODE, id: 'ore_far', pos: { x: 40, z: 0 } };
+    const r = rig();
+    expect(interact(r, gatherOpts([farNode]))).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+    expect(r.world.nodeHarvestableByMe).not.toHaveBeenCalled();
+  });
+
+  it('a dead player never gathers a node', () => {
+    const r = rig();
+    r.player.dead = true;
+    expect(interact(r, gatherOpts([ORE_NODE]))).toBe(false);
+    expect(r.calls).toEqual(['error:nothing']);
+    expect(r.world.nodeHarvestableByMe).not.toHaveBeenCalled();
+  });
+
+  it('threads toolGateFor to the picked node and surfaces the unmet line', () => {
+    const lockedNode = { ...ORE_NODE, id: 'ore_t2', level: 10, tier: 2 };
+    const r = rig();
+    const seen: string[] = [];
+    const gateFor = (node: { id: string; tier: number }) => {
+      seen.push(node.id);
+      return { nodeTier: node.tier, viewerToolTier: 1, unmetText: 'needs tier 2' };
+    };
+    expect(interact(r, gatherOpts([lockedNode], gateFor))).toBe(false);
+    // The resolver ran against the PICKED node, and the tool denial won over
+    // both harvest and not-ready (the node reads locked, not cooling).
+    expect(seen).toEqual(['ore_t2']);
+    expect(r.calls).toEqual(['error:needs tier 2']);
+
+    // The met arm: a sufficient viewer tier lets the harvest through untouched.
+    const met = rig();
+    expect(
+      interact(
+        met,
+        gatherOpts([lockedNode], (node) => ({
+          nodeTier: node.tier,
+          viewerToolTier: 2,
+          unmetText: 'needs tier 2',
+        })),
+      ),
+    ).toBe(true);
+    expect(met.calls).toEqual(['harvest:ore_t2']);
+  });
+
+  it('keeps corpse, delve, object, npc, node priority stable and ends at the nothing line', () => {
     const npc = entity({ id: 2, kind: 'npc', templateId: 'elder_maren' });
     const object = entity({ id: 3, kind: 'object', lootable: true });
     const delve = entity({ id: 4, kind: 'object', templateId: 'delve_chest', lootable: true });
@@ -264,16 +347,17 @@ describe('tryNearbyInteraction', () => {
       loot: { copper: 1, items: [] },
     });
     const cases = [
-      { targets: [corpse, delve, object, npc], expected: 'loot:5', outcome: true },
-      { targets: [delve, object, npc], expected: 'delve:4', outcome: true },
-      { targets: [object, npc], expected: 'pickup:3', outcome: true },
-      { targets: [npc], expected: 'quest:2', outcome: true },
-      { targets: [], expected: 'error:nothing', outcome: false },
+      { targets: [corpse, delve, object, npc], expected: 'loot:5', outcome: true, nodes: true },
+      { targets: [delve, object, npc], expected: 'delve:4', outcome: true, nodes: true },
+      { targets: [object, npc], expected: 'pickup:3', outcome: true, nodes: true },
+      { targets: [npc], expected: 'quest:2', outcome: true, nodes: true },
+      { targets: [], expected: 'harvest:ore_1', outcome: true, nodes: true },
+      { targets: [], expected: 'error:nothing', outcome: false, nodes: false },
     ];
 
-    for (const { targets, expected, outcome } of cases) {
+    for (const { targets, expected, outcome, nodes } of cases) {
       const r = rig(targets);
-      expect(interact(r)).toBe(outcome);
+      expect(interact(r, nodes ? gatherOpts([ORE_NODE]) : undefined)).toBe(outcome);
       expect(r.calls).toEqual([expected]);
     }
   });
@@ -702,6 +786,14 @@ describe('the garden-bed arm (Phase 9b)', () => {
     expect(r.calls).toEqual(['plantSheet:bed_test_1']);
   });
 
+  // The node arm sits above the bed arm (restored with the node arm itself;
+  // the pin c67072a13f dropped): a node in reach wins over the bed underfoot.
+  it('lets a gather node in range keep winning the press over a bed', () => {
+    const r = bedRig('ready');
+    expect(interact(r, gatherOpts([ORE_NODE]))).toBe(true);
+    expect(r.calls).toEqual(['harvest:ore_1']);
+  });
+
   it('lets a corpse in range keep winning the press over a bed', () => {
     const corpse = entity({
       id: 2,
@@ -781,6 +873,14 @@ describe('the feast arm (Phase 12)', () => {
     r.world.entities = new Map();
     expect(interact(r)).toBe(true);
     expect(r.calls).toEqual(['plantSheet:bed_test_1']);
+  });
+
+  // The node arm sits above the feast arm (restored with the node arm itself;
+  // the pin c67072a13f dropped): a node in reach wins over the placed feast.
+  it('a gather node in reach keeps winning the press over a feast', () => {
+    const r = rig([feast(12)]);
+    expect(interact(r, gatherOpts([ORE_NODE]))).toBe(true);
+    expect(r.calls).toEqual(['harvest:ore_1']);
   });
 
   it('falls through to the nothing-to-interact line when the feast is out of range', () => {

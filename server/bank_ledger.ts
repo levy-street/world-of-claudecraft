@@ -735,7 +735,7 @@ export function vaultCountLedgerIdentity(
   return vaultSpecialLedgerIdentity({ instance, craftedRecipeId });
 }
 
-interface VaultCountGroup {
+export interface VaultCountGroup {
   readonly identity: VaultLedgerIdentity | null;
   readonly count: number;
 }
@@ -751,7 +751,7 @@ interface VaultCountGroup {
  * throws into the dispatch path, and an unreadable row keeps whatever identity
  * the pre-provenance ledger already gave it.
  */
-function vaultCountGroups(slot: VaultInfo['special'][number]): VaultCountGroup[] {
+export function vaultCountGroups(slot: VaultInfo['special'][number]): VaultCountGroup[] {
   const crafted = slot.craftedRecipeId ?? null;
   const normalized = isMaterialItemId(slot.itemId)
     ? normalizeMaterialStack(slot, materialItemIds())

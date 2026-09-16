@@ -1901,7 +1901,7 @@ describe('vault_wire module units', () => {
   const withdrawArgs: unknown[][] = [];
   const unitSim = (): VaultSim => ({
     ctx: {
-      resolve: () => ({ meta: { entityId: 9 } }),
+      resolve: () => ({ meta: { entityId: 9, inventory: [] } }),
       error: (_id, text) => void calls.push(`error:${text}`),
     },
     vaultInfoFor: () => null,

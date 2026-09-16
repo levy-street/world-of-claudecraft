@@ -291,6 +291,76 @@ describe('updateSelfRenderPosition predictor path', () => {
     expect(state.position.x).toBeCloseTo(-0.02, 10);
   });
 
+  it('snaps to a teleported authoritative pose when the gate closes on the same frame', () => {
+    // A delve entry: the predictor owned the pose at the board door, then one
+    // snapshot both closes the prediction gate (delves never predict) and
+    // relocates the body ~104,000 yards into the instance band. The drawn pose
+    // must land on the new body at once; a captured handoff gap would pin it
+    // at the door and creep it east at the rewind ceiling for hours.
+    const state = createSelfRenderPositionState();
+    const door = playerAt({ x: -136, y: 1.67, z: 109 }, { x: -136, y: 1.67, z: 109 });
+    noteSelfIdentity(state, 1);
+    updateSelfRenderPosition(state, door, SEED, 1, FRAME_DT, 0.2, null, false);
+    state.predictor = stubPredictor(() => ({ x: -139.4, y: 1.56, z: 106 }));
+    runPredicted(state, door);
+    expect(state.active).toBe(true);
+
+    state.predictor = stubPredictor(() => null);
+    const inDelve = playerAt({ x: 104200, y: 0, z: -633 }, { x: 104200, y: 0, z: -633 });
+    runPredicted(state, inDelve);
+    expect(state.active).toBe(false);
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: 104200, y: 0, z: -633 });
+
+    runPredicted(state, inDelve);
+    expect(state.position).toEqual({ x: 104200, y: 0, z: -633 });
+  });
+
+  it('still glides a handoff gap just under the teleport threshold', () => {
+    const state = createSelfRenderPositionState();
+    const player = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    noteSelfIdentity(state, 1);
+    updateSelfRenderPosition(state, player, SEED, 1, FRAME_DT, 0.2, null, false);
+    state.predictor = stubPredictor(() => ({ x: 5.9, y: 0, z: 0 }));
+    runPredicted(state, player);
+    state.predictor = stubPredictor(() => null);
+    runPredicted(state, player);
+    expect(state.offset.x).toBeGreaterThan(0);
+    // The predictor frame drew 5.9 minus the decayed gap; the closing frame
+    // then rewinds toward the authoritative 0 at the rewind ceiling.
+    expect(state.position.x).toBeCloseTo(
+      5.9 * (1 - Math.exp(-HANDOFF_RATE * FRAME_DT)) - MAX_SELF_REWIND_YD_PER_SEC * FRAME_DT,
+      10,
+    );
+  });
+
+  it('snaps to the predictor when it takes over across a teleport', () => {
+    // The mirror case: a dungeon door teleport lands while the predictor is
+    // suspended for the override epoch, then prediction resumes at the new
+    // body. The 0.3 s rate-15 glide from the old spot is the same void-flight
+    // in miniature, so the same six-yard rule snaps it.
+    const state = createSelfRenderPositionState();
+    const outside = playerAt({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: 0 });
+    noteSelfIdentity(state, 1);
+    updateSelfRenderPosition(state, outside, SEED, 1, FRAME_DT, 0.2, null, false);
+    expect(state.position.x).toBe(0);
+
+    const inside = playerAt({ x: 5000, y: 0, z: 40 }, { x: 5000, y: 0, z: 40 });
+    updateSelfRenderPosition(
+      state,
+      inside,
+      SEED,
+      1,
+      FRAME_DT,
+      0.2,
+      { kind: 'reconciled', position: { x: 5000, y: 0, z: 40 }, residual: null },
+      false,
+    );
+    expect(state.offset).toEqual({ x: 0, y: 0, z: 0 });
+    expect(state.position).toEqual({ x: 5000, y: 0, z: 40 });
+    expect(state.active).toBe(true);
+  });
+
   it('captures no offset when the predictor is the first to place the body', () => {
     const state = createSelfRenderPositionState();
     state.predictor = stubPredictor(() => ({ x: 5, y: 1, z: 2 }));

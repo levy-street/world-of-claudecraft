@@ -22,6 +22,7 @@ import type { MaterialComposition } from '../sim/material_sources';
 import { isVaultDepositableSlot, VAULT_BASE_CAP, VAULT_UPGRADE_STEP } from '../sim/materials_vault';
 import { baseMaterialFor } from '../sim/professions/material_grades';
 import { cloneItemInstancePayload, type InvSlot, type ItemInstancePayload } from '../sim/types';
+import { vaultRowMovesWhole } from '../sim/vault_slot_ops';
 import type { VaultInfo, VaultSpecialRef } from '../world_api';
 import { bagFineMark } from './bag_fine_mark_view';
 import { bagQualityKey } from './bags_view';
@@ -45,11 +46,14 @@ interface VaultRowBase {
   /** Total for this material across pooled and special storage. Capacity is
    *  shared, so fill/over-cap decisions always key off this value. */
   storedTotal: number;
-  /** Whether the row exposes the explicit partial-withdraw action. The model
-   *  owns this eligibility so every painter presents pooled counts alike. */
+  /** Whether the row exposes the explicit chosen-quantity action: every
+   *  stocked row except one whose payload moves whole (the sim's
+   *  vaultRowMovesWhole), a one-unit row included, so the action reads the
+   *  same on every material. The model owns this eligibility so every painter
+   *  presents the rows alike. */
   canChooseQuantity: boolean;
-  /** The click-time ceiling shown by the quantity prompt, null when splitting
-   *  a one-count row would have no meaning. Submit still clamps to live stock. */
+  /** The click-time ceiling shown by the quantity prompt, null only when the
+   *  row offers no chosen-quantity action. Submit still clamps to live stock. */
   partialMax: number | null;
   /** The uniform per-material ceiling (wire perMaterialCap), repeated per row
    *  for the painter's count/cap readout. */
@@ -77,8 +81,9 @@ export interface VaultPooledRowModel extends VaultRowBase {
 
 /** One identity/provenance-preserving row. The payload is cloned off the wire
  *  snapshot and the exact selector carries its original snapshot index plus
- *  every present identity field. Instance rows are whole/all-or-nothing;
- *  recipe-only rows remain safely splittable. */
+ *  every present identity field. A charge-bearing or locked payload row is
+ *  whole/all-or-nothing (the sim's vaultRowMovesWhole); every other row,
+ *  a signed or bind-on-trade payload included, is splittable. */
 export interface VaultSpecialRowModel extends VaultRowBase {
   kind: 'special';
   specialRef: VaultSpecialRef;
@@ -177,8 +182,8 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
       itemId,
       count,
       storedTotal,
-      canChooseQuantity: count > 1,
-      partialMax: count > 1 ? count : null,
+      canChooseQuantity: count > 0,
+      partialMax: count > 0 ? count : null,
       cap,
       atCap: storedTotal >= cap,
       overCap: storedTotal > cap,
@@ -197,13 +202,15 @@ export function buildVaultView(info: VaultInfo | null, lookup: BankItemLookup): 
       const materialSources =
         slot.materialSources === undefined ? undefined : cloneMaterialData(slot.materialSources);
       const specialRef = vaultSpecialRef(index, slot);
+      // The ONE sim rule (vault_slot_ops.ts vaultRowMovesWhole) decides which
+      // payloads split: a charge-bearing or locked payload is one identity per
+      // unit and moves whole, so its row offers no chosen-quantity action.
+      const splittable = !vaultRowMovesWhole(slot.instance) && slot.count > 0;
       const row: VaultSpecialRowModel = {
         kind: 'special',
         ...common(slot.itemId, slot.count),
-        // One instance payload describes the entire row and may never be
-        // split into two independently mutable identities.
-        canChooseQuantity: instance === undefined && slot.count > 1,
-        partialMax: instance === undefined && slot.count > 1 ? slot.count : null,
+        canChooseQuantity: splittable,
+        partialMax: splittable ? slot.count : null,
         specialRef,
         ...(materialSources === undefined ? {} : { materialSources }),
         ...(instance === undefined ? {} : { instance }),
@@ -335,10 +342,11 @@ export function predictVaultDepositAll(
       full = true;
       continue;
     }
-    // One instance payload describes the whole row. The authoritative sweep
-    // leaves it carried when the entire count cannot fit; predicting a partial
-    // move would claim items were stored when the sim moved none.
-    if (slot.instance !== undefined && headroom < slot.count) {
+    // A whole-move payload (the sim's vaultRowMovesWhole: charge-bearing or
+    // locked) is left carried by the authoritative sweep when the entire count
+    // cannot fit; predicting a partial move would claim items were stored when
+    // the sim moved none. Every other payload partially fills like plain stock.
+    if (vaultRowMovesWhole(slot.instance) && headroom < slot.count) {
       full = true;
       continue;
     }
@@ -414,11 +422,27 @@ export function vaultWithdrawFit(
   craftedRecipeId?: string,
 ): number {
   const fit = countFit(inventory, bagPools(bags), itemId, want, instance, craftedRecipeId);
-  return instance !== undefined && fit < want ? 0 : fit;
+  return vaultRowMovesWhole(instance) && fit < want ? 0 : fit;
 }
 
 function saneStoredCount(count: number): number {
   return Number.isSafeInteger(count) && count > 0 ? count : 0;
+}
+
+/** How many more units of `itemId` the vault can take right now, read off
+ *  the same wire snapshot the tab paints: the per-material ceiling less the
+ *  pooled and identity-row units already stored. Undefined while the vault is
+ *  away or locked (no ceiling to speak of). The picker caps a vault deposit
+ *  at this so an explicit selection never exceeds what the sim would refuse
+ *  (materials_vault.ts vaultDeposit refuses a selection past the headroom
+ *  rather than clipping it). */
+export function vaultMaterialHeadroom(info: VaultInfo | null, itemId: string): number | undefined {
+  if (!info || info.upgrades <= 0) return undefined;
+  let held = Object.hasOwn(info.stock, itemId) ? saneStoredCount(info.stock[itemId]) : 0;
+  for (const slot of info.special) {
+    if (slot.itemId === itemId) held += saneStoredCount(slot.count);
+  }
+  return Math.max(0, info.perMaterialCap - held);
 }
 
 /** Canonical JSON for deterministic special-row ordering across a JSONB wire

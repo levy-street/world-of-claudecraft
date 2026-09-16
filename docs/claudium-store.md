@@ -94,7 +94,15 @@ Saved copies remain discardable, non-usable souvenirs; they never grant skin own
 | `chimeglass_tortoise` | Tolliver the Chimeglass | epic |
 | `rickshaw_mount` | Bonebound Rickshaw | epic |
 | `goblin_rocket_sled` | Goblin Rocket Sled | epic |
-| `rallycart_rxt` | Rallycart RXT | epic |
+
+The Rallycart RXT (`rallycart_rxt`, epic) sold from the v0.42.0 release until 2026-09-10, when
+it was withdrawn after player feedback: its service row went first (no further sales, the card
+rendered unavailable), then the game registry retired the id (`RETIRED_MOUNT_SKIN_IDS` in
+`src/sim/content/mount_skins.ts`). Its grant rows, the account mirror entries, the GLB, the
+vehicle render modules, the audio takes, the legacy reins item and the locale rows all stay as
+dormant data; none of them sells, grants, wears, lists, or renders it. Buyers were compensated
+out of band. The id still travels in the account cosmetics payload (`mountSkinIds`) for the
+accounts that own it; every consumer iterates the live registry, so nothing shows.
 
 Ownership is a per-account entitlement in `account_mount_cosmetics` (its own rollback-safe row,
 mirrored from the service's grant ledger on purchase and on every store open, exactly like

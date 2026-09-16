@@ -13,6 +13,7 @@ export function navigationAllowed(
   isMainFrame: boolean,
   mainFrameOrigins: Iterable<string>,
   subframeOrigins?: Iterable<string>,
+  subframeHostSuffixes?: readonly string[],
 ): boolean;
 export function isTrustedSender(
   frame: { origin?: unknown; url?: unknown } | null | undefined,
@@ -37,6 +38,7 @@ export function isSoftwareRenderer(
 ): boolean;
 export const ALLOWED_PERMISSIONS: Set<string>;
 export const EMBEDDED_SUBFRAME_ORIGINS: Set<string>;
+export const EMBEDDED_SUBFRAME_HOST_SUFFIXES: readonly string[];
 export const CSP_ORIGINS: {
   script: string[];
   connect: string[];
@@ -44,6 +46,14 @@ export const CSP_ORIGINS: {
   turnstile: string;
   fontsStyle: string;
   fontsFile: string;
+  walletFrames: string[];
+  reownFonts: string;
+  stripe: {
+    script: string[];
+    connect: string[];
+    frame: string[];
+    img: string[];
+  };
 };
 export function extractInlineScriptHashes(html: string): string[];
 export function buildContentSecurityPolicy(options?: {

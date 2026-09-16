@@ -56,14 +56,39 @@ function appNavigationOrigins(appOrigin, devServerUrl) {
 }
 
 // Third-party origins the app legitimately embeds in a SUBFRAME only (never the main
-// frame): the Cloudflare Turnstile bot-gate renders in its own cross-origin iframe.
+// frame): the Cloudflare Turnstile bot-gate renders in its own cross-origin iframe, the
+// WalletConnect modal verifies in its own, and the Claudium store's Stripe Embedded
+// Checkout (src/net/stripe_checkout.ts) mounts Stripe's iframes on the page.
 const EMBEDDED_SUBFRAME_ORIGINS = new Set([
   'https://challenges.cloudflare.com',
   'https://secure.walletconnect.com',
   'https://secure.walletconnect.org',
   'https://verify.walletconnect.com',
   'https://verify.walletconnect.org',
+  'https://js.stripe.com',
+  'https://checkout.stripe.com',
+  'https://hooks.stripe.com',
+  'https://link.com',
 ]);
+
+// Stripe starts some of its frames on per-session subdomains (Stripe's CSP guidance lists
+// https://*.js.stripe.com and https://*.link.com for exactly that), which an exact-origin
+// set cannot name. A subframe whose HTTPS host ends with one of these suffixes is allowed;
+// the leading dot means the bare parent host is matched by the exact set above, never a
+// look-alike such as evil-js.stripe.com or js.stripe.com.evil.com.
+const EMBEDDED_SUBFRAME_HOST_SUFFIXES = Object.freeze(['.js.stripe.com', '.link.com']);
+
+function subframeHostSuffixAllowed(urlString, suffixes) {
+  let parsed;
+  try {
+    parsed = new URL(urlString);
+  } catch {
+    return false;
+  }
+  if (parsed.protocol !== 'https:') return false;
+  const host = parsed.hostname;
+  return suffixes.some((suffix) => host.length > suffix.length && host.endsWith(suffix));
+}
 
 // Decide whether a navigation to `url` is permitted. Main-frame navigations may only
 // target the app or dev origin (the top-level hijack surface that setWindowOpenHandler
@@ -74,12 +99,14 @@ function navigationAllowed(
   isMainFrame,
   mainFrameOrigins,
   subframeOrigins = EMBEDDED_SUBFRAME_ORIGINS,
+  subframeHostSuffixes = EMBEDDED_SUBFRAME_HOST_SUFFIXES,
 ) {
   const origin = deriveOrigin(url);
   if (!origin) return false;
   if (toOriginSet(mainFrameOrigins).has(origin)) return true;
-  if (!isMainFrame && toOriginSet(subframeOrigins).has(origin)) return true;
-  return false;
+  if (isMainFrame) return false;
+  if (toOriginSet(subframeOrigins).has(origin)) return true;
+  return subframeHostSuffixAllowed(url, subframeHostSuffixes);
 }
 
 // Third-party origins the shipped index.html actually uses. The desktop shell keeps
@@ -119,6 +146,32 @@ const CSP_ORIGINS = {
   ],
   // Cloudflare Turnstile: api.js (script) plus the challenge iframe (frame).
   turnstile: 'https://challenges.cloudflare.com',
+  // Stripe Embedded Checkout for the Claudium store (src/net/stripe_checkout.ts loads
+  // https://js.stripe.com/v3/ and mounts the checkout iframe). Without these the desktop
+  // shell alone fails every card purchase with "Checkout could not be loaded" while the
+  // browser build (no CSP) works: the v0.42.0 desktop-only report. The lists follow
+  // Stripe's CSP guidance for Stripe.js, Checkout, and Link (the wallet inside Checkout):
+  // script and frame for js.stripe.com and its per-session subdomains, hooks.stripe.com
+  // for 3D Secure redirects, checkout.stripe.com for Checkout, api.stripe.com for
+  // Stripe.js calls, and the link.com family for Link's authentication frames.
+  stripe: {
+    script: ['https://js.stripe.com', 'https://*.js.stripe.com', 'https://checkout.stripe.com'],
+    connect: [
+      'https://api.stripe.com',
+      'https://checkout.stripe.com',
+      'https://link.com',
+      'https://*.link.com',
+    ],
+    frame: [
+      'https://js.stripe.com',
+      'https://*.js.stripe.com',
+      'https://hooks.stripe.com',
+      'https://checkout.stripe.com',
+      'https://link.com',
+      'https://*.link.com',
+    ],
+    img: ['https://*.stripe.com', 'https://*.link.com'],
+  },
   // Google Fonts: the stylesheet origin (style-src) and the font-file origin (font-src).
   fontsStyle: 'https://fonts.googleapis.com',
   fontsFile: 'https://fonts.gstatic.com',
@@ -177,6 +230,7 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
     hashPart,
     CSP_ORIGINS.turnstile,
     ...CSP_ORIGINS.script,
+    ...CSP_ORIGINS.stripe.script,
   ]
     .filter(Boolean)
     .join(' ');
@@ -197,10 +251,16 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
     deriveWebSocketOrigin(apiOrigin),
     'wss:',
     ...CSP_ORIGINS.connect,
+    ...CSP_ORIGINS.stripe.connect,
   ]
     .filter(Boolean)
     .join(' ');
-  const imgSrc = ["img-src 'self' data: blob:", apiOrigin, ...CSP_ORIGINS.img]
+  const imgSrc = [
+    "img-src 'self' data: blob:",
+    apiOrigin,
+    ...CSP_ORIGINS.img,
+    ...CSP_ORIGINS.stripe.img,
+  ]
     .filter(Boolean)
     .join(' ');
   return [
@@ -211,7 +271,7 @@ function buildContentSecurityPolicy({ apiOrigin, scriptHashes = [] } = {}) {
     `style-src 'self' 'unsafe-inline' ${CSP_ORIGINS.fontsStyle}`,
     `font-src 'self' ${CSP_ORIGINS.fontsFile} ${CSP_ORIGINS.reownFonts}`,
     "worker-src 'self' blob:",
-    `frame-src ${CSP_ORIGINS.turnstile} ${CSP_ORIGINS.walletFrames.join(' ')}`,
+    `frame-src ${CSP_ORIGINS.turnstile} ${CSP_ORIGINS.walletFrames.join(' ')} ${CSP_ORIGINS.stripe.frame.join(' ')}`,
     "object-src 'none'",
     "base-uri 'none'",
     "frame-ancestors 'none'",
@@ -292,6 +352,7 @@ module.exports = {
   isSoftwareRenderer,
   ALLOWED_PERMISSIONS,
   EMBEDDED_SUBFRAME_ORIGINS,
+  EMBEDDED_SUBFRAME_HOST_SUFFIXES,
   CSP_ORIGINS,
   extractInlineScriptHashes,
   buildContentSecurityPolicy,

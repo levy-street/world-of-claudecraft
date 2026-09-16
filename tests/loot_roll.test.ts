@@ -8,6 +8,7 @@ import {
   awardSharedLootItem,
   CORPSE_INTERACT_GRACE_SECONDS,
   distributeLootCopper,
+  killSnapshotEligibility,
   lootRollGroupStatus,
   lootSlotVisibleTo,
   partyLootCandidatesForMob,
@@ -818,6 +819,30 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
 });
 
 describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () => {
+  it('keeps the exact drop group eligible when a member disconnects before distribution', () => {
+    const { sim, a, b, c } = partyOfThree();
+    playerMeta(sim, a).characterId = 101;
+    playerMeta(sim, b).characterId = 102;
+    playerMeta(sim, c).characterId = 103;
+    const mob = createMob(sim.nextId++, MOBS.ignivar_herald_of_the_last_flame, 20, {
+      x: 0,
+      y: 0,
+      z: 0,
+    });
+    mob.lootRecipientIds = [a, b, c];
+    rollLoot(sim.ctx, mob, playerMeta(sim, a), [
+      playerMeta(sim, a),
+      playerMeta(sim, b),
+      playerMeta(sim, c),
+    ]);
+    playerMeta(sim, b).leaving = true;
+
+    expect(killSnapshotEligibility(sim.ctx, mob)).toEqual({
+      names: ['Aaa', 'Bbb', 'Ccc'],
+      characterIds: [101, 102, 103],
+    });
+  });
+
   it('stamps the drop-moment candidate snapshot onto a need/greed win of a soulbound item', () => {
     const { sim, a, b, c } = partyOfThree();
     const mob = deadCorpse(sim, a, [a, b, c], {

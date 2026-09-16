@@ -191,7 +191,9 @@ export function instanceBindingLines(
  *  this builder stays a Node-testable pure string function. Renders nothing
  *  for an absent, malformed, or expired window, and never on WORN gear
  *  (equip strips the payload field, and wornTooltipInstance would trim it
- *  anyway). */
+ *  anyway). The caller gates on the DEF's soulbound flag (hud.ts renders this
+ *  inside its Soulbound block), so a legacy marker on a drop that has since
+ *  become freely tradable never shows a stale window line. */
 export function instancePartyTradeLine(
   instance: ItemInstancePayload | undefined,
   msRemainingFor: (untilMs: number) => number,

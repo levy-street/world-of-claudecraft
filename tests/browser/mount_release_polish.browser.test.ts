@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 import indexHtml from '../../index.html?raw';
 import playHtml from '../../play.html?raw';
+import { MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
 import { storeMountsSectionHtml } from '../../src/ui/store_mount_card_view';
 import { hydrateIcons } from '../../src/ui/ui_icons';
 import { buildStoreMountRows } from '../../src/ui/woc_store_view';
@@ -49,13 +50,9 @@ describe.each(['index.html', 'play.html'])('%s release UI', (entry) => {
       buildStoreMountRows(
         10000,
         [
-          ...[
-            'mech_bird',
-            'chimeglass_tortoise',
-            'rickshaw_mount',
-            'goblin_rocket_sled',
-            'rallycart_rxt',
-          ].map((itemId) => ({
+          // Registry-first, like cosmetics.browser.test.ts: a catalog change
+          // (a retired skin, a new one) moves this fixture on its own.
+          ...MOUNT_SKIN_IDS.map((itemId) => ({
             itemId,
             name: itemId,
             kind: 'skin' as const,
@@ -76,7 +73,7 @@ describe.each(['index.html', 'play.html'])('%s release UI', (entry) => {
     expect(Math.min(a.top, b.top)).toBeGreaterThanOrEqual(0);
     expect(Math.abs(a.bottom - b.bottom)).toBeLessThan(1);
     expect(store.querySelectorAll('.store-mounts')).toHaveLength(1);
-    expect(store.querySelectorAll('.armory-card.rarity-epic')).toHaveLength(5);
+    expect(store.querySelectorAll('.armory-card.rarity-epic')).toHaveLength(MOUNT_SKIN_IDS.length);
   });
 
   it('keeps compact, horizontal and mobile pad layouts reachable', async () => {

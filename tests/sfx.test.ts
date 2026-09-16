@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FORGE_MAX_DISTANCE, MAX_DISTANCE, REF_DISTANCE, sfx } from '../src/game/sfx';
 import { SFX_CLIPS, type SfxEntry } from '../src/game/sfx_manifest.generated';
-import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
+import { MOUNT_SKIN_IDS, RETIRED_MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 // The footstep "jingling" bug: foot clips are ~0.48s but steps fire every ~0.22s
@@ -506,12 +506,17 @@ describe('mount running audio', () => {
 
   it('ships one non-empty MP3 asset for every mount and no orphan clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
-    const expected = CUSTOM_STRIDE_MOUNTS.flatMap((mountKey) => [
-      `mount_run_${mountKey}.mp3`,
-      ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
-        (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
-      ),
-    ]).sort();
+    // A retired skin's takes stay on disk as dormant data: expected here, never
+    // orphans, until the asset sweep that deletes them moves this pin together
+    // with the RETIRED_MOUNT_SKIN_IDS entry.
+    const expected = [...CUSTOM_STRIDE_MOUNTS, ...RETIRED_MOUNT_SKIN_IDS]
+      .flatMap((mountKey) => [
+        `mount_run_${mountKey}.mp3`,
+        ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
+          (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
+        ),
+      ])
+      .sort();
     const actual = readdirSync(directory)
       .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
       .sort();

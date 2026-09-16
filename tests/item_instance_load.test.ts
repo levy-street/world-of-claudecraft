@@ -17,6 +17,7 @@ import {
   MAX_INSTANCE_SUBTREE_JSON_LENGTH,
   MAX_LEGENDARY_NAME_LOAD_LENGTH,
   sanitizeItemInstancePayloadOnLoad,
+  sanitizeSlotInstanceOnLoad,
   warnDroppedInstanceKeys,
 } from '../src/sim/item_instance_load';
 import { PERFECTING_RANKS } from '../src/sim/professions/perfecting';
@@ -453,6 +454,50 @@ describe('boundCraftedRecipeIdOnLoad: the slot-level sibling bound', () => {
     boundCraftedRecipeIdOnLoad(nonString, dropped, 'buyback');
     expect('craftedRecipeId' in nonString).toBe(false);
     expect(dropped).toEqual(['bag.hide.craftedRecipeId', 'buyback.hide.craftedRecipeId']);
+  });
+});
+
+describe('sanitizeSlotInstanceOnLoad: the per-slot bound the container load loops share', () => {
+  it('leaves a slot without a payload alone and reports nothing', () => {
+    const slot = { itemId: 'tough_jerky', count: 3 };
+    const dropped: string[] = [];
+    sanitizeSlotInstanceOnLoad(slot, dropped, 'bag');
+    expect(slot).toEqual({ itemId: 'tough_jerky', count: 3 });
+    expect(dropped).toEqual([]);
+  });
+
+  it('keeps a legal payload by identity and reports nothing', () => {
+    const instance = legalPayload();
+    const slot = { itemId: 'tough_jerky', count: 1, instance };
+    const dropped: string[] = [];
+    sanitizeSlotInstanceOnLoad(slot, dropped, 'bag');
+    expect(slot.instance).toBe(instance);
+    expect(dropped).toEqual([]);
+  });
+
+  it('labels each dropped key under the container and item: bag.<id>.<key>', () => {
+    const slot = {
+      itemId: 'tough_jerky',
+      count: 1,
+      instance: { ...legalPayload(), signer: 'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1) },
+    };
+    const dropped: string[] = [];
+    sanitizeSlotInstanceOnLoad(slot, dropped, 'bag');
+    expect(dropped).toEqual(['bag.tough_jerky.signer']);
+    const { signer: _signer, ...rest } = legalPayload();
+    expect(slot.instance).toEqual(rest);
+  });
+
+  it('deletes the field outright when the payload sanitizes to nothing (never leaves `{}`)', () => {
+    const slot: { itemId: string; count: number; instance?: unknown } = {
+      itemId: 'tough_jerky',
+      count: 1,
+      instance: { signer: 'x'.repeat(MAX_INSTANCE_STRING_LENGTH + 1) },
+    };
+    const dropped: string[] = [];
+    sanitizeSlotInstanceOnLoad(slot, dropped, 'buyback');
+    expect('instance' in slot).toBe(false);
+    expect(dropped).toEqual(['buyback.tough_jerky.signer', 'buyback.tough_jerky.payload']);
   });
 });
 

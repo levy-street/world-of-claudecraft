@@ -37,6 +37,7 @@
 // The pure decisions live in the two view cores; this owns only DOM + dispatch,
 // talks to the world exclusively through IWorld, and never decides an outcome.
 
+import { stackSizeOf } from '../sim/bags';
 import { ENCHANTS } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
 import type { MaterialComposition } from '../sim/material_sources';
@@ -276,6 +277,7 @@ export class BagItemActionMenu {
       itemName: itemDisplayName(def),
       sources,
       opener,
+      stepSize: stackSizeOf(def),
       onConfirm: (selected) => {
         this.deps.world().separateMaterialStack(itemId, selection, selected.sources);
         this.deps.afterAction();

@@ -188,7 +188,7 @@ describe('mob_lifecycle module: respawnMob + despawnSummonedAdds', () => {
 // so the tapping player keeps a bounded, classic-faithful window before the loot
 // decays with the corpse. Both facets were previously unpinned.
 describe('mob_lifecycle module: un-looted corpse loot on respawn (issue #1539)', () => {
-  it('respawnMob wipes the reused corpse loot state (lootable/loot/tappedById/lootRecipientIds)', () => {
+  it('respawnMob wipes the reused corpse loot state and party-trade eligibility snapshot', () => {
     const sim = makeSim();
     const p = sim.player as any;
     const mob = spawn(sim, 'forest_wolf', 5, 40, 40);
@@ -200,6 +200,7 @@ describe('mob_lifecycle module: un-looted corpse loot on respawn (issue #1539)',
     mob.loot = { copper: 120, items: [{ itemId: 'wolf_pelt', count: 1 }] };
     mob.tappedById = p.id;
     mob.lootRecipientIds = [p.id];
+    mob.lootPartyTradeEligibility = { names: ['Tester'], characterIds: [101] };
 
     respawnMob(ctxOf(sim), mob);
 
@@ -207,6 +208,7 @@ describe('mob_lifecycle module: un-looted corpse loot on respawn (issue #1539)',
     expect(mob.loot).toBe(null);
     expect(mob.tappedById).toBe(null);
     expect(mob.lootRecipientIds).toBeUndefined();
+    expect(mob.lootPartyTradeEligibility).toBeUndefined();
   });
 
   it('the in-place respawn is deferred while the corpse is lootable, then wipes the loot when the corpse decays', () => {

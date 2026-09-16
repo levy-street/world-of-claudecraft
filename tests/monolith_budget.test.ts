@@ -1052,7 +1052,13 @@ const MONOLITHS: MonolithRow[] = [
     // and join-retro passes into src/sim/deeds_restore.ts and the ownership
     // union into accountReliquaryOwnershipOpts (src/sim/reliquary.ts). Exact
     // count, zero slack.
-    ceiling: 11843,
+    // Down 11843 -> 11822 at the v0.42.2 hotfix line forward merge: the
+    // Crucible binding restore moved the per-slot payload-bound blocks to
+    // item_instance_load.ts's sanitizeSlotInstanceOnLoad and the party-trade
+    // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
+    // composed with the release's own extractions above. Exact merged count,
+    // zero slack.
+    ceiling: 11822,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1252,7 +1258,12 @@ const MONOLITHS: MonolithRow[] = [
     // release count 11327 minus the redesign's own 6 extracted lines = 11321
     // (exact wc -l on the merged tree, zero headroom).
     // Renderer construction and rebuild validation now share game/game_renderer.ts.
-    ceiling: 11317,
+    // Down 11317 -> 11281 at the v0.42.2 hotfix line forward merge: the
+    // interact-key gather extraction (src/game/interact_key_gather.ts took the
+    // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
+    // composed with the release's game_renderer.ts extraction. Exact merged
+    // count, zero slack.
+    ceiling: 11281,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1958,7 +1969,10 @@ const MONOLITHS: MonolithRow[] = [
     // disagreement about TEXT; this gate is about SIZE). BOTH parent pins for
     // the record: ours 2804, the release 2433. Measured on the merged tree,
     // never reconciled by arithmetic. Exact merged count, zero slack.
-    ceiling: 2432,
+    // Lowered again after the dais foundation-block stacking (and its
+    // per-position hash) moved to src/render/dais_blocks_core.ts for the
+    // Nythraxis flanking platforms (v0.42.2). Exact count, zero slack.
+    ceiling: 2420,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

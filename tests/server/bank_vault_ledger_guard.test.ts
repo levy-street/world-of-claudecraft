@@ -526,3 +526,37 @@ describe('resolveBankVaultLedgerMaxAccountStates', () => {
     );
   });
 });
+
+describe('vault surface reservation shape', () => {
+  // The vault surface reserves a per-command bound (vault_ledger_row_bound.ts)
+  // rather than one of two literals, so the guard's only self-check on that
+  // surface is a RANGE: any positive integer up to the account row burst. Pin
+  // both edges as literals: a widened range would silently admit a reservation
+  // the bucket can never hold, and a narrowed one would re-open the old
+  // budget-mismatch throw for a legal mixed-identity command.
+  const expected = 'bank-vault wire reservation does not match its command budget';
+
+  it('accepts every count from one row up to the 121-row burst', () => {
+    const coordinator = createBankVaultLedgerGuardCoordinator(() => 0);
+    const inner = fakeAdmission();
+    const runtime = coordinator.createRuntime(11, inner.admission, vi.fn());
+    expect(runtime.admission.tryReserve(1, 0, 'vault')?.commit([row])).toBe(true);
+    const full = coordinator.createRuntime(12, fakeAdmission().admission, vi.fn());
+    const burst = Array.from({ length: 121 }, () => row);
+    expect(full.admission.tryReserve(121, 0, 'vault')?.commit(burst)).toBe(true);
+    expect(BANK_VAULT_LEDGER_ROW_BURST).toBe(121);
+  });
+
+  it('throws the budget-mismatch error at 122, zero, a fraction, and a personal-surface widening', () => {
+    const coordinator = createBankVaultLedgerGuardCoordinator(() => 0);
+    const runtime = coordinator.createRuntime(13, fakeAdmission().admission, vi.fn());
+    expect(() => runtime.admission.tryReserve(122, 0, 'vault')).toThrow(expected);
+    expect(() => runtime.admission.tryReserve(0, 0, 'vault')).toThrow(expected);
+    expect(() => runtime.admission.tryReserve(1.5, 0, 'vault')).toThrow(expected);
+    expect(() => runtime.admission.tryReserve(3, 1, 'vault')).toThrow(expected);
+    // The personal bank keeps its two literals: the range is vault-only.
+    expect(() => runtime.admission.tryReserve(3, 0, 'personal')).toThrow(expected);
+    // Nothing above consumed a command token, so a legal reservation still admits.
+    expect(runtime.admission.tryReserve(2, 0, 'vault')?.commit([row, row])).toBe(true);
+  });
+});

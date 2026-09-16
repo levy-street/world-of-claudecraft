@@ -288,6 +288,7 @@ import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
+  sanitizeSlotInstanceOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isMergeableInstancePayload } from './item_instance_merge';
@@ -309,6 +310,7 @@ import {
 } from './leaderboard_page';
 import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
+import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
@@ -3192,12 +3194,7 @@ export class Sim {
         // equipment-only clamp missed the container that carries most of
         // them). Same shared rule as the equip arm above, on the clone
         // cloneInvSlot just made (or the fresh rift rebuild).
-        if (slot.instance) {
-          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
-          for (const d of dropped) droppedInstanceJunk.push(`bag.${slot.itemId}.${d}`);
-          if (payload) slot.instance = payload;
-          else delete slot.instance;
-        }
+        sanitizeSlotInstanceOnLoad(slot, droppedInstanceJunk, 'bag');
       }
       meta.inventory = meta.inventory.map(normalizeLoadedMaterialSlot);
       if (s.bags === undefined) {
@@ -3249,12 +3246,7 @@ export class Sim {
         // as bags and equipment; the first cut reached neither this list nor
         // the bank. Before the charges clamp below, which reads the payload
         // this leaves behind.
-        if (slot.instance) {
-          const { payload, dropped } = sanitizeItemInstancePayloadOnLoad(slot.instance);
-          for (const d of dropped) droppedInstanceJunk.push(`buyback.${slot.itemId}.${d}`);
-          if (payload) slot.instance = payload;
-          else delete slot.instance;
-        }
+        sanitizeSlotInstanceOnLoad(slot, droppedInstanceJunk, 'buyback');
         if (
           !preservesMaterialCountOnLoad(slot) &&
           slot.instance &&
@@ -3272,6 +3264,8 @@ export class Sim {
       // save sanitizes to the empty locked vault): restoreVaultStateOnLoad owns the
       // whole-record replacement AND its vaultWireRev bump (the rationale sits there).
       vaultMod.restoreVaultStateOnLoad(meta, s.vault, droppedInstanceJunk, player.id);
+      // Expired bind-on-pickup party-trade markers retire here and at serialize.
+      retirePartyTradeOnLoad(meta, this.lockoutNowMs());
       warnDroppedInstanceKeys(meta.name, droppedInstanceJunk);
       let questRevReset = false;
       for (const q of s.questLog) {
@@ -4292,7 +4286,8 @@ export class Sim {
       // pre-feature save stay byte-equal.
       ...materialGathererIdentitySaveFragment(meta.gathererIdentity),
     };
-    return sanitizeRemovedZone1Content(state).state;
+    // Expired party-trade markers retire at this persistence boundary, never by tick sweep.
+    return sanitizeRemovedZone1Content(retirePartyTradeOnSave(state, this.lockoutNowMs())).state;
   }
 
   /** Set a player's appearance skin (meta + entity). Bounded; the renderer

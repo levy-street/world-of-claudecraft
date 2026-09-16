@@ -11,6 +11,7 @@ vi.mock('../../server/db', () => ({
 
 import { EMPTY_LIVE_ACCOUNT_COSMETICS } from '../../server/account_cosmetics_live';
 import { AccountCosmeticsService } from '../../server/account_cosmetics_service';
+import { RETIRED_MOUNT_SKIN_IDS } from '../../src/sim/content/mount_skins';
 
 const base = () => ({ ...EMPTY_LIVE_ACCOUNT_COSMETICS, mountSkinIds: [] as string[] });
 const flush = async () => {
@@ -39,6 +40,16 @@ function setup() {
 }
 
 describe('durable mount skin grants', () => {
+  it('never mirrors a retired skin the economy ledger still grants', () => {
+    // The service's grant ledger keeps the Rallycart RXT rows as dormant data
+    // after the skin left the catalog; the mirror filters them like any id the
+    // registry does not carry, so no session ever owns something it cannot wear.
+    const { service, sessions } = setup();
+    service.grantMountSkins(7, [...RETIRED_MOUNT_SKIN_IDS, 'not_a_skin']);
+    expect(persist).not.toHaveBeenCalled();
+    expect(sessions.map((s) => s.accountCosmetics.mountSkinIds)).toEqual([[], []]);
+  });
+
   it('coalesces repeated reconciliation and publishes only a durable grant to both characters', async () => {
     let finish!: (value: unknown) => void;
     persist.mockReturnValue(
@@ -47,17 +58,17 @@ describe('durable mount skin grants', () => {
       }),
     );
     const { service, sessions } = setup();
-    service.grantMountSkins(7, ['rallycart_rxt']);
-    service.grantMountSkins(7, ['rallycart_rxt']);
+    service.grantMountSkins(7, ['goblin_rocket_sled']);
+    service.grantMountSkins(7, ['goblin_rocket_sled']);
     expect(persist).toHaveBeenCalledTimes(1);
     expect(sessions.map((s) => s.accountCosmetics.mountSkinIds)).toEqual([[], []]);
-    finish({ ...base(), mountSkinIds: ['rallycart_rxt'] });
+    finish({ ...base(), mountSkinIds: ['goblin_rocket_sled'] });
     await flush();
     expect(sessions.map((s) => s.accountCosmetics.mountSkinIds)).toEqual([
-      ['rallycart_rxt'],
-      ['rallycart_rxt'],
+      ['goblin_rocket_sled'],
+      ['goblin_rocket_sled'],
     ]);
-    service.grantMountSkins(7, ['rallycart_rxt']);
+    service.grantMountSkins(7, ['goblin_rocket_sled']);
     expect(persist).toHaveBeenCalledTimes(1);
   });
   it('retries a failed database grant on the next authoritative reconciliation', async () => {
@@ -82,13 +93,13 @@ describe('durable mount skin grants', () => {
       }),
     );
     const { service, sessions } = setup();
-    service.grantMountSkins(7, ['rallycart_rxt']);
+    service.grantMountSkins(7, ['goblin_rocket_sled']);
     service.updateLive(7, {
       ...base(),
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: { sword: 'ice_fang_sword' },
     });
-    finish({ ...base(), mountSkinIds: ['rallycart_rxt'] });
+    finish({ ...base(), mountSkinIds: ['goblin_rocket_sled'] });
     await flush();
     expect(sessions[0].accountCosmetics.weaponSkinLoadout).toEqual({ sword: 'ice_fang_sword' });
   });

@@ -128,6 +128,9 @@ export function borrowRiderLocomotion(mount: AnimState, rider: AnimState, airbor
   mount.swimming = rider.swimming;
 }
 
+// Dormant since the Rallycart RXT retired (RETIRED_MOUNT_SKIN_IDS): no live
+// spec sets the 'pipes' exhaust, so nothing reaches this or the 'pipes'
+// branches below until a vehicle skin ships again or the asset sweep removes them.
 function rallycartExhaustPhase(input: MountPresentationInputs): ExhaustPhase {
   const phase = input.enginePhase;
   if (!phase) return 'idle';

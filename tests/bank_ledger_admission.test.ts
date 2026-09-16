@@ -158,7 +158,7 @@ function vaultSim(initial: VaultInfo = vaultInfo()): VaultSim & {
       info = next;
     },
     ctx: {
-      resolve: () => ({ meta: { entityId: 88 } }),
+      resolve: () => ({ meta: { entityId: 88, inventory: [] } }),
       error: (_id, text) => void errors.push(text),
     },
     vaultInfoFor: () => info,

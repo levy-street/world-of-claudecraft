@@ -94,7 +94,7 @@ function bankSim(): BankSim {
 function vaultSim(): VaultSim {
   return {
     ctx: {
-      resolve: () => ({ meta: { entityId: 88 } }),
+      resolve: () => ({ meta: { entityId: 88, inventory: [] } }),
       error: vi.fn(),
     },
     vaultInfoFor: () => vaultInfo(),

@@ -291,7 +291,7 @@ describe('tryNearbyInteraction default arm', () => {
     expect(hud.showError).toHaveBeenCalledWith('nothing');
   });
 
-  it('never gathers an overlapped node from the press; the explicit node action still does', () => {
+  it('a blocked corpse cannot shadow the node beside it: the press gathers the node, and so does the explicit node action', () => {
     const blockedCorpse = corpse({ loot: null, harvestClaimedBy: 9 });
     const node = {
       id: 'ore_under_corpse',
@@ -303,11 +303,27 @@ describe('tryNearbyInteraction default arm', () => {
     } as const;
     const { world, hud, lootCorpse, harvestCorpse, harvestNode } = nearbyRig(blockedCorpse);
 
+    // Without a node list the press is the ordinary one and ends at nothing.
     expect(tryNearbyInteraction(world, hud, 'escortAway', 'nothing')).toBe(false);
     expect(harvestCorpse).not.toHaveBeenCalled();
     expect(lootCorpse).not.toHaveBeenCalled();
     expect(harvestNode).not.toHaveBeenCalled();
     expect(hud.showError).toHaveBeenCalledWith('nothing');
+
+    // With the live node list the interact key harvests the node: the blocked
+    // corpse is no target (hasLoot false), so it never swallows the press.
+    expect(
+      tryNearbyInteraction(world, hud, 'escortAway', 'nothing', undefined, undefined, {
+        nodes: [node],
+        toolGateFor: null,
+        tooFarText: 'far',
+        notReadyText: 'notReady',
+      }),
+    ).toBe(true);
+    expect(harvestNode).toHaveBeenCalledExactlyOnceWith('ore_under_corpse');
+    expect(harvestCorpse).not.toHaveBeenCalled();
+    expect(lootCorpse).not.toHaveBeenCalled();
+    harvestNode.mockClear();
 
     // The blocked corpse does not block the deliberate node click beside it.
     expect(

@@ -121,6 +121,7 @@ import {
 } from './game/graphics_rebuild_crash_guard';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { createGatherEffectConfirm, interactKeyGatherOptions } from './game/interact_key_gather';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
 import { createBgFlagKey } from './game/interaction_input';
 import {
@@ -494,7 +495,7 @@ import {
   setReferralProvider,
   setStandingProvider,
 } from './ui/hud/player_card/player_card_share';
-import { gatherEffectPrompt, gatherToolNoNodeKey } from './ui/hud/professions/gathering_view';
+import { gatherToolNoNodeKey } from './ui/hud/professions/gathering_view';
 import {
   ensureLocaleLoaded,
   formatNumber,
@@ -3330,16 +3331,9 @@ async function startGame(
   }
   const bgFlagKey = createBgFlagKey(world);
 
-  // The R40 per-use effect confirm gate, shared by the explicit gather entry
-  // points (world click, gathering-tool use): the pure question from the view
-  // core, the ask through the HUD's confirm-dialog family. The harvest
-  // proceeds on either answer; only the charge follows it. The generic
-  // interact key never gathers, so it takes no part in this.
-  const gatherEffectConfirm = {
-    needed: (nodeId: string) => gatherEffectPrompt(world, nodeId),
-    ask: (prompt: { effectId: string; charges: number }, proceed: (confirmed: boolean) => void) =>
-      hud.confirmToolEffectUse(prompt, proceed),
-  };
+  // The R40 per-use effect confirm gate, shared by every gather entry point
+  // (world click, interact key, gathering-tool use).
+  const gatherEffectConfirm = createGatherEffectConfirm(world, hud);
   function interactKey(preferNpcId?: number | null): void {
     if (shouldRouteInteractToBgFlag(world.bgInfo, world.player, world.entities)) {
       world.bgFlagAction();
@@ -3353,6 +3347,7 @@ async function startGame(
         t('errors.nothingInteract'),
         undefined,
         preferNpcId,
+        interactKeyGatherOptions(world, gatherEffectConfirm),
       ),
       input,
       mobileControls,

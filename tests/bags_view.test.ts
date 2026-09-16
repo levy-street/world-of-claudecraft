@@ -505,6 +505,48 @@ describe('transfer-locked instanced copies (issue 1165)', () => {
 });
 
 describe('soulbound transfer affordances', () => {
+  const PARTY_WINDOW = {
+    partyTrade: { untilMs: 10_000, eligible: ['Alice', 'Bob'] },
+  };
+
+  it('stages a marked soulbound copy for player trade while keeping every anonymous pipe blocked', () => {
+    expect([
+      bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }, PARTY_WINDOW),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, mailAttach: true }, PARTY_WINDOW),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, marketSell: true }, PARTY_WINDOW),
+      bagItemAction(ITEMS.mark, { ...NO_MODE, vendorOpen: true }, PARTY_WINDOW),
+    ]).toEqual([
+      'trade',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+      'transferBlockedSoulbound',
+    ]);
+  });
+
+  it('advertises player trade only for a marked soulbound copy', () => {
+    expect([
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, tradeOpen: true }, PARTY_WINDOW),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, mailAttach: true }, PARTY_WINDOW),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, marketSell: true }, PARTY_WINDOW),
+      bagTooltipHintKey(ITEMS.mark, { ...NO_MODE, vendorOpen: true }, PARTY_WINDOW),
+    ]).toEqual([
+      'itemUi.tooltip.clickTradeOffer',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+      'hudChrome.itemSoulbound',
+    ]);
+  });
+
+  it('blocks the trade action and hint once the host clock says the marker expired', () => {
+    const tradeMode = { ...NO_MODE, tradeOpen: true };
+    expect(bagItemAction(ITEMS.mark, tradeMode, PARTY_WINDOW, undefined, false)).toBe(
+      'transferBlockedSoulbound',
+    );
+    expect(bagTooltipHintKey(ITEMS.mark, tradeMode, PARTY_WINDOW, undefined, false)).toBe(
+      'hudChrome.itemSoulbound',
+    );
+  });
+
   it('blocks trade, mail, market, and vendor clicks instead of staging a Heroic Mark transfer', () => {
     expect([
       bagItemAction(ITEMS.mark, { ...NO_MODE, tradeOpen: true }),

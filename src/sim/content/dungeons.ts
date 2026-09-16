@@ -1202,9 +1202,12 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
   // Bone Spike: the stationary pillar Nythraxis impales a raider on
   // (src/sim/nythraxis_bone_spike.ts). It never moves, aggroes, or swings; the
   // impaled raider drains until the raid kills it, so its health IS the
-  // mechanic's timer (about four seconds of two DPS on normal after the arena's
-  // 2.0x, 1.5x that on heroic via healthMultiplierByMob). xpMult 0: shattering a
-  // spike is the counterplay, never a kill worth experience.
+  // mechanic's timer: 1,000 on both difficulties (normal through the arena's
+  // shared 2.0x, heroic through a per-mob 2.0 override that mirrors it), about
+  // four seconds of two DPS on normal and a little longer on heroic against
+  // the level-22 miss gap. Heroic scales the victim count, cadence, and drain
+  // instead of the pool. xpMult 0: shattering a spike is the counterplay,
+  // never a kill worth experience.
   nythraxis_bone_spike: {
     id: 'nythraxis_bone_spike',
     name: 'Bone Spike',

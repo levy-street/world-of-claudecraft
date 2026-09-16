@@ -2960,15 +2960,16 @@ describe('client HTML shell', () => {
     // Open-gate flip: the trailing (online === null) override is gone,
     // so the helpers default harvestStateReliable = true (trusting the hcb
     // corpse-claim mirror online); it stays an explicit `undefined` (the
-    // default), never a live override. Intentional gathering: the generic
-    // press takes no node list, tool gate, or R40 confirm gate any more (it
-    // never gathers; those stay on the explicit node/tool entry points).
-    // preferNpcId trails: the pad names the npc the player SELECTED, so a
-    // talk press cannot answer whoever happens to stand closer.
+    // default), never a live override. preferNpcId follows: the pad names the
+    // npc the player SELECTED, so a talk press cannot answer whoever happens
+    // to stand closer. The gather-node bundle trails it: the interact key
+    // harvests the nearest node in reach through the node click's core, with
+    // the live node list, the tool gate and the R40 confirm gate all wired
+    // (intentional gathering keeps corpse components and crops explicit; a
+    // node has no ordinary half to protect, so the press IS the intent).
     expect(mainTs).toContain(
-      "t('errors.nothingInteract'),\n        undefined,\n        preferNpcId,\n      ),",
+      "t('errors.nothingInteract'),\n        undefined,\n        preferNpcId,\n        interactKeyGatherOptions(world, gatherEffectConfirm),\n      ),",
     );
-    expect(mainTs).not.toContain('GATHER_NODES,\n        (node) => gatherNodeToolGateFor');
     // The escort away line sits immediately before it (escort_interact.ts): an
     // escort run has no other client entry point, so an unwired argument here
     // would silently make those quests uncompletable again.

@@ -129,6 +129,10 @@ describe('Bone Spike never lands on fire', () => {
       expect(victims.length).toBe(2);
       expect(victims).not.toContain(burning);
       nythraxis.shatterNythraxisBoneSpikes(ctx, boss);
+      // Back-to-back casts here are about the fire rule, not the per-raider
+      // cooldown (v0.42.2, its own suite): clear the ledger so every cast
+      // sees the full pool again.
+      st.boneSpikeCooldowns = [];
     }
   });
 

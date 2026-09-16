@@ -254,7 +254,9 @@ failure, kept as stable English that `main.ts` re-localizes.
   is really on the wire, never an outcome guess; (c) corrections exist only on
   server override epochs (`ovE`/`ovA`) and genuine reconcile mismatches, and
   the display absorbs them through the handoff offset bounded by
-  `MAX_SELF_REWIND_YD_PER_SEC`; (d) the feel bar is
+  `MAX_SELF_REWIND_YD_PER_SEC`, except that a gap past the shared six-yard
+  teleport rule (`SELF_MOTION_SNAP_DIST_SQ`) is an authoritative relocation
+  and snaps outright instead of gliding; (d) the feel bar is
   `tests/movement_latency_baseline.test.ts` in strict mode, and any change here
   must keep it green. Changing this model is a maintainer decision. The legacy
   display extrapolator (`src/render/self_motion.ts`, leash + servo + block

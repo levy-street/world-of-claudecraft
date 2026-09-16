@@ -217,7 +217,11 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     healthMultiplier: 2.0,
     // The boss alone: 160,000 on the 60,000 template (owner call for the
     // mechanics redo, 2026-09-04; was the shared 2.0 for 120,000). Adds and
-    // the Bone Spikes keep the shared multiplier.
+    // the Bone Spikes keep the shared multiplier; the heroic row's
+    // nythraxis_bone_spike override deliberately MIRRORS this 2.0 (same
+    // template pool), but since v0.42.2 a spike is a ward whose pool is its
+    // HIT COUNT, set at spawn (nythraxis_bone_spike.ts nythraxisBoneSpikeHits);
+    // this multiplier no longer decides anything a player sees.
     healthMultiplierByMob: {
       // 120,000 after the first playtest (2026-09-04; the redo tried 160,000).
       nythraxis_scourge_of_thornpeak: 120_000 / 60_000,
@@ -474,10 +478,14 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // and its respawn gate (only after the previous court dies) self-limits.
     healthMultiplierByMob: {
       nythraxis_skeleton_warrior: 2.22,
-      // Bone Spikes are a DPS target-switch check, not a health sponge: 1.5x
-      // their normal pool (1,500 vs 1,000) so three spikes still shatter inside
-      // the impale drain window when the raid splits onto them.
-      nythraxis_bone_spike: 3.0,
+      // Bone Spikes are a DPS target-switch check, not a health sponge: the
+      // SAME 1,000 pool as normal (owner call, 2026-09-10; the redo shipped
+      // 1.5x at 1,500). Heroic already stacks one more victim per cast, a
+      // shorter cadence, a faster drain, and level-22 spikes the level-20 raid
+      // misses more often, so a bigger pool on top compounded into an
+      // overtuned check. The 2.0 mirrors the normal table's shared multiplier
+      // instead of falling through to the raid-wide 3.2x.
+      nythraxis_bone_spike: 2.0,
       // The boss alone: 192,000 on the 60,000 template (owner call after the
       // first playtest, 2026-09-04; the redo tried 230,000).
       nythraxis_scourge_of_thornpeak: 192_000 / 60_000,

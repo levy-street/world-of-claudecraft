@@ -10207,6 +10207,31 @@
     margin-bottom: 4px;
     font-family: var(--font-ui);
   }
+  /* The quantity prompt's shared stepper (quantity_stepper.ts): the input
+     between its unit pair and its bag-stack pair, one centred row above the
+     confirm and cancel buttons; the buttons drop the plate's top margin so
+     the row lines up on the input. */
+  .prompt .prompt-steps {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px 0 6px;
+  }
+  .prompt .prompt-steps .prompt-number {
+    margin: 0;
+  }
+  .prompt .prompt-step {
+    margin: 0;
+    min-width: 40px;
+    min-height: 40px;
+    padding: 4px 8px;
+    font-size: 13px;
+    line-height: 1;
+  }
+  .prompt .prompt-step-big {
+    font-size: 12px;
+  }
   .prompt .prompt-number {
     width: 82px;
     margin: 8px 8px 6px 0;

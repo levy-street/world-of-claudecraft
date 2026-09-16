@@ -336,15 +336,9 @@ export const MOUNT_SKIN_VISUAL_SPECS: Record<MountSkinId, MountVisualSpec> = {
     null,
     { groundLift: 0.09 },
   ),
-  // Compact tracked vehicle with an authored rider socket behind the turret.
-  // Its rigid-body clips animate the suspension and track wheels without a
-  // procedural bob, keeping the pilot locked to the saddle.
-  // Seat solved in Blender against the car's real features rather than by eye:
-  // the rider's back lands on the backrest cushion face and the underside of
-  // his hips on the real sitting surface, which is the top of the cockpit's
-  // UPWARD-FACING geometry (model z 0.20). Measuring the max z of a probe box
-  // instead caught the base of the backrest and sat him a foot in the air.
-  rallycart_rxt: spec('mount_rallycart_rxt', 1.06, true, undefined, -0.86, 'pipes'),
+  // The Rallycart RXT spec (mount_rallycart_rxt, scale 1.06, seat -0.86,
+  // 'pipes' exhaust) left with the skin's retirement (RETIRED_MOUNT_SKIN_IDS in
+  // src/sim/content/mount_skins.ts); the GLB and its vehicle modules stay dormant.
 
   // The Cluckwork Mech Bird: authored rigid-servo clips (no procedural bob,
   // the clips carry the motion). Saddle surface sits at 0.60 of the raw model

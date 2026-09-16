@@ -41,6 +41,9 @@ describeDb('account mount cosmetics (real Postgres)', () => {
     ]);
     // An older binary replaces only accounts.cosmetics; paid rows survive.
     await db.pool.query("UPDATE accounts SET cosmetics = '{}'::jsonb WHERE id = $1", [id]);
+    // rallycart_rxt is RETIRED (src/sim/content/mount_skins.ts): the row keeps it
+    // as dormant data on purpose and the load returns it verbatim; every read
+    // that sells, wears, lists or renders a skin filters it out downstream.
     const loaded = await db.loadAccountCosmetics(id);
     expect(loaded.mountSkinIds.slice().sort()).toEqual([
       'chimeglass_tortoise',

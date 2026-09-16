@@ -5,13 +5,13 @@
 // charges living, non-impaled raiders in sequence: one target per charge
 // window, at NYTHRAXIS_BONE_STORM_SPEED_MULT times his move speed. When he
 // reaches a target he Bone Slams everyone around him (the storm's first slam
-// lands softer, since the raid has not spread yet)
-// and a Gravefire line runs on down the charge direction, then he whirls in
-// place until the next window opens. The storm casts no spike of its own and
-// the regular Bone Spike cadence is frozen while he storms (the mid-storm
-// cast pinned raiders inside the whirl and was retired). When the storm ends
-// the threat table is intact, the top-threat tank picks him up, and
-// Gravebreaker re-arms shortly after.
+// lands softer, since the raid has not spread yet; since v0.42.2 no Gravefire
+// line runs on down the charge direction), then he whirls in place until the
+// next window opens. The storm casts no spike of its own and the regular Bone
+// Spike cadence is frozen while he storms (the mid-storm cast pinned raiders
+// inside the whirl and was retired). When the storm ends the threat table is
+// intact, the top-threat tank picks him up, and Gravebreaker re-arms shortly
+// after.
 //
 // Target order spends no shared rng: each window ranks the eligible raiders by
 // a hash of the cast key, the window index, and the raider id, the idiom

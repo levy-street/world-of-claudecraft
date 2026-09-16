@@ -1,10 +1,22 @@
 import { describe, expect, it } from 'vitest';
 import { resolveNearbyInteractionCandidate } from '../src/game/nearby_interaction_core';
+import { ESCORTS } from '../src/sim/data';
 import { feastTemplateIds } from '../src/sim/professions/feast';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
 import type { FarmPatchDef } from '../src/world_api/farming';
 
 const FEAST_TEMPLATE_ID = feastTemplateIds()[0];
+
+// The node the press is offered (the live call site passes GATHER_NODES);
+// one yard off the player, so it is in reach unless a case moves it.
+const ORE_NODE = {
+  id: 'ore_1',
+  zoneId: 'zone',
+  type: 'ore',
+  pos: { x: 1, z: 0 },
+  level: 1,
+  tier: 1,
+} as const satisfies GatherNodeDef;
 
 const BED_PATCH: readonly FarmPatchDef[] = [
   {
@@ -58,8 +70,73 @@ const FIELD_KIT = [{ itemId: 'field_kit', count: 1 }];
 describe('resolveNearbyInteractionCandidate', () => {
   // The ladder IS the press ladder in nearby_interaction.ts, arm for arm. Note
   // what is absent: intentional gathering made the generic press ordinary
-  // interaction only, so no gather node and no corpse harvest ever resolves
-  // here.
+  // interaction for bodies and crops, so no corpse harvest ever resolves here;
+  // a gather NODE is the one exception, and only when the caller offers nodes.
+  it('slots an offered gather node below npc and escort start and above feast and bed', () => {
+    const npc = entity({ id: 5, kind: 'npc', templateId: 'elder_maren', name: 'Elder Maren' });
+    const feast = entity({
+      id: 6,
+      kind: 'object',
+      templateId: FEAST_TEMPLATE_ID,
+      name: 'Harvest Feast',
+    });
+    const nodes = [ORE_NODE];
+    // An npc in reach still wins the press over the node.
+    expect(
+      resolveNearbyInteractionCandidate(
+        scan([npc, feast], BED_PATCH).world,
+        true,
+        undefined,
+        nodes,
+      ),
+    ).toMatchObject({ kind: 'npc', id: 5 });
+    // The node beats the placed feast and the bed behind it.
+    expect(
+      resolveNearbyInteractionCandidate(scan([feast], BED_PATCH).world, true, undefined, nodes),
+    ).toMatchObject({ kind: 'node', id: 'ore_1', node: ORE_NODE });
+    expect(
+      resolveNearbyInteractionCandidate(scan([], BED_PATCH).world, true, undefined, nodes),
+    ).toMatchObject({ kind: 'node', id: 'ore_1' });
+    // An idle escortee at its post (quest active) beats the node beside it:
+    // escort start sits above the node arm. With the quest inactive the same
+    // escortee is no candidate at all, and the node beside it wins.
+    const escortDef = Object.values(ESCORTS)[0];
+    const post = escortDef.start;
+    const escortee = entity({
+      id: 7,
+      kind: 'mob',
+      templateId: escortDef.npcMobId,
+      name: 'Escortee',
+      pos: { x: post.x, y: 0, z: post.z },
+    });
+    const atPost = scan([escortee]);
+    atPost.world.player.pos = { x: post.x + 1, y: 0, z: post.z };
+    const postNode = { ...ORE_NODE, id: 'ore_post', pos: { x: post.x + 2, z: post.z } };
+    atPost.world.questLog.set(escortDef.questId, { state: 'active' } as unknown as QuestProgress);
+    expect(
+      resolveNearbyInteractionCandidate(atPost.world, true, undefined, [postNode]),
+    ).toMatchObject({ kind: 'escort', id: 7 });
+    atPost.world.questLog.clear();
+    expect(
+      resolveNearbyInteractionCandidate(atPost.world, true, undefined, [postNode]),
+    ).toMatchObject({ kind: 'node', id: 'ore_post' });
+    // Nearest node wins among several in reach.
+    const nearer = { ...ORE_NODE, id: 'ore_near', pos: { x: 0.5, z: 0 } };
+    expect(
+      resolveNearbyInteractionCandidate(scan([]).world, true, undefined, [ORE_NODE, nearer]),
+    ).toMatchObject({ kind: 'node', id: 'ore_near' });
+    // Out of reach, the ladder falls through to the bed; a dead player never
+    // gathers; no offered list means no node arm at all.
+    const far = { ...ORE_NODE, id: 'ore_far', pos: { x: 40, z: 0 } };
+    expect(
+      resolveNearbyInteractionCandidate(scan([], BED_PATCH).world, true, undefined, [far]),
+    ).toMatchObject({ kind: 'bed', id: 'bed_test_1' });
+    const dead = scan([]);
+    dead.world.player.dead = true;
+    expect(resolveNearbyInteractionCandidate(dead.world, true, undefined, nodes)).toBeNull();
+    expect(resolveNearbyInteractionCandidate(scan([]).world)).toBeNull();
+  });
+
   it('returns the same stable corpse, delve, object, npc, feast, bed priority used by dispatch', () => {
     const corpse = entity({
       id: 2,

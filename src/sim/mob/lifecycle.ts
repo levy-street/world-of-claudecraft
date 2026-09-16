@@ -63,6 +63,7 @@ export function respawnMob(ctx: SimContext, mob: Entity): void {
   mob.lootable = false;
   mob.loot = null;
   mob.lootRecipientIds = undefined;
+  mob.lootPartyTradeEligibility = undefined;
   mob.tappedById = null;
   mob.harvestClaimedBy = null;
   mob.ownerId = null;

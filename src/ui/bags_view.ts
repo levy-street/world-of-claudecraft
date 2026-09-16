@@ -193,7 +193,12 @@ export function bagItemAction(
    *  by the bank socket arm (bank sockets store bare ids, so a marked bag
    *  deposits instead). The vault preserves it, so it never blocks there. */
   craftedRecipeId?: string,
+  /** Host-clock verdict for the copy's bind-on-pickup marker. The server still
+   *  authorizes the recipient; this only prevents an expired client affordance. */
+  partyTradeWindowActive = instance?.partyTrade !== undefined,
 ): BagAction {
+  if (item.soulbound && mode.tradeOpen && instance?.partyTrade && partyTradeWindowActive)
+    return 'trade';
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'transferBlockedSoulbound';
   if (mode.tradeOpen) return 'trade';
@@ -469,7 +474,10 @@ export function bagTooltipHintKey(
   /** The slot's crafting provenance marker, the bagItemAction twin: read only
    *  by the vaultDeposit arm. */
   craftedRecipeId?: string,
+  partyTradeWindowActive = instance?.partyTrade !== undefined,
 ): BagTooltipHintKey {
+  if (item.soulbound && mode.tradeOpen && instance?.partyTrade && partyTradeWindowActive)
+    return 'itemUi.tooltip.clickTradeOffer';
   if (item.soulbound && (mode.tradeOpen || mode.mailAttach || mode.marketSell || mode.vendorOpen))
     return 'hudChrome.itemSoulbound';
   if (mode.tradeOpen) return 'itemUi.tooltip.clickTradeOffer';

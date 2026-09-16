@@ -14,6 +14,8 @@
 // Registered in UI_DOM_MODULES (tests/architecture.test.ts): it mounts real
 // DOM. Cold-path chrome: built once per prompt open, no driver, no layout read.
 
+import { mountQuantityStepper } from './quantity_stepper';
+
 export interface QuantityPromptWiring {
   /** The owning window's WCAG prompt-dialog installer (role/aria-modal/Tab
    *  cycle/Escape/inert), so a shared prompt is indistinguishable from a
@@ -27,9 +29,24 @@ export interface QuantityPromptWiring {
   dismissSiblings(): void;
 }
 
+/** Optional step buttons flanking the number input: the shared stepper
+ *  (quantity_stepper.ts), a unit pair inside a big pair that moves `size`
+ *  units (a whole carried stack for the vault). Every press clamps to the
+ *  prompt's [1, maxCount] range so the last one lands on the bound, and both
+ *  pairs disable on their bound (a [1, 1] prompt disables all four). Every
+ *  string arrives resolved, like the rest of the prompt's copy. */
+export interface QuantityPromptStep {
+  size: number;
+  downAriaText: string;
+  upAriaText: string;
+  unitDownAriaText: string;
+  unitUpAriaText: string;
+}
+
 export interface QuantityPromptOpts {
   /** Extra classes after 'prompt panel' (the family's teardown selectors). */
   className: string;
+  step?: QuantityPromptStep;
   titleText: string;
   inputAriaText: string;
   confirmText: string;
@@ -69,7 +86,34 @@ export function showQuantityPrompt(wiring: QuantityPromptWiring, opts: QuantityP
   const cancel = document.createElement('button');
   cancel.className = 'btn ui-btn';
   cancel.textContent = opts.cancelText;
-  prompt.append(input, confirm, cancel);
+  if (opts.step) {
+    const { size, downAriaText, upAriaText, unitDownAriaText, unitUpAriaText } = opts.step;
+    const steps = document.createElement('div');
+    steps.className = 'prompt-steps';
+    const stepper = mountQuantityStepper({
+      input,
+      bounds: () => ({ min: 1, max: opts.maxCount }),
+      size,
+      labels: {
+        bigDown: downAriaText,
+        unitDown: unitDownAriaText,
+        unitUp: unitUpAriaText,
+        bigUp: upAriaText,
+      },
+      className: 'prompt-step',
+      bigClassName: 'prompt-step-big',
+    });
+    steps.append(
+      stepper.buttons.bigDown,
+      stepper.buttons.unitDown,
+      input,
+      stepper.buttons.unitUp,
+      stepper.buttons.bigUp,
+    );
+    prompt.append(steps, confirm, cancel);
+  } else {
+    prompt.append(input, confirm, cancel);
+  }
   const { dismiss, dismissAndReturn } = wiring.installPromptDialog(prompt, opener, () =>
     prompt.remove(),
   );

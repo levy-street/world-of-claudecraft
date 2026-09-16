@@ -707,7 +707,7 @@ contested across the whole raid rather than inside one armor class:
 Token items: "Helm Sigil of the Anvil", "Mantle Sigil of the Ember", "Robe
 Sigil of the Tempest", and so on for all 15 (slot nouns Helm, Mantle, Robe,
 Grip, Legging). Ids follow `sigil_<group>_<slot>`. Each token is kind 'tool',
-epic quality, soulbound, noDiscard, stackSize 20, requiredClass locked to its
+epic quality, soulbound, discardable, stackSize 20, requiredClass locked to its
 three classes, exactly the heroic_mark pattern.
 
 ### Redemption
@@ -1018,9 +1018,12 @@ Each phase is a reviewable commit (or small commit series) with its tests:
    catalog of 58 bonuses lives in the set tables above and in the item
    catalog; implementation rides the TalentEffect seam.
 
-## Binding rules: the party trade window (maintainer directives, 2026-08-29)
+## Binding rules: sigils and tier pieces bind, ordinary drops trade
 
-Implemented alongside the soulbound rulings above:
+The 15 class-tier redemption sigils and the 145 redeemed tier set pieces
+are soulbound. The ordinary boss drops (offset, jewelry, held, weapons)
+are transferable. The party trade window applies when a soulbound item,
+in this tier a sigil, is awarded from party loot:
 
 - Every SOULBOUND item awarded from party boss loot (need/greed win,
   master-loot assignment, round-robin, or a shared direct pickup) is

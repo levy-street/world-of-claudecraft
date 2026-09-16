@@ -98,6 +98,7 @@ describe('cosmetics accessibility and interaction', () => {
       root.querySelector<HTMLButtonElement>('[data-act="takeoff-mount"]')!.click();
       expect(world.player.mountSkinId).toBeNull();
     }
-    expect(world.changeMountSkin).toHaveBeenCalledTimes(10);
+    // One wear plus one take-off per live skin.
+    expect(world.changeMountSkin).toHaveBeenCalledTimes(MOUNT_SKIN_IDS.length * 2);
   });
 });

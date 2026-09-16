@@ -14,8 +14,10 @@ budgets that tests/item_level.test.ts enforces (35 x slot mult x 0.7,
 epic quality), so what is reviewed here is what the budget sweep will pin.
 
 Shared by every gear item below: item level 35 (source 26 + epic 6 + raid
-3), epic quality, requiredLevel 20, soulbound. Set pieces are class-locked
-to their set's class. Armor values by slot:
+3), epic quality, requiredLevel 20. Set pieces are class-locked to their
+set's class and soulbound, like the redemption sigils that buy them; the
+ordinary boss drops (offset, jewelry, held, weapons) are transferable.
+Armor values by slot:
 
 | Slot | Mail | Leather | Cloth |
 |---|---|---|---|
@@ -365,7 +367,7 @@ design targets for the tuning pass.
 
 ## The 15 sigils
 
-Tokens are kind tool, epic, soulbound, noDiscard, stack 20, class-locked
+Tokens are kind tool, epic, soulbound, discardable, stack 20, class-locked
 to their group. One sigil buys any one matching-slot set piece for the
 holder's class at the Crucible Quartermaster.
 

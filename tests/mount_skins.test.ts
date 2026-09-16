@@ -15,6 +15,7 @@ import {
   mountPresentationKey,
   mountSkinDef,
   normalizeMountSkinId,
+  RETIRED_MOUNT_SKIN_IDS,
 } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 
@@ -22,13 +23,12 @@ import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 // catalog row. These pins keep the family disjoint from the mount catalog and
 // the render specs in lockstep with the sim content.
 describe('mount skin catalog', () => {
-  it('ships exactly the five converted mounts, in store order', () => {
+  it('ships exactly the four live converted mounts, in store order', () => {
     expect(MOUNT_SKIN_IDS).toEqual([
       'mech_bird',
       'chimeglass_tortoise',
       'rickshaw_mount',
       'goblin_rocket_sled',
-      'rallycart_rxt',
     ]);
     expect(MOUNT_SKINS.mech_bird).toEqual({
       id: 'mech_bird',
@@ -50,8 +50,23 @@ describe('mount skin catalog', () => {
     });
   });
 
+  it('retires the Rallycart RXT out of every registry read', () => {
+    // Withdrawn 2026-09-10 after player feedback. The id stays listed under
+    // RETIRED_MOUNT_SKIN_IDS so the dormant assets have an owner, but no read
+    // that sells, grants, wears, lists or renders a skin ever sees it.
+    expect(RETIRED_MOUNT_SKIN_IDS).toEqual(['rallycart_rxt']);
+    for (const id of RETIRED_MOUNT_SKIN_IDS) {
+      expect(MOUNT_SKIN_IDS).not.toContain(id);
+      expect(isMountSkinId(id)).toBe(false);
+      expect(mountSkinDef(id)).toBeNull();
+      expect(normalizeMountSkinId(id)).toBeNull();
+      // A worn retired skin never renames the ride's audio either.
+      expect(mountPresentationKey('horse', id)).toBe('horse');
+    }
+  });
+
   it('classifies every paid mount skin as epic', () => {
-    expect(MOUNT_SKIN_IDS).toHaveLength(5);
+    expect(MOUNT_SKIN_IDS).toHaveLength(4);
     for (const id of MOUNT_SKIN_IDS) expect(MOUNT_SKINS[id].rarity, id).toBe('epic');
   });
 
@@ -118,6 +133,10 @@ describe('mount skin visual specs', () => {
     expect(horse).not.toBeNull();
     expect(mountVisualSpecFor('valorsteed', null)).toBe(horse);
     expect(mountVisualSpecFor('valorsteed', undefined)).toBe(horse);
+    // A save still naming a retired skin renders the ridden mount's own look.
+    for (const retired of RETIRED_MOUNT_SKIN_IDS) {
+      expect(mountVisualSpecFor('valorsteed', retired)).toBe(horse);
+    }
     expect(mountVisualSpecFor('valorsteed', 'mech_bird')).toBe(MOUNT_SKIN_VISUAL_SPECS.mech_bird);
     expect(mountVisualSpecFor('grag_bear', 'chimeglass_tortoise')).toBe(
       MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise,

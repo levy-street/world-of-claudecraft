@@ -6,7 +6,20 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import { describe, expect, it } from 'vitest';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
-import { manifestUrls, VISUALS, visualKeyFor } from '../src/render/characters/manifest';
+import {
+  CLICK_RADIUS_CAP,
+  CLICK_RADIUS_FLOOR,
+  resolveClickRadius,
+} from '../src/render/characters/assets';
+import {
+  manifestUrls,
+  NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
+  NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+  NYTHRAXIS_BONE_SPIKE_TINT,
+  NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
+  VISUALS,
+  visualKeyFor,
+} from '../src/render/characters/manifest';
 import { MOBS } from '../src/sim/data';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../src/sim/nythraxis_bone_spike';
 
@@ -20,6 +33,26 @@ const DISPLAY_HEIGHT = 2.6;
 const AUTHORED_FOOTPRINT_RADIUS = 0.88;
 
 describe('Nythraxis Bone Spike model', () => {
+  it('resolves the click capsule from the override, above the cap ordinary defs get', () => {
+    // The footprint-derived default for the spike would be 0.88 * (2.6 / 1.6)
+    // * 0.9 = 1.29; the override doubles it and is not subject to the cap.
+    const normScale = DISPLAY_HEIGHT / AUTHORED_HEIGHT;
+    expect(resolveClickRadius({}, AUTHORED_FOOTPRINT_RADIUS, normScale)).toBeCloseTo(1.29, 2);
+    expect(
+      resolveClickRadius(VISUALS.mob_nythraxis_bone_spike, AUTHORED_FOOTPRINT_RADIUS, normScale),
+    ).toBe(NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS);
+    expect(NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS).toBeGreaterThan(CLICK_RADIUS_CAP);
+    // The default arm keeps its clamp for everyone else.
+    expect(resolveClickRadius({}, 100, 1)).toBe(CLICK_RADIUS_CAP);
+    expect(resolveClickRadius({}, 0.01, 1)).toBe(CLICK_RADIUS_FLOOR);
+    // No def may override its way to unclickable or arena-swallowing.
+    for (const [key, def] of Object.entries(VISUALS)) {
+      if (def.clickRadius === undefined) continue;
+      expect(def.clickRadius, key).toBeGreaterThanOrEqual(CLICK_RADIUS_FLOOR);
+      expect(def.clickRadius, key).toBeLessThanOrEqual(2 * CLICK_RADIUS_CAP);
+    }
+  });
+
   it('routes the spike template to its own static-prop visual', () => {
     expect(MOBS[NYTHRAXIS_BONE_SPIKE_ID]?.name).toBe('Bone Spike');
     const key = visualKeyFor({ kind: 'mob', templateId: NYTHRAXIS_BONE_SPIKE_ID } as never);
@@ -28,6 +61,16 @@ describe('Nythraxis Bone Spike model', () => {
       url: RELATIVE_URL,
       height: DISPLAY_HEIGHT,
       yaw: 0,
+      // Ember-orange recolour + a tinted lift (v0.42.2): the authored bone
+      // and flagstone atlas read as the boss and the floor under the hall's
+      // violet torchlight (owner playtest), so the spike carries the one hue
+      // no other Nythraxis surface uses. Literal pins: nythraxis_hazard_palette.
+      tint: NYTHRAXIS_BONE_SPIKE_TINT,
+      tintStrength: NYTHRAXIS_BONE_SPIKE_TINT_STRENGTH,
+      selfIllumination: NYTHRAXIS_BONE_SPIKE_SELF_ILLUMINATION,
+      // About twice the footprint-derived default, so a click near the spike
+      // lands on it rather than on the raider it pins (v0.42.2).
+      clickRadius: NYTHRAXIS_BONE_SPIKE_CLICK_RADIUS,
       // STATIC_PROP: every action parks on the nominal 'Idle' the GLB lacks
       clips: {
         idle: 'Idle',
