@@ -138,6 +138,23 @@ export const WOC_MARKET_RETURN_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// The Exchange Broker's letter ids, the ONE list the post's expiry sweep reads:
+// an UNREAD Exchange letter rides a much longer unread window than any other
+// letter (a sale or return notice waits for its owner; the ceiling is
+// MAIL_EXCHANGE_UNREAD_EXPIRY_SECONDS in post_office.ts). These are PERSISTED
+// tokens (every booked row carries its letterId), so the literals here must
+// match the three WOC_MARKET_* defs in this module byte for byte, and
+// tests/mail_expiry.test.ts pins the strings themselves, not the defs.
+export const WOC_MARKET_LETTER_IDS: ReadonlySet<string> = new Set([
+  'woc_market_delivery',
+  'woc_market_return',
+  'woc_market_sold',
+]);
+
+export function isWocMarketLetterId(letterId: string | undefined): boolean {
+  return letterId !== undefined && WOC_MARKET_LETTER_IDS.has(letterId);
+}
+
 export const WOC_MARKET_SOLD_LETTER: LetterDef = {
   letterId: 'woc_market_sold',
   senderName: 'The Exchange Broker',

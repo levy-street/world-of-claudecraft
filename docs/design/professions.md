@@ -961,7 +961,9 @@ guards.
 | MARKET_MAX_LISTINGS | src/sim/market.ts | 12 per seller |
 | STATION_RADIUS | src/sim/content/professions.ts | 20 |
 | BARE_HANDS_TOOL_TIER | src/sim/professions/tools.ts | 1 |
-| MAIL_ATTACHMENT_EXPIRY_SECONDS | src/sim/mail/post_office.ts | 30 days sim-time |
+| MAIL_ATTACHMENT_EXPIRY_SECONDS | src/sim/mail/post_office.ts | 30 days sim-time (then the parcel flies home and holds Infinity: mail with attachments is never auto-deleted) |
+| MAIL_UNREAD_EXPIRY_SECONDS / MAIL_READ_EXPIRY_SECONDS | src/sim/mail/post_office.ts | 30 days / 3 days sim-time for a letter with no escrow aboard; an unread Exchange Broker letter (WOC_MARKET_LETTER_IDS) waits MAIL_EXCHANGE_UNREAD_EXPIRY_SECONDS (90 days) instead |
+| MAIL_ESCROW_COPPER_MIN | src/sim/mail/post_office.ts | 100 copper (one silver): coin below this is not escrow, so the letter is swept with the coin aboard; any item stack is escrow (mailHoldsEscrow) |
 | CORPSE_INTERACT_GRACE_SECONDS | src/sim/loot/loot_roll.ts | 30 |
 | requiredAmendsProgress | src/sim/professions/archetype.ts | 5 + 3 * switchCount |
 | LEGACY_GOLD_POSITIVE_RECIPE_IDS | tests/recipe_economy.test.ts | empty set (every recipe passes the invariant) |
