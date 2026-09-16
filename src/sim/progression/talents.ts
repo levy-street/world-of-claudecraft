@@ -36,6 +36,7 @@ import { clearAfflictionState } from '../combat/affliction';
 import { stripTemporalEchoes } from '../combat/chronomancy';
 import { clearDestructionState } from '../combat/destruction';
 import { cleanDruidEngineState } from '../combat/druid_engines';
+import { playerInEngagedBossFight } from '../combat/engaged_combat';
 import { cleanColdsightReadState } from '../combat/hunter_coldsight_read';
 import { clearFieldcraftState } from '../combat/hunter_fieldcraft';
 import { clearPacklordState } from '../combat/hunter_packlord';
@@ -288,9 +289,13 @@ function stripOrphanedFormAuras(ctx: SimContext, meta: PlayerMeta, e: Entity | u
 // was always swappable in there (equipItem carries no match gate), so blocking
 // the talent half left a fighter with no way to fix a build the queue chose for
 // them. The arena stays locked; its matches are short and start on a prep hold.
+// A boss encounter locks the same way: the intermission drops the player out of
+// combat, but the boss is still engaged and holding the raid, and swapping to a
+// fight-winning loadout mid-boss (issue #3372) cuts the encounter-level line.
 function talentLockReason(ctx: SimContext, p: Entity): string | null {
   if (p.inCombat) return 'You cannot change talents in combat.';
   if (ctx.arenaMatches.has(p.id)) return 'You cannot change talents during an arena match.';
+  if (playerInEngagedBossFight(ctx, p.id)) return 'You cannot change talents during a boss fight.';
   return null;
 }
 
