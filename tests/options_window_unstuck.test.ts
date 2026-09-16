@@ -114,4 +114,40 @@ describe('options window unstuck action', () => {
     expect(cmd).toHaveBeenCalledWith({ cmd: 'unstuck' });
     expect(root.style.display).toBe('none');
   });
+
+  it('keeps the Escape-menu command available while a battleground is active', () => {
+    const root = new FakeElement();
+    const unstuck = vi.fn();
+    vi.stubGlobal('document', {
+      createElement: () => new FakeElement(),
+    });
+    const window = new OptionsWindow({
+      root: () => root as unknown as HTMLElement,
+      world: () =>
+        ({
+          bgInfo: {
+            match: {
+              id: 42,
+              state: 'active',
+              slot: 0,
+              myTeam: 0,
+              scores: [0, 0],
+              flags: [],
+              roster: [],
+            },
+          },
+          unstuck,
+        }) as never,
+      options: () => null,
+      bugReport: () => null,
+      hideTooltip: vi.fn(),
+      restoreFocus: vi.fn(),
+    } as never);
+
+    (window as unknown as { renderMain(): void }).renderMain();
+    root.findButton(t('hudChrome.unstuck.menuButton'))?.click();
+
+    expect(unstuck).toHaveBeenCalledOnce();
+    expect(root.style.display).toBe('none');
+  });
 });
