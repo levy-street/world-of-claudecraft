@@ -684,7 +684,7 @@
   .wallet-mini:focus,
   .wallet-mini:focus-visible {
     color: var(--color-text-light);
-    border-color: var(--color-wallet-mini-focus-border);
+    border-color: var(--color-wallet-mini-focus-border, var(--color-border-focus));
     outline: none;
   }
   #btn-wallet-unlink:hover,
