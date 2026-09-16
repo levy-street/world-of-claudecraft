@@ -1404,6 +1404,7 @@ export const vi_VN: EnTranslations = {
       "targetPrev": "Luân Phiên Mục Tiêu Ngược",
       "discord": "Discord",
       "bgFlag": "Hành Động Cờ Chiến Trường",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Tra/Rút Vũ Khí",
       "dive": "Lặn Xuống",
       "categoryPet": "Thú Cưng",

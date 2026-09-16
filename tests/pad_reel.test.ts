@@ -117,6 +117,7 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
       if (action.kind !== 'edge') continue;
       if (action.id === 'attackMove') continue; // panel-excluded, pinned below
       if (action.id === 'jump' || action.id === 'autorun') continue; // gamepad.ts-handled, pinned below
+      if (action.id === 'friendlyNameplates') continue; // gamepad.ts-handled, pinned below
       if (action.id.startsWith('slot')) continue; // the slotN prefix arm, pinned below
       if (dispatchCollectionAction(action.id, collections)) continue;
       expect(body.includes(`case '${action.id}'`), `pad dispatch drops '${action.id}'`).toBe(true);
@@ -135,6 +136,11 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     expect(pad).toContain('this.input.triggerGamepadJump();');
     expect(pad).toContain("if (action === 'autorun') {");
     expect(pad).toContain('this.input.toggleAutorun();');
+    // friendlyNameplates: same interception, because the toggle is a local view
+    // preference the input layer owns (game/nameplate_view_prefs) rather than a
+    // world action, so it never reaches main.ts's dispatcher at all.
+    expect(pad).toContain("if (action === 'friendlyNameplates') {");
+    expect(pad).toContain('this.input.toggleFriendlyNameplates();');
     // slotN: the prefix arm exists and dispatches to the hotbar, and the
     // registry genuinely offers slot ids as edges (so the arm is
     // load-bearing, not decorative).

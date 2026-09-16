@@ -1433,6 +1433,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfareShop.buyConfirmBody':
     '{item}を{honor}で購入しますか？名誉での購入は返金できません。',
   'hudChrome.keybinds.bgFlag': '戦場フラッグアクション',
+  'hudChrome.keybinds.friendlyNameplates': '友好ネームプレート切り替え',
   'hudChrome.pvp.mobileLabel': 'PvP',
   'hudChrome.bg.title': 'ソーンホロウ平原',
   'hudChrome.bg.blurb':

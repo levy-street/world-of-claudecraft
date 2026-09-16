@@ -1404,6 +1404,7 @@ export const es_ES: EnTranslations = {
       "targetPrev": "Objetivo anterior",
       "discord": "Discord",
       "bgFlag": "Acción de bandera de campo de batalla",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Envainar/Desenvainar arma",
       "dive": "Nadar hacia abajo",
       "categoryPet": "Mascota",

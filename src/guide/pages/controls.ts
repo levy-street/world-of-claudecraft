@@ -76,6 +76,7 @@ const GROUPS: Group[] = [
       { keys: ['Shift+I'], label: 'guide.controls.dungeonFinder' },
       { keys: ['U'], label: 'guide.controls.discord' },
       { keys: ['V'], label: 'controls.nameplates' },
+      { keys: ['Ctrl+V'], label: 'hudChrome.keybinds.friendlyNameplates' },
       { keys: ['X'], label: 'controls.emoteWheel' },
       { keys: ['Enter', 'NumEnter'], label: 'controls.chat' },
     ],

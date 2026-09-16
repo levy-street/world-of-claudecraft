@@ -1404,6 +1404,7 @@ export const en_CA: EnTranslations = {
       "targetPrev": "Cycle Target Backward",
       "discord": "Discord",
       "bgFlag": "Battleground Flag Action",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Sheathe/Unsheathe Weapon",
       "dive": "Swim Down",
       "categoryPet": "Pet",

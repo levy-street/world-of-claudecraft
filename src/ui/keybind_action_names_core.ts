@@ -39,6 +39,7 @@ export const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   map: 'hud.keybinds.actions.map',
   bags: 'hud.keybinds.actions.bags',
   nameplates: 'hud.keybinds.actions.nameplates',
+  friendlyNameplates: 'hudChrome.keybinds.friendlyNameplates',
   meters: 'hud.keybinds.actions.meters',
   targetAuras: 'hudChrome.targetAuras.keybindLabel',
   social: 'hud.keybinds.actions.social',

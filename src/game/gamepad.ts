@@ -887,6 +887,10 @@ export class GamepadManager {
       this.input.toggleAutorun();
       return;
     }
+    if (action === 'friendlyNameplates') {
+      this.input.toggleFriendlyNameplates();
+      return;
+    }
     // Negative delta pulls the camera closer (zoom in), positive pushes it away
     // (zoom out), matching Input's wheel handler's Math.sign(deltaY) convention.
     if (action === GAMEPAD_ZOOM_IN) {

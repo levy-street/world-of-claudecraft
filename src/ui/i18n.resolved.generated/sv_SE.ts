@@ -1404,6 +1404,7 @@ export const sv_SE: EnTranslations = {
       "targetPrev": "Växla mål bakåt",
       "discord": "Discord",
       "bgFlag": "Slagfältets flaggåtgärd",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Slida/Ta fram vapen",
       "dive": "Simma nedåt",
       "categoryPet": "Djur",

@@ -3205,6 +3205,40 @@ export const TARGETS = [
     },
   },
   {
+    // The Key Bindings panel's Interface rows, where a new bindable action lands.
+    // Shot by ROW TEXT rather than an index: the registry order shifts whenever an
+    // action is added, and a stale index would quietly frame the wrong row.
+    key: 'keybinds-interface-rows',
+    label: 'Key Bindings panel: the Interface action rows and their keys',
+    when: ['game/keybinds', 'ui/keybind_action_names_core'],
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#tutorial-greeting button')?.click();
+        const el = document.querySelector('#options-menu');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.toggleOptionsMenu?.();
+      });
+      await wait(400);
+      await page.evaluate(() => {
+        // Key Bindings is the first row on the main options menu.
+        document.querySelectorAll('#options-menu .opt-btn')[0]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .kb-cols');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        const rows = Array.from(document.querySelectorAll('#options-menu .kb-row'));
+        const match = rows.find((row) =>
+          (row.querySelector('.kb-label')?.textContent ?? '').includes('Nameplates'),
+        );
+        match?.scrollIntoView({ block: 'center' });
+      });
+      await wait(120);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     key: 'interface-unlock-hud',
     label: 'HUD with the interface unlocked: move buttons and resize grips on every live frame',
     when: ['ui/interface_unlock', 'ui/movable_frame'],

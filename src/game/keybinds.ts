@@ -228,6 +228,18 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['KeyV'],
   },
+  // The friendly half of the pair above, on the Ctrl layer of the same key so
+  // the two read as one control: V hides every mob plate, Ctrl+V hides just the
+  // friendly ones (town NPCs, vendors, quest givers, friendly pets) and leaves
+  // the enemies you are fighting alone. Ctrl+V is free here: the pet bar owns
+  // Ctrl+1 to Ctrl+6 and no other action claims a Ctrl letter.
+  {
+    id: 'friendlyNameplates',
+    label: 'Toggle Friendly Nameplates',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Ctrl+KeyV'],
+  },
   { id: 'talents', label: 'Talents', category: 'Interface', kind: 'edge', defaults: ['KeyN'] },
   // Every bare letter is claimed by another default (see the KeyZ note on
   // Book of Deeds below), so Damage Meters parks on the shifted layer of its

@@ -3,6 +3,7 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
+import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
@@ -50,6 +51,7 @@ import {
   nameplateDotRowHeight,
   nameplateDotsInto,
 } from './nameplate_dots_core';
+import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
 import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
@@ -149,6 +151,11 @@ export interface NameplatePainterDeps {
    *  host) means the device ratio. */
   getSurfacePixelRatio?: () => number;
   showNameplates: () => boolean;
+  /** The Toggle Friendly Nameplates keybind's state. Defaults to the live
+   *  preference (game/nameplate_view_prefs), which is why the renderer carries no
+   *  pass-through field for it; injectable so a test drives it. Read once per
+   *  pass; the rule it feeds is nameplate_friendly_core.ts. */
+  showFriendlyNameplates?: () => boolean;
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
@@ -168,6 +175,7 @@ export class NameplatePainter {
   private readonly getDevicePixelRatio: () => number;
   private readonly getSurfacePixelRatio: () => number;
   private readonly showNameplates: () => boolean;
+  private readonly showFriendlyNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
@@ -223,6 +231,7 @@ export class NameplatePainter {
       (() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
     this.getSurfacePixelRatio = deps.getSurfacePixelRatio ?? this.getDevicePixelRatio;
     this.showNameplates = deps.showNameplates;
+    this.showFriendlyNameplates = deps.showFriendlyNameplates ?? friendlyNameplatesShown;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
@@ -244,6 +253,7 @@ export class NameplatePainter {
     this.anchorCount = 0;
 
     const showNameplates = this.showNameplates();
+    const showFriendlyNameplates = this.showFriendlyNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
@@ -275,6 +285,23 @@ export class NameplatePainter {
         !!view.visual,
         anyCharacterRigDrawing(view),
       );
+      // The Toggle Friendly Nameplates keybind, gated here rather than inside the
+      // plan because resolving a mob's reaction needs the entity map. Skipping
+      // the entity is the whole hide, so a gated plate leaves no pick anchor
+      // behind, and `standIn` wins over it exactly as it wins over the other
+      // nameplate toggles: a body the compile gate is still hiding keeps the
+      // plate that says it is there.
+      if (
+        !standIn &&
+        isFriendlyNameplateHidden(
+          entity,
+          world.entities,
+          this.isHostilePlayer,
+          showFriendlyNameplates,
+        )
+      ) {
+        continue;
+      }
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,

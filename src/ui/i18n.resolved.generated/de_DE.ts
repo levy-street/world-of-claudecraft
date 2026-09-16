@@ -1404,6 +1404,7 @@ export const de_DE: EnTranslations = {
       "targetPrev": "Ziel rückwärts wechseln",
       "discord": "Discord",
       "bgFlag": "Schlachtfeld-Flaggenaktion",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Waffe einstecken/ziehen",
       "dive": "Nach unten schwimmen",
       "categoryPet": "Begleiter",
