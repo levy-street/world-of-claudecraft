@@ -678,7 +678,8 @@ interface AttributionTargetFixture {
 // Re-minted for the druid Cat Form merge with release/v0.43.0: the merged
 // runtimeRender.renderer leaf matches neither parent. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c2d9fc0d9936681c4ece986481496ff334e2e2e7e2cf0ac271aaac88620d991f';
+  // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
+  '9085842c298f0abd0ae869ed2ec189945bd6d04294f63e695a714d2c068e51f6';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -1382,11 +1383,13 @@ describe('Eastbrook polish capture contract', () => {
     // row follows him (target on the authored stand, camera holding its former
     // 4.47 yd offset on his re-derived public-facing side). Lin and Saul did
     // not move this round.
+    // The handoff experiment moves Lin to (-11, -89); the live portrait
+    // follows her while the artifact suite keeps the historical framing frozen.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: -65, y: 6, z: -96 },
-        target: { x: -72, y: 2.5, z: -96 },
+        camera: { x: -12, y: 6, z: -94 },
+        target: { x: -11, y: 2.5, z: -89 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',

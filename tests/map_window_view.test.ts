@@ -34,7 +34,6 @@ import { KIT_BUILDINGS } from '../src/sim/kit_buildings';
 import type { QuestObjectiveRef } from '../src/sim/quest_targets';
 import {
   emptyZoneProps,
-  isQuestTurnInNpc,
   type NoticeboardDef,
   type QuestProgress,
   type WorldServicesDef,
@@ -78,24 +77,10 @@ const ZONE_MAX_X = ZONE.xMax ?? STRIP_MAX_X;
 const FULL_SPAN = Math.max(ZONE_MAX_X - ZONE_MIN_X, ZONE.zMax - ZONE.zMin);
 const ZONE_CX = (ZONE_MIN_X + ZONE_MAX_X) / 2;
 const LABELS_ZOOM = 1;
-// A quest giver with a real giverNpcId, so the npc-marker branch exercises real
-// content rather than an undefined === undefined accident.
-function requireQuestWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
-  if (!quest) throw new Error('expected a quest with a giverNpcId');
-  return quest;
-}
-const GIVER_QUEST = requireQuestWithGiver();
-// A quest whose giver is also a turn-in npc, so a single npc can carry a 'ready'
-// turn-in (the '?' glyph branch the painter renders, distinct from '!').
-function requireReadyQuest() {
-  const quest = Object.values(QUESTS).find(
-    (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
-  );
-  if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
-  return quest;
-}
-const READY_QUEST = requireReadyQuest();
+// Explicit combat content keeps generic glyph geometry independent of ambient
+// profession-offer visibility and content-table insertion order.
+const GIVER_QUEST = QUESTS.q_wolves;
+const READY_QUEST = QUESTS.q_wolves;
 
 // One scenario as plain data, so we can build two structurally-distinct IWorld
 // stubs (a "Sim-shaped" one carrying extra sim-only fields the core must ignore,
@@ -581,8 +566,8 @@ describe('buildOverworldMapModel (pure draw model)', () => {
   });
 
   it('classifies the repeat and cooldown variants identically for both world shapes', () => {
-    // Acceptance (a)'s both-worlds arm at the map surface: a real cadenced
-    // work order (giver in this test's zone), driven through a Sim-shaped
+    // Generic cadence classification at the map surface: a synthetic non-profession
+    // combat repeatable (giver in this test's zone), driven through a Sim-shaped
     // and a ClientWorld-mirror-shaped stub. After one completion the offer
     // is the blue repeat glyph; inside the window it is the dimmed cooldown
     // glyph; and a non-repeatable quest stays pixel-identical gold
@@ -590,29 +575,43 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     // CLASSIFIER over each world's data shape; true world-to-world parity
     // of the inputs rests on the online cadence/attunement suites pinning
     // the qdone and cprof mirrors.
-    const workOrder = QUESTS.q_prof_workorder_forge;
-    expect(workOrder.repeatable).toBe(true);
-    for (const shape of ['sim', 'client'] as const) {
-      const world = makeOverworldWorld(shape) as unknown as {
-        questsDone: Set<string>;
-        craftingIdentity: { cadenceBlockedQuests: string[] };
-        questState: (q: string) => string;
-      };
-      world.questsDone = new Set([workOrder.id]);
-      world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
-      const offered = buildOverworldMapModel(input(world as unknown as IWorld, 1));
-      const offeredGlyph = offered.npcs.find((n) =>
-        n.quests.some((q) => q.questId === workOrder.id),
-      );
-      expect(offeredGlyph?.kind, `${shape}: offered again`).toBe('repeat');
+    const giverId = 'test_map_view_repeat_giver';
+    const workOrder = {
+      ...QUESTS.q_wolves,
+      id: 'q_test_map_view_repeat',
+      giverNpcId: giverId,
+      turnInNpcId: giverId,
+      repeatable: true,
+      repeatCadenceTicks: 1200,
+    };
+    QUESTS[workOrder.id] = workOrder;
+    NPCS[giverId] = { ...NPCS.marshal_redbrook, id: giverId, questIds: [workOrder.id] };
+    try {
+      for (const shape of ['sim', 'client'] as const) {
+        const world = makeOverworldWorld(shape) as unknown as {
+          questsDone: Set<string>;
+          craftingIdentity: { cadenceBlockedQuests: string[] };
+          questState: (q: string) => string;
+        };
+        world.questsDone = new Set([workOrder.id]);
+        world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
+        const offered = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+        const offeredGlyph = offered.npcs.find((n) =>
+          n.quests.some((q) => q.questId === workOrder.id),
+        );
+        expect(offeredGlyph?.kind, `${shape}: offered again`).toBe('repeat');
 
-      world.questState = () => 'unavailable';
-      world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
-      const blocked = buildOverworldMapModel(input(world as unknown as IWorld, 1));
-      const blockedGlyph = blocked.npcs.find((n) =>
-        n.quests.some((q) => q.questId === workOrder.id),
-      );
-      expect(blockedGlyph?.kind, `${shape}: inside the window`).toBe('cooldown');
+        world.questState = () => 'unavailable';
+        world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+        const blocked = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+        const blockedGlyph = blocked.npcs.find((n) =>
+          n.quests.some((q) => q.questId === workOrder.id),
+        );
+        expect(blockedGlyph?.kind, `${shape}: inside the window`).toBe('cooldown');
+      }
+    } finally {
+      delete QUESTS[workOrder.id];
+      delete NPCS[giverId];
     }
   });
 

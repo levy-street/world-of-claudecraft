@@ -10,7 +10,8 @@ describe('tutorial greeting view', () => {
   it('builds the town-bell homecoming note for the harbor guide', () => {
     const note = buildFerryBellHomeNote();
     expect(note.speakerNpcId).toBe('wayfarer_bryn');
-    expect(note.bodyKey).toBe('hudChrome.tutorialGreeting.bellHomeNote');
+    expect(note.bodyKey).toBe('hudChrome.tutorialGreeting.eastbrookGuidanceNote');
+    expect(note.guidanceChoice).toBe(true);
     expect(note.closeKey).toBe('hudChrome.tutorialGreeting.noteClose');
   });
 

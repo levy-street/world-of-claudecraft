@@ -1,12 +1,7 @@
 // @vitest-environment happy-dom
 //
-// The overhead quest marker branch of the nameplate painter, now driven by the
-// shared quest_marker_kind rule (phase 23) on the batched canvas surface: the
-// gold '!'/'?' arms must stay byte-identical to the pre-phase painter, the
-// blue repeat and dimmed cooldown variants join them, and (the
-// nameplate_ai_tag lesson) a LIVE transition from gold to blue must repaint,
-// which holds only while resolveContent recomputes marker and markerTone on
-// every full pass and the throttled-pass context reuse stays bounded.
+// Exercise the real canvas painter: ambient profession offers are hidden,
+// while active/ready hand-ins and combat offers on mixed givers remain visible.
 
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -128,6 +123,7 @@ function expectMarker(
  *  content branch, which the snapshot-reuse arms below depend on. */
 function harness(knobs: {
   state: QuestState;
+  npcId?: string;
   /** true = the work order's id; an array = explicit questsDone ids (so a
    *  NON-repeatable id can sit in the history for the negative arm). */
   done?: boolean | string[];
@@ -140,7 +136,7 @@ function harness(knobs: {
     id: 2,
     kind: 'npc',
     name: 'Master',
-    templateId: WORK_ORDER.giverNpcId,
+    templateId: knobs.npcId ?? WORK_ORDER.giverNpcId,
     questIds: knobs.questIds ?? [WORK_ORDER.id],
   });
   const views = new Map<number, EntityView>();
@@ -185,148 +181,81 @@ function harness(knobs: {
 }
 
 describe('nameplate quest marker variants', () => {
-  it("keeps the gold '!' for a never-completed offer, repeatable or not (Q30's first half)", () => {
-    const { painter } = harness({ state: 'available' });
-    painter.update(true);
-    expectMarker(painter, '!', 'quest');
-
-    // The other half of "repeatable or not": a NON-repeatable quest whose id
-    // IS in questsDone must stay gold at this surface too. The classifier
-    // owns the rule; this arm reddens a plate that branched on
-    // questsDone.has(id) directly instead of asking it.
-    const attuneId = 'q_prof_attune_smith';
-    const plain = harness({ state: 'available', done: [attuneId], questIds: [attuneId] });
-    plain.painter.update(true);
-    expectMarker(plain.painter, '!', 'quest');
-  });
-
-  it("keeps the gold '?' for a ready turn-in and the gray '?' for an active one", () => {
-    const ready = harness({ state: 'ready', done: true });
-    ready.painter.update(true);
-    expectMarker(ready.painter, '?', 'quest');
-
-    const active = harness({ state: 'active' });
-    active.painter.update(true);
-    expectMarker(active.painter, '?', 'active');
-  });
-
-  it("shows the blue '!' once the repeatable has been completed at least once", () => {
-    const { painter } = harness({ state: 'available', done: true });
-    painter.update(true);
-    expectMarker(painter, '!', 'repeat');
-  });
-
-  it("shows the dimmed '!' inside the cadence window, and nothing without the mirror", () => {
-    const blocked = harness({ state: 'unavailable', done: true, cadenceBlocked: true });
-    blocked.painter.update(true);
-    expectMarker(blocked.painter, '!', 'cooldown');
-
-    // An older server payload (no cadenceBlockedQuests) degrades to today's
-    // no-marker plate rather than guessing.
-    const bare = harness({ state: 'unavailable', done: true });
-    bare.painter.update(true);
-    expectMarker(bare.painter, '', 'none');
-  });
-
-  it("folds across an NPC's quests: a ready turn-in beats a completed repeatable", () => {
-    // Acceptance (c) at THIS surface: the per-surface fold (accumulator plus
-    // the break on ready) runs over more than one quest, not just the
-    // classifier unit. The work order's giver also gives the attune quest,
-    // and its ready '?' must win the plate over the repeat-blue offer.
-    // BOTH orders: with the ready quest first, a fold degenerated to
-    // last-value-wins answers 'repeat' (the mutation round proved the
-    // ready-last order alone leaves exactly that mutant green).
-    const attuneId = 'q_prof_attune_smith';
-    for (const questIds of [
-      [attuneId, WORK_ORDER.id],
-      [WORK_ORDER.id, attuneId],
-    ]) {
+  it("hides Jessica's farming offer but keeps accepted and ready hand-ins", () => {
+    for (const state of ['available', 'active', 'ready'] as const) {
       const { painter } = harness({
-        state: 'unavailable',
-        done: true,
-        questIds,
-        questStates: { [WORK_ORDER.id]: 'available', [attuneId]: 'ready' },
+        state,
+        npcId: 'farmer_jessica',
+        questIds: ['q_farm_intro'],
       });
       painter.update(true);
-      expectMarker(painter, '?', 'quest', questIds.join(','));
+      expect(stateOf(painter, 2).title).toBe('<Farming Trainer>');
+      expectMarker(
+        painter,
+        state === 'available' ? '' : '?',
+        state === 'available' ? 'none' : state === 'active' ? 'active' : 'quest',
+      );
     }
   });
 
-  it('renders the gray in-progress state over a cooldown mark: the documented divergence', () => {
-    // The nameplate is the ONE surface that renders 'active', and at its
-    // shared rank the gray '?' beats the dimmed '!' (an in-progress turn-in
-    // here is the more actionable signal). The minimap and map filter
-    // 'active' per quest instead and show the cooldown mark for the same
-    // state; tests/quest_marker_surface_agreement.test.ts pins their side.
-    const attuneId = 'q_prof_attune_smith';
-    const { painter } = harness({
-      state: 'unavailable',
-      done: true,
-      cadenceBlocked: true,
-      questIds: [WORK_ORDER.id, attuneId],
-      questStates: { [attuneId]: 'active' },
-    });
+  it.each([
+    { state: 'available' as const },
+    { state: 'available' as const, done: true },
+    { state: 'unavailable' as const, done: true, cadenceBlocked: true },
+  ])('hides profession offers and cooldowns: %j', (knobs) => {
+    const { painter } = harness(knobs);
     painter.update(true);
-    expectMarker(painter, '?', 'active');
+    expectMarker(painter, '', 'none');
   });
 
-  it('heals a REPLACED questsDone set immediately, even on a throttled pass', () => {
-    // Online, ClientWorld REPLACES the whole Set per qdone snapshot rather
-    // than mutating it in place (the offline shape). The snapshot's identity
-    // re-check must drop the cached context, so a completion flips the plate
-    // on the very next pass, full or throttled: the harness NPC sits inside
-    // NAMEPLATE_URGENT_RANGE, so update(false) reaches the content branch.
+  it("keeps the gold '?' for ready profession hand-ins and gray '?' for active ones", () => {
+    for (const state of ['ready', 'active'] as const) {
+      const { painter } = harness({ state });
+      painter.update(true);
+      expectMarker(painter, '?', state === 'ready' ? 'quest' : 'active');
+    }
+  });
+
+  it('preserves combat offers on mixed givers regardless of quest order', () => {
+    for (const questIds of [
+      ['q_prof_intro', 'q_mine'],
+      ['q_mine', 'q_prof_intro'],
+    ]) {
+      const { painter } = harness({ state: 'available', npcId: 'foreman_odell', questIds });
+      painter.update(true);
+      expectMarker(painter, '!', 'quest');
+    }
+  });
+
+  it('a ready profession hand-in wins over an available combat quest', () => {
+    for (const questIds of [
+      ['q_prof_intro', 'q_mine'],
+      ['q_mine', 'q_prof_intro'],
+    ]) {
+      const { painter } = harness({
+        state: 'available',
+        npcId: 'foreman_odell',
+        questIds,
+        questStates: { q_prof_intro: 'ready' },
+      });
+      painter.update(true);
+      expectMarker(painter, '?', 'quest');
+    }
+  });
+
+  it('repaints a live profession hand-in and hides its next offer', () => {
     const { painter, world } = harness({ state: 'available' });
     painter.update(true);
-    expectMarker(painter, '!', 'quest');
-    (world as unknown as { questsDone: Set<string> }).questsDone = new Set([WORK_ORDER.id]);
-    painter.update(false);
-    expectMarker(painter, '!', 'repeat');
-  });
-
-  it('reuses the snapshot for a cprof-only change until the next full pass: the bounded lag', () => {
-    // A fresh turn-in flips the quest state live, but the cadence mirror
-    // rides the cached snapshot (questsDone identity unchanged), so a
-    // throttled pass blanks the plate for one interval instead of dimming:
-    // the one-interval bound the field comment documents. Deleting the
-    // cache (resolving fresh every pass) would dim here and redden this
-    // arm; the next full pass re-resolves and dims.
-    const { painter, world } = harness({ state: 'available', done: true });
+    expectMarker(painter, '', 'none');
+    const mutable = world as unknown as { questState: () => QuestState; questsDone: Set<string> };
+    mutable.questState = () => 'ready';
     painter.update(true);
-    expectMarker(painter, '!', 'repeat');
-    (world as unknown as { questState: () => string }).questState = () => 'unavailable';
-    (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
-      [WORK_ORDER.id];
+    expectMarker(painter, '?', 'quest');
+    // The online mirror replaces the history set on hand-in. Even a
+    // throttled pass must clear the previously visible completion marker.
+    mutable.questsDone = new Set([WORK_ORDER.id]);
+    mutable.questState = () => 'available';
     painter.update(false);
     expectMarker(painter, '', 'none');
-    painter.update(true);
-    expectMarker(painter, '!', 'cooldown');
-  });
-
-  it('repaints on a LIVE gold-to-blue transition: the marker rides every full pass', () => {
-    // The first completion of a work order happens while its giver's plate
-    // is on screen; resolveContent must recompute marker and markerTone on
-    // every full pass (the ai-tag lesson, applied to this branch), or the
-    // plate keeps the gold '!' until something else changes.
-    const { painter, world } = harness({ state: 'available' });
-    painter.update(true);
-    expectMarker(painter, '!', 'quest');
-    (world as unknown as { questsDone: Set<string> }).questsDone.add(WORK_ORDER.id);
-    painter.update(true);
-    expectMarker(painter, '!', 'repeat');
-
-    // The reverse transitions ride the same recompute (and the per-full-pass
-    // context refresh): a fresh turn-in arms the window (blue to dimmed),
-    // and expiry returns the blue offer.
-    (world as unknown as { questState: () => string }).questState = () => 'unavailable';
-    (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
-      [WORK_ORDER.id];
-    painter.update(true);
-    expectMarker(painter, '!', 'cooldown');
-    (world as unknown as { questState: () => string }).questState = () => 'available';
-    (world.craftingIdentity as unknown as { cadenceBlockedQuests: string[] }).cadenceBlockedQuests =
-      [];
-    painter.update(true);
-    expectMarker(painter, '!', 'repeat');
   });
 });

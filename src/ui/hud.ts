@@ -11986,17 +11986,9 @@ export class Hud {
           break;
         }
         case 'ferryBellHome':
-          // The island bell just set this player down in town: point out the
-          // town's twin bell ONCE per device (the ride may have been a
-          // misclick), the woc.tutorial.v1 presentation-only one-shot idiom.
-          try {
-            if (localStorage.getItem('woc.ferrybellhint.v1') !== 'seen') {
-              localStorage.setItem('woc.ferrybellhint.v1', 'seen');
-              this.openTutorialGreetingNote(buildFerryBellHomeNote());
-            }
-          } catch {
-            /* private mode: skip the hint rather than throw */
-          }
+          // Every crossing offers the choice, including existing characters
+          // and browsers that cannot persist settings.
+          this.openTutorialGreetingNote(buildFerryBellHomeNote());
           break;
         case 'ferryIslandArrival':
           // Landing on the Proving Shore with the rail not yet started:
@@ -13815,16 +13807,15 @@ export class Hud {
   }
 
   // The #tutorial-greeting note dialog (the town bell homecoming, Ferryman
-  // Odo's island welcome): one speaker, one closing affordance, trapped and
-  // floored above the mobile sheet so a one-shot never opens buried. It is
-  // the only thing that mints this shell now, and the managed-close registry
-  // covers it unchanged: the two-choice greeting it grew out of went with the
-  // tutorialGreeting event at the Phase 18 dead-union sweep.
+  // Odo's island welcome): one speaker, with a guidance choice on homecoming.
+  // Keep focus trapped and the shell above the mobile sheet; both choice
+  // buttons and the managed-close registry use the same cleanup path.
   private openTutorialGreetingNote(note: TutorialGreetingNote): void {
     this.tutorialGreetingTrap?.release(false);
     this.tutorialGreetingTrap = null;
     const el = renderTutorialGreetingNote(note, {
       onClose: () => this.closeTutorialGreeting(),
+      onGuidanceChoice: (enabled) => this.optionsHooks?.settings.set('eastbrookGuidance', enabled),
     });
     this.bringWindowToFront(el);
     el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));

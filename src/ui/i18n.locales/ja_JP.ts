@@ -6861,7 +6861,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'クラスと見た目を選び、ヒーローに名前を付けてワールドへ。キャラクターは後からでも追加できます。',
   'guide.howToPlay.step2Title': '最初のクエストを見つける',
   'guide.howToPlay.step2Body':
-    '開始の街では、レッドブルック隊長が「門前の狼」を持って待っており、近くのオデル親方にも仕事があります。どちらかに話しかけて、最初のクエストを受注しましょう。',
+    '開始の街では、レッドブルック隊長が「戸口の狼」を持って待っており、近くのオデル親方にも仕事があります。どちらかに話しかけて、最初のクエストを受注しましょう。',
   'guide.howToPlay.step3Title': '移動して見回す',
   'guide.howToPlay.step3Body':
     'W、A、S、Dで移動します。右マウスボタンを押したままドラッグすると見回せます。基本はこれだけです。',
@@ -7173,7 +7173,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'クエストはこの世界の中心であり、最も早くレベルを上げる手段です。その仕組みを紹介します。',
   'guide.questsPage.acceptTitle': '探し方と受注',
   'guide.questsPage.acceptBody':
-    '頭上に印のある人は、あなたに仕事があります。印はその種類も教えてくれます。金の感嘆符は今すぐ受けられるクエスト、金の疑問符は完了して納品できるクエストを表します。ネームプレートには灰色の疑問符も現れます。そのクエストを受けてはいるが、まだ終わっていないという意味です。繰り返しの仕事は同じ印を青で使います。明るい青の感嘆符は前にやったことがあり再び受けられる依頼で、同じ印がくすんでいれば、まだ待ち時間の中にあるものです。灰色以外のすべての印はネームプレート、ミニマップ、ワールドマップに表示されるので、町の向こう側からでも仕事を見つけられます。イーストブルックでは、レッドブルック元帥が「門前の狼」を携えて待っています。最初に受けられるクエストの一つです。',
+    '頭上に印のある人は、あなたに仕事があります。印はその種類も教えてくれます。金の感嘆符は今すぐ受けられるクエスト、金の疑問符は完了して納品できるクエストを表します。ネームプレートには灰色の疑問符も現れます。そのクエストを受けてはいるが、まだ終わっていないという意味です。繰り返しの仕事は同じ印を青で使います。明るい青の感嘆符は前にやったことがあり再び受けられる依頼で、同じ印がくすんでいれば、まだ待ち時間の中にあるものです。灰色以外のすべての印はネームプレート、ミニマップ、ワールドマップに表示されるので、町の向こう側からでも仕事を見つけられます。イーストブルックでは、レッドブルック元帥が「戸口の狼」を携えて待っています。最初に受けられるクエストの一つです。',
   'guide.questsPage.objectivesTitle': '目標',
   'guide.questsPage.objectivesBody':
     '特定の敵を倒したり、アイテムを集めたり、世界の何かと対話したり。画面上のトラッカーが、進行に合わせて進捗を数えてくれます。気が変わったら、クエストログからクエストを破棄し、後でその発注者から再び受けることができます。',
@@ -15757,6 +15757,22 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '重大',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '要確認',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'イーストブルックへようこそ！町の広場でレッドブルック元帥が仕事を用意しています。金色のガイドをオンにして彼を見つけ、「戸口の狼」を進めることも、自分で探索することもできます。この設定は後からオプションのインターフェース、戦闘で変更できます。',
+  'hudChrome.tutorialGreeting.guidanceOn': 'ガイドをオンにする',
+  'hudChrome.tutorialGreeting.guidanceOff': 'ガイドをオフにする',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'イーストブルックの金色ガイド',
+  'hudChrome.professionTrainers.blacksmithing': '鍛冶のトレーナー',
+  'hudChrome.professionTrainers.cooking': '料理のトレーナー',
+  'hudChrome.professionTrainers.tailoring': '裁縫のトレーナー',
+  'hudChrome.professionTrainers.engineering': '工学のトレーナー',
+  'hudChrome.professionTrainers.leatherworking': '革細工のトレーナー',
+  'hudChrome.professionTrainers.alchemy': '錬金術のトレーナー',
+  'hudChrome.professionTrainers.farming': '農業のトレーナー',
+  'hudChrome.professionTrainers.mining': '採鉱のトレーナー',
+  'hudChrome.professionTrainers.hobby': '趣味のトレーナー',
+  'hudChrome.tutorialGreeting.eastbrookArrivalNote':
+    'イーストブルックへようこそ！レッドブルック元帥がすぐ目の前にいます。谷での仕事について彼に話しかけてみましょう。修練の浜へ戻りたいときは、町のレイヴンポストの郵便箱のそばにある渡しの鐘を鳴らしてください。',
   'hudChrome.tutorialGreeting.bellHomeNote':
     'もう浜から戻ったのかい？さっき鳴らしたのが渡しの鐘だよ。その双子がすぐそこ、レイヴンポストの郵便柱のそばに掛かっている。いつでも鳴らせば、渡しが修練の浜へ運び直してくれる。間違って鳴らしたのなら、それはそれで構わないさ。',
   'hudChrome.tutorialGreeting.islandArrivalNote':

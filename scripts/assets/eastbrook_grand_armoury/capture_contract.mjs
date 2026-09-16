@@ -355,17 +355,13 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
     camera: Object.freeze({ x: -14.5, y: 6, z: -109 }),
     target: Object.freeze({ x: -18.017695018376127, y: 2.5, z: -106.73703645219788 }),
   }),
-  // Re-aimed for owner refinement round 6b: the town's NPCs were redistributed
-  // by role along the dock road and Lin moved from the civic green to the
-  // quayside home at (-72, -96). The view is re-seated, never retired: same
-  // name, same subject, target back on her authored stand and the camera 7 yd
-  // out along her derived facing (toward the civic centre), probed
-  // collision-clear at camera height.
+  // The live portrait follows Lin to the civic square. Historical
+  // captures retain their original camera records and frozen source identity.
   Object.freeze({
     name: 'apothecary-lin',
     subject: 'apothecary_lin',
-    camera: Object.freeze({ x: -65, y: 6, z: -96 }),
-    target: Object.freeze({ x: -72, y: 2.5, z: -96 }),
+    camera: Object.freeze({ x: -12, y: 6, z: -94 }),
+    target: Object.freeze({ x: -11, y: 2.5, z: -89 }),
   }),
   Object.freeze({
     name: 'ravenpost-mailbox',

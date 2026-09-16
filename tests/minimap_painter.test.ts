@@ -9,11 +9,11 @@
 // cadence + the '#zone-label' setText preserved from the inline site.
 
 import { readFileSync } from 'node:fs';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BG_HALF_X, BG_HALF_Z, bgFieldPlanWalls } from '../src/sim/battleground_layout';
-import { battlegroundOrigin, GATHER_NODES, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
+import { battlegroundOrigin, GATHER_NODES, NPCS, QUESTS, YUMI_BAND_X_MIN } from '../src/sim/data';
 import { TH_GRAVEYARDS } from '../src/sim/thornhollow_field.generated';
-import { EASTBROOK_NOTICEBOARD_TEMPLATE_ID, isQuestTurnInNpc } from '../src/sim/types';
+import { EASTBROOK_NOTICEBOARD_TEMPLATE_ID } from '../src/sim/types';
 import {
   BG_SURFACE_GRASS,
   BG_SURFACE_GRAVE,
@@ -321,16 +321,9 @@ interface GlyphTrace {
 
 const NPC_QUEST_TOKEN = '--color-minimap-npc-quest';
 const MINIMAP_OUTLINE_TOKEN = '--color-minimap-outline';
-// A real quest whose giver is also its turn-in npc, so one npc template carries both
-// the 'available' ('!') and 'ready' ('?') branches against real content.
-function requireReadyQuest() {
-  const quest = Object.values(QUESTS).find(
-    (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
-  );
-  if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
-  return quest;
-}
-const READY_QUEST = requireReadyQuest();
+// Explicit combat content exercises available and ready glyphs independently
+// of ambient profession-offer visibility and content-table insertion order.
+const READY_QUEST = QUESTS.q_wolves;
 
 function makeFakeSprite(trace: GlyphTrace): FakeSprite {
   const ink: SpriteInk[] = [];
@@ -602,16 +595,19 @@ function drawSymbols(
 // The player sits at an overworld position with no gather node or station in the rim.
 const PLAYER_POS = { x: 0, z: 100 };
 
-// A real cadenced work order drives the repeat/cooldown marker variants.
-function requireWorkOrderQuest() {
-  const quest = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
-  if (!quest) throw new Error('expected a cadenced work order');
-  return quest;
-}
-const WORK_ORDER_QUEST = requireWorkOrderQuest();
+// A synthetic non-profession repeatable exercises generic cadence art while
+// profession offers are intentionally hidden. Registered only for its describe.
+const WORK_ORDER_QUEST = {
+  ...QUESTS.q_wolves,
+  id: 'q_test_minimap_repeat',
+  giverNpcId: 'test_minimap_repeat_giver',
+  turnInNpcId: 'test_minimap_repeat_giver',
+  repeatable: true,
+  repeatCadenceTicks: 1200,
+};
 
 /** `npcs` are world positions; `state` drives which glyph and marker variant
- *  each quest-giver resolves to (repeat/cooldown ride the real work order
+ *  each quest-giver resolves to (repeat/cooldown ride the synthetic combat repeatable
  *  with the questsDone/cadence inputs the classifier reads). */
 function glyphWorld(
   npcs: Array<{ x: number; z: number; quest: boolean }>,
@@ -1754,6 +1750,20 @@ describe('minimap_painter: painted stable marker sprites', () => {
 });
 
 describe('minimap_painter: generated quest art', () => {
+  beforeEach(() => {
+    QUESTS[WORK_ORDER_QUEST.id] = { ...WORK_ORDER_QUEST };
+    NPCS[WORK_ORDER_QUEST.giverNpcId] = {
+      ...NPCS.marshal_redbrook,
+      id: WORK_ORDER_QUEST.giverNpcId,
+      questIds: [WORK_ORDER_QUEST.id],
+    };
+  });
+
+  afterEach(() => {
+    delete QUESTS[WORK_ORDER_QUEST.id];
+    delete NPCS[WORK_ORDER_QUEST.giverNpcId];
+  });
+
   it.each([
     { state: 'available', id: 'quest-available', size: 'minimapQuest' },
     { state: 'ready', id: 'quest-ready', size: 'minimapQuest' },

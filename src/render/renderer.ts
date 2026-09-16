@@ -405,7 +405,7 @@ import {
   type FogSceneState,
   isOpenAirFogState,
 } from './interior_light_rig';
-import { IslandGuidance } from './island_guidance';
+import { IslandGuidance, type QuestGuidanceOptions } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { legendaryRegaliaActive, legendaryRegaliaEmitDt } from './legendary_regalia_core';
@@ -1250,7 +1250,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
 
-export interface RendererCreateOptions extends QuestObjectGateOptions {
+export interface RendererCreateOptions extends QuestObjectGateOptions, QuestGuidanceOptions {
   context?: WebGL2RenderingContext;
   initializeGfx?: boolean;
   /** Build the far-vista grid eagerly during construction (macrotask bites,
@@ -3146,7 +3146,7 @@ export class Renderer {
     // Riding-lesson start platform: the glowing square behind the start arch.
     this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
     // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t));
+    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t), options.isQuestTracked, options.isEastbrookGuidanceEnabled);
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);

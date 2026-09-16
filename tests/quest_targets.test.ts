@@ -4,7 +4,7 @@
 // real content tables (QUESTS/CAMPS/MOBS/GROUND_OBJECTS) so the fixtures can
 // never drift from shipped content.
 
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import {
   CAMPS,
@@ -26,6 +26,7 @@ import {
   questObjectiveAreas,
   questObjectivesForMob,
 } from '../src/sim/quest_targets';
+import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { isQuestTurnInNpc, type QuestDef, type QuestProgress } from '../src/sim/types';
 
 function activeLog(quest: QuestDef, counts?: number[]): Map<string, QuestProgress> {
@@ -743,7 +744,7 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
   });
 
   it('returns fresh positions, never aliasing the shared NPCS content', () => {
-    const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+    const quest = Object.values(QUESTS).find((q) => q.giverNpcId && !isProfessionQuest(q));
     if (!quest) throw new Error('expected a quest with a giverNpcId');
     const giver = NPCS[quest.giverNpcId as string];
     const marker = questGiverNpcMarkers(
@@ -757,7 +758,7 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
   });
 
   it("resolves a real giver's static position for an available quest ('!' glyph)", () => {
-    const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+    const quest = Object.values(QUESTS).find((q) => q.giverNpcId && !isProfessionQuest(q));
     if (!quest) throw new Error('expected a quest with a giverNpcId');
     const giver = NPCS[quest.giverNpcId as string];
     const markers = questGiverNpcMarkers(
@@ -784,113 +785,131 @@ describe('questGiverNpcMarkers (the world-map quest-giver glyphs, resolved from 
     expect(marker?.kind).toBe('ready');
   });
 
-  it('classifies a completed repeatable as the blue repeat variant, and only then', () => {
-    // A real repeatable work order: available again with the id in
-    // questsDone is the settled Q30 rule for the blue "!", while the same
-    // offer WITHOUT history keeps the first-offer gold (the negative arm).
-    const quest = Object.values(QUESTS).find((q) => q.repeatable && q.giverNpcId);
-    if (!quest) throw new Error('expected a repeatable quest with a giver');
-    const giver = NPCS[quest.giverNpcId as string];
-    const state = (q: string) =>
-      q === quest.id ? ('available' as const) : ('unavailable' as const);
-    const fresh = questGiverNpcMarkers(state, NO_HISTORY).find(
-      (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
-    );
-    expect(fresh?.kind).toBe('available');
-    const done = questGiverNpcMarkers(state, new Set([quest.id])).find(
-      (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
-    );
-    expect(done?.kind).toBe('repeat');
-    expect(done?.quests).toContainEqual({ questId: quest.id, kind: 'repeat' });
-  });
+  describe('generic non-profession offer ordering', () => {
+    const fixtures = [
+      ['q_test_marker_plain', 'q_prof_attune_smith'],
+      ['q_test_marker_repeat', 'q_prof_amends_smith'],
+      ['q_test_marker_workorder', 'q_prof_workorder_forge'],
+    ] as const;
+    const giver = NPCS.forgemistress_darva;
+    const originalQuestIds = giver.questIds;
+    beforeEach(() => {
+      for (const [id, source] of fixtures) QUESTS[id] = { ...QUESTS[source], id };
+      giver.questIds = [...originalQuestIds, ...fixtures.map(([id]) => id)];
+    });
+    afterEach(() => {
+      for (const [id] of fixtures) delete QUESTS[id];
+      giver.questIds = originalQuestIds;
+    });
 
-  it('surfaces a cadence-blocked work order as the dimmed cooldown marker, from the set only', () => {
-    // Today the giver shows nothing inside the 30-minute window; with the
-    // blocked set the marker resolves cooldown, and WITHOUT the set the same
-    // unavailable state stays markerless (an older server payload degrades
-    // to the pre-phase map rather than guessing).
-    const quest = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
-    if (!quest) throw new Error('expected a cadenced work order');
-    const giver = NPCS[quest.giverNpcId as string];
-    const state = () => 'unavailable' as const;
-    const blocked = questGiverNpcMarkers(state, new Set([quest.id]), new Set([quest.id])).find(
-      (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
-    );
-    expect(blocked?.kind).toBe('cooldown');
-    expect(blocked?.quests).toContainEqual({ questId: quest.id, kind: 'cooldown' });
-    expect(
-      questGiverNpcMarkers(state, new Set([quest.id])).find(
+    it('classifies a completed repeatable as the blue repeat variant, and only then', () => {
+      // A synthetic non-profession repeatable: available again with the id in
+      // questsDone is the settled Q30 rule for the blue "!", while the same
+      // offer WITHOUT history keeps the first-offer gold (the negative arm).
+      const quest = QUESTS.q_test_marker_workorder;
+      if (!quest) throw new Error('expected a repeatable quest with a giver');
+      const giver = NPCS[quest.giverNpcId as string];
+      const state = (q: string) =>
+        q === quest.id ? ('available' as const) : ('unavailable' as const);
+      const fresh = questGiverNpcMarkers(state, NO_HISTORY).find(
         (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
-      ),
-    ).toBeUndefined();
-  });
+      );
+      expect(fresh?.kind).toBe('available');
+      const done = questGiverNpcMarkers(state, new Set([quest.id])).find(
+        (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+      );
+      expect(done?.kind).toBe('repeat');
+      expect(done?.quests).toContainEqual({ questId: quest.id, kind: 'repeat' });
+    });
 
-  it("lists a marker's quests strongest kind first, across the whole fold order", () => {
-    // The profession masters hold the full real mix on one NPC: a plain
-    // attunement quest, a repeatable amends return, and a cadenced work
-    // order (forgemistress_darva's three, giver and turn-in alike). Two
-    // arms pin every adjacent pair of the ready > available > repeat >
-    // cooldown listing order, so a reorder of any two neighbors reddens.
-    const ATTUNE = 'q_prof_attune_smith';
-    const AMENDS = 'q_prof_amends_smith';
-    const WORK_ORDER = 'q_prof_workorder_forge';
-    const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
-    const at = (m: { pos: { x: number; z: number } }) =>
-      m.pos.x === giver.pos.x && m.pos.z === giver.pos.z;
+    it('surfaces a cadence-blocked work order as the dimmed cooldown marker, from the set only', () => {
+      // Today the giver shows nothing inside the 30-minute window; with the
+      // blocked set the marker resolves cooldown, and WITHOUT the set the same
+      // unavailable state stays markerless (an older server payload degrades
+      // to the pre-phase map rather than guessing).
+      const quest = QUESTS.q_test_marker_workorder;
+      if (!quest) throw new Error('expected a cadenced work order');
+      const giver = NPCS[quest.giverNpcId as string];
+      const state = () => 'unavailable' as const;
+      const blocked = questGiverNpcMarkers(state, new Set([quest.id]), new Set([quest.id])).find(
+        (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+      );
+      expect(blocked?.kind).toBe('cooldown');
+      expect(blocked?.quests).toContainEqual({ questId: quest.id, kind: 'cooldown' });
+      expect(
+        questGiverNpcMarkers(state, new Set([quest.id])).find(
+          (m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z,
+        ),
+      ).toBeUndefined();
+    });
 
-    // Arm A: ready + available + repeat (the amends fresh, the work order
-    // completed and offered again).
-    const armA = questGiverNpcMarkers(
-      (q) =>
-        q === ATTUNE ? 'ready' : q === AMENDS || q === WORK_ORDER ? 'available' : 'unavailable',
-      new Set([WORK_ORDER]),
-    ).find(at);
-    expect(armA?.kind).toBe('ready');
-    expect(armA?.quests.map((q) => q.kind)).toEqual(['ready', 'available', 'repeat']);
+    it("lists a marker's quests strongest kind first, across the whole fold order", () => {
+      // Synthetic non-profession offers hold the full mix on one NPC: a plain
+      // attunement quest, a repeatable amends return, and a cadenced work
+      // order (forgemistress_darva's three, giver and turn-in alike). Two
+      // arms pin every adjacent pair of the ready > available > repeat >
+      // cooldown listing order, so a reorder of any two neighbors reddens.
+      const ATTUNE = 'q_test_marker_plain';
+      const AMENDS = 'q_test_marker_repeat';
+      const WORK_ORDER = 'q_test_marker_workorder';
+      const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
+      const at = (m: { pos: { x: number; z: number } }) =>
+        m.pos.x === giver.pos.x && m.pos.z === giver.pos.z;
 
-    // Arm B: ready + repeat + cooldown (the amends completed and offered
-    // again, the work order inside its window).
-    const armB = questGiverNpcMarkers(
-      (q) => (q === ATTUNE ? 'ready' : q === AMENDS ? 'available' : 'unavailable'),
-      new Set([AMENDS, WORK_ORDER]),
-      new Set([WORK_ORDER]),
-    ).find(at);
-    expect(armB?.kind).toBe('ready');
-    expect(armB?.quests.map((q) => q.kind)).toEqual(['ready', 'repeat', 'cooldown']);
-  });
+      // Arm A: ready + available + repeat (the amends fresh, the work order
+      // completed and offered again).
+      const armA = questGiverNpcMarkers(
+        (q) =>
+          q === ATTUNE ? 'ready' : q === AMENDS || q === WORK_ORDER ? 'available' : 'unavailable',
+        new Set([WORK_ORDER]),
+      ).find(at);
+      expect(armA?.kind).toBe('ready');
+      expect(armA?.quests.map((q) => q.kind)).toEqual(['ready', 'available', 'repeat']);
 
-  it('sorts the listing even when the strongest kind arrives LAST in content order', () => {
-    // Both arms above happen to classify in already-sorted content order, so
-    // deleting the sort (or the glyph reading quests[0]) would leave them
-    // green. Here the work order, LAST in the giver's questIds, is the ready
-    // turn-in while the attune quest is merely available: the sort must lift
-    // it to the front and the glyph must take its kind.
-    const ATTUNE = 'q_prof_attune_smith';
-    const WORK_ORDER = 'q_prof_workorder_forge';
-    const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
-    const marker = questGiverNpcMarkers(
-      (q) => (q === ATTUNE ? 'available' : q === WORK_ORDER ? 'ready' : 'unavailable'),
-      NO_HISTORY,
-    ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
-    expect(marker?.kind).toBe('ready');
-    expect(marker?.quests.map((q) => q.questId)).toEqual([WORK_ORDER, ATTUNE]);
-    expect(marker?.quests.map((q) => q.kind)).toEqual(['ready', 'available']);
-  });
+      // Arm B: ready + repeat + cooldown (the amends completed and offered
+      // again, the work order inside its window).
+      const armB = questGiverNpcMarkers(
+        (q) => (q === ATTUNE ? 'ready' : q === AMENDS ? 'available' : 'unavailable'),
+        new Set([AMENDS, WORK_ORDER]),
+        new Set([WORK_ORDER]),
+      ).find(at);
+      expect(armB?.kind).toBe('ready');
+      expect(armB?.quests.map((q) => q.kind)).toEqual(['ready', 'repeat', 'cooldown']);
+    });
 
-  it('keeps questIds order WITHIN a kind: the stable half of the sort contract', () => {
-    // The amends return and the work order both classify 'repeat'; the
-    // giver's content order lists amends first, and the stable sort must
-    // keep it there for the tooltip rows.
-    const AMENDS = 'q_prof_amends_smith';
-    const WORK_ORDER = 'q_prof_workorder_forge';
-    const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
-    const marker = questGiverNpcMarkers(
-      (q) => (q === AMENDS || q === WORK_ORDER ? 'available' : 'unavailable'),
-      new Set([AMENDS, WORK_ORDER]),
-    ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
-    expect(marker?.kind).toBe('repeat');
-    expect(marker?.quests.map((q) => q.questId)).toEqual([AMENDS, WORK_ORDER]);
-    expect(marker?.quests.map((q) => q.kind)).toEqual(['repeat', 'repeat']);
+    it('sorts the listing even when the strongest kind arrives LAST in content order', () => {
+      // Both arms above happen to classify in already-sorted content order, so
+      // deleting the sort (or the glyph reading quests[0]) would leave them
+      // green. Here the work order, LAST in the giver's questIds, is the ready
+      // turn-in while the attune quest is merely available: the sort must lift
+      // it to the front and the glyph must take its kind.
+      const ATTUNE = 'q_test_marker_plain';
+      const WORK_ORDER = 'q_test_marker_workorder';
+      const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
+      const marker = questGiverNpcMarkers(
+        (q) => (q === ATTUNE ? 'available' : q === WORK_ORDER ? 'ready' : 'unavailable'),
+        NO_HISTORY,
+      ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+      expect(marker?.kind).toBe('ready');
+      expect(marker?.quests.map((q) => q.questId)).toEqual([WORK_ORDER, ATTUNE]);
+      expect(marker?.quests.map((q) => q.kind)).toEqual(['ready', 'available']);
+    });
+
+    it('keeps questIds order WITHIN a kind: the stable half of the sort contract', () => {
+      // The amends return and the work order both classify 'repeat'; the
+      // giver's content order lists amends first, and the stable sort must
+      // keep it there for the tooltip rows.
+      const AMENDS = 'q_test_marker_repeat';
+      const WORK_ORDER = 'q_test_marker_workorder';
+      const giver = NPCS[QUESTS[WORK_ORDER].giverNpcId];
+      const marker = questGiverNpcMarkers(
+        (q) => (q === AMENDS || q === WORK_ORDER ? 'available' : 'unavailable'),
+        new Set([AMENDS, WORK_ORDER]),
+      ).find((m) => m.pos.x === giver.pos.x && m.pos.z === giver.pos.z);
+      expect(marker?.kind).toBe('repeat');
+      expect(marker?.quests.map((q) => q.questId)).toEqual([AMENDS, WORK_ORDER]);
+      expect(marker?.quests.map((q) => q.kind)).toEqual(['repeat', 'repeat']);
+    });
   });
 
   it('skips a dynamic NPC (spawned on demand by its owning system) even when it lists a matching turn-in quest', () => {

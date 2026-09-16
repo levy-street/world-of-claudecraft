@@ -181,7 +181,7 @@ describe('reveal gate wiring (source pins)', () => {
     const main = stripComments(readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8'));
     const rebuild = main.slice(
       anchor(main, 'prewarmRenderer: async (next) => {'),
-      anchor(main, 'validateRenderer: (next) => {'),
+      anchor(main, 'validateRenderer: validateGameRenderer,'),
     );
     expect(rebuild).toContain('await next.prewarmInitialScene();');
 

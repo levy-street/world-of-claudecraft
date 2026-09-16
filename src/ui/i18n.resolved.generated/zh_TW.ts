@@ -326,6 +326,18 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "鍛造訓練師",
+      "cooking": "烹飪訓練師",
+      "tailoring": "裁縫訓練師",
+      "engineering": "工程學訓練師",
+      "leatherworking": "製皮訓練師",
+      "alchemy": "鍊金術訓練師",
+      "farming": "耕作訓練師",
+      "mining": "採礦訓練師",
+      "hobby": "嗜好訓練師",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
     "warlock": {
       "doomLabel": "譴罪",
@@ -1042,7 +1054,12 @@ export const zh_TW: EnTranslations = {
       "clearArmed": "點擊一個欄位即可清除。"
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "歡迎來到東溪鎮！雷德布魯克元帥在城鎮廣場有工作交給你。開啟金色引導，找到他並完成「門前群狼」，也可以自行探索。你可以稍後在選項、介面、戰鬥中更改此設定。",
+      "guidanceOn": "開啟引導",
+      "guidanceOff": "關閉引導",
+      "guidanceSetting": "東溪金色引導",
       "bellHomeNote": "這麼快就從海濱回來了？你剛才敲響的正是渡船鈴。它的孿生兄弟就掛在那邊鴉郵信箱旁：想回試煉之濱，隨時敲響它，渡航就會送你過去。敲錯了也不打緊。",
+      "eastbrookArrivalNote": "歡迎來到東溪鎮！雷德布魯克元帥就在你正前方。和他交談，看看谷地裡有什麼工作。想重返試煉之濱，就敲響鎮上鴉郵信箱旁的渡船鈴。",
       "islandArrivalNote": "剛下渡船嗎？歡迎來到試煉之濱。看守塔姆就在你正前方的海灘上守著試煉跑道：走到他跟前，直到他的名字顯示出來，然後按 F，或用滑鼠左鍵點擊他，他的跑道會把你雙腿該會的都教給你。等你準備離開時，敲響立在我碼頭旁的那口鈴，渡航就會送你回東溪鎮。",
       "noteClose": "明白了"
     },

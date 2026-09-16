@@ -89,6 +89,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
+import { createGameRenderer, validateGameRenderer } from './game/game_renderer';
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
@@ -362,7 +363,7 @@ import {
 } from './render/gfx';
 import { setNameplateDotScale } from './render/nameplate_dot_scale';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
-import { Renderer } from './render/renderer';
+import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
 import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
@@ -1456,12 +1457,12 @@ async function startGame(
         ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
         : npcLookFor(e.templateId, e.kind),
     );
-    // No helmet re-assert here on purpose. The preference is per CHARACTER
-    // now: set from the creator's toggle at creation, changed by the paperdoll
-    // eye afterwards, and serialized into that character's own saved state.
-    // The device-global localStorage key this used to read forced ONE
-    // character's choice onto every character on the machine.
-    renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
+    // Helmet visibility belongs to each character's saved state: creator
+    // toggle first, then paperdoll eye. Do not re-assert the old device-wide
+    // preference here and overwrite the current character's choice.
+    renderer = loadSpan('renderer-ctor', () =>
+      createGameRenderer(world, canvas, nameplates, settings),
+    );
     rendererReady = true;
     ktx2RestoreUploadQueue.publish({ queue: renderer.backgroundGpuWork, host: renderer.webgl });
     publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
@@ -2860,7 +2861,7 @@ async function startGame(
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
     buildRenderer: (_target, recycled) => {
-      const next = new Renderer(world, recycled.canvas, nameplates, {
+      const next = createGameRenderer(world, recycled.canvas, nameplates, settings, {
         context: recycled.context,
         initializeGfx: false,
       });
@@ -2884,12 +2885,7 @@ async function startGame(
       await next.farVistaReady();
       await ktx2MipsRestored();
     },
-    validateRenderer: (next) => {
-      next.sync(1, 0, null, 0, null);
-      if (next.webgl.getContext().isContextLost()) {
-        throw new Error('WebGL2 context was lost while validating the rebuilt renderer');
-      }
-    },
+    validateRenderer: validateGameRenderer,
     commit: (next, target) => {
       settings.patch(target);
       configureRebuiltRenderer(next);

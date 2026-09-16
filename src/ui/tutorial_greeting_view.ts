@@ -13,13 +13,15 @@ export interface TutorialGreetingNote {
   speakerNpcId: string;
   bodyKey: TranslationKey;
   closeKey: TranslationKey;
+  guidanceChoice?: boolean;
 }
 
 export function buildFerryBellHomeNote(): TutorialGreetingNote {
   return {
     speakerNpcId: TUTORIAL_GREETER_NPC_ID,
-    bodyKey: 'hudChrome.tutorialGreeting.bellHomeNote',
+    bodyKey: 'hudChrome.tutorialGreeting.eastbrookGuidanceNote',
     closeKey: 'hudChrome.tutorialGreeting.noteClose',
+    guidanceChoice: true,
   };
 }
 

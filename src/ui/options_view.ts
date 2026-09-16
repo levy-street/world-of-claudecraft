@@ -925,6 +925,7 @@ export function buildInterfaceControls(
       boolToggle(s, 'filterProfanity', 'hud.options.filterProfanity'),
     ]),
     ...tag('combat', [
+      boolToggle(s, 'eastbrookGuidance', 'hudChrome.tutorialGreeting.guidanceSetting'),
       boolToggle(s, 'startAttackOnAbilityUse', 'hudChrome.options.startAttackOnAbility'),
       boolToggle(
         s,

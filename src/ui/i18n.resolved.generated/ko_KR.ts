@@ -326,6 +326,18 @@ export const ko_KR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "대장기술 전문가",
+      "cooking": "요리 전문가",
+      "tailoring": "재봉술 전문가",
+      "engineering": "기계공학 전문가",
+      "leatherworking": "가죽세공 전문가",
+      "alchemy": "연금술 전문가",
+      "farming": "농사 전문가",
+      "mining": "채광 전문가",
+      "hobby": "취미 전문가",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
     "warlock": {
       "doomLabel": "단죄",
@@ -1042,7 +1054,12 @@ export const ko_KR: EnTranslations = {
       "clearArmed": "슬롯을 탭하면 비워집니다."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "이스트브룩에 오신 것을 환영합니다! 마을 광장의 레드브룩 원수가 일을 맡기려고 기다립니다. 황금빛 안내를 켜고 원수를 찾아가 문 앞의 늑대들 퀘스트를 진행하거나 자유롭게 탐험하세요. 나중에 옵션의 인터페이스, 전투에서 설정을 바꿀 수 있습니다.",
+      "guidanceOn": "안내 켜기",
+      "guidanceOff": "안내 끄기",
+      "guidanceSetting": "이스트브룩 황금빛 안내",
       "bellHomeNote": "벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.",
+      "eastbrookArrivalNote": "이스트브룩에 오신 것을 환영합니다! 레드브룩 원수가 바로 앞에 있습니다. 말을 걸어 계곡에서 할 일을 알아보세요. 수련의 해안으로 돌아가려면 마을의 레이븐포스트 우편함 옆에 있는 나룻배 종을 울리세요.",
       "islandArrivalNote": "방금 건너오셨나요? 수련의 해안에 온 것을 환영합니다. 바로 앞 바닷가에서 워든 탐이 건틀릿을 지키고 있어요. 이름이 보일 때까지 바짝 다가가 F를 누르거나 왼쪽 클릭하면, 그의 길이 몸 쓰는 법을 전부 가르쳐 줄 겁니다. 그리고 떠날 준비가 되면 제 부두 옆에 선 종을 울리세요. 건너기가 이스트브룩의 집으로 데려다줄 겁니다.",
       "noteClose": "알겠어요"
     },

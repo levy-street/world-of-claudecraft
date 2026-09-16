@@ -697,6 +697,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
+  'src/render/eastbrook_wolves_guidance_core.ts',
   'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',

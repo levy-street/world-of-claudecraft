@@ -801,6 +801,7 @@ const FRAMES_KEYS = [
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
+  'eastbrookGuidance',
   'startAttackOnAbilityUse',
   'stopAutoAttackOnTargetSwitch',
   'showAttackButton',

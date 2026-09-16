@@ -239,6 +239,8 @@ export const SETTING_RANGES = {
 } as const;
 
 export const BOOL_SETTINGS = {
+  // Optional mainland directions, independent of quest tracking and graphics quality.
+  eastbrookGuidance: { def: true },
   // Icon flow of the standalone buff/debuff rows (the Frames Settings menu in
   // edit mode). Off = the stock right-to-left growth (the rows anchor beside
   // the minimap and fill toward the screen centre); on = left to right, via

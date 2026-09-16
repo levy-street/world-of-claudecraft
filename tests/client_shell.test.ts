@@ -409,7 +409,7 @@ describe('client HTML shell', () => {
     const build = mainTs.slice(buildAt, prepareAt);
     expect(buildAt).toBeGreaterThan(-1);
     expect(prepareAt).toBeGreaterThan(buildAt);
-    expect(build).toContain('new Renderer(world, recycled.canvas, nameplates, {');
+    expect(build).toContain('createGameRenderer(world, recycled.canvas, nameplates, settings, {');
     expect(mainTs).toContain('online?.neutralizeInputForClientPause();');
   });
 

@@ -7563,6 +7563,34 @@
     justify-content: flex-end;
     margin-top: 4px;
   }
+  #tutorial-greeting .cd-actions {
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  #tutorial-greeting .cd-actions .btn {
+    min-height: 44px;
+  }
+  /* Guidance is a paired choice: shared forged-gold and dark button primitives,
+     with balanced columns that naturally stack on narrow viewports. */
+  #tutorial-greeting.guidance-choice {
+    width: 480px;
+    --window-pad: var(--spacing-lg);
+  }
+  #tutorial-greeting.guidance-choice .cd-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+  }
+  #tutorial-greeting.guidance-choice .ui-btn {
+    width: 100%;
+    min-width: 0;
+    height: auto;
+    min-height: 44px;
+    padding: var(--spacing-sm) var(--spacing-md);
+    white-space: normal;
+    line-height: 1.4;
+  }
 
   /* ---------- train window ---------- */
   /* Recipe training: the station master's teaching ladder. Rows keep the

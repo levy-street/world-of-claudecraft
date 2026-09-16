@@ -15716,6 +15716,22 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '심각',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '주의 필요',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    '이스트브룩에 오신 것을 환영합니다! 마을 광장의 레드브룩 원수가 일을 맡기려고 기다립니다. 황금빛 안내를 켜고 원수를 찾아가 문 앞의 늑대들 퀘스트를 진행하거나 자유롭게 탐험하세요. 나중에 옵션의 인터페이스, 전투에서 설정을 바꿀 수 있습니다.',
+  'hudChrome.tutorialGreeting.guidanceOn': '안내 켜기',
+  'hudChrome.tutorialGreeting.guidanceOff': '안내 끄기',
+  'hudChrome.tutorialGreeting.guidanceSetting': '이스트브룩 황금빛 안내',
+  'hudChrome.professionTrainers.blacksmithing': '대장기술 전문가',
+  'hudChrome.professionTrainers.cooking': '요리 전문가',
+  'hudChrome.professionTrainers.tailoring': '재봉술 전문가',
+  'hudChrome.professionTrainers.engineering': '기계공학 전문가',
+  'hudChrome.professionTrainers.leatherworking': '가죽세공 전문가',
+  'hudChrome.professionTrainers.alchemy': '연금술 전문가',
+  'hudChrome.professionTrainers.farming': '농사 전문가',
+  'hudChrome.professionTrainers.mining': '채광 전문가',
+  'hudChrome.professionTrainers.hobby': '취미 전문가',
+  'hudChrome.tutorialGreeting.eastbrookArrivalNote':
+    '이스트브룩에 오신 것을 환영합니다! 레드브룩 원수가 바로 앞에 있습니다. 말을 걸어 계곡에서 할 일을 알아보세요. 수련의 해안으로 돌아가려면 마을의 레이븐포스트 우편함 옆에 있는 나룻배 종을 울리세요.',
   'hudChrome.tutorialGreeting.bellHomeNote':
     '벌써 해안에서 돌아오셨나요? 방금 울리신 것이 나룻배 종입니다. 그 쌍둥이가 바로 저기 레이븐포스트 우편함 옆에 걸려 있죠. 언제든 울리면 건너기가 수련의 해안으로 다시 데려다줍니다. 실수로 울리셨더라도 손해 볼 것 없어요.',
   'hudChrome.tutorialGreeting.islandArrivalNote':

@@ -12,6 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
@@ -30,7 +31,7 @@ import { assertAllocationStable } from './util/alloc_probe';
 // A real quest whose giver is also a turn-in npc, so a single npc can carry both the
 // 'available' ('!') and 'ready' ('?') glyph branches against real content.
 function requireQuestWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+  const quest = Object.values(QUESTS).find((q) => q.giverNpcId && !isProfessionQuest(q));
   if (!quest) throw new Error('expected a quest with a giverNpcId');
   return quest;
 }
@@ -707,15 +708,8 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     expect(npcs[0].marker).toBe('ready');
   });
 
-  it('stamps the repeat and cooldown variants identically for both world shapes', () => {
-    // The phase 23 blue "!" at the minimap surface, from a real cadenced work
-    // order re-pointed onto the seeded npc: after one completion the offer
-    // stamps 'repeat'; inside the window (the cadenceBlockedQuests mirror)
-    // it stamps 'cooldown' where the npc previously showed the neutral dot.
-    // Driven through BOTH stub shapes (acceptance (a)'s both-worlds arm).
-    // This pins the CLASSIFIER over each world's data shape; true
-    // world-to-world parity of the inputs themselves rests on the online
-    // cadence/attunement suites pinning the qdone and cprof mirrors.
+  it('hides profession repeat and cooldown offers for both world shapes', () => {
+    // Both offline and online-shaped inputs keep ambient profession offers quiet.
     const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
     if (!workOrder) throw new Error('expected a cadenced work order');
     for (const shape of ['sim', 'client'] as const) {
@@ -734,16 +728,16 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       const offered = buildMarkers(world as unknown as IWorld).filter(
         (m) => m.kind === 'npc',
       ) as Extract<MinimapMarker, { kind: 'npc' }>[];
-      expect(offered[0].glyph, `${shape}: offered again`).toBe('!');
-      expect(offered[0].marker, `${shape}: offered again`).toBe('repeat');
+      expect(offered[0].glyph, `${shape}: offered again`).toBe('•');
+      expect(offered[0].marker, `${shape}: offered again`).toBe('none');
 
       world.questState = () => 'unavailable';
       world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
       const blocked = buildMarkers(world as unknown as IWorld).filter(
         (m) => m.kind === 'npc',
       ) as Extract<MinimapMarker, { kind: 'npc' }>[];
-      expect(blocked[0].glyph, `${shape}: inside the window`).toBe('!');
-      expect(blocked[0].marker, `${shape}: inside the window`).toBe('cooldown');
+      expect(blocked[0].glyph, `${shape}: inside the window`).toBe('•');
+      expect(blocked[0].marker, `${shape}: inside the window`).toBe('none');
 
       // The negative arm: the same unavailable state WITHOUT the mirror set
       // keeps the pre-phase neutral dot (an older server payload degrades to

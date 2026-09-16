@@ -725,6 +725,9 @@ describe('authoritative Eastbrook replacement plan', () => {
 
     const npcsByAnchor = new Map(EASTBROOK_LAYOUT.services.npcs.map((npc) => [npc.anchorId, npc]));
     for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+      // Wilkes trades on the civic square's market edge. The physical
+      // provisions stall stays in the market; the world-market merchant stays put.
+      if (stall.id === 'eastbrook_market_stall_provisions') continue;
       const vendor = npcsByAnchor.get(stall.id);
       expect(vendor, `missing vendor for ${stall.id}`).toBeDefined();
       if (!vendor) throw new Error(`missing vendor for ${stall.id}`);
@@ -1306,15 +1309,9 @@ describe('layout clearance and service anchors', () => {
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
-      ['marshal_redbrook', -58, -102, 1.5707963267948966, 'eastbrook_harbour_market'],
-      [
-        'trader_wilkes',
-        -17.833512834321652,
-        -106.50023078698499,
-        0.6610431688506869,
-        'eastbrook_market_stall_provisions',
-      ],
-      ['apothecary_lin', -72, -96, 1.673877935317597, 'eastbrook_quayside_home'],
+      ['marshal_redbrook', 0, -92, -2.191045812777718, 'eastbrook_noticeboard'],
+      ['trader_wilkes', -25, -94, 2.1995926132103296, 'eastbrook_civic_square'],
+      ['apothecary_lin', -11, -89, -2.9147938055359073, 'eastbrook_civic_square'],
       [
         'brother_aldric',
         5.181980515339464,
@@ -1323,8 +1320,8 @@ describe('layout clearance and service anchors', () => {
         'eastbrook_chapel',
       ],
       ['smith_haldren', -3.4, -112.5, -1.6631256615264958, 'eastbrook_blacksmith'],
-      ['fisherman_brandt', -95, -50, -1.5707963267948966, 'eastbrook_quay'],
-      ['foreman_odell', -84, -63, 0.6747409422235526, 'eastbrook_quay'],
+      ['fisherman_brandt', -25, -104, 1.3909428270024184, 'eastbrook_civic_square'],
+      ['foreman_odell', -16, -111, 0.21866894587394195, 'eastbrook_civic_square'],
       [
         'bursar_fernando',
         8.49982143312659,

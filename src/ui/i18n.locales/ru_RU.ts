@@ -5696,7 +5696,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_fv_snowline_report.completion':
     'Значит, перевал держится. Эйнна высиживает в том путевом лагере бури, что хоронят дорожные вехи, и ни разу не прислала мне пустой вести. Добро пожаловать в Ледяную Мантию, {playerName}.',
   'entities.quests.q_fv_snowline_report.objectives.0.label': 'Доложите Смотрительнице Калдре',
-  'entities.quests.q_fv_wolves_at_the_door.title': 'Волки у порога',
+  'entities.quests.q_fv_wolves_at_the_door.title': 'Волки у дверей',
   'entities.quests.q_fv_wolves_at_the_door.text':
     'Сугробные стаи прежде держались верхних уступов. Теперь они переходят озёрную дорогу средь бела дня, и мои дровосеки не выходят за стены. Прореди стаи, {playerName}, десятерых хватит, — и дорога снова станет дорогой.',
   'entities.quests.q_fv_wolves_at_the_door.completion':
@@ -6581,7 +6581,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.tutorial.talkTitle': 'Возьмите задание',
   'hud.tutorial.talkBody':
     'Подойдите к маршалу Редбруку и нажмите {interactKey}, чтобы заговорить, затем примите его задание.',
-  'hud.tutorial.slayTitle': 'Волки у порога',
+  'hud.tutorial.slayTitle': 'Волки у дверей',
   'hud.tutorial.slayBody':
     'Поохотьтесь на лесных волков на северной дороге. Выберите цель и атакуйте, чтобы проредить стаю.',
   'hud.tutorial.slayProgress': 'Лесных волков убито: {current} / {needed}',
@@ -7300,7 +7300,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Задания - это сердце мира и самый быстрый способ повышать уровень. Вот как они работают.',
   'guide.questsPage.acceptTitle': 'Поиск и принятие',
   'guide.questsPage.acceptBody':
-    'У людей со значком над головой есть для вас работа, и значок говорит, какая именно. Золотой восклицательный знак означает задание, которое можно взять прямо сейчас, а золотой вопросительный — задание, которое вы завершили и можете сдать. На табличке с именем вы увидите ещё и серый вопросительный знак: он означает, что это задание у вас взято, но ещё не выполнено. Повторяемая работа использует те же значки в синем: ярко-синий восклицательный знак — это поручение, которое вы уже выполняли и можете взять снова, а тот же значок приглушённым — то, что ещё внутри своего ожидания. Все значки, кроме серого, видны на табличках с именами, на мини-карте и на карте мира, поэтому работу можно заметить через весь город. В Истбруке маршал Редбрук ждёт с заданием «Волки у порога», одним из первых, какие вам доступны.',
+    'У людей со значком над головой есть для вас работа, и значок говорит, какая именно. Золотой восклицательный знак означает задание, которое можно взять прямо сейчас, а золотой вопросительный — задание, которое вы завершили и можете сдать. На табличке с именем вы увидите ещё и серый вопросительный знак: он означает, что это задание у вас взято, но ещё не выполнено. Повторяемая работа использует те же значки в синем: ярко-синий восклицательный знак — это поручение, которое вы уже выполняли и можете взять снова, а тот же значок приглушённым — то, что ещё внутри своего ожидания. Все значки, кроме серого, видны на табличках с именами, на мини-карте и на карте мира, поэтому работу можно заметить через весь город. В Истбруке маршал Редбрук ждёт с заданием «Волки у дверей», одним из первых, какие вам доступны.',
   'guide.questsPage.objectivesTitle': 'Цели',
   'guide.questsPage.objectivesBody':
     'Убивайте определённых врагов, собирайте предметы или взаимодействуйте с чем-то в мире. Экранный трекер ведёт счёт вашему прогрессу по ходу дела. Если передумаете, вы можете убрать задание из журнала заданий и позже снова взять его у того, кто его выдал.',
@@ -16015,6 +16015,22 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': 'критично',
   'hudChrome.perf.diagnostics.report.status.needsAttention': 'требует внимания',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Добро пожаловать в Истбрук! Маршал Редбрук ждёт вас с работой на городской площади. Включите золотые указатели, чтобы найти его и пройти задание «Волки у дверей», или исследуйте всё самостоятельно. Позже это можно изменить в настройках: Интерфейс, Бой.',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Включить указатели',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Выключить указатели',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'Золотые указатели Истбрука',
+  'hudChrome.professionTrainers.blacksmithing': 'Учитель кузнечного дела',
+  'hudChrome.professionTrainers.cooking': 'Учитель кулинарии',
+  'hudChrome.professionTrainers.tailoring': 'Учитель портняжного дела',
+  'hudChrome.professionTrainers.engineering': 'Учитель инженерного дела',
+  'hudChrome.professionTrainers.leatherworking': 'Учитель кожевничества',
+  'hudChrome.professionTrainers.alchemy': 'Учитель алхимии',
+  'hudChrome.professionTrainers.farming': 'Учитель земледелия',
+  'hudChrome.professionTrainers.mining': 'Учитель горного дела',
+  'hudChrome.professionTrainers.hobby': 'Учитель увлечений',
+  'hudChrome.tutorialGreeting.eastbrookArrivalNote':
+    'Добро пожаловать в Истбрук! Маршал Редбрук прямо перед вами. Поговорите с ним о работе в долине. Чтобы вернуться на Берег Испытаний, позвоните в паромный колокол рядом с почтовым ящиком Вранопочты в городе.',
   'hudChrome.tutorialGreeting.bellHomeNote':
     'Уже вернулся с берега? Это был паромный колокол. Его близнец висит вон там, у почтового столба Вранопочты: позвони в любой момент, и переправа отнесет тебя обратно на Берег Испытаний. А если позвонил по ошибке - ничего страшного.',
   'hudChrome.tutorialGreeting.islandArrivalNote':
@@ -17098,7 +17114,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.rendererContextLost':
     '3D-рендерер потерял графический контекст и не смог восстановиться. Попробуйте обновить страницу.',
   'hudChrome.charSidebar.label': 'Сведения о персонаже',
-  'hudChrome.charSidebar.subtitle': 'Уровень {level} {className} . {archetype} . Увлечение: {hobby}',
+  'hudChrome.charSidebar.subtitle':
+    'Уровень {level} {className} . {archetype} . Увлечение: {hobby}',
   'hudChrome.charSidebar.subtitleNoHobby': 'Уровень {level} {className} . {archetype}',
   'hudChrome.charSidebar.stats': 'Характеристики',
   'hudChrome.charSidebar.progression': 'Прогресс',

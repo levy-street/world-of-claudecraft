@@ -14969,6 +14969,22 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.diagnostics.report.status.critical': '严重',
   'hudChrome.perf.diagnostics.report.status.needsAttention': '需要注意',
   // The Proving Shore (tutorial island) + the spawn greeting dialog.
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    '欢迎来到东溪镇！雷德布鲁克元帅在城镇广场有工作交给你。开启金色引导，找到他并完成“门前群狼”，也可以自行探索。你可以稍后在选项、界面、战斗中更改此设置。',
+  'hudChrome.tutorialGreeting.guidanceOn': '开启引导',
+  'hudChrome.tutorialGreeting.guidanceOff': '关闭引导',
+  'hudChrome.tutorialGreeting.guidanceSetting': '东溪金色引导',
+  'hudChrome.professionTrainers.blacksmithing': '锻造训练师',
+  'hudChrome.professionTrainers.cooking': '烹饪训练师',
+  'hudChrome.professionTrainers.tailoring': '裁缝训练师',
+  'hudChrome.professionTrainers.engineering': '工程学训练师',
+  'hudChrome.professionTrainers.leatherworking': '制皮训练师',
+  'hudChrome.professionTrainers.alchemy': '炼金术训练师',
+  'hudChrome.professionTrainers.farming': '耕作训练师',
+  'hudChrome.professionTrainers.mining': '采矿训练师',
+  'hudChrome.professionTrainers.hobby': '爱好训练师',
+  'hudChrome.tutorialGreeting.eastbrookArrivalNote':
+    '欢迎来到东溪镇！雷德布鲁克元帅就在你正前方。和他交谈，看看谷地里有什么工作。想重返试炼之滨，就敲响镇上鸦邮信箱旁的渡船铃。',
   'hudChrome.tutorialGreeting.bellHomeNote':
     '这么快就从海滨回来了？你刚才敲响的正是渡船铃。它的孪生兄弟就挂在那边鸦邮信箱旁：想回试炼之滨，随时敲响它，渡航就会送你过去。敲错了也不打紧。',
   'hudChrome.tutorialGreeting.islandArrivalNote':

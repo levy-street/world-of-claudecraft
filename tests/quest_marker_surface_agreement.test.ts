@@ -1,9 +1,10 @@
-// One state, two pure marker cores (phase 23): the minimap model and the
+// One state, two pure marker cores: the minimap model and the
 // world-map marker resolver must agree on every kind they BOTH render, over
 // identical inputs. The review round caught exactly this divergence: the
 // minimap folded 'active' into the winner before collapsing it while the map
 // filtered it per quest, so an in-progress turn-in swallowed a cooldown mark
-// on the minimap that the map drew, on every profession master. The
+// on the minimap that the map drew. Profession offers now stay hidden on
+// both surfaces, including cooldown, without changing the shared classifier. The
 // nameplate's deliberate divergence (it alone renders the gray in-progress
 // state, which then outranks cooldown) is pinned separately in
 // tests/nameplate_quest_marker.test.ts.
@@ -75,21 +76,21 @@ function minimapWorld(): IWorld {
 }
 
 describe('minimap and map marker cores agree over one state', () => {
-  it('an in-progress turn-in never swallows the cooldown mark on either core', () => {
+  it('profession cooldown offers stay hidden beside an in-progress turn-in on both cores', () => {
     const npcMarkers = createMinimapMarkers()
       .build(minimapWorld(), 162, 1.7)
       .markers.filter((m) => m.kind === 'npc') as Extract<MinimapMarker, { kind: 'npc' }>[];
     expect(npcMarkers).toHaveLength(1);
-    expect(npcMarkers[0].glyph).toBe('!');
-    expect(npcMarkers[0].marker).toBe('cooldown');
+    expect(npcMarkers[0].glyph).toBe('•');
+    expect(npcMarkers[0].marker).toBe('none');
 
     const giver = questGiverNpcMarkers(questState, questsDone, cadenceBlocked).find((m) =>
       m.quests.some((q) => q.questId === WORK_ORDER.id),
     );
-    expect(giver?.kind).toBe('cooldown');
+    expect(giver).toBeUndefined();
 
     // The agreement itself, stated as one assertion so a future divergence
     // names both surfaces in the failure.
-    expect(npcMarkers[0].marker).toBe(giver?.kind);
+    expect(npcMarkers[0].marker).toBe(giver?.kind ?? 'none');
   });
 });
