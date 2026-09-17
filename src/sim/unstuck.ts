@@ -438,7 +438,7 @@ function motionBlock(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlock
 function blockedReason(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlockedReason | null {
   const bgGeometryTrap = battlegroundGeometryTrap(ctx, meta, p);
   if (p.jailed) return 'jailed';
-  if (p.inCombat || p.combatTimer < 5) return 'combat';
+  if ((p.inCombat || p.combatTimer < 5) && !bgGeometryTrap) return 'combat';
   if (isStunned(p) || isRooted(p)) return 'controlled';
   const motion = motionBlock(ctx, meta, p);
   if (motion) return motion;
@@ -517,7 +517,7 @@ function cancelReason(
     Math.hypot(p.pos.x - pending.origin.x, p.pos.z - pending.origin.z) > CANCEL_MOVE_DISTANCE ||
     Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE;
   if (meta.counters.damageTaken > pending.damageTaken) return 'damaged';
-  if (p.inCombat || p.combatTimer < 5) return 'combat';
+  if ((p.inCombat || p.combatTimer < 5) && !bgGeometryTrap) return 'combat';
   if (p.castingAbility !== null || isConsuming(p) || p.sitting) return 'busy';
   if (pending.area.kind === 'battleground' && bgCarryingFlag(ctx, p.id)) return 'state_changed';
   if (

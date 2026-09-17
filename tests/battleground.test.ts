@@ -1438,7 +1438,31 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(meta.pendingUnstuck).toBeNull();
   });
 
-  it('combat still cancels a battleground wall-trap Unstuck countdown', () => {
+  it('Unstuck accepts a battleground wall-trap fighter with an existing combat flag', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    e.inCombat = true;
+    e.combatTimer = 0;
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(inGraveyard(sim, match, pid, 0)).toBe(true);
+    expectClearPlayerPosition(sim, e);
+  });
+
+  it('fresh damage still cancels a battleground wall-trap Unstuck countdown', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
     toActive(sim, match);
@@ -1447,6 +1471,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
 
     expect(sim.unstuck(pid)).toBe(true);
     sim.drainEvents();
+    must(sim.meta(pid), 'player meta').counters.damageTaken += 1;
     e.inCombat = true;
     e.combatTimer = 0;
 
@@ -1454,7 +1479,7 @@ describe('Thornhollow Fields: the graveyard rite', () => {
       expect.objectContaining({
         type: 'unstuck',
         phase: 'cancelled',
-        reason: 'combat',
+        reason: 'damaged',
         pid,
       }),
     );

@@ -618,6 +618,35 @@ describe('online unstuck command wiring', () => {
     expect(inBgGraveyard(server, match, pid)).toBe(true);
   });
 
+  it('the Settings command completes for a combat-flagged battleground wall trap', () => {
+    const server = new GameServer();
+    const { session } = join(server, 31);
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallTrap(server, match, pid);
+    player.inCombat = true;
+    player.combatTimer = 0;
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+  });
+
   it('the Settings command refuses idle clear battleground wall-contact as a shortcut', () => {
     const server = new GameServer();
     const { session } = join(server, 24);
