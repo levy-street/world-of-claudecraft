@@ -16,8 +16,9 @@ export interface PreviewFraming {
 }
 
 export const PREVIEW_FRAMING = {
-  // Self character sheet: the classic close, face-on framing.
-  sheet: { y: 1.45, z: 5.1, lookY: 1.3 },
+  // Self character sheet: face-on, a step back from the classic close framing so
+  // the model clears the gear columns that float over the stage's edges.
+  sheet: { y: 1.45, z: 5.67, lookY: 1.3 },
   // Inspect another player: pulled back / raised so tall silhouettes stay framed.
   inspect: { y: 1.5, z: 6.6, lookY: 1.3 },
 } as const satisfies Record<string, PreviewFraming>;
