@@ -13,6 +13,7 @@ import {
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
 import { createMob, recalcPlayerStats } from '../src/sim/entity';
+import { catFormBonusAp, meleeApFromAttributes } from '../src/sim/melee_ap';
 import { moveSpeedMult } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity } from '../src/sim/types';
@@ -235,7 +236,16 @@ describe('Wildfang engine', () => {
     player.auras.push(formAura(player, 'form_cat'));
     recalcPlayerStats(player, meta.cls, meta.equipment, meta.talentMods, meta.equipmentInstance);
 
-    expect(player.attackPower).toBe(Math.round((casterAttackPower + 8 + player.level * 2) * 1.1));
+    // Wolf Form is no longer caster attack power plus a flat bonus: the feral
+    // conversion (src/sim/melee_ap.ts) re-sources it from Strength-at-2 to the
+    // rogue line, str + agi, so the caster base is the wrong starting point and
+    // the form's own Agility grant now feeds the total. Rebuilt from the live
+    // attributes, which is what the form actually converts.
+    const feralBase = meleeApFromAttributes('druid', true, player.stats.str, player.stats.agi);
+    expect(player.attackPower).toBe(Math.round((feralBase + catFormBonusAp(player.level)) * 1.1));
+    // The caster base is still the 2/str line, and the two now differ: that gap
+    // IS the change, so pin it rather than leaving the old equality rotting.
+    expect(casterAttackPower).toBeLessThan(player.attackPower);
   });
 
   it('shares three landed stages across forms, spends through the live button, and clears after combat', () => {

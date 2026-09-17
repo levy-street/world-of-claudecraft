@@ -7,6 +7,12 @@ import { aggregateSetBonuses, CLASSES, ITEMS, MOBS, type NpcDef } from './data';
 import { canDualWield, isShieldItem } from './equipment_rules';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
+import {
+  bearFormBonusAp,
+  catFormAgiBonus,
+  catFormBonusAp,
+  meleeApFromAttributes,
+} from './melee_ap';
 import { pvpFractionsFromRatings } from './pvp';
 import type {
   Entity,
@@ -523,11 +529,11 @@ export function recalcPlayerStats(
     // ever the raw kit armour or a prot-mastery-folded reading is UNSETTLED, so
     // it is not re-based here and rides the packet's R5 re-measure.
     s.armor = Math.round(s.armor * 2.1);
-    bonusAp += 15 + Math.round(s.agi * 1.5);
+    bonusAp += bearFormBonusAp(s.agi);
   }
   if (catForm) {
-    bonusAp += 8 + lvl * 2;
-    s.agi += Math.max(2, Math.floor(lvl / 2));
+    bonusAp += catFormBonusAp(lvl);
+    s.agi += catFormAgiBonus(lvl);
   }
   // Moonkin Form: a hardy caster form that adds 50% armor (its +20% spell damage rides a
   // separate buff_spelldmg aura the form applies).
@@ -634,13 +640,10 @@ export function recalcPlayerStats(
       )
     : {};
   // Melee AP by class (classic-era-ish): warriors/paladins/shamans/druids 2/str,
-  // rogues str+agi, hunters str+agi, pure casters str.
-  const apFromStats =
-    cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid'
-      ? s.str * 2
-      : cls === 'rogue' || cls === 'hunter'
-        ? s.str + s.agi
-        : s.str;
+  // rogues str+agi, hunters str+agi, pure casters str. A druid in Wolf or Bruin
+  // Form converts on the ROGUE line instead, so its leather Agility scales its
+  // attack power; see melee_ap.ts for the tradeoff that carries.
+  const apFromStats = meleeApFromAttributes(cls, bearForm || catForm, s.str, s.agi);
   // Floor at 0 so a heavy debuff_ap stack can never bake a negative attack power
   // (mirrors effectiveAttackPower's mob floor and the agi/spi floors above).
   // buffApPct (Battle Shout / Blessing of Might) folds into the same AP multiplier.

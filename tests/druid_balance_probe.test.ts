@@ -138,8 +138,21 @@ describe('Druid v0.29 balance and live-mob harness', () => {
     // (real BiS parity is the montecarlo's job). These bands guard the proxy only.
     expect(moongrove?.value).toBeGreaterThanOrEqual(140);
     expect(moongrove?.value).toBeLessThanOrEqual(185);
-    expect(wildfang?.value).toBeGreaterThanOrEqual(165);
-    expect(wildfang?.value).toBeLessThanOrEqual(205);
+    // RE-MINTED for the feral Agility conversion (src/sim/melee_ap.ts), and it
+    // is a DELIBERATE power increase rather than drift: Wolf Form converts on
+    // the rogue line (str + agi) instead of Strength-at-2, so the Agility this
+    // pinned kit carries now converts at 1:1 where it converted to nothing.
+    // Measured on release/v0.43.0 at this seed: wildfang 189.09; on this branch
+    // 210.53, about +11%. Moongrove is unchanged at 151.67 (no caster arm reads
+    // melee attack power) and keeps its band, which is what says the delta is
+    // the conversion rather than the harness. Re-derived at the same relative
+    // margins (0.87x to 1.08x of the measurement), rounded to the file's
+    // five-step style.
+    // FLAGGED for the class owner: this band no longer guards the change that
+    // moved it. If feral is not meant to gain this, the mechanic is what should
+    // change, not this number: revert the band commit and the gate says so.
+    expect(wildfang?.value).toBeGreaterThanOrEqual(185);
+    expect(wildfang?.value).toBeLessThanOrEqual(230);
     expect(best.find((result) => result.profile === 'moongrove_3t')?.value).toBeGreaterThan(0);
     expect(best.find((result) => result.profile === 'groveheart')?.value).toBeGreaterThan(0);
     // 12 profile x capstone combos over a 123s window: ~90-105s solo. In the

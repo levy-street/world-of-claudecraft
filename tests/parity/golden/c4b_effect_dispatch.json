@@ -7382,7 +7382,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1020,
-      "state": "9e5f57b6",
+      "state": "e3329eb5",
       "events": "69c43081",
       "rng": {
         "draws": 894,
@@ -8299,7 +8299,7 @@
         },
         {
           "aiState": "idle",
-          "attackPower": 116,
+          "attackPower": 126,
           "auras": [
             {
               "duration": 3,

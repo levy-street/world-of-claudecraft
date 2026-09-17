@@ -46,10 +46,26 @@ describe('owned-class level 20 balance harness (Druid bands)', () => {
       // code moved). Re-derived at the same relative margins: moongrove
       // 127 to 166 full / 128 to 166 diet, wildfang 154 to 191 / 155 to 193.
       // FLAGGED for the class owner: the nightly full sweep is the arbiter.
+      // RE-MINTED for the feral Agility conversion (src/sim/melee_ap.ts). THIS
+      // IS A DELIBERATE POWER INCREASE, not drift, and it is the reviewable
+      // decision of that change: Wolf Form converts on the rogue line (str +
+      // agi) instead of Strength-at-2, so the 107 Agility the pinned level-20
+      // reference kit carries now converts at 1:1 where it previously converted
+      // to nothing. Wildfang measures 202.60 full / 204.13 diet against the
+      // 164.85 / 166.20 anchors above, about +23%. Moongrove does not move (no
+      // caster arm reads melee attack power) and keeps its bands untouched,
+      // which is what says the delta is the conversion and not the harness.
+      // Bruin is held NEAR-NEUTRAL instead (373 vs 376 attack power on the same
+      // kit) by the derived bear coefficient, so only the damage form moves.
+      // Re-derived at the same relative margins as the row above.
+      // FLAGGED for the class owner: this band no longer guards the change that
+      // moved it, and the nightly full sweep is the arbiter. If feral is not
+      // meant to gain this much, the mechanic is what should change, not this
+      // number: revert the commit that re-minted it and the gate says so again.
       expect(moongrove.dps).toBeGreaterThanOrEqual(band(127, 128));
       expect(moongrove.dps).toBeLessThanOrEqual(band(166, 166));
-      expect(wildfang.dps).toBeGreaterThanOrEqual(band(154, 155));
-      expect(wildfang.dps).toBeLessThanOrEqual(band(191, 193));
+      expect(wildfang.dps).toBeGreaterThanOrEqual(band(189, 190));
+      expect(wildfang.dps).toBeLessThanOrEqual(band(235, 238));
     },
     FULL_SWEEP ? 180_000 : 90_000,
   );

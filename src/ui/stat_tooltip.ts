@@ -13,6 +13,7 @@
 
 import { CLASSES } from '../sim/data';
 import { COMBAT_SPIRIT_REGEN_FRACTION, spiritRegenPer2s } from '../sim/mana_regen';
+import { catFormAgiBonus, isFeralApForm, meleeApWeights } from '../sim/melee_ap';
 import {
   type AuraKind,
   armorReduction,
@@ -196,15 +197,27 @@ export function isManaClass(cls: PlayerClass): boolean {
   return CLASSES[cls].resourceType === 'mana';
 }
 
-/** Melee attack power gained per point of Strength (entity.ts apFromStats):
- *  2 for warrior/paladin/shaman/druid, 1 for everyone else. */
-export function strApPerPoint(cls: PlayerClass): number {
-  return cls === 'warrior' || cls === 'paladin' || cls === 'shaman' || cls === 'druid' ? 2 : 1;
+/** Melee attack power gained per point of Strength. Delegates to the sim's own
+ *  conversion (src/sim/melee_ap.ts) rather than restating the coefficients, so a
+ *  feral druid's sheet reads the rogue line the moment it shapeshifts. */
+export function strApPerPoint(cls: PlayerClass, feralForm = false): number {
+  return meleeApWeights(cls, feralForm).str;
 }
 
-/** Melee attack power gained per point of Agility: 1 for rogue/hunter, else 0. */
-export function agiMeleeApPerPoint(cls: PlayerClass): number {
-  return cls === 'rogue' || cls === 'hunter' ? 1 : 0;
+/** Melee attack power gained per point of Agility: 1 for rogue/hunter and for a
+ *  druid in Wolf/Bruin Form, else 0. */
+export function agiMeleeApPerPoint(cls: PlayerClass, feralForm = false): number {
+  return meleeApWeights(cls, feralForm).agi;
+}
+
+/** Whether the character is in a druid feral form, which switches the melee
+ *  attack-power conversion to the rogue line (src/sim/melee_ap.ts).
+ *
+ *  Read from the live aura list rather than taken as a separate input: the armor
+ *  line below already resolves Cat Form from `buffs` the same way, and a second
+ *  way to say the same thing is a second way for the two lines to disagree. */
+function resolveFeralForm(buffs: BuffStatSource[]): boolean {
+  return buffs.some((b) => isFeralApForm(b.kind));
 }
 
 /** First 20 stamina give 1 hp each, the rest 10 (entity.ts hpFromStamina). */
@@ -258,6 +271,7 @@ export function combatManaPer5s(spi: number, level: number): number {
  *  read the final entity values, so they stay correct under buffs. */
 export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatTooltipModel {
   const { cls, stats, level } = input;
+  const feralForm = resolveFeralForm(input.buffs ?? []);
   const mana = isManaClass(cls);
   const effects: StatEffect[] = [];
   let minorForClass = false;
@@ -271,12 +285,12 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
   switch (stat) {
     case 'str': {
       statValue = stats.str;
-      effects.push({ kind: 'attackPower', value: stats.str * strApPerPoint(cls) });
+      effects.push({ kind: 'attackPower', value: stats.str * strApPerPoint(cls, feralForm) });
       break;
     }
     case 'agi': {
       statValue = stats.agi;
-      const meleeAp = agiMeleeApPerPoint(cls);
+      const meleeAp = agiMeleeApPerPoint(cls, feralForm);
       if (meleeAp) effects.push({ kind: 'attackPower', value: stats.agi * meleeAp });
       if (cls === 'hunter') {
         effects.push({ kind: 'rangedAttackPower', value: stats.agi * HUNTER_RANGED_AP_PER_AGI });
@@ -447,6 +461,7 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
   const { cls, stats, level } = input;
   const gear = input.gear ?? [];
   const buffs = input.buffs ?? [];
+  const feralForm = resolveFeralForm(buffs);
   const sources: StatSource[] = [];
 
   // Append the reconciling remainder (label it talents/effects) unless it rounds
@@ -478,9 +493,7 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
       // (entity.ts). Subtract it when shifted so the "From Agility" line is honest; the Cat
       // Form bonus still shows in the remainder of the Agility cell's own breakdown. (Crit
       // and dodge read Agility AFTER the form bonus, so they need no such adjustment.)
-      const catAgiBonus = buffs.some((b) => b.kind === 'form_cat')
-        ? Math.max(2, Math.floor(level / 2))
-        : 0;
+      const catAgiBonus = buffs.some((b) => b.kind === 'form_cat') ? catFormAgiBonus(level) : 0;
       const fromAgi = (stats.agi - catAgiBonus) * AGI_ARMOR_PER_POINT;
       if (fromAgi !== 0) sources.push({ kind: 'attributes', value: fromAgi, fromStat: 'agi' });
       const g = gearTotal(gear, 'armor');
@@ -492,7 +505,8 @@ export function buildStatSources(stat: StatId, input: StatTooltipInput): StatSou
       // Attack power comes from the str/agi conversion (which already folds in
       // gear / buff stats), the flat attack-power buffs by name, then talents /
       // forms / the apPct multiplier in the remainder.
-      const meleeAp = stats.str * strApPerPoint(cls) + stats.agi * agiMeleeApPerPoint(cls);
+      const meleeAp =
+        stats.str * strApPerPoint(cls, feralForm) + stats.agi * agiMeleeApPerPoint(cls, feralForm);
       sources.push({ kind: 'attributes', value: meleeAp });
       sources.push(...buffLines(buffs, ['buff_ap']));
       for (const b of buffs) {
