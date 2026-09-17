@@ -375,15 +375,11 @@ async function openMarketBrowse(page) {
   return pollForSize(page, '#market-window');
 }
 
-// Open Esc options -> Interface -> the given tab by CLICKING the rendered controls
-// rather than reaching past them, so the shot proves the row is reachable the way a
-// player reaches it. Interface is the 4th main-menu row (buildOptionsMenu; the optional
-// Bug Report row is appended AFTER it, so the index is stable) and tabIndex indexes
-// INTERFACE_TAB_ORDER (general, frames, chat, combat). The window is force-hidden first
-// so the toggle is deterministic regardless of prior state, the same trick the bags
-// target uses, and the one-shot tutorial greeting (Ferryman Odo) is dismissed by its
-// own button, the way a player does, so it never sits over the clip.
-async function openInterfaceTab(page, tabIndex) {
+// Open the Esc game menu at its root. The window is force-hidden first so the
+// toggle is deterministic regardless of prior state, the same trick the bags
+// target uses, and the one-shot tutorial greeting (Ferryman Odo) is dismissed by
+// its own button, the way a player does, so it never sits over the clip.
+async function openGameMenu(page) {
   await page.evaluate(() => {
     document.querySelector('#tutorial-greeting button')?.click();
     const el = document.querySelector('#options-menu');
@@ -391,8 +387,19 @@ async function openInterfaceTab(page, tabIndex) {
     window.__game?.hud?.toggleOptionsMenu?.();
   });
   await wait(400);
+  return pollForSize(page, '#options-menu .opt-list');
+}
+
+// Open Esc options -> Interface -> the given tab by CLICKING the rendered controls
+// rather than reaching past them, so the shot proves the row is reachable the way a
+// player reaches it. The main-menu row is found by its data-menu-action hook (the
+// sub-view id options_main_menu.ts stamps on every plate), never by index: the
+// list's order shifts by host (the Unlock Interface row leads on desktop only).
+// tabIndex indexes INTERFACE_TAB_ORDER (general, frames, chat, combat).
+async function openInterfaceTab(page, tabIndex) {
+  await openGameMenu(page);
   await page.evaluate(() => {
-    document.querySelectorAll('#options-menu .opt-btn')[3]?.click();
+    document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
   });
   await wait(400);
   await page.evaluate((i) => {
@@ -3762,7 +3769,7 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        document.querySelectorAll('#options-menu .opt-btn')[2]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
       });
       // Poll the rendered dial rows, not the shell, so the shot never lands on
       // the main menu before the Graphics sub-panel paints.
@@ -3781,6 +3788,35 @@ export const TARGETS = [
     async capture(page) {
       await openInterfaceFramesTab(page);
       return { clip: '#options-menu' };
+    },
+  },
+  {
+    key: 'game-menu-unlock-interface',
+    label: 'Esc game menu: the Unlock Interface row leads the list (desktop only)',
+    // Keyed on the list painter alone (not options_view) so the options_view
+    // target order pinned in tests/pr_shot_targets.test.ts stays as it is.
+    when: ['ui/options_main_menu'],
+    // Both hosts: the row is desktop-only, so the mobile arm is the evidence
+    // that the touch menu still leads with Key Bindings. The unlocked arm
+    // presses the row for real and shoots the whole viewport: the plate
+    // relabels Lock Interface and the HUD behind the menu grows its frame
+    // chrome plus the floating Lock Interface control, which proves the press
+    // reaches Hud.toggleInterfaceUnlock rather than stopping at the window.
+    variants: [
+      { key: 'desktop' },
+      { key: 'desktop-unlocked', unlocked: true },
+      { key: 'mobile', mobile: true },
+    ],
+    async capture(page, variant) {
+      await openGameMenu(page);
+      if (!variant?.unlocked) return { clip: '#options-menu' };
+      await page.evaluate(() => {
+        document
+          .querySelector('#options-menu .opt-btn[data-menu-action="interfaceUnlock"]')
+          ?.click();
+      });
+      await pollForSize(page, '#interface-edit-controls');
+      return {};
     },
   },
   {
@@ -3807,8 +3843,7 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        // Key Bindings is the first row on the main options menu.
-        document.querySelectorAll('#options-menu .opt-btn')[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       return open ? { clip: '#options-menu' } : {};
@@ -3830,7 +3865,7 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        document.querySelectorAll('#options-menu .opt-btn')[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       return open ? { clip: '#options-menu' } : {};
@@ -3868,8 +3903,7 @@ export const TARGETS = [
       });
       await wait(400);
       await page.evaluate(() => {
-        // Key Bindings is the first row on the main options menu.
-        document.querySelectorAll('#options-menu .opt-btn')[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-cols');
       if (!open) return {};
@@ -9731,9 +9765,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Graphics is the third button on the main options menu (offline).
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[2]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -9773,9 +9805,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Controller is the second button on the offline main options menu.
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[1]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="controller"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -9804,8 +9834,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[3]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       return open ? { clip: '#options-menu' } : {};
@@ -9827,9 +9856,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Interface is the fourth button on the main options menu (offline).
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[3]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
       });
       let open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -9917,9 +9944,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Interface is the fourth button on the main options menu (offline).
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[3]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       if (!open) return {};
@@ -9948,9 +9973,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Key Bindings is the first row on the main options menu.
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-actionbar-edit');
       const board = await pollForSize(page, '#options-menu .kbm-key', 6);
@@ -9976,8 +9999,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-transfer .set-toggle');
       if (!open) return {};
@@ -10004,8 +10026,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const ready = await pollForSize(page, '#options-menu .kbm-popout');
       if (!ready) return {};
@@ -10059,8 +10080,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       await pollForSize(page, '#options-menu .kb-actionbar-edit');
       await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
@@ -10095,8 +10115,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[4]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .aura-settings-intro');
       if (!open) return {};
@@ -10165,9 +10184,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Offline has no Report a Bug row, so Auras is the fifth button.
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[4]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="auras"]')?.click();
       });
       // Poll the panel INTRO, not the proc grid: a class with no authored proc
       // (Shaman, the case this feature exists for) renders no grid at all, and a
@@ -10233,9 +10250,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        // Key Bindings is the first row on the main options menu.
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       const open = await pollForSize(page, '#options-menu .kb-actionbar-edit');
       return open ? { clip: '#options-menu' } : {};
@@ -10256,8 +10271,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       await pollForSize(page, '#options-menu .kb-actionbar-edit');
       await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());
@@ -10285,8 +10299,7 @@ export const TARGETS = [
         const win = document.querySelector('#options-menu');
         if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
         hud.toggleOptionsMenu();
-        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-        buttons[0]?.click();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="keybinds"]')?.click();
       });
       await pollForSize(page, '#options-menu .kb-actionbar-edit');
       await page.evaluate(() => document.querySelector('.kb-actionbar-edit')?.click());

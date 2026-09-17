@@ -1242,10 +1242,20 @@ describe('options_view: interface tab taxonomy', () => {
 // ---------------------------------------------------------------------------
 // Main menu routing (cluster 5)
 // ---------------------------------------------------------------------------
+// The desktop menu with the frames locked: what the painter asks for on a
+// mouse-and-keyboard HUD with nothing loose (the touch HUD flips
+// interfaceUnlockAvailable off, see the touch case below).
+const DESKTOP_MENU = {
+  bugReportAvailable: false,
+  interfaceUnlockAvailable: true,
+  interfaceUnlocked: false,
+};
+
 describe('options_view: main menu routing', () => {
   it('routes each row to its sub-view, with unstuck before logout + close, omitting bug report offline', () => {
-    const offline = buildOptionsMenu({ bugReportAvailable: false });
+    const offline = buildOptionsMenu(DESKTOP_MENU);
     expect(offline.map((e) => e.labelKey)).toEqual([
+      'hudChrome.interfaceUnlock.unlock',
       'hud.options.keyBindings',
       'hudChrome.controller.title',
       'hud.options.graphics',
@@ -1282,8 +1292,44 @@ describe('options_view: main menu routing', () => {
     });
   });
 
+  it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
+    // Owner request for the frame lock-down: arranging frames is one press
+    // from Esc, not three levels into Interface > Frames. The row is the
+    // same action the Frames tab's row fires, so its label follows the same
+    // rule (interfaceUnlockLabelKey), and only the label changes with state.
+    const locked = buildOptionsMenu(DESKTOP_MENU);
+    expect(locked[0]).toEqual({
+      labelKey: 'hudChrome.interfaceUnlock.unlock',
+      action: { kind: 'interfaceUnlock', unlocked: false },
+    });
+    expect(locked.filter((e) => e.action.kind === 'interfaceUnlock')).toHaveLength(1);
+    const unlocked = buildOptionsMenu({ ...DESKTOP_MENU, interfaceUnlocked: true });
+    expect(unlocked[0]).toEqual({
+      labelKey: 'hudChrome.interfaceUnlock.lock',
+      action: { kind: 'interfaceUnlock', unlocked: true },
+    });
+    expect(unlocked.slice(1)).toEqual(locked.slice(1));
+  });
+
+  it('omits the Unlock Interface row on the touch HUD, where Key Bindings leads again', () => {
+    // Frame editing is desktop-only (every gesture refuses touch layouts), the
+    // same gate the Frames tab's row sits behind. Unavailable wins even if the
+    // state somehow reads unlocked: the row must never appear on touch.
+    const locked = buildOptionsMenu(DESKTOP_MENU);
+    for (const interfaceUnlocked of [false, true]) {
+      const touch = buildOptionsMenu({
+        ...DESKTOP_MENU,
+        interfaceUnlockAvailable: false,
+        interfaceUnlocked,
+      });
+      expect(touch.some((e) => e.action.kind === 'interfaceUnlock')).toBe(false);
+      expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
+      expect(touch).toEqual(locked.slice(1));
+    }
+  });
+
   it('adds the online-only Report a Bug row when bug reporting is available', () => {
-    const online = buildOptionsMenu({ bugReportAvailable: true });
+    const online = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
     const bug = online.find((e) => e.labelKey === 'hudChrome.bugReport.menuButton');
     expect(bug?.action).toEqual({ kind: 'goto', view: 'bugreport' });
     // The Wiki row keeps its place above the report row in both modes.
@@ -1372,9 +1418,8 @@ describe('options_view: determinism', () => {
       buildInterfaceControls(src, DESKTOP_ENV),
     );
     expect(buildControllerControls(src)).toEqual(buildControllerControls(src));
-    expect(buildOptionsMenu({ bugReportAvailable: true })).toEqual(
-      buildOptionsMenu({ bugReportAvailable: true }),
-    );
+    const menuOpts = { ...DESKTOP_MENU, bugReportAvailable: true };
+    expect(buildOptionsMenu(menuOpts)).toEqual(buildOptionsMenu(menuOpts));
   });
 });
 

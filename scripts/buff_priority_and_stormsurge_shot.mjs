@@ -201,8 +201,7 @@ const framesTabClicked = await page.evaluate(() => {
   const win = document.querySelector('#options-menu');
   if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
   hud.toggleOptionsMenu();
-  const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
-  buttons[3]?.click();
+  document.querySelector('#options-menu .opt-btn[data-menu-action="interface"]')?.click();
   const framesTab = document.querySelectorAll('#options-menu .opt-tab')[1];
   framesTab?.click();
   return !!framesTab;

@@ -109,6 +109,7 @@ import {
   buildChatWindowResetRow,
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
+import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -654,49 +655,18 @@ export class OptionsWindow {
   private renderMain(): void {
     const el = this.deps.root();
     const scroll = this.viewShell(t('hud.options.gameMenu'));
-    const list = document.createElement('div');
-    list.className = 'opt-list';
-    for (const entry of buildOptionsMenu({ bugReportAvailable: this.deps.bugReport() !== null })) {
-      const b = document.createElement('button');
-      b.className = 'btn ui-btn opt-btn';
-      b.textContent = t(entry.labelKey);
-      if (entry.action.kind === 'close') b.classList.add('ui-btn--red', 'ui-btn--lg');
-      if (entry.action.kind === 'logout') b.classList.add('opt-btn-hostile');
-      if (entry.action.kind === 'wiki') {
-        const chevron = document.createElement('span');
-        chevron.className = 'opt-btn-chevron';
-        chevron.setAttribute('aria-hidden', 'true');
-        chevron.innerHTML = svgIcon('next');
-        b.appendChild(chevron);
-      }
-      if (entry.action.kind === 'goto' && entry.action.view === 'bugreport') {
-        const status = document.createElement('span');
-        status.className = 'opt-btn-status ui-muted';
-        status.textContent = t('hudChrome.bugReport.online');
-        status.setAttribute('aria-hidden', 'true');
-        b.setAttribute('aria-label', `${t(entry.labelKey)}: ${t('hudChrome.bugReport.online')}`);
-        b.appendChild(status);
-      }
-      b.addEventListener('click', () => {
-        audio.click();
-        const a = entry.action;
-        if (a.kind === 'goto') {
-          this.view = a.view;
-          this.keybindNote = '';
-          this.render();
-        } else if (a.kind === 'wiki') {
-          this.deps.openWiki();
-        } else if (a.kind === 'logout') {
-          this.deps.options()?.logout();
-        } else if (a.kind === 'unstuck') {
-          this.deps.world().unstuck();
-          this.close();
-        } else {
-          this.close();
-        }
-      });
-      list.appendChild(b);
-    }
+    const entries = buildOptionsMenu({
+      bugReportAvailable: this.deps.bugReport() !== null,
+      // Frame editing is desktop-only: the same gate as the Frames tab's row,
+      // and the same union that raises the touch HUD (mobile_controls
+      // setActive), which is what Hud.toggleInterfaceUnlock refuses on.
+      interfaceUnlockAvailable: !(useTouchInterface() || isNativeAppShell()),
+      interfaceUnlocked: this.deps.isInterfaceUnlocked(),
+    });
+    const list = buildOptionsMenuList(entries, {
+      toggleInterfaceUnlock: () => this.deps.toggleInterfaceUnlock(),
+      dispatch: (action) => this.routeMenuAction(action),
+    });
     scroll.appendChild(list);
     // Running build, as small secondary text at the foot of the menu, so players can
     // confirm their version without leaving the settings window (issue 1541).
@@ -706,6 +676,25 @@ export class OptionsWindow {
     ver.textContent = t('hudChrome.options.version', { version, build });
     scroll.appendChild(ver);
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
+  }
+
+  /** Route a main-menu press. The sub-views, the wiki hop, logout, unstuck and
+   *  close all mutate window state, so the list painter hands them back here. */
+  private routeMenuAction(a: OptionsMenuRoutedAction): void {
+    if (a.kind === 'goto') {
+      this.view = a.view;
+      this.keybindNote = '';
+      this.render();
+    } else if (a.kind === 'wiki') {
+      this.deps.openWiki();
+    } else if (a.kind === 'logout') {
+      this.deps.options()?.logout();
+    } else if (a.kind === 'unstuck') {
+      this.deps.world().unstuck();
+      this.close();
+    } else {
+      this.close();
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -1683,8 +1672,10 @@ export class OptionsWindow {
       // Frame editing is desktop-only (every gesture refuses touch layouts), so
       // the touch HUD offers neither the entry row nor the layout code rows that
       // carry its saved spots; Hud.toggleInterfaceUnlock refuses as the backstop.
-      if (!env.touch) buildInterfaceUnlockRow(body, this.deps);
-      if (!env.touch) this.transferRows(body, 'frames');
+      // The native shell forces the touch HUD whatever the Interface Mode override
+      // says, so it is gated too (the same union as the Esc menu's row).
+      if (!env.touch && !env.nativeShell) buildInterfaceUnlockRow(body, this.deps);
+      if (!env.touch && !env.nativeShell) this.transferRows(body, 'frames');
       subhead(body, t('hudChrome.partyFrames.optionsSection'), 'set-subhead');
     }
 

@@ -17,6 +17,7 @@
 
 import { QUALITY_RANK } from '../sim/loot_master';
 import type { TranslationKey } from './i18n.catalog';
+import { interfaceUnlockLabelKey } from './interface_unlock_core';
 import { VENDOR_SELL_CONFIRM_QUALITIES } from './vendor_sell_confirm_policy';
 
 /** Copy at the ownership boundary so a caller can never mutate the applied
@@ -452,6 +453,10 @@ export type OptionsPanelId =
 
 export type OptionsMenuAction =
   | { kind: 'goto'; view: OptionsPanelId }
+  /** The Unlock Interface action, carrying the state it was built from so the
+   *  painter's establishing paint has ONE source (the core); a press then
+   *  repaints from the seam's answer. */
+  | { kind: 'interfaceUnlock'; unlocked: boolean }
   | { kind: 'wiki' }
   | { kind: 'unstuck' }
   | { kind: 'logout' }
@@ -462,10 +467,32 @@ export interface OptionsMenuEntry {
   action: OptionsMenuAction;
 }
 
-/** The main Esc-menu button list. The "Report a Bug" row is online-only (it needs
- *  an authoritative server to receive the report). */
-export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): OptionsMenuEntry[] {
-  const entries: OptionsMenuEntry[] = [
+export interface OptionsMenuOpts {
+  /** The "Report a Bug" row is online-only (it needs an authoritative server
+   *  to receive the report). */
+  bugReportAvailable: boolean;
+  /** Frame editing is desktop-only (every gesture refuses touch layouts), so
+   *  the touch HUD omits the Unlock Interface row: the same gate the Frames
+   *  tab's row sits behind, and the predicate Hud.toggleInterfaceUnlock
+   *  refuses on (the touch HUD is active), so the row never paints inert. */
+  interfaceUnlockAvailable: boolean;
+  /** Whether the frames are loose right now. The row labels itself "Lock
+   *  interface" while they are, exactly as the Frames tab's row does. */
+  interfaceUnlocked: boolean;
+}
+
+/** The main Esc-menu button list. Unlock Interface leads (owner request: the
+ *  frames lock down by default, so the way to arrange them is one press from
+ *  Esc rather than three levels into Interface > Frames); it is an ACTION the
+ *  painter repaints in place, not a sub-view. */
+export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
+  const entries: OptionsMenuEntry[] = [];
+  if (opts.interfaceUnlockAvailable)
+    entries.push({
+      labelKey: interfaceUnlockLabelKey(opts.interfaceUnlocked),
+      action: { kind: 'interfaceUnlock', unlocked: opts.interfaceUnlocked },
+    });
+  entries.push(
     { labelKey: 'hud.options.keyBindings', action: { kind: 'goto', view: 'keybinds' } },
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
@@ -479,7 +506,7 @@ export function buildOptionsMenu(opts: { bugReportAvailable: boolean }): Options
     // The wiki row sits with the help-shaped entries (above Report a Bug /
     // Unstuck); it opens the confirm-first external hop, never a sub-panel.
     { labelKey: 'nav.wiki', action: { kind: 'wiki' } },
-  ];
+  );
   if (opts.bugReportAvailable)
     entries.push({
       labelKey: 'hudChrome.bugReport.menuButton',

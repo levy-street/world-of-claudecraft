@@ -489,7 +489,11 @@ const MONOLITHS: MonolithRow[] = [
     // bespoke rows (the chat timestamp pair, the chat-window reset, the Unlock
     // Interface action) moved to src/ui/options_interface_rows.ts. Exact count,
     // zero slack.
-    ceiling: 2840,
+    // LOWERED 2840 -> 2831 when the main menu's button list (and the Unlock
+    // Interface entry that joined it) moved to
+    // src/ui/options_main_menu_controller.ts; the window keeps only the
+    // routing and the touch gate. Exact count, zero slack.
+    ceiling: 2831,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {

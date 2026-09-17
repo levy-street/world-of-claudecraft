@@ -2498,6 +2498,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
   'src/ui/options_window_shell.ts',
   'src/ui/options_interface_rows.ts',
+  'src/ui/options_main_menu_controller.ts',
   'src/ui/hud/talking_head/talking_head_controller.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',

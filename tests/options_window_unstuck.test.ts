@@ -21,7 +21,9 @@ class FakeElement {
   readonly classList = {
     add: () => {},
     remove: () => {},
+    toggle: () => {},
   };
+  readonly dataset: Record<string, string> = {};
   className = '';
   innerHTML = '';
   textContent: string | null = null;
@@ -70,7 +72,12 @@ describe('options window unstuck action', () => {
     const unstuck = vi.fn();
     vi.stubGlobal('document', {
       createElement: () => new FakeElement(),
+      // The main menu's touch gate also asks whether the native shell is up.
+      body: { classList: { contains: () => false } },
     });
+    // The main menu reads the touch probe (desktop here, so the Unlock
+    // Interface row paints too) and the frame-editing seam.
+    vi.stubGlobal('window', { matchMedia: () => ({ matches: false }) });
     const window = new OptionsWindow({
       root: () => root as unknown as HTMLElement,
       world: () => ({ unstuck }) as never,
@@ -78,6 +85,8 @@ describe('options window unstuck action', () => {
       bugReport: () => null,
       hideTooltip: vi.fn(),
       restoreFocus: vi.fn(),
+      isInterfaceUnlocked: () => false,
+      toggleInterfaceUnlock: () => false,
     } as never);
 
     (window as unknown as { renderMain(): void }).renderMain();
@@ -98,7 +107,10 @@ describe('options window unstuck action', () => {
     };
     vi.stubGlobal('document', {
       createElement: () => new FakeElement(),
+      // The main menu's touch gate also asks whether the native shell is up.
+      body: { classList: { contains: () => false } },
     });
+    vi.stubGlobal('window', { matchMedia: () => ({ matches: false }) });
     const window = new OptionsWindow({
       root: () => root as unknown as HTMLElement,
       world: () => clientWorld as never,
@@ -106,6 +118,8 @@ describe('options window unstuck action', () => {
       bugReport: () => null,
       hideTooltip: vi.fn(),
       restoreFocus: vi.fn(),
+      isInterfaceUnlocked: () => false,
+      toggleInterfaceUnlock: () => false,
     } as never);
 
     (window as unknown as { renderMain(): void }).renderMain();

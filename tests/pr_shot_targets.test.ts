@@ -180,6 +180,26 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps the main-menu list painter to the Esc game menu target on both hosts', () => {
+    // The Unlock Interface row leads the desktop menu and is absent on touch,
+    // so the target carries both arms; it keys on the list painter alone so
+    // the options_view order above is untouched.
+    const plan = classifyDiff(['src/ui/options_main_menu_controller.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'game-menu-unlock-interface',
+    ]);
+    // desktop-unlocked presses the row for real, so the shot proves the press
+    // reaches Hud.toggleInterfaceUnlock (frame chrome + the floating Lock
+    // Interface control appear), not just the window.
+    expect(plan.specific[0].variants.map((v: { key: string }) => v.key)).toEqual([
+      'desktop',
+      'desktop-unlocked',
+      'mobile',
+    ]);
+    expect(plan.generic).toHaveLength(0);
+  });
+
   it('maps controller option changes to remapped desktop and mobile evidence', () => {
     const plan = classifyDiff(['src/game/gamepad_bindings.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
@@ -191,7 +211,11 @@ describe('classifyDiff', () => {
     ]);
     const captureSource = plan.specific[0].capture.toString();
     expect(captureSource).toContain('[aria-label="Cross"]');
-    expect(captureSource).toContain('buttons[1]?.click()');
+    // The Controller row by its data-menu-action hook, never by index: the
+    // main menu's order shifts by host (the Unlock Interface row leads on
+    // desktop only).
+    expect(captureSource).toContain('[data-menu-action="controller"]');
+    expect(captureSource).not.toContain('buttons[1]?.click()');
     expect(captureSource).toContain('#tutorial-greeting');
   });
 
