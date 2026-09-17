@@ -1255,6 +1255,18 @@ export function dealDamage(
       }
     }
   }
+  if (
+    source &&
+    source.kind !== 'player' &&
+    source.ownerId !== null &&
+    source.ownerId !== target.id
+  ) {
+    const ownerMeta = ctx.players.get(source.ownerId);
+    const pending = ownerMeta?.pendingUnstuck;
+    if (pending?.area.kind === 'battleground' && amount > 0) {
+      pending.companionDamageDealt += amount;
+    }
+  }
 
   // Reactive "Frenzy": a wounded mob carrying frenzyOnHit may lash out faster.
   // Rolls only for mobs that actually carry the trait (the helper bails before

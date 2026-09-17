@@ -78,6 +78,7 @@ export interface PendingUnstuck {
   area: UnstuckArea;
   damageTaken: number;
   damageDealt: number;
+  companionDamageDealt: number;
   lastAnnouncedSecond: number;
   /**
    * Whether the invoker was dead or a ghost when the countdown began. A crossing of the
@@ -495,6 +496,7 @@ export function requestUnstuck(ctx: SimContext, pid?: number): boolean {
     area: current.area,
     damageTaken: meta.counters.damageTaken,
     damageDealt: meta.counters.damageDealt,
+    companionDamageDealt: 0,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: p.dead || p.ghost,
   };
@@ -520,6 +522,9 @@ function cancelReason(
     Math.abs(p.pos.y - pending.origin.y) > CANCEL_VERTICAL_DISTANCE;
   if (meta.counters.damageTaken > pending.damageTaken) return 'damaged';
   if (pending.area.kind === 'battleground' && meta.counters.damageDealt > pending.damageDealt) {
+    return 'damaged';
+  }
+  if (pending.area.kind === 'battleground' && pending.companionDamageDealt > 0) {
     return 'damaged';
   }
   if ((p.inCombat || p.combatTimer < 5) && !bgGeometryTrap) return 'combat';
