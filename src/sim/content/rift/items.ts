@@ -1,3 +1,4 @@
+import { DAGGER_WEAPON_CLASSES } from '../../equipment_rules';
 import type { ItemDef } from '../../types';
 
 export const RIFT_ESSENCE_ITEM_ID = 'rift_essence';
@@ -94,7 +95,7 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     // rating ladder pins, at the same 40-rating floor the armor pieces mirror.
     critRating: RIFT_ARMOR_RATING,
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
     requiredLevel: 20,
     weaponProcs: [
       {

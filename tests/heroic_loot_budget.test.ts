@@ -23,6 +23,19 @@ import { Sim } from '../src/sim/sim';
 // (scripts/stamina_baseline_codemod.ts, run with --dry) and the generated
 // variants that follow their bases; the one boss whose digest did not move
 // (choirmother_selthe) is the one whose gear def did not change.
+//
+// Three further gearDigest values (vael_the_mistcaller, korzul_the_gravewyrm,
+// wildheart_high_priest) were re-minted when druids gained the dagger
+// proficiency: each of those bosses drops a dagger (mistcallers_fang,
+// fang_of_korzul, wildheart_fangknife) whose `requiredClass` widened from
+// ['rogue','hunter'] to the shared DAGGER_WEAPON_CLASSES constant
+// (src/sim/equipment_rules.ts). The digest covers the whole item def, so it
+// moves on a requiredClass edit even though NO stat moved, which is exactly
+// what this pin exists to distinguish. Receipt: every changed line in
+// src/sim/content/ for that change is either a `requiredClass:` line or the
+// import of that constant (28 requiredClass edits, 12 imports, zero stat
+// lines), and gearIds is unchanged for all three bosses, so no acquisition
+// was added or dropped.
 const BASELINE = {
   sexton_marrow: {
     gearIds: ['oiled_boots', 'quilted_trousers'],
@@ -81,7 +94,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
-    gearDigest: 'cb4f14361b295142d4e3cff80d5128973ade319912ee149ae013859e22075a6a',
+    gearDigest: 'a95bb6b44af04e89f04b1773d83260d8d95a86c5443d01bcd75397badf63165f',
   },
   choirmother_selthe: {
     gearIds: ['heroic_selthes_seastriders'],
@@ -172,7 +185,7 @@ const BASELINE = {
       'wyrmchoir_handwraps',
     ],
     normalDigest: '0ac50f2ff6acdc808e5c24f721c84b337eade18ea81d2463f77bdd437599946a',
-    gearDigest: '483612e11a843da003d682b74a7934bc686b57107e8a39dc779285efdb198c6a',
+    gearDigest: '1bbc5800144686dbcd1a6e857794e5909d434827b0054daf9ee738a12a5239ba',
   },
   wildheart_high_priest: {
     gearIds: [
@@ -190,7 +203,7 @@ const BASELINE = {
       'vineclaw_stalking_breeches',
     ],
     normalDigest: 'dc4c6a27f87b5cd5ab11237b791de5a2707e2b55329f7c1aada4a4fb9cfe34f8',
-    gearDigest: 'b2d1139c6e200d4a6e86302d3761a656b52ec898f341de292da2d5505db57bb5',
+    gearDigest: '9ca01a2098e97ba2bbaac781f51774a57f3c080a86e9c0025c1cbd14307ee421',
   },
 } as const;
 

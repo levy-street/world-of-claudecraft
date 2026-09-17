@@ -14,12 +14,21 @@ import { requiredClassesForTooltip } from '../src/ui/item_class_restriction';
 // grouping alone made the restriction obvious. Neither actually names the eligible
 // classes (and weapons have no equivalent badge at all), so the line must always
 // render when the item carries a class restriction.
+//
+// The dagger half of that report was later answered at the source: druids now
+// hold the dagger proficiency (DAGGER_WEAPON_CLASSES, src/sim/equipment_rules.ts),
+// so Fang of Korzul admits them. The TOOLTIP rule this suite exists for is
+// unchanged and still covered below, now by a class the group really does
+// exclude (a warrior), which is the case that would regress.
 describe('requiredClassesForTooltip', () => {
-  it('names the classes for a rogue/hunter-only weapon (Fang of Korzul)', () => {
+  it('names the classes for a dagger, and still blocks a class outside the group', () => {
     const item = ITEMS.fang_of_korzul;
     expect(item).toBeDefined();
-    expect(canEquipItem('druid', item)).toBe(false);
-    expect(requiredClassesForTooltip(item)).toEqual(['rogue', 'hunter']);
+    // Druids hold the dagger proficiency now; a warrior never did.
+    expect(canEquipItem('druid', item)).toBe(true);
+    expect(canEquipItem('warrior', item)).toBe(false);
+    // The line must still render, and must name the whole group.
+    expect(requiredClassesForTooltip(item)).toEqual(['rogue', 'hunter', 'druid']);
   });
 
   it('does not advertise Rogue for a future two-handed weapon', () => {

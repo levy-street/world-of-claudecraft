@@ -51,8 +51,14 @@ const BALANCE_LOADOUT = {
   ring1: 'circle_of_cinders',
   ring2: 'loop_of_quiet_springs',
 } as const;
+// mainhand re-pinned when druids gained the dagger proficiency
+// (DAGGER_WEAPON_CLASSES, src/sim/equipment_rules.ts). Before that the feral
+// fixture had no eligible MELEE weapon at all and the scorer fell through to a
+// wand, which Wolf Form cannot even swing (form_swing.ts wandAllowedInForm);
+// it now picks a real one-hander. The caster BALANCE_LOADOUT above keeps its
+// wand, which is the tell that this moved the feral scorer only.
 const FERAL_LOADOUT = {
-  mainhand: 'wand_of_quenched_sparks',
+  mainhand: 'cinderfang_kris',
   helmet: 'heroic_bramblehide_crown',
   neck: 'ignivars_ember_choker',
   shoulder: 'ashveil_shoulder',

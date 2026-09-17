@@ -5,6 +5,7 @@
 // around the roots of a great tree. Reached only by portal: the southern
 // border ridge is sealed (see sealedSouthBorder in world.ts).
 
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type {
   CampDef,
   GroundObjectDef,
@@ -1089,7 +1090,7 @@ export const REALM_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 13, max: 21, speed: 1.7, dagger: true },
     stats: { agi: 6, sta: 2 },
     sellValue: 950,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   gleamwood_stave: {
     id: 'gleamwood_stave',

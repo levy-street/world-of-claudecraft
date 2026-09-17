@@ -3,6 +3,7 @@
 // by its former per-kill chance. Normal loot and non-equipment chances are
 // unchanged. Migrated base drops retain their original source tier and stats.
 
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import { VARKHUL_BOSS_ID } from '../ignivar_raid_ids';
 import { weightedLootGroup } from '../loot/weighted_loot_group';
 import { IGNIVAR_BOSS_ID, type ItemDef, type LootEntry } from '../types';
@@ -145,7 +146,7 @@ export const HEROIC_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 13, sta: 9 },
     critRating: FIVE_MAN_WEAPON_RATING,
     sellValue: 15000,
-    requiredClass: AGILE,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   tidebound_spaulders: {
     id: 'tidebound_spaulders',

@@ -6,6 +6,7 @@
 // pass (southPassX). Terrain shape: the EMBER_* tables in world.ts (coast
 // lobes, the desert gradient, volcano cones).
 
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type {
   CampDef,
   GroundObjectDef,
@@ -726,7 +727,7 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
     // DPS-neutral stat, keeping the agility identity.
     stats: { agi: 13, sta: 7 },
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
     requiredLevel: 20,
     weaponProcs: [
       {

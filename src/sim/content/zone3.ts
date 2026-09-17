@@ -3,6 +3,7 @@
 // the wall against ogres, waking elementals, and the open chanting of the
 // Broodsworn at the Gravewyrm Sanctum gates.
 
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import { WORK_ORDER_CADENCE_TICKS } from '../professions/cadence';
 import type {
   CampDef,
@@ -2392,7 +2393,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 17, max: 27, speed: 1.7, dagger: true },
     stats: { agi: 7, sta: 4 },
     sellValue: 3000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
     weaponProcs: [
       {
         id: 'boneglass_cut',
@@ -2712,7 +2713,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 12, max: 19, speed: 1.7, dagger: true },
     stats: { agi: 5, sta: 3 },
     sellValue: 900,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   drogmar_warboots: {
     id: 'drogmar_warboots',
@@ -2734,7 +2735,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 13, max: 21, speed: 1.8, dagger: true },
     stats: { agi: 7, sta: 2 },
     sellValue: 950,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   ironvein_lantern_staff: {
     id: 'ironvein_lantern_staff',
@@ -2839,7 +2840,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 15, max: 23, speed: 1.7, dagger: true },
     stats: { agi: 7, sta: 4 },
     sellValue: 2000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   drogmars_skullcleaver: {
     id: 'drogmars_skullcleaver',
@@ -2872,7 +2873,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 14, max: 22, speed: 1.7, dagger: true },
     stats: { agi: 7, sta: 4 },
     sellValue: 2000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   stormshard_leggings: {
     id: 'stormshard_leggings',
@@ -3138,7 +3139,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 19, max: 30, speed: 1.7, dagger: true },
     stats: { agi: 12, sta: 6 },
     sellValue: 8000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   // --- Inventory 2.0 epics: one per armor archetype, filling the new slots and
   // named into the existing Barrowlord/Mournweave/Nightfang Korzul epic families.
@@ -4217,7 +4218,7 @@ export const ZONE3_ITEMS: Record<string, ItemDef> = {
     stats: { agi: 13, sta: 7 },
     hitRating: 20,
     sellValue: 14000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   // Tank one-hander: the sta-led threat blade prot warriors and paladins lacked
   // (they ran the Kingsbane legendary or a five-man cleaver). Hit for threat,

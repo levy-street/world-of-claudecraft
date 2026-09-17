@@ -2,6 +2,8 @@
 // Idol in Palmreach. Unlike Orkadia's processional war-camp, this interior is a
 // flooded jungle caldera with two routes around a central beast island. Both
 // paths climb into one ritual terrace beneath a colossal jaguar shrine.
+
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type { DungeonDef, DungeonSpawn, ItemDef, MobTemplate } from '../types';
 import { HEROIC_FINALE_COPPER } from './dungeon_difficulty';
 
@@ -19,7 +21,7 @@ export const WILDHEART_ITEMS: Record<string, ItemDef> = {
     // DPS-neutral stat, keeping the agility identity.
     stats: { agi: 12, sta: 7 },
     sellValue: 9000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
     requiredLevel: 20,
     weaponProcs: [
       {
@@ -66,7 +68,7 @@ export const WILDHEART_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 19, max: 30, speed: 1.7, dagger: true },
     stats: { agi: 12, sta: 6 },
     sellValue: 8000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   // The Beastmaster's signature rare: item level 23 (source 20 + rare 3). 2H dps
   // on the weaponDpsBudget(23) x TWOHAND_DPS_MULT curve (~15.6 at speed 3.2);

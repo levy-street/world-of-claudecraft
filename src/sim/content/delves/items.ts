@@ -1,3 +1,4 @@
+import { DAGGER_WEAPON_CLASSES } from '../../equipment_rules';
 import type { ItemDef, PlayerClass } from '../../types';
 
 // Archetype groups, mirrors the pattern in content/items.ts so class-locked
@@ -173,7 +174,7 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 14, max: 22, speed: 1.8, dagger: true },
     stats: { agi: 2, sta: 1 },
     sellValue: 200,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   widow_silk_hood: {
     id: 'widow_silk_hood',
@@ -352,6 +353,6 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 20, max: 32, speed: 1.7, dagger: true },
     stats: { agi: 4, sta: 3 },
     sellValue: 620,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
 };

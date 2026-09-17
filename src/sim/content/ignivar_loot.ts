@@ -38,6 +38,7 @@
 // ordinary boss drops (offset, jewelry, held, weapons) carry no `soulbound`
 // flag and trade freely. Pinned by tests/ignivar_loot.test.ts.
 
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type { ItemDef, NpcDef } from '../types';
 import { CRUCIBLE_PATTERN_VENDOR_STOCK } from './crucible_collections';
 
@@ -3127,7 +3128,7 @@ export const IGNIVAR_WEAPON_ITEMS: Record<string, ItemDef> = {
     critRating: 70,
     hitRating: 30,
     sellValue: 14000,
-    requiredClass: ['rogue', 'hunter'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   slagrender_cleaver: {
     id: 'slagrender_cleaver',

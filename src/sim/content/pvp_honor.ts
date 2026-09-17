@@ -38,6 +38,7 @@
 // tests/warfare_gear_tier.test.ts. Design doc: docs/design/warfare.md.
 
 import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../eastbrook_layout';
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type { ItemDef, NpcDef } from '../types';
 import {
   SET_WARFARE_ASHSTALKER,
@@ -828,7 +829,7 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
     priceHonor: 1200,
     sellValue: 0,
     soulbound: true,
-    requiredClass: ['rogue', 'hunter', 'druid'],
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   emberglass_warstaff: {
     id: 'emberglass_warstaff',

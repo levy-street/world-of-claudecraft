@@ -30,7 +30,19 @@ const CASTER_WEAPON_CLASSES = new Set<PlayerClass>([
   'paladin',
   'druid',
 ]);
-const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(['rogue', 'hunter']);
+// The dagger proficiency group. Every weapon carrying this archetype in the
+// content tables is a dagger (`weapon.dagger`), so this list is literally "who
+// can wield a dagger": rogues and hunters, plus druids, who fight with one-handed
+// blades out of form and whose feral forms already swing whatever is equipped.
+//
+// Exported as an ARRAY for content authoring because `weaponArchetypeForItem`
+// recovers the archetype by matching an item's `requiredClass` against this
+// group EXACTLY (`sameClassSet`). A dagger whose list drifts from this one
+// silently loses its archetype and falls through to a literal class check, so
+// the content tables must reference this constant rather than restate it;
+// `tests/dagger_proficiency.test.ts` pins that they do.
+export const DAGGER_WEAPON_CLASSES: PlayerClass[] = ['rogue', 'hunter', 'druid'];
+const ROGUE_WEAPON_CLASSES = new Set<PlayerClass>(DAGGER_WEAPON_CLASSES);
 
 const ARMOR_RANK: Record<ArmorType, number> = {
   cloth: 0,

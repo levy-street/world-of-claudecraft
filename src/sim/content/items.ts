@@ -1,3 +1,4 @@
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type { ItemDef, PlayerClass } from '../types';
 
 // Archetype groups for class-locked rewards (REWARD_ARCHETYPE hands warrior
@@ -149,7 +150,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 4, max: 8, speed: 1.7, dagger: true },
     stats: { agi: 1, sta: 1 },
     sellValue: 120,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   militia_vest: {
     id: 'militia_vest',
@@ -302,7 +303,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 6, max: 11, speed: 1.7, dagger: true },
     stats: { agi: 4, sta: 2 },
     sellValue: 850,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   valeborn_spellblade: {
     id: 'valeborn_spellblade',
@@ -2629,7 +2630,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 7, max: 11, speed: 1.7, dagger: true },
     stats: { agi: 4, sta: 2 },
     sellValue: 880,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   maldrecs_soulbinder: {
     id: 'maldrecs_soulbinder',
@@ -3568,7 +3569,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 5, max: 9, speed: 1.7, dagger: true },
     stats: { agi: 3, sta: 2 },
     sellValue: 170,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   outrider_brigandine: {
     id: 'outrider_brigandine',

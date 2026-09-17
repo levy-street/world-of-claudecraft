@@ -8,6 +8,7 @@
 // way the per-zone modules and content/dungeons.ts are. Levels ~15-18: a step
 // up from the Sunken Bastion (13) for players climbing toward the Sanctum (20).
 
+import { DAGGER_WEAPON_CLASSES } from '../equipment_rules';
 import type {
   CampDef,
   DungeonDef,
@@ -625,7 +626,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 11, max: 18, speed: 1.7, dagger: true },
     stats: { agi: 6, sta: 2 },
     sellValue: 700,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
 
   // --- quest & dungeon blues (rare) ---
@@ -693,7 +694,7 @@ export const TEMPLE_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 16, max: 25, speed: 1.7, dagger: true },
     stats: { agi: 8, sta: 4 },
     sellValue: 2200,
-    requiredClass: ROG,
+    requiredClass: DAGGER_WEAPON_CLASSES,
   },
   moonshroud_breastplate: {
     id: 'moonshroud_breastplate',
