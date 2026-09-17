@@ -1546,10 +1546,9 @@ export class OptionsWindow {
     presetName.textContent = t('hudChrome.theme.preset');
     const presetLabel = (id: PresetId): string =>
       t(`hudChrome.theme.presets.${id}` as TranslationKey);
-    // The themed dropdown the language picker uses (owner request: a dropdown
-    // rather than a row of segment buttons). Through render(), not
-    // renderInterface(): the dispatcher re-wires the title-bar [data-back]
-    // control the rebuild just destroyed.
+    // The language picker's themed dropdown (owner request, not segment buttons). Through
+    // render(), not renderInterface(): the dispatcher re-wires the title-bar [data-back]
+    // control the rebuild just destroyed. Carries the picker's downward-menu override too.
     const presetDropdown = this.buildDropdown(
       PRESET_ORDER.map((id) => ({ value: id, label: presetLabel(id) })),
       theme.get().preset,
@@ -1563,6 +1562,7 @@ export class OptionsWindow {
       undefined,
       { ariaLabel: t('hudChrome.theme.preset') },
     );
+    presetDropdown.classList.add('set-theme-select');
     presetRow.append(presetName, presetDropdown);
     body.appendChild(presetRow);
 

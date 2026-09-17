@@ -6230,9 +6230,11 @@
     bottom: auto;
     top: calc(100% + 4px);
   }
-  /* options language picker: it is the first row of the Interface panel, so the
-     default upward menu clips off the panel top; drop it downward instead. */
-  .set-lang-select .ui-dd-menu {
+  /* options language picker and UI theme preset: they are the first rows of the
+     Interface panel, so the default upward menu clips off the panel top (the
+     theme menu landed on the tab strip); drop them downward instead. */
+  .set-lang-select .ui-dd-menu,
+  .set-theme-select .ui-dd-menu {
     bottom: auto;
     top: calc(100% + 4px);
   }
