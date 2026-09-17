@@ -30,6 +30,7 @@ import { tickTemporalHourglassGround } from './combat/temporal_hourglass';
 import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
+import { guardAndReportPose, isPosFinite } from './finite_pose_guard';
 import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
@@ -219,8 +220,17 @@ export function rebucketEntity(ctx: SimContext, e: Entity): void {
 export function runDespawnDecay(ctx: SimContext): void {
   const despawnIds: number[] = [];
   for (const e of ctx.entities.values()) {
-    copyPos(e.prevPos, e.pos);
-    e.prevFacing = e.facing;
+    // A player whose pose went non-finite since its last step (a forced
+    // locomotion arm, a knockback, a teleport) is restored here, ahead of
+    // movement; the movement kernel catches its own step in-line. Players
+    // only, by design: the freeze class is the player scope plus the client
+    // camera, and a NaN mob merely goes inert (every comparison against it
+    // reads false) rather than breaking anything.
+    if (e.kind === 'player') guardAndReportPose(ctx, e);
+    // prevPos / prevFacing hold the last FINITE pose by contract, which is
+    // what the finite-pose guard restores from (finite_pose_guard.ts).
+    if (isPosFinite(e.pos)) copyPos(e.prevPos, e.pos);
+    if (Number.isFinite(e.facing)) e.prevFacing = e.facing;
     if (e.despawnTimer !== undefined) {
       e.despawnTimer -= DT;
       if (e.despawnTimer <= 0) despawnIds.push(e.id);

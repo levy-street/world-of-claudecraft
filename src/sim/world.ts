@@ -1421,10 +1421,10 @@ export function inGardenMaze(x: number, z: number): boolean {
   );
 }
 
-// Is a grid position a wall? Out-of-bounds counts as open (the lawn beyond
-// the maze), so the outer ring's pieces run along the perimeter only.
+// Is a grid position a wall? Out-of-bounds counts as open (the lawn beyond the
+// maze), and so does a NaN index: one positive conjunction, every comparison false.
 function mazeWallAt(c: number, r: number): boolean {
-  if (r < 0 || r >= MAZE_ROWS || c < 0 || c >= MAZE_COLS) return false;
+  if (!(r >= 0 && r < MAZE_ROWS && c >= 0 && c < MAZE_COLS)) return false;
   return GARDEN_MAZE[r].charCodeAt(c) === 35; // '#'
 }
 

@@ -22,6 +22,7 @@ import { abilityCastSurvivesMovement, movementInputWouldMove } from './combat/ca
 import { isRooted, isStunned } from './combat/cc';
 import { isVeilboundMarchActive } from './combat/paladin_veilbound_state';
 import { mountMoveSpeedPct } from './content/mounts';
+import { guardAndReportPose } from './finite_pose_guard';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from './pathfind';
 import {
   type CharacterMoveParams,
@@ -295,6 +296,11 @@ export interface PlayerMotionDeps {
     kind: 'hit',
     noRage: boolean,
   ): void;
+  /**
+   * Called on every restore by the finite-pose guard, with the input the body
+   * was holding. Absent: the throttled dev-channel warning (warnNonFinitePose).
+   */
+  onNonFinitePose?(p: Entity, inp: MoveInput | undefined): void;
 }
 
 export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInput): void {
@@ -507,6 +513,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
 
   verticalPass(deps, p, inp, wishX, wishZ, wishSpeed, swimming, steepGround, mountLocked);
   standoffPass(deps, p, stepStartX, stepStartZ, wishX, wishZ, wishSpeed, movingOnGround);
+  // Backstop for the NaN freeze class (finite_pose_guard.ts): whatever the
+  // step did, the pose it hands to the rest of the tick is finite.
+  guardAndReportPose(deps, p, inp, deps.onNonFinitePose);
 }
 
 // Instanced interiors (dungeons, delves, arena, the Yumi maze): flat floors

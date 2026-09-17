@@ -84,6 +84,10 @@ const CAM_LIFT_RAMP = 2.2; // yd of smooth rise approaching a hedge face
  * camera glides over walls rather than popping.
  */
 export function gardenMazeCameraLift(x: number, z: number): number {
+  // A non-finite camera (a NaN player pose mirrored by the client) passes
+  // every range check below, and floor(NaN) would index GARDEN_MAZE[NaN] and
+  // throw on every frame, killing the render loop. Treat it as outside.
+  if (!Number.isFinite(x) || !Number.isFinite(z)) return 0;
   const w = MAZE_COLS * MAZE_CELL;
   const m = CAM_LIFT_RAMP + 1;
   if (x < MAZE_X0 - m || x > MAZE_X0 + w + m) return 0;
