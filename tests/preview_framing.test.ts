@@ -7,8 +7,15 @@ import { PREVIEW_FRAMING } from '../src/render/characters/preview_framing';
 // tall silhouette (a pointed hat, a staff) stays inside the frame.
 
 describe('PREVIEW_FRAMING', () => {
-  it('pins the self-sheet framing (the classic close, face-on camera)', () => {
-    expect(PREVIEW_FRAMING.sheet).toEqual({ y: 1.45, z: 5.1, lookY: 1.3 });
+  it('pins the self-sheet framing (face-on, a step back from the classic close camera)', () => {
+    expect(PREVIEW_FRAMING.sheet).toEqual({ y: 1.45, z: 5.67, lookY: 1.3 });
+  });
+
+  it('draws the sheet model about a tenth smaller than the classic 5.1 distance', () => {
+    // Apparent size scales with 1 / distance, so 5.1 / 5.67 is the on-screen ratio.
+    // The gear columns float over the stage edges; the step back keeps a wide
+    // silhouette (a shield arm, a drawn weapon) clear of their names.
+    expect(5.1 / PREVIEW_FRAMING.sheet.z).toBeCloseTo(0.9, 2);
   });
 
   it('pins the pulled-back inspect framing', () => {
