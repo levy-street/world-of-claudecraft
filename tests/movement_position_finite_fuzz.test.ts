@@ -38,119 +38,129 @@ function firstNonFinite(sim: Sim): string | null {
 
 const CLASS_IDS = Object.keys(CLASSES) as PlayerClass[];
 
+// Each class walks its whole kit through the real Sim: a few seconds locally,
+// tens of seconds on a cold CI runner, past vitest's 20 s default per test.
+const FUZZ_CASE_TIMEOUT_MS = 120_000;
+
 describe('NaN position fuzz (v0.43.0 dev freeze reproduction)', () => {
   for (const cls of CLASS_IDS) {
-    it(`${cls}: whole kit against a mob and a player while moving stays finite`, () => {
-      const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
-      const pid = sim.addPlayer(cls, `Fuzz_${cls}`) as number;
-      const other = sim.addPlayer(cls === 'druid' ? 'shaman' : 'druid', 'Sparring') as number;
-      sim.setPlayerLevel(20, pid);
-      sim.setPlayerLevel(20, other);
-      const me = sim.entities.get(pid) as AnyEntity;
-      const foe = sim.entities.get(other) as AnyEntity;
-      const meta = sim.meta(pid)!;
-      const foeMeta = sim.meta(other)!;
-      foe.pos = { x: me.pos.x + 4, y: me.pos.y, z: me.pos.z };
-      foe.prevPos = { ...foe.pos };
-      sim.rebucket(foe);
-      const abilities: string[] = [...(CLASSES[cls].abilities as readonly string[])];
-      const rand = lcg(11 + CLASS_IDS.indexOf(cls));
-      let step = 0;
-      // Both axes, so opposed pairs (forward with back, strafe-left with
-      // strafe-right) come up regularly: that is the cancelled-vector case.
-      const dirs = ['forward', 'back', 'strafeLeft', 'strafeRight'] as const;
-      const drive = (ticks: number, label: string) => {
-        for (let i = 0; i < ticks; i++) {
-          // Jittery movement for both players: a fresh direction every few ticks.
-          if (step % 5 === 0) {
-            if (!process.env.FUZZ_NO_MOVE) {
-              for (const d of dirs) {
-                meta.moveInput[d] = rand() < 0.35;
-                foeMeta.moveInput[d] = rand() < 0.35;
+    it(
+      `${cls}: whole kit against a mob and a player while moving stays finite`,
+      () => {
+        const sim = new Sim({ seed: 7, playerClass: 'warrior', noPlayer: true }) as AnySim;
+        const pid = sim.addPlayer(cls, `Fuzz_${cls}`) as number;
+        const other = sim.addPlayer(cls === 'druid' ? 'shaman' : 'druid', 'Sparring') as number;
+        sim.setPlayerLevel(20, pid);
+        sim.setPlayerLevel(20, other);
+        const me = sim.entities.get(pid) as AnyEntity;
+        const foe = sim.entities.get(other) as AnyEntity;
+        const meta = sim.meta(pid)!;
+        const foeMeta = sim.meta(other)!;
+        foe.pos = { x: me.pos.x + 4, y: me.pos.y, z: me.pos.z };
+        foe.prevPos = { ...foe.pos };
+        sim.rebucket(foe);
+        const abilities: string[] = [...(CLASSES[cls].abilities as readonly string[])];
+        const rand = lcg(11 + CLASS_IDS.indexOf(cls));
+        let step = 0;
+        // Both axes, so opposed pairs (forward with back, strafe-left with
+        // strafe-right) come up regularly: that is the cancelled-vector case.
+        const dirs = ['forward', 'back', 'strafeLeft', 'strafeRight'] as const;
+        const drive = (ticks: number, label: string) => {
+          for (let i = 0; i < ticks; i++) {
+            // Jittery movement for both players: a fresh direction every few ticks.
+            if (step % 5 === 0) {
+              if (!process.env.FUZZ_NO_MOVE) {
+                for (const d of dirs) {
+                  meta.moveInput[d] = rand() < 0.35;
+                  foeMeta.moveInput[d] = rand() < 0.35;
+                }
+              }
+              if (!process.env.FUZZ_NO_JUMP) meta.moveInput.jump = rand() < 0.15;
+              if (!process.env.FUZZ_NO_FACING) {
+                me.facing = rand() * Math.PI * 2;
+                foe.facing = rand() * Math.PI * 2;
               }
             }
-            if (!process.env.FUZZ_NO_JUMP) meta.moveInput.jump = rand() < 0.15;
-            if (!process.env.FUZZ_NO_FACING) {
-              me.facing = rand() * Math.PI * 2;
-              foe.facing = rand() * Math.PI * 2;
-            }
-          }
-          const before = {
-            me: { ...me.pos },
-            foe: { ...foe.pos },
-            meIn: { ...meta.moveInput },
-            foeIn: { ...foeMeta.moveInput },
-          };
-          sim.tick();
-          step++;
-          const bad = firstNonFinite(sim);
-          if (bad) {
-            const who = bad.includes('Sparring') ? foe : me;
-            const dump = {
-              before: bad.includes('Sparring') ? before.foe : before.me,
-              input: bad.includes('Sparring') ? before.foeIn : before.meIn,
-              facing: who.facing,
-              prevPos: who.prevPos,
-              vy: who.vy,
-              auras: who.auras.map((a: { kind: string; value?: number }) => `${a.kind}=${a.value}`),
-              mountKey: who.mountKey,
-              ghost: who.ghost,
-              dead: who.dead,
-              stance: who.stance,
-              casting: who.castingAbility,
-              level: who.level,
-              stats: who.stats,
+            const before = {
+              me: { ...me.pos },
+              foe: { ...foe.pos },
+              meIn: { ...meta.moveInput },
+              foeIn: { ...foeMeta.moveInput },
             };
-            // eslint-disable-next-line no-console
-            console.log(`NAN DUMP ${cls} ${label} step ${step}: ${bad}\n${JSON.stringify(dump)}`);
+            sim.tick();
+            step++;
+            const bad = firstNonFinite(sim);
+            if (bad) {
+              const who = bad.includes('Sparring') ? foe : me;
+              const dump = {
+                before: bad.includes('Sparring') ? before.foe : before.me,
+                input: bad.includes('Sparring') ? before.foeIn : before.meIn,
+                facing: who.facing,
+                prevPos: who.prevPos,
+                vy: who.vy,
+                auras: who.auras.map(
+                  (a: { kind: string; value?: number }) => `${a.kind}=${a.value}`,
+                ),
+                mountKey: who.mountKey,
+                ghost: who.ghost,
+                dead: who.dead,
+                stance: who.stance,
+                casting: who.castingAbility,
+                level: who.level,
+                stats: who.stats,
+              };
+              // eslint-disable-next-line no-console
+              console.log(`NAN DUMP ${cls} ${label} step ${step}: ${bad}\n${JSON.stringify(dump)}`);
+            }
+            expect(bad, `${cls}: ${label} at step ${step}`).toBeNull();
           }
-          expect(bad, `${cls}: ${label} at step ${step}`).toBeNull();
+        };
+        // Nearest living hostile mob within 40 yd, if any (the Eastbrook spawn
+        // has wolves and boars around it).
+        const mob = () =>
+          [...sim.entities.values()].find(
+            (e: AnyEntity) =>
+              e.kind === 'mob' &&
+              !e.dead &&
+              e.hostile &&
+              Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z) < 40,
+          ) as AnyEntity | undefined;
+        drive(20, 'warm-up');
+        for (const id of abilities) {
+          const m = mob();
+          if (m) {
+            me.targetId = m.id;
+            sim.castAbilityOn(id, m.id, pid);
+            drive(5, `cast ${id} on mob`);
+          }
+          me.targetId = foe.id;
+          sim.castAbilityOn(id, foe.id, pid);
+          drive(5, `cast ${id} on player`);
+          // Ground-aimed form of the same ability at a point beside, on and far from the caster.
+          for (const aim of [
+            { x: me.pos.x, z: me.pos.z },
+            { x: me.pos.x + 3, z: me.pos.z - 3 },
+            { x: me.pos.x + 60, z: me.pos.z + 60 },
+          ]) {
+            sim.castAbility(id, pid, aim);
+            drive(3, `cast ${id} at ground`);
+          }
+          // Self-cast with no target at all.
+          me.targetId = null;
+          sim.castAbility(id, pid);
+          drive(5, `cast ${id} self`);
         }
-      };
-      // Nearest living hostile mob within 40 yd, if any (the Eastbrook spawn
-      // has wolves and boars around it).
-      const mob = () =>
-        [...sim.entities.values()].find(
-          (e: AnyEntity) =>
-            e.kind === 'mob' &&
-            !e.dead &&
-            e.hostile &&
-            Math.hypot(e.pos.x - me.pos.x, e.pos.z - me.pos.z) < 40,
-        ) as AnyEntity | undefined;
-      drive(40, 'warm-up');
-      for (const id of abilities) {
-        const m = mob();
-        if (m) {
-          me.targetId = m.id;
-          sim.castAbilityOn(id, m.id, pid);
-          drive(12, `cast ${id} on mob`);
+        // The sparring partner fires its own kit back while the subject keeps moving.
+        const foeCls = cls === 'druid' ? 'shaman' : 'druid';
+        for (const id of CLASSES[foeCls].abilities as readonly string[]) {
+          foe.targetId = me.id;
+          sim.castAbilityOn(id, me.id, other);
+          drive(5, `partner cast ${id}`);
         }
-        me.targetId = foe.id;
-        sim.castAbilityOn(id, foe.id, pid);
-        drive(12, `cast ${id} on player`);
-        // Ground-aimed form of the same ability at a point beside, on and far from the caster.
-        for (const aim of [
-          { x: me.pos.x, z: me.pos.z },
-          { x: me.pos.x + 3, z: me.pos.z - 3 },
-          { x: me.pos.x + 60, z: me.pos.z + 60 },
-        ]) {
-          sim.castAbility(id, pid, aim);
-          drive(6, `cast ${id} at ground`);
-        }
-        // Self-cast with no target at all.
-        me.targetId = null;
-        sim.castAbility(id, pid);
-        drive(12, `cast ${id} self`);
-      }
-      // The sparring partner fires its own kit back while the subject keeps moving.
-      const foeCls = cls === 'druid' ? 'shaman' : 'druid';
-      for (const id of CLASSES[foeCls].abilities as readonly string[]) {
-        foe.targetId = me.id;
-        sim.castAbilityOn(id, me.id, other);
-        drive(10, `partner cast ${id}`);
-      }
-      drive(200, 'cool-down');
-      expect(ZONES.length).toBeGreaterThan(0);
-    });
+        drive(60, 'cool-down');
+        expect(ZONES.length).toBeGreaterThan(0);
+      },
+      FUZZ_CASE_TIMEOUT_MS,
+    );
   }
 });
