@@ -14,8 +14,10 @@ export function impactContact(
   reducedMotion: boolean,
   abilityId?: string,
   periodic = false,
+  beat?: number,
+  source?: { x: number; z: number },
 ): void {
-  const profile = abilityId ? meleeImpactProfile(abilityId) : undefined;
+  const profile = abilityId ? meleeImpactProfile(abilityId, beat) : undefined;
   const physical = abilityId ? abilityVfxFullSpec(abilityId)?.physical : undefined;
   if (physical) {
     const contact = physicalContactSheet(physical);
@@ -31,6 +33,8 @@ export function impactContact(
   if (profile?.bleeding) school = 'physical-blood';
   visual?.respondToElement(school, Math.min(0.95, 0.55 + weight * 0.15), profile);
   if (periodic || abilityId === 'deep_wounds') return;
+  if (abilityId === 'red_harvest' && beat !== undefined && !reducedMotion)
+    visual?.receiveHarvestImpact(beat, source);
   if (!reducedMotion) visual?.holdFrame(0.18, Math.min(0.045, 0.018 + weight * 0.01));
   if (!local || reducedMotion || typeof navigator === 'undefined' || !navigator.vibrate) return;
   const now = performance.now();

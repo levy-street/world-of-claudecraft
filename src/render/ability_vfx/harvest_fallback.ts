@@ -14,11 +14,11 @@ export function harvestFallback(host: SequencerHost, at: SeqPoint, facing: numbe
       (points) => {
         for (let i = 0; i < points.length; i++) {
           const u = i / (points.length - 1);
-          const across = side * (0.15 + Math.sin(u * Math.PI * 0.85) * 4.5);
+          const across = side * (0.15 + Math.sin(u * Math.PI * 0.68) * 5.4);
           const depth = u * 1.75;
           points[i].set(
             at.x + dz * across + dx * depth,
-            at.y - 0.35 + u * 7.56,
+            at.y - 0.35 + u * (side > 0 ? 8.52 : 7.68),
             at.z - dx * across + dz * depth,
           );
         }

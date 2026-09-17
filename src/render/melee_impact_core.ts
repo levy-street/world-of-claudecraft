@@ -92,7 +92,15 @@ export function isBleedContinuation(id: string | undefined, primaryId?: string |
   );
 }
 
-export function meleeImpactProfile(id: string): MeleeImpactProfile | undefined {
+const HARVEST_CONTACTS = [-0.66, 0.58, 0].map((angle, beat) => ({
+  ...MELEE_IMPACTS.red_harvest,
+  height: MELEE_IMPACTS.red_harvest.height + [0, 0.13, -0.055][beat],
+  angle,
+}));
+
+export function meleeImpactProfile(id: string, beat?: number): MeleeImpactProfile | undefined {
+  if (id === 'red_harvest' && beat !== undefined && Number.isInteger(beat))
+    return HARVEST_CONTACTS[beat] ?? MELEE_IMPACTS[id];
   return MELEE_IMPACTS[id];
 }
 

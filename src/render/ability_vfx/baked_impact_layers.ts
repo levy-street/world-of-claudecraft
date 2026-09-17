@@ -252,7 +252,7 @@ export class BakedImpactLayers {
                 : 0.5,
     );
     s.mesh.userData.heat = u.uHeat.value;
-    if (kind === 'harvest_impact') u.uPivot.value.set(0.5, 0.5 + 0.45 / 7.8);
+    if (kind === 'harvest_impact') u.uPivot.value.set(0.5, 0.5 + 3 / 14);
     return true;
   }
   update(dt: number, camera: THREE.Quaternion, reducedMotion: boolean): void {

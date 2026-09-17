@@ -10,6 +10,10 @@
     "other": 0
   },
   "keyTrimDb": {
+    "melee_warrior_red_harvest_release": -1.2,
+    "impact_warrior_red_harvest_first": 0.4,
+    "impact_warrior_red_harvest_second": 0.9,
+    "impact_warrior_red_harvest_finish": 1.8,
     "amb_forge": 5,
     "ambush": 5.1,
     "arcane_blast": 6,

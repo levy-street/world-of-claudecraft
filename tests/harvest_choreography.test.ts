@@ -40,6 +40,36 @@ function fixture(available = true) {
 }
 
 describe('Red Harvest impact composition', () => {
+  it('keeps the receiving seam attached through translation, turning and sequencer-slot reuse', () => {
+    const { host, slot } = fixture();
+    let x = 4,
+      yaw = 0,
+      alive = true;
+    host.anchorOf = (id, fraction, out = { x: 0, y: 0, z: 0 }) => {
+      if (id === 2 && !alive) return null;
+      return Object.assign(out, { x: id === 1 ? 0 : x, y: fraction * 2, z: 2 });
+    };
+    host.facingAt = () => yaw;
+    harvestBeat(host, slot, 0);
+    const call = vi.mocked(host.pathRibbon).mock.calls[0];
+    expect(call[9]).toBe(true);
+    const points = Array.from({ length: 24 }, () => new Vector3());
+    call[3](points);
+    const before = points.map((p) => p.clone());
+    x += 3;
+    slot.targetId = 999;
+    call[3](points);
+    for (let i = 0; i < points.length; i++) {
+      expect(points[i].x - before[i].x).toBeCloseTo(3);
+      expect(points[i].z).toBeCloseTo(before[i].z);
+    }
+    yaw = Math.PI / 2;
+    call[3](points);
+    expect(Math.abs(points[23].x - points[0].x)).toBeGreaterThan(1);
+    expect(Math.abs(points[23].z - points[0].z)).toBeLessThan(0.001);
+    alive = false;
+    expect(call[3](points)).toBe(0);
+  });
   it('keeps full-height extraction when the shared sculpture and sprite pools are saturated', () => {
     const { host, slot, ribbons } = fixture(false);
     harvestBeat(host, slot, 2);

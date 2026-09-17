@@ -92,8 +92,8 @@ const harvestCoil = pose(sample(1, 0.27), sample(2, 0.28), -38, 5, 8);
 const harvestFirst = pose(sample(1, 0.38), sample(2, 0.28), 35, 15, 2);
 const harvestReverse = pose(sample(1, 0.78), sample(2, 0.32), 38, 5, 14);
 const harvestSecond = pose(sample(1, 0.88), sample(2, 0.87), -40, 18, 7);
-const harvestLow = pose(sample(2, 0.87), sample(2, 0.87), -5, 18, 5, sample(2, 0.87));
-const harvestHigh = pose(sample(2, 0.28), sample(2, 0.28), 0, -12, 5, sample(2, 0.28));
+const harvestLow = pose(sample(2, 0.87), sample(2, 0.87), -8, 24, 5, sample(2, 0.87));
+const harvestHigh = pose(sample(2, 0.28), sample(2, 0.28), 0, -8, 7, sample(2, 0.28));
 const clips = [];
 for (const [name, beats] of [
   [
@@ -113,16 +113,16 @@ for (const [name, beats] of [
     'Fury_Red_Harvest',
     [
       [0, idle],
-      [0.075, harvestCoil],
+      [0.09, harvestCoil],
       [0.15, harvestFirst],
       [0.166, harvestFirst],
-      [0.245, harvestReverse],
+      [0.265, harvestReverse],
       [0.32, harvestSecond],
       [0.337, harvestSecond],
-      [0.42, harvestLow],
+      [0.44, harvestLow],
       [0.49, reapCut],
       [0.53, reapCut],
-      [0.595, harvestHigh],
+      [0.585, harvestHigh],
       [0.72, idle],
     ],
   ],
@@ -135,7 +135,8 @@ for (const [name, beats] of [
     for (let step = 1; step <= steps; step++) {
       const t = step / steps;
       // Ease in/out retains distinct loaded poses without a robotic stop.
-      const weight = t * t * (3 - 2 * t);
+      const striking = name === 'Fury_Red_Harvest' && [0.15, 0.32, 0.49, 0.585].includes(end);
+      const weight = striking ? t * t : t * t * (3 - 2 * t);
       const time = start + (end - start) * t;
       const blended = new Map(
         keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)]),

@@ -558,7 +558,7 @@ it.each(['raging_gale', 'red_harvest'])(
     const ribbons = (fx as unknown as { ribbons: AbilityVfxRibbons }).ribbons;
     const probe = ribbons as unknown as {
       geo: THREE.BufferGeometry;
-      arcs: Array<{ active: boolean; priority: number; glow: THREE.Color }>;
+      arcs: Array<{ active: boolean; priority: number; glow: THREE.Color; pts: THREE.Vector3[] }>;
     };
     const fill = (pts: { set(x: number, y: number, z: number): unknown }[]) => {
       pts[0].set(0, 0, -5);
@@ -579,13 +579,21 @@ it.each(['raging_gale', 'red_harvest'])(
       for (let i = 0; i < 20; i++) fx.pathRibbon(0x001122, 0.1, 1, fill);
       fx.update(0.011);
       const edges = probe.arcs.filter((a) => a.active && a.priority === 1);
-      expect(edges).toHaveLength(1);
+      // Both the dark receiving body and bright cutting edge are indispensable.
+      expect(edges).toHaveLength(2);
       expect(probe.geo.drawRange.count).toBeGreaterThan(0);
-      const edge = edges[0];
-      const color = edge.glow.getHex();
+      const retained = edges.map((edge) => ({
+        color: edge.glow.getHex(),
+        points: edge.pts.map((p) => p.toArray()),
+      }));
+      expect(retained[0].color).not.toBe(retained[1].color);
       for (let i = 0; i < 40; i++) fx.pathRibbon(0x005566, 0.1, 1, fill);
-      expect(edge.priority).toBe(1);
-      expect(edge.glow.getHex()).toBe(color);
+      for (let i = 0; i < edges.length; i++) {
+        expect(edges[i].active).toBe(true);
+        expect(edges[i].priority).toBe(1);
+        expect(edges[i].glow.getHex()).toBe(retained[i].color);
+        expect(edges[i].pts.map((p) => p.toArray())).toEqual(retained[i].points);
+      }
       fx.update(0.01);
       expect(probe.geo.drawRange.count).toBeGreaterThan(0);
     } finally {
@@ -623,7 +631,9 @@ it('reclaims expiring crest slots before admitting a contact and displays the ne
     expect(live[0].mesh.visible).toBe(true);
     expect(live[0].age).toBe(0);
     // The curved wake sits toward the caster; the target imprint stays at x=4.
-    expect(live[0].mesh.position.x).toBe(3.35);
+    expect(live[0].mesh.position.x).toBe(3.75);
+    expect((live[0].mesh.material as THREE.ShaderMaterial).uniforms.uKind.value).toBe(26);
+    expect(live[0].mesh.geometry.getAttribute('position').count).toBeGreaterThan(0);
   } finally {
     fx.dispose();
   }

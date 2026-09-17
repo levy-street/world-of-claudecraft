@@ -3062,7 +3062,7 @@ export class Renderer {
       abilityAudio: (kind, palette, power, x, y, z, opts) =>
         this.audioSink?.abilityAudio?.(kind, palette, power, x, y, z, opts),
     }, () => this.time);
-    this.abilityVfxFx.onContact = (source, target, school, weight, abilityId, beat) => { const view = this.views.get(target); impactContact(view ? this.activeVisual(view) : null, school, weight, beat !== 0 && source === this.sim.playerId, this.reducedMotion(), abilityId); };
+    this.abilityVfxFx.onContact = (source, target, school, weight, abilityId, beat) => { const view = this.views.get(target); impactContact(view ? this.activeVisual(view) : null, school, weight, beat !== 0 && source === this.sim.playerId, this.reducedMotion(), abilityId, false, beat, this.views.get(source)?.group.position); };
     // probe wiring lives entirely inside the subsystem it measures and the
     // production bundle carries none of it.
     if (import.meta.env.DEV && typeof window !== 'undefined') {

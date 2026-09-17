@@ -1,7 +1,7 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "5f8312f3a43ea4f6b3b1ba263ce24d7eca86af0e7f717dd3a6c615489658106a",
+  "bundleId": "5fb32df282167627cdc6e11be17197c29ffe8e5f518ed6506299f86a7f0006e8",
   "catalogHash": "c7c9b5110b6e7920093afa3a12389f7867af585555a4a9a768c6ad7bb75a76dd",
   "clips": {
     "amb_birds": {
@@ -1567,8 +1567,8 @@
           "sha256": "51008df3e442d35ab69ffd8ef3e47796a3222126f3403519ae6058f29ba7f772"
         }
       ],
-      "gain": 1,
-      "playbackRate": 1
+      "gain": 1.230269,
+      "playbackRate": 0.96
     },
     "impact_warrior_red_harvest_first": {
       "variants": [
@@ -1585,7 +1585,7 @@
           "sha256": "9a6ced4af541af82dbbbc29b1d60b65092ee5604018371ebc8f7b74ed46bc753"
         }
       ],
-      "gain": 1,
+      "gain": 1.047129,
       "playbackRate": 1
     },
     "impact_warrior_red_harvest_second": {
@@ -1603,7 +1603,7 @@
           "sha256": "76dff31562ccb23c9a2952132fd8cd8ab60936f3f1af6392f1e2e780551273df"
         }
       ],
-      "gain": 1,
+      "gain": 1.109175,
       "playbackRate": 1
     },
     "impact_warrior_redhand": {
@@ -2533,7 +2533,7 @@
           "sha256": "e110a89fe07846a1f76a3aa0ca22512412b47fa4f3e6fc0d45f8bfde4dc6e661"
         }
       ],
-      "gain": 1,
+      "gain": 0.870964,
       "playbackRate": 1
     },
     "melee_warrior_redhand_release": {

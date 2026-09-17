@@ -78,6 +78,26 @@ describe('buildHarvestShape', () => {
       expect(box.max.y - box.min.y).toBeGreaterThanOrEqual(6);
     });
 
+    it('has continuous lighting across the closed liquid UV seams', () => {
+      const uv = geo.getAttribute('uv');
+      const seams = new Map<string, number>();
+      for (let i = 0; i < pos.count; i++) {
+        if (uv.getX(i) === 0 || uv.getX(i) === 1) continue;
+        const key = [pos.getX(i), pos.getY(i), pos.getZ(i)].join(',');
+        if (uv.getY(i) === 0) seams.set(key, i);
+        if (uv.getY(i) !== 1) continue;
+        const first = seams.get(key);
+        expect(first).toBeDefined();
+        if (first === undefined) throw new Error('Open liquid seam');
+        const dot =
+          nrm.getX(first) * nrm.getX(i) +
+          nrm.getY(first) * nrm.getY(i) +
+          nrm.getZ(first) * nrm.getZ(i);
+        expect(dot).toBeGreaterThan(0.999);
+      }
+      expect(seams.size).toBeGreaterThan(400);
+    });
+
     it('width spans at least 6 units', () => {
       expect(box.max.x - box.min.x).toBeGreaterThanOrEqual(6);
     });

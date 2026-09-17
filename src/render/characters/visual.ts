@@ -74,6 +74,7 @@ import {
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
+import { HarvestRecoil } from './harvest_recoil';
 import { disposeHeldPropIdles, updateHeldPropIdles } from './held_prop_idle';
 import { noteLookAttached } from './look_pieces';
 import type { EmoteClipSpec, VisualDef, WeaponLayoutOverride } from './manifest';
@@ -689,6 +690,7 @@ export class CharacterVisual {
   // writing emissive on those would leak the glow across every same-skin rig.
   private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
   private readonly surfaceResponse = new CharacterSurfaceResponse();
+  private readonly harvestRecoil = new HarvestRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
 
@@ -1282,6 +1284,7 @@ export class CharacterVisual {
       this.swimBlend * (swimRise + Math.sin(this.swimBobTime * 2 + this.bobPhase) * 0.08) +
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
+    this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
 
     // distant corpses show the static idle far mesh, tip it over
     if (this.farMesh?.visible) {
@@ -2200,9 +2203,14 @@ export class CharacterVisual {
     if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
   }
   clearElementResponse(): void {
+    this.harvestRecoil.clear();
     const active = this.surfaceResponse.active;
     this.surfaceResponse.clear();
     if (active && !this.disposed) this.applyVisualMaterials();
+  }
+  receiveHarvestImpact(beat: number, source?: { x: number; z: number }): void {
+    if (!this.disposed && !this.deadLock)
+      this.harvestRecoil.trigger(beat, this.height, this.root, source);
   }
 
   private writeAuraGlow(material: THREE.Material): void {

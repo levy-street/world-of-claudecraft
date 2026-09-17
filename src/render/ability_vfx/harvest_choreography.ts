@@ -22,7 +22,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
   const final = beat === 2,
     primary = !slot.physicalSecondary;
   const roll = beat === 0 ? -0.66 : beat === 1 ? 0.58 : 0;
-  const life = final ? 0.25 : 0.16;
+  const life = final ? 0.26 : 0.16;
   if (outcome === 2) {
     host.flipbookAt(
       at.x,
@@ -39,6 +39,18 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     return true;
   }
   let count = 0;
+  host.flipbookAt(
+    at.x - dx * 0.18,
+    at.y,
+    at.z - dz * 0.18,
+    final ? 4.8 : beat === 1 ? 3.3 : 2.8,
+    final ? 0xffd5d5 : 0xff9ca7,
+    'contact_cut',
+    final ? 1.6 : 1.2,
+    final ? 0.075 : 0.055,
+    roll,
+  );
+  count++;
   // The broad normal-alpha sprite carries dense red material beneath a very
   // short hot seam. It is prepared before use, including on Low graphics.
   if (
@@ -48,7 +60,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       at.x - dx * 0.55,
       at.y,
       at.z - dz * 0.55,
-      final ? 7.4 : 4.6,
+      final ? 8.6 : beat === 1 ? 5.2 : 4.6,
       0xffffff,
       0xff8990,
       life,
@@ -67,10 +79,10 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       at.x - dx * 0.25,
       at.y - (final ? 0.35 : 0),
       at.z - dz * 0.25,
-      final ? 1.25 : 1.12,
+      final ? 1.3 : beat === 1 ? 1.2 : 1.12,
       final ? 1.2 : 1.35,
-      0x530b20,
-      0xe32d47,
+      0x58091d,
+      0xf02d49,
       final ? 'harvest_eruption' : 'harvest_cut',
       facing,
       life,
@@ -78,25 +90,55 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     ) !== false;
   if (sculpture) count++;
   else if (primary && final) count += harvestFallback(host, at, facing);
+  // Admit the contact first. Dust may only borrow capacity left after its core.
+  if (primary && final && slot.tier === 0 && host.bakedAt) {
+    const floor = host.groundYAt(from.x, from.z);
+    for (const side of [-1, 1])
+      if (
+        host.bakedAt(
+          'shout_dust',
+          from.x + dz * side * 0.4,
+          floor + 0.07,
+          from.z - dx * side * 0.4,
+          1.25,
+          0x79716b,
+          0xaaa19a,
+          0.2,
+          0,
+          0,
+          facing + Math.PI + side * 0.35,
+        ) !== false
+      )
+        count++;
+  }
   // A narrow receiving seam remains visible when optional pools are busy.
   // Both the seam and its dark backing lie on the body, never at the caster.
+  const targetId = slot.targetId;
+  const height = meleeContactHeight(profile, beat);
+  const yawOffset = facing - (host.facingAt?.(targetId) ?? facing);
+  const followPoint = { x: 0, y: 0, z: 0 };
   for (let layer = 0; layer < 2; layer++) {
     if (
       host.pathRibbon(
-        layer ? 0xffc2b1 : 0x790b27,
-        layer ? (final ? 0.18 : 0.12) : final ? 0.5 : 0.3,
-        layer ? 0.075 : 0.14,
+        layer ? 0xffe5de : 0x6c0824,
+        layer ? (final ? 0.27 : 0.14) : final ? 0.72 : 0.34,
+        layer ? (final ? 0.055 : 0.045) : final ? 0.23 : 0.16,
         (points) => {
+          const body = host.anchorOf(targetId, height, followPoint);
+          if (!body) return 0;
+          const yaw = (host.facingAt?.(targetId) ?? facing) + yawOffset;
+          const sx = Math.sin(yaw),
+            sz = Math.cos(yaw);
           for (let i = 0; i < points.length; i++) {
             const u = i / (points.length - 1),
-              s = (u - 0.5) * (final ? 2.3 : 1.65);
+              s = (u - 0.5) * (final ? 2.7 : 1.8);
             const across = s * Math.cos(roll),
               rise = s * Math.sin(roll);
             const jag = Math.sin(u * 23) * Math.sin(u * Math.PI) * 0.055;
             points[i].set(
-              at.x + dz * across - dx * 0.23,
-              at.y + rise + jag,
-              at.z - dx * across - dz * 0.23,
+              body.x + sz * across - sx * 0.23,
+              body.y + rise + jag,
+              body.z - sx * across - sz * 0.23,
             );
           }
           return points.length;
@@ -105,6 +147,8 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
         null,
         false,
         1,
+        null,
+        true,
       ) !== false
     )
       count++;
@@ -114,10 +158,10 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     at.y,
     at.z,
     0x940c2b,
-    slot.tier === 0 ? (final ? 24 : 13) : 7,
-    final ? 1.65 : 1.05,
+    slot.tier === 0 ? (final ? 38 : beat === 1 ? 19 : 13) : 7,
+    final ? 2.15 : beat === 1 ? 1.3 : 1.05,
     'blood',
-    life,
+    final ? 0.4 : life,
   );
   if (slot.tier === 0) {
     host.fragmentsAt?.(
@@ -134,7 +178,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     );
     count++;
   }
-  const force = profile.force * (final ? 1.5 : 1.05);
+  const force = profile.force * (final ? 1.65 : beat === 1 ? 1.15 : 1.05);
   host.contact?.(slot.casterId, slot.targetId, 'physical', force, slot.abilityId, beat);
   host.abilityAudio?.('impact', slot.spec.palette, force, at.x, at.y, at.z, {
     lite: slot.tier > 0 || !primary,
@@ -143,7 +187,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     abilityId: slot.abilityId,
   });
   host.pulseLight(slot.targetId, slot.spec.palette, final ? 2 : 1.1, 0.055, 3);
-  if (primary && final) host.shakeAt(at.x, at.y, at.z, 0.28);
+  if (primary && final) host.shakeAt(at.x, at.y, at.z, 0.32);
   host.countPrimitive(slot.abilityId, count + 3);
   return true;
 }

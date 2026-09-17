@@ -1668,6 +1668,7 @@ export class AbilityVfxFx implements SequencerHost {
     preserveActive = false,
     priority: 0 | 1 = 0,
     sweep: SteelSweepRange | null = null,
+    follow = false,
   ): boolean {
     if (this.disposed) return false;
     return this.ribbons.spawnPath(
@@ -1678,7 +1679,7 @@ export class AbilityVfxFx implements SequencerHost {
       brushed,
       motion,
       preserveActive,
-      false,
+      follow,
       priority,
       sweep,
     );
