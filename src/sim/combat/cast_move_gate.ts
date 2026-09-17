@@ -46,8 +46,12 @@ export function abilityCastSurvivesMovement(
 // only, mirroring player_motion's own hasMoveInput (turning in place and jump never
 // count). This is the one thing castAbility needs at press time to know whether the
 // very next movement tick would cancel a cast it is about to start.
+// NET vector, not "any key held": forward with back, or strafe-left with
+// strafe-right, cancels to zero and translates nobody. Counting a cancelled pair
+// as movement sent a zero vector into player_motion's direction normalization,
+// and 0 / 0 made the server position NaN (the v0.43.0 dev world freeze).
 export function hasMovementInput(inp: MoveInput): boolean {
-  return inp.forward || inp.back || inp.strafeLeft || inp.strafeRight;
+  return inp.forward !== inp.back || inp.strafeLeft !== inp.strafeRight;
 }
 
 // The movement-cancel predicate only fires when those held keys would actually
