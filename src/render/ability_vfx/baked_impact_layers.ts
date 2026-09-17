@@ -19,6 +19,7 @@ interface Slot {
   reverse: boolean;
   roll: number;
   dust: boolean;
+  harvest: boolean;
   x: number;
   z: number;
   dx: number;
@@ -29,6 +30,7 @@ interface Slot {
  * output, scene-depth intersection softness and bounded heat refraction. */
 export class BakedImpactLayers {
   private readonly point = new THREE.Vector3();
+  private readonly cameraInverse = new THREE.Quaternion();
   private readonly slots: Slot[] = [];
   private disposed = false;
   private readonly unbind: Array<() => void> = [];
@@ -133,6 +135,7 @@ export class BakedImpactLayers {
         reverse: false,
         roll: 0,
         dust: false,
+        harvest: false,
         x: 0,
         z: 0,
         dx: 0,
@@ -195,8 +198,13 @@ export class BakedImpactLayers {
     s.x = x;
     s.z = z;
     s.dust = kind === 'shout_dust';
+    s.harvest = kind === 'harvest_impact';
     s.dx = s.dust ? Math.sin(angle) * s.size * 0.7 : 0;
     s.dz = s.dust ? Math.cos(angle) * s.size * 0.7 : 0;
+    if (s.harvest) {
+      s.dx = Math.cos(angle) * Math.cos(roll);
+      s.dz = -Math.sin(angle) * Math.cos(roll);
+    }
     for (let i = 0; i < 5; i++) {
       const sampled = s.dust && groundY ? groundY(x + (s.dx * i) / 4, z + (s.dz * i) / 4) : floor;
       s.groundPath[i] = Number.isFinite(sampled) ? sampled : floor;
@@ -221,7 +229,13 @@ export class BakedImpactLayers {
     positions.needsUpdate = true;
     const u = s.mesh.material.uniforms;
     u.uMap.value = bakedTexture(kind);
-    u.uMirror.value = (kind === 'shout_dust' || s.power) && Math.cos(angle) < 0 ? -1 : 1;
+    u.uMirror.value = s.harvest
+      ? roll > 0
+        ? -1
+        : 1
+      : (kind === 'shout_dust' || s.power) && Math.cos(angle) < 0
+        ? -1
+        : 1;
     const surface = kind === 'chain_heal' ? liquidSurfaceMaps() : null;
     u.uSurface.value = surface ? 1 : 0;
     u.uNormal.value = surface?.normal ?? u.uMap.value;
@@ -252,7 +266,7 @@ export class BakedImpactLayers {
                 : 0.5,
     );
     s.mesh.userData.heat = u.uHeat.value;
-    if (kind === 'harvest_impact') u.uPivot.value.set(0.5, 0.5 + 3 / 14);
+    if (kind === 'harvest_impact') u.uPivot.value.set(0.5, 0.5);
     return true;
   }
   update(dt: number, camera: THREE.Quaternion, reducedMotion: boolean): void {
@@ -275,7 +289,14 @@ export class BakedImpactLayers {
       u.uHeat.value = s.mesh.userData.heat * (1 - p) ** 3;
       if (!s.ground) {
         s.mesh.quaternion.copy(camera);
-        if (s.roll !== 0) s.mesh.rotateZ(s.roll);
+        if (s.harvest) {
+          // Project the world-space blade axis into the camera plane. Rotating
+          // the camera must not reverse the receiving spray's cutting direction.
+          this.point
+            .set(s.dx, Math.sin(s.roll), s.dz)
+            .applyQuaternion(this.cameraInverse.copy(camera).invert());
+          s.mesh.rotateZ(Math.atan2(this.point.y, this.point.x));
+        } else if (s.roll !== 0) s.mesh.rotateZ(s.roll);
         s.mesh.position.y = s.y + (reducedMotion ? 0 : p * s.rise);
         if (s.dust) {
           const advance = reducedMotion ? 0.65 : 1 - (1 - p) * (1 - p);

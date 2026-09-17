@@ -1,24 +1,26 @@
 import type { SeqPoint, SequencerHost } from './sequencer';
 
-/** Full-reach extraction when the shared sculpture pool is occupied. The
+/** Full-reach blade sweep when the shared membrane pool is occupied. The
  * existing priority ribbon pool admits these before decorative trails. */
 export function harvestFallback(host: SequencerHost, at: SeqPoint, facing: number): number {
   let count = 0;
   const dx = Math.sin(facing),
     dz = Math.cos(facing);
-  for (const side of [-1, 1]) {
+  for (const layer of [0, 1]) {
     const accepted = host.pathRibbon(
       0xc92343,
-      0.72,
-      0.25,
+      layer ? 0.13 : 0.32,
+      0.22,
       (points) => {
         for (let i = 0; i < points.length; i++) {
           const u = i / (points.length - 1);
-          const across = side * (0.15 + Math.sin(u * Math.PI * 0.68) * 5.4);
-          const depth = u * 1.75;
+          const angle = (u - 0.5) * 2.65;
+          const across = Math.sin(angle) * 6.36;
+          const bow = Math.cos(angle) - 1;
+          const depth = bow * 2.16 + layer * 0.12;
           points[i].set(
             at.x + dz * across + dx * depth,
-            at.y - 0.35 + u * (side > 0 ? 8.52 : 7.68),
+            at.y + bow * 0.6 - layer * 0.13,
             at.z - dx * across + dz * depth,
           );
         }

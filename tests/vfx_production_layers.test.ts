@@ -7,6 +7,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     shout_dust: new three.Texture(),
     smoke: new three.Texture(),
     shockwave: new three.Texture(),
+    harvest_impact: new three.Texture(),
   };
   const source = new three.IcosahedronGeometry(1, 0);
   return {
@@ -31,6 +32,64 @@ function meshes(scene: THREE.Scene) {
 }
 
 describe('baked impact volumes', () => {
+  it.each([-0.66, 0.58, 0])(
+    'pins blood to the wound and projects cut roll %s across camera angles',
+    (roll) => {
+      const scene = new THREE.Scene(),
+        pool = new BakedImpactLayers(scene, () => true);
+      const yaw = 0.7;
+      const direction = roll > 0 ? -1 : 1;
+      const axis = new THREE.Vector3(
+        Math.cos(yaw) * Math.cos(roll),
+        Math.sin(roll),
+        -Math.sin(yaw) * Math.cos(roll),
+      );
+      expect(
+        pool.spawn(
+          'harvest_impact',
+          3,
+          2,
+          5,
+          6.4,
+          0xffffff,
+          0,
+          0.24,
+          0,
+          0,
+          0,
+          yaw,
+          undefined,
+          false,
+          roll,
+        ),
+      ).toBe(true);
+      const mesh = meshes(scene)[0];
+      for (const turn of [-1.1, 0, 1.9]) {
+        const camera = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.4, turn, 0, 'YXZ'));
+        pool.update(0.025, camera, false);
+        const pivot = mesh.material.uniforms.uPivot.value;
+        expect(pivot.toArray()).toEqual([0.5, 0.5]);
+        expect(mesh.material.uniforms.uMirror.value).toBe(direction);
+        expect(mesh.position.toArray()).toEqual([3, 2, 5]);
+        const inverse = camera.clone().invert();
+        const expected = axis
+          .clone()
+          .multiplyScalar(direction)
+          .applyQuaternion(inverse)
+          .setZ(0)
+          .normalize();
+        const actual = new THREE.Vector3(mesh.material.uniforms.uMirror.value, 0, 0)
+          .applyQuaternion(mesh.quaternion)
+          .applyQuaternion(inverse)
+          .setZ(0)
+          .normalize();
+        expect(actual.dot(expected)).toBeGreaterThan(0.9999);
+      }
+      pool.update(0.3, new THREE.Quaternion(), false);
+      expect(mesh.visible).toBe(false);
+      pool.dispose();
+    },
+  );
   it('drapes a turned shockwave onto sloped ground without changing it every frame', () => {
     const scene = new THREE.Scene(),
       pool = new BakedImpactLayers(scene);
@@ -181,6 +240,25 @@ it('uses distinct prepared silhouettes and preserves their direction without reb
   expect(active.map((m) => m.geometry)).toEqual(geometries);
   pool.dispose();
   expect(scene.children).toHaveLength(0);
+});
+
+it('reverses the second blood sheet without leaking direction into a reused non-Harvest slot', () => {
+  const scene = new THREE.Scene(),
+    pool = new SignatureCrests(scene);
+  vi.spyOn(pool.preparation, 'ready').mockReturnValue(true);
+  for (const roll of [-0.66, 0.58, 0]) {
+    pool.clear();
+    expect(pool.spawn(3, 2, 5, 1.2, 1.15, 0x590719, 0xd9233d, 'harvest_cut', 0.7, 0.16, roll)).toBe(
+      true,
+    );
+    const mesh = meshes(scene)[0];
+    expect(mesh.material.uniforms.uFlow.value).toBe(roll > 0 ? -1 : 1);
+    expect(mesh.rotation.z).toBeCloseTo(roll);
+  }
+  pool.clear();
+  pool.spawn(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'water');
+  expect(meshes(scene)[0].material.uniforms.uFlow.value).toBe(0);
+  pool.dispose();
 });
 
 it('two full shouts retain four dust quadrants each beside two other live spell volumes', () => {

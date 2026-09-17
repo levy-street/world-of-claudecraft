@@ -70,7 +70,7 @@ describe('Red Harvest impact composition', () => {
     alive = false;
     expect(call[3](points)).toBe(0);
   });
-  it('keeps full-height extraction when the shared sculpture and sprite pools are saturated', () => {
+  it('keeps full directional reach when the shared membrane and sprite pools are saturated', () => {
     const { host, slot, ribbons } = fixture(false);
     harvestBeat(host, slot, 2);
     expect(host.crestAt).toHaveBeenCalledTimes(1);
@@ -78,12 +78,15 @@ describe('Red Harvest impact composition', () => {
     for (const ribbon of ribbons.slice(0, 2)) {
       expect(ribbon.every((p) => p.toArray().every(Number.isFinite))).toBe(true);
       const heights = ribbon.map((p) => p.y);
-      expect(Math.max(...heights) - Math.min(...heights)).toBeGreaterThan(7.5);
+      expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(3);
+      const across = ribbon.map((p) => p.z);
+      expect(Math.max(...across) - Math.min(...across)).toBeGreaterThan(12);
+      expect(ribbon[0].distanceTo(ribbon[ribbon.length - 1])).toBeGreaterThan(12);
     }
     expect(host.contact).toHaveBeenCalledTimes(1);
     expect(host.ringAt).not.toHaveBeenCalled();
   });
-  it('does not duplicate the towering performance on cleave recipients', () => {
+  it('does not duplicate the full blade performance on cleave recipients', () => {
     const { host, slot } = fixture(false);
     slot.physicalSecondary = true;
     harvestBeat(host, slot, 2);

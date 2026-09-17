@@ -6,7 +6,7 @@ const source = { x: 0, y: 0, z: 0 },
   target = { x: 0, y: 0, z: 0 };
 
 /** A confirmed collision owns every layer. Cleave recipients receive the bite,
- * while only the primary recipient owns the towering extraction. */
+ * while only the primary recipient owns the full blade membrane. */
 export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): boolean {
   if (slot.abilityId !== 'red_harvest') return false;
   const outcome =
@@ -21,8 +21,8 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     dz = Math.cos(facing);
   const final = beat === 2,
     primary = !slot.physicalSecondary;
-  const roll = beat === 0 ? -0.66 : beat === 1 ? 0.58 : 0;
-  const life = final ? 0.26 : 0.16;
+  const roll = meleeImpactProfile('red_harvest', beat)?.angle ?? profile.angle;
+  const life = final ? 0.24 : 0.16;
   if (outcome === 2) {
     host.flipbookAt(
       at.x,
@@ -43,24 +43,24 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     at.x - dx * 0.18,
     at.y,
     at.z - dz * 0.18,
-    final ? 4.8 : beat === 1 ? 3.3 : 2.8,
-    final ? 0xffd5d5 : 0xff9ca7,
+    final ? 3.8 : beat === 1 ? 2.9 : 2.5,
+    final ? 0xffb6ad : 0xea7078,
     'contact_cut',
-    final ? 1.6 : 1.2,
-    final ? 0.075 : 0.055,
+    final ? 1.25 : 1.05,
+    final ? 0.055 : 0.04,
     roll,
   );
   count++;
-  // The broad normal-alpha sprite carries dense red material beneath a very
-  // short hot seam. It is prepared before use, including on Low graphics.
+  // The compact spray starts at its centred wound pivot. The wider world-space
+  // membrane carries the blade direction, independently of this contact detail.
   if (
     host.bakedAt &&
     host.bakedAt(
       'harvest_impact',
-      at.x - dx * 0.55,
+      at.x - dx * 0.28,
       at.y,
-      at.z - dz * 0.55,
-      final ? 8.6 : beat === 1 ? 5.2 : 4.6,
+      at.z - dz * 0.28,
+      final ? 6.4 : beat === 1 ? 4.8 : 4.2,
       0xffffff,
       0xff8990,
       life,
@@ -77,12 +77,12 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     host.crestAt &&
     host.crestAt(
       at.x - dx * 0.25,
-      at.y - (final ? 0.35 : 0),
+      at.y,
       at.z - dz * 0.25,
-      final ? 1.3 : beat === 1 ? 1.2 : 1.12,
-      final ? 1.2 : 1.35,
-      0x58091d,
-      0xf02d49,
+      1.2,
+      1.15,
+      0x590719,
+      0xd9233d,
       final ? 'harvest_eruption' : 'harvest_cut',
       facing,
       life,
@@ -158,10 +158,10 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     at.y,
     at.z,
     0x940c2b,
-    slot.tier === 0 ? (final ? 38 : beat === 1 ? 19 : 13) : 7,
-    final ? 2.15 : beat === 1 ? 1.3 : 1.05,
+    slot.tier === 0 ? (final ? 12 : beat === 1 ? 7 : 5) : 3,
+    final ? 1.35 : beat === 1 ? 1.0 : 0.85,
     'blood',
-    final ? 0.4 : life,
+    final ? 0.28 : life,
   );
   if (slot.tier === 0) {
     host.fragmentsAt?.(

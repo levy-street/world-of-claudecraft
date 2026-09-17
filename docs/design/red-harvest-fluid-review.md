@@ -1,5 +1,8 @@
 # Red Harvest liquid-impact checkpoint, 17 September 2026
 
+Historical checkpoint: Tony rejected this liquid composition as blobby and antler-shaped.
+The replacement is recorded in [the blade-blood review](red-harvest-blade-blood-review.md).
+
 This continues the approved Red Harvest-only benchmark. It does not roll the treatment out to other abilities. Gameplay costs, damage, Enrage and contact times remain unchanged at 0.15, 0.32 and 0.49 seconds.
 
 ## Implemented

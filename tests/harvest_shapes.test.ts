@@ -74,32 +74,56 @@ describe('buildHarvestShape', () => {
       expect(box.max.z - box.min.z).toBeGreaterThan(0.2);
     });
 
-    it('height spans at least 6 units', () => {
-      expect(box.max.y - box.min.y).toBeGreaterThanOrEqual(6);
+    it('keeps a narrow cutting band across more than ten units of reach', () => {
+      expect(box.max.x - box.min.x).toBeGreaterThan(10);
+      expect(box.max.y - box.min.y).toBeLessThan(1.6);
+      expect((box.max.x - box.min.x) / (box.max.y - box.min.y)).toBeGreaterThan(7);
+      const middleLeadingEdge = 32 * 13;
+      expect(pos.getX(middleLeadingEdge)).toBeCloseTo(0);
+      expect(pos.getY(middleLeadingEdge)).toBeCloseTo(0, 1);
+      expect(pos.getZ(middleLeadingEdge)).toBeCloseTo(0);
     });
 
-    it('has continuous lighting across the closed liquid UV seams', () => {
+    it('has separate open sheet edges and nonzero interior normals, never closed tubes', () => {
       const uv = geo.getAttribute('uv');
-      const seams = new Map<string, number>();
+      let checked = 0;
       for (let i = 0; i < pos.count; i++) {
-        if (uv.getX(i) === 0 || uv.getX(i) === 1) continue;
-        const key = [pos.getX(i), pos.getY(i), pos.getZ(i)].join(',');
-        if (uv.getY(i) === 0) seams.set(key, i);
-        if (uv.getY(i) !== 1) continue;
-        const first = seams.get(key);
-        expect(first).toBeDefined();
-        if (first === undefined) throw new Error('Open liquid seam');
-        const dot =
-          nrm.getX(first) * nrm.getX(i) +
-          nrm.getY(first) * nrm.getY(i) +
-          nrm.getZ(first) * nrm.getZ(i);
-        expect(dot).toBeGreaterThan(0.999);
+        const along = (Math.floor(i / 13) % 65) / 64;
+        if (along < 0.03 || along > 0.97) continue;
+        expect(Math.hypot(nrm.getX(i), nrm.getY(i), nrm.getZ(i))).toBeCloseTo(1, 5);
+        if (uv.getY(i) !== 0) continue;
+        const last = i + 12;
+        expect(uv.getY(last)).toBe(1);
+        const gap = Math.hypot(
+          pos.getX(i) - pos.getX(last),
+          pos.getY(i) - pos.getY(last),
+          pos.getZ(i) - pos.getZ(last),
+        );
+        expect(gap).toBeGreaterThan(0.01);
+        expect(gap).toBeLessThan(1.25);
+        checked++;
       }
-      expect(seams.size).toBeGreaterThan(400);
+      expect(checked).toBeGreaterThan(400);
     });
 
     it('width spans at least 6 units', () => {
       expect(box.max.x - box.min.x).toBeGreaterThanOrEqual(6);
+    });
+
+    it('uses short uneven trailing patches rather than seven parallel full-width ribbons', () => {
+      const uv = geo.getAttribute('uv');
+      const count = pos.count / 7;
+      const starts = new Set<number>();
+      expect(uv.getX(0)).toBe(0);
+      expect(uv.getX(count - 1)).toBe(1);
+      for (let layer = 1; layer < 7; layer++) {
+        const start = uv.getX(layer * count);
+        const end = uv.getX((layer + 1) * count - 1);
+        starts.add(start);
+        expect(end - start).toBeGreaterThan(0.1);
+        expect(end - start).toBeLessThan(0.4);
+      }
+      expect(starts.size).toBe(6);
     });
 
     it('lobes occupy distinct vertex blocks with no cross-lobe index references', () => {

@@ -101,7 +101,8 @@ describe('Fury authored performance', () => {
     expect(crest.mock.calls[1][0]).toBeCloseTo(8 - (8 / Math.hypot(8, 4)) * 0.25);
     const finalSize = ending.boundingBox!.getSize(new THREE.Vector3());
     expect(finalSize.x * crest.mock.calls[1][3]).toBeGreaterThan(firstWidth * 1.3);
-    expect(finalSize.y * crest.mock.calls[1][4]).toBeGreaterThan(7);
+    expect(finalSize.x * crest.mock.calls[1][3]).toBeGreaterThan(12);
+    expect(finalSize.y * crest.mock.calls[1][4]).toBeLessThan(2);
     expect(crest.mock.calls).toHaveLength(2);
     expect(crest.mock.calls.map((call) => call[7])).toEqual(['harvest_cut', 'harvest_eruption']);
     opening.dispose();

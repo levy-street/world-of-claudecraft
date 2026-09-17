@@ -1683,7 +1683,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/vfx/production/chain_heal.ktx2": "/media/textures/vfx/production/chain_heal.3a29ea08ee7c.ktx2",
   "textures/vfx/production/chain_heal_2k.ktx2": "/media/textures/vfx/production/chain_heal_2k.0a4d475fe520.ktx2",
   "textures/vfx/production/frost_nova.ktx2": "/media/textures/vfx/production/frost_nova.cb132bf5d97c.ktx2",
-  "textures/vfx/production/harvest_impact.webp": "/media/textures/vfx/production/harvest_impact.57b0be5c9596.webp",
+  "textures/vfx/production/harvest_impact.webp": "/media/textures/vfx/production/harvest_impact.8dd5e6fc6f82.webp",
   "textures/vfx/production/liquid_lighting.ktx2": "/media/textures/vfx/production/liquid_lighting.5ab41f8c5e4a.ktx2",
   "textures/vfx/production/liquid_lighting_2k.ktx2": "/media/textures/vfx/production/liquid_lighting_2k.f1cd4b1338be.ktx2",
   "textures/vfx/production/liquid_motion_depth.ktx2": "/media/textures/vfx/production/liquid_motion_depth.c42595a3d81f.ktx2",

@@ -1,41 +1,42 @@
-/** Shared crest program extension. No extra material, pass or runtime upload.
- * UV.x follows extraction; UV.y crosses each sculpted fold. */
+﻿/** Prepared crest extension: a travelling cut through a fraying sheet.
+ * UV.x follows the blade; UV.y measures distance behind its cutting edge. */
 export const HARVEST_VERTEX = `
 if(uKind>23.5&&uKind<25.5){
   float motionAge=mix(0.32,uAge,uMotion);
-  float grow=1.0-pow(1.0-clamp(motionAge/0.38,0.0,1.0),3.0);
-  float erupt=step(24.5,uKind);
-  p=mix(position*vec3(0.12,0.06,0.18),position,grow*erupt+(1.0-erupt));
-  float release=smoothstep(0.36,1.0,motionAge);
-  p.x+=sign(position.x)*release*uv.x*0.95;
-  p.y+=(release*uv.x*0.45-release*release*1.45)*erupt;
-  p.z+=release*uv.x*0.85;
+  float release=smoothstep(0.18,1.0,motionAge);
+  p=position;
+  p.z+=release*0.75;
+  p.y-=release*release*0.48;
+}`;
+
+export const HARVEST_NOISE = `
+float harvestHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float harvestNoise(vec2 p){
+  vec2 cell=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);
+  return mix(mix(harvestHash(cell),harvestHash(cell+vec2(1.,0.)),f.x),
+    mix(harvestHash(cell+vec2(0.,1.)),harvestHash(cell+vec2(1.,1.)),f.x),f.y);
 }`;
 
 export const HARVEST_FRAGMENT = `
 if(uKind>23.5&&uKind<25.5){
-  if(uKind>24.5&&!gl_FrontFacing)discard;
   float motionAge=mix(0.32,uAge,uMotion);
-  float head=clamp(motionAge/0.20,0.0,1.0)*1.18;
-  float reveal=1.0-smoothstep(head-0.09,head+0.015,vUv.x);
-  vec2 flow=vec2(fract(vUv.x*0.85-motionAge*0.12),0.08+vUv.y*0.82);
-  vec3 tex=texture2D(uBloodMap,flow).rgb;
+  float along=uFlow<0.0?1.0-vUv.x:vUv.x;
+  float head=clamp(motionAge/0.34,0.0,1.0)*1.18;
+  float tail=max(0.0,(motionAge-0.26)*1.55);
+  float reveal=(1.0-smoothstep(head-0.08,head+0.015,along))*smoothstep(tail-0.08,tail+0.04,along);
+  vec3 tex=texture2D(uBloodMap,vec2(fract(vUv.x*0.91-motionAge*0.035),0.05+vUv.y*0.9)).rgb;
   float grain=dot(tex,vec3(0.333333));
-  float erosion=smoothstep(0.38,0.95,motionAge);
-  float neck=sin(vUv.x*21.0+sin(vUv.y*6.2831853)*1.2+vLocal.z*0.8);
-  float holes=smoothstep(-1.3+erosion*2.8,-0.9+erosion*2.8,neck+grain*0.7);
-  vec3 hn=normalize(vNormal);
-  vec3 he=normalize(vView); if(dot(hn,he)<0.0)hn=-hn;
-  vec3 hs=normalize((viewMatrix*vec4(uSunWorld,0.0)).xyz);
-  float light=0.32+0.68*max(0.0,dot(hn,hs));
-  float wet=pow(max(0.0,dot(hn,normalize(hs+he))),42.0);
-  colour=mix(uTint*0.8,uAccent,0.2+grain*0.3)*light;
-  colour+=vec3(1.0,0.38,0.42)*wet*0.38;
-  float tip=1.0-smoothstep(0.018,0.09,abs(vUv.x-head));
-  colour+=vec3(1.0,0.45,0.4)*tip*0.45*(1.0-uAge);
-  float tornEdge=0.67+0.16*sin(vUv.x*29.0)+0.08*sin(vUv.x*73.0);
-  float edgeBreak=1.0-smoothstep(tornEdge-0.045,tornEdge+0.015,vUv.y);
-  float aperture=mix(0.38,1.0,smoothstep(0.7,1.7,vLocal.y));
-  float rootRelease=smoothstep(erosion*0.5-0.08,erosion*0.5+0.06,vUv.x);
-  alpha=reveal*holes*mix(edgeBreak,1.0,step(24.5,uKind))*aperture*rootRelease*0.94*(1.0-smoothstep(0.68,1.0,uAge));
+  vec2 tornUv=vec2(vUv.x*17.0,vUv.y*5.0)+vec2(vLocal.z*1.3,0.0);
+  float broad=harvestNoise(tornUv);
+  float detail=harvestNoise(tornUv*2.71+7.3);
+  float fibres=harvestNoise(vec2(vUv.x*8.0,vUv.y*38.0)+broad*2.0);
+  float film=broad*0.65+detail*0.25+fibres*0.1;
+  float erosion=smoothstep(0.22,0.94,motionAge);
+  float holes=smoothstep(0.18+erosion*0.6,0.3+erosion*0.6,film);
+  float edge=0.48+harvestNoise(vec2(vUv.x*31.0,2.7))*0.5;
+  float fray=1.0-smoothstep(edge-0.12,edge+0.03,vUv.y+erosion*0.18);
+  float density=mix(0.38,0.88,broad);
+  float blade=exp(-vUv.y*14.0)*0.22;
+  colour=mix(uTint,uAccent,clamp(0.16+broad*0.5+grain*0.12+blade,0.0,1.0));
+  alpha=reveal*holes*fray*density*(1.0-smoothstep(0.66,1.0,uAge));
 }`;
