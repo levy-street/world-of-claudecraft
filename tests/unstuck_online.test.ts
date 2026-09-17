@@ -48,6 +48,7 @@ import {
   UNSTUCK_COUNTDOWN_SECONDS,
   UNSTUCK_RETRY_SECONDS,
   UNSTUCK_SUCCESS_COOLDOWN_SECONDS,
+  unstuckCombatActivitySerial,
 } from '../src/sim/unstuck';
 
 function fakeWs() {
@@ -106,6 +107,7 @@ function armUnstuck(server: GameServer, session: ClientSession): void {
     damageTaken: meta.counters.damageTaken,
     damageDealt: meta.counters.damageDealt,
     companionDamageDealt: 0,
+    combatActivitySerial: unstuckCombatActivitySerial(server.sim.ctx, session.pid),
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: player.dead || player.ghost,
   };

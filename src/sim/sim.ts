@@ -1568,8 +1568,7 @@ export interface PlayerMeta {
   // aggressive pet auto-pull (see PET_OWNER_IDLE_TICKS) so an idle owner's pet
   // cannot farm the area alone.
   lastActiveTick: number;
-  // Runtime-only local recovery attempt. The owning system lives in unstuck.ts;
-  // only its anti-relog cooldown is persisted through Entity.cooldowns.
+  // Runtime-only local recovery attempt; unstuck.ts owns the rules.
   pendingUnstuck: unstuckMod.PendingUnstuck | null;
   // Ashen Coliseum standings. Legacy arenaRating/Wins/Losses are the 1v1
   // bracket; 2v2 is fully independent and persisted alongside them.
@@ -7576,6 +7575,7 @@ export class Sim {
 
   private enterCombat(a: Entity, b: Entity): boolean {
     if (questGateBlocksCombat(this.players, a, b)) return false;
+    unstuckMod.noteUnstuckCombatPair(this.ctx, a, b);
     a.combatTimer = 0;
     b.combatTimer = 0;
     a.inCombat = true;

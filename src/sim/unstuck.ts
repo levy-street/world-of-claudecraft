@@ -70,6 +70,7 @@ const BG_WALL_PRESS_PROBE_DISTANCE = 0.35;
 const BG_WALL_PRESS_MIN_PROGRESS = 0.05;
 const BG_WALL_PRESS_ESC_GRACE_SECONDS = 3;
 const battlegroundWallPressGrace = new WeakMap<SimContext, Map<number, number>>();
+const combatActivitySerials = new WeakMap<SimContext, Map<number, number>>();
 
 export interface PendingUnstuck {
   startedAt: number;
@@ -79,6 +80,7 @@ export interface PendingUnstuck {
   damageTaken: number;
   damageDealt: number;
   companionDamageDealt: number;
+  combatActivitySerial: number;
   lastAnnouncedSecond: number;
   /**
    * Whether the invoker was dead or a ghost when the countdown began. A crossing of the
@@ -97,6 +99,26 @@ export type CancelledUnstuckEvent = Extract<UnstuckEvent, { phase: 'cancelled' }
 interface LocatedPoint {
   area: UnstuckArea;
   point: UnstuckPosition;
+}
+
+export function unstuckCombatActivitySerial(ctx: SimContext, pid: number): number {
+  return combatActivitySerials.get(ctx)?.get(pid) ?? 0;
+}
+
+export function noteUnstuckCombatActivity(ctx: SimContext, entity: Entity): void {
+  const pid = entity.kind === 'player' ? entity.id : entity.ownerId;
+  if (pid === null) return;
+  let serials = combatActivitySerials.get(ctx);
+  if (!serials) {
+    serials = new Map();
+    combatActivitySerials.set(ctx, serials);
+  }
+  serials.set(pid, (serials.get(pid) ?? 0) + 1);
+}
+
+export function noteUnstuckCombatPair(ctx: SimContext, a: Entity, b: Entity): void {
+  noteUnstuckCombatActivity(ctx, a);
+  noteUnstuckCombatActivity(ctx, b);
 }
 
 function located(area: UnstuckArea, pos: Vec3, origin: { x: number; z: number }): LocatedPoint {
@@ -497,6 +519,7 @@ export function requestUnstuck(ctx: SimContext, pid?: number): boolean {
     damageTaken: meta.counters.damageTaken,
     damageDealt: meta.counters.damageDealt,
     companionDamageDealt: 0,
+    combatActivitySerial: unstuckCombatActivitySerial(ctx, p.id),
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: p.dead || p.ghost,
   };
@@ -525,6 +548,12 @@ function cancelReason(
     return 'damaged';
   }
   if (pending.area.kind === 'battleground' && pending.companionDamageDealt > 0) {
+    return 'damaged';
+  }
+  if (
+    pending.area.kind === 'battleground' &&
+    unstuckCombatActivitySerial(ctx, p.id) > pending.combatActivitySerial
+  ) {
     return 'damaged';
   }
   if ((p.inCombat || p.combatTimer < 5) && !bgGeometryTrap) return 'combat';

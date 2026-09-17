@@ -1517,6 +1517,62 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(sim.bgMatchFor(pid)).toBe(match);
   });
 
+  it('missed incoming hostile activity cancels a battleground wall-trap Unstuck countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const attackerPid = match.teams[1][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    const attacker = must(sim.entities.get(attackerPid), 'opposing battleground player');
+    const meta = must(sim.meta(pid), 'player meta');
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const damageTaken = meta.counters.damageTaken;
+    sim.ctx.dealDamage(attacker, e, 0, false, 'physical', null, 'miss');
+    expect(meta.counters.damageTaken).toBe(damageTaken);
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'damaged',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
+  it('missed outgoing player activity cancels a battleground wall-trap Unstuck countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const targetPid = match.teams[1][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    const target = must(sim.entities.get(targetPid), 'opposing battleground player');
+    const meta = must(sim.meta(pid), 'player meta');
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const damageDealt = meta.counters.damageDealt;
+    sim.ctx.dealDamage(e, target, 0, false, 'physical', null, 'miss');
+    expect(meta.counters.damageDealt).toBe(damageDealt);
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'damaged',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
   it('owned companion damage cancels a battleground wall-trap Unstuck countdown', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
@@ -1536,6 +1592,38 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(meta.counters.damageDealt).toBe(damageDealt);
     e.inCombat = true;
     e.combatTimer = 0;
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'damaged',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
+  it('missed owned companion activity cancels a battleground wall-trap Unstuck countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const targetPid = match.teams[1][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    const target = must(sim.entities.get(targetPid), 'opposing battleground player');
+    const meta = must(sim.meta(pid), 'player meta');
+    summonPet(sim.ctx, e, 'emberkin');
+    const pet = must(sim.petOf(pid), 'owned pet');
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const damageDealt = meta.counters.damageDealt;
+    const pending = must(meta.pendingUnstuck, 'pending unstuck');
+    sim.ctx.dealDamage(pet, target, 0, false, 'physical', null, 'miss');
+    expect(meta.counters.damageDealt).toBe(damageDealt);
+    expect(pending.companionDamageDealt).toBe(0);
 
     expect(sim.tick()).toContainEqual(
       expect.objectContaining({
