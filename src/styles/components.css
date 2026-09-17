@@ -15590,7 +15590,16 @@
     align-items: stretch;
     padding: 2px 0;
   }
-  .opt-btn {
+  /* The row plates sit under the `all: revert-layer` reset on
+     `#options-menu button.ui-btn` (above), whose id + element + class
+     specificity outranks a bare class selector, so a plain `.opt-btn` rule
+     is silently discarded. That left the Wiki chevron and the Report a Bug
+     status (absolutely positioned children, below) resolving against the
+     whole window instead of their own plate: they hung past the plate's edge
+     at rest, then snapped inside on hover once the hover filter created a
+     containing block. Match the reset's specificity so the plate is the
+     positioning host. */
+  #options-menu .opt-btn.ui-btn {
     position: relative;
     width: 100%;
     margin: 0;
@@ -15607,6 +15616,11 @@
   .opt-btn-status {
     position: absolute;
     inset-inline-end: 10px;
+    /* Centre on the label line explicitly rather than trusting the flex
+       static position: the chevron is a 12px box and the status is 10px text,
+       so the height-agnostic pair is the one value that centres both. */
+    top: 50%;
+    transform: translateY(-50%);
   }
   .opt-btn-chevron {
     width: 12px;
@@ -16969,10 +16983,12 @@
     border-radius: 0;
     padding: 7px var(--window-pad);
   }
-  /* The one child that actually scrolls. Bottom padding reserves room for the
-     corner motif's ink reach past the footer buttons (moved off
-     #options-menu.perf-wide itself, which no longer scrolls; see above). */
-  #options-menu.perf-wide .perf-scroll {
+  /* The one child that actually scrolls. Under the Fancy Gold theme its bottom
+     padding reserves room for the corner motif's ink reach past the footer
+     buttons (moved off #options-menu.perf-wide itself, which no longer scrolls;
+     see above); the other presets have no ornament to clear and keep the shared
+     .ui-win-body inset. */
+  .fancy-gold-ui #options-menu.perf-wide .perf-scroll {
     padding-bottom: 64px;
   }
   .perf-panel {
@@ -17124,12 +17140,18 @@
   /* ---------- performance overlay gilded ornament (pilot) ---------- */
   /* A hand-gilded filigree frame, scoped strictly to #options-menu.perf-wide (the
      Performance sub-view only): does not touch the shared .panel/.window
-     primitive or any other window. Shapes come from perf_ornament_svg.ts
+     primitive or any other window. Since the Fancy Gold preset made the
+     gilding a theme opt-in (the .fancy-gold-ui root class applyTheme stamps
+     in main.ts; see the window-frame section below), every rule here that
+     paints the ornament, gilds the title bar, or clears room for the corner
+     ink carries that same gate: Classic, Midnight, Parchment and High
+     Contrast keep the flat panel on this sub-view like everywhere else
+     (tests/perf_ornament_header_clearance.test.ts pins the gate). Shapes come from perf_ornament_svg.ts
      (applyPerfOrnamentVars, called once at boot); colors read the new
      --color-gold-* ramp (tokens.css) and --perf-ornament-* mask vars, never a
      literal hex. See the PR body for why this is scoped narrowly rather than
      landed as a DESIGN.md-phase-ordered, repo-wide chrome retune. */
-  #options-menu.perf-wide {
+  .fancy-gold-ui #options-menu.perf-wide {
     /* The base .panel border stays fully transparent (not `border: 0`, which
        would reflow the box): the gilded ::before below is the only visible
        frame color, so there is no flat border peeking through the noisy
@@ -17158,7 +17180,7 @@
        above), so its own padding-bottom would sit on a box that never
        scrolls and could not carry the footer's last pixels into view. */
   }
-  #options-menu.perf-wide::before {
+  .fancy-gold-ui #options-menu.perf-wide::before {
     content: "";
     position: absolute;
     /* Negative inset: the gilded frame sits just OUTSIDE the dark panel's own
@@ -17255,7 +17277,7 @@
      background ABOVE the ornament and silently hid the top-left/top-right
      corner flourish entirely; verified live via a getBoundingClientRect +
      forced-z-index probe before landing this fix. */
-  #options-menu.perf-wide .panel-title {
+  .fancy-gold-ui #options-menu.perf-wide .panel-title {
     color: var(--color-gold-400);
     border-bottom-color: var(--color-gold-700);
     /* Room for the corner motif's ~60px ink reach along the top edge (the
@@ -17272,7 +17294,7 @@
      inline start next to the now-padded title): move its absolute inset
      in by the same ~60px the ornament needs, so the button box never sits
      under the top-right corner's ink. */
-  #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
+  .fancy-gold-ui #options-menu.perf-wide .panel-title > .x-btn:not(.back-btn) {
     inset-inline-end: 64px;
   }
   /* The Fancy Gold theme's window frame: every desktop feature window wears
@@ -17450,10 +17472,10 @@
      src/ui/CLAUDE.md); restore a plain system-color border so the window frame
      stays visible in high-contrast mode instead of vanishing with the mask. */
   @media (forced-colors: active) {
-    #options-menu.perf-wide {
+    .fancy-gold-ui #options-menu.perf-wide {
       border-color: CanvasText;
     }
-    #options-menu.perf-wide::before {
+    .fancy-gold-ui #options-menu.perf-wide::before {
       display: none;
     }
     .fancy-gold-ui body:not(.mobile-touch) .window.panel:not(.perf-wide) {

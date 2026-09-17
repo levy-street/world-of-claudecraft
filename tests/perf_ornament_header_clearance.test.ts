@@ -127,3 +127,52 @@ describe('perf overlay ornament host never scrolls with the panel content (issue
     expect(hasScrollY, '.perf-scroll must declare overflow-y: auto or scroll').toBe(true);
   });
 });
+
+// The gilded pilot frame is the Fancy Gold theme's look. When the fancyGold
+// preset landed, its window frame became a theme opt-in (the .fancy-gold-ui
+// root class applyTheme stamps in main.ts; every other preset keeps the classic
+// flat panels, see THEME_PRESETS in src/ui/theme.ts), but the Performance
+// sub-view's own pilot ornament stayed unconditional, so Classic, Midnight,
+// Parchment and High Contrast all opened a gold-framed perf panel. Every rule
+// that paints or makes room for that ornament must carry the theme gate; the
+// panel's width/layout block stays theme-agnostic.
+describe('perf overlay ornament is a Fancy Gold theme opt-in', () => {
+  // Flat "selector { body }" pairs; an at-rule's own `{` simply ends the previous
+  // non-brace run, so the rules nested inside it still surface as pairs.
+  const pairs = [...stripCssComments(componentsCss).matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => ({
+    selector: m[1].trim(),
+    body: m[2],
+  }));
+  const perfWide = pairs.filter((p) => p.selector.includes('#options-menu.perf-wide'));
+  const ornamentMarkers = [
+    /--perf-ornament-/,
+    /border-radius:\s*30px/,
+    /--color-gold-/,
+    /padding-left:\s*64px/,
+    /inset-inline-end:\s*64px/,
+    /padding-bottom:\s*64px/,
+    /border-color:\s*(transparent|CanvasText)/,
+  ];
+
+  it('every ornament-painting or ornament-clearing perf-wide rule is gated on .fancy-gold-ui', () => {
+    const ornamentRules = perfWide.filter((p) => ornamentMarkers.some((re) => re.test(p.body)));
+    expect(ornamentRules.length).toBeGreaterThanOrEqual(5);
+    for (const rule of ornamentRules) {
+      expect(rule.selector, rule.selector).toMatch(/^\.fancy-gold-ui\s+#options-menu\.perf-wide/);
+    }
+  });
+
+  it('the ::before ornament host exists only under the theme gate', () => {
+    const befores = perfWide.filter((p) => p.selector.includes('::before'));
+    expect(befores.length).toBeGreaterThan(0);
+    for (const rule of befores) expect(rule.selector).toMatch(/^\.fancy-gold-ui\s/);
+  });
+
+  it('the wide two-column layout itself stays theme-agnostic', () => {
+    const layout = perfWide.find(
+      (p) => p.selector === '#options-menu.perf-wide' && /\bwidth:/.test(p.body),
+    );
+    expect(layout, 'ungated #options-menu.perf-wide width rule').toBeTruthy();
+    expect(ornamentMarkers.some((re) => re.test(layout?.body ?? ''))).toBe(false);
+  });
+});
