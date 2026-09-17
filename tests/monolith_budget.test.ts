@@ -473,7 +473,12 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // LOWERED 18309 -> 18299 by the map atlas rail's collapse toggle: the new
+    // MapSidebarController settings port would have added 8 lines, so it moved
+    // (with the quest tracker's identical existing port literal) behind a
+    // shared trackerCollapseSettings factory in src/ui/tracker_collapse_settings.ts,
+    // leaving both call sites one line each. Exact count, zero slack.
+    ceiling: 18299,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

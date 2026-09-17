@@ -5396,7 +5396,9 @@ export const da_DK: EnTranslations = {
         "herb": "Urt",
         "mail": "Post",
         "passage": "Passage"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Kræver niveau {level}"

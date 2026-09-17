@@ -5396,7 +5396,9 @@ export const vi_VN: EnTranslations = {
         "herb": "RAU THƠM",
         "mail": "Mail",
         "passage": "lối đi; ngõ; hành lang đi qua"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Yêu cầu Cấp {level}"

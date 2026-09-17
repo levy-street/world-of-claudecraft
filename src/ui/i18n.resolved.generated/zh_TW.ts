@@ -5396,7 +5396,9 @@ export const zh_TW: EnTranslations = {
         "herb": "草藥",
         "mail": "信箱",
         "passage": "通道"
-      }
+      },
+      "collapseHint": "摺疊地圖側欄",
+      "expandHint": "展開地圖側欄"
     },
     "arenaGate": {
       "minLevelNote": "需要等級 {level}"

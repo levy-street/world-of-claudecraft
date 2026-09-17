@@ -16176,6 +16176,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.herb': '草藥',
   'hudChrome.mapAtlas.legend.mail': '信箱',
   'hudChrome.mapAtlas.legend.passage': '通道',
+  'hudChrome.mapAtlas.collapseHint': '摺疊地圖側欄',
+  'hudChrome.mapAtlas.expandHint': '展開地圖側欄',
 
   'hudChrome.wocStore.mountSkinType': '坐騎造型',
   'hudChrome.wocStore.mountInspectAria': '預覽{item}',

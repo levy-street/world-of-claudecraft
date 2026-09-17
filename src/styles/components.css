@@ -13186,6 +13186,25 @@
     gap: 10px;
     overflow: hidden;
   }
+  /* The player's own collapse toggle stays outside the body it hides, so its
+     aria-controls names something real (the deed-tracker disclosure
+     convention). It sits at the rail's own top-right corner. */
+  .map-atlas-sidebar-toggle {
+    align-self: flex-end;
+    flex: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .map-atlas-sidebar-toggle .ui-icon {
+      transition: transform 0.15s ease;
+    }
+  }
+  .map-atlas-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
   .map-atlas-stage {
     position: absolute;
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
@@ -13206,6 +13225,31 @@
   }
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar:empty) .map-atlas-stage {
     inset: var(--window-pad);
+  }
+  /* The player's OWN collapse choice (mapAtlasSidebarCollapsed), distinct from
+     the :empty auto-collapse above (an unfed rail before Hud wiring runs): the
+     toggle button stays put, the rest of the rail hides behind it, and the
+     window shrinks to the slim rail plus the stage. */
+  body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) {
+    width: 652px;
+  }
+  .map-atlas-sidebar.is-collapsed {
+    width: 44px;
+    padding: 14px 8px;
+    align-items: center;
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-sidebar-toggle {
+    align-self: center;
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-sidebar-toggle .ui-icon {
+    transform: rotate(180deg);
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-body {
+    display: none;
+  }
+  body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-stage {
+    inset: var(--window-pad) var(--window-pad) var(--window-pad)
+      calc(var(--window-pad) + 44px + 12px);
   }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */

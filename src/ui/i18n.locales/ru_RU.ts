@@ -17258,6 +17258,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.herb': 'Трава',
   'hudChrome.mapAtlas.legend.mail': 'Почта',
   'hudChrome.mapAtlas.legend.passage': 'Проход',
+  'hudChrome.mapAtlas.collapseHint': 'Свернуть боковую панель карты',
+  'hudChrome.mapAtlas.expandHint': 'Развернуть боковую панель карты',
 
   'hudChrome.wocStore.mountSkinType': 'Облик ездового животного',
   'hudChrome.wocStore.mountInspectAria': 'Предпросмотр: {item}',

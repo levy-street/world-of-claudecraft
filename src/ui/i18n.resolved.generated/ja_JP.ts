@@ -5396,7 +5396,9 @@ export const ja_JP: EnTranslations = {
         "herb": "薬草",
         "mail": "郵便",
         "passage": "通路"
-      }
+      },
+      "collapseHint": "マップサイドバーを折りたたむ",
+      "expandHint": "マップサイドバーを展開"
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"

@@ -5396,7 +5396,9 @@ export const ru_RU: EnTranslations = {
         "herb": "Трава",
         "mail": "Почта",
         "passage": "Проход"
-      }
+      },
+      "collapseHint": "Свернуть боковую панель карты",
+      "expandHint": "Развернуть боковую панель карты"
     },
     "arenaGate": {
       "minLevelNote": "Требуется уровень {level}"

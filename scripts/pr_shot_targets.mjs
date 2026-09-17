@@ -5892,6 +5892,43 @@ export const TARGETS = [
       return open ? { clip: '#map-window' } : {};
     },
   },
+  {
+    key: 'map-atlas-sidebar-collapse',
+    label: 'World map atlas rail collapse toggle',
+    when: ['ui/map_sidebar_controller', 'ui/map_sidebar_view', 'ui/tracker_collapse_settings'],
+    // Desktop only: the toggle (and the whole atlas rail it collapses) is
+    // hidden on body.mobile-touch by design, so a mobile shot of this target
+    // would be identical to the plain world-map one above.
+    variants: [{ key: 'desktop' }],
+    // Same landmark as the world-map target (Boar Meadow, Eastbrook Vale), open
+    // the map, then click the rail's own collapse toggle if it exists (the
+    // market-collapse-toggle precedent: present only on this branch, absent on
+    // the base commit, which leaves the "before" half of the pair the plain
+    // uncollapsed rail).
+    async capture(page) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 65;
+          p.pos.z = 0;
+        }
+      });
+      await wait(400);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      if (!open) return {};
+      await page.evaluate(() => {
+        const toggle = document.querySelector('[data-map-sidebar-toggle]');
+        if (toggle instanceof HTMLElement) toggle.click();
+      });
+      await wait(300);
+      return { clip: '#map-window' };
+    },
+  },
   // The Wildheart Basin's light grade: the caldera used to add its own fill
   // pair to the world scene (a light census change that relinked every
   // material for the rest of the session); the grade now lives in

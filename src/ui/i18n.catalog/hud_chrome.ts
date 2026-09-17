@@ -8121,6 +8121,11 @@ export const hudChromeStrings = {
       mail: 'Mail',
       passage: 'Passage',
     },
+    // The rail's own collapse toggle (map_sidebar_controller.ts): the accessible
+    // name/title pair, following the tracker collapse convention (e.g.
+    // hudChrome.deeds.collapseHint / expandHint).
+    collapseHint: 'Collapse map sidebar',
+    expandHint: 'Expand map sidebar',
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note

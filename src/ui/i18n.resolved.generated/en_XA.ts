@@ -5396,7 +5396,9 @@ export const en_XA: EnTranslations = {
         "herb": "[Ĥéŕƀ]",
         "mail": "[Ɱáíļ]",
         "passage": "[Þáššáĝé]"
-      }
+      },
+      "collapseHint": "[Çóļļáþšé ɱáþ šíðéƀáŕ]",
+      "expandHint": "[Éẋþáñð ɱáþ šíðéƀáŕ]"
     },
     "arenaGate": {
       "minLevelNote": "[Ŕéɋúíŕéš ļéʋéļ {level}]"

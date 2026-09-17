@@ -16984,6 +16984,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.herb': '약초',
   'hudChrome.mapAtlas.legend.mail': '우편',
   'hudChrome.mapAtlas.legend.passage': '통로',
+  'hudChrome.mapAtlas.collapseHint': '지도 사이드바 접기',
+  'hudChrome.mapAtlas.expandHint': '지도 사이드바 펼치기',
 
   'hudChrome.wocStore.mountSkinType': '탈것 스킨',
   'hudChrome.wocStore.mountInspectAria': '{item} 미리 보기',

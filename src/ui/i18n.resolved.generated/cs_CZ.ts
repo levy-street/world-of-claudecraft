@@ -5396,7 +5396,9 @@ export const cs_CZ: EnTranslations = {
         "herb": "Bylina",
         "mail": "Mail",
         "passage": "Průchod"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Vyžaduje úroveň {level}"

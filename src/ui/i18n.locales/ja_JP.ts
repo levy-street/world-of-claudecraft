@@ -17021,6 +17021,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mapAtlas.legend.herb': '薬草',
   'hudChrome.mapAtlas.legend.mail': '郵便',
   'hudChrome.mapAtlas.legend.passage': '通路',
+  'hudChrome.mapAtlas.collapseHint': 'マップサイドバーを折りたたむ',
+  'hudChrome.mapAtlas.expandHint': 'マップサイドバーを展開',
 
   'hudChrome.wocStore.mountSkinType': 'マウントスキン',
   'hudChrome.wocStore.mountInspectAria': '{item}をプレビュー',

@@ -5396,7 +5396,9 @@ export const ko_KR: EnTranslations = {
         "herb": "약초",
         "mail": "우편",
         "passage": "통로"
-      }
+      },
+      "collapseHint": "지도 사이드바 접기",
+      "expandHint": "지도 사이드바 펼치기"
     },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"

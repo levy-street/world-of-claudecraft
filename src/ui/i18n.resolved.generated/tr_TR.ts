@@ -5396,7 +5396,9 @@ export const tr_TR: EnTranslations = {
         "herb": "Bitki",
         "mail": "Posta",
         "passage": "Geçit"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Seviye {level} gerektirir"

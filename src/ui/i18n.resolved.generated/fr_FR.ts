@@ -5396,7 +5396,9 @@ export const fr_FR: EnTranslations = {
         "herb": "Herbe",
         "mail": "Mail",
         "passage": "Passage"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Niveau requis : {level}"
