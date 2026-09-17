@@ -3,6 +3,45 @@ import { CameraImpact } from '../src/render/camera_impact_core';
 
 const camera = () => ({ position: { x: 0, y: 3, z: 10 }, quaternion: { x: 0, y: 0, z: 0, w: 1 } });
 describe('directional camera impact', () => {
+  it.each([30, 60, 120])('draws one shove and two smaller returns at %s Hz', (hz) => {
+    const c = camera(),
+      a = new CameraImpact();
+    a.add(0.4, c.position, -10, 3, 10, true);
+    const offsets: number[] = [];
+    for (let i = 0; i < hz / 3; i++) {
+      a.beginDraw(c, 1 / hz, false);
+      offsets.push(c.position.x);
+      a.endDraw(c);
+      expect(c.position.x).toBeCloseTo(0, 12);
+      expect(c.position.y).toBeCloseTo(3, 12);
+      expect(c.position.z).toBe(10);
+    }
+    expect(offsets[0]).toBeCloseTo(0.168);
+    const negative = offsets.filter((v) => v < 0);
+    const lastReturn = offsets.filter((v, i) => i / hz > 0.108 && v > 0);
+    expect(negative.length).toBeGreaterThan(0);
+    expect(lastReturn.length).toBeGreaterThan(0);
+    expect(Math.max(...lastReturn)).toBeLessThan(-Math.min(...negative));
+    expect(-Math.min(...negative)).toBeLessThan(offsets[0] * 0.4);
+    expect(offsets.at(-1)).toBe(0);
+  });
+  it('keeps crunch direction independent of another impact and cancels all pending returns', () => {
+    const c = camera(),
+      a = new CameraImpact();
+    a.add(0.4, c.position, -10, 3, 10, true);
+    a.add(0.1, c.position, 10, 3, 10);
+    a.beginDraw(c, 0, false);
+    expect(c.position.x).toBeCloseTo(0.168 - 0.024);
+    a.endDraw(c);
+    a.clear();
+    expect(a.beginDraw(c, 0.08, false)).toBe(false);
+    for (let i = 0; i < 100; i++) a.add(1, c.position, -10, 3, 10, true);
+    a.beginDraw(c, 0.016, false);
+    expect(Math.abs(c.position.x)).toBeLessThanOrEqual(0.18);
+    a.endDraw(c);
+    expect(a.beginDraw(c, 0.016, true)).toBe(false);
+    expect(a.beginDraw(c, 0.016, false)).toBe(false);
+  });
   it('responds away from the hit and restores the exact camera pose', () => {
     const c = camera(),
       a = new CameraImpact();

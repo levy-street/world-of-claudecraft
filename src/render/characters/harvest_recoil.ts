@@ -6,6 +6,7 @@ export class HarvestRecoil {
   private strength = 0;
   private direction = 1;
   private away = Math.PI;
+  private hold = 0.02;
   private readonly point = new THREE.Vector3();
   private readonly rotation = new THREE.Quaternion();
 
@@ -21,7 +22,8 @@ export class HarvestRecoil {
       height *= Math.abs(this.point.y);
     }
     // Tall creatures retain a readable bite without a humanoid-sized topple.
-    this.strength = (beat === 2 ? 0.115 : 0.065) / Math.max(1, height / 3);
+    this.strength = (beat === 2 ? 0.115 : 0.075) / Math.max(1, height / 3);
+    this.hold = beat === 2 ? 0.048 : 0.02;
     this.direction = beat === 1 ? -1 : 1;
     this.away = Math.PI;
     if (root && source) {
@@ -37,13 +39,13 @@ export class HarvestRecoil {
   apply(pose: THREE.Object3D, dt: number, suppressed: boolean): void {
     if (suppressed) this.age = 1;
     else this.age += Number.isFinite(dt) ? Math.max(0, dt) : 0;
-    const t = this.age / 0.22;
+    const t = Math.max(0, this.age - this.hold) / 0.19;
     if (t >= 1) return;
-    const bite = Math.min(1, t / 0.12) * (1 - t) ** 2;
-    const recover = Math.sin(t * Math.PI * 2) * (1 - t) * 0.18;
+    const bite = Math.min(1, this.age / 0.008) * (1 - t) ** 2;
+    const recover = -Math.sin(t * Math.PI * 2) * (1 - t) * 0.22;
     pose.rotation.x += Math.cos(this.away) * this.strength * (bite + recover);
     pose.rotation.z += (-Math.sin(this.away) + this.direction * 0.25) * this.strength * bite;
-    pose.position.y -= this.strength * bite * 0.22;
+    pose.position.y -= this.strength * bite * 0.4;
   }
 
   clear(): void {

@@ -134,6 +134,24 @@ it('loads the delivered native Fury clips with finite normalized joints and pres
     expect(source.duration).toBeLessThan(0.75);
     expect(prepared.duration).toBe(source.duration);
     expect(prepared.tracks.length).toBeGreaterThan(40);
+    if (id === 'red_harvest') {
+      const chest = prepared.tracks.find((track) => track.name === 'chest.quaternion');
+      expect(chest).toBeDefined();
+      const times = Array.from(chest!.times);
+      for (const [contact, release] of [
+        [0.15, 0.17],
+        [0.32, 0.34],
+        [0.49, 0.538],
+      ]) {
+        const start = times.findIndex((time) => Math.abs(time - contact) < 0.0001);
+        const end = times.findIndex((time) => Math.abs(time - release) < 0.0001);
+        expect(start).toBeGreaterThan(0);
+        expect(end).toBeGreaterThan(start);
+        const a = new THREE.Quaternion().fromArray(chest!.values, start * 4);
+        const b = new THREE.Quaternion().fromArray(chest!.values, end * 4);
+        expect(a.angleTo(b)).toBeLessThan(0.002);
+      }
+    }
     for (let i = 0; i < prepared.tracks.length; i++) {
       const track = prepared.tracks[i];
       expect(Array.from(track.times)).toEqual(Array.from(source.tracks[i].times));

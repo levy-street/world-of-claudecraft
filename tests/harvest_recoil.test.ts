@@ -3,6 +3,26 @@ import { describe, expect, it } from 'vitest';
 import { HarvestRecoil } from '../src/render/characters/harvest_recoil';
 
 describe('Red Harvest receiving impulse', () => {
+  it('holds final compression then releases it at 30, 60 and 120 Hz without drift', () => {
+    for (const hz of [30, 60, 120]) {
+      const recoil = new HarvestRecoil(),
+        pose = new Group();
+      recoil.trigger(2, 2);
+      let peak = 0,
+        early = 0;
+      for (let frame = 1; frame <= hz / 2; frame++) {
+        pose.rotation.set(0, 0, 0);
+        pose.position.set(0, 0, 0);
+        recoil.apply(pose, 1 / hz, false);
+        peak = Math.max(peak, -pose.position.y);
+        if (frame / hz <= 0.048) early = Math.max(early, -pose.position.y);
+      }
+      expect(early).toBeCloseTo(0.046, 6);
+      expect(peak).toBeLessThanOrEqual(0.0461);
+      expect(pose.position.y).toBe(0);
+      expect(pose.rotation.x).toBe(0);
+    }
+  });
   it('alternates impact twist, keeps the world root still and gives the final hit more weight', () => {
     const root = new Group(),
       pose = new Group();

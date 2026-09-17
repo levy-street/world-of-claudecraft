@@ -27,6 +27,7 @@ import { drawClassCast, hasClassCast } from './cast_language';
 import { isContactSheet } from './contact_assets';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { type DecalStyle, GroundDecals } from './decals';
+import { DeferredContactBursts } from './deferred_contact_bursts';
 import { ElementalForms } from './elemental_forms';
 import { ElementalContactMemory, elementalPerformance } from './elemental_performance_core';
 import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
@@ -532,7 +533,9 @@ export class AbilityVfxFx implements SequencerHost {
   private statSink: ((abilityId: string, n: number) => void) | null = null;
   private applyGlow: ((entityId: number, colorHex: number, intensity: number) => void) | null =
     null;
-  private shakeCb: ((amount: number, x?: number, y?: number, z?: number) => void) | null = null;
+  private shakeCb:
+    | ((amount: number, x?: number, y?: number, z?: number, crunch?: boolean) => void)
+    | null = null;
   private bodyLeanCb: ((entityId: number, amount: number) => void) | null = null;
   private screenImpactCb: ((x: number, y: number, z: number, strength: number) => void) | null =
     null;
@@ -575,6 +578,7 @@ export class AbilityVfxFx implements SequencerHost {
   // Stable sink for the styled bolt heads (ribbons.drawHeads pushes through
   // it into the frame's overlay batch); one closure for the object's lifetime.
   private readonly furyAudio = new FuryAudioQueue();
+  private readonly contactBursts = new DeferredContactBursts();
   private disposed = false;
   private heldConduction = new HeldConduction();
   private heldWarriorStorm = new HeldWarriorStorm();
@@ -773,7 +777,7 @@ export class AbilityVfxFx implements SequencerHost {
     ) => void,
     statSink: (abilityId: string, n: number) => void,
     applyGlow?: (entityId: number, colorHex: number, intensity: number) => void,
-    addShake?: (amount: number, x?: number, y?: number, z?: number) => void,
+    addShake?: (amount: number, x?: number, y?: number, z?: number, crunch?: boolean) => void,
     bodyLean?: (entityId: number, amount: number) => void,
     screenImpact?: (x: number, y: number, z: number, strength: number) => void,
     abilityAudio?: (
@@ -1596,9 +1600,12 @@ export class AbilityVfxFx implements SequencerHost {
     power: number,
     kind: ParticleBurstKind,
     duration?: number,
+    delay = 0,
   ): void {
     if (this.disposed) return;
-    this.particleBurst?.(x, y, z, colorHex, count, power, kind, duration);
+    if (delay > 0)
+      this.contactBursts.reserve(x, y, z, colorHex, count, power, kind, duration, delay);
+    else this.particleBurst?.(x, y, z, colorHex, count, power, kind, duration);
   }
 
   pulseLight(
@@ -1740,7 +1747,7 @@ export class AbilityVfxFx implements SequencerHost {
       tint,
       hot,
       duration,
-      delay,
+      kind === 'harvest_impact' && delay > 0 ? delay + Math.max(0, this.guardDt) : delay,
       heat,
       this.groundY(x, z),
       angle,
@@ -1980,7 +1987,7 @@ export class AbilityVfxFx implements SequencerHost {
   // Camera trauma from a world point: distance falloff (full inside 18 yd,
   // gone by 50) plus the rolling budget, so only nearby heavy moments kick
   // and a spam fight can never hold the camera shaking.
-  shakeAt(x: number, y: number, z: number, amount: number): void {
+  shakeAt(x: number, y: number, z: number, amount: number, crunch = false): void {
     if (
       !this.shakeCb ||
       this.reducedMotionActive ||
@@ -1993,7 +2000,7 @@ export class AbilityVfxFx implements SequencerHost {
     const granted = Math.min(amount * falloff, Math.max(0, 0.55 - this.shakeRecent));
     if (granted <= 0.01) return;
     this.shakeRecent += granted;
-    this.shakeCb(granted, x, y, z);
+    this.shakeCb(granted, x, y, z, crunch);
   }
 
   // Screen-space impact feedback (the gallery distortion ripple + flash),
@@ -2557,6 +2564,7 @@ export class AbilityVfxFx implements SequencerHost {
     }
     // the archetype sequences advance here so their transient draws (release
     // flash, gavel descent, stun stars) land inside this frame's overlay batch
+    this.contactBursts.update(this, dt);
     this.sequencer.update(this, dt);
     this.furyAudio.update(this, dt);
     // Pack after the sequence emits this frame's contacts, so the visible
@@ -2630,6 +2638,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.warriorReadiness.clear();
     this.warriorStorms.clear();
     this.furyAudio.clear();
+    this.contactBursts.clear();
     this.ribbons.clear();
     this.water.clear();
     this.baked.clear();

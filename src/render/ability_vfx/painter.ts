@@ -147,7 +147,7 @@ export interface AbilityVfxDeps {
   // Adds camera trauma (the renderer's Fiesta addShake accumulator); the fx
   // engine applies distance falloff and a rolling budget before it. Optional
   // so tests can omit it.
-  addShake?: (amount: number, x?: number, y?: number, z?: number) => void;
+  addShake?: (amount: number, x?: number, y?: number, z?: number, crunch?: boolean) => void;
   // Contact-frame hitstop on ONE rig (CharacterVisual.holdFrame): briefly hold
   // that character's animation clock at `scale` for `dur` seconds. The visual
   // guards stacking; the world clock is never touched. Optional for tests.

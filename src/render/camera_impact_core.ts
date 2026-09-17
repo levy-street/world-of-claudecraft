@@ -15,6 +15,10 @@ export class CameraImpact {
   private dx = 0;
   private dz = 0;
   private kick = 0;
+  private crunch = 0;
+  private crunchAge = 0;
+  private crunchDx = 0;
+  private crunchDz = 0;
   private ox = 0;
   private oy = 0;
   private oz = 0;
@@ -22,18 +26,28 @@ export class CameraImpact {
     this.trauma = 0;
     this.kick = 0;
     this.elapsed = 0;
+    this.crunch = 0;
+    this.crunchAge = 0;
   }
-  add(amount: number, camera: Point, x?: number, y?: number, z?: number): void {
+  add(amount: number, camera: Point, x?: number, y?: number, z?: number, crunch = false): void {
     if (!Number.isFinite(amount) || amount <= 0) return;
-    this.trauma = Math.min(0.65, this.trauma + amount);
+    if (crunch) {
+      this.crunch = Math.min(0.18, this.crunch + amount * 0.42);
+      this.crunchAge = 0;
+    } else this.trauma = Math.min(0.65, this.trauma + amount);
     if (x !== undefined && y !== undefined && z !== undefined && [x, y, z].every(Number.isFinite)) {
       const dx = camera.x - x,
         dz = camera.z - z,
         len = Math.hypot(dx, dz);
       if (len > 0.001) {
-        this.dx = dx / len;
-        this.dz = dz / len;
-        this.kick = Math.min(0.18, this.kick + amount * 0.24);
+        if (crunch) {
+          this.crunchDx = dx / len;
+          this.crunchDz = dz / len;
+        } else {
+          this.dx = dx / len;
+          this.dz = dz / len;
+          this.kick = Math.min(0.18, this.kick + amount * 0.24);
+        }
       }
     }
   }
@@ -42,27 +56,39 @@ export class CameraImpact {
     this.oy = 0;
     this.oz = 0;
     if (reducedMotion) {
-      this.trauma = 0;
-      this.kick = 0;
+      this.clear();
       return false;
     }
     const step = Number.isFinite(dt) ? Math.max(0, dt) : 0;
     this.elapsed += step;
+    // One shove and two diminishing returns. Sample before advancing so a
+    // 30 Hz contact still draws its initial bite rather than skipping it.
+    const age = this.crunchAge;
+    const shove = age < 0.045 ? (1 - age / 0.045) ** 2 : 0;
+    const echo =
+      age >= 0.045 && age < 0.17
+        ? -Math.sin(((age - 0.045) * Math.PI * 2) / 0.125) * Math.exp(-(age - 0.045) * 23) * 0.42
+        : 0;
+    const impulse = this.crunch * (shove + echo);
+    this.crunchAge += step;
+    if (this.crunchAge >= 0.18) this.crunch = 0;
     const q = camera.quaternion,
       power = this.trauma * this.trauma;
     const horizontal = Math.sin(this.elapsed * 43) * power * 0.18;
-    const vertical = Math.sin(this.elapsed * 57 + 1.1) * power * 0.12;
+    const vertical = Math.sin(this.elapsed * 57 + 1.1) * power * 0.12 - impulse * 0.22;
     // The quaternion's local X and Y columns keep vibration in camera space.
     this.ox =
       (1 - 2 * (q.y * q.y + q.z * q.z)) * horizontal +
       2 * (q.x * q.y - q.z * q.w) * vertical +
-      this.dx * this.kick;
+      this.dx * this.kick +
+      this.crunchDx * impulse;
     this.oy =
       2 * (q.x * q.y + q.z * q.w) * horizontal + (1 - 2 * (q.x * q.x + q.z * q.z)) * vertical;
     this.oz =
       2 * (q.x * q.z - q.y * q.w) * horizontal +
       2 * (q.y * q.z + q.x * q.w) * vertical +
-      this.dz * this.kick;
+      this.dz * this.kick +
+      this.crunchDz * impulse;
     camera.position.x += this.ox;
     camera.position.y += this.oy;
     camera.position.z += this.oz;

@@ -115,13 +115,13 @@ for (const [name, beats] of [
       [0, idle],
       [0.09, harvestCoil],
       [0.15, harvestFirst],
-      [0.166, harvestFirst],
+      [0.17, harvestFirst],
       [0.265, harvestReverse],
       [0.32, harvestSecond],
-      [0.337, harvestSecond],
+      [0.34, harvestSecond],
       [0.44, harvestLow],
       [0.49, reapCut],
-      [0.53, reapCut],
+      [0.538, reapCut],
       [0.585, harvestHigh],
       [0.72, idle],
     ],
@@ -145,6 +145,27 @@ for (const [name, beats] of [
         name === 'Fury_Red_Harvest'
           ? harvestStance(blended, time)
           : twinstrikeStance(blended, time);
+      if (name === 'Fury_Red_Harvest') {
+        // Blade resistance is authored inside the contact windows, never by
+        // slowing the attack clock and pushing the next hit away from its cue.
+        for (const [contact, duration] of [
+          [0.15, 0.02],
+          [0.32, 0.02],
+          [0.49, 0.048],
+        ]) {
+          const phase = (time - contact) / duration;
+          if (phase <= 0 || phase >= 1) continue;
+          const shudder = Math.sin(phase * Math.PI * 3) * Math.sin(phase * Math.PI) * 1.6 * degrees;
+          for (const key of ['hand.r|rotation', 'hand.l|rotation']) {
+            const value = authored.get(key);
+            if (!value) continue;
+            q.fromArray(value)
+              .multiply(offset.setFromEuler(euler.set(shudder, 0, -shudder * 0.4)))
+              .normalize();
+            authored.set(key, q.toArray());
+          }
+        }
+      }
       timeline.push([time, (key) => authored.get(key)]);
     }
   }

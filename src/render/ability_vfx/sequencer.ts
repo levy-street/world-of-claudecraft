@@ -199,6 +199,7 @@ export interface SequencerHost {
     power: number,
     kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood',
     duration?: number,
+    delay?: number,
   ): void;
   pulseLight(
     entityId: number,
@@ -286,7 +287,7 @@ export interface SequencerHost {
   countPrimitive(abilityId: string, n: number): void;
   // Camera trauma at a world point (the host applies distance falloff and a
   // rolling budget so spam can never stack shake).
-  shakeAt(x: number, y: number, z: number, amount: number): void;
+  shakeAt(x: number, y: number, z: number, amount: number, crunch?: boolean): void;
   // Per-ability audio (src/game/sfx.ts: sampled pack + procedural recipes) at
   // the sequence's exact release and impact moments - a projectile's boom
   // lands when the bolt does, a ground cast's boom lands AT the zone - plus

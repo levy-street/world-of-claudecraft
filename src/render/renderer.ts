@@ -3038,7 +3038,7 @@ export class Renderer {
       // heavy VFX moments (fissures, gavel verdicts, finisher crits) ride the
       // Fiesta trauma accumulator; the fx engine has already applied distance
       // falloff and its rolling anti-spam budget
-      addShake: (amount,x,y,z) => this.addShake(amount,x,y,z),
+      addShake: (amount, x, y, z, crunch) => this.addShake(amount, x, y, z, crunch),
       // contact-frame hitstop: only THAT rig's animation clock slows (the
       // world, sim, and every other character keep running); the visual
       // guards against stacking
@@ -7996,9 +7996,9 @@ export class Renderer {
   // Add camera trauma (0..1). Squared on apply, so small adds barely register
   // and big hits (kills, ring closes) really kick. A no-op for
   // reduced-motion players (OS query or the in-game switch).
-  addShake(amount: number, x?: number, y?: number, z?: number): void {
+  addShake(amount: number, x?: number, y?: number, z?: number, crunch = false): void {
     if (this.reducedMotion()) return;
-    this.cameraImpact.add(amount, this.camera.position, x, y, z);
+    this.cameraImpact.add(amount, this.camera.position, x, y, z, crunch);
   }
 
   // Zone-entry vista sweep (hud.ts fires it on the zone-banner edge): the

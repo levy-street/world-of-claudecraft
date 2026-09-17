@@ -63,8 +63,8 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       final ? 6.4 : beat === 1 ? 4.8 : 4.2,
       0xffffff,
       0xff8990,
-      life,
-      0,
+      life - (final ? 0.048 : 0.02),
+      final ? 0.048 : 0.02,
       0,
       facing,
       false,
@@ -161,7 +161,8 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     slot.tier === 0 ? (final ? 12 : beat === 1 ? 7 : 5) : 3,
     final ? 1.35 : beat === 1 ? 1.0 : 0.85,
     'blood',
-    final ? 0.28 : life,
+    life - (final ? 0.048 : 0.02),
+    final ? 0.048 : 0.02,
   );
   if (slot.tier === 0) {
     host.fragmentsAt?.(
@@ -187,7 +188,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     abilityId: slot.abilityId,
   });
   host.pulseLight(slot.targetId, slot.spec.palette, final ? 2 : 1.1, 0.055, 3);
-  if (primary && final) host.shakeAt(at.x, at.y, at.z, 0.32);
+  if (primary && final) host.shakeAt(at.x, at.y, at.z, 0.36, true);
   host.countPrimitive(slot.abilityId, count + 3);
   return true;
 }

@@ -684,6 +684,46 @@ it('packs a travelling projectile head through a full decorative overlay while p
   }
 });
 
+it.each([30, 60, 120])('retains extraction beyond its spawning frame at %s Hz', (hz) => {
+  installCanvasStub();
+  const fx = new AbilityVfxFx(
+    new THREE.Scene(),
+    new THREE.PerspectiveCamera(),
+    () => null,
+    () => 0,
+  );
+  const probe = fx as unknown as {
+    sequencer: { update(host: unknown, dt: number): void };
+    baked: { spawn(...args: unknown[]): boolean };
+  };
+  const burst = vi.fn(),
+    spawn = vi.spyOn(probe.baked, 'spawn');
+  fx.setDelegates(
+    burst,
+    () => {},
+    () => {},
+  );
+  let emitted = false;
+  vi.spyOn(probe.sequencer, 'update').mockImplementation(() => {
+    if (emitted) return;
+    emitted = true;
+    fx.burstAt(2, 3, 4, 0, 12, 1, 'blood', 0.192, 0.048);
+    fx.bakedAt('harvest_impact', 2, 3, 4, 6.4, 0xffffff, 0xff8990, 0.192, 0.048, 0);
+  });
+  try {
+    fx.update(1 / hz);
+    expect(burst).not.toHaveBeenCalled();
+    expect(spawn.mock.calls[0][8]).toBeCloseTo(0.048 + 1 / hz);
+    for (let i = 1; i <= Math.ceil(0.048 * hz); i++) {
+      fx.update(1 / hz);
+      if (i / hz < 0.048) expect(burst).not.toHaveBeenCalled();
+    }
+    expect(burst).toHaveBeenCalledExactlyOnceWith(2, 3, 4, 0, 12, 1, 'blood', 0.192);
+  } finally {
+    fx.dispose();
+  }
+});
+
 it('continues outer VFX teardown after a crest removal callback throws', () => {
   installCanvasStub();
   const fx = new AbilityVfxFx(

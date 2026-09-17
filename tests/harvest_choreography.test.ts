@@ -40,6 +40,16 @@ function fixture(available = true) {
 }
 
 describe('Red Harvest impact composition', () => {
+  it('keeps the bite immediate, delays the extraction and owns one final camera impulse', () => {
+    const { host, slot } = fixture();
+    for (let beat = 0; beat < 3; beat++) harvestBeat(host, slot, beat);
+    const sprays = vi.mocked(host.bakedAt!).mock.calls.filter((c) => c[0] === 'harvest_impact');
+    expect(sprays.map((c) => c[8])).toEqual([0.02, 0.02, 0.048]);
+    expect(host.contact).toHaveBeenCalledTimes(3);
+    expect(host.flipbookAt).toHaveBeenCalledTimes(3);
+    expect(host.shakeAt).toHaveBeenCalledExactlyOnceWith(4, 0.91, 2, 0.36, true);
+    expect(sprays[2][7] + sprays[2][8]).toBeLessThan(0.3);
+  });
   it('keeps the receiving seam attached through translation, turning and sequencer-slot reuse', () => {
     const { host, slot } = fixture();
     let x = 4,
