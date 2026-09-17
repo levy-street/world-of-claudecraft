@@ -133,7 +133,7 @@
     --color-bg-dark: #08080d;
     --color-bg-input: #0a0a0f;
     --color-border-default: #4e3d1d;
-    --color-wallet-mini-focus-border: #ffd100;
+    --color-wallet-mini-focus-border: var(--gold, #ffd100);
     /* The showcase hairline: the gold-brown 1px keyline the char-window stat
        panels established and the inset-card family repeats (section cards,
        recipe cards, pill chips, panel dividers). One token for every site so
