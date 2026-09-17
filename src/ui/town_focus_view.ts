@@ -8,6 +8,7 @@
 // town_focus_window.ts.
 
 import { isTownFocusComponent, TOWN_FOCUS_COMPONENTS } from '../sim/professions/focus';
+import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
 
 export interface TownFocusRow {
   component: string;
@@ -23,6 +24,10 @@ export interface TownFocusView {
   budget: number;
   remaining: number;
   inTown: boolean;
+  /** The queued re-spec (IWorld `townFocusPending`), or null while nothing
+   *  is waiting. Rendered as the "Saved, completes in ..." line, so the panel
+   *  says that Save took instead of showing the old committed allocation. */
+  pending: TownFocusPendingView | null;
 }
 
 // Every currently-harvestable component type (#1140/#1142), stable order.
@@ -35,6 +40,7 @@ export function buildTownFocusView(
   allocation: Readonly<Record<string, number>>,
   budget: number,
   inTown: boolean,
+  pending: TownFocusPendingView | null = null,
 ): TownFocusView {
   const totalSpent = TOWN_FOCUS_COMPONENTS.reduce(
     (sum, c) => sum + Math.max(0, allocation[c] ?? 0),
@@ -50,7 +56,7 @@ export function buildTownFocusView(
       canDecrease: inTown && points > 0,
     };
   });
-  return { rows, totalSpent, budget, remaining, inTown };
+  return { rows, totalSpent, budget, remaining, inTown, pending: pending ?? null };
 }
 
 /**
@@ -81,7 +87,17 @@ export function townFocusRenderSig(view: TownFocusView): string {
   const rows = view.rows
     .map((r) => `${r.component}:${r.points}:${r.canIncrease ? 1 : 0}${r.canDecrease ? 1 : 0}`)
     .join('|');
-  return `${view.inTown ? 1 : 0}/${view.budget}/${view.remaining}/${rows}`;
+  // The queued re-spec: its rows AND its countdown, so an open panel
+  // repaints once a second while a re-spec is waiting (a full wipe, focus
+  // carried across by the painter) and never while nothing is queued.
+  const pending =
+    view.pending === null
+      ? ''
+      : `${view.pending.remainingSeconds}:${Object.entries(view.pending.allocation)
+          .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+          .map(([c, n]) => `${c}=${n}`)
+          .join(',')}`;
+  return `${view.inTown ? 1 : 0}/${view.budget}/${view.remaining}/${rows}/${pending}`;
 }
 
 /**

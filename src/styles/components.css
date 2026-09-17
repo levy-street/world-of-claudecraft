@@ -1002,6 +1002,12 @@
   .town-focus-budget {
     margin-bottom: 8px;
   }
+  /* The queued re-spec line (#1144): the one line on the panel that says
+     Save took, in the same gold the chat notice for it uses. */
+  .town-focus-pending {
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
   .town-focus-row {
     display: flex;
     align-items: center;

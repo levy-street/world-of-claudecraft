@@ -1410,6 +1410,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.budgetLabel': '남은 포인트: {remaining} / {budget}',
   'hudChrome.townFocus.saveButton': '집중 저장',
   'hudChrome.townFocus.notInTownHint': '집중을 설정하려면 마을에 있어야 합니다.',
+  'hudChrome.townFocus.preferenceHint':
+    '집중은 채집하는 재료의 등급과 양을 높입니다. 한 가지 재료만 채집하려면 야전 키트나 전문 기술 창에서 채집 설정을 지정하세요.',
+  'hudChrome.townFocus.pendingLine':
+    '저장되었습니다. 이 배분으로의 재설정은 {time} 후에 완료됩니다.',
   'hudChrome.townFocus.increaseAria': '{component}에 대한 집중 증가',
   'hudChrome.townFocus.decreaseAria': '{component}에 대한 집중 감소',
   'hudChrome.townFocus.respecTierLabel': '재배분 속도',

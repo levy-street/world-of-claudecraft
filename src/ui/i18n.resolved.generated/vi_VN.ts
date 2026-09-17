@@ -2683,6 +2683,8 @@ export const vi_VN: EnTranslations = {
       "hint": "Điểm trọng tâm cộng thêm một khoản trên mức sản lượng cơ bản của từng hạng mục. Hạng mục không được dồn trọng tâm giữ nguyên mức cơ bản.",
       "tierHint": "Mỗi {points} điểm vào một hạng mục nâng bậc thu hoạch lên một bước, tối đa {steps} bước; ít hơn {points} điểm vẫn tăng sản lượng.",
       "townOnlyHint": "Trọng tâm chỉ có thể thay đổi khi bạn đang ở trong thị trấn.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Điểm còn lại: {remaining} / {budget}",
       "saveButton": "Lưu Trọng Tâm",
       "notInTownHint": "Bạn phải ở trong thị trấn để đặt trọng tâm.",

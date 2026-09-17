@@ -2683,6 +2683,8 @@ export const pt_BR: EnTranslations = {
       "hint": "Pontos de foco adicionam um bônus sobre o rendimento base de cada componente. Componentes sem foco permanecem no valor base.",
       "tierHint": "Cada {points} pontos em um componente elevam seu nível de coleta um passo, até {steps} passos; menos de {points} pontos ainda aumentam o rendimento.",
       "townOnlyHint": "O foco só pode ser alterado enquanto você estiver na cidade.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Pontos restantes: {remaining} / {budget}",
       "saveButton": "Salvar Foco",
       "notInTownHint": "Você precisa estar na cidade para definir seu foco.",

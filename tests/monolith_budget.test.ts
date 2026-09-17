@@ -1062,7 +1062,14 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // LOWERED 11822 -> 11809 at the pending Town Focus fix: the townFocus /
+    // harvestPreference load and save pair moved out to
+    // src/sim/professions/gathering_settings_persist.ts (where the queued
+    // re-spec's persistence joined them), and the private
+    // updateTownFocusRespec wrapper retired in favor of the module call.
+    // The residual is the two townFocusPending delegates. Exact count
+    // (wc -l < src/sim/sim.ts), zero slack.
+    ceiling: 11809,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {

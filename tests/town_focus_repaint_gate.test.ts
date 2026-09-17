@@ -41,6 +41,7 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { HARVEST_COMPONENT_ITEMS } from '../src/sim/content/professions';
 import { FOCUS_POINT_BUDGET, type RespecPaymentTier } from '../src/sim/professions/focus';
+import type { TownFocusPendingView } from '../src/sim/professions/town_focus_pending';
 import { FOCUSABLE_SELECTOR, FocusManager } from '../src/ui/focus_manager';
 import { Hud } from '../src/ui/hud';
 import { t } from '../src/ui/i18n';
@@ -58,8 +59,12 @@ const OTHER_COMPONENT = TOWN_FOCUS_COMPONENTS[1];
 
 /** A view built from real inputs, never hand-written, so the assertions below
  *  keep testing what the panel is actually handed. */
-function viewOf(allocation: Record<string, number>, inTown = true): TownFocusView {
-  return buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown);
+function viewOf(
+  allocation: Record<string, number>,
+  inTown = true,
+  pending: TownFocusPendingView | null = null,
+): TownFocusView {
+  return buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown, pending);
 }
 
 // #1144: this file owns everything about the painter's REBUILD/focus behavior
@@ -180,14 +185,41 @@ describe('townFocusRenderSig', () => {
       }),
     ],
     ['rows (a row disappears)', (v) => ({ ...v, rows: v.rows.slice(1) })],
+    // The queued re-spec: appearing, its countdown moving (the once-a-second
+    // repaint while a re-spec waits), and its allocation changing.
+    ['pending (appears)', (v) => ({ ...v, pending: { allocation: {}, remainingSeconds: 5 } })],
+    [
+      'pending.remainingSeconds',
+      (v) => ({
+        ...v,
+        pending: { allocation: { [COMPONENT]: 1 }, remainingSeconds: 5 },
+      }),
+    ],
+    [
+      'pending.allocation',
+      (v) => ({
+        ...v,
+        pending: { allocation: { [OTHER_COMPONENT]: 1 }, remainingSeconds: 6 },
+      }),
+    ],
   ];
 
   for (const [field, mutate] of MUTATIONS) {
     it(`moves when ${field} changes and nothing else does`, () => {
-      const base = viewOf({ [COMPONENT]: 2 });
+      const base = viewOf({ [COMPONENT]: 2 }, true, {
+        allocation: { [COMPONENT]: 1 },
+        remainingSeconds: 6,
+      });
       expect(townFocusRenderSig(mutate(base))).not.toBe(townFocusRenderSig(base));
     });
   }
+
+  it('reads the queued allocation in any key order', () => {
+    const a = viewOf({}, true, { allocation: { hide: 1, silk: 2 }, remainingSeconds: 3 });
+    const b = viewOf({}, true, { allocation: { silk: 2, hide: 1 }, remainingSeconds: 3 });
+    expect(townFocusRenderSig(a)).toBe(townFocusRenderSig(b));
+    expect(townFocusRenderSig(viewOf({}))).not.toBe(townFocusRenderSig(a));
+  });
 
   it('ignores totalSpent, the one view field nothing renders', () => {
     // Stated out loud rather than left as an omission: remaining already
@@ -248,7 +280,13 @@ function aliasesOf(src: string, receiver: string): string[] {
 describe('the signature covers exactly what the painter renders', () => {
   it('reads only the view fields the signature carries', () => {
     // `rows` is the container the row terms come from, so it belongs here too.
-    expect(readsOf(painterSrc, 'view')).toEqual(['budget', 'inTown', 'remaining', 'rows']);
+    expect(readsOf(painterSrc, 'view')).toEqual([
+      'budget',
+      'inTown',
+      'pending',
+      'remaining',
+      'rows',
+    ]);
   });
 
   it('never aliases the view or a row past the scans above', () => {
@@ -299,7 +337,13 @@ describe('the signature covers exactly what the painter renders', () => {
       start,
     );
     const sigBody = sigSrc.slice(start, end);
-    for (const term of ['view.inTown', 'view.budget', 'view.remaining', 'view.rows'])
+    for (const term of [
+      'view.inTown',
+      'view.budget',
+      'view.remaining',
+      'view.rows',
+      'view.pending',
+    ])
       expect(sigBody).toContain(term);
     for (const term of ['r.component', 'r.points', 'r.canIncrease', 'r.canDecrease'])
       expect(sigBody).toContain(term);

@@ -58,6 +58,7 @@ import type { RespecPaymentTier } from '../sim/professions/focus';
 import type { MaterialRarity } from '../sim/professions/gathering';
 import type { HarvestPreference } from '../sim/professions/harvest_preference';
 import type { PerfectingSwapRequest } from '../sim/professions/perfecting_swap';
+import type { TownFocusPendingView } from '../sim/professions/town_focus_pending';
 import { emptyCraftSkills } from '../sim/professions/wheel';
 import {
   accountReliquaryOwnershipOpts,
@@ -1513,6 +1514,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   professionsState: PlayerProfessionsView = { skills: [] };
   // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
   townFocus: Record<string, number> = {};
+  // #1144: the queued re-spec, mirrored from the self-wire `tfpend` (professions_self_mirror.ts).
+  townFocusPending: TownFocusPendingView | null = null;
   // Per-node respawn readiness (#1121, wired #1866): mirrored from the `ncd`
   // self-wire delta below, same shape/semantics as `cooldowns` (remaining
   // seconds as of the last snapshot that changed it; a node with no entry is

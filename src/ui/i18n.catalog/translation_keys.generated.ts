@@ -12223,6 +12223,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.townFocus.hint'
   | 'hudChrome.townFocus.increaseAria'
   | 'hudChrome.townFocus.notInTownHint'
+  | 'hudChrome.townFocus.pendingLine'
+  | 'hudChrome.townFocus.preferenceHint'
   | 'hudChrome.townFocus.respecCostFree'
   | 'hudChrome.townFocus.respecCostLine'
   | 'hudChrome.townFocus.respecTierInstantOption'

@@ -1418,6 +1418,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.budgetLabel': 'Осталось очков: {remaining} / {budget}',
   'hudChrome.townFocus.saveButton': 'Сохранить фокус',
   'hudChrome.townFocus.notInTownHint': 'Чтобы задать фокус, нужно находиться в городе.',
+  'hudChrome.townFocus.preferenceHint':
+    'Фокус повышает качество и количество добываемых материалов. Чтобы добывать только один материал, задайте настройку сбора в полевом наборе или в окне профессий.',
+  'hudChrome.townFocus.pendingLine': 'Сохранено. Перераспределение на эту раскладку завершится через {time}.',
   'hudChrome.townFocus.increaseAria': 'Увеличить фокус на {component}',
   'hudChrome.townFocus.decreaseAria': 'Уменьшить фокус на {component}',
   'hudChrome.townFocus.respecTierLabel': 'Скорость перераспределения',

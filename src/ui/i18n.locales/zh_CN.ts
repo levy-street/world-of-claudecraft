@@ -1367,6 +1367,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.budgetLabel': '剩余点数：{remaining} / {budget}',
   'hudChrome.townFocus.saveButton': '保存专注',
   'hudChrome.townFocus.notInTownHint': '你必须在城镇中才能设置专注。',
+  'hudChrome.townFocus.preferenceHint':
+    '专注会提高你采集材料的品级和数量。若只想采集一种材料，请在野外工具包或专业窗口中设置采集偏好。',
+  'hudChrome.townFocus.pendingLine': '已保存。切换到此分配将在{time}后完成。',
   'hudChrome.townFocus.increaseAria': '增加对{component}的专注',
   'hudChrome.townFocus.decreaseAria': '减少对{component}的专注',
   'hudChrome.townFocus.respecTierLabel': '重新分配速度',

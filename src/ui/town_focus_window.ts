@@ -15,7 +15,7 @@ import { markDialogRoot } from './dialog_root';
 import { tEntity } from './entity_i18n';
 import { esc } from './esc';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
-import { formatMoney, formatNumber, t } from './i18n';
+import { formatDuration, formatMoney, formatNumber, t } from './i18n';
 import type { TownFocusView } from './town_focus_view';
 import { svgIcon } from './ui_icons';
 
@@ -125,6 +125,29 @@ export function renderTownFocusWindow(
   townOnlyHint.className = 'town-focus-hint ui-meta ui-muted';
   townOnlyHint.textContent = t('hudChrome.townFocus.townOnlyHint');
   el.appendChild(townOnlyHint);
+
+  // Focus is a bonus, never a selector: the one thing that narrows a harvest
+  // to a single material is the Harvest Preference, and a player who has
+  // just put ten points on silk and still skins hide off a spider needs to be
+  // told so HERE, on the panel they just used.
+  const preferenceHint = document.createElement('div');
+  preferenceHint.className = 'town-focus-hint ui-meta ui-muted';
+  preferenceHint.textContent = t('hudChrome.townFocus.preferenceHint');
+  el.appendChild(preferenceHint);
+
+  // The queued re-spec (#1144): Save on the 'time' / 'timeAndPartial' tiers
+  // does not commit at once, and without this line the panel showed only the
+  // old committed allocation for the whole wait, so Save read as a no-op and
+  // a second Save used to restart the clock. The rows below already show the
+  // queued allocation (Hud opens the draft on it); this says when it lands.
+  if (view.pending !== null) {
+    const pendingLine = document.createElement('div');
+    pendingLine.className = 'town-focus-pending ui-meta';
+    pendingLine.textContent = t('hudChrome.townFocus.pendingLine', {
+      time: formatDuration(view.pending.remainingSeconds),
+    });
+    el.appendChild(pendingLine);
+  }
 
   if (!view.inTown) {
     const notInTown = document.createElement('div');

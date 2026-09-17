@@ -2683,6 +2683,8 @@ export const es_ES: EnTranslations = {
       "hint": "Los puntos de enfoque añaden una bonificación sobre el rendimiento base de cada componente. Los componentes sin enfoque se mantienen en el nivel base.",
       "tierHint": "Cada {points} puntos en un componente suben su nivel de recolección un paso, hasta {steps} pasos; menos de {points} puntos aún mejoran el rendimiento.",
       "townOnlyHint": "El enfoque solo puede cambiarse mientras estés en el pueblo.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Puntos restantes: {remaining} / {budget}",
       "saveButton": "Guardar enfoque",
       "notInTownHint": "Debes estar en el pueblo para fijar tu enfoque.",

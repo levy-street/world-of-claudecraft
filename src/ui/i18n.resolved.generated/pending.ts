@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "es_ES": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "fr_FR": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "fr_CA": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "de_DE": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "nl_NL": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "pl_PL": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "id_ID": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "tr_TR": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "sv_SE": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "vi_VN": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ],
+  "da_DK": [
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
+  ]
 };

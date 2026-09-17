@@ -1943,6 +1943,61 @@ export const TARGETS = [
     },
   },
   {
+    key: 'town-focus',
+    label: 'Town Focus panel: a queued free-tier re-spec (the Saved line and the countdown)',
+    when: [
+      'ui/town_focus_view.ts',
+      'ui/town_focus_window.ts',
+      'sim/professions/town_focus_pending.ts',
+      'sim/professions/town_focus_commands.ts',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', beforeLoad: lowGraphicsSeed, mobile: true },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      await awaitVeilSettled(page);
+      // Stand in the Eastbrook hub (zone 1, `ZONES[0].hub`; the panel is
+      // town-gated), the reliquary targets' teleport idiom.
+      const moved = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        const ground = sim.groundPos(-14, -100);
+        p.pos.x = ground.x;
+        p.pos.y = ground.y;
+        p.pos.z = ground.z;
+        p.prevPos = { ...p.pos };
+        sim.rebucket?.(p);
+        return { ok: true };
+      });
+      if (!moved.ok) return { skip: moved.reason };
+      // The cross-zone teleport re-arms the loading veil while the hub streams
+      // in; the panel and its shot must both land on a painted world.
+      await awaitVeilSettled(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim || !game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        // Queue a free-tier re-spec the way a player does: ten points on silk,
+        // Save. The baseline shows the same panel with the old committed rows.
+        sim.setTownFocus({ silk: 10 }, 'time');
+        game.hud.toggleTownFocus?.();
+        return { ok: true, open: game.hud.townFocusOpen === true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      if (!staged.open) return { skip: 'the Town Focus panel never opened' };
+      const ready = await pollForSize(page, '#town-focus-window');
+      if (!ready) return { skip: 'the Town Focus panel never became visible' };
+      await wait(400);
+      return { clip: '#town-focus-window' };
+    },
+  },
+  {
     key: 'dev-command-travel',
     label: 'Developer Command Center: the Travel tab (teleport, town hub, dungeon, raid cards)',
     when: ['ui/dev_command_view.ts', 'ui/dev_command_window.ts', 'sim/dev/town_teleport.ts'],

@@ -3490,6 +3490,13 @@ export const hudChromeStrings = {
     tierHint:
       'Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.',
     townOnlyHint: 'Focus can only be changed while you are in town.',
+    // Focus is a bonus, never a selector (docs/design/professions.md): the
+    // panel says where the selector lives so a silk focus is not read as
+    // "harvest silk only".
+    preferenceHint:
+      'Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.',
+    // The queued re-spec (#1144). {time} is pre-formatted (formatDuration).
+    pendingLine: 'Saved. Your re-spec to this allocation completes in {time}.',
     budgetLabel: 'Points remaining: {remaining} / {budget}',
     saveButton: 'Save Focus',
     notInTownHint: 'You must be in town to set your focus.',

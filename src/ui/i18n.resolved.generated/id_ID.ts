@@ -2683,6 +2683,8 @@ export const id_ID: EnTranslations = {
       "hint": "Poin fokus menambahkan bonus di atas hasil dasar setiap komponen. Komponen tanpa fokus tetap pada hasil dasar.",
       "tierHint": "Setiap {points} poin pada komponen meningkatkan tingkat panennya satu langkah, hingga {steps} langkah; kurang dari {points} poin tetap meningkatkan hasilnya.",
       "townOnlyHint": "Fokus hanya bisa diubah saat kamu berada di kota.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Sisa poin: {remaining} / {budget}",
       "saveButton": "Simpan Fokus",
       "notInTownHint": "Kamu harus berada di kota untuk mengatur fokusmu.",

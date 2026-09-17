@@ -15307,7 +15307,8 @@ export class Hud {
       return;
     }
     this.closeOtherWindows('#town-focus-window');
-    this.townFocusDraft = { ...this.sim.townFocus };
+    // Open on the QUEUED allocation when one waits: re-saving it never restarts the clock.
+    this.townFocusDraft = { ...(this.sim.townFocusPending?.allocation ?? this.sim.townFocus) };
     this.townFocusRespecTier = 'time';
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
@@ -15325,7 +15326,8 @@ export class Hud {
   private renderTownFocus(): void {
     const inTown = this.isInTown();
     const allocation = this.townFocusDraft ?? this.sim.townFocus;
-    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown);
+    const pending = this.sim.townFocusPending;
+    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown, pending);
     // Re-arm the latch on EVERY paint, whatever caused it (the open, a step, a
     // language switch), so the slow-band probe below elides against the state
     // actually on screen rather than against the last thing the probe itself
@@ -15377,6 +15379,7 @@ export class Hud {
         this.townFocusDraft ?? this.sim.townFocus,
         FOCUS_POINT_BUDGET,
         this.isInTown(),
+        this.sim.townFocusPending,
       ),
     );
     if (sig === this.lastTownFocusSig) return;

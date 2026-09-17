@@ -12,9 +12,20 @@ import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { RespecPaymentTier } from './focus';
 import * as professionsFocus from './focus';
+import {
+  sameTownFocusAllocation,
+  type TownFocusPendingView,
+  townFocusPendingView,
+} from './town_focus_pending';
 
 export function townFocusFor(ctx: SimContext, pid: number): Record<string, number> {
   return ctx.players.get(pid)?.townFocus ?? {};
+}
+
+/** The queued re-spec as the panel reads it (IWorld `townFocusPending`), or
+ *  null while nothing is waiting; see town_focus_pending.ts. */
+export function townFocusPendingFor(ctx: SimContext, pid: number): TownFocusPendingView | null {
+  return townFocusPendingView(ctx.players.get(pid)?.pendingTownFocus, ctx.time);
 }
 
 // #1143: sets the caller's persistent town focus allocation. Gated on the
@@ -86,9 +97,29 @@ export function setTownFocus(
     ctx.markDeedsDirty(meta.entityId); // soc_civic_duty reads the allocation
     return;
   }
+  // Re-saving the SAME allocation never pushes the clock back. Before this
+  // rule every Save replaced the queue and restarted its full duration, and
+  // since the panel showed only the committed allocation while it waited, the
+  // natural reaction to "did that take?" (press Save again) reset the wait
+  // each time. A same-allocation request keeps whichever queue would commit
+  // FIRST: a faster tier re-queues sooner (and re-prices), a slower one is
+  // ignored, and the notice reports the wait actually left.
+  const readyAtTime = ctx.time + cost.durationMs / 1000;
+  const queued = meta.pendingTownFocus;
+  if (
+    queued &&
+    queued.readyAtTime <= readyAtTime &&
+    sameTownFocusAllocation(queued.allocation, resolvedAllocation)
+  ) {
+    ctx.notice(
+      meta.entityId,
+      `Your focus re-spec will complete in ${Math.ceil(queued.readyAtTime - ctx.time)}s.`,
+    );
+    return;
+  }
   meta.pendingTownFocus = {
     allocation: resolvedAllocation,
-    readyAtTime: ctx.time + cost.durationMs / 1000,
+    readyAtTime,
     coin: cost.coin,
     materials: cost.materials,
   };

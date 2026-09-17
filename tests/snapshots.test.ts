@@ -5244,6 +5244,7 @@ const ALL_DELTA_KEYS = [
   'stats',
   'tal',
   'tfocus',
+  'tfpend',
   'trade',
   'tslot',
   'vault',
@@ -5358,6 +5359,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   sh: 'spellHaste',
   sp: 'spellPower',
   tfocus: 'townFocus',
+  tfpend: 'townFocusPending',
   tslot: 'toolEffectSlots',
   vault: 'vaultInfo',
 };
@@ -5494,6 +5496,14 @@ function dirtyEveryDeltaField(): {
   // the "carries every key" presence loop, since All encodes as the
   // non-null explicit token, but would not prove a real choice decodes).
   meta.harvestPreference = { kind: 'material', itemId: 'rough_hide' };
+  // tfpend: a REAL queued re-spec (null is the idle default and would fail
+  // the presence loop). Far enough out that no tick in this fixture resolves it.
+  meta.pendingTownFocus = {
+    allocation: { silk: 2 },
+    readyAtTime: sim.time + FAR_FUTURE_MS,
+    coin: 0,
+    materials: 0,
+  };
   // tslot: a REAL slotted effect, not the empty default. Without this the key
   // rides the first snapshot as `[]`, which is not null, so it passes the
   // "dirtied to a non-default value" loop below vacuously and nothing anywhere
@@ -6503,9 +6513,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // for 92. Intentional Gathering PR4 adds the owner-only tracked-goal
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
-    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
-    expect(ALL_DELTA_KEYS).toHaveLength(95);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
+    // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95. The
+    // pending Town Focus fix adds the queued re-spec key tfpend (a sibling of
+    // tfocus in gathering_self_wire.ts, null for every idle player), for 96.
+    expect(ALL_DELTA_KEYS).toHaveLength(96);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(96);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6667,8 +6679,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
-    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
-    expect(scraped.size).toBe(95);
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95. The
+    // pending Town Focus fix's tfpend (gathering_self_wire.ts) makes it 96.
+    expect(scraped.size).toBe(96);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

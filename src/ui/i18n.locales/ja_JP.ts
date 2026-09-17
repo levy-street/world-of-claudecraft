@@ -1418,6 +1418,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.budgetLabel': '残りポイント：{remaining} / {budget}',
   'hudChrome.townFocus.saveButton': 'フォーカスを保存',
   'hudChrome.townFocus.notInTownHint': 'フォーカスを設定するには町にいる必要があります。',
+  'hudChrome.townFocus.preferenceHint':
+    'フォーカスは採取する素材の品質と量を高めます。ひとつの素材だけを採取するには、フィールドキットまたは専門技能ウィンドウから採取設定を選んでください。',
+  'hudChrome.townFocus.pendingLine': '保存しました。この割り振りへの再設定は{time}で完了します。',
   'hudChrome.townFocus.increaseAria': '{component}へのフォーカスを増やす',
   'hudChrome.townFocus.decreaseAria': '{component}へのフォーカスを減らす',
   'hudChrome.townFocus.respecTierLabel': '再割り振りの速さ',

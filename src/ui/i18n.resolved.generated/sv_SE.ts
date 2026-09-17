@@ -2683,6 +2683,8 @@ export const sv_SE: EnTranslations = {
       "hint": "Fokuspoäng ger en bonus ovanpå varje komponents grundavkastning. Ofokuserade komponenter stannar på grundnivån.",
       "tierHint": "Varje {points} poäng på en komponent höjer dess skördnivå ett steg, upp till {steps} steg; färre än {points} poäng ökar fortfarande utbytet.",
       "townOnlyHint": "Fokus kan bara ändras medan du är i staden.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Poäng kvar: {remaining} / {budget}",
       "saveButton": "Spara fokus",
       "notInTownHint": "Du måste vara i staden för att ställa in ditt fokus.",
