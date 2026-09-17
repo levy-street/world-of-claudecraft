@@ -104,6 +104,7 @@ function armUnstuck(server: GameServer, session: ClientSession): void {
     origin: { ...player.pos, localX: player.pos.x, localZ: player.pos.z },
     area: { kind: 'overworld', id: 'eastbrook_vale' },
     damageTaken: meta.counters.damageTaken,
+    damageDealt: meta.counters.damageDealt,
     lastAnnouncedSecond: UNSTUCK_COUNTDOWN_SECONDS,
     startedDead: player.dead || player.ghost,
   };

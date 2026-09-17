@@ -1487,6 +1487,36 @@ describe('Thornhollow Fields: the graveyard rite', () => {
     expect(sim.bgMatchFor(pid)).toBe(match);
   });
 
+  it('outgoing damage cancels a battleground wall-trap Unstuck countdown', () => {
+    const { sim, pids } = tenInQueue();
+    const match = must(sim.bgMatchFor(pids[0]), 'bg match');
+    toActive(sim, match);
+    const pid = match.teams[0][0];
+    const targetPid = match.teams[1][0];
+    const e = forceIntoBgWallTrap(sim, match, pid);
+    const target = must(sim.entities.get(targetPid), 'opposing battleground player');
+    const meta = must(sim.meta(pid), 'player meta');
+
+    expect(sim.unstuck(pid)).toBe(true);
+    sim.drainEvents();
+    const damageDealt = meta.counters.damageDealt;
+    sim.ctx.dealDamage(e, target, 1, false, 'physical', null, 'hit');
+    expect(meta.counters.damageDealt).toBeGreaterThan(damageDealt);
+    e.inCombat = true;
+    e.combatTimer = 0;
+
+    expect(sim.tick()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'cancelled',
+        reason: 'damaged',
+        pid,
+      }),
+    );
+    expect(sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(sim.bgMatchFor(pid)).toBe(match);
+  });
+
   it('Unstuck falls back to a clear team spawn when the graveyard plot is obstructed', () => {
     const { sim, pids } = tenInQueue();
     const match = must(sim.bgMatchFor(pids[0]), 'bg match');
