@@ -16002,6 +16002,89 @@ export const TARGETS = [
     },
   },
   {
+    key: 'touch-engine-indicator-drag',
+    label:
+      'Class engine indicator on touch, carried toward the top-left corner with one real finger (before the change it stays put): the fire phoenix, and the paladin devotion medallion',
+    when: ['ui/touch_frame_drag'],
+    // Two of the three indicators on the compact tier, where a parked indicator
+    // matters most: a fire mage's phoenix (lit through the login preview class,
+    // the state the touch layer makes grabbable) and a paladin's medallion (always
+    // showing for the class, so always grabbable).
+    variants: [
+      {
+        ...TOUCH_TIER_VARIANTS[0],
+        key: 'mage-compact-874x402',
+        charClass: 'mage',
+        charName: 'Aldwin',
+      },
+      {
+        ...TOUCH_TIER_VARIANTS[0],
+        key: 'paladin-compact-874x402',
+        charClass: 'paladin',
+        charName: 'Elric',
+      },
+    ],
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await dismissEntryOverlays(page);
+      const frame = variant.charClass === 'paladin' ? '#paladin-devotion-frame' : '#proc-overlay';
+      if (variant.charClass === 'mage') {
+        // The offline mage boots in another spec, whose painter hides the fire
+        // bird every frame: switch to Fire first, then stamp the Hot Streak
+        // look (the dim login preview reads as nothing at the touch scale) so
+        // the frame shows the bird a fire mage actually drags mid-fight.
+        await page.evaluate(() => {
+          window.__game?.sim?.setSpec?.('fire');
+        });
+        await wait(400);
+        await page.evaluate(() => {
+          document.getElementById('proc-overlay')?.classList.add('preview', 'heating', 'hot');
+        });
+        await wait(300);
+      }
+      const pt = await touchPoint(page, frame);
+      if (!pt) throw new Error(`no live engine indicator to grab (${frame})`);
+      // One real finger through the input pipeline, carried in two legs so the
+      // move path (not just the drop) is what places the frame.
+      const touch = await page.touchscreen.touchStart(pt.x, pt.y);
+      await wait(120);
+      await touch.move(pt.x - 150, pt.y - 40);
+      await wait(120);
+      await touch.move(130, 90);
+      await wait(120);
+      await touch.end();
+      await wait(500);
+      // The proof the gesture landed, printed into the rig log beside the frame.
+      const placed = await page.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return {
+          placed: el.classList.contains('tf-touch-placed'),
+          fx: el.style.getPropertyValue('--touch-fx'),
+          fy: el.style.getPropertyValue('--touch-fy'),
+          center: { x: Math.round(r.x + r.width / 2), y: Math.round(r.y + r.height / 2) },
+        };
+      }, frame);
+      console.log(`[touch-engine-indicator-drag] ${frame} ${JSON.stringify(placed)}`);
+      return {};
+    },
+  },
+  {
+    key: 'touch-frames-tab',
+    label:
+      'Options > Interface > Frames on touch: neither the Edit Frames row nor the layout export / import rows are offered',
+    when: ['ui/touch_frame_drag'],
+    variants: [TOUCH_TIER_VARIANTS[0]],
+    async capture(page, variant) {
+      await enterTouchTier(page, variant.tier);
+      await dismissEntryOverlays(page);
+      await openInterfaceFramesTab(page);
+      await wait(400);
+      return {};
+    },
+  },
+  {
     key: 'touch-radial',
     label: 'Action radial held open: four petals, the local scrim, the receded ring',
     when: ['action_bar/radial_gesture_controller', 'action_bar/radial_petal_painter'],

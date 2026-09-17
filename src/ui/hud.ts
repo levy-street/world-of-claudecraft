@@ -882,6 +882,7 @@ import {
   paintMobTooltipBottomRight as paintMobTooltipBottomRightCore,
   paintTooltipAt as paintTooltipAtCore,
 } from './tooltip_paint';
+import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
@@ -2020,6 +2021,7 @@ export class Hud {
     },
     () => petBarPreviewIconIds(this.sim.cfg.playerClass),
   );
+  private touchFrameDrags: TouchFrameDrags | null = null;
   private readonly interfaceUnlock = new InterfaceUnlock({
     document,
     onUnlockedChanged: (unlocked) => {
@@ -3873,6 +3875,7 @@ export class Hud {
       },
     });
     this.initInterfaceUnlock(isMobileLayout);
+    this.touchFrameDrags = attachTouchFrameDrags(document, isMobileLayout);
   }
 
   // resizeMode 'dimensions' plumbing for the movers above: each axis reads
@@ -4069,6 +4072,7 @@ export class Hud {
     // seam; show/hide settings keep the player's choice. The buff row's
     // reset can seat it in the aura column: re-anchor.
     this.interfaceUnlock.resetAll();
+    this.touchFrameDrags?.resetAll();
     this.applyAuraAnchor();
     this.chatGeometry.reset();
     this.meters.resetFrames();

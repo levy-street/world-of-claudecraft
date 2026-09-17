@@ -304,6 +304,7 @@ const UI_PURE_CORES = [
   'src/ui/interface_unlock_core.ts',
   'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
+  'src/ui/touch_frame_drag_core.ts',
   'src/ui/keybind_transfer_core.ts',
   'src/ui/keyboard_map_core.ts',
   'src/ui/keybind_conflict_prompt_core.ts',
@@ -2675,6 +2676,10 @@ const UI_DOM_MODULES = [
   // once in its constructor, the same DOM-owning shape as its sibling above.
   'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
+  // The engine indicators' touch drag: pointer events on the frame, a resize
+  // listener, localStorage and the document's safe-area probe (the math is the
+  // touch_frame_drag_core pure core).
+  'src/ui/touch_frame_drag.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',

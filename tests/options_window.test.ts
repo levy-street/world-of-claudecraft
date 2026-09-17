@@ -449,12 +449,14 @@ describe('options_window: interface tab split', () => {
     expect(painter).toMatch(
       /if \(tab === 'general'\) \{\s*this\.languageSelect\(body\);\s*this\.renderThemeControls\(body\);/,
     );
-    // the Edit Frames entry and the layout transfer lead the Frames tab,
-    // with the remaining declarative rows under the Party Frame Options
-    // subhead (the unit-frames reset row was retired with the per-frame
-    // Reset size buttons in the editor's Show or Hide Frames list)
+    // the Edit Frames entry and the layout transfer lead the Frames tab, BOTH
+    // behind the touch gate (the editor is desktop-only and the layout code
+    // carries only its saved spots, so the touch HUD offers neither), with the
+    // remaining declarative rows under the Party Frame Options subhead (the
+    // unit-frames reset row was retired with the per-frame Reset size buttons
+    // in the editor's Show or Hide Frames list)
     expect(painter).toMatch(
-      /if \(tab === 'frames'\) \{[\s\S]*?if \(!env\.touch\) buildInterfaceUnlockRow\(body, this\.deps\);\s*this\.transferRows\(body, 'frames'\);\s*subhead\(body, t\('hudChrome\.partyFrames\.optionsSection'\), 'set-subhead'\);/,
+      /if \(tab === 'frames'\) \{[\s\S]*?if \(!env\.touch\) buildInterfaceUnlockRow\(body, this\.deps\);\s*if \(!env\.touch\) this\.transferRows\(body, 'frames'\);\s*subhead\(body, t\('hudChrome\.partyFrames\.optionsSection'\), 'set-subhead'\);/,
     );
     expect(painter).not.toContain('unitFramesResetRow');
     // the chat-timestamp / chat-reset / deed-broadcast rows live in the Chat tab
@@ -1065,6 +1067,15 @@ describe('options_window: frame editing is locked out on touch', () => {
     // never renders the entry row (the reviewer found the floating lock bar
     // and inert previews still reachable there).
     expect(painter).toContain('if (!env.touch) buildInterfaceUnlockRow(body, this.deps);');
+  });
+
+  it('the Frames tab offers the layout export / import rows only off the touch HUD', () => {
+    // The layout code carries only the editor's saved spots, which the touch
+    // HUD can neither make nor apply (the engine indicators keep their own
+    // touch drag, touch_frame_drag.ts), so the rows are withheld with the row.
+    expect(painter).toContain("if (!env.touch) this.transferRows(body, 'frames');");
+    // The General tab's whole-settings transfer stays on every layout.
+    expect(painter).toContain("if (tab === 'general') this.transferRows(body, 'settings');");
   });
 
   it('Hud.toggleInterfaceUnlock refuses on the mobile layout as the backstop', () => {
