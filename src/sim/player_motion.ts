@@ -401,14 +401,9 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       const mobile = casting != null && abilityCastSurvivesMovement(p, p.castingAbility, casting);
       if (!mobile) deps.cancelCast(p);
     }
-    // `moving` already excludes a cancelled pair (hasMovementInput is the net
-    // vector), so len is never zero here; the guard keeps a zero vector from
-    // ever reaching the division again, because 0 / 0 is a NaN position.
     const len = Math.hypot(mx, mz);
-    if (len > 0) {
-      mx /= len;
-      mz /= len;
-    }
+    mx /= len;
+    mz /= len;
     let speed = RUN_SPEED * deps.moveSpeedMult(p);
     if (mz < 0) speed *= BACKPEDAL_MULT;
     if (swimming) speed *= swimSpeedMult(p.swimStroke, submerged);
