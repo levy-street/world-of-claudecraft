@@ -1,5 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
+import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
+import type { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
+import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
+import { type WarriorPowerPiece, warriorPowerPiece } from '../src/render/warrior_power_core';
 
 const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
 const characterVisual = readFileSync(
@@ -43,12 +49,112 @@ describe('character presentation sleep wiring', () => {
     expect(offscreenBlock).toContain('this.endStowGesture();');
   });
 
-  it('persists the Recklessness latch across camera re-entry and clears it on aura end', () => {
-    expect(renderer).toContain('const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(');
-    expect(renderer).toContain(
-      'const spawnRecklessnessSkulls = nextRecklessSkullsLatch && !recklessSkullsSpawned;',
+  it('routes Recklessness sleep and re-entry through actual aura age without replaying activation', () => {
+    expect(renderer.includes('this.abilityVfx.syncEntity(e, runCharacterPresentation);')).toBe(
+      true,
     );
-    expect(renderer).toContain('v.recklessSkullsSpawned = nextRecklessSkullsLatch;');
+    const pool = new WarriorPowerForms(new THREE.Scene());
+    for (const prep of pool.preparation) vi.spyOn(prep, 'ready').mockReturnValue(true);
+    // Keep the real power hold/sleep dispatch. Other families own separate pools
+    // and are inert here; no browser, texture generation or GPU setup is needed.
+    const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
+    const sleep = () => ({ sleep: vi.fn() });
+    Object.assign(fx, {
+      frame: 0,
+      powerForms: pool,
+      controlSignals: sleep(),
+      guards: sleep(),
+      furyStates: sleep(),
+      warriorAttention: sleep(),
+      warriorStorms: new Map(),
+      crests: { releaseHeld: vi.fn() },
+      ccBands: new Map(),
+      windups: new Map(),
+      orbits: new Map(),
+      shells: { sleepEntity: vi.fn() },
+      groundAuras: { sleepEntity: vi.fn() },
+      glows: new Map(),
+      cancelWarriorHammer: vi.fn(),
+      holdControlSignals: vi.fn(),
+    });
+    const activation = vi.spyOn(fx, 'sequenceInstant').mockReturnValue(false);
+    const sound = vi.fn(),
+      detail = vi.fn();
+    const painter = new AbilityVfx(
+      {
+        fx,
+        vfx: {},
+        localPlayerId: () => 1,
+        warriorSpecOf: () => 'fury',
+        abilityAudio: sound,
+      } as unknown as AbilityVfxDeps,
+      () => 0,
+    );
+    const e = {
+      id: 1,
+      castingAbility: null,
+      castRemaining: 0,
+      castTotal: 0,
+      auras: [{ id: 'recklessness', kind: 'buff_reckless', duration: 20, remaining: 17 }],
+    };
+    const draw = (frame: number) =>
+      pool.draw(
+        frame,
+        0,
+        false,
+        (_id, _fraction, out = new THREE.Vector3()) => out.set(0, 1, 0),
+        () => 0,
+        { appendHeld: vi.fn() } as unknown as AbilityVfxRibbons,
+        detail,
+      );
+    const sync = (frame: number, visible: boolean, dead = false) => {
+      Object.assign(fx, { frame });
+      painter.syncEntity({ ...e, dead }, visible);
+      draw(frame);
+    };
+    try {
+      sync(0, true);
+      expect(pool.meshes[1].count).toBe(6);
+      sync(1, false);
+      expect(pool.meshes.every((mesh) => mesh.count === 0 && !mesh.visible)).toBe(true);
+      e.auras[0].remaining = 12;
+      sync(10, true);
+      expect(pool.meshes[1].count).toBe(6);
+      for (let part = 0; part < 6; part++) {
+        const p = warriorPowerPiece({} as WarriorPowerPiece, 1, 1, part, 8, false);
+        const expected = new THREE.Matrix4().compose(
+          new THREE.Vector3(p.x, p.y + 1, p.z),
+          new THREE.Quaternion().setFromEuler(new THREE.Euler(0, p.yaw, p.roll)),
+          new THREE.Vector3(p.sx, p.sy, p.sz),
+        );
+        const actual = new THREE.Matrix4();
+        pool.meshes[1].getMatrixAt(part, actual);
+        actual.elements.forEach((value, index) => {
+          expect(value).toBeCloseTo(expected.elements[index], 5);
+        });
+      }
+      expect(detail).not.toHaveBeenCalled();
+      expect(activation).not.toHaveBeenCalled();
+      expect(sound).not.toHaveBeenCalled();
+      e.auras[0].remaining = 20;
+      sync(11, true);
+      const fresh = new THREE.Matrix4();
+      pool.meshes[1].getMatrixAt(0, fresh);
+      const scale = new THREE.Vector3().setFromMatrixScale(fresh);
+      expect(scale.y).toBeCloseTo(0.95 * 0.02, 6);
+      e.auras[0].remaining = 0;
+      sync(12, true);
+      expect(pool.meshes.every((mesh) => mesh.count === 0 && !mesh.visible)).toBe(true);
+      e.auras[0].remaining = 19;
+      sync(13, true, true);
+      expect(pool.meshes.every((mesh) => mesh.count === 0 && !mesh.visible)).toBe(true);
+      expect(activation).not.toHaveBeenCalled();
+      expect(sound).not.toHaveBeenCalled();
+    } finally {
+      activation.mockRestore();
+      pool.dispose();
+      vi.restoreAllMocks();
+    }
   });
 
   it('sleeps ability VFX semantically while mount particles remain presentation-gated', () => {

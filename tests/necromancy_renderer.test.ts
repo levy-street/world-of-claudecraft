@@ -16,6 +16,7 @@ interface HarnessResult {
   abilityVfx: {
     handleSpellfx: ReturnType<typeof vi.fn>;
     handleSpellfxAt: ReturnType<typeof vi.fn>;
+    releaseGesture: ReturnType<typeof vi.fn>;
   };
   vfx: {
     lichTransform: ReturnType<typeof vi.fn>;
@@ -77,6 +78,7 @@ function makeHarness({
       (event: Extract<SimEvent, { type: 'spellfx' }>) => event.ability !== 'unknown_shadow_spell',
     ),
     handleSpellfxAt: vi.fn(() => true),
+    releaseGesture: vi.fn(),
   };
   const audio = vi.fn();
   const pulseAt = vi.fn();
@@ -284,6 +286,13 @@ describe('Necromancy renderer routing', () => {
     expect(transformed.vfx.projectile).not.toHaveBeenCalled();
     expect(transformed.abilityVfx.handleSpellfx).not.toHaveBeenCalled();
     expect(transformed.pulseMetamorphosis).toHaveBeenCalledOnce();
+    expect(transformed.abilityVfx.releaseGesture).toHaveBeenCalledExactlyOnceWith(
+      11,
+      'soul_harvest',
+    );
+    expect(transformed.abilityVfx.releaseGesture.mock.invocationCallOrder[0]).toBeLessThan(
+      transformed.vfx.deathBolt.mock.invocationCallOrder[0],
+    );
 
     const noHands = makeHarness({ hands: false });
     noHands.renderer.handleEvent({
@@ -297,6 +306,10 @@ describe('Necromancy renderer routing', () => {
     expect(noHands.vfx.projectile).toHaveBeenCalledWith(11, 22, 'shadow', 1.3);
     expect(noHands.vfx.deathBolt).not.toHaveBeenCalled();
     expect(noHands.abilityVfx.handleSpellfx).not.toHaveBeenCalled();
+    expect(noHands.abilityVfx.releaseGesture).toHaveBeenCalledExactlyOnceWith(11, 'soul_harvest');
+    expect(noHands.abilityVfx.releaseGesture.mock.invocationCallOrder[0]).toBeLessThan(
+      noHands.vfx.projectile.mock.invocationCallOrder[0],
+    );
 
     const mortal = makeHarness({ lich: false });
     mortal.renderer.handleEvent({
@@ -317,6 +330,7 @@ describe('Necromancy renderer routing', () => {
       ability: 'soul_harvest',
     });
     expect(mortal.vfx.projectile).not.toHaveBeenCalled();
+    expect(mortal.abilityVfx.releaseGesture).not.toHaveBeenCalled();
 
     const otherAbility = makeHarness();
     otherAbility.renderer.handleEvent({
@@ -329,6 +343,7 @@ describe('Necromancy renderer routing', () => {
     });
     expect(otherAbility.vfx.deathBolt).not.toHaveBeenCalled();
     expect(otherAbility.vfx.projectile).toHaveBeenCalledWith(11, 22, 'shadow');
+    expect(otherAbility.abilityVfx.releaseGesture).not.toHaveBeenCalled();
   });
 
   it('plays soul-consumption audio only when the soul reaches its owner', () => {

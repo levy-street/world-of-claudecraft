@@ -7,6 +7,7 @@ describe('Paladin combat VFX routing', () => {
     const triggerAttack = vi.fn();
     const pulseAt = vi.fn();
     const solarExecution = vi.fn();
+    const releaseGesture = vi.fn();
     const vfx = {
       paladinHolyShock: vi.fn(),
       paladinSunwardDisc: vi.fn(),
@@ -28,7 +29,7 @@ describe('Paladin combat VFX routing', () => {
       abilityVfxFx: { solarExecution },
       // The spec-registry gate runs before the paladin switch; none of these fx
       // names are registry casts, so the real painter returns false too.
-      abilityVfx: { handleSpellfx: vi.fn(() => false) },
+      abilityVfx: { handleSpellfx: vi.fn(() => false), releaseGesture },
     } as unknown as Renderer;
     const handle = (event: Record<string, unknown>) =>
       Renderer.prototype.handleEvent.call(renderer, event as SimEvent);
@@ -42,6 +43,10 @@ describe('Paladin combat VFX routing', () => {
       impact: 'healing',
     });
     expect(vfx.paladinHolyShock).toHaveBeenCalledWith(1, 2, 'heal');
+    expect(releaseGesture).toHaveBeenCalledExactlyOnceWith(1, 'solar_invocation');
+    expect(releaseGesture.mock.invocationCallOrder[0]).toBeLessThan(
+      vfx.paladinHolyShock.mock.invocationCallOrder[0],
+    );
 
     handle({
       type: 'spellfx',
@@ -118,5 +123,6 @@ describe('Paladin combat VFX routing', () => {
     });
     expect(vfx.paladinFinalEdict).toHaveBeenCalledWith(1, 2);
     expect(solarExecution).toHaveBeenCalledWith(1, 2);
+    expect(releaseGesture).toHaveBeenCalledExactlyOnceWith(1, 'solar_invocation');
   });
 });

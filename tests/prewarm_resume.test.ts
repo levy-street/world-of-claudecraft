@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import { initialFrameDeferral } from '../src/render/initial_frame_core';
 import { createPrewarmCompileLifecycle } from '../src/render/prewarm_compile_lifecycle';
@@ -675,24 +676,58 @@ describe('resumeDroppedPrewarmEntries', () => {
   // Weapon-skin rigs are worn by OTHER players, so nothing at boot draws one
   // and their programs otherwise link on the first sighting, mid-gameplay.
   it('warms the weapon-skin VFX programs as small resumable units', () => {
-    const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
-    const start = source.indexOf("id: 'vfx.weapon-skins'");
-    const end = source.indexOf("id: 'vfx.ability-primitives'", start);
-    const entry = source.slice(start, end);
-
-    expect(start).toBeGreaterThan(-1);
-    expect(end).toBeGreaterThan(start);
-    expect(entry).toContain("category: 'vfx'");
-    expect(entry).toContain('required: false');
+    // Parse the actual object instead of slicing up to a neighboring entry:
+    // that neighbor now lives in an extracted factory. Commented-out wiring
+    // must not count, and formatting changes must not alter the boundary.
+    const parsed = ts.createSourceFile(
+      'renderer.ts',
+      readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
+      ts.ScriptTarget.Latest,
+      true,
+    );
+    const printer = ts.createPrinter({ removeComments: true });
+    const source = printer.printFile(parsed);
+    const compact = (node: ts.Node) =>
+      printer.printNode(ts.EmitHint.Unspecified, node, parsed).replace(/\s+/g, '');
+    const objects: ts.ObjectLiteralExpression[] = [];
+    const visit = (node: ts.Node) => {
+      if (
+        ts.isObjectLiteralExpression(node) &&
+        node.properties.some(
+          (property) =>
+            ts.isPropertyAssignment(property) &&
+            property.name.getText() === 'id' &&
+            ts.isStringLiteral(property.initializer) &&
+            property.initializer.text === 'vfx.weapon-skins',
+        )
+      )
+        objects.push(node);
+      ts.forEachChild(node, visit);
+    };
+    visit(parsed);
+    expect(objects).toHaveLength(1);
+    const entry = compact(objects[0]);
+    const property = (name: string) => {
+      const match = objects[0].properties.find((p) => p.name?.getText() === name);
+      if (!match || !ts.isPropertyAssignment(match))
+        throw new Error(`Missing weapon-skin entry ${name}`);
+      return compact(match.initializer);
+    };
+    expect(property('category')).toBe("'vfx'");
+    expect(property('required')).toBe('false');
     // One bounded build and compile unit per real catalog spec, never a
     // whole-entry rerun that rebuilds all rigs after the loading cover drops.
     // The PLAN now lives in weapon_vfx_prewarm.ts (its unit ids are pinned to
     // literals in tests/weapon_vfx_rig_build.test.ts, and they double as the
     // per-skin failure boundary), so the renderer side pins the WIRING and the
     // module side pins the shape.
-    const prewarmModule = readFileSync(
-      new URL('../src/render/weapon_vfx_prewarm.ts', import.meta.url),
-      'utf8',
+    const prewarmModule = printer.printFile(
+      ts.createSourceFile(
+        'weapon_vfx_prewarm.ts',
+        readFileSync(new URL('../src/render/weapon_vfx_prewarm.ts', import.meta.url), 'utf8'),
+        ts.ScriptTarget.Latest,
+        true,
+      ),
     );
     expect(prewarmModule).toContain(`weapon-skins:build:\${key}`);
     expect(prewarmModule).toContain(`weapon-skins:compile:\${key}`);
@@ -705,16 +740,32 @@ describe('resumeDroppedPrewarmEntries', () => {
     expect(source).toContain(
       'const weaponVfxPrewarmSkinStage = createWeaponVfxPrewarmSkinStage(this.scene);',
     );
-    expect(entry).toContain('weaponVfxPrewarmUnits(weaponVfxPrewarmSkinStage, {');
-    expect(entry).toContain('compile: (group) => this.compilePrewarmColorPrograms(group, false),');
+    const resume = property('resumeUnits');
+    const boot = property('run');
+    expect(resume).toContain('weaponVfxPrewarmUnits(weaponVfxPrewarmSkinStage,{');
+    expect(resume).toContain('compile:(group)=>this.compilePrewarmColorPrograms(group,false),');
+    expect(resume).toContain('publishGroup:(group)=>{weaponVfxPrewarmGroup=group;');
+    expect(resume).not.toContain('buildWeaponVfxPrewarmGroup(');
+    expect(boot).toContain('weaponVfxPrewarmGroup=buildWeaponVfxPrewarmGroup()');
     expect(entry.match(/buildWeaponVfxPrewarmGroup\(\)/g)).toHaveLength(1); // loading-screen path only
-    expect(entry).toContain('for (const texture of weaponVfxPrewarmTextures()) ');
+    for (const arm of [boot, resume]) {
+      expect(arm).toContain('for(consttextureofweaponVfxPrewarmTextures())');
+      expect(arm).toContain('this.prewarmTexture(texture)');
+    }
+    const buildAt = prewarmModule.indexOf('weapon-skins:build:');
+    const textureAt = prewarmModule.indexOf("id: 'weapon-skins:textures'");
+    const compileAt = prewarmModule.indexOf('weapon-skins:compile:');
+    expect(buildAt).toBeGreaterThan(-1);
+    expect(textureAt).toBeGreaterThan(buildAt);
+    expect(compileAt).toBeGreaterThan(textureAt);
     // The sky dome is not warmed: the world path builds none any more.
     expect(entry).not.toContain('skyTex');
 
     // The staged group is torn out of the scene by both cleanup paths and
     // hidden between resumed entries, exactly like every other prewarm group.
-    expect(source).toContain('if (weaponVfxPrewarmGroup) this.scene.remove(weaponVfxPrewarmGroup)');
+    expect(source.replace(/\s+/g, '')).toContain(
+      'if(weaponVfxPrewarmGroup)this.scene.remove(weaponVfxPrewarmGroup)',
+    );
     expect(source).toContain('weaponVfxPrewarmGroup = null;');
     const hideStart = source.indexOf('const hidePrewarmArtifacts = ');
     const hideEnd = source.indexOf('const cleanupPrewarmArtifacts = ', hideStart);

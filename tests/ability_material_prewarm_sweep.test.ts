@@ -44,6 +44,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type * as THREE from 'three';
+import ts from 'typescript';
 import { describe, expect, it } from 'vitest';
 import {
   ABILITY_MATERIAL_SOURCES,
@@ -311,12 +312,116 @@ describe('the manifest wiring (source pins)', () => {
   );
 
   it('rides the ability-primitives entry, on both arms', () => {
-    const start = renderer.indexOf("        id: 'vfx.ability-primitives',");
-    expect(start).toBeGreaterThan(0);
-    const entryStart = renderer.lastIndexOf('      {', start);
-    const entry = renderer.slice(entryStart, renderer.indexOf('\n      {', start));
-    expect(entry).toContain('abilityMaterialSlot.run();');
-    expect(entry).toContain('...abilityMaterialSlot.resumeUnits(),');
+    const primitiveSource = readFileSync(
+      new URL('../src/render/ability_vfx/primitive_prewarm.ts', import.meta.url),
+      'utf8',
+    );
+    const parse = (source: string) =>
+      ts.createSourceFile('prewarm.ts', source, ts.ScriptTarget.Latest, true);
+    const printer = ts.createPrinter({ removeComments: true });
+    const compact = (node: ts.Node) =>
+      printer.printNode(ts.EmitHint.Unspecified, node, node.getSourceFile()).replace(/\s+/g, '');
+    const nodes = (root: ts.Node): ts.Node[] => {
+      const found: ts.Node[] = [];
+      const visit = (node: ts.Node) => {
+        found.push(node);
+        ts.forEachChild(node, visit);
+      };
+      visit(root);
+      return found;
+    };
+    const rendererNodes = nodes(parse(renderer));
+    const calls = rendererNodes
+      .filter(ts.isCallExpression)
+      .filter((call) => compact(call.expression) === 'abilityPreparation.entries');
+    expect(calls).toHaveLength(1);
+    expect(ts.isSpreadElement(calls[0].parent)).toBe(true);
+    expect(calls[0].arguments.slice(0, 2).map(compact)).toEqual([
+      'this.sim.cfg.playerClass',
+      'this.backgroundGpuWork',
+    ]);
+    expect(compact(calls[0].arguments[2])).toContain('materialSlot:abilityMaterialSlot');
+    expect(renderer).toContain(
+      "import * as abilityPreparation from './ability_vfx/primitive_prewarm'",
+    );
+
+    const primitiveNodes = nodes(parse(primitiveSource));
+    const functions = primitiveNodes.filter(ts.isFunctionDeclaration);
+    const entries = functions.find((fn) => fn.name?.text === 'entries');
+    const factory = functions.find((fn) => fn.name?.text === 'abilityPrimitivePrewarmEntry');
+    if (!entries || !factory) throw new Error('Missing extracted primitive preparation factory');
+    const bridge = compact(entries);
+    expect(bridge).toContain(
+      'abilityPrimitivePrewarmEntry({...host,stageMaterials:()=>host.materialSlot.run(),materialUnits:()=>host.materialSlot.resumeUnits(),})',
+    );
+    const returned = nodes(factory)
+      .filter(ts.isObjectLiteralExpression)
+      .filter((object) =>
+        object.properties.some(
+          (property) =>
+            ts.isPropertyAssignment(property) &&
+            property.name.getText() === 'id' &&
+            ts.isStringLiteral(property.initializer) &&
+            property.initializer.text === 'vfx.ability-primitives',
+        ),
+      );
+    expect(returned).toHaveLength(1);
+    const property = (name: string) => {
+      const match = returned[0].properties.find((p) => p.name?.getText() === name);
+      if (!match || !ts.isPropertyAssignment(match))
+        throw new Error(`Missing primitive entry ${name}`);
+      return match.initializer;
+    };
+    const category = property('category');
+    expect(compact(ts.isAsExpression(category) ? category.expression : category)).toBe("'vfx'");
+    expect(compact(property('required'))).toBe('false');
+    const run = compact(property('run'));
+    const bootSteps = [
+      'abilityVfxBootTextureDependencies()',
+      'host.texture(texture)',
+      'host.spawn()',
+      'awaithost.stageMaterials()',
+      'host.materialTextures(material)',
+      'constunits=geometry()',
+      'if(!host.withinDeadline())break',
+      'awaitunit.run()',
+    ];
+    let previous = -1;
+    for (const step of bootSteps) {
+      const at = run.indexOf(step);
+      expect(at, `Boot preparation order: ${step}`).toBeGreaterThan(previous);
+      previous = at;
+    }
+    expect(
+      returned[0].properties.some(
+        (p) => ts.isShorthandPropertyAssignment(p) && p.name.text === 'resumeUnits',
+      ),
+    ).toBe(true);
+    expect(compact(property('resumePartialUnits'))).toBe(
+      '()=>(textureSweepDone?geometry():resumeUnits())',
+    );
+    const resume = nodes(factory)
+      .filter(ts.isVariableDeclaration)
+      .find((node) => node.name.getText() === 'resumeUnits');
+    if (!resume?.initializer) throw new Error('Missing small-unit primitive resume plan');
+    const background = compact(resume.initializer);
+    const resumeSteps = [
+      'abilityVfxTexturePrewarmSteps().map(',
+      '...host.materialUnits()',
+      '...collectAbilityVfxCompileTargets(host.scene)',
+      'persistentClassVfxCompileTargets()',
+      'host.compile(target.object,false)',
+      '...geometry()',
+    ];
+    previous = -1;
+    for (const step of resumeSteps) {
+      const at = background.indexOf(step);
+      expect(at, `Background preparation order: ${step}`).toBeGreaterThan(previous);
+      previous = at;
+    }
+    expect(background).toContain('for(consttextureofstep.build())host.texture(texture)');
+    expect(background).not.toContain('host.spawn(');
+    expect(background).not.toContain('host.stageMaterials(');
   });
 
   it('is a staged compile group, so the boot compile lane links it', () => {

@@ -1425,9 +1425,18 @@ describe('Ignivar encounter renderer', () => {
     // The anchor overlays (the actionable player chain plus the unloaded-rig
     // telegraph sync) run BEFORE the unloaded-rig early return, so a
     // still-compiling body cannot hide them.
-    expect(renderer).toMatch(
-      /syncRaidEncounterAnchorVisuals\(\s*v\.group,\s*e,\s*this\.views,\s*dt,\s*this\.vfx,\s*this\.sim\.entities,\s*this\.reducedMotion\(\),\s*v\.visual !== null,\s*\);\s*if \(!v\.visual\) continue;/,
-    );
+    const anchorSync =
+      /syncRaidEncounterAnchorVisuals\(\s*v\.group,\s*e,\s*this\.views,\s*dt,\s*this\.vfx,\s*this\.sim\.entities,\s*this\.reducedMotion\(\),\s*v\.visual !== null,\s*\);/.exec(
+        renderer,
+      );
+    expect(anchorSync !== null).toBe(true);
+    if (!anchorSync) throw new Error('Missing actionable encounter anchor sync');
+    const syncEnd = anchorSync.index + anchorSync[0].length;
+    const unloadedReturn = renderer.indexOf('if (!v.visual) continue;', syncEnd);
+    expect(unloadedReturn).toBeGreaterThan(syncEnd);
+    // Other independent overlays may sync here, but none may bypass the
+    // actionable chain/telegraph owner or move it behind the unloaded return.
+    expect(renderer.slice(syncEnd, unloadedReturn)).not.toMatch(/\bcontinue\s*;/);
     expect(raidVisuals).toContain(
       'syncIgnivarPlayerChainVisual(group, entity, views, dt, entities, reducedMotion);',
     );

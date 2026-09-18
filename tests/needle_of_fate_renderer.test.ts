@@ -11,6 +11,7 @@ function makeHarness() {
   const beginCast = vi.fn();
   const endCast = vi.fn();
   const genericProjectile = vi.fn();
+  const releaseGesture = vi.fn();
   const renderer = Object.create(Renderer.prototype) as NeedleRendererHarness & {
     needleOfFateVfx: {
       spawn: typeof needleSpawn;
@@ -18,18 +19,18 @@ function makeHarness() {
       endCast: typeof endCast;
     };
     vfx: { projectile: typeof genericProjectile };
-    abilityVfx: { handleSpellfx: ReturnType<typeof vi.fn> };
+    abilityVfx: { handleSpellfx: ReturnType<typeof vi.fn>; releaseGesture: typeof releaseGesture };
     sim: { entities: Map<number, never> };
     views: Map<number, never>;
     triggerAttack: ReturnType<typeof vi.fn>;
   };
   renderer.needleOfFateVfx = { spawn: needleSpawn, beginCast, endCast };
   renderer.vfx = { projectile: genericProjectile };
-  renderer.abilityVfx = { handleSpellfx: vi.fn(() => false) };
+  renderer.abilityVfx = { handleSpellfx: vi.fn(() => false), releaseGesture };
   renderer.sim = { entities: new Map<number, never>() };
   renderer.views = new Map<number, never>();
   renderer.triggerAttack = vi.fn();
-  return { renderer, needleSpawn, beginCast, endCast, genericProjectile };
+  return { renderer, needleSpawn, beginCast, endCast, genericProjectile, releaseGesture };
 }
 
 describe('Needle of Fate renderer routing', () => {
@@ -45,6 +46,10 @@ describe('Needle of Fate renderer routing', () => {
     });
     expect(needle.needleSpawn).toHaveBeenCalledWith(11, 22);
     expect(needle.genericProjectile).not.toHaveBeenCalled();
+    expect(needle.releaseGesture).toHaveBeenCalledExactlyOnceWith(11, 'needle_of_fate');
+    expect(needle.releaseGesture.mock.invocationCallOrder[0]).toBeLessThan(
+      needle.needleSpawn.mock.invocationCallOrder[0],
+    );
 
     const fallback = makeHarness();
     fallback.renderer.handleEvent({
@@ -56,6 +61,7 @@ describe('Needle of Fate renderer routing', () => {
     });
     expect(fallback.needleSpawn).not.toHaveBeenCalled();
     expect(fallback.genericProjectile).toHaveBeenCalledWith(11, 22, 'shadow');
+    expect(fallback.releaseGesture).not.toHaveBeenCalled();
   });
 
   it('routes Needle cast windup and stop events into the powerful VFX painter', () => {
@@ -84,5 +90,7 @@ describe('Needle of Fate renderer routing', () => {
       time: 2,
     });
     expect(other.beginCast).not.toHaveBeenCalled();
+    for (const instance of [harness, interrupted, other])
+      expect(instance.releaseGesture).not.toHaveBeenCalled();
   });
 });

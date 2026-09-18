@@ -39,8 +39,25 @@ describe('specialization ritual choreography', () => {
     for (const id of Object.keys(RITUAL_KIT_CHOREOGRAPHY)) {
       const { host, paths } = recorder(),
         seq = new ArchetypeSequencer();
-      const slot = seq.start(host, id, abilityVfxFullSpec(id)!, 1, 2, 0xaaaabb, 0, false)!;
+      const spec = abilityVfxFullSpec(id);
+      if (!spec) throw new Error(`Missing resolved ritual identity: ${id}`);
+      const slot = seq.start(host, id, spec, 1, 2, 0xaaaabb, 0, false);
       for (let i = 0; i < 60; i++) seq.update(host, 0.05);
+      // Shellskin's equipped shell is now a dedicated live-state owner. Its
+      // older planning entry must not add a second generic ceremony on top.
+      if (id === 'shellskin') {
+        expect(spec.presentation).toBe('dedicated');
+        expect(slot).toBeNull();
+        expect(paths).toHaveLength(0);
+        expect(host.countPrimitive).not.toHaveBeenCalled();
+        expect(host.ringAt).not.toHaveBeenCalled();
+        expect(host.elementalImpact).not.toHaveBeenCalled();
+        expect(host.flipbookAt).not.toHaveBeenCalled();
+        continue;
+      }
+      expect(spec.presentation, id).toBeUndefined();
+      expect(slot, id).not.toBeNull();
+      if (!slot) throw new Error(`Registered ritual was not admitted: ${id}`);
       expect(slot.active, id).toBe(false);
       expect(host.countPrimitive, id).toHaveBeenCalled();
       expect(host.ringAt, id).not.toHaveBeenCalled();

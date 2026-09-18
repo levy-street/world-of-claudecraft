@@ -134,7 +134,9 @@ describe('Metamorphosis character integration', () => {
     expect(source).toContain(
       'applyCharacterFormDetail(v, active, v.isFar, resolvedForm, shadowPlan)',
     );
-    expect(source).toContain("['warlock', 'form_metamorph'], ['druid', 'form_moonkin']");
+    expect(/\['warlock', 'form_metamorph'\],\s*\['druid', 'form_moonkin'\]/.test(source)).toBe(
+      true,
+    );
     expect(source).toContain('createCharacterVisual(entity, form)');
     expect(source).toContain('for (const visual of playerPrewarmInstances) visual.dispose();');
     // The per-rig setActive fan-out lives in entity_gate_stand_in_core.ts
