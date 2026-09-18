@@ -92,6 +92,32 @@ it('rejects an absent instanceColor at construction', () => {
   material.dispose();
 });
 
+it('prepares plain meshes with their actual buffers and material, without an instanced shader variant', async () => {
+  const geometry = new THREE.PlaneGeometry(1, 1, 8, 8);
+  const material = new THREE.ShaderMaterial();
+  const mesh = new THREE.Mesh(geometry, material);
+  const prep = new GuardPrewarm(new THREE.Scene(), mesh);
+  const carrier = prep.group.children[0] as THREE.Mesh;
+  expect(carrier.isMesh).toBe(true);
+  expect((carrier as THREE.InstancedMesh).isInstancedMesh).not.toBe(true);
+  expect(carrier.geometry).toBe(geometry);
+  expect(carrier.material).toBe(material);
+  expect(carrier.geometry.getAttribute('position')).toBe(geometry.getAttribute('position'));
+  expect(carrier.geometry.getIndex()).toBe(geometry.getIndex());
+  const host = makeHost();
+  for (const unit of prep.units(host)) await unit.run();
+  expect(host.compile).toHaveBeenCalledWith(carrier, true);
+  expect(host.draw).toHaveBeenCalledWith(prep.group, carrier);
+  expect(prep.ready()).toBe(true);
+  const disposeGeometry = vi.spyOn(geometry, 'dispose');
+  const disposeMaterial = vi.spyOn(material, 'dispose');
+  prep.dispose();
+  expect(disposeGeometry).not.toHaveBeenCalled();
+  expect(disposeMaterial).not.toHaveBeenCalled();
+  geometry.dispose();
+  material.dispose();
+});
+
 it('cannot call a failed compilation ready or draw it through a later resume unit, and retries only unpaid work', async () => {
   const mesh = makeMesh();
   const prep = new GuardPrewarm(new THREE.Scene(), mesh);

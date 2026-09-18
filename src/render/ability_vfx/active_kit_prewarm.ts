@@ -99,6 +99,14 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
         state.host.texture(texture);
       },
     },
+    {
+      id: 'upload-big:active-warrior-shear',
+      run: () => {
+        const texture = bakedTexture('warrior_shear');
+        if (!texture) throw new Error('Warrior shear texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
     ...state.host.geometry(ACTIVE_WARRIOR_CRESTS),
   ].filter((unit) => !state.done.has(unit.id));
 }

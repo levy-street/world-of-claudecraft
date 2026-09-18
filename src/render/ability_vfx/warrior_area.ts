@@ -45,6 +45,7 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
       null,
       false,
       strand === 0 ? 1 : 0,
+      { from: 0, to: 1 },
     );
   host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x8c9fae, 0xe4edf2, 'steel_reap', angle, 0.28);
   host.countPrimitive('cleave', slot.tier > 0 ? 2 : 4);

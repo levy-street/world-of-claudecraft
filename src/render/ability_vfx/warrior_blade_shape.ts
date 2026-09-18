@@ -40,7 +40,7 @@ export function buildWarriorBlade(
           point.y,
           point.z + side * (bevel ? 0.012 : 0.09) * Math.sin(u * Math.PI),
         );
-        uvs.push(u, bevel ? 0 : row === 1 ? 0.18 : 0.7);
+        uvs.push(u, v);
         if (row < bands.length - 1 && col < columns && !breaks.includes(col)) {
           const a = start + row * (columns + 1) + col,
             b = a + 1,

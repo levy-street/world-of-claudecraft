@@ -70,16 +70,13 @@ export class DeferredContactBursts {
       slot.delay -= dt;
       if (slot.delay > 0) continue;
       slot.active = false;
-      host.burstAt(
-        slot.x,
-        slot.y,
-        slot.z,
-        slot.color,
-        slot.count,
-        slot.power,
-        slot.kind,
-        slot.duration,
-      );
+      // The extraction's end belongs to the contact clock, even when a slow
+      // frame delivers it late. An unspecified lifetime remains host-owned.
+      const duration = slot.duration === undefined ? undefined : slot.duration + slot.delay;
+      // Vfx.burst clamps explicit lifetimes to 50 ms. Omit optional garnish
+      // when that minimum would push it beyond the original contact window.
+      if (duration !== undefined && duration < 0.05) continue;
+      host.burstAt(slot.x, slot.y, slot.z, slot.color, slot.count, slot.power, slot.kind, duration);
     }
   }
   clear(): void {

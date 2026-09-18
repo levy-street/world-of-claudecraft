@@ -46,7 +46,7 @@ export function buildWarriorArea(kind: WarriorAreaShape): THREE.BufferGeometry {
             point.y + side * (bevel ? 0.012 : 0.065) * Math.sin(u * Math.PI),
             point.z,
           );
-          uvs.push(u, kind === 'steel_storm' ? rows[row] : bevel ? 0 : row === 1 ? 0.18 : 0.7);
+          uvs.push(u, rows[row]);
           if (row < rows.length - 1 && col < columns) {
             const a = base + row * (columns + 1) + col,
               b = a + 1,

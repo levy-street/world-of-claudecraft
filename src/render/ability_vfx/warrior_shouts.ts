@@ -3,6 +3,7 @@ import {
   type WarriorPressureKind,
   warriorPressureLayers,
   warriorPressurePoint,
+  warriorVoiceProfile,
 } from './warrior_shout_shapes';
 
 interface ShoutDesign {
@@ -81,6 +82,7 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
     y = at.y,
     z = at.z;
   const facing = host.facingAt?.(slot.casterId) ?? 0;
+  const voice = warriorVoiceProfile(design.shape)!;
   let count = 0;
   if (beat === 0) {
     const mouth = host.anchorOf(slot.casterId, 0.79, mouthPoint);
@@ -96,7 +98,7 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
           design.edge,
           design.shape,
           facing,
-          0.65,
+          voice.duration,
         )
       : false;
     // A cold sculpture or a fully occupied pool must still have a large,
@@ -109,12 +111,15 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
       for (let spoke = 0; spoke < warriorPressureLayers(design.shape); spoke++) {
         host.pathRibbon(
           design.edge,
-          0.32 + design.lift * 0.1,
-          0.52,
+          0.12 + design.lift * 0.035,
+          voice.duration,
           (points) => {
             for (let i = 0; i < points.length; i++) {
-              const u = i / (points.length - 1);
-              warriorPressurePoint(design.shape, spoke, u, 0.5, pressurePoint, true);
+              const layers = warriorPressureLayers(design.shape);
+              // Sparse open sectors preserve the surrounding voice without
+              // spending more fallback ribbons or joining into a solid ring.
+              const u = (spoke + 0.08 + (i / (points.length - 1)) * 0.76) / layers;
+              warriorPressurePoint(design.shape, spoke, u, 0.15, pressurePoint);
               const forward = (pressurePoint.z * design.presence) / 5;
               const side = (pressurePoint.x * design.presence) / 5;
               const px = x + dx * forward + dz * side;
@@ -179,12 +184,12 @@ export function drawWarriorShout(host: SequencerHost, slot: SeqSlot, beat: numbe
       (points) => {
         for (let i = 0; i < points.length; i++) {
           const u = i / (points.length - 1);
-          const side = Math.sin(u * Math.PI) * 0.35 * (lobe === 0 ? 1 : -1);
-          const r = radius * (0.45 + 0.55 * u);
-          const tooth = Math.sin(u * Math.PI) * 0.22;
-          const tx = x + dx * r + dz * side,
-            tz = z + dz * r - dx * side;
-          points[i].set(tx, y + 1.75 + tooth * design.lift * 0.6, tz);
+          // A transverse compression edge, perpendicular to propagation.
+          // Radial curling streamers read as liquid rather than sound.
+          const spread = (u - 0.5) * 0.54;
+          const tx = x + Math.sin(a + spread) * radius,
+            tz = z + Math.cos(a + spread) * radius;
+          points[i].set(tx, y + 1.75 + lobe * 0.08, tz);
         }
         return points.length;
       },

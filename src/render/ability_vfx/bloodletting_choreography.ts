@@ -11,7 +11,9 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
   const outcome = slot.componentOutcomes === undefined ? 1 : slot.componentOutcomes & 3;
   if (beat > 0 || !outcome || slot.targetId === slot.casterId) return true;
   const profile = meleeImpactProfile('bloodthirst')!;
-  const at = host.anchorOf(slot.targetId, meleeContactHeight(profile, 0), target);
+  const targetId = slot.targetId,
+    height = meleeContactHeight(profile, 0);
+  const at = host.anchorOf(targetId, height, target);
   const from = host.anchorOf(slot.casterId, 0.55, source);
   if (!at || !from) return true;
   const facing = Math.atan2(at.x - from.x, at.z - from.z);
@@ -23,6 +25,9 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
     host.countPrimitive(slot.abilityId, 1);
     return true;
   }
+  const impact = { x: at.x, y: at.y, z: at.z };
+  const body = { x: 0, y: 0, z: 0 };
+  const facingOffset = facing - (host.facingAt?.(targetId) ?? facing);
   const primary = !slot.physicalSecondary;
   const sculpted =
     primary &&
@@ -68,14 +73,19 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
         layer ? 0.14 : 0.48,
         layer ? 0.075 : 0.2,
         (points) => {
+          const origin = fallback ? impact : host.anchorOf(targetId, height, body);
+          if (!origin) return 0;
+          const yaw = fallback ? facing : (host.facingAt?.(targetId) ?? facing) + facingOffset;
+          const sx = Math.sin(yaw),
+            sz = Math.cos(yaw);
           for (let i = 0; i < points.length; i++) {
             const u = i / (points.length - 1),
               s = (u - 0.5) * (fallback ? 5.4 : 2.5);
             const jag = Math.sin(u * 31) * Math.sin(u * Math.PI) * 0.065;
             points[i].set(
-              at.x + dz * s * Math.cos(roll) - dx * 0.24,
-              at.y + s * Math.sin(roll) + jag,
-              at.z - dx * s * Math.cos(roll) - dz * 0.24,
+              origin.x + sz * s * Math.cos(roll) - sx * 0.24,
+              origin.y + s * Math.sin(roll) + jag,
+              origin.z - sx * s * Math.cos(roll) - sz * 0.24,
             );
           }
           return points.length;
@@ -84,11 +94,13 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
         null,
         false,
         1,
+        null,
+        !fallback,
       ) !== false
     )
       count++;
   }
-  host.burstAt(at.x, at.y, at.z, 0x940d2b, slot.tier > 0 ? 10 : 30, 1.45, 'blood', 0.27);
+  host.burstAt(at.x, at.y, at.z, 0x940d2b, slot.tier > 0 ? 10 : 30, 1.45, 'blood', 0.25, 0.02);
   count++;
   if (slot.tier === 0 && host.fragmentsAt) {
     host.fragmentsAt(
@@ -110,7 +122,7 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
     count++;
   }
   host.pulseLight(slot.targetId, slot.spec.palette, 1.4, 0.055, 3);
-  if (primary) host.shakeAt(at.x, at.y, at.z, 0.15);
+  if (primary) host.shakeAt(at.x, at.y, at.z, 0.15, true);
   host.countPrimitive(slot.abilityId, count + 1);
   return true;
 }

@@ -1360,6 +1360,7 @@ export class AbilityVfxFx implements SequencerHost {
       ...this.guards.units(host),
       ...this.powerForms.units(host),
       ...this.furyStates.units(host),
+      ...(kinds?.includes('harvest_cut') ? this.baked.units(host) : []),
     ];
   }
 

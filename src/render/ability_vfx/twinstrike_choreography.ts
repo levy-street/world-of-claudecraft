@@ -12,7 +12,9 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     slot.componentOutcomes === undefined ? 1 : (slot.componentOutcomes >> (beat * 2)) & 3;
   if (!outcome) return true;
   const profile = meleeImpactProfile(slot.abilityId)!;
-  const at = host.anchorOf(slot.targetId, meleeContactHeight(profile, beat), target);
+  const targetId = slot.targetId,
+    height = meleeContactHeight(profile, beat);
+  const at = host.anchorOf(targetId, height, target);
   const from = host.anchorOf(slot.casterId, 0.55, source);
   if (!at || !from || slot.targetId === slot.casterId) return true;
   const facing = Math.atan2(at.x - from.x, at.z - from.z);
@@ -36,6 +38,9 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     host.countPrimitive(slot.abilityId, 1);
     return true;
   }
+  const impact = { x: at.x, y: at.y, z: at.z };
+  const body = { x: 0, y: 0, z: 0 };
+  const facingOffset = facing - (host.facingAt?.(targetId) ?? facing);
   let count = 0;
   const sculpted =
     primary &&
@@ -81,15 +86,20 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
         layer ? 0.13 : fallback ? 0.58 : 0.36,
         layer ? 0.08 : 0.18,
         (points) => {
+          const origin = fallback ? impact : host.anchorOf(targetId, height, body);
+          if (!origin) return 0;
+          const yaw = fallback ? facing : (host.facingAt?.(targetId) ?? facing) + facingOffset;
+          const sx = Math.sin(yaw),
+            sz = Math.cos(yaw);
           for (let i = 0; i < points.length; i++) {
             const u = i / (points.length - 1);
             const span = fallback ? 5.6 : 2.1;
             const s = (u - 0.5) * span;
             const curved = fallback ? Math.sin(u * Math.PI) * 0.85 : Math.sin(u * 27) * 0.035;
             points[i].set(
-              at.x + dz * s * Math.cos(roll) - dx * (0.28 - curved),
-              at.y + s * Math.sin(roll),
-              at.z - dx * s * Math.cos(roll) - dz * (0.28 - curved),
+              origin.x + sz * s * Math.cos(roll) - sx * (0.28 - curved),
+              origin.y + s * Math.sin(roll),
+              origin.z - sx * s * Math.cos(roll) - sz * (0.28 - curved),
             );
           }
           return points.length;
@@ -98,10 +108,13 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
         null,
         false,
         1,
+        null,
+        !fallback,
       ) !== false
     )
       count++;
   }
+  const extractionDelay = reverse ? 0.022 : 0.015;
   host.burstAt(
     at.x,
     at.y,
@@ -110,7 +123,8 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     slot.tier === 0 ? (reverse ? 21 : 17) : 7,
     reverse ? 1.4 : 1.15,
     'blood',
-    0.2,
+    0.2 - extractionDelay,
+    extractionDelay,
   );
   if (slot.tier === 0) {
     host.fragmentsAt?.(
@@ -136,7 +150,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     abilityId: slot.abilityId,
   });
   host.pulseLight(slot.targetId, slot.spec.palette, reverse ? 1.6 : 1.1, 0.055, 3);
-  if (primary) host.shakeAt(at.x, at.y, at.z, reverse ? 0.18 : 0.12);
+  if (primary) host.shakeAt(at.x, at.y, at.z, reverse ? 0.18 : 0.12, true);
   host.countPrimitive(slot.abilityId, count + 3);
   return true;
 }

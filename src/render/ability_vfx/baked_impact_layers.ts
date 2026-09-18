@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { SUN_DIR } from '../gfx';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL } from '../scene_sampling';
+import { BakedPoolPrewarm } from './baked_pool_prewarm';
+import type { CrestPrewarmHost } from './crest_prewarm';
 import { type BakedKind, bakedTexture } from './production_assets';
 import { liquidSurfaceMaps } from './simulation_assets';
 
@@ -32,10 +34,11 @@ export class BakedImpactLayers {
   private readonly point = new THREE.Vector3();
   private readonly cameraInverse = new THREE.Quaternion();
   private readonly slots: Slot[] = [];
+  private preparation: BakedPoolPrewarm | null = null;
   private disposed = false;
   private readonly unbind: Array<() => void> = [];
   constructor(
-    scene: THREE.Scene,
+    private readonly scene: THREE.Scene,
     private readonly textureReady?: (texture: THREE.Texture) => boolean,
   ) {
     const geometry = new THREE.PlaneGeometry(1, 1, 8, 8);
@@ -146,6 +149,18 @@ export class BakedImpactLayers {
     proto.dispose();
     geometry.dispose();
   }
+  /** Active Warrior preparation opts into strict, per-slot draw readiness.
+   * Other classes keep their existing dependency set and texture-only path. */
+  units(host: CrestPrewarmHost) {
+    if (this.disposed) return [];
+    const texture = bakedTexture('harvest_impact');
+    if (!texture) throw new Error('Authored contact texture is not loaded');
+    this.preparation ??= new BakedPoolPrewarm(
+      this.scene,
+      this.slots.map((s) => s.mesh),
+    );
+    return this.preparation.units(host, texture);
+  }
   spawn(
     kind: BakedKind,
     x: number,
@@ -169,7 +184,10 @@ export class BakedImpactLayers {
       !bakedTexture(kind) ||
       // Decoding is not GPU preparation. The new large optional layer stays
       // cold until this renderer's explicit upload has completed successfully.
-      ((kind === 'warrior_power' || kind === 'harvest_impact' || kind === 'warrior_bite') &&
+      ((kind === 'warrior_power' ||
+        kind === 'harvest_impact' ||
+        kind === 'warrior_bite' ||
+        kind === 'warrior_shear') &&
         !this.textureReady?.(bakedTexture(kind)!)) ||
       ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
       aspect <= 0 ||
@@ -177,7 +195,11 @@ export class BakedImpactLayers {
       duration <= 0
     )
       return false;
-    const s = this.slots.find((s) => !s.active);
+    const prepared = this.preparation;
+    const strict = kind === 'harvest_impact' || kind === 'warrior_shear';
+    const s = this.slots.find(
+      (s, index) => !s.active && (!strict || !prepared || prepared.ready(index)),
+    );
     if (!s) return false;
     s.active = true;
     s.age = -Math.max(0, delay);
@@ -189,7 +211,8 @@ export class BakedImpactLayers {
       kind === 'frost_nova' ||
       kind === 'chain_heal' ||
       kind === 'harvest_impact' ||
-      kind === 'warrior_bite';
+      kind === 'warrior_bite' ||
+      kind === 'warrior_shear';
     s.power = kind === 'warrior_power';
     s.reverse = reverse;
     s.roll = roll;
@@ -198,7 +221,7 @@ export class BakedImpactLayers {
     s.x = x;
     s.z = z;
     s.dust = kind === 'shout_dust';
-    s.harvest = kind === 'harvest_impact';
+    s.harvest = kind === 'harvest_impact' || kind === 'warrior_shear';
     s.dx = s.dust ? Math.sin(angle) * s.size * 0.7 : 0;
     s.dz = s.dust ? Math.cos(angle) * s.size * 0.7 : 0;
     if (s.harvest) {
@@ -266,7 +289,7 @@ export class BakedImpactLayers {
                 : 0.5,
     );
     s.mesh.userData.heat = u.uHeat.value;
-    if (kind === 'harvest_impact') u.uPivot.value.set(0.5, 0.5);
+    if (s.harvest) u.uPivot.value.set(0.5, 0.5);
     return true;
   }
   update(dt: number, camera: THREE.Quaternion, reducedMotion: boolean): void {
@@ -324,11 +347,21 @@ export class BakedImpactLayers {
     if (this.disposed) return;
     this.disposed = true;
     this.clear();
-    for (const unbind of this.unbind) unbind();
+    const errors: unknown[] = [];
+    const release = (work: () => void) => {
+      try {
+        work();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
+    release(() => this.preparation?.dispose());
+    for (const unbind of this.unbind) release(unbind);
     for (const s of this.slots) {
-      s.mesh.removeFromParent();
-      s.mesh.material.dispose();
-      s.mesh.geometry.dispose();
+      release(() => s.mesh.removeFromParent());
+      release(() => s.mesh.material.dispose());
+      release(() => s.mesh.geometry.dispose());
     }
+    if (errors.length) throw new AggregateError(errors, 'Baked impact cleanup failed');
   }
 }

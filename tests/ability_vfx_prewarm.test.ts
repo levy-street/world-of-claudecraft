@@ -28,6 +28,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     warrior_power: new Texture(),
     harvest_impact: new Texture(),
     warrior_bite: new Texture(),
+    warrior_shear: new Texture(),
     shockwave: new Texture(),
     pyroblast: new Texture(),
     frost_nova: new Texture(),
@@ -122,11 +123,12 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     expect(ids).toContain('production:warrior_power');
     expect(ids).toContain('production:harvest_impact');
     expect(ids).toContain('production:warrior_bite');
+    expect(ids).toContain('production:warrior_shear');
     expect(ids).toContain('production:shockwave');
     for (const key of ['normal', 'motion', 'lighting'])
       expect(ids).toContain(`liquid-surface:${key}`);
     for (const id of ['contact_cut', 'contact_crush', 'contact_pierce']) expect(ids).toContain(id);
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 20);
+    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 21);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -151,12 +153,13 @@ describe('abilityVfxTexturePrewarmSteps', () => {
 });
 
 describe('abilityVfxBootTextureDependencies', () => {
-  it('returns warrior_power, harvest_impact and warrior_bite as the three boot texture dependencies', () => {
+  it('returns all four authored Warrior sprite dependencies before boot draws', () => {
     const deps = abilityVfxBootTextureDependencies();
-    expect(deps).toHaveLength(3);
+    expect(deps).toHaveLength(4);
     expect(deps).toContain(bakedTexture('warrior_power'));
     expect(deps).toContain(bakedTexture('harvest_impact'));
     expect(deps).toContain(bakedTexture('warrior_bite'));
+    expect(deps).toContain(bakedTexture('warrior_shear'));
   });
 });
 

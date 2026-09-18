@@ -5,6 +5,7 @@ import { physicalContact } from './physical_contact';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { warriorBladePoint } from './warrior_blade_shape';
 import { WARRIOR_HEAVY_POINTS, type WarriorHeavyShape } from './warrior_heavy_shapes';
+import { warriorSteelContact } from './warrior_steel_contact';
 
 interface BladeStyle {
   span: number;
@@ -15,14 +16,40 @@ interface BladeStyle {
   groundChop?: boolean;
   rising?: boolean;
   shape?: WarriorHeavyShape;
+  duration?: number;
+  contactSize?: number;
 }
 export const WARRIOR_BLADE_STYLES: Readonly<Record<string, BladeStyle | undefined>> = {
   heroic_strike: { span: 4.2, height: 0.95, roll: -0.95 },
   hamstring: { span: 3.5, height: 0.35, roll: 0.015, blood: true },
-  slam: { span: 4.8, height: 1.4, roll: -1.35, groundChop: true, shape: 'steel_chop' },
-  overpower: { span: 5.1, height: 1.25, roll: 1.05, rising: true, shape: 'steel_counter' },
-  mortal_strike: { span: 5.2, height: 1.4, roll: -0.65 },
-  execute: { span: 6.4, height: 1.65, roll: -1.25, heavy: true, shape: 'steel_execution' },
+  slam: {
+    span: 4.8,
+    height: 1.4,
+    roll: -1.35,
+    groundChop: true,
+    shape: 'steel_chop',
+    duration: 0.2,
+    contactSize: 5.2,
+  },
+  overpower: {
+    span: 5.1,
+    height: 1.25,
+    roll: 1.05,
+    rising: true,
+    shape: 'steel_counter',
+    duration: 0.18,
+    contactSize: 5.6,
+  },
+  mortal_strike: { span: 5.2, height: 1.4, roll: -0.65, duration: 0.24, contactSize: 6.4 },
+  execute: {
+    span: 6.4,
+    height: 1.65,
+    roll: -1.25,
+    heavy: true,
+    shape: 'steel_execution',
+    duration: 0.28,
+    contactSize: 8,
+  },
   bloodthirst: { span: 4.6, height: 1.45, roll: -0.8, blood: true },
   victory_rush: { span: 4.8, height: 1.3, roll: 0.35 },
 };
@@ -48,7 +75,8 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     dz = Math.cos(facing);
   const front = Math.min(0.65, Math.hypot(at.x - from.x, at.z - from.z) * 0.45);
   const xAt = at.x - dx * front,
-    zAt = at.z - dz * front;
+    zAt = at.z - dz * front,
+    yAt = at.y;
   if (outcome === 2) {
     host.flipbookAt(at.x, at.y, at.z, style.heavy ? 3 : 2.3, 0xd3e2eb, 'contact_crush', 1.45, 0.2);
     host.countPrimitive(slot.abilityId, 1);
@@ -62,13 +90,13 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     : style.shape
       ? WARRIOR_HEAVY_POINTS[style.shape]
       : warriorBladePoint;
-  const duration = style.heavy ? 0.28 : 0.24;
+  const duration = style.duration ?? 0.22;
   const count = slot.tier > 0 ? 1 : 3;
   for (let strand = 0; strand < count; strand++) {
     host.pathRibbon(
       strand === 0 ? (style.blood ? 0xff9caa : 0xf1f6ff) : style.blood ? 0xb31831 : 0x8e9ca5,
       (strand === 0 ? 0.19 : 0.1) * (style.heavy ? 1.4 : 1),
-      duration,
+      strand === 0 ? (style.heavy ? 0.09 : 0.065) : duration,
       (points) => {
         for (let i = 0; i < points.length; i++) {
           sample(i / (points.length - 1), strand * 0.1, point);
@@ -76,7 +104,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
           const rise = point.x * scale * sine + point.y * style.height * cosine;
           points[i].set(
             xAt + dz * across + dx * point.z * scale,
-            at.y + rise,
+            yAt + rise,
             zAt - dx * across + dz * point.z * scale,
           );
         }
@@ -102,14 +130,25 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     duration,
     style.roll,
   );
-  const contacts = physicalContact(host, slot, 0, at.x, at.y, at.z);
+  const contacts = style.blood
+    ? physicalContact(host, slot, 0, at.x, at.y, at.z)
+    : warriorSteelContact(
+        host,
+        slot,
+        at,
+        facing,
+        style.roll,
+        style.contactSize ?? 4.8,
+        duration,
+        !!style.heavy,
+      );
   if (slot.tier === 0) {
     host.fragmentsAt?.(
       'metal_splinter',
       at.x,
       at.y,
       at.z,
-      style.blood ? 0xb01732 : 0xb3ada5,
+      style.blood ? 0xb01732 : 0xaebdc6,
       style.heavy ? 18 : 10,
       style.heavy ? 1.7 : 1.15,
       dx,
@@ -129,21 +168,34 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
         duration,
       );
     if (style.heavy || style.groundChop) {
-      const floor = host.groundYAt(at.x, at.z);
+      // The planted stance throws grit from the caster's feet. A torso cut
+      // does not create a second ground collision beneath the victim.
+      const floor = host.groundYAt(from.x, from.z);
       host.bakedAt?.(
         'shout_dust',
-        at.x,
+        from.x,
         floor + 0.08,
-        at.z,
-        style.heavy ? 4.2 : 3.4,
+        from.z,
+        style.heavy ? 2.4 : 1.6,
         0xa39482,
         0xc2b7a1,
-        0.42,
+        0.23,
         0,
         0,
         facing,
       );
-      host.fragmentsAt?.('stone_chip', at.x, floor + 0.08, at.z, 0x8b8173, 9, 0.85, dx, dz, 0.3);
+      host.fragmentsAt?.(
+        'stone_chip',
+        from.x,
+        floor + 0.08,
+        from.z,
+        0x8b8173,
+        5,
+        0.45,
+        -dx,
+        -dz,
+        0.23,
+      );
     }
     if (style.rising) {
       // Two split splinter fans rise along the cut. They sit on the receiving
@@ -172,6 +224,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     0,
   );
   host.pulseLight(slot.targetId, slot.spec.palette, style.heavy ? 1.7 : 1.1, 0.06, 3);
+  if (style.heavy && !slot.physicalSecondary) host.shakeAt(at.x, at.y, at.z, 0.25, true);
   host.countPrimitive(
     slot.abilityId,
     count +

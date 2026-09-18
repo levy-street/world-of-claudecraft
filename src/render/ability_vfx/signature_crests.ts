@@ -12,6 +12,8 @@ import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 import { STEEL_SWEEP_GLSL } from './steel_sweep';
 import { TWINSTRIKE_FRAGMENT, TWINSTRIKE_VERTEX } from './twinstrike_shape';
 import { WARRIOR_BARK_FRAGMENT, WARRIOR_BARK_VERTEX } from './warrior_bark_shape';
+import { warriorVoiceProfile } from './warrior_shout_shapes';
+import { WARRIOR_STEEL_FRAGMENT } from './warrior_steel_material';
 import { WARRIOR_VOICE_FRAGMENT, WARRIOR_VOICE_VERTEX } from './warrior_voice_material';
 
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
@@ -50,11 +52,12 @@ export class SignatureCrests {
         uMotion: { value: 1 },
         uStorm: { value: 0 },
         uFlow: { value: 0 },
+        uVoice: { value: new THREE.Vector3(0.09, 0.63, 0) },
         uPressureGround: { value: new Float32Array(25) },
         uTint: { value: new THREE.Color() },
         uAccent: { value: new THREE.Color() },
       },
-      vertexShader: `uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
+      vertexShader: `uniform vec3 uVoice; uniform float uAge,uKind,uMotion,uPressureGround[25]; varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         float pressureGround(vec2 p){
           vec2 uv=uKind>22.5?p/12.0+0.5:(uKind>20.5 && uKind<21.5)?p/8.0+0.5:uKind>16.5?p/16.0+0.5:p/22.0+0.5;
           vec2 grid=clamp(uv*4.0,vec2(0.0),vec2(3.9999));
@@ -112,7 +115,7 @@ export class SignatureCrests {
         }`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
         ${STEEL_SWEEP_GLSL} ${HARVEST_NOISE}
-        uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion,uStorm,uFlow; uniform vec3 uTint,uAccent,uSunWorld;
+        uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion,uStorm,uFlow; uniform vec3 uTint,uAccent,uSunWorld,uVoice;
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
         void main(){
@@ -203,13 +206,7 @@ export class SignatureCrests {
             }
             alpha=1.0-smoothstep(0.48,1.0,uAge);
           }
-          if(uKind>14.5 && uKind<15.5){
-            // A fast cutting head draws the broad steel wake through contact.
-            // A fixed full-opacity wall would freeze the motion into a panel.
-            float gain=steelSweepGain(vUv.x,uAge);
-            alpha*=mix(1.0,min(1.0,gain),uMotion);
-            colour+=uAccent*max(0.0,gain-0.8)*0.24*uMotion;
-          }
+          ${WARRIOR_STEEL_FRAGMENT}
           if(uStorm>0.5){
             // Directional air dragged by the cutting edge. Broken textured
             // tails leave the fighter visible through the full-radius sweep.
@@ -437,6 +434,12 @@ export class SignatureCrests {
                                               ? 6
                                               : 2;
     u.uAge.value = 0;
+    const voice = warriorVoiceProfile(kind);
+    u.uVoice.value.set(
+      voice ? voice.gap / voice.duration : 0.09,
+      voice?.decay ?? 0.63,
+      voice?.index ?? -1,
+    );
     if (kind === 'harvest_cut') u.uKind.value = 24;
     if (kind === 'harvest_eruption') u.uKind.value = 25;
     if (kind === 'twinstrike_cut') u.uKind.value = 26;

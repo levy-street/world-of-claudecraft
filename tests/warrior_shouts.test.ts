@@ -6,6 +6,8 @@ import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 import {
   buildWarriorPressure,
   WARRIOR_PRESSURE_KINDS,
+  warriorPressureLayers,
+  warriorVoiceProfile,
 } from '../src/render/ability_vfx/warrior_shout_shapes';
 import { drawWarriorShout } from '../src/render/ability_vfx/warrior_shouts';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
@@ -84,6 +86,8 @@ describe('Warrior surrounding voice sculptures', () => {
       for (let beat = 0; beat < spec.physical!.beats.length; beat++)
         expect(drawWarriorShout(host, slot, beat)).toBe(true);
       expect(host.crestAt).toHaveBeenCalledTimes(1);
+      const crest = vi.mocked(host.crestAt!).mock.calls[0];
+      expect(crest[9]).toBe(warriorVoiceProfile(crest[7])!.duration);
       const dust = vi.mocked(host.bakedAt!).mock.calls;
       expect(dust.some((call) => call[1] > 11)).toBe(true);
       expect(dust.some((call) => call[1] < 9)).toBe(true);
@@ -212,51 +216,121 @@ it('keeps the pressure height grid finite when the caster floor sample is unavai
   crests.dispose();
 });
 
-it('keeps a full-size directed primary silhouette when its sculpture is cold', () => {
-  const crests = new SignatureCrests(new THREE.Scene());
-  expect(crests.preparation.ready('piercing_pressure')).toBe(false);
-  const host = {
-    anchorOf: (_id: number, fraction: number, out: THREE.Vector3) =>
-      Object.assign(out, { x: 0, y: fraction * 3, z: 0 }),
-    groundYAt: (_x: number, z: number) => z * 0.2,
-    facingAt: () => 0,
-    crestAt: crests.spawn.bind(crests),
-    pulseLight: vi.fn(),
-    bakedAt: vi.fn(),
-    fragmentsAt: vi.fn(),
-    pathRibbon: vi.fn(),
-    countPrimitive: vi.fn(),
-    burstAt: vi.fn(),
-  } as unknown as SequencerHost;
-  const slot = {
-    abilityId: 'piercing_howl',
-    casterId: 1,
-    tier: 1,
-    spec: WARRIOR_VFX_FULL_SPECS.piercing_howl,
-  } as SeqSlot;
-  drawWarriorShout(host, slot, 0);
-  const primary = vi.mocked(host.pathRibbon).mock.calls.filter((call) => call[7] === 1);
-  expect(primary).toHaveLength(3);
-  let previousFront = 0;
-  for (const call of primary) {
-    const points = Array.from({ length: 24 }, () => new THREE.Vector3());
-    call[3](points);
-    // Compression crosses the direction of travel. Its open ends lie on
-    // opposite sides, unlike the old longitudinal liquid plumes.
-    expect(points[0].x).toBeLessThan(-4);
-    expect(points.at(-1)!.x).toBeGreaterThan(4);
-    expect(points[0].x).toBeCloseTo(-points.at(-1)!.x, 10);
-    expect(points[0].z).toBeCloseTo(points.at(-1)!.z, 10);
-    expect(points[0].y - host.groundYAt(points[0].x, points[0].z)).toBeCloseTo(
-      0.79 * 3 + 0.12 * 0.55,
-      12,
-    );
-    const front = Math.max(...points.map((p) => p.z));
-    expect(front).toBeGreaterThan(previousFront + 4);
-    previousFront = front;
-    expect(points.every((p) => p.y >= host.groundYAt(p.x, p.z))).toBe(true);
+it.each(WARRIOR_PRESSURE_KINDS)(
+  'keeps cold %s fronts surrounding, open and terrain-aware',
+  (kind) => {
+    const ids = [
+      'rallying_cry',
+      'demoralizing_shout',
+      'defiant_bellow',
+      'battle_shout',
+      'emboldening_roar',
+      'intimidating_shout',
+      'piercing_howl',
+    ];
+    const id = ids[WARRIOR_PRESSURE_KINDS.indexOf(kind)];
+    const crests = new SignatureCrests(new THREE.Scene());
+    expect(crests.preparation.ready(kind)).toBe(false);
+    const host = {
+      anchorOf: (_id: number, fraction: number, out: THREE.Vector3) =>
+        Object.assign(out, { x: 0, y: fraction * 3, z: 0 }),
+      groundYAt: (_x: number, z: number) => z * 0.2,
+      facingAt: () => 0,
+      crestAt: crests.spawn.bind(crests),
+      pulseLight: vi.fn(),
+      bakedAt: vi.fn(),
+      fragmentsAt: vi.fn(),
+      pathRibbon: vi.fn(),
+      countPrimitive: vi.fn(),
+      burstAt: vi.fn(),
+      contact: vi.fn(),
+    } as unknown as SequencerHost;
+    const slot = {
+      abilityId: id,
+      casterId: 1,
+      tier: 1,
+      spec: WARRIOR_VFX_FULL_SPECS[id],
+    } as SeqSlot;
+    drawWarriorShout(host, slot, 0);
+    const primary = vi.mocked(host.pathRibbon).mock.calls.filter((call) => call[7] === 1);
+    expect(primary).toHaveLength(warriorPressureLayers(kind));
+    const all: THREE.Vector3[] = [];
+    for (const call of primary) {
+      expect(call[2]).toBe(warriorVoiceProfile(kind)!.duration);
+      const points = Array.from({ length: 24 }, () => new THREE.Vector3());
+      call[3](points);
+      expect(points[0].distanceTo(points.at(-1)!)).toBeGreaterThan(8);
+      expect(points.every((p) => [p.x, p.y, p.z].every(Number.isFinite))).toBe(true);
+      expect(points.every((p) => p.y >= host.groundYAt(p.x, p.z) + 0.79 * 3)).toBe(true);
+      const heights = points.map((p) => p.y - host.groundYAt(p.x, p.z));
+      expect(Math.max(...heights) - Math.min(...heights)).toBeLessThan(0.12);
+      all.push(...points);
+    }
+    for (const sx of [-1, 1])
+      for (const sz of [-1, 1]) expect(all.some((p) => p.x * sx > 2 && p.z * sz > 2)).toBe(true);
+    const radius = Math.max(...all.map((p) => Math.hypot(p.x, p.z)));
+    expect(radius).toBeGreaterThan(15);
+    if (kind === 'piercing_pressure') expect(radius).toBeGreaterThan(23);
+    expect(host.contact).not.toHaveBeenCalled();
+    expect(host.burstAt).not.toHaveBeenCalled();
+    expect(crests.preparation.ready(kind)).toBe(false);
+    crests.dispose();
+  },
+);
+
+it('keeps seven immutable, distinct acoustic timing profiles', () => {
+  const expected = [
+    [0.68, 0.12, 0.65],
+    [0.6, 0.045, 0.72],
+    [0.52, 0.035, 0.45],
+    [0.5, 0.025, 0.42],
+    [0.64, 0.1, 0.6],
+    [0.62, 0.055, 0.5],
+    [0.44, 0.022, 0.36],
+  ];
+  for (const [index, kind] of WARRIOR_PRESSURE_KINDS.entries()) {
+    const profile = warriorVoiceProfile(kind)!;
+    expect([profile.duration, profile.gap, profile.decay]).toEqual(expected[index]);
+    expect(profile.index).toBe(index);
+    expect(Object.isFrozen(profile)).toBe(true);
+    expect(profile.duration - profile.gap * (warriorPressureLayers(kind) - 1)).toBeGreaterThan(0.3);
+    const geometry = buildWarriorPressure(kind);
+    const positions = geometry.getAttribute('position');
+    const perLayer = positions.count / warriorPressureLayers(kind);
+    for (let layer = 0; layer < warriorPressureLayers(kind); layer++) {
+      const ys = Array.from({ length: perLayer }, (_, i) => positions.getY(layer * perLayer + i));
+      expect(Math.max(...ys) - Math.min(...ys)).toBeLessThan(0.1);
+    }
+    geometry.dispose();
   }
-  expect(previousFront).toBeGreaterThan(22.08);
-  expect(crests.preparation.ready('piercing_pressure')).toBe(false);
-  crests.dispose();
+  expect(warriorVoiceProfile('blood_cut')).toBeUndefined();
+  expect(warriorVoiceProfile('toString')).toBeUndefined();
+});
+
+it('retains each voice profile under reduced motion and resets reused non-voice slots', () => {
+  const scene = new THREE.Scene();
+  const crests = new SignatureCrests(scene);
+  vi.spyOn(crests.preparation, 'ready').mockReturnValue(true);
+  try {
+    for (const kind of WARRIOR_PRESSURE_KINDS) {
+      crests.clear();
+      crests.update(0, true);
+      crests.spawn(0, 0, 0, 2, 1, 0x777777, 0xffffff, kind);
+      const mesh = scene.children.find(
+        (child) => child.name === 'signatureCrest' && child.visible,
+      ) as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
+      const profile = warriorVoiceProfile(kind)!;
+      const expected = [profile.gap / profile.duration, profile.decay, profile.index];
+      expect(mesh.material.uniforms.uVoice.value.toArray()).toEqual(expected);
+      expect(mesh.material.uniforms.uMotion.value).toBe(0);
+      crests.update(0.1, true);
+      expect(mesh.material.uniforms.uVoice.value.toArray()).toEqual(expected);
+      expect(mesh.material.uniforms.uMotion.value).toBe(0);
+      crests.clear();
+      crests.spawn(0, 0, 0, 1, 1, 0x990000, 0xff3300, 'blood_cut');
+      expect(mesh.material.uniforms.uVoice.value.toArray()).toEqual([0.09, 0.63, -1]);
+    }
+  } finally {
+    crests.dispose();
+  }
 });

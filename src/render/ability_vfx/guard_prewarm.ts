@@ -11,26 +11,33 @@ import type { CrestPrewarmHost } from './crest_prewarm';
 
 export type { CrestPrewarmHost };
 
-/** Hidden InstancedMesh carrier borrows the actual pool buffers and material.
+/** Hidden same-kind mesh carrier borrows the actual pool buffers and material.
  * Compilation alone never uploads geometry; the upload unit triggers the
- * bounded draw. The actual mesh must have instanceColor before construction. */
+ * bounded draw. Instanced meshes must have instanceColor before construction. */
 export class GuardPrewarm {
   readonly group = new THREE.Group();
-  private readonly carrier: THREE.InstancedMesh;
+  private readonly carrier: THREE.Mesh;
   private compiled: LinkedProgramLike[] | null = null;
   private compiling: Promise<void> | null = null;
   private readonly touched = new Set<LinkedProgramLike>();
   private uploaded = false;
   private disposed = false;
 
-  constructor(scene: THREE.Scene, mesh: THREE.InstancedMesh) {
-    if (!mesh.instanceColor) {
-      throw new Error('GuardPrewarm: mesh must have instanceColor before construction');
+  constructor(scene: THREE.Scene, mesh: THREE.Mesh) {
+    let carrier: THREE.Mesh;
+    const instanced = mesh as THREE.InstancedMesh;
+    if (instanced.isInstancedMesh) {
+      if (!instanced.instanceColor) {
+        throw new Error('GuardPrewarm: mesh must have instanceColor before construction');
+      }
+      const count = instanced.instanceMatrix.count;
+      const instanceCarrier = new THREE.InstancedMesh(mesh.geometry, mesh.material, count);
+      instanceCarrier.instanceMatrix = instanced.instanceMatrix;
+      instanceCarrier.instanceColor = instanced.instanceColor;
+      carrier = instanceCarrier;
+    } else {
+      carrier = new THREE.Mesh(mesh.geometry, mesh.material);
     }
-    const count = mesh.instanceMatrix.count;
-    const carrier = new THREE.InstancedMesh(mesh.geometry, mesh.material as THREE.Material, count);
-    carrier.instanceMatrix = mesh.instanceMatrix;
-    carrier.instanceColor = mesh.instanceColor;
     carrier.name = 'guard-upload';
     carrier.frustumCulled = false;
     carrier.userData.renderCategory = 'prewarm';

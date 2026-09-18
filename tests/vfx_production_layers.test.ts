@@ -8,6 +8,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     smoke: new three.Texture(),
     shockwave: new three.Texture(),
     harvest_impact: new three.Texture(),
+    warrior_shear: new three.Texture(),
   };
   const source = new three.IcosahedronGeometry(1, 0);
   return {
@@ -32,6 +33,37 @@ function meshes(scene: THREE.Scene) {
 }
 
 describe('baked impact volumes', () => {
+  it('prepares actual slot draws before admitting authored contact sprites', async () => {
+    const scene = new THREE.Scene(),
+      pool = new BakedImpactLayers(scene, () => true);
+    const live = meshes(scene).slice();
+    const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
+    const host = {
+      properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
+      compile: vi.fn(async () => {}),
+      draw: vi.fn(),
+    };
+    const units = pool.units(host);
+    expect(units).toHaveLength(30);
+    const spawn = () => pool.spawn('warrior_shear', 1, 2, 3, 6, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
+    expect(spawn()).toBe(false);
+    for (const unit of units.slice(0, 3)) await unit.run();
+    expect(spawn()).toBe(true);
+    expect(spawn()).toBe(false);
+    for (const unit of units.slice(3)) await unit.run();
+    for (let i = 0; i < 9; i++) expect(spawn()).toBe(true);
+    expect(spawn()).toBe(false);
+    expect(host.draw).toHaveBeenCalledTimes(10);
+    const disposal = live.map((mesh) => vi.spyOn(mesh.material, 'dispose'));
+    const carrier = scene.children.find((child) => child.name === 'guard-prewarm');
+    expect(carrier).toBeDefined();
+    carrier?.addEventListener('removed', () => {
+      throw new Error('listener failure');
+    });
+    expect(() => pool.dispose()).toThrow('Baked impact cleanup failed');
+    for (const spy of disposal) expect(spy).toHaveBeenCalledOnce();
+    expect(() => pool.dispose()).not.toThrow();
+  });
   it.each([-0.66, 0.58, 0])(
     'pins blood to the wound and projects cut roll %s across camera angles',
     (roll) => {

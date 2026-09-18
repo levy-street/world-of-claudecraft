@@ -714,11 +714,16 @@ it.each([30, 60, 120])('retains extraction beyond its spawning frame at %s Hz', 
     fx.update(1 / hz);
     expect(burst).not.toHaveBeenCalled();
     expect(spawn.mock.calls[0][8]).toBeCloseTo(0.048 + 1 / hz);
+    let deliveredAt = 0;
     for (let i = 1; i <= Math.ceil(0.048 * hz); i++) {
       fx.update(1 / hz);
       if (i / hz < 0.048) expect(burst).not.toHaveBeenCalled();
+      if (!deliveredAt && burst.mock.calls.length) deliveredAt = i / hz;
     }
-    expect(burst).toHaveBeenCalledExactlyOnceWith(2, 3, 4, 0, 12, 1, 'blood', 0.192);
+    expect(burst).toHaveBeenCalledExactlyOnceWith(2, 3, 4, 0, 12, 1, 'blood', expect.any(Number));
+    expect(deliveredAt).toBeGreaterThanOrEqual(0.048);
+    expect(deliveredAt).toBeLessThan(0.048 + 1 / hz);
+    expect(deliveredAt + burst.mock.calls[0][7]).toBeCloseTo(0.24, 12);
   } finally {
     fx.dispose();
   }
