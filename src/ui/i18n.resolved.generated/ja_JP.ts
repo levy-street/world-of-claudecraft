@@ -9742,6 +9742,13 @@ export const ja_JP: EnTranslations = {
       "dodge": "回避！"
     }
   },
+  "landing": {
+    "headline": "あなたの物語は、ここから。",
+    "tools": "ツール",
+    "records": "WoC 記録",
+    "scout": "WoC スカウト",
+    "parseService": "WoC 戦闘ログ"
+  },
   "seo": {
     "title": "World of ClaudeCraft: クラシック風Web MMO",
     "description": "ブラウザで直接遊べるクラシック風マイクロMMO、World of ClaudeCraft で壮大な冒険に出ましょう。永続的な共有ワールドに参加し、クラスを育て、敵を倒してください。",

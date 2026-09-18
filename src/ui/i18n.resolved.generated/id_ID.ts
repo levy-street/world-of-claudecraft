@@ -9742,6 +9742,13 @@ export const id_ID: EnTranslations = {
       "dodge": "MENGELAK!"
     }
   },
+  "landing": {
+    "headline": "Your story starts here.",
+    "tools": "Tools",
+    "records": "WoC Records",
+    "scout": "WoC Scout",
+    "parseService": "WoC Parse Service"
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO Web Bergaya Klasik",
     "description": "Mulailah petualangan epik di World of ClaudeCraft, micro-MMO bergaya klasik yang dapat dimainkan langsung di peramban. Bergabunglah dengan dunia bersama yang persisten, naikkan level kelas, dan kalahkan musuh!",

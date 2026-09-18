@@ -9742,6 +9742,13 @@ export const ko_KR: EnTranslations = {
       "dodge": "회피!"
     }
   },
+  "landing": {
+    "headline": "당신의 이야기는 여기서 시작됩니다.",
+    "tools": "도구",
+    "records": "WoC 기록",
+    "scout": "WoC 정찰",
+    "parseService": "WoC 전투 기록"
+  },
   "seo": {
     "title": "World of ClaudeCraft: 클래식 스타일 웹 MMO",
     "description": "브라우저에서 바로 즐기는 클래식 스타일 마이크로 MMO, World of ClaudeCraft에서 장대한 모험을 시작하세요. 지속되는 공유 월드에 접속해 직업을 성장시키고 적을 물리치세요.",

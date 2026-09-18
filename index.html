@@ -199,7 +199,7 @@
      inline block is intentionally empty. */
 </style>
 </head>
-<body class="steam-wishlist-pending start-screen-open" data-start-panel="mode-select">
+<body class="steam-wishlist-pending start-screen-open" data-start-panel="mode-select" data-website-redesign>
   <!-- Skip links: the first focusable elements, visually hidden until focused (a11y
        infra). Targets live inside #game-ui-template, cloned into the page in-game. -->
   <a class="hud-skip" href="#ui" data-i18n="hudChrome.skipLinks.mainHud">Skip to Main HUD</a>
@@ -762,12 +762,20 @@
     </div>
     <!-- Keep the backdrop here at the top level so it spans the entire screen behind content -->
     <div id="start-screen-backdrop" aria-hidden="true">
+      <!-- Cinematic website slideshow. The original trailer is reserved for native shells. -->
+      <div class="website-cinematic-art">
+        <div class="website-scene website-scene-eastbrook"></div>
+        <div class="website-scene website-scene-galecrest"></div>
+        <div class="website-scene website-scene-drakelands"></div>
+        <div class="website-scene website-scene-thornpeak"></div>
+      </div>
       <!-- Looping cinematic background video; poster = static key-art for instant paint + fallback. -->
       <!-- The poster (static key-art) paints instantly. The 5.7 MB looping trailer
            is NOT eagerly fetched: no autoplay/preload/source here — main.ts attaches
            the source and plays only on capable devices (see applyLandingBackdrop).
            Phones / Save-Data / reduced-motion / high-contrast keep the poster only. -->
       <video id="bg-home" class="bg-trailer bg-home" loop muted playsinline preload="none" poster="/home-bg.png" aria-hidden="true" data-trailer-src="/home-bg.mp4"></video>
+      <div class="website-cinematic-atmosphere"></div>
       <div class="bg-trailer-scrim"></div>
       <div class="portal-ring"></div>
       <div class="portal-ring-reverse"></div>
@@ -778,6 +786,7 @@
       <div class="header-logo-container">
         <button type="button" class="header-logo-btn" id="header-logo-btn" data-i18n-aria="a11y.goHome" data-i18n-title="a11y.goHome" aria-label="Go to homepage" title="Go to homepage">
           <img class="header-logo" src="/icon-192.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+          <span class="website-wordmark" data-i18n="guide.brand">World of ClaudeCraft</span>
         </button>
       </div>
       
@@ -807,6 +816,16 @@
               </li>
               <li class="nav-item">
                 <button type="button" class="nav-link" id="nav-btn-login" aria-pressed="false" data-i18n="nav.loginRegister">Login/Register</button>
+              </li>
+              <li class="nav-item website-tools-item">
+                <details class="website-tools">
+                  <summary class="website-tools-toggle" data-i18n="landing.tools">Tools</summary>
+                  <ul class="website-tools-links">
+                    <li><a href="https://records.worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer" data-i18n="landing.records">WoC Records</a></li>
+                    <li><a href="https://scout.worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer" data-i18n="landing.scout">WoC Scout</a></li>
+                    <li><a href="https://parses.worldofclaudecraft.com/" target="_blank" rel="noopener noreferrer" data-i18n="landing.parseService">WoC Parse Service</a></li>
+                  </ul>
+                </details>
               </li>
               <li class="nav-item" id="nav-item-account" hidden>
                 <button type="button" class="nav-link" id="nav-btn-account" aria-pressed="false" data-i18n="nav.account">Account</button>
@@ -846,17 +865,33 @@
 
     <div id="homepage-views-container">
       <section id="hero-view" class="view-section" aria-hidden="false">
-        <h1 class="visually-hidden">World of ClaudeCraft</h1>
-        
-        <!-- Main Logo -->
-        <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+        <h1 class="visually-hidden" data-i18n="guide.brand">World of ClaudeCraft</h1>
+        <div class="website-story">
+          <img class="main-logo" id="title-logo" src="/worldofclaudecraft-logo.png" data-i18n-alt="serverUnavailable.logoAlt" alt="World of ClaudeCraft" />
+          <p class="website-genre">
+            <span data-i18n="guide.home.eyebrow">Classic-style browser MMO</span>
+          </p>
+          <h2 class="website-headline" data-i18n="landing.headline">Your story starts here.</h2>
+          <p class="website-intro" data-i18n="guide.home.subtitle">Quest, group up, and explore a hand-built world, free in your browser.</p>
+          <ul class="website-benefits">
+            <li><span class="website-benefit-mark" aria-hidden="true"><img src="/website-feature-classes-v1.webp" width="52" height="52" alt="" /></span><span data-i18n="guide.home.what.pillarClassesTitle">Nine classes, three roles</span></li>
+            <li><span class="website-benefit-mark" aria-hidden="true"><img src="/website-feature-open-v1.webp" width="52" height="52" alt="" /></span><span data-i18n="guide.home.what.pillarOpenTitle">Free and open source</span></li>
+          </ul>
+          <a class="website-community" href="https://discord.com/invite/worldofclaudecraft" target="_blank" rel="noopener noreferrer">
+            <span data-i18n="footer.discordLabel">Join the Discord</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg>
+          </a>
+        </div>
 
-        <section class="official-site-copy" aria-labelledby="official-site-copy-heading">
-          <p class="official-site-copy__label" id="official-site-copy-heading" data-i18n="seo.officialLabel">Official World of ClaudeCraft website</p>
-          <p class="official-site-copy__body" data-i18n="seo.officialBody">worldofclaudecraft.com is the official free browser MMO for the Claudemoon world. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.</p>
-        </section>
-
-        <div id="mode-select">
+        <div id="mode-select" class="website-entry-card">
+          <div class="website-card-heading">
+            <div class="website-card-eyebrow">
+              <span class="website-card-emblem" aria-hidden="true"><img src="/icon-192.png" alt="" /></span>
+              <span data-i18n="mode.serverLabel">Choose your world</span>
+            </div>
+            <h2 data-i18n="auth.enterRealm">Enter the World</h2>
+            <p data-i18n="guide.tagline">A classic-style MMO you play free in your browser.</p>
+          </div>
           <div class="play-console">
             <!-- World selector: a themed dropdown that defaults to Online and can switch to Offline.
                  It only chooses the destination; the Play button below commits. -->
@@ -902,6 +937,9 @@
             <button type="button" class="btn-play" id="btn-play" data-i18n-aria="mode.playAria" aria-label="Play World of ClaudeCraft">
               <span class="btn-play-sheen" aria-hidden="true"></span>
               <span class="btn-play-label" data-i18n="mode.play">Play</span>
+              <span class="website-play-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+              </span>
             </button>
           </div>
 
@@ -912,6 +950,10 @@
 
           <!-- Tip — part of the same play container (divider above). -->
           <div class="play-tip">
+            <div class="website-performance">
+              <span class="website-tip-label" data-i18n="mode.tipTitle">TIP:</span>
+              <p class="website-performance-tip"><span data-i18n="mode.tipText">For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</span></p>
+            </div>
             <p id="performance-tip"><b data-i18n="mode.tipTitle">TIP:</b> <span data-i18n="mode.tipText">For the smoothest experience, turn off ad blocker extensions on this site. Community reports found some blockers can cause lag.</span></p>
           </div>
         </div>
@@ -1647,6 +1689,13 @@
 
     <footer class="homepage-footer">
       <div class="footer-bar">
+      <div class="website-footer-brand">
+        <div class="website-footer-lockup">
+          <img src="/icon-192.png" width="52" height="52" alt="" aria-hidden="true" />
+          <span data-i18n="guide.brand">World of ClaudeCraft</span>
+        </div>
+        <p data-i18n="guide.home.subtitle">Quest, group up, and explore a hand-built world, free in your browser.</p>
+      </div>
       <div class="footer-left">
       <div class="footer-social-row">
         <a class="social-link steam-wishlist steam-wishlist-social" href="https://store.steampowered.com/app/4897790/World_of_ClaudeCraft/" target="_blank" rel="noopener noreferrer" data-icon="steam" data-i18n-title="hudChrome.steam.wishlistAria" data-i18n-aria="hudChrome.steam.wishlistAria" title="Wishlist on Steam: open the World of ClaudeCraft store page" aria-label="Wishlist on Steam: open the World of ClaudeCraft store page">
@@ -1715,6 +1764,10 @@
         <button type="button" id="landing-contrast-toggle" class="landing-contrast-toggle" aria-pressed="false" data-i18n="hudChrome.landing.highContrast" data-i18n-aria="hudChrome.landing.highContrastAria" aria-label="Toggle high-contrast background">High Contrast</button>
       </div>
       </div>
+      <section class="official-site-copy" aria-labelledby="official-site-copy-heading">
+        <p class="official-site-copy__label" id="official-site-copy-heading" data-i18n="seo.officialLabel">Official World of ClaudeCraft website</p>
+        <p class="official-site-copy__body" data-i18n="seo.officialBody">worldofclaudecraft.com is the official free browser MMO for the Claudemoon world. Play online with a persistent character, explore solo offline, read the wiki, and follow verified community links from this site.</p>
+      </section>
     </footer>
   </main>
 

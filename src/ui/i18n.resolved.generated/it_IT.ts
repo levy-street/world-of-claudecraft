@@ -9742,6 +9742,13 @@ export const it_IT: EnTranslations = {
       "dodge": "SCHIVATA!"
     }
   },
+  "landing": {
+    "headline": "Your story starts here.",
+    "tools": "Tools",
+    "records": "WoC Records",
+    "scout": "WoC Scout",
+    "parseService": "WoC Parse Service"
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web in stile classico",
     "description": "Parti per un'avventura epica in World of ClaudeCraft, un micro-MMO in stile classico giocabile direttamente dal browser. Entra in un mondo condiviso persistente, fai crescere le classi e sconfiggi i nemici!",

@@ -160,6 +160,8 @@ const CEILINGS: Record<string, number> = {
   'library.css': 0,
   'play.extra.css': 1,
   'shell.css': 719,
+  'shell.website.css': 0,
+  'shell.website-pages.css': 0,
 };
 
 // How far under its ceiling a sheet may sit before the ceiling has to be lowered,

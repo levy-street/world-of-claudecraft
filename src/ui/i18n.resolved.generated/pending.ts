@@ -9,25 +9,115 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "es_ES": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "fr_FR": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "fr_CA": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "de_DE": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "nl_NL": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "pl_PL": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "id_ID": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "tr_TR": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "sv_SE": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "vi_VN": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ],
+  "da_DK": [
+    "landing.headline",
+    "landing.parseService",
+    "landing.records",
+    "landing.scout",
+    "landing.tools"
+  ]
 };

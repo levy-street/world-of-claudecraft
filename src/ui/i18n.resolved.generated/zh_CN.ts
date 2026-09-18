@@ -9742,6 +9742,13 @@ export const zh_CN: EnTranslations = {
       "dodge": "躲闪！"
     }
   },
+  "landing": {
+    "headline": "你的故事，从这里开始。",
+    "tools": "工具",
+    "records": "WoC 记录",
+    "scout": "WoC 侦察",
+    "parseService": "WoC 战斗日志"
+  },
   "seo": {
     "title": "World of ClaudeCraft：经典风格网页 MMO",
     "description": "在 World of ClaudeCraft 展开史诗冒险。这是一款可直接在浏览器中游玩的经典风格微型 MMO。加入持续共享的世界，提升职业等级，击败敌人！",

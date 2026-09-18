@@ -15,6 +15,11 @@ import type { TranslationKey } from '../i18n.catalog';
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '《{title}》',
+  'landing.headline': '你的故事，從這裡開始。',
+  'landing.tools': '工具',
+  'landing.records': 'WoC 紀錄',
+  'landing.scout': 'WoC 偵察',
+  'landing.parseService': 'WoC 戰鬥紀錄',
   'guide.professions.endgameBodyRaidCollections':
     '大師鍛造是帶有「唯一裝備：大師鍛造」標記的共同裝備家族。舊有的巔峰製作路線仍需尋找圖樣、製作每日限次的中間材料，並消耗共同的終局材料。熔爐套裝則是由團隊副本材料支持的獨立路線，並非在舊路線之上再加一套費用。兩條路線共用最多穿戴兩件的限制，因此會競爭配裝中的同兩個位置。成品在臻至完美或委託綁定該件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':

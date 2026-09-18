@@ -14,6 +14,46 @@
    written per element by the HUD, never on :root. */
 @layer tokens {
   :root {
+    /* Website entry surfaces are intentionally fixed cinematic forest and gold,
+       independent of the player's in-game theme. Only shell.website.css consumes them. */
+    --website-ink: #101b17;
+    --website-ink-deep: #0a120f;
+    --website-ivory: #f1eee4;
+    --website-muted: #b6c0b7;
+    --website-gold: #c8af7a;
+    --website-gold-bright: #efd594;
+    --website-online: #83d6a3;
+    --website-line: #39483d;
+    --website-glass: #0b1513e8;
+    --website-glass-raised: #14231f;
+    --website-glass-line: #ae96676e;
+    --website-glow: #d7ad5d52;
+    --website-paper: #eeeade;
+    --website-paper-muted: #515d50;
+    --website-paper-line: #c7c8b8;
+    --website-parchment: #e8d2a3;
+    --website-parchment-light: #fbefd3;
+    --website-parchment-edge: #a5743d;
+    --website-parchment-ink: #352b1d;
+    --website-parchment-muted: #665338;
+    --website-seal: #285346;
+    --website-portal-blue: #8addeb;
+    --website-portal-line: #376471;
+    --website-portal-field: #071a23;
+    --website-portal-raised: #123340;
+    --website-stone: #11151b;
+    --website-stone-deep: #0c1016;
+    --website-stone-raised: #1a2029;
+    --website-metal: #675c45;
+    --website-brass: #29271f;
+    --website-stone-muted: #b6b9bf;
+    --website-input: #f8f6ed;
+    --website-error: #a62c31;
+    --website-focus: #8c6530;
+    --website-card-shadow: 0 24px 80px #00000040;
+    --website-radius: 12px;
+    --website-width: 1320px;
+    --website-gutter: clamp(24px, 5vw, 80px);
     --gold: #ffd100;
     --gold-dim: #c8a838;
     /* The deed-unlock banner plate (#banner.banner-deed). Echoes the Book of

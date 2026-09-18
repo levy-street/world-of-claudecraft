@@ -246,6 +246,18 @@ function splitGameUiTemplate(): { templateHtml: string; liveHtml: string } {
 }
 
 describe('client HTML shell', () => {
+  it('opens the header wiki separately without replacing the login page', () => {
+    expect(mainTsCode).toContain('openHeaderWiki(NATIVE_APP || DESKTOP_APP)');
+    expect(mainTsCode).not.toContain("window.location.href = '/wiki'");
+  });
+  it('links to the three companion websites in separate tabs', () => {
+    for (const site of ['records', 'scout', 'parses']) {
+      const href = `https://${site}.worldofclaudecraft.com/`;
+      const link = html.match(/<a\b[^>]*>/g)?.find((tag) => tag.includes(`href="${href}"`));
+      expect(link).toContain('target="_blank"');
+      expect(link).toContain('rel="noopener noreferrer"');
+    }
+  });
   it('uses the painted combat-status crest in both game entries', () => {
     for (const entry of [html, playHtml]) {
       const combat = entry.match(

@@ -8,6 +8,13 @@
 
 export const shellStrings = {
   en: {
+    landing: {
+      headline: 'Your story starts here.',
+      tools: 'Tools',
+      records: 'WoC Records',
+      scout: 'WoC Scout',
+      parseService: 'WoC Parse Service',
+    },
     seo: {
       title: 'World of ClaudeCraft: Classic-Style Web MMO',
       description:
