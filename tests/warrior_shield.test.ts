@@ -46,6 +46,7 @@ it('keeps the complete shield and target imprint at reduced detail and during co
     burstAt: vi.fn(),
     bakedAt: vi.fn(),
     pulseLight: vi.fn(),
+    shakeAt: vi.fn(),
     countPrimitive: vi.fn(),
   } as unknown as SequencerHost;
   const slot = {
@@ -79,7 +80,9 @@ it('keeps the complete shield and target imprint at reduced detail and during co
   targetX = 7;
   drawWarriorShield(host, slot, 0);
   expect(crest.mock.calls[1][0]).toBeCloseTo(7 - (7 / Math.hypot(7, 3)) * 1.05);
-  expect(vi.mocked(host.flipbookAt).mock.calls[1][0]).toBe(7);
+  expect(vi.mocked(host.flipbookAt).mock.calls[1][0]).toBeCloseTo(
+    7 - (7 / Math.hypot(7, 3)) * 0.28,
+  );
   drawWarriorShield(host, slot, 1);
   expect(contact).toHaveBeenCalledTimes(2);
   host.weaponFace = vi.fn((_id, _hand, out, normal) => {
@@ -91,7 +94,9 @@ it('keeps the complete shield and target imprint at reduced detail and during co
   expect(host.weaponFace).toHaveBeenCalledWith(1, 1, expect.any(Object), expect.any(Object));
   expect(crest.mock.calls[2].slice(0, 5)).toEqual([0.25, 1.4, 1.6, 1.4, 1.4]);
   // The physical imprint continues to follow the target, independent of the carrier.
-  expect(vi.mocked(host.flipbookAt).mock.calls[2][0]).toBe(7);
+  expect(vi.mocked(host.flipbookAt).mock.calls[2][0]).toBeCloseTo(
+    7 - (7 / Math.hypot(7, 3)) * 0.28,
+  );
   const link = ribbon.mock.calls.find((args) => args[1] === 0.14 && args[2] === 0.18)!;
   link[3](points);
   expect(points[0].toArray()).toEqual([0.25, 1.4, 1.6]);

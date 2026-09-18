@@ -1211,7 +1211,10 @@ export class CharacterVisual {
     }
 
     if (s.spinning && !s.dead) {
-      this.spinAngle = (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
+      this.spinAngle =
+        !this.currentIsOneShot && this.current?.getClip().name === 'Warrior_Bladestorm_Loop'
+          ? 0
+          : (this.spinAngle + dt * SPIN_RATE) % (Math.PI * 2);
       this.spinOnceTimer = 0;
     } else if (this.spinOnceTimer > 0 && !s.dead) {
       this.spinOnceTimer = Math.max(0, this.spinOnceTimer - dt);

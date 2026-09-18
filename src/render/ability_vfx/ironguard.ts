@@ -29,7 +29,7 @@ export function drawIronguard(host: SequencerHost, slot: SeqSlot, beat: number):
     // These paths are also the cold/full-pool fallback. Every setting retains
     // the same 8-yard footprint, sampled against the real ground.
     host.pathRibbon(
-      id === 'revenge' ? 0xaecbdf : 0x78919b,
+      id === 'revenge' ? 0xd7e1e8 : 0x8e9a9d,
       id === 'revenge' ? 0.2 : 0.15,
       duration,
       (points) => {
@@ -61,7 +61,7 @@ export function drawIronguard(host: SequencerHost, slot: SeqSlot, beat: number):
         0x78858a,
         0xb9b9ae,
         duration + 0.1,
-        0,
+        id === 'faultline' ? 0.1 : id === 'thunder_clap' ? 0.07 : 0,
         0,
         angle,
       );
@@ -85,13 +85,14 @@ export function drawIronguard(host: SequencerHost, slot: SeqSlot, beat: number):
     at.z,
     1,
     1,
-    id === 'thunder_clap' ? 0x716d68 : 0x637d90,
-    0xadd3e8,
+    id === 'revenge' ? 0x8296a6 : 0x6f737c,
+    0xc5d1d8,
     kind,
     angle,
     duration,
   );
   if (id !== 'revenge') {
+    host.shakeAt(at.x, at.y, at.z, id === 'faultline' ? 0.22 : 0.12, true);
     host.bakedAt?.('shout_dust', at.x, at.y + 0.12, at.z, 3.5, 0x69757c, 0xc5c5b7, 0.38, 0, 0);
     host.flipbookAt(
       at.x,

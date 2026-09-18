@@ -3,6 +3,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { expect, it } from 'vitest';
+import { WARRIOR_STORM_TURN_RATE } from '../src/render/ability_vfx/held_warrior_storm';
 import { VISUALS } from '../src/render/characters/manifest';
 import { prepareMeleeClips } from '../src/render/characters/melee_clips';
 import { prepareSignatureClips } from '../src/render/characters/signature_clips';
@@ -56,29 +57,59 @@ it('Bladed Gyre completes a native full-body pivot without translating the playe
   expect(f.clip.duration).toBeLessThan(0.75);
 });
 
-it('holds a seamless native Bladestorm loop with planted feet and no repeated chop', async () => {
+it('holds a seamless full-turn native Bladestorm loop with pivot-locked feet and no repeated chop', async () => {
   const f = await fixture('Warrior_Bladestorm_Loop');
   expect(VISUALS.player_warrior.clips.castByAbility?.bladestorm).toBe(f.clip.name);
   expect(VISUALS.player_warrior.clips.castTimeScaleByAbility?.bladestorm).toBe(1);
   expect(f.clip.duration).toBeCloseTo(0.45, 6);
+  expect(f.clip.duration * WARRIOR_STORM_TURN_RATE).toBeCloseTo(Math.PI * 2, 5);
   const feet = ['footl', 'footr', 'toesl', 'toesr'].map(f.bone);
+  const root = f.bone('root');
+  const inPivot = (bone: THREE.Object3D) => root.worldToLocal(position(bone));
+  const pivotRotation = (bone: THREE.Object3D) => rotation(root).invert().multiply(rotation(bone));
   f.pose(0);
-  const initial = feet.map((b) => ({ p: position(b), q: rotation(b) }));
-  const hand = f.bone('handslotr'),
-    start = position(hand);
+  const rootPosition = position(root);
+  const initial = feet.map((b) => ({ p: inPivot(b), q: pivotRotation(b) }));
+  const hands = ['handslotr', 'handslotl'].map(f.bone),
+    start = hands.map(inPivot);
+  const forward = new THREE.Vector3();
+  let previousYaw = 0,
+    fullTurn = 0;
   for (let i = 0; i <= 90; i++) {
     f.pose(i * 0.005);
+    expect(position(root).distanceTo(rootPosition)).toBeLessThan(1e-6);
+    forward.set(0, 0, 1).applyQuaternion(rotation(root));
+    const yaw = Math.atan2(forward.x, forward.z);
+    if (i > 0) {
+      const step = Math.atan2(Math.sin(yaw - previousYaw), Math.cos(yaw - previousYaw));
+      expect(step).toBeGreaterThanOrEqual(-1e-6);
+      fullTurn += step;
+    }
+    previousYaw = yaw;
     feet.forEach((b, j) => {
-      expect(position(b).distanceTo(initial[j].p)).toBeLessThan(0.0005);
-      expect(rotation(b).angleTo(initial[j].q)).toBeLessThan(0.005);
+      expect(inPivot(b).distanceTo(initial[j].p)).toBeLessThan(0.0005);
+      expect(pivotRotation(b).angleTo(initial[j].q)).toBeLessThan(0.005);
     });
-    expect(position(hand).distanceTo(start)).toBeLessThan(0.3);
+    hands.forEach((hand, j) => {
+      expect(inPivot(hand).distanceTo(start[j])).toBeLessThan(0.3);
+    });
   }
-  expect(position(hand).distanceTo(start)).toBeLessThan(1e-5);
+  expect(fullTurn).toBeCloseTo(Math.PI * 2, 3);
+  hands.forEach((hand, j) => {
+    expect(inPivot(hand).distanceTo(start[j])).toBeLessThan(1e-5);
+  });
   for (const track of f.clip.tracks) {
+    expect(Array.from(track.times).every(Number.isFinite)).toBe(true);
+    expect(Array.from(track.values).every(Number.isFinite)).toBe(true);
     const stride = track.getValueSize();
     for (let i = 0; i < stride; i++)
       expect(track.values[track.values.length - stride + i]).toBeCloseTo(track.values[i], 5);
+    if (track.name.endsWith('.quaternion'))
+      for (let i = 0; i < track.values.length; i += 4)
+        expect(Math.hypot(...track.values.slice(i, i + 4))).toBeCloseTo(1, 5);
+    if (track.name === 'root.position')
+      for (let i = 3; i < track.values.length; i++)
+        expect(track.values[i]).toBe(track.values[i % 3]);
   }
 });
 

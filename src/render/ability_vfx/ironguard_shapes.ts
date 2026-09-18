@@ -43,6 +43,7 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
     indices.push(start, start + 1, start + 2);
   }
   function plate(angle: number, near: number, far: number, width: number, height: number) {
+    const firstUv = uvs.length;
     const sin = Math.sin(angle),
       cos = Math.cos(angle);
     const point = (side: number, y: number, radius: number) => {
@@ -79,6 +80,9 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
     }
     const floor = rim.map((p) => [p[0], 0.04, p[2]]);
     for (let i = 1; i < floor.length - 1; i++) face(floor[0], floor[i], floor[i + 1], false);
+    // Ground materials use world-space texture projection; UV.x is free to
+    // carry one coherent travel phase across every face of this plate.
+    for (let i = firstUv; i < uvs.length; i += 2) uvs[i] = near / 8;
   }
   if (kind === 'breach_wedge') {
     const tail = [0, 0, -3.3],

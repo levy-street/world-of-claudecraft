@@ -1,8 +1,9 @@
 /** A cut displaces air along the weapon path. Its cool steel catch belongs to
  * the advancing edge; transparent striations carry the full broad wake. */
 export const WARRIOR_STEEL_FRAGMENT = `
-if((uKind>14.5&&uKind<15.5)||(uKind>15.5&&uKind<16.5&&uStorm<.5)){
-  float u=vUv.x,v=vUv.y;
+if((uKind>14.5&&uKind<15.5)||(uKind>15.5&&uKind<16.5&&uStorm<.5)||(uKind>16.5&&uKind<17.5)){
+  float u=uKind>16.5?clamp((atan(vLocal.x,vLocal.z)+2.2)/4.4,0.,1.):vUv.x;
+  float v=uKind>16.5?clamp((8.-length(vLocal.xz))/2.2,0.,1.):vUv.y;
   float gain=steelSweepGain(u,uAge);
   float head=clamp((gain-.22)/1.45,0.,1.);
   float flow=u-uAge*.27*uMotion;

@@ -443,9 +443,20 @@ it('cleans every owned resource after a disposal error without touching shared m
   texture.dispose();
 });
 
-it.each(['raging_gale', 'red_harvest'])(
-  'retains every authored %s ribbon under the worst guard load',
-  (id) => {
+it.each([
+  { id: 'raging_gale', beat: 0, ready: true, paths: 2, following: 2 },
+  { id: 'raging_gale', beat: 1, ready: true, paths: 2, following: 2 },
+  { id: 'raging_gale', beat: 0, ready: false, paths: 2, following: 1 },
+  { id: 'raging_gale', beat: 1, ready: false, paths: 2, following: 1 },
+  { id: 'red_harvest', beat: 0, ready: true, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 1, ready: true, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 2, ready: true, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 0, ready: false, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 1, ready: false, paths: 2, following: 2 },
+  { id: 'red_harvest', beat: 2, ready: false, paths: 4, following: 2 },
+])(
+  'retains every authored $id ribbon for beat $beat (crest ready=$ready) under worst guard load',
+  ({ id, beat, ready, paths, following }) => {
     function draw(crowded: boolean) {
       const h = fixture(false),
         texture = new THREE.Texture();
@@ -453,33 +464,36 @@ it.each(['raging_gale', 'red_harvest'])(
         ribbon: texture,
         noise: texture,
       } as AbilityVfxTextures);
+      const target = { x: 0, y: 0, z: 2, yaw: 0, present: true };
+      const pathRibbon = vi.fn<SequencerHost['pathRibbon']>(
+        (color, width, duration, fill, brushed, motion, preserve, priority, sweep, follow) =>
+          ribbons.spawnPath(
+            color,
+            width,
+            duration,
+            fill,
+            brushed,
+            motion,
+            preserve,
+            follow,
+            priority,
+            sweep,
+          ),
+      );
       const host = new Proxy(
         {
-          anchorOf: (entity: number, frac: number, out: { x: number; y: number; z: number }) =>
-            Object.assign(out, { x: 0, y: frac * 2, z: entity === 1 ? 0 : 2 }),
-          facingAt: () => 0,
+          anchorOf: (entity: number, frac: number, out: { x: number; y: number; z: number }) => {
+            if (entity !== 1 && !target.present) return null;
+            return Object.assign(out, {
+              x: entity === 1 ? 0 : target.x,
+              y: frac * 2 + (entity === 1 ? 0 : target.y),
+              z: entity === 1 ? 0 : target.z,
+            });
+          },
+          facingAt: (entity: number) => (entity === 1 ? 0 : target.yaw),
+          crestAt: vi.fn(() => ready),
           groundYAt: () => 0,
-          pathRibbon: (
-            color: number,
-            width: number,
-            duration: number,
-            fill: (points: THREE.Vector3[]) => number,
-            brushed: boolean,
-            motion: null,
-            preserve: boolean,
-            priority: 0 | 1,
-          ) =>
-            ribbons.spawnPath(
-              color,
-              width,
-              duration,
-              fill,
-              brushed,
-              motion,
-              preserve,
-              false,
-              priority,
-            ),
+          pathRibbon,
         },
         {
           get(target, key) {
@@ -498,7 +512,15 @@ it.each(['raging_gale', 'red_harvest'])(
         color: 0xb82235,
         physicalSecondary: false,
       } as SeqSlot;
-      expect(furyBeat(host, slot, id === 'red_harvest' ? 2 : 1)).toBe(true);
+      expect(furyBeat(host, slot, beat)).toBe(true);
+      expect(pathRibbon).toHaveBeenCalledTimes(paths);
+      expect(
+        pathRibbon.mock.results.every(
+          (result) => result.type === 'return' && result.value === true,
+        ),
+      ).toBe(true);
+      expect(pathRibbon.mock.calls.filter((call) => call[9])).toHaveLength(following);
+      expect(pathRibbon.mock.calls.every((call) => call[7] === 1)).toBe(true);
       if (crowded)
         for (let entity = 1; entity <= 64; entity++) {
           h.pool.hold(entity, 0, raised, 0, entity === 1);
@@ -515,17 +537,41 @@ it.each(['raging_gale', 'red_harvest'])(
       const anchor: RibbonAnchor = (entity, _frac, out = new THREE.Vector3()) =>
         out.set(entity * 4, 1, 0);
       const storm = new HeldWarriorStorm();
-      ribbons.update(0.05, new THREE.Vector3(0, 5, 20), false, undefined, () => {
-        storm.drawPrimary(ribbons, new THREE.Vector3(0, 0, 20), 0.2, false);
-        if (crowded) h.pool.draw(0, 0.05, false, anchor, () => 0, undefined, ribbons);
-      });
       const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
-      const used = Math.max(...Array.from(geo.getIndex()!.array).slice(0, geo.drawRange.count)) + 1;
       const prefix = 132 + (crowded ? 3200 : 0);
-      const result = {
-        vertices: used - prefix,
-        positions: Array.from(geo.getAttribute('position').array).slice(prefix * 3, used * 3),
+      const capture = (dt: number) => {
+        ribbons.update(dt, new THREE.Vector3(0, 5, 20), false, undefined, () => {
+          storm.drawPrimary(ribbons, new THREE.Vector3(0, 0, 20), 0.2, false);
+          if (crowded) h.pool.draw(0, dt, false, anchor, () => 0, undefined, ribbons);
+        });
+        const index = geo.getIndex();
+        if (!index) throw Error('Missing ribbon indices');
+        const used = Math.max(...Array.from(index.array).slice(0, geo.drawRange.count)) + 1;
+        return {
+          vertices: used - prefix,
+          positions: Array.from(geo.getAttribute('position').array).slice(prefix * 3, used * 3),
+        };
       };
+      // All bright receiving catches are still alive at this shared sample.
+      const initial = capture(0.02);
+      const beforeMovement = capture(0.005);
+      Object.assign(target, { x: 3, y: 0.5, z: 4, yaw: 1.1 });
+      // Hold effect age fixed to distinguish target following from sweep travel.
+      const moved = capture(0);
+      expect(initial.vertices).toBe(paths * 136);
+      expect(moved.vertices).toBe(paths * 136);
+      pathRibbon.mock.calls.forEach((call, i) => {
+        const before = beforeMovement.positions.slice(i * 136 * 3, (i + 1) * 136 * 3);
+        const after = moved.positions.slice(i * 136 * 3, (i + 1) * 136 * 3);
+        if (call[9]) expect(after).not.toEqual(before);
+        else expect(after).toEqual(before);
+      });
+      target.present = false;
+      const removed = capture(0.005);
+      expect(removed.vertices).toBe((paths - following) * 136);
+      const expired = capture(0.3);
+      expect(expired.vertices).toBe(0);
+      const result = { initial, moved, removed, expired };
       h.pool.dispose();
       ribbons.dispose();
       texture.dispose();
@@ -533,7 +579,6 @@ it.each(['raging_gale', 'red_harvest'])(
     }
     const ordinary = draw(false),
       crowded = draw(true);
-    expect(ordinary.vertices).toBe(id === 'red_harvest' ? 816 : 408);
     expect(crowded).toEqual(ordinary);
   },
 );

@@ -14,6 +14,7 @@ import {
 import { warriorControlPerformances } from './anim/warrior_control_poses.mjs';
 import { warriorReadinessPerformances } from './anim/warrior_readiness_poses.mjs';
 import { warriorReaverPerformance } from './anim/warrior_reaver_pose.mjs';
+import { warriorSpinPerformance } from './anim/warrior_spin_poses.mjs';
 import { warriorVoicePerformances } from './anim/warrior_voice_poses.mjs';
 
 const io = await createGlbIO();
@@ -477,18 +478,7 @@ const performances = [
       [0.72, idle],
     ],
   ],
-  [
-    'Warrior_Bladed_Gyre',
-    [
-      [0, idle],
-      [0.085, bladePose(5, 0.1, [0, -0.035, 0], -18, -3, 0, true)],
-      [0.15, openAvatarArms(bladePose(5, 0.24, [0, -0.025, 0], 0, 3, 0, true), 1)],
-      [0.29, openAvatarArms(bladePose(5, 0.24, [0, -0.025, 0], 0, 3, 0, true), 1)],
-      [0.46, openAvatarArms(bladePose(5, 0.24, [0, -0.025, 0], 0, 3, 0, true), 1)],
-      [0.56, bladePose(5, 0.5, [0, -0.02, 0], 12, 3, 0, true)],
-      [0.72, idle],
-    ],
-  ],
+  warriorSpinPerformance(idle, bladePose, openAvatarArms),
   [
     'Warrior_Avatar',
     [
@@ -715,13 +705,21 @@ for (const [name, beats] of performances) {
       let pose = plantFeet(
         new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
       );
-      if (name === 'Warrior_Bladed_Gyre') {
+      if (name === 'Warrior_Bladed_Gyre' || name === 'Warrior_Bladestorm_Loop') {
         // Bake the complete pivot into the native root after solving the
         // local stance. Translation stays fixed; both hands and feet turn
         // with the fighter, and recovery returns to the exact starting yaw.
         const time = start + (end - start) * t;
-        const phase = Math.min(1, Math.max(0, (time - 0.085) / 0.475));
-        const spin = new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), phase * Math.PI * 2);
+        const phase =
+          name === 'Warrior_Bladestorm_Loop'
+            ? Math.min(1, time / 0.45)
+            : Math.min(1, Math.max(0, (time - 0.085) / 0.475));
+        // Exact identity at the loop seam also preserves quaternion storage
+        // sign. Dense intermediate keys still describe the complete turn.
+        const spin = new Quaternion().setFromAxisAngle(
+          new Vector3(0, 1, 0),
+          phase === 1 ? 0 : phase * Math.PI * 2,
+        );
         pose.set(
           'root|rotation',
           spin.multiply(new Quaternion().fromArray(pose.get('root|rotation'))).toArray(),

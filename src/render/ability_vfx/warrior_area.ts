@@ -91,12 +91,13 @@ export function drawWarriorAreaContact(
   if (!profile) return false;
   const at = host.anchorOf(targetId, meleeContactHeight(profile, 0), target);
   if (!at) return false;
+  const groundImpact = id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline';
   host.flipbookAt(
     at.x,
     at.y,
     at.z,
     outcome === 2 ? 2.4 : 2.8,
-    outcome === 2 ? 0xcadce8 : id === 'cleave' ? 0xe2edf2 : 0xeac6a4,
+    outcome === 2 ? 0xcadce8 : groundImpact ? 0xc4c9c9 : 0xe2edf2,
     outcome === 2 || id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline'
       ? 'contact_crush'
       : 'contact_cut',
@@ -110,7 +111,7 @@ export function drawWarriorAreaContact(
   const dx = Math.sin(angle),
     dz = Math.cos(angle);
   host.pathRibbon(
-    id === 'cleave' ? 0xe2edf2 : 0xf1cbaa,
+    groundImpact ? 0xa8b3b5 : 0xe2edf2,
     0.18,
     0.2,
     (points) => {
@@ -131,11 +132,11 @@ export function drawWarriorAreaContact(
   );
   if (tier === 0)
     host.fragmentsAt?.(
-      id === 'heroic_leap' ? 'stone_chip' : 'metal_splinter',
+      groundImpact ? 'stone_chip' : 'metal_splinter',
       at.x,
       at.y,
       at.z,
-      id === 'cleave' ? 0xc6d2da : 0xc6aa8f,
+      groundImpact ? 0x9da4a7 : 0xc6d2da,
       8,
       0.9,
       dx,

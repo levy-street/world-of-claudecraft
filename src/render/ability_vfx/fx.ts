@@ -75,6 +75,7 @@ import {
 import { launchWarriorHammer } from './warrior_hammer';
 import { WarriorPowerForms } from './warrior_power_forms';
 import { WarriorReadiness } from './warrior_readiness';
+import { WarriorStormAnchor } from './warrior_storm_anchor';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
 
@@ -586,7 +587,14 @@ export class AbilityVfxFx implements SequencerHost {
   private readonly warriorReadiness = new WarriorReadiness();
   private warriorStorms = new Map<
     number,
-    { stamp: number; elapsed: number; nextDust: number; surface: boolean }
+    {
+      stamp: number;
+      elapsed: number;
+      nextDust: number;
+      surface: boolean;
+      anchor: WarriorStormAnchor;
+      angle: number;
+    }
   >();
   private drawPriorityStorms = (): void => {
     for (const [id, storm] of this.warriorStorms) {
@@ -598,6 +606,7 @@ export class AbilityVfxFx implements SequencerHost {
           at,
           storm.elapsed,
           this.reducedMotionActive,
+          storm.angle,
         );
     }
     this.guards.draw(
@@ -652,6 +661,7 @@ export class AbilityVfxFx implements SequencerHost {
           at,
           storm.elapsed,
           this.reducedMotionActive,
+          storm.angle,
         );
     }
     for (const [id, bands] of this.orbits) {
@@ -2361,6 +2371,8 @@ export class AbilityVfxFx implements SequencerHost {
         elapsed,
         nextDust: elapsed,
         surface: false,
+        anchor: new WarriorStormAnchor(entityId),
+        angle: 0,
       });
   }
 
@@ -2469,10 +2481,17 @@ export class AbilityVfxFx implements SequencerHost {
         this.crests.releaseHeld(id);
         continue;
       }
-      storm.surface = this.crests.holdStorm(id, at.x, at.y, at.z, storm.elapsed);
+      storm.angle = storm.anchor.update(
+        storm.elapsed,
+        at,
+        this.facingAt(id) ?? 0,
+        this.time,
+        this.weaponAnchor,
+      );
+      storm.surface = this.crests.holdStorm(id, at.x, at.y, at.z, storm.elapsed, storm.angle);
       if (!reducedMotion && this.qualityLevel > 0.55 && storm.elapsed >= storm.nextDust) {
         storm.nextDust = storm.elapsed + 0.14;
-        const angle = storm.elapsed * 14,
+        const angle = storm.angle,
           x = at.x + Math.sin(angle) * 3.2,
           z = at.z + Math.cos(angle) * 3.2;
         this.bakedAt(

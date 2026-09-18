@@ -4,6 +4,9 @@ import type { OverlaySprites } from './overlay_sprites';
 import type { AbilityVfxRibbons } from './ribbons';
 import { warriorAreaPoint } from './warrior_area_shapes';
 
+// One complete turn per native Warrior_Bladestorm_Loop, pinned against the GLB.
+export const WARRIOR_STORM_TURN_RATE = (Math.PI * 2) / 0.45;
+
 /** Immediate held cutting seams use the existing ribbon buffer, with no new
  * per-frame paths, allocations, texture uploads or spawn-time world anchors. */
 export class HeldWarriorStorm {
@@ -16,8 +19,9 @@ export class HeldWarriorStorm {
     at: THREE.Vector3,
     elapsed: number,
     reducedMotion: boolean,
+    weaponAngle = elapsed * WARRIOR_STORM_TURN_RATE,
   ): void {
-    const angle = reducedMotion ? 0 : elapsed * 14,
+    const angle = reducedMotion ? 0 : weaponAngle,
       cosine = Math.cos(angle),
       sine = Math.sin(angle);
     for (let blade = 0; blade < 2; blade++) {
@@ -29,7 +33,7 @@ export class HeldWarriorStorm {
           at.z + this.point.z * cosine - this.point.x * sine,
         );
       }
-      ribbons.appendHeld(this.primary, this.primary.length, 0.24, 0xd9d3be, 1.4);
+      ribbons.appendHeld(this.primary, this.primary.length, 0.24, 0xdce8f0, 1.4);
     }
   }
 
@@ -39,8 +43,9 @@ export class HeldWarriorStorm {
     at: THREE.Vector3,
     elapsed: number,
     reducedMotion: boolean,
+    weaponAngle = elapsed * WARRIOR_STORM_TURN_RATE,
   ): void {
-    const angle = reducedMotion ? 0 : elapsed * 14;
+    const angle = reducedMotion ? 0 : weaponAngle;
     const cosine = Math.cos(angle),
       sine = Math.sin(angle);
     for (let blade = 0; blade < 2; blade++) {
@@ -58,7 +63,7 @@ export class HeldWarriorStorm {
           at.z + this.point.z * cosine - this.point.x * sine,
         );
       }
-      ribbons.appendHeld(this.points, this.points.length, 0.11, 0xecd5b7, 1.15);
+      ribbons.appendHeld(this.points, this.points.length, 0.11, 0xcbd7e1, 1.15);
       // Short inner wakes emerge at weapon reach and dissolve outward.
       for (let i = 0; i < this.points.length; i++) {
         const u = i / (this.points.length - 1);
@@ -70,7 +75,7 @@ export class HeldWarriorStorm {
           at.z + Math.cos(a) * radius,
         );
       }
-      ribbons.appendHeld(this.points, this.points.length, 0.07, 0xb3ada0, 0.45);
+      ribbons.appendHeld(this.points, this.points.length, 0.07, 0x97a9b7, 0.45);
     }
     const time = reducedMotion ? 0 : elapsed;
     for (let chip = 0; chip < 18; chip++) {
@@ -81,7 +86,7 @@ export class HeldWarriorStorm {
         at.x + Math.sin(phase) * radius,
         at.y + lift,
         at.z + Math.cos(phase) * radius,
-        chip % 3 ? 0x9aafbb : 0xd3b08b,
+        chip % 3 ? 0x9aafbb : 0xd2dde5,
         chip % 3 ? 0.12 : 0.19,
         OVERLAY_CELL.spark,
         0.85,

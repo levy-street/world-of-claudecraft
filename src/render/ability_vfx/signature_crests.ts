@@ -3,6 +3,7 @@ import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../sc
 import { BLOODLETTING_FRAGMENT, BLOODLETTING_VERTEX } from './bloodletting_shape';
 import { CrestPrewarm } from './crest_prewarm';
 import { HARVEST_FRAGMENT, HARVEST_NOISE, HARVEST_VERTEX } from './harvest_material';
+import { WARRIOR_STORM_TURN_RATE } from './held_warrior_storm';
 import {
   warriorBloodTexture,
   warriorPressureTexture,
@@ -12,6 +13,7 @@ import { buildSignatureShapes, type CrestKind } from './signature_shapes';
 import { STEEL_SWEEP_GLSL } from './steel_sweep';
 import { TWINSTRIKE_FRAGMENT, TWINSTRIKE_VERTEX } from './twinstrike_shape';
 import { WARRIOR_BARK_FRAGMENT, WARRIOR_BARK_VERTEX } from './warrior_bark_shape';
+import { WARRIOR_GROUND_FRAGMENT, WARRIOR_GROUND_VERTEX } from './warrior_ground_material';
 import { warriorVoiceProfile } from './warrior_shout_shapes';
 import { WARRIOR_STEEL_FRAGMENT } from './warrior_steel_material';
 import { WARRIOR_VOICE_FRAGMENT, WARRIOR_VOICE_VERTEX } from './warrior_voice_material';
@@ -86,8 +88,8 @@ export class SignatureCrests {
             p.x+=sign(p.x)*smoothstep(0.35,1.0,uAge)*0.17*uMotion;
             p.z-=uAge*uAge*0.18*uMotion;
           }
+          ${WARRIOR_GROUND_VERTEX}
           if(uKind>16.5 && uKind<19.5){
-            if(uKind>17.5)p.y*=mix(1.0,(0.45+0.55*smoothstep(0.0,0.12,uAge))*(1.0-0.7*smoothstep(0.45,1.0,uAge)),uMotion);
             p.y+=pressureGround(p.xz);
           }
           if((uKind>20.5 && uKind<21.5)){
@@ -193,19 +195,21 @@ export class SignatureCrests {
               colour=uTint*(0.58+grain*1.5)*faceLight;
               colour+=uAccent*bevel*(0.06+0.2*incidence)*(0.45+grain);
               colour+=uAccent*fresnel*0.055;
-              if(uKind>22.5){
+              if(uKind>22.5||(uKind>17.5&&uKind<19.5)){
                 // Matte fault faces use the existing surface's mineral grain,
                 // with compressed highlights and dark sediment seams. The thin
                 // fresh edge catches light without reading as a forged blade.
                 float strata=sin(vLocal.y*6.0+vLocal.x*0.6+vLocal.z*0.3+grain*0.45);
                 float seam=1.0-smoothstep(0.04,0.16,abs(strata));
-                float bed=mix(0.6,1.1,grain)*(1.0-seam*0.24);
+                float mineral=texture2D(uPressureMap,fract(vLocal.xz*1.31+vLocal.y*.43)).r;
+                float bed=(.66+.19*grain+.15*mineral)*(1.0-seam*.30);
                 colour=uTint*bed*(0.52+incidence*0.65);
                 colour+=uAccent*bevel*(0.045+incidence*0.12);
               }
             }
             alpha=1.0-smoothstep(0.48,1.0,uAge);
           }
+          ${WARRIOR_GROUND_FRAGMENT}
           ${WARRIOR_STEEL_FRAGMENT}
           if(uStorm>0.5){
             // Directional air dragged by the cutting edge. Broken textured
@@ -223,12 +227,6 @@ export class SignatureCrests {
           if(uKind>13.5 && uKind<14.5){
             float bevel=1.0-smoothstep(0.18,0.3,vUv.y);
             colour=mix(uTint*0.55,colour,0.6)+uAccent*bevel*0.08;
-          }
-          if(uKind>16.5 && uKind<17.5){
-            float sweepU=clamp((atan(vSurface.x-0.5,vSurface.y-0.5)+2.2)/4.4,0.0,1.0);
-            float gain=steelSweepGain(sweepU,uAge);
-            alpha*=mix(1.0,min(1.0,gain),uMotion);
-            colour+=uAccent*max(0.0,gain-0.75)*0.55*uMotion;
           }
           if(uKind>19.5 && uKind<20.5){
             // The compression travels down the thrust, with its hot head
@@ -452,13 +450,21 @@ export class SignatureCrests {
   }
   /** One caster-owned storm borrows the existing eight-slot sculpture pool.
    * Live frame stamps, not a guessed duration, own release and interruption. */
-  holdStorm(entityId: number, x: number, y: number, z: number, elapsed: number): boolean {
+  holdStorm(
+    entityId: number,
+    x: number,
+    y: number,
+    z: number,
+    elapsed: number,
+    weaponAngle = elapsed * WARRIOR_STORM_TURN_RATE,
+  ): boolean {
     if (
       this.disposed ||
       !Number.isFinite(x) ||
       !Number.isFinite(y) ||
       !Number.isFinite(z) ||
-      !Number.isFinite(elapsed)
+      !Number.isFinite(elapsed) ||
+      !Number.isFinite(weaponAngle)
     )
       return false;
     let slot: (typeof this.slots)[number] | undefined;
@@ -477,6 +483,7 @@ export class SignatureCrests {
     slot.heldStamp = this.frame;
     slot.phase = Math.max(0, elapsed);
     slot.mesh.position.set(x, y, z);
+    slot.mesh.rotation.y = weaponAngle;
     return true;
   }
   releaseHeld(entityId: number): void {
@@ -495,7 +502,7 @@ export class SignatureCrests {
       if (s.heldId !== null) {
         s.active = s.heldStamp === this.frame;
         s.mesh.visible = s.active;
-        s.mesh.rotation.y = reducedMotion ? 0 : s.phase * 14;
+        if (reducedMotion) s.mesh.rotation.y = 0;
         s.mesh.material.uniforms.uAge.value = 0.18;
         s.mesh.material.uniforms.uFlow.value = s.phase;
         s.mesh.material.uniforms.uMotion.value = reducedMotion ? 0 : 1;
