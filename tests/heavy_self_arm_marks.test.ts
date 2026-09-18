@@ -8,8 +8,10 @@ import { describe, expect, it } from 'vitest';
 import {
   HEAVY_SELF_ARM_MARKED_CMDS,
   HEAVY_SELF_CMDS,
+  HEAVY_SELF_EVENTS,
   heavySelfMarkOnAccept,
   heavySelfMarkOnReceipt,
+  isHeavySelfEvent,
 } from '../server/heavy_self';
 
 describe('the arm-marked subset', () => {
@@ -64,5 +66,18 @@ describe('the two predicates partition the membership', () => {
     expect(receiptMarked).toContain('use');
     expect(receiptMarked).not.toContain('perfect_item');
     expect(receiptMarked).not.toContain('plant_crop');
+  });
+});
+
+describe('isHeavySelfEvent', () => {
+  it('answers every named heavy event and every world-quest event, and nothing else', () => {
+    for (const type of HEAVY_SELF_EVENTS) expect(isHeavySelfEvent(type), type).toBe(true);
+    for (const type of ['worldQuestProgress', 'worldQuestScore', 'worldQuestPuzzleUpdated']) {
+      expect(HEAVY_SELF_EVENTS.has(type), type).toBe(false);
+      expect(isHeavySelfEvent(type), type).toBe(true);
+    }
+    expect(HEAVY_SELF_EVENTS.has('chat')).toBe(false);
+    expect(isHeavySelfEvent('chat')).toBe(false);
+    expect(isHeavySelfEvent('questWorld')).toBe(false);
   });
 });

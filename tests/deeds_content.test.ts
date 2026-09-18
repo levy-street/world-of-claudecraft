@@ -138,8 +138,12 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    expect(DEED_ORDER.length).toBe(300);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
+    // 308 / 3355 at the release/v0.43.0 merge into feature/world-quests: the
+    // release's 300 plus the branch's eight world-quest exploration deeds.
+    // 315 / 3495 with the seven faction standing deeds (three Trusted at 5,
+    // three Champion at 25, and the all-factions meta at 50: +140).
+    expect(DEED_ORDER.length).toBe(315);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3495);
   });
 
   it('ships the audited per-category counts', () => {
@@ -155,8 +159,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 Phase 11k's cross-packet prog_field_to_feast, then
       // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
       // release/v0.41.0 merge (the release's own chain read 58), then
-      // +1 the Phase 13 promotion capstone prog_legendmaker.
-      progression: 68,
+      // +1 the Phase 13 promotion capstone prog_legendmaker, then
+      // +7 the faction standing ladder (a Trusted and a Champion deed per
+      // allied faction plus the all-factions meta).
+      progression: 75,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
@@ -174,7 +180,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 11,
+      exploration: 19,
       feat: 3,
       hidden: 10,
     });
@@ -369,6 +375,23 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
+      'exp_arcane_calligraphy',
+      'exp_arcane_calligraphy_gold',
+      'exp_forge_helper',
+      'exp_last_barricade',
+      'exp_borrowed_face',
+      'exp_windrider_slalom',
+      'exp_duskweave_dispatches',
+      'exp_wisp_maze',
+      // The faction standing ladder: Trusted and Champion per allied faction
+      // (the standing* meters) plus the all-factions meta, appended last.
+      'prog_rift_watch_trusted',
+      'prog_church_order_trusted',
+      'prog_automatons_trusted',
+      'prog_rift_watch_champion',
+      'prog_church_order_champion',
+      'prog_automatons_champion',
+      'prog_faction_champion_all',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -762,12 +785,14 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (phase 06) the tenth, closing the family across the whole ring,
     // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
     // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
-    // the 2026-08-30 release/v0.41.0 sync merge) one more.
-    expect(titles.length).toBe(46);
+    // the 2026-08-30 release/v0.41.0 sync merge) one more, and the three
+    // faction standing Champion titles (Riftwarden, Dawnkeeper, Forgemaster)
+    // three more.
+    expect(titles.length).toBe(50);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(46);
+    expect(new Set(titleTexts).size).toBe(50);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -978,7 +1003,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  const FROZEN_CATALOG_SHA256 = '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  // Re-baselined for the seven appended faction standing deeds (a Trusted and
+  // a Champion meter deed per allied faction on the new standing* meters,
+  // plus the prog_faction_champion_all meta), re-minted THE AUDITABLE WAY:
+  // the afe535f4... literal rotated down into PRE_APPEND_CATALOG_SHA256 and
+  // the proof below reproduces it exactly. No shipped trigger or renown
+  // value was touched.
+  const FROZEN_CATALOG_SHA256 = '2b8d9d03740487fde602cfb2c610880747113a59c98539eab242e498840c422a';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1026,21 +1057,39 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // merged table with the two new ids removed, folding the eighteen-value
   // retune into the new checkpoint; every append AFTER this merge is once
   // again provable the auditable way against it.
+  //
+  // At the release/v0.43.0 merge into feature/world-quests the previous mint is
+  // the release's own 931a0593... literal and the append set is the branch's
+  // eight world-quest deeds, seated after hid_forgebreaker: stripping them
+  // must reproduce the release catalogue exactly.
+  //
+  // The faction standing ladder appends seven deeds after exp_wisp_maze; the
+  // previous mint is that merge's afe535f4... literal (rotated down here),
+  // and stripping the seven must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '516adb010bf37c91076b9a16bdf0e4dc22c72506fcb64e237468d1ee197d1358';
-  const APPENDED_SINCE: readonly string[] = ['col_set_bramblehide', 'hid_forgebreaker'];
+    'afe535f45c2b87e267e29dd1d11207395d0c0a5e41980f728b106f58a33bf686';
+  const APPENDED_SINCE: readonly string[] = [
+    'prog_rift_watch_trusted',
+    'prog_church_order_trusted',
+    'prog_automatons_trusted',
+    'prog_rift_watch_champion',
+    'prog_church_order_champion',
+    'prog_automatons_champion',
+    'prog_faction_champion_all',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The new quest celebration sits at the true tail after the raid block.
-    // Pin its two predecessors too: this is an append into a known seat,
-    // never a scattered insert or a retro-edit (the digest below proves it).
+    // The faction standing ladder sits at the true tail after the world-quest
+    // block. Pin its two predecessors too: this is an append into a known
+    // seat, never a scattered insert or a retro-edit (the digest below
+    // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_varkhul_heroic',
-      'dgn_varkhul_flawless',
+      'exp_duskweave_dispatches',
+      'exp_wisp_maze',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1257,8 +1306,10 @@ describe('table shape', () => {
     // that (appended behind the branch's rows; the flawless task is its
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
-    // The one-time Forgebreaker quest's hidden celebration appends after it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
+    // The one-time Forgebreaker quest's hidden celebration appends after it,
+    // then the world-quest block, then the faction standing ladder whose
+    // all-factions meta is the final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_faction_champion_all');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

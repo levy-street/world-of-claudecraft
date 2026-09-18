@@ -77,7 +77,9 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
       // bag (an Intellect amulet, an Intellect ring) gives way to Ignivar's
       // Ember Choker and the Seal of the Forgewall; the three-seed averages
       // stayed inside the bands below (185.8 / 207.6 / 152.6) and the sibling
-      // order held, so only the identity pins move.
+      // order held, so only the identity pins move. The Champion-standing
+      // faction rings (content/faction_vendors.ts) are tuned to sit below the
+      // Nythraxis jewelry on every line, so standing stock never places here.
       expect(Object.keys(gear).length, `${spec} fills every slot`).toBe(12);
       expect(gear.neck, `${spec} neck is the physical Ignivar choker`).toBe(
         'ignivars_ember_choker',

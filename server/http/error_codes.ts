@@ -189,6 +189,9 @@ export const ERROR_CODES = deepFreeze({
   // The public guild roster read (server/guild_roster.ts).
   'guilds.invalid_roster_name': { params: [] },
   'guilds.unknown': { params: [] },
+  // The public world-quest scoreboard read (server/world_quest_leaderboard.ts):
+  // the ?board= id names no scoreboard (400).
+  'world_quests.unknown_board': { params: [] },
 
   // --- Steam link family codes (server/steam/). The whole surface is
   // env-gated: with STEAM_ENABLED unset every route answers steam.disabled.

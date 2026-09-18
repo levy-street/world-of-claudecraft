@@ -687,7 +687,10 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'f429f724ca7ab90873b4a86950c0046585ef66bec7c2052cda12ae578ecee3d0';
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -1,4 +1,6 @@
-export class ReconWireState {
+import { QuestWorldWireState } from './quest_world_wire_state';
+
+export class ReconWireState extends QuestWorldWireState {
   reconAuthoritativeX: number | null = null;
   reconAuthoritativeY: number | null = null;
   reconAuthoritativeZ: number | null = null;

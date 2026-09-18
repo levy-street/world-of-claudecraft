@@ -125,6 +125,7 @@ export const API_ERROR_KEYS = {
   'deeds.invalid_input': 'apiError.deeds.invalid_input',
   'guilds.invalid_roster_name': 'apiError.guilds.invalid_roster_name',
   'guilds.unknown': 'apiError.guilds.unknown',
+  'world_quests.unknown_board': 'apiError.world_quests.unknown_board',
 
   // steam: the env-gated Steam link family (server/steam/).
   'steam.disabled': 'apiError.steam.disabled',

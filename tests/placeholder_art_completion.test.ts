@@ -310,6 +310,10 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'courtiers_bonefang',
       'thornpeak_wardblade',
       'gravecourt_hewer',
+      // The three faction quartermaster epics (faction-vendor-icons-2026-09-16).
+      'riftwarden_voidblade',
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

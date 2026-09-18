@@ -344,6 +344,43 @@ export const cs_CZ: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "lastKeepTitle": "The Last Keep Cannon",
+      "lastKeepObjective": "Defend the approach to The Last Keep",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "endlessWave": "Endless wave {wave} (round {round})",
+      "resultWaves": "Waves held: {waves}.",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "Odsouzení",
       "fateThreadsLabel": "Nitě osudu",
@@ -1261,9 +1298,45 @@ export const cs_CZ: EnTranslations = {
       "devTierCol": "Odznak",
       "mergedPrs": "Sloučené PR",
       "devEmpty": "Zatím žádní hodnocení přispěvatelé.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot.",
       "podiumLabel": "První tři",
       "unclaimed": "Nevyzvednuto",
       "prestigeTitle": "Prestiž {rank}"
+    },
+    "wqLadder": {
+      "title": "World Quest Rankings",
+      "subtitle": "The best attempt of every hero, one ladder per medal world quest.",
+      "close": "Close World Quest Rankings",
+      "rankedBy": {
+        "waves": "Ranked by waves held",
+        "seconds": "Ranked by fastest time",
+        "points": "Ranked by highest score"
+      },
+      "rankedByMedal": {
+        "waves": "Ranked by medal, then waves held",
+        "seconds": "Ranked by medal, then fastest time",
+        "points": "Ranked by medal, then highest score"
+      },
+      "podiumLabel": "Top three",
+      "unclaimed": "Unclaimed",
+      "totalOne": "One hero ranked",
+      "totalMany": "{count} heroes ranked",
+      "selfLabel": "Your best",
+      "selfRank": "Rank {rank}",
+      "selfNone": "You have no score on this board yet. Finish the world quest to join the ladder."
     },
     "pledge": {
       "open": "Přijímá přihlášky",
@@ -2237,9 +2310,93 @@ export const cs_CZ: EnTranslations = {
       "stats": "Statistiky",
       "progression": "Postup",
       "skills": "Dovednosti",
+      "reputation": "Reputation",
+      "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Shromáždění",
       "crafting": "Řemeslnictví",
       "openProfessions": "Otevřené profese"
+    },
+    "currencies": {
+      "intro": "None of these take bag space. Coin stays in your bag as always.",
+      "activities": "Activities",
+      "factions": "Factions",
+      "honor": "Honor",
+      "delveMark": "Delve Mark",
+      "wocToken": "WoC Token",
+      "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
+      "honorNote": "Battlegrounds and the arena",
+      "delveMarkNote": "Delves completed",
+      "wocTokenNote": "Linked wallet balance",
+      "walletNotLinked": "No wallet linked",
+      "wocPreview": "Preview balance, not yet verified",
+      "lifetime": "Lifetime {amount}",
+      "factionPending": "Faction currency: pending Stage 2"
+    },
+    "reputation": {
+      "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
+      "faction": {
+        "rift_watch": "Rift Watch",
+        "church_order": "Church Order",
+        "automatons": "Automatons"
+      },
+      "hub": {
+        "rift_watch": "Drifthaven",
+        "church_order": "Brother Aldric",
+        "automatons": "Wyrmwatch"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "Unknown",
+        "recognized": "Recognized",
+        "trusted": "Trusted",
+        "proven": "Proven",
+        "vanguard": "Vanguard",
+        "champion": "Champion"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "Outsider",
+          "recognized": "Watcher",
+          "trusted": "Riftwalker",
+          "proven": "Warden",
+          "vanguard": "Riftwarden",
+          "champion": "Champion"
+        },
+        "church_order": {
+          "unknown": "Outsider",
+          "recognized": "Acolyte",
+          "trusted": "Keeper",
+          "proven": "Templar",
+          "vanguard": "Dawnkeeper",
+          "champion": "Champion"
+        },
+        "automatons": {
+          "unknown": "Outsider",
+          "recognized": "Operator",
+          "trusted": "Mechanist",
+          "proven": "Artificer",
+          "vanguard": "Forgemaster",
+          "champion": "Champion"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "Next: {tier}",
+      "maxed": "Highest standing reached",
+      "cappedByLevel": "Standing pauses at {tier} until level 16",
+      "today": "Today",
+      "questsDone": "World quests completed",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "Board",
+      "resetsUnknown": "No board today",
+      "title": "Faction title",
+      "titleLine": "{faction} . {tier}",
+      "legend": "Standing tiers",
+      "vendorGate": "Requires {tier} with {faction}.",
+      "tierReachedBanner": "Now {tier} with the {faction}",
+      "tierReachedSubtext": "Faction title: {title}",
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Dokončeno",
@@ -3151,6 +3308,7 @@ export const cs_CZ: EnTranslations = {
       "forbiddenReflectionLock": "Zakázaný odraz zatím nelze znovu připravit",
       "internalCooldown": "Tento efekt nelze spustit znovu, dokud nevyprší časovač",
       "carriedFlag": "Neseš nepřátelskou vlajku. Zrušením tohoto efektu ji upustíš.",
+      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
       "battleStance": "Bojový postoj: o 10 % vyšší generování vzteku",
       "berserkerStance": "Postoj berserka: kritické zásahy o 3 % častěji a o 3 % tvrdší",
       "crit": "Zvyšuje šanci na kritický zásah o {pct} %",
@@ -5375,6 +5533,8 @@ export const cs_CZ: EnTranslations = {
       "level": "Úroveň {level}",
       "landmarkCount": "{count} památek",
       "filtersAria": "Mapové vrstvy",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Úkoly",
         "gather": "Shromáždit",
@@ -5390,6 +5550,32 @@ export const cs_CZ: EnTranslations = {
       "showRoute": "Zobrazit trasu",
       "untrack": "Untrack",
       "track": "Dráha",
+      "worldQuests": {
+        "heading": "World quests today",
+        "count": "{done} / {total}",
+        "empty": "No world quests today",
+        "replacement": "Replacement",
+        "state": {
+          "active": "In progress",
+          "completed": "Done"
+        },
+        "reroll": "Replace quest",
+        "rerollNote": "One replacement available today",
+        "rerollUsed": "Replacement used today",
+        "rerollReason": {
+          "noCycle": "No board today",
+          "usedToday": "Replacement used today",
+          "completed": "A completed quest cannot be replaced",
+          "inProgress": "A quest in progress cannot be replaced",
+          "notActive": "This quest is not on your board",
+          "noAlternative": "No other quest is available in that zone today",
+          "unknown": "This quest cannot be replaced today"
+        },
+        "confirmTitle": "Replace this world quest?",
+        "confirmBody": "You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.",
+        "confirmOk": "Replace",
+        "confirmCancel": "Cancel"
+      },
       "legend": {
         "dungeon": "Žalář",
         "ore": "Ruda",
@@ -5669,6 +5855,61 @@ export const cs_CZ: EnTranslations = {
       "gatedByQuest": "Při hledání: {quest}",
       "empty": "Těmto filtrům neodpovídá žádná kořist.",
       "resultCount": "Výsledky {count}"
+    },
+    "weekly": {
+      "title": "Weekly Quests",
+      "close": "Close weekly quests",
+      "subtitle": "Pick one of the four charges. It",
+      "resetsIn": "resets in {time}.",
+      "anyDifficulty": "Any difficulty",
+      "choose": "Choose quest",
+      "inProgress": "In progress ({count}/{required})",
+      "completed": "Completed this week",
+      "lockedThisWeek": "Locked this week",
+      "footerPick": "You may hold one weekly charge at a time. Pick a card to read its terms.",
+      "footerHeld": "Your charge for the week is set. The other three unlock at the reset.",
+      "dialogHeading": "Weekly quest: {category}",
+      "objectives": "Quest objectives",
+      "rewards": "Rewards",
+      "alsoReceive": "You will also receive:",
+      "tally": "{count} / {required}",
+      "cacheDesc": "Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.",
+      "dialogNote": "Only one weekly charge can be active. It {reset}",
+      "accept": "Accept",
+      "decline": "Decline",
+      "kinds": {
+        "dungeons": {
+          "category": "Dungeons",
+          "lore": "The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.",
+          "goal": "Complete {count} dungeons on any difficulty.",
+          "goalLabel": "Dungeons completed"
+        },
+        "raid": {
+          "category": "Raid",
+          "lore": "Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.",
+          "goal": "Take part in {count} raid on any difficulty.",
+          "goalLabel": "Raids completed"
+        },
+        "battlegrounds": {
+          "category": "Battlegrounds",
+          "lore": "War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.",
+          "goal": "Complete {count} battlegrounds.",
+          "goalLabel": "Battlegrounds completed"
+        },
+        "worldboss": {
+          "category": "World boss",
+          "lore": "Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.",
+          "goal": "Defeat {count} world boss in the wild lands.",
+          "goalLabel": "World bosses defeated"
+        }
+      },
+      "commendHeading": "Emissary's commendation",
+      "commendNote": "{amount} standing to one faction of your choice, once a week.",
+      "commendClaimed": "This week's commendation went to the {faction}.",
+      "commendRewardLine": "{amount} standing with a faction of your choice",
+      "chosen": "Weekly quest taken: {category}",
+      "progress": "{label}: {count}/{required}",
+      "done": "Weekly quest complete: {category}"
     }
   },
   "gatherEvent": {
@@ -5777,6 +6018,9 @@ export const cs_CZ: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Neplatný název cechu.",
       "unknown": "Cech s tímto názvem neexistuje."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Propojení účtu Steam není momentálně k dispozici.",
@@ -5899,6 +6143,7 @@ export const cs_CZ: EnTranslations = {
       "progression": "Levelování a postup",
       "world": "Svět",
       "quests": "Úkoly",
+      "factions": "Factions & Standing",
       "dungeons": "Dungeony a raidy",
       "delves": "Výpravy",
       "rifts": "Trhliny",
@@ -7231,6 +7476,30 @@ export const cs_CZ: EnTranslations = {
       "ladderBody": "Každý zápas pohne trvalým hodnocením bojiště vázaným na postavu, ať vyhraješ nebo prohraješ, a tabulka všech dob řadí šampiony říše.",
       "rewardsHeading": "Odměny za zápas",
       "rewardsBody": "Každý dokončený zápas vyplácí čest: víc za výhru, útěchu za prohru nebo remízu, a navíc drobnou částku za každý smrtící úder, který zasadíš, i za každý, na kterém se podílíš, takže boj mimo vlajky se pořád vyplácí. Tvá první výhra dne navíc vyplácí bonus a panel ti ukazuje, dokud na tebe tento bonus ještě čeká. Tento den patří jen cti a přetáčí se podle vlastních hodin, ne podle resetu instancí říše. Opakované střetnutí se stejným týmem vyplácí za samotný zápas méně po tom prvním, rychle se ustálí na dně místo toho, aby se propadlo k nule, a odstoupený zápas nevyplácí nic. Utrať, co si vyděláš, u kteréhokoli intendanta Válečnictví."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "weeklyBody": "The weekly emissary in Eastbrook Vale adds a second road: finish the week's charge and you may name one faction to receive his commendation of standing, once a week, at the window where you took the charge.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "Kniha skutků je místo, kde si svět počítá vše, co máš za sebou: od prvních kroků z počátečního údolí až po nejtěžší boje, jaké říše nabízí. Vykonávej skutky při hraní, nos tituly, které ti udělí, a sleduj, jak tvůj věhlas roste.",
@@ -10123,6 +10392,9 @@ export const cs_CZ: EnTranslations = {
         "readyQuest": "Úkol připravený k odevzdání",
         "repeatQuest": "Opakovatelný úkol",
         "cooldownQuest": "Úkol čeká na obnovení",
+        "availableWorldQuest": "Available world quest: {name}",
+        "activeWorldQuest": "Active world quest: {name}",
+        "worldBoss": "World boss: {name}",
         "questObjective": "Oblast cíle úkolu",
         "readyOre": "Dostupná rudná žíla",
         "readyWood": "Dostupná skupina stromů",
@@ -10899,6 +11171,8 @@ export const cs_CZ: EnTranslations = {
       "browseGoodsAria": "Procházet zboží od {name}",
       "worldMarket": "Ukaž mi Světový trh.",
       "worldMarketAria": "Otevřít Světový trh",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Přijmout",
       "decline": "Odmítnout",
       "continue": "Pokračovat",
@@ -10918,8 +11192,345 @@ export const cs_CZ: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Vyžaduje úroveň {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Unknown world quest ({id})",
+      "itemReward": "Item reward: {name}",
+      "rewardLine": "Rewards: {reward}",
+      "availableStatus": "Available world quest",
+      "activeStatus": "Active world quest",
+      "expiresIn": "Expires in {time}",
+      "mineOre": "Mine copper ore",
+      "recoverObject": "Recover {name}",
+      "redirectLeyBeam": "Redirect the ley beam",
+      "matchConfections": "Match enchanted confections",
+      "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escort the caravan: {zone}",
+      "salvageWreckage": "Salvage debris washed along the strand from the wreck northwest of Gullhaven",
+      "banner": {
+        "riftOpens": "A rift tears open on the strand! Raiders are coming for the salvage.",
+        "captainSteps": "The raider captain steps through the rift!",
+        "riftRouted": "The raiders are routed. The strand is yours again.",
+        "championRises": "Extra loot! A champion rises at the site. Bring it down together.",
+        "championFallen": "Extra loot! The champion falls: a bonus purse for everyone who fought it.",
+        "endlessBegins": "The line holds! Endless waves begin, each one harder. Leave the cannon whenever you like."
+      },
+      "shadow": {
+        "title": "Under Cover of Shadow",
+        "objective": "Steal four sealed orders without being caught",
+        "cloak": "Duskweave Cloak",
+        "pickpocket": "Pick Pocket",
+        "leave": "Remove Cloak",
+        "stealTip": "Approach from behind and remain still while taking the orders. Stay out of the lantern beams.",
+        "leaveTip": "Remove the cloak. Your recovered orders are kept.",
+        "documents": "Orders recovered: {count}/4",
+        "suspicion": "Suspicion: {value}",
+        "safe": "Steal from behind. Lantern guards sweep wide beams that see through the cloak; wait for a clear opening.",
+        "behind": "Move behind the guard before stealing.",
+        "danger": "You are being spotted! Get out of sight!",
+        "channel": "Stealing... {seconds}s",
+        "noTarget": "Move close to a guard carrying orders.",
+        "start": "Speak with Scout Valerie to borrow her cloak.",
+        "caught": "Caught! Return to Scout Valerie for another cloak. Your orders are safe.",
+        "complete": "All four orders recovered."
+      },
+      "investigation": {
+        "title": "A Borrowed Face",
+        "objective": "Unmask and defeat the infiltrator",
+        "briefing": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.",
+        "instructions": "Read the standing orders and watch ledger, then question all four guards. Compare their stories with the records.",
+        "confront": "Report to Sergeant Alric and name the guard whose story contradicts the records.",
+        "name": "Which of my guards is wearing a borrowed face?",
+        "accuseOption": "Accuse {name}",
+        "cleared": "Sergeant Alric: That soldier is accounted for. Compare the other stories with our records and try again.",
+        "guardCleared": "Sergeant Alric has already accounted for this soldier.",
+        "revealed": "The creature has shed this face. Defeat it.",
+        "defeat": "Defeat the revealed infiltrator.",
+        "heard": "Guards questioned: {count}/4",
+        "clues": "Records examined: {count}/2",
+        "clueNames": {
+          "c0": "Standing Orders",
+          "c1": "Watch Ledger"
+        },
+        "variants": {
+          "v0": {
+            "clue0": "The south bridge has been closed since dawn. All patrols must use the western road.",
+            "clue1": "Orin was assigned to gate duty. Nella, Bram and Tessa patrolled the western road.",
+            "guard0": "My patrol took the western road this morning.",
+            "guard1": "I crossed the south bridge on my morning patrol.",
+            "guard2": "I patrolled the western road with Nella and Tessa.",
+            "guard3": "The south bridge is closed. We used the western road."
+          },
+          "v1": {
+            "clue0": "Today's password is Reedwatch. Yesterday's password, Lantern, is no longer valid.",
+            "clue1": "All four guards were briefed on the new password at dawn.",
+            "guard0": "Reedwatch. I learned the new password at dawn.",
+            "guard1": "Lantern was yesterday's password. Today we use Reedwatch.",
+            "guard2": "All four of us attended the dawn briefing.",
+            "guard3": "Today's password is Lantern. I heard it at the dawn briefing."
+          },
+          "v2": {
+            "clue0": "All garrison supply crates must carry blue wax seals. Reject any crate with a red seal.",
+            "clue1": "Today's delivery was inspected: every crate had an intact blue wax seal.",
+            "guard0": "I inspected today's delivery. Every crate had a red wax seal.",
+            "guard1": "We only accept crates sealed with blue wax.",
+            "guard2": "The ledger records blue seals on today's delivery.",
+            "guard3": "No crates with red seals were accepted today."
+          },
+          "v3": {
+            "clue0": "The night watch relights the east beacon at dusk. The west beacon stays dark until the ferry signals.",
+            "clue1": "Nella and Orin held the gate through the night. Bram and Tessa walked the causeway and relit the east beacon at dusk.",
+            "guard0": "Orin and I had the gate all night. Nothing came through but the fog.",
+            "guard1": "Gate duty with Nella. We watched the east beacon come alight at dusk, as ordered.",
+            "guard2": "Tessa and I walked the causeway. We lit the west beacon at dusk so the ferry could see us.",
+            "guard3": "Causeway patrol with Bram. We relit the east beacon the moment the sun went down."
+          },
+          "v4": {
+            "clue0": "The quartermaster's cart arrives at noon by the north road. No supplies come by water while the marsh is flooded.",
+            "clue1": "Noon delivery received from the north road. Tessa signed for it; Bram and Nella unloaded; Orin was at the well.",
+            "guard0": "I helped Bram unload the cart at noon. Salt pork and lamp oil, the usual.",
+            "guard1": "I unloaded the noon delivery myself, straight off the supply barge.",
+            "guard2": "Nella and I carried the crates in. Tessa signed the ledger.",
+            "guard3": "The cart came up the north road at noon. I signed for it."
+          },
+          "v5": {
+            "clue0": "The fallen from the last raid lie in the chapel crypt. Nobody enters the crypt without the sergeant's key.",
+            "clue1": "The sergeant's key has not left his belt since the raid. Nella, Orin and Bram stood the wall; Tessa kept the yard.",
+            "guard0": "I stood the wall. The crypt has stayed locked since the raid; only the sergeant holds the key.",
+            "guard1": "Wall duty with Nella and Bram. Quiet, except for the frogs.",
+            "guard2": "The wall, all day. Nobody has been near the crypt.",
+            "guard3": "I kept the yard and looked in on the crypt this morning. The fallen are resting."
+          }
+        }
+      },
+      "horde": {
+        "title": "The Last Barricade",
+        "objective": "Defend the barricade and defeat the horde commander",
+        "ready": "Speak to the barricade captain to begin.",
+        "countdown": "Horde incoming in {seconds}s!",
+        "status": "{seconds}s left. Kills: {kills}. Barricade: {barrier}%.",
+        "upgrade": "Weapon: {weapon}",
+        "loadout": "Shots: {count} | +{speed}% speed | {weapon}",
+        "exit": "Leave defense",
+        "gained": "Upgrade: {upgrade}",
+        "killBurst": "+{count} defeated!",
+        "choices": {
+          "projectile": "+1 shot",
+          "haste": "+25% fire rate",
+          "pierce": "Piercing shots",
+          "explosive": "Explosive shots",
+          "double": "x2 shots"
+        },
+        "weapons": {
+          "0": "Repeater",
+          "1": "Twin Shot",
+          "2": "Piercing Shot",
+          "3": "Explosive Shot"
+        },
+        "controls": "Auto-fire. A/D, arrows or joystick. Backward: leave.",
+        "supplies": "Break one crate to choose. The other disappears!",
+        "result": "{rating}! Score: {score}.",
+        "resultStats": "Kills: {kills}. Barricade: {barrier}%.",
+        "failed": "Defense failed. Try again!",
+        "replay": "Speak to the captain to retry. Rewards once per rotation.",
+        "medals": {
+          "gold": "Gold",
+          "silver": "Silver",
+          "bronze": "Bronze"
+        }
+      },
+      "wispMaze": {
+        "leave": "Leave maze",
+        "title": "Wispwood Maze",
+        "objective": "Recover every stolen coin purse from the maze",
+        "ready": "Speak to the maze keeper to begin.",
+        "controls": "Move through the maze to pick up the coin purses. Avoid the shadows. Radiant wisps let you banish shadows for a short time.",
+        "collected": "Coin purses: {count}/{total}",
+        "lives": "Lives: {count}/3",
+        "power": "Wisp power: {seconds}s",
+        "countdown": "Starting in {seconds}s",
+        "collect": "Pick up the coin purses. Avoid shadows.",
+        "powered": "Power surge! Touch shadows to banish them.",
+        "finished": "Every coin purse is recovered!",
+        "retry": "Three lives restored. Try the maze again.",
+        "startNormal": "Enter the maze: Normal ({shadows} shadows)",
+        "startHard": "Enter the maze: Hard ({shadows} shadows, bonus purse)"
+      },
+      "forge": {
+        "title": "A Helping Hammer",
+        "objective": "Help Smith Mara forge a shield",
+        "ready": "Speak to Smith Mara to begin.",
+        "countdown": "Ready your hands! Starting in {seconds}s.",
+        "preparing": "Nicely done! Next request...",
+        "fuel": "Woodpile",
+        "metal": "Ingot Crate",
+        "water": "Well",
+        "tools": "Anvil",
+        "request": {
+          "fuel": "Stoke the fire! Add some wood!",
+          "metal": "More metal! Open the ingot crate!",
+          "water": "Cool it down! Water from the well!",
+          "tools": "Hammer it into shape! Use the anvil!"
+        },
+        "sequence": "{instruction} Then click the {next}.",
+        "round": "Request {round}/{total}: step {step}/{steps}",
+        "thresholds": "Gold: {gold}s or less. Silver: {silver}s or less.",
+        "starting": "Getting ready...",
+        "finished": "Fine work! A shield fit for the garrison!",
+        "failed": "Too many mistakes! The metal cracked. Speak to Mara to try again.",
+        "wrong": "Wrong tool! +{penalty}s. Try the requested object.",
+        "correct": "That is it! Keep going.",
+        "result": "{rating}! {seconds}s. Mistakes: {mistakes}.",
+        "replay": "Speak to Mara to try again. Rewards are earned once per rotation.",
+        "medals": {
+          "gold": "Gold",
+          "silver": "Silver",
+          "bronze": "Bronze"
+        },
+        "strike": "Strike",
+        "strikeTip": "Hammer the piece. Press when the needle crosses the dark band; the band narrows and the needle quickens with every good blow. A blow outside the band, or on a cold forge, costs three seconds.",
+        "stoke": "Stoke",
+        "stokeTip": "Throw wood on the fire. The forge cools all the time; keep its heat above {floor} or your blows land cold.",
+        "strikes": "Strikes: {count}/{total}",
+        "heat": "Forge heat: {value} (keep above {floor})",
+        "mistakes": "Mistakes: {count}",
+        "meterAria": "Hammer timing meter",
+        "hintStrike": "Watch the needle. Strike inside the dark band!",
+        "hintStoke": "The forge is cooling! Stoke the fire before you strike.",
+        "hit": "Clean blow! The band narrows.",
+        "miss": "Missed the band! +{penalty}s.",
+        "cold": "Cold strike! Stoke the fire first. +{penalty}s."
+      },
+      "glider": {
+        "title": "Windrider Slalom",
+        "boost": "Extra Speed",
+        "boostTip": "Increase your flight speed by {speed} yd/s, up to {maximum} yd/s. Available while flying. Recharges in {seconds} seconds.",
+        "objective": "Soar through the wind rings and land in the marked zone",
+        "ready": "Speak to Flightmaster Zephyr to launch.",
+        "countdown": "Launch in {count}... Hold tight!",
+        "flying": "Rings: {rings}/{total} | Time: {time}s | Speed: {speed} yd/s",
+        "climb": "Climb",
+        "climbTip": "Hold to pull the nose up and trade speed for height. Tap for a short nudge. Slow flight loses lift.",
+        "dive": "Dive",
+        "diveTip": "Hold to point the nose down and gain speed. Tap for a short nudge.",
+        "controls": "Hold right mouse and look up to climb at the cost of speed; look down to dive and gain speed. Slow flight loses lift. Left/right steer; backward brakes. Jump or swim up/down also control pitch. Fly forward through wind tunnels for a speed boost, once per tunnel per attempt.",
+        "landed": "{rating}! Passed {rings}/{total} rings in {time}s.",
+        "failed": "Descent failed! Landed off course or missed too many rings.",
+        "retry": "Talk to Zephyr to retry, or to Skye by the landing zone to return to the launch point.",
+        "nextRing": "Aim through the next wind ring along the canyon. Clear at least {minimum} rings, then land in the marked zone.",
+        "landing": "All rings cleared! Steer onto the landing zone ahead.",
+        "complete": "Landing complete!",
+        "score": "Score: {score}.",
+        "medals": {
+          "gold": "Gold",
+          "silver": "Silver",
+          "bronze": "Bronze"
+        }
+      },
+      "calligraphyTitle": "Arcane Calligraphy",
+      "traceOutline": "Trace the outline with your footsteps",
+      "traceRoundInstruction": "Round {round} of {total}: {shape}. {instruction}",
+      "traceShape": {
+        "triangle": "Triangle",
+        "square": "Square",
+        "star": "Star",
+        "hourglass": "Hourglass",
+        "lightning": "Lightning Rune",
+        "spiral": "Angular Spiral",
+        "double-triangle": "Twin-Triangle Sigil",
+        "diamond": "Diamond",
+        "pentagon": "Pentagon",
+        "arrow": "Arrow Rune",
+        "zigzag": "Zigzag Sigil",
+        "cross": "Cross Rune"
+      },
+      "traceRating": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold"
+      },
+      "traceScoreResult": "Complete! {rating}: {score}/{total}. Base reward unchanged. Gold: deed, title, +10 Renown.",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "This rune needs a newer game version.",
+      "traceReaction": {
+        "tessaTriangle": "Three corners, and every one in its place!",
+        "pipSquare": "Four sides! I think I can do that too!",
+        "elianFinal": "Final rune. A line may cross or revisit a point; follow the bright marker to the next corner.",
+        "elianGold": "Beautifully traced! Your steps have earned their place in gold.",
+        "elianComplete": "A complete rune! Care and practice will make your next one even finer."
+      },
+      "traceReady": "Speak to the instructor to begin.",
+      "tracePreview": "Watch the outline. Golden sparkles will guide you.",
+      "traceStart": "Move to the start marker. Trace either way.",
+      "traceDrawing": "Follow golden sparkles to the bright corner. Blue marks your trail.",
+      "traceSuccess": "Outline complete!",
+      "traceRetry": "Speak to the instructor to try again.",
+      "traceOffPath": "You left the outline. Speak to the instructor to retry.",
+      "traceMovement": "Stay on foot and on the ground. Speak to the instructor to retry.",
+      "traceTimeout": "Time ran out. Speak to the instructor to retry.",
+      "traceCombat": "Leave combat, then speak to the instructor to retry.",
+      "puzzleTitle": "Ley Beam Alignment",
+      "puzzleBeamReach": "Crystals reached: {count}",
+      "puzzleVictoryTitle": "Perfect alignment",
+      "puzzleVictoryDetail": "The ley beam has reached its destination.",
+      "puzzleDefeatTitle": "Alignment lost",
+      "puzzleDefeatDetail": "The current has faded. The ritual is unfinished.",
+      "puzzleReturn": "Return to realm",
+      "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
+      "puzzleLevel": "Daily level {level}",
+      "puzzleBonusLevel": "Bonus level {level} of {total}",
+      "puzzleBonusCharged": "The cache hums with a bonus charge: level {level} of {total} awaits. Touch the Ley Cache again for extra gold.",
+      "puzzleBonusPaid": "Bonus purse earned!",
+      "puzzleBonusDone": "Every bonus level cleared. The cache rests until the next offer.",
+      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
+      "puzzleRotateTile": "Rotate tile {tile}",
+      "puzzleConnectors": "Connectors: {connectors}.",
+      "puzzlePowered": "The beam reaches this tile.",
+      "puzzleUnpowered": "The beam does not reach this tile.",
+      "puzzleClose": "Close ley beam puzzle",
+      "puzzleSource": "Source",
+      "puzzleTarget": "Destination",
+      "puzzleSourceEndpoint": "Source: {direction}.",
+      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "puzzleRetry": "Try again",
+      "puzzleTimer": "{seconds}s",
+      "puzzleTimerAria": "Time remaining: {seconds} seconds",
+      "startQuest": "Start World Quest",
+      "startEscort": "Start Escort",
+      "escortTitle": "Caravan",
+      "alreadyCompleted": "You have already completed this World Quest for this cycle.",
+      "inProgress": "This World Quest is already underway.",
+      "match3Title": "Confection Cascade",
+      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
+      "match3Moves": "Moves: {current}/{total}",
+      "match3Cleared": "Confections cleared: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Row {row}, column {column}: {candy}",
+      "match3Selected": "Selected",
+      "match3Reset": "Restart level",
+      "match3Close": "Close confection puzzle",
+      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
+      "match3VictoryTitle": "Sweet victory",
+      "match3VictoryDetail": "The enchanted collection is complete.",
+      "match3DefeatTitle": "Bitter defeat",
+      "match3DefeatDetail": "Your moves are spent. A fresh collection awaits.",
+      "match3TryAgain": "Try again",
+      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
+      "match3ResultSummary": "{title}. {detail} {cleared}.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "berry crystal",
+        "citrus": "citrus orb",
+        "mint": "mint triangle",
+        "grape": "grape square",
+        "star": "sugar star"
+      }
+    },
     "logs": {
       "accepted": "Úkol přijat: {name}",
+      "worldQuestStarted": "World quest started: {name}",
       "abandoned": "Úkol opuštěn: {name}",
       "completed": "Úkol dokončen: {name}",
       "ready": "{name} ({status})",
@@ -14306,6 +14917,18 @@ export const cs_CZ: EnTranslations = {
       "sprung_trap": {
         "name": "Spuštěná bažinná past"
       },
+      "leyline_cache": {
+        "name": "Miniature Ley Cache"
+      },
+      "confection_game_box": {
+        "name": "Confectioner's Game Box"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Eastbrook Freight Crate"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Eastbrook Freight Wagon"
+      },
       "hearthlined_treads": {
         "name": "Boty podšité ohništěm"
       },
@@ -16322,6 +16945,9 @@ export const cs_CZ: EnTranslations = {
       "event_skin_token": {
         "name": "Tajemná kosmetická skrýš"
       },
+      "emissary_cache": {
+        "name": "Emissary's Cache"
+      },
       "heroic_mark": {
         "name": "Hrdinská značka"
       },
@@ -16633,6 +17259,51 @@ export const cs_CZ: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "Žárová stráž, Varkhulův val"
+      },
+      "rift_watchers_band": {
+        "name": "Rift Watcher's Band"
+      },
+      "rift_surveyors_satchel": {
+        "name": "Rift Surveyor's Satchel"
+      },
+      "riftwalkers_tunic": {
+        "name": "Riftwalker's Tunic"
+      },
+      "riftwarden_voidblade": {
+        "name": "Riftwarden's Voidblade"
+      },
+      "champion_rift_band": {
+        "name": "Champion's Rift Band"
+      },
+      "order_prayer_beads": {
+        "name": "Order Prayer Beads"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "Vestments of the Acolyte"
+      },
+      "templar_dawn_shield": {
+        "name": "Templar's Dawn Shield"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "Dawnkeeper's Consecrated Mace"
+      },
+      "champion_dawn_medallion": {
+        "name": "Champion's Dawn Medallion"
+      },
+      "automaton_cog_ring": {
+        "name": "Automaton Cog Ring"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "Clockwork Tinker's Pack"
+      },
+      "artificers_welding_cowl": {
+        "name": "Artificer's Welding Cowl"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "Forgemaster's Crag Cleaver"
+      },
+      "champion_forged_loop": {
+        "name": "Champion's Forged Loop"
       }
     },
     "mobs": {
@@ -16660,6 +17331,15 @@ export const cs_CZ: EnTranslations = {
       "vale_bandit": {
         "name": "Bandita z údolí"
       },
+      "eastbrook_freight_caravan": {
+        "name": "Eastbrook Freight Caravan"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Willowfen Remedy Caravan"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Frostveil Supply Caravan"
+      },
       "restless_bones": {
         "name": "Neklidné kosti"
       },
@@ -16680,6 +17360,9 @@ export const cs_CZ: EnTranslations = {
       },
       "drowned_dead": {
         "name": "Utopený mrtvý"
+      },
+      "fenbridge_infiltrator": {
+        "name": "The Borrowed Face"
       },
       "fen_troll": {
         "name": "Troll z Mirefenu"
@@ -17388,6 +18071,116 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "npcs": {
+      "glider_instructor": {
+        "name": "Flightmaster Zephyr",
+        "title": "Windrider Instructor",
+        "greeting": "The thermals howling off the cliffs of The Shear are fierce today. Ready to strap into the mechanical glider and test your wings through the slalom course?"
+      },
+      "glider_apprentice": {
+        "name": "Skye",
+        "title": "Zephyrs Apprentice",
+        "greeting": "Great flight down the canyon. Speak with me whenever you need a magical updraft back to Zephyr at The Shear."
+      },
+      "shadow_cloak_scout": {
+        "name": "Scout Valerie",
+        "title": "Covert Operations",
+        "greeting": "Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him."
+      },
+      "shadow_guard_north": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "These sealed orders are for the captain. Keep your distance."
+      },
+      "shadow_guard_south": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "I have a dispatch to deliver. Move along."
+      },
+      "shadow_guard_east": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "No delays. The watch is waiting for these orders."
+      },
+      "shadow_guard_west": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "Official business. Keep the path clear."
+      },
+      "shadow_sentry_south": {
+        "name": "Lantern Sentry",
+        "title": "True Sight",
+        "greeting": "My lantern reveals more than shadows. Stay where I can see you."
+      },
+      "shadow_sentry_north": {
+        "name": "Lantern Sentry",
+        "title": "True Sight",
+        "greeting": "Nothing slips past the lantern watch."
+      },
+      "shadow_watch_west": {
+        "name": "Lantern Watchman",
+        "title": "True Sight",
+        "greeting": "Hold there. The lantern sees what the eye misses."
+      },
+      "shadow_watch_east": {
+        "name": "Lantern Watchman",
+        "title": "True Sight",
+        "greeting": "Nobody crosses my light unseen."
+      },
+      "forge_instructor": {
+        "name": "Smith Mara",
+        "title": "Wyrmwatch Smith",
+        "greeting": "Help me finish a shield! Click the supplies I call for. Quick hands earn a better medal."
+      },
+      "infiltrator_captain": {
+        "name": "Sergeant Alric",
+        "title": "Fenbridge Watch",
+        "greeting": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records."
+      },
+      "infiltrator_nella": {
+        "name": "Guard Nella",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "infiltrator_orin": {
+        "name": "Guard Orin",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "infiltrator_bram": {
+        "name": "Guard Bram",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "infiltrator_tessa": {
+        "name": "Guard Tessa",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "wisp_maze_keeper": {
+        "name": "Keeper Liora",
+        "title": "Warden of the Hedge Maze",
+        "greeting": "Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe."
+      },
+      "weekly_emissary": {
+        "name": "Cham Pete",
+        "title": "Emissary",
+        "greeting": "The Vale keeps a ledger of deeds, and I keep the ledger. Pick one charge for the week, see it through, and the purse is yours."
+      },
+      "calligraphy_instructor": {
+        "name": "Instructor Elian",
+        "title": "Arcane Calligraphy",
+        "greeting": "A steady step makes a steady line. Teach my apprentices a triangle, a square, and an advanced rune."
+      },
+      "calligraphy_apprentice_1": {
+        "name": "Apprentice Tessa",
+        "title": "Student of Calligraphy",
+        "greeting": "I keep turning too soon. Will you show me where the corners belong?"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "Apprentice Pip",
+        "title": "Student of Calligraphy",
+        "greeting": "A triangle first, then a square, then a rune. One steady step at a time!"
+      },
       "the_merchant": {
         "name": "Kupec",
         "title": "Správce Světového trhu",
@@ -17822,6 +18615,26 @@ export const cs_CZ: EnTranslations = {
         "name": "Riftová tvůrkyně Maelis",
         "title": "Mistryně riftové kovárny",
         "greeting": "Kapela Riftbound si pamatuje přestávku, která ji udělala, {className}. Přines mi kapelu a esenci, která se zbaví, a já ji naučím pamatovat si víc."
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "Quartermaster Vaelen",
+        "title": "Rift Watch Provisioner",
+        "greeting": "The Rift Watch protects the shore and watches the deep tears. Our stores are open to those of recognized standing."
+      },
+      "npc_church_order_quartermaster": {
+        "name": "Templar Althea",
+        "title": "Church Order Quartermaster",
+        "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
+      },
+      "npc_automaton_quartermaster": {
+        "name": "Artificer Tobrin",
+        "title": "Automaton Requisitioner",
+        "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
+      },
+      "npc_wq_taskmaster": {
+        "name": "Taskmaster Kaelen",
+        "title": "World Quest Taskmaster",
+        "greeting": "The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment."
       },
       "forgemistress_darva": {
         "name": "Mistryně kovárny Darva",
@@ -20658,6 +21471,9 @@ export const cs_CZ: EnTranslations = {
           },
           "4": {
             "label": "Trhlinová pole"
+          },
+          "5": {
+            "label": "The Wreck"
           }
         }
       },

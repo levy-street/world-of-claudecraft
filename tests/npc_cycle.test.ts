@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { type CycleEntity, nearbyNpcs, nextNpcTarget } from '../src/game/npc_cycle';
+import {
+  type CycleEntity,
+  nearbyNpcs,
+  nextNpcTarget,
+  nextNpcTargetForWorld,
+} from '../src/game/npc_cycle';
 
 const npc = (id: number, x: number, z = 0, over: Partial<CycleEntity> = {}): CycleEntity => ({
   id,
@@ -60,5 +65,43 @@ describe('nextNpcTarget', () => {
 
   it('answers null with nobody around', () => {
     expect(nextNpcTarget([], origin, null)).toBeNull();
+  });
+});
+
+it('skips the revealed disguise for its investigator and restores it after completion', () => {
+  const progress = {
+    questId: 'wq_mirefen_infiltrator',
+    state: 'active' as 'active' | 'completed',
+    count: 0,
+    investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
+  };
+  const world = {
+    // A cycle whose story names Orin (2146900022): variant 0 of the rotation.
+    worldQuestCycle: 'wq3_0',
+    worldQuestLog: new Map([[progress.questId, progress]]),
+  };
+  const people = [npc(2146900022, 1), npc(2146900021, 2)];
+  expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900021);
+  expect(nextNpcTarget(people, origin, 2146900022, -1, 40, world)).toBe(2146900021);
+  // A closed case empties the post for its investigator; the next rotation
+  // (no log entry) brings everyone back.
+  progress.state = 'completed';
+  expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBeNull();
+  world.worldQuestLog.clear();
+  expect(nextNpcTarget(people, origin, null, 1, 40, world)).toBe(2146900022);
+});
+
+describe('nextNpcTargetForWorld', () => {
+  it('cycles from the world player exactly as nextNpcTarget does with the same inputs', () => {
+    const list = [npc(1, 5), npc(2, 10), npc(3, 30)];
+    const entities = new Map(list.map((e) => [e.id, e]));
+    for (const targetId of [null, 1, 2, 3]) {
+      for (const step of [1, -1] as const) {
+        const world = { entities, player: { pos: origin, targetId } };
+        expect(nextNpcTargetForWorld(world, step)).toBe(
+          nextNpcTarget(list, origin, targetId, step),
+        );
+      }
+    }
   });
 });

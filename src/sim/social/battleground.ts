@@ -48,6 +48,7 @@ import type { ArenaReturnPools } from '../sim';
 import type { SimContext } from '../sim_context';
 import { settleTeleportArrival } from '../teleport_arrival';
 import { type Aura, DT, type Entity, type Vec3 } from '../types';
+import { onBattlegroundMatchForWeeklyQuests } from '../weekly_quests';
 import { eloDelta, snapshotArenaReturnPools } from './arena';
 import { bgBackfillSeat, pickBgBackfillGroup } from './battleground_backfill';
 import { recordBgOutcome } from './battleground_outcomes';
@@ -2037,6 +2038,7 @@ function resolveBgResult(
         ).firstWinBonus;
       }
       ctx.markDeedsDirty(pid);
+      onBattlegroundMatchForWeeklyQuests(ctx, meta);
       ctx.emit({
         type: 'bgEnd',
         pid,

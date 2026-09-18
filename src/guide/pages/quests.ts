@@ -84,6 +84,7 @@ export const quests: GuidePage = {
 
         ${related([
           { href: hrefFor('world'), key: 'guide.nav.world' },
+          { href: hrefFor('factions'), key: 'guide.nav.factions' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
         ])}

@@ -1903,6 +1903,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // Heroic-dungeon participation token: the final boss of a heroic instance
   // directly awards marks to every eligible participant (awardHeroicMarks in
   // src/sim/instances/dungeons.ts). Not vendorable; a spend sink ships later.
+  // The weekly emissary's reward chest (src/sim/weekly_quests.ts): opening it
+  // (src/sim/emissary_cache.ts) hands over one Normal raid piece for the
+  // owner's class plus a few Heroic Marks. Bound to the earner like a mark.
+  emissary_cache: {
+    id: 'emissary_cache',
+    name: "Emissary's Cache",
+    kind: 'tool',
+    quality: 'epic',
+    use: { type: 'container', container: 'emissary_cache' },
+    stackSize: 5,
+    sellValue: 0,
+    soulbound: true,
+  },
   heroic_mark: {
     id: 'heroic_mark',
     name: 'Heroic Mark',

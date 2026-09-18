@@ -30,6 +30,7 @@ import {
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight } from './deck_surfaces';
+import { isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { eastbrookDeckSurface } from './eastbrook_harbor';
@@ -4905,14 +4906,7 @@ export interface Decoration {
   biome: BiomeId;
 }
 
-const DECORATION_EXCLUSION_RADIUS = 1.2;
-const DECORATION_EXCLUSIONS = [{ x: 2.456450840458274, z: 211.33819991815835 }];
-
-function isExcludedDecoration(x: number, z: number): boolean {
-  return DECORATION_EXCLUSIONS.some(
-    (p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS,
-  );
-}
+// Shared by render scatter and its collision grid; independent of terrain shaping.
 
 export function zoneBiomeAt(x: number, z: number): BiomeId {
   // Delegates to zoneAt rather than repeating its rect walk over the static

@@ -40,12 +40,15 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // shared stream again: protection 41.7 to 40.15, retribution 52.45 to
 // 55.75; holy unmoved. The keep-side graveyard's move to the owner's
 // churchyard (the rebuild epic's Pale Keeper seat) forks it once more:
-// retribution 55.75 to 59.2; holy and protection unmoved. The wide
-// 35-65s design band still holds.
+// retribution 55.75 to 59.2; holy and protection unmoved. The
+// release/v0.43.0 merge into feature/world-quests forks it once more, through
+// the branch's hedge_knight camp move in src/sim/content/evergarden.ts
+// (c43178a68c): retribution 59.2 back to 55.75; holy and protection unmoved.
+// The wide 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 41.25,
   protection: 40.15,
-  retribution: 59.2,
+  retribution: 55.75,
 };
 
 function addDummy(sim: Sim): Entity {

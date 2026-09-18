@@ -848,11 +848,13 @@ describe('item-art audit builder', () => {
     // PR3941: measured again after retiring the five premium reins.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '74bd65a9b0efd433b12c9bf0cdaa509eeac3e4986edb8878e8f069f4e24088f0',
-      catalogBytes: 699134,
+      // Re-minted at the weekly emissary rebase: the catalog now carries the 15
+      // faction quartermaster owners and the Emissary's Cache chest (1303 / 1321).
+      catalogSha256: 'e347107788203b8b58789cd97e39c8c9ab0871770e4e603696091cb82a5ca165',
+      catalogBytes: 709767,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1283,
-      liveItemCount: 1301,
+      catalogCount: 1303,
+      liveItemCount: 1321,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -870,7 +872,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'aaa08264b12c4be606ab2ffd06a573c7cf24a78c440bc2198b9f18b16e8062de',
+      shippingCatalogSha256: 'a8e2e6a929d2f035776e4d542f83937823bc98a46d7ff97b2fc5d1f8d88573bf',
       machineChecksPassed: true,
       verdict: null,
     });

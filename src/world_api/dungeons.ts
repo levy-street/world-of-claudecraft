@@ -53,6 +53,9 @@ export interface IWorldDungeons {
   // Still-locked raids for the local player (unlock countdown in ms), driving the
   // minimap raid-lockout badge + panel. Empty when nothing is locked.
   raidLockouts(): RaidLockout[];
+  // Whether this fixed-position world boss is spawned and alive right now. Reward
+  // eligibility remains a separate per-player raid-lockout read.
+  worldBossActive(bossId: string): boolean;
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
   // Key into the per-Sim rift collision registry (sim/colliders.ts). Per world

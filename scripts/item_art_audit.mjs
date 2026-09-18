@@ -126,8 +126,13 @@ const build = await buildItemArtAudit({
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
     // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
-    catalogCount: 1283,
-    liveItemCount: 1301,
+    // + the World Quests branch merge (release/v0.43.0 sync): its two painted
+    // puzzle activators and two Eastbrook freight icons join both counts.
+    // + the 15 faction quartermaster pieces (wq-reputation merge) and the
+    // weekly emissary's cache chest (feature/weekly-quests): 1303 owners over
+    // 1321 live definitions, measured on the tree.
+    catalogCount: 1303,
+    liveItemCount: 1321,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

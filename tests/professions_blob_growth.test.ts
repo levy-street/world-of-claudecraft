@@ -199,6 +199,13 @@ const NON_PROFESSIONS_BLOB_FIELDS = [
   'vendorBuyback',
   'questLog',
   'questsDone',
+  'worldQuests',
+  // Faction standing rows (src/sim/factions.ts), persisted beside the
+  // world-quest log they are earned from.
+  'factions',
+  // The weekly emissary's pick (src/sim/weekly_quests.ts), beside the world
+  // quests it stands next to.
+  'weeklyQuest',
   'arenaRating',
   'arenaWins',
   'arenaLosses',
@@ -2318,8 +2325,32 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // q_hub_healing_numbers) joining questsDone in this maximal fixture: 23 and
     // 21 characters as `"<id>",` in the sorted array (26 + 24 bytes). MEASURED,
     // not inferred, same as every other row this equation names.
+    // Plus 375 at the release/v0.43.0 merge into feature/world-quests: the
+    // branch's eight world-quest deeds in the maximal character's deeds row
+    // (+285; 0abacf03af, c5f0329076, 2e6508f52b, 91fdf36c86) and its four quest
+    // items in deedStats.itemsDiscovered (+90; c5d5fe1718). Removing both
+    // reproduces every release pin; measured on the merged tree.
+    // Plus 358 at the wq-reputation merge: the 15 faction quartermaster item
+    // ids in the maximal character's deedStats.itemsDiscovered (sorted array
+    // rows of `"<id>",`). MEASURED on the merged tree (55,601 to 55,959;
+    // the deedStats row below moves 111 to 469 by the same 358).
+    // Plus 282 at the faction standing deeds (2026-09-17): the seven
+    // prog_*_trusted / prog_*_champion / prog_faction_champion_all ids in the
+    // maximal character's deeds row (the deeds row below moves 317 to 599 by
+    // the same 282). MEASURED on the tree (55,959 to 56,241).
     expect(counterfactualBytes - 156144).toBe(
-      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) + 183 + 1548 + 50 + 49,
+      Object.values(fixtureDelta).reduce((sum, value) => sum + value, 0) +
+        183 +
+        1548 +
+        50 +
+        49 +
+        375 +
+        358 +
+        // Plus 17 at the weekly emissary rebase: the Emissary's Cache id in the
+        // maximal character's deedStats.itemsDiscovered (the deedStats row
+        // below moves 469 to 486 by the same 17). MEASURED (56,241 to 56,258).
+        282 +
+        17,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2340,8 +2371,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       ),
       // questsDone moved from 50 to 100 against the SAME forgeBaseline reference
       // point: the +50 hub practice quest delta above, on top of the prior +50
-      // this row already carried.
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 32, deedStats: 21, reliquary: 80 });
+      // this row already carried. deeds 32 -> 317 and deedStats 21 -> 111 at the
+      // release/v0.43.0 merge: the world-quest deeds (+285) and quest items
+      // (+90) attributed in the +375 above. deedStats 111 -> 469 at the
+      // wq-reputation merge: the faction quartermaster items (+358 above).
+      // deeds 317 -> 599 at the faction standing deeds (+282 above); deedStats
+      // 469 -> 486 at the weekly emissary rebase (+17 above).
+    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 599, deedStats: 486, reliquary: 80 });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2354,7 +2390,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-    ).toBe(209773);
+      // 209,773 -> 210,148 at the release/v0.43.0 merge into feature/world-quests:
+      // the world-quest deeds and items (+375, attributed above) stay in this
+      // counterfactual, which removes only field_kit and the Bramblehide content.
+      // 210,506 -> 210,788 at the faction standing deeds (+282, the seven ids).
+      // 210,148 -> 210,506 at the wq-reputation merge: the 15 faction
+      // quartermaster item ids (+358, attributed above) stay here too.
+      // 210,506 -> 210,788 at the faction standing deeds (+282), in the deeds
+      // row this counterfactual keeps; +17 at the weekly emissary rebase.
+    ).toBe(210805);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2365,7 +2409,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211370);
+      // 211,370 -> 211,745 at the release/v0.43.0 merge into feature/world-quests:
+      // plus the world-quest deeds and items (+375), which this baseline keeps.
+      // 212,103 -> 212,385 at the faction standing deeds (+282, the seven ids).
+      // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
+      // 212,103 -> 212,385 at the faction standing deeds (+282); +17 at the
+      // weekly emissary rebase.
+    ).toBe(212402);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2415,8 +2465,22 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // the zero-valued Spirit keys the old normaliser wrote (-8). Re-based per
     // the standing rule (floor measurement minus 380, edge measurement plus
     // one, band width unchanged at 381): 211,002..211,383.
-    expect(bytes, reMint).toBeGreaterThan(211002);
-    expect(bytes, reMint).toBeLessThan(211383);
+    // RE-BASED at the release/v0.43.0 merge into feature/world-quests: 211,757
+    // bytes, up 375 from 211,382. The movers are the branch's eight world-quest
+    // deeds (deeds, +285) and four quest items (deedStats.itemsDiscovered, +90),
+    // attributed in the growth equation above; no container or ceiling changed
+    // shape. Floor at measurement minus 380, edge at measurement plus one.
+    // RE-BASED at the wq-reputation merge (faction quartermaster stock):
+    // 212,115 bytes, up 358 from 211,757. The mover is the 15 faction vendor
+    // item ids in deedStats.itemsDiscovered (+358, attributed in the growth
+    // equation above); no container or ceiling changed shape. Floor at
+    // measurement minus 380, edge at measurement plus one: 211,735..212,116.
+    // RE-BASED at the faction standing deeds: 212,397 bytes, up 282 from
+    // 212,115. The mover is the seven faction standing deed ids in the maximal
+    // character's deeds row (+282, attributed in the growth equation above).
+    // Shifted +17 at the weekly emissary rebase: the held weekly pick row.
+    expect(bytes, reMint).toBeGreaterThan(212034);
+    expect(bytes, reMint).toBeLessThan(212415);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

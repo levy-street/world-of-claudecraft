@@ -634,11 +634,12 @@ describe('Necromancy Warlock', () => {
     sim.ctx.rebucket(secondary);
 
     finishCast(sim, 'raise_graveguard');
-    // Six harvests, not five: the keep-side graveyard move (the rebuild
-    // epic) forked the shared stream and this seed's fifth harvest no
-    // longer procs the bonus fragment; one more cast restores the intended
-    // two-fragment bank the reap below spends from.
-    for (let fragment = 0; fragment < 6; fragment++) finishCast(sim, 'soul_harvest');
+    // Five harvests: the keep-side graveyard move (the rebuild epic) once
+    // forked the shared stream so this seed's fifth harvest stopped procing
+    // the bonus fragment and a sixth cast was needed; the release/v0.43.0
+    // merge into feature/world-quests (the moved Evergarden hedge knight camp)
+    // forks it again and five harvests bank the two-fragment reap once more.
+    for (let fragment = 0; fragment < 5; fragment++) finishCast(sim, 'soul_harvest');
     finishCast(sim, 'raise_skeletal_warrior');
     finishCast(sim, 'raise_bone_mage');
     expect(fragmentCount(sim.player)).toBe(2);
