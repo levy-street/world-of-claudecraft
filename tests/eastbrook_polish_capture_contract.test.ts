@@ -365,7 +365,7 @@ interface AttributionTargetFixture {
 // Re-minted for the Studio renderer and class material integration. Historical
 // captures are retained; only the runtime-input provenance seals changed.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd33be6e284a305a2fdfdbadc41197251618baf6fe44229cb059f2d5666d1d842';
+  '4d7903de45706c16d3178739b4707d260c965eac6242b6846fbc063635b5b0d9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
