@@ -10495,6 +10495,7 @@ export const nl_NL: EnTranslations = {
       "cantInForm": "Dat kun je niet doen in {form}-gedaante.",
       "bear": "Bruin",
       "cat": "Kat",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Dat kun je niet doen terwijl je van gedaante bent veranderd.",
       "stealthed": "Je moet in sluiptocht zijn.",
@@ -10826,7 +10827,8 @@ export const nl_NL: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Kat"
+      "cat": "Kat",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Vissen",

@@ -2945,6 +2945,7 @@ function buildHarnesses(shape: WorldShape, facet: PainterHostWriters): PainterHa
           aiming: false,
           procGlow: false,
           empowered: false,
+          naturesBoonGlow: false,
           ascensionSpender: false,
           ascensionCostLabel: '',
           fateConsumeReady: false,

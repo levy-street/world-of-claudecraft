@@ -10495,6 +10495,7 @@ export const vi_VN: EnTranslations = {
       "cantInForm": "Bạn không thể làm điều đó khi đang ở Hình {form}.",
       "bear": "Bruin",
       "cat": "Mèo",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "Bạn không thể làm điều đó khi đang biến hình.",
       "stealthed": "Bạn phải đang ẩn thân.",
@@ -10826,7 +10827,8 @@ export const vi_VN: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Mèo"
+      "cat": "Mèo",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Câu Cá",

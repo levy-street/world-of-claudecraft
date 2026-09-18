@@ -15491,6 +15491,175 @@ export const TARGETS = [
     },
   },
   {
+    // Nature's Boon (src/sim/combat/druid_natures_boon.ts). The change is a HUD
+    // STATE, not a window, so the evidence is the action bar while a window is
+    // live: an ability the window pays for wears the golden rim
+    // (.action-btn.natures-boon, src/styles/hud.css).
+    //
+    // The pair of desktop variants IS the proof, and the Cat one is the
+    // negative half: the same armed window, the same Oakhide slot, no rim,
+    // because Oakhide is a Bruin payoff and naturesBoonFormAllows refuses it
+    // out of Bruin Form. A positive frame alone would not tell a working form
+    // gate from a rim painted on everything. The window's other member
+    // (Wildbloom) is not in the curated druid form-bar defaults
+    // (ui/hud/action_bar/owned_class_spec_defaults.ts DRUID_FORM_DEFAULTS), so
+    // it has no slot to light on a stock form bar and is deliberately not what
+    // these frames are shot against.
+    //
+    // The window is armed the way a player arms it, by auto-attacking in form
+    // until the 1-in-15 roll lands, because the rim is painted off the real
+    // aura and nothing shorter proves the auto-attack hook fires at all. On the
+    // BASE branch the passive does not exist, so the identical recipe waits out
+    // its window and shoots the plain bar: that is the honest BEFORE frame, and
+    // the reason this recipe must never throw when the aura never arrives.
+    key: 'natures-boon-glow',
+    label: "Nature's Boon armed: Oakhide rims in Bruin Form and nowhere else",
+    when: [
+      'sim/combat/druid_natures_boon',
+      'ui/hud/action_bar/action_bar_painter',
+      'ui/hud/action_bar/action_bar_view.ts',
+    ],
+    variants: [
+      {
+        key: 'cat-form-desktop',
+        charClass: 'druid',
+        charName: 'Wildfang',
+        formAbility: 'cat_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'bruin-form-desktop',
+        charClass: 'druid',
+        charName: 'Wildfang',
+        formAbility: 'bear_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage: high enough to know both members of the window, committed to the
+      // feral spec (the passive's gate reads playerMods().spec, so a specless
+      // druid never rolls at all), then shifted through the REAL cast so the
+      // form aura and the form's own bar page are both live.
+      const staged = await page.evaluate((formAbility) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(40, player.id);
+        if (sim.setSpec?.('feral', player.id) !== true) {
+          return { ok: false, reason: 'the feral spec never took' };
+        }
+        player.resource = player.maxResource;
+        player.hp = player.maxHp;
+        sim.castAbility?.(formAbility, player.id);
+        return { ok: true };
+      }, variant.formAbility);
+      if (!staged.ok) throw new Error(staged.reason);
+      await page.waitForFunction(
+        () => {
+          const player = window.__game?.sim?.player;
+          return (
+            !!player &&
+            player.auras.some((a) => a.kind.startsWith('form_')) &&
+            player.gcdRemaining <= 0 &&
+            player.castingAbility === null
+          );
+        },
+        { timeout: 30000, polling: 100 },
+      );
+      // Let the level-up deed banners clear the middle of the screen before the
+      // bar shot, the way the swing-timer target does.
+      await wait(5200);
+      // Plant a durable hostile inside the (now feral) melee reach and engage
+      // auto-attack through the public toggle: the roll hangs off a LANDED
+      // melee swing, so nothing arms without a real target being really hit.
+      const engaged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        let mob = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.hp <= 0 || e.id === player.id) continue;
+          const d = (e.pos.x - player.pos.x) ** 2 + (e.pos.z - player.pos.z) ** 2;
+          if (d < best) {
+            best = d;
+            mob = e;
+          }
+        }
+        if (!mob) return { ok: false, reason: 'no living mob in the offline world' };
+        // Deep enough to outlast a full arming window at level 40 in form, so
+        // the shot is never a corpse and the swings never stop.
+        mob.maxHp = 200000;
+        mob.hp = 200000;
+        mob.hostile = true;
+        mob.pos.x = player.pos.x + Math.sin(player.facing) * 2;
+        mob.pos.z = player.pos.z + Math.cos(player.facing) * 2;
+        mob.pos.y = player.pos.y;
+        if (mob.prevPos) {
+          mob.prevPos.x = mob.pos.x;
+          mob.prevPos.y = mob.pos.y;
+          mob.prevPos.z = mob.pos.z;
+        }
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        player.targetId = mob.id;
+        sim.startAutoAttack?.(player.id);
+        return { ok: true, mobId: mob.id };
+      });
+      if (!engaged.ok) throw new Error(engaged.reason);
+      // Poll for the armed window rather than sleeping a fixed span: the offline
+      // sim advances on animation frames, so a wall-clock guess is either short
+      // (an unarmed AFTER frame, the exact false negative this target exists to
+      // avoid) or wastefully long. Topped up each pass so the druid never dies,
+      // runs out of resource, or loses the target mid-wait.
+      const armed = await page
+        .waitForFunction(
+          (mobId) => {
+            const sim = window.__game?.sim;
+            const player = sim?.player;
+            if (!sim || !player) return false;
+            player.hp = player.maxHp;
+            player.resource = player.maxResource;
+            const mob = sim.entities?.get(mobId);
+            if (mob) {
+              mob.hp = mob.maxHp;
+              if (player.targetId !== mob.id) player.targetId = mob.id;
+            }
+            return player.auras.some((a) => a.id === 'natures_boon');
+          },
+          { timeout: 120000, polling: 100 },
+          engaged.mobId,
+        )
+        .then(() => true)
+        .catch(() => false);
+      // Deliberately NOT a throw: on the base branch nothing ever arms, and that
+      // plain bar is the BEFORE half of this comparison.
+      if (!armed) console.log(`[shot] ${variant.key}: no window armed (expected on the base arm)`);
+      // Desktop only, deliberately: the rim is painted by action_bar_painter
+      // onto a .action-btn, and the mobile radial ring is a different painter
+      // that never receives the class, so a touch variant here would shoot a
+      // frame that cannot show the change either way.
+      return { clip: '#actionbar' };
+    },
+  },
+  {
     key: 'swing-timer',
     label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],

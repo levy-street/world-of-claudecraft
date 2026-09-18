@@ -183,10 +183,20 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   const key = exact[text];
   if (key) return t(key);
 
-  let match = /^You must be in (Bruin|Cat) Form\.$/.exec(text);
+  // The three shapes the cast gate's refusal ladder emits (castAbility in
+  // sim/combat/casting_lifecycle.ts): one form, or the Bruin-and-Cat pair that
+  // Savage Mending shares. Keep this vocabulary byte-identical to those
+  // literals.
+  let match = /^You must be in (Bruin or Cat|Bruin|Cat) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.requiresForm', {
-      form: t(match[1] === 'Bruin' ? 'hud.errors.bear' : 'hud.errors.cat'),
+      form: t(
+        match[1] === 'Bruin'
+          ? 'hud.errors.bear'
+          : match[1] === 'Cat'
+            ? 'hud.errors.cat'
+            : 'hud.errors.bearOrCat',
+      ),
     });
   match = /^You can't do that in (Bruin|Cat|Fleet) Form\.$/.exec(text);
   if (match)

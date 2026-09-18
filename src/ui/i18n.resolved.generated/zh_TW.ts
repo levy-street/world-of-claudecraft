@@ -10495,6 +10495,7 @@ export const zh_TW: EnTranslations = {
       "cantInForm": "{form}形態下無法這樣做。",
       "bear": "巨熊",
       "cat": "貓",
+      "bearOrCat": "巨熊或貓",
       "travel": "迅捷",
       "shapeshifted": "變形狀態下不能這樣做。",
       "stealthed": "你必須處於潛行狀態。",
@@ -10826,7 +10827,8 @@ export const zh_TW: EnTranslations = {
     },
     "forms": {
       "bear": "巨熊",
-      "cat": "貓"
+      "cat": "貓",
+      "bearOrCat": "巨熊或貓"
     },
     "cast": {
       "fishing": "釣魚",

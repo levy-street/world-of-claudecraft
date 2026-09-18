@@ -4366,6 +4366,32 @@
     box-shadow: var(--glow-action-empowered);
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
+  /* Nature's Boon (druid): the golden rim on the three spells an armed window
+     pays for. Listed AFTER .empowered so it wins on a slot that is both (the
+     window is a next_cast_free aura, so it lights the generic empowered state
+     too). Actionable info: never gated by a graphics tier. The pulse is motion
+     only, so reduced motion keeps the steady rim and drops the animation. */
+  .action-btn.natures-boon {
+    border-color: var(--gold);
+    box-shadow: var(--glow-action-natures-boon);
+    animation: action-natures-boon-pulse 1.3s ease-in-out infinite alternate;
+  }
+  @keyframes action-natures-boon-pulse {
+    from {
+      box-shadow: var(--glow-action-natures-boon);
+    }
+    to {
+      box-shadow: var(--glow-action-natures-boon-strong);
+    }
+  }
+  @media (forced-colors: active) {
+    .action-btn.natures-boon {
+      forced-color-adjust: none;
+      border: 3px double Highlight;
+      outline: 1px solid CanvasText;
+      box-shadow: none;
+    }
+  }
   .action-btn.ascension-spender::after {
     content: attr(data-ascension-cost);
     position: absolute;
@@ -4446,6 +4472,7 @@
   @media (prefers-reduced-motion: reduce) {
     .action-btn.proc,
     .action-btn.empowered,
+    .action-btn.natures-boon,
     .action-btn.fate-consume-ready,
     .action-btn.fate-sentence-ready,
     .mobile-action-slot.fate-consume-ready,
@@ -4455,6 +4482,7 @@
   }
   body.reduce-motion .action-btn.proc,
   body.reduce-motion .action-btn.empowered,
+  body.reduce-motion .action-btn.natures-boon,
   body.reduce-motion .action-btn.fate-consume-ready,
   body.reduce-motion .action-btn.fate-sentence-ready,
   body.reduce-motion .mobile-action-slot.fate-consume-ready,

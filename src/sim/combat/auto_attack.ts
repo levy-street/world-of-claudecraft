@@ -58,8 +58,10 @@ import { drawWeapon } from '../weapon_stow';
 import { applyRageSpendCooldownRefund, spendResource } from './casting_lifecycle';
 import { blindMissBonus, isDisarmed, isInStasis, isStunned } from './cc';
 import { druidEngineOnLandedStrike } from './druid_engines';
+import { naturesBoonOnAutoAttack } from './druid_natures_boon';
 import { consumeNextAttackCrit } from './empower_next';
 import { runWeaponProcs } from './equip_procs';
+import { meleeReachActor } from './feral_reach';
 import {
   baseSwingSpeed,
   catAutoWeaponRollMult,
@@ -167,7 +169,7 @@ export function startAutoAttack(ctx: SimContext, pid?: number): void {
   // bug, #1324). The toggle still arms autoAttack above; once the cast resolves, the
   // first landed swing (or the spell's own damage) aggros the target legitimately.
   if (
-    d <= effectivePlayerAttackRange(t, MELEE_RANGE) &&
+    d <= effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p)) &&
     !p.castingAbility &&
     t.kind === 'mob' &&
     t.hostile &&
@@ -265,7 +267,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
     p.swingTimer = shot.speed * ctx.swingIntervalMult(p, 'ranged');
     return;
   }
-  if (d > effectivePlayerAttackRange(t, MELEE_RANGE)) return;
+  if (d > effectivePlayerAttackRange(t, MELEE_RANGE, meleeReachActor(ctx, p))) return;
   // Melee normally skips line of sight (it's always point-blank), but the
   // arena's thin enclosing walls sit inside MELEE_RANGE: without this a
   // combatant pressed against a wall could swing through it. See sibling
@@ -706,6 +708,12 @@ export function meleeSwing(
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);
+    // Nature's Boon (combat/druid_natures_boon.ts): a landed AUTO-attack, and
+    // only an auto-attack, can arm the Wildfang free-spell window. The
+    // opts.autoAttack gate is what keeps a weaponStrike ability (which
+    // resolves through this same shell) from rolling it. Feral-gated inside,
+    // so no other player draws rng here.
+    if (opts.autoAttack) naturesBoonOnAutoAttack(ctx, attacker);
     // Weapon coats (the rogue poisons) land their rider on the struck target
     // here, on the LANDED arm only: a miss, dodge or parry returned above, so
     // a whiffed swing carries no poison. Draws no rng.

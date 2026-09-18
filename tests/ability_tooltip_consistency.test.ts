@@ -54,6 +54,10 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Bruin Rush also cites its Pin rider (combat/druid_engines.ts: the 3 sec
   // window, the 50% slow, the 4 sec Pin), engine constants like the 9 and 1.
   bear_charge: [9, 1, 3, 50, 4],
+  // Slinkstrike cites the Old Blood cap it banks toward. That 3 is
+  // OLD_BLOOD_STAGES (combat/druid_engines.ts), an engine constant the bank
+  // site enforces, not a field on the stun effect that could drift by rank.
+  pounce: [3],
   // "30% more threat": the stance threat multiplier inside threatModifier.
   // Bear form's "armor +110%" and "maximum health +30%" are the
   // recalcPlayerStats multipliers (2.1 and 1.3, the v0.38 tank-parity pass)

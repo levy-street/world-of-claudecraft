@@ -1,5 +1,6 @@
 import type { SimContext } from '../sim_context';
 import type { Aura, AuraKind, Entity } from '../types';
+import { naturesBoonFormAllows } from './druid_natures_boon';
 import {
   RADIANT_RESONANCE_DAWN_COST_MULTIPLIER,
   RADIANT_RESONANCE_KIND,
@@ -8,6 +9,12 @@ import {
 function matches(aura: { empowerAbilities?: readonly string[] }, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
   return abilityId !== undefined && aura.empowerAbilities.includes(abilityId);
+}
+
+/** The consume-side twin of the freeCostAuraActive form gate: a window that may
+ *  not PAY for this cast must not be SPENT by it either. */
+function formAllowsConsume(e: Entity, abilityId?: string): boolean {
+  return abilityId === undefined || naturesBoonFormAllows(e.auras, abilityId);
 }
 
 // The aura kinds whose consumption marks the cast as empowered for the castNth
@@ -92,7 +99,12 @@ export function freeCostAuraActive(
   for (const aura of auras) {
     if (
       (aura.kind === 'next_cast_free' || aura.kind === 'next_execute_free') &&
-      (aura.empowerAbilities === undefined || aura.empowerAbilities.includes(abilityId))
+      (aura.empowerAbilities === undefined || aura.empowerAbilities.includes(abilityId)) &&
+      // Nature's Boon scopes Oakhide to Bruin Form (combat/druid_natures_boon.ts).
+      // Checked HERE as well as at the cast gate because this is the tail that
+      // actually zeroes the bill: without it a caster-form druid could spend the
+      // window on a free Oakhide the gate had already refused to empower.
+      naturesBoonFormAllows(auras, abilityId)
     ) {
       return true;
     }
@@ -108,6 +120,7 @@ export function hasFreeCostFor(e: Entity, abilityId: string): boolean {
 }
 
 export function consumeNextCastFree(ctx: SimContext, e: Entity, abilityId?: string): boolean {
+  if (!formAllowsConsume(e, abilityId)) return false;
   return (
     consumeAuraKind(ctx, e, 'next_cast_free', abilityId) !== null ||
     consumeAuraKind(ctx, e, 'next_execute_free', abilityId) !== null

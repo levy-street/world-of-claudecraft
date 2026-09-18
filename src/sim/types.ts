@@ -3779,7 +3779,11 @@ export interface AbilityDef {
   // Classic threat riders: flat bonus threat on a successful use and/or a
   // multiplier on the damage-threat (both scale with stance/form modifiers).
   threat?: { flat?: number; mult?: number };
-  requiresForm?: 'bear' | 'cat'; // druid form kit (maul/growl/swipe/claw/bite)
+  // Druid form kit (maul/growl/swipe/claw/bite). A LIST names an ability that
+  // several forms share (Savage Mending: Bruin and Cat). Read it through
+  // combat/form_requirement.ts, never by hand: that module owns the
+  // single-or-list normalization, the aura kinds, and the English label.
+  requiresForm?: 'bear' | 'cat' | readonly ('bear' | 'cat')[];
   // Castable while shapeshifted without requiring a SPECIFIC form (Feral Instinct works in
   // both Cat and Bear Form). Exempts the ability from the "can't act while shapeshifted" lock.
   usableInForm?: boolean;

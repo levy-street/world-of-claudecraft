@@ -130,6 +130,8 @@ import {
   spendRuin,
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
+import { applyDruidFormEntry, druidFormEntryOwed } from './druid_form_entry';
+import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
 import {
   consumeAuraKind,
   consumeFreeCostFor,
@@ -143,11 +145,13 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import { meleeReachActor } from './feral_reach';
 import {
   applyAutoUnshift,
   isFormToggleAbility as isFormToggle,
   willAutoUnshift,
 } from './form_auto_unshift';
+import { formRequirementMet, hasFormRequirement, requiredForms } from './form_requirement';
 import { isActionLockingFormAuraKind, isResourceShiftFormAuraKind } from './forms';
 import {
   applyBrainFreezeOverride,
@@ -1213,11 +1217,19 @@ export function castAbility(
     : p.resourceType === 'mana'
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
+  // A form-entry press (Lunge from Bruin Form) is billed AFTER its shift, so
+  // the live bar here is not the one that pays: entering Cat hands over a full
+  // 100 energy, which always covers Lunge's 40. Weighing it against the rage or
+  // mana it happens to be standing in would refuse a press that is payable.
+  // Only exempt when a shift is actually owed, so a Lunge pressed already in
+  // Cat Form keeps the ordinary energy check.
+  const entersFormOnCast = druidFormEntryOwed(meta, p.auras, ability.id);
   if (
     castingPool < payableCost &&
     (!canCastFree || stormcastArmedForAbility) &&
     !freeBySolarReprisal &&
     !togglingOff &&
+    !entersFormOnCast &&
     !formShiftKind(p, ability)
   ) {
     ctx.error(
@@ -1302,13 +1314,29 @@ export function castAbility(
   // Action-locking forms gate their kit both ways: Druid form abilities need
   // their form, while travel forms lock the normal kit until toggled off.
   const form = p.auras.find((a) => isActionLockingFormAuraKind(a.kind));
-  if (ability.requiresForm) {
-    const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
-    if (!form || form.kind !== need) {
-      ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Cat'} Form.`);
+  if (hasFormRequirement(ability)) {
+    if (!formRequirementMet(p.auras, ability)) {
+      // The three refusals are spelled out rather than interpolated so the S3
+      // i18n drift guard (tests/localization_fixes.test.ts) can read each one
+      // as a literal, and so ui/error_text_i18n_core.ts has a fixed vocabulary
+      // to parse back into a key. Keep the three byte-identical to that matcher.
+      const forms = requiredForms(ability);
+      if (forms.length > 1) ctx.error(p.id, 'You must be in Bruin or Cat Form.');
+      else if (forms[0] === 'bear') ctx.error(p.id, 'You must be in Bruin Form.');
+      else ctx.error(p.id, 'You must be in Cat Form.');
       return;
     }
-  } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
+  } else if (
+    form &&
+    !isFormToggle(ability) &&
+    !ability.usableInForm &&
+    // An armed Nature's Boon window is a form exemption for exactly the two
+    // spells it names (combat/druid_natures_boon.ts). Checked here rather than
+    // folded into usableInForm because it is aura state, not a property of the
+    // button: with no window armed, Wildbloom and Lunar Tempest refuse and
+    // auto-unshift exactly as they always have.
+    !naturesBoonArmedFor(p.auras, ability.id)
+  ) {
     // Only the DECISION is made here, so the ladder below continues for a cast
     // that will auto-unshift. The form itself is not touched until the cast
     // commits (see applyAutoUnshift further down): every refusal between here
@@ -1453,7 +1481,7 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -1483,7 +1511,7 @@ export function castAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -1766,6 +1794,13 @@ export function castAbility(
   // the same press and pays from the restored mana pool. Shifting back IN stays a
   // normal ability and bills both.
   if (autoUnshift) applyAutoUnshift(ctx, p, meta, ability);
+  // The form-entry buttons (Stalk, Lunge, Bruin Rush) put the druid in their
+  // form on the way in (v0.43, combat/druid_form_entry.ts). Placed HERE for the
+  // same reason as the auto-unshift above: every refusal has cleared, so the
+  // form change can no longer be spent on a press that never happens. It runs
+  // BEFORE this cast's own effects resolve, so the stealth lands on a cat and
+  // the rush leaves as a bear.
+  applyDruidFormEntry(ctx, p, meta, ability.id);
   // Auto-dismount when the player is mounted or mid-summon-channel and casts any ability.
   if (p.mountKey !== '') forceDismount(ctx, p);
   if (p.mountCastKey !== '') {
@@ -1807,6 +1842,10 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
+  // Nature's Boon makes its spell 25% stronger. Scaled on a COPY here, BEFORE
+  // the block below spends the window: the instant arm consumes the aura and
+  // only then calls applyAbility, so a multiplier read any later is always 1.
+  res = scaleNaturesBoonPower(p, res);
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -2106,6 +2145,24 @@ function overflowingPowerCdr(ctx: SimContext, p: Entity, meta: PlayerMeta, cost:
 // is never mutated. Draws no rng.
 const OVERLOAD_COST_MULT = 1.5;
 
+/** Scale a Nature's Boon cast's magnitudes by its power multiplier, returning a
+ *  NEW resolved ability: the base content arrays are shared module data and must
+ *  never be mutated (the consumeOverload rule, right below). Returns `res`
+ *  untouched when no window covers this cast, so nothing else moves. */
+function scaleNaturesBoonPower(p: Entity, res: ResolvedAbility): ResolvedAbility {
+  const amp = naturesBoonPowerFor(p.auras, res.def.id);
+  if (amp === 1) return res;
+  const effects = res.effects.map((eff) => {
+    const scaled: Record<string, unknown> = { ...eff };
+    for (const key of ['min', 'max', 'amount', 'total', 'value'] as const) {
+      const v = scaled[key];
+      if (typeof v === 'number' && v > 0) scaled[key] = Math.round(v * amp);
+    }
+    return scaled as AbilityEffect;
+  });
+  return { ...res, effects };
+}
+
 function consumeOverload(ctx: SimContext, p: Entity, res: ResolvedAbility): ResolvedAbility {
   if (res.def.school === 'physical' || res.cost <= 0) return res;
   const idx = p.auras.findIndex((a) => a.kind === 'overload');
@@ -2383,7 +2440,7 @@ function applyChannelTick(
     cancelCast(ctx, p);
     return;
   }
-  const maxRange = effectivePlayerAttackRange(target, res.def.range);
+  const maxRange = effectivePlayerAttackRange(target, res.def.range, meleeReachActor(ctx, p));
   if (dist2d(p.pos, target.pos) > maxRange) {
     ctx.error(p.id, 'Out of range.');
     cancelCast(ctx, p);
@@ -2733,7 +2790,7 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;
@@ -2749,7 +2806,7 @@ function applyAbility(
       return;
     }
     const d = dist2d(p.pos, target.pos);
-    const maxRange = effectivePlayerAttackRange(target, ability.range);
+    const maxRange = effectivePlayerAttackRange(target, ability.range, meleeReachActor(ctx, p));
     if (d > maxRange + 2) {
       ctx.error(p.id, 'Out of range.');
       return;

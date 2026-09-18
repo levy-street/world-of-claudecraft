@@ -10495,6 +10495,7 @@ export const ko_KR: EnTranslations = {
       "cantInForm": "{form} 변신 상태에서는 할 수 없습니다.",
       "bear": "큰곰",
       "cat": "고양이",
+      "bearOrCat": "곰 또는 표범",
       "travel": "쾌속",
       "shapeshifted": "변신 중에는 할 수 없습니다.",
       "stealthed": "은신 상태여야 합니다.",
@@ -10826,7 +10827,8 @@ export const ko_KR: EnTranslations = {
     },
     "forms": {
       "bear": "곰",
-      "cat": "고양이"
+      "cat": "고양이",
+      "bearOrCat": "곰 또는 고양이"
     },
     "cast": {
       "fishing": "낚시",

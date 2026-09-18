@@ -394,7 +394,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Wildfang',
     'tank',
     'x',
-    'A shapeshifter whose landed hits build Old Blood in both forms: Cat spends it for damage, Bruin spends it to tank.',
+    "A shapeshifter whose landed hits build Old Blood in both forms: Cat spends it for damage, Bruin spends it to tank. Reaches 1 yd further with every melee attack, and melee autoattacks grant Nature's Boon about every 15 sec: for 10 sec, one free Wildbloom castable in any form, or one free Oakhide in Bruin Form, either 25% stronger.",
     'feral_charge',
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear

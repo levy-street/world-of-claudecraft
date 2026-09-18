@@ -10495,6 +10495,7 @@ export const en: EnTranslations = {
       "cantInForm": "You can't do that in {form} Form.",
       "bear": "Bruin",
       "cat": "Cat",
+      "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "You cannot do that while shapeshifted.",
       "stealthed": "You must be stealthed.",
@@ -10826,7 +10827,8 @@ export const en: EnTranslations = {
     },
     "forms": {
       "bear": "Bruin",
-      "cat": "Cat"
+      "cat": "Cat",
+      "bearOrCat": "Bruin or Cat"
     },
     "cast": {
       "fishing": "Fishing",
@@ -12181,7 +12183,7 @@ export const en: EnTranslations = {
       },
       "barkskin": {
         "name": "Oakhide",
-        "description": "Your skin hardens like bark, increasing armor by 150 for 15 sec."
+        "description": "Your skin hardens like bark, increasing armor by 20% for 15 sec."
       },
       "sacred_bulwark": {
         "name": "Sacred Bulwark",
@@ -12222,11 +12224,11 @@ export const en: EnTranslations = {
       },
       "pounce": {
         "name": "Slinkstrike",
-        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge."
+        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge."
       },
       "lunge": {
         "name": "Lunge",
-        "description": "Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only."
+        "description": "Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form."
       },
       "hamstring_bite": {
         "name": "Takedown",
@@ -12715,7 +12717,7 @@ export const en: EnTranslations = {
       },
       "frenzied_regeneration": {
         "name": "Savage Mending",
-        "description": "Restores 40% of your maximum health over 10 sec. Bruin Form only."
+        "description": "Restores 40% of your maximum health over 10 sec. Bruin or Cat Form only."
       },
       "frost_trap": {
         "name": "Rime Snare",
@@ -12944,7 +12946,7 @@ export const en: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bruin Rush",
-        "description": "Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only."
+        "description": "Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form."
       },
       "demoralizing_roar": {
         "name": "Craven Roar",
@@ -12952,7 +12954,7 @@ export const en: EnTranslations = {
       },
       "prowl": {
         "name": "Stalk",
-        "description": "Enter stealth while in Cat Form. Cannot be used in combat."
+        "description": "Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat."
       },
       "rake": {
         "name": "Flense",

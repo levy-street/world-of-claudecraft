@@ -2243,6 +2243,12 @@ export function runEffects(
           ctx.awardCombo(p, target, ability.awardsCombo);
           comboAwarded = true;
         }
+        // Same moment, same rule for the feral Old Blood bank: Slinkstrike's
+        // stun IS its landed hit (no strike arm above ever runs for it), so
+        // this is where it reports. A no-op for every other class and for any
+        // druid ability outside OLD_BLOOD_STRIKE_IDS (combat/druid_engines.ts).
+        // Draws no rng.
+        druidEngineOnLandedStrike(ctx, p, ability.id);
         // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
         // sound at the target; every other stun has no dedicated recording
         // and stays silent here.

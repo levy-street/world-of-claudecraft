@@ -929,6 +929,19 @@
     --glow-action-empowered-soft:
       0 0 calc(9px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 73%, transparent),
       inset 0 0 0 1px color-mix(in srgb, var(--color-glint) 53%, transparent), var(--edge-glint);
+    /* Nature's Boon (druid): a heavier GOLD RIM than the generic empowered
+       halo, so the three spells an armed window pays for read as their own
+       thing rather than as any other free cast. Actionable information, so the
+       rim itself never thins with the graphics tier; only the blur radius
+       rides --fx-shadow, as every other action glow does. */
+    --glow-action-natures-boon:
+      0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 80%, transparent),
+      0 0 calc(20px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 45%, transparent),
+      inset 0 0 0 1px color-mix(in srgb, var(--gold) 75%, transparent);
+    --glow-action-natures-boon-strong:
+      0 0 calc(16px * var(--fx-shadow, 1)) var(--gold),
+      0 0 calc(28px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 60%, transparent),
+      inset 0 0 0 1px var(--gold);
     /* The upper empowered pulse frame strengthens only decorative blur. */
     --glow-action-empowered-strong:
       0 0 calc(18px * var(--fx-shadow, 1)) var(--gold),
