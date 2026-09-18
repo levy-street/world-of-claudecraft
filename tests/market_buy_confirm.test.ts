@@ -61,6 +61,7 @@ function info(listings: MarketListingView[], over: Partial<MarketInfo> = {}): Ma
     myListingCount: 0,
     sellPriceItemId: null,
     sellLowestPrice: null,
+    sweepQuote: null,
     ...over,
   };
 }

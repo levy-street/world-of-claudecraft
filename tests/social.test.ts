@@ -13,6 +13,7 @@ import {
   instanceOrigin,
   MOBS,
 } from '../src/sim/data';
+import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
 import { createMob } from '../src/sim/entity';
 import { type Party, Sim } from '../src/sim/sim';
 import {
@@ -454,8 +455,12 @@ describe('parties', () => {
     // NPCs by role along the dock road: Redbrook moved out to the harbour
     // market at (-58, -102), so the duo stands 2 and 3 yards south of his new
     // stand, both well inside the 5 yard interact gate.
-    teleport(sim, a, -58, -100);
-    teleport(sim, b, -58, -99);
+    // Re-pinned for the first-quest handoff: Redbrook stands beside the
+    // noticeboard on the civic square, so the duo reads his stand from the
+    // layout and keeps the same 2 and 3 yard offsets.
+    const marshal = EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position;
+    teleport(sim, a, marshal.x, marshal.z + 2);
+    teleport(sim, b, marshal.x, marshal.z + 3);
     sim.acceptQuest('q_wolves', a);
     sim.acceptQuest('q_wolves', b);
     const wolf = nearestMob(sim, 'forest_wolf');

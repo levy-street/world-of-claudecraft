@@ -73,6 +73,11 @@ const SECONDARY_CONTEXTS: ReadonlyArray<[string, string, string]> = [
     'renderer.debug.checkShaderErrors = shaderDebugRequested();',
   ],
   [
+    'the mount preview',
+    '../src/render/mount_preview.ts',
+    'renderer.debug.checkShaderErrors = shaderDebugRequested();',
+  ],
+  [
     'the Founder Pack mount preview',
     '../src/render/founder_pack_mount_preview.ts',
     'renderer.debug.checkShaderErrors = shaderDebugRequested();',

@@ -5,10 +5,19 @@
 // ONE core, six tracks. The descriptor decides what a track accepts; everything
 // else here is shared, so a fix lands in all six at once.
 //
-// SELECTION IS OWNERSHIP PLUS CATALOG. An aura qualifies when the host's isOwn
-// predicate says the local player cast it and the catalog places it in a
-// category this track accepts. No class list and no ability list: a heal added
-// to any class joins its track the day it exists.
+// SELECTION IS OWNERSHIP PLUS CATALOG PLUS POLARITY. An aura qualifies when the
+// host's isOwn predicate says the local player cast it, the catalog places it in
+// a category this track accepts, and the aura is not HARMFUL. No class list and
+// no ability list: a heal added to any class joins its track the day it exists.
+//
+// The polarity check is not belt-and-braces. The catalog is keyed by aura id
+// alone, and one id can carry both polarities: Hourglass of Suspension applies
+// `stasis` to the caster or a group ally and `incapacitate` to an enemy under the
+// same id, so admitting it by id put "Hourglass of Suspension on Forest Wolf" in
+// the Friendly track, reading as a heal the mage was maintaining on a mob. Only
+// the LIVE aura says which arm landed, and this family is the helpful side (the
+// enemy side is src/ui/hud/target_dots/). Asked of the SAME classifier the aura
+// strips use, never a local list of harmful kinds.
 //
 // ORDER IS STABLE ON PURPOSE. Self rows sort by aura id; ally rows group by
 // entity (the player first when a track carries both) and then by aura id. Never
@@ -18,6 +27,8 @@
 // Allocation-light: the state, its row array and every row record are owned by
 // the core and reused across ticks, so a steady frame allocates nothing.
 
+import { isDebuffDisplayAura } from '../../../sim/aura_classify';
+import type { AuraKind } from '../../../sim/types';
 import { isAuraExpiring } from '../../auras_view';
 import { auraTrackEntry } from './aura_track_catalog';
 import type { AuraTrackDescriptor } from './aura_track_descriptors';
@@ -184,6 +195,12 @@ export function createAuraTrackView<TEntity extends AuraTrackEntityInput>(
       if (!entry) continue;
       if (!descriptor.accepts(entry, onSelf)) continue;
       if (aura.remaining <= 0 && aura.permanent !== true) continue;
+      // See the header: one aura id, two polarities. LAST of the four filters on
+      // purpose. Six views each scan every unit, so an aura this track was never
+      // going to take (a self-buff reaching the Friendly track) would otherwise
+      // be polarity-classified six times a frame to be dropped by the next line
+      // anyway; here it is only asked of auras this track would actually paint.
+      if (isDebuffDisplayAura((aura.kind ?? '') as AuraKind, aura.value ?? 1, aura.id)) continue;
       scratch.push(aura);
     }
     scratch.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));

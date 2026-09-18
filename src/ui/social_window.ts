@@ -23,7 +23,8 @@
 import { CLASSES } from '../sim/data';
 import { GUILD_ROSTER_PAGE_SEATS } from '../sim/guild_roster';
 import type { PlayerClass } from '../sim/types';
-import type { IWorld } from '../world_api';
+import type { IWorld, WhoRosterInfo } from '../world_api';
+import { formatCount } from './count_format';
 import { deedTitleText } from './deed_i18n';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
@@ -31,6 +32,7 @@ import { esc } from './esc';
 import { captureFormDraft, restoreFormDraft } from './form_draft';
 import { loadGuildHideOffline, saveGuildHideOffline } from './guild_hide_offline';
 import { formatDateTime, formatNumber, t, tPlural } from './i18n';
+import { classColorCss } from './inspect_view';
 import { moneyHtml } from './money_html';
 import { localizeZone } from './server_i18n';
 import {
@@ -54,6 +56,17 @@ import {
 import { focusActiveTab, wireTabStrip } from './tab_strip_painter';
 import { tabStripHtml, tabStripModel } from './tab_strip_view';
 import { svgIcon } from './ui_icons';
+import {
+  DEFAULT_WHO_TAB_STATE,
+  toggleWhoSort,
+  WHO_SORT_KEYS,
+  type WhoSortKey,
+  type WhoTabState,
+  whoClassOptions,
+  whoCountView,
+  whoTabRows,
+  whoTabSig,
+} from './who_tab_view';
 
 // Typeahead timings (named, not bare literals): debounce a keystroke
 // before searching, and clear the suggestion list shortly after blur so a pending
@@ -81,6 +94,12 @@ const GUILD_MOTD_MAX = 240;
 const PLEDGE_NOTE_MAX = 90;
 const PLEDGE_MIN_LEVEL_FLOOR = 1;
 const PLEDGE_MIN_LEVEL_CEIL = 60;
+
+// Who tab search cap; mirrors WHO_FILTER_MAX in server/who_roster.ts (the
+// server clamps authoritatively, this is UX only).
+const WHO_SEARCH_MAX = 32;
+// Slow-HUD ticks between re-asks while the Who tab still has no answer.
+const WHO_RETRY_SLOW_TICKS = 4;
 
 /**
  * Hud-supplied glue. The social window renders no item rows (it uses CSS-classed
@@ -211,22 +230,22 @@ export function guildMemberRowHtml(m: GuildRow, now: number): string {
   const nameInner = `${esc(m.name)}<span class="rank">${esc(roleLabel(role))}</span>${memberTitleSpan}`;
   const name =
     m.online && !m.self
-      ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
-      : `<span class="soc-name">${nameInner}</span>`;
+      ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(m.cls)}" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${nameInner}</button>`
+      : `<span class="soc-name" style="--class-color:${classColorCss(m.cls)}">${nameInner}</span>`;
   let actions = m.canWhisper
-    ? `<button type="button" class="soc-x" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
+    ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(m.name)}" title="${esc(t('hud.social.whisperTitle', { name: m.name }))}">${svgIcon('whisper')}</button>`
     : '';
   if (m.canTransfer)
-    actions += `<button type="button" class="soc-x" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="gtransfer" data-name="${esc(m.name)}" title="${esc(t('hud.social.makeGuildMasterTitle', { name: m.name }))}">${svgIcon('crown')}</button>`;
   if (m.canPromote)
-    actions += `<button type="button" class="soc-x" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">${svgIcon('promote')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="promote" data-name="${esc(m.name)}" title="${esc(t('hud.social.promoteTitle', { name: m.name }))}">${svgIcon('promote')}</button>`;
   if (m.canDemote)
-    actions += `<button type="button" class="soc-x" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">${svgIcon('demote')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="demote" data-name="${esc(m.name)}" title="${esc(t('hud.social.demoteTitle', { name: m.name }))}">${svgIcon('demote')}</button>`;
   if (m.canKick)
-    actions += `<button type="button" class="soc-x" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
+    actions += `<button type="button" class="soc-x ui-disc" data-act="gkick" data-name="${esc(m.name)}" title="${esc(t('hud.social.removeGuildTitle', { name: m.name }))}">${svgIcon('close')}</button>`;
   const tip = esc(dotTitle(m.online, m.status, m.zone));
   return (
-    `<div class="soc-row">` +
+    `<div class="soc-row${m.online ? '' : ' is-offline'}">` +
     `<span class="soc-dot ${m.dot === 'off' ? '' : m.dot}" title="${tip}"></span>` +
     `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
     `<span class="soc-meta" title="${tip}">${meta}</span>` +
@@ -260,6 +279,17 @@ export class SocialWindow {
   // every structural repaint; applyGuildCreateLock re-stamps the fresh button.
   private guildCreateLocked = false;
   private guildCreateTimer: number | undefined;
+  // Who tab: the local sort / class chip plus the last server-side search
+  // (who_tab_view.ts owns the decisions). Window-local like the tab itself.
+  private who: WhoTabState = { ...DEFAULT_WHO_TAB_STATE };
+  private whoRetryTicks = 0;
+  // Answer identity for the content signature: ClientWorld builds a fresh
+  // whoInfo object per `who` frame, so a reference change is exactly "a new
+  // answer landed", even when the filter, row count, and total all match the
+  // previous one (a re-submitted search after someone logged off and someone
+  // else logged on, or the same names with new levels or zones).
+  private whoSeen: WhoRosterInfo | null = null;
+  private whoAnswerSeq = 0;
 
   constructor(private readonly deps: SocialWindowDeps) {}
 
@@ -280,6 +310,70 @@ export class SocialWindow {
     this.lastStruct = this.structSig();
     this.lastContent = this.contentSig();
     this.render();
+    if (this.tab === 'who') this.requestWho();
+  }
+
+  // The chat `/who [filter]` command lands here online: open the window on the
+  // Who tab with the filter applied and ask the server. Returns false offline,
+  // so the caller falls through to the normal send path (the offline Sim
+  // answers the classic "online play only" line itself).
+  openWhoTab(filter: string): boolean {
+    const w = this.deps.world();
+    // Spectating drops every command but chat before the socket, so the
+    // classic chat dump (which chat still delivers) is the honest answer there.
+    if (w.socialInfo === null || w.spectating !== null) return false;
+    this.who = { ...this.who, search: filter.slice(0, WHO_SEARCH_MAX) };
+    this.tab = 'who';
+    this.notice = null;
+    if (this.isOpen) {
+      this.lastStruct = this.structSig();
+      this.render();
+      this.requestWho();
+    } else {
+      this.toggle();
+    }
+    return true;
+  }
+
+  // Ask the server for the roster under the current search. Online only (the
+  // offline Sim's whoRequest is inert anyway); the answer lands as whoInfo and
+  // the content signature repaints the list on the next slow tick.
+  private requestWho(): void {
+    const w = this.deps.world();
+    if (w.socialInfo === null || w.spectating !== null) return;
+    this.whoRetryTicks = 0;
+    w.whoRequest(this.who.search);
+  }
+
+  // While the tab shows the pending state (no answer yet: the viewer's block
+  // list was still loading server-side, a shed request, or a transport that
+  // reset the mirror), re-ask every few slow ticks. Bounded by the server's
+  // list-read guard and by the tab being open; stops on the first answer.
+  private retryWhoIfPending(): void {
+    const w = this.deps.world();
+    if (
+      this.tab !== 'who' ||
+      (w.whoInfo !== null && w.whoInfo.filter === this.who.search) ||
+      w.spectating !== null
+    )
+      return;
+    if (++this.whoRetryTicks < WHO_RETRY_SLOW_TICKS) return;
+    this.requestWho();
+  }
+
+  // A local who-state change (sort, chip, search) repaints the list itself, so
+  // the content signature is re-latched here: otherwise the next slow tick sees
+  // the moved whoTabSig and rebuilds the body a second time, dropping the focus
+  // the handler just restored (the file's "re-latch, never clear" rule).
+  private refreshWhoList(): void {
+    this.refreshList();
+    this.lastContent = this.contentSig();
+  }
+
+  private searchWho(filter: string): void {
+    this.who = { ...this.who, search: filter.slice(0, WHO_SEARCH_MAX) };
+    this.requestWho();
+    this.refreshWhoList();
   }
 
   // Close path (toggle close + the window-manager's closeManagedWindow case): drop
@@ -304,6 +398,7 @@ export class SocialWindow {
   // change, else an in-place list refresh on a content change.
   refreshIfChanged(): void {
     if (!this.isOpen) return;
+    this.retryWhoIfPending();
     const struct = this.structSig();
     if (struct !== this.lastStruct) {
       this.lastStruct = struct;
@@ -363,9 +458,27 @@ export class SocialWindow {
     return socialStructSig(this.tab, w.socialInfo, w.partyInfo);
   }
 
+  private whoAnswerId(info: WhoRosterInfo | null): number {
+    if (info !== this.whoSeen) {
+      this.whoSeen = info;
+      this.whoAnswerSeq++;
+    }
+    return this.whoAnswerSeq;
+  }
+
   private contentSig(): string {
     const w = this.deps.world();
-    return JSON.stringify({ social: w.socialInfo, party: w.partyInfo });
+    return JSON.stringify({
+      social: w.socialInfo,
+      // The Who tab paints nothing from the party mirror, whose members carry
+      // live hp/resource; keeping it in would rebuild the tab every slow tick
+      // while partied in combat (and drop a focused header or chip each time).
+      party: this.tab === 'who' ? null : w.partyInfo,
+      // A cheap digest of the roster answer (never the 200 rows themselves):
+      // the answer's identity, so a same-count answer still repaints.
+      who: this.whoAnswerId(w.whoInfo),
+      whoTab: whoTabSig(this.who),
+    });
   }
 
   // Full rebuild: title, tabs, body, notice, and the tab's footer (with its
@@ -388,7 +501,7 @@ export class SocialWindow {
     const realmTag =
       online && w.realm ? ` <span class="soc-realm-tag">- ${esc(w.realm)}</span>` : '';
     el.innerHTML =
-      `<div class="panel-title"><span>${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hud.social.title'))}${realmTag}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.options.returnToGame'))}">${svgIcon('close')}</button></div>` +
       // WAI-ARIA tabs: a real role=tablist / role=tab / role=tabpanel with a
       // roving tabindex (0 on the active tab, -1 on the rest) and aria-selected, built
       // from the shared tab_strip_view core (same markup contract talents_window
@@ -399,12 +512,13 @@ export class SocialWindow {
         tabStripModel({
           ariaLabel: t('hud.social.title'),
           panelId: 'soc-body-panel',
-          stripClass: 'soc-tabs',
-          tabClass: 'soc-tab',
+          stripClass: 'soc-tabs ui-tabs',
+          tabClass: 'soc-tab ui-tab',
           selectedClass: 'on',
           tabs: [
             { id: 'friends', label: t('hud.social.friendsTab') },
             { id: 'guild', label: t('hud.social.guildTab') },
+            { id: 'who', label: t('hudChrome.social.who.tab') },
             // Officer-plus only: the pledge dashboard. The label carries the
             // live open-pledge count (the count is in the structural
             // signature, so a new pledge rebuilds the strip).
@@ -454,6 +568,17 @@ export class SocialWindow {
           ke.preventDefault();
           this.savePledgeSettings();
         }
+      });
+      // The Who tab's class chip is a native select inside the body (rebuilt
+      // by every refreshList swap), so its change is delegated like the clicks.
+      body.addEventListener('change', (e) => {
+        const target = e.target as HTMLSelectElement;
+        if (!target.matches?.('select[data-field="who-cls"]')) return;
+        this.who = { ...this.who, cls: target.value };
+        this.refreshWhoList();
+        (
+          this.deps.root().querySelector('select[data-field="who-cls"]') as HTMLElement | null
+        )?.focus();
       });
     }
     this.refreshList();
@@ -506,6 +631,18 @@ export class SocialWindow {
         selEnd: isCheckbox ? null : prev.selectionEnd,
       });
     }
+    // The Who tab's focusable controls outside the draft inputs: a sort header
+    // (by column key) or the class chip. Both are re-emitted from `this.who`,
+    // so focus can be handed back to the freshly rendered element.
+    const active = document.activeElement as HTMLElement | null;
+    const whoFocus =
+      active && body.contains(active)
+        ? active.dataset.act === 'who-sort'
+          ? `[data-act="who-sort"][data-key="${active.dataset.key}"]`
+          : active.dataset.field === 'who-cls'
+            ? 'select[data-field="who-cls"]'
+            : null
+        : null;
     const online = this.deps.world().socialInfo !== null;
     body.innerHTML =
       this.tab === 'raid'
@@ -514,13 +651,15 @@ export class SocialWindow {
           ? `<div class="soc-empty">${esc(t('hud.social.offlineEmpty'))}</div>`
           : this.tab === 'friends'
             ? this.friendsHtml()
-            : this.tab === 'guild'
-              ? this.guildHtml()
-              : this.tab === 'pledges'
-                ? this.pledgesHtml()
-                : this.tab === 'block'
-                  ? this.blockHtml()
-                  : this.ignoreHtml();
+            : this.tab === 'who'
+              ? this.whoHtml()
+              : this.tab === 'guild'
+                ? this.guildHtml()
+                : this.tab === 'pledges'
+                  ? this.pledgesHtml()
+                  : this.tab === 'block'
+                    ? this.blockHtml()
+                    : this.ignoreHtml();
     for (const draft of drafts) {
       const next = body.querySelector(
         `input[data-field="${draft.field}"]`,
@@ -538,6 +677,7 @@ export class SocialWindow {
           next.setSelectionRange(draft.selStart, draft.selEnd);
       }
     }
+    if (whoFocus) (body.querySelector(whoFocus) as HTMLElement | null)?.focus();
   }
 
   // The single delegated row handler (click + whisper). Resolves the nearest
@@ -562,6 +702,20 @@ export class SocialWindow {
       // keyboard presses keep working (WCAG 2.2 AA focus management).
       (
         this.deps.root().querySelector('[data-act="toggle-hide-offline"]') as HTMLElement | null
+      )?.focus();
+      return;
+    }
+    // Who tab column header: re-sort the delivered rows locally (no round-trip),
+    // then hand focus back to the freshly rendered header button.
+    if (node.dataset.act === 'who-sort') {
+      const key = node.dataset.key as WhoSortKey | undefined;
+      if (!key || !WHO_SORT_KEYS.includes(key)) return;
+      this.who = toggleWhoSort(this.who, key);
+      this.refreshWhoList();
+      (
+        this.deps
+          .root()
+          .querySelector(`[data-act="who-sort"][data-key="${key}"]`) as HTMLElement | null
       )?.focus();
       return;
     }
@@ -622,19 +776,26 @@ export class SocialWindow {
 
   // Send the pledge-board recruiting settings up through IWorld: the accepting
   // toggle, the level floor (parsed + clamped here for UX; the server clamps
-  // authoritatively), and the board note ('' clears it). A malformed level
-  // falls back to the floor, matching an unset field.
+  // authoritatively), the board note ('' clears it), and the new-player
+  // friendly opt-in. A malformed level falls back to the floor, matching an
+  // unset field.
   private savePledgeSettings(): void {
     const root = this.deps.root();
     const open = root.querySelector('input[data-field="popen"]') as HTMLInputElement | null;
     const level = root.querySelector('input[data-field="pminlvl"]') as HTMLInputElement | null;
     const note = root.querySelector('input[data-field="pnote"]') as HTMLInputElement | null;
-    if (!open || !level || !note) return;
+    const newbie = root.querySelector('input[data-field="pnewbie"]') as HTMLInputElement | null;
+    if (!open || !level || !note || !newbie) return;
     const parsed = Number.parseInt(level.value, 10);
     const minLevel = Number.isFinite(parsed)
       ? Math.min(PLEDGE_MIN_LEVEL_CEIL, Math.max(PLEDGE_MIN_LEVEL_FLOOR, parsed))
       : PLEDGE_MIN_LEVEL_FLOOR;
-    this.deps.world().setGuildPledgeSettings(open.checked, minLevel, note.value);
+    this.deps.world().setGuildPledgeSettings({
+      enabled: open.checked,
+      minLevel,
+      note: note.value,
+      newPlayerFriendly: newbie.checked,
+    });
   }
 
   private friendsHtml(): string {
@@ -653,18 +814,18 @@ export class SocialWindow {
         const titleText = f.activeTitle ? deedTitleText(f.activeTitle) : '';
         const titleSpan = titleText ? `<span class="soc-title">${esc(titleText)}</span>` : '';
         const name = f.online
-          ? `<button type="button" class="soc-name soc-link" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
-          : `<span class="soc-name">${esc(f.name)}${titleSpan}</span>`;
+          ? `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(f.cls)}" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${esc(f.name)}${titleSpan}</button>`
+          : `<span class="soc-name" style="--class-color:${classColorCss(f.cls)}">${esc(f.name)}${titleSpan}</span>`;
         const whisper = f.online
-          ? `<button type="button" class="soc-x" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
+          ? `<button type="button" class="soc-x ui-disc" data-whisper="${esc(f.name)}" title="${esc(t('hud.social.whisperTitle', { name: f.name }))}">${svgIcon('whisper')}</button>`
           : '';
         const tip = esc(dotTitle(f.online, f.status, f.zone));
         return (
-          `<div class="soc-row">` +
+          `<div class="soc-row${f.online ? '' : ' is-offline'}">` +
           `<span class="soc-dot ${f.dot === 'off' ? '' : f.dot}" title="${tip}"></span>` +
           `<span class="soc-id">${name}<span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(f.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(f.cls) }))}</span></span>` +
           `<span class="soc-meta" title="${tip}">${meta}</span>` +
-          `<span class="soc-actions">${whisper}<button type="button" class="soc-x" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
+          `<span class="soc-actions">${whisper}<button type="button" class="soc-x ui-disc" data-act="unfriend" data-name="${esc(f.name)}" title="${esc(t('hud.social.removeFriendTitle', { name: f.name }))}">${svgIcon('close')}</button></span>` +
           `</div>`
         );
       })
@@ -686,7 +847,7 @@ export class SocialWindow {
         (r) =>
           `<div class="soc-row">` +
           `<span class="soc-name">${esc(r.name)}</span>` +
-          `<span class="soc-actions" style="margin-left:auto"><button type="button" class="soc-x" data-act="${act}" data-name="${esc(r.name)}" title="${esc(title(r.name))}">${svgIcon('close')}</button></span>` +
+          `<span class="soc-actions soc-actions-end"><button type="button" class="soc-x ui-disc" data-act="${act}" data-name="${esc(r.name)}" title="${esc(title(r.name))}">${svgIcon('close')}</button></span>` +
           `</div>`,
       )
       .join('');
@@ -714,7 +875,7 @@ export class SocialWindow {
     const w = this.deps.world();
     const view = guildView(w.socialInfo, w.player.name);
     if (!view.guild)
-      return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>` + this.myPledgeHtml();
+      return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>${this.myPledgeHtml()}`;
     const g = view.guild;
     const guildCount = formatNumber(g.memberCount, { maximumFractionDigits: 0 });
     // The guild name carries its lifetime-XP colour tier (the nameplate ladder,
@@ -732,7 +893,7 @@ export class SocialWindow {
     // The persisted "hide offline" toggle: a pressed-state button (a single click event
     // through the delegated body handler, unlike a label+checkbox that double-fires).
     const toggle =
-      `<button type="button" class="soc-hide-offline${this.hideOffline ? ' on' : ''}" data-act="toggle-hide-offline" aria-pressed="${this.hideOffline ? 'true' : 'false'}" title="${esc(t('hudChrome.social.hideOfflineTitle'))}">` +
+      `<button type="button" class="soc-hide-offline ui-btn${this.hideOffline ? ' on' : ''}" data-act="toggle-hide-offline" aria-pressed="${this.hideOffline ? 'true' : 'false'}" title="${esc(t('hudChrome.social.hideOfflineTitle'))}">` +
       `<span class="soc-hide-box" aria-hidden="true"></span>${esc(t('hudChrome.social.hideOffline'))}</button>`;
     // Online-first grouping with per-group count headers; the offline group (header +
     // rows) is suppressed when the toggle is on. Empty groups emit no header.
@@ -770,12 +931,12 @@ export class SocialWindow {
     const inputLabel = esc(t('hudChrome.social.billboard.inputLabel'));
     const edit = g.canEditMotd
       ? `<div class="soc-billboard-edit">` +
-        `<input maxlength="${GUILD_MOTD_MAX}" value="${esc(g.motd)}" aria-label="${inputLabel}" placeholder="${esc(t('hudChrome.social.billboard.placeholder'))}" data-field="gmotd" autocomplete="off" spellcheck="false"/>` +
-        `<button type="button" class="btn" data-act="gmotd-save">${esc(t('hudChrome.social.billboard.save'))}</button>` +
+        `<input class="ui-input" maxlength="${GUILD_MOTD_MAX}" value="${esc(g.motd)}" aria-label="${inputLabel}" placeholder="${esc(t('hudChrome.social.billboard.placeholder'))}" data-field="gmotd" autocomplete="off" spellcheck="false"/>` +
+        `<button type="button" class="btn ui-btn" data-act="gmotd-save">${esc(t('hudChrome.social.billboard.save'))}</button>` +
         `</div>`
       : '';
     return (
-      `<div class="soc-billboard">` +
+      `<div class="soc-billboard ui-card">` +
       `<div class="soc-billboard-label">${esc(t('hudChrome.social.billboard.label'))}</div>` +
       message +
       setBy +
@@ -798,10 +959,10 @@ export class SocialWindow {
       guild: `<span class="guild-tier-${pledge.tier}">${esc(pledge.guildName)}</span>`,
     });
     return (
-      `<div class="soc-my-pledge">` +
+      `<div class="soc-my-pledge ui-card">` +
       `<span class="soc-my-pledge-line">${line}</span>` +
       `<span class="soc-my-pledge-since">${esc(t('hudChrome.pledge.since', { date: formatDateTime(new Date(pledge.sinceMs), { dateStyle: 'medium' }) }))}</span>` +
-      `<button type="button" class="btn" data-act="pledge-withdraw">${esc(t('hudChrome.pledge.withdraw'))}</button>` +
+      `<button type="button" class="btn ui-btn" data-act="pledge-withdraw">${esc(t('hudChrome.pledge.withdraw'))}</button>` +
       `</div>`
     );
   }
@@ -815,27 +976,32 @@ export class SocialWindow {
     if (!panel) return `<div class="soc-empty">${esc(t('hud.social.noGuild'))}</div>`;
     const s = panel.settings;
     const settings =
-      `<div class="soc-pledge-settings">` +
+      `<div class="soc-pledge-settings ui-card">` +
       `<div class="soc-billboard-label">${esc(t('hudChrome.pledge.settings'))}</div>` +
-      `<label class="soc-pledge-open"><input type="checkbox" data-field="popen"${s.enabled ? ' checked' : ''}/> ${esc(t('hudChrome.pledge.acceptingLabel'))}</label>` +
+      `<label class="soc-pledge-open"><input class="ui-check" type="checkbox" data-field="popen"${s.enabled ? ' checked' : ''}/> ${esc(t('hudChrome.pledge.acceptingLabel'))}</label>` +
       `<label class="soc-pledge-minlvl">${esc(t('hudChrome.pledge.minLevelLabel'))} ` +
-      `<input inputmode="numeric" pattern="[0-9]*" maxlength="2" data-field="pminlvl" value="${esc(String(s.minLevel))}" autocomplete="off"/></label>` +
+      `<input class="ui-input" inputmode="numeric" pattern="[0-9]*" maxlength="2" data-field="pminlvl" value="${esc(String(s.minLevel))}" autocomplete="off"/></label>` +
+      // Guild board categories: the new-player-friendly opt-in, with the
+      // board's own sprout glyph so the editor and the signpost chip match.
+      `<label class="soc-pledge-open soc-pledge-category"><input class="ui-check" type="checkbox" data-field="pnewbie"${s.newPlayerFriendly ? ' checked' : ''}/> ` +
+      `<span class="soc-pledge-category-icon" aria-hidden="true">${svgIcon('sprout')}</span>${esc(t('hudChrome.pledge.newPlayerFriendlyLabel'))}</label>` +
+      `<div class="soc-pledge-hint">${esc(t('hudChrome.pledge.newPlayerFriendlyHint'))}</div>` +
       `<div class="soc-pledge-note-row">` +
-      `<input maxlength="${PLEDGE_NOTE_MAX}" value="${esc(s.note)}" aria-label="${esc(t('hudChrome.pledge.noteLabel'))}" placeholder="${esc(t('hudChrome.pledge.notePlaceholder'))}" data-field="pnote" autocomplete="off" spellcheck="false"/>` +
-      `<button type="button" class="btn" data-act="pledge-settings-save">${esc(t('hudChrome.pledge.save'))}</button>` +
+      `<input class="ui-input" maxlength="${PLEDGE_NOTE_MAX}" value="${esc(s.note)}" aria-label="${esc(t('hudChrome.pledge.noteLabel'))}" placeholder="${esc(t('hudChrome.pledge.notePlaceholder'))}" data-field="pnote" autocomplete="off" spellcheck="false"/>` +
+      `<button type="button" class="btn ui-btn" data-act="pledge-settings-save">${esc(t('hudChrome.pledge.save'))}</button>` +
       `</div></div>`;
     if (panel.rows.length === 0)
-      return settings + `<div class="soc-empty">${esc(t('hudChrome.pledge.empty'))}</div>`;
+      return `${settings}<div class="soc-empty">${esc(t('hudChrome.pledge.empty'))}</div>`;
     const rows = panel.rows
       .map((p) => {
         const since = formatDateTime(new Date(p.sinceMs), { dateStyle: 'medium' });
         return (
           `<div class="soc-row">` +
-          `<span class="soc-id"><span class="soc-name">${esc(p.name)}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(p.cls) }))}</span></span>` +
+          `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(p.cls)}">${esc(p.name)}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(p.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(p.cls) }))}</span></span>` +
           `<span class="soc-meta">${esc(t('hudChrome.pledge.since', { date: since }))}</span>` +
           `<span class="soc-actions">` +
-          `<button type="button" class="soc-x soc-pledge-accept" data-act="pledge-accept" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.acceptTitle', { name: p.name }))}">${svgIcon('check')}</button>` +
-          `<button type="button" class="soc-x" data-act="pledge-reject" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.rejectTitle', { name: p.name }))}">${svgIcon('close')}</button>` +
+          `<button type="button" class="soc-x soc-pledge-accept ui-disc" data-act="pledge-accept" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.acceptTitle', { name: p.name }))}">${svgIcon('check')}</button>` +
+          `<button type="button" class="soc-x ui-disc" data-act="pledge-reject" data-name="${esc(p.name)}" title="${esc(t('hudChrome.pledge.rejectTitle', { name: p.name }))}">${svgIcon('close')}</button>` +
           `</span></div>`
         );
       })
@@ -847,7 +1013,7 @@ export class SocialWindow {
     const w = this.deps.world();
     const view = raidView(w.partyInfo, w.playerId);
     if (!view.raid) {
-      return `<div class="soc-empty">${esc(t('hud.social.raidEmpty'))}${view.canConvert ? `<div class="soc-empty-action"><button type="button" class="soc-x" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</button></div>` : ''}</div>`;
+      return `<div class="soc-empty">${esc(t('hud.social.raidEmpty'))}${view.canConvert ? `<div class="soc-empty-action"><button type="button" class="soc-x ui-btn" data-act="convert-raid">${esc(t('hud.chat.context.convertToRaid'))}</button></div>` : ''}</div>`;
     }
     const groupHtml = (grp: NonNullable<typeof view.groups>[number]): string => {
       const rows =
@@ -855,11 +1021,11 @@ export class SocialWindow {
           .map((m) => {
             const move =
               m.moveTo !== null
-                ? `<button type="button" class="soc-x" data-act="raid-move" data-pid="${m.pid}" data-group="${m.moveTo}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(m.moveTo, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(m.moveTo, { maximumFractionDigits: 0 }))}</button>`
+                ? `<button type="button" class="soc-x ui-disc" data-act="raid-move" data-pid="${m.pid}" data-group="${m.moveTo}" title="${esc(t('hud.social.raidMoveToGroup', { group: formatNumber(m.moveTo, { maximumFractionDigits: 0 }) }))}">${esc(formatNumber(m.moveTo, { maximumFractionDigits: 0 }))}</button>`
                 : '';
             return (
               `<div class="soc-row raid-row">` +
-              `<span class="soc-id"><span class="soc-name">${esc(m.name)}${m.isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
+              `<span class="soc-id"><span class="soc-name" style="--class-color:${classColorCss(m.cls)}">${esc(m.name)}${m.isLead ? `<span class="rank">${esc(t('hud.social.raidLeader'))}</span>` : ''}</span><span class="soc-sub">${esc(t('hud.social.levelClass', { level: formatNumber(m.level, { maximumFractionDigits: 0 }), className: playerClassDisplayName(m.cls) }))}</span></span>` +
               `<span class="soc-meta">${esc(formatNumber(m.hpPct, { maximumFractionDigits: 0 }))}%</span>` +
               (move ? `<span class="soc-actions">${move}</span>` : '') +
               `</div>`
@@ -871,14 +1037,96 @@ export class SocialWindow {
     if (!view.groups) return '';
     const [g1, g2] = view.groups;
     const footer = view.canUnconvert
-      ? `<div class="soc-empty-action"><button type="button" class="soc-x" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</button></div>`
+      ? `<div class="soc-empty-action"><button type="button" class="soc-x ui-btn" data-act="convert-party">${esc(t('hud.chat.context.convertToParty'))}</button></div>`
       : '';
     return `<div class="raid-groups">${groupHtml(g1)}${groupHtml(g2)}</div>${footer}`;
+  }
+
+  // The Who tab body: the count line + class chip, then a sortable table of the
+  // delivered rows (who_tab_view.ts decides the order and the chip options).
+  private whoHtml(): string {
+    const w = this.deps.world();
+    // Spectating drops every command but chat before the socket, so the tab
+    // can never be answered there: show the same online-only empty state the
+    // offline window shows rather than a loading line that never resolves.
+    if (w.spectating !== null)
+      return `<div class="soc-empty">${esc(t('hud.social.offlineEmpty'))}</div>`;
+    const info = w.whoInfo;
+    if (!info || info.filter !== this.who.search)
+      return `<div class="soc-empty">${esc(t('hudChrome.social.who.loading'))}</div>`;
+    const labels = { cls: playerClassDisplayName, zone: localizeZone };
+    const rows = whoTabRows(info, this.who, w.player.name, labels);
+    const count = whoCountView(info, rows.length);
+    const n = formatCount;
+    const countText =
+      count.shown === count.total
+        ? t('hudChrome.social.who.count', { total: n(count.total) })
+        : t('hudChrome.social.who.countFiltered', { shown: n(count.shown), total: n(count.total) });
+    const capped = count.capped
+      ? ` <span class="soc-who-capped">${esc(t('hudChrome.social.who.capped', { delivered: n(count.delivered) }))}</span>`
+      : '';
+    const options = whoClassOptions(info, labels)
+      .map(
+        (cls) =>
+          `<option value="${esc(cls)}"${cls === this.who.cls ? ' selected' : ''}>${esc(playerClassDisplayName(cls))}</option>`,
+      )
+      .join('');
+    const chip =
+      `<select class="ui-input soc-who-cls" data-field="who-cls" aria-label="${esc(t('hudChrome.social.who.classFilter'))}">` +
+      `<option value=""${this.who.cls === '' ? ' selected' : ''}>${esc(t('hudChrome.social.who.allClasses'))}</option>${options}</select>`;
+    const head = `<div class="soc-who-head"><span class="soc-who-count">${esc(countText)}${capped}</span>${chip}</div>`;
+    const columns: { key: WhoSortKey; label: string }[] = [
+      { key: 'name', label: t('hudChrome.social.who.colName') },
+      { key: 'level', label: t('hudChrome.social.who.colLevel') },
+      { key: 'cls', label: t('hudChrome.social.who.colClass') },
+      { key: 'zone', label: t('hudChrome.social.who.colZone') },
+      { key: 'guild', label: t('hudChrome.social.who.colGuild') },
+    ];
+    const headerCell = (c: { key: WhoSortKey; label: string }): string => {
+      const active = this.who.sort === c.key;
+      const ariaSort = active ? (this.who.desc ? 'descending' : 'ascending') : 'none';
+      return `<span class="soc-who-cell who-${c.key}" role="columnheader" aria-sort="${ariaSort}"><button type="button" class="soc-who-sort${active ? ' on' : ''}" data-act="who-sort" data-key="${c.key}" title="${esc(t('hudChrome.social.who.sortTitle', { column: c.label }))}">${esc(c.label)}${active ? `<span class="soc-who-dir">${this.who.desc ? svgIcon('demote') : svgIcon('promote')}</span>` : ''}</button></span>`;
+    };
+    // The class / zone / guild trio is grouped (.soc-who-meta: display contents
+    // on the desktop grid, one wrapped line under the name on a touch window).
+    const header =
+      `<div class="soc-who-row soc-who-header" role="row"><span class="soc-who-cell who-dot" role="columnheader" aria-label="${esc(t('hudChrome.social.who.colStatus'))}"></span>` +
+      columns.slice(0, 2).map(headerCell).join('') +
+      `<span class="soc-who-meta" role="presentation">${columns.slice(2).map(headerCell).join('')}</span>` +
+      `</div>`;
+    if (rows.length === 0)
+      return `${head}<div class="soc-empty">${esc(t('hudChrome.social.who.empty'))}</div>`;
+    const body = rows
+      .map((r) => {
+        const tip = esc(dotTitle(true, r.status, r.zone));
+        const name = r.self
+          ? `<span class="soc-name" style="--class-color:${classColorCss(r.cls)}">${esc(r.name)}</span>`
+          : `<button type="button" class="soc-name soc-link" style="--class-color:${classColorCss(r.cls)}" data-whisper="${esc(r.name)}" title="${esc(t('hud.social.whisperTitle', { name: r.name }))}">${esc(r.name)}</button>`;
+        return (
+          `<div class="soc-row soc-who-row" role="row">` +
+          `<span class="soc-who-cell who-dot" role="cell"><span class="soc-dot ${r.dot}" title="${tip}"></span></span>` +
+          `<span class="soc-who-cell who-name" role="cell">${name}</span>` +
+          `<span class="soc-who-cell who-level" role="cell">${n(r.level)}</span>` +
+          `<span class="soc-who-meta" role="presentation">` +
+          `<span class="soc-who-cell who-cls" role="cell">${esc(playerClassDisplayName(r.cls))}</span>` +
+          `<span class="soc-who-cell who-zone" role="cell" title="${tip}">${esc(localizeZone(r.zone))}</span>` +
+          `<span class="soc-who-cell who-guild" role="cell">${esc(r.guild)}</span>` +
+          `</span></div>`
+        );
+      })
+      .join('');
+    return `${head}<div class="soc-who-list" role="table" aria-label="${esc(t('hudChrome.social.who.tab'))}">${header}${body}</div>`;
   }
 
   // The add/action row changes with the tab (and guild membership). Inputs
   // tagged data-suggest get the username typeahead.
   private footer(): string {
+    if (this.tab === 'who')
+      return (
+        `<div class="soc-add">` +
+        `<input class="ui-input" maxlength="${WHO_SEARCH_MAX}" aria-label="${esc(t('hudChrome.social.who.searchPlaceholder'))}" placeholder="${esc(t('hudChrome.social.who.searchPlaceholder'))}" data-field="who" value="${esc(this.who.search)}" autocomplete="off" spellcheck="false"/>` +
+        `<button class="btn ui-btn" data-act="who-search">${esc(t('hudChrome.social.who.search'))}</button></div>`
+      );
     if (this.tab === 'friends')
       return this.addRow(
         'friend',
@@ -936,15 +1184,15 @@ export class SocialWindow {
     const expand =
       roster && guild.rank === 'leader'
         ? roster.nextRosterPrice === null
-          ? `<button class="btn soc-foot-start" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
-          : `<button class="btn soc-foot-start" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand'))}</button>`
+          ? `<button class="btn ui-btn soc-foot-start" data-act="guild-expand" disabled>${esc(t('hudChrome.social.roster.maxed'))}</button>`
+          : `<button class="btn ui-btn soc-foot-start" data-act="guild-expand">${esc(t('hudChrome.social.roster.expand'))}</button>`
         : '';
     // classic MMOs: a Guild Master with other members can't just leave (they disband,
     // or hand over leadership via the crown action). Everyone else can leave.
     const leave =
       guild.rank === 'leader' && guild.members.length > 1
-        ? `<button class="btn" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button>`
-        : `<button class="btn" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button>`;
+        ? `<button class="btn ui-btn ui-btn--red" data-act="guild-disband">${esc(t('hud.social.disbandGuild'))}</button>`
+        : `<button class="btn ui-btn ui-btn--red" data-act="guild-leave">${esc(t('hud.social.leaveGuild'))}</button>`;
     foot += `<div class="soc-add soc-leave">${expand}${leave}</div>`;
     return foot;
   }
@@ -966,8 +1214,8 @@ export class SocialWindow {
       (suggest
         ? `<div class="soc-suggest" id="${listId}" data-for="${field}" role="listbox"></div>`
         : '') +
-      `<input maxlength="${maxlen}" aria-label="${esc(placeholder)}" placeholder="${esc(placeholder)}" data-field="${field}"${suggest ? ` data-suggest="1" role="combobox" aria-autocomplete="list" aria-controls="${listId}" aria-expanded="false"` : ''} autocomplete="off" spellcheck="false"/>` +
-      `<button class="btn" data-act="${act}">${esc(label)}</button></div>`
+      `<input class="ui-input" maxlength="${maxlen}" aria-label="${esc(placeholder)}" placeholder="${esc(placeholder)}" data-field="${field}"${suggest ? ` data-suggest="1" role="combobox" aria-autocomplete="list" aria-controls="${listId}" aria-expanded="false"` : ''} autocomplete="off" spellcheck="false"/>` +
+      `<button class="btn ui-btn" data-act="${act}">${esc(label)}</button></div>`
     );
   }
 
@@ -991,6 +1239,7 @@ export class SocialWindow {
       this.notice = null;
       this.lastStruct = this.structSig();
       this.render();
+      if (this.tab === 'who') this.requestWho();
       if (focusFollow) focusActiveTab(el, 'soc-tab', 'on');
     });
     const w = this.deps.world();
@@ -998,7 +1247,8 @@ export class SocialWindow {
       (el.querySelector(`input[data-field="${sel}"]`) as HTMLInputElement | null)?.value.trim() ??
       '';
     const submit = (act: string | undefined): void => {
-      if (act === 'friend-add') void this.resolveAndAct('friend', field('friend'));
+      if (act === 'who-search') this.searchWho(field('who'));
+      else if (act === 'friend-add') void this.resolveAndAct('friend', field('friend'));
       else if (act === 'ignore-add') void this.resolveAndAct('ignore', field('ignore'));
       else if (act === 'block-add') void this.resolveAndAct('block', field('block'));
       else if (act === 'guild-invite') void this.resolveAndAct('ginvite', field('ginvite'));

@@ -10,6 +10,7 @@ import {
   type GfxCapabilities,
   getActiveGfxProfile,
   getGfxProfileEpoch,
+  rememberedGpuRendererName,
   resolveGfxProfile,
 } from '../src/render/gfx';
 
@@ -177,6 +178,9 @@ describe('GfxProfile resolution and activation', () => {
       softwareRendering: true,
     });
     expect(Object.isFrozen(capabilities)).toBe(true);
+    // The capture remembers the adapter string per renderer for the shader
+    // corpus record, which then never issues the query a second time.
+    expect(rememberedGpuRendererName(webgl)).toBe('Google SwiftShader');
 
     vi.unstubAllGlobals();
   });

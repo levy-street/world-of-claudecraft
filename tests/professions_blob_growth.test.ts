@@ -2169,11 +2169,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         fieldBytes(s2, key as keyof typeof fixtureBaseline) - value,
       ]),
     );
+    // Re-pinned 2026-09-11 with the stamina baseline model: a masterwork or
+    // Perfecting bake on a caster piece now carries its Stamina growth beside
+    // Intellect and Spirit (tierDeltaStats, item_budget.ts), so every baked
+    // copy in the maximal bags and bank is a few bytes longer and the
+    // equipped-instance delta shrinks by the same shape.
     expect(fixtureDelta).toEqual({
       equipment: 115,
-      equipmentInstance: -10,
-      inventory: 16320,
-      bank: 35904,
+      equipmentInstance: -17,
+      inventory: 16400,
+      bank: 36080,
       vendorBuyback: 756,
       knownRecipes: 62,
     });
@@ -2349,7 +2354,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       Buffer.byteLength(JSON.stringify(preReleaseCounterfactual), 'utf8'),
       'field_kit and the Bramblehide release content removed, must reproduce the recorded pre-field-kit Crucible+hammer baseline',
-    ).toBe(209524);
+    ).toBe(209773);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2360,7 +2365,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     expect(
       counterfactualBytes,
       'field_kit removed, must reproduce the current staged Crucible+hammer+Bramblehide+dev-mount baseline',
-    ).toBe(211121);
+    ).toBe(211370);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2383,7 +2388,7 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         return [field, bytes - Buffer.byteLength(JSON.stringify(stripped), 'utf8')];
       }),
     );
-    expect(metadataDelta).toEqual({ perfectingBonus: 11880, perfectingBound: 5934 });
+    expect(metadataDelta).toEqual({ perfectingBonus: 11872, perfectingBound: 5934 });
     // Combined fixture (Crucible baseline + hammer recipe/proof content +
     // field_kit + the Bramblehide/Nythgap release content, commit
     // 0ca3d01a60), measured after this release merge's settle: 211,034
@@ -2399,8 +2404,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // shared 211,034). Re-based per the standing rule (floor measurement
     // minus 380, edge measurement plus one, band width unchanged at 381):
     // 210,753..211,134.
-    expect(bytes, reMint).toBeGreaterThan(210753);
-    expect(bytes, reMint).toBeLessThan(211134);
+    //
+    // RE-BASED 2026-09-11 for the stamina baseline model (item_budget.ts,
+    // PR 3993): 211,382 bytes, +249 over the 211,133 above. What moved it: a
+    // masterwork or Perfecting bake on a caster piece now carries its Stamina
+    // growth beside Intellect and Spirit (tierDeltaStats), so every baked copy
+    // in the maximal bags and bank is a few bytes longer (the fixtureDelta
+    // block above records the same shape: inventory +80, bank +176,
+    // equipped-instance delta -7), while the Perfecting bonus metadata lost
+    // the zero-valued Spirit keys the old normaliser wrote (-8). Re-based per
+    // the standing rule (floor measurement minus 380, edge measurement plus
+    // one, band width unchanged at 381): 211,002..211,383.
+    expect(bytes, reMint).toBeGreaterThan(211002);
+    expect(bytes, reMint).toBeLessThan(211383);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

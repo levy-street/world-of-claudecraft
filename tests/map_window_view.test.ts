@@ -34,7 +34,6 @@ import { KIT_BUILDINGS } from '../src/sim/kit_buildings';
 import type { QuestObjectiveRef } from '../src/sim/quest_targets';
 import {
   emptyZoneProps,
-  isQuestTurnInNpc,
   type NoticeboardDef,
   type QuestProgress,
   type WorldServicesDef,
@@ -78,24 +77,10 @@ const ZONE_MAX_X = ZONE.xMax ?? STRIP_MAX_X;
 const FULL_SPAN = Math.max(ZONE_MAX_X - ZONE_MIN_X, ZONE.zMax - ZONE.zMin);
 const ZONE_CX = (ZONE_MIN_X + ZONE_MAX_X) / 2;
 const LABELS_ZOOM = 1;
-// A quest giver with a real giverNpcId, so the npc-marker branch exercises real
-// content rather than an undefined === undefined accident.
-function requireQuestWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
-  if (!quest) throw new Error('expected a quest with a giverNpcId');
-  return quest;
-}
-const GIVER_QUEST = requireQuestWithGiver();
-// A quest whose giver is also a turn-in npc, so a single npc can carry a 'ready'
-// turn-in (the '?' glyph branch the painter renders, distinct from '!').
-function requireReadyQuest() {
-  const quest = Object.values(QUESTS).find(
-    (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
-  );
-  if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
-  return quest;
-}
-const READY_QUEST = requireReadyQuest();
+// Explicit combat content keeps generic glyph geometry independent of ambient
+// profession-offer visibility and content-table insertion order.
+const GIVER_QUEST = QUESTS.q_wolves;
+const READY_QUEST = QUESTS.q_wolves;
 
 // One scenario as plain data, so we can build two structurally-distinct IWorld
 // stubs (a "Sim-shaped" one carrying extra sim-only fields the core must ignore,
@@ -581,8 +566,8 @@ describe('buildOverworldMapModel (pure draw model)', () => {
   });
 
   it('classifies the repeat and cooldown variants identically for both world shapes', () => {
-    // Acceptance (a)'s both-worlds arm at the map surface: a real cadenced
-    // work order (giver in this test's zone), driven through a Sim-shaped
+    // Generic cadence classification at the map surface: a synthetic non-profession
+    // combat repeatable (giver in this test's zone), driven through a Sim-shaped
     // and a ClientWorld-mirror-shaped stub. After one completion the offer
     // is the blue repeat glyph; inside the window it is the dimmed cooldown
     // glyph; and a non-repeatable quest stays pixel-identical gold
@@ -590,29 +575,43 @@ describe('buildOverworldMapModel (pure draw model)', () => {
     // CLASSIFIER over each world's data shape; true world-to-world parity
     // of the inputs rests on the online cadence/attunement suites pinning
     // the qdone and cprof mirrors.
-    const workOrder = QUESTS.q_prof_workorder_forge;
-    expect(workOrder.repeatable).toBe(true);
-    for (const shape of ['sim', 'client'] as const) {
-      const world = makeOverworldWorld(shape) as unknown as {
-        questsDone: Set<string>;
-        craftingIdentity: { cadenceBlockedQuests: string[] };
-        questState: (q: string) => string;
-      };
-      world.questsDone = new Set([workOrder.id]);
-      world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
-      const offered = buildOverworldMapModel(input(world as unknown as IWorld, 1));
-      const offeredGlyph = offered.npcs.find((n) =>
-        n.quests.some((q) => q.questId === workOrder.id),
-      );
-      expect(offeredGlyph?.kind, `${shape}: offered again`).toBe('repeat');
+    const giverId = 'test_map_view_repeat_giver';
+    const workOrder = {
+      ...QUESTS.q_wolves,
+      id: 'q_test_map_view_repeat',
+      giverNpcId: giverId,
+      turnInNpcId: giverId,
+      repeatable: true,
+      repeatCadenceTicks: 1200,
+    };
+    QUESTS[workOrder.id] = workOrder;
+    NPCS[giverId] = { ...NPCS.marshal_redbrook, id: giverId, questIds: [workOrder.id] };
+    try {
+      for (const shape of ['sim', 'client'] as const) {
+        const world = makeOverworldWorld(shape) as unknown as {
+          questsDone: Set<string>;
+          craftingIdentity: { cadenceBlockedQuests: string[] };
+          questState: (q: string) => string;
+        };
+        world.questsDone = new Set([workOrder.id]);
+        world.questState = (q) => (q === workOrder.id ? 'available' : 'unavailable');
+        const offered = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+        const offeredGlyph = offered.npcs.find((n) =>
+          n.quests.some((q) => q.questId === workOrder.id),
+        );
+        expect(offeredGlyph?.kind, `${shape}: offered again`).toBe('repeat');
 
-      world.questState = () => 'unavailable';
-      world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
-      const blocked = buildOverworldMapModel(input(world as unknown as IWorld, 1));
-      const blockedGlyph = blocked.npcs.find((n) =>
-        n.quests.some((q) => q.questId === workOrder.id),
-      );
-      expect(blockedGlyph?.kind, `${shape}: inside the window`).toBe('cooldown');
+        world.questState = () => 'unavailable';
+        world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
+        const blocked = buildOverworldMapModel(input(world as unknown as IWorld, 1));
+        const blockedGlyph = blocked.npcs.find((n) =>
+          n.quests.some((q) => q.questId === workOrder.id),
+        );
+        expect(blockedGlyph?.kind, `${shape}: inside the window`).toBe('cooldown');
+      }
+    } finally {
+      delete QUESTS[workOrder.id];
+      delete NPCS[giverId];
     }
   });
 
@@ -984,6 +983,25 @@ describe('active-quest objective areas (the classic POI blobs)', () => {
     for (const a of model.questAreas) expect(a.numbers).toEqual([1]);
   });
 
+  it('drops the badges of an untracked quest and keeps the tracked numbering', () => {
+    // Untracking is presentation state (quest_tracking_core): the quest stays in
+    // the log and keeps its acceptance number, its BADGES just leave the map, the
+    // same way its row leaves the atlas rail and the HUD tracker.
+    const tracked = buildOverworldMapModel(input(makeOverworldWorld('sim', activeLog()), 1));
+    expect(tracked.questAreas.length).toBeGreaterThan(0);
+    const untracked = buildOverworldMapModel({
+      ...input(makeOverworldWorld('sim', activeLog()), 1),
+      untrackedQuestIds: new Set([quest.id]),
+    });
+    expect(untracked.questAreas).toEqual([]);
+    // An unrelated id in the set changes nothing.
+    const other = buildOverworldMapModel({
+      ...input(makeOverworldWorld('sim', activeLog()), 1),
+      untrackedQuestIds: new Set(['q_not_in_the_log']),
+    });
+    expect(other.questAreas).toEqual(tracked.questAreas);
+  });
+
   it('plots one blob per gather-node cluster, and the zone cull keeps them', () => {
     // The gather branch of questObjectiveAreas is the one that groups a flat node
     // table into clusters (quest_targets.ts pushNodeCluster), and it is the one
@@ -1169,15 +1187,16 @@ describe('zone-map gather nodes', () => {
     const wields = build([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 40 });
     expect(lockOf(wields, 'ore_mirefen_1')).toBe(false);
     expect(lockOf(wields, 'ore_mirefen_t2')).toBe(false);
-    // ...and is wield-filtered out at 39: no usable tool at all, so even the
-    // tier-1 veins lock (the wield arm, not the tier compare).
+    // ...and degrades at 39: the same owned pick still works as the best
+    // lower tier the counter can wield, so tier-1 veins open while tier-2
+    // veins stay locked (the wield arm, not the tier compare).
     const under = build([{ itemId: 'iron_mining_pick', count: 1 }], { mining: 39 });
-    expect(lockOf(under, 'ore_mirefen_1')).toBe(true);
+    expect(lockOf(under, 'ore_mirefen_1')).toBe(false);
     expect(lockOf(under, 'ore_mirefen_t2')).toBe(true);
     // A client mirror before its first gprof delta has NO proficiency map at
-    // all: the read fails closed (coerced to 0), never open.
+    // all: the read coerces to 0, so an owned higher tool degrades to tier 1.
     const preGprof = build([{ itemId: 'iron_mining_pick', count: 1 }], undefined);
-    expect(lockOf(preGprof, 'ore_mirefen_1')).toBe(true);
+    expect(lockOf(preGprof, 'ore_mirefen_1')).toBe(false);
     expect(lockOf(preGprof, 'ore_mirefen_t2')).toBe(true);
   });
 
@@ -1931,6 +1950,49 @@ describe('zone-map crafting stations', () => {
       );
       expect(nearest).toBeGreaterThanOrEqual(MAP_STATION_NPC_SEPARATION - 1e-6);
     }
+  });
+});
+
+describe('atlas layer filters', () => {
+  it('hides only player-selectable marker layers while retaining navigation and self', () => {
+    const world = makeOverworldWorldWithParty('sim');
+    const baseline = buildOverworldMapModel(input(world, LABELS_ZOOM));
+    const model = buildOverworldMapModel({
+      ...input(world, LABELS_ZOOM),
+      filters: {
+        quests: false,
+        gather: false,
+        dungeons: false,
+        services: false,
+        players: false,
+      },
+    });
+
+    expect(model.questAreas).toEqual([]);
+    expect(model.npcs).toEqual([]);
+    expect(model.gatherNodes).toEqual([]);
+    expect(model.portals).toEqual([]);
+    expect(model.services).toEqual([]);
+    expect(model.stations).toEqual([]);
+    expect(model.allies).toEqual([]);
+    expect(model.party).toEqual([]);
+    expect(model.player).not.toBeNull();
+    expect(model.navigation).toEqual(baseline.navigation);
+  });
+
+  it('projects the selected quest route from the player to the objective', () => {
+    const world = makeOverworldWorld('sim');
+    const route = { questId: 'q_wolves', x: 30, z: ZONE_CZ + 24 };
+    const model = buildOverworldMapModel({ ...input(world, 1), route });
+
+    expect(model.route).not.toBeNull();
+    expect(model.route?.from).toEqual(
+      expect.objectContaining({ mx: expect.any(Number), my: expect.any(Number) }),
+    );
+    expect(model.route?.to).toEqual(
+      expect.objectContaining({ mx: expect.any(Number), my: expect.any(Number) }),
+    );
+    expect(model.route?.to).not.toEqual(model.route?.from);
   });
 });
 

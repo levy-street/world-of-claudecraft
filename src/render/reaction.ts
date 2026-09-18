@@ -35,6 +35,19 @@ export function isFriendlyPet(
   return e.kind === 'mob' && e.ownerId !== null && !isOwnedPetHostile(e, entities, isPlayerHostile);
 }
 
+// True when a MOB reads as hostile to the viewer, folding in the same pet rule as
+// above: an owned pet inherits its owner's reaction, anything else answers with
+// its own `hostile` flag. The friendly-nameplate keybind asks this per plate
+// (nameplate_friendly_core.ts), so it lives with the other two helpers rather
+// than being re-derived at the call site.
+export function isMobHostileToViewer(
+  e: Entity,
+  entities: Map<number, Entity>,
+  isPlayerHostile: (p: Entity) => boolean,
+): boolean {
+  return e.ownerId !== null ? isOwnedPetHostile(e, entities, isPlayerHostile) : e.hostile;
+}
+
 // The classic level-difference ("con") color for a wild mob's nameplate, with a
 // friendly-pet override so an owned pet reads as friendly green rather than a
 // scary red. Kept here (pure) so the exact color thresholds are unit-tested.

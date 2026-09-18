@@ -530,7 +530,7 @@ export const PALMREACH_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 76, sta: 6, spi: 4 },
+    stats: { armor: 76, sta: 6, spi: 7 },
     sellValue: 2400,
   },
 };

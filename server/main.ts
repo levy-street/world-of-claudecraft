@@ -9,11 +9,11 @@ import { WebSocketServer } from 'ws';
 import { bankGrantStorageSlots } from '../src/sim/bank';
 import { DEEDS } from '../src/sim/content/deeds';
 import { PROVING_SHORE_ARRIVAL } from '../src/sim/content/proving_shore';
+import { GUILD_BOARD_CATEGORY_PARAM } from '../src/sim/guild_board_category';
 import {
   LEADERBOARD_MAX,
   LEADERBOARD_PAGE_SIZE,
   paginateDevLeaderboard,
-  paginateGuildLeaderboard,
   paginateLeaderboard,
 } from '../src/sim/leaderboard_page';
 import { Sim } from '../src/sim/sim';
@@ -48,6 +48,9 @@ import {
   handleEmailUnsubscribe,
   verifyLoginTwoFactor,
 } from './account';
+import { loadAccountLedger } from './account_ledger_db';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
+import { relicRecordsIdle } from './account_ledger_records';
 import {
   configureTopWealthHolders,
   startAccountWealthSweep,
@@ -218,7 +221,6 @@ import {
   type TokenScope,
   topArenaRatings,
   topBgRatings,
-  topGuilds,
   topLifetimeXp,
   touchLogin,
   walletForAccount,
@@ -272,6 +274,8 @@ import {
 import { configureGithubContributorsRuntime, topContributors } from './github_contributors';
 import { pruneGitHubOAuthStates } from './github_db';
 import { guildBankLogCacheStats } from './guild_bank_log';
+import { topGuilds } from './guild_board_db';
+import { guildBoardPresence } from './guild_board_presence';
 import { configurePaidGuildCreateBackgroundGate } from './guild_create_db';
 import { createAccessLogSink } from './http/access_log';
 import { setAttackSignalSink } from './http/attack_signals';
@@ -323,8 +327,10 @@ import { isConnectionRefused } from './ip_block';
 import { pruneExpiredBlockedIps } from './ip_block_db';
 import {
   buildDeedsBoard,
+  buildGuildBoardResponse,
   configureLeaderboardRuntime,
   decodedRouteName,
+  decodeGuildBoardCategory,
   type ReleaseEntry,
   readArenaLeaderboard,
   readProjectStats,
@@ -756,6 +762,7 @@ async function refreshGuildLeaderboard(
     pledgesOpen: r.pledgesEnabled,
     ...(r.pledgeMinLevel > 1 ? { pledgeMinLevel: r.pledgeMinLevel } : {}),
     ...(r.pledgeNote ? { pledgeNote: r.pledgeNote } : {}),
+    ...(r.newPlayerFriendly ? { newPlayerFriendly: true } : {}),
     ...(scope === 'global' ? { realm: r.realm } : {}),
   }));
   // Skip the install if a moderation bust landed mid-refresh (see boardEpoch).
@@ -995,6 +1002,9 @@ function bustBoardCaches(): void {
   arenaLeaderboardCache['2v2'] = null;
   bgLeaderboardCache = null;
   deedsBoardCache = null;
+  // The guild board's officer roster (guild_board_presence.ts): a moderated
+  // officer's name must leave the presence tooltip as fast as the boards.
+  guildBoardPresence.bust();
   bustDailyRewardBoardCache();
   // Not a board, but the same delisting-must-be-immediate reasoning: the
   // per-character lifetime-XP rank cache (server/character_rank_cache.ts).
@@ -1966,10 +1976,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacterById(target.characterId);
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank, deedsRecent] = await Promise.all([
+      const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+        accountLedgerKeysFor(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -1982,6 +1993,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           guild,
           rank: toSheetRank(rank),
           deedsRecent,
+          accountLedger,
         }),
       );
     }
@@ -1992,10 +2004,11 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       const row = await getCharacter(accountId, Number(ownerSheetMatch[1]));
       if (!row)
         return json(res, 404, { error: 'character not found', code: 'character.not_found' });
-      const [guild, rank, deedsRecent] = await Promise.all([
+      const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
         guildNameForCharacter(row.id),
         lifetimeXpRankForCharacter(row.id),
         recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+        accountLedgerKeysFor(row.account_id).catch(() => undefined),
       ]);
       return json(
         res,
@@ -2008,6 +2021,7 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
           guild,
           rank: toSheetRank(rank),
           deedsRecent,
+          accountLedger,
         }),
       );
     }
@@ -2351,14 +2365,25 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
         const guildEntries = await getGuildLeaderboard(scope);
         const guildPageSize = Number(params.get('pageSize')) || LEADERBOARD_PAGE_SIZE;
         const guildPage = Number(params.get('page')) || 0;
-        const guildSlice = paginateGuildLeaderboard(guildEntries, guildPage, guildPageSize);
-        return json(res, 200, {
-          realm: REALM,
-          scope,
-          board: 'guilds',
-          metric: 'guildLifetimeXp',
-          ...guildSlice,
-        });
+        // The category filter and the live officer presence ride the shared
+        // served-body builder, so this arm and the RouteDef stay byte-identical.
+        const guildCategory = decodeGuildBoardCategory(
+          params.get(GUILD_BOARD_CATEGORY_PARAM) ?? undefined,
+        );
+        return json(
+          res,
+          200,
+          await buildGuildBoardResponse(
+            REALM,
+            scope,
+            guildEntries,
+            guildPage,
+            guildPageSize,
+            guildCategory,
+            (id) => liveGame().hasSessionForCharacter(id),
+            req,
+          ),
+        );
       }
       // ?board=devs ranks open-source CONTRIBUTORS by merged pull requests, sourced
       // from the cached public GitHub PR stats. The same data for every realm,
@@ -2915,6 +2940,7 @@ configureLeaderboardRuntime({
   perfProfile: () => liveGame().perfProfile(),
   getLeaderboard,
   getGuildLeaderboard,
+  isCharacterOnline: (id) => liveGame().hasSessionForCharacter(id),
   getDevLeaderboard: () => topContributors(),
   getDeedsLeaderboard,
   deedsSelfRank,
@@ -3747,6 +3773,10 @@ export async function startServer(): Promise<http.Server> {
     void refreshGuildLeaderboardShared
       .global()
       .catch((err) => console.error('guild leaderboard refresh failed (global):', err));
+    // The guild board's officer roster (guild_board_presence.ts) rides the
+    // same cadence, so the first viewer after a refresh or a bust never pays
+    // the roster read inline on the request path; warm() never rejects.
+    void guildBoardPresence.warm();
     // Demand-gated: the Renown board is a full-table roll-up, so keep it warm
     // only while it is actually being viewed (a request within
     // DEEDS_BOARD_DEMAND_TTL_MS). An idle board pays nothing here; a cold or stale
@@ -3797,6 +3827,7 @@ export async function startServer(): Promise<http.Server> {
     metaRequestUserData,
     metaEventSourceUrl,
     loadAccountCosmetics,
+    loadAccountLedger,
     isConnectionRefused,
     bufferHandshakeMessages,
     requestMetadata,
@@ -4243,6 +4274,10 @@ export async function startServer(): Promise<http.Server> {
     // go missing until that character's next login (the join reconcile is the
     // only heal). Rejections log inside the writer, so the drain never throws.
     await deedRecordsIdle();
+    // The account ledger's relic FIFO (account_relic_finds) drains on the same
+    // reasoning: a queued insert rejected by pool.end() would wait for the
+    // finder's next login reconcile while its alts miss the find.
+    await relicRecordsIdle();
     // Drain the progress-events FIFO (level_up_events / ftue_events) as well:
     // unlike deeds these rows have no reconcile heal path, so a row dropped by
     // pool.end() is gone. Rejections log inside the writer; never throws.

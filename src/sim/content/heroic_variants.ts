@@ -14,10 +14,10 @@
 // key, and the entity manifest skips it.
 import {
   HEROIC_VARIANT_SOURCE_LEVEL,
-  normalizePrimaryStats,
-  PRIMARY_STATS,
+  normalizeToStaminaModel,
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
+  realizedLineBudget,
   scaleWeaponDamage,
   slotStatMultForItem,
   TWOHAND_DPS_MULT,
@@ -123,14 +123,20 @@ function makeHeroicVariant(base: ItemDef, sourceLevel = HEROIC_VARIANT_SOURCE_LE
     primaryStatBudget(targetLevel, base.quality, base.slot, slotStatMultForItem(base)) *
       handMultiplier,
   );
-  const baseBudget = base.stats
-    ? PRIMARY_STATS.reduce((sum, stat) => sum + (base.stats?.[stat] ?? 0), 0)
-    : 0;
-  // normalizePrimaryStats keeps the item's stat identity (its str/agi/int ratio)
-  // and passes armor through untouched; only the primary-stat sum grows to the
-  // larger of the heroic target budget and the base item's realized budget.
+  // The base item's realized LINE budget (item_budget.ts, the stamina baseline
+  // model): its whole primary total for a physical identity (stamina sits inside
+  // it); for a caster identity its Intellect plus Spirit plus whatever stamina it
+  // carries above the baseline, since that extra was bought from the line. Read
+  // from the stats themselves so an off-budget base (the drift allowlist) keeps
+  // its realized line and its variant never carries less of any stat than the
+  // item it upgrades.
+  const baseBudget = base.stats ? realizedLineBudget(base.stats) : 0;
+  // normalizeToStaminaModel keeps the item's stat identity (its str/agi/int ratio),
+  // places the free stamina baseline for the variant's line, and passes armor
+  // through untouched; the line grows to the larger of the heroic target and the
+  // base item's realized line.
   const stats = base.stats
-    ? normalizePrimaryStats(base.stats, Math.max(targetBudget, baseBudget))
+    ? normalizeToStaminaModel(base.stats, Math.max(targetBudget, baseBudget))
     : base.stats;
   // Weapon damage tracks item level too: scale the base weapon to the heroic-tier
   // dps for this variant's item level (two-handers ride TWOHAND_DPS_MULT above the

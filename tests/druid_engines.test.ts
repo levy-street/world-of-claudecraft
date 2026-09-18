@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { isRooted } from '../src/sim/combat/cc';
 import { handleDeath } from '../src/sim/combat/damage';
 import {
   druidEngineCombatState,
@@ -222,7 +223,7 @@ describe('Moongrove engine', () => {
 });
 
 describe('Wildfang engine', () => {
-  it('applies Wildfang AP tuning to the Wolf Form bonus', () => {
+  it('applies Wildfang AP tuning to the Cat Form bonus', () => {
     const { sim, player } = rig('feral');
     const meta = sim.meta(player.id);
     expect(meta).toBeDefined();
@@ -510,7 +511,8 @@ describe('Groveheart engine', () => {
 
 describe('Loping Stride', () => {
   it('stamps a real move-speed multiplier so shapeshifting actually sprints', () => {
-    const { sim, player } = rig('feral', { 5: 'dru_r5_ferocity' });
+    // Baseline since the Wildfang kit pass 2: no row 5 talent selected.
+    const { sim, player } = rig('feral');
     expect(moveSpeedMult(player)).toBe(1);
 
     completed(sim, 'bear_form');
@@ -527,7 +529,7 @@ describe('Loping Stride', () => {
   });
 
   it('holds the 20s internal cooldown between shifts', () => {
-    const { sim, player } = rig('feral', { 5: 'dru_r5_ferocity' });
+    const { sim, player } = rig('feral');
     completed(sim, 'cat_form');
     player.auras = player.auras.filter((aura) => aura.id !== 'loping_stride');
     completed(sim, 'bear_form');
@@ -540,5 +542,106 @@ describe('Loping Stride', () => {
     completed(sim, 'cat_form');
     expect(player.auras.some((aura) => aura.id === 'loping_stride')).toBe(true);
     expect(moveSpeedMult(player)).toBeCloseTo(1.6);
+  });
+});
+
+describe('Fleet Form control break (baseline) and the Wildshift gate', () => {
+  // A breakable root or slow the way an enemy would stamp it; unbreakable
+  // control carries the unbreakableControl flag (encounter-owned CC).
+  function control(
+    player: Entity,
+    kind: 'root' | 'slow',
+    id: string,
+    options: { unbreakable?: boolean } = {},
+  ): Aura {
+    const aura: Aura = { ...formAura(player, kind), id, name: id };
+    aura.value = kind === 'slow' ? 0.5 : 0;
+    aura.sourceId = -1;
+    if (options.unbreakable) aura.unbreakableControl = true;
+    return aura;
+  }
+  const wears = (player: Entity, kind: Aura['kind']) =>
+    player.auras.some((aura) => aura.kind === kind);
+
+  it('Fleet Form strips a breakable root and slow with NO talent selected', () => {
+    const { sim, player } = rig('feral');
+    player.auras.push(
+      control(player, 'root', 'entangling_roots'),
+      control(player, 'slow', 'crippling_poison'),
+    );
+    expect(isRooted(player)).toBe(true);
+    expect(moveSpeedMult(player)).toBeCloseTo(0.5);
+
+    completed(sim, 'travel_form');
+    expect(wears(player, 'root')).toBe(false);
+    expect(wears(player, 'slow')).toBe(false);
+    expect(isRooted(player)).toBe(false);
+    // One aura-lost event per stripped control, the same emit Wildshift makes.
+    const lost = sim
+      .tick()
+      .filter(
+        (event) =>
+          event.type === 'aura' &&
+          event.targetId === player.id &&
+          event.gained === false &&
+          (event.name === 'entangling_roots' || event.name === 'crippling_poison'),
+      )
+      .map((event) => (event as { name: string }).name)
+      .sort();
+    expect(lost).toEqual(['crippling_poison', 'entangling_roots']);
+  });
+
+  it('Fleet Form leaves unbreakable control in place', () => {
+    const { sim, player } = rig('feral');
+    player.auras.push(
+      control(player, 'root', 'boss_grasp', { unbreakable: true }),
+      control(player, 'slow', 'crippling_poison'),
+    );
+    completed(sim, 'travel_form');
+    expect(player.auras.some((aura) => aura.id === 'boss_grasp')).toBe(true);
+    expect(isRooted(player)).toBe(true);
+    expect(wears(player, 'slow')).toBe(false);
+  });
+
+  it('the real cast path breaks the root: a rooted druid casts Fleet Form and is free', () => {
+    const { sim, player } = rig('feral');
+    player.auras.push(control(player, 'root', 'entangling_roots'));
+    player.gcdRemaining = 0;
+    player.resource = player.maxResource;
+    sim.castAbility('travel_form');
+    sim.tick();
+    expect(wears(player, 'form_travel')).toBe(true);
+    expect(wears(player, 'root')).toBe(false);
+  });
+
+  it('Cat Form strips nothing without Wildshift', () => {
+    const { sim, player } = rig('feral');
+    player.auras.push(
+      control(player, 'root', 'entangling_roots'),
+      control(player, 'slow', 'crippling_poison'),
+    );
+    completed(sim, 'cat_form');
+    expect(wears(player, 'root')).toBe(true);
+    expect(wears(player, 'slow')).toBe(true);
+  });
+
+  it('Cat Form strips both with Wildshift selected', () => {
+    const { sim, player } = rig('feral', { 5: 'dru_r5_improved_wrath' });
+    player.auras.push(
+      control(player, 'root', 'entangling_roots'),
+      control(player, 'slow', 'crippling_poison'),
+    );
+    completed(sim, 'cat_form');
+    expect(wears(player, 'root')).toBe(false);
+    expect(wears(player, 'slow')).toBe(false);
+  });
+
+  it('Bruin and Moonwing keep the talent gate (only Fleet Form is baseline)', () => {
+    for (const form of ['bear_form', 'moonkin_form']) {
+      const { sim, player } = rig('feral');
+      player.auras.push(control(player, 'root', 'entangling_roots'));
+      completed(sim, form);
+      expect(wears(player, 'root'), form).toBe(true);
+    }
   });
 });

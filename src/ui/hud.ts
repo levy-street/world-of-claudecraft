@@ -54,8 +54,6 @@ import {
   onPortraitsReady,
   onPortraitUpdate,
 } from '../render/characters/portrait';
-import { currentDayNightPhase } from '../render/day_night_clock';
-import { globalDayness, skyTintForDayness } from '../render/day_night_core';
 import { isFriendlyPet, mobTooltipConColor } from '../render/reaction';
 import type { Renderer } from '../render/renderer';
 import {
@@ -180,7 +178,8 @@ import {
 } from './aura_effect';
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
-import { AuraOverlayController } from './aura_overlay_controller';
+import type { AuraOverlayController } from './aura_overlay_controller';
+import { auraOverlaySettingsHooks, createAuraOverlayController } from './aura_overlay_wiring';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import {
@@ -189,7 +188,6 @@ import {
   createAurasView,
   isToggleAuraKind,
 } from './auras_view';
-import { attachAvatarFallback } from './avatar_fallback';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
 import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
@@ -206,9 +204,9 @@ import { CalendarWindow } from './calendar_window';
 import { require2dContext } from './canvas_context';
 import { CardDuelWindow } from './card_duel_window';
 import { CastBarPainter, type CastBarPaintInput } from './cast_bar_painter';
-import { castDisplayName, targetCastDisplayLabel } from './cast_display_name';
+import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
-import { charSheetRefreshSig } from './char_sheet_sig_core';
+import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
@@ -221,12 +219,11 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import { cheaterTagLabel } from './cheater_tag';
 import { wireChromeFocus } from './chrome_focus_wiring';
 import { ClaudiumLauncherBalance } from './claudium_launcher_balance_core';
 import { createClaudiumPurchaseFacet } from './claudium_purchase_bridge';
 import { type ClaudiumRail, type ClaudiumSnapshot, ClaudiumWindow } from './claudium_window';
-import { formatClockTime } from './clock';
+import { formatClockTimeMemo } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
   auraApplyCue,
@@ -255,13 +252,15 @@ import {
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
 import { formatMinimapCoords } from './coords';
+import { formatCount } from './count_format';
 import { classCrestId } from './crest_icon_art';
 import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
+import { DayNightDialPainter } from './day_night_dial_painter';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
-import { deedBorderSlug, deedTargetBorderSlug } from './deed_border_view';
+import { deedBorderSlug } from './deed_border_view';
 import {
   deedBroadcastRendered,
   deedName,
@@ -322,6 +321,7 @@ import { esc } from './esc';
 import { blockFctAmountText } from './fct_core';
 import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
+import { ferryBellHomeNoteToOpen, writeEastbrookGuidanceChoice } from './ferry_bell_home_note';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
 import { type FounderPackPreviewDeps, FounderPackPreviewPanel } from './founder_pack_preview';
@@ -351,6 +351,7 @@ import {
   handleShiftClearKeydown,
 } from './hud/action_bar/action_bar_clear';
 import { ActionBarController } from './hud/action_bar/action_bar_controller';
+import { actionBarIconBg } from './hud/action_bar/action_bar_icon_bg';
 import {
   ACTION_BAR_ABILITY_SLOTS,
   ACTION_BAR_ABILITY_SLOTS_PER_ROW,
@@ -364,14 +365,10 @@ import {
   installActionBarToggle,
 } from './hud/action_bar/action_bar_toggle_controller';
 import {
-  ABILITY_ICON_PREFIX,
   type ActionBarView,
   type ActionBarWorldInput,
-  ATTACK_ICON_KEY,
   actionBarCooldownRemaining,
   createActionBarView,
-  EMPTY_ICON_KEY,
-  ITEM_ICON_PREFIX,
 } from './hud/action_bar/action_bar_view';
 import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
 import {
@@ -454,6 +451,8 @@ import {
 import { type ChatClock, clampChatClock, formatChatTimestamp } from './hud/chat/chat_timestamp';
 import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
+import { RaidWarningBanner } from './hud/chat/raid_warning_banner';
+import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import {
@@ -462,6 +461,7 @@ import {
   type CrossHotbarOverlayAction,
   type CrossHotbarPanelHooks,
   crossHotbarResolvers,
+  crossHotbarSeedActions,
 } from './hud/cross_hotbar';
 import { DelveBoardController } from './hud/delve/delve_board_controller';
 import { DelveMapPainter } from './hud/delve/delve_map_painter';
@@ -675,13 +675,11 @@ import { onMapArtReady } from './map_art';
 import { bakedMapBgEligible, loadBakedMapBg } from './map_bg';
 import { createMapMarkerArt } from './map_marker_icon_loader';
 import { mapMarkerProfileForFlags } from './map_marker_profile_core';
+import { mapDragPanCenter } from './map_pan_core';
 import { bindMapPinchZoom, finishMapTap, mapTapReleaseFromPointer } from './map_pinch_zoom';
-import {
-  MAP_TAP_MOVE_TOLERANCE_PX,
-  nextMapZoom,
-  zoomOutExitsZoneLevel,
-} from './map_pinch_zoom_core';
+import { MAP_TAP_MOVE_TOLERANCE_PX, nextMapZoom, zoomOutLevelExit } from './map_pinch_zoom_core';
 import { shouldResetMapPanOnZoneCross, showOnMapPanState } from './map_show_on_map_core';
+import { MapSidebarController } from './map_sidebar_controller';
 import {
   defaultMapLevel,
   type MapLevel,
@@ -704,6 +702,8 @@ import { MarketWindow } from './market_window';
 import { masterwroughtTooltipLines } from './masterwrought_cap_view';
 import { closeMaterialSourcesDialog, openMaterialSourcesDialog } from './material_sources_dialog';
 import { Meters } from './meters';
+import { MicroMenuStatePainter, microMenuWindowOpen } from './micro_menu_state_painter';
+import { createMicroMenuStateView } from './micro_menu_state_view';
 import { minimapMode } from './minimap_markers';
 import { MINIMAP_SIZE, MinimapPainter } from './minimap_painter';
 import {
@@ -724,6 +724,7 @@ import {
 } from './mob_idle_sfx';
 import { type MobTooltipI18n, type MobTooltipModel, mobTooltipHtml } from './mob_tooltip_view';
 import { bindMobileFrameLongPress as bindMobileFrameLongPressCore } from './mobile_frame_long_press';
+import { isCompactTouchHud, touchBagsShown } from './mobile_hud_layout';
 import { MobileMoreDialogController } from './mobile_more_dialog';
 import { moneyHtml } from './money_html';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
@@ -792,6 +793,7 @@ import {
   procOverlayState,
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
+import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -804,6 +806,13 @@ import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
+import { RecipePinStore } from './recipe_pins_store';
+import { RecipeTrackerPainter } from './recipe_tracker_painter';
+import {
+  makeRecipeTrackerInput,
+  type RecipeTrackerInput,
+  recipeTrackerView,
+} from './recipe_tracker_view';
 import {
   reliquaryIlluminationBroadcastLine,
   reliquaryIlluminationBroadcastRendered,
@@ -855,7 +864,6 @@ import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import { isStanceBarAbilityGroup } from './stance_bar_view';
 import {
   type BuffStatSource,
   buildStatTooltip,
@@ -873,12 +881,8 @@ import { localizeSystemText } from './system_text_i18n';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
-import {
-  type TargetFlairLineInput,
-  targetFlairLineHtml,
-  targetFlairLineVisible,
-  targetFlairSignature,
-} from './target_flair_line_view';
+import { TargetDiscordController } from './target_discord_controller';
+import { fillTargetFrameDescriptor } from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -893,18 +897,16 @@ import {
   paintMobTooltipBottomRight as paintMobTooltipBottomRightCore,
   paintTooltipAt as paintTooltipAtCore,
 } from './tooltip_paint';
+import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { tradeOfferCeiling } from './trade_view';
 import { TutorialOverlay } from './tutorial';
-import {
-  buildFerryBellHomeNote,
-  buildFerryIslandArrivalNote,
-  type TutorialGreetingNote,
-} from './tutorial_greeting_view';
+import { buildFerryIslandArrivalNote, type TutorialGreetingNote } from './tutorial_greeting_view';
 import { renderTutorialGreetingNote } from './tutorial_greeting_window';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
@@ -914,6 +916,7 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
+import { vendorSellConfirmPolicyFrom } from './vendor_sell_confirm_policy';
 import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
@@ -1209,6 +1212,7 @@ const CRAFTING_TAB_KEY = 'woc_crafting_tab';
 const CHAT_TEMPLATE_KEYS = {
   party: 'hud.chat.templates.party',
   battleground: 'hud.chat.templates.battleground',
+  raidWarning: 'hud.chat.templates.raidWarning',
   yell: 'hud.chat.templates.yell',
   whisper: 'hud.chat.templates.whisper',
   toWhisper: 'hud.chat.templates.toWhisper',
@@ -1221,6 +1225,10 @@ const CHAT_TEMPLATE_KEYS = {
   roll: 'hud.chat.templates.roll',
   say: 'hud.chat.templates.say',
 } satisfies Record<string, TranslationKey>;
+
+function localizeChatBody(ev: Extract<SimEvent, { type: 'chat' }>): string {
+  return ev.textKey ? t(ev.textKey as TranslationKey, ev.textValues) : ev.text;
+}
 // world map: terrain is pre-rendered for the whole zone at this resolution
 // (cached per zone) and a sub-rect is blitted for the current zoom.
 const MAP_BG_RES = 480;
@@ -1453,6 +1461,10 @@ export class Hud {
   // top-center lines fed by the questProgress event, aria-hidden decoration
   // (the chat log + live region carry the announced copy).
   private readonly questBanner = new QuestProgressBanner($('#quest-banner'));
+  private readonly raidWarningBanner = new RaidWarningBanner($('#raid-warning-banner'));
+  private readonly readyCheckLeaderWindow = new ReadyCheckLeaderWindow(
+    $('#ready-check-leader-window'),
+  );
   private subzoneEl = $('#subzone-banner');
   private tooltipEl = $('#tooltip');
   // Which element last painted the shared #tooltip box, so a hovered slot can
@@ -1509,9 +1521,11 @@ export class Hud {
   private targetTitlePostEl = appendChildSpan(this.targetNameEl, 'uf-title');
   private targetLevelEl = $('#tf-level');
   private targetDiscordEl = $('#tf-discord');
-  // Diff key for the target-frame Discord line, so its per-frame update only rebuilds
-  // innerHTML (and re-attaches the avatar fallback) when the Discord content changes.
-  private targetDiscordSig = '';
+  private mapSidebar: MapSidebarController;
+  private targetDiscord = new TargetDiscordController(
+    this.targetDiscordEl,
+    () => this.optionsHooks?.settings.get('showDevBadges') ?? true,
+  );
   private targetHpEl = $('#tf-hp');
   private targetHpTextEl = $('#tf-hp-text');
   private targetPortraitEl = $('#tf-portrait') as unknown as HTMLCanvasElement;
@@ -1635,8 +1649,7 @@ export class Hud {
   private minimapCtx: CanvasRenderingContext2D;
   private minimapBg: HTMLCanvasElement;
   private clockEl: HTMLElement | null = null;
-  private dayNightCtx: CanvasRenderingContext2D | null = null;
-  private lastDayNightDrawAt = 0; // the dial redraws ~1Hz; ample for the 20-minute cycle
+  private readonly dayNightDial = new DayNightDialPainter();
   private raidLockoutEl: HTMLElement | null = null;
   private raidLockoutLocked = false;
   private clock24 = false; // 24-hour vs 12-hour AM/PM display
@@ -2035,6 +2048,7 @@ export class Hud {
     },
     () => petBarPreviewIconIds(this.sim.cfg.playerClass),
   );
+  private touchFrameDrags: TouchFrameDrags | null = null;
   private readonly interfaceUnlock = new InterfaceUnlock({
     document,
     onUnlockedChanged: (unlocked) => {
@@ -2210,7 +2224,7 @@ export class Hud {
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
     });
     this.mapMarkerArt.preload();
-    this.auraOverlayController = new AuraOverlayController({
+    this.auraOverlayController = createAuraOverlayController({
       writers: this.writerFacet,
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
@@ -2218,6 +2232,7 @@ export class Hud {
       talents: () => this.sim.talents,
       iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
       paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
+      playCue: (cueId, volume) => audio.auraCue(cueId, volume),
     });
     this.farmPressAffordance = new FarmPressAffordanceController({
       root: $('#interact-affordance'),
@@ -2363,6 +2378,12 @@ export class Hud {
       log: (text, color) => this.log(text, color),
       hideTooltip: () => this.hideTooltip(),
     });
+    this.mapSidebar = new MapSidebarController({
+      root: () => $('#map-sidebar'),
+      click: () => audio.click(),
+      onRepaintMap: () => this.repaintOpenMap(),
+      onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
+    });
     this.fiesta = new FiestaController({
       document,
       world: () => this.sim,
@@ -2410,7 +2431,7 @@ export class Hud {
         questTitle,
         questNarrative,
         objectiveLabel: questObjectiveLabel,
-        number: (value) => this.questNumber(value),
+        number: (value) => formatCount(value),
         progress: (label, current, total) => this.questProgressText(label, current, total),
         suggestedPlayers: (count) => this.questSuggestedPlayersHtml(count),
         money: (copper) => moneyHtml(copper),
@@ -2567,6 +2588,7 @@ export class Hud {
       selectedQuestId: () => this.questlogWindow.selectedQuestId,
       hasQuest: (questId) => this.sim.questLog.has(questId),
       showError: (text) => this.showError(text),
+      openWhoTab: (filter) => this.socialWindow.openWhoTab(filter),
       afterTabShown: (pane) => {
         window.requestAnimationFrame(() => this.chatFollow.scrollToBottomIfPinned(pane));
       },
@@ -2765,8 +2787,9 @@ export class Hud {
     this.clockEl = $('#minimap-clock');
     // day/night dial on the minimap rim: a decorative canvas showing the
     // world day/night cycle. Same UI-only wall-clock allowance as the clock above.
-    const dayNightCanvas = document.getElementById('minimap-daynight') as HTMLCanvasElement | null;
-    this.dayNightCtx = dayNightCanvas?.getContext('2d') ?? null;
+    this.dayNightDial.attach(
+      document.getElementById('minimap-daynight') as HTMLCanvasElement | null,
+    );
     // raid-lockout badge on the minimap rim: a lock icon whose hover/tap panel
     // lists the player's raid lockouts (the unlock countdown). Always visible;
     // it lights up (.locked) while any raid is on cooldown. attachTooltip handles
@@ -2798,7 +2821,7 @@ export class Hud {
       this.dailyRewardsButtonEl = dailyRewardsButton;
       this.mobileDailyRewardsButtonEl = mobileDailyRewardsButton;
       dailyRewardsButton.innerHTML =
-        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async">';
+        '<img class="daily-rewards-icon" src="/ui/daily-rewards/treasure_chest.webp" alt="" draggable="false" decoding="async"><span class="daily-reward-count ui-badge ui-badge--corner" aria-hidden="true">1</span>';
       this.syncDailyRewardsSurfaceLabels();
       dailyRewardsButton.classList.remove('spin-ready');
       this.applyDailyRewardsChestButtonVisibility();
@@ -2876,91 +2899,41 @@ export class Hud {
     $('#mm-professions').addEventListener('click', () => this.toggleProfessions());
     $('#mm-harvest-journal')?.addEventListener('click', () => this.toggleHarvestJournal());
     $('#mm-perfecting')?.addEventListener('click', () => this.togglePerfecting());
-    // Collapse/expand the on-screen quest tracker by clicking its header. The
-    // overlay is click-through (pointer-events:none) except the header button, so
-    // delegate on the stable container (the header is rebuilt on each render).
-    $('#quest-tracker').addEventListener('click', (e) => {
-      if ((e.target as HTMLElement).closest('.qt-header')) this.toggleQuestTrackerCollapsed();
-      // A quest row jumps to that quest's detail in the quest log window.
-      const row = (e.target as HTMLElement).closest<HTMLElement>('.qt-title');
-      if (row?.dataset.quest) this.questlogWindow.openWithQuest(row.dataset.quest);
+    // The always-on tracker headers share one delegation contract
+    // (tracker_header_wiring.ts): a click or Enter/Space on the header flips
+    // the persisted collapse, stopped before the game binds hijack the focused
+    // button; a quest row jumps to that quest in the log. On the compact touch
+    // tier the deed and Reliquary rows are folded away (hud.mobile.css) and the
+    // header is a count chip, so activation opens the owning window instead of
+    // toggling a collapse the player cannot see; the recipe tracker is hidden
+    // on touch.
+    wireTrackerHeader($('#quest-tracker'), {
+      header: '.qt-header',
+      toggle: () => this.toggleQuestTrackerCollapsed(),
+      rows: {
+        selector: '.qt-title',
+        activate: (row) => {
+          if (!row.dataset.quest) return false;
+          this.questlogWindow.openWithQuest(row.dataset.quest);
+          return true;
+        },
+      },
     });
-    // Keyboard activation: handle Enter/Space here and stop the event before
-    // it bubbles to the window-level game keybinds (Enter opens chat, Space
-    // is preventDefault'd for jump), which would hijack the focused header
-    // button's activation: the tracker is a non-modal overlay, so
-    // canUseGameKeys() stays true while it has focus.
-    $('#quest-tracker').addEventListener('keydown', (e) => {
-      const target = e.target as HTMLElement;
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (target.closest('.qt-header')) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.toggleQuestTrackerCollapsed();
-        return;
-      }
-      // Keyboard activation for the quest rows (role=button), stopped before
-      // the window-level game keybinds hijack Enter/Space (same as the header).
-      const row = target.closest<HTMLElement>('.qt-title');
-      if (row?.dataset.quest) {
-        e.preventDefault();
-        e.stopPropagation();
-        this.questlogWindow.openWithQuest(row.dataset.quest);
-      }
+    const compactTouch = (): boolean =>
+      document.body.classList.contains('mobile-touch') &&
+      document.body.classList.contains('hud-mobile-compact');
+    wireTrackerHeader($('#deed-tracker'), {
+      toggle: () => this.toggleDeedTrackerCollapsed(),
+      isCompact: compactTouch,
+      openCompact: () => this.openDeeds(),
     });
-    // Collapse/expand the deed tracker from its header (the quest tracker
-    // delegation pattern: click plus the Enter/Space keydown arm below,
-    // stopped before the window-level chat-open/jump binds hijack the
-    // focused header button; see the quest-tracker guard above). On the
-    // compact touch tier the rows are folded away (hud.mobile.css) and the
-    // header is a count chip: activation opens the Book of Deeds instead of
-    // toggling a collapse the player cannot see.
-    $('#deed-tracker').addEventListener('click', (e) => {
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openDeeds();
-        return;
-      }
-      this.toggleDeedTrackerCollapsed();
+    wireTrackerHeader($('#reliquary-tracker'), {
+      toggle: () => this.toggleReliquaryTrackerCollapsed(),
+      isCompact: compactTouch,
+      openCompact: () => this.openReliquary(),
     });
-    $('#deed-tracker').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openDeeds();
-        return;
-      }
-      this.toggleDeedTrackerCollapsed();
-    });
-    // The Reliquary tracker header, the same delegation contract as the deed
-    // tracker above (click + Enter/Space, stopped before the game binds). On
-    // the compact touch tier the rows are folded away (hud.mobile.css) and
-    // the header is a count chip: activation opens The Reliquary instead of
-    // toggling a collapse the player cannot see.
-    $('#reliquary-tracker').addEventListener('click', (e) => {
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openReliquary();
-        return;
-      }
-      this.toggleReliquaryTrackerCollapsed();
-    });
-    $('#reliquary-tracker').addEventListener('keydown', (e) => {
-      if (e.key !== 'Enter' && e.key !== ' ' && e.code !== 'Space') return;
-      if (!(e.target as HTMLElement).closest('.dt-header')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const body = document.body.classList;
-      if (body.contains('mobile-touch') && body.contains('hud-mobile-compact')) {
-        this.openReliquary();
-        return;
-      }
-      this.toggleReliquaryTrackerCollapsed();
+    wireTrackerHeader($('#recipe-tracker'), {
+      toggle: () => this.toggleRecipeTrackerCollapsed(),
     });
     // Chrome focus hygiene (the shared Enter/Space key guard + pointer-only focus
     // drop) over the trackers, the non-modal overlay panels, and the micromenu rail:
@@ -2977,7 +2950,6 @@ export class Hud {
       'wheel',
       (ev) => {
         ev.preventDefault();
-        if (this.mapLevel !== 'zone') return; // no per-zone zoom on the overview
         this.zoomMap((ev as WheelEvent).deltaY < 0 ? 1.2 : 1 / 1.2);
       },
       { passive: false },
@@ -3006,16 +2978,8 @@ export class Hud {
     mapCanvas.addEventListener('pointermove', (ev) => {
       if (mapPinch.isPinching() || !this.mapDrag || !this.mapView) return;
       const rect = mapCanvas.getBoundingClientRect();
-      // "grab the paper" pan: the world point under the cursor stays under it.
-      // toMap draws +X to the left and +Z up (mx = (maxX-x)/span, my = (maxZ-z)/
-      // span), so a cursor delta of (dx, dy) px shifts the centre by (+dx, +dy)
-      // world units on each axis.
-      const wppx = this.mapView.spanX / rect.width;
-      const wppy = this.mapView.spanZ / rect.height;
-      this.mapCenter = {
-        x: this.mapDrag.cx + (ev.clientX - this.mapDrag.px) * wppx,
-        z: this.mapDrag.cz + (ev.clientY - this.mapDrag.py) * wppy,
-      };
+      // "grab the paper" pan (map_pan_core.ts): the grabbed world point stays under the cursor.
+      this.mapCenter = mapDragPanCenter(this.mapDrag, this.mapView, rect, ev.clientX, ev.clientY);
       this.updateMapWindow();
     });
     const endDrag = () => {
@@ -3198,7 +3162,7 @@ export class Hud {
     const styleMusicBtn = () => {
       // keep the note clearly readable when off (a plain tan, not gold) — the
       // slash, not dimming, signals "muted"
-      musicBtn.style.color = music.enabled ? 'var(--gold)' : CHROME_TONE.MUSIC_OFF;
+      musicBtn.classList.toggle('mm-on', music.enabled);
       musicBtn.classList.toggle('mm-muted', !music.enabled);
     };
     styleMusicBtn();
@@ -3863,7 +3827,7 @@ export class Hud {
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
         frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.targetFrame',
         draggingBodyClass: 'target-frame-dragging',
-        fallbackSize: { w: 220, h: 92 },
+        fallbackSize: { w: 278, h: 60 },
         isMobileLayout,
         scalable: true,
         resizeMode: 'dimensions',
@@ -3897,7 +3861,7 @@ export class Hud {
         resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
         frameLabelKey: 'hudChrome.interfaceUnlock.frameNames.playerFrame',
         draggingBodyClass: 'player-frame-dragging',
-        fallbackSize: { w: 260, h: 84 },
+        fallbackSize: { w: 278, h: 60 },
         isMobileLayout,
         scalable: true,
         resizeMode: 'dimensions',
@@ -3959,6 +3923,7 @@ export class Hud {
       },
     });
     this.initInterfaceUnlock(isMobileLayout);
+    this.touchFrameDrags = attachTouchFrameDrags(document, isMobileLayout);
   }
 
   // resizeMode 'dimensions' plumbing for the movers above: each axis reads
@@ -4155,6 +4120,7 @@ export class Hud {
     // seam; show/hide settings keep the player's choice. The buff row's
     // reset can seat it in the aura column: re-anchor.
     this.interfaceUnlock.resetAll();
+    this.touchFrameDrags?.resetAll();
     this.applyAuraAnchor();
     this.chatGeometry.reset();
     this.meters.resetFrames();
@@ -4311,8 +4277,8 @@ export class Hud {
     this.chatWindow.clearPendingLinks();
   }
 
-  maybeHandleQuestShareCommand(raw: string): boolean {
-    return this.chatWindow.maybeHandleQuestShareCommand(raw);
+  maybeHandleLocalChatCommand(raw: string): boolean {
+    return this.chatWindow.maybeHandleLocalChatCommand(raw);
   }
 
   activeChatPlaceholder(): string {
@@ -4422,11 +4388,11 @@ export class Hud {
     // language switch); the blocked-state Space guard (stale_chrome_focus.ts) spares it.
     markDialogRoot(el, { label: t('hudChrome.emoteWheel.label') });
     const slots = this.emoteWheelSlots.filter(isOverheadEmoteId).slice(0, EMOTE_WHEEL_LIMIT);
-    el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
+    el.innerHTML = `<div class="emote-wheel-ring"></div><button class="emote-wheel-edit ui-btn" data-edit>${esc(t('hudChrome.emoteWheel.edit'))}</button>`;
     slots.forEach((id, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'emote-wheel-item';
+      btn.className = 'emote-wheel-item ui-btn';
       btn.dataset.emote = id;
       btn.title = this.emoteLabel(id);
       const icon = document.createElement('img');
@@ -4443,8 +4409,8 @@ export class Hud {
         this.selectEmoteWheelChoice(id);
       });
       const angle = -Math.PI / 2 + (i / Math.max(1, slots.length)) * Math.PI * 2;
-      btn.style.left = `${50 + Math.cos(angle) * 39}%`;
-      btn.style.top = `${50 + Math.sin(angle) * 39}%`;
+      btn.style.left = `calc(50% + ${Math.cos(angle) * 92}px)`;
+      btn.style.top = `calc(50% + ${Math.sin(angle) * 92}px)`;
       el.appendChild(btn);
     });
     el.querySelector<HTMLButtonElement>('.emote-wheel-edit')?.addEventListener('click', (ev) => {
@@ -4507,9 +4473,9 @@ export class Hud {
     // An isModalOpen() surface: a dialog root, so the blocked-state Space guard
     // (src/game/stale_chrome_focus.ts) spares the editor's own buttons.
     markDialogRoot(el, { label: t('hudChrome.emoteEditor.title') });
-    el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
+    el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.emoteEditor.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.emoteEditor.close'))}">${svgIcon('close')}</button></div>`;
     const count = document.createElement('div');
-    count.className = 'emote-editor-count';
+    count.className = 'emote-editor-count ui-h ui-num';
     const grid = document.createElement('div');
     grid.className = 'emote-editor-grid';
     const selected = new Set(this.emoteWheelSlots);
@@ -4528,7 +4494,7 @@ export class Hud {
     for (const def of OVERHEAD_EMOTES) {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'emote-editor-item';
+      btn.className = 'emote-editor-item ui-btn';
       btn.dataset.emote = def.id;
       const icon = document.createElement('img');
       icon.className = 'emote-editor-icon';
@@ -4555,7 +4521,7 @@ export class Hud {
     const footer = document.createElement('div');
     footer.className = 'emote-editor-footer';
     const done = document.createElement('button');
-    done.className = 'btn';
+    done.className = 'btn ui-btn';
     done.textContent = t('hudChrome.emoteEditor.done');
     done.addEventListener('click', () => this.closeEmoteEditor());
     footer.append(count, done);
@@ -4590,6 +4556,12 @@ export class Hud {
       this.hotDomSkippedWrites++;
     },
   );
+  // The micro-menu rail's open-window ring and count badges. The view core owns the
+  // launcher-to-window table; the painter writes only through the elided facet.
+  private readonly microMenuStateView = createMicroMenuStateView((value) =>
+    formatNumber(value, { maximumFractionDigits: 0 }),
+  );
+  private readonly microMenuStatePainter = new MicroMenuStatePainter(this.writerFacet);
   private readonly paladinDevotionView = createPaladinDevotionView(
     (value) => formatNumber(value, { maximumFractionDigits: 0 }),
     (value, max, charges, lastCharge) =>
@@ -4782,8 +4754,7 @@ export class Hud {
   // castBarState core. Both instances localize cast ids: the PLAYER instance
   // resolves through castDisplayName, layers the eat/drink overlay
   // (consumeBarState, player-only), and clears the bar on hide (its inline
-  // block did). The TARGET instance resolves the farming cast through
-  // targetCastDisplayLabel and every other id through
+  // block did). The TARGET instance resolves every id through
   // abilityDisplayNameFromSource, has no eat/drink (the target never
   // eats/drinks, so its paint omits `consume`), and hides with only
   // display:none (no inline-block clear).
@@ -4806,15 +4777,11 @@ export class Hud {
       timer: this.targetCastbarTimerEl,
     },
     {
-      // Union of two label fixes: this branch's Phase 14 farming arm
-      // (targetCastDisplayLabel localizes the FARMING cast and hands every
-      // other id back raw) and the release's Ignivar raid pass, which
-      // localizes every other cast through abilityDisplayNameFromSource (the
-      // boss mechanic names ride the aura/mechanic matcher there).
-      resolveCastLabel: (s) => {
-        const farming = targetCastDisplayLabel(s.label);
-        return farming === s.label ? abilityDisplayNameFromSource(s.label) : farming;
-      },
+      // The release's Ignivar raid pass localizes every cast through
+      // abilityDisplayNameFromSource (the boss mechanic names ride the
+      // aura/mechanic matcher there). The Phase 14 farming arm that used to
+      // sit in front of it went with the farming plant cast itself.
+      resolveCastLabel: (s) => abilityDisplayNameFromSource(s.label),
     },
   );
   // Second unit-frame painter instance; heraldry hosts are player identity only.
@@ -4837,6 +4804,7 @@ export class Hud {
       hpFill: this.targetHpEl,
       hpText: this.targetHpTextEl,
       absorb: this.targetAbsorbEl,
+      raidMarker: $('#tf-raid-marker'),
       portraitBorder: this.targetPortraitWrapEl,
       heraldry: {
         nameHeader: $('#tf-name-header'),
@@ -4852,6 +4820,7 @@ export class Hud {
     {
       shownDisplay: 'flex',
       repaintPortrait: () => this.drawTargetPortrait(),
+      raidMarkerUrl: raidMarkerDataUrl,
     },
   );
   // The target-of-target frame is the THIRD instance of the unit_frame family (after
@@ -5300,7 +5269,7 @@ export class Hud {
     resetPetBarSig: () => {
       this.lastPetBarSig = '';
     },
-    confirmVendorSell: () => this.optionsHooks?.settings.get('confirmVendorSell') ?? true,
+    sellConfirmPolicy: () => vendorSellConfirmPolicyFrom((k) => this.optionsHooks?.settings.get(k)),
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
     useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
     setDragAction: (action) => {
@@ -5457,6 +5426,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#professions-window'),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
+    openWiki: () => this.openWiki(),
     ...this.windowFocus('#professions-window'),
     openHarvestJournal: () => this.harvestJournalWindow.open(),
     harvestBody: () => this.lootWindow.openHarvestBodyChoice(),
@@ -5515,6 +5485,7 @@ export class Hud {
     world: () => this.sim,
     closeOthers: () => this.closeOtherWindows('#cosmetics-window'),
     hideTooltip: () => this.hideTooltip(),
+    store: () => this.dailyRewardsWindow,
     ...this.windowFocus('#cosmetics-window'),
   });
   private readonly reliquaryWindow = new ReliquaryWindow({
@@ -5564,6 +5535,19 @@ export class Hud {
   private reliquaryTrackerInput: ReliquaryTrackerInput | null = null;
   private readonly reliquaryTrackerPainter = new ReliquaryTrackerPainter({
     root: () => $('#reliquary-tracker'),
+    writers: this.writerFacet,
+  });
+  // Pinned-recipe HUD tracker (#recipe-tracker): the crafting window's pin
+  // chips write the per-character store, the slow-band painter reads it and
+  // folds each reagent's carried count against the craft's charge.
+  private readonly recipePins = new RecipePinStore({
+    world: () => this.sim,
+    storage: () => localStorage,
+    known: (recipeId) => this.sim.recipeList.some((recipe) => recipe.id === recipeId),
+  });
+  private recipeTrackerInput: RecipeTrackerInput | null = null;
+  private readonly recipeTrackerPainter = new RecipeTrackerPainter({
+    root: () => $('#recipe-tracker'),
     writers: this.writerFacet,
   });
   // Seats #right-tracker-stack below the minimap column's REAL rendered bottom
@@ -5767,23 +5751,11 @@ export class Hud {
     root: () => $('#options-menu'),
     world: () => this.sim,
     options: () => this.optionsHooks,
-    auraOverlays: () => ({
-      playerClass: () => this.sim.cfg.playerClass,
-      defs: () => this.auraOverlayController.defs(),
-      get: (id) => this.auraOverlayController.get(id),
-      patch: (id, patch) => this.auraOverlayController.patch(id, patch),
-      getLayout: () => this.auraOverlayController.getLayout(),
-      patchLayout: (patch) => this.auraOverlayController.patchLayout(patch),
-      reset: (id) => this.auraOverlayController.reset(id),
-      nudge: (id, part, deltaX, deltaY) =>
-        this.auraOverlayController.nudge(id, part, deltaX, deltaY),
-      setAll: (enabled) => this.auraOverlayController.setAll(enabled),
-      beginPlacement: (id, part) => this.auraOverlayController.beginPlacement(id, part),
-      endPlacement: () => this.auraOverlayController.endPlacement(),
-      setPlacement: (on) => this.auraOverlayController.setPlacement(on),
-      onPositionChange: (listener) => this.auraOverlayController.onPositionChange(listener),
-      onPlacementChange: (listener) => this.auraOverlayController.onPlacementChange(listener),
-    }),
+    auraOverlays: () =>
+      auraOverlaySettingsHooks(this.auraOverlayController, {
+        playerClass: () => this.sim.cfg.playerClass,
+        previewCue: (cueId, volume) => audio.auraCue(cueId, volume),
+      }),
     bugReport: () => this.bugReportHooks,
     openWiki: () => this.openWiki(),
     keybinds: () => this.keybinds,
@@ -5839,6 +5811,7 @@ export class Hud {
     ...this.windowFocus('#guild-board-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
   });
   // The Rift Forge (src/ui/hud/rift_forge/): opened by the Riftwright's
   // interaction event, never a menu button; the forge lives in the world.
@@ -6046,6 +6019,7 @@ export class Hud {
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     insertQuestChatLink: (questId) => this.insertQuestChatLink(questId),
+    showOnMap: (x, z) => this.showFinderOnMap(x, z),
   });
 
   /** The player's own frame portrait.
@@ -6927,15 +6901,11 @@ export class Hud {
     });
   }
 
-  private questNumber(value: number): string {
-    return formatNumber(value, { maximumFractionDigits: 0 });
-  }
-
   private questProgressText(label: string, current: number, total: number): string {
     return t('questUi.detail.objectiveProgress', {
       label,
-      current: this.questNumber(current),
-      total: this.questNumber(total),
+      current: formatCount(current),
+      total: formatCount(total),
     });
   }
 
@@ -6991,7 +6961,7 @@ export class Hud {
 
   private questSuggestedPlayersHtml(count?: number): string {
     if (!count) return '';
-    return ` <span class="quest-suggested">${esc(t('questUi.log.suggestedPlayers', { count: this.questNumber(count) }))}</span>`;
+    return ` <span class="quest-suggested">${esc(t('questUi.log.suggestedPlayers', { count: formatCount(count) }))}</span>`;
   }
 
   // The {captureFocus, restoreFocus} pair for a painter window. The bridge logic
@@ -7071,6 +7041,7 @@ export class Hud {
     // locale, so relocalize() clears the latch for exactly one rebuild.
     this.gatheringGoalController.relocalize();
     this.partyFramesPainter.relocalize();
+    this.readyCheckLeaderWindow.relocalize();
     this.raidBossGuideWindow.relocalize();
     // The world map rasterizes its labels into sprites keyed on the RESOLVED
     // string, so a switch can never draw the old language; clearing is about not
@@ -7119,6 +7090,7 @@ export class Hud {
     // now so the strip never shows a stale language for up to a slow tick.
     this.updateDeedTracker();
     this.updateReliquaryTracker();
+    this.updateRecipeTracker();
     this.charWindow.renderIfOpen();
     // The arena window's render-skip signature is text-independent (offline sentinel or a
     // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
@@ -7139,6 +7111,7 @@ export class Hud {
     this.mailboxWindow.relocalize();
     this.socialWindow.relocalize();
     this.cosmeticsWindow.relocalize();
+    this.dailyRewardsWindow.relocalize();
     this.cardDuelWindow.relocalize();
     this.spellbookWindow.relocalize();
     this.barEditorWindow.relocalize();
@@ -7333,8 +7306,9 @@ export class Hud {
 
   private syncActiveHotbarForm(): void {
     const profileSwitched = this.actionBarController.syncProfile();
-    if (profileSwitched) this.spellbookWindow.refreshHotbarControls();
-    if (!profileSwitched && !this.actionBarController.syncActiveForm()) return;
+    const specSwitched = this.actionBarController.syncSpec();
+    if (profileSwitched || specSwitched) this.spellbookWindow.refreshHotbarControls();
+    if (!profileSwitched && !specSwitched && !this.actionBarController.syncActiveForm()) return;
     this.dragAction = null;
     this.mobileActionPage = this.currentMobileActionPage();
   }
@@ -7825,18 +7799,18 @@ export class Hud {
     for (let i = 0; i < totalButtons; i++) {
       const container = bars[actionBarRowForSlot(i) - 1];
       const btn = document.createElement('button');
-      btn.className = 'action-btn empty';
+      btn.className = 'action-btn ui-socket empty';
       const label = document.createElement('span');
-      label.className = 'icon-label';
+      label.className = 'icon-label ui-socket-art';
       const countEl = document.createElement('span');
-      countEl.className = 'item-count';
+      countEl.className = 'item-count ui-socket-count';
       const kb = document.createElement('span');
-      kb.className = 'keybind';
+      kb.className = 'keybind ui-socket-key';
       kb.textContent = keyCapLabel(this.keybinds.primaryLabel(`slot${i}`)); // initial keycap; the ActionBarPainter keeps it current each frame
       const cdOverlay = document.createElement('div');
-      cdOverlay.className = 'cd-overlay';
+      cdOverlay.className = 'cd-overlay ui-socket-cd';
       const cdText = document.createElement('div');
-      cdText.className = 'cdtext';
+      cdText.className = 'cdtext ui-socket-cd-text';
       const rechargeOverlay = document.createElement('div');
       rechargeOverlay.className = 'recharge-overlay';
       btn.append(label, countEl, kb, cdOverlay, rechargeOverlay, cdText);
@@ -8109,6 +8083,7 @@ export class Hud {
         itemName: itemDisplayName,
         slotLabel: (i) => formatAbilityNumber(i + 1),
         formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
+        watchedGlowAbilityIds: () => this.auraOverlayController.readyGlowAbilityIds(),
       },
     );
     this.actionBarPainter = new ActionBarPainter(
@@ -8125,10 +8100,10 @@ export class Hud {
           rechargeOverlay: ab.rechargeOverlay,
         })),
       },
-      (iconKey) => this.actionBarIconBg(iconKey),
+      actionBarIconBg,
     );
 
-    // The plus/minus optional-row toggle rides the end of the primary bar. Its
+    // The chevron optional-row toggle rides the end of the primary bar. Its
     // clicks route the visibility settings through optionsHooks.onSettingChange,
     // so main.ts applySetting stays the one resolver (dependency rule, body
     // classes, persistence) and pushes the result back via setActionBarVisibility.
@@ -8149,7 +8124,7 @@ export class Hud {
 
     this.crossHotbar = CrossHotbarController.create(
       this.writerFacet,
-      (k) => this.actionBarIconBg(k),
+      actionBarIconBg,
       crossHotbarResolvers(this.sim, ITEMS, abilityDisplayName, itemDisplayName, () =>
         this.groundAim.activeAbilityId(),
       ),
@@ -8196,7 +8171,7 @@ export class Hud {
   private buildMobileActionRing(): void {
     const ring = buildMobileActionRing({
       writers: this.writerFacet,
-      iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+      iconBackground: actionBarIconBg,
       sourceSlot: (i, direction) => this.mobileSourceSlotForButton(i, direction),
       hasSourceSlot: (i, direction) =>
         mobileButtonHasSourceSlot(
@@ -8251,13 +8226,13 @@ export class Hud {
   // the SAME IWorld.useItem seam castSlot's item arm uses (offline runs the sim
   // directly, online sends the authoritative 'use' command), minus the
   // hotbar-eligibility gate: the ids come pre-filtered from consumable_bar_view,
-  // which deliberately INCLUDES elixirs and scrolls (usable from bags, never
-  // hotbar-placeable).
+  // which deliberately INCLUDES elixirs and scrolls; elixirs are hotbar-placeable
+  // too, while scrolls stay tray/bag consumables.
   private buildMobileConsumableSeat(): void {
     this.mobileConsumableSeat =
       buildMobileConsumableSeat({
         writers: this.writerFacet,
-        iconBackground: (iconKey) => this.actionBarIconBg(iconKey),
+        iconBackground: actionBarIconBg,
         lookupItem: (id) => ITEMS[id],
         useItem: (id) => {
           if (this.tradeOpen) return false;
@@ -8271,18 +8246,6 @@ export class Hud {
         hideTooltip: () => this.hideTooltip(),
         consumePeekGuard: () => this.peekGuard.consume(),
       }) ?? undefined;
-  }
-
-  // Resolve a core icon key to the slot label's background-image value. Kept on the
-  // Hud (not the painter) so the painter holds no icon table or literal URL; the
-  // painter calls this only when a slot's icon key changes.
-  private actionBarIconBg(iconKey: string): string {
-    if (iconKey === EMPTY_ICON_KEY) return '';
-    if (iconKey === ATTACK_ICON_KEY) return `url(${iconDataUrl('ability', 'attack')})`;
-    if (iconKey.startsWith(ITEM_ICON_PREFIX)) {
-      return `url(${iconDataUrl('item', iconKey.slice(ITEM_ICON_PREFIX.length))})`;
-    }
-    return `url(${iconDataUrl('ability', iconKey.slice(ABILITY_ICON_PREFIX.length))})`;
   }
 
   private clearActionDropTargets(): void {
@@ -8432,9 +8395,9 @@ export class Hud {
       } = {},
     ) => {
       const btn = document.createElement('button');
-      btn.className = 'pet-btn';
+      btn.className = 'pet-btn ui-socket';
       btn.dataset.focusKey = opts.focusKey ?? iconId;
-      if (opts.active) btn.classList.add('active');
+      if (opts.active) btn.classList.add('active', 'is-on');
       if (opts.autocast) btn.classList.add('autocast');
       if (opts.cooldownText) btn.classList.add('cooldown');
       if (opts.disabled) btn.classList.add('disabled');
@@ -8458,12 +8421,12 @@ export class Hud {
         btn.setAttribute('aria-keyshortcuts', 'Shift+Enter');
       }
       const icon = document.createElement('span');
-      icon.className = 'icon-label';
+      icon.className = 'icon-label ui-socket-art';
       icon.style.backgroundImage = `url(${iconDataUrl('ability', iconId)})`;
       btn.appendChild(icon);
       if (opts.cooldownText) {
         const cdText = document.createElement('span');
-        cdText.className = 'cdtext';
+        cdText.className = 'cdtext ui-socket-cd-text';
         cdText.textContent = opts.cooldownText;
         btn.appendChild(cdText);
       }
@@ -8982,6 +8945,16 @@ export class Hud {
     const talGlow = talentsFor(sim.cfg.playerClass) !== null && tp.spent < tp.total;
     document.getElementById('mm-talents')?.classList.toggle('has-points', talGlow);
     document.getElementById('mobile-talents')?.classList.toggle('has-points', talGlow);
+    // The rail's own state: the gold ring on whichever launcher's window is open,
+    // plus the unspent-point badge. Medium band, elided writes, so a steady rail
+    // costs no DOM mutation.
+    if (mediumHud) {
+      this.microMenuStatePainter.paint(
+        this.microMenuStateView.tick(microMenuWindowOpen, {
+          talentPoints: talGlow ? tp.total - tp.spent : 0,
+        }),
+      );
+    }
 
     // Town Focus (#1143): the minimap button (and, if open, the panel's live
     // gate) only ever shows/works while standing in a town hub. Cheap zone
@@ -9188,48 +9161,19 @@ export class Hud {
           this.lastTargetTitleSig = titleSig;
           this.targetTitleDecoration = titledNameDecoration(target.title ?? null);
         }
-        const targetFrame = this.targetFrameDescriptor;
-        targetFrame.present = true;
-        targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
+        // The descriptor fill lives in target_frame_descriptor.ts; the raid
+        // marker is the party mark the nameplate also floats over the mob.
+        const targetFrame = fillTargetFrameDescriptor(
+          this.targetFrameDescriptor,
+          target,
+          this.targetTitleDecoration,
+          sim.markerFor(target.id),
+        );
         const hpMode = healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3);
         targetFrame.hpText = target.dead
           ? t('hud.core.dead')
           : unitFrameHealthText(target.hp, target.maxHp, hpMode);
         targetFrame.showAbsorbText = !target.dead && hpMode !== 0;
-        // The target's power bar (classic target frame): players and caster
-        // mobs show their mana/rage/energy; a resource-less target (a plain
-        // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
-        // buckets null with mana), so every type class turns off and the
-        // rail renders EMPTY (zero fill, no text) but stays visible, the
-        // classic look where the frame never changes height. Dead: same.
-        targetFrame.resourceKind =
-          target.dead || !target.resourceType ? 'none' : target.resourceType;
-        targetFrame.resFrac =
-          target.dead || !target.resourceType
-            ? 0
-            : target.resource / Math.max(1, target.maxResource);
-        targetFrame.resText =
-          target.dead || !target.resourceType
-            ? ''
-            : unitFrameCurrentMaxText(Math.round(target.resource), target.maxResource);
-        targetFrame.levelText = String(target.level);
-        targetFrame.name = entityDisplayName(target);
-        targetFrame.titlePre = this.targetTitleDecoration.pre;
-        targetFrame.titlePost = this.targetTitleDecoration.post;
-        // The operator-applied Cheater tag (src/sim/moderation/). Resolved every
-        // gated paint rather than memoized behind a signature like the title:
-        // cheaterTagLabel is a field read plus one t() lookup, so a memo would
-        // cost more than it saves and would need its own language key.
-        targetFrame.cheaterTag = cheaterTagLabel(target);
-        // Explicit player-kind gate: stale/malformed NPC or mob identity data
-        // must never inherit a player reward surface.
-        targetFrame.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);
-        // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
-        // the painter resets it on hide so an id reused by a new mob still redraws.
-        targetFrame.portraitKey = String(target.id);
-        targetFrame.absorb = target.dead ? null : target;
-        targetFrame.dead = false;
-        targetFrame.outOfRange = false;
         this.targetFramePainter.paint(unitFrameViewInto(this.targetFrameBuffer, targetFrame));
       }
       // Target-only sub-parts the family frame does not express, each routed through
@@ -9249,7 +9193,7 @@ export class Hud {
         'color',
         tfRoleColor ?? (target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
       );
-      this.updateTargetDiscordLine(target);
+      this.targetDiscord.update(target);
       // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
       // strips the inline color so a hostile and a friendly name would read identically.
       // The base.css forced-colors block underlines #tf-name.hostile; routed through the
@@ -9784,7 +9728,7 @@ export class Hud {
         this.updateMinimap();
       }
       this.updateClock();
-      this.updateDayNightDial();
+      this.dayNightDial.paint(now);
       this.updateMinimapCoords();
       this.updateCompass();
     }
@@ -9838,6 +9782,9 @@ export class Hud {
     // no dedicated event, so it rides the same slow poll; update() is
     // signature-gated, so an unchanged goal costs nothing.
     if (slowHud) this.gatheringGoalController.update();
+    // The pinned-recipe tracker is always-on chrome too: reagents arrive from
+    // gathering and loot with no craft event to repaint on.
+    if (slowHud) this.updateRecipeTracker();
     // Re-seat the tracker stack under the minimap column (bounded layout read).
     if (slowHud) this.trackerStackAnchor.apply();
     if (slowHud && this.calendarWindow.isOpen) this.calendarWindow.refreshIfChanged();
@@ -10479,7 +10426,7 @@ export class Hud {
   // the DOM write whenever it is unchanged.
   private updateClock(): void {
     if (!this.clockEl) return;
-    const text = formatClockTime(new Date(), this.clock24);
+    const text = formatClockTimeMemo(Date.now(), this.clock24);
     if (text !== this.lastClockText) {
       this.lastClockText = text;
       this.clockEl.textContent = text;
@@ -10489,100 +10436,7 @@ export class Hud {
   /** Force the minimap day/night dial to redraw on the next tick (the /daynight
    *  dev command calls this so an override shows without the ~1s throttle wait). */
   refreshDayNightDial(): void {
-    this.lastDayNightDrawAt = 0;
-  }
-
-  // Draw the minimap day/night dial: a ring painted with the world sky cycle
-  // (deep navy night, warm dawn/dusk glow, bright day blue), a "now" marker that
-  // sweeps it once per cycle, and a centre sun or moon. Purely visual (the canvas
-  // is aria-hidden) and reads the shared UTC-anchored cycle, so a glance shows the
-  // current time of day and how far the marker sits from the coming day or night.
-  private updateDayNightDial(): void {
-    const ctx = this.dayNightCtx;
-    if (!ctx) return;
-    const now = Date.now();
-    if (now - this.lastDayNightDrawAt < 1000) return; // the marker crawls; ~1Hz is ample
-    this.lastDayNightDrawAt = now;
-
-    const S = 88; // backing resolution (CSS shows it at 44px, so 2x for crispness)
-    const cx = S / 2;
-    const cy = S / 2;
-    const rMid = 34; // ring centreline radius
-    const ringW = 11;
-    const rInner = rMid - ringW / 2 - 2; // centre disc radius
-    // noon (brightest) sits at the top, midnight at the bottom; the marker sweeps
-    // clockwise once per cycle. angle = pi/2 + phase*2pi (canvas y is down).
-    const angleForPhase = (p: number): number => Math.PI / 2 + p * Math.PI * 2;
-    const rgb = (c: readonly [number, number, number]): string =>
-      `rgb(${Math.round(c[0] * 255)}, ${Math.round(c[1] * 255)}, ${Math.round(c[2] * 255)})`;
-
-    ctx.clearRect(0, 0, S, S);
-
-    // the ring: sample the cycle in segments, each an arc of its sky color. The
-    // small angular overlap hides seams between the butt-capped arc segments.
-    const SEG = 60;
-    ctx.lineWidth = ringW;
-    ctx.lineCap = 'butt';
-    for (let i = 0; i < SEG; i++) {
-      const p0 = i / SEG;
-      const p1 = (i + 1) / SEG;
-      ctx.strokeStyle = rgb(skyTintForDayness(globalDayness((p0 + p1) / 2)));
-      ctx.beginPath();
-      ctx.arc(cx, cy, rMid, angleForPhase(p0), angleForPhase(p1) + 0.02);
-      ctx.stroke();
-    }
-
-    const phaseNow = currentDayNightPhase();
-    const daynessNow = globalDayness(phaseNow);
-    const skyNow = skyTintForDayness(daynessNow);
-
-    // centre disc tinted to the current sky, with a sun by day or a moon by night
-    ctx.fillStyle = rgb(skyNow);
-    ctx.beginPath();
-    ctx.arc(cx, cy, rInner, 0, Math.PI * 2);
-    ctx.fill();
-    if (daynessNow >= 0.5) {
-      ctx.fillStyle = MAP_TONE.CLOCK_SUN;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = MAP_TONE.CLOCK_SUN;
-      ctx.lineWidth = 2;
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * 11.5, cy + Math.sin(a) * 11.5);
-        ctx.lineTo(cx + Math.cos(a) * 15.5, cy + Math.sin(a) * 15.5);
-        ctx.stroke();
-      }
-    } else {
-      // crescent: a pale disc minus an offset disc repainted in the sky color
-      ctx.fillStyle = MAP_TONE.CLOCK_MOON;
-      ctx.beginPath();
-      ctx.arc(cx, cy, 8.8, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = rgb(skyNow);
-      ctx.beginPath();
-      ctx.arc(cx + 4.4, cy - 3.2, 8.8, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // the "now" marker: a glowing pip riding the ring at the current phase,
-    // sized and haloed so the cycle position reads at a glance
-    const am = angleForPhase(phaseNow);
-    ctx.save();
-    ctx.shadowColor = MAP_TONE.CLOCK_HAND;
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
-    ctx.fillStyle = MAP_TONE.CLOCK_HAND;
-    ctx.fill();
-    ctx.restore();
-    ctx.beginPath();
-    ctx.arc(cx + Math.cos(am) * rMid, cy + Math.sin(am) * rMid, 5.2, 0, Math.PI * 2);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = MAP_TONE.CLOCK_HAND_RING;
-    ctx.stroke();
+    this.dayNightDial.invalidate();
   }
 
   // Classic-style coordinate readout pinned under the minimap. Reads only the
@@ -10886,14 +10740,16 @@ export class Hud {
 
   // scroll-wheel / button zoom for the world map (clamped to [1, MAP_MAX_ZOOM])
   private zoomMap(factor: number): void {
-    if (this.mapLevel !== 'zone' && this.mapLevel !== 'continent') return;
-    // One more zoom-out at the zone map's full extent leaves the zone and opens
-    // the continent overview (the level toggle's other half), instead of clamping
-    // at the minimum and doing nothing. A delve has no overview to go to.
-    if (this.mapLevel === 'zone' && zoomOutExitsZoneLevel(this.mapZoom, factor)) {
-      this.setMapLevel('continent');
+    // A zoom-out past a level's floor climbs one level: the instance plan has no
+    // zoom of its own, so any zoom-out there opens the zone map, and the zone
+    // map at full extent opens the continent overview. Only the zone map zooms
+    // within its level (map_pinch_zoom_core.ts owns the rule).
+    const exit = zoomOutLevelExit(this.mapLevel, this.mapZoom, factor);
+    if (exit) {
+      this.setMapLevel(exit);
       return;
     }
+    if (this.mapLevel !== 'zone') return;
     const prev = this.mapZoom;
     this.mapZoom = nextMapZoom(this.mapZoom, factor);
     // zooming back to 1 resumes following the player; a fresh zoom-in from the
@@ -10939,6 +10795,10 @@ export class Hud {
     this.hideTooltip();
   }
 
+  private repaintOpenMap(): void {
+    if ($('#map-window').style.display === 'block') this.updateMapWindow();
+  }
+
   private updateMapWindow(): void {
     const canvas = $('#map-canvas') as unknown as HTMLCanvasElement;
     const ctx = require2dContext(canvas);
@@ -10955,7 +10815,10 @@ export class Hud {
     this.mapLevel = resolveMapSurface(mapMode, this.mapLevel, remote !== null);
     const schematic = this.mapLevel === 'instance';
     this.setText($('#map-level-toggle'), t(mapLevelToggleKey(mapMode, this.mapLevel, !!remote)));
-    this.setDisplay($('#map-zoom'), this.mapLevel === 'zone' ? 'flex' : 'none');
+    // The zoom cluster shows on the zone map and on an instance plan; the plan
+    // has no zoom-in, so only its minus button is live (it leaves for the zone map).
+    this.setDisplay($('#map-zoom'), this.mapLevel === 'continent' ? 'none' : 'flex');
+    $('#map-zoom-in')?.toggleAttribute('disabled', schematic);
     if (schematic && mapMode === 'rift') {
       this.clearMapHitState(canvas);
       const model = this.riftPainter.paintWorldMap(ctx, this.sim, S);
@@ -11028,6 +10891,7 @@ export class Hud {
       : dungeon
         ? zoneAt(dungeon.doorPos.x, dungeon.doorPos.z)
         : (ZONES.find((z) => z.id === this.lastZoneId) ?? zoneAt(p.pos.x, p.pos.z));
+    this.mapSidebar.update(this.sim, zone);
     // Crossing a zone while the map is open starts that zone at its full frame;
     // a pan target from the previous zone must never leak into the new one.
     // shouldResetMapPanOnZoneCross (map_show_on_map_core.ts) is what keeps a
@@ -11051,6 +10915,8 @@ export class Hud {
       zoom: this.mapZoom,
       center: this.mapCenter,
       ping: this.mapPing,
+      filters: this.mapSidebar.filterState(),
+      route: this.mapSidebar.shownRoute(),
     });
     this.mapView = result.view;
     this.mapMarkerInteraction.setOverworld(result);
@@ -11071,8 +10937,8 @@ export class Hud {
     if (region) {
       html += `<div class="tt-quest-req">${esc(
         t('hudChrome.continentMap.levels', {
-          min: this.questNumber(region.levelMin),
-          max: this.questNumber(region.levelMax),
+          min: formatCount(region.levelMin),
+          max: formatCount(region.levelMax),
         }),
       )}</div>`;
     }
@@ -12103,19 +11969,14 @@ export class Hud {
           if (this.professionsWindow.isOpen) this.professionsWindow.render();
           break;
         }
-        case 'ferryBellHome':
-          // The island bell just set this player down in town: point out the
-          // town's twin bell ONCE per device (the ride may have been a
-          // misclick), the woc.tutorial.v1 presentation-only one-shot idiom.
-          try {
-            if (localStorage.getItem('woc.ferrybellhint.v1') !== 'seen') {
-              localStorage.setItem('woc.ferrybellhint.v1', 'seen');
-              this.openTutorialGreetingNote(buildFerryBellHomeNote());
-            }
-          } catch {
-            /* private mode: skip the hint rather than throw */
-          }
+        case 'ferryBellHome': {
+          // The island bell just set this player down in town: the guidance
+          // choice while the wolves are ahead, else the return-bell hint once
+          // per device (ferry_bell_home_note.ts owns the rule).
+          const note = ferryBellHomeNoteToOpen(this.sim);
+          if (note) this.openTutorialGreetingNote(note);
           break;
+        }
         case 'ferryIslandArrival':
           // Landing on the Proving Shore with the rail not yet started:
           // Ferryman Odo's welcome note teaches walking and talking and points
@@ -12445,10 +12306,9 @@ export class Hud {
           } else {
             // A board with no authored listings IS the guild board: the
             // signpost opens the realm's ranked pledge surface
-            // (src/ui/hud/guild_board/). Offline the window renders its
-            // localized nothing-posted state, so the interaction never
-            // looks inert on any host.
-            this.openGuildBoard();
+            // (src/ui/hud/guild_board/) on the view its board id selects.
+            // Offline the window renders its localized nothing-posted state.
+            this.openGuildBoard(ev.boardId);
           }
           break;
         case 'realmBuilder':
@@ -12671,6 +12531,23 @@ export class Hud {
                 ev.fromTitle,
                 ev.classId,
               );
+              break;
+            case 'raidWarning':
+              {
+                const text = localizeChatBody(ev);
+                this.chatLogFrom(
+                  ev.from,
+                  text,
+                  CHAT_TEMPLATE_KEYS.raidWarning,
+                  'raidWarning',
+                  ev.fromPid,
+                  ev.flair,
+                  ev.fromTitle,
+                  ev.classId,
+                );
+                audio.raidWarning();
+                this.raidWarningBanner.show(text);
+              }
               break;
             case 'yell':
               this.chatLogFrom(
@@ -12909,6 +12786,9 @@ export class Hud {
             // let the sim's own 30s timeout bucket the straggler.
             () => {},
           );
+          break;
+        case 'readyCheckStatus':
+          this.readyCheckLeaderWindow.update(ev);
           break;
         case 'resurrectionOffer':
           // An offer completing against a player who is no longer dead (they
@@ -13934,16 +13814,15 @@ export class Hud {
   }
 
   // The #tutorial-greeting note dialog (the town bell homecoming, Ferryman
-  // Odo's island welcome): one speaker, one closing affordance, trapped and
-  // floored above the mobile sheet so a one-shot never opens buried. It is
-  // the only thing that mints this shell now, and the managed-close registry
-  // covers it unchanged: the two-choice greeting it grew out of went with the
-  // tutorialGreeting event at the Phase 18 dead-union sweep.
+  // Odo's island welcome): one speaker, with a guidance choice on homecoming.
+  // Keep focus trapped and the shell above the mobile sheet; both choice
+  // buttons and the managed-close registry use the same cleanup path.
   private openTutorialGreetingNote(note: TutorialGreetingNote): void {
     this.tutorialGreetingTrap?.release(false);
     this.tutorialGreetingTrap = null;
     const el = renderTutorialGreetingNote(note, {
       onClose: () => this.closeTutorialGreeting(),
+      onGuidanceChoice: (enabled) => writeEastbrookGuidanceChoice(this.optionsHooks, enabled),
     });
     this.bringWindowToFront(el);
     el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
@@ -14181,7 +14060,7 @@ export class Hud {
 
   log(
     text: string,
-    color: string = HUD_LOG.PLAIN,
+    color = 'var(--color-accent)',
     decorativeIconUrl?: string,
     channel = ERROR_LOG_CHAN,
     announceWhenFiltered = false,
@@ -14243,7 +14122,7 @@ export class Hud {
   private prependTimestamp(div: HTMLElement): void {
     if (!this.chatTimestamps) return;
     const ts = document.createElement('span');
-    ts.className = 'chat-ts';
+    ts.className = 'chat-ts ui-faint ui-num';
     ts.textContent = `${formatChatTimestamp(new Date(), this.chatClock)} `;
     div.appendChild(ts);
   }
@@ -15188,8 +15067,7 @@ export class Hud {
     // firing hideTooltip/mobile-bags teardown) before closeHeroicVendor got a chance to
     // restore it, dropping the WCAG 2.4.3 focus return on the Esc/generic close path.
     if (this.openVendorNpcId === null) return;
-    const closeMobileBags =
-      document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
+    const closeMobileBags = touchBagsShown(document.body.classList, $('#bags').style.display);
     // Force-close backstop for the custom-amount prompt (the shared modal
     // recipe's contract): a close under an open prompt must remove the prompt
     // node and clear the window inert it holds, or a hidden #vendor-window
@@ -15872,6 +15750,12 @@ export class Hud {
           if (on) this.craftCommissionOptIn.add(recipeId);
           else this.craftCommissionOptIn.delete(recipeId);
         },
+        recipePinned: (recipeId) => this.recipePins.has(recipeId),
+        onToggleRecipePin: (recipeId) => {
+          const result = this.recipePins.toggle(recipeId);
+          if (result.changed) this.updateRecipeTracker();
+          return result;
+        },
         craftQty: (recipeId) => this.craftQtyByRecipe.get(recipeId) ?? 1,
         onCraftQty: (recipeId, qty) => {
           this.craftQtyByRecipe.set(recipeId, Math.max(1, Math.floor(qty)));
@@ -16087,8 +15971,7 @@ export class Hud {
   }
 
   private onBankClosed(): void {
-    const closeMobileBags =
-      document.body.classList.contains('mobile-touch') && $('#bags').style.display !== 'none';
+    const closeMobileBags = touchBagsShown(document.body.classList, $('#bags').style.display);
     document.body.classList.remove('bank-open'); // bags (if still open) re-centres
     if (closeMobileBags) {
       // Mirror closeVendor's teardown backstop: a discard/sell/deposit prompt may hold
@@ -16221,9 +16104,7 @@ export class Hud {
     // delegation, which reroutes to openDeeds here). Tell the painter so it swaps
     // the header from a disclosure toggle to a dialog opener. Reuse the exact class
     // test the delegation uses so the announced role matches the behavior.
-    view.chip =
-      document.body.classList.contains('mobile-touch') &&
-      document.body.classList.contains('hud-mobile-compact');
+    view.chip = isCompactTouchHud(document.body.classList);
     this.deedTrackerPainter.update(view);
   }
 
@@ -16261,9 +16142,7 @@ export class Hud {
     // painter so it swaps the header from a disclosure toggle to a dialog opener.
     // Reuse the exact class test the delegation uses so the announced role
     // matches the behavior.
-    view.chip =
-      document.body.classList.contains('mobile-touch') &&
-      document.body.classList.contains('hud-mobile-compact');
+    view.chip = isCompactTouchHud(document.body.classList);
     this.reliquaryTrackerPainter.update(view);
   }
 
@@ -16274,6 +16153,26 @@ export class Hud {
     settings.set('reliquaryTrackerCollapsed', !settings.get('reliquaryTrackerCollapsed'));
     audio.click();
     this.updateReliquaryTracker();
+  }
+
+  // Repaint the pinned-recipe tracker from the live world: the slow band, a
+  // pin toggle, the collapse toggle, and language switches all funnel here;
+  // the elided writers make an unchanged repaint free.
+  private updateRecipeTracker(): void {
+    this.recipeTrackerInput ??= makeRecipeTrackerInput(() => this.sim);
+    const input = this.recipeTrackerInput;
+    input.pinned = this.recipePins.pinned;
+    input.collapsed = (this.optionsHooks?.settings.get('recipeTrackerCollapsed') ?? false) === true;
+    this.recipeTrackerPainter.update(recipeTrackerView(input));
+  }
+
+  /** Flip the persisted recipe-tracker collapse (header click/keyboard delegation). */
+  private toggleRecipeTrackerCollapsed(): void {
+    const settings = this.optionsHooks?.settings;
+    if (!settings) return;
+    settings.set('recipeTrackerCollapsed', !settings.get('recipeTrackerCollapsed'));
+    audio.click();
+    this.updateRecipeTracker();
   }
 
   toggleCalendar(): void {
@@ -16626,14 +16525,7 @@ export class Hud {
   // synchronous; online the atitle/aborder echo and the snapshot's ownership
   // fields land well inside one band), and render() rebuilds every row fresh.
   private refreshCharSheetIfChanged(): void {
-    const sig = charSheetRefreshSig({
-      activeTitle: this.sim.activeTitle,
-      activeBorder: this.sim.activeBorder,
-      deedsEarned: this.sim.deedsEarned.size,
-      itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,
-      marks: this.sim.reliquaryMarks.size,
-      mounts: this.sim.ownedMounts().length,
-    });
+    const sig = charSheetRefreshSigFor(this.sim);
     if (sig === this.lastCharSheetSig) return;
     this.lastCharSheetSig = sig;
     this.charWindow.renderIfOpen();
@@ -16787,13 +16679,13 @@ export class Hud {
       look,
       mainhand,
       offhand: this.sim.equipment.offhand ?? null,
-      // The paperdoll wears the same Armory skin the world renders: resolved
-      // through the one shared rule (class + equipped mainhand + loadout).
+      // The paperdoll wears the world's Armory skin: one shared rule (class + hands + loadout).
       weaponSkinId: resolveActiveWeaponSkin(
         cls,
         mainhand,
         this.sim.accountCosmetics.weaponSkinLoadout,
         this.sim.player.skinCatalog ?? 'class',
+        this.sim.equipment.offhand ?? null,
       ),
       framing: 'sheet',
     });
@@ -17229,10 +17121,10 @@ export class Hud {
     this.leaderboardWindow.toggle();
   }
 
-  /** The signpost guild board: opened by the world's noticeboard interaction
-   *  (and the E2E capture rigs); there is no menu launcher on purpose. */
-  openGuildBoard(): void {
-    this.guildBoardWindow.open();
+  /** The signpost guild board, opened by the noticeboard interaction (and the
+   *  E2E rigs), never a menu launcher; the board id picks the default view. */
+  openGuildBoard(boardId?: string): void {
+    this.guildBoardWindow.open(boardId);
   }
 
   /** The Rift Forge: opened by the Riftwright interaction (and the capture rigs). */
@@ -17570,6 +17462,7 @@ export class Hud {
       undefined,
       config,
       pets,
+      this.sim.player.targetId,
     );
     if (sig === this.lastPartySig) return;
     this.lastPartySig = sig;
@@ -17581,7 +17474,7 @@ export class Hud {
       config,
       pets,
     );
-    this.partyFramesPainter.sync(others, info.leader, info.raid, config);
+    this.partyFramesPainter.sync(others, info.leader, info.raid, config, this.sim.player.targetId);
     // Re-dock the Loot Settings panel below the (just re-synced) party frames when their
     // size changes (row count / raid grouping). Gated so the layout measure runs on a real
     // geometry change, not every combat tick; positionLootSettingsPanel honors a manual drag.
@@ -17828,49 +17721,6 @@ export class Hud {
       else if (act === 'kick') this.sim.partyKick(pid);
       else if (act === 'loot-settings') this.openLootSettings();
     });
-  }
-
-  // Fill the target frame's social/badge line: a linked player's nickname (with
-  // PFP), their staff-role tag, Discord rank, and developer badge. Hidden for mobs
-  // and players with no linked flair at all.
-  private updateTargetDiscordLine(target: Entity): void {
-    const el = this.targetDiscordEl;
-    const showDevBadges = this.optionsHooks?.settings.get('showDevBadges') ?? true;
-    // getLanguage() is a real input here, not bookkeeping: four of this line's faces
-    // are localized while every other field is identity data a locale switch never
-    // moves, so keyed on identity alone the line sat in the PREVIOUS locale until that
-    // player's flair happened to change. targetFlairSignature owns that reasoning.
-    // The AI flag rides both the visibility test and the signature: without it an AI
-    // account carrying no Discord or dev flair would never render the line at all.
-    const flair: TargetFlairLineInput = {
-      language: getLanguage(),
-      tier: target.discordTier ?? 0,
-      name: target.discordName ?? '',
-      role: target.discordRole ?? '',
-      avatar: target.discordAvatar ?? '',
-      devIndex: showDevBadges ? (target.devTier ?? 0) : 0,
-      isAi: target.aiAccount === true,
-    };
-    if (target.kind !== 'player' || !targetFlairLineVisible(flair)) {
-      if (this.targetDiscordSig !== '') {
-        this.targetDiscordSig = '';
-        el.classList.remove('show');
-        el.replaceChildren();
-      }
-      return;
-    }
-    // This runs every frame the target frame updates; only rebuild when the line's
-    // content actually changes (else a fresh <img> per frame would re-fetch the
-    // avatar and, on a failing CDN load, flicker between the broken glyph and hidden).
-    const sig = targetFlairSignature(flair);
-    if (sig === this.targetDiscordSig) return;
-    this.targetDiscordSig = sig;
-    el.innerHTML = targetFlairLineHtml(flair);
-    // Hide the external Discord avatar if its CDN image fails to load, so the line
-    // never shows the browser's broken-image placeholder (the nickname stays).
-    const dcAvatar = el.querySelector<HTMLImageElement>('.uf-dc-name img');
-    if (dcAvatar) attachAvatarFallback(dcAvatar);
-    el.classList.add('show');
   }
 
   /** Inspect another player: a profile window with their portrait, name, level
@@ -18340,7 +18190,7 @@ export class Hud {
   ): HTMLElement {
     const stack = $('#prompt-stack');
     const prompt = document.createElement('div');
-    prompt.className = 'prompt panel';
+    prompt.className = 'prompt panel ui-panel-strong';
     prompt.innerHTML = `<div class="prompt-text">${text}</div>`;
     prompt.setAttribute('role', 'alertdialog');
     prompt.setAttribute('aria-modal', 'false');
@@ -18348,11 +18198,11 @@ export class Hud {
     promptText.id = `hud-prompt-title-${this.promptSequence++}`;
     prompt.setAttribute('aria-labelledby', promptText.id);
     const accept = document.createElement('button');
-    accept.className = 'btn';
+    accept.className = 'btn ui-btn ui-btn--red';
     accept.type = 'button';
     accept.textContent = acceptLabel;
     const decline = document.createElement('button');
-    decline.className = 'btn';
+    decline.className = 'btn ui-btn';
     decline.type = 'button';
     decline.textContent = declineLabel;
     accept.addEventListener('click', () => {
@@ -18363,7 +18213,10 @@ export class Hud {
       prompt.remove();
       onDecline();
     });
-    prompt.append(accept, decline);
+    const actions = document.createElement('div');
+    actions.className = 'prompt-actions';
+    actions.append(accept, decline);
+    prompt.append(actions, createPromptTimeoutBar());
     stack.appendChild(prompt);
     if (focusFirst) accept.focus();
     window.setTimeout(() => {
@@ -18371,7 +18224,7 @@ export class Hud {
         prompt.remove();
         onTimeout();
       }
-    }, 28000);
+    }, PROMPT_TIMEOUT_MS);
     return prompt;
   }
 
@@ -18505,17 +18358,7 @@ export class Hud {
   /** What an untouched cross hotbar is filled from: this character's action bar,
    *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
-    return {
-      bar: this.hotbarActions.map((a) => (a ? { type: a.type, id: a.id } : null)),
-      // Attack leads: it is on no hotbar slot to copy (the desktop bar draws it as
-      // a fixed button), so a pad player would otherwise have no auto-attack at all.
-      extras: [
-        CROSS_HOTBAR_ATTACK_ID,
-        ...this.sim.known
-          .filter((k) => isStanceBarAbilityGroup(k.def.exclusiveGroup))
-          .map((k) => k.def.id),
-      ],
-    };
+    return crossHotbarSeedActions(this.hotbarActions, this.sim.known);
   }
 
   /** The bar's own arrange surface, whole rather than proxied method by method. */

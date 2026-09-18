@@ -13,7 +13,7 @@ const rogueBuilderAbilityIds = [
   'ghostly_strike',
 ];
 
-const rogueFinisherAbilityIds = [
+const _rogueFinisherAbilityIds = [
   'eviscerate',
   'rupture',
   'kidney_shot',
@@ -1601,10 +1601,10 @@ export const WARLOCK_CHOICE_ROWS: ClassChoiceRows = {
           id: 'wlk_r8_curse_of_exhaustion',
           name: 'Leaden Hex',
           description:
-            'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+            'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
           icon: 'wlk_r8_curse_of_exhaustion',
           effect: {
-            global: { warlockLeadenHex: 0.05 },
+            global: { warlockLeadenHex: 0.1 },
             tuning: {
               maxStacks: 3,
               slowDuration: 5,
@@ -1796,25 +1796,30 @@ export const DRUID_CHOICE_ROWS: ClassChoiceRows = {
     {
       level: 5,
       theme: 'movement',
-      decision: 'escape control, sprint after shifting, or cast while moving',
+      decision: 'escape control, a longer and more frequent shift sprint, or cast while moving',
       options: [
         {
           id: 'dru_r5_improved_wrath',
           name: 'Wildshift',
-          description: 'Shapeshifting removes breakable roots and slows.',
+          description:
+            'Shapeshifting into Cat, Bruin, or Moonwing Form removes breakable roots and slows.',
           icon: 'travel_form',
           effect: { intrinsic: { mechanic: 'druid_wildshift', metrics: {} } },
         },
         {
+          // Loping Stride (the 60% for 3 sec, once per 20 sec shift sprint) is
+          // baseline for every druid since the Wildfang kit pass 2; this slot
+          // keeps its option id so saved allocations still resolve, and the
+          // engine (combat/druid_engines.ts) reads these metrics as the
+          // selected-talent duration and cooldown.
           id: 'dru_r5_ferocity',
-          name: 'Loping Stride',
-          description:
-            'Shapeshifting grants 60% movement speed for 3 sec, at most once every 20 sec.',
+          name: 'Longstride',
+          description: 'Loping Stride lasts 5 sec and its cooldown is 12 sec.',
           icon: 'cat_form',
           effect: {
             intrinsic: {
-              mechanic: 'druid_loping_stride',
-              metrics: { pct: 0.6, duration: 3, icd: 20 },
+              mechanic: 'druid_longstride',
+              metrics: { duration: 5, icd: 12 },
             },
           },
         },

@@ -88,6 +88,7 @@ function makeCtx() {
     get entities() {
       return entities;
     },
+    entityRosterVersion: 0,
     primaryId: -1,
     tradeInvites: new Map(),
     duelInvites: new Map(),
@@ -166,6 +167,7 @@ function makeCtx() {
     pendingMobRespawns: [],
     partyInvites: new Map(),
     readyChecks: new Map(),
+    pullTimers: new Map(),
     pendingResurrections: new Map(),
     chatTokens: new Map(),
     channelSubs: new Map(),
@@ -375,6 +377,8 @@ function makeCtx() {
     stopFollow: vi.fn(),
     partyInvite: vi.fn(),
     readyCheckStart: vi.fn(),
+    pullTimerStart: vi.fn(),
+    pullTimerCancel: vi.fn(),
     tameError: vi.fn(() => null),
     standUp: vi.fn(),
     breakGhostWolf: vi.fn(),

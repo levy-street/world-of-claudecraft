@@ -8,12 +8,15 @@
 // the method comments below, verbatim from the coordinator; the ledgers
 // and deps stay ON the service (live state), handed in through the ctx.
 
+import { ITEMS } from '../src/sim/data';
+import { exchangeBrowseCategory, exchangeBrowseSubcategory } from '../src/sim/exchange_eligibility';
 import type { InvSlot } from '../src/sim/types';
 import type {
   WocDeliveryScope,
   WocListingRow,
   WocMarketCustody,
   WocMarketDb,
+  WocSaleType,
   WocSettlementRow,
   WocSweepErrorTag,
 } from './woc_market';
@@ -27,6 +30,33 @@ import {
   listingSoldNoticeCustodyRef,
   settlementCustodyRef,
 } from './woc_market_rules';
+
+/** The Sales History axes stamped on the sale row at the one close-tail insert.
+ *  saleType is derived from facts in hand: a directed offer became a buy-now
+ *  listing with a designated buyer, a public buy-now settles with no winning
+ *  bid, an auction settles on its winner's bid. quality is the listing's rolled
+ *  quality; category/subcategory come from the item def through the SAME browse
+ *  helpers escrow stamped the listing with (identical, defs being static), so
+ *  the listing read need not carry the columns; a pruned/unknown def stamps
+ *  null, sitting the row outside the filtered results. Pure and exported so the
+ *  three saleType arms and the null-def case pin without the delivery-path rig. */
+export function wocSaleStampFor(
+  listing: Pick<WocListingRow, 'directedBuyerAccount' | 'quality' | 'itemId'>,
+  settlement: Pick<WocSettlementRow, 'bidId'>,
+): { saleType: WocSaleType; quality: string; category: string | null; subcategory: string | null } {
+  const saleDef = ITEMS[listing.itemId];
+  return {
+    saleType:
+      listing.directedBuyerAccount !== null
+        ? 'directed'
+        : settlement.bidId === null
+          ? 'buy_now'
+          : 'auction',
+    quality: listing.quality,
+    category: saleDef ? exchangeBrowseCategory(saleDef) : null,
+    subcategory: saleDef ? exchangeBrowseSubcategory(saleDef) : null,
+  };
+}
 
 /** Minute-scale cadence for the two legacy-residue arms (they converge an
  *  OLDER binary's crash residue, so every-pass cost bought nothing). */
@@ -645,6 +675,9 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
         buyerAccount: settlement.buyerAccount,
         sellerName: listing.sellerName,
         buyerName: settlement.buyerName,
+        // The Sales History axes (saleType / quality / category / subcategory),
+        // derived at this one insert site. See wocSaleStampFor.
+        ...wocSaleStampFor(listing, settlement),
       },
     });
   }

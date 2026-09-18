@@ -511,7 +511,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // Deliberately strict: bags and bank are the ownership surfaces, so a meta
     // missing either is a broken fixture, not a mountless player. Tolerating it
     // returns a confident empty list that silently under-reports the collection
-    // (and, through characterReliquaryOwnership, under-counts Curator rank).
+    // (and, through accountReliquaryOwnership, under-counts Curator rank).
     const noBags = { bank: { inventory: [] } } as unknown as PlayerMeta;
     expect(() => ownedMounts(noBags)).toThrow(TypeError);
     // The /inventory/ arm leans on V8 embedding the source expression in the

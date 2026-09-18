@@ -208,16 +208,26 @@ describe('the HUD latch that converges the open character sheet', () => {
     const at = hud.indexOf('private refreshCharSheetIfChanged(): void {');
     expect(at, 'refreshCharSheetIfChanged is missing from hud.ts').toBeGreaterThan(-1);
     const body = hud.slice(at, at + 620);
-    expect(body).toContain('charSheetRefreshSig({');
+    // The HUD hands the live world to the core's own reader (the monolith
+    // ratchet moved the per-field reads out of hud.ts), so the world-fed pins
+    // below hold on charSheetRefreshSigFor instead.
+    expect(body).toContain('const sig = charSheetRefreshSigFor(this.sim);');
+    const core = read('src/ui/char_sheet_sig_core.ts');
+    const coreAt = core.indexOf('export function charSheetRefreshSigFor(');
+    expect(coreAt).toBeGreaterThan(-1);
+    const reader = core.slice(coreAt, core.indexOf('export function charSheetRefreshSig(', coreAt));
     // Every field the core signs has to actually be fed from the world, or the
-    // widening is cosmetic: a call site that passed a constant would keep the
+    // widening is cosmetic: a reader that passed a constant would keep the
     // core's own per-field tests green while the sheet stayed stale.
-    expect(body).toContain('activeTitle: this.sim.activeTitle,');
-    expect(body).toContain('activeBorder: this.sim.activeBorder,');
-    expect(body).toContain('deedsEarned: this.sim.deedsEarned.size,');
-    expect(body).toContain('itemsDiscovered: this.sim.deedStats.itemsDiscovered.size,');
-    expect(body).toContain('marks: this.sim.reliquaryMarks.size,');
-    expect(body).toContain('mounts: this.sim.ownedMounts().length,');
+    expect(reader).toContain('activeTitle: world.activeTitle,');
+    expect(reader).toContain('activeBorder: world.activeBorder,');
+    expect(reader).toContain('deedsEarned: world.deedsEarned.size,');
+    expect(reader).toContain('itemsDiscovered: world.deedStats.itemsDiscovered.size,');
+    expect(reader).toContain('marks: world.reliquaryMarks.size,');
+    expect(reader).toContain('mounts: world.ownedMounts().length,');
+    expect(reader).toContain(
+      'accountEntries: world.reliquaryAccountFinds.size + world.accountDeeds.size,',
+    );
     expect(body).toContain('if (sig === this.lastCharSheetSig) return;');
     expect(body).toContain('this.lastCharSheetSig = sig;');
     // ORDER, not just presence: hoisting the assignment above the compare
@@ -278,7 +288,10 @@ describe('the HUD latch that converges the open character sheet', () => {
     const body = progression.slice(0, 2600);
     expect(body).toContain('sim.activeBorder');
     expect(body).toContain('sim.activeTitle');
-    expect(body).toContain('sim.deedsEarned.has(id)');
+    // Account-wide: the border row reads the union of the character's own
+    // earns and the account ledger (src/sim/account_ledger.ts).
+    expect(body).toContain('accountDeedLookup(sim.deedsEarned, { deeds: sim.accountDeeds })');
+    expect(body).toContain('earnedBorders.has(id)');
     expect(body).toContain('reliquarySheetProgressionHtml(buildReliquarySheetModel(sim))');
   });
 });

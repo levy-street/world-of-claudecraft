@@ -396,15 +396,15 @@ const withoutLineComments = (source: string): string =>
     .join('\n');
 
 describe('the second live draw site is gated too', () => {
-  // The animate loop is a class-field arrow function, so it exists only on a
-  // fully constructed preview (which needs a real WebGL context). Its gate is
-  // pinned at the source, because a gate covering only syncSize is not a gate:
-  // the loop would redraw the same cold scene on the very next frame.
+  // The animate loop's frame body (animateFrame, requested through the
+  // class-field arrow `animate`) is pinned at the source, because a gate
+  // covering only syncSize is not a gate: the loop would redraw the same cold
+  // scene on the very next frame.
   it('the animate loop consults the same gate before its render', () => {
     const src = readFileSync('src/render/characters/preview.ts', 'utf8');
-    const animate = src.slice(src.indexOf('private animate = ('));
+    const animate = src.slice(src.indexOf('private animateFrame(): void {'));
     // Code only: a commented-out gate must not satisfy the pin.
-    const body = withoutLineComments(animate.slice(0, animate.indexOf('\n  };')));
+    const body = withoutLineComments(animate.slice(0, animate.indexOf('\n  }\n')));
     expect(body).toContain('if (!this.gateAllowsDraw()) return;');
     expect(body.indexOf('this.gateAllowsDraw()')).toBeLessThan(
       body.indexOf('this.renderer.render(this.scene, this.camera)'),

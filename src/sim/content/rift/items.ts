@@ -238,8 +238,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-26 shoulder rare budget = 11; int:7+spi:4 = 11
-    stats: { armor: 38, int: 7, spi: 4 },
+    // ilvl-26 shoulder rare line = 11; int:7+spi:4 = 11, stamina baseline 4 on top
+    stats: { armor: 38, int: 7, spi: 4, sta: 4 },
     sellValue: 5000,
     requiredClass: CASTER,
   },
@@ -264,8 +264,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'gloves',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-26 gloves rare budget = 10; int:6+spi:4 = 10
-    stats: { armor: 42, int: 6, spi: 4 },
+    // ilvl-26 gloves rare line = 10; int:6+spi:4 = 10, stamina baseline 3 on top
+    stats: { armor: 42, int: 6, spi: 4, sta: 3 },
     sellValue: 5000,
     requiredClass: CASTER,
   },
@@ -289,8 +289,9 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-26 ring rare budget = 9; sta:5+spi:4 = 9 (unchanged from ilvl-28: same budget)
-    stats: { sta: 5, spi: 4 },
+    // ilvl-26 ring rare line = 9: spi:7 plus two stamina bought above the free
+    // baseline of 3 (sta:5); stamina baseline model (unchanged line from ilvl-28)
+    stats: { sta: 5, spi: 7 },
     sellValue: 5000,
   },
   // ---- The Infernal Citadel set-piece drops ----
@@ -302,8 +303,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'chest',
     quality: 'rare',
     requiredLevel: 20,
-    // ilvl-26 chest rare budget = 15; int:9+spi:6 = 15
-    stats: { armor: 55, int: 9, spi: 6 },
+    // ilvl-26 chest rare line = 15; int:9+spi:6 = 15, stamina baseline 5 on top
+    stats: { armor: 55, int: 9, spi: 6, sta: 5 },
     sellValue: 6500,
     requiredClass: CASTER,
   },
@@ -367,8 +368,8 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'shoulder',
     quality: 'epic',
     requiredLevel: 20,
-    // ilvl-31 shoulder epic budget = 16; int:10+spi:6 = 16
-    stats: { armor: 48, int: 10, spi: 6 },
+    // ilvl-31 shoulder epic line = 16; int:10+spi:6 = 16, stamina baseline 5 on top
+    stats: { armor: 48, int: 10, spi: 6, sta: 5 },
     hasteRating: RIFT_ARMOR_RATING,
     sellValue: 13000,
     requiredClass: CASTER,
@@ -380,12 +381,13 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     slot: 'ring',
     quality: 'epic',
     requiredLevel: 20,
-    // ilvl-31 ring epic budget = 13; sta:8+spi:5 = 13.
+    // ilvl-31 ring epic line = 13: spi:9 plus four stamina bought above the
+    // free baseline of 4 (sta:8); stamina baseline model.
     // Rating follows the jewelry precedent (25, not the 40 armor-piece floor).
     // Haste with NO authored Hit: under the heroic_variants.ts rule an authored
     // Hit seed is what marks caster DPS, so the Hit-free sta/spi line reads as
     // healer/throughput jewelry.
-    stats: { sta: 8, spi: 5 },
+    stats: { sta: 8, spi: 9 },
     hasteRating: RIFT_JEWELRY_RATING,
     sellValue: 12000,
   },
@@ -446,7 +448,7 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     // so no rogue is tempted); the ilvl-49 band power lives in the caster
     // axes: the 65-point stat line and the lane-share Spell Power.
     weapon: { min: 15, max: 25, speed: 1.8, dagger: true },
-    stats: { int: 25, spi: 23, sta: 17 },
+    stats: { int: 25, spi: 40, sta: 22 },
     spellPower: 25,
     // NO requiredClass, deliberately: a class lock is a nerf, and the stat line
     // already decides who wants this (19 int / 17 spi / 0 agi / 0 str). A paladin

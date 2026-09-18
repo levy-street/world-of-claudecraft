@@ -86,17 +86,17 @@ export class PlayerCardController {
     backdrop.id = 'player-card-modal';
     const poseButtonsHtml = CARD_POSES.map(
       (pose, index) =>
-        `<button type="button" class="btn pc-pose${index === 0 ? ' sel' : ''}" data-pose="${index}">${esc(t(pose.labelKey))}</button>`,
+        `<button type="button" class="btn pc-pose ui-btn${index === 0 ? ' sel ui-btn--on' : ''}" data-pose="${index}" aria-pressed="${index === 0 ? 'true' : 'false'}">${esc(t(pose.labelKey))}</button>`,
     ).join('');
     backdrop.innerHTML =
-      `<div class="panel pc-modal" role="dialog" aria-modal="true" aria-labelledby="player-card-modal-title">` +
-      `<div class="panel-title"><span id="player-card-modal-title">${esc(t('playerCard.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('playerCard.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel pc-modal ui-window" role="dialog" aria-modal="true" aria-labelledby="player-card-modal-title">` +
+      `<div class="panel-title ui-win-head"><span id="player-card-modal-title" class="ui-win-title">${esc(t('playerCard.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('playerCard.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="pc-preview pc-loading">${esc(t('playerCard.loading'))}</div>` +
       `<div class="pc-poses" role="group" aria-label="${esc(t('playerCard.poseGroup'))}">${poseButtonsHtml}</div>` +
-      `<div class="pc-options"><button type="button" class="btn pc-wallet-toggle" data-wallet-card-toggle><span>${esc(t('hudChrome.playerCard.showWalletBadge'))}</span><span class="pc-toggle-state"></span></button></div>` +
+      `<div class="pc-options"><button type="button" class="btn pc-wallet-toggle ui-btn ui-btn--red ui-btn--plate" data-wallet-card-toggle><span>${esc(t('hudChrome.playerCard.showWalletBadge'))}</span><span class="pc-toggle-state"></span></button></div>` +
       `<div class="pc-actions"></div>` +
       `<div class="pc-link" hidden><span class="pc-link-label">${esc(t('playerCard.referralLinkLabel'))}</span>` +
-      `<input class="pc-link-input" type="text" readonly aria-label="${esc(t('playerCard.referralLinkAria'))}"></div>` +
+      `<input class="pc-link-input ui-input" type="text" readonly aria-label="${esc(t('playerCard.referralLinkAria'))}"></div>` +
       `<div class="pc-status" aria-live="polite"></div>` +
       `</div>`;
     this.deps.document.body.appendChild(backdrop);
@@ -136,6 +136,8 @@ export class PlayerCardController {
       requestedPoseIndex = poseIndex;
       poseButtons.forEach((button, index) => {
         button.classList.toggle('sel', index === poseIndex);
+        button.classList.toggle('ui-btn--on', index === poseIndex);
+        button.setAttribute('aria-pressed', index === poseIndex ? 'true' : 'false');
       });
     };
     const syncWalletToggle = (): void => {
@@ -244,7 +246,7 @@ export class PlayerCardController {
     const makeButton = (label: string, className = ''): HTMLButtonElement => {
       const button = this.deps.document.createElement('button');
       button.type = 'button';
-      button.className = `btn${className ? ` ${className}` : ''}`;
+      button.className = `btn ui-btn${className ? ` ${className}` : ''}`;
       button.textContent = label;
       actions.appendChild(button);
       return button;
@@ -266,7 +268,7 @@ export class PlayerCardController {
     };
 
     if (cardHostingAvailable()) {
-      const shareX = makeButton(t('playerCard.actionShareX'), 'cd-ok');
+      const shareX = makeButton(t('playerCard.actionShareX'), 'cd-ok ui-btn--red');
       shareX.addEventListener('click', async () => {
         this.deps.click();
         shareX.disabled = true;

@@ -13,6 +13,112 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const fr_FR: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.cannotCastWhileMoving': 'Vous ne pouvez pas lancer de sort en vous déplaçant.',
+  'hudChrome.auraEffect.wolfForm':
+    'Forme de chat : dégâts de mêlée et énergie ; vitesse de déplacement augmentée de {pct}%',
+  'hudChrome.auraOverlay.cues.anvilStrike': "Coup d'enclume",
+  'hudChrome.auraOverlay.cues.blaringHorn': "Corne d'alarme",
+  'hudChrome.auraOverlay.cues.bubblePop': 'Éclatement de bulle',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Klaxon de voiture',
+  'hudChrome.auraOverlay.cues.catMeow': 'Miaulement de chat',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Chute de pièce',
+  'hudChrome.auraOverlay.cues.electricZap': 'Décharge électrique',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Coassement de grenouille',
+  'hudChrome.auraOverlay.cues.glassPing': 'Tintement de verre',
+  'hudChrome.auraOverlay.cues.hardBell': 'Cloche métallique',
+  'hudChrome.auraOverlay.cues.musicBox': 'Boîte à musique',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Hululement de chouette',
+  'hudChrome.auraOverlay.cues.softChime': 'Carillon doux',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Écho de sonar',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Sifflement de vapeur',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Épée dégainée',
+  'hudChrome.auraOverlay.cues.templeGong': 'Gong de temple',
+  'hudChrome.auraOverlay.cues.waterDrop': "Goutte d'eau",
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Souffle du vent',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Hurlement de loup',
+  'hudChrome.auraOverlay.haptic': 'Vibration',
+  'hudChrome.auraOverlay.hapticHint':
+    "Fait vibrer une manette connectée, ou votre téléphone. Ignoré si l'appareil ne prend pas en charge les vibrations.",
+  'hudChrome.auraOverlay.hapticNone': 'Désactivé',
+  'hudChrome.auraOverlay.haptics.double': 'Doublée',
+  'hudChrome.auraOverlay.haptics.long': 'Longue',
+  'hudChrome.auraOverlay.haptics.tap': 'Brève',
+  'hudChrome.auraOverlay.readyGlow': "Lueur de barre d'action",
+  'hudChrome.auraOverlay.readyGlowHint':
+    "Fait s'illuminer ce sort sur votre barre d'action tant que son amélioration est active.",
+  'hudChrome.auraOverlay.reticleTick': 'Marque de réticule',
+  'hudChrome.auraOverlay.reticleTickHint':
+    "Ajoute une marque près du centre de l'écran qui s'illumine quand ce sort se déclenche.",
+  'hudChrome.auraOverlay.sound': "Son d'alerte",
+  'hudChrome.auraOverlay.soundHint':
+    "Un son se joue chaque fois que ce sort se déclenche. Désactivez l'icône, les croissants latéraux et l'anneau au sol pour que seul le son l'annonce.",
+  'hudChrome.auraOverlay.soundNone': 'Aucun son',
+  'hudChrome.auraOverlay.soundPreview': 'Écouter',
+  'hudChrome.auraOverlay.soundPreviewAria': "Écouter le son d'alerte {sound}",
+  'hudChrome.auraOverlay.soundVolume': 'Volume du son',
+  'hudChrome.auraOverlay.watchlist': 'Sorts surveillés',
+  'hudChrome.auraOverlay.watchlistCount': '{count} surveillés',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    "Aucun autre sort de votre grimoire ne vous accorde d'amélioration.",
+  'hudChrome.auraOverlay.watchlistHint':
+    "Choisissez n'importe quel sort qui vous améliore pour lui donner sa propre aura. Les sorts choisis reçoivent une fiche complète ci-dessous, avec leur propre icône, couleur, position et anneau au sol.",
+  'hudChrome.auraOverlay.watchlistUnwatch': 'Arrêter de surveiller {spell}',
+  'hudChrome.auraOverlay.watchlistWatch': 'Surveiller {spell}',
+  'hudChrome.bank.quantityStepDownAria': 'Diminuer la quantité de {count}',
+  'hudChrome.bank.quantityStepUpAria': 'Augmenter la quantité de {count}',
+  'hudChrome.deeds.accountScopeHint':
+    "Un haut fait accompli par n'importe quel personnage de votre compte est aussi acquis ici, et le Livre indique qui l'a accompli.",
+  'hudChrome.deeds.accountScopeNote': 'Partagé par tous les personnages de votre compte',
+  'hudChrome.deeds.earnedBy': 'Obtenu par {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} ({date})',
+  'hudChrome.finder.lootHeroicChance': 'Bonus héroïque, butins supplémentaires possibles :',
+  'hudChrome.finder.lootHeroicMaybe': 'Bonus héroïque, au plus un de ces objets peut apparaître :',
+  'hudChrome.keybinds.friendlyNameplates': 'Basculer les plaques de nom amies',
+  'hudChrome.leaderboard.podiumLabel': 'Les trois premiers',
+  'hudChrome.leaderboard.prestigeTitle': 'Rang Prestige {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Non réclamé',
+  'hudChrome.materialSources.decreaseByAria': 'Retirer {count} unités de {source}',
+  'hudChrome.materialSources.fits': "Jusqu'à {units} peuvent tenir pour l'instant",
+  'hudChrome.materialSources.increaseByAria': 'Ajouter {count} unités de {source}',
+  'hudChrome.materialSources.moveAll': 'Déplacer toutes les unités',
+  'hudChrome.noticeboard.filterEmpty':
+    "Aucune guilde n'a encore ouvert ses portes aux nouveaux joueurs.",
+  'hudChrome.noticeboard.filterNewPlayersTitle':
+    'Afficher uniquement les guildes qui accueillent les nouveaux joueurs',
+  'hudChrome.noticeboard.filters': 'Filtres du tableau',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Ouverte aux nouveaux joueurs',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Cette guilde accueille les nouveaux joueurs',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Officiers en ligne',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Officiers en ligne : {names}',
+  'hudChrome.noticeboard.showAll': 'Afficher toutes les guildes',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    "Affiché sur le tableau des recrues, au poteau indicateur du Rivage de l'Épreuve.",
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Ouverte aux nouveaux joueurs',
+  'hudChrome.plurals.guildBoardShown.few': '{count} guildes affichées',
+  'hudChrome.plurals.guildBoardShown.many': '{count} guildes affichées',
+  'hudChrome.plurals.guildBoardShown.one': '{count} guilde affichée',
+  'hudChrome.plurals.guildBoardShown.other': '{count} guildes affichées',
+  'hudChrome.professionTrainers.alchemy': 'Maître alchimiste',
+  'hudChrome.professionTrainers.blacksmithing': 'Maître forgeron',
+  'hudChrome.professionTrainers.cooking': 'Maître cuisinier',
+  'hudChrome.professionTrainers.engineering': 'Maître ingénieur',
+  'hudChrome.professionTrainers.farming': 'Maître jardinier',
+  'hudChrome.professionTrainers.hobby': 'Maître des loisirs',
+  'hudChrome.professionTrainers.leatherworking': 'Maître tanneur',
+  'hudChrome.professionTrainers.mining': 'Maître mineur',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Maître tailleur',
+  'hudChrome.reliquary.finderWithDate': '{name} ({date})',
+  'hudChrome.reliquary.foundBy': 'Trouvée par {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    "Une relique trouvée par n'importe quel personnage de votre compte remplit aussi la page ici.",
+  'hudChrome.reliquary.sharedScopeNote': 'Partagé par tous les personnages de votre compte',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Bienvenue à Eastbrook ! Le maréchal Redbrook a du travail pour vous sur la place du village. Activez le guidage doré pour le trouver et suivre Des loups à la porte, ou explorez par vous-même. Vous pouvez modifier ce réglage plus tard dans Options, Interface, Combat.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Désactiver le guidage',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Activer le guidage',
+  'hudChrome.tutorialGreeting.guidanceSetting': "Guidage doré d'Eastbrook",
   'devCommand.actions.farmgrow.description':
     'Amène vos parcelles plantées à leur maturité, ou une parcelle par identifiant. Rien d’autre ne change : le résultat a été tiré au moment de la plantation.',
   'devCommand.actions.farmgrow.label': 'Faire mûrir les cultures',
@@ -1024,11 +1130,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     "La forme de déplacement : bien plus rapide au sol, mais sans aucune autre capacité tant que vous n'en changez pas.",
   'guide.classPage.formName.form_bear': 'Forme de Bruin',
-  'guide.classPage.formName.form_cat': 'Forme de loup',
+  'guide.classPage.formName.form_cat': 'Forme de chat',
   'guide.classPage.formName.form_travel': 'Forme de Fleet',
   'guide.classPage.formsHeading': 'Changement de forme',
   'guide.classPage.formsMoonwing':
     "Un druide Équilibre gagne une forme supplémentaire, la Forme de sélénien, la forme de lanceur de sorts dans laquelle il combat. C'est la seule forme animale qui conserve vos sorts, et votre baguette ne fonctionne que dans cette forme ou dans votre forme de lanceur de sorts normale.",
+  'guide.classPage.formsWolfEngage':
+    "Un loup ouvre le combat avec Ruée de Bruin, passe aussitôt en Forme de loup pour clouer la cible, comble la distance avec Bond quand il n'est pas camouflé et immobilise un ennemi avec Mise à terre.",
   'guide.classPage.formsNote':
     'Un druide combat en changeant de forme. La plupart des capacités de druide appartiennent à une forme précise, si bien que la forme que vous portez détermine ce que vous pouvez lancer, et changer de forme coûte un peu de mana. Vous pouvez changer de forme en combat ou hors combat, aussi souvent que vous le souhaitez.',
   'guide.classPage.mageEleHeading': "Élémentaire d'eau",
@@ -1052,7 +1160,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "La mer n'a pas de mur. Les traversées que le monde attend de vous, les détroits et les étendues d'eau entre deux bandes de terre, ainsi que les lacs intérieurs, se traversent en toute sécurité, quel que soit le temps que cela prenne. Aventurez-vous en revanche au-delà du rivage, en pleine mer ouverte, et cela commence à drainer vos forces : un avertissement apparaît, vous disposez d'une réelle marge pour faire demi-tour, et après cela la mer inflige des dégâts de plus en plus lourds que rien ne peut empêcher tant que vous ne revenez pas vers la terre. Vous noyer ou vous épuiser aussi loin du rivage vous libère comme n'importe quelle autre mort, alors traitez l'horizon comme un décor plutôt que comme une destination.",
   'guide.combat.hazardsTitle': "L'eau peut vous tuer",
   'guide.combat.threatBody':
-    "Chaque ennemi tient un décompte privé de qui l'a le plus agacé. Les dégâts s'y ajoutent, et les soins aussi : un soin place de la menace sur les ennemis qui combattent déjà la personne soignée, répartie entre eux, si bien que le soin le plus sûr est celui porté sur quelqu'un que le tank tient déjà. Les tanks activent une posture de garde ou une forme protectrice qui multiplie tout ce qu'ils génèrent, tandis que la Forme de loup du druide dissipe la menace au lieu d'en accumuler, et une provocation propulse d'un coup le lanceur en tête du décompte et force l'ennemi à s'acharner sur lui pendant quelques secondes. Les ennemis ne changent pas de cible à l'instant même où quelqu'un dépasse le tank : il faut une avance nette pour en détourner un, et une avance plus grande à distance qu'au corps à corps, si bien qu'un peu de patience au début d'un pull garde le combat là où il doit être.",
+    "Chaque ennemi tient un décompte privé de qui l'a le plus agacé. Les dégâts s'y ajoutent, et les soins aussi : un soin place de la menace sur les ennemis qui combattent déjà la personne soignée, répartie entre eux, si bien que le soin le plus sûr est celui porté sur quelqu'un que le tank tient déjà. Les tanks activent une posture de garde ou une forme protectrice qui multiplie tout ce qu'ils génèrent, tandis que la Forme de chat du druide dissipe la menace au lieu d'en accumuler, et une provocation propulse d'un coup le lanceur en tête du décompte et force l'ennemi à s'acharner sur lui pendant quelques secondes. Les ennemis ne changent pas de cible à l'instant même où quelqu'un dépasse le tank : il faut une avance nette pour en détourner un, et une avance plus grande à distance qu'au corps à corps, si bien qu'un peu de patience au début d'un pull garde le combat là où il doit être.",
   'guide.combat.threatTitle': "Qui l'ennemi frappe",
   'guide.combat.unstuckBody':
     "Si le monde vous piège quelque part dont vous ne pouvez pas sortir, tapez /unstuck. Vous devez être hors combat et immobile, non entravé par un étourdissement ou une immobilisation, et non engagé dans un duel ou un match d'arène : un court compte à rebours démarre, et bouger ou subir des dégâts l'annule. Une fois terminé, vous êtes déposé au cimetière le plus proche. Cela ne vous tue jamais et ne laisse aucun cadavre, et si vous étiez déjà tombé, cela vous relève sur place à la place. Le prix en est le Mal de déblocage, un affaiblissement temporaire de tout ce que vous êtes qui s'est dissipé le temps que vous puissiez réutiliser la commande, et comme le Glas du Veilleur, il épargne entièrement les personnages tout neufs.",
@@ -3337,7 +3445,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Lancez un éclat de glace infligeant {damage} points de dégâts de Givre, triplés contre une cible gelée. Dépense Fingers of Frost ou une charge de Morsure de l'hiver pour traiter la cible comme gelée. (Givre)",
   'entities.abilities.ice_lance.name': 'Lance de glace',
   'entities.abilities.perfect_moment.description':
-    "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas. (Chromancie)",
+    "Saisissez votre moment parfait : gagnez instantanément 4 Charges d'arcane, et pendant 10 s Traits d'Aether ne les consomme pas et infligent 20% de dégâts supplémentaires. (Chromancie)",
   'entities.abilities.perfect_moment.name': 'Moment parfait',
   'entities.abilities.shatter.name': 'Ruine fragile',
   'entities.abilities.temporal_acceleration.description':
@@ -3616,9 +3724,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.tierTutorial.masters':
     "Les maîtres des métiers en ville proposent des quêtes d'harmonisation. Rendez-leur visite pour choisir votre paire quand vous êtes prêt. Rien de ce que vous avez appris n'est jamais perdu.",
   'hudChrome.crafting.tierTutorial.radar':
-    "Vos professions forment une roue. Harmonisez-vous à une paire adjacente et ces deux métiers deviennent des majeures sans plafond, le métier opposé sur la roue devient un passe-temps plafonné au rare, et les autres restent dormants : leur savoir conservé, mais plafonné au commun jusqu'à ce que vous les repreniez.",
+    "Vos professions d'artisanat forment une roue. Harmonisez-vous à une paire adjacente et ces deux métiers deviennent des majeures sans plafond, le métier opposé sur la roue devient un passe-temps plafonné au rare, et les autres restent dormants : leur savoir est conservé, mais plafonné au commun jusqu'à ce que vous les repreniez.",
   'hudChrome.crafting.tierTutorial.tierCap':
-    "Un métier atteint son premier palier à {skill} de compétence, et chaque palier améliore ce qu'il peut produire. Mais un métier ne dépasse le travail rare qu'une fois qu'il est l'une de vos deux majeures.",
+    "Une profession atteint son premier palier à {skill} de compétence, et chaque palier améliore ce qu'elle produit ou vous permet de fabriquer. Parmi vos professions d'artisanat précisément, cependant, un métier ne dépasse le travail rare qu'une fois qu'il fait partie de vos deux majeures.",
   'hudChrome.crafting.tierTutorial.title': 'Votre premier palier',
   'hudChrome.crafting.trendNudge':
     'Vos mains se penchent vers {archetype}. Son harmonisation vous attend avec {master}.',
@@ -4488,7 +4596,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.title': 'Priorités de la ville',
   'hudChrome.townFocus.townOnlyHint':
     'Le focus ne peut être modifié que lorsque vous êtes en ville.',
-  'hudChrome.archetypeTitle.label': 'Titre',
   'hudChrome.archetypeTitle.none': 'Aucun',
   'entities.itemSets.crownforged.bonus4':
     "Vos coups critiques d'arme lacèrent la cible avec Éclat d'os, lui infligeant 8 points de dégâts de saignement toutes les 2 s pendant 12 s. Se cumule jusqu'à 3 fois.",
@@ -6666,7 +6773,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresCombo': 'Cette technique requiert des points de combo.',
   'hud.errors.requiresForm': 'Vous devez être en forme de {form}.',
   'hud.errors.bear': 'Bruin',
-  'hud.errors.cat': 'loup',
+  'hud.errors.cat': 'chat',
   'hud.errors.travel': 'Fleet',
   'hud.errors.cantInForm': 'Vous ne pouvez pas faire cela en forme de {form}.',
   'hud.errors.shapeshifted': 'Vous ne pouvez pas faire cela en forme changeante.',
@@ -6919,8 +7026,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'mana',
   'abilityUi.resources.rage': 'rage',
   'abilityUi.resources.energy': 'énergie',
-  'abilityUi.forms.bear': 'ours',
-  'abilityUi.forms.cat': 'loup',
+  'abilityUi.forms.bear': 'Bruin',
+  'abilityUi.forms.cat': 'chat',
   'abilityUi.cast.fishing': 'Pêche',
   'abilityUi.cast.gathering': 'Collecte',
   'abilityUi.cast.thunzharrStormcall': 'Appel de la tempête',
@@ -7561,14 +7668,14 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Enracine la cible sur place pendant un maximum de 12 s.',
   'entities.abilities.bear_form.name': 'Forme de Bruin',
   'entities.abilities.bear_form.description':
-    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Relancez pour reprendre votre forme de lanceur.",
+    "Vous change en ours: armure +110%, santé maximale +30%, puissance d'attaque fortement augmentée, vos attaques génèrent de la rage et 30% de menace en plus. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Relancez pour reprendre votre forme de lanceur.",
   'entities.abilities.maul.name': 'Brise-os',
   'entities.abilities.growl.name': 'Menacer',
   'entities.abilities.growl.description':
     'Gronde la cible : votre menace rejoint celle de son ennemi le plus haï et elle est forcée de vous attaquer pendant 3 s. Forme de Bruin uniquement.',
-  'entities.abilities.cat_form.name': 'Forme de loup',
+  'entities.abilities.cat_form.name': 'Forme de chat',
   'entities.abilities.cat_form.description':
-    "Vous transforme en loup : l'agilité monte avec votre niveau, puissance d'attaque +8 plus 2 par niveau, vos attaques utilisent de l'énergie et des points de combo, et vous générez 29% de menace en moins. Lancez de nouveau pour revenir en forme de lanceur de sorts.",
+    "Vous transforme en loup : l'agilité monte avec votre niveau, puissance d'attaque +8 plus 2 par niveau, vos attaques utilisent de l'énergie et des points de combo, et vous générez 29% de menace en moins. Passer sous une forme quelconque octroie Foulée bondissante : 60% de vitesse de déplacement pendant 3 s, une fois toutes les 20 s. Lancez de nouveau pour revenir en forme de lanceur de sorts.",
   'entities.abilities.claw.name': 'Griffe lacérante',
   'entities.abilities.ferocious_bite.name': 'Morsure sanglante',
   'entities.abilities.swipe.name': 'Griffes balayantes',
@@ -7579,7 +7686,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Chute céleste',
   'entities.abilities.travel_form.name': 'Forme de Fleet',
   'entities.abilities.travel_form.description':
-    "Adopte instantanément une forme de Fleet rapide, augmentant la vitesse de déplacement de 40%. Vous ne pouvez pas utiliser d'autres capacités sous cette forme, mais vous pouvez l'adopter ou la quitter en combat, idéale pour fuir.",
+    "Adopte instantanément une forme de Fleet rapide, augmentant la vitesse de déplacement de 40% et supprimant les racines et ralentissements brisables. Vous ne pouvez pas utiliser d'autres capacités sous cette forme, mais vous pouvez l'adopter ou la quitter en combat, idéale pour fuir. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement.",
   'entities.abilities.enrage.name': 'Attiser',
   'entities.abilities.enrage.description':
     'Génère 20 points de rage instantanément. Forme de Bruin uniquement.',
@@ -7592,16 +7699,22 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Plonge la cible dans un sommeil profond pendant 8 s maximum. Tout dégât la réveille.',
   'entities.abilities.dash.name': 'Sprint',
   'entities.abilities.dash.description':
-    'Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de loup uniquement.',
+    'Bondit en avant, augmentant la vitesse de déplacement de 50% pendant 15 s. Forme de chat uniquement.',
   'entities.abilities.pounce.name': 'Frappe furtive',
+  'entities.abilities.lunge.description':
+    "Bondit sur un ennemi jusqu'à 12 m, inflige 60% des dégâts de l'arme et octroie 1 point de combo. Forme de loup uniquement.",
+  'entities.abilities.lunge.name': 'Bond',
+  'entities.abilities.hamstring_bite.description':
+    'Technique de finition qui étourdit la cible pendant 1 s plus 1 s par point de combo (5 points de combo : 6 s). Forme de loup uniquement.',
+  'entities.abilities.hamstring_bite.name': 'Mise à terre',
   'entities.abilities.pounce.description':
-    'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de loup uniquement.',
+    'Ouverture furtive qui étourdit la cible pendant 2 s. Confère 1 point de combo. Forme de loup uniquement. Hors camouflage, ce bouton devient Bond.',
   'entities.abilities.insect_swarm.name': 'Nuée cinglante',
   'entities.abilities.insect_swarm.description':
     "L'ennemi est assailli par une nuée d'insectes, subissant {damage} points de dégâts de Nature sur 12 s.",
-  'entities.abilities.tigers_fury.name': 'Sang de loup',
+  'entities.abilities.tigers_fury.name': 'Sang de lynx',
   'entities.abilities.tigers_fury.description':
-    "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de loup uniquement.",
+    "Libère {rage} points d'énergie et augmente la puissance d'attaque de {buff} pendant {duration} s. Forme de chat uniquement.",
   'entities.abilities.rip.name': 'Faille sanglante',
   'entities.abilities.mortal_strike.name': 'Frappe mutilante',
   'entities.abilities.mortal_strike.description':
@@ -7641,13 +7754,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Soumet un Wraithborn à votre volonté, un démon d'élite qui déverse de lourds dégâts d'Ombre à distance. Un long temps de recharge bride sa puissance dévastatrice. Invoquer un nouveau démon renvoie celui que vous avez. Vous ne pouvez avoir qu'un démon à la fois.",
   'entities.abilities.bear_charge.name': 'Ruée de Bruin',
   'entities.abilities.bear_charge.description':
-    "Charge un ennemi, génère 9 points de rage et l'étourdit pendant 1 s. Portée de 8-25 m. Forme de Bruin uniquement.",
+    "Charge un ennemi, génère 9 points de rage et l'étourdit pendant 1 s. Pendant les 3 s qui suivent, la Forme de loup est gratuite et cloue la cible, la ralentissant de 50% pendant 4 s. Portée de 8-25 m. Forme de Bruin uniquement.",
   'entities.abilities.demoralizing_roar.name': 'Rugissement lâche',
   'entities.abilities.demoralizing_roar.description':
     "Démoralise les ennemis proches, réduisant leur puissance d'attaque de 20 pendant 20 s. Forme de Bruin uniquement.",
   'entities.abilities.prowl.name': 'Traquer',
   'entities.abilities.prowl.description':
-    'Passe en camouflage tant que vous êtes en forme de loup, avec une vitesse de déplacement réduite de 5%. Inutilisable en combat.',
+    'Passe en camouflage tant que vous êtes en forme de loup. Inutilisable en combat.',
   'entities.abilities.rake.name': 'Écorcher',
   'entities.abilities.revive_pet.name': 'Rafistoler',
   'entities.abilities.revive_pet.description':
@@ -7697,10 +7810,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Avance un tic à venir de votre Pacte brûlant, puis embrase la cible pour {damage} points de dégâts de Feu. Génère 1 Dévastation et 1 Ruine. Retient {charges} charges. (Signature Destruction)',
   'entities.abilities.moonkin_form.name': 'Forme de sélénien',
   'entities.abilities.moonkin_form.description':
-    'Adopte la forme de sélénien, renforçant l’incantation jusqu’à ce que vous changiez de nouveau. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)',
+    "Adopte la forme de sélénien, renforçant l'incantation jusqu'à ce que vous changiez de nouveau. Se transformer, quelle que soit la forme, confère Foulée bondissante, une brève poussée de vitesse de déplacement. Lancez à nouveau pour revenir à la forme normale. (signature Équilibre)",
   'entities.abilities.feral_charge.name': 'Déferlante primordiale',
   'entities.abilities.feral_charge.description':
-    "Libère une déferlante primordiale. En Forme de loup, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
+    "Libère une déferlante primordiale. En Forme de chat, augmente la régénération d'énergie de 100% pendant 10 s. En Forme de Bruin, génère instantanément 50 points de rage. (signature Farouche)",
   'entities.abilities.swiftmend.name': 'Prompte guérison',
   'entities.abilities.crusader_strike.description':
     'Frappe la cible et inflige les dégâts de l’arme plus {damage} points de dégâts du Sacré. (talent de paladin)',
@@ -10803,7 +10916,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Arme imprégnée : {min} à {max} dégâts bonus au Verdict',
   'hudChrome.auraEffect.stealth': 'Camouflé ; vitesse de déplacement réduite de {pct}%',
   'hudChrome.auraEffect.formBear': 'Forme de Bruin : points de vie et armure augmentés',
-  'hudChrome.auraEffect.formCat': 'Forme de félin : dégâts de mêlée et énergie',
   'hudChrome.auraEffect.formTravel': 'Forme de Fleet : vitesse de déplacement augmentée de {pct}%',
   'hudChrome.auraEffect.defensiveStance': 'Posture de garde : dégâts subis réduits, menace accrue',
   'hudChrome.auraEffect.righteousFury':
@@ -11089,7 +11201,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Herboristerie',
   'hudChrome.gathering.logging': 'Bûcheronnage',
   'hudChrome.gathering.mining': 'Minage',
-  'hudChrome.gathering.title': 'Récolte',
   'errors.api.accountSessionLimit': 'Trop de personnages de ce compte sont déjà dans le monde.',
   'errors.api.crossSiteOrigin': 'Requête bloquée pour des raisons de sécurité.',
   'errors.api.unsupportedMediaType': 'Format de requête non pris en charge.',
@@ -11517,7 +11628,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.willow_sprite.name': 'Lutin du saule',
   'entities.mobs.wood_wraith.name': 'Spectre des bois',
   'entities.mobs.wreck_thief.name': "Voleur des champs d'épaves",
-  'hudChrome.archetypeTitle.hobbyLabel': 'Loisir',
   'hudChrome.auraEffect.armorPct': "Réduit l'armure de {pct}%",
   'hudChrome.auraEffect.armorPctStacks': "Réduit l'armure de {pct}% ({stacks} charges)",
   'hudChrome.auraEffect.increasePct.allStats': 'Augmente tous les attributs de {pct}%',
@@ -11616,7 +11726,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les Prouesses forment une étagère à part: les annales de l'héritage et des premières mondiales, ces hauts faits liés à une époque révolue ou à un instant qui ne se produira qu'une seule fois. Elles ne rapportent aucune Renommée et restent hors du compte d'achèvement, conservées à jamais en mémoire de ce qui fut accompli.",
   'guide.deedsPage.featsHeading': 'Prouesses',
   'guide.deedsPage.howBody':
-    "Les hauts faits s'obtiennent et se conservent personnage par personnage, si bien que chaque héros que vous jouez se bâtit son propre Livre ; seul le Classement du royaume rassemble votre Renommée sur l'ensemble des personnages que vous jouez, en ne comptant chaque haut fait qu'une seule fois. Chaque haut fait énonce clairement ce qu'il attend de vous, directement dans le Livre des hauts faits en jeu, si bien que vous savez toujours quoi viser, et vous pouvez suivre ceux que vous convoitez pour les garder sous les yeux en jouant. Une petite poignée restent secrets et ne se dévoilent qu'une fois obtenus. Le Livre se tient aussi honnête : tout ce que votre passé peut prouver, il vous le crédite sur-le-champ, si bien qu'un vétéran ne l'ouvre jamais sur une page vide ; seuls les hauts faits à décompte commencent leur comptage de zéro.",
+    "Les hauts faits s'obtiennent personnage par personnage, mais le Livre des hauts faits est partagé par tous les personnages de votre compte : un haut fait accompli par l'un d'eux est acquis pour tous, le Livre indique qui l'a accompli et quand, et un titre ou une bordure qu'il octroie peut être porté par n'importe lequel de vos personnages. Le Classement du royaume rassemble votre Renommée de la même façon, en ne comptant chaque haut fait qu'une seule fois. Chaque haut fait énonce clairement ce qu'il attend de vous, directement dans le Livre des hauts faits en jeu, si bien que vous savez toujours quoi viser, et vous pouvez suivre ceux que vous convoitez pour les garder sous les yeux en jouant. Une petite poignée restent secrets et ne se dévoilent qu'une fois obtenus. Le Livre se tient aussi honnête : tout ce que votre passé peut prouver, il vous le crédite sur-le-champ, si bien qu'un vétéran ne l'ouvre jamais sur une page vide ; seuls les hauts faits à décompte commencent leur comptage de zéro.",
   'guide.deedsPage.howHeading': 'Comment fonctionnent les hauts faits',
   'guide.deedsPage.intro':
     "Le Livre des hauts faits est l'endroit où le monde tient le compte de tout ce que vous avez accompli, de vos premiers pas hors de la vallée de départ aux combats les plus rudes que le royaume puisse offrir. Obtenez des hauts faits au fil du jeu, portez les titres qu'ils confèrent et regardez votre Renommée grimper.",
@@ -12557,7 +12667,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Un boss de la puissance d'un raid qui surgit dans le monde ouvert à un rythme régulier, affronté par quiconque se rassemble pour répondre à l'appel plutôt que par un groupe fixe.",
   'guide.glossary.worldBossTerm': 'Boss de monde',
   'guide.models.formBear': 'Forme de Bruin',
-  'guide.models.formCat': 'Forme de loup',
+  'guide.models.formCat': 'Forme de chat',
   'guide.models.formTravel': 'Forme de Fleet',
   'guide.models.groupForms': 'Formes de druide',
   'guide.nav.sidebarLabel': 'Rubriques du guide',
@@ -12692,7 +12802,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     "Frappe jusqu'à 3 ennemis dans un rayon de 10 m pour {damage} points de dégâts de Nature chacun. Élémentaire : un coup au but accorde 1 Tonnerre. Les dégâts augmentent avec la puissance des sorts.",
   'entities.abilities.chaos_bolt.description':
-    'Dépense 3 Dévastation pour lancer un lourd trait de feu chaotique infligeant {damage} points de dégâts de Feu. Ruine raccourcit son incantation de 30%.',
+    'Dépense 3 Dévastation pour lancer un lourd trait de feu chaotique infligeant {damage} points de dégâts de Feu avant application des dégâts critiques. Assène toujours un coup critique en cas de touche. Ruine raccourcit son incantation de 30%.',
   'entities.abilities.cloak_of_shadows.description':
     "Vous enveloppe d'ombres et absorbe 420 points de dégâts pendant 5 s. (talent de Voleur)",
   'entities.abilities.cone_of_cold.description':
@@ -14109,7 +14219,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     "Marée lunaire : cran {stacks} sur {max}. Les incantations de Trait sauvage, Chute céleste et Graine lunaire la remplissent en Forme de sélénien ; à {max}, Graine lunaire devient Déferlante lunaire et Chute céleste devient Sillage solaire, et l'une ou l'autre la dépense",
   'hudChrome.auraEffect.oldBlood':
-    'Sang ancien : cran {stacks} sur {max}. Les frappes portées en loup et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
+    'Sang ancien : cran {stacks} sur {max}. Les frappes portées en chat et en Bruin partagent cette réserve ; à {max}, Morsure sanglante ou Brise-os se transforme',
   'hudChrome.auraEffect.verdance':
     'Verdoyance : cran {stacks} sur {max}. Les incantations achevées de Floraison sauvage et de Seconde floraison la remplissent ; à {max}, Prompte guérison devient Surfloraison',
   'hudChrome.riftTracker.title': 'Faille',
@@ -14220,7 +14330,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Durcit votre peau en scorie refroidissante pendant 10 s, réduisant tous les dégâts subis de 25%.',
   'entities.abilities.cinderhide.name': 'Peau de braise',
   'entities.abilities.claw.description':
-    "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de loup uniquement.",
+    "Griffe l'ennemi pour les dégâts de l'arme plus {damage}. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.claw.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.cold_blood.description':
     'Concentre votre instinct meurtrier pour que votre prochaine attaque soit un coup critique. (signature Art des lames)',
@@ -14255,7 +14365,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description':
     "Réduit l'armure de la cible de {damage}% pendant 40 s.",
   'entities.abilities.ferocious_bite.description':
-    'Technique de finition qui inflige {damage}. Forme de loup uniquement.',
+    'Technique de finition qui inflige {damage}. Forme de chat uniquement.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Chaque coup porté ajoute 1 Sang ancien ; à 3 Sang ancien, ce bouton devient Moisson rouge, qui consomme le Sang ancien pour une frappe plus puissante qui inflige aussi instantanément tous les dégâts que vos Écorcher et Lacération auraient encore infligés, et restaure de l’énergie.',
   'entities.abilities.funeral_harvest.description':
@@ -14270,7 +14380,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     "Frappe l'ennemi pour les dégâts de l'arme plus {damage}, cause des dégâts de saignement sur 12 s, et augmente les dégâts de saignement subis de 40%. Confère 1 point de combo. Une utilisation sur deux ajoute 1 Pénombre (maximum 3). (signature Fourberie)",
   'entities.abilities.hex_of_violence.description':
-    "Maudit l'ennemi pendant 8 s. Ses 3 prochaines actions offensives génèrent chacune 7 Condamnation et lui infligent 17 points de dégâts d'Ombre.",
+    "Maudit l'ennemi pendant 8 s, lui infligeant des dégâts d'Ombre et générant 2 Condamnation toutes les 2 s. Ses 3 prochaines actions offensives génèrent chacune 7 Condamnation et lui infligent 17 points de dégâts d'Ombre.",
   'entities.abilities.hex_of_violence.name': 'Malédiction de violence',
   'entities.abilities.hour_of_judgment.description':
     "Appelle le jugement sur votre Mauvais œil principal pendant 15 s, accordant 40 Condamnation et 3 Fils du destin, activant la Possession, doublant la Condamnation générée par l'Œil principal, et augmentant les dégâts de Sentence de 20%. La première Sentence rembourse 50 Condamnation.",
@@ -14313,7 +14423,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Dépense 1 Fragment d'âme pour ajouter un Guerrier squelette permanent à votre Domination à 2 emplacements. Un seul peut vous servir à la fois. Il frappe en zone les ennemis proches pour 45% de dégâts toutes les 6 s, et Commandement de la moisson cloue sa cible avec un ralentissement de 40% pendant 4 s.",
   'entities.abilities.raise_skeletal_warrior.name': 'Relever un Guerrier squelette',
   'entities.abilities.rake.description':
-    "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et cause des dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de loup uniquement.",
+    "Écorche l'ennemi pour les dégâts de l'arme plus {damage} et cause des dégâts de saignement sur 18 s. Confère 1 point de combo. Forme de chat uniquement.",
   'entities.abilities.rake.specNote_feral': 'Chaque coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.reaping_command.description':
     "Dépense 2 Fragments d'âme pour ordonner à tous vos serviteurs morts-vivants de frapper à l'unisson. Les Graveguards provoquent et s'arc-boutent, les Guerriers squelettes clouent leur cible, les Mages d’os exposent les défenses magiques, et l’Aile funéraire déchire tous les ennemis touchés.",
@@ -14326,10 +14436,10 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Planter une NOUVELLE floraison ajoute 1 Verdoyance (maximum 5). À 5 Verdoyance, Prompte guérison devient Surfloraison.',
   'entities.abilities.rip.description':
-    'Technique de finition qui fait saigner la cible toutes les 2 s pendant 24 s : 36 dégâts plus 24 par point de combo dépensé (5 points de combo : {damage} au total). Forme de loup uniquement.',
+    'Technique de finition qui fait saigner la cible toutes les 2 s pendant 24 s : 36 dégâts plus 24 par point de combo dépensé (5 points de combo : {damage} au total). Forme de chat uniquement.',
   'entities.abilities.rip.specNote_feral': 'Le coup porté ajoute 1 Sang ancien (maximum 3).',
   'entities.abilities.ruinous_brand.description':
-    "Marque un ennemi pendant 15 s. Vos 3 prochains sorts directs se répercutent pour 25% de dégâts contre l'ennemi marqué, ou lui recopient 50% de dégâts quand ils sont lancés sur une autre cible.",
+    "Marque un ennemi pendant 15 s. Vos 3 prochains sorts directs se répercutent pour 25% de dégâts contre l'ennemi marqué, ou lui recopient 50% de dégâts quand ils sont lancés sur une autre cible. Les répercussions de Trait de ruine comptent aussi comme coups critiques, sans multiplicateur de dégâts critiques supplémentaire.",
   'entities.abilities.ruinous_brand.name': 'Marque ruineuse',
   'entities.abilities.rupture.description':
     'Technique de finition qui blesse la cible : elle saigne toutes les 2 s, pendant 6 s plus 2 s par point de combo (5 points de combo : 16 s et {damage} dégâts au total).',
@@ -14442,6 +14552,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.cauterizeFatigue': 'Cautérisation ne peut pas empêcher un autre coup fatal',
   'hudChrome.auraEffect.cooldownCap':
     '{used} sur {cap} s de réduction de temps de recharge utilisés dans cette fenêtre',
+  'hudChrome.auraEffect.bruinRushWindow':
+    'La Forme de loup ne coûte aucun mana et cloue la cible de votre Ruée de Bruin, la ralentissant de {pct}% pendant {sec} s',
   'hudChrome.auraEffect.desolation':
     "{charges} charges : votre prochain Trait de ruine s'incante {castPct}% plus vite, ou votre prochaine Pluie de feu s'abat immédiatement",
   'hudChrome.auraEffect.duskfireClaim': 'La mort accorde {value} Ruine',
@@ -14549,7 +14661,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Toutes les pages écrites du Reliquaire et les noms des reliques qu'elles contiennent. Cette liste ne donne que des noms sans divulgâcher : ouvrez Le Reliquaire en jeu pour voir votre progression, vos conquêtes et les silhouettes.",
   'guide.reliquaryPage.catalogHeading': 'Catalogue des pages',
   'guide.reliquaryPage.howBody':
-    "Ouvrez Le Reliquaire en jeu (Maj+X par défaut). Chaque étagère abrite des pages de reliques uniques. Vous remplissez une silhouette lorsque vous obtenez cette pièce pour la première fois sur ce personnage, et vous enluminez une page lorsque toutes ses reliques sont remplies. Quelques pages portent la mention Retirée ou Personnelle : elles restent hors de la complétion et ne bloquent donc jamais une étagère ni le catalogue entier. Les trouvailles en direct déclenchent une notification et rafraîchissent la fenêtre ouverte ; la progression est propre au personnage, sauf les apparences d'arme, qui sont des cosmétiques de compte.",
+    "Ouvrez Le Reliquaire en jeu (Maj+X par défaut). Chaque étagère contient des pages de reliques uniques. Une silhouette se remplit dès qu'un personnage de votre compte, quel qu'il soit, obtient cette pièce pour la première fois, et une page s'illumine lorsque chaque relique qu'elle contient est remplie. Quelques pages portent la mention Retirée ou Personnelle : elles restent hors de la complétion et ne bloquent donc jamais une étagère ni le catalogue entier. Les trouvailles en direct affichent une notification et rafraîchissent la fenêtre ouverte ; la progression est partagée par tous les personnages du compte, si bien qu'une relique trouvée par un personnage remplit la page pour tous.",
   'guide.reliquaryPage.howHeading': 'Comment fonctionne la collection',
   'guide.reliquaryPage.intro':
     "Le Reliquaire est le musée des butins uniques que vous avez catalogués : les pièces convoitées des donjons, les trophées de métier, les montures, les apparences d'arme et les titres. Il accompagne le Livre des hauts faits comme une salle des trophées accompagne un livre de succès.",
@@ -14866,13 +14978,13 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Maintenez le pare-chocs gauche et appuyez sur le bouton supérieur pour organiser la barre avec le contrôleur.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Organisation : confirmer le prélèvement dans une cellule ou le livre de sorts et le dépôt sur une cellule, annuler en efface un.',
+    'Organisation · le D-pad déplace · confirmer prend et pose · annuler vide une cellule',
   'hudChrome.controller.crossHotbarEnable': 'Activer la barre de raccourcis croisée',
   'hudChrome.controller.crossHotbarExpand': 'Barre de raccourcis double croix',
   'hudChrome.controller.crossHotbarHelp':
     "Maintenez une gâchette enfoncée pour allumer huit emplacements de barre d'action sur le pavé directionnel et les boutons du visage. Appuyez sur l'autre déclencheur pour passer au deuxième ensemble.",
   'hudChrome.controller.crossHotbarOwnsButtons':
-    "Les déclencheurs et le D-pad appartiennent à la barre de raccourcis croisée lorsqu'elle est activée, ils sont donc configurés ci-dessous plutôt qu'ici.",
+    "Les déclencheurs modifient la barre de raccourcis croisée lorsqu'elle est activée. Les directions du D-pad restent modifiables ici pour les menus et les déplacements.",
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Réinitialiser la barre de raccourcis croisée',
   'hudChrome.controller.cycleHudAction': 'Interface de cycles',
@@ -16059,12 +16171,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     "Toutes les {everyNormal} s, Nythraxis empale {victimsNormal} membres du raid autres que sa cible actuelle sur des Pointes d'os. Un membre empalé ne peut pas agir et perd {drainNormal} de ses points de vie maximum chaque seconde jusqu'à la destruction de sa pointe. Une pointe se brise après {hitsNormal} coups portés par n'importe qui, quels que soient leurs dégâts. Un joueur déjà empalé ne peut pas être choisi de nouveau pendant {cooldown} s, de sorte que les pointes se répartissent sur tout le raid.",
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    "À partir de {first} s après le Courroux du roi, puis toutes les {everyHeroic} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlHeroic} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamHeroic} des points de vie maximum. Il lance Pointe d'os {spikeAt} s après le début de la tempête, puis Brise-tombe se réarme {rearm} s après la fin.",
+    "À partir de {first} s après le Courroux du roi, puis toutes les {everyHeroic} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlHeroic} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamHeroic} des points de vie maximum. Brise-tombe se réarme {rearm} s après la fin.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': "Tempête d'os",
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Dispersez-vous et continuez à courir pour vous éloigner de Nythraxis. Le membre chargé fuit pendant que les autres laissent de l espace autour de la trajectoire, puis les tanks le reprennent quand la tempête se termine.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    "À partir de {first} s après le Courroux du roi, puis toutes les {everyNormal} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlNormal} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamNormal} des points de vie maximum. Il lance Pointe d'os {spikeAt} s après le début de la tempête, puis Brise-tombe se réarme {rearm} s après la fin.",
+    "À partir de {first} s après le Courroux du roi, puis toutes les {everyNormal} s, Nythraxis commence Tempête d'os pendant {duration} s. Il ignore la menace, se déplace à {speed} fois la vitesse normale, et effectue {charges} charges de {chargeSeconds} s chacune. Son tourbillon inflige {whirlNormal} des points de vie maximum chaque seconde dans un rayon de {radius} yd. Chaque charge se termine par un Heurt d'os dans le même rayon, infligeant {slamNormal} des points de vie maximum. Brise-tombe se réarme {rearm} s après la fin.",
   'hudChrome.raidBossGuide.nythraxis.courtName': 'La Cour immortelle',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     "Les tanks récupèrent Aldren et tournent son cleave loin du raid. Étourdissez ou réduisez Malric au silence dès que Guérison de Malric commence, et tuez-le d'abord ; puis immobilisez ou étourdissez Voss loin des soigneurs, puisqu'il ne peut pas être provoqué, et achevez-le ensuite.",
@@ -16693,7 +16805,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchantName.enchant_feet_stamina': 'Gravure de bottes : Endurance',
   'hudChrome.enchantName.enchant_feet_strength': 'Gravure de bottes : Force',
   'hudChrome.enchantName.enchant_gloves_agility': 'Gravure de gants : Agilité',
-  'abilityUi.cast.farming': 'Plantation',
   'abilityUi.cast.sundering': 'Bris',
   'hud.core.mapMarkerLabels.farmPatch': 'Carrés de culture',
   'hud.logs.keptLockedMany': 'Copies verrouillées conservées : {count}.',
@@ -17105,7 +17216,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Modifier les cadres déverrouille aussi les six pistes d’auras facultatives après leur activation dans l’onglet Combat des mêmes options d’interface : Mes améliorations, Temps de recharge défensifs, Mes boucliers, Temps de recharge offensifs, Déplacement et furtivité, et Mes améliorations sur les alliés. Chaque piste est désactivée par défaut et porte sa propre étiquette lorsqu’elle est déverrouillée.',
   'guide.interfacePage.framesGovernedExtra':
-    'Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, l’exploration, la faille et la recette ou commission suivies), la barre d’action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d’affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu’il est déverrouillé.',
+    "Modifier les cadres déverrouille aussi la pile de suivi ci-dessous (quêtes et objectifs suivis, progression des hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, l'exploration, la faille et la recette ou commission suivies), la barre d'action du familier, le cadre des points de cible pour vos affaiblissements sur les ennemis proches, le médaillon de Dévotion du paladin, la barre d'affliction du démoniste, la superposition des déclenchements de sorts, le minuteur de frappe de la main secondaire et la fenêtre à onglets des compteurs de dégâts. Chacun porte sa propre étiquette lorsqu'il est déverrouillé.",
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Votre cadre, votre cadre de cible et vos cadres de groupe peuvent tous être déplacés. Chacun possède un petit bouton de déplacement dans un coin : déverrouillez-le, faites glisser le cadre où vous le souhaitez, puis verrouillez-le afin qu’un clic égaré ne le déplace pas. Modifier les cadres, en haut de l’onglet Cadres des options d’interface, déverrouille tout le reste en même temps : barres d’action, barre d’incantation, barre de frappe, barre d’expérience, minicarte, rail de boutons, cadre du familier, barre de posture, lignes d’améliorations et d’affaiblissements et étiquette de rappel de liste de souhaits. Si le résultat ne vous convient pas, Réinitialiser par défaut, en bas du même onglet, remet tout à sa place.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -17113,7 +17224,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.hubPracticeTrackerBody':
     'Près du hub d’Eastbrook, un suivi d’entraînement rejoint la pile lorsque vous prenez les leçons guidées : il garde vos meilleurs résultats contre les mannequins d’entraînement. Pendant une leçon, une bande de coaching vous guide à travers l’étape actuelle, de l’ouverture des compteurs de dégâts à la comparaison d’un deuxième résultat.',
   'guide.interfacePage.mapBodyZoneFirst':
-    'M ouvre la carte de la zone où vous vous trouvez, avec votre flèche, les points d’intérêt, les donneurs de quêtes, les zones de vos objectifs, les stations d’artisanat, boîtes aux lettres, tableaux et parcelles, les entrées de donjons et tous les nœuds de récolte, grisés pendant leur repousse ou marqués lorsque vos outils sont insuffisants. Votre groupe apparaît aussi. Faites un clic droit sur la carte ou appuyez sur le bouton Carte du monde pour reculer jusqu’au continent ; chaque zone porte son nom et un clic ouvre sa carte. Entrez dans une exploration, un donjon, une faille ou une forteresse pour passer au plan de l’étage ; le champ de bataille des Champs de Thornhollow possède sa propre carte.\n\nÀ droite, sous la minicarte, une pile de suivis garde vos activités visibles : quêtes et objectifs, hauts faits, pages du Reliquaire, exploration et faille en cours. Le suivi de quête se réduit quand vous voulez récupérer de l’espace.',
+    "M ouvre la carte de la zone où vous vous trouvez, avec votre flèche, les points d'intérêt, les donneurs de quêtes, les zones de vos objectifs, les stations d'artisanat, boîtes aux lettres, tableaux et parcelles, les entrées de donjons et tous les nœuds de récolte, grisés pendant leur repousse ou marqués lorsque vos outils sont insuffisants. Votre groupe apparaît aussi. Faites un clic droit sur la carte ou appuyez sur le bouton Carte du monde pour reculer jusqu'au continent ; chaque zone porte son nom et un clic ouvre sa carte. Entrez dans une exploration, un donjon, une faille ou une forteresse pour passer au plan de l'étage ; le champ de bataille des Champs de Thornhollow possède sa propre carte.\n\nÀ droite, sous la minicarte, une pile de suivis garde vos activités visibles : quêtes et objectifs, hauts faits, pages du Reliquaire, recettes épinglées depuis l'artisanat, exploration et faille en cours. Le suivi de quête se réduit quand vous voulez récupérer de l'espace.",
   'guide.interfacePage.mobileBodyTwoPages':
     'Les commandes tactiles apparaissent automatiquement et la disposition s’adapte à l’écran : compacte sur un petit téléphone, standard sur un grand téléphone et plus spacieuse sur une tablette.\n\nVos compétences sont disposées en anneau plutôt qu’en ligne de chiffres : bouton d’attaque et quatre boutons d’action, avec un bouton de page qui fait tourner l’anneau entre ses {pages} pages et couvre vos {slots} emplacements, même si les barres de bureau supplémentaires sont activées. Le cinquième arc accueille les consommables : touchez-le pour utiliser l’objet installé, maintenez-le ou faites-le glisser vers l’intérieur pour ouvrir une rangée remplie depuis vos sacs. Autour de l’anneau se trouvent les boutons essentiels au tactile : changer de cible, utiliser ce qui est devant vous et sauter.\n\nUn bouton Actions rapides se trouve au bord inférieur. Il ouvre le reste : monture, discussion, carte, sacs, social, quêtes, personnage, grimoire, menu et une entrée Plus contenant les autres fenêtres, dont le chercheur de donjons, le JcJ, les emotes et le wiki. Les fenêtres occupent tout l’écran au tactile.\n\nLe déplacement des cadres d’unités est réservé au bureau ; en tactile, la disposition les place automatiquement.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -17191,7 +17302,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'L’économie des métiers : frais et sources de pièces, objets vendus, règles du Marché mondial, commandes, commissions et place des collections financées par les raids.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Certains objets portent un nom. Les lignes de provenance d’un matériau indiquent qui a récolté chaque groupe d’unités, tandis qu’une marque distincte de signature identifie le signataire de qualité lorsqu’il y en a un. Ces faits sont indépendants : un matériau récolté ordinaire enregistre son collecteur sans recevoir de signature, et un stock ancien signé peut nommer son signataire tout en indiquant honnêtement qu’aucun récolteur n’a été enregistré. Une pièce terminée indique plutôt qui l’a fabriquée. Ces données voyagent avec l’objet lors des échanges, au coffre, par courrier, au Marché mondial et même lors d’un rachat chez un vendeur, sans jamais disparaître.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte de qualité rare ou supérieure arrive signée, et les trouvailles rares signent toute leur manne multipliée par cinq. Un butin de cadavre chanceux signe son rendement quand la famille n’a aucun spécimen à fournir ; lorsqu’elle en a un, le rendement reste ordinaire et le spécimen immaculé signé apparaît à côté. L’artisanat suit la même règle : chaque exemplaire d’une sortie rare ou supérieure reçoit une signature, et un chef-d’œuvre est toujours signé quelle que soit sa qualité, si bien que la meilleure version d’une pièce nomme toujours son créateur. La signature d’un matériau ordinaire accompagne les unités elles-mêmes et ne se perd pas simplement parce qu’une pile compatible contient déjà un autre collecteur ou signataire. Un spécimen immaculé distinct est un objet séparé qui demande toujours de la place ; s’il ne peut pas entrer dans le sac, le rendement ordinaire du cadavre reste mais le spécimen est perdu.\n\nLes objets terminés gardent une identité stricte : deux exemplaires ne fusionnent que si chaque marque correspond exactement, avec le même objet, le même signataire, les mêmes statistiques de chef-d’œuvre, le même enchantement et le même lien. Les matériaux compatibles partagent un emplacement entre collecteurs et signataires tout en gardant un compte pour chaque source. L’infobulle résume les sources ; ouvrez Sources pour la liste complète. Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s’empiler normalement avec ceux de son destinataire.\n\nLes signatures remboursent les artisans : tenir à la station un exemplaire signé d’un réactif requis, quel que soit son signataire, ajoute 2 points de pourcentage aux chances de chef-d’œuvre. Tenir un réactif signé de votre propre main réduit de 1 la quantité requise pour ce réactif, jamais sous 1, sauf s’il porte la marque sans remise ; les noyaux de raid gardent toujours leur coût complet. Votre propre travail rare ou supérieur signé peut même continuer à vous enseigner, aujourd’hui uniquement par les potions fabriquées : buvez une potion rare que vous avez brassée et signée, et un petit gain de compétence revient au métier qui l’a produite tant que ce métier est l’un de vos métiers majeurs actifs. C’est uniquement la branche des potions : un élixir, un parchemin ou un flacon d’apogée ne vous enseigne rien, quelle que soit la finesse de sa signature.',
+    "Certains objets portent un nom. Les lignes de provenance d'un matériau indiquent qui a récolté chaque groupe d'unités, tandis qu'une marque distincte de signature identifie le signataire de qualité lorsqu'il y en a un. Ces faits sont indépendants : un matériau récolté ordinaire enregistre son collecteur sans recevoir de signature, et un stock ancien signé peut nommer son signataire tout en indiquant honnêtement qu'aucun récolteur n'a été enregistré. Une pièce terminée indique plutôt qui l'a fabriquée. Ces données voyagent avec l'objet lors des échanges, au coffre, par courrier, au Marché mondial et même lors d'un rachat chez un vendeur, sans jamais disparaître.\n\nLa récolte signe automatiquement son meilleur travail : toute récolte de qualité rare ou supérieure arrive signée, et les trouvailles rares signent toute leur manne multipliée par cinq. Un butin de cadavre chanceux signe son rendement quand la famille n'a aucun spécimen à fournir ; lorsqu'elle en a un, le rendement reste ordinaire et le spécimen immaculé signé apparaît à côté. L'artisanat suit la même règle : chaque exemplaire d'une sortie rare ou supérieure reçoit une signature, et un chef-d'œuvre est toujours signé quelle que soit sa qualité, si bien que la meilleure version d'une pièce nomme toujours son créateur. La signature d'un matériau ordinaire accompagne les unités elles-mêmes et ne se perd pas simplement parce qu'une pile compatible contient déjà un autre collecteur ou signataire. Un spécimen immaculé distinct est un objet séparé qui demande toujours de la place ; s'il ne peut pas entrer dans le sac, le rendement ordinaire du cadavre reste mais le spécimen est perdu.\n\nLes objets terminés gardent une identité stricte : deux exemplaires ne fusionnent que si chaque marque correspond exactement, avec le même objet, le même signataire, les mêmes statistiques de chef-d'œuvre, le même enchantement et le même lien. Les matériaux compatibles partagent un emplacement entre collecteurs et signataires tout en gardant un compte pour chaque source. L'infobulle résume les sources ; faites un clic droit sur la pile pour la liste complète (sur écran tactile, utilisez son bouton Sources). Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s'empiler normalement avec ceux de son destinataire.\n\nLes signatures remboursent les artisans : tenir à la station un exemplaire signé d'un réactif requis, quel que soit son signataire, ajoute 2 points de pourcentage aux chances de chef-d'œuvre. Tenir un réactif signé de votre propre main réduit de 1 la quantité requise pour ce réactif, jamais sous 1, sauf s'il porte la marque sans remise ; les noyaux de raid gardent toujours leur coût complet. Votre propre travail rare ou supérieur signé peut même continuer à vous enseigner, aujourd'hui uniquement par les potions fabriquées : buvez une potion rare que vous avez brassée et signée, et un petit gain de compétence revient au métier qui l'a produite tant que ce métier est l'un de vos métiers majeurs actifs. C'est uniquement la branche des potions : un élixir, un parchemin ou un flacon d'apogée ne vous enseigne rien, quelle que soit la finesse de sa signature.",
   'guide.profPages.effectFeast':
     'Dresse un festin dont les autres peuvent se servir : {servings} portions pendant {minutes} min.',
   'guide.profPages.effectFeastServing':
@@ -17204,12 +17315,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Bien nourri à la fin du repas : +{value} {stat} pendant {minutes} min.',
   'guide.profPages.effectWellFedAura': 'Accorde {aura} pendant {minutes} min à la fin du repas.',
   'guide.profPages.ench.enchantsNoteRaidFormula':
-    'Les enchantements ont quatre paliers. Le palier de base utilise la poussière de carillon, avec un peu d’essence dans le haut de la gamme, et couvre l’emplacement d’arme, la main gauche et toutes les pièces d’armure. Les options de statistiques sont assez nombreuses pour que chaque configuration trouve quelque chose pour chaque emplacement : les boucliers et les mains gauches de lanceur prennent leur propre enchantement d’Endurance, si bien qu’aucun emplacement équipé n’est inutilisable pour l’enchantement. Le palier supérieur coûte un éclat de carillon et de l’essence, pour des bonus plus forts sur les emplacements les plus importants. Les éclats alimentent aussi trois autres dépenses : les deux recettes de charmes à cinq éclats chacune, le dernier palier des recharges d’effets d’outils et le palier lumineux, où les enchantements d’arme et de torse prennent chacun un éclat et l’Infusion en prend deux. Gardez-en quelques-uns avant de dépenser.\n\nEntre les deux se trouvent les cinq enchantements runiques, un consommateur par statistique secondaire typée, afin que rien de ce que vous broyez ne soit perdu : Tranchant runique pour l’arme et la Force avec de l’Acier résonant, Sigil runique pour l’arme et l’Intelligence avec du Bois résonant, Tissage runique pour le torse et l’Esprit avec du Fil résonant, Peau runique pour les jambes et l’Agilité avec de la Peau résonante, et Liens runiques pour le casque et l’Endurance avec des Liens résonants. Chacun demande aussi deux essences de carillon. Lorsqu’un emplacement et une statistique possèdent un enchantement de base et un enchantement supérieur, le bonus runique se situe entre les deux ; Tissage runique est directement le plus puissant enchantement d’Esprit du torse, et Peau runique est le seul enchantement d’Agilité des jambes. Les bonus exacts figurent dans le tableau ci-dessous.\n\nAu-dessus des paliers ordinaires inférieurs se trouve le palier lumineux, sommet du travail ordinaire : Enchantement 100 pour les quatre premiers, 125 pour l’Infusion, comme l’indique la colonne Compétence. Chacun demande un réactif lumineux et ajoute une étape à son emplacement : l’arme avec une option de Puissance et une option de Puissance des sorts, le torse et les bottes. La dernière, l’Infusion lumineuse, ne fonctionne que sur une pièce perfectionnée : le Perfectionnement est le travail du porteur, pas celui de l’enchanteur, et la page Professions explique comment une pièce l’obtient.\n\nLe Zèle de la Dernière Flamme est une formule de raid distincte, et non un enchantement ordinaire gratuit. Apprenez sa formule échangeable à 100 en enchantement avant de l’appliquer. Chaque application consomme 3 cœurs de la Dernière Flamme et 2 éclats de carillon ; la formule peut tomber au Creuset ou être achetée à son quartier-maître pour un cœur. Ses règles de déclenchement au corps à corps et de vitesse d’arme sont détaillées ci-dessous.',
+    'Les enchantements ont quatre paliers. Le palier de base utilise la poussière de carillon, avec un peu d’essence dans le haut de la gamme, et couvre l’emplacement d’arme, la main gauche et toutes les pièces d’armure. Les options de statistiques sont assez nombreuses pour que chaque configuration trouve quelque chose pour chaque emplacement : les boucliers et les mains gauches de lanceur prennent leur propre enchantement d’Endurance, si bien qu’aucun emplacement équipé n’est inutilisable pour l’enchantement. Le palier supérieur coûte un éclat de carillon et de l’essence, pour des bonus plus forts sur les emplacements les plus importants. Les éclats alimentent aussi trois autres dépenses : les deux recettes de charmes à un éclat chacune (le reste du coût d’un charme est en essence et en poussière), le dernier palier des recharges d’effets d’outils et le palier lumineux, où les enchantements d’arme et de torse prennent chacun un éclat et l’Infusion en prend deux. Gardez-en quelques-uns avant de dépenser.\n\nEntre les deux se trouvent les cinq enchantements runiques, un consommateur par statistique secondaire typée, afin que rien de ce que vous broyez ne soit perdu : Tranchant runique pour l’arme et la Force avec de l’Acier résonant, Sigil runique pour l’arme et l’Intelligence avec du Bois résonant, Tissage runique pour le torse et l’Esprit avec du Fil résonant, Peau runique pour les jambes et l’Agilité avec de la Peau résonante, et Liens runiques pour le casque et l’Endurance avec des Liens résonants. Chacun demande aussi deux essences de carillon. Lorsqu’un emplacement et une statistique possèdent un enchantement de base et un enchantement supérieur, le bonus runique se situe entre les deux ; Tissage runique est directement le plus puissant enchantement d’Esprit du torse, et Peau runique est le seul enchantement d’Agilité des jambes. Les bonus exacts figurent dans le tableau ci-dessous.\n\nAu-dessus des paliers ordinaires inférieurs se trouve le palier lumineux, sommet du travail ordinaire : Enchantement 100 pour les quatre premiers, 125 pour l’Infusion, comme l’indique la colonne Compétence. Chacun demande un réactif lumineux et ajoute une étape à son emplacement : l’arme avec une option de Puissance et une option de Puissance des sorts, le torse et les bottes. La dernière, l’Infusion lumineuse, ne fonctionne que sur une pièce perfectionnée : le Perfectionnement est le travail du porteur, pas celui de l’enchanteur, et la page Professions explique comment une pièce l’obtient.\n\nLe Zèle de la Dernière Flamme est une formule de raid distincte, et non un enchantement ordinaire gratuit. Apprenez sa formule échangeable à 100 en enchantement avant de l’appliquer. Chaque application consomme 3 cœurs de la Dernière Flamme et 2 éclats de carillon ; la formule peut tomber au Creuset ou être achetée à son quartier-maître pour un cœur. Ses règles de déclenchement au corps à corps et de vitesse d’arme sont détaillées ci-dessous.',
   'guide.profPages.ench.formulaRequired': 'Formule requise',
   'guide.profPages.ench.perfectedOnly': 'Perfectionné uniquement',
   'guide.profPages.ench.tier.lucent': 'Lumineux',
   'guide.profPages.faq.a1':
-    'Les objets finis suivent toujours une règle d’identité stricte : deux copies ne fusionnent que si leur signataire, leurs propriétés tirées, leurs statistiques de chef-d’œuvre, leur enchantement, leur lien et toute autre marque d’identité correspondent exactement. Une lame signée reste donc séparée d’une lame ordinaire.\n\nLes matériaux font exception. Les piles compatibles d’un même matériau peuvent fusionner même lorsque leurs collecteurs ou leurs signataires diffèrent, car la pile conserve un compte pour chaque source. L’infobulle résume les sources ; ouvrez Sources pour la liste complète. Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s’empiler normalement avec ceux de son destinataire.',
+    "Les objets finis suivent toujours une règle d'identité stricte : deux copies ne fusionnent que si leur signataire, leurs propriétés tirées, leurs statistiques de chef-d'œuvre, leur enchantement, leur lien et toute autre marque d'identité correspondent exactement. Une lame signée reste donc séparée d'une lame ordinaire.\n\nLes matériaux font exception. Les piles compatibles d'un même matériau peuvent fusionner même lorsque leurs collecteurs ou leurs signataires diffèrent, car la pile conserve un compte pour chaque source. L'infobulle résume les sources ; faites un clic droit sur la pile pour la liste complète (sur écran tactile, utilisez son bouton Sources). Séparer par collecteur garde ces piles distinctes dans vos sacs et le tri respecte ce choix. Un matériau transféré peut s'empiler normalement avec ceux de son destinataire.",
   'guide.profPages.faq.a11Promotion':
     'Fabriquez ou achetez une pièce forgée de maître d’apogée, puis perfectionnez-la avec 125 dans le métier qui l’a créée. Chaque tentative coûte une braise de créateur, une essence fracturée et une monture de verre prismatique, réussit quatre fois sur cinq et n’endommage jamais la pièce en cas d’échec. La première tentative vous la lie et quatre rangs réussis la rendent perfectionnée. Dépensez ensuite un acte de création, une commande d’inscription à 125 achetable ou commissionnable, pour promouvoir la copie en légendaire et lui donner le nom de votre choix. La promotion est déterministe : les statistiques ne changent pas, seuls le nom et la couleur changent.',
   'guide.profPages.faq.a2':
@@ -17229,7 +17340,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Le gain est déterministe et dépend de votre propre compteur plutôt que de la culture : {g1} de compétence pour une récolte sous {p1}, {g2} sous {p2}, {g3} sous {p3}, puis {g4} jusqu’au plafond de {cap}. Il ne s’agit jamais d’un jet de progression, si bien que la montée dure exactement ce que donne le calcul.\n\nLe palier de la culture décide jusqu’où une parcelle peut vous porter. Une culture de palier 1 enseigne jusqu’à {c1}, puis devient grise ; une culture de palier 2 enseigne jusqu’à {c2}, et les cultures de palier 3 et supérieur vont jusqu’au plafond. Monter vers les parcelles supérieures est donc ce qui permet au compteur de continuer à avancer.',
   'guide.profPages.farm.gainHeading': 'Ce qu’une récolte enseigne',
   'guide.profPages.farm.rhythmBody':
-    'Planter est une courte incantation visible de {plant} secondes exactement à chaque palier, car une houe ouvre le terrain sans acheter de vitesse. Retirer une culture mûre est instantané. Il n’y a aucune incantation à interrompre ni vérification de sac qui puisse la refuser, et une parcelle prête attend aussi longtemps que vous la laissez ; un sac plein ne coûte donc au fermier que le trajet pour le vider.\n\nUne récolte rapporte des produits et de la compétence en Agriculture. Contrairement à un filon, elle ne donne aucune expérience de personnage : les parcelles sont un métier à travailler, pas un moyen de monter de niveau.',
+    'Planter est instantané, car une houe ouvre le terrain sans acheter de vitesse : il n’y a aucune incantation à attendre, et un fermier qui s’éloigne a tout de même planté. Retirer une culture mûre est instantané aussi. Il n’y a aucune incantation à interrompre ni vérification de sac qui puisse la refuser, et une parcelle prête attend aussi longtemps que vous la laissez ; un sac plein ne coûte donc au fermier que le trajet pour le vider.\n\nUne récolte rapporte des produits et de la compétence en Agriculture. Contrairement à un filon, elle ne donne aucune expérience de personnage : les parcelles sont un métier à travailler, pas un moyen de monter de niveau.',
   'guide.profPages.farm.rhythmHeading': 'Le rythme de l’agriculture',
   'guide.profPages.farm.tableBodyOneMeal':
     'Les cuisines sont l’endroit où une saison porte ses fruits. Au-delà des plats agricoles ordinaires, chaque palier de culture possède un plat plus riche qui laisse l’effet Bien nourri : terminez le repas et un bonus durable reste sur vous, le genre d’avantage qu’un groupe veut obtenir avant la porte du donjon. Un seul effet Bien nourri est actif à la fois : un repas plus récent le remplace. Au sommet se trouve le Festin des récoltes, un étalage que le cuisinier pose dans le monde : chaque personne présente prend sa propre portion, une seule, et chaque repas terminé donne le même bonus Bien nourri. La saison d’un seul fermier peut donc dresser la table pour tout un groupe. Les deux plats les plus riches et le festin s’appuient sur les cultures de montagne et de parterre, dont les graines sont vendues par les fermières près de ces parcelles. Les recettes suivent une autre règle : les paliers supérieurs de l’échelle agricole ne sont plus enseignés à un comptoir et se trouvent dans le contenu final ou s’achètent avec des marques héroïques comme toutes les autres recettes de fin de jeu. L’échelle des plats elle-même relève de la cuisine : la page Cuisine en porte tous les paliers.\n\nLa chance a aussi sa place à table. Chaque récolte que vous rapportez lance la même chance de manne que les autres métiers de récolte, et une culture devient parfois dorée : le rendement dépasse largement une récolte ordinaire, un supplément apparaît avec elle, comme une graine d’un terrain plus fin que celui que vous travaillez ou parfois une recette de fin de jeu, toute la zone entend l’annonce nommée de la trouvaille et Récolte dorée est inscrite dans votre Livre des hauts faits.',
@@ -17328,4 +17439,237 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch tient le rempart. Stalker Ridge et les terriers de Deeprock appartiennent aux félins et fouisseurs ; les contreforts ogres et le camp de guerre de Drogmar aux brutes mercenaires. Stormcrag crépite d’élémentaires. Plus bas brille Glimmermere, dont la rive garde la porte de lumière vers le Temple noyé ; les tentes des Broodsworn et les Champs revenants entourent les hauteurs du culte, avec le Sanctum du Wyrm funéraire à leur sommet.',
   'worldContent.farmPatchName': 'Parcelles de jardin',
+  'hud.chat.templates.raidWarning': '[Avertissement de raid] {name}: {message}',
+  'hudChrome.bugReport.online': 'En ligne',
+  'hudChrome.charSidebar.crafting': 'Artisanat',
+  'hudChrome.charSidebar.gathering': 'Rassemblement',
+  'hudChrome.charSidebar.label': 'Détails du personnage',
+  'hudChrome.charSidebar.openProfessions': 'Métiers ouverts',
+  'hudChrome.charSidebar.progression': 'Progression',
+  'hudChrome.charSidebar.skills': 'Compétences',
+  'hudChrome.charSidebar.stats': 'Statistiques',
+  'hudChrome.charSidebar.subtitle': 'Niveau {level} {className}. {archetype}. Passe-temps: {hobby}',
+  'hudChrome.charSidebar.subtitleNoHobby': 'Niveau {level} {className}. {archetype}',
+  'hudChrome.controller.device': 'Appareil connecté',
+  'hudChrome.controller.deviceConnected': 'Connecté',
+  'hudChrome.controller.deviceDisconnected': 'Aucun contrôleur détecté',
+  'hudChrome.cosmetics.preview': 'Aperçu',
+  'hudChrome.cosmetics.previewAria': 'Aperçu {name}',
+  'hudChrome.crafting.materialsFooter':
+    'Les matériaux de votre coffre-fort sont automatiquement dessinés. Apprenez plus de recettes à la gare.',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} détenu: {count}, mais seule la bonne note compte ici)',
+  'hudChrome.finder.lockoutWeekly': 'Lock-out hebdomadaire sur chaque patron',
+  'hudChrome.finder.mech.ancestral_sap': 'Sève ancestrale (soigne ses alliés)',
+  'hudChrome.finder.mech.anvils_decree':
+    "Décret d'Anvil (trois coups de marteau à l'échelle du raid, guérison)",
+  'hudChrome.finder.mech.apocalypse_add':
+    "Ignivar Ashcaller (ajout prioritaire du lancement d'Apocalypse, tuez-le rapidement)",
+  'hudChrome.finder.mech.beast_pit_quake': 'Beast Pit Quake (dégâts de zone)',
+  'hudChrome.finder.mech.bloodmane_rend':
+    'Bloodmane Rend (saignement, surveillez les échanges de cibles)',
+  'hudChrome.finder.mech.brand_of_the_pyre':
+    "Marque du Bûcher (marque de feu empilable, la laver à l'eau du conduit)",
+  'hudChrome.finder.mech.call_of_the_hunt': 'Appel de la chasse (accélère les alliés proches)',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    'Chaînes de la Forge (héroïque uniquement, restez proche de votre partenaire lié)',
+  'hudChrome.finder.mech.cinder_orbs':
+    'Orbes de cendre (les joueurs marqués sont répartis sur les bords de la pièce)',
+  'hudChrome.finder.mech.falling_cinders':
+    'Falling Cinders (cercles de météores sur les joueurs, sortez)',
+  'hudChrome.finder.mech.forge_strike': "Forge Strike (débuff d'échange de chars empilable)",
+  'hudChrome.finder.mech.forge_wave':
+    'Forge Wave (pare-feu en expansion, utilisez les deux voies de sécurité)',
+  'hudChrome.finder.mech.forgefathers_sweep':
+    "Forgefather's Sweep (large cône frontal sur un non-char)",
+  'hudChrome.finder.mech.forgestorm': 'Forgestorm (chute de cercles de météores, sortez)',
+  'hudChrome.finder.mech.jaguar_roar': 'Jaguar Roar (recul)',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    'Jugement de la Forge (entracte, partagez le seul refuge sûr)',
+  'hudChrome.finder.mech.last_inferno': 'Last Inferno (brûlure de 45 secondes à 20% de santé)',
+  'hudChrome.finder.mech.makers_brand': "Maker's Brand (débuff d'échange de réservoir empilable)",
+  'hudChrome.finder.mech.masters_assembly':
+    "L'Assemblée du Maître (bloquer les poutres de forge, faire pivoter les bloqueurs)",
+  'hudChrome.finder.mech.rain_of_cinders':
+    'Pluie de cendres (trois cônes de feu, placez-vous entre eux)',
+  'hudChrome.finder.mech.revolving_inferno':
+    'Revolving Inferno (rayons de feu rotatifs, se déplacent à travers les interstices)',
+  'hudChrome.finder.mech.shared_pyre':
+    'Bûcher partagé (cercle de rassemblement, partage des dégâts)',
+  'hudChrome.finder.mech.tempering_ray':
+    'Tempering Ray (ligne vers un joueur marqué, interceptez-le)',
+  'hudChrome.finder.mech.thickhide_ward': 'Thickhide Ward (protège les alliés proches)',
+  'hudChrome.finder.mech.tusk_sweep': 'Balayage des défenses (coupe frontale)',
+  'hudChrome.finder.mech.wildheart_pulse': 'Wildheart Pulse (dégâts de zone de pulsation)',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'En dessous de cette compétence, il fonctionne toujours comme un outil de niveau inférieur.',
+  'hudChrome.keybinds.hideInterface': "Masquer l'interface",
+  'hudChrome.keybinds.targetParty1': 'Membre du groupe cible 1',
+  'hudChrome.keybinds.targetParty2': 'Membre du groupe cible 2',
+  'hudChrome.keybinds.targetParty3': 'Membre du groupe cible 3',
+  'hudChrome.keybinds.targetParty4': 'Membre du groupe cible 4',
+  'hudChrome.keybinds.targetParty5': 'Membre du groupe cible 5',
+  'hudChrome.keybinds.targetParty6': 'Membre du groupe cible 6',
+  'hudChrome.keybinds.targetParty7': 'Membre du groupe cible 7',
+  'hudChrome.keybinds.targetParty8': 'Membre du groupe cible 8',
+  'hudChrome.keybinds.targetParty9': 'Membre du groupe cible 9',
+  'hudChrome.keybinds.targetSelf': 'Cibler soi-même',
+  'hudChrome.keybinds.wheelHeldRefused':
+    "Une encoche de roue ne peut pas entraîner une action maintenue telle qu'un mouvement. Choisissez une touche ou un bouton de souris pour cela.",
+  'hudChrome.keybinds.wheelHint':
+    'La molette de la souris se lie également: faites-la rouler vers le haut ou vers le bas pendant la liaison, en maintenant Ctrl, Alt ou Shift enfoncé si vous le souhaitez. Les zooms avant et arrière de la caméra sont placés par défaut sur la roue nue; déplacez-les vers un accord tel que Ctrl+roue pour libérer la roue pour les capacités.',
+  'hudChrome.keybinds.zoomIn': 'Zoomer sur la caméra',
+  'hudChrome.keybinds.zoomOut': 'Zoom arrière de la caméra',
+  'hudChrome.mapAtlas.availableNearby': 'Disponible à proximité',
+  'hudChrome.mapAtlas.distance': '{distance} mètres',
+  'hudChrome.mapAtlas.filters.dungeons': 'Donjons',
+  'hudChrome.mapAtlas.filters.gather': 'Rassembler',
+  'hudChrome.mapAtlas.filters.players': 'Joueurs',
+  'hudChrome.mapAtlas.filters.quests': 'Quêtes',
+  'hudChrome.mapAtlas.filters.services': 'Services',
+  'hudChrome.mapAtlas.filtersAria': 'Couches de carte',
+  'hudChrome.mapAtlas.landmarkCount': 'Points de repère {count}',
+  'hudChrome.mapAtlas.legend.dungeon': 'Cachot',
+  'hudChrome.mapAtlas.legend.herb': 'Herbe',
+  'hudChrome.mapAtlas.legend.mail': 'Mail',
+  'hudChrome.mapAtlas.legend.ore': 'Minerai',
+  'hudChrome.mapAtlas.legend.passage': 'Passage',
+  'hudChrome.mapAtlas.level': 'Niveau {level}',
+  'hudChrome.mapAtlas.noNearbyQuests': 'Aucune quête à proximité',
+  'hudChrome.mapAtlas.noTrackedQuests': 'Aucune quête suivie',
+  'hudChrome.mapAtlas.showRoute': "Afficher l'itinéraire",
+  'hudChrome.mapAtlas.track': 'Piste',
+  'hudChrome.mapAtlas.trackedQuests': 'Quêtes suivies',
+  'hudChrome.mapAtlas.untrack': 'Désuivre',
+  'hudChrome.marketWindow.mixedListingsFooter':
+    'Le marchand réapprovisionne les biens communs; les listes de joueurs se trouvent à côté d’eux au prix demandé.',
+  'hudChrome.materialHint.fineFarmGrade':
+    "Belle qualité. Certaines récoltes fonctionnent bien, le plus souvent avec une compétence agricole plus élevée ou avec un œil d'artisan chargé. Les produits ordinaires ne comptent jamais là où la qualité fine est requise.",
+  'hudChrome.nameplate.npcRole.alchemyTrainer': "Entraîneur d'alchimie",
+  'hudChrome.nameplate.npcRole.armorVendor': "Vendeur d'armures",
+  'hudChrome.nameplate.npcRole.armsDealer': "Marchand d'armes",
+  'hudChrome.nameplate.npcRole.auctioneer': 'Commissaire-priseur',
+  'hudChrome.nameplate.npcRole.banker': 'Banquier',
+  'hudChrome.nameplate.npcRole.cardMaster': 'Maître des cartes',
+  'hudChrome.nameplate.npcRole.cookingTrainer': 'Formateur en cuisine',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'Intendant du Creuset',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': 'Formateur en ingénierie',
+  'hudChrome.nameplate.npcRole.foodVendor': 'Vendeur de nourriture et de boissons',
+  'hudChrome.nameplate.npcRole.generalGoods': 'Marchandises générales',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': 'Intendant héroïque',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': 'Formateur en travail du cuir',
+  'hudChrome.nameplate.npcRole.potionVendor': 'Vendeur de potions',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'Vendeur PvP',
+  'hudChrome.nameplate.npcRole.riftForgemaster': 'Maître forgeron de la Faille',
+  'hudChrome.nameplate.npcRole.stableMaster': "Maître d'écurie",
+  'hudChrome.nameplate.npcRole.tailoringTrainer': 'Formateur en couture',
+  'hudChrome.nameplate.npcRole.weaponVendor': "Vendeur d'armes",
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': 'Formateur en forge',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.options.confirmVendorSellMinQuality': 'Confirmer les ventes de la qualité',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'Les articles de qualité inférieure se vendent en un seul clic; un article mal vendu peut toujours être racheté auprès du vendeur.',
+  'hudChrome.partyFrames.header': 'Faire la fête',
+  'hudChrome.professions.retentionFooter': 'Retours sur respec: 60% de compétence conservée.',
+  'hudChrome.professions.tutorialLink': 'Tutoriel métier',
+  'hudChrome.pullTimer.cancel': 'Tirage annulé.',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': 'TIRER!',
+  'hudChrome.pullTimer.start': 'Attendez {seconds} s!',
+  'hudChrome.questLog.completed': 'Complété',
+  'hudChrome.questLog.shiftHint': 'Maj-cliquez sur une quête pour la lier dans le chat.',
+  'hudChrome.questLog.zoneSummary': '{count} ({ready} prêt)',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.readyCheck.close': 'Fermer',
+  'hudChrome.readyCheck.memberNotReady': "{name} n'est pas prêt.",
+  'hudChrome.readyCheck.memberPending': "{name} n'a pas encore répondu.",
+  'hudChrome.readyCheck.memberReady': '{name} est prêt.',
+  'hudChrome.readyCheck.status': 'Prêt: {ready}/{total}',
+  'hudChrome.readyCheck.title': 'Vérification prête',
+  'hudChrome.readyCheck.waiting': 'En attente de réponses...',
+  'hudChrome.recipeTracker.collapseHint': 'Réduire le suivi des recettes',
+  'hudChrome.recipeTracker.expandHint': 'Développer le suivi des recettes',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.pin': 'Épingle',
+  'hudChrome.recipeTracker.pinAria': 'Épinglez {name} au tracker HUD',
+  'hudChrome.recipeTracker.pinFull': "Le suivi des recettes est plein (jusqu'à {cap} recettes)",
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.recipeTracker.trackerLabel': 'Recettes',
+  'hudChrome.recipeTracker.unpin': 'Détacher',
+  'hudChrome.recipeTracker.unpinAria': 'Détachez {name} du tracker HUD',
+  'hudChrome.social.who.allClasses': 'Tous les cours',
+  'hudChrome.social.who.capped':
+    'Affichage du premier {delivered}. Affinez la recherche pour voir le reste.',
+  'hudChrome.social.who.classFilter': 'Filtrer par classe',
+  'hudChrome.social.who.colClass': 'Classe',
+  'hudChrome.social.who.colGuild': 'Guilde',
+  'hudChrome.social.who.colLevel': 'Niveau',
+  'hudChrome.social.who.colName': 'Nom',
+  'hudChrome.social.who.colStatus': 'Statut',
+  'hudChrome.social.who.colZone': 'Zone',
+  'hudChrome.social.who.count': '{total} en ligne',
+  'hudChrome.social.who.countFiltered': '{shown} sur {total} en ligne',
+  'hudChrome.social.who.empty': 'Aucun joueur ne correspond.',
+  'hudChrome.social.who.loading': 'Demander au royaume qui est en ligne...',
+  'hudChrome.social.who.search': 'Recherche',
+  'hudChrome.social.who.searchPlaceholder': 'Nom, zone ou guilde',
+  'hudChrome.social.who.sortTitle': 'Trier par {column}',
+  'hudChrome.social.who.tab': 'OMS',
+  'hudChrome.talkingHead.label': 'Dialogue',
+  'hudChrome.wocMarket.colBuyer': 'Acheteur',
+  'hudChrome.wocMarket.colSalePrice': 'Prix ​​de vente',
+  'hudChrome.wocMarket.colSaleType': 'Taper',
+  'hudChrome.wocMarket.colSoldAt': 'Vendu',
+  'hudChrome.wocMarket.historyEmpty': "Aucune vente enregistrée pour l'instant.",
+  'hudChrome.wocMarket.historyError': "L'historique des ventes n'a pas pu être chargé.",
+  'hudChrome.wocMarket.saleTypeAuction': 'Enchères',
+  'hudChrome.wocMarket.saleTypeBuyNow': 'Acheter maintenant',
+  'hudChrome.wocMarket.saleTypeDirected': 'Réalisé',
+  'hudChrome.wocMarket.saleTypeUnknown': 'Inconnu',
+  'hudChrome.wocMarket.tabHistory': 'Historique des ventes',
+  'hudChrome.wocStore.mountBuy': 'Acheter un skin de monture',
+  'hudChrome.wocStore.mountInspectAria': 'Aperçu {item}',
+  'hudChrome.wocStore.mountOnly': 'Montage uniquement',
+  'hudChrome.wocStore.mountRideIt': 'Montez-le',
+  'hudChrome.wocStore.mountScopeLine':
+    'Apparence à l’échelle du compte. Porté par un personnage à la fois.',
+  'itemUi.errors.sweepNoListings':
+    "Aucune annonce de cet article n'est disponible pour le balayage.",
+  'itemUi.errors.sweepPriceChanged':
+    "Les prix ont changé avant l'arrivée de votre balayage. Vérifiez le devis et réessayez.",
+  'itemUi.market.sweep': 'Balayer',
+  'itemUi.market.sweepAria': 'Balayez le marché pour {item}',
+  'itemUi.market.sweepButton': 'Balayer',
+  'itemUi.market.sweepChanged':
+    'Le devis de balayage a changé avant votre confirmation. Vérifiez le total et réessayez.',
+  'itemUi.market.sweepClose': 'Fermer',
+  'itemUi.market.sweepConfirmBody':
+    'Acheter {item} x{units} sur {listings} annonces pour {total} ({each} chacune)?',
+  'itemUi.market.sweepConfirmTitle': 'Confirmer le balayage du marché',
+  'itemUi.market.sweepNote':
+    "Achète des annonces entières auprès d'autres vendeurs, le moins cher par unité en premier, jusqu'à ce que votre nombre soit couvert. Vous pourriez en recevoir un peu plus que ce que vous aviez demandé.",
+  'itemUi.market.sweepQuantity': 'Unités recherchées',
+  'itemUi.market.sweepQuoteLine':
+    '{units} unités sur {listings} listes pour {total} ({each} chacune)',
+  'itemUi.market.sweepQuoteNone': 'Aucune annonce de cet article à balayer.',
+  'itemUi.market.sweepQuoteShort':
+    'Seules {units} unités parmi {listings} listings sont disponibles, pour {total} ({each} chacune)',
+  'itemUi.market.sweepTitle': 'Balayage du marché: {item}',
+  'devCommand.actions.town.description':
+    'Téléportez-vous vers un centre de la ville par votre nom.',
+  'devCommand.actions.town.label': 'Centre ville',
+  'devCommand.fields.town': 'Ville',
+  'entities.mobs.healing_dummy_caster.name': 'Mannequin de lanceur de sorts blessé',
+  'entities.mobs.healing_dummy_ranger.name': 'Mannequin de Ranger battu',
+  'entities.mobs.healing_dummy_scout.name': "Mannequin d'éclaireur critique",
+  'entities.mobs.healing_dummy_soldier.name': 'Mannequin de soldat blessé',
+  'entities.mobs.healing_dummy_tank.name': "Mannequin d'avant-garde blessé",
+  'guide.controls.hideInterface': "Masquer l'interface (captures d'écran et vidéos)",
+  'guide.controls.targetParty':
+    'Ciblez les membres du groupe 1 à 9, de haut en bas, comme le montrent les cadres du groupe.',
+  'guide.controls.targetSelf': 'Ciblez-vous',
+  'guide.interfacePage.framesGovernedTalkingHead':
+    "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
+  'guide.settingsPage.keybindsWheelBody':
+    "La roue elle-même se lie également. Zoom Camera In et Zoom Camera Out sont des liaisons ordinaires qui se trouvent par défaut sur la roue nue, vous pouvez donc les déplacer vers Ctrl plus la roue, ou vers les touches, puis faire rouler la roue libérée pour déclencher les emplacements de la barre d'action. Une encoche de roue n'a pas de dégagement, elle ne peut donc pas conduire une action maintenue comme avancer.",
 };

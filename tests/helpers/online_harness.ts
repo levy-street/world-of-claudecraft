@@ -407,6 +407,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     playerImmobilized: false,
     posX: 0,
     climbing: false,
+    leaping: false,
     riftFloor: null,
   };
   const heldInput = emptyMoveInput();
@@ -526,6 +527,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     selfMotionGateArgs.playerImmobilized = isPlayerImmobilized(pe.auras);
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;
+    selfMotionGateArgs.leaping = pe.leaping;
     selfMotionGateArgs.riftFloor = client.riftFloor;
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
     movementPrediction.prepare(client, pe, predictionEnabled);

@@ -11,11 +11,23 @@ import { Sim } from '../src/sim/sim';
 // Release baseline: every existing acquisition remains and item definitions and
 // levels stay byte-equivalent after canonical serialization. This catches an
 // accidental stat buff from moving generated variants into HEROIC_BOSS_LOOT.
+// The nine gearDigest values below were re-minted for the stamina baseline
+// model (item_budget.ts, "The stamina baseline model"): every changed def
+// either gained its free stamina baseline (a caster identity) or had its
+// Strength/Agility trimmed onto its line with stamina added, and every heroic
+// variant recomputes through the same model at merge time
+// (heroic_variants.ts, makeHeroicVariant), so its digest moves even where the
+// base item's literal did not. normalDigest is untouched because the loot
+// table shape and chances did not change. Receipt for every def behind the
+// re-minted digests: the codemod's before/after list
+// (scripts/stamina_baseline_codemod.ts, run with --dry) and the generated
+// variants that follow their bases; the one boss whose digest did not move
+// (choirmother_selthe) is the one whose gear def did not change.
 const BASELINE = {
   sexton_marrow: {
     gearIds: ['oiled_boots', 'quilted_trousers'],
     normalDigest: '030977d6324caf60a1c4e5b122d48af316ff8633d3cb627179c8130ba27f8776',
-    gearDigest: '3b0b1f90c47672bc0b07c4bd7eb6733dd8b1c678cae29b686d31f482ceec97be',
+    gearDigest: 'ea8a1aac274c2a7449d98c148162069acc5b62b3a13278cce82f2d861cd1f7f0',
   },
   morthen: {
     gearIds: [
@@ -34,7 +46,7 @@ const BASELINE = {
       'shadowpulse_slippers',
     ],
     normalDigest: '608ad38c9ea77cb6a20f75c9aac2fc5bf6787ccf9ac41a8a50ae9b9cd7ddef13',
-    gearDigest: 'f52ae1097cb4f45b0c547cfb2ebce590624f4b95eb7e2884931fd0ebb971109e',
+    gearDigest: 'd47e4919442dff38f8cced88ea753e42a151ddbcde21b69c50704049b9af8b82',
   },
   knight_commander_olen: {
     gearIds: [
@@ -46,7 +58,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '9165d82e66547ae3ab98bcab284ee171842737273727a4701d140fd7c2922016',
-    gearDigest: '426604ed8f7dfe81c85bb8a947c4e970fda25d8b5b8edb00fccf764bb8830b6e',
+    gearDigest: '0b7bcbadd3c806ae4c788945cccb7cb71b6297372784fff8f4890bdf652153eb',
   },
   vael_the_mistcaller: {
     gearIds: [
@@ -69,7 +81,7 @@ const BASELINE = {
       'trollhide_leggings',
     ],
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
-    gearDigest: 'd5991a262b361b97fd07aff9ca1ff9fb4f97239fc023975aaace90dc3107f31d',
+    gearDigest: 'cb4f14361b295142d4e3cff80d5128973ade319912ee149ae013859e22075a6a',
   },
   choirmother_selthe: {
     gearIds: ['heroic_selthes_seastriders'],
@@ -91,7 +103,7 @@ const BASELINE = {
       'tidewoven_trousers',
     ],
     normalDigest: 'aa4c9a380d095266e6cd74de3869ac1652f4a896af53c6bdd4cf406fa35ee01c',
-    gearDigest: '61aca27f2d85ec007ba42850e9735463c2e847a4131426cbc7c0357f819bca50',
+    gearDigest: '9a57395e1bf2c6c01ed41bd56a891a386fa999e4014c23176a5513e9666338b9',
   },
   korgath_the_bound: {
     gearIds: [
@@ -110,7 +122,7 @@ const BASELINE = {
       'zealotsbane_blade',
     ],
     normalDigest: '48c75a437f0d7672490273450f6a49fbc974378155beefd3184a71cea13c2521',
-    gearDigest: '819c8b898bc2afff45c279b8c9c109a856f03096edda71004a9a7c089d6bc71b',
+    gearDigest: '3b2983de5d71e532d19a604a4cbdbf843d264f7ac974d8b44562892cba824dc7',
   },
   grand_necromancer_velkhar: {
     gearIds: [
@@ -127,7 +139,7 @@ const BASELINE = {
       'revenant_silk_robe',
     ],
     normalDigest: 'e9b35e13c5de33a5bf786cdba760f19b6b769a4bf712de6ee2ff0698ed1fcb09',
-    gearDigest: '5f0ab11f2b8365a28e0192bdc47aca16eaa22d727ae7c66a18d6eba3d5b3e8a2',
+    gearDigest: '19d839abf88e5d2efdbd0230589c511e709e2ec65cd13c9da3df67a2207bbda5',
   },
   korzul_the_gravewyrm: {
     gearIds: [
@@ -160,7 +172,7 @@ const BASELINE = {
       'wyrmchoir_handwraps',
     ],
     normalDigest: '0ac50f2ff6acdc808e5c24f721c84b337eade18ea81d2463f77bdd437599946a',
-    gearDigest: '27d907ece0786d3994aec6330d2373e8a8e4731c1610ef5f2980a763374585b8',
+    gearDigest: '483612e11a843da003d682b74a7934bc686b57107e8a39dc779285efdb198c6a',
   },
   wildheart_high_priest: {
     gearIds: [
@@ -178,7 +190,7 @@ const BASELINE = {
       'vineclaw_stalking_breeches',
     ],
     normalDigest: 'dc4c6a27f87b5cd5ab11237b791de5a2707e2b55329f7c1aada4a4fb9cfe34f8',
-    gearDigest: '0939a67a0c3e1b70187cee7379c1360b26b4b97720d56a475e0a23c2155aaaf5',
+    gearDigest: 'b2d1139c6e200d4a6e86302d3761a656b52ec898f341de292da2d5505db57bb5',
   },
 } as const;
 

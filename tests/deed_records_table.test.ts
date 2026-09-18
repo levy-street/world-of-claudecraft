@@ -45,6 +45,10 @@ vi.mock('../server/epic/mirror', () => ({
   reconcileOnLogin: vi.fn(),
 }));
 
+import {
+  accountLedgerKeysFor,
+  setAccountLedgerKeysReaderForTests,
+} from '../server/account_ledger_keys_cache';
 import { saveCharacterState } from '../server/db';
 import { getDeedBroadcasts, insertCharacterDeed, insertCharacterDeeds } from '../server/deeds_db';
 import {
@@ -114,6 +118,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await settle();
+  setAccountLedgerKeysReaderForTests(null);
   vi.restoreAllMocks();
 });
 
@@ -212,7 +217,30 @@ describe('publicRarityPayload', () => {
 // recordDeedUnlock: the fire-and-forget FIFO observer.
 // ---------------------------------------------------------------------------
 
+/** Warm the public sheet's cached ledger view for one account and return a
+ *  counter of reader calls: a second read after the observer settles proves
+ *  the observer busted the entry (the /c/ page sees the new row on its next
+ *  read instead of waiting out the TTL). */
+async function warmLedgerKeys(accountId: number): Promise<() => number> {
+  let reads = 0;
+  setAccountLedgerKeysReaderForTests(async () => {
+    reads++;
+    return { deeds: new Set<string>(), relics: new Set<string>() };
+  });
+  await accountLedgerKeysFor(accountId);
+  expect(reads).toBe(1);
+  return () => reads;
+}
+
 describe('recordDeedUnlock', () => {
+  it("busts the account's cached public-sheet ledger keys once the insert lands", async () => {
+    const reads = await warmLedgerKeys(7);
+    recordDeedUnlock({ characterId: 42, accountId: 7 }, 'prog_first_steps');
+    await settle();
+    await accountLedgerKeysFor(7);
+    expect(reads()).toBe(2); // the entry was dropped: the next read refreshed
+  });
+
   it('writes one row per unlock with the exact field mapping', async () => {
     // Distinct account/character ids so a swapped-field bug cannot pass.
     recordDeedUnlock({ characterId: 42, accountId: 7 }, 'prog_first_steps');
@@ -351,6 +379,14 @@ describe('recordDeedUnlock', () => {
 // ---------------------------------------------------------------------------
 
 describe('recordDeedUnlocks (batch drain)', () => {
+  it("busts the account's cached public-sheet ledger keys once the batch lands", async () => {
+    const reads = await warmLedgerKeys(7);
+    recordDeedUnlocks({ characterId: 42, accountId: 7 }, ['a', 'b', 'c']);
+    await settle();
+    await accountLedgerKeysFor(7);
+    expect(reads()).toBe(2);
+  });
+
   it('mirrors a multi-deed slice in ONE batch insert carrying every id in order, no single-row inserts', async () => {
     recordDeedUnlocks({ characterId: 42, accountId: 7 }, ['a', 'b', 'c', 'd', 'e']);
     await deedRecordsIdle();

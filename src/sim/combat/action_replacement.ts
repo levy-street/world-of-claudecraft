@@ -14,10 +14,19 @@ export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): 
     if (rule.actorAuraKind && !actor.auras.some((aura) => aura.kind === rule.actorAuraKind)) {
       continue;
     }
-    const active = actor.auras.some(
-      (aura) => aura.kind === rule.auraKind && (aura.stacks ?? 1) >= (rule.minStacks ?? 1),
-    );
-    if (active) {
+    // A rule names an aura kind that must be PRESENT (a payoff armed by an
+    // engine state), an aura kind that must be ABSENT (Lunge: the Slinkstrike
+    // button out of stealth), or both. A rule naming neither never matches.
+    if (rule.auraKind === undefined && rule.absentAuraKind === undefined) continue;
+    const present =
+      rule.auraKind === undefined ||
+      actor.auras.some(
+        (aura) => aura.kind === rule.auraKind && (aura.stacks ?? 1) >= (rule.minStacks ?? 1),
+      );
+    const absent =
+      rule.absentAuraKind === undefined ||
+      !actor.auras.some((aura) => aura.kind === rule.absentAuraKind);
+    if (present && absent) {
       const replaced = replaceResolvedAbility(base, rule.abilityId, actor.level);
       // One slot, one clock: an aura-state transform that carries its own
       // cooldown checks and arms the BASE button's cooldown (Fleetmend and
@@ -27,7 +36,13 @@ export function resolveActionReplacement(base: ResolvedAbility, actor: Entity): 
       // swaps defs via replaceResolvedAbility, and Pack Rally deliberately
       // owns its own clock (the resolver reverts the button while
       // cooldowns.has('pack_rally') runs).
-      if (replaced !== base && replaced.cooldown > 0) replaced.cooldownId = base.def.id;
+      // An absence-only rule is a MODE of the button, not a payoff over it:
+      // Lunge keeps its own 12 sec key so a restealth Slinkstrike (no
+      // cooldown of its own) is never locked behind the Lunge it followed.
+      const modeRule = rule.auraKind === undefined;
+      if (replaced !== base && replaced.cooldown > 0 && !modeRule) {
+        replaced.cooldownId = base.def.id;
+      }
       return replaced;
     }
   }

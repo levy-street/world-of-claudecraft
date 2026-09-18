@@ -3389,10 +3389,10 @@ frozen).
 | Withered Benediction | GENERIC |  | mobMechanic:corrupted_priest_malric.manaBurn |
 | Withering Rot | GENERIC |  | mobMechanic:fen_troll.wither |
 | Withering Wail | GENERIC |  | mobMechanic:restless_bones.demoralize |
-| Wolf Form | GENERIC |  | ability:cat_form |
+| Cat Form | GENERIC |  | ability:cat_form |
 | Wolf Run | GENERIC |  | poi:0.1 |
 | Wolfhide Satchel | GENERIC |  | item:wolfhide_satchel |
-| Wolfsblood | GENERIC |  | ability:tigers_fury |
+| Lynxblood | GENERIC |  | ability:tigers_fury |
 | Wolves at the Door | GENERIC |  | quest:q_wolves quest:q_fv_wolves_at_the_door |
 | Wood Wraith | GENERIC |  | mob:wood_wraith |
 | Wool by Moonlight | GENERIC |  | quest:q_nb_wool_by_moonlight |

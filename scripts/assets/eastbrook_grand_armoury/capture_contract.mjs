@@ -355,17 +355,13 @@ export const EASTBROOK_TOWN_POLISH_CAPTURE_VIEWS = Object.freeze([
     camera: Object.freeze({ x: -14.5, y: 6, z: -109 }),
     target: Object.freeze({ x: -18.017695018376127, y: 2.5, z: -106.73703645219788 }),
   }),
-  // Re-aimed for owner refinement round 6b: the town's NPCs were redistributed
-  // by role along the dock road and Lin moved from the civic green to the
-  // quayside home at (-72, -96). The view is re-seated, never retired: same
-  // name, same subject, target back on her authored stand and the camera 7 yd
-  // out along her derived facing (toward the civic centre), probed
-  // collision-clear at camera height.
+  // The live portrait follows Lin to the civic square. Historical
+  // captures retain their original camera records and frozen source identity.
   Object.freeze({
     name: 'apothecary-lin',
     subject: 'apothecary_lin',
-    camera: Object.freeze({ x: -65, y: 6, z: -96 }),
-    target: Object.freeze({ x: -72, y: 2.5, z: -96 }),
+    camera: Object.freeze({ x: -12, y: 6, z: -94 }),
+    target: Object.freeze({ x: -11, y: 2.5, z: -89 }),
   }),
   Object.freeze({
     name: 'ravenpost-mailbox',
@@ -510,6 +506,26 @@ export const EASTBROOK_POLISH_BASELINE_REVISION = '3ab740db453bd8b5858a52c304edc
 // covers the renderer's own call sites. Add the module as a leaf at the next
 // legitimate re-mint only if a future capture's claims come to depend on
 // prewarm behavior.
+// SECOND DELIBERATE EXCLUSION (2026-09-12): the monument impostor's GLSL,
+// extracted out of the civicShader module into
+// src/render/realm_builder_monument_impostor_glsl.ts, is NOT a leaf here, and
+// this is the same shape as the exclusion above rather than a new judgement.
+// The extraction bought a real-context link of the shipped strings: importing
+// the fx module into a browser test cost +1.2 s of import time on a file whose
+// own assertions cost 110 ms, while a dependency-free source module costs
+// nothing. Applying the exclusion note's own test, do the polish evidence's
+// claims depend on these bytes: no. MONUMENT_IMPOSTOR_RANGE is 72
+// (realm_builder_monument_fx_core.ts) and the monument sits at (-14.75, -102)
+// (CIVIC_FEATURE_CENTER); every polish view that can contain it is within
+// 51 yd, the farthest being apothecary-lin at 50.6, so the captures show the
+// statue BODY and can never show the impostor card. The one polish view beyond
+// that range (camera (34, 15, 25), target (12.5, 4, -5.5)) is aimed at another
+// district, away from the monument. The civicShader leaf still seals the
+// wiring (which strings, which uniforms, fog: true), and the bytes themselves
+// now carry a stronger guard than a sha256: a real driver links them in
+// tests/browser/dry_compile_sources.browser.test.ts. Add the module as a leaf
+// at the next legitimate re-mint only if a future capture is retaken from
+// beyond 72 yd with the monument in frame.
 export const EASTBROOK_POLISH_PROVENANCE_INPUTS = Object.freeze({
   townAssetSourceFingerprint: 'scripts/assets/eastbrook_town/source_fingerprint.mjs',
   authoritativeLayout: 'src/sim/eastbrook_layout.ts',
@@ -524,6 +540,8 @@ export const EASTBROOK_POLISH_PROVENANCE_INPUTS = Object.freeze({
   mailboxRuntime: 'src/render/mailbox.ts',
   noticeboardRuntime: 'src/render/noticeboard.ts',
   rendererIntegration: 'src/render/renderer.ts',
+  entityGroundSample: 'src/render/entity_ground_sample.ts',
+  entityGroundSampleCore: 'src/render/entity_ground_sample_core.ts',
   entityViewPolicy: 'src/render/entity_view_policy_core.ts',
   viewPriorityPolicy: 'src/render/prewarm_policy.ts',
   mailboxSourceFingerprint: 'scripts/assets/eastbrook_mailbox/source_fingerprint.mjs',
@@ -643,6 +661,8 @@ export function deriveEastbrookPolishCompositeProvenance({
   mailboxRuntimeSha256,
   noticeboardRuntimeSha256,
   rendererIntegrationSha256,
+  entityGroundSampleSha256,
+  entityGroundSampleCoreSha256,
   entityViewPolicySha256,
   viewPriorityPolicySha256,
   mailboxSourceFingerprint,
@@ -658,6 +678,8 @@ export function deriveEastbrookPolishCompositeProvenance({
     mailboxRuntimeSha256,
     noticeboardRuntimeSha256,
     rendererIntegrationSha256,
+    entityGroundSampleSha256,
+    entityGroundSampleCoreSha256,
     entityViewPolicySha256,
     viewPriorityPolicySha256,
     mailboxSourceFingerprint,
@@ -696,6 +718,14 @@ export function deriveEastbrookPolishCompositeProvenance({
       renderer: {
         path: EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
         sha256: rendererIntegrationSha256,
+      },
+      entityGroundSample: {
+        path: EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSample,
+        sha256: entityGroundSampleSha256,
+      },
+      entityGroundSampleCore: {
+        path: EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSampleCore,
+        sha256: entityGroundSampleCoreSha256,
       },
       entityViewPolicy: {
         path: EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy,

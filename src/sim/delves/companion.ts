@@ -14,6 +14,7 @@
 // Sim (foreign quest/delve callers). The heal is a DIRECT hp mutation + heal/spellfx
 // emit (no aura). `src/sim`-pure: no DOM/Three/Math.random.
 
+import { DELVE_COMPANIONS } from '../content/delves';
 import * as deedsMod from '../deeds';
 import type { SimContext } from '../sim_context';
 import {
@@ -192,4 +193,13 @@ export function updateDelveCompanion(ctx: SimContext, companion: Entity): void {
   } else if (d > DELVE_COMPANION_FOLLOW && !ctx.isRooted(companion)) {
     ctx.moveToward(companion, owner.pos, companion.moveSpeed * ctx.moveSpeedMult(companion));
   }
+}
+
+/** An owned mob whose template is a delve companion. Pure over the catalog;
+ *  bound onto SimContext.isDelveCompanionMob by the Sim ctor. */
+export function isDelveCompanionMob(mob: Entity): boolean {
+  return (
+    mob.ownerId !== null &&
+    Object.values(DELVE_COMPANIONS).some((c) => c.mobTemplateId === mob.templateId)
+  );
 }

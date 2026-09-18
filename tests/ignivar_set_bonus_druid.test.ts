@@ -525,7 +525,7 @@ describe('Cinderbark 2pc: Sweeping Claws may bank an additional Old Blood', () =
       .mockImplementation((p) => p === CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE);
     sim.castAbility('swipe');
     expect(stacks(sim.player, OLD_BLOOD_ID)).toBe(2);
-    // Round trip: out of Bruin into Wolf and back. The shared bank persists
+    // Round trip: out of Bruin into Cat and back. The shared bank persists
     // by design (Wildfang's cross-form identity).
     sim.player.auras = sim.player.auras.filter((aura) => aura.kind !== 'form_bear');
     sim.player.auras.push(formAura(sim.player, 'form_cat'));

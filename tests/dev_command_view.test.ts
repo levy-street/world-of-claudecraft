@@ -16,6 +16,16 @@ describe('developer command view', () => {
     expect(buildDevCommand('biskit', { bisSpec: 'prot; /dev gold 999' })).toBe('/dev bis');
   });
 
+  it('builds the town teleport from a slug and refuses a crafted value', () => {
+    expect(buildDevCommand('town', { town: 'eastbrook' })).toBe('/dev town eastbrook');
+    expect(buildDevCommand('town', { town: 'dawnrest_camp' })).toBe('/dev town dawnrest_camp');
+    // Token-gated like every other id field: an injection-shaped value never
+    // reaches the command line, and there is no wider form to fall back to.
+    expect(buildDevCommand('town', { town: 'eastbrook; /dev gold 999' })).toBeNull();
+    expect(buildDevCommand('town', {})).toBeNull();
+    expect(DEV_COMMAND_ACTIONS.find((action) => action.id === 'town')?.category).toBe('travel');
+  });
+
   it('builds farmgrow with the optional bed id and refuses to splice a crafted one', () => {
     // The all-plots form is what an EMPTY field means, not a refusal: the
     // command already accepts both shapes, so the row degrades to the wider

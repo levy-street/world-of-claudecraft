@@ -92,6 +92,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     // translation ask for no player-visible gain.
     "Can't move!": 'hud.combat.cannotMove',
     'You are busy.': 'hud.errors.busy',
+    "You can't cast while moving.": 'hud.errors.cannotCastWhileMoving',
     'That ability is not ready yet.': 'hud.errors.abilityNotReady',
     'Not enough rage!': 'hud.errors.notEnoughRage',
     'Not enough energy!': 'hud.errors.notEnoughEnergy',
@@ -172,6 +173,9 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'You cannot afford that.': 'itemUi.errors.cannotAfford',
     'That is not your listing.': 'itemUi.errors.notYourListing',
     'You have nothing to collect.': 'itemUi.errors.nothingToCollect',
+    'No listings of that item are available to sweep.': 'itemUi.errors.sweepNoListings',
+    'Prices changed before your sweep landed. Check the quote and try again.':
+      'itemUi.errors.sweepPriceChanged',
     "You can't assist yourself.": 'hud.errors.assistSelf',
     'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
     'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
@@ -179,12 +183,12 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   const key = exact[text];
   if (key) return t(key);
 
-  let match = /^You must be in (Bruin|Wolf) Form\.$/.exec(text);
+  let match = /^You must be in (Bruin|Cat) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.requiresForm', {
       form: t(match[1] === 'Bruin' ? 'hud.errors.bear' : 'hud.errors.cat'),
     });
-  match = /^You can't do that in (Bruin|Wolf|Fleet) Form\.$/.exec(text);
+  match = /^You can't do that in (Bruin|Cat|Fleet) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.cantInForm', {
       form: t(

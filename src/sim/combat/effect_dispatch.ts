@@ -2234,6 +2234,15 @@ export function runEffects(
           sourceId: p.id,
           school: ability.school,
         });
+        // A stun-only opener that awards a combo point (Slinkstrike: its stun is
+        // its whole effect list, so no strike arm above ever paid the point the
+        // tooltip promised). Paid once the stun has landed, the incapacitate
+        // arm's rule; the comboAwarded latch keeps a strike-plus-stun ability
+        // at one point per cast.
+        if (ability.awardsCombo && !comboAwarded) {
+          ctx.awardCombo(p, target, ability.awardsCombo);
+          comboAwarded = true;
+        }
         // Sundering Gavel (hammer_of_justice) and Gut Punch (cheap_shot)
         // sound at the target; every other stun has no dedicated recording
         // and stays silent here.
@@ -4031,6 +4040,13 @@ export function runEffects(
       }
       case 'afflictionViolence': {
         if (target) {
+          const spBonus = dotTickBonus(
+            abilityScalingPower(p, ability),
+            ability,
+            eff.duration,
+            eff.interval ?? 2,
+            talentDmgMult * (1 + mods.global.dotDmgPct),
+          );
           applyHexOfViolence(
             ctx,
             p,
@@ -4039,6 +4055,9 @@ export function runEffects(
             eff.charges,
             eff.doomPerProc,
             eff.damage,
+            spBonus,
+            eff.interval ?? 2,
+            eff.tickDoom ?? 2,
           );
         }
         break;
@@ -4067,7 +4086,7 @@ export function runEffects(
         break;
       }
       case 'afflictionJudgment': {
-        if (target) applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
+        applyHourOfJudgment(ctx, p, target, eff.duration, eff.doom, eff.refund);
         break;
       }
       case 'afflictionLitany': {

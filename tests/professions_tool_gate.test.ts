@@ -227,11 +227,14 @@ describe('the wield resolvers (professions/wield_gate.ts)', () => {
     }
   });
 
-  it('the wield-aware scan filters an unwieldable land tool and floors at NO_TOOL', () => {
-    // A tier-2 pick at mining 0: owned, not wieldable, so the scan reports
-    // nothing usable at all.
-    expect(bestWieldableGatherToolTierOrNone(inv('iron_mining_pick'), 'mining', 0, ITEMS)).toBe(0);
-    // At the threshold it wields.
+  it('the wield-aware scan DEGRADES an unwieldable land tool to the best wieldable tier', () => {
+    // A tier-2 pick at mining 0: owned, not wieldable in full, so it works as
+    // a tier-1 pick (the farming-tools report: a tool never loses function
+    // by being the upgrade). Only a bag with NO tool of the profession reads
+    // NO_TOOL_OWNED.
+    expect(bestWieldableGatherToolTierOrNone(inv('iron_mining_pick'), 'mining', 0, ITEMS)).toBe(1);
+    expect(bestWieldableGatherToolTierOrNone(inv(), 'mining', 0, ITEMS)).toBe(0);
+    // At the threshold it wields in full.
     expect(
       bestWieldableGatherToolTierOrNone(
         inv('iron_mining_pick'),
@@ -240,8 +243,8 @@ describe('the wield resolvers (professions/wield_gate.ts)', () => {
         ITEMS,
       ),
     ).toBe(2);
-    // A wieldable lower tool beside an unwieldable higher one: the usable one
-    // wins, the unearned one is inert rather than poisonous.
+    // A wieldable lower tool beside an unwieldable higher one: both read as
+    // tier 1 at mining 0, so the scan answers 1 either way.
     expect(
       bestWieldableGatherToolTierOrNone(
         inv('copper_mining_pick', 'mithril_mining_pick'),
@@ -262,8 +265,8 @@ describe('the wield resolvers (professions/wield_gate.ts)', () => {
   });
 
   it('the any-profession corpse scan filters land tools per counter, rods unfiltered', () => {
-    // R50: an unwieldable tier-3 pick contributes nothing, bare hands floor
-    // the scan at 1.
+    // R50: an unwieldable tier-3 pick degrades to tier 1, which is the
+    // bare-hands floor anyway.
     expect(bestWieldableAnyGatherToolTier(inv('mithril_mining_pick'), {}, ITEMS)).toBe(1);
     // The same pick at mining 70 contributes its tier.
     expect(
@@ -277,14 +280,18 @@ describe('the wield resolvers (professions/wield_gate.ts)', () => {
     expect(bestWieldableAnyGatherToolTier(inv('silverstream_fishing_rod'), {}, ITEMS)).toBe(3);
   });
 
-  it('minWieldRequirementToWork names the smallest threshold that unlocks something CARRIED', () => {
-    // Owns tier-2 and tier-3 picks, target tier 2: the tier-2 pick's 40 is
-    // the honest number, not the tier-3 pick's 70.
+  it('minWieldRequirementToWork names the TARGET tier requirement when something carried covers it', () => {
+    // Owns tier-2 and tier-3 picks, target tier 2: 40 opens tier-2 ground.
     expect(
       minWieldRequirementToWork(inv('iron_mining_pick', 'mithril_mining_pick'), 'mining', 2, ITEMS),
     ).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
-    // Owns ONLY the tier-3 pick, target tier 2: 70 is what unlocks it.
+    // Owns ONLY the tier-3 pick, target tier 2: still 40, because under the
+    // degrade rule the tier-3 pick works as a tier-2 pick from 40 on (it
+    // used to name the pick's own 70, a threshold that unlocked nothing).
     expect(minWieldRequirementToWork(inv('mithril_mining_pick'), 'mining', 2, ITEMS)).toBe(
+      TIER2_TOOL_WIELD_PROFICIENCY,
+    );
+    expect(minWieldRequirementToWork(inv('mithril_mining_pick'), 'mining', 3, ITEMS)).toBe(
       TIER3_TOOL_WIELD_PROFICIENCY,
     );
     // Nothing covering the target: null, the plain no-tool arm's signal.
@@ -658,7 +665,10 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     );
   }
 
-  it('refuses a covering tool below its wield threshold, naming the counter, drawing nothing', () => {
+  it('a covering tool below its wield threshold WORKS the ground beneath it (degrade, never brick)', () => {
+    // The farming-tools report: a tier-2 pick at mining 0 used to be inert,
+    // refusing even the tier-1 vein the entry pick would have worked. It now
+    // works as a tier-1 pick, so the same bags cast on tier-1 ground.
     const sim = new Sim({
       seed: 42,
       playerClass: 'warrior',
@@ -668,18 +678,36 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
     sim.addItem('iron_mining_pick', 1, pid);
     expect(meta.gatheringProficiency.mining).toBe(0);
+    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(true);
+    expect(p.castingAbility).toBeTruthy();
+    expect(denials(sim.drainEvents())).toHaveLength(0);
+  });
+
+  it('refuses a covering tool below its wield threshold on ground ABOVE the counter, naming it, drawing nothing', () => {
+    // The tier-2 vein is what the tier-2 pick cannot yet work at mining 0:
+    // the denial names the smallest counter that would put it to work.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
+    const { pid, p, meta, node } = miner(sim, 'ore_mirefen_t2b');
+    expect(node.tier).toBe(2);
+    sim.addItem('iron_mining_pick', 1, pid);
+    expect(meta.gatheringProficiency.mining).toBe(0);
     let draws = 0;
     (sim as unknown as { rng: { setObserver(fn: () => void): void } }).rng.setObserver(() => {
       draws++;
     });
 
-    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(false);
+    expect(sim.harvestNode('ore_mirefen_t2b', undefined, pid)).toBe(false);
 
     const denied = denials(sim.drainEvents());
     expect(denied).toHaveLength(1);
     expect(denied[0].surface).toBe('node');
     expect(denied[0].professionId).toBe('mining');
-    expect(denied[0].requiredTier).toBe(1);
+    expect(denied[0].requiredTier).toBe(2);
     // The wield arm: a covering tool IS owned, so the denial names the
     // smallest counter that would put something carried to work.
     expect(denied[0].wieldProficiency).toBe(TIER2_TOOL_WIELD_PROFICIENCY);
@@ -687,21 +715,21 @@ describe('the harvest boundary enforces the wield gate (the re-minted deny pins)
     expect(draws).toBe(0);
   });
 
-  it('the boundary: denied at 39, casts at 40 with the same bags', () => {
+  it('the boundary: denied at 39, casts at 40 with the same bags on tier-2 ground', () => {
     const sim = new Sim({
       seed: 42,
       playerClass: 'warrior',
       noPlayer: true,
       world: VENDOR_TEST_WORLD,
     });
-    const { pid, p, meta } = miner(sim, 'ore_eastbrook_1');
+    const { pid, p, meta } = miner(sim, 'ore_mirefen_t2b');
     sim.addItem('iron_mining_pick', 1, pid);
     meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY - 1;
-    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(false);
+    expect(sim.harvestNode('ore_mirefen_t2b', undefined, pid)).toBe(false);
     expect(denials(sim.drainEvents())).toHaveLength(1);
 
     meta.gatheringProficiency.mining = TIER2_TOOL_WIELD_PROFICIENCY;
-    expect(sim.harvestNode('ore_eastbrook_1', undefined, pid)).toBe(true);
+    expect(sim.harvestNode('ore_mirefen_t2b', undefined, pid)).toBe(true);
     expect(p.castingAbility).toBeTruthy();
     expect(denials(sim.drainEvents())).toHaveLength(0);
   });

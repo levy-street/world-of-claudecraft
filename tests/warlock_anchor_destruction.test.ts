@@ -4,23 +4,15 @@ import {
   WARLOCK_HEROIC_NYTHRAXIS_SCENARIO,
 } from '../scripts/warlock_balance_probe';
 
-// The 200 heroic anchor (owner directive, 2026-08-23 PVE viability round):
-// each warlock spec converges on about 200 DPS at 120 seconds against the
-// heroic Nythraxis profile (level-22 target wearing the real Nythraxis armor
-// curve) in the re-anchored best real kit, the fix for live heroic parse tops
-// of 169/133/131 while combat and fire topped 217 to 222. This supersedes the
-// 2026-08-06 sub-200 ruling, which was minted on a zero-armor level-20 dummy
-// and a fixture kit that forfeited both caster set bonuses and most hit
-// rating. The level-20 dummy stays pinned below as the historical drift
-// tripwire. Both statistics are the probe harness's own four-seed mean, the
-// same number the tuning study and the balance reports quote (a single seed
-// wobbles a few points around it). One spec per file since the 2026-08-13
-// split, so the anchors spread across CI shards instead of sharing one
-// file's wall clock.
+// September 8 approved tuning: a faster Gloom Bolt generator and a faster,
+// guaranteed-critical Ruinbolt. Retain the historical full-world fixtures,
+// four seeds, duration and economy guard; center the damage corridors on the
+// measured new means. The isolated before/after matrix is recorded separately
+// in docs/design/warlock-ruinbolt-feedback/README.md.
 const ANCHOR_SEEDS = [42, 1337, 9001, 777] as const;
 
-describe('destruction 200 DPS anchors at 120 seconds', () => {
-  it('lands on the 200 DPS heroic Nythraxis anchor with a healthy economy', () => {
+describe('destruction Ruinbolt feedback anchors at 120 seconds', () => {
+  it('lands on the approved Ruinbolt heroic anchor with a healthy economy', () => {
     const rows = ANCHOR_SEEDS.map((seed) =>
       runWarlockBalanceProbe('destruction', seed, 120, WARLOCK_HEROIC_NYTHRAXIS_SCENARIO),
     );
@@ -40,10 +32,12 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     // Re-anchored for the v0.42.0 Ruination retune (+10% destruction damage:
     // spec_output_tuning.ts's +0.11 offensive spell bonus plus the explicit
     // Pyre Aura pet-damage fix, docs/design/class-balance-v042-results.md).
-    // Measured 203.75208333333336 on this frozen kit; about plus or minus 5%
-    // around that, same as every prior re-anchor here.
-    expect(mean('dps')).toBeGreaterThanOrEqual(194);
-    expect(mean('dps')).toBeLessThanOrEqual(214);
+    // Measured 203.75208333333336 on this frozen kit before the Ruinbolt-cycle
+    // change. With the approved faster guaranteed-critical cycle, the same
+    // release fixture measures 236.21875; keep about plus or minus 5% around
+    // that, the same relative corridor as every prior re-anchor here.
+    expect(mean('dps')).toBeGreaterThanOrEqual(224);
+    expect(mean('dps')).toBeLessThanOrEqual(249);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 
@@ -62,11 +56,12 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     // Re-anchored for the v0.42.0 Ruination retune (+10% destruction damage,
     // see the heroic anchor note above): measured 227.5625 on this frozen
     // kit. Both floor and ceiling move by about plus or minus 5% around the
-    // new measurement, preserving the same relative width as every prior
-    // re-anchor here (this pin has no separate collapse-guard rationale for
-    // its floor, unlike the OSSBrain re-anchor above).
-    expect(mean('dps')).toBeGreaterThanOrEqual(216);
-    expect(mean('dps')).toBeLessThanOrEqual(239);
+    // new measurement. The approved Ruinbolt-cycle change then measures
+    // 252.82708333333335 on the same release fixture; preserve that same
+    // relative corridor (this pin has no separate collapse-guard rationale
+    // for its floor, unlike the OSSBrain re-anchor above).
+    expect(mean('dps')).toBeGreaterThanOrEqual(240);
+    expect(mean('dps')).toBeLessThanOrEqual(266);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

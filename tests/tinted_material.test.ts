@@ -322,7 +322,7 @@ describe('tinted character materials', () => {
   });
 
   it('partitions the cache so a flagged def never hands its clone to a player form on the same GLB', () => {
-    // mob_wolf (authoredAtlas) and the druid form_cat share wolf_basic.glb, so
+    // mob_wolf (authoredAtlas) and form_ghost_wolf share wolf_basic.glb, so
     // both reach tintedMaterial with the SAME source material. The flag must
     // partition the cache key: the flagged clone carries the atlas-scaled
     // floor, the form keeps the uniform one, and neither borrows the other.

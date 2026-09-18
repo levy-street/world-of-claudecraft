@@ -5,7 +5,7 @@ import {
 } from '../src/sim/content/crucible_collections';
 import { STATIONS } from '../src/sim/content/professions';
 import { ITEMS } from '../src/sim/data';
-import { primaryStatBudget } from '../src/sim/item_budget';
+import { primaryStatBudget, staminaBaseline, statIdentity } from '../src/sim/item_budget';
 import { isEnchantedInstance } from '../src/sim/professions/enchanting';
 import {
   COLLECTION_PERFECTING_SOURCE_INCREASE,
@@ -25,13 +25,30 @@ describe('immutable Perfecting collection contributions', () => {
       const def = CRUCIBLE_COLLECTION_ITEMS[recipe.resultItemId];
       expect(recipe.level).toBe(29);
       const bonus = perfectedBonusStats(def, recipe)!;
-      const delta =
-        primaryStatBudget(38, 'epic', def.slot) - primaryStatBudget(35, 'epic', def.slot);
-      expect(Object.values(bonus).reduce((sum, n) => sum + n, 0)).toBe(delta);
+      const lineBefore = primaryStatBudget(35, 'epic', def.slot);
+      const lineAfter = primaryStatBudget(38, 'epic', def.slot);
+      const delta = lineAfter - lineBefore;
+      // Model-aware (item_budget.ts' tierDeltaStats, used by perfectedBonusStats):
+      // a caster piece (int/spi, no str/agi) also gains the growth of its free
+      // stamina baseline between the two source lines; a physical piece keeps the
+      // historical line-only delta exactly.
+      const staminaGrowth =
+        statIdentity(def.stats) === 'caster'
+          ? Math.max(0, staminaBaseline(lineAfter) - staminaBaseline(lineBefore))
+          : 0;
+      expect(Object.values(bonus).reduce((sum, n) => sum + n, 0)).toBe(delta + staminaGrowth);
       expect(delta).toBeGreaterThan(0);
       expect(bonus.armor).toBeUndefined();
     }
-    expect(perfectedBonusStats(ITEMS.wyrmfall_pendant, { level: 25 })).toEqual({ int: 1, sta: 0 });
+    // wyrmfall_pendant is caster identity and now carries real Spirit (the
+    // stamina baseline model filled its old int-only line with Spirit), so the
+    // bake's profile keys include it too, even at a zero share. Its stamina
+    // baseline does not grow between source levels 25 and 28 (tierDeltaStats
+    // only sets sta when that growth is positive), so no sta key at all.
+    expect(perfectedBonusStats(ITEMS.wyrmfall_pendant, { level: 25 })).toEqual({
+      int: 1,
+      spi: 0,
+    });
   });
 
   it('retains the originally minted profile across later balance changes and adds no active stats', () => {

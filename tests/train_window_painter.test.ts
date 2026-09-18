@@ -156,23 +156,24 @@ describe('renderTrainWindow quality-glow socket', () => {
 describe('train/unbind card hover restores (CSS source pins)', () => {
   // jsdom runs no layout or cascade, so the two rules that keep the card fill
   // under the vendor family's higher-specificity hover arms are pinned at the
-  // source: without them, .vendor-item:disabled:hover blanks a disabled card
-  // to transparent and the known row's wash suppressor did the same.
+  // source. W10 moved the shared card hover to filter-only so disabled and
+  // known service rows suppress that filter without overriding ui-card fill.
   const css = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
 
   it('restates the card fill on disabled hover for both service windows', () => {
     const start = css.indexOf('.train-row:disabled:hover,\n  .unbind-row:disabled:hover {');
     expect(start).toBeGreaterThanOrEqual(0);
     const rule = css.slice(start, css.indexOf('}', start));
-    expect(rule).toContain('background: rgba(0, 0, 0, 0.24)');
+    expect(rule).toContain('filter: none');
+    expect(rule).not.toContain('background:');
   });
 
   it('keeps the card fill (never transparent) on the known-row hover', () => {
     const start = css.indexOf('.train-row.train-known:hover {');
     expect(start).toBeGreaterThanOrEqual(0);
     const rule = css.slice(start, css.indexOf('}', start));
-    expect(rule).toContain('background: rgba(0, 0, 0, 0.24)');
-    expect(rule).not.toContain('background: transparent');
+    expect(rule).toContain('filter: none');
+    expect(rule).not.toContain('background:');
   });
 });
 

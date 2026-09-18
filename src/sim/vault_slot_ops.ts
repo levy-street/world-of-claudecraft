@@ -35,6 +35,7 @@ import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
 } from './item_instance_load';
+import { isMergeableInstancePayload } from './item_instance_merge';
 import {
   normalizeLoadedMaterialSlot,
   preservesMaterialCountOnLoad,
@@ -46,8 +47,9 @@ import {
   normalizeMaterialStack,
   takeMaterialStack,
 } from './material_stack';
+import { type MaterialAddPlan, planMaterialStackAdd } from './material_stack_packing';
 import { sanitizeRiftGearInstance } from './rift/progression';
-import { cloneInvSlot, type InvSlot } from './types';
+import { cloneInvSlot, type InvSlot, type ItemInstancePayload } from './types';
 import {
   absorbsCompactStock,
   drawableStockUnits,
@@ -56,12 +58,114 @@ import {
 } from './vault_material_sources';
 
 // ---------------------------------------------------------------------------
+// Rows
+// ---------------------------------------------------------------------------
+
+/** An identity row holds one material identity WHOLE. The vault has no bag
+ *  cells, so a row is bounded by the per-material ceiling the command shells
+ *  enforce, never by the carried stack size: eighty units of one herb are one
+ *  row of eighty, not four rows of twenty. */
+export const VAULT_ROW_STACK_SIZE = Number.MAX_SAFE_INTEGER;
+
+/** Whether a row's payload pins it to whole moves. A charge-bearing or
+ *  player-locked payload is one identity per unit (item_instance_merge.ts,
+ *  the bags' one-per-slot stacking rule), so it deposits and withdraws whole:
+ *  stricter than the bank's material arm (material_container_move.ts), which
+ *  splits any material stack, and stricter is the safe side. Every other
+ *  payload (a signer, a bind-on-trade mark) already rides counted stacks in
+ *  the bags, where a split simply clones it onto both halves, so the vault
+ *  splits it the same way. vaultDeposit, vaultDepositAll and the withdraw
+ *  planner all read this one predicate, and so does the vault_view.ts row
+ *  model for its chosen-quantity action and its deposit-all replay. */
+export function vaultRowMovesWhole(instance: ItemInstancePayload | undefined): boolean {
+  return instance !== undefined && !isMergeableInstancePayload(instance);
+}
+
+/** Decide adding `grant` to the identity rows: the compatible row tops up,
+ *  else one fresh row opens, at the vault's row size. Null when the shared
+ *  model cannot read the grant or an existing same-item row. */
+export function planVaultRowAdd(
+  special: readonly InvSlot[],
+  grant: MaterialStackSlot,
+  materialIds: ReadonlySet<string>,
+): MaterialAddPlan | null {
+  const plan = planMaterialStackAdd({
+    inventory: special,
+    incoming: grant,
+    materialIds,
+    stackSize: VAULT_ROW_STACK_SIZE,
+    maxNewSlots: grant.count,
+  });
+  return plan.ok ? plan.value : null;
+}
+
+/** The rows with a row-add plan applied, as a NEW array: the caller commits
+ *  it in one assignment, so a later refusal in the same deposit leaves the
+ *  live rows untouched. */
+export function appliedVaultRowAdd(special: readonly InvSlot[], plan: MaterialAddPlan): InvSlot[] {
+  const out = special.slice();
+  for (const replacement of plan.replacements) out[replacement.index] = replacement.slot;
+  for (const fresh of plan.appended) out.push(fresh);
+  return out;
+}
+
+/** Fold rows that share one identity into one row each: the load-path repack
+ *  for saves written while a row was capped at the bag stack size (four rows
+ *  of twenty read as one row of eighty). A row nothing folds into, a row the
+ *  shared model cannot read, a dormant non-material id, and a whole-move
+ *  payload row all stay exactly as they are, in place and by reference. A row
+ *  that DOES fold is rebuilt through the shared normalize, so two legacy
+ *  signer-payload rows come back as one row whose signer sits in a source
+ *  bucket with no payload: the shape the deposit path already stores. Null
+ *  when nothing folded, and a load with no two rows of one id never reads a
+ *  row at all (the steady state costs nothing). */
+export function coalesceVaultRows(
+  special: readonly InvSlot[],
+  materialIds: ReadonlySet<string>,
+): InvSlot[] | null {
+  const ids = new Set<string>();
+  let shared = false;
+  for (const row of special) {
+    if (ids.has(row.itemId)) {
+      shared = true;
+      break;
+    }
+    ids.add(row.itemId);
+  }
+  if (!shared) return null;
+  const out: InvSlot[] = [];
+  let folded = false;
+  for (const row of special) {
+    const plan =
+      materialIds.has(row.itemId) && !vaultRowMovesWhole(row.instance)
+        ? planMaterialStackAdd({
+            inventory: out,
+            incoming: row,
+            materialIds,
+            stackSize: VAULT_ROW_STACK_SIZE,
+            maxNewSlots: 1,
+          })
+        : null;
+    if (plan === null || !plan.ok || plan.value.replacements.length === 0) {
+      out.push(row);
+      continue;
+    }
+    folded = true;
+    for (const replacement of plan.value.replacements) out[replacement.index] = replacement.slot;
+    for (const fresh of plan.value.appended) out.push(fresh);
+  }
+  return folded ? out : null;
+}
+
+// ---------------------------------------------------------------------------
 // Deposit
 // ---------------------------------------------------------------------------
 
 /**
  * Everything one deposit moves, decided before anything is written. The caller
- * applies it in this order: compact write, compact clear, fold, grant, carried.
+ * (materials_vault.ts applyVaultDeposit) plans the fold and the grant onto a
+ * COPY of the rows first (planVaultRowAdd), and only then commits: the compact
+ * write, the compact clear, the rows, the carried remainder.
  */
 export interface VaultDepositPlan {
   /** The compact row's new count, or null when this deposit does not pool. */
@@ -192,7 +296,7 @@ export function planVaultRowWithdraw(
   if (!planned.ok) return { kind: 'refused' };
 
   const moved = fitFor(planned.value.taken);
-  if (moved <= 0 || (row.instance !== undefined && moved !== want)) return { kind: 'full' };
+  if (moved <= 0 || (vaultRowMovesWhole(row.instance) && moved !== want)) return { kind: 'full' };
   if (moved === want) {
     return { kind: 'move', moved, taken: planned.value.taken, remaining: planned.value.remaining };
   }

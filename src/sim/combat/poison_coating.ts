@@ -12,6 +12,7 @@
 // icon, tooltip and localized name all resolve exactly as the ability's do.
 import { ABILITIES } from '../data';
 import type { SimContext } from '../sim_context';
+import { duelJustEndedBetween } from '../social/duel';
 import type { Aura, Entity, PoisonCoat } from '../types';
 
 // Ability id -> its coat rider (null when the ability carries none). ABILITIES
@@ -72,7 +73,16 @@ function applyStackDotCoat(
     existing.value = coatTickValue(coat.perTick, existing.stacks);
     existing.remaining = existing.duration;
     if (existing.stacks !== before) {
-      ctx.emit({ type: 'aura', targetId: target.id, name: coating.name, gained: true });
+      ctx.emit({
+        type: 'aura',
+        targetId: target.id,
+        name: coating.name,
+        gained: true,
+        sourceId: attacker.id,
+        abilityId: coating.id,
+        stacks: existing.stacks,
+        refresh: true,
+      });
     }
     return;
   }
@@ -139,7 +149,8 @@ function resolvedCoat(ctx: SimContext, wearer: Entity, abilityId: string): Poiso
  *  alike), so a miss, dodge or parry carries no poison. Draws no rng: a coat
  *  applies on every swing that connects. */
 export function applyPoisonCoats(ctx: SimContext, attacker: Entity, target: Entity): void {
-  if (target.dead) return;
+  // The swing's damage can end a duel and clear its auras before riders run.
+  if (target.dead || duelJustEndedBetween(ctx, target, attacker)) return;
   for (const aura of attacker.auras) {
     if (aura.kind !== 'imbue') continue;
     if (poisonCoatFor(aura.id) === null) continue;

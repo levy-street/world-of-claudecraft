@@ -401,7 +401,12 @@ describe('mailSend: instanced attachments', () => {
     expect(slotsOf(sim, sender, HIDE)[0].instance).toEqual(STAMPED);
   });
 
-  it('an instanced entry with a count other than exactly 1 is refused, never truncated', () => {
+  it('a MATERIAL instanced (legacy signer needle) entry with a count other than 1 is refused, never truncated', () => {
+    // Materials keep their own rule (material_attachment_plan.ts: an
+    // instanced request must be exactly 1, since a bulk material send is the
+    // PLAIN {itemId, count} shape instead, resolved through provenance
+    // composition): the merge relaxation below is scoped to NON-material
+    // mergeable payloads and must never widen this one.
     const { sim, sender } = mailSetup();
     sim.addItemInstance(HIDE, { ...SIGNED }, sender);
     sim.addItemInstance(HIDE, { ...SIGNED }, sender);
@@ -444,6 +449,185 @@ describe('mailSend: instanced attachments', () => {
     expect(mailCodes(sim.drainEvents())).toContain('sent');
     const letter = bookOf(sim).find((m) => m.items.length > 0);
     expect(letter?.items).toEqual([{ itemId: BREAD, count: 3 }]);
+  });
+});
+
+// Mergeable, NON-material instanced attachments bundle as one parcel
+// (report: "new potions don't stack in mail"). A rare-quality crafted
+// consumable (Sunpetal Healing Draught and kin) mints a SIGNED instance
+// payload (#1149) that already stacks byte-equal in bags/bank/trade
+// (item_instance_merge.ts isMergeableInstancePayload); before this fix mail's
+// SEND path still refused anything but exactly 1 per instanced slot, so
+// mailing more than MAIL_MAX_ATTACHMENTS (3) of a single signed potion was
+// outright impossible. BOOTS (oiled_boots, armor, stackSize 1) is chosen
+// deliberately: its bag copies can NEVER share one slot, so a bundled parcel
+// here proves the escrow draws across several physical stacks, not just a
+// single already-merged one.
+describe('mailSend: mergeable instanced attachments bundle into one parcel', () => {
+  it('bundles several byte-equal signed copies, split across bag slots, into ONE count-N parcel', () => {
+    const { sim, sender, recipient } = mailSetup();
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    // Three copies of a stackSize-1 item can never share a bag slot.
+    expect(slotsOf(sim, sender, BOOTS)).toHaveLength(3);
+
+    sim.mailSend(
+      'Rex',
+      'potions',
+      'have some',
+      0,
+      [{ itemId: BOOTS, count: 3, instance: SIGNED }],
+      sender,
+    );
+
+    expect(mailCodes(sim.drainEvents())).toContain('sent');
+    expect(slotsOf(sim, sender, BOOTS)).toHaveLength(0);
+    const letter = bookOf(sim).find((m) => m.items.length > 0);
+    // ONE parcel row, not three: this is the actual fix, not just that the
+    // send succeeds.
+    expect(letter?.items).toHaveLength(1);
+    expect(letter?.items[0]).toMatchObject({ itemId: BOOTS, count: 3, instance: SIGNED });
+
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
+    moveToMailbox(sim, recipient);
+    sim.mailTake(firstPlayerLetterId(sim, recipient), recipient);
+    const got = slotsOf(sim, recipient, BOOTS);
+    expect(got.reduce((n, s) => n + s.count, 0)).toBe(3);
+    for (const s of got) expect(s.instance).toEqual(SIGNED);
+  });
+
+  it('keeps a count-N mergeable instanced parcel stable across serialize/load before take', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.mailSend(
+      'Rex',
+      'restart',
+      'hold these',
+      0,
+      [{ itemId: BOOTS, count: 3, instance: SIGNED }],
+      sender,
+    );
+    expect(mailCodes(sim.drainEvents())).toContain('sent');
+    const save = JSON.parse(JSON.stringify(sim.serializeMail()));
+
+    const sim2 = makeWorld();
+    sim2.addPlayer('warrior', 'Sender');
+    const recipient2 = sim2.addPlayer('mage', 'Rex');
+    sim2.loadMail(save);
+    const loaded = bookOf(sim2).find((m) => m.items.length > 0);
+    expect(loaded?.items).toEqual([
+      expect.objectContaining({ itemId: BOOTS, count: 3, instance: SIGNED }),
+    ]);
+
+    tickFor(sim2, MAIL_DELIVERY_SECONDS + 1);
+    moveToMailbox(sim2, recipient2);
+    sim2.mailTake(firstPlayerLetterId(sim2, recipient2), recipient2);
+    const got = slotsOf(sim2, recipient2, BOOTS);
+    expect(got.reduce((n, s) => n + s.count, 0)).toBe(3);
+    for (const s of got) expect(s.instance).toEqual(SIGNED);
+  });
+
+  it('requesting more than is held is refused, never a partial bundle', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender);
+    sim.mailSend(
+      'Rex',
+      'greedy',
+      'more than i have',
+      0,
+      [{ itemId: BOOTS, count: 3, instance: SIGNED }],
+      sender,
+    );
+    const codes = mailCodes(sim.drainEvents());
+    expect(codes).toContain('notEnoughItems');
+    expect(codes).not.toContain('sent');
+    expect(slotsOf(sim, sender, BOOTS)).toHaveLength(2);
+    expect(sim.players.get(sender)!.copper).toBe(10000);
+  });
+
+  it('counts projected crafted-recipe buckets against the parcel cap before escrow', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender, 1, { craftedRecipeId: 'recipeA' });
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender, 2, { craftedRecipeId: 'recipeB' });
+    sim.addItem(BREAD, 1, sender);
+    sim.addItem('roasted_boar', 1, sender);
+    const breadBefore = sim.countItem(BREAD, sender);
+    const boarBefore = sim.countItem('roasted_boar', sender);
+
+    sim.mailSend(
+      'Rex',
+      'too much',
+      'one staged chip would split',
+      0,
+      [
+        { itemId: BOOTS, count: 3, instance: SIGNED },
+        { itemId: BREAD, count: 1 },
+        { itemId: 'roasted_boar', count: 1 },
+      ],
+      sender,
+    );
+
+    const codes = mailCodes(sim.drainEvents());
+    expect(codes).toContain('tooManyParcels');
+    expect(codes).not.toContain('sent');
+    expect(slotsOf(sim, sender, BOOTS).reduce((n, s) => n + s.count, 0)).toBe(3);
+    expect(sim.countItem(BREAD, sender)).toBe(breadBefore);
+    expect(sim.countItem('roasted_boar', sender)).toBe(boarBefore);
+    expect(metaOf(sim, sender).copper).toBe(10000);
+    expect(bookOf(sim).filter((m) => m.items.length > 0)).toHaveLength(0);
+  });
+
+  it('never blends provenance: differently-crafted stacks bundle as SEPARATE buckets even in one request', () => {
+    const { sim, sender, recipient } = mailSetup();
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender, 1, { craftedRecipeId: 'recipeA' });
+    sim.addItemInstance(BOOTS, { ...SIGNED }, sender, 2, { craftedRecipeId: 'recipeB' });
+    expect(slotsOf(sim, sender, BOOTS).reduce((n, s) => n + s.count, 0)).toBe(3);
+
+    sim.mailSend(
+      'Rex',
+      'mixed',
+      'provenance',
+      0,
+      [{ itemId: BOOTS, count: 3, instance: SIGNED }],
+      sender,
+    );
+    expect(mailCodes(sim.drainEvents())).toContain('sent');
+    const letter = bookOf(sim).find((m) => m.items.length > 0);
+    expect(letter?.items).toHaveLength(2);
+    const byRecipe = new Map(letter?.items.map((s) => [s.craftedRecipeId, s.count]));
+    expect(byRecipe).toEqual(
+      new Map([
+        ['recipeA', 1],
+        ['recipeB', 2],
+      ]),
+    );
+    expect(letter?.items.reduce((n, s) => n + s.count, 0)).toBe(3);
+
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 1);
+    moveToMailbox(sim, recipient);
+    sim.mailTake(firstPlayerLetterId(sim, recipient), recipient);
+    expect(slotsOf(sim, recipient, BOOTS).reduce((n, s) => n + s.count, 0)).toBe(3);
+  });
+
+  it('a genuinely non-mergeable (charge-bearing) instanced entry still refuses a count other than 1', () => {
+    const { sim, sender } = mailSetup();
+    sim.addItemInstance(BOOTS, { ...CHARGED }, sender);
+    sim.addItemInstance(BOOTS, { ...CHARGED }, sender);
+    sim.mailSend(
+      'Rex',
+      'zapped',
+      'boots',
+      0,
+      [{ itemId: BOOTS, count: 2, instance: CHARGED }],
+      sender,
+    );
+    expect(mailCodes(sim.drainEvents())).not.toContain('sent');
+    expect(slotsOf(sim, sender, BOOTS)).toHaveLength(2);
+    expect(sim.players.get(sender)!.copper).toBe(10000);
   });
 });
 

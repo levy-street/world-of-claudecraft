@@ -3,16 +3,14 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
+import { friendlyNameplatesShown } from '../game/nameplate_view_prefs';
 import { isOwnAura } from '../sim/aura_classify';
 import { corpseIndicatorFor } from '../sim/corpse_loot_state';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
-import {
-  npcQuestMarkerKind,
-  type QuestMarkerKind,
-  strongerQuestMarker,
-} from '../sim/quests/quest_marker_kind';
+import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
+import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
 import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { resolveHudAuraIconId } from '../ui/aura_icon_runtime';
@@ -30,6 +28,7 @@ import {
   proceduralIconDataUrl,
   raidMarkerDataUrl,
 } from '../ui/icons';
+import { professionTrainerNameplateLabel } from '../ui/profession_trainer_label_core';
 import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 import { castBarState } from './cast_bar';
@@ -50,6 +49,7 @@ import {
   nameplateDotRowHeight,
   nameplateDotsInto,
 } from './nameplate_dots_core';
+import { isFriendlyNameplateHidden } from './nameplate_friendly_core';
 import { nameplateHeraldryLift } from './nameplate_heraldry_core';
 import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
@@ -58,6 +58,7 @@ import {
   isProjectedNameplateAnchorVisible,
 } from './nameplate_projection';
 import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './nameplate_view';
+import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
 
@@ -149,6 +150,11 @@ export interface NameplatePainterDeps {
    *  host) means the device ratio. */
   getSurfacePixelRatio?: () => number;
   showNameplates: () => boolean;
+  /** The Toggle Friendly Nameplates keybind's state. Defaults to the live
+   *  preference (game/nameplate_view_prefs), which is why the renderer carries no
+   *  pass-through field for it; injectable so a test drives it. Read once per
+   *  pass; the rule it feeds is nameplate_friendly_core.ts. */
+  showFriendlyNameplates?: () => boolean;
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
   showPlayerNameplates: () => boolean;
@@ -168,6 +174,7 @@ export class NameplatePainter {
   private readonly getDevicePixelRatio: () => number;
   private readonly getSurfacePixelRatio: () => number;
   private readonly showNameplates: () => boolean;
+  private readonly showFriendlyNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
   private readonly showPlayerNameplates: () => boolean;
@@ -223,6 +230,7 @@ export class NameplatePainter {
       (() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
     this.getSurfacePixelRatio = deps.getSurfacePixelRatio ?? this.getDevicePixelRatio;
     this.showNameplates = deps.showNameplates;
+    this.showFriendlyNameplates = deps.showFriendlyNameplates ?? friendlyNameplatesShown;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
     this.showPlayerNameplates = deps.showPlayerNameplates;
@@ -244,6 +252,7 @@ export class NameplatePainter {
     this.anchorCount = 0;
 
     const showNameplates = this.showNameplates();
+    const showFriendlyNameplates = this.showFriendlyNameplates();
     const showDevBadges = this.showDevBadges();
     const showOwnNameplate = this.showOwnNameplate();
     const showPlayerNameplates = this.showPlayerNameplates();
@@ -275,6 +284,23 @@ export class NameplatePainter {
         !!view.visual,
         anyCharacterRigDrawing(view),
       );
+      // The Toggle Friendly Nameplates keybind, gated here rather than inside the
+      // plan because resolving a mob's reaction needs the entity map. Skipping
+      // the entity is the whole hide, so a gated plate leaves no pick anchor
+      // behind, and `standIn` wins over it exactly as it wins over the other
+      // nameplate toggles: a body the compile gate is still hiding keeps the
+      // plate that says it is there.
+      if (
+        !standIn &&
+        isFriendlyNameplateHidden(
+          entity,
+          world.entities,
+          this.isHostilePlayer,
+          showFriendlyNameplates,
+        )
+      ) {
+        continue;
+      }
       // the saddle lift rides the anchor so a mounted player's plate clears the head
       const plan = nameplatePlanInto(
         this.plan,
@@ -511,7 +537,7 @@ export class NameplatePainter {
     state.nameColor = '#fff';
     state.level = '';
     state.levelColor = '#fff';
-    state.guild = '';
+    state.guild = entity.kind === 'npc' ? (npcRoleLabel(entity.templateId) ?? '') : '';
     state.guildLabel = '';
     state.guildTier = 0;
     state.title = '';
@@ -644,6 +670,24 @@ export class NameplatePainter {
           ? npcDisplayName(entity.templateId)
           : tEntity({ kind: 'mob', id: entity.templateId, field: 'name' });
       state.nameColor = FRIENDLY;
+      // The role line: what this NPC DOES, on the same line a player's
+      // `<Guild>` uses (npc_role.ts owns the rule; the tag wrapper is the
+      // catalog VALUE so a locale owns its brackets). Built here, never in the
+      // per-frame draw path, the same cadence contract as guildLabel.
+      if (entity.kind === 'npc') {
+        const roleLabel = state.guild;
+        if (roleLabel) {
+          state.guildLabel = t('hudChrome.nameplate.npcRoleTag', { role: roleLabel });
+        }
+        // The profession-trainer service title beneath the name, unless the
+        // role line already says it (the resident master's trainer role, or
+        // the flavour fallback that resolves to the same service title). A
+        // trainer with a distinct service role, the hobby smith who also
+        // deals arms, keeps both lines.
+        if (!(roleLabel && npcRoleLineCarriesTrainerTitle(entity.templateId))) {
+          state.title = professionTrainerNameplateLabel(entity.templateId);
+        }
+      }
       const questMarker = this.questMarker(entity);
       state.marker = questMarker.marker;
       state.markerTone = questMarker.tone;
@@ -708,7 +752,7 @@ export class NameplatePainter {
       if (!quest || !this.questMarkerCtx) continue;
       folded = strongerQuestMarker(
         folded,
-        npcQuestMarkerKind(
+        ambientNpcQuestMarkerKind(
           quest,
           entity.templateId,
           this.world.questState(questId),

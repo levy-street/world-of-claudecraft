@@ -10,12 +10,12 @@
 // module workers, OffscreenCanvas or the extension set are missing, the
 // client reports unavailable and every gate keeps its path. A worker that
 // dies (module load failure, OOM kill, lost context), never answers ready,
-// lets gates time out repeatedly, or (the rule that fires first, before any
-// hold has paid) cannot serve its oldest hold inside what is left of that
-// hold's own cap at the wall its links have actually been costing, is
-// retired and the policy falls back to the pre-worker path for the rest of
-// the renderer's life: no gate waits on a worker that has stopped
-// delivering.
+// or lets gates time out repeatedly is retired and the policy falls back to
+// the pre-worker path for the rest of the renderer's life: no gate waits on a
+// worker that has stopped delivering. A worker that cannot serve its oldest
+// hold inside what is left of that hold's own cap (the rule that fires first,
+// before any hold has paid) RELEASES that burst's holds and keeps warming;
+// only a verdict repeated over bursts retires it.
 //
 // The worker's context is one more WebGL context in the GPU process (the
 // cap is about sixteen, context_release.ts); it lives in the worker, so the
@@ -34,8 +34,11 @@ import {
   noteShaderWarmFrame,
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
+  SHADER_WARM_AB_REFUSAL,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
+  SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
+  type ShaderWarmAbArm,
   type ShaderWarmBypass,
   type ShaderWarmDecision,
   type ShaderWarmMode,
@@ -45,12 +48,15 @@ import {
   type ShaderWarmRequestStats,
   type ShaderWarmRequests,
   type ShaderWarmSetting,
+  shaderWarmAbArmFor,
   shaderWarmCannotServe,
   shaderWarmDecision,
+  shaderWarmLinkEvidence,
   shaderWarmModeFor,
 } from './shader_warm_client_core';
 import type { ShaderWarmSource, ShaderWarmWorkerMessage } from './shader_warm_protocol';
 import {
+  SHADER_WARM_LINK_DEADLINE_MS,
   SHADER_WARM_MAX_WINDOW_DESKTOP,
   SHADER_WARM_MAX_WINDOW_MOBILE,
   SHADER_WARM_RETAINED_DESKTOP,
@@ -80,6 +86,14 @@ export interface ShaderWarmSnapshot extends ShaderWarmRequestStats {
   adapter: string;
   paused: boolean;
   frameEmaMs: number;
+  /** Wall time during which at least one gate was held. */
+  holdWallMs: number;
+  /** Cannot-serve verdicts that released a burst's held gates. */
+  releases: number;
+  /** A release happened and the worker still owes requests: no gate holds. */
+  standingDown: boolean;
+  /** The D3D11 experiment's arm for this profile; null where no draw ran. */
+  abArm: ShaderWarmAbArm | null;
   /** The worker's last stats message. */
   workerStats: {
     pending: number;
@@ -116,13 +130,37 @@ export interface ShaderWarmClientDeps {
   schedule?: (callback: () => void, ms: number) => () => void;
   /** Injectable clock, for the breaker's progress check. */
   now?: () => number;
+  /** Where the profile's A/B arm is kept; the page default is localStorage. */
+  abStore?: ShaderWarmAbStore;
+  /** The draw for a profile with no arm yet. */
+  random?: () => number;
 }
+
+/** The browser profile's slot for the A/B arm. Either call may throw (storage
+ *  blocked, private mode): the client then draws once per page load. */
+export interface ShaderWarmAbStore {
+  get(): string | null;
+  set(value: string): void;
+}
+
+const SHADER_WARM_AB_STORAGE_KEY = 'woc.shaderWarm.abArm';
+
+/** How long a worker the gates stand down for may stay silent before it is
+ *  retired. Not a tuned timer: the worker answers every link it runs by its
+ *  own deadline and posts stats while it works, so two deadlines without a
+ *  single message mean it is not ticking at all, and standing down would
+ *  otherwise keep its context for the page with no hold left to judge it. */
+export const SHADER_WARM_SILENT_STANDDOWN_MS = 2 * SHADER_WARM_LINK_DEADLINE_MS;
 
 /** A request a hold can give up on: `settled` resolves with each program's
  *  outcome; `abandon` tells the worker to drop what nobody else waits for. */
 export interface ShaderWarmHold {
   settled: Promise<ShaderWarmOutcome[]>;
   abandon(): void;
+  /** A cannot-serve release ended this hold (or refused it while standing
+   *  down): its caller passes this to noteShaderWarmHold, so the expiry rules
+   *  never read it as evidence against the worker. */
+  wasReleased(): boolean;
 }
 
 /** How long a spawned worker has to answer ready. A module worker loads and
@@ -157,15 +195,38 @@ const state = {
   queuedUntilReady: [] as ShaderWarmSource[],
   cancelReadyDeadline: null as (() => void) | null,
   pagehideHooked: false,
-  /** Held gates that expired in a row while the worker settled nothing:
-   *  the breaker's count. */
-  consecutiveTimeouts: 0,
+  /** Held gates in a row the worker answered nothing through, whether each
+   *  expired on its cap or ended on the worker's own failure: the breaker's
+   *  count. */
+  consecutiveUnanswered: 0,
   /** When the worker last answered warmed, on the client's clock. */
   lastWarmedAtMs: Number.NEGATIVE_INFINITY,
+  /** When the worker last gave up a link at its own deadline, on the
+   *  client's clock: the other way a hold pays for a worker that answers
+   *  nothing (a fast rejection of a text says nothing about the worker). */
+  lastDeadlineAtMs: Number.NEGATIVE_INFINITY,
   /** The last few holds, for the breaker's expired-share rule. */
   holds: createShaderWarmHoldRing(),
   /** The holds still waiting, for the cannot-serve rule. */
   outstanding: createShaderWarmOutstandingHolds(),
+  /** Cannot-serve verdicts this worker's life; the last one retires it. */
+  releases: 0,
+  /** Set by a release, cleared once the worker owes nothing: no gate holds. */
+  standingDown: false,
+  /** When the gates last started standing down, and when the worker last
+   *  posted anything, on the client's clock: the silence bound reads both. */
+  standingDownSinceMs: Number.NEGATIVE_INFINITY,
+  lastWorkerMessageAtMs: Number.NEGATIVE_INFINITY,
+  /** Carried over retired workers' books, so the beacon's A/B cost terms
+   *  cover the page like the long-task total they are weighed against. */
+  carriedHoldWallMs: 0,
+  carriedReleases: 0,
+  abArm: null as ShaderWarmAbArm | null,
+  /** The arm this page load drew, kept for the page's life: a profile whose
+   *  storage refuses must not draw again at every renderer rebuild. */
+  pageArm: null as ShaderWarmAbArm | null,
+  abStore: null as ShaderWarmAbStore | null,
+  random: null as (() => number) | null,
   /** Why the worker was retired FOR CAUSE, if it was. Sticky across a setting
    *  round trip; only a renderer swap clears it (retireAndForgetWorker). */
   retiredCause: null as { worker: 'dead' | 'refused'; reason: string | null } | null,
@@ -196,6 +257,70 @@ function defaultMobile(): boolean {
 function defaultSchedule(callback: () => void, ms: number): () => void {
   const handle = setTimeout(callback, ms);
   return () => clearTimeout(handle);
+}
+
+function defaultAbStore(): ShaderWarmAbStore {
+  // The property access itself throws where site data is blocked, so it is
+  // made inside the calls resolveMode already guards.
+  const storage = (): Storage | undefined =>
+    (globalThis as { localStorage?: Storage }).localStorage;
+  return {
+    get: () => storage()?.getItem(SHADER_WARM_AB_STORAGE_KEY) ?? null,
+    set: (value) => storage()?.setItem(SHADER_WARM_AB_STORAGE_KEY, value),
+  };
+}
+
+function clock(): number {
+  return (state.now ?? defaultNow)();
+}
+
+/** The mode in force for the setting and backend known now, through the A/B
+ *  draw: a profile in the `off` arm resolves `auto` to off and names the arm
+ *  on the refusal, unless a real cause already owns it. */
+function resolveMode(): void {
+  // Storage is read only where a draw can happen: a masked renderer string
+  // reads as unknown at every policy call, and that is every gate.
+  const drawable =
+    state.setting === 'auto' && shaderWarmModeFor('auto', state.backend, state.platform) !== 'off';
+  let stored: string | null = null;
+  if (drawable) {
+    try {
+      stored = state.abStore?.get() ?? null;
+    } catch {
+      stored = null;
+    }
+    if (stored !== 'on' && stored !== 'off') stored = state.pageArm;
+  }
+  const draw = shaderWarmAbArmFor({
+    setting: state.setting,
+    backend: state.backend,
+    platform: state.platform,
+    stored,
+    random: state.random ?? Math.random,
+  });
+  if (draw.store) {
+    try {
+      state.abStore?.set(draw.store);
+    } catch {
+      // Blocked storage: this page load keeps its draw, the next one draws again.
+    }
+  }
+  state.abArm = draw.arm;
+  if (draw.arm) state.pageArm = draw.arm;
+  state.mode =
+    draw.arm === 'off' ? 'off' : shaderWarmModeFor(state.setting, state.backend, state.platform);
+  // Between a renderer's dispose and the next context read the backend is
+  // unknown and no draw applies, but the page's off arm still names the
+  // session on the typed refusal column.
+  const backendPending = state.backend === null || state.backend === 'unknown';
+  const offArm =
+    draw.arm === 'off' ||
+    (draw.arm === null && backendPending && state.setting === 'auto' && state.pageArm === 'off');
+  if (offArm) {
+    if (!state.retiredCause) state.refusal = SHADER_WARM_AB_REFUSAL;
+  } else if (state.refusal === SHADER_WARM_AB_REFUSAL) {
+    state.refusal = null;
+  }
 }
 
 function currentSearch(): string {
@@ -229,7 +354,9 @@ export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
   state.readyDeadlineMs = readShaderWarmReadyDeadline(search, SHADER_WARM_READY_DEADLINE_MS);
   state.backend = null;
   state.platform = deps.platform ?? defaultPlatform();
-  state.mode = shaderWarmModeFor(state.setting, null, state.platform);
+  state.abStore = deps.abStore ?? defaultAbStore();
+  state.random = deps.random ?? Math.random;
+  resolveMode();
   // The one refusal decided before any context: named so the readout says
   // why an explicit setting did nothing on a phone.
   if (state.platform === 'ios' && state.setting !== 'off') state.refusal = 'ios-webkit';
@@ -256,6 +383,7 @@ export function shaderWarmChoiceAvailable(
 
 function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
   const message = event.data;
+  state.lastWorkerMessageAtMs = clock();
   switch (message.kind) {
     case 'ready':
       state.cancelReadyDeadline?.();
@@ -273,17 +401,32 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
       }
       break;
     case 'warmed':
-      state.lastWarmedAtMs = (state.now ?? defaultNow)();
+      state.lastWarmedAtMs = clock();
       // A link time counts only for a request that was waiting for it.
       if (state.requests.settle(message.id, 'warmed')) state.requests.noteLink(message.linkMs);
-      if (retireIfCannotServe()) break;
+      if (judgeCannotServe() === 'retired') break;
+      resumeHoldsIfDrained();
       syncWorkerPause();
       break;
-    case 'failed':
-      state.requests.settle(message.id, 'failed', message.reason === 'cancelled');
-      if (retireIfCannotServe()) break;
+    case 'failed': {
+      const settled = state.requests.settle(message.id, 'failed', message.reason === 'cancelled');
+      if (message.reason === 'link-failed' || message.reason === 'link-deadline') {
+        state.requests.noteFailedProgram(message.id, message.reason);
+      }
+      if (message.reason === 'link-deadline') {
+        state.lastDeadlineAtMs = clock();
+        // A give-up at the worker's deadline is link evidence (a lower
+        // bound), counted like a link time: once per request the book still
+        // had open (an abandoned in-flight link runs to its deadline too,
+        // and its wall is evidence all the same).
+        if (settled && message.linkMs !== undefined)
+          state.requests.noteCensoredLink(message.linkMs);
+      }
+      if (judgeCannotServe() === 'retired') break;
+      resumeHoldsIfDrained();
       syncWorkerPause();
       break;
+    }
     case 'lost':
       retireForCause('dead', 'context-lost');
       retireWorker();
@@ -327,7 +470,8 @@ function retireWorker(): void {
   const worker = state.worker;
   state.worker = null;
   state.queuedUntilReady = [];
-  state.outstanding.clear();
+  state.outstanding.clear(clock());
+  state.standingDown = false;
   state.cancelReadyDeadline?.();
   state.cancelReadyDeadline = null;
   state.workerPaused = false;
@@ -424,15 +568,17 @@ export function shaderWarmDecide(
     // Only a definite class is kept: a lost context or a masked string reads
     // as unknown (OFF) and is read again at the next policy call.
     state.backend = readGpuBackend(context).backend;
-    state.mode = shaderWarmModeFor(state.setting, state.backend, state.platform);
+    resolveMode();
   }
   if (state.mode !== 'off' && state.workerState === 'idle') startWorker(context);
+  retireIfSilentWhileStandingDown();
   const decision = shaderWarmDecision({
     mode: state.mode,
     available: shaderWarmAvailable(),
     armed: state.armed,
     priority,
     imminent,
+    standingDown: state.standingDown,
     liveViewPriority: GPU_WORK_PRIORITY.LIVE_VIEW,
     actionablePriority: GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
   });
@@ -481,6 +627,18 @@ export function holdShaderPrograms(
   capMs?: number,
   startedAtMs?: number,
 ): ShaderWarmHold {
+  const capped = capMs !== undefined && Number.isFinite(capMs) && capMs > 0;
+  if (capped && state.standingDown && sources.length > 0) {
+    // A gate decides before its assembly unit runs, so a hold can be asked
+    // after a release even though the decision said hold. Opening it would
+    // queue behind the backlog the release gave up on and let the same
+    // burst release again: it is refused, sends nothing, and ends at once.
+    return {
+      settled: Promise.resolve(sources.map((): ShaderWarmOutcome => 'failed')),
+      abandon: () => {},
+      wasReleased: () => true,
+    };
+  }
   const { ids, toSend, toPromote } = state.requests.request(sources, priority);
   if (toSend.length > 0) {
     if (state.workerState === 'ready' && state.worker) {
@@ -504,38 +662,84 @@ export function holdShaderPrograms(
     }
   }
   const requests = state.requests;
+  const book = state.outstanding;
   const settled = requests.whenSettled(ids);
-  const outstanding =
-    capMs !== undefined && Number.isFinite(capMs) && capMs > 0 && ids.length > 0
-      ? state.outstanding.open({
-          startedAtMs:
-            startedAtMs !== undefined && Number.isFinite(startedAtMs)
-              ? startedAtMs
-              : (state.now ?? defaultNow)(),
-          capMs,
-          priority,
-          highestId: Math.max(...ids),
-        })
-      : null;
-  if (outstanding) settled.then(() => state.outstanding.close(outstanding));
-  return {
-    settled,
-    abandon: () => {
-      if (outstanding) state.outstanding.close(outstanding);
-      // The book this request was written in: a renderer swap starts a new
-      // one, and an abandon after that has nothing to drop.
-      if (requests !== state.requests) return;
-      const dropped = requests.abandon(ids);
-      if (dropped.length === 0) return;
-      if (state.workerState === 'ready' && state.worker) {
-        state.worker.postMessage({ kind: 'cancel', ids: dropped });
-      } else if (state.workerState === 'starting') {
-        const droppedSet = new Set(dropped);
-        state.queuedUntilReady = state.queuedUntilReady.filter((s) => !droppedSet.has(s.id));
-        for (const id of dropped) requests.settle(id, 'failed');
-      }
-    },
+  let endByRelease: ((outcomes: ShaderWarmOutcome[]) => void) | null = null;
+  let released = false;
+  let abandoned = false;
+  let outstanding: ReturnType<typeof book.open> | null = null;
+  const abandon = (): void => {
+    if (abandoned) return;
+    abandoned = true;
+    if (outstanding) book.close(outstanding, clock());
+    // The book this request was written in: a renderer swap starts a new
+    // one, and an abandon after that has nothing to drop.
+    if (requests !== state.requests) return;
+    const dropped = requests.abandon(ids);
+    if (dropped.length === 0) return;
+    if (state.workerState === 'ready' && state.worker) {
+      state.worker.postMessage({ kind: 'cancel', ids: dropped });
+    } else if (state.workerState === 'starting') {
+      const droppedSet = new Set(dropped);
+      state.queuedUntilReady = state.queuedUntilReady.filter((s) => !droppedSet.has(s.id));
+      for (const id of dropped) requests.settle(id, 'failed');
+    }
   };
+  outstanding =
+    capped && ids.length > 0
+      ? book.open(
+          {
+            startedAtMs:
+              startedAtMs !== undefined && Number.isFinite(startedAtMs) ? startedAtMs : clock(),
+            capMs,
+            priority,
+            highestId: Math.max(...ids),
+            // A release ends the hold now with what is warm so far and gives
+            // its requests back, the way an expiry does: the game context links
+            // those programs now, and the worker linking the same text again
+            // would compete for the driver the verdict found too busy (a
+            // program another request still waits on is kept). A hold whose
+            // last request settled in the very message that released it counts
+            // as released too: it ended the same way either path.
+            release: () => {
+              released = true;
+              endByRelease?.(
+                ids.map((id) => (requests.outcomeOf(id) === 'warmed' ? 'warmed' : 'failed')),
+              );
+              abandon();
+            },
+          },
+          clock(),
+        )
+      : null;
+  if (outstanding) settled.then(() => book.close(outstanding, clock()));
+  const ended = outstanding
+    ? Promise.race([
+        settled,
+        new Promise<ShaderWarmOutcome[]>((resolve) => {
+          endByRelease = resolve;
+        }),
+      ])
+    : settled;
+  return { settled: ended, wasReleased: () => released, abandon };
+}
+
+/** A worker the gates stand down for that has posted nothing for
+ *  `SHADER_WARM_SILENT_STANDDOWN_MS` is not ticking: retire it. Read from the
+ *  frame hook and the policy call, signals the worker cannot withhold. */
+function retireIfSilentWhileStandingDown(): boolean {
+  if (!state.standingDown || state.workerState !== 'ready') return false;
+  const quietSinceMs = Math.max(state.standingDownSinceMs, state.lastWorkerMessageAtMs);
+  if (clock() - quietSinceMs < SHADER_WARM_SILENT_STANDDOWN_MS) return false;
+  retireForCause('dead', 'standing-down:silent');
+  retireWorker();
+  return true;
+}
+
+/** No gate holds after a release until the worker owes nothing: the burst the
+ *  verdict priced is still being served, and a new hold would queue behind it. */
+function resumeHoldsIfDrained(): void {
+  if (state.standingDown && state.requests.pendingCount() === 0) state.standingDown = false;
 }
 
 /** The breaker's third rule, read on every settle and every hold note: can
@@ -553,57 +757,116 @@ export function holdShaderPrograms(
  *
  *  Nothing is judged before the worker's first stats message: the window is
  *  the divisor, and reading a worker that links four at a time as one at a
- *  time condemns it four times too fast, on a verdict that is final. That
- *  message comes on the worker's own poll, so it is also a few hundred
- *  milliseconds stale once it lands. Returns true when it retired the
- *  worker. */
-function retireIfCannotServe(): boolean {
-  if (state.workerState !== 'ready') return false;
+ *  time condemns it four times too fast. That message comes on the worker's
+ *  own poll, so it is also a few hundred milliseconds stale once it lands.
+ *
+ *  A verdict prices ONE burst, so it releases that burst's held gates (they
+ *  link on the game context now, which is what the rule is for) and keeps
+ *  the worker warming: read off a window that had just halved, it condemned a
+ *  worker that warmed 174 programs on the next launch (RTX 3060, 2026-09-12).
+ *  The release empties the outstanding set and no gate holds until the worker
+ *  owes nothing, so the next verdict can only come from a later burst; the
+ *  `SHADER_WARM_RELEASE_BREAKER`th retires it. */
+function judgeCannotServe(): 'released' | 'retired' | null {
+  if (state.workerState !== 'ready') return null;
   const stats = state.workerStats;
-  if (!stats) return false;
+  if (!stats) return null;
   const oldest = state.outstanding.oldest();
-  if (!oldest) return false;
-  const links = state.requests.stats().links;
-  const cannotServe = shaderWarmCannotServe({
+  if (!oldest) return null;
+  const { links, censoredLinks } = state.requests.stats();
+  const inputs = {
     linkCount: links.count,
     linkSumMs: links.sumMs,
+    censoredCount: censoredLinks.count,
+    censoredSumMs: censoredLinks.sumMs,
     windowLinks: stats.windowLinks,
     aheadOfOldest: state.requests.unsettledAhead(oldest.priority, oldest.highestId),
     capMs: oldest.capMs,
-    waitedMs: (state.now ?? defaultNow)() - oldest.startedAtMs,
-  });
-  if (!cannotServe) return false;
-  retireForCause('dead', 'cannot-serve:hold-cap');
-  retireWorker();
-  return true;
+    waitedMs: clock() - oldest.startedAtMs,
+  };
+  if (!shaderWarmCannotServe(inputs)) return null;
+  state.releases++;
+  if (state.releases >= SHADER_WARM_RELEASE_BREAKER) {
+    // Named by the evidence that spoke: a verdict on deadline give-ups alone
+    // is its own arm, and the fleet must be able to tell it from the baseline.
+    const censored = shaderWarmLinkEvidence(inputs)?.source === 'censored';
+    retireForCause('dead', censored ? 'cannot-serve:hold-cap:censored' : 'cannot-serve:hold-cap');
+    retireWorker();
+    return 'retired';
+  }
+  const now = clock();
+  state.standingDown = true;
+  state.standingDownSinceMs = now;
+  for (const hold of state.outstanding.releaseAll(now)) hold.release?.();
+  return 'released';
 }
 
-/** A held gate ended its hold. Consecutive expiries during which the worker
+/** A held gate ended its hold. Consecutive holds during which the worker
  *  settled NOTHING trip the breaker: the worker is retired and every later
- *  gate takes the unavailable bypass. An expiry the worker answered other
- *  requests through is a slow worker, not a dead one (a cold D3D11 links
- *  in 400 ms a program and a hold waits its turn in the queue), and a slow
- *  worker that keeps delivering is worth more than none. */
-export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: number): void {
-  state.requests.noteHeld(warm, timedOut, holdMs);
+ *  gate takes the unavailable bypass. A hold counts whether it expired on
+ *  its cap or ended on the worker giving a link up at its own deadline: the
+ *  deadline (`SHADER_WARM_LINK_DEADLINE_MS`) is shorter than the hold cap
+ *  (`SHADER_WARM_HOLD_CAP_MS`, the lanes' too), so on a machine whose links
+ *  never settle a single-program hold never expires, it fails at the
+ *  deadline, and a rule that counted expiries alone never fired while every
+ *  hold paid that deadline (the RTX 4060 Ti capture). A hold that ended on a
+ *  FAST failure (a text the worker's context rejects, or a program already
+ *  failed once that a later root shares) paid nothing and says nothing
+ *  about the worker's speed, so it neither counts nor names the cause. An
+ *  expiry the worker answered other requests through is a slow worker, not
+ *  a dead one (a cold D3D11 links in 400 ms a program and a hold waits its
+ *  turn in the queue), and a slow worker that keeps delivering is worth
+ *  more than none. A hold that ended before the worker was ready settled on
+ *  the client's side and says nothing about it; the ready deadline owns
+ *  that worker. A hold a cannot-serve release ended (`released`, from the
+ *  hold's own `wasReleased`) is not evidence for the other rules either: it
+ *  is counted as released and goes no further, or a release with a link
+ *  deadline inside it would feed the wedged streak and retire the worker the
+ *  release kept. `progressed` and `paidDeadline` read the worker's LAST warm
+ *  and LAST deadline against this hold's start, not this hold's own programs:
+ *  a warm for someone else means the worker is alive, and a deadline anywhere
+ *  means its links are not settling, which is the evidence either way. */
+export function noteShaderWarmHold(
+  warm: boolean,
+  timedOut: boolean,
+  holdMs: number,
+  released = false,
+): void {
+  const holdStartedAtMs = clock() - Math.max(0, holdMs);
+  const releasedHold = released && !warm;
+  state.requests.noteHeld(warm, timedOut, holdMs, releasedHold);
+  if (releasedHold) return;
   state.holds.note(timedOut);
-  const holdStartedAtMs = (state.now ?? defaultNow)() - Math.max(0, holdMs);
   const progressed = state.lastWarmedAtMs >= holdStartedAtMs;
-  state.consecutiveTimeouts = timedOut && !progressed ? state.consecutiveTimeouts + 1 : 0;
+  const paidDeadline = state.lastDeadlineAtMs >= holdStartedAtMs;
+  const unanswered =
+    !warm && !progressed && (timedOut || paidDeadline) && state.workerState === 'ready';
+  state.consecutiveUnanswered = unanswered ? state.consecutiveUnanswered + 1 : 0;
   // The cannot-serve rule first: what it sees, the two rules below only learn
-  // once the holds it is about have paid their caps.
-  if (retireIfCannotServe()) return;
-  // Two rules: a worker that answered nothing through three expiries in a
-  // row is wedged; one that keeps answering someone while half the recent
-  // holds still expire is too slow for the demand, and either costs the
-  // player more than no worker.
-  const wedged = state.consecutiveTimeouts >= SHADER_WARM_TIMEOUT_BREAKER;
+  // once the holds it is about have paid their caps. A release falls through
+  // on purpose: it exempts the holds IT ends early, not the evidence this hold
+  // and the ones before it already left, so a third unanswered expiry that
+  // also trips a release still retires the worker as wedged.
+  if (judgeCannotServe() === 'retired') return;
+  // Two rules: a worker that answered nothing through three holds in a row
+  // is wedged; one that keeps answering someone while half the recent holds
+  // still expire is too slow for the demand, and either costs the player
+  // more than no worker.
+  const wedged = state.consecutiveUnanswered >= SHADER_WARM_TIMEOUT_BREAKER;
   const tooSlow = state.holds.expired() >= SHADER_WARM_EXPIRED_SHARE_BREAKER;
   if ((wedged || tooSlow) && state.workerState !== 'dead') {
-    // Named per rule: a capture must say which one fired (a worker that
-    // answered nothing, or one that answered someone while the holds paid the
+    // Named per rule, and for the wedged rule by how THIS hold ended (the
+    // streak requires it to be unanswered, so it is the last of them): a
+    // capture must say which one fired (a worker that answered nothing while
+    // the holds paid their cap, one that answered nothing while they paid its
+    // own deadline, or one that answered someone while the holds paid the
     // cap), since the fixes differ.
-    retireForCause('dead', wedged ? 'hold-timeouts:wedged' : 'hold-timeouts:expired-share');
+    const cause = wedged
+      ? timedOut
+        ? 'hold-timeouts:wedged'
+        : 'hold-failures:wedged'
+      : 'hold-timeouts:expired-share';
+    retireForCause('dead', cause);
     retireWorker();
   }
 }
@@ -615,7 +878,9 @@ export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: num
  *  the readout names the extension that did it, which is also the fix (add it
  *  to RENDERER_CONTEXT_EXTENSIONS so both contexts enable it up front). */
 export function noteShaderWarmExtensionDrift(name: string): void {
-  if (state.workerState === 'dead') return;
+  // The off arm never ran a worker: there is nothing to retire, and the arm
+  // token must survive to the report that carries it.
+  if (state.workerState === 'dead' || state.abArm === 'off') return;
   retireForCause('dead', `extension-drift:${name}`);
   retireWorker();
 }
@@ -639,6 +904,7 @@ function syncWorkerPause(): void {
 
 /** One frame's duration, from the perf monitor: the pause signal. */
 export function noteShaderWarmFrameMs(frameMs: number): void {
+  if (retireIfSilentWhileStandingDown()) return;
   if (noteShaderWarmFrame(state.pause, frameMs)) syncWorkerPause();
 }
 
@@ -648,13 +914,20 @@ export function noteShaderWarmFrameMs(frameMs: number): void {
  *  from the dead one's outcomes. The player's setting and `armed` outlive it. */
 function retireAndForgetWorker(): void {
   retireWorker();
+  state.carriedHoldWallMs += state.outstanding.wallMs(clock());
+  state.carriedReleases += state.releases;
   state.workerState = 'idle';
   state.refusal = null;
   state.retiredCause = null;
   state.adapter = '';
   state.workerStats = null;
-  state.consecutiveTimeouts = 0;
+  state.consecutiveUnanswered = 0;
   state.lastWarmedAtMs = Number.NEGATIVE_INFINITY;
+  state.lastDeadlineAtMs = Number.NEGATIVE_INFINITY;
+  state.releases = 0;
+  state.standingDown = false;
+  state.standingDownSinceMs = Number.NEGATIVE_INFINITY;
+  state.lastWorkerMessageAtMs = Number.NEGATIVE_INFINITY;
   state.holds = createShaderWarmHoldRing();
   state.outstanding = createShaderWarmOutstandingHolds();
   state.requests = createShaderWarmRequests();
@@ -673,7 +946,7 @@ export function noteShaderWarmSettingChanged(): void {
   const setting = readShaderWarmSetting(state.search, storedSettingSource());
   if (setting === state.setting) return;
   state.setting = setting;
-  state.mode = shaderWarmModeFor(setting, state.backend, state.platform);
+  resolveMode();
   if (state.mode !== 'off') return;
   const cause = state.retiredCause;
   retireAndForgetWorker();
@@ -686,6 +959,7 @@ export function noteShaderWarmSettingChanged(): void {
     state.retiredCause = cause;
     return;
   }
+  if (state.abArm === 'off') state.refusal = SHADER_WARM_AB_REFUSAL;
   if (state.platform === 'ios' && setting !== 'off') state.refusal = 'ios-webkit';
 }
 
@@ -696,8 +970,8 @@ export function disposeShaderWarm(): void {
   // The next renderer's context decides the backend again (a rebuild can
   // land on another backend, software included).
   state.backend = null;
-  state.mode = shaderWarmModeFor(state.setting, null, state.platform);
   retireAndForgetWorker();
+  resolveMode();
   state.armed = false;
 }
 
@@ -713,16 +987,44 @@ export function shaderWarmSnapshot(): ShaderWarmSnapshot {
     adapter: state.adapter,
     paused: state.pause.paused,
     frameEmaMs: state.pause.emaMs,
+    holdWallMs: state.carriedHoldWallMs + state.outstanding.wallMs(clock()),
+    releases: state.carriedReleases + state.releases,
+    standingDown: state.standingDown,
+    // Between a renderer's dispose and the next context read the backend is
+    // unknown and no draw applies; the page's arm still names the session.
+    abArm:
+      state.abArm ??
+      (state.setting === 'auto' && (state.backend === null || state.backend === 'unknown')
+        ? state.pageArm
+        : null),
     workerStats: state.workerStats ? { ...state.workerStats } : null,
   };
 }
 
 export function resetShaderWarmForTest(deps: ShaderWarmClientDeps = {}): void {
   disposeShaderWarm();
+  state.carriedHoldWallMs = 0;
+  state.carriedReleases = 0;
+  state.pageArm = null;
   state.pause = createShaderWarmPauseState();
   state.spawn = null;
   state.schedule = null;
   state.now = null;
   state.pagehideHooked = false;
-  configureShaderWarm({ search: '', mobile: false, platform: 'other', ...deps });
+  // Tests get a profile store of their own and the `on` arm unless they ask:
+  // a suite must never share a real storage slot, nor draw at random.
+  let testArm: string | null = null;
+  configureShaderWarm({
+    search: '',
+    mobile: false,
+    platform: 'other',
+    abStore: {
+      get: () => testArm,
+      set: (value) => {
+        testArm = value;
+      },
+    },
+    random: () => 0.75,
+    ...deps,
+  });
 }

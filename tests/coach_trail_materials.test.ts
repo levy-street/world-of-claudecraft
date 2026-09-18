@@ -144,7 +144,7 @@ describe('coach trail materials', () => {
   it('the renderer hands the guidance its compile gate (source pin)', () => {
     const renderer = read('src/render/renderer.ts');
     expect(renderer).toContain(
-      'new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t))',
+      'new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t), options.isQuestTracked, options.isEastbrookGuidanceEnabled)',
     );
   });
 });

@@ -4,6 +4,7 @@
 // it. Keeping ONE classifier avoids the drift where the HUD treated silence/disarm/
 // blind/etc. as debuffs but /targetbuffs (a narrower set) tagged them as buffs.
 import { isUnbreakableControlAura } from './combat/cc';
+import { isPersistentEngineAura } from './persistent_aura';
 import type { Aura, AuraKind } from './types';
 
 // A kind that is harmful by nature regardless of its value. Mirrors classic-era
@@ -125,6 +126,58 @@ export function isDispellableAura(
   if (aura.school === 'physical') return false;
   const harmful = isDebuffAura(aura.kind, aura.value);
   return offensive ? !harmful : harmful;
+}
+
+// Auras that read as a MODE rather than a timed effect: the forms, the stances,
+// stealth, Ghost Wolf, and the battleground carried-flag buff. The sim backs each
+// with a long finite duration (3600s, or a whole match) that is SCAFFOLDING, not
+// information, so no surface may print a countdown for one: the buff bar suppresses
+// its remaining-time label and the aura overlay suppresses its timer ring.
+//
+// This lives here, beside the debuff classifier, for the same stated reason: one
+// classifier so the surfaces cannot drift. They did drift once already, which is how
+// a watched Battle Stance came to show a 3,599 countdown on the overlay while the
+// buff bar showed none for the same aura.
+export const TOGGLE_AURA_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([
+  'stealth',
+  'form_bear',
+  'form_cat',
+  'form_moonkin',
+  'form_shadow',
+  'form_travel',
+  'form_fireball',
+  'battle_stance',
+  'berserker_stance',
+  'defensive_stance',
+]);
+
+// Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
+// Sprint also uses, 15s and very much worth a countdown), so it toggles by id. The
+// carried-flag buff is a MODE for the same reason: you have the flag until you do
+// not, and its duration only outlasts any match so nothing can expire it out from
+// under the carry. Beacon of Light is the paladin's maintained link: it persists
+// until it is moved to another target, so a countdown under it would read as
+// "this is about to leave me" for a bond that never expires on its own.
+export const TOGGLE_AURA_IDS: ReadonlySet<string> = new Set([
+  'ghost_wolf',
+  'beacon_of_light',
+  'bg_carried_flag',
+]);
+
+// The inverse override: an aura that rides a TOGGLE kind but is a genuine timed buff
+// worth a countdown. Greater Invisibility reuses the rogue-stealth machinery for its
+// vanish (kind 'stealth' with full move speed) but is a fixed 20s buff.
+export const TIMED_AURA_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
+
+/** Whether this aura reads as a MODE rather than a timed effect, so no surface
+ *  prints a remaining time for it. The persistent-engine term keeps the
+ *  never-expiring engine auras (src/sim/persistent_aura.ts) in the same band as
+ *  the authored toggles: both are states, not countdowns. */
+export function isToggleAura(kind: AuraKind, id: string): boolean {
+  return (
+    (TOGGLE_AURA_KINDS.has(kind) || TOGGLE_AURA_IDS.has(id) || isPersistentEngineAura(id)) &&
+    !TIMED_AURA_IDS.has(id)
+  );
 }
 
 const PARTY_FRAME_HELPFUL_KINDS: ReadonlySet<AuraKind> = new Set<AuraKind>([

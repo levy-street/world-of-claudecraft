@@ -14,13 +14,13 @@ import {
   STORE_BUY_CLAUDIUM_SELECTOR,
   type StoreBodyActions,
 } from '../src/ui/store_body_actions';
-import { STORE_MOUNT_BUY_ATTR } from '../src/ui/store_mount_card_view';
+import { STORE_MOUNT_INSPECT_ATTR } from '../src/ui/store_mount_card_view';
 
 function actions(): { [K in keyof StoreBodyActions]: ReturnType<typeof vi.fn> } {
   return {
     buyClaudium: vi.fn(),
     inspectArmorySkin: vi.fn(),
-    buyStoreMount: vi.fn(),
+    inspectStoreMount: vi.fn(),
     buyCharter: vi.fn(),
   };
 }
@@ -43,18 +43,18 @@ describe('bindStoreBodyActions', () => {
       body(
         `<button type="button" data-buy-claudium>top up</button>` +
           `<button type="button" ${ARMORY_SKIN_ATTR}="guildmark_arming_sword">skin</button>` +
-          `<button type="button" ${STORE_MOUNT_BUY_ATTR}="mech_bird">mount</button>` +
+          `<button type="button" ${STORE_MOUNT_INSPECT_ATTR}="mech_bird">mount</button>` +
           `<button type="button" ${CHARTER_BUY_ATTR}="storage_charter_small">charter</button>`,
       ),
       a as unknown as StoreBodyActions,
     );
     click(STORE_BUY_CLAUDIUM_SELECTOR);
     click(`[${ARMORY_SKIN_ATTR}]`);
-    click(`[${STORE_MOUNT_BUY_ATTR}]`);
+    click(`[${STORE_MOUNT_INSPECT_ATTR}]`);
     click(`[${CHARTER_BUY_ATTR}]`);
     expect(a.buyClaudium).toHaveBeenCalledTimes(1);
     expect(a.inspectArmorySkin).toHaveBeenCalledWith('guildmark_arming_sword');
-    expect(a.buyStoreMount).toHaveBeenCalledWith('mech_bird');
+    expect(a.inspectStoreMount).toHaveBeenCalledWith('mech_bird');
     expect(a.buyCharter).toHaveBeenCalledWith('storage_charter_small');
   });
 
@@ -62,14 +62,14 @@ describe('bindStoreBodyActions', () => {
     const a = actions();
     bindStoreBodyActions(
       body(
-        `<button type="button" id="m1" ${STORE_MOUNT_BUY_ATTR}="reins_a">a</button>` +
-          `<button type="button" id="m2" ${STORE_MOUNT_BUY_ATTR}="reins_b">b</button>`,
+        `<button type="button" id="m1" ${STORE_MOUNT_INSPECT_ATTR}="reins_a">a</button>` +
+          `<button type="button" id="m2" ${STORE_MOUNT_INSPECT_ATTR}="reins_b">b</button>`,
       ),
       a as unknown as StoreBodyActions,
     );
     click('#m2');
     click('#m1');
-    expect(a.buyStoreMount.mock.calls).toEqual([['reins_b'], ['reins_a']]);
+    expect(a.inspectStoreMount.mock.calls).toEqual([['reins_b'], ['reins_a']]);
   });
 
   it('passes an empty id for an attribute the markup left empty, and binds nothing absent', () => {
@@ -82,6 +82,6 @@ describe('bindStoreBodyActions', () => {
     expect(a.buyCharter).toHaveBeenCalledWith('');
     expect(a.buyClaudium).not.toHaveBeenCalled();
     expect(a.inspectArmorySkin).not.toHaveBeenCalled();
-    expect(a.buyStoreMount).not.toHaveBeenCalled();
+    expect(a.inspectStoreMount).not.toHaveBeenCalled();
   });
 });

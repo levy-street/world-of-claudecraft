@@ -1,3 +1,5 @@
+import { apiUrl } from './client_origin';
+
 const STORAGE_KEY = 'woc_site_visitor_id';
 const HEARTBEAT_MS = 45_000;
 
@@ -35,7 +37,7 @@ export function startSitePresence(fallbackPage = 'home'): void {
   const id = visitorId();
   const send = () => {
     if (document.visibilityState === 'hidden') return;
-    void fetch('/api/site-presence', {
+    void fetch(apiUrl('/api/site-presence'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visitorId: id, page: pageName(fallbackPage) }),

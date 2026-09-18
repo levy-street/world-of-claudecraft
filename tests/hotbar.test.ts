@@ -281,7 +281,7 @@ describe('hotbar action placement', () => {
     expect(next[targetIndex]).toEqual({ type: 'ability', id: 'ice_barrier' });
     expect(next).not.toContain(displacedAbility);
     expect(occupied).toHaveLength(barSlots);
-    expect(new Set(occupied.map((action) => action!.id)).size).toBe(occupied.length);
+    expect(new Set(occupied.map((action) => action?.id)).size).toBe(occupied.length);
     expect(slots).toEqual(mageAbilities.slice(0, barSlots).map((id) => ({ type: 'ability', id })));
   });
 });
@@ -522,6 +522,76 @@ describe('hotbar slot sync', () => {
       { type: 'ability', id: 'blink' },
     ]);
     expect(synced.changed).toBe(true);
+  });
+
+  it('replaces an unlearned talent choice ability in-place with its newly learned sibling', () => {
+    // Player has power_echo in slot 3. Slot 1 is empty (null).
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      null,
+      { type: 'ability' as const, id: 'frost_armor' },
+      { type: 'ability' as const, id: 'power_echo' },
+      null,
+    ];
+    // Player switches from power_echo to overload (same choice row).
+    const known = ['fireball', 'frost_armor', 'overload'];
+    const autoPlace = new Set(['overload']);
+    const choiceGroups = [['power_echo', 'overload', 'presence_of_mind']];
+
+    const synced = syncHotbarActions(slots, known, autoPlace, () => false, choiceGroups);
+
+    // overload must take slot 3 (where power_echo was), NOT slot 1 (the first null)
+    expect(synced.actions).toEqual([
+      { type: 'ability', id: 'fireball' },
+      null,
+      { type: 'ability', id: 'frost_armor' },
+      { type: 'ability', id: 'overload' },
+      null,
+    ]);
+    expect(synced.changed).toBe(true);
+  });
+
+  it('handles multiple simultaneous talent choice swaps in their respective slots', () => {
+    const slots = [
+      null,
+      { type: 'ability' as const, id: 'power_echo' },
+      null,
+      { type: 'ability' as const, id: 'cold_snap' },
+    ];
+    const known = ['overload', 'mass_barrier'];
+    const autoPlace = new Set(['overload', 'mass_barrier']);
+    const choiceGroups = [
+      ['power_echo', 'overload', 'presence_of_mind'],
+      ['cold_snap', 'mass_barrier'],
+    ];
+
+    const synced = syncHotbarActions(slots, known, autoPlace, () => false, choiceGroups);
+
+    expect(synced.actions).toEqual([
+      null,
+      { type: 'ability', id: 'overload' },
+      null,
+      { type: 'ability', id: 'mass_barrier' },
+    ]);
+  });
+
+  it('falls back to indexOf(null) when a newly learned ability has no vacated sibling slot', () => {
+    const slots = [
+      { type: 'ability' as const, id: 'fireball' },
+      null,
+      { type: 'ability' as const, id: 'frost_armor' },
+    ];
+    const known = ['fireball', 'frost_armor', 'overload'];
+    const autoPlace = new Set(['overload']);
+    const choiceGroups = [['power_echo', 'overload', 'presence_of_mind']];
+
+    const synced = syncHotbarActions(slots, known, autoPlace, () => false, choiceGroups);
+
+    expect(synced.actions).toEqual([
+      { type: 'ability', id: 'fireball' },
+      { type: 'ability', id: 'overload' },
+      { type: 'ability', id: 'frost_armor' },
+    ]);
   });
 });
 

@@ -6,7 +6,9 @@ import { describe, expect, it } from 'vitest';
 import {
   AETHER_DARTS_FULL_CHARGE_MISSILES,
   AETHER_SURGE_MAX_CHARGES,
+  ARCANE_SURGE_ID,
   aetherSurgeStacks,
+  PERFECT_MOMENT_DARTS_DAMAGE_MULT,
   PERFECT_MOMENT_DURATION,
   PERFECT_MOMENT_ID,
 } from '../src/sim/combat/chronomancy';
@@ -19,7 +21,12 @@ import {
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
+import type { SimContext } from '../src/sim/sim_context';
 import type { Entity, SimEvent } from '../src/sim/types';
+
+function ctxOf(sim: Sim): SimContext {
+  return (sim as unknown as { ctx: SimContext }).ctx;
+}
 
 function chronoMage(level = 20) {
   const sim = new Sim({ seed: 41, playerClass: 'mage', autoEquip: true });
@@ -133,5 +140,61 @@ describe('Perfect Moment window', () => {
     sim.castAbility('arcane_missiles');
     collect(sim, 4);
     expect(aetherSurgeStacks(p)).toBe(0);
+  });
+
+  it('increases Aether Darts damage by 20% while Perfect Moment is active', () => {
+    // 1. Fire Aether Darts at 4 charges WITHOUT Perfect Moment
+    const { sim: simNormal, p: pNormal } = chronoMage();
+    const mobNormal = addHostile(simNormal);
+    simNormal.targetEntity(mobNormal.id);
+    ctxOf(simNormal).applyAura(pNormal, {
+      id: ARCANE_SURGE_ID,
+      name: 'Aether Surge',
+      kind: 'arcane_charge',
+      value: AETHER_SURGE_MAX_CHARGES,
+      stacks: AETHER_SURGE_MAX_CHARGES,
+      duration: 10,
+      remaining: 10,
+      sourceId: pNormal.id,
+      school: 'arcane',
+    });
+    pNormal.gcdRemaining = 0;
+    pNormal.resource = pNormal.maxResource;
+    simNormal.castAbility('arcane_missiles');
+    const normalHits = collect(simNormal, 4).filter(
+      (e) => e.type === 'damage' && e.ability === 'Aether Darts',
+    ) as { amount: number; crit: boolean }[];
+    expect(normalHits).toHaveLength(AETHER_DARTS_FULL_CHARGE_MISSILES);
+
+    // 2. Fire Aether Darts WITH Perfect Moment
+    const { sim: simPM, p: pPM } = chronoMage();
+    const mobPM = addHostile(simPM);
+    simPM.targetEntity(mobPM.id);
+    simPM.castAbility('perfect_moment');
+    simPM.tick();
+    pPM.gcdRemaining = 0;
+    pPM.resource = pPM.maxResource;
+    simPM.castAbility('arcane_missiles');
+    const pmHits = collect(simPM, 4).filter(
+      (e) => e.type === 'damage' && e.ability === 'Aether Darts',
+    ) as { amount: number; crit: boolean }[];
+    expect(pmHits).toHaveLength(AETHER_DARTS_FULL_CHARGE_MISSILES);
+
+    // Non-crit and crit bolts are both buffed by exactly 20%
+    const normalNonCrit = normalHits.find((h) => !h.crit);
+    const pmNonCrit = pmHits.find((h) => !h.crit);
+    expect(normalNonCrit).toBeDefined();
+    expect(pmNonCrit).toBeDefined();
+    if (normalNonCrit && pmNonCrit) {
+      expect(pmNonCrit.amount).toBe(
+        Math.round(normalNonCrit.amount * PERFECT_MOMENT_DARTS_DAMAGE_MULT),
+      );
+    }
+
+    const normalCrit = normalHits.find((h) => h.crit);
+    const pmCrit = pmHits.find((h) => h.crit);
+    if (normalCrit && pmCrit) {
+      expect(pmCrit.amount).toBe(Math.round(normalCrit.amount * PERFECT_MOMENT_DARTS_DAMAGE_MULT));
+    }
   });
 });

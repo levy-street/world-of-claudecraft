@@ -139,6 +139,7 @@ function makeWindow(
     consumePeek: () => false,
     captureFocus: () => null,
     restoreFocus: () => {},
+    openWiki: () => {},
     itemIcon: () => '',
     moneyHtml: () => '',
     itemTooltip: () => '',
@@ -167,9 +168,10 @@ describe('ProfessionsWindow: hero band structure', () => {
     const hero = mustQuery(el, '.prof-hero');
     // Exact child pin: the hero band holds the identity section and the ring
     // stage, nothing else, in that order.
+    // Both surfaces now inherit their visual treatment from the shared card primitive.
     expect(
       [...hero.children].map((child) => `${child.tagName.toLowerCase()}.${child.className}`),
-    ).toEqual(['section.prof-identity', 'div.prof-ring-stage']);
+    ).toEqual(['section.prof-identity ui-card', 'div.prof-ring-stage ui-card']);
   });
 
   it('keeps the aria surface on the ring itself, never the stage wrapper', () => {
@@ -209,9 +211,10 @@ describe('ProfessionsWindow: craft row anatomy', () => {
         'prof-skill-value',
       ]);
       const chips = mustQuery(row, '.prof-craft-chips');
+      // Shared chips replace the legacy pill styling without changing row content.
       expect([...chips.children].map((child) => child.className)).toEqual([
-        'prof-role-badge',
-        'prof-ceiling',
+        'prof-role-badge ui-chip',
+        'prof-ceiling ui-chip',
       ]);
     }
   });

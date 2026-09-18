@@ -493,7 +493,10 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     expect(root.querySelector('[data-market-filter-menu="primaryStat"]')).toBeNull();
   });
 
-  it('keeps search and armor filters aligned in shared columns as the window narrows', () => {
+  it('stacks search and every armor filter in the browse sidebar at any window width', () => {
+    // The redesign moved the controls into a persistent flex-column sidebar beside the
+    // listing body, so the search box and the six filters share ONE column at every width
+    // instead of reflowing across a responsive grid.
     const root = openMarket();
     pickItemType(root, 'armor');
     const controls = req(root.querySelector<HTMLElement>('.mkt-controls'), 'market controls');
@@ -501,34 +504,31 @@ describe('keyboard-nav: the market filter listbox (dropdownKeyNav wiring)', () =
     const fields = Array.from(root.querySelectorAll<HTMLElement>('.mkt-filter'));
     // itemType, subtype (armorSlot), armorClass, primaryStat, rarity, sort (issue #3102).
     expect(fields).toHaveLength(6);
+    expect(getComputedStyle(controls).flexDirection).toBe('column');
 
     const layout = (width: number) => {
-      controls.style.width = `${width}px`;
-      const fieldRects = fields.map((field) => field.getBoundingClientRect());
-      const typeButton = req(
-        fields[0].querySelector<HTMLElement>('.mkt-select-btn'),
-        'item type filter button',
-      ).getBoundingClientRect();
+      root.style.width = `${width}px`;
       const searchRect = search.getBoundingClientRect();
+      const fieldRects = fields.map((field) => field.getBoundingClientRect());
       return {
-        columns: getComputedStyle(controls).gridTemplateColumns.split(' ').length,
-        fieldWidths: fieldRects.map((rect) => Math.round(rect.width)),
-        searchWidth: Math.round(searchRect.width),
+        widths: new Set([
+          Math.round(searchRect.width),
+          ...fieldRects.map((r) => Math.round(r.width)),
+        ]),
         searchBottom: Math.round(searchRect.bottom),
-        typeButtonBottom: Math.round(typeButton.bottom),
+        firstFieldTop: Math.round(fieldRects[0].top),
+        lastFieldTop: Math.round(fieldRects[fieldRects.length - 1].top),
       };
     };
 
-    // With an 8px column gap: (832 - 2 * 8) / 3 = 272, (596 - 8) / 2 = 294.
-    const wide = layout(832);
-    expect(wide.columns).toBe(3);
-    expect(new Set([...wide.fieldWidths, wide.searchWidth])).toEqual(new Set([272]));
-    expect(wide.searchBottom).toBe(wide.typeButtonBottom);
-
-    const compact = layout(596);
-    expect(compact.columns).toBe(2);
-    expect(new Set([...compact.fieldWidths, compact.searchWidth])).toEqual(new Set([294]));
-    expect(compact.searchBottom).toBe(compact.typeButtonBottom);
+    for (const width of [860, 596]) {
+      const at = layout(width);
+      // One shared column: every control is exactly as wide as the search box.
+      expect(at.widths.size).toBe(1);
+      // Search sits above the first filter, and the filters run downward in order.
+      expect(at.searchBottom).toBeLessThanOrEqual(at.firstFieldTop);
+      expect(at.lastFieldTop).toBeGreaterThan(at.firstFieldTop);
+    }
   });
 
   // Issue #2189: bags matched no item-type option at all, so this asserts the whole

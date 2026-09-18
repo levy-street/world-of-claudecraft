@@ -33,11 +33,11 @@ describe('quest log: landscape window + single-scroll detail pane', () => {
     expect(block).not.toContain('max-width: 70ch;');
   });
 
-  it('widens the quest list column to match the wider window', () => {
+  it('uses the approved 230px zone-group list column', () => {
     const start = css.indexOf('.ql-list {');
     expect(start).toBeGreaterThan(0);
     const block = css.slice(start, css.indexOf('}', start));
-    expect(block).toContain('width: 220px;');
+    expect(block).toContain('width: 230px;');
   });
 
   it('widens the later window-frame-phase #quest-log-window rule too (it cascades last and would otherwise win), without overriding the shared width clamp', () => {

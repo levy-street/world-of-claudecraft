@@ -7,6 +7,11 @@
 // per-angler transparent ring draw. Graphics-preset-identical on purpose: the
 // bobber and bite state are player-actionable feedback, so nothing here reads
 // GFX tiers or the frame-budget governor.
+//
+// Who is fishing comes from the renderer's per-view entity loop, which already
+// reads every drawn entity's cast each frame (noteAngler), so this module never
+// walks the roster itself: a frame with nobody fishing and no bobber afloat
+// touches no entity at all.
 import * as THREE from 'three';
 import { type Entity, FISHING_CAST_ID } from '../sim/types';
 import { type BobberAnchor, bobberAnchorInto } from './fishing_bobber_core';
@@ -19,6 +24,9 @@ const BITE_JITTER_AMPLITUDE = 0.09;
 const BITE_JITTER_SPEED = 14;
 const SPLASH_PERIOD = 0.55;
 const SINK_DURATION = 0.35;
+/** Far more anglers than a view set can hold: only a frame that skipped
+ *  update could ever reach it. */
+const MAX_NOTED_ANGLERS = 512;
 
 interface BobberInstance {
   group: THREE.Group;
@@ -27,6 +35,8 @@ interface BobberInstance {
   splashT: number;
   /** seconds left of the sink-out despawn; 0 while the cast is live */
   sinkT: number;
+  /** Noted as a live cast this frame; cleared by update. */
+  live: boolean;
 }
 
 let sharedBodyGeo: THREE.SphereGeometry | null = null;
@@ -47,6 +57,8 @@ const scratchAnchor: BobberAnchor = { x: 0, y: 0, z: 0 };
 export class FishingBobberVisual {
   private instances = new Map<number, BobberInstance>();
   private time = 0;
+  /** The entities the renderer saw casting the fishing sentinel this frame. */
+  private readonly anglers: number[] = [];
 
   constructor(
     private scene: THREE.Scene,
@@ -63,15 +75,24 @@ export class FishingBobberVisual {
     }
   }
 
+  /** Called once per frame per viewed entity whose cast is the fishing
+   *  sentinel; the next update drives that angler's bobber and drains the
+   *  list. Bounded so a frame that never reaches update cannot grow it. */
+  noteAngler(id: number): void {
+    if (this.anglers.length < MAX_NOTED_ANGLERS) this.anglers.push(id);
+  }
+
   update(dt: number, entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.time += dt;
-    for (const [id, e] of entities) {
-      if (e.dead || e.castingAbility !== FISHING_CAST_ID) continue;
+    for (const id of this.anglers) {
+      const e = entities.get(id);
+      if (!e || e.dead || e.castingAbility !== FISHING_CAST_ID) continue;
       let inst = this.instances.get(id);
       if (!inst) {
         inst = this.spawn(id);
         this.instances.set(id, inst);
       }
+      inst.live = true;
       inst.sinkT = 0;
       if (!bobberAnchorInto(scratchAnchor, e.pos.x, e.pos.z, e.facing, seed)) {
         inst.group.visible = false;
@@ -81,10 +102,11 @@ export class FishingBobberVisual {
       inst.group.position.set(scratchAnchor.x, scratchAnchor.y, scratchAnchor.z);
       this.animate(inst, dt);
     }
+    this.anglers.length = 0;
 
     for (const [id, inst] of this.instances) {
-      const e = entities.get(id);
-      const live = e !== undefined && !e.dead && e.castingAbility === FISHING_CAST_ID;
+      const live = inst.live;
+      inst.live = false;
       if (live) continue;
       if (inst.sinkT <= 0) {
         inst.sinkT = SINK_DURATION;
@@ -115,6 +137,7 @@ export class FishingBobberVisual {
       biting: false,
       splashT: 0,
       sinkT: 0,
+      live: false,
     };
   }
 

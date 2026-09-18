@@ -304,6 +304,50 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
   // the glyph instead of separating it. The halo needs to sit on the opposite
   // side of the panel's lightness from the text, so flip it light there.
   const textOutline = lightPanel ? '#ffffff' : '#000000';
+  // Library text roles (src/styles/library.css): the secondary shade leans the
+  // body text toward the muted knob, the faint shade leans the muted knob toward
+  // the panel; both are contrast-repaired against the panel and its edge so the
+  // light Parchment preset keeps them readable.
+  const textSecondary = ensureReadable(
+    ensureReadable(mixHex(text, textMuted, 0.18), panel, MIN_TEXT_CONTRAST),
+    panelEdge,
+    MIN_TEXT_CONTRAST,
+  );
+  const textFaint = ensureReadable(
+    ensureReadable(mixHex(textMuted, panel, 0.12), panel, MIN_TEXT_CONTRAST),
+    panelEdge,
+    MIN_TEXT_CONTRAST,
+  );
+  // The soft and strong panel fills are the standard panel gradient at the two
+  // other alphas the boards use (trackers and chat at rest; tooltips, inputs and
+  // confirm dialogs), the strong one pulled a step toward black.
+  // The lifted stops the library composes over the panel: the socket radial's
+  // highlight and the window head's upper stop. Dark panels lift toward a cool
+  // slate (the shipped #2c2c3a / #1c1c29 land exactly), light panels sink a step.
+  const socketHi = lightPanel ? mixHex(panel, '#000000', 0.08) : mixHex(panel, '#434355', 0.5);
+  const panelHi = lightPanel ? mixHex(panel, '#000000', 0.06) : mixHex(panel, '#232333', 0.5);
+  // The glint (inner edge highlight, badge edge, thumb) follows the accent so a
+  // blue preset does not carry a gold hairline; light panels darken it instead.
+  const glint = lightPanel ? mixHex(accent, '#000000', 0.15) : mixHex(accent, '#ffffff', 0.55);
+  // Window-resident control borders follow the border knob (DESIGN.md 4.1: a
+  // border on a themed surface is preset-aware); HUD sockets keep the static rim.
+  const controlBorder = mixHex(border, '#000000', 0.3);
+  // Info and warning are chat text on the boards: repaired to the text tier like
+  // --color-material-use, against the panel and its edge.
+  const info = ensureReadable(
+    ensureReadable('#45c9ff', panel, MIN_TEXT_CONTRAST),
+    panelEdge,
+    MIN_TEXT_CONTRAST,
+  );
+  const warning = ensureReadable(
+    ensureReadable('#ff9d32', panel, MIN_TEXT_CONTRAST),
+    panelEdge,
+    MIN_TEXT_CONTRAST,
+  );
+  const panelStrong = lightPanel ? mixHex(panel, '#ffffff', 0.3) : mixHex(panel, '#000000', 0.24);
+  const panelStrongEdge = lightPanel
+    ? mixHex(panelEdge, '#ffffff', 0.2)
+    : mixHex(panelEdge, '#000000', 0.25);
   return {
     '--gold': accent,
     '--gold-dim': accentDim,
@@ -317,9 +361,19 @@ export function themeCssVars(knobs: ThemeKnobs): Record<string, string> {
     '--panel-base': panel,
     '--panel-bg': `linear-gradient(170deg, ${rgba(panel, 0.95)} 0%, ${rgba(panelEdge, 0.95)} 60%, ${rgba(panelEdge, 0.95)} 100%)`,
     '--panel-edge': panelEdge,
+    '--panel-bg-soft': `linear-gradient(170deg, ${rgba(panel, 0.74)} 0%, ${rgba(panelEdge, 0.74)} 60%, ${rgba(panelEdge, 0.74)} 100%)`,
+    '--panel-bg-strong': `linear-gradient(170deg, ${rgba(panelStrong, 0.97)} 0%, ${rgba(panelStrongEdge, 0.97)} 100%)`,
     '--color-bg-dark': panelEdge,
     '--color-text-light': text,
     '--color-text-muted': textMuted,
+    '--color-text-secondary': textSecondary,
+    '--color-text-faint': textFaint,
+    '--color-info': info,
+    '--color-warning': warning,
+    '--color-socket-hi': socketHi,
+    '--color-panel-hi': panelHi,
+    '--color-glint': glint,
+    '--color-control-border': controlBorder,
     '--color-text-overlay': overlayText,
     '--color-quest-tag-text': questTagText,
     '--color-material-use': materialUseText,

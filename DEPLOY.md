@@ -401,6 +401,16 @@ For off-box safety, sync the directory to S3 occasionally:
   expansion or vault upgrade table joins the professions cap-raise class: the old
   binary clamps the raised value on load and persists the loss, so that release
   owes its own caveat here.
+- **Vault identity rows over the bag stack size (v0.43.0)**: the Materials Vault now
+  packs one row per material identity at the vault's own row size, so a row can hold
+  more than the 20-unit bag stack (four legacy rows of twenty fold into one row of
+  eighty on load). Rolling back to a build before this change keeps such a row intact
+  through the material exemption in `src/sim/material_slot_load.ts`, with one
+  exception: a row whose item id has since LEFT the material taxonomy, carrying a
+  mergeable payload and no source buckets, clips back to the bag stack size on the old
+  build's load (`instancedCountCap`) and persists the clipped count on its next save.
+  No shipped material id has left the taxonomy; if one does, roll back only after
+  splitting such rows, or accept that clip.
 - **Client/server deploy order for content releases**: deploy the SERVER first, then
   let clients update. Web and desktop bundles refresh on their next load. The iOS
   binary rides App Store review and cannot pick up a same-day bundle (LiveUpdates
@@ -824,7 +834,17 @@ For off-box safety, sync the directory to S3 occasionally:
   heavy-jank counts, frame p95 / fps / worst-10s / long-task / render-scale
   histograms, context losses, and perf-doctor suggestion counts, labeled only
   by fixed vocabularies (graphics tier, device class, GPU family, OS family,
-  scene class, suggestion id). The whole family follows the exporter's
+  scene class, suggestion id, and on the reports counter and the frame p95
+  histogram the host `runtime`: `web` or `desktop-shell`, the Electron
+  client, which no other label can tell from a Chrome tab; its SQL twin is the
+  `desktop_shell` column; adding the label changed those two families'
+  series identity, so a dashboard or rule matching their exact label set
+  needs `sum without (runtime)` or a `runtime` selector from that deploy on).
+  From the same deploy, `fps_avg` from browser sessions steps UP for a
+  measurement reason: the hidden-time ledger behind it now also discounts a
+  background tab, where it used to discount only a minimized desktop window;
+  `raw_summary.visibleSeconds` beside `seconds` is the discriminator, and its
+  absence means an older client. The whole family follows the exporter's
   zero-backfill design above: every counter cross product registers at zero and
   every histogram series is pre-seeded at boot (roughly 600 always-present
   samples), so the jank-share ratio reads 0% rather than "no data" for a
@@ -839,12 +859,33 @@ For off-box safety, sync the directory to S3 occasionally:
   the warm-up worker was alive on the reporting client, and
   `shader_warm_refusal` carries the cause when it was not (`none` when there is
   none, one `extension-drift` series for the whole family, `other` for a cause
-  this server's vocabulary does not know). Its cardinality is the two active
+  this server's vocabulary does not know). One value is NOT a refusal: `ab:off`
+  marks the `off` arm of the one-release D3D11 A/B experiment on the `auto`
+  setting (`shaderWarmAbArmFor` in `src/render/shader_warm_client_core.ts`), so a
+  refusal-share reading must exclude it while the experiment runs, or the d3d11
+  refusal share roughly doubles. Its cardinality is the two active
   values times that fixed vocabulary, pre-registered at zero like the rest of
   the family. The SQL drill-down is the two client_perf_reports columns behind
   it (`shader_warm_worker_active`, `shader_warm_refusal`, both bounded at
   ingest), plus `raw_summary.shaderWarm` for the per-session detail (mode,
-  setting, backend, and the warmed / held counts).
+  setting, backend, the warmed / held counts, the summed and wall hold time,
+  the cannot-serve releases, and `abArm`, the only field that names the `on`
+  arm). The `held` and `heldReleased` counts include holds a gate asked for
+  while the worker was standing down after a release, which were refused at
+  once and hid nothing. For D3D11 `auto` sessions `raw_summary.shaderWarm.mode`
+  also shifts during the experiment: the `off` arm resolves to `off`.
+  `raw_summary` itself is capped in bytes by a priority shed ladder
+  (`server/perf_report_shed.ts`): an oversized report loses its biggest,
+  least diagnostic blocks one rung at a time and records them under
+  `raw_summary.dropped`, so a key that is absent AND unlisted there was never
+  sent, and the small diagnostic keys (`windows`, `bootPhases`, `shaderWarm`,
+  `postRevealLinks`, `rendererDrawingBuffer`, `browser`) survive on every row.
+  `woc_client_raw_summary_shed_total{rung}` counts stored reports by the
+  deepest rung reached (`none` when the blob fit), the readout for "did a
+  client shape start blowing the cap" and for sizing a cap change. Size the
+  `client_perf_reports` retention on the cap times the report rate: since the
+  ladder, a stored row carries up to the whole cap where the old whole-blob
+  drop left most heavy rows at a few bytes.
 - **Multi-realm scraping**: one server process hosts exactly one realm, and no
   exported series carries a `realm` label (pinned by the exporter tests; the
   DB-backed business family filters on the realm in its queries instead). Give

@@ -1027,6 +1027,7 @@ const baseEnTable = {
   'aura.verdance': 'Verdance',
   'aura.lopingStride': 'Loping Stride',
   'aura.marrowbreak': 'Marrowbreak',
+  'aura.pin': 'Pin',
   // Coldsight's banked Fevered Draw opportunity (combat/hunter_coldsight_read.ts).
   'aura.coldsightRead': 'Coldsight Read',
   // Card Duel minigame (Card Master NPC, src/sim/social/card_duel.ts).
@@ -1900,6 +1901,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.nythraxisBound': 'Vinculado',
     'aura.matriarchsWard': 'Protección de la matriarca',
     'aura.marrowbreak': 'Quebrantamiento de médula',
+    'aura.pin': 'Sujeción',
     'aura.nythraxisDeathlessRageInterrupted': 'Rabia inmortal interrumpida',
     'aura.radiantResonance': 'Resonancia Radiante',
     'aura.nythraxisKingsWrath': 'La ira del rey',
@@ -2703,6 +2705,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
 
     'aura.lopingStride': 'Paso ligero',
     'aura.marrowbreak': 'Quebrantamiento de médula',
+    'aura.pin': 'Sujeción',
     'aura.matriarchsWard': 'Protección de la matriarca',
     'aura.moontide': 'Marea lunar',
     'aura.nythraxisBound': 'Vinculado',
@@ -3547,6 +3550,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarMoltenArmor': 'Armure en fusion',
     'aura.ignivarForgeChains': 'Chaînes de la Forge',
     'aura.marrowbreak': 'Brise-moelle',
+    'aura.pin': 'Clouage',
     'aura.ignivarLastInferno': 'Dernier enfer',
     'aura.moontide': 'Marée lunaire',
     'aura.nythraxisBound': 'Lié',
@@ -4414,6 +4418,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarSharedPyre': 'Bûcher partagé',
     'aura.lopingStride': 'Foulée bondissante',
     'aura.marrowbreak': 'Brise-moelle',
+    'aura.pin': 'Clouage',
     'aura.matriarchsWard': 'Protection de la matriarche',
     'aura.moontide': 'Marée lunaire',
     'aura.nythraxisBound': 'Lié',
@@ -5498,6 +5503,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.nythraxisDeathlessAscension': 'Ascensione immortale',
     'aura.moontide': 'Marea lunare',
     'aura.marrowbreak': 'Spaccamidollo',
+    'aura.pin': 'Bloccaggio',
     'aura.nythraxisCrownEndures': 'La Corona resiste',
     'aura.nythraxisDeathlessRageInterrupted': 'Rabbia Immortale Interrotta',
     'aura.riftCorrode': 'Corrosione',
@@ -6346,6 +6352,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.nythraxisBound': 'Gebunden',
     'aura.ignivarForgeChains': 'Ketten der Schmiede',
     'aura.marrowbreak': 'Markbruch',
+    'aura.pin': 'Festnageln',
     'aura.ignivarMoltenArmor': 'Geschmolzene Rüstung',
     'aura.ignivarBrandOfThePyre': 'Brandmal des Scheiterhaufens',
     'aura.nythraxisCrownEndures': 'Die Krone bleibt bestehen',
@@ -7241,6 +7248,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarSharedPyre': '共焚火堆',
     'aura.lopingStride': '疾跃步伐',
     'aura.marrowbreak': '裂骨',
+    'aura.pin': '钉制',
     'aura.matriarchsWard': '母巢守护',
     'aura.moontide': '月潮',
     'aura.nythraxisBound': '受缚',
@@ -7988,6 +7996,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarSharedPyre': '共焚火堆',
     'aura.lopingStride': '疾躍步伐',
     'aura.marrowbreak': '裂骨',
+    'aura.pin': '釘制',
     'aura.matriarchsWard': '母巢守護',
     'aura.moontide': '月潮',
     'aura.nythraxisBound': '受縛',
@@ -8749,6 +8758,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarSharedPyre': '공유 화장불',
     'aura.lopingStride': '질주 보폭',
     'aura.marrowbreak': '골수 파괴',
+    'aura.pin': '고정',
     'aura.matriarchsWard': '여족장의 수호',
     'aura.moontide': '달의 물결',
     'aura.nythraxisBound': '속박',
@@ -9545,6 +9555,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarSharedPyre': '共有の火葬の火',
     'aura.lopingStride': '疾駆の歩み',
     'aura.marrowbreak': '骨髄砕き',
+    'aura.pin': '押さえ込み',
     'aura.matriarchsWard': '女王母の守り',
     'aura.moontide': '月の潮',
     'aura.nythraxisBound': '拘束',
@@ -10268,6 +10279,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.nythraxisBound': 'Vinculado',
     'aura.ignivarLastInferno': 'Último Inferno',
     'aura.marrowbreak': 'Quebra de medula',
+    'aura.pin': 'Fixação',
     'aura.matriarchsWard': 'Proteção da Matriarca',
     'aura.ignivarMoltenArmor': 'Armadura fundida',
     'aura.ignivarBrandOfThePyre': 'Marca da Pira',
@@ -11185,6 +11197,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.ignivarSharedPyre': 'Общий костёр',
     'aura.lopingStride': 'Иноходь',
     'aura.marrowbreak': 'Разлом костного мозга',
+    'aura.pin': 'Пригвождение',
     'aura.matriarchsWard': 'Оберег матриарха',
     'aura.moontide': 'Лунный прилив',
     'aura.nythraxisBound': 'Скован',
@@ -13992,6 +14005,8 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Loping Stride': 'aura.lopingStride',
   'Coldsight Read': 'aura.coldsightRead',
   Marrowbreak: 'aura.marrowbreak',
+  // Pin, the Bruin Rush to Cat Form rider's slow (combat/druid_engines.ts).
+  Pin: 'aura.pin',
   // Bladed Gyre's armed echo buff (whirlwind's selfBuff auraName in
   // src/sim/content/classes.ts); shown on the buff bar and combat log.
   'Bladed Echo': 'aura.bladedEcho',
@@ -14353,9 +14368,23 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
   'Forbidden Reflection',
 ]);
 
+// Engine auras named after the ability that opened them: the Bruin Rush Pin
+// window and the Bruin Rush stun (combat/druid_engines.ts, the stun arm of
+// combat/effect_dispatch.ts) and the Lunge in-flight marker
+// (combat/druid_lunge.ts). Their aura ids are not ABILITIES keys, so the
+// HUD's ability-name fallback never fires for them; resolve the name to the
+// ability's localized name here so the buff bar and combat log never paint
+// raw English in a non-English locale.
+const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
+  'Bruin Rush': 'bear_charge',
+  Lunge: 'lunge',
+};
+
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
   if (key) return tSim(key);
+  const namedAbilityId = ABILITY_NAMED_AURA_IDS[name];
+  if (namedAbilityId) return tEntity({ kind: 'ability', id: namedAbilityId, field: 'name' });
   if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');
   if (name === 'Fate Threads') return t('hudChrome.warlock.fateThreadsLabel');
   if (name === 'Soul Fragments') return t('hudChrome.procOverlay.soulFragmentsMeter');

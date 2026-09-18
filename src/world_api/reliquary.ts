@@ -1,3 +1,5 @@
+import type { AccountEarner } from '../sim/account_ledger';
+
 // ---------------------------------------------------------------------------
 // The Reliquary: sparse first-find meta, authored marks, capped recent finds,
 // and pure completion reads for the SELF player. Ownership of item relics is
@@ -87,9 +89,20 @@ export interface IWorldReliquary {
    */
   reliquaryObtainCounts: Readonly<Record<string, number>>;
   /**
+   * The ACCOUNT ledger's relic half (src/sim/account_ledger.ts):
+   * accountRelicKey (`item:<id>`, `mark:<id>`, `mount:<key>`) -> every
+   * character on the account that found it, first finder first. The Reliquary
+   * is account-wide: a cell is owned when the character's own surface holds
+   * it OR this map does, and the cell names its finders. Offline the Sim's one
+   * player appends itself; online the ClientWorld mirrors the heavy-gated
+   * `acct` self key. Readonly across the seam.
+   */
+  reliquaryAccountFinds: ReadonlyMap<string, readonly AccountEarner[]>;
+  /**
    * Page progress X/Y for a catalog page id, or null when the id is not a
    * live page. Owned counts come from itemsDiscovered, marks, ownedMounts,
-   * account weapon skins, and deedsEarned (title relics).
+   * account weapon skins, and deedsEarned (title relics), each unioned with
+   * the account ledger (reliquaryAccountFinds / accountDeeds).
    */
   reliquaryPageCompletion(pageId: string): ReliquaryPageCompletion | null;
   /**

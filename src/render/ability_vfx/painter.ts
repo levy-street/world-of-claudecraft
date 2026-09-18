@@ -15,7 +15,9 @@ import {
   abilityHexColor,
   abilityVfxChargeStreams,
   abilityVfxColor,
+  claimsSelfCastVfx,
   localCasterTier,
+  ownsDotCompletionGesture,
   planCast,
   planImpact,
   wornCcBand,
@@ -553,16 +555,14 @@ export class AbilityVfx {
     if (ev.fx === 'selfCast') {
       const arch = full?.archetype ?? spec.a;
       const targeted = ev.targetId !== ev.sourceId;
-      const ceremonial =
-        arch === 'buff' || arch === 'summon' || arch === 'cc' || arch === 'heal' || !!full?.spirit;
-      const utility =
-        (targeted &&
-          (arch === 'strike' || arch === 'cc' || arch === 'burst' || arch === 'shout')) ||
-        // Untargeted shout/dash carry no victim to anchor a contact claim and
-        // no castFx of their own (heroic_leap, piercing_howl): selfCast is
-        // their only completion cue, same as the ceremonies above.
-        (!targeted && (arch === 'shout' || arch === 'dash'));
-      if (!full || !(utility || ceremonial)) return false;
+      if (!claimsSelfCastVfx(arch, targeted, !!full, !!full?.spirit)) {
+        // A listed pure-DoT completion (Rip on the cat rig) still owns its
+        // authored finisher; every other DoT keeps its no-gesture completion.
+        if (ownsDotCompletionGesture(arch, ev.ability)) {
+          this.playerGestureRelease(ev.sourceId, ev.ability);
+        }
+        return false;
+      }
     }
     const tier = this.castTier(ev.sourceId, ev.ability);
     const plan = planCast(spec, this.quality, tier);

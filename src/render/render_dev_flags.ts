@@ -27,12 +27,25 @@
 //                 to the draped ground-glow pools and the mob glow discs
 //   fardetail   - the far vista mesh's world-scale rock detail (far_terrain);
 //                 off returns the tiles to one flat baked colour per vertex
+//   fencells    - the Willowfen dressing's per-cell cull groups (fen_features);
+//                 off builds today's five whole meshes and one footprint on
+//                 any tier, the before arm of the scene census
+//   fencellgeo  - the per-cell geometry OBJECT the same cells carry (one
+//                 vertex-array binding per cell instead of one per family,
+//                 over the same attribute buffers); off shares the family's
+//                 geometry across its cells, which is the A/B arm for pricing
+//                 the binding on a driver whose vertex-state changes cost
+//                 more than three's attribute re-setup
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
 //   postshed    - the render budget's post shed (post_shed_core.ts): off
 //                 builds no FXAA grade twin and pins the governor's `post`
 //                 level at 1, so a bench reads the tier-static chain
+//   gathercoarse - the gather nodes' (zone, type) InstancedMesh key plus the
+//                  per-batch reach hide (gather_nodes.ts); off restores the
+//                  (zone, type, z-band) key with every batch drawn to the far
+//                  plane, the A/B arm for pricing the coarser key
 
 // Beside the ?<name>=off layer switches, knobs and modes with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split
@@ -67,6 +80,13 @@
 //                  screenshot reads a known rung instead of racing the
 //                  governor's cooldowns. The same parameter's `off` value is
 //                  the layer kill switch above.
+//   ?gputimer=1 - the GPU timer probe (gpu_timer_probe.ts): per-bracket GPU
+//                  time from EXT_disjoint_timer_query_webgl2 (shadow, scene,
+//                  and each composer pass) into perfStats().gpuTimer and the
+//                  ?perf overlay. Never on for players: the extension has a
+//                  per-query cost and is fingerprint-grade, and it joins the
+//                  context's enabled extension set, so a session under this
+//                  flag is not a warm-cache twin of one without it.
 
 /**
  * Sectors per axis each blade-grass pool splits its slot grid into. Four is
@@ -155,4 +175,14 @@ const postShedPin = ((): number | null => {
  *  otherwise not a number. */
 export function postShedLevelPin(): number | null {
   return postShedPin;
+}
+
+const gpuTimer = ((): boolean => {
+  if (typeof location === 'undefined') return false;
+  return new URLSearchParams(location.search).get('gputimer') === '1';
+})();
+
+/** True under `?gputimer=1`: run the GPU timer probe (dev only, never a player default). */
+export function gpuTimerRequested(): boolean {
+  return gpuTimer;
 }

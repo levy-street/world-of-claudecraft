@@ -37,10 +37,10 @@ export function dailyRewardsWalletCardHtml(
         : t('hudChrome.dailyRewards.walletPriceBody');
   const button =
     reason === 'no_wallet'
-      ? `<button type="button" class="lb-page-btn" data-wallet-connect>${esc(t('hudChrome.dailyRewards.walletConnectButton'))}</button>`
+      ? `<button type="button" class="lb-page-btn ui-btn" data-wallet-connect>${esc(t('hudChrome.dailyRewards.walletConnectButton'))}</button>`
       : '';
   return (
-    `<section class="dr-wallet-card">` +
+    `<section class="dr-wallet-card ui-card">` +
     `<h3>${esc(title)}</h3>` +
     `<p>${esc(body)}</p>` +
     button +

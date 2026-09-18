@@ -33,6 +33,13 @@ function placeOnGround(sim: Sim, pid: number, x: number, z: number) {
 function advanceTicks(sim: Sim, ticks: number) {
   for (let i = 0; i < ticks; i++) sim.tick();
 }
+// Every form shift now grants the baseline Loping Stride sprint (60% for 3 sec,
+// combat/druid_engines.ts); these cases measure the FORM's own speed, so the
+// burst is shed right after the shift the way a player 3 sec later feels it.
+function shedStride(sim: Sim, pid: number) {
+  const e = sim.entities.get(pid)!;
+  e.auras = e.auras.filter((a) => a.id !== 'loping_stride');
+}
 
 function castTravelForm(sim: Sim, pid: number) {
   const e = sim.entities.get(pid)!;
@@ -40,6 +47,7 @@ function castTravelForm(sim: Sim, pid: number) {
   e.resource = e.maxResource;
   sim.castAbility('travel_form', pid);
   sim.tick();
+  shedStride(sim, pid);
 }
 
 function horizontalTravel(sim: Sim, pid: number, ticks: number): number {
@@ -110,12 +118,13 @@ describe('druid spell pack — definitions', () => {
 describe('druid spell pack — level gating', () => {
   it('gates each pack spell at its learn level and teaches everything by 20', () => {
     // The choice-row unlock guard moved travel_form (11), bash (8), and rip (14)
-    // earlier so the rows that modify them are live at unlock, and the feral
-    // enablement pass moved pounce to 8 so Stalk has an early payoff; the rest
-    // of the pack still lands 16 to 20.
+    // earlier so the rows that modify them are live at unlock, the feral
+    // enablement pass moved pounce to 8 so Stalk has an early payoff, and the
+    // Cat Form mobility pass moved dash to 12 (docs/design/druid-cat-mobility.md);
+    // the rest of the pack still lands 16 to 20.
     const known15 = abilitiesKnownAt('druid', 15).map((k) => k.def.id);
     const stillLate = NEW_DRUID.filter(
-      (id) => !['travel_form', 'bash', 'rip', 'pounce'].includes(id),
+      (id) => !['travel_form', 'bash', 'rip', 'pounce', 'dash'].includes(id),
     );
     for (const id of stillLate) expect(known15).not.toContain(id);
     for (const id of NEW_DRUID) {
@@ -139,7 +148,7 @@ describe('druid spell pack — casting applies effects', () => {
     const a = sim.addPlayer('druid', 'Cat');
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Cat Form');
     // The giveForm shortcut leaves the pool mid-conversion (still mana), and
     // the next cast finishes the switch by refilling to max, which would mask
     // the surge. Settle the pool as energy FIRST, then the free cast plus 30
@@ -175,6 +184,7 @@ describe('druid spell pack — casting applies effects', () => {
     e.resource = 100;
     sim.castAbility('travel_form', a);
     sim.tick();
+    shedStride(sim, a);
     const form = e.auras.find((au) => au.kind === 'form_travel');
     expect(form, 'travel_form should apply a form_travel aura').toBeTruthy();
     expect(form!.value).toBeCloseTo(1.4);
@@ -197,6 +207,7 @@ describe('druid spell pack — casting applies effects', () => {
       if (withForm) {
         sim.castAbility('travel_form', a);
         sim.tick();
+        shedStride(sim, a);
       }
       const meta = (sim as any).players.get(a);
       meta.moveInput = {
@@ -221,7 +232,7 @@ describe('druid spell pack — casting applies effects', () => {
     expect(travel / base).toBeCloseTo(1.4, 1);
   });
 
-  it('Prowl actually moves the druid at half speed in Wolf Form', () => {
+  it('Prowl actually moves the druid at half speed in Cat Form', () => {
     const distanceOver = (withProwl: boolean): number => {
       const sim = makeWorld();
       const pid = sim.addPlayer('druid', withProwl ? 'Prowler' : 'Runner');
@@ -232,6 +243,7 @@ describe('druid spell pack — casting applies effects', () => {
       e.resource = e.maxResource;
       sim.castAbility('cat_form', pid);
       sim.tick();
+      shedStride(sim, pid);
       advanceTicks(sim, 40);
       if (withProwl) {
         e.resource = e.maxResource;
@@ -259,7 +271,7 @@ describe('druid spell pack — casting applies effects', () => {
     const base = distanceOver(false);
     const prowl = distanceOver(true);
     expect(base).toBeGreaterThan(0);
-    expect(prowl / base).toBeCloseTo(0.95, 1);
+    expect(prowl / base).toBeCloseTo(1, 1);
   });
 
   it('Travel Form toggles off cleanly, removing the form and the speed', () => {
@@ -270,10 +282,12 @@ describe('druid spell pack — casting applies effects', () => {
     e.resource = 100;
     sim.castAbility('travel_form', a);
     sim.tick();
+    shedStride(sim, a);
     expect(e.auras.some((au) => au.kind === 'form_travel')).toBe(true);
     for (let i = 0; i < 40; i++) sim.tick(); // wait out the GCD (forms are on-GCD)
     sim.castAbility('travel_form', a); // recast = shift out
     sim.tick();
+    shedStride(sim, a);
     expect(e.auras.some((au) => au.kind === 'form_travel')).toBe(false);
     expect((sim as any).moveSpeedMult(e)).toBeCloseTo(1);
   });
@@ -287,6 +301,7 @@ describe('druid spell pack — casting applies effects', () => {
     e.inCombat = true; // mid-fight
     sim.castAbility('travel_form', a);
     sim.tick();
+    shedStride(sim, a);
     expect(
       e.auras.some((au) => au.kind === 'form_travel'),
       'travel_form should shift even in combat',
@@ -380,6 +395,7 @@ describe('druid spell pack — casting applies effects', () => {
     e.resource = e.maxResource;
     sim.castAbility('cat_form', pid);
     sim.tick();
+    shedStride(sim, pid);
     expect(e.auras.some((a) => a.kind === 'form_cat')).toBe(true);
     advanceTicks(sim, 40);
 
@@ -387,12 +403,16 @@ describe('druid spell pack — casting applies effects', () => {
     sim.castAbility('prowl', pid);
     sim.tick();
     expect(e.auras.some((a) => a.id === 'prowl' && a.kind === 'stealth')).toBe(true);
-    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(0.95);
+    // Stalk moves at full speed (kit pass 2: stealth value 1.0) on top of the
+    // Cat Form passive (+15%, CAT_FORM_MOVE_MULT): 1.0 x 1.15. The tooltip's
+    // speed claim is relative to Cat Form, the form Stalk requires.
+    expect((sim as any).moveSpeedMult(e)).toBeCloseTo(1.15);
     advanceTicks(sim, 40);
 
     e.resource = e.maxResource;
     sim.castAbility('travel_form', pid);
     sim.tick();
+    shedStride(sim, pid);
 
     expect(e.auras.some((a) => a.kind === 'form_travel')).toBe(true);
     expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
@@ -404,7 +424,7 @@ describe('druid spell pack — casting applies effects', () => {
     const a = sim.addPlayer('druid', 'Dasher');
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Cat Form');
     e.resource = 100;
     sim.castAbility('dash', a);
     sim.tick();

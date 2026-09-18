@@ -19,9 +19,11 @@ import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS, NPCS } from '../src/sim/data';
 import {
   expectedStatBudget,
+  expectedStatTotal,
   itemLevel,
   primaryStatBudget,
   primaryStatSum,
+  statIdentity,
 } from '../src/sim/item_level';
 import { requiredLevelFor } from '../src/sim/item_level_req';
 import { craftSkillGainMultiplier } from '../src/sim/professions/archetype';
@@ -252,9 +254,14 @@ describe('engineering on-ramp: the gadget honors masterwrought R14 and R23', () 
     // drifted recipe.level cannot leave the hardcoded 16 telling a stale
     // story while the shipped item goes off-budget.
     expect(itemLevel(def)).toBe(16);
-    expect(expectedStatBudget(def)).toBe(5);
-    expect(primaryStatSum(def)).toBe(primaryStatBudget(16, 'uncommon', 'offhand'));
-    expect(primaryStatSum(def)).toBe(5);
+    // stamina baseline model: primaryStatBudget(16, 'uncommon', 'offhand')
+    // stays the LINE budget (5), unaffected by identity; copperlens_ocular is
+    // a caster identity (Intellect, no Strength/Agility), so its realized
+    // total is the line plus its free stamina baseline, 5 + 2 = 7.
+    const line = primaryStatBudget(16, 'uncommon', 'offhand');
+    expect(expectedStatBudget(def)).toBe(expectedStatTotal(line, statIdentity(def.stats)));
+    expect(primaryStatSum(def)).toBe(expectedStatBudget(def));
+    expect(primaryStatSum(def)).toBe(7);
     // Uncommon stays ungated (leveling greens are never level-gated); the
     // derived consequence of the quality assertion above, kept as an
     // explicit read of the live gate.

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { freshAccountLedger } from '../src/sim/account_ledger';
 import { bagCapacity } from '../src/sim/bags';
 import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
@@ -232,6 +233,8 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
         reliquary: freshReliquaryState(),
         deedStats: { itemsDiscovered: new Set<string>() },
         deedsEarned: new Map<string, string>(),
+        // The mark path appends the finder to the account ledger.
+        accountLedger: freshAccountLedger(),
       } as unknown as PlayerMeta;
       players.set(pid, meta);
       entities.set(pid, { pos: { x, y: 0, z } });

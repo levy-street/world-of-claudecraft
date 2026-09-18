@@ -219,13 +219,15 @@ describe('woc_market_chrome: the standing banners', () => {
   it('the wallet card is the Claudium card: title, state sentence, one action button', () => {
     const html = wocMarketBannersHtml({ paused: false, wallet: view(null, null) });
     expect(html).toContain('<div class="wm-strip">');
-    expect(html).toContain('class="wm-banner wm-banner-wallet" data-wallet-kind="unlinked"');
+    expect(html).toContain(
+      'class="wm-banner wm-banner-wallet ui-card" data-wallet-kind="unlinked"',
+    );
     expect(html).toContain(`<strong>${t('hudChrome.wocStore.wallet.title')}</strong>`);
     expect(html).toContain(`<p>${t('hudChrome.wocStore.wallet.unlinked')}</p>`);
     // The button keeps the window's connect-wallet click action and its focus
     // key, so the existing handler arm and the focus-restore ladder both reach it.
     expect(html).toContain(
-      `<button type="button" data-action="connect-wallet" data-focus-key="wm-connect-wallet">${t(
+      `<button type="button" class="ui-btn" data-action="connect-wallet" data-focus-key="wm-connect-wallet">${t(
         'hudChrome.wocStore.wallet.connect',
       )}</button>`,
     );
@@ -278,7 +280,7 @@ describe('woc_market_chrome: the standing banners', () => {
     expect(html).toContain('15,625 $WOC');
     expect(html).toContain('$2.00 USD');
     expect(html.indexOf('wm-wallet-balance')).toBeLessThan(
-      html.indexOf('button type="button" data-action="connect-wallet"'),
+      html.indexOf('button type="button" class="ui-btn" data-action="connect-wallet"'),
     );
   });
 

@@ -30,6 +30,15 @@ const RETIRED_IDS = [
 
 type RetiredId = (typeof RETIRED_IDS)[number];
 
+// The frozen v0.24.2 identity is the id, name, kind, slot, armor type and armor
+// value: a player still wearing one of these four must keep resolving to the
+// same piece of gear. The stat LINE is not part of that freeze, and follows the
+// stamina baseline model (src/sim/item_budget.ts) like every other item, so a
+// caster wearing a retired piece is not the one caster left without stamina.
+// deathless_warguard_legmail and scourgehide_carapace are physical (str/agi, no
+// int/spi) and keep their baseline inside the line, unchanged; soulforged_warplate
+// and soulrend_diadem are caster (int/spi, no str/agi) and carry their free
+// baseline on top (docs/design/gear-stamina-baseline-2026-09-10.md).
 const EXPECTED_RETIRED_ITEMS: Record<RetiredId, ItemDef> = {
   deathless_warguard_legmail: {
     id: 'deathless_warguard_legmail',
@@ -63,7 +72,7 @@ const EXPECTED_RETIRED_ITEMS: Record<RetiredId, ItemDef> = {
     slot: 'chest',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 335, int: 12, spi: 10 },
+    stats: { armor: 335, int: 12, spi: 10, sta: 7 },
     sellValue: 14_000,
     requiredClass: ['paladin', 'shaman'],
   },
@@ -75,7 +84,7 @@ const EXPECTED_RETIRED_ITEMS: Record<RetiredId, ItemDef> = {
     slot: 'helmet',
     quality: 'epic',
     requiredLevel: 20,
-    stats: { armor: 76, int: 10, spi: 8 },
+    stats: { armor: 76, int: 10, spi: 8, sta: 6 },
     sellValue: 12_000,
     requiredClass: ['mage', 'priest', 'warlock', 'druid'],
   },

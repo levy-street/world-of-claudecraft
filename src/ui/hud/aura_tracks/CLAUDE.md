@@ -25,6 +25,25 @@ classifiers rather than each keeping a list.
   a rule change has to be argued rather than absorbed. New content needs no edit
   here. A spell the rules cannot see gets a row in `EXCLUDED_IDS` or `FORCED`
   **with the reason written down**.
+- **A bespoke effect type gets a row in `BESPOKE_EFFECT_AURAS`, naming the aura it
+  lands.** The derivation reads the effect's TYPE for heals and absorbs and its
+  `kind` for everything else, so content that authors NEITHER falls through both
+  halves and joins no track, silently. That is not hypothetical: it took out four
+  Chronomancy spells at once (Temporal Echo and its Cascade group mark, Hourglass
+  of Suspension, Temporal Acceleration, Perfect Moment), and the spec's buffs were
+  invisible with nothing red. A row always names the KIND the aura lands under, so
+  the ordinary rules then classify it like any other spell instead of growing a
+  second derivation. It names the ID too whenever the sim module applies a FIXED
+  one whichever ability cast the effect (`temporal_echo`, `temporal_hourglass`,
+  `perfect_moment`): that is the only way to avoid minting a key no live aura can
+  carry. `auraId: null` is for the effects that genuinely take the ordinary rule,
+  which today is `aoeAllyHaste` alone (`applyGroupHaste` writes the aura under the
+  casting ability's id). `duration` is there only for an effect whose content
+  record authors none, and it IMPORTS the sim's constant rather than copying the
+  number. `groupWide` marks a cast that lands an identical copy on every group
+  member, so only the caster's copy takes a row. Prefer this table to `FORCED`,
+  which skips the ceiling and the mode test and reads the ability's first effect
+  for its metadata.
 - **Keys are the ids the SIM applies, not ability ids.** An effect can name its
   own `auraId` (Raised Guard lands as `raised_guard_dr`, Hallowed Wall's shield
   as `holy_shield_absorb`), a second self-buff is kind-suffixed, an absorb beside
@@ -36,9 +55,17 @@ classifiers rather than each keeping a list.
 - **`AURA_TRACK_DURATION_CEILING_SEC = 60` is what keeps the long buffs out.**
   Everything shown is 60s or less; the next longest helpful buff is 600s, then
   1800s and 3600s, so the cutoff sits in a 10x gap and nothing is borderline.
-- **Never a second classifier.** Ownership comes from `isOwnAura`
-  (`src/sim/aura_classify.ts`), the toggle test from `isToggleAuraKind` and the
-  final seconds from `isAuraExpiring` (both `src/ui/auras_view.ts`). The catalog
+- **The catalog is keyed by aura id alone, so the LIVE kind decides polarity.**
+  One id can carry both: Hourglass of Suspension applies `stasis` to the caster or
+  a group ally and `incapacitate` to an enemy under the same id. Admitting it by
+  id put "Hourglass of Suspension on Forest Wolf" in the Friendly track, reading
+  as a heal the mage was maintaining on a mob. `aura_track_view.ts` therefore asks
+  the shared harm classifier before it accepts a row; this family is the helpful
+  side, and the enemy side is `src/ui/hud/target_dots/`.
+- **Never a second classifier.** Ownership comes from `isOwnAura` and harm from
+  `isDebuffDisplayAura` (both `src/sim/aura_classify.ts`), the toggle test from
+  `isToggleAuraKind` and the final seconds from `isAuraExpiring` (both
+  `src/ui/auras_view.ts`). The catalog
   admits a long-duration aura past the ceiling ONLY when `isToggleAuraKind` calls
   it a toggle, and that same answer is its row shape, so a catalog mode is always
   painted as a mode. A first cut had its own "long utility kind" rule and painted

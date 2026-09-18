@@ -226,7 +226,7 @@ export class ChatGeometryController {
     // body.interface-unlocked, so the locked HUD gains no tab stop.
     const moveBtn = this.deps.document.createElement('button');
     moveBtn.type = 'button';
-    moveBtn.className = 'tf-move-btn chat-move-btn';
+    moveBtn.className = 'tf-move-btn chat-move-btn ui-disc';
     moveBtn.setAttribute('aria-label', t('hudChrome.chatWindow.move'));
     moveBtn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
     moveBtn.addEventListener('keydown', (event) => this.onKeyMove(event, wrap, tabs));

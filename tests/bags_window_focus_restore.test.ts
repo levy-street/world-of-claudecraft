@@ -63,7 +63,7 @@ function harness(inventory: InvSlot[]): { root: HTMLElement; w: BagsWindow; inv:
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
     isTouchHud: () => false,
-    confirmVendorSell: () => true,
+    sellConfirmPolicy: () => ({ enabled: true, minQualityRank: 1 }),
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     isGuildBankTab: () => false,

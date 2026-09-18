@@ -28,8 +28,8 @@ export function raidLockoutPanelHtml(
           .map(
             (l) =>
               `<div class="rl-row"><span class="rl-name">${esc(i18n.raidName(l.id))}</span>` +
-              `<span class="rl-time">${esc(i18n.duration(l.msRemaining))}</span></div>`,
+              `<span class="rl-time ui-num">${esc(i18n.duration(l.msRemaining))}</span></div>`,
           )
           .join('');
-  return `<div class="tt-title rl-panel-title">${esc(i18n.title)}</div>${body}`;
+  return `<div class="tt-title rl-panel-title ui-cin">${esc(i18n.title)}</div>${body}`;
 }

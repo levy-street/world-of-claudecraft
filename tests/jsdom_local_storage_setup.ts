@@ -8,7 +8,9 @@
 // in every DOM-environment test. Replace them with a small in-memory
 // Storage-compatible polyfill whenever that happens, so tests get a real
 // localStorage/sessionStorage regardless of the Node version running them.
-// Setup is a no-op on pure Node environment files (no `window`).
+// Storage setup is a no-op on pure Node environment files (no `window`). The
+// ProgressEvent shim is global because Three's FileLoader may instantiate it
+// from a Node-environment test before jsdom exists.
 
 function isUsableStorage(storage: unknown): storage is Storage {
   return (
@@ -50,7 +52,38 @@ function ensureUsable(key: 'localStorage' | 'sessionStorage'): void {
   }
 }
 
+const MemoryProgressEvent =
+  globalThis.ProgressEvent ??
+  class extends Event implements ProgressEvent {
+    readonly lengthComputable: boolean;
+    readonly loaded: number;
+    readonly total: number;
+
+    constructor(type: string, init: ProgressEventInit = {}) {
+      super(type, init);
+      this.lengthComputable = init.lengthComputable ?? false;
+      this.loaded = init.loaded ?? 0;
+      this.total = init.total ?? 0;
+    }
+  };
+
+if (typeof globalThis.ProgressEvent === 'undefined') {
+  Object.defineProperty(globalThis, 'ProgressEvent', {
+    value: MemoryProgressEvent,
+    configurable: true,
+    enumerable: true,
+  });
+}
+
 if (typeof window !== 'undefined') {
   ensureUsable('localStorage');
   ensureUsable('sessionStorage');
+
+  if (typeof window.ProgressEvent === 'undefined') {
+    Object.defineProperty(window, 'ProgressEvent', {
+      value: MemoryProgressEvent,
+      configurable: true,
+      enumerable: true,
+    });
+  }
 }

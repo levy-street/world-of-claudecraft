@@ -23,13 +23,18 @@ import type { SimContext } from '../sim_context';
 import type { ItemInstancePayload, LootSlot } from '../types';
 import { bopPartyTradeInstance } from './bop_trade_window';
 
-// Sim-seconds a corpse keeps at least once an award is held on it: the same
-// bounded window a fresh kill gets (CORPSE_DURATION in combat/damage.ts,
-// restated here rather than imported so the loot layer stays downstream of
-// the damage layer). A roll can resolve with only seconds left on the corpse,
-// which would otherwise decay the item before the winner could even react to
-// the "waiting on the corpse" line.
-export const HELD_LOOT_CORPSE_SECONDS = 60;
+// Sim-seconds a corpse keeps at least once an award is held on it. A held
+// award is UNLOOTED loot, and a classic corpse with loot still on it persists
+// about five minutes, not the one-minute trash window (CORPSE_DURATION in
+// combat/damage.ts). The first cut reused that 60s window, and a winner who
+// was still running back to a rare the party dropped, or dead from the fight
+// and walking from the graveyard, found the corpse gone with the item on it
+// (the "Corpse disappeared with loot on it" report). Five minutes is the
+// classic loot window; the item still decays with the corpse after it, so
+// bag space still has to be managed, and there is still no mailbox fallback.
+// Stated as a literal rather than derived from CORPSE_DURATION so the loot
+// layer stays downstream of the damage layer.
+export const HELD_LOOT_CORPSE_SECONDS = 5 * 60;
 
 export interface AwardEligibility {
   names: readonly string[];

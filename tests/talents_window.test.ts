@@ -1,11 +1,30 @@
-import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+// @vitest-environment happy-dom
 
-// Source-level guards for the Talents V2 painter. DOM behavior is exercised in the
-// browser suite; these checks keep the painter on canonical allocation/world APIs and
-// prevent the removed point-tree staging model from creeping back in.
-const painter = readFileSync(new URL('../src/ui/talents_window.ts', import.meta.url), 'utf8');
-const styles = readFileSync(new URL('../src/styles/components.css', import.meta.url), 'utf8');
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { rowTreeFor, type TalentAllocation } from '../src/sim/content/talents';
+import { TalentsWindow } from '../src/ui/talents_window';
+
+// Source-level guards and Happy DOM interactions keep the Talents V2 painter on canonical
+// allocation/world APIs and prevent the removed point-tree staging model from creeping back in.
+const painter = readFileSync(join(__dirname, '../src/ui/talents_window.ts'), 'utf8');
+const styles = readFileSync(join(__dirname, '../src/styles/components.css'), 'utf8');
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.restoreAllMocks();
+  document.body.replaceChildren();
+});
+
+function stubDeps<T extends object>(overrides: Partial<NoInfer<T>>): T {
+  const noop = () => undefined;
+  return new Proxy(overrides as Record<string, unknown>, {
+    get(target, prop: string) {
+      return prop in target ? target[prop] : noop;
+    },
+  }) as T;
+}
 
 describe('talents_window: no magic values', () => {
   it('carries no literal hex color in TS (colors flow through --color-* tokens)', () => {
@@ -27,7 +46,7 @@ describe('talents_window: no magic values', () => {
   });
 
   it('defines the talent color tokens it reads in the design-token sheet', () => {
-    const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+    const tokens = readFileSync(join(__dirname, '../src/styles/tokens.css'), 'utf8');
     for (const tok of ['--color-talent-opt-dim', '--color-talent-hint']) {
       expect(tokens, `missing ${tok}`).toContain(`${tok}:`);
     }
@@ -61,10 +80,13 @@ describe('talents_window: no magic values', () => {
     expect(painter).toContain("grid.setAttribute('role', 'radiogroup');");
     expect(painter).toContain("head.setAttribute('role', 'radio');");
     expect(painter).toContain("head.setAttribute('aria-checked', String(entry.selected));");
+    expect(painter).toContain("pick.setAttribute('role', 'menuitemradio');");
+    expect(painter).toContain("pick.setAttribute('aria-checked', String(index === activeIndex));");
     expect(painter).toContain("t('hudChrome.specPanel.viewTalents')");
     expect(styles).toContain('.tal-rows');
     expect(styles).toContain('.tal-row-opts');
-    expect(styles).toContain('.tal-row-opt.picked');
+    // W7 expresses a picked talent through the shared gold button state in painter markup.
+    expect(painter).toContain("optionVM.picked ? ' picked ui-btn--gold' : ''");
     expect(styles).toContain('.tal-row-opt:focus-visible');
   });
 
@@ -92,7 +114,7 @@ describe('talents_window: no magic values', () => {
     // the save-a-loadout detour.
     expect(painter).toContain('commitSpec(specId: string): void;');
     expect(painter).toContain('this.deps.commitSpec(entry.spec.id);');
-    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
     expect(hud).toContain('commitSpec: (specId) => this.sim.setSpec(specId),');
   });
 });
@@ -112,8 +134,9 @@ describe('talents_window: WAI-ARIA spec/rows tabs', () => {
     expect(painter).toContain('tabStripModel(');
     expect(painter).toContain('wireTabStrip(');
     expect(painter).toContain("panelId: 'tal-body'");
-    expect(painter).toContain("stripClass: 'tal-tabs'");
-    expect(painter).toContain("tabClass: 'tal-tab'");
+    // W7 composes the existing keyboard model with the shared tab paint primitive.
+    expect(painter).toContain("stripClass: 'tal-tabs ui-tabs'");
+    expect(painter).toContain("tabClass: 'tal-tab ui-tab'");
     expect(painter).toContain("selectedClass: 'active'");
     expect(painter).toContain("id: 'spec',");
     expect(painter).toContain("id: 'rows',");
@@ -122,5 +145,75 @@ describe('talents_window: WAI-ARIA spec/rows tabs', () => {
   it('refocuses the newly active tab only on a keyboard move, matching the shared wiring contract', () => {
     expect(painter).toContain('(id, focusFollow) => {');
     expect(painter).toContain('if (focusFollow) focusActiveTab(root,');
+  });
+});
+
+describe('talents_window: W7 visible footer actions', () => {
+  it('dispatches save, import, export, and clear through their authoritative handlers', () => {
+    vi.useFakeTimers();
+    const row = rowTreeFor('warrior')?.[0];
+    const option = row?.options.find((candidate) => Object.keys(candidate.effect).length > 0);
+    if (!row || !option) throw new Error('fixture needs an implemented warrior row option');
+    const allocation: TalentAllocation = {
+      spec: 'arms',
+      rows: { [row.level]: option.id },
+    };
+    const root = document.createElement('div');
+    root.id = 'talents-window';
+    root.style.display = 'none';
+    document.body.appendChild(root);
+    const inputDialog = vi.fn();
+    const respec = vi.fn();
+    const win = new TalentsWindow(
+      stubDeps({
+        root: () => root,
+        playerClass: () => 'warrior',
+        playerLevel: () => 60,
+        currentAllocation: () => allocation,
+        activeLoadout: () => -1,
+        loadouts: () => [],
+        currentBar: () => [],
+        captureFocus: () => null,
+        inputDialog,
+        respec,
+      }),
+    );
+    win.open();
+    const click = (action: string) =>
+      root
+        .querySelector<HTMLButtonElement>(`.tal-foot-actions [data-menu-action="${action}"]`)
+        ?.click();
+
+    click('save');
+    expect(inputDialog).toHaveBeenCalledTimes(1);
+    click('import');
+    expect(inputDialog).toHaveBeenCalledTimes(2);
+    click('export');
+    expect(inputDialog).toHaveBeenCalledTimes(3);
+    expect(inputDialog.mock.calls[2][0]).toMatchObject({ readOnly: true, copy: true });
+    click('clear');
+    expect(respec).toHaveBeenCalledOnce();
+  });
+});
+
+// W20: the painter still stamps `.active` on the current loadout row, but the
+// rule that painted `.tal-lo-row.active .tal-lo-pick` was deleted with the legacy
+// menu look, so the active build was indistinguishable from the others.
+describe('talents loadout menu: the active build is marked', () => {
+  it('still stamps the active class and the radio state', () => {
+    expect(painter).toContain("`tal-lo-row${index === activeIndex ? ' active' : ''}`");
+    expect(painter).toContain("pick.setAttribute('aria-checked', String(index === activeIndex));");
+  });
+
+  it('paints the active pick with the library selected fill', () => {
+    const at = styles.indexOf('\n  .tal-lo-row.active .tal-lo-pick {');
+    expect(at, 'components.css has no active-loadout rule').toBeGreaterThan(-1);
+    const body = styles.slice(at, styles.indexOf('}', at));
+    expect(body).toContain('background: var(--btn-fill-selected);');
+    expect(body).toContain('border-color: var(--gold-dim);');
+    expect(body).toContain('color: var(--color-accent);');
+    // aria-checked is not what the library reads (it reads aria-pressed), which is
+    // exactly why the row needs its own rule rather than a bare .ui-btn--on.
+    expect(painter).not.toContain("pick.setAttribute('aria-pressed'");
   });
 });

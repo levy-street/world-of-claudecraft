@@ -102,6 +102,8 @@ describe('DelveTrackerController', () => {
 
     controller.update();
 
+    expect(element.querySelector('.dt-header')?.classList.contains('ui-cin')).toBe(true);
+    expect(element.querySelector('.dt-tier')?.classList.contains('ui-chip')).toBe(true);
     const marksRows = [...element.querySelectorAll<HTMLElement>('.dt-obj')].filter((row) =>
       row.querySelector('img.currency-delve_mark'),
     );
@@ -162,7 +164,7 @@ describe('DelveTrackerController', () => {
     expect(tracker.element.innerHTML).toContain('/ui/delve-affixes/high_water.webp');
     expect(tracker.element.innerHTML).toContain('/ui/delve-affixes/lively_choir.webp');
     expect(tracker.element.innerHTML).toContain('/ui/delve-affixes/belligerent_dead.webp');
-    expect(tracker.element.innerHTML).not.toContain('background:#888');
+    expect(tracker.element.innerHTML).not.toContain('background:var(--color-delve-affix-unknown)');
   });
 
   it('replaces a failed affix image with its distinct accessible color fallback', () => {
@@ -187,7 +189,7 @@ describe('DelveTrackerController', () => {
     expect(image?.src).toContain('/ui/delve-affixes/high_water.webp');
     image?.dispatchEvent(new Event('error'));
     const fallback = element.querySelector<HTMLElement>('span.dt-affix-icon');
-    expect(fallback?.style.background).toBe('#2f718c');
+    expect(fallback?.style.background).toBe('var(--color-delve-affix-high-water)');
     expect(fallback?.getAttribute('role')).toBe('img');
     expect(fallback?.tabIndex).toBe(0);
     expect(fallback?.getAttribute('aria-label')).toBeTruthy();
@@ -214,7 +216,7 @@ describe('DelveTrackerController', () => {
 
     expect(element.querySelector('img.dt-affix-icon')).toBeNull();
     const fallback = element.querySelector<HTMLElement>('span.dt-affix-icon');
-    expect(fallback?.style.background).toBe('#888');
+    expect(fallback?.style.background).toBe('var(--color-delve-affix-unknown)');
     expect(fallback?.getAttribute('role')).toBe('img');
     expect(fallback?.tabIndex).toBe(0);
     expect(fallback?.getAttribute('aria-label')).toBe('future_affix');

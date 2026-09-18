@@ -104,6 +104,7 @@ function makeWindow(identity: Identity, depsOver: Partial<ProfessionsWindowDeps>
     moneyHtml: () => '',
     itemTooltip: () => '',
     attachTooltip: () => {},
+    openWiki: () => {},
     ...depsOver,
   };
   const w = new ProfessionsWindow(deps);
@@ -157,7 +158,12 @@ describe('ProfessionsWindow: the Harvest a body entry', () => {
         'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ),
     ];
-    expect(focusables.map((node) => node.hasAttribute('data-harvest-body'))).toEqual([false, true]);
+    // Close, then the entry, then the redesign's footer wiki button: the claim
+    // is the ORDER at the head of the tab ring, so it is pinned as a prefix
+    // rather than as the whole list, and the entry is pinned to exactly one node.
+    const flags = focusables.map((node) => node.hasAttribute('data-harvest-body'));
+    expect(flags.slice(0, 2)).toEqual([false, true]);
+    expect(flags.filter(Boolean)).toHaveLength(1);
   });
 
   it('paints no button when the host has not wired the entry', () => {

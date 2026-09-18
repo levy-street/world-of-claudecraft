@@ -62,6 +62,7 @@ export const it_IT: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Città",
       "difficulty": "Difficoltà",
       "name": "Nome",
       "spec": "Specializzazione",
@@ -159,6 +160,10 @@ export const it_IT: EnTranslations = {
       "teleport": {
         "label": "Teletrasporta",
         "description": "Sposta il giocatore a coordinate esatte del mondo."
+      },
+      "town": {
+        "label": "Centro cittadino",
+        "description": "Teletrasportarsi in un hub cittadino per nome."
       },
       "dungeon": {
         "label": "Entra nel dungeon",
@@ -326,6 +331,18 @@ export const it_IT: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "Istruttore di Forgiatura",
+      "cooking": "Istruttore di Cucina",
+      "tailoring": "Istruttore di Sartoria",
+      "engineering": "Istruttore di Ingegneria",
+      "leatherworking": "Istruttore di Lavorazione del Cuoio",
+      "alchemy": "Istruttore di Alchimia",
+      "farming": "Istruttore di Agricoltura",
+      "mining": "Istruttore di Estrazione Mineraria",
+      "hobby": "Istruttore di Passatempo",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "Quella selezione di materiali non è più disponibile.",
     "warlock": {
       "doomLabel": "Condanna",
@@ -348,12 +365,25 @@ export const it_IT: EnTranslations = {
       "banner": "Stai osservando {name}"
     },
     "readyCheck": {
+      "title": "Controllo pronto",
+      "close": "Vicino",
       "prompt": "{name} ha avviato un controllo di prontezza. Sei pronto?",
       "ready": "Pronto",
       "notReady": "Non pronto",
+      "status": "Pronto: {ready}/{total}",
+      "waiting": "In attesa di risposte...",
+      "memberReady": "{name} è pronto.",
+      "memberNotReady": "{name} non è pronto.",
+      "memberPending": "{name} non ha ancora risposto.",
       "result": "Controllo di prontezza: {ready} pronti, {notReady} non pronti, {noResponse} senza risposta.",
       "notInPartyError": "Devi essere in un gruppo per avviare un controllo di prontezza.",
       "inProgressError": "È già in corso un controllo di prontezza."
+    },
+    "pullTimer": {
+      "start": "Tira in {seconds} secondi!",
+      "cancel": "Tirata annullata.",
+      "countdown": "{seconds}",
+      "pull": "TIRO!"
     },
     "death": {
       "resurrectAtCorpse": "Risorgi al cadavere",
@@ -578,6 +608,11 @@ export const it_IT: EnTranslations = {
       "mountsTitle": "Stabile alla macchina",
       "mountBuyAria": "Acquista {item}",
       "mountSkinType": "Skin per cavalcatura",
+      "mountInspectAria": "Anteprima {item}",
+      "mountRideIt": "Guidalo",
+      "mountOnly": "Solo montaggio",
+      "mountBuy": "Acquista la skin della cavalcatura",
+      "mountScopeLine": "Skin a livello di account. Indossato da un personaggio alla volta.",
       "loading": "Caricamento del negozio WOC...",
       "error": "Il negozio WOC non è al momento disponibile. Per favore riprova a breve.",
       "balance": "Saldo Claudium",
@@ -902,6 +937,7 @@ export const it_IT: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Comprimi il riquadro Missioni",
       "expandHint": "Espandi il riquadro Missioni"
     },
@@ -1041,6 +1077,10 @@ export const it_IT: EnTranslations = {
       "clearArmed": "Tocca uno slot per svuotarlo."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "Benvenuto a Eastbrook! Il Maresciallo Redbrook ha un incarico per te nella piazza del paese. Attiva la guida dorata per trovarlo e seguire Lupi alle porte, oppure esplora per conto tuo. Puoi modificarlo più avanti in Opzioni, Interfaccia, Combattimento.",
+      "guidanceOn": "Attiva la guida",
+      "guidanceOff": "Disattiva la guida",
+      "guidanceSetting": "Guida dorata di Eastbrook",
       "bellHomeNote": "Già di ritorno dalla riva? Quella era la campana del traghetto che hai suonato. La sua gemella è appesa proprio lì, accanto alla cassetta della Posta dei Corvi: suonala quando vuoi e la traversata ti riporterà alla Riva della Prova. Nessun danno in entrambi i casi.",
       "islandArrivalNote": "Benvenuto alla Riva della Prova. Il Guardiano Tam ti aspetta poco più avanti sulla spiaggia: vai a trovarlo. Quando vorrai partire, suona la campana accanto al mio molo e ti porterà nella valle in qualsiasi momento.",
       "noteClose": "Capito"
@@ -1220,7 +1260,10 @@ export const it_IT: EnTranslations = {
       "devName": "Contributore",
       "devTierCol": "Distintivo",
       "mergedPrs": "PR integrate",
-      "devEmpty": "Ancora nessun contributore in classifica."
+      "devEmpty": "Ancora nessun contributore in classifica.",
+      "podiumLabel": "Podio",
+      "unclaimed": "Non rivendicato",
+      "prestigeTitle": "Prestigio {rank}"
     },
     "pledge": {
       "open": "Accetta giuramenti",
@@ -1243,6 +1286,8 @@ export const it_IT: EnTranslations = {
       "noteLabel": "Nota della bacheca",
       "notePlaceholder": "Racconta agli aspiranti membri cosa cerca la tua gilda",
       "save": "Salva",
+      "newPlayerFriendlyLabel": "Adatta ai nuovi giocatori",
+      "newPlayerFriendlyHint": "Mostrato sulla bacheca delle reclute al cartello della Riva della Prova.",
       "yourPledge": "Il tuo giuramento: {guild}",
       "since": "Giurato il {date}",
       "withdraw": "Ritira il giuramento"
@@ -1266,6 +1311,9 @@ export const it_IT: EnTranslations = {
       "previous": "Sessioni precedenti",
       "runLabel": "Sessione {index}",
       "runSummary": "Totale: {total} in {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogo"
     },
     "hubLesson": {
       "target": "Seleziona il manichino per iniziare.",
@@ -1395,7 +1443,9 @@ export const it_IT: EnTranslations = {
       "targetPrev": "Scorri i bersagli indietro",
       "discord": "Discord",
       "bgFlag": "Azione Bandiera del Campo di Battaglia",
+      "friendlyNameplates": "Mostra nomi amichevoli",
       "sheathe": "Fodera/Sfodera Arma",
+      "hideInterface": "Nascondi interfaccia",
       "dive": "Nuota Verso il Basso",
       "categoryPet": "Famiglio",
       "petAttack": "Famiglio: attacca",
@@ -1404,8 +1454,22 @@ export const it_IT: EnTranslations = {
       "petDefensive": "Famiglio: difensivo",
       "petAggressive": "Famiglio: aggressivo",
       "targetPet": "Famiglio: bersaglia",
+      "targetSelf": "Obiettivo Sé",
+      "targetParty1": "Membro del partito bersaglio 1",
+      "targetParty2": "Membro del partito bersaglio 2",
+      "targetParty3": "Membro del partito bersaglio 3",
+      "targetParty4": "Membro del partito bersaglio 4",
+      "targetParty5": "Membro del partito bersaglio 5",
+      "targetParty6": "Membro del partito bersaglio 6",
+      "targetParty7": "Membro del partito bersaglio 7",
+      "targetParty8": "Membro del partito bersaglio 8",
+      "targetParty9": "Membro del partito bersaglio 9",
       "mount": "Monta / Smonta",
-      "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo."
+      "mouseHint": "Anche i pulsanti del mouse funzionano: premi il pulsante centrale (M3) o un pulsante del pollice (M4, M5) durante l'assegnazione. I pulsanti sinistro e destro restano riservati per la telecamera, il clic per muoverti e il clic sugli oggetti nel mondo.",
+      "zoomIn": "Ingrandisci la fotocamera",
+      "zoomOut": "Rimpicciolisci la fotocamera",
+      "wheelHint": "Anche la rotellina del mouse si vincola: ruotala verso l'alto o verso il basso durante la rilegatura, tenendo premuto Ctrl, Alt o Maiusc, se lo desideri. Lo zoom avanti e indietro della telecamera si trova sulla ruota nuda per impostazione predefinita; spostali su un accordo come Ctrl+rotella per liberare la ruota per le abilità.",
+      "wheelHeldRefused": "Una tacca della ruota non può guidare un'azione trattenuta come il movimento. Scegli un tasto o un pulsante del mouse per questo."
     },
     "actionBar": {
       "editKeys": "Modifica i tasti della barra delle azioni",
@@ -1682,6 +1746,8 @@ export const it_IT: EnTranslations = {
       "showReliquaryTracker": "Mostra tracker del reliquiario",
       "confirmVendorSell": "Conferma prima di vendere",
       "confirmVendorSellNote": "Disattivandolo, gli oggetti vengono venduti con un solo clic e senza conferma, quindi uno slot della borsa spostato potrebbe far vendere l'oggetto sbagliato.",
+      "confirmVendorSellMinQuality": "Conferma le vendite dalla qualità",
+      "confirmVendorSellMinQualityNote": "Gli articoli di qualità inferiore a questa vengono venduti con un solo clic; un articolo venduto erroneamente può ancora essere riacquistato dal venditore.",
       "itemLevelLine": "Livello oggetto {level}",
       "itemScoreLine": "Punteggio {score}",
       "showSecondaryActionBar": "Mostra la barra delle azioni secondaria",
@@ -1735,6 +1801,9 @@ export const it_IT: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Dispositivo connesso",
+      "deviceConnected": "Collegato",
+      "deviceDisconnected": "Nessun controller rilevato",
       "glyphStyle": "Etichette dei pulsanti",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -1759,7 +1828,7 @@ export const it_IT: EnTranslations = {
       "crossHotbarHelp": "Tieni premuto un grilletto per illuminare otto slot della barra delle azioni sul D-pad e sui pulsanti frontali. Tocca l'altro trigger per passare al secondo set.",
       "crossHotbarResetLayout": "Reimposta la barra di accesso incrociata",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "I trigger e il D-pad appartengono alla barra rapida incrociata mentre è attiva, quindi sono impostati sotto anziché qui.",
+      "crossHotbarOwnsButtons": "I trigger modificano la barra rapida incrociata mentre è attiva. Le direzioni del D-pad restano modificabili qui per i menu e il movimento.",
       "cancelAction": "Annulla / Indietro",
       "subcommandsAction": "Sottocomandi/Mappa",
       "cycleHudAction": "Interfaccia del ciclo",
@@ -1770,7 +1839,7 @@ export const it_IT: EnTranslations = {
       "crossHotbarDisplayMinimal": "Solo durante la detenzione",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Portando con sé {action}: conferma su una cella per posizionarlo, annulla per rimetterlo a posto.",
-      "crossHotbarEditHint": "Organizzazione: conferma la raccolta da una cella o dal libro degli incantesimi e la rilascia su una cella, l'annullamento ne cancella una.",
+      "crossHotbarEditHint": "Organizzazione · il D-pad muove · conferma raccoglie e posiziona · annulla svuota una cella",
       "crossHotbarEditHelp": "Tieni il paraurti sinistro e premi il pulsante frontale superiore per sistemare la barra con il controller."
     },
     "perf": {
@@ -2049,6 +2118,52 @@ export const it_IT: EnTranslations = {
       "spellOrder": "Ordine degli incantesimi",
       "reset": "Ripristina posizione",
       "spellPosition": "Ordine incantesimi {position} / {count}",
+      "watchlist": "Incantesimi osservati",
+      "watchlistHint": "Scegli un incantesimo che ti dà un buff per assegnargli un'aura propria. Gli incantesimi scelti ottengono una scheda completa qui sotto, con icona, colore, posizione e anello a terra propri.",
+      "watchlistEmpty": "Nessun altro incantesimo nel tuo libro degli incantesimi ti applica un buff.",
+      "watchlistWatch": "Osserva {spell}",
+      "watchlistUnwatch": "Interrompi l'osservazione di {spell}",
+      "watchlistCount": "{count} osservati",
+      "sound": "Suono di avviso",
+      "soundNone": "Nessun suono",
+      "soundVolume": "Volume del suono",
+      "soundPreview": "Riproduci",
+      "soundPreviewAria": "Ascolta in anteprima il suono di avviso {sound}",
+      "soundHint": "Un suono viene riprodotto ogni volta che questo incantesimo scatta. Disattiva l'icona, le mezzelune e l'anello a terra per farlo annunciare dal solo suono.",
+      "readyGlow": "Bagliore della barra delle azioni",
+      "readyGlowHint": "Illumina questo incantesimo sulla tua barra delle azioni mentre il suo buff è attivo.",
+      "reticleTick": "Tacca del reticolo",
+      "reticleTickHint": "Aggiunge un segno vicino al centro dello schermo che si illumina quando questo incantesimo scatta.",
+      "haptic": "Vibrazione",
+      "hapticNone": "Disattivata",
+      "hapticHint": "Fa vibrare un controller collegato o il telefono. Ignorato se il dispositivo non supporta la vibrazione.",
+      "haptics": {
+        "tap": "Colpetto",
+        "double": "Doppia",
+        "long": "Lunga"
+      },
+      "cues": {
+        "softChime": "Campanellino Dolce",
+        "musicBox": "Carillon",
+        "glassPing": "Tintinnio di Vetro",
+        "waterDrop": "Goccia d'Acqua",
+        "bubblePop": "Scoppio di Bolla",
+        "hardBell": "Campana Forte",
+        "templeGong": "Gong del Tempio",
+        "anvilStrike": "Colpo di Incudine",
+        "coinDrop": "Tintinnio di Moneta",
+        "swordDraw": "Spada Sfoderata",
+        "blaringHorn": "Corno Squillante",
+        "carKlaxon": "Claxon d'Auto",
+        "sonarPing": "Segnale Sonar",
+        "electricZap": "Scarica Elettrica",
+        "catMeow": "Miao di Gatto",
+        "owlHoot": "Richiamo di Civetta",
+        "wolfHowl": "Ululato di Lupo",
+        "frogCroak": "Gracidio di Rana",
+        "windWhoosh": "Soffio di Vento",
+        "steamHiss": "Sibilo di Vapore"
+      },
       "procs": {
         "revenge": "Vendetta!",
         "battleTrance": "Trance di Battaglia",
@@ -2153,6 +2268,22 @@ export const it_IT: EnTranslations = {
       "playtimeHidden": "Nascosto",
       "showPlaytimeAria": "Mostra il tempo di gioco",
       "hidePlaytimeAria": "Nascondi il tempo di gioco"
+    },
+    "charSidebar": {
+      "label": "Dettagli del personaggio",
+      "subtitle": "Livello {level} {className}. {archetype}. Hobby: {hobby}",
+      "subtitleNoHobby": "Livello {level} {className}. {archetype}",
+      "stats": "Statistiche",
+      "progression": "Progressione",
+      "skills": "Competenze",
+      "gathering": "Assembramento",
+      "crafting": "Creazione",
+      "openProfessions": "Professioni aperte"
+    },
+    "questLog": {
+      "completed": "Completato",
+      "zoneSummary": "{count} ({ready} pronto)",
+      "shiftHint": "Fai clic tenendo premuto il tasto Maiusc su una missione per collegarla nella chat."
     },
     "statInfo": {
       "fromYour": "Dai tuoi {value} punti {stat}:",
@@ -2267,6 +2398,12 @@ export const it_IT: EnTranslations = {
       "linkHint": "Shift-clic per collegare questo oggetto in chat."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "{count} gilda mostrata",
+        "few": "{count} gilde mostrate",
+        "many": "{count} gilde mostrate",
+        "other": "{count} gilde mostrate"
+      },
       "commissionMasterworks": {
         "one": "{count} capolavoro",
         "few": "{count} capolavori",
@@ -2396,6 +2533,7 @@ export const it_IT: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Segnala un bug",
+      "online": "In linea",
       "realm": "Mondo",
       "character": "Personaggio",
       "position": "Posizione",
@@ -2993,8 +3131,8 @@ export const it_IT: EnTranslations = {
         "kingsWrathSummary": "Nythraxis infligge {bonusNormal} danni in più in normale o {bonusHeroic} in eroica per il resto del combattimento. Eruzione sepolcrale si verifica ogni {eruptionEveryNormal} s ({eruptionEveryHeroic} in eroica).",
         "kingsWrathResponse": "Usa i tempi di recupero difensivi rimasti per i danni inevitabili. Mantieni pulita ogni meccanica precedente mentre l'incursione conclude lo scontro.",
         "boneStormName": "Tempesta d'ossa",
-        "boneStormSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyNormal} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlNormal} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamNormal} della salute massima. Lancia Spina ossea {spikeAt} s dopo l'inizio della tempesta, poi Spezzatombe si riattiva {rearm} s dopo la fine.",
-        "boneStormHeroicSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Lancia Spina ossea {spikeAt} s dopo l'inizio della tempesta, poi Spezzatombe si riattiva {rearm} s dopo la fine.",
+        "boneStormSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyNormal} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlNormal} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamNormal} della salute massima. Spezzatombe si riattiva {rearm} s dopo la fine.",
+        "boneStormHeroicSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Spezzatombe si riattiva {rearm} s dopo la fine.",
         "boneStormResponse": "Disperdetevi e continuate a correre lontano da Nythraxis. Il membro caricato scappa mentre tutti gli altri lasciano spazio lungo la traiettoria della carica, poi i tank lo riprendono quando la tempesta finisce.",
         "crownEnduresName": "La Corona perdura",
         "crownEnduresSummary": "A {enrageNormal} s dal pull (il timer si ferma mentre Fratello Aldric entra al 70%), La Corona perdura si attiva come enrage rigido. Nythraxis guadagna {damage} danni in più e attacchi {haste} più rapidi, poi altri {rampStep} danni ogni {rampEveryNormal} s. Non c'è barra del timer. Gli avvisi arrivano come grida a {warn60}, {warn30} e {warn10} s rimanenti.",
@@ -3045,6 +3183,7 @@ export const it_IT: EnTranslations = {
       "elementalConvergencePrimed": "Il prossimo incantesimo dall'altra scuola elementale concede Convergenza Elementale",
       "hunterFerocity": "{stacks} Ferocia del Branco: il tuo famiglio infligge il {pct}% di danni in più",
       "cooldownCap": "{used} di {cap} sec di riduzione del tempo di recupero usati in questa finestra",
+      "bruinRushWindow": "La Forma del Lupo non costa mana e blocca il bersaglio della vostra Carica di Bruin, rallentandolo del {pct}% per {sec} sec",
       "funeralHarvestLock": "Funeral Harvest non può ancora creare un altro Frammento d'Anima",
       "leadenHexLock": "Maleficio Plum beo non può ancora radicare di nuovo questo bersaglio",
       "forbiddenReflectionReady": "Il tuo prossimo tempo di recupero idoneo dello Stregone può essere lanciato di nuovo",
@@ -3092,7 +3231,7 @@ export const it_IT: EnTranslations = {
       "coldsightRead": "Il tuo prossimo Tiro lungo infligge il {longDrawPct}% di danni in più, oppure il tuo prossimo Tiro funesto ne infligge il {fellShotPct}% in più",
       "duskEconomy": "Le abilità costano il {pct}% di energia in meno",
       "moontide": "Marea Lunare: stadio {stacks} di {max}. I lanci di Dardo Silvano, Caduta Celeste e Seme Lunare la riempiono in Forma di Lunagufo; a {max}, Seme Lunare diventa Ondata Lunare e Caduta Celeste diventa Scia Solare, ed entrambe la spendono",
-      "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Lupo e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
+      "oldBlood": "Sangue Antico: stadio {stacks} di {max}. I colpi a segno in Gatto e Bruin condividono questa riserva; a {max}, Morso Cruento o Frantumaossa si trasforma",
       "verdance": "Verzura {stacks}/{max}. Ogni nuova Fioritura Selvaggia o Seconda Fioritura che pianti aggiunge 1. A {max}, Rapidità di Guarigione diventa Sovrafioritura",
       "freeExecute": "La tua prossima abilità di esecuzione idonea non costa nulla",
       "resourceSap": "Ripristina {value} della tua risorsa attuale ogni {interval} sec",
@@ -3157,7 +3296,7 @@ export const it_IT: EnTranslations = {
       "elementalTrance": "Danni subiti ridotti del {pct}%. Il {mana}% di tutti i danni che infliggi viene convertito in mana",
       "stealth": "Nascosto; velocità di movimento ridotta del {pct}%",
       "formBear": "Forma di Bruin: salute e armatura aumentate",
-      "formCat": "Forma felina: danni in mischia ed energia",
+      "wolfForm": "Forma del Gatto: danno da mischia ed energia; velocità di movimento aumentata del {pct}%",
       "formTravel": "Forma di Fleet: velocità di movimento aumentata del {pct}%",
       "formFireball": "Forma Brace: velocità di movimento aumentata del {pct}%; attacchi e incantesimi disabilitati",
       "formMoonkin": "Forma di Lunagufo: danni degli incantesimi aumentati del {pct}% e armatura aumentata del {armorPct}%",
@@ -3246,7 +3385,30 @@ export const it_IT: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Baro >",
-      "pledgeTag": "Giuramento a {guild}"
+      "pledgeTag": "Giuramento a {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Banditore",
+        "banker": "Banchiere",
+        "riftForgemaster": "Mastro Forgiatore della Spaccatura",
+        "cardMaster": "Maestro delle carte",
+        "crucibleQuartermaster": "Quartiermastro del Crogiolo",
+        "heroicQuartermaster": "Quartiermastro eroico",
+        "pvpVendor": "Venditore PvP",
+        "weaponsmithTrainer": "Istruttore di fabbro",
+        "cookingTrainer": "Formatore di cucina",
+        "tailoringTrainer": "Formatore di sartoria",
+        "engineeringTrainer": "Formatore di ingegneria",
+        "leatherworkingTrainer": "Formatore per la lavorazione della pelle",
+        "alchemyTrainer": "Allenatore di alchimia",
+        "weaponVendor": "Venditore di armi",
+        "armorVendor": "Venditore di armature",
+        "armsDealer": "Commerciante d'armi",
+        "foodVendor": "Venditore di cibo e bevande",
+        "potionVendor": "Venditore di pozioni",
+        "stableMaster": "Maestro di stalla",
+        "generalGoods": "Beni generali"
+      }
     },
     "mobTooltip": {
       "levelFamily": "{family} di livello {level}",
@@ -3265,6 +3427,7 @@ export const it_IT: EnTranslations = {
       "lock": "Blocca il riquadro del giocatore"
     },
     "partyFrames": {
+      "header": "Festa",
       "section": "Riquadri gruppo e incursione",
       "optionsSection": "Opzioni riquadro gruppo",
       "unlock": "Sposta i riquadri di gruppo e incursione",
@@ -3475,10 +3638,15 @@ export const it_IT: EnTranslations = {
       "unrecordedSigned": "Raccoglitore non registrato, firmato da {name}",
       "quantityAria": "Unità da {source}, fino a {count}",
       "decreaseAria": "Diminuisci unità da {source}",
-      "increaseAria": "Aumenta unità da {source}"
+      "increaseAria": "Aumenta unità da {source}",
+      "decreaseByAria": "Riduci le unità da {source} di {count}",
+      "increaseByAria": "Aumenta le unità da {source} di {count}",
+      "moveAll": "Sposta tutte le unità",
+      "fits": "Al momento ne entrano fino a {units}"
     },
     "materialHint": {
       "fineGrade": "Grado pregiato. Raccolto da un filone di pieno livello con uno strumento di rango superiore al materiale, e vale come la versione ordinaria ovunque ne venga richiesta una.",
+      "fineFarmGrade": "Grado eccellente. Alcune raccolte di un raccolto danno buoni risultati, più spesso con un'abilità di agricoltura più elevata o con un occhio dell'artigiano carico. I prodotti ordinari non contano mai dove è richiesta la qualità fine.",
       "cookingCatch": "Ingrediente da cucina. Deve essere cucinato prima di essere mangiato.",
       "usedBy": "Usato da {crafts}.",
       "arcaneDust": "Reagente di creazione. Disincantato da equipaggiamento comune e non comune.",
@@ -3763,6 +3931,15 @@ export const it_IT: EnTranslations = {
       "subtitle": "Le gilde del reame",
       "rosterTitle": "Visualizza l'elenco membri di {guild}",
       "back": "Indietro",
+      "filters": "Filtri della bacheca",
+      "newPlayerFriendly": "Adatta ai nuovi giocatori",
+      "newPlayerFriendlyTitle": "Questa gilda accoglie i nuovi giocatori",
+      "filterNewPlayersTitle": "Mostra solo le gilde che accolgono i nuovi giocatori",
+      "filterEmpty": "Nessuna gilda ha ancora aperto le porte ai nuovi giocatori.",
+      "showAll": "Mostra tutte le gilde",
+      "officersOnline": "Ufficiali online",
+      "officersOnlineLabel": "Ufficiali online: {names}",
+      "officerEntry": "{name} ({rank})",
       "popupTitle": "Cartello della Gilda",
       "close": "Chiudi"
     },
@@ -3819,6 +3996,8 @@ export const it_IT: EnTranslations = {
       "withdrawQuantityTitle": "Ritira {item}",
       "withdrawQuantityInput": "Quantità da ritirare",
       "withdrawQuantityConfirm": "Ritira",
+      "quantityStepDownAria": "Diminuisci la quantità di {count}",
+      "quantityStepUpAria": "Aumenta la quantità di {count}",
       "vaultRowWithdrawName": "Ritira {item}",
       "priceChanged": "Il prezzo è cambiato prima che l'acquisto si completasse. Controlla il prezzo aggiornato e conferma di nuovo.",
       "withdrawQuantityAction": "Quantità da ritirare: {item}",
@@ -4010,6 +4189,25 @@ export const it_IT: EnTranslations = {
       "lastSeenNever": "mai",
       "ignoredTab": "Ignorati",
       "blockedTab": "Bloccati",
+      "who": {
+        "tab": "Chi",
+        "searchPlaceholder": "Nome, zona o gilda",
+        "search": "Ricerca",
+        "loading": "Chiedendo al regno chi è online...",
+        "empty": "Nessun giocatore corrisponde.",
+        "count": "{total} in linea",
+        "countFiltered": "{shown} di {total} online",
+        "capped": "Mostra il primo {delivered}. Restringi la ricerca per vedere il resto.",
+        "classFilter": "Filtra per classe",
+        "allClasses": "Tutte le classi",
+        "colStatus": "Stato",
+        "colName": "Nome",
+        "colLevel": "Livello",
+        "colClass": "Classe",
+        "colZone": "Zona",
+        "colGuild": "Gilda",
+        "sortTitle": "Ordina per {column}"
+      },
       "ignoredEmpty": "Non stai ignorando nessuno.",
       "blockedEmpty": "Non hai bloccato nessuno.",
       "blockSearchPlaceholder": "Nome del giocatore",
@@ -4049,7 +4247,6 @@ export const it_IT: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Raccolta",
       "mining": "Estrazione mineraria",
       "logging": "Taglio del legname",
       "herbalism": "Erbalismo",
@@ -4132,6 +4329,7 @@ export const it_IT: EnTranslations = {
           "farming": "Funziona dalla borsa quando pianti un’aiuola."
         },
         "speed": "Raccoglie più in fretta sui nodi di livello inferiore a {tier}.",
+        "wieldDegrade": "Al di sotto di tale abilità funziona ancora come uno strumento di livello inferiore.",
         "rodRequired": "Necessaria per pescare.",
         "rodBite": "I pesci abboccano fino a {seconds} s prima.",
         "rodReel": "Allunga di {seconds} s la finestra per recuperare la lenza.",
@@ -4233,9 +4431,7 @@ export const it_IT: EnTranslations = {
       "noviceBody": "L’abilità di Agricoltura cresce ogni volta che raccogli una coltura. Semina un seme in un’aiuola per iniziare."
     },
     "archetypeTitle": {
-      "label": "Titolo",
-      "none": "Nessuno",
-      "hobbyLabel": "Passatempo"
+      "none": "Nessuno"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardiere",
@@ -4405,7 +4601,21 @@ export const it_IT: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Maggiori: {a} e {b}",
       "pairsHeld": "Coppie detenute: {count}",
-      "returnsLabel": "Restituisce: {count}"
+      "returnsLabel": "Restituisce: {count}",
+      "retentionFooter": "Rendimento in rispetto: 60% dell'abilità mantenuta.",
+      "tutorialLink": "Tutorial sulla professione"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Ricette",
+      "collapseHint": "Comprimi il tracker delle ricette",
+      "expandHint": "Espandi il tracker delle ricette",
+      "pin": "Spillo",
+      "unpin": "Sblocca",
+      "pinFull": "Il tracker delle ricette è pieno (fino a {cap} ricette)",
+      "pinAria": "Blocca {name} sul tracker HUD",
+      "unpinAria": "Sblocca {name} dal tracker HUD",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Creazione",
@@ -4437,9 +4647,11 @@ export const it_IT: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(usa {count} di grado pregiato)",
       "reagentVaultDraw": "(preleva {count} dal tuo caveau)",
+      "reagentOrdinaryHeld": "({name} ha tenuto: {count}, ma qui conta solo il voto buono)",
       "vaultUnreachable": "Il Caveau dei Materiali non è raggiungibile qui.",
       "craftFeeLine": "Tariffa di lavorazione: {fee} ciascuno",
       "empty": "Nessuna ricetta ancora conosciuta.",
+      "materialsFooter": "I materiali nel tuo caveau vengono estratti automaticamente. Scopri altre ricette alla stazione.",
       "resultAria": "Crea {name}",
       "craftedToast": "Realizzato: {name}",
       "craftedToastQty": "Realizzato: {name} x{qty}",
@@ -4529,8 +4741,8 @@ export const it_IT: EnTranslations = {
       "attunedBanner": "Sintonizzato: {title}",
       "tierTutorial": {
         "title": "Il tuo primo livello",
-        "tierCap": "Un mestiere raggiunge il suo primo livello a {skill} di competenza, e ogni livello migliora cio che puo produrre. Ma un mestiere sale oltre il lavoro raro solo quando e una delle tue due specializzazioni principali.",
-        "radar": "Le tue professioni formano una ruota. Sintonizzati a una coppia adiacente e quei due mestieri diventano specializzazioni principali senza limiti, un mestiere dall'altra parte della ruota diventa un passatempo con limite raro, e gli altri rimangono dormienti: la loro conoscenza e conservata, ma limitata al comune finche non li riprendi.",
+        "tierCap": "Un mestiere raggiunge il suo primo livello con l'abilità {skill} e ogni livello migliora ciò che può fare. Ma un mestiere supera i lavori rari solo quando è una delle tue due specializzazioni.",
+        "radar": "Le tue professioni formano una ruota. Attune to an adjacent pair and those two crafts become uncapped majors, one craft across the wheel becomes a rare-capped hobby, and the rest lie dormant: their knowledge kept, but capped at common until you take them up again.",
         "masters": "I maestri artigiani nelle citta offrono missioni di sintonizzazione. Visita uno quando sei pronto a scegliere la tua coppia. Niente di cio che hai imparato va mai perduto.",
         "dismiss": "Capito"
       },
@@ -4541,6 +4753,9 @@ export const it_IT: EnTranslations = {
       "commissionToggleHint": "Si lega al primo personaggio che lo riceve in uno scambio.",
       "commissionUnbound": "Pezzo su commissione: si lega al primo destinatario",
       "commissionBound": "Pezzo su commissione: legato al suo destinatario"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "Il Mercante rifornisce i beni comuni; gli elenchi dei giocatori si trovano accanto a loro al prezzo richiesto."
     },
     "itemMenu": {
       "use": "Usa",
@@ -4821,6 +5036,7 @@ export const it_IT: EnTranslations = {
       "roleDps": "Danno",
       "freeRoles": "Qualsiasi ruolo benvenuto",
       "lockoutDaily": "Blocco giornaliero sul boss finale",
+      "lockoutWeekly": "Blocco settimanale su ciascun boss",
       "lockoutNone": "Nessun blocco",
       "lockedFor": "Bloccato per circa {minutes} min",
       "attunement": "Richiede sintonia: {quest}",
@@ -4834,6 +5050,8 @@ export const it_IT: EnTranslations = {
       "lootMaybe": "Al massimo uno di questi puo cadere:",
       "lootChance": "Possibilita di bottino aggiuntivo:",
       "lootHeroic": "Bonus eroico, uno di questi cade sempre:",
+      "lootHeroicMaybe": "Bonus eroico, al massimo uno di questi può cadere:",
+      "lootHeroicChance": "Bonus eroico, possibilità di bottino aggiuntivo:",
       "pct": "{pct}%",
       "blockedLevel": "Solo livelli da {min} a {max}",
       "blockedSpec": "Richiede una specializzazione",
@@ -4905,7 +5123,33 @@ export const it_IT: EnTranslations = {
         "kings_wrath": "Ira del re (30%: bonus danni permanente, pericoli a terra più rapidi)",
         "bone_storm": "Tempesta d'ossa (ignora la minaccia, vortica e carica l'incursione)",
         "crown_endures": "La Corona perdura (enrage rigido a 6:00, 5:00 in eroica)",
-        "deathless_court": "La Corte immortale (solo eroica, la corte reale si rialza dopo Furia immortale)"
+        "deathless_court": "La Corte immortale (solo eroica, la corte reale si rialza dopo Furia immortale)",
+        "bloodmane_rend": "Bloodmane Rend (sanguinamento, attenzione agli scambi di bersagli)",
+        "tusk_sweep": "Zanna spazzata (fendente frontale)",
+        "ancestral_sap": "Linfa ancestrale (cura i suoi alleati)",
+        "call_of_the_hunt": "Richiamo della caccia (accelera gli alleati vicini)",
+        "thickhide_ward": "Protezione di Pellespessa (protegge gli alleati vicini)",
+        "beast_pit_quake": "Beast Pit Quake (danno ad area)",
+        "wildheart_pulse": "Impulso del cuore selvaggio (danno ad area pulsante)",
+        "jaguar_roar": "Ruggito del giaguaro (respinta)",
+        "brand_of_the_pyre": "Marchio della Pira (impilare il marchio del fuoco, lavarlo via con l'acqua del condotto)",
+        "forge_strike": "Forge Strike (debuff cumulativo di scambio di carri armati)",
+        "rain_of_cinders": "Pioggia di cenere (tre coni di fuoco, posizionati in mezzo a loro)",
+        "falling_cinders": "Ceneri cadenti (cerchi di meteoriti sui giocatori, allontanati)",
+        "revolving_inferno": "Inferno rotante (raggi di fuoco rotanti, muoviti attraverso gli spazi vuoti)",
+        "forge_wave": "Forge Wave (espandendo il muro di fuoco, usa le due corsie sicure)",
+        "apocalypse_add": "Ignivar Ashcaller (aggiunta prioritaria al lancio di Apocalisse, uccidilo velocemente)",
+        "judgment_of_the_forge": "Il giudizio della forgia (intervallo, condividi l'unico rifugio sicuro)",
+        "last_inferno": "Ultimo Inferno (bruciatura di 45 secondi al 20% di salute)",
+        "chains_of_the_forge": "Catene della Forgia (solo eroica, resta vicino al tuo partner collegato)",
+        "makers_brand": "Marchio del creatore (debuff cumulativo di scambio di carri armati)",
+        "forgefathers_sweep": "Spazzata del Forgefather (ampio cono frontale in un non-tank)",
+        "tempering_ray": "Raggio Temprante (linea verso un giocatore marcato, intercettalo)",
+        "cinder_orbs": "Sfere di cenere (i giocatori contrassegnati si diffondono ai bordi della stanza)",
+        "forgestorm": "Forgestorm (cerchi di meteoriti che cadono, allontanati)",
+        "shared_pyre": "Pira condivisa (cerchio di raccolta, divide il danno)",
+        "anvils_decree": "Decreto dell'incudine (tre colpi di martello in tutto il raid, guarigione)",
+        "masters_assembly": "L'Assemblea del Maestro (blocca le travi della forgia, ruota i bloccanti)"
       }
     },
     "cosmetics": {
@@ -4926,6 +5170,8 @@ export const it_IT: EnTranslations = {
       "applied": "Applicato",
       "owned": "Posseduti",
       "storeOnly": "Disponibile nel Negozio WOC",
+      "preview": "Anteprima",
+      "previewAria": "Anteprima {name}",
       "cardAria": "Oggetto: {name}, {rarity}",
       "mountsIntro": "Una skin per cavalcatura viene disegnata sulla cavalcatura usata dal personaggio. Non cambia mai la velocità.",
       "mountsNoMount": "Possiedi prima una cavalcatura: una skin ha bisogno di qualcosa da cavalcare.",
@@ -4974,6 +5220,10 @@ export const it_IT: EnTranslations = {
       "ownedTooltipStatus": "Catalogata nel Reliquiario",
       "missingTooltipStatus": "Non ancora trovata",
       "firstFindClears": "Trovata per la prima volta alla conquista {count}",
+      "foundBy": "Trovata da {names}",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "Condiviso da tutti i personaggi del tuo account",
+      "sharedScopeHint": "Una reliquia trovata da un personaggio qualsiasi del tuo account riempie la pagina anche qui.",
       "unlockToast": "Reliquia catalogata: {name}",
       "illuminateBanner": "Pagina miniata: {name}",
       "illuminateToast": "Ogni reliquia di {name} è riempita.",
@@ -5107,6 +5357,10 @@ export const it_IT: EnTranslations = {
       "progressAria": "Progresso: {current} su {target}",
       "renownChip": "{renown} Fama",
       "earnedDate": "Ottenuta il {date}",
+      "earnedBy": "Ottenuta da {names}",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "Condiviso da tutti i personaggi del tuo account",
+      "accountScopeHint": "Un'impresa compiuta da un personaggio qualsiasi del tuo account viene ottenuta anche qui, e il Libro indica chi l'ha ottenuta.",
       "featRibbon": "Prodezza",
       "hiddenBadge": "Nascosta",
       "titleChip": "Titolo in premio",
@@ -5156,6 +5410,33 @@ export const it_IT: EnTranslations = {
       "toggleAria": "Passa dalla mappa del mondo, alla mappa della zona e alla mappa dell’istanza",
       "levels": "Livelli da {min} a {max}"
     },
+    "mapAtlas": {
+      "level": "Livello {level}",
+      "landmarkCount": "{count} punti di riferimento",
+      "filtersAria": "Livelli della mappa",
+      "filters": {
+        "quests": "Missioni",
+        "gather": "Raccogliere",
+        "dungeons": "Dungeon",
+        "services": "Servizi",
+        "players": "Giocatori"
+      },
+      "trackedQuests": "Missioni monitorate",
+      "noTrackedQuests": "Nessuna missione tracciata",
+      "availableNearby": "Disponibile nelle vicinanze",
+      "noNearbyQuests": "Nessuna missione nelle vicinanze",
+      "distance": "{distance} iarde",
+      "showRoute": "Mostra percorso",
+      "untrack": "Annulla traccia",
+      "track": "Traccia",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Minerale",
+        "herb": "Erba",
+        "mail": "Posta",
+        "passage": "Passaggio"
+      }
+    },
     "arenaGate": {
       "minLevelNote": "Richiede il livello {level}"
     },
@@ -5174,6 +5455,7 @@ export const it_IT: EnTranslations = {
       "tabBrowse": "Sfoglia",
       "tabSell": "Vendi",
       "tabActivity": "Le mie attività",
+      "tabHistory": "Cronologia delle vendite",
       "tabsLabel": "Sezioni della Borsa $WOC",
       "loading": "Caricamento della Borsa...",
       "loadFailed": "Impossibile raggiungere la Borsa. Riprova tra poco.",
@@ -5198,6 +5480,16 @@ export const it_IT: EnTranslations = {
       "colCurrentBid": "Offerta attuale",
       "colBuyNow": "Acquisto immediato",
       "colTimeLeft": "Tempo rimasto",
+      "colBuyer": "Acquirente",
+      "colSoldAt": "Venduto",
+      "colSalePrice": "Prezzo di vendita",
+      "colSaleType": "Tipo",
+      "saleTypeAuction": "Asta",
+      "saleTypeBuyNow": "Acquista ora",
+      "saleTypeDirected": "Diretto",
+      "saleTypeUnknown": "Sconosciuto",
+      "historyEmpty": "Nessuna vendita ancora registrata.",
+      "historyError": "Impossibile caricare la cronologia delle vendite.",
       "reserveMet": "Riserva raggiunta",
       "reserveNotMet": "Riserva non raggiunta",
       "yourListing": "La tua inserzione",
@@ -5870,6 +6162,7 @@ export const it_IT: EnTranslations = {
       "deeds": "Libro delle Imprese",
       "reliquary": "Il Reliquiario",
       "sheathe": "Rinfodera/Sfodera Arma",
+      "hideInterface": "Nascondi l'interfaccia (screenshot e video)",
       "crafting": "Creazione",
       "mount": "Cavalca / Smonta",
       "calendar": "Calendario degli eventi",
@@ -5899,6 +6192,8 @@ export const it_IT: EnTranslations = {
       "attackMove": "Attacca in Movimento (solo dopo aver attivato l'opzione)",
       "meters": "Misuratori danni (danno, cura e minaccia)",
       "petMark": "Famiglio: bersaglia, seleziona il tuo famiglio (equivale a cliccare sul suo riquadro)",
+      "targetSelf": "Prendi di mira te stesso",
+      "targetParty": "Scegli come target i membri del party da 1 a 9, dall'alto verso il basso come li mostrano i riquadri del party",
       "onBarBinding": "Puoi anche associare i tasti direttamente dalla barra: scegli Modifica i tasti della barra delle azioni nel pannello Comandi da tastiera, poi clicca uno slot sulla barra attiva e premi il tasto che vuoi. Clicca Fatto quando hai finito. Questa opzione è solo desktop, perché richiede una tastiera fisica.",
       "clickMoveNote": "Clicca per muoverti è disattivato finché non lo attivi: apri il pannello Comandi da tastiera nel menu di gioco, attiva Clicca per muoverti, poi usa la riga Pulsante clic per muovere sotto di esso per scegliere quale pulsante del mouse cammina (Clic sinistro per impostazione predefinita, oppure Clic destro). Una volta attivato, cliccare un punto sul terreno ti fa camminare fin lì, con un indicatore a terra che mostra dove sei diretto. Cliccare una creatura o un altro giocatore ti fa camminare verso di loro fermandoti a portata, mentre quel clic svolge comunque il suo compito abituale di bersagliare o interagire; se sei già abbastanza vicino da raggiungere ciò su cui hai cliccato, interagisci semplicemente e resti dove sei. Uno qualsiasi dei tasti di movimento riprende subito il controllo e termina il tragitto, e lo stesso fa tenere premuto il pulsante del mouse per guardarti intorno. Saltare no, quindi continui il viaggio anche durante il balzo, e aprire il menu di gioco mette solo in pausa il tragitto, che riprende quando chiudi il menu."
     },
@@ -6036,7 +6331,8 @@ export const it_IT: EnTranslations = {
       "ifLockBars": "Blocca le tue barre così non puoi trascinare per sbaglio un'abilità fuori da uno slot.",
       "keybindsHeading": "Il pannello Comandi da tastiera",
       "keybindsBody": "L'elenco dei tasti è solo metà di quel pannello. Sopra di esso si trovano gli interruttori che decidono come il mouse guida il gioco: telecamera con mouse, se il cursore si blocca durante la rotazione, clic per muoversi e quale pulsante del mouse lo attiva, movimento d'attacco, il layout touch per mancini, e il filtro del linguaggio per la chat.",
-      "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi."
+      "keybindsMouseBody": "Due cose lì sono facili da non notare. I pulsanti del mouse si associano come i tasti, quindi il clic della rotellina e i pulsanti laterali possono portare abilità, mentre il clic sinistro e destro restano riservati alla telecamera e al clic sul mondo. E puoi associare i tasti direttamente dalla barra delle azioni: attiva qui la modalità di associazione sulla barra, poi fai clic su uno slot e premi il tasto che vuoi.",
+      "keybindsWheelBody": "Anche la ruota stessa si lega. Zoom telecamera avanti e Zoom telecamera indietro sono normali collegamenti che si trovano sulla ruota nuda per impostazione predefinita, quindi puoi spostarli su Ctrl più la ruota o sui tasti, quindi ruotare la ruota liberata per attivare gli slot della barra delle azioni. Una tacca della ruota non ha rilascio, quindi non può eseguire un'azione trattenuta come andare avanti."
     },
     "combat": {
       "intro": "Il combattimento segue le familiari regole degli MMO classici. Non hai mai bisogno di studiarne nulla per giocare bene, questa è solo la forma di come funzionano gli scontri.",
@@ -6057,7 +6353,7 @@ export const it_IT: EnTranslations = {
       "deathTitle": "Quando cadi",
       "deathBody": "Se la tua salute arriva a zero, cadi a terra dove ti trovi, e il tuo corpo resta lì. Libera il tuo spirito e risorgi come spettro al cimitero più vicino: più rapido dei vivi, fuori dalla portata dei tuoi nemici, ma incapace di combattere, saccheggiare o parlare con chiunque tranne il Custode Pallido che aleggia sulle pietre. Da lì scegli. Riporta il tuo spettro fino al corpo e rivivi sul posto con parte della salute e del mana ripristinati e senza alcuna penalità. Oppure accetta dal Custode Pallido un risveglio immediato dove ti trovi, al prezzo del Mal di resurrezione: un indebolimento temporaneo di tutto ciò che sei, che dura più a lungo quanto più sei navigato e risparmia del tutto i personaggi appena creati. Cadi dentro un dungeon e il tuo spirito ti attende al cimitero all'esterno; riporta lo spettro oltre la soglia e rivivi all'ingresso. Le esplorazioni fanno eccezione: se cadi lì vieni semplicemente rimesso in piedi all'ingresso dell'esplorazione, anche se una seconda caduta pone fine alla spedizione. In un modo o nell'altro, non perdi esperienza, equipaggiamento o monete. Tra uno scontro e l'altro, siediti a mangiare e bere così affronti il prossimo a piena forza.",
       "threatTitle": "Chi colpisce il nemico",
-      "threatBody": "Ogni nemico tiene un proprio conto privato di chi lo ha infastidito di più. I danni lo alimentano, e così fanno anche le cure: una cura genera minaccia sui nemici che stanno già combattendo la persona che hai curato, ripartita tra loro, quindi la cura più sicura è quella su qualcuno che il tank ha già in pugno. I tank attivano una posizione guardinga o una forma protettiva che moltiplica tutto ciò che generano, mentre la Forma del Lupo del druido riduce invece la minaccia, e una provocazione porta chi la lancia direttamente in cima al conto e blocca il nemico su di lui per pochi secondi. I nemici non cambiano bersaglio nell'istante in cui qualcuno supera il tank: serve un vantaggio netto per strapparne uno, e un vantaggio maggiore a distanza che in mischia, quindi un po' di pazienza all'inizio di un pull mantiene lo scontro dove deve stare.",
+      "threatBody": "Ogni nemico tiene un proprio conto privato di chi lo ha infastidito di più. I danni lo alimentano, e così fanno anche le cure: una cura genera minaccia sui nemici che stanno già combattendo la persona che hai curato, ripartita tra loro, quindi la cura più sicura è quella su qualcuno che il tank ha già in pugno. I tank attivano una posizione guardinga o una forma protettiva che moltiplica tutto ciò che generano, mentre la Forma del Gatto del druido riduce invece la minaccia, e una provocazione porta chi la lancia direttamente in cima al conto e blocca il nemico su di lui per pochi secondi. I nemici non cambiano bersaglio nell'istante in cui qualcuno supera il tank: serve un vantaggio netto per strapparne uno, e un vantaggio maggiore a distanza che in mischia, quindi un po' di pazienza all'inizio di un pull mantiene lo scontro dove deve stare.",
       "hazardsTitle": "L'acqua può ucciderti",
       "breathBody": "L'acqua profonda si può nuotare, e puoi immergerti sott'acqua. Mentre la testa è sott'acqua, una barra del respiro blu appare vicino alla parte superiore dello schermo e si esaurisce; riemergi e si riempie molto più in fretta di quanto si sia svuotata. Lasciala esaurire mentre sei ancora sott'acqua e inizi ad annegare, perdendo una parte della tua salute ogni secondo finché non raggiungi l'aria, quindi tieni d'occhio la barra durante un'immersione lunga. La morte la azzera, quindi una corsa al cadavere inizia sempre con i polmoni pieni.",
       "fatigueBody": "Il mare non ha un muro. Gli attraversamenti che il mondo intende farti nuotare, gli stretti e le lagune tra un tratto di terra e il successivo, e i laghi interni, sono sicuri da attraversare per quanto tempo ci vuole. Spingiti invece oltre la costa in acque davvero aperte e comincerai a perdere le forze: appare un avviso, hai una vera finestra di tempo per tornare indietro, e dopo quella il mare infligge un danno costantemente crescente che nulla può prevenire finché non torni verso terra. Annega o sfinisciti così lontano dalla riva e liberi lo spirito come per qualsiasi altra morte, quindi tratta l'orizzonte come uno scenario, non come una destinazione.",
@@ -6088,8 +6384,9 @@ export const it_IT: EnTranslations = {
       "framePetBody": "Cacciatori, stregoni e chiunque altro abbia un famiglio evocato ottengono per lui un piccolo riquadro accanto al proprio, con nome, livello e salute. Fare clic su quel riquadro seleziona il tuo famiglio, e Ctrl+6 fa lo stesso da tastiera.",
       "framesMoveBody": "Il tuo riquadro, il riquadro del tuo bersaglio e i riquadri del tuo gruppo possono essere tutti spostati. Ognuno porta un piccolo pulsante di spostamento nel proprio angolo: premi Sposta per sbloccarlo, trascina il riquadro dove vuoi, e premi di nuovo Blocca così un clic accidentale non può spostarlo. Se finiscono in un punto che non ti piace, Ripristina posizione dei riquadri nelle opzioni li riporta tutti dove erano all'inizio.",
       "framesMoveBodyEditFrames": "Puoi spostare la tua struttura, quella del bersaglio e quelle del gruppo. Ognuna ha un piccolo pulsante di spostamento nell’angolo: sbloccalo, trascina la struttura dove vuoi e bloccalo di nuovo, così un clic accidentale non la muove. Modifica Strutture, in cima alla scheda Strutture delle opzioni Interfaccia, allenta in una volta sola il resto dell’interfaccia, comprese quelle tre strutture: barre delle azioni, barra di lancio, barra dei colpi, barra dell’esperienza, minimappa, barra dei pulsanti, struttura del famiglio, barra della posizione, righe di benefici e debilitazioni e chip del Promemoria Lista dei Desideri, ciascuno con il proprio chip quando è allentato. Se li metti in una posizione scomoda, Ripristina impostazioni predefinite in fondo alla stessa scheda Strutture li riporta tutti al punto di partenza.",
-      "framesGovernedExtra": "Modifica Strutture allenta anche la pila di tracciatori sottostante, con le missioni e gli obiettivi tracciati, il progresso delle imprese, le pagine del Reliquiario, la spedizione in corso, lo squarcio a cui partecipi e la ricetta o commissione seguita, oltre alla barra delle azioni del famiglio, ai punti del bersaglio per le tue debilitazioni sui nemici vicini, al medaglione Devozione del paladino, alla Barra Afflizione dello stregone, alla sovrapposizione dei proc degli incantesimi, al timer del colpo della mano secondaria per chi impugna due armi e alla finestra a schede dei misuratori dei danni. Ognuno porta il proprio chip con il nome quando è allentato.",
+      "framesGovernedExtra": "Modifica Strutture allenta anche la pila di tracciatori sottostante, con le missioni e gli obiettivi tracciati, il progresso delle imprese, le pagine del Reliquiario, le ricette che hai appuntato dalla fabbricazione, la spedizione in corso, lo squarcio a cui partecipi e la ricetta o commissione seguita, oltre alla barra delle azioni del famiglio, ai punti del bersaglio per le tue debilitazioni sui nemici vicini, al medaglione Devozione del paladino, alla Barra Afflizione dello stregone, alla sovrapposizione dei proc degli incantesimi, al timer del colpo della mano secondaria per chi impugna due armi e alla finestra a schede dei misuratori dei danni. Ognuno porta il proprio chip con il nome quando è allentato.",
       "framesGovernedAuraTracks": "Modifica Strutture allenta anche le sei tracce aura opzionali dopo che le hai attivate dalla scheda Combattimento delle stesse opzioni Interfaccia: la traccia I miei benefici, la traccia Recuperi difensivi, la traccia I miei scudi, la traccia Recuperi offensivi, la traccia Movimento e furtività e la traccia I miei benefici sugli alleati. Ogni traccia è disattivata per impostazione predefinita e, quando è allentata, porta il proprio chip con il nome.",
+      "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",
@@ -6100,7 +6397,7 @@ export const it_IT: EnTranslations = {
       "minimapBody": "In alto a destra: una minimappa rotonda con il nome della zona sopra e le tue coordinate sotto, cinta da una ghiera che dipinge l'ora del giorno.\n\nIl disco porta più del solo terreno. La tua freccia sta al centro, rivolta nella direzione in cui guardi, con il tuo gruppo intorno a te come puntini colorati per classe e una freccia sul bordo per chiunque se ne sia allontanato. Chi assegna missioni porta sulla minimappa gli stessi simboli che porta nel mondo, e riconoscerai anche i nodi di raccolta e le stazioni di lavorazione, i portali di viaggio, i cadaveri e i contenitori saccheggiabili, qualsiasi ostile che si è interessato a te, gli amici e i compagni di gilda nelle vicinanze, e il tuo stesso corpo mentre corri indietro come spettro.\n\nPiccoli indicatori compaiono su di essa quando hanno qualcosa da dire: una busta mentre ti aspettano lettere non lette, una moneta mentre ricavi di vendita o oggetti restituiti attendono al Mercante, e un pulsante che elenca i tuoi blocchi d'incursione.",
       "mapTitle": "La mappa del mondo e i tuoi tracciatori",
       "mapBody": "M apre la mappa del mondo: il continente disegnato per intero, con sopra la tua freccia, le zone e i loro nomi, i punti di interesse intorno a te, i portali di viaggio e i nodi di raccolta che hai trovato. Anche il tuo gruppo compare sulla mappa. All'interno di un'incursione, la mappa passa a uno schema delle stanze che hai esplorato finora.\n\nLungo il lato destro, sotto la minimappa, una pila di tracciatori tiene sott'occhio i tuoi affari del momento senza che tu debba aprire nulla: le missioni che tieni sotto traccia e i loro obiettivi, il tuo progresso nelle imprese, l'incursione in cui ti trovi, e qualsiasi squarcio a cui stai partecipando. Il tracciatore delle missioni si comprime quando vuoi indietro lo schermo.",
-      "mapBodyZoneFirst": "M apre la mappa del mondo sulla zona in cui ti trovi, con la tua freccia, i punti di interesse vicini, i donatori di missioni con i loro simboli, le aree degli obiettivi, stazioni di fabbricazione, cassette della posta, bacheche e aiuole, ingressi dei dungeon e ogni nodo di raccolta della zona, attenuato mentre ricresce e segnato quando i tuoi strumenti non sono all’altezza. Anche il gruppo compare. Fai clic destro sulla mappa o premi il pulsante Mappa del mondo per allontanare la vista al continente, con ogni zona disegnata e nominata; un clic su una zona apre la sua mappa. Entrando in una spedizione, dungeon, squarcio o fortezza, la mappa passa alla pianta del piano in cui ti trovi; il campo di battaglia delle Piane di Thornhollow ha una mappa propria.\n\nA destra, sotto la minimappa, una pila di tracciatori tiene in vista le tue attività senza aprire finestre: missioni e obiettivi seguiti, progresso delle imprese, pagine del Reliquiario, la spedizione in corso e ogni squarcio a cui partecipi. Il tracciatore delle missioni si comprime quando vuoi recuperare spazio.",
+      "mapBodyZoneFirst": "M apre la mappa del mondo sulla zona in cui ti trovi, con la tua freccia, i punti di interesse vicini, i donatori di missioni con i loro simboli, le aree degli obiettivi, stazioni di fabbricazione, cassette della posta, bacheche e aiuole, ingressi dei dungeon e ogni nodo di raccolta della zona, attenuato mentre ricresce e segnato quando i tuoi strumenti non sono all’altezza. Anche il gruppo compare. Fai clic destro sulla mappa o premi il pulsante Mappa del mondo per allontanare la vista al continente, con ogni zona disegnata e nominata; un clic su una zona apre la sua mappa. Entrando in una spedizione, dungeon, squarcio o fortezza, la mappa passa alla pianta del piano in cui ti trovi; il campo di battaglia delle Piane di Thornhollow ha una mappa propria.\n\nA destra, sotto la minimappa, una pila di tracciatori tiene in vista le tue attività senza aprire finestre: missioni e obiettivi seguiti, progresso delle imprese, pagine del Reliquiario, le ricette che hai appuntato dalla fabbricazione, la spedizione in corso e ogni squarcio a cui partecipi. Il tracciatore delle missioni si comprime quando vuoi recuperare spazio.",
       "gatheringGoalTrackerBody": "Un tracciatore degli obiettivi di raccolta entra nella pila quando segui una ricetta nella finestra di fabbricazione o una commissione sulla bacheca: indica la ricetta o commissione, quanti pezzi stai raccogliendo e quanto i materiali tenuti e immagazzinati ti avvicinano al traguardo. Segui sostituisce l’obiettivo attuale e Cancella lo rimuove esplicitamente; nessuna delle due azioni cambia la tua preferenza di raccolta.",
       "hubPracticeTrackerBody": "Vicino al centro di Eastbrook compare un tracciatore di pratica quando segui le lezioni guidate: tiene in vista i tuoi risultati migliori contro i manichini da pratica. Durante una lezione, una fascia di insegnamento accanto indica il passo attuale, dall’apertura dei Misuratori dei Danni al confronto con una seconda prova.",
       "chatTitle": "La finestra della chat",
@@ -6447,6 +6744,7 @@ export const it_IT: EnTranslations = {
       "formsNote": "Un druido combatte cambiando forma. La maggior parte delle abilità del druido appartiene a una forma specifica, quindi la forma in cui ti trovi decide cosa puoi lanciare, e trasformarti costa un po' di mana. Puoi trasformarti dentro o fuori dal combattimento, tutte le volte che vuoi.",
       "formsAutoUnshift": "Una cura o un incantesimo di danno lanciato in forma ti fa uscire da solo. Lasciare una forma in questo modo è gratuito e non consuma il recupero globale, quindi un incantesimo istantaneo parte nel momento in cui lo premi. Rientrare in forma è un'abilità normale e costa comunque mana e il tuo recupero globale.",
       "formsMoonwing": "Un druido di Equilibrio ottiene una forma in più, la Forma di Lunagufo, la forma da incantatore in cui combatte questa specializzazione. È l'unica forma animale che conserva i tuoi incantesimi, e la tua bacchetta funziona solo con essa o con la tua normale forma da incantatore.",
+      "formsWolfEngage": "Un lupo apre lo scontro con Carica di Bruin, passa subito in Forma del Lupo per bloccare il bersaglio, chiude la distanza con Balzo quando non è in furtività e ferma un nemico con Atterramento.",
       "formLine": {
         "form_bear": "La forma da tank: una pelle spessa, rabbia al posto del mana, e minaccia extra così i nemici continuano ad attaccarti.",
         "form_cat": "La forma da danno in mischia: energia e punti combo, come un ladro, e molta meno minaccia.",
@@ -6455,7 +6753,7 @@ export const it_IT: EnTranslations = {
       "mageEleSummon": "Un incantesimo di Gelo che richiama l'elementale al tuo fianco e lo indirizza contro il tuo bersaglio.",
       "formName": {
         "form_bear": "Forma di Bruin",
-        "form_cat": "Forma del Lupo",
+        "form_cat": "Forma del Gatto",
         "form_travel": "Forma di Fleet"
       }
     },
@@ -6976,7 +7274,7 @@ export const it_IT: EnTranslations = {
     "deedsPage": {
       "intro": "Il Libro delle Imprese è il luogo dove il mondo tiene il conto di tutto ciò che hai fatto, dai primi passi fuori dalla valle iniziale agli scontri più duri che il reame possa offrire. Ottieni imprese giocando, indossa i titoli che concedono e guarda salire la tua Fama.",
       "howHeading": "Come funzionano le imprese",
-      "howBody": "Le imprese si ottengono e si custodiscono con un personaggio alla volta, così ogni eroe che giochi costruisce un Libro tutto suo; solo la Classifica del reame raccoglie la tua Fama su tutti i personaggi che giochi, e conta ogni impresa una volta sola. Ogni impresa dichiara chiaramente che cosa ti chiede, direttamente nel Libro delle Imprese in gioco, così sai sempre a che cosa dare la caccia, e puoi seguire quelle che ti stanno a cuore per tenerle in vista mentre giochi. Poche restano segrete e si rivelano soltanto una volta ottenute. Il Libro si mantiene anche onesto: tutto ciò che il tuo passato può dimostrare, te lo accredita all'istante, così un veterano non lo apre mai su una pagina vuota; solo le imprese a conteggio iniziano il loro computo da zero.",
+      "howBody": "Le imprese si ottengono con un personaggio alla volta, ma il Libro delle Imprese è condiviso da tutti i personaggi del tuo account: un'impresa compiuta da uno qualsiasi di loro viene ottenuta per tutti, il Libro indica chi l'ha ottenuta e quando, e un titolo o un bordo che essa assegna può essere indossato da qualsiasi tuo personaggio. La classifica del reame raccoglie la tua Fama allo stesso modo, contando ogni impresa una volta sola. Ogni impresa dichiara chiaramente che cosa ti chiede, direttamente nel Libro delle Imprese in gioco, così sai sempre a che cosa dare la caccia, e puoi seguire quelle che ti stanno a cuore per tenerle in vista mentre giochi. Poche restano segrete e si rivelano soltanto una volta ottenute. Il Libro si mantiene anche onesto: tutto ciò che il tuo passato può dimostrare, te lo accredita all'istante, così un veterano non lo apre mai su una pagina vuota; solo le imprese a conteggio iniziano il loro computo da zero.",
       "renownHeading": "Fama",
       "renownBody": "La Fama è il punteggio dietro il Libro. Ogni impresa che ottieni vale una quantità fissa, e il tuo totale non fa che salire, così una settimana tranquilla non ti costa mai terreno. Una manciata dipendono dalla fortuna più che dall'abilità, altre imprese di collezione sono la ricompensa di sé stesse, e le Prodezze sono un onore a parte, quindi nessuna di quelle vale alcuna Fama. Le imprese senza Fama contano comunque per il completamento del tuo Libro; semplicemente non danno mai punti. Le Prodezze sono l'unica eccezione, tenute del tutto fuori dal conteggio.",
       "rewardsHeading": "Titoli e bordi",
@@ -7014,7 +7312,7 @@ export const it_IT: EnTranslations = {
     "reliquaryPage": {
       "intro": "Il Reliquiario è il museo dei bottini unici che hai catalogato: i pezzi più ambiti dei dungeon, i trofei di professione, le cavalcature, gli aspetti delle armi e i titoli. Fa coppia con il Libro delle Imprese come una sala dei trofei fa coppia con un libro delle conquiste.",
       "howHeading": "Come funziona la collezione",
-      "howBody": "Apri Il Reliquiario in gioco (Maiusc+X di base). Ogni scaffale custodisce pagine di reliquie uniche. Riempi una sagoma quando ottieni quel pezzo per la prima volta con quel personaggio, e minia una pagina quando ogni sua reliquia è riempita. Alcune pagine portano l'etichetta Ritirata o Personale: restano fuori dal completamento, quindi non bloccano mai uno scaffale né l'intero catalogo. I ritrovamenti in tempo reale mostrano un avviso e aggiornano la finestra aperta; i progressi sono legati al personaggio, tranne gli aspetti delle armi, che sono cosmetici dell'account.",
+      "howBody": "Apri Il Reliquiario in gioco (Maiusc+X per impostazione predefinita). Ogni scaffale contiene pagine di reliquie uniche. Una sagoma si riempie quando un qualsiasi personaggio del tuo account ottiene quel pezzo per la prima volta, e una pagina si illumina quando ogni reliquia al suo interno è riempita. Alcune pagine sono contrassegnate come Ritirata o Personale: restano fuori dal completamento, quindi non bloccano mai uno scaffale o l'intero catalogo. I ritrovamenti dal vivo mostrano un avviso e aggiornano la finestra aperta; i progressi sono condivisi da tutti i personaggi dell'account, così una reliquia trovata da un personaggio riempie la pagina per tutti.",
       "ranksHeading": "Gradi di Curatore",
       "ranksBody": "I gradi di Curatore salgono con ogni reliquia unica catalogata e concedono soltanto titoli e bordi cosmetici. Non danno mai potenza in combattimento, probabilità di bottino o compensazione per la sfortuna. Gli aspetti delle armi legati all'account non contano per il grado di Curatore, così il prestigio resta legato al personaggio, e nemmeno le reliquie delle pagine Ritirate o Personali vi contribuiscono.",
       "retiredTag": "Ritirata",
@@ -7100,7 +7398,7 @@ export const it_IT: EnTranslations = {
       "groupClasses": "Classi",
       "groupForms": "Forme del Druido",
       "formBear": "Forma di Bruin",
-      "formCat": "Forma del Lupo",
+      "formCat": "Forma del Gatto",
       "formTravel": "Forma di Fleet",
       "groupCreatures": "Creature",
       "groupPets": "Demoni dello Stregone",
@@ -7424,7 +7722,7 @@ export const it_IT: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Gli incantamenti hanno quattro gradini. Quello base usa Polvere di Rintocco, con un po’ di Essenza ai livelli alti, e copre lo slot dell’arma, la mano secondaria e ogni slot dell’armatura, con abbastanza varianti per asse di statistiche perché ogni configurazione trovi qualcosa per ogni slot: scudi e mani secondarie da incantatore tenute in mano ricevono un incantamento di Tempra dedicato, quindi nessuno slot equipaggiato resta privo di incantamento. Il gradino Superiore costa un Frammento di Rintocco più Essenza e offre bonus più forti negli slot di maggiore impatto. I frammenti hanno anche altri tre impieghi: le due ricette dei ciondoli, cinque ciascuna, il gradino superiore delle ricariche degli effetti degli strumenti e il gradino Lucente, dove gli incantamenti dell’arma e del petto ne prendono uno ciascuno e l’Infusione ne prende due, quindi mettine da parte alcuni prima di spenderli.\n\nFra questi si trovano i cinque incantamenti Runici, uno per ogni statistica secondaria tipizzata, così nulla di ciò che macini finisce inutilizzato: Bordo Runico, arma e Forza, consuma Acciaio Risonante; Sigillo Runico, arma e Intelletto, Legno Risonante; Trama Runica, petto e Spirito, Filo Risonante; Pelle Runica, gambe e Agilità, Pelle Risonante; Legami Runici, elmo e Tempra, Legami Risonanti. Ognuno usa anche due Essenze di Rintocco; dove uno slot e una statistica hanno sia un incantamento base sia uno Superiore, il bonus Runico cade fra i due, mentre Trama Runica è in assoluto il più forte incantamento di Spirito per il petto e Pelle Runica è l’unico incantamento di Agilità per le gambe. I bonus esatti sono tutti nella tabella seguente.\n\nSopra i gradini ordinari inferiori siede il gradino Lucente, il culmine del lavoro ordinario della professione: Incantamento 100 per i quattro incantamenti e 125 per l’Infusione, come indicato nella colonna Competenza. Ognuno usa un Reagente Lucente e aggiunge un altro gradino al proprio slot: l’arma, con un’opzione Potere e una Potere Magico, il petto e gli stivali. L’ultimo, l’Infusione Lucente, si applica solo a un pezzo Perfezionato: la Perfezione è opera di chi indossa il pezzo, non dell’incantatore, e la pagina delle Professioni spiega come ottenerla.\n\nLo Zelo dell’Ultima Fiamma è una formula separata da incursione, non un incantamento ordinario gratuito. Impara la sua formula commerciabile a Incantamento 100 prima di applicarla. Ogni applicazione usa 3 Nuclei dell’Ultima Fiamma e 2 Frammenti di Rintocco; la formula può cadere nel Crogiolo o essere comprata dal suo quartiermastro per un nucleo. Le regole del proc da mischia e della velocità dell’arma sono mostrate per intero qui sotto.",
+        "enchantsNoteRaidFormula": "Gli incantamenti hanno quattro gradini. Quello base usa Polvere di Rintocco, con un po’ di Essenza ai livelli alti, e copre lo slot dell’arma, la mano secondaria e ogni slot dell’armatura, con abbastanza varianti per asse di statistiche perché ogni configurazione trovi qualcosa per ogni slot: scudi e mani secondarie da incantatore tenute in mano ricevono un incantamento di Tempra dedicato, quindi nessuno slot equipaggiato resta privo di incantamento. Il gradino Superiore costa un Frammento di Rintocco più Essenza e offre bonus più forti negli slot di maggiore impatto. I frammenti hanno anche altri tre impieghi: le due ricette dei ciondoli, uno ciascuna (il resto del costo di un ciondolo è essenza e polvere), il gradino superiore delle ricariche degli effetti degli strumenti e il gradino Lucente, dove gli incantamenti dell’arma e del petto ne prendono uno ciascuno e l’Infusione ne prende due, quindi mettine da parte alcuni prima di spenderli.\n\nFra questi si trovano i cinque incantamenti Runici, uno per ogni statistica secondaria tipizzata, così nulla di ciò che macini finisce inutilizzato: Bordo Runico, arma e Forza, consuma Acciaio Risonante; Sigillo Runico, arma e Intelletto, Legno Risonante; Trama Runica, petto e Spirito, Filo Risonante; Pelle Runica, gambe e Agilità, Pelle Risonante; Legami Runici, elmo e Tempra, Legami Risonanti. Ognuno usa anche due Essenze di Rintocco; dove uno slot e una statistica hanno sia un incantamento base sia uno Superiore, il bonus Runico cade fra i due, mentre Trama Runica è in assoluto il più forte incantamento di Spirito per il petto e Pelle Runica è l’unico incantamento di Agilità per le gambe. I bonus esatti sono tutti nella tabella seguente.\n\nSopra i gradini ordinari inferiori siede il gradino Lucente, il culmine del lavoro ordinario della professione: Incantamento 100 per i quattro incantamenti e 125 per l’Infusione, come indicato nella colonna Competenza. Ognuno usa un Reagente Lucente e aggiunge un altro gradino al proprio slot: l’arma, con un’opzione Potere e una Potere Magico, il petto e gli stivali. L’ultimo, l’Infusione Lucente, si applica solo a un pezzo Perfezionato: la Perfezione è opera di chi indossa il pezzo, non dell’incantatore, e la pagina delle Professioni spiega come ottenerla.\n\nLo Zelo dell’Ultima Fiamma è una formula separata da incursione, non un incantamento ordinario gratuito. Impara la sua formula commerciabile a Incantamento 100 prima di applicarla. Ogni applicazione usa 3 Nuclei dell’Ultima Fiamma e 2 Frammenti di Rintocco; la formula può cadere nel Crogiolo o essere comprata dal suo quartiermastro per un nucleo. Le regole del proc da mischia e della velocità dell’arma sono mostrate per intero qui sotto.",
         "charmsHeading": "Ciondoli per gli strumenti di un raccoglitore",
         "formulaRequired": "Questa formula richiede il modello corretto e la competenza necessaria.",
         "charmsBody": "L'Incantamento è anche l'origine dei ciondoli di un raccoglitore. L'Armeggiatore Gizzel li insegna entrambi all'officina degli attrezzi di Eastbrook una volta che il tuo Incantamento raggiunge 25: la Riserva del Raccoglitore, che aggiunge un'unità a un raccolto, e l'Occhio dell'Artigiano, che innalza il grado di ciò che viene estratto. Ciascuno viene fabbricato una sola volta, poi inserito in un piccone, un'ascia o un falcetto, dove spende una carica solo sui raccolti che effettivamente migliora.\n\nÈ nella ricarica che il mestiere continua a guadagnare. Le cariche vengono ripristinate da chi possiede lo strumento, non da un incantatore di passaggio, e la ricarica costa la metà dei materiali quando quel proprietario è l'incantatore che ha firmato il ciondolo, ancora meno con una specializzazione in Incantamento. Quindi un ciondolo venduto al banco è una vendita unica, mentre i ciondoli che viaggiano sui tuoi stessi strumenti sono quelli economici da mantenere in funzione. La scala completa di cariche e materiali si trova in qualsiasi pagina delle professioni di raccolta, sotto Effetti da strumento."
@@ -7493,7 +7791,7 @@ export const it_IT: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Il ritmo dell’agricoltura",
-        "rhythmBody": "La semina è il lancio visibile breve: {plant} secondi netti a ogni gradino, perché una zappa apre il terreno invece di comprare velocità. Raccogliere una coltura matura è istantaneo. Non c’è lancio da interrompere né controllo delle borse che possa rifiutare l’azione, e un’aiuola pronta aspetta finché la lasci, quindi una borsa piena costa all’agricoltore solo la camminata per svuotarla.\n\nUn raccolto paga prodotti e competenza agricola. A differenza di un filone, non concede alcuna esperienza al personaggio, quindi le aiuole sono un mestiere da lavorare, non un modo per salire di livello.",
+        "rhythmBody": "La semina è istantanea, perché una zappa apre il terreno invece di comprare velocità: non c’è alcun lancio da attendere, quindi un agricoltore che si allontana ha comunque seminato. Anche raccogliere una coltura matura è istantaneo. Non c’è lancio da interrompere né controllo delle borse che possa rifiutare l’azione, e un’aiuola pronta aspetta finché la lasci, quindi una borsa piena costa all’agricoltore solo la camminata per svuotarla.\n\nUn raccolto paga prodotti e competenza agricola. A differenza di un filone, non concede alcuna esperienza al personaggio, quindi le aiuole sono un mestiere da lavorare, non un modo per salire di livello.",
         "gainHeading": "Guadagnare competenza",
         "gainBody": "Il guadagno è deterministico e dipende dal tuo contatore, non dal raccolto: {g1} di competenza per un raccolto sotto {p1}, {g2} sotto {p2}, {g3} sotto {p3} e {g4} fino al limite di {cap}. Non è mai un tiro di aumento, quindi la scalata dura esattamente quanto stabilisce l’aritmetica.\n\nIl grado del raccolto decide quanto lontano può portarti un’aiuola. Un raccolto di grado 1 insegna fino a {c1} e poi diventa grigio, un raccolto di grado 2 fino a {c2}, mentre il grado 3 e oltre arriva al limite: salire fra le aiuole è ciò che mantiene attivo il contatore.",
         "yieldsHeading": "Resa e qualità",
@@ -7535,8 +7833,8 @@ export const it_IT: EnTranslations = {
         "commissionsHeading": "Commissioni e il Vincolo dell'Artigiano",
         "commissionsBody": "Una commissione e una lavorazione fatta per qualcuno. Quando si forgia un'arma, un pezzo d'armatura o un oggetto tenuto fuori mano (una pozione non puo portare un vincolo), l'artigiano puo contrassegnare la lavorazione come commissione: il pezzo finito si comporta normalmente tra le mani del creatore, ma nel momento in cui cambia mani in uno scambio si vincola alla persona che lo ha ricevuto. Questo e il Vincolo dell'Artigiano: il compratore ottiene il suo pezzo, e il pezzo non puo essere ceduto o rivenduto.\n\nI vincoli non sono eterni, solo costosi. Qualsiasi maestro di stazione sciolgliera un pezzo vincolato mentre sei presso la sua stazione (una stazione mobile non offre mai il servizio), per una tariffa fissata dalla qualita dell'oggetto: 25 argento per il non comune, 1 oro per il raro, 4 oro per l'epico, con il leggendario che paga la tariffa dell'epico e un pezzo comune commissionato quella del non comune.\n\nLa tariffa compra una lavagna pulita, non una cura: il pezzo e ancora una commissione, quindi si vincola di nuovo a chiunque lo riceva nel successivo scambio, e tutto il resto, firma, capolavoro e incanti, sopravvive intatto.",
         "provenanceHeading": "Lavoro firmato",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; apri Fonti per l’elenco completo. Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: tenere al banco una copia firmata di un reagente necessario, da chiunque sia stata firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Alcuni oggetti portano un nome. Le righe della provenienza di un materiale indicano chi ha raccolto ogni gruppo di unità, mentre un marchio separato firmato da identifica l’eventuale firmatario premium. I due fatti sono indipendenti: un materiale raccolto normalmente registra il raccoglitore senza ottenere una firma, mentre una scorta firmata ereditata può indicare il firmatario dichiarando onestamente che non è stato registrato alcun raccoglitore. Un pezzo finito indica invece chi lo ha fabbricato. Questi dati viaggiano con l’oggetto attraverso scambi, banca, posta, Mercato Globale e perfino il riacquisto dal venditore, senza mai svanire.\n\nLa raccolta firma automaticamente il lavoro migliore: ogni raccolto che ottiene raro o superiore arriva firmato, e i ritrovamenti rari firmano l’intero bottino di cinque unità. Un raccolto da cadavere con tiro fortunato firma la resa quando la famiglia non ha un esemplare da offrire; quando ce l’ha, mantiene la resa normale e crea accanto l’esemplare intatto firmato. L’artigianato firma allo stesso modo: ogni copia di un’uscita rara o superiore crea una copia firmata, e un capolavoro firma sempre qualunque sia la sua qualità, così la versione migliore di ogni pezzo indica sempre il suo creatore. La firma di un materiale ordinario viaggia con le unità e non si perde solo perché una pila compatibile contiene già un altro raccoglitore o firmatario. Un esemplare intatto distinto è un oggetto separato e richiede spazio; se non può entrare, la resa ordinaria del cadavere resta ma l’esemplare viene perso.\n\nGli oggetti finiti mantengono un’identità rigida, quindi due copie si fondono solo quando ogni marchio coincide esattamente: stesso oggetto, stesso firmatario, stesse statistiche del capolavoro, stesso incantamento e stesso vincolo. I materiali compatibili condividono uno slot fra raccoglitori e firmatari, mantenendo però un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.\n\nLe firme ricompensano gli artigiani: tenere al banco una copia firmata di un reagente necessario, da chiunque sia stata firmata, aggiunge 2 punti percentuali alla probabilità di capolavoro; tenere un reagente firmato da te riduce di uno la quantità richiesta di quel reagente, mai sotto uno, salvo che il reagente sia marcato come non scontabile; i nuclei da incursione mantengono sempre il costo pieno. Il tuo lavoro raro o superiore firmato continua persino a insegnarti, oggi solo tramite le pozioni fabbricate: bevi una bevanda rara che hai preparato e firmato e un piccolo rivolo di competenza torna alla professione che l’ha creata, purché sia una delle tue professioni principali attive. Vale davvero solo per il ramo delle pozioni: un elisir, una pergamena o una fiasca d’apice non ti insegna nulla, per quanto finemente sia stata firmata.",
         "collectorsHeading": "Collezionisti, trofei, e il prezzo di una storia",
         "collectorsBody": "I venditori sono ciechi alla provenienza: un oggetto firmato si vende a un PNG esattamente al suo prezzo normale. Il sovrapprezzo di una firma esiste solo tra i giocatori, il che e precisamente cio che lo rende interessante: una pila di minerale fortunato firmata da un celebre raccoglitore, un Taglio Pregiato da un raccolto fortunato, una lama da capolavoro che porta il nome di un artigiano ormai ritirato, valgono tutti cio che la memoria di qualcuno dice che valgano.\n\nIl Libro delle Imprese segue lo stesso istinto: Filone Intatto, Cuore di Legno Antico, Fiore di Luna, Un Esemplare Perfetto, e Barlume di Speranza sono segni da collezionista a zero Fama che esistono solo per provare che un momento e accaduto a te. Conserva l'oggetto che ha guadagnato l'impresa e tieni la ricevuta. Nulla di tutto questo e potere; la provenienza non compra statistiche e non vince battaglie, e il registro cartaceo del gioco dei giorni felici.",
         "castPaceHeading": "Tempo di lancio e pozzo dell'oro",
@@ -7579,7 +7877,7 @@ export const it_IT: EnTranslations = {
         "title": "Domande Frequenti sulle Professioni",
         "intro": "Risposte rapide alle domande piu frequenti degli artigiani.",
         "q1": "Quale professione dovrei scegliere per prima? Scegli quella che usa i materiali che raccogli più spesso e lascia che gli ordini guidino la scalata.",
-        "a1": "Gli oggetti finiti seguono ancora la rigida regola dell’istanza: due copie si fondono solo quando firmatario, proprietà ottenute, statistiche del capolavoro, incantamento, vincolo e ogni altro dato d’identità coincidono esattamente. Una lama firmata resta quindi separata da una semplice.\n\nI materiali sono l’eccezione. Le pile compatibili dello stesso materiale possono fondersi anche quando raccoglitori o firmatari differiscono, perché la pila conserva un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; apri Fonti per l’elenco completo. Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.",
+        "a1": "Gli oggetti finiti seguono ancora la rigida regola dell’istanza: due copie si fondono solo quando firmatario, proprietà ottenute, statistiche del capolavoro, incantamento, vincolo e ogni altro dato d’identità coincidono esattamente. Una lama firmata resta quindi separata da una semplice.\n\nI materiali sono l’eccezione. Le pile compatibili dello stesso materiale possono fondersi anche quando raccoglitori o firmatari differiscono, perché la pila conserva un conteggio per ogni fonte. Il suggerimento al passaggio riassume le fonti; fai clic destro sulla pila per l’elenco completo (su touch, usa il suo pulsante Fonti). Separare per raccoglitore mantiene separate le pile nelle borse e l’ordinamento rispetta la scelta. Il materiale trasferito può impilarsi normalmente con quello del destinatario.",
         "q2": "Le ricette comuni aumentano la mia competenza all'infinito?",
         "a2": "No. Ogni ricetta viene valutata in base a quanto si trova sotto la tua fascia attuale nella professione, secondo la lettura classica arancione, gialla, verde e grigia: guadagno pieno alla tua fascia o sopra, metà un gradino sotto, un quarto due gradini sotto e nulla tre o più gradini sotto. Le fasce sono ogni 25 punti di competenza, quindi le ricette gratuite di competenza 0 smettono di insegnare a competenza 75.\n\nAnche i limiti sono inferiori ai 300 classici che potresti aspettarti: ognuna delle dieci professioni ottenibili arriva a 125, Estrazione, Taglio e Erboristeria arrivano a 100 e la Pesca arriva fino a 200. Salire significa passare alle ricette della tua fascia, non macinare quella più economica.",
         "q3": "Qual e la differenza tra saccheggiare e raccogliere una carcassa?",
@@ -10083,6 +10381,7 @@ export const it_IT: EnTranslations = {
       "templates": {
         "battleground": "[Campo di battaglia] {name}: {message}",
         "party": "[Gruppo] {name}: {message}",
+        "raidWarning": "[Avviso raid] {name}: {message}",
         "yell": "{name} urla: {message}",
         "whisper": "{name} sussurra: {message}",
         "toWhisper": "A {name}: {message}",
@@ -10221,6 +10520,7 @@ export const it_IT: EnTranslations = {
       "stunned": "Sei stordito!",
       "silenced": "Sei ridotto al silenzio!",
       "busy": "Sei occupato.",
+      "cannotCastWhileMoving": "Non puoi lanciare incantesimi mentre sei in movimento.",
       "abilityNotReady": "Quell'abilità non è ancora pronta.",
       "notEnoughRage": "Rabbia insufficiente!",
       "notEnoughEnergy": "Energia insufficiente!",
@@ -10233,7 +10533,7 @@ export const it_IT: EnTranslations = {
       "requiresForm": "Devi essere in Forma di {form}.",
       "cantInForm": "Non puoi farlo in Forma di {form}.",
       "bear": "Bruin",
-      "cat": "Lupo",
+      "cat": "Gatto",
       "travel": "Fleet",
       "shapeshifted": "Non puoi farlo mentre sei trasformato.",
       "stealthed": "Devi essere furtivo.",
@@ -10565,11 +10865,10 @@ export const it_IT: EnTranslations = {
     },
     "forms": {
       "bear": "orso",
-      "cat": "lupo"
+      "cat": "gatto"
     },
     "cast": {
       "fishing": "Pesca",
-      "farming": "Piantare",
       "gathering": "Raccolta",
       "crafting": "Creazione",
       "disenchanting": "Disincantamento",
@@ -10913,6 +11212,19 @@ export const it_IT: EnTranslations = {
       "buyConfirmAccept": "Compra",
       "buyConfirmCancel": "Annulla",
       "buyChanged": "Quell'inserzione è cambiata prima che tu confermassi. Controlla il prezzo e riprova.",
+      "sweep": "Spazzare",
+      "sweepAria": "Conquista il mercato per {item}",
+      "sweepTitle": "Spazzata di mercato: {item}",
+      "sweepClose": "Vicino",
+      "sweepNote": "Acquista intere inserzioni da altri venditori, prima per unità più economica, finché il conteggio non viene coperto. Potresti riceverne qualcuno in più di quanto hai chiesto.",
+      "sweepQuantity": "Cercasi unità",
+      "sweepQuoteNone": "Nessuna inserzione di questo oggetto da analizzare.",
+      "sweepQuoteLine": "{units} unità in {listings} elenchi per {total} ({each} ciascuno)",
+      "sweepQuoteShort": "Sono disponibili solo {units} unità negli elenchi di {listings}, per {total} ({each} ciascuno)",
+      "sweepButton": "Spazzare",
+      "sweepConfirmTitle": "Conferma la scansione del mercato",
+      "sweepConfirmBody": "Acquistare {item} x{units} in {listings} inserzioni per {total} ({each} ciascuno)?",
+      "sweepChanged": "La citazione è cambiata prima della tua conferma. Controlla il totale e riprova.",
       "sellNote": "Metti in vendita merci dalle borse. Il Mercante prende il {cut}% quando un oggetto viene venduto. Usi {used}/{max} spazi.",
       "sellPickEmpty": "Clicca su un oggetto nelle borse per scegliere cosa vendere.",
       "quantity": "Quantità",
@@ -10952,7 +11264,9 @@ export const it_IT: EnTranslations = {
       "ownListing": "Questa è la tua inserzione. Annullala per riprenderla.",
       "cannotAfford": "Non puoi permettertelo.",
       "notYourListing": "Questa inserzione non è tua.",
-      "nothingToCollect": "Non hai nulla da ritirare."
+      "nothingToCollect": "Non hai nulla da ritirare.",
+      "sweepNoListings": "Nessun elenco di quell'articolo disponibile per lo screening.",
+      "sweepPriceChanged": "I prezzi sono cambiati prima che arrivasse il tuo sondaggio. Controlla il preventivo e riprova."
     },
     "loot": {
       "takeAll": "Prendi tutto",
@@ -11790,7 +12104,7 @@ export const it_IT: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Lancia un maleficio sul nemico per 8 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 17 danni da Ombra."
+        "description": "Lancia un maleficio sul nemico per 8 sec, infliggendo danni da Ombra e generando 2 Condanna ogni 2 sec. Le sue prossime 3 azioni dannose generano ciascuna 7 Condanna e lo colpiscono per 17 danni da Ombra."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -11826,7 +12140,7 @@ export const it_IT: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio."
+        "description": "Marchia un nemico per 15 sec. I tuoi prossimi 3 incantesimi diretti riecheggiano per il 25% dei danni contro il nemico marchiato, oppure copiano il 50% dei danni su di esso quando lanciati contro un altro bersaglio. Gli echi di Dardo della Rovina contano anche come colpi critici, senza un ulteriore moltiplicatore di danno critico."
       },
       "wrath": {
         "name": "Dardo Silvano",
@@ -11865,7 +12179,7 @@ export const it_IT: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma di Bruin",
-        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Lanciala di nuovo per tornare alla forma da incantatore."
+        "description": "Mutamenti in orso: armatura +110%, salute massima +30%, potenza d'attacco notevolmente aumentata, i tuoi attacchi generano rabbia e il 30% di minaccia in più. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lanciala di nuovo per tornare alla forma da incantatore."
       },
       "maul": {
         "name": "Frantumaossa",
@@ -11881,17 +12195,17 @@ export const it_IT: EnTranslations = {
         "description": "Un ruggito funesto: ogni nemico entro 10 metri viene provocato, la sua minaccia verso di te sale fino a eguagliare quella del suo nemico più odiato, ed è costretto ad attaccarti per 3 sec. Solo in Forma di Bruin."
       },
       "cat_form": {
-        "name": "Forma del Lupo",
-        "description": "Vi trasforma in lupo: l'agilità sale con il vostro livello, potenza d'attacco +8 più 2 per livello, i vostri attacchi usano energia e punti combo, e generate il 29% di minaccia in meno. Lanciate di nuovo per tornare alla forma da incantatore."
+        "name": "Forma del Gatto",
+        "description": "Vi trasforma in lupo: l'agilità sale con il vostro livello, potenza d'attacco +8 più 2 per livello, i vostri attacchi usano energia e punti combo, e generate il 29% di minaccia in meno. Passare a qualsiasi forma concede Passo leggero: il 60% di velocità di movimento per 3 sec, una volta ogni 20 sec. Lanciate di nuovo per tornare alla forma da incantatore."
       },
       "claw": {
         "name": "Artiglio Lacerante",
-        "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "description": "Artiglia il nemico per danni dell'arma più {damage}. Conferisce 1 punto combo. Solo Forma del Gatto.",
         "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "ferocious_bite": {
         "name": "Morso Cruento",
-        "description": "Mossa finale che infligge {damage}. Solo Forma del Lupo.",
+        "description": "Mossa finale che infligge {damage}. Solo Forma del Gatto.",
         "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico; a 3 Sangue Antico questo pulsante diventa Mietitura Rossa, che consuma il Sangue Antico per un colpo più forte che infligge anche istantaneamente tutti i danni che Scarnificare e Squartare avrebbero ancora inflitto, e ripristina energia."
       },
       "swipe": {
@@ -11923,7 +12237,7 @@ export const it_IT: EnTranslations = {
       },
       "travel_form": {
         "name": "Forma di Fleet",
-        "description": "Assumi all'istante una rapida Forma di Fleet, aumentando la velocità di movimento del 40%. Mentre sei trasformato non puoi usare altre abilità, ma puoi trasformarti dentro o fuori dal combattimento: ideale per fuggire."
+        "description": "Assumi all'istante una rapida Forma di Fleet, aumentando la velocità di movimento del 40% e rimuovendo i radicamenti e i rallentamenti annullabili. Mentre sei trasformato non puoi usare altre abilità, ma puoi trasformarti dentro o fuori dal combattimento: ideale per fuggire. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento."
       },
       "enrage": {
         "name": "Attizzare",
@@ -11943,23 +12257,31 @@ export const it_IT: EnTranslations = {
       },
       "dash": {
         "name": "Scatto",
-        "description": "Scatta in avanti, aumentando la velocità di movimento del 50% per 15 sec. Solo Forma del Lupo."
+        "description": "Scatta in avanti, aumentando la velocità di movimento del 50% per 15 sec. Solo Forma del Gatto."
       },
       "pounce": {
         "name": "Colpo Strisciante",
-        "description": "Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Lupo."
+        "description": "Apertura furtiva che stordisce il bersaglio per 2 sec. Conferisce 1 punto combo. Solo Forma del Lupo. Fuori dalla furtività questo pulsante è Balzo."
+      },
+      "lunge": {
+        "name": "Balzo",
+        "description": "Balza su un nemico fino a 12 metri di distanza, infliggendo il 60% del danno dell'arma e conferendo 1 punto combo. Solo in Forma del Lupo."
+      },
+      "hamstring_bite": {
+        "name": "Atterramento",
+        "description": "Mossa finale che stordisce il bersaglio per 1 sec più 1 sec per punto combo (5 punti combo: 6 sec). Solo in Forma del Lupo."
       },
       "insect_swarm": {
         "name": "Sciame Pungente",
         "description": "Il nemico è assalito da uno sciame di insetti, subendo {damage} danni da Natura in 12 sec."
       },
       "tigers_fury": {
-        "name": "Sangue di Lupo",
-        "description": "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Lupo."
+        "name": "Sangue di Lince",
+        "description": "Sprigiona {rage} energia e aumenta la potenza d'attacco di {buff} per {duration} sec. Solo Forma del Gatto."
       },
       "rip": {
         "name": "Faglia Sanguigna",
-        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Lupo.",
+        "description": "Mossa finale che fa sanguinare il bersaglio ogni 2 sec per 24 sec: 36 danni più 24 per punto combo speso (5 punti combo: {damage} danni totali). Solo Forma del Gatto.",
         "specNote_feral": "Il colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "mortal_strike": {
@@ -12156,11 +12478,11 @@ export const it_IT: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Forma di Lunagufo",
-        "description": "Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Lancia ancora per tornare alla forma normale. (firma Equilibrio)"
+        "description": "Assume Forma di Lunagufo, potenziando il lancio di incantesimi finché non cambi di nuovo. Assumere una forma qualsiasi conferisce Falcata Ampia, una breve raffica di velocità di movimento. Lancia ancora per tornare alla forma normale. (firma Equilibrio)"
       },
       "feral_charge": {
         "name": "Impeto Primordiale",
-        "description": "Scatena un impeto primordiale. In Forma del Lupo, la rigenerazione dell’energia aumenta del 100% per 10 s. In Forma di Bruin, genera istantaneamente 50 rabbia. (firma Aggressore Ferino)"
+        "description": "Scatena un impeto primordiale. In Forma del Gatto, la rigenerazione dell’energia aumenta del 100% per 10 s. In Forma di Bruin, genera istantaneamente 50 rabbia. (firma Aggressore Ferino)"
       },
       "swiftmend": {
         "name": "Rapidità di Guarigione",
@@ -12380,7 +12702,7 @@ export const it_IT: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Dardo della Rovina",
-        "description": "Spende 3 Devastazione per scagliare un pesante dardo di fuoco caotico che infligge {damage} danni da Fuoco. Rovina ne accorcia il lancio del 30%."
+        "description": "Spende 3 Devastazione per scagliare un pesante dardo di fuoco caotico che infligge {damage} danni da Fuoco prima dell'applicazione del danno critico. Colpisce sempre in modo critico quando va a segno. Rovina ne accorcia il lancio del 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -12524,7 +12846,7 @@ export const it_IT: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Momento Perfetto",
-        "description": "Cogli il tuo momento perfetto: guadagni istantaneamente 4 Cariche Arcane e per 10 secondi Dardi d'Etere non le consuma. (Cronomanzia)"
+        "description": "Cogli il tuo momento perfetto: guadagni istantaneamente 4 Cariche Arcane e per 10 secondi Dardi d'Etere non le consuma e infligge il 20% di danni in più. (Cronomanzia)"
       },
       "arcane_surge": {
         "name": "Potere d'Etere",
@@ -12661,7 +12983,7 @@ export const it_IT: EnTranslations = {
       },
       "bear_charge": {
         "name": "Carica di Bruin",
-        "description": "Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Gittata di 7-23 metri. Solo in Forma di Bruin."
+        "description": "Carica un nemico, generando 9 punti rabbia e stordendolo per 1 sec. Per i 3 sec successivi, la Forma del Lupo è gratuita e blocca il bersaglio, rallentandolo del 50% per 4 sec. Gittata di 7-23 metri. Solo in Forma di Bruin."
       },
       "demoralizing_roar": {
         "name": "Ruggito Codardo",
@@ -12669,11 +12991,11 @@ export const it_IT: EnTranslations = {
       },
       "prowl": {
         "name": "Appostamento",
-        "description": "Entra in furtività mentre sei in Forma del Lupo, muovendoti il 5% più lentamente. Non utilizzabile in combattimento."
+        "description": "Entra in furtività mentre sei in Forma del Lupo. Non utilizzabile in combattimento."
       },
       "rake": {
         "name": "Scarnificare",
-        "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Lupo.",
+        "description": "Scarnifica il nemico per danni dell'arma più {damage} e causa danni da sanguinamento in 18 sec. Conferisce 1 punto combo. Solo Forma del Gatto.",
         "specNote_feral": "Ogni colpo a segno aggiunge 1 Sangue Antico (massimo 3)."
       },
       "revive_pet": {
@@ -16433,6 +16755,21 @@ export const it_IT: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Manichino da Cura"
+      },
+      "healing_dummy_tank": {
+        "name": "Manichino dell'Avanguardia ferito"
+      },
+      "healing_dummy_soldier": {
+        "name": "Manichino del soldato ferito"
+      },
+      "healing_dummy_scout": {
+        "name": "Manichino da scout critico"
+      },
+      "healing_dummy_caster": {
+        "name": "Manichino dell'incantatore ferito"
+      },
+      "healing_dummy_ranger": {
+        "name": "Manichino Ranger malconcio"
       },
       "ridge_stalker": {
         "name": "Braccatore della cresta"

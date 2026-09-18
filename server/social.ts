@@ -18,6 +18,8 @@ import {
 } from '../src/sim/guild_roster';
 import { guildTierForLifetimeXp } from '../src/sim/guild_tier';
 import type { PlayerClass } from '../src/sim/types';
+import type { GuildPledgeSettings } from '../src/world_api/social_graph';
+import type { GuildPledgeSettingsInput } from './guild_pledge_settings_cmd';
 
 export type GuildRank = 'leader' | 'officer' | 'member';
 
@@ -99,7 +101,7 @@ export interface GuildView {
   events: GuildEventRow[];
   // Guild pledge board: the recruiting settings every member sees, and the
   // open pledges (officer-plus only; empty for plain members).
-  pledgeSettings: { enabled: boolean; minLevel: number; note: string };
+  pledgeSettings: GuildPledgeSettings;
   pledges: (CharInfo & { sinceMs: number })[];
   // The guild colour tier (sim/guild_tier.ts) for the nameplate line.
   tier: number;
@@ -204,13 +206,10 @@ export interface SocialDb {
   guildMotd(guildId: number): Promise<{ motd: string; motdSetBy: string }>;
   // guild pledge board (docs/prd/guild-pledge-board.md)
   guildByName(name: string): Promise<{ id: number; name: string } | null>;
-  guildPledgeSettings(
-    guildId: number,
-  ): Promise<{ enabled: boolean; minLevel: number; note: string }>;
-  setGuildPledgeSettings(
-    guildId: number,
-    settings: { enabled: boolean; minLevel: number; note: string },
-  ): Promise<void>;
+  guildPledgeSettings(guildId: number): Promise<GuildPledgeSettings>;
+  /** An absent `newPlayerFriendly` keeps the stored flag: the store merges it
+   *  inside the write (one statement), never read-then-write. */
+  setGuildPledgeSettings(guildId: number, settings: GuildPledgeSettingsInput): Promise<void>;
   guildPledges(guildId: number): Promise<(CharInfo & { sinceMs: number })[]>;
   pledgeOf(charId: number): Promise<{ guildId: number; guildName: string; sinceMs: number } | null>;
   upsertPledge(charId: number, guildId: number): Promise<void>;
@@ -1395,7 +1394,7 @@ export class SocialService {
 
   async setGuildPledgeSettings(
     actor: SocialActor,
-    settings: { enabled: boolean; minLevel: number; note: string },
+    settings: GuildPledgeSettingsInput,
   ): Promise<void> {
     const membership = await this.db.guildMembership(actor.characterId);
     if (!membership) {
@@ -1419,10 +1418,16 @@ export class SocialService {
       this.err(actor.characterId, 'That board note is not allowed.');
       return;
     }
+    // The category opt-in is optional on the wire (guild_pledge_settings_cmd.ts):
+    // a client that predates it leaves the stored flag alone, merged by the
+    // store inside its one write (no extra read, no read-modify-write race).
     await this.db.setGuildPledgeSettings(membership.guildId, {
       enabled: !!settings.enabled,
       minLevel,
       note,
+      ...(settings.newPlayerFriendly === undefined
+        ? {}
+        : { newPlayerFriendly: settings.newPlayerFriendly }),
     });
     await this.pushGuild(membership.guildId);
   }

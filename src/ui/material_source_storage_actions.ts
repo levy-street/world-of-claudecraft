@@ -3,6 +3,8 @@
 // closes over it until Confirm. Ordinary whole-stack transfer paths stay in
 // their owning windows.
 
+import { stackSizeOf } from '../sim/bags';
+import { ITEMS } from '../sim/data';
 import type { InvSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
@@ -10,7 +12,7 @@ import {
   selectedMaterialSourceTransfer,
 } from './material_source_transfer_view';
 import type { MaterialSourcesSelectionFactory } from './material_sources_dialog';
-import { vaultSpecialRef } from './vault_view';
+import { vaultMaterialHeadroom, vaultSpecialRef } from './vault_view';
 
 export type MaterialStorageDestination = 'bank' | 'guild' | 'vault';
 
@@ -25,8 +27,15 @@ export function bagMaterialDepositSelection(
     if (slotIndex < 0) return null;
     const captured = captureMaterialSourceTransfer(world.inventory, slot.itemId, slotIndex);
     if (!captured) return null;
+    // The vault has a live per-material ceiling and refuses an explicit
+    // selection that exceeds it outright, so the picker is told what fits
+    // (the bank and guild book are slot-bound and have no such number).
+    const limit =
+      destination === 'vault' ? vaultMaterialHeadroom(world.vaultInfo, slot.itemId) : undefined;
     return {
       sources: captured.sources,
+      stepSize: stackSizeOf(ITEMS[slot.itemId]),
+      ...(limit === undefined ? {} : { limit }),
       onConfirm: (selected) => {
         const intent = selectedMaterialSourceTransfer(captured, selected);
         if (destination === 'bank') world.bankDeposit(slotIndex, selected.count, intent);
@@ -54,6 +63,7 @@ export function bankMaterialWithdrawSelection(
     if (!captured) return null;
     return {
       sources: captured.sources,
+      stepSize: stackSizeOf(ITEMS[itemId]),
       onConfirm: (selected) => {
         world.bankWithdraw(
           slotIndex,
@@ -79,6 +89,7 @@ export function guildMaterialWithdrawSelection(
     if (!captured) return null;
     return {
       sources: captured.sources,
+      stepSize: stackSizeOf(ITEMS[itemId]),
       onConfirm: (selected) => {
         world.guildBankWithdraw(
           slotIndex,
@@ -106,6 +117,7 @@ export function vaultMaterialWithdrawSelection(
     const special = vaultSpecialRef(slotIndex, slot);
     return {
       sources: captured.sources,
+      stepSize: stackSizeOf(ITEMS[itemId]),
       onConfirm: (selected) => {
         world.vaultWithdraw(itemId, selected.count, {
           ...special,

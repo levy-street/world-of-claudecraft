@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "f208f49ca956f1d671f2a3b6b2e51ef9213a4a0b2258b1c43443cf118c5a32d1",
+  "rendererFingerprint": "dddd242fe3f5a95440f018b9c3d111c1cc55c0484e3775cdb6c0ac5c6a676f06",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4892699,
-      "sha256": "ce057dbb3df55684df4f85015698ee615888cb53ff845756d2c258e698ede2e9",
+      "bytes": 4910366,
+      "sha256": "f11524a7390cb8b858c582a6025275f16f547cc669e2e8f5d9b335391fd8e10e",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 245,
+  "portraitCount": 250,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -2936,6 +2936,176 @@
       }
     },
     {
+      "id": "healing_dummy_caster",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_caster.webp",
+        "bytes": 1746,
+        "sha256": "f7f6203b7467ddbb8922a7fb9acc74caba136f389cd9d96098657bf699bb00f3"
+      }
+    },
+    {
+      "id": "healing_dummy_ranger",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_ranger.webp",
+        "bytes": 1746,
+        "sha256": "f7f6203b7467ddbb8922a7fb9acc74caba136f389cd9d96098657bf699bb00f3"
+      }
+    },
+    {
+      "id": "healing_dummy_scout",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_scout.webp",
+        "bytes": 1746,
+        "sha256": "f7f6203b7467ddbb8922a7fb9acc74caba136f389cd9d96098657bf699bb00f3"
+      }
+    },
+    {
+      "id": "healing_dummy_soldier",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#74c476",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "e9fa47b31ad3c092566a54dd3ecab9cd9eeac17e40fe6a397e1766577b8dbb26",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_soldier.webp",
+        "bytes": 1746,
+        "sha256": "f7f6203b7467ddbb8922a7fb9acc74caba136f389cd9d96098657bf699bb00f3"
+      }
+    },
+    {
+      "id": "healing_dummy_tank",
+      "family": "humanoid",
+      "finderEncounter": false,
+      "visualKey": "mob_training_dummy",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/training_dummy.glb",
+          "path": "public/models/creatures/training_dummy.glb",
+          "bytes": 885308,
+          "sha256": "e29aa3fb8ea7472d51f86176bdf5051c921794f62ac7af5941e0cd3fa560ab92"
+        },
+        "idle": "Idle",
+        "height": 2.3,
+        "yaw": null,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.35
+      },
+      "tint": {
+        "source": "entity",
+        "authored": "entity",
+        "resolved": "#55aa55",
+        "strength": 0.35
+      },
+      "sourceFingerprint": "55d10c68776144c21a92c3422b2cb0deb1bd71397381f8c38bdc888153796f5d",
+      "output": {
+        "path": "public/ui/mobs/healing_dummy_tank.webp",
+        "bytes": 1766,
+        "sha256": "bc047d31c56cf79a3e4293d7d8d06e5a17a901364858d0e69ae9b1b0e2b3c882"
+      }
+    },
+    {
       "id": "hedge_gnome",
       "family": "burrower",
       "finderEncounter": false,
@@ -3380,7 +3550,7 @@
     {
       "id": "ignivar_herald_of_the_last_flame",
       "family": "elemental",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_ignivar",
       "renderSpec": {
         "model": {
@@ -7983,7 +8153,7 @@
     {
       "id": "varkhul_forgefather_of_the_last_flame",
       "family": "elemental",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_varkhul_forgefather",
       "renderSpec": {
         "model": {
@@ -8648,7 +8818,7 @@
     {
       "id": "wildheart_beastmaster",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_beastmaster",
       "renderSpec": {
         "model": {
@@ -8682,7 +8852,7 @@
     {
       "id": "wildheart_hexcaller",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_hexcaller",
       "renderSpec": {
         "model": {
@@ -8716,7 +8886,7 @@
     {
       "id": "wildheart_high_priest",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_high_priest",
       "renderSpec": {
         "model": {
@@ -8750,7 +8920,7 @@
     {
       "id": "wildheart_ravager",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_ravager",
       "renderSpec": {
         "model": {
@@ -8784,7 +8954,7 @@
     {
       "id": "wildheart_stalker",
       "family": "troll",
-      "finderEncounter": false,
+      "finderEncounter": true,
       "visualKey": "mob_wildheart_stalker",
       "renderSpec": {
         "model": {

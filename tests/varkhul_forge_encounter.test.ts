@@ -128,6 +128,27 @@ function addEncounterPlayer(
 }
 
 describe('Varkhul forge pillars and add intermission', () => {
+  it('re-seats on the highest-threat raider, not the lowest entity id, when the tank leaves the claim', () => {
+    const { sim, boss } = claimedEncounter(9401);
+    // The druid spawns first (lowest entity id after the tank) with almost no
+    // threat; the mage joined later and holds far more.
+    const druid = addEncounterPlayer(sim, boss, 'Wolf Druid', 'dps');
+    const mage = addEncounterPlayer(sim, boss, 'Mage', 'dps');
+    expect(druid.id).toBeLessThan(mage.id);
+    boss.threat.set(sim.player.id, 9000);
+    boss.threat.set(druid.id, 120);
+    boss.threat.set(mage.id, 4500);
+    updateVarkhulEncounter(sim.ctx, boss);
+    expect(boss.aggroTargetId).toBe(sim.player.id);
+
+    // A knockback carried the tank outside the wing claim.
+    sim.player.pos = { x: boss.pos.x + 100000, y: boss.pos.y, z: boss.pos.z + 100000 };
+    sim.player.prevPos = { ...sim.player.pos };
+    updateVarkhulEncounter(sim.ctx, boss);
+
+    expect(boss.aggroTargetId).toBe(mage.id);
+  });
+
   it('names his unseen master once when Varkhul dies', () => {
     const { sim, boss } = claimedEncounter(699);
     updateVarkhulEncounter(sim.ctx, boss);

@@ -49,7 +49,7 @@ const guildSnap = (rank: 'leader' | 'officer' | 'member'): SocialSnapshot => ({
     rank,
     motd: '',
     motdSetBy: '',
-    pledgeSettings: { enabled: true, minLevel: 1, note: '' },
+    pledgeSettings: { enabled: true, minLevel: 1, note: '', newPlayerFriendly: false },
     pledges: [],
     tier: 0,
     memberCap: 100,

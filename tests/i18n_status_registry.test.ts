@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { runInNewContext } from 'node:vm';
@@ -535,13 +535,15 @@ describe('i18n status summary: audit rollup cross-checks the full registry', () 
   it('keeps the audit summary out of version control (gitignored, still generated)', () => {
     // Re-committing the summary would resurrect the guaranteed pairwise merge
     // conflict the degit change removed; its audit trail lives in the CI job
-    // summary instead. `--error-unmatch` throws only for an untracked path.
-    expect(() =>
-      execFileSync('git', ['ls-files', '--error-unmatch', '--', summaryRel], {
-        cwd: root,
-        encoding: 'utf8',
-      }),
-    ).toThrow();
+    // summary instead. Keep stderr captured so this expected negative probe
+    // does not look like a gate failure in the combined log.
+    const res = spawnSync('git', ['ls-files', '--error-unmatch', '--', summaryRel], {
+      cwd: root,
+      encoding: 'utf8',
+    });
+    expect(res.status).toBe(1);
+    expect(res.stderr).toContain(summaryRel);
+    expect(res.error).toBeUndefined();
   });
 
   it('summary counts equal the full registry counts, and locales/scopes mirror it', () => {

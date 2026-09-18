@@ -74,6 +74,8 @@ export interface PartyRow {
   group: HTMLElement;
   rewind: HTMLElement;
   incoming: HTMLElement;
+  /** The compact raid-cell role swatch; the painter drives its tank/healer/damage class. */
+  role: HTMLElement;
   /** The pet health sliver and its parts; the painter drives all three. */
   petBar: HTMLElement;
   petFill: HTMLElement;
@@ -184,7 +186,7 @@ export function createPartyRow(
   const slot: PartyRowSlot = { member };
 
   const row = doc.createElement('div');
-  row.className = 'party-frame panel';
+  row.className = 'party-frame panel ui-panel';
   // A keyboard-focusable target that selects on activation and opens the context menu
   // on the Menu key; the member name reaches the accessible name through the visible
   // text below, so it stays correct as the pool recycles the row (no per-frame aria).
@@ -244,12 +246,16 @@ export function createPartyRow(
   const group = doc.createElement('span');
   group.className = 'pfm-group visually-hidden';
 
+  const role = doc.createElement('span');
+  role.className = 'pfm-role';
+  role.setAttribute('aria-hidden', 'true');
+
   nameRow.append(id, meta, group);
 
   const hpBar = doc.createElement('div');
-  hpBar.className = 'bar hp';
+  hpBar.className = 'bar hp ui-bar ui-bar--hp';
   const hpFill = doc.createElement('div');
-  hpFill.className = 'bar-fill';
+  hpFill.className = 'bar-fill ui-bar-fill';
   const hpAbsorb = doc.createElement('div');
   hpAbsorb.className = 'bar-absorb';
   const rewind = doc.createElement('div');
@@ -261,9 +267,9 @@ export function createPartyRow(
   hpBar.append(hpFill, incoming, rewind, hpAbsorb, hpText);
 
   const resBar = doc.createElement('div');
-  resBar.className = 'bar';
+  resBar.className = 'bar ui-bar';
   const resFill = doc.createElement('div');
-  resFill.className = 'bar-fill';
+  resFill.className = 'bar-fill ui-bar-fill';
   resBar.append(resFill);
 
   // The member's PET health sliver. Deliberately NOT class `bar`: two shipped rules
@@ -314,7 +320,7 @@ export function createPartyRow(
     aurasPainter.paint(aurasView.tick(aurasEntity));
   };
 
-  row.append(nameRow, hpBar, resBar, petBar, aurasEl);
+  row.append(role, nameRow, hpBar, resBar, petBar, aurasEl);
 
   const handlers = partyRowHandlers(slot, deps);
   row.addEventListener('click', handlers.click);
@@ -358,6 +364,7 @@ export function createPartyRow(
     group,
     rewind,
     incoming,
+    role,
     petBar,
     petFill,
     petLabel,
@@ -378,6 +385,7 @@ export const PARTY_ROWS_CLASS = 'party-rows';
  *  wrapper existed. The pool re-parents the pooled rows into it without churning nodes. */
 export function createPartyRowsWrapper(doc: Document): HTMLElement {
   const el = doc.createElement('div');
+  el.id = 'party-frame-rows';
   el.className = PARTY_ROWS_CLASS;
   return el;
 }

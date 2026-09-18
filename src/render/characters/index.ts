@@ -5,6 +5,7 @@
 import { type Entity, hasReplacementBody, type PlayerClass } from '../../sim/types';
 import { logAssetMissOnce } from './asset_miss_log';
 import { type AssembleOptions, modularHeadFor } from './assets';
+import { type CharacterFormKey, characterFormAssetKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
   mechHeldWeaponOverride,
@@ -104,7 +105,7 @@ export function createMountVisual(visualKey: string): CharacterVisual {
  *  training dummy freeze). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+  formKey?: CharacterFormKey,
   opts?: AssembleOptions,
 ): CharacterVisual | null {
   // Forms are their own models. Skins and held weapons
@@ -114,7 +115,11 @@ export function createCharacterVisual(
   // replacement body, so the cosmetic must win over the authored look
   // (composing over it hid a purchased skin).
   const look = formKey || hasReplacementBody(e) ? null : (modularLookProvider?.(e) ?? null);
-  const key = formKey ?? (look ? modularKeyFor(e) : visualKeyFor(e));
+  const key = formKey
+    ? characterFormAssetKey(formKey, e.auras)
+    : look
+      ? modularKeyFor(e)
+      : visualKeyFor(e);
   // Every class-agnostic replacement body adopts the wearer's independent
   // mainhand and offhand layout. e.templateId is the player's class on every
   // host, so this matches offline and online.

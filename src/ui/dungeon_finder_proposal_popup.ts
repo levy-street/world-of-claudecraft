@@ -137,7 +137,7 @@ export class DungeonFinderProposalPopup {
 
   private html(view: FinderProposalPopupView): string {
     const name = dungeonDisplayName(view.dungeonId);
-    const badge = `<span class="df-badge${view.difficulty === 'heroic' ? ' heroic' : ''}">${esc(
+    const badge = `<span class="df-badge ui-chip${view.difficulty === 'heroic' ? ' heroic' : ''}">${esc(
       view.difficulty === 'heroic' ? t('hudChrome.finder.heroic') : t('hudChrome.finder.normal'),
     )}</span>`;
     const slots = view.slots
@@ -149,7 +149,7 @@ export class DungeonFinderProposalPopup {
           total: num(s.total),
         });
         return (
-          `<span class="dfp-slot${s.mine ? ' mine' : ''}${full ? ' full' : ''}" title="${esc(label)}" aria-label="${esc(label)}">` +
+          `<span class="dfp-slot ui-card${s.mine ? ' mine' : ''}${full ? ' full' : ''}" title="${esc(label)}" aria-label="${esc(label)}">` +
           `${svgIcon(s.role === 'tank' ? 'tank' : s.role === 'healer' ? 'healer' : 'attack')}` +
           `<span class="dfp-count">${esc(
             t('hudChrome.finder.slots', { size: num(s.accepted), capacity: num(s.total) }),
@@ -160,8 +160,8 @@ export class DungeonFinderProposalPopup {
     const actions =
       view.myResponse === 'pending'
         ? `<div class="dfp-actions">` +
-          `<button type="button" class="btn df-accept" data-dfp="accept">${svgIcon('check')}${esc(t('hudChrome.finder.accept'))}</button>` +
-          `<button type="button" class="btn df-decline" data-dfp="decline">${svgIcon('close')}${esc(t('hudChrome.finder.decline'))}</button></div>`
+          `<button type="button" class="btn df-accept ui-btn ui-btn--red" data-dfp="accept">${svgIcon('check')}${esc(t('hudChrome.finder.accept'))}</button>` +
+          `<button type="button" class="btn df-decline ui-btn" data-dfp="decline">${svgIcon('close')}${esc(t('hudChrome.finder.decline'))}</button></div>`
         : `<div class="dfp-waiting">${esc(t('hudChrome.finder.acceptedWait'))}</div>`;
     return (
       `<div class="dfp-head">${svgIcon('dfinder')}<span class="dfp-title">${esc(

@@ -113,6 +113,9 @@ describe('ReliquaryTrackerPainter: rows', () => {
     const painter = new ReliquaryTrackerPainter({ root: () => root, writers: liveWriters() });
     painter.update(view({ owned: 4 }));
     const line = root.querySelector('.dt-line') as HTMLElement;
+    expect(root.querySelector('.dt-header')?.classList.contains('ui-cin')).toBe(true);
+    expect(root.querySelector('.dt-bar')?.classList.contains('ui-bar')).toBe(true);
+    expect(root.querySelector('.dt-bar-fill')?.classList.contains('ui-bar-fill')).toBe(true);
     expect(line.style.display).toBe('');
     // Live t() / label calls, never hardcoded English: a locale fill must not
     // turn this pin red, and an English-only regression must not hide in it.

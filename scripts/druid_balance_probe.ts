@@ -261,6 +261,11 @@ function incomingDamageForDruidForm(form: 'cat_form' | 'bear_form', seed: number
   player.resource = player.maxResource;
   sim.castAbility(form);
   sim.tick();
+  // The shift's baseline Loping Stride sprint (combat/druid_engines.ts) expires
+  // 3 sec in and its removal recalcs stats, which would clamp the 1M hp pool
+  // below back to the real maximum mid-window; shed it so the passive window
+  // measures the FORM's defense alone, as it did before the sprint was baseline.
+  player.auras = player.auras.filter((aura) => aura.id !== 'loping_stride');
   player.hp = player.maxHp = 1_000_000;
   const before = player.hp;
   for (let tick = 0; tick < 30 * 20; tick++) sim.tick();

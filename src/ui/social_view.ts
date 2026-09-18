@@ -23,7 +23,7 @@ import type {
   SocialInfo,
 } from '../world_api';
 
-export type SocialTab = 'friends' | 'guild' | 'pledges' | 'ignore' | 'block' | 'raid';
+export type SocialTab = 'friends' | 'guild' | 'who' | 'pledges' | 'ignore' | 'block' | 'raid';
 
 /** Structural identity of the panel: which tab, online or not, and the guild
  *  membership/rank (which changes the footer AND the officer-only Pledges tab)
@@ -268,7 +268,12 @@ export function pledgePanelView(social: SocialInfo | null): PledgePanelView | nu
   const guild = social?.guild ?? null;
   if (!guild || (guild.rank !== 'leader' && guild.rank !== 'officer')) return null;
   return {
-    settings: guild.pledgeSettings ?? { enabled: true, minLevel: 1, note: '' },
+    settings: guild.pledgeSettings ?? {
+      enabled: true,
+      minLevel: 1,
+      note: '',
+      newPlayerFriendly: false,
+    },
     rows: (guild.pledges ?? []).map((p) => ({
       name: p.name,
       cls: p.cls,

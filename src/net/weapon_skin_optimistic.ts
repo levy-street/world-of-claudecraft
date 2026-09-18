@@ -10,6 +10,7 @@ import type { SkinCatalog, WeaponSkinLoadout, WeaponSkinType } from '../sim/type
 export interface WeaponSkinOptimisticInput {
   templateId: string;
   mainhandItemId: string | null;
+  offhandItemId?: string | null;
   weaponSkinLoadout: WeaponSkinLoadout;
   skinCatalog?: SkinCatalog;
 }
@@ -54,6 +55,7 @@ export function optimisticWeaponSkinChange(
       p.mainhandItemId,
       loadout,
       p.skinCatalog ?? 'class',
+      p.offhandItemId ?? null,
     ),
     loadoutRecord,
   };

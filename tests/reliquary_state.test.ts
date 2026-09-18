@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { type AccountEarner, accountRelicKey, recordAccountRelic } from '../src/sim/account_ledger';
 import { stackSizeOf } from '../src/sim/bags';
 import { DEEDS } from '../src/sim/content/deeds';
 import { delveShopGateUnlocked } from '../src/sim/content/delves/shop';
@@ -32,13 +33,13 @@ import {
   openCommissionOrder,
 } from '../src/sim/professions/commission_order';
 import {
+  accountReliquaryOwnership,
   CURATOR_RANK_DEFS,
   CURATOR_RANK_THRESHOLDS,
   catalogCharacterCompletion,
   catalogItemCompletion,
   catalogRankOwned,
   catalogRelicCompletion,
-  characterReliquaryOwnership,
   clearCountForSource,
   curatorRankFromOwned,
   curatorSealIdForRank,
@@ -695,17 +696,17 @@ describe('Reliquary profession marks (Phase 7)', () => {
     ).toBe(1);
   });
 
-  it('characterReliquaryOwnership uses live ownedMounts (bags + bank reins)', () => {
+  it('accountReliquaryOwnership uses live ownedMounts (bags + bank reins)', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
     // No skins field: character path never carries account cosmetics.
-    const empty = characterReliquaryOwnership(meta);
+    const empty = accountReliquaryOwnership(meta);
     expect(empty.ownedMounts.has('valorsteed')).toBe(false);
     expect(empty).not.toHaveProperty('weaponSkins');
 
     sim.addItem('reins_valorsteed', 1);
-    expect(characterReliquaryOwnership(meta).ownedMounts.has('valorsteed')).toBe(true);
-    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(1);
+    expect(accountReliquaryOwnership(meta).ownedMounts.has('valorsteed')).toBe(true);
+    expect(catalogRankOwned(accountReliquaryOwnership(meta))).toBe(1);
 
     // Bank-only reins still count (ownedMounts = bags + bank).
     const sim2 = makeSim();
@@ -716,7 +717,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     if (!slot) throw new Error('expected grag reins in bags');
     m2.inventory.splice(m2.inventory.indexOf(slot), 1);
     m2.bank.inventory.push(slot);
-    expect(characterReliquaryOwnership(m2).ownedMounts.has('grag_bear')).toBe(true);
+    expect(accountReliquaryOwnership(m2).ownedMounts.has('grag_bear')).toBe(true);
   });
 
   it('live mount first-discover and title grant sync Curator rank deeds', () => {
@@ -739,7 +740,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     const renownBeforeMount = mMount.renown;
     simMount.addItem('reins_valorsteed', 1);
     // 9 items + mount (+ rank-2 title bridge, itself a Horizons title relic).
-    expect(catalogRankOwned(characterReliquaryOwnership(mMount))).toBeGreaterThanOrEqual(10);
+    expect(catalogRankOwned(accountReliquaryOwnership(mMount))).toBeGreaterThanOrEqual(10);
     expect(mMount.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
     expect(mMount.renown).toBe(renownBeforeMount);
     // No invent of firstFind / unlock toast for mount membership.
@@ -761,7 +762,7 @@ describe('Reliquary profession marks (Phase 7)', () => {
     const renownBeforeTitle = mTitle.renown;
     expect(grantDeed(simTitle.ctx, mTitle, 'prog_veteran')).toBe(true);
     // Title fill + rank-2 title bridge both score; rank is at least 2.
-    expect(catalogRankOwned(characterReliquaryOwnership(mTitle))).toBeGreaterThanOrEqual(10);
+    expect(catalogRankOwned(accountReliquaryOwnership(mTitle))).toBeGreaterThanOrEqual(10);
     expect(mTitle.deedsEarned.has('col_reliquary_rank_2')).toBe(true);
     expect(mTitle.renown).toBe(renownBeforeTitle + (DEEDS.prog_veteran.renown ?? 0));
   });
@@ -1371,7 +1372,7 @@ describe('Reliquary pure completion + curator rank', () => {
     // onItemDiscovered reads the live ledger the same way however it got
     // there; 25 keeps the rig small.
     for (const id of scoringIds) meta.deedStats.itemsDiscovered.add(id);
-    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(25);
+    expect(catalogRankOwned(accountReliquaryOwnership(meta))).toBe(25);
     markItemDiscovered(sim.ctx, meta, band);
     const unlock = sim
       .drainEvents()
@@ -1380,7 +1381,7 @@ describe('Reliquary pure completion + curator rank', () => {
     expect(unlock).toBeDefined();
     // ...but carries NO rank-up, and the true rank never moved.
     expect(unlock && 'curatorRank' in unlock ? unlock.curatorRank : undefined).toBeUndefined();
-    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(25);
+    expect(catalogRankOwned(accountReliquaryOwnership(meta))).toBe(25);
 
     // Positive control on the same boundary: a character at 24 scoring fills
     // whose 25th fill SCORES still gets the rank-3 announcement (the fix must
@@ -1388,7 +1389,7 @@ describe('Reliquary pure completion + curator rank', () => {
     const sim2 = makeSim();
     const { meta: meta2 } = primary(sim2);
     for (const id of scoringIds.slice(0, 24)) meta2.deedStats.itemsDiscovered.add(id);
-    expect(catalogRankOwned(characterReliquaryOwnership(meta2))).toBe(24);
+    expect(catalogRankOwned(accountReliquaryOwnership(meta2))).toBe(24);
     markItemDiscovered(sim2.ctx, meta2, scoringIds[24]!);
     const crossing = sim2
       .drainEvents()
@@ -1635,7 +1636,7 @@ describe('Reliquary pure completion + curator rank', () => {
     markItemDiscovered(sim.ctx, meta, ITEM);
     // The fill completes ONLY the set page: every pageIds entry ahead of it
     // stays incomplete, so the emit has to scan past them.
-    const ownership = characterReliquaryOwnership(meta);
+    const ownership = accountReliquaryOwnership(meta);
     for (const pageId of pageIds!.slice(0, completingIdx)) {
       expect(
         pageCompletion(RELIQUARY_PAGES_BY_ID[pageId], ownership).complete,
@@ -2048,14 +2049,14 @@ describe('Reliquary obtain counts', () => {
   it('is information only: the tally scores no completion, rank, or deed', () => {
     const sim = makeSim();
     const { meta } = primary(sim);
-    const rankBefore = catalogRankOwned(characterReliquaryOwnership(meta));
+    const rankBefore = catalogRankOwned(accountReliquaryOwnership(meta));
     const deedsBefore = meta.deedsEarned.size;
     // Two hundred obtains of ONE relic: a tally that fed rank or completion
     // anywhere would have to move something here.
     for (let i = 0; i < 200; i++) noteRelicObtain(meta, CATALOGUE_RELIC);
     expect(meta.reliquary.counts[CATALOGUE_RELIC]).toBe(200);
-    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBe(rankBefore);
-    expect(curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)))).toBe(0);
+    expect(catalogRankOwned(accountReliquaryOwnership(meta))).toBe(rankBefore);
+    expect(curatorRankFromOwned(catalogRankOwned(accountReliquaryOwnership(meta)))).toBe(0);
     expect(meta.deedsEarned.size).toBe(deedsBefore);
     expect(catalogItemCompletion(meta.deedStats.itemsDiscovered).owned).toBe(0);
     // And it is never a top-level saved key: the blob still has three.
@@ -2346,7 +2347,7 @@ describe('Reliquary movement flag at the remaining relocation sites', () => {
 
 describe('Reliquary fill-chain ownership hoist premise', () => {
   // The hoist in src/sim/reliquary.ts (onItemDiscovered / noteReliquaryMark /
-  // maybeSyncCuratorRankDeeds each build characterReliquaryOwnership ONCE and
+  // maybeSyncCuratorRankDeeds each build accountReliquaryOwnership ONCE and
   // thread it) rests on a stated premise, quoted from the comment there:
   // three of the snapshot's four surfaces are LIVE references, so a write
   // inside the chain is visible through it, and the fourth, ownedMounts, is a
@@ -2372,7 +2373,7 @@ describe('Reliquary fill-chain ownership hoist premise', () => {
       equipment: JSON.stringify(meta.equipment),
       mounts: [...ownedMounts(meta)].sort().join(','),
     });
-    const rank = () => curatorRankFromOwned(catalogRankOwned(characterReliquaryOwnership(meta)));
+    const rank = () => curatorRankFromOwned(catalogRankOwned(accountReliquaryOwnership(meta)));
 
     const ids = [
       ...new Set(
@@ -2408,17 +2409,25 @@ describe('Reliquary ownership snapshot liveness', () => {
     // noteReliquaryMark builds its ownership snapshot BEFORE marks.add and
     // hands the SAME object to emitReliquaryUnlock and syncCuratorRankDeeds,
     // which need the post-add view. That is correct only while
-    // characterReliquaryOwnership returns live references for these three
-    // surfaces: a future defensive copy (an entirely safe-looking change)
-    // would kill page-completion illumination and rank deeds on the MARK path
-    // silently, with the whole suite green, because every illumination test
-    // drives the ITEM path where the ledger write precedes the snapshot.
+    // accountReliquaryOwnership answers LIVE for these three surfaces (the
+    // account-union lookups read the character's own Set and the ledger at
+    // query time, never a copy): a future defensive copy (an entirely
+    // safe-looking change) would kill page-completion illumination and rank
+    // deeds on the MARK path silently, with the whole suite green, because
+    // every illumination test drives the ITEM path where the ledger write
+    // precedes the snapshot.
     const sim = makeSim();
     const { meta } = primary(sim);
-    const ownership = characterReliquaryOwnership(meta);
-    expect(ownership.marks).toBe(meta.reliquary.marks);
-    expect(ownership.itemsDiscovered).toBe(meta.deedStats.itemsDiscovered);
-    expect(ownership.deedsEarned).toBe(meta.deedsEarned);
+    const ownership = accountReliquaryOwnership(meta);
+    expect(ownership.marks.has('gather_event:pristine_vein')).toBe(false);
+    expect(ownership.itemsDiscovered.has('cryptbone_helm')).toBe(false);
+    expect(ownership.deedsEarned.has('soc_meet_bursar')).toBe(false);
+    meta.reliquary.marks.add('gather_event:pristine_vein');
+    meta.deedStats.itemsDiscovered.add('cryptbone_helm');
+    meta.deedsEarned.set('soc_meet_bursar', '2026-09-01');
+    expect(ownership.marks.has('gather_event:pristine_vein')).toBe(true);
+    expect(ownership.itemsDiscovered.has('cryptbone_helm')).toBe(true);
+    expect(ownership.deedsEarned.has('soc_meet_bursar')).toBe(true);
   });
 
   it('a MARK that completes its page illuminates it (the liveness in behavior)', () => {
@@ -2426,7 +2435,7 @@ describe('Reliquary ownership snapshot liveness', () => {
     // is all-mark, so its LAST fill goes through noteReliquaryMark, whose
     // hoisted pre-add snapshot must still see the add (the live marks Set)
     // for pageCompletion to read complete. A defensive copy in
-    // characterReliquaryOwnership kills exactly this emit.
+    // accountReliquaryOwnership kills exactly this emit.
     const sim = makeSim();
     const { meta } = primary(sim);
     const page = RELIQUARY_PAGES_BY_ID.professions_field_notes;
@@ -2980,7 +2989,7 @@ describe('Reliquary join seed is silent, flagged, and provenance-honest', () => 
     const meta = sim.players.get(pid)!;
     const events = sim.drainEvents().filter((e) => e.pid === pid);
 
-    expect(catalogRankOwned(characterReliquaryOwnership(meta))).toBeGreaterThanOrEqual(
+    expect(catalogRankOwned(accountReliquaryOwnership(meta))).toBeGreaterThanOrEqual(
       CURATOR_RANK_DEFS[1].threshold,
     );
     // No catalogued item relic was seeded, so the item arm never synced rank.
@@ -3132,7 +3141,7 @@ describe('Reliquary illuminated pages (Phase 18 sticky record)', () => {
     // The page really is complete now, so silence can only come from the
     // sticky record, not from an incomplete read.
     expect(
-      pageCompletion(RELIQUARY_PAGES_BY_ID.conquerors_thunzharr, characterReliquaryOwnership(meta))
+      pageCompletion(RELIQUARY_PAGES_BY_ID.conquerors_thunzharr, accountReliquaryOwnership(meta))
         .complete,
     ).toBe(true);
     expect('illuminatedPageId' in unlock).toBe(false);
@@ -3478,7 +3487,7 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
     }
     expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(false);
     expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(false);
-    const pair = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    const pair = catalogCharacterCompletion(accountReliquaryOwnership(meta));
     // The missing relic plus the unearned shelf title (itself a page slot).
     expect(pair.total - pair.owned).toBe(2);
 
@@ -3502,7 +3511,7 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
     expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
     // Zero-Renown ladder: the whole two-deed pass moves no Renown.
     expect(meta.renown).toBe(renownBefore);
-    const after = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    const after = catalogCharacterCompletion(accountReliquaryOwnership(meta));
     expect(after.owned).toBe(after.total);
   });
 
@@ -3600,7 +3609,7 @@ describe('Reliquary completion ladder deeds (Phase 18)', () => {
     expect(meta.deedStats.itemsDiscovered.has(bandIds[0]!)).toBe(true);
     expect(meta.deedsEarned.has('col_reliquary_conquerors')).toBe(true);
     expect(meta.deedsEarned.has('col_reliquary_complete')).toBe(true);
-    const pair = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    const pair = catalogCharacterCompletion(accountReliquaryOwnership(meta));
     expect(pair.owned).toBe(pair.total);
   });
 
@@ -3669,5 +3678,46 @@ describe('reliquaryRarity (offline facet arm)', () => {
     // Reliquary renders zero rarity nodes rather than fabricated zeros.
     const sim = makeSim();
     await expect(sim.reliquaryRarity()).resolves.toBeNull();
+  });
+});
+
+describe('an alt-completed page and the sibling mid-session (the account-wide union in the fill chain)', () => {
+  const ALT: AccountEarner = { characterId: 99, name: 'Bram', cls: 'mage', day: '2026-09-01' };
+
+  it("a sibling's FIRST own relic on a page an alt completed mid-session illuminates it for the sibling", () => {
+    // Pinned as a decision, not a defect: at join the sweep (syncIlluminatedPages)
+    // folds an alt-completed page into the sticky set silently, so the
+    // mid-session shape is the only one that celebrates. The alt completes
+    // Thunzharr AFTER this character joined; this character then finds one of
+    // those same relics. The union reads the page complete, the sticky record
+    // gains it, and the unlock names the page (the client banner and the
+    // guild marquee inherit that), consistent with the account-wide model.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    sim.drainEvents();
+    const items = pageItemIds('conquerors_thunzharr');
+    expect(items.length).toBeGreaterThan(1);
+    expect(meta.reliquary.illuminatedPages.has('conquerors_thunzharr')).toBe(false);
+    for (const id of items)
+      recordAccountRelic(meta.accountLedger, accountRelicKey('item', id), ALT);
+    // The record alone changes no sticky state: nothing celebrates until this
+    // character's own fill chain runs.
+    expect(meta.reliquary.illuminatedPages.has('conquerors_thunzharr')).toBe(false);
+    expect(sim.drainEvents().filter((e) => e.type === 'reliquaryUnlock')).toEqual([]);
+
+    markItemDiscovered(sim.ctx, meta, items[0]!);
+    expect(meta.reliquary.illuminatedPages.has('conquerors_thunzharr')).toBe(true);
+    const unlock = sim
+      .drainEvents()
+      .find((e) => e.type === 'reliquaryUnlock' && e.itemId === items[0]);
+    expect(unlock).toBeDefined();
+    expect(unlock && unlock.type === 'reliquaryUnlock' && unlock.illuminatedPageId).toBe(
+      'conquerors_thunzharr',
+    );
+    // A relic the account already held moves no rank count on the same event.
+    expect(unlock && unlock.type === 'reliquaryUnlock' && unlock.curatorRank).toBeUndefined();
+    // The same completion also lands the page's Illumination deed on this
+    // character through the ladder (recorded under its own name).
+    expect(meta.deedsEarned.has('col_reliquary_illum_thunzharr')).toBe(true);
   });
 });

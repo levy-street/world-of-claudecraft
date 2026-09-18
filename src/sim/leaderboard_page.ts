@@ -5,6 +5,7 @@ import type {
   GuildLeaderboardEntry,
   LeaderboardEntry,
 } from '../world_api';
+import type { GuildBoardCategory } from './guild_board_category';
 
 // Host-agnostic pagination for the high-score boards. Lives in src/sim/
 // (no DOM, no randomness) so BOTH the authoritative server and the offline Sim
@@ -30,7 +31,14 @@ export interface RankedPage<T> {
 }
 
 export type LeaderboardPage = RankedPage<LeaderboardEntry>;
-export type GuildLeaderboardPage = RankedPage<GuildLeaderboardEntry>;
+// The guild board page also echoes the category the server APPLIED (guild
+// board categories, src/sim/guild_board_category.ts): absent means the whole
+// board, so a client that asked for a category the server did not honour (an
+// older server, or an unknown category) can tell rather than mislabel the
+// ranking; the paginator never sets it, the route builder does.
+export type GuildLeaderboardPage = RankedPage<GuildLeaderboardEntry> & {
+  category?: GuildBoardCategory;
+};
 
 /** One roster row of the signpost guild board's drill-in (host-agnostic like
  *  the page shapes above: the facet re-exports it). */

@@ -45,7 +45,10 @@ import { pruneWocLocalLedgers, wocBackedOffIds, wocParkRow } from './woc_market_
 import type { WocStuckCustodyClasses } from './woc_market_monitor_types';
 import type * as WocOps from './woc_market_ops';
 import type { WocMarketReadCache } from './woc_market_read_cache';
-import { WOC_MARKET_BROWSE_CACHE_MAX_PAGE } from './woc_market_read_cache';
+import {
+  WOC_MARKET_BROWSE_CACHE_MAX_PAGE,
+  WOC_MARKET_SALES_CACHE_MAX_PAGE,
+} from './woc_market_read_cache';
 import {
   resolveReviewSettlement,
   type WocReviewResolution,
@@ -83,6 +86,15 @@ import {
   type WocListingParams,
   type WocSettlementState,
 } from './woc_market_rules';
+import type {
+  WocBrowseQuery,
+  WocSaleRow,
+  WocSalesQuery,
+  WocSaleType,
+  WocSellerHistoryReadout,
+  WocSellerProfile,
+  WocStrikeRow,
+} from './woc_market_sale_types';
 import type {
   NewWocStepUpChallenge,
   WocStepUpBinding,
@@ -264,44 +276,18 @@ export type WocActivityBidRow = WocBidRow & { itemId: string };
 /** The Activity tab's settlement row, item-named for the same reason. */
 export type WocActivitySettlementRow = WocSettlementRow & { itemId: string };
 
-export interface WocSaleRow {
-  id: number;
-  realm: string;
-  listingId: number;
-  itemId: string;
-  item: InvSlot;
-  priceCents: number;
-  amountBase: string | null;
-  sellerAccount: number;
-  buyerAccount: number;
-  sellerName: string;
-  buyerName: string;
-  excluded: boolean;
-  atMs: number;
-}
-
-export interface WocStrikeRow {
-  accountId: number;
-  strikes: number;
-  suspendedUntilMs: number | null;
-}
-
-export interface WocBrowseQuery {
-  page: number;
-  pageSize: number;
-  quality: string | null;
-  format: WocListingFormat | null;
-  /** The stamped category axes (exchangeBrowseCategory /
-   *  exchangeBrowseSubcategory): closed vocabularies, validated at the
-   *  route. Legacy rows carry NULL stamps and sit outside filtered results
-   *  (pre-enable data only; no backfill by decision). */
-  category: string | null;
-  subcategory: string | null;
-  /** Client-resolved item ids for a name search (the server stays
-   *  language-agnostic; the client owns localized names). */
-  itemIds: readonly string[] | null;
-  sort: 'ending' | 'newest' | 'price_asc' | 'price_desc';
-}
+// The Sales History provenance types live in their own leaf module (the
+// economy/monitor types pattern); re-exported (import + export below) so every
+// existing importer keeps this one home while the coordinator uses them too.
+export type {
+  WocBrowseQuery,
+  WocSaleRow,
+  WocSalesQuery,
+  WocSaleType,
+  WocSellerHistoryReadout,
+  WocSellerProfile,
+  WocStrikeRow,
+};
 
 // ---------------------------------------------------------------------------
 // Injected seams
@@ -329,22 +315,6 @@ export interface NewWocListing {
    *  stamped), the invariant the accepted-offer converge arm proves rollback
    *  by; a zero-row stamp CAS aborts the whole transaction 'not_pending'. */
   directedOfferId: number | null;
-}
-
-/** The seller click-through's public profile line: only facts the game
- *  already shows in the world (the guild tag on nameplates and rosters).
- *  Derived per read, never stored on sale rows. The character's creation
- *  date was dropped: it is account-age data the world does not otherwise
- *  surface and no PRD authorizes disclosing (a deliberate re-add is a PRD
- *  decision, not a default). */
-export interface WocSellerProfile {
-  guildName: string | null;
-}
-
-/** The seller click-through's one cached readout: sales plus profile. */
-export interface WocSellerHistoryReadout {
-  sales: WocSaleRow[];
-  profile: WocSellerProfile | null;
 }
 
 export type { CharacterSaveArgs } from './woc_market_character_save';
@@ -885,6 +855,9 @@ export interface WocMarketDb {
   insertSale(args: Omit<WocSaleRow, 'id' | 'excluded' | 'atMs'>): Promise<number>;
   salesForItem(realm: string, itemId: string, limit: number): Promise<WocSaleRow[]>;
   salesForSeller(realm: string, sellerName: string, limit: number): Promise<WocSaleRow[]>;
+  /** The realm-wide Sales History read: most-recent-first, paged, filtered by
+   *  the Browse axes over the stamped sale columns (has-more probe, no COUNT). */
+  salesForRealm(realm: string, q: WocSalesQuery): Promise<{ rows: WocSaleRow[]; hasMore: boolean }>;
   /** The seller pane's public profile line, or null when the name no longer
    *  resolves to a character on this realm. */
   sellerProfile(realm: string, sellerName: string): Promise<WocSellerProfile | null>;
@@ -1431,6 +1404,31 @@ export class WocMarketService {
     return this.deps.readCache && limit === 20
       ? this.deps.readCache.sellerSales(sellerName, refresh)
       : refresh();
+  }
+
+  /** The Sales History tab's realm-wide read: every completed public sale,
+   *  most-recent-first, paged and filterable by the Browse axes. The UNFILTERED
+   *  shallow pages ride the read cache like browse (viewer-identical; names are
+   *  already public via the per-item/seller reads); filtered and deep pages
+   *  bypass, the browse reasoning. */
+  async realmSalesHistory(
+    q: WocSalesQuery,
+  ): Promise<{ sales: WocSaleRow[]; hasMore: boolean; page: number; pageSize: number }> {
+    const pageSize = Math.min(Math.max(1, q.pageSize), 50);
+    const page = Math.max(0, q.page);
+    if (!this.cfg.enabled) return { sales: [], hasMore: false, page, pageSize };
+    const refresh = () => this.deps.db.salesForRealm(this.cfg.realm, q);
+    const unfiltered =
+      q.itemIds === null &&
+      q.quality === null &&
+      q.format === null &&
+      q.category === null &&
+      q.subcategory === null;
+    const { rows, hasMore } =
+      this.deps.readCache && unfiltered && page <= WOC_MARKET_SALES_CACHE_MAX_PAGE
+        ? await this.deps.readCache.salesRealm(q, refresh)
+        : await refresh();
+    return { sales: rows, hasMore, page, pageSize };
   }
 
   // -------------------------------------------------------------------------

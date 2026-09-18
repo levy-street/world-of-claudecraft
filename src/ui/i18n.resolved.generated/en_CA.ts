@@ -62,6 +62,7 @@ export const en_CA: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Dungeon",
+      "town": "Town",
       "difficulty": "Difficulty",
       "name": "Name",
       "spec": "Spec",
@@ -159,6 +160,10 @@ export const en_CA: EnTranslations = {
       "teleport": {
         "label": "Teleport",
         "description": "Move to exact world coordinates."
+      },
+      "town": {
+        "label": "Town hub",
+        "description": "Teleport to a town hub by name."
       },
       "dungeon": {
         "label": "Enter dungeon",
@@ -326,6 +331,18 @@ export const en_CA: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "Blacksmithing Trainer",
+      "cooking": "Cooking Trainer",
+      "tailoring": "Tailoring Trainer",
+      "engineering": "Engineering Trainer",
+      "leatherworking": "Leatherworking Trainer",
+      "alchemy": "Alchemy Trainer",
+      "farming": "Farming Trainer",
+      "mining": "Mining Trainer",
+      "hobby": "Hobby Trainer",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "That material selection is no longer available.",
     "warlock": {
       "doomLabel": "Condemnation",
@@ -348,12 +365,25 @@ export const en_CA: EnTranslations = {
       "banner": "Spectating {name}"
     },
     "readyCheck": {
+      "title": "Ready Check",
+      "close": "Close",
       "prompt": "{name} has started a ready check. Are you ready?",
       "ready": "Ready",
       "notReady": "Not Ready",
+      "status": "Ready: {ready}/{total}",
+      "waiting": "Waiting for responses...",
+      "memberReady": "{name} is ready.",
+      "memberNotReady": "{name} is not ready.",
+      "memberPending": "{name} has not responded yet.",
       "result": "Ready check: {ready} ready, {notReady} not ready, {noResponse} no response.",
       "notInPartyError": "You must be in a party to start a ready check.",
       "inProgressError": "A ready check is already in progress."
+    },
+    "pullTimer": {
+      "start": "Pull in {seconds} sec!",
+      "cancel": "Pull cancelled.",
+      "countdown": "{seconds}",
+      "pull": "PULL!"
     },
     "death": {
       "resurrectAtCorpse": "Resurrect at Corpse",
@@ -578,6 +608,11 @@ export const en_CA: EnTranslations = {
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
       "mountSkinType": "Mount skin",
+      "mountInspectAria": "Preview {item}",
+      "mountRideIt": "Ride it",
+      "mountOnly": "Mount only",
+      "mountBuy": "Purchase Mount Skin",
+      "mountScopeLine": "Account-wide skin. Worn by one character at a time.",
       "loading": "Loading WOC Store...",
       "error": "The WOC Store is unavailable right now. Please try again shortly.",
       "balance": "Claudium Balance",
@@ -902,6 +937,7 @@ export const en_CA: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Collapse quest tracker",
       "expandHint": "Expand quest tracker"
     },
@@ -1041,6 +1077,10 @@ export const en_CA: EnTranslations = {
       "clearArmed": "Tap a slot to clear it."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "Welcome to Eastbrook! Marshal Redbrook has work for you in the town square. Turn on golden guidance to find him and follow Wolves at the Door, or explore on your own. You can change this later in Options, Interface, Combat.",
+      "guidanceOn": "Turn guidance on",
+      "guidanceOff": "Turn guidance off",
+      "guidanceSetting": "Eastbrook golden guidance",
       "bellHomeNote": "Back from the shore already? That was the ferry bell you rang. Its twin hangs just there by the Ravenpost mailbox: ring it any time and the crossing will carry you back to the Proving Shore. No harm done either way.",
       "islandArrivalNote": "Welcome to the Proving Shore. Warden Tam is waiting just up the strand: go and see him. When you would rather be off, ring the bell beside my pier and it will carry you across to the vale at any time.",
       "noteClose": "Understood"
@@ -1220,7 +1260,10 @@ export const en_CA: EnTranslations = {
       "devName": "Contributor",
       "devTierCol": "Badge",
       "mergedPrs": "Merged PRs",
-      "devEmpty": "No ranked contributors yet."
+      "devEmpty": "No ranked contributors yet.",
+      "podiumLabel": "Top three",
+      "unclaimed": "Unclaimed",
+      "prestigeTitle": "Prestige {rank}"
     },
     "pledge": {
       "open": "Accepting pledges",
@@ -1243,6 +1286,8 @@ export const en_CA: EnTranslations = {
       "noteLabel": "Board note",
       "notePlaceholder": "Tell aspiring members what your guild is looking for",
       "save": "Save",
+      "newPlayerFriendlyLabel": "New player friendly",
+      "newPlayerFriendlyHint": "Shown on the recruits' board at the Proving Shore signpost.",
       "yourPledge": "Your pledge: {guild}",
       "since": "Pledged {date}",
       "withdraw": "Withdraw pledge"
@@ -1266,6 +1311,9 @@ export const en_CA: EnTranslations = {
       "previous": "Previous runs",
       "runLabel": "Run {index}",
       "runSummary": "{total} in {time}"
+    },
+    "talkingHead": {
+      "label": "Dialogue"
     },
     "hubLesson": {
       "target": "Target the dummy to begin.",
@@ -1395,7 +1443,9 @@ export const en_CA: EnTranslations = {
       "targetPrev": "Cycle Target Backward",
       "discord": "Discord",
       "bgFlag": "Battleground Flag Action",
+      "friendlyNameplates": "Toggle Friendly Nameplates",
       "sheathe": "Sheathe/Unsheathe Weapon",
+      "hideInterface": "Hide Interface",
       "dive": "Swim Down",
       "categoryPet": "Pet",
       "petAttack": "Pet: Attack",
@@ -1404,8 +1454,22 @@ export const en_CA: EnTranslations = {
       "petDefensive": "Pet: Defensive",
       "petAggressive": "Pet: Aggressive",
       "targetPet": "Pet: Mark",
+      "targetSelf": "Target Self",
+      "targetParty1": "Target Party Member 1",
+      "targetParty2": "Target Party Member 2",
+      "targetParty3": "Target Party Member 3",
+      "targetParty4": "Target Party Member 4",
+      "targetParty5": "Target Party Member 5",
+      "targetParty6": "Target Party Member 6",
+      "targetParty7": "Target Party Member 7",
+      "targetParty8": "Target Party Member 8",
+      "targetParty9": "Target Party Member 9",
       "mount": "Mount / Dismount",
-      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world."
+      "mouseHint": "Mouse buttons work too: press the middle button (M3) or a thumb button (M4, M5) while binding. Left and right stay reserved for the camera, click to move, and clicking things in the world.",
+      "zoomIn": "Zoom Camera In",
+      "zoomOut": "Zoom Camera Out",
+      "wheelHint": "The mouse wheel binds too: roll it up or down while binding, with Ctrl, Alt, or Shift held if you like. Zoom Camera In and Out sit on the bare wheel by default; move them to a chord such as Ctrl+wheel to free the wheel for abilities.",
+      "wheelHeldRefused": "A wheel notch cannot drive a held action such as movement. Pick a key or a mouse button for it."
     },
     "actionBar": {
       "editKeys": "Edit action bar keys",
@@ -1682,6 +1746,8 @@ export const en_CA: EnTranslations = {
       "showReliquaryTracker": "Show Reliquary Tracker",
       "confirmVendorSell": "Confirm Before Selling",
       "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
+      "confirmVendorSellMinQuality": "Confirm Sales From Quality",
+      "confirmVendorSellMinQualityNote": "Items below this quality sell with a single click; a mis-sold item can still be bought back from the vendor.",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
@@ -1735,6 +1801,9 @@ export const en_CA: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Connected Device",
+      "deviceConnected": "Connected",
+      "deviceDisconnected": "No controller detected",
       "glyphStyle": "Button Labels",
       "glyphStyleAuto": "Auto",
       "glyphStyleXbox": "Xbox",
@@ -1759,7 +1828,7 @@ export const en_CA: EnTranslations = {
       "crossHotbarHelp": "Hold a trigger to light eight action-bar slots on the d-pad and face buttons. Tap the other trigger to swap to the second set.",
       "crossHotbarResetLayout": "Reset Cross Hotbar",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "The triggers and the d-pad belong to the cross hotbar while it is on, so they are set up below rather than here.",
+      "crossHotbarOwnsButtons": "The triggers modify the cross hotbar while it is on. D-pad directions remain editable here for menus and movement.",
       "cancelAction": "Cancel / Back",
       "subcommandsAction": "Subcommands / Map",
       "cycleHudAction": "Cycle Interface",
@@ -1770,7 +1839,7 @@ export const en_CA: EnTranslations = {
       "crossHotbarDisplayMinimal": "Only While Held",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Carrying {action}: confirm on a cell to place it, cancel to put it back.",
-      "crossHotbarEditHint": "Arranging: confirm picks up from a cell or the spellbook and drops on a cell, cancel clears one.",
+      "crossHotbarEditHint": "Arranging · d-pad moves · confirm picks up and places · cancel clears a cell",
       "crossHotbarEditHelp": "Hold the left bumper and press the top face button to arrange the bar with the controller."
     },
     "perf": {
@@ -2049,6 +2118,52 @@ export const en_CA: EnTranslations = {
       "spellOrder": "Spell Order",
       "reset": "Reset Position",
       "spellPosition": "Spell order {position} / {count}",
+      "watchlist": "Watched Spells",
+      "watchlistHint": "Pick any spell that buffs you to give it its own aura. Picked spells get a full card below, with their own icon, color, position and ground ring.",
+      "watchlistEmpty": "No other spell in your spellbook puts a buff on you.",
+      "watchlistWatch": "Watch {spell}",
+      "watchlistUnwatch": "Stop watching {spell}",
+      "watchlistCount": "{count} watched",
+      "sound": "Alert Sound",
+      "soundNone": "No sound",
+      "soundVolume": "Sound Volume",
+      "soundPreview": "Play",
+      "soundPreviewAria": "Preview the {sound} alert sound",
+      "soundHint": "A sound plays each time this spell procs. Turn the icon, crescents and ground ring off to have the sound alone announce it.",
+      "readyGlow": "Hotbar Glow",
+      "readyGlowHint": "Lights this spell on your action bar while its buff is up.",
+      "reticleTick": "Reticle Tick",
+      "reticleTickHint": "Adds a mark near the centre of the screen that lights when this spell procs.",
+      "haptic": "Rumble",
+      "hapticNone": "Off",
+      "hapticHint": "Vibrates a connected controller, or your phone. Ignored where the device has no haptics.",
+      "haptics": {
+        "tap": "Tap",
+        "double": "Double",
+        "long": "Long"
+      },
+      "cues": {
+        "softChime": "Soft Chime",
+        "musicBox": "Music Box",
+        "glassPing": "Glass Ping",
+        "waterDrop": "Water Drop",
+        "bubblePop": "Bubble Pop",
+        "hardBell": "Hard Bell",
+        "templeGong": "Temple Gong",
+        "anvilStrike": "Anvil Strike",
+        "coinDrop": "Coin Drop",
+        "swordDraw": "Sword Draw",
+        "blaringHorn": "Blaring Horn",
+        "carKlaxon": "Car Klaxon",
+        "sonarPing": "Sonar Ping",
+        "electricZap": "Electric Zap",
+        "catMeow": "Cat Meow",
+        "owlHoot": "Owl Hoot",
+        "wolfHowl": "Wolf Howl",
+        "frogCroak": "Frog Croak",
+        "windWhoosh": "Wind Whoosh",
+        "steamHiss": "Steam Hiss"
+      },
       "procs": {
         "revenge": "Revenge!",
         "battleTrance": "Battle Trance",
@@ -2153,6 +2268,22 @@ export const en_CA: EnTranslations = {
       "playtimeHidden": "Hidden",
       "showPlaytimeAria": "Show time played",
       "hidePlaytimeAria": "Hide time played"
+    },
+    "charSidebar": {
+      "label": "Character details",
+      "subtitle": "Level {level} {className} . {archetype} . Hobby: {hobby}",
+      "subtitleNoHobby": "Level {level} {className} . {archetype}",
+      "stats": "Stats",
+      "progression": "Progression",
+      "skills": "Skills",
+      "gathering": "Gathering",
+      "crafting": "Crafting",
+      "openProfessions": "Open Professions"
+    },
+    "questLog": {
+      "completed": "Completed",
+      "zoneSummary": "{count} ({ready} ready)",
+      "shiftHint": "Shift-click a quest to link it in chat."
     },
     "statInfo": {
       "fromYour": "From your {value} {stat}:",
@@ -2267,6 +2398,12 @@ export const en_CA: EnTranslations = {
       "linkHint": "Shift-click to link this item in chat."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "{count} guild shown",
+        "few": "{count} guilds shown",
+        "many": "{count} guilds shown",
+        "other": "{count} guilds shown"
+      },
       "commissionMasterworks": {
         "one": "{count} masterwork",
         "few": "{count} masterworks",
@@ -2396,6 +2533,7 @@ export const en_CA: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Report a Bug",
+      "online": "Online",
       "realm": "World",
       "character": "Character",
       "position": "Position",
@@ -2993,8 +3131,8 @@ export const en_CA: EnTranslations = {
         "kingsWrathSummary": "Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).",
         "kingsWrathResponse": "Use remaining defensive cooldowns for unavoidable damage. Keep every earlier mechanic clean while the raid finishes the fight.",
         "boneStormName": "Bone Storm",
-        "boneStormSummary": "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. He casts Bone Spike {spikeAt} sec into the storm, then Gravebreaker re-arms {rearm} sec after it ends.",
-        "boneStormHeroicSummary": "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. He casts Bone Spike {spikeAt} sec into the storm, then Gravebreaker re-arms {rearm} sec after it ends.",
+        "boneStormSummary": "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. Gravebreaker re-arms {rearm} sec after the storm ends.",
+        "boneStormHeroicSummary": "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. Gravebreaker re-arms {rearm} sec after the storm ends.",
         "boneStormResponse": "Spread out and keep running from Nythraxis. The charged raider runs away while everyone else leaves room around the charge path, then tanks pick him up when the storm ends.",
         "crownEnduresName": "The Crown Endures",
         "crownEnduresSummary": "At {enrageNormal} sec from the pull (the clock pauses while Brother Aldric enters at 70%), The Crown Endures triggers as a hard enrage. Nythraxis gains {damage} more damage and {haste} faster attacks, then another {rampStep} damage every {rampEveryNormal} sec. There is no timer bar. Warnings come as yells at {warn60}, {warn30}, and {warn10} sec remaining.",
@@ -3045,6 +3183,7 @@ export const en_CA: EnTranslations = {
       "elementalConvergencePrimed": "Your next spell from the other elemental school grants Elemental Convergence",
       "hunterFerocity": "{stacks} Pack Ferocity: your pet deals {pct}% more damage",
       "cooldownCap": "{used} of {cap} sec of cooldown reduction used in this window",
+      "bruinRushWindow": "Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec",
       "funeralHarvestLock": "Funeral Harvest cannot create another Soul Fragment yet",
       "leadenHexLock": "Leaden Hex cannot root this target again yet",
       "forbiddenReflectionReady": "Your next eligible Warlock cooldown can be cast again",
@@ -3092,7 +3231,7 @@ export const en_CA: EnTranslations = {
       "coldsightRead": "Your next Long Draw deals {longDrawPct}% more damage, or your next Fell Shot deals {fellShotPct}% more",
       "duskEconomy": "Abilities cost {pct}% less energy",
       "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
-      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Cat Form, Bonecrush becomes Marrowbreak in Bruin Form",
       "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Fleetmend becomes Overbloom",
       "freeExecute": "Your next eligible execute ability costs nothing",
       "resourceSap": "Restores {value} of your current resource every {interval} sec",
@@ -3157,7 +3296,7 @@ export const en_CA: EnTranslations = {
       "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
       "stealth": "Concealed; movement speed reduced by {pct}%",
       "formBear": "Bruin Form: increased health and armor",
-      "formCat": "Wolf Form: melee damage and energy",
+      "wolfForm": "Cat Form: melee damage and energy; movement speed increased by {pct}%",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
@@ -3246,7 +3385,30 @@ export const en_CA: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Cheater >",
-      "pledgeTag": "Pledge of {guild}"
+      "pledgeTag": "Pledge of {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Auctioneer",
+        "banker": "Banker",
+        "riftForgemaster": "Rift Forgemaster",
+        "cardMaster": "Card Master",
+        "crucibleQuartermaster": "Crucible Quartermaster",
+        "heroicQuartermaster": "Heroic Quartermaster",
+        "pvpVendor": "PvP Vendor",
+        "weaponsmithTrainer": "Blacksmithing Trainer",
+        "cookingTrainer": "Cooking Trainer",
+        "tailoringTrainer": "Tailoring Trainer",
+        "engineeringTrainer": "Engineering Trainer",
+        "leatherworkingTrainer": "Leatherworking Trainer",
+        "alchemyTrainer": "Alchemy Trainer",
+        "weaponVendor": "Weapon Vendor",
+        "armorVendor": "Armor Vendor",
+        "armsDealer": "Arms Dealer",
+        "foodVendor": "Food & Drink Vendor",
+        "potionVendor": "Potion Vendor",
+        "stableMaster": "Stable Master",
+        "generalGoods": "General Goods"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Level {level} {family}",
@@ -3265,6 +3427,7 @@ export const en_CA: EnTranslations = {
       "lock": "Lock player frame"
     },
     "partyFrames": {
+      "header": "Party",
       "section": "Party and Raid Frames",
       "optionsSection": "Party Frame Options",
       "unlock": "Move party and raid frames",
@@ -3475,10 +3638,15 @@ export const en_CA: EnTranslations = {
       "unrecordedSigned": "No gatherer recorded, signed by {name}",
       "quantityAria": "Units from {source}, up to {count}",
       "decreaseAria": "Decrease units from {source}",
-      "increaseAria": "Increase units from {source}"
+      "increaseAria": "Increase units from {source}",
+      "decreaseByAria": "Decrease units from {source} by {count}",
+      "increaseByAria": "Increase units from {source} by {count}",
+      "moveAll": "Move all units",
+      "fits": "Up to {units} fit right now"
     },
     "materialHint": {
       "fineGrade": "Fine grade. Gathered from a full-tier vein with a tool ranked above the material, and counts as the ordinary version wherever one is required.",
+      "fineFarmGrade": "Fine grade. Some picks of a harvest come up fine, more often at higher Farming skill or with a charged Artisan's Eye. Ordinary produce never counts where the fine grade is required.",
       "cookingCatch": "Cooking ingredient. Must be cooked before eating.",
       "usedBy": "Used by {crafts}.",
       "arcaneDust": "Crafting reagent. Disenchanted from common and uncommon gear.",
@@ -3763,6 +3931,15 @@ export const en_CA: EnTranslations = {
       "subtitle": "Guilds of the realm",
       "rosterTitle": "View the roster of {guild}",
       "back": "Back",
+      "filters": "Board filters",
+      "newPlayerFriendly": "New player friendly",
+      "newPlayerFriendlyTitle": "This guild welcomes new players",
+      "filterNewPlayersTitle": "Show only guilds that welcome new players",
+      "filterEmpty": "No guild has opened its doors to new players yet.",
+      "showAll": "Show all guilds",
+      "officersOnline": "Officers online",
+      "officersOnlineLabel": "Officers online: {names}",
+      "officerEntry": "{name} ({rank})",
       "popupTitle": "Guild Signpost",
       "close": "Close"
     },
@@ -3819,6 +3996,8 @@ export const en_CA: EnTranslations = {
       "withdrawQuantityTitle": "Withdraw {item}",
       "withdrawQuantityInput": "Quantity to withdraw",
       "withdrawQuantityConfirm": "Withdraw",
+      "quantityStepDownAria": "Decrease the quantity by {count}",
+      "quantityStepUpAria": "Increase the quantity by {count}",
       "vaultRowWithdrawName": "Withdraw {item}",
       "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
       "withdrawQuantityAction": "Quantity to withdraw: {item}",
@@ -4010,6 +4189,25 @@ export const en_CA: EnTranslations = {
       "lastSeenNever": "never",
       "ignoredTab": "Ignored",
       "blockedTab": "Blocked",
+      "who": {
+        "tab": "Who",
+        "searchPlaceholder": "Name, zone, or guild",
+        "search": "Search",
+        "loading": "Asking the realm who is online...",
+        "empty": "No players match.",
+        "count": "{total} online",
+        "countFiltered": "{shown} of {total} online",
+        "capped": "Showing the first {delivered}. Narrow the search to see the rest.",
+        "classFilter": "Filter by class",
+        "allClasses": "All classes",
+        "colStatus": "Status",
+        "colName": "Name",
+        "colLevel": "Level",
+        "colClass": "Class",
+        "colZone": "Zone",
+        "colGuild": "Guild",
+        "sortTitle": "Sort by {column}"
+      },
       "ignoredEmpty": "You are not ignoring anyone.",
       "blockedEmpty": "You have not blocked anyone.",
       "blockSearchPlaceholder": "Player name",
@@ -4049,7 +4247,6 @@ export const en_CA: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Gathering",
       "mining": "Mining",
       "logging": "Logging",
       "herbalism": "Herbalism",
@@ -4132,6 +4329,7 @@ export const en_CA: EnTranslations = {
           "farming": "Works from your bags when you plant a crop bed."
         },
         "speed": "Gathers faster at nodes below tier {tier}.",
+        "wieldDegrade": "Below that skill it still works as a lower-tier tool.",
         "rodRequired": "Required to fish.",
         "rodBite": "Fish bite up to {seconds}s sooner.",
         "rodReel": "Extends the reel window by {seconds}s.",
@@ -4233,9 +4431,7 @@ export const en_CA: EnTranslations = {
       "noviceBody": "Farming skill grows every time you bring in a crop. Sow a seed in any garden bed to begin."
     },
     "archetypeTitle": {
-      "label": "Title",
-      "none": "None",
-      "hobbyLabel": "Hobby"
+      "none": "None"
     },
     "archetypePair": {
       "engineering+alchemy": "Bombardier",
@@ -4312,7 +4508,7 @@ export const en_CA: EnTranslations = {
       "enchant_lucent_infusion": "Lucent Infusion"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Wolf Form uses its 1 sec base swing speed instead."
+      "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead."
     },
     "professions": {
       "title": "Professions",
@@ -4405,7 +4601,21 @@ export const en_CA: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Majors: {a} and {b}",
       "pairsHeld": "Pairs held: {count}",
-      "returnsLabel": "Returns: {count}"
+      "returnsLabel": "Returns: {count}",
+      "retentionFooter": "Returns on respec: 60% of skill kept.",
+      "tutorialLink": "Profession tutorial"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Recipes",
+      "collapseHint": "Collapse recipe tracker",
+      "expandHint": "Expand recipe tracker",
+      "pin": "Pin",
+      "unpin": "Unpin",
+      "pinFull": "The recipe tracker is full (up to {cap} recipes)",
+      "pinAria": "Pin {name} to the HUD tracker",
+      "unpinAria": "Unpin {name} from the HUD tracker",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Crafting",
@@ -4437,9 +4647,11 @@ export const en_CA: EnTranslations = {
       "reagentLine": "{name} x{have}/{required}",
       "reagentFineSub": "(spends {count} fine-grade)",
       "reagentVaultDraw": "(draws {count} from your vault)",
+      "reagentOrdinaryHeld": "({name} held: {count}, but only the fine grade counts here)",
       "vaultUnreachable": "The Materials Vault is out of reach here.",
       "craftFeeLine": "Craft fee: {fee} each",
       "empty": "No recipes known yet.",
+      "materialsFooter": "Materials in your vault are drawn automatically. Learn more recipes at the station.",
       "resultAria": "Craft {name}",
       "craftedToast": "Crafted: {name}",
       "craftedToastQty": "Crafted: {name} x{qty}",
@@ -4541,6 +4753,9 @@ export const en_CA: EnTranslations = {
       "commissionToggleHint": "Binds to the first character to receive it in a trade.",
       "commissionUnbound": "Commission piece: binds to the first recipient",
       "commissionBound": "Commission piece: bound to its recipient"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "The Merchant restocks common goods; player listings sit beside them at their asking price."
     },
     "itemMenu": {
       "use": "Use",
@@ -4821,6 +5036,7 @@ export const en_CA: EnTranslations = {
       "roleDps": "Damage",
       "freeRoles": "Any roles welcome",
       "lockoutDaily": "Daily lockout on the final boss",
+      "lockoutWeekly": "Weekly lockout on each boss",
       "lockoutNone": "No lockout",
       "lockedFor": "Locked for about {minutes} min",
       "attunement": "Requires attunement: {quest}",
@@ -4834,6 +5050,8 @@ export const en_CA: EnTranslations = {
       "lootMaybe": "At most one of these may drop:",
       "lootChance": "Additional chance drops:",
       "lootHeroic": "Heroic bonus, one of these always drops:",
+      "lootHeroicMaybe": "Heroic bonus, at most one of these may drop:",
+      "lootHeroicChance": "Heroic bonus, additional chance drops:",
       "pct": "{pct}%",
       "blockedLevel": "Levels {min} to {max} only",
       "blockedSpec": "Requires a specialization",
@@ -4905,7 +5123,33 @@ export const en_CA: EnTranslations = {
         "kings_wrath": "King's Wrath (30%: permanent damage bonus, faster floor hazards)",
         "bone_storm": "Bone Storm (he ignores threat, whirls, and charges the raid)",
         "crown_endures": "The Crown Endures (hard enrage at 6:00, heroic 5:00)",
-        "deathless_court": "The Deathless Court (heroic only, the royal court rises after Deathless Rage)"
+        "deathless_court": "The Deathless Court (heroic only, the royal court rises after Deathless Rage)",
+        "bloodmane_rend": "Bloodmane Rend (bleed, watch for target swaps)",
+        "tusk_sweep": "Tusk Sweep (frontal cleave)",
+        "ancestral_sap": "Ancestral Sap (heals its allies)",
+        "call_of_the_hunt": "Call of the Hunt (hastens nearby allies)",
+        "thickhide_ward": "Thickhide Ward (shields nearby allies)",
+        "beast_pit_quake": "Beast Pit Quake (area damage)",
+        "wildheart_pulse": "Wildheart Pulse (pulsing area damage)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Brand of the Pyre (stacking fire mark, wash it off in conduit water)",
+        "forge_strike": "Forge Strike (stacking tank-swap debuff)",
+        "rain_of_cinders": "Rain of Cinders (three fire cones, stand between them)",
+        "falling_cinders": "Falling Cinders (meteor circles on players, move out)",
+        "revolving_inferno": "Revolving Inferno (rotating fire rays, move through the gaps)",
+        "forge_wave": "Forge Wave (expanding fire wall, use the two safe lanes)",
+        "apocalypse_add": "Ignivar Ashcaller (priority add casting Apocalypse, kill it fast)",
+        "judgment_of_the_forge": "Judgment of the Forge (intermission, share the one safe refuge)",
+        "last_inferno": "Last Inferno (45-second burn at 20% health)",
+        "chains_of_the_forge": "Chains of the Forge (heroic only, stay close to your linked partner)",
+        "makers_brand": "Maker's Brand (stacking tank-swap debuff)",
+        "forgefathers_sweep": "Forgefather's Sweep (wide frontal cone at a non-tank)",
+        "tempering_ray": "Tempering Ray (line to a marked player, intercept it)",
+        "cinder_orbs": "Cinder Orbs (marked players spread to the room edges)",
+        "forgestorm": "Forgestorm (falling meteor circles, move out)",
+        "shared_pyre": "Shared Pyre (gathering circle, split the damage)",
+        "anvils_decree": "Anvil's Decree (three raid-wide hammer strikes, heal through)",
+        "masters_assembly": "The Master's Assembly (block the forge beams, rotate blockers)"
       }
     },
     "cosmetics": {
@@ -4926,6 +5170,8 @@ export const en_CA: EnTranslations = {
       "applied": "Applied",
       "owned": "Owned",
       "storeOnly": "Available in the WOC Store",
+      "preview": "Preview",
+      "previewAria": "Preview {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "A mount skin is drawn over whichever mount this character rides. It never changes speed.",
       "mountsNoMount": "Own a mount first: a skin needs something to ride.",
@@ -4974,6 +5220,10 @@ export const en_CA: EnTranslations = {
       "ownedTooltipStatus": "Catalogued in The Reliquary",
       "missingTooltipStatus": "Not yet found",
       "firstFindClears": "First found on clear {count}",
+      "foundBy": "Found by {names}",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "Shared by every character on your account",
+      "sharedScopeHint": "A relic found by any character on your account fills the page here too.",
       "unlockToast": "Relic catalogued: {name}",
       "illuminateBanner": "Page illuminated: {name}",
       "illuminateToast": "Every relic on {name} is filled.",
@@ -5107,6 +5357,10 @@ export const en_CA: EnTranslations = {
       "progressAria": "Progress: {current} of {target}",
       "renownChip": "{renown} Renown",
       "earnedDate": "Earned {date}",
+      "earnedBy": "Earned by {names}",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "Shared by every character on your account",
+      "accountScopeHint": "A deed any character on your account accomplishes is earned here too, and the Book names who earned it.",
       "featRibbon": "Feat",
       "hiddenBadge": "Hidden",
       "titleChip": "Title reward",
@@ -5156,6 +5410,33 @@ export const en_CA: EnTranslations = {
       "toggleAria": "Switch between the world map, zone map, and instance map",
       "levels": "Levels {min} to {max}"
     },
+    "mapAtlas": {
+      "level": "Level {level}",
+      "landmarkCount": "{count} landmarks",
+      "filtersAria": "Map layers",
+      "filters": {
+        "quests": "Quests",
+        "gather": "Gather",
+        "dungeons": "Dungeons",
+        "services": "Services",
+        "players": "Players"
+      },
+      "trackedQuests": "Tracked quests",
+      "noTrackedQuests": "No tracked quests",
+      "availableNearby": "Available nearby",
+      "noNearbyQuests": "No nearby quests",
+      "distance": "{distance} yards",
+      "showRoute": "Show Route",
+      "untrack": "Untrack",
+      "track": "Track",
+      "legend": {
+        "dungeon": "Dungeon",
+        "ore": "Ore",
+        "herb": "Herb",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
+    },
     "arenaGate": {
       "minLevelNote": "Requires level {level}"
     },
@@ -5174,6 +5455,7 @@ export const en_CA: EnTranslations = {
       "tabBrowse": "Browse",
       "tabSell": "Sell",
       "tabActivity": "My Activities",
+      "tabHistory": "Sales History",
       "tabsLabel": "$WOC Exchange sections",
       "loading": "Loading the Exchange...",
       "loadFailed": "The Exchange could not be reached. Try again shortly.",
@@ -5198,6 +5480,16 @@ export const en_CA: EnTranslations = {
       "colCurrentBid": "Current bid",
       "colBuyNow": "Buy now",
       "colTimeLeft": "Time left",
+      "colBuyer": "Buyer",
+      "colSoldAt": "Sold",
+      "colSalePrice": "Sale price",
+      "colSaleType": "Type",
+      "saleTypeAuction": "Auction",
+      "saleTypeBuyNow": "Buy now",
+      "saleTypeDirected": "Directed",
+      "saleTypeUnknown": "Unknown",
+      "historyEmpty": "No sales recorded yet.",
+      "historyError": "Sales history could not be loaded.",
       "reserveMet": "Reserve met",
       "reserveNotMet": "Reserve not met",
       "yourListing": "Your listing",
@@ -5870,6 +6162,7 @@ export const en_CA: EnTranslations = {
       "deeds": "Book of Deeds",
       "reliquary": "The Reliquary",
       "sheathe": "Sheathe/Unsheathe Weapon",
+      "hideInterface": "Hide the interface (screenshots and videos)",
       "crafting": "Crafting",
       "mount": "Mount / Dismount",
       "calendar": "Event Calendar",
@@ -5899,6 +6192,8 @@ export const en_CA: EnTranslations = {
       "attackMove": "Attack Move (only once you switch the option on)",
       "meters": "Damage meters (damage, healing, and threat)",
       "petMark": "Pet: Mark, select your own pet (the same as clicking its frame)",
+      "targetSelf": "Target yourself",
+      "targetParty": "Target party members 1 to 9, top to bottom as the party frames show them",
       "onBarBinding": "You can also bind straight from the bar: choose Edit action bar keys in the Key Bindings panel, then click a slot on the live bar and press the key you want. Click Done when you are finished. This one is desktop only, since it needs a physical keyboard.",
       "clickMoveNote": "Click to Move is off until you switch it on: open the Key Bindings panel in the game menu, turn on Click to Move, then use the Click Move Button row under it to choose which mouse button does the walking (Left Click by default, or Right Click). Once it is on, clicking a spot on the ground sends you walking there, with a marker on the ground showing where you are headed. Clicking a creature or another player walks you over to them and stops in range, while that click still does its usual job of targeting or interacting; if you are already close enough to reach what you clicked, you simply interact and stay where you are. Any of the movement keys takes control straight back and ends the trip, and so does holding the mouse button to look around. Jumping does not, so you keep travelling through the hop, and opening the game menu only pauses the trip, which carries on when you close the menu."
     },
@@ -6036,7 +6331,8 @@ export const en_CA: EnTranslations = {
       "ifLockBars": "Locks your bars so you cannot drag an ability out of a slot by accident.",
       "keybindsHeading": "The Key Bindings panel",
       "keybindsBody": "The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.",
-      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want."
+      "keybindsMouseBody": "Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want.",
+      "keybindsWheelBody": "The wheel itself binds too. Zoom Camera In and Zoom Camera Out are ordinary bindings that sit on the bare wheel by default, so you can move them to Ctrl plus the wheel, or to keys, and then roll the freed wheel to fire action bar slots. A wheel notch has no release, so it cannot drive a held action like moving forward."
     },
     "combat": {
       "intro": "Combat follows familiar classic-MMO rules. You never need to study any of it to play well, this is just the shape of how fights work.",
@@ -6057,7 +6353,7 @@ export const en_CA: EnTranslations = {
       "deathTitle": "When you fall",
       "deathBody": "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
       "threatTitle": "Who the enemy hits",
-      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
+      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Cat Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
       "hazardsTitle": "The water can kill you",
       "breathBody": "Deep water is swimmable, and you can dive under it. While your head is under, a blue breath bar appears near the top of the screen and drains; break the surface and it refills far faster than it emptied. Let it empty while you are still under and you begin to drown, losing a chunk of your health every second until you reach air, so keep an eye on the bar on a long dive. Death clears it, so a corpse run always starts with a full lungful.",
       "fatigueBody": "The sea has no wall. The crossings the world means you to swim, the straits and meres between one stretch of land and the next, and the inland lakes, are safe to cross however long they take. Strike out past the shore into genuinely open water instead and it starts to sap your strength: a warning appears, you get a real window to turn around, and after that the sea deals steadily heavier damage that nothing can prevent until you head back toward land. Drown or wear yourself out that far from shore and you release like any other death, so treat the horizon as scenery rather than a destination.",
@@ -6088,8 +6384,9 @@ export const en_CA: EnTranslations = {
       "framePetBody": "Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.",
       "framesMoveBody": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.",
       "framesMoveBodyEditFrames": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. Edit Frames, at the top of the Frames tab in the Interface options, loosens the rest of the interface at once, those three frames with it: the action bars, the cast bar, the swing bar, the experience bar, the minimap, the button rail, the pet frame, the stance bar, the buff and debuff rows, and the Wishlist Reminder chip, each wearing a name chip while it is loose. If they end up somewhere you regret, Reset to Defaults at the foot of that same Frames tab snaps them all back to where they started.",
-      "framesGovernedExtra": "Edit Frames also loosens the tracker stack below (your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, any rift you are taking part in, and the recipe or commission you are tracking), the pet action bar beside your pet frame, the Target dots frame for your debuffs across nearby enemies, the paladin's Devotion medallion, the warlock's Affliction Bar, the spell-proc overlay, the off-hand swing timer for dual-wielders, and the tabbed damage meter window, each wearing its own name chip while it is loose.",
+      "framesGovernedExtra": "Edit Frames also loosens the tracker stack below (your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, any rift you are taking part in, and the recipe or commission you are tracking), the pet action bar beside your pet frame, the Target dots frame for your debuffs across nearby enemies, the paladin's Devotion medallion, the warlock's Affliction Bar, the spell-proc overlay, the off-hand swing timer for dual-wielders, and the tabbed damage meter window, each wearing its own name chip while it is loose.",
       "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
+      "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",
@@ -6100,7 +6397,7 @@ export const en_CA: EnTranslations = {
       "minimapBody": "Top right: a round minimap with the zone name above it and your coordinates below, ringed by a dial that paints the time of day.\n\nThe disc carries more than terrain. Your own arrow sits at the center, pointing the way you face, with your party around you as class-colored dots and an edge arrow for anyone who has wandered off it. Quest givers wear the same marks there as they do in the world, and you will also pick out gathering nodes and crafting stations, travel portals, lootable bodies and containers, any hostile that has taken an interest in you, friends and guildmates who are nearby, and your own body while you are running back as a ghost.\n\nSmall indicators appear on it when they have something to say: an envelope while unread letters are waiting for you, a coin while sale proceeds or returned goods are waiting at the Merchant, and a button listing your raid lockouts.",
       "mapTitle": "The world map and your trackers",
       "mapBody": "M opens the world map: the continent drawn out, with your own arrow on it, the zones and their names, the points of interest around you, the travel portals, and the gathering nodes you have found. Your party shows on it too. Inside a delve the map switches to a schematic of the rooms you have explored so far.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
-      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
+      "mapBodyZoneFirst": "M opens the world map on the zone you are standing in, with your own arrow on it, the points of interest around you, the quest givers with their marks and the areas your objectives sit in, the crafting stations, mailboxes, noticeboards and garden beds, the dungeon entrances, and every gathering node in the zone, grayed out while it regrows and marked when your tools are not up to it. Your party shows on it too. Right-click the map, or press its World map button, and it pulls back to the continent, every zone drawn with its name, where a click on a zone opens that zone's map. Step into a delve, a dungeon, a rift or a castle keep and the map switches to a floor plan of where you stand; the Thornhollow Fields battleground gets a field map of its own.\n\nDown the right side, under the minimap, a stack of trackers keeps your current business in view without opening anything: your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, and any rift you are taking part in. The quest tracker collapses when you want the screen back.",
       "gatheringGoalTrackerBody": "A gathering goal tracker joins the stack once you Track a recipe in the crafting window or a commission on the board: it names the recipe or commission you are tracking, how many you are collecting for, and how far your held and stored materials get you there. Track replaces your current goal, and Clear drops it explicitly; neither one ever changes your harvest preference.",
       "hubPracticeTrackerBody": "Near the Eastbrook hub, a practice tracker joins the stack once you take the guided practice lessons there: it keeps your best runs against the practice dummies in view. While a lesson is active, a coaching strip beside it walks you through the current step of the lesson, from opening the Damage Meters to comparing a second run.",
       "chatTitle": "The chat box",
@@ -6447,6 +6744,7 @@ export const en_CA: EnTranslations = {
       "formsNote": "A druid fights by changing shape. Most druid abilities belong to one shape, so the form you are in decides what you can cast, and shifting costs a little mana. You can shift in or out of combat, as often as you like.",
       "formsAutoUnshift": "A heal or a damaging spell cast while shifted shifts you out for you. Leaving a shape that way is free and does not spend your global cooldown, so an instant spell goes off the moment you press it. Shifting back in is an ordinary ability, and still costs mana and your global cooldown.",
       "formsMoonwing": "A Moongrove druid gains one more shape, Moonwing Form, the caster shape a Balance druid fights in. It is the one animal shape that keeps your spells, and your wand only works in it or in your normal caster form.",
+      "formsWolfEngage": "A Cat opens a fight with Bruin Rush, shifts straight into Cat Form to Pin the target, closes the gap with Lunge when it is not stalking, and holds an enemy still with Takedown.",
       "formLine": {
         "form_bear": "The tanking shape: a heavy hide, rage instead of mana, and extra threat so enemies keep swinging at you.",
         "form_cat": "The melee damage shape: energy and combo points, like a rogue, and much less threat.",
@@ -6455,7 +6753,7 @@ export const en_CA: EnTranslations = {
       "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
       "formName": {
         "form_bear": "Bruin Form",
-        "form_cat": "Wolf Form",
+        "form_cat": "Cat Form",
         "form_travel": "Fleet Form"
       }
     },
@@ -6976,7 +7274,7 @@ export const en_CA: EnTranslations = {
     "deedsPage": {
       "intro": "The Book of Deeds is where the world keeps score of all you have done, from your first steps out of the starting valley to the hardest fights the realm can offer. Earn deeds as you play, wear the titles they grant, and watch your Renown climb.",
       "howHeading": "How deeds work",
-      "howBody": "Deeds are earned and kept one character at a time, so every hero you play builds a Book of their own; only the realm leaderboard gathers your Renown across every character you play, counting each deed just once. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them. The Book also keeps itself honest: whatever your past record can prove, it credits on the spot, so a veteran never opens it to an empty page; only the counting deeds begin their tally fresh.",
+      "howBody": "Deeds are earned one character at a time, but the Book of Deeds is shared by every character on your account: a deed any of them accomplishes is earned for all of them, the Book names who earned it and when, and a title or border it rewards can be worn by any of your characters. The realm leaderboard gathers your Renown the same way, counting each deed just once. Each deed spells out plainly what it asks of you, right there in the Book of Deeds in game, so you always know what to chase, and you can set a watch on the ones you are after to keep them in sight while you play. A small few stay secret and reveal themselves only once you have earned them. The Book also keeps itself honest: whatever your past record can prove, it credits on the spot, so a veteran never opens it to an empty page; only the counting deeds begin their tally fresh.",
       "renownHeading": "Renown",
       "renownBody": "Renown is the score behind the Book. Every deed you earn is worth a set amount, and your total only ever climbs, so a quiet week never costs you ground. A handful turn on luck rather than skill, other collection deeds are their own reward, and Feats are an honor apart, so none of those are worth any Renown. Deeds without Renown still count toward completion in your Book; they simply never score. Feats are the one exception, kept outside the count entirely.",
       "rewardsHeading": "Titles and borders",
@@ -7014,7 +7312,7 @@ export const en_CA: EnTranslations = {
     "reliquaryPage": {
       "intro": "The Reliquary is the museum of unique spoils you have catalogued: dungeon chase uniques, profession trophies, mounts, weapon skins, and titles. It pairs with the Book of Deeds the way a trophy hall pairs with an achievement book.",
       "howHeading": "How the collection works",
-      "howBody": "Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when you obtain that piece for the first time on the character, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is character-scoped except weapon skins, which are account cosmetics.",
+      "howBody": "Open The Reliquary in game (default Shift+X). Each shelf holds pages of unique relics. Fill a silhouette when any character on your account obtains that piece for the first time, and illuminate a page when every relic on it is filled. A few pages are labeled Retired or Personal: they sit outside completion, so they never gate a shelf or the whole catalog. Live finds toast and refresh the open window; progress is shared by every character on the account, so a relic one character finds fills the page for all of them.",
       "ranksHeading": "Curator ranks",
       "ranksBody": "Curator ranks rise with unique catalogued fills and grant only cosmetic titles and borders. They never grant combat power, drop rate, or pity. Account weapon skins do not score Curator rank so prestige stays character-durable, and relics on Retired or Personal pages score nothing toward it either.",
       "retiredTag": "Retired",
@@ -7100,7 +7398,7 @@ export const en_CA: EnTranslations = {
       "groupClasses": "Classes",
       "groupForms": "Druid Forms",
       "formBear": "Bruin Form",
-      "formCat": "Wolf Form",
+      "formCat": "Cat Form",
       "formTravel": "Fleet Form",
       "groupCreatures": "Creatures",
       "groupPets": "Warlock Demons",
@@ -7424,7 +7722,7 @@ export const en_CA: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove the ordinary lower tiers sits the Lucent tier, the capstone ordinary work of the craft: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.\n\nLast Flame's Zeal is a separate raid formula, not a free ordinary enchant. Learn its tradable formula at Enchanting 100 before applying it. Each application uses 3 Cores of the Last Flame and 2 Chime Shards; the formula can drop in the Crucible or be bought from its quartermaster for one core. Its melee proc and weapon-speed rules are shown in full below.",
+        "enchantsNoteRaidFormula": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at one apiece (the rest of a charm's bill is Essence and Dust), the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove the ordinary lower tiers sits the Lucent tier, the capstone ordinary work of the craft: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.\n\nLast Flame's Zeal is a separate raid formula, not a free ordinary enchant. Learn its tradable formula at Enchanting 100 before applying it. Each application uses 3 Cores of the Last Flame and 2 Chime Shards; the formula can drop in the Crucible or be bought from its quartermaster for one core. Its melee proc and weapon-speed rules are shown in full below.",
         "charmsHeading": "Charms for a gatherer's tools",
         "formulaRequired": "Formula required",
         "charmsBody": "Enchanting is also where a gatherer's charms come from. Tinker Gizzel teaches both at the Eastbrook toolworks once your Enchanting reaches 25: the Gatherer's Cache, which adds a unit to a harvest, and the Artisan's Eye, which raises the grade of what comes up. Each is crafted once, then slotted into a pick, axe, or sickle, where it spends a charge only on the harvests it actually improves.\n\nThe refill is where the trade keeps earning. Charges are restored by whoever owns the tool, not by a visiting enchanter, and the refill costs half the materials when that owner is the enchanter who signed the charm, less again with an Enchanting specialization. So a charm sold across the counter is a single sale, while the charms riding your own tools are the cheap ones to keep running. The full charge and material ladder is on any gathering profession page, under Tool effects."
@@ -7493,7 +7791,7 @@ export const en_CA: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "The farming rhythm",
-        "rhythmBody": "Planting is the short visible cast: {plant} seconds flat at every rung, because a hoe opens ground rather than buying speed. Pulling a ripe crop is instant. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
+        "rhythmBody": "Planting is instant, because a hoe opens ground rather than buying speed: there is no cast to wait out, so a farmer who walks off has planted all the same. Pulling a ripe crop is instant too. There is no cast to interrupt and no bag check to refuse it, and a bed that has come ready waits as long as you leave it, so a full pack costs a farmer nothing but the walk to empty it.\n\nWhat a harvest pays is produce and farming proficiency. Unlike a vein, it grants no character XP at all, so the beds are a trade to work rather than a way to level.",
         "gainHeading": "What a harvest teaches",
         "gainBody": "Gain is deterministic and keyed to your own counter rather than to the crop: {g1} proficiency a harvest below {p1}, {g2} below {p2}, {g3} below {p3}, and {g4} the rest of the way to the cap of {cap}. It is never a skill-up roll, so the climb is exactly as long as the arithmetic makes it.\n\nWhat the crop tier decides is how far a bed can carry you. A tier 1 crop teaches to {c1} and grays there, a tier 2 crop to {c2}, and tier 3 and above to the cap, so moving up the beds is what keeps the counter moving at all.",
         "yieldsHeading": "What a harvest yields",
@@ -7535,8 +7833,8 @@ export const en_CA: EnTranslations = {
         "commissionsHeading": "Commissions and the Maker's Bond",
         "commissionsBody": "A commission is a craft made for someone. When crafting a weapon, armor piece, or held off-hand (a potion cannot carry a bond), the crafter can flag the craft as a commission: the finished piece behaves normally in the maker's own hands, but the moment it changes hands in a trade it binds to the person who received it. That is the Maker's Bond: the buyer gets their piece, and the piece cannot be passed on or resold.\n\nBonds are not forever, just expensive. Any station master will unbind a bound piece while you stand at their station (a mobile station never offers the service), for a fee set by the item's quality: 25 silver uncommon, 1 gold rare, 4 gold epic, with a legendary paying the epic rate and a commissioned common piece the uncommon one.\n\nThe fee buys a clean slate, not a cure: the piece is still a commission, so it binds again to whoever receives it in the next trade, and everything else about it, signature, masterwork, and enchants, survives untouched.",
         "provenanceHeading": "Signed work",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one), unless that reagent is marked undiscountable; raid cores always keep their full cost. Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
         "collectorsHeading": "Collectors, trophies, and the price of a story",
         "collectorsBody": "Vendors are blind to provenance: a signed item sells to an NPC for exactly its plain price. The premium on a signature exists only between players, which is precisely what makes it interesting: a stack of windfall ore signed by a famous gatherer, a Prime Cut from a lucky harvest, a masterwork blade naming a crafter who has since retired, all cost whatever someone's memory says they are worth.\n\nThe Book of Deeds leans into the same instinct: Pristine Vein, Ancient Heartwood, Moonlit Bloom, A Perfect Specimen, and Glimmer of Hope are zero-Renown collector's marks that exist purely to prove a moment happened to you. Keep the item that earned the deed and you hold the receipt. None of this is power; provenance buys no stats and wins no fights, it is the game's paper trail of good days.",
         "castPaceHeading": "Cast time and the gold sink",
@@ -7579,7 +7877,7 @@ export const en_CA: EnTranslations = {
         "title": "Professions FAQ",
         "intro": "Quick answers to the questions crafters ask most.",
         "q1": "Why do my signed items not stack?",
-        "a1": "Finished items still follow the strict instance rule: two copies merge only when their signer, rolled properties, masterwork stats, enchant, bond, and other identity all match exactly. A signed blade therefore stays apart from a plain one.\n\nMaterials are the exception. Compatible stacks of the same material can merge even when their collectors or signers differ, because the stack keeps a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.",
+        "a1": "Finished items still follow the strict instance rule: two copies merge only when their signer, rolled properties, masterwork stats, enchant, bond, and other identity all match exactly. A signed blade therefore stays apart from a plain one.\n\nMaterials are the exception. Compatible stacks of the same material can merge even when their collectors or signers differ, because the stack keeps a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.",
         "q2": "Do common recipes raise my skill forever?",
         "a2": "No. Every recipe is scored by how far it sits below your current bracket in that craft, the classic orange, yellow, green, gray reading: full gain at or above your bracket, half one tier below, a quarter two tiers below, and nothing three or more below. Brackets are every 25 skill, so the free skill 0 recipes stop teaching you anything at 75 skill.\n\nThe caps are also lower than the classic 300 you might expect: each of the ten earnable crafts caps at 125, Mining, Logging, and Herbalism cap at 100, and Fishing runs long at 200. Climbing means moving up to recipes at your own bracket, not grinding the cheapest one.",
         "q3": "What is the difference between looting and harvesting a corpse?",
@@ -10083,6 +10381,7 @@ export const en_CA: EnTranslations = {
       "templates": {
         "battleground": "[Battleground] {name}: {message}",
         "party": "[Party] {name}: {message}",
+        "raidWarning": "[Raid Warning] {name}: {message}",
         "yell": "{name} yells: {message}",
         "whisper": "{name} whispers: {message}",
         "toWhisper": "To {name}: {message}",
@@ -10221,6 +10520,7 @@ export const en_CA: EnTranslations = {
       "stunned": "You are stunned!",
       "silenced": "You are silenced!",
       "busy": "You are busy.",
+      "cannotCastWhileMoving": "You can't cast while moving.",
       "abilityNotReady": "That ability is not ready yet.",
       "notEnoughRage": "Not enough rage!",
       "notEnoughEnergy": "Not enough energy!",
@@ -10233,7 +10533,7 @@ export const en_CA: EnTranslations = {
       "requiresForm": "You must be in {form} Form.",
       "cantInForm": "You can't do that in {form} Form.",
       "bear": "Bruin",
-      "cat": "Wolf",
+      "cat": "Cat",
       "travel": "Fleet",
       "shapeshifted": "You cannot do that while shapeshifted.",
       "stealthed": "You must be stealthed.",
@@ -10564,12 +10864,11 @@ export const en_CA: EnTranslations = {
       "devotion": "Devotion"
     },
     "forms": {
-      "bear": "Bear",
-      "cat": "Wolf"
+      "bear": "Bruin",
+      "cat": "Cat"
     },
     "cast": {
       "fishing": "Fishing",
-      "farming": "Planting",
       "gathering": "Gathering",
       "crafting": "Crafting",
       "disenchanting": "Disenchanting",
@@ -10913,6 +11212,19 @@ export const en_CA: EnTranslations = {
       "buyConfirmAccept": "Buy",
       "buyConfirmCancel": "Cancel",
       "buyChanged": "That listing changed before you confirmed. Check the price and try again.",
+      "sweep": "Sweep",
+      "sweepAria": "Sweep the market for {item}",
+      "sweepTitle": "Market Sweep: {item}",
+      "sweepClose": "Close",
+      "sweepNote": "Buys whole listings from other sellers, cheapest per unit first, until your count is covered. You may receive a few more than you asked for.",
+      "sweepQuantity": "Units wanted",
+      "sweepQuoteNone": "No listings of this item to sweep.",
+      "sweepQuoteLine": "{units} units across {listings} listings for {total} ({each} each)",
+      "sweepQuoteShort": "Only {units} units across {listings} listings are available, for {total} ({each} each)",
+      "sweepButton": "Sweep",
+      "sweepConfirmTitle": "Confirm Market Sweep",
+      "sweepConfirmBody": "Buy {item} x{units} across {listings} listings for {total} ({each} each)?",
+      "sweepChanged": "The sweep quote changed before you confirmed. Check the total and try again.",
       "sellNote": "List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.",
       "sellPickEmpty": "Click an item in your bags to choose what to sell.",
       "quantity": "Quantity",
@@ -10952,7 +11264,9 @@ export const en_CA: EnTranslations = {
       "ownListing": "That is your own listing. Cancel it to reclaim it.",
       "cannotAfford": "You cannot afford that.",
       "notYourListing": "That is not your listing.",
-      "nothingToCollect": "You have nothing to collect."
+      "nothingToCollect": "You have nothing to collect.",
+      "sweepNoListings": "No listings of that item are available to sweep.",
+      "sweepPriceChanged": "Prices changed before your sweep landed. Check the quote and try again."
     },
     "loot": {
       "takeAll": "Take All",
@@ -11790,7 +12104,7 @@ export const en_CA: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Hexes the enemy for 8 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage."
+        "description": "Hexes the enemy for 8 sec, dealing Shadow damage and generating 2 Condemnation every 2 sec. Its next 3 damaging actions each generate 7 Condemnation and lash it for 17 Shadow damage."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -11826,7 +12140,7 @@ export const en_CA: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target."
+        "description": "Brands an enemy for 15 sec. Your next 3 direct spells echo for 25% damage against the branded enemy, or copy 50% damage to it when cast against another target. Ruinbolt echoes also count as critical hits, without another critical damage multiplier."
       },
       "wrath": {
         "name": "Wildbolt",
@@ -11865,7 +12179,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruin Form",
-        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Cast again to return to caster form."
+        "description": "Shapeshift into a bear: armor +110%, maximum health +30%, greatly increased attack power, your attacks build rage and generate 30% more threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
       },
       "maul": {
         "name": "Bonecrush",
@@ -11881,17 +12195,17 @@ export const en_CA: EnTranslations = {
         "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
-        "name": "Wolf Form",
-        "description": "Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
+        "name": "Cat Form",
+        "description": "Shapeshift into a cat: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, you move 15% faster, and you generate 29% less threat. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form."
       },
       "claw": {
         "name": "Rendclaw",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
+        "description": "Finishing move that causes {damage}. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy."
       },
       "swipe": {
@@ -11923,7 +12237,7 @@ export const en_CA: EnTranslations = {
       },
       "travel_form": {
         "name": "Fleet Form",
-        "description": "Instantly shift into a swift fleet form, increasing movement speed by 40%. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping."
+        "description": "Instantly shift into a swift fleet form, increasing movement speed by 40% and removing breakable roots and slows. You cannot use other abilities while shifted, but can shift in or out of combat, ideal for escaping. Shifting into any form grants Loping Stride, a short burst of movement speed."
       },
       "enrage": {
         "name": "Stoke",
@@ -11943,23 +12257,31 @@ export const en_CA: EnTranslations = {
       },
       "dash": {
         "name": "Dash",
-        "description": "Sprint forward, increasing movement speed by 50% for 15 sec. Wolf Form only."
+        "description": "Sprint forward, increasing movement speed by 50% for 15 sec. Cat Form only."
       },
       "pounce": {
         "name": "Slinkstrike",
-        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Wolf Form only."
+        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge."
+      },
+      "lunge": {
+        "name": "Lunge",
+        "description": "Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only."
+      },
+      "hamstring_bite": {
+        "name": "Takedown",
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec). Cat Form only."
       },
       "insect_swarm": {
         "name": "Stinging Swarm",
         "description": "The enemy is swarmed by insects, taking {damage} Nature damage over 12 sec."
       },
       "tigers_fury": {
-        "name": "Wolfsblood",
-        "description": "Surges {rage} energy and increases attack power by {buff} for {duration} sec. Wolf Form only."
+        "name": "Lynxblood",
+        "description": "Surges {rage} energy and increases attack power by {buff} for {duration} sec. Cat Form only."
       },
       "rip": {
         "name": "Bloodrift",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Cat Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
@@ -12156,11 +12478,11 @@ export const en_CA: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Moonwing Form",
-        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Cast again to return to caster form. (Balance signature)"
+        "description": "Shapeshift into a fearsome Moonkin, increasing your spell damage by 20% and your armor by 50%. Lasts until you shift out. Shifting into any form grants Loping Stride, a short burst of movement speed. Cast again to return to caster form. (Balance signature)"
       },
       "feral_charge": {
         "name": "Primal Surge",
-        "description": "Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)"
+        "description": "Unleash a primal surge. In Cat Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)"
       },
       "swiftmend": {
         "name": "Fleetmend",
@@ -12380,7 +12702,7 @@ export const en_CA: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Ruinbolt",
-        "description": "Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage. Desolation shortens its cast by 30%."
+        "description": "Spends 3 Wrack to hurl a heavy bolt of chaotic fire for {damage} Fire damage before critical damage is applied. Always critically strikes when it hits. Desolation shortens its cast by 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -12524,7 +12846,7 @@ export const en_CA: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Perfect Moment",
-        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them. (Chronomancy)"
+        "description": "Seize your perfect moment: instantly gain 4 Arcane Charges, and for 10 sec Aether Darts does not consume them and deals 20% increased damage. (Chronomancy)"
       },
       "arcane_surge": {
         "name": "Aether Surge",
@@ -12661,7 +12983,7 @@ export const en_CA: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bruin Rush",
-        "description": "Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only."
+        "description": "Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only."
       },
       "demoralizing_roar": {
         "name": "Craven Roar",
@@ -12669,11 +12991,11 @@ export const en_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Stalk",
-        "description": "Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat."
+        "description": "Enter stealth while in Cat Form. Cannot be used in combat."
       },
       "rake": {
         "name": "Flense",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {
@@ -16433,6 +16755,21 @@ export const en_CA: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Healing Dummy"
+      },
+      "healing_dummy_tank": {
+        "name": "Injured Vanguard Dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Injured Soldier Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Critical Scout Dummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Wounded Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Battered Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Ridge Stalker"

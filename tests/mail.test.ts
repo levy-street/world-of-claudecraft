@@ -19,6 +19,7 @@ import { BUILTIN_WORLD } from '../src/sim/data';
 import {
   MAIL_ATTACHMENT_EXPIRY_SECONDS,
   MAIL_DELIVERY_SECONDS,
+  MAIL_ESCROW_COPPER_MIN,
   MAIL_MAX_ATTACHMENTS,
   MAIL_PERSIST_REFRESH_SECONDS,
   MAIL_POSTAGE,
@@ -1226,11 +1227,12 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
   });
 
   // Regression for the #3613 review finding: the periodic re-dirty arm was
-  // gated on `hasEscrow &&`, so a PLAIN (no coin, no items) letter's 14-day
-  // read/expiry clock was NEVER re-dirtied after send. secondsLeft was
+  // gated on `hasEscrow &&`, so a PLAIN (no coin, no items) letter's
+  // read/expiry clock (then a flat 14 days, now the 30-day unread / 3-day
+  // read windows) was NEVER re-dirtied after send. secondsLeft was
   // written once at send time; on load expiresAt = ctx.time + secondsLeft, so
   // every server restart handed plain and already-read letters a fresh full
-  // 14-day expiry window. Since realms restart far more often than 14 days
+  // expiry window. Since realms restart far more often than the window
   // (every deploy), this meant plain letters effectively never expired, the
   // reclaim sweep stopped working, and the mail book grew unbounded again:
   // exactly the #3560 class this PR exists to prevent. Proven end to end: the
@@ -1267,7 +1269,7 @@ describe('takeDirtyMailPartitions (#3561 incremental autosave)', () => {
 
     // The restart: a fresh Sim loaded from EXACTLY what the drain produced
     // (nothing more) must carry that same advanced countdown forward, not
-    // hand the letter a fresh 14-day window from a stale secondsLeft.
+    // hand the letter a fresh full window from a stale secondsLeft.
     const sim2 = makeWorld();
     sim2.loadMail({ mail: [chatAfterDrain!], nextMailId: chatAfterDrain!.id + 1 });
     const reloaded = sim2.serializeMail().mail.find((m) => m.subject === 'Chat');
@@ -1520,6 +1522,18 @@ describe('purgeMailOwner - deleting a character', () => {
       [],
       alice,
     );
+    // Sub-silver coin from a live third party: NOT escrow (mailHoldsEscrow),
+    // so the purge deletes it with the coin aboard instead of flying it home,
+    // the same rule the age sweep applies. The 250-copper Legacy letter beside
+    // it is the paired control that does fly home.
+    sim.mailSendResolved(
+      { key: DOOMED_KEY, name: 'Doomed' },
+      'Tip',
+      'Pocket change.',
+      MAIL_ESCROW_COPPER_MIN - 1,
+      [],
+      alice,
+    );
     // An authored parcel: minted by the world, with no live sender to fly home to.
     sim.postOffice.sendLetter(
       DOOMED_KEY,
@@ -1561,8 +1575,10 @@ describe('purgeMailOwner - deleting a character', () => {
     expect(goods.items).toEqual([{ itemId: 'roasted_boar', count: 3 }]);
     expect(goods.returned).toBe(true);
 
-    // The bare note and the authored parcel are gone; the bystander keeps his.
+    // The bare note, the sub-silver tip (coin and all, no return flight), and
+    // the authored parcel are gone; the bystander keeps his.
     expect(bookOf(sim).some((m) => m.subject === 'Note')).toBe(false);
+    expect(bookOf(sim).some((m) => m.subject === 'Tip')).toBe(false);
     expect(bookOf(sim).some((m) => m.letterId === QUEST_LETTERS.q_wolves.letterId)).toBe(false);
     expect(letterBy(sim, (m) => m.subject === 'Untouched', 'bystander letter').recipientKey).toBe(
       sim.postOffice.mailKeyFor(bystanderMeta),
@@ -1667,7 +1683,7 @@ describe('purgeMailOwner - deleting a character', () => {
       { key: DOOMED_KEY, name: 'Doomed' },
       'OldSelf',
       'Mine to mine.',
-      80,
+      120, // a silver or more: the escrow arm must be entered for arm (b) to mean anything
       [],
       alice,
     );

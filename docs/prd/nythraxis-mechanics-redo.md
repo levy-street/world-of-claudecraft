@@ -166,9 +166,11 @@ phase: for 12 s Nythraxis ignores threat and taunts, cannot be knocked back, and
 whirls, dealing 10% max hp per second to anyone within 9 yd. He charges four
 random living, non-impaled players in sequence (3 s each) at 2.2x move speed;
 on reaching one, Bone Slam: 35% max hp (heroic 55%) physical to everyone within
-9 yd, plus a Gravefire line down the charge direction. One Bone Spike cast lands
-mid-storm on both difficulties (two victims normal, three heroic), so the raid
-frees the spiked while running from him. When it ends the threat table is
+9 yd, plus a Gravefire line down the charge direction; the storm's first
+landed slam is softer (section 18), since the raid has not spread yet. No Bone Spike lands
+of the storm's own: it casts none and the regular spike cadence is frozen
+while he storms (the mid-storm cast was retired on 2026-09-16, section 17).
+When it ends the threat table is
 intact, the top-threat tank picks him up, and Gravebreaker re-arms in 3 s.
 Melee cannot attack safely; the raid spreads and runs.
 
@@ -388,8 +390,8 @@ client must see it) an `Active*` readout with a stable id; the driver in
   eruption placement, damage boundary, and flame residue; sigil placement
   validity on both difficulties, bound and unbound resolutions, Ascension
   purge; Soulfire wardstone exclusion; the Rage calm window; immobile-player
-  protection; phase 3 gating; storm target order, slam, mid-storm spike, and
-  pickup; clock warns and enrage; personal-mechanic exclusivity.
+  protection; phase 3 gating; storm target order, slam, no spike while
+  storming, and pickup; clock warns and enrage; personal-mechanic exclusivity.
 - Render, wire, and guide tests mirroring `varkhul_*_render.test.ts`,
   `varkhul_*_wire.test.ts`, and `raid_boss_guide_view.test.ts`.
 - `tests/raid_avoidable_damage_tuning.test.ts` Nythraxis block.
@@ -630,3 +632,58 @@ only the points named below.
   drain, the 55 s per-raider cooldown, Grave Eruption and Grave Flame, Dread
   Curse, Deathless Rage, the sigil's cadence, radius, bind window, Ascension
   and Bound rules, and every phase buff.
+
+## 17. Mid-storm Bone Spike retired (2026-09-16)
+
+Read from the parse service over the 0.42.2 pulls (Sep 11 to 15): heroic sat at
+3 kills to 37 wipes, normal at 39 to 33. Almost every wipe reached phase 3 (36
+of 37 heroic, 29 of 33 normal, median boss health left about 20%) and the
+largest single cause on both difficulties was a Bone Storm collapse (46% of
+heroic wipes, 45% of normal). Inside those storms roughly a quarter of the
+deaths were raiders being drained by a Bone Spike at the time, in 13 of the 22
+heroic storm wipes and 16 of the 19 normal ones.
+
+The storm's counter is "leave 9 yd and spread"; the spike's counter is "stand
+still while others run to you and land the ward hits". Cast together they
+contradict: rescuers walk into the whirl and form the cluster the next Bone
+Slam wants, and an unfreed victim dies to the drain anyway. The mid-storm cast
+(6 s into the storm, both difficulties) is therefore retired. The regular Bone
+Spike cadence timer was already frozen for the storm's duration and resumes
+after the pickup, so the storm itself lands no spike;
+`nythraxisBoneStormSpikeDue`, the
+`NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS` constant, and the `spikeCast` storm
+flag are gone. Whirl tick, Bone Slam damage, and both cadences are unchanged;
+because nobody is impaled mid-storm any more, the hash-ranked charge targets
+after the 6 s mark can differ from before. A spike cast shortly before a storm
+can still leave its victims pinned into it: a storm-lead hold on the regular
+cadence is a separate knob, not taken here.
+
+## 18. Opening Bone Slam softened (2026-09-16, superseded by section 19)
+
+Same parse read as section 17. Bone Slam was 7.5% of heroic wipe killing blows
+and 17% of the damage in the pre-death windows, and its first landing is the
+one that hits a raid that has not spread yet: the storm opens with a charge at
+2.2x move speed, so the first slam arrives 1 to 2 s after the callout, on the
+charged raider and everyone still stacked within 9 yd, with the arrival whirl
+tick on top (heroic 55% + 20% = 75% of max HP in one landing). The storm's
+first landed slam, whichever charge window lands it, now deals 23% of max HP
+on normal and 37% on heroic, about a third less than the full slam; every
+later slam keeps 35% / 55%, so not spreading later still costs the same.
+`nythraxisBoneStormSlamMaxHp` (`src/sim/nythraxis_bone_storm.ts`) owns the
+fraction, the `openingSlamSpent` storm flag marks the first landing, and the
+raid boss guide row states both numbers.
+
+## 19. Hotfix v0.43.1 (2026-09-17): every Bone Slam softened
+
+Section 18 softened only the storm's first landed slam and kept 35% / 55%
+for every later window. The intent behind the v0.43.0 retune was a softer
+Bone Slam across the storm, not a softer opening only, and the release notes
+made the gap visible. Every Bone Slam of a storm, whichever window lands it,
+now deals 23% of max HP on normal and 37% on heroic. The opening-slam
+split is gone with it: `NYTHRAXIS_BONE_SLAM_MAX_HP_*` carry the softer
+values, `nythraxisBoneSlamDamageMaxHp` is the one fraction the driver reads,
+and the `openingSlamSpent` storm flag, the opening constants and
+`nythraxisBoneStormSlamMaxHp` are removed. The raid boss guide row states one
+slam number per difficulty; the sentence about the first slam is deleted
+from the English copy and every locale overlay. Whirl tick, cadence, charge
+count and radius are unchanged.

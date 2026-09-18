@@ -143,6 +143,8 @@ describe('collectPolishProvenanceInputPaths', () => {
     });
     // The incident input and the extracted policy authority are both explicit.
     expect(paths).toContain('src/render/renderer.ts');
+    expect(paths).toContain('src/render/entity_ground_sample.ts');
+    expect(paths).toContain('src/render/entity_ground_sample_core.ts');
     expect(paths).toContain('src/render/entity_view_policy_core.ts');
     expect(paths).toContain('pnpm-lock.yaml');
     expect(paths).not.toContain('polish-v2');

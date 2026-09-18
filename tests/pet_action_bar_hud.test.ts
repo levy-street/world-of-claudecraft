@@ -156,6 +156,12 @@ describe('Hud Warlock pet signature bar', () => {
 
     const felbolt = document.querySelector<HTMLButtonElement>('[title="Felbolt"]');
     expect(felbolt).not.toBeNull();
+    // Shared socket pins keep pet state and icon structure on the common visual recipe.
+    expect(felbolt?.classList.contains('ui-socket')).toBe(true);
+    expect(felbolt?.querySelector('.ui-socket-art')).not.toBeNull();
+    const stanceMenu = document.querySelector<HTMLButtonElement>('[data-focus-key="stance-menu"]');
+    expect(stanceMenu?.classList.contains('ui-socket')).toBe(true);
+    expect(stanceMenu?.classList.contains('is-on')).toBe(true);
     expect(
       document.querySelector<HTMLElement>('[data-focus-key="pet_attack"] .icon-label')?.style
         .backgroundImage,

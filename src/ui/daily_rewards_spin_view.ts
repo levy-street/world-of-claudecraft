@@ -41,9 +41,9 @@ export function spinSectionHtml(view: Extract<DailyRewardsView, { kind: 'ready' 
       })
     : t('hudChrome.dailyRewards.spinReady');
   return (
-    `<section class="dr-section"><h3>${esc(t('hudChrome.dailyRewards.spinTitle'))}</h3>` +
-    `<div class="dr-spin"><div class="dr-wheel">${esc(spin.claimed ? `+${formatNumber(spin.points ?? 0, { maximumFractionDigits: 0 })}` : '?')}</div>` +
-    `<div><p>${esc(text)}</p><button type="button" class="lb-page-btn" data-spin ${view.locked || spin.claimed ? 'disabled' : ''}>${esc(t('hudChrome.dailyRewards.spinButton'))}</button></div></div></section>`
+    `<section class="dr-section ui-card"><h3>${esc(t('hudChrome.dailyRewards.spinTitle'))}</h3>` +
+    `<div class="dr-spin ui-card"><div class="dr-wheel">${esc(spin.claimed ? `+${formatNumber(spin.points ?? 0, { maximumFractionDigits: 0 })}` : '?')}</div>` +
+    `<div><p>${esc(text)}</p><button type="button" class="lb-page-btn ui-btn ui-btn--gold" data-spin ${view.locked || spin.claimed ? 'disabled' : ''}>${esc(t('hudChrome.dailyRewards.spinButton'))}</button></div></div></section>`
   );
 }
 
@@ -58,10 +58,10 @@ export function spinOverlayHtml(points: number): string {
   ).join('');
   return (
     `<div class="dr-spin-stage" role="dialog" aria-modal="true" aria-label="${esc(t('hudChrome.dailyRewards.spinDialogTitle'))}">` +
-    `<button type="button" class="x-btn dr-spin-close" data-spin-close aria-label="${esc(t('hudChrome.dailyRewards.spinClose'))}">${svgIcon('close')}</button>` +
+    `<button type="button" class="x-btn dr-spin-close ui-x-btn" data-spin-close aria-label="${esc(t('hudChrome.dailyRewards.spinClose'))}">${svgIcon('close')}</button>` +
     `<div class="dr-spin-pointer" aria-hidden="true"></div>` +
     `<div class="dr-spin-wheel-big" style="--land-angle:${spinLandingAngle(points)}deg" aria-hidden="true">${labels}</div>` +
-    `<div class="dr-spin-result" style="--tier-color:#ffe27a">` +
+    `<div class="dr-spin-result" style="--tier-color:var(--color-deed-banner-text)">` +
     `<span>${esc(t('hudChrome.dailyRewards.spinResult', { points: formatNumber(points, { maximumFractionDigits: 0 }) }))}</span>` +
     `<i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>` +
     `<b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b><b></b>` +

@@ -135,6 +135,34 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     await pool.query('ANALYZE woc_market_directed_offers');
     await pool.query('ANALYZE woc_market_settlements');
     await pool.query('ANALYZE woc_market_listings');
+    // The 'plans-sales' ledger for the two sales pins below: 1,000 completed
+    // sales where PlanSeller1 is a prolific seller (~250, a 25% slice) beside
+    // 30 smaller ones. Realistic statistics are load-bearing here, because the
+    // by-seller and realm-wide reads share the (realm, ...) prefix and each has
+    // its OWN best index: the planner must seek the tight (realm, seller_name,
+    // created_at) index for one seller as an ordered Index Scan (no sort) and
+    // the (realm, created_at, id) index for the realm-wide walk. Three forces
+    // pull the seller read off that plan, and the seed answers all three: on an
+    // EMPTY table the two indexes tie and the arbitrary winner was the realm
+    // index (adding it alone silently flipped the seller pin onto it); at a
+    // small seller slice the planner prefers a Bitmap Index Scan that loses the
+    // created_at order and re-sorts; and the ops-listings pin above seeds ~1,200
+    // sales under DISTINCT seller names and re-ANALYZEs the whole table, so a
+    // seller holding a handful of rows reads as globally rare and bitmaps. A
+    // seller that dominates its realm stays a plain ordered index seek through
+    // all three. listing_id carries no FK, so the sales seed needs no listings.
+    await pool.query(
+      `INSERT INTO woc_market_sales (
+         realm, listing_id, item_id, item, price_cents, amount_base,
+         seller_account, buyer_account, seller_name, buyer_name, created_at)
+       SELECT 'plans-sales', g, 'crown_of_embers',
+              '{"itemId":"crown_of_embers","count":1}'::jsonb, 1000, '1000000000',
+              10001, 10002,
+              CASE WHEN g % 4 = 0 THEN 'PlanSeller1' ELSE 'PlanSeller' || (2 + (g % 30)) END,
+              'PlanBuyer', now() - (g || ' seconds')::interval
+         FROM generate_series(1, 1000) g`,
+    );
+    await pool.query('ANALYZE woc_market_sales');
   }, 120_000);
 
   afterAll(async () => {
@@ -537,6 +565,31 @@ describeDb('woc market plan-class pins against real Postgres', () => {
     const plan = await planOf(read.text, read.values);
     expect(plan).not.toMatch(/Seq Scan on woc_market_sales/);
     expect(plan).toContain('woc_market_sales_seller');
+    expect(plan).not.toMatch(/^\s*-> {2}Sort/m);
+  }, 20_000);
+
+  it('the realm-wide Sales History read is an ordered index walk on its realm composite', async () => {
+    // The whole justification for woc_market_sales_realm_created (built
+    // CONCURRENTLY post-commit) is that the Sales History tab's realm-wide read
+    // is index-served: equality on realm, then created_at DESC, id DESC supplied
+    // by the composite index, LIMIT-cut, no sort node. The keep-forever sales
+    // table would otherwise seq-scan and external-sort on every page open.
+    // excluded=false is a heap filter, the same choice the seller read makes
+    // (rare operator voids on an insert-only provenance table).
+    take();
+    await marketDb.salesForRealm('plans-sales', {
+      page: 0,
+      pageSize: 20,
+      quality: null,
+      format: null,
+      category: null,
+      subcategory: null,
+      itemIds: null,
+    });
+    const [read] = take();
+    const plan = await planOf(read.text, read.values);
+    expect(plan).not.toMatch(/Seq Scan on woc_market_sales/);
+    expect(plan).toContain('woc_market_sales_realm_created');
     expect(plan).not.toMatch(/^\s*-> {2}Sort/m);
   }, 20_000);
 

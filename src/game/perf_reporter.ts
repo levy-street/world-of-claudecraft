@@ -1,3 +1,4 @@
+import { apiUrl } from '../client_origin';
 import { graphicsPresetLabel } from '../render/gfx';
 import { isSoftwareRendererName } from '../render/software_renderer';
 import { crowdBucketLabel } from './crowd_bucket';
@@ -618,6 +619,11 @@ function payloadFromSnapshot(
     deviceMemory: device.deviceMemory,
     hardwareConcurrency: device.hardwareConcurrency,
     mobileTouch: device.mobileTouch,
+    // The Electron shell is Chromium loading the same web bundle, so neither
+    // browserFamily nor buildId can tell it apart; this flag is the only
+    // fleet-visible desktop-versus-browser marker (the server also falls back
+    // on the Electron user-agent token).
+    desktopShell,
     browserFamily: browserFamily(device.userAgent),
     osFamily: osFamily(device.userAgent),
     glVendor: renderer.glVendor,
@@ -646,6 +652,10 @@ function payloadFromSnapshot(
       // the only fleet-visible proof the skip is working. Rides in rawSummary
       // (the no-DDL home, like the longtask block below), not as a column.
       hiddenPresentSkips: snapshot.hiddenPresentSkips,
+      // The fps denominator itself (wall seconds minus hidden time, both
+      // arms): beside `seconds` it says how much of the session the
+      // cumulative fps actually covers.
+      visibleSeconds: snapshot.visibleSeconds,
       windows: snapshot.windows,
       mainMs: snapshot.mainMs,
       rendererPhaseMs: renderer.phaseMs,
@@ -806,7 +816,7 @@ export function startPerfReporter(options: PerfReporterOptions): () => void {
         `final post too large for keepalive: ${status.lastBodyBytes} bytes`,
       );
     }
-    void fetch('/api/perf-report', {
+    void fetch(apiUrl('/api/perf-report'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

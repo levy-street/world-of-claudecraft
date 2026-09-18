@@ -6,6 +6,7 @@ import {
   DEFAULT_PARTY_FRAME_DISPLAY,
   PARTY_FRAME_RANGE_YD,
   partyFrameAuraIsRelevant,
+  partyFrameHeaderState,
   partyFrameHealthText,
   partyFrameSignature,
   prioritizePartyFrameAuras,
@@ -39,6 +40,14 @@ describe('party frame style resolution', () => {
     expect(resolvePartyFrameStyle(0, true)).toBe('raid');
     expect(resolvePartyFrameStyle(1, true)).toBe('classic');
     expect(resolvePartyFrameStyle(2, false)).toBe('raid');
+  });
+});
+
+describe('party frame header state', () => {
+  it('shows the member count and derives the disclosure state without DOM state', () => {
+    expect(partyFrameHeaderState(4, false)).toEqual({ visible: true, count: 4, collapsed: false });
+    expect(partyFrameHeaderState(4, true)).toEqual({ visible: true, count: 4, collapsed: true });
+    expect(partyFrameHeaderState(0, true)).toEqual({ visible: false, count: 0, collapsed: true });
   });
 });
 
@@ -230,6 +239,16 @@ describe('party frame signature (the per-frame short-circuit)', () => {
   it('is stable: the same party yields the same signature (so an unchanged party short-circuits)', () => {
     const pos = { x: 0, z: 0 };
     expect(partyFrameSignature(info(), 1, pos)).toBe(partyFrameSignature(info(), 1, pos));
+  });
+
+  it('changes when the selected party target changes so the raid halo repaints', () => {
+    const party = info();
+    const pos = { x: 0, z: 0 };
+    expect(
+      partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, undefined, 2),
+    ).not.toBe(
+      partyFrameSignature(party, 1, pos, undefined, DEFAULT_PARTY_FRAME_DISPLAY, undefined, 3),
+    );
   });
 
   it('skips the local player but encodes every other member + leader / raid / group', () => {

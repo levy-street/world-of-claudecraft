@@ -70,6 +70,16 @@ export interface GuildBankOpHostPort {
   readonly flushUnsettledGuildBook: (guildId: number, dependency: GuildBookDependency) => void;
   readonly recordGuildBankIncident: (kind: 'counterparty_orphan' | 'unsettled_refused') => void;
   readonly logError: (message: string) => void;
+  /** Tell the guild that gold moved. Fired ONCE per committed player gold op
+   *  with the positive magnitude the treasury moved by; never for item ops,
+   *  operator purges, refusals, or no-op diffs (those stage nothing, so there
+   *  is nothing to announce). The host fans it out to online members
+   *  (server/guild_bank_gold_notice.ts). */
+  readonly notifyGuildGoldMovement: (
+    guildId: number,
+    op: 'deposit_gold' | 'withdraw_gold',
+    copper: number,
+  ) => void;
 }
 
 /**
@@ -255,6 +265,13 @@ export function runGuildBankOp(
       ...(playerTarget ? {} : { actorAccountId: target.actorAccountId }),
     });
     if (host.bankLedgerNeedsSave()) host.scheduleBankLedgerHighWaterSave();
+    // The notice rides the SAME success signal as the ledger row (a non-empty
+    // book diff that committed), so a refused withdraw can never announce
+    // itself and a committed one can never stay quiet.
+    if (playerTarget && (effectiveOp === 'deposit_gold' || effectiveOp === 'withdraw_gold')) {
+      const moved = guildDeltas.reduce((sum, d) => sum + Math.abs(d.copperDelta), 0);
+      if (moved > 0) host.notifyGuildGoldMovement(guildId, effectiveOp, moved);
+    }
   } catch (error) {
     reservation.failAfterMutation(error);
     throw error;

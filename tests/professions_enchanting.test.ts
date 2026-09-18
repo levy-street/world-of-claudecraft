@@ -33,7 +33,7 @@ import {
   PERFECTING_SKILL_REQ,
 } from '../src/sim/professions/perfecting';
 import { type StationType, stationsOfType } from '../src/sim/professions/stations';
-import { createRiftGearInstance } from '../src/sim/rift/progression';
+import { createRiftGearInstance, sanitizeRiftGearInstance } from '../src/sim/rift/progression';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { type Entity, type InvSlot, xpForLevel } from '../src/sim/types';
 import { enchantTargets, wornEnchantTargets } from '../src/ui/hud/professions/enchant_apply_view';
@@ -697,62 +697,149 @@ describe('applyEnchant', () => {
 // The authoritative predicate is now isEnchantedInstance (the explicit
 // `enchant` marker, or the legacy bare-stats arm), the enchant merges stats
 // ADDITIVELY, and double-enchant stays blocked for old and new copies alike.
-describe('Riftbound bands are forge-only (rift/band_ladder.ts)', () => {
+describe('Riftbound bands take enchants at every rung (rift/progression.ts)', () => {
   const BAND = 'riftbound_band_of_might';
-  const RING_ENCHANT = Object.values(ENCHANTS).find((e) => e.itemSlot === 'ring')?.id ?? '';
+  const RING_ENCHANT = 'enchant_ring_strength';
+  const OTHER_RING_ENCHANT = 'enchant_ring_agility';
+  const bonusOf = (id: string) => ENCHANTS[id].statBonus;
 
-  it('a band copy never reads as enchanted: its rolled line is the ladder, not an enchant', () => {
-    expect(RING_ENCHANT).not.toBe('');
-    const band = createRiftGearInstance('forge-only', 'S', 'warrior', 1);
+  it('a plain band never reads as enchanted, but a band carrying the marker does', () => {
+    const band = createRiftGearInstance('band', 'S', 'warrior', 1);
     expect(band.instance.rolled?.stats).not.toEqual({});
     expect(isEnchantedInstance(band.instance)).toBe(false);
+    expect(isEnchantedInstance({ ...band.instance, enchant: RING_ENCHANT })).toBe(true);
   });
 
-  it('the profession refuses a bagged band by id with rift_gear, consuming nothing', () => {
+  it('a bagged band takes a ring enchant: ladder line plus the bonus, dust spent', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const band = createRiftGearInstance('forge-only', 'S', 'warrior', pid);
+    const band = createRiftGearInstance('band', 'S', 'warrior', pid);
+    const ladder = { ...band.instance.rolled?.stats };
     sim.ctx.addItemInstance(band.itemId, band.instance, pid);
     sim.addItem('arcane_dust', 5, pid);
     const result = resolveApplyEnchant(sim.ctx, pid, BAND, RING_ENCHANT);
-    expect(result).toEqual(expect.objectContaining({ ok: false, reason: 'rift_gear' }));
-    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+    expect(result.ok).toBe(true);
+    expect(sim.countItem('arcane_dust', pid)).toBeLessThan(5);
     const slot = sim.ctx.resolve(pid)!.meta.inventory.find((s) => s.itemId === BAND);
-    expect(slot?.instance?.enchant).toBeUndefined();
+    expect(slot?.instance?.enchant).toBe(RING_ENCHANT);
     expect(slot?.instance?.rift?.upgradeLevel).toBe(0);
+    expect(slot?.instance?.rolled?.stats).toEqual({
+      ...ladder,
+      str: (ladder.str ?? 0) + (bonusOf(RING_ENCHANT).str ?? 0),
+    });
   });
 
-  it('the enchant picker never offers a band, bagged or worn', () => {
+  it('the enchant survives the load rebuild, an essence upgrade, and a gem socket', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const bagged = createRiftGearInstance('forge-only', 'S', 'warrior', pid);
-    const worn = createRiftGearInstance('forge-only-worn', 'A', 'warrior', pid);
+    const band = createRiftGearInstance('band', 'S', 'warrior', pid);
+    sim.ctx.addItemInstance(band.itemId, band.instance, pid);
+    sim.addItem('arcane_dust', 5, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, BAND, RING_ENCHANT).ok).toBe(true);
+    const enchanted = sim.ctx.resolve(pid)!.meta.inventory.find((s) => s.itemId === BAND)!
+      .instance!;
+    // The load path: the rebuild is the ONLY writer of a band's rolled line,
+    // so what the apply minted must equal what the sanitizer rebuilds.
+    const reloaded = sanitizeRiftGearInstance(BAND, enchanted, pid);
+    expect(reloaded?.enchant).toBe(RING_ENCHANT);
+    expect(reloaded?.rolled?.stats).toEqual(enchanted.rolled?.stats);
+    // Upgraded and socketed: the bonus rides on top of the new ladder line.
+    const upgraded = sanitizeRiftGearInstance(
+      BAND,
+      {
+        ...enchanted,
+        rift: { ...enchanted.rift!, upgradeLevel: 2, gems: ['rift_gem_crimson'] },
+      },
+      pid,
+    );
+    const bare = createRiftGearInstance('band', 'S', 'warrior', pid, 2, ['rift_gem_crimson']);
+    expect(upgraded?.rolled?.stats).toEqual({
+      ...bare.instance.rolled?.stats,
+      str: (bare.instance.rolled?.stats?.str ?? 0) + (bonusOf(RING_ENCHANT).str ?? 0),
+    });
+    expect(isEnchantedInstance(upgraded!)).toBe(true);
+  });
+
+  it('the load rebuild drops an enchant marker that is unknown, off-slot, or Perfected-only', () => {
+    const band = createRiftGearInstance('band', 'S', 'warrior', 1);
+    const helmet = Object.values(ENCHANTS).find((e) => e.itemSlot !== 'ring')!.id;
+    // A band is never Perfected, so a Perfected-only marker (unreachable
+    // through the apply, which refuses not_perfected) can only be tampered
+    // state: dropped, and its bonus never priced. Probed through a ring-slot
+    // stand-in so the guard is pinned even while no ring Lucent tier ships.
+    const perfectedOnly = Object.values(ENCHANTS).find((e) => e.requiresPerfected)!;
+    ENCHANTS.__probe_ring_lucent = {
+      ...perfectedOnly,
+      id: '__probe_ring_lucent',
+      itemSlot: 'ring',
+    };
+    try {
+      const tampered = sanitizeRiftGearInstance(
+        BAND,
+        { ...band.instance, enchant: '__probe_ring_lucent' },
+        1,
+      );
+      expect(tampered?.enchant).toBeUndefined();
+      expect(tampered?.rolled?.stats).toEqual(band.instance.rolled?.stats);
+    } finally {
+      delete ENCHANTS.__probe_ring_lucent;
+    }
+    expect(
+      sanitizeRiftGearInstance(BAND, { ...band.instance, enchant: 'nope' }, 1)?.enchant,
+    ).toBeUndefined();
+    const wrong = sanitizeRiftGearInstance(BAND, { ...band.instance, enchant: helmet }, 1);
+    expect(wrong?.enchant).toBeUndefined();
+    expect(wrong?.rolled?.stats).toEqual(band.instance.rolled?.stats);
+  });
+
+  it('the enchant picker offers a band, bagged or worn', () => {
+    const sim = makeSim();
+    const pid = sim.playerId;
+    const bagged = createRiftGearInstance('band', 'S', 'warrior', pid);
+    const worn = createRiftGearInstance('band-worn', 'A', 'warrior', pid);
     sim.ctx.addItemInstance(bagged.itemId, bagged.instance, pid);
     sim.ctx.addItemInstance(worn.itemId, worn.instance, pid);
+    while (sim.player.level < 20) sim.grantXp(xpForLevel(sim.player.level));
     sim.equipItem(BAND, pid);
+    expect(sim.ctx.resolve(pid)!.meta.equipment.ring1).toBe(BAND);
     const meta = sim.ctx.resolve(pid)!.meta;
-    expect(enchantTargets(meta.inventory, RING_ENCHANT).map((row) => row.itemId)).not.toContain(
-      BAND,
-    );
+    expect(enchantTargets(meta.inventory, RING_ENCHANT).map((row) => row.itemId)).toContain(BAND);
     expect(
       wornEnchantTargets(meta.equipment, meta.equipmentInstance, RING_ENCHANT).map(
         (row) => row.itemId,
       ),
-    ).not.toContain(BAND);
+    ).toContain(BAND);
   });
 
-  it('the worn arm refuses the same way, and the confirm-replace flag changes nothing', () => {
+  it('a worn band is enchanted in place, and a confirmed replace swaps the bonus', () => {
     const sim = makeSim();
     const pid = sim.playerId;
-    const band = createRiftGearInstance('forge-only', 'S', 'warrior', pid);
+    const band = createRiftGearInstance('band', 'S', 'warrior', pid);
+    const ladder = { ...band.instance.rolled?.stats };
     sim.ctx.addItemInstance(band.itemId, band.instance, pid);
+    while (sim.player.level < 20) sim.grantXp(xpForLevel(sim.player.level));
     sim.equipItem(BAND, pid);
-    sim.addItem('arcane_dust', 5, pid);
-    expect(resolveApplyEnchant(sim.ctx, pid, BAND, RING_ENCHANT, 'ring1').reason).toBe('rift_gear');
-    expect(resolveApplyEnchant(sim.ctx, pid, BAND, RING_ENCHANT, 'ring1', true).reason).toBe(
-      'rift_gear',
+    expect(sim.ctx.resolve(pid)!.meta.equipment.ring1).toBe(BAND);
+    sim.addItem('arcane_dust', 10, pid);
+    expect(resolveApplyEnchant(sim.ctx, pid, BAND, RING_ENCHANT, 'ring1').ok).toBe(true);
+    const meta = sim.ctx.resolve(pid)!.meta;
+    expect(meta.equipmentInstance.ring1?.enchant).toBe(RING_ENCHANT);
+    expect(resolveApplyEnchant(sim.ctx, pid, BAND, OTHER_RING_ENCHANT, 'ring1').reason).toBe(
+      'already_enchanted',
     );
-    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+    expect(resolveApplyEnchant(sim.ctx, pid, BAND, OTHER_RING_ENCHANT, 'ring1', true).ok).toBe(
+      true,
+    );
+    const swapped = meta.equipmentInstance.ring1!;
+    expect(swapped.enchant).toBe(OTHER_RING_ENCHANT);
+    expect(swapped.rift?.tier).toBe('S');
+    expect(swapped.rolled?.stats).toEqual({
+      ...ladder,
+      agi: (ladder.agi ?? 0) + (bonusOf(OTHER_RING_ENCHANT).agi ?? 0),
+    });
+    expect(sanitizeRiftGearInstance(BAND, swapped, pid)?.rolled?.stats).toEqual(
+      swapped.rolled?.stats,
+    );
   });
 });
 

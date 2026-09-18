@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -161,19 +161,11 @@ describe('i18n coverage summary: CLI', () => {
   it('exits nonzero with a legible error naming npm run i18n:gen when the summary is missing', () => {
     const dir = makeWorkspace(); // no summary written
     try {
-      let status: number | null = null;
-      let stderr = '';
-      try {
-        execFileSync(process.execPath, [script], { cwd: dir, encoding: 'utf8' });
-      } catch (err) {
-        const e = err as { status?: number | null; stderr?: unknown };
-        status = e.status ?? null;
-        stderr = String(e.stderr ?? '');
-      }
-      expect(status).not.toBe(0);
-      expect(status).toBe(1);
-      expect(stderr).toContain('npm run i18n:gen');
-      expect(stderr).toContain('i18n.status.summary.json');
+      const res = spawnSync(process.execPath, [script], { cwd: dir, encoding: 'utf8' });
+      expect(res.status).toBe(1);
+      expect(res.stderr).toContain('npm run i18n:gen');
+      expect(res.stderr).toContain('i18n.status.summary.json');
+      expect(res.error).toBeUndefined();
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

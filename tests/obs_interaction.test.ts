@@ -250,6 +250,7 @@ describe('RL interactable observation parity', () => {
       {
         type: 'noticeboard',
         noticeboardId: 'noticeboard_eastbrook',
+        boardId: 'eastbrook_noticeboard',
         state: 'empty',
         pid: sim.player.id,
       },

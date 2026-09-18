@@ -132,4 +132,19 @@ describe('aura overlay placement styles', () => {
     expect(toolbarZ).toBeGreaterThan(touchUiZ);
     expect(toolbarZ).toBeGreaterThan(backdropZ);
   });
+  it('gives every watchlist chip a touch-sized target and a visibly picked state', () => {
+    // The picker is a wrapping row of toggle chips, so each one carries the HUD's
+    // 40px mobile-touch floor on its own rather than inheriting a row height.
+    const chip = componentsCss.match(/\.aura-watch-chip\s*\{([^}]*)\}/s)?.[1] ?? '';
+    expect(Number(chip.match(/min-height:\s*(\d+)px/)?.[1])).toBeGreaterThanOrEqual(40);
+    // Pressed state is carried by aria-pressed, so the style and the a11y state
+    // can never disagree about which spells are watched.
+    expect(componentsCss).toMatch(
+      /\.aura-watch-chip\[aria-pressed="true"\]\s*\{[^}]*color:\s*var\(--color-aura-rpg-gold\)/s,
+    );
+    expect(componentsCss).toMatch(
+      /\.aura-watch-chip\[aria-pressed="true"\] img\s*\{[^}]*opacity:\s*1/s,
+    );
+    expect(componentsCss).toMatch(/\.aura-watch-list\s*\{[^}]*flex-wrap:\s*wrap/s);
+  });
 });

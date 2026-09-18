@@ -21,6 +21,26 @@
 
 import { FOCUSABLE_SELECTOR } from './focus_manager';
 
+/**
+ * Wall-clock life of a #prompt-stack prompt that nobody answers (party invite,
+ * trade request, duel challenge, ready check), after which it auto-dismisses.
+ * The countdown bar in src/styles/hud.css drains over --prompt-timeout-dur,
+ * which tests/prompt_timeout_duration.test.ts pins equal to this value.
+ */
+export const PROMPT_TIMEOUT_MS = 28_000;
+
+/**
+ * The prompt's countdown bar: a .ui-bar whose fill drains over
+ * --prompt-timeout-dur, hidden outright under reduced motion (a frozen fill
+ * would read as time remaining right up to the silent auto-dismiss).
+ */
+export function createPromptTimeoutBar(): HTMLElement {
+  const bar = document.createElement('div');
+  bar.className = 'prompt-timeout ui-bar';
+  bar.innerHTML = '<span class="ui-bar-fill"></span>';
+  return bar;
+}
+
 // Monotonic id source for the prompts' aria-labelledby target, so the id never
 // couples to class ordering. Shared across every consumer; ids only need to be
 // unique, not sequential per window.
@@ -45,6 +65,22 @@ export function installPromptDialog(
     idPrefix: string;
   },
 ): PromptDialogHandle {
+  prompt.classList.add('ui-panel-strong');
+  prompt.querySelectorAll<HTMLElement>('.prompt-number').forEach((input) => {
+    input.classList.add('ui-input');
+  });
+  prompt.querySelectorAll<HTMLElement>('button').forEach((button) => {
+    button.classList.add(
+      button.matches('.woc-store-prompt-close, .x-btn, [data-close]') ? 'ui-x-btn' : 'ui-btn',
+    );
+  });
+  const accept =
+    prompt.querySelector<HTMLElement>('[data-store-prompt-confirm]') ??
+    prompt.querySelector<HTMLElement>(
+      '.btn:not([data-store-prompt-cancel]):not([class*="cancel"])',
+    ) ??
+    prompt.querySelector<HTMLElement>('button');
+  accept?.classList.add('ui-btn--red');
   prompt.setAttribute('role', 'dialog');
   prompt.setAttribute('aria-modal', 'true');
   const { inertRoot } = opts;

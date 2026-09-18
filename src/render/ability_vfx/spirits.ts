@@ -36,6 +36,8 @@ export const SPIRIT_URLS: Record<string, string> = {
   wolf: 'models/creatures/wolf.glb',
   // the real quadruped, not the brown-tinted yeti biped this used to conjure
   bear: 'models/creatures/bear_form.glb',
+  // the druid's own cat rig, so shifting into the form conjures the body it becomes
+  cat: 'models/creatures/druid_cat_form.glb',
   raptor: 'models/creatures/velociraptor.glb',
   stag: 'models/creatures/stag.glb',
   fox: 'models/creatures/fox.glb',
@@ -55,6 +57,7 @@ const SPIRIT_HEIGHT: Record<string, number> = {
   fox: 0.8,
   sheep: 1.1,
   wolf: 1.15,
+  cat: 1.92,
   boar: 1.0,
   raptor: 1.7,
   stag: 2.0,
@@ -72,6 +75,7 @@ const SPIRIT_TEMPO: Record<string, number> = {
   bear: 0.85,
   bull: 1.0,
   wolf: 1.15,
+  cat: 1.15,
   fox: 1.25,
   raptor: 1.3,
   sheep: 0.9,
@@ -96,13 +100,21 @@ export const MOVE_CLIPS = [
   'Spider_Walk',
   'Walking_A',
 ];
-export const IDLE_CLIPS = ['Idle', 'Flying_Idle', 'Idle1', 'Idle_Combat', 'Spider_Idle'];
+export const IDLE_CLIPS = [
+  'Idle',
+  'Flying_Idle',
+  'Idle1',
+  'Idle_Combat',
+  'Spider_Idle',
+  'Idle_Look',
+];
 export const ATTACK_CLIPS = [
   'Attack',
   'Attack1 (marracca)',
   'Attack_Headbutt',
   'Punch',
   'Spider_Attack',
+  'Pounce',
 ];
 
 const MAX_SPIRITS = 2;

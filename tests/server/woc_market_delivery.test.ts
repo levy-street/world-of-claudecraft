@@ -16,6 +16,7 @@ import type {
 import {
   createWocMarketDeliveryArms,
   type WocDeliveryCtx,
+  wocSaleStampFor,
   wocStampHighWaterCount,
 } from '../../server/woc_market_delivery';
 import {
@@ -23,6 +24,11 @@ import {
   WOC_LOCAL_STAMP_HIGH_WATER,
   wocParkRefusalCount,
 } from '../../server/woc_market_local_ledgers';
+import { ITEMS } from '../../src/sim/data';
+import {
+  exchangeBrowseCategory,
+  exchangeBrowseSubcategory,
+} from '../../src/sim/exchange_eligibility';
 
 /** A minimal ctx whose mail persist FAILS after the intent stamp, so every
  *  drive adds one retained pendingMail entry (the stamp survives a persist
@@ -214,6 +220,184 @@ describe('direct-grant storage-effect acknowledgement', () => {
     expect(advanced).toBe(0);
     expect(acknowledge).not.toHaveBeenCalled();
     expect(save.bankLedgerSnapshot?.batches).toEqual([]);
+  });
+});
+
+describe('the delivery close stamps the Sales History axes at the one insert site', () => {
+  const defOf = (id: string) => {
+    const d = ITEMS[id];
+    if (!d) throw new Error(`fixture item missing: ${id}`);
+    return d;
+  };
+
+  // Drives the direct-grant delivery arm (the makeGrantDeliveryCtx 'booked'
+  // path) and returns the sale object the close tail hands
+  // finalizeDeliveredSettlement, so the saleType derivation and the
+  // category/quality stamps are pinned where the Type column and the `format`
+  // filter read them from.
+  async function stampSale(over: {
+    directedBuyerAccount: number | null;
+    bidId: number | null;
+    itemId: string;
+    quality: string;
+  }): Promise<{ saleType: unknown; quality: unknown; category: unknown; subcategory: unknown }> {
+    const settlement = {
+      id: 9,
+      listingId: 3,
+      bidId: over.bidId,
+      buyerAccount: 8,
+      buyerCharacter: 55,
+      buyerName: 'Buyer',
+      amountCents: 500,
+      quoteReference: null,
+      settledAmountBase: null,
+    } as WocSettlementRow;
+    const listingRow = {
+      id: 3,
+      sellerAccount: 4,
+      sellerCharacter: 11,
+      sellerName: 'Seller',
+      itemId: over.itemId,
+      item: { itemId: over.itemId, count: 1 },
+      quality: over.quality,
+      itemDisposed: false,
+      directedBuyerAccount: over.directedBuyerAccount,
+      resolution: 'sold',
+    } as unknown as WocListingRow;
+    const save = {
+      characterId: 55,
+      level: 7,
+      state: {} as CharacterSaveArgs['state'],
+      leaseNonce: 'buyer-nonce',
+      storageEffects: [],
+      bankLedgerSnapshot: Object.freeze({
+        owner: Object.freeze({ realm: 'test-realm', characterId: 55, accountId: 8 }),
+        batches: Object.freeze([]),
+        rowCount: 0,
+        encodedBytes: 0,
+        guildIds: Object.freeze([]),
+        hasUnscopedRows: true,
+      }),
+    };
+    const finalize = vi.fn(
+      async (_args: {
+        sale: { saleType: unknown; quality: unknown; category: unknown; subcategory: unknown };
+      }) => 'already_final' as const,
+    );
+    const db = {
+      deliveringSettlements: vi.fn(async () => [settlement]),
+      listingById: vi.fn(async () => listingRow),
+      deliveryTarget: vi.fn(async () => ({ characterId: 55, name: 'Buyer' })),
+      claimCustodyRef: vi.fn(async () => false),
+      custodyRefState: vi.fn(async () => ({
+        booked: false,
+        grantCharacterId: 55,
+        mailIntent: false,
+      })),
+      saveDeliveredCharacterBooked: vi.fn(async () => 'booked' as const),
+      finalizeDeliveredSettlement: finalize,
+      touchSettlementRow: vi.fn(async () => {}),
+    };
+    const custody = {
+      snapshotCopy: vi.fn(() => ({ ok: true as const, save })),
+      persistGrantSerialized: vi.fn(
+        async (
+          _a: number,
+          _c: number,
+          _n: string | undefined,
+          persist: (captured: CharacterSaveArgs) => Promise<unknown>,
+        ) => persist(save),
+      ),
+      acknowledgeCharacterSave: vi.fn(),
+    };
+    const ctx = {
+      db: db as unknown as WocDeliveryCtx['db'],
+      custody: custody as unknown as WocDeliveryCtx['custody'],
+      realm: 'test-realm',
+      now: () => 1_000,
+      sweepError: vi.fn(),
+      pruneLocalLedgers: () => {},
+      parkedDeliveries: new Map(),
+      parkedReturns: new Map(),
+      pendingGrants: new Map([
+        ['woc_settlement:9', { characterId: 55, leaseNonce: 'buyer-nonce', stampMs: 1 }],
+      ]),
+      pendingMail: new Map(),
+      parkRetryMs: 60_000,
+      sweepBatch: 25,
+    } as unknown as WocDeliveryCtx;
+    await createWocMarketDeliveryArms(ctx).reconcileDelivering(1_000, {
+      contended: false,
+      parked: 0,
+    });
+    expect(finalize).toHaveBeenCalledOnce();
+    const call = finalize.mock.calls[0];
+    if (!call) throw new Error('finalizeDeliveredSettlement was not called');
+    return call[0].sale;
+  }
+
+  it('derives directed when the listing carries a directed buyer', async () => {
+    const sale = await stampSale({
+      directedBuyerAccount: 8,
+      bidId: null,
+      itemId: 'deathlord_warplate',
+      quality: 'epic',
+    });
+    expect(sale.saleType).toBe('directed');
+    expect(sale.quality).toBe('epic');
+    // category/subcategory come from the item def through the SAME browse
+    // helpers escrow stamped the listing with.
+    expect(sale.category).toBe(exchangeBrowseCategory(defOf('deathlord_warplate')));
+    expect(sale.subcategory).toBe(exchangeBrowseSubcategory(defOf('deathlord_warplate')));
+  });
+});
+
+describe('wocSaleStampFor derives the sale axes (the three arms plus a pruned def)', () => {
+  const defOf = (id: string) => {
+    const d = ITEMS[id];
+    if (!d) throw new Error(`fixture item missing: ${id}`);
+    return d;
+  };
+  const row = (
+    over: Partial<Pick<WocListingRow, 'directedBuyerAccount' | 'quality' | 'itemId'>>,
+  ): WocListingRow =>
+    ({
+      directedBuyerAccount: null,
+      quality: 'epic',
+      itemId: 'deathlord_warplate',
+      ...over,
+    }) as unknown as WocListingRow;
+  const bid = (bidId: number | null): WocSettlementRow => ({ bidId }) as WocSettlementRow;
+
+  it('directed when the listing carries a directed buyer (a designated buy-now)', () => {
+    expect(wocSaleStampFor(row({ directedBuyerAccount: 8 }), bid(null)).saleType).toBe('directed');
+  });
+
+  it('buy_now for a public sale that settled with no winning bid', () => {
+    expect(wocSaleStampFor(row({ directedBuyerAccount: null }), bid(null)).saleType).toBe(
+      'buy_now',
+    );
+  });
+
+  it('auction when a winning bid settled the listing', () => {
+    expect(wocSaleStampFor(row({ directedBuyerAccount: null }), bid(77)).saleType).toBe('auction');
+  });
+
+  it('passes the listing quality and derives category/subcategory from the item def', () => {
+    const s = wocSaleStampFor(row({ itemId: 'deathlord_warplate', quality: 'epic' }), bid(null));
+    expect(s.quality).toBe('epic');
+    expect(s.category).toBe(exchangeBrowseCategory(defOf('deathlord_warplate')));
+    expect(s.subcategory).toBe(exchangeBrowseSubcategory(defOf('deathlord_warplate')));
+  });
+
+  it('stamps null category/subcategory for an unknown item id (a pruned def)', () => {
+    const s = wocSaleStampFor(row({ itemId: '__no_such_item__', quality: 'rare' }), bid(null));
+    // saleType and quality still stamp; only the def-derived axes go null,
+    // which sits the row outside the filtered results.
+    expect(s.saleType).toBe('buy_now');
+    expect(s.quality).toBe('rare');
+    expect(s.category).toBeNull();
+    expect(s.subcategory).toBeNull();
   });
 });
 

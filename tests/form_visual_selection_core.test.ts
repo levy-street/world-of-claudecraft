@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   activeCharacterFormVisual,
   CHARACTER_FORM_READY,
+  characterFormAssetKey,
   characterFormMaskForAura,
   characterFormReadyMask,
   characterFormShadowPlan,
@@ -15,6 +16,17 @@ function maskFor(auras: ReadonlyArray<{ kind: string; id?: string }>): number {
 }
 
 describe('character form visual selection', () => {
+  it('keeps the shaman wolf asset independent of the druid cat in the shared form slot', () => {
+    expect(characterFormAssetKey('form_cat', [{ kind: 'form_cat' }])).toBe('form_cat');
+    expect(characterFormAssetKey('form_cat', [{ kind: 'buff_speed', id: 'ghost_wolf' }])).toBe(
+      'form_ghost_wolf',
+    );
+    expect(characterFormAssetKey('form_sheep', [{ kind: 'buff_speed', id: 'ghost_wolf' }])).toBe(
+      'form_sheep',
+    );
+    expect(characterFormAssetKey('form_cat', [])).toBe('form_cat');
+  });
+
   it('keeps every asset readiness bit independent', () => {
     expect(CHARACTER_FORM_READY).toEqual({
       sheep: 1,

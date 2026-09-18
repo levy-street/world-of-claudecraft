@@ -115,9 +115,11 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['ignite', 'ignition'],
   ['lich_form_army', 'metamorphosis'],
   ['lich_form_army_haste', 'metamorphosis'],
+  ['bruin_rush_window', 'bear_charge'],
   ['loping_stride', 'cat_form'],
   ['marked_prey', 'kidney_shot'],
   ['marrowbreak_guard', 'marrowbreak'],
+  ['pin', 'bear_charge'],
   ['natures_fury', 'hurricane'],
   ['oath_chain_pull', 'oath_chain'],
   // Oathpyre 4pc consume shield (src/sim/combat/paladin_solar_reprisal.ts):

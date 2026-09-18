@@ -119,7 +119,6 @@ import {
   FARM_HARVEST_LIFE_FLOOR,
   FARM_KEEP_CHANCE_BASE,
   FARM_KEEP_CHANCE_SKILL_SCALE,
-  FARM_PLANT_CAST_SEC,
   FARM_TONIC_BONUS_CHANCE,
   FARM_TONIC_BONUS_PICKS,
   FARMING_GAIN_SCHEDULE,
@@ -164,7 +163,7 @@ import {
 import {
   TIER4_TOOL_WIELD_PROFICIENCY,
   TIER5_TOOL_WIELD_PROFICIENCY,
-  WIELD_REQUIREMENT_BY_TIER,
+  wieldRequirementFor,
 } from '../src/sim/professions/wield_gate';
 import {
   ARENA_DAILY_TAPER_FLOOR_START,
@@ -943,9 +942,11 @@ describe('Guide deeds spoiler safety', () => {
     // table is regenerated centrally) so the account-wide misstatement cannot return.
     expect(guideStrings.deedsPage.howBody).not.toContain('across your whole account');
     expect(guideStrings.deedsPage.howBody).not.toContain('same collection');
-    expect(guideStrings.deedsPage.howBody).toContain('builds a Book of their own');
+    expect(guideStrings.deedsPage.howBody).toContain('shared by every character on your account');
+    // The Book is account-wide since the account ledger (src/sim/account_ledger.ts);
+    // the board still counts each deed once, which the sentence keeps saying.
     expect(guideStrings.deedsPage.howBody).toContain(
-      'only the realm leaderboard gathers your Renown',
+      'The realm leaderboard gathers your Renown the same way, counting each deed just once',
     );
     // The per-category heading is a translator-controlled format, not a hardcoded join.
     expect(t('guide.deedsPage.catHeading' as never, { label: 'Combat', count: '7' })).toBe(
@@ -1711,6 +1712,7 @@ describe('Guide controls reference completeness', () => {
     expect(defaults.get('dungeonFinder')).toEqual(['Shift+KeyI']);
     expect(defaults.get('mount')).toEqual(['Backquote']);
     expect(defaults.get('sheathe')).toEqual(['KeyZ']);
+    expect(defaults.get('hideInterface')).toEqual(['Alt+KeyZ']);
   });
 });
 
@@ -2585,10 +2587,11 @@ describe('Guide professions gathering accuracy', () => {
       expect(miningHtml, `a node page must still carry "${clause}"`).toContain(clause);
     }
 
-    // The rhythm: planting is the live cast constant, harvesting is instant,
-    // and nothing is refused for bag room (harvestCrop guards on dead, bed,
-    // range, plot and readiness only).
-    expect(html).toContain(`${formatNumber(FARM_PLANT_CAST_SEC)} seconds flat at every rung`);
+    // The rhythm: planting and harvesting are both instant (the farming-tools
+    // report retired the plant cast), and nothing is refused for bag room
+    // (harvestCrop guards on dead, bed, range, plot and readiness only).
+    expect(html).toContain('Planting is instant');
+    expect(html).not.toContain('seconds flat at every rung');
     expect(html).toContain('Pulling a ripe crop is instant');
     expect(html).toContain('no bag check to refuse it');
     expect(html).toContain('it grants no character XP at all');
@@ -2924,16 +2927,12 @@ describe('Guide professions gathering accuracy', () => {
           ALL_RECIPES.find((r) => r.resultItemId === itemId)?.professionId,
         );
       }
-      // R22 wield column: land tools above tier 1 publish the frozen wield
-      // requirement; tier 1 and every fishing rod publish none (rods are the
-      // structural exemption, wield_gate.ts). This is a MIRROR (generator and
-      // expectation both read the same constants); the absolute literal pins
-      // live in tests/professions_tool_gate.test.ts (85/100) and
-      // tests/delve_shop.test.ts (24/56 and every gate).
-      if (use.professionId !== 'fishing' && use.tier >= 2) {
-        expect(rows[0].wieldProficiency, `${itemId} wield requirement`).toBe(
-          WIELD_REQUIREMENT_BY_TIER[use.tier],
-        );
+      // R22 wield column: tools publish the requirement for their own trade.
+      // Fishing rods remain the structural exemption, while farming hoes use
+      // the crop ladder rather than the land-node tool ladder.
+      const wieldReq = wieldRequirementFor(use.professionId, use.tier);
+      if (wieldReq > 0) {
+        expect(rows[0].wieldProficiency, `${itemId} wield requirement`).toBe(wieldReq);
       } else {
         expect(rows[0].wieldProficiency, `${itemId} must publish no wield`).toBeUndefined();
       }
@@ -6521,6 +6520,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       // registry row and its live copy are checked against ONE literal each.
       questTracker: 'your tracked quests and their objectives',
       reliquaryTracker: 'your Reliquary pages',
+      recipeTracker: 'recipes you pinned from crafting',
       deedTracker: 'your deed progress',
       delveTracker: 'the delve you are in',
       riftTracker: 'any rift you are taking part in',
@@ -6542,6 +6542,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       auraTrack_power: `the ${t('hudChrome.auraTracks.power')} track`,
       auraTrack_utility: `the ${t('hudChrome.auraTracks.utility')} track`,
       auraTrack_friendly: `the ${t('hudChrome.auraTracks.friendly')} track`,
+      talkingHead: 'the Dialogue panel',
     };
     expect(Object.keys(phraseFor).sort()).toEqual(HUD_FRAME_SPECS.map((s) => s.id).sort());
     for (const spec of HUD_FRAME_SPECS) {
@@ -6594,6 +6595,9 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       detail: null,
       ping: null,
       rift: null,
+      // The atlas rail's Show Route projection: a layer the interface page's
+      // prose does not name yet, on the castles/navigation/allies footing above.
+      route: null,
       castles: null,
       navigation: null,
       allies: null,
@@ -6668,6 +6672,7 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       'quest-tracker': 'your tracked quests and their objectives',
       'deed-tracker': 'your deed progress',
       'reliquary-tracker': 'your Reliquary pages',
+      'recipe-tracker': 'recipes you pinned from crafting',
       'delve-tracker': 'the delve you are in',
       'rift-tracker': 'any rift you are taking part in',
       'gathering-goal-tracker': 'the recipe or commission you are tracking',

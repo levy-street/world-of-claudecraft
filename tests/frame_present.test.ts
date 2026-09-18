@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { presentFrame } from '../src/render/frame_present';
+import { type FramePresentHost, presentFrame } from '../src/render/frame_present';
 
 // Fake draw surfaces that record the call order: the contract is not only WHICH
 // calls happen but that the vfx prep runs before the composer submits, and that
@@ -10,6 +10,7 @@ function makeHost(options: { withPost: boolean }) {
   const screenFxDts: number[] = [];
   const host = {
     calls,
+    gpuTimer: null as FramePresentHost['gpuTimer'],
     screenFxDts,
     scene: { tag: 'scene' },
     camera: { tag: 'camera' },
@@ -83,5 +84,95 @@ describe('presentFrame', () => {
     presentFrame(host, 0.016, false);
     expect(presentFrame(host, 0.016, true)).toBe(true);
     expect(host.calls).toEqual(['updateScreenFx', 'prepareDraw', 'updateScreenFx', 'post.render']);
+  });
+});
+
+describe('presentFrame: the GPU timer probe', () => {
+  function withTimer(host: ReturnType<typeof makeHost>) {
+    return Object.assign(host, {
+      gpuTimer: {
+        beginFrame: () => host.calls.push('beginFrame'),
+        beginScene: (name?: string) => host.calls.push(`beginScene ${name ?? ''}`.trim()),
+        begin: (name: string) => host.calls.push(`begin ${name}`),
+        end: () => host.calls.push('end'),
+        endFrame: () => host.calls.push('endFrame'),
+      },
+    });
+  }
+
+  it('brackets the direct draw as a scene submit and seals the frame after it', () => {
+    const host = withTimer(makeHost({ withPost: false }));
+    expect(presentFrame(host, 0.016, true)).toBe(true);
+    expect(host.calls).toEqual([
+      'prepareDraw',
+      'beginFrame',
+      'beginScene',
+      'webgl.render',
+      'end',
+      'endFrame',
+    ]);
+  });
+
+  it('arms the probe around the composer submit and leaves the passes to it', () => {
+    const host = withTimer(makeHost({ withPost: true }));
+    expect(presentFrame(host, 0.016, true)).toBe(true);
+    expect(host.calls).toEqual([
+      'prepareDraw',
+      'beginFrame',
+      'updateScreenFx',
+      'post.render',
+      'endFrame',
+    ]);
+  });
+
+  it('seals the frame when the composer submit throws', () => {
+    const host = withTimer(makeHost({ withPost: true }));
+    const failure = new Error('post submit failed');
+    host.post!.render = (): void => {
+      host.calls.push('post.render');
+      throw failure;
+    };
+
+    expect(() => presentFrame(host, 0.016, true)).toThrow(failure);
+    expect(host.calls).toEqual([
+      'prepareDraw',
+      'beginFrame',
+      'updateScreenFx',
+      'post.render',
+      'endFrame',
+    ]);
+  });
+
+  it('closes the direct scene bracket and seals the frame when the renderer throws', () => {
+    const host = withTimer(makeHost({ withPost: false }));
+    const failure = new Error('direct render failed');
+    host.webgl.render = (scene: unknown, camera: unknown): void => {
+      host.calls.push('webgl.render');
+      host.webglArgs.push([scene, camera]);
+      throw failure;
+    };
+
+    expect(() => presentFrame(host, 0.016, true)).toThrow(failure);
+    expect(host.calls).toEqual([
+      'prepareDraw',
+      'beginFrame',
+      'beginScene',
+      'webgl.render',
+      'end',
+      'endFrame',
+    ]);
+  });
+
+  it('still polls the readback on a skipped frame, with no bracket opened', () => {
+    const host = withTimer(makeHost({ withPost: true }));
+    expect(presentFrame(host, 0.016, false)).toBe(false);
+    expect(host.calls).toEqual(['updateScreenFx', 'endFrame']);
+  });
+
+  it('draws exactly as before when no probe is attached', () => {
+    const host = makeHost({ withPost: false });
+    host.gpuTimer = null;
+    expect(presentFrame(host, 0.016, true)).toBe(true);
+    expect(host.calls).toEqual(['prepareDraw', 'webgl.render']);
   });
 });

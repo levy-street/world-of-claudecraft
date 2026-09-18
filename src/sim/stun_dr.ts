@@ -6,7 +6,7 @@ import type { CrowdControlDrCategory, Entity } from './types';
 // diminishing chain of a controlled stun:
 //   - openerStun:     from-stealth openers (Cheap Shot, Pounce)
 //   - controlledStun: deliberate on-demand stuns (Kidney Shot, Hammer of Justice,
-//                     Bash, Charge, Feral/Bear Charge)
+//                     Bash, Charge, Feral/Bear Charge, Takedown)
 //   - randomStun:     proc-style stuns (none represented yet; the safe default)
 // Keeping these separate preserves the core rogue opener flow: Cheap Shot does
 // not diminish the following Kidney Shot, while repeated Kidney Shots (or repeated
@@ -18,6 +18,7 @@ const CONTROLLED_STUNS = new Set([
   'bash',
   'charge',
   'bear_charge',
+  'hamstring_bite',
   'faultline',
   'sun_gods_verdict',
 ]);

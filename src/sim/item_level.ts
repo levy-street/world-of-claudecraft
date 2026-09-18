@@ -42,16 +42,26 @@ import { ALL_RECIPES, DUNGEONS, ITEMS, MOBS, QUESTS } from './data';
 // cycle). Imported for internal use and re-exported so every existing importer of
 // item_level keeps working unchanged.
 import {
+  checkStaminaModel,
+  expectedStatTotal,
   HEROIC_VARIANT_SOURCE_LEVEL,
   normalizePrimaryStats,
+  normalizeToStaminaModel,
   PRIMARY_STATS,
   type PrimaryStat,
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   QUALITY_STAT_MULT,
+  realizedLineBudget,
   SLOT_STAT_MULT,
+  STAMINA_BASELINE_SHARE,
+  STAMINA_PREMIUM,
   STAT_PER_ILVL,
+  type StaminaModelCheck,
+  type StatIdentity,
   slotStatMultForItem,
+  staminaBaseline,
+  statIdentity,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
@@ -60,16 +70,26 @@ import { COLLECTION_PERFECTING_SOURCE_INCREASE } from './professions/perfecting_
 import type { ItemDef, ItemInstancePayload } from './types';
 
 export {
+  checkStaminaModel,
+  expectedStatTotal,
   HEROIC_VARIANT_SOURCE_LEVEL,
   normalizePrimaryStats,
+  normalizeToStaminaModel,
   PRIMARY_STATS,
   type PrimaryStat,
   primaryStatBudget,
   QUALITY_ILVL_BONUS,
   QUALITY_STAT_MULT,
+  realizedLineBudget,
   SLOT_STAT_MULT,
+  STAMINA_BASELINE_SHARE,
+  STAMINA_PREMIUM,
   STAT_PER_ILVL,
+  type StaminaModelCheck,
+  type StatIdentity,
   slotStatMultForItem,
+  staminaBaseline,
+  statIdentity,
   TWOHAND_DPS_MULT,
   TWOHAND_STAT_MULT,
   WORN_OFFHAND_STAT_MULT,
@@ -382,17 +402,35 @@ export function itemInstanceLevel(
     : level;
 }
 
-// The budget an item is expected to carry given its own source/quality/slot, or
-// undefined when the item has no derivable item level. A two-handed weapon carries
-// only the modest TWOHAND_STAT_MULT premium over the mainhand line (its real
-// compensation is weapon dps, TWOHAND_DPS_MULT); rounded so budgets stay integral.
-export function expectedStatBudget(item: ItemDef): number | undefined {
+// The offense-and-resource LINE an item is expected to spend on its identity
+// (str/agi or int/spi, plus any stamina above the baseline) given its own
+// source/quality/slot, or undefined when the item has no derivable item level. A
+// two-handed weapon carries only the modest TWOHAND_STAT_MULT premium over the
+// mainhand line (its real compensation is weapon dps, TWOHAND_DPS_MULT); rounded
+// so budgets stay integral. This is the number the stamina baseline is taken from.
+export function expectedLineBudget(item: ItemDef): number | undefined {
   const level = itemLevel(item);
   if (level === undefined) return undefined;
   const base = primaryStatBudget(level, item.quality, item.slot, slotStatMultForItem(item));
   return item.kind === 'weapon' && item.hand === 'twohand'
     ? Math.round(base * TWOHAND_STAT_MULT)
     : base;
+}
+
+// The primary-stat TOTAL (all five attributes) an item is expected to carry: the
+// line above plus, for a caster identity, its free stamina baseline (a physical
+// identity already holds its baseline inside the line). primaryStatSum(item) equals
+// this for every item on the model; see item_budget.ts for the model.
+export function expectedStatBudget(item: ItemDef): number | undefined {
+  const line = expectedLineBudget(item);
+  if (line === undefined) return undefined;
+  return expectedStatTotal(line, statIdentity(item.stats));
+}
+
+// The stamina-model readout for an item with a derivable line, or undefined.
+export function itemStaminaModel(item: ItemDef): StaminaModelCheck | undefined {
+  const line = expectedLineBudget(item);
+  return line === undefined ? undefined : checkStaminaModel(item.stats, line);
 }
 
 // The sum of an item's primary stats (its realized stat budget).

@@ -448,9 +448,9 @@ describe('character visual manifest', () => {
     expect(animationNames.has('Jump')).toBe(false);
   });
 
-  it('points the baked wolf visuals (form_cat, mob_wolf, greyjaw) at clips in their GLBs', async () => {
+  it('points the baked wolf visuals (form_ghost_wolf, mob_wolf, greyjaw) at clips in their GLBs', async () => {
     const byUrl = new Map<string, Set<string>>();
-    for (const key of ['form_cat', 'mob_wolf', 'greyjaw'] as const) {
+    for (const key of ['form_ghost_wolf', 'mob_wolf', 'greyjaw'] as const) {
       const visual = VISUALS[key];
       const baseNames = byUrl.get(visual.url) ?? (await glbAnimationNames(`public/${visual.url}`));
       byUrl.set(visual.url, baseNames);

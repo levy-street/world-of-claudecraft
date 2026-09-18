@@ -668,11 +668,26 @@ interface AttributionTargetFixture {
 // v0.42.0 dependency-floor bump (sharp, js-yaml, vitest): the lockfile is a
 // fingerprint input, so every shipping GLB was size-preserving re-minted and this
 // seal follows the swept evidence. No capture was retaken.
-// v0.42.2 Nythraxis platforms (PR3994): the renderer leaf moved for the
-// flanking-platform ground lift and the plateau-aware ground-cue height.
-// No capture was retaken.
+// Re-minted for the CPU-hygiene lot: the view-candidate scan and the drop
+// half of the view policy moved out of renderer.ts, and the rift ambience,
+// fishing bobber and Nythraxis painter consumers changed there, so the
+// runtimeRender.renderer leaf moved. No capture was retaken.
+// Re-minted again for its review round: the ranked and required view
+// candidates now share the scan module's liveViewCandidate check, so the
+// same leaf moved once more. No capture was retaken.
+// Re-minted for reconciling the latest v0.43.0 base: the release-side
+// CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
+// one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '429a5ebec09a5a2303745e334acd908eae9ec0b7c9cf04b3dbd54742d500e199';
+  // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
+  // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
+  // the Eastbrook handoff): the merged renderer leaf, the moved NPC layout and
+  // the ground-sample leaves compose in one tree. No capture was retaken.
+  // Re-minted for the v0.42.2 hotfix line forward merge into release/v0.43.0:
+  // the merged renderer leaf (main's flanking-platform ground lift and
+  // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
+  // leaves) matches neither parent. No capture was retaken.
+  'f429f724ca7ab90873b4a86950c0046585ef66bec7c2052cda12ae578ecee3d0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
@@ -979,6 +994,12 @@ describe('Eastbrook polish capture contract', () => {
       rendererIntegrationSha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.rendererIntegration,
       ),
+      entityGroundSampleSha256: await fileSha256(
+        EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSample,
+      ),
+      entityGroundSampleCoreSha256: await fileSha256(
+        EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSampleCore,
+      ),
       entityViewPolicySha256: await fileSha256(EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy),
       viewPriorityPolicySha256: await fileSha256(
         EASTBROOK_POLISH_PROVENANCE_INPUTS.viewPriorityPolicy,
@@ -995,6 +1016,16 @@ describe('Eastbrook polish capture contract', () => {
     });
     expect(policyOnlyChange.fingerprint).not.toBe(provenance.fingerprint);
     expect(policyOnlyChange.components.runtimeRender.entityViewPolicy.sha256).toBe('0'.repeat(64));
+    const samplerChange = deriveEastbrookPolishCompositeProvenance({
+      ...provenanceInputs,
+      entityGroundSampleSha256: '1'.repeat(64),
+    });
+    const samplerCoreChange = deriveEastbrookPolishCompositeProvenance({
+      ...provenanceInputs,
+      entityGroundSampleCoreSha256: '2'.repeat(64),
+    });
+    expect(samplerChange.fingerprint).not.toBe(provenance.fingerprint);
+    expect(samplerCoreChange.fingerprint).not.toBe(provenance.fingerprint);
     // On a mismatch the diagnostics module names the moved leaf against the
     // committed evidence seal, reports whether any fingerprinted input is
     // dirty vs HEAD (the stale-mint hazard: the 2026-08-05 craft-cast pin
@@ -1036,6 +1067,14 @@ describe('Eastbrook polish capture contract', () => {
           sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
         },
         runtimeRender: {
+          entityGroundSample: {
+            path: 'src/render/entity_ground_sample.ts',
+            sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          },
+          entityGroundSampleCore: {
+            path: 'src/render/entity_ground_sample_core.ts',
+            sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
+          },
           entityViewPolicy: {
             path: 'src/render/entity_view_policy_core.ts',
             sha256: expect.stringMatching(/^[a-f0-9]{64}$/),
@@ -1376,11 +1415,13 @@ describe('Eastbrook polish capture contract', () => {
     // row follows him (target on the authored stand, camera holding its former
     // 4.47 yd offset on his re-derived public-facing side). Lin and Saul did
     // not move this round.
+    // The handoff experiment moves Lin to (-11, -89); the live portrait
+    // follows her while the artifact suite keeps the historical framing frozen.
     const expectedViews = {
       'apothecary-lin': {
         subject: 'apothecary_lin',
-        camera: { x: -65, y: 6, z: -96 },
-        target: { x: -72, y: 2.5, z: -96 },
+        camera: { x: -12, y: 6, z: -94 },
+        target: { x: -11, y: 2.5, z: -89 },
       },
       'ravenpost-chronicler': {
         subject: 'chronicler_saul',
@@ -1909,6 +1950,8 @@ describe('Eastbrook polish capture contract', () => {
       'npcFacings:',
       'polishProvenance',
       'deriveEastbrookPolishCompositeProvenance({',
+      'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSample',
+      'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityGroundSampleCore',
       'EASTBROOK_POLISH_PROVENANCE_INPUTS.entityViewPolicy',
       'TOWN_CONTRACT',
     ]) {

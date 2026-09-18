@@ -35,14 +35,16 @@ export interface AnimState {
    *  from the local camera so peers pitch too, and so the pose can never
    *  disagree with the travel it is drawn against. */
   swimPitch: number;
-  /** Feet under water but the ground still under them — the band between a dry
+  /** Feet under water but the ground still under them, the band between a dry
    *  stride and a swim. Walking here plays the wade cycle and the sim slows the
    *  body down (player_motion.wadeSpeedMult). */
   wading: boolean;
   sitting: boolean;
+  /** Concealed by an existing stealth aura. Only rigs with prowl clips use it. */
+  stealthed?: boolean;
   /** Engaged with someone right now: a standing body holds its rig's braced
    *  battle stance instead of the relaxed idle (see desiredBaseState). Derived
-   *  from the mob's live aggro target, which both hosts carry, so peers brace
+   *  from a mob's live aggro target or a player's targeted auto-attack, so peers brace
    *  identically with no new wire traffic. Display-only; never gates gameplay. */
   combat?: boolean;
 }
@@ -51,6 +53,8 @@ export type BaseState =
   | 'idle'
   /** Standing, but engaged: the braced guard loop, not the relaxed idle. */
   | 'combatIdle'
+  | 'prowlIdle'
+  | 'prowlWalk'
   | 'walk'
   | 'walkBack'
   | 'run'
@@ -81,25 +85,22 @@ const SWIM_EXIT_FLOOR_DEPTH = 0.6;
  * stand height. A swimmer is prone, not upright: the authored strokes lay the
  * body flat about the hips, so its top is the back at roughly hip height
  * (0.41 of the ~1.6-unit source rig, scaled to the 2.6 stand height, plus the
- * surface lift) — about 0.42 of stand height, NOT the ~0.86 an upright head
+ * surface lift), about 0.42 of stand height, NOT the ~0.86 an upright head
  * would sit at. Using the standing figure here would mean the waterline could
  * never close over a swimmer at all, and the submerged stroke would never play.
  */
 export const SUBMERGED_HEAD_FRACTION = 0.42;
 
-/**
- * Is a swimming body's head under water? Hysteresis mirrors the swim latch: the
- * head must clear the line by a margin to count as surfaced again, so bobbing on
- * a wave cannot flip the stroke back and forth every frame.
- */
-export function isSubmergedAtDepth(
+/** Same waterline latch with a rig's measured swimming head height. Animal
+ *  heads keep their upright height when the body swims horizontally. */
+export function isSubmergedAtHeadHeight(
   previous: boolean,
   swimming: boolean,
   feetDepth: number,
-  standHeight: number,
+  headHeight: number,
 ): boolean {
   if (!swimming || !Number.isFinite(feetDepth)) return false;
-  const headDepth = feetDepth - standHeight * SUBMERGED_HEAD_FRACTION;
+  const headDepth = feetDepth - headHeight;
   return headDepth >= (previous ? -0.22 : 0.02);
 }
 
@@ -109,7 +110,7 @@ export function isSubmergedAtDepth(
  * The band is everything between a dry stride and a swim: the swim latch takes
  * over once the bed drops ~0.8 yd under the line (about mid-thigh on these
  * bodies), so wading tops out below the waist by construction. Hysteresis for
- * the same reason as the swim latch — a shoreline is exactly where a body
+ * the same reason as the swim latch: a shoreline is exactly where a body
  * hovers on the threshold, and a flickering gait reads as a stutter.
  */
 export function isWadingAtDepth(
@@ -190,7 +191,7 @@ export function advanceSwimBlend(current: number, swimming: boolean, dt: number)
  * both in the water: a prone stroke floats the body at hip height, an upright
  * tread has to sink most of a third of a yard, and the renderer applies that
  * difference as one offset. Switching it on the state edge would throw the
- * model that whole distance in a single frame, so it rides this instead — and
+ * model that whole distance in a single frame, so it rides this instead, and
  * deliberately a little slower than the clip crossfade under it, which reads as
  * the body settling into the water after the stroke stops.
  */
@@ -207,7 +208,7 @@ const TREAD_BLEND_RATE = 6;
  *  literal reading of the travel angle would give when diving from a standstill,
  *  which reads as a faceplant rather than a dive. */
 export const SWIM_PITCH_MAX = 0.62;
-/** Vertical speed (yd/s) that reaches that full pitch — the sim's dive rate. */
+/** Vertical speed (yd/s) that reaches that full pitch: the sim's dive rate. */
 export const SWIM_PITCH_FULL_SPEED = 3.2;
 /** Exponential response of the pitch follow, per second. Slow enough that the
  *  net's jitter on a peer's Y cannot flutter the body, fast enough that your
@@ -219,7 +220,7 @@ const SWIM_PITCH_RESPONSE = 5;
  *
  * `verticalSpeed` is yards/second, positive UP. The result is positive
  * NOSE-DOWN, matching the renderer's prone pitch convention, and eases out to
- * level whenever the body is not swimming — so wading ashore mid-dive unwinds
+ * level whenever the body is not swimming, so wading ashore mid-dive unwinds
  * instead of snapping.
  */
 export function advanceSwimPitch(
@@ -394,8 +395,17 @@ export function shouldPlayLanding(
   airborne: boolean,
   dead: boolean,
   hasLandClip: boolean,
+  swimming = false,
 ): boolean {
-  return hasLandClip && wasAirborne && !airborne && !dead;
+  return hasLandClip && wasAirborne && !airborne && !dead && !swimming;
+}
+
+/** A touchdown recovery may hold only while the body still rests on the
+ *  ground. Repeated hops and water entry must release it as promptly as a run. */
+export function shouldInterruptLanding(
+  s: Pick<AnimState, 'moving' | 'airborne' | 'swimming'>,
+): boolean {
+  return s.moving || s.airborne || s.swimming;
 }
 
 /**
@@ -412,10 +422,12 @@ export function desiredBaseState(
   hasWalkBackClip: boolean,
   hasWadeClip = true,
   hasCombatIdleClip = false,
+  hasProwlIdleClip = false,
+  hasProwlWalkClip = false,
 ): BaseState {
   if (s.swimming) {
     // A swimmer who stops treads water rather than stroking on the spot; a
-    // swimmer who moves picks the stroke for their depth — surface crawl above
+    // swimmer who moves picks the stroke for their depth: surface crawl above
     // the waterline, breaststroke below it. Rigs with one swim clip and no
     // tread resolve all three to whatever they have (baseAction falls back).
     if (!s.moving) return 'swimIdle';
@@ -429,6 +441,7 @@ export function desiredBaseState(
     // Shallow water is still walking, just against resistance: one cycle covers
     // both gaits, because nobody sprints through knee-deep water.
     if (s.wading && hasWadeClip) return 'wade';
+    if (s.stealthed && hasProwlWalkClip) return 'prowlWalk';
     if (s.backwards && hasWalkBackClip && !s.reverseBackpedal) return 'walkBack';
     return s.running ? 'run' : 'walk';
   }
@@ -438,6 +451,7 @@ export function desiredBaseState(
   // ends. Gated on the rig actually HAVING the loop, the same rule walkBack and
   // wade follow: baseAction() falls back to idle for a rig without one, and the
   // machine must not sit in a state nothing is playing.
+  if (s.stealthed && hasProwlIdleClip) return 'prowlIdle';
   if (s.combat && hasCombatIdleClip) return 'combatIdle';
   return 'idle';
 }
@@ -447,27 +461,34 @@ export function locomotionTimeScale(
   s: Pick<AnimState, 'speed' | 'backwards' | 'reverseBackpedal'>,
   walkRef = DEFAULT_WALK_REF,
   runRef = DEFAULT_RUN_REF,
+  prowlRef = walkRef,
+  walkBackRef = walkRef,
+  runTimeScaleMin = 0.6,
 ): number | null {
   if (baseState === 'swim' || baseState === 'swimSurface') {
     // Stroke rate follows swim speed: the slow opening strokes of a dive read as
     // deliberate and the cruise reads as purposeful, off ONE authored clip each.
-    // Never reversed — there is no backwards stroke, a backpedaling swimmer just
+    // Never reversed: there is no backwards stroke, a backpedaling swimmer just
     // pulls more slowly.
     return clamp(s.speed / DEFAULT_SWIM_REF, 0.55, 1.4);
   }
   // Treading is an idle: it holds its own tempo whatever the body drifts at.
   if (baseState === 'swimIdle') return null;
   let timeScale: number;
+  if (baseState === 'prowlWalk') {
+    const stalkScale = clamp(s.speed / prowlRef, 0.6, 1.8);
+    return s.backwards ? -stalkScale : stalkScale;
+  }
   if (baseState === 'walk' || baseState === 'walkBack') {
-    timeScale = clamp(s.speed / walkRef, 0.6, 1.8);
+    timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, 1.8);
   } else if (baseState === 'wade') {
     // One cycle covers the whole wade band, and the band is slow by
-    // construction (the sim drags the body down to ~0.7 run) — so the clip is
+    // construction (the sim drags the body down to ~0.7 run), so the clip is
     // timed against a wading pace, not a dry one, and clamped tighter: a stride
     // through water reads wrong the moment it starts to sprint.
     timeScale = clamp(s.speed / DEFAULT_WADE_REF, 0.65, 1.45);
   } else if (baseState === 'run') {
-    timeScale = clamp(s.speed / runRef, 0.6, 1.6);
+    timeScale = clamp(s.speed / runRef, runTimeScaleMin, 1.6);
   } else {
     return null;
   }

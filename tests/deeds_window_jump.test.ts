@@ -49,6 +49,7 @@ function makeWindow(
     world: () =>
       ({
         deedsEarned: state.deedsEarned,
+        accountDeeds: new Map(),
         deedStats: stats,
         renown: state.renown,
         activeTitle: state.activeTitle,

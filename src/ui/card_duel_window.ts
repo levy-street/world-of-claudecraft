@@ -82,13 +82,13 @@ export class CardDuelWindow {
   private html(view: CardDuelViewModel): string {
     let body = '';
     if (view.state === 'unavailable') {
-      body = `<div class="cd-status">${esc(t('cardDuel.unavailable'))}</div>`;
+      body = `<div class="cd-status ui-meta ui-muted">${esc(t('cardDuel.unavailable'))}</div>`;
     } else if (view.state === 'idle') {
-      body = `<button type="button" class="cd-action-btn" data-join aria-label="${esc(t('cardDuel.joinAria'))}">${esc(t('cardDuel.join'))}</button>`;
+      body = `<button type="button" class="cd-action-btn ui-btn" data-join aria-label="${esc(t('cardDuel.joinAria'))}">${esc(t('cardDuel.join'))}</button>`;
     } else if (view.state === 'queued') {
       body =
-        `<div class="cd-status">${esc(t('cardDuel.queued'))}</div>` +
-        `<button type="button" class="cd-action-btn" data-leave aria-label="${esc(t('cardDuel.leaveAria'))}">${esc(t('cardDuel.leave'))}</button>`;
+        `<div class="cd-status ui-meta ui-muted">${esc(t('cardDuel.queued'))}</div>` +
+        `<button type="button" class="cd-action-btn ui-btn ui-btn--red" data-leave aria-label="${esc(t('cardDuel.leaveAria'))}">${esc(t('cardDuel.leave'))}</button>`;
     } else {
       const roundText = esc(
         t('cardDuel.round', {
@@ -103,7 +103,7 @@ export class CardDuelWindow {
       const hand = view.hand
         .map(
           (card) =>
-            `<button type="button" class="cd-card" data-play="${card.value}" ${
+            `<button type="button" class="cd-card ui-btn ui-num" data-play="${card.value}" ${
               card.playable ? '' : 'disabled'
             } aria-label="${esc(t('cardDuel.playCardAria', { value: formatNumber(card.value, { maximumFractionDigits: 0 }) }))}">${formatNumber(card.value, { maximumFractionDigits: 0 })}</button>`,
         )
@@ -114,18 +114,18 @@ export class CardDuelWindow {
           discard: formatNumber(view.discardCount, { maximumFractionDigits: 0 }),
         }),
       );
-      const forfeitBtn = `<button type="button" class="cd-action-btn" data-forfeit aria-label="${esc(t('cardDuel.forfeitAria'))}">${esc(t('cardDuel.forfeit'))}</button>`;
+      const forfeitBtn = `<button type="button" class="cd-action-btn ui-btn ui-btn--red" data-forfeit aria-label="${esc(t('cardDuel.forfeitAria'))}">${esc(t('cardDuel.forfeit'))}</button>`;
       body =
-        `<div class="cd-opponent">${oppText}</div>` +
-        `<div class="cd-status">${roundText}</div>` +
-        `<div class="cd-status cd-turn">${turnText}</div>` +
+        `<div class="cd-opponent ui-h">${oppText}</div>` +
+        `<div class="cd-status ui-meta ui-num">${roundText}</div>` +
+        `<div class="cd-status cd-turn ui-meta ui-muted">${turnText}</div>` +
         `<div class="cd-hand">${hand}</div>` +
-        `<div class="cd-counts">${counts}</div>` +
+        `<div class="cd-counts ui-meta ui-muted ui-num">${counts}</div>` +
         forfeitBtn;
     }
     return (
-      `<div class="panel-title"><span id="card-duel-title">${esc(t('cardDuel.title'))}</span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('cardDuel.close'))}">${svgIcon('close')}</button></div>` +
+      `<div class="panel-title ui-win-head"><span id="card-duel-title" class="ui-win-title">${esc(t('cardDuel.title'))}</span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('cardDuel.close'))}">${svgIcon('close')}</button></div>` +
       `<div class="cd-body">${body}</div>`
     );
   }

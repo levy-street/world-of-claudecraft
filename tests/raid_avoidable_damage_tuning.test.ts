@@ -73,7 +73,7 @@ describe('raid avoidable damage tuning', () => {
       nythraxisUnboundHitMaxHp('normal'),
       nythraxisBoneSlamDamageMaxHp('normal'),
       nythraxisBoneStormWhirlTickMaxHp('normal'),
-    ]).toEqual([0.45, 0.06, 0.08, 0.35, 0.4, 0.35, 0.1]);
+    ]).toEqual([0.45, 0.06, 0.08, 0.35, 0.4, 0.23, 0.1]);
     expect([
       nythraxisGraveEruptionDamageMaxHp('heroic'),
       nythraxisGraveFlameTickMaxHp('heroic'),
@@ -82,6 +82,6 @@ describe('raid avoidable damage tuning', () => {
       nythraxisUnboundHitMaxHp('heroic'),
       nythraxisBoneSlamDamageMaxHp('heroic'),
       nythraxisBoneStormWhirlTickMaxHp('heroic'),
-    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.6, 0.55, 0.2]);
+    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.6, 0.37, 0.2]);
   });
 });

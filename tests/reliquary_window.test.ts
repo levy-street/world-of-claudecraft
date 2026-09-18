@@ -82,16 +82,15 @@ describe('painter hygiene', () => {
     expect(trackerView).toContain('RELIQUARY_TRACK_CAP');
   });
 
-  it('dims the at-cap pin in BOTH refusal spellings and excludes it from hover', () => {
+  it('dims the at-cap pin in BOTH refusal spellings and uses the shared button hover', () => {
     // The control no longer carries native disabled, so the whole "refused
     // looks refused" affordance rests on the attribute selector.
     const reliquaryCss = sectionCss('reliquary');
     expect(reliquaryCss).toMatch(
       /\.reliquary-pin:disabled,\s*\.reliquary-pin\[aria-disabled="true"\] \{\s*opacity: 0\.5;/,
     );
-    expect(reliquaryCss).toContain(
-      '.reliquary-pin:hover:not(:disabled):not([aria-disabled="true"])',
-    );
+    // Grammar migration: ui-btn now owns hover while this section keeps the refusal state.
+    expect(painter).toContain('class="reliquary-pin ui-btn${pinned');
   });
 
   it('elides slow-band repaints through the pure refresh signature', () => {
@@ -127,12 +126,16 @@ describe('painter hygiene', () => {
     expect(code).toContain('firstFind: world.reliquaryFirstFind');
     // Phase 7: profession mark ownership must feed the pure model (owned vs
     // missing cells). Dropping this leaves every mark painted missing.
-    expect(code).toContain('marks: world.reliquaryMarks');
+    // Account-wide (src/sim/account_ledger.ts): every character-durable
+    // lookup is the character's own surface unioned with the account ledger.
+    expect(code).toContain("marks: accountRelicLookup(world.reliquaryMarks, ledger, 'mark')");
     expect(code).toContain('marksSize: world.reliquaryMarks.size');
     // Phase 8: Horizons ownership from live seams only.
-    expect(code).toContain('ownedMounts: new Set(world.ownedMounts())');
+    expect(code).toContain('ownedMounts: accountRelicLookup(');
+    expect(code).toContain('new Set(world.ownedMounts())');
     expect(code).toContain('weaponSkins: new Set(world.accountCosmetics.weaponSkinIds)');
-    expect(code).toContain('deedsEarned: world.deedsEarned');
+    expect(code).toContain('deedsEarned: accountDeedLookup(world.deedsEarned, ledger)');
+    expect(code).toContain('accountFinds: world.reliquaryAccountFinds');
   });
 
   it('paints profession mark cells with quality silhouettes', () => {
@@ -211,7 +214,10 @@ describe('painter hygiene', () => {
     // guard exists to catch, and fails the exact-match below.
     const code = stripComments(painter);
     const nameReads = [...code.matchAll(/[\w.]*\.name\b/g)].map((m) => m[0]);
-    expect(nameReads).toEqual(['world.player.name']);
+    // The two finder.name reads are the account ledger's CHARACTER names on an
+    // owned cell's "Found by" line (foundByLineHtml): identity strings, never
+    // translatable text, listed here in full like the pin-store read.
+    expect(nameReads).toEqual(['finder.name', 'finder.name', 'world.player.name']);
     expect(code).toContain('reliquaryPageName(');
     expect(code).toContain('reliquaryRelicDisplayName(');
   });
@@ -223,7 +229,12 @@ describe('painter hygiene', () => {
       ['sim', simSrc],
       ['online', onlineSrc],
     ] as const) {
-      expect(src, name).toContain('reliquaryOwnershipOpts');
+      // Account-wide union (src/sim/account_ledger.ts) through the ONE shared
+      // helper on both hosts, so the completion reads answer identically for
+      // the same scripted state.
+      expect(src, name).toMatch(
+        /accountReliquaryOwnershipOpts\(this\.(primary\.)?accountLedger, \{/,
+      );
       expect(src, name).toContain('ownedMounts: this.ownedMounts()');
       expect(src, name).toContain('weaponSkinIds: this.accountCosmetics.weaponSkinIds');
       expect(src, name).toMatch(/deedsEarned: this\.(primary\.)?deedsEarned/);
@@ -298,7 +309,10 @@ describe('painter hygiene', () => {
     // empty list. The row stays a button INSIDE its own <li>.
     expect(painter).toMatch(/<ul class="reliquary-page-list" role="list"/);
     expect(painter).toContain('<li class="reliquary-page-item">');
-    expect(painter).toMatch(/<li class="reliquary-page-item">[\s\S]*?class="reliquary-page-row"/);
+    // Grammar migration: the row retains its list semantics and adopts the shared card surface.
+    expect(painter).toMatch(
+      /<li class="reliquary-page-item">[\s\S]*?class="reliquary-page-row ui-card"/,
+    );
     // list-style: none drops list semantics in Safari VoiceOver; the explicit
     // role above is the counterweight and must not be dropped with the ul.
     expect(components).toMatch(/\.reliquary-page-list \{[^}]*list-style: none;[^}]*\}/);
@@ -1386,9 +1400,13 @@ describe('styles and architecture registration', () => {
     // transform: a scale on hover/focus is banned in this family.
     expect(reliquaryCss).toContain('.reliquary-cell:hover');
     expect(reliquaryCss).not.toMatch(/:(?:hover|focus-visible) \{[^}]*transform:/);
-    // Everything that IS clickable keeps its pointer and a hover state.
-    for (const clickable of ['.reliquary-nav', '.reliquary-page-row', '.reliquary-filter-chip']) {
-      expect(reliquaryCss, clickable).toContain(`${clickable}:hover`);
+    // Grammar migration: shared primitives own pointer and hover for every clickable surface.
+    for (const primitiveClass of [
+      'class="reliquary-nav ui-seg-tab',
+      'class="reliquary-page-row ui-card',
+      'class="reliquary-filter-chip ui-chip',
+    ]) {
+      expect(painter, primitiveClass).toContain(primitiveClass);
     }
   });
 
@@ -1443,7 +1461,8 @@ describe('styles and architecture registration', () => {
     expect(optOut).toContain('background: none');
     // The painter's side of the join: class + hook on the SAME span, one arm
     // per reason through the exhaustive record.
-    expect(painter).toContain('class="reliquary-complete-badge" ${chip.attr}="1"');
+    // Grammar migration: the reason badge keeps its hook and adopts the shared chip surface.
+    expect(painter).toMatch(/class="reliquary-complete-badge ui-chip" \$\{chip\.attr\}="1"/);
     expect(painter).toContain("attr: 'data-retired'");
     expect(painter).toContain("attr: 'data-personal'");
   });

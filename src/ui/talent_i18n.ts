@@ -11107,7 +11107,7 @@ function effectDescription(
   if (global.warlockLeadenHex) {
     const maxStacks = tuning.maxStacks ?? 3;
     parts.push(
-      `${abilityName('curse_of_exhaustion')}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber(global.warlockLeadenHex * 100, lang) })} x${formatNumber(maxStacks, lang)} (${seconds(tuning.slowDuration ?? 5, lang)}); x${formatNumber(maxStacks, lang)} ${text.thenWord} ${t('hudChrome.auraEffect.root')} (${seconds(tuning.rootDuration ?? 1.5, lang)}; ${seconds(tuning.rootLockDuration ?? 15, lang)} ${text.statLabels.cooldown}).`,
+      `${abilityName('curse_of_exhaustion')}: ${t('hudChrome.auraEffect.slow', { pct: formatNumber(global.warlockLeadenHex * 100, lang) })} x${formatNumber(maxStacks, lang)} (${seconds(tuning.slowDuration ?? 5, lang)}); x${formatNumber(maxStacks, lang)} ${text.thenWord} ${t('hudChrome.auraEffect.root')} (${seconds(tuning.rootDuration ?? 3.5, lang)}; ${seconds(tuning.rootLockDuration ?? 15, lang)} ${text.statLabels.cooldown}).`,
     );
   }
   if (global.warlockShadowCredit) {

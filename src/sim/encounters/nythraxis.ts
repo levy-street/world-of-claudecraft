@@ -111,7 +111,6 @@ import {
   nythraxisBoneStormChargeTarget,
   nythraxisBoneStormDone,
   nythraxisBoneStormReached,
-  nythraxisBoneStormSpikeDue,
   nythraxisBoneStormWhirlTickMaxHp,
   pointInNythraxisBoneStorm,
 } from '../nythraxis_bone_storm';
@@ -119,6 +118,7 @@ import {
   castNythraxisDreadCurse,
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_EVERY,
+  nythraxisDreadCurseStacks,
 } from '../nythraxis_dread_curse';
 import {
   NYTHRAXIS_CROWN_ENDURES_AURA_ID,
@@ -207,6 +207,7 @@ type NythraxisCallout = Extract<SimEvent, { type: 'nythraxisCallout' }>['call'];
 type NythraxisState = NonNullable<Entity['nythraxis']>;
 type NythraxisMechanicField =
   | 'dreadCurseTimer'
+  | 'dreadCurseHolderId'
   | 'boneSpikeTimer'
   | 'boneSpikes'
   | 'boneSpikeCooldowns'
@@ -243,6 +244,7 @@ const NYTHRAXIS_MAJOR_GAP_SECONDS = 6;
  */
 export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicState {
   st.dreadCurseTimer ??= NYTHRAXIS_DREAD_CURSE_EVERY;
+  st.dreadCurseHolderId ??= null;
   st.boneSpikeTimer ??= NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS;
   st.boneSpikes ??= [];
   st.boneSpikeCooldowns ??= [];
@@ -487,6 +489,7 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       dreadCurseTimer: NYTHRAXIS_DREAD_CURSE_EVERY,
+      dreadCurseHolderId: null,
       boneSpikeTimer: NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
       boneSpikes: [],
       boneSpikeCooldowns: [],
@@ -660,7 +663,8 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     startNythraxisKingsWrath(ctx, boss, st);
   }
   // Bone Storm owns the boss's body (he runs): like the Rage cast, no new cast
-  // starts until it ends, except the mid-storm spike the storm casts itself.
+  // starts until it ends, the regular Bone Spike cadence included (its timer
+  // is frozen below this return); the storm casts no spike of its own.
   if (storming) return;
 
   if (st.deathlessStunRemaining > 0) {
@@ -963,12 +967,63 @@ export function emitNythraxisCallout(
 
 // ----- Dread Curse: the tank swap (both difficulties) --------------------------
 
+/**
+ * The swap must hold: once the boss has settled onto a raider who does not
+ * carry a live Dread Curse stack, he must not be turned back onto whoever
+ * still does, even by their own taunt. Without this a momentary taunt (from
+ * anyone, tank-specced or not) intercepts a single scheduled application, and
+ * the old holder's own stack then lapses on its unrefreshed 20 s clock before
+ * the next one lands, which reads to the raid as the debuff "resetting"
+ * rather than forcing the real hold it exists for. Runs every tick, ahead of
+ * the cadence check, so a taunt-back is corrected the same tick it lands.
+ * Compares against the LAST settled holder rather than scanning the threat
+ * table, so it never second-guesses a tank who simply hasn't been swapped off
+ * yet: a threat-table scan would pick off the top DPS the instant the tank's
+ * own stack lands, since they always outrank a DPS's threat.
+ */
+export function enforceNythraxisDreadCurseSwap(
+  ctx: SimContext,
+  boss: Entity,
+  ms: NythraxisMechanicState,
+): void {
+  const held = boss.aggroTargetId !== null ? (ctx.entities.get(boss.aggroTargetId) ?? null) : null;
+  const prior =
+    ms.dreadCurseHolderId !== null ? (ctx.entities.get(ms.dreadCurseHolderId) ?? null) : null;
+  const priorCanHold =
+    prior !== null &&
+    !prior.dead &&
+    prior.kind === 'player' &&
+    dist2d(prior.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS;
+  if (
+    held &&
+    !held.dead &&
+    priorCanHold &&
+    prior.id !== held.id &&
+    nythraxisDreadCurseStacks(prior, boss.id) === 0 &&
+    nythraxisDreadCurseStacks(held, boss.id) > 0
+  ) {
+    boss.aggroTargetId = prior.id;
+    return;
+  }
+  if (
+    held &&
+    !held.dead &&
+    held.kind === 'player' &&
+    dist2d(held.pos, boss.spawnPos) <= NYTHRAXIS_ROOM_RADIUS
+  ) {
+    ms.dreadCurseHolderId = held.id;
+  } else if (prior !== null && !priorCanHold) {
+    ms.dreadCurseHolderId = null;
+  }
+}
+
 export function updateNythraxisDreadCurse(
   ctx: SimContext,
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
   const ms = nythraxisMechanicState(st);
+  enforceNythraxisDreadCurseSwap(ctx, boss, ms);
   const target = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : null;
   if (!target || target.dead || target.kind !== 'player') return;
   ms.dreadCurseTimer -= DT;
@@ -1992,8 +2047,8 @@ export function startNythraxisBoneStorm(
 
 /**
  * Drive the live storm: the whirl tick, the charge windows (one hash-ranked
- * target each, the boss runs at it and Bone Slams on arrival), the mid-storm
- * spike, and the pickup when it ends. Returns true while a storm is live.
+ * target each, the boss runs at it and Bone Slams on arrival), and the pickup
+ * when it ends. Returns true while a storm is live.
  */
 export function updateNythraxisBoneStorm(
   ctx: SimContext,
@@ -2061,11 +2116,6 @@ export function updateNythraxisBoneStorm(
         slamNythraxisBoneStorm(ctx, boss, st, room);
       }
     }
-  }
-  // One Bone Spike lands mid-storm on both difficulties.
-  if (!storm.spikeCast && nythraxisBoneStormSpikeDue(storm.elapsed)) {
-    storm.spikeCast = true;
-    castNythraxisBoneSpike(ctx, boss, st, room, nythraxisDifficulty(ctx, boss));
   }
   if (nythraxisBoneStormDone(storm.elapsed)) endNythraxisBoneStorm(ctx, boss, st);
   return true;

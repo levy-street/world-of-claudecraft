@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { defaultAuraOverlayConfig } from '../src/ui/aura_overlay_config';
 import { AuraOverlaySettingsPanel } from '../src/ui/aura_overlay_settings';
 import type { AuraOverlayProcDef } from '../src/ui/aura_overlay_view';
+import type { AuraWatchOption } from '../src/ui/aura_watchlist_core';
 import { FocusManager } from '../src/ui/focus_manager';
 
 const revenge: AuraOverlayProcDef = {
@@ -47,6 +48,10 @@ describe('AuraOverlaySettingsPanel position controls', () => {
           config = { ...config, ...defaultAuraOverlayConfig(id) };
         },
         nudge,
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue: vi.fn(),
+        readyGlowAvailable: () => true,
         setAll: vi.fn(),
         beginPlacement: vi.fn(),
         endPlacement: vi.fn(),
@@ -122,6 +127,10 @@ describe('AuraOverlaySettingsPanel position controls', () => {
         },
         reset: vi.fn(),
         nudge: vi.fn(),
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue: vi.fn(),
+        readyGlowAvailable: () => true,
         setAll: vi.fn(),
         beginPlacement: vi.fn(),
         endPlacement: vi.fn(),
@@ -158,6 +167,10 @@ describe('AuraOverlaySettingsPanel position controls', () => {
         },
         reset: vi.fn(),
         nudge: vi.fn(),
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue: vi.fn(),
+        readyGlowAvailable: () => true,
         setAll,
         beginPlacement: vi.fn(),
         endPlacement: vi.fn(),
@@ -221,6 +234,10 @@ describe('AuraOverlaySettingsPanel position controls', () => {
             groundOrder: 0,
           });
         },
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue: vi.fn(),
+        readyGlowAvailable: () => true,
         setAll: vi.fn(),
         beginPlacement: vi.fn(),
         endPlacement: vi.fn(),
@@ -306,6 +323,10 @@ describe('AuraOverlaySettingsPanel position controls', () => {
         },
         reset,
         nudge,
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue: vi.fn(),
+        readyGlowAvailable: () => true,
         setAll: vi.fn(),
         beginPlacement,
         endPlacement,
@@ -500,5 +521,311 @@ describe('AuraOverlaySettingsPanel position controls', () => {
     expect(document.activeElement).toBe(refreshedSetup);
     await new Promise((resolve) => window.setTimeout(resolve, 0));
     expect(document.activeElement).toBe(refreshedSetup);
+  });
+});
+
+describe('AuraOverlaySettingsPanel watchlist picker', () => {
+  const option = (abilityId: string, watched: boolean): AuraWatchOption => ({
+    procId: `watch:${abilityId}`,
+    abilityId,
+    auraKind: 'buff_reckless',
+    auraId: abilityId,
+    watched,
+  });
+  const renderPanel = (
+    watchOptions: () => AuraWatchOption[],
+    defs: AuraOverlayProcDef[] = [revenge],
+    setWatched = vi.fn(),
+  ): { root: HTMLElement; setWatched: ReturnType<typeof vi.fn> } => {
+    const panel = new AuraOverlaySettingsPanel({
+      click: vi.fn(),
+      openFocusTrap,
+      auras: {
+        playerClass: () => 'warrior',
+        defs: () => defs,
+        get: () => defaultAuraOverlayConfig('revenge_free'),
+        getLayout: () => ({ crescentBlockScale: 1, groundRingBlockScale: 1 }),
+        patchLayout: vi.fn(),
+        patch: vi.fn(),
+        reset: vi.fn(),
+        nudge: vi.fn(),
+        watchOptions,
+        setWatched,
+        previewCue: vi.fn(),
+        readyGlowAvailable: () => true,
+        setAll: vi.fn(),
+        beginPlacement: vi.fn(),
+        endPlacement: vi.fn(),
+        setPlacement: vi.fn(),
+        onPositionChange: () => vi.fn(),
+        onPlacementChange: () => vi.fn(),
+      },
+    });
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    panel.render(root);
+    return { root, setWatched };
+  };
+
+  it('renders a labelled chip per offered spell with its picked state pressed', () => {
+    const { root } = renderPanel(() => [option('recklessness', false), option('avatar', true)]);
+    const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('.aura-watch-chip'));
+    expect(chips.map((chip) => chip.dataset.focusKey)).toEqual(
+      ['watch:recklessness', 'watch:avatar'].map((id) => `aura-watch:${id}`),
+    );
+    expect(chips.map((chip) => chip.getAttribute('aria-pressed'))).toEqual(['false', 'true']);
+    expect(chips[0].querySelector('span')?.textContent).toBe('Recklessness');
+    expect(chips[0].getAttribute('aria-label')).toBe('Watch Recklessness');
+    expect(chips[1].getAttribute('aria-label')).toBe('Stop watching Avatar');
+    expect(root.querySelector('.aura-watch-count')?.textContent).toBe('1 watched');
+    expect(root.querySelector('.aura-watch-section strong')?.textContent).toBe('Watched Spells');
+  });
+
+  it('toggles the picked state through the hook, repaints it, and keeps focus on the chip', () => {
+    // A LIVE list, so the assertions below prove the picker re-reads the hook on
+    // its rebuild rather than re-rendering the state it started with.
+    let options = [option('recklessness', false)];
+    const setWatched = vi.fn((id: string, on: boolean) => {
+      options = [option(id.slice('watch:'.length), on)];
+    });
+    const { root } = renderPanel(() => options, [revenge], setWatched);
+    root.querySelector<HTMLButtonElement>('.aura-watch-chip')?.click();
+
+    expect(setWatched.mock.calls).toEqual([['watch:recklessness', true]]);
+    const chip = root.querySelector<HTMLButtonElement>('.aura-watch-chip');
+    expect(chip?.getAttribute('aria-pressed')).toBe('true');
+    expect(chip?.getAttribute('aria-label')).toBe('Stop watching Recklessness');
+    expect(root.querySelector('.aura-watch-count')?.textContent).toBe('1 watched');
+    // The rebuild replaces the chip node, so focus has to be carried across it.
+    expect(document.activeElement).toBe(chip);
+
+    chip?.click();
+    expect(setWatched.mock.calls[1]).toEqual(['watch:recklessness', false]);
+    expect(root.querySelector('.aura-watch-chip')?.getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('says so instead of rendering an empty list when nothing else is offerable', () => {
+    const { root } = renderPanel(() => []);
+    expect(root.querySelectorAll('.aura-watch-chip')).toHaveLength(0);
+    expect(root.querySelector('.aura-watch-empty')?.textContent).toBe(
+      'No other spell in your spellbook puts a buff on you.',
+    );
+  });
+
+  it('keeps the picker reachable for a character with no authored proc at all', () => {
+    const { root } = renderPanel(() => [option('recklessness', false)], []);
+    // The old dead end returned before any picker existed, locking such a
+    // character out of the whole feature.
+    expect(root.querySelectorAll('.aura-watch-chip')).toHaveLength(1);
+    expect(root.querySelector('.set-note:not(.aura-watch-hint)')?.textContent).toBe(
+      'No supported proc is available for this character.',
+    );
+    expect(root.querySelectorAll('.aura-settings-card')).toHaveLength(0);
+  });
+});
+
+describe('AuraOverlaySettingsPanel alert sound controls', () => {
+  const renderCard = (config: Partial<ReturnType<typeof defaultAuraOverlayConfig>> = {}) => {
+    let current = { ...defaultAuraOverlayConfig('revenge_free'), ...config };
+    const previewCue = vi.fn();
+    const patch = vi.fn((_id: string, p: Record<string, unknown>) => {
+      current = { ...current, ...p };
+    });
+    const panel = new AuraOverlaySettingsPanel({
+      click: vi.fn(),
+      openFocusTrap,
+      auras: {
+        playerClass: () => 'warrior',
+        defs: () => [revenge],
+        get: () => current,
+        getLayout: () => ({ crescentBlockScale: 1, groundRingBlockScale: 1 }),
+        patchLayout: vi.fn(),
+        patch,
+        reset: vi.fn(),
+        nudge: vi.fn(),
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue,
+        readyGlowAvailable: () => true,
+        setAll: vi.fn(),
+        beginPlacement: vi.fn(),
+        endPlacement: vi.fn(),
+        setPlacement: vi.fn(),
+        onPositionChange: () => vi.fn(),
+        onPlacementChange: () => vi.fn(),
+      },
+    });
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    panel.render(root);
+    return {
+      root,
+      previewCue,
+      readyGlowAvailable: () => true,
+      patch,
+      get current() {
+        return current;
+      },
+    };
+  };
+
+  it('offers silence plus all twenty cues, defaulting to silence', () => {
+    const { root } = renderCard();
+    const select = root.querySelector<HTMLSelectElement>('.aura-sound-select');
+    expect(select?.options).toHaveLength(21);
+    expect(select?.options[0].value).toBe('none');
+    expect(select?.options[0].textContent).toBe('No sound');
+    expect(select?.value).toBe('none');
+    expect(
+      Array.from(select?.options ?? [])
+        .slice(1)
+        .map((o) => o.textContent),
+    ).toContain('Cat Meow');
+  });
+
+  it('hides the volume slider and preview until a cue is chosen', () => {
+    // A silent proc shows ONE control, not three dead ones.
+    const silent = renderCard();
+    expect(silent.root.querySelector('.aura-sound-volume')).toBeNull();
+    expect(silent.root.querySelector('.aura-sound-preview')).toBeNull();
+    expect(silent.root.querySelector('.aura-sound-hint')).toBeNull();
+
+    const loud = renderCard({ soundId: 'ui_aura_car_klaxon' });
+    expect(loud.root.querySelector('.aura-sound-volume')).not.toBeNull();
+    expect(loud.root.querySelector('.aura-sound-preview')).not.toBeNull();
+    // The hint is what tells a player the sound can REPLACE the overlay.
+    expect(loud.root.querySelector('.aura-sound-hint')?.textContent).toContain('sound alone');
+  });
+
+  it('stores the pick and auditions it, so the player chooses by ear', () => {
+    const card = renderCard();
+    const select = card.root.querySelector<HTMLSelectElement>('.aura-sound-select');
+    if (!select) throw new Error('no cue select');
+    select.value = 'ui_aura_wolf_howl';
+    select.dispatchEvent(new Event('change'));
+
+    expect(card.patch).toHaveBeenCalledWith('revenge_free', { soundId: 'ui_aura_wolf_howl' });
+    expect(card.previewCue).toHaveBeenCalledWith('ui_aura_wolf_howl', 0.7);
+  });
+
+  it('does not audition a switch back to silence', () => {
+    const card = renderCard({ soundId: 'ui_aura_wolf_howl' });
+    const select = card.root.querySelector<HTMLSelectElement>('.aura-sound-select');
+    if (!select) throw new Error('no cue select');
+    select.value = 'none';
+    select.dispatchEvent(new Event('change'));
+
+    expect(card.patch).toHaveBeenCalledWith('revenge_free', { soundId: 'none' });
+    expect(card.previewCue).not.toHaveBeenCalled();
+  });
+
+  it('previews at the proc own volume and names the cue for a screen reader', () => {
+    const card = renderCard({ soundId: 'ui_aura_glass_ping', soundVolume: 0.35 });
+    const preview = card.root.querySelector<HTMLButtonElement>('.aura-sound-preview');
+    expect(preview?.getAttribute('aria-label')).toBe('Preview the Glass Ping alert sound');
+    preview?.click();
+    expect(card.previewCue).toHaveBeenCalledWith('ui_aura_glass_ping', 0.35);
+  });
+});
+
+describe('AuraOverlaySettingsPanel proc channel controls', () => {
+  const renderCard = (
+    readyGlowAvailable: () => boolean,
+    config: Partial<ReturnType<typeof defaultAuraOverlayConfig>> = {},
+  ) => {
+    let current = { ...defaultAuraOverlayConfig('revenge_free'), ...config };
+    const patch = vi.fn((_id: string, p: Record<string, unknown>) => {
+      current = { ...current, ...p };
+    });
+    const panel = new AuraOverlaySettingsPanel({
+      click: vi.fn(),
+      openFocusTrap,
+      auras: {
+        playerClass: () => 'warrior',
+        defs: () => [revenge],
+        get: () => current,
+        getLayout: () => ({ crescentBlockScale: 1, groundRingBlockScale: 1 }),
+        patchLayout: vi.fn(),
+        patch,
+        reset: vi.fn(),
+        nudge: vi.fn(),
+        watchOptions: () => [],
+        setWatched: vi.fn(),
+        previewCue: vi.fn(),
+        readyGlowAvailable,
+        setAll: vi.fn(),
+        beginPlacement: vi.fn(),
+        endPlacement: vi.fn(),
+        setPlacement: vi.fn(),
+        onPositionChange: () => vi.fn(),
+        onPlacementChange: () => vi.fn(),
+      },
+    });
+    const root = document.createElement('div');
+    document.body.appendChild(root);
+    panel.render(root);
+    return { root, patch };
+  };
+  const rowNames = (root: HTMLElement): string[] =>
+    Array.from(root.querySelectorAll('.set-row .set-name')).map((n) => n.textContent ?? '');
+  const hints = (root: HTMLElement): string[] =>
+    Array.from(root.querySelectorAll('.aura-channel-hint')).map((n) => n.textContent ?? '');
+  const toggleFor = (root: HTMLElement, label: string): HTMLButtonElement | null | undefined =>
+    Array.from(root.querySelectorAll<HTMLElement>('.set-row'))
+      .find((row) => row.querySelector('.set-name')?.textContent === label)
+      ?.querySelector('button');
+
+  it('offers the three channels, each explained by a hint, where the desktop bar is live', () => {
+    const { root } = renderCard(() => true);
+    const names = rowNames(root);
+    expect(names).toContain('Hotbar Glow');
+    expect(names).toContain('Reticle Tick');
+    expect(names).toContain('Rumble');
+    // The labels alone do not say what a reticle tick is or what the rumble
+    // shapes feel like; the authored hints are what render under each row.
+    expect(hints(root)).toEqual([
+      'Lights this spell on your action bar while its buff is up.',
+      'Adds a mark near the centre of the screen that lights when this spell procs.',
+      'Vibrates a connected controller, or your phone. Ignored where the device has no haptics.',
+    ]);
+  });
+
+  it('leaves the Hotbar Glow row out where the desktop bar is not the live bar', () => {
+    // The mobile ring and the cross hotbar never paint a proc glow, so on a phone
+    // the toggle would do nothing; the other two channels still work there.
+    const { root } = renderCard(() => false);
+    const names = rowNames(root);
+    expect(names).not.toContain('Hotbar Glow');
+    expect(toggleFor(root, 'Hotbar Glow')).toBeUndefined();
+    expect(names).toContain('Reticle Tick');
+    expect(names).toContain('Rumble');
+    expect(hints(root)).toHaveLength(2);
+  });
+
+  it('routes the glow and tick toggles to the proc config', () => {
+    const { root, patch } = renderCard(() => true);
+    toggleFor(root, 'Hotbar Glow')?.click();
+    expect(patch).toHaveBeenLastCalledWith('revenge_free', { showReadyGlow: true });
+    toggleFor(root, 'Reticle Tick')?.click();
+    expect(patch).toHaveBeenLastCalledWith('revenge_free', { showReticleTick: true });
+  });
+
+  it('offers Off plus the three rumble shapes under typed labels, and stores the pick', () => {
+    const { root, patch } = renderCard(() => true, { haptic: 'double' });
+    const select = root.querySelector<HTMLSelectElement>('.aura-haptic-select');
+    if (!select) throw new Error('no rumble select');
+    expect(Array.from(select.options).map((o) => [o.value, o.textContent])).toEqual([
+      ['none', 'Off'],
+      ['tap', 'Tap'],
+      ['double', 'Double'],
+      ['long', 'Long'],
+    ]);
+    expect(select.value).toBe('double');
+    select.value = 'long';
+    select.dispatchEvent(new Event('change'));
+    expect(patch).toHaveBeenLastCalledWith('revenge_free', { haptic: 'long' });
+    select.value = 'none';
+    select.dispatchEvent(new Event('change'));
+    expect(patch).toHaveBeenLastCalledWith('revenge_free', { haptic: 'none' });
   });
 });

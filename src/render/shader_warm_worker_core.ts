@@ -182,6 +182,8 @@ export interface WarmSchedulerSnapshot {
   submitted: number;
   settled: number;
   failed: number;
+  /** Links the context refused, released without touching the window. */
+  rejected: number;
   cancelled: number;
   budget: AdaptiveLinkBudgetSnapshot;
   judge: RelativeSettleJudgeSnapshot;
@@ -205,6 +207,10 @@ export interface WarmScheduler {
   takeNext(): WarmSchedulerRequest | null;
   markSettled(id: number): void;
   markFailed(id: number): void;
+  /** The context refused the program (it does not link, or no program object
+   *  could be made): the slot frees and the window stays, since a refusal is
+   *  not congestion. A link past its deadline is `markFailed`. */
+  markRejected(id: number): void;
   pendingCount(): number;
   inFlightCount(): number;
   /** Anything left to do: a pending request or a link in flight. */
@@ -232,6 +238,7 @@ export function createWarmScheduler(
   let submitted = 0;
   let settled = 0;
   let failed = 0;
+  let rejected = 0;
   let cancelled = 0;
   const key = (id: number): string => String(id);
   const insert = (request: WarmSchedulerRequest): void => {
@@ -293,6 +300,11 @@ export function createWarmScheduler(
       failed++;
       budget.markFailed(key(id));
     },
+    markRejected(id) {
+      if (!inFlight.delete(id)) return;
+      rejected++;
+      budget.markRejected(key(id));
+    },
     pendingCount: () => pending.length,
     inFlightCount: () => inFlight.size,
     active: () => pending.length > 0 || inFlight.size > 0,
@@ -304,6 +316,7 @@ export function createWarmScheduler(
         submitted,
         settled,
         failed,
+        rejected,
         cancelled,
         budget: budget.snapshot(),
         judge: judge.snapshot(),

@@ -228,11 +228,13 @@ describe('v0.42.0 offense-only package: real combat-path packets', () => {
       return amount;
     }
 
-    it('the SP-rider delta (1200 vs 0 Spell Power) matches the literal 1.21 destruction total exactly (0.10 legacy + 0.11 offense-only, engine-constant formula, independent of resolveTalentHitMult)', () => {
+    it('the SP-rider delta (1200 vs 0 Spell Power) matches the literal 1.21 destruction total after the Gloom Bolt rank reduction', () => {
       const delta = gloomBoltAmount(1200, 10) - gloomBoltAmount(0, 10);
       // Rank-4 (level 20) castTime 3.0s, destruction's own castPct -0.03:
       // resolved cast time 3.0 * 0.97 = 2.91s (unclamped, between 1.5 and 3.5).
-      const expectedDelta = Math.round(1200 * directCoeff(3.0 * 0.97) * 1.21);
+      // The approved Ruinbolt-cycle pass then moves later Gloom Bolt ranks to
+      // an authored damageMult: 0.8 whole-hit reduction, including Spell Power.
+      const expectedDelta = Math.round(1200 * directCoeff(3.0 * 0.97) * 1.21 * 0.8);
       expect(delta).toBeCloseTo(expectedDelta, -1);
     });
 

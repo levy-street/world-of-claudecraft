@@ -129,14 +129,14 @@ export class PerfectingSwapController {
     const rows = model.rows
       .map(
         (row, index) =>
-          `<li role="none"><button type="button" class="pf-cand" role="radio" data-swap-target="${index}" ${FOCUS_KEY_ATTR}="swap:${esc(row.candidate.identity)}" aria-checked="${row.selected}" tabindex="${index === selected ? 0 : -1}"${this.pending || this.waitingForSnapshot ? ' disabled' : ''}><span class="pf-cand-names">${esc(row.candidate.chosenName ?? nameOf(row.candidate.itemId))}<span class="pf-cand-sub">${esc(perfectingCandidateLocation(row.ref, view.candidates) ?? '')}</span></span><span class="pf-cand-state">${esc(perfectingCandidateRank(row.candidate.rank, row.candidate.ranks))}</span></button></li>`,
+          `<li role="none"><button type="button" class="pf-cand ui-card" role="radio" data-swap-target="${index}" ${FOCUS_KEY_ATTR}="swap:${esc(row.candidate.identity)}" aria-checked="${row.selected}" tabindex="${index === selected ? 0 : -1}"${this.pending || this.waitingForSnapshot ? ' disabled' : ''}><span class="pf-cand-names">${esc(row.candidate.chosenName ?? nameOf(row.candidate.itemId))}<span class="pf-cand-sub">${esc(perfectingCandidateLocation(row.ref, view.candidates) ?? '')}</span></span><span class="pf-cand-state">${esc(perfectingCandidateRank(row.candidate.rank, row.candidate.ranks))}</span></button></li>`,
       )
       .join('');
     const preview = model.changes.length
       ? `<ul class="pf-swap-preview" data-swap-preview>${changesHtml(model, view.candidates)}</ul>`
       : '';
     const reason = this.notice ?? (model.reason ? reasonKeys[model.reason] : null);
-    return `<section class="pf-swap-section" data-swap-section aria-labelledby="pf-swap-title"><h3 id="pf-swap-title">${esc(t('hudChrome.perfecting.swapTitle'))}</h3><p>${esc(skillText('hudChrome.perfecting.swapIntro'))}</p><ul class="pf-list" role="radiogroup" aria-labelledby="pf-swap-title">${rows}</ul>${preview}${reason ? `<p class="pf-warning" role="note">${esc(skillText(reason))}</p>` : ''}<button type="button" class="pf-action" data-swap-action ${FOCUS_KEY_ATTR}="pfSwapAction"${!model.enabled || this.deps.blocked() || this.waitingForSnapshot ? ' disabled' : ''}>${esc(t(this.pending ? 'hudChrome.perfecting.swapPending' : 'hudChrome.perfecting.swapAction'))}</button></section>`;
+    return `<section class="pf-swap-section" data-swap-section aria-labelledby="pf-swap-title"><h3 id="pf-swap-title">${esc(t('hudChrome.perfecting.swapTitle'))}</h3><p>${esc(skillText('hudChrome.perfecting.swapIntro'))}</p><ul class="pf-list" role="radiogroup" aria-labelledby="pf-swap-title">${rows}</ul>${preview}${reason ? `<p class="pf-warning" role="note">${esc(skillText(reason))}</p>` : ''}<button type="button" class="pf-action ui-btn ui-btn--gold" data-swap-action ${FOCUS_KEY_ATTR}="pfSwapAction"${!model.enabled || this.deps.blocked() || this.waitingForSnapshot ? ' disabled' : ''}>${esc(t(this.pending ? 'hudChrome.perfecting.swapPending' : 'hudChrome.perfecting.swapAction'))}</button></section>`;
   }
 
   wire(view: PerfectingViewModel): void {

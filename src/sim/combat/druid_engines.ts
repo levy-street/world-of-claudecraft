@@ -1,9 +1,10 @@
 // Druid v0.29 spec engines. Engine banks are authoritative, visible auras:
 // Moongrove fills one Moontide bank toward a CHOSEN payoff (Moonsurge on the
 // Moonseed button or Sunwake on the Skyfall button, either spend clears it),
-// Wildfang shares Old Blood across Wolf and Bruin forms, and Groveheart
+// Wildfang shares Old Blood across Cat and Bruin forms, and Groveheart
 // grows Verdance toward Overbloom.
 
+import { DRUID_CHOICE_ROWS } from '../content/choice_rows_classic';
 import {
   CINDERBARK_2PC_EXTRA_OLD_BLOOD_CHANCE,
   GROVESPRING_4PC_VERDANCE_BANK,
@@ -16,6 +17,7 @@ import { primaryHealingMultiplier } from '../spec_output_tuning';
 import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
+import { LUNGE_ID, startLunge } from './druid_lunge';
 import { wearsSetBonus } from './set_bonus_wearer';
 
 export const MOONTIDE_ID = 'moontide';
@@ -32,16 +34,18 @@ export const WILD_APEX_MULT = 1.25;
 export const QUICKENING_ENERGY = 5;
 export const QUICKENING_RAGE = 3;
 export const QUICKENING_MANA_PCT = 0.02;
-// buff_speed auras carry a 1+fraction multiplier (moveSpeedMult takes the max
-// over 1), so +60% is 1.6; a bare 0.6 was silently discarded by the max.
+// Loping Stride: the baseline shift sprint every druid gets on any form shift
+// (Wildfang kit pass 2 made it talent-free). buff_speed auras carry a
+// 1+fraction multiplier (moveSpeedMult takes the max over 1), so +60% is 1.6;
+// a bare 0.6 was silently discarded by the max.
 export const LOPING_STRIDE_SPEED = 1.6;
 export const LOPING_STRIDE_DURATION = 3;
 const LOPING_STRIDE_ICD_KEY = 'dru_loping_stride';
-const LOPING_STRIDE_ICD = 20;
+export const LOPING_STRIDE_ICD = 20;
 
 export const DRUID_TALENT_IDS = {
   wildshift: 'dru_r5_improved_wrath',
-  lopingStride: 'dru_r5_ferocity',
+  longstride: 'dru_r5_ferocity',
   skylark: 'dru_r5_natures_bounty',
   highmoonTithe: 'dru_r14_moonfury',
   blooddrunk: 'dru_r14_savage_fury',
@@ -59,7 +63,79 @@ export const DRUID_PAYOFF_IDS = new Set([
   'overbloom',
 ]);
 
-const ENGINE_AURA_IDS = new Set([MOONTIDE_ID, OLD_BLOOD_ID, VERDANCE_ID]);
+// Longstride (row 5, mechanic druid_longstride) lengthens the baseline sprint
+// and shortens its cooldown. The row option's metrics are the ONE source of
+// those two numbers: the engine reads them here so the talent tooltip (which
+// tests/talent_tooltip_accuracy.test.ts holds to the same metrics) cannot drift
+// from what the sim applies. A missing metric falls back to the baseline value.
+// Read lazily on first use and memoised, never at module load: a content
+// module that one day imports combat code would otherwise crash at import
+// time instead of falling back.
+export const LONGSTRIDE_MECHANIC = 'druid_longstride';
+export interface LongstrideMetrics {
+  duration: number;
+  icd: number;
+}
+let longstrideCache: LongstrideMetrics | null = null;
+function readLongstrideMetrics(): LongstrideMetrics {
+  for (const row of DRUID_CHOICE_ROWS.rows) {
+    for (const option of row.options) {
+      const intrinsic = option.effect.intrinsic;
+      if (
+        option.id !== DRUID_TALENT_IDS.longstride ||
+        intrinsic?.mechanic !== LONGSTRIDE_MECHANIC
+      ) {
+        continue;
+      }
+      return {
+        duration: intrinsic.metrics.duration ?? LOPING_STRIDE_DURATION,
+        icd: intrinsic.metrics.icd ?? LOPING_STRIDE_ICD,
+      };
+    }
+  }
+  return { duration: LOPING_STRIDE_DURATION, icd: LOPING_STRIDE_ICD };
+}
+export function longstrideMetrics(): LongstrideMetrics {
+  if (longstrideCache === null) longstrideCache = readLongstrideMetrics();
+  return longstrideCache;
+}
+
+// Pin, the Bruin Rush to Cat Form rider (Wildfang kit pass 2). Landing Bruin
+// Rush opens a short window in which Cat Form costs nothing and Pins the
+// Rush target: a 50% slow for 4 sec. The window is an AURA on the druid
+// rather than a new Entity field, the Colossal Might cap precedent: it rides
+// the ordinary aura wire so the online client's resolvedAbility (the shared
+// cost tail in combat/ability_resolution.ts) shows the free cost the server
+// will bill, it expires through the aura tick, a death wipes it with every
+// other aura, and it adds no field to the parity trace. Its value carries the
+// Rush target's entity id, the one piece of state the rider needs.
+export const BRUIN_RUSH_WINDOW_ID = 'bruin_rush_window';
+export const BRUIN_RUSH_WINDOW_SECONDS = 3;
+export const PIN_ID = 'pin';
+export const PIN_SLOW_MULT = 0.5;
+export const PIN_DURATION = 4;
+// The window is opened by this ability and consumed by this shift.
+const BRUIN_RUSH_ID = 'bear_charge';
+const CAT_FORM_ID = 'cat_form';
+
+// The Rush target's entity id while the window is live, else null. Reads the
+// aura list only, so both the Sim and the online client mirror can ask.
+export function bruinRushWindowTargetId(actor: Pick<Entity, 'auras'>): number | null {
+  for (const aura of actor.auras) {
+    if (aura.id === BRUIN_RUSH_WINDOW_ID && aura.kind === 'internal_cd') return aura.value;
+  }
+  return null;
+}
+
+// The cost tail's question: is Cat Form free for this actor right now?
+export function bruinRushMakesCatFormFree(
+  actor: Pick<Entity, 'auras'>,
+  abilityId: string,
+): boolean {
+  return abilityId === CAT_FORM_ID && bruinRushWindowTargetId(actor) !== null;
+}
+
+const ENGINE_AURA_IDS = new Set([MOONTIDE_ID, OLD_BLOOD_ID, VERDANCE_ID, BRUIN_RUSH_WINDOW_ID]);
 const FORM_ABILITY_IDS = new Set(['bear_form', 'cat_form', 'travel_form', 'moonkin_form']);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
 const OLD_BLOOD_STRIKE_IDS = new Set(['claw', 'rake', 'rip', 'ferocious_bite', 'maul', 'swipe']);
@@ -176,6 +252,23 @@ function inMoonwing(player: Entity): boolean {
   return player.auras.some((aura) => aura.kind === 'form_moonkin');
 }
 
+// Strip every breakable root and slow the player wears (an aura stamped
+// unbreakableControl stays). Fleet Form runs this on every cast, baseline;
+// the other three forms run it only with Wildshift selected. Draws no rng.
+// A form button reaches this hook in BOTH directions of the shift: the
+// toggle-off press that returns to caster form runs the same
+// casting_lifecycle path as the shift in, so a druid rooted while in Fleet
+// Form breaks the root on the way out too. Wildshift has always behaved this
+// way for every form; the baseline Fleet Form arm inherits it.
+function breakMovementControl(ctx: SimContext, player: Entity): void {
+  for (let index = player.auras.length - 1; index >= 0; index--) {
+    const aura = player.auras[index];
+    if ((aura.kind !== 'root' && aura.kind !== 'slow') || aura.unbreakableControl) continue;
+    player.auras.splice(index, 1);
+    ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
+  }
+}
+
 export function druidEngineOnCast(
   ctx: SimContext,
   player: Entity,
@@ -187,31 +280,77 @@ export function druidEngineOnCast(
   if (meta?.cls !== 'druid') return;
 
   if (FORM_ABILITY_IDS.has(abilityId)) {
-    if (selectedRow(ctx, player, DRUID_TALENT_IDS.wildshift)) {
-      for (let index = player.auras.length - 1; index >= 0; index--) {
-        const aura = player.auras[index];
-        if ((aura.kind !== 'root' && aura.kind !== 'slow') || aura.unbreakableControl) continue;
-        player.auras.splice(index, 1);
-        ctx.emit({ type: 'aura', targetId: player.id, name: aura.name, gained: false });
-      }
+    // Fleet Form breaks control on its own (the classic travel-form escape:
+    // 30 mana, no cooldown, and no abilities while shifted). Cat, Bruin, and
+    // Moonwing keep the Wildshift gate, which is what makes the row 5 pick
+    // the in-combat option: break the root without leaving your damage form.
+    if (abilityId === 'travel_form' || selectedRow(ctx, player, DRUID_TALENT_IDS.wildshift)) {
+      breakMovementControl(ctx, player);
     }
-    if (selectedRow(ctx, player, DRUID_TALENT_IDS.lopingStride)) {
-      if (!player.procState) player.procState = { counters: {}, icds: {} };
-      if (player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
-        player.procState.icds[LOPING_STRIDE_ICD_KEY] = LOPING_STRIDE_ICD;
-        ctx.applyAura(player, {
-          id: 'loping_stride',
-          name: 'Loping Stride',
-          kind: 'buff_speed',
-          remaining: LOPING_STRIDE_DURATION,
-          duration: LOPING_STRIDE_DURATION,
-          value: LOPING_STRIDE_SPEED,
+    // Loping Stride is baseline: every form shift sprints, no talent check.
+    // Longstride only changes the two numbers (duration and cooldown).
+    const longstride = selectedRow(ctx, player, DRUID_TALENT_IDS.longstride);
+    const strideDuration = longstride ? longstrideMetrics().duration : LOPING_STRIDE_DURATION;
+    const strideIcd = longstride ? longstrideMetrics().icd : LOPING_STRIDE_ICD;
+    if (!player.procState) player.procState = { counters: {}, icds: {} };
+    if (player.procState.icds[LOPING_STRIDE_ICD_KEY] === undefined) {
+      player.procState.icds[LOPING_STRIDE_ICD_KEY] = strideIcd;
+      ctx.applyAura(player, {
+        id: 'loping_stride',
+        name: 'Loping Stride',
+        kind: 'buff_speed',
+        remaining: strideDuration,
+        duration: strideDuration,
+        value: LOPING_STRIDE_SPEED,
+        sourceId: player.id,
+        school: 'nature',
+      });
+    }
+  }
+
+  // Bruin Rush opens the Pin window on its target; a Cat Form shift inside
+  // the window Pins that target (never the current target) and closes it.
+  // Both arms are talent-free and draw no rng.
+  if (abilityId === BRUIN_RUSH_ID && target && !target.dead && ctx.isHostileTo(player, target)) {
+    removeOwnedAura(ctx, player, BRUIN_RUSH_WINDOW_ID);
+    ctx.applyAura(player, {
+      id: BRUIN_RUSH_WINDOW_ID,
+      name: 'Bruin Rush',
+      kind: 'internal_cd',
+      remaining: BRUIN_RUSH_WINDOW_SECONDS,
+      duration: BRUIN_RUSH_WINDOW_SECONDS,
+      value: target.id,
+      sourceId: player.id,
+      school: 'physical',
+    });
+  } else if (abilityId === CAT_FORM_ID) {
+    const pinTargetId = bruinRushWindowTargetId(player);
+    if (pinTargetId !== null) {
+      removeOwnedAura(ctx, player, BRUIN_RUSH_WINDOW_ID);
+      const pinTarget = ctx.entities.get(pinTargetId);
+      if (pinTarget && !pinTarget.dead && ctx.isHostileTo(player, pinTarget)) {
+        // Slows carry no diminishing-returns ladder in this sim (the 'slow'
+        // arm of combat/effect_dispatch.ts applies Hobbling Cut and every
+        // other snare at full duration); Pin rides the same kind and the
+        // same rule, so it diminishes exactly as they do: not at all.
+        ctx.applyAura(pinTarget, {
+          id: PIN_ID,
+          name: 'Pin',
+          kind: 'slow',
+          remaining: PIN_DURATION,
+          duration: PIN_DURATION,
+          value: PIN_SLOW_MULT,
           sourceId: player.id,
-          school: 'nature',
+          school: 'physical',
         });
+        ctx.enterCombat(player, pinTarget);
       }
     }
   }
+
+  // Lunge parks its strike on the charge route the cast just started
+  // (combat/druid_lunge.ts); the route's settle hook lands it on arrival.
+  if (abilityId === LUNGE_ID) startLunge(ctx, player, target);
 
   const spec = specOf(ctx, player);
   if (spec === 'balance') {
@@ -306,9 +445,10 @@ export function druidEngineOnBleedTick(ctx: SimContext, source: Entity | null, a
 }
 
 export function druidEngineCombatState(ctx: SimContext, player: Entity): void {
-  if (!player.inCombat && ownedAura(player, OLD_BLOOD_ID)) {
-    removeOwnedAura(ctx, player, OLD_BLOOD_ID);
-  }
+  if (player.inCombat) return;
+  if (ownedAura(player, OLD_BLOOD_ID)) removeOwnedAura(ctx, player, OLD_BLOOD_ID);
+  // The Pin window is an engage tool: leaving combat closes it.
+  if (ownedAura(player, BRUIN_RUSH_WINDOW_ID)) removeOwnedAura(ctx, player, BRUIN_RUSH_WINDOW_ID);
 }
 
 export function druidApexPayoffMult(ctx: SimContext, player: Entity, abilityId: string): number {

@@ -4,10 +4,11 @@
 // ::before ornament (components.css) is attached to #options-menu.perf-wide, the
 // exact element the base `.window` rule (layout.css) also makes the scrolling
 // box (`overflow-y: auto`). Before this fix, PerfOverlaySettingsPanel.render()
-// appended the scrollable body (.perf-panel) and the footer directly as children
-// of that same container, so the ornament scrolled away with the content instead
-// of staying pinned to the window frame, and the bottom-corner ornament never
-// lined up with the true bottom edge.
+// appended the scrollable body (.perf-panel) directly as a child of that same
+// container, so the ornament scrolled away with the content instead of staying
+// pinned to the window frame, and the bottom-corner ornament never lined up with
+// the true bottom edge. The footer moved OUT of the wrapper again in W25 (the
+// window-shell finding: an action row must never scroll out of reach).
 //
 // This drives the real production module (not a mock of it): it asserts the DOM
 // nesting the fix requires, so the scrolling content lives inside a dedicated
@@ -37,7 +38,7 @@ function makeHost(): PerfSettingsHost {
 }
 
 describe('PerfOverlaySettingsPanel: scroll wrapper stays off the ornament host (issue 2569)', () => {
-  it('wraps the panel body and footer in a single .perf-scroll child, leaving the title as the only other direct child', () => {
+  it('wraps the panel body in a single .perf-scroll child and pins the footer beside it', () => {
     const container = document.createElement('div');
     const panel = new PerfOverlaySettingsPanel(makeHost());
     panel.render(container);
@@ -54,19 +55,21 @@ describe('PerfOverlaySettingsPanel: scroll wrapper stays off the ornament host (
         'wrap them in a .perf-scroll child so the ::before ornament never scrolls',
     ).not.toBeNull();
     expect(container.querySelector(':scope > .perf-panel')).toBeNull();
-    expect(container.querySelector(':scope > .perf-footer')).toBeNull();
 
-    // The body card grid and the footer buttons are the scroll wrapper's own
-    // children, in the same relative order they rendered in before the fix.
+    // The card grid is the scroll wrapper's only child. Reset / Back MOVED OUT
+    // of the wrapper (W25): an action row that scrolls is exactly the maintainer
+    // finding the window shell fixes, and 2569 only ever needed the ORNAMENT
+    // HOST to stop scrolling, which the wrapper still guarantees.
     expect(scroll?.querySelector(':scope > .perf-panel')).not.toBeNull();
-    expect(scroll?.querySelector(':scope > .perf-footer')).not.toBeNull();
-    const scrollChildren = [...(scroll as Element).children].map((el) => el.className);
-    expect(scrollChildren).toEqual(['perf-panel', 'perf-footer']);
+    expect(scroll?.querySelector('.perf-footer')).toBeNull();
+    expect([...(scroll as Element).children].map((el) => el.className)).toEqual(['perf-panel']);
 
-    // Exactly two direct children of the container: the title, then the wrapper.
+    // Three direct children of the container: the title, the one scrollport, the
+    // pinned foot, which is the shared shell shape (library.css).
     expect([...container.children].map((el) => el.className)).toEqual([
       'panel-title',
-      'perf-scroll',
+      'perf-scroll ui-win-body',
+      'perf-footer ui-win-foot',
     ]);
   });
 
@@ -78,8 +81,10 @@ describe('PerfOverlaySettingsPanel: scroll wrapper stays off the ornament host (
 
     expect([...container.children].map((el) => el.className)).toEqual([
       'panel-title',
-      'perf-scroll',
+      'perf-scroll ui-win-body',
+      'perf-footer ui-win-foot',
     ]);
     expect(container.querySelectorAll('.perf-scroll')).toHaveLength(1);
+    expect(container.querySelectorAll('.perf-footer')).toHaveLength(1);
   });
 });

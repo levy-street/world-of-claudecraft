@@ -99,7 +99,7 @@ describe('rogue wave 2 choice rows', () => {
 });
 
 describe('druid wave 2 choice rows', () => {
-  it('Loping Stride triggers once per internal cooldown after a form change', () => {
+  it('Longstride keeps the baseline Loping Stride to once per internal cooldown', () => {
     const { sim, p } = rig('druid', 20, { 5: 'dru_r5_ferocity' });
     castAndSettle(sim, 'cat_form', 1);
     expect(p.auras.some((a) => a.id === 'loping_stride' && a.kind === 'buff_speed')).toBe(true);
@@ -137,7 +137,7 @@ describe('warlock wave 2 choice rows', () => {
     expect(leadenHex).toMatchObject({
       effect: { tuning: { rootDuration: 3.5 } },
       description:
-        'Damaging spells apply a 5% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
+        'Damaging spells apply a 10% slow for 5 sec, stacking 3 times. At 3 stacks, the next spell roots for 3.5 sec and consumes them. A target can be rooted once every 15 sec.',
     });
     if (!improvedAbyssalGag) throw new Error('Missing Improved Abyssal Gag talent');
     setLanguage('zh_CN');

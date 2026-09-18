@@ -371,7 +371,17 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     // picks are not the max-stamina picks, and the Crucible plate that wins
     // each slot on armour carries less stamina than the pre-raid kit it
     // displaces. Same re-pin, same date, same named cause.
-    expect(a.maxHp, 'and its pool').toBe(1582);
+    // Re-pinned 1582 -> 1922 on 2026-09-10 with the stamina baseline model
+    // (item_budget.ts): the reference picker now scores the class line, so the
+    // tank's neck and rings are physical, stamina-bearing pieces instead of the
+    // caster jewelry a raw five-stat sum tied them with, and the two
+    // stamina-free physical pieces gained their floor. The armor pin above did
+    // not move (the max-armor picks are the same plate). Same class of move as
+    // the practice dummy's reference body (tests/practice_dummies.test.ts); the
+    // difficulty floors themselves are not retuned here, which is the same
+    // maintainer decision the 1672 -> 1582 re-pin recorded: REF_ARMOR and the
+    // packet's Phase 19 table stay the calibration constants.
+    expect(a.maxHp, 'and its pool').toBe(1922);
   });
 
   it('REF_ARMOR provenance: the readings the comments quote are derived, not hand-carried', () => {

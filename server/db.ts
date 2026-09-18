@@ -10,6 +10,7 @@ import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 import type { ArenaFormat, PlayerClass } from '../src/sim/types';
 import type { ActionBarLayoutProfiles, StoredActionBarLayout } from '../src/world_api/action_bar';
 import { projectAccountExportState } from './account_export_state';
+import { ACCOUNT_LEDGER_SCHEMA } from './account_ledger_db';
 import { ACCOUNT_WEALTH_SCHEMA } from './account_wealth_db';
 import { AD_SPEND_SCHEMA } from './ad_spend_db';
 import { bustAdminGuildListReads } from './admin_guilds_read';
@@ -78,6 +79,7 @@ import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
 import { cancelDetachedBackend } from './db_backend_cancel';
 import { dbConnectionBudgetWarning } from './db_connection_budget';
 import type { RankedDeedsAccount } from './deeds_board';
+import { DEEDS_SCHEMA } from './deeds_db';
 import { DISCORD_SCHEMA } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
 import { bustDiscordStatus } from './discord_status_cache';
@@ -1181,42 +1183,6 @@ CREATE INDEX IF NOT EXISTS bank_ledger_created ON bank_ledger(created_at);
 -- those two ops.
 ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_copper_delta BIGINT;
 ALTER TABLE bank_ledger ADD COLUMN IF NOT EXISTS counterparty_count INT;
--- Earned-deed records: one row per (character, deed), written fire-and-forget
--- off the game loop by server/deeds_records.ts, an OBSERVER of the sim's
--- deedUnlocked events. The characters.state blob stays the gameplay source of
--- truth; this table only indexes it for rarity aggregates, account roll-ups,
--- and sheet reads, and no server path grants or revokes a deed. realm carries
--- no DEFAULT deliberately: the interpolated-default pattern is last-boot-wins
--- across realm processes, so every insert passes realm explicitly. account_id
--- is a snapshot of the owner at unlock time (a future character-transfer
--- feature must update or re-derive it). earned_at is the server clock (the
--- sim's utcDay stamp lives in the state blob and is not duplicated here).
--- UNIQUE (character_id, deed_id) is the idempotence backbone: retro re-emits
--- and crash-replays collapse into no-ops.
-CREATE TABLE IF NOT EXISTS character_deeds (
-  id BIGSERIAL PRIMARY KEY,
-  realm TEXT NOT NULL,
-  character_id INT NOT NULL REFERENCES characters(id) ON DELETE CASCADE,
-  account_id INT NOT NULL REFERENCES accounts(id) ON DELETE CASCADE,
-  deed_id TEXT NOT NULL,
-  earned_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (character_id, deed_id)
-);
--- character_deeds_deed (a lone index on deed_id) was retired: no query seeks
--- by deed_id. insertCharacterDeed's ON CONFLICT rides the UNIQUE (character_id,
--- deed_id) index, deedRarityCounts groups by deed_id but cannot seek on it,
--- and the board and account reads use their own indexes below, so the index
--- was pure write amplification. The statement below removes it idempotently to
--- converge databases that booted the earlier schema; a no-op where it never
--- existed.
-DROP INDEX IF EXISTS character_deeds_deed;
--- Per-account roll-up reads: earnedDeedIdsForAccount (server/deeds_db.ts,
--- the Steam reconcile-on-link push) filters on account_id through this
--- index. The Renown board's deedsBoardRanked read stays a full-table hash
--- aggregation (cached in main.ts) and does not use it.
-CREATE INDEX IF NOT EXISTS character_deeds_account ON character_deeds(account_id);
-CREATE INDEX IF NOT EXISTS character_deeds_character_earned
-  ON character_deeds(character_id, earned_at DESC);
 `;
 
 // Kept out of SCHEMA on purpose: the association arm reads
@@ -1368,6 +1334,11 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the other schema modules.
     await client.query(ACCOUNT_WEALTH_SCHEMA);
     await client.query(SUSPICION_FLAGS_SCHEMA);
+    // The Book of Deeds observer index and the account ledger's relic half
+    // (server/deeds_db.ts, server/account_ledger_db.ts). Both FK-reference
+    // characters(id) and accounts(id), so they run after SCHEMA.
+    await client.query(DEEDS_SCHEMA);
+    await client.query(ACCOUNT_LEDGER_SCHEMA);
     // The $WOC custody mail overlay (server/mail_custody_overlay.ts): one
     // durable row per booked parcel until the next full mail-book write
     // bakes it. No FK on purpose: rows must survive character deletion long
@@ -3891,80 +3862,6 @@ export async function topLifetimeXp(
 }
 
 // ---------------------------------------------------------------------------
-// Guild high-score board: ranks guilds by the SUM of every member's lifetimeXp.
-// Aggregate JOIN of guilds -> guild_members -> characters (all in this pool); an
-// INNER JOIN drops guilds with no seated members. Realm-scoped (the in-game
-// panel) or global (cross-realm), mirroring topLifetimeXp. Read through the
-// server-side cache in main.ts, never run per request under load.
-// ---------------------------------------------------------------------------
-
-export interface GuildLeaderRow {
-  name: string;
-  realm: string;
-  memberCount: number;
-  totalLifetimeXp: number;
-  topLevel: number;
-  // Guild pledge board recruiting status (docs/prd/guild-pledge-board.md),
-  // shown per row on the high-score board so aspirants know who is looking.
-  pledgesEnabled: boolean;
-  pledgeMinLevel: number;
-  pledgeNote: string;
-}
-
-export async function topGuilds(
-  limit = 100,
-  opts: { global?: boolean } = {},
-): Promise<GuildLeaderRow[]> {
-  // Capped at LEADERBOARD_MAX (1000) like the player board, so a realm with many
-  // guilds is fully ranked through the cached window.
-  const cap = Math.max(1, Math.min(LEADERBOARD_MAX, limit));
-  const selectAgg = `g.name, g.realm, g.pledges_enabled, g.pledge_min_level, g.pledge_note,
-                COUNT(gm.character_id)                                AS member_count,
-                COALESCE(SUM(COALESCE((c.state->>'lifetimeXp')::bigint, 0)), 0) AS total_lifetime_xp,
-                COALESCE(MAX(COALESCE((c.state->>'level')::int, 0)), 0)         AS top_level`;
-  // The eligibility predicate applies to the MEMBER characters inside the SUM:
-  // a banned or suspended member's XP stops inflating the guild score (and its
-  // seat leaves member_count) without delisting the whole guild. A guild whose
-  // every member is ineligible drops off the board like any empty guild.
-  const fromJoin = `FROM guilds g
-           JOIN guild_members gm ON gm.guild_id = g.id
-           JOIN characters c ON c.id = gm.character_id
-            AND EXISTS (SELECT 1 FROM accounts a
-                         WHERE a.id = c.account_id AND ${ELIGIBLE_ACCOUNT_SQL})`;
-  const groupOrder = `GROUP BY g.id, g.name, g.realm
-          ORDER BY total_lifetime_xp DESC, member_count DESC, g.name ASC`;
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    opts.global
-      ? query(
-          `SELECT ${selectAgg}
-           ${fromJoin}
-          WHERE c.state IS NOT NULL
-          ${groupOrder}
-          LIMIT $1`,
-          [cap],
-        )
-      : query(
-          `SELECT ${selectAgg}
-           ${fromJoin}
-          WHERE g.realm = $1 AND c.state IS NOT NULL
-          ${groupOrder}
-          LIMIT $2`,
-          [REALM, cap],
-        ),
-  );
-  return res.rows.map((r) => ({
-    name: r.name,
-    realm: r.realm,
-    memberCount: Number(r.member_count),
-    totalLifetimeXp: Number(r.total_lifetime_xp),
-    topLevel: Number(r.top_level),
-    pledgesEnabled: !!r.pledges_enabled,
-    pledgeMinLevel: Number(r.pledge_min_level) || 1,
-    pledgeNote: typeof r.pledge_note === 'string' ? r.pledge_note : '',
-  }));
-}
-
-// ---------------------------------------------------------------------------
 // Renown board read (the account-level deeds leaderboard). Renown values are
 // content-owned (server/deeds_board.ts doctrine: never stored in SQL, so a
 // rebalance needs no migration), so the caller passes the whole content table
@@ -4121,162 +4018,16 @@ export {
   CLIENT_PERF_WORST10S_INVALID_INDEX_DROP_SQL,
 } from './client_perf_indexes';
 
-export interface ClientPerfReportInsert {
-  schemaVersion: number;
-  releaseVersion: string;
-  buildId: string;
-  sessionId: string;
-  accountId: number | null;
-  characterId: number | null;
-  realm: string;
-  graphicsPreset: string;
-  gfxTier: string;
-  autoGovernor: boolean;
-  shaderWarmWorkerActive: boolean;
-  shaderWarmRefusal: string;
-  targetFps: number;
-  renderScale: number;
-  effectiveRenderScale: number;
-  fpsAvg: number;
-  frameP95Ms: number;
-  frameP99Ms: number;
-  longFrameCount: number;
-  rendererCalls: number;
-  rendererTriangles: number;
-  rendererTextures: number;
-  rendererPrograms: number;
-  contextLostCount: number;
-  longTaskCount: number;
-  longTaskP95Ms: number;
-  memoryUsedMb: number | null;
-  memoryLimitMb: number | null;
-  dpr: number;
-  viewportBucket: string;
-  deviceMemory: number | null;
-  hardwareConcurrency: number;
-  mobileTouch: boolean;
-  browserFamily: string;
-  osFamily: string;
-  glVendor: string;
-  glRendererBucket: string;
-  glBackend: string;
-  glRendererRaw: string;
-  glModel: string;
-  glLaptop: boolean | null;
-  gpuHpAdapter: string;
-  zoneOrScenario: string;
-  source: string;
-  crowdBucket: string;
-  simEntities: number;
-  activeViews: number;
-  visibleViews: number;
-  worst10sFrameP95Ms: number;
-  suggestionIds: string[];
-  rawSummary: Record<string, unknown>;
-}
-
-export async function insertClientPerfReport(row: ClientPerfReportInsert): Promise<void> {
-  await pool.query(
-    `INSERT INTO client_perf_reports (
-       schema_version, release_version, build_id, session_id, account_id, character_id, realm,
-       graphics_preset, gfx_tier, auto_governor, target_fps, render_scale, effective_render_scale,
-       fps_avg, frame_p95_ms, frame_p99_ms, long_frame_count,
-       renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
-       long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
-       dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_backend, zone_or_scenario, source,
-       crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
-       suggestion_ids, raw_summary,
-       gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
-       shader_warm_worker_active, shader_warm_refusal
-     ) VALUES (
-       $1, $2, $3, $4, $5, $6, $7,
-       $8, $9, $10, $11, $12, $13,
-       $14, $15, $16, $17,
-       $18, $19, $20, $21, $22,
-       $23, $24, $25, $26,
-       $27, $28, $29, $30, $31, $32, $33, $34, $35, $36, $37, $38,
-       $39, $40, $41, $42, $43,
-       $44, $45, $46, $47, $48, $49, $50, $51
-     )`,
-    [
-      row.schemaVersion,
-      row.releaseVersion,
-      row.buildId,
-      row.sessionId,
-      row.accountId,
-      row.characterId,
-      row.realm,
-      row.graphicsPreset,
-      row.gfxTier,
-      row.autoGovernor,
-      row.targetFps,
-      row.renderScale,
-      row.effectiveRenderScale,
-      row.fpsAvg,
-      row.frameP95Ms,
-      row.frameP99Ms,
-      row.longFrameCount,
-      row.rendererCalls,
-      row.rendererTriangles,
-      row.rendererTextures,
-      row.rendererPrograms,
-      row.contextLostCount,
-      row.longTaskCount,
-      row.longTaskP95Ms,
-      row.memoryUsedMb,
-      row.memoryLimitMb,
-      row.dpr,
-      row.viewportBucket,
-      row.deviceMemory,
-      row.hardwareConcurrency,
-      row.mobileTouch,
-      row.browserFamily,
-      row.osFamily,
-      row.glVendor,
-      row.glRendererBucket,
-      row.glBackend,
-      row.zoneOrScenario,
-      row.source,
-      row.crowdBucket,
-      row.simEntities,
-      row.activeViews,
-      row.visibleViews,
-      row.worst10sFrameP95Ms,
-      row.suggestionIds,
-      JSON.stringify(row.rawSummary),
-      row.glRendererRaw,
-      row.glModel,
-      row.glLaptop,
-      row.gpuHpAdapter,
-      row.shaderWarmWorkerActive,
-      row.shaderWarmRefusal,
-    ],
-  );
-}
-
-// Keeps production telemetry bounded. PERF_REPORT_RETENTION_DAYS=0 disables
-// pruning for a short manual capture window. One bounded batch per call: the
-// caller (the retention sweep) drives iteration, so each DELETE is a short
-// autocommit statement on the default statement timeout, riding
-// client_perf_reports_created via the oldest-first ORDER BY.
-export async function pruneClientPerfReportsBatch(
-  retentionDays: number,
-  batchSize: number,
-): Promise<number> {
-  if (!Number.isFinite(retentionDays) || retentionDays <= 0) return 0;
-  const days = Math.max(1, Math.floor(retentionDays));
-  const res = await pool.query(
-    `DELETE FROM client_perf_reports
-      WHERE id IN (
-        SELECT id FROM client_perf_reports
-         WHERE created_at < now() - ($1 || ' days')::interval
-         ORDER BY created_at
-         LIMIT $2)`,
-    [String(days), Math.max(1, Math.floor(batchSize))],
-  );
-  return res.rowCount ?? 0;
-}
+// The insert and the retention prune moved whole to
+// server/client_perf_reports_db.ts (the monolith ratchet: db.ts pays for
+// growth by extraction, the same split as character_lease_db.ts); the DDL
+// already lived in client_perf_reports_schema.ts. Re-exported so no caller or
+// test double re-points.
+export {
+  type ClientPerfReportInsert,
+  insertClientPerfReport,
+  pruneClientPerfReportsBatch,
+} from './client_perf_reports_db';
 
 // ---------------------------------------------------------------------------
 // World state: a tiny key→JSONB store for shared, global game state that isn't

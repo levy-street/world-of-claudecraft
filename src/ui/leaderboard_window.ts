@@ -42,6 +42,20 @@ import { buildGuildLeaderboardView, type GuildLeaderboardRow } from './guild_lea
 import { guildTagHtml } from './guild_tag';
 import { formatNumber, t } from './i18n';
 import {
+  dailyPodiumSlot,
+  deedsPodiumSlot,
+  devPodiumSlot,
+  guildPodiumSlot,
+  playersPodiumSlot,
+} from './leaderboard_board_html';
+import { type PodiumSlotHtml, podiumHtml } from './leaderboard_podium_html';
+import {
+  guildStandingRow,
+  playersStandingBar,
+  podiumSplit,
+  viewerRowOnPage,
+} from './leaderboard_podium_view';
+import {
   buildLeaderboardView,
   type LeaderboardPager,
   type LeaderboardRow,
@@ -239,10 +253,12 @@ export class LeaderboardWindow {
     if (view.kind !== 'ranked') return;
     // Mirror the server's clamped page back into the pager state.
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
     body.innerHTML =
+      this.podiumHtml(split.podium.map((slot) => playersPodiumSlot(slot, deedTitleText))) +
       this.headerHtml() +
-      view.rows.map((r) => this.rowHtml(r)).join('') +
-      this.stickyHtml(view.standing) +
+      split.listed.map((r) => this.rowHtml(r)).join('') +
+      this.stickyHtml(playersStandingBar(view.rows, view.standing)) +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -286,9 +302,13 @@ export class LeaderboardWindow {
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
+    const ownGuild = guildStandingRow(view.rows, world.player.guild);
     body.innerHTML =
+      this.podiumHtml(split.podium.map((slot) => guildPodiumSlot(slot, world.player.guild))) +
       this.guildHeaderHtml() +
-      view.rows.map((r) => this.guildRowHtml(r)).join('') +
+      split.listed.map((r) => this.guildRowHtml(r)).join('') +
+      this.standingHtml(ownGuild ? this.guildRowHtml(ownGuild) : '') +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -337,10 +357,12 @@ export class LeaderboardWindow {
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
     body.innerHTML =
       this.deedsScopeNoteHtml() +
+      this.podiumHtml(split.podium.map((slot) => deedsPodiumSlot(slot, deedTitleText))) +
       this.deedsHeaderHtml() +
-      view.rows.map((r) => this.deedsRowHtml(r)).join('') +
+      split.listed.map((r) => this.deedsRowHtml(r)).join('') +
       this.deedsSelfHtml(view.self) +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
@@ -385,9 +407,13 @@ export class LeaderboardWindow {
     }
     if (view.kind !== 'ranked') return;
     this.page = view.page;
+    const split = podiumSplit(view.page, view.rows, (row) => row.rank);
+    const ownDev = viewerRowOnPage(view.rows);
     body.innerHTML =
+      this.podiumHtml(split.podium.map(devPodiumSlot)) +
       this.devHeaderHtml() +
-      view.rows.map((r) => this.devRowHtml(r)).join('') +
+      split.listed.map((r) => this.devRowHtml(r)).join('') +
+      this.standingHtml(ownDev ? this.devRowHtml(ownDev) : '') +
       this.pagerHtml(view.pager);
     this.wirePager(body as HTMLElement, focus);
   }
@@ -420,10 +446,14 @@ export class LeaderboardWindow {
       return;
     }
     this.page = result.page;
+    const split = podiumSplit(result.page, result.leaders, (row) => row.rank);
+    const ownDaily = viewerRowOnPage(result.leaders);
     body.innerHTML =
       this.dailyTotalHtml(result.total) +
+      this.podiumHtml(split.podium.map(dailyPodiumSlot)) +
       this.dailyHeaderHtml() +
-      result.leaders.map((r) => this.dailyRowHtml(r)).join('') +
+      split.listed.map((r) => this.dailyRowHtml(r)).join('') +
+      this.standingHtml(ownDaily ? this.dailyRowHtml(ownDaily) : '') +
       this.pagerHtml(
         result.pageCount > 1
           ? {
@@ -442,9 +472,9 @@ export class LeaderboardWindow {
   private titleHtml(realm: string): string {
     const realmTag = realm ? ` &middot; ${esc(realm)}` : '';
     return (
-      `<div class="panel-title"><span id="leaderboard-title">${esc(t('game.leaderboard.title'))} ` +
-      `<span class="lb-subtitle">${esc(t('game.leaderboard.subtitle'))}${realmTag}</span></span>` +
-      `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.leaderboard.close'))}">${svgIcon('close')}</button></div>`
+      `<div class="panel-title ui-win-head"><span id="leaderboard-title" class="ui-win-title">${esc(t('game.leaderboard.title'))} ` +
+      `<span class="lb-subtitle ui-win-sub">${esc(t('game.leaderboard.subtitle'))}${realmTag}</span></span>` +
+      `<button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.leaderboard.close'))}">${svgIcon('close')}</button></div>`
     );
   }
 
@@ -456,7 +486,7 @@ export class LeaderboardWindow {
   // src/styles/components.css). It is emitted here, not stamped once at open,
   // because every render() rebuilds the window's innerHTML from scratch.
   private loadingBodyHtml(): string {
-    return `<div class="lb-body window-fill" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
+    return `<div class="lb-body window-fill ui-card" id="lb-body-panel" role="tabpanel"><div class="lb-loading" role="status" aria-busy="true">${esc(t('game.leaderboard.loading'))}</div></div>`;
   }
 
   // The Players / Guilds / Daily tab bar. A WAI-ARIA role=tablist with roving
@@ -467,13 +497,13 @@ export class LeaderboardWindow {
     const tab = (board: LeaderboardBoard, label: string): string => {
       const active = this.board === board;
       return (
-        `<button type="button" role="tab" class="lb-tab${active ? ' lb-tab-active' : ''}" ` +
+        `<button type="button" role="tab" class="lb-tab ui-tab${active ? ' lb-tab-active' : ''}" ` +
         `data-leaderboard-tab="${board}" aria-selected="${active ? 'true' : 'false'}" ` +
         `tabindex="${active ? '0' : '-1'}" aria-controls="lb-body-panel">${esc(label)}</button>`
       );
     };
     return (
-      `<div class="lb-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
+      `<div class="lb-tabs ui-tabs" role="tablist" aria-label="${esc(t('hudChrome.leaderboard.tabsLabel'))}">` +
       tab('players', t('hudChrome.leaderboard.tabPlayers')) +
       tab('guilds', t('hudChrome.leaderboard.tabGuilds')) +
       tab('deeds', t('hudChrome.deeds.lbTab')) +
@@ -637,7 +667,7 @@ export class LeaderboardWindow {
             renown: formatNumber(self.renown, { maximumFractionDigits: 0 }),
           })
         : t('hudChrome.deeds.lbSelfRank', { rank, percent });
-    return `<div class="lb-self">${esc(line)}</div>`;
+    return `<div class="lb-self lb-standing">${esc(line)}</div>`;
   }
 
   private dailyHeaderHtml(): string {
@@ -667,7 +697,7 @@ export class LeaderboardWindow {
     // &starf; renders the prestige star without a literal symbol glyph in source.
     const star =
       r.prestigeRank > 0
-        ? `<span class="lb-prestige" title="${esc(`${t('game.prestige.rank')} ${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}`)}">&starf;${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}</span> `
+        ? `<span class="lb-prestige" title="${esc(t('hudChrome.leaderboard.prestigeTitle', { rank: formatNumber(r.prestigeRank, { maximumFractionDigits: 0 }) }))}">&starf;${formatNumber(r.prestigeRank, { maximumFractionDigits: 0 })}</span> `
         : '';
     const title = r.knownClass ? ` title="${esc(classDisplayName(r.cls))}"` : '';
     const you = r.me ? ` <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span>` : '';
@@ -683,21 +713,47 @@ export class LeaderboardWindow {
     );
   }
 
-  // The sticky "your standing" row, shown when the viewer is off the visible page.
+  // The sticky "your standing" pill: the viewer's ranked row when it is on this
+  // page, else their off-page standing with the placeholder rank. The compact
+  // pill hides the level, virtual level and title cells; they stay in the
+  // markup so the row keeps the players grid variant the source pins read.
   // &mdash; is the unranked-rank placeholder, kept as an entity so the source
   // carries no literal em dash (project style rule).
-  private stickyHtml(standing: LeaderboardStanding | null): string {
+  private stickyHtml(standing: (LeaderboardStanding & { rank: number | null }) | null): string {
     if (!standing) return '';
+    const rankCell =
+      standing.rank === null
+        ? '&mdash;'
+        : formatNumber(standing.rank, { maximumFractionDigits: 0 });
     // The Renown-tab title-cell treatment, mirroring rowHtml: a deed id in the
     // view-model, localized here; '' (untitled/stale) renders an empty cell.
     const deedTitle = standing.title ? deedTitleText(standing.title) : '';
     return (
-      `<div class="lb-sticky"><div class="lb-row lb-row-players lb-mine"><span class="lb-rank">&mdash;</span>` +
+      `<div class="lb-sticky lb-standing">${this.standingLabelHtml()}<div class="lb-row lb-row-players lb-mine"><span class="lb-rank">${rankCell}</span>` +
       `<span class="lb-name">${esc(standing.name)}${guildTagHtml(standing.guild, 'lb-guild')} <span class="lb-you">(${esc(t('game.leaderboard.you'))})</span></span>` +
       `<span class="lb-lvl">${formatNumber(standing.level, { maximumFractionDigits: 0 })}</span><span class="lb-vlvl">${formatNumber(standing.virtualLevel, { maximumFractionDigits: 0 })}</span>` +
       `<span class="lb-xp">${formatXp(standing.lifetimeXp)}</span>` +
       `<span class="lb-deed-title">${esc(deedTitle)}</span></div></div>`
     );
+  }
+
+  // The shared top-three podium (leaderboard_podium_html.ts), first page only.
+  private podiumHtml(slots: PodiumSlotHtml[]): string {
+    return podiumHtml(slots, t('hudChrome.leaderboard.podiumLabel'));
+  }
+
+  // The viewer's own row pinned under the list, in the sticky standing bar the
+  // players tab uses; '' when the viewer is not on this page.
+  private standingHtml(rowHtml: string): string {
+    return rowHtml
+      ? `<div class="lb-sticky lb-standing">${this.standingLabelHtml()}${rowHtml}</div>`
+      : '';
+  }
+
+  // The compact bar's lead-in ("Your Standing"), so the pinned row reads as the
+  // viewer's own summary and not as a repeated ladder row.
+  private standingLabelHtml(): string {
+    return `<span class="lb-standing-label">${esc(t('game.leaderboard.yourRank'))}</span>`;
   }
 
   // Prev/Next pager, mirroring the World Market browse pager (it reuses the same
@@ -709,9 +765,9 @@ export class LeaderboardWindow {
     const status = t('itemUi.market.pageStatus', { current, total });
     return (
       `<div class="lb-pager">` +
-      `<button type="button" class="lb-page-btn" data-leaderboard-page="prev"${pager.prevDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pagePrev'))}</button>` +
+      `<button type="button" class="lb-page-btn ui-btn" data-leaderboard-page="prev"${pager.prevDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pagePrev'))}</button>` +
       `<span class="lb-page-status">${esc(status)}</span>` +
-      `<button type="button" class="lb-page-btn" data-leaderboard-page="next"${pager.nextDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pageNext'))}</button>` +
+      `<button type="button" class="lb-page-btn ui-btn" data-leaderboard-page="next"${pager.nextDisabled ? ' disabled' : ''}>${esc(t('itemUi.market.pageNext'))}</button>` +
       `</div>`
     );
   }

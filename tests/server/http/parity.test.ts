@@ -141,6 +141,14 @@ const API_REQUEST_CORPUS: readonly ApiRequestSpec[] = [
   // --- leaderboard payload shapes, empty cache (characterization block 4) ------
   { name: 'leaderboard_default', method: 'GET', url: '/api/leaderboard' },
   { name: 'leaderboard_guilds', method: 'GET', url: '/api/leaderboard?board=guilds' },
+  // ?category= (guild board categories): the legacy arm decodes the query with
+  // params.get and the RouteDef with firstQueryValue; both echo the applied
+  // category on the (empty-cache) body and must stay byte-identical.
+  {
+    name: 'leaderboard_guilds_category',
+    method: 'GET',
+    url: '/api/leaderboard?board=guilds&category=newPlayerFriendly',
+  },
   // ?board=devs (open-source contributor board, added by the release/v0.18.0 merge):
   // fetch is disabled in this harness so topContributors yields an empty snapshot on
   // BOTH passes, proving the migrated leaderboardHandler devs fork is byte-identical

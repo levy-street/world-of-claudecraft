@@ -254,7 +254,7 @@ function grantFateThreads(ctx: SimContext, warlock: Entity, stacks: number): voi
 export function applyHourOfJudgment(
   ctx: SimContext,
   warlock: Entity,
-  target: Entity,
+  target: Entity | null,
   duration: number,
   doom: number,
   refund: number,
@@ -273,10 +273,12 @@ export function applyHourOfJudgment(
     sourceId: warlock.id,
     school: 'shadow',
   });
+  const fxTarget =
+    (target && !target.dead ? target : null) ?? primaryEye(ctx, warlock.id) ?? warlock;
   ctx.emit({
     type: 'spellfx',
     sourceId: warlock.id,
-    targetId: target.id,
+    targetId: fxTarget.id,
     school: 'shadow',
     fx: 'evilEyeGaze',
     ability: 'hour_of_judgment',
@@ -540,7 +542,11 @@ export function applyHexOfViolence(
   charges: number,
   doomPerProc: number,
   damage: number,
+  spellPowerBonus = 0,
+  interval = 2,
+  tickDoom = 2,
 ): void {
+  const totalDamage = damage + spellPowerBonus;
   ctx.applyAura(target, {
     id: 'hex_of_violence',
     name: 'Hex of Violence',
@@ -550,6 +556,10 @@ export function applyHexOfViolence(
     value: doomPerProc,
     value2: damage,
     charges,
+    tickInterval: interval,
+    tickTimer: interval,
+    tickDamage: totalDamage,
+    tickDoom,
     sourceId: warlock.id,
     school: 'shadow',
   });
@@ -908,6 +918,12 @@ export function clearAfflictionConsumeThreads(ctx: SimContext, warlock: Entity):
   if (threads) removeOwnedAura(ctx, warlock, threads);
 }
 
+export function hasAfflictionConsumePushbackImmunity(entity: Entity): boolean {
+  return entity.auras.some(
+    (aura) => aura.kind === 'affliction_consume_threads' && (aura.stacks ?? 0) >= FATE_THREAD_MAX,
+  );
+}
+
 export function afflictionConsumeThreadDoomBonus(warlock: Entity): number {
   const threads = warlock.auras.find(
     (aura) => aura.kind === 'affliction_consume_threads' && aura.sourceId === warlock.id,
@@ -972,18 +988,6 @@ export function afflictionTargetCastError(
     return 'That ability is not ready yet.';
   }
   if (
-    ability.id === 'possess_evil_eye' &&
-    !target?.auras.some((aura) => aura.kind === 'affliction_eye' && aura.sourceId === player.id)
-  ) {
-    return 'That ability is not ready yet.';
-  }
-  if (
-    ability.id === 'hour_of_judgment' &&
-    !target?.auras.some((aura) => aura.kind === 'affliction_eye' && aura.sourceId === player.id)
-  ) {
-    return 'That ability is not ready yet.';
-  }
-  if (
     ability.id === 'litany_of_guilt' &&
     !target?.auras.some((aura) => aura.kind === 'affliction_eye' && aura.sourceId === player.id)
   ) {
@@ -1014,6 +1018,38 @@ export function tickAfflictionAura(ctx: SimContext, target: Entity, aura: Aura, 
     // or the marked enemy is not yet engaged, keep a full attack timer banked.
     aura.tickTimer = interval + dt;
   }
+}
+
+export function tickHexOfViolence(ctx: SimContext, target: Entity, aura: Aura): void {
+  if (target.dead) return;
+  const warlock = ctx.entities.get(aura.sourceId);
+  if (!warlock || warlock.dead) return;
+  const marked = eyeAura(target, warlock.id);
+  const doomGain = aura.tickDoom ?? 2;
+  gainDoom(ctx, warlock, marked ? eyeGeneration(marked, doomGain, warlock) : doomGain);
+  ctx.emit({
+    type: 'spellfx',
+    sourceId: warlock.id,
+    targetId: target.id,
+    school: 'shadow',
+    fx: 'tick',
+  });
+  const tickDmg = aura.tickDamage ?? aura.value2 ?? 16;
+  ctx.dealDamage(
+    warlock,
+    target,
+    tickDmg,
+    false,
+    'shadow',
+    aura.name,
+    'hit',
+    true,
+    undefined,
+    false,
+    false,
+    false,
+    'hex_of_violence',
+  );
 }
 
 /**
@@ -1085,12 +1121,6 @@ export function onAfflictionDamage(
       false,
       'hex_of_violence',
     );
-  }
-  for (let index = source.auras.length - 1; index >= 0; index--) {
-    const aura = source.auras[index];
-    if (aura.kind === 'affliction_violence' && (aura.charges ?? 0) <= 0) {
-      removeOwnedAura(ctx, source, aura);
-    }
   }
 
   for (const accomplice of source.auras) {

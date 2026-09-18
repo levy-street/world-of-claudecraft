@@ -18,6 +18,7 @@ import type { CrossHotbarOverlayState } from './cross_hotbar_view';
 const DISPLAY_SHOWN = '';
 const DISPLAY_HIDDEN = 'none';
 const CLASS_EXPANDED = 'xhb-expanded';
+const CLASS_ACTIVE = 'xhb-active';
 // Marks the half a held trigger has armed. Both halves stay visible either way:
 // the bar shows the whole set, and this only says which one a press will fire.
 const CLASS_HALF_ARMED = 'xhb-armed';
@@ -52,6 +53,7 @@ export class CrossHotbarPainter {
     if (!state.visible) return;
 
     this.writers.toggleClass(this.descriptor.root, CLASS_EXPANDED, state.expanded);
+    this.writers.toggleClass(this.descriptor.root, CLASS_ACTIVE, state.activeLayer !== null);
     this.writers.toggleClass(
       this.descriptor.leftHalf,
       CLASS_HALF_ARMED,

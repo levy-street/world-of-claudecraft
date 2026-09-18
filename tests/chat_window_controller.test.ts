@@ -54,6 +54,7 @@ interface Harness {
   storage: MemoryStorage;
   sent: string[];
   errors: string[];
+  activateContextAction(action: string): void;
   shownPanes: HTMLElement[];
 }
 
@@ -74,6 +75,7 @@ function makeHarness(
   const errors: string[] = [];
   const shownPanes: HTMLElement[] = [];
   let opener: HTMLElement | null = null;
+  let handleContextAction: (action: string) => void = () => {};
   const contextMenu: ChatContextMenuPort = {
     element: menu as unknown as HTMLElement,
     opener: () => opener,
@@ -85,7 +87,9 @@ function makeHarness(
       opener = null;
     },
     place: () => {},
-    bind: () => {},
+    bind: (onActivate) => {
+      handleContextAction = onActivate;
+    },
   };
   const controller = new ChatWindowController({
     document: document as unknown as Document,
@@ -103,9 +107,21 @@ function makeHarness(
     selectedQuestId: () => selectedQuest,
     hasQuest: (questId) => questId === 'q_wolves' || questId === ODD_QUEST_ID,
     showError: (text) => errors.push(text),
+    openWhoTab: () => false,
     afterTabShown: (pane) => shownPanes.push(pane),
   });
-  return { controller, document, input, chatLog, combatLog, storage, sent, errors, shownPanes };
+  return {
+    controller,
+    document,
+    input,
+    chatLog,
+    combatLog,
+    storage,
+    sent,
+    errors,
+    shownPanes,
+    activateContextAction: (action) => handleContextAction(action),
+  };
 }
 
 function tabsBar(harness: Harness): FakeElement {
@@ -153,6 +169,61 @@ describe('ChatWindowController', () => {
     expect(harness.input.style.color).toBe('#ff9d5c');
   });
 
+  it('uses tab primitives and clears an inactive channel unread badge when selected', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["party"]' });
+    harness.controller.init();
+
+    const party = tabButton(harness, 'party');
+    expect(tabButton(harness, 'all').classList.contains('ui-tab')).toBe(true);
+    expect(party.classList.contains('ui-tab')).toBe(true);
+    expect(addButton(harness).classList.contains('ui-tab--add')).toBe(true);
+
+    const first = harness.document.createElement('div');
+    const second = harness.document.createElement('div');
+    harness.controller.hideIfFiltered(first as unknown as HTMLElement, 'party');
+    harness.controller.hideIfFiltered(second as unknown as HTMLElement, 'party');
+
+    const badge = party.children.find((child) => child.classList.contains('ui-badge'));
+    expect(badge?.textContent).toBe('2');
+    expect(badge?.getAttribute('aria-hidden')).toBe('true');
+
+    party.dispatchEvent(new Event('click'));
+
+    expect(party.children.some((child) => child.classList.contains('ui-badge'))).toBe(false);
+
+    const activeLine = harness.document.createElement('div');
+    harness.controller.hideIfFiltered(activeLine as unknown as HTMLElement, 'party');
+    expect(party.children.some((child) => child.classList.contains('ui-badge'))).toBe(false);
+  });
+
+  it('preserves unread counts across reorder and discards them when a channel closes', () => {
+    const harness = makeHarness({ woc_chat_tabs: '["party","world"]' });
+    harness.controller.init();
+
+    for (let i = 0; i < 2; i += 1) {
+      const line = harness.document.createElement('div');
+      harness.controller.hideIfFiltered(line as unknown as HTMLElement, 'party');
+    }
+
+    tabButton(harness, 'party').dispatchEvent(keydown('ArrowRight', true));
+
+    const reorderedParty = tabButton(harness, 'party');
+    expect(
+      reorderedParty.children.find((child) => child.classList.contains('ui-badge'))?.textContent,
+    ).toBe('2');
+
+    reorderedParty.dispatchEvent(new Event('contextmenu', { cancelable: true }));
+    const closedLine = harness.document.createElement('div');
+    harness.controller.hideIfFiltered(closedLine as unknown as HTMLElement, 'party');
+
+    addButton(harness).dispatchEvent(new Event('click'));
+    harness.activateContextAction('party');
+
+    expect(
+      tabButton(harness, 'party').children.some((child) => child.classList.contains('ui-badge')),
+    ).toBe(false);
+  });
+
   it('reports the visible pane after activating a tab', () => {
     const harness = makeHarness();
     harness.controller.init();
@@ -190,18 +261,41 @@ describe('ChatWindowController', () => {
     expect(harness.controller.composeSend('[Thin the Pack]')).toBe('/say [Thin the Pack]');
   });
 
+  it('routes /who to the Social window Who tab online, and falls through offline', () => {
+    const harness = makeHarness();
+    harness.controller.init();
+    // offline: openWhoTab declines (the harness default), so the line is NOT
+    // consumed and reaches the world, where the Sim prints its classic line
+    expect(harness.controller.maybeHandleLocalChatCommand('/who Thornpeak')).toBe(false);
+    expect(harness.sent).toEqual([]);
+    // online: the tab takes the trimmed filter and the line never reaches chat
+    const online = makeHarness();
+    const opened: string[] = [];
+    (online.controller as unknown as { deps: { openWhoTab(f: string): boolean } }).deps.openWhoTab =
+      (f) => {
+        opened.push(f);
+        return true;
+      };
+    online.controller.init();
+    expect(online.controller.maybeHandleLocalChatCommand('/who  Thornpeak ')).toBe(true);
+    expect(online.controller.maybeHandleLocalChatCommand('/WHO')).toBe(true);
+    expect(online.controller.maybeHandleLocalChatCommand('/whoa')).toBe(false);
+    expect(opened).toEqual(['Thornpeak', '']);
+    expect(online.sent).toEqual([]);
+  });
+
   it('handles quest sharing through the injected authoritative quest state', () => {
     const missing = makeHarness();
     missing.controller.init();
-    expect(missing.controller.maybeHandleQuestShareCommand('/share')).toBe(true);
+    expect(missing.controller.maybeHandleLocalChatCommand('/share')).toBe(true);
     expect(missing.sent).toEqual([]);
     expect(missing.errors).toHaveLength(1);
 
     const selected = makeHarness({}, 'q_wolves');
     selected.controller.init();
-    expect(selected.controller.maybeHandleQuestShareCommand('/share now')).toBe(true);
+    expect(selected.controller.maybeHandleLocalChatCommand('/share now')).toBe(true);
     expect(selected.sent).toEqual(['/p [[q:q_wolves]]']);
-    expect(selected.controller.maybeHandleQuestShareCommand('/party hello')).toBe(false);
+    expect(selected.controller.maybeHandleLocalChatCommand('/party hello')).toBe(false);
   });
 
   // #2459: three encode sites used to mint a token from an id the chat parser
@@ -254,7 +348,7 @@ describe('ChatWindowController', () => {
     harness.controller.init();
 
     // The command is still consumed (it is a /share), but nothing goes out.
-    expect(harness.controller.maybeHandleQuestShareCommand('/share')).toBe(true);
+    expect(harness.controller.maybeHandleLocalChatCommand('/share')).toBe(true);
     expect(harness.sent).toEqual([]);
     // Which string, spelled out: "can't be shared" is the truthful outcome, and
     // the sibling "select a quest" copy would be a lie here (one IS selected and

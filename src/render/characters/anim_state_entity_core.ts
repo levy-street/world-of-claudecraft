@@ -31,6 +31,7 @@ export function applyEntityAnimOverrides(
   e: AnimOverrideFacts,
   visuallyDead: boolean,
   characterEffects = 0,
+  stealthed = false,
 ): void {
   // Engaged with someone: a rig that ships a battle stance holds it between
   // swings instead of relaxing into its idle. Reading the aggro target (rather
@@ -39,6 +40,7 @@ export function applyEntityAnimOverrides(
   // same way. Players have no stance clip today, and they carry their selection
   // in targetId rather than aggroTargetId, so they are unaffected either way.
   st.combat = e.aggroTargetId !== null && !visuallyDead;
+  st.stealthed = stealthed && !visuallyDead;
   // Ice slide: the sim glides the player at speed but they should read as FROZEN
   // (gliding stiff on the ice), not sprinting. Suppress locomotion + airborne so
   // the state machine holds a static pose while they slide. Last, so it also
@@ -49,6 +51,7 @@ export function applyEntityAnimOverrides(
     st.running = false;
     st.airborne = false;
     st.combat = false;
+    st.stealthed = false;
   }
   // Impaled on a Nythraxis Bone Spike: the body lies pinned to the floor, so
   // the rig takes the DEATH pose while alive. `dead` is a level the visual
@@ -64,5 +67,6 @@ export function applyEntityAnimOverrides(
     st.running = false;
     st.airborne = false;
     st.combat = false;
+    st.stealthed = false;
   }
 }

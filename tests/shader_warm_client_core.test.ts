@@ -15,11 +15,14 @@ import {
   readShaderWarmQuery,
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
+  SHADER_WARM_AB_REFUSAL,
   SHADER_WARM_EVIDENCE_LINKS,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
+  SHADER_WARM_FAILED_PROGRAMS_KEPT,
   SHADER_WARM_FRAME_PERIOD_MS,
   SHADER_WARM_HOLD_WINDOW,
   SHADER_WARM_PAUSE_ABOVE_MS,
+  SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_RESUME_BELOW_MS,
   SHADER_WARM_SETTINGS,
   SHADER_WARM_TIMEOUT_BREAKER,
@@ -27,8 +30,10 @@ import {
   type ShaderWarmCannotServeInputs,
   type ShaderWarmPolicyInputs,
   type ShaderWarmRequestSource,
+  shaderWarmAbArmFor,
   shaderWarmCannotServe,
   shaderWarmDecision,
+  shaderWarmLinkEvidence,
   shaderWarmModeFor,
 } from '../src/render/shader_warm_client_core';
 
@@ -44,6 +49,7 @@ function policyInputs(overrides: Partial<ShaderWarmPolicyInputs> = {}): ShaderWa
     armed: true,
     priority: 20,
     imminent: false,
+    standingDown: false,
     liveViewPriority: LIVE_VIEW,
     actionablePriority: ACTIONABLE_VIEW,
     ...overrides,
@@ -60,6 +66,7 @@ describe('shaderWarmDecision', () => {
   const bypasses: Array<[ShaderWarmBypass, Partial<ShaderWarmPolicyInputs>]> = [
     ['mode-off', { mode: 'off' }],
     ['unavailable', { available: false }],
+    ['standing-down', { standingDown: true }],
     ['before-reveal', { armed: false }],
     ['actionable', { priority: ACTIONABLE_VIEW }],
     ['imminent', { imminent: true }],
@@ -116,6 +123,17 @@ describe('shaderWarmDecision', () => {
       hold: false,
       bypass: 'unavailable',
     });
+    // Standing down after a release is the worker's state, not the gate's:
+    // it names the bypass before anything about the gate itself.
+    expect(shaderWarmDecision(policyInputs({ standingDown: true, available: false }))).toEqual({
+      hold: false,
+      bypass: 'unavailable',
+    });
+    expect(
+      shaderWarmDecision(
+        policyInputs({ standingDown: true, armed: false, priority: ACTIONABLE_VIEW }),
+      ),
+    ).toEqual({ hold: false, bypass: 'standing-down' });
     expect(shaderWarmDecision(policyInputs({ armed: false, priority: ACTIONABLE_VIEW }))).toEqual({
       hold: false,
       bypass: 'before-reveal',
@@ -321,6 +339,7 @@ describe('createShaderWarmRequests', () => {
     for (const bypass of [
       'mode-off',
       'unavailable',
+      'standing-down',
       'before-reveal',
       'actionable',
       'live-view',
@@ -337,6 +356,7 @@ describe('createShaderWarmRequests', () => {
     expect(stats.bypassed).toEqual({
       'mode-off': 1,
       unavailable: 1,
+      'standing-down': 1,
       'before-reveal': 1,
       actionable: 1,
       'live-view': 2,
@@ -383,26 +403,46 @@ describe('createShaderWarmRequests', () => {
     requests.noteLink(140);
     requests.noteLink(30);
     requests.noteLink(-5);
+    // A garbage wall is dropped: one NaN in the sum would silence the rule.
+    requests.noteLink(Number.NaN);
 
     const stats = requests.stats();
     expect(stats.dryAssembleMs).toBe(10.5);
     expect(stats.links).toEqual({ count: 4, sumMs: 182, maxMs: 140 });
+    expect(stats.censoredLinks).toEqual({ count: 0, sumMs: 0, maxMs: 0 });
+  });
+
+  it('keeps the links the worker gave up on apart from the ones it settled', () => {
+    // A deadline is a lower bound on the wall, never a link time: a capture
+    // that read them as one block would report a mean the worker never paid.
+    const requests = createShaderWarmRequests();
+    requests.noteLink(40);
+    requests.noteCensoredLink(4_000);
+    requests.noteCensoredLink(4_010);
+    requests.noteCensoredLink(-1);
+    // A garbage wall is dropped, not clamped: this sum decides a retirement.
+    requests.noteCensoredLink(Number.NaN);
+    expect(requests.stats().links).toEqual({ count: 1, sumMs: 40, maxMs: 40 });
+    expect(requests.stats().censoredLinks).toEqual({ count: 3, sumMs: 8_010, maxMs: 4_010 });
   });
 
   it('hands out a copy of its counters, so a reader cannot move them', () => {
     const requests = createShaderWarmRequests();
     requests.noteBypass('actionable');
     requests.noteLink(20);
+    requests.noteCensoredLink(4_000);
     const stats = requests.stats();
     stats.held = 99;
     stats.bypassed.actionable = 99;
-    // The link block is nested: a shallow copy would hand out the live one.
+    // The link blocks are nested: a shallow copy would hand out the live ones.
     stats.links.count = 99;
     stats.links.maxMs = 99;
+    stats.censoredLinks.count = 99;
 
     expect(requests.stats()).toMatchObject({ held: 0 });
     expect(requests.stats().bypassed.actionable).toBe(1);
     expect(requests.stats().links).toEqual({ count: 1, sumMs: 20, maxMs: 20 });
+    expect(requests.stats().censoredLinks).toEqual({ count: 1, sumMs: 4_000, maxMs: 4_000 });
   });
 });
 
@@ -433,6 +473,136 @@ describe('the breaker the client retires a worker on', () => {
     expect(ring.expired()).toBe(1);
     ring.note(false);
     expect(ring.expired()).toBe(0);
+  });
+
+  it('pins how many cannot-serve releases retire the worker', () => {
+    // A release ends the held gates of one burst and keeps the worker; the
+    // same count as the wedged rule turns repeated bursts into a retirement.
+    expect(SHADER_WARM_RELEASE_BREAKER).toBe(3);
+  });
+});
+
+describe('the A/B arm (the D3D11 experiment)', () => {
+  const D3D11 = { setting: 'auto', backend: 'd3d11', platform: 'other' } as const;
+
+  it('draws only where auto would start the worker, and stores what it drew', () => {
+    expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => 0.2 })).toEqual({
+      arm: 'off',
+      store: 'off',
+    });
+    expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => 0.7 })).toEqual({
+      arm: 'on',
+      store: 'on',
+    });
+    // The boundary belongs to the on arm: half open below one half.
+    expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => 0.5 }).arm).toBe('on');
+    expect(SHADER_WARM_AB_REFUSAL).toBe('ab:off');
+  });
+
+  it('reads a stored arm back without drawing again', () => {
+    let draws = 0;
+    const random = () => {
+      draws++;
+      return 0.2;
+    };
+    expect(shaderWarmAbArmFor({ ...D3D11, stored: 'on', random })).toEqual({
+      arm: 'on',
+      store: null,
+    });
+    expect(shaderWarmAbArmFor({ ...D3D11, stored: 'off', random })).toEqual({
+      arm: 'off',
+      store: null,
+    });
+    expect(draws).toBe(0);
+    // A stored value the experiment never wrote is drawn over.
+    expect(shaderWarmAbArmFor({ ...D3D11, stored: 'maybe', random })).toEqual({
+      arm: 'off',
+      store: 'off',
+    });
+  });
+
+  it('never draws for an explicit setting, another backend, an unknown one, or iOS', () => {
+    const random = () => 0.2;
+    for (const setting of ['off', 'reveal', 'all'] as const) {
+      expect(shaderWarmAbArmFor({ ...D3D11, setting, stored: 'off', random })).toEqual({
+        arm: null,
+        store: null,
+      });
+    }
+    for (const backend of ['vulkan', 'metal', 'opengl', 'software', 'unknown', null] as const) {
+      expect(shaderWarmAbArmFor({ ...D3D11, backend, stored: null, random })).toEqual({
+        arm: null,
+        store: null,
+      });
+    }
+    expect(shaderWarmAbArmFor({ ...D3D11, platform: 'ios', stored: null, random })).toEqual({
+      arm: null,
+      store: null,
+    });
+  });
+
+  it('reads a random source that answers garbage as the on arm, the shipped behavior', () => {
+    for (const garbage of [Number.NaN, Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY]) {
+      expect(shaderWarmAbArmFor({ ...D3D11, stored: null, random: () => garbage })).toEqual({
+        arm: 'on',
+        store: 'on',
+      });
+    }
+  });
+});
+
+describe('what a release and a failed program leave in the book', () => {
+  it('answers a request outcome and its source key by id', async () => {
+    const requests = createShaderWarmRequests();
+    const { ids } = requests.request([source('a'), source('b')], 10);
+    expect(requests.outcomeOf(ids[0] ?? 0)).toBeNull();
+    requests.settle(ids[0] ?? 0, 'warmed');
+    expect(requests.outcomeOf(ids[0] ?? 0)).toBe('warmed');
+    expect(requests.outcomeOf(999)).toBeNull();
+    expect(requests.hashOf(ids[1] ?? 0)).toBe(
+      `${programSourceHash('b', 'precision highp float;')}|position`,
+    );
+    expect(requests.hashOf(999)).toBeNull();
+  });
+
+  it('counts a released hold as held, apart from the warm and the expired ones', () => {
+    const requests = createShaderWarmRequests();
+    requests.noteHeld(false, false, 300, true);
+    requests.noteHeld(false, true, 5_000);
+    requests.noteHeld(true, false, 100);
+    expect(requests.stats()).toMatchObject({
+      held: 3,
+      heldWarm: 1,
+      heldTimedOut: 1,
+      heldReleased: 1,
+      holdMs: 5_400,
+    });
+  });
+
+  it('keeps the first programs the worker failed, once each, with why', () => {
+    const requests = createShaderWarmRequests();
+    const sources = Array.from({ length: SHADER_WARM_FAILED_PROGRAMS_KEPT + 3 }, (_, index) =>
+      source(`v${index}`),
+    );
+    const { ids } = requests.request(sources, 10);
+    requests.noteFailedProgram(ids[0] ?? 0, 'link-failed');
+    // The same program failing again adds nothing.
+    requests.noteFailedProgram(ids[0] ?? 0, 'link-failed');
+    requests.noteFailedProgram(ids[1] ?? 0, 'link-deadline');
+    for (const id of ids.slice(2)) requests.noteFailedProgram(id, 'link-failed');
+    // An id the book never issued names nothing.
+    requests.noteFailedProgram(999, 'link-failed');
+    const failed = requests.stats().failedPrograms;
+    expect(SHADER_WARM_FAILED_PROGRAMS_KEPT).toBe(8);
+    expect(failed).toHaveLength(SHADER_WARM_FAILED_PROGRAMS_KEPT);
+    expect(failed[0]).toEqual({
+      hash: `${programSourceHash('v0', 'precision highp float;')}|position`,
+      reason: 'link-failed',
+    });
+    expect(failed[1]?.reason).toBe('link-deadline');
+    // A copy: a reader cannot move the book.
+    failed.length = 0;
+    expect(requests.stats().failedPrograms).toHaveLength(SHADER_WARM_FAILED_PROGRAMS_KEPT);
   });
 });
 
@@ -629,6 +799,49 @@ describe("the cannot-serve rule (the worker measured against the caller's cap)",
     expect(shaderWarmCannotServe(six)).toBe(false);
   });
 
+  it('stands on censored links once three of them exist and nothing settled', () => {
+    // The RTX 4060 Ti shape: no link ever settles, and every one the worker
+    // gave up on at its deadline is a lower bound on the wall. Three of those
+    // with nothing real to stand on is evidence; two is still one outlier
+    // short, the same floor the settled links get.
+    const blind = { ...LAPTOP, linkCount: 0, linkSumMs: 0 };
+    expect(shaderWarmCannotServe({ ...blind, censoredCount: 3, censoredSumMs: 12_000 })).toBe(true);
+    expect(shaderWarmCannotServe({ ...blind, censoredCount: 2, censoredSumMs: 8_000 })).toBe(false);
+    expect(shaderWarmCannotServe(blind)).toBe(false);
+    // And the evidence names its pool, so the cause can.
+    expect(shaderWarmLinkEvidence({ ...blind, censoredCount: 3, censoredSumMs: 12_000 })).toEqual({
+      count: 3,
+      sumMs: 12_000,
+      source: 'censored',
+    });
+    expect(shaderWarmLinkEvidence(LAPTOP)).toEqual({ count: 5, sumMs: 2_800, source: 'settled' });
+    // A garbage settled count is no evidence at all, censored or not.
+    expect(
+      shaderWarmLinkEvidence({
+        ...blind,
+        linkCount: Number.NaN,
+        censoredCount: 3,
+        censoredSumMs: 12_000,
+      }),
+    ).toBeNull();
+  });
+
+  it('prefers the settled links, and never mixes a censored sample into their mean', () => {
+    // Three real links at 50 ms and three deadlines: the worker's own wall is
+    // 50 ms and the queue fits, whatever a throttled tab did to three links.
+    const fast = { ...LAPTOP, linkCount: 3, linkSumMs: 150 };
+    expect(shaderWarmCannotServe({ ...fast, censoredCount: 3, censoredSumMs: 12_000 })).toBe(false);
+    // One settled link is enough to say the worker is not blind: the censored
+    // pool only speaks when NOTHING settled, and below the real floor the
+    // rule waits for a third real link as before. A tab throttled early and
+    // then foregrounded is the healthy case this protects.
+    const one = { ...LAPTOP, linkCount: 1, linkSumMs: 50 };
+    expect(shaderWarmCannotServe({ ...one, censoredCount: 3, censoredSumMs: 12_000 })).toBe(false);
+    // And a censored pool with no wall in it is no evidence either.
+    const blind = { ...LAPTOP, linkCount: 0, linkSumMs: 0 };
+    expect(shaderWarmCannotServe({ ...blind, censoredCount: 3, censoredSumMs: 0 })).toBe(false);
+  });
+
   it('never fires on an empty queue', () => {
     // Nothing ahead is nothing to wait for, whatever the wall.
     expect(shaderWarmCannotServe({ ...LAPTOP, aheadOfOldest: 0 })).toBe(false);
@@ -693,6 +906,70 @@ describe('the outstanding holds book', () => {
     holds.clear();
     expect(holds.size()).toBe(0);
     expect(holds.oldest()).toBeNull();
+  });
+
+  it('counts the wall time at least one hold was open, never once per hold', () => {
+    // Forty-four entry holds opened together and closed together are one
+    // wall span, not forty-four: the cost the A/B weighs is how long
+    // SOMETHING was hidden.
+    const holds = createShaderWarmOutstandingHolds();
+    const burst = Array.from({ length: 44 }, (_, index) =>
+      holds.open({ startedAtMs: 1_000, capMs: 5_000, priority: 20, highestId: index + 1 }, 1_000),
+    );
+    expect(holds.wallMs(1_400)).toBe(400);
+    for (const hold of burst) holds.close(hold, 2_000);
+    expect(holds.wallMs(9_000)).toBe(1_000);
+    // A gap with nothing open adds nothing; the next span adds its own.
+    const late = holds.open(
+      { startedAtMs: 5_000, capMs: 5_000, priority: 20, highestId: 99 },
+      5_000,
+    );
+    holds.close(late, 5_250);
+    expect(holds.wallMs(9_000)).toBe(1_250);
+    // A clear ends the span it interrupts, and a clock going backwards adds nothing.
+    holds.open({ startedAtMs: 6_000, capMs: 5_000, priority: 20, highestId: 100 }, 6_000);
+    holds.clear(6_100);
+    expect(holds.wallMs(9_000)).toBe(1_350);
+    holds.open({ startedAtMs: 7_000, capMs: 5_000, priority: 20, highestId: 101 }, 7_000);
+    holds.clear(6_900);
+    expect(holds.wallMs(6_900)).toBe(1_350);
+  });
+
+  it('hands every open hold to a release at once, and ends the wall span with them', () => {
+    const holds = createShaderWarmOutstandingHolds();
+    const first = holds.open({ startedAtMs: 10, capMs: 5_000, priority: 20, highestId: 1 }, 10);
+    const second = holds.open({ startedAtMs: 20, capMs: 5_000, priority: 20, highestId: 2 }, 20);
+    const released = holds.releaseAll(510);
+    expect(released).toEqual([first, second]);
+    expect(holds.size()).toBe(0);
+    expect(holds.oldest()).toBeNull();
+    expect(holds.wallMs(10_000)).toBe(500);
+    // A hold already released closes as a no-op when its promise settles later.
+    holds.close(first, 900);
+    expect(holds.wallMs(10_000)).toBe(500);
+  });
+
+  it('closes a released hold late without touching the hold opened after it', () => {
+    // The released hold's promise can settle while a newer hold is open: its
+    // close must neither drop that hold nor end its span.
+    const holds = createShaderWarmOutstandingHolds();
+    const released = holds.open({ startedAtMs: 0, capMs: 5_000, priority: 20, highestId: 1 }, 0);
+    holds.releaseAll(100);
+    const newer = holds.open({ startedAtMs: 200, capMs: 5_000, priority: 20, highestId: 2 }, 200);
+    holds.close(released, 300);
+    expect(holds.size()).toBe(1);
+    expect(holds.oldest()).toBe(newer);
+    expect(holds.wallMs(700)).toBe(600);
+  });
+
+  it('unions holds that overlap without opening together', () => {
+    const holds = createShaderWarmOutstandingHolds();
+    const a = holds.open({ startedAtMs: 0, capMs: 5_000, priority: 20, highestId: 1 }, 0);
+    const b = holds.open({ startedAtMs: 200, capMs: 5_000, priority: 20, highestId: 2 }, 200);
+    holds.close(a, 300);
+    expect(holds.wallMs(500)).toBe(500);
+    holds.close(b, 800);
+    expect(holds.wallMs(5_000)).toBe(800);
   });
 });
 

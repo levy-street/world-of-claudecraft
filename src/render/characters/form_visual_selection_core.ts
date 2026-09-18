@@ -51,6 +51,24 @@ interface AuraIdentity {
   id?: string;
 }
 
+export type CharacterFormKey =
+  | 'form_sheep'
+  | 'form_bear'
+  | 'form_cat'
+  | 'form_travel'
+  | 'form_metamorph';
+
+/** The renderer shares one cat/wolf slot, but the two classes keep distinct
+ *  assets. Resolve at construction so both stay behind the existing form gate. */
+export function characterFormAssetKey(
+  formKey: CharacterFormKey,
+  auras: readonly AuraIdentity[],
+): CharacterFormKey | 'form_ghost_wolf' {
+  return formKey === 'form_cat' && auras.some((aura) => aura.id === 'ghost_wolf')
+    ? 'form_ghost_wolf'
+    : formKey;
+}
+
 export function characterFormMaskForAura(aura: AuraIdentity): number {
   if (aura.kind === 'polymorph') return CHARACTER_FORM_FLAG.sheep;
   if (aura.kind === 'form_bear') return CHARACTER_FORM_FLAG.bear;

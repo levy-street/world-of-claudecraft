@@ -154,8 +154,10 @@ describe('steam wishlist markup', () => {
 
   it('starts both entries fail-closed until the Steam-distribution probe settles', () => {
     for (const file of ENTRIES) {
-      expect(entry(file), `${file} boot body class`).toContain(
-        `<body class="${STEAM_WISHLIST_PENDING_BODY_CLASS}"`,
+      // The boot class list also carries start-screen-open (the pre-game HUD
+      // hide, src/ui/root_state_classes.ts), so match the token, not the whole list.
+      expect(entry(file), `${file} boot body class`).toMatch(
+        new RegExp(`<body class="[^"]*\\b${STEAM_WISHLIST_PENDING_BODY_CLASS}\\b`),
       );
     }
   });
@@ -249,10 +251,9 @@ describe('steam wishlist styling stays quiet', () => {
   it('never fills with Steam blue or the reserved gold, only edges with it on hover and focus', () => {
     const hud = hudCss();
     const shell = shellCss();
-    for (const [name, raw] of [
-      ['hud.css', hud],
-      ['shell.css', shell],
-    ] as const) {
+    expect(hud).not.toContain('#66c0f4');
+    expect(hud).toContain('border-color: var(--color-steam-accent);');
+    for (const [name, raw] of [['shell.css', shell]] as const) {
       // Comments name the colour too; only declarations are being audited here.
       const css = raw.replace(/\/\*[\s\S]*?\*\//g, (c) => ' '.repeat(c.length));
       const uses = [...css.matchAll(/#66c0f4/g)];

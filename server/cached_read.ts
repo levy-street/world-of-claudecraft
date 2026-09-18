@@ -62,6 +62,12 @@ export interface CachedRead<T> {
   read(): Promise<T>;
   /** Last installed value regardless of freshness, null when cold or busted. */
   peek(): T | null;
+  /** Refresh NOW regardless of freshness (the warm loops, which run on the
+   *  same cadence as the TTL and would find the value still fresh on every
+   *  other tick through read()): single-flight with any in-flight refresh
+   *  and under the same epoch guard. Rejects when the refresh fails; never
+   *  stale-serves (a warm loop logs and moves on). */
+  refresh(): Promise<T>;
   /** Drop the cached value and bump the epoch so an in-flight refresh declines to install. */
   bust(): void;
 }
@@ -143,6 +149,9 @@ export function createCachedRead<T>(
     },
     peek(): T | null {
       return installed === null ? null : installed.value;
+    },
+    refresh(): Promise<T> {
+      return refreshShared();
     },
     bust(): void {
       epoch++;

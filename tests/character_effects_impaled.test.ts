@@ -130,7 +130,9 @@ describe('applyEntityAnimOverrides: the impaled pose', () => {
     const renderer = codeWithoutLineComments(
       readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8'),
     );
-    expect(renderer).toContain('applyEntityAnimOverrides(st, e, visuallyDead, characterEffects);');
+    expect(renderer).toContain(
+      'applyEntityAnimOverrides(st, e, visuallyDead, characterEffects, hasStealth);',
+    );
     expect(renderer).toContain('const visuallyDead = isVisuallyDead(e) && !e.ghost;');
     expect(renderer).not.toContain('CHARACTER_EFFECT_IMPALED');
   });

@@ -62,12 +62,10 @@ describe('the Interface panel Reset to Defaults restores the layout too', () => 
     const source = stripComments(readFileSync(OPTIONS_PATH, 'utf8'));
     const start = source.indexOf('private renderInterface(');
     expect(start, 'renderInterface() was renamed or moved; re-point this pin').toBeGreaterThan(-1);
-    const end = source.indexOf('private chatTimestampRows(', start);
+    const end = source.indexOf('private transferRows(', start);
     // Without this guard a moved end anchor silently widens the slice to the
     // rest of the file, and the containment pins below lose their scoping.
-    expect(end, 'chatTimestampRows() was renamed or moved; re-point this pin').toBeGreaterThan(
-      start,
-    );
+    expect(end, 'transferRows() was renamed or moved; re-point this pin').toBeGreaterThan(start);
     const body = source.slice(start, end);
     expect(body).toContain('this.settingsViewFooter(interfaceControlsForTab(controls, tab)');
     expect(body).toContain(`if (tab === 'frames') this.deps.resetUnitFrames()`);

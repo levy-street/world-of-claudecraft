@@ -585,7 +585,8 @@ const spec = (detachToUiRoot: boolean): HudFrameSpec => ({
   elementId: 'actionbar',
   storageKey: 'woc_hud_frame_actionbar',
   labelKey: 'hudChrome.interfaceUnlock.frameNames.actionBar1',
-  fallbackSize: { w: 612, h: 46 },
+  // The plateless action rail is 596px wide after removing its old tray padding.
+  fallbackSize: { w: 596, h: 46 },
   detachToUiRoot,
 });
 

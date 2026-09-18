@@ -125,7 +125,7 @@ describe('abilityRequirementLines', () => {
     const rows: { def: AbilityDef; line: string }[] = [
       {
         def: { ...base, requiresForm: 'bear' } as AbilityDef,
-        line: 'Requires Bear Form',
+        line: 'Requires Bruin Form',
       },
       { def: { ...base, spendsCombo: true } as AbilityDef, line: 'Consumes combo points' },
       {

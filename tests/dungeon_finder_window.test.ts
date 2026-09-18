@@ -64,8 +64,9 @@ describe('dungeon finder window painter (source contract)', () => {
     // screen reader under role=tablist / role=listbox than under a labelled group.
     expect(src).not.toContain('role="tablist"');
     expect(src).not.toContain('role="listbox"');
-    expect(src).toContain('class="df-tabs" role="group"');
-    expect(src).toContain('class="df-rail" role="group"');
+    // W12: shared visual primitives sit beside legacy group hooks without changing roles.
+    expect(src).toContain('class="df-tabs ui-seg" role="group"');
+    expect(src).toContain('class="df-rail ui-panel-soft" role="group"');
   });
 
   it('composes every localizable sentence from tokens, never from a concat', () => {
@@ -116,6 +117,28 @@ describe('dungeon finder window painter (source contract)', () => {
     expect(src).toContain("el.style.display = 'none';");
     expect(src).toContain("return this.deps.root().style.display === 'flex';");
     expect(src).not.toContain("style.display = 'block'");
+  });
+
+  // Regression: the heroic-only loot rows (a bespoke heroic equipment slot, plus the
+  // ungrouped heroic-only rolls like mount reins) were BOTH always labelled with the
+  // "always drops" lootHeroic string, even when the underlying entries are a partial
+  // roll group (heroicGroups whose chances sum below 1, e.g. the farm-pattern bonus)
+  // or an independent low-chance single (a heroic mount, 0.1% to 0.5% per clear). A
+  // Heroic Nythraxis raider reading "Heroic bonus, one of these always drops:" directly
+  // over the mount reins row read that mount as guaranteed, which it never was: only
+  // the label was wrong, never the roll. Mirror the non-heroic groups/singles split
+  // (lootGuaranteed/lootMaybe, lootChance) so a non-guaranteed heroic group or an
+  // ungrouped heroic single is never claimed as an always-drops slot.
+  it('never claims a non-guaranteed heroic loot row always drops', () => {
+    expect(src).toContain(
+      "g.guaranteed ? 'hudChrome.finder.lootHeroic' : 'hudChrome.finder.lootHeroicMaybe'",
+    );
+    expect(src).toContain("t('hudChrome.finder.lootHeroicChance')");
+    // The old unconditional heroic-singles header must be gone: heroicSingles are
+    // ungrouped independent-chance rolls (mounts), never a guaranteed slot.
+    expect(src).not.toMatch(
+      /heroicSingles\.length > 0[\s\S]{0,80}t\('hudChrome\.finder\.lootHeroic'\)/,
+    );
   });
 });
 

@@ -65,6 +65,7 @@ import { guildMaterialWithdrawSelection } from './material_source_storage_action
 import {
   appendMaterialSourcesActionAfter,
   attachMaterialSourcesContextMenu,
+  type MaterialSourcesSelectionFactory,
 } from './material_sources_dialog';
 import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
@@ -385,9 +386,9 @@ export class GuildBankTab {
       tabStripHtml(
         tabStripModel({
           ariaLabel: t('hudChrome.bank.guildViewsAria'),
-          stripClass: 'bank-tabs gbank-view-tabs',
-          tabClass: 'gbank-view-tab',
-          selectedClass: 'on',
+          stripClass: 'bank-tabs ui-tabs gbank-view-tabs',
+          tabClass: 'gbank-view-tab ui-tab',
+          selectedClass: 'on is-on',
           tabs: [
             { id: 'contents', label: t('hudChrome.bank.guildContentsTab') },
             { id: 'log', label: t('hudChrome.bank.guildHistoryTab') },
@@ -427,13 +428,13 @@ export class GuildBankTab {
     actions.className = 'gbank-treasury-actions';
     const deposit = document.createElement('button');
     deposit.type = 'button';
-    deposit.className = 'gbank-gold-btn';
+    deposit.className = 'gbank-gold-btn ui-btn';
     deposit.textContent = t('hudChrome.bank.guildDepositGold');
     deposit.disabled = !treasury.canDepositGold;
     deposit.addEventListener('click', () => this.showGoldPrompt('deposit', treasury.copper));
     const withdraw = document.createElement('button');
     withdraw.type = 'button';
-    withdraw.className = 'gbank-gold-btn';
+    withdraw.className = 'gbank-gold-btn ui-btn';
     withdraw.textContent = t('hudChrome.bank.guildWithdrawGold');
     withdraw.disabled = !treasury.canWithdrawGold;
     withdraw.addEventListener('click', () => this.showGoldPrompt('withdraw', treasury.copper));
@@ -456,7 +457,7 @@ export class GuildBankTab {
     row.className = 'bank-buy-row gbank-buy-row gbank-open-row';
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `bank-buy-btn${open.affordable ? '' : ' gbank-buy-short'}`;
+    btn.className = `bank-buy-btn ui-btn ui-btn--gold${open.affordable ? '' : ' gbank-buy-short'}`;
     const short = open.affordable
       ? ''
       : `<span class="gbank-buy-short-label">${esc(t('hudChrome.bank.guildPurseShort'))}</span>`;
@@ -550,7 +551,18 @@ export class GuildBankTab {
     // NO filter/sort layer and NO unknown-id drop: every slot renders at its
     // wire index, dormant ones visibly distinct (the carried-forward line).
     for (const slot of model.slots) {
-      const cell = this.buildCell(slot, model.readOnly);
+      // The exact-source withdraw session (absent on a read-only pane and on a
+      // dormant slot, where no withdraw exists) rides both doors into the
+      // dialog: desktop right-click and the touch-only Sources button.
+      const withdrawSelection =
+        model.readOnly || slot.dormant
+          ? undefined
+          : guildMaterialWithdrawSelection(this.deps.world(), slot.itemId, slot.slotIndex, () => {
+              this.deps.hideTooltip();
+              this.deps.onInventoryChanged();
+              this.deps.requestRender();
+            });
+      const cell = this.buildCell(slot, model.readOnly, withdrawSelection);
       const item = knownItemDef(ITEMS, slot.itemId);
       const itemName = item ? itemDisplayName(item) : slot.itemId;
       grid.appendChild(cell);
@@ -559,24 +571,22 @@ export class GuildBankTab {
         itemName,
         materialSourcesForDisplay(slot),
         this.deps.openMaterialSources,
-        model.readOnly || slot.dormant
-          ? undefined
-          : guildMaterialWithdrawSelection(this.deps.world(), slot.itemId, slot.slotIndex, () => {
-              this.deps.hideTooltip();
-              this.deps.onInventoryChanged();
-              this.deps.requestRender();
-            }),
+        withdrawSelection,
       );
     }
     for (let i = 0; i < model.emptyCells; i++) {
       const cell = document.createElement('div');
-      cell.className = 'bank-item empty';
+      cell.className = 'bank-item ui-socket ui-socket--bag empty';
       cell.setAttribute('aria-hidden', 'true');
       grid.appendChild(cell);
     }
   }
 
-  private buildCell(slot: GuildBankSlotModel, readOnly: boolean): HTMLElement {
+  private buildCell(
+    slot: GuildBankSlotModel,
+    readOnly: boolean,
+    withdrawSelection: MaterialSourcesSelectionFactory,
+  ): HTMLElement {
     const item = knownItemDef(ITEMS, slot.itemId);
     const cell = document.createElement('button');
     cell.type = 'button';
@@ -611,7 +621,7 @@ export class GuildBankTab {
     const locked = isItemLocked(slot.instance);
     const lockSeal = lockMarkHtml(locked);
     if (slot.known && item) {
-      cell.className = `bank-item q-${slot.qualityKey}${bagRimClasses(null, fineMark)}${dormantClass}`;
+      cell.className = `bank-item ui-socket ui-socket--bag q-${slot.qualityKey}${bagRimClasses(null, fineMark)}${dormantClass}`;
       const qColor = QUALITY_COLOR[slot.qualityKey] ?? QUALITY_DEFAULT_COLOR;
       cell.style.setProperty('--bank-slot-quality', qColor);
       const mark = slot.dormant ? `<span class="gbank-dormant-mark">${svgIcon('lock')}</span>` : '';
@@ -642,7 +652,7 @@ export class GuildBankTab {
       // table, so this is a no-op today, but if the grade table ever carried
       // an id this branch sees, the seal minted above and the rim would still
       // arrive together.
-      cell.className = `bank-item gbank-unknown${bagRimClasses(null, fineMark)}${dormantClass}`;
+      cell.className = `bank-item ui-socket ui-socket--bag gbank-unknown${bagRimClasses(null, fineMark)}${dormantClass}`;
       cell.innerHTML = `<span class="gbank-unknown-label">${esc(
         t('hudChrome.bank.guildUnknownItem'),
       )}</span>${instanceMark}${lockSeal}<span class="bank-count">${
@@ -664,6 +674,7 @@ export class GuildBankTab {
       itemName,
       displayedSources,
       this.deps.openMaterialSources,
+      withdrawSelection,
     );
     // Dormant wording outranks every other announcement (the guild-permission
     // lock is the action fact); the player item lock (issue 3042) outranks
@@ -792,7 +803,7 @@ export class GuildBankTab {
         ? guildBankGoldDepositMax(purse, treasuryCopper)
         : guildBankGoldWithdrawMax(purse, treasuryCopper);
     const prompt = document.createElement('div');
-    prompt.className = 'prompt panel bank-quantity-prompt gbank-gold-prompt';
+    prompt.className = 'prompt panel ui-window bank-quantity-prompt gbank-gold-prompt';
     const title =
       direction === 'deposit'
         ? t('hudChrome.bank.guildDepositGoldTitle')
@@ -808,7 +819,7 @@ export class GuildBankTab {
     coinRow.className = 'gbank-coin-row';
     const mkCoin = (cls: 'g' | 's' | 'c', ariaText: string, capped: boolean): HTMLInputElement => {
       const input = document.createElement('input');
-      input.className = 'coininput';
+      input.className = 'coininput ui-input';
       input.type = 'number';
       input.min = '0';
       if (capped) input.max = '99';
@@ -846,13 +857,13 @@ export class GuildBankTab {
       errorLine.appendChild(line);
     };
     const confirm = document.createElement('button');
-    confirm.className = 'btn';
+    confirm.className = 'btn ui-btn ui-btn--red';
     confirm.textContent =
       direction === 'deposit'
         ? t('hudChrome.bank.depositQuantityConfirm')
         : t('hudChrome.bank.withdrawQuantityConfirm');
     const cancel = document.createElement('button');
-    cancel.className = 'btn';
+    cancel.className = 'btn ui-btn';
     cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
     prompt.append(confirm, cancel);
     const { dismiss, dismissAndReturn } = this.deps.installPromptDialog(prompt, opener, () =>
@@ -927,7 +938,7 @@ export class GuildBankTab {
     }
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = `bank-buy-btn${buy.affordable ? '' : ' gbank-buy-short'}`;
+    btn.className = `bank-buy-btn ui-btn ui-btn--gold${buy.affordable ? '' : ' gbank-buy-short'}`;
     const short = buy.affordable
       ? ''
       : `<span class="gbank-buy-short-label">${esc(t('hudChrome.bank.guildTreasuryShort'))}</span>`;

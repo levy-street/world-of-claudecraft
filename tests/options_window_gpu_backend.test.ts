@@ -23,10 +23,13 @@ import {
 import { normalizeGraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import { type DesktopGpuBackendState, desktopBridge } from '../src/runtime';
 import { t } from '../src/ui/i18n';
-import { buildOptionsMenu } from '../src/ui/options_view';
 import { OptionsWindow } from '../src/ui/options_window';
 
 const BOOL_SETTING_KEYS = new Set(['waterRipples']);
+// The Graphics row by its data-menu-action hook, never by index: the main
+// menu's order shifts by host (the Unlock Interface row leads on desktop only).
+const GRAPHICS_ROW =
+  '#options-menu .opt-btn[data-menu-action="graphics"], .opt-btn[data-menu-action="graphics"]';
 
 function installShell(): { send(state: DesktopGpuBackendState): void } {
   let push: ((state: DesktopGpuBackendState) => void) | null = null;
@@ -64,6 +67,8 @@ function openGraphicsPanel(root: HTMLElement): OptionsWindow {
         perfOverlay: { setPlacement: vi.fn() },
       }) as never,
     bugReport: () => null,
+    isInterfaceUnlocked: () => false,
+    toggleInterfaceUnlock: () => false,
     hideTooltip: vi.fn(),
     captureFocus: () => null,
     restoreFocus: vi.fn(),
@@ -71,11 +76,7 @@ function openGraphicsPanel(root: HTMLElement): OptionsWindow {
     closeOthers: vi.fn(),
   } as never);
   window.toggle();
-  const menu = buildOptionsMenu({ bugReportAvailable: false });
-  const graphicsIndex = menu.findIndex(
-    (entry) => entry.action.kind === 'goto' && entry.action.view === 'graphics',
-  );
-  root.querySelectorAll<HTMLButtonElement>('.opt-btn')[graphicsIndex]?.click();
+  root.querySelector<HTMLButtonElement>(GRAPHICS_ROW)?.click();
   return window;
 }
 
@@ -292,13 +293,7 @@ describe('OptionsWindow graphics backend reading', () => {
     expect(backendReading(root)).toBeNull();
 
     // Reopening picks the latched reading straight up.
-    root
-      .querySelectorAll<HTMLButtonElement>('.opt-btn')
-      [
-        buildOptionsMenu({ bugReportAvailable: false }).findIndex(
-          (entry) => entry.action.kind === 'goto' && entry.action.view === 'graphics',
-        )
-      ]?.click();
+    root.querySelector<HTMLButtonElement>(GRAPHICS_ROW)?.click();
     expect(backendReading(root)).toBe(OPENGL_FELL_SHORT);
 
     // Closed: the hidden panel keeps whatever it last painted rather than

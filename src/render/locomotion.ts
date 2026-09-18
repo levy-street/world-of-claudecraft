@@ -22,6 +22,12 @@ export const GAIT_RUN_EXIT = 3.6; // u/s smoothed speed to drop the gait to walk
 export const GAIT_HOLD_TIME = 0.25; // s minimum dwell between gait/direction switches
 const TELEPORT_SPEED = 25; // u/s above this is a snap, not locomotion
 
+/** A rig's authored walk/run coverage, using the same shared dwell and smoothing. */
+export interface LocoGaitThresholds {
+  runEnter: number;
+  runExit: number;
+}
+
 /** Per-entity hysteresis state; the renderer keeps one of these per view. */
 export interface LocoTrack {
   moveHold: number;
@@ -68,8 +74,9 @@ export function updateLocomotion(
   vz: number,
   facing: number,
   dt: number,
+  gait?: LocoGaitThresholds,
 ): LocoState {
-  return updateLocomotionInto(newLocoState(), t, vx, vz, facing, dt);
+  return updateLocomotionInto(newLocoState(), t, vx, vz, facing, dt, gait);
 }
 
 /** Fill a caller-owned state while advancing one entity's locomotion track. */
@@ -80,6 +87,7 @@ export function updateLocomotionInto(
   vz: number,
   facing: number,
   dt: number,
+  gait?: LocoGaitThresholds,
 ): LocoState {
   const dist = Math.hypot(vx, vz);
   let speed = dist / Math.max(dt, 1e-4);
@@ -125,7 +133,9 @@ export function updateLocomotionInto(
     t.runGait = false;
     t.gaitHold = 0;
   } else {
-    const want = t.runGait ? t.smoothSpeed > GAIT_RUN_EXIT : t.smoothSpeed >= GAIT_RUN_ENTER;
+    const want = t.runGait
+      ? t.smoothSpeed > (gait?.runExit ?? GAIT_RUN_EXIT)
+      : t.smoothSpeed >= (gait?.runEnter ?? GAIT_RUN_ENTER);
     if (want !== t.runGait && t.gaitHold <= 0) {
       t.runGait = want;
       t.gaitHold = GAIT_HOLD_TIME;

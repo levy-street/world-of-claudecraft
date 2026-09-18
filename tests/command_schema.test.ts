@@ -166,9 +166,14 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // 220+14+1=235, dispatch-only 13+0+1=14), NOT a suite run, which the NOTE
 // above explicitly warns against trusting: confirm with
 // `npx vitest run tests/command_schema.test.ts` before merge lands.
-// +2 for claim_founder_pack/claim_founder_skin (The Founder Salesman).
-const EXPECTED_SEND_COUNT = 224;
-const EXPECTED_DISPATCH_COUNT = 238;
+// +2 for claim_founder_pack/claim_founder_skin (The Founder Salesman), on top
+// of the release/main side's own +3 (send/dispatch): +1 for the Social
+// window's Who tab (`who`: a structured realm roster answered by the `who`
+// frame; the chat /who stays as it was) and +2 for Market Sweep
+// (`market_sweep_quote`, `market_sweep`, both client-sent and
+// server-dispatched).
+const EXPECTED_SEND_COUNT = 227;
+const EXPECTED_DISPATCH_COUNT = 241;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

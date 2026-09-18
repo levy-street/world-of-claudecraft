@@ -1178,6 +1178,7 @@ describe('Eastbrook runtime collision, spawn, and services', () => {
     expect(sim.drainEvents()).toContainEqual({
       type: 'noticeboard',
       noticeboardId: 'noticeboard_eastbrook',
+      boardId: 'eastbrook_noticeboard',
       state: 'empty',
       pid: first,
     });

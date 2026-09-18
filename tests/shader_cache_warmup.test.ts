@@ -26,7 +26,14 @@ import {
   type WarmupContext,
   type WarmupGl,
 } from '../src/game/shader_cache_warmup';
+import {
+  CORPUS_GZIP_KIND,
+  CORPUS_READ_KIND,
+  type CorpusRecordQueue,
+} from '../src/game/shader_corpus_slices';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import { releaseTrackedWebGLContexts } from '../src/render/context_release';
+import { rememberGpuRendererName } from '../src/render/gfx';
 import { setShaderWarmStoredSettingSource } from '../src/render/shader_warm_client';
 import {
   createShaderCorpusRecord,
@@ -451,6 +458,13 @@ describe('startShaderWarmup', () => {
     expect(ctx.storeGets()).toBe(0);
   });
 
+  it('is off under ?gputimer=1, where the probe changes the extension set it would key for', async () => {
+    const ctx = await run({ record: corpusRecord([program(1)]), search: '?gputimer=1' });
+    expect(shaderWarmupStats().skipped).toBe('gpu-timer');
+    expect(ctx.contexts()).toBe(0);
+    expect(ctx.storeGets()).toBe(0);
+  });
+
   it('is off under the worker grammar too: ?shaderwarm=off silences both arms', async () => {
     const ctx = await run({ record: corpusRecord([program(1)]), search: '?shaderwarm=off' });
     expect(shaderWarmupStats().skipped).toBe('disabled');
@@ -772,6 +786,16 @@ describe('the src/main.ts wiring', () => {
     expect(mainSource).toContain("from './game/shader_cache_warmup'");
   });
 
+  it('hands the record the renderer background queue and the adapter capture the same renderer', () => {
+    // The record runs as units of the renderer's own background GPU queue,
+    // and its identity takes the boot capture's adapter string through a map
+    // keyed on the three renderer, so all three sites name the same object.
+    expect(mainSource).toContain(
+      'finishShaderWarmup(renderer.webgl, { queue: renderer.backgroundGpuWork });',
+    );
+    expect(mainSource).toContain('captureGfxCapabilities(renderer.webgl)');
+  });
+
   it('registers the stored option source before the warm-up can start', () => {
     // The corpus reads the option through the registered source at start;
     // registered later, a stored Off would read as no option, which is ON.
@@ -799,9 +823,9 @@ describe('the src/main.ts wiring', () => {
 
   it('records and releases at the world reveal, not before', () => {
     expect(mainSource).toContain(
-      'renderer.markGpuHitchReveal();\n        finishShaderWarmup(renderer.webgl);',
+      'renderer.markGpuHitchReveal();\n        finishShaderWarmup(renderer.webgl, { queue: renderer.backgroundGpuWork });',
     );
-    const reveal = mainSource.indexOf('finishShaderWarmup(renderer.webgl);');
+    const reveal = mainSource.indexOf('finishShaderWarmup(renderer.webgl, {');
     const stop = mainSource.indexOf('stopShaderWarmup();');
     const start = mainSource.indexOf('startShaderWarmup();');
     expect(start).toBeGreaterThan(0);
@@ -811,6 +835,216 @@ describe('the src/main.ts wiring', () => {
     // set of points, not a pattern sprayed around.
     expect(mainSource.split('startShaderWarmup();')).toHaveLength(2);
     expect(mainSource.split('stopShaderWarmup();')).toHaveLength(3);
-    expect(mainSource.split('finishShaderWarmup(renderer.webgl);')).toHaveLength(2);
+    expect(mainSource.split('finishShaderWarmup(renderer.webgl, {')).toHaveLength(2);
+  });
+});
+
+describe('recordShaderCorpus as background queue units', () => {
+  beforeEach(() => {
+    shaderWarmupInternalsForTest.reset();
+    vi.spyOn(console, 'info').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const renderer = (gl: WarmupGl, programs: unknown[]): ShaderCorpusRenderer => ({
+    info: { programs },
+    getContext: () => gl,
+  });
+
+  function attachedPrograms(gl: ReturnType<typeof fakeGl>, count: number): unknown[] {
+    // Each entry carries its own attached pair, so the record keeps every one.
+    const entries = Array.from({ length: count }, (_, i) => ({
+      program: {},
+      shaders: [
+        { type: gl.VERTEX_SHADER, source: `void vertex${i}(){}` },
+        { type: gl.FRAGMENT_SHADER, source: `void frag${i}(){}` },
+      ],
+    }));
+    (gl as unknown as { getAttachedShaders: (p: unknown) => unknown[] }).getAttachedShaders = (
+      program,
+    ) =>
+      (
+        entries.find((e) => (e as { program: unknown }).program === program) as {
+          shaders: unknown[];
+        }
+      ).shaders;
+    return entries;
+  }
+
+  function recordingQueue(): CorpusRecordQueue & { labels: string[]; priorities: number[] } {
+    const q = {
+      labels: [] as string[],
+      priorities: [] as number[],
+      run: async <T>(work: () => T | Promise<T>, priority = -1, label = ''): Promise<T> => {
+        q.labels.push(label);
+        q.priorities.push(priority);
+        await Promise.resolve();
+        return work();
+      },
+    };
+    return q;
+  }
+
+  it('runs the record as BACKGROUND units of the given queue and stores the single-shot bytes', async () => {
+    const gl = fakeGl();
+    const entries = attachedPrograms(gl, 6);
+    const values = new Map<string, unknown>();
+    const queue = recordingQueue();
+    const count = await recordShaderCorpus(renderer(gl, entries), {
+      store: createMemoryStore(values),
+      buildId: BUILD,
+      tier: TIER,
+      now: () => 42,
+      queue,
+    });
+    expect(count).toBe(6);
+    // One read batch for six programs, then eight gzip chunks (the envelope,
+    // six programs, the closing).
+    expect(queue.labels).toEqual([
+      `${CORPUS_READ_KIND}:0`,
+      ...Array.from({ length: 8 }, (_, i) => `${CORPUS_GZIP_KIND}:${i}`),
+    ]);
+    expect(new Set(queue.priorities)).toEqual(new Set([GPU_WORK_PRIORITY.BACKGROUND]));
+    const decoded = await decodeCorpus(values.get(shaderWarmupInternalsForTest.corpusKey));
+    expect(decoded?.programs.map((p) => p.vertex)).toEqual(
+      Array.from({ length: 6 }, (_, i) => `void vertex${i}(){}`),
+    );
+    // Byte for byte what the single-shot encoder writes for the same record.
+    const single = await encodeCorpus(
+      createShaderCorpusRecord({
+        identity: shaderCorpusIdentity({
+          buildId: BUILD,
+          tier: TIER,
+          adapter: ADAPTER,
+          extensions: ENABLED,
+        }),
+        extensions: ENABLED,
+        savedAt: 42,
+        contextAttributes: { antialias: false, alpha: true },
+        sources: Array.from({ length: 6 }, (_, i) => ({
+          vertex: `void vertex${i}(){}`,
+          fragment: `void frag${i}(){}`,
+          index0Attribute: 'position',
+        })),
+      }),
+    );
+    const stored = values.get(shaderWarmupInternalsForTest.corpusKey) as { bytes: Uint8Array };
+    expect(Buffer.from(stored.bytes).equals(Buffer.from(single.bytes))).toBe(true);
+  });
+
+  it('takes the adapter string the boot capture remembered instead of querying again', async () => {
+    const gl = fakeGl();
+    gl.attached = [
+      { type: gl.VERTEX_SHADER, source: 'void vertex1(){}' },
+      { type: gl.FRAGMENT_SHADER, source: 'void frag1(){}' },
+    ];
+    const getParameter = vi.spyOn(gl, 'getParameter');
+    const target = renderer(gl, [{ program: {} }]);
+    // A string the context itself would never answer, so the identity says
+    // which source was read.
+    const remembered = 'Remembered HD 530 (boot capture)';
+    rememberGpuRendererName(target, remembered);
+    const values = new Map<string, unknown>();
+    await recordShaderCorpus(target, {
+      store: createMemoryStore(values),
+      buildId: BUILD,
+      tier: TIER,
+      queue: recordingQueue(),
+    });
+    expect(getParameter).not.toHaveBeenCalled();
+    const decoded = await decodeCorpus(values.get(shaderWarmupInternalsForTest.corpusKey));
+    expect(decoded?.identity).toBe(
+      shaderCorpusIdentity({
+        buildId: BUILD,
+        tier: TIER,
+        adapter: remembered,
+        extensions: ENABLED,
+      }),
+    );
+    // A renderer the capture never saw, or one whose capture read nothing, is
+    // still queried, and its identity is the context's.
+    for (const seen of [null, '']) {
+      const fresh = renderer(gl, [{ program: {} }]);
+      if (seen !== null) rememberGpuRendererName(fresh, seen);
+      const freshValues = new Map<string, unknown>();
+      await recordShaderCorpus(fresh, {
+        store: createMemoryStore(freshValues),
+        buildId: BUILD,
+        tier: TIER,
+        queue: recordingQueue(),
+      });
+      const freshDecoded = await decodeCorpus(
+        freshValues.get(shaderWarmupInternalsForTest.corpusKey),
+      );
+      expect(freshDecoded?.identity).toBe(
+        shaderCorpusIdentity({ buildId: BUILD, tier: TIER, adapter: ADAPTER, extensions: ENABLED }),
+      );
+    }
+    expect(getParameter).toHaveBeenCalledTimes(2);
+  });
+
+  it('paces by the frame fallback when no queue is given (a timer where the host has no animation frame)', async () => {
+    const gl = fakeGl();
+    const entries = attachedPrograms(gl, 4);
+    const values = new Map<string, unknown>();
+    const count = await recordShaderCorpus(renderer(gl, entries), {
+      store: createMemoryStore(values),
+      buildId: BUILD,
+      tier: TIER,
+    });
+    expect(count).toBe(4);
+    const decoded = await decodeCorpus(values.get(shaderWarmupInternalsForTest.corpusKey));
+    expect(decoded?.programs).toHaveLength(4);
+  });
+
+  it('logs a queue shut down mid-record at info level and keeps the stored corpus', async () => {
+    const gl = fakeGl();
+    const entries = attachedPrograms(gl, 3);
+    const queue = createBackgroundGpuQueue();
+    const shutdown = queue.shutdown(new Error('Renderer shut down'));
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const values = new Map<string, unknown>([[shaderWarmupInternalsForTest.corpusKey, 'kept']]);
+    const count = await recordShaderCorpus(renderer(gl, entries), {
+      store: createMemoryStore(values),
+      buildId: BUILD,
+      tier: TIER,
+      queue,
+    });
+    await shutdown;
+    expect(count).toBe(0);
+    expect(values.get(shaderWarmupInternalsForTest.corpusKey)).toBe('kept');
+    expect(warn).not.toHaveBeenCalled();
+    expect(info.mock.calls.some(([line]) => String(line).includes('queue shut down'))).toBe(true);
+  });
+
+  it('leaves the stored corpus alone when the context is lost during the read', async () => {
+    const gl = fakeGl();
+    const entries = attachedPrograms(gl, 3);
+    // Lost while the batch reads: a partial set must not replace the stored one.
+    let reads = 0;
+    const attached = (gl as unknown as { getAttachedShaders: (p: unknown) => unknown[] })
+      .getAttachedShaders;
+    (gl as unknown as { getAttachedShaders: (p: unknown) => unknown[] }).getAttachedShaders = (
+      program,
+    ) => {
+      reads++;
+      return attached(program);
+    };
+    (gl as unknown as { isContextLost: () => boolean }).isContextLost = () => reads >= 2;
+    const values = new Map<string, unknown>([[shaderWarmupInternalsForTest.corpusKey, 'kept']]);
+    const count = await recordShaderCorpus(renderer(gl, entries), {
+      store: createMemoryStore(values),
+      buildId: BUILD,
+      tier: TIER,
+      queue: recordingQueue(),
+    });
+    expect(count).toBe(0);
+    expect(values.get(shaderWarmupInternalsForTest.corpusKey)).toBe('kept');
+    expect(shaderWarmupStats().recorded).toBeNull();
   });
 });

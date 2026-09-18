@@ -99,7 +99,14 @@ const MONOLITHS: MonolithRow[] = [
     // wiring, the wallet re-arm, and the scroll-after-focus ordering. The
     // review round (the hold's lazy first-render attach, the no-rung scroll
     // carve-out) fits inside the same count. Exact count, zero slack.
-    ceiling: 2475,
+    // Down 2475 -> 2419 at the Sales History tab: the browse detail pane
+    // (detailPaneHtml/bidFormHtml/confirmFieldsHtml) moved to
+    // src/ui/woc_market_detail_html.ts (the activity-html precedent), and the
+    // new tab's own table markup lives in src/ui/woc_market_sales_html.ts, so
+    // the fourth tab's window glue landed under the old ceiling (net of the
+    // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
+    // count, zero slack.
+    ceiling: 2419,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -113,6 +120,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned from 19177 after the v0.38.0 sync merge: the release's map
     // overhaul extracted marker interaction out of the coordinator, so the
     // merged file landed SMALLER and the ratchet follows it down.
+    // Re-pinned DOWN from 18472 by the aura watchlist change: standing the
+    // feature up inline would have added 14 lines here, so the controller
+    // build and the Options > Auras projection both moved out to
+    // src/ui/aura_overlay_wiring.ts. The coordinator ends 9 lines SMALLER
+    // than it started, and the pin follows it down. Extract, then lower.
     file: 'src/ui/hud.ts',
     // Lowered from 19600 at the Phase 07 review round (craft-denial key
     // ternary out to craft_denial_line_view), then from 19500 at the Phase 07
@@ -443,12 +455,25 @@ const MONOLITHS: MonolithRow[] = [
     // The aura-tracks release sync (186dd8fe7f) composes its system-text
     // extraction with the OSSBrain long-press and tooltip modules. The
     // measured combined count is below both parent pins (18574 / 18489).
-    // Compose the mount cosmetics and practice lesson extractions.
-    // Measured combined size; retain zero headroom after the release merge.
-    // LOWERED for the coin-icon money readout extraction (moneyHtml moved out
-    // to src/ui/money_html.ts so the social tab's roster confirm shares it);
-    // the coordinator keeps three one-line deps wirings. Exact count, zero slack.
-    ceiling: 18461,
+    // Re-measured at the release/v0.43.0 sync: the review-fix batches
+    // and the release's own extractions both landed; wc -l on the merged tree.
+    // LOWERED 18352 -> 18350 in the review-fix round: the prompt countdown bar
+    // moved to createPromptTimeoutBar in src/ui/prompt_dialog.ts alongside the
+    // PROMPT_TIMEOUT_MS the sheet's --prompt-timeout-dur mirrors.
+    // Re-measured at the second release/v0.43.0 sync of the account-wide Book
+    // of Deeds / Reliquary change: the release's interface-redesign merge and
+    // this branch's charSheetRefreshSigFor extraction compose to 18343 by
+    // wc -l, below both parent pins (18455 / 18350). Exact count, zero slack.
+    // Re-measured at the release/v0.43.0 sync of the aura Watched Spells
+    // change: the branch had already moved the overlay wiring out to
+    // src/ui/aura_overlay_wiring.ts (its own arm re-pinned 18472 -> 18463), and
+    // the release's extractions compose with it to 18334 by wc -l on the
+    // merged tree, below both parent pins (18463 / 18343). Exact count, zero slack.
+    // Re-measured while reconciling the latest v0.43.0 base: the release-side
+    // screenshot and HUD extractions compose with aura overlay wiring and the
+    // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
+    // merged tree. Exact count, zero slack.
+    ceiling: 18309,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -460,7 +485,15 @@ const MONOLITHS: MonolithRow[] = [
     // release-side import/export panel composed with the batch settings rows.
     // Measured with wc -l on the merged tree. Exact count, zero headroom.
     file: 'src/ui/options_window.ts',
-    ceiling: 2843,
+    // LOWERED 2955 -> 2840 on the redesign review: the Interface panel's three
+    // bespoke rows (the chat timestamp pair, the chat-window reset, the Unlock
+    // Interface action) moved to src/ui/options_interface_rows.ts. Exact count,
+    // zero slack.
+    // LOWERED 2840 -> 2831 when the main menu's button list (and the Unlock
+    // Interface entry that joined it) moved to
+    // src/ui/options_main_menu_controller.ts; the window keeps only the
+    // routing and the touch gate. Exact count, zero slack.
+    ceiling: 2831,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -840,7 +873,10 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Restored per-ability resurrection school lookup removes one line.
-    ceiling: 12851,
+    // CPU-hygiene review: the ranked and required view candidates share the
+    // scan module's liveViewCandidate check (present, view-less, admitted),
+    // which drops the coordinator's own admission call. Exact count.
+    ceiling: 12850,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1013,12 +1049,20 @@ const MONOLITHS: MonolithRow[] = [
     // measures 11923, below both arms, so the ceiling follows it down. Exact
     // merged count, zero slack: any further growth reds again.
     // Main hotfix integration: combined extractions, exact merged count.
-    // Down 11879 -> 11874 at the Crucible binding restore (PRs #3788/#3789/#3791
-    // re-applied for v0.42.1): the two per-slot payload-bound blocks in the
-    // character load loops (bags, buyback) moved to item_instance_load.ts's
-    // sanitizeSlotInstanceOnLoad, paying for the party-trade retire hooks that
-    // now live in src/sim/loot/bop_trade_persistence.ts. Exact count, zero slack.
-    ceiling: 11874,
+    // Down 11879 -> 11843: the CPU-hygiene lot moved the rift floor descriptor
+    // builder to src/sim/rift/rift_floor_view.ts, the Wildfang kit pass 2 moved
+    // the charge route constants to combat/charge_route.ts (11856 together), and
+    // the account-wide Book of Deeds / Reliquary change moved the deeds restore
+    // and join-retro passes into src/sim/deeds_restore.ts and the ownership
+    // union into accountReliquaryOwnershipOpts (src/sim/reliquary.ts). Exact
+    // count, zero slack.
+    // Down 11843 -> 11822 at the v0.42.2 hotfix line forward merge: the
+    // Crucible binding restore moved the per-slot payload-bound blocks to
+    // item_instance_load.ts's sanitizeSlotInstanceOnLoad and the party-trade
+    // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
+    // composed with the release's own extractions above. Exact merged count,
+    // zero slack.
+    ceiling: 11822,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1213,10 +1257,17 @@ const MONOLITHS: MonolithRow[] = [
     // Measured after formatting; lower the ratchet with the extraction.
     // Compose the mount cosmetics and practice lesson extractions.
     // Measured combined size; retain zero headroom after the release merge.
-    // RE-PINNED 11332 -> 11327 at the interact-key gather extraction
-    // (src/game/interact_key_gather.ts took the R40 confirm gate and the
-    // node bundle out of interactKey). Exact count, zero slack.
-    ceiling: 11327,
+    // Weapon-coat amounts now share src/ui/ability_imbue_text.ts with live tooltips.
+    // Re-measured at the release/v0.43.0 sync that brought PR 3778 in: the
+    // release count 11327 minus the redesign's own 6 extracted lines = 11321
+    // (exact wc -l on the merged tree, zero headroom).
+    // Renderer construction and rebuild validation now share game/game_renderer.ts.
+    // Down 11317 -> 11281 at the v0.42.2 hotfix line forward merge: the
+    // interact-key gather extraction (src/game/interact_key_gather.ts took the
+    // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
+    // composed with the release's game_renderer.ts extraction. Exact merged
+    // count, zero slack.
+    ceiling: 11281,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1431,7 +1482,13 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 10095,
+    // LOWERED 10095 -> 10082 at the account-wide Book of Deeds / Reliquary change:
+    // the Book heavy keys moved into server/deeds_wire.ts and the Curator
+    // standing stamp into server/curator_standing.ts.
+    // Guild board categories: the guild_pledge_settings dispatch arm's field
+    // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
+    // account-wide books extraction above; exact merged count, zero slack.
+    ceiling: 10076,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1574,7 +1631,14 @@ const MONOLITHS: MonolithRow[] = [
     // OSSBrain integration: entity flair decoding moved to net/entity_flair_wire.ts.
     // Measured after formatting; lower the ratchet with the extraction.
     // Main hotfix integration: combined extractions, exact merged count.
-    ceiling: 5540,
+    // Down 5540 -> 5506: the CPU-hygiene lot moved the interest-boundary despawn
+    // grace to src/net/despawn_grace.ts (5523), and the account-wide Book of Deeds /
+    // Reliquary change moved the deeds / Reliquary / account-ledger self-decode
+    // into src/net/book_wire.ts. Exact count, zero slack.
+    // Guild board categories: the board path builder, the page decode and the
+    // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
+    // with the book_wire extraction above; exact merged count, zero slack.
+    ceiling: 5498,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1723,7 +1787,15 @@ const MONOLITHS: MonolithRow[] = [
     // reach it directly), unlike createCharacterCapped's pure re-export.
     // Exact count, zero slack.
     // Mount skins: bank the coordinator extraction at its measured size.
-    ceiling: 4744,
+    // LOWERED 4744 -> 4715 at the account-wide Book of Deeds / Reliquary change:
+    // the character_deeds DDL moved into DEEDS_SCHEMA (server/deeds_db.ts) and
+    // the new account_relic_finds DDL landed as ACCOUNT_LEDGER_SCHEMA
+    // (server/account_ledger_db.ts), both applied by ensureSchema.
+    // Guild board categories: topGuilds and its GuildLeaderRow moved whole to
+    // server/guild_board_db.ts beside the new officer-roster read. Merged with
+    // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
+    // zero slack.
+    ceiling: 4641,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -1781,7 +1853,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 3945,
+    // Down 3945 -> 3943 at the Sales History tab: the sale/query/seller read
+    // types moved to woc_market_sale_types.ts (the economy-types leaf
+    // pattern), which more than paid for the realmSalesHistory read added
+    // here. Measured on the v0.43.0-rebased tree. Exact count, zero slack.
+    ceiling: 3943,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {
@@ -2090,7 +2166,10 @@ const MONOLITHS: MonolithRow[] = [
     // another method cluster here.
     file: 'src/ui/hud/professions/professions_window.ts',
     // Harvest entry chrome and bindings now live in a sibling controller.
-    ceiling: 836,
+    // LOWERED 847 -> 824 on the redesign review: the craft row's role and
+    // ceiling chip labels and its next-unlock line moved to
+    // src/ui/hud/professions/craft_row_labels.ts. Exact count, zero slack.
+    ceiling: 824,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
   {
@@ -2103,7 +2182,10 @@ const MONOLITHS: MonolithRow[] = [
     // apex-channel-to-translation-key table moved to apex_recipe_view.ts.
     // Exact count, zero slack.
     file: 'src/ui/hud/professions/crafting_window.ts',
-    ceiling: 766,
+    // LOWERED 771 -> 747 on the redesign review: the difficulty label table and
+    // the cast-duration chip text moved to
+    // src/ui/hud/professions/craft_row_chip_text.ts. Exact count, zero slack.
+    ceiling: 747,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/hud/CLAUDE.md)',
   },
 ];

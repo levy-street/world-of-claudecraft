@@ -1,8 +1,8 @@
 // Pure model for the Key Bindings panel's keyboard overview: a desktop keyboard
 // in the player's chosen form factor (full size with numpad, tenkeyless, 75%,
-// 60%) plus the three bindable mouse buttons, each key annotated with what the
-// player's current bindings put on it. DOM-free and game-free: the caller hands
-// in the Keybinds snapshot (actionId -> [primary, secondary] combos) and
+// 60%) plus the bindable mouse buttons and wheel notches, each key annotated
+// with what the player's current bindings put on it. DOM-free and game-free:
+// the caller hands in the Keybinds snapshot (actionId -> [primary, secondary] combos) and
 // resolvers for the key legend, the action's display name and its category,
 // and gets back the blocks the painter (keyboard_map.ts) lays out plus the
 // bindings that sit on keys the chosen board does not have. Registered in
@@ -213,6 +213,8 @@ const mouseBlock = (fRow: boolean): KeyboardBlockSpec => ({
   units: 1,
   rows: [
     ...(fRow ? [[gap(1)]] : []),
+    [{ code: 'WheelUp', legend: 'WhUp' }],
+    [{ code: 'WheelDown', legend: 'WhDn' }],
     [{ code: 'Mouse3' }],
     [{ code: 'Mouse4' }],
     [{ code: 'Mouse5' }],

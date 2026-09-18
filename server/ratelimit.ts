@@ -631,6 +631,33 @@ export function resetWocBalanceRateLimits(): void {
   wocBalanceIpAttempts.clear();
 }
 
+export const GUILD_BOARD_PRESENCE_MAX_PER_MINUTE = 60;
+const guildBoardPresenceIpAttempts = new Map<string, number[]>();
+
+/**
+ * Throttle the guild board's "officers online" presence per IP on its OWN
+ * bucket. The board read itself is never refused: past the ceiling the page is
+ * served without the live officer names (server/leaderboard.ts
+ * buildGuildBoardResponse), so a scraper cannot poll officer activity at request
+ * rate. Its own map, NOT the shared public-read bucket: the board never 429s
+ * itself, so charging the shared budget would let signpost browsing 429 the
+ * sibling public reads (the roster drill-in is the next click in the same
+ * window) while the board only lost its dot, the wocBalanceRateLimited reasoning
+ * above.
+ */
+export function guildBoardPresenceRateLimited(req: http.IncomingMessage): RateLimitOutcome {
+  return recordSlidingWindowAttempt(
+    guildBoardPresenceIpAttempts,
+    requestIp(req),
+    GUILD_BOARD_PRESENCE_MAX_PER_MINUTE,
+  );
+}
+
+/** Reset the presence throttle. Test-only: keeps scoped buckets isolated. */
+export function resetGuildBoardPresenceRateLimits(): void {
+  guildBoardPresenceIpAttempts.clear();
+}
+
 // Public, unauthenticated read endpoints (the public character sheet, the /c/
 // profile page) get a generous per-IP bucket on their OWN map, decoupled from
 // login/register, to deter scraping without ever spilling into the auth

@@ -19,7 +19,10 @@
 //   kept the hidden one alive until that point, since a lost context can take
 //   its cached translations with it), then record the session's own program
 //   set for the next boot, about 25 s later on an idle callback so the corpus
-//   covers the first minutes of play and costs nothing during them.
+//   covers the first minutes of play. The record itself runs as background
+//   GPU queue units (shader_corpus_slices.ts): reading a program's sources
+//   back is a synchronous driver round trip, and reading every program at
+//   once was a 1.1 s stall on an Intel HD 530.
 //
 // The corpus is stored gzipped (about 35 MB of GLSL for a full ultra set,
 // a few MB compressed) under one key in one IndexedDB store.
@@ -35,16 +38,21 @@
 // context beside the world's on a phone-class WebKit). The RECORD half asks
 // the same two questions before it walks a single program: a host whose next
 // boot would skip the replay is not worth the source walk or the megabytes.
-// This arm is NOT a client of the renderer's preparation scheduler, and cannot
-// be: it runs on the character-select screen, before any renderer or
+// The REPLAY arm is NOT a client of the renderer's preparation scheduler, and
+// cannot be: it runs on the character-select screen, before any renderer or
 // background_gpu_queue exists, and every world entry stops it as
 // its first statement (enterWorld and startOffline), so no live frame ever
 // shares the main thread with a submission. What the GPU process still holds
 // in flight at the click is the entry's own program set resolving into the
-// shared cache, which is the measured gain.
+// shared cache, which is the measured gain. The RECORD arm runs in live
+// frames after the reveal, so it IS a client: main.ts hands it the renderer's
+// background GPU queue and shader_corpus_slices.ts runs it as BACKGROUND
+// units, one per batch of program reads and per chunk encoded, behind every
+// live gate.
 
+import { isGpuQueueShutdown } from '../render/background_gpu_queue';
 import { trackWebGLContext } from '../render/context_release';
-import { GFX, mobilePlatformFromNavigator } from '../render/gfx';
+import { GFX, mobilePlatformFromNavigator, rememberedGpuRendererName } from '../render/gfx';
 import { enableRendererExtensions } from '../render/renderer_extensions';
 import { storedShaderWarmSetting } from '../render/shader_warm_client';
 import type { ShaderWarmPlatform } from '../render/shader_warm_client_core';
@@ -63,6 +71,7 @@ import {
   type WarmupSkipReason,
   warmupApplies,
   warmupExtensionsMatch,
+  warmupGpuTimerPinned,
   warmupRefusedOnPlatform,
 } from '../render/shader_warmup_core';
 import {
@@ -71,6 +80,13 @@ import {
   type WarmProgramHandle,
   type WarmupGl,
 } from '../render/shader_warmup_gl_core';
+import {
+  type CorpusRecordQueue,
+  encodeCorpusQueued,
+  frameFallbackQueue,
+  readProgramSourcesQueued,
+  recordContextLost,
+} from './shader_corpus_slices';
 
 declare const __APP_BUILD_ID__: string;
 
@@ -291,7 +307,9 @@ async function gunzip(bytes: Uint8Array, maxBytes: number): Promise<Uint8Array |
 }
 
 /** Gzip when the platform has `CompressionStream`, raw with the flag down
- *  otherwise, so a browser without it still warms. */
+ *  otherwise, so a browser without it still warms. The single-shot encoder:
+ *  the record itself goes through encodeCorpusQueued (shader_corpus_slices.ts),
+ *  which is pinned byte for byte against this one. */
 export async function encodeCorpus(record: ShaderCorpusRecord): Promise<StoredCorpus> {
   const bytes = new TextEncoder().encode(JSON.stringify(record));
   if (typeof CompressionStream === 'undefined') return { gzip: false, bytes };
@@ -391,6 +409,19 @@ function defaultCancelFrame(handle: number): void {
   cancel?.(handle);
 }
 
+/** The frame the fallback queue paces by on a host with no renderer queue:
+ *  an animation frame where the host has one, a short timer otherwise. */
+function defaultRecordFrame(callback: () => void): number {
+  const raf = (globalThis as { requestAnimationFrame?: (cb: () => void) => number })
+    .requestAnimationFrame;
+  if (raf) return raf(callback);
+  (globalThis as { setTimeout?: (cb: () => void, ms: number) => unknown }).setTimeout?.(
+    callback,
+    16,
+  );
+  return 0;
+}
+
 function defaultScheduleIdle(callback: () => void, delayMs: number): void {
   const scope = globalThis as {
     setTimeout?: (cb: () => void, ms: number) => unknown;
@@ -448,13 +479,16 @@ function resolveCompletedLinks(gl: WarmupGl): void {
 }
 
 async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
+  const search = options.search ?? currentSearch();
   const query = readWarmupQuery(
-    options.search ?? currentSearch(),
+    search,
     options.stored !== undefined ? options.stored : storedShaderWarmSetting(),
   );
   const refused = warmupRefusedOnPlatform(options.platform ?? currentPlatform());
-  // Off and a refused platform read no storage and mint no context.
-  const admitted = query.enabled && !refused;
+  const gpuTimer = warmupGpuTimerPinned(search);
+  // Off, a refused platform and the GPU timer probe read no storage and mint
+  // no context.
+  const admitted = query.enabled && !refused && !gpuTimer;
   const store = options.store ?? createIndexedDbStore();
   const record = admitted ? await decodeCorpus(await store.get(CORPUS_KEY)) : null;
   // The player can have clicked through to the world while the corpus loaded.
@@ -476,6 +510,7 @@ async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
       : '';
   const decision = warmupApplies({
     enabled: query.enabled,
+    gpuTimer,
     iosWebKit: refused,
     parallelCompile: sweep?.parallelCompile ?? false,
     hasCorpus,
@@ -593,44 +628,12 @@ export interface RecordShaderCorpusOptions {
   store?: KeyValueStore;
   buildId?: string;
   tier?: string;
+  /** The wall clock the record's `savedAt` reads. */
   now?: () => number;
-}
-
-/** The attribute the linked program carries at location 0. three binds
- *  `position` there on every program that has it, and that bind is part of the
- *  program cache key, so the replay has to make the same one. */
-function index0AttributeOf(gl: CorpusGl, program: WebGLProgram): string {
-  const count = Number(gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES) ?? 0);
-  for (let i = 0; i < count; i++) {
-    const attribute = gl.getActiveAttrib(program, i);
-    if (attribute && gl.getAttribLocation(program, attribute.name) === 0) return attribute.name;
-  }
-  return '';
-}
-
-function programSourcesOf(gl: CorpusGl, entries: readonly unknown[]): ShaderProgramSources[] {
-  const sources: ShaderProgramSources[] = [];
-  for (const entry of entries) {
-    const program = (entry as { program?: unknown } | null)?.program;
-    if (!program) continue;
-    const shaders = gl.getAttachedShaders(program as WebGLProgram);
-    if (!shaders) continue;
-    let vertex = '';
-    let fragment = '';
-    for (const shader of shaders) {
-      const source = gl.getShaderSource(shader) ?? '';
-      if (gl.getShaderParameter(shader, gl.SHADER_TYPE) === gl.VERTEX_SHADER) vertex = source;
-      else fragment = source;
-    }
-    if (vertex && fragment) {
-      sources.push({
-        vertex,
-        fragment,
-        index0Attribute: index0AttributeOf(gl, program as WebGLProgram),
-      });
-    }
-  }
-  return sources;
+  /** The renderer's background GPU queue: the record runs as its units. */
+  queue?: CorpusRecordQueue;
+  /** Without a queue, the frame the fallback pacing waits for between units. */
+  scheduleFrame?: (callback: () => void) => number;
 }
 
 /** Read this session's whole program set off the world renderer and store it
@@ -657,24 +660,43 @@ export async function recordShaderCorpus(
     const gl = renderer.getContext() as CorpusGl;
     const entries = renderer.info.programs ?? [];
     const sweep = enableRendererExtensions(gl);
+    const queue = options.queue ?? frameFallbackQueue(options.scheduleFrame ?? defaultRecordFrame);
+    // The identity's adapter string is the one the boot capture already read
+    // off this same context (gfx.ts captureGfxCapabilities): the second
+    // UNMASKED_RENDERER_WEBGL query drained the command queue for 290 ms on
+    // the HD 530. A context the capture never saw (a rebuilt renderer, a
+    // test), or one whose capture read nothing, is queried here as before.
+    const adapter = rememberedGpuRendererName(renderer) || adapterStringOf(gl);
+    const sources = await readProgramSourcesQueued(gl, entries, queue);
+    if (recordContextLost(gl) || (sources.length === 0 && entries.length > 0)) {
+      // A context lost while the units ran read a partial set at best: the
+      // stored corpus, if any, stays as it is rather than being replaced.
+      console.info(`${LOG} recording skipped: the context was lost during the read`);
+      return 0;
+    }
     const record = createShaderCorpusRecord({
       identity: shaderCorpusIdentity({
         buildId: options.buildId ?? appBuildId(),
         tier: options.tier ?? String(GFX.tier),
-        adapter: adapterStringOf(gl),
+        adapter,
         extensions: sweep.enabled,
       }),
       extensions: sweep.enabled,
       savedAt: (options.now ?? (() => Date.now()))(),
       contextAttributes: gl.getContextAttributes(),
-      sources: programSourcesOf(gl, entries),
+      sources,
     });
     const store = options.store ?? createIndexedDbStore();
-    await store.set(CORPUS_KEY, await encodeCorpus(record));
+    await store.set(CORPUS_KEY, await encodeCorpusQueued(record, queue));
     session.recorded = record.programs.length;
     console.info(`${LOG} recorded ${record.programs.length} programs for the next boot`);
     return record.programs.length;
   } catch (error) {
+    // A queue shut down under a renderer rebuild is an expected exit, not a fault.
+    if (isGpuQueueShutdown(error)) {
+      console.info(`${LOG} recording skipped: the background GPU queue shut down`);
+      return 0;
+    }
     console.warn(`${LOG} recording failed`, error);
     return 0;
   }

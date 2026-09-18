@@ -513,10 +513,6 @@ const mergeStringsEn = {
     ...abilityStrings.en.abilityUi,
     cast: {
       fishing: 'Fishing',
-      // The plant cast (Farming, the growth-engine phase). Same gerund style
-      // as its neighbours; the cast is pure flavor (plantCrop already resolved
-      // the plant), so the label names the activity and nothing more.
-      farming: 'Planting',
       gathering: 'Gathering',
       crafting: 'Crafting',
       disenchanting: 'Disenchanting',
@@ -3930,22 +3926,18 @@ const mergeExtraEn = {
     [
       'bear_charge',
       'Bruin Rush',
-      'Charge an enemy, generating 9 rage and stunning it for 1 sec. 8-25 yd range. Bruin Form only.',
+      'Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only.',
     ],
     [
       'demoralizing_roar',
       'Craven Roar',
       'Demoralizes nearby enemies, reducing their attack power by 20 for 20 sec. Bruin Form only.',
     ],
-    [
-      'prowl',
-      'Stalk',
-      'Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat.',
-    ],
+    ['prowl', 'Stalk', 'Enter stealth while in Cat Form. Cannot be used in combat.'],
     [
       'rake',
       'Flense',
-      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.',
+      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Cat Form only.',
       { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
     ],
     [

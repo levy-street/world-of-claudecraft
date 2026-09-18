@@ -156,6 +156,9 @@ const FRAME_EXEMPT: Record<string, string> = {
   'arena-status': 'match-scoped arena status strip, pointer-inert',
   'dfinder-proposal-popup': 'transient dungeon-finder proposal popup',
   'bg-proposal-popup': 'transient battleground proposal popup',
+  'raid-warning-banner': 'transient raid warning alert stack, pointer-inert and time-limited',
+  'ready-check-leader-window':
+    'transient party-leader status popup for an active ready check, hidden outside that check',
   'practice-tracker':
     'live DPS readout strip (src/ui/hud/practice/), read-only text: not yet promoted to a movable frame (pre-existing gap, not introduced by this change)',
   'hub-lesson-coach':
@@ -174,6 +177,8 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/meters_frame.ts': 're-homes framed meter panels onto #ui',
   'src/ui/bootcamp.ts': 'world-anchored tutorial prompts, transient coachmarks',
   'src/ui/tutorial.ts': 'transient tutorial coachmarks',
+  'src/ui/window_open_state.ts':
+    'mounts nothing: toggles #ui.options-open (the Esc menu scrim state class that replaced a #ui-anchored :has())',
   'src/ui/noticeboard_popup.ts': 'transient noticeboard popup card',
   'src/ui/realm_builder_popup.ts': 'transient Realm Builder honour roll card',
   'src/ui/dev_command_window.ts': 'dev-only command window (a .window, window_drag governs it)',

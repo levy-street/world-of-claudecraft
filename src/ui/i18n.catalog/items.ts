@@ -336,6 +336,26 @@ const itemStringsEn = {
       buyConfirmAccept: 'Buy',
       buyConfirmCancel: 'Cancel',
       buyChanged: 'That listing changed before you confirmed. Check the price and try again.',
+      // Market Sweep (src/sim/market_sweep.ts): buy N units of one item across many
+      // sellers' listings in one command, cheapest per unit first. A browse row's
+      // Sweep button stages the card; the quote line echoes the server's plan for
+      // the staged item and count, and the Sweep button confirms the quoted terms
+      // before sending them as the price cap the sim enforces.
+      sweep: 'Sweep',
+      sweepAria: 'Sweep the market for {item}',
+      sweepTitle: 'Market Sweep: {item}',
+      sweepClose: 'Close',
+      sweepNote:
+        'Buys whole listings from other sellers, cheapest per unit first, until your count is covered. You may receive a few more than you asked for.',
+      sweepQuantity: 'Units wanted',
+      sweepQuoteNone: 'No listings of this item to sweep.',
+      sweepQuoteLine: '{units} units across {listings} listings for {total} ({each} each)',
+      sweepQuoteShort:
+        'Only {units} units across {listings} listings are available, for {total} ({each} each)',
+      sweepButton: 'Sweep',
+      sweepConfirmTitle: 'Confirm Market Sweep',
+      sweepConfirmBody: 'Buy {item} x{units} across {listings} listings for {total} ({each} each)?',
+      sweepChanged: 'The sweep quote changed before you confirmed. Check the total and try again.',
       sellNote:
         'List goods from your bags. The Merchant takes a {cut}% cut when an item sells. You are using {used}/{max} listing slots.',
       sellPickEmpty: 'Click an item in your bags to choose what to sell.',
@@ -383,6 +403,10 @@ const itemStringsEn = {
       cannotAfford: 'You cannot afford that.',
       notYourListing: 'That is not your listing.',
       nothingToCollect: 'You have nothing to collect.',
+      // Market Sweep refusals (src/sim/market.ts marketSweep): an empty plan, and
+      // the live total moving past the quoted cap between quote and buy.
+      sweepNoListings: 'No listings of that item are available to sweep.',
+      sweepPriceChanged: 'Prices changed before your sweep landed. Check the quote and try again.',
     },
   },
 };

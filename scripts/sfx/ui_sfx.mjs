@@ -48,6 +48,29 @@ const MASTER_GAINS_DB = {
   ui_perfecting_success: 0,
   ui_legendary_forged: 0,
   ui_sunder_complete: 0,
+  // Aura proc cues: the conform pass normalizes every one to the shared
+  // loudness target, and the player has a per-proc volume slider on top, so
+  // none of these needs a source-character trim.
+  ui_aura_soft_chime: 0,
+  ui_aura_hard_bell: 0,
+  ui_aura_blaring_horn: 0,
+  ui_aura_cat_meow: 0,
+  ui_aura_car_klaxon: 0,
+  ui_aura_wind_whoosh: 0,
+  ui_aura_water_drop: 0,
+  ui_aura_glass_ping: 0,
+  ui_aura_anvil_strike: 0,
+  ui_aura_wolf_howl: 0,
+  ui_aura_temple_gong: 0,
+  ui_aura_coin_drop: 0,
+  ui_aura_bubble_pop: 0,
+  ui_aura_owl_hoot: 0,
+  ui_aura_electric_zap: 0,
+  ui_aura_sword_draw: 0,
+  ui_aura_frog_croak: 0,
+  ui_aura_sonar_ping: 0,
+  ui_aura_steam_hiss: 0,
+  ui_aura_music_box: 0,
 };
 
 function tone(frequency, start, duration, gain, options = {}) {
@@ -299,6 +322,157 @@ export const UI_SFX_SPECS = [
     noise('brown', 0.02, 0.2, 0.08, { lowpass: 600 }),
     tone(880, 0.14, 0.4, 0.08, { wave: 'sine', endFrequency: 440 }),
     noise('white', 0.16, 0.4, 0.02, { highpass: 3000 }),
+  ]),
+  // --- Aura proc cues (20) -------------------------------------------------
+  // The player-selectable alert palette for the Auras panel: one of these can be
+  // attached to any watched or authored proc, alongside the visual overlay or
+  // instead of it. Deliberately WIDE in character (gentle chime to car klaxon to
+  // cat meow), because the point is telling several simultaneous procs apart by
+  // ear, not a house style. Every one sits in the 1.0 to 2.0s band: long enough
+  // to register over combat, short enough not to trail into the next proc.
+  //
+  // Synthesized here rather than recorded for the same reason the rest of this
+  // file is: they ship through the shared conform pipeline with no paid
+  // generation, and any one can be swapped for a real recording later exactly
+  // like every other custom cue (see gen_ui_sfx.mjs).
+  cue('ui_aura_soft_chime', 1.2, 'Soft gentle two-note bell chime, warm and unobtrusive.', [
+    tone(880, 0, 1.0, 0.15),
+    tone(1320, 0.05, 0.9, 0.07),
+    tone(1760, 0.05, 0.5, 0.03),
+  ]),
+  cue(
+    'ui_aura_hard_bell',
+    1.5,
+    'Bright struck metal handbell with a hard attack and ringing tail.',
+    [
+      noise('white', 0, 0.04, 0.16, { highpass: 3000 }),
+      tone(1568, 0, 1.4, 0.17),
+      tone(2350, 0, 1.0, 0.09),
+      tone(3130, 0, 0.6, 0.05),
+    ],
+  ),
+  cue('ui_aura_blaring_horn', 1.3, 'Loud brassy horn stab, flat and attention-grabbing.', [
+    tone(233, 0, 1.15, 0.16, { wave: 'saw' }),
+    tone(349, 0.02, 1.1, 0.11, { wave: 'saw' }),
+    tone(466, 0.02, 1.05, 0.07, { wave: 'saw' }),
+  ]),
+  cue('ui_aura_cat_meow', 1.1, 'Short nasal cat meow rising then falling in pitch.', [
+    tone(520, 0, 0.34, 0.15, { wave: 'saw', endFrequency: 780 }),
+    tone(780, 0.32, 0.5, 0.14, { wave: 'saw', endFrequency: 430 }),
+    tone(1560, 0.05, 0.7, 0.03, { wave: 'triangle', endFrequency: 900 }),
+  ]),
+  cue('ui_aura_car_klaxon', 1.2, 'Two-tone car horn honk, blunt and mechanical.', [
+    tone(440, 0, 0.42, 0.15, { wave: 'square' }),
+    tone(587, 0, 0.42, 0.13, { wave: 'square' }),
+    tone(440, 0.58, 0.5, 0.15, { wave: 'square' }),
+    tone(587, 0.58, 0.5, 0.13, { wave: 'square' }),
+  ]),
+  cue('ui_aura_wind_whoosh', 1.5, 'Airy wind gust sweeping past, rising then falling.', [
+    noise('white', 0, 0.6, 0.1, { highpass: 500, lowpass: 4000 }),
+    noise('white', 0.4, 0.7, 0.12, { highpass: 1600, lowpass: 9000 }),
+    noise('brown', 0, 1.4, 0.07, { lowpass: 900 }),
+  ]),
+  cue('ui_aura_water_drop', 1.0, 'Single water droplet plink into still water.', [
+    tone(1500, 0, 0.09, 0.15, { endFrequency: 620 }),
+    tone(620, 0.07, 0.3, 0.1, { endFrequency: 300 }),
+    noise('white', 0, 0.03, 0.05, { highpass: 4000 }),
+  ]),
+  cue('ui_aura_glass_ping', 1.1, 'Thin crystalline glass ping with a fast shimmering decay.', [
+    tone(2093, 0, 0.9, 0.13),
+    tone(3136, 0, 0.5, 0.06),
+    tone(4186, 0, 0.28, 0.03),
+  ]),
+  cue('ui_aura_anvil_strike', 1.3, 'Hammer striking an anvil, hard metallic clang.', [
+    noise('white', 0, 0.05, 0.18, { highpass: 2200 }),
+    tone(1046, 0, 1.1, 0.12),
+    tone(1567, 0, 0.8, 0.09),
+    tone(2490, 0, 0.45, 0.05),
+    noise('brown', 0, 0.12, 0.09, { lowpass: 600 }),
+  ]),
+  cue('ui_aura_wolf_howl', 2.0, 'Distant wolf howl rising and trailing off.', [
+    tone(330, 0, 0.55, 0.11, { wave: 'saw', endFrequency: 430 }),
+    tone(430, 0.5, 0.9, 0.13, { wave: 'saw', endFrequency: 400 }),
+    tone(400, 1.35, 0.55, 0.09, { wave: 'saw', endFrequency: 300 }),
+    tone(860, 0.5, 0.9, 0.03, { wave: 'triangle', endFrequency: 800 }),
+  ]),
+  // Built around its UPPER partials, not its fundamental. The first version put
+  // nearly all its energy at 98 to 233 Hz, which is faithful to a big gong and
+  // useless in practice: laptop and phone speakers have almost no output down
+  // there, so it lost 14 dB through a 200 Hz high-pass and read as silent. Real
+  // tam-tams are heard through a dense inharmonic cluster in the 300 Hz to
+  // 1.5 kHz range anyway; the low partials are kept for weight on real speakers
+  // but no longer carry the sound. The slight downward chirps are the pitch droop
+  // a struck gong has as it decays.
+  cue('ui_aura_temple_gong', 2.0, 'Deep temple gong bloom with a long shimmering tail.', [
+    noise('white', 0, 0.06, 0.1, { highpass: 700, lowpass: 5000 }),
+    noise('brown', 0, 0.12, 0.08, { lowpass: 900 }),
+    tone(110, 0, 1.9, 0.09),
+    tone(262, 0, 1.8, 0.11, { endFrequency: 256 }),
+    tone(415, 0, 1.7, 0.13, { endFrequency: 405 }),
+    tone(622, 0, 1.5, 0.11, { endFrequency: 607 }),
+    tone(831, 0, 1.2, 0.08, { endFrequency: 812 }),
+    tone(1100, 0, 0.9, 0.05, { endFrequency: 1075 }),
+    tone(1480, 0, 0.6, 0.03),
+  ]),
+  cue('ui_aura_coin_drop', 1.2, 'Small coins landing on stone, bright metallic ticks.', [
+    tone(2637, 0, 0.28, 0.11),
+    tone(3520, 0.14, 0.24, 0.09),
+    tone(2093, 0.3, 0.3, 0.1),
+    tone(3136, 0.48, 0.35, 0.07),
+    noise('white', 0, 0.03, 0.06, { highpass: 5000 }),
+  ]),
+  cue('ui_aura_bubble_pop', 1.0, 'Wet upward bubble pop, short and playful.', [
+    tone(300, 0, 0.13, 0.14, { endFrequency: 1500 }),
+    tone(1500, 0.12, 0.12, 0.1, { endFrequency: 900 }),
+    noise('white', 0.1, 0.05, 0.04, { highpass: 3000 }),
+  ]),
+  // No breath bed under this one: a long, near-silent noise layer drags the
+  // integrated loudness below the conform target (it failed sfx:check at
+  // -14.6 LUFS with one), and it was inaudible under the hoots anyway.
+  cue('ui_aura_owl_hoot', 1.5, 'Two soft breathy owl hoots, low and rounded.', [
+    tone(440, 0, 0.34, 0.16, { endFrequency: 400 }),
+    tone(880, 0, 0.3, 0.035),
+    tone(430, 0.6, 0.5, 0.16, { endFrequency: 390 }),
+    tone(860, 0.6, 0.45, 0.035),
+  ]),
+  cue('ui_aura_electric_zap', 1.0, 'Sharp electric arc zap with a crackling tail.', [
+    noise('white', 0, 0.14, 0.16, { highpass: 2500 }),
+    tone(1800, 0, 0.2, 0.11, { wave: 'square', endFrequency: 220 }),
+    noise('white', 0.16, 0.35, 0.05, { highpass: 4000 }),
+  ]),
+  cue('ui_aura_sword_draw', 1.2, 'Steel blade drawn from a scabbard, metallic ring.', [
+    noise('white', 0, 0.3, 0.09, { highpass: 1500, lowpass: 7000 }),
+    noise('white', 0.2, 0.3, 0.11, { highpass: 3500 }),
+    tone(2600, 0.25, 0.85, 0.07, { endFrequency: 2400 }),
+    tone(3900, 0.25, 0.5, 0.03),
+  ]),
+  // Same lesson as the gong, less severely: the croak leaned on 150 to 165 Hz and
+  // lost 7 dB through the small-speaker high-pass. The upper voice is now the
+  // louder of the pair, which is also closer to how a real croak reads.
+  cue('ui_aura_frog_croak', 1.1, 'Low burbling frog croak, two short ribbits.', [
+    tone(165, 0, 0.22, 0.11, { wave: 'square', endFrequency: 130 }),
+    tone(330, 0, 0.2, 0.13, { wave: 'square', endFrequency: 260 }),
+    tone(495, 0, 0.18, 0.05, { wave: 'triangle', endFrequency: 390 }),
+    tone(150, 0.38, 0.3, 0.1, { wave: 'square', endFrequency: 120 }),
+    tone(300, 0.38, 0.28, 0.12, { wave: 'square', endFrequency: 240 }),
+    tone(450, 0.38, 0.24, 0.05, { wave: 'triangle', endFrequency: 360 }),
+  ]),
+  cue('ui_aura_sonar_ping', 2.0, 'Submarine sonar ping with two fading echoes.', [
+    tone(1046, 0, 0.35, 0.15),
+    tone(1046, 0.6, 0.35, 0.08),
+    tone(1046, 1.2, 0.4, 0.04),
+    noise('brown', 0, 1.9, 0.015, { lowpass: 500 }),
+  ]),
+  cue('ui_aura_steam_hiss', 1.5, 'Pressurized steam venting, bright airy hiss.', [
+    noise('white', 0, 0.12, 0.13, { highpass: 3000 }),
+    noise('white', 0.06, 1.3, 0.1, { highpass: 2000, lowpass: 7000 }),
+  ]),
+  cue('ui_aura_music_box', 1.8, 'Delicate music-box arpeggio, four plucked notes.', [
+    tone(1046, 0, 0.7, 0.12, { wave: 'triangle' }),
+    tone(1318, 0.16, 0.7, 0.11, { wave: 'triangle' }),
+    tone(1568, 0.32, 0.75, 0.1, { wave: 'triangle' }),
+    tone(2093, 0.48, 0.9, 0.09, { wave: 'triangle' }),
+    tone(523, 0, 1.2, 0.04, { wave: 'triangle' }),
   ]),
 ].map((spec) => ({ ...spec, masterGainDb: MASTER_GAINS_DB[spec.key] }));
 

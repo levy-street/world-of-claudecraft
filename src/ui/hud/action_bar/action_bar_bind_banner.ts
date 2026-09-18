@@ -18,6 +18,9 @@ export function mountActionBarBindBanner(
 ): HTMLElement {
   const el = document.createElement('div');
   el.id = ACTION_BAR_BIND_BANNER_ID;
+  // The banner is a plated surface (the library's strong panel), like every
+  // other chrome plate the redesign put under the bar.
+  el.className = 'ui-panel-strong';
   el.setAttribute('role', 'status');
   const hint = document.createElement('div');
   hint.className = 'actionbar-bind-hint';
@@ -28,7 +31,7 @@ export function mountActionBarBindBanner(
   actions.className = 'actionbar-bind-actions';
   const resetBtn = document.createElement('button');
   resetBtn.type = 'button';
-  resetBtn.className = 'btn';
+  resetBtn.className = 'btn ui-btn';
   resetBtn.textContent = t('hudChrome.actionBar.reset');
   resetBtn.addEventListener('click', () => {
     audio.click();
@@ -36,7 +39,7 @@ export function mountActionBarBindBanner(
   });
   const doneBtn = document.createElement('button');
   doneBtn.type = 'button';
-  doneBtn.className = 'btn';
+  doneBtn.className = 'btn ui-btn';
   doneBtn.textContent = t('hudChrome.actionBar.done');
   doneBtn.addEventListener('click', () => {
     audio.click();

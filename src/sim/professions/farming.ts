@@ -99,7 +99,7 @@ import { gatheredMaterialSources } from '../material_gatherer';
 import { forceDismount } from '../mounts';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
-import { type Entity, FARMING_CAST_ID, INTERACT_RANGE, isConsuming } from '../types';
+import { type Entity, INTERACT_RANGE, isConsuming } from '../types';
 import { resolveFarmGoldenBonus } from './farm_golden_bonus';
 import { type FarmPlantKnobs, farmPlotSurvived, type PlotState } from './farm_projection';
 import { notifyFarmReady } from './farm_ready';
@@ -148,12 +148,6 @@ export {
   farmPlotSurvived,
   farmSurvivalChance,
 } from './farm_projection';
-
-// How long the planting animation runs. Pure flavor: the plant has ALREADY
-// resolved by the time this cast starts (see plantCrop), so castTotal carries
-// no hidden information and the completion arm in combat/casting_lifecycle.ts
-// dispatches nothing. TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER.
-export const FARM_PLANT_CAST_SEC = 2;
 
 // Harvest-lives yield (the D7 model). A plot starts with a floor of lives;
 // each pick rolls a skill-scaled chance NOT to consume one, and the loop stops
@@ -534,14 +528,16 @@ function farmingSkillOf(meta: PlayerMeta): number {
 
 /** Put a crop in a bed, with every plant-time choice riding the same call.
  *
- *  THE PLANT RESOLVES AT COMMAND TIME. Everything that decides an outcome (the
- *  seed and knob consumption, the two-draw pre-roll, the plot write, the
- *  event) happens here, before the cast even starts; the cast is pure flavor.
- *  That is a DELIBERATE deviation from every other non-spell cast in the
- *  codebase, where the completion does the work, and its consequence is the
- *  point: damage cancelling the cast leaves the plant standing, because the
- *  crop is already in the ground. A player who is interrupted mid-animation
- *  has still planted, and has not lost the seed for nothing.
+ *  PLANTING IS INSTANT, like harvesting. Everything that decides an outcome
+ *  (the seed and knob consumption, the two-draw pre-roll, the plot write, the
+ *  event) happens here, at command time, and nothing follows it. It used to
+ *  ALSO start a two-second "flavor" cast that decided nothing: the plant was
+ *  already in the ground, so moving or taking damage cancelled a bar whose
+ *  cancellation changed nothing, which players read as a broken cast that
+ *  had eaten their seed. The "Farming Tools not working correctly" report
+ *  retired that cast: a bar that can be cancelled must mean something, and
+ *  the honest shape for an action that already resolved is no bar at all.
+ *  The busy gate below still refuses a plant while some OTHER cast runs.
  *
  *  Gate order is STATED and checked top to bottom. Every deny arm returns
  *  early, draws ZERO rng and consumes NOTHING, so a refused plant can never
@@ -688,7 +684,7 @@ export function plantCrop(
   if (p.sitting) ctx.standUp(p);
   // Auto-dismount family (the castStart arm in combat/casting_lifecycle.ts),
   // the same three lines fishing and gathering run at cast start: planting is
-  // a deliberate cast, so a mounted farmer dismounts and an in-flight summon
+  // a deliberate action, so a mounted farmer dismounts and an in-flight summon
   // channel is dropped, exactly as any ability cast does. Draw-free
   // (forceDismount is field writes plus a stat recalc), and ABOVE the pre-roll
   // block, so the two-draw contract is untouched no matter what state the
@@ -759,28 +755,8 @@ export function plantCrop(
   };
   insertPlotSorted(meta.farmPlots, bedId, plot);
 
-  // The flavor cast, started AFTER the plant has fully resolved. castTotal is
-  // a constant that carries no hidden information (there is nothing left to
-  // hide: the outcome is already written), and the completion arm dispatches
-  // nothing.
-  p.castingAbility = FARMING_CAST_ID;
-  p.castTotal = FARM_PLANT_CAST_SEC;
-  p.castRemaining = FARM_PLANT_CAST_SEC;
-  p.castTargetId = null;
-  p.channeling = false;
-  // Drop any GCD-held queued spell press, the startFishing precedent: this
-  // cast's end path never calls fireQueuedCast, so a slot that survived into
-  // it would fire unprompted one tick after it ends.
-  p.queuedCastAbility = null;
-  p.queuedCastAim = null;
-  p.queuedCastTargetId = null;
-  ctx.emit({
-    type: 'castStart',
-    entityId: p.id,
-    ability: FARMING_CAST_ID,
-    time: FARM_PLANT_CAST_SEC,
-  });
-  // Text-free on purpose (the gatherResult idiom): the client logs its own
+  // No cast follows: the plot is written and the plant is done (see the
+  // header). Text-free on purpose (the gatherResult idiom): the client logs its own
   // localized line.
   ctx.emit({ type: 'farmPlanted', pid: meta.entityId, bedId, cropId: crop.id });
   // The first-planting proof (the celebrations phase): one idempotent visited

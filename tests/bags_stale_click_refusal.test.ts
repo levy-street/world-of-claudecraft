@@ -116,7 +116,7 @@ function harness(inventory: InvSlot[]): Harness {
     // the arm this suite needs: the stale-click refusals below must fire before
     // any sale is attempted, and the opt-out would skip the confirm entirely and
     // hide which gate refused.
-    confirmVendorSell: () => true,
+    sellConfirmPolicy: () => ({ enabled: true, minQualityRank: 1 }),
   };
   new BagsWindow(deps).render();
   return { root, calls, errors, inventory };

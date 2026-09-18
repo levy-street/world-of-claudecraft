@@ -724,7 +724,16 @@ describe('authoritative Eastbrook replacement plan', () => {
     }
 
     const npcsByAnchor = new Map(EASTBROOK_LAYOUT.services.npcs.map((npc) => [npc.anchorId, npc]));
+    // Wilkes trades on the civic square's market edge (the handoff move), so
+    // the physical provisions stall stands vendorless BY DESIGN: pin that
+    // positively, so an accidental orphan elsewhere still fails below.
+    const provisions = EASTBROOK_LAYOUT.market.stalls.find(
+      (stall) => stall.id === 'eastbrook_market_stall_provisions',
+    );
+    expect(provisions).toBeDefined();
+    expect(npcsByAnchor.has('eastbrook_market_stall_provisions')).toBe(false);
     for (const stall of EASTBROOK_LAYOUT.market.stalls) {
+      if (stall.id === 'eastbrook_market_stall_provisions') continue;
       const vendor = npcsByAnchor.get(stall.id);
       expect(vendor, `missing vendor for ${stall.id}`).toBeDefined();
       if (!vendor) throw new Error(`missing vendor for ${stall.id}`);
@@ -1183,6 +1192,15 @@ describe('layout clearance and service anchors', () => {
     // out to the town's edge at (16, -78), and forgemistress_darva and
     // tinker_gizzel now stand out to OPPOSITE sides of their own benches, which
     // widens the station-to-master band below from 3 yd to 4.5 yd.
+    // Re-pinned for the first-quest handoff (docs/design/
+    // eastbrook-handoff-experiment.md): the five starter givers now stand on
+    // spaced civic-square stands so a character stepping off the ferry sees
+    // them, marshal_redbrook beside the noticeboard at (-1, -93) and
+    // apothecary_lin, trader_wilkes, fisherman_brandt and foreman_odell around
+    // the square (the harbour-market and quayside stands above are history).
+    // The authored playerStart is the offline and editor spawn; a real new
+    // character arrives at the ferry landing, which is why the givers moved
+    // toward the quay side of the square rather than toward this spawn.
     expect(EASTBROOK_LAYOUT.services.playerStart).toEqual({
       id: 'eastbrook_player_start',
       position: { x: -94, z: -58 },
@@ -1306,15 +1324,9 @@ describe('layout clearance and service anchors', () => {
         2.4805494847391065,
         'eastbrook_market_stall_world_market',
       ],
-      ['marshal_redbrook', -58, -102, 1.5707963267948966, 'eastbrook_harbour_market'],
-      [
-        'trader_wilkes',
-        -17.833512834321652,
-        -106.50023078698499,
-        0.6610431688506869,
-        'eastbrook_market_stall_provisions',
-      ],
-      ['apothecary_lin', -72, -96, 1.673877935317597, 'eastbrook_quayside_home'],
+      ['marshal_redbrook', -1, -93, -2.1763409903998667, 'eastbrook_noticeboard'],
+      ['trader_wilkes', -25, -94, 2.1995926132103296, 'eastbrook_civic_square'],
+      ['apothecary_lin', -11, -89, -2.9147938055359073, 'eastbrook_civic_square'],
       [
         'brother_aldric',
         5.181980515339464,
@@ -1323,8 +1335,8 @@ describe('layout clearance and service anchors', () => {
         'eastbrook_chapel',
       ],
       ['smith_haldren', -3.4, -112.5, -1.6631256615264958, 'eastbrook_blacksmith'],
-      ['fisherman_brandt', -95, -50, -1.5707963267948966, 'eastbrook_quay'],
-      ['foreman_odell', -84, -63, 0.6747409422235526, 'eastbrook_quay'],
+      ['fisherman_brandt', -25, -104, 1.3909428270024184, 'eastbrook_civic_square'],
+      ['foreman_odell', -16, -111, 0.21866894587394195, 'eastbrook_civic_square'],
       [
         'bursar_fernando',
         8.49982143312659,
@@ -1414,6 +1426,42 @@ describe('layout clearance and service anchors', () => {
     expect(distance(loom.position, EASTBROOK_LAYOUT.services.graveyard.position)).toBeGreaterThan(
       8,
     );
+  });
+
+  it('keeps the marshal outside the noticeboard envelopes and the starter givers off the roads', () => {
+    const npcs = new Map(EASTBROOK_LAYOUT.services.npcs.map((npc) => [npc.id, npc]));
+    const marshal = npcs.get('marshal_redbrook');
+    if (!marshal) throw new Error('missing marshal_redbrook');
+    const board = EASTBROOK_LAYOUT.services.noticeboard;
+    // Standing beside the board must not be standing INSIDE its interaction
+    // envelope: a player posting at the front standing point should not be
+    // handed the marshal's dialogue, and vice versa.
+    expect(distance(marshal.position, board.position)).toBeGreaterThan(board.interactionRadius);
+    expect(distance(marshal.position, board.frontStandingPoint)).toBeGreaterThan(
+      board.interactionRadius,
+    );
+
+    // The road-lane sweep above checks solids only; an NPC body is not a
+    // solid, so the five spaced givers get their own lane check.
+    const givers = [
+      'marshal_redbrook',
+      'apothecary_lin',
+      'trader_wilkes',
+      'fisherman_brandt',
+      'foreman_odell',
+    ];
+    for (const id of givers) {
+      const npc = npcs.get(id);
+      if (!npc) throw new Error(`missing ${id}`);
+      for (const road of EASTBROOK_LAYOUT.roads) {
+        const nearest = Math.min(
+          ...samplePolyline(road.points, 0.1).map((point) => distance(point, npc.position)),
+        );
+        expect(nearest, `${id} stands in the ${road.id} lane`).toBeGreaterThanOrEqual(
+          road.halfWidth + npc.bodyRadius - 1e-6,
+        );
+      }
+    }
   });
 
   it('keeps every entrance, stall standing point, service route, and banker chest sample clear', () => {

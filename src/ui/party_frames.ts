@@ -73,6 +73,18 @@ export const DEFAULT_PARTY_FRAME_DISPLAY: PartyFrameDisplayConfig = {
   presentation: 0,
 };
 
+export interface PartyFrameHeaderState {
+  visible: boolean;
+  count: number;
+  collapsed: boolean;
+}
+
+/** Derive the desktop party disclosure from the roster count and user toggle. */
+export function partyFrameHeaderState(count: number, collapsed: boolean): PartyFrameHeaderState {
+  const safeCount = Math.max(0, Math.floor(count));
+  return { visible: safeCount > 0, count: safeCount, collapsed };
+}
+
 const ROLE_ORDER = { tank: 0, healer: 1, dps: 2 } as const;
 
 export { isPartyFrameRelevantAura as partyFrameAuraIsRelevant };
@@ -188,7 +200,7 @@ export function selectPartyFrameMembers(
  * render from: per member the pid, group, hp/maxHp, resource, dead,
  * in-combat, the out-of-range flag (computed inline, identically to the selector),
  * level, and the aura strip (id + kind + sap flag per aura, in order), plus the
- * leader, raid flag, and the player's own group. The player is skipped (the
+ * leader, raid flag, selected target, and the player's own group. The player is skipped (the
  * frames never show the local player), matching the selector's `pid !== playerId`.
  *
  * Pure and deterministic (only `Math.hypot` and string building). It iterates in raw
@@ -205,6 +217,7 @@ export function partyFrameSignature(
   rangeYd = PARTY_FRAME_RANGE_YD,
   config: PartyFrameDisplayConfig = DEFAULT_PARTY_FRAME_DISPLAY,
   pets?: PartyPetMap,
+  targetId?: number | null,
 ): string {
   let sig = '';
   let myGroup: 1 | 2 = 1;
@@ -237,5 +250,5 @@ export function partyFrameSignature(
     sig += `W${m.rewind ?? 0}:I${m.incomingHeal ?? 0}:A${m.hasAggro ?? 0}:C${m.connected ?? 1}`;
     sig += pet ? `:P${pet.id},${pet.name},${pet.hp}/${pet.maxHp},${pet.dead ? 1 : 0}|` : '|';
   }
-  return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.showPets ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
+  return `${sig}L${info.leader}:R${info.raid ? 1 : 0}:G${myGroup}:T${targetId ?? 0}:C${config.showSelf ? 1 : 0}${config.showResource ? 1 : 0}${config.showAbsorbs ? 1 : 0}${config.showAuras ? 1 : 0}${config.showPets ? 1 : 0}${config.healthText}${config.sort}${config.presentation}`;
 }

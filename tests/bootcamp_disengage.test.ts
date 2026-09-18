@@ -5,7 +5,21 @@
 // from its own card to #ui, so riding the ferry off the island deleted the
 // entire HUD subtree and every later Hud.update() threw on a null lookup.
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+// The reroute test exercises Bootcamp's Talking Head wiring, not the 3D
+// portrait pipeline. Importing the real portrait renderer starts GLB fetches
+// that can outlive happy-dom teardown and surface Three FileLoader
+// ProgressEvent rejections after otherwise green assertions.
+vi.mock('../src/render/characters/portrait', () => ({
+  modularPortraitDataUrl: vi.fn(() => null),
+  onPortraitsReady: vi.fn(),
+  onPortraitUpdate: vi.fn(),
+  playerPortraitDataUrl: vi.fn(() => null),
+  portraitsReady: vi.fn(() => false),
+  visualPortraitDataUrl: vi.fn(() => null),
+}));
+
 import type { CrossHotbarAction } from '../src/game/cross_hotbar';
 import { GAMEPAD_CONFIRM, GAMEPAD_CYCLE_HUD, GAMEPAD_NONE, GP } from '../src/game/gamepad_map';
 import { Keybinds } from '../src/game/keybinds';
@@ -31,7 +45,8 @@ describe('BootcampOverlay.disengage', () => {
     expect(document.getElementById('ui'), '#ui survives graduation').not.toBeNull();
     expect(document.getElementById('petbar'), 'HUD siblings survive graduation').not.toBeNull();
     expect(
-      document.querySelectorAll('#ui .tut-prompt, #ui .tut-glow, #ui .tut-voice').length,
+      document.querySelectorAll('#ui .tut-prompt, #ui .tut-glow, #talking-head:not([hidden])')
+        .length,
       'the coach cleans up every node it minted',
     ).toBe(0);
   });
@@ -532,5 +547,59 @@ describe('BootcampOverlay controller prompt wiring', () => {
       'Access interface',
     );
     expect(document.querySelector('.tut-prompt')?.textContent).not.toContain('View');
+  });
+});
+
+describe('BootcampOverlay: a bubble whose speaker walks off screen finishes on the panel', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '<div id="ui"><div id="petbar"></div></div>';
+  });
+
+  it('re-routes the live line to the Talking Head once Odo leaves view', () => {
+    // showCaption decided bubble or panel ONCE per line, so a line spoken while
+    // Odo was on screen stayed a bubble after he walked off, and the player
+    // never read the rest of it. The coach runs per frame, so the live line is
+    // re-evaluated there.
+    const coach = new BootcampOverlay();
+    const odo = {
+      id: 7,
+      kind: 'npc',
+      templateId: 'ferryman_odo',
+      name: 'Ferryman Odo',
+      pos: { x: -300, y: 0, z: 50 },
+    };
+    const world = {
+      playerId: 1,
+      player: { id: 1, pos: { x: -300, y: 0, z: 50 }, dead: false, hp: 100 },
+      cfg: { playerClass: 'warrior', seed: 1 },
+      questLog: new Map([['q_ps_strike_true', { state: 'active' }]]),
+      questState: () => null,
+      entities: new Map([[odo.id, odo]]),
+    } as never;
+    const bubbles: string[] = [];
+    let onScreen = true;
+    const renderer = {
+      camYaw: 0,
+      worldToScreen: () =>
+        onScreen ? { x: 800, y: 450, behind: false } : { x: 0, y: 0, behind: true },
+      showChatBubble: (_id: number, text: string) => bubbles.push(text),
+    } as never;
+    const keybinds = { capFor: () => 'F', movementCaps: () => ({}) } as never;
+
+    coach.update(world, renderer, keybinds);
+    (coach as unknown as { showCaption(text: string): void }).showCaption('Mind the tide.');
+    expect(bubbles, 'a visible Odo speaks in a world bubble').toEqual(['Mind the tide.']);
+    expect(document.getElementById('talking-head')?.hidden).not.toBe(false);
+
+    // Still on screen: the line stays where it is, and nothing is duplicated.
+    coach.update(world, renderer, keybinds);
+    expect(document.getElementById('talking-head')?.hidden).not.toBe(false);
+
+    onScreen = false;
+    coach.update(world, renderer, keybinds);
+    const panel = document.getElementById('talking-head') as HTMLElement;
+    expect(panel.hidden, 'the rest of the line moved to the panel').toBe(false);
+    expect(panel.querySelector('.th-text')?.textContent).toBe('Mind the tide.');
+    expect(bubbles, 'and it was not spoken again as a bubble').toHaveLength(1);
   });
 });

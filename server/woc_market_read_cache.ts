@@ -57,7 +57,7 @@
 
 import type { KeyedCachedReadStats } from './cached_read';
 import { KeyedCachedRead } from './cached_read';
-import type { WocBrowseQuery } from './woc_market';
+import type { WocBrowseQuery, WocSalesQuery } from './woc_market';
 
 /** Browse and detail: the win is CROSS-PLAYER sharing (every viewer of a
  *  page or a hot listing rides one read per TTL window), so the TTL matching
@@ -85,6 +85,15 @@ export const WOC_MARKET_DETAIL_CACHE_TTL_MS = 3_000;
 export const WOC_MARKET_DETAIL_CACHE_MAX_ENTRIES = 256;
 export const WOC_MARKET_HISTORY_CACHE_TTL_MS = 10_000;
 export const WOC_MARKET_HISTORY_CACHE_MAX_ENTRIES = 256;
+/** The realm-wide Sales History surface: cross-player shared like browse (the
+ *  same unfiltered list every viewer reads), so the TTL matches the per-item
+ *  history's rather than the faster browse poll (a sale is immutable once
+ *  written; only new rows arrive). Only the SHALLOW unfiltered pages are
+ *  cached; a filtered or deep page is a per-user, click-driven lookup whose
+ *  bound is the read limiter, exactly the browse reasoning. */
+export const WOC_MARKET_SALES_CACHE_TTL_MS = 10_000;
+export const WOC_MARKET_SALES_CACHE_MAX_ENTRIES = 64;
+export const WOC_MARKET_SALES_CACHE_MAX_PAGE = 2;
 // Seller keys are FREE TEXT (the route screens shape, not vocabulary), so
 // unlike the item arm there is no closed key set: the LRU bound is what makes
 // junk names churn, never grow, and a churned entry degrades to the indexed
@@ -118,6 +127,23 @@ export function wocBrowseCacheKey(q: WocBrowseQuery): string {
     String(q.page),
     String(q.pageSize),
     q.sort,
+    q.quality ?? '',
+    q.format ?? '',
+    q.category ?? '',
+    q.subcategory ?? '',
+    q.itemIds === null ? '' : q.itemIds.join(','),
+  ].join('\x1f');
+}
+
+/** The Sales History cache key, the wocBrowseCacheKey sibling minus the sort
+ *  component (sales are always most-recent-first). Same \x1f discipline: the
+ *  filter components are enum words and clamped integers, and the service
+ *  consults the cache only for the unfiltered shallow pages, so the filter
+ *  slots are empty in every live key. */
+export function wocSalesCacheKey(q: WocSalesQuery): string {
+  return [
+    String(q.page),
+    String(q.pageSize),
     q.quality ?? '',
     q.format ?? '',
     q.category ?? '',
@@ -240,6 +266,7 @@ export interface WocMarketReadCacheOptions {
   browseTtlMs?: number;
   detailTtlMs?: number;
   historyTtlMs?: number;
+  salesTtlMs?: number;
   meTtlMs?: number;
 }
 
@@ -248,6 +275,7 @@ export class WocMarketReadCache {
   private readonly listingRows: ThunkKeyedCache<number>;
   private readonly salesByItem: ThunkKeyedCache<string>;
   private readonly salesBySeller: ThunkKeyedCache<string>;
+  private readonly salesByRealm: ThunkKeyedCache<string>;
   private readonly meByAccount: ThunkKeyedCache<number>;
 
   constructor(opts: WocMarketReadCacheOptions = {}) {
@@ -271,6 +299,11 @@ export class WocMarketReadCache {
       maxEntries: WOC_MARKET_SELLER_CACHE_MAX_ENTRIES,
       now: opts.now,
     });
+    this.salesByRealm = new ThunkKeyedCache({
+      ttlMs: opts.salesTtlMs ?? WOC_MARKET_SALES_CACHE_TTL_MS,
+      maxEntries: WOC_MARKET_SALES_CACHE_MAX_ENTRIES,
+      now: opts.now,
+    });
     this.meByAccount = new ThunkKeyedCache({
       ttlMs: opts.meTtlMs ?? WOC_MARKET_ME_CACHE_TTL_MS,
       maxEntries: WOC_MARKET_ME_CACHE_MAX_ENTRIES,
@@ -292,6 +325,16 @@ export class WocMarketReadCache {
 
   sellerSales<T>(sellerName: string, refresh: () => Promise<T>): Promise<T> {
     return this.salesBySeller.read(sellerName, refresh);
+  }
+
+  /** The realm-wide Sales History surface (unfiltered shallow pages only, the
+   *  service gate). Keyed by the query tuple. Freshness is TTL-bounded, not
+   *  bust-complete: an eager confirm and the admin exclude drop it through
+   *  bustHistoryAll, but a sale the delivery SWEEP closes lands without a bust,
+   *  so a new head can lag by up to the (short) TTL. The item and seller sales
+   *  caches already work this way. */
+  salesRealm<T>(q: WocSalesQuery, refresh: () => Promise<T>): Promise<T> {
+    return this.salesByRealm.read(wocSalesCacheKey(q), refresh);
   }
 
   myActivity<T>(account: number, refresh: () => Promise<T>): Promise<T> {
@@ -326,9 +369,11 @@ export class WocMarketReadCache {
    *  production caller needed. */
   bustHistoryAll(): void {
     this.salesByItem.bustAll();
-    // The seller pivot restates the same sale rows, so every history bust
-    // (sale exclusion, eager delivery) drops it in the same stroke.
+    // The seller pivot AND the realm-wide list restate the same sale rows, so
+    // every history bust (a new sale on eager delivery, a sale exclusion)
+    // drops all three in the same stroke.
     this.salesBySeller.bustAll();
+    this.salesByRealm.bustAll();
   }
 
   /** Everything at once (tests; also the honest lever if an operator action
@@ -338,6 +383,7 @@ export class WocMarketReadCache {
     this.listingRows.bustAll();
     this.salesByItem.bustAll();
     this.salesBySeller.bustAll();
+    this.salesByRealm.bustAll();
     this.meByAccount.bustAll();
   }
 
@@ -346,6 +392,7 @@ export class WocMarketReadCache {
     detail: KeyedCachedReadStats & { refreshRegistry: number };
     history: KeyedCachedReadStats & { refreshRegistry: number };
     seller: KeyedCachedReadStats & { refreshRegistry: number };
+    sales: KeyedCachedReadStats & { refreshRegistry: number };
     me: KeyedCachedReadStats & { refreshRegistry: number };
   } {
     return {
@@ -353,6 +400,7 @@ export class WocMarketReadCache {
       detail: this.listingRows.stats(),
       history: this.salesByItem.stats(),
       seller: this.salesBySeller.stats(),
+      sales: this.salesByRealm.stats(),
       me: this.meByAccount.stats(),
     };
   }

@@ -28,6 +28,7 @@ const SEED = 20_061;
 const EMPTY_NOTICEBOARD_EVENT = {
   type: 'noticeboard',
   noticeboardId: 'noticeboard_eastbrook',
+  boardId: 'eastbrook_noticeboard',
   state: 'empty',
 } as const;
 
@@ -230,7 +231,7 @@ describe('active-world noticeboard service', () => {
     expect(nextCaseAt).toBeGreaterThan(noticeboardCaseAt);
     const branch = source.slice(noticeboardCaseAt, nextCaseAt);
     expect(branch).toContain('this.noticeboardPopup.show(ev.listings);');
-    expect(branch).toContain('this.openGuildBoard();');
+    expect(branch).toContain('this.openGuildBoard(ev.boardId);');
     expect(branch).not.toContain('showBanner');
     expect(branch).not.toContain('Nothing seems posted.');
   });
@@ -276,9 +277,11 @@ describe('active-world noticeboard service', () => {
     setLanguage('ja_JP');
     hud.handleEvents([{ ...EMPTY_NOTICEBOARD_EVENT, pid: 17 }]);
 
-    // The window opens exactly once and no transient banner or log line
-    // fires: the board itself is the feedback now.
+    // The window opens exactly once, handed the board's own id (the guild
+    // board picks its default category from it), and no transient banner or
+    // log line fires: the board itself is the feedback now.
     expect(openGuildBoard).toHaveBeenCalledTimes(1);
+    expect(openGuildBoard).toHaveBeenCalledWith('eastbrook_noticeboard');
     expect(hud.showBanner).not.toHaveBeenCalled();
     expect(hud.log).not.toHaveBeenCalled();
     expect(hud.renderer.handleEvent).toHaveBeenCalledWith({

@@ -127,6 +127,21 @@ describe('minimap rim badges', () => {
     }
   });
 
+  it('composes the minimap labels, satellites, and lower controls from shared primitives', () => {
+    for (const entry of ENTRIES) {
+      const html = read(entry);
+      expect(html, entry).toMatch(/id="zone-label" class="ui-cin ui-outline"/);
+      expect(html, entry).toMatch(/id="raid-lockout"[^>]*class="ui-disc"/);
+      expect(html, entry).toMatch(/id="mail-indicator"[^>]*class="ui-disc"/);
+      expect(html, entry).toMatch(/id="market-indicator"[^>]*class="ui-disc"/);
+      // The clock is interactive, so the board's medallion must retain native
+      // keyboard activation instead of relying on a click-wired div.
+      expect(html, entry).toMatch(/<button id="minimap-clock" class="ui-cin ui-num" type="button"/);
+      expect(html, entry).toMatch(/id="minimap-coords" class="ui-chip ui-num"/);
+      expect(html, entry).toMatch(/class="minimap-zoom-btn ui-disc ui-cin"/);
+    }
+  });
+
   // FOURTH: the touch sheet did not just resize these, it lifted all three badges
   // OFF the disc into a free-floating row beside it (`right: calc(100% + 138px)`
   // puts the coin's right edge 138px past the disc's LEFT edge), so on a phone they

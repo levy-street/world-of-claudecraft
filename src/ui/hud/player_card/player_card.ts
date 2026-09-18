@@ -107,18 +107,29 @@ export interface PlayerCardData {
 
 const SCALE = 1; // native Open Graph size; already denser than the 680px preview
 
-const COL = {
-  bgTop: '#1d1409',
-  bgBottom: '#0a0805',
-  frame: '#b8902f',
-  frameInner: '#3a2d12',
-  gold: '#ffd100',
-  goldDim: '#caa64a',
-  cream: '#ece2c4',
-  muted: '#9b8b62',
-  panel: 'rgba(0,0,0,0.34)',
-  panelEdge: 'rgba(255,209,0,0.14)',
-};
+export const PLAYER_CARD_COLOR_TOKENS = {
+  bgTop: '--color-player-card-bg-hi',
+  bgBottom: '--color-player-card-bg-lo',
+  frame: '--border',
+  frameInner: '--color-control-border',
+  gold: '--color-accent',
+  goldDim: '--gold-dim',
+  cream: '--color-text-light',
+  muted: '--color-text-muted',
+  keyline: '--color-keyline',
+  chipInk: '--color-player-card-chip-ink',
+} as const;
+
+type PlayerCardColors = Record<keyof typeof PLAYER_CARD_COLOR_TOKENS, string>;
+
+function resolvePlayerCardColors(): PlayerCardColors {
+  const styles = getComputedStyle(document.documentElement);
+  const colors = {} as PlayerCardColors;
+  for (const key of Object.keys(PLAYER_CARD_COLOR_TOKENS) as (keyof PlayerCardColors)[]) {
+    colors[key] = styles.getPropertyValue(PLAYER_CARD_COLOR_TOKENS[key]).trim();
+  }
+  return colors;
+}
 
 /** A selectable pose for the card avatar. `clips` is tried in order against the
  *  model (first present wins; Idle is the universal fallback); `fraction` is the
@@ -269,38 +280,43 @@ export async function renderPlayerCardCanvas(data: PlayerCardData): Promise<HTML
   if (!ctx) throw new Error('player-card: could not create canvas context');
   ctx.scale(SCALE, SCALE);
   ctx.textBaseline = 'alphabetic';
+  const colors = resolvePlayerCardColors();
 
-  drawBackdrop(ctx, data.classColor);
+  drawBackdrop(ctx, data.classColor, colors);
   drawCharacter(ctx, charImg);
-  drawHeader(ctx, data, pctBadgeImg, pctTier);
-  if (devTier && devBadgeImg) drawDevBadge(ctx, devTier, devBadgeImg, data.devMergedPrs);
-  if (tier && badgeImg) drawBadge(ctx, tier, badgeImg, data.balance);
-  drawStats(ctx, data);
-  drawGear(ctx, data);
-  drawFooter(ctx, data, logoImg);
-  drawFrame(ctx, data.classColor);
+  drawHeader(ctx, data, pctBadgeImg, pctTier, colors);
+  if (devTier && devBadgeImg) drawDevBadge(ctx, devTier, devBadgeImg, data.devMergedPrs, colors);
+  if (tier && badgeImg) drawBadge(ctx, tier, badgeImg, data.balance, colors);
+  drawStats(ctx, data, colors);
+  drawGear(ctx, data, colors);
+  drawFooter(ctx, data, logoImg, colors);
+  drawFrame(ctx, data.classColor, colors);
 
   return canvas;
 }
 
-function drawBackdrop(ctx: CanvasRenderingContext2D, accent: string): void {
+function drawBackdrop(
+  ctx: CanvasRenderingContext2D,
+  accent: string,
+  colors: PlayerCardColors,
+): void {
   const g = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
-  g.addColorStop(0, COL.bgTop);
-  g.addColorStop(1, COL.bgBottom);
+  g.addColorStop(0, colors.bgTop);
+  g.addColorStop(1, colors.bgBottom);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 
   // Soft accent wash behind the character (class-coloured).
   const halo = ctx.createRadialGradient(230, 330, 40, 230, 330, 360);
-  halo.addColorStop(0, hexWithAlpha(accent, 0.34));
-  halo.addColorStop(1, hexWithAlpha(accent, 0));
+  halo.addColorStop(0, colorWithAlpha(accent, 0.34));
+  halo.addColorStop(1, colorWithAlpha(accent, 0));
   ctx.fillStyle = halo;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 
   // Vignette.
   const vig = ctx.createRadialGradient(CARD_W / 2, CARD_H / 2, 200, CARD_W / 2, CARD_H / 2, 720);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(0,0,0,0.5)');
+  vig.addColorStop(0, colorWithAlpha(colors.keyline, 0));
+  vig.addColorStop(1, colorWithAlpha(colors.keyline, 0.5));
   ctx.fillStyle = vig;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 }
@@ -328,12 +344,13 @@ function drawHeader(
   data: PlayerCardData,
   pctBadge: HTMLImageElement | null,
   pctTier: PercentileTier | null,
+  colors: PlayerCardColors,
 ): void {
   const x = HEADER_X;
   ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.6)';
+  ctx.shadowColor = colorWithAlpha(colors.keyline, 0.6);
   ctx.shadowBlur = 8;
-  ctx.fillStyle = COL.gold;
+  ctx.fillStyle = colors.gold;
   ctx.font = `700 58px ${TITLE_FONT}`;
   fillTextClamped(ctx, data.name, x, NAME_BASELINE, 540);
   ctx.restore();
@@ -359,7 +376,7 @@ function drawHeader(
   const medalW = hasFlex && pctTier && pctBadge ? chipH + 14 : 0;
   const reserved = hasFlex ? 16 + medalW + tw + padX * 2 : 0;
 
-  ctx.fillStyle = COL.cream;
+  ctx.fillStyle = colors.cream;
   ctx.font = `600 24px ${BODY_FONT}`;
   const maxSubW = RIGHT_EDGE - x - reserved;
   fillTextClamped(ctx, sub, x, SUBTITLE_BASELINE, maxSubW);
@@ -379,15 +396,15 @@ function drawHeader(
       );
       cursorX += medalW; // the medal box's transparent margin spaces it from the tile
     }
-    ctx.fillStyle = pctTier ? pctTier.ring : COL.gold;
+    ctx.fillStyle = pctTier ? pctTier.ring : colors.gold;
     roundRect(ctx, cursorX, chipY, tw + padX * 2, chipH, 13);
     ctx.fill();
-    ctx.fillStyle = '#1c1407';
+    ctx.fillStyle = colors.chipInk;
     ctx.font = `700 16px ${BODY_FONT}`;
     ctx.fillText(label, cursorX + padX, chipY + 18);
   }
 
-  ctx.fillStyle = COL.muted;
+  ctx.fillStyle = colors.muted;
   ctx.font = `400 19px ${BODY_FONT}`;
   const realmLine = data.realm
     ? t('playerCard.realmSubtitle', { realm: data.realm })
@@ -399,7 +416,7 @@ function drawHeader(
   // for the same baseline: an untitled card draws NOTHING here still.
   const titleLine = cardTitleLayout(data.titleText);
   if (titleLine) {
-    ctx.fillStyle = COL.goldDim;
+    ctx.fillStyle = colors.goldDim;
     ctx.font = `600 19px ${BODY_FONT}`;
     fillTextClamped(ctx, titleLine.text, titleLine.x, titleLine.y, titleLine.maxW);
   }
@@ -410,6 +427,7 @@ function drawBadge(
   tier: HolderTier,
   badge: HTMLImageElement,
   balance: number | null,
+  colors: PlayerCardColors,
 ): void {
   // Bottom-left of the right column (the footer band), swapped with the brand
   // mark, which now sits top-right. Badge on the left, tier + balance to its right.
@@ -420,7 +438,7 @@ function drawBadge(
   const cx = HOLDER_BADGE_CX;
   const cy = HOLDER_BADGE_CY;
   ctx.save();
-  ctx.shadowColor = hexWithAlpha(tier.glow, 0.9);
+  ctx.shadowColor = colorWithAlpha(tier.glow, 0.9);
   ctx.shadowBlur = 8;
   ctx.drawImage(badge, cx - r, cy - r, r * 2, r * 2);
   ctx.restore();
@@ -439,7 +457,7 @@ function drawBadge(
   // run to the footer band, not a fixed guess, so a long localized balance
   // string gets real room instead of truncating early on a wide card.
   if (balance !== null) {
-    ctx.fillStyle = COL.gold;
+    ctx.fillStyle = colors.gold;
     ctx.font = `700 20px ${BODY_FONT}`;
     fillTextClamped(
       ctx,
@@ -450,7 +468,7 @@ function drawBadge(
     );
   }
   // Flavour line.
-  ctx.fillStyle = COL.muted;
+  ctx.fillStyle = colors.muted;
   ctx.font = `400 12px ${BODY_FONT}`;
   fillTextClamped(ctx, holderTierFlavorText(tier), left, cy + 28, maxW);
 }
@@ -468,12 +486,13 @@ function drawDevBadge(
   tier: DevTier,
   badge: HTMLImageElement,
   mergedPrs: number | null,
+  colors: PlayerCardColors,
 ): void {
   const r = DEV_BADGE_R;
   const cx = DEV_BADGE_CX;
   const cy = DEV_BADGE_CY;
   ctx.save();
-  ctx.shadowColor = hexWithAlpha(tier.glow, 0.9);
+  ctx.shadowColor = colorWithAlpha(tier.glow, 0.9);
   ctx.shadowBlur = 6;
   ctx.drawImage(badge, cx - r, cy - r, r * 2, r * 2);
   ctx.restore();
@@ -486,7 +505,7 @@ function drawDevBadge(
   ctx.fillText(name, left, cy + 4);
   if (mergedPrs !== null) {
     const nameW = ctx.measureText(name).width;
-    ctx.fillStyle = COL.muted;
+    ctx.fillStyle = colors.muted;
     ctx.font = `400 12px ${BODY_FONT}`;
     fillTextClamped(
       ctx,
@@ -500,15 +519,19 @@ function drawDevBadge(
   }
 }
 
-function drawStats(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
+function drawStats(
+  ctx: CanvasRenderingContext2D,
+  data: PlayerCardData,
+  colors: PlayerCardColors,
+): void {
   const x = HEADER_X;
   const y = STATS_Y;
   const w = STATS_W;
   const h = STATS_H;
-  ctx.fillStyle = COL.panel;
+  ctx.fillStyle = colorWithAlpha(colors.keyline, 0.34);
   roundRect(ctx, x, y, w, h, 12);
   ctx.fill();
-  ctx.strokeStyle = COL.panelEdge;
+  ctx.strokeStyle = colorWithAlpha(colors.gold, 0.14);
   ctx.lineWidth = 1.5;
   roundRect(ctx, x, y, w, h, 12);
   ctx.stroke();
@@ -519,8 +542,8 @@ function drawStats(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
   // fixed-height panel instead of running past it.
   const padX = 26;
   const colW = (w - padX * 2) / 2;
-  drawStatColumn(ctx, data.primaryStats, x + padX, y + 22, colW - 20, h);
-  drawStatColumn(ctx, data.combatStats, x + padX + colW + 8, y + 22, colW - 20, h);
+  drawStatColumn(ctx, data.primaryStats, x + padX, y + 22, colW - 20, h, colors);
+  drawStatColumn(ctx, data.combatStats, x + padX + colW + 8, y + 22, colW - 20, h, colors);
 }
 
 function drawStatColumn(
@@ -530,30 +553,35 @@ function drawStatColumn(
   y: number,
   w: number,
   panelH: number,
+  colors: PlayerCardColors,
 ): void {
   const rowH = statRowHeight(stats.length, panelH);
   ctx.font = `600 20px ${BODY_FONT}`;
   for (let i = 0; i < stats.length; i++) {
     const ry = y + i * rowH + 18;
-    ctx.fillStyle = COL.muted;
+    ctx.fillStyle = colors.muted;
     ctx.textAlign = 'left';
     ctx.fillText(stats[i].label, x, ry);
-    ctx.fillStyle = COL.cream;
+    ctx.fillStyle = colors.cream;
     ctx.textAlign = 'right';
     ctx.fillText(stats[i].value, x + w, ry);
   }
   ctx.textAlign = 'left';
 }
 
-function drawGear(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
+function drawGear(
+  ctx: CanvasRenderingContext2D,
+  data: PlayerCardData,
+  colors: PlayerCardColors,
+): void {
   const x = HEADER_X;
   const y = GEAR_Y;
   const w = GEAR_W;
   const h = gearPanelHeight(data.gear.length);
-  ctx.fillStyle = COL.panel;
+  ctx.fillStyle = colorWithAlpha(colors.keyline, 0.34);
   roundRect(ctx, x, y, w, h, 12);
   ctx.fill();
-  ctx.strokeStyle = COL.panelEdge;
+  ctx.strokeStyle = colorWithAlpha(colors.gold, 0.14);
   ctx.lineWidth = 1.5;
   roundRect(ctx, x, y, w, h, 12);
   ctx.stroke();
@@ -565,7 +593,7 @@ function drawGear(ctx: CanvasRenderingContext2D, data: PlayerCardData): void {
     const rowIdx = Math.floor(i / 2);
     const gx = x + padX + col * colW;
     const gy = y + 20 + rowIdx * GEAR_ROW_H;
-    ctx.fillStyle = COL.muted;
+    ctx.fillStyle = colors.muted;
     ctx.font = `600 15px ${BODY_FONT}`;
     ctx.fillText(data.gear[i].slot.toUpperCase(), gx, gy);
     ctx.fillStyle = data.gear[i].color;
@@ -578,6 +606,7 @@ function drawFooter(
   ctx: CanvasRenderingContext2D,
   data: PlayerCardData,
   logo: HTMLImageElement | null,
+  colors: PlayerCardColors,
 ): void {
   const y = CARD_H - 26;
   // Brand mark: the full logo lockup, else a plain text wordmark, top-right now
@@ -589,7 +618,7 @@ function drawFooter(
     ctx.drawImage(logo, 1156 - w, 38, w, h);
   } else {
     ctx.textAlign = 'right';
-    ctx.fillStyle = COL.gold;
+    ctx.fillStyle = colors.gold;
     ctx.font = `700 34px ${TITLE_FONT}`;
     ctx.fillText(t('playerCard.brandWordmark'), 1156, 100);
     ctx.textAlign = 'left';
@@ -598,7 +627,7 @@ function drawFooter(
   // Referral line stays bottom-right; URL clamp trimmed so it clears the badge
   // block now occupying the bottom-left.
   ctx.textAlign = 'right';
-  ctx.fillStyle = COL.cream;
+  ctx.fillStyle = colors.cream;
   ctx.font = `600 19px ${BODY_FONT}`;
   const referralLine = data.referralCount
     ? t('playerCard.footerHandleWithRecruits', {
@@ -611,35 +640,33 @@ function drawFooter(
   // Clamped so a long referral handle plus a large recruited count can never
   // run unbounded past the card's left frame.
   fillTextClamped(ctx, referralLine, 1168, y - 22, 600);
-  ctx.fillStyle = COL.goldDim;
+  ctx.fillStyle = colors.goldDim;
   ctx.font = `400 16px ${BODY_FONT}`;
   fillTextClamped(ctx, t('playerCard.footerCta', { siteUrl: data.siteUrl }), 1168, y, 360);
   ctx.textAlign = 'left';
 }
 
-function drawFrame(ctx: CanvasRenderingContext2D, accent: string): void {
+function drawFrame(ctx: CanvasRenderingContext2D, accent: string, colors: PlayerCardColors): void {
   // Outer gold frame with a class-accent inner hairline.
-  ctx.strokeStyle = COL.frameInner;
+  ctx.strokeStyle = colors.frameInner;
   ctx.lineWidth = 10;
   ctx.strokeRect(5, 5, CARD_W - 10, CARD_H - 10);
   const grad = ctx.createLinearGradient(0, 0, CARD_W, CARD_H);
-  grad.addColorStop(0, COL.frame);
-  grad.addColorStop(0.5, COL.gold);
-  grad.addColorStop(1, COL.frame);
+  grad.addColorStop(0, colors.frame);
+  grad.addColorStop(0.5, colors.gold);
+  grad.addColorStop(1, colors.frame);
   ctx.strokeStyle = grad;
   ctx.lineWidth = 3;
   ctx.strokeRect(10, 10, CARD_W - 20, CARD_H - 20);
-  ctx.strokeStyle = hexWithAlpha(accent, 0.5);
+  ctx.strokeStyle = colorWithAlpha(accent, 0.5);
   ctx.lineWidth = 1.5;
   ctx.strokeRect(15, 15, CARD_W - 30, CARD_H - 30);
 }
 
-/** Convert a #rrggbb hex to an rgba() string at the given alpha. */
-function hexWithAlpha(hex: string, alpha: number): string {
-  const m = /^#?([0-9a-fA-F]{6})$/.exec(hex.trim());
-  if (!m) return `rgba(255,209,0,${alpha})`;
-  const n = parseInt(m[1], 16);
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${alpha})`;
+/** Apply alpha without spelling a painter-local color. */
+function colorWithAlpha(color: string, alpha: number): string {
+  if (alpha <= 0) return 'transparent';
+  return `color-mix(in srgb, ${color} ${Math.round(alpha * 100)}%, transparent)`;
 }
 
 function canvasToPngBlob(canvas: HTMLCanvasElement, context: string): Promise<Blob> {

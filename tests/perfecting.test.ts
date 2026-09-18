@@ -21,7 +21,7 @@ import {
 } from '../src/sim/item_budget';
 import { sanitizeItemInstancePayloadOnLoad } from '../src/sim/item_instance_load';
 import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
-import { expectedStatBudget } from '../src/sim/item_level';
+import { expectedStatBudget, staminaBaseline, statIdentity } from '../src/sim/item_level';
 import { archetypeCeilingFor, JACK_CEILING_TIER } from '../src/sim/professions/archetype';
 import { MASTERWORK_CHANCE_CAP, masterworkBumpedQuality } from '../src/sim/professions/masterwork';
 import {
@@ -558,25 +558,30 @@ describe('R5: the Perfected bonus is exactly the source-28 budget delta', () => 
 
   // The concrete shipped-apex literals (recipe.level 25, epic: the ilvl 34
   // budget minus the ilvl 31 budget per slot). A new masterwrought item fails
-  // the roster equality until its row is added deliberately.
+  // the roster equality until its row is added deliberately. Since the stamina
+  // baseline model (item_budget.ts's tierDeltaStats, used by perfectedBonusStats),
+  // a CASTER item (int/spi, no str/agi) also bakes in the growth of its free
+  // stamina baseline between the two source lines, one point higher than the
+  // line-only delta wherever that baseline crosses an integer boundary; a
+  // physical item keeps the historical line-only delta exactly.
   const EXPECTED_DELTA_BY_ID: Record<string, number> = {
-    duskforged_warblade: 2, // mainhand
-    ridgebreaker: 2, // two-hand mainhand
-    duskforged_bulwark: 2, // held offhand (shield)
-    wyrmfall_pendant: 1, // neck
-    warhewn_signet: 1, // ring
-    prismglass_loop: 1, // ring
-    gyrelens_array: 2, // held offhand
-    voidbound_grimoire: 2, // held offhand
-    spiritweld_girdle: 2, // waist
-    forgefold_legguards: 1, // legs
-    wardspeaker_sabatons: 1, // feet
-    briarstep_jerkin: 2, // chest
-    fenbloom_breeches: 1, // legs
-    barksong_handguards: 2, // gloves
-    sunspun_vestments: 2, // chest
-    sunspun_leggings: 1, // legs
-    sunspun_handwraps: 2, // gloves
+    duskforged_warblade: 2, // mainhand, physical
+    ridgebreaker: 2, // two-hand mainhand, physical
+    duskforged_bulwark: 2, // held offhand (shield), physical
+    wyrmfall_pendant: 1, // neck, caster, no baseline growth 14 -> 15
+    warhewn_signet: 1, // ring, physical
+    prismglass_loop: 2, // ring, caster, +1 line +1 baseline growth
+    gyrelens_array: 3, // held offhand, caster, +2 line +1 baseline growth
+    voidbound_grimoire: 3, // held offhand, caster, +2 line +1 baseline growth
+    spiritweld_girdle: 3, // waist, caster, +2 line +1 baseline growth
+    forgefold_legguards: 1, // legs, physical
+    wardspeaker_sabatons: 1, // feet, caster, no baseline growth
+    briarstep_jerkin: 2, // chest, physical
+    fenbloom_breeches: 1, // legs, caster, no baseline growth
+    barksong_handguards: 3, // gloves, caster, +2 line +1 baseline growth
+    sunspun_vestments: 3, // chest, caster, +2 line +1 baseline growth
+    sunspun_leggings: 1, // legs, caster, no baseline growth
+    sunspun_handwraps: 3, // gloves, caster, +2 line +1 baseline growth
   };
 
   it('every original apex item keeps its source-28 formula delta, pinned per slot', () => {
@@ -601,10 +606,26 @@ describe('R5: the Perfected bonus is exactly the source-28 budget delta', () => 
       expect(recipe.level).toBe(25);
       const shipped = expectedStatBudget(def);
       expect(shipped, `${id}: the shipped budget resolves`).toBeDefined();
-      expect(budgetAtSource(def, recipe.level), `${id}: low side is the shipped budget`).toBe(
-        shipped,
-      );
-      const formulaDelta = budgetAtSource(def, PERFECTED_SOURCE_LEVEL) - (shipped ?? 0);
+      // perfectedBonusStats bakes off the raw LINE (item_budget.ts's
+      // primaryStatBudget), never touched by the stamina baseline model. The
+      // live shipped total additionally carries the caster baseline on top of
+      // that line (item_level.ts, expectedStatBudget), so a caster identity's
+      // low side needs the baseline added back before comparing to it.
+      const identity = statIdentity(def.stats);
+      const lowSideLine = budgetAtSource(def, recipe.level);
+      const lowSideShipped =
+        identity === 'caster' ? lowSideLine + staminaBaseline(lowSideLine) : lowSideLine;
+      expect(lowSideShipped, `${id}: low side is the shipped budget`).toBe(shipped);
+      const highSideLine = budgetAtSource(def, PERFECTED_SOURCE_LEVEL);
+      // tierDeltaStats (item_budget.ts) also bakes in the growth of a caster
+      // identity's free stamina baseline between the two source lines, on top
+      // of the line-only delta; a physical identity has none (its baseline
+      // already sits inside the line).
+      const staminaGrowth =
+        identity === 'caster'
+          ? Math.max(0, staminaBaseline(highSideLine) - staminaBaseline(lowSideLine))
+          : 0;
+      const formulaDelta = highSideLine - lowSideLine + staminaGrowth;
       expect(statSum(bonus), `${id}: the bake sums to the formula delta`).toBe(formulaDelta);
       expect(statSum(bonus), `${id}: the pinned literal`).toBe(EXPECTED_DELTA_BY_ID[id]);
       // The bonus keeps the def's own stat identity: no stat outside the

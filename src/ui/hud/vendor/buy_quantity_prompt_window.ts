@@ -44,7 +44,7 @@ export function showBuyQuantityPrompt(
   // bags-full toast (maxBuyCount's contract).
   const cap = Math.max(1, Math.floor(maxCount));
   const prompt = document.createElement('div');
-  prompt.className = 'prompt panel buy-quantity-prompt';
+  prompt.className = 'prompt panel ui-window buy-quantity-prompt';
   prompt.innerHTML = `<div class="prompt-text">${esc(
     t('itemUi.vendor.buyQuantityTitle', {
       item: itemDisplayName(item),
@@ -52,7 +52,7 @@ export function showBuyQuantityPrompt(
     }),
   )}</div>`;
   const input = document.createElement('input');
-  input.className = 'prompt-number';
+  input.className = 'prompt-number ui-input';
   input.type = 'number';
   input.setAttribute('aria-label', t('itemUi.vendor.buyQuantityInput'));
   input.min = '1';
@@ -60,10 +60,10 @@ export function showBuyQuantityPrompt(
   input.step = '1';
   input.value = '1';
   const confirm = document.createElement('button');
-  confirm.className = 'btn';
+  confirm.className = 'btn ui-btn ui-btn--red';
   confirm.textContent = t('itemUi.vendor.buyQuantityConfirm');
   const cancel = document.createElement('button');
-  cancel.className = 'btn';
+  cancel.className = 'btn ui-btn';
   // The shared prompt cancel label, the deposit-prompt precedent.
   cancel.textContent = t('itemUi.vendor.sellQuantityCancel');
   const close = () => prompt.remove();

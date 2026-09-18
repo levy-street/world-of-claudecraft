@@ -32,6 +32,7 @@ import type {
   WocListingRow,
   WocMarketDb,
   WocSaleRow,
+  WocSalesQuery,
   WocSellerProfile,
   WocSettlementRow,
   WocStrikeRow,
@@ -2236,6 +2237,26 @@ export class FakeWocMarketDb implements WocMarketDb {
       .sort((a, b) => b.atMs - a.atMs || b.id - a.id)
       .slice(0, limit)
       .map((s) => structuredClone(s));
+  }
+
+  async salesForRealm(
+    realm: string,
+    q: WocSalesQuery,
+  ): Promise<{ rows: WocSaleRow[]; hasMore: boolean }> {
+    const filtered = [...this.sales.values()]
+      .filter((s) => s.realm === realm && !s.excluded)
+      .filter((s) => q.quality === null || s.quality === q.quality)
+      .filter((s) => q.format === null || s.saleType === q.format)
+      .filter((s) => q.category === null || s.category === q.category)
+      .filter((s) => q.subcategory === null || s.subcategory === q.subcategory)
+      .filter((s) => q.itemIds === null || q.itemIds.includes(s.itemId))
+      .sort((a, b) => b.atMs - a.atMs || b.id - a.id);
+    const pageSize = Math.min(Math.max(1, q.pageSize), 50);
+    const offset = Math.max(0, q.page) * pageSize;
+    const page = filtered.slice(offset, offset + pageSize + 1);
+    const hasMore = page.length > pageSize;
+    const rows = (hasMore ? page.slice(0, pageSize) : page).map((s) => structuredClone(s));
+    return { rows, hasMore };
   }
 
   /** Seeded by tests that drive the seller pane's profile line; absent

@@ -4,6 +4,7 @@ import {
   onShamanManaSpent,
   shamanManaCost,
 } from '../src/sim/combat/shaman_talents';
+import { DRUID_CHOICE_ROWS } from '../src/sim/content/choice_rows_classic';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -296,5 +297,30 @@ describe('druid Lifesap redesign', () => {
     p.resource = 0;
     for (let i = 0; i < 20 * 6; i++) sim.tick();
     expect(p.resource).toBeGreaterThanOrEqual(40); // sap ticks fed Rage in form
+  });
+});
+
+describe('druid Cat Form mobility pass (row 5 wording)', () => {
+  it('Wildshift names the three forms it still gates; Longstride and Skylark keep their own wording', () => {
+    const row5 = expectDefined(DRUID_CHOICE_ROWS.rows.find((row) => row.level === 5));
+    expect(row5.options.map((option) => option.id)).toEqual([
+      'dru_r5_improved_wrath',
+      'dru_r5_ferocity',
+      'dru_r5_natures_bounty',
+    ]);
+    const byId = (id: string) => expectDefined(row5.options.find((option) => option.id === id));
+    expect(byId('dru_r5_improved_wrath').name).toBe('Wildshift');
+    expect(byId('dru_r5_improved_wrath').description).toBe(
+      'Shapeshifting into Cat, Bruin, or Moonwing Form removes breakable roots and slows.',
+    );
+    // Loping Stride is baseline since the Wildfang kit pass 2; the slot keeps
+    // its id and is Longstride, the retune of that baseline sprint.
+    expect(byId('dru_r5_ferocity').name).toBe('Longstride');
+    expect(byId('dru_r5_ferocity').description).toBe(
+      'Loping Stride lasts 5 sec and its cooldown is 12 sec.',
+    );
+    expect(byId('dru_r5_natures_bounty').description).toBe(
+      'Wildbolt, Skyfall, Wildmend, and Second Bloom are castable while moving.',
+    );
   });
 });

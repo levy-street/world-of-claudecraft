@@ -6,6 +6,8 @@
 // (shared with the server); this module only maps that model to and from the
 // per-profile, per-form storage keys and decides the world-entry reconciliation.
 
+import { classSpecs } from '../../../sim/content/talents';
+import type { PlayerClass } from '../../../sim/types';
 import {
   ACTION_BAR_LAYOUT_FORMS,
   ACTION_BAR_LAYOUT_LEGACY_PROFILE,
@@ -42,10 +44,14 @@ export function actionBarSlotMapKey(
   playerName: string,
   profile: ActionBarLayoutProfile,
   form: ActionBarLayoutForm,
+  spec?: string | null,
 ): string {
   const base = `woc_hotbar_${playerClass}_${playerName}`;
   const scoped = profile === ACTION_BAR_LAYOUT_LEGACY_PROFILE ? base : `${base}_${profile}`;
-  return form === 'normal' ? scoped : `${scoped}_${form}`;
+  if (form !== 'normal') {
+    return `${scoped}_${form}`;
+  }
+  return spec ? `${scoped}_${spec}` : scoped;
 }
 
 export function actionBarFormSeededKey(slotMapKey: string): string {
@@ -87,7 +93,28 @@ export function captureActionBarLayout(
     if (attackRaw !== null) formLayout.attack = safeParse(attackRaw);
     forms[form] = formLayout;
   }
-  return sanitizeActionBarLayout({ v: 1, forms }) ?? { v: 1, forms: {} };
+  const specs: Record<string, unknown> = {};
+  const knownSpecs = classSpecs(playerClass as PlayerClass);
+  for (const spec of knownSpecs) {
+    const key = actionBarSlotMapKey(playerClass, playerName, profile, 'normal', spec);
+    let barRaw: string | null = null;
+    let attackRaw: string | null = null;
+    try {
+      barRaw = storage.getItem(key);
+      attackRaw = storage.getItem(attackSlotStorageKey(key));
+    } catch {
+      // Storage can be unavailable in private browsing modes.
+    }
+    if (barRaw === null && attackRaw === null) continue;
+    const specLayout: Record<string, unknown> = { bar: safeParseArray(barRaw) };
+    if (attackRaw !== null) specLayout.attack = safeParse(attackRaw);
+    specs[spec] = specLayout;
+  }
+  const payload: Record<string, unknown> = { v: 1, forms };
+  if (Object.keys(specs).length > 0) {
+    payload.specs = specs;
+  }
+  return sanitizeActionBarLayout(payload) ?? { v: 1, forms: {} };
 }
 
 /**
@@ -124,6 +151,25 @@ export function applyActionBarLayout(
       storage.setItem(actionBarStealthInitializedKey(key), '1');
     } catch {
       // Storage can be unavailable in private browsing modes.
+    }
+  }
+  if (clean.specs) {
+    for (const [spec, specLayout] of Object.entries(clean.specs)) {
+      if (!specLayout) continue;
+      const key = actionBarSlotMapKey(playerClass, playerName, profile, 'normal', spec);
+      const bar: HotbarAction[] = Array.from(
+        { length: Math.min(specLayout.bar.length, ACTION_BAR_ABILITY_SLOTS) },
+        (_, i) => specLayout.bar[i] ?? null,
+      );
+      try {
+        storage.setItem(key, JSON.stringify(bar));
+        const encodedAttack = encodeStoredHotbarAction((specLayout.attack ?? null) as HotbarAction);
+        if (encodedAttack === null) storage.removeItem(attackSlotStorageKey(key));
+        else storage.setItem(attackSlotStorageKey(key), encodedAttack);
+        storage.setItem(actionBarFormSeededKey(key), '1');
+      } catch {
+        // Storage can be unavailable in private browsing modes.
+      }
     }
   }
 }

@@ -147,6 +147,80 @@ describe('first-tier tutorial one-shot (Professions 2.0)', () => {
   });
 });
 
+describe('first-tier tutorial also fires for gathering (fishing/mining/etc.)', () => {
+  it('fires from a gathering proficiency alone, with all craft skills at zero', () => {
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    for (const craft of Object.keys(meta.craftSkills)) meta.craftSkills[craft] = 0;
+
+    const below = nudgeCtx();
+    meta.gatheringProficiency.fishing = 24; // still tier 0
+    expect(maybeEmitTierTutorial(meta, below.ctx)).toBe(false);
+    expect(below.emitted).toEqual([]);
+
+    meta.gatheringProficiency.fishing = 25; // tier 1: a fishing-only character now gets the explainer
+    const first = nudgeCtx();
+    expect(maybeEmitTierTutorial(meta, first.ctx)).toBe(true);
+    expect(first.emitted).toEqual([{ type: 'profTierTutorial', pid: sim.playerId }]);
+    expect(meta.profTierTutorialSent).toBe(true);
+  });
+
+  it('one-shot holds across BOTH trigger paths: a later craft tier-up does not re-fire', () => {
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    for (const craft of Object.keys(meta.craftSkills)) meta.craftSkills[craft] = 0;
+    meta.gatheringProficiency.mining = 30; // fires via gathering
+    expect(maybeEmitTierTutorial(meta, nudgeCtx().ctx)).toBe(true);
+    expect(meta.profTierTutorialSent).toBe(true);
+
+    meta.craftSkills.tailoring = 25; // now also crosses tier 1 via craft
+    const second = nudgeCtx();
+    expect(maybeEmitTierTutorial(meta, second.ctx)).toBe(false);
+    expect(second.emitted).toEqual([]);
+  });
+
+  it('the existing craft-only trigger is unaffected: still fires with every gathering proficiency at zero', () => {
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    for (const proficiency of Object.keys(meta.gatheringProficiency)) {
+      (meta.gatheringProficiency as Record<string, number>)[proficiency] = 0;
+    }
+    meta.craftSkills.engineering = 25; // tier 1 via craft, exactly as before
+    const result = nudgeCtx();
+    expect(maybeEmitTierTutorial(meta, result.ctx)).toBe(true);
+    expect(result.emitted).toEqual([{ type: 'profTierTutorial', pid: sim.playerId }]);
+  });
+
+  it('a pre-fix save (gathering already at tier 1, flag never set) gets a one-time retroactive tutorial on load', () => {
+    // A character saved BEFORE this change: fishing already past tier 1, but
+    // profTierTutorialSent was never set because the old hasCraftAtTierOne
+    // never looked at gatheringProficiency. This is the intended, one-shot
+    // retroactive rollout effect for existing gathering-only characters, not
+    // a bug: loading that save and running the sweep once now fires the
+    // explainer exactly once, same as any fresh crossing.
+    const sim = makeSim();
+    const meta = sim.players.get(sim.playerId)!;
+    for (const craft of Object.keys(meta.craftSkills)) meta.craftSkills[craft] = 0;
+    meta.gatheringProficiency.fishing = 60;
+    const preFixSave = sim.serializeCharacter(sim.playerId);
+    expect(preFixSave && 'profTierTutorialSent' in preFixSave).toBe(false);
+
+    const reloaded = makeSim(3122);
+    const pid = reloaded.addPlayer('warrior', 'PreFix', { state: preFixSave ?? undefined });
+    const reloadedMeta = reloaded.players.get(pid)!;
+    expect(reloadedMeta.profTierTutorialSent).toBeFalsy();
+
+    const first = nudgeCtx();
+    expect(maybeEmitTierTutorial(reloadedMeta, first.ctx)).toBe(true);
+    expect(first.emitted).toEqual([{ type: 'profTierTutorial', pid }]);
+    expect(reloadedMeta.profTierTutorialSent).toBe(true);
+
+    const second = nudgeCtx();
+    expect(maybeEmitTierTutorial(reloadedMeta, second.ctx)).toBe(false);
+    expect(second.emitted).toEqual([]);
+  });
+});
+
 describe('nudge sweep determinism (Professions 2.0)', () => {
   it('two same-seed sims run the sweep identically', () => {
     const run = () => {

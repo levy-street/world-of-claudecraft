@@ -231,7 +231,11 @@ export class LootWindowController {
     this.lastHarvestQueryAtMs = Number.NEGATIVE_INFINITY;
     this.renderCorpseBody(mob, availability);
     this.deps.element.style.display = 'block';
-    if (this.deps.document.body.classList.contains('mobile-touch')) {
+    // A pointer-less open (the interact key, a pad press, the mobile interact
+    // button: HARVEST_CHOICE_NO_POINTER for both coordinates) has no cursor to
+    // anchor to, so it centers exactly like the Professions entry and touch.
+    const pointerless = !Number.isFinite(screenX) || !Number.isFinite(screenY);
+    if (pointerless || this.deps.document.body.classList.contains('mobile-touch')) {
       this.deps.centerPopup(this.deps.element);
     } else {
       this.deps.placePopup(this.deps.element, screenX - 115, screenY - 30, 260, 280, 10, 10);
@@ -750,7 +754,7 @@ export class LootWindowController {
   }
 
   private titleHtml(title: string): string {
-    return `<div class="panel-title"><span>${esc(title)}</span><button type="button" class="x-btn" data-close data-pad-initial-focus aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
+    return `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(title)}</span><button type="button" class="x-btn ui-x-btn" data-close data-pad-initial-focus aria-label="${esc(t('itemUi.loot.close'))}">${svgIcon('close')}</button></div>`;
   }
 
   private itemRowHtml(stack: LootWindowItemStack): string {
@@ -764,7 +768,8 @@ export class LootWindowController {
       stack.count > 1
         ? ` ${esc(t('itemUi.bags.stackCount', { count: formatNumber(stack.count, { maximumFractionDigits: 0 }) }))}`
         : '';
-    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}<span style="font-size:12px">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
+    const qualityClass = item?.kind === 'quest' ? 'q-quest' : `q-${item?.quality ?? 'common'}`;
+    return `<div class="loot-item" data-item="${esc(stack.itemId)}">${item ? this.deps.itemIcon(item) : unknownItemIconHtml(stack.itemId)}<span class="loot-item-name ${qualityClass}">${esc(item ? itemDisplayName(item) : stack.itemId)}${count}</span></div>`;
   }
 
   private attachItemTooltips(): void {
@@ -784,7 +789,7 @@ export class LootWindowController {
 
   private appendTakeButton(label: string, onClick: () => void, tooltip?: () => string): void {
     const button = this.deps.document.createElement('button');
-    button.className = 'btn';
+    button.className = 'btn ui-btn ui-btn--red';
     button.textContent = label;
     // The shared attachTooltip idiom (hover, mobile long-press, and keyboard
     // focus), not a native title attribute, so touch players see it too.

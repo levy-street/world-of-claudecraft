@@ -1,10 +1,14 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { QUESTS } from '../src/sim/data';
 import type { QuestProgress } from '../src/sim/types';
 import { QuestTrackerController } from '../src/ui/hud/quest/quest_tracker_controller';
 import { makeWriterFacet } from '../src/ui/painter_host';
 import { dropPointerFocus } from '../src/ui/pointer_blur';
+import { QuestTrackingState } from '../src/ui/quest_tracking_core';
 import type { IWorld } from '../src/world_api';
+
+const hudCss = readFileSync(new URL('../src/styles/hud.css', import.meta.url), 'utf8');
 
 /** A private facet per rig: the controller takes Hud's shared one in production,
  *  and a test needs only the elision behaviour. */
@@ -29,8 +33,23 @@ function progress(questId: string, state: QuestProgress['state'] = 'active'): Qu
   };
 }
 
+/** In-memory Storage stand-in, so a rig never touches the shipped per-character rows. */
+function fakeStorage() {
+  const rows = new Map<string, string>();
+  return {
+    getItem: (key: string) => rows.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      rows.set(key, value);
+    },
+  };
+}
+
 function harness(entries: QuestProgress[] = []) {
   const questLog = new Map(entries.map((entry) => [entry.questId, entry]));
+  const tracking = new QuestTrackingState(fakeStorage());
+  // Same identity the fake world reports, so the controller's own per-frame sync
+  // is a no-op and a rig can seed the set before the first update.
+  tracking.useCharacter('warrior', 'Adventurer');
   let html = '';
   let writes = 0;
   let collapsed = false;
@@ -66,8 +85,13 @@ function harness(entries: QuestProgress[] = []) {
     writers: writers(),
     element,
     document,
-    world: () => ({ questLog }) as Pick<IWorld, 'questLog'>,
+    world: () =>
+      ({ cfg: { playerClass: 'warrior' }, player: { name: 'Adventurer' }, questLog }) as Pick<
+        IWorld,
+        'questLog' | 'cfg' | 'player'
+      >,
     settings,
+    tracking,
     questTitle: (questId) => `title:${questId}`,
     objectiveLabel: (questId, index) => `objective:${questId}:${index}`,
     click,
@@ -75,6 +99,7 @@ function harness(entries: QuestProgress[] = []) {
   return {
     controller,
     questLog,
+    tracking,
     settings,
     click,
     header,
@@ -88,8 +113,43 @@ function harness(entries: QuestProgress[] = []) {
 }
 
 describe('QuestTrackerController', () => {
-  it('renders authoritative quests in acceptance order and elides an identical paint', () => {
+  it('drops an untracked quest from the tracker and reserves its acceptance number', () => {
+    // The map badges number every LOG entry, so an untracked quest must leave a
+    // gap rather than renumber the rows after it; otherwise a tracker row and the
+    // gold badge for the same quest would name different numbers.
+    const wolves = progress('q_wolves');
+    wolves.counts[0] = 0;
+    const test = harness([wolves, progress('q_boars', 'ready')]);
+    test.controller.update(0);
+    expect(test.html()).toContain('title:q_wolves');
+
+    test.tracking.setTracked('q_wolves', false);
+    test.controller.update(0);
+
+    expect(test.html()).not.toContain('title:q_wolves');
+    expect(test.html()).toContain('title:q_boars');
+    // q_boars keeps the number 2 it had while q_wolves was tracked.
+    expect(test.html()).toContain('class="qt-num ui-badge ui-num">2</span>title:q_boars');
+    expect(test.html()).toContain('<span class="qt-count ui-num">1</span>');
+    // Presentation only: the quest is still in the authoritative log.
+    expect(test.questLog.has('q_wolves')).toBe(true);
+  });
+
+  it('brings a re-tracked quest back on the next update', () => {
     const test = harness([progress('q_wolves'), progress('q_boars', 'ready')]);
+    test.tracking.setTracked('q_wolves', false);
+    test.controller.update(0);
+    expect(test.html()).not.toContain('title:q_wolves');
+
+    test.tracking.setTracked('q_wolves', true);
+    test.controller.update(0);
+    expect(test.html()).toContain('title:q_wolves');
+  });
+
+  it('renders authoritative quests in acceptance order and elides an identical paint', () => {
+    const wolves = progress('q_wolves');
+    wolves.counts[0] = 0;
+    const test = harness([wolves, progress('q_boars', 'ready')]);
 
     test.controller.update(0);
     test.controller.update(0);
@@ -102,6 +162,30 @@ describe('QuestTrackerController', () => {
     );
     expect(test.html()).toContain('objective:q_wolves:0');
     expect(test.html()).toContain('quest-complete');
+    expect(test.html()).toContain('class="qt-header ui-cin"');
+    // A <button> takes no colour from #quest-tracker, so the heading names the
+    // gold accent itself (the review finding: it rendered black).
+    expect(hudCss).toMatch(/#quest-tracker \.qt-header \{\s*\n\s*color: var\(--color-accent\);/);
+    expect(test.html()).toContain('class="qt-num ui-badge ui-num"');
+    // The right-rail board separates the objective label from its live numeric column.
+    expect(test.html()).toContain('class="qt-obj ui-meta counted"');
+    expect(test.html()).toContain('class="qt-obj-count ui-num"');
+    expect(test.html()).toContain('0 / 8');
+    expect(test.html()).toContain('<span class="qt-count ui-num">2</span>');
+  });
+
+  it('renders complete and single-target objectives without a numeric column', () => {
+    const incomplete = progress('q_greyjaw');
+    incomplete.counts[0] = 0;
+    const test = harness([incomplete, progress('q_ringleader')]);
+
+    test.controller.update(0);
+
+    expect(test.html()).toContain('class="qt-obj ui-meta muted"');
+    expect(test.html()).toContain('objective:q_greyjaw:0</span></div>');
+    expect(test.html()).toContain('class="qt-obj ui-meta done"');
+    expect(test.html()).toContain('objective:q_ringleader:0</span></div>');
+    expect(test.html()).not.toContain('class="qt-obj-count ui-num"');
   });
 
   it('keeps an unknown quest id tracked at its log position, never a throw (R34)', () => {

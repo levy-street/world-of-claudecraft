@@ -3081,6 +3081,8 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   hibernate: r('arcane', 'silverWhite', [{ p: 'moon', pal: 'silverWhite' }], ['sparkle']),
   dash: r('nature', 'leafGreen', ['paw', { p: 'claw_slash', ...TR }], ['motion']),
   pounce: r('nature', 'leafGreen', ['fang', { p: 'claw_slash', ...BR }], ['motion']),
+  lunge: r('nature', 'leafGreen', ['paw', { p: 'fang', ...TR }], ['motion', 'glow']),
+  hamstring_bite: r('blood', 'blood', ['fang', { p: 'boot', ...BR }], ['crack']),
   insect_swarm: r('nature', 'leafGreen', ['tendrils'], ['sparkle']),
   tigers_fury: r('fire', 'ember', ['fang'], ['glow']),
   rip: r('blood', 'blood', ['claw_slash'], ['drips']),
@@ -3725,6 +3727,7 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_buff_speed: r('earth', 'leather', ['boot'], ['motion']),
   aura_buff_haste: r('storm', 'sky', ['lightning']),
   aura_absorb: r('holy', 'silverWhite', ['shield'], ['glow']),
+  temporal_aegis: r('arcane', 'arcanePink', ['shield', { p: 'moon', ...TR }], ['sparkle']),
   aura_imbue: r('holy', 'holyGold', ['sword', { p: 'sunburst', ...TL }]),
   aura_buff_allstats: r('arcane', 'arcanePink', ['gem']),
   aura_thorns: r('nature', 'leafGreen', ['leaf', { p: 'claw_slash', ...BR }]),
@@ -4950,8 +4953,20 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'sudden_death',
 ]);
 
+// Ability ids that ship their procedural ABILITY_RECIPES glyph while their
+// painted art is owned by a later art pass (the ITEM_ART_PENDING shape for
+// abilities). The painted-census guards (tests/missing_painted_icons_wave,
+// tests/release_v039_icon_art) treat these as parked, never as painted, and
+// reject a stale entry once art lands.
+export const ABILITY_ART_PENDING = new Set<string>([
+  // Wildfang kit pass 2: the VFX and art retune owns the final paintings.
+  'lunge',
+  'hamstring_bite',
+]);
+
 /** Static URL of an ability's image icon, or null if it uses a recipe. */
 export function abilityImageUrl(id: string): string | null {
+  if (ABILITY_ART_PENDING.has(id)) return null;
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
   if (PET_ACTION_IMAGE_IDS.has(id)) return `${SKILL_ICON_DIR}/pet/${id}.webp`;
   const cls =

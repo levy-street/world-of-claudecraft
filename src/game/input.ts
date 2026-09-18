@@ -7,9 +7,17 @@
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
 import { detectBrowserEngine } from './browser_env';
+import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
-import { comboCode, isModifierCode, type Keybinds, makeCombo } from './keybinds';
+import {
+  comboCode,
+  isModifierCode,
+  type Keybinds,
+  makeCombo,
+  partyTargetActionSlot,
+} from './keybinds';
 import { bindableMouseCodeForButton, isReservedMouseButton } from './mouse_binds';
+import { toggleFriendlyNameplates } from './nameplate_view_prefs';
 import {
   inForcedPointerLockCooldown,
   pointerLockNeedsSyncGesture,
@@ -20,6 +28,7 @@ import {
 import { normalizePointerLookDelta } from './pointer_look_delta';
 import { clickPickFromMouseGesture, DEFAULT_CLICK_PICK_MAX_MS } from './pointer_pick';
 import { isStaleChromeButton } from './stale_chrome_focus';
+import { wheelCodeForDelta, zoomStepForAction } from './wheel_binds';
 
 function detectPointerLockNeedsSyncGesture(): boolean {
   try {
@@ -70,6 +79,9 @@ export interface InputCallbacks {
   // Select your own pet (Ctrl+6 by default). Separate from onPet: this targets the
   // pet rather than commanding it, so it belongs with the targeting callbacks above.
   onTargetPet(): void;
+  // A party target hotkey (F1..F10 by default): slot 0 is yourself, 1..9 the
+  // party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts).
+  onTargetParty(slot: number): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -105,6 +117,7 @@ export interface InputCallbacks {
       | 'cosmetics'
       | 'crafting'
       | 'sheathe'
+      | 'hideInterface'
       | 'mount',
   ): void;
   onEmoteWheel(open: boolean): void;
@@ -396,16 +409,17 @@ export class Input {
     // See releaseMouseActivatedFocus: sheds a HUD button's lingering focus
     // after a real mouse click so it cannot hijack the next Space/Enter.
     window.addEventListener('click', (e) => this.releaseMouseActivatedFocus(e));
-    canvas.addEventListener(
-      'wheel',
-      (e) => {
-        e.preventDefault();
-        if (document.body.classList.contains('mobile-touch')) return;
-        this.zoomBy(Math.sign(e.deltaY) * 1.4);
-        this.noteIntent('zoom');
-      },
-      { passive: false },
-    );
+    // A wheel notch over the game world is a bindable pseudo-key (WheelUp /
+    // WheelDown, see wheel_binds.ts) that drives camera zoom by default. Only the
+    // canvas dispatches it: a notch over the HUD must keep scrolling that list.
+    canvas.addEventListener('wheel', (e) => this.onWheel(e), { passive: false });
+    // The rebind CAPTURE listens on the window in the capture phase instead: the
+    // player rolls the wheel over the Key Bindings panel, never over the canvas,
+    // and the panel's own scroll must not swallow the notch first.
+    window.addEventListener('wheel', (e) => this.onCaptureWheel(e), {
+      passive: false,
+      capture: true,
+    });
     canvas.addEventListener('contextmenu', (e) => e.preventDefault());
     canvas.addEventListener('mouseenter', () => {
       this.hoverActive = true;
@@ -682,6 +696,14 @@ export class Input {
     this.autorun = !this.autorun;
     this.noteMovementIntent();
     return this.autorun;
+  }
+
+  // Friendly-nameplate toggle: where the Ctrl+V edge action lands, and what the
+  // pad calls directly (gamepad.ts, the way it calls toggleAutorun). The state is
+  // a local view preference in nameplate_view_prefs, so it never travels through
+  // main.ts; the nameplate painter reads it from there. Returns the new state.
+  toggleFriendlyNameplates(): boolean {
+    return toggleFriendlyNameplates();
   }
 
   // Idempotent autorun latch for analog inputs that have a one-way "engage"
@@ -966,7 +988,49 @@ export class Input {
     return Math.max(0, performance.now() - this.downAt);
   }
 
+  // The rebind capture half of a wheel notch, anywhere in the window: the same
+  // one-shot delivery a key or a mouse button gets, chord included (Ctrl+wheel).
+  private onCaptureWheel(e: WheelEvent): void {
+    if (!this.captureCb) return;
+    const code = wheelCodeForDelta(e.deltaY);
+    if (code === null) return;
+    e.preventDefault?.();
+    e.stopPropagation?.();
+    const cb = this.captureCb;
+    this.captureCb = null;
+    cb(makeCombo(code, { ctrl: e.ctrlKey, alt: e.altKey, shift: e.shiftKey, meta: e.metaKey }));
+  }
+
+  // A wheel notch over the canvas dispatches like a key tap: the full chord is
+  // looked up as an edge action (a zoom step, a slot tap, a window toggle) and
+  // honors the same guards as a bound key. A notch has no release, so a slot
+  // bound to it fires as a complete tap, never a charge. An unbound notch does
+  // nothing: zoom is only ever the zoomIn / zoomOut actions, wherever they sit.
+  private onWheel(e: WheelEvent): void {
+    e.preventDefault();
+    if (document.body.classList.contains('mobile-touch')) return;
+    if (this.captureCb) return; // onCaptureWheel already consumed this notch
+    const code = wheelCodeForDelta(e.deltaY);
+    if (code === null) return;
+    const tag = (document.activeElement?.tagName ?? '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    if (this.cb.canUseGameKeys && !this.cb.canUseGameKeys()) return;
+    const combo = makeCombo(code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    const edge = this.keybinds.edgeActionForCombo(combo);
+    if (edge !== null) this.dispatchEdge(edge);
+  }
+
   private onKeyDown(e: KeyboardEvent): void {
+    // A bound F-key belongs to the game on EVERY keydown, auto-repeats included:
+    // the repeat early return below would otherwise hand a held key's repeats
+    // back to the browser (F5 reload, F1 help, F3 find, F10 menu focus). Unbound
+    // F-keys stay the browser's; the action itself still fires once per press.
+    if (this.isBoundFKey(e)) e.preventDefault?.();
     if (e.repeat) return;
     if (this.captureCb) {
       e.preventDefault();
@@ -1079,6 +1143,20 @@ export class Input {
     }
   }
 
+  /** True for an F-row key that some action holds, as a held key (bare code) or
+   *  as an edge chord; onKeyDown cancels the browser default for those. */
+  private isBoundFKey(e: KeyboardEvent): boolean {
+    if (!/^F\d{1,2}$/.test(e.code)) return false;
+    if (this.keybinds.heldActionForCode(e.code) !== null) return true;
+    const combo = makeCombo(e.code, {
+      ctrl: e.ctrlKey,
+      alt: e.altKey,
+      shift: e.shiftKey,
+      meta: e.metaKey,
+    });
+    return this.keybinds.edgeActionForCombo(combo) !== null;
+  }
+
   private onKeyUp(e: KeyboardEvent): void {
     if (this.releaseBoundCode(e.code)) e.preventDefault();
   }
@@ -1117,10 +1195,25 @@ export class Input {
       this.cb.onAbility(Number(action.slice(4)));
       return;
     }
+    const partySlot = partyTargetActionSlot(action);
+    if (partySlot !== null) {
+      this.cb.onTargetParty(partySlot);
+      return;
+    }
+    // Camera zoom: one step per notch or key tap, from whatever code carries it.
+    const zoom = zoomStepForAction(action);
+    if (zoom !== null) {
+      this.zoomBy(zoom);
+      this.noteIntent('zoom');
+      return;
+    }
     switch (action) {
       case 'autorun':
         this.autorun = !this.autorun;
         this.noteMovementIntent();
+        return;
+      case 'friendlyNameplates':
+        this.toggleFriendlyNameplates();
         return;
       case 'target':
         this.cb.onTab();
@@ -1235,6 +1328,9 @@ export class Input {
         return;
       case 'sheathe':
         this.cb.onUiKey('sheathe');
+        return;
+      case 'hideInterface':
+        this.cb.onUiKey('hideInterface');
         return;
     }
   }
@@ -1385,7 +1481,12 @@ export class Input {
   // drag-to-equip/drag-to-hotbar stay untouched. A non-primary release
   // (right/middle-click) has no keyboard equivalent in this game, so
   // onMouseUp always treats it as mouse-driven.
-  private releaseMouseActivatedFocus(e: { type: string; detail?: number }): void {
+  //
+  // One exception: the click's own handler may have opened a modal confirm
+  // (Disenchant, Salvage, the vendor sell confirm) and focused its OK button
+  // in this same click. That focus is keyboard-owned (Enter confirms it), so
+  // it is left alone; src/game/click_claimed_focus.ts owns the rule.
+  private releaseMouseActivatedFocus(e: { type: string; detail?: number; target?: unknown }): void {
     if (e.type === 'click' && e.detail === 0) return;
     const active = document.activeElement as {
       tagName?: string;
@@ -1395,7 +1496,9 @@ export class Input {
       hasAttribute?: (name: string) => boolean;
       blur?: () => void;
     } | null;
-    if (active && this.isMouseActivatableFocusTarget(active)) this.dropMouseActivatedFocus(active);
+    if (!active || !this.isMouseActivatableFocusTarget(active)) return;
+    if (clickClaimedModalFocus(active, e.target)) return;
+    this.dropMouseActivatedFocus(active);
   }
 
   private dropMouseActivatedFocus(active: {

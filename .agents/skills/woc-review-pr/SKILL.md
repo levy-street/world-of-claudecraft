@@ -38,6 +38,13 @@ background database work, database driver/dependency versions, PostgreSQL
 engine/resource/configuration/topology, or stored-data growth. Pair it with persistence or security
 review when those concerns also apply.
 
+Invoke `woc_server_hot_path` when the diff adds or changes server work that runs per tick,
+per request, per broadcast, per session, or on a recurring main-thread job: a shared read or
+cache, a growing table or in-memory collection, a snapshot or event payload, a `selfWireJson`
+key or the `src/sim/` read it calls, an autosave, sweep, or self-clocked job, or a
+`world_state` blob write. It owns the non-SQL server budget; pair it with
+`woc_database_performance` when SQL cost is also in play.
+
 For every candidate finding:
 
 1. Trace the execution path.

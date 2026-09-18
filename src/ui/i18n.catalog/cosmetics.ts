@@ -21,6 +21,8 @@ export const cosmeticsStrings = {
   applied: 'Applied',
   owned: 'Owned',
   storeOnly: 'Available in the WOC Store',
+  preview: 'Preview',
+  previewAria: 'Preview {name}',
   cardAria: '{name}, {rarity}',
   mountsIntro:
     'A mount skin is drawn over whichever mount this character rides. It never changes speed.',

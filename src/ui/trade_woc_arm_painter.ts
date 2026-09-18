@@ -178,7 +178,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   // Caption and link share one wrapping row at one size, so they read as one
   // sentence instead of the link dropping to its own line under the box.
   const termsRow = model.showTerms
-    ? `<div class="trade-woc-consent"><label class="trade-woc-terms"><input type="checkbox" data-woc-terms data-focus-key="trade-woc-terms"${
+    ? `<div class="trade-woc-consent"><label class="trade-woc-terms"><input class="ui-check" type="checkbox" data-woc-terms data-focus-key="trade-woc-terms"${
         model.termsChecked ? ' checked' : ''
       } /> ${esc(t('hudChrome.wocMarket.termsLabel'))}</label>
       <a class="trade-woc-terms-link" href="${esc(model.termsHref)}" target="_blank" rel="noopener noreferrer">${esc(
@@ -203,9 +203,9 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   // is told apart by aria-pressed AND the underline (shape, not colour alone).
   // The disabled $WOC toggle on the gold face carries the reason as a hint.
   const modeTabs = `
-    <div class="trade-woc-modes" role="group" aria-label="${esc(t('hudChrome.trade.woc.modesLabel'))}">
-      <button type="button" class="btn trade-woc-mode" aria-pressed="${model.mode === 'gold'}" data-woc-mode="gold" data-focus-key="trade-woc-tab-gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
-      <button type="button" class="btn trade-woc-mode" aria-pressed="${model.mode === 'woc'}" data-woc-mode="woc" data-focus-key="trade-woc-tab-woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
+    <div class="trade-woc-modes ui-seg" role="group" aria-label="${esc(t('hudChrome.trade.woc.modesLabel'))}">
+      <button type="button" class="btn ui-seg-tab trade-woc-mode${model.mode === 'gold' ? ' is-on' : ''}" aria-pressed="${model.mode === 'gold'}" data-woc-mode="gold" data-focus-key="trade-woc-tab-gold"${model.wocDealStanding ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabGold'))}</button>
+      <button type="button" class="btn ui-seg-tab trade-woc-mode${model.mode === 'woc' ? ' is-on' : ''}" aria-pressed="${model.mode === 'woc'}" data-woc-mode="woc" data-focus-key="trade-woc-tab-woc"${model.wocDisabled ? ' disabled' : ''}>${esc(t('hudChrome.trade.woc.tabWoc'))}</button>
     </div>`;
   const wocOffHint =
     model.mode === 'gold' && model.wocDisabled && !model.wocDealStanding && model.blockKey === null
@@ -322,10 +322,10 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
           ${dueLine}
           <p class="trade-woc-warn">${esc(t('hudChrome.wocMarket.quoteFixedNote'))}</p>
           <div class="trade-woc-actions">
-          <button type="button" class="btn trade-woc-pay trade-woc-primary" data-woc-sign data-focus-key="trade-woc-sign"${
+          <button type="button" class="btn ui-btn ui-btn--red trade-woc-pay trade-woc-primary" data-woc-sign data-focus-key="trade-woc-sign"${
             model.quoteExpired ? ' disabled' : ''
           }>${esc(t('hudChrome.wocMarket.quoteSign'))}</button>
-          <button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-quote-cancel data-focus-key="trade-woc-quote-cancel">${esc(
+          <button type="button" class="btn ui-btn trade-woc-cancel trade-woc-quiet" data-woc-quote-cancel data-focus-key="trade-woc-quote-cancel">${esc(
             t('hudChrome.wocMarket.quoteCancel'),
           )}</button>
           </div>
@@ -344,7 +344,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             )}</p>`;
       const body =
         model.canPay && o.role === 'buyer'
-          ? `${dueOrNote}${termsRow}<button type="button" class="btn trade-woc-pay trade-woc-primary" data-woc-pay data-focus-key="trade-woc-pay"${
+          ? `${dueOrNote}${termsRow}<button type="button" class="btn ui-btn ui-btn--red trade-woc-pay trade-woc-primary" data-woc-pay data-focus-key="trade-woc-pay"${
               model.busy ? ' disabled' : ''
             }>${
               model.busy ? '<span class="woc-spinner" aria-hidden="true"></span>' : ''
@@ -354,7 +354,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
             }${esc(t(model.statusKey ?? 'hudChrome.trade.woc.awaitingPayment'))}</p>`;
       const cancelSale =
         o.role === 'seller' && o.phase === 'awaiting_payment' && !model.cancelPending
-          ? `<button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale"${busyResolve}>${esc(
+          ? `<button type="button" class="btn ui-btn trade-woc-cancel trade-woc-quiet" data-woc-cancel-sale data-focus-key="trade-woc-cancel-sale"${busyResolve}>${esc(
               t('hudChrome.trade.woc.cancelSale'),
             )}</button>`
           : '';
@@ -373,8 +373,8 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     // disables the control.
     const action =
       o.role === 'buyer'
-        ? `<button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-cancel data-focus-key="trade-woc-withdraw"${busyResolve}>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
-        : `<button type="button" class="btn trade-woc-cancel trade-woc-quiet" data-woc-decline data-focus-key="trade-woc-decline"${busyResolve}>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
+        ? `<button type="button" class="btn ui-btn trade-woc-cancel trade-woc-quiet" data-woc-cancel data-focus-key="trade-woc-withdraw"${busyResolve}>${esc(t('hudChrome.trade.woc.withdraw'))}</button>`
+        : `<button type="button" class="btn ui-btn trade-woc-cancel trade-woc-quiet" data-woc-decline data-focus-key="trade-woc-decline"${busyResolve}>${esc(t('hudChrome.trade.woc.decline'))}</button>`;
     // The offer is not open-ended, so say when it lapses; static text on
     // purpose (a per-second countdown would rebuild the subtree for no
     // decision the player can take differently).
@@ -403,7 +403,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
   const priceValue = usdCents === null ? '' : (usdCents / 100).toFixed(2);
   return `<div class="trade-woc-arm">${modeTabs}
     <label class="trade-woc-price-label" for="trade-woc-usd">${esc(t('hudChrome.trade.woc.priceLabel'))}</label>
-    <input id="trade-woc-usd" class="coininput trade-woc-price" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(priceValue)}" placeholder="${esc(t('hudChrome.trade.woc.pricePlaceholder'))}" data-focus-key="trade-woc-usd">
+    <input id="trade-woc-usd" class="coininput ui-input trade-woc-price" type="number" min="0" step="0.01" inputmode="decimal" value="${esc(priceValue)}" placeholder="${esc(t('hudChrome.trade.woc.pricePlaceholder'))}" data-focus-key="trade-woc-usd">
     <p class="trade-woc-equiv" data-woc-equiv></p>
     ${feeLines}
     <p class="trade-woc-note" data-woc-ineligible></p>
@@ -411,7 +411,7 @@ export function wocTradeArmHtml(model: WocTradeModel, usdCents: number | null): 
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.variableWarning'))}</p>
     <p class="trade-woc-warn">${esc(t('hudChrome.trade.woc.notInstant'))}</p>
     ${termsRow}
-    <button type="button" class="btn trade-woc-send trade-woc-primary" data-woc-send data-focus-key="trade-woc-send">${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
+    <button type="button" class="btn ui-btn ui-btn--red trade-woc-send trade-woc-primary" data-woc-send data-focus-key="trade-woc-send">${esc(t('hudChrome.trade.woc.sendOffer'))}</button>
     <p class="trade-woc-hint" data-woc-hint role="status"></p>
   </div>`;
 }

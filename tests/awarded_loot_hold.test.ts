@@ -5,6 +5,7 @@ import { createMob } from '../src/sim/entity';
 import { HELD_LOOT_CORPSE_SECONDS } from '../src/sim/loot/awarded_loot_hold';
 import { BOP_PARTY_TRADE_MS } from '../src/sim/loot/bop_trade_window';
 import { awardSharedLootItem, submitLootRoll } from '../src/sim/loot/loot_roll';
+import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import type { PlayerMeta } from '../src/sim/sim';
 import { Sim } from '../src/sim/sim';
 import type { Entity, LootSlot, SimEvent } from '../src/sim/types';
@@ -209,6 +210,52 @@ describe('awarded loot hold: a roll winner with full bags', () => {
     sim.lootCorpse(mob.id, a);
     expect(sim.countItem(STACKABLE_SOULBOUND, a)).toBe(19);
     expect(heldSlot(mob, STACKABLE_SOULBOUND)).toBeDefined();
+  });
+
+  it('keeps the held award for the classic five-minute window, past the trash decay window', () => {
+    // The report this pins: a party member killed a rare, the winner had full
+    // bags, the corpse kept only the CORPSE_DURATION 60s trash window from the
+    // award, and a winner still running back (or dead from the fight) found
+    // the corpse gone with the item on it. A held award is UNLOOTED loot, and
+    // an unlooted classic corpse persists five minutes, not one.
+    const { sim, a, b, c } = partyOfThree();
+    fillBags(sim, a);
+    const mob = deadCorpse(sim, a, [a, b, c]);
+    winRoll(sim, mob, UNCOMMON, a, [b, c]);
+    expect(HELD_LOOT_CORPSE_SECONDS).toBe(5 * 60);
+    expect(mob.corpseTimer).toBe(HELD_LOOT_CORPSE_SECONDS);
+    tickFor(sim, 90);
+    expect(mob.lootable).toBe(true);
+    expect(heldSlot(mob, UNCOMMON)).toBeDefined();
+    const p = expectDefined(sim.entities.get(a));
+    p.pos = { ...mob.pos };
+    freeOneSlot(sim, a);
+    expect(sim.lootCorpse(mob.id, a)).toBe(true);
+    expect(sim.countItem(UNCOMMON, a)).toBe(1);
+  }, 30_000);
+
+  it('a held award outlives the roll window but not the five-minute hold', () => {
+    const { sim, a, b, c } = partyOfThree();
+    fillBags(sim, a);
+    const mob = deadCorpse(sim, a, [a, b, c]);
+    winRoll(sim, mob, UNCOMMON, a, [b, c]);
+    // Pin the slot OBJECT: an in-place respawn wipes the loot table, and a
+    // respawned wolf the party then re-kills would leave a fresh corpse that a
+    // by-id lookup could mistake for the held one.
+    const held = expectDefined(heldSlot(mob, UNCOMMON));
+    expect(mob.corpseTimer).toBe(HELD_LOOT_CORPSE_SECONDS);
+    // Jump to the last second of the hold rather than ticking 6000 frames.
+    mob.corpseTimer = 1;
+    tickFor(sim, 0.5);
+    expect(mob.dead).toBe(true);
+    expect(corpseHasDecayed(mob.dead, mob.corpseTimer)).toBe(false);
+    expect(mob.loot?.items.includes(held)).toBe(true);
+    tickFor(sim, 1);
+    // Past the hold the corpse decays (and the wolf respawns in place, wiping
+    // the held slot): the item is gone, no mailbox catches it.
+    expect(mob.dead && !corpseHasDecayed(mob.dead, mob.corpseTimer)).toBe(false);
+    expect(mob.loot?.items.includes(held) ?? false).toBe(false);
+    expect(sim.countItem(UNCOMMON, a)).toBe(0);
   });
 
   it('decays with the corpse if the winner never makes room (no mailbox fallback)', () => {

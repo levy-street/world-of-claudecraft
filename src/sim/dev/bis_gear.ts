@@ -9,6 +9,7 @@
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random or
 // Date.now (enforced by tests/architecture.test.ts).
 
+import { DEV_KIT_ROLES, devKitRole } from '../content/dev_kit_roles';
 import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
@@ -26,14 +27,37 @@ import { ALL_EQUIP_SLOTS } from '../types';
 import { collectionFitsRole, collectionRoleForSpec } from './gear_selection';
 import { parseBisGearFor } from './parse_bis_loadouts';
 
-// Rough single-number item power: weapon dps dominates for weapons, stat
-// budget plus armor carries the rest. Only used to ORDER epics per slot.
-function score(item: ItemDef): number {
+// The primary stats a class scores: its own line plus stamina. Under the stamina
+// baseline model (item_budget.ts) a caster piece totals a third more than the
+// physical piece of the same tier, so a raw five-stat sum would rank healer mail
+// above a warrior's own set; counting only the line the class spends keeps the
+// ordering within an identity exactly as before and never crosses it. A
+// spec-less caller takes the line of the class's FIRST-LISTED spec in
+// DEV_KIT_ROLES (talent-tree order: holy for paladins, elemental for shamans,
+// balance for druids), which is the same pick the raw sum happened to land on
+// for those classes; a deliberate rule, not an accident of the table.
+const CASTER_LINE = ['int', 'spi', 'sta'] as const;
+const PHYSICAL_LINE = ['str', 'agi', 'sta'] as const;
+function lineStatsFor(
+  cls: string,
+  spec: string | null,
+): readonly ('str' | 'agi' | 'sta' | 'int' | 'spi')[] {
+  const role =
+    (spec ? devKitRole(cls as PlayerClass, spec) : null) ??
+    DEV_KIT_ROLES[cls as PlayerClass]?.[0] ??
+    null;
+  return role?.weights.int ? CASTER_LINE : PHYSICAL_LINE;
+}
+
+// Rough single-number item power: weapon dps dominates for weapons, the class's
+// stat line plus armor carries the rest. Only used to ORDER epics per slot.
+function score(item: ItemDef, line: readonly ('str' | 'agi' | 'sta' | 'int' | 'spi')[]): number {
   let total = 0;
   if (item.kind === 'weapon' && item.weapon) {
     total += (((item.weapon.min + item.weapon.max) / 2) * 12) / Math.max(0.1, item.weapon.speed);
   }
-  for (const value of Object.values(item.stats ?? {})) total += value as number;
+  total += item.stats?.armor ?? 0;
+  for (const stat of line) total += item.stats?.[stat] ?? 0;
   return total;
 }
 
@@ -50,6 +74,7 @@ export function bestEpicGearFor(
   spec: string | null,
 ): Partial<Record<EquipSlot, string>> {
   const collectionRole = collectionRoleForSpec(cls as PlayerClass, spec);
+  const line = lineStatsFor(cls, spec);
   const epics = Object.values(ITEMS).filter(
     (item) =>
       item.quality === 'epic' &&
@@ -82,7 +107,9 @@ export function bestEpicGearFor(
       );
       if (oneHanders.length > 0) candidates = oneHanders;
     }
-    candidates.sort((a, b) => score(b) - score(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    candidates.sort(
+      (a, b) => score(b, line) - score(a, line) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    );
     return candidates[0];
   };
   for (const slot of ALL_EQUIP_SLOTS) {
@@ -113,7 +140,7 @@ export function bestEpicGearFor(
   let allowedRefill: (item: ItemDef) => boolean = () => true;
   if (flagged.length > MASTERWROUGHT_EQUIP_CAP) {
     const scored = flagged
-      .map(([slot, id]) => ({ slot, id, s: score(ITEMS[id]) }))
+      .map(([slot, id]) => ({ slot, id, s: score(ITEMS[id], line) }))
       .sort((a, b) => b.s - a.s || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     const kept = new Set(scored.slice(0, MASTERWROUGHT_EQUIP_CAP).map((entry) => entry.id));
     allowedRefill = (item: ItemDef): boolean => !item.masterwrought || kept.has(item.id);

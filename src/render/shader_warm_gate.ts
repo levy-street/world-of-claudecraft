@@ -164,7 +164,7 @@ export function runPiecesWarmed(
           cancelCap();
           // The piece links cold now: the worker must not spend a slot on it.
           if (timedOut) hold?.abandon();
-          noteShaderWarmHold(isWarm, timedOut, now() - startedAt);
+          noteShaderWarmHold(isWarm, timedOut, now() - startedAt, hold?.wasReleased() === true);
           submit([piece], index).then(resolve, reject);
         };
         cancelCap = schedule(() => finish(false, true), remainingMs);

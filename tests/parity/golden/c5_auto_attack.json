@@ -35,7 +35,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1016,
-      "state": "54643be8",
+      "state": "ff49854b",
       "events": "52858f53",
       "rng": {
         "draws": 25,
@@ -46,7 +46,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1016,
-      "state": "ae27cc02",
+      "state": "d209b8b3",
       "events": "741638a5",
       "rng": {
         "draws": 25,
@@ -57,7 +57,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1016,
-      "state": "4991f8f3",
+      "state": "cbc61042",
       "events": "e5dae72a",
       "rng": {
         "draws": 28,
@@ -68,7 +68,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1016,
-      "state": "b3f26c14",
+      "state": "c7a8602f",
       "events": "916df3c6",
       "rng": {
         "draws": 31,
@@ -79,7 +79,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1016,
-      "state": "8fef0006",
+      "state": "011cab73",
       "events": "741638a5",
       "rng": {
         "draws": 31,
@@ -90,7 +90,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1016,
-      "state": "1bc0a772",
+      "state": "30c84547",
       "events": "741638a5",
       "rng": {
         "draws": 31,
@@ -101,7 +101,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1016,
-      "state": "a67e0a92",
+      "state": "63db50f7",
       "events": "fe877d4f",
       "rng": {
         "draws": 34,
@@ -112,7 +112,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1016,
-      "state": "480bd487",
+      "state": "7e90f77e",
       "events": "4d3ada89",
       "rng": {
         "draws": 40,
@@ -123,7 +123,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 1016,
-      "state": "a813c023",
+      "state": "fc629c1c",
       "events": "fa59aaea",
       "rng": {
         "draws": 94,
@@ -134,7 +134,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1016,
-      "state": "4b5ce237",
+      "state": "eedc0f6a",
       "events": "aa80ae4f",
       "rng": {
         "draws": 137,
@@ -145,7 +145,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 1016,
-      "state": "cd85b3c6",
+      "state": "177aad65",
       "events": "741638a5",
       "rng": {
         "draws": 167,
@@ -156,7 +156,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1016,
-      "state": "4b6e762e",
+      "state": "ae992629",
       "events": "37e76402",
       "rng": {
         "draws": 208,
@@ -167,7 +167,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 1016,
-      "state": "8f1f4868",
+      "state": "5d843267",
       "events": "fe877d4f",
       "rng": {
         "draws": 252,
@@ -178,7 +178,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1016,
-      "state": "45e56b28",
+      "state": "756e445d",
       "events": "741638a5",
       "rng": {
         "draws": 285,
@@ -189,7 +189,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1016,
-      "state": "24022a0b",
+      "state": "083b1c0a",
       "events": "c2574cd4",
       "rng": {
         "draws": 326,
@@ -200,7 +200,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1016,
-      "state": "333dfd05",
+      "state": "6a9b993e",
       "events": "741638a5",
       "rng": {
         "draws": 368,
@@ -211,7 +211,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 1016,
-      "state": "c38c5043",
+      "state": "62deebbe",
       "events": "9e934a9a",
       "rng": {
         "draws": 426,
@@ -222,7 +222,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1016,
-      "state": "5a020fa8",
+      "state": "63e3ff91",
       "events": "165278e5",
       "rng": {
         "draws": 480,
@@ -233,7 +233,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 1016,
-      "state": "a1713567",
+      "state": "95ca53b2",
       "events": "fe877d4f",
       "rng": {
         "draws": 525,
@@ -244,7 +244,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1016,
-      "state": "2da4d39b",
+      "state": "240cbacc",
       "events": "741638a5",
       "rng": {
         "draws": 570,
@@ -255,7 +255,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 1016,
-      "state": "72af7303",
+      "state": "c84c490a",
       "events": "f2e4cd46",
       "rng": {
         "draws": 636,
@@ -266,7 +266,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1016,
-      "state": "24c2afcd",
+      "state": "6804faec",
       "events": "4d3ada89",
       "rng": {
         "draws": 694,
@@ -277,7 +277,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 1016,
-      "state": "ec102c89",
+      "state": "f11c2d4a",
       "events": "741638a5",
       "rng": {
         "draws": 745,
@@ -288,7 +288,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1016,
-      "state": "d00b645c",
+      "state": "8592da41",
       "events": "69ebfa54",
       "rng": {
         "draws": 812,
@@ -299,7 +299,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1016,
-      "state": "d00b645c",
+      "state": "8592da41",
       "events": "741638a5",
       "rng": {
         "draws": 812,
@@ -912,7 +912,7 @@
             "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 31,
+            "sta": 45,
             "str": 31
           },
           "swingTimer": 1.25,
@@ -1079,7 +1079,7 @@
             "armor": 113,
             "int": 67,
             "spi": 50,
-            "sta": 28,
+            "sta": 42,
             "str": 10
           },
           "swingTimer": 1.25,
@@ -1392,7 +1392,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1016,
-      "state": "3decfa8e",
+      "state": "6fe85919",
       "events": "9f6d4d89",
       "rng": {
         "draws": 864,
@@ -1403,7 +1403,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 1016,
-      "state": "65a0a950",
+      "state": "c37bbe8f",
       "events": "741638a5",
       "rng": {
         "draws": 876,
@@ -2014,7 +2014,7 @@
             "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 31,
+            "sta": 45,
             "str": 31
           },
           "swingTimer": 0.95,
@@ -2181,7 +2181,7 @@
             "armor": 113,
             "int": 67,
             "spi": 50,
-            "sta": 28,
+            "sta": 42,
             "str": 10
           },
           "swingTimer": 0.95,
@@ -2494,7 +2494,7 @@
       "tick": 126,
       "time": 6.3,
       "nextId": 1016,
-      "state": "65a0a950",
+      "state": "c37bbe8f",
       "events": "741638a5",
       "rng": {
         "draws": 876,
@@ -3105,7 +3105,7 @@
             "armor": 300,
             "int": 11,
             "spi": 12,
-            "sta": 31,
+            "sta": 45,
             "str": 31
           },
           "swingTimer": 0.95,
@@ -3272,7 +3272,7 @@
             "armor": 113,
             "int": 67,
             "spi": 50,
-            "sta": 28,
+            "sta": 42,
             "str": 10
           },
           "swingTimer": 0.95,

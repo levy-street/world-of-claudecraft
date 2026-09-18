@@ -68,11 +68,13 @@ describe('character presentation sleep wiring', () => {
     const update = characterVisual.slice(start, end);
 
     const edgeAt = update.indexOf(
-      'shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))',
+      'shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip), s.swimming)',
     );
     const latchAt = update.indexOf('this.currentOneShotIsLanding = true;', edgeAt);
     const stateAt = update.indexOf('const desired = this.desiredBase(s);', latchAt);
-    const cancelAt = update.indexOf('MOVING_STATES.has(desired)', stateAt);
+    // The landing yields to movement, a re-jump, a stationary swim or a moving
+    // cast through one predicate (anim_state.ts shouldInterruptLanding).
+    const cancelAt = update.indexOf('shouldInterruptLanding(s)', stateAt);
     const handoffAt = update.indexOf(
       'this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);',
       cancelAt,
@@ -237,5 +239,21 @@ describe('char-select roster wiring (source pins)', () => {
     expect(swapAt).toBeGreaterThan(-1);
     expect(hydrateAt).toBeGreaterThan(swapAt);
     expect(main).toContain('trackComposedChipRow(row, chipHtml, () => hydratePortraits(row));');
+  });
+});
+
+describe('quadruped swim head and gait wiring (source pins)', () => {
+  // Both arguments default silently (CharacterVisual falls back to the humanoid
+  // head fraction and updateLocomotionInto to the global thresholds), so
+  // reverting either keeps every unit test green while a form_cat swims with
+  // its head under the waterline or breaks into a run at the biped speed.
+  it("latches the surface off the rig's own swimming head height, scaled with the body", () => {
+    expect(renderer).toContain('active.swimHeadHeight * e.scale,');
+  });
+
+  it("feeds the rig's own gait thresholds into the displayed-motion locomotion track", () => {
+    expect(renderer).toContain(
+      'updateLocomotionInto(v.locoState, v.loco, vx, vz, facing, dt, active.gait);',
+    );
   });
 });

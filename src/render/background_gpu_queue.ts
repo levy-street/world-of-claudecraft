@@ -369,6 +369,23 @@ export interface BackgroundGpuQueueStats {
   recent: GpuQueueWindowStats;
 }
 
+/** The `name` of the error every rejection of a shut-down queue carries, so a
+ *  client can tell the expected exit (a renderer rebuild) from a failed unit.
+ *  `shutdown()` builds that error itself (the caller's message, the caller's
+ *  error as `cause`) and leaves the caller's object untouched, so a reason of
+ *  any class (an AbortError, a subclass with its own name) classifies alike. */
+export const GPU_QUEUE_SHUTDOWN_ERROR_NAME = 'GpuQueueShutdown';
+
+function gpuQueueShutdownError(reason: Error): Error {
+  const error = new Error(reason.message, { cause: reason });
+  error.name = GPU_QUEUE_SHUTDOWN_ERROR_NAME;
+  return error;
+}
+
+export function isGpuQueueShutdown(error: unknown): boolean {
+  return error instanceof Error && error.name === GPU_QUEUE_SHUTDOWN_ERROR_NAME;
+}
+
 export interface BackgroundGpuQueue {
   run<T>(
     work: () => T | Promise<T>,
@@ -879,7 +896,9 @@ export function createBackgroundGpuQueue(opts?: {
       options?: GpuWorkRunOptions,
     ): Promise<T> {
       if (!accepting) {
-        return Promise.reject(shutdownReason ?? new Error('Background GPU queue is shut down'));
+        return Promise.reject(
+          shutdownReason ?? gpuQueueShutdownError(new Error('Background GPU queue is shut down')),
+        );
       }
       const result = new Promise<T>((resolve, reject) => {
         pending.push({
@@ -1014,8 +1033,8 @@ export function createBackgroundGpuQueue(opts?: {
     shutdown(reason = new Error('Background GPU queue is shut down')): Promise<void> {
       if (shutdownPromise) return shutdownPromise;
       accepting = false;
-      shutdownReason = reason;
-      for (const entry of pending.splice(0)) entry.reject(reason);
+      shutdownReason = gpuQueueShutdownError(reason);
+      for (const entry of pending.splice(0)) entry.reject(shutdownReason);
       // A loop parked on the admission has no other way out: nothing will feed
       // it a frame after shutdown, and its pending set just emptied.
       wakeAdmission();

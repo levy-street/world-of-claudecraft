@@ -35,6 +35,14 @@ const facts = (over: Partial<AnimOverrideFacts> = {}): AnimOverrideFacts => ({
 });
 
 describe('applyEntityAnimOverrides: battle-stance engagement', () => {
+  it('copies and clears the already folded stealth input every frame', () => {
+    const st = state();
+    applyEntityAnimOverrides(st, facts(), false, 0, true);
+    expect(st.stealthed).toBe(true);
+    applyEntityAnimOverrides(st, facts(), false, 0, false);
+    expect(st.stealthed).toBe(false);
+  });
+
   it('flags a mob that holds a live aggro target as engaged', () => {
     const st = state();
     applyEntityAnimOverrides(st, facts({ aggroTargetId: 7 }), false);

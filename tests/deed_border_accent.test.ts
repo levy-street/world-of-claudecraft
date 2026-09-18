@@ -851,7 +851,11 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       expect(html.match(/class="deed-heraldry-pattern"/g)).toHaveLength(2);
     }
     const hud = read('src/ui/hud.ts');
-    expect(hud).toContain('targetFrame.borderSlug = deedTargetBorderSlug(');
+    // The target fill moved to src/ui/target_frame_descriptor.ts; the Hud calls it.
+    expect(hud).toContain('const targetFrame = fillTargetFrameDescriptor(');
+    expect(read('src/ui/target_frame_descriptor.ts')).toContain(
+      'd.borderSlug = deedTargetBorderSlug(',
+    );
     expect(hud.match(/heraldry:\s*\{/g)).toHaveLength(2);
     expect(hud.slice(hud.indexOf('private readonly totFramePainter'))).not.toContain(
       'totf-heraldry',
@@ -1103,10 +1107,15 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
           const tierUses = normalized.match(/var\(--fx-shadow/g) ?? [];
           allTierShadowDeclarations.push(...tierUses.map(() => normalized));
           const property = normalized.slice(0, normalized.indexOf(':')).trim();
+          // The library glow composites (tokens.css --glow-*) are box-shadow values
+          // by construction, so a tier may scale them like any other bloom.
+          const tierScalable =
+            ['box-shadow', 'filter', '--art-shadow-sm', '--art-shadow-lg'].includes(property) ||
+            property.startsWith('--glow-');
           expect(
-            ['box-shadow', 'filter', '--art-shadow-sm', '--art-shadow-lg'],
+            tierScalable,
             `${rel} has an identity-affecting --fx-shadow property: ${rule[1].trim()}`,
-          ).toContain(property);
+          ).toBe(true);
           if (property === 'filter') {
             expect(normalized, `${rel} may use --fx-shadow filters only for bloom`).toMatch(
               /^filter\s*:\s*drop-shadow\(/,
@@ -1132,10 +1141,13 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
         }
       }
     }
+    // 96 -> 97: the target frame's raid-marker badge (.uf-raid-marker) scales its
+    // drop-shadow bloom by the tier token; the symbol itself renders at every tier.
     expect(
       allTierShadowDeclarations,
-      'the style graph owns 30 reviewed tier-shadow uses',
-    ).toHaveLength(30);
+      // Shipped uses plus the two library glow composites in tokens.css.
+      'the style graph owns 97 reviewed tier-shadow uses',
+    ).toHaveLength(97);
 
     for (const [name, body] of [
       [
@@ -1159,6 +1171,44 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
       expect(body).not.toContain('var(--fx-shadow');
       expect(body).not.toMatch(/data-fx-level|animation:|transition:/);
     }
+  });
+
+  // The scan above now blesses any --glow-* token as tier-scalable, which is only
+  // safe because the three ACTIONABLE ability states draw their identity from an
+  // unscaled rim and use the glow purely as bloom. Nothing recorded that, so a
+  // future state could ship its whole readable signal inside a --glow-* and
+  // vanish at the low tier without failing anything.
+  it('keeps an unscaled rim on the proc, queued and empowered ability states', () => {
+    const library = read('src/styles/library.css');
+    const hudCss = read('src/styles/hud.css');
+    const rims = [
+      [
+        'socket proc rim',
+        library.match(/\.ui-socket\.is-proc,\s*\n\s*\.ui-socket\.proc \{([^}]*)\}/)?.[1],
+        'border-color: var(--color-proc-rim);',
+      ],
+      [
+        'queued rim',
+        hudCss.match(/\n {2}\.action-btn\.queued \{([^}]*)\}/)?.[1],
+        'border-color: var(--color-white);',
+      ],
+      [
+        'empowered rim',
+        hudCss.match(/\n {2}\.action-btn\.empowered \{([^}]*)\}/)?.[1],
+        'border-color: var(--gold);',
+      ],
+    ] as const;
+    for (const [name, body, rim] of rims) {
+      expect(body, `${name}: rule missing`).toBeTruthy();
+      expect(body, `${name}: the rim must not ride --fx-shadow`).toContain(rim);
+      const rimLine = (body ?? '')
+        .split(';')
+        .find((declaration) => declaration.includes('border-color'));
+      expect(rimLine, `${name}: rim scaled by the graphics tier`).not.toContain('--fx-shadow');
+    }
+    // The socket's own keyline ring is unscaled too, so the proc state keeps a
+    // hard edge even when every glow term collapses to zero.
+    expect(rims[0][1]).toContain('0 0 0 1px var(--color-keyline)');
   });
 
   it('E35: changing activeBorder busts the character sheet refresh signature', () => {
@@ -1203,12 +1253,17 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     // fxTier everywhere else. Scan a small window around each `borderSlug =`
     // assignment so a future edit that gated it behind a tier (inline or a
     // wrapping if) is caught without whole-file false positives.
+    // The target site now lives in the extracted fill module (which reads no
+    // tier at all: scan it whole), the self site stays in hud.ts.
+    const fill = read('src/ui/target_frame_descriptor.ts');
+    expect(fill).toContain('d.borderSlug = deedTargetBorderSlug(');
+    for (const token of [...PROFILE_TOKENS, 'fxTier']) expect(fill).not.toContain(token);
     const hud = read('src/ui/hud.ts').split('\n');
     const sites = hud.reduce<number[]>((acc, line, i) => {
       if (line.includes('Frame.borderSlug = deed')) acc.push(i);
       return acc;
     }, []);
-    expect(sites.length, 'expected both borderSlug assignments (self + target)').toBe(2);
+    expect(sites.length, 'expected the self borderSlug assignment').toBe(1);
     for (const i of sites) {
       const window = hud.slice(Math.max(0, i - 3), i + 2).join('\n');
       for (const token of [...PROFILE_TOKENS, 'fxTier']) {

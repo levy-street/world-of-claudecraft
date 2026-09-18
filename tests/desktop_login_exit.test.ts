@@ -19,8 +19,22 @@ class FakeButton {
   }
 }
 
+class FakeBody {
+  readonly classes = new Set<string>();
+  readonly classList = {
+    toggle: (token: string, force: boolean): boolean => {
+      if (force) this.classes.add(token);
+      else this.classes.delete(token);
+      return force;
+    },
+  };
+}
+
 class FakeRoot {
-  constructor(readonly button: FakeButton | null) {}
+  constructor(
+    readonly button: FakeButton | null,
+    readonly body: FakeBody | null = null,
+  ) {}
 
   querySelector(selector: string): FakeButton | null {
     return selector === '#desktop-login-exit' ? this.button : null;
@@ -82,6 +96,36 @@ describe('initDesktopLoginExit', () => {
     await settle();
     expect(button.hidden).toBe(false);
     expect(button.listeners.size).toBe(1);
+  });
+
+  it('mirrors the reveal onto body.desktop-login-exit-shown and clears it on dispose', async () => {
+    // shell.css re-flows the homepage header off this class; it replaced a
+    // `body.desktop-app:has(.desktop-login-exit:not([hidden]))` selector
+    // (src/ui/root_state_classes.ts), so the class must track `hidden` exactly.
+    const button = new FakeButton();
+    const body = new FakeBody();
+    body.classes.add('desktop-login-exit-shown');
+    const dispose = initDesktopLoginExit(bridge(), new FakeRoot(button, body));
+    expect(button.hidden).toBe(true);
+    expect(body.classes.has('desktop-login-exit-shown')).toBe(false);
+    await settle();
+    expect(button.hidden).toBe(false);
+    expect(body.classes.has('desktop-login-exit-shown')).toBe(true);
+    dispose();
+    expect(button.hidden).toBe(true);
+    expect(body.classes.has('desktop-login-exit-shown')).toBe(false);
+  });
+
+  it('never stamps the class for a non-borderless mode', async () => {
+    const button = new FakeButton();
+    const body = new FakeBody();
+    initDesktopLoginExit(
+      bridge({ getDisplayMode: async () => 'windowed' as DesktopDisplayMode }),
+      new FakeRoot(button, body),
+    );
+    await settle();
+    expect(button.hidden).toBe(true);
+    expect(body.classes.has('desktop-login-exit-shown')).toBe(false);
   });
 
   it.each(['windowed', 'exclusive', '', null])(

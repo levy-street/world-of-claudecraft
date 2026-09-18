@@ -14,7 +14,7 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Gymnasium](https://img.shields.io/badge/Gymnasium-RL%20env-0C7BDC)](https://gymnasium.farama.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.42.2-blue)](package.json)
+[![Version](https://img.shields.io/badge/version-0.43.2-blue)](package.json)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Discord](https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/worldofclaudecraft)
 
@@ -266,7 +266,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 ### World and systems
 
 - **Professions** (`Shift+P`): four gathering trades (mining, logging, herbalism, fishing) feed ten crafts, from cooking and alchemy to weaponcrafting, jewelcrafting, and enchanting. Gathering tools come in tiers that decide which nodes you can work, crafting runs at town workstations with a chance at masterwork quality that carries your maker's mark, and there is an archetype system to discover as you specialize.
-- **The World Market**: a player-driven auction house for gear, materials, and consumables, browsable from the hub towns.
+- **The World Market**: a player-driven auction house for gear, materials, and consumables, browsable from the hub towns. **Market Sweep** buys a wanted quantity of one item across many sellers in one action, cheapest per unit first, at a server-quoted total.
 - **Ravenpost mail**: send items and coin to other characters, with attachments held safely until claimed.
 - **Guilds**: charters, rosters, ranks, and guild chat.
 - **The Guide**: a searchable in-site wiki at `/wiki` covering classes, creatures, zones, and deeds, generated straight from live game content so it cannot drift from the world it documents.
@@ -288,6 +288,7 @@ Press `G` to open the PvP window (Thornhollow Fields is its primary tab, beside 
 | `W` / `S` | run / backpedal. `A`/`D` turn (strafe with right mouse held), `Q`/`E` strafe |
 | right-drag / left-drag | mouselook / orbit camera. Wheel zooms, `Space` jumps |
 | `Tab` / `Shift+Tab` | cycle nearest enemies forward / backward. left-click to target, right-click to attack, loot, or talk |
+| `F1` / `F2`-`F10` | target yourself / party members 1 to 9 (top to bottom, as the party frames show them) |
 | `1`-`9`, `0`, `-`, `=` | action bar |
 | `F` | interact (loot a corpse, pick up an object, talk) |
 | `C` `P` `L` `M` `B` `N` `T` | character, spellbook, quest log, world map, bags, talents, crafting |

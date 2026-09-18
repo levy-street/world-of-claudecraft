@@ -104,6 +104,14 @@ describe('classifyDiff', () => {
     }
   });
 
+  it('maps the Hide Interface core to its shown/hidden desktop legs', () => {
+    const plan = classifyDiff(['src/ui/interface_visibility_core.ts']);
+    expect(plan.isVisual).toBe(true);
+    const target = plan.specific.find((t: { key: string }) => t.key === 'hide-interface');
+    expect(target?.variants.map((v: { key: string }) => v.key)).toEqual(['shown', 'hidden']);
+    expect(plan.generic).toHaveLength(0);
+  });
+
   it('maps a bags change to the inventory window target', () => {
     const plan = classifyDiff(['src/ui/bags.ts']);
     expect(plan.isVisual).toBe(true);
@@ -172,6 +180,26 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
+  it('maps the main-menu list painter to the Esc game menu target on both hosts', () => {
+    // The Unlock Interface row leads the desktop menu and is absent on touch,
+    // so the target carries both arms; it keys on the list painter alone so
+    // the options_view order above is untouched.
+    const plan = classifyDiff(['src/ui/options_main_menu_controller.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'game-menu-unlock-interface',
+    ]);
+    // desktop-unlocked presses the row for real, so the shot proves the press
+    // reaches Hud.toggleInterfaceUnlock (frame chrome + the floating Lock
+    // Interface control appear), not just the window.
+    expect(plan.specific[0].variants.map((v: { key: string }) => v.key)).toEqual([
+      'desktop',
+      'desktop-unlocked',
+      'mobile',
+    ]);
+    expect(plan.generic).toHaveLength(0);
+  });
+
   it('maps controller option changes to remapped desktop and mobile evidence', () => {
     const plan = classifyDiff(['src/game/gamepad_bindings.ts']);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
@@ -183,7 +211,11 @@ describe('classifyDiff', () => {
     ]);
     const captureSource = plan.specific[0].capture.toString();
     expect(captureSource).toContain('[aria-label="Cross"]');
-    expect(captureSource).toContain('buttons[1]?.click()');
+    // The Controller row by its data-menu-action hook, never by index: the
+    // main menu's order shifts by host (the Unlock Interface row leads on
+    // desktop only).
+    expect(captureSource).toContain('[data-menu-action="controller"]');
+    expect(captureSource).not.toContain('buttons[1]?.click()');
     expect(captureSource).toContain('#tutorial-greeting');
   });
 
@@ -312,6 +344,7 @@ describe('classifyDiff', () => {
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'market-window',
       'market-collapse-toggle',
+      'market-sweep',
       'market-sell-price-ref',
       'market-collect-ledger',
       'market-buy-confirm',
@@ -363,6 +396,7 @@ describe('classifyDiff', () => {
       'src/sim/combat/stealth_focus.ts',
       'src/sim/combat/auto_attack.ts',
       'src/sim/combat/poison_coating.ts',
+      'src/ui/ability_imbue_text.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -377,6 +411,7 @@ describe('classifyDiff', () => {
       'melting-acid',
       'instant-poison',
       'deadly-poison',
+      'deadly-poison-mobile',
       'nightshade-coating',
       'sap',
       'eye-jab',
@@ -668,7 +703,7 @@ describe('classifyDiff', () => {
     expect(windowSrc).toContain('aria-disabled="true"');
     expect(script).toContain("getAttribute('aria-disabled') === 'true'");
     expect(script).toContain("getAttribute('aria-pressed') === 'true'");
-    expect(windowSrc).toContain('class="reliquary-page-row" data-page=');
+    expect(windowSrc).toContain('class="reliquary-page-row ui-card" data-page=');
     expect(script).toContain('.reliquary-page-row');
     // And the routing: both halves of the tracker pair reach the target.
     for (const path of [
@@ -752,6 +787,42 @@ describe('classifyDiff', () => {
       | { userAgent?: string }
       | undefined;
     expect(mobileVariant?.userAgent).toContain('Android');
+  });
+});
+
+describe('recipe-tracker target', () => {
+  it('holds the recipe-tracker capture to the window and store contracts it borrows', () => {
+    const stripSource = (src: string): string =>
+      src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+    const script = stripSource(
+      readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8'),
+    );
+    const storeSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/recipe_pins_store.ts'), 'utf8'),
+    );
+    const chipSrc = stripSource(
+      readFileSync(join(__dirname, '../src/ui/hud/professions/crafting_pin_chip.ts'), 'utf8'),
+    );
+    // The between-variant cleanup sweeps the store's own prefix (the chip is
+    // a TOGGLE, so a stale pin would be flipped off and the capture corrupt).
+    expect(storeSrc).toContain("RECIPE_PIN_KEY_PREFIX = 'woc_recipe_pins'");
+    expect(script).toContain("indexOf('woc_recipe_pins')");
+    // The staging clicks the window's own chip, skipping already-pressed ones.
+    expect(chipSrc).toContain("pinBtn.className = 'crafting-pin-chip';");
+    expect(script).toContain('.crafting-pin-chip');
+    expect(script).toContain("getAttribute('aria-pressed') !== 'true'");
+    for (const path of [
+      'src/ui/recipe_tracker_painter.ts',
+      'src/ui/recipe_tracker_view.ts',
+      'src/ui/recipe_pins_store.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      expect(plan.isVisual, path).toBe(true);
+      expect(
+        plan.specific.map((t: { key: string }) => t.key),
+        path,
+      ).toContain('recipe-tracker');
+    }
   });
 });
 

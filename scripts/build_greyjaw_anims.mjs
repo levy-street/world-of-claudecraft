@@ -1,9 +1,9 @@
 // Build greyjaw's bespoke attack clip (issue #2889 round 2). greyjaw (the
 // Mirefen Marsh named rare wolf boss, manifest key literally "greyjaw", not
 // to be confused with mob_wolf on the same WOLF_BAKED ClipMap) currently
-// shares WOLF_BAKED's plain Attack, the same swing mob_wolf and form_cat (a
-// player druid/shaman form) still play. Unlike wolf_basic.glb (mob_wolf's
-// and form_cat's separate, plainer rig), greyjaw.glb is a much richer,
+// shares WOLF_BAKED's plain Attack, the same swing mob_wolf and form_ghost_wolf (the
+// shaman Shadewolf) still play. Unlike wolf_basic.glb (mob_wolf's
+// and form_ghost_wolf's separate, plainer rig), greyjaw.glb is a much richer,
 // dedicated 48-animated-node rig that ships unused bonus donor clips
 // specific to this named rare: Bark, Howl, "Idle Alert", Sneak. This
 // authors a genuinely dramatic bespoke attack by pose-sample-and-blend
@@ -11,7 +11,7 @@
 // rear-back, head-raised howl windup into the lunge. No Blender: same
 // technique, same module, as scripts/build_stag_anims.mjs.
 //
-// WOLF_BAKED itself (and mob_wolf, form_cat) is NOT touched: this task only
+// WOLF_BAKED itself (and mob_wolf, form_ghost_wolf) is NOT touched: this task only
 // overrides greyjaw's own ClipMap. greyjaw already ships and wires BOTH
 // Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
 // hit-variety work is needed or possible here: this is attack-only.
@@ -20,7 +20,7 @@
 //   peak (head raised), transition into the lunge windup, pounce impact,
 //   follow-through, settle. Reads as an intimidating howl-then-pounce,
 //   clearly more dramatic than the plain Attack every other WOLF_BAKED
-//   user (mob_wolf, form_cat) still plays.
+//   user (mob_wolf, form_ghost_wolf) still plays.
 //
 // Usage: node scripts/build_greyjaw_anims.mjs [--preview]
 // Output: public/models/creatures/greyjaw_ability_anims.glb (0 meshes/

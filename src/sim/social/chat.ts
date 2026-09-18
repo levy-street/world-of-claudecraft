@@ -46,7 +46,7 @@ const OVERHEAD_EMOTE_DURATION = 3.2;
 // through deed_i18n, never display text. Untitled players omit the key
 // entirely (the event stays byte-identical to the pre-title shape), and the
 // mob/boss yell emitters (mob/yells.ts, encounters/*) never call this.
-function speakerTitle(meta: PlayerMeta): { fromTitle?: string } {
+export function speakerTitle(meta: PlayerMeta): { fromTitle?: string } {
   return meta.activeTitle ? { fromTitle: meta.activeTitle } : {};
 }
 
@@ -58,7 +58,7 @@ function speakerTitle(meta: PlayerMeta): { fromTitle?: string } {
 // scoped online) would silently drop it for the exact channels it matters
 // most in. Always present for a player sender (a class is never optional), so
 // this only omits the key for the mob/boss yell emitters, which never call it.
-function speakerClass(meta: PlayerMeta): { classId: PlayerClass } {
+export function speakerClass(meta: PlayerMeta): { classId: PlayerClass } {
   return { classId: meta.cls };
 }
 
@@ -363,6 +363,12 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
   // party, leader-only, none already running) is delegated to readyCheckStart.
   if (/^\/ready(?:check)?\s*$/i.test(raw)) {
     ctx.readyCheckStart(r.meta.entityId);
+    return null;
+  }
+
+  // "/pull [seconds]": the party/raid leader starts a pull countdown.
+  if (/^\/pull(?:\s|$)/i.test(raw)) {
+    ctx.pullTimerStart(raw, r.meta.entityId);
     return null;
   }
 
@@ -827,6 +833,35 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
     return { channel: 'battleground', message: clean };
   }
 
+  // "/rw message" (or "/ab" in Spanish client, "/raidwarning") sends a Raid Warning to the party/raid.
+  // Restricted to the party leader.
+  if (/^\/(?:rw|ab|raidwarning)(?:\s|$)/i.test(raw)) {
+    const clean = raw.replace(/^\/(?:rw|ab|raidwarning)\s*/i, '').trim();
+    if (!clean) return null;
+    const party = ctx.partyOf(r.meta.entityId);
+    if (!party) {
+      ctx.error(r.meta.entityId, 'You are not in a party.');
+      return null;
+    }
+    if (party.leader !== r.meta.entityId) {
+      ctx.error(r.meta.entityId, 'You are not the party leader.');
+      return null;
+    }
+    for (const mPid of party.members) {
+      ctx.emit({
+        type: 'chat',
+        fromPid: r.meta.entityId,
+        from: r.meta.name,
+        ...speakerTitle(r.meta),
+        ...speakerClass(r.meta),
+        text: clean,
+        channel: 'raidWarning',
+        pid: mPid,
+      });
+    }
+    return { channel: 'raidWarning', message: clean };
+  }
+
   // "/g message" / "/1 message": world-wide general channel (no pid = broadcast to
   // all). "/1" is the classic numbered-channel shortcut for General; unlike "/g" it
   // is never claimed by the online guild router, so it always reaches General.
@@ -1080,9 +1115,9 @@ export function playEmote(ctx: SimContext, emoteId: OverheadEmoteId, pid?: numbe
 // in sync with the commands handled in chat() above.
 export function helpLines(): string[] {
   return [
-    'Chat channels: /s say, /y yell, /general, /p party, /bg battleground, /world, /lfg.',
+    'Chat channels: /s say, /y yell, /general, /p party, /bg battleground, /rw raid warning, /world, /lfg.',
     'Whisper a player with /w <name> <message>, reply with /r.',
-    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /afk, /dnd, /who.',
+    'Other commands: /join <world|lfg>, /roll, /invite <name>, /inspect <name>, /follow <name>, /unfollow, /assist <name>, /ready, /pull <sec>, /afk, /dnd, /who.',
     'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',
     'Hide a player: /ignore <name> hides their public chat only. /block <name> also stops their whispers, invites and mail. Also /unignore, /unblock, /ignorelist, /blocklist.',
     'Character readouts: /played, /playtime, /xp, /gold, /stats, /bags, /gear, /abilities, /buffs, /cooldowns, /quest, /completed.',

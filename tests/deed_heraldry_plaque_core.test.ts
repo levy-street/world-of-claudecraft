@@ -64,9 +64,11 @@ describe('Deed Heraldry plaque surface family', () => {
   it('uses the shared compact and mirrored plaque hosts on both game entries', () => {
     for (const rel of ['index.html', 'play.html']) {
       const html = read(rel);
-      expect(html).toMatch(/class="uf-name-header deed-heraldry-plaque" id="pf-name-header"/);
       expect(html).toMatch(
-        /class="uf-name-header deed-heraldry-plaque deed-heraldry-plaque-mirror" id="tf-name-header"/,
+        /class="uf-name-header deed-heraldry-plaque ui-ribbon" id="pf-name-header"/,
+      );
+      expect(html).toMatch(
+        /class="uf-name-header deed-heraldry-plaque deed-heraldry-plaque-mirror ui-ribbon ui-ribbon--mirror" id="tf-name-header"/,
       );
     }
   });

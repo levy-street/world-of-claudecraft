@@ -1,8 +1,8 @@
 {
   "format": "woc-sfx-runtime-pack",
   "version": 1,
-  "bundleId": "12c88e20e4cee24af46e1533e1e7051140b06333090cd5433d5cf71ea8bbd3b6",
-  "catalogHash": "bbbc04128a3ba011c2c2d182a8723a946fb791feb8684a3fbf25850a6bdf1bc3",
+  "bundleId": "25f1e98d41749404d47f80110cb3f5d3af3689689d3f30b04c348d62cb18bf11",
+  "catalogHash": "77475257efebc1f4fb73a47d810c561da4f01be17a790982bc80b5ff5e06789b",
   "clips": {
     "amb_birds": {
       "variants": [
@@ -4157,6 +4157,246 @@
           "url": "/audio/sfx/ui_arena_loss.mp3?v=188308687d6f",
           "bytes": 33270,
           "sha256": "188308687d6fb17a2fc446016a6b0791bcd77c4861850f2901e04d1f2265a1c3"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_anvil_strike": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_anvil_strike.mp3?v=0647a7f8a285",
+          "bytes": 32643,
+          "sha256": "0647a7f8a285936bb3ae1eb28d4b3cf78acc4251ab98a16d1fdc219fb94d5bda"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_blaring_horn": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_blaring_horn.mp3?v=61b0353ab5b7",
+          "bytes": 32643,
+          "sha256": "61b0353ab5b7a1c09f32cf1eeb5807e77266e2356ffc14095c4d6d70ebaf800d"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_bubble_pop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_bubble_pop.mp3?v=6985cfc3c32f",
+          "bytes": 25747,
+          "sha256": "6985cfc3c32f502abf2c3cc4135f1fc9365059021efccfe21c4c264297b03878"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_car_klaxon": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_car_klaxon.mp3?v=f2e5d810741f",
+          "bytes": 30136,
+          "sha256": "f2e5d810741fe806844b5f3cfca4be9da007adc26a2d1c62390840b5e88c8285"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_cat_meow": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_cat_meow.mp3?v=4c235a7207fc",
+          "bytes": 28255,
+          "sha256": "4c235a7207fc1e4a9c4b22cd67e1fd9547e7012778a43a806595ee4d545aab56"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_coin_drop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_coin_drop.mp3?v=6b039e5e3431",
+          "bytes": 30136,
+          "sha256": "6b039e5e3431c73bd68175faf84031d180d04ad0cc682b9e9bfcc9083fb7978e"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_electric_zap": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_electric_zap.mp3?v=9feb19dd7265",
+          "bytes": 25747,
+          "sha256": "9feb19dd7265b2db1948442f0664205005fdbf088e09d496a0a26c1ddf1a1353"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_frog_croak": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_frog_croak.mp3?v=84713a4f7898",
+          "bytes": 28255,
+          "sha256": "84713a4f7898639365daae41d3e8dc4f052ec031b8b3feee258f3341294b2c22"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_glass_ping": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_glass_ping.mp3?v=bfa74cd3848e",
+          "bytes": 28255,
+          "sha256": "bfa74cd3848ef0374509333e1468f65552a0a224ef11bb2bd5c44107971fefbd"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_hard_bell": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_hard_bell.mp3?v=cd1c613935a2",
+          "bytes": 37659,
+          "sha256": "cd1c613935a2ea5c2e7e74e2353ff51f1bbbdd48e755e010be8d11fb957013bf"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_music_box": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_music_box.mp3?v=90bcbb56e072",
+          "bytes": 44555,
+          "sha256": "90bcbb56e072a669938fabe4d11a4a7bd5fa744f296357627301b305b1d4434b"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_owl_hoot": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_owl_hoot.mp3?v=105e71c6762c",
+          "bytes": 37659,
+          "sha256": "105e71c6762c8314a0f4f4964c50d9ef6cb3202a00fa230092aac11d457bee90"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_soft_chime": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_soft_chime.mp3?v=9993bfb86ced",
+          "bytes": 30136,
+          "sha256": "9993bfb86ced37b08c87216939134baa7f9821b94b5ede37d600d581ea05fd57"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_sonar_ping": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_sonar_ping.mp3?v=1d2907418717",
+          "bytes": 49571,
+          "sha256": "1d2907418717f7cc6fe38856df35c880641c9c6abf8be4b0c950b985e6c80c81"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_steam_hiss": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_steam_hiss.mp3?v=ebfa3b761e30",
+          "bytes": 37659,
+          "sha256": "ebfa3b761e30327ca56b5ebe26c68f2777d4f6fee42c26d52d0b1d97892bae68"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_sword_draw": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_sword_draw.mp3?v=d72cb28fb8c1",
+          "bytes": 30136,
+          "sha256": "d72cb28fb8c11bd36289fdbc9c3f672cda7a65785500798ced002d0d3a7c05f5"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_temple_gong": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_temple_gong.mp3?v=ad3754adda22",
+          "bytes": 49571,
+          "sha256": "ad3754adda228b4b5962d21c52f5c826d1993f097d2e52840494b389a014cefd"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_water_drop": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_water_drop.mp3?v=89b36bacdd81",
+          "bytes": 25747,
+          "sha256": "89b36bacdd81adfc7d560f16658f33d1f96596932ea2ddf9700e46bc36539cad"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_wind_whoosh": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_wind_whoosh.mp3?v=bf3600860f4e",
+          "bytes": 37659,
+          "sha256": "bf3600860f4e108b2b2e3af73c9ea50b63354826c6ba340df18cba7b983cf6da"
+        }
+      ],
+      "gain": 1,
+      "playbackRate": 1
+    },
+    "ui_aura_wolf_howl": {
+      "variants": [
+        {
+          "id": "main",
+          "url": "/audio/sfx/ui_aura_wolf_howl.mp3?v=16a5648edd12",
+          "bytes": 49571,
+          "sha256": "16a5648edd12dc0c0caf794dfda82e5fcb59db6f904453457d601bb6968a3baa"
         }
       ],
       "gain": 1,

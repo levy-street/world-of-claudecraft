@@ -62,6 +62,7 @@ export const nl_NL: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Kerker",
+      "town": "Dorp",
       "difficulty": "Moeilijkheidsgraad",
       "name": "Naam",
       "spec": "Spec",
@@ -159,6 +160,10 @@ export const nl_NL: EnTranslations = {
       "teleport": {
         "label": "Teleporteren",
         "description": "Ga naar exacte coördinaten in de wereld."
+      },
+      "town": {
+        "label": "Stadscentrum",
+        "description": "Teleporteer op naam naar een stadshub."
       },
       "dungeon": {
         "label": "Kerker binnengaan",
@@ -326,6 +331,18 @@ export const nl_NL: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "Smeedtrainer",
+      "cooking": "Kooktrainer",
+      "tailoring": "Kleermaaktrainer",
+      "engineering": "Knutseltrainer",
+      "leatherworking": "Leerbewerkingstrainer",
+      "alchemy": "Alchemietrainer",
+      "farming": "Landbouwtrainer",
+      "mining": "Mijnbouwtrainer",
+      "hobby": "Hobbytrainer",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "Die materiaalkeuze is niet langer beschikbaar.",
     "warlock": {
       "doomLabel": "Verdoemenis",
@@ -348,12 +365,25 @@ export const nl_NL: EnTranslations = {
       "banner": "Toeschouwer bij {name}"
     },
     "readyCheck": {
+      "title": "Klaar controle",
+      "close": "Dichtbij",
       "prompt": "{name} heeft een gereedheidscontrole gestart. Ben je gereed?",
       "ready": "Gereed",
       "notReady": "Niet gereed",
+      "status": "Klaar: {ready}/{total}",
+      "waiting": "Wachten op reacties...",
+      "memberReady": "{name} is klaar.",
+      "memberNotReady": "{name} is niet klaar.",
+      "memberPending": "{name} heeft nog niet gereageerd.",
       "result": "Gereedheidscontrole: {ready} gereed, {notReady} niet gereed, {noResponse} geen antwoord.",
       "notInPartyError": "Je moet in een groep zitten om een gereedheidscontrole te starten.",
       "inProgressError": "Er is al een gereedheidscontrole bezig."
+    },
+    "pullTimer": {
+      "start": "Trek over {seconds} sec!",
+      "cancel": "Trek geannuleerd.",
+      "countdown": "{seconds}",
+      "pull": "TREKKEN!"
     },
     "death": {
       "resurrectAtCorpse": "Herrijs bij je lijk",
@@ -578,6 +608,11 @@ export const nl_NL: EnTranslations = {
       "mountsTitle": "Machinestabiel",
       "mountBuyAria": "Koop {item}",
       "mountSkinType": "Rijdier-skin",
+      "mountInspectAria": "Voorbeeld {item}",
+      "mountRideIt": "Berijd het",
+      "mountOnly": "Alleen monteren",
+      "mountBuy": "Koop Mount-skin",
+      "mountScopeLine": "Accountbrede skin. Gedragen door één personage tegelijk.",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",
@@ -902,6 +937,7 @@ export const nl_NL: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Queestevolger inklappen",
       "expandHint": "Queestevolger uitklappen"
     },
@@ -1041,6 +1077,10 @@ export const nl_NL: EnTranslations = {
       "clearArmed": "Tik op een vak om het te wissen."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "Welkom in Oostbeek! Maarschalk Redbrook heeft werk voor je op het stadsplein. Zet de gouden gids aan om hem te vinden en Wolven voor de deur te volgen, of verken zelf. Je kunt dit later wijzigen bij Opties, Interface, Gevecht.",
+      "guidanceOn": "Zet de gids aan",
+      "guidanceOff": "Zet de gids uit",
+      "guidanceSetting": "Gouden gids van Oostbeek",
       "bellHomeNote": "Alweer terug van de kust? Dat was de veerbel die je luidde. Zijn tweelingbroer hangt daar bij de brievenbus van de Ravenpost: luid hem wanneer je wilt en de overtocht brengt je terug naar de Beproevingskust. Geen kwaad geschied, hoe dan ook.",
       "islandArrivalNote": "Welkom op de Beproevingskust. Warden Tam wacht verderop op het strand: ga naar hem toe.",
       "noteClose": "Begrepen"
@@ -1220,7 +1260,10 @@ export const nl_NL: EnTranslations = {
       "devName": "Bijdrager",
       "devTierCol": "Insigne",
       "mergedPrs": "Samengevoegde PR's",
-      "devEmpty": "Nog geen gerangschikte bijdragers."
+      "devEmpty": "Nog geen gerangschikte bijdragers.",
+      "podiumLabel": "Top drie",
+      "unclaimed": "Niet opgeëist",
+      "prestigeTitle": "Prestige {rank}"
     },
     "pledge": {
       "open": "Accepteert geloften",
@@ -1243,6 +1286,8 @@ export const nl_NL: EnTranslations = {
       "noteLabel": "Bordnotitie",
       "notePlaceholder": "Vertel aspirant-leden waarnaar je gilde op zoek is",
       "save": "Opslaan",
+      "newPlayerFriendlyLabel": "Vriendelijk voor nieuwe spelers",
+      "newPlayerFriendlyHint": "Wordt getoond op het rekruteringsbord bij de wegwijzer van De Beproevingskust.",
       "yourPledge": "Je gelofte: {guild}",
       "since": "Gezworen op {date}",
       "withdraw": "Gelofte intrekken"
@@ -1266,6 +1311,9 @@ export const nl_NL: EnTranslations = {
       "previous": "Vorige sessies",
       "runLabel": "Sessie {index}",
       "runSummary": "{total} in {time}"
+    },
+    "talkingHead": {
+      "label": "Dialoog"
     },
     "hubLesson": {
       "target": "Richt je op de oefenpop om te beginnen.",
@@ -1395,7 +1443,9 @@ export const nl_NL: EnTranslations = {
       "targetPrev": "Achteruit Door Doelwitten Bladeren",
       "discord": "Discord",
       "bgFlag": "Slagveldvlag-actie",
+      "friendlyNameplates": "Naamplaatjes van bondgenoten omschakelen",
       "sheathe": "Wapen Schede In/Uit",
+      "hideInterface": "Interface verbergen",
       "dive": "Omlaag Zwemmen",
       "categoryPet": "Huisdier",
       "petAttack": "Huisdier: Aanvallen",
@@ -1404,8 +1454,22 @@ export const nl_NL: EnTranslations = {
       "petDefensive": "Huisdier: Verdedigend",
       "petAggressive": "Huisdier: Agressief",
       "targetPet": "Huisdier: Aanwijzen",
+      "targetSelf": "Doel Zelf",
+      "targetParty1": "Doelpartijlid 1",
+      "targetParty2": "Doelpartijlid 2",
+      "targetParty3": "Doelpartijlid 3",
+      "targetParty4": "Doelpartijlid 4",
+      "targetParty5": "Doelpartijlid 5",
+      "targetParty6": "Doelpartijlid 6",
+      "targetParty7": "Doelpartijlid 7",
+      "targetParty8": "Doelpartijlid 8",
+      "targetParty9": "Doelpartijlid 9",
       "mount": "Opstijgen / Afstijgen",
-      "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld."
+      "mouseHint": "Muisknoppen werken ook: druk tijdens het toewijzen op de middelste knop (M3) of een duimknop (M4, M5). Links en rechts blijven gereserveerd voor de camera, klik om te bewegen en het aanklikken van dingen in de wereld.",
+      "zoomIn": "Zoomcamera in",
+      "zoomOut": "Camera uitzoomen",
+      "wheelHint": "Het muiswiel werkt ook: rol het tijdens het binden omhoog of omlaag, met Ctrl, Alt of Shift ingedrukt als je wilt. Zoomcamera in en uit zitten standaard op het blote stuur; verplaats ze naar een akkoord zoals Ctrl+wiel om het wiel vrij te maken voor vaardigheden.",
+      "wheelHeldRefused": "Een wielinkeping kan geen vastgehouden actie, zoals beweging, aandrijven. Kies er een sleutel of een muisknop voor."
     },
     "actionBar": {
       "editKeys": "Actiebalktoetsen bewerken",
@@ -1682,6 +1746,8 @@ export const nl_NL: EnTranslations = {
       "showReliquaryTracker": "Toon Relikwieëntracker",
       "confirmVendorSell": "Bevestigen Voor Verkoop",
       "confirmVendorSellNote": "Dit uitzetten verkoopt voorwerpen met één klik zonder bevestiging, dus een verschoven tasvak zou het verkeerde voorwerp aan de handelaar kunnen verkopen.",
+      "confirmVendorSellMinQuality": "Bevestig de verkoop van kwaliteit",
+      "confirmVendorSellMinQualityNote": "Artikelen onder deze kwaliteit worden met een enkele klik verkocht; een verkeerd verkocht artikel kan nog steeds worden teruggekocht bij de verkoper.",
       "itemLevelLine": "Itemniveau {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Secundaire actiebalk tonen",
@@ -1735,6 +1801,9 @@ export const nl_NL: EnTranslations = {
     },
     "controller": {
       "title": "Controller",
+      "device": "Verbonden apparaat",
+      "deviceConnected": "Aangesloten",
+      "deviceDisconnected": "Geen controller gedetecteerd",
       "glyphStyle": "Knoplabels",
       "glyphStyleAuto": "Automatisch",
       "glyphStyleXbox": "Xbox",
@@ -1759,7 +1828,7 @@ export const nl_NL: EnTranslations = {
       "crossHotbarHelp": "Houd een trekker ingedrukt om acht actiebalkgleuven op de d-pad en gezichtsknoppen te laten oplichten. Tik op de andere trigger om naar de tweede set te wisselen.",
       "crossHotbarResetLayout": "Cross-hotbar opnieuw instellen",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "De triggers en de d-pad behoren tot de cross-hotbar terwijl deze is ingeschakeld, dus ze zijn hieronder ingesteld in plaats van hier.",
+      "crossHotbarOwnsButtons": "De triggers wijzigen de cross-hotbar terwijl deze is ingeschakeld. D-pad-richtingen blijven hier bewerkbaar voor menu's en beweging.",
       "cancelAction": "Annuleren / Terug",
       "subcommandsAction": "Subopdrachten / Kaart",
       "cycleHudAction": "Cyclusinterface",
@@ -1770,7 +1839,7 @@ export const nl_NL: EnTranslations = {
       "crossHotbarDisplayMinimal": "Alleen tijdens het vasthouden",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "{action} dragen: bevestig op een cel om deze te plaatsen, annuleer om deze terug te plaatsen.",
-      "crossHotbarEditHint": "Schikken: bevestig het ophalen van een cel of het spreukenboek en laat het op een cel vallen, annuleren wist er één.",
+      "crossHotbarEditHint": "Schikken · d-pad verplaatst · bevestigen pakt op en plaatst · annuleren wist een cel",
       "crossHotbarEditHelp": "Houd de linkerbumper vast en druk op de bovenste gezichtsknop om de balk met de controller te rangschikken."
     },
     "perf": {
@@ -2049,6 +2118,52 @@ export const nl_NL: EnTranslations = {
       "spellOrder": "Spreukvolgorde",
       "reset": "Positie resetten",
       "spellPosition": "Spreukvolgorde {position} / {count}",
+      "watchlist": "Gevolgde spreuken",
+      "watchlistHint": "Kies een spreuk die jou buffs geeft om er een eigen aura aan toe te kennen. Gekozen spreuken krijgen hieronder een volledige kaart, met hun eigen pictogram, kleur, positie en grondring.",
+      "watchlistEmpty": "Geen andere spreuk in je spreukenboek geeft jou een buff.",
+      "watchlistWatch": "Volg {spell}",
+      "watchlistUnwatch": "Stop met het volgen van {spell}",
+      "watchlistCount": "{count} gevolgd",
+      "sound": "Waarschuwingsgeluid",
+      "soundNone": "Geen geluid",
+      "soundVolume": "Geluidsvolume",
+      "soundPreview": "Afspelen",
+      "soundPreviewAria": "Speel een voorbeeld van het waarschuwingsgeluid {sound} af",
+      "soundHint": "Er klinkt een geluid elke keer dat deze spreuk proct. Schakel het pictogram, de maansikkels en de grondring uit om het alleen met geluid aan te kondigen.",
+      "readyGlow": "Hotbar-gloed",
+      "readyGlowHint": "Verlicht deze spreuk op je actiebalk zolang de buff ervan actief is.",
+      "reticleTick": "Vizierstip",
+      "reticleTickHint": "Voegt een markering toe nabij het midden van het scherm die oplicht wanneer deze spreuk proct.",
+      "haptic": "Trilling",
+      "hapticNone": "Uit",
+      "hapticHint": "Laat een verbonden controller of je telefoon trillen. Wordt genegeerd op apparaten zonder trilfunctie.",
+      "haptics": {
+        "tap": "Tik",
+        "double": "Dubbel",
+        "long": "Lang"
+      },
+      "cues": {
+        "softChime": "Zacht klokje",
+        "musicBox": "Muziekdoos",
+        "glassPing": "Glastik",
+        "waterDrop": "Waterdruppel",
+        "bubblePop": "Belknal",
+        "hardBell": "Harde bel",
+        "templeGong": "Tempelgong",
+        "anvilStrike": "Aanbeeldslag",
+        "coinDrop": "Muntval",
+        "swordDraw": "Zwaardtrek",
+        "blaringHorn": "Schallende hoorn",
+        "carKlaxon": "Autoclaxon",
+        "sonarPing": "Sonarping",
+        "electricZap": "Elektrische schok",
+        "catMeow": "Kattenmiauw",
+        "owlHoot": "Uilenroep",
+        "wolfHowl": "Wolvengehuil",
+        "frogCroak": "Kikkerkwaak",
+        "windWhoosh": "Windgeruis",
+        "steamHiss": "Stoomsissen"
+      },
       "procs": {
         "revenge": "Wraak!",
         "battleTrance": "Gevechtstrance",
@@ -2153,6 +2268,22 @@ export const nl_NL: EnTranslations = {
       "playtimeHidden": "Verborgen",
       "showPlaytimeAria": "Speeltijd tonen",
       "hidePlaytimeAria": "Speeltijd verbergen"
+    },
+    "charSidebar": {
+      "label": "Karakterdetails",
+      "subtitle": "Niveau {level} {className}. {archetype}. Hobby: {hobby}",
+      "subtitleNoHobby": "Niveau {level} {className}. {archetype}",
+      "stats": "Statistieken",
+      "progression": "Progressie",
+      "skills": "Vaardigheden",
+      "gathering": "Bijeenkomst",
+      "crafting": "Knutselen",
+      "openProfessions": "Open beroepen"
+    },
+    "questLog": {
+      "completed": "Voltooid",
+      "zoneSummary": "{count} ({ready} gereed)",
+      "shiftHint": "Houd Shift ingedrukt en klik op een missie om deze in de chat te koppelen."
     },
     "statInfo": {
       "fromYour": "Van je {value} {stat}:",
@@ -2267,6 +2398,12 @@ export const nl_NL: EnTranslations = {
       "linkHint": "Shift-klik om dit voorwerp in de chat te delen."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "{count} gilde getoond",
+        "few": "{count} gilden getoond",
+        "many": "{count} gilden getoond",
+        "other": "{count} gilden getoond"
+      },
       "commissionMasterworks": {
         "one": "{count} meesterwerk",
         "few": "{count} meesterwerken",
@@ -2396,6 +2533,7 @@ export const nl_NL: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Bug melden",
+      "online": "Online",
       "realm": "Wereld",
       "character": "Personage",
       "position": "Positie",
@@ -2993,8 +3131,8 @@ export const nl_NL: EnTranslations = {
         "kingsWrathSummary": "Nythraxis richt op Normal {bonusNormal} meer schade aan of {bonusHeroic} op Heroic voor de rest van het gevecht. Grafuitbarsting gebeurt elke {eruptionEveryNormal} sec ({eruptionEveryHeroic} op Heroic).",
         "kingsWrathResponse": "Gebruik resterende defensieve cooldowns voor onvermijdbare schade. Houd elke eerdere mechaniek schoon terwijl de raid het gevecht afrondt.",
         "boneStormName": "Beenderstorm",
-        "boneStormSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyNormal} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlNormal} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamNormal} van maximale gezondheid. Hij cast Beenderspies {spikeAt} sec in de storm, daarna wordt Grafbreker {rearm} sec na het einde opnieuw geactiveerd.",
-        "boneStormHeroicSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyHeroic} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlHeroic} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamHeroic} van maximale gezondheid. Hij cast Beenderspies {spikeAt} sec in de storm, daarna wordt Grafbreker {rearm} sec na het einde opnieuw geactiveerd.",
+        "boneStormSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyNormal} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlNormal} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamNormal} van maximale gezondheid. Grafbreker wordt {rearm} sec na het einde opnieuw geactiveerd.",
+        "boneStormHeroicSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyHeroic} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlHeroic} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamHeroic} van maximale gezondheid. Grafbreker wordt {rearm} sec na het einde opnieuw geactiveerd.",
         "boneStormResponse": "Verspreid je en blijf wegrennen van Nythraxis. De gechargede raider rent weg terwijl iedereen ruimte vrijlaat rond het chargepad, daarna pakken de tanks hem op wanneer de storm eindigt.",
         "crownEnduresName": "De Kroon houdt stand",
         "crownEnduresSummary": "Op {enrageNormal} sec vanaf de pull (de klok pauzeert terwijl Broeder Aldric bij 70% binnenkomt) activeert De Kroon houdt stand als harde razernij. Nythraxis krijgt {damage} meer schade en {haste} snellere aanvallen, daarna elke {rampEveryNormal} sec nog eens {rampStep} schade. Er is geen timerbalk. Waarschuwingen komen als kreten bij {warn60}, {warn30} en {warn10} sec resterend.",
@@ -3045,6 +3183,7 @@ export const nl_NL: EnTranslations = {
       "elementalConvergencePrimed": "Je volgende spreuk van de andere elementaire school verleent Elementaire Convergentie",
       "hunterFerocity": "{stacks} Roedelfelheid: je huisdier richt {pct}% meer schade aan",
       "cooldownCap": "{used} van {cap} sec afkoeltijdvermindering gebruikt in dit venster",
+      "bruinRushWindow": "Wolfsgedaante kost geen mana en pint het doelwit van uw Bruin-stormloop vast, wat het {sec} sec lang {pct}% vertraagt",
       "funeralHarvestLock": "Funeral Harvest kan nog geen ander Zielfragment creëren",
       "leadenHexLock": "Loden vloek kan dit doelwit nog niet opnieuw vastwortelen",
       "forbiddenReflectionReady": "Je volgende in aanmerking komende Heksenmeester-afkoeltijd kan opnieuw worden ingezet",
@@ -3092,7 +3231,7 @@ export const nl_NL: EnTranslations = {
       "coldsightRead": "Je volgende Lange Trek richt {longDrawPct}% meer schade aan, of je volgende Onheilsschot richt {fellShotPct}% meer aan",
       "duskEconomy": "Vaardigheden kosten {pct}% minder energie",
       "moontide": "Maanvloed: stadium {stacks} van {max}. Wildbout-, Hemelval- en Maanzaad-spreuken vullen haar in Maanuilvorm; bij {max} wordt Maanzaad Maangolf en Hemelval Zonnespoor, en beide geven haar uit",
-      "oldBlood": "Oud Bloed: stadium {stacks} van {max}. Gelande Wolfs- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen",
+      "oldBlood": "Oud Bloed: stadium {stacks} van {max}. Gelande Kat- en Bruin-slagen delen deze bank; bij {max} transformeert Bloedbeet of Botverbrijzelen",
       "verdance": "Groenkracht: stadium {stacks} van {max}. Voltooide Wildbloei- en Tweede Bloei-spreuken vullen haar; bij {max} wordt Snelle genezing Overbloei",
       "freeExecute": "Je volgende in aanmerking komende afmaakvaardigheid kost niets",
       "resourceSap": "Herstelt {value} van je huidige hulpbron elke {interval} sec",
@@ -3157,7 +3296,7 @@ export const nl_NL: EnTranslations = {
       "elementalTrance": "Opgelopen schade verminderd met {pct}%. {mana}% van alle schade die je aanricht wordt omgezet in mana",
       "stealth": "Verborgen; Bewegungstempo um {pct}% verringert",
       "formBear": "Bruingedaante: verhoogde gezondheid en pantser",
-      "formCat": "Katzengestalt: Nahkampfschaden und Energie",
+      "wolfForm": "Katgedaante: melee-schade en energie; bewegingssnelheid verhoogd met {pct}%",
       "formTravel": "Fleetgedaante: bewegingssnelheid verhoogd met {pct}%",
       "formFireball": "Ember Form: bewegingssnelheid verhoogd met {pct}%; aanvallen en spreuken zijn uitgeschakeld",
       "formMoonkin": "Maanuilvorm: spreukschade verhoogd met {pct}% en pantser verhoogd met {armorPct}%",
@@ -3246,7 +3385,30 @@ export const nl_NL: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
       "cheaterTag": "< Valsspeler >",
-      "pledgeTag": "Gelofte aan {guild}"
+      "pledgeTag": "Gelofte aan {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Veilingmeester",
+        "banker": "Bankier",
+        "riftForgemaster": "Rift Forgemaster",
+        "cardMaster": "Kaartmeester",
+        "crucibleQuartermaster": "Smeltkroes kwartiermeester",
+        "heroicQuartermaster": "Heroïsche kwartiermeester",
+        "pvpVendor": "PvP-leverancier",
+        "weaponsmithTrainer": "Trainer voor smeden",
+        "cookingTrainer": "Kooktrainer",
+        "tailoringTrainer": "Trainer voor maatwerk",
+        "engineeringTrainer": "Techniek trainer",
+        "leatherworkingTrainer": "Trainer voor leerbewerking",
+        "alchemyTrainer": "Alchemie trainer",
+        "weaponVendor": "Wapenverkoper",
+        "armorVendor": "Armourverkoper",
+        "armsDealer": "Wapenhandelaar",
+        "foodVendor": "Leverancier van eten en drinken",
+        "potionVendor": "Drankjesverkoper",
+        "stableMaster": "Stabiele meester",
+        "generalGoods": "Algemene goederen"
+      }
     },
     "mobTooltip": {
       "levelFamily": "Niveau {level} {family}",
@@ -3265,6 +3427,7 @@ export const nl_NL: EnTranslations = {
       "lock": "Spelerframe vergrendelen"
     },
     "partyFrames": {
+      "header": "Feest",
       "section": "Groeps- en raidframes",
       "optionsSection": "Groepsframe-opties",
       "unlock": "Groeps- en raidframes verplaatsen",
@@ -3475,10 +3638,15 @@ export const nl_NL: EnTranslations = {
       "unrecordedSigned": "Geen verzamelaar geregistreerd, gesigneerd door {name}",
       "quantityAria": "Eenheden van {source}, maximaal {count}",
       "decreaseAria": "Eenheden van {source} verminderen",
-      "increaseAria": "Eenheden van {source} verhogen"
+      "increaseAria": "Eenheden van {source} verhogen",
+      "decreaseByAria": "Verlaag eenheden van {source} met {count}",
+      "increaseByAria": "Verhoog eenheden van {source} met {count}",
+      "moveAll": "Verplaats alle eenheden",
+      "fits": "Er passen momenteel tot {units}"
     },
     "materialHint": {
       "fineGrade": "Fijne kwaliteit. Verzameld uit een grondstoffenpunt op volle rang met gereedschap boven de rang van het materiaal, en telt overal waar de gewone versie vereist is als die versie.",
+      "fineFarmGrade": "Fijne kwaliteit. Sommige keuzes van een oogst komen goed uit, vaker bij een hogere landbouwvaardigheid of met een opgeladen Artisan's Eye. Gewone producten tellen nooit mee als de fijne kwaliteit vereist is.",
       "cookingCatch": "Kookingrediënt. Moet worden gekookt voordat het gegeten wordt.",
       "usedBy": "Gebruikt door {crafts}.",
       "arcaneDust": "Vervaardigingsreagens. Verkregen door gewone en ongebruikelijke uitrusting te onttoveren.",
@@ -3763,6 +3931,15 @@ export const nl_NL: EnTranslations = {
       "subtitle": "Gildes van het rijk",
       "rosterTitle": "Bekijk de ledenlijst van {guild}",
       "back": "Terug",
+      "filters": "Bordfilters",
+      "newPlayerFriendly": "Vriendelijk voor nieuwe spelers",
+      "newPlayerFriendlyTitle": "Deze gilde verwelkomt nieuwe spelers",
+      "filterNewPlayersTitle": "Toon alleen gilden die nieuwe spelers verwelkomen",
+      "filterEmpty": "Nog geen gilde heeft haar deuren geopend voor nieuwe spelers.",
+      "showAll": "Toon alle gilden",
+      "officersOnline": "Officieren online",
+      "officersOnlineLabel": "Officieren online: {names}",
+      "officerEntry": "{name} ({rank})",
       "popupTitle": "Gildebord",
       "close": "Sluiten"
     },
@@ -3819,6 +3996,8 @@ export const nl_NL: EnTranslations = {
       "withdrawQuantityTitle": "{item} opnemen",
       "withdrawQuantityInput": "Aantal om op te nemen",
       "withdrawQuantityConfirm": "Opnemen",
+      "quantityStepDownAria": "Verlaag de hoeveelheid met {count}",
+      "quantityStepUpAria": "Verhoog de hoeveelheid met {count}",
       "vaultRowWithdrawName": "{item} opnemen",
       "priceChanged": "De prijs is veranderd voordat de aankoop werd voltooid. Bekijk de vernieuwde prijs en bevestig opnieuw.",
       "withdrawQuantityAction": "Aantal om op te nemen: {item}",
@@ -4010,6 +4189,25 @@ export const nl_NL: EnTranslations = {
       "lastSeenNever": "nooit",
       "ignoredTab": "Genegeerd",
       "blockedTab": "Geblokkeerd",
+      "who": {
+        "tab": "WHO",
+        "searchPlaceholder": "Naam, zone of gilde",
+        "search": "Zoekopdracht",
+        "loading": "Vraag aan het rijk wie online is...",
+        "empty": "Er komen geen spelers overeen.",
+        "count": "{total} online",
+        "countFiltered": "{shown} van {total} online",
+        "capped": "Het tonen van de eerste {delivered}. Verfijn de zoekopdracht om de rest te zien.",
+        "classFilter": "Filter op klasse",
+        "allClasses": "Alle klassen",
+        "colStatus": "Status",
+        "colName": "Naam",
+        "colLevel": "Niveau",
+        "colClass": "Klas",
+        "colZone": "Zone",
+        "colGuild": "Gilde",
+        "sortTitle": "Sorteren op {column}"
+      },
       "ignoredEmpty": "Je negeert niemand.",
       "blockedEmpty": "Je hebt niemand geblokkeerd.",
       "blockSearchPlaceholder": "Spelersnaam",
@@ -4049,7 +4247,6 @@ export const nl_NL: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Verzamelen",
       "mining": "Mijnbouw",
       "logging": "Houtkap",
       "herbalism": "Kruidenkunde",
@@ -4132,6 +4329,7 @@ export const nl_NL: EnTranslations = {
           "farming": "Werkt vanuit je tassen wanneer je een kweekbed plant."
         },
         "speed": "Verzamelt sneller bij grondstoffenpunten onder rang {tier}.",
+        "wieldDegrade": "Onder die vaardigheid werkt het nog steeds als een hulpmiddel op een lager niveau.",
         "rodRequired": "Vereist om te vissen.",
         "rodBite": "Vissen bijten tot {seconds} s eerder.",
         "rodReel": "Verlengt de binnenhaaltijd met {seconds} s.",
@@ -4233,9 +4431,7 @@ export const nl_NL: EnTranslations = {
       "noviceBody": "Je Landbouwvaardigheid groeit telkens wanneer je een gewas oogst. Zaai een zaad in een kweekbed om te beginnen."
     },
     "archetypeTitle": {
-      "label": "Titel",
-      "none": "Geen",
-      "hobbyLabel": "Liefhebberij"
+      "none": "Geen"
     },
     "archetypePair": {
       "engineering+alchemy": "Bommenwerper",
@@ -4405,7 +4601,21 @@ export const nl_NL: EnTranslations = {
       "hobbyLabel": "Hobby: {craft}",
       "majorsLabel": "Hoofdvakken: {a} en {b}",
       "pairsHeld": "Behouden paren: {count}",
-      "returnsLabel": "Teruggaven: {count}"
+      "returnsLabel": "Teruggaven: {count}",
+      "retentionFooter": "Rendement op respect: 60% van de vaardigheden behouden.",
+      "tutorialLink": "Beroepsles"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Recepten",
+      "collapseHint": "Recepttracker samenvouwen",
+      "expandHint": "Vouw de receptentracker uit",
+      "pin": "Pin",
+      "unpin": "Losmaken",
+      "pinFull": "De receptentracker is vol (maximaal {cap} recepten)",
+      "pinAria": "Maak {name} vast aan de HUD-tracker",
+      "unpinAria": "Maak {name} los van de HUD-tracker",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Knutselen",
@@ -4437,9 +4647,11 @@ export const nl_NL: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(verbruikt {count} van fijne kwaliteit)",
       "reagentVaultDraw": "(haalt {count} uit je Materialenkluis)",
+      "reagentOrdinaryHeld": "({name} gehouden: {count}, maar hier telt alleen het fijne cijfer)",
       "vaultUnreachable": "De Materialenkluis is hier niet bereikbaar.",
       "craftFeeLine": "Ambachtskosten: {fee} per stuk",
       "empty": "Nog geen recepten bekend.",
+      "materialsFooter": "Materialen in uw kluis worden automatisch getekend. Leer meer recepten op het station.",
       "resultAria": "Ambacht {name}",
       "craftedToast": "Gemaakt: {name}",
       "craftedToastQty": "Gemaakt: {name} x{qty}",
@@ -4529,8 +4741,8 @@ export const nl_NL: EnTranslations = {
       "attunedBanner": "Afgestemd: {title}",
       "tierTutorial": {
         "title": "Je Eerste Niveau",
-        "tierCap": "Een ambacht bereikt zijn eerste niveau bij {skill} vaardigheid, en elk niveau verbetert wat het kan maken. Maar een ambacht klimt pas voorbij zeldzaam werk als het een van je twee hoofdvakken is.",
-        "radar": "Je beroepen vormen een wiel. Stem af op een naburig paar en die twee ambachten worden onbegrensde hoofdvakken; een ambacht aan de andere kant van het wiel wordt een zeldzaam-begrensde liefhebberij; de rest ligt slapend: hun kennis bewaard, maar begrensd op gewoon totdat je ze weer oppakt.",
+        "tierCap": "Een ambacht bereikt zijn eerste niveau met de vaardigheid {skill}, en elk niveau verbetert wat het kan maken. Maar een ambacht klimt pas voorbij zeldzaam werk als het een van je twee hoofdvakken is.",
+        "radar": "Je beroepen vormen een wiel. Stem je af op een aangrenzend paar en die twee ambachten worden onbegrensde majors, één vaartuig aan de overkant wordt een hobby met zeldzame limieten, en de rest sluimert: hun kennis blijft behouden, maar wordt gemeenschappelijk beperkt totdat je ze weer oppakt.",
         "masters": "Ambachtsmeesters in de steden bieden afstemmingsopdrachten aan. Bezoek er een om je paar te kiezen wanneer je er klaar voor bent. Niets wat je hebt geleerd gaat ooit verloren.",
         "dismiss": "Begrepen"
       },
@@ -4541,6 +4753,9 @@ export const nl_NL: EnTranslations = {
       "commissionToggleHint": "Bindt aan het eerste personage dat het via een ruil ontvangt.",
       "commissionUnbound": "Opdrachtsstuk: bindt aan de eerste ontvanger",
       "commissionBound": "Opdrachtstuk: gebonden aan de ontvanger"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "De Handelaar vult gewone goederen aan; Spelerslijsten staan ​​naast hen tegen de vraagprijs."
     },
     "itemMenu": {
       "use": "Gebruiken",
@@ -4821,6 +5036,7 @@ export const nl_NL: EnTranslations = {
       "roleDps": "Schade",
       "freeRoles": "Alle rollen welkom",
       "lockoutDaily": "Dagelijkse vergrendeling op de eindbaas",
+      "lockoutWeekly": "Wekelijkse uitsluiting voor elke baas",
       "lockoutNone": "Geen vergrendeling",
       "lockedFor": "Vergrendeld voor ongeveer {minutes} min",
       "attunement": "Vereist afstemming: {quest}",
@@ -4834,6 +5050,8 @@ export const nl_NL: EnTranslations = {
       "lootMaybe": "Maximaal een van deze kan vallen:",
       "lootChance": "Extra kansen op buit:",
       "lootHeroic": "Heroïsche bonus, een van deze valt altijd:",
+      "lootHeroicMaybe": "Heroïsche bonus, hoogstens één hiervan kan droppen:",
+      "lootHeroicChance": "Heroïsche bonus, extra kansdrops:",
       "pct": "{pct}%",
       "blockedLevel": "Alleen niveaus {min} tot {max}",
       "blockedSpec": "Vereist een specialisatie",
@@ -4905,7 +5123,33 @@ export const nl_NL: EnTranslations = {
         "kings_wrath": "Koningswoede (30%: permanente schadebonus, snellere vloergevaren)",
         "bone_storm": "Beenderstorm (hij negeert dreiging, wervelt en bestormt de raid)",
         "crown_endures": "De Kroon houdt stand (harde razernij om 6:00, heroic 5:00)",
-        "deathless_court": "Het Doodloze Hof (alleen heroic, het koninklijk hof verrijst na Doodloze Razernij)"
+        "deathless_court": "Het Doodloze Hof (alleen heroic, het koninklijk hof verrijst na Doodloze Razernij)",
+        "bloodmane_rend": "Bloodmane Rend (bloeden, let op doelwissels)",
+        "tusk_sweep": "Tusk Sweep (frontaal splijten)",
+        "ancestral_sap": "Ancestral Sap (geneest zijn bondgenoten)",
+        "call_of_the_hunt": "Call of the Hunt (versnelt nabije bondgenoten)",
+        "thickhide_ward": "Thickhide Ward (schermt nabijgelegen bondgenoten)",
+        "beast_pit_quake": "Beast Pit Quake (gebiedsschade)",
+        "wildheart_pulse": "Wildheart Pulse (schade aan pulserend gebied)",
+        "jaguar_roar": "Jaguar Roar (terugslag)",
+        "brand_of_the_pyre": "Brand of the Pyre (stapelbrandvlek, afwassen in leidingwater)",
+        "forge_strike": "Forge Strike (debuff voor het stapelen van tanks)",
+        "rain_of_cinders": "Rain of Cinders (drie vuurkegels, ga ertussen staan)",
+        "falling_cinders": "Falling Cinders (meteoorcirkels op spelers, ga naar buiten)",
+        "revolving_inferno": "Revolving Inferno (roterende vuurstralen, beweeg door de gaten)",
+        "forge_wave": "Forge Wave (uitbreidende brandmuur, gebruik de twee veilige rijstroken)",
+        "apocalypse_add": "Ignivar Ashcaller (prioriteit toevoegen van casting Apocalypse, dood het snel)",
+        "judgment_of_the_forge": "Oordeel van de Smidse (pauze, deel het enige veilige toevluchtsoord)",
+        "last_inferno": "Last Inferno (45 seconden branden met 20% gezondheid)",
+        "chains_of_the_forge": "Chains of the Forge (alleen heroïsch, blijf dicht bij je gekoppelde partner)",
+        "makers_brand": "Maker's Brand (debuff voor het stapelen van tanks)",
+        "forgefathers_sweep": "Forgefather's Sweep (brede frontale kegel bij een niet-tank)",
+        "tempering_ray": "Tempering Ray (lijn naar een gemarkeerde speler, onderschep deze)",
+        "cinder_orbs": "Cinder Orbs (gemarkeerde spelers verspreiden zich naar de randen van de kamer)",
+        "forgestorm": "Forgestorm (vallende meteoorcirkels, ga weg)",
+        "shared_pyre": "Gedeelde brandstapel (verzamelcirkel, de schade verdelen)",
+        "anvils_decree": "Anvil's Decreet (drie hamerslagen over de hele raid, genezen door)",
+        "masters_assembly": "De Meestervergadering (blokkeer de smederijbalken, draai blokkers)"
       }
     },
     "cosmetics": {
@@ -4926,6 +5170,8 @@ export const nl_NL: EnTranslations = {
       "applied": "Toegepast",
       "owned": "In bezit",
       "storeOnly": "Verkrijgbaar in de WOC-winkel",
+      "preview": "Voorbeeld",
+      "previewAria": "Voorbeeld {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Een rijdier-skin wordt over het rijdier getekend waarop dit personage rijdt. De snelheid verandert nooit.",
       "mountsNoMount": "Bezit eerst een rijdier: een skin heeft iets nodig om op te rijden.",
@@ -4974,6 +5220,10 @@ export const nl_NL: EnTranslations = {
       "ownedTooltipStatus": "Gecatalogiseerd in Het Reliquarium",
       "missingTooltipStatus": "Nog niet gevonden",
       "firstFindClears": "Voor het eerst gevonden bij voltooiing {count}",
+      "foundBy": "Gevonden door {names}",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "Gedeeld door alle personages op je account",
+      "sharedScopeHint": "Een reliek die een van je personages vindt, vult de bladzijde ook hier.",
       "unlockToast": "Reliek gecatalogiseerd: {name}",
       "illuminateBanner": "Bladzijde verlucht: {name}",
       "illuminateToast": "Elk reliek op {name} is gevuld.",
@@ -5107,6 +5357,10 @@ export const nl_NL: EnTranslations = {
       "progressAria": "Voortgang: {current} van {target}",
       "renownChip": "{renown} Roem",
       "earnedDate": "Behaald op {date}",
+      "earnedBy": "Behaald door {names}",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "Gedeeld door alle personages op je account",
+      "accountScopeHint": "Een daad die een van je personages behaalt, telt ook hier mee, en het Boek vermeldt wie hem heeft behaald.",
       "featRibbon": "Wapenfeit",
       "hiddenBadge": "Verborgen",
       "titleChip": "Titelbeloning",
@@ -5156,6 +5410,33 @@ export const nl_NL: EnTranslations = {
       "toggleAria": "Schakel tussen de wereldkaart en de gebiedskaart",
       "levels": "Niveaus {min} tot {max}"
     },
+    "mapAtlas": {
+      "level": "Niveau {level}",
+      "landmarkCount": "{count} oriëntatiepunten",
+      "filtersAria": "Kaartlagen",
+      "filters": {
+        "quests": "Zoektochten",
+        "gather": "Bijeenkomen",
+        "dungeons": "Kerkers",
+        "services": "Diensten",
+        "players": "Spelers"
+      },
+      "trackedQuests": "Bijgehouden speurtochten",
+      "noTrackedQuests": "Geen bijgehouden speurtochten",
+      "availableNearby": "Beschikbaar in de buurt",
+      "noNearbyQuests": "Geen speurtochten in de buurt",
+      "distance": "{distance} meter",
+      "showRoute": "Route weergeven",
+      "untrack": "Ontsporen",
+      "track": "Spoor",
+      "legend": {
+        "dungeon": "Kerker",
+        "ore": "Erts",
+        "herb": "Kruid",
+        "mail": "Mail",
+        "passage": "Passage"
+      }
+    },
     "arenaGate": {
       "minLevelNote": "Vereist niveau {level}"
     },
@@ -5174,6 +5455,7 @@ export const nl_NL: EnTranslations = {
       "tabBrowse": "Bladeren",
       "tabSell": "Verkopen",
       "tabActivity": "Mijn Activiteiten",
+      "tabHistory": "Verkoopgeschiedenis",
       "tabsLabel": "Onderdelen van de $WOC-beurs",
       "loading": "De Beurs laden...",
       "loadFailed": "De Beurs kon niet worden bereikt. Probeer het straks opnieuw.",
@@ -5198,6 +5480,16 @@ export const nl_NL: EnTranslations = {
       "colCurrentBid": "Huidig bod",
       "colBuyNow": "Nu kopen",
       "colTimeLeft": "Resterende tijd",
+      "colBuyer": "Koper",
+      "colSoldAt": "Verkocht",
+      "colSalePrice": "Verkoopprijs",
+      "colSaleType": "Type",
+      "saleTypeAuction": "Veiling",
+      "saleTypeBuyNow": "Koop nu",
+      "saleTypeDirected": "Geregisseerd",
+      "saleTypeUnknown": "Onbekend",
+      "historyEmpty": "Er zijn nog geen verkopen geregistreerd.",
+      "historyError": "Verkoopgeschiedenis kan niet worden geladen.",
       "reserveMet": "Reserveprijs behaald",
       "reserveNotMet": "Reserveprijs niet behaald",
       "yourListing": "Jouw aanbieding",
@@ -5870,6 +6162,7 @@ export const nl_NL: EnTranslations = {
       "deeds": "Boek der Daden",
       "reliquary": "Het Reliquarium",
       "sheathe": "Wapen Schede In/Uit",
+      "hideInterface": "Verberg de interface (screenshots en video's)",
       "crafting": "Vervaardigen",
       "mount": "Opstijgen / Afstijgen",
       "calendar": "Evenementenkalender",
@@ -5899,6 +6192,8 @@ export const nl_NL: EnTranslations = {
       "attackMove": "Aanvalsbeweging (alleen zodra je de optie inschakelt)",
       "meters": "Schademeters (schade, genezing en dreiging)",
       "petMark": "Huisdier: Markeren, selecteer je eigen huisdier (hetzelfde als op zijn frame klikken)",
+      "targetSelf": "Richt je op jezelf",
+      "targetParty": "Richt je op partijleden 1 tot en met 9, van boven naar beneden, zoals de partijframes ze laten zien",
       "onBarBinding": "Je kunt ook direct vanaf de balk toewijzen: kies Actiebalktoetsen bewerken in het paneel Toetsbindingen, klik dan op een vak op de actiebalk en druk op de gewenste toets. Klik op Klaar wanneer je klaar bent. Dit is alleen beschikbaar op desktop, omdat het een fysiek toetsenbord vereist.",
       "clickMoveNote": "Klik om te bewegen staat uit totdat je het inschakelt: open het paneel Toetsbindingen in het spelmenu, schakel Klik om te bewegen in, en gebruik dan de rij Klik-beweegknop eronder om te kiezen welke muisknop het lopen doet (standaard Linkermuisklik, of Rechtermuisklik). Zodra het aanstaat, stuurt klikken op een plek op de grond je daarheen lopend, met een markering op de grond die toont waar je naartoe gaat. Klikken op een wezen of een andere speler loopt je naar hen toe en stopt binnen bereik, terwijl die klik nog steeds zijn gewone taak van doelwit kiezen of interageren uitvoert; als je al dicht genoeg bent om te bereiken wat je hebt aangeklikt, interageer je gewoon en blijf je staan waar je bent. Elke bewegingstoets neemt de controle meteen terug en beëindigt de tocht, en dat geldt ook voor de muisknop ingedrukt houden om rond te kijken. Springen doet dat niet, dus je blijft reizen door de sprong heen, en het openen van het spelmenu pauzeert de tocht alleen maar, die verdergaat zodra je het menu sluit."
     },
@@ -6036,7 +6331,8 @@ export const nl_NL: EnTranslations = {
       "ifLockBars": "Vergrendelt je balken zodat je niet per ongeluk een vaardigheid uit een vak sleept.",
       "keybindsHeading": "Het paneel Toetsbindingen",
       "keybindsBody": "De toetsenlijst is maar de helft van dat paneel. Erboven staan de schakelaars die bepalen hoe je muis het spel bestuurt: muiscamera, of de cursor vergrendelt terwijl je draait, klik om te bewegen en welke muisknop dat activeert, aanvalsbeweging, de linkshandige aanraakindeling, en het filter voor grof taalgebruik in de chat.",
-      "keybindsMouseBody": "Twee dingen daar zijn makkelijk over het hoofd te zien. Muisknoppen binden als toetsen, dus de wielklik en de duimknoppen kunnen vaardigheden dragen, terwijl links- en rechtsklikken gereserveerd blijven voor de camera en voor klikken in de wereld. En je kunt rechtstreeks vanaf de actiebalk binden: zet hier de bindmodus op de actiebalk aan, klik dan op een vak en druk op de gewenste toets."
+      "keybindsMouseBody": "Twee dingen daar zijn makkelijk over het hoofd te zien. Muisknoppen binden als toetsen, dus de wielklik en de duimknoppen kunnen vaardigheden dragen, terwijl links- en rechtsklikken gereserveerd blijven voor de camera en voor klikken in de wereld. En je kunt rechtstreeks vanaf de actiebalk binden: zet hier de bindmodus op de actiebalk aan, klik dan op een vak en druk op de gewenste toets.",
+      "keybindsWheelBody": "Het wiel zelf bindt ook. Zoom Camera In en Zoom Camera Out zijn gewone bindingen die standaard op het blote wiel zitten, dus je kunt ze naar Ctrl plus het wiel of naar toetsen verplaatsen en vervolgens aan het vrijgekomen wiel rollen om actiebalkslots af te vuren. Een wielinkeping heeft geen ontgrendeling, dus hij kan geen vastgehouden actie voortzetten, zoals vooruit rijden."
     },
     "combat": {
       "intro": "Gevechten volgen vertrouwde klassieke MMO-regels. Je hoeft er niets van te bestuderen om goed te spelen, dit is gewoon de vorm van hoe gevechten werken.",
@@ -6057,7 +6353,7 @@ export const nl_NL: EnTranslations = {
       "deathTitle": "Wanneer je valt",
       "deathBody": "Als je gezondheid nul bereikt, ga je neer waar je staat, en je lichaam blijft daar liggen. Laat je geest los en je herrijst als een geest bij de dichtstbijzijnde begraafplaats: sneller ter been dan de levenden, buiten het bereik van je vijanden, maar niet in staat om te vechten, te plunderen of met iemand te spreken behalve de Bleke Hoeder die boven de stenen zweeft. Vanaf daar kies je. Loop je geest terug naar je lichaam en je herleeft ter plekke, met een deel van je gezondheid en mana hersteld en zonder enige straf. Of neem de Bleke Hoeder aan voor een onmiddellijke herrijzenis waar je staat, tegen de prijs van de Tol van de Hoeder: een tijdelijke verzwakking van alles wat je bent, die langer duurt naarmate je meer ervaren bent, en gloednieuwe personages helemaal bespaard blijft. Val je in een kerker, dan wacht je geest bij de begraafplaats buiten; loop je geest terug door de deur en je herleeft bij de ingang. Delves zijn de uitzondering: val je daar, dan word je simpelweg weer op je benen gezet bij de ingang van de delve, al beëindigt een tweede val de run. Welke weg je ook kiest, je verliest geen ervaring, uitrusting of munten. Ga tussen gevechten zitten om te eten en te drinken zodat je het volgende op volle kracht begint.",
       "threatTitle": "Wie de vijand raakt",
-      "threatBody": "Elke vijand houdt een eigen lijst bij van wie hem het meest heeft geïrriteerd. Schade voegt daaraan toe, en genezing ook: een genezing legt dreiging op de vijanden die al vechten tegen de persoon die je genas, verdeeld over hen, dus de veiligste genezing is er een op iemand die de tank al vasthoudt. Tanks zetten een Bewaakte Houding of een beschermende gedaante aan die alles wat ze opwekken vermenigvuldigt, terwijl de Wolfsgedaante van de druïde juist dreiging afwerpt, en een provocatie tilt de aanroeper meteen naar de top van de lijst en pint de vijand een paar seconden op diegene vast. Vijanden wisselen niet meteen zodra iemand de tank voorbijstreeft: er is een duidelijke voorsprong nodig om er een los te trekken, en een grotere voorsprong op afstand dan in melee, dus een beetje geduld aan het begin van een pull houdt het gevecht waar het hoort.",
+      "threatBody": "Elke vijand houdt een eigen lijst bij van wie hem het meest heeft geïrriteerd. Schade voegt daaraan toe, en genezing ook: een genezing legt dreiging op de vijanden die al vechten tegen de persoon die je genas, verdeeld over hen, dus de veiligste genezing is er een op iemand die de tank al vasthoudt. Tanks zetten een Bewaakte Houding of een beschermende gedaante aan die alles wat ze opwekken vermenigvuldigt, terwijl de Katgedaante van de druïde juist dreiging afwerpt, en een provocatie tilt de aanroeper meteen naar de top van de lijst en pint de vijand een paar seconden op diegene vast. Vijanden wisselen niet meteen zodra iemand de tank voorbijstreeft: er is een duidelijke voorsprong nodig om er een los te trekken, en een grotere voorsprong op afstand dan in melee, dus een beetje geduld aan het begin van een pull houdt het gevecht waar het hoort.",
       "hazardsTitle": "Het water kan je doden",
       "breathBody": "Diep water is bezwembaar, en je kunt eronder duiken. Terwijl je hoofd onder water is, verschijnt er een blauwe adembalk bovenaan het scherm die leegloopt; kom weer boven en hij vult zich veel sneller dan hij leegliep. Laat hem leeglopen terwijl je nog onder water bent en je begint te verdrinken, waarbij je elke seconde een flink stuk gezondheid verliest totdat je lucht bereikt, dus houd de balk in de gaten tijdens een lange duik. De dood wist hem, dus een lijkenloop begint altijd met volle longen.",
       "fatigueBody": "De zee heeft geen muur. De oversteken die de wereld bedoelt dat je zwemt, de zee-engtes en meren tussen het ene stuk land en het volgende, en de binnenmeren, zijn veilig over te steken hoe lang het ook duurt. Waag je voorbij de kust het echt open water in, dan begint het je krachten uit te putten: er verschijnt een waarschuwing, je krijgt een echt tijdvenster om terug te keren, en daarna doet de zee gestaag zwaardere schade die niets kan voorkomen totdat je weer richting land gaat. Verdrink je of raak je zo ver van de kust uitgeput, dan laat je je geest los zoals bij elke andere dood, dus behandel de horizon als decor in plaats van een bestemming.",
@@ -6088,8 +6384,9 @@ export const nl_NL: EnTranslations = {
       "framePetBody": "Jagers, heksenmeesters en iedereen anders met een actief huisdier krijgen er een klein frame voor naast hun eigen frame, met zijn naam, niveau en gezondheid. Op dat frame klikken selecteert je huisdier, en Ctrl+6 doet hetzelfde vanaf het toetsenbord.",
       "framesMoveBody": "Je eigen frame, je doelwitframe en je groepsframes kunnen allemaal worden verplaatst. Elk heeft een klein verplaatsknopje in de hoek: ontgrendel het, sleep het frame waar je het wilt hebben, en vergrendel het weer zodat een verdwaalde klik het niet kan verschuiven. Belanden ze ergens waar je spijt van hebt, dan zet Frameposities herstellen in de opties ze allemaal terug naar waar ze begonnen.",
       "framesMoveBodyEditFrames": "Je eigen frame, je doelraam en je groepsframes kunnen allemaal worden verplaatst. Elk heeft een kleine verplaatsknop in de hoek: ontgrendel hem, sleep het frame naar de gewenste plek en vergrendel hem weer zodat een verdwaalde klik niets kan verschuiven. Frames bewerken bovenaan het tabblad Frames in de Interface-opties maakt de rest van de interface in één keer los, samen met die drie frames: de actiebar, de werpbalk, de zwaaibalk, de ervaringsbalk, de minimap, de knoppenrail, het huisdierframe, de houdingsbalk, de buff- en debuffrijen en het label Herinnering voor verlanglijst. Als ze op een plek belanden waar je spijt van krijgt, zet Herstellen naar standaard onderaan hetzelfde tabblad Frames ze allemaal terug naar hun oorspronkelijke plek.",
-      "framesGovernedExtra": "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
+      "framesGovernedExtra": "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
+      "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
       "aurasTitle": "Buffs en debuffs",
@@ -6100,7 +6397,7 @@ export const nl_NL: EnTranslations = {
       "minimapBody": "Rechtsboven: een ronde minimap met de gebiedsnaam erboven en je coördinaten eronder, omringd door een wijzerplaat die het tijdstip van de dag toont.\n\nDe schijf draagt meer dan alleen terrein. Je eigen pijl staat in het midden en wijst de kant op die je aankijkt, met je groep eromheen als klassekleurige stippen en een randpijl voor iedereen die erbuiten is gedwaald. Questgevers dragen daar dezelfde markering als in de wereld, en je herkent er ook grondstoffenpunten en werkbanken, reisportalen, buitbare lichamen en kisten, elke vijand die interesse in je heeft opgevat, vrienden en gildgenoten in de buurt, en je eigen lichaam terwijl je als geest terugrent.\n\nKleine indicatoren verschijnen erop wanneer ze iets te melden hebben: een envelop terwijl ongelezen brieven op je wachten, een munt terwijl verkoopopbrengsten of teruggegeven goederen bij de Koopman op je wachten, en een knop met een overzicht van je raidvergrendelingen.",
       "mapTitle": "De wereldkaart en je trackers",
       "mapBody": "M opent de wereldkaart: het continent uitgetekend, met je eigen pijl erop, de gebieden en hun namen, de interessante plekken in je omgeving, de reisportalen, en de grondstoffenpunten die je hebt gevonden. Je groep staat er ook op. Binnen een delve schakelt de kaart om naar een schema van de kamers die je tot nu toe hebt verkend.\n\nAan de rechterkant, onder de minimap, houdt een stapel trackers je huidige zaken in beeld zonder dat je iets hoeft te openen: je gevolgde quests en hun doelen, je voortgang bij daden, de delve waarin je zit, en elke rift waaraan je deelneemt. De questtracker klapt in wanneer je het scherm terug wilt.",
-      "mapBodyZoneFirst": "M opent de wereldkaart op de zone waarin je staat, met je eigen pijl erop, de interessante plekken om je heen, de queestgevers met hun markeringen en de gebieden waarin je doelen liggen, de ambachtsstations, brievenbussen, mededelingenborden en tuinbedden, de kerkeringangen en elk verzamelpunt in de zone. Punten die opnieuw groeien zijn grijs en punten waarvoor je gereedschap niet goed genoeg is, gemarkeerd. Je groep staat er ook op. Klik met rechts op de kaart of druk op de knop Wereldkaart om uit te zoomen naar het continent, met elke zone en haar naam. Klik op een zone om haar kaart te openen. Stap een delve, kerker, rift of kasteel in en de kaart verandert in een plattegrond van de plek waar je staat. Het slagveld Doornholte-Velden krijgt zijn eigen veldkaart.\n\nAan de rechterkant, onder de minimap, houdt een stapel trackers je huidige zaken in beeld zonder iets te openen: je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, de delve waarin je zit en elke rift waaraan je deelneemt. De queesttracker klapt in wanneer je het scherm terug wilt.",
+      "mapBodyZoneFirst": "M opent de wereldkaart op de zone waarin je staat, met je eigen pijl erop, de interessante plekken om je heen, de queestgevers met hun markeringen en de gebieden waarin je doelen liggen, de ambachtsstations, brievenbussen, mededelingenborden en tuinbedden, de kerkeringangen en elk verzamelpunt in de zone. Punten die opnieuw groeien zijn grijs en punten waarvoor je gereedschap niet goed genoeg is, gemarkeerd. Je groep staat er ook op. Klik met rechts op de kaart of druk op de knop Wereldkaart om uit te zoomen naar het continent, met elke zone en haar naam. Klik op een zone om haar kaart te openen. Stap een delve, kerker, rift of kasteel in en de kaart verandert in een plattegrond van de plek waar je staat. Het slagveld Doornholte-Velden krijgt zijn eigen veldkaart.\n\nAan de rechterkant, onder de minimap, houdt een stapel trackers je huidige zaken in beeld zonder iets te openen: je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit en elke rift waaraan je deelneemt. De queesttracker klapt in wanneer je het scherm terug wilt.",
       "gatheringGoalTrackerBody": "Een tracker voor verzameldoelen komt in de stapel zodra je een recept in het maakvenster of een opdracht op het bord volgt. Hij noemt het recept of de opdracht die je volgt, hoeveel je verzamelt en hoe ver je bewaarde en opgeslagen materialen je brengen. Volgen vervangt je huidige doel en Wissen verwijdert het expliciet. Geen van beide verandert ooit je oogstvoorkeur.",
       "hubPracticeTrackerBody": "Bij de Oostbeek-hub komt een oefentracker in de stapel zodra je daar de begeleide oefenlessen volgt. Hij houdt je beste pogingen tegen de oefenpoppen in beeld. Terwijl een les actief is, leidt een coachingsbalk ernaast je door de huidige stap, van het openen van de Schademeters tot het vergelijken van een tweede poging.",
       "chatTitle": "De chatbox",
@@ -6447,6 +6744,7 @@ export const nl_NL: EnTranslations = {
       "formsNote": "Een druïde vecht door van gedaante te veranderen. De meeste druïdenvaardigheden horen bij één gedaante, dus de vorm waarin je verkeert bepaalt wat je kunt gebruiken, en van gedaante wisselen kost een beetje mana. Je kunt in of buiten gevecht van gedaante wisselen, zo vaak je wilt.",
       "formsAutoUnshift": "Een heling of een schadespreuk die je in gedaante uitspreekt, haalt je er vanzelf uit. Een gedaante zo verlaten is gratis en verbruikt je globale afkoeltijd niet, dus een instantspreuk gaat af op het moment dat je drukt. Terugschakelen is een gewone vaardigheid en kost nog steeds mana en je globale afkoeltijd.",
       "formsMoonwing": "Een Balans-druïde krijgt er nog één gedaante bij: de Maanuilvorm, de spreukgedaante waarin hij vecht. Het is de enige diergedaante die je spreuken behoudt, en je toverstaf werkt alleen in deze vorm of in je normale spreukgedaante.",
+      "formsWolfEngage": "Een wolf opent het gevecht met Bruin-stormloop, wisselt meteen naar Wolfsgedaante om het doelwit vast te pinnen, dicht de afstand met Uitval wanneer hij niet sluipt, en houdt een vijand stil met Neerhalen.",
       "formLine": {
         "form_bear": "De tankgedaante: een zware huid, Woede in plaats van mana, en extra dreiging zodat vijanden jou blijven aanvallen.",
         "form_cat": "De gedaante voor melee-schade: Energie en combopunten, zoals een Schurk, en veel minder dreiging.",
@@ -6455,7 +6753,7 @@ export const nl_NL: EnTranslations = {
       "mageEleSummon": "Een Vorst-spreuk die de elementaal naar je zijde roept en op je doelwit afstuurt.",
       "formName": {
         "form_bear": "Bruingedaante",
-        "form_cat": "Wolfsgedaante",
+        "form_cat": "Katgedaante",
         "form_travel": "Fleetgedaante"
       }
     },
@@ -6976,7 +7274,7 @@ export const nl_NL: EnTranslations = {
     "deedsPage": {
       "intro": "In het Boek der Daden houdt de wereld de stand bij van alles wat je hebt verricht, van je eerste stappen buiten het dal waar je begon tot de zwaarste gevechten die het rijk te bieden heeft. Behaal daden terwijl je speelt, draag de titels die ze schenken en zie je Roem stijgen.",
       "howHeading": "Hoe daden werken",
-      "howBody": "Daden behaal en bewaar je met één personage tegelijk, dus elke held die je speelt bouwt een eigen Boek op; alleen de ranglijst van het rijk bundelt je Roem over alle personages die je speelt, en telt elke daad maar één keer. Elke daad zegt in duidelijke taal wat er van je wordt gevraagd, direct in het Boek der Daden in het spel, zodat je altijd weet waar je op jaagt, en de daden waar je achteraan zit kun je op de volglijst zetten om ze tijdens het spelen in het oog te houden. Een klein aantal blijft geheim en onthult zich pas wanneer je ze hebt behaald. Het Boek houdt zichzelf ook eerlijk: alles wat je verleden kan bewijzen, wordt je meteen toegekend, zodat een veteraan het nooit op een lege bladzijde opent; alleen de tellende daden beginnen hun telling opnieuw.",
+      "howBody": "Daden behaal je met één personage tegelijk, maar het Boek der Daden wordt gedeeld door elk personage op je account: een daad die een van hen volbrengt, is voor allemaal behaald, het Boek vermeldt wie hem behaalde en wanneer, en een titel of rand die hij oplevert kan door elk van je personages worden gedragen. De ranglijst van het rijk bundelt je Roem op dezelfde manier, en telt elke daad maar één keer. Elke daad zegt in duidelijke taal wat er van je wordt gevraagd, direct in het Boek der Daden in het spel, zodat je altijd weet waar je op jaagt, en de daden waar je achteraan zit kun je op de volglijst zetten om ze tijdens het spelen in het oog te houden. Een klein aantal blijft geheim en onthult zich pas wanneer je ze hebt behaald. Het Boek houdt zichzelf ook eerlijk: alles wat je verleden kan bewijzen, wordt je meteen toegekend, zodat een veteraan het nooit op een lege bladzijde opent; alleen de tellende daden beginnen hun telling opnieuw.",
       "renownHeading": "Roem",
       "renownBody": "Roem is de score achter het Boek. Elke daad die je verdient is een vast bedrag waard, en je totaal gaat alleen maar omhoog, dus een rustige week kost je nooit terrein. Een handvol draaien om geluk in plaats van vaardigheid, andere verzameldaden zijn hun eigen beloning, en Wapenfeiten zijn een eer apart, dus geen daarvan is enige Roem waard. Daden zonder Roem tellen nog steeds mee voor de voltooiing van je Boek; ze scoren alleen nooit. Wapenfeiten zijn de enige uitzondering, helemaal buiten de telling gehouden.",
       "rewardsHeading": "Titels en randen",
@@ -7014,7 +7312,7 @@ export const nl_NL: EnTranslations = {
     "reliquaryPage": {
       "intro": "Het Reliquarium is het museum van de unieke buit die je hebt gecatalogiseerd: de felbegeerde stukken uit kerkers, beroepstrofeeën, rijdieren, wapenskins en titels. Het hoort bij het Boek der Daden zoals een trofeeënzaal hoort bij een prestatieboek.",
       "howHeading": "Hoe de verzameling werkt",
-      "howBody": "Open Het Reliquarium in het spel (standaard Shift+X). Elke plank draagt bladzijden met unieke relieken. Je vult een silhouet zodra je dat stuk voor het eerst op dit personage bemachtigt, en je verlucht een bladzijde zodra elk reliek erop gevuld is. Een paar bladzijden dragen het label Vervallen of Persoonlijk: die staan buiten de voltooiing en blokkeren dus nooit een plank of de hele catalogus. Vondsten verschijnen meteen als melding en verversen het geopende venster; voortgang geldt per personage, behalve wapenskins, die accountcosmetica zijn.",
+      "howBody": "Open Het Reliekschrijn in het spel (standaard Shift+X). Elke plank bevat pagina's met unieke relieken. Een silhouet wordt gevuld zodra een willekeurig personage op je account dat stuk voor het eerst verkrijgt, en een pagina licht op wanneer elke reliek erop gevuld is. Enkele pagina's dragen het label Uitgefaseerd of Persoonlijk: ze vallen buiten de voltooiing en blokkeren dus nooit een plank of de hele catalogus. Vondsten verschijnen meteen als melding en verversen het geopende venster; voortgang wordt gedeeld door alle personages op het account, dus een reliek die één personage vindt, vult de pagina voor allemaal.",
       "ranksHeading": "Curator-rangen",
       "ranksBody": "Curator-rangen stijgen met elk uniek gecatalogiseerd reliek en schenken uitsluitend cosmetische titels en randen. Ze geven nooit gevechtskracht, buitkans of pechcompensatie. Wapenskins van het account tellen niet mee voor de Curator-rang, zodat het aanzien aan het personage gebonden blijft, en relieken op Vervallen of Persoonlijke bladzijden tellen er evenmin voor mee.",
       "retiredTag": "Vervallen",
@@ -7100,7 +7398,7 @@ export const nl_NL: EnTranslations = {
       "groupClasses": "Klassen",
       "groupForms": "Druïdengedaanten",
       "formBear": "Bruingedaante",
-      "formCat": "Wolfsgedaante",
+      "formCat": "Katgedaante",
       "formTravel": "Fleetgedaante",
       "groupCreatures": "Wezens",
       "groupPets": "Heksenmeester-Demonen",
@@ -7424,7 +7722,7 @@ export const nl_NL: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Betoveringen komen in vier niveaus. Het basisniveau gebruikt Klokstof, met bovenaan wat Essentie, en dekt het wapenvak, de vrije hand en elk pantservak. Er zijn genoeg statistiekassen dat elke build voor elk vak iets vindt: schilden en gedragen vrije handen van spreukwerpers krijgen elk een eigen Uithoudingsbetovering, zodat geen uitgerust vak zonder betovering blijft. Het Grotere niveau kost één Klokscherf plus Essentie en geeft sterkere bonussen op de vakken met de grootste impact. Scherven hebben daarnaast drie extra verbruikers: de twee amuletrecepten van vijf per stuk, het hoogste niveau van gereedschapseffectherladingen en het Lichtende niveau, waarbij wapen- en borstbetoveringen elk één scherf kosten en de Infusie twee. Leg er dus een paar opzij voordat je uitgeeft.\n\nDaartussen liggen de vijf Runenbetoveringen, één verbruiker per getypeerde secundaire statistiek, zodat niets wat je maalt ooit een dood einde is: Runenrand (wapen, Kracht, verbruikt Resonant staal), Runenzegel (wapen, Intellect, Resonant hout), Runenweefsel (borst, Geest, Resonante draad), Runenhuid (benen, Behendigheid, Resonante huid) en Runenschakels (helm, Uithouding, Resonante schakels). Elk gebruikt ook twee Klokessenties. Als een vak en statistiek zowel een basis- als Grotere betovering hebben, valt de Runenbonus ertussen. Runenweefsel is zonder meer de sterkste Geestbetovering voor de borst en Runenhuid is de enige Behendigheidsbetovering voor de benen. De exacte bonussen staan allemaal in de tabel hieronder.\n\nBoven de gewone lagere niveaus staat het Lichtende niveau, het gewone sluitstuk van het ambacht: Betoveren 100 voor de vier varianten en 125 voor de Infusie, zoals in de kolom Vaardigheid hieronder. Elke variant gebruikt een Lichtend reagens en voegt een extra stap aan zijn eigen vak toe: het wapen, met een optie voor Macht en één voor Spreukkracht, de borst en de laarzen. De laatste, de Lichtende Infusie, werkt alleen op een stuk dat Volmaakt is. Volmaken is werk van de drager, niet van de betoveraar, en de pagina Beroepen vertelt hoe een stuk het verdient.\n\nIJver van de Laatste Vlam is een afzonderlijke raidformule, geen gratis gewone betovering. Leer de verhandelbare formule op Betoveren 100 voordat je haar toepast. Elke toepassing gebruikt 3 Kernen van de Laatste Vlam en 2 Klokscherven. De formule kan in de Smeltkroes vallen of voor één kern bij haar kwartiermeester worden gekocht. Haar mêleeproc en regels voor wapensnelheid staan volledig hieronder.",
+        "enchantsNoteRaidFormula": "Betoveringen komen in vier niveaus. Het basisniveau gebruikt Klokstof, met bovenaan wat Essentie, en dekt het wapenvak, de vrije hand en elk pantservak. Er zijn genoeg statistiekassen dat elke build voor elk vak iets vindt: schilden en gedragen vrije handen van spreukwerpers krijgen elk een eigen Uithoudingsbetovering, zodat geen uitgerust vak zonder betovering blijft. Het Grotere niveau kost één Klokscherf plus Essentie en geeft sterkere bonussen op de vakken met de grootste impact. Scherven hebben daarnaast drie extra verbruikers: de twee amuletrecepten van één per stuk (de rest van de prijs van een amulet is essence en stof), het hoogste niveau van gereedschapseffectherladingen en het Lichtende niveau, waarbij wapen- en borstbetoveringen elk één scherf kosten en de Infusie twee. Leg er dus een paar opzij voordat je uitgeeft.\n\nDaartussen liggen de vijf Runenbetoveringen, één verbruiker per getypeerde secundaire statistiek, zodat niets wat je maalt ooit een dood einde is: Runenrand (wapen, Kracht, verbruikt Resonant staal), Runenzegel (wapen, Intellect, Resonant hout), Runenweefsel (borst, Geest, Resonante draad), Runenhuid (benen, Behendigheid, Resonante huid) en Runenschakels (helm, Uithouding, Resonante schakels). Elk gebruikt ook twee Klokessenties. Als een vak en statistiek zowel een basis- als Grotere betovering hebben, valt de Runenbonus ertussen. Runenweefsel is zonder meer de sterkste Geestbetovering voor de borst en Runenhuid is de enige Behendigheidsbetovering voor de benen. De exacte bonussen staan allemaal in de tabel hieronder.\n\nBoven de gewone lagere niveaus staat het Lichtende niveau, het gewone sluitstuk van het ambacht: Betoveren 100 voor de vier varianten en 125 voor de Infusie, zoals in de kolom Vaardigheid hieronder. Elke variant gebruikt een Lichtend reagens en voegt een extra stap aan zijn eigen vak toe: het wapen, met een optie voor Macht en één voor Spreukkracht, de borst en de laarzen. De laatste, de Lichtende Infusie, werkt alleen op een stuk dat Volmaakt is. Volmaken is werk van de drager, niet van de betoveraar, en de pagina Beroepen vertelt hoe een stuk het verdient.\n\nIJver van de Laatste Vlam is een afzonderlijke raidformule, geen gratis gewone betovering. Leer de verhandelbare formule op Betoveren 100 voordat je haar toepast. Elke toepassing gebruikt 3 Kernen van de Laatste Vlam en 2 Klokscherven. De formule kan in de Smeltkroes vallen of voor één kern bij haar kwartiermeester worden gekocht. Haar mêleeproc en regels voor wapensnelheid staan volledig hieronder.",
         "charmsHeading": "Bedels voor het gereedschap van een oogster",
         "formulaRequired": "Formule vereist",
         "charmsBody": "Betovering is ook waar de bedels van een oogster vandaan komen. Knutselaar Gizzel leert beide bij de gereedschapswerkplaats van Oostbeek zodra je Betovering 25 bereikt: de Buidel van de Verzamelaar, die een eenheid toevoegt aan een oogst, en het Oog van de Ambachtsman, dat de graad verhoogt van wat naar boven komt. Elk wordt eenmaal vervaardigd, en daarna geplaatst op een houweel, kapbijl of sikkel, waar het alleen een lading besteedt aan de oogsten die het daadwerkelijk verbetert.\n\nDe oplaadbeurt is waar het vak blijft verdienen. Ladingen worden hersteld door wie het gereedschap ook bezit, niet door een langskomende betoveraar, en het opladen kost de helft van de materialen wanneer die eigenaar de betoveraar is die de bedel heeft gesigneerd, en nog minder met een specialisatie in Betovering. Dus een bedel die over de toonbank verkocht wordt is een eenmalige verkoop, terwijl de bedels op je eigen gereedschap de goedkope zijn om aan de gang te houden. De volledige ladder van ladingen en materialen staat op elke verzamelberoepspagina, onder Gereedschapseffecten."
@@ -7493,7 +7791,7 @@ export const nl_NL: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Het ritme van de landbouw",
-        "rhythmBody": "Planten is de korte zichtbare cast: precies {plant} seconden op elke sport, omdat een schoffel de grond opent en geen snelheid koopt. Een rijp gewas lostrekken is direct. Er is geen cast om te onderbreken en geen tascontrole om het te weigeren. Een bed dat klaar is, wacht zolang je het laat staan, dus een volle tas kost een boer alleen de wandeling om haar leeg te maken.\n\nWat een oogst oplevert is produce en landbouwvaardigheid. Anders dan een ader geeft ze helemaal geen personage-XP, dus bedden zijn een ambacht om te beoefenen, geen manier om te levelen.",
+        "rhythmBody": "Planten is direct, omdat een schoffel de grond opent en geen snelheid koopt: er is geen cast om af te wachten, dus een boer die wegloopt heeft evengoed geplant. Een rijp gewas lostrekken is ook direct. Er is geen cast om te onderbreken en geen tascontrole om het te weigeren. Een bed dat klaar is, wacht zolang je het laat staan, dus een volle tas kost een boer alleen de wandeling om haar leeg te maken.\n\nWat een oogst oplevert is produce en landbouwvaardigheid. Anders dan een ader geeft ze helemaal geen personage-XP, dus bedden zijn een ambacht om te beoefenen, geen manier om te levelen.",
         "gainHeading": "Wat een oogst leert",
         "gainBody": "Winst is deterministisch en hangt af van je eigen teller, niet van het gewas: {g1} vaardigheid voor een oogst onder {p1}, {g2} onder {p2}, {g3} onder {p3} en {g4} voor de rest tot het maximum van {cap}. Het is nooit een vaardigheidsrol, dus de klim duurt precies zo lang als de berekening bepaalt.\n\nHet niveau van het gewas bepaalt hoe ver een bed je kan brengen. Een gewas van niveau 1 leert tot {c1} en wordt daar grijs, niveau 2 tot {c2} en niveau 3 en hoger tot het maximum. Naar hogere bedden gaan is dus wat de teller in beweging houdt.",
         "yieldsHeading": "Wat een oogst oplevert",
@@ -7535,8 +7833,8 @@ export const nl_NL: EnTranslations = {
         "commissionsHeading": "Opdrachten en de Makersbond",
         "commissionsBody": "Een opdracht is een vervaardiging gemaakt voor iemand anders. Wanneer je een wapen, wapenrustingsstuk of gehouden off-hand maakt (een drankje kan geen band dragen), kan de ambachtsman de vervaardiging aanmerken als opdracht: het afgewerkte stuk gedraagt zich normaal in de handen van de maker, maar het moment dat het van eigenaar wisselt in een ruil, bindt het aan de ontvanger. Dat is de Makersbond: de koper krijgt zijn stuk, en het stuk kan niet verder worden doorgegeven of doorverkocht.\n\nBonds zijn niet voor altijd, alleen kostbaar. Elke stationsmeester verbindt een gebonden stuk los terwijl je bij zijn station staat (een mobiel station biedt de dienst nooit aan), voor een bedrag bepaald door de kwaliteit van het voorwerp: 25 zilver ongewoon, 1 goud zeldzaam, 4 goud episch, waarbij een legendarisch het epische tarief betaalt en een gewoon opdrachtsstuk het ongewone.\n\nHet bedrag koopt een schone lei, geen genezing: het stuk is nog steeds een opdracht, dus het bindt opnieuw aan wie het in de volgende ruil ontvangt, en al het andere, handtekening, meesterwerk en betoveringen, blijft ongewijzigd.",
         "provenanceHeading": "Ondertekend werk",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Sommige items dragen een naam. De bronregels van een materiaal zeggen wie elke groep eenheden verzamelde, terwijl een aparte handtekeningmarkering de premiumondertekenaar aanwijst als die er is. Die feiten staan los van elkaar: gewoon verzameld materiaal registreert een verzamelaar zonder handtekening, en oude ondertekende voorraad kan de ondertekenaar noemen terwijl eerlijk staat dat geen verzamelaar is geregistreerd. Een voltooid stuk zegt in plaats daarvan wie het maakte. Deze registraties reizen met het item mee door handel, bank, post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervagen nooit.\n\nVerzamelen ondertekent het beste werk automatisch: elke oogst die zeldzaam of beter rolt, komt ondertekend aan en zeldzame vondsten ondertekenen hun volledige vijfvoudige meevaller. Een gelukkige rol bij het oogsten van een lijk ondertekent de opbrengst wanneer de familie geen specimen heeft om te geven. Waar dat wel kan, blijft de opbrengst gewoon en wordt daarnaast het ondertekende zuivere specimen gemaakt. Ambacht ondertekent op dezelfde manier: elke kopie van zeldzame of betere uitvoer maakt een handtekening en een Meesterwerk ondertekent altijd, ongeacht zijn kwaliteit. De beste versie van elk stuk noemt dus altijd zijn maker. De handtekening van gewoon materiaal zit op de eenheden zelf en kan niet verloren gaan alleen omdat een passende stapel al een andere verzamelaar of ondertekenaar bevat. Een afzonderlijk zuiver specimen is een apart item en heeft nog steeds ruimte nodig. Als het niet past, blijft de gewone lijkopbrengst maar gaat het specimen verloren.\n\nVoltooide items houden één strikte identiteit. Twee kopieën voegen alleen samen als elk merkteken exact overeenkomt: hetzelfde item, dezelfde ondertekenaar, dezelfde Meesterwerkstatistieken, dezelfde betovering en dezelfde binding. Compatibele materialen delen een plek tussen verzamelaars en ondertekenaars maar houden per bron een telling bij. De tooltip bij aanwijzen vat de bronnen samen; open Bronnen voor de volledige lijst. Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.\n\nHandtekeningen betalen makers terug: als je aan de werkbank een ondertekende kopie van een benodigde grondstof vasthoudt, door wie die ook is ondertekend, krijg je 2 procentpunten extra Meesterwerkkans. Een grondstof die door je eigen hand is ondertekend verlaagt de vereiste hoeveelheid van die grondstof met één, nooit onder één, tenzij de grondstof als niet-kortbaar is gemarkeerd. Raidkernen behouden altijd hun volledige kost. Je eigen ondertekende werk van zeldzame of betere kwaliteit blijft je vandaag zelfs onderwijzen via gemaakte drankjes alleen. Drink een zeldzame drank die je zelf hebt gebrouwen en ondertekend en een klein beetje vaardigheid stroomt terug naar het ambacht dat haar maakte, zolang dat ambacht één van je actieve hoofdambachten is. Het geldt echt alleen voor de dranktak. Een elixer, rol of topflacon leert je niets terug, hoe fijn het ook is ondertekend.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Sommige items dragen een naam. De bronregels van een materiaal zeggen wie elke groep eenheden verzamelde, terwijl een aparte handtekeningmarkering de premiumondertekenaar aanwijst als die er is. Die feiten staan los van elkaar: gewoon verzameld materiaal registreert een verzamelaar zonder handtekening, en oude ondertekende voorraad kan de ondertekenaar noemen terwijl eerlijk staat dat geen verzamelaar is geregistreerd. Een voltooid stuk zegt in plaats daarvan wie het maakte. Deze registraties reizen met het item mee door handel, bank, post, de Wereldmarkt en zelfs een terugkoop bij een handelaar, en vervagen nooit.\n\nVerzamelen ondertekent het beste werk automatisch: elke oogst die zeldzaam of beter rolt, komt ondertekend aan en zeldzame vondsten ondertekenen hun volledige vijfvoudige meevaller. Een gelukkige rol bij het oogsten van een lijk ondertekent de opbrengst wanneer de familie geen specimen heeft om te geven. Waar dat wel kan, blijft de opbrengst gewoon en wordt daarnaast het ondertekende zuivere specimen gemaakt. Ambacht ondertekent op dezelfde manier: elke kopie van zeldzame of betere uitvoer maakt een handtekening en een Meesterwerk ondertekent altijd, ongeacht zijn kwaliteit. De beste versie van elk stuk noemt dus altijd zijn maker. De handtekening van gewoon materiaal zit op de eenheden zelf en kan niet verloren gaan alleen omdat een passende stapel al een andere verzamelaar of ondertekenaar bevat. Een afzonderlijk zuiver specimen is een apart item en heeft nog steeds ruimte nodig. Als het niet past, blijft de gewone lijkopbrengst maar gaat het specimen verloren.\n\nVoltooide items houden één strikte identiteit. Twee kopieën voegen alleen samen als elk merkteken exact overeenkomt: hetzelfde item, dezelfde ondertekenaar, dezelfde Meesterwerkstatistieken, dezelfde betovering en dezelfde binding. Compatibele materialen delen een plek tussen verzamelaars en ondertekenaars maar houden per bron een telling bij. De tooltip bij aanwijzen vat de bronnen samen; klik met rechts op de stapel voor de volledige lijst (gebruik op een touchscreen de knop Bronnen). Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.\n\nHandtekeningen betalen makers terug: als je aan de werkbank een ondertekende kopie van een benodigde grondstof vasthoudt, door wie die ook is ondertekend, krijg je 2 procentpunten extra Meesterwerkkans. Een grondstof die door je eigen hand is ondertekend verlaagt de vereiste hoeveelheid van die grondstof met één, nooit onder één, tenzij de grondstof als niet-kortbaar is gemarkeerd. Raidkernen behouden altijd hun volledige kost. Je eigen ondertekende werk van zeldzame of betere kwaliteit blijft je vandaag zelfs onderwijzen via gemaakte drankjes alleen. Drink een zeldzame drank die je zelf hebt gebrouwen en ondertekend en een klein beetje vaardigheid stroomt terug naar het ambacht dat haar maakte, zolang dat ambacht één van je actieve hoofdambachten is. Het geldt echt alleen voor de dranktak. Een elixer, rol of topflacon leert je niets terug, hoe fijn het ook is ondertekend.",
         "collectorsHeading": "Verzamelaars, trofees en de prijs van een verhaal",
         "collectorsBody": "Handelaren zijn blind voor herkomst: een gesigneerd voorwerp verkoopt aan een NPC voor precies zijn gewone prijs. De premie op een handtekening bestaat alleen tussen spelers, en dat is precies wat het interessant maakt: een stapel windfall-erts gesigneerd door een beroemde verzamelaar, een Prime Cut van een gelukkige oogst, een meesterwerkling met de naam van een ambachtsman die inmiddels gestopt is, ze kosten wat iemands geheugen zegt dat ze waard zijn.\n\nHet Boek der Daden speelt op hetzelfde instinct in: Ongerept Ader, Oud Hardhout, Maanbloesem, Een Perfect Exemplaar en Glinstering van Hoop zijn nul-Roem verzamelaarsdaden die puur bestaan om te bewijzen dat een moment jou is overkomen. Bewaar het voorwerp dat de daad verdiende en je hebt het bewijs. Niets hiervan is macht; herkomst koopt geen statistieken en wint geen gevechten, het is het papieren spoor van het spel van goede dagen.",
         "castPaceHeading": "Bereidingstijd en de goudput",
@@ -7579,7 +7877,7 @@ export const nl_NL: EnTranslations = {
         "title": "Ambachten FAQ",
         "intro": "Snelle antwoorden op de vragen die ambachtslieden het vaakst stellen.",
         "q1": "Waarom stapelen mijn ondertekende items niet?",
-        "a1": "Voltooide items volgen nog steeds de strikte instantieregel: twee kopieën voegen alleen samen als hun ondertekenaar, gerolde eigenschappen, Meesterwerkstatistieken, betovering, binding en andere identiteit exact overeenkomen. Een ondertekend zwaard blijft dus apart van een gewoon zwaard.\n\nMaterialen zijn de uitzondering. Compatibele stapels van hetzelfde materiaal kunnen samengaan, zelfs als hun verzamelaars of ondertekenaars verschillen, omdat de stapel per bron een telling bewaart. De tooltip bij aanwijzen vat de bronnen samen; open Bronnen voor de volledige lijst. Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.",
+        "a1": "Voltooide items volgen nog steeds de strikte instantieregel: twee kopieën voegen alleen samen als hun ondertekenaar, gerolde eigenschappen, Meesterwerkstatistieken, betovering, binding en andere identiteit exact overeenkomen. Een ondertekend zwaard blijft dus apart van een gewoon zwaard.\n\nMaterialen zijn de uitzondering. Compatibele stapels van hetzelfde materiaal kunnen samengaan, zelfs als hun verzamelaars of ondertekenaars verschillen, omdat de stapel per bron een telling bewaart. De tooltip bij aanwijzen vat de bronnen samen; klik met rechts op de stapel voor de volledige lijst (gebruik op een touchscreen de knop Bronnen). Scheiden op verzamelaar houdt die stapels uit elkaar in je tassen en sorteren respecteert die keuze. Overgedragen materiaal kan normaal stapelen met materiaal van de ontvanger.",
         "q2": "Verhogen gewone recepten mijn vaardigheid voor altijd?",
         "a2": "Nee. Elk recept wordt beoordeeld op hoe ver het onder je huidige band in dat ambacht ligt, volgens de bekende oranje, gele, groene en grijze indeling: volledige winst op of boven je band, halve winst één niveau eronder, een kwart twee niveaus eronder en niets drie of meer niveaus eronder. Banden liggen elke 25 vaardigheidspunten, dus de gratis recepten op vaardigheid 0 stoppen met onderwijzen op vaardigheid 75.\n\nDe maxima liggen ook lager dan de klassieke 300 die je misschien verwacht: elk van de tien verkrijgbare ambachten stopt op 125, Mijnbouw, Houtkap en Kruidenkunde op 100 en Vissen loopt door tot 200. Klimmen betekent recepten op je eigen band nemen, niet het goedkoopste recept grinden.",
         "q3": "Wat is het verschil tussen een lijk looten en oogsten?",
@@ -10083,6 +10381,7 @@ export const nl_NL: EnTranslations = {
       "templates": {
         "battleground": "[Slagveld] {name}: {message}",
         "party": "[Groep] {name}: {message}",
+        "raidWarning": "[Overvalwaarschuwing] {name}: {message}",
         "yell": "{name} schreeuwt: {message}",
         "whisper": "{name} fluistert: {message}",
         "toWhisper": "Aan {name}: {message}",
@@ -10221,6 +10520,7 @@ export const nl_NL: EnTranslations = {
       "stunned": "Je bent verdoofd!",
       "silenced": "Je bent het zwijgen opgelegd!",
       "busy": "Je bent bezig.",
+      "cannotCastWhileMoving": "Je kunt geen spreuken uitspreken terwijl je beweegt.",
       "abilityNotReady": "Die vaardigheid is nog niet gereed.",
       "notEnoughRage": "Niet genoeg woede!",
       "notEnoughEnergy": "Niet genoeg energie!",
@@ -10233,7 +10533,7 @@ export const nl_NL: EnTranslations = {
       "requiresForm": "Je moet in {form}-gedaante zijn.",
       "cantInForm": "Dat kun je niet doen in {form}-gedaante.",
       "bear": "Bruin",
-      "cat": "Wolf",
+      "cat": "Kat",
       "travel": "Fleet",
       "shapeshifted": "Dat kun je niet doen terwijl je van gedaante bent veranderd.",
       "stealthed": "Je moet in sluiptocht zijn.",
@@ -10564,12 +10864,11 @@ export const nl_NL: EnTranslations = {
       "devotion": "Toewijding"
     },
     "forms": {
-      "bear": "Beer",
-      "cat": "Wolf"
+      "bear": "Bruin",
+      "cat": "Kat"
     },
     "cast": {
       "fishing": "Vissen",
-      "farming": "Planten",
       "gathering": "Verzamelen",
       "crafting": "Vervaardigen",
       "disenchanting": "Onttoveren",
@@ -10913,6 +11212,19 @@ export const nl_NL: EnTranslations = {
       "buyConfirmAccept": "Kopen",
       "buyConfirmCancel": "Annuleren",
       "buyChanged": "Die vermelding is veranderd voordat je bevestigde. Controleer de prijs en probeer het opnieuw.",
+      "sweep": "Vegen",
+      "sweepAria": "Veeg de markt voor {item}",
+      "sweepTitle": "Marktonderzoek: {item}",
+      "sweepClose": "Dichtbij",
+      "sweepNote": "Koopt volledige aanbiedingen van andere verkopers, eerst de goedkoopste per eenheid, totdat uw aantal is gedekt. Het kan zijn dat u er een paar meer ontvangt dan waar u om vroeg.",
+      "sweepQuantity": "Eenheden gezocht",
+      "sweepQuoteNone": "Geen aanbiedingen van dit item om te vegen.",
+      "sweepQuoteLine": "{units} eenheden verdeeld over {listings} vermeldingen voor {total} ({each} elk)",
+      "sweepQuoteShort": "Er zijn slechts {units} eenheden voor {listings} vermeldingen beschikbaar, voor {total} ({each} elk)",
+      "sweepButton": "Vegen",
+      "sweepConfirmTitle": "Bevestig marktonderzoek",
+      "sweepConfirmBody": "{item} x{units} kopen in {listings} vermeldingen voor {total} ({each} elk)?",
+      "sweepChanged": "De sweepquote is gewijzigd voordat u deze bevestigde. Controleer het totaal en probeer het opnieuw.",
       "sellNote": "Bied goederen uit je tassen aan. De handelaar neemt een aandeel van {cut}% wanneer een voorwerp verkocht wordt. Je gebruikt {used}/{max} aanbiedingsplekken.",
       "sellPickEmpty": "Klik op een voorwerp in je tassen om te kiezen wat je verkoopt.",
       "quantity": "Aantal",
@@ -10952,7 +11264,9 @@ export const nl_NL: EnTranslations = {
       "ownListing": "Dat is je eigen aanbieding. Annuleer deze om hem terug te halen.",
       "cannotAfford": "Dat kun je niet betalen.",
       "notYourListing": "Dat is niet jouw aanbieding.",
-      "nothingToCollect": "Je hebt niets om op te halen."
+      "nothingToCollect": "Je hebt niets om op te halen.",
+      "sweepNoListings": "Er zijn geen vermeldingen van dat item beschikbaar om te vegen.",
+      "sweepPriceChanged": "Prijzen zijn gewijzigd voordat uw sweep werd geland. Controleer de offerte en probeer het opnieuw."
     },
     "loot": {
       "takeAll": "Alles nemen",
@@ -11790,7 +12104,7 @@ export const nl_NL: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Hex of Violence",
-        "description": "Betovert de vijand gedurende 8 sec. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade."
+        "description": "Betovert de vijand gedurende 8 sec, waarbij Schaduwschade wordt toegebracht en elke 2 sec 2 Verdoemenis wordt gegenereerd. Zijn volgende 3 schadelijke acties genereren elk 7 Verdoemenis en geselen het voor 17 Schaduwschade."
       },
       "cruel_pact": {
         "name": "Cruel Pact",
@@ -11826,7 +12140,7 @@ export const nl_NL: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Ruinous Brand",
-        "description": "Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt."
+        "description": "Brandmerkt een vijand gedurende 15 sec. Je volgende 3 directe spreuken weerklinken voor 25% schade tegen de gebrandmerkte vijand, of kopiëren 50% schade naar hem wanneer ze tegen een ander doelwit worden gespreukt. Ruinenschicht-echo's gelden ook als kritieke treffers, zonder een extra kritieke-schademultiplier."
       },
       "wrath": {
         "name": "Wildbout",
@@ -11865,7 +12179,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_form": {
         "name": "Bruingedaante",
-        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
+        "description": "Verander in een beer: pantser +110%, maximale gezondheid +30%, sterk verhoogde aanvalskracht, je aanvallen bouwen woede op en genereren 30% meer dreiging. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw om terug te keren naar je oorspronkelijke gedaante."
       },
       "maul": {
         "name": "Botverbrijzelen",
@@ -11881,17 +12195,17 @@ export const nl_NL: EnTranslations = {
         "description": "Een onheilspellend gebrul: elke vijand binnen 10 m wordt bedreigd, zijn dreiging jegens jou stijgt tot het niveau van zijn meest gehate vijand, en wordt gedwongen je 3 sec aan te vallen. Alleen in Bruingedaante."
       },
       "cat_form": {
-        "name": "Wolfsgedaante",
-        "description": "Verandert u in een wolf: behendigheid stijgt met uw niveau, aanvalskracht +8 plus 2 per niveau, uw aanvallen gebruiken energie en combopunten, en u wekt 29% minder dreiging op. Werp de spreuk opnieuw om naar de spreukengedaante terug te keren."
+        "name": "Katgedaante",
+        "description": "Verandert u in een wolf: behendigheid stijgt met uw niveau, aanvalskracht +8 plus 2 per niveau, uw aanvallen gebruiken energie en combopunten, en u wekt 29% minder dreiging op. Wisselen naar welke gedaante ook verleent Hobbelende pas: 3 sec lang 60% bewegingssnelheid, eenmaal per 20 sec. Werp de spreuk opnieuw om naar de spreukengedaante terug te keren."
       },
       "claw": {
         "name": "Rijtklauw",
-        "description": "Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Wolfsgedaante.",
+        "description": "Klauwt de vijand voor wapenschade plus {damage}. Levert 1 combopunt op. Alleen in Katgedaante.",
         "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
       },
       "ferocious_bite": {
         "name": "Bloedbeet",
-        "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Wolfsgedaante.",
+        "description": "Afmaakactie die {damage} veroorzaakt. Alleen in Katgedaante.",
         "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe; bij 3 Oud Bloed wordt deze knop Rode Oogst, die je Oude Bloed verbruikt voor een krachtigere slag die ook meteen alle schade toebrengt die je Villen en Verscheuren nog zouden hebben toegebracht, en energie herstelt."
       },
       "swipe": {
@@ -11923,7 +12237,7 @@ export const nl_NL: EnTranslations = {
       },
       "travel_form": {
         "name": "Fleetgedaante",
-        "description": "Verander ogenblikkelijk in een snelle Fleetgedaante en verhoog je bewegingssnelheid met 40%. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen."
+        "description": "Verander ogenblikkelijk in een snelle Fleetgedaante, verhoog je bewegingssnelheid met 40% en verwijder breekbare wortels en vertragingen. Je kunt geen andere vaardigheden gebruiken terwijl je veranderd bent, maar je kunt in of buiten gevecht van gedaante wisselen, ideaal om te ontsnappen. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid."
       },
       "enrage": {
         "name": "Opstoken",
@@ -11943,23 +12257,31 @@ export const nl_NL: EnTranslations = {
       },
       "dash": {
         "name": "Spurt",
-        "description": "Spurt vooruit en verhoogt de bewegingssnelheid met 50% gedurende 15 sec. Alleen in Wolfsgedaante."
+        "description": "Spurt vooruit en verhoogt de bewegingssnelheid met 50% gedurende 15 sec. Alleen in Katgedaante."
       },
       "pounce": {
         "name": "Sluipslag",
-        "description": "Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Wolfsgedaante."
+        "description": "Een sluipopener die het doelwit 2 sec verdooft. Levert 1 combopunt op. Alleen in Wolfsgedaante. Buiten sluiptocht is deze knop Uitval."
+      },
+      "lunge": {
+        "name": "Uitval",
+        "description": "Stort je op een vijand tot 12 m ver, wat 60% wapenschade toebrengt en 1 combopunt oplevert. Alleen in Wolfsgedaante."
+      },
+      "hamstring_bite": {
+        "name": "Neerhalen",
+        "description": "Afmaakactie die het doelwit verdooft voor 1 sec plus 1 sec per combopunt (5 combopunten: 6 sec). Alleen in Wolfsgedaante."
       },
       "insect_swarm": {
         "name": "Stekende Zwerm",
         "description": "De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec."
       },
       "tigers_fury": {
-        "name": "Wolvenbloed",
-        "description": "Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Wolfsgedaante."
+        "name": "Lynxbloed",
+        "description": "Wekt {rage} energie op en verhoogt de aanvalskracht met {buff} gedurende {duration} sec. Alleen in Katgedaante."
       },
       "rip": {
         "name": "Bloedscheur",
-        "description": "Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Wolfsgedaante.",
+        "description": "Afmaakactie die het doelwit elke 2 sec laat bloeden gedurende 24 sec: 36 schade plus 24 per besteed combopunt (5 combopunten: {damage} totaal). Alleen in Katgedaante.",
         "specNote_feral": "De gelande treffer voegt 1 Oud Bloed toe (max 3)."
       },
       "mortal_strike": {
@@ -12156,11 +12478,11 @@ export const nl_NL: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Maanuilvorm",
-        "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
+        "description": "Neem maanuilvorm aan en versterk spreuken totdat je terugschakelt. Bij het aannemen van een gedaante krijg je Sluipdraf, een korte uitbarsting van bewegingssnelheid. Spreek opnieuw uit om terug te keren naar normale vorm. (Balans signatuur)"
       },
       "feral_charge": {
         "name": "Oerkrachtgolf",
-        "description": "Ontketent een golf van oerkracht. In Wolfsgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)"
+        "description": "Ontketent een golf van oerkracht. In Katgedaante wordt uw energieregeneratie 10 sec. lang met 100% verhoogd. In Bruingedaante krijgt u onmiddellijk 50 woede. (Wildernis-signatuur)"
       },
       "swiftmend": {
         "name": "Snelle genezing",
@@ -12380,7 +12702,7 @@ export const nl_NL: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Ruinenschicht",
-        "description": "Verbruikt 3 Verwoesting om een zware bout chaotisch vuur te werpen die {damage} Vuurschade toebrengt. Ondergang verkort de bezwering met 30%."
+        "description": "Verbruikt 3 Verwoesting om een zware bout chaotisch vuur te werpen die {damage} Vuurschade toebrengt voordat kritieke schade wordt toegepast. Treft altijd kritiek raak. Ondergang verkort de bezwering met 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -12524,7 +12846,7 @@ export const nl_NL: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Volmaakt Ogenblik",
-        "description": "Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet. (Chronomantie)"
+        "description": "Grijp je perfecte moment: ontvang direct 4 Arcaneladingen, en gedurende 10 sec verbruikt Aetherpijlen ze niet en brengt het 20% meer schade toe. (Chronomantie)"
       },
       "arcane_surge": {
         "name": "Arcanekracht",
@@ -12661,7 +12983,7 @@ export const nl_NL: EnTranslations = {
       },
       "bear_charge": {
         "name": "Bruin-stormloop",
-        "description": "Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Bereik 8-25 m. Alleen in Bruingedaante."
+        "description": "Storm op een vijand af, genereer 9 woede en verdoof hem gedurende 1 sec. Gedurende 3 sec daarna is Wolfsgedaante gratis en pint het doelwit vast, wat het 4 sec lang 50% vertraagt. Bereik 8-25 m. Alleen in Bruingedaante."
       },
       "demoralizing_roar": {
         "name": "Laf Gebrul",
@@ -12669,11 +12991,11 @@ export const nl_NL: EnTranslations = {
       },
       "prowl": {
         "name": "Besluipen",
-        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent en beweeg 5% trager. Kan niet in gevecht worden gebruikt."
+        "description": "Ga in sluiptocht terwijl je in Wolfsgedaante bent. Kan niet in gevecht worden gebruikt."
       },
       "rake": {
         "name": "Villen",
-        "description": "Vilt de vijand voor wapenschade plus {damage} en veroorzaakt bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Wolfsgedaante.",
+        "description": "Vilt de vijand voor wapenschade plus {damage} en veroorzaakt bloedende schade over 18 sec. Levert 1 combopunt op. Alleen in Katgedaante.",
         "specNote_feral": "Elke slag die raakt voegt 1 Oud Bloed toe (max 3)."
       },
       "revive_pet": {
@@ -16433,6 +16755,21 @@ export const nl_NL: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Genezingspop"
+      },
+      "healing_dummy_tank": {
+        "name": "Gewonde Vanguard-dummy"
+      },
+      "healing_dummy_soldier": {
+        "name": "Gewonde soldaat Dummy"
+      },
+      "healing_dummy_scout": {
+        "name": "Kritische verkennersdummy"
+      },
+      "healing_dummy_caster": {
+        "name": "Gewonde Spellcaster Dummy"
+      },
+      "healing_dummy_ranger": {
+        "name": "Gehavende Ranger Dummy"
       },
       "ridge_stalker": {
         "name": "Bergkam-Sluiper"

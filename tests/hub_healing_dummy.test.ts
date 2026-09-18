@@ -9,6 +9,7 @@
 // with the Highwatch row.
 import { describe, expect, it } from 'vitest';
 import { isBlocked } from '../src/sim/colliders';
+import { HEALING_DUMMY_IDS } from '../src/sim/content/healing_training';
 import {
   HUB_HEALING_DUMMY_ID,
   HUB_HEALING_DUMMY_POS,
@@ -107,11 +108,16 @@ describe('placement: near Hale, clear of the road and every quay neighbour', () 
       playerClass: 'priest',
       world: { ...BUILTIN_WORLD, npcs: npcsWithoutHale },
     });
-    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3);
+    // Hale owns the hub damage/healing dummies and the five nearby healing
+    // training allies, all outside normal camp construction.
+    expect(withYard.entities.size).toBe(withoutYard.entities.size + 3 + HEALING_DUMMY_IDS.length);
     const damageDummy = [...withYard.entities.values()].find(
       (e) => e.templateId === 'hub_training_dummy',
-    )!;
-    const hale = [...withYard.entities.values()].find((e) => e.templateId === 'drillmaster_hale')!;
+    );
+    const hale = [...withYard.entities.values()].find((e) => e.templateId === 'drillmaster_hale');
+    expect(damageDummy).toBeDefined();
+    expect(hale).toBeDefined();
+    if (!damageDummy || !hale) throw new Error('hub practice yard did not spawn');
     const healingDummy = healingDummyOf(withYard);
     expect(healingDummy.id).toBeGreaterThan(hale.id);
     expect(hale.id).toBeGreaterThan(damageDummy.id);

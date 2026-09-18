@@ -5,9 +5,8 @@
 // keeps two one-line call sites, one in the entity loop's NPC branch and
 // one beside the raceLine update.
 //
-// Off the shore every memo slot goes empty, so the rail's seven questState
-// reads (each an options-object plus attunement-copy allocation online)
-// never run per frame for mainland players.
+// Mainland players use the confirmed wolves log entry instead of reading the
+// island rail's seven quest states. Both routes reuse this one painter.
 
 import type * as THREE from 'three';
 import { isOnProvingShore } from '../sim/content/proving_shore';
@@ -15,7 +14,13 @@ import { CRAB_MOB_ID } from '../sim/interactions/crab_summon';
 import { isObjectOpenedByViewer } from '../sim/quests/opened_object_view';
 import { CoachTrail, type CoachTrailCompileGate } from './coach_trail';
 import { type CoachGuideReader, type CoachGuides, coachGuides } from './coach_trail_core';
+import { eastbrookWolvesGuide, WOLVES_QUEST_ID } from './eastbrook_wolves_guidance_core';
 import { beaconNpcIds } from './quest_beacon_core';
+
+export interface QuestGuidanceOptions {
+  isQuestTracked?: (questId: string) => boolean;
+  isEastbrookGuidanceEnabled?: () => boolean;
+}
 
 // The off-island beacon answer, shared so the per-frame memo never
 // allocates away from the shore.
@@ -29,10 +34,14 @@ export interface GuideWorld extends CoachGuideReader {
         /** Ghost state and the body it walks back to: the death lesson's
          *  route (coach_trail_core corpse-run arm) is read from these. */
         ghost?: boolean;
+        dead?: boolean;
         corpsePos?: { x: number; z: number } | null;
       }
     | null
     | undefined;
+  /** Completed quest ids, read by the mainland wolves guide so a veteran
+   *  never pays the per-frame questState() read. */
+  questsDone?: ReadonlySet<string>;
   entities: ReadonlyMap<
     number,
     {
@@ -65,6 +74,8 @@ export class IslandGuidance {
     scene: THREE.Object3D,
     groundAt: (x: number, z: number) => number,
     compileGate?: CoachTrailCompileGate,
+    private readonly isQuestTracked: (questId: string) => boolean = () => true,
+    private readonly isEastbrookGuidanceEnabled: () => boolean = () => true,
   ) {
     this.trail = new CoachTrail(scene, groundAt, compileGate);
   }
@@ -85,7 +96,10 @@ export class IslandGuidance {
           playerPos: p ? { x: p.pos.x, z: p.pos.z } : undefined,
           corpsePos: p?.ghost && p.corpsePos ? { x: p.corpsePos.x, z: p.corpsePos.z } : null,
         })
-      : null;
+      : eastbrookWolvesGuide(
+          world,
+          () => !this.isEastbrookGuidanceEnabled() || !this.isQuestTracked(WOLVES_QUEST_ID),
+        );
   }
 
   /** The rail NPCs' go-here-next fizz: gentle holy sparkle over every beacon
@@ -100,7 +114,7 @@ export class IslandGuidance {
     dt: number,
   ): void {
     this.frame(world, time);
-    if (!this.beaconIds.has(e.templateId)) return;
+    if (!this.beaconIds.has(e.templateId) && e.templateId !== this.guides?.glowNpcId) return;
     const gold = e.templateId === this.guides?.glowNpcId;
     vfx.castSparkle(e.id, 'holy', dt * (gold ? 3.0 : 2.0), gold ? GOLD_FIZZ : undefined);
   }

@@ -724,7 +724,7 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
     weapon: { min: 21, max: 34, speed: 1.8, dagger: true },
     // ilvl-26 mainhand budget (18): the stamina point over budget came off the
     // DPS-neutral stat, keeping the agility identity.
-    stats: { agi: 13, sta: 5 },
+    stats: { agi: 13, sta: 7 },
     sellValue: 9000,
     requiredClass: ['rogue', 'hunter'],
     requiredLevel: 20,
@@ -806,7 +806,7 @@ export const DRAKELANDS_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 72, sta: 6, int: 4 },
+    stats: { armor: 72, sta: 6, int: 4, spi: 3 },
     sellValue: 2200,
   },
   // --- the Drakemaw legendary ---

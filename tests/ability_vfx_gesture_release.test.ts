@@ -57,6 +57,47 @@ function makePainter(hasGestureClip: (id: number, ability: string) => boolean, i
 }
 
 describe('player gesture release on cast fx (review #2961)', () => {
+  it.each([true, false])('plays only an authored pure-DoT completion gesture: %s', (authored) => {
+    const { painter, triggerAttack } = makePainter((_id, ability) => authored && ability === 'rip');
+    expect(
+      painter.handleSpellfx({
+        sourceId: SOURCE_ID,
+        targetId: TARGET_ID,
+        school: 'physical',
+        fx: 'selfCast',
+        ability: 'rip',
+      }),
+    ).toBe(false);
+    if (authored) expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(SOURCE_ID, 'rip');
+    else expect(triggerAttack).not.toHaveBeenCalled();
+    // Periodic DoT ticks carry no ability completion; they must never restart the finisher.
+    painter.handleSpellfx({
+      sourceId: SOURCE_ID,
+      targetId: TARGET_ID,
+      school: 'physical',
+      fx: 'tick',
+    });
+    expect(triggerAttack).toHaveBeenCalledTimes(authored ? 1 : 0);
+  });
+  it('keeps every other pure-DoT completion gesture-free even when the rig authors one', () => {
+    // The humanoid rigs carry attackByAbility rows for corruption, rupture and
+    // serpent_sting; those completions have never played a swing, and the cat
+    // finisher allowlist (ownsDotCompletionGesture) must not widen that.
+    for (const ability of ['corruption', 'rupture', 'serpent_sting']) {
+      const { painter, triggerAttack } = makePainter(() => true);
+      expect(
+        painter.handleSpellfx({
+          sourceId: SOURCE_ID,
+          targetId: TARGET_ID,
+          school: 'shadow',
+          fx: 'selfCast',
+          ability,
+        }),
+      ).toBe(false);
+      expect(triggerAttack, ability).not.toHaveBeenCalled();
+    }
+  });
+
   it('plays the authored clip for a player projectile cast whose ability has a gesture (earth_shock)', () => {
     const { painter, triggerAttack } = makePainter((_id, ability) => ability === 'earth_shock');
     painter.handleSpellfx({

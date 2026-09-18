@@ -36,6 +36,17 @@ export const INTERIOR_ENCOUNTER_PREWARM: Record<string, InteriorEncounterPrewarm
     varkhulVisuals: true,
     ignivarVisuals: true,
   },
+  // The Crucible arena where Ignivar itself is fought (interior 'ignivar'):
+  // the same fire beams, rotating rays and Judgment as the depths, without
+  // Varkhul. Without this row the arena had no spec at all, so every mechanic
+  // linked its programs at first onset (2026-09-12 hunt: fire beams, rotating
+  // rays and the water cleanse runes, 15 live programs in one pull).
+  ignivar: {
+    soulRendPlayerClasses: false,
+    soulRendVfxWeaponSkins: false,
+    soulRendLivePlayerVisuals: false,
+    ignivarVisuals: true,
+  },
 };
 
 export function encounterPrewarmForInterior(interior: string): InteriorEncounterPrewarmSpec | null {

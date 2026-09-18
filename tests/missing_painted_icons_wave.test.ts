@@ -9,6 +9,7 @@ import { DEED_ORDER } from '../src/sim/content/deeds';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import {
+  ABILITY_ART_PENDING,
   ABILITY_IMAGE_IDS,
   abilityImageUrl,
   DEED_ART_PENDING,
@@ -477,7 +478,16 @@ describe('missing painted ability integration', () => {
   it('makes every live ability image-backed while preserving non-ABILITY image ids', () => {
     const accepted = manifest();
     expect(accepted.targetSets.abilities).toHaveLength(90);
-    expect(Object.keys(ABILITIES).filter((id) => !ABILITY_IMAGE_IDS.has(id))).toEqual([]);
+    // Every live ability is painted, except the explicitly parked glyph-only
+    // ids (ABILITY_ART_PENDING), which a later art pass paints; a parked id
+    // that ships art anyway is a stale entry and reds below.
+    expect(
+      Object.keys(ABILITIES).filter(
+        (id) => !ABILITY_IMAGE_IDS.has(id) && !ABILITY_ART_PENDING.has(id),
+      ),
+    ).toEqual([]);
+    expect([...ABILITY_ART_PENDING].filter((id) => !Object.hasOwn(ABILITIES, id))).toEqual([]);
+    expect([...ABILITY_ART_PENDING].filter((id) => ABILITY_IMAGE_IDS.has(id))).toEqual([]);
     expect(sorted([...ABILITY_IMAGE_IDS].filter((id) => !Object.hasOwn(ABILITIES, id)))).toEqual([
       ...PRESERVED_IMAGE_BACKED_MODIFIER_IDS,
     ]);

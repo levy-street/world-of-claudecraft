@@ -569,7 +569,7 @@ describe('Reliquary Conqueror catalog structure', () => {
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
     // Structural, not cosmetic. emitReliquaryUnlock (src/sim/reliquary.ts)
-    // decides Illumination from characterReliquaryOwnership, which deliberately
+    // decides Illumination from accountReliquaryOwnership, which deliberately
     // omits account weapon skins: the server cannot answer account cosmetics
     // from inside the sim. That is only safe while a page holds ONE relic kind,
     // because an item or mark fill can then only ever reach item or mark pages,
@@ -588,7 +588,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // shelf deed on a necessity argument: owned === total implies the shelf
     // is complete. That implication holds only while every conquerors page
     // is non-empty and carries NO weapon_skin relic (skin ownership is
-    // account-scoped, invisible to characterReliquaryOwnership, and
+    // account-scoped, invisible to accountReliquaryOwnership, and
     // subtracted from the character total, so a conquerors skin page would
     // keep the shelf deed permanently ungrantable while owned === total
     // stays reachable: the capstone would dead-end silently). An empty page

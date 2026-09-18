@@ -40,8 +40,9 @@ import type { PainterHostWriters } from './painter_host';
 
 // Class / property names the painter drives. Named, not inlined, so the painter
 // references no bare DOM string literal.
-const BUFF_CLASS = 'buff';
+const BUFF_CLASS = 'buff ui-aura';
 const DEBUFF_CLASS = 'debuff';
+const UI_DEBUFF_CLASS = 'ui-aura--debuff';
 // Marks a node the local player may right-click to cancel (a helpful own buff). The
 // stylesheet draws the affordance (context-menu cursor + hover border); the class is
 // toggled per frame so a recycled node never keeps a stale affordance.
@@ -50,6 +51,7 @@ const CANCELABLE_CLASS = 'cancelable';
 // stylesheet renders it larger so your dots/hots read at a glance among other
 // casters'. Toggled per frame so a recycled node never keeps stale prominence.
 const OWN_CLASS = 'own';
+const UI_OWN_CLASS = 'ui-aura--own';
 // Marks an aura in its final seconds (auras_view isAuraExpiring): the stylesheet
 // blinks the icon so an expiring DoT/buff reads at a glance, with a steady
 // brightness fallback under prefers-reduced-motion. Toggled per frame so a
@@ -58,8 +60,9 @@ const EXPIRING_CLASS = 'expiring';
 // Carries the debuff's magic school so the stylesheet tints the border per school
 // (WoW-style poison/magic/curse reads); '' on a buff, so no school selector matches.
 const SCHOOL_ATTR = 'data-school';
-const DUR_CLASS = 'dur';
-const STACKS_CLASS = 'stacks';
+const DUR_CLASS = 'dur ui-aura-time';
+const DUR_DEBUFF_CLASS = 'ui-aura-time--debuff';
+const STACKS_CLASS = 'stacks ui-badge ui-badge--corner';
 const BACKGROUND_IMAGE_PROP = 'background-image';
 // Pool-key separator for same-id auras. The core keys a slot by the aura id, but one
 // entity can legitimately carry several auras with the SAME id from different sources
@@ -276,9 +279,12 @@ export class AurasPainter {
       // The buff/debuff distinction is a structural class (not an inline color); the
       // stylesheet renders it as a border the icon meaning does not depend on.
       this.writers.toggleClass(rec.el, DEBUFF_CLASS, s.isDebuff);
+      this.writers.toggleClass(rec.el, UI_DEBUFF_CLASS, s.isDebuff);
+      this.writers.toggleClass(rec.dur, DUR_DEBUFF_CLASS, s.isDebuff);
       this.writers.setAttr(rec.el, SCHOOL_ATTR, s.school);
       this.writers.toggleClass(rec.el, CANCELABLE_CLASS, rec.cancelable);
       this.writers.toggleClass(rec.el, OWN_CLASS, s.own);
+      this.writers.toggleClass(rec.el, UI_OWN_CLASS, s.own);
       this.writers.toggleClass(rec.el, EXPIRING_CLASS, s.expiring);
       this.writers.setText(rec.dur, s.durationText);
       const hasStacks = s.stacksText !== '';

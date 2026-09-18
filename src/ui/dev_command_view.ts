@@ -239,6 +239,19 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     },
   },
   {
+    id: 'town',
+    category: 'travel',
+    labelKey: 'devCommand.actions.town.label',
+    descriptionKey: 'devCommand.actions.town.description',
+    // The select carries town slugs (a closed list the sim re-validates), so
+    // the token gate is belt-and-braces: a crafted value never reaches the
+    // command line, it simply builds nothing.
+    command: (values) => {
+      const town = token(values, 'town');
+      return town ? `/dev town ${town}` : null;
+    },
+  },
+  {
     id: 'dungeon',
     category: 'travel',
     labelKey: 'devCommand.actions.dungeon.label',

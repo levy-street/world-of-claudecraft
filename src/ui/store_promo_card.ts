@@ -51,7 +51,7 @@ export function mountStorePromoCard(
 ): StorePromoCardController {
   const doc = host.ownerDocument;
   const card = doc.createElement('div');
-  card.className = 'store-promo-card';
+  card.className = 'store-promo-card ui-panel';
 
   const open = doc.createElement('button');
   open.type = 'button';
@@ -64,20 +64,20 @@ export function mountStorePromoCard(
   image.decoding = 'async';
 
   const copy = doc.createElement('span');
-  copy.className = 'store-promo-card-copy';
+  copy.className = 'store-promo-card-copy ui-outline';
   const season = doc.createElement('span');
-  season.className = 'store-promo-card-season';
+  season.className = 'store-promo-card-season ui-cin';
   const title = doc.createElement('span');
-  title.className = 'store-promo-card-title';
+  title.className = 'store-promo-card-title ui-cin';
   copy.append(season, title);
 
   const cta = doc.createElement('span');
-  cta.className = 'store-promo-card-cta';
+  cta.className = 'store-promo-card-cta ui-chip ui-cin';
   open.append(image, copy, cta);
 
   const close = doc.createElement('button');
   close.type = 'button';
-  close.className = 'x-btn store-promo-card-close';
+  close.className = 'x-btn store-promo-card-close ui-x-btn';
   close.innerHTML = svgIcon('close');
 
   card.append(open, close);

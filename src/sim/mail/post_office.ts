@@ -20,6 +20,7 @@ import { bagPools, canGrantCopies, instancedCountCap } from '../bags';
 import { rekeySigner } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
+  isWocMarketLetterId,
   type LetterDef,
   QUEST_LETTERS,
   WELCOME_LETTER,
@@ -27,7 +28,7 @@ import {
 } from '../content/letters';
 import { ITEMS } from '../data';
 import { boundCraftedRecipeIdOnLoad, warnDroppedInstanceKeys } from '../item_instance_load';
-import { itemInstancePayloadsEqual } from '../item_instance_merge';
+import { isMergeableInstancePayload, itemInstancePayloadsEqual } from '../item_instance_merge';
 import {
   countMatchingUnlocked,
   grantCopies,
@@ -36,7 +37,7 @@ import {
   removeMatchingInstance,
   sanitizeEscrowSlot,
 } from '../item_instance_transfer';
-import { removeVendorSellUnits } from '../items';
+import { removeSellUnitsFromInventory, removeVendorSellUnits } from '../items';
 import { isMaterialItemId } from '../material_ids';
 import { rekeyMaterialSignature } from '../material_signatures';
 import { validateMaterialSlotSourcesOnLoad } from '../material_slot_load';
@@ -60,9 +61,39 @@ export const MAIL_POSTAGE = 30; // copper per letter
 export const MAIL_MAX_ATTACHMENTS = 3; // item stacks a letter can carry
 export const MAIL_DELIVERY_SECONDS = 45; // player mail: the raven's flight
 const MAIL_NPC_DELIVERY_SECONDS = 90; // authored letters default delay
-const MAIL_EXPIRY_SECONDS = 14 * 24 * 3600; // sim-seconds a read/plain letter lingers
+// The emptied-letter clocks (a letter carrying no escrow, see mailHoldsEscrow):
+// an UNREAD letter lingers 30 sim-days from booking, a READ letter 3 sim-days
+// from the moment it was read (mailMarkRead, or the take that read it), and
+// an unread Exchange Broker letter (WOC_MARKET_LETTER_IDS) waits 90 sim-days
+// for its owner. The Exchange ceiling exists so an unread population is still
+// bounded: nothing in the book has a per-recipient cap on system mail
+// (book() enforces none, see takeDirtyMailPartitions), so an exemption with
+// no ceiling would let an absent seller's sold notices grow the book and the
+// per-second sweep forever. A letter with escrow aboard is NEVER auto-deleted:
+// see the sweep in PostOffice.update.
+export const MAIL_UNREAD_EXPIRY_SECONDS = 30 * 24 * 3600;
+export const MAIL_READ_EXPIRY_SECONDS = 3 * 24 * 3600;
+export const MAIL_EXCHANGE_UNREAD_EXPIRY_SECONDS = 90 * 24 * 3600;
+// The smallest coin attachment that counts as escrow (one silver): a letter
+// whose only attachment is less than this rides the emptied-letter clocks
+// above and is swept with the coin aboard, exactly like a bare note. Any
+// item stack counts as escrow at any count.
+export const MAIL_ESCROW_COPPER_MIN = 100;
+
+// The ONE escrow predicate every EXPIRY decision reads (the sweep, the
+// booking clock, the take and read flips, the purge, and loadMail): items at
+// any count, or coin of at least MAIL_ESCROW_COPPER_MIN. Deliberately NOT
+// read by mailDelete: the player's own delete verb keeps its strict
+// takeParcelsFirst guard on any coin at all, so a click can never destroy
+// even pocket change; the age sweep is the only thing that ever deletes a
+// letter with sub-silver coin aboard. The asymmetry is intended; do not
+// "fix" either side to match the other.
+export function mailHoldsEscrow(m: { copper: number; items: readonly unknown[] }): boolean {
+  return m.items.length > 0 || m.copper >= MAIL_ESCROW_COPPER_MIN;
+}
 // Sim-seconds an unclaimed player parcel waits before it flies home to its
-// sender, and the returned letter's second window before the sweep deletes it.
+// sender. The returned letter then holds Infinity while its attachments
+// remain (the never-auto-deleted rule), like a system parcel.
 export const MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 * 24 * 3600;
 const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse new)
 // #3561: the window every still-live letter with a finite expiresAt gets its
@@ -70,9 +101,10 @@ const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse
 // (one ~1/3600th slice of the book per sim-second, never a synchronized
 // whole-book burst): bounds staleness against both the 30-day attachment
 // window it protects (MAIL_ATTACHMENT_EXPIRY_SECONDS, at roughly 0.14%) and
-// the 14-day plain-letter expiry window (MAIL_EXPIRY_SECONDS, at roughly
-// 0.3%), nowhere near the tight ~30s bound the old whole-book autosave
-// incidentally provided but never actually needed. See PostOffice.update.
+// the emptied-letter windows (MAIL_UNREAD_EXPIRY_SECONDS at roughly 0.14%,
+// MAIL_READ_EXPIRY_SECONDS at roughly 1.4%), nowhere near the tight ~30s
+// bound the old whole-book autosave incidentally provided but never actually
+// needed. See PostOffice.update.
 // Exported so tests can compute a letter's exact stagger slot (id %
 // MAIL_PERSIST_REFRESH_SECONDS) instead of guessing how long to tick.
 export const MAIL_PERSIST_REFRESH_SECONDS = 3600;
@@ -80,6 +112,53 @@ export const MAIL_SUBJECT_MAX = 64;
 export const MAIL_BODY_MAX = 600;
 
 export type MailKind = 'player' | 'system' | 'npc';
+
+function mailEscrowCountCap(def: (typeof ITEMS)[string] | undefined, slot: InvSlot): number {
+  if (!slot.instance) return Number.POSITIVE_INFINITY;
+  if (isMergeableInstancePayload(slot.instance)) return Number.POSITIVE_INFINITY;
+  return instancedCountCap(def, slot.instance);
+}
+
+function countRecipeBuckets(units: readonly { craftedRecipeId?: string }[]): number {
+  const buckets = new Set<string | undefined>();
+  for (const unit of units) buckets.add(unit.craftedRecipeId);
+  return buckets.size;
+}
+
+function projectedMailParcelRows(
+  inventory: readonly InvSlot[],
+  attachments: readonly InvSlot[],
+  materialRowsByAttachment: readonly (readonly InvSlot[] | null)[],
+): number | null {
+  const scratch = inventory.map(cloneInvSlot);
+  let rows = 0;
+  for (const [attachmentIndex, s] of attachments.entries()) {
+    const materialRows = materialRowsByAttachment[attachmentIndex];
+    if (materialRows !== null) {
+      rows += materialRows.length;
+      continue;
+    }
+    const count = Math.floor(s.count);
+    if (s.instance && typeof s.instance === 'object') {
+      const consumed = removeSellUnitsFromInventory(
+        scratch,
+        s.itemId,
+        count,
+        (instance) =>
+          isTransferLockedInstance(instance) || !itemInstancePayloadsEqual(instance, s.instance),
+        undefined,
+        true,
+      );
+      if (consumed.length !== count) return null;
+      rows += countRecipeBuckets(consumed);
+    } else {
+      const consumed = removeSellUnitsFromInventory(scratch, s.itemId, count, () => true);
+      if (consumed.length !== count) return null;
+      rows += countRecipeBuckets(consumed);
+    }
+  }
+  return rows;
+}
 
 export interface MailMessage {
   id: number;
@@ -100,8 +179,10 @@ export interface MailMessage {
   copper: number;
   items: InvSlot[];
   deliverAt: number; // sim.time seconds; in the recipient's box once time >= deliverAt
-  // sim.time seconds. Player parcels ride the attachment window; system and npc
-  // parcels hold Infinity while attachments remain (their expiry exemption).
+  // sim.time seconds. An unreturned player parcel rides the attachment window
+  // (then flies home); system, npc, and returned parcels hold Infinity while
+  // attachments remain (no letter with attachments is ever auto-deleted). An
+  // emptied letter rides the read or unread window (emptiedExpiresAt).
   expiresAt: number;
   read: boolean;
   // Opaque broker reference on custody parcels (the $WOC Exchange delivery /
@@ -248,27 +329,24 @@ export class PostOffice {
           });
         }
       }
-      const hasEscrow = m.items.length > 0 || m.copper > 0;
-      // Attachment expiry, player mail ONLY: a system/npc parcel holds
-      // expiresAt = Infinity, so it can never trip this arm; the kind filter is
-      // the belt-and-braces behind that by-construction exemption. An unclaimed
-      // parcel first flies home; deletion with attachments aboard requires the
-      // returned flag, so no item is ever destroyed without the return cycle
-      // having run.
-      if (m.kind === 'player' && now >= m.expiresAt && hasEscrow) {
-        if (m.returned) {
-          // The one sanctioned destruction: the return flight already happened.
-          this.index.untrack(m, now);
-          this.mail.splice(i, 1);
-          this.bumpRev();
-        } else {
+      const hasEscrow = mailHoldsEscrow(m);
+      if (hasEscrow) {
+        // A letter with escrow aboard (any item, or at least a silver of
+        // coin) is NEVER auto-deleted (the book's hard invariant). The one thing
+        // the sweep does to a parcel is the return flight, player mail ONLY
+        // and once: a system/npc parcel and a returned parcel hold
+        // expiresAt = Infinity, so neither can trip this arm; the kind and
+        // returned filters are the belt-and-braces behind that by-construction
+        // exemption.
+        if (m.kind === 'player' && !m.returned && now >= m.expiresAt) {
           this.returnToSender(m, now);
+          continue;
         }
-        continue;
-      }
-      if (now >= m.expiresAt && !hasEscrow) {
-        // An expired letter leaves the buckets and, if delivered-and-unread,
-        // the unread count (untrack re-derives both from the letter's state).
+      } else if (now >= m.expiresAt) {
+        // An expired emptied letter (or one carrying only sub-silver coin,
+        // which goes with it) leaves the buckets and, if
+        // delivered-and-unread, the unread count (untrack re-derives both
+        // from the letter's state).
         this.index.untrack(m, now);
         this.mail.splice(i, 1);
         this.bumpRev();
@@ -309,10 +387,29 @@ export class PostOffice {
     // A fresh flight: the normal delivery path lands and announces the return.
     m.announced = false;
     m.deliverAt = now + MAIL_DELIVERY_SECONDS;
-    // The second window: one more chance to claim, then the sweep deletes.
-    m.expiresAt = now + MAIL_ATTACHMENT_EXPIRY_SECONDS;
+    // Home for good: the returned parcel is never auto-deleted while its
+    // attachments remain (the same Infinity a system parcel holds). The
+    // sender's take empties it onto the ordinary read clock. Retention story:
+    // this is the sender's own property sitting in the sender's own box, so
+    // its only bound is that box (storedCountFor counts returned parcels
+    // against MAIL_MAX_PER_RECIPIENT, so an absent sender's box fills and
+    // refuses new player mail rather than the book destroying their goods).
+    // A product rule, deliberately: escrow is never destroyed by age.
+    m.expiresAt = Infinity;
     this.index.track(m, now);
     this.bumpRev();
+  }
+
+  // The clock of a letter carrying no escrow: a read letter gets the short
+  // window from the moment it was read, an unread one the long window, and an
+  // unread Exchange Broker letter the longer Exchange ceiling (it waits for
+  // its owner to see it, but not forever). Always finite. Every emptied-letter
+  // expiresAt write goes through here (book, the read flip in mailTake and
+  // mailMarkRead, and loadMail's cap).
+  private emptiedExpiresAt(m: { read: boolean; letterId?: string }, now: number): number {
+    if (m.read) return now + MAIL_READ_EXPIRY_SECONDS;
+    if (isWocMarketLetterId(m.letterId)) return now + MAIL_EXCHANGE_UNREAD_EXPIRY_SECONDS;
+    return now + MAIL_UNREAD_EXPIRY_SECONDS;
   }
 
   private nearMailbox(e: Entity): boolean {
@@ -468,7 +565,11 @@ export class PostOffice {
       return;
     }
     const wanted = new Map<string, number>();
-    const instancedWanted: { itemId: string; instance: NonNullable<InvSlot['instance']> }[] = [];
+    const instancedWanted: {
+      itemId: string;
+      instance: NonNullable<InvSlot['instance']>;
+      count: number;
+    }[] = [];
     for (const s of items) {
       const def = ITEMS[s.itemId];
       const count = Math.floor(s.count);
@@ -482,20 +583,25 @@ export class PostOffice {
         return;
       }
       if (s.instance && typeof s.instance === 'object') {
-        // Instanced parcels (the #1165 completion): single-copy by design (the
-        // qty stepper stays fungible-only), named by payload so a bag reshuffle
-        // can never redirect the escrow. A count other than exactly 1 is a
-        // malformed request and refuses like any other malformed entry, never
-        // silently truncates. Transfer-locked copies (bindOnTrade armed or
-        // boundTo bound, the shared market rule) never ride a raven: a
-        // bind-on-trade windfall must not be mail-launderable.
-        if (count !== 1) return;
+        // Instanced parcels (the #1165 completion): single-copy per slot by
+        // design UNLESS the payload is MERGEABLE (Professions 2.0,
+        // item_instance_merge.ts isMergeableInstancePayload): a byte-equal
+        // signed consumable (a rare-quality crafted potion, say) already
+        // stacks in bags/bank/trade, so a letter may bundle several as one
+        // attachment the same way instead of burning one of the letter's
+        // MAIL_MAX_ATTACHMENTS slots per copy. A non-mergeable payload
+        // (charge-bearing, player-locked, or otherwise one-per-slot) still
+        // refuses anything but exactly 1: a malformed request, never a
+        // silent truncation. Transfer-locked copies (bindOnTrade armed or
+        // boundTo bound, the shared market rule) never ride a raven either
+        // way: a bind-on-trade windfall must not be mail-launderable.
+        if (count !== 1 && !isMergeableInstancePayload(s.instance)) return;
         if (isTransferLockedInstance(s.instance)) {
           this.result(meta.entityId, 'noMailBound');
           return;
         }
         if (!isMaterialItemId(s.itemId)) {
-          instancedWanted.push({ itemId: s.itemId, instance: s.instance });
+          instancedWanted.push({ itemId: s.itemId, instance: s.instance, count });
         }
       } else if (!isMaterialItemId(s.itemId)) {
         wanted.set(s.itemId, (wanted.get(s.itemId) ?? 0) + count);
@@ -510,14 +616,15 @@ export class PostOffice {
         return;
       }
     }
-    // Each instanced entry needs a matching UNLOCKED held copy, counting every
-    // entry that names the same payload (byte-equal copies are interchangeable;
-    // a stripped-lock forgery simply fails to match and lands here too).
+    // Each instanced entry needs that many matching UNLOCKED held copies,
+    // summing every entry that names the same payload (byte-equal copies are
+    // interchangeable; a stripped-lock forgery simply fails to match and
+    // lands here too).
     for (const w of instancedWanted) {
       let need = 0;
       for (const other of instancedWanted) {
         if (other.itemId === w.itemId && itemInstancePayloadsEqual(other.instance, w.instance))
-          need += 1;
+          need += other.count;
       }
       if (countMatchingUnlocked(meta, w.itemId, w.instance) < need) {
         this.result(meta.entityId, 'notEnoughItems');
@@ -539,6 +646,19 @@ export class PostOffice {
       if (materialPlan.error === 'insufficient') {
         this.result(meta.entityId, 'notEnoughItems');
       }
+      return;
+    }
+    const projectedRows = projectedMailParcelRows(
+      meta.inventory,
+      items,
+      materialPlan.value.rowsByAttachment,
+    );
+    if (projectedRows === null) {
+      this.result(meta.entityId, 'notEnoughItems');
+      return;
+    }
+    if (projectedRows > MAIL_MAX_ATTACHMENTS) {
+      this.result(meta.entityId, 'tooManyParcels', { value: MAIL_MAX_ATTACHMENTS });
       return;
     }
     if (meta.copper < coin + MAIL_POSTAGE) {
@@ -570,22 +690,48 @@ export class PostOffice {
         continue;
       }
       if (s.instance && typeof s.instance === 'object') {
-        const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
-        // The craft marker rides alongside the payload: an instanced parcel can
-        // be crafted too (a masterwork proc, an enchanted crafted piece), so it
-        // is carried rather than assumed absent on this arm.
-        if (escrowed)
+        // A mergeable attachment's copies can have arrived from more than one
+        // physical stack (an overflow split at the item's stack cap), so
+        // remove them one at a time and bucket by craftedRecipeId, exactly
+        // like the plain-fungible arm below: a bundled parcel must never
+        // silently blend provenance from two differently-crafted stacks that
+        // merely staged as one byte-equal attachment. Runs exactly once for
+        // the ordinary count-1 case, so that shape is untouched.
+        const want = Math.floor(s.count);
+        const byRecipe = new Map<
+          string | undefined,
+          {
+            count: number;
+            instance: InvSlot['instance'];
+            materialSources: InvSlot['materialSources'];
+          }
+        >();
+        for (let i = 0; i < want; i++) {
+          const escrowed = removeMatchingInstance(this.ctx, s.itemId, s.instance, meta.entityId);
+          if (!escrowed) break;
+          const bucket = byRecipe.get(escrowed.craftedRecipeId);
+          if (bucket) bucket.count += 1;
+          else
+            byRecipe.set(escrowed.craftedRecipeId, {
+              count: 1,
+              // The craft marker rides alongside the payload: an instanced
+              // parcel can be crafted too (a masterwork proc, an enchanted
+              // crafted piece), so it is carried rather than assumed absent.
+              instance: escrowed.instance,
+              materialSources: escrowed.materialSources,
+            });
+        }
+        for (const [craftedRecipeId, bucket] of byRecipe) {
           parcels.push({
             itemId: s.itemId,
-            count: 1,
-            ...(escrowed.instance === undefined ? {} : { instance: escrowed.instance }),
-            ...(escrowed.materialSources === undefined
+            count: bucket.count,
+            ...(bucket.instance === undefined ? {} : { instance: bucket.instance }),
+            ...(bucket.materialSources === undefined
               ? {}
-              : { materialSources: escrowed.materialSources }),
-            ...(escrowed.craftedRecipeId === undefined
-              ? {}
-              : { craftedRecipeId: escrowed.craftedRecipeId }),
+              : { materialSources: bucket.materialSources }),
+            ...(craftedRecipeId === undefined ? {} : { craftedRecipeId }),
           });
+        }
       } else {
         const count = Math.floor(s.count);
         const consumed = removeVendorSellUnits(
@@ -641,7 +787,9 @@ export class PostOffice {
       this.result(meta.entityId, 'letterGone');
       return;
     }
-    const hadAttachments = m.copper > 0 || m.items.length > 0;
+    // Escrow in the expiry sense (sub-silver coin alone does not count): the
+    // clock write at the tail keys on this, the coin grant below on any coin.
+    const hadAttachments = mailHoldsEscrow(m);
     // Bump only when something observable moved: the revision is realm-global,
     // so an unconditional bump would let a repeat-take on an already-emptied,
     // already-read letter force an inbox rebuild for every near-pillar viewer
@@ -699,7 +847,8 @@ export class PostOffice {
     if (kept.length !== m.items.length) mutated = true;
     m.items = kept;
     // Tending the letter marks it read (drops it from the unread index once).
-    if (!m.read) {
+    const flippedRead = !m.read;
+    if (flippedRead) {
       this.index.markRead(m, this.ctx.time);
       mutated = true;
     }
@@ -718,21 +867,21 @@ export class PostOffice {
     }
     if (kept.length > 0) {
       // Attachments remain: expiresAt is untouched here, so the letter's
-      // existing clock keeps running. That is Infinity for system/npc mail
-      // (their by-construction exemption, see the book() comment below), but a
-      // player parcel's real MAIL_ATTACHMENT_EXPIRY_SECONDS deadline still
-      // ticks and can still trip returnToSender. The player is told to make
-      // room, exactly as the Merchant's collect does.
+      // existing clock keeps running. That is Infinity for system/npc mail and
+      // a returned parcel (never auto-deleted with attachments aboard, see the
+      // book() comment below), but an unreturned player parcel's real
+      // MAIL_ATTACHMENT_EXPIRY_SECONDS deadline still ticks and can still trip
+      // returnToSender. The player is told to make room, exactly as the
+      // Merchant's collect does.
       this.ctx.error(meta.entityId, 'Your bags are full.');
       return;
     }
-    // Fully emptied: the letter leaves its attachment clock (Infinity for
-    // system/npc mail, the attachment window for player parcels, either way a
-    // returned letter included) and starts the standard emptied-letter window.
-    // Only the take that empties it fires, so a repeat take never extends it.
-    // No extra bump for the expiry-clock write: reaching here means the take
-    // emptied real attachments, so `mutated` already bumped above.
-    if (hadAttachments) m.expiresAt = this.ctx.time + MAIL_EXPIRY_SECONDS;
+    // Nothing aboard: the letter is read now, so it rides the read clock.
+    // Fires on the take that empties it (leaving Infinity or the attachment
+    // window behind) and on the take that first reads a bare note; a repeat
+    // take on a read, empty letter never extends it. No extra bump for the
+    // expiry-clock write: either trigger already set `mutated` above.
+    if (hadAttachments || flippedRead) m.expiresAt = this.emptiedExpiresAt(m, this.ctx.time);
   }
 
   mailDelete(mailId: number, pid?: number): void {
@@ -775,6 +924,12 @@ export class PostOffice {
     const m = this.deliveredFor(r.meta).find((x) => x.id === mailId);
     if (m && !m.read) {
       this.index.markRead(m, this.ctx.time);
+      // The read flip starts the short read clock on an emptied letter (a
+      // parcel keeps its attachment clock until the take empties it). markRead
+      // already dirtied the row, so the clock write persists with the flag.
+      if (!mailHoldsEscrow(m)) {
+        m.expiresAt = this.emptiedExpiresAt(m, this.ctx.time);
+      }
       this.bumpRev();
     }
   }
@@ -918,15 +1073,17 @@ export class PostOffice {
     delaySeconds: number;
     custodyRef?: string;
   }): void {
-    const hasAttachments = opts.copper > 0 || opts.items.length > 0;
-    // Player parcels ride the attachment window (one return cycle, then the
-    // sweep deletes). System and npc parcels get NO clock at all while loaded:
-    // that absence, plus the sweep's kind filter, IS their expiry exemption.
+    const hasAttachments = mailHoldsEscrow(opts);
+    // Player parcels ride the attachment window (one return flight, then
+    // Infinity). System and npc parcels get NO clock at all while loaded: that
+    // absence, plus the sweep's kind filter, IS their expiry exemption. A bare
+    // note, or one carrying only sub-silver coin, starts the unread window
+    // (none at all for an Exchange notice).
     const expiresAt = hasAttachments
       ? opts.kind === 'player'
         ? this.ctx.time + MAIL_ATTACHMENT_EXPIRY_SECONDS
         : Infinity
-      : this.ctx.time + MAIL_EXPIRY_SECONDS;
+      : this.emptiedExpiresAt({ read: false, letterId: opts.letterId }, this.ctx.time);
     const msg: MailMessage = {
       id: this.nextMailId++,
       recipientKey: opts.recipientKey,
@@ -1052,11 +1209,12 @@ export class PostOffice {
   // escrowed coin and goods, so the book's standing invariant still rules: an
   // unclaimed player parcel flies home through the ordinary return flight rather
   // than being destroyed, and only letters with nothing at stake are deleted:
-  //  - a bare note (no coin, no items), read or not;
+  //  - a bare note (no items, less than a silver of coin), read or not;
   //  - a system/npc parcel, whose attachments were minted by the world and have
   //    no live sender to fly home to (their senderKey is absent by construction);
-  //  - a player parcel whose return flight has ALREADY run (the sweep's one
-  //    sanctioned destruction, the `returned` flag);
+  //  - a player parcel whose return flight has ALREADY run (the `returned`
+  //    flag: the sweep never deletes it, but there is no second flight and
+  //    the deleted character can no longer claim it);
   //  - a player parcel the deleted character sent to themselves, whose home key
   //    is the key being purged: the escrow was theirs alone and there is nowhere
   //    left to return it to.
@@ -1104,7 +1262,7 @@ export class PostOffice {
       }
       if (!owns(m.recipientKey)) continue;
       changed = true;
-      const escrowed = m.copper > 0 || m.items.length > 0;
+      const escrowed = mailHoldsEscrow(m);
       // returnToSender's own fallback: the stable sender id, or the display name
       // for a letter persisted before senderKey existed.
       const homeKey = m.senderKey ?? m.senderName;
@@ -1235,7 +1393,10 @@ export class PostOffice {
       // Keep letters whose attached item id is no longer in ITEMS (a content
       // edit): dormant, recoverable data, exactly like market listings.
       // sanitizeEscrowSlot preserves an instanced parcel's payload and clamps
-      // its count to the identical-payload merge cap (the character-load rule).
+      // non-mergeable instance rows to the identical-payload merge cap (the
+      // character-load rule). Mergeable mail rows deliberately preserve their
+      // count: a single Ravenpost parcel may bundle byte-equal copies pulled
+      // from several physical bag rows, including stackSize-1 crafted items.
       // A plain parcel's craftedRecipeId marker rides alongside it (dropped by
       // sanitizeEscrowSlot, which is instance-only), so a mail restart never
       // strips a crafted item's provenance out of an in-flight attachment.
@@ -1243,7 +1404,7 @@ export class PostOffice {
         .filter((s) => s && typeof s.itemId === 'string')
         .map((s) => {
           const slot: InvSlot = {
-            ...sanitizeEscrowSlot(s, instancedCountCap(ITEMS[s.itemId], s.instance), escrowDrops),
+            ...sanitizeEscrowSlot(s, mailEscrowCountCap(ITEMS[s.itemId], s), escrowDrops),
             ...(typeof s.craftedRecipeId === 'string'
               ? { craftedRecipeId: s.craftedRecipeId }
               : {}),
@@ -1296,17 +1457,35 @@ export class PostOffice {
         m.secondsLeft === -1 || !Number.isFinite(m.secondsLeft)
           ? Infinity
           : this.ctx.time + Math.max(0, m.secondsLeft);
-      // Deploy clock: a save written before the attachment window existed
-      // persisted player parcels with the never sentinel. Their window starts
-      // at this load, never retroactively. System/npc parcels keep Infinity.
-      const expiresAt =
-        returnedItems.length > 0 && retainedItems.length === 0 && copper <= 0
-          ? Math.min(persistedExpiresAt, this.ctx.time + MAIL_EXPIRY_SECONDS)
-          : kind === 'player' &&
-              (retainedItems.length > 0 || copper > 0) &&
-              !Number.isFinite(persistedExpiresAt)
-            ? this.ctx.time + MAIL_ATTACHMENT_EXPIRY_SECONDS
-            : persistedExpiresAt;
+      const read = m.read === true;
+      const returned = m.returned === true;
+      const letterId = typeof m.letterId === 'string' ? m.letterId : undefined;
+      const hasEscrow = mailHoldsEscrow({ copper, items: retainedItems });
+      // The expiry model re-applied at load, so a row persisted under an older
+      // model can never outlive (or, for attachments, undercut) the live one:
+      //  - attachments aboard: system/npc and RETURNED parcels hold Infinity
+      //    (never auto-deleted; a returned row written under the old second
+      //    window is lifted back to Infinity here). An unreturned player parcel
+      //    keeps its finite window, or starts one at this load (the deploy
+      //    clock for a save written before the window existed: never
+      //    retroactively).
+      //  - no escrow aboard (a bare note, sub-silver coin, an emptied letter,
+      //    or a parcel the soulbound strip above just emptied): the
+      //    read/unread model's own window CAPS the persisted countdown and
+      //    never extends it (an extension would re-arm every boot, the #3561
+      //    class), so a read letter persisted under a longer window collapses
+      //    to the read clock at load, a never-sentinel row starts the model's
+      //    window here, and an unread Exchange notice persisted under the old
+      //    14-day model keeps that shorter countdown (a one-time deploy
+      //    artifact, no worse than the status quo it replaces).
+      const modelExpiresAt = this.emptiedExpiresAt({ read, letterId }, this.ctx.time);
+      const expiresAt = hasEscrow
+        ? kind !== 'player' || returned
+          ? Infinity
+          : Number.isFinite(persistedExpiresAt)
+            ? persistedExpiresAt
+            : this.ctx.time + MAIL_ATTACHMENT_EXPIRY_SECONDS
+        : Math.min(persistedExpiresAt, modelExpiresAt);
       this.mail.push({
         id: m.id,
         recipientKey: m.recipientKey,
@@ -1314,16 +1493,16 @@ export class PostOffice {
         senderName,
         senderKey,
         kind,
-        letterId: typeof m.letterId === 'string' ? m.letterId : undefined,
+        letterId,
         subject,
         body,
         copper,
         items: retainedItems,
         deliverAt: this.ctx.time + deliverIn,
         expiresAt,
-        read: m.read === true,
+        read,
         ...(typeof m.custodyRef === 'string' ? { custodyRef: m.custodyRef } : {}),
-        returned: m.returned === true,
+        returned,
         // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,
       });

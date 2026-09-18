@@ -28,6 +28,12 @@ export interface PartyChip {
   label: HTMLElement;
 }
 
+export interface PartyFrameHeader {
+  el: HTMLButtonElement;
+  label: HTMLElement;
+  count: HTMLElement;
+}
+
 /**
  * Build the collapse chip once: a button carrying the chevron icon + a label span.
  * The caller (the painter) writes the localized caption and drives aria-expanded
@@ -52,4 +58,22 @@ export function createPartyChip(doc: Document, onToggle: () => void): PartyChip 
   btn.appendChild(label);
   btn.addEventListener('click', onToggle);
   return { el: btn, label };
+}
+
+/** Build the unbacked desktop Party disclosure once; mutable text and state use the painter facet. */
+export function createPartyFrameHeader(doc: Document, onToggle: () => void): PartyFrameHeader {
+  const btn = doc.createElement('button');
+  btn.id = 'party-frame-header';
+  btn.className = 'party-frame-header ui-cin ui-outline';
+  btn.type = 'button';
+  btn.setAttribute('aria-controls', 'party-frame-rows');
+  btn.setAttribute('aria-expanded', 'true');
+  const label = doc.createElement('span');
+  label.className = 'party-frame-header-label';
+  const count = doc.createElement('span');
+  count.className = 'party-frame-header-count';
+  btn.append(label, count);
+  btn.insertAdjacentHTML('beforeend', svgIcon('next'));
+  btn.addEventListener('click', onToggle);
+  return { el: btn, label, count };
 }

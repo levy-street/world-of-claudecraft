@@ -111,6 +111,50 @@ describe('sampled GameAudio facade', () => {
     expect(sfxMock.playUi).toHaveBeenCalledTimes(1);
   });
 
+  it('plays a player-chosen aura cue at its own gain, and never an id outside the palette', () => {
+    const audio = new GameAudio();
+
+    audio.auraCue('ui_aura_hard_bell', 0.4);
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_aura_hard_bell', {
+      jitter: false,
+      cooldown: 1,
+      gain: 0.4,
+    });
+    expect(sfxMock.playUi).toHaveBeenCalledTimes(1);
+
+    // The key is chosen by the PLAYER at runtime, so anything outside the palette
+    // (a retired cue, another UI cue, the silence sentinel) is a silent no-op
+    // rather than a fetch for a clip that does not exist.
+    audio.auraCue('ui_aura_retired', 0.5);
+    audio.auraCue('ui_click', 0.5);
+    audio.auraCue('none', 0.5);
+    expect(sfxMock.playUi).toHaveBeenCalledTimes(1);
+  });
+
+  it('clamps an aura cue gain into 0..1 and skips a silent one entirely', () => {
+    const audio = new GameAudio();
+
+    audio.auraCue('ui_aura_cat_meow', 7);
+    expect(sfxMock.playUi).toHaveBeenLastCalledWith('ui_aura_cat_meow', {
+      jitter: false,
+      cooldown: 1,
+      gain: 1,
+    });
+    audio.auraCue('ui_aura_cat_meow', 0);
+    audio.auraCue('ui_aura_cat_meow', -1);
+    expect(sfxMock.playUi).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps aura cues playing with the interface feedback sounds switched off', () => {
+    // The cue is opt-in per proc and the player asked for it by name, so the
+    // general feedback toggle does not silence it: it routes through play, not
+    // playFeedback.
+    const audio = new GameAudio();
+    audio.setFeedbackEnabled(false);
+    audio.auraCue('ui_aura_wolf_howl', 0.7);
+    expect(sfxMock.playUi).toHaveBeenCalledTimes(1);
+  });
+
   it('gates the feedback cues on setFeedbackEnabled but leaves timing/affordance cues alone', () => {
     const audio = new GameAudio();
     expect(audio.feedbackEnabled).toBe(true); // on by default (no change out of the box)
@@ -325,7 +369,7 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 25 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 45 unique UI cues to the authoritative studio inventory', () => {
     // 13 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
     // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
     // cast-start placeholder (ui_craft_cast) plus the Farming render/juice
@@ -347,7 +391,9 @@ describe('deterministic UI SFX catalog', () => {
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(25);
+    expect(keys).toHaveLength(45);
+    // The 20 player-selectable aura proc alerts (src/game/aura_cue_catalog.ts).
+    expect(keys.filter((key: string) => key.startsWith('ui_aura_'))).toHaveLength(20);
     expect(keys).toContain('ui_craft_cast');
     expect(keys).toContain('ui_farm_plant');
     expect(keys).toContain('ui_farm_harvest');

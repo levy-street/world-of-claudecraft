@@ -26,6 +26,7 @@
 // render/ui/game/net/DOM/Three, no Math.random/Date.now), so it runs unchanged
 // in Node, the browser, and the headless RL env.
 
+import { recordAccountDeed, selfEarner } from './account_ledger';
 import { DEED_ORDER, DEEDS, DEEDS_ERA } from './content/deeds';
 import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
@@ -33,7 +34,7 @@ import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
-  characterReliquaryOwnership,
+  accountReliquaryOwnership,
   isHorizonsTitleDeed,
   maybeSyncCuratorRankDeeds,
   noteReliquaryMark,
@@ -774,6 +775,10 @@ export function grantDeed(
   if (!def) return false;
   if (meta.deedsEarned.has(deedId)) return false;
   meta.deedsEarned.set(deedId, ctx.utcDay);
+  // The account ledger lists this character among the deed's earners from the
+  // same stamp (src/sim/account_ledger.ts): both books and the Reliquary grant
+  // lane read the union; every other deed's evaluator stays character-scoped.
+  recordAccountDeed(meta.accountLedger, deedId, selfEarner(meta, ctx.utcDay));
   meta.renown += def.renown;
   const legacy = MILESTONE_DEED_TO_LEGACY[deedId];
   if (legacy) meta.unlockedMilestones.add(legacy);
@@ -800,7 +805,7 @@ export function grantDeed(
     // grantDeed and this hook builds a fresh snapshot for its own level, so
     // a full ladder cascade builds a handful of snapshots. Bounded by the
     // ladder depth and once-ever per character; accepted.
-    const titleOwnership = characterReliquaryOwnership(meta);
+    const titleOwnership = accountReliquaryOwnership(meta);
     const retroOpts = opts?.retro ? ({ retro: true } as const) : undefined;
     maybeSyncCuratorRankDeeds(ctx, meta, retroOpts, titleOwnership);
     // A title relic earned ANYWHERE (a pvp title as the last missing relic)
@@ -825,7 +830,9 @@ export function grantDeed(
 export function setActiveTitle(meta: PlayerMeta, e: Entity, deedId: string | null): void {
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
-    if (!meta.deedsEarned.has(deedId)) return;
+    // Account-wide: a deed earned by ANY character on the account unlocks its
+    // cosmetic for every character (the ledger's display lane).
+    if (!meta.deedsEarned.has(deedId) && !meta.accountLedger.deeds.has(deedId)) return;
     // DEEDS is a plain object. The reward-kind check below already refuses a
     // bare prototype key on its own (Object.prototype has no `reward`), so this
     // hasOwn guard's real job is to stay correct if Object.prototype is ever
@@ -851,7 +858,8 @@ export function setActiveTitle(meta: PlayerMeta, e: Entity, deedId: string | nul
 export function setActiveBorder(meta: PlayerMeta, e: Entity, deedId: string | null): void {
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
-    if (!meta.deedsEarned.has(deedId)) return;
+    // Account-wide, exactly like setActiveTitle above.
+    if (!meta.deedsEarned.has(deedId) && !meta.accountLedger.deeds.has(deedId)) return;
     // Same prototype-key guard as setActiveTitle above: the two validators
     // stay identical in shape so neither drifts into a weaker check.
     if (!Object.hasOwn(DEEDS, deedId)) return;
@@ -1491,7 +1499,7 @@ export function retroFallbackGrants(ctx: SimContext, meta: PlayerMeta, player: E
   // ONE ownership snapshot for the three syncs below (deed surface live, so
   // each sync sees the grants of the one before it; a join would otherwise
   // scan inventory + bank once per sync).
-  const joinOwnership = characterReliquaryOwnership(meta);
+  const joinOwnership = accountReliquaryOwnership(meta);
   syncCuratorRankDeeds(ctx, meta, { retro: true }, joinOwnership);
   // Phase 18 completion ladder, retro-flagged like the rank bridges: a
   // veteran who finished a flagship page, the Conquerors shelf, or the whole

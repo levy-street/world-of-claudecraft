@@ -114,7 +114,9 @@ describe('startGame wiring', () => {
   it('opens the lane BEFORE the assetsReady that gates the Renderer', () => {
     const beginAt = mainSource.indexOf('beginDeferredPreloads()');
     const awaitAt = mainSource.indexOf('await assetsReady(');
-    const rendererAt = mainSource.indexOf('new Renderer(world, canvas, nameplates)');
+    // The client builds its Renderer through game_renderer.ts (the live
+    // Settings reader is composed there), so the gate pin follows the factory.
+    const rendererAt = mainSource.indexOf('createGameRenderer(world, canvas, nameplates');
     expect(beginAt).toBeGreaterThan(-1);
     expect(awaitAt).toBeGreaterThan(beginAt);
     expect(rendererAt).toBeGreaterThan(awaitAt);
@@ -238,7 +240,8 @@ describe('every assetsReady host opens the lane', () => {
     for (const { file, full } of files) {
       const code = readFileSync(full, 'utf8');
       const awaitAt = code.indexOf('await assetsReady(');
-      if (awaitAt < 0 || !code.includes('new Renderer(')) continue;
+      const buildsRenderer = code.includes('new Renderer(') || code.includes('createGameRenderer(');
+      if (awaitAt < 0 || !buildsRenderer) continue;
       hosts++;
       const beginAt = code.indexOf('beginDeferredPreloads()');
       if (beginAt < 0 || beginAt > awaitAt) offenders.push(`src/${file}`);

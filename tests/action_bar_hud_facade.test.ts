@@ -141,7 +141,11 @@ describe('Hud action-bar facade', () => {
   // that test covered: a form swap must drop the desktop drag AND re-clamp the
   // ring page, or the newly loaded bar is exposed through a stale page.
   interface FormSyncHud {
-    actionBarController: { syncActiveForm(): boolean; syncProfile(): boolean };
+    actionBarController: {
+      syncActiveForm(): boolean;
+      syncProfile(): boolean;
+      syncSpec(): boolean;
+    };
     spellbookWindow: { refreshHotbarControls(): void };
     dragAction: unknown;
     mobileActionPage: number;
@@ -168,6 +172,10 @@ describe('Hud action-bar facade', () => {
         return formSwapped;
       },
       syncProfile: () => profileSwitched,
+      // The spec sync sits beside the profile and form syncs on the real
+      // controller; these cases hold the spec still so only the form and
+      // surface arms move.
+      syncSpec: () => false,
     };
     hud.spellbookWindow = {
       refreshHotbarControls: () => {

@@ -77,7 +77,7 @@ export function runWeaponProcs(
   const enchant = enchantId ? ENCHANTS[enchantId] : undefined;
   const enchantProc = enchant?.weaponProc;
   if (!enchant || !enchantProc) return;
-  // Wolf Form has a fixed natural cadence; a slow carried stat stick must not
+  // Cat Form has a fixed natural cadence; a slow carried stat stick must not
   // multiply its proc frequency. Bear and ordinary swings keep item base speed.
   const baseSpeed =
     meleeHand === 'mainhand' && isCatForm(wielder) ? baseSwingSpeed(wielder) : item.weapon.speed;

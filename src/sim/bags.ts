@@ -84,7 +84,10 @@ export const BACKPACK_SLOTS = 16;
 /** Number of equippable bag sockets next to the backpack. */
 export const BAG_SOCKETS = 4;
 /** Default stack cap for stackable kinds (consumables, junk, quest drops). */
-const DEFAULT_STACK = 20;
+/** The default carried stack size, exported for the surfaces that step a
+ *  quantity by "one bag stack" (the material source picker, the vault's
+ *  withdraw prompt). Every honest material stacks at this size today. */
+export const DEFAULT_STACK = 20;
 
 /** Kinds that never stack: each copy occupies its own slot, classic style.
  *  Recipe patterns join gear here: classic recipe drops are one per slot. */

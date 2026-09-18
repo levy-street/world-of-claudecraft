@@ -18,6 +18,7 @@ import type { ResolvedAbility } from '../sim';
 import type { Entity, PlayerClass } from '../types';
 import { resolveActionReplacement } from './action_replacement';
 import { aetherSurgeCostMult } from './chronomancy';
+import { bruinRushMakesCatFormFree } from './druid_engines';
 import { resolveColdsightAbilityForSpec } from './hunter_coldsight';
 import { resolveHunterSharedAbilityForTalents } from './hunter_shared';
 import { radiantResonanceCastTime } from './paladin_radiant_resonance';
@@ -90,5 +91,8 @@ export function applyAbilityCostTail(
   if (abilityId === 'arcane_surge' && cost > 0) {
     cost = Math.round(cost * aetherSurgeCostMult(actor));
   }
+  // Cat Form inside the Bruin Rush window (combat/druid_engines.ts): free, so
+  // the tooltip both worlds paint agrees with the parked-mana bill.
+  if (cost > 0 && bruinRushMakesCatFormFree(actor, abilityId)) cost = 0;
   return cost === found.cost ? found : { ...found, cost };
 }

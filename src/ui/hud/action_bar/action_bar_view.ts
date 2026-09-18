@@ -195,6 +195,11 @@ export interface ActionBarDeps {
   /** Localized integer formatter (the item stack count and cooldown digits go
    *  through this, per the "numbers go through formatNumber" invariant). */
   formatCount(n: number): string;
+  /** Ability ids a WATCHED aura proc is lighting right now (the Auras panel's
+   *  hotbar channel, src/ui/proc_ready_glow_core.ts). Purely ADDITIVE: it only
+   *  ever turns a glow on, so it can never mask an authored class proc. Absent on
+   *  a host that does not drive the aura overlay. */
+  watchedGlowAbilityIds?(): ReadonlySet<string>;
 }
 
 /** The player fields the bar reads; a structural subset both worlds mirror. */
@@ -707,11 +712,7 @@ export function createActionBarView(
         const devotionReady =
           def.devotionCost === undefined ||
           (player.paladinDevotion?.value ?? 0) >= def.devotionCost;
-        const requiresPrimaryEye =
-          def.id === 'sentence' ||
-          def.id === 'coven' ||
-          def.id === 'possess_evil_eye' ||
-          def.id === 'hour_of_judgment';
+        const requiresPrimaryEye = def.id === 'sentence' || def.id === 'coven';
         const primaryEyeReady =
           !requiresPrimaryEye ||
           target?.auras.some(
@@ -726,7 +727,7 @@ export function createActionBarView(
           dominionReady =
             dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
         }
-        // A druid pressing a heal or a nuke from Bruin/Wolf Form leaves the form
+        // A druid pressing a heal or a nuke from Bruin/Cat Form leaves the form
         // and casts it, and the cast is billed against the PARKED mana pool, not
         // the rage or energy bar the button is pressed from (the same predicate
         // the sim's cast gate asks, so the bar cannot paint a slot unusable while
@@ -767,7 +768,11 @@ export function createActionBarView(
         // Radiant Chorus's proc: Mending Light turns instant and Dawn's Embrace
         // halves its cost, so both light up while Radiant Resonance is worn.
         const radiantResonanceActive = radiantResonanceAbilityGlowActive(player, def.id);
+        // The player's own pick from the Auras panel, ORed in last so it can only
+        // add to the authored glows above, never replace one.
+        const watchedGlow = deps.watchedGlowAbilityIds?.().has(def.id) === true;
         slot.procGlow =
+          watchedGlow ||
           reflectionReady ||
           freeByProc ||
           dawnsWrathActive ||

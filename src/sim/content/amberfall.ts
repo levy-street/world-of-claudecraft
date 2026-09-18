@@ -510,7 +510,7 @@ export const AMBERFALL_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 74, sta: 6, spi: 4 },
+    stats: { armor: 74, sta: 6, spi: 7 },
     sellValue: 2300,
   },
 };

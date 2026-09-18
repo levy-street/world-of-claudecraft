@@ -20,7 +20,7 @@ import {
   MAZE_Z1,
   planGardenMazePieces,
 } from '../src/render/garden_maze_core';
-import { gardenMazeCellPieces, inGardenMazeWall } from '../src/sim/world';
+import { gardenMazeCellPieces, inGardenMaze, inGardenMazeWall } from '../src/sim/world';
 
 const cellCenter = (c: number, r: number) => ({
   x: MAZE_X0 + (c + 0.5) * MAZE_CELL,
@@ -129,5 +129,22 @@ describe('the modeled-hedge plan', () => {
         expect(inGardenMazeWall(x, z), `piece at ${w.x},${w.z} rot ${w.rot} t ${t}`).toBe(true);
       }
     }
+  });
+
+  it('treats a NaN position as open ground everywhere, and never throws', () => {
+    // A NaN pose (the v0.43.0 freeze) passes every range check: the camera
+    // lift and the sim wall test both reached GARDEN_MAZE[NaN] and threw
+    // (NaN row), or coerced charCodeAt(NaN) to column 0 and answered NaN
+    // (NaN column). Both now answer as outside the maze. Infinity was already
+    // rejected by the range checks, so it is not pinned here.
+    expect(gardenMazeCameraLift(Number.NaN, Number.NaN)).toBe(0);
+    expect(gardenMazeCameraLift(Number.NaN, MAZE_Z1 - MAZE_CELL)).toBe(0);
+    expect(gardenMazeCameraLift(MAZE_X0 + MAZE_CELL, Number.NaN)).toBe(0);
+    expect(inGardenMaze(Number.NaN, Number.NaN)).toBe(false);
+    expect(inGardenMazeWall(Number.NaN, Number.NaN)).toBe(false);
+    expect(inGardenMazeWall(MAZE_X0 + MAZE_CELL, Number.NaN)).toBe(false);
+    expect(gardenMazeCellPieces(Number.NaN, Number.NaN)).toBeNull();
+    expect(gardenMazeCellPieces(Number.NaN, 3)).toBeNull();
+    expect(gardenMazeCellPieces(3, Number.NaN)).toBeNull();
   });
 });

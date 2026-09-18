@@ -74,8 +74,8 @@ recover. High-impact planning and GitHub issue creation disable implicit invocat
 ## Specialist agents
 
 The read-only roles are `woc_sim_architecture`, `woc_cross_platform`,
-`woc_persistence`, `woc_database_performance`, `woc_security`, `woc_test_coverage`,
-`woc_frontend`, `woc_release_malware`, and `woc_docs_researcher`. The main agent owns
+`woc_persistence`, `woc_database_performance`, `woc_server_hot_path`, `woc_security`,
+`woc_test_coverage`, `woc_frontend`, `woc_release_malware`, and `woc_docs_researcher`. The main agent owns
 edits, integration, and deterministic commands. Review agents inspect the assigned
 proposal or established diff and shared results so the same gate is not rerun by every
 specialist.

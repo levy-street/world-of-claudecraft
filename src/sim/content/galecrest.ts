@@ -565,7 +565,7 @@ export const GALECREST_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 62, sta: 3, spi: 2 },
+    stats: { armor: 62, sta: 3, spi: 4 },
     sellValue: 1000,
   },
   wreck_wardens_mantle: {

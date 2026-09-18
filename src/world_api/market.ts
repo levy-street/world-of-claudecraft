@@ -29,6 +29,10 @@ export interface MarketListingView {
    *  allowlist (signer/enchant/rolled; never boundTo/bindOnTrade/charges): the
    *  tooltip's enchant line and maker's mark. Absent on plain listings. */
   instance?: ItemInstancePayload;
+  /** Recipe marker carried by a crafted listing. The client does not display the
+   *  id, but Market Sweep needs the bit so it never offers a bulk action the
+   *  server planner rejects. */
+  craftedRecipeId?: string;
   materialSources?: MaterialComposition;
 }
 
@@ -77,6 +81,24 @@ export interface MarketInfo {
   // price with a non-null itemId means the item has no active listings.
   sellPriceItemId: string | null;
   sellLowestPrice: number | null; // per unit, matching the sell form's "price each" field
+  /** The Market Sweep quote for what the viewer asked to sweep (marketSweepQuote),
+   *  or null when nothing is staged. Echoes the request (itemId, count) so the
+   *  UI trusts a quote only when it matches what it currently has staged, the
+   *  sellPriceItemId precedent. Recomputed on the live book every snapshot. */
+  sweepQuote: MarketSweepQuote | null;
+}
+
+/** A server-planned Market Sweep: buy `count` units of `itemId` across other
+ *  sellers' plain listings, cheapest per unit first (src/sim/market_sweep.ts).
+ *  `units` may exceed `count` by up to one stack (whole listings only); `short`
+ *  means the book cannot cover `count` and the plan holds every eligible row. */
+export interface MarketSweepQuote {
+  itemId: string;
+  count: number;
+  units: number;
+  listings: number;
+  total: number; // copper for the whole plan
+  short: boolean;
 }
 
 export interface IWorldMarket {
@@ -98,6 +120,13 @@ export interface IWorldMarket {
    *  (bindOnTrade-armed or boundTo-bound) copies. Plain stacks use marketList. */
   marketListInstance(itemId: string, price: number, instance: ItemInstancePayload): void;
   marketBuy(listingId: number): void;
+  /** Stage a Market Sweep quote: the next marketInfo carries `sweepQuote` for this
+   *  item and count (a display/query narrowing, the marketSellPriceCheck precedent). */
+  marketSweepQuote(itemId: string, count: number): void;
+  /** Buy `count` units of `itemId` across other sellers' plain listings, cheapest
+   *  per unit first, as one command; the sim re-plans on the live book and refuses
+   *  when the total exceeds `maxCopper` (the quoted total the player agreed to). */
+  marketSweep(itemId: string, count: number, maxCopper: number): void;
   marketCancel(listingId: number): void;
   marketCollect(): void;
 }

@@ -21,6 +21,7 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
+import { expectedStatBudget } from '../src/sim/item_level';
 import type { ItemDef } from '../src/sim/types';
 import { expectDefined } from './helpers/defined';
 
@@ -102,7 +103,9 @@ describe('the chipped tusk weaponcrafting exclusion, recomputed', () => {
   it('no in-band CASTER row reaches the rung-50 battle staff', () => {
     const staff = ITEMS.elderwood_battle_staff;
     expect(staff.quality, 'the staff is the rare rung-50 row').toBe('rare');
-    expect(staff.stats, 'staff stats').toEqual({ int: 9, spi: 4 });
+    // The stamina baseline model (src/sim/item_budget.ts) added the staff's
+    // free caster baseline (int/spi, no str/agi) on top of its line.
+    expect(staff.stats, 'staff stats').toEqual({ int: 9, spi: 4, sta: 3 });
     expect(dps(staff).toFixed(2), 'staff dps').toBe('8.33');
     expect(staff.requiredClass, 'the staff carries no class lock').toBeUndefined();
     const stronger = band()
@@ -237,16 +240,28 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     const loop = expectDefined(ITEMS.etched_iron_loop);
     const points = (d: { stats?: Record<string, number> }): number =>
       Object.values(d.stats ?? {}).reduce((a, b) => a + b, 0);
-    // The keepsake spreads five points one per stat; each trainer ring pays
-    // four points but concentrates three of them in ONE primary, which is what
-    // "dominated" means here and why the spread loses despite the higher total.
+    // The keepsake spreads five points one per stat. riveted_iron_signet is
+    // physical, so the stamina baseline model (src/sim/item_budget.ts) keeps
+    // its baseline inside the line and it still pays four points;
+    // etched_iron_loop is a caster ring, so the model adds its free baseline
+    // on top and its total now matches the keepsake's five. Either way, each
+    // trainer ring concentrates three of its points in ONE primary against
+    // the keepsake's flat one-per-stat spread, which is what "dominated"
+    // means here and why the spread loses even where the total does not.
     expect(points(keepsake), 'keepsake total points').toBe(5);
     expect(Math.max(...Object.values(keepsake.stats ?? {})), 'keepsake best stat').toBe(1);
     for (const [ring, primary] of [
       [signet, 'str'],
       [loop, 'int'],
     ] as const) {
-      expect(points(ring), `${ring.id} total points`).toBe(4);
+      // riveted_iron_signet is physical (its baseline lives inside the line,
+      // per the stamina baseline model in src/sim/item_budget.ts) so its total
+      // is still the bare budget; etched_iron_loop is a caster ring (int/spi,
+      // no str/agi) so the model adds its free baseline on top, one point
+      // higher. expectedStatBudget derives each ring's own total from its
+      // live item level, independent of its authored stats, so this stays a
+      // real check rather than a restated literal.
+      expect(points(ring), `${ring.id} total points`).toBe(expectedStatBudget(ring));
       expect(ring.stats?.[primary], `${ring.id} focused primary`).toBe(3);
       expect(ring.sellValue, `${ring.id} sell value`).toBe(46);
       // The claim is domination by jewelcrafting's OWN rung-0 output, so the

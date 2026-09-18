@@ -12,7 +12,7 @@
 // markup + abandon/chat-link wiring is covered by the questlog_window.ts guard.
 
 import { describe, expect, it } from 'vitest';
-import { QUESTS } from '../src/sim/data';
+import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
 import type { PlayerClass, QuestProgress } from '../src/sim/types';
 import { buildQuestLogView, type QuestLogInput } from '../src/ui/hud/quest/questlog_view';
 
@@ -96,6 +96,62 @@ describe('buildQuestLogView: list rows + selection', () => {
       }),
     );
     expect(v.selectedQuestId).toBe(QUEST_A.id);
+  });
+
+  it('groups active quests by their giver zone and keeps the completed tally unexpandable', () => {
+    const questsByZone = new Map<string, (typeof QUEST_A)[]>();
+    for (const quest of Object.values(QUESTS)) {
+      const giver = NPCS[quest.giverNpcId];
+      if (!giver || quest.objectives.length === 0) continue;
+      const zoneId = zoneAt(giver.pos.x, giver.pos.z).id;
+      const zoneQuests = questsByZone.get(zoneId) ?? [];
+      zoneQuests.push(quest);
+      questsByZone.set(zoneId, zoneQuests);
+    }
+    const distinctZoneQuests = [...questsByZone.entries()].slice(0, 2);
+    expect(distinctZoneQuests, 'fixture needs quests from two giver zones').toHaveLength(2);
+    const [[zoneA, [questA]], [zoneB, [questB]]] = distinctZoneQuests;
+    const v = buildQuestLogView(
+      input({
+        quests: [progress('sim', questA.id, 'active'), progress('sim', questB.id, 'ready')],
+        completedCount: 7,
+        collapsedGroupIds: ['completed'],
+      }),
+    );
+    const activeGroups = v.groups.filter((group) => group.id !== 'completed');
+    expect(activeGroups).toHaveLength(2);
+    expect(activeGroups.map((group) => group.zoneId)).toEqual([zoneA, zoneB]);
+    expect(activeGroups.map((group) => group.items.map((item) => item.questId))).toEqual([
+      [questA.id],
+      [questB.id],
+    ]);
+    expect(activeGroups.map((group) => group.readyCount)).toEqual([0, 1]);
+    expect(activeGroups.every((group) => group.expandable)).toBe(true);
+    // Pin moved: the completed tally carries a count but never rows (the log
+    // mirrors only ACTIVE quests), so it is not expandable and its collapse
+    // state is meaningless: a stored 'completed' collapse id must not make it
+    // one, or the painter offers a disclosure onto nothing.
+    expect(v.groups.at(-1)).toMatchObject({
+      id: 'completed',
+      zoneId: null,
+      count: 7,
+      collapsed: false,
+      dimmed: true,
+      expandable: false,
+      items: [],
+    });
+  });
+
+  it('carries painter-owned collapse state into matching zone groups', () => {
+    const first = buildQuestLogView(input({ quests: [progress('sim', QUEST_A.id, 'active')] }))
+      .groups[0];
+    const v = buildQuestLogView(
+      input({
+        quests: [progress('sim', QUEST_A.id, 'active')],
+        collapsedGroupIds: [first.id],
+      }),
+    );
+    expect(v.groups[0]).toMatchObject({ id: first.id, collapsed: true });
   });
 });
 

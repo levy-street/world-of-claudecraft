@@ -71,7 +71,6 @@ import {
   dist2d,
   ENCHANT_CAST_ID,
   FACING_HOLD_DIST,
-  FARMING_CAST_ID,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
   isFormAuraKind,
@@ -98,8 +97,10 @@ import {
   completeNeedleOfFateCast,
   consumeFateThreadsForDrain,
   gainDoom,
+  hasAfflictionConsumePushbackImmunity,
 } from './affliction';
 import { shouldPreserveQueuedSentence } from './affliction_sentence_queue';
+import { abilityCastSurvivesMovement, heldMovementInputWouldMove } from './cast_move_gate';
 import {
   hasUnbreakableMovementLock,
   isInStasis,
@@ -116,6 +117,8 @@ import {
   aetherDartsBoltBonus,
   aetherDartsChannelStart,
   aetherSurgeCastMult,
+  PERFECT_MOMENT_DARTS_DAMAGE_MULT,
+  perfectMomentActive,
 } from './chronomancy';
 import { onCraftedCollectionHeal } from './crafted_collection_effects';
 import {
@@ -692,17 +695,6 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       ctx.completeRechargeCast(p, meta);
       return;
     }
-    // Planting cast completion (Farming): DELIBERATELY DISPATCHES NOTHING.
-    // Every other arm above routes to the module that resolves its outcome;
-    // farming's plant resolves at COMMAND time (professions/farming.ts
-    // plantCrop writes the plot, consumes the seed and pre-rolls the growth
-    // script before the cast even starts), so the cast is pure flavor and
-    // this arm exists only to return before fireQueuedCast, exactly like its
-    // neighbours. The generic cast-field clearing above (castingAbility,
-    // castRemaining) plus the castStop already emitted is the whole
-    // completion. The consequence is the point: damage cancelling the cast
-    // leaves the plant standing, because the crop was already in the ground.
-    if (castId === FARMING_CAST_ID) return;
     // Ice Floes (mage choice row): a COMPLETED hard cast spends one protected
     // use whether or not the caster actually moved (the buff is a banked
     // window, not a refund). Fishing above never spends one. Draws no rng.
@@ -884,6 +876,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
 
 export function pushbackCast(p: Entity): void {
   if (hasCastShield(p)) return;
+  if (p.castingAbility === 'drain_life' && hasAfflictionConsumePushbackImmunity(p)) return;
   // Item-set caster bonus scales damage-driven pushback (1 = fully immune).
   const factor = 1 - p.castPushbackReduction;
   if (factor <= 0) return;
@@ -1171,7 +1164,7 @@ export function castAbility(
     return;
   }
   // Auto-unshift (see combat/form_auto_unshift.ts): a healing or damaging spell
-  // pressed in Bruin/Wolf/Fleet Form drops the form and casts. Decided HERE and
+  // pressed in Bruin/Cat/Fleet Form drops the form and casts. Decided HERE and
   // applied at the form gate below, because the two questions this answers sit
   // on either side of it: the cast is billed against the PARKED mana (the live
   // bar is rage or energy while shifted), and refusing it for cost must leave
@@ -1312,7 +1305,7 @@ export function castAbility(
   if (ability.requiresForm) {
     const need = ability.requiresForm === 'bear' ? 'form_bear' : 'form_cat';
     if (!form || form.kind !== need) {
-      ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Wolf'} Form.`);
+      ctx.error(p.id, `You must be in ${ability.requiresForm === 'bear' ? 'Bruin' : 'Cat'} Form.`);
       return;
     }
   } else if (form && !isFormToggle(ability) && !ability.usableInForm) {
@@ -1703,6 +1696,55 @@ export function castAbility(
     }
   }
 
+  // Brain Freeze (combat/frost_mage.ts): consumed HERE, after every gate
+  // above (so a blocked cast never eats the proc) and before the cast-time /
+  // cost / cooldown reads below: the armed Flurry goes instant, skips its
+  // cooldown and carries its 30% baked into the resolved effects.
+  res = applyBrainFreezeOverride(ctx, p, res);
+  // Solar Reprisal shares one choice across the Protection Paladin's ranged
+  // strike, self-sustain strike, and ally-capable filler heal. Consume only
+  // after all cast gates succeed, then bake the chosen override into this cast.
+  res = applySolarReprisalOverride(ctx, p, res);
+  // Dawn's Wrath is a stored extra Tolling Hammer cast, not a cooldown reset:
+  // consume it only after every cast gate succeeds, then leave any existing
+  // cooldown untouched by resolving this one cast with a zero-second cooldown.
+  res = applyDawnsWrathOverride(ctx, p, res);
+
+  // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
+  // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
+  // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
+  // unchanged.
+  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
+  // A channel keeps its duration, so it must not eat a next_cast_instant charge.
+  let consumedInstantAura: Aura | null = null;
+  if (
+    !ability.channel &&
+    res.castTime > 0 &&
+    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id))
+  ) {
+    consumedInstantAura = consumeNextCastInstantAura(ctx, p, ability.id);
+  }
+  const instantBaseCastTime =
+    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
+  const castTime =
+    afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
+    destructionCastTimeMult(p, ability.id) *
+    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+  // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
+  // OUTRIGHT here, before the GCD arms or any cast-commit body state is changed,
+  // when the player's held movement input would actually move this tick. A root,
+  // steep-ground control strip, or dismount lock matches player_motion's own
+  // cancellation gate: those states mean the input is held but the body is not
+  // moving, so the cast may start normally.
+  if (
+    (ability.channel || (castTime > 0 && !togglingOff)) &&
+    heldMovementInputWouldMove(p, meta.moveInput, ctx.cfg.seed) &&
+    !abilityCastSurvivesMovement(p, ability.id, res)
+  ) {
+    ctx.error(p.id, "You can't cast while moving.");
+    return;
+  }
+
   if (p.sitting) ctx.standUp(p);
   if (p.weaponStowed) drawWeapon(p);
   if (ability.id !== 'ghost_wolf' && p.auras.some((a) => a.id === 'ghost_wolf')) {
@@ -1765,41 +1807,6 @@ export function castAbility(
     return;
   }
   p.castTargetId = target?.id ?? null;
-
-  // Brain Freeze (combat/frost_mage.ts): consumed HERE, after every gate
-  // above (so a blocked cast never eats the proc) and before the cast-time /
-  // cost / cooldown reads below: the armed Flurry goes instant, skips its
-  // cooldown and carries its 30% baked into the resolved effects.
-  res = applyBrainFreezeOverride(ctx, p, res);
-  // Solar Reprisal shares one choice across the Protection Paladin's ranged
-  // strike, self-sustain strike, and ally-capable filler heal. Consume only
-  // after all cast gates succeed, then bake the chosen override into this cast.
-  res = applySolarReprisalOverride(ctx, p, res);
-  // Dawn's Wrath is a stored extra Tolling Hammer cast, not a cooldown reset:
-  // consume it only after every cast gate succeeds, then leave any existing
-  // cooldown untouched by resolving this one cast with a zero-second cooldown.
-  res = applyDawnsWrathOverride(ctx, p, res);
-
-  // Owner 2026-07-13: spell haste shortens the global cooldown (floored at MIN_GCD),
-  // so gear/Bloodlust/Temporal Acceleration haste speeds the whole rotation, not just
-  // cast bars. spellHasteMult is 1 for anyone without spell haste, so their GCD is
-  // unchanged.
-  const gcd = Math.max(MIN_GCD, ctx.playerGcdFor(meta.cls) / spellHasteMult(p));
-  // A channel keeps its duration, so it must not eat a next_cast_instant charge.
-  let consumedInstantAura: Aura | null = null;
-  if (
-    !ability.channel &&
-    res.castTime > 0 &&
-    (ability.school !== 'physical' || hasScopedNextCastInstant(p, ability.id))
-  ) {
-    consumedInstantAura = consumeNextCastInstantAura(ctx, p, ability.id);
-  }
-  const instantBaseCastTime =
-    consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
-  const castTime =
-    afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
-    destructionCastTimeMult(p, ability.id) *
-    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
   // A free cast is consumed where the cost is actually billed: here for channels
   // and instants (this tick resolves them via the local `res`), but for cast-time
   // spells the bill lands in applyAbility at completion, which RE-RESOLVES the
@@ -2418,6 +2425,9 @@ function applyChannelTick(
         const crit = ctx.rng.chance(consumeNextAttackCrit(ctx, src) ? 1 : ctx.spellCrit(src));
         let dmg = ctx.rng.range(eff.min, eff.max) + channelSp + surgeBonus;
         dmg *= spellDamageMultFromAuras(src);
+        if (res.def.id === 'arcane_missiles' && perfectMomentActive(src)) {
+          dmg *= PERFECT_MOMENT_DARTS_DAMAGE_MULT;
+        }
         // A channeled spell tick (Arcane Missiles) is a spell crit, so it takes the
         // spell crit-damage channel of the mastery (plus the generic bonus) like
         // every other spell crit.

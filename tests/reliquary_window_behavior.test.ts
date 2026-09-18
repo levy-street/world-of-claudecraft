@@ -305,6 +305,8 @@ function makeWindow(state: WorldState, opts: { open?: boolean; nav?: ReliquaryNa
           },
         },
         deedsEarned: state.deedsEarned,
+        accountDeeds: new Map(),
+        reliquaryAccountFinds: new Map(),
         reliquaryPageClearCount: (pageId: string) => state.clears.get(pageId),
         reliquaryCatalogCompletion: () => state.catalog,
         reliquaryCuratorRank: () => state.curatorRank,

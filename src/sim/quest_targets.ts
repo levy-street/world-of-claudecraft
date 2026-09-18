@@ -13,11 +13,8 @@ import { FARM_PATCHES } from './content/farm_patches';
 import { CAMPS, ESCORTS, GATHER_NODES, GROUND_OBJECTS, MOBS, NPCS, QUESTS } from './data';
 import { nodeMaterialFor } from './professions/gathering';
 import { fineGradeReachable, fineMaterialFor } from './professions/material_grades';
-import {
-  npcQuestMarkerKind,
-  type QuestMarkerKind,
-  questMarkerRank,
-} from './quests/quest_marker_kind';
+import { ambientNpcQuestMarkerKind } from './quests/ambient_quest_marker';
+import { type QuestMarkerKind, questMarkerRank } from './quests/quest_marker_kind';
 import {
   type GatherNodeType,
   type QuestObjective,
@@ -501,7 +498,7 @@ export function questGiverNpcMarkers(
     for (const questId of npc.questIds) {
       const quest = QUESTS[questId];
       if (!quest) continue;
-      const kind = npcQuestMarkerKind(
+      const kind = ambientNpcQuestMarkerKind(
         quest,
         npc.id,
         questState(questId),

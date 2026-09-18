@@ -150,6 +150,10 @@ function inRiftFloorRegion(pos: { x: number; z: number }, origin: { x: number; z
 
 /** The rift instance whose region contains `pos`, or null. */
 export function riftInstanceAtPos(ctx: SimContext, pos: Vec3): RiftInstance | null {
+  // Every floor region sits inside the rift x band (RIFT_REGION_HALF_X is
+  // aligned to its west edge), so a position outside the band is in no rift
+  // and the per-frame readers (riftFloor, riftBossDeathZones) skip the slots.
+  if (!isRiftPos(pos.x)) return null;
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
     if (inRiftFloorRegion(pos, riftInstanceOrigin(inst.slot, inst.floorIndex))) return inst;

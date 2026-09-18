@@ -32,6 +32,7 @@
 import {
   isDebuffDisplayAura as classifyDebuffDisplayAura,
   DEBUFF_AURA_KINDS,
+  isToggleAura as isToggleAuraShared,
 } from '../sim/aura_classify';
 import { isCancelableAura } from '../sim/combat/aura_cancel';
 import { isColdsightInternalMarkerAuraId } from '../sim/combat/hunter_coldsight_read';
@@ -48,36 +49,15 @@ export { DEBUFF_AURA_KINDS };
 // Wolf) read as MODES, not timed effects: WoW shows no countdown under them, so
 // neither do we, even though the sim backs each with a long finite duration
 // (3600s). Every other aura shows a compact WoW-style remaining label (20s /
-// 5m / 1h / 2d) via compactAuraDuration below.
-const TOGGLE_KINDS: ReadonlySet<AuraKind> = new Set([
-  'stealth',
-  'form_bear',
-  'form_cat',
-  'form_moonkin',
-  'form_shadow',
-  'form_travel',
-  'form_fireball',
-  'battle_stance',
-  'berserker_stance',
-  'defensive_stance',
-]);
+// 5m / 1h / 2d) via compactAuraDuration below. The MEMBERSHIP itself lives in
+// the host-agnostic sim leaf (src/sim/aura_classify.ts) so every surface that
+// asks the question reads one rule.
 /** Thornhollow Fields' carried-flag buff (src/sim/social/battleground.ts
  *  `CARRIED_FLAG_AURA_ID`, named here as a literal the same way icons.ts names
  *  the rune ids). Exported because the buff bar's cancel affordance has to
  *  recognize it: cancelling THIS buff is a gameplay action (it drops the flag),
  *  not a cosmetic un-buff. */
 export const CARRIED_FLAG_AURA_ID = 'bg_carried_flag';
-// Ghost Wolf toggles too, but its aura rides the generic buff_speed kind (which
-// Sprint also uses, 15s and very much worth a countdown), so it hides by id.
-// The carried-flag buff is a MODE for the same reason: you have the flag until
-// you do not, and the sim only backs it with a longer-than-any-match duration so
-// nothing can expire it out from under the carry. A countdown under either would
-// be a lie the player reads as "this is about to leave me".
-const TOGGLE_IDS: ReadonlySet<string> = new Set([
-  'ghost_wolf',
-  'beacon_of_light',
-  CARRIED_FLAG_AURA_ID,
-]);
 // Auras the low graphics tier's buff cap may NEVER shed (auras_painter.ts).
 // The cap's fairness rule is "spend the budget on buffs, a debuff always
 // renders", which rests on buffs being cosmetic. That is false for an aura whose
@@ -87,11 +67,6 @@ const TOGGLE_IDS: ReadonlySet<string> = new Set([
 // the one player who needs it. Hiding it is hiding an action, which the
 // gameplay-neutral-graphics invariant forbids (docs/design/graphics-settings-fairness.md).
 const NEVER_SHED_IDS: ReadonlySet<string> = new Set([CARRIED_FLAG_AURA_ID]);
-// The inverse override: an aura that rides a TOGGLE_KIND but is a genuine timed
-// buff worth a countdown. Greater Invisibility reuses the rogue-stealth machinery
-// for its vanish (kind 'stealth' with full move speed), but it is a fixed 20s
-// buff, not a toggle, so it must show its remaining time like any other buff.
-const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
 
 /**
  * Whether an aura reads as a MODE rather than a timed effect (a stance, a druid
@@ -102,14 +77,15 @@ const TIMED_IDS: ReadonlySet<string> = new Set(['greater_invisibility']);
  * (src/ui/hud/aura_tracks/) became a third caller. They hold the id and kind but
  * NOT a whole `AuraInput`, and building one per aura per frame would allocate on
  * the per-frame path; a second copy of the rule would drift from this one, which
- * is the outcome the shared classifier exists to prevent. So the rule lives here
- * and the object form delegates.
+ * is the outcome the shared classifier exists to prevent.
+ *
+ * The membership moved down to the sim leaf when the Auras watchlist became a
+ * caller from OUTSIDE the view (src/ui/aura_watchlist_core.ts, which must not
+ * offer a mode as a watchable proc). This stays the UI-side name every HUD
+ * surface already imports, so hud.ts and the aura tracks are unaffected.
  */
 export function isToggleAuraKind(id: string, kind: AuraKind): boolean {
-  return (
-    (TOGGLE_KINDS.has(kind) || TOGGLE_IDS.has(id) || isPersistentEngineAura(id)) &&
-    !TIMED_IDS.has(id)
-  );
+  return isToggleAuraShared(kind, id);
 }
 
 /** The `AuraInput` form, for the two callers inside this module that hold one:

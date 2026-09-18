@@ -6,6 +6,7 @@
 // tooFar check, same as the static sources, so this returns every live match
 // unfiltered.
 
+import { isRiftPos } from '../sim/data';
 import type { Entity } from '../sim/types';
 import type { AmbientPointSource } from './audio_sink';
 
@@ -58,4 +59,49 @@ export function riftAmbientSources(entities: ReadonlyMap<number, Entity>): Ambie
   const sources: AmbientPointSource[] = [];
   collectRiftAmbientSources(entities, sources);
   return sources;
+}
+
+/**
+ * The per-frame caller's view of the live set. Inside the rift band the walk
+ * runs every frame (rollers roll, gliders glide). Outside it the only sources
+ * are the overworld rift portals, which stand still and only come and go with
+ * the roster, so the portal ids are re-walked when `rosterVersion` changes and
+ * the frame otherwise reads the few cached entities. Output is the walk's own.
+ */
+export class RiftAmbienceSources {
+  private rosterVersion = -1;
+  private readonly portalIds: number[] = [];
+
+  /** `playerX` is the viewer's own x: the chase camera can trail past the
+   *  band's west edge from a rift room's west wall, the player cannot. */
+  collect(
+    world: { entities: ReadonlyMap<number, Entity>; entityRosterVersion: number },
+    playerX: number,
+    out: AmbientPointSource[],
+  ): void {
+    const { entities, entityRosterVersion: rosterVersion } = world;
+    if (isRiftPos(playerX)) {
+      this.rosterVersion = -1;
+      collectRiftAmbientSources(entities, out);
+      return;
+    }
+    if (this.rosterVersion !== rosterVersion) {
+      this.rosterVersion = rosterVersion;
+      this.portalIds.length = 0;
+      for (const e of entities.values())
+        if (e.templateId === 'rift_portal') this.portalIds.push(e.id);
+    }
+    out.length = 0;
+    for (const id of this.portalIds) {
+      const e = entities.get(id);
+      if (!e) continue;
+      out.push({
+        id: `rift_portal:${e.id}`,
+        kind: 'rift_portal',
+        x: e.pos.x,
+        y: e.pos.y,
+        z: e.pos.z,
+      });
+    }
+  }
 }

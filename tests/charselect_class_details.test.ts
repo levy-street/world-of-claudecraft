@@ -86,6 +86,14 @@ describe('specialization card metadata', () => {
             ability.specs === undefined || ability.specs.includes(spec.id),
             `ability "${abilityId}" is not offered by ${cls}:${spec.id}`,
           ).toBe(true);
+          // Mirrors the other half of abilitiesKnownAt's spec gate (classes.ts):
+          // an ability whose excludeSpecs lists this committed spec is dropped
+          // from the kit, so it cannot showcase the spec either, however it
+          // looked before the exclusion was added.
+          expect(
+            ability.excludeSpecs === undefined || !ability.excludeSpecs.includes(spec.id),
+            `ability "${abilityId}" is excluded from ${cls}:${spec.id} (excludeSpecs)`,
+          ).toBe(true);
         }
       }
     }

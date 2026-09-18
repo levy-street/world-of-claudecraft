@@ -192,16 +192,18 @@ describe('the mail revision signal (mailRevFor)', () => {
     expect(bookOf(sim).find((m) => m.subject === 'Coin')?.returned).toBe(true);
     expect(rawRev(sim)).toBeGreaterThan(rev);
 
-    // Third sweep arm: the RETURNED parcel, expired a second time, is the one
-    // sanctioned destruction (attachments aboard, return flight already run),
-    // and it must bump too.
+    // The RETURNED parcel has no sweep arm left: attachments aboard are never
+    // auto-deleted and the one return flight has run, so a forced expiry
+    // touches nothing and the signal holds (no phantom rebuild).
     const returned = bookOf(sim).find((m) => m.subject === 'Coin');
     if (!returned) throw new Error('missing returned parcel');
+    expect(returned.expiresAt).toBe(Infinity);
+    tickFor(sim, MAIL_DELIVERY_SECONDS + 2); // the flight home lands (its own bump)
     returned.expiresAt = sim.time;
     rev = rawRev(sim);
     tickFor(sim, 2);
-    expect(bookOf(sim).some((m) => m.subject === 'Coin')).toBe(false);
-    expect(rawRev(sim)).toBeGreaterThan(rev);
+    expect(bookOf(sim).some((m) => m.subject === 'Coin')).toBe(true);
+    expect(rawRev(sim)).toBe(rev);
   });
 
   it('a parcel-only take bumps through the items dimension alone (read first, no coin)', () => {

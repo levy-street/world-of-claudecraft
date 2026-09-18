@@ -377,7 +377,11 @@ describe('generated chunk geometry is stable', () => {
     // The branch's gap super-chunk pin (c4839177e825dbcf8dc5bcf501336fc2) is
     // gone with the gap chunks themselves: the island claims the old vale gap
     // cells, and gapFill.length above pins their absence.
-    expect(digestOf(inRect)).toBe('1d9b0a4a7e0d97c5a11c918b1a8f29c3');
+    // Eastbrook handoff: the five starter givers carry their existing calm
+    // pads into spaced town-square positions; the terrain generator is unchanged.
+    // Desktop/mobile captures and the rendered wolf-route collision checks
+    // were reviewed before refreshing this intentional layout fingerprint.
+    expect(digestOf(inRect)).toBe('6750fb67ee25f0addbea3cf2b350775d');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

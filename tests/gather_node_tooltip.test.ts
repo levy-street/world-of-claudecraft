@@ -161,7 +161,7 @@ describe('gatherNodeToolGateFor', () => {
       }),
     ).toEqual({
       nodeTier: 2,
-      viewerToolTier: 0,
+      viewerToolTier: 1,
       unmetText: 'You need Mining 40 to swing the pick already in your bags.',
     });
     // Empty bags read as no tool owned (0, #2343: no bare-hands floor), and

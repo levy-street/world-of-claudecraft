@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 import { meleeSwing } from '../src/sim/combat/auto_attack';
 import { coatTickValue, nextCoatStacks, poisonCoatFor } from '../src/sim/combat/poison_coating';
-import { ABILITIES, MOBS } from '../src/sim/data';
+import { ABILITIES, BUILTIN_WORLD, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
+import { duelFor } from '../src/sim/social/duel';
 import type { Entity } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
 
@@ -285,4 +286,57 @@ describe('one coat at a time', () => {
     for (let i = 0; i < 10; i++) swing(sim, rogue, mob);
     expect(dotOf(mob, 'deadly_poison', rogue.id)).toBeUndefined();
   });
+});
+
+describe('poison-coated duel aftermath', () => {
+  it.each(['deadly_poison', 'melting_acid', 'nightshade_coating'])(
+    '%s lands during the duel but cannot survive the winning swing',
+    (id) => {
+      const sim = new Sim({
+        seed: 42,
+        playerClass: 'rogue',
+        noPlayer: true,
+        world: { ...BUILTIN_WORLD, camps: [], npcs: {}, groundObjects: [] },
+      });
+      const winnerId = sim.addPlayer('rogue', 'Winner', { autoEquip: true });
+      const loserId = sim.addPlayer('mage', 'Loser', { autoEquip: true });
+      sim.setPlayerLevel(20, winnerId);
+      sim.setPlayerLevel(20, loserId);
+      const winner = sim.entities.get(winnerId);
+      const loser = sim.entities.get(loserId);
+      assert(winner && loser);
+      teleport(sim, winner, 0, -40);
+      teleport(sim, loser, 2, -40);
+      sim.castAbility(id, winnerId);
+      for (let i = 0; i < 5; i++) sim.tick();
+      expect(winner.auras.some((a) => a.id === id && a.kind === 'imbue')).toBe(true);
+      sim.duelRequest(loserId, winnerId);
+      sim.duelAccept(loserId);
+      for (let i = 0; i < 120 && duelFor(sim.ctx, winnerId)?.state !== 'active'; i++) sim.tick();
+      expect(duelFor(sim.ctx, winnerId)?.state).toBe('active');
+      winner.facing = Math.PI / 2;
+      sim.targetEntity(loserId, winnerId);
+
+      // The first real hit proves the rider still works mid-duel and establishes
+      // combat, so passive out-of-combat regeneration cannot mask a leftover DoT.
+      for (let i = 0; i < 100 && !loser.auras.some((a) => a.id === id); i++) {
+        swing(sim, winner, loser);
+      }
+      expect(duelFor(sim.ctx, winnerId)?.state).toBe('active');
+      expect(loser.auras.some((a) => a.id === id && a.sourceId === winnerId)).toBe(true);
+      loser.hp = 1;
+      sim.drainEvents();
+      for (let i = 0; i < 100 && duelFor(sim.ctx, winnerId); i++) swing(sim, winner, loser);
+
+      expect(duelFor(sim.ctx, winnerId)).toBeNull();
+      expect(loser.hp).toBe(1);
+      expect(loser.dead).toBe(false);
+      expect(loser.auras.filter((a) => a.sourceId === winnerId)).toHaveLength(0);
+      expect(
+        sim.drainEvents().filter((e) => e.type === 'aura' && e.targetId === loserId && e.gained),
+      ).toHaveLength(0);
+      for (let i = 0; i < 80; i++) sim.tick();
+      expect(loser.dead).toBe(false);
+    },
+  );
 });

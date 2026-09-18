@@ -22,7 +22,7 @@
 // Pure and host-agnostic (no ctx, no rng): the sim, the client tooltip, and
 // the tests all read the same numbers from here.
 import type { RiftGemId } from '../content/rift/items';
-import { normalizePrimaryStats, type PrimaryStat, primaryStatBudget } from '../item_budget';
+import { normalizeToStaminaModel, type PrimaryStat, primaryStatBudget } from '../item_budget';
 import type { RiftTier } from '../types';
 
 /** The ladder ceiling: one under the raid ring line, so the raid stays best. */
@@ -86,7 +86,10 @@ export function riftBandPrimaryStats(
   itemLevel: number,
 ): Partial<Record<PrimaryStat, number>> {
   const [primaryShare, secondaryShare] = RIFT_BAND_STAT_RATIO;
-  return normalizePrimaryStats(
+  // Model-aware: a physical shell (str/sta, agi/sta) keeps its 3:2 split with the
+  // stamina inside the ring budget; the caster shell (int/spi) carries its free
+  // stamina baseline on top of the split (item_budget.ts, the stamina baseline model).
+  return normalizeToStaminaModel(
     { [shell.primary]: primaryShare, [shell.secondary]: secondaryShare },
     riftBandStatBudget(itemLevel),
   );

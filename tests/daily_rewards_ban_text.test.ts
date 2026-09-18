@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dailyRewardReasonText } from '../src/ui/daily_rewards_window';
+import { dailyRewardReasonText } from '../src/ui/daily_rewards_reason_view';
 
 describe('Daily Rewards ban messaging', () => {
   it('shows remaining time, exact expiry, and reason for a timed ban', () => {
@@ -26,17 +26,20 @@ describe('Daily Rewards ban messaging', () => {
 
   it('keeps the permanent-ban message when no expiry is present', () => {
     expect(
-      dailyRewardReasonText({
-        eligible: false,
-        reason: 'banned',
-        walletPubkey: null,
-        wocBalance: null,
-        wocUsdPrice: null,
-        usdValue: null,
-        minUsd: 20,
-        banReason: 'Repeated abuse',
-        banExpiresAt: null,
-      }),
+      dailyRewardReasonText(
+        {
+          eligible: false,
+          reason: 'banned',
+          walletPubkey: null,
+          wocBalance: null,
+          wocUsdPrice: null,
+          usdValue: null,
+          minUsd: 20,
+          banReason: 'Repeated abuse',
+          banExpiresAt: null,
+        },
+        0,
+      ),
     ).toBe('You are banned from Daily Rewards. Reason: Repeated abuse');
   });
 });

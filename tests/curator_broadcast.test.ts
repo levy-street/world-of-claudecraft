@@ -34,9 +34,9 @@ import { pool } from '../server/db';
 import { type ClientSession, GameServer } from '../server/game';
 import { RELIQUARY_PAGES } from '../src/sim/content/reliquary';
 import {
+  accountReliquaryOwnership,
   CURATOR_RANK_THRESHOLDS,
   catalogCharacterCompletion,
-  characterReliquaryOwnership,
   curatorRankFromOwned,
 } from '../src/sim/reliquary';
 import type { PlayerClass } from '../src/sim/types';
@@ -521,7 +521,7 @@ describe('GameServer.refreshCuratorStanding (real ownership resolution)', () => 
     // independent page-table walk above, which is what catches a refresher
     // that swapped in a different helper agreeing with itself.
     const meta = server.sim.meta(session.pid)!;
-    expect(e.relicsTotal).toBe(catalogCharacterCompletion(characterReliquaryOwnership(meta)).total);
+    expect(e.relicsTotal).toBe(catalogCharacterCompletion(accountReliquaryOwnership(meta)).total);
     expect(e.relicsTotal).toBe(characterScopedTotalByWalk());
     expect(e.relicsTotal).toBeGreaterThan(1);
   });
@@ -550,7 +550,7 @@ describe('GameServer.refreshCuratorStanding (real ownership resolution)', () => 
     (server as any).refreshCuratorStanding(session);
     const e = server.sim.entities.get(session.pid)!;
     const meta = server.sim.meta(session.pid)!;
-    const expected = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    const expected = catalogCharacterCompletion(accountReliquaryOwnership(meta));
     expect(e.relicsOwned).toBe(expected.owned);
     expect(e.relicsTotal).toBe(expected.total);
     expect(e.curatorRank).toBe(curatorRankFromOwned(expected.owned));
@@ -611,7 +611,7 @@ describe('GameServer.refreshCuratorStanding (real ownership resolution)', () => 
     // relic scores too, so the true owned count is the ten finds PLUS whatever
     // that pass granted. What this asserts is that join stamped the character's
     // WHOLE live ownership, not that the catalog has a particular size.
-    const expected = catalogCharacterCompletion(characterReliquaryOwnership(meta));
+    const expected = catalogCharacterCompletion(accountReliquaryOwnership(meta));
     expect(expected.owned).toBeGreaterThanOrEqual(10);
     expect(e.relicsOwned).toBe(expected.owned);
     expect(e.relicsTotal).toBe(expected.total);
@@ -785,6 +785,7 @@ describe('GameServer.refreshCuratorStanding (real ownership resolution)', () => 
 // vacuously over an empty corpus).
 const SERVER_ROOT = fileURLToPath(new URL('../server', import.meta.url));
 const GAME_SRC = fileURLToPath(new URL('../server/game.ts', import.meta.url));
+const STANDING_SRC = fileURLToPath(new URL('../server/curator_standing.ts', import.meta.url));
 
 /** Strip block and line comments (keeping a `://` in a URL intact) before any
  *  bound below counts anything. Without it, prose describing a write this code
@@ -841,16 +842,24 @@ describe('Curator standing is server authority, never a client claim', () => {
     const writes = serverCode.match(CURATOR_WRITE) ?? [];
     expect(writes, 'only refreshCuratorStanding may write a Curator standing').toHaveLength(6);
 
+    // The stamp moved whole into server/curator_standing.ts (the monolith
+    // ratchet); game.ts's refresher only resolves the entity and meta and
+    // delegates, so it holds NO write of its own.
     const game = codeOnly(readFileSync(GAME_SRC, 'utf8'));
-    const start = game.indexOf('private refreshCuratorStanding(');
-    const end = game.indexOf('private async refreshAllHolderTiers(');
+    const refresherStart = game.indexOf('private refreshCuratorStanding(');
+    const refresherEnd = game.indexOf('private async refreshAllHolderTiers(');
+    expect(refresherStart).toBeGreaterThan(0);
+    expect(refresherEnd).toBeGreaterThan(refresherStart);
+    expect(game.slice(refresherStart, refresherEnd).match(CURATOR_WRITE) ?? []).toHaveLength(0);
+    const standing = codeOnly(readFileSync(STANDING_SRC, 'utf8'));
+    const start = standing.indexOf('export function stampCuratorStanding(');
+    const end = standing.length;
     expect(start).toBeGreaterThan(0);
-    expect(end).toBeGreaterThan(start);
     // Counting the writes INSIDE the refresher, rather than checking each
     // whole-tree match is a substring of it, is what makes containment
     // decisive: three identical `curatorRank =` strings anywhere else in the
     // tree satisfy a substring check while sitting outside the refresher.
-    expect(game.slice(start, end).match(CURATOR_WRITE) ?? []).toHaveLength(6);
+    expect(standing.slice(start, end).match(CURATOR_WRITE) ?? []).toHaveLength(6);
   });
 
   it('the terse wire keys are WRITE-ONLY on the server', () => {

@@ -473,7 +473,7 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'uncommon',
-    stats: { armor: 60, sta: 3, spi: 2 },
+    stats: { armor: 60, sta: 3, spi: 4 },
     sellValue: 1000,
   },
   lilybed_mantle: {
@@ -483,7 +483,7 @@ export const WILLOWFEN_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 76, sta: 6, spi: 4 },
+    stats: { armor: 76, sta: 6, spi: 7 },
     sellValue: 2400,
   },
 };
@@ -500,21 +500,27 @@ export const WILLOWFEN_OBJECTS: GroundObjectDef[] = [
     itemId: 'fenway_mooring_line',
     name: 'Cut Mooring Line',
     // The chewed-through lines lie along the moat shore where the skiffs
-    // slipped them, ringing the Bridgemere boardwalks.
+    // slipped them, ringing the Bridgemere boardwalks. The moat is a ring of
+    // lake pools (MOAT above) and a pickup spawns exactly where it is
+    // authored, so every spot here is on the BANK of a pool, never inside
+    // one: a line on a pool floor is under the water plane, unseen and
+    // unclickable (tests/ground_object_placement.test.ts, the swim-depth arm).
     positions: [
       { x: -348, z: 344 },
-      { x: -338, z: 340 },
+      { x: -318, z: 340 }, // east bank of the SE pool (-336,336)
       { x: -372, z: 336 },
-      { x: -384, z: 346 },
+      { x: -380, z: 350 }, // south bank of the west pool (-384,336)
     ],
   },
   {
     itemId: 'bridgemere_toll_chest',
     name: 'Sunken Toll-Chest',
     // Where the toll skiff went over: scattered along the east track toward
-    // the Drowsy Flats.
+    // the Drowsy Flats. "Sunken" is flavour, not placement: the first chest
+    // lies on the east bank of the moat's east pool (-324,361), not on its
+    // floor, or nothing shows above the water and the objective sticks at 2/3.
     positions: [
-      { x: -324, z: 360 },
+      { x: -310, z: 360 },
       { x: -320, z: 398 },
       { x: -326, z: 428 },
     ],

@@ -34,6 +34,7 @@ import { knownItemIconHtml } from '../src/ui/unknown_item_icon';
 // Under happy-dom import.meta.url is an http URL, so source is resolved from
 // Vitest's injected filesystem dirname (same reason char_window.test.ts does).
 const painter = readFileSync(join(__dirname, '../src/ui/inspect_window.ts'), 'utf8');
+const shellCss = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
 // Comment-stripped copy for the Curator scans below (the architecture-test rule):
 // prose that NAMES a pinned literal must neither satisfy a positive pin nor trip
 // a negative one. The doc comment beside the sigil <img> literally quotes alt=""
@@ -65,6 +66,12 @@ describe('inspect_window: WCAG 2.2 AA focus trap (new to the extraction)', () =>
 });
 
 describe('inspect_window: thin painter, deps-only Hud access', () => {
+  it('keeps a desktop scroll path after adopting the window primitive', () => {
+    const rootRule = shellCss.match(/#inspect-window\s*\{([^}]*)\}/)?.[1] ?? '';
+    // W12: ui-window hides overflow by default, while Inspect owns no inner desktop scroller.
+    expect(rootRule).toContain('overflow-y: auto');
+  });
+
   it('imports no Sim / Hud / render layer and no Three', () => {
     expect(painter).not.toMatch(/from\s+['"]\.\.\/render\//);
     expect(painter).not.toMatch(/from\s+['"]three['"]/);
@@ -125,7 +132,8 @@ describe('inspect_window: the Curator standing surfaces', () => {
   it('reuses the shared .inspect-holder badge family for the sigil (no bespoke row)', () => {
     const curator = code.slice(code.indexOf('private curatorHtml('));
     const body = curator.slice(0, curator.indexOf('private holderHtml('));
-    expect(body).toContain('<div class="inspect-holder">');
+    // W12: the shared badge-row hook now sits beside the shared card primitive.
+    expect(body).toContain('<div class="inspect-holder ui-card">');
     expect(body).toContain('inspect-holder-text');
     expect(body).toContain('inspect-holder-name');
     // The art + class + glow all come from the sigil module, never inline here.
@@ -153,8 +161,9 @@ describe('inspect_window: the Curator standing surfaces', () => {
     const body = curator.slice(0, curator.indexOf('private holderHtml('));
     expect(body).toContain('alt=""');
     expect(body).not.toContain('alt="${esc(t(\'hudChrome.reliquary.sigilCaption\'))}"');
+    // W12: the visible caption adopts the shared muted metadata primitives.
     expect(body).toContain(
-      '<div class="inspect-holder-sub">${esc(t(\'hudChrome.reliquary.sigilCaption\'))}</div>',
+      '<div class="inspect-holder-sub ui-meta ui-muted">${esc(t(\'hudChrome.reliquary.sigilCaption\'))}</div>',
     );
     // Rename-residue negative, decisive only as a PAIR: the caption-div
     // positive above is the control proving this slice sees the live row.
@@ -254,26 +263,20 @@ describe('inspect_window: the Curator standing surfaces', () => {
     ]) {
       expect(body, `the remote card must not paint ${token}`).not.toContain(token);
     }
-    expect(body).toContain('class="inspect-card inspect-card-remote"');
+    // W12: the remote profile preserves its hooks beside the shared card primitive.
+    expect(body).toContain('class="inspect-card inspect-card-remote ui-card"');
   });
 
-  it('the Reliquary line joins the .inspect-meta pill family, and CSS reaches it', () => {
-    // Class presence proves only that the painter wrote the hook. The line
-    // wears the family class itself (.inspect-meta), so the pill chrome
-    // reaches it by construction, and that base rule is the reach pin. The
-    // modifier is a semantic hook by DESIGN, not an override: an earlier
-    // revision shipped a .inspect-meta.inspect-reliquary rule that repeated
-    // the base color byte for byte (a dead declaration certified by this very
-    // test), so the negative bound below keeps a repainted override from
-    // coming back without the comment above it being rewritten on purpose.
+  it('the Reliquary line joins the shared inspect pill family', () => {
+    // The ui-chip class owns the shared look while .inspect-meta keeps geometry
+    // and .inspect-reliquary remains a rule-free semantic hook.
     const line = code.slice(code.indexOf('private curatorLineHtml('));
     const body = line.slice(0, line.indexOf('private curatorHtml('));
-    expect(body).toContain('class="inspect-meta inspect-reliquary"');
+    // W12: the semantic hooks retain geometry while shared primitives own the pill look.
+    expect(body).toContain('class="inspect-meta inspect-reliquary ui-chip ui-num"');
     const shell = readFileSync(join(__dirname, '../src/styles/shell.css'), 'utf8');
-    // Positive controls: the base family rule exists and carries the pill
-    // chrome the standing line inherits.
+    // Positive control: the legacy family still owns only its compact geometry.
     expect(shell).toMatch(/\n {2}\.inspect-meta \{[^}]*display: inline-block;/);
-    expect(shell).toMatch(/\n {2}\.inspect-meta \{[^}]*color: var\(--color-text-muted\);/);
     // The semantic hook stays rule-free (occurrence bound, not a bare
     // negative: the two positive matches above prove this scan sees the file).
     expect(shell.match(/\.inspect-meta\.inspect-reliquary\s*\{/g) ?? []).toHaveLength(0);
@@ -507,7 +510,8 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
     const standing = root.querySelector('.inspect-standing-row');
     const standingItems = [...(standing?.children ?? [])];
     expect(standingItems).toHaveLength(2);
-    expect(standingItems[0]?.className).toBe('inspect-meta');
+    // W12: the standing pill adopts the shared chip and numeric primitives.
+    expect(standingItems[0]?.className).toBe('inspect-meta ui-chip ui-num');
     expect(standingItems[0]?.textContent).toContain('60');
     expect(standingItems[1]?.classList.contains('inspect-reliquary')).toBe(true);
     expect(standingItems[1]?.textContent).toContain('300');

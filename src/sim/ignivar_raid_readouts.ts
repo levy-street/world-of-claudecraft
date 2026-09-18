@@ -3,9 +3,13 @@
 // entity.varkhul) into the presentation arrays render/ui consume through the
 // seam. Every collector is a pure read over the SimContext views (no rng, no
 // mutation, no tick-phase work); Sim keeps thin getters that delegate here so
-// the IWorld surface resolves unchanged.
+// the IWorld surface resolves unchanged. Every collector walks the instance
+// slots' own mob lists (instance_entities.ts), never the whole roster: the
+// renderer reads these once per frame, and an open-field world has thousands
+// of entities and no raid.
 import { type ActiveIgnivarMeteorWarning, activeIgnivarMeteorWarnings } from './ignivar_meteors';
 import { VARKHUL_BOSS_ID } from './ignivar_raid_ids';
+import { instanceEntities } from './instance_entities';
 import { activeIgnivarTrashMeteorWarning } from './mob/ignivar_trash_automata';
 import type { SimContext } from './sim_context';
 import { IGNIVAR_BOSS_ID } from './types';
@@ -46,7 +50,7 @@ export type { ActiveVarkhulForgestormWarning } from './varkhul_forgestorm';
 
 export function collectActiveIgnivarMeteors(ctx: SimContext): ActiveIgnivarMeteorWarning[] {
   const warnings: ActiveIgnivarMeteorWarning[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId === IGNIVAR_BOSS_ID && entity.ignivar) {
       warnings.push(...activeIgnivarMeteorWarnings(entity.id, entity.ignivar));
     }
@@ -60,7 +64,7 @@ export function collectActiveVarkhulForgestormWarnings(
   ctx: SimContext,
 ): ActiveVarkhulForgestormWarning[] {
   const warnings: ActiveVarkhulForgestormWarning[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== VARKHUL_BOSS_ID || !entity.varkhul) continue;
     warnings.push(...activeVarkhulForgestormWarnings(entity.id, entity.varkhul));
   }
@@ -71,7 +75,7 @@ export function collectActiveVarkhulAnvilMeteors(
   ctx: SimContext,
 ): ActiveVarkhulAnvilMeteorWarning[] {
   const warnings: ActiveVarkhulAnvilMeteorWarning[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
     for (const batch of entity.varkhul.anvilMeteorBatches ?? []) {
       warnings.push(...activeVarkhulAnvilMeteorWarnings(entity.id, batch));
@@ -82,7 +86,7 @@ export function collectActiveVarkhulAnvilMeteors(
 
 export function collectActiveVarkhulAssemblies(ctx: SimContext): ActiveVarkhulAssembly[] {
   const assemblies: ActiveVarkhulAssembly[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead) continue;
     const instance = ctx.instances.find((candidate) => candidate.mobIds.includes(entity.id));
     const origin = instance ? ctx.instanceOriginOf(instance) : null;
@@ -110,7 +114,7 @@ export function collectActiveVarkhulForgePortalTelegraphs(
   ctx: SimContext,
 ): VarkhulForgePortalTelegraph[] {
   const telegraphs: VarkhulForgePortalTelegraph[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
     const instance = ctx.instances.find((candidate) => candidate.mobIds.includes(entity.id));
     if (!instance) continue;
@@ -127,7 +131,7 @@ export function collectActiveVarkhulForgePortalTelegraphs(
 
 export function collectActiveVarkhulCinderFires(ctx: SimContext): ActiveVarkhulCinderFire[] {
   const fires: ActiveVarkhulCinderFire[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
     fires.push(...activeVarkhulCinderFires(entity.id, entity.varkhul));
   }
@@ -138,7 +142,7 @@ export function collectActiveVarkhulCinderOrbProjectiles(
   ctx: SimContext,
 ): ActiveVarkhulCinderOrbProjectile[] {
   const projectiles: ActiveVarkhulCinderOrbProjectile[] = [];
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== VARKHUL_BOSS_ID || entity.dead || !entity.varkhul) continue;
     projectiles.push(...activeVarkhulCinderOrbProjectiles(entity.id, entity.varkhul));
   }

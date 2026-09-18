@@ -313,7 +313,7 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     // next. It is never put in combat, so healing it costs the healer no regen.
     if (dummyTemplate.friendlyPracticeTarget) {
       mob.inCombat = false;
-      mob.hp = playerDummyShedHp(mob.hp, mob.maxHp, DT);
+      mob.hp = playerDummyShedHp(mob.hp, mob.maxHp, DT, dummyTemplate.restHpFraction);
       mob.aiState = 'idle';
       mob.aggroTargetId = null;
       mob.forcedTargetId = null;

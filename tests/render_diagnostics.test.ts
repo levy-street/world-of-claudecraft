@@ -4,6 +4,7 @@ import {
   RenderDiagnostics,
   type RenderDiagnosticsHost,
 } from '../src/render/render_diagnostics';
+import { collectRenderDiagnostics } from '../src/render/renderer_diagnostics';
 
 interface FakeObject {
   visible: boolean;
@@ -110,6 +111,50 @@ describe('render diagnostics census', () => {
     expect(snapshot.categories.props.materials).toBe(2);
     expect(snapshot.newMaterials.some((label) => label.startsWith('village:Wood'))).toBe(true);
     expect(snapshot.newMaterials.some((label) => label.startsWith('never-drawn'))).toBe(false);
+  });
+
+  it('counts a count-0 InstancedMesh as no draw and no object, like the render list', () => {
+    // The gather-node reach hide and the props far bake hide through
+    // `count = 0`, which the vendored three skips before any program binds;
+    // the census must agree with renderer.info.render.calls rather than
+    // report one draw with zero triangles. A live batch of the same shape
+    // is the positive control.
+    const scene = makeObject();
+    const props = makeObject({ userData: { renderCategory: 'props' } });
+    const hidden = makeMesh('gather:ore', 20);
+    hidden.isMesh = false;
+    hidden.isInstancedMesh = true;
+    hidden.count = 0;
+    const live = makeMesh('gather:wood', 20);
+    live.isMesh = false;
+    live.isInstancedMesh = true;
+    live.count = 3;
+    props.children.push(hidden, live);
+    scene.children.push(props);
+    const { diagnostics } = makeHarness(scene);
+    const snapshot = diagnostics.collect();
+    expect(snapshot.totalObjects).toBe(1);
+    expect(snapshot.estimatedDraws).toBe(1);
+    expect(snapshot.estimatedTriangles).toBe(60);
+    expect(snapshot.categories.props.objects).toBe(1);
+    expect(snapshot.newMaterials.some((label) => label.startsWith('gather:ore'))).toBe(false);
+    expect(snapshot.newMaterials.some((label) => label.startsWith('gather:wood'))).toBe(true);
+    // The renderer-side twin applies the same skip.
+    const twin = collectRenderDiagnostics(
+      scene as unknown as Parameters<typeof collectRenderDiagnostics>[0],
+      { programs: [], memory: { textures: 0 } } as unknown as Parameters<
+        typeof collectRenderDiagnostics
+      >[1],
+      {
+        lastPrograms: 0,
+        lastTextures: 0,
+        knownMaterials: new Set(),
+        knownVisibleObjects: new Set(),
+      },
+    );
+    expect(twin.snapshot.totalObjects).toBe(1);
+    expect(twin.snapshot.estimatedDraws).toBe(1);
+    expect(twin.snapshot.estimatedTriangles).toBe(60);
   });
 
   it('reports program and texture deltas across collects', () => {

@@ -4,6 +4,8 @@
 // here is the whole of the live state it still needs, which is what makes the
 // lockout arms and the fall-through chain assertable in isolation.
 import { afterEach, describe, expect, it } from 'vitest';
+import { Sim } from '../src/sim/sim';
+import type { SimEvent } from '../src/sim/types';
 import { type ErrorTextLockoutDeps, localizeErrorText } from '../src/ui/error_text_i18n_core';
 import { ensureLocaleLoaded, formatDuration, setLanguage, t } from '../src/ui/i18n';
 import type { RaidLockout } from '../src/ui/raid_lockout';
@@ -122,4 +124,46 @@ describe('localizeErrorText', () => {
     expect(localizeSimText(unmatched)).toBeNull();
     expect(localizeErrorText(unmatched, deps())).toBe(unmatched);
   });
+});
+
+// The form gate's English is a template the S3 emit scan cannot read
+// (src/sim/combat/casting_lifecycle.ts builds it from ability.requiresForm), so
+// nothing else ever fed the sim's literal to the matcher and the two drifted
+// (the sim said Cat while the regex still matched Wolf). The refusal here comes
+// off a REAL cast, and a non-Latin locale is the discriminator: raw English
+// coming back means the arm fell through.
+describe('localizeErrorText: the form gate off a real cast', () => {
+  afterEach(() => setLanguage('en'));
+
+  function formRefusal(abilityId: string): string {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('druid', 'Fern');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const e = sim.entities.get(pid)!;
+    e.resource = e.maxResource;
+    sim.castAbility(abilityId, pid);
+    const errors = sim
+      .tick()
+      .filter((ev): ev is Extract<SimEvent, { type: 'error' }> => ev.type === 'error')
+      .map((ev) => ev.text);
+    expect(errors).toHaveLength(1);
+    return errors[0];
+  }
+
+  it.each([
+    ['prowl', 'You must be in Cat Form.', 'hud.errors.cat'],
+    ['enrage', 'You must be in Bruin Form.', 'hud.errors.bear'],
+  ] as const)(
+    'localizes the %s refusal through the requiresForm key under zh_CN',
+    async (abilityId, literal, formKey) => {
+      const input = formRefusal(abilityId);
+      expect(input).toBe(literal);
+      await ensureLocaleLoaded('zh_CN');
+      setLanguage('zh_CN');
+      const out = localizeErrorText(input, deps());
+      expect(out).not.toBe(input);
+      expect(out).toBe(t('hud.errors.requiresForm', { form: t(formKey) }));
+    },
+  );
 });

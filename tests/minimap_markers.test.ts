@@ -12,6 +12,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import { DELVE_X_MIN, GATHER_NODES, ITEMS, QUESTS, STATIONS, YUMI_MAZE_X } from '../src/sim/data';
+import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { isQuestTurnInNpc } from '../src/sim/types';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
@@ -30,7 +31,7 @@ import { assertAllocationStable } from './util/alloc_probe';
 // A real quest whose giver is also a turn-in npc, so a single npc can carry both the
 // 'available' ('!') and 'ready' ('?') glyph branches against real content.
 function requireQuestWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+  const quest = Object.values(QUESTS).find((q) => q.giverNpcId && !isProfessionQuest(q));
   if (!quest) throw new Error('expected a quest with a giverNpcId');
   return quest;
 }
@@ -707,15 +708,8 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
     expect(npcs[0].marker).toBe('ready');
   });
 
-  it('stamps the repeat and cooldown variants identically for both world shapes', () => {
-    // The phase 23 blue "!" at the minimap surface, from a real cadenced work
-    // order re-pointed onto the seeded npc: after one completion the offer
-    // stamps 'repeat'; inside the window (the cadenceBlockedQuests mirror)
-    // it stamps 'cooldown' where the npc previously showed the neutral dot.
-    // Driven through BOTH stub shapes (acceptance (a)'s both-worlds arm).
-    // This pins the CLASSIFIER over each world's data shape; true
-    // world-to-world parity of the inputs themselves rests on the online
-    // cadence/attunement suites pinning the qdone and cprof mirrors.
+  it('hides profession repeat and cooldown offers for both world shapes', () => {
+    // Both offline and online-shaped inputs keep ambient profession offers quiet.
     const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
     if (!workOrder) throw new Error('expected a cadenced work order');
     for (const shape of ['sim', 'client'] as const) {
@@ -734,16 +728,16 @@ describe('createMinimapMarkers: the discriminated union per draw kind', () => {
       const offered = buildMarkers(world as unknown as IWorld).filter(
         (m) => m.kind === 'npc',
       ) as Extract<MinimapMarker, { kind: 'npc' }>[];
-      expect(offered[0].glyph, `${shape}: offered again`).toBe('!');
-      expect(offered[0].marker, `${shape}: offered again`).toBe('repeat');
+      expect(offered[0].glyph, `${shape}: offered again`).toBe('•');
+      expect(offered[0].marker, `${shape}: offered again`).toBe('none');
 
       world.questState = () => 'unavailable';
       world.craftingIdentity.cadenceBlockedQuests = [workOrder.id];
       const blocked = buildMarkers(world as unknown as IWorld).filter(
         (m) => m.kind === 'npc',
       ) as Extract<MinimapMarker, { kind: 'npc' }>[];
-      expect(blocked[0].glyph, `${shape}: inside the window`).toBe('!');
-      expect(blocked[0].marker, `${shape}: inside the window`).toBe('cooldown');
+      expect(blocked[0].glyph, `${shape}: inside the window`).toBe('•');
+      expect(blocked[0].marker, `${shape}: inside the window`).toBe('none');
 
       // The negative arm: the same unavailable state WITHOUT the mirror set
       // keeps the pre-phase neutral dot (an older server payload degrades to
@@ -1239,13 +1233,13 @@ describe('gather-node markers: the locked dimension', () => {
     // (centre): the pick unlocks the ores alone; the wood stand and the herb
     // patch both stay locked without their own implements.
     expect(tooled.map((m) => m.locked)).toEqual([false, false, true, true, false]);
-    // The R22 arm: the SAME pick with the counter short is unusable, so
-    // every ore row stays locked on the map exactly as the sim's wield
-    // denial would refuse the harvest (owned is not earned).
+    // The R22 degrade arm: the SAME pick with the counter short works as its
+    // best wieldable lower tier, so the tier-1 ores open and the tier-2
+    // centre vein still locks (owned is not fully earned).
     const unearned = gatherMarkers(
       makeGatherWorld('sim', { inventory: [{ itemId: 'iron_mining_pick', count: 1 }] }),
     );
-    expect(unearned.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    expect(unearned.map((m) => m.locked)).toEqual([false, false, true, true, true]);
     // Locked composes WITH the respawn dimension, never replaces it: a
     // cooling locked vein keeps ready=false (the silhouette the painter keeps
     // readable under the locked tint).
@@ -1291,16 +1285,15 @@ describe('gather-node markers: the locked dimension', () => {
     // assertion either: each shape's locked vector is pinned literally, so a
     // pair that agreed on a WRONG vector still reds.
     const PICK = [{ itemId: 'iron_mining_pick', count: 1 }];
-    // Covering but unwieldable (R22): mining 0 puts nothing to work, so every
-    // node in the rim stays locked, the tier-1 ores included, even though the
-    // bags hold a pick that covers them.
+    // Covering but not fully wieldable (R22): mining 0 degrades the pick to
+    // tier 1, so tier-1 ore opens while the tier-2 centre vein stays locked.
     const unearnedSim = gatherMarkers(
       makeGatherWorld('sim', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
     );
     const unearnedClient = gatherMarkers(
       makeGatherWorld('client', { inventory: PICK, gatheringProficiency: { mining: 0 } }),
     );
-    expect(unearnedSim.map((m) => m.locked)).toEqual([true, true, true, true, true]);
+    expect(unearnedSim.map((m) => m.locked)).toEqual([false, false, true, true, true]);
     expect(unearnedClient).toEqual(unearnedSim);
     // The same pick at the pick's own requirement flips the ore rows open
     // (rim order: ore t1, ore t1, wood t1, herb t1, ore t2 at the centre);

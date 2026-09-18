@@ -340,7 +340,7 @@ export function tryPlayerSwing(ctx: SimContext, p: Entity, meta: PlayerMeta): vo
     }
     maybeProcBattleTrance(ctx, p, meta, connected);
     maybeProcSuddenDeath(ctx, p, meta, connected);
-    // Wolf Form swings at the fixed fast cat cadence, not the carried weapon's
+    // Cat Form swings at the fixed fast cat cadence, not the carried weapon's
     // speed (see combat/form_swing.ts); everyone else uses their weapon speed.
     // Melee haste (item sets + Enrage + haste buffs) lives in the ONE additive
     // bucket inside swingIntervalMult (v0.27.1); only the stance-mastery auto
@@ -601,7 +601,7 @@ export function meleeSwing(
     opts.normalizedInstant && opts.autoAttackHand === undefined
       ? normalizedInstantSpeed(weapon)
       : undefined;
-  // The cat mainhand auto is the one REAL auto attack that normalizes: Wolf
+  // The cat mainhand auto is the one REAL auto attack that normalizes: Cat
   // Form swings its claws at the fixed cat cadence, so the carried weapon's
   // roll is rescaled to that cadence (catAutoWeaponRollMult, the same shape as
   // the instant rescale above) and white DPS equals the weapon's authored dps
@@ -620,7 +620,7 @@ export function meleeSwing(
   let dmg =
     (ctx.rng.range(weapon.min, weapon.max) * weaponRollMult +
       // Normalize the attack-power contribution to the SAME cadence the swing
-      // fires at: Wolf Form swings at the fixed cat speed (baseSwingSpeed), so
+      // fires at: Cat Form swings at the fixed cat speed (baseSwingSpeed), so
       // its AP-per-swing must use that speed too, not the slow staff's, or
       // feral would double-dip (fast swings AND heavy slow-weapon AP weighting).
       (ctx.effectiveAttackPower(attacker) / 14) * apSwingSpeed) *

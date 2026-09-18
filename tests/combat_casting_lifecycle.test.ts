@@ -610,6 +610,144 @@ describe('casting_lifecycle: interrupt (cancelCast)', () => {
   });
 });
 
+// A press already moving used to start the cast anyway, arming the GCD, only for
+// player_motion's own move-to-cancel check to kill it on the very next tick (the same
+// held movement keys never went away): a full GCD spent for a cast that never had a
+// chance to complete. These pin the fix: the press is denied outright while movement
+// input is held, before the GCD or any cost/proc is touched.
+describe('casting_lifecycle: a movement-sensitive press denies outright while already moving', () => {
+  it('denies a normal timed cast press and never arms the GCD', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    meta.moveInput.forward = true;
+    sim.drainEvents();
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBeNull();
+    expect(p.gcdRemaining).toBe(0);
+    const events = sim.drainEvents();
+    expect(
+      events.some(
+        (e: any) =>
+          e.type === 'error' && e.pid === p.id && e.text === "You can't cast while moving.",
+      ),
+    ).toBe(true);
+  });
+
+  it('denies a channel press and never arms the GCD', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    expect(sim.setSpec('arcane')).toBe(true);
+    spawnTarget(sim, p);
+    meta.moveInput.strafeLeft = true;
+    castAbility(sim.ctx, 'arcane_missiles', p.id);
+    expect(p.castingAbility).toBeNull();
+    expect(p.channeling).toBe(false);
+    expect(p.gcdRemaining).toBe(0);
+  });
+
+  it('starts the cast normally once movement input is released', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    meta.moveInput.forward = true;
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBeNull(); // denied while moving
+    meta.moveInput.forward = false;
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.gcdRemaining).toBeGreaterThan(0);
+  });
+
+  it('starts a normal timed cast while rooted even if movement input is held', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    p.auras.push({
+      id: 'test_root',
+      name: 'Test Root',
+      kind: 'root',
+      remaining: 3,
+      duration: 3,
+      value: 0,
+      sourceId: p.id,
+      school: 'nature',
+    });
+    meta.moveInput.forward = true;
+    sim.drainEvents();
+
+    castAbility(sim.ctx, 'fireball', p.id);
+
+    expect(p.castingAbility).toBe('fireball');
+    expect(p.gcdRemaining).toBeGreaterThan(0);
+    expect(
+      sim
+        .drainEvents()
+        .some(
+          (e: any) =>
+            e.type === 'error' && e.pid === p.id && e.text === "You can't cast while moving.",
+        ),
+    ).toBe(false);
+  });
+
+  it('still starts a def-level castWhileMoving ability while moving (mobility is unaffected)', () => {
+    ABILITIES.fireball.castWhileMoving = true;
+    try {
+      const { sim, p, meta } = makeSim('mage', 12);
+      spawnTarget(sim, p);
+      meta.moveInput.forward = true;
+      castAbility(sim.ctx, 'fireball', p.id);
+      expect(p.castingAbility).toBe('fireball');
+      expect(p.gcdRemaining).toBeGreaterThan(0);
+    } finally {
+      delete ABILITIES.fireball.castWhileMoving;
+    }
+  });
+
+  it('a press while stationary that only starts moving mid-cast still costs the GCD (unchanged)', () => {
+    const { sim, p, meta } = makeSim('mage', 12);
+    spawnTarget(sim, p);
+    castAbility(sim.ctx, 'fireball', p.id);
+    expect(p.castingAbility).toBe('fireball');
+    const gcdAtCastStart = p.gcdRemaining;
+    expect(gcdAtCastStart).toBeGreaterThan(0);
+    meta.moveInput.forward = true;
+    sim.tick();
+    expect(p.castingAbility).toBeNull(); // interrupted by movement
+    expect(p.gcdRemaining).toBeGreaterThan(0); // still costs the GCD it already armed
+  });
+
+  it('denies before standing, drawing, breaking travel form, or clearing a mount channel', () => {
+    const { sim, p, meta } = makeSim('shaman', 12);
+    spawnTarget(sim, p);
+    p.sitting = true;
+    p.weaponStowed = true;
+    p.mountKey = 'valorsteed';
+    p.mountCastRemaining = 0.75;
+    p.mountCastKey = 'valorsteed';
+    p.auras.push({
+      id: 'ghost_wolf',
+      name: 'Shadewolf',
+      kind: 'buff_speed',
+      remaining: 60,
+      duration: 60,
+      value: 1.4,
+      sourceId: p.id,
+      school: 'nature',
+    });
+    meta.moveInput.forward = true;
+
+    castAbility(sim.ctx, 'lightning_bolt', p.id);
+
+    expect(p.castingAbility).toBeNull();
+    expect(p.gcdRemaining).toBe(0);
+    expect(p.sitting).toBe(true);
+    expect(p.weaponStowed).toBe(true);
+    expect(p.auras.some((a: Aura) => a.id === 'ghost_wolf')).toBe(true);
+    expect(p.mountKey).toBe('valorsteed');
+    expect(p.mountCastRemaining).toBe(0.75);
+    expect(p.mountCastKey).toBe('valorsteed');
+    expect(p.castTargetId).toBeNull();
+    expect(p.castAim).toBeNull();
+  });
+});
+
 describe('casting_lifecycle: pushbackCast', () => {
   it('delays a timed cast by CAST_PUSHBACK_SEC (does not cancel)', () => {
     const { sim, p } = makeSim('mage', 12);

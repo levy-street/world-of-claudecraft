@@ -54,6 +54,12 @@ const bundled = await esbuild.build({
     'import.meta.env.DEV': 'true',
     'import.meta.env.PROD': 'false',
     'import.meta.env.TEST': 'false',
+    // three's KTX2Loader (reached through loadGltf -> ktx2_support) builds its default
+    // transcoder URLs from import.meta.url at MODULE SCOPE, so the empty-object rewrite
+    // throws `new URL(x, undefined)` before the page can boot. A placeholder origin keeps
+    // that construction valid; the runtime overrides the path to /basis/ (same-origin on
+    // the harness server below) via setTranscoderPath before any texture is transcoded.
+    'import.meta.url': '"https://local.bundle/"',
     // src/client_origin.ts and src/runtime.ts (pulled in transitively via the guide
     // viewer's asset chain) also read import.meta.env at module scope; esbuild replaces
     // the whole import.meta object with {} for a non-ESM output format, so an undefined

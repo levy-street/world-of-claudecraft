@@ -64,7 +64,7 @@ describe('emote editor + inputDialog title-bar close controls have real button s
   it('renderEmoteEditor emits a real button with a non-empty aria-label (source pin + parse)', () => {
     const literal =
       // biome-ignore lint/suspicious/noTemplateCurlyInString: a literal copy of hud.ts's real template-literal source, asserted verbatim below.
-      '<div class="panel-title"><span>${esc(t(\'hudChrome.emoteEditor.title\'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t(\'hudChrome.emoteEditor.close\'))}">${svgIcon(\'close\')}</button></div>';
+      '<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t(\'hudChrome.emoteEditor.title\'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t(\'hudChrome.emoteEditor.close\'))}">${svgIcon(\'close\')}</button></div>';
     expect(HUD_SRC).toContain(literal);
 
     // Resolve the interpolations generically: proves the control is a real

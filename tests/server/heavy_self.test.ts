@@ -56,6 +56,7 @@ const EXPECTED_CMDS = [
   'market_collect',
   'market_list',
   'market_list_instance',
+  'market_sweep',
   // Masterwrought stack-grouping commands: both mutate the carried inventory
   // in place (a combine/separate reshapes existing stacks, never grants a new
   // copy), so the inv self mirror must re-diff exactly like inv_move/inv_sort.
@@ -108,6 +109,7 @@ const EXPECTED_EVENTS = [
   'questDone',
   'questProgress',
   'questReady',
+  'relicRecorded',
   'reliquaryUnlock',
   'skinEvent',
   'skinSelect',

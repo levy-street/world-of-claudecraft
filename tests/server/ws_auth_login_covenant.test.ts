@@ -28,6 +28,7 @@
 // it, so sharing a file with the rest of the ws_auth suite would let a stray
 // kick satisfy an arm for the wrong reason (and would leave that suite's ~30
 // existing joins taking real holds).
+
 import { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -43,6 +44,7 @@ import {
 } from '../../server/storage_purchases';
 import { createWsAuth, type WsAuthDeps } from '../../server/ws_auth';
 import { bufferHandshakeMessages } from '../../server/ws_buffer';
+import { freshAccountLedger } from '../../src/sim/account_ledger';
 import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 
 const CHARACTER = 7;
@@ -141,6 +143,7 @@ function setup() {
     permissionsForRoles: vi.fn((roles: readonly string[]) => new Set<string>(roles)),
     metaRequestUserData: vi.fn(() => ({ fbp: null, fbc: null })),
     metaEventSourceUrl: vi.fn(() => undefined),
+    loadAccountLedger: async () => freshAccountLedger(),
     loadAccountCosmetics: vi.fn(async () => ({
       completedQuestIds: [],
       mechChromaIds: [],

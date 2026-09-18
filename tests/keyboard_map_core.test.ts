@@ -86,7 +86,7 @@ describe('keyboard layouts', () => {
     expect(c60.has('ArrowUp')).toBe(false);
     expect(c60.has('KeyA')).toBe(true);
     // The 60% board has no F row, so its mouse column starts at the top.
-    expect(keyboardLayoutFor('60')[1].rows[0][0].code).toBe('Mouse3');
+    expect(keyboardLayoutFor('60')[1].rows[0].map((k) => k.code)).toEqual(['WheelUp']);
   });
 
   it('offers the bare layer first, then Shift, Ctrl and Alt', () => {

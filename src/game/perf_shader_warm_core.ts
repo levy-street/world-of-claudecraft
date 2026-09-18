@@ -6,14 +6,18 @@
 //
 // Deliberately a PROJECTION, not a passthrough: the client's snapshot names
 // the adapter and carries per-gate counts and GLSL-derived keys, none of which
-// belong in a fleet row, so this core takes the eight fields the fleet reads
+// belong in a fleet row, so this core takes only the fields the fleet reads
 // and bounds every one of them. `active` is the worker being READY, never the
 // setting or the mode: a mode of `all` on a session whose worker was retired
 // at second four is not an active worker, and reading the setting as if it
 // were is what would make the fleet numbers say the opposite of the truth.
 
 /** The client snapshot's fields this block projects (structurally, so the
- *  core stays free of the render layer). */
+ *  core stays free of the render layer). Two scopes: `holdWallMs` and
+ *  `releases` cover the page's life (the A/B weighs them against the page's
+ *  long-task total), while `warmed`, `held`, `heldTimedOut` and `holdMs` come
+ *  from the request book a renderer rebuild starts over, so after a graphics
+ *  rebuild a report can read releases with no held gate. */
 export interface ShaderWarmBeaconInput {
   worker: string;
   refusal: string | null;
@@ -23,6 +27,14 @@ export interface ShaderWarmBeaconInput {
   warmed: number;
   held: number;
   heldTimedOut: number;
+  /** Hold time summed over every held gate. */
+  holdMs: number;
+  /** Wall time during which at least one gate was held. */
+  holdWallMs: number;
+  /** Cannot-serve releases in this renderer's life. */
+  releases: number;
+  /** The A/B arm drawn, null when no draw ran. */
+  abArm: 'on' | 'off' | null;
 }
 
 export interface ShaderWarmBeaconSummary {
@@ -36,6 +48,12 @@ export interface ShaderWarmBeaconSummary {
   warmed: number;
   held: number;
   heldTimedOut: number;
+  /** The A/B checkpoint's cost term, both ways: the sum counts simultaneous
+   *  holds once each, the wall time counts the span they shared once. */
+  holdMs: number;
+  holdWallMs: number;
+  releases: number;
+  abArm: 'on' | 'off' | null;
 }
 
 /** The longest any string in the block: every one of them is a short enum-like
@@ -57,6 +75,14 @@ function count(value: number): number {
   return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
 }
 
+function millis(value: number): number {
+  return Number.isFinite(value) ? Math.max(0, Math.round(value)) : 0;
+}
+
+function arm(value: unknown): 'on' | 'off' | null {
+  return value === 'on' || value === 'off' ? value : null;
+}
+
 export function shaderWarmBeaconSummary(snapshot: ShaderWarmBeaconInput): ShaderWarmBeaconSummary {
   return {
     active: snapshot.worker === 'ready',
@@ -68,5 +94,9 @@ export function shaderWarmBeaconSummary(snapshot: ShaderWarmBeaconInput): Shader
     warmed: count(snapshot.warmed),
     held: count(snapshot.held),
     heldTimedOut: count(snapshot.heldTimedOut),
+    holdMs: millis(snapshot.holdMs),
+    holdWallMs: millis(snapshot.holdWallMs),
+    releases: count(snapshot.releases),
+    abArm: arm(snapshot.abArm),
   };
 }

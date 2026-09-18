@@ -444,6 +444,8 @@ describe('i18n CLDR pluralization', () => {
       'commissionMasterworks',
       'deedsRetroSummary',
       'finderPartySize',
+      // The signpost guild board's live count line (guild board categories).
+      'guildBoardShown',
       'guildMembers',
       'playersMatching',
       'playersOnline',

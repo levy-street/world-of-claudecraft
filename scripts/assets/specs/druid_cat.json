@@ -1,0 +1,29 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/druid_cat_form.glb",
+      "out": "models/creatures/druid_cat_form.glb",
+      "type": "character",
+      "maxTex": 1024,
+      "keepClips": [
+        "Idle_Look",
+        "Walk",
+        "WalkBack",
+        "Run",
+        "ProwlIdle",
+        "ProwlWalk",
+        "Jump",
+        "Land",
+        "Fall",
+        "Attack_Left",
+        "Attack_Right",
+        "Bite",
+        "Pounce",
+        "Finisher",
+        "Hit_Left",
+        "Death",
+        "Swim"
+      ]
+    }
+  ]
+}

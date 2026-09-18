@@ -227,7 +227,7 @@ describe('Soul Rend marker visual', () => {
 
   it('rides the shared mechanic facade and is staged at the crypt prewarm', () => {
     const facade = readSource('../src/render/nythraxis_mechanic_visuals.ts');
-    expect(facade).toContain('this.soulRendMarkers.syncWorld(world)');
+    expect(facade).toContain('this.soulRendMarkers.syncWorld(roster)');
     expect(facade).toContain('this.soulRendMarkers.update(dt, reducedMotion)');
     expect(facade).toContain('this.soulRendMarkers.dispose()');
     const prewarm = buildNythraxisGravePrewarmVisual();

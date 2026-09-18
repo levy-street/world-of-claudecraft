@@ -422,6 +422,9 @@ describe('the window paints the RESOLVED page name, never the model English', ()
       player: { name: 'Testwright' },
       deedStats: { itemsDiscovered: empty },
       reliquaryMarks: empty,
+      // The account ledger halves every real world carries (src/sim/account_ledger.ts).
+      reliquaryAccountFinds: new Map(),
+      accountDeeds: new Map(),
       reliquaryRecent: [],
       reliquaryFirstFind: {},
       ownedMounts: () => [],

@@ -254,7 +254,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     slot: 'mainhand',
     quality: 'rare',
     weapon: { min: 19, max: 31, speed: 3.0 },
-    stats: { int: 9, spi: 4 },
+    stats: { int: 9, spi: 4, sta: 3 },
     sellValue: 285,
   },
 
@@ -404,7 +404,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'uncommon',
-    stats: { armor: 41, int: 4, spi: 2 },
+    stats: { armor: 41, int: 4, spi: 2, sta: 2 },
     sellValue: 140,
   },
   goldweave_leggings: {
@@ -414,7 +414,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'uncommon',
-    stats: { armor: 37, int: 3, spi: 2 },
+    stats: { armor: 37, int: 3, spi: 2, sta: 2 },
     sellValue: 125,
   },
   silkspun_satchel: {
@@ -476,7 +476,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'rare',
-    stats: { armor: 52, int: 8, spi: 5 },
+    stats: { armor: 52, int: 8, spi: 5, sta: 3 },
     sellValue: 340,
   },
   sunweave_mantle: {
@@ -486,7 +486,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'shoulder',
     quality: 'rare',
-    stats: { armor: 40, int: 6, spi: 4 },
+    stats: { armor: 40, int: 6, spi: 4, sta: 3 },
     sellValue: 175,
   },
   sunweave_treads: {
@@ -496,7 +496,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'feet',
     quality: 'rare',
-    stats: { armor: 34, int: 5, spi: 3 },
+    stats: { armor: 34, int: 5, spi: 3, sta: 2 },
     sellValue: 260,
   },
 
@@ -1254,7 +1254,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'ring',
     quality: 'uncommon',
-    stats: { int: 2, sta: 1 },
+    stats: { int: 2, sta: 1, spi: 1 },
     sellValue: 32,
   },
   coiled_copper_torc: {
@@ -1281,7 +1281,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'armor',
     slot: 'ring',
     quality: 'uncommon',
-    stats: { int: 3, sta: 1 },
+    stats: { int: 3, sta: 1, spi: 1 },
     sellValue: 46,
   },
   iron_link_choker: {
@@ -1351,7 +1351,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'uncommon',
-    stats: { int: 2, spi: 1 },
+    stats: { int: 2, spi: 1, sta: 1 },
     requiredClass: CASTER_ALL,
     sellValue: 24,
   },
@@ -1361,7 +1361,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'uncommon',
-    stats: { int: 3, spi: 2 },
+    stats: { int: 3, spi: 2, sta: 2 },
     requiredClass: CASTER_ALL,
     sellValue: 100,
   },
@@ -1371,7 +1371,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'rare',
-    stats: { int: 5, spi: 3, sta: 2 },
+    stats: { int: 5, spi: 3, sta: 3 },
     requiredClass: CASTER_ALL,
     sellValue: 280,
   },
@@ -1536,8 +1536,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'waist',
     quality: 'epic',
-    // ilvl-31 waist epic budget = 15; int:9+spi:6 = 15. Armor: gravescale_girdle.
-    stats: { armor: 224, int: 9, spi: 6 },
+    // ilvl-31 waist epic line = 15; int:9+spi:6 = 15, stamina baseline 5 on top. Armor: gravescale_girdle.
+    stats: { armor: 224, int: 9, spi: 6, sta: 5 },
     hasteRating: 40,
     sellValue: 300,
     masterwrought: true,
@@ -1562,8 +1562,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'mail',
     slot: 'feet',
     quality: 'epic',
-    // ilvl-31 feet epic budget = 14; int:8+spi:6 = 14. Armor: tideworn_warboots.
-    stats: { armor: 212, int: 8, spi: 6 },
+    // ilvl-31 feet epic line = 14; int:8+spi:6 = 14, stamina baseline 5 on top. Armor: tideworn_warboots.
+    stats: { armor: 212, int: 8, spi: 6, sta: 5 },
     hasteRating: 40,
     sellValue: 280,
     masterwrought: true,
@@ -1588,8 +1588,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'legs',
     quality: 'epic',
-    // ilvl-31 legs epic budget = 20; int:12+spi:8 = 20. Armor: tidewoven_trousers.
-    stats: { armor: 132, int: 12, spi: 8 },
+    // ilvl-31 legs epic line = 20; int:12+spi:8 = 20, stamina baseline 7 on top. Armor: tidewoven_trousers.
+    stats: { armor: 132, int: 12, spi: 8, sta: 7 },
     hasteRating: 40,
     sellValue: 160,
     masterwrought: true,
@@ -1601,8 +1601,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'leather',
     slot: 'gloves',
     quality: 'epic',
-    // ilvl-31 gloves epic budget = 15; int:9+spi:6 = 15. Armor: sanctum_prowlers_grips.
-    stats: { armor: 104, int: 9, spi: 6 },
+    // ilvl-31 gloves epic line = 15; int:9+spi:6 = 15, stamina baseline 5 on top. Armor: sanctum_prowlers_grips.
+    stats: { armor: 104, int: 9, spi: 6, sta: 5 },
     critRating: 40,
     sellValue: 140,
     masterwrought: true,
@@ -1614,8 +1614,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'chest',
     quality: 'epic',
-    // ilvl-31 chest epic budget = 22; int:12+spi:10 = 22. Armor: shroud_of_the_gravewyrm.
-    stats: { armor: 90, int: 12, spi: 10 },
+    // ilvl-31 chest epic line = 22; int:12+spi:10 = 22, stamina baseline 7 on top. Armor: shroud_of_the_gravewyrm.
+    stats: { armor: 90, int: 12, spi: 10, sta: 7 },
     // HASTE, not Hit, and Phase 15 moved it here: hit converts at twice the
     // rate of the other two ratings (HIT_RATING_PER_PCT 10 vs 20, types.ts),
     // so a 40-rating Hit piece is worth 4 percent where a 40-rating crit or
@@ -1648,8 +1648,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'legs',
     quality: 'epic',
-    // ilvl-31 legs epic budget = 20; int:12+spi:8 = 20. Armor: lunar_choir_leggings.
-    stats: { armor: 72, int: 12, spi: 8 },
+    // ilvl-31 legs epic line = 20; int:12+spi:8 = 20, stamina baseline 7 on top. Armor: lunar_choir_leggings.
+    stats: { armor: 72, int: 12, spi: 8, sta: 7 },
     hasteRating: 40,
     sellValue: 190,
     masterwrought: true,
@@ -1661,8 +1661,8 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     armorType: 'cloth',
     slot: 'gloves',
     quality: 'epic',
-    // ilvl-31 gloves epic budget = 15; int:9+spi:6 = 15. Armor: shadowpulse_handwraps.
-    stats: { armor: 52, int: 9, spi: 6 },
+    // ilvl-31 gloves epic line = 15; int:9+spi:6 = 15, stamina baseline 5 on top. Armor: shadowpulse_handwraps.
+    stats: { armor: 52, int: 9, spi: 6, sta: 5 },
     critRating: 40,
     sellValue: 170,
     masterwrought: true,
@@ -1703,7 +1703,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   },
   // Engineering's own held-lens identity one register below gyrelens_array:
   // pure stats on the formula at the rung-25 convention (level 15 + uncommon
-  // bonus 1 = ilvl 16; held line 0.75: int:3+sta:2 = 5), no use field, no
+  // bonus 1 = ilvl 16; held line 0.75: int:3+spi:2 = 5, stamina baseline 2), no use field, no
   // ratings (masterwrought R14), no vendor twin (masterwrought R23; no vendor
   // sells any held_offhand). Caster lock per the wraithfire_orb gate.
   copperlens_ocular: {
@@ -1712,7 +1712,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     kind: 'held_offhand',
     slot: 'offhand',
     quality: 'uncommon',
-    stats: { int: 3, sta: 2 },
+    stats: { int: 3, sta: 2, spi: 2 },
     sellValue: 36,
     requiredClass: ['mage', 'priest', 'warlock', 'shaman', 'paladin', 'druid'],
   },

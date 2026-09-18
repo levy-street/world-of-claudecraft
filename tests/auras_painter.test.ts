@@ -212,7 +212,9 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     expect(nodes()).toHaveLength(2);
     // each pooled node has the two children (dur, stacks) appended once.
     expect(nodes()[0].childNodes).toHaveLength(2);
-    expect(nodes()[0].className).toBe('buff');
+    expect(nodes()[0].className).toBe('buff ui-aura');
+    expect(nodes()[0].childNodes[0].className).toBe('dur ui-aura-time');
+    expect(nodes()[0].childNodes[1].className).toBe('stacks ui-badge ui-badge--corner');
   });
 
   it('attaches the tooltip ONCE per pooled node across frames (no duplicate listeners)', () => {
@@ -352,6 +354,13 @@ describe('AurasPainter: keyed pool over the elided writers', () => {
     ).toBe(true);
     // debuff via toggleClass (a structural class, not a color).
     expect(has('toggleClass', (c) => c.args[0] === 'debuff' && c.args[1] === true)).toBe(true);
+    expect(has('toggleClass', (c) => c.args[0] === 'ui-aura--debuff' && c.args[1] === true)).toBe(
+      true,
+    );
+    expect(
+      has('toggleClass', (c) => c.args[0] === 'ui-aura-time--debuff' && c.args[1] === true),
+    ).toBe(true);
+    expect(has('toggleClass', (c) => c.args[0] === 'ui-aura--own')).toBe(true);
     // the expiring blink via toggleClass too (the stylesheet owns the animation).
     expect(has('toggleClass', (c) => c.args[0] === 'expiring' && c.args[1] === true)).toBe(true);
     // the school border tint via setAttr(data-school), a structural attribute the

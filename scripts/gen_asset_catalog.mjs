@@ -9,6 +9,7 @@
 import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { isFoliageFieldCopyCatalogId } from './assets/foliage_bark_decimation.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const modelsDir = join(root, 'public', 'models');
@@ -40,8 +41,12 @@ function toEntry(full) {
   return { id, category, label, path: `/${rel}` };
 }
 
+// The world foliage field's decimated-bark copies
+// (scripts/assets/decimate_foliage_bark.mjs) are not placeable: an authored
+// map places the full-detail original, at any scale.
 const entries = walk(modelsDir)
   .map(toEntry)
+  .filter((e) => !isFoliageFieldCopyCatalogId(e.id))
   .sort((a, b) => a.id.localeCompare(b.id));
 
 const byCat = {};

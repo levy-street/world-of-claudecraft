@@ -13,6 +13,7 @@
 // every other effect here (injected, so this file stays a pure core and a
 // stub host draws with no watch at all).
 
+import type { GpuFrameTimer } from './gpu_timer_probe';
 import type { ProgramListHost } from './live_program_watch';
 
 /** The live-program watch as the draw sees it (src/render/live_program_watch.ts). */
@@ -28,6 +29,9 @@ export interface FramePresentHost {
   scene: unknown;
   camera: unknown;
   programWatch?: FramePresentProgramWatch | null;
+  /** The GPU timer probe (gpu_timer_probe.ts), null unless `?gputimer=1`.
+   *  The composer brackets its own passes; the direct draw is bracketed here. */
+  gpuTimer?: GpuFrameTimer | null;
 }
 
 /**
@@ -43,17 +47,35 @@ export function presentFrame(host: FramePresentHost, dt: number, present: boolea
   // definition (nothing drew it), so absorbing only on the drawing arm would
   // hand a whole hidden-window backlog to the next real draw as escapes.
   host.programWatch?.absorbLivePrograms(host.webgl);
+  const gpuTimer = host.gpuTimer ?? null;
   if (!present) {
     host.post?.updateScreenFx(dt);
+    // A skipped frame issues no queries, but the ones in flight still need
+    // their readback poll or a long hidden stretch would drop them all.
+    gpuTimer?.endFrame();
     return false;
   }
   host.vfx.prepareDraw(host.camera);
-  if (host.post) {
-    // screen-fx pass state (ripple re-projection, flash decay) advances
-    // with the camera finalized for this frame
-    host.post.updateScreenFx(dt);
-    host.post.render();
-  } else host.webgl.render(host.scene, host.camera);
+  // Arms the probe for THIS submit only: a composer or renderer draw issued
+  // out of band (prewarm, census, screenshot) opens no bracket.
+  gpuTimer?.beginFrame();
+  try {
+    if (host.post) {
+      // screen-fx pass state (ripple re-projection, flash decay) advances
+      // with the camera finalized for this frame
+      host.post.updateScreenFx(dt);
+      host.post.render();
+    } else {
+      gpuTimer?.beginScene();
+      try {
+        host.webgl.render(host.scene, host.camera);
+      } finally {
+        gpuTimer?.end();
+      }
+    }
+  } finally {
+    gpuTimer?.endFrame();
+  }
   host.programWatch?.recordNewLivePrograms(host.webgl);
   return true;
 }

@@ -41,6 +41,13 @@ describe('renderCorpseHarvestPanel: shape', () => {
       'Harvest preference: All materials',
     );
     expect(section?.querySelector('.corpse-harvest-change-btn')).not.toBeNull();
+    // The interface redesign paints this section through the shared primitives
+    // (heading, buttons), so a rebuilt section keeps the library look.
+    expect(section?.querySelector('.corpse-harvest-title')?.classList.contains('ui-h')).toBe(true);
+    expect(section?.querySelector('.corpse-harvest-change-btn')?.classList.contains('ui-btn')).toBe(
+      true,
+    );
+    expect(section?.querySelector('.corpse-harvest-btn')?.classList.contains('ui-btn')).toBe(true);
     expect(section?.querySelector('.corpse-harvest-hint')).not.toBeNull();
     expect(section?.querySelector('.corpse-harvest-btn')).not.toBeNull();
   });
@@ -80,6 +87,7 @@ describe('renderCorpseHarvestPanel: shape', () => {
       attachTooltip,
     });
     const btn = container.querySelector<HTMLButtonElement>('.corpse-harvest-btn');
+    expect(btn?.classList.contains('ui-btn')).toBe(true);
     // No native title: the shared idiom covers hover, mobile long-press, and
     // keyboard focus, where a bare title attribute is hover-only.
     expect(btn?.title).toBe('');

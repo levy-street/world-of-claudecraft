@@ -18,38 +18,6 @@ import {
 const SELF_MOTION_HANDOFF_RATE = 15;
 export const MAX_SELF_REWIND_YD_PER_SEC = 12;
 
-/**
- * Capture the gap between the drawn pose and the pose the incoming path wants
- * as the handoff offset, unless it is a teleport. A handoff gap is at most a
- * few yards (predictor lead, a reconcile residual); anything past the shared
- * six-yard snap rule is an authoritative relocation that landed on the same
- * frame the paths swapped: a delve or dungeon entry closes the prediction gate
- * and teleports the body at once. Gliding that gap would pin the drawn body
- * (and the camera) at the old spot and creep it toward the new one, which
- * inside an instance reads as floating through the void. Zeroing the offset
- * lets the fallback snap exactly as it would for a teleport with no handoff.
- */
-function captureHandoffOffset(
-  offset: Vec3Like,
-  from: Vec3Like,
-  toX: number,
-  toY: number,
-  toZ: number,
-): void {
-  const dx = from.x - toX;
-  const dy = from.y - toY;
-  const dz = from.z - toZ;
-  if (dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ) {
-    offset.x = 0;
-    offset.y = 0;
-    offset.z = 0;
-    return;
-  }
-  offset.x = dx;
-  offset.y = dy;
-  offset.z = dz;
-}
-
 function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE_INFINITY): void {
   const decayShare = 1 - Math.exp(-SELF_MOTION_HANDOFF_RATE * Math.max(0, dt));
   const decayDistance = Math.hypot(offset.x, offset.y, offset.z) * decayShare;
@@ -60,6 +28,63 @@ function decayOffset(offset: Vec3Like, dt: number, maxDistance = Number.POSITIVE
   offset.x *= 1 - appliedShare;
   offset.y *= 1 - appliedShare;
   offset.z *= 1 - appliedShare;
+}
+
+/**
+ * The handoff-offset teleport rule. The offset exists to hide a SMALL gap
+ * between the drawn pose and the pose that takes over (a predictor lead, a
+ * reconcile correction), decayed so the camera glides instead of stepping.
+ * A gap no real motion could open in one frame is a teleport (dungeon exit,
+ * hearth, graveyard release, rift or delve exit, unstuck) and must never be
+ * glided: decaying it drew the body flying across the map. Same six-yard rule
+ * the other whole-pose smoothers apply (self_motion.ts SELF_MOTION_SNAP_DIST_SQ,
+ * camera_boom_core.ts BOOM_SNAP_DIST; the step smoother's STEP_SMOOTH_SNAP is a
+ * separate, tighter vertical-only rule), and the same margin: the fastest
+ * plausible mover (23.1 yd/s, entity_reanchor.ts) over the main loop's 0.25 s
+ * frame clamp covers 5.8 yd, so one frame of real motion never trips it.
+ */
+export function isTeleportGap(dx: number, dy: number, dz: number): boolean {
+  return dx * dx + dy * dy + dz * dz > SELF_MOTION_SNAP_DIST_SQ;
+}
+
+/**
+ * Did the pose the display is anchored to jump a teleport this frame? Both
+ * paths draw `position = target + offset`, so `position - offset` is last
+ * frame's target on x and z, and the gap to the new one is the AUTHORITATIVE
+ * jump alone. Measuring from the drawn pose instead would count the decaying
+ * offset too, and a legitimately accumulated offset (handoff plus a run of
+ * reconcile residuals) could then read as a teleport and pop. Two small
+ * display terms do ride along in `position`: the renderer writes the step
+ * smoother's y back into it (bounded by STEP_SMOOTH_MAX_LAG), and on the plain
+ * fallback path it is the lead-smoothed pose; both stay well inside the margin
+ * above, so neither can turn real motion into a snap.
+ */
+function targetJumpedTeleport(
+  state: SelfRenderPositionState,
+  tx: number,
+  ty: number,
+  tz: number,
+): boolean {
+  return (
+    state.ready &&
+    isTeleportGap(
+      state.position.x - state.offset.x - tx,
+      state.position.y - state.offset.y - ty,
+      state.position.z - state.offset.z - tz,
+    )
+  );
+}
+
+function clearOffset(offset: Vec3Like): void {
+  offset.x = 0;
+  offset.y = 0;
+  offset.z = 0;
+}
+
+function captureHandoffOffset(offset: Vec3Like, from: Vec3Like, to: Vec3Like): void {
+  offset.x = from.x - to.x;
+  offset.y = from.y - to.y;
+  offset.z = from.z - to.z;
 }
 
 export interface ReconciledSelfPrediction {
@@ -149,17 +174,28 @@ export function updateSelfRenderPosition(
       // remove). The only discontinuity is the handoff frame from the
       // lead-smoothing path below: capture that gap once as an offset and
       // decay it, so the camera glides instead of stepping.
-      if (authoritativeDiscontinuity) {
-        state.offset.x = 0;
-        state.offset.y = 0;
-        state.offset.z = 0;
+      // A teleport is not a handoff: when the new pose sits a teleport away
+      // from the drawn one (the predictor re-adopted a jumped anchor, or a
+      // v2 reconcile replayed onto a jumped acknowledgement), adopt it
+      // outright, residual included, exactly like an authoritative
+      // discontinuity.
+      const discontinuity =
+        authoritativeDiscontinuity ||
+        targetJumpedTeleport(state, predicted.x, predicted.y, predicted.z);
+      if (discontinuity) {
+        clearOffset(state.offset);
       } else if (state.ready && !state.active) {
-        captureHandoffOffset(state.offset, state.position, predicted.x, predicted.y, predicted.z);
+        captureHandoffOffset(state.offset, state.position, predicted);
       }
-      if (reconciled.kind === 'reconciled' && reconciled.residual) {
-        state.offset.x += reconciled.residual.x;
-        state.offset.y += reconciled.residual.y;
-        state.offset.z += reconciled.residual.z;
+      const residual = reconciled.kind === 'reconciled' ? reconciled.residual : null;
+      if (residual) {
+        if (discontinuity || isTeleportGap(residual.x, residual.y, residual.z)) {
+          clearOffset(state.offset);
+        } else {
+          state.offset.x += residual.x;
+          state.offset.y += residual.y;
+          state.offset.z += residual.z;
+        }
       }
       decayOffset(state.offset, dt);
       state.position.x = predicted.x + state.offset.x;
@@ -176,15 +212,18 @@ export function updateSelfRenderPosition(
   const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
   const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
   const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-  if (authoritativeDiscontinuity) {
-    state.offset.x = 0;
-    state.offset.y = 0;
-    state.offset.z = 0;
+  // The same teleport rule as the predictor path: a handoff gap (prediction
+  // suspending on the teleport frame) or a mid-decay target jump of teleport
+  // size adopts the authoritative pose outright instead of rewinding toward
+  // it at MAX_SELF_REWIND_YD_PER_SEC.
+  const discontinuity = authoritativeDiscontinuity || targetJumpedTeleport(state, px, py, pz);
+  if (discontinuity) {
+    clearOffset(state.offset);
   } else if (state.ready && predictorWasActive) {
-    captureHandoffOffset(state.offset, state.position, px, py, pz);
+    captureHandoffOffset(state.offset, state.position, { x: px, y: py, z: pz });
   }
   if (
-    !authoritativeDiscontinuity &&
+    !discontinuity &&
     (predictorWasActive || state.offset.x !== 0 || state.offset.y !== 0 || state.offset.z !== 0)
   ) {
     const previousX = state.position.x;
@@ -223,7 +262,7 @@ export function updateSelfRenderPosition(
     state.ready,
     dt,
     selfAlphaLead > 0,
-    authoritativeDiscontinuity,
+    discontinuity,
   );
   state.ready = true;
   return state.position;

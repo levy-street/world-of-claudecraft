@@ -194,7 +194,7 @@ Nightfang Legguards, Nightfang Talongrips, Dreamroot Boots, Seal of the Nine
 Oaths, Oath of the Round Table.
 
 **Rotation**
-1. `cat_form` before the pull, `tigers_fury` (Wolfsblood) on cooldown
+1. `cat_form` before the pull, `tigers_fury` (Lynxblood) on cooldown
 2. `ferocious_bite` (Redharvest) at 3 Old Blood with any combo points
 3. `rip` at 5 combo points if missing
 4. `rake` (Flense) if missing

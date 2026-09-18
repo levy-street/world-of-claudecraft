@@ -120,6 +120,13 @@ export interface UnitFrameDescriptor {
   /** The unit is beyond party range (a party member past PARTY_FRAME_RANGE_YD);
    *  the painter dims the frame. The player and a target are always in range. */
   outOfRange: boolean;
+  /** The party-scoped raid target marker on this unit (IWorld.markerFor: index
+   *  0..7, or null for an unmarked unit), read at the call site. Optional and
+   *  absent for instances without a marker surface (player, party); absent means
+   *  unmarked. The target frame shows it beside the portrait so a player can tell
+   *  WHICH of several stacked same-name mobs they hold, the same symbol the
+   *  nameplate floats over the mob in the world. */
+  raidMarker?: number | null;
 }
 
 /** The values the painter writes, derived from a descriptor by unitFrameView. */
@@ -145,18 +152,21 @@ export interface UnitFrameView {
   borderSlug: string;
   portraitKey: string;
   /** The absorb-shield overlay fraction (hp + absorb) / maxHp, clamped by
-   *  absorbBarView; equals hpFrac when there is no shield. Kept for the player /
-   *  target painter's left-filled overlay. */
+   *  absorbBarView; equals hpFrac when there is no shield. Kept for call sites
+   *  and tests that read the shield's right edge. */
   absorbFrac: number;
-  /** The left edge of the visible shield segment (party frames' positioned
-   *  segment; the player/target painter ignores it). */
+  /** The left edge of the visible shield segment: where the painter seats the
+   *  hatched overlay, so the hatch never lies over plain health. */
   absorbStartFrac: number;
-  /** The width of the visible shield segment. */
+  /** The width of the visible shield segment; 0 when there is no shield. */
   absorbSizeFrac: number;
   /** The shield reaches/passes the bar's right edge (fully shielded). */
   absorbOvershield: boolean;
   dead: boolean;
   outOfRange: boolean;
+  /** The raid marker index (0..7) to show beside the portrait, or null when the
+   *  unit is unmarked or the instance has no marker surface. */
+  raidMarker: number | null;
 }
 
 export interface UnitFrameBuffer {
@@ -189,6 +199,7 @@ const HIDDEN: UnitFrameView = {
   absorbOvershield: false,
   dead: false,
   outOfRange: false,
+  raidMarker: null,
 };
 
 // The no-shield absorb result, matching absorbBarView's shape for a null entity.
@@ -212,6 +223,18 @@ export function unitResourceClass(kind: UnitResourceKind): UnitResourceClass {
   if (kind === 'focus') return 'focus';
   // 'mana' or null: the player's default branch, byte-identical to the old ternary.
   return 'mana';
+}
+
+/**
+ * The absorb overlay's transform: the hatched shield segment ONLY, seated at its
+ * own left edge. A bar with no shield collapses to zero width, so a healthy unit
+ * shows the plain health gradient instead of a hatch laid over the whole bar.
+ * `scale` is the caller's already-formatted scaleX for the segment's width, so a
+ * party row keeps its quantized precision.
+ */
+export function absorbSegmentTransform(startFrac: number, sizeFrac: number, scale: string): string {
+  if (sizeFrac <= 0) return scale;
+  return `translateX(${startFrac * 100}%) ${scale}`;
 }
 
 /**
@@ -245,6 +268,7 @@ export function unitFrameView(d: UnitFrameDescriptor): UnitFrameView {
     absorbOvershield: absorb.overshield,
     dead: d.dead,
     outOfRange: d.outOfRange,
+    raidMarker: d.raidMarker ?? null,
   };
 }
 
@@ -271,6 +295,7 @@ export function newUnitFrameBuffer(): UnitFrameBuffer {
       absorbOvershield: false,
       dead: false,
       outOfRange: false,
+      raidMarker: null,
     },
     absorb: {
       total: 0,
@@ -311,6 +336,7 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
     out.absorbOvershield = false;
     out.dead = false;
     out.outOfRange = false;
+    out.raidMarker = null;
     return out;
   }
 
@@ -343,5 +369,6 @@ export function unitFrameViewInto(buffer: UnitFrameBuffer, d: UnitFrameDescripto
   out.absorbOvershield = absorb.overshield;
   out.dead = d.dead;
   out.outOfRange = d.outOfRange;
+  out.raidMarker = d.raidMarker ?? null;
   return out;
 }

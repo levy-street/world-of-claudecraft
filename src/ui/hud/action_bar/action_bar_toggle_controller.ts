@@ -1,4 +1,4 @@
-// The small plus/minus buttons at the end of the primary action bar (#actionbar)
+// The small chevrons at the end of the primary action bar (#actionbar)
 // that reveal or hide the optional desktop rows (#actionbar2/#actionbar3). A cold,
 // click-driven control: it owns no repeating driver and reads no layout. Clicks
 // route the matching visibility SETTING through deps.apply (the optionsHooks
@@ -9,7 +9,8 @@
 // coordinator pushes the resolved visibility back through sync(), which is the
 // only state this module holds.
 
-import type { TranslationKey } from '../../i18n';
+import { formatNumber, type TranslationKey } from '../../i18n';
+import { svgIcon, type UiIconName } from '../../ui_icons';
 import { actionBarToggleModel } from './action_bar_toggle_core';
 import type { ActionBarVisibility, ActionBarVisibilitySetting } from './action_bar_visibility_core';
 
@@ -45,14 +46,14 @@ export function installActionBarToggle(deps: ActionBarToggleDeps): ActionBarTogg
   };
 
   const makeButton = (
-    glyph: string,
+    icon: UiIconName,
     labelKey: TranslationKey,
     onClick: () => void,
   ): HTMLButtonElement => {
     const btn = deps.document.createElement('button');
     btn.type = 'button';
     btn.className = 'bar-toggle-btn';
-    btn.textContent = glyph;
+    btn.innerHTML = svgIcon(icon);
     // The live aria-label plus the data-i18n-aria attribute, so translatePage
     // re-resolves it on a runtime language switch (the daily-rewards idiom).
     btn.setAttribute('data-i18n-aria', labelKey);
@@ -65,18 +66,21 @@ export function installActionBarToggle(deps: ActionBarToggleDeps): ActionBarTogg
     return btn;
   };
 
-  const plusBtn = makeButton('+', SHOW_KEY, () => {
+  const plusBtn = makeButton('prev', SHOW_KEY, () => {
     const action = actionBarToggleModel(visibility).expand;
     if (action) deps.apply(action.setting, action.value);
   });
-  const minusBtn = makeButton('-', HIDE_KEY, () => {
+  const minusBtn = makeButton('next', HIDE_KEY, () => {
     const action = actionBarToggleModel(visibility).collapse;
     if (action) deps.apply(action.setting, action.value);
   });
 
   const wrap = deps.document.createElement('div');
   wrap.className = 'bar-toggle';
-  wrap.append(plusBtn, minusBtn);
+  const count = deps.document.createElement('span');
+  count.className = 'bar-toggle-count ui-num';
+  count.setAttribute('aria-hidden', 'true');
+  wrap.append(plusBtn, count, minusBtn);
   deps.container.appendChild(wrap);
 
   const control: ActionBarToggleControl = {
@@ -85,6 +89,10 @@ export function installActionBarToggle(deps: ActionBarToggleDeps): ActionBarTogg
       const model = actionBarToggleModel(visibility);
       plusBtn.disabled = model.expand === null;
       minusBtn.disabled = model.collapse === null;
+      count.textContent = formatNumber(
+        1 + Number(visibility.secondary) + Number(visibility.third),
+        { maximumFractionDigits: 0 },
+      );
     },
   };
   control.sync(visibility);

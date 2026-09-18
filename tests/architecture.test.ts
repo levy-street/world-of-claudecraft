@@ -209,7 +209,17 @@ describe('live graphics profile architecture', () => {
 // import), so it is registered here even though it lives in src/game. Paths are
 // repo-relative for the failure messages.
 const UI_PURE_CORES = [
+  // The one clamp and disabled rule the source picker's row steppers and the
+  // bank quantity prompt share (quantity_stepper.ts is their DOM consumer).
+  'src/ui/quantity_step_core.ts',
+  'src/ui/party_pids_core.ts',
+  // The one face-button tone rule, shared by the interact prompt and the pad
+  // hint strip so a printed glyph and its colour can never disagree.
+  'src/ui/micro_menu_state_view.ts',
   'src/ui/ability_tooltip_lines.ts',
+  'src/ui/proc_ready_glow_core.ts',
+  'src/ui/reticle_ticks_core.ts',
+  'src/ui/aura_watchlist_core.ts',
   'src/ui/collection_actions_core.ts',
   'src/ui/hud/cosmetics/cosmetics_cards_view.ts',
   'src/ui/hud/cosmetics/cosmetics_view.ts',
@@ -219,6 +229,7 @@ const UI_PURE_CORES = [
   'src/ui/map_marker_semantics_core.ts',
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',
+  'src/ui/map_pan_core.ts',
   'src/ui/mouseover_cast_core.ts',
   'src/ui/paladin_devotion_view.ts',
   'src/ui/aura_icon_view.ts',
@@ -254,6 +265,7 @@ const UI_PURE_CORES = [
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
+  'src/ui/party_target_hotkeys_core.ts',
   'src/ui/party_below_target_core.ts',
   'src/ui/party_collapse.ts',
   'src/ui/guild_hide_offline.ts',
@@ -290,11 +302,14 @@ const UI_PURE_CORES = [
   'src/ui/target_flair_line_view.ts',
   'src/ui/meters_breakdown_view.ts',
   'src/ui/interface_unlock_core.ts',
+  'src/ui/interface_visibility_core.ts',
   'src/ui/interface_unlock_menu_core.ts',
+  'src/ui/touch_frame_drag_core.ts',
   'src/ui/keybind_transfer_core.ts',
   'src/ui/keyboard_map_core.ts',
   'src/ui/keybind_conflict_prompt_core.ts',
   'src/ui/keybind_action_names_core.ts',
+  'src/ui/keybind_device_notes_core.ts',
   'src/ui/keyboard_layout_pref_core.ts',
   'src/ui/settings_transfer_core.ts',
   'src/ui/meters_frame_core.ts',
@@ -306,6 +321,7 @@ const UI_PURE_CORES = [
   'src/ui/preview_prewarm_core.ts',
   'src/ui/talents_view.ts',
   'src/ui/social_view.ts',
+  'src/ui/who_tab_view.ts',
   'src/ui/tab_strip_view.ts',
   'src/ui/bag_filter.ts',
   'src/ui/bank_filter.ts',
@@ -314,8 +330,12 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/enchant_apply_view.ts',
   'src/ui/hud/professions/enchanting_view.ts',
   'src/ui/entity_display_core.ts',
+  // npc id to localized Profession Trainer label; the nameplate painter and
+  // entity_display_core are its thin consumers.
+  'src/ui/profession_trainer_label_core.ts',
   'src/ui/hud/professions/disenchant_yield_view.ts',
   'src/ui/hud/professions/material_hint_view.ts',
+  'src/ui/hud/professions/reagent_suffix_view.ts',
   'src/ui/hud/professions/material_profession_hint_view.ts',
   'src/ui/hud/professions/craft_denial_line_view.ts',
   'src/ui/hud/professions/elixir_tooltip_view.ts',
@@ -353,6 +373,7 @@ const UI_PURE_CORES = [
   'src/ui/guild_bank_view.ts',
   'src/ui/item_set_tooltip_view.ts',
   'src/ui/weapon_proc_view.ts',
+  'src/ui/controller_options_view.ts',
   'src/ui/options_view.ts',
   'src/ui/hud/loot_explorer/loot_explorer_view.ts',
   'src/ui/hud/vendor/vendor_view.ts',
@@ -372,6 +393,8 @@ const UI_PURE_CORES = [
   // The Machine Stable's section / card markup (the store-mount strip), the
   // armory_card_view twin for the account-mount SKUs.
   'src/ui/store_mount_card_view.ts',
+  'src/ui/mount_inspect_view.ts',
+  'src/ui/daily_rewards_reason_view.ts',
   // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
   // phase 17). The overlay ELEMENT lives in the thin painter beside it.
   'src/ui/daily_rewards_spin_view.ts',
@@ -468,6 +491,7 @@ const UI_PURE_CORES = [
   'src/ui/market_search_localized_core.ts',
   'src/ui/bank_item_name_core.ts',
   'src/ui/market_buy_confirm_core.ts',
+  'src/ui/market_sweep_core.ts',
   'src/ui/usd_text.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/woc_log_tones.ts',
@@ -476,6 +500,8 @@ const UI_PURE_CORES = [
   'src/ui/woc_balance_chip.ts',
   'src/ui/woc_market_chrome.ts',
   'src/ui/woc_market_activity_html.ts',
+  'src/ui/woc_market_detail_html.ts',
+  'src/ui/woc_market_sales_html.ts',
   'src/ui/guild_tag.ts',
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
@@ -502,11 +528,14 @@ const UI_PURE_CORES = [
   'src/ui/castle_plan_core.ts',
   'src/ui/map_gather_tip_memo.ts',
   'src/ui/map_window_view.ts',
+  'src/ui/map_sidebar_view.ts',
   'src/ui/continent_land_mask_core.ts',
   'src/ui/map_show_on_map_core.ts',
   'src/ui/continent_map_view.ts',
   'src/ui/map_open_sea_edge_core.ts',
   'src/ui/map_quest_list_view.ts',
+  'src/ui/quest_tracking_core.ts',
+  'src/ui/quest_map_location_core.ts',
   'src/ui/arena_window_view.ts',
   'src/ui/pvp_record_core.ts',
   'src/ui/pvp_tabs_view.ts',
@@ -527,6 +556,9 @@ const UI_PURE_CORES = [
   'src/ui/dev_command_view.ts',
   'src/ui/dev_item_picker_view.ts',
   'src/ui/deeds_leaderboard_view.ts',
+  'src/ui/leaderboard_podium_view.ts',
+  'src/ui/leaderboard_podium_html.ts',
+  'src/ui/leaderboard_board_html.ts',
   'src/ui/daily_rewards_view.ts',
   'src/ui/deed_border_view.ts',
   'src/ui/deed_heraldry_plaque_core.ts',
@@ -536,11 +568,13 @@ const UI_PURE_CORES = [
   'src/ui/reliquary_sheet_view.ts',
   'src/ui/character_progression_view.ts',
   'src/ui/reliquary_tracker_view.ts',
+  'src/ui/recipe_tracker_view.ts',
   'src/ui/tracker_stack_anchor_core.ts',
   'src/ui/spellbook_view.ts',
   'src/ui/hud/quest/questlog_view.ts',
   'src/ui/swing_timer.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/target_frame_descriptor.ts',
   'src/ui/hud_frames.ts',
   'src/ui/stance_bar_view.ts',
   'src/ui/hud/stance/stance_radial_core.ts',
@@ -610,11 +644,17 @@ const UI_PURE_CORES = [
   'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  // The Toggle Friendly Nameplates view pref (Ctrl+V): module state the input
+  // layer owns and the nameplate painter reads, so render imports it as a game
+  // leaf the same way it reads the tier knobs. Pure: no DOM, no sim, no renderer.
+  'src/game/nameplate_view_prefs.ts',
+  'src/game/nearby_interaction_core.ts',
   'src/ui/trade_view.ts',
   'src/ui/trade_woc_view.ts',
   'src/ui/hud/rift/rift_floor_tracker_view.ts',
   'src/ui/hud/practice/practice_dps_view.ts',
   'src/ui/hud/practice/hub_lesson_view.ts',
+  'src/ui/hud/talking_head/talking_head_core.ts',
   'src/ui/hud/woc_trade/woc_trade_offer_view.ts',
   'src/ui/hud/target_dots/target_dots_view.ts',
   'src/ui/safe_local_storage.ts',
@@ -644,12 +684,15 @@ const DOM_GLOBAL_VALUE_ALLOWLIST = new Set([join(repoRoot, 'src/ui/safe_local_st
 // post_bloom_shader_core is the host-agnostic GLSL source patch for the
 // identity tint terms in UnrealBloom's composite shader.
 const RENDER_PURE_CORES = [
+  'src/render/tree_hide_index_core.ts',
+  'src/render/view_candidate_scan_core.ts',
   'src/render/arena_wall_occlusion_core.ts',
   'src/render/outdoor_light_rig_core.ts',
   'src/render/wall_backface_cull_core.ts',
   'src/render/dais_blocks_core.ts',
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
+  'src/render/rift_platform_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
   'src/render/nythraxis_bound_cage_core.ts',
   'src/render/nythraxis_grave_core.ts',
@@ -661,6 +704,7 @@ const RENDER_PURE_CORES = [
   'src/render/varkhul_assembly_focus_core.ts',
   'src/render/delve_interior_cache_core.ts',
   'src/render/entity_gate_stand_in_core.ts',
+  'src/render/entity_ground_sample_core.ts',
   'src/render/entity_view_policy_core.ts',
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
@@ -674,17 +718,23 @@ const RENDER_PURE_CORES = [
   'src/render/characters/anim_state_entity_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/entry_detail_horizon_core.ts',
+  'src/render/gather_batch_reach_core.ts',
+  'src/render/zone_feature_cells_core.ts',
   'src/render/characters/portrait_bitmap_transfer_core.ts',
   'src/render/characters/portrait_capture_lane_core.ts',
   'src/render/quest_beacon_core.ts',
   'src/render/coach_trail_core.ts',
+  'src/render/eastbrook_wolves_guidance_core.ts',
   'src/render/island_isolation_core.ts',
   'src/render/characters/portrait_prewarm_core.ts',
   'src/render/characters/portrait_readback_core.ts',
   'src/render/characters/preview_open_gate_core.ts',
   'src/render/characters/soul_rend_prewarm_core.ts',
   'src/render/characters/design_code_core.ts',
+  'src/render/view_vfx_pose_core.ts',
   'src/render/live_program_watch_core.ts',
+  'src/render/mount_preview_framing_core.ts',
+  'src/render/gpu_timer_probe_core.ts',
   'src/render/post_reveal_links_core.ts',
   'src/render/program_key_ledger_core.ts',
   'src/render/renderer_extensions.ts',
@@ -803,6 +853,7 @@ const RENDER_PURE_CORES = [
   'src/render/nameplate_cadence_core.ts',
   'src/render/nameplate_heraldry_core.ts',
   'src/render/nameplate_dots_core.ts',
+  'src/render/nameplate_friendly_core.ts',
   'src/render/net_interp_core.ts',
   'src/render/paladin_ascension_core.ts',
   'src/render/paladin_sun_verdict_core.ts',
@@ -913,6 +964,10 @@ const BARE_NAMED = [
   'src/ui/woc_balance_chip.ts',
   'src/ui/woc_market_chrome.ts',
   'src/ui/woc_market_activity_html.ts',
+  'src/ui/woc_market_detail_html.ts',
+  'src/ui/woc_market_sales_html.ts',
+  'src/ui/leaderboard_podium_html.ts',
+  'src/ui/leaderboard_board_html.ts',
   'src/ui/guild_tag.ts',
   'src/ui/wallet_bridge_reason_text.ts',
   'src/ui/terms_link.ts',
@@ -968,6 +1023,7 @@ const BARE_NAMED = [
   'src/ui/system_text_i18n.ts',
   'src/ui/target_frame_pos.ts',
   'src/ui/unit_frame.ts',
+  'src/ui/target_frame_descriptor.ts',
   'src/ui/hud_frames.ts',
   'src/ui/minimap_markers.ts',
   'src/ui/fct_event.ts',
@@ -982,6 +1038,7 @@ const BARE_NAMED = [
   'src/ui/chat_bubble_style.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
+  'src/game/nameplate_view_prefs.ts',
   'src/render/cast_bar.ts',
   'src/ui/safe_local_storage.ts',
   'src/ui/claudium_purchase_bridge.ts',
@@ -1983,6 +2040,7 @@ function deriveBareNamedCores(uiCores: string[], renderCores: string[]): string[
 // allowlist, so a synchronized delete leaves BARE_NAMED disagreeing with THIS list
 // instead of only agreeing with itself.
 const EXPECTED_BARE_NAMED = [
+  'src/game/nameplate_view_prefs.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/game/ui_effects_profile.ts',
@@ -2036,6 +2094,8 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/item_name_color.ts',
   'src/ui/item_slot_labels.ts',
   'src/ui/known_item.ts',
+  'src/ui/leaderboard_board_html.ts',
+  'src/ui/leaderboard_podium_html.ts',
   'src/ui/live_region_politeness.ts',
   'src/ui/log_event_route.ts',
   'src/ui/low_health.ts',
@@ -2061,6 +2121,7 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/store_purchase_intent.ts',
   'src/ui/swing_timer.ts',
   'src/ui/system_text_i18n.ts',
+  'src/ui/target_frame_descriptor.ts',
   'src/ui/target_frame_pos.ts',
   'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
@@ -2072,7 +2133,9 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/woc_log_tones.ts',
   'src/ui/woc_market_activity_html.ts',
   'src/ui/woc_market_chrome.ts',
+  'src/ui/woc_market_detail_html.ts',
   'src/ui/woc_market_reason_text.ts',
+  'src/ui/woc_market_sales_html.ts',
   'src/ui/woc_tokens_text.ts',
   'src/ui/xp_bar.ts',
 ];
@@ -2366,6 +2429,8 @@ const COLOR_FUNC_RE = /\brgba?\s*\(/g;
 // updates the nodes of its own window. What the gate enforces is that one of them
 // is chosen on purpose.
 const UI_PAINTER_HELPERS = [
+  // The Show Absorb Shields root-class gate (one classList.toggle on an injected host).
+  'src/ui/absorb_overlay_gate.ts',
   'src/ui/continent_land_mask.ts',
   'src/ui/text_sprite_cache.ts',
   // Detached tt-desc / tt-sub line mint (createElement + textContent only).
@@ -2396,11 +2461,20 @@ const UI_PAINTER_HELPERS = [
 // the English catalog, it is a maintainer fix during the release locale fill:
 // contributors do not edit those files.
 const UI_DOM_MODULES = [
+  // Mints the shared unit and bag-stack step buttons around a number input and
+  // writes the input on a press; the rules are quantity_step_core.ts.
+  'src/ui/quantity_stepper.ts',
   'src/ui/mobile_frame_long_press.ts',
   'src/ui/account_portal_dom.ts',
   'src/ui/appearance_customizer.ts',
+  // Owns browser state on purpose: it mints the reticle tick ring's root and
+  // mounts it, which is exactly the work it exists to keep out of hud.ts. The
+  // RULES it wires up are all in the pure cores (reticle_ticks_core,
+  // proc_ready_glow_core, haptic_pulse_core, aura_watchlist_core).
+  'src/ui/aura_overlay_wiring.ts',
   'src/ui/arena_window.ts',
   'src/ui/armory_inspect.ts',
+  'src/ui/mount_inspect_controller.ts',
   'src/ui/bag_item_action_menu.ts',
   'src/ui/bags_window.ts',
   'src/ui/bank_buy_prompt.ts',
@@ -2422,6 +2496,10 @@ const UI_DOM_MODULES = [
   'src/ui/hud/quest/quest_strip_controller.ts',
   'src/ui/hud/quest/quest_strip_gesture_controller.ts',
   'src/ui/hud/cross_hotbar/cross_hotbar_controller.ts',
+  'src/ui/options_window_shell.ts',
+  'src/ui/options_interface_rows.ts',
+  'src/ui/options_main_menu_controller.ts',
+  'src/ui/hud/talking_head/talking_head_controller.ts',
   'src/ui/char_skin_window.ts',
   'src/ui/char_window.ts',
   'src/ui/charselect_news.ts',
@@ -2429,6 +2507,7 @@ const UI_DOM_MODULES = [
   'src/ui/chat_command_menu.ts',
   'src/ui/claudium_window.ts',
   'src/ui/continent_art.ts',
+  'src/ui/touch_peek.ts',
   'src/ui/hud/professions/crafting_window.ts',
   'src/ui/hud/professions/commission_order_window.ts',
   // The spin celebration's live element: created, listened to, mounted on
@@ -2449,6 +2528,9 @@ const UI_DOM_MODULES = [
   'src/ui/epic_link.ts',
   'src/ui/focus_manager.ts',
   'src/ui/focus_restore.ts',
+  // The town-bell homecoming policy: the return-bell hint's per-device one-shot
+  // lives in localStorage; the note models stay in the pure tutorial_greeting_view.
+  'src/ui/ferry_bell_home_note.ts',
   'src/ui/form_draft.ts',
   'src/ui/gather_node_tooltip_controller.ts',
   'src/ui/gpu_notice_toast.ts',
@@ -2504,6 +2586,11 @@ const UI_DOM_MODULES = [
   'src/ui/map_bg.ts',
   'src/ui/map_marker_icon_loader.ts',
   'src/ui/map_marker_palette_lifecycle.ts',
+  // The World Map atlas rail adapter: it owns the rail subtree (a click listener
+  // on the injected root plus an innerHTML swap) and reads document.activeElement
+  // so the focused chip or quest row survives that swap.
+  'src/ui/map_sidebar_controller.ts',
+  'src/ui/market_sweep_panel.ts',
   'src/ui/market_window.ts',
   'src/ui/woc_market_window.ts',
   'src/ui/material_sources_dialog.ts',
@@ -2554,6 +2641,7 @@ const UI_DOM_MODULES = [
   'src/ui/hud/professions/professions_window.ts',
   'src/ui/raid_boss_guide_window.ts',
   'src/ui/raid_boss_guide_model_controller.ts',
+  'src/ui/hud/chat/ready_check_leader_window.ts',
   // The binder that gives a purchase-intent ledger a durable half. It reaches
   // localStorage (through the safe_local_storage seam, the one sanctioned door)
   // and the clock, which is precisely why it is not in the pure record core it
@@ -2589,6 +2677,10 @@ const UI_DOM_MODULES = [
   // once in its constructor, the same DOM-owning shape as its sibling above.
   'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
+  // The engine indicators' touch drag: pointer events on the frame, a resize
+  // listener, localStorage and the document's safe-area probe (the math is the
+  // touch_frame_drag_core pure core).
+  'src/ui/touch_frame_drag.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
   'src/ui/town_focus_window.ts',

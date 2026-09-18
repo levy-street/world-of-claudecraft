@@ -22,7 +22,6 @@ import {
 import { normalizeGraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
 import { type DesktopLaunchSettings, desktopBridge } from '../src/runtime';
 import { t } from '../src/ui/i18n';
-import { buildOptionsMenu } from '../src/ui/options_view';
 import { OptionsWindow } from '../src/ui/options_window';
 
 const BOOL_SETTING_KEYS = new Set(['waterRipples', 'forceHighPerfGpu']);
@@ -108,12 +107,10 @@ function openWindow(
   return window;
 }
 
+// By the row's data-menu-action hook, never by index: the main menu's order
+// shifts by host (the Unlock Interface row leads on desktop only).
 function goTo(root: HTMLElement, view: 'graphics' | 'interface'): void {
-  const menu = buildOptionsMenu({ bugReportAvailable: false });
-  const index = menu.findIndex(
-    (entry) => entry.action.kind === 'goto' && entry.action.view === view,
-  );
-  root.querySelectorAll<HTMLButtonElement>('.opt-btn')[index]?.click();
+  root.querySelector<HTMLButtonElement>(`.opt-btn[data-menu-action="${view}"]`)?.click();
 }
 
 /** A second window on a fresh root: the menu buttons live on the menu view only,
@@ -156,11 +153,13 @@ describe('OptionsWindow restart strip', () => {
 
     const shown = strip(root);
     expect(shown).not.toBeNull();
+    expect(shown?.classList.contains('ui-panel-strong')).toBe(true);
     expect(shown?.dataset.restartStrip).toBe('ready');
     expect(shown?.querySelector('.restart-strip-status')?.textContent).toBe(
       t('hudChrome.options.restartPending'),
     );
     expect(stripButton(root)?.textContent).toBe(t('hudChrome.options.restartGame'));
+    expect(stripButton(root)?.classList.contains('ui-btn--red')).toBe(true);
     expect(stripButton(root)?.disabled).toBe(false);
     // The in-page Apply is untouched: still there, still nothing to apply.
     const apply = root.querySelector<HTMLButtonElement>('[data-graphics-apply]');

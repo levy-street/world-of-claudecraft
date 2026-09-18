@@ -155,6 +155,7 @@ describe('settings_transfer_core', () => {
       'woc_native_auto_locale',
       'paladinDevotionAnchor',
       'procOverlayAnchor',
+      'warlockDoomAnchor',
       'woc_perf_overlay',
       'wocc.charSort',
       'woc.tutorial.v1',

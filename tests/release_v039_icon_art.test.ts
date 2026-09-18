@@ -4,7 +4,12 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ABILITIES, ITEMS } from '../src/sim/data';
 import { ActionBarController } from '../src/ui/hud/action_bar/action_bar_controller';
-import { abilityImageUrl, ITEM_ART_PENDING, itemImageUrl } from '../src/ui/icons';
+import {
+  ABILITY_ART_PENDING,
+  abilityImageUrl,
+  ITEM_ART_PENDING,
+  itemImageUrl,
+} from '../src/ui/icons';
 
 interface AcceptedAsset {
   kind: 'ability' | 'aura';
@@ -76,7 +81,9 @@ const SECOND_PASS_RECORD_SHA256 =
   // candidate's arm (78, its two disjoint reins items on the shared 76 base)
   // are additive, so 76 + 3 + 2 = 81. Substituted the two hotbarItems lines
   // by hand again, never a JSON round trip. No capture or asset was retaken.
-  '08348fb39f90a7074a3c9201811cb4bfd0905ec8b4bc534a3302e3e0e0a6a93e';
+  // PR #3898 adds the four painted elixirs to the hotbar-eligible set, advancing
+  // the sealed hotbarItems census 81 -> 85 without retaking any captures.
+  '1cc5c0af72c78bf0fe048c052861dc10008cb55925b013441a19730f9a83c581';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -384,7 +391,9 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // Cluckwork Mech Bird store-mount reins (79), then the OSSBrain PR
         // #3781 reconcile's own Goblin Rocket Sled and Rallycart RXT reins
         // (both committed painted art, kind 'mount') add two more: 81.
-        hotbarItems: { live: 81, painted: 81 },
+        // The four painted elixirs added by the action-bar eligibility change
+        // advance the sealed hotbar item census to 85.
+        hotbarItems: { live: 85, painted: 85 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
         fiesta: { augments: 20, powerups: 4, painted: 24 },
@@ -449,10 +458,21 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         hotbarItems: { live: number; painted: number };
       };
     };
-    const liveAbilityIds = Object.keys(ABILITIES);
+    // The ART-SUBJECT split, the same rule the hotbar items use below: an
+    // explicitly parked id (ABILITY_ART_PENDING, glyph-only until its art
+    // pass) is outside the painted census, and a parked id that ships art
+    // anyway is a stale entry.
+    const pendingAbilityIds = Object.keys(ABILITIES).filter((id) => ABILITY_ART_PENDING.has(id));
+    const liveAbilityIds = Object.keys(ABILITIES).filter((id) => !ABILITY_ART_PENDING.has(id));
     const paintedAbilityIds = new Set(
       liveAbilityIds.filter((id) => shippingImageExists(abilityImageUrl(id))),
     );
+    expect(
+      pendingAbilityIds.filter((id) =>
+        shippingImageExists(`/ui/skills/${ABILITIES[id].class}/${id}.webp`),
+      ),
+      'no parked ability ships committed art (a stale ABILITY_ART_PENDING entry)',
+    ).toEqual([]);
     const liveHotbarItemIds = Object.keys(ITEMS).filter((id) =>
       inventoryController.isHotbarItemId(id),
     );
@@ -490,10 +510,14 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // painted art and are never ITEM_ART_PENDING, so they join the
     // art-subject set directly: 102. Converting all five premium mounts to
     // skins retires their unusable reins from the hotbar: 102 - 5 = 97.
+    // PR #3898 admits the four painted elixirs to the production hotbar item
+    // inventory. The production set is broader than the sealed historical
+    // second-pass record because it also includes later pending-art families.
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(101);
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(97);
+    ).toHaveLength(101);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
@@ -503,6 +527,6 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       artSubjectHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
       'every art-subject hotbar item resolves to committed painted art',
     ).toEqual([]);
-    expect(aggregate.runtimeClosure.hotbarItems).toEqual({ live: 81, painted: 81 });
+    expect(aggregate.runtimeClosure.hotbarItems).toEqual({ live: 85, painted: 85 });
   });
 });

@@ -126,11 +126,14 @@ import {
 import { GATHER_NODES as GATHER_NODES_CONTENT } from './content/gather_nodes';
 import {
   type GraveyardDef,
+  LAST_KEEP_GRAVEYARD_ID,
+  LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
   OVERWORLD_GRAVEYARDS,
   SPIRIT_HEALER,
   SPIRIT_HEALER_NPC_ID,
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
+import { HEALING_TRAINING_MOBS } from './content/healing_training';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -401,6 +404,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...ZONE2_MOBS,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
+  ...HEALING_TRAINING_MOBS,
   ...DUNGEON_MOBS,
   ...WARLOCK_PET_MOBS,
   ...NECROMANCY_MOBS,
@@ -470,7 +474,14 @@ export const NPCS: Record<string, NpcDef> = {
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
 // whole death-loop data surface from this one merge module.
-export { type GraveyardDef, OVERWORLD_GRAVEYARDS, SPIRIT_HEALER, SPIRIT_HEALER_NPC_ID };
+export {
+  type GraveyardDef,
+  LAST_KEEP_GRAVEYARD_ID,
+  LAST_KEEP_SPIRIT_HEALER_ENTITY_ID,
+  OVERWORLD_GRAVEYARDS,
+  SPIRIT_HEALER,
+  SPIRIT_HEALER_NPC_ID,
+};
 
 export const QUESTS: Record<string, QuestDef> = {
   ...ZONE1_QUESTS,

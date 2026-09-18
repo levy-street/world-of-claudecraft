@@ -43,6 +43,8 @@ describe('spirit apparition models', () => {
     // the wrong ANIMAL rather than as a missing asset.
     expect(SPIRIT_URLS.bear).toBe('models/creatures/bear_form.glb');
     expect(SPIRIT_URLS.wolf).toBe('models/creatures/wolf.glb');
+    // the druid's cat form conjures its own rig, never the wolf it replaced
+    expect(SPIRIT_URLS.cat).toBe('models/creatures/druid_cat_form.glb');
     expect(SPIRIT_URLS.sheep).toBe('models/creatures/alpaca.glb');
     // the yeti rig stays the yeti's, and is no longer conscripted as a bear
     expect(Object.values(SPIRIT_URLS)).not.toContain('models/creatures/yetialt.glb');
@@ -55,17 +57,20 @@ describe('spirit apparition models', () => {
     }
   });
 
-  it('gives the bear spirit a move, idle and attack clip to match', async () => {
-    const names = await glbAnimationNames(`public/${SPIRIT_URLS.bear}`);
-    for (const [intent, list] of [
-      ['move', MOVE_CLIPS],
-      ['idle', IDLE_CLIPS],
-      ['attack', ATTACK_CLIPS],
-    ] as const) {
-      expect(
-        list.some((n) => names.has(n)),
-        `bear matches no ${intent} clip; it would slide along its path in bind pose. Has: ${[...names].join(', ')}`,
-      ).toBe(true);
-    }
-  });
+  it.each(['bear', 'cat'])(
+    'gives the %s spirit a move, idle and attack clip to match',
+    async (species) => {
+      const names = await glbAnimationNames(`public/${SPIRIT_URLS[species]}`);
+      for (const [intent, list] of [
+        ['move', MOVE_CLIPS],
+        ['idle', IDLE_CLIPS],
+        ['attack', ATTACK_CLIPS],
+      ] as const) {
+        expect(
+          list.some((n) => names.has(n)),
+          `${species} matches no ${intent} clip; it would slide along its path in bind pose. Has: ${[...names].join(', ')}`,
+        ).toBe(true);
+      }
+    },
+  );
 });

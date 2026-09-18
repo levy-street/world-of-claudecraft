@@ -7,6 +7,7 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
+import { SHADER_WARM_LINK_DEADLINE_MS } from '../src/render/shader_warm_worker_core';
 import { stripComments } from './helpers/strip_comments';
 
 /** Only the extension the worker's own contract turns on a decision:
@@ -26,6 +27,12 @@ let contextIsLost = false;
 
 /** The vertex texts the stub context was asked to link, in submission order. */
 let submitted: string[] = [];
+/** What the stub's completion query answers: pending until a case flips it,
+ *  so a link can be made to complete (and fail) at a chosen tick. */
+let linkComplete = false;
+/** Whether the stub context refuses to create a program object at all. */
+let refuseProgram = false;
+const COMPLETION_STATUS_KHR = 0x91b1;
 
 function glStub() {
   return {
@@ -42,12 +49,15 @@ function glStub() {
       if (shader.type === 1) submitted.push(source);
     },
     compileShader: () => {},
-    createProgram: () => ({}),
+    createProgram: () => (refuseProgram ? null : {}),
     attachShader: () => {},
     bindAttribLocation: () => {},
     linkProgram: () => {},
-    // Never completes: the cases here read the submission order only.
-    getProgramParameter: () => false,
+    // Never completes unless a case flips `linkComplete`, and never links
+    // (LINK_STATUS stays false): the cases read the submission order, the
+    // deadline, and a genuine failure.
+    getProgramParameter: (_program: unknown, pname: number) =>
+      pname === COMPLETION_STATUS_KHR ? linkComplete : false,
     deleteShader: () => {},
     deleteProgram: () => {},
   };
@@ -106,11 +116,22 @@ function warmOne(id: number, priority = 0) {
  *  a request schedules. */
 const TICK_WINDOW_MS = 50;
 
+/** The worker's last stats message: its window history is the AIMD's. */
+function lastStats(): Extract<ShaderWarmWorkerMessage, { kind: 'stats' }> | undefined {
+  const stats = posted.filter(
+    (message): message is Extract<ShaderWarmWorkerMessage, { kind: 'stats' }> =>
+      message.kind === 'stats',
+  );
+  return stats[stats.length - 1];
+}
+
 beforeEach(() => {
   posted.length = 0;
   canvases = [];
   submitted = [];
   contextIsLost = false;
+  linkComplete = false;
+  refuseProgram = false;
   // The worker's state is module-scoped and its handler installs at import.
   vi.resetModules();
 });
@@ -196,6 +217,76 @@ describe('the shader warm worker scope', () => {
     send(warmOne(7));
     vi.advanceTimersByTime(TICK_WINDOW_MS);
     expect(posted).toEqual([{ kind: 'failed', id: 7, reason: 'context-lost' }, { kind: 'lost' }]);
+  });
+
+  it('gives up a link at its deadline as a censored sample, with the wall it ran', async () => {
+    // The stub context never completes a link. Past the worker's own no-progress
+    // bound the flight is failed and dropped (one wedged link must not close
+    // admission for good), but the client learns WHAT it was: not a text the
+    // context rejected, a link that ran at least the deadline. That wall is
+    // the only link evidence a machine whose links never settle produces.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+    const send = await loadWorker();
+    init(send);
+    posted.length = 0;
+    // The clock is well past zero before the request: the wall posted is
+    // the link's own (submission to give-up), never the absolute clock.
+    vi.advanceTimersByTime(60_000);
+    send(warmOne(7));
+    vi.advanceTimersByTime(TICK_WINDOW_MS);
+    expect(submitted).toEqual(['v7']);
+    expect(posted.filter((message) => message.kind === 'failed')).toEqual([]);
+
+    vi.advanceTimersByTime(SHADER_WARM_LINK_DEADLINE_MS);
+    const failed = posted.filter((message) => message.kind === 'failed');
+    expect(failed).toEqual([
+      { kind: 'failed', id: 7, reason: 'link-deadline', linkMs: expect.any(Number) },
+    ]);
+    const linkMs = (failed[0] as { linkMs: number }).linkMs;
+    expect(linkMs).toBeGreaterThanOrEqual(SHADER_WARM_LINK_DEADLINE_MS);
+    expect(linkMs).toBeLessThan(SHADER_WARM_LINK_DEADLINE_MS + TICK_WINDOW_MS);
+    // A link past the deadline is slowness evidence: the window backs off.
+    expect(lastStats()).toMatchObject({ backoffCount: 1, failed: 1 });
+  });
+
+  it('keeps a genuine link failure past the deadline a failure, with no wall on it', async () => {
+    // The deadline arm only reclassifies a link still PENDING. A link the
+    // driver finished and refused, however late it answered, is a text the
+    // context rejected: the client must not read it as link-cost evidence.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+    const send = await loadWorker();
+    init(send);
+    posted.length = 0;
+    send(warmOne(7));
+    vi.advanceTimersByTime(TICK_WINDOW_MS);
+    expect(submitted).toEqual(['v7']);
+    // Right before the tick that crosses the deadline, the driver answers:
+    // complete, and not linked.
+    vi.advanceTimersByTime(SHADER_WARM_LINK_DEADLINE_MS - TICK_WINDOW_MS);
+    linkComplete = true;
+    vi.advanceTimersByTime(TICK_WINDOW_MS);
+    expect(posted.filter((message) => message.kind === 'failed')).toEqual([
+      { kind: 'failed', id: 7, reason: 'link-failed' },
+    ]);
+    // A refused text is not congestion: the window does not back off.
+    expect(lastStats()).toMatchObject({ backoffCount: 0, failed: 1 });
+  });
+
+  it('keeps the window when the context will not even create the program', async () => {
+    // The other rejection the worker can meet: no program object at all. It
+    // says as little about the driver's load as a failed link status does.
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'performance'] });
+    const send = await loadWorker();
+    init(send);
+    posted.length = 0;
+    refuseProgram = true;
+    send(warmOne(7));
+    vi.advanceTimersByTime(TICK_WINDOW_MS);
+    expect(submitted).toEqual([]);
+    expect(posted.filter((message) => message.kind === 'failed')).toEqual([
+      { kind: 'failed', id: 7, reason: 'link-failed' },
+    ]);
+    expect(lastStats()).toMatchObject({ backoffCount: 0, failed: 1 });
   });
 
   it('submits a reprioritized request ahead of what was queued before it', async () => {

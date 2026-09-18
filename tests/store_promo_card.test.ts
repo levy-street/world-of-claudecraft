@@ -139,6 +139,17 @@ describe('store promo card', () => {
     expect(storePromoReservedHeight(500, 1.25)).toBe(307.5);
   });
 
+  it('keeps the required outward focus ring outside the card clip', () => {
+    const hudCss = readFileSync(join(process.cwd(), 'src/styles/hud.css'), 'utf8');
+    const card = /\.store-promo-card \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    const open = /\.store-promo-card-open \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    const focus = /\.store-promo-card-open:focus-visible \{([^}]*)\}/.exec(hudCss)?.[1] ?? '';
+    expect(card).toContain('overflow: visible;');
+    expect(open).toContain('overflow: hidden;');
+    expect(focus).toContain('outline: 2px solid var(--color-border-focus);');
+    expect(focus).toContain('outline-offset: 2px;');
+  });
+
   it('opens the Store, preserves a permanent focus target, and then dismisses itself', () => {
     const { document, host, returnTarget } = fixture();
     const calls: string[] = [];
@@ -154,8 +165,10 @@ describe('store promo card', () => {
     });
 
     const open = host.querySelector('.store-promo-card-open');
+    expect(host.querySelector('.store-promo-card')?.className).toContain('ui-panel');
     expect(open?.getAttribute('aria-label')).toBe('WOC Store');
-    expect(open?.querySelector('.store-promo-card-copy')).not.toBeNull();
+    expect(open?.querySelector('.store-promo-card-copy')?.className).toContain('ui-outline');
+    expect(open?.querySelector('.store-promo-card-cta')?.className).toContain('ui-chip');
     expect(open?.querySelector('.store-promo-card-cta')?.textContent).toBe('WOC Store');
     expect(open?.querySelector('img')?.src).toBe('/ui/store/season-01-armory-promo.webp');
 
@@ -176,6 +189,7 @@ describe('store promo card', () => {
     });
 
     const close = host.querySelector('.store-promo-card-close');
+    expect(close?.className).toContain('ui-x-btn');
     expect(close?.getAttribute('aria-label')).toBe('Close WOC Store');
     close?.dispatch('click');
 

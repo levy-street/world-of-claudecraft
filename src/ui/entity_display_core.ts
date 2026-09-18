@@ -21,6 +21,7 @@ import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { feastTitleFor } from './hud/professions/feast_title';
 import { formatNumber, t } from './i18n';
+import { professionTrainerLabel } from './profession_trainer_label_core';
 import { localizeSimAuraName } from './sim_i18n';
 
 export function itemDisplayNameFromSource(name: string): string {
@@ -44,7 +45,7 @@ export function npcDisplayName(npcId: string): string {
 }
 
 export function npcDisplayTitle(npcId: string): string {
-  return tEntity({ kind: 'npc', id: npcId, field: 'title' });
+  return professionTrainerLabel(npcId) || tEntity({ kind: 'npc', id: npcId, field: 'title' });
 }
 
 export function npcGreeting(npcId: string, playerClass: PlayerClass, playerName: string): string {

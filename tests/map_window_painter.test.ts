@@ -15,12 +15,14 @@ import {
   BUILTIN_WORLD,
   CAMPS,
   DUNGEON_LIST,
+  NPCS,
   QUESTS,
   STRIP_MAX_X,
   STRIP_MIN_X,
   setActiveWorldContent,
   ZONES,
 } from '../src/sim/data';
+import { isProfessionQuest } from '../src/sim/quests/ambient_quest_marker';
 import { emptyZoneProps, isQuestTurnInNpc, type QuestProgress } from '../src/sim/types';
 import { overworldDungeonPortals } from '../src/ui/map_dungeon_portals';
 import {
@@ -446,7 +448,11 @@ function mapWorld(): IWorld {
   } as unknown as IWorld;
 }
 
+let restoreRepeatGiver: (() => void) | undefined;
 afterEach(() => {
+  restoreRepeatGiver?.();
+  restoreRepeatGiver = undefined;
+  delete QUESTS.q_test_map_painter_repeat;
   setActiveWorldContent(null);
   vi.unstubAllGlobals();
 });
@@ -678,10 +684,9 @@ describe('map_window_painter: cadence + cached background preserved', () => {
 const LABEL_ZONE = ZONES[0];
 const LABEL_ZONE_CZ = (LABEL_ZONE.zMin + LABEL_ZONE.zMax) / 2;
 
-// Real content rather than a synthetic fixture, so a rename in the quest tables
-// cannot leave this passing against a stale expectation.
+// A real combat offer: ambient profession offers are intentionally hidden.
 function questWithGiver() {
-  const quest = Object.values(QUESTS).find((q) => q.giverNpcId);
+  const quest = QUESTS.q_boars;
   if (!quest) throw new Error('expected a quest with a giverNpcId');
   return quest;
 }
@@ -757,7 +762,7 @@ function labelWorld(): IWorld {
  *  (ready) glyph rather than the '!' (available) one. */
 function turnInQuestWithGiver() {
   const quest = Object.values(QUESTS).find(
-    (q) => q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
+    (q) => !isProfessionQuest(q) && q.giverNpcId && isQuestTurnInNpc(q, q.giverNpcId),
   );
   if (!quest) throw new Error('expected a quest whose giver is also a turn-in npc');
   return quest;
@@ -782,8 +787,21 @@ function readyGlyphWorld(): IWorld {
 function questVariantWorld(state: 'available' | 'ready' | 'repeat' | 'cooldown'): IWorld {
   if (state === 'ready') return readyGlyphWorld();
   if (state === 'available') return labelWorld();
-  const workOrder = Object.values(QUESTS).find((q) => q.repeatable && q.repeatCadenceTicks);
-  if (!workOrder) throw new Error('expected a cadenced work order');
+  // Current repeatables are profession offers and do not produce ambient
+  // markers. A synthetic combat repeatable preserves the painter's generic
+  // repeat/cooldown art, geometry, and alpha contract without changing that policy.
+  const workOrder = {
+    ...questWithGiver(),
+    id: 'q_test_map_painter_repeat',
+    repeatable: true,
+    repeatCadenceTicks: 100,
+  };
+  QUESTS[workOrder.id] = workOrder;
+  const giver = NPCS[workOrder.giverNpcId];
+  restoreRepeatGiver = () => {
+    NPCS[giver.id] = giver;
+  };
+  NPCS[giver.id] = { ...giver, questIds: [...giver.questIds, workOrder.id] };
   const world = labelWorld() as unknown as {
     entities: Map<number, { templateId: string; questIds: string[] }>;
     questState: (q: string) => string;

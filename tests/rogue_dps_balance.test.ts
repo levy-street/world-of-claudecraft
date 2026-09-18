@@ -71,9 +71,20 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
       // NO masterwrought piece at all (tests/dev_bis_gear.test.ts pins the
       // same displacement per class). This pin re-anchors to that merged
       // truth so the mechanism survives: the next swap reds on gear first.
+      // 2026-09-11, the stamina baseline model (item_budget.ts): the reference
+      // picker now scores the class LINE plus stamina and armor, never the raw
+      // five-stat bag, so the caster jewelry the rogue wore by accident of that
+      // bag (an Intellect amulet, an Intellect ring) gives way to Ignivar's
+      // Ember Choker and the Seal of the Forgewall; the three-seed averages
+      // stayed inside the bands below (185.8 / 207.6 / 152.6) and the sibling
+      // order held, so only the identity pins move.
       expect(Object.keys(gear).length, `${spec} fills every slot`).toBe(12);
-      expect(gear.neck, `${spec} neck is the Crucible amulet`).toBe('heartspring_amulet');
-      expect(gear.ring2, `${spec} ring2 is the Crucible ring`).toBe('circle_of_cinders');
+      expect(gear.neck, `${spec} neck is the physical Ignivar choker`).toBe(
+        'ignivars_ember_choker',
+      );
+      expect(gear.ring2, `${spec} ring2 is the physical Forgewall seal`).toBe(
+        'seal_of_the_forgewall',
+      );
       expect(
         Object.values(gear).every((itemId) => ITEMS[itemId]?.quality === 'epic'),
         `${spec} probe loadout excludes legendary gear`,

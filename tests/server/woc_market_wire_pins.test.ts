@@ -163,6 +163,10 @@ function saleRow(): WocSaleRow {
     buyerAccount: VIEWER,
     sellerName: 'Aurelia',
     buyerName: 'Sable',
+    saleType: 'auction',
+    quality: 'epic',
+    category: 'armor',
+    subcategory: 'chest',
     excluded: false,
     atMs: 1_799_000_300_000,
   };
@@ -303,6 +307,22 @@ async function historySaleView(): Promise<Record<string, unknown>> {
   return (body.sales as Record<string, unknown>[])[0];
 }
 
+async function realmSalesBody(): Promise<Record<string, unknown>> {
+  service({
+    realmSalesHistory: async () => ({
+      sales: [saleRow()],
+      hasMore: true,
+      page: 0,
+      pageSize: 25,
+    }),
+  });
+  const ctx = readCtx({ url: '/api/woc-market/sales' });
+  await handlerFor('GET', '/api/woc-market/sales')(ctx);
+  const { status, body } = sent(ctx);
+  expect(status).toBe(200);
+  return body;
+}
+
 async function sellerHistoryBody(): Promise<Record<string, unknown>> {
   service({
     sellerSalesHistory: async () => ({
@@ -417,6 +437,27 @@ describe('market wire views expose exactly their pinned key sets', () => {
       // No `item`: the full InvSlot was dead wire weight (no client reader);
       // itemId is the identity the history caller already keys by.
       ['atMs', 'buyerName', 'id', 'itemId', 'priceCents', 'sellerName'].sort(),
+    );
+  });
+
+  it('realmSaleView (the Sales History tab)', async () => {
+    // The realm-wide sales row: the saleView fields plus the two the tab shows
+    // and the per-item read does not, the sale type and the item quality
+    // (which frames the icon). category/subcategory stay filter-only, never
+    // on the wire. The response wraps them with the browse-style pager fields.
+    const body = await realmSalesBody();
+    expect(Object.keys(body).sort()).toEqual(['hasMore', 'page', 'pageSize', 'sales'].sort());
+    expect(Object.keys((body.sales as Record<string, unknown>[])[0]).sort()).toEqual(
+      [
+        'atMs',
+        'buyerName',
+        'id',
+        'itemId',
+        'priceCents',
+        'quality',
+        'saleType',
+        'sellerName',
+      ].sort(),
     );
   });
 

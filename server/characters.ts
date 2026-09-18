@@ -44,12 +44,14 @@
 import type * as http from 'node:http';
 import { resolveActiveWeaponSkin } from '../src/sim/content/weapon_skin_rules';
 import { DEEDS_RECENT_CAP } from '../src/sim/deeds';
+import { savedZoneId } from '../src/sim/saved_pos_exit';
 import type { CharacterState } from '../src/sim/sim';
 import { isSkinCatalog, type PlayerClass } from '../src/sim/types';
 // The shared, host-agnostic bounds check for an untrusted look (the
 // action_bar.ts pattern). The renderer owns what the values MEAN; the server
 // only guarantees the stored document is small and well shaped.
 import { sanitizeAppearance } from '../src/world_api/appearance';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { normalizeCharName, offensiveName } from './auth';
 import {
   characterDeleteClientGone,
@@ -248,6 +250,7 @@ function useRuntime(): CharactersRuntime {
 const REAL_CHARACTERS_DB = {
   accountAndScopeForToken,
   loadAccountCosmetics,
+  loadAccountLedgerKeys: accountLedgerKeysFor,
   moderationStatusForAccount,
   listCharacters,
   getCharacter,
@@ -388,7 +391,7 @@ export function buildCharacterList(
       mainhandItemId: c.state?.equipment?.mainhand ?? null,
       offhandItemId: c.state?.equipment?.offhand ?? null,
       // The account's active Armory weapon skin for THIS character's class and
-      // held mainhand (the same shared rule the world and paperdoll use), so
+      // held hands (the same shared rule the world and paperdoll use), so
       // the char-select turntable matches the in-world render. Loadout is
       // account state; resolution is per character.
       weaponSkinId: resolveActiveWeaponSkin(
@@ -396,6 +399,7 @@ export function buildCharacterList(
         c.state?.equipment?.mainhand ?? null,
         weaponSkinLoadout,
         isSkinCatalog(c.state?.skinCatalog) ? c.state.skinCatalog : 'class',
+        c.state?.equipment?.offhand ?? null,
       ),
       // The authored modular look (null = pre-creator character, legacy rig).
       // Re-validated here the same way the join path does (ws_auth.ts
@@ -413,6 +417,11 @@ export function buildCharacterList(
       // Server-decided (cutoff + unspent token): the roster's one-shot
       // redesign button renders exactly when this is true.
       appearanceRerollAvailable: appearanceRerollAvailable(c),
+      // The zone this character stands in on login (the same rejoin rule
+      // addPlayer applies, so an instance save reads as its door's zone; null
+      // for a mid-match battleground save that resumes at the world start).
+      // Character select labels the roster row with it.
+      zoneId: savedZoneId(c.state?.pos),
     })),
   };
 }
@@ -787,10 +796,13 @@ async function standingHandler(ctx: Ctx): Promise<void> {
 async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
   const row = ownedCharacter(ctx);
-  const [guild, rank, deedsRecent] = await Promise.all([
+  const [guild, rank, deedsRecent, accountLedger] = await Promise.all([
     charactersDb.guildNameForCharacter(row.id),
     charactersDb.lifetimeXpRankForCharacter(row.id),
     charactersDb.recentDeedsForCharacter(row.id, SHEET_RECENT_DEEDS),
+    // A cosmetic aggregate must never 500 the sheet: a failed ledger read
+    // degrades the pair to the character's own fills.
+    charactersDb.loadAccountLedgerKeys(row.account_id).catch(() => undefined),
   ]);
   json(
     ctx.res,
@@ -803,6 +815,7 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
       guild,
       rank: toSheetRank(rank),
       deedsRecent,
+      accountLedger,
     }),
   );
 }

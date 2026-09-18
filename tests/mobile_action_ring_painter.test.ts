@@ -252,8 +252,11 @@ describe('mobile action ring: proc state remains perceptible', () => {
       MOBILE_HUD_CSS,
       'body.mobile-touch #mobile-action-ring button.proc',
     );
-    expect(steadyRule).toContain('border-color: #ffd97a;');
-    expect(steadyRule).toMatch(/box-shadow:\s*[\s\S]*#ffcf40e6/);
+    // W13: the proc rim and halo read --color-proc-rim / --color-proc-glow, the
+    // same tokens the desktop .action-btn.proc family uses; only the blur radius
+    // rides --fx-shadow, so the actionable rim is identical on every tier.
+    expect(steadyRule).toContain('border-color: var(--color-proc-rim);');
+    expect(steadyRule).toMatch(/box-shadow:\s*[\s\S]*var\(--color-proc-glow\)/);
     // The override may share its block with other selectors (button.empowered
     // groups with it upstream): [^{]* spans the rest of the selector list, so
     // this still proves button.proc itself receives animation: none.

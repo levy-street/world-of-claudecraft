@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import {
@@ -67,6 +68,37 @@ function meshCount(root: THREE.Object3D): number {
 }
 
 describe('Varkhul forge beam visuals', () => {
+  it('attaches a new forge meter through the compile gate, hidden until it links', async () => {
+    // Varkhul is already active when the player steps through the Crucible
+    // gate, before the interior's encounter prewarm has run; the root goes
+    // in hidden and shows once the gate resolves instead of linking its
+    // programs on the arrival frame (2026-09-12 hunt, twice running).
+    const scene = new THREE.Scene();
+    let release!: () => void;
+    const gate = vi.fn(() => new Promise<void>((resolve) => (release = resolve)));
+    const visuals = new VarkhulForgeBeamVisuals(scene, () => 0, gate);
+    visuals.sync([ACTIVE]);
+    const root = scene.getObjectByName(`varkhul-forge-beams-${ACTIVE.bossId}`);
+    expect(root).toBeDefined();
+    expect(gate).toHaveBeenCalledWith(root);
+    expect(root?.visible).toBe(false);
+    release();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(root?.visible).toBe(true);
+    visuals.dispose();
+  });
+
+  it('threads the renderer compile gate through the forgestorm host to the forge meter', () => {
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const host = readFileSync(
+      new URL('../src/render/varkhul_forgestorm_visual.ts', import.meta.url),
+      'utf8',
+    );
+    expect(renderer).toContain('new VarkhulForgestormVisuals(this.scene, this.groundSample, gate)');
+    expect(renderer).toContain('const gate = this.worldCompileGate();');
+    expect(host).toContain('new VarkhulForgeBeamVisuals(scene, groundY, compileGate)');
+  });
+
   it('formats the world-space heat percentage through the active locale', () => {
     setLanguage('es_ES');
     try {

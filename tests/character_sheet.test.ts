@@ -13,6 +13,7 @@ import {
   splitCopper,
 } from '../server/character_sheet';
 import type { CharacterRow } from '../server/db';
+import { accountRelicKey, freshAccountLedger, recordAccountRelic } from '../src/sim/account_ledger';
 import { DEEDS } from '../src/sim/content/deeds';
 import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS, MOBS, zoneAt } from '../src/sim/data';
@@ -723,5 +724,54 @@ describe('characterSheet: deeds.recent hidden/unknown filter', () => {
     expect(own.deeds.recent).toEqual([
       { deedId: 'prog_veteran', earnedAt: '2026-06-01T13:45:22.318Z' },
     ]);
+  });
+});
+
+describe('characterSheet: the Reliquary pair reads the account ledger', () => {
+  // The public sheet reads the same account-wide union the in-game window and
+  // the inspect card show (jgyy's public-sheet read from PR #3933, over our
+  // ledger). Absent ledger: the character's own fills only, never a throw.
+  it('counts a relic an alt found, and ranks from the union; no ledger means own fills only', () => {
+    const state = makeState({});
+    const own = sheetReliquaryFromState(state);
+    expect(own.owned).toBe(0);
+    expect(own.curatorRank).toBe(0);
+    const ledger = freshAccountLedger();
+    recordAccountRelic(ledger, accountRelicKey('item', 'cryptbone_helm'), {
+      characterId: 99,
+      name: 'Bram',
+      cls: 'mage',
+      day: '2026-09-01',
+    });
+    const shared = sheetReliquaryFromState(state, ledger);
+    expect(shared.owned).toBe(1);
+    expect(shared.total).toBe(own.total);
+    expect(shared.curatorRank).toBe(1);
+    // The strip is HISTORY and stays the character's own: the alt's find is
+    // not this character's recent find.
+    expect(shared.recent).toEqual([]);
+  });
+
+  it('threads the ledger from the sheet input into the pair', () => {
+    const ledger = freshAccountLedger();
+    recordAccountRelic(ledger, accountRelicKey('item', 'cryptbone_helm'), {
+      characterId: 99,
+      name: 'Bram',
+      cls: 'mage',
+      day: '2026-09-01',
+    });
+    const sheet = characterSheet(input({ visibility: 'public', accountLedger: ledger }));
+    expect(sheet.reliquary.owned).toBe(1);
+    expect(characterSheet(input({ visibility: 'public' })).reliquary.owned).toBe(0);
+  });
+
+  it('accepts the ids-only Sets view the public handlers pass (accountLedgerKeysFor)', () => {
+    // The /c/ page and both JSON sheets hand in AccountLedgerKeys (two Sets of
+    // ids, no earner detail), not the join-time Maps ledger: membership is
+    // all the pair needs, and this pins the key format the cache serves.
+    const keys = { deeds: new Set<string>(), relics: new Set(['item:cryptbone_helm']) };
+    const sheet = characterSheet(input({ visibility: 'public', accountLedger: keys }));
+    expect(sheet.reliquary.owned).toBe(1);
+    expect(sheet.reliquary.curatorRank).toBe(1);
   });
 });

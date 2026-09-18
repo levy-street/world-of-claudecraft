@@ -110,3 +110,26 @@ for (const [cls, tree] of Object.entries(ROW_TREES)) {
     throw new Error(`Invalid talent row tree for ${cls}: ${errors.join('; ')}`);
   }
 }
+
+/**
+ * Returns groups of active ability IDs that are mutually exclusive alternatives
+ * on the same talent choice row. When a player changes their choice on such a row,
+ * the action bar can replace the old ability in-place with the new one.
+ */
+export function classTalentChoiceAbilityGroups(cls: PlayerClass): string[][] {
+  const tree = rowTreeFor(cls);
+  if (!tree) return [];
+  const groups: string[][] = [];
+  for (const row of tree) {
+    const abilityIds: string[] = [];
+    for (const option of row.options) {
+      if (option.effect.grant?.ability) {
+        abilityIds.push(option.effect.grant.ability);
+      }
+    }
+    if (abilityIds.length > 1) {
+      groups.push(abilityIds);
+    }
+  }
+  return groups;
+}

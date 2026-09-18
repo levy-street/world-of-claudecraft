@@ -4,6 +4,8 @@
 // a pure read over the SimContext views (no rng, no mutation, no tick-phase
 // work); Sim keeps thin getters that delegate here so the IWorld surface
 // resolves unchanged. Sibling of ignivar_raid_readouts.ts.
+
+import { instanceEntities } from './instance_entities';
 import {
   type ActiveNythraxisBindingSigil,
   activeNythraxisBindingSigils,
@@ -42,8 +44,9 @@ function nythraxisDifficulty(ctx: SimContext, bossId: number): DungeonDifficulty
   return inst?.difficulty === 'heroic' ? 'heroic' : 'normal';
 }
 
+// The slots' own mob lists, never the whole roster (see ignivar_raid_readouts.ts).
 function* liveBosses(ctx: SimContext) {
-  for (const entity of ctx.entities.values()) {
+  for (const entity of instanceEntities(ctx)) {
     if (entity.templateId !== NYTHRAXIS_BOSS_ID || entity.dead || !entity.nythraxis) continue;
     yield entity as typeof entity & { nythraxis: NythraxisEncounterState };
   }

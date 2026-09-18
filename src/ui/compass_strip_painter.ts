@@ -36,7 +36,9 @@ export function buildCompassMarks(track: HTMLElement, doc: Document): CompassMar
   const marks: CompassMarkElements = new Map();
   for (const id of COMPASS_ROSE_IDS) {
     const el = doc.createElement('span');
-    el.className = `compass-mark${id.length === 1 ? ' major' : ''}`;
+    // The rose labels ride the Cinzel outline family, so the strip reads as
+    // one with the other engraved chrome.
+    el.className = `compass-mark ui-cin ui-outline${id.length === 1 ? ' major' : ''}`;
     el.textContent = t(`hudChrome.compass.${id}`);
     track.appendChild(el);
     marks.set(id, el);

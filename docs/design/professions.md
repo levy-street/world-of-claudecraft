@@ -961,7 +961,9 @@ guards.
 | MARKET_MAX_LISTINGS | src/sim/market.ts | 12 per seller |
 | STATION_RADIUS | src/sim/content/professions.ts | 20 |
 | BARE_HANDS_TOOL_TIER | src/sim/professions/tools.ts | 1 |
-| MAIL_ATTACHMENT_EXPIRY_SECONDS | src/sim/mail/post_office.ts | 30 days sim-time |
+| MAIL_ATTACHMENT_EXPIRY_SECONDS | src/sim/mail/post_office.ts | 30 days sim-time (then the parcel flies home and holds Infinity: mail with attachments is never auto-deleted) |
+| MAIL_UNREAD_EXPIRY_SECONDS / MAIL_READ_EXPIRY_SECONDS | src/sim/mail/post_office.ts | 30 days / 3 days sim-time for a letter with no escrow aboard; an unread Exchange Broker letter (WOC_MARKET_LETTER_IDS) waits MAIL_EXCHANGE_UNREAD_EXPIRY_SECONDS (90 days) instead |
+| MAIL_ESCROW_COPPER_MIN | src/sim/mail/post_office.ts | 100 copper (one silver): coin below this is not escrow, so the letter is swept with the coin aboard; any item stack is escrow (mailHoldsEscrow) |
 | CORPSE_INTERACT_GRACE_SECONDS | src/sim/loot/loot_roll.ts | 30 |
 | requiredAmendsProgress | src/sim/professions/archetype.ts | 5 + 3 * switchCount |
 | LEGACY_GOLD_POSITIVE_RECIPE_IDS | tests/recipe_economy.test.ts | empty set (every recipe passes the invariant) |
@@ -1044,6 +1046,33 @@ worklist's phase 13: the wield gate is the shipped enforcement
 the knife-edge derivation in `tests/professions_tool_gate.test.ts`), the
 counters sell ahead freely with the requirement as an advisory line, and
 the old authoritative buy deny is retired.
+
+Two amendments from the "Farming Tools not working correctly" player report
+(pinned in `tests/professions_wield_degrade.test.ts`):
+
+- **Degrade, never drop.** A land tool above its holder's counter is no
+  longer filtered out of the bag scan; it works as the best tier the counter
+  allows (`effectiveWieldableTier`). The report's brick: every hoe upgrade
+  recipe consumes the previous hoe, and the tier-2 hoe is an engineering
+  craft at skill 0, so a farmer who crafted it under farming 40 owned NO
+  usable hoe and could not plant even the tier-1 crops they had been
+  planting. The gate still refuses exactly what it was written to refuse
+  (ground ABOVE the counter, which a traded tool still cannot skip), and a
+  denial now names the TARGET tier's requirement, which under this rule is
+  the number that actually unlocks the ground asked for.
+- **Farming reads its own ladder.** The 40/70/85 table was written against
+  the node ladders; crops open on the 25-point band
+  (`farmCropSkillThreshold`, `src/sim/content/farm_crops.ts`), so a tier-2
+  seed said 25 while its hoe said 40. Farming's hoe requirements are now
+  derived FROM the crop thresholds (`FARMING_WIELD_REQUIREMENT_BY_TIER`,
+  0/25/50/75, the apex hoe at the cap), so a hoe wields on exactly the
+  proficiency that opens its tier of seed. The land node professions keep
+  the shared table; rods stay exempt.
+
+The same report retired the farming plant cast: the plot was written at
+command time and the two-second bar decided nothing, so cancelling it by
+walking off read as a broken cast that had eaten the seed. Planting is now
+instant, like harvesting (`plantCrop` in `src/sim/professions/farming.ts`).
 
 One knock-on worth naming, and it INVERTED when the gate moved: the tier-4
 engineering tool recipes consume the tier-3 land tools as reagents, and

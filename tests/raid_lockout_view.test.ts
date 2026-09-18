@@ -13,6 +13,7 @@ describe('raidLockoutPanelHtml', () => {
     const html = raidLockoutPanelHtml([], i18n);
     expect(html).toContain('Raid Lockouts');
     expect(html).toContain('All raids ready');
+    expect(html).toContain('class="tt-title rl-panel-title ui-cin"');
     expect(html).not.toContain('rl-row');
   });
 
@@ -23,6 +24,7 @@ describe('raidLockoutPanelHtml', () => {
     );
     expect(html).toContain('Crypt of Nythraxis');
     expect(html).toContain('5h');
+    expect(html).toContain('class="rl-time ui-num"');
     expect(html).not.toContain('All raids ready');
   });
 

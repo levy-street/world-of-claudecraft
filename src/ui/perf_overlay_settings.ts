@@ -84,9 +84,10 @@ export class PerfOverlaySettingsPanel {
     // The gilded corner ornament (components.css) is a ::before on this same
     // container, so the container itself must stay non-scrolling or the
     // ornament scrolls away with the content instead of staying pinned to the
-    // window frame (issue #2569). Everything that DOES need to scroll (the
-    // card body plus the footer buttons) lives inside this dedicated wrapper.
-    const scroll = div('perf-scroll');
+    // window frame (issue #2569). The cards scroll inside this wrapper, which is
+    // the window shell's one scrolling body (library.css); the footer buttons sit
+    // OUTSIDE it so Reset and Back cannot scroll out of reach.
+    const scroll = div('perf-scroll ui-win-body');
     container.appendChild(scroll);
 
     const panel = div('perf-panel');
@@ -104,7 +105,7 @@ export class PerfOverlaySettingsPanel {
     this.buildAppearanceCard(right);
     this.buildPositionCard(right);
 
-    scroll.appendChild(this.buildFooter());
+    container.appendChild(this.buildFooter());
   }
 
   /** Push a dropped drag position back into the X/Y sliders (no full re-render). */
@@ -212,7 +213,9 @@ export class PerfOverlaySettingsPanel {
       for (const chip of chips) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'btn set-choice-btn';
+        // ui-btn carries the selected fill off aria-pressed, which sync() sets
+        // below; the legacy .set-choice-btn.sel look no longer exists.
+        btn.className = 'btn ui-btn set-choice-btn';
         const label = t(chip.labelKey);
         btn.textContent = label;
         const isOn = (): boolean => perf.get().metrics[chip.key];
@@ -359,7 +362,7 @@ export class PerfOverlaySettingsPanel {
   }
 
   private buildFooter(): HTMLElement {
-    const footer = div('perf-footer');
+    const footer = div('perf-footer ui-win-foot');
     const reset = document.createElement('button');
     reset.type = 'button';
     reset.className = 'btn';

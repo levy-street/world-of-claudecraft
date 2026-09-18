@@ -259,7 +259,6 @@ export const fr_CA: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Arme enchantée : {min} à {max} dégâts bonus au Verdict',
   'hudChrome.auraEffect.stealth': 'Dissimulé ; vitesse de déplacement réduite de {pct}%',
   'hudChrome.auraEffect.formBear': 'Forme de Bruin : points de vie et armure accrus',
-  'hudChrome.auraEffect.formCat': 'Forme féline : dégâts de mêlée et énergie',
   'hudChrome.auraEffect.formTravel': 'Forme de Fleet : vitesse de déplacement accrue de {pct}%',
   'hudChrome.auraEffect.defensiveStance':
     'Guarded Stance : dégâts encaissés réduits, menace accrue',

@@ -195,11 +195,14 @@ humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
 `MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
 live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
-(`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer.
+(`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer;
+`characterFormAssetKey` (`form_visual_selection_core.ts`) then splits the shared cat slot at
+construction, so a shaman's `ghost_wolf` aura resolves to `form_ghost_wolf` (the tinted
+`wolf_basic.glb`) while the druid's `form_cat` loads its own `druid_cat_form.glb`.
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`
-  (`idle|walk|walkBack|run|cast|spin|swim|sit|jump`) live in `anim_state.ts`, which
+  (`idle|walk|walkBack|run|cast|spin|swim|sit|jump|prowlIdle|prowlWalk|...`) live in `anim_state.ts`, which
   also owns `desiredBaseState()` (pose selection) and `locomotionTimeScale()`
   (foot-speed matching). Clip *names* are per source rig in the `ClipMap`
   factories (`manifest.ts`); names differ per rig (e.g. KayKit `Walking_A`,

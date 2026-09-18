@@ -51,11 +51,6 @@
       "output": "growl.webp"
     },
     {
-      "abilityId": "cat_form",
-      "sourceFile": "44.png",
-      "output": "cat_form.webp"
-    },
-    {
       "abilityId": "prowl",
       "sourceFile": "41.png",
       "output": "prowl.webp"
@@ -640,8 +635,17 @@
         }
       ],
       "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square game ability icon for druid\nPrimary request: fresh distinct premium hand-painted dark-fantasy MMORPG ability art for Grove Awakening (grove_awakening)\nCanonical mechanic: Grove Awakening is a 7 sec out-of-combat rite that calls every fallen group or raid member within 40 yd back to life with 30% health and mana; 5 min cooldown.\nSubject: An ancient glowing tree spreading rings of green light over three rising spirits at its roots.\nScene/backdrop: opaque full-square atmospheric background in the class palette\nComposition/framing: one dominant readable action or symbol, visually centered, subject fills 75 to 88 percent, safe at 32px and 48px\nLighting/mood: deep values, controlled saturated accents, crisp focal edges and softer peripheral atmosphere\nConstraints: fresh composition; no text, letters, numbers, border, frame, rarity chrome, watermark, modern graphic design or flat glyph"
+    },
+    {
+      "abilityId": "cat_form",
+      "sourcePack": "owner-provided",
+      "sourceFile": "owner-provided artwork (Cat Form, the maintainer's painted lynx head; the CraftPix 44.png it replaced is retired), re-encoded to 128px WebP by scripts/convert_skill_icons_webp.mjs",
+      "output": "cat_form.webp",
+      "source": "Owner-provided original artwork",
+      "owner": "Levy Street account",
+      "license": "Owner-provided artwork, used with permission (Levy Street), rights reserved"
     }
   ],
   "deferredStayProcedural": {},
-  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it."
+  "licenseScope": "The top-level CraftPix license applies only to entries without their own license; woc_openai_missing_painted_icons_2026_08_01 entries are project-generated and explicitly override it, and the owner-provided cat_form entry carries its own licence."
 }

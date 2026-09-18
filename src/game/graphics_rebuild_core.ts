@@ -35,6 +35,21 @@ export function normalizeGraphicsSettingsSnapshot(
   return Object.freeze(snapshot);
 }
 
+/**
+ * The applied snapshot at boot, read from stored settings. Derived from
+ * GRAPHICS_REBUILD_KEYS so a new dial can never be left out: a hand-written
+ * key list once read only the round-10 knobs and let every round-12 dial
+ * silently fall back to its High/Full/On default, which the options panel
+ * displayed under Advanced and the next Apply made live.
+ */
+export function captureGraphicsSettingsSnapshot(
+  read: (key: GraphicsSettingsKey) => number,
+): Readonly<GraphicsSettingsSnapshot> {
+  const stored: Partial<GraphicsSettingsSnapshot> = {};
+  for (const key of GRAPHICS_REBUILD_KEYS) stored[key] = read(key);
+  return normalizeGraphicsSettingsSnapshot(stored);
+}
+
 export function graphicsSettingsSnapshotsEqual(
   a: Readonly<GraphicsSettingsSnapshot>,
   b: Readonly<GraphicsSettingsSnapshot>,

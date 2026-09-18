@@ -118,6 +118,14 @@ const EXEMPT: ReadonlyArray<{ cmd: string; why: string }> = [
     cmd: 'market_sell_price_check',
     why: 'a read-only price lookup keyed by item id (issue 3043), not an action on a held copy: it never touches bags or escrow, so there is no copy to address',
   },
+  {
+    cmd: 'market_sweep_quote',
+    why: 'a read-only Market Sweep quote over live auction rows keyed by item id and filters; it neither selects nor consumes a player-held bag copy',
+  },
+  {
+    cmd: 'market_sweep',
+    why: 'buys server-selected auction listings from escrow, not a player-held inventory copy; the server planner rechecks eligible listing rows before spending',
+  },
 ];
 
 /**

@@ -13,6 +13,111 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'hud.errors.cannotCastWhileMoving': 'Ihr könnt nicht zaubern, während Ihr Euch bewegt.',
+  'hudChrome.auraEffect.wolfForm':
+    'Katzengestalt: Nahkampfschaden und Energie; Lauftempo um {pct}% erhöht',
+  'hudChrome.auraOverlay.cues.anvilStrike': 'Amboss-Schlag',
+  'hudChrome.auraOverlay.cues.blaringHorn': 'Schmetterndes Horn',
+  'hudChrome.auraOverlay.cues.bubblePop': 'Blasenplatzen',
+  'hudChrome.auraOverlay.cues.carKlaxon': 'Autohupe',
+  'hudChrome.auraOverlay.cues.catMeow': 'Katzenmiauen',
+  'hudChrome.auraOverlay.cues.coinDrop': 'Münzklimpern',
+  'hudChrome.auraOverlay.cues.electricZap': 'Stromstoß',
+  'hudChrome.auraOverlay.cues.frogCroak': 'Froschquaken',
+  'hudChrome.auraOverlay.cues.glassPing': 'Glasklingeln',
+  'hudChrome.auraOverlay.cues.hardBell': 'Harte Glocke',
+  'hudChrome.auraOverlay.cues.musicBox': 'Spieluhr',
+  'hudChrome.auraOverlay.cues.owlHoot': 'Eulenruf',
+  'hudChrome.auraOverlay.cues.softChime': 'Sanftes Glöckchen',
+  'hudChrome.auraOverlay.cues.sonarPing': 'Sonarping',
+  'hudChrome.auraOverlay.cues.steamHiss': 'Dampfzischen',
+  'hudChrome.auraOverlay.cues.swordDraw': 'Schwertziehen',
+  'hudChrome.auraOverlay.cues.templeGong': 'Tempelgong',
+  'hudChrome.auraOverlay.cues.waterDrop': 'Wassertropfen',
+  'hudChrome.auraOverlay.cues.windWhoosh': 'Windrauschen',
+  'hudChrome.auraOverlay.cues.wolfHowl': 'Wolfsgeheul',
+  'hudChrome.auraOverlay.haptic': 'Vibration',
+  'hudChrome.auraOverlay.hapticHint':
+    'Lässt einen verbundenen Controller oder dein Telefon vibrieren. Wird ignoriert, wenn das Gerät keine Vibration unterstützt.',
+  'hudChrome.auraOverlay.hapticNone': 'Aus',
+  'hudChrome.auraOverlay.haptics.double': 'Doppelt',
+  'hudChrome.auraOverlay.haptics.long': 'Lang',
+  'hudChrome.auraOverlay.haptics.tap': 'Kurz',
+  'hudChrome.auraOverlay.readyGlow': 'Hotbar-Leuchten',
+  'hudChrome.auraOverlay.readyGlowHint':
+    'Lässt diesen Zauber auf deiner Aktionsleiste aufleuchten, solange sein Buff aktiv ist.',
+  'hudChrome.auraOverlay.reticleTick': 'Fadenkreuz-Markierung',
+  'hudChrome.auraOverlay.reticleTickHint':
+    'Fügt eine Markierung nahe der Bildschirmmitte hinzu, die aufleuchtet, wenn dieser Zauber ausgelöst wird.',
+  'hudChrome.auraOverlay.sound': 'Alarmton',
+  'hudChrome.auraOverlay.soundHint':
+    'Ein Ton spielt jedes Mal, wenn dieser Zauber ausgelöst wird. Schalte Symbol, Halbmonde und Bodenring aus, damit allein der Ton ihn ankündigt.',
+  'hudChrome.auraOverlay.soundNone': 'Kein Ton',
+  'hudChrome.auraOverlay.soundPreview': 'Abspielen',
+  'hudChrome.auraOverlay.soundPreviewAria': 'Vorschau des Alarmtons {sound} abspielen',
+  'hudChrome.auraOverlay.soundVolume': 'Lautstärke',
+  'hudChrome.auraOverlay.watchlist': 'Beobachtete Zauber',
+  'hudChrome.auraOverlay.watchlistCount': '{count} beobachtet',
+  'hudChrome.auraOverlay.watchlistEmpty':
+    'Kein anderer Zauber in deinem Zauberbuch legt einen Buff auf dich.',
+  'hudChrome.auraOverlay.watchlistHint':
+    'Wähle einen beliebigen Zauber, der dich bufft, um ihm seine eigene Aura zu geben. Gewählte Zauber erhalten unten eine vollständige Karte mit eigenem Symbol, eigener Farbe, Position und Bodenring.',
+  'hudChrome.auraOverlay.watchlistUnwatch': '{spell} nicht mehr beobachten',
+  'hudChrome.auraOverlay.watchlistWatch': '{spell} beobachten',
+  'hudChrome.bank.quantityStepDownAria': 'Menge um {count} verringern',
+  'hudChrome.bank.quantityStepUpAria': 'Menge um {count} erhöhen',
+  'hudChrome.deeds.accountScopeHint':
+    'Eine Tat, die irgendein Charakter auf deinem Account vollbringt, wird auch hier verzeichnet, und das Buch nennt, wer sie errungen hat.',
+  'hudChrome.deeds.accountScopeNote': 'Gemeinsam für alle Charaktere auf deinem Account',
+  'hudChrome.deeds.earnedBy': 'Errungen von {names}',
+  'hudChrome.deeds.earnerWithDate': '{name} (am {date})',
+  'hudChrome.finder.lootHeroicChance': 'Heroischer Bonus, zusätzliche Zufallsdrops:',
+  'hudChrome.finder.lootHeroicMaybe': 'Heroischer Bonus, höchstens eines davon kann fallen:',
+  'hudChrome.keybinds.friendlyNameplates': 'Freundliche Namensschilder umschalten',
+  'hudChrome.leaderboard.podiumLabel': 'Top Drei',
+  'hudChrome.leaderboard.prestigeTitle': 'Prestige-Stufe {rank}',
+  'hudChrome.leaderboard.unclaimed': 'Unbeansprucht',
+  'hudChrome.materialSources.decreaseByAria': 'Einheiten von {source} um {count} verringern',
+  'hudChrome.materialSources.fits': 'Bis zu {units} passen jetzt hinein',
+  'hudChrome.materialSources.increaseByAria': 'Einheiten von {source} um {count} erhöhen',
+  'hudChrome.materialSources.moveAll': 'Alle Einheiten verschieben',
+  'hudChrome.noticeboard.filterEmpty': 'Noch hat keine Gilde ihre Tore für neue Spieler geöffnet.',
+  'hudChrome.noticeboard.filterNewPlayersTitle':
+    'Nur Gilden anzeigen, die neue Spieler willkommen heißen',
+  'hudChrome.noticeboard.filters': 'Tafelfilter',
+  'hudChrome.noticeboard.newPlayerFriendly': 'Neulingsfreundlich',
+  'hudChrome.noticeboard.newPlayerFriendlyTitle': 'Diese Gilde heißt neue Spieler willkommen',
+  'hudChrome.noticeboard.officerEntry': '{name} ({rank})',
+  'hudChrome.noticeboard.officersOnline': 'Offiziere online',
+  'hudChrome.noticeboard.officersOnlineLabel': 'Offiziere online: {names}',
+  'hudChrome.noticeboard.showAll': 'Alle Gilden anzeigen',
+  'hudChrome.pledge.newPlayerFriendlyHint':
+    'Wird an der Rekrutentafel am Wegweiser der Küste der Bewährung angezeigt.',
+  'hudChrome.pledge.newPlayerFriendlyLabel': 'Neulingsfreundlich',
+  'hudChrome.plurals.guildBoardShown.few': '{count} Gilden angezeigt',
+  'hudChrome.plurals.guildBoardShown.many': '{count} Gilden angezeigt',
+  'hudChrome.plurals.guildBoardShown.one': '{count} Gilde angezeigt',
+  'hudChrome.plurals.guildBoardShown.other': '{count} Gilden angezeigt',
+  'hudChrome.professionTrainers.alchemy': 'Alchemielehrer',
+  'hudChrome.professionTrainers.blacksmithing': 'Schmiedelehrer',
+  'hudChrome.professionTrainers.cooking': 'Kochlehrer',
+  'hudChrome.professionTrainers.engineering': 'Ingenieurslehrer',
+  'hudChrome.professionTrainers.farming': 'Landwirtschaftslehrer',
+  'hudChrome.professionTrainers.hobby': 'Hobbylehrer',
+  'hudChrome.professionTrainers.leatherworking': 'Kürschnerlehrer',
+  'hudChrome.professionTrainers.mining': 'Bergbaulehrer',
+  'hudChrome.professionTrainers.nameplate': '<{title}>',
+  'hudChrome.professionTrainers.tailoring': 'Schneiderlehrer',
+  'hudChrome.reliquary.finderWithDate': '{name} (am {date})',
+  'hudChrome.reliquary.foundBy': 'Gefunden von {names}',
+  'hudChrome.reliquary.sharedScopeHint':
+    'Ein Relikt, das irgendein Charakter auf deinem Account findet, füllt die Seite auch hier.',
+  'hudChrome.reliquary.sharedScopeNote': 'Gemeinsam für alle Charaktere auf deinem Account',
+  'hudChrome.tutorialGreeting.eastbrookGuidanceNote':
+    'Willkommen in Eastbrook! Marschall Redbrook hat Arbeit für dich auf dem Dorfplatz. Aktiviere die goldene Führung, um ihn zu finden und der Quest „Wölfe vor der Tür“ zu folgen, oder erkunde auf eigene Faust. Du kannst dies später unter Optionen, Interface, Kampf ändern.',
+  'hudChrome.tutorialGreeting.guidanceOff': 'Führung ausschalten',
+  'hudChrome.tutorialGreeting.guidanceOn': 'Führung einschalten',
+  'hudChrome.tutorialGreeting.guidanceSetting': 'Goldene Führung in Eastbrook',
   'hudChrome.barEditor.armed': 'Tippe einen Platz an, um {name} zu platzieren.',
   'hudChrome.barEditor.buttonHeader': 'Taste {button}',
   'hudChrome.barEditor.cellAria': 'Taste {button}, {direction}: {action}',
@@ -984,11 +1089,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     'Die Reisegestalt: deutlich schneller am Boden unterwegs, aber ohne andere Fähigkeiten, bis du zurückwechselst.',
   'guide.classPage.formName.form_bear': 'Bruin-Gestalt',
-  'guide.classPage.formName.form_cat': 'Wolfsgestalt',
+  'guide.classPage.formName.form_cat': 'Katzengestalt',
   'guide.classPage.formName.form_travel': 'Fleet-Gestalt',
   'guide.classPage.formsHeading': 'Gestaltwandel',
   'guide.classPage.formsMoonwing':
     'Ein Gleichgewichts-Druide erhält eine weitere Gestalt, die Mondkingestalt, die Zaubergestalt, in der er kämpft. Sie ist die einzige Tiergestalt, die deine Zauber behält, und dein Zauberstab funktioniert nur in ihr oder in deiner gewöhnlichen Zaubergestalt.',
+  'guide.classPage.formsWolfEngage':
+    'Ein Wolf eröffnet den Kampf mit Bruin-Ansturm, wechselt sofort in die Wolfsgestalt, um das Ziel festzunageln, schließt die Lücke mit Ansprung, wenn er nicht schleicht, und hält einen Gegner mit Niederreißen fest.',
   'guide.classPage.formsNote':
     'Ein Druide kämpft, indem er die Gestalt wechselt. Die meisten Druidenfähigkeiten gehören zu einer bestimmten Gestalt, sodass die Form, in der du dich befindest, entscheidet, was du wirken kannst, und der Wechsel kostet etwas Mana. Du kannst innerhalb oder außerhalb des Kampfes wechseln, so oft du willst.',
   'guide.classPage.mageEleHeading': 'Wasserelementar',
@@ -1012,7 +1119,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Das Meer kennt keine Mauer. Die Überquerungen, die die Welt dir zumutet, die Meerengen und Weiher zwischen einem Landstrich und dem nächsten sowie die Seen im Landesinneren, sind sicher zu durchschwimmen, egal wie lange es dauert. Schwimmst du stattdessen vom Ufer hinaus in wirklich offenes Wasser, beginnt es, deine Kraft zu zehren: Eine Warnung erscheint, du bekommst ein echtes Zeitfenster, um umzukehren, und danach fügt dir das Meer stetig schwereren Schaden zu, den nichts verhindern kann, bis du zurück Richtung Land schwimmst. Ertrinkst du oder erschöpfst dich so weit vom Ufer entfernt, löst du dich wie bei jedem anderen Tod, behandle den Horizont also als Kulisse und nicht als Ziel.',
   'guide.combat.hazardsTitle': 'Das Wasser kann dich töten',
   'guide.combat.threatBody':
-    'Jeder Gegner führt eine private Liste darüber, wer ihn am meisten geärgert hat. Schaden erhöht sie, und Heilung ebenso: Eine Heilung legt Bedrohung auf die Gegner, die bereits mit der geheilten Person kämpfen, aufgeteilt unter ihnen, sodass die sicherste Heilung eine ist, die auf jemanden fällt, den der Tank bereits gebunden hat. Tanks schalten eine wehrhafte Haltung oder eine schützende Gestalt ein, die alles, was sie erzeugen, vervielfacht, während die Wolfsgestalt des Druiden stattdessen Bedrohung abwirft, und eine Verspottung hebt den Wirkenden sofort an die Spitze der Liste und fesselt den Gegner für einige Sekunden an ihn. Gegner wechseln nicht in dem Moment, in dem jemand am Tank vorbeizieht: Es braucht einen klaren Vorsprung, um einen Gegner abzuziehen, und einen größeren Vorsprung auf Distanz als im Nahkampf, sodass ein wenig Geduld am Anfang eines Pulls den Kampf dort hält, wo er hingehört.',
+    'Jeder Gegner führt eine private Liste darüber, wer ihn am meisten geärgert hat. Schaden erhöht sie, und Heilung ebenso: Eine Heilung legt Bedrohung auf die Gegner, die bereits mit der geheilten Person kämpfen, aufgeteilt unter ihnen, sodass die sicherste Heilung eine ist, die auf jemanden fällt, den der Tank bereits gebunden hat. Tanks schalten eine wehrhafte Haltung oder eine schützende Gestalt ein, die alles, was sie erzeugen, vervielfacht, während die Katzengestalt des Druiden stattdessen Bedrohung abwirft, und eine Verspottung hebt den Wirkenden sofort an die Spitze der Liste und fesselt den Gegner für einige Sekunden an ihn. Gegner wechseln nicht in dem Moment, in dem jemand am Tank vorbeizieht: Es braucht einen klaren Vorsprung, um einen Gegner abzuziehen, und einen größeren Vorsprung auf Distanz als im Nahkampf, sodass ein wenig Geduld am Anfang eines Pulls den Kampf dort hält, wo er hingehört.',
   'guide.combat.threatTitle': 'Wen der Feind angreift',
   'guide.combat.unstuckBody':
     'Wenn die Welt dich irgendwo einsperrt, aus dem du nicht herauskommst, tippe /unstuck. Du musst dich außerhalb des Kampfes befinden und stillstehen, nicht durch eine Betäubung oder Verwurzelung festgehalten werden, und dich nicht in einem Duell oder einem Arenakampf befinden: Ein kurzer Countdown läuft, und Bewegung oder erlittener Schaden brechen ihn ab. Ist er abgeschlossen, wirst du am nächsten Friedhof abgesetzt. Er tötet dich nie und hinterlässt keine Leiche, und warst du bereits gefallen, wirst du stattdessen dort wiederbelebt. Der Preis dafür ist die Befreiungskrankheit, eine vorübergehende Schwächung all dessen, was du bist, die abgeklungen ist, bis du den Befehl erneut benutzen könntest, und wie der Zoll des Hüters verschont sie brandneue Charaktere vollständig.',
@@ -3273,7 +3380,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Schleudert einen Eissplitter und verursacht {damage} Frostschaden, dreifach gegen ein eingefrorenes Ziel. Verbraucht Fingers of Frost oder eine Ladung Winterskälte, um das Ziel als eingefroren zu behandeln. (Frost)',
   'entities.abilities.ice_lance.name': 'Eislanze',
   'entities.abilities.perfect_moment.description':
-    'Nutze deinen perfekten Moment: Gewinne sofort 4 Arkane Ladungen, und für 10 Sek. verbraucht Aether-Pfeile diese nicht. (Chronomantie)',
+    'Nutze deinen perfekten Moment: Gewinne sofort 4 Arkane Ladungen, und für 10 Sek. verbraucht Aether-Pfeile diese nicht und verursacht 20% erhöhten Schaden. (Chronomantie)',
   'entities.abilities.perfect_moment.name': 'Perfekter Moment',
   'entities.abilities.shatter.name': 'Sprödes Verderben',
   'entities.abilities.temporal_acceleration.description':
@@ -3955,7 +4062,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.townFocus.notInTownHint': 'Du musst in der Stadt sein, um deinen Fokus festzulegen.',
   'hudChrome.townFocus.saveButton': 'Fokus speichern',
   'hudChrome.townFocus.title': 'Stadtfokus',
-  'hudChrome.archetypeTitle.label': 'Titel',
   'hudChrome.archetypeTitle.none': 'Keiner',
   'entities.itemSets.crownforged.bonus4':
     'Eure kritischen Waffentreffer zersplittern das Ziel mit Knochensplitter und lassen es 12 Sek. lang alle 2 Sek. 8 Schaden bluten. Stapelt sich bis zu 3-mal.',
@@ -6144,7 +6250,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresCombo': 'Diese Fähigkeit benötigt Combopunkte.',
   'hud.errors.requiresForm': 'Ihr müsst in {form}form sein.',
   'hud.errors.bear': 'Bruin',
-  'hud.errors.cat': 'Wolfs',
+  'hud.errors.cat': 'Katzen',
   'hud.errors.travel': 'Fleet',
   'hud.errors.cantInForm': 'Das könnt Ihr in {form}form nicht tun.',
   'hud.errors.shapeshifted': 'Das könnt Ihr in Gestaltwandlung nicht tun.',
@@ -6399,7 +6505,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.rage': 'Wut',
   'abilityUi.resources.energy': 'Energie',
   'abilityUi.forms.bear': 'Bären',
-  'abilityUi.forms.cat': 'Wolfs',
+  'abilityUi.forms.cat': 'Katzen',
   'abilityUi.cast.fishing': 'Angeln',
   'abilityUi.cast.gathering': 'Sammeln',
   'abilityUi.cast.thunzharrStormcall': 'Sturmruf',
@@ -7023,14 +7129,14 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verwurzelt das Ziel bis zu 12 Sek. lang an Ort und Stelle.',
   'entities.abilities.bear_form.name': 'Bruin-Gestalt',
   'entities.abilities.bear_form.description':
-    'Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Bären: Rüstung +110%, maximale Gesundheit +30%, stark erhöhte Angriffskraft, eure Angriffe erzeugen Wut und 30% mehr Bedrohung. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.maul.name': 'Knochenmalmer',
   'entities.abilities.growl.name': 'Bedrohen',
   'entities.abilities.growl.description':
     'Knurrt das Ziel an: Eure Bedrohung steigt auf die seines meistgehassten Gegners und es wird 3 Sek. lang gezwungen, euch anzugreifen. Nur in Bruin Form.',
-  'entities.abilities.cat_form.name': 'Wolfsgestalt',
+  'entities.abilities.cat_form.name': 'Katzengestalt',
   'entities.abilities.cat_form.description':
-    'Verwandelt euch in einen Wolf: Beweglichkeit steigt mit eurer Stufe, Angriffskraft +8 plus 2 je Stufe, eure Angriffe nutzen Energie und Combopunkte, und ihr erzeugt 29% weniger Bedrohung. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
+    'Verwandelt euch in einen Wolf: Beweglichkeit steigt mit eurer Stufe, Angriffskraft +8 plus 2 je Stufe, eure Angriffe nutzen Energie und Combopunkte, und ihr erzeugt 29% weniger Bedrohung. Der Wechsel in eine beliebige Gestalt gewährt Weiter Schritt: 3 Sek. lang 60% Bewegungstempo, einmal alle 20 Sek. Erneut wirken, um zur Zauberergestalt zurückzukehren.',
   'entities.abilities.claw.name': 'Reißklaue',
   'entities.abilities.ferocious_bite.name': 'Blutbiss',
   'entities.abilities.swipe.name': 'Fegende Klauen',
@@ -7041,7 +7147,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Himmelssturz',
   'entities.abilities.travel_form.name': 'Fleet-Gestalt',
   'entities.abilities.travel_form.description':
-    'Nehmt augenblicklich eine flinke Fleet Form an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht.',
+    'Nehmt augenblicklich eine flinke Fleet Form an, was das Lauftempo um 40% erhöht. In dieser Gestalt könnt ihr keine anderen Fähigkeiten einsetzen, aber ihr könnt im Kampf hinein- und herauswechseln. Ideal zur Flucht. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo.',
   'entities.abilities.enrage.name': 'Anfachen',
   'entities.abilities.enrage.description': 'Erzeugt sofort 20 Wut. Nur in Bruin Form.',
   'entities.abilities.bash.name': 'Erschüttern',
@@ -7052,16 +7158,22 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Versetzt das Ziel bis zu 8 Sek. in tiefen Schlaf. Jeglicher Schaden weckt es auf.',
   'entities.abilities.dash.name': 'Sprint',
   'entities.abilities.dash.description':
-    'Sprintet vorwärts und erhöht das Lauftempo 15 Sek. lang um 50%. Nur in Wolfsgestalt.',
+    'Sprintet vorwärts und erhöht das Lauftempo 15 Sek. lang um 50%. Nur in Katzengestalt.',
   'entities.abilities.pounce.name': 'Schleichschlag',
+  'entities.abilities.lunge.description':
+    'Springt einen bis zu 12 m entfernten Gegner an, verursacht 60% Waffenschaden und gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
+  'entities.abilities.lunge.name': 'Ansprung',
+  'entities.abilities.hamstring_bite.description':
+    'Finishing-Move, der das Ziel 1 Sek. plus 1 Sek. pro Combopunkt betäubt (5 Combopunkte: 6 Sek.). Nur in Wolfsgestalt.',
+  'entities.abilities.hamstring_bite.name': 'Niederreißen',
   'entities.abilities.pounce.description':
-    'Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
+    'Ein Eröffnungsangriff aus der Verstohlenheit, der das Ziel 2 Sek. lang betäubt. Gewährt 1 Combopunkt. Nur in Wolfsgestalt. Außerhalb des Schleichmodus ist diese Taste Ansprung.',
   'entities.abilities.insect_swarm.name': 'Stechender Schwarm',
   'entities.abilities.insect_swarm.description':
     'Der Gegner wird von Insekten umschwärmt und erleidet {damage} Naturschaden über 12 Sek.',
-  'entities.abilities.tigers_fury.name': 'Wolfsblut',
+  'entities.abilities.tigers_fury.name': 'Luchsblut',
   'entities.abilities.tigers_fury.description':
-    'Erzeugt sofort {rage} Energie und erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Wolfsgestalt.',
+    'Erzeugt sofort {rage} Energie und erhöht die Angriffskraft {duration} Sek. lang um {buff}. Nur in Katzengestalt.',
   'entities.abilities.rip.name': 'Blutriss',
   'entities.abilities.mortal_strike.name': 'Verstümmelnder Hieb',
   'entities.abilities.mortal_strike.description':
@@ -7101,13 +7213,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Bindet einen Wraithborn an Euren Willen, einen Elitedämon, der aus der Ferne schweren Schattenschaden niederregnen lässt. Eine lange Abklingzeit zügelt seine verheerende Kraft. Das Beschwören eines neuen Dämons entlässt Euren aktuellen. Ihr könnt nur einen Dämon zur Zeit haben.',
   'entities.abilities.bear_charge.name': 'Bruin-Ansturm',
   'entities.abilities.bear_charge.description':
-    'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. Reichweite 8-25 m. Nur in Bruin Form.',
+    'Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. 3 Sek. lang danach ist die Wolfsgestalt kostenlos und nagelt das Ziel fest, was es 4 Sek. lang um 50% verlangsamt. Reichweite 8-25 m. Nur in Bruin Form.',
   'entities.abilities.demoralizing_roar.name': 'Feiges Gebrüll',
   'entities.abilities.demoralizing_roar.description':
     'Demoralisiert nahe Gegner und senkt ihre Angriffskraft 20 Sek. lang um 20. Nur in Bruin Form.',
   'entities.abilities.prowl.name': 'Anpirschen',
   'entities.abilities.prowl.description':
-    'Geht in Wolfsgestalt in den Schleichmodus über und bewegt Euch 5% langsamer. Im Kampf nicht einsetzbar.',
+    'Geht in Wolfsgestalt in den Schleichmodus über. Im Kampf nicht einsetzbar.',
   'entities.abilities.rake.name': 'Schinden',
   'entities.abilities.revive_pet.name': 'Zusammenflicken',
   'entities.abilities.revive_pet.description':
@@ -7157,10 +7269,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Zieht einen künftigen Tick eures Brennenden Pakts vor und entzündet dann das Ziel für {damage} Feuerschaden. Erzeugt 1 Verwüstung und 1 Verderben. Hält {charges} Aufladungen. (Zerstörungs-Signatur)',
   'entities.abilities.moonkin_form.name': 'Mondkingestalt',
   'entities.abilities.moonkin_form.description':
-    'Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)',
+    'Nehmt Mondkingestalt an und verstärkt Eure Zauber, bis Ihr zurückwechselt. Das Wechseln in eine Gestalt gewährt Trabschritt, einen kurzen Schub an Lauftempo. Erneut wirken, um zur normalen Gestalt zurückzukehren. (Gleichgewichts-Signatur)',
   'entities.abilities.feral_charge.name': 'Urwoge',
   'entities.abilities.feral_charge.description':
-    'Entfesselt eine Urwoge. In Wolfsgestalt wird Eure Energieregeneration 10 Sek. lang um 100% erhöht. In Bruin-Gestalt erhaltet Ihr sofort 50 Wut. (Wildheits-Signatur)',
+    'Entfesselt eine Urwoge. In Katzengestalt wird Eure Energieregeneration 10 Sek. lang um 100% erhöht. In Bruin-Gestalt erhaltet Ihr sofort 50 Wut. (Wildheits-Signatur)',
   'entities.abilities.swiftmend.name': 'Rasche Heilung',
   'entities.abilities.crusader_strike.description':
     'Trifft das Ziel für Waffenschaden plus {damage} Heiligschaden. (Paladin-Talent)',
@@ -10048,7 +10160,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.imbueRange': 'Waffe erfüllt: {min} bis {max} Bonusschaden bei Verdict',
   'hudChrome.auraEffect.stealth': 'Verborgen; Bewegungstempo um {pct}% verringert',
   'hudChrome.auraEffect.formBear': 'Bruin Form: Gesundheit und Rüstung erhöht',
-  'hudChrome.auraEffect.formCat': 'Katzengestalt: Nahkampfschaden und Energie',
   'hudChrome.auraEffect.formTravel': 'Fleet Form: Bewegungstempo um {pct}% erhöht',
   'hudChrome.auraEffect.defensiveStance':
     'Wehrhafte Haltung: weniger erlittener Schaden, mehr Bedrohung',
@@ -10334,7 +10445,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.gathering.herbalism': 'Kräuterkunde',
   'hudChrome.gathering.logging': 'Holzfällen',
   'hudChrome.gathering.mining': 'Bergbau',
-  'hudChrome.gathering.title': 'Sammeln',
   'errors.api.accountSessionLimit': 'Zu viele Charaktere dieses Kontos sind bereits in der Welt.',
   'errors.api.crossSiteOrigin': 'Anfrage aus Sicherheitsgründen blockiert.',
   'errors.api.unsupportedMediaType': 'Nicht unterstütztes Anfrageformat.',
@@ -10653,7 +10763,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.hub_training_dummy.name': 'Trainingspuppe',
   'entities.mobs.yumi_cat.name': 'Yumi',
   'entities.mobs.water_elemental.name': 'Wasserelementar',
-  'hudChrome.archetypeTitle.hobbyLabel': 'Freizeit',
   'hudChrome.auraEffect.armorPct': 'Verringert Rüstung um {pct}%',
   'hudChrome.auraEffect.armorPctStacks': 'Verringert Rüstung um {pct}% ({stacks} Stapel)',
   'hudChrome.auraEffect.increasePct.allStats': 'Erhöht alle Attribute um {pct}%',
@@ -10755,7 +10864,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Heldentaten stehen auf einem eigenen Regal: Zeugnisse vergangener Zeiten und Welterster, Taten, die an eine vergangene Ära oder einen Moment gebunden sind, der nur ein einziges Mal geschieht. Sie bringen kein Ansehen und fließen nicht in die Abschlusszählung ein, sondern bleiben für immer als Erinnerung an das Vollbrachte erhalten.',
   'guide.deedsPage.featsHeading': 'Heldentaten',
   'guide.deedsPage.howBody':
-    'Taten werden mit jeweils einem Charakter errungen und behalten, sodass jeder Held, den du spielst, ein eigenes Buch aufbaut; erst die Bestenliste des Reiches sammelt dein Ansehen über alle Charaktere hinweg, die du spielst, und zählt jede Tat nur ein einziges Mal. Jede Tat benennt klar und deutlich, was sie von dir verlangt, direkt im Buch der Taten im Spiel, sodass du immer weißt, was es zu erjagen gilt; und die Taten, hinter denen du her bist, kannst du verfolgen, um sie beim Spielen im Blick zu behalten. Einige wenige bleiben geheim und geben sich erst zu erkennen, wenn du sie errungen hast. Das Buch hält sich auch selbst ehrlich: Was immer deine bisherige Bilanz belegen kann, schreibt es dir sofort gut, sodass ein Veteran es nie mit leerer Seite aufschlägt; nur die zählenden Taten beginnen ihre Zählung von neuem.',
+    'Taten werden mit jeweils einem Charakter errungen, doch das Buch der Taten wird von jedem Charakter auf deinem Account gemeinsam genutzt: Eine Tat, die einer von ihnen vollbringt, wird auch für alle anderen errungen, das Buch nennt, wer sie errungen hat und wann, und ein Titel oder eine Umrandung, die sie belohnt, kann von jedem deiner Charaktere getragen werden. Die Bestenliste des Reiches sammelt dein Ansehen auf die gleiche Weise und zählt jede Tat nur ein einziges Mal. Jede Tat benennt klar und deutlich, was sie von dir verlangt, direkt im Buch der Taten im Spiel, sodass du immer weißt, was es zu erjagen gilt; und die Taten, hinter denen du her bist, kannst du verfolgen, um sie beim Spielen im Blick zu behalten. Einige wenige bleiben geheim und geben sich erst zu erkennen, wenn du sie errungen hast. Das Buch hält sich auch selbst ehrlich: Was immer deine bisherige Bilanz belegen kann, schreibt es dir sofort gut, sodass ein Veteran es nie mit leerer Seite aufschlägt; nur die zählenden Taten beginnen ihre Zählung von neuem.',
   'guide.deedsPage.howHeading': 'So funktionieren Taten',
   'guide.deedsPage.intro':
     'Im Buch der Taten führt die Welt Buch über alles, was du vollbracht hast: von deinen ersten Schritten aus dem Starttal bis zu den härtesten Kämpfen, die das Reich zu bieten hat. Erringe Taten, während du spielst, trage die Titel, die sie verleihen, und sieh zu, wie dein Ansehen wächst.',
@@ -11015,7 +11124,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Ein Boss von Schlachtzugsstärke, der sich in stetigem Rhythmus in der offenen Welt erhebt und von allen bekämpft wird, die sich zusammenfinden, statt von einer festen Gruppe.',
   'guide.glossary.worldBossTerm': 'Weltboss',
   'guide.models.formBear': 'Bruin Form',
-  'guide.models.formCat': 'Wolfsgestalt',
+  'guide.models.formCat': 'Katzengestalt',
   'guide.models.formTravel': 'Fleet Form',
   'guide.models.groupForms': 'Druidengestalten',
   'guide.nav.sidebarLabel': 'Handbuchthemen',
@@ -11475,7 +11584,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Trifft bis zu 3 Gegner im Umkreis von 10 m für je {damage} Naturschaden. Elementar: Ein Treffer gewährt 1 Donner. Der Schaden steigt mit der Zaubermacht.',
   'entities.abilities.chaos_bolt.description':
-    'Verbraucht 3 Verwüstung, um einen schweren chaotischen Feuerblitz zu schleudern, der {damage} Feuerschaden verursacht. Verderben verkürzt die Zauberzeit um 30%.',
+    'Verbraucht 3 Verwüstung, um einen schweren chaotischen Feuerblitz zu schleudern, der {damage} Feuerschaden verursacht, bevor kritischer Schaden angewendet wird. Trifft er, erzielt er immer einen kritischen Treffer. Verderben verkürzt die Zauberzeit um 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Hüllt Euch in Schatten und absorbiert 5 Sek. lang 420 Schaden. (Schurkentalent)',
   'entities.abilities.cone_of_cold.description':
@@ -12062,9 +12171,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.tierTutorial.masters':
     'Handwerksmeister in den Städten bieten Abstimmungsquests an. Besuche einen, um dein Paar zu wählen, wann immer du bereit bist. Nichts, was du gelernt hast, geht je verloren.',
   'hudChrome.crafting.tierTutorial.radar':
-    'Deine Berufe bilden ein Rad. Stimme dich auf ein benachbartes Paar ab und diese zwei Handwerke werden unbegrenzte Hauptberufe, ein Handwerk gegenüber auf dem Rad wird ein auf Selten begrenztes Hobby, und der Rest liegt ruhend: ihr Wissen bewahrt, aber auf Gewöhnlich begrenzt, bis du sie wieder aufnimmst.',
+    'Deine Handwerksberufe bilden ein Rad. Stimme dich auf ein benachbartes Paar ab und diese zwei Handwerke werden unbegrenzte Hauptberufe, ein Handwerk gegenüber auf dem Rad wird ein auf Selten begrenztes Hobby, und der Rest ruht: ihr Wissen bleibt erhalten, ist aber auf Gewöhnlich begrenzt, bis du sie wieder aufnimmst.',
   'hudChrome.crafting.tierTutorial.tierCap':
-    'Ein Handwerk erreicht seine erste Stufe bei {skill} Fertigkeit, und jede Stufe verbessert, was es herstellen kann. Aber ein Handwerk steigt nur über seltene Arbeit hinaus, wenn es einer deiner zwei Hauptberufe ist.',
+    'Ein Beruf erreicht seine erste Stufe bei {skill} Fertigkeit, und jede Stufe verbessert, was er hervorbringt oder herstellen lässt. Unter deinen Handwerksberufen steigt ein Handwerk jedoch erst über seltene Arbeiten hinaus, wenn es einer deiner zwei Hauptberufe ist.',
   'hudChrome.crafting.tierTutorial.title': 'Deine erste Stufe',
   'hudChrome.crafting.trendNudge':
     'Deine Hände neigen zum {archetype}. Seine Abstimmung wartet bei {master}.',
@@ -12617,7 +12726,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Mondflut: Stufe {stacks} von {max}. Wildblitz-, Himmelssturz- und Mondsaat-Zauber füllen sie in Mondkingestalt; bei {max} wird Mondsaat zu Mondwoge und Himmelssturz zu Sonnenspur, und beide zehren von ihr',
   'hudChrome.auraEffect.oldBlood':
-    'Altes Blut: Stufe {stacks} von {max}. Gelandete Wolfs- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
+    'Altes Blut: Stufe {stacks} von {max}. Gelandete Katzen- und Bruin-Schläge teilen sich diese Bank; bei {max} verwandelt sich Blutbiss oder Knochenmalmer',
   'hudChrome.auraEffect.verdance':
     'Grünkraft: Stufe {stacks} von {max}. Jede NEUE Wildblüte oder Zweite Blüte, die du pflanzt, fügt 1 hinzu. Bei {max} wird Flinkheilung zu Überblüte.',
   'abilityUi.cast.rift_arcane_execution': 'Leerenriss',
@@ -14104,7 +14213,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Härtet Eure Haut 10 Sek. lang zu erkaltender Schlacke und verringert allen erlittenen Schaden um 25%.',
   'entities.abilities.cinderhide.name': 'Cinderhide',
   'entities.abilities.claw.description':
-    'Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
+    'Krallt den Gegner für Waffenschaden plus {damage}. Gewährt 1 Combopunkt. Nur in Katzengestalt.',
   'entities.abilities.claw.specNote_feral':
     'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
   'entities.abilities.cold_blood.description':
@@ -14140,7 +14249,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description':
     'Verringert die Rüstung des Ziels 40 Sek. lang um {damage}%.',
   'entities.abilities.ferocious_bite.description':
-    'Finishing-Move, der {damage} verursacht. Nur in Wolfsgestalt.',
+    'Finishing-Move, der {damage} verursacht. Nur in Katzengestalt.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu; bei 3 Altem Blut wird diese Taste zu Rote Ernte, die das Alte Blut für einen stärkeren Schlag verbraucht, der außerdem sofort allen Schaden verursacht, den Euer Schinden und Zerfetzen noch verursacht hätten, und Energie wiederherstellt.',
   'entities.abilities.funeral_harvest.description':
@@ -14155,7 +14264,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.hemorrhage.description':
     'Trifft den Gegner für Waffenschaden plus {damage}, verursacht Blutungsschaden über 12 Sek. und erhöht erlittenen Blutungsschaden um 40%. Gewährt 1 Combopunkt. Jeder 2. Einsatz fügt 1 Dämmer hinzu (max. 3). (Skulduggery-Engine)',
   'entities.abilities.hex_of_violence.description':
-    'Belegt den Gegner 8 Sek. lang mit einem Hex. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 17 Schattenschaden.',
+    'Belegt den Gegner 8 Sek. lang mit einem Hex, der Schattenschaden verursacht und alle 2 Sek. 2 Verdammnis erzeugt. Dessen nächste 3 Schadenshandlungen erzeugen je 7 Verdammnis und peitschen ihn für 17 Schattenschaden.',
   'entities.abilities.hex_of_violence.name': 'Hex of Violence',
   'entities.abilities.hour_of_judgment.description':
     'Ruft 15 Sek. lang Urteil über Euer primäres Evil Eye herab, gewährt 40 Verdammnis und 3 Schicksalsfäden, aktiviert Possession, verdoppelt die durch das primäre Eye erzeugte Verdammnis und erhöht den Schaden von Sentence um 20%. Das erste Sentence erstattet 50 Verdammnis.',
@@ -14198,7 +14307,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verbraucht 1 Seelenfragment, um Eurer Domäne mit 2 Plätzen einen dauerhaften Skeletal Warrior hinzuzufügen. Nur einer kann Euch dienen. Er spaltet alle 6 Sek. nahe Gegner für 45% Schaden, und Reaping Command fesselt sein Ziel 4 Sek. lang mit 40% Verlangsamung.',
   'entities.abilities.raise_skeletal_warrior.name': 'Raise Skeletal Warrior',
   'entities.abilities.rake.description':
-    'Schindet den Gegner für Waffenschaden plus {damage} und verursacht Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Wolfsgestalt.',
+    'Schindet den Gegner für Waffenschaden plus {damage} und verursacht Blutungsschaden über 18 Sek. Gewährt 1 Combopunkt. Nur in Katzengestalt.',
   'entities.abilities.rake.specNote_feral':
     'Jeder Treffer, der landet, fügt 1 Altes Blut hinzu (max. 3).',
   'entities.abilities.reaping_command.description':
@@ -14212,11 +14321,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Das Pflanzen einer NEUEN Blüte fügt 1 Grünkraft hinzu (max. 5). Bei 5 Grünkraft wird Rasche Heilung zu Überblüte.',
   'entities.abilities.rip.description':
-    'Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 36 Schaden plus 24 pro eingesetztem Combopunkt (5 Combopunkte: {damage} insgesamt). Nur in Wolfsgestalt.',
+    'Finishing-Move, der das Ziel 24 Sek. lang alle 2 Sek. bluten lässt: 36 Schaden plus 24 pro eingesetztem Combopunkt (5 Combopunkte: {damage} insgesamt). Nur in Katzengestalt.',
   'entities.abilities.rip.specNote_feral':
     'Der gelandete Treffer fügt 1 Altes Blut hinzu (max. 3).',
   'entities.abilities.ruinous_brand.description':
-    'Brandmarkt einen Gegner 15 Sek. lang. Eure nächsten 3 direkten Zauber hallen gegen den gebrandmarkten Gegner für 25% Schaden wider, oder kopieren 50% Schaden auf ihn, wenn sie gegen ein anderes Ziel gewirkt werden.',
+    'Brandmarkt einen Gegner 15 Sek. lang. Eure nächsten 3 direkten Zauber hallen gegen den gebrandmarkten Gegner für 25% Schaden wider, oder kopieren 50% Schaden auf ihn, wenn sie gegen ein anderes Ziel gewirkt werden. Verderbensblitz-Echos gelten außerdem als kritische Treffer, ohne einen weiteren kritischen Schadensmultiplikator.',
   'entities.abilities.ruinous_brand.name': 'Ruinous Brand',
   'entities.abilities.rupture.description':
     'Finishing-Move, der das Ziel verwundet: es blutet alle 2 Sek., für 6 Sek. plus 2 Sek. pro Combopunkt (5 Combopunkte: 16 Sek. und {damage} Gesamtschaden).',
@@ -14330,6 +14439,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Kauterisieren kann keinen weiteren tödlichen Treffer verhindern',
   'hudChrome.auraEffect.cooldownCap':
     '{used} von {cap} Sek. Abklingzeit-Verkürzung in diesem Fenster verbraucht',
+  'hudChrome.auraEffect.bruinRushWindow':
+    'Die Wolfsgestalt kostet kein Mana und nagelt das Ziel eures Bruin-Ansturms fest, was es {sec} Sek. lang um {pct}% verlangsamt',
   'hudChrome.auraEffect.desolation':
     '{charges} Aufladungen: Euer nächster Verderbensblitz wirkt {castPct}% schneller, oder Euer nächster Feuerregen trifft sofort',
   'hudChrome.auraEffect.duskfireClaim': 'Tod gewährt {value} Verderben',
@@ -14438,7 +14549,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Alle verfassten Reliquiar-Seiten und die Namen der Reliquien darauf. Diese Liste nennt ausschließlich spoilerfreie Namen: Öffne Das Reliquiar im Spiel, um deinen eigenen Fortschritt, deine Durchgänge und die Silhouetten zu sehen.',
   'guide.reliquaryPage.catalogHeading': 'Katalog der Seiten',
   'guide.reliquaryPage.howBody':
-    'Öffne Das Reliquiar im Spiel (standardmäßig Umschalt+X). Jedes Regal beherbergt Seiten einzigartiger Reliquien. Du füllst eine Silhouette, sobald du dieses Stück zum ersten Mal auf dem Charakter erhältst, und illuminierst eine Seite, sobald jede Reliquie darauf gefüllt ist. Einige Seiten tragen die Kennzeichnung Ausgemustert oder Persönlich: Sie stehen außerhalb der Vervollständigung und blockieren daher niemals ein Regal oder den gesamten Katalog. Funde erscheinen sofort als Hinweis und aktualisieren das offene Fenster; der Fortschritt gilt pro Charakter, ausgenommen Waffenoptiken, die Kontokosmetik sind.',
+    'Öffne Das Reliquiar im Spiel (standardmäßig Umschalt+X). Jedes Regal beherbergt Seiten einzigartiger Reliquien. Eine Silhouette füllt sich, sobald irgendein Charakter deines Kontos dieses Stück zum ersten Mal erhält, und eine Seite wird illuminiert, sobald jede Reliquie darauf gefüllt ist. Einige Seiten tragen die Kennzeichnung Ausgemustert oder Persönlich: Sie stehen außerhalb der Vervollständigung und blockieren daher niemals ein Regal oder den gesamten Katalog. Funde erscheinen sofort als Hinweis und aktualisieren das offene Fenster; der Fortschritt gilt für alle Charaktere des Kontos gemeinsam, sodass eine Reliquie, die ein Charakter findet, die Seite für alle füllt.',
   'guide.reliquaryPage.howHeading': 'Wie die Sammlung funktioniert',
   'guide.reliquaryPage.intro':
     'Das Reliquiar ist das Museum der einzigartigen Beute, die du katalogisiert hast: begehrte Einzelstücke aus Dungeons, Berufstrophäen, Reittiere, Waffenoptiken und Titel. Es ergänzt das Buch der Taten so, wie eine Trophäenhalle ein Erfolgsbuch ergänzt.',
@@ -14753,13 +14864,13 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Halten Sie den linken Stoßfänger fest und drücken Sie die Taste auf der Oberseite, um die Leiste mit dem Controller auszurichten.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Ordnen: Bestätigen: Nimmt eine Zelle oder das Zauberbuch auf und legt sie auf eine Zelle ab, Abbrechen löscht eine.',
+    'Ordnen · D-Pad bewegt · Bestätigen nimmt auf und platziert · Abbrechen leert eine Zelle',
   'hudChrome.controller.crossHotbarEnable': 'Aktivieren Sie Cross Hotbar',
   'hudChrome.controller.crossHotbarExpand': 'Double Cross Hotbar',
   'hudChrome.controller.crossHotbarHelp':
     'Halten Sie einen Auslöser gedrückt, um acht Aktionsleisten-Slots auf dem Steuerkreuz und den Gesichtstasten zu beleuchten. Tippen Sie auf den anderen Auslöser, um zum zweiten Satz zu wechseln.',
   'hudChrome.controller.crossHotbarOwnsButtons':
-    'Die Auslöser und das D-Pad gehören zur Cross-Hotbar, solange diese aktiviert ist, daher werden sie unten und nicht hier eingerichtet.',
+    'Die Auslöser steuern die Cross-Hotbar, solange diese aktiviert ist. Die D-Pad-Richtungen bleiben hier für Menüs und Bewegung einstellbar.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Cross Hotbar zurücksetzen',
   'hudChrome.controller.cycleHudAction': 'Zyklusschnittstelle',
@@ -15938,12 +16049,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Alle {everyNormal} Sek. spießt Nythraxis {victimsNormal} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainNormal} der maximalen Gesundheit, bis sein Spieß zerstört ist. Ein Spieß zerbricht nach {hitsNormal} Treffern von irgendjemandem, egal wie viel Schaden sie anrichten. Ein bereits aufgespießter Schlachtzügler kann {cooldown} Sek. lang nicht erneut gewählt werden, sodass sich die Spieße über den ganzen Schlachtzug verteilen.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Er wirkt {spikeAt} Sek. nach Beginn des Sturms Knochenspieß, dann wird Grabbrecher {rearm} Sek. nach seinem Ende wieder bereit.',
+    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knochensturm',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Verteilt Euch und lauft weiter vor Nythraxis weg. Der anvisierte Schlachtzügler läuft davon, während alle anderen Platz um die Ansturmroute lassen. Danach nehmen die Tanks ihn wieder auf.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyNormal} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlNormal} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamNormal} der maximalen Gesundheit. Er wirkt {spikeAt} Sek. nach Beginn des Sturms Knochenspieß, dann wird Grabbrecher {rearm} Sek. nach seinem Ende wieder bereit.',
+    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyNormal} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlNormal} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamNormal} der maximalen Gesundheit. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Der Todlose Hof',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tanks nehmen Aldren auf und drehen seinen Spaltangriff vom Schlachtzug weg. Betäubt oder unterbrecht Malric, sobald Malrics Heilung beginnt, und tötet ihn zuerst. Verwurzelt oder betäubt danach Voss weg von den Heilern, da er nicht verspottet werden kann, und erledigt ihn als Nächstes.',
@@ -16013,7 +16124,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.procOverlayFrost': 'Eiszapfen',
 
   // Release fill: v0.31 farming, corpse harvest, aura tracks, and cosmetics.
-  'abilityUi.cast.farming': 'Pflanzen',
   'abilityUi.cast.sundering': 'Zerschmettern',
   'hud.core.mapMarkerLabels.farmPatch': 'Pflanzbeete',
   'hud.logs.keptLockedMany': '{count} gesperrte Kopien behalten.',
@@ -17045,7 +17155,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Rahmen bearbeiten löst außerdem die sechs optionalen Aurenleisten, sobald du sie im Reiter Kampf der Interfaceoptionen einschaltest: Meine Stärkungen, defensive Abklingzeiten, meine Schilde, offensive Abklingzeiten, Bewegung und Verstohlenheit sowie Meine Stärkungen auf Verbündeten. Jede Leiste ist zunächst aus und trägt beim Lösen ihren eigenen Namenschip.',
   'guide.interfacePage.framesGovernedExtra':
-    'Rahmen bearbeiten löst außerdem den Trackerstapel darunter: verfolgte Quests und Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, das aktuelle Delve, jeden Riss, an dem du teilnimmst, und das verfolgte Rezept oder die Kommission. Ebenfalls enthalten sind die Haustieraktionsleiste neben dem Haustierrahmen, der Zielpunkte-Rahmen für deine Schwächungen auf nahen Gegnern, das Paladin-Medaillon der Hingabe, die Affliction-Leiste des Hexenmeisters, das Zauberproc-Overlay, der Nebenhandschwungtimer für Beidhänder und das Register-Schadensmeterfenster. Jeder Bereich trägt seinen eigenen Namenschip, sobald er gelöst ist.',
+    'Rahmen bearbeiten löst außerdem den Trackerstapel darunter: verfolgte Quests und Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, vom Handwerk angepinnte Rezepte, das aktuelle Delve, jeden Riss, an dem du teilnimmst, und das verfolgte Rezept oder die Kommission. Ebenfalls enthalten sind die Haustieraktionsleiste neben dem Haustierrahmen, der Zielpunkte-Rahmen für deine Schwächungen auf nahen Gegnern, das Paladin-Medaillon der Hingabe, die Affliction-Leiste des Hexenmeisters, das Zauberproc-Overlay, der Nebenhandschwungtimer für Beidhänder und das Register-Schadensmeterfenster. Jeder Bereich trägt seinen eigenen Namenschip, sobald er gelöst ist.',
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Dein Einheitenrahmen, dein Zielrahmen und deine Gruppenrahmen können alle verschoben werden. Jeder besitzt eine kleine Verschiebeschaltfläche in der Ecke: entsperre ihn, ziehe ihn an die gewünschte Stelle und sperre ihn wieder, damit ein Fehlklick nichts verschiebt. Rahmen bearbeiten oben im Reiter Rahmen der Interfaceoptionen löst den übrigen Bildschirm gleichzeitig mit diesen drei Rahmen: Aktionsleisten, Zauberleiste, Schwungleiste, Erfahrungsleiste, Minikarte, Schaltflächenleiste, Haustierrahmen, Haltungsleiste, Stärkungs- und Schwächungsreihen sowie den Wunschlistenhinweis. Wenn ein Rahmen falsch steht, setzt Auf Standard zurück am Fuß desselben Reiters alle auf ihren Ausgangsort.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -17053,7 +17163,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.hubPracticeTrackerBody':
     'Beim Eastbrook-Hub erscheint nach den geführten Übungslektionen ein Tracker mit deinen besten Läufen an den Übungsattrappen. Während einer Lektion erklärt eine Leiste den aktuellen Schritt, vom Öffnen der Schadensanzeigen bis zum Vergleich eines zweiten Laufs.',
   'guide.interfacePage.mapBodyZoneFirst':
-    'M öffnet die Weltkarte in der Zone, in der du stehst, mit deinem eigenen Pfeil, den Orten um dich herum, Questgebern mit ihren Markierungen und den Gebieten deiner Ziele. Sie zeigt außerdem Handwerksstationen, Briefkästen, Anschlagtafeln und Gartenbeete, Dungeonportale und jeden Sammelknoten der Zone. Knoten werden während der Regeneration grau und markiert, wenn deine Werkzeuge nicht ausreichen. Deine Gruppe erscheint ebenfalls. Rechtsklicke die Karte oder drücke die Weltkartenschaltfläche, um zum Kontinent zurückzuzoomen. Jede Zone ist dort mit Namen gezeichnet, ein Klick öffnet ihre Karte. Betrittst du ein Delve, einen Dungeon, einen Riss oder eine Burgfeste, wechselt die Karte zum Grundriss deines Standorts. Das Schlachtfeld Thornhollow-Felder hat eine eigene Feldkarte.\n\nRechts unter der Minikarte hält ein Stapel Tracker dein aktuelles Geschäft sichtbar, ohne ein Fenster zu öffnen: Quests und ihre Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, das aktuelle Delve und jeder Riss, an dem du teilnimmst. Der Questtracker lässt sich einklappen, wenn du den Bildschirm wieder frei haben willst.',
+    'M öffnet die Weltkarte in der Zone, in der du stehst, mit deinem eigenen Pfeil, den Orten um dich herum, Questgebern mit ihren Markierungen und den Gebieten deiner Ziele. Sie zeigt außerdem Handwerksstationen, Briefkästen, Anschlagtafeln und Gartenbeete, Dungeonportale und jeden Sammelknoten der Zone. Knoten werden während der Regeneration grau und markiert, wenn deine Werkzeuge nicht ausreichen. Deine Gruppe erscheint ebenfalls. Rechtsklicke die Karte oder drücke die Weltkartenschaltfläche, um zum Kontinent zurückzuzoomen. Jede Zone ist dort mit Namen gezeichnet, ein Klick öffnet ihre Karte. Betrittst du ein Delve, einen Dungeon, einen Riss oder eine Burgfeste, wechselt die Karte zum Grundriss deines Standorts. Das Schlachtfeld Thornhollow-Felder hat eine eigene Feldkarte.\n\nRechts unter der Minikarte hält ein Stapel Tracker dein aktuelles Geschäft sichtbar, ohne ein Fenster zu öffnen: Quests und ihre Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, vom Handwerk angepinnte Rezepte, das aktuelle Delve und jeder Riss, an dem du teilnimmst. Der Questtracker lässt sich einklappen, wenn du den Bildschirm wieder frei haben willst.',
   'guide.interfacePage.mobileBodyTwoPages':
     'Touchsteuerung erscheint automatisch, und die Anordnung passt sich an den Bildschirm an: kompakt auf einem kleinen Telefon, standardmäßig auf einem größeren Telefon und großzügiger auf einem Tablet.\n\nDeine Fähigkeiten liegen in einem Ring statt in einer Zahlenreihe: die Angriffsschaltfläche mit vier Aktionsschaltflächen daneben und ein Seitenschalter, der den Ring zwischen seinen {pages} Seiten wechselt. Zusammen erreichen sie alle {slots} Fähigkeitenslots, unabhängig davon, ob zusätzliche Desktopleisten aktiv sind. Die fünfte Ringposition ist für Verbrauchsgüter: Tippe sie zur Benutzung an, halte sie gedrückt oder wische nach innen, um eine Reihe zu öffnen, die sich aus deinem Vorrat füllt. Um den Ring liegen häufige Touchaktionen: Ziel wechseln, das Vorderste benutzen und springen.\n\nEine Schnellaktionen-Schaltfläche sitzt unten statt einer Knopfreihe. Sie öffnet alles Weitere: Reittier, Chat, Karte, Taschen, Soziales, Quests, Charakter, Zauberbuch und Spielmenü sowie einen Weitere-Eintrag mit den übrigen Fenstern, darunter Dungeonfinder, PvP, Emotes und Wiki. Fenster füllen auf Touch den Bildschirm, statt darüber zu schweben.\n\nEinheitenrahmen zu verschieben ist eine Desktopfunktion; Touch platziert sie automatisch.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -17131,7 +17241,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.econ.introRaidCollections':
     'Münzen bewegen sich durch Gebühren, Markt, Aufträge und Kommissionen. Der Weltmarkt handelt normale Waren; raidfinanzierte Schmelztiegel-Sammlungen stehen daneben als eigene Route.',
   'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Manche Gegenstände tragen einen Namen. Die Herkunftszeilen eines Materials sagen, wer jede Einheitengruppe gesammelt hat, während ein getrenntes Signiert-von-Zeichen den Premiumsignierer nennt, falls es einen gibt. Diese Tatsachen sind unabhängig: Gewöhnliches Sammelmaterial bewahrt den Sammler ohne Signatur, und alter signierter Bestand kann seinen Signierer nennen, obwohl ehrlich kein Sammler aufgezeichnet wurde. Ein fertiges Stück nennt stattdessen seinen Handwerker. Diese Aufzeichnungen reisen durch Handel, Bank, Post, Weltmarkt und sogar den Händlerrückkauf mit dem Gegenstand und verblassen nie.\n\nSammeln signiert die beste Arbeit automatisch. Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Glücksertrag. Der Glückswurf bei einer Leichenverarbeitung signiert den Ertrag, wenn die Familie kein Exemplar besitzt. Wenn sie ein Exemplar besitzt, bleibt der normale Ertrag gewöhnlich und daneben wird das signierte makellose Exemplar erzeugt. Herstellung folgt derselben Linie: Jede seltene oder bessere Ausgabe wird in jeder Kopie signiert, und ein Meisterwerk ist unabhängig von seiner Qualität immer signiert. Die Signatur eines gewöhnlichen Materials sitzt auf den Einheiten selbst und geht nicht verloren, nur weil ein passender Stapel bereits einen anderen Sammler oder Signierer enthält. Ein getrenntes makelloses Exemplar ist ein eigener Gegenstand und braucht Platz. Passt es nicht, bleibt der gewöhnliche Leichenertrag, aber das Exemplar geht verloren.\n\nFertige Gegenstände haben eine strenge Identität. Zwei Kopien verschmelzen nur, wenn jedes Merkmal exakt gleich ist: Gegenstand, Signierer, Meisterwerkwerte, Verzauberung und Bindung. Kompatible Materialien teilen einen Platz über Sammler und Signierer hinweg, behalten aber je Quelle ihre Menge. Der Tooltip fasst Quellen zusammen, Quellen öffnet die vollständige Liste. Nach Sammler trennen hält diese Stapel in deinen Taschen auseinander, und Sortieren respektiert die Wahl. Übertragenes Material stapelt sich beim Empfänger normal.\n\nSignaturen zahlen Handwerkern etwas zurück. Hältst du an der Werkbank eine signierte Kopie eines benötigten Reagenzes, erhöht der Signierer die Meisterwerkchance um 2 Prozentpunkte. Hältst du ein mit deiner eigenen Hand signiertes Reagenz, sinkt seine benötigte Menge um eins, nie unter eins, außer das Reagenz ist als nicht rabattierbar markiert; Raidkerne behalten immer die volle Menge. Deine eigene signierte Arbeit der Stufe selten oder besser lehrt dich heute sogar zurück, allerdings nur bei gefertigten Tränken: Trinkst du einen seltenen Trank, den du selbst gebraut und signiert hast, fließt ein kleiner Fertigkeitsstrom in den Beruf zurück, solange er aktiver Hauptberuf ist. Ein Elixier, eine Schriftrolle oder ein Apexfläschchen lehrt unabhängig von seiner feinen Signatur nichts zurück.',
+    'Manche Gegenstände tragen einen Namen. Die Herkunftszeilen eines Materials sagen, wer jede Einheitengruppe gesammelt hat, während ein getrenntes Signiert-von-Zeichen den Premiumsignierer nennt, falls es einen gibt. Diese Tatsachen sind unabhängig: Gewöhnliches Sammelmaterial bewahrt den Sammler ohne Signatur, und alter signierter Bestand kann seinen Signierer nennen, obwohl ehrlich kein Sammler aufgezeichnet wurde. Ein fertiges Stück nennt stattdessen seinen Handwerker. Diese Aufzeichnungen reisen durch Handel, Bank, Post, Weltmarkt und sogar den Händlerrückkauf mit dem Gegenstand und verblassen nie.\n\nSammeln signiert die beste Arbeit automatisch. Jede Ernte, die selten oder besser würfelt, kommt signiert an, und seltene Funde signieren ihren gesamten fünffachen Glücksertrag. Der Glückswurf bei einer Leichenverarbeitung signiert den Ertrag, wenn die Familie kein Exemplar besitzt. Wenn sie ein Exemplar besitzt, bleibt der normale Ertrag gewöhnlich und daneben wird das signierte makellose Exemplar erzeugt. Herstellung folgt derselben Linie: Jede seltene oder bessere Ausgabe wird in jeder Kopie signiert, und ein Meisterwerk ist unabhängig von seiner Qualität immer signiert. Die Signatur eines gewöhnlichen Materials sitzt auf den Einheiten selbst und geht nicht verloren, nur weil ein passender Stapel bereits einen anderen Sammler oder Signierer enthält. Ein getrenntes makelloses Exemplar ist ein eigener Gegenstand und braucht Platz. Passt es nicht, bleibt der gewöhnliche Leichenertrag, aber das Exemplar geht verloren.\n\nFertige Gegenstände haben eine strenge Identität. Zwei Kopien verschmelzen nur, wenn jedes Merkmal exakt gleich ist: Gegenstand, Signierer, Meisterwerkwerte, Verzauberung und Bindung. Kompatible Materialien teilen einen Platz über Sammler und Signierer hinweg, behalten aber je Quelle ihre Menge. Der Tooltip beim Darüberfahren fasst die Quellen zusammen; ein Rechtsklick auf den Stapel öffnet die vollständige Liste (auf Touchgeräten nutze dessen Schaltfläche Quellen). Nach Sammler trennen hält diese Stapel in deinen Taschen auseinander, und Sortieren respektiert die Wahl. Übertragenes Material stapelt sich beim Empfänger normal.\n\nSignaturen zahlen Handwerkern etwas zurück. Hältst du an der Werkbank eine signierte Kopie eines benötigten Reagenzes, erhöht der Signierer die Meisterwerkchance um 2 Prozentpunkte. Hältst du ein mit deiner eigenen Hand signiertes Reagenz, sinkt seine benötigte Menge um eins, nie unter eins, außer das Reagenz ist als nicht rabattierbar markiert; Raidkerne behalten immer die volle Menge. Deine eigene signierte Arbeit der Stufe selten oder besser lehrt dich heute sogar zurück, allerdings nur bei gefertigten Tränken: Trinkst du einen seltenen Trank, den du selbst gebraut und signiert hast, fließt ein kleiner Fertigkeitsstrom in den Beruf zurück, solange er aktiver Hauptberuf ist. Ein Elixier, eine Schriftrolle oder ein Apexfläschchen lehrt unabhängig von seiner feinen Signatur nichts zurück.',
   'guide.profPages.effectFeast':
     'Stellt ein Festmahl auf, von dem andere je eine Portion essen: {servings} Portionen, hält {minutes} Min.',
   'guide.profPages.effectFeastServing':
@@ -17143,12 +17253,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.effectWellFed': 'Satt nach dem Essen: +{value} {stat} für {minutes} Min.',
   'guide.profPages.effectWellFedAura': 'Gewährt nach dem Essen {aura} für {minutes} Min.',
   'guide.profPages.ench.enchantsNoteRaidFormula':
-    'Verzauberungen kommen in vier Stufen. Die Grundstufe läuft mit Klangstaub, am oberen Ende mit etwas Essenz, und deckt Waffenhand, Nebenhand und jeden Rüstungsplatz ab. Es gibt genügend Werteachsen, dass jeder Build für jeden Platz etwas findet. Schilde und getragene Zauberer-Nebenhände erhalten eine eigene Ausdauerverzauberung, daher bleibt kein ausgerüsteter Platz ohne Verzauberung. Die größere Stufe kostet einen Klangsplitter plus Essenz und gibt stärkere Boni auf den wirkungsvollsten Plätzen. Splitter speisen außerdem drei weitere Senken: die beiden Amulettrezepte mit je fünf, die oberste Aufladung der Werkzeugeffekte und die Leuchtendstufe. Dort kosten Waffen- und Brustverzauberung je einen Splitter, die Infusion zwei. Lege einige zurück, bevor du ausgibst.\n\nDazwischen liegen fünf Runenverzauberungen, je eine für einen sekundären Wert, damit nichts, was du mahlst, Sackgasse wird: Runenkante für Waffenstärke mit Resonanzstahl, Runensiegel für Waffenintelligenz mit Resonanzholz, Runengewebe für Brustwillenskraft mit Resonanzfaden, Runenhaut für Beweglichkeit an den Beinen mit Resonanzhaut und Runenglieder für Ausdauer am Helm mit Resonanzgliedern. Jede kostet außerdem zwei Klangessenzen. Wo Platz und Wert sowohl eine Grund- als auch eine größere Verzauberung besitzen, liegt der Runenbonus dazwischen. Runengewebe ist die stärkste Brustverzauberung für Willenskraft, Runenhaut die einzige Beinverzauberung für Beweglichkeit. Die genauen Boni stehen in der folgenden Tabelle.\n\nÜber den gewöhnlichen unteren Stufen liegt Leuchtend, der gewöhnliche Capstone des Berufs: Verzauberung 100 für die vier und 125 für die Infusion, wie die Skillspalte zeigt. Jede verlangt ein leuchtendes Reagenz und fügt auf ihrem Platz einen weiteren Schritt hinzu: Waffen mit Macht oder Zaubermacht, Brust und Stiefel. Die Leuchtend-Infusion greift nur auf einem perfektionierten Stück. Perfektionierung ist die Arbeit des Trägers, nicht des Verzauberers, und die Berufe-Seite erklärt, wie ein Stück sie erhält.\n\nEifer der Letzten Flamme ist eine eigene Raidformel und keine kostenlose gewöhnliche Verzauberung. Lerne die handelbare Formel bei Verzauberung 100, bevor du sie anbringst. Jede Anwendung braucht 3 Kerne der Letzten Flamme und 2 Klangsplitter. Die Formel kann im Schmelztiegel fallen oder beim Quartiermeister für einen Kern gekauft werden. Ihr Nahkampfproc und die Regeln zur Waffengeschwindigkeit stehen vollständig weiter unten.',
+    'Verzauberungen kommen in vier Stufen. Die Grundstufe läuft mit Klangstaub, am oberen Ende mit etwas Essenz, und deckt Waffenhand, Nebenhand und jeden Rüstungsplatz ab. Es gibt genügend Werteachsen, dass jeder Build für jeden Platz etwas findet. Schilde und getragene Zauberer-Nebenhände erhalten eine eigene Ausdauerverzauberung, daher bleibt kein ausgerüsteter Platz ohne Verzauberung. Die größere Stufe kostet einen Klangsplitter plus Essenz und gibt stärkere Boni auf den wirkungsvollsten Plätzen. Splitter speisen außerdem drei weitere Senken: die beiden Amulettrezepte mit je einem (der Rest der Rechnung eines Amuletts ist Essenz und Staub), die oberste Aufladung der Werkzeugeffekte und die Leuchtendstufe. Dort kosten Waffen- und Brustverzauberung je einen Splitter, die Infusion zwei. Lege einige zurück, bevor du ausgibst.\n\nDazwischen liegen fünf Runenverzauberungen, je eine für einen sekundären Wert, damit nichts, was du mahlst, Sackgasse wird: Runenkante für Waffenstärke mit Resonanzstahl, Runensiegel für Waffenintelligenz mit Resonanzholz, Runengewebe für Brustwillenskraft mit Resonanzfaden, Runenhaut für Beweglichkeit an den Beinen mit Resonanzhaut und Runenglieder für Ausdauer am Helm mit Resonanzgliedern. Jede kostet außerdem zwei Klangessenzen. Wo Platz und Wert sowohl eine Grund- als auch eine größere Verzauberung besitzen, liegt der Runenbonus dazwischen. Runengewebe ist die stärkste Brustverzauberung für Willenskraft, Runenhaut die einzige Beinverzauberung für Beweglichkeit. Die genauen Boni stehen in der folgenden Tabelle.\n\nÜber den gewöhnlichen unteren Stufen liegt Leuchtend, der gewöhnliche Capstone des Berufs: Verzauberung 100 für die vier und 125 für die Infusion, wie die Skillspalte zeigt. Jede verlangt ein leuchtendes Reagenz und fügt auf ihrem Platz einen weiteren Schritt hinzu: Waffen mit Macht oder Zaubermacht, Brust und Stiefel. Die Leuchtend-Infusion greift nur auf einem perfektionierten Stück. Perfektionierung ist die Arbeit des Trägers, nicht des Verzauberers, und die Berufe-Seite erklärt, wie ein Stück sie erhält.\n\nEifer der Letzten Flamme ist eine eigene Raidformel und keine kostenlose gewöhnliche Verzauberung. Lerne die handelbare Formel bei Verzauberung 100, bevor du sie anbringst. Jede Anwendung braucht 3 Kerne der Letzten Flamme und 2 Klangsplitter. Die Formel kann im Schmelztiegel fallen oder beim Quartiermeister für einen Kern gekauft werden. Ihr Nahkampfproc und die Regeln zur Waffengeschwindigkeit stehen vollständig weiter unten.',
   'guide.profPages.ench.formulaRequired': 'Formel erforderlich',
   'guide.profPages.ench.perfectedOnly': 'Nur perfektionierte Stücke',
   'guide.profPages.ench.tier.lucent': 'Leuchtend',
   'guide.profPages.faq.a1':
-    'Fertige Gegenstände folgen weiterhin der strengen Instanzregel: Zwei Exemplare verschmelzen nur, wenn ihre Signatur, gewürfelten Eigenschaften, Meisterwerkwerte, Verzauberung, Bindung und jede andere Identität exakt übereinstimmen. Eine signierte Klinge bleibt daher von einer gewöhnlichen getrennt.\n\nMaterialien sind die Ausnahme. Verträgliche Stapel desselben Materials können sich verbinden, auch wenn Sammler oder Signaturen verschieden sind, weil der Stapel für jede Quelle eine Anzahl führt. Der Tooltip beim Darüberfahren fasst die Quellen zusammen; öffne Quellen für die vollständige Liste. Nach Sammler zu trennen hält diese Stapel in deinen Taschen auseinander, und das Sortieren respektiert diese Wahl. Übertragenes Material kann sich normal mit den Materialien des Empfängers stapeln.',
+    'Fertige Gegenstände folgen weiterhin der strengen Instanzregel: Zwei Exemplare verschmelzen nur, wenn ihre Signatur, gewürfelten Eigenschaften, Meisterwerkwerte, Verzauberung, Bindung und jede andere Identität exakt übereinstimmen. Eine signierte Klinge bleibt daher von einer gewöhnlichen getrennt.\n\nMaterialien sind die Ausnahme. Verträgliche Stapel desselben Materials können sich verbinden, auch wenn Sammler oder Signaturen verschieden sind, weil der Stapel für jede Quelle eine Anzahl führt. Der Tooltip beim Darüberfahren fasst die Quellen zusammen; ein Rechtsklick auf den Stapel öffnet die vollständige Liste (auf Touchgeräten nutze dessen Schaltfläche Quellen). Nach Sammler zu trennen hält diese Stapel in deinen Taschen auseinander, und das Sortieren respektiert diese Wahl. Übertragenes Material kann sich normal mit den Materialien des Empfängers stapeln.',
   'guide.profPages.faq.a11Promotion':
     'Stelle ein Apex-Meistergeschmiedetes Stück her oder kaufe eines und perfektioniere es. Mit 125 Fertigkeit im Beruf, der es hergestellt hat, kostet jeder Versuch eine Handwerker-Glut, eine zersprungene Essenz und eine Prismaglasfassung, gelingt vier von fünf Malen und beschädigt das Stück bei einem Fehlschlag nie. Der erste Versuch bindet das Stück an dich, und vier erfolgreiche Ränge machen es Perfektioniert. Gib danach eine Urkunde des Schaffens aus, eine Urkunde mit Fertigkeit 125 der Inschriftenkunde, die jeder kaufen oder in Auftrag geben kann, um die perfektionierte Kopie zu einem legendären Stück zu befördern, dessen Namen du wählst. Die Beförderung ist deterministisch: kein Wurf, unveränderte Werte, nur Name und Farbe ändern sich.',
   'guide.profPages.faq.a2':
@@ -17168,7 +17278,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Der Gewinn ist deterministisch und an deinen eigenen Zähler statt an die Pflanze gebunden: {g1} Fertigkeit bei einer Ernte unter {p1}, {g2} unter {p2}, {g3} unter {p3} und {g4} für den Rest bis zur Obergrenze {cap}. Es gibt nie einen Fertigkeitswurf, daher ist der Aufstieg genau so lang, wie die Rechnung ihn macht.\n\nDie Pflanzenstufe entscheidet, wie weit ein Beet dich tragen kann. Eine Pflanze der Stufe 1 lehrt bis {c1} und wird dort grau, eine Pflanze der Stufe 2 bis {c2}, und Stufe 3 und höher bis zur Obergrenze. Nur wenn du zu höheren Beeten wechselst, bewegt sich der Zähler weiter.',
   'guide.profPages.farm.gainHeading': 'Was eine Ernte lehrt',
   'guide.profPages.farm.rhythmBody':
-    'Pflanzen ist der kurze sichtbare Zauber: auf jeder Stufe pauschal {plant} Sekunden, weil eine Hacke Boden öffnet und kein Tempo kauft. Das Herausnehmen einer reifen Ernte geschieht sofort. Es gibt keinen Zauber, den man unterbrechen könnte, und keine Taschenprüfung, die es ablehnt. Ein Beet, das bereit ist, wartet so lange, wie du es stehen lässt, daher kostet ein voller Rucksack den Bauern nichts außer dem Weg zum Leeren.\n\nWas eine Ernte zahlt, sind Erzeugnis und Landwirtschafts-Fertigkeit. Anders als eine Erzader gewährt sie überhaupt keine Charakter-EP, denn die Beete sind ein Beruf zum Arbeiten und kein Weg zum Stufenaufstieg.',
+    'Pflanzen geschieht sofort, weil eine Hacke Boden öffnet und kein Tempo kauft: Es gibt keinen Zauber, den man abwarten müsste, wer also weitergeht, hat trotzdem gepflanzt. Das Herausnehmen einer reifen Ernte geschieht ebenfalls sofort. Es gibt keinen Zauber, den man unterbrechen könnte, und keine Taschenprüfung, die es ablehnt. Ein Beet, das bereit ist, wartet so lange, wie du es stehen lässt, daher kostet ein voller Rucksack den Bauern nichts außer dem Weg zum Leeren.\n\nWas eine Ernte zahlt, sind Erzeugnis und Landwirtschafts-Fertigkeit. Anders als eine Erzader gewährt sie überhaupt keine Charakter-EP, denn die Beete sind ein Beruf zum Arbeiten und kein Weg zum Stufenaufstieg.',
   'guide.profPages.farm.rhythmHeading': 'Der Rhythmus der Landwirtschaft',
   'guide.profPages.farm.tableBodyOneMeal':
     'Die Küchen sind der Ort, an dem eine Saison weitergibt. Neben den alltäglichen Gartengerichten hat jede Pflanzenstufe ein reichhaltigeres Gericht, das dich Gut gesättigt zurücklässt: Beende die Mahlzeit, und ein dauerhafter Bonus bleibt bei dir, genau der Vorteil, den eine Gruppe vor dem Dungeonportal gegessen haben will. Nur ein Gut-gesättigt-Effekt gilt gleichzeitig, eine neuere Mahlzeit ersetzt ihn. An der Spitze steht das Erntefest, das ein Koch in der Welt aufstellt: Jeder in der Nähe nimmt eine eigene Portion, eine pro Person, und jede fertige Mahlzeit gewährt denselben Bonus, sodass die Saison eines Farmers den Tisch für eine ganze Gruppe decken kann. Die Spitze der Leiter, die beiden reichhaltigsten Gerichte und das Fest selbst, stützt sich auf Berg- und Parterrepflanzen, deren Samen die Bauern neben diesen Beeten verkaufen. Die Rezepte sind eine andere Sache: Die oberen Stufen der Gartenleiter werden an keinem Schalter mehr gelehrt, sondern im Endspiel gefunden oder wie jedes andere Endspielrezept für heroische Marken gekauft. Die Gerichtleiter selbst ist Kochsache: Die Kochseite führt jede Stufe.\n\nAuch Glück hat an diesem Tisch seinen Platz. Jede Ernte, die du einbringst, würfelt dieselbe Chance auf einen Glückstreffer wie die anderen Sammelberufe. Hin und wieder wird eine Pflanze golden: Der Ertrag liegt weit über einer normalen Ernte, zusätzlich kommt etwas hervor, etwa ein Samen für besseres Land als das, auf dem du arbeitest, oder gelegentlich eines dieser Endspielrezepte. Die ganze Zone hört die namentliche Ankündigung der Entdeckung, und Goldene Ernte wird in deinem Buch der Taten verzeichnet.',
@@ -17272,4 +17382,236 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.peaksPlaceNotes':
     'Highwatch hält die Mauer. Stalkergrat und Tiefenfelsgruben gehören Gratkatzen und Wühlern, die Ogerausläufer und Drogmars Kriegslager Söldnern. Sturmklamm knistert vor Elementaren, darunter glimmt der Glimmersee mit dem Tor zum Ertrunkenen Tempel. Zelte der Brutgeschworenen und die Wiedergängerfelder umringen das Hochland, an dessen Spitze das Gravewyrm-Heiligtum steht.',
   'worldContent.farmPatchName': 'Gartenbeete',
+  'hud.chat.templates.raidWarning': '[Raid-Warnung] {name}: {message}',
+  'hudChrome.bugReport.online': 'Online',
+  'hudChrome.charSidebar.crafting': 'Basteln',
+  'hudChrome.charSidebar.gathering': 'Versammlung',
+  'hudChrome.charSidebar.label': 'Charakterdetails',
+  'hudChrome.charSidebar.openProfessions': 'Offene Berufe',
+  'hudChrome.charSidebar.progression': 'Progression',
+  'hudChrome.charSidebar.skills': 'Fähigkeiten',
+  'hudChrome.charSidebar.stats': 'Statistiken',
+  'hudChrome.charSidebar.subtitle': 'Ebene {level} {className}. {archetype}. Hobby: {hobby}',
+  'hudChrome.charSidebar.subtitleNoHobby': 'Ebene {level} {className}. {archetype}',
+  'hudChrome.controller.device': 'Verbundenes Gerät',
+  'hudChrome.controller.deviceConnected': 'Verbunden',
+  'hudChrome.controller.deviceDisconnected': 'Kein Controller erkannt',
+  'hudChrome.cosmetics.preview': 'Vorschau',
+  'hudChrome.cosmetics.previewAria': 'Vorschau {name}',
+  'hudChrome.crafting.materialsFooter':
+    'Materialien in Ihrem Tresor werden automatisch gezogen. Weitere Rezepte erfahren Sie am Bahnhof.',
+  'hudChrome.crafting.reagentOrdinaryHeld':
+    '({name} gehalten: {count}, hier zählt aber nur die gute Note)',
+  'hudChrome.finder.lockoutWeekly': 'Wöchentliche Aussperrung für jeden Boss',
+  'hudChrome.finder.mech.ancestral_sap': 'Ahnensaft (heilt seine Verbündeten)',
+  'hudChrome.finder.mech.anvils_decree':
+    'Amboss-Dekret (drei Raid-weite Hammerschläge, Heilung durch)',
+  'hudChrome.finder.mech.apocalypse_add':
+    'Ignivar Aschenrufer (Priorität: Apokalypse hinzufügen, schnell töten)',
+  'hudChrome.finder.mech.beast_pit_quake': 'Beast Pit Quake (Flächenschaden)',
+  'hudChrome.finder.mech.bloodmane_rend': 'Bloodmane Rend (bluten, auf Zielwechsel achten)',
+  'hudChrome.finder.mech.brand_of_the_pyre':
+    'Brandmal des Scheiterhaufens (Stapelfeuermal, mit Leitungswasser abwaschen)',
+  'hudChrome.finder.mech.call_of_the_hunt': 'Ruf der Jagd (beschleunigt Verbündete in der Nähe)',
+  'hudChrome.finder.mech.chains_of_the_forge':
+    'Ketten der Schmiede (nur heroisch, bleiben Sie in der Nähe Ihres verbundenen Partners)',
+  'hudChrome.finder.mech.cinder_orbs':
+    'Aschekugeln (markierte Spieler verteilen sich an den Raumrändern)',
+  'hudChrome.finder.mech.falling_cinders': 'Fallende Aschen (Meteorkreise auf Spielern, Auszug)',
+  'hudChrome.finder.mech.forge_strike': 'Forge Strike (stapelbarer Panzerwechsel-Debuff)',
+  'hudChrome.finder.mech.forge_wave':
+    'Forge Wave (erweiternde Feuermauer, nutzen Sie die beiden sicheren Spuren)',
+  'hudChrome.finder.mech.forgefathers_sweep':
+    "Forgefather's Sweep (breiter Frontkegel bei einem Nicht-Panzer)",
+  'hudChrome.finder.mech.forgestorm': 'Forgestorm (fallende Meteorkreise, ausziehen)',
+  'hudChrome.finder.mech.jaguar_roar': 'Jaguar-Gebrüll (Rückstoß)',
+  'hudChrome.finder.mech.judgment_of_the_forge':
+    'Urteil der Schmiede (Pause, teilen Sie die einzige sichere Zuflucht)',
+  'hudChrome.finder.mech.last_inferno': 'Letztes Inferno (45 Sekunden Brennen bei 20 % Gesundheit)',
+  'hudChrome.finder.mech.makers_brand': "Maker's Brand (stapelbarer Panzerwechsel-Debuff)",
+  'hudChrome.finder.mech.masters_assembly':
+    'Die Versammlung des Meisters (Schmiedebalken blockieren, Blocker drehen)',
+  'hudChrome.finder.mech.rain_of_cinders': 'Aschenregen (drei Feuerkegel, dazwischen stehen)',
+  'hudChrome.finder.mech.revolving_inferno':
+    'Rotierendes Inferno (rotierende Feuerstrahlen, Bewegung durch die Lücken)',
+  'hudChrome.finder.mech.shared_pyre':
+    'Gemeinsamer Scheiterhaufen (Sammelkreis, Schaden aufteilen)',
+  'hudChrome.finder.mech.tempering_ray':
+    'Temperierender Strahl (Linie zu einem markierten Spieler, abfangen)',
+  'hudChrome.finder.mech.thickhide_ward': 'Dickfellschutz (schützt Verbündete in der Nähe)',
+  'hudChrome.finder.mech.tusk_sweep': 'Tusk Sweep (Frontalspaltung)',
+  'hudChrome.finder.mech.wildheart_pulse': 'Wildheart Pulse (pulsierender Flächenschaden)',
+  'hudChrome.gathering.toolTooltip.wieldDegrade':
+    'Unterhalb dieser Fähigkeit funktioniert es immer noch als untergeordnetes Werkzeug.',
+  'hudChrome.keybinds.hideInterface': 'Schnittstelle ausblenden',
+  'hudChrome.keybinds.targetParty1': 'Zielparteimitglied 1',
+  'hudChrome.keybinds.targetParty2': 'Zielparteimitglied 2',
+  'hudChrome.keybinds.targetParty3': 'Zielparteimitglied 3',
+  'hudChrome.keybinds.targetParty4': 'Zielparteimitglied 4',
+  'hudChrome.keybinds.targetParty5': 'Zielparteimitglied 5',
+  'hudChrome.keybinds.targetParty6': 'Zielparteimitglied 6',
+  'hudChrome.keybinds.targetParty7': 'Zielparteimitglied 7',
+  'hudChrome.keybinds.targetParty8': 'Zielparteimitglied 8',
+  'hudChrome.keybinds.targetParty9': 'Zielparteimitglied 9',
+  'hudChrome.keybinds.targetSelf': 'Zielselbst',
+  'hudChrome.keybinds.wheelHeldRefused':
+    'Eine Radkerbe kann keine gehaltene Aktion wie eine Bewegung antreiben. Wählen Sie dafür eine Taste oder eine Maustaste.',
+  'hudChrome.keybinds.wheelHint':
+    'Auch das Mausrad bindet: Rollen Sie es beim Binden nach oben oder unten, bei gedrückter Strg-, Alt- oder Umschalttaste, wenn Sie möchten. Die Funktion zum Vergrößern und Verkleinern der Kamera befindet sich standardmäßig auf dem bloßen Lenkrad. Bewegen Sie sie zu einem Akkord wie Strg+Rad, um das Rad für Fähigkeiten freizugeben.',
+  'hudChrome.keybinds.zoomIn': 'Kamera heranzoomen',
+  'hudChrome.keybinds.zoomOut': 'Kamera herauszoomen',
+  'hudChrome.mapAtlas.availableNearby': 'In der Nähe verfügbar',
+  'hudChrome.mapAtlas.distance': '{distance} Yards',
+  'hudChrome.mapAtlas.filters.dungeons': 'Dungeons',
+  'hudChrome.mapAtlas.filters.gather': 'Versammeln',
+  'hudChrome.mapAtlas.filters.players': 'Spieler',
+  'hudChrome.mapAtlas.filters.quests': 'Quests',
+  'hudChrome.mapAtlas.filters.services': 'Dienstleistungen',
+  'hudChrome.mapAtlas.filtersAria': 'Kartenebenen',
+  'hudChrome.mapAtlas.landmarkCount': '{count} Sehenswürdigkeiten',
+  'hudChrome.mapAtlas.legend.dungeon': 'Verlies',
+  'hudChrome.mapAtlas.legend.herb': 'Kraut',
+  'hudChrome.mapAtlas.legend.mail': 'Post',
+  'hudChrome.mapAtlas.legend.ore': 'Erz',
+  'hudChrome.mapAtlas.legend.passage': 'Passage',
+  'hudChrome.mapAtlas.level': 'Level {level}',
+  'hudChrome.mapAtlas.noNearbyQuests': 'Keine Quests in der Nähe',
+  'hudChrome.mapAtlas.noTrackedQuests': 'Keine verfolgten Quests',
+  'hudChrome.mapAtlas.showRoute': 'Route anzeigen',
+  'hudChrome.mapAtlas.track': 'Schiene',
+  'hudChrome.mapAtlas.trackedQuests': 'Verfolgte Quests',
+  'hudChrome.mapAtlas.untrack': 'Untrack',
+  'hudChrome.marketWindow.mixedListingsFooter':
+    'Der Händler füllt seine Vorräte an gewöhnlichen Gütern auf; Spielerlisten liegen daneben zu ihrem geforderten Preis.',
+  'hudChrome.materialHint.fineFarmGrade':
+    'Feine Note. Einige Picks einer Ernte kommen gut zurecht, häufiger bei höheren Fertigkeiten in der Landwirtschaft oder mit einem aufgeladenen Auge des Handwerkers. Gewöhnliche Produkte zählen nie, wenn die feine Qualität erforderlich ist.',
+  'hudChrome.nameplate.npcRole.alchemyTrainer': 'Alchemie-Trainer',
+  'hudChrome.nameplate.npcRole.armorVendor': 'Rüstungshändler',
+  'hudChrome.nameplate.npcRole.armsDealer': 'Waffenhändler',
+  'hudChrome.nameplate.npcRole.auctioneer': 'Auktionator',
+  'hudChrome.nameplate.npcRole.banker': 'Banker',
+  'hudChrome.nameplate.npcRole.cardMaster': 'Kartenmeister',
+  'hudChrome.nameplate.npcRole.cookingTrainer': 'Kochtrainer',
+  'hudChrome.nameplate.npcRole.crucibleQuartermaster': 'Schmelztiegel-Quartiermeister',
+  'hudChrome.nameplate.npcRole.engineeringTrainer': 'Ingenieurtrainer',
+  'hudChrome.nameplate.npcRole.foodVendor': 'Lebensmittel- und Getränkeverkäufer',
+  'hudChrome.nameplate.npcRole.generalGoods': 'Allgemeine Güter',
+  'hudChrome.nameplate.npcRole.heroicQuartermaster': 'Heroischer Quartiermeister',
+  'hudChrome.nameplate.npcRole.leatherworkingTrainer': 'Trainer für Lederverarbeitung',
+  'hudChrome.nameplate.npcRole.potionVendor': 'Trankverkäufer',
+  'hudChrome.nameplate.npcRole.pvpVendor': 'PvP-Händler',
+  'hudChrome.nameplate.npcRole.riftForgemaster': 'Rift-Schmiedemeister',
+  'hudChrome.nameplate.npcRole.stableMaster': 'Stallmeister',
+  'hudChrome.nameplate.npcRole.tailoringTrainer': 'Schneider-Trainer',
+  'hudChrome.nameplate.npcRole.weaponVendor': 'Waffenverkäufer',
+  'hudChrome.nameplate.npcRole.weaponsmithTrainer': 'Schmiede-Trainer',
+  'hudChrome.nameplate.npcRoleTag': '<{role}>',
+  'hudChrome.options.confirmVendorSellMinQuality': 'Bestätigen Sie Verkäufe durch Qualität',
+  'hudChrome.options.confirmVendorSellMinQualityNote':
+    'Artikel unter dieser Qualität werden mit einem einzigen Klick verkauft; Ein falsch verkaufter Artikel kann immer noch vom Verkäufer zurückgekauft werden.',
+  'hudChrome.partyFrames.header': 'Party',
+  'hudChrome.professions.retentionFooter':
+    'Rendite bei Respec: 60 % der Fertigkeit bleiben erhalten.',
+  'hudChrome.professions.tutorialLink': 'Berufstutorial',
+  'hudChrome.pullTimer.cancel': 'Zug abgebrochen.',
+  'hudChrome.pullTimer.countdown': '{seconds}',
+  'hudChrome.pullTimer.pull': 'ZIEHEN!',
+  'hudChrome.pullTimer.start': 'Ziehen Sie {seconds} Sekunden ein!',
+  'hudChrome.questLog.completed': 'Vollendet',
+  'hudChrome.questLog.shiftHint':
+    'Klicken Sie bei gedrückter Umschalttaste auf eine Quest, um sie im Chat zu verknüpfen.',
+  'hudChrome.questLog.zoneSummary': '{count} ({ready} bereit)',
+  'hudChrome.questTracker.objectiveValue': '{current} / {total}',
+  'hudChrome.readyCheck.close': 'Schließen',
+  'hudChrome.readyCheck.memberNotReady': '{name} ist nicht bereit.',
+  'hudChrome.readyCheck.memberPending': '{name} hat noch nicht geantwortet.',
+  'hudChrome.readyCheck.memberReady': '{name} ist bereit.',
+  'hudChrome.readyCheck.status': 'Bereit: {ready}/{total}',
+  'hudChrome.readyCheck.title': 'Bereitschaftsprüfung',
+  'hudChrome.readyCheck.waiting': 'Warten auf Antworten...',
+  'hudChrome.recipeTracker.collapseHint': 'Rezept-Tracker einklappen',
+  'hudChrome.recipeTracker.expandHint': 'Rezept-Tracker erweitern',
+  'hudChrome.recipeTracker.haveNeed': '{have}/{need}',
+  'hudChrome.recipeTracker.pin': 'Stift',
+  'hudChrome.recipeTracker.pinAria': 'Pin {name} an den HUD-Tracker',
+  'hudChrome.recipeTracker.pinFull': 'Der Rezept-Tracker ist voll (bis zu {cap} Rezepte)',
+  'hudChrome.recipeTracker.resultCount': '{name} x{count}',
+  'hudChrome.recipeTracker.trackerLabel': 'Rezepte',
+  'hudChrome.recipeTracker.unpin': 'Lösen',
+  'hudChrome.recipeTracker.unpinAria': 'Lösen Sie {name} vom HUD-Tracker',
+  'hudChrome.social.who.allClasses': 'Alle Klassen',
+  'hudChrome.social.who.capped':
+    'Zeigt den ersten {delivered}. Grenzen Sie die Suche ein, um den Rest zu sehen.',
+  'hudChrome.social.who.classFilter': 'Nach Klasse filtern',
+  'hudChrome.social.who.colClass': 'Klasse',
+  'hudChrome.social.who.colGuild': 'Gilde',
+  'hudChrome.social.who.colLevel': 'Ebene',
+  'hudChrome.social.who.colName': 'Name',
+  'hudChrome.social.who.colStatus': 'Status',
+  'hudChrome.social.who.colZone': 'Zone',
+  'hudChrome.social.who.count': '{total} online',
+  'hudChrome.social.who.countFiltered': '{shown} von {total} online',
+  'hudChrome.social.who.empty': 'Es stimmen keine Spieler überein.',
+  'hudChrome.social.who.loading': 'Ich frage das Reich, wer online ist...',
+  'hudChrome.social.who.search': 'Suchen',
+  'hudChrome.social.who.searchPlaceholder': 'Name, Zone oder Gilde',
+  'hudChrome.social.who.sortTitle': 'Sortieren nach {column}',
+  'hudChrome.social.who.tab': 'WHO',
+  'hudChrome.talkingHead.label': 'Dialog',
+  'hudChrome.wocMarket.colBuyer': 'Käufer',
+  'hudChrome.wocMarket.colSalePrice': 'Verkaufspreis',
+  'hudChrome.wocMarket.colSaleType': 'Typ',
+  'hudChrome.wocMarket.colSoldAt': 'Verkauft',
+  'hudChrome.wocMarket.historyEmpty': 'Es wurden noch keine Verkäufe verzeichnet.',
+  'hudChrome.wocMarket.historyError': 'Der Verkaufsverlauf konnte nicht geladen werden.',
+  'hudChrome.wocMarket.saleTypeAuction': 'Auktion',
+  'hudChrome.wocMarket.saleTypeBuyNow': 'Jetzt kaufen',
+  'hudChrome.wocMarket.saleTypeDirected': 'Regie geführt',
+  'hudChrome.wocMarket.saleTypeUnknown': 'Unbekannt',
+  'hudChrome.wocMarket.tabHistory': 'Verkaufshistorie',
+  'hudChrome.wocStore.mountBuy': 'Kaufen Sie Reittier-Skin',
+  'hudChrome.wocStore.mountInspectAria': 'Vorschau {item}',
+  'hudChrome.wocStore.mountOnly': 'Nur montieren',
+  'hudChrome.wocStore.mountRideIt': 'Fahr damit',
+  'hudChrome.wocStore.mountScopeLine':
+    'Accountweiter Skin. Wird jeweils von einem Charakter getragen.',
+  'itemUi.errors.sweepNoListings':
+    'Für diesen Artikel sind keine Einträge zum Durchsuchen verfügbar.',
+  'itemUi.errors.sweepPriceChanged':
+    'Die Preise haben sich geändert, bevor Ihr Gewinnspiel gelandet ist. Überprüfen Sie das Angebot und versuchen Sie es erneut.',
+  'itemUi.market.sweep': 'Fegen',
+  'itemUi.market.sweepAria': 'Durchsuchen Sie den Markt nach {item}',
+  'itemUi.market.sweepButton': 'Fegen',
+  'itemUi.market.sweepChanged':
+    'Das Sweep-Angebot hat sich geändert, bevor Sie es bestätigt haben. Überprüfen Sie die Gesamtsumme und versuchen Sie es erneut.',
+  'itemUi.market.sweepClose': 'Schließen',
+  'itemUi.market.sweepConfirmBody':
+    '{item} x{units} in {listings} Angeboten für {total} (jeweils {each}) kaufen?',
+  'itemUi.market.sweepConfirmTitle': 'Bestätigen Sie den Market Sweep',
+  'itemUi.market.sweepNote':
+    'Kauft ganze Angebote von anderen Verkäufern, zuerst mit dem günstigsten Preis pro Einheit, bis Ihre Anzahl gedeckt ist. Möglicherweise erhalten Sie ein paar mehr, als Sie verlangt haben.',
+  'itemUi.market.sweepQuantity': 'Einheiten gesucht',
+  'itemUi.market.sweepQuoteLine':
+    '{units} Einheiten in {listings} Einträgen für {total} (jeweils {each})',
+  'itemUi.market.sweepQuoteNone': 'Für diesen Artikel liegen keine Einträge vor.',
+  'itemUi.market.sweepQuoteShort':
+    'Es sind nur {units} Einheiten in {listings} Einträgen verfügbar, für {total} (jeweils {each}).',
+  'itemUi.market.sweepTitle': 'Marktdurchsuchung: {item}',
+  'devCommand.actions.town.description':
+    'Teleportieren Sie sich namentlich zu einem Stadtknotenpunkt.',
+  'devCommand.actions.town.label': 'Zentrum der Stadt',
+  'devCommand.fields.town': 'Stadt',
+  'entities.mobs.healing_dummy_caster.name': 'Verwundeter Zauberer-Dummy',
+  'entities.mobs.healing_dummy_ranger.name': 'Zerschlagener Ranger-Dummy',
+  'entities.mobs.healing_dummy_scout.name': 'Kritischer Scout-Dummy',
+  'entities.mobs.healing_dummy_soldier.name': 'Verletzter Soldaten-Dummy',
+  'entities.mobs.healing_dummy_tank.name': 'Verletzter Vanguard-Dummy',
+  'guide.controls.hideInterface': 'Benutzeroberfläche ausblenden (Screenshots und Videos)',
+  'guide.controls.targetParty':
+    'Zielen Sie auf die Gruppenmitglieder 1 bis 9, von oben nach unten, wie sie in den Gruppenrahmen angezeigt werden',
+  'guide.controls.targetSelf': 'Zielen Sie auf sich selbst',
+  'guide.interfacePage.framesGovernedTalkingHead':
+    'Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.',
+  'guide.settingsPage.keybindsWheelBody':
+    'Auch das Rad selbst klemmt. „Kamera vergrößern“ und „Kamera verkleinern“ sind gewöhnliche Bindungen, die standardmäßig auf dem bloßen Rad sitzen. Sie können sie also auf Strg plus Rad oder auf Tasten bewegen und dann das freigegebene Rad drehen, um Aktionsleisten-Slots auszulösen. Eine Radkerbe verfügt nicht über eine Auslösefunktion und kann daher keine gehaltene Aktion wie Vorwärtsbewegung ausführen.',
 };

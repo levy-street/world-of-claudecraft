@@ -87,7 +87,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
     // SUBLAYERS, not top-level layers. hud-mobile is ordered AFTER shell so the
     // in-game mobile overrides of pre-game shell elements win as they did when inline.
     expect(barrel).toContain(
-      '@layer tokens, base, layout, components, hud, shell, hud-mobile, index-extra, play-extra;',
+      '@layer tokens, base, layout, library, components, hud, shell, hud-mobile, index-extra, play-extra;',
     );
   });
 
@@ -99,6 +99,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
       'tokens.css',
       'base.css',
       'layout.css',
+      'library.css',
       'hud.css',
       'components.css',
       'shell.css',
@@ -121,6 +122,7 @@ describe('CSS extraction: barrel + seam wiring', () => {
       'tokens.css',
       'base.css',
       'layout.css',
+      'library.css',
       'hud.css',
       'components.css',
       'shell.css',

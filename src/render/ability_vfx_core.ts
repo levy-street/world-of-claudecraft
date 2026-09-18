@@ -58,6 +58,38 @@ export type AbilityVfxArchetype =
   | 'cc'
   | 'dash';
 
+/** Self-cast completion cues with a full ceremony or targeted utility read.
+ * Pure DoTs keep their aura effects; an authored rig gesture is routed separately. */
+export function claimsSelfCastVfx(
+  archetype: string | undefined,
+  targeted: boolean,
+  hasFullSpec: boolean,
+  hasSpirit: boolean,
+): boolean {
+  if (!hasFullSpec) return false;
+  const ceremonial =
+    hasSpirit ||
+    archetype === 'buff' ||
+    archetype === 'summon' ||
+    archetype === 'cc' ||
+    archetype === 'heal';
+  const utility = targeted
+    ? archetype === 'strike' || archetype === 'cc' || archetype === 'burst' || archetype === 'shout'
+    : archetype === 'shout' || archetype === 'dash';
+  return ceremonial || utility;
+}
+
+/** Pure-DoT completions that own an authored rig gesture on their caster's
+ * form rig. The list is explicit on purpose: the humanoid rigs also carry
+ * attackByAbility rows for their own DoTs (corruption, rupture, serpent_sting),
+ * and those completions have never played a gesture; routing every DoT through
+ * the gesture read would change three classes to ship one cat finisher. */
+const DOT_COMPLETION_GESTURES: ReadonlySet<string> = new Set(['rip']);
+
+export function ownsDotCompletionGesture(archetype: string | undefined, ability: string): boolean {
+  return archetype === 'dot' && DOT_COMPLETION_GESTURES.has(ability);
+}
+
 export type AbilityVfxWindupStyle =
   | 'none'
   | 'stance'

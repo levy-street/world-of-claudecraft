@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   advancedDialSeed,
+  captureGraphicsSettingsSnapshot,
   GRAPHICS_DIAL_KEYS,
   GRAPHICS_PRESET_ADVANCED,
   GRAPHICS_REBUILD_KEYS,
@@ -16,6 +17,32 @@ import { gfxInternalsForTest, graphicsPresetLabel } from '../src/render/gfx';
 import { waterFieldPlan } from '../src/render/water_core';
 
 describe('graphics rebuild settings snapshot', () => {
+  it('captures EVERY rebuild key from stored settings (no dial falls back to its default)', () => {
+    // Regression: the boot-time applied snapshot read only the six round-10
+    // keys, so a stored Advanced mix with the round-12 dials at Low (view
+    // distance, water, AO, bloom, AA, character detail) came back as their
+    // High/Full/On defaults: the panel displayed them, and the next Apply
+    // made them live.
+    const stored: Record<string, number> = {};
+    for (const key of GRAPHICS_REBUILD_KEYS) stored[key] = SETTING_RANGES[key].min;
+    stored.graphicsPreset = GRAPHICS_PRESET_ADVANCED;
+    stored.characterDetail = 1;
+    const reads: string[] = [];
+    const snapshot = captureGraphicsSettingsSnapshot((key) => {
+      reads.push(key);
+      return stored[key];
+    });
+    expect(Object.isFrozen(snapshot)).toBe(true);
+    expect(reads).toEqual([...GRAPHICS_REBUILD_KEYS]);
+    for (const key of GRAPHICS_REBUILD_KEYS) expect(snapshot[key]).toBe(stored[key]);
+    expect(snapshot.viewDistance).toBe(0);
+    expect(snapshot.waterQuality).toBe(0);
+    expect(snapshot.ambientOcclusion).toBe(0);
+    expect(snapshot.bloomQuality).toBe(0);
+    expect(snapshot.antiAliasing).toBe(0);
+    expect(snapshot.characterDetail).toBe(1);
+  });
+
   it('pins the complete ordered preference surface', () => {
     expect(GRAPHICS_REBUILD_KEYS).toEqual([
       'graphicsPreset',

@@ -62,6 +62,7 @@ export const vi_VN: EnTranslations = {
       "x": "X",
       "z": "Z",
       "dungeon": "Hầm Ngục",
+      "town": "Thị trấn/thị xã",
       "difficulty": "Độ Khó",
       "name": "Tên",
       "spec": "Chuyên Môn",
@@ -159,6 +160,10 @@ export const vi_VN: EnTranslations = {
       "teleport": {
         "label": "Dịch chuyển",
         "description": "Di chuyển đến tọa độ chính xác trong thế giới."
+      },
+      "town": {
+        "label": "Trung tâm thị trấn",
+        "description": "Dịch chuyển tức thời đến trung tâm thành phố theo tên."
       },
       "dungeon": {
         "label": "Vào hầm ngục",
@@ -326,6 +331,18 @@ export const vi_VN: EnTranslations = {
     }
   },
   "hudChrome": {
+    "professionTrainers": {
+      "blacksmithing": "Huấn Luyện Viên Rèn",
+      "cooking": "Huấn Luyện Viên Nấu Ăn",
+      "tailoring": "Huấn Luyện Viên May Vá",
+      "engineering": "Huấn Luyện Viên Cơ Khí",
+      "leatherworking": "Huấn Luyện Viên Thuộc Da",
+      "alchemy": "Huấn Luyện Viên Giả Kim",
+      "farming": "Huấn Luyện Viên Trồng Trọt",
+      "mining": "Huấn Luyện Viên Khai Khoáng",
+      "hobby": "Huấn Luyện Viên Sở Thích",
+      "nameplate": "<{title}>"
+    },
     "materialStackSelectionUnavailable": "Lựa chọn nguyên liệu đó không còn khả dụng.",
     "warlock": {
       "doomLabel": "Kết Án",
@@ -348,12 +365,25 @@ export const vi_VN: EnTranslations = {
       "banner": "Đang xem {name}"
     },
     "readyCheck": {
+      "title": "Kiểm tra sẵn sàng",
+      "close": "Đóng",
       "prompt": "{name} đã bắt đầu kiểm tra sẵn sàng. Bạn đã sẵn sàng chưa?",
       "ready": "Sẵn Sàng",
       "notReady": "Chưa Sẵn Sàng",
+      "status": "Sẵn sàng: {ready}/{total}",
+      "waiting": "Đang chờ phản hồi...",
+      "memberReady": "{name} đã sẵn sàng.",
+      "memberNotReady": "{name} chưa sẵn sàng.",
+      "memberPending": "{name} chưa phản hồi.",
       "result": "Kiểm tra sẵn sàng: {ready} sẵn sàng, {notReady} chưa sẵn sàng, {noResponse} không phản hồi.",
       "notInPartyError": "Bạn phải ở trong tổ đội để bắt đầu kiểm tra sẵn sàng.",
       "inProgressError": "Một lượt kiểm tra sẵn sàng đang diễn ra."
+    },
+    "pullTimer": {
+      "start": "Kéo vào {seconds} giây!",
+      "cancel": "Đã hủy kéo.",
+      "countdown": "{seconds}",
+      "pull": "Kéo!"
     },
     "death": {
       "resurrectAtCorpse": "Hồi Sinh Tại Xác Chết",
@@ -578,6 +608,11 @@ export const vi_VN: EnTranslations = {
       "mountsTitle": "Máy ổn định",
       "mountBuyAria": "Mua {item}",
       "mountSkinType": "Ngoại hình thú cưỡi",
+      "mountInspectAria": "Xem trước {item}",
+      "mountRideIt": "Đi xe",
+      "mountOnly": "Chỉ lắp đặt",
+      "mountBuy": "Mua ngoại trang Mount",
+      "mountScopeLine": "Toàn bộ tài khoản. Được mặc bởi một nhân vật tại một thời điểm.",
       "loading": "Đang tải Cửa hàng WOC...",
       "error": "Cửa hàng WOC hiện không khả dụng. Vui lòng thử lại trong thời gian ngắn.",
       "balance": "Số dư Claudium",
@@ -902,6 +937,7 @@ export const vi_VN: EnTranslations = {
     },
     "questTracker": {
       "count": "({count})",
+      "objectiveValue": "{current} / {total}",
       "collapseHint": "Thu gọn bảng theo dõi nhiệm vụ",
       "expandHint": "Mở rộng bảng theo dõi nhiệm vụ"
     },
@@ -1041,6 +1077,10 @@ export const vi_VN: EnTranslations = {
       "clearArmed": "Chạm vào một ô để xóa nó."
     },
     "tutorialGreeting": {
+      "eastbrookGuidanceNote": "Chào mừng đến với Đông Khê! Cảnh Vệ Trưởng Redbrook có việc cần bạn giúp ở quảng trường thị trấn. Hãy bật chỉ dẫn vàng để tìm ông ấy và làm theo nhiệm vụ Sói Trước Cửa, hoặc tự mình khám phá. Bạn có thể đổi lựa chọn này sau trong Tùy Chọn, Giao Diện, Chiến Đấu.",
+      "guidanceOn": "Bật chỉ dẫn",
+      "guidanceOff": "Tắt chỉ dẫn",
+      "guidanceSetting": "Chỉ dẫn vàng Đông Khê",
       "bellHomeNote": "Đã quay lại từ bờ biển rồi sao? Đó là tiếng chuông phà bạn vừa rung đấy. Chiếc chuông song sinh của nó treo ngay cạnh hòm thư Bưu Quạ: rung nó bất cứ lúc nào và chuyến phà sẽ đưa bạn trở lại Bờ Biển Thử Thách. Dù chọn cách nào cũng chẳng hại gì.",
       "islandArrivalNote": "Chào mừng đến với Bờ Biển Thử Thách. Vệ Quan Tam đang chờ ngay phía trên bãi biển: hãy đến gặp ông ấy. Khi muốn rời đi, hãy rung chuông bên bến tàu của tôi; nó sẽ đưa bạn qua thung lũng bất cứ lúc nào.",
       "noteClose": "Đã hiểu"
@@ -1220,7 +1260,10 @@ export const vi_VN: EnTranslations = {
       "devName": "Người đóng góp",
       "devTierCol": "Huy hiệu",
       "mergedPrs": "PR đã hợp nhất",
-      "devEmpty": "Chưa có người đóng góp nào được xếp hạng."
+      "devEmpty": "Chưa có người đóng góp nào được xếp hạng.",
+      "podiumLabel": "Ba Hạng Đầu",
+      "unclaimed": "Chưa Nhận",
+      "prestigeTitle": "Vinh Quang {rank}"
     },
     "pledge": {
       "open": "Đang Nhận Cam Kết",
@@ -1243,6 +1286,8 @@ export const vi_VN: EnTranslations = {
       "noteLabel": "Ghi chú bảng tin",
       "notePlaceholder": "Cho các thành viên tương lai biết bang hội của bạn đang tìm kiếm điều gì",
       "save": "Lưu",
+      "newPlayerFriendlyLabel": "Thân thiện với người mới",
+      "newPlayerFriendlyHint": "Hiển thị trên bảng tuyển mộ tại cột biển chỉ đường ở Bờ Biển Thử Thách.",
       "yourPledge": "Cam kết của bạn: {guild}",
       "since": "Đã cam kết {date}",
       "withdraw": "Rút cam kết"
@@ -1266,6 +1311,9 @@ export const vi_VN: EnTranslations = {
       "previous": "Các lượt trước",
       "runLabel": "Lượt luyện tập {index}",
       "runSummary": "{total} trong {time}"
+    },
+    "talkingHead": {
+      "label": "Hội thoại"
     },
     "hubLesson": {
       "target": "Nhắm vào hình nộm để bắt đầu.",
@@ -1395,7 +1443,9 @@ export const vi_VN: EnTranslations = {
       "targetPrev": "Luân Phiên Mục Tiêu Ngược",
       "discord": "Discord",
       "bgFlag": "Hành Động Cờ Chiến Trường",
+      "friendlyNameplates": "Bật/Tắt Bảng Tên Đồng Minh",
       "sheathe": "Tra/Rút Vũ Khí",
+      "hideInterface": "Ẩn giao diện",
       "dive": "Lặn Xuống",
       "categoryPet": "Thú Cưng",
       "petAttack": "Thú Cưng: Tấn Công",
@@ -1404,8 +1454,22 @@ export const vi_VN: EnTranslations = {
       "petDefensive": "Thú Cưng: Phòng Thủ",
       "petAggressive": "Thú Cưng: Hung Hăng",
       "targetPet": "Thú Cưng: Chọn",
+      "targetSelf": "Bản thân mục tiêu",
+      "targetParty1": "Thành viên bên mục tiêu 1",
+      "targetParty2": "Thành viên bên mục tiêu 2",
+      "targetParty3": "Thành viên bên mục tiêu 3",
+      "targetParty4": "Thành viên bên mục tiêu 4",
+      "targetParty5": "Thành viên bên mục tiêu 5",
+      "targetParty6": "Thành viên bên mục tiêu 6",
+      "targetParty7": "Thành viên bên mục tiêu 7",
+      "targetParty8": "Thành viên bên mục tiêu 8",
+      "targetParty9": "Thành viên bên mục tiêu 9",
       "mount": "Cưỡi Thú / Xuống Thú",
-      "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới."
+      "mouseHint": "Nút chuột cũng dùng được: nhấn nút giữa (M3) hoặc nút ngón cái (M4, M5) trong khi gán phím. Nút trái và nút phải vẫn được dành riêng cho máy ảnh, bấm để di chuyển, và bấm chọn vật thể trong thế giới.",
+      "zoomIn": "Phóng to máy ảnh",
+      "zoomOut": "Thu nhỏ camera",
+      "wheelHint": "Bánh xe chuột cũng liên kết: cuộn lên hoặc xuống trong khi liên kết, với Ctrl, Alt hoặc Shift được giữ nếu bạn muốn. Zoom Camera In và Out ngồi trên bánh xe trần theo mặc định; di chuyển chúng đến một hợp âm như Ctrl+bánh xe để giải phóng bánh xe cho các khả năng.",
+      "wheelHeldRefused": "Một notch bánh xe không thể điều khiển một hành động được tổ chức như chuyển động. Chọn một phím hoặc một nút chuột cho nó."
     },
     "actionBar": {
       "editKeys": "Sửa phím thanh hành động",
@@ -1682,6 +1746,8 @@ export const vi_VN: EnTranslations = {
       "showReliquaryTracker": "Hiển thị Trình theo dõi Thánh tích",
       "confirmVendorSell": "Xác Nhận Trước Khi Bán",
       "confirmVendorSellNote": "Tắt tùy chọn này sẽ bán vật phẩm chỉ với một cú nhấp và không cần xác nhận, nên một ô túi bị xê dịch có thể khiến bạn bán nhầm vật phẩm.",
+      "confirmVendorSellMinQuality": "Xác nhận bán hàng từ chất lượng",
+      "confirmVendorSellMinQualityNote": "Các mặt hàng dưới chất lượng này được bán chỉ với một cú nhấp chuột; một mặt hàng bị bán sai vẫn có thể được mua lại từ nhà cung cấp.",
       "itemLevelLine": "Cấp Vật Phẩm {level}",
       "itemScoreLine": "Điểm {score}",
       "showSecondaryActionBar": "Hiện Thanh Hành Động Phụ",
@@ -1735,6 +1801,9 @@ export const vi_VN: EnTranslations = {
     },
     "controller": {
       "title": "Tay Cầm",
+      "device": "Thiết bị Được Kết nối",
+      "deviceConnected": "Đã kết nối",
+      "deviceDisconnected": "Không phát hiện bộ điều khiển",
       "glyphStyle": "Nhãn Nút",
       "glyphStyleAuto": "Tự Động",
       "glyphStyleXbox": "Xbox",
@@ -1759,7 +1828,7 @@ export const vi_VN: EnTranslations = {
       "crossHotbarHelp": "Giữ nút kích hoạt để thắp sáng tám khe thanh hành động trên các nút d-pad và mặt. Nhấn vào nút kích hoạt khác để chuyển sang bộ thứ hai.",
       "crossHotbarResetLayout": "Đặt lại thanh nóng chéo",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Bộ kích hoạt và d-pad thuộc về thanh hotbar chéo khi nó được bật, vì vậy chúng được thiết lập bên dưới chứ không phải ở đây.",
+      "crossHotbarOwnsButtons": "Cần bấm (trigger) chỉnh sửa thanh kỹ năng chữ thập khi nó đang mở. Các hướng d-pad vẫn có thể chỉnh tại đây cho menu và di chuyển.",
       "cancelAction": "Hủy / Quay lại",
       "subcommandsAction": "Lệnh phụ / Bản đồ",
       "cycleHudAction": "Giao diện chu trình",
@@ -1770,7 +1839,7 @@ export const vi_VN: EnTranslations = {
       "crossHotbarDisplayMinimal": "Chỉ khi được giữ",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Mang {action}: xác nhận vào một ô để đặt nó, hủy để đặt lại.",
-      "crossHotbarEditHint": "Sắp xếp: xác nhận nhặt từ một ô hoặc sổ chính tả và thả vào một ô, hủy xóa một ô.",
+      "crossHotbarEditHint": "Đang sắp xếp · d-pad di chuyển · xác nhận để nhặt và đặt · hủy để xóa một ô",
       "crossHotbarEditHelp": "Giữ cản trái và nhấn nút mặt trên để sắp xếp thanh với bộ điều khiển."
     },
     "perf": {
@@ -2049,6 +2118,52 @@ export const vi_VN: EnTranslations = {
       "spellOrder": "Thứ tự phép",
       "reset": "Đặt Lại Vị Trí",
       "spellPosition": "Thứ tự phép {position} / {count}",
+      "watchlist": "Phép Đang Theo Dõi",
+      "watchlistHint": "Chọn bất kỳ phép nào tăng lực cho bạn để gán cho nó một hào quang riêng. Các phép được chọn sẽ có một thẻ đầy đủ bên dưới, với biểu tượng, màu sắc, vị trí và vòng tròn mặt đất riêng của nó.",
+      "watchlistEmpty": "Không còn phép nào khác trong sách phép của bạn tạo hiệu ứng tăng lực lên bạn.",
+      "watchlistWatch": "Theo dõi {spell}",
+      "watchlistUnwatch": "Ngừng theo dõi {spell}",
+      "watchlistCount": "{count} đang theo dõi",
+      "sound": "Âm Báo",
+      "soundNone": "Không có âm thanh",
+      "soundVolume": "Âm Lượng",
+      "soundPreview": "Phát",
+      "soundPreviewAria": "Nghe thử âm báo {sound}",
+      "soundHint": "Một âm thanh phát ra mỗi khi phép này kích hoạt. Tắt biểu tượng, các hình lưỡi liềm và vòng tròn mặt đất để chỉ âm thanh báo hiệu điều đó.",
+      "readyGlow": "Sáng Thanh Kỹ Năng",
+      "readyGlowHint": "Làm sáng phép này trên thanh kỹ năng của bạn trong khi hiệu ứng của nó còn tồn tại.",
+      "reticleTick": "Dấu Tâm Ngắm",
+      "reticleTickHint": "Thêm một dấu gần tâm màn hình, sáng lên khi phép này kích hoạt.",
+      "haptic": "Rung",
+      "hapticNone": "Tắt",
+      "hapticHint": "Làm rung tay cầm đang kết nối, hoặc điện thoại của bạn. Bị bỏ qua trên thiết bị không hỗ trợ rung.",
+      "haptics": {
+        "tap": "Gõ",
+        "double": "Đôi",
+        "long": "Dài"
+      },
+      "cues": {
+        "softChime": "Tiếng Chuông Nhẹ",
+        "musicBox": "Hộp Nhạc",
+        "glassPing": "Tiếng Ly Vang",
+        "waterDrop": "Tiếng Nước Rơi",
+        "bubblePop": "Tiếng Bong Bóng Nổ",
+        "hardBell": "Tiếng Chuông Đanh",
+        "templeGong": "Tiếng Cồng Chùa",
+        "anvilStrike": "Tiếng Đe",
+        "coinDrop": "Tiếng Rơi Xu",
+        "swordDraw": "Tiếng Rút Kiếm",
+        "blaringHorn": "Tiếng Kèn Rền",
+        "carKlaxon": "Tiếng Kèn Xe",
+        "sonarPing": "Tiếng Sonar",
+        "electricZap": "Tiếng Điện Giật",
+        "catMeow": "Tiếng Mèo Kêu",
+        "owlHoot": "Tiếng Cú Kêu",
+        "wolfHowl": "Tiếng Sói Tru",
+        "frogCroak": "Tiếng Ếch Kêu",
+        "windWhoosh": "Tiếng Gió Rít",
+        "steamHiss": "Tiếng Hơi Xì"
+      },
       "procs": {
         "revenge": "Phục Thù!",
         "battleTrance": "Nhập Định Chiến Đấu",
@@ -2153,6 +2268,22 @@ export const vi_VN: EnTranslations = {
       "playtimeHidden": "Ẩn",
       "showPlaytimeAria": "Hiện thời gian chơi",
       "hidePlaytimeAria": "Ẩn thời gian chơi"
+    },
+    "charSidebar": {
+      "label": "Chi tiết ký tự",
+      "subtitle": "Cấp {level} {className}. {archetype}. Sở thích: {hobby}",
+      "subtitleNoHobby": "Cấp {level} {className}. {archetype}",
+      "stats": "Thống kê",
+      "progression": "Những người tôi quản lý",
+      "skills": "Kỹ năng",
+      "gathering": "Quy tụ",
+      "crafting": "Chế tạo",
+      "openProfessions": "Nghề nghiệp đang mở"
+    },
+    "questLog": {
+      "completed": "Hoàn thành",
+      "zoneSummary": "{count} ({ready} sẵn sàng)",
+      "shiftHint": "Shift-click vào một nhiệm vụ để liên kết nó trong cuộc trò chuyện."
     },
     "statInfo": {
       "fromYour": "Từ {value} {stat} của bạn:",
@@ -2267,6 +2398,12 @@ export const vi_VN: EnTranslations = {
       "linkHint": "Shift-click để chia sẻ vật phẩm này trong khung chat."
     },
     "plurals": {
+      "guildBoardShown": {
+        "one": "Đang hiển thị {count} bang hội",
+        "few": "Đang hiển thị {count} bang hội",
+        "many": "Đang hiển thị {count} bang hội",
+        "other": "Đang hiển thị {count} bang hội"
+      },
       "commissionMasterworks": {
         "one": "{count} kiệt tác",
         "few": "{count} kiệt tác",
@@ -2396,6 +2533,7 @@ export const vi_VN: EnTranslations = {
     },
     "bugReport": {
       "menuButton": "Báo Cáo Lỗi",
+      "online": "Trực tuyến",
       "realm": "Thế Giới",
       "character": "Nhân vật",
       "position": "Vị Trí",
@@ -2993,8 +3131,8 @@ export const vi_VN: EnTranslations = {
         "kingsWrathSummary": "Nythraxis gây thêm {bonusNormal} sát thương ở Normal hoặc {bonusHeroic} ở Heroic trong phần còn lại của trận đấu. Mộ Phần Phun Trào xảy ra mỗi {eruptionEveryNormal} giây ({eruptionEveryHeroic} ở Heroic).",
         "kingsWrathResponse": "Dùng các cooldown phòng thủ còn lại cho sát thương không thể tránh. Giữ mọi cơ chế trước đó thật sạch trong khi raid kết thúc trận đấu.",
         "boneStormName": "Bão Xương",
-        "boneStormSummary": "Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyNormal} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlNormal} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamNormal} máu tối đa. Hắn niệm Cọc Xương vào {spikeAt} giây sau khi bão bắt đầu, rồi Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.",
-        "boneStormHeroicSummary": "Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyHeroic} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlHeroic} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamHeroic} máu tối đa. Hắn niệm Cọc Xương vào {spikeAt} giây sau khi bão bắt đầu, rồi Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.",
+        "boneStormSummary": "Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyNormal} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlNormal} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamNormal} máu tối đa. Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.",
+        "boneStormHeroicSummary": "Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyHeroic} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlHeroic} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamHeroic} máu tối đa. Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.",
         "boneStormResponse": "Tản ra và tiếp tục chạy khỏi Nythraxis. Raider bị lao vào chạy đi xa trong khi những người khác chừa chỗ quanh đường lao, rồi tank kéo hắn lại khi bão kết thúc.",
         "crownEnduresName": "Vương Miện Trường Tồn",
         "crownEnduresSummary": "Ở {enrageNormal} giây tính từ lúc kéo boss (đồng hồ tạm dừng khi Tu Huynh Aldric bước vào ở 70%), Vương Miện Trường Tồn kích hoạt như một cuồng nộ cứng. Nythraxis nhận thêm {damage} sát thương và đòn đánh nhanh hơn {haste}, rồi thêm {rampStep} sát thương mỗi {rampEveryNormal} giây. Không có thanh hẹn giờ. Cảnh báo đến dưới dạng tiếng hét khi còn {warn60}, {warn30}, và {warn10} giây.",
@@ -3045,6 +3183,7 @@ export const vi_VN: EnTranslations = {
       "elementalConvergencePrimed": "Phép tiếp theo của bạn từ trường nguyên tố khác sẽ ban Hội Tụ Nguyên Tố",
       "hunterFerocity": "{stacks} Hung Tính Bầy Đàn: thú nuôi của bạn gây thêm {pct}% sát thương",
       "cooldownCap": "{used} trên {cap} giây giảm thời gian hồi chiêu đã dùng trong khung này",
+      "bruinRushWindow": "Hình Sói không tốn mana và ghim mục tiêu Cú Lao Bruin của bạn, làm chậm nó {pct}% trong {sec} giây",
       "funeralHarvestLock": "Thu Hoạch Tang Lễ chưa thể tạo thêm Mảnh Linh Hồn",
       "leadenHexLock": "Bùa Trì Trệ chưa thể trói mục tiêu này lại",
       "forbiddenReflectionReady": "Kỹ năng hồi chiêu Thuật Sĩ Hắc Ám hợp lệ tiếp theo của bạn có thể được thi triển lại",
@@ -3092,7 +3231,7 @@ export const vi_VN: EnTranslations = {
       "coldsightRead": "Kéo Cung Dài tiếp theo của bạn gây thêm {longDrawPct}% sát thương, hoặc Đòn Bắn Sa Ngã tiếp theo của bạn gây thêm {fellShotPct}%",
       "duskEconomy": "Kỹ năng tốn ít hơn {pct}% năng lượng",
       "moontide": "Triều Nguyệt: tầng {stacks} trên {max}. Các lần thi triển Tia Hoang Dã, Thiên Giáng và Nguyệt Chủng tích nó trong Dạng Cú Mặt Trăng; ở {max}, Nguyệt Chủng trở thành Nguyệt Trào và Thiên Giáng trở thành Vệt Dương, và đòn nào cũng tiêu nó",
-      "oldBlood": "Huyết Cổ: tầng {stacks} trên {max}. Các đòn đánh trúng ở Hình Sói và Hình Bruin dùng chung bể này; ở {max}, Cắn Xé Máu hoặc Nghiền Xương biến đổi",
+      "oldBlood": "Huyết Cổ {stacks}/{max}. Đòn trúng từ Vuốt Xé, Lóc Xé, Vết Nứt Máu, Cắn Xé Máu, Vuốt Quét Ngang và Nghiền Xương mỗi lần cộng 1. Ở {max}: Cắn Xé Máu biến thành Thu Hoạch Đỏ khi ở Hình Mèo, Nghiền Xương biến thành Đoạn Tủy khi ở Hình Bruin",
       "verdance": "Sắc Xanh: tầng {stacks} trên {max}. Mỗi lần gieo Hoa Nở Hoang Dã hoặc Nở Hoa Lần Hai MỚI cộng 1. Ở {max}, Hồi Phục Nhanh trở thành Mãn Khai",
       "freeExecute": "Kỹ năng kết liễu hợp lệ tiếp theo của bạn không tốn gì",
       "resourceSap": "Hồi {value} tài nguyên hiện tại của bạn mỗi {interval} giây",
@@ -3157,7 +3296,7 @@ export const vi_VN: EnTranslations = {
       "elementalTrance": "Sát thương phải nhận giảm {pct}%. {mana}% toàn bộ sát thương bạn gây ra được chuyển thành mana",
       "stealth": "Oculto; velocidad de movimiento reducida un {pct}%",
       "formBear": "Bruin Form: tăng máu và giáp.",
-      "formCat": "Forma felina: daño cuerpo a cuerpo y energía",
+      "wolfForm": "Hình Mèo: sát thương cận chiến và năng lượng; tăng tốc độ di chuyển {pct}%",
       "formTravel": "Fleet Form: tốc độ di chuyển tăng {pct}%.",
       "formFireball": "Ember Form: tốc độ di chuyển tăng {pct}%; tấn công và thi triển phép bị vô hiệu hóa",
       "formMoonkin": "Dạng Cú Mặt Trăng: sát thương phép tăng {pct}% và giáp tăng {armorPct}%",
@@ -3246,7 +3385,30 @@ export const vi_VN: EnTranslations = {
       "mobEliteLevel": "{level}+",
       "afkTag": "VắngMặt",
       "cheaterTag": "< Kẻ Gian Lận >",
-      "pledgeTag": "Trung Thành Với {guild}"
+      "pledgeTag": "Trung Thành Với {guild}",
+      "npcRoleTag": "<{role}>",
+      "npcRole": {
+        "auctioneer": "Đấu giá",
+        "banker": "Nhà cái",
+        "riftForgemaster": "Thợ rèn Rift",
+        "cardMaster": "Bậc thầy về thẻ",
+        "crucibleQuartermaster": "Crucible Quartermaster",
+        "heroicQuartermaster": "Hiệu trưởng quân khu anh hùng",
+        "pvpVendor": "Nhà cung cấp PvP",
+        "weaponsmithTrainer": "Giảng viên thợ rèn",
+        "cookingTrainer": "Huấn luyện viên nấu ăn",
+        "tailoringTrainer": "Huấn luyện viên may đo",
+        "engineeringTrainer": "Giảng viên kỹ thuật",
+        "leatherworkingTrainer": "Huấn luyện viên gia công da",
+        "alchemyTrainer": "Alchemy Trainer",
+        "weaponVendor": "Nhà cung cấp vũ khí",
+        "armorVendor": "Nhà cung cấp áo giáp",
+        "armsDealer": "người buôn bán vũ khí",
+        "foodVendor": "Nhà cung cấp Thực phẩm & Đồ uống",
+        "potionVendor": "Nhà cung cấp thuốc",
+        "stableMaster": "Bậc thầy ổn định",
+        "generalGoods": "Hàng Tổng Hợp"
+      }
     },
     "mobTooltip": {
       "levelFamily": "{family} cấp {level}",
@@ -3265,6 +3427,7 @@ export const vi_VN: EnTranslations = {
       "lock": "Khóa khung người chơi"
     },
     "partyFrames": {
+      "header": "Tiệc tùng",
       "section": "Khung Tổ Đội và Raid",
       "optionsSection": "Tùy Chọn Khung Tổ Đội",
       "unlock": "Di chuyển khung tổ đội và raid",
@@ -3475,10 +3638,15 @@ export const vi_VN: EnTranslations = {
       "unrecordedSigned": "Không ghi nhận người thu thập, có chữ ký của {name}",
       "quantityAria": "Đơn vị từ {source}, tối đa {count}",
       "decreaseAria": "Giảm số đơn vị từ {source}",
-      "increaseAria": "Tăng số đơn vị từ {source}"
+      "increaseAria": "Tăng số đơn vị từ {source}",
+      "decreaseByAria": "Giảm đơn vị từ {source} đi {count}",
+      "increaseByAria": "Tăng đơn vị từ {source} thêm {count}",
+      "moveAll": "Chuyển tất cả đơn vị",
+      "fits": "Hiện có thể xếp tối đa {units}"
     },
     "materialHint": {
       "fineGrade": "Phẩm cấp hảo hạng. Thu được từ mạch đủ bậc bằng công cụ xếp trên nguyên liệu, và được tính như bản thường ở bất cứ đâu cần đến.",
+      "fineFarmGrade": "Chất lượng tốt. Một số vụ thu hoạch diễn ra tốt đẹp, thường xuyên hơn ở kỹ năng Nông nghiệp cao hơn hoặc với Artisan's Eye bị tính phí. Sản phẩm thông thường không bao giờ được tính ở những nơi yêu cầu chất lượng tốt.",
       "cookingCatch": "Nguyên liệu nấu ăn. Phải nấu chín trước khi ăn.",
       "usedBy": "Được dùng bởi {crafts}.",
       "arcaneDust": "Nguyên liệu chế tác. Thu được khi giải phép trang bị phổ thông và khác thường.",
@@ -3763,6 +3931,15 @@ export const vi_VN: EnTranslations = {
       "subtitle": "Các bang hội trong vương quốc",
       "rosterTitle": "Xem danh sách thành viên của {guild}",
       "back": "Quay Lại",
+      "filters": "Bộ lọc bảng tin",
+      "newPlayerFriendly": "Thân thiện với người mới",
+      "newPlayerFriendlyTitle": "Bang hội này chào đón người chơi mới",
+      "filterNewPlayersTitle": "Chỉ hiện bang hội chào đón người chơi mới",
+      "filterEmpty": "Chưa có bang hội nào mở cửa chào đón người chơi mới.",
+      "showAll": "Hiện tất cả bang hội",
+      "officersOnline": "Sĩ Quan Trực Tuyến",
+      "officersOnlineLabel": "Sĩ quan trực tuyến: {names}",
+      "officerEntry": "{name} ({rank})",
       "popupTitle": "Bảng Thông Báo Bang Hội",
       "close": "Đóng"
     },
@@ -3819,6 +3996,8 @@ export const vi_VN: EnTranslations = {
       "withdrawQuantityTitle": "Rút {item}",
       "withdrawQuantityInput": "Số lượng cần rút",
       "withdrawQuantityConfirm": "Rút Ra",
+      "quantityStepDownAria": "Giảm số lượng đi {count}",
+      "quantityStepUpAria": "Tăng số lượng thêm {count}",
       "vaultRowWithdrawName": "Rút {item}",
       "priceChanged": "Giá đã thay đổi trước khi giao dịch mua hoàn tất. Hãy xem lại giá mới và xác nhận lại.",
       "withdrawQuantityAction": "Số lượng cần rút: {item}",
@@ -4010,6 +4189,25 @@ export const vi_VN: EnTranslations = {
       "lastSeenNever": "chưa bao giờ",
       "ignoredTab": "Đã bỏ qua",
       "blockedTab": "Đã chặn",
+      "who": {
+        "tab": "Đối tượng",
+        "searchPlaceholder": "Tên, khu vực hoặc bang hội",
+        "search": "Tìm kiếm",
+        "loading": "Hỏi vương quốc đang trực tuyến...",
+        "empty": "Không có người chơi nào phù hợp.",
+        "count": "{total} trực tuyến",
+        "countFiltered": "{shown} trong tổng số {total} trực tuyến",
+        "capped": "Hiển thị {delivered} đầu tiên. Thu hẹp tìm kiếm để xem phần còn lại.",
+        "classFilter": "Lọc theo lớp",
+        "allClasses": "Mọi hạng",
+        "colStatus": "Trạng thái",
+        "colName": "Tên",
+        "colLevel": "Trình độ",
+        "colClass": "Class",
+        "colZone": "Phân vùng",
+        "colGuild": "Liên minh",
+        "sortTitle": "Sắp xếp theo {column}"
+      },
       "ignoredEmpty": "Bạn không bỏ qua ai.",
       "blockedEmpty": "Bạn chưa chặn ai.",
       "blockSearchPlaceholder": "Tên người chơi",
@@ -4049,7 +4247,6 @@ export const vi_VN: EnTranslations = {
       }
     },
     "gathering": {
-      "title": "Thu thập",
       "mining": "Khai mỏ",
       "logging": "Đốn gỗ",
       "herbalism": "Thảo dược học",
@@ -4132,6 +4329,7 @@ export const vi_VN: EnTranslations = {
           "farming": "Hoạt động từ túi khi bạn trồng ở luống."
         },
         "speed": "Thu hoạch nhanh hơn tại các điểm tài nguyên dưới bậc {tier}.",
+        "wieldDegrade": "Dưới kỹ năng đó, nó vẫn hoạt động như một công cụ cấp thấp hơn.",
         "rodRequired": "Cần thiết để câu cá.",
         "rodBite": "Cá cắn câu sớm hơn tới {seconds} giây.",
         "rodReel": "Kéo dài thời gian thu dây thêm {seconds} giây.",
@@ -4233,9 +4431,7 @@ export const vi_VN: EnTranslations = {
       "noviceBody": "Kỹ năng trồng trọt tăng mỗi khi bạn thu hoạch cây. Gieo hạt vào bất kỳ luống nào để bắt đầu."
     },
     "archetypeTitle": {
-      "label": "Danh hiệu",
-      "none": "Không có",
-      "hobbyLabel": "Sở Thích"
+      "none": "Không có"
     },
     "archetypePair": {
       "engineering+alchemy": "Chuyên Gia Nổ",
@@ -4405,7 +4601,21 @@ export const vi_VN: EnTranslations = {
       "hobbyLabel": "Sở thích: {craft}",
       "majorsLabel": "Chuyên ngành: {a} và {b}",
       "pairsHeld": "Các cặp được tổ chức: {count}",
-      "returnsLabel": "Trả về: {count}"
+      "returnsLabel": "Trả về: {count}",
+      "retentionFooter": "Lợi nhuận trên respec: 60% kỹ năng được giữ lại.",
+      "tutorialLink": "Hướng dẫn chuyên môn"
+    },
+    "recipeTracker": {
+      "trackerLabel": "Công thức",
+      "collapseHint": "Thu gọn công cụ theo dõi công thức",
+      "expandHint": "Mở rộng công cụ theo dõi công thức",
+      "pin": "Chấu",
+      "unpin": "Bỏ ghim",
+      "pinFull": "Trình theo dõi công thức đã đầy (tối đa {cap} công thức)",
+      "pinAria": "Ghim {name} vào trình theo dõi HUD",
+      "unpinAria": "Bỏ ghim {name} khỏi trình theo dõi HUD",
+      "haveNeed": "{have}/{need}",
+      "resultCount": "{name} x{count}"
     },
     "crafting": {
       "title": "Chế tạo",
@@ -4437,9 +4647,11 @@ export const vi_VN: EnTranslations = {
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(tiêu tốn {count} hảo hạng)",
       "reagentVaultDraw": "(lấy {count} từ kho của bạn)",
+      "reagentOrdinaryHeld": "({name} giữ: {count}, nhưng chỉ tính điểm tốt ở đây)",
       "vaultUnreachable": "Kho Nguyên Liệu không thể tiếp cận được ở đây.",
       "craftFeeLine": "Phí chế tạo: {fee} mỗi món",
       "empty": "Chưa có công thức nấu ăn nào được biết đến.",
+      "materialsFooter": "Vật liệu trong hầm của bạn được rút ra tự động. Tìm hiểu thêm công thức nấu ăn tại nhà ga.",
       "resultAria": "Thủ công {name}",
       "craftedToast": "Đã chế tác: {name}",
       "craftedToastQty": "Đã chế tác: {name} x{qty}",
@@ -4529,8 +4741,8 @@ export const vi_VN: EnTranslations = {
       "attunedBanner": "Đã Thụ Ngộ: {title}",
       "tierTutorial": {
         "title": "Bậc Đầu Tiên Của Bạn",
-        "tierCap": "Một nghề thủ công đạt bậc đầu tiên ở kỹ năng {skill}, và mỗi bậc cải thiện những gì nó có thể làm. Nhưng một nghề chỉ vượt qua công việc hiếm khi nó là một trong những chuyên ngành của bạn.",
-        "radar": "Các nghề thủ công của bạn tạo thành một bánh xe. Hãy thụ ngộ với một đôi lân cận và hai nghề đó trở thành chuyên ngành không giới hạn, một nghề đối diện trên bánh xe trở thành sở thích bị giới hạn ở mức hiếm.",
+        "tierCap": "Một nghề thủ công đạt đến cấp độ đầu tiên với kỹ năng {skill} và mỗi cấp độ cải thiện những gì nó có thể tạo ra. Nhưng một nghề thủ công chỉ vượt qua công việc hiếm hoi một khi nó là một trong hai chuyên ngành của bạn.",
+        "radar": "Nghề nghiệp của bạn tạo thành một bánh xe. Tập trung vào một cặp liền kề và hai nghề thủ công đó trở thành những chuyên ngành chưa được khai phá, một nghề thủ công trên bánh xe trở thành một sở thích hiếm có, và phần còn lại nằm im: kiến thức của họ được lưu giữ, nhưng được giới hạn chung cho đến khi bạn tiếp nhận chúng một lần nữa.",
         "masters": "Các bậc thầy thủ công trong thị trấn cung cấp nhiệm vụ thụ ngộ. Hãy thăm một người để chọn đôi khi bạn sẵn sàng. Những gì bạn đã học sẽ không bao giờ mất.",
         "dismiss": "Đã hiểu"
       },
@@ -4541,6 +4753,9 @@ export const vi_VN: EnTranslations = {
       "commissionToggleHint": "Ràng buộc với nhân vật đầu tiên nhận nó qua giao dịch.",
       "commissionUnbound": "Đồ ủy thác: ràng buộc với người nhận đầu tiên",
       "commissionBound": "Đồ ủy thác: đã ràng buộc với người nhận"
+    },
+    "marketWindow": {
+      "mixedListingsFooter": "Người bán bổ sung hàng hóa thông thường; danh sách người chơi ngồi bên cạnh họ với mức giá chào bán."
     },
     "itemMenu": {
       "use": "Sử Dụng",
@@ -4821,6 +5036,7 @@ export const vi_VN: EnTranslations = {
       "roleDps": "Gây Sát Thương",
       "freeRoles": "Chào đón mọi vai trò",
       "lockoutDaily": "Khóa hàng ngày trên trùm cuối",
+      "lockoutWeekly": "Khóa cửa hàng tuần đối với mỗi ông chủ",
       "lockoutNone": "Không có khóa",
       "lockedFor": "Bị khóa khoảng {minutes} phút",
       "attunement": "Yêu cầu điều chỉnh: {quest}",
@@ -4834,6 +5050,8 @@ export const vi_VN: EnTranslations = {
       "lootMaybe": "Tối đa một trong số này có thể rơi:",
       "lootChance": "Cơ hội rơi thêm:",
       "lootHeroic": "Thưởng anh hùng, luôn rơi một trong số này:",
+      "lootHeroicMaybe": "Thưởng Anh Hùng, nhiều nhất một trong số này có thể rơi:",
+      "lootHeroicChance": "Thưởng Anh Hùng, vật phẩm có thể rơi thêm:",
       "pct": "{pct}%",
       "blockedLevel": "Chỉ dành cho cấp độ {min} đến {max}",
       "blockedSpec": "Yêu cầu chuyên môn hóa",
@@ -4905,7 +5123,33 @@ export const vi_VN: EnTranslations = {
         "kings_wrath": "Cơn Thịnh Nộ Của Vua (30%: cộng sát thương vĩnh viễn, bẫy sàn nhanh hơn)",
         "bone_storm": "Bão Xương (hắn bỏ qua thù hận, xoáy và lao vào raid)",
         "crown_endures": "Vương Miện Trường Tồn (cuồng nộ cứng ở 6:00, heroic 5:00)",
-        "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)"
+        "deathless_court": "Triều Đình Bất Tử (chỉ heroic, triều đình hoàng gia trỗi dậy sau Cơn Thịnh Nộ Bất Tử)",
+        "bloodmane_rend": "Bloodmane Rend (chảy máu, theo dõi các giao dịch hoán đổi mục tiêu)",
+        "tusk_sweep": "Quét ngà (khe hở trán)",
+        "ancestral_sap": "Sap tổ tiên (chữa lành các đồng minh của nó)",
+        "call_of_the_hunt": "Call of the Hunt (đẩy nhanh các đồng minh gần đó)",
+        "thickhide_ward": "Thickhide Ward (khiên chắn cho các đồng minh gần đó)",
+        "beast_pit_quake": "Động đất Beast Pit (thiệt hại khu vực)",
+        "wildheart_pulse": "Wildheart Pulse (sát thương vùng xung)",
+        "jaguar_roar": "Jaguar Roar (knockback)",
+        "brand_of_the_pyre": "Thương hiệu của Pyre (xếp dấu lửa, rửa sạch trong nước ống dẫn)",
+        "forge_strike": "Forge Strike (xếp chồng lên nhau)",
+        "rain_of_cinders": "Mưa xi măng (ba nón lửa, đứng giữa chúng)",
+        "falling_cinders": "Chất kết dính rơi xuống (vòng tròn thiên thạch trên người chơi, di chuyển ra ngoài)",
+        "revolving_inferno": "Địa ngục quay tròn (xoay tia lửa, di chuyển qua các khoảng trống)",
+        "forge_wave": "Làn sóng rèn (mở rộng tường lửa, sử dụng hai làn đường an toàn)",
+        "apocalypse_add": "Ignivar Ashcaller (ưu tiên thêm casting Apocalypse, kill it fast)",
+        "judgment_of_the_forge": "Phán quyết của Forge (tạm dừng, chia sẻ một nơi trú ẩn an toàn)",
+        "last_inferno": "Địa ngục cuối cùng (đốt cháy 45 giây ở mức 20% máu)",
+        "chains_of_the_forge": "Chains of the Forge (chỉ anh hùng, ở gần đối tác được liên kết của bạn)",
+        "makers_brand": "Thương hiệu của nhà sản xuất (xếp chồng lên nhau)",
+        "forgefathers_sweep": "Forgefather's Sweep (hình nón phía trước rộng ở một chiếc xe tăng)",
+        "tempering_ray": "Tia nhiệt (dòng đến một người chơi được đánh dấu, chặn nó)",
+        "cinder_orbs": "Cinder Orbs (người chơi được đánh dấu trải rộng đến các cạnh phòng)",
+        "forgestorm": "Forgestorm (vòng tròn sao băng rơi xuống, di chuyển ra ngoài)",
+        "shared_pyre": "Dãy Pyre Chung (tập hợp vòng tròn, chia sẻ sát thương)",
+        "anvils_decree": "Nghị định của Anvil (ba cuộc tấn công búa toàn diện, chữa lành)",
+        "masters_assembly": "Hội đồng tổng thể (chặn dầm rèn, xoay chặn)"
       }
     },
     "cosmetics": {
@@ -4926,6 +5170,8 @@ export const vi_VN: EnTranslations = {
       "applied": "Đã áp dụng",
       "owned": "Đã sở hữu",
       "storeOnly": "Có tại Cửa hàng WOC",
+      "preview": "Xem trước",
+      "previewAria": "Xem trước {name}",
       "cardAria": "{name}, {rarity}",
       "mountsIntro": "Ngoại hình thú cưỡi phủ lên thú cưỡi mà nhân vật này đang cưỡi. Nó không bao giờ thay đổi tốc độ.",
       "mountsNoMount": "Trước hết hãy sở hữu một thú cưỡi: ngoại hình cần có thứ để cưỡi.",
@@ -4974,6 +5220,10 @@ export const vi_VN: EnTranslations = {
       "ownedTooltipStatus": "Đã biên mục trong Kỳ Trân Các",
       "missingTooltipStatus": "Chưa tìm thấy",
       "firstFindClears": "Lần đầu tìm thấy ở lượt hoàn thành thứ {count}",
+      "foundBy": "Tìm thấy bởi {names}",
+      "finderWithDate": "{name} ({date})",
+      "sharedScopeNote": "Được chia sẻ cho mọi nhân vật trong tài khoản của bạn",
+      "sharedScopeHint": "Một kỳ trân do bất kỳ nhân vật nào trong tài khoản của bạn tìm thấy cũng sẽ lấp đầy trang này.",
       "unlockToast": "Đã biên mục kỳ trân: {name}",
       "illuminateBanner": "Trang đã rực sáng: {name}",
       "illuminateToast": "Mọi kỳ trân trên trang {name} đã được lấp đầy.",
@@ -5107,6 +5357,10 @@ export const vi_VN: EnTranslations = {
       "progressAria": "Tiến độ: {current} trên {target}",
       "renownChip": "{renown} Danh Vọng",
       "earnedDate": "Lập ngày {date}",
+      "earnedBy": "Lập bởi {names}",
+      "earnerWithDate": "{name} ({date})",
+      "accountScopeNote": "Được chia sẻ cho mọi nhân vật trong tài khoản của bạn",
+      "accountScopeHint": "Một kỳ công mà bất kỳ nhân vật nào trong tài khoản của bạn lập được cũng sẽ được ghi nhận ở đây, và Sách sẽ nêu tên người đã lập nó.",
       "featRibbon": "Kỳ Tích",
       "hiddenBadge": "Ẩn",
       "titleChip": "Thưởng Danh Hiệu",
@@ -5156,6 +5410,33 @@ export const vi_VN: EnTranslations = {
       "toggleAria": "Chuyển đổi giữa bản đồ thế giới, bản đồ vùng và bản đồ phiên",
       "levels": "Cấp {min} đến {max}"
     },
+    "mapAtlas": {
+      "level": "Cấp {level}",
+      "landmarkCount": "{count} mốc",
+      "filtersAria": "Các Tầng Lớp Ánh Xạ UV",
+      "filters": {
+        "quests": "Nhiệm Vụ",
+        "gather": "Tập họp",
+        "dungeons": "Hầm ngục",
+        "services": "Các dịch vụ",
+        "players": "Cầu thủ"
+      },
+      "trackedQuests": "Nhiệm vụ được theo dõi",
+      "noTrackedQuests": "Không có nhiệm vụ được theo dõi",
+      "availableNearby": "Có sẵn gần đó",
+      "noNearbyQuests": "Không có nhiệm vụ gần đó",
+      "distance": "{distance} yard",
+      "showRoute": "Hiển thị lộ trình",
+      "untrack": "Bỏ theo dõi",
+      "track": "Bám",
+      "legend": {
+        "dungeon": "Hầm ngục",
+        "ore": "Quặng",
+        "herb": "RAU THƠM",
+        "mail": "Mail",
+        "passage": "lối đi; ngõ; hành lang đi qua"
+      }
+    },
     "arenaGate": {
       "minLevelNote": "Yêu cầu Cấp {level}"
     },
@@ -5174,6 +5455,7 @@ export const vi_VN: EnTranslations = {
       "tabBrowse": "Duyệt",
       "tabSell": "Bán",
       "tabActivity": "Hoạt Động Của Tôi",
+      "tabHistory": "Lịch sử bán hàng",
       "tabsLabel": "Các mục của Sàn Giao Dịch $WOC",
       "loading": "Đang tải Sàn Giao Dịch...",
       "loadFailed": "Không thể kết nối tới Sàn Giao Dịch. Hãy thử lại sau ít phút.",
@@ -5198,6 +5480,16 @@ export const vi_VN: EnTranslations = {
       "colCurrentBid": "Giá Thầu Hiện Tại",
       "colBuyNow": "Mua Ngay",
       "colTimeLeft": "Thời Gian Còn Lại",
+      "colBuyer": "Người mua",
+      "colSoldAt": "Đã bán",
+      "colSalePrice": "Giá giảm",
+      "colSaleType": "Loại",
+      "saleTypeAuction": "Đấu giá",
+      "saleTypeBuyNow": "Chọn mua",
+      "saleTypeDirected": "Được định hướng",
+      "saleTypeUnknown": "Không xác định",
+      "historyEmpty": "Chưa có doanh số nào được ghi nhận.",
+      "historyError": "Không thể tải lịch sử bán hàng.",
       "reserveMet": "Đã đạt giá dự trữ",
       "reserveNotMet": "Chưa đạt giá dự trữ",
       "yourListing": "Tin rao của bạn",
@@ -5870,6 +6162,7 @@ export const vi_VN: EnTranslations = {
       "deeds": "Sách Kỳ Công",
       "reliquary": "Kỳ Trân Các",
       "sheathe": "Tra/Rút Vũ Khí",
+      "hideInterface": "Ẩn giao diện (ảnh chụp màn hình và video)",
       "crafting": "Chế Tác",
       "mount": "Cưỡi Thú / Xuống Thú",
       "calendar": "Lịch Sự Kiện",
@@ -5899,6 +6192,8 @@ export const vi_VN: EnTranslations = {
       "attackMove": "Di Chuyển Tấn Công (chỉ khi bạn đã bật tùy chọn này)",
       "meters": "Bảng thống kê (sát thương, hồi máu, và đe dọa)",
       "petMark": "Thú Cưng: Đánh Dấu, chọn thú cưng của chính bạn (giống hệt việc bấm vào khung của nó)",
+      "targetSelf": "Nhắm mục tiêu cho chính bạn",
+      "targetParty": "Nhắm mục tiêu vào các thành viên trong nhóm từ 1 đến 9, từ trên xuống dưới khi khung nhóm hiển thị cho họ",
       "onBarBinding": "Bạn cũng có thể gán phím trực tiếp từ thanh hành động: chọn Sửa phím thanh hành động trong bảng Gán Phím, rồi bấm vào một ô trên thanh đang hiển thị và nhấn phím bạn muốn. Bấm Xong khi hoàn tất. Cách này chỉ dùng được trên máy tính, vì nó cần một bàn phím vật lý.",
       "clickMoveNote": "Bấm Để Di Chuyển mặc định tắt cho đến khi bạn bật nó lên: mở bảng Gán Phím trong menu trò chơi, bật Bấm Để Di Chuyển, rồi dùng dòng Nút Bấm Để Di Chuyển bên dưới để chọn nút chuột nào đảm nhận việc đi bộ (Nhấp Trái theo mặc định, hoặc Nhấp Phải). Khi đã bật, bấm vào một điểm trên mặt đất sẽ đưa bạn đi bộ tới đó, kèm một dấu hiệu trên mặt đất cho biết bạn đang hướng tới đâu. Bấm vào một sinh vật hoặc người chơi khác sẽ đưa bạn đi tới gần họ rồi dừng lại trong tầm, trong khi cú bấm đó vẫn làm nhiệm vụ thường lệ là chọn mục tiêu hoặc tương tác; nếu bạn đã đủ gần để chạm tới thứ vừa bấm, bạn chỉ đơn giản tương tác và đứng nguyên tại chỗ. Bất kỳ phím di chuyển nào cũng lập tức giành lại quyền điều khiển và kết thúc chuyến đi, và giữ nút chuột để nhìn quanh cũng vậy. Nhảy thì không, nên bạn vẫn tiếp tục di chuyển xuyên qua cú nhảy, còn mở menu trò chơi chỉ tạm dừng chuyến đi, và nó tiếp tục khi bạn đóng menu lại."
     },
@@ -6036,7 +6331,8 @@ export const vi_VN: EnTranslations = {
       "ifLockBars": "Khóa các thanh của bạn để bạn không vô tình kéo một kỹ năng ra khỏi ô.",
       "keybindsHeading": "Bảng Gán Phím",
       "keybindsBody": "Danh sách phím chỉ là một nửa của bảng đó. Phía trên nó là các công tắc quyết định cách con chuột của bạn điều khiển trò chơi: Camera Chuột, con trỏ có khóa lại khi bạn xoay hay không, Bấm Để Di Chuyển và nút chuột nào kích hoạt nó, Di Chuyển Tấn Công, bố cục cảm ứng thuận tay trái, và bộ lọc lời tục tĩu cho khung chat.",
-      "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn."
+      "keybindsMouseBody": "Có hai điều dễ bị bỏ sót ở đó. Nút chuột được gán như phím thường, nên nút cuộn và các nút ngón cái có thể mang kỹ năng, trong khi chuột trái và chuột phải vẫn được dành riêng cho camera và cho việc nhấp vào thế giới. Và bạn cũng có thể gán phím ngay từ thanh hành động: bật chế độ gán phím trên thanh tại đây, sau đó nhấp vào một ô và nhấn phím bạn muốn.",
+      "keybindsWheelBody": "Bản thân bánh xe cũng bị ràng buộc. Zoom Camera In và Zoom Camera Out là các liên kết thông thường nằm trên bánh xe trần theo mặc định, vì vậy bạn có thể di chuyển chúng đến Ctrl cộng với bánh xe hoặc tới các phím, sau đó cuộn bánh xe tự do để kích hoạt các khe thanh hành động. Một rãnh bánh xe không có cơ cấu nhả nên nó không thể điều khiển một hành động được giữ lại như di chuyển về phía trước."
     },
     "combat": {
       "intro": "Chiến đấu tuân theo những quy tắc MMO cổ điển quen thuộc. Bạn không bao giờ cần nghiên cứu bất kỳ điều gì để chơi tốt, đây chỉ là hình dáng cách các trận đấu vận hành.",
@@ -6057,7 +6353,7 @@ export const vi_VN: EnTranslations = {
       "deathTitle": "Khi bạn ngã xuống",
       "deathBody": "Nếu máu của bạn về không, bạn gục ngã ngay tại chỗ, và thi thể bạn nằm lại đó. Hãy giải thoát linh hồn và bạn trỗi dậy thành một hồn ma tại nghĩa địa gần nhất: nhanh chân hơn người sống, ngoài tầm với của kẻ thù, nhưng không thể chiến đấu, nhặt chiến lợi phẩm, hay nói chuyện với bất kỳ ai ngoài Người Canh Giữ Nhợt Nhạt lơ lửng trên những bia đá. Từ đó bạn chọn. Chạy hồn ma về lại thi thể và bạn hồi sinh ngay tại chỗ với một phần máu và mana được hồi phục, không một hình phạt nào. Hoặc nhờ Người Canh Giữ Nhợt Nhạt hồi sinh tức thì ngay nơi bạn đứng, đổi lại là Cái Giá của Người Canh Giữ: một sự suy yếu tạm thời cho tất cả những gì làm nên bạn, kéo dài càng lâu khi bạn càng dày dạn, và miễn hoàn toàn cho những nhân vật vừa mới vào đời. Ngã xuống bên trong một hầm ngục thì linh hồn bạn chờ ở nghĩa địa bên ngoài; đưa hồn ma trở lại qua cánh cửa và bạn hồi sinh tại lối vào. Delve là ngoại lệ: ngã xuống ở đó thì bạn chỉ đơn giản được dựng lại trên đôi chân mình tại lối vào delve, dù một lần ngã thứ hai sẽ kết thúc lượt chạy. Dù chọn đường nào, bạn cũng không mất kinh nghiệm, trang bị hay tiền vàng. Giữa các trận, hãy ngồi ăn uống để bạn bắt đầu trận kế tiếp với sức lực đầy đủ.",
       "threatTitle": "Kẻ Địch Nhắm Vào Ai",
-      "threatBody": "Mỗi kẻ địch đều giữ một bảng tính riêng ghi lại ai đã làm nó khó chịu nhất. Sát thương cộng thêm vào đó, và hồi máu cũng vậy: một lần hồi máu đặt đe dọa lên những kẻ địch đang đánh nhau với người bạn vừa chữa, chia đều giữa chúng, nên lần hồi máu an toàn nhất là lần dành cho người mà Tank đã giữ chân sẵn. Tank bật một thế phòng thủ hoặc một hình dạng bảo vệ giúp nhân lên mọi đe dọa họ tạo ra, trong khi Hình Sói của Druid lại giảm bớt đe dọa thay vì tăng, và một đòn khiêu khích đẩy người thi triển thẳng lên đầu bảng tính và ghim kẻ địch vào họ trong vài giây. Kẻ địch không đổi mục tiêu ngay khoảnh khắc ai đó vượt qua Tank: cần một khoảng cách rõ rệt mới kéo được chúng ra, và khoảng cách đó lớn hơn khi đánh tầm xa so với cận chiến, nên một chút kiên nhẫn lúc bắt đầu một đợt kéo sẽ giữ trận chiến đúng chỗ của nó.",
+      "threatBody": "Mỗi kẻ địch tự giữ một bảng theo dõi riêng về việc ai đã khiến nó tức giận nhất. Sát thương làm tăng chỉ số này, và hồi máu cũng vậy: một lần hồi máu sẽ đặt thù hận lên những kẻ địch đang giao chiến với người bạn hồi máu, chia đều giữa chúng, vì vậy cách hồi máu an toàn nhất là hồi cho người mà tank đã khống chế được. Tank kích hoạt thế thủ hoặc một hình dạng bảo vệ nhân lên mọi thù hận họ tạo ra, trong khi Hình Mèo của druid lại giúp giảm thù hận, còn khiêu khích sẽ đưa người dùng lên thẳng đầu bảng và giữ chân kẻ địch vào họ trong vài giây. Kẻ địch không đổi mục tiêu ngay khi ai đó vượt qua tank: cần một khoảng cách rõ rệt để kéo được mục tiêu, và khoảng cách cần lớn hơn khi đánh từ xa so với cận chiến, vì vậy một chút kiên nhẫn khi bắt đầu một lượt kéo quái sẽ giữ trận đấu đi đúng hướng.",
       "hazardsTitle": "Nước Có Thể Giết Chết Bạn",
       "breathBody": "Vùng nước sâu có thể bơi qua, và bạn có thể lặn xuống dưới nó. Khi đầu bạn ở dưới nước, một thanh hơi thở màu xanh xuất hiện gần đỉnh màn hình và cạn dần; trồi lên mặt nước và nó sẽ đầy lại nhanh hơn nhiều so với tốc độ nó đã cạn. Để nó cạn hết trong khi bạn vẫn còn ở dưới nước và bạn sẽ bắt đầu chết đuối, mất một phần máu mỗi giây cho đến khi bạn chạm được không khí, nên hãy để mắt tới thanh đó trong một lần lặn dài. Cái chết sẽ làm đầy lại nó, nên một lần chạy xác luôn bắt đầu với một hơi thở đầy đủ.",
       "fatigueBody": "Biển cả không có tường chắn. Những đoạn băng qua mà thế giới có ý để bạn bơi, các eo biển và đầm nước giữa hai dải đất, cùng các hồ nội địa, đều an toàn để vượt qua dù mất bao lâu đi nữa. Nhưng bơi ra khỏi bờ vào vùng biển khơi thực sự thì lại bắt đầu rút cạn sức lực của bạn: một cảnh báo hiện ra, bạn có một khoảng thời gian thực sự để quay đầu lại, và sau đó biển cả gây sát thương ngày càng nặng mà không gì ngăn được cho đến khi bạn hướng về phía đất liền. Chết đuối hoặc kiệt sức khi đã ở quá xa bờ và bạn sẽ giải thoát như bất kỳ cái chết nào khác, nên hãy xem đường chân trời là phong cảnh chứ không phải điểm đến.",
@@ -6088,8 +6384,9 @@ export const vi_VN: EnTranslations = {
       "framePetBody": "Thợ Săn, Thuật Sĩ Hắc Ám, và bất kỳ ai khác đang thả thú cưng đều có một khung nhỏ cho nó bên cạnh khung của mình, với tên, cấp, và máu của thú cưng. Bấm vào khung đó sẽ chọn thú cưng của bạn, và Ctrl+6 làm điều tương tự từ bàn phím.",
       "framesMoveBody": "Khung của bạn, khung mục tiêu, và các khung tổ đội đều có thể di chuyển được. Mỗi khung mang một nút di chuyển nhỏ ở góc: mở khóa nó, kéo khung tới vị trí bạn muốn, rồi khóa lại để một cú bấm nhầm không thể làm nó xê dịch. Nếu chúng lỡ nằm ở chỗ bạn không ưng, mục Đặt Lại Vị Trí Các Khung trong phần cài đặt sẽ đưa tất cả về đúng vị trí ban đầu.",
       "framesMoveBodyEditFrames": "Khung của bạn, khung mục tiêu và khung tổ đội đều di chuyển được. Mỗi khung có nút di chuyển nhỏ ở góc: mở khóa, kéo đến nơi muốn đặt rồi khóa lại để cú bấm nhầm không làm nó xê dịch. Chỉnh Khung ở đầu thẻ Khung trong tùy chọn Giao Diện mở khóa phần còn lại của giao diện cùng lúc, gồm cả ba khung trên: thanh hành động, thanh niệm phép, thanh đòn đánh, thanh kinh nghiệm, bản đồ nhỏ, dãy nút, khung thú cưng, thanh tư thế, hàng bùa lợi và bùa hại, cùng nhãn Nhắc Danh Sách Mong Muốn. Mỗi thành phần hiện tên khi mở khóa. Nếu đặt nhầm, Khôi Phục Mặc Định ở cuối cùng thẻ Khung đó đưa tất cả về vị trí ban đầu.",
-      "framesGovernedExtra": "Chỉnh Khung cũng mở khóa cụm theo dõi phía dưới (nhiệm vụ và mục tiêu đang theo dõi, tiến độ chiến công, trang Thánh Tích, hang thám hiểm hiện tại, khe nứt đang tham gia, và công thức hoặc đơn đặt chế tác đang theo dõi), thanh hành động cạnh khung thú cưng, khung hiệu ứng theo thời gian trên mục tiêu để xem bùa hại của bạn trên kẻ địch gần đó, huy hiệu Tận Hiến của Thánh Kỵ Sĩ, thanh Thống Khổ của Thuật Sĩ, lớp hiển thị phép được kích hoạt, thanh đếm đòn tay phụ cho người dùng hai vũ khí và cửa sổ thống kê sát thương có thẻ. Mỗi thành phần hiện nhãn tên riêng khi mở khóa.",
+      "framesGovernedExtra": "Chỉnh Sửa Khung cũng nới khóa cụm theo dõi bên dưới (các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công, các trang Kỳ Trân Các của bạn, các công thức bạn đã ghim từ chế tác, hang sâu bạn đang khám phá, bất kỳ Vết Nứt nào bạn đang tham gia, và công thức hay đơn đặt hàng bạn đang theo dõi), thanh hành động của thú cưỡi bên cạnh khung thú cưỡi, khung điểm mục tiêu cho các hiệu ứng bất lợi của bạn trên các kẻ địch gần đó, mề đay Sùng Tín của Thánh Kỵ Sĩ, Thanh Sa Đọa của Thuật Sĩ Hắc Ám, lớp phủ hiệu ứng kích hoạt phép, đồng hồ đòn tay phụ cho người dùng vũ khí đôi, và cửa sổ đo sát thương theo tab, mỗi thứ mang nhãn tên riêng khi được nới lỏng.",
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
+      "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",
@@ -6100,7 +6397,7 @@ export const vi_VN: EnTranslations = {
       "minimapBody": "Góc trên bên phải: một bản đồ nhỏ hình tròn với tên vùng đất phía trên và tọa độ của bạn phía dưới, được viền bởi một vòng quay tô màu theo thời khắc trong ngày.\n\nTấm đĩa này chứa nhiều hơn cả địa hình. Mũi tên của chính bạn nằm ở trung tâm, chỉ theo hướng bạn đang nhìn, với tổ đội quanh bạn hiện thành các chấm màu theo lớp nhân vật và một mũi tên ở rìa cho bất kỳ ai đã đi lạc ra ngoài phạm vi. Người giao nhiệm vụ mang cùng loại dấu hiệu trên đó như ngoài thế giới thật, và bạn cũng sẽ nhận ra các điểm tài nguyên và trạm chế tác, các cổng dịch chuyển, các xác và rương có thể nhặt đồ, bất kỳ kẻ địch nào đã để ý đến bạn, bạn bè và thành viên bang hội ở gần, và cả thi thể của chính bạn trong lúc bạn đang chạy hồn ma quay lại.\n\nCác biểu tượng nhỏ sẽ xuất hiện trên đó khi có điều cần báo: một phong bì khi có thư chưa đọc đang chờ bạn, một đồng xu khi tiền bán hàng hoặc hàng trả lại đang chờ ở chỗ Thương Nhân, và một nút liệt kê các khóa lượt raid của bạn.",
       "mapTitle": "Bản đồ thế giới và các bảng theo dõi của bạn",
       "mapBody": "M mở bản đồ thế giới: toàn bộ lục địa được vẽ ra, với mũi tên của chính bạn trên đó, các vùng đất cùng tên gọi, các điểm quan tâm quanh bạn, các cổng dịch chuyển, và các điểm tài nguyên bạn đã tìm thấy. Tổ đội của bạn cũng hiện trên đó. Bên trong một Hang Sâu, bản đồ chuyển sang một sơ đồ các phòng bạn đã khám phá được cho tới lúc đó.\n\nDọc theo cạnh phải, bên dưới bản đồ nhỏ, một chồng bảng theo dõi giữ những việc bạn đang làm trong tầm mắt mà không cần mở gì cả: các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công của bạn, Hang Sâu bạn đang ở trong, và bất kỳ Rạn Nứt nào bạn đang tham gia. Bảng theo dõi nhiệm vụ sẽ thu gọn lại khi bạn muốn lấy lại khoảng trống trên màn hình.",
-      "mapBodyZoneFirst": "M mở bản đồ thế giới tại khu vực bạn đang đứng, hiện mũi tên của bạn, điểm đáng chú ý xung quanh, người giao nhiệm vụ cùng ký hiệu và vùng có mục tiêu, trạm chế tác, hộp thư, bảng tin và luống vườn, lối vào phó bản, cùng mọi điểm thu thập trong khu vực. Điểm đang tái sinh được làm xám, và điểm vượt khả năng công cụ của bạn được đánh dấu. Tổ đội cũng hiện trên bản đồ. Bấm chuột phải hoặc nút Bản Đồ Thế Giới để lùi ra bản đồ lục địa, nơi mỗi khu vực có tên; bấm vào khu vực để mở bản đồ của nó. Vào hang thám hiểm, phó bản, khe nứt hoặc thành trì thì bản đồ chuyển sang sơ đồ tầng tại vị trí hiện tại; chiến trường Đồng Thornhollow có bản đồ riêng.\n\nỞ cạnh phải, dưới bản đồ nhỏ, một cụm theo dõi giữ công việc hiện tại trong tầm mắt mà không cần mở cửa sổ: nhiệm vụ và mục tiêu đang theo dõi, tiến độ chiến công, trang Thánh Tích, hang thám hiểm hiện tại và khe nứt đang tham gia. Có thể thu gọn bảng nhiệm vụ để lấy lại không gian màn hình.",
+      "mapBodyZoneFirst": "M mở bản đồ thế giới tại vùng bạn đang đứng, với mũi tên của riêng bạn trên đó, các điểm quan tâm quanh bạn, những người giao nhiệm vụ cùng dấu hiệu của họ và khu vực chứa mục tiêu của bạn, các trạm chế tác, hòm thư, bảng tin và luống vườn, các cửa hầm ngục, và mọi điểm thu hoạch trong vùng, mờ đi khi đang mọc lại và được đánh dấu khi công cụ của bạn chưa đủ. Nhóm của bạn cũng hiện trên đó. Nhấp chuột phải vào bản đồ, hoặc bấm nút Bản đồ thế giới của nó, bản đồ sẽ lùi về toàn lục địa, mỗi vùng được vẽ cùng tên, và bấm vào một vùng sẽ mở bản đồ của vùng đó. Bước vào một hang sâu, một hầm ngục, một Vết Nứt hay một pháo đài, bản đồ sẽ chuyển sang bản vẽ mặt bằng nơi bạn đang đứng; chiến trường Cánh Đồng Gai Trũng có bản đồ chiến trường riêng của nó.\n\nỞ bên phải, dưới minimap, một cụm theo dõi giữ công việc hiện tại của bạn trong tầm mắt mà không cần mở gì cả: các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công, các trang Kỳ Trân Các của bạn, các công thức bạn đã ghim từ chế tác, hang sâu bạn đang ở trong, và bất kỳ Vết Nứt nào bạn đang tham gia. Trình theo dõi nhiệm vụ thu gọn lại khi bạn muốn lấy lại màn hình.",
       "gatheringGoalTrackerBody": "Bảng mục tiêu thu thập được thêm vào cụm theo dõi khi bạn chọn Theo Dõi một công thức trong cửa sổ chế tác hoặc một đơn trên bảng đơn đặt chế tác: nó hiện tên công thức hoặc đơn, số lượng cần chuẩn bị và mức đáp ứng của nguyên liệu đang mang cùng nguyên liệu đã cất. Theo Dõi thay mục tiêu hiện tại, còn Xóa chủ động bỏ mục tiêu; cả hai đều không thay đổi ưu tiên thu hoạch.",
       "hubPracticeTrackerBody": "Gần trung tâm Đông Khê, bảng theo dõi luyện tập được thêm vào cụm khi bạn nhận các bài tập hướng dẫn tại đó: nó giữ thành tích tốt nhất với hình nhân tập trong tầm mắt. Khi bài học đang diễn ra, dải hướng dẫn bên cạnh dẫn bạn qua từng bước, từ mở Bảng Thống Kê Sát Thương đến so sánh lượt tập thứ hai.",
       "chatTitle": "Khung trò chuyện",
@@ -6447,6 +6744,7 @@ export const vi_VN: EnTranslations = {
       "formsNote": "Druid chiến đấu bằng cách đổi hình dạng. Hầu hết kỹ năng của Druid thuộc về một hình dạng riêng, nên hình bạn đang mang quyết định bạn có thể thi triển gì, và việc đổi hình tốn một chút mana. Bạn có thể đổi hình trong hoặc ngoài chiến đấu, bao nhiêu lần tùy thích.",
       "formsAutoUnshift": "Một phép hồi máu hoặc phép gây sát thương thi triển khi đang ở dạng thú sẽ tự đưa bạn ra khỏi dạng đó. Rời dạng theo cách này miễn phí và không tốn hồi chiêu toàn cục, nên phép tức thời phát ra ngay khi bạn bấm. Vào lại dạng là một kỹ năng bình thường, vẫn tốn mana và hồi chiêu toàn cục.",
       "formsMoonwing": "Một Druid Moongrove có thêm một hình dạng nữa, Dạng Cú Mặt Trăng, hình dạng pháp thuật mà một Druid Cân Bằng chiến đấu trong đó. Đây là hình thú duy nhất giữ lại các phép của bạn, và đũa phép của bạn chỉ dùng được trong hình đó hoặc trong hình pháp sư bình thường.",
+      "formsWolfEngage": "Sói mở màn trận đấu bằng Cú Lao Bruin, lập tức chuyển sang Hình Sói để ghim mục tiêu, thu hẹp khoảng cách bằng Lao Vồ khi không ẩn thân, và giữ chân kẻ địch bằng Quật Ngã.",
       "formLine": {
         "form_bear": "Dạng gánh chịu đòn: một lớp da dày, dùng Nộ Khí thay vì Mana, và tạo thêm đe dọa để kẻ địch luôn nhắm vào bạn.",
         "form_cat": "Dạng sát thương cận chiến: dùng Năng Lượng và điểm tổ hợp giống Đạo Tặc, và tạo ra ít đe dọa hơn nhiều.",
@@ -6455,7 +6753,7 @@ export const vi_VN: EnTranslations = {
       "mageEleSummon": "Một phép Băng Giá triệu gọi nguyên tố về bên bạn và tung nó vào mục tiêu của bạn.",
       "formName": {
         "form_bear": "Hình Bruin",
-        "form_cat": "Hình Sói",
+        "form_cat": "Hình Mèo",
         "form_travel": "Hình Thần Tốc"
       }
     },
@@ -6976,7 +7274,7 @@ export const vi_VN: EnTranslations = {
     "deedsPage": {
       "intro": "Sách Kỳ Công là nơi thế giới ghi sổ tất cả những gì bạn đã làm, từ những bước chân đầu tiên rời thung lũng khởi đầu cho đến những trận đánh khó nhất mà vương quốc có thể bày ra. Hãy lập kỳ công khi chơi, mang những danh hiệu chúng ban tặng, và nhìn Danh Vọng của bạn leo cao.",
       "howHeading": "Cách kỳ công hoạt động",
-      "howBody": "Kỳ công được lập và giữ lại theo từng nhân vật một, nên mỗi anh hùng bạn chơi đều dựng nên cuốn Sách của riêng mình; chỉ Bảng Xếp Hạng của vương quốc mới gom Danh Vọng của bạn qua tất cả các nhân vật bạn chơi, và tính mỗi kỳ công đúng một lần. Mỗi kỳ công ghi rõ ràng nó đòi hỏi gì ở bạn, ngay trong Sách Kỳ Công trong trò chơi, nên bạn luôn biết mình đang theo đuổi điều gì, và bạn có thể theo dõi những kỳ công mình nhắm tới để giữ chúng trong tầm mắt khi chơi. Một số ít vẫn được giữ bí mật và chỉ lộ diện khi bạn đã lập được chúng. Sách cũng tự giữ mình trung thực: bất cứ điều gì hồ sơ quá khứ của bạn có thể chứng minh, nó ghi công ngay lập tức, nên một kỳ cựu chẳng bao giờ mở sách ra thấy một trang trống; chỉ những kỳ công đếm số mới bắt đầu đếm lại từ đầu.",
+      "howBody": "Kỳ công được lập từng nhân vật một, nhưng Sách Kỳ Công được chia sẻ cho mọi nhân vật trong tài khoản của bạn: một kỳ công mà bất kỳ nhân vật nào trong số đó lập được sẽ được ghi nhận cho tất cả, Sách sẽ nêu tên ai đã lập nó và khi nào, và danh hiệu hay viền mà nó trao có thể được bất kỳ nhân vật nào của bạn đeo. Bảng xếp hạng của cõi giới thu thập Danh Vọng của bạn theo cùng cách đó, tính mỗi kỳ công chỉ một lần. Mỗi kỳ công nói rõ ràng những gì nó yêu cầu ở bạn, ngay trong Sách Kỳ Công ở trong game, để bạn luôn biết mình cần theo đuổi điều gì, và bạn có thể đặt theo dõi cho những kỳ công bạn đang nhắm tới để luôn thấy chúng khi chơi. Một số ít vẫn giữ bí mật và chỉ hiện ra khi bạn đã lập được chúng. Sách cũng luôn giữ sự trung thực: bất cứ điều gì hồ sơ trước đây của bạn có thể chứng minh, nó sẽ ghi công ngay lập tức, vì vậy một người chơi kỳ cựu không bao giờ mở sách ra và thấy trang trống; chỉ những kỳ công đếm số mới bắt đầu đếm lại từ đầu.",
       "renownHeading": "Danh Vọng",
       "renownBody": "Danh Vọng là điểm số nằm sau cuốn Sách. Mỗi kỳ công bạn giành được đáng một lượng nhất định, và tổng của bạn chỉ có tăng, nên một tuần lặng lẽ không bao giờ khiến bạn mất chỗ đứng. Một nhúm kỳ công dựa vào may mắn hơn là kỹ năng, những kỳ công sưu tầm khác là phần thưởng của chính chúng, còn Chiến Tích là một vinh dự riêng, nên không cái nào trong số đó đáng chút Danh Vọng nào. Kỳ công không có Danh Vọng vẫn tính vào việc hoàn tất cuốn Sách của bạn; chúng chỉ đơn giản là không bao giờ ghi điểm. Chiến Tích là ngoại lệ duy nhất, được giữ hoàn toàn ngoài phép đếm.",
       "rewardsHeading": "Danh hiệu và viền tên",
@@ -7014,7 +7312,7 @@ export const vi_VN: EnTranslations = {
     "reliquaryPage": {
       "intro": "Kỳ Trân Các là bảo tàng những chiến lợi phẩm độc nhất mà bạn đã biên mục: các món săn lùng trong hầm ngục, cúp nghề, thú cưỡi, ngoại hình vũ khí và danh hiệu. Nó đi cùng Sách Kỳ Công như một sảnh cúp đi cùng một cuốn sổ thành tích.",
       "howHeading": "Bộ sưu tập vận hành ra sao",
-      "howBody": "Mở Kỳ Trân Các trong trò chơi (mặc định Shift+X). Mỗi kệ chứa những trang kỳ trân độc nhất. Bạn lấp đầy một bóng hình khi lần đầu sở hữu món đó trên nhân vật này, và làm rực sáng một trang khi mọi kỳ trân trên trang ấy đã được lấp đầy. Một vài trang mang nhãn Đã ngừng hoặc Riêng: chúng nằm ngoài phần hoàn tất, nên không bao giờ chặn một kệ hay cả mục lục. Vật phẩm tìm được sẽ hiện thông báo ngay và làm mới cửa sổ đang mở; tiến trình gắn với từng nhân vật, trừ ngoại hình vũ khí vốn là đồ trang trí của tài khoản.",
+      "howBody": "Mở Thánh Tích Quán trong game (mặc định Shift+X). Mỗi kệ chứa các trang thánh tích độc nhất. Một bóng hình được lấp đầy khi bất kỳ nhân vật nào trong tài khoản của bạn nhận được món đó lần đầu, và một trang được thắp sáng khi mọi thánh tích trên đó đã đầy. Vài trang được gắn nhãn Đã ngừng hoặc Cá nhân: chúng nằm ngoài phần hoàn thành nên không bao giờ chặn một kệ hay toàn bộ danh mục. Vật tìm được sẽ hiện thông báo ngay và làm mới cửa sổ đang mở; tiến trình được chia sẻ cho mọi nhân vật trong tài khoản, nên thánh tích một nhân vật tìm được sẽ lấp đầy trang cho tất cả.",
       "ranksHeading": "Cấp Quản Thủ",
       "ranksBody": "Cấp Quản Thủ tăng theo từng kỳ trân độc nhất được biên mục và chỉ trao danh hiệu cùng viền trang trí. Chúng không bao giờ trao sức mạnh chiến đấu, tỉ lệ rơi đồ hay bù trừ vận rủi. Ngoại hình vũ khí thuộc tài khoản không tính điểm cấp Quản Thủ, nhờ vậy danh vọng vẫn gắn chặt với nhân vật, và kỳ trân trên các trang Đã ngừng hoặc Riêng cũng không tính điểm cho cấp ấy.",
       "retiredTag": "Đã ngừng",
@@ -7100,7 +7398,7 @@ export const vi_VN: EnTranslations = {
       "groupClasses": "Lớp nhân vật",
       "groupForms": "Hình Dạng Druid",
       "formBear": "Bruin Form",
-      "formCat": "Hình Sói",
+      "formCat": "Hình Mèo",
       "formTravel": "Fleet Form",
       "groupCreatures": "Sinh vật",
       "groupPets": "Quỷ của Thuật Sĩ Hắc Ám",
@@ -7424,7 +7722,7 @@ export const vi_VN: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Bùa phép có bốn bậc. Bậc cơ bản dùng Bụi Thanh Âm, thêm ít Tinh Chất ở đầu trên, và phủ lên ô vũ khí, tay phụ cùng mọi ô giáp, với đủ lựa chọn trục chỉ số để mọi cách xây dựng có thứ cho từng ô: khiên và tay phụ pháp sư cầm trên tay có bùa Thể Lực riêng, nên không ô trang bị nào bị bỏ trống. Bậc Cường Hóa tốn một Mảnh Thanh Âm và Tinh Chất, cho bonus mạnh hơn ở các ô quan trọng nhất. Mảnh còn có ba nơi tiêu khác: hai công thức lá bùa, mỗi công thức năm mảnh; bậc cao nhất của nạp hiệu ứng công cụ; và bậc Quang, trong đó bùa vũ khí và ngực mỗi loại tốn một mảnh còn Truyền Lực tốn hai, nên hãy để dành vài mảnh.\n\nỞ giữa là năm bùa Khắc, mỗi bùa dùng một chỉ số phụ riêng, để không thứ gì bạn nghiền thành mực bị lãng phí: Cạnh Khắc cho vũ khí và Sức Mạnh, dùng Thép Cộng Hưởng; Dấu Khắc cho vũ khí và Trí Tuệ, dùng Gỗ Cộng Hưởng; Dệt Khắc cho ngực và Tinh Thần, dùng Chỉ Cộng Hưởng; Da Khắc cho chân và Nhanh Nhẹn, dùng Da Cộng Hưởng; Liên Kết Khắc cho mũ và Thể Lực, dùng Liên Kết Cộng Hưởng. Mỗi loại còn cần hai Tinh Chất Thanh Âm; khi một ô và chỉ số có cả bùa cơ bản lẫn Cường Hóa, bonus Khắc nằm giữa hai mức, còn Dệt Khắc là bùa Tinh Thần ngực mạnh nhất hoàn toàn và Da Khắc là bùa Nhanh Nhẹn chân duy nhất. Bảng dưới có bonus chính xác.\n\nTrên các bậc thấp thông thường là bậc Quang, đỉnh cao của công việc thường: Phù Phép 100 cho bốn loại, 125 cho Truyền Lực, như cột Kỹ Năng bên dưới. Mỗi loại cần Chất Dẫn Quang và thêm một bước cho ô của mình: vũ khí có lựa chọn Sức Mạnh và Phép Lực, ngực và giày. Cuối cùng, Truyền Lực Quang chỉ bám được vào món đã Hoàn Thiện: Hoàn Thiện là việc của người mặc, không phải thợ pháp khắc, và trang Nghề Nghiệp giải thích cách món đồ đạt trạng thái đó.\n\nNhiệt Huyết Ngọn Lửa Cuối Cùng là công thức raid riêng, không phải bùa thường miễn phí. Học công thức có thể giao dịch ở Phù Phép 100 trước khi áp dụng. Mỗi lần dùng cần 3 Lõi Ngọn Lửa Cuối Cùng và 2 Mảnh Thanh Âm; công thức có thể rơi trong Lò Luyện hoặc mua từ quân nhu trưởng với một lõi. Quy tắc proc cận chiến và tốc độ vũ khí được trình bày đầy đủ bên dưới.",
+        "enchantsNoteRaidFormula": "Bùa phép có bốn bậc. Bậc cơ bản dùng Bụi Thanh Âm, thêm ít Tinh Chất ở đầu trên, và phủ lên ô vũ khí, tay phụ cùng mọi ô giáp, với đủ lựa chọn trục chỉ số để mọi cách xây dựng có thứ cho từng ô: khiên và tay phụ pháp sư cầm trên tay có bùa Thể Lực riêng, nên không ô trang bị nào bị bỏ trống. Bậc Cường Hóa tốn một Mảnh Thanh Âm và Tinh Chất, cho bonus mạnh hơn ở các ô quan trọng nhất. Mảnh còn có ba nơi tiêu khác: hai công thức lá bùa, mỗi công thức một mảnh (phần còn lại của giá lá bùa là tinh chất và bụi); bậc cao nhất của nạp hiệu ứng công cụ; và bậc Quang, trong đó bùa vũ khí và ngực mỗi loại tốn một mảnh còn Truyền Lực tốn hai, nên hãy để dành vài mảnh.\n\nỞ giữa là năm bùa Khắc, mỗi bùa dùng một chỉ số phụ riêng, để không thứ gì bạn nghiền thành mực bị lãng phí: Cạnh Khắc cho vũ khí và Sức Mạnh, dùng Thép Cộng Hưởng; Dấu Khắc cho vũ khí và Trí Tuệ, dùng Gỗ Cộng Hưởng; Dệt Khắc cho ngực và Tinh Thần, dùng Chỉ Cộng Hưởng; Da Khắc cho chân và Nhanh Nhẹn, dùng Da Cộng Hưởng; Liên Kết Khắc cho mũ và Thể Lực, dùng Liên Kết Cộng Hưởng. Mỗi loại còn cần hai Tinh Chất Thanh Âm; khi một ô và chỉ số có cả bùa cơ bản lẫn Cường Hóa, bonus Khắc nằm giữa hai mức, còn Dệt Khắc là bùa Tinh Thần ngực mạnh nhất hoàn toàn và Da Khắc là bùa Nhanh Nhẹn chân duy nhất. Bảng dưới có bonus chính xác.\n\nTrên các bậc thấp thông thường là bậc Quang, đỉnh cao của công việc thường: Phù Phép 100 cho bốn loại, 125 cho Truyền Lực, như cột Kỹ Năng bên dưới. Mỗi loại cần Chất Dẫn Quang và thêm một bước cho ô của mình: vũ khí có lựa chọn Sức Mạnh và Phép Lực, ngực và giày. Cuối cùng, Truyền Lực Quang chỉ bám được vào món đã Hoàn Thiện: Hoàn Thiện là việc của người mặc, không phải thợ pháp khắc, và trang Nghề Nghiệp giải thích cách món đồ đạt trạng thái đó.\n\nNhiệt Huyết Ngọn Lửa Cuối Cùng là công thức raid riêng, không phải bùa thường miễn phí. Học công thức có thể giao dịch ở Phù Phép 100 trước khi áp dụng. Mỗi lần dùng cần 3 Lõi Ngọn Lửa Cuối Cùng và 2 Mảnh Thanh Âm; công thức có thể rơi trong Lò Luyện hoặc mua từ quân nhu trưởng với một lõi. Quy tắc proc cận chiến và tốc độ vũ khí được trình bày đầy đủ bên dưới.",
         "charmsHeading": "Bùa cho công cụ của người thu hoạch",
         "formulaRequired": "Cần công thức",
         "charmsBody": "Pháp Khắc cũng là nơi những lá bùa của người thu hoạch ra đời. Thợ máy Gizzel dạy cả hai tại xưởng dụng cụ ở Đông Khê một khi Pháp Khắc của bạn đạt 25: Túi Trữ Của Thợ Thu Thập, thứ cộng thêm một đơn vị vào một lần thu hoạch, và Con Mắt Nghệ Nhân, thứ nâng bậc của những gì thu được. Mỗi loại được chế tạo một lần, rồi gắn vào một cây cuốc, rìu, hoặc liềm, nơi nó chỉ tiêu một lượt nạp trên những lần thu hoạch mà nó thực sự cải thiện được.\n\nViệc nạp lại là nơi nghề này tiếp tục kiếm tiền. Lượt nạp được khôi phục bởi bất kỳ ai sở hữu công cụ, không phải bởi một thợ pháp khắc ghé qua, và việc nạp lại tốn một nửa nguyên liệu khi chủ công cụ đó chính là thợ pháp khắc đã ký lên lá bùa, ít hơn nữa nếu có chuyên ngành Pháp Khắc. Vậy nên một lá bùa bán qua quầy là một lần bán duy nhất, trong khi những lá bùa gắn trên chính công cụ của bạn là những lá bùa rẻ để tiếp tục vận hành. Toàn bộ thang lượt nạp và nguyên liệu có trên bất kỳ trang nghề thu hoạch nào, dưới mục Hiệu Ứng Công Cụ."
@@ -7493,7 +7791,7 @@ export const vi_VN: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "Nhịp điệu canh tác",
-        "rhythmBody": "Gieo là lượt đúc ngắn có thể thấy: đúng {plant} giây ở mọi bậc, vì cuốc mở đất chứ không mua tốc độ. Nhổ cây chín là tức thì. Không có lượt đúc để ngắt, không có kiểm tra túi để từ chối, và luống đã sẵn sàng chờ mãi nếu bạn để đó, nên túi đầy chỉ tốn một chuyến đi đổ đồ.\n\nThu hoạch trả nông sản và kỹ năng Nông Nghiệp. Không như mạch quặng, nó không cho XP nhân vật, nên luống là nghề để làm chứ không phải cách lên cấp.",
+        "rhythmBody": "Gieo là tức thì, vì cuốc mở đất chứ không mua tốc độ: không có lượt đúc nào phải chờ, nên nông dân bỏ đi ngay vẫn đã gieo xong. Nhổ cây chín cũng tức thì. Không có lượt đúc để ngắt, không có kiểm tra túi để từ chối, và luống đã sẵn sàng chờ mãi nếu bạn để đó, nên túi đầy chỉ tốn một chuyến đi đổ đồ.\n\nThu hoạch trả nông sản và kỹ năng Nông Nghiệp. Không như mạch quặng, nó không cho XP nhân vật, nên luống là nghề để làm chứ không phải cách lên cấp.",
         "gainHeading": "Thu hoạch dạy điều gì",
         "gainBody": "Điểm tăng là tất định và dựa vào bộ đếm của bạn, không dựa vào cây: {g1} kỹ năng cho lần thu hoạch dưới {p1}, {g2} dưới {p2}, {g3} dưới {p3}, rồi {g4} cho phần còn lại đến giới hạn {cap}. Đây không phải lượt gieo kỹ năng, nên độ dài chặng đường đúng theo phép tính.\n\nBậc cây quyết định luống đưa bạn đi xa đến đâu. Cây bậc 1 dạy tới {c1} rồi chuyển xám, cây bậc 2 tới {c2}, còn bậc 3 trở lên tới giới hạn, nên chuyển lên luống là cách duy nhất giữ bộ đếm chạy.",
         "yieldsHeading": "Thu hoạch cho gì",
@@ -7535,8 +7833,8 @@ export const vi_VN: EnTranslations = {
         "commissionsHeading": "Ủy thác và Giao Kèo Thợ Thủ Công",
         "commissionsBody": "Ủy thác là đồ chế tác cho người khác. Khi chế tác vũ khí, trang phục giáp, hoặc vật phẩm cầm tay phụ (một bình thuốc không thể mang giao kèo), thợ thủ công có thể đánh dấu món đồ là ủy thác: món đồ hoàn thiện hoạt động bình thường trong tay người làm, nhưng ngay khoảnh khắc nó đổi tay trong giao dịch, nó ràng buộc với người nhận. Đó là Giao Kèo Thợ Thủ Công: người mua nhận được món đồ, và món đồ không thể chuyển tiếp hay bán lại.\n\nGiao kèo không phải mãi mãi, chỉ là tốn kém. Bất kỳ chủ bàn nào cũng có thể tháo giao kèo cho một món đồ đã ràng buộc khi bạn đứng tại bàn của họ (bàn di động không bao giờ cung cấp dịch vụ này), với phí theo phẩm chất vật phẩm: 25 bạc cho khác thường, 1 vàng cho hiếm, 4 vàng cho sử thi, huyền thoại trả theo giá sử thi và một đồ phổ thông ủy thác trả theo giá khác thường.\n\nPhí mua lấy tờ giấy trắng, không phải thuốc chữa: món đồ vẫn là ủy thác, nên nó ràng buộc lại với bất kỳ ai nhận nó trong lần giao dịch tiếp theo, và mọi thứ khác về nó, dấu thợ, kiệt tác, và pháp khắc, đều còn nguyên vẹn.",
         "provenanceHeading": "Đồ có dấu thợ",
-        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; open Sources for the full list. Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Một số vật phẩm mang tên. Dòng nguồn của nguyên liệu nói ai thu thập từng nhóm đơn vị, còn dấu ký tên riêng xác định người ký cao cấp nếu có. Hai việc độc lập: nguyên liệu thu thập thường ghi người thu thập nhưng không có chữ ký, còn hàng đã ký từ trước có thể ghi người ký trong khi thành thật nói rằng không ghi người thu thập. Món hoàn thiện lại ghi người chế tạo. Các dữ liệu này đi theo vật phẩm qua giao dịch, ngân hàng, thư, Chợ Thế Giới và cả mua lại từ người bán, không bao giờ phai.\n\nThu thập tự ký công việc tốt nhất: mọi lần thu hoạch ra hiếm hoặc cao hơn đều có chữ ký, và vật hiếm ký lên toàn bộ món quà năm đơn vị. Một lần thu hoạch xác có lượt may mắn ký phần thu được khi họ vật không có mẫu vật để đưa; khi có mẫu, phần thu được vẫn thường và mẫu nguyên vẹn có chữ ký được tạo bên cạnh. Chế tác cũng ký như vậy: mọi bản sao đầu ra hiếm hoặc cao hơn đều có chữ ký, và Kiệt tác luôn ký bất kể phẩm chất, nên phiên bản tốt nhất của món nào cũng ghi người làm. Chữ ký của nguyên liệu thường đi cùng các đơn vị và không mất chỉ vì chồng tương thích đã có người thu thập hoặc ký khác. Mẫu nguyên vẹn là vật phẩm riêng và cần chỗ riêng; nếu không vừa, phần thu hoạch xác thường vẫn còn nhưng mẫu bị mất.\n\nVật phẩm hoàn thiện giữ một danh tính chặt chẽ, nên hai bản sao chỉ gộp khi mọi dấu đều giống hệt: cùng món, cùng người ký, cùng chỉ số Kiệt tác, cùng bùa phép và cùng ràng buộc. Nguyên liệu tương thích chia sẻ một ô giữa các người thu thập và người ký nhưng vẫn giữ số lượng theo từng nguồn. Chú giải tóm tắt nguồn; mở Nguồn để xem danh sách đầy đủ. Tách theo người thu thập giữ các chồng riêng trong túi và sắp xếp tôn trọng lựa chọn đó. Nguyên liệu đã chuyển có thể xếp bình thường với nguyên liệu của người nhận.\n\nChữ ký trả công cho thợ chế tác: giữ tại bàn bất kỳ bản sao có chữ ký của nguyên liệu cần dùng, bất kể ai ký, cộng 2 điểm phần trăm vào cơ hội Kiệt tác; giữ nguyên liệu do chính bạn ký giảm số lượng cần của nguyên liệu đó đi một đơn vị, không bao giờ dưới một, trừ khi nguyên liệu được đánh dấu không giảm giá; lõi raid luôn giữ nguyên chi phí đầy đủ. Công việc hiếm trở lên do chính bạn ký còn tiếp tục dạy nghề, hiện chỉ qua thuốc đã chế: uống một chai thuốc hiếm do bạn pha và ký, một dòng kỹ năng nhỏ chảy về nghề đã tạo nó nếu nghề đó là một trong các nghề chính đang hoạt động. Thật sự chỉ nhánh thuốc mới có tác dụng, nên linh dược, cuộn giấy hay bình đỉnh dù ký đẹp đến đâu cũng không dạy ngược.",
+        "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
+        "provenanceBodyUndiscounted": "Một số vật phẩm mang một cái tên. Các dòng nguồn của một nguyên liệu cho biết ai đã thu thập từng nhóm đơn vị, còn một dấu ký-tên-bởi riêng biệt xác định người ký tên cao cấp nếu có. Hai thông tin này độc lập với nhau: nguyên liệu thu thập thông thường ghi lại người thu thập mà không có chữ ký, còn hàng có chữ ký từ trước có thể nêu tên người ký trong khi thành thật báo rằng không có người thu thập được ghi lại. Một vật phẩm hoàn chỉnh thì lại cho biết ai đã chế tác ra nó. Những ghi nhận này theo vật phẩm qua các giao dịch, ngân hàng, thư tín, Chợ Thế Giới, và cả khi bán lại cho người bán, và không bao giờ mờ đi.\n\nViệc thu thập tự động ký tên cho thành quả tốt nhất của nó: bất kỳ lần thu hoạch nào ra kết quả hiếm hoặc tốt hơn sẽ đến kèm chữ ký, và các phát hiện hiếm sẽ ký cho toàn bộ phần thu hoạch dồi dào gấp năm của chúng. Kết quả may mắn từ việc thu hoạch xác sẽ ký cho sản lượng của nó ở những họ không có mẫu vật để cho, và ở những họ có, sản lượng vẫn giữ bình thường còn mẫu vật nguyên vẹn có chữ ký được tạo thêm bên cạnh. Việc chế tác cũng ký theo cùng cách: mọi bản của một sản phẩm hiếm hoặc tốt hơn được tạo ra đều có chữ ký, và một kiệt tác luôn có chữ ký bất kể phẩm chất của nó, vì vậy phiên bản tinh xảo nhất của bất kỳ vật phẩm nào luôn nêu tên người tạo ra nó. Chữ ký của một nguyên liệu thông thường gắn liền với chính các đơn vị đó và không thể mất đi chỉ vì một chồng tương thích đã chứa người thu thập hay người ký khác. Một mẫu vật nguyên vẹn riêng biệt là một vật phẩm tách biệt và vẫn cần chỗ trống; nếu không đủ chỗ, sản lượng xác thông thường vẫn còn nhưng mẫu vật sẽ mất.\n\nVật phẩm hoàn chỉnh giữ một danh tính nghiêm ngặt duy nhất, nên hai bản chỉ gộp lại khi mọi dấu hiệu trùng khớp hoàn toàn: cùng vật phẩm, cùng người ký, cùng chỉ số kiệt tác, cùng phù chú, cùng ràng buộc. Nguyên liệu tương thích chia sẻ một ô trống giữa các người thu thập và người ký khác nhau trong khi vẫn giữ số lượng riêng cho từng nguồn. Chú giải khi rê chuột tổng hợp các nguồn; nhấp phải vào chồng đồ để xem danh sách đầy đủ (trên thiết bị chạm, dùng nút Nguồn của nó). Tách theo người thu thập giữ các chồng đó riêng biệt trong túi đồ của bạn, và sắp xếp sẽ tôn trọng lựa chọn đó. Nguyên liệu được chuyển có thể gộp bình thường với nguyên liệu của người nhận.\n\nChữ ký đền đáp lại cho người chế tác: giữ bất kỳ bản có chữ ký của một nguyên liệu cần thiết tại bàn chế tác, bất kể ai đã ký, sẽ cộng thêm 2 điểm phần trăm tỉ lệ kiệt tác, và giữ một nguyên liệu do chính tay bạn ký sẽ giảm số lượng cần của nguyên liệu đó đi một (không bao giờ dưới một), trừ khi nguyên liệu đó được đánh dấu không thể giảm số lượng; các nguyên liệu lõi raid luôn giữ nguyên chi phí đầy đủ. Chính tác phẩm hiếm hoặc tốt hơn mà bạn ký còn tiếp tục dạy lại cho bạn, hiện tại chỉ qua các loại dược phẩm chế tác: uống một dược phẩm hiếm bạn đã pha chế và ký tên, và một luồng kỹ năng nhỏ sẽ chảy ngược lại nghề đã tạo ra nó, miễn là nghề đó là một trong các nghề chính đang hoạt động của bạn. Đây thực sự chỉ là nhánh dược phẩm và không gì khác, vì vậy một eliksir, một cuộn giấy, hay một bình tinh túy sẽ không dạy lại gì cho bạn cho dù nó được ký tên tinh xảo đến đâu.",
         "collectorsHeading": "Người sưu tầm, chiến tích, và giá của một câu chuyện",
         "collectorsBody": "Người bán NPC không quan tâm xuất xứ: một vật phẩm có dấu thợ bán cho NPC vẫn đúng giá thông thường. Phần giá trị tăng thêm của dấu thợ chỉ tồn tại giữa các người chơi, và đó chính xác là điều làm nó thú vị: một đống quặng may mắn được ký bởi một thợ thu hoạch nổi tiếng, một Miếng Ngon từ vụ thu hoạch may mắn, một lưỡi kiệt tác ghi tên thợ rèn đã nghỉ hưu từ lâu, tất cả đều có giá là bao nhiêu ký ức của ai đó nói lên.\n\nSách Kỳ Công cũng dựa vào cùng cảm giác đó: Mạch Nguyên Sơ, Lõi Cây Cổ Đại, Bông Trăng, Mẫu Vật Hoàn Hảo, và Tia Hy Vọng là những dấu ấn sưu tầm không có Danh Vọng tồn tại thuần túy để chứng minh một khoảnh khắc đã xảy ra với bạn. Giữ lại vật phẩm đã kiếm được kỳ công và bạn nắm giữ biên lai. Tất cả những thứ này không phải sức mạnh; xuất xứ không mua được chỉ số và không thắng được trận chiến, đó là dấu vết giấy tờ của những ngày tốt lành trong trò chơi.",
         "castPaceHeading": "Thời gian thi triển và kênh tiêu vàng",
@@ -7579,7 +7877,7 @@ export const vi_VN: EnTranslations = {
         "title": "Câu Hỏi Thường Gặp Về Nghề Nghiệp",
         "intro": "Giải đáp nhanh những câu hỏi thợ chế tác hay hỏi nhất.",
         "q1": "Vì sao vật phẩm có chữ ký của tôi không xếp chồng?",
-        "a1": "Vật phẩm hoàn thiện vẫn theo quy tắc danh tính chặt chẽ: hai bản sao chỉ gộp khi người ký, thuộc tính ngẫu nhiên, chỉ số Kiệt tác, bùa phép, ràng buộc và mọi dữ liệu nhận dạng khác giống hệt. Vì vậy một thanh kiếm có chữ ký luôn tách khỏi thanh kiếm thường.\n\nNguyên liệu là ngoại lệ. Các chồng tương thích cùng loại có thể gộp dù người thu thập hay người ký khác nhau, vì chồng giữ số lượng theo từng nguồn. Chú giải tóm tắt nguồn; mở Nguồn để xem toàn bộ. Tách theo người thu thập giữ chồng riêng trong túi và sắp xếp tôn trọng lựa chọn đó. Nguyên liệu đã chuyển có thể xếp bình thường với nguyên liệu của người nhận.",
+        "a1": "Vật phẩm hoàn chỉnh vẫn tuân theo quy tắc thực thể nghiêm ngặt: hai bản chỉ gộp lại khi người ký tên, thuộc tính ngẫu nhiên, chỉ số kiệt tác, phù chú, ràng buộc và các đặc điểm nhận dạng khác trùng khớp hoàn toàn. Vì vậy một thanh kiếm có dấu thợ sẽ tách biệt với một thanh kiếm thường.\n\nNguyên liệu là trường hợp ngoại lệ. Các chồng tương thích của cùng một nguyên liệu có thể gộp lại dù người thu thập hay người ký tên khác nhau, vì chồng đó vẫn giữ số lượng riêng cho từng nguồn. Chú giải khi rê chuột tổng hợp các nguồn; nhấp phải vào chồng đồ để xem danh sách đầy đủ (trên thiết bị chạm, dùng nút Nguồn của nó). Tách theo người thu thập giữ các chồng đó riêng biệt trong túi đồ của bạn, và sắp xếp sẽ tôn trọng lựa chọn đó. Nguyên liệu được chuyển có thể gộp bình thường với nguyên liệu của người nhận.",
         "q2": "Các công thức phổ thông có tăng kỹ năng mãi mãi không?",
         "a2": "Không. Mỗi công thức được chấm theo khoảng cách dưới bậc hiện tại của nghề, theo cách đọc cổ điển cam, vàng, xanh lá, xám: đủ điểm ở bậc của bạn hoặc cao hơn, một nửa thấp hơn một bậc, một phần tư thấp hơn hai bậc và không gì cả nếu thấp hơn từ ba bậc. Bậc cách nhau 25 kỹ năng, nên công thức miễn phí kỹ năng 0 ngừng dạy ở kỹ năng 75.\n\nGiới hạn cũng thấp hơn con số 300 cổ điển: mỗi trong mười nghề có thể kiếm đạt 125, Khai Khoáng, Đốn Gỗ và Học Thảo Dược đạt 100, còn Câu Cá kéo dài đến 200. Lên nghề nghĩa là chuyển sang công thức ở bậc của mình, không phải nghiền công thức rẻ nhất.",
         "q3": "Khác biệt giữa nhặt loot và thu hoạch xác là gì?",
@@ -10083,6 +10381,7 @@ export const vi_VN: EnTranslations = {
       "templates": {
         "battleground": "[Chiến Trường] {name}: {message}",
         "party": "[Tổ Đội] {name}: {message}",
+        "raidWarning": "[Cảnh báo đột kích] {name}: {message}",
         "yell": "{name} hét: {message}",
         "whisper": "{name} nhắn riêng: {message}",
         "toWhisper": "Gửi {name}: {message}",
@@ -10221,6 +10520,7 @@ export const vi_VN: EnTranslations = {
       "stunned": "Bạn đang bị choáng!",
       "silenced": "Bạn đang bị câm lặng!",
       "busy": "Bạn đang bận.",
+      "cannotCastWhileMoving": "Không thể thi triển khi đang di chuyển.",
       "abilityNotReady": "Kỹ năng đó chưa sẵn sàng.",
       "notEnoughRage": "Không đủ nộ khí!",
       "notEnoughEnergy": "Không đủ năng lượng!",
@@ -10233,7 +10533,7 @@ export const vi_VN: EnTranslations = {
       "requiresForm": "Bạn phải ở Hình {form}.",
       "cantInForm": "Bạn không thể làm điều đó khi đang ở Hình {form}.",
       "bear": "Bruin",
-      "cat": "Sói",
+      "cat": "Mèo",
       "travel": "Fleet",
       "shapeshifted": "Bạn không thể làm điều đó khi đang biến hình.",
       "stealthed": "Bạn phải đang ẩn thân.",
@@ -10564,12 +10864,11 @@ export const vi_VN: EnTranslations = {
       "devotion": "Sùng Tín"
     },
     "forms": {
-      "bear": "Gấu",
-      "cat": "Sói"
+      "bear": "Bruin",
+      "cat": "Mèo"
     },
     "cast": {
       "fishing": "Câu Cá",
-      "farming": "Trồng trọt",
       "gathering": "Thu Thập",
       "crafting": "Chế Tác",
       "disenchanting": "Hủy Pháp Khắc",
@@ -10913,6 +11212,19 @@ export const vi_VN: EnTranslations = {
       "buyConfirmAccept": "Mua",
       "buyConfirmCancel": "Hủy",
       "buyChanged": "Rao bán đó đã thay đổi trước khi bạn xác nhận. Hãy kiểm tra giá và thử lại.",
+      "sweep": "Quét",
+      "sweepAria": "Quét thị trường cho {item}",
+      "sweepTitle": "Quét thị trường: {item}",
+      "sweepClose": "Đóng",
+      "sweepNote": "Mua toàn bộ nhà/phòng cho thuê từ những người bán khác, rẻ nhất trên mỗi căn hộ trước, cho đến khi số lượng của bạn được chi trả. Quý vị có thể nhận được nhiều hơn một chút so với những gì quý vị yêu cầu.",
+      "sweepQuantity": "Đơn vị cần",
+      "sweepQuoteNone": "Không có nhà/phòng cho thuê của mặt hàng này để quét.",
+      "sweepQuoteLine": "{units} đơn vị trên {listings} danh sách với giá {total} ({each} mỗi danh sách)",
+      "sweepQuoteShort": "Chỉ có {units} đơn vị trên {listings} danh sách có sẵn, với giá {total} ({each} mỗi đơn vị)",
+      "sweepButton": "Quét",
+      "sweepConfirmTitle": "Xác nhận Market Sweep",
+      "sweepConfirmBody": "Mua {item} x{units} trên {listings} danh sách với giá {total} ({each} mỗi danh sách)?",
+      "sweepChanged": "Báo giá điều chuyển vốn đã thay đổi trước khi bạn xác nhận. Kiểm tra tổng số và thử lại.",
       "sellNote": "Rao bán hàng hóa từ túi của bạn. Thương Nhân thu {cut}% phí khi vật phẩm được bán. Bạn đang dùng {used}/{max} ô rao bán.",
       "sellPickEmpty": "Nhấp vào một vật phẩm trong túi để chọn món muốn bán.",
       "quantity": "Số lượng",
@@ -10952,7 +11264,9 @@ export const vi_VN: EnTranslations = {
       "ownListing": "Đó là mặt hàng rao của chính bạn. Hủy nó để nhận lại.",
       "cannotAfford": "Bạn không đủ tiền mua thứ đó.",
       "notYourListing": "Đó không phải mặt hàng rao của bạn.",
-      "nothingToCollect": "Bạn không có gì để thu về."
+      "nothingToCollect": "Bạn không có gì để thu về.",
+      "sweepNoListings": "Không có nhà/phòng cho thuê nào của mặt hàng đó có sẵn để quét.",
+      "sweepPriceChanged": "Giá đã thay đổi trước khi lệnh càn quét của bạn hạ cánh. Kiểm tra báo giá và thử lại."
     },
     "loot": {
       "takeAll": "Lấy Tất Cả",
@@ -11790,7 +12104,7 @@ export const vi_VN: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Lời Nguyền Bạo Lực",
-        "description": "Bỏ bùa kẻ địch trong 8 giây. 3 hành động gây sát thương tiếp theo của nó sẽ mỗi lần tạo ra 7 Kết Án và quất nó 17 sát thương Bóng Tối."
+        "description": "Nguyền rủa kẻ địch trong 8 giây, gây Sát Thương Bóng Tối và tạo ra 2 Án Phạt mỗi 2 giây. 3 hành động gây sát thương tiếp theo của nó mỗi lần tạo ra 7 Án Phạt và quật nó chịu 17 Sát Thương Bóng Tối."
       },
       "cruel_pact": {
         "name": "Khế Ước Tàn Nhẫn",
@@ -11826,7 +12140,7 @@ export const vi_VN: EnTranslations = {
       },
       "ruinous_brand": {
         "name": "Dấu Ấn Diệt Vong",
-        "description": "Đóng dấu một kẻ địch trong 15 giây. 3 phép trực tiếp tiếp theo của bạn sẽ vọng lại 25% sát thương lên kẻ địch bị đóng dấu, hoặc sao chép 50% sát thương vào nó khi thi triển lên mục tiêu khác."
+        "description": "Đóng dấu một kẻ địch trong 15 giây. 3 phép trực tiếp tiếp theo của bạn sẽ vọng lại 25% sát thương lên kẻ địch bị đóng dấu, hoặc sao chép 50% sát thương vào nó khi được thi triển lên mục tiêu khác. Tiếng vọng của Tia Hủy Diệt cũng được tính là đòn chí mạng, nhưng không nhân thêm hệ số sát thương chí mạng khác."
       },
       "wrath": {
         "name": "Tia Hoang Dã",
@@ -11865,7 +12179,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_form": {
         "name": "Hình Bruin",
-        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, sức mạnh tấn công tăng mạnh, các đòn đánh của ngươi tích nộ khí và tạo thêm 30% đe dọa. Niệm lại để trở về hình pháp sư."
+        "description": "Biến hình thành gấu: giáp +110%, máu tối đa +30%, tăng mạnh sức mạnh tấn công, các đòn đánh của bạn tích Thịnh Nộ và tạo ra 30% thù hận nhiều hơn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép."
       },
       "maul": {
         "name": "Nghiền Xương",
@@ -11881,17 +12195,17 @@ export const vi_VN: EnTranslations = {
         "description": "Một tiếng gầm hiểm độc: mọi kẻ địch trong vòng 10 thước bị khiêu khích, mối đe dọa của chúng đối với bạn tăng lên ngang bằng kẻ địch mà chúng căm ghét nhất, và chúng bị buộc phải tấn công bạn trong 3 giây. Chỉ dùng được ở Bruin Form."
       },
       "cat_form": {
-        "name": "Hình Sói",
-        "description": "Biến bạn thành sói: nhanh nhẹn tăng theo cấp của bạn, sức tấn công +8 cộng 2 mỗi cấp, các đòn của bạn dùng năng lượng và điểm combo, và bạn tạo ra ít hơn 29% mối đe dọa. Niệm lại để trở về hình dạng pháp sư."
+        "name": "Hình Mèo",
+        "description": "Biến bạn thành sói: nhanh nhẹn tăng theo cấp của bạn, sức tấn công +8 cộng 2 mỗi cấp, các đòn của bạn dùng năng lượng và điểm combo, và bạn tạo ra ít hơn 29% mối đe dọa. Biến thành bất kỳ hình dạng nào sẽ ban Sải bước: 60% tốc độ di chuyển trong 3 giây, mỗi 20 giây một lần. Niệm lại để trở về hình dạng pháp sư."
       },
       "claw": {
         "name": "Vuốt Xé",
-        "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Nhận 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.",
+        "description": "Cào kẻ địch gây sát thương vũ khí cộng thêm {damage}. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.",
         "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "ferocious_bite": {
         "name": "Cắn Xé Máu",
-        "description": "Chiêu kết liễu gây {damage} sát thương. Chỉ dùng được ở Hình Sói.",
+        "description": "Đòn kết liễu gây {damage}. Chỉ trong Hình Mèo.",
         "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ; ở 3 Huyết Cổ, nút này trở thành Thu Hoạch Đỏ, tiêu Huyết Cổ cho một cú cắn mạnh hơn, đồng thời lập tức gây toàn bộ sát thương còn lại của Lóc Xé và Xé Rách, và hồi năng lượng."
       },
       "swipe": {
@@ -11923,7 +12237,7 @@ export const vi_VN: EnTranslations = {
       },
       "travel_form": {
         "name": "Hình Thần Tốc",
-        "description": "Tức thì biến thành Fleet Form nhanh nhẹn, tăng 40% tốc độ di chuyển. Bạn không thể dùng các kỹ năng khác khi đã biến hình, nhưng có thể biến hình trong hoặc ngoài chiến đấu, lý tưởng để chạy trốn."
+        "description": "Biến hình ngay lập tức thành Hình Thần Tốc nhanh nhẹn, tăng tốc độ di chuyển 40% và loại bỏ các hiệu ứng trói chân và làm chậm có thể phá vỡ. Bạn không thể dùng kỹ năng khác khi đang biến hình, nhưng có thể biến hình dù đang hay không đang chiến đấu, lý tưởng để chạy trốn. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn."
       },
       "enrage": {
         "name": "Khơi Bùng",
@@ -11943,23 +12257,31 @@ export const vi_VN: EnTranslations = {
       },
       "dash": {
         "name": "Lao Nhanh",
-        "description": "Lao về phía trước, tăng tốc độ di chuyển 50% trong 15 giây. Chỉ dùng được ở Hình Sói."
+        "description": "Chạy nhanh về phía trước, tăng tốc độ di chuyển 50% trong 15 giây. Chỉ trong Hình Mèo."
       },
       "pounce": {
         "name": "Đòn Lẻn Vồ",
-        "description": "Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói."
+        "description": "Một đòn mở màn từ trạng thái ẩn thân làm choáng mục tiêu trong 2 giây. Tặng 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói. Khi không ẩn thân, nút này là Lao Vồ."
+      },
+      "lunge": {
+        "name": "Lao Vồ",
+        "description": "Lao vào kẻ địch cách xa tới 12 thước, gây 60% sát thương vũ khí và nhận 1 điểm combo. Chỉ dùng được ở Hình Sói."
+      },
+      "hamstring_bite": {
+        "name": "Quật Ngã",
+        "description": "Chiêu kết liễu làm choáng mục tiêu trong 1 giây cộng thêm 1 giây mỗi điểm liên hoàn (5 điểm liên hoàn: 6 giây). Chỉ dùng được ở Hình Sói."
       },
       "insect_swarm": {
         "name": "Bầy Đốt Chích",
         "description": "Kẻ địch bị bầy côn trùng bủa vây, nhận {damage} sát thương Tự Nhiên trong 12 giây."
       },
       "tigers_fury": {
-        "name": "Huyết Sói",
-        "description": "Trào dâng {rage} năng lượng và tăng {buff} sức mạnh tấn công trong {duration} giây. Chỉ dùng được ở Hình Sói."
+        "name": "Huyết Linh Miêu",
+        "description": "Tạo ra {rage} năng lượng và tăng sức mạnh tấn công thêm {buff} trong {duration} giây. Chỉ trong Hình Mèo."
       },
       "rip": {
         "name": "Vết Nứt Máu",
-        "description": "Chiêu kết liễu khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 36 sát thương cộng thêm 24 mỗi điểm liên hoàn tiêu hao (5 điểm liên hoàn: tổng {damage}). Chỉ dùng được ở Hình Sói.",
+        "description": "Đòn kết liễu khiến mục tiêu chảy máu mỗi 2 giây trong 24 giây: 36 sát thương cộng 24 cho mỗi điểm tổ hợp đã dùng (5 điểm tổ hợp: tổng {damage}). Chỉ trong Hình Mèo.",
         "specNote_feral": "Đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "mortal_strike": {
@@ -12156,11 +12478,11 @@ export const vi_VN: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Dạng Cú Mặt Trăng",
-        "description": "Nhận dạng cú mặt trăng, cường hóa thi triển phép cho đến khi bạn đổi lại. Thi triển lần nữa để trở về dạng thường. (dấu ấn Cân Bằng)"
+        "description": "Biến hình thành một Cú Mặt Trăng đáng sợ, tăng sát thương phép của bạn thêm 20% và giáp thêm 50%. Kéo dài đến khi bạn biến hình trở lại. Biến hình thành bất kỳ dạng nào cũng trao Bước Sải Dài, một khoảng tăng tốc độ di chuyển ngắn. Thi triển lại để trở về hình dạng thi triển phép. (Dấu ấn Cân Bằng)"
       },
       "feral_charge": {
         "name": "Dâng Trào Nguyên Thủy",
-        "description": "Giải phóng một đợt dâng trào nguyên thủy. Trong Hình Sói, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Trong Hình Bruin, lập tức tạo 50 Nộ Khí. (dấu ấn Hoang Dã)"
+        "description": "Giải phóng một Dâng Trào Nguyên Thủy. Khi ở Hình Mèo, tốc độ hồi Năng Lượng tăng 100% trong 10 giây. Khi ở Hình Bruin, ngay lập tức tạo ra 50 Thịnh Nộ. (Dấu ấn Cuồng Dã)"
       },
       "swiftmend": {
         "name": "Hồi Phục Nhanh",
@@ -12380,7 +12702,7 @@ export const vi_VN: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Tia Hủy Diệt",
-        "description": "Tiêu 3 Tàn Phá để phóng một luồng lửa hỗn mang nặng nề gây {damage} sát thương Hỏa. Hủy Hoại rút ngắn thời gian niệm của nó đi 30%."
+        "description": "Tiêu 3 Tàn Phá để phóng một tia lửa hỗn loạn nặng, gây {damage} Sát Thương Lửa trước khi áp dụng sát thương chí mạng. Luôn đánh chí mạng khi trúng mục tiêu. Điêu Tàn giúp rút ngắn thời gian thi triển của nó 30%."
       },
       "dark_pact": {
         "name": "Giao Ước Huyết Sắc",
@@ -12524,7 +12846,7 @@ export const vi_VN: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Khoảnh Khắc Hoàn Hảo",
-        "description": "Chớp lấy khoảnh khắc hoàn hảo của bạn: lập tức nhận 4 Điện Tích Bí Thuật và trong 10 giây Phi Tiêu Ê-te không tiêu hao chúng. (Thời Thuật)"
+        "description": "Nắm lấy khoảnh khắc hoàn hảo của bạn: ngay lập tức nhận 4 Điểm Bí Thuật, và trong 10 giây Phi Tiêu Ê-te không tiêu hao chúng và gây thêm 20% sát thương. (Thuật Thời Gian)"
       },
       "arcane_surge": {
         "name": "Sức Mạnh Bí Thuật",
@@ -12661,7 +12983,7 @@ export const vi_VN: EnTranslations = {
       },
       "bear_charge": {
         "name": "Cú Lao Bruin",
-        "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form."
+        "description": "Lao vào kẻ địch, tạo 9 nộ khí và làm choáng nó trong 1 giây. Trong 3 giây sau đó, Hình Sói miễn phí và ghim mục tiêu, làm chậm nó 50% trong 4 giây. Tầm 8-25 thước. Chỉ dùng được ở Bruin Form."
       },
       "demoralizing_roar": {
         "name": "Tiếng Gầm Khiếp Đảm",
@@ -12669,11 +12991,11 @@ export const vi_VN: EnTranslations = {
       },
       "prowl": {
         "name": "Rình Rập",
-        "description": "Vào trạng thái ẩn thân khi ở Hình Sói, di chuyển chậm hơn 5%. Không thể dùng trong chiến đấu."
+        "description": "Vào trạng thái ẩn thân khi ở Hình Sói. Không thể dùng trong chiến đấu."
       },
       "rake": {
         "name": "Lóc Xé",
-        "description": "Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 18 giây. Nhận 1 điểm liên hoàn. Chỉ dùng được ở Hình Sói.",
+        "description": "Lóc xé kẻ địch gây sát thương vũ khí cộng thêm {damage} và gây sát thương chảy máu trong 18 giây. Cho 1 điểm tổ hợp. Chỉ trong Hình Mèo.",
         "specNote_feral": "Mỗi đòn đánh trúng thêm 1 Huyết Cổ (tối đa 3)."
       },
       "revive_pet": {
@@ -16433,6 +16755,21 @@ export const vi_VN: EnTranslations = {
       },
       "hub_healing_dummy": {
         "name": "Hình Nhân Hồi Máu"
+      },
+      "healing_dummy_tank": {
+        "name": "Hình nộm tiên phong bị thương"
+      },
+      "healing_dummy_soldier": {
+        "name": "Người lính bị thương"
+      },
+      "healing_dummy_scout": {
+        "name": "Hình nộm trinh sát quan trọng"
+      },
+      "healing_dummy_caster": {
+        "name": "Hình nộm pháp sư bị thương"
+      },
+      "healing_dummy_ranger": {
+        "name": "Kiểm lâm bị đánh đập"
       },
       "ridge_stalker": {
         "name": "Kẻ Rình Sườn Núi"

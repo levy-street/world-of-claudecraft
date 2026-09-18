@@ -1147,15 +1147,12 @@ const MERCHANT_POSITION = localToWorld(
   0,
   MARKET_STALLS[0].depth / 2 + 0.8,
 );
-const TRADER_POSITION = localToWorld(
-  MARKET_STALLS[1].position,
-  MARKET_STALLS[1].rotation,
-  0,
-  MARKET_STALLS[1].depth / 2 + 0.8,
-);
-// Lin is a quest herbalist, not a merchant. Keep her already-clear civic-green
-// position without inventing a replacement stall or blocking the smithy sightline.
-const APOTHECARY_POSITION = { x: -72, z: -96 } as const;
+// Starter combat givers occupy the civic square with room between each stand.
+// Wilkes keeps his vendor service on the market edge; trades stay at their stations.
+const TRADER_POSITION = { x: -25, z: -94 } as const;
+const APOTHECARY_POSITION = { x: -11, z: -89 } as const;
+const BRANDT_POSITION = { x: -25, z: -104 } as const;
+const ODELL_POSITION = { x: -16, z: -111 } as const;
 // Station cluster props sit at station + world-axis offsets (town_props.ts,
 // no rotation), so the smith's and cook's work points derive the same way.
 // Round 4: the smith stands on the yard's open corner, half a stride clear
@@ -1192,20 +1189,12 @@ const SAUL_POSITION = { x: 10.2, z: -87.5 } as const;
 // the town's edge rather than in the churchyard approach.
 const FURY_POSITION = { x: 16, z: -78 } as const;
 
-// Round 4: the marshal keeps watch beside his notice board, a clear stride
-// from the bursar's queue and outside the board's posting envelope (the
-// board's body and posting point both stay a full interact range away, the
-// board comment's rule). The drafted spot at (9, -92.5) sat INSIDE the
-// bank's rotated lot (the 45-degree townhall footprint owns that corner),
-// so the watch stands on the green south of the board instead: outside the
-// envelope, off the posting lane, facing the civic square he polices.
-// Round 6b (owner): the town's NPCs are laid out by ROLE along the dockside
-// road. Quest givers sit nearest the quay, because a new character spawns
-// there and the zone's welcome line sends them to Redbrook: he used to be an
-// eighty yard walk inland. Profession masters stay mid-town with their
-// crafting stations (a forge master cannot leave the forge), and service NPCs
-// sit out on the edges. Each group is spread, not clustered.
-const MARSHAL_POSITION = { x: -58, z: -102 } as const;
+// Marshal stands beside the noticeboard, a full INTERACT_RANGE clear of
+// both the board's body and its posting point so a player posting a notice
+// is never handed his dialogue (tests/noticeboard_interaction.test.ts and
+// the layout suite pin that clearance), facing the square that holds the
+// other combat givers.
+const MARSHAL_POSITION = { x: -1, z: -93 } as const;
 
 // The Founder Salesman (Founder Pack vendor, content/founder_pack.ts): a few
 // yards east of the graveyard's headstone plot (services.graveyard.position
@@ -1222,14 +1211,19 @@ const NPCS = [
     'marshal_redbrook',
     MARSHAL_POSITION,
     facingToward(MARSHAL_POSITION, CIVIC_CENTER),
-    'eastbrook_harbour_market',
+    'eastbrook_noticeboard',
   ),
-  makeNpc('trader_wilkes', TRADER_POSITION, MARKET_STALLS[1].rotation, MARKET_STALLS[1].id),
+  makeNpc(
+    'trader_wilkes',
+    TRADER_POSITION,
+    facingToward(TRADER_POSITION, CIVIC_CENTER),
+    'eastbrook_civic_square',
+  ),
   makeNpc(
     'apothecary_lin',
     APOTHECARY_POSITION,
     facingToward(APOTHECARY_POSITION, CIVIC_CENTER),
-    'eastbrook_quayside_home',
+    'eastbrook_civic_square',
   ),
   makeNpc('brother_aldric', CHAPEL.frontStandingPoint, CHAPEL.rotation, CHAPEL.id),
   makeNpc(
@@ -1240,8 +1234,18 @@ const NPCS = [
     facingToward(BLACKSMITH_SHOP_CENTER, SMITH_POSITION),
     'eastbrook_blacksmith',
   ),
-  makeNpc('fisherman_brandt', { x: -95, z: -50 }, -1.5707963267948966, 'eastbrook_quay'),
-  makeNpc('foreman_odell', { x: -84, z: -63 }, 0.6747409422235526, 'eastbrook_quay'),
+  makeNpc(
+    'fisherman_brandt',
+    BRANDT_POSITION,
+    facingToward(BRANDT_POSITION, CIVIC_CENTER),
+    'eastbrook_civic_square',
+  ),
+  makeNpc(
+    'foreman_odell',
+    ODELL_POSITION,
+    facingToward(ODELL_POSITION, CIVIC_CENTER),
+    'eastbrook_civic_square',
+  ),
   makeNpc('bursar_fernando', BANK.frontStandingPoint, BANK.rotation, BANK.id),
   makeNpc('card_master', { x: 20, z: -98 }, -2.677945044588987, 'eastbrook_bank'),
   makeNpc('chronicler_saul', SAUL_POSITION, TOOLWORKS.rotation, 'mailbox_eastbrook'),

@@ -6,8 +6,8 @@ import {
 } from '../src/ui/hud/chat/chat_input_autosize';
 
 const LIMITS = { minHeight: 36, maxHeight: 110 };
-// The desktop #chat-input has a 2px top + 2px bottom border under box-sizing: border-box.
-const BORDER = 4;
+// The shared input primitive has a 1px top + 1px bottom border under box-sizing: border-box.
+const BORDER = 2;
 
 describe('chatInputSize', () => {
   it('keeps the floor for an empty / single-line input', () => {
@@ -22,15 +22,15 @@ describe('chatInputSize', () => {
   it('grows with typed content while it fits under the cap', () => {
     expect(
       chatInputSize({ contentHeight: 56, placeholderHeight: 0, borderY: BORDER }, LIMITS),
-    ).toEqual({ height: 60, overflowY: 'hidden' });
+    ).toEqual({ height: 58, overflowY: 'hidden' });
   });
 
   it('adds the border so a border-box textarea does not clip its last line', () => {
     // Without the border compensation the box would be sized at exactly the scrollHeight
-    // (70) and clip its final line by the 4px border; the returned height accounts for it.
+    // (70) and clip its final line by the 2px border; the returned height accounts for it.
     expect(
       chatInputSize({ contentHeight: 70, placeholderHeight: 0, borderY: BORDER }, LIMITS),
-    ).toEqual({ height: 74, overflowY: 'hidden' });
+    ).toEqual({ height: 72, overflowY: 'hidden' });
     expect(chatInputSize({ contentHeight: 70, placeholderHeight: 0, borderY: 0 }, LIMITS)).toEqual({
       height: 70,
       overflowY: 'hidden',
@@ -42,13 +42,13 @@ describe('chatInputSize', () => {
     // the placeholder measurement keeps the box tall enough to show a wrapped hint unclipped.
     expect(
       chatInputSize({ contentHeight: 22, placeholderHeight: 50, borderY: BORDER }, LIMITS),
-    ).toEqual({ height: 54, overflowY: 'hidden' });
+    ).toEqual({ height: 52, overflowY: 'hidden' });
   });
 
   it('lets typed content win once it grows past the placeholder', () => {
     expect(
       chatInputSize({ contentHeight: 82, placeholderHeight: 50, borderY: BORDER }, LIMITS),
-    ).toEqual({ height: 86, overflowY: 'hidden' });
+    ).toEqual({ height: 84, overflowY: 'hidden' });
   });
 
   it('caps height and shows a scrollbar once content overflows', () => {
@@ -59,11 +59,11 @@ describe('chatInputSize', () => {
 
   it('does not show a scrollbar when the border-inclusive height lands on the cap', () => {
     expect(
-      chatInputSize({ contentHeight: 106, placeholderHeight: 0, borderY: BORDER }, LIMITS),
+      chatInputSize({ contentHeight: 108, placeholderHeight: 0, borderY: BORDER }, LIMITS),
     ).toEqual({ height: 110, overflowY: 'hidden' });
     // ...but one pixel more of content past the cap does surface it.
     expect(
-      chatInputSize({ contentHeight: 107, placeholderHeight: 0, borderY: BORDER }, LIMITS),
+      chatInputSize({ contentHeight: 109, placeholderHeight: 0, borderY: BORDER }, LIMITS),
     ).toEqual({ height: 110, overflowY: 'auto' });
   });
 

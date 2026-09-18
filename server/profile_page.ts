@@ -8,6 +8,7 @@
 // pos), so the page leaks nothing the public JSON wouldn't.
 
 import type * as http from 'node:http';
+import { accountLedgerKeysFor } from './account_ledger_keys_cache';
 import { avatarPng, isPlayerClass, isValidSkin } from './avatar';
 import {
   type CharacterSheet,
@@ -89,9 +90,11 @@ export async function handleProfilePage(
       res.end(missingProfileHtml(origin));
       return;
     }
-    const [guild, rank] = await Promise.all([
+    const [guild, rank, accountLedger] = await Promise.all([
       guildNameForCharacter(row.id),
       lifetimeXpRankForCharacter(row.id),
+      // Cosmetic aggregate: a failed ledger read degrades to the character's own fills.
+      accountLedgerKeysFor(row.account_id).catch(() => undefined),
     ]);
     const sheet = characterSheet({
       row,
@@ -100,6 +103,7 @@ export async function handleProfilePage(
       origin,
       guild,
       rank: toSheetRank(rank),
+      accountLedger,
     });
     res.writeHead(200, {
       'Content-Type': 'text/html; charset=utf-8',

@@ -28,6 +28,13 @@ import {
  *  under its established name so no caller of this module moves. */
 export const HARVEST_BODY_RANGE = CORPSE_HARVEST_POPUP_RANGE;
 
+/** The "no pointer position" a pointer-less corpse open passes for BOTH screen
+ *  coordinates (the interact key, a pad press, the mobile interact button):
+ *  the loot popup centers itself instead of anchoring to a cursor, the same
+ *  placement the Professions "Harvest a body" entry gets. Non-finite on
+ *  purpose, so no real pointer coordinate can ever collide with it. */
+export const HARVEST_CHOICE_NO_POINTER = Number.NaN;
+
 export interface HarvestBodyPickWorld {
   player: Entity;
   inventory: readonly Pick<InvSlot, 'itemId' | 'count'>[];

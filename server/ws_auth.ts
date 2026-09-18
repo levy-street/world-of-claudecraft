@@ -15,6 +15,7 @@ import { randomUUID } from 'node:crypto';
 import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
+import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
@@ -114,6 +115,9 @@ export interface WsAuthDeps {
   ) => { fbp?: string | null; fbc?: string | null };
   metaEventSourceUrl: (req: http.IncomingMessage) => string | undefined;
   loadAccountCosmetics: (accountId: number) => Promise<AccountCosmetics>;
+  /** The account ledger load (server/account_ledger_db.ts): which characters
+   *  on the account earned each deed and found each relic. */
+  loadAccountLedger: (accountId: number) => Promise<AccountLedger>;
   isConnectionRefused: (input: {
     blocked: boolean;
     isAdmin: boolean;
@@ -171,6 +175,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     metaRequestUserData,
     metaEventSourceUrl,
     loadAccountCosmetics,
+    loadAccountLedger,
     isConnectionRefused,
     bufferHandshakeMessages,
     requestMetadata,
@@ -352,12 +357,20 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
         rejectHandshake(ws, WS_AUTH_ERROR.tooManyConnections);
         return;
       }
-      const accountCosmetics = await loadAccountCosmetics(accountId);
+      // The account ledger rides beside the cosmetics: both are account-wide
+      // state the join hands the sim, so one round trip covers the pair.
+      const [accountCosmetics, accountLedger] = await Promise.all([
+        loadAccountCosmetics(accountId),
+        // A cosmetic table must never gate login: a failed read joins with a
+        // fresh ledger (the sim's own default) and the next join retries.
+        loadAccountLedger(accountId).catch(() => freshAccountLedger()),
+      ]);
       const joinMeta = {
         ...meta,
         ...metaRequestUserData(req, meta),
         sourceUrl: metaEventSourceUrl(req),
         accountCosmetics,
+        accountLedger,
         isAdmin,
         adminPermissions,
         clientSeed,

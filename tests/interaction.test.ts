@@ -13,6 +13,7 @@
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
 import { ITEMS, MOBS } from '../src/sim/data';
+import { EASTBROOK_NPC_PLACEMENTS_BY_ID } from '../src/sim/eastbrook_layout';
 import { createGroundObject, createMob } from '../src/sim/entity';
 import * as interaction from '../src/sim/interaction';
 import { CORPSE_INTERACT_GRACE_SECONDS } from '../src/sim/loot/loot_roll';
@@ -436,13 +437,16 @@ describe('interaction.interact dispatch', () => {
     // 8.7yd off).
     // Re-pinned again for owner refinement round 6b, which redistributed the
     // town's NPCs by role along the dock road: the q_wolves giver moved out to
-    // the harbour market at (-58, -102), so the probe follows him. The same 2yd
-    // offset south holds every premise this test needs: he is the only entity
-    // of any kind within 12yd of the stand, so he is the nearest quest NPC and
-    // no lootable or ground object is in interact's scan range.
+    // the harbour market at (-58, -102), so the probe follows him.
+    // Re-pinned for the first-quest handoff: the marshal stands beside the
+    // noticeboard on the civic square, so the probe reads his stand from the
+    // layout and keeps the same 2yd offset south. The premises hold there: he
+    // is the nearest NPC (2yd, apothecary_lin 10yd off), and the lootable
+    // board sits outside interact's scan range (6yd, its own radius is 4).
     const sim = new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true }) as AnySim;
     const p = sim.player;
-    place(sim, p, -58, -100);
+    const marshal = EASTBROOK_NPC_PLACEMENTS_BY_ID.marshal_redbrook.position;
+    place(sim, p, marshal.x, marshal.z + 2);
     expect(sim.questState('q_wolves')).toBe('available');
     interaction.interact(ctxOf(sim), p.id);
     expect(sim.questState('q_wolves')).toBe('active');

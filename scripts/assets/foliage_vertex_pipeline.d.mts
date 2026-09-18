@@ -1,4 +1,4 @@
-import type { Document } from '@gltf-transform/core';
+import type { Document, Primitive } from '@gltf-transform/core';
 
 export interface FoliageTownTreeAsset {
   readonly path: string;
@@ -10,5 +10,7 @@ export interface FoliageTownTreeAsset {
 export const FOLIAGE_TOWN_TREE_ASSETS: readonly FoliageTownTreeAsset[];
 
 export function triangleAttributeFingerprint(document: Document): string;
+
+export function primitiveTriangleAttributeFingerprint(primitive: Primitive): string;
 
 export function optimizeFoliageVertexDocument(document: Document, encoder: unknown): Promise<void>;

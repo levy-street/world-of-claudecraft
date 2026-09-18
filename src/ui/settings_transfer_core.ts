@@ -76,7 +76,7 @@ const FULL_KEY_PREFIXES = [
  *  the layout-reset epoch (so a fresh browser does not wipe the imported
  *  frame positions at its first boot), chat/clock/minimap toggles, window
  *  filters and tabs, roster prefs, the chat ignore list, audio and haptics
- *  toggles, language, the proc-overlay anchors, the perf overlay config, the
+ *  toggles, language, the engine indicators' touch anchors, the perf overlay config, the
  *  character-select sort, and the one-time dismissed hints. NEVER a session,
  *  wallet, purchase, attribution or cache key: see tests. */
 const FULL_KEYS = [
@@ -105,6 +105,7 @@ const FULL_KEYS = [
   'woc_native_auto_locale',
   'paladinDevotionAnchor',
   'procOverlayAnchor',
+  'warlockDoomAnchor',
   'woc_perf_overlay',
   'wocc.charSort',
   'woc.tutorial.v1',

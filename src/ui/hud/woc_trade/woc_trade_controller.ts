@@ -1454,35 +1454,41 @@ export class WocTradeController {
           item && parts
             ? itemNameColor({ kind: item.kind, quality: parts.quality ?? 'common' })
             : QUALITY_DEFAULT_COLOR;
-        const inner = `${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}<span style="color:${qColor}">${esc(label)}</span>`;
+        const inner = `<span class="ui-socket ui-socket--bag">${item && parts ? this.itemIcon(item, parts.quality) : unknownItemIconHtml(s.itemId)}</span><span style="color:${qColor}">${esc(label)}</span>`;
         return mine
-          ? `<button type="button" class="trade-item mine" data-item="${esc(s.itemId)}">${inner}</button>`
-          : `<div class="trade-item">${inner}</div>`;
+          ? `<button type="button" class="trade-item mine ui-card" data-item="${esc(s.itemId)}">${inner}</button>`
+          : `<div class="trade-item ui-card">${inner}</div>`;
       };
+      const emptyRows = (count: number, label: string) =>
+        Array.from(
+          { length: Math.max(0, 4 - count) },
+          (_, index) =>
+            `<div class="trade-item trade-item-empty"><span class="ui-socket ui-socket--bag empty" aria-hidden="true"></span>${index === 0 && count === 0 ? `<span class="trade-empty">${esc(label)}</span>` : ''}</div>`,
+        ).join('');
       el.innerHTML = `
-        <div class="panel-title"><span>${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
+        <div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hud.trade.title', { name: info.otherName }))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.trade.cancel'))}">${svgIcon('close')}</button></div>
         <div class="trade-cols">
           <div class="trade-col ${info.myAccepted ? 'accepted' : ''}">
             <h4>${esc(t('hud.trade.yourOffer'))}</h4>
-            <div class="trade-items">${info.myOffer.items.map((s) => itemRow(s, true)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyMine'))}</div>`}</div>
+            <div class="trade-items ui-well">${info.myOffer.items.map((s) => itemRow(s, true)).join('')}${emptyRows(info.myOffer.items.length, t('hud.trade.emptyMine'))}</div>
             <div class="trade-money"><span class="trade-money-label">${esc(t('hud.trade.money'))}:</span>${wocMoneyMine}
               <span class="trade-coins"${wocModel.wocDealStanding ? ' hidden' : ''}>
-                <input class="coininput" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
-                <input class="coininput" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
-                <input class="coininput" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
+                <input class="coininput ui-input" id="trade-g"${goldAttr} type="number" min="0" value="${Math.floor(this.stagedTrade.copper / 10000)}" aria-label="${esc(t('itemUi.money.gold'))}"><span class="coin g" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.goldShort'))}</span>
+                <input class="coininput ui-input" id="trade-s"${goldAttr} type="number" min="0" max="99" value="${Math.floor((this.stagedTrade.copper % 10000) / 100)}" aria-label="${esc(t('itemUi.money.silver'))}"><span class="coin s" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.silverShort'))}</span>
+                <input class="coininput ui-input" id="trade-c"${goldAttr} type="number" min="0" max="99" value="${this.stagedTrade.copper % 100}" aria-label="${esc(t('itemUi.money.copper'))}"><span class="coin c" aria-hidden="true"></span><span class="mkt-coin-tag">${esc(t('itemUi.money.copperShort'))}</span>
               </span>
             </div>
           </div>
           <div class="trade-col ${info.theirAccepted ? 'accepted' : ''}">
             <h4>${esc(t('hud.trade.theirOffer', { name: info.otherName }))}</h4>
-            <div class="trade-items">${info.theirOffer.items.map((s) => itemRow(s, false)).join('') || `<div class="trade-empty">${esc(t('hud.trade.emptyTheirs'))}</div>`}</div>
+            <div class="trade-items ui-well">${info.theirOffer.items.map((s) => itemRow(s, false)).join('')}${emptyRows(info.theirOffer.items.length, t('hud.trade.emptyTheirs'))}</div>
             <div class="trade-money">${esc(t('hud.trade.money'))}: ${wocMoneyTheirs || `<span class="gold">${formatLocalizedMoney(info.theirOffer.copper)}</span>`}</div>
           </div>
         </div>
         <div class="trade-hint">${esc(t('hud.trade.hint'))}</div>
         ${wocTradeArmHtml(wocModel, this.wocTradeUsdCents)}`;
       const acceptBtn = document.createElement('button');
-      acceptBtn.className = 'btn';
+      acceptBtn.className = 'btn ui-btn ui-btn--red';
       // With a $WOC offer standing, agreement lives on the OFFER, not on the sim
       // trade (which this deal never confirms). Reading myAccepted here left the
       // button saying "Accept" after the player had already accepted, and
@@ -1529,7 +1535,7 @@ export class WocTradeController {
         this.sim.tradeConfirm();
       });
       const cancelBtn = document.createElement('button');
-      cancelBtn.className = 'btn';
+      cancelBtn.className = 'btn ui-btn';
       cancelBtn.textContent = t('hud.trade.cancel');
       cancelBtn.addEventListener('click', () => this.sim.tradeCancel());
       // The two window actions in one row (the sheet pins it to the bottom

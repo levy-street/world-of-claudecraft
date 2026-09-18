@@ -24,6 +24,7 @@ import { WARRIOR_TALENTS } from './talents_warrior';
 
 export {
   type ClassChoiceRows,
+  classTalentChoiceAbilityGroups,
   isTalentRowLevel,
   OPTIONS_PER_ROW,
   ROW_COUNT,
@@ -422,6 +423,10 @@ export const TALENTS = {
 
 export function talentsFor(cls: PlayerClass): ClassTalents | null {
   return (TALENTS as Partial<Record<PlayerClass, ClassTalents>>)[cls] ?? null;
+}
+
+export function classSpecs(cls: PlayerClass): string[] {
+  return talentsFor(cls)?.specs.map((s) => s.id) ?? [];
 }
 
 export function hasTalents(cls: PlayerClass): boolean {

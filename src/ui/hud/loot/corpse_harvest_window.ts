@@ -171,7 +171,7 @@ export function renderCorpseHarvestPanel(
   section.className = 'corpse-harvest';
 
   const title = document.createElement('div');
-  title.className = 'corpse-harvest-title';
+  title.className = 'corpse-harvest-title ui-h';
   title.textContent = t('hudChrome.corpseHarvest.preferenceLabel', {
     preference: preferenceLabel(view.preference),
   });
@@ -179,7 +179,7 @@ export function renderCorpseHarvestPanel(
 
   const changeBtn = document.createElement('button');
   changeBtn.type = 'button';
-  changeBtn.className = 'btn btn-secondary corpse-harvest-change-btn';
+  changeBtn.className = 'btn btn-secondary corpse-harvest-change-btn ui-btn';
   changeBtn.textContent = t('hudChrome.corpseHarvest.changeButton');
   changeBtn.addEventListener('click', () => deps.onChange());
   section.appendChild(changeBtn);
@@ -195,7 +195,7 @@ export function renderCorpseHarvestPanel(
 
   const harvestBtn = document.createElement('button');
   harvestBtn.type = 'button';
-  harvestBtn.className = 'btn corpse-harvest-btn';
+  harvestBtn.className = 'btn corpse-harvest-btn ui-btn';
   harvestBtn.textContent = t('hudChrome.corpseHarvest.harvestButton');
   const hardDisabled = view.harvestDisabled || commandPending;
   harvestBtn.disabled = hardDisabled;

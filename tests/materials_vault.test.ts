@@ -31,7 +31,7 @@ import {
   vaultStoredCount,
 } from '../src/sim/materials_vault';
 import { Sim } from '../src/sim/sim';
-import type { Entity, WorldContent } from '../src/sim/types';
+import type { Entity, InvSlot, WorldContent } from '../src/sim/types';
 import { tSim } from '../src/ui/sim_i18n';
 import { predictVaultDepositAll } from '../src/ui/vault_view';
 import { COMMAND_NAMES } from '../src/world_api';
@@ -2464,5 +2464,62 @@ describe('the cvault wire signature premise: stock writers are confined', () => 
     const serverRoot = fileURLToPath(new URL('../server', import.meta.url));
     walk(serverRoot);
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('the sweep and the targeted op share one whole-move rule (vaultRowMovesWhole)', () => {
+  // A mergeable payload (bind-on-trade, the disenchant secondary) partially
+  // fills the headroom under BOTH doors; a locked payload is left carried by
+  // both. The two bodies read one predicate, so they cannot route the same
+  // stack differently (the divergence the sweep's docstring rules out).
+  const bindOnTrade = (): InvSlot => ({
+    itemId: 'copper_ore',
+    count: 5,
+    instance: { bindOnTrade: true },
+  });
+
+  it('the sweep moves what fits of a bind-on-trade stack, exactly like vaultDeposit(0, 2)', () => {
+    const viaSweep = makeSim();
+    const a = meta(viaSweep);
+    a.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 }; // headroom 2
+    a.inventory = [bindOnTrade()];
+    viaSweep.drainEvents();
+    viaSweep.vaultDepositAll();
+    expect(errorTexts(viaSweep.drainEvents())).toEqual([]);
+
+    const viaTargeted = makeSim();
+    const b = meta(viaTargeted);
+    b.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 };
+    b.inventory = [bindOnTrade()];
+    viaTargeted.vaultDeposit(0, 2);
+
+    for (const m of [a, b]) {
+      expect(m.inventory).toHaveLength(1);
+      expect(m.inventory[0]).toMatchObject({ count: 3, instance: { bindOnTrade: true } });
+      expect(m.vault.special).toHaveLength(1);
+      expect(m.vault.special[0]).toMatchObject({ count: 2, instance: { bindOnTrade: true } });
+      expect(vaultStoredCount(m.vault, 'copper_ore')).toBe(40);
+    }
+    expect(a.vault.special).toEqual(b.vault.special);
+    expect(a.inventory).toEqual(b.inventory);
+  });
+
+  it('both doors leave a locked stack carried when it does not fit whole', () => {
+    const locked = (): InvSlot => ({ itemId: 'copper_ore', count: 5, instance: { locked: true } });
+    const viaSweep = makeSim();
+    const a = meta(viaSweep);
+    a.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 };
+    a.inventory = [locked()];
+    viaSweep.vaultDepositAll();
+    const viaTargeted = makeSim();
+    const b = meta(viaTargeted);
+    b.vault = { stock: { copper_ore: 38 }, special: [], upgrades: 1 };
+    b.inventory = [locked()];
+    viaTargeted.vaultDeposit(0);
+    for (const m of [a, b]) {
+      expect(m.inventory).toEqual([locked()]);
+      expect(m.vault.special).toEqual([]);
+      expect(m.vault.stock).toEqual({ copper_ore: 38 });
+    }
   });
 });

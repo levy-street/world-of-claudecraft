@@ -19,7 +19,8 @@ describe('spellbook_window: WCAG chrome (rows + toggles + focus-return)', () => 
   });
 
   it('gives the close control a real button with an aria-label', () => {
-    expect(code).toContain('class="x-btn" data-close aria-label=');
+    // W7 keeps the established close hook while adopting the shared window primitive.
+    expect(code).toContain('class="x-btn ui-x-btn" data-close aria-label=');
     expect(code).toContain("t('abilityUi.spellbook.close')");
   });
 

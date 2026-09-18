@@ -83,9 +83,9 @@ function crafterRecordHtml(row: CommissionOrderRowModel): string {
 function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps): HTMLElement {
   const name = itemName(row);
   const item = document.createElement('div');
-  item.className = 'vendor-item commission-order-row';
+  item.className = 'vendor-item ui-card commission-order-row';
   const glow = row.item?.quality ? qualityGlowShadow(QUALITY_COLOR[row.item.quality]) : '';
-  const socket = `<span class="crafting-recipe-socket"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
+  const socket = `<span class="crafting-recipe-socket ui-socket ui-socket--bag"${glow ? ` style="box-shadow:${glow}"` : ''}>${row.item ? deps.itemIcon(row.item) : ''}</span>`;
   const line =
     row.scope === 'crafter' && row.crafterName
       ? t('hudChrome.commissionBoard.rowTargeted', {
@@ -109,7 +109,7 @@ function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps
   if (row.canCancel) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'vi-price-chip commission-order-btn';
+    btn.className = 'vi-price-chip ui-btn commission-order-btn';
     btn.textContent = t('hudChrome.commissionBoard.cancelButton');
     btn.addEventListener('click', () => deps.onCancel(row.id));
     actions.appendChild(btn);
@@ -117,7 +117,7 @@ function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps
   if (row.canAccept) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'vi-price-chip commission-order-btn';
+    btn.className = 'vi-price-chip ui-btn commission-order-btn';
     btn.textContent = t('hudChrome.commissionBoard.acceptButton');
     btn.addEventListener('click', () => deps.onAccept(row.id));
     actions.appendChild(btn);
@@ -125,7 +125,7 @@ function renderRow(row: CommissionOrderRowModel, deps: CommissionOrderWindowDeps
   if (row.canDeliver) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'vi-price-chip commission-order-btn';
+    btn.className = 'vi-price-chip ui-btn ui-btn--red commission-order-btn';
     btn.textContent = t('hudChrome.commissionBoard.deliverButton');
     btn.title = t('hudChrome.commissionBoard.deliverHint');
     btn.addEventListener('click', () => deps.onDeliver(row.id));
@@ -182,7 +182,7 @@ export function renderCommissionOrderWindow(
 ): void {
   deps.hideTooltip();
   const scrollTop = el.scrollTop;
-  el.innerHTML = `<div class="panel-title"><span>${esc(t('hudChrome.commissionBoard.title'))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.commissionBoard.close'))}">${svgIcon('close')}</button></div>`;
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.commissionBoard.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hudChrome.commissionBoard.close'))}">${svgIcon('close')}</button></div>`;
   // The chrome dialog contract (src/ui/CLAUDE.md): role=dialog, ONE accessible
   // name (the label form; the title span carries no id), aria-modal false like
   // the crafting window it opens from (Hud installs the shared focus trap).
@@ -195,7 +195,7 @@ export function renderCommissionOrderWindow(
 
   // --- the "open a new order" form ---
   const form = document.createElement('div');
-  form.className = 'commission-board-form';
+  form.className = 'commission-board-form ui-card';
   const recipeOptions = model.openableRecipes
     .map((r) => `<option value="${esc(r.recipeId)}">${esc(r.item?.name ?? r.itemId)}</option>`)
     .join('');
@@ -203,13 +203,13 @@ export function renderCommissionOrderWindow(
     `<div class="commission-form-title">${esc(t('hudChrome.commissionBoard.formTitle'))}</div>` +
     (model.openableRecipes.length === 0
       ? `<div class="vi-sub">${esc(t('hudChrome.commissionBoard.recipeEmpty'))}</div>`
-      : `<div class="commission-field"><label for="cob-recipe">${esc(t('hudChrome.commissionBoard.recipeLabel'))}</label><select id="cob-recipe" class="hud-select">${recipeOptions}</select></div>` +
+      : `<div class="commission-field"><label for="cob-recipe">${esc(t('hudChrome.commissionBoard.recipeLabel'))}</label><select id="cob-recipe" class="ui-input">${recipeOptions}</select></div>` +
         `<div class="commission-field"><label>${esc(t('hudChrome.commissionBoard.scopeLabel'))}</label><div class="commission-radio-row">` +
         `<label><input type="radio" name="cob-scope" value="open" checked>${esc(t('hudChrome.commissionBoard.scopeOpen'))}</label>` +
         `<label><input type="radio" name="cob-scope" value="crafter">${esc(t('hudChrome.commissionBoard.scopeCrafter'))}</label>` +
         `</div></div>` +
-        `<div class="commission-field" id="cob-crafter-field" style="display:none"><label for="cob-crafter-name">${esc(t('hudChrome.commissionBoard.crafterNameLabel'))}</label><input id="cob-crafter-name" type="text" maxlength="32" autocomplete="off" placeholder="${esc(t('hudChrome.commissionBoard.crafterNamePlaceholder'))}"></div>` +
-        `<button type="button" class="commission-submit-btn" id="cob-submit">${esc(t('hudChrome.commissionBoard.openSubmit'))}</button>`);
+        `<div class="commission-field" id="cob-crafter-field" style="display:none"><label for="cob-crafter-name">${esc(t('hudChrome.commissionBoard.crafterNameLabel'))}</label><input id="cob-crafter-name" class="ui-input" type="text" maxlength="32" autocomplete="off" placeholder="${esc(t('hudChrome.commissionBoard.crafterNamePlaceholder'))}"></div>` +
+        `<button type="button" class="commission-submit-btn ui-btn ui-btn--red" id="cob-submit">${esc(t('hudChrome.commissionBoard.openSubmit'))}</button>`);
   el.appendChild(form);
 
   const crafterField = form.querySelector<HTMLElement>('#cob-crafter-field');

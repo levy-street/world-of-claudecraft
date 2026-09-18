@@ -47,8 +47,8 @@ describe('character preview memory policy', () => {
     expect(preview).toContain('antialias: policy.antialias');
     expect(preview).toContain('preserveDrawingBuffer: policy.preserveDrawingBuffer');
     expect(preview).toContain('Math.min(window.devicePixelRatio, policy.pixelRatioCap)');
-    const animateStart = preview.indexOf('private animate = (): void => {');
-    const animateEnd = preview.indexOf('\n  private ', animateStart + 1);
+    const animateStart = preview.indexOf('private animateFrame(): void {');
+    const animateEnd = preview.indexOf('\n  /**', animateStart + 1);
     const animate = preview.slice(animateStart, animateEnd);
     expect(animate.indexOf('characterPreviewFrameVisible(')).toBeGreaterThan(-1);
     expect(animate.indexOf('characterPreviewFrameVisible(')).toBeLessThan(

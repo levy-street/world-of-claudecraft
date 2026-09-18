@@ -1,4 +1,9 @@
+import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
+import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
+import { createInterfaceVisibility } from './ui/interface_visibility';
+import { dispatchInterfaceVisibilityAction } from './ui/interface_visibility_core';
+import { MOBILE_CHAT_REPLY_CLASS, START_SCREEN_OPEN_CLASS } from './ui/root_state_classes';
 // Game-client style barrel (declares the @layer order, loads tokens + base, etc.).
 // index.html and play.html both bootstrap through this module, so this one import
 // styles both game entries; admin/guide use their own entries and inline CSS.
@@ -45,6 +50,7 @@ import {
   resolveClickMoveAction,
   stepAngleToward,
 } from './game/click_move';
+import { paintClickMoveMarker } from './game/click_move_marker';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { buildContextRecoveryCallbacks } from './game/context_loss_diagnostics';
@@ -88,6 +94,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
+import { createGameRenderer, validateGameRenderer } from './game/game_renderer';
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
@@ -100,6 +107,7 @@ import { gatherToolProfessionFor, nearestGatherNodeForProfession } from './game/
 import { publishGpuHitchRuntimeReceipt } from './game/gpu_hitch_receipt';
 import { GraphicsRebuildCoordinator } from './game/graphics_rebuild_coordinator';
 import {
+  captureGraphicsSettingsSnapshot,
   type GraphicsSettingsSnapshot,
   graphicsApplyMode,
   graphicsSettingsSnapshotsEqual,
@@ -115,6 +123,7 @@ import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
 import { createGatherEffectConfirm, interactKeyGatherOptions } from './game/interact_key_gather';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
+import { createBgFlagKey } from './game/interaction_input';
 import {
   activePvpOpponentIds,
   HoverPickGate,
@@ -169,11 +178,13 @@ import { sendOnlineMovementFrame } from './game/online_movement_frame';
 import { padCastPress, padCastRelease } from './game/pad_cast_routing';
 import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
 import { padReelItemId } from './game/pad_reel';
+import { dispatchPadSharedEdgeAction } from './game/pad_shared_edge_action';
 import { openTargetSubcommands } from './game/pad_subcommands';
 import { createPadTargetPick } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
+import { runPetCommand } from './game/pet_commands';
 import { kickCharacterPreloadStream, runPostEntryWarmups } from './game/post_entry_warmups_core';
 import { newPresentationGateInput, presentationGate } from './game/presentation_gate';
 import { startRealmBuilderRollLoad } from './game/realm_builder_boot';
@@ -210,6 +221,7 @@ import {
 import { markSpawnIntroSeen, readSpawnIntroSeen } from './game/spawn_intro_seen';
 import { safeStartupGraphicsPreset } from './game/startup_graphics_safety';
 import { shouldClearTargetOnGroundClick } from './game/target_click';
+import { dispatchTargetingAction, targetingInputCallbacks } from './game/targeting_actions';
 import {
   type TeleportCameraArrival,
   teleportCameraArrivalAfterTick,
@@ -361,7 +373,7 @@ import {
 } from './render/gfx';
 import { setNameplateDotScale } from './render/nameplate_dot_scale';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
-import { Renderer } from './render/renderer';
+import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
 import { MovementPredictionPipeline } from './render/self_prediction';
 import { ensureSkyAssetsAt, navigatorSaveData } from './render/sky';
@@ -402,6 +414,7 @@ import {
 } from './sim/types';
 import { zoneBiomeAt } from './sim/world';
 import { startSitePresence } from './site_presence';
+import { applyAbsorbOverlayGate } from './ui/absorb_overlay_gate';
 import {
   accountPortalModel,
   deactivateConfirmReady,
@@ -438,6 +451,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
+import { charselectHintsHtml } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -1098,6 +1112,7 @@ function beginWorldEntry(): boolean {
 function enterLoadingState(statusText: string): void {
   hideMobilePreflightPrompt();
   showLoadingScreen(statusText);
+  document.body.classList.remove(START_SCREEN_OPEN_CLASS);
   $('#start-screen').style.display = 'none';
   releaseStartScreenPreview();
   // Landing-only advisory: never let it survive into the world on top of
@@ -1377,6 +1392,8 @@ async function startGame(
   const nameplates = $('#nameplates') as HTMLDivElement;
 
   const keybinds = new Keybinds(keybindScope);
+  // The Hide Interface toggle (Alt+Z by default): body.interface-hidden.
+  const interfaceVisibility = createInterfaceVisibility(document.body);
   // UI theming: apply the persisted theme's CSS variables to :root, then keep a
   // hook so the Options panel can switch preset / override colours live.
   const themeStore = new ThemeStore();
@@ -1455,12 +1472,12 @@ async function startGame(
         ? inWorldLookFor(e, armorSetForEntity(e.id === world.playerId))
         : npcLookFor(e.templateId, e.kind),
     );
-    // No helmet re-assert here on purpose. The preference is per CHARACTER
-    // now: set from the creator's toggle at creation, changed by the paperdoll
-    // eye afterwards, and serialized into that character's own saved state.
-    // The device-global localStorage key this used to read forced ONE
-    // character's choice onto every character on the machine.
-    renderer = loadSpan('renderer-ctor', () => new Renderer(world, canvas, nameplates));
+    // Helmet visibility belongs to each character's saved state: creator
+    // toggle first, then paperdoll eye. Do not re-assert the old device-wide
+    // preference here and overwrite the current character's choice.
+    renderer = loadSpan('renderer-ctor', () =>
+      createGameRenderer(world, canvas, nameplates, settings),
+    );
     rendererReady = true;
     ktx2RestoreUploadQueue.publish({ queue: renderer.backgroundGpuWork, host: renderer.webgl });
     publishGpuHitchRuntimeReceipt({ search: location.search, renderer: renderer.perfStats() });
@@ -1634,7 +1651,7 @@ async function startGame(
     chatInput.blur();
     // Leave mobile reply mode when the composer closes (issue 1577 round 2 (8)),
     // so the in-log reply button reappears for the read state.
-    document.body.classList.remove('mobile-chat-reply');
+    resetChatComposer(document.body, document.getElementById('chatlog-wrap'));
     hud.clearPendingChatLinks();
     recoverFromMobileKeyboard();
   };
@@ -1665,7 +1682,7 @@ async function startGame(
     ensureMobileComposerInPanel();
     hud.applyChatInputPresentation();
     chatInput.style.display = 'block';
-    document.body.classList.remove('mobile-chat-reply');
+    document.body.classList.remove(MOBILE_CHAT_REPLY_CLASS);
     autosizeChat();
   }
   // Fired for every open path (keybind, whisper context menu, mobile toggle)
@@ -1675,16 +1692,13 @@ async function startGame(
     autosizeChat();
     anchorChatInput();
   });
-  chatInput.addEventListener('focus', () => {
-    // Actively replying (issue 1577 round 2 (7)/(8)): the composer is focused, so
-    // expand it and fade the chat window behind it. Class is mirror-tied to focus
-    // so it clears the moment the composer loses focus.
-    document.body.classList.add('mobile-chat-reply');
-    anchorChatInput();
-    autosizeChat();
-  });
-  chatInput.addEventListener('blur', () => {
-    document.body.classList.remove('mobile-chat-reply');
+  bindChatComposerFocusState(chatInput, {
+    body: document.body,
+    wrap: document.getElementById('chatlog-wrap'),
+    onFocus: () => {
+      anchorChatInput();
+      autosizeChat();
+    },
   });
   chatInput.addEventListener('input', () => {
     autosizeChat();
@@ -1717,10 +1731,10 @@ async function startGame(
         closeChat();
         return;
       }
-      // "/share" links the selected quest into party chat; skip the normal send path.
+      // Client-answered commands ("/share" quest link, "/who" Who tab online) skip the send.
       if (hud.devCommandsAvailable && isDevGuiCommand(raw)) {
         hud.toggleDevCommandWindow();
-      } else if (!hud.maybeHandleQuestShareCommand(raw)) {
+      } else if (!hud.maybeHandleLocalChatCommand(raw)) {
         const text = hud.composeChatSend(raw);
         if (text) {
           world.chat(text);
@@ -1769,21 +1783,11 @@ async function startGame(
   const input = new Input(
     canvas,
     {
-      onTab: () => world.tabTarget(),
-      onTabPrev: () => world.tabTargetPrev(),
-      onTargetFriendly: () => world.targetNearestFriendly(),
-      onCycleFriendly: () => world.friendlyTabTarget(),
-      // Pet bar (Ctrl+1..5 by default): drive the existing IWorld pet commands.
-      onPet: (action) => {
-        if (action === 'attack') world.petAttack();
-        else if (action === 'taunt') world.petTaunt();
-        else if (action === 'stop') world.setPetMode('passive');
-        else world.setPetMode(action); // 'defensive' | 'aggressive'
-      },
-      // Ctrl+6 by default: select your own pet, the keyboard route to what clicking
-      // the pet frame does (one implementation, on the Hud, which owns the roster
-      // scan that resolves the pet).
-      onTargetPet: () => hud.targetOwnPet(),
+      // The targeting slice (the Tab cycles, the friendly picks, Pet: Mark, the
+      // F-row party hotkeys): one implementation with the pad arm below.
+      ...targetingInputCallbacks(world, hud, settings),
+      // Pet bar (Ctrl+1..5 by default): the shared routing in pet_commands.ts.
+      onPet: (action) => runPetCommand(world, action),
       // slot 0 (key 1) is Attack for every class, auto-attack without needing
       // right-click; keys and clicks share the Hud's remappable slot layout
       onAbility: (slot) => hud.castSlot(slot),
@@ -1793,6 +1797,7 @@ async function startGame(
       onUiKey: (key) => {
         if (key !== 'escape') hud.cancelGroundAim();
         if (dispatchCollectionAction(key, hud)) return;
+        if (dispatchInterfaceVisibilityAction(key, interfaceVisibility)) return;
         switch (key) {
           case 'interact':
             interactKey();
@@ -1863,6 +1868,9 @@ async function startGame(
             openChat();
             break;
           case 'escape':
+            // A hidden interface comes back first: Escape is the one key that
+            // can never be rebound away, so it is the guaranteed way out.
+            if (interfaceVisibility.show()) break;
             if (hud.cancelGroundAim()) break;
             // close the topmost panel; if nothing was open, open the game menu
             if (!hud.closeAll()) hud.toggleOptionsMenu();
@@ -2055,7 +2063,7 @@ async function startGame(
     });
   }, APM_BEAT_MS);
   const gamepadBindings = new GamepadBindings();
-  const crossHotbar = createCrossHotbar(() => hud, keybindScope);
+  const crossHotbar = createCrossHotbar(() => hud, keybindScope, gamepadBindings);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
   function dispatchGamepadAction(id: string): void {
     // Cancel backs out one step at a time: the top window, then the target. Only
@@ -2071,27 +2079,22 @@ async function startGame(
       return;
     }
     if (id === 'escape') {
+      if (interfaceVisibility.show()) return;
       if (hud.cancelGroundAim()) return;
       if (!hud.closeAll()) hud.toggleOptionsMenu();
       return;
     }
     if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
+    // Shared keyboard/controller arms: pet commands, hide-interface, camera zoom.
+    if (dispatchPadSharedEdgeAction(id, { input, interfaceVisibility, world })) return;
     if (id.startsWith('slot')) {
       hud.pressSlot(Number(id.slice(4)));
       return;
     }
     hud.cancelGroundAim();
     if (dispatchCollectionAction(id, hud)) return;
+    if (dispatchTargetingAction(id, world, hud, settings)) return;
     switch (id) {
-      case 'target':
-        world.tabTarget();
-        break;
-      case 'targetPrev':
-        world.tabTargetPrev();
-        break;
-      case 'targetFriendly':
-        world.targetNearestFriendly();
-        break;
       // Selecting the people you talk to. The sim's friendly cycle answers heal
       // eligibility and so skips every quest giver, which left a pad player with
       // no way to pick one; targetEntity is the seam that already exists for it.
@@ -2106,9 +2109,6 @@ async function startGame(
         if (next !== null) world.targetEntity(next);
         break;
       }
-      case 'targetFriendlyNext':
-        world.friendlyTabTarget();
-        break;
       case 'interact': {
         // The pad reel (the UX pass): mid fishing cast, the interact press
         // answers the bite by re-using the rod (the sim's armed-window arm),
@@ -2185,28 +2185,6 @@ async function startGame(
         // The controller panel has always OFFERED this bind (it lists every
         // edge keybind action); the dispatch dropped it silently.
         hud.toggleCrafting();
-        break;
-      case 'petStop':
-        // The pet edges, the dungeon finder, and the sheathe toggle: the
-        // same offered-but-dropped sweep that found Crafting (the controller
-        // panel lists every edge keybind action), each wired to its exact
-        // keyboard handler.
-        world.setPetMode('passive');
-        break;
-      case 'petTaunt':
-        world.petTaunt();
-        break;
-      case 'petAttack':
-        world.petAttack();
-        break;
-      case 'petDefensive':
-        world.setPetMode('defensive');
-        break;
-      case 'petAggressive':
-        world.setPetMode('aggressive');
-        break;
-      case 'targetPet':
-        hud.targetOwnPet();
         break;
       case 'dungeonFinder':
         hud.toggleDungeonFinder();
@@ -2395,9 +2373,14 @@ async function startGame(
       renderer.setWaterRipples(settings.set('waterRipples', !!value));
       return;
     }
+    if (key === 'partyFrameShowAbsorbs') {
+      // Party rows read it live (Hud.updatePartyFrames); the player / target
+      // overlays are gated by one root class hud.css keys on.
+      applyAbsorbOverlayGate(document.documentElement, settings.set(key, !!value));
+      return;
+    }
     if (
       key === 'partyFrameShowResource' ||
-      key === 'partyFrameShowAbsorbs' ||
       key === 'partyFrameShowAuras' ||
       key === 'partyFrameShowPets' ||
       key === 'partyFrameShowSelf'
@@ -2754,16 +2737,9 @@ async function startGame(
   // apply persisted settings to the freshly-built subsystems
   const saved = settings.all();
   for (const k of Object.keys(saved) as (keyof GameSettings)[]) applySetting(k, saved[k]);
-  const captureGraphicsSettings = (): GraphicsSettingsSnapshot =>
-    normalizeGraphicsSettingsSnapshot({
-      graphicsPreset: settings.get('graphicsPreset'),
-      terrainDetail: settings.get('terrainDetail'),
-      foliageDensity: settings.get('foliageDensity'),
-      surfaceDetail: settings.get('surfaceDetail'),
-      effectsQuality: settings.get('effectsQuality'),
-      shadowQuality: settings.get('shadowQuality'),
-    });
-  let appliedGraphicsSettings = captureGraphicsSettings();
+  let appliedGraphicsSettings: GraphicsSettingsSnapshot = captureGraphicsSettingsSnapshot((key) =>
+    settings.get(key),
+  );
   const graphicsCapabilities = captureGfxCapabilities(renderer.webgl);
   const configureRebuiltRenderer = (next: Renderer): void => {
     next.showNameplates = renderer.showNameplates;
@@ -2859,7 +2835,7 @@ async function startGame(
       activateGfxProfile(resolveGfxProfile(graphicsCapabilities, target, location.search)).epoch,
     resetProfileResources: () => resetGraphicsProfileDerivedCaches(),
     buildRenderer: (_target, recycled) => {
-      const next = new Renderer(world, recycled.canvas, nameplates, {
+      const next = createGameRenderer(world, recycled.canvas, nameplates, settings, {
         context: recycled.context,
         initializeGfx: false,
       });
@@ -2883,12 +2859,7 @@ async function startGame(
       await next.farVistaReady();
       await ktx2MipsRestored();
     },
-    validateRenderer: (next) => {
-      next.sync(1, 0, null, 0, null);
-      if (next.webgl.getContext().isContextLost()) {
-        throw new Error('WebGL2 context was lost while validating the rebuilt renderer');
-      }
-    },
+    validateRenderer: validateGameRenderer,
     commit: (next, target) => {
       settings.patch(target);
       configureRebuiltRenderer(next);
@@ -3358,12 +3329,7 @@ async function startGame(
       }
     }
   }
-  // The deliberate Thornhollow Fields flag press: always attempted, the world
-  // owns every rule (radius, team, the return-beats-press race), so a stray
-  // press is a no-op.
-  function bgFlagKey(): void {
-    if (world.bgInfo?.match) world.bgFlagAction();
-  }
+  const bgFlagKey = createBgFlagKey(world);
 
   // The R40 per-use effect confirm gate, shared by every gather entry point
   // (world click, interact key, gathering-tool use).
@@ -3388,8 +3354,6 @@ async function startGame(
     );
   }
 
-  // The pad's own selection rules (which npc a talk press addresses, which enemy
-  // a cast picks) live in src/game/pad_target_pick.ts; this carries the calls.
   const padTargetPick = createPadTargetPick({ world, interactKey });
 
   function attackNearest(): void {
@@ -3695,7 +3659,7 @@ async function startGame(
       !world.player.dead &&
       (!!input.clickMoveTarget || nowMs < clickMoveMarkerHideAt);
     if (!show) {
-      clickMoveMarker.classList.remove('active', 'entity', 'pulse', 'blocked');
+      paintClickMoveMarker(clickMoveMarker, 'hidden');
       return;
     }
     const screen = renderer.worldToScreen(target.x, world.player.pos.y + 0.05, target.z);
@@ -3706,21 +3670,19 @@ async function startGame(
       screen.y < -80 ||
       screen.y > window.innerHeight + 80;
     if (offscreen) {
-      clickMoveMarker.classList.remove('active', 'pulse', 'blocked');
+      paintClickMoveMarker(clickMoveMarker, 'offscreen');
       return;
     }
-    clickMoveMarker.style.transform = `translate(${screen.x.toFixed(0)}px, ${screen.y.toFixed(0)}px) translate(-50%, -50%)`;
-    clickMoveMarker.classList.toggle('entity', input.clickMoveEntityId !== null);
-    // Only meaningful for a live destination you're still trying to reach (not the
-    // brief post-arrival fade), so gate on an active target.
-    clickMoveMarker.classList.toggle('blocked', !!input.clickMoveTarget && playerImmobilized());
-    clickMoveMarker.classList.add('active');
-    if (pulseChanged || clickMoveMarker.dataset.pulse !== String(input.clickMovePulse)) {
-      clickMoveMarker.dataset.pulse = String(input.clickMovePulse);
-      clickMoveMarker.classList.remove('pulse');
-      void clickMoveMarker.offsetWidth;
-      clickMoveMarker.classList.add('pulse');
-    }
+    paintClickMoveMarker(clickMoveMarker, {
+      x: screen.x,
+      y: screen.y,
+      entity: input.clickMoveEntityId !== null,
+      // Only meaningful for a live destination you're still trying to reach (not the
+      // brief post-arrival fade), so gate on an active target.
+      blocked: !!input.clickMoveTarget && playerImmobilized(),
+      pulse: input.clickMovePulse,
+      pulseChanged,
+    });
   }
 
   let last = performance.now();
@@ -3912,6 +3874,7 @@ async function startGame(
     playerImmobilized: false,
     posX: 0,
     climbing: undefined,
+    leaping: undefined,
     riftFloor: null,
   };
   function updateCamera(frameDt: number, interpFacing: number): void {
@@ -4595,6 +4558,7 @@ async function startGame(
     selfMotionGateArgs.playerImmobilized = playerImmobilized();
     selfMotionGateArgs.posX = pe.pos.x;
     selfMotionGateArgs.climbing = pe.climbing;
+    selfMotionGateArgs.leaping = pe.leaping;
     selfMotionGateArgs.riftFloor = net.riftFloor;
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
@@ -5036,7 +5000,7 @@ async function startGame(
         loadPhaseEnd('settle-cover');
         loadPhaseStart('curtain-fade');
         renderer.markGpuHitchReveal();
-        finishShaderWarmup(renderer.webgl);
+        finishShaderWarmup(renderer.webgl, { queue: renderer.backgroundGpuWork });
         hideLoadingScreen();
         // Start the intro clock as the loading screen begins to fade: the camera
         // holds the opening pose until now, so the fade doubles as the cut in.
@@ -6708,13 +6672,9 @@ async function refreshCharacters(): Promise<void> {
       row.dataset.class = c.class;
       row.dataset.skin = String(c.skin ?? 0);
       const className = classDisplayName(c.class);
-      // Online characters explain themselves on their own hint line (below the
-      // class) instead of the terse "(in world)" suffix, so the reason for the
-      // Take Over button is unmissable.
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
-      const inWorldHint = c.online
-        ? `<span class="char-inworld-hint">${esc(t('character.inWorldHint'))}</span>`
-        : '';
+      // Zone line plus the in-world notice (src/ui/charselect_hints.ts).
+      const hintsHtml = charselectHintsHtml(c);
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable
@@ -6739,7 +6699,7 @@ async function refreshCharacters(): Promise<void> {
         <div class="char-id">
           <span class="char-name">${esc(c.name)}</span>
           <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
-          ${inWorldHint}
+          ${hintsHtml}
         </div>
         ${
           c.forceRename
@@ -7309,13 +7269,7 @@ function renderClassDetails(
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);
           } else if (secondaryEffect.type === 'imbue') {
-            // Same rule as ability_description's $d: a coat with a damage
-            // rider reads the rider, not its zero flat swing bonus.
-            dmgText = formatClassDetailNumber(
-              secondaryEffect.coat?.rider === 'stackDot'
-                ? Math.max(1, Math.round(secondaryEffect.coat.perTick))
-                : secondaryEffect.bonus,
-            );
+            dmgText = formatAbilityImbueDamage(secondaryEffect);
           }
         }
       }

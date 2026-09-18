@@ -135,6 +135,11 @@ export interface ReliquaryTrackerWorld {
   deedsEarned: { size: number };
   ownedMounts(): readonly string[];
   accountCosmetics: { weaponSkinIds: readonly string[] };
+  // The account ledger halves (both worlds mirror them): an alt's find or earn
+  // changes the account-wide completion the pinned pages read, so both sizes
+  // ride the ownership signature.
+  reliquaryAccountFinds?: { size: number };
+  accountDeeds?: { size: number };
 }
 
 /**
@@ -171,6 +176,8 @@ export function makeReliquaryTrackerInput(
         deedsEarned: w.deedsEarned.size,
         mounts: w.ownedMounts().length,
         weaponSkins: w.accountCosmetics.weaponSkinIds.length,
+        accountFinds: w.reliquaryAccountFinds?.size ?? 0,
+        accountDeeds: w.accountDeeds?.size ?? 0,
       });
     },
     collapsed: false,
@@ -220,6 +227,11 @@ export function reliquaryTrackerOwnershipSig(parts: {
   deedsEarned: number;
   mounts: number;
   weaponSkins: number;
+  /** reliquaryAccountFinds.size (the account ledger's relic half). Optional so
+   *  a host with no ledger signs exactly as before. */
+  accountFinds?: number;
+  /** accountDeeds.size (the ledger's deed half, for title relics). */
+  accountDeeds?: number;
 }): number {
   // Math.imul per step keeps every intermediate in int32: one trailing |0 over
   // float products would start rounding low bits away once an intermediate
@@ -229,6 +241,8 @@ export function reliquaryTrackerOwnershipSig(parts: {
   sig = (Math.imul(sig, 1009) + parts.deedsEarned) | 0;
   sig = (Math.imul(sig, 1009) + parts.mounts) | 0;
   sig = (Math.imul(sig, 1009) + parts.weaponSkins) | 0;
+  sig = (Math.imul(sig, 1009) + (parts.accountFinds ?? 0)) | 0;
+  sig = (Math.imul(sig, 1009) + (parts.accountDeeds ?? 0)) | 0;
   return sig;
 }
 

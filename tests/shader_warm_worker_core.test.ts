@@ -468,10 +468,46 @@ describe('warm scheduler settles and cancels', () => {
     scheduler.markSettled(1);
     scheduler.markSettled(404);
     scheduler.markFailed(404);
+    scheduler.markRejected(1);
+    scheduler.markRejected(404);
     const snapshot = scheduler.snapshot();
     expect(snapshot.settled).toBe(1);
     expect(snapshot.failed).toBe(0);
+    expect(snapshot.rejected).toBe(0);
     expect(snapshot.inFlight).toBe(0);
+  });
+
+  it('keeps the window when the context rejects a program, and halves it when a link fails', () => {
+    // The RTX 3060 cold entry: one program the worker context refused turned
+    // a window of three into one, and the client read that as a worker four
+    // times too slow for the session. A refusal is not congestion; a link past
+    // the deadline is, and keeps halving.
+    const grownTo2 = (): Rig => {
+      const r = rig();
+      for (let id = 1; id <= 6; id++) r.scheduler.enqueue({ id, priority: 10 });
+      expect(r.drain()).toEqual([1]);
+      r.advance(40);
+      r.scheduler.markSettled(1);
+      expect(r.drain()).toEqual([2]);
+      r.advance(40);
+      r.scheduler.markSettled(2);
+      expect(r.scheduler.snapshot().budget.windowLinks).toBe(2);
+      expect(r.drain()).toEqual([3, 4]);
+      return r;
+    };
+
+    const rejected = grownTo2();
+    rejected.scheduler.markRejected(3);
+    expect(rejected.scheduler.snapshot()).toMatchObject({ rejected: 1, failed: 0, inFlight: 1 });
+    expect(rejected.scheduler.snapshot().budget).toMatchObject({ windowLinks: 2, backoffCount: 0 });
+    // The slot it held is free again at the same window.
+    expect(rejected.drain()).toEqual([5]);
+
+    const failed = grownTo2();
+    failed.scheduler.markFailed(3);
+    expect(failed.scheduler.snapshot()).toMatchObject({ rejected: 0, failed: 1 });
+    expect(failed.scheduler.snapshot().budget).toMatchObject({ windowLinks: 1, backoffCount: 1 });
+    expect(failed.drain()).toEqual([]);
   });
 
   it('counts what it did and says when there is nothing left to do', () => {

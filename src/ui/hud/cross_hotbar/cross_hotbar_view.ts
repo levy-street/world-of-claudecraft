@@ -86,6 +86,11 @@ export interface CrossHotbarHold {
   /** The arrange chord's glyphs, so the resting bar can name the way into edit
    *  mode instead of hiding it in the options panel. */
   arrange: { bumper: string; button: string };
+  /** The button that changes standing set, printed under the set pips. The pips
+   *  say WHICH set is live; nothing else says how to change it, and the bind is
+   *  remappable, so it cannot be a letter in the markup. Empty when the player
+   *  has cleared that bind. */
+  swap: string;
 }
 
 /**

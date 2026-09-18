@@ -136,6 +136,58 @@ describe('createCachedRead: stale-serve on refresh failure', () => {
   });
 });
 
+describe('createCachedRead: refresh (the warm loops)', () => {
+  it('refreshes inside the TTL window where read() would serve the cache, and installs', async () => {
+    let value = 'first';
+    const refresh = vi.fn(async () => value);
+    const cache = createCachedRead(refresh, { ttlMs: 1_000, now: () => 0 });
+    await expect(cache.read()).resolves.toBe('first');
+    value = 'second';
+    await expect(cache.read()).resolves.toBe('first');
+    expect(refresh).toHaveBeenCalledOnce();
+    await expect(cache.refresh()).resolves.toBe('second');
+    expect(refresh).toHaveBeenCalledTimes(2);
+    expect(cache.peek()).toBe('second');
+    await expect(cache.read()).resolves.toBe('second');
+  });
+
+  it('shares ONE flight with a concurrent refresh or read', async () => {
+    const d = deferred<string>();
+    const refresh = vi.fn(() => d.promise);
+    const cache = createCachedRead(refresh, { ttlMs: 1_000, now: () => 0 });
+    const flights = [cache.refresh(), cache.refresh(), cache.read()];
+    expect(refresh).toHaveBeenCalledOnce();
+    d.resolve('board');
+    await expect(Promise.all(flights)).resolves.toEqual(['board', 'board', 'board']);
+    expect(refresh).toHaveBeenCalledOnce();
+  });
+
+  it('rejects on failure and never stale-serves (a warm loop logs and moves on)', async () => {
+    let fail = false;
+    const refresh = vi.fn(async () => {
+      if (fail) throw new Error('db down');
+      return 'board';
+    });
+    const cache = createCachedRead(refresh, { ttlMs: 1_000, now: () => 0 });
+    await cache.read();
+    fail = true;
+    await expect(cache.refresh()).rejects.toThrow('db down');
+    // The installed value survives for read()'s stale-serve.
+    expect(cache.peek()).toBe('board');
+  });
+
+  it('declines its install when a bust lands mid-flight (the epoch guard)', async () => {
+    const d = deferred<string>();
+    const refresh = vi.fn(() => d.promise);
+    const cache = createCachedRead(refresh, { ttlMs: 1_000, now: () => 0 });
+    const flight = cache.refresh();
+    cache.bust();
+    d.resolve('pre-bust');
+    await expect(flight).resolves.toBe('pre-bust');
+    expect(cache.peek()).toBeNull();
+  });
+});
+
 describe('createCachedRead: bust', () => {
   it('forces the next read to refresh even inside the TTL window; peek() empties', async () => {
     let t = 0;

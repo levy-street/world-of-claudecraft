@@ -115,7 +115,10 @@ function paint(
 describe('UnitFramePainter: the player instance routes every write through the elided writers', () => {
   it('paints level, hp, absorb, resource type/fill/text and NOTHING else (byte-faithful)', () => {
     const calls = paint(playerDescriptor());
-    // absorb { hp: 300, maxHp: 600, auras: [] } -> fillFrac = 300/600 = 0.5 (no shield).
+    // absorb { hp: 300, maxHp: 600, auras: [] } -> no shield -> the overlay SEGMENT
+    // collapses to zero width at the health edge. (The old left-anchored
+    // scaleX(fillFrac) = scaleX(0.5) hatched the whole health fill with no shield
+    // up: the striped-hp-bar bug.)
     // No setDisplay (CSS owns it), no name (static, set at login), no dead/oor
     // (player frame never carries them): exactly the inline block + the absorb /
     // resource-type folds.
@@ -123,12 +126,13 @@ describe('UnitFramePainter: the player instance routes every write through the e
       { m: 'setText', args: [LEVEL, '60'] },
       { m: 'setTransform', args: [HP_FILL, 'scaleX(0.5)'] },
       { m: 'setText', args: [HP_TEXT, '300 / 600'] },
-      { m: 'setTransform', args: [ABSORB, 'scaleX(0.5)'] },
+      { m: 'setTransform', args: [ABSORB, 'translateX(50%) scaleX(0)'] },
       { m: 'toggleClass', args: [ABSORB, 'overshield', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'rage', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'energy', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'focus', false] },
       { m: 'toggleClass', args: [RES_CONTAINER, 'mana', true] },
+      { m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', false] },
       { m: 'setTransform', args: [RES_FILL, 'scaleX(0.8)'] },
       { m: 'setText', args: [RES_TEXT, '80 / 100'] },
     ]);
@@ -150,6 +154,13 @@ describe('UnitFramePainter: the player instance routes every write through the e
     const focus = paint(playerDescriptor({ resourceKind: 'focus' }));
     expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'focus', true] });
     expect(focus).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'mana', false] });
+  });
+
+  it('shrinks the empty resource rail and restores it when text returns', () => {
+    const empty = paint(playerDescriptor({ resourceKind: 'none', resFrac: 0, resText: '' }));
+    expect(empty).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', true] });
+    const filled = paint(playerDescriptor());
+    expect(filled).toContainEqual({ m: 'toggleClass', args: [RES_CONTAINER, 'is-empty', false] });
   });
 
   it('folds the absorb overshield toggle onto the elided writers', () => {
@@ -174,8 +185,49 @@ describe('UnitFramePainter: the player instance routes every write through the e
         },
       }),
     );
-    expect(calls).toContainEqual({ m: 'setTransform', args: [ABSORB, 'scaleX(1)'] });
+    // Right-aligned segment: start = 1 - 50/600, size = 50/600 (never scaleX(1)).
+    expect(calls).toContainEqual({
+      m: 'setTransform',
+      args: [ABSORB, `translateX(91.667%) scaleX(${50 / 600})`],
+    });
     expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', true] });
+  });
+
+  it('hatches ONLY the shield segment past current health, never the health fill', () => {
+    // hp 300 + shield 60 over 600 -> the overlay starts at the 50% health edge and
+    // spans 10% of the bar (a 300-hp / 30-shield tank reads as 10% hatched, not 100%).
+    const calls = paint(
+      playerDescriptor({
+        absorb: {
+          hp: 300,
+          maxHp: 600,
+          auras: [
+            {
+              id: 'power_word_shield',
+              name: 'Power Word: Shield',
+              kind: 'absorb',
+              remaining: 30,
+              duration: 30,
+              value: 60,
+              sourceId: 1,
+              school: 'holy',
+            },
+          ],
+        },
+      }),
+    );
+    expect(calls).toContainEqual({
+      m: 'setTransform',
+      args: [ABSORB, 'translateX(50%) scaleX(0.1)'],
+    });
+    expect(calls).toContainEqual({ m: 'toggleClass', args: [ABSORB, 'overshield', false] });
+    // The shield segment never carries a left-anchored fill transform.
+    expect(
+      calls.some(
+        (c) =>
+          c.m === 'setTransform' && c.args[0] === ABSORB && /^scaleX\(/.test(String(c.args[1])),
+      ),
+    ).toBe(false);
   });
 });
 
@@ -311,6 +363,78 @@ describe('UnitFramePainter: the portrait repaint gate (lastPortraitTarget path)'
     const first = calls.length;
     painter.paint(unitFrameView(playerDescriptor({ portraitKey: 'k2' })));
     expect(calls.length - first).toBe(first); // the changing key added nothing
+  });
+});
+
+describe('UnitFramePainter: the raid-marker badge (target frame)', () => {
+  const BADGE = { tag: 'raidMarker' } as unknown as HTMLElement;
+  const MARKED_ELEMENTS: UnitFrameElements = { ...FULL_ELEMENTS, raidMarker: BADGE };
+  const urlFor = (marker: number) => `data:marker-${marker}`;
+
+  it('paints the resolved symbol url and shows the badge for a marked unit', () => {
+    const calls = paint(playerDescriptor({ raidMarker: 5 }), MARKED_ELEMENTS, {
+      raidMarkerUrl: urlFor,
+    });
+    const badge = calls.filter((c) => c.args[0] === BADGE);
+    expect(badge).toEqual([
+      { m: 'setStyleProp', args: [BADGE, 'background-image', 'url(data:marker-5)'] },
+      { m: 'setDisplay', args: [BADGE, 'block'] },
+    ]);
+  });
+
+  it('hides the badge and clears the image for an unmarked unit', () => {
+    const calls = paint(playerDescriptor({ raidMarker: null }), MARKED_ELEMENTS, {
+      raidMarkerUrl: urlFor,
+    });
+    const badge = calls.filter((c) => c.args[0] === BADGE);
+    expect(badge).toEqual([
+      { m: 'setDisplay', args: [BADGE, 'none'] },
+      { m: 'setStyleProp', args: [BADGE, 'background-image', ''] },
+    ]);
+  });
+
+  it('hides the badge when no url resolver is wired, even for a marked unit', () => {
+    const calls = paint(playerDescriptor({ raidMarker: 2 }), MARKED_ELEMENTS);
+    const badge = calls.filter((c) => c.args[0] === BADGE);
+    expect(badge.some((c) => c.m === 'setDisplay' && c.args[1] === 'block')).toBe(false);
+    expect(badge.some((c) => c.m === 'setDisplay' && c.args[1] === 'none')).toBe(true);
+  });
+
+  it('resolves the symbol url once per marker change, never per repeated frame', () => {
+    const { calls, writers } = recordingFacet();
+    const resolver = vi.fn(urlFor);
+    const painter = new UnitFramePainter(writers, MARKED_ELEMENTS, { raidMarkerUrl: resolver });
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 4 })));
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 4 })));
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 4 })));
+    expect(resolver).toHaveBeenCalledTimes(1);
+    painter.paint(unitFrameView(playerDescriptor({ raidMarker: 1 })));
+    expect(resolver).toHaveBeenCalledTimes(2);
+    const urls = calls
+      .filter((c) => c.args[0] === BADGE && c.m === 'setStyleProp')
+      .map((c) => c.args[2]);
+    expect(urls).toEqual([
+      'url(data:marker-4)',
+      'url(data:marker-4)',
+      'url(data:marker-4)',
+      'url(data:marker-1)',
+    ]);
+  });
+
+  it('an instance without the badge element pays zero marker writes (player, party)', () => {
+    const calls = paint(playerDescriptor({ raidMarker: 2 }), FULL_ELEMENTS, {
+      raidMarkerUrl: urlFor,
+    });
+    expect(calls.some((c) => c.args[0] === BADGE)).toBe(false);
+    expect(calls.some((c) => c.args[1] === 'background-image')).toBe(false);
+  });
+
+  it('writes nothing for the badge while the unit is absent (the family contract)', () => {
+    const calls = paint(playerDescriptor({ present: false, raidMarker: 2 }), MARKED_ELEMENTS, {
+      shownDisplay: 'flex',
+      raidMarkerUrl: urlFor,
+    });
+    expect(calls).toEqual([{ m: 'setDisplay', args: [FRAME, 'none'] }]);
   });
 });
 

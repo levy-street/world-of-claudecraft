@@ -35,6 +35,7 @@ export type ShaderWarmMode = 'off' | 'reveal' | 'all';
 export type ShaderWarmBypass =
   | 'mode-off'
   | 'unavailable'
+  | 'standing-down'
   | 'before-reveal'
   | 'actionable'
   | 'live-view'
@@ -42,9 +43,10 @@ export type ShaderWarmBypass =
   | 'piece-mismatch'
   | 'nothing-to-warm';
 
-/** Held gates expiring in a row before the client retires the worker for the
- *  rest of the renderer's life: three is one too many to be one slow link,
- *  and each expiry is a reveal delayed by the whole hold cap. */
+/** Held gates the worker answered nothing through, in a row, before the
+ *  client retires the worker for the rest of the renderer's life: three is
+ *  one too many to be one slow link, and each such hold is a reveal delayed
+ *  by the whole hold cap or by the worker's own link deadline. */
 export const SHADER_WARM_TIMEOUT_BREAKER = 3;
 
 /** The breaker's second rule, for a worker that keeps answering SOMEONE
@@ -72,6 +74,62 @@ export const SHADER_WARM_EVIDENCE_LINKS = 3;
  *  so this only catches a message whose window reads as nothing. */
 export const SHADER_WARM_WINDOW_FALLBACK = 1;
 
+/** Cannot-serve verdicts that RETIRE the worker. The first ones only release:
+ *  the verdict prices one burst (the queue ahead of the oldest hold at that
+ *  moment), and a verdict read off a window that had just halved condemned a
+ *  worker that warmed 174 programs on the next launch (RTX 3060, 2026-09-12).
+ *  A release ends that burst's holds and keeps the worker; the same count as
+ *  the wedged rule turns repeated bursts into a retirement. */
+export const SHADER_WARM_RELEASE_BREAKER = 3;
+
+/** Programs the readout names after the worker failed them, first ones kept:
+ *  enough to tell a source mismatch between the dry assembly and the real
+ *  link from the known silent link failures, small enough for a capture. */
+export const SHADER_WARM_FAILED_PROGRAMS_KEPT = 8;
+
+/** The A/B experiment deciding whether `auto` keeps the worker on D3D11, run
+ *  for one release and removed by the decision PR whatever it shows. */
+export const SHADER_WARM_AB_ACTIVE = true;
+
+/** The refusal token the `off` arm reports on the typed refusal column, so
+ *  the fleet splits the arms without a new column. It is not a refusal: a
+ *  refusal-share reading must exclude it while the experiment runs. */
+export const SHADER_WARM_AB_REFUSAL = 'ab:off';
+
+export type ShaderWarmAbArm = 'on' | 'off';
+
+export interface ShaderWarmAbInputs {
+  setting: ShaderWarmSetting;
+  backend: GpuBackendClass | null;
+  platform: ShaderWarmPlatform;
+  /** What the browser profile stored the first time; anything but an arm is
+   *  no draw yet. */
+  stored: string | null;
+  /** A draw in [0, 1). Owes nothing to the GPU: the arm must not depend on
+   *  the machine it measures. */
+  random: () => number;
+}
+
+/** The arm for this launch, and the arm to store when this launch drew it.
+ *  Drawn only where `auto` would start the worker: an explicit setting is
+ *  never overridden, and a backend `auto` leaves off has nothing to compare.
+ *  Once per browser profile, so a machine stays in one arm for the whole
+ *  experiment and neither arm runs on caches the other arm's worker warmed. */
+export function shaderWarmAbArmFor(inputs: ShaderWarmAbInputs): {
+  arm: ShaderWarmAbArm | null;
+  store: ShaderWarmAbArm | null;
+} {
+  if (!SHADER_WARM_AB_ACTIVE) return { arm: null, store: null };
+  if (inputs.setting !== 'auto') return { arm: null, store: null };
+  if (shaderWarmModeFor('auto', inputs.backend, inputs.platform) === 'off') {
+    return { arm: null, store: null };
+  }
+  if (inputs.stored === 'on' || inputs.stored === 'off') return { arm: inputs.stored, store: null };
+  const draw = inputs.random();
+  const arm: ShaderWarmAbArm = Number.isFinite(draw) && draw < 0.5 ? 'off' : 'on';
+  return { arm, store: arm };
+}
+
 /** One hold the client is still waiting on, in the order it opened: when its
  *  caller's cap clock started, the cap itself, the priority it asked at and
  *  the highest request id it asked for. The last two together are what the
@@ -83,27 +141,50 @@ export interface ShaderWarmOutstandingHold {
   capMs: number;
   priority: number;
   highestId: number;
+  /** Ends this hold now, not warm, when a release takes it (the client). */
+  release?: () => void;
 }
 
 export interface ShaderWarmOutstandingHolds {
-  open(hold: ShaderWarmOutstandingHold): ShaderWarmOutstandingHold;
-  close(hold: ShaderWarmOutstandingHold): void;
+  /** `nowMs` is the client's clock at the call, for the wall span below. */
+  open(hold: ShaderWarmOutstandingHold, nowMs?: number): ShaderWarmOutstandingHold;
+  close(hold: ShaderWarmOutstandingHold, nowMs?: number): void;
   /** The hold that started earliest among those still waiting. */
   oldest(): ShaderWarmOutstandingHold | null;
   size(): number;
-  clear(): void;
+  /** Every open hold, removed at once, in the order they opened. */
+  releaseAll(nowMs?: number): ShaderWarmOutstandingHold[];
+  clear(nowMs?: number): void;
+  /** Wall time during which at least one hold was open. The A/B weighs the
+   *  worker's cost in it: forty-four holds opened by one entry burst hide
+   *  things for the second the burst lasted, not for forty-four seconds. */
+  wallMs(nowMs: number): number;
 }
 
 export function createShaderWarmOutstandingHolds(): ShaderWarmOutstandingHolds {
   let open: ShaderWarmOutstandingHold[] = [];
+  let busySinceMs: number | null = null;
+  let wallTotalMs = 0;
+  const span = (nowMs: number | undefined): number =>
+    busySinceMs === null || nowMs === undefined || !Number.isFinite(nowMs)
+      ? 0
+      : Math.max(0, nowMs - busySinceMs);
+  const endSpanIfIdle = (nowMs: number | undefined): void => {
+    if (open.length > 0 || busySinceMs === null) return;
+    wallTotalMs += span(nowMs);
+    busySinceMs = null;
+  };
   return {
-    open(hold) {
+    open(hold, nowMs) {
+      if (open.length === 0 && nowMs !== undefined && Number.isFinite(nowMs)) busySinceMs = nowMs;
       open.push(hold);
       return hold;
     },
-    close(hold) {
+    close(hold, nowMs) {
       const at = open.indexOf(hold);
-      if (at >= 0) open.splice(at, 1);
+      if (at < 0) return;
+      open.splice(at, 1);
+      endSpanIfIdle(nowMs);
     },
     oldest() {
       let oldest: ShaderWarmOutstandingHold | null = null;
@@ -113,9 +194,17 @@ export function createShaderWarmOutstandingHolds(): ShaderWarmOutstandingHolds {
       return oldest;
     },
     size: () => open.length,
-    clear() {
+    releaseAll(nowMs) {
+      const released = open;
       open = [];
+      endSpanIfIdle(nowMs);
+      return released;
     },
+    clear(nowMs) {
+      open = [];
+      endSpanIfIdle(nowMs);
+    },
+    wallMs: (nowMs) => wallTotalMs + span(nowMs),
   };
 }
 
@@ -123,6 +212,11 @@ export interface ShaderWarmCannotServeInputs {
   /** The worker's own links this session, and their summed wall. */
   linkCount: number;
   linkSumMs: number;
+  /** The links the worker gave up on at its own deadline, and the wall they
+   *  had run: each a LOWER BOUND on a link's cost. Read only while no link at
+   *  all has settled, and at the same evidence floor as the settled ones. */
+  censoredCount?: number;
+  censoredSumMs?: number;
   /** The window from the worker's last stats message, which can be a few
    *  hundred milliseconds stale (the worker reports on its own poll); a
    *  window that reads as nothing floors at one link at a time. */
@@ -139,11 +233,17 @@ export interface ShaderWarmCannotServeInputs {
  *  mean wall this worker has actually paid per link, spread over the links it
  *  runs at once, against the cap the caller already owns. Nothing here is a
  *  millisecond bound: the same arithmetic that retires a worker whose links
- *  cost half a second keeps one whose links cost fifty. */
+ *  cost half a second keeps one whose links cost fifty.
+ *
+ *  Where NO link has settled, the links the worker gave up on at its deadline
+ *  are the evidence instead: each ran at least the deadline, and a lower
+ *  bound is enough to say a queue does not fit. They are read at the same
+ *  floor, and never once a link has settled: a tab throttled early produces
+ *  deadlines on a healthy machine, and one settled link says the worker is
+ *  not blind, so the rule then waits for the settled evidence as before. */
 export function shaderWarmCannotServe(inputs: ShaderWarmCannotServeInputs): boolean {
-  const linkCount = Math.floor(inputs.linkCount);
-  if (!Number.isFinite(linkCount) || linkCount < SHADER_WARM_EVIDENCE_LINKS) return false;
-  if (!Number.isFinite(inputs.linkSumMs) || inputs.linkSumMs <= 0) return false;
+  const evidence = shaderWarmLinkEvidence(inputs);
+  if (!evidence) return false;
   const ahead = Math.floor(inputs.aheadOfOldest);
   if (!Number.isFinite(ahead) || ahead <= 0) return false;
   if (!Number.isFinite(inputs.capMs) || !Number.isFinite(inputs.waitedMs)) return false;
@@ -152,13 +252,44 @@ export function shaderWarmCannotServe(inputs: ShaderWarmCannotServeInputs): bool
   // just before the cap but ran after a long task spanning it would otherwise
   // read a negative remainder and retire the worker on one overrun.
   if (inputs.waitedMs >= inputs.capMs) return false;
-  const meanLinkMs = inputs.linkSumMs / linkCount;
+  const meanLinkMs = evidence.sumMs / evidence.count;
   const window = Math.max(
     SHADER_WARM_WINDOW_FALLBACK,
     Number.isFinite(inputs.windowLinks) ? Math.floor(inputs.windowLinks) : 0,
   );
   const remainingMs = inputs.capMs - inputs.waitedMs;
   return (ahead * meanLinkMs) / window > remainingMs;
+}
+
+export interface ShaderWarmLinkEvidence {
+  count: number;
+  sumMs: number;
+  /** Which pool spoke: the retirement cause names it, so the fleet can
+   *  tell a verdict on settled links from one on deadline give-ups. */
+  source: 'settled' | 'censored';
+}
+
+/** The pool the cannot-serve rule prices links at: the settled links once
+ *  there are enough of them, else the deadline-censored ones when nothing at
+ *  all settled, else nothing (no evidence is not evidence of slowness). */
+export function shaderWarmLinkEvidence(
+  inputs: ShaderWarmCannotServeInputs,
+): ShaderWarmLinkEvidence | null {
+  const pool = (
+    count: number,
+    sumMs: number,
+    source: ShaderWarmLinkEvidence['source'],
+  ): ShaderWarmLinkEvidence | null => {
+    const links = Math.floor(count);
+    if (!Number.isFinite(links) || links < SHADER_WARM_EVIDENCE_LINKS) return null;
+    if (!Number.isFinite(sumMs) || sumMs <= 0) return null;
+    return { count: links, sumMs, source };
+  };
+  if (!Number.isFinite(inputs.linkCount)) return null;
+  const settled = pool(inputs.linkCount, inputs.linkSumMs, 'settled');
+  if (settled) return settled;
+  if (Math.floor(inputs.linkCount) > 0) return null;
+  return pool(inputs.censoredCount ?? 0, inputs.censoredSumMs ?? 0, 'censored');
 }
 
 /** The last few holds, expired or not, for the breaker's second rule. */
@@ -190,6 +321,9 @@ export interface ShaderWarmPolicyInputs {
   armed: boolean;
   priority: number;
   imminent: boolean;
+  /** A cannot-serve release happened and the worker's queue has not drained
+   *  yet: no gate holds until it has. */
+  standingDown?: boolean;
   /** The queue's floors, so the core does not import the queue. */
   liveViewPriority: number;
   actionablePriority: number;
@@ -201,6 +335,7 @@ export type ShaderWarmDecision = { hold: true } | { hold: false; bypass: ShaderW
 export function shaderWarmDecision(inputs: ShaderWarmPolicyInputs): ShaderWarmDecision {
   if (inputs.mode === 'off') return { hold: false, bypass: 'mode-off' };
   if (!inputs.available) return { hold: false, bypass: 'unavailable' };
+  if (inputs.standingDown === true) return { hold: false, bypass: 'standing-down' };
   if (!inputs.armed) return { hold: false, bypass: 'before-reveal' };
   if (inputs.priority >= inputs.actionablePriority) return { hold: false, bypass: 'actionable' };
   if (inputs.imminent) return { hold: false, bypass: 'imminent' };
@@ -324,6 +459,8 @@ export interface ShaderWarmRequestStats {
   heldWarm: number;
   /** Held gates that gave up on the hold cap and linked cold. */
   heldTimedOut: number;
+  /** Held gates a cannot-serve release ended before their cap. */
+  heldReleased: number;
   bypassed: Record<ShaderWarmBypass, number>;
   /** Hold durations, summed, so a mean is one division away. */
   holdMs: number;
@@ -332,6 +469,13 @@ export interface ShaderWarmRequestStats {
   /** The worker's own link times (submission to resolution), so a capture
    *  can say how long the GPU process took per program under this load. */
   links: { count: number; sumMs: number; maxMs: number };
+  /** The links the worker gave up on at its own deadline, and the wall they
+   *  had run when it did: lower bounds, kept apart from `links` so a capture
+   *  never reads a give-up as a link time. The cannot-serve rule's only
+   *  evidence on a machine where no link ever settles. */
+  censoredLinks: { count: number; sumMs: number; maxMs: number };
+  /** The first programs the worker failed, by source key, with the reason. */
+  failedPrograms: Array<{ hash: string; reason: 'link-failed' | 'link-deadline' }>;
 }
 
 export interface ShaderWarmRequests {
@@ -371,10 +515,18 @@ export interface ShaderWarmRequests {
    *  any more (a hold that gave up) are on their way out and count for
    *  nobody. */
   unsettledAhead(priority: number, highestId: number): number;
-  noteHeld(warm: boolean, timedOut: boolean, holdMs: number): void;
+  /** The outcome a request settled with; null while pending or unknown. */
+  outcomeOf(id: number): ShaderWarmOutcome | null;
+  /** The source key a request was made for; null for an unknown id. */
+  hashOf(id: number): string | null;
+  noteHeld(warm: boolean, timedOut: boolean, holdMs: number, released?: boolean): void;
+  /** The worker failed this request's program: keep its key for the readout. */
+  noteFailedProgram(id: number, reason: 'link-failed' | 'link-deadline'): void;
   noteBypass(bypass: ShaderWarmBypass): void;
   noteAssembly(ms: number): void;
   noteLink(ms: number): void;
+  /** A link the worker gave up on at its deadline, with the wall it ran. */
+  noteCensoredLink(ms: number): void;
   stats(): ShaderWarmRequestStats;
 }
 
@@ -394,9 +546,11 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
     held: 0,
     heldWarm: 0,
     heldTimedOut: 0,
+    heldReleased: 0,
     bypassed: {
       'mode-off': 0,
       unavailable: 0,
+      'standing-down': 0,
       'before-reveal': 0,
       actionable: 0,
       'live-view': 0,
@@ -407,6 +561,8 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
     holdMs: 0,
     dryAssembleMs: 0,
     links: { count: 0, sumMs: 0, maxMs: 0 },
+    censoredLinks: { count: 0, sumMs: 0, maxMs: 0 },
+    failedPrograms: [],
   };
   return {
     request(sources, priority) {
@@ -506,10 +662,13 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
       }
       return ahead;
     },
-    noteHeld(warm, timedOut, holdMs) {
+    outcomeOf: (id) => byId.get(id)?.outcome ?? null,
+    hashOf: (id) => byId.get(id)?.hash ?? null,
+    noteHeld(warm, timedOut, holdMs, released = false) {
       stats.held++;
       if (warm) stats.heldWarm++;
       if (timedOut) stats.heldTimedOut++;
+      if (released) stats.heldReleased++;
       stats.holdMs += Math.max(0, holdMs);
     },
     noteBypass(bypass) {
@@ -519,12 +678,37 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
       stats.dryAssembleMs += Math.max(0, ms);
     },
     noteLink(ms) {
+      // Dropped like a censored wall: one NaN in the sum would silence the
+      // cannot-serve rule for the session with no trace.
+      if (!Number.isFinite(ms)) return;
       const linkMs = Math.max(0, ms);
       stats.links.count++;
       stats.links.sumMs += linkMs;
       stats.links.maxMs = Math.max(stats.links.maxMs, linkMs);
     },
-    stats: () => ({ ...stats, bypassed: { ...stats.bypassed }, links: { ...stats.links } }),
+    noteCensoredLink(ms) {
+      // This sum decides a retirement: one NaN would disable the arm for the
+      // session, so a garbage wall is dropped rather than clamped.
+      if (!Number.isFinite(ms)) return;
+      const censoredMs = Math.max(0, ms);
+      stats.censoredLinks.count++;
+      stats.censoredLinks.sumMs += censoredMs;
+      stats.censoredLinks.maxMs = Math.max(stats.censoredLinks.maxMs, censoredMs);
+    },
+    noteFailedProgram(id, reason) {
+      const hash = byId.get(id)?.hash;
+      if (hash === undefined) return;
+      if (stats.failedPrograms.length >= SHADER_WARM_FAILED_PROGRAMS_KEPT) return;
+      if (stats.failedPrograms.some((kept) => kept.hash === hash && kept.reason === reason)) return;
+      stats.failedPrograms.push({ hash, reason });
+    },
+    stats: () => ({
+      ...stats,
+      failedPrograms: stats.failedPrograms.map((kept) => ({ ...kept })),
+      bypassed: { ...stats.bypassed },
+      links: { ...stats.links },
+      censoredLinks: { ...stats.censoredLinks },
+    }),
   };
 }
 

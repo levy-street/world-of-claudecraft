@@ -93,6 +93,40 @@ describe('resolveActionReplacement', () => {
     );
     expect(inForm.def.id).toBe('sunlance');
   });
+  it('resolves an ABSENCE rule: Slinkstrike is Lunge out of stealth, on its own clock', () => {
+    const base = resolved('pounce');
+    // Stealthed: the base opener stays.
+    expect(resolveActionReplacement(base, actorWith({ kind: 'stealth' }))).toBe(base);
+    const out = resolveActionReplacement(base, actorWith({ kind: 'form_cat' }));
+    expect(out.def.id).toBe('lunge');
+    expect(out.cooldown).toBe(12);
+    // A mode rule (absence only) never stamps the base key: Lunge's 12 sec
+    // clock must not lock a restealth Slinkstrike, which has no cooldown.
+    expect(out.cooldownId).toBeUndefined();
+  });
+
+  it('a rule naming both a present and an absent kind needs both to hold', () => {
+    const def = {
+      ...ABILITIES.pounce,
+      actionReplacement: { abilityId: 'lunge', auraKind: 'form_cat', absentAuraKind: 'stealth' },
+    } as typeof ABILITIES.pounce;
+    const base = { ...resolved('pounce'), def };
+    expect(resolveActionReplacement(base, actorWith())).toBe(base);
+    expect(resolveActionReplacement(base, actorWith({ kind: 'stealth' }))).toBe(base);
+    expect(
+      resolveActionReplacement(base, actorWith({ kind: 'form_cat' }, { kind: 'stealth' })),
+    ).toBe(base);
+    expect(resolveActionReplacement(base, actorWith({ kind: 'form_cat' })).def.id).toBe('lunge');
+  });
+
+  it('a rule naming neither kind never matches', () => {
+    const def = {
+      ...ABILITIES.pounce,
+      actionReplacement: { abilityId: 'lunge' },
+    } as typeof ABILITIES.pounce;
+    const base = { ...resolved('pounce'), def };
+    expect(resolveActionReplacement(base, actorWith())).toBe(base);
+  });
 });
 
 describe('replaceResolvedAbility', () => {
@@ -176,5 +210,26 @@ describe('replacement rank resolution', () => {
     const out = replaceResolvedAbility(resolved('ferocious_bite'), 'redharvest');
     expect(out.rank).toBe(1);
     expect(finisherOf(out)).toMatchObject({ base: 35, perCombo: 20 });
+  });
+});
+
+describe('actionReplacement content pin', () => {
+  it('every rule names an aura kind that must be present or absent, and a real ability', () => {
+    // A rule naming neither kind never matches in the resolver, so a typo in a
+    // content field would hide as a button that quietly never transforms.
+    for (const def of Object.values(ABILITIES)) {
+      const rules = def.actionReplacement;
+      if (!rules) continue;
+      for (const rule of Array.isArray(rules) ? rules : [rules]) {
+        expect(
+          rule.auraKind !== undefined || rule.absentAuraKind !== undefined,
+          `${def.id}: actionReplacement -> ${rule.abilityId} names neither auraKind nor absentAuraKind`,
+        ).toBe(true);
+        expect(
+          ABILITIES[rule.abilityId],
+          `${def.id}: unknown replacement ${rule.abilityId}`,
+        ).toBeDefined();
+      }
+    }
   });
 });

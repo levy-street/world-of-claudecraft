@@ -518,15 +518,20 @@ export const ROD_RECIPES: ProfessionRecipeRecord[] = [
 //   resets charges to full, so the mint MUST cost more than the most
 //   expensive generic recharge (a full epic-rung fill priced in shards) or
 //   re-crafting would bypass recharging outright. The whole arcane ladder is
-//   consumed (shards the bulk of the value), which also gives the shard its
-//   second sink beside the Greater enchants. The counts clear the bound at
-//   the DISCOUNTED price, not just the listed one: a specialized enchanter
-//   consumes floor(count x 0.8) of each reagent (crafting.ts
-//   requiredReagentCountFor), which is the arm that actually competes with a
-//   recharge, so the listed 383 copper is sized so the discounted 298 still
-//   sits above the 275 the worst generic recharge costs. The inequality is
-//   pinned BOTH ways in tests/professions_tool_effect_recharge.test.ts;
-//   retune both sides together.
+//   consumed, but the bulk of the value sits in ESSENCE, not shards: a
+//   shard is one epic disenchant (the scarcest material on the ladder) and
+//   the original five-shard bill priced a charm above what its recharges
+//   ever cost in practice (a common hoe refills on dust), so the bill was
+//   retuned to a single shard (the same "one shard plus essence" shape as
+//   the Greater enchants) with the copper value moved onto essence and
+//   dust. The counts clear the bound at the DISCOUNTED price, not just the
+//   listed one: a specialized enchanter consumes floor(count x 0.8) of each
+//   reagent (crafting.ts requiredReagentCountFor), which is the arm that
+//   actually competes with a recharge, so the listed 367 copper is sized so
+//   the discounted 301 still sits above the 275 the worst generic recharge
+//   costs. The inequality is pinned BOTH ways in
+//   tests/professions_tool_effect_recharge.test.ts, and the one-shard cap is
+//   pinned there too; retune both sides together.
 // - NO Springback (quickening_charm) recipe: the R9 slot policy refuses that
 //   effect everywhere, and no path may mint what another path refuses (same
 //   guard test derives this from the policy).
@@ -537,9 +542,9 @@ export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'gatherers_cache',
     resultCount: 1,
     reagents: [
-      { itemId: 'arcane_shard', count: 5 },
-      { itemId: 'arcane_essence', count: 4 },
-      { itemId: 'arcane_dust', count: 6 },
+      { itemId: 'arcane_shard', count: 1 },
+      { itemId: 'arcane_essence', count: 14 },
+      { itemId: 'arcane_dust', count: 10 },
     ],
     skillReq: 25,
     itemLevelBudget: 15,
@@ -553,9 +558,9 @@ export const TOOL_EFFECT_RECIPES: ProfessionRecipeRecord[] = [
     resultItemId: 'artisans_eye',
     resultCount: 1,
     reagents: [
-      { itemId: 'arcane_shard', count: 5 },
-      { itemId: 'arcane_essence', count: 4 },
-      { itemId: 'arcane_dust', count: 6 },
+      { itemId: 'arcane_shard', count: 1 },
+      { itemId: 'arcane_essence', count: 14 },
+      { itemId: 'arcane_dust', count: 10 },
     ],
     skillReq: 25,
     itemLevelBudget: 15,
@@ -4330,8 +4335,9 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //     uncrafted output, valefire_lantern (offhand, uncommon, int 1 spi 1,
 //     item level 7, sellValue 160), is strictly dominated by the trainer's
 //     OWN rows at the same rung and below, recipe_goldleaf_folio (rung 25,
-//     int 3 spi 2, a 150 bill) and recipe_silverleaf_primer (rung 0, int 2
-//     spi 1, a 36 bill): same slot, same CASTER_ALL lock, same quality, more
+//     int 3 spi 2 sta 2, a 150 bill) and recipe_silverleaf_primer (rung 0,
+//     int 2 spi 1 sta 1, a 36 bill): same slot, same CASTER_ALL lock, same
+//     quality, more
 //     stats, cheaper. The only axis the lantern wins is sellValue, so the row
 //     was a fetish sink whose one use was the vendor loop (+24 per craft at
 //     the floor after the sink). No other uncrafted caster offhand sits in

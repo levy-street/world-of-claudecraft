@@ -4,19 +4,21 @@
 // max-hp tick every second to anyone within NYTHRAXIS_BONE_STORM_RADIUS, and
 // charges living, non-impaled raiders in sequence: one target per charge
 // window, at NYTHRAXIS_BONE_STORM_SPEED_MULT times his move speed. When he
-// reaches a target (or the window runs out) he Bone Slams everyone around him
-// (since v0.42.2 no fire line runs on down the charge direction), then he
-// whirls in place until the next window opens. One Bone Spike cast lands
-// mid-storm. When
-// the storm ends the threat table is intact, the top-threat tank picks him up,
-// and Gravebreaker re-arms shortly after.
+// reaches a target he Bone Slams everyone around him (every slam of the storm
+// deals the same fraction; since v0.42.2 no Gravefire line runs on down the
+// charge direction), then he whirls in place until the
+// next window opens. The storm casts no spike of its own and the regular Bone
+// Spike cadence is frozen while he storms (the mid-storm cast pinned raiders
+// inside the whirl and was retired). When the storm ends the threat table is
+// intact, the top-threat tank picks him up, and Gravebreaker re-arms shortly
+// after.
 //
 // Target order spends no shared rng: each window ranks the eligible raiders by
 // a hash of the cast key, the window index, and the raider id, the idiom
 // Grave Eruption and the Binding Sigil use, so adding the storm moves no other
 // draw. The pure pieces live here (tuning, the window math, the target rank,
 // the reach and radius tests); the driver in encounters/nythraxis.ts owns the
-// movement, the damage, the spike, and the pickup.
+// movement, the damage, and the pickup.
 //
 // `src/sim`-pure: no rng stream, no wall clock, no DOM.
 
@@ -40,8 +42,6 @@ export interface NythraxisBoneStorm {
   slammed: boolean;
   /** seconds until the next whirl tick */
   whirlTickTimer: number;
-  /** the mid-storm Bone Spike has been cast */
-  spikeCast: boolean;
   /** raiders already charged this storm, so no one is charged twice while others remain */
   chargedIds: number[];
 }
@@ -63,12 +63,16 @@ export const NYTHRAXIS_BONE_STORM_RADIUS = 9;
 export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS = 1;
 export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL = 0.1;
 export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_HEROIC = 0.2;
-export const NYTHRAXIS_BONE_SLAM_MAX_HP_NORMAL = 0.35;
-export const NYTHRAXIS_BONE_SLAM_MAX_HP_HEROIC = 0.55;
+/**
+ * Every slam of a storm, whichever window lands it, deals this fraction.
+ * v0.43.0 softened only the storm's first slam to these values and kept
+ * 35% / 55% for the rest; v0.43.1 flattened the whole storm to the softer
+ * value, so later windows cost the same as the opening one.
+ */
+export const NYTHRAXIS_BONE_SLAM_MAX_HP_NORMAL = 0.23;
+export const NYTHRAXIS_BONE_SLAM_MAX_HP_HEROIC = 0.37;
 /** He has reached his charge target inside this distance. */
 export const NYTHRAXIS_BONE_STORM_ARRIVE_DIST = 3;
-/** Seconds into the storm the mid-storm Bone Spike lands. */
-export const NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS = 6;
 /** Seconds after the storm ends before Gravebreaker is charged again. */
 export const NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS = 3;
 
@@ -84,6 +88,7 @@ export function nythraxisBoneStormWhirlTickMaxHp(difficulty: DungeonDifficulty):
     : NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL;
 }
 
+/** The max-hp fraction every Bone Slam of a storm deals. */
 export function nythraxisBoneSlamDamageMaxHp(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic'
     ? NYTHRAXIS_BONE_SLAM_MAX_HP_HEROIC
@@ -100,11 +105,6 @@ export function nythraxisBoneStormChargeIndex(elapsed: number): number {
 
 export function nythraxisBoneStormDone(elapsed: number): boolean {
   return elapsed >= NYTHRAXIS_BONE_STORM_SECONDS;
-}
-
-/** True once the storm has run long enough for its mid-storm Bone Spike. */
-export function nythraxisBoneStormSpikeDue(elapsed: number): boolean {
-  return elapsed >= NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS;
 }
 
 /**
@@ -158,7 +158,6 @@ export function beginNythraxisBoneStorm(castKey: number): NythraxisBoneStorm {
     chargeTargetId: null,
     slammed: false,
     whirlTickTimer: NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS,
-    spikeCast: false,
     chargedIds: [],
   };
 }

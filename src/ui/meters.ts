@@ -50,6 +50,7 @@ import { MeterFrame } from './meters_frame';
 import { METER_FRAME_LIMITS } from './meters_frame_core';
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
 import { buildMeterRows, type MeterPet, type MeterTab } from './meters_rows_view';
+import { PartyPidsCache } from './party_pids_core';
 import type { SimpleMenuItem } from './simple_context_menu';
 import { resolveThreatSubject, resolveThreatValues } from './threat_subject_core';
 
@@ -147,7 +148,7 @@ export class MeterData {
     pid: number,
     name: string,
     cls: string | null,
-    partyPids: Set<number>,
+    partyPids: ReadonlySet<number>,
   ): MemberTally {
     let t = enc.tallies.get(pid);
     if (t) return t;
@@ -185,7 +186,7 @@ export class MeterData {
    * OWNER (folding hunter/warlock/mage pet output into the player's row) and
    * keeps its own name for the breakdown; anything else reports itself.
    */
-  private attribute(world: IWorld, sourceId: number, partyPids: Set<number>): Attribution {
+  private attribute(world: IWorld, sourceId: number, partyPids: ReadonlySet<number>): Attribution {
     const src = world.entities.get(sourceId);
     const ownerId = src?.kind === 'mob' ? (src.ownerId ?? null) : null;
     const owned = ownerId !== null && partyPids.has(ownerId);
@@ -204,14 +205,14 @@ export class MeterData {
   private threatEntryBelongsToParty(
     world: IWorld,
     entityId: number,
-    partyPids: Set<number>,
+    partyPids: ReadonlySet<number>,
   ): boolean {
     if (partyPids.has(entityId)) return true;
     const entity = world.entities.get(entityId);
     return entity?.kind === 'mob' && entity.ownerId !== null && partyPids.has(entity.ownerId);
   }
 
-  private refreshThreatSnapshots(world: IWorld, partyPids: Set<number>): void {
+  private refreshThreatSnapshots(world: IWorld, partyPids: ReadonlySet<number>): void {
     if (!this.current) return;
     for (const entity of world.entities.values()) {
       if (entity.kind !== 'mob' || !entity.threat || entity.threat.size === 0) continue;
@@ -228,7 +229,7 @@ export class MeterData {
   }
 
   /** party membership check is supplied by the caller (self + party pids) */
-  onEvent(ev: SimEvent, world: IWorld, partyPids: Set<number>, now: number): void {
+  onEvent(ev: SimEvent, world: IWorld, partyPids: ReadonlySet<number>, now: number): void {
     if (ev.type !== 'damage' && ev.type !== 'heal2') return;
     // The HoT-application sound cue (Sim.applyAura, cueOnly:true) is audio-only
     // and must not open or keep alive an otherwise-idle encounter segment. Gated
@@ -259,7 +260,26 @@ export class MeterData {
 
     if (ev.type === 'damage' && sourceInParty && ev.kind === 'hit' && ev.amount > 0) {
       const target = world.entities.get(ev.targetId);
-      if (target && target.kind === 'mob') {
+      // A hit on an OPPOSING player (duel, arena, battleground) is real party
+      // output and belongs on the Damage tab like any mob hit. The target must
+      // be outside the party: a self-sourced DoT (delve Bad Air, a Cauterize
+      // burn) also arrives as a player-target hit and is not output. It skips
+      // the mob-only bookkeeping below: threat tables, dmgByMob, and the threat
+      // subject, which have no meaning for a player target.
+      if (target && target.kind === 'player' && !partyPids.has(ev.targetId)) {
+        const who = this.attribute(world, ev.sourceId, partyPids);
+        for (const enc of [this.current, this.allTime]) {
+          const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
+          t.dmg += ev.amount;
+          addBreakdown(t.dmgByAbility, who.petName, ev.ability, ev.amount);
+        }
+        // Name the segment after the FIRST opponent hit (a battleground has
+        // many, and the label must not flip per hit) until a mob claims it; a
+        // player name is literal text, so it needs no entity localization.
+        if (this.current.biggestMobHp < 0 && this.current.label === 'Combat') {
+          this.current.label = target.name;
+        }
+      } else if (target && target.kind === 'mob') {
         const who = this.attribute(world, ev.sourceId, partyPids);
         for (const enc of [this.current, this.allTime]) {
           const t = this.tally(enc, who.pid, who.name, who.cls, partyPids);
@@ -299,7 +319,7 @@ export class MeterData {
   }
 
   /** advance clocks + close the encounter once combat has clearly ended */
-  update(world: IWorld, partyPids: Set<number>, now: number): void {
+  update(world: IWorld, partyPids: ReadonlySet<number>, now: number): void {
     if (!this.current) return;
     this.current.duration = Math.max(1, (now - this.current.startedAt) / 1000);
     if ((now - this.lastActivity) / 1000 < ENCOUNTER_END_SECONDS) return;
@@ -408,7 +428,7 @@ interface PanelHost {
   /** Live pets per owner, scanned once per render by the owner. */
   petsByOwner(): Map<number, Pet[]>;
   /** Self plus every party member, for deciding which mobs the group is on. */
-  partyPids(): Set<number>;
+  partyPids(): ReadonlySet<number>;
   attachTooltip(el: HTMLElement, html: () => string): void;
   /** Fired by a detached panel's close button. */
   onDock(tab: DetachableTab): void;
@@ -648,6 +668,7 @@ export class MetersPanel {
   private refreshTabs(): void {
     this.root.querySelectorAll('.mt-tab').forEach((el) => {
       el.classList.toggle('on', (el as HTMLElement).dataset.tab === this.tab);
+      el.classList.toggle('is-on', (el as HTMLElement).dataset.tab === this.tab);
     });
   }
 
@@ -722,7 +743,7 @@ export class MetersPanel {
         ? viewName
         : enc.mainMobTemplateId
           ? tEntity({ kind: 'mob', id: enc.mainMobTemplateId, field: 'name' })
-          : enc.mainMobName;
+          : enc.mainMobName || enc.label; // PvP segments carry the opponent's name as the label
     // Say plainly when the bars are the damage fallback rather than hate: the
     // numbers are honest, but under a "Threat" heading they read as hate and a
     // player acts on them. A FROZEN read is real hate too, just no longer
@@ -774,7 +795,7 @@ export class MetersPanel {
   private syncRowPool(count: number): void {
     while (this.rowPool.length < count) {
       const el = document.createElement('div');
-      el.className = 'mt-row';
+      el.className = 'mt-row ui-card';
       // Focusable so the breakdown is reachable by keyboard, not hover only
       // (attachTooltip shows on focusin and on a mobile long-press).
       el.tabIndex = 0;
@@ -783,7 +804,7 @@ export class MetersPanel {
       const label = document.createElement('span');
       label.className = 'mt-label';
       const num = document.createElement('span');
-      num.className = 'mt-num';
+      num.className = 'mt-num ui-num';
       el.append(fill, label, num);
       const row: MeterRowNodes = {
         el,
@@ -948,6 +969,7 @@ export class Meters {
   readonly data: MeterData;
   private readonly main: MetersPanel;
   private readonly detached = new Map<DetachableTab, MetersPanel>();
+  private readonly partyPidsCache = new PartyPidsCache();
   /** Detached windows hidden along with the tabbed one, to restore on reopen. */
   private reopenDetached: DetachableTab[] = [];
   /**
@@ -1208,13 +1230,10 @@ export class Meters {
     }
   }
 
-  private partyPids(): Set<number> {
-    const pids = new Set<number>([this.world.player.id]);
-    for (const m of this.world.partyInfo?.members ?? []) pids.add(m.pid);
-    for (const e of this.world.entities.values()) {
-      if (e.kind === 'mob' && e.ownerId !== null && pids.has(e.ownerId)) pids.add(e.id);
-    }
-    return pids;
+  /** Self, party members, and their pets: rebuilt by the cache only when the
+   *  viewer, the member list, or the entity roster changed (party_pids_core.ts). */
+  private partyPids(): ReadonlySet<number> {
+    return this.partyPidsCache.get(this.world);
   }
 
   /**
