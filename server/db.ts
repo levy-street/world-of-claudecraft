@@ -52,7 +52,6 @@ import {
 } from './character_rank_cache';
 import { characterSaveFailure, characterSaveLanded } from './character_save_result';
 import {
-  type CharacterSaveFence,
   liveSaveFence,
   runFencedCharacterSave,
   runPreimageCharacterSave,
@@ -129,7 +128,6 @@ import {
   closePlayerSession,
   openPlayerSession,
   PLAYER_METRICS_SCHEMA,
-  recordCharacterCreation,
 } from './player_metrics_db';
 import { PROGRESS_EVENTS_SCHEMA } from './progress_events_db';
 import { RATELIMIT_PRUNE_SQL, RATELIMIT_SCHEMA } from './ratelimit_db';

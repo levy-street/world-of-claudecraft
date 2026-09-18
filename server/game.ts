@@ -22,11 +22,9 @@ import {
   founderSkinDef,
 } from '../src/sim/content/founder_pack';
 import { FOUNDER_PACK_LETTER } from '../src/sim/content/letters';
-import { isMountSkinId } from '../src/sim/content/mount_skins';
 import type { MountKey } from '../src/sim/content/mounts';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
-import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   DELVES,
   DUNGEON_X_THRESHOLD,
@@ -69,13 +67,7 @@ import { effectiveFishingBand } from '../src/sim/professions/fishing';
 import { cancelProfessionSessionOnDisplacement } from '../src/sim/professions/session_teardown';
 import { restoreToolEffectSlotAction } from '../src/sim/professions/tool_effect_actions';
 import type { ToolEffectConfirmMode } from '../src/sim/professions/tools';
-import {
-  catalogCharacterCompletion,
-  curatorRankFromOwned,
-  reliquaryWireJson,
-  selfRelicKeys,
-  syncAccountRelicGrants,
-} from '../src/sim/reliquary';
+import { selfRelicKeys, syncAccountRelicGrants } from '../src/sim/reliquary';
 import { corpseHasDecayed } from '../src/sim/respawn_policy';
 import { loadRiftWorldState, serializeRiftWorldState } from '../src/sim/rift/persistence';
 import { riftStateEventFor } from '../src/sim/rift/runs';

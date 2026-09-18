@@ -81,7 +81,6 @@ import {
 } from '../src/sim/data';
 import { RARE_SLAIN_TEMPLATES } from '../src/sim/deeds';
 import type { LootTier } from '../src/sim/lockpick';
-import { mountItemId } from '../src/sim/mounts';
 import { craftBonusStatsFor } from '../src/sim/professions/crafting';
 import {
   ARMOR_SECONDARY_BY_TYPE,
@@ -846,7 +845,7 @@ describe('Reliquary clear sources map to live content', () => {
   it('dungeon clear sources reference real DUNGEONS ids', () => {
     for (const page of RELIQUARY_PAGES) {
       const src = page.clearSource;
-      if (!src || src.kind !== 'dungeon') continue;
+      if (src?.kind !== 'dungeon') continue;
       expect(DUNGEONS[src.dungeonId], `${page.id} dungeon ${src.dungeonId}`).toBeDefined();
     }
   });
@@ -854,7 +853,7 @@ describe('Reliquary clear sources map to live content', () => {
   it('delve clear sources reference real DELVES ids', () => {
     for (const page of RELIQUARY_PAGES) {
       const src = page.clearSource;
-      if (!src || src.kind !== 'delve') continue;
+      if (src?.kind !== 'delve') continue;
       expect(DELVES[src.delveId], `${page.id} delve ${src.delveId}`).toBeDefined();
     }
   });
@@ -862,7 +861,7 @@ describe('Reliquary clear sources map to live content', () => {
   it('deed_stat clear sources reference real DEED_STAT_KEYS', () => {
     for (const page of RELIQUARY_PAGES) {
       const src = page.clearSource;
-      if (!src || src.kind !== 'deed_stat') continue;
+      if (src?.kind !== 'deed_stat') continue;
       expect(DEED_STAT_KEYS).toContain(src.stat);
     }
   });
@@ -1649,7 +1648,7 @@ describe('Reliquary curation bounds (no full-table scrape)', () => {
     // Shared epic set pieces appear on both the source page and the set page.
     const pages = RELIQUARY_ITEM_TO_PAGES.get('deathlord_warplate');
     expect(pages).toBeDefined();
-    expect(pages!.length).toBeGreaterThanOrEqual(2);
+    expect(pages?.length).toBeGreaterThanOrEqual(2);
     expect(pages).toContain('conquerors_gravewyrm_sanctum');
     expect(pages).toContain('conquerors_set_deathlord');
   });
@@ -1987,7 +1986,7 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     for (const page of RELIQUARY_PAGES) {
       if (!page.desc) continue;
       const named = Object.keys(MOBS)
-        .filter((mobId) => page.desc!.includes(MOBS[mobId].name))
+        .filter((mobId) => page.desc?.includes(MOBS[mobId].name))
         .sort();
       if (named.length > 0) derivedPairs[page.id] = named;
     }

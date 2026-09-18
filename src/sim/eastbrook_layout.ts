@@ -951,7 +951,7 @@ const WALL_CONFIG = {
   maximumSegmentSpan: 6.5,
 } as const;
 
-function wallPoint(x: number, z: number): Point2 {
+function _wallPoint(x: number, z: number): Point2 {
   const scale = WALL_CONFIG.radius / Math.hypot(x, z);
   return { x: x * scale, z: z * scale };
 }
@@ -979,7 +979,7 @@ export function wallSegmentMirrored(segment: CircularWallSegment): boolean {
   );
 }
 
-function gateCrossing(id: string): Point2 {
+function _gateCrossing(id: string): Point2 {
   const gate = WALL_GATES.find((candidate) => candidate.id === id);
   if (!gate) throw new Error(`missing Eastbrook wall gate ${id}`);
   return gate.crossing;
