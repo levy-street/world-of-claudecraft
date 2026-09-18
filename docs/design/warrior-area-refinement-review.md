@@ -55,3 +55,35 @@ second cycle, final reduced-motion checks, sustained rotation review and
 canonical contribution gate still need completion. A first outdoor attempt
 was invalidated by a build-triggered preview reload and is not acceptance
 evidence. Public Site publication has not occurred.
+
+## Outdoor follow-up
+
+`warrior-final-warrior-complete-cycle-two-frozen` completed every active Warrior
+fixture without errors, missing assets or source drift. Controls were hidden
+through capture-only CSS; camera, gameplay and effects remained ordinary Studio
+settings. Review confirmed the improved Faultline silhouette and Breachmaker
+mark. Outdoor lighting varies between runs, so these are context checks rather
+than a controlled material comparison.
+
+The follow-up `warrior-final-warrior-leap-storm-final` keeps Leap's full geometry,
+radius, dust and landing force but uses earthier mineral colors and finer edge
+highlights. Four Leap suites passed 15 tests. The outdoor frame is retained
+[here](../screenshots/warrior-area-refinement/leap-outdoor-final.png).
+
+Bladestorm's former first post-hit sample was too late to judge its peak: the
+1.15-second frame is 200ms into an impact whose flash lasts 65ms. The capture
+harness now includes the actual pulse and early aftermath. The
+[1.00-second frame](../screenshots/warrior-area-refinement/bladestorm-receiving-peak.png)
+shows the receiving catch. No contact-timing code was changed for this finding.
+Both follow-up fixtures completed cleanly. Sustained combat, reduced motion and
+the canonical gate remain separate checks.
+
+`warrior-natural-timing-warrior-final-sept18` subsequently completed three
+30-second live-clock rotations against five training dummies: Battlecraft,
+Bloodrush and Iron Guard. No resource, cooldown or aura resets occurred during
+the takes. All completed without runtime errors or source drift. Measured frame
+times were 7ms median and 14ms p95 for each; maxima were 62.5ms, 21ms and 21.1ms
+respectively. These are measurements on this laptop, with audio off, not isolated
+GPU benchmarks or raid acceptance. Battlecraft registered two real recipients;
+the other rotations registered five. The fixture supplies no hostile attacker,
+so it does not establish incoming-damage or Revenge Free coverage.

@@ -53,7 +53,7 @@ export function drawWarriorLeapLanding(
   let count = 1;
   if (
     host.crestAt &&
-    host.crestAt(x, floor, z, scale, 1, 0x898b90, 0xc7bbaa, 'leap_rupture', 0, 0.72) !== false
+    host.crestAt(x, floor, z, scale, 1, 0x746b60, 0xb9ad98, 'leap_rupture', 0, 0.72) !== false
   )
     count++;
   // Supplementary fracture highlights may yield to busy attack paths. The
@@ -63,8 +63,8 @@ export function drawWarriorLeapLanding(
     const dx = Math.sin(angle),
       dz = Math.cos(angle);
     const pathAdmitted = host.pathRibbon(
-      0xc3c2bc,
-      0.23,
+      0x817665,
+      0.11,
       0.42,
       (points) => {
         for (let j = 0; j < points.length; j++) {
