@@ -33,46 +33,33 @@ export function paintWarriorMark(
     g.stroke();
   };
   if (breach) {
-    // An off-centre rupture through two staggered armor leaves. This is a
-    // wound in protection, not a floating shield bubble or a generic star.
-    plate([
-      [-23, -21],
-      [-7, -26],
-      [-3, -12],
-      [-10, -3],
-      [-20, -7],
-    ]);
-    plate([
-      [-20, -3],
-      [-11, 0],
-      [-6, 9],
-      [-13, 24],
-      [-23, 12],
-    ]);
-    plate([
-      [1, -26],
-      [20, -19],
-      [23, -7],
-      [10, -2],
-      [5, -11],
-    ]);
-    plate([
-      [13, 2],
-      [23, -1],
-      [20, 14],
-      [1, 27],
-      [7, 12],
-      [3, 6],
-    ]);
-    g.strokeStyle = 'rgba(255,255,255,1)';
-    g.lineWidth = 2.2;
+    // Open, diagonal split with short offshoots. Only the broken seam has
+    // coverage: the recipient's original armor supplies the surrounding face.
+    for (const [width, color, shift] of [
+      [6, '#18232c', 0],
+      [1.4, '#bacbd5', 2.4],
+    ] as const) {
+      g.strokeStyle = color;
+      g.lineWidth = width;
+      g.lineJoin = 'bevel';
+      g.beginPath();
+      g.moveTo(-23 + shift, 19);
+      g.lineTo(-10 + shift, 11);
+      g.lineTo(-6 + shift, 2);
+      g.lineTo(3 + shift, 0);
+      g.lineTo(10 + shift, -13);
+      g.lineTo(24 + shift, -23);
+      g.stroke();
+    }
+    g.strokeStyle = '#374651';
+    g.lineWidth = 2;
     g.beginPath();
-    g.moveTo(-3, -28);
-    g.lineTo(2, -13);
-    g.lineTo(-5, -2);
-    g.moveTo(-1, 4);
-    g.lineTo(3, 11);
-    g.lineTo(-4, 27);
+    g.moveTo(-10, 11);
+    g.lineTo(-17, 3);
+    g.lineTo(-21, 4);
+    g.moveTo(10, -13);
+    g.lineTo(17, -7);
+    g.lineTo(23, -8);
     g.stroke();
   } else {
     // Two visibly downward load-bearing weights frame an open centre. The

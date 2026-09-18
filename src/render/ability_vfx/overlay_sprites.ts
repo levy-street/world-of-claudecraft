@@ -92,7 +92,7 @@ export class OverlaySprites {
           float lum = max(tex.r, max(tex.g, tex.b)) * tex.a;
           if (lum * vAlpha < 0.012) discard;
           float opacity = tex.a * vAlpha;
-          float physical = step(${OVERLAY_CELL.hammer0}.0, idx);
+          float physical = max(step(${OVERLAY_CELL.hammer0}.0, idx), 1.-step(.5,abs(idx-${OVERLAY_CELL.breachMark}.0)));
           gl_FragColor = vec4(vColor * tex.rgb * opacity, opacity * physical);
         }`,
     });
@@ -145,7 +145,7 @@ export class OverlaySprites {
     this.col[i * 3 + 2] = this.tmpColor.b;
     this.size[i] = size;
     this.cell[i] = cell;
-    if (cell >= OVERLAY_CELL.hammer0) this.hasCoverage = true;
+    if (cell >= OVERLAY_CELL.hammer0 || cell === OVERLAY_CELL.breachMark) this.hasCoverage = true;
     this.alpha[i] = alpha;
   }
 

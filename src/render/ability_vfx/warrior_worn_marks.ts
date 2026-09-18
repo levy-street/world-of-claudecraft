@@ -32,10 +32,10 @@ export function drawWarriorWornMark(
     at.x + towardX * 1.2,
     at.y - 0.15 + towardY * 1.2,
     at.z + towardZ * 1.2,
-    breach ? 0xe9ad79 : 0x93bfdb,
+    breach ? 0xffffff : 0x93bfdb,
     breach ? 1.05 : 0.95,
     cell,
     alpha,
-    1.5,
+    breach ? 1 : 1.5,
   );
 }

@@ -396,7 +396,7 @@ const ORBIT_DNA: Record<
     rate: 0,
     radius: 0,
     weave: 0,
-    frac: 0.36,
+    frac: 0.57,
     size: 0.16,
     cell: OVERLAY_CELL.spark,
   },

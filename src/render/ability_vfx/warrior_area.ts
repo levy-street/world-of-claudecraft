@@ -1,5 +1,6 @@
 import { meleeContactHeight, meleeContactPoint, meleeImpactProfile } from '../melee_impact_core';
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { drawWarriorAreaReceivingContact } from './warrior_area_receiving_contact';
 import { warriorAreaPoint } from './warrior_area_shapes';
 
 const source = { x: 0, y: 0, z: 0 },
@@ -27,12 +28,19 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
     cosine = Math.cos(angle);
   for (let strand = 0; strand < (slot.tier > 0 ? 1 : 3); strand++)
     host.pathRibbon(
-      strand === 0 ? 0xe2edf2 : 0x8799a4,
-      strand === 0 ? 0.2 : 0.1,
+      strand === 0 ? 0x718896 : 0xe2edf2,
+      strand === 0 ? 0.1 : strand === 1 ? 0.26 : 0.13,
       0.28,
       (points) => {
         for (let i = 0; i < points.length; i++) {
-          warriorAreaPoint('steel_reap', 0, i / (points.length - 1), strand * 0.11, point);
+          const u = i / (points.length - 1);
+          warriorAreaPoint(
+            'steel_reap',
+            0,
+            strand === 0 ? u : strand === 1 ? 0.22 + u * 0.56 : 0.32 + u * 0.36,
+            strand * 0.11,
+            point,
+          );
           points[i].set(
             at.x + point.x * cosine + point.z * sine,
             at.y + point.y,
@@ -92,6 +100,10 @@ export function drawWarriorAreaContact(
   const at = host.anchorOf(targetId, meleeContactHeight(profile, 0), target);
   if (!at) return false;
   const groundImpact = id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline';
+  if (!groundImpact && outcome === 1) {
+    drawWarriorAreaReceivingContact(host, id, sourceId, targetId, tier, at, profile);
+    return true;
+  }
   host.flipbookAt(
     at.x,
     at.y,

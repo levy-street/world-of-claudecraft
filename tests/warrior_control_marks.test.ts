@@ -75,35 +75,41 @@ it('imprints replace decorative sprites while protecting the hard-control prefix
   texture.dispose();
 });
 
-it('solid overlays draw far-to-near as the camera moves while hard-control tells remain on top', () => {
-  const texture = new THREE.Texture(),
-    scene = new THREE.Scene();
-  const overlay = new OverlaySprites(scene, { overlay: texture } as AbilityVfxTextures);
-  const camera = new THREE.PerspectiveCamera();
-  camera.position.set(0, 0, 10);
-  camera.lookAt(0, 0, 0);
-  camera.updateMatrixWorld();
-  overlay.beginFrame();
-  overlay.push(0, 0, -10, 0xffffff, 1, OVERLAY_CELL.star, 1);
-  overlay.protectPrefix();
-  overlay.push(0, 0, 5, 0xffffff, 1, OVERLAY_CELL.armorShear0, 1, 1, 1);
-  overlay.push(0, 0, 0, 0xffffff, 1, OVERLAY_CELL.hammer0, 1);
-  overlay.commit(camera);
-  const geometry = (scene.children[0] as THREE.Points).geometry;
-  const order = () => Array.from(geometry.index!.array).slice(0, geometry.drawRange.count);
-  expect(order()).toEqual([2, 1, 0]);
-  camera.position.z = -20;
-  camera.lookAt(0, 0, 0);
-  camera.updateMatrixWorld();
-  overlay.orderForCamera(camera);
-  expect(order()).toEqual([1, 2, 0]);
-  // Sorting did not move admission slots: the protected prefix is still slot zero.
-  expect(geometry.getAttribute('aCell').getX(0)).toBe(OVERLAY_CELL.star);
-  overlay.beginFrame();
-  overlay.push(0, 0, 5, 0xffffff, 1, OVERLAY_CELL.glow, 1);
-  overlay.push(0, 0, 0, 0xffffff, 1, OVERLAY_CELL.spark, 1);
-  overlay.commit(camera);
-  expect(order()).toEqual([0, 1]);
-  overlay.dispose();
-  texture.dispose();
-});
+it.each([
+  [OVERLAY_CELL.armorShear0, OVERLAY_CELL.hammer0],
+  [OVERLAY_CELL.breachMark, OVERLAY_CELL.spark],
+])(
+  'solid overlays %s/%s draw far-to-near as the camera moves while hard-control tells remain on top',
+  (nearCell, farCell) => {
+    const texture = new THREE.Texture(),
+      scene = new THREE.Scene();
+    const overlay = new OverlaySprites(scene, { overlay: texture } as AbilityVfxTextures);
+    const camera = new THREE.PerspectiveCamera();
+    camera.position.set(0, 0, 10);
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+    overlay.beginFrame();
+    overlay.push(0, 0, -10, 0xffffff, 1, OVERLAY_CELL.star, 1);
+    overlay.protectPrefix();
+    overlay.push(0, 0, 5, 0xffffff, 1, nearCell, 1, 1, 1);
+    overlay.push(0, 0, 0, 0xffffff, 1, farCell, 1);
+    overlay.commit(camera);
+    const geometry = (scene.children[0] as THREE.Points).geometry;
+    const order = () => Array.from(geometry.index!.array).slice(0, geometry.drawRange.count);
+    expect(order()).toEqual([2, 1, 0]);
+    camera.position.z = -20;
+    camera.lookAt(0, 0, 0);
+    camera.updateMatrixWorld();
+    overlay.orderForCamera(camera);
+    expect(order()).toEqual([1, 2, 0]);
+    // Sorting did not move admission slots: the protected prefix is still slot zero.
+    expect(geometry.getAttribute('aCell').getX(0)).toBe(OVERLAY_CELL.star);
+    overlay.beginFrame();
+    overlay.push(0, 0, 5, 0xffffff, 1, OVERLAY_CELL.glow, 1);
+    overlay.push(0, 0, 0, 0xffffff, 1, OVERLAY_CELL.spark, 1);
+    overlay.commit(camera);
+    expect(order()).toEqual([0, 1]);
+    overlay.dispose();
+    texture.dispose();
+  },
+);

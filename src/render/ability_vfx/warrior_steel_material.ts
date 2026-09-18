@@ -18,4 +18,9 @@ if((uKind>14.5&&uKind<15.5)||(uKind>15.5&&uKind<16.5&&uStorm<.5)||(uKind>16.5&&u
   colour=mix(uTint*.5,uAccent,edge*.8+strands*.13)*( .8+score*.35);
   colour+=uAccent*edge*head*.7*uMotion;
   alpha=(edge*.8+wake)*movement*(1.-smoothstep(.48,1.,uAge));
+  if(uKind>15.5&&uKind<16.5){
+    float receivingFace=smoothstep(.12,.4,u)*(1.-smoothstep(.6,.88,u));
+    colour*=.8+receivingFace*.65;
+    alpha*=.3+receivingFace*.9;
+  }
 }`;
