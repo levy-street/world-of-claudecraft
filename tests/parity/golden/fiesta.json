@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -29,9 +29,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1010,
-      "state": "6c9c3066",
-      "events": "ee4ebe83",
+      "nextId": 1014,
+      "state": "38fdec4f",
+      "events": "5a383747",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,9 +40,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1010,
-      "state": "c7a47ab7",
-      "events": "1bd60145",
+      "nextId": 1014,
+      "state": "3a19408e",
+      "events": "3a5da579",
       "rng": {
         "draws": 66,
         "digest": "383a5306"
@@ -51,9 +51,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1010,
-      "state": "d8dc3619",
-      "events": "cc883821",
+      "nextId": 1014,
+      "state": "cabb5a6c",
+      "events": "70150bad",
       "rng": {
         "draws": 247,
         "digest": "6b3f31b5"
@@ -62,9 +62,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1010,
-      "state": "a0d6afde",
-      "events": "a4509c69",
+      "nextId": 1014,
+      "state": "4ce1d4e7",
+      "events": "f35a0f3d",
       "rng": {
         "draws": 485,
         "digest": "b0986e30"
@@ -73,9 +73,9 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1010,
-      "state": "8ad3e6c9",
-      "events": "d7855660",
+      "nextId": 1014,
+      "state": "6010c4c4",
+      "events": "156bef56",
       "rng": {
         "draws": 756,
         "digest": "b0eecf8d"
@@ -84,8 +84,8 @@
     {
       "tick": 150,
       "time": 7.5,
-      "nextId": 1010,
-      "state": "bca018c6",
+      "nextId": 1014,
+      "state": "cb8a96cb",
       "events": "741638a5",
       "rng": {
         "draws": 1041,
@@ -95,9 +95,9 @@
     {
       "tick": 163,
       "time": 8.15,
-      "nextId": 1010,
-      "state": "7b7c805e",
-      "events": "940cfa12",
+      "nextId": 1014,
+      "state": "8f573d35",
+      "events": "f14382e0",
       "rng": {
         "draws": 1178,
         "digest": "c7cc1a3a"
@@ -145,13 +145,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -193,6 +194,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -232,12 +234,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -281,6 +284,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -321,13 +325,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaAugments": [
             "aug_fleetfoot"
           ],
@@ -370,6 +375,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -408,12 +414,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -453,6 +460,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -468,7 +476,7 @@
               "name": "Battle Stance",
               "remaining": 3591.9,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -481,7 +489,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 5,
           "hp": 822,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -530,7 +538,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 41,
           "hp": 665,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -581,7 +589,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 6,
           "hp": 700,
-          "id": 1008,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -639,7 +647,7 @@
           "fiveSecondRule": 107.15,
           "healPower": 16,
           "hp": 783,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

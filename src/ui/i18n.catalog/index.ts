@@ -1743,6 +1743,22 @@ export const en = {
       // until the raid loot pass wires them.
       varkhul_forgebreaker: { name: 'Forgebreaker, Engine of Varkhul' },
       varkhul_emberward: { name: 'Emberward, Bulwark of Varkhul' },
+      // Faction Quartermaster vendor items
+      rift_watchers_band: { name: "Rift Watcher's Band" },
+      rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },
+      riftwalkers_tunic: { name: "Riftwalker's Tunic" },
+      riftwarden_voidblade: { name: "Riftwarden's Voidblade" },
+      champion_rift_band: { name: "Champion's Rift Band" },
+      order_prayer_beads: { name: 'Order Prayer Beads' },
+      vestments_of_the_acolyte: { name: 'Vestments of the Acolyte' },
+      templar_dawn_shield: { name: "Templar's Dawn Shield" },
+      dawnkeeper_consecrated_mace: { name: "Dawnkeeper's Consecrated Mace" },
+      champion_dawn_medallion: { name: "Champion's Dawn Medallion" },
+      automaton_cog_ring: { name: 'Automaton Cog Ring' },
+      clockwork_tinkers_pack: { name: "Clockwork Tinker's Pack" },
+      artificers_welding_cowl: { name: "Artificer's Welding Cowl" },
+      forgemaster_crag_cleaver: { name: "Forgemaster's Crag Cleaver" },
+      champion_forged_loop: { name: "Champion's Forged Loop" },
     },
     itemSets: itemSetEntityText,
     mobs: {

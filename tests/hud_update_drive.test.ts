@@ -901,11 +901,25 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Start/Cancel Race button and the 3..2..1..GO countdown; each painter returns early on an unchanged mode',
   },
   {
+    call: 'this.vehicleControls.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'vehicle integrity, aiming and cooldowns use the shared eliding writer facet',
+  },
+  {
     call: 'this.showSubzone',
     band: 'medium',
     gate: 'subzone !== this.lastSubzone && subzone',
     surface: 'chrome',
     why: 'the subzone banner on a landmark crossing',
+  },
+  {
+    call: 'syncMinigameMusic',
+    band: 'medium',
+    gate: '',
+    surface: 'none',
+    why: 'the world-quest minigame track override (minigame_music_sync.ts) the music machine reads next; audio only, so it rides above the hidden-frame cut',
   },
   {
     call: 'this.instanceMusic.update',
@@ -1236,7 +1250,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.marketWindow.close',
     band: 'slow',
-    gate: 'this.marketWindow.isOpen && !this.nearbyMarketNpc()',
+    gate: "this.marketWindow.isOpen && !nearbyServiceNpc(this.sim, 'market')",
     surface: 'window',
     guard: { kind: 'callsite' },
     why: 'closes the market window when the player leaves the auctioneer',
@@ -1252,7 +1266,7 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
     call: 'this.marketWindow.refreshIfChanged',
     band: 'slow',
-    gate: 'this.marketWindow.isOpen && !(!this.nearbyMarketNpc())',
+    gate: "this.marketWindow.isOpen && !(!nearbyServiceNpc(this.sim, 'market'))",
     surface: 'window',
     guard: { kind: 'module', module: 'market_window.ts', proof: SIG_RETURN },
     why: 'the market window',
@@ -1625,6 +1639,7 @@ describe('the hidden-frame paint cut', () => {
       'this.chatAnnouncer.flush',
       'this.questDialog.updateVoice',
       'this.lootRolls.update',
+      'syncMinigameMusic',
       // Music keeps playing on hidden frames, so its state machine must keep
       // transitioning there too (phase 4 QA F1: a minimized player heard the
       // stale track until restore while this sat below the cut).
@@ -1796,7 +1811,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 90 -> 91: the always-on pinned-recipe tracker
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
-    ).toEqual({ window: 49, chrome: 91, none: 17 });
+      // chrome 91 -> 92 and none 17 -> 18 on the World Quests branch: its
+      // vehicle bar chrome row and its minigame music override.
+    ).toEqual({ window: 49, chrome: 92, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

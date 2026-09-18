@@ -25,6 +25,7 @@ import type {
   QuestProgress,
   SkinCatalog,
   SkinRank,
+  WorldQuestProgress,
 } from './types';
 
 // Persistable character state (stored as JSONB server-side). The arena fields
@@ -97,6 +98,17 @@ export interface CharacterState {
   vendorBuyback?: InvSlot[];
   questLog: QuestProgress[];
   questsDone: string[];
+  // Daily world-quest state. Optional so every pre-feature save loads as an
+  // untouched empty cycle; available quests are implicit and are not stored.
+  worldQuests?: {
+    cycle: string;
+    progress: WorldQuestProgress[];
+    factions?: Partial<Record<string, number>>;
+    rerollCycle?: string;
+    replacements?: Record<string, string>;
+  };
+  // Faction standing (JSONB; optional so pre-reputation saves load cleanly).
+  factions?: Partial<Record<string, number>>;
   // Legacy arenaRating/Wins/Losses are treated as 1v1 data. The explicit
   // 1v1 fields are written by new saves, while old saves fall back cleanly.
   arenaRating?: number;

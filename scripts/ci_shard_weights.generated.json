@@ -2,9 +2,405 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 3959,
+    "files": 4106,
     "harvestedFiles": 3948,
     "carried": {
+      "tests/cannon_emplacement.test.ts": {
+        "ms": 1230,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1199,
+          1230,
+          1324
+        ]
+      },
+      "tests/cannon_encounter.test.ts": {
+        "ms": 49,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          48,
+          50,
+          49
+        ]
+      },
+      "tests/cannon_encounter_content.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          15,
+          14,
+          16
+        ]
+      },
+      "tests/cannon_encounter_visual.test.ts": {
+        "ms": 82,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          80,
+          89,
+          82
+        ]
+      },
+      "tests/cannon_endless_session.test.ts": {
+        "ms": 22488,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          22299,
+          22877,
+          22488
+        ]
+      },
+      "tests/cannon_enemy_visuals.test.ts": {
+        "ms": 26,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          23,
+          26,
+          26
+        ]
+      },
+      "tests/cannon_feedback_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/cannon_tactical_visuals.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/cannon_tactics.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          13,
+          12,
+          12
+        ]
+      },
+      "tests/cannon_tactics_view.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          11,
+          11,
+          12
+        ]
+      },
+      "tests/cannon_tactics_wire.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/decoration_exclusions.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/dev_world_quest_cannon.test.ts": {
+        "ms": 1554,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1539,
+          1554,
+          1564
+        ]
+      },
+      "tests/dev_world_quest_daily.test.ts": {
+        "ms": 1921,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1900,
+          1921,
+          1967
+        ]
+      },
+      "tests/dev_world_quest_wisp_selector.test.ts": {
+        "ms": 1583,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1583,
+          1567,
+          1602
+        ]
+      },
+      "tests/dev_world_quests.test.ts": {
+        "ms": 2318,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          2397,
+          2318,
+          2317
+        ]
+      },
+      "tests/disconnected_player_input.test.ts": {
+        "ms": 1237,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1233,
+          1240,
+          1237
+        ]
+      },
+      "tests/escort_story.test.ts": {
+        "ms": 2184,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          2184,
+          2144,
+          2184
+        ]
+      },
+      "tests/farshore_shipwreck.test.ts": {
+        "ms": 157,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          152,
+          161,
+          157
+        ]
+      },
+      "tests/forge_anvil_target.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/forge_speech.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          11,
+          11,
+          12
+        ]
+      },
+      "tests/forge_workshop.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          9,
+          9,
+          8
+        ]
+      },
+      "tests/forge_workshop_input.test.ts": {
+        "ms": 1434,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1432,
+          1434,
+          1438
+        ]
+      },
+      "tests/forge_workshop_placement.test.ts": {
+        "ms": 1208,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1182,
+          1208,
+          1214
+        ]
+      },
+      "tests/glider_action_bar_view.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          10,
+          10,
+          11
+        ]
+      },
+      "tests/glider_boost.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/glider_controls.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/glider_course_core.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5,
+          5,
+          4
+        ]
+      },
+      "tests/glider_course_visual.test.ts": {
+        "ms": 87,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          87,
+          87,
+          87
+        ]
+      },
+      "tests/glider_energy.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          27,
+          28,
+          27
+        ]
+      },
+      "tests/glider_flight.test.ts": {
+        "ms": 231,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          240,
+          231,
+          229
+        ]
+      },
+      "tests/glider_flight_pose_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/glider_pitch_input.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/glider_tower_layout.test.ts": {
+        "ms": 1258,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1258,
+          1256,
+          1260
+        ]
+      },
+      "tests/glider_wind.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/glider_wind_visual.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          16,
+          17,
+          17
+        ]
+      },
       "tests/hub_dummy_drill.test.ts": {
         "ms": 3069,
         "method": "local-median",
@@ -93,6 +489,72 @@
           805
         ]
       },
+      "tests/hud_vehicle_bar.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/investigation_presentation.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
+      "tests/minigame_music.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          14,
+          13,
+          13
+        ]
+      },
+      "tests/minimap_objective_tap.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          8,
+          7
+        ]
+      },
+      "tests/music_notes.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/player_movement_modes.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
       "tests/practice_dps_controller.test.ts": {
         "ms": 13,
         "method": "local-median",
@@ -115,6 +577,50 @@
           4
         ]
       },
+      "tests/quest_entity_presentation.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          11,
+          11,
+          11
+        ]
+      },
+      "tests/quest_event_router.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          14,
+          8
+        ]
+      },
+      "tests/quest_event_view.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          14,
+          13,
+          14
+        ]
+      },
+      "tests/quest_npc_interaction.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          10,
+          10,
+          11
+        ]
+      },
       "tests/raid_lockout_format.test.ts": {
         "ms": 11,
         "method": "local-median",
@@ -124,6 +630,1117 @@
           11,
           11,
           11
+        ]
+      },
+      "tests/regional_caravan_content.test.ts": {
+        "ms": 1956,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1962,
+          1916,
+          1956
+        ]
+      },
+      "tests/server/world_quest_leaderboard.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          21,
+          22,
+          21
+        ]
+      },
+      "tests/server_calendar.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          21,
+          20,
+          20
+        ]
+      },
+      "tests/server_quest_command_wire.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          7,
+          6
+        ]
+      },
+      "tests/server_quest_snapshot_wire.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          5,
+          6
+        ]
+      },
+      "tests/server_world_boss_wire.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5,
+          4,
+          5
+        ]
+      },
+      "tests/shadow_controls.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          12,
+          13,
+          13
+        ]
+      },
+      "tests/shadow_detection.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          9,
+          9,
+          9
+        ]
+      },
+      "tests/vehicle_action_bar_controller.test.ts": {
+        "ms": 34,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          33,
+          35,
+          34
+        ]
+      },
+      "tests/vehicle_action_tooltip.test.ts": {
+        "ms": 19,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          19,
+          19,
+          20
+        ]
+      },
+      "tests/vehicle_aim_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          8,
+          7
+        ]
+      },
+      "tests/vehicle_camera_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          9,
+          8,
+          9
+        ]
+      },
+      "tests/vehicle_command_wire.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          7
+        ]
+      },
+      "tests/vehicle_gamepad.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          6,
+          9
+        ]
+      },
+      "tests/vehicle_gamepad_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/vehicle_station_placement.test.ts": {
+        "ms": 1628,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1628,
+          1621,
+          1632
+        ]
+      },
+      "tests/vehicles.test.ts": {
+        "ms": 35143,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          36741,
+          35143,
+          34446
+        ]
+      },
+      "tests/wisp_maze.test.ts": {
+        "ms": 118,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          118,
+          115,
+          124
+        ]
+      },
+      "tests/wisp_maze_action_lock.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          5,
+          6
+        ]
+      },
+      "tests/wisp_maze_clearance.test.ts": {
+        "ms": 1294,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1272,
+          1294,
+          1297
+        ]
+      },
+      "tests/wisp_maze_core.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/wisp_maze_hud_controller.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          27,
+          27,
+          28
+        ]
+      },
+      "tests/wisp_maze_hud_css.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/wisp_maze_visual.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          17,
+          18,
+          17
+        ]
+      },
+      "tests/world_boss_snapshot_wire.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/world_guidance.test.ts": {
+        "ms": 39,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          39,
+          40,
+          39
+        ]
+      },
+      "tests/world_quest_activity.test.ts": {
+        "ms": 1548,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1543,
+          1548,
+          1651
+        ]
+      },
+      "tests/world_quest_ambush.test.ts": {
+        "ms": 7999,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8028,
+          7999,
+          7972
+        ]
+      },
+      "tests/world_quest_calligraphy_deed.test.ts": {
+        "ms": 1574,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1581,
+          1552,
+          1574
+        ]
+      },
+      "tests/world_quest_caravan.test.ts": {
+        "ms": 4531,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          4458,
+          4531,
+          4542
+        ]
+      },
+      "tests/world_quest_caravan_driver.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          10,
+          10,
+          10
+        ]
+      },
+      "tests/world_quest_caravans.test.ts": {
+        "ms": 1204,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1237,
+          1204,
+          1202
+        ]
+      },
+      "tests/world_quest_champion.test.ts": {
+        "ms": 1522,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1599,
+          1522,
+          1513
+        ]
+      },
+      "tests/world_quest_confection_fx_controller.test.ts": {
+        "ms": 203,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          203,
+          200,
+          203
+        ]
+      },
+      "tests/world_quest_confection_fx_view.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/world_quest_confection_view.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/world_quest_confection_window.test.ts": {
+        "ms": 405,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          422,
+          405,
+          403
+        ]
+      },
+      "tests/world_quest_context.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          6,
+          5,
+          5
+        ]
+      },
+      "tests/world_quest_daily_generation.test.ts": {
+        "ms": 79,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          79,
+          78,
+          80
+        ]
+      },
+      "tests/world_quest_daily_levels.test.ts": {
+        "ms": 2101,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          2060,
+          2101,
+          2102
+        ]
+      },
+      "tests/world_quest_forge_view.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          13,
+          13,
+          14
+        ]
+      },
+      "tests/world_quest_forging.test.ts": {
+        "ms": 2217,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          2193,
+          2258,
+          2217
+        ]
+      },
+      "tests/world_quest_freight_i18n.test.ts": {
+        "ms": 23,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          22,
+          23,
+          23
+        ]
+      },
+      "tests/world_quest_freight_visual.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          22,
+          22,
+          23
+        ]
+      },
+      "tests/world_quest_glider.test.ts": {
+        "ms": 8216,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8050,
+          8255,
+          8216
+        ]
+      },
+      "tests/world_quest_glider_boost.test.ts": {
+        "ms": 1594,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1594,
+          1598,
+          1575
+        ]
+      },
+      "tests/world_quest_glider_levels.test.ts": {
+        "ms": 1294,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1288,
+          1294,
+          1298
+        ]
+      },
+      "tests/world_quest_glider_projection.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
+      "tests/world_quest_glider_view.test.ts": {
+        "ms": 19,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          20,
+          19,
+          19
+        ]
+      },
+      "tests/world_quest_instructor_dialog.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          14,
+          15,
+          15
+        ]
+      },
+      "tests/world_quest_investigation.test.ts": {
+        "ms": 1265,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1243,
+          1265,
+          1319
+        ]
+      },
+      "tests/world_quest_investigation_view.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          22,
+          22,
+          22
+        ]
+      },
+      "tests/world_quest_investigation_visibility.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          18,
+          18,
+          18
+        ]
+      },
+      "tests/world_quest_investigation_wire.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          14,
+          14,
+          14
+        ]
+      },
+      "tests/world_quest_ladder_view.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          18,
+          16,
+          18
+        ]
+      },
+      "tests/world_quest_leaderboard_view.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          12,
+          12,
+          12
+        ]
+      },
+      "tests/world_quest_leaderboard_window.test.ts": {
+        "ms": 95,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          95,
+          108,
+          94
+        ]
+      },
+      "tests/world_quest_leaderboard_wire.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/world_quest_ley_bonus.test.ts": {
+        "ms": 1539,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1562,
+          1539,
+          1519
+        ]
+      },
+      "tests/world_quest_ley_fx_controller.test.ts": {
+        "ms": 34,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          29,
+          34,
+          44
+        ]
+      },
+      "tests/world_quest_ley_placement.test.ts": {
+        "ms": 1229,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1226,
+          1229,
+          1240
+        ]
+      },
+      "tests/world_quest_ley_view.test.ts": {
+        "ms": 29,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          29,
+          37,
+          28
+        ]
+      },
+      "tests/world_quest_ley_window.test.ts": {
+        "ms": 88,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          88,
+          92,
+          87
+        ]
+      },
+      "tests/world_quest_match3.test.ts": {
+        "ms": 7929,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7929,
+          7976,
+          7847
+        ]
+      },
+      "tests/world_quest_match3_trace.test.ts": {
+        "ms": 121,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          121,
+          116,
+          121
+        ]
+      },
+      "tests/world_quest_match3_view.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          20,
+          20,
+          20
+        ]
+      },
+      "tests/world_quest_mount_gate.test.ts": {
+        "ms": 318,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          320,
+          316,
+          318
+        ]
+      },
+      "tests/world_quest_online_vertical.test.ts": {
+        "ms": 1490,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1449,
+          1490,
+          1492
+        ]
+      },
+      "tests/world_quest_public_trace_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
+      "tests/world_quest_public_trace_visual.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          12,
+          11,
+          11
+        ]
+      },
+      "tests/world_quest_puzzle.test.ts": {
+        "ms": 5786,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5744,
+          5786,
+          5799
+        ]
+      },
+      "tests/world_quest_puzzle_view.test.ts": {
+        "ms": 19,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          20,
+          19,
+          19
+        ]
+      },
+      "tests/world_quest_puzzle_window.test.ts": {
+        "ms": 73,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          73,
+          73,
+          73
+        ]
+      },
+      "tests/world_quest_salvage.test.ts": {
+        "ms": 1876,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1902,
+          1876,
+          1874
+        ]
+      },
+      "tests/world_quest_salvage_assets.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          11,
+          11,
+          11
+        ]
+      },
+      "tests/world_quest_scoreboards.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          8,
+          8,
+          7
+        ]
+      },
+      "tests/world_quest_shadow.test.ts": {
+        "ms": 1439,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1439,
+          1484,
+          1417
+        ]
+      },
+      "tests/world_quest_shadow_patrol.test.ts": {
+        "ms": 83,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          84,
+          83,
+          83
+        ]
+      },
+      "tests/world_quest_shadow_wire.test.ts": {
+        "ms": 1420,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1420,
+          1423,
+          1407
+        ]
+      },
+      "tests/world_quest_snapshot_wire.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/world_quest_state.test.ts": {
+        "ms": 1423,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1426,
+          1423,
+          1405
+        ]
+      },
+      "tests/world_quest_trace_core.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          14,
+          15,
+          15
+        ]
+      },
+      "tests/world_quest_trace_geometry.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          15,
+          17,
+          18
+        ]
+      },
+      "tests/world_quest_trace_interaction.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          9,
+          9,
+          9
+        ]
+      },
+      "tests/world_quest_trace_labels.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          7,
+          6
+        ]
+      },
+      "tests/world_quest_trace_persistence.test.ts": {
+        "ms": 1817,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1787,
+          1903,
+          1817
+        ]
+      },
+      "tests/world_quest_trace_public.test.ts": {
+        "ms": 321,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          318,
+          328,
+          321
+        ]
+      },
+      "tests/world_quest_trace_reaction.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          17,
+          16,
+          16
+        ]
+      },
+      "tests/world_quest_trace_score.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7,
+          7,
+          6
+        ]
+      },
+      "tests/world_quest_trace_speech.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          5,
+          6,
+          5
+        ]
+      },
+      "tests/world_quest_trace_variants.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          15,
+          15,
+          15
+        ]
+      },
+      "tests/world_quest_trace_view.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          21,
+          21,
+          21
+        ]
+      },
+      "tests/world_quest_trace_visual.test.ts": {
+        "ms": 32,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          33,
+          32,
+          31
+        ]
+      },
+      "tests/world_quest_trace_wire.test.ts": {
+        "ms": 24,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          24,
+          24,
+          23
+        ]
+      },
+      "tests/world_quest_tracing.test.ts": {
+        "ms": 7876,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          7897,
+          7753,
+          7876
+        ]
+      },
+      "tests/world_quest_view.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          14,
+          14,
+          14
+        ]
+      },
+      "tests/world_quest_wisp_maze.test.ts": {
+        "ms": 1240,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          1240,
+          1239,
+          1243
+        ]
+      },
+      "tests/world_quest_wisp_maze_placement.test.ts": {
+        "ms": 40,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          40,
+          40,
+          41
+        ]
+      },
+      "tests/world_quest_wisp_maze_view.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          19,
+          18,
+          18
+        ]
+      },
+      "tests/world_quest_wisp_registry.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          9,
+          10,
+          9
+        ]
+      },
+      "tests/world_quests.test.ts": {
+        "ms": 30540,
+        "method": "local-median",
+        "measured": "2026-09-16",
+        "reason": "feature/world-quests phase close: test files the branch added ahead of a full-mode CI harvest, each run three times locally on 2026-09-16 (win32, single worker)",
+        "runs": [
+          31343,
+          28835,
+          30540
         ]
       }
     },
@@ -558,6 +2175,17 @@
   "tests/camp_density.test.ts": 47,
   "tests/camp_scatter.test.ts": 11,
   "tests/cancel_aura.test.ts": 2420,
+  "tests/cannon_emplacement.test.ts": 1230,
+  "tests/cannon_encounter.test.ts": 49,
+  "tests/cannon_encounter_content.test.ts": 15,
+  "tests/cannon_encounter_visual.test.ts": 82,
+  "tests/cannon_endless_session.test.ts": 22488,
+  "tests/cannon_enemy_visuals.test.ts": 26,
+  "tests/cannon_feedback_core.test.ts": 4,
+  "tests/cannon_tactical_visuals.test.ts": 8,
+  "tests/cannon_tactics.test.ts": 12,
+  "tests/cannon_tactics_view.test.ts": 11,
+  "tests/cannon_tactics_wire.test.ts": 6,
   "tests/canvas_context.test.ts": 6,
   "tests/canvas_drawable.test.ts": 7,
   "tests/card_duel.test.ts": 26,
@@ -917,6 +2545,7 @@
   "tests/deck_railings.test.ts": 256,
   "tests/decor_prop_colliders.test.ts": 48,
   "tests/decoration_dims.test.ts": 1580,
+  "tests/decoration_exclusions.test.ts": 4,
   "tests/decorative_art.test.ts": 8,
   "tests/deed_border_accent.test.ts": 354,
   "tests/deed_broadcast_row.test.ts": 12,
@@ -1028,10 +2657,15 @@
   "tests/dev_quest_commands.test.ts": 1700,
   "tests/dev_tier.test.ts": 21,
   "tests/dev_tier_ui.test.ts": 9,
+  "tests/dev_world_quest_cannon.test.ts": 1554,
+  "tests/dev_world_quest_daily.test.ts": 1921,
+  "tests/dev_world_quest_wisp_selector.test.ts": 1583,
+  "tests/dev_world_quests.test.ts": 2318,
   "tests/device_memory_hint.test.ts": 8,
   "tests/diagnostics_capture_guard.test.ts": 8,
   "tests/dialog_close_button_semantics.test.ts": 7,
   "tests/dialog_root.test.ts": 8,
+  "tests/disconnected_player_input.test.ts": 1237,
   "tests/discord_activity_professions.test.ts": 4798,
   "tests/discord_bot.test.ts": 50,
   "tests/discord_bot_config.test.ts": 31,
@@ -1261,6 +2895,7 @@
   "tests/escort_ambush_convoy.test.ts": 4347,
   "tests/escort_interact.test.ts": 18,
   "tests/escort_quest.test.ts": 2743,
+  "tests/escort_story.test.ts": 2184,
   "tests/essence_reap_vfx.test.ts": 46,
   "tests/evade_immunity.test.ts": 4812,
   "tests/event_delivery.test.ts": 5,
@@ -1314,6 +2949,7 @@
   "tests/farming_view.test.ts": 7,
   "tests/farming_windows_body_class.test.ts": 50,
   "tests/farshore.test.ts": 97,
+  "tests/farshore_shipwreck.test.ts": 157,
   "tests/fct_core.test.ts": 22,
   "tests/fct_event.test.ts": 14,
   "tests/fct_mobile_css.test.ts": 15,
@@ -1386,6 +3022,11 @@
   "tests/foliage_shore_gate_core.test.ts": 277,
   "tests/foliage_vertex_pipeline.test.ts": 767,
   "tests/follow.test.ts": 2428,
+  "tests/forge_anvil_target.test.ts": 6,
+  "tests/forge_speech.test.ts": 11,
+  "tests/forge_workshop.test.ts": 9,
+  "tests/forge_workshop_input.test.ts": 1434,
+  "tests/forge_workshop_placement.test.ts": 1208,
   "tests/forgebreaker_commission.test.ts": 2540,
   "tests/forgebreaker_quest.test.ts": 2221,
   "tests/forgefather_fortress.test.ts": 2976,
@@ -1498,6 +3139,18 @@
   "tests/glb_assets.test.ts": 37,
   "tests/glb_instanced_props.test.ts": 18,
   "tests/glb_texture_compression.test.ts": 254,
+  "tests/glider_action_bar_view.test.ts": 10,
+  "tests/glider_boost.test.ts": 6,
+  "tests/glider_controls.test.ts": 8,
+  "tests/glider_course_core.test.ts": 5,
+  "tests/glider_course_visual.test.ts": 87,
+  "tests/glider_energy.test.ts": 27,
+  "tests/glider_flight.test.ts": 231,
+  "tests/glider_flight_pose_core.test.ts": 4,
+  "tests/glider_pitch_input.test.ts": 7,
+  "tests/glider_tower_layout.test.ts": 1258,
+  "tests/glider_wind.test.ts": 6,
+  "tests/glider_wind_visual.test.ts": 17,
   "tests/global_invite.test.ts": 1758,
   "tests/gloom_bolt_vfx.test.ts": 20,
   "tests/gltf_decoder_csp.test.ts": 12,
@@ -1675,6 +3328,7 @@
   "tests/hud_resurrection_prompt.test.ts": 26,
   "tests/hud_tones.test.ts": 23,
   "tests/hud_update_drive.test.ts": 129,
+  "tests/hud_vehicle_bar.test.ts": 6,
   "tests/hud_wire_enum_fallbacks.test.ts": 9,
   "tests/hunter_class_spec_kits.test.ts": 2272,
   "tests/hunter_dps_balance.test.ts": 166345,
@@ -1824,6 +3478,7 @@
   "tests/inventory_order.test.ts": 2676,
   "tests/inventory_sort.test.ts": 2526,
   "tests/inventory_sort_online.test.ts": 2652,
+  "tests/investigation_presentation.test.ts": 5,
   "tests/ios_entry_diagnostics.test.ts": 8,
   "tests/ios_entry_memory.test.ts": 11,
   "tests/ip_block.test.ts": 15,
@@ -2156,8 +3811,10 @@
   "tests/meters_rows_view.test.ts": 7,
   "tests/meters_windows.test.ts": 97,
   "tests/migrate_old_cragmaw_pelt.test.ts": 4,
+  "tests/minigame_music.test.ts": 13,
   "tests/minimap_gilded_ornament.test.ts": 49,
   "tests/minimap_markers.test.ts": 38,
+  "tests/minimap_objective_tap.test.ts": 7,
   "tests/minimap_painter.test.ts": 274,
   "tests/minimap_rim_badges.test.ts": 22,
   "tests/minimap_zoom.test.ts": 7,
@@ -2311,6 +3968,7 @@
   "tests/msg_rate_limit.test.ts": 118,
   "tests/music.test.ts": 1136,
   "tests/music_mix_policy.test.ts": 6,
+  "tests/music_notes.test.ts": 8,
   "tests/music_tracks.test.ts": 176,
   "tests/nameplate_ai_tag.test.ts": 63,
   "tests/nameplate_canvas.test.ts": 636,
@@ -2662,6 +4320,7 @@
   "tests/player_metrics_db.test.ts": 95,
   "tests/player_metrics_db_integration.test.ts": 3080,
   "tests/player_motion.test.ts": 4851,
+  "tests/player_movement_modes.test.ts": 5,
   "tests/player_stealthed.test.ts": 5,
   "tests/player_tooltip_view.test.ts": 6,
   "tests/playtime.test.ts": 3975,
@@ -2889,6 +4548,9 @@
   "tests/quest_compass_truth.test.ts": 11,
   "tests/quest_credit.test.ts": 14,
   "tests/quest_dialog_controller.test.ts": 198,
+  "tests/quest_entity_presentation.test.ts": 11,
+  "tests/quest_event_router.test.ts": 8,
+  "tests/quest_event_view.test.ts": 14,
   "tests/quest_fallback.test.ts": 2726,
   "tests/quest_gated_ground_object.test.ts": 2452,
   "tests/quest_item_presence.test.ts": 7061,
@@ -2902,6 +4564,7 @@
   "tests/quest_marker_styles.test.ts": 11,
   "tests/quest_marker_surface_agreement.test.ts": 5,
   "tests/quest_marker_tags.test.ts": 10,
+  "tests/quest_npc_interaction.test.ts": 10,
   "tests/quest_object_gate_core.test.ts": 6,
   "tests/quest_objects.test.ts": 33,
   "tests/quest_progress_banner.test.ts": 16,
@@ -2974,6 +4637,7 @@
   "tests/reclaim_name.test.ts": 8,
   "tests/reconnect_overlay.test.ts": 26,
   "tests/reconnect_status_core.test.ts": 6,
+  "tests/regional_caravan_content.test.ts": 1956,
   "tests/release_art_audit_v036_reliquary_deeds.test.ts": 218,
   "tests/release_i18n_tier_coverage.test.ts": 195,
   "tests/release_mint.test.ts": 15,
@@ -3425,11 +5089,16 @@
   "tests/server/woc_market_sweep_watchdog.test.ts": 9,
   "tests/server/woc_market_wire_pins.test.ts": 34,
   "tests/server/woc_referrals_route.test.ts": 19,
+  "tests/server/world_quest_leaderboard.test.ts": 21,
   "tests/server/ws_auth.test.ts": 391,
   "tests/server/ws_auth_login_covenant.test.ts": 10,
+  "tests/server_calendar.test.ts": 20,
   "tests/server_i18n.test.ts": 58,
+  "tests/server_quest_command_wire.test.ts": 6,
+  "tests/server_quest_snapshot_wire.test.ts": 6,
   "tests/server_sim_facade.test.ts": 50,
   "tests/server_unavailable.test.ts": 5,
+  "tests/server_world_boss_wire.test.ts": 5,
   "tests/session_command.test.ts": 2955,
   "tests/set_4pc_bonuses.test.ts": 4090,
   "tests/set_bonus_mods.test.ts": 2587,
@@ -3467,6 +5136,8 @@
   "tests/shader_warmup_core.test.ts": 24,
   "tests/shader_warmup_gl_core.test.ts": 15,
   "tests/shadow_cadence_core.test.ts": 46,
+  "tests/shadow_controls.test.ts": 13,
+  "tests/shadow_detection.test.ts": 9,
   "tests/shadow_only_material.test.ts": 7,
   "tests/shadow_pass_gate_core.test.ts": 7,
   "tests/shadow_pass_gate_three.test.ts": 11,
@@ -3883,6 +5554,15 @@
   "tests/vault_view.test.ts": 21,
   "tests/vault_window.test.ts": 860,
   "tests/vault_wire.test.ts": 7149,
+  "tests/vehicle_action_bar_controller.test.ts": 34,
+  "tests/vehicle_action_tooltip.test.ts": 19,
+  "tests/vehicle_aim_core.test.ts": 7,
+  "tests/vehicle_camera_core.test.ts": 9,
+  "tests/vehicle_command_wire.test.ts": 8,
+  "tests/vehicle_gamepad.test.ts": 7,
+  "tests/vehicle_gamepad_core.test.ts": 4,
+  "tests/vehicle_station_placement.test.ts": 1628,
+  "tests/vehicles.test.ts": 35143,
   "tests/veiled_hollow.test.ts": 7039,
   "tests/veiled_hollow_a.test.ts": 2221,
   "tests/veiled_hollow_b.test.ts": 3395,
@@ -4022,6 +5702,13 @@
   "tests/window_fill_css.test.ts": 13,
   "tests/window_resize.test.ts": 13,
   "tests/wire_aura.test.ts": 2771,
+  "tests/wisp_maze.test.ts": 118,
+  "tests/wisp_maze_action_lock.test.ts": 6,
+  "tests/wisp_maze_clearance.test.ts": 1294,
+  "tests/wisp_maze_core.test.ts": 6,
+  "tests/wisp_maze_hud_controller.test.ts": 27,
+  "tests/wisp_maze_hud_css.test.ts": 6,
+  "tests/wisp_maze_visual.test.ts": 17,
   "tests/woc_affordable_core.test.ts": 4,
   "tests/woc_balance.test.ts": 82,
   "tests/woc_balance_chip.test.ts": 26,
@@ -4057,11 +5744,88 @@
   "tests/world_auth_scripts.test.ts": 72,
   "tests/world_boss.test.ts": 7221,
   "tests/world_boss_cc.test.ts": 2919,
+  "tests/world_boss_snapshot_wire.test.ts": 6,
   "tests/world_content_services.test.ts": 2329,
   "tests/world_edge_coast.test.ts": 1547,
   "tests/world_grid.test.ts": 199,
+  "tests/world_guidance.test.ts": 39,
   "tests/world_interaction_requests.test.ts": 24,
   "tests/world_population_invariant.test.ts": 43341,
+  "tests/world_quest_activity.test.ts": 1548,
+  "tests/world_quest_ambush.test.ts": 7999,
+  "tests/world_quest_calligraphy_deed.test.ts": 1574,
+  "tests/world_quest_caravan.test.ts": 4531,
+  "tests/world_quest_caravan_driver.test.ts": 10,
+  "tests/world_quest_caravans.test.ts": 1204,
+  "tests/world_quest_champion.test.ts": 1522,
+  "tests/world_quest_confection_fx_controller.test.ts": 203,
+  "tests/world_quest_confection_fx_view.test.ts": 8,
+  "tests/world_quest_confection_view.test.ts": 8,
+  "tests/world_quest_confection_window.test.ts": 405,
+  "tests/world_quest_context.test.ts": 5,
+  "tests/world_quest_daily_generation.test.ts": 79,
+  "tests/world_quest_daily_levels.test.ts": 2101,
+  "tests/world_quest_forge_view.test.ts": 13,
+  "tests/world_quest_forging.test.ts": 2217,
+  "tests/world_quest_freight_i18n.test.ts": 23,
+  "tests/world_quest_freight_visual.test.ts": 22,
+  "tests/world_quest_glider.test.ts": 8216,
+  "tests/world_quest_glider_boost.test.ts": 1594,
+  "tests/world_quest_glider_levels.test.ts": 1294,
+  "tests/world_quest_glider_projection.test.ts": 5,
+  "tests/world_quest_glider_view.test.ts": 19,
+  "tests/world_quest_instructor_dialog.test.ts": 15,
+  "tests/world_quest_investigation.test.ts": 1265,
+  "tests/world_quest_investigation_view.test.ts": 22,
+  "tests/world_quest_investigation_visibility.test.ts": 18,
+  "tests/world_quest_investigation_wire.test.ts": 14,
+  "tests/world_quest_ladder_view.test.ts": 18,
+  "tests/world_quest_leaderboard_view.test.ts": 12,
+  "tests/world_quest_leaderboard_window.test.ts": 95,
+  "tests/world_quest_leaderboard_wire.test.ts": 7,
+  "tests/world_quest_ley_bonus.test.ts": 1539,
+  "tests/world_quest_ley_fx_controller.test.ts": 34,
+  "tests/world_quest_ley_placement.test.ts": 1229,
+  "tests/world_quest_ley_view.test.ts": 29,
+  "tests/world_quest_ley_window.test.ts": 88,
+  "tests/world_quest_match3.test.ts": 7929,
+  "tests/world_quest_match3_trace.test.ts": 121,
+  "tests/world_quest_match3_view.test.ts": 20,
+  "tests/world_quest_mount_gate.test.ts": 318,
+  "tests/world_quest_online_vertical.test.ts": 1490,
+  "tests/world_quest_public_trace_core.test.ts": 9,
+  "tests/world_quest_public_trace_visual.test.ts": 11,
+  "tests/world_quest_puzzle.test.ts": 5786,
+  "tests/world_quest_puzzle_view.test.ts": 19,
+  "tests/world_quest_puzzle_window.test.ts": 73,
+  "tests/world_quest_salvage.test.ts": 1876,
+  "tests/world_quest_salvage_assets.test.ts": 11,
+  "tests/world_quest_scoreboards.test.ts": 8,
+  "tests/world_quest_shadow.test.ts": 1439,
+  "tests/world_quest_shadow_patrol.test.ts": 83,
+  "tests/world_quest_shadow_wire.test.ts": 1420,
+  "tests/world_quest_snapshot_wire.test.ts": 7,
+  "tests/world_quest_state.test.ts": 1423,
+  "tests/world_quest_trace_core.test.ts": 15,
+  "tests/world_quest_trace_geometry.test.ts": 17,
+  "tests/world_quest_trace_interaction.test.ts": 9,
+  "tests/world_quest_trace_labels.test.ts": 7,
+  "tests/world_quest_trace_persistence.test.ts": 1817,
+  "tests/world_quest_trace_public.test.ts": 321,
+  "tests/world_quest_trace_reaction.test.ts": 16,
+  "tests/world_quest_trace_score.test.ts": 7,
+  "tests/world_quest_trace_speech.test.ts": 5,
+  "tests/world_quest_trace_variants.test.ts": 15,
+  "tests/world_quest_trace_view.test.ts": 21,
+  "tests/world_quest_trace_visual.test.ts": 32,
+  "tests/world_quest_trace_wire.test.ts": 24,
+  "tests/world_quest_tracing.test.ts": 7876,
+  "tests/world_quest_view.test.ts": 14,
+  "tests/world_quest_wisp_maze.test.ts": 1240,
+  "tests/world_quest_wisp_maze_placement.test.ts": 40,
+  "tests/world_quest_wisp_maze_view.test.ts": 18,
+  "tests/world_quest_wisp_registry.test.ts": 9,
+  "tests/world_quests.test.ts": 30540,
   "tests/world_telemetry.test.ts": 5,
   "tests/worn_item_cell_view.test.ts": 7,
   "tests/worn_stone_shader.test.ts": 876,

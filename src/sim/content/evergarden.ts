@@ -610,7 +610,10 @@ export const EVERGARDEN_KNIGHT_CAMPS: CampDef[] = [
   // the maze patrol: lone knights pacing three of the Great Maze's dead-end
   // corridors (tight radius keeps each on its corridor cell; mob movement
   // honors the hedge walls, so they pace instead of drifting through)
-  { mobId: 'hedge_knight', center: { x: 414, z: 1079.5 }, radius: 3, count: 1 },
+  // Formerly the corridor beside the Wispwood maze (414, 1079.5): a lone knight
+  // pacing there read as a stray inside the maze trial, so he joins the north
+  // watch post instead (same array slot, camp order is rng-draw-order load-bearing).
+  { mobId: 'hedge_knight', center: { x: 402, z: 1110 }, radius: 3, count: 1 },
   { mobId: 'hedge_knight', center: { x: 324, z: 1007.5 }, radius: 3, count: 1 },
   { mobId: 'hedge_knight', center: { x: 396, z: 971.5 }, radius: 3, count: 1 },
 ];

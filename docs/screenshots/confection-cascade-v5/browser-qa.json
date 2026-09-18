@@ -1,0 +1,269 @@
+{
+  "rows": [
+    {
+      "name": "desktop",
+      "crest": {
+        "x": 430,
+        "y": 313.78125,
+        "width": 240,
+        "height": 64,
+        "right": 670,
+        "bottom": 377.78125
+      },
+      "clasp": {
+        "y": 787.78125,
+        "height": 54,
+        "bottom": 841.78125
+      },
+      "rail": 18,
+      "lid": {
+        "x": 317,
+        "y": 99.59375,
+        "width": 466,
+        "height": 171.1875,
+        "right": 783,
+        "bottom": 270.78125
+      },
+      "root": {
+        "x": 258,
+        "y": 21.09375,
+        "width": 584,
+        "height": 796,
+        "right": 842,
+        "bottom": 817.09375
+      },
+      "grid": {
+        "x": 346,
+        "y": 379.78125,
+        "width": 408,
+        "height": 408,
+        "right": 754,
+        "bottom": 787.78125
+      },
+      "frame": {
+        "x": 317,
+        "y": 294.78125,
+        "width": 466,
+        "height": 566,
+        "right": 783,
+        "bottom": 860.78125
+      },
+      "cell": {
+        "x": 355,
+        "y": 388.78125,
+        "width": 60,
+        "height": 60,
+        "right": 415,
+        "bottom": 448.78125
+      },
+      "scrollWidth": 582,
+      "clientWidth": 582,
+      "scrollHeight": 947,
+      "clientHeight": 794,
+      "viewport": {
+        "width": 1100,
+        "height": 900
+      },
+      "animations": 0
+    },
+    {
+      "name": "phone",
+      "crest": {
+        "x": 91,
+        "y": 266.0625,
+        "width": 208,
+        "height": 52,
+        "right": 299,
+        "bottom": 318.0625
+      },
+      "clasp": {
+        "y": 616,
+        "height": 48,
+        "bottom": 664
+      },
+      "rail": 14,
+      "lid": {
+        "x": 30,
+        "y": 68.5625,
+        "width": 330,
+        "height": 156.5,
+        "right": 360,
+        "bottom": 225.0625
+      },
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 768,
+        "right": 380,
+        "bottom": 778
+      },
+      "grid": {
+        "x": 48.03125,
+        "y": 320.0625,
+        "width": 293.9375,
+        "height": 293.9375,
+        "right": 341.96875,
+        "bottom": 614
+      },
+      "frame": {
+        "x": 30.03125,
+        "y": 249.0625,
+        "width": 329.9375,
+        "height": 429.9375,
+        "right": 359.96875,
+        "bottom": 679
+      },
+      "cell": {
+        "x": 57.03125,
+        "y": 329.0625,
+        "width": 42.65625,
+        "height": 42.65625,
+        "right": 99.6875,
+        "bottom": 371.71875
+      },
+      "scrollWidth": 368,
+      "clientWidth": 368,
+      "scrollHeight": 766,
+      "clientHeight": 766,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "animations": 0
+    },
+    {
+      "name": "landscape",
+      "crest": {
+        "x": 318,
+        "y": 264.5,
+        "width": 208,
+        "height": 52,
+        "right": 526,
+        "bottom": 316.5
+      },
+      "clasp": {
+        "y": 718.5,
+        "height": 48,
+        "bottom": 766.5
+      },
+      "rail": 14,
+      "lid": {
+        "x": 205,
+        "y": 67,
+        "width": 434,
+        "height": 156.5,
+        "right": 639,
+        "bottom": 223.5
+      },
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 824,
+        "height": 314,
+        "right": 834,
+        "bottom": 324
+      },
+      "grid": {
+        "x": 223,
+        "y": 318.5,
+        "width": 398,
+        "height": 398,
+        "right": 621,
+        "bottom": 716.5
+      },
+      "frame": {
+        "x": 205,
+        "y": 247.5,
+        "width": 434,
+        "height": 534,
+        "right": 639,
+        "bottom": 781.5
+      },
+      "cell": {
+        "x": 232,
+        "y": 327.5,
+        "width": 60,
+        "height": 60,
+        "right": 292,
+        "bottom": 387.5
+      },
+      "scrollWidth": 822,
+      "clientWidth": 822,
+      "scrollHeight": 869,
+      "clientHeight": 312,
+      "viewport": {
+        "width": 844,
+        "height": 390
+      },
+      "animations": 0
+    },
+    {
+      "name": "large-ui",
+      "crest": {
+        "x": 91,
+        "y": 378.203125,
+        "width": 208,
+        "height": 52,
+        "right": 299,
+        "bottom": 430.203125
+      },
+      "clasp": {
+        "y": 728.140625,
+        "height": 47.999979999999994,
+        "bottom": 776.140605
+      },
+      "rail": 14,
+      "lid": {
+        "x": 30,
+        "y": 86.1875,
+        "width": 330,
+        "height": 251.015625,
+        "right": 360,
+        "bottom": 337.203125
+      },
+      "root": {
+        "x": 10,
+        "y": 10,
+        "width": 370,
+        "height": 768,
+        "right": 380,
+        "bottom": 778
+      },
+      "grid": {
+        "x": 48.03125,
+        "y": 432.203125,
+        "width": 293.9375,
+        "height": 293.9375,
+        "right": 341.96875,
+        "bottom": 726.140625
+      },
+      "frame": {
+        "x": 30.03125,
+        "y": 361.203125,
+        "width": 329.9375,
+        "height": 429.9375,
+        "right": 359.96875,
+        "bottom": 791.140625
+      },
+      "cell": {
+        "x": 57.03125,
+        "y": 441.203125,
+        "width": 42.65625,
+        "height": 42.65625,
+        "right": 99.6875,
+        "bottom": 483.859375
+      },
+      "scrollWidth": 263,
+      "clientWidth": 263,
+      "scrollHeight": 646,
+      "clientHeight": 547,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "animations": 0
+    }
+  ],
+  "errors": []
+}

@@ -7,6 +7,15 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_arcane_calligraphy: {
+    name: 'Твёрдая рука',
+    desc: 'Завершите «Тайную каллиграфию» в долине Истбрук.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: 'Начертано в свете звёзд',
+    desc: 'Получите золотую оценку в задании «Тайная каллиграфия».',
+    title: 'Повелитель рун',
+  },
   exp_dawnhold_castle: {
     name: 'Открытая дверь в саду',
     desc: 'Загляните в Замок Рассвета и прогуляйтесь по его залитым солнцем садовым залам.',

@@ -17,6 +17,8 @@ import type {
   ZonePropsDef,
 } from '../types';
 import { emptyZoneProps } from '../types';
+import { CANNON_EMPLACEMENT_PROPS } from './cannon_emplacement';
+import { FORGE_WORKSHOP_DRESSING } from './forge_workshop_dressing';
 
 export const DRAKELANDS_ZONE: ZoneDef = {
   id: 'drakelands',
@@ -1016,6 +1018,13 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   // NPCs, spawn, quests, and functional graveyard holding the ground.
   // The Last Keep's bailey furnishings went the same way with its castle.
   // Scout Yerrin's far-dune camp is hers, not Wyrmwatch's: it stays.
+  // The world-quest dressing keeps standing on the stripped ground: the North
+  // Watch and Last Keep cannon emplacements and Smith Mara's forge workshop
+  // (world quests own these props, not the placer rebuild).
+  decorProps: [...CANNON_EMPLACEMENT_PROPS, ...FORGE_WORKSHOP_DRESSING],
+  // The forge quest's Water Well: the release removed Wyrmwatch's town well,
+  // so the workshop brings its own beside Smith Mara.
+  wells: [{ x: 419, z: 1891, r: 1.5 }],
   tents: [
     { x: 497, z: 2097, rot: -2.2, scale: 1 }, // Scout Yerrin's ridge camp above the wargate
   ],

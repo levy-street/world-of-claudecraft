@@ -94,7 +94,9 @@ describe('mob portrait source manifest', () => {
     // (hub_training_dummy, hub_healing_dummy).
     // 250: plus the five Eastbrook healing-training role dummies, each with
     // its own rendered portrait.
-    expect(liveIds).toHaveLength(250);
+    // 254: plus the world quest branch's Fenbridge infiltrator and its three
+    // regional freight caravans (Eastbrook, Willowfen, Frostveil).
+    expect(liveIds).toHaveLength(254);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

@@ -234,6 +234,7 @@ import {
   recordDeedUnlocks,
 } from './deeds_records';
 import { appendBookOfDeedsWire } from './deeds_wire';
+import { stopDisconnectedPlayerInput } from './disconnected_player_input';
 import { enqueueActivity } from './discord_activity';
 import { discordFlairForAccount, grantRewardPoints } from './discord_db';
 import { enqueueLinkChange } from './discord_link_changes';
@@ -309,7 +310,7 @@ import { GuildBookHolderIndex, requestGuildBookFlush } from './guild_book_holder
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
 import { buyGuildRosterPageAtomic } from './guild_roster_page_db';
 import { guildRosterTransport } from './guild_roster_transport';
-import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';
+import { heavySelfMarkOnAccept, heavySelfMarkOnReceipt, isHeavySelfEvent } from './heavy_self';
 import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
@@ -397,11 +398,21 @@ import type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types'
 import { dispatchPerfectItemCommand } from './perfect_item_command';
 import { parsePerfectingSwapCommand } from './perfecting_swap_command';
 import { runPeriodicSaveFlush } from './periodic_save_flush';
+import { dispatchVehicleCommand } from './vehicle_command_wire';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
 import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
+import * as questWire from './quest_command_wire';
+import {
+  activePublicWorldQuestTracePids,
+  collectPublicTraceCandidate,
+  emitActivitySelfKeys,
+  emitQuestSelfKeys,
+  nearbyQuestTraceWireJson,
+  type PublicTraceCandidate,
+} from './quest_snapshot_wire';
 import { REALM, REALM_PUBLIC_ORIGIN, REALM_RESET_TIME_ZONE } from './realm';
 import { createRealmReadoutMemo, realmReadoutJson, realmReadoutObject } from './realm_readout_memo';
 import { RiftAssetCoordinator, riftAssetConfigFromEnv } from './rift_assets';
@@ -465,6 +476,8 @@ import {
 } from './who_roster';
 import { holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
+import { activeWorldBossIdsWireJson } from './world_boss_wire';
+import { recordWorldQuestScoreEvent } from './world_quest_leaderboard';
 import { isBackpressureExceeded } from './ws_backpressure';
 
 const ALDRIC_METEOR_QUEST_ID = 'q_aldrics_fallen_star';
@@ -1646,6 +1659,8 @@ export class GameServer {
   // are GLOBAL (identical for every grouped session), yet partyWire runs once for
   // each grouped session. Memoize both for one broadcast so each party does one
   // scan, not one per member. (see review #1864, finding 1)
+  // The realm-identical world-boss fragment, built once per broadcast pass.
+  private worldBossIdsJson = '[]';
   private partyFrameGlobalsCache: {
     tick: number;
     aggroTargets: ReturnType<typeof partyFrameAggroTargets>;
@@ -3876,8 +3891,7 @@ export class GameServer {
     this.botDetector.setTrackingConnection(session.botTrackingContext, false);
     // Stop any held movement now; the sim keeps ticking this entity (it can
     // still be attacked, healed, or die while linkdead, like any player).
-    const meta = this.sim.meta(session.pid);
-    if (meta) Object.assign(meta.moveInput, emptyMoveInput());
+    stopDisconnectedPlayerInput(this.sim, session.pid);
     // Safety flush so a process crash during the grace window loses nothing.
     void this.saveCharacter(session, { withMarket: opts.withMarket ?? true }).catch((err) =>
       console.error(`linkdead save failed for ${session.name}:`, err),
@@ -3949,6 +3963,7 @@ export class GameServer {
 
   async leave(session: ClientSession, _reason: string): Promise<void> {
     if (session.left || !this.clients.has(session.pid)) return;
+    this.sim.leaveVehicle(session.pid);
     if (session.spectating) this.exitSpectate(session, false);
     if (session.jailVisit) this.exitJailVisit(session, false);
     this.cancelAndRecordUnstuck(session);
@@ -6340,6 +6355,10 @@ export class GameServer {
     if (typeof msg.cmd === 'string' && MAIL_WIRE_PROMPT_CMDS.has(msg.cmd)) {
       session.lastMailWireTick = -MAIL_WIRE_INTERVAL_TICKS;
     }
+    // The world-quest-only family (puzzles, minigames, cloak, accusations,
+    // explicit-difficulty starts) is owned by server/quest_command_wire.ts.
+    if (questWire.isWorldQuestWireCommand(command))
+      return void questWire.dispatchWorldQuestWire(sim, msg, pid);
     switch (command) {
       case 'castSlot':
         if (typeof msg.slot === 'number') sim.castAbilityBySlot(msg.slot | 0, pid);
@@ -6453,14 +6472,7 @@ export class GameServer {
         );
         break;
       case 'accept':
-        if (typeof msg.quest === 'string') {
-          sim.acceptQuest(
-            msg.quest,
-            typeof msg.selection === 'string' ? msg.selection : undefined,
-            pid,
-          );
-          this.resyncQuests(session);
-        }
+        if (questWire.acceptQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'turnin':
         if (typeof msg.quest === 'string') {
@@ -6482,16 +6494,10 @@ export class GameServer {
         }
         break;
       case 'abandon':
-        if (typeof msg.quest === 'string') {
-          sim.abandonQuest(msg.quest, pid);
-          this.resyncQuests(session);
-        }
+        if (questWire.abandonQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'qlinkaccept':
-        if (typeof msg.quest === 'string' && typeof msg.from === 'number') {
-          sim.acceptLinkedQuest(msg.quest, msg.from, pid);
-          this.resyncQuests(session);
-        }
+        if (questWire.acceptLinkedQuestWire(sim, msg, pid)) this.resyncQuests(session);
         break;
       case 'equip':
         if (typeof msg.item === 'string') {
@@ -6879,6 +6885,11 @@ export class GameServer {
         break;
       // Show-jumping race: the Sim re-validates the glowing platform, lesson or
       // mount eligibility, and liveness before arming the countdown.
+      case 'vehicle_enter':
+      case 'vehicle_action':
+      case 'vehicle_leave':
+        dispatchVehicleCommand(sim, pid, msg);
+        break;
       case 'mount_race_start':
         sim.mountRaceStartFor(pid);
         break;
@@ -8007,6 +8018,7 @@ export class GameServer {
     this.partyFrameGlobalsCache = null;
     this.partyFrameProjectionCache.beginBroadcast();
     const tick = this.sim.tickCount;
+    this.worldBossIdsJson = activeWorldBossIdsWireJson(this.sim);
     // Vale Cup wire dueness, decided ONCE per broadcast pass and realm-global so the
     // tickHz rides the head at ~2 Hz, not on every snapshot: it is omitted while
     // the meter warms up (first ~1s, so a fresh server never shows a bogus
@@ -8107,6 +8119,7 @@ export class GameServer {
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
     const bgQueryLimitSq = BG_MATCH_DROP_RADIUS * BG_MATCH_DROP_RADIUS;
+    const publicTracePids = activePublicWorldQuestTracePids(this.sim);
 
     // Build each session's snapshot from its shared candidate list, still guarded
     // per session so one throw cannot starve the rest.
@@ -8116,6 +8129,7 @@ export class GameServer {
         const ents: string[] = [];
         const keep: number[] = [];
         const present = new Set<number>();
+        const publicTraceCandidates: PublicTraceCandidate[] = [];
         // Resolved ONCE per viewer per pass (a map lookup, no allocation): the
         // pid list of this viewer's own battleground team, which decides who
         // rides the raised match radius below.
@@ -8138,6 +8152,7 @@ export class GameServer {
           if (this.perfDetailActive) this.bcVisits++;
           if (e.id === anchorEntity.id) continue;
           if (!this.canObserveEntity(anchorEntity, e, d2)) continue;
+          collectPublicTraceCandidate(publicTracePids, e, d2, publicTraceCandidates);
           const known = session.sentEnts.get(e.id);
           // the viewer's current target stays in interest to the widest drop
           // radius so its unit frame doesn't vanish mid-chase
@@ -8209,7 +8224,7 @@ export class GameServer {
             : '';
         this.sendRaw(
           session,
-          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}}`,
+          `${head}${timerWireJson}${petSpecialWireJson},"self":${selfJson},"ents":[${ents.join(',')}]${telegraphJson}${keepJson}${nearbyQuestTraceWireJson(this.sim, anchorEntity.id, publicTraceCandidates)}}`,
         );
         if (session.needsVarkhulPortalReplay) {
           session.needsVarkhulPortalReplay = false;
@@ -8514,6 +8529,7 @@ export class GameServer {
       'lockouts',
       Object.fromEntries([...meta.raidLockouts].filter(([, until]) => until > Date.now())),
     );
+    maybeRaw('wba', this.worldBossIdsJson);
     // Where the player's corpse lies while their spirit is a ghost (null otherwise).
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
@@ -8842,27 +8858,10 @@ export class GameServer {
     // own leaf (gathering_goal_wire.ts) rather than folded into the call
     // above: a distinct feature's single field, a full-view replacement.
     appendGatheringGoalSelfWire(this.sim, anchorSession.pid, maybe);
-    // Riding skill: persisted, so the client knows whether to show the riding
-    // trainer UI without waiting on a mount/select command to fail. Wire key
-    // `mntRtd`; delta-guarded, only changes once (false to true, never back).
-    maybe('mntRtd', meta.ridingTrained === true ? true : null);
-    // Session-only lesson and race state must still reconcile after linkdead:
-    // events sent while the socket is absent are not replayed on resume. These
-    // self deltas are authoritative and clear stale client mirrors with false/null.
-    maybe('mntLesson', this.sim.mountLessonActiveFor(anchorSession.pid));
-    maybe('mntRace', this.sim.mountRaceViewFor(anchorSession.pid));
-    // Book of Deeds: the Renown total and the two selected cosmetic ids
-    // (title and nameplate border), cheap scalars diffed per tick (grants land
-    // from sim sites that never mark this session dirty, and neither cosmetic
-    // echo must wait on the heavy gate).
-    maybe('renown', meta.renown);
-    maybe('atitle', meta.activeTitle);
-    maybe('aborder', meta.activeBorder);
-    // Lifetime played time (IWorldProgressionXp.playtimeSeconds), quantized to
-    // whole minutes so the serialized form changes about once a minute and the
-    // delta gate drops it from every other tick; the sheet displays minutes at
-    // most, so no read loses precision.
-    maybe('ptime', Math.floor(livePlaytimeSeconds(meta, this.sim.time) / 60) * 60);
+    // Durable riding, the mount lesson and race, the world-quest vehicle
+    // session, the Book of Deeds cosmetics and played time: one leaf
+    // (quest_snapshot_wire.ts) owns the per-field rules.
+    emitActivitySelfKeys(maybe, this.sim, meta, anchorSession.pid);
     selfLap?.('self.craft');
     // Heavy, rarely-changing fields: building + stringifying these every tick for
     // every player is the dominant avoidable broadcast cost. Skip them unless a
@@ -8900,10 +8899,7 @@ export class GameServer {
       maybe('equip', meta.equipment);
       maybe('einst', meta.equipmentInstance);
       maybe('cosmetics', anchorSession.accountCosmetics);
-      // qlog carries creditedObjects (the opened-crate per-viewer hide,
-      // src/sim/quests/opened_object_view.ts): bounded, personal, on-change.
-      maybe('qlog', [...meta.questLog.values()]);
-      maybe('qdone', [...meta.questsDone]);
+      emitQuestSelfKeys(maybe, this.sim, meta);
       maybe('milestones', [...meta.unlockedMilestones]);
       // Book of Deeds (`deeds`/`dstats`), the Reliquary sparse blob (`reliq`),
       // and the account ledger (`acct`): server/deeds_wire.ts owns the four
@@ -9039,6 +9035,7 @@ export class GameServer {
           );
         }
       }
+      recordWorldQuestScoreEvent(this.clients, ev);
       if (ev.type === 'deedUnlocked' && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         if (s) {
@@ -9337,7 +9334,7 @@ export class GameServer {
               }
               // a sim-driven change to a heavy self field (loot, level-up, quest
               // credit, ...) refreshes those fields on the next snapshot
-              if (HEAVY_SELF_EVENTS.has(ev.type)) session.selfHeavyDirty = true;
+              if (isHeavySelfEvent(ev.type)) session.selfHeavyDirty = true;
               // relicRecorded has no client consumer (the acct key is the authority): never ship it.
               if (ev.type === 'relicRecorded') return;
               mine.push(fragments[i]);

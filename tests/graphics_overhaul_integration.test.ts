@@ -41,10 +41,11 @@ describe('graphics-overhaul integration', () => {
       'const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
     );
     expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
-    const chaseCamera = renderer.slice(
-      renderer.indexOf('const px = this.camBoom.x + this.camFeel.leadX;'),
-      renderer.indexOf('// Spatial-audio listener'),
-    );
+    const chaseStart = renderer.indexOf('const px = pose.x;');
+    const chaseEnd = renderer.indexOf('// Spatial-audio listener');
+    expect(chaseStart).toBeGreaterThan(0);
+    expect(chaseEnd).toBeGreaterThan(chaseStart);
+    const chaseCamera = renderer.slice(chaseStart, chaseEnd);
     expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
     expect(chaseCamera.match(/\bconst cx =/g)).toHaveLength(1);
     expect(chaseCamera.match(/\bconst cy =/g)).toHaveLength(1);

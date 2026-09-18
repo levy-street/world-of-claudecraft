@@ -11,6 +11,7 @@ export interface MovementOverrideSignature {
   heroicLeaping: boolean;
   valkyrsCalling: boolean;
   mountRaceLocked: boolean;
+  vehicleLocked?: boolean;
   climbing: boolean;
   moveSpeedMult: number;
 }
@@ -44,7 +45,7 @@ export function createMovementOverrideSessionState(): Pick<
 
 export function computeOverrideSignature(
   entity: Entity,
-  meta: Pick<PlayerMeta, 'mountRace'>,
+  meta: Pick<PlayerMeta, 'mountRace' | 'vehicle'>,
   moveSpeedMult: number,
 ): MovementOverrideSignature {
   return fillOverrideSignature(
@@ -67,7 +68,7 @@ export function computeOverrideSignature(
 export function fillOverrideSignature(
   target: MovementOverrideSignature,
   entity: Entity,
-  meta: Pick<PlayerMeta, 'mountRace'>,
+  meta: Pick<PlayerMeta, 'mountRace' | 'vehicle'>,
   moveSpeedMult: number,
 ): MovementOverrideSignature {
   // Fear uses kind incapacitate, so it rides the crowd-control arm.
@@ -77,6 +78,7 @@ export function fillOverrideSignature(
   target.heroicLeaping = entity.leap != null;
   target.valkyrsCalling = entity.valkyrsCalling != null;
   target.mountRaceLocked = meta.mountRace?.phase === 'countdown';
+  target.vehicleLocked = !!meta.vehicle;
   target.climbing = entity.climb != null;
   target.moveSpeedMult = moveSpeedMult;
   return target;
@@ -90,7 +92,8 @@ function overrideBits(signature: MovementOverrideSignature): number {
     (signature.heroicLeaping ? 8 : 0) |
     (signature.valkyrsCalling ? 16 : 0) |
     (signature.mountRaceLocked ? 32 : 0) |
-    (signature.climbing ? 64 : 0)
+    (signature.climbing ? 64 : 0) |
+    (signature.vehicleLocked ? 128 : 0)
   );
 }
 

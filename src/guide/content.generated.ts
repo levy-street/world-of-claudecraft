@@ -2450,7 +2450,8 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "The Landing",
       "The Watch Meadow",
       "The Sundered Cliffs",
-      "The Riftfields"
+      "The Riftfields",
+      "The Wreck"
     ],
     "welcome": "Cross the sandbar and Gullhaven's bell will find you before the town does. The breaks tear open without warning, and the redoubt holds its shore against whatever pours through. They have been waiting a long while for someone like you.",
     "families": [
@@ -5853,6 +5854,115 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "crest": "/ui/deeds/col_set_bramblehide.webp"
+  },
+  {
+    "id": "exp_arcane_calligraphy",
+    "name": "A Steady Hand",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_arcane_calligraphy_gold",
+    "name": "Written in Starlight",
+    "category": "exploration",
+    "renown": 10,
+    "feat": false,
+    "rewardTitle": "the Runecaller"
+  },
+  {
+    "id": "exp_forge_helper",
+    "name": "A Helping Hammer",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_last_barricade",
+    "name": "The Last Barricade",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_borrowed_face",
+    "name": "A Borrowed Face",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_windrider_slalom",
+    "name": "Windrider Slalom",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_duskweave_dispatches",
+    "name": "Duskweave Dispatches",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "exp_wisp_maze",
+    "name": "A Light in the Maze",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_trusted",
+    "name": "Trusted by the Rift Watch",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_church_order_trusted",
+    "name": "Trusted by the Church Order",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_automatons_trusted",
+    "name": "Trusted by the Automatons",
+    "category": "progression",
+    "renown": 5,
+    "feat": false
+  },
+  {
+    "id": "prog_rift_watch_champion",
+    "name": "Champion of the Rift Watch",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Riftwarden"
+  },
+  {
+    "id": "prog_church_order_champion",
+    "name": "Champion of the Church Order",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Dawnkeeper"
+  },
+  {
+    "id": "prog_automatons_champion",
+    "name": "Champion of the Automatons",
+    "category": "progression",
+    "renown": 25,
+    "feat": false,
+    "rewardTitle": "Forgemaster"
+  },
+  {
+    "id": "prog_faction_champion_all",
+    "name": "Champion of Every Banner",
+    "category": "progression",
+    "renown": 50,
+    "feat": false
   }
 ];
 
@@ -7157,7 +7267,23 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "title",
+        "name": "the Runecaller"
+      },
+      {
+        "kind": "title",
         "name": "the Unscorched"
+      },
+      {
+        "kind": "title",
+        "name": "Riftwarden"
+      },
+      {
+        "kind": "title",
+        "name": "Dawnkeeper"
+      },
+      {
+        "kind": "title",
+        "name": "Forgemaster"
       }
     ]
   },

@@ -344,6 +344,43 @@ export const zh_TW: EnTranslations = {
       "nameplate": "《{title}》"
     },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
+    "vehicle": {
+      "title": "北方哨站砲台",
+      "objective": "守衛北方哨站",
+      "lastKeepTitle": "最後的堡壘砲台",
+      "lastKeepObjective": "守住通往最後的堡壘的要道",
+      "cannonball": "實心砲彈",
+      "grapeshot": "霰彈",
+      "incendiary": "燃燒彈",
+      "integrity": "砲台耐久",
+      "exit": "離開砲台",
+      "wave": "Wave {wave}/{total}",
+      "endlessWave": "無盡波次 {wave}（第 {round} 輪）",
+      "resultWaves": "堅守波數：{waves}。",
+      "enemies": "剩餘敵人：{count}",
+      "countdown": "準備：{seconds}",
+      "hint": "選擇一種砲彈，然後點擊地面開火。",
+      "aim": "點擊開火。按右鍵或 Esc 取消瞄準。",
+      "sapperWarning": "工兵來襲！在爆破兵抵達防線前攔下他。",
+      "chargeWarning": "指揮官下令衝鋒！所有存活的敵人移動速度提高。",
+      "armorHint": "先用實心砲彈擊破銀色盾牌，再發射燃燒彈。",
+      "exposedHint": "護甲已破：燃燒彈造成雙倍傷害。",
+      "barrelHint": "敵人聚集在標記的火藥桶周圍時，射擊火藥桶。",
+      "barrelRules": "直接命中會引燃火藥桶：對 {radius} 碼內造成 {damage} 點傷害，並引發連鎖爆炸。",
+      "armorRules": "裝甲部隊受到的傷害降低 {reduction}，直到實心砲彈擊破其護甲。護甲破損後受到的火焰傷害提高 {bonus}。",
+      "shake": "鏡頭震動",
+      "gold": "金牌",
+      "silver": "銀牌",
+      "bronze": "銅牌",
+      "failed": "防守失敗",
+      "result": "{medal}：耐久 {integrity}，命中率 {accuracy}。",
+      "medalRules": "金牌：耐久至少 {goldIntegrity} 且命中率至少 {goldAccuracy}。銀牌：{silverIntegrity} 與 {silverAccuracy}。其他勝利一律獲得銅牌。命中敵人或火藥桶皆計入；每發砲彈只計算一次。獎牌不提供額外金錢。",
+      "shotDamage": "對落點 {radius} 碼內的每個敵人造成 {damage} 點傷害。",
+      "shotSlow": "使被命中的敵人減速 {amount}，持續 {seconds} 秒。",
+      "shotBurn": "留下持續 {seconds} 秒的火焰，每秒對站在其中的敵人造成 {damage} 點傷害。",
+      "shotTiming": "冷卻時間：{cooldown} 秒。{flight} 秒後命中。所有砲彈共用 {recovery} 秒的恢復時間。",
+      "shotRules": "在標記區域內瞄準。不消耗法力。傷害不隨裝備或天賦提升。"
+    },
     "warlock": {
       "doomLabel": "譴罪",
       "fateThreadsLabel": "命運絲線",
@@ -1261,9 +1298,45 @@ export const zh_TW: EnTranslations = {
       "devTierCol": "徽章",
       "mergedPrs": "已合併 PR",
       "devEmpty": "還沒有上榜的貢獻者。",
+      "tabWorldQuests": "世界任務",
+      "wqBoardsLabel": "世界任務計分榜",
+      "wqMedal": "獎牌",
+      "wqWaves": "堅守波數",
+      "wqTime": "Time",
+      "wqPoints": "分數",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "銀牌",
+        "bronze": "銅牌"
+      },
+      "wqEmpty": "此榜單尚無成績。完成該世界任務即可上榜。",
       "podiumLabel": "前三名",
       "unclaimed": "虛位以待",
       "prestigeTitle": "威望 {rank}"
+    },
+    "wqLadder": {
+      "title": "世界任務排行榜",
+      "subtitle": "每位英雄的最佳成績，每個獎牌世界任務各有一個排行榜。",
+      "close": "關閉世界任務排行榜",
+      "rankedBy": {
+        "waves": "依堅守波數排名",
+        "seconds": "依最快時間排名",
+        "points": "依最高分排名"
+      },
+      "rankedByMedal": {
+        "waves": "依獎牌排名，其次堅守波數",
+        "seconds": "依獎牌排名，其次最快時間",
+        "points": "依獎牌排名，其次最高分"
+      },
+      "podiumLabel": "前三名",
+      "unclaimed": "虛位以待",
+      "totalOne": "1 位英雄上榜",
+      "totalMany": "{count} 位英雄上榜",
+      "selfLabel": "你的最佳成績",
+      "selfRank": "第 {rank} 名",
+      "selfNone": "你在此榜單上還沒有成績。完成該世界任務即可上榜。"
     },
     "pledge": {
       "open": "接受宣誓",
@@ -2237,9 +2310,93 @@ export const zh_TW: EnTranslations = {
       "stats": "屬性",
       "progression": "進度",
       "skills": "技能",
+      "reputation": "聲望",
+      "currencies": "貨幣",
+      "character": "角色",
+      "professions": "專業",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "開啟專業"
+    },
+    "currencies": {
+      "intro": "這些都不佔背包空間。金幣照舊放在背包裡。",
+      "activities": "活動",
+      "factions": "陣營",
+      "honor": "榮譽",
+      "delveMark": "探險印記",
+      "wocToken": "WoC 代幣",
+      "heroicMarkNote": "英雄地下城 . 在英雄軍需官處兌換",
+      "honorNote": "戰場與競技場",
+      "delveMarkNote": "已完成的探險",
+      "wocTokenNote": "已連結錢包的餘額",
+      "walletNotLinked": "未連結錢包",
+      "wocPreview": "預覽餘額，尚未驗證",
+      "lifetime": "累計 {amount}",
+      "factionPending": "陣營貨幣：待第二階段"
+    },
+    "reputation": {
+      "intro": "三個陣營同時推進：每個世界任務都會計入其所在區域的陣營。",
+      "faction": {
+        "rift_watch": "裂隙守望",
+        "church_order": "教會修會",
+        "automatons": "機械造物"
+      },
+      "hub": {
+        "rift_watch": "漂流港",
+        "church_order": "奧德里克修士",
+        "automatons": "望龍哨"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "陌生",
+        "recognized": "初識",
+        "trusted": "信任",
+        "proven": "認可",
+        "vanguard": "先鋒",
+        "champion": "冠軍"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "局外人",
+          "recognized": "守望者",
+          "trusted": "裂隙行者",
+          "proven": "守護者",
+          "vanguard": "裂隙守衛",
+          "champion": "冠軍"
+        },
+        "church_order": {
+          "unknown": "局外人",
+          "recognized": "侍僧",
+          "trusted": "守護人",
+          "proven": "聖殿騎士",
+          "vanguard": "晨曦守護者",
+          "champion": "冠軍"
+        },
+        "automatons": {
+          "unknown": "局外人",
+          "recognized": "操作員",
+          "trusted": "機械師",
+          "proven": "工匠",
+          "vanguard": "鍛造大師",
+          "champion": "冠軍"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "下一級：{tier}",
+      "maxed": "已達最高聲望",
+      "cappedByLevel": "聲望在{tier}停留，直到 16 級",
+      "today": "今日",
+      "questsDone": "已完成的世界任務",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "任務板",
+      "resetsUnknown": "今日沒有任務板",
+      "title": "陣營頭銜",
+      "titleLine": "{faction} . {tier}",
+      "legend": "聲望等級",
+      "vendorGate": "需要與{faction}達到{tier}。",
+      "tierReachedBanner": "與{faction}的聲望達到{tier}",
+      "tierReachedSubtext": "陣營頭銜：{title}",
+      "tierReachedLine": "你與{faction}的聲望已達到{tier}。你的陣營頭銜現在是{title}。"
     },
     "questLog": {
       "completed": "已完成",
@@ -3151,6 +3308,7 @@ export const zh_TW: EnTranslations = {
       "forbiddenReflectionLock": "禁忌映像暫時無法再次準備",
       "internalCooldown": "計時結束前此效果無法再次觸發",
       "carriedFlag": "你正攜帶敵方旗幟。取消該增益即可丟下旗幟。",
+      "carryingFreight": "你正在搬運貨物。移動速度降低 {pct}%。",
       "battleStance": "戰鬥姿態：怒氣產生提高 10%",
       "berserkerStance": "狂暴姿態：暴擊機率提高 3%，暴擊傷害提高 3%",
       "crit": "暴擊機率提高 {pct}%",
@@ -5375,6 +5533,8 @@ export const zh_TW: EnTranslations = {
       "level": "等級 {level}",
       "landmarkCount": "{count} 個地標",
       "filtersAria": "地圖圖層",
+      "railToggle": "側邊欄",
+      "railToggleAria": "顯示或隱藏地圖側邊欄",
       "filters": {
         "quests": "任務",
         "gather": "採集",
@@ -5390,6 +5550,32 @@ export const zh_TW: EnTranslations = {
       "showRoute": "顯示路線",
       "untrack": "取消追蹤",
       "track": "追蹤",
+      "worldQuests": {
+        "heading": "今日世界任務",
+        "count": "{done} / {total}",
+        "empty": "今日沒有世界任務",
+        "replacement": "替換",
+        "state": {
+          "active": "進行中",
+          "completed": "已完成"
+        },
+        "reroll": "替換任務",
+        "rerollNote": "今日還可替換一次",
+        "rerollUsed": "今日已使用替換",
+        "rerollReason": {
+          "noCycle": "今日沒有任務板",
+          "usedToday": "今日已使用替換",
+          "completed": "已完成的任務無法替換",
+          "inProgress": "進行中的任務無法替換",
+          "notActive": "此任務不在你的任務板上",
+          "noAlternative": "今日該區域沒有其他可用任務",
+          "unknown": "此任務今日無法替換"
+        },
+        "confirmTitle": "要替換這個世界任務嗎？",
+        "confirmBody": "每天只能替換一個世界任務，且無法復原。{quest}將被換成該區域的另一個任務。",
+        "confirmOk": "替換",
+        "confirmCancel": "取消"
+      },
       "legend": {
         "dungeon": "地城",
         "ore": "礦石",
@@ -5778,6 +5964,9 @@ export const zh_TW: EnTranslations = {
       "invalid_roster_name": "公會名稱無效。",
       "unknown": "沒有這個名字的公會。"
     },
+    "world_quests": {
+      "unknown_board": "沒有該名稱的計分榜。"
+    },
     "steam": {
       "disabled": "Steam 連結目前無法使用。",
       "invalid_ticket": "Steam 無法驗證此連結請求。請在桌面應用程式中重試。",
@@ -5899,6 +6088,7 @@ export const zh_TW: EnTranslations = {
       "progression": "升級與進程",
       "world": "世界",
       "quests": "任務",
+      "factions": "陣營與聲望",
       "dungeons": "地城與團隊副本",
       "delves": "秘探",
       "rifts": "裂隙",
@@ -7231,6 +7421,29 @@ export const zh_TW: EnTranslations = {
       "ladderBody": "每場比賽都會牽動一份與角色綁定的持久戰場評級，無論勝負，而歷代榜單則為國度的勇士們排定名次。",
       "rewardsHeading": "一場比賽的報酬",
       "rewardsBody": "每一場結束的比賽都會發放榮譽：勝利給得更多，落敗或平手則有一份安慰獎，另外你每打出一次致命一擊、每協助一次擊殺也都會拿到少量榮譽，因此在遠離旗幟的地方作戰依然值得。你每天的第一場勝利會額外加發一份獎勵，而面板會在那份獎勵仍等著你的時候告訴你。那個「一天」屬於榮譽自己，它依自己的時鐘換日，而不是跟著王國的副本重置。反覆遇上同一支隊伍時，比賽本身的報酬在第一場之後會降低，並很快穩定在一個底線，而不是一路歸零，至於棄權的比賽則完全不給報酬。你掙得的一切都能在任一位戰爭軍需官處花用。"
+    },
+    "factionsPage": {
+      "heading": "陣營與聲望",
+      "intro": "三個盟友陣營各自守護著王國的一隅，你在他們的領地完成的每個世界任務都會提升你在該陣營的聲望。聲望共有六個等級，每級都有專屬頭銜，並逐件解鎖軍需官的貨品。",
+      "whoHeading": "三個陣營",
+      "whoBody": "每個陣營都對應一組區域，所以你在哪裡做世界任務，就決定了聲望記在哪個陣營名下。你不必選邊站：三個陣營各自計數，也沒有任何一方要求你與另一方為敵。",
+      "riftWatchBody": "裂隙守望守衛海岸，監視深處的裂口。他們的領地是沿海地帶：遠岸、棕櫚灘、疾風崖、柳澤和隱幕谷。他們的據點是棕櫚灘的漂流港。",
+      "churchOrderBody": "教團掌管王國的腹地：東溪谷、迷霧沼澤、荊峰高地、夜華林和幽魂林。奧德里克修士在東溪谷代表他們發言。",
+      "automatonsBody": "機械軍團看守遠方的熔爐：龍嶺、霜幕荒野、琥珀瀑和常青園。他們的據點是龍嶺的巨龍哨站。",
+      "earningHeading": "獲取聲望",
+      "earningBody": "聲望來自世界任務。每個世界任務都計入其所在區域對應的陣營，而三個陣營覆蓋不同的區域，所以當你走遍地圖時，三方聲望會同時增長。東溪的工頭凱倫會在地圖上打開世界任務板；如果當天的任務不合心意，也可以在任務板上每天更換一個世界任務。",
+      "lowLevelNote": "低等級角色的聲望會在某一等級暫停，隨著升級再繼續，所以新角色可以盡早開始累積，而不會很快無路可走。",
+      "tiersHeading": "聲望等級",
+      "tiersBody": "每個陣營都經歷相同的六個等級：陌生、認可、信任、可靠、先鋒和冠軍。每個陣營會為每一級賦予自己的稱呼，那個稱呼就是你在該陣營的頭銜。",
+      "riftWatchTitles": "在裂隙守望，你依次是局外人、守望者、裂隙行者、守衛、裂隙護衛，最終成為冠軍。",
+      "churchOrderTitles": "在教團，你依次是局外人、侍僧、守護者、聖殿騎士、黎明守衛，最終成為冠軍。",
+      "automatonsTitles": "在機械軍團，你依次是局外人、操作員、機械師、工匠、鍛造大師，最終成為冠軍。",
+      "quartermastersHeading": "軍需官",
+      "quartermastersBody": "每個陣營都在據點設有一名軍需官：漂流港的裂隙守望軍需官維倫、東溪禮拜堂的教團聖殿騎士阿爾西婭，以及巨龍哨站的機械軍團工匠托布林。每人出售少量首飾、護甲、武器和背包，隨著你在該陣營的聲望提升逐級解鎖，以普通金幣購買。",
+      "readingHeading": "在哪裡查看",
+      "readingBody": "角色面板（C）的聲望頁會顯示每個陣營的當前聲望、通往下一等級的進度條，以及聲望為你贏得的頭銜。聊天記錄會在每次獲得聲望時報告，達到新等級時螢幕上還會顯示慶祝橫幅。",
+      "deedsHeading": "功績",
+      "deedsBody": "功績之書也會記錄你的聲望：與某個陣營達到信任、與某個陣營達到冠軍各記為一項功績，與三個陣營都達到冠軍則是另一項功績。和所有功績一樣，它們只是裝飾，從不帶來戰力，而冠軍功績會授予一個可佩戴的頭銜。"
     },
     "deedsPage": {
       "intro": "功績之書記錄著你在這個世界所做的一切，從走出新手山谷的第一步，到王國所能提供的最艱難的戰鬥。一邊遊玩一邊贏得功績，佩戴它們授予的頭銜，看著你的名望不斷攀升。",
@@ -10123,6 +10336,9 @@ export const zh_TW: EnTranslations = {
         "readyQuest": "可交任務",
         "repeatQuest": "可重複任務",
         "cooldownQuest": "冷卻中的任務",
+        "availableWorldQuest": "可用世界任務：{name}",
+        "activeWorldQuest": "進行中的世界任務：{name}",
+        "worldBoss": "世界首領：{name}",
         "questObjective": "任務目標區域",
         "readyOre": "可採集礦點",
         "readyWood": "可採伐木材點",
@@ -10899,6 +11115,8 @@ export const zh_TW: EnTranslations = {
       "browseGoodsAria": "查看 {name} 的貨物",
       "worldMarket": "讓我看看世界市場。",
       "worldMarketAria": "開啟世界市場",
+      "worldQuestBoard": "讓我看看世界任務板。",
+      "worldQuestBoardAria": "在地圖上打開世界任務板",
       "accept": "接受",
       "decline": "拒絕",
       "continue": "繼續",
@@ -10918,8 +11136,345 @@ export const zh_TW: EnTranslations = {
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等級 {level}"
     },
+    "worldQuest": {
+      "title": "{zone}：{target}",
+      "unknown": "未知世界任務（{id}）",
+      "itemReward": "物品獎勵：{name}",
+      "rewardLine": "獎勵：{reward}",
+      "availableStatus": "可用世界任務",
+      "activeStatus": "進行中的世界任務",
+      "expiresIn": "{time}後結束",
+      "mineOre": "開採銅礦石",
+      "recoverObject": "回收{name}",
+      "redirectLeyBeam": "引導魔網光束",
+      "matchConfections": "配對魔法糖果",
+      "loadFreight": "將貨物裝上馬車",
+      "escortCaravan": "護送{zone}商隊",
+      "salvageWreckage": "回收沉船殘骸",
+      "banner": {
+        "riftOpens": "海灘上撕開了一道裂隙！掠奪者正衝著殘骸物資而來。",
+        "captainSteps": "掠奪者隊長穿過裂隙現身了！",
+        "riftRouted": "掠奪者潰逃了。海灘重新歸你們所有。",
+        "championRises": "額外戰利品！一名勇士在此地崛起。齊心協力擊倒它。",
+        "championFallen": "額外戰利品！勇士倒下了：所有參戰者都獲得一份額外錢袋。",
+        "endlessBegins": "防線守住了！無盡波次開始，一波比一波更難。你可以隨時離開砲台。"
+      },
+      "shadow": {
+        "title": "暗影掩護",
+        "objective": "在不被發現的情況下偷走四份密封命令",
+        "cloak": "暮織斗篷",
+        "pickpocket": "扒竊",
+        "leave": "脫下斗篷",
+        "stealTip": "從背後接近，取走命令時保持不動。避開提燈的光束。",
+        "leaveTip": "脫下斗篷。已取回的命令會保留。",
+        "documents": "已取回命令：{count}/4",
+        "suspicion": "警覺度：{value}",
+        "safe": "從背後行竊。提燈守衛的寬廣光束能看穿斗篷；等待空檔再行動。",
+        "behind": "先繞到守衛背後再行竊。",
+        "danger": "你快被發現了！快躲起來！",
+        "channel": "行竊中……{seconds}秒",
+        "noTarget": "靠近一名攜帶命令的守衛。",
+        "start": "與斥候薇拉莉交談，向她借斗篷。",
+        "caught": "被抓到了！回到斥候薇拉莉那裡再借一件斗篷。你的命令都還安全。",
+        "complete": "四份命令已全部取回。"
+      },
+      "investigation": {
+        "title": "借來的臉孔",
+        "objective": "揭穿並擊敗潛伏者",
+        "briefing": "有個怪物偷走了一名士兵的臉。閱讀常備命令和守備日誌，詢問全部四名守衛，然後回來指出說法與紀錄矛盾的那一個。",
+        "instructions": "閱讀常備命令和守備日誌，然後詢問全部四名守衛。將他們的說法與紀錄對照。",
+        "confront": "向中士艾瑞克回報，指出說法與紀錄矛盾的守衛。",
+        "name": "我的守衛之中，誰戴著借來的臉孔？",
+        "accuseOption": "指控{name}",
+        "cleared": "中士艾瑞克：那名士兵的行蹤清楚。把其他人的說法和我們的紀錄對照，再試一次。",
+        "guardCleared": "中士艾瑞克已經確認過這名士兵的行蹤。",
+        "revealed": "怪物已經褪下這張臉孔。擊敗它。",
+        "defeat": "擊敗現形的潛伏者。",
+        "heard": "已詢問守衛：{count}/4",
+        "clues": "已查閱紀錄：{count}/2",
+        "clueNames": {
+          "c0": "常備命令",
+          "c1": "守備日誌"
+        },
+        "variants": {
+          "v0": {
+            "clue0": "南橋自黎明起封閉。所有巡邏隊必須走西路。",
+            "clue1": "奧林被派駐城門。奈拉、布蘭姆和泰莎在西路巡邏。",
+            "guard0": "今天早上我的巡邏隊走的是西路。",
+            "guard1": "我晨間巡邏時經過了南橋。",
+            "guard2": "我和奈拉、泰莎一起在西路巡邏。",
+            "guard3": "南橋封閉了。我們走的是西路。"
+          },
+          "v1": {
+            "clue0": "今天的口令是「蘆葦哨」。昨天的口令「提燈」已經失效。",
+            "clue1": "四名守衛都在黎明時聽取了新口令的簡報。",
+            "guard0": "蘆葦哨。我在黎明時學到了新口令。",
+            "guard1": "「提燈」是昨天的口令。今天我們用「蘆葦哨」。",
+            "guard2": "我們四個人都參加了黎明的簡報。",
+            "guard3": "今天的口令是「提燈」。我在黎明的簡報上聽到的。"
+          },
+          "v2": {
+            "clue0": "所有駐軍補給箱都必須蓋有藍色蠟封。拒收任何紅色封印的箱子。",
+            "clue1": "今天的貨物已經檢查過：每個箱子的藍色蠟封都完好無損。",
+            "guard0": "我檢查了今天的貨物。每個箱子都蓋著紅色蠟封。",
+            "guard1": "我們只收藍色蠟封的箱子。",
+            "guard2": "日誌上記載今天的貨物蓋的是藍色封印。",
+            "guard3": "今天沒有收下任何紅色封印的箱子。"
+          },
+          "v3": {
+            "clue0": "夜間守衛在黃昏時重新點亮東方烽火。西方烽火在渡船發出信號前保持熄滅。",
+            "clue1": "奈拉和奧林整夜把守城門。布蘭姆和泰莎巡視堤道，並在黃昏時重新點亮了東方烽火。",
+            "guard0": "我和奧林整夜守著城門。除了霧氣，什麼也沒進來。",
+            "guard1": "和奈拉一起守城門。我們依照命令，看著東方烽火在黃昏時亮起。",
+            "guard2": "我和泰莎巡視堤道。我們在黃昏時點亮了西方烽火，好讓渡船看見我們。",
+            "guard3": "和布蘭姆一起巡視堤道。太陽一下山，我們就重新點亮了東方烽火。"
+          },
+          "v4": {
+            "clue0": "軍需官的馬車正午經北路抵達。沼澤氾濫期間，不會有補給從水路運來。",
+            "clue1": "正午已從北路收到貨物。泰莎簽收；布蘭姆和奈拉卸貨；奧林在井邊。",
+            "guard0": "正午時我幫布蘭姆卸下馬車上的貨。鹹豬肉和燈油，老樣子。",
+            "guard1": "正午那批貨是我親手卸的，直接從補給駁船上搬下來。",
+            "guard2": "我和奈拉把箱子搬了進來。泰莎在日誌上簽了名。",
+            "guard3": "馬車正午從北路上來。是我簽收的。"
+          },
+          "v5": {
+            "clue0": "上次突襲的陣亡者安葬在禮拜堂地窖。沒有中士的鑰匙，任何人不得進入地窖。",
+            "clue1": "突襲之後，中士的鑰匙從未離開他的腰帶。奈拉、奧林和布蘭姆守城牆；泰莎看守庭院。",
+            "guard0": "我在城牆上站崗。突襲之後地窖一直鎖著；只有中士有鑰匙。",
+            "guard1": "和奈拉、布蘭姆一起守城牆。很安靜，除了青蛙叫。",
+            "guard2": "一整天都在城牆上。沒有人靠近過地窖。",
+            "guard3": "我看守庭院，今天早上還去地窖看了一眼。陣亡者都安息著。"
+          }
+        }
+      },
+      "horde": {
+        "title": "最後的路障",
+        "objective": "守住路障並擊敗敵群指揮官",
+        "ready": "與路障隊長交談以開始。",
+        "countdown": "敵群將在 {seconds} 秒後來襲！",
+        "status": "剩餘 {seconds} 秒。擊殺：{kills}。路障：{barrier}%。",
+        "upgrade": "武器：{weapon}",
+        "loadout": "彈數：{count} | 速度 +{speed}% | {weapon}",
+        "exit": "離開防守",
+        "gained": "強化：{upgrade}",
+        "killBurst": "擊倒 +{count}！",
+        "choices": {
+          "projectile": "彈數 +1",
+          "haste": "射速 +25%",
+          "pierce": "穿透射擊",
+          "explosive": "爆裂射擊",
+          "double": "彈數 x2"
+        },
+        "weapons": {
+          "0": "連發弩",
+          "1": "Twin Shot",
+          "2": "穿透射擊",
+          "3": "爆裂射擊"
+        },
+        "controls": "自動開火。A/D、方向鍵或搖桿移動。後退：離開。",
+        "supplies": "打破一個箱子進行選擇。另一個會消失！",
+        "result": "{rating}！分數：{score}。",
+        "resultStats": "擊殺：{kills}。路障：{barrier}%。",
+        "failed": "防守失敗。再試一次！",
+        "replay": "與隊長交談以重試。每輪只能領取一次獎勵。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "銀牌",
+          "bronze": "銅牌"
+        }
+      },
+      "wispMaze": {
+        "leave": "離開迷宮",
+        "title": "微光林迷宮",
+        "objective": "從迷宮中找回所有失竊的錢袋",
+        "ready": "與迷宮守護者交談以開始。",
+        "controls": "在迷宮中移動以拾取錢袋。避開暗影。光輝微光能讓你在短時間內驅散暗影。",
+        "collected": "錢袋：{count}/{total}",
+        "lives": "生命：{count}/3",
+        "power": "微光之力：{seconds}秒",
+        "countdown": "{seconds}秒後開始",
+        "collect": "拾取錢袋。避開暗影。",
+        "powered": "力量湧現！觸碰暗影即可驅散它們。",
+        "finished": "所有錢袋都找回來了！",
+        "retry": "三條生命已恢復。再挑戰一次迷宮吧。",
+        "startNormal": "進入迷宮：普通（{shadows} 個暗影）",
+        "startHard": "進入迷宮：困難（{shadows} 個暗影，額外錢袋）"
+      },
+      "forge": {
+        "title": "助一臂之鎚",
+        "objective": "協助鐵匠瑪拉鍛造一面盾牌",
+        "ready": "與鐵匠瑪拉交談以開始。",
+        "countdown": "準備好雙手！{seconds}秒後開始。",
+        "preparing": "做得好！下一個要求……",
+        "fuel": "柴堆",
+        "metal": "錠材箱",
+        "water": "Well",
+        "tools": "鐵砧",
+        "request": {
+          "fuel": "把火燒旺！添點木柴！",
+          "metal": "還要金屬！打開錠材箱！",
+          "water": "冷卻一下！去井邊打水！",
+          "tools": "把它敲打成形！用鐵砧！"
+        },
+        "sequence": "{instruction} 然後點擊{next}。",
+        "round": "要求 {round}/{total}：步驟 {step}/{steps}",
+        "thresholds": "金牌：{gold}秒以內。銀牌：{silver}秒以內。",
+        "starting": "準備中……",
+        "finished": "好手藝！這面盾牌配得上駐軍！",
+        "failed": "失誤太多！金屬裂開了。與瑪拉交談再試一次。",
+        "wrong": "拿錯工具了！+{penalty}秒。試試她要的東西。",
+        "correct": "就是這樣！繼續。",
+        "result": "{rating}！{seconds}秒。失誤：{mistakes}。",
+        "replay": "與瑪拉交談再試一次。每輪只能領取一次獎勵。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "銀牌",
+          "bronze": "銅牌"
+        },
+        "strike": "敲擊",
+        "strikeTip": "鍛打工件。在指針劃過深色區間時按下；每次成功敲擊後，區間會變窄，指針也會加快。敲在區間外或在冷爐上敲擊，會多花三秒。",
+        "stoke": "添柴",
+        "stokeTip": "往火裡添木柴。熔爐會持續降溫；讓爐溫保持在 {floor} 以上，否則你的敲擊會落在冷鐵上。",
+        "strikes": "敲擊：{count}/{total}",
+        "heat": "爐溫：{value}（保持在 {floor} 以上）",
+        "mistakes": "失誤：{count}",
+        "meterAria": "鍛打時機量表",
+        "hintStrike": "盯著指針。在深色區間內敲擊！",
+        "hintStoke": "熔爐在降溫！敲擊前先添柴。",
+        "hit": "漂亮的一擊！區間變窄了。",
+        "miss": "沒敲中區間！+{penalty}秒。",
+        "cold": "冷打！先把火燒旺。+{penalty}秒。"
+      },
+      "glider": {
+        "title": "御風者迴旋賽",
+        "boost": "額外加速",
+        "boostTip": "飛行速度提高 {speed} 碼/秒，最高 {maximum} 碼/秒。飛行時可用。{seconds} 秒後充能。",
+        "objective": "穿越風環，並降落在標記區域",
+        "ready": "與飛行管理員澤菲爾交談以起飛。",
+        "countdown": "{count} 秒後起飛……抓穩了！",
+        "flying": "風環：{rings}/{total} | 時間：{time}秒 | 速度：{speed} 碼/秒",
+        "climb": "爬升",
+        "climbTip": "按住拉起機頭，以速度換取高度。輕點可微調。飛得太慢會失去升力。",
+        "dive": "Dive",
+        "diveTip": "按住壓低機頭以加速。輕點可微調。",
+        "controls": "按住滑鼠右鍵向上看可爬升，但會降低速度；向下看可俯衝加速。飛得太慢會失去升力。左右轉向；後退減速。跳躍或上浮/下潛鍵也能控制俯仰。向前飛過風道可獲得加速，每次挑戰每條風道限一次。",
+        "landed": "{rating}！在 {time} 秒內穿過 {rings}/{total} 個風環。",
+        "failed": "降落失敗！偏離航道降落，或錯過太多風環。",
+        "retry": "與澤菲爾交談以重試，或找降落區旁的絲凱返回起飛點。",
+        "nextRing": "沿著峽谷瞄準下一個風環穿過。至少穿過 {minimum} 個風環，然後降落在標記區域。",
+        "landing": "所有風環已穿越！轉向前方的降落區。",
+        "complete": "降落完成！",
+        "score": "分數：{score}。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "銀牌",
+          "bronze": "銅牌"
+        }
+      },
+      "calligraphyTitle": "秘法書法",
+      "traceOutline": "用腳步描繪輪廓",
+      "traceRoundInstruction": "第{round}/{total}輪：{shape}。{instruction}",
+      "traceShape": {
+        "triangle": "三角形",
+        "square": "正方形",
+        "star": "星形",
+        "hourglass": "沙漏",
+        "lightning": "閃電符文",
+        "spiral": "折角螺旋",
+        "double-triangle": "雙三角印記",
+        "diamond": "菱形",
+        "pentagon": "五邊形",
+        "arrow": "箭矢符文",
+        "zigzag": "鋸齒印記",
+        "cross": "十字符文"
+      },
+      "traceRating": {
+        "bronze": "銅",
+        "silver": "銀",
+        "gold": "金"
+      },
+      "traceScoreResult": "完成！{rating}：{score}/{total}。基礎獎勵不變。金牌：功績、稱號、+10 聲望。",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "此符文需要更新遊戲版本。",
+      "traceReaction": {
+        "tessaTriangle": "三個角，每個都在正確的位置！",
+        "pipSquare": "四條邊！我想我也能做到！",
+        "elianFinal": "最後一道符文。線條可能交叉或再次經過同一點；跟隨亮起的標記前往下一個轉角。",
+        "elianGold": "描繪得真漂亮！你的腳步贏得了金色的榮耀。",
+        "elianComplete": "符文完成了！用心練習，下次一定會更好。"
+      },
+      "traceReady": "與導師交談開始練習。",
+      "tracePreview": "觀察輪廓，金色光點會為你引路。",
+      "traceStart": "走到起點標記，任選一個方向描繪。",
+      "traceDrawing": "沿金色光點走向明亮的轉角。藍色標記你的足跡。",
+      "traceSuccess": "輪廓完成！",
+      "traceRetry": "與導師交談重試。",
+      "traceOffPath": "你偏離了輪廓。與導師交談重試。",
+      "traceMovement": "請下坐騎並留在地面上。與導師交談重試。",
+      "traceTimeout": "時間已到。與導師交談重試。",
+      "traceCombat": "脫離戰鬥後，與導師交談重試。",
+      "puzzleTitle": "魔網光束校準",
+      "puzzleBeamReach": "已連接水晶：{count}",
+      "puzzleVictoryTitle": "完美校準",
+      "puzzleVictoryDetail": "魔網光束已抵達目的地。",
+      "puzzleDefeatTitle": "校準失敗",
+      "puzzleDefeatDetail": "能量已經消散，儀式尚未完成。",
+      "puzzleReturn": "返回世界",
+      "puzzleResultAnnouncement": "{title}。{detail} {reach}。",
+      "puzzleLevel": "每日關卡 {level}",
+      "puzzleBonusLevel": "額外關卡 {level}/{total}",
+      "puzzleBonusCharged": "秘藏嗡嗡作響，蓄滿了額外能量：第 {level}/{total} 個額外關卡正等著你。再次觸碰魔網秘藏以獲得額外金幣。",
+      "puzzleBonusPaid": "獲得額外錢袋！",
+      "puzzleBonusDone": "所有額外關卡都已完成。秘藏將沉寂到下一次開放。",
+      "puzzleInstructions": "旋轉拼塊，將光束從起點引導至終點。",
+      "puzzleRotateTile": "旋轉拼塊{tile}",
+      "puzzleConnectors": "連接方向：{connectors}。",
+      "puzzlePowered": "光束已到達此拼塊。",
+      "puzzleUnpowered": "光束尚未到達此拼塊。",
+      "puzzleClose": "關閉魔網光束謎題",
+      "puzzleSource": "起點",
+      "puzzleTarget": "終點",
+      "puzzleSourceEndpoint": "起點：{direction}。",
+      "puzzleTargetEndpoint": "終點：{direction}。",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "puzzleRetry": "重試",
+      "puzzleTimer": "{seconds}s",
+      "puzzleTimerAria": "剩餘時間：{seconds} 秒",
+      "startQuest": "開始世界任務",
+      "startEscort": "開始護送",
+      "escortTitle": "商隊",
+      "alreadyCompleted": "你已完成本輪世界任務。",
+      "inProgress": "此世界任務已在進行中。",
+      "match3Title": "糖果連鎖",
+      "match3Instructions": "選擇兩個相鄰的糖果。只有組成三個或更多相同糖果的一排時，交換才會計入。",
+      "match3Moves": "步數：{current}/{total}",
+      "match3Cleared": "已消除糖果：{current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "第 {row} 行，第 {column} 列：{candy}",
+      "match3Selected": "已選擇",
+      "match3Reset": "重新開始關卡",
+      "match3Close": "關閉糖果謎題",
+      "match3OutOfMoves": "沒有剩餘步數。重新開始關卡再試一次。",
+      "match3VictoryTitle": "甜蜜的勝利",
+      "match3VictoryDetail": "魔法糖果已收集完畢。",
+      "match3DefeatTitle": "苦澀的敗北",
+      "match3DefeatDetail": "步數已用盡。新一盤糖果正等著你。",
+      "match3TryAgain": "再試一次",
+      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
+      "match3ResultSummary": "{title}. {detail} {cleared}.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "莓果水晶",
+        "citrus": "柑橘球",
+        "mint": "薄荷三角",
+        "grape": "葡萄方塊",
+        "star": "糖霜星"
+      }
+    },
     "logs": {
       "accepted": "已接受任務：{name}",
+      "worldQuestStarted": "世界任務已開始：{name}",
       "abandoned": "已放棄任務：{name}",
       "completed": "已完成任務：{name}",
       "ready": "{name}（{status}）",
@@ -14306,6 +14861,18 @@ export const zh_TW: EnTranslations = {
       "sprung_trap": {
         "name": "被觸發的沼澤陷阱"
       },
+      "leyline_cache": {
+        "name": "微型魔網秘藏"
+      },
+      "confection_game_box": {
+        "name": "糖果師的遊戲盒"
+      },
+      "eastbrook_freight_crate": {
+        "name": "東溪貨運箱"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "東溪貨運馬車"
+      },
       "hearthlined_treads": {
         "name": "爐火襯裡之靴"
       },
@@ -16633,6 +17200,51 @@ export const zh_TW: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "燼衛，瓦庫爾的壁壘"
+      },
+      "rift_watchers_band": {
+        "name": "裂隙守望者指環"
+      },
+      "rift_surveyors_satchel": {
+        "name": "裂隙勘測員挎包"
+      },
+      "riftwalkers_tunic": {
+        "name": "裂隙行者外衣"
+      },
+      "riftwarden_voidblade": {
+        "name": "裂隙守衛者虛空之刃"
+      },
+      "champion_rift_band": {
+        "name": "勇士裂隙指環"
+      },
+      "order_prayer_beads": {
+        "name": "教團祈禱念珠"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "侍僧法衣"
+      },
+      "templar_dawn_shield": {
+        "name": "聖殿騎士黎明之盾"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "黎明守護者祝聖錘"
+      },
+      "champion_dawn_medallion": {
+        "name": "勇士黎明勳章"
+      },
+      "automaton_cog_ring": {
+        "name": "機械齒輪指環"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "發條工匠背包"
+      },
+      "artificers_welding_cowl": {
+        "name": "工匠焊接兜帽"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "鍛造大師峭壁劈砍斧"
+      },
+      "champion_forged_loop": {
+        "name": "勇士鍛造指環"
       }
     },
     "mobs": {
@@ -16660,6 +17272,15 @@ export const zh_TW: EnTranslations = {
       "vale_bandit": {
         "name": "谷地強盜"
       },
+      "eastbrook_freight_caravan": {
+        "name": "東溪貨運商隊"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "柳澤沼地藥品商隊"
+      },
+      "frostveil_supply_caravan": {
+        "name": "霜幕之境補給商隊"
+      },
       "restless_bones": {
         "name": "不寧骸骨"
       },
@@ -16680,6 +17301,9 @@ export const zh_TW: EnTranslations = {
       },
       "drowned_dead": {
         "name": "溺亡死者"
+      },
+      "fenbridge_infiltrator": {
+        "name": "借臉者"
       },
       "fen_troll": {
         "name": "泥沼巨魔"
@@ -17388,6 +18012,111 @@ export const zh_TW: EnTranslations = {
       }
     },
     "npcs": {
+      "glider_instructor": {
+        "name": "飛行管理員澤菲爾",
+        "title": "御風者教官",
+        "greeting": "今天從斷崖峭壁呼嘯而出的熱氣流特別猛烈。準備好綁上機械滑翔翼，在迴旋賽道上試試你的翅膀了嗎？"
+      },
+      "glider_apprentice": {
+        "name": "Skye",
+        "title": "澤菲爾的學徒",
+        "greeting": "沿著峽谷飛下來的那一趟真漂亮。需要魔法上升氣流送你回斷崖找澤菲爾時，隨時來找我。"
+      },
+      "shadow_cloak_scout": {
+        "name": "斥候薇拉莉",
+        "title": "秘密行動",
+        "greeting": "借我的暮織斗篷去用吧。悄悄溜到每個傳令兵背後，摸走他的命令。避開提燈的光束：提燈守衛能直接看穿這層附魔，而且只要你擦碰到傳令兵，他就會察覺到你。"
+      },
+      "shadow_guard_north": {
+        "name": "傳令守衛",
+        "title": "傳令兵",
+        "greeting": "這些密封命令是給隊長的。離遠一點。"
+      },
+      "shadow_guard_south": {
+        "name": "傳令守衛",
+        "title": "傳令兵",
+        "greeting": "我有急件要送。別擋路。"
+      },
+      "shadow_guard_east": {
+        "name": "傳令守衛",
+        "title": "傳令兵",
+        "greeting": "不得延誤。守備隊正等著這些命令。"
+      },
+      "shadow_guard_west": {
+        "name": "傳令守衛",
+        "title": "傳令兵",
+        "greeting": "公務在身。請讓開道路。"
+      },
+      "shadow_sentry_south": {
+        "name": "提燈哨兵",
+        "title": "真實視界",
+        "greeting": "我的提燈照出的不只是暗影。待在我看得見的地方。"
+      },
+      "shadow_sentry_north": {
+        "name": "提燈哨兵",
+        "title": "真實視界",
+        "greeting": "沒有什麼能溜過提燈守望。"
+      },
+      "shadow_watch_west": {
+        "name": "提燈守夜人",
+        "title": "真實視界",
+        "greeting": "站住。提燈看得見肉眼看漏的東西。"
+      },
+      "shadow_watch_east": {
+        "name": "提燈守夜人",
+        "title": "真實視界",
+        "greeting": "沒有人能不被發現地穿過我的燈光。"
+      },
+      "forge_instructor": {
+        "name": "鐵匠瑪拉",
+        "title": "望龍哨鐵匠",
+        "greeting": "幫我完成一面盾牌！點擊我喊出的材料。手腳越快，獎牌越好。"
+      },
+      "infiltrator_captain": {
+        "name": "中士艾瑞克",
+        "title": "芬橋守備隊",
+        "greeting": "有個怪物偷走了一名士兵的臉。閱讀常備命令和守備日誌，詢問全部四名守衛，然後回來指出說法與紀錄矛盾的那一個。"
+      },
+      "infiltrator_nella": {
+        "name": "衛兵奈拉",
+        "title": "芬橋守備隊",
+        "greeting": "前來報到執勤。"
+      },
+      "infiltrator_orin": {
+        "name": "衛兵奧林",
+        "title": "芬橋守備隊",
+        "greeting": "前來報到執勤。"
+      },
+      "infiltrator_bram": {
+        "name": "衛兵布蘭姆",
+        "title": "芬橋守備隊",
+        "greeting": "前來報到執勤。"
+      },
+      "infiltrator_tessa": {
+        "name": "衛兵泰莎",
+        "title": "芬橋守備隊",
+        "greeting": "前來報到執勤。"
+      },
+      "wisp_maze_keeper": {
+        "name": "守護者莉歐拉",
+        "title": "樹籬迷宮看守",
+        "greeting": "盜賊把偷來的金幣藏遍了我的迷宮，現在由暗影看守著。找回每一個錢袋。避開守衛者，或者拿一團光輝微光去驅散它們。失去三條生命會把你送回入口，但你已收集的錢袋仍會安全保留。"
+      },
+      "calligraphy_instructor": {
+        "name": "導師埃利安",
+        "title": "秘法書法",
+        "greeting": "步伐穩，線條才穩。教我的學徒描繪三角形、正方形和進階符文吧。"
+      },
+      "calligraphy_apprentice_1": {
+        "name": "學徒泰莎",
+        "title": "書法學徒",
+        "greeting": "我總是轉彎太早。你能教我在哪裡轉彎嗎？"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "學徒皮普",
+        "title": "書法學徒",
+        "greeting": "先畫三角形，再畫正方形，最後畫符文。一步一步穩穩地走！"
+      },
       "the_merchant": {
         "name": "商人",
         "title": "世界市場守護者",
@@ -17822,6 +18551,26 @@ export const zh_TW: EnTranslations = {
         "name": "裂隙鍛匠梅莉絲",
         "title": "裂隙熔爐大師",
         "greeting": "裂隙之戒記得造就它的那道裂隙，{className}。把戒指和裂隙散落的精華帶來，我會教它記住更多。"
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "軍需官維倫",
+        "title": "裂隙守望補給官",
+        "greeting": "裂隙守望守護海岸，監視深處的裂口。我們的庫房向獲得認可聲望的人開放。"
+      },
+      "npc_church_order_quartermaster": {
+        "name": "聖殿騎士阿爾西婭",
+        "title": "教團軍需官",
+        "greeting": "行走於黎明之光中。教團為與我們並肩效力者提供補給。"
+      },
+      "npc_automaton_quartermaster": {
+        "name": "工匠托布林",
+        "title": "機械軍團徵用官",
+        "greeting": "精密齒輪、鍛造鋼材與校準動力。授權操作員可從我們的庫存中領取。"
+      },
+      "npc_wq_taskmaster": {
+        "name": "監工凱倫",
+        "title": "世界任務監工",
+        "greeting": "各盟友陣營每天都會在全境發布任務。若某項任務不適合你的技能，你每天可以申請一次重新分配。"
       },
       "forgemistress_darva": {
         "name": "達爾瓦鍛造師",
@@ -20658,6 +21407,9 @@ export const zh_TW: EnTranslations = {
           },
           "4": {
             "label": "裂隙原野"
+          },
+          "5": {
+            "label": "沉船殘骸"
           }
         }
       },

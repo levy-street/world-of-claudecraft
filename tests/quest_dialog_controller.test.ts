@@ -1,6 +1,12 @@
 // @vitest-environment happy-dom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  INVESTIGATION_CLUES,
+  INVESTIGATION_NPC_IDS,
+  INVESTIGATION_NPCS,
+  INVESTIGATION_QUEST_ID,
+} from '../src/sim/content/world_quest_investigation';
 import { DELVES, NPCS, QUESTS, STATIONS } from '../src/sim/data';
 import { CHRONICLER_TEMPLATE_IDS } from '../src/sim/deeds';
 import type { Entity } from '../src/sim/types';
@@ -100,6 +106,7 @@ function harness(
   const openCrucibleVendor = vi.fn();
   const openWarfareVendor = vi.fn();
   const openMarket = vi.fn();
+  const openWorldQuestBoard = vi.fn();
   const openDelveBoard = vi.fn();
   const openCardDuel = vi.fn();
   const openTrain = vi.fn();
@@ -137,6 +144,7 @@ function harness(
     openCrucibleVendor,
     openWarfareVendor,
     openMarket,
+    openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
     openTrain,
@@ -170,6 +178,7 @@ function harness(
     openCrucibleVendor,
     openWarfareVendor,
     openMarket,
+    openWorldQuestBoard,
     openDelveBoard,
     openCardDuel,
     openTrain,
@@ -505,6 +514,15 @@ describe('QuestDialogController', () => {
     market.controller.open(41);
     market.element.querySelector<HTMLButtonElement>('[data-market]')?.click();
     expect(market.openMarket).toHaveBeenCalledTimes(1);
+
+    // The World Quest taskmaster offers the board row and nothing else; the
+    // row routes to the map rail through openWorldQuestBoard.
+    const boardId = Object.values(NPCS).find((definition) => definition.worldQuestBoard)?.id;
+    if (!boardId) throw new Error('world quest board fixture not found');
+    const taskmaster = harness(npc(45, boardId));
+    taskmaster.controller.open(45);
+    taskmaster.element.querySelector<HTMLButtonElement>('[data-world-quest-board]')?.click();
+    expect(taskmaster.openWorldQuestBoard).toHaveBeenCalledTimes(1);
 
     const heroic = harness(npc(42, heroicId));
     heroic.controller.open(42);
@@ -847,5 +865,108 @@ describe('QuestDialogController', () => {
     test.controller.refreshIfChanged();
 
     expect(test.element.querySelector('[data-prof-intro-hint]')).toBe(hintNode);
+  });
+
+  it('opens a caravan briefing and confirms through target then interact', () => {
+    const caravan = {
+      ...npc(80, 'eastbrook_freight_caravan'),
+      kind: 'mob',
+      dead: false,
+    } as Entity;
+    const test = harness(caravan);
+    test.world.player.level = 60;
+    test.world.player.dead = false;
+    test.world.worldQuestLog = new Map([
+      ['wq_eastbrook_caravan', { questId: 'wq_eastbrook_caravan', state: 'active', count: 0 }],
+    ]);
+
+    test.controller.open(caravan.id);
+    const start = test.element.querySelector<HTMLButtonElement>('[data-start-wq]');
+    expect(test.controller.isOpen).toBe(true);
+    expect(start).not.toBeNull();
+    expect(start?.hidden).toBe(false);
+    start?.click();
+    expect(test.targetEntity).toHaveBeenCalledWith(caravan.id);
+    expect(test.interact).toHaveBeenCalledTimes(1);
+    expect(test.targetEntity.mock.invocationCallOrder[0]).toBeLessThan(
+      test.interact.mock.invocationCallOrder[0],
+    );
+  });
+});
+
+describe('investigation quest dialogue', () => {
+  it('opens records using existing dialogue chrome and distance dismissal', () => {
+    const clue = INVESTIGATION_CLUES[0];
+    const entity = {
+      ...npc(clue.entityId, `ground_${clue.objectItemId}`),
+      kind: 'object',
+    } as Entity;
+    const h = harness(entity);
+    h.world.worldQuestCycle = 'wq3_0';
+    h.world.worldQuestLog = new Map([
+      [
+        INVESTIGATION_QUEST_ID,
+        {
+          questId: INVESTIGATION_QUEST_ID,
+          state: 'active',
+          count: 0,
+          investigation: { heard: 0, clues: 1, cleared: 0 },
+        },
+      ],
+    ]);
+    h.controller.open(entity.id);
+    expect(h.controller.isOpen).toBe(true);
+    expect(h.element.querySelector('#quest-dialog-title')?.textContent).toBe('Standing Orders');
+    expect(h.element.querySelector('[data-close]')).not.toBeNull();
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    const title = h.element.querySelector('#quest-dialog-title');
+    h.controller.refreshIfChanged();
+    expect(h.element.querySelector('#quest-dialog-title')).toBe(title);
+    h.world.player.pos.x = 100;
+    h.controller.updateProximity();
+    expect(h.controller.isOpen).toBe(false);
+    expect(h.release).toHaveBeenCalled();
+  });
+  it('refreshes after online snapshot arrival, emits only accusation intent and restores correction', () => {
+    const entity = npc(INVESTIGATION_NPC_IDS[0], INVESTIGATION_NPCS[0].id);
+    const h = harness(entity);
+    h.world.worldQuestCycle = 'wq3_0';
+    const progress = {
+      questId: INVESTIGATION_QUEST_ID,
+      state: 'active' as const,
+      count: 0,
+      investigation: { heard: 7, clues: 3, cleared: 0, mobId: undefined as number | undefined },
+    };
+    h.world.worldQuestLog = new Map([[INVESTIGATION_QUEST_ID, progress]]);
+    h.world.accuseWorldQuestSuspect = vi.fn();
+    h.controller.open(entity.id);
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    progress.investigation.heard = 15;
+    h.controller.refreshIfChanged();
+    // One option per guard, in post order, each naming the guard.
+    const options = Array.from(h.element.querySelectorAll<HTMLButtonElement>('[data-accuse]'));
+    expect(options.map((b) => Number(b.dataset.accuse))).toEqual(INVESTIGATION_NPC_IDS.slice(1));
+    expect(options[0].textContent).toBe('Accuse npc:infiltrator_nella');
+    options[1].click();
+    expect(h.world.accuseWorldQuestSuspect).toHaveBeenCalledWith(INVESTIGATION_NPC_IDS[2]);
+    expect(progress.investigation.cleared).toBe(0);
+    expect(h.controller.isOpen).toBe(false);
+    progress.investigation.cleared = 2;
+    h.controller.open(entity.id);
+    expect(h.element.textContent).toContain('try again');
+    expect(
+      Array.from(h.element.querySelectorAll<HTMLButtonElement>('[data-accuse]')).map((b) =>
+        Number(b.dataset.accuse),
+      ),
+    ).toEqual([INVESTIGATION_NPC_IDS[1], INVESTIGATION_NPC_IDS[3], INVESTIGATION_NPC_IDS[4]]);
+    // A guard's own dialog never carries the option.
+    const guard = npc(INVESTIGATION_NPC_IDS[2], INVESTIGATION_NPCS[2].id);
+    h.world.entities.set(guard.id, guard);
+    h.controller.open(guard.id);
+    expect(h.element.querySelector('[data-accuse]')).toBeNull();
+    h.controller.open(entity.id);
+    progress.investigation.mobId = 500;
+    h.controller.refreshIfChanged();
+    expect(h.controller.isOpen).toBe(false);
   });
 });

@@ -80,6 +80,7 @@ const EXCLUDED: Record<string, string> = {
  *  auditing, and pinned equal to the sources' own `module` fields: a row added
  *  here to silence a hit, with no factory behind it, fails that pin. */
 const REGISTERED_MODULES = [
+  'world_quest_trace_materials.ts',
   'frost_nova_root_visual.ts',
   'ice_block_visual.ts',
   'temporal_hourglass_visual.ts',
@@ -237,8 +238,9 @@ describe('the lazy-material sweep', () => {
     // bundles (the coach trail's guidance set, the ground fire AoE anchor and
     // the Ring of Frost stand-in among the four spell visuals), the two
     // excluded scenery bakes, and the battleground caches.
-    expect(hits.length).toBeGreaterThanOrEqual(10);
-    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(9);
+    // Plus the World Quests branch's calligraphy guidance bundle.
+    expect(hits.length).toBeGreaterThanOrEqual(11);
+    expect(hits.filter((hit) => hit.idiom === 'bundle')).toHaveLength(10);
   });
 
   it('leaves no hit unregistered and unexcluded', () => {

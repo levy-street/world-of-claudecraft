@@ -1381,7 +1381,10 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  '9a08435a1a0fca561d272adace7835c51d77742e86a201b83554e78620d9d1b3';
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  'e9216c460d8656182ec22c88fa7c685ee3009647cdac328ad9621e03d5b5ca57';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1391,7 +1394,10 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'f429f724ca7ab90873b4a86950c0046585ef66bec7c2052cda12ae578ecee3d0';
+  // Re-minted at the third release/v0.43.0 merge into feature/world-quests
+  // (the hotfix-line renderer leaf composed with the branch's guidance wiring).
+  // No capture was retaken.
+  'cb3585ee0788cbaa3befd04c3c0971ea7a4cbd165c741e81bbb8d3391748c119';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2764,7 +2770,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // was retaken.
       // v0.42.2 hotfix line forward merge into release/v0.43.0: recomputed LAST
       // again over the re-swept evidence. No capture was retaken.
-    ).toBe('88176ae77a5c2ccec01ed97b5ab9d3a54a7f97e788b36bb1432bc7ee1103fca6');
+      // Third release/v0.43.0 merge into feature/world-quests: recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('99ebc1ece3554d5946158a424745558226bec1f680b72d5f5e7867c4cb132614');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

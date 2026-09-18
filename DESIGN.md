@@ -761,15 +761,26 @@ Every window adopts the grammar; these carry specific intent:
   bottom right, and the money footer composes `.ui-money` with `formatMoney`.
 - **Bank** (`bank_window.ts`): 32px `.ui-socket--bank` cells (`--socket-size-bank`) with
   the existing `--bank-slot-quality` hook. Bank-docked behavior stays.
-- **Character** (`char_window.ts`): the paperdoll and equipment sockets gain a tabbed
-  sidebar with Stats, Progression, and Skills. Stat labels remain muted with parchment
-  values; `item_compare.ts` continues to provide success and danger deltas.
+- **Character** (`char_window.ts`): a sheet in four bands. The head; the body; a row
+  of the five attribute tiles; and a footer that carries the tab strip (Character,
+  Reputation, Currencies, Progression, Professions) beside the Cosmetics and Share Player
+  Card actions. The Character tab keeps the paperdoll and seats the Offense, Defense and Specialization
+  boards in a rail at its right that scrolls on the wheel; every other tab takes the whole
+  body: Reputation (`src/ui/hud/reputation/`, one card per faction with the standing pill
+  and tier bar on the quality ramp), Currencies (`src/ui/hud/currencies/`, the activity
+  currencies and the faction rows), Progression (milestones, title, Reliquary and Time
+  Played) and Professions (the gathering and crafting boards). The Specialization board is
+  a readout only (spec, role, mastery): the talents window owns the picker. Stat labels
+  remain muted with parchment values;
+  `item_compare.ts` continues to provide success and danger deltas. (Amended at the
+  world-quest reputation work: the earlier note seated Stats, Progression and Skills in a
+  300px side rail, which left no room for the reputation and currency surfaces.)
   ACCEPTED DEVIATION (stage and overlay): on pointer form factors the 3D model preview is
   the full-height stage of the equipment pane, and the two equipment slot columns float
   over its outer edges on a scrim (`--color-stage-overlay-scrim`), spanning the stage
   height with their five armor sockets spaced evenly, while the two weapon hands sit in
-  their own centred row along the stage's bottom above the skin row, with the playtime and
-  share footer pinned below. The boards drew the model as a fixed narrow panel between two
+  their own centred row along the stage's bottom above the skin row, with the attribute row
+  and the tab-strip footer pinned below. The boards drew the model as a fixed narrow panel between two
   flowed 6/6 columns, which left the pane's lower half empty at every window height. Slot
   names, empty labels, the unequip and helm-eye chips and the Masterwrought marks are
   unchanged; the touch sheet keeps the stacked paperdoll (the weapons row wraps under it),
@@ -789,9 +800,12 @@ Every window adopts the grammar; these carry specific intent:
   reward sockets.
 - **World map** (`map_window_view.ts`, `map_window_painter.ts`): the canvas sits in a
   dark inset atlas frame beside a 300px side rail. The rail lists the zone's quests with
-  numbers matching the map badges, then Available Nearby; it also carries filters, legend,
-  Show Route, and Untrack. Map controls use `.ui-disc`; pins stay on the `--color-map-*`
-  tokens with quest pins vivid.
+  numbers matching the map badges, then the World Quests board (today's quests with their
+  state, the selected quest's daily reroll behind a confirmation dialog, never one click),
+  then Available Nearby; it also carries filters, legend, Show Route, and Untrack. A Side
+  panel button under the map-level toggle folds the rail away (`mapSidebarCollapsed`,
+  `src/ui/hud/map/map_sidebar_collapse.ts`) so the map takes the whole window. Map
+  controls use `.ui-disc`; pins stay on the `--color-map-*` tokens with quest pins vivid.
 - **Vendor** (`src/ui/hud/vendor/vendor_window.ts`): inventory uses a compact two-column
   `.ui-card` grid with sockets, price, stock state, and buy action composed from the shared
   primitives.

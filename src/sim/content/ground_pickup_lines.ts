@@ -9,6 +9,22 @@ export interface GroundPickupLines {
 }
 
 export const GROUND_PICKUP_LINES: Record<string, GroundPickupLines> = {
+  leyline_cache: {
+    deny: 'The cache is dormant. A ley disturbance may awaken it.',
+    enough: 'This ley alignment is already complete.',
+  },
+  confection_game_box: {
+    deny: 'The game box is sealed until its confectionery challenge returns.',
+    enough: 'This confection challenge is already complete.',
+  },
+  eastbrook_freight_crate: {
+    deny: 'The freight order is not active.',
+    enough: 'You are already carrying a freight crate.',
+  },
+  eastbrook_freight_wagon: {
+    deny: 'The freight order is not active.',
+    enough: 'The wagon is waiting for another crate.',
+  },
   supply_crate: {
     deny: 'The crate is nailed shut.',
     enough: 'You already have enough supply crates.',
