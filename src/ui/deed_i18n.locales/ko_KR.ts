@@ -7,6 +7,15 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_arcane_calligraphy: {
+    name: '흔들림 없는 손길',
+    desc: '이스트브룩 골짜기에서 비전 서예를 완료하세요.',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: '별빛에 쓰인 글',
+    desc: '이스트브룩 계곡의 비전 서예에서 골드 등급을 획득하세요.',
+    title: '룬소환사',
+  },
   exp_dawnhold_castle: {
     name: '정원의 열린 문',
     desc: '던홀드 성을 찾아 햇살 가득한 정원 회랑을 거닐어 보세요.',

@@ -13,6 +13,13 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'questUi.worldQuest.puzzleRetry': '다시 시도',
+  'questUi.worldQuest.puzzleTimerAria': '남은 시간: {seconds}초',
+  'questUi.worldQuest.startQuest': '전역 퀘스트 시작',
+  'questUi.worldQuest.startEscort': '호위 시작',
+  'questUi.worldQuest.escortTitle': '대상단',
+  'questUi.worldQuest.alreadyCompleted': '이번 주기의 전역 퀘스트를 이미 완료했습니다.',
+  'questUi.worldQuest.inProgress': '이 전역 퀘스트는 이미 진행 중입니다.',
   'hudChrome.noticeboard.officerEntry': '{name}({rank})',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -1077,6 +1084,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.core.mapMarkerDistances.far': '멀리',
   'hud.core.mapMarkerLabels.you': '자신',
   'hud.core.mapMarkerLabels.availableQuest': '수락 가능한 퀘스트',
+  'hud.core.mapMarkerLabels.availableWorldQuest': '가능한 전역 퀘스트: {name}',
+  'hud.core.mapMarkerLabels.activeWorldQuest': '진행 중인 전역 퀘스트: {name}',
+  'hud.core.mapMarkerLabels.worldBoss': '월드 보스: {name}',
   'hud.core.mapMarkerLabels.readyQuest': '완료 가능한 퀘스트',
   'hud.core.mapMarkerLabels.repeatQuest': '반복 퀘스트',
   'hud.core.mapMarkerLabels.cooldownQuest': '재사용 대기 중인 퀘스트',
@@ -1552,6 +1562,42 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bg.map.ruinCourtyard': '폐허 안뜰',
   'hudChrome.bg.map.graveyard': '묘지',
   'guide.nav.thornhollow': '쏜할로우 평원',
+  'guide.nav.factions': '진영과 평판',
+  'guide.factionsPage.heading': '진영과 평판',
+  'guide.factionsPage.intro':
+    '세 동맹 진영이 각자 왕국의 한 구석을 지키고 있으며, 그들의 땅에서 월드 퀘스트를 완료할 때마다 해당 진영에 대한 평판이 오릅니다. 평판은 여섯 단계를 오르며, 단계마다 고유한 칭호가 있고 보급관의 물품을 하나씩 열어 줍니다.',
+  'guide.factionsPage.whoHeading': '세 진영',
+  'guide.factionsPage.whoBody':
+    '각 진영은 한 무리의 지역에 묶여 있어서, 어디에서 월드 퀘스트를 하느냐에 따라 어느 진영에 공로가 쌓이는지 정해집니다. 편을 고를 필요는 없습니다. 세 진영은 각자 집계하며, 어느 쪽도 다른 진영과 맞서라고 요구하지 않습니다.',
+  'guide.factionsPage.riftWatchBody':
+    '균열 감시단은 해안을 지키고 깊은 균열을 감시합니다. 그들의 땅은 해안 지대입니다. 파쇼어, 팜리치, 게일크레스트, 윌로우펜, 베일드 할로우. 거점은 팜리치의 드리프트헤이븐입니다.',
+  'guide.factionsPage.churchOrderBody':
+    '교단은 왕국의 심장부를 다스립니다. 이스트브룩 계곡, 마이어펜 습지, 손피크 고지, 나이트블룸, 레이스우드. 알드릭 수사가 이스트브룩 계곡에서 그들을 대변합니다.',
+  'guide.factionsPage.automatonsBody':
+    '오토마톤은 먼 변경의 용광로를 지킵니다. 드레이크랜드, 프로스트베일, 앰버폴, 에버가든. 거점은 드레이크랜드의 웜워치입니다.',
+  'guide.factionsPage.earningHeading': '평판 얻기',
+  'guide.factionsPage.earningBody':
+    '평판은 월드 퀘스트에서 나옵니다. 각 월드 퀘스트는 그 퀘스트가 놓인 지역의 진영에 집계되고, 세 진영이 서로 다른 지역을 맡고 있으므로 지도를 누비는 동안 세 평판이 동시에 오릅니다. 이스트브룩의 감독관 카엘렌이 지도에서 월드 퀘스트 게시판을 열어 주며, 그날의 배정이 마음에 들지 않으면 게시판에서 하루에 하나의 월드 퀘스트를 교체할 수도 있습니다.',
+  'guide.factionsPage.lowLevelNote':
+    '저레벨 캐릭터는 평판이 한 단계에서 멈추었다가 레벨이 오르면 다시 이어지므로, 어린 캐릭터도 일찍부터 쌓기 시작하면서 금방 막히지 않습니다.',
+  'guide.factionsPage.tiersHeading': '평판 단계',
+  'guide.factionsPage.tiersBody':
+    '모든 진영은 같은 여섯 단계를 오릅니다. 미지, 인정, 신뢰, 입증, 선봉, 그리고 챔피언입니다. 각 진영은 단계마다 고유한 이름을 붙이며, 그 이름이 그 진영에서의 당신의 칭호가 됩니다.',
+  'guide.factionsPage.riftWatchTitles':
+    '균열 감시단에서는 외부인으로 시작해 감시자, 균열 행자, 수호자, 균열 파수꾼을 거쳐 마침내 챔피언이 됩니다.',
+  'guide.factionsPage.churchOrderTitles':
+    '교단에서는 외부인으로 시작해 수련사, 수호자, 성전기사, 여명의 파수꾼을 거쳐 마침내 챔피언이 됩니다.',
+  'guide.factionsPage.automatonsTitles':
+    '오토마톤에서는 외부인으로 시작해 조작자, 기계공, 기술자, 대장장이 장인을 거쳐 마침내 챔피언이 됩니다.',
+  'guide.factionsPage.quartermastersHeading': '보급관',
+  'guide.factionsPage.quartermastersBody':
+    '각 진영은 거점에 보급관을 둡니다. 드리프트헤이븐의 균열 감시단 보급관 바엘렌, 이스트브룩 예배당의 교단 성전기사 알테아, 웜워치의 오토마톤 기술자 토브린입니다. 각자 장신구, 방어구, 무기, 가방을 소량 판매하며, 해당 진영 평판이 오를수록 단계별로 열리고 일반 화폐로 살 수 있습니다.',
+  'guide.factionsPage.readingHeading': '어디에서 확인하나',
+  'guide.factionsPage.readingBody':
+    '캐릭터 창(C)의 평판 탭에 각 진영의 현재 평판, 다음 단계까지의 막대, 평판으로 얻은 칭호가 표시됩니다. 대화 기록은 평판을 얻을 때마다 알려 주고, 새 단계에 도달하면 화면에 축하 배너가 뜹니다.',
+  'guide.factionsPage.deedsHeading': '업적',
+  'guide.factionsPage.deedsBody':
+    '업적의 서도 평판을 기록합니다. 한 진영에서 신뢰에 도달하는 것과 한 진영에서 챔피언에 도달하는 것이 각각 업적으로 기록되고, 세 진영 모두에서 챔피언에 도달하면 별도의 업적이 됩니다. 다른 업적과 마찬가지로 이는 장식일 뿐 힘이 되지 않으며, 챔피언 업적은 착용할 수 있는 칭호를 줍니다.',
   'guide.thornhollowPage.heading': '쏜할로우 평원',
   'guide.thornhollowPage.intro':
     '가시봉 아래 오래된 숲의 성벽으로 둘러싸인 분지에서 벌어지는 랭크 5대 5 깃발 뺏기 전장. 협곡 양 끝에서 두 폐허 요새가 마주 보고, 그 사이에는 누구도 차지한 적 없는 더 오래된 안뜰이 있다. 다섯 명씩, 요새 둘, 목표 하나. 적의 깃발을 빼앗아 우리 깃발을 빼앗기기 전에 가져와라.',
@@ -3137,7 +3183,72 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'questUi.detail.itemReward': '아이템 보상:',
   'questUi.detail.objectiveProgress': '{label}: {current}/{total}',
   'questUi.detail.requiresLevel': '{level}레벨 필요',
+  'questUi.worldQuest.title': '{zone}: {target}',
+  'questUi.worldQuest.unknown': '알 수 없는 전역 퀘스트 ({id})',
+  'questUi.worldQuest.itemReward': '아이템 보상: {name}',
+  'questUi.worldQuest.rewardLine': '보상: {reward}',
+  'questUi.worldQuest.availableStatus': '가능한 전역 퀘스트',
+  'questUi.worldQuest.activeStatus': '진행 중인 전역 퀘스트',
+  'questUi.worldQuest.expiresIn': '{time} 후 종료',
+  'questUi.worldQuest.mineOre': '구리 광석 채굴',
+  'questUi.worldQuest.recoverObject': '{name} 회수',
+  'questUi.worldQuest.redirectLeyBeam': '지맥 광선의 방향을 바꾸기',
+  'questUi.worldQuest.puzzleTitle': '지맥 광선 정렬',
+  'questUi.worldQuest.puzzleBeamReach': '연결된 수정: {count}',
+  'questUi.worldQuest.puzzleVictoryTitle': '완벽한 정렬',
+  'questUi.worldQuest.puzzleVictoryDetail': '지맥 광선이 목적지에 도달했습니다.',
+  'questUi.worldQuest.puzzleDefeatTitle': '정렬 실패',
+  'questUi.worldQuest.puzzleDefeatDetail': '기운이 사라졌습니다. 의식이 완료되지 않았습니다.',
+  'questUi.worldQuest.puzzleReturn': '세계로 돌아가기',
+  'questUi.worldQuest.puzzleResultAnnouncement': '{title}. {detail} {reach}.',
+  'questUi.worldQuest.puzzleInstructions': '타일을 돌려 광선을 시작점에서 목적지까지 연결하세요.',
+  'questUi.worldQuest.puzzleRotateTile': '타일 {tile} 돌리기',
+  'questUi.worldQuest.puzzleConnectors': '연결 방향: {connectors}.',
+  'questUi.worldQuest.puzzlePowered': '광선이 이 타일에 도달합니다.',
+  'questUi.worldQuest.puzzleUnpowered': '광선이 이 타일에 도달하지 않습니다.',
+  'questUi.worldQuest.puzzleClose': '지맥 광선 퍼즐 닫기',
+  'questUi.worldQuest.puzzleSource': '시작점',
+  'questUi.worldQuest.puzzleTarget': '목적지',
+  'questUi.worldQuest.puzzleSourceEndpoint': '시작점: {direction}.',
+  'questUi.worldQuest.puzzleTargetEndpoint': '목적지: {direction}.',
+  'questUi.worldQuest.matchConfections': '마법 과자 맞추기',
+  'questUi.worldQuest.loadFreight': '화물을 마차에 싣기',
+  'questUi.worldQuest.escortCaravan': '{zone} 대상단 호위',
+  'questUi.worldQuest.salvageWreckage': '난파선 잔해 회수',
+  'questUi.worldQuest.puzzleLevel': '일일 레벨 {level}',
+  'questUi.worldQuest.match3Title': '과자 연쇄',
+  'questUi.worldQuest.match3Instructions':
+    '서로 인접한 과자 두 개를 선택하세요. 세 개 이상 한 줄을 만드는 교환만 이동으로 계산됩니다.',
+  'questUi.worldQuest.match3Moves': '이동: {current}/{total}',
+  'questUi.worldQuest.match3Cleared': '제거한 과자: {current}/{total}',
+  'questUi.worldQuest.match3Cell': '{row}행 {column}열: {candy}',
+  'questUi.worldQuest.match3Selected': '선택됨',
+  'questUi.worldQuest.match3Reset': '레벨 다시 시작',
+  'questUi.worldQuest.match3VictoryTitle': '달콤한 승리',
+  'questUi.worldQuest.match3VictoryDetail': '마법의 과자를 모두 모았습니다.',
+  'questUi.worldQuest.match3DefeatTitle': '쓰라린 패배',
+  'questUi.worldQuest.match3DefeatDetail':
+    '이동 횟수를 모두 사용했습니다. 새로운 과자가 기다립니다.',
+  'questUi.worldQuest.match3TryAgain': '다시 도전',
+  'questUi.worldQuest.match3Close': '과자 퍼즐 닫기',
+  'questUi.worldQuest.match3OutOfMoves': '남은 이동이 없습니다. 레벨을 다시 시작하세요.',
+  'questUi.worldQuest.match3Candy.berry': '베리 수정',
+  'questUi.worldQuest.match3Candy.citrus': '시트러스 구슬',
+  'questUi.worldQuest.match3Candy.mint': '민트 삼각형',
+  'questUi.worldQuest.match3Candy.grape': '포도 사각형',
+  'questUi.worldQuest.match3Candy.star': '설탕 별',
   'questUi.logs.accepted': '퀘스트 수락: {name}',
+  'questUi.logs.worldQuestStarted': '전역 퀘스트 시작: {name}',
+  'questUi.logs.clueScrollEarned':
+    '오늘의 월드 퀘스트를 모두 완료했습니다. 단서 두루마리를 얻었습니다.',
+  'questUi.logs.clueScrollLost':
+    '오늘의 월드 퀘스트를 모두 완료했지만 단서 두루마리를 더 가질 수 없습니다.',
+  'questUi.logs.clueHuntStarted': '보물찾기 시작: {title}',
+  'questUi.logs.clueHuntStep': '단서 {step}/{total} 해결: {title}',
+  'questUi.logs.clueHuntDone': '보물찾기 완료: {title}. 보물 상자는 당신 것입니다.',
+  'questUi.logs.clueHuntAbandoned': '보물찾기 포기: {title}',
+  'questUi.logs.clueCasketOpened': '보물 상자에는 {money}과(와) {items}이(가) 들어 있었습니다.',
+  'questUi.tracker.clueHuntTitle': '{title} (단서 {step}/{total})',
   'questUi.logs.abandoned': '퀘스트 포기: {name}',
   'questUi.logs.completed': '퀘스트 완료: {name}',
   'questUi.logs.ready': '{name} ({status})',
@@ -4301,6 +4412,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.mobs.mudfin_murloc.name': '진흙지느러미 잠복자',
   'entities.mobs.tunnel_rat.name': '깊은바위 채굴꾼',
   'entities.mobs.vale_bandit.name': '계곡 도적',
+  'entities.mobs.eastbrook_freight_caravan.name': '이스트브룩 화물 대상단',
+  'entities.mobs.willowfen_remedy_caravan.name': '버들늪 약품 대상단',
+  'entities.mobs.frostveil_supply_caravan.name': '서리장막 보급 대상단',
   'entities.mobs.restless_bones.name': '불안한 뼈무더기',
   'entities.mobs.gorrak.name': '무자비한 고라크',
   'entities.mobs.mire_prowler.name': '수렁 배회자',
@@ -6433,6 +6547,23 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.leaderboard.devTierCol': '배지',
   'hudChrome.leaderboard.mergedPrs': '병합된 PR',
   'hudChrome.leaderboard.devEmpty': '아직 순위에 오른 기여자가 없습니다.',
+  'hudChrome.wqLadder.title': '전역 퀘스트 순위',
+  'hudChrome.wqLadder.subtitle': '모든 영웅의 최고 기록을 메달 전역 퀘스트별로 보여줍니다.',
+  'hudChrome.wqLadder.close': '전역 퀘스트 순위 닫기',
+  'hudChrome.wqLadder.rankedBy.waves': '버틴 웨이브 순',
+  'hudChrome.wqLadder.rankedBy.seconds': '가장 빠른 시간 순',
+  'hudChrome.wqLadder.rankedBy.points': '가장 높은 점수 순',
+  'hudChrome.wqLadder.rankedByMedal.waves': '메달 순, 그다음 버틴 웨이브',
+  'hudChrome.wqLadder.rankedByMedal.seconds': '메달 순, 그다음 가장 빠른 시간',
+  'hudChrome.wqLadder.rankedByMedal.points': '메달 순, 그다음 가장 높은 점수',
+  'hudChrome.wqLadder.podiumLabel': '상위 3명',
+  'hudChrome.wqLadder.unclaimed': '비어 있음',
+  'hudChrome.wqLadder.totalOne': '영웅 1명 순위 등록',
+  'hudChrome.wqLadder.totalMany': '영웅 {count}명 순위 등록',
+  'hudChrome.wqLadder.selfLabel': '내 최고 기록',
+  'hudChrome.wqLadder.selfRank': '{rank}위',
+  'hudChrome.wqLadder.selfNone':
+    '이 순위표에 아직 기록이 없습니다. 전역 퀘스트를 완료해 순위에 오르세요.',
   'hudChrome.leaderboard.podiumLabel': '상위 3명',
   'hudChrome.leaderboard.prestigeTitle': '명예 {rank}',
   'hudChrome.leaderboard.unclaimed': '비어 있음',
@@ -7739,6 +7870,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.questsPage.sagaValeBody':
     '동부개울에서는 죽은 자가 쉬지 못하고, 그 배후의 표식은 사라진 지 오래라 여겨지던 종파의 것입니다. 자취를 좇으면 예배당 묘실에서 일하는 무덤부름에 닿고, 그의 문서가 당신을 북쪽 습지로 가리킵니다.',
   'guide.questsPage.sagaValeTitle': '골짜기: 인장에 새겨진 이름',
+  // The Clue Scrolls section of the Guide quests page (M16 non-Latin fills).
+  'guide.questsPage.cluesTitle': '단서 두루마리',
+  'guide.questsPage.cluesBody':
+    '먼 지역에서는 그날의 세계 임무 게시판이 판 전체를 비운 이에게 보상을 하나 더 숨겨 둡니다. 단서 두루마리와 그 위에 적힌 보물찾기입니다.',
+  'guide.questsPage.cluesEarnTitle': '두루마리 얻기',
+  'guide.questsPage.cluesEarnBody':
+    '캐릭터가 충분히 성장하면, 그날의 세계 임무 게시판에 있는 지역 칸을 모두 완료했을 때 평소의 보상에 더해 단서 두루마리를 받습니다. 다시 굴린 칸도 끝내면 인정되고, 항상 열려 있는 일일 임무는 필요하지 않습니다. 두루마리는 몇 장까지 지닐 수 있으니 얻은 날에 바로 쓸 필요는 없습니다.',
+  'guide.questsPage.cluesHuntTitle': '단서 따라가기',
+  'guide.questsPage.cluesHuntBody':
+    '두루마리를 사용하면 보물찾기가 시작됩니다. 짧은 수수께끼의 연쇄가 임무 추적기에 한 단계씩 표시됩니다. 각 수수께끼는 세상에 실제로 있는 무언가를 가리킵니다. 서야 할 명소, 이야기할 사람, 어딘가에서 해야 할 감정 표현, 또는 작은 심부름이며, 마지막 단서는 언제나 파라고 합니다. 보물찾기는 한 번에 하나만 진행되고, 일일 초기화를 지나도 접속 사이에도 진행 상황이 유지되니 천천히 하셔도 됩니다.',
+  'guide.questsPage.cluesCasketTitle': '보물 상자',
+  'guide.questsPage.cluesCasketBody':
+    "마지막 단서를 풀고 단서가 가리키는 곳에서 두루마리를 사용하면 보물 상자를 파낼 수 있습니다. 보물찾기를 마치면 그 땅을 다스리는 세력의 평판도 얻습니다. 상자를 열면 주화와 고급 채집 재료 묶음이 나옵니다. 가끔 장비나 영웅의 징표가 들어 있고, 아주 드물게 다른 곳에서는 얻을 수 없는 탈것인 '등불지기 그룸볼'이 나옵니다. 첫 번째 상자와 열 번째 상자는 업적의 서에 기록됩니다.",
   'guide.questsPage.sideCryptBody':
     '봉우리 높은 곳에 한층 조용한 수수께끼가 흐릅니다. 어떤 기록에도 남지 않은 왕관이 새겨진 오래된 무덤들이지요. 죽은 자를 읽고, 그들이 지키던 것을 모아, 닫힌 채로 두려던 무덤의 봉인을 푸세요. 서버의 10인 최종 공격대로 가는 길을 여는 추리의 자취입니다.',
   'guide.questsPage.sideCryptTitle': '잊힌 왕',
@@ -8642,6 +8786,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.dmgDoneReduce': '입히는 피해가 {pct}% 감소합니다',
   'hudChrome.auraEffect.carriedFlag':
     '적의 깃발을 운반하고 있습니다. 이 버프를 해제하면 깃발을 내려놓습니다.',
+  'hudChrome.auraEffect.carryingFreight': '화물을 운반 중입니다. 이동 속도가 {pct}% 감소합니다.',
   'hudChrome.auraEffect.elementalConvergencePrimed':
     '다음에 다른 원소 계열 주문을 시전하면 원소 융합이 발동합니다',
   'hudChrome.auraEffect.heatingUp':
@@ -12641,6 +12786,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.shearkeeper_gloves.name': '가위지기 장갑',
   'entities.items.silkbound_remains.name': '비단에 감긴 유해',
   'entities.items.sprung_trap.name': '튕겨진 늪 덫',
+  'entities.items.leyline_cache.name': '소형 지맥 보관함',
+  'entities.items.confection_game_box.name': '제과사의 게임 상자',
+  'entities.items.eastbrook_freight_crate.name': '이스트브룩 화물 상자',
+  'entities.items.eastbrook_freight_wagon.name': '이스트브룩 화물 마차',
   'entities.items.sunken_idol_mantle.name': '가라앉은 신상의 어깨덮개',
   'entities.items.sunken_offering_bowl.name': '다시 채워진 공양 그릇',
   'entities.items.thick_winter_pelt.name': '두꺼운 겨울 모피',
@@ -16720,6 +16869,55 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.nameSubmitBusy': '벼려내는 중',
   'hudChrome.perfecting.nameCancel': '취소',
   'crucibleShop.balanceEntry': '{name} x{count}',
+  'questUi.worldQuest.calligraphyTitle': '비전 서예',
+  'questUi.worldQuest.traceOutline': '발걸음으로 윤곽 따라 그리기',
+  'questUi.worldQuest.traceRoundInstruction': '{round}/{total}단계: {shape}. {instruction}',
+  'questUi.worldQuest.traceShape.triangle': '삼각형',
+  'questUi.worldQuest.traceShape.square': '정사각형',
+  'questUi.worldQuest.traceShape.star': '별',
+  'questUi.worldQuest.traceReady': '교관에게 말을 걸어 시작하세요.',
+  'questUi.worldQuest.tracePreview': '윤곽을 살펴보세요. 금빛 반짝임이 길을 안내합니다.',
+  'questUi.worldQuest.traceStart': '시작 표식으로 이동하세요. 어느 방향으로든 시작할 수 있습니다.',
+  'questUi.worldQuest.traceDrawing':
+    '금빛 반짝임을 따라 빛나는 꼭짓점으로 가세요. 파란색은 지나온 길입니다.',
+  'questUi.worldQuest.traceSuccess': '윤곽 완성!',
+  'questUi.worldQuest.traceRetry': '교관에게 말을 걸어 다시 도전하세요.',
+  'questUi.worldQuest.traceOffPath': '윤곽을 벗어났습니다. 교관에게 말을 걸어 다시 도전하세요.',
+  'questUi.worldQuest.traceMovement':
+    '탈것에서 내려 땅 위를 걸으세요. 교관에게 말을 걸어 다시 도전하세요.',
+  'questUi.worldQuest.traceTimeout': '시간이 다 됐습니다. 교관에게 말을 걸어 다시 도전하세요.',
+  'questUi.worldQuest.traceCombat': '전투에서 벗어난 뒤 교관에게 말을 걸어 다시 도전하세요.',
+  'entities.npcs.calligraphy_instructor.name': '교관 엘리안',
+  'entities.npcs.calligraphy_instructor.title': '비전 서예',
+  'entities.npcs.calligraphy_instructor.greeting':
+    '차분한 걸음이 반듯한 선을 만들지. 제자들에게 삼각형과 정사각형, 고급 룬을 그리는 법을 가르쳐 주게.',
+  'entities.npcs.calligraphy_apprentice_1.name': '견습생 테사',
+  'entities.npcs.calligraphy_apprentice_1.title': '서예 학생',
+  'entities.npcs.calligraphy_apprentice_1.greeting':
+    '자꾸 너무 일찍 방향을 틀어요. 어디가 꼭짓점인지 보여 주실래요?',
+  'entities.npcs.calligraphy_apprentice_2.name': '견습생 핍',
+  'entities.npcs.calligraphy_apprentice_2.title': '서예 학생',
+  'entities.npcs.calligraphy_apprentice_2.greeting':
+    '삼각형 먼저, 그다음은 정사각형, 마지막은 룬. 한 걸음씩 차분하게!',
+  'questUi.worldQuest.traceShape.hourglass': '모래시계',
+  'questUi.worldQuest.traceShape.lightning': '번개 룬',
+  'questUi.worldQuest.traceShape.spiral': '각진 나선',
+  'questUi.worldQuest.traceShape.double-triangle': '쌍삼각 문양',
+  'questUi.worldQuest.traceRating.bronze': '동',
+  'questUi.worldQuest.traceRating.silver': '은',
+  'questUi.worldQuest.traceRating.gold': '금',
+  'questUi.worldQuest.traceScoreResult':
+    '완료! {rating}: {score}/{total}. 기본 보상 유지. 금: 업적, 칭호, 명성 +10.',
+  'questUi.worldQuest.traceCompletionLog': '{completion} {result}',
+  'questUi.worldQuest.traceUnavailable': '이 룬은 최신 게임 버전이 필요합니다.',
+  'questUi.worldQuest.traceReaction.tessaTriangle': '꼭짓점 세 개가 모두 제자리에 있어요!',
+  'questUi.worldQuest.traceReaction.pipSquare': '변이 네 개! 저도 할 수 있을 것 같아요!',
+  'questUi.worldQuest.traceReaction.elianFinal':
+    '마지막 룬이네. 선이 교차하거나 같은 점을 다시 지날 수 있으니 밝은 표식을 따라 다음 꼭짓점으로 가게.',
+  'questUi.worldQuest.traceReaction.elianGold':
+    '멋지게 그렸군! 자네의 발걸음은 금빛 평가에 어울리네.',
+  'questUi.worldQuest.traceReaction.elianComplete':
+    '룬 완성! 정성을 다해 연습하면 다음에는 더 멋지게 그릴 걸세.',
   'guide.arenaPage.honorFinalNoteSoldBack':
     '명예로 산 물건은 되돌릴 수 없습니다. 되사기 목록에는 언제나 직접 판 물건만 오릅니다. 동전으로 산 물건은 대개 판매 가격에 되팔 수 있고, 마음이 다시 바뀌면 그 목록에서 되찾을 수 있지만, 워페어 장비는 구매하는 순간 귀속되어 거래도, 우편 발송도, 되팔기도 영영 할 수 없습니다. 그러니 그 목록에 오르는 일도 결코 없습니다. 상점이 굳이 한 번 더 확인을 묻는 이유가 그것이니, 누르기 전에 장비를 찬찬히 읽어 보세요.',
   'guide.arenaPage.rewardsBodyLossShare':
@@ -16946,9 +17144,188 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.stats': '능력치',
   'hudChrome.charSidebar.progression': '진행도',
   'hudChrome.charSidebar.skills': '기술',
+  'hudChrome.charSidebar.reputation': '평판',
+  'hudChrome.charSidebar.currencies': '화폐',
+  'hudChrome.charSidebar.character': '캐릭터',
+  'hudChrome.charSidebar.professions': '전문 기술',
+  'hudChrome.mapAtlas.railToggle': '사이드 패널',
+  'hudChrome.mapAtlas.railToggleAria': '지도 사이드 패널 표시 또는 숨기기',
+  'questUi.dialog.worldQuestBoard': '세계 임무 게시판을 보여 주게.',
+  'questUi.dialog.worldQuestBoardAria': '지도에서 세계 임무 게시판 열기',
+  // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
+  'entities.items.rift_watchers_band.name': '균열 감시자의 반지',
+  'entities.items.rift_surveyors_satchel.name': '균열 측량사의 가방',
+  'entities.items.riftwalkers_tunic.name': '균열 방랑자의 튜닉',
+  'entities.items.riftwarden_voidblade.name': '균열 수호자의 공허검',
+  'entities.items.champion_rift_band.name': '용사의 균열 반지',
+  'entities.items.order_prayer_beads.name': '교단의 기도 염주',
+  'entities.items.vestments_of_the_acolyte.name': '수련사의 제의',
+  'entities.items.templar_dawn_shield.name': '성전기사의 여명 방패',
+  'entities.items.dawnkeeper_consecrated_mace.name': '여명 수호자의 축성된 철퇴',
+  'entities.items.champion_dawn_medallion.name': '용사의 여명 메달',
+  'entities.items.automaton_cog_ring.name': '자동인형 톱니 반지',
+  'entities.items.clockwork_tinkers_pack.name': '태엽 수리공의 배낭',
+  'entities.items.artificers_welding_cowl.name': '기술자의 용접 두건',
+  'entities.items.forgemaster_crag_cleaver.name': '대장장이 장인의 바위 절단기',
+  'entities.items.champion_forged_loop.name': '용사의 단조 반지',
+  // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
+  'entities.items.clue_scroll.name': '단서 두루마리',
+  'entities.items.treasure_casket.name': '보물 상자',
+  'entities.npcs.npc_rift_watch_quartermaster.name': '병참관 바엘렌',
+  'entities.npcs.npc_rift_watch_quartermaster.title': '균열 감시대 보급관',
+  'entities.npcs.npc_rift_watch_quartermaster.greeting':
+    '균열 감시대는 해안을 지키고 깊은 균열을 감시한다. 우리의 창고는 인정받은 평판을 가진 이에게 열려 있다.',
+  'entities.npcs.npc_church_order_quartermaster.name': '성전기사 알테아',
+  'entities.npcs.npc_church_order_quartermaster.title': '교단 병참관',
+  'entities.npcs.npc_church_order_quartermaster.greeting':
+    '여명의 빛 속을 걸으라. 교단은 우리와 함께 봉사하는 이들에게 물자를 공급한다.',
+  'entities.npcs.npc_automaton_quartermaster.name': '기술자 토브린',
+  'entities.npcs.npc_automaton_quartermaster.title': '자동인형 조달관',
+  'entities.npcs.npc_automaton_quartermaster.greeting':
+    '정밀 톱니, 단조 강철, 보정된 동력. 승인된 조작자는 우리 재고에서 물품을 받을 수 있다.',
+  'entities.npcs.npc_wq_taskmaster.name': '감독관 카엘렌',
+  'entities.npcs.npc_wq_taskmaster.title': '세계 임무 감독관',
+  'entities.npcs.npc_wq_taskmaster.greeting':
+    '동맹 세력들은 매일 왕국 전역에 임무를 게시한다. 임무가 네 기술에 맞지 않는다면 하루에 한 번 재배정을 요청할 수 있다.',
   'hudChrome.charSidebar.gathering': '채집',
   'hudChrome.charSidebar.crafting': '제작',
   'hudChrome.charSidebar.openProfessions': '전문 기술 열기',
+  'hudChrome.currencies.intro':
+    '모두 가방 칸을 차지하지 않습니다. 동전은 늘 그렇듯 가방에 있습니다.',
+  'hudChrome.currencies.activities': '활동',
+  'hudChrome.currencies.factions': '세력',
+  'hudChrome.currencies.honor': '명예',
+  'hudChrome.currencies.delveMark': '델브 징표',
+  'hudChrome.currencies.wocToken': 'WoC 토큰',
+  'hudChrome.currencies.heroicMarkNote': '영웅 던전 . 영웅 보급관에게서 사용',
+  'hudChrome.currencies.honorNote': '전장과 투기장',
+  'hudChrome.currencies.delveMarkNote': '완료한 델브',
+  'hudChrome.currencies.wocTokenNote': '연동된 지갑 잔액',
+  'hudChrome.currencies.walletNotLinked': '연동된 지갑 없음',
+  'hudChrome.currencies.wocPreview': '미검증 미리보기 잔액',
+  'hudChrome.currencies.lifetime': '누적 {amount}',
+  'hudChrome.currencies.factionPending': '세력 화폐: 2단계에서 결정',
+  'hudChrome.reputation.intro':
+    '세 세력이 동시에 진행됩니다. 모든 월드 퀘스트는 해당 지역의 세력에 반영됩니다.',
+  'hudChrome.reputation.faction.rift_watch': '균열 감시단',
+  'hudChrome.reputation.faction.church_order': '교회 수도회',
+  'hudChrome.reputation.faction.automatons': '오토마톤',
+  'hudChrome.reputation.hub.rift_watch': '드리프트헤이븐',
+  'hudChrome.reputation.hub.church_order': '알드릭 수사',
+  'hudChrome.reputation.hub.automatons': '웜워치',
+  'hudChrome.reputation.tier.unknown': '미지',
+  'hudChrome.reputation.tier.recognized': '인지',
+  'hudChrome.reputation.tier.trusted': '신뢰',
+  'hudChrome.reputation.tier.proven': '입증',
+  'hudChrome.reputation.tier.vanguard': '선봉',
+  'hudChrome.reputation.tier.champion': '챔피언',
+  'hudChrome.reputation.factionTitle.rift_watch.unknown': '외부인',
+  'hudChrome.reputation.factionTitle.rift_watch.recognized': '감시자',
+  'hudChrome.reputation.factionTitle.rift_watch.trusted': '균열 방랑자',
+  'hudChrome.reputation.factionTitle.rift_watch.proven': '수호자',
+  'hudChrome.reputation.factionTitle.rift_watch.vanguard': '균열 수호관',
+  'hudChrome.reputation.factionTitle.rift_watch.champion': '챔피언',
+  'hudChrome.reputation.factionTitle.church_order.unknown': '외부인',
+  'hudChrome.reputation.factionTitle.church_order.recognized': '시종',
+  'hudChrome.reputation.factionTitle.church_order.trusted': '수호인',
+  'hudChrome.reputation.factionTitle.church_order.proven': '성전 기사',
+  'hudChrome.reputation.factionTitle.church_order.vanguard': '여명 수호자',
+  'hudChrome.reputation.factionTitle.church_order.champion': '챔피언',
+  'hudChrome.reputation.factionTitle.automatons.unknown': '외부인',
+  'hudChrome.reputation.factionTitle.automatons.recognized': '조작자',
+  'hudChrome.reputation.factionTitle.automatons.trusted': '기계공',
+  'hudChrome.reputation.factionTitle.automatons.proven': '장인',
+  'hudChrome.reputation.factionTitle.automatons.vanguard': '대장장인',
+  'hudChrome.reputation.factionTitle.automatons.champion': '챔피언',
+  'hudChrome.reputation.next': '다음: {tier}',
+  'hudChrome.reputation.maxed': '최고 평판 도달',
+  'hudChrome.reputation.cappedByLevel': '16레벨까지 평판이 {tier}에서 멈춥니다',
+  'hudChrome.reputation.today': '오늘',
+  'hudChrome.reputation.questsDone': '완료한 월드 퀘스트',
+  'hudChrome.reputation.resetsIn': '게시판',
+  'hudChrome.reputation.resetsUnknown': '오늘은 게시판이 없습니다',
+  'hudChrome.reputation.title': '세력 칭호',
+  'hudChrome.reputation.legend': '평판 단계',
+  'hudChrome.reputation.vendorGate': '{faction}과(와) {tier} 평판이 필요합니다.',
+  'hudChrome.reputation.standingGained': '{faction} 평판 +{amount}',
+  'hudChrome.reputation.tierReachedBanner': '{faction}과(와) {tier} 평판 달성',
+  'hudChrome.reputation.tierReachedSubtext': '진영 칭호: {title}',
+  'hudChrome.reputation.tierReachedLine':
+    '{faction}과(와)의 평판이 {tier}에 도달했습니다. 진영 칭호가 {title}(으)로 바뀌었습니다.',
+  // Clue Scrolls (world quests, Stage 3): hunt titles, per-step riddles and the two item
+  // descriptions (M16 non-Latin fills; src/ui/i18n.catalog/clues.ts).
+  'clues.items.clue_scroll.desc':
+    '그날의 지역 칸을 모두 끝내고 얻은 봉인된 수수께끼입니다. 사용하면 보물찾기가 시작되고, 마지막 단서가 파라고 하면 숨겨진 장소에서 다시 사용하세요.',
+  'clues.items.treasure_casket.desc':
+    '보물찾기의 끝에서 파낸 잠긴 상자입니다. 사용해서 열고, 보물찾기가 묻어 둔 것을 받으세요.',
+  'clues.hunt_drakelands_gate_ashes.title': '관문 앞의 재',
+  'clues.hunt_drakelands_gate_ashes.0':
+    '와이름 감시탑을 나서는 길은 서쪽으로, 관문을 지키는 오래된 나무들 사이로 이어집니다. 관문숲 아래에 서면 길이 시작됩니다.',
+  'clues.hunt_drakelands_gate_ashes.1':
+    '먼 사구의 감시자가 주둔지 북쪽, 동쪽 모래밭에 머물고 있습니다. 정찰병 예린을 찾아 바람이 무엇을 실어 왔는지 물으세요.',
+  'clues.hunt_drakelands_gate_ashes.2':
+    '주둔지 창고를 지키는 이는 지난 순찰 이후로 아무것도 먹지 못했습니다. 병참관 셀라에게 2 x 시골 빵 을 가져다주세요.',
+  'clues.hunt_drakelands_gate_ashes.3':
+    '잿가루가 사구로 흘러드는 곳의 동쪽, 조금 남쪽에 재가 묻어 둔 것을 감춘 그을린 땅이 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_frostveil_aurora_vigil.title': '계단 위의 빛',
+  'clues.hunt_frostveil_aurora_vigil.0':
+    '밤마다 춤추는 빛을 향해 단구가 올라가는 곳, 오로라 계단에 무릎을 꿇고 하늘이 당신을 알아보게 하세요.',
+  'clues.hunt_frostveil_aurora_vigil.1':
+    '빛을 읽는 이가 계단 가까이에서 기다립니다. 오로라술사 베일라에게 하늘이 무엇을 써 내려갔는지 물으세요.',
+  'clues.hunt_frostveil_aurora_vigil.2':
+    '울부짖는 단구의 동쪽, 조금 남쪽에 눈이 있어야 할 것보다 더 평평하게 쌓여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_amberfall_lantern_ferry.title': '호수 위의 등불',
+  'clues.hunt_amberfall_lantern_ferry.0':
+    '랜턴미어 북쪽 물가에서 등불 나룻배를 맡은 이가 어느 불이 꺼졌는지 압니다. 나루지기 캐도우와 이야기하세요.',
+  'clues.hunt_amberfall_lantern_ferry.1':
+    '큰 호수의 북동쪽에 마을보다 오래된 돌 하나가 하늘에 기대어 있습니다. 기운 비석 앞에 서세요.',
+  'clues.hunt_amberfall_lantern_ferry.2':
+    '금빛 과수원을 지키는 이는 손수 나무에 물을 주느라 정작 자신은 목이 마릅니다. 과수원지기 포멜린에게 3 x 차가운 우물물 을 가져다주세요.',
+  'clues.hunt_amberfall_lantern_ferry.3':
+    '잿단풍이 붉게 타는 언덕의 북동쪽에 바람이 만든 것이 아닌 원을 그리며 잎이 놓여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_willowfen_fenwitch_salt.title': '늪 마녀의 소금',
+  'clues.hunt_willowfen_fenwitch_salt.0':
+    '수양버들 만의 늪 마녀는 빈손으로 오는 이와는 말을 섞지 않습니다. 세지 어멈에게 1 x 요리용 소금 을 가져다주세요.',
+  'clues.hunt_willowfen_fenwitch_salt.1':
+    '늪이 평평해지고 공기가 모두를 졸리게 하는 곳, 나른한 여울에 서서 마녀가 일러 준 대로 한숨을 쉬세요.',
+  'clues.hunt_willowfen_fenwitch_salt.2':
+    '늪에서 빛나는 웅덩이의 남동쪽에 일 년 내내 마른 채로 남는 둔덕이 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.title': '잠들지 않는 자의 불침번',
+  'clues.hunt_nightbloom_sleepless_vigil.0':
+    '문레스트의 북동쪽, 돌들이 끝나지 않는 불침번을 서는 곳, 불침번 선돌 앞에 서세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.1':
+    '불침번 자리의 관측자는 남들이 동전을 세듯 별을 셉니다. 천문학자 카시안에게 떨어진 별 하나에 대해 물으세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.2':
+    '마을 북쪽에 잠든 이가 결코 쉬지 못하는 봉분이 있습니다. 잠들지 않는 봉분에 경례해서 잠든 이에게 친구가 왔음을 알리세요.',
+  'clues.hunt_nightbloom_sleepless_vigil.3':
+    '어스름이 모이는 꽃벌판의 남동쪽에 달빛이 맨땅 한 곳에 고여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_wraithwood_mournstone_candles.title': '애도석의 양초',
+  'clues.hunt_wraithwood_mournstone_candles.0':
+    '기빗미어의 양초장이는 어둠을 두려워하는 이들에게 빛을 팝니다. 과부 탠지에게 끝내 값을 치르지 않은 양초에 대해 물으세요.',
+  'clues.hunt_wraithwood_mournstone_candles.1':
+    '애도석의 마지막 사제는 기도만으로 금식하고 있습니다. 사제 크릴에게 2 x 소금에 절인 육포 를 가져다주세요.',
+  'clues.hunt_wraithwood_mournstone_candles.2':
+    '마을 북동쪽, 까마귀들을 지나면 스스로 기이한 열매를 매단 공터가 있습니다. 교수대 공터에 서세요.',
+  'clues.hunt_wraithwood_mournstone_candles.3':
+    '사냥꾼이 덫을 놓은 공터의 남동쪽에 낙엽이 최근에 뒤집힌 자리가 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_palmreach_sunken_idol.title': '신상의 비밀',
+  'clues.hunt_palmreach_sunken_idol.0':
+    '밀림 깊은 곳, 석호의 북서쪽에서 덩굴이 폭포처럼 쏟아져 내립니다. 덩굴폭포 숲에 서세요.',
+  'clues.hunt_palmreach_sunken_idol.1':
+    '밀림에 들어갔다가 다시 나온 은둔자가 쏟아지는 덩굴 가까이에 삽니다. 오크림에게 그 아래에서 무엇을 보았는지 물으세요.',
+  'clues.hunt_palmreach_sunken_idol.2':
+    '동쪽에는 반쯤 가라앉은 신상이 여전히 지켜보고 있습니다. 은둔자가 말한 잠수부들처럼 가라앉은 신상 앞에서 움츠리세요.',
+  'clues.hunt_palmreach_sunken_idol.3':
+    '밀림이 바다를 향해 어귀를 여는 곳의 북동쪽에 모래가 밀물이 닿는 곳보다 높게 쌓여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
+  'clues.hunt_evergarden_beacon_road.title': '등대와 꽃',
+  'clues.hunt_evergarden_beacon_road.0':
+    '헤지윅 북쪽 산책로의 화단 정원사가 자기 화단이 굶주리고 있다고 장담합니다. 농부 버베나에게 2 x 퇴비 를 가져다주세요.',
+  'clues.hunt_evergarden_beacon_road.1':
+    '정원의 먼 남동쪽 구석에서 방앗간지기 없는 오래된 풍차가 아직도 돌아갑니다. 오래된 풍차 앞에 서세요.',
+  'clues.hunt_evergarden_beacon_road.2':
+    '길을 따라 남쪽으로 경계를 넘어 게일크레스트로 들어가 해안까지 나가세요. 오래된 등대를 지키는 등불지기 브람이 마지막 말을 쥐고 있습니다.',
+  'clues.hunt_evergarden_beacon_road.3':
+    '올드 비컨의 북서쪽, 등대에서 내려오는 오솔길 바로 옆에 잔디가 잘렸다가 다시 덮여 있습니다. 그곳에서 두루마리를 사용해 파세요.',
   'hudChrome.questLog.completed': '완료됨',
   'hudChrome.questLog.zoneSummary': '{count}개（완료 {ready}개）',
   'hudChrome.questLog.shiftHint': 'Shift를 누른 채 퀘스트를 클릭하면 채팅에 링크됩니다.',
@@ -16964,6 +17341,27 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.marketWindow.mixedListingsFooter':
     '상인은 일반 상품을 보충하며, 플레이어 매물은 판매자가 정한 가격으로 함께 표시됩니다.',
   'hudChrome.mapAtlas.track': '추적',
+  'hudChrome.mapAtlas.worldQuests.heading': '오늘의 월드 퀘스트',
+  'hudChrome.mapAtlas.worldQuests.empty': '오늘은 월드 퀘스트가 없습니다',
+  'hudChrome.mapAtlas.worldQuests.replacement': '교체됨',
+  'hudChrome.mapAtlas.worldQuests.state.active': '진행 중',
+  'hudChrome.mapAtlas.worldQuests.state.completed': '완료',
+  'hudChrome.mapAtlas.worldQuests.reroll': '퀘스트 교체',
+  'hudChrome.mapAtlas.worldQuests.rerollNote': '오늘 교체 1회 가능',
+  'hudChrome.mapAtlas.worldQuests.rerollUsed': '오늘 교체를 사용했습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noCycle': '오늘은 게시판이 없습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.usedToday': '오늘 교체를 사용했습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.completed': '완료한 퀘스트는 교체할 수 없습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.inProgress': '진행 중인 퀘스트는 교체할 수 없습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.notActive': '이 퀘스트는 내 게시판에 없습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.noAlternative':
+    '오늘 그 지역에는 다른 퀘스트가 없습니다',
+  'hudChrome.mapAtlas.worldQuests.rerollReason.unknown': '이 퀘스트는 오늘 교체할 수 없습니다',
+  'hudChrome.mapAtlas.worldQuests.confirmTitle': '이 월드 퀘스트를 교체할까요?',
+  'hudChrome.mapAtlas.worldQuests.confirmBody':
+    '월드 퀘스트는 하루에 하나만 교체할 수 있으며 되돌릴 수 없습니다. {quest}이(가) 같은 지역의 다른 퀘스트로 바뀝니다.',
+  'hudChrome.mapAtlas.worldQuests.confirmOk': '교체',
+  'hudChrome.mapAtlas.worldQuests.confirmCancel': '취소',
   'hudChrome.mapAtlas.level': '레벨 {level}',
   'hudChrome.mapAtlas.landmarkCount': '랜드마크 {count}개',
   'hudChrome.mapAtlas.filtersAria': '지도 레이어',
@@ -17047,6 +17445,365 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.farmgrow.label': '작물 익히기',
   'devCommand.fields.bed': '경작지 ID (선택 사항)',
   'guide.profPages.oncePerDay': '하루 한 번',
+  'hudChrome.vehicle.title': '북부 감시초소 대포',
+  'hudChrome.vehicle.objective': '북부 감시초소 방어',
+  'hudChrome.vehicle.lastKeepTitle': '마지막 요새 대포',
+  'hudChrome.vehicle.lastKeepObjective': '마지막 요새로 향하는 길목 방어',
+  'hudChrome.vehicle.cannonball': '포탄',
+  'hudChrome.vehicle.grapeshot': '산탄',
+  'hudChrome.vehicle.incendiary': '소이탄',
+  'hudChrome.vehicle.integrity': '대포 내구도',
+  'hudChrome.vehicle.exit': '대포에서 내리기',
+  'hudChrome.vehicle.endlessWave': '무한 웨이브 {wave} ({round}라운드)',
+  'hudChrome.vehicle.resultWaves': '버텨 낸 웨이브: {waves}.',
+  'hudChrome.vehicle.enemies': '남은 적: {count}',
+  'hudChrome.vehicle.countdown': '준비: {seconds}',
+  'hudChrome.vehicle.hint': '포탄을 고른 뒤 땅을 클릭해 발사하세요.',
+  'hudChrome.vehicle.aim': '클릭하여 발사. 오른쪽 클릭이나 Esc로 조준을 취소합니다.',
+  'hudChrome.vehicle.sapperWarning': '공병 접근! 폭약 운반병이 방어선에 닿기 전에 막으세요.',
+  'hudChrome.vehicle.chargeWarning':
+    '지휘관이 돌격을 명령했습니다! 살아남은 적 전원이 더 빠르게 이동합니다.',
+  'hudChrome.vehicle.armorHint': '포탄으로 은빛 방패를 부순 뒤 소이탄을 쏘세요.',
+  'hudChrome.vehicle.exposedHint': '갑옷 파괴: 소이탄이 2배의 피해를 줍니다.',
+  'hudChrome.vehicle.barrelHint': '적이 표시된 화약통 주위에 모이면 화약통을 쏘세요.',
+  'hudChrome.vehicle.barrelRules':
+    '화약통에 직접 명중하면 불이 붙어 {radius}야드 이내에 {damage}의 피해를 주고 연쇄 폭발을 일으킵니다.',
+  'hudChrome.vehicle.armorRules':
+    '갑옷 입은 병력은 포탄에 갑옷이 부서지기 전까지 받는 피해가 {reduction} 감소합니다. 갑옷이 부서지면 화염 피해를 {bonus} 더 받습니다.',
+  'hudChrome.vehicle.shake': '화면 흔들림',
+  'hudChrome.vehicle.gold': '금메달',
+  'hudChrome.vehicle.silver': '은메달',
+  'hudChrome.vehicle.bronze': '동메달',
+  'hudChrome.vehicle.failed': '방어 실패',
+  'hudChrome.vehicle.result': '{medal}: 내구도 {integrity}, 명중률 {accuracy}.',
+  'hudChrome.vehicle.medalRules':
+    '금메달: 내구도 {goldIntegrity} 이상, 명중률 {goldAccuracy} 이상. 은메달: {silverIntegrity}, {silverAccuracy}. 그 밖의 승리는 동메달입니다. 적이나 화약통 명중만 인정되며 한 발은 한 번만 계산됩니다. 메달에 따른 추가 금전 보상은 없습니다.',
+  'hudChrome.vehicle.shotDamage':
+    '착탄 지점 {radius}야드 이내의 모든 적에게 {damage}의 피해를 줍니다.',
+  'hudChrome.vehicle.shotSlow': '적중한 적의 이동 속도를 {seconds}초 동안 {amount} 감소시킵니다.',
+  'hudChrome.vehicle.shotBurn':
+    '{seconds}초 동안 불길을 남겨 그 안에 선 적에게 매초 {damage}의 피해를 줍니다.',
+  'hudChrome.vehicle.shotTiming':
+    '재사용 대기시간: {cooldown}초. {flight}초 후 착탄. 모든 포격이 {recovery}초의 회복 시간을 공유합니다.',
+  'hudChrome.vehicle.shotRules':
+    '표시된 구역 안을 조준하세요. 마나 소모 없음. 피해는 장비나 특성의 영향을 받지 않습니다.',
+  'hudChrome.leaderboard.tabWorldQuests': '전역 퀘스트',
+  'hudChrome.leaderboard.wqBoardsLabel': '전역 퀘스트 점수판',
+  'hudChrome.leaderboard.wqMedal': '메달',
+  'hudChrome.leaderboard.wqWaves': '버틴 웨이브',
+  'hudChrome.leaderboard.wqPoints': '점수',
+  'hudChrome.leaderboard.wqMedals.silver': '은',
+  'hudChrome.leaderboard.wqMedals.bronze': '동',
+  'hudChrome.leaderboard.wqEmpty':
+    '아직 이 점수판에 기록이 없습니다. 전역 퀘스트를 완료해 자리를 차지하세요.',
+  'apiError.world_quests.unknown_board': '그런 이름의 점수판이 없습니다.',
+  'questUi.worldQuest.banner.riftOpens':
+    '해안에 균열이 찢어지듯 열립니다! 약탈자들이 인양물을 노리고 몰려옵니다.',
+  'questUi.worldQuest.banner.captainSteps': '약탈자 대장이 균열을 넘어 나타납니다!',
+  'questUi.worldQuest.banner.riftRouted':
+    '약탈자들이 패주했습니다. 해안이 다시 우리 것이 되었습니다.',
+  'questUi.worldQuest.banner.championRises':
+    '추가 전리품! 현장에 용사가 나타났습니다. 함께 쓰러뜨리세요.',
+  'questUi.worldQuest.banner.championFallen':
+    '추가 전리품! 용사가 쓰러졌습니다. 함께 싸운 모두에게 보너스 주머니가 주어집니다.',
+  'questUi.worldQuest.banner.endlessBegins':
+    '방어선이 버텼습니다! 갈수록 강해지는 무한 웨이브가 시작됩니다. 원할 때 언제든 대포에서 내릴 수 있습니다.',
+  'questUi.worldQuest.shadow.title': '그림자에 몸을 숨기고',
+  'questUi.worldQuest.shadow.objective': '들키지 않고 봉인된 명령서 네 장 훔치기',
+  'questUi.worldQuest.shadow.cloak': '황혼직 망토',
+  'questUi.worldQuest.shadow.pickpocket': '소매치기',
+  'questUi.worldQuest.shadow.leave': '망토 벗기',
+  'questUi.worldQuest.shadow.stealTip':
+    '뒤에서 다가가 명령서를 빼내는 동안 가만히 있으세요. 등불 빛줄기 밖에 머무르세요.',
+  'questUi.worldQuest.shadow.leaveTip': '망토를 벗습니다. 되찾은 명령서는 그대로 유지됩니다.',
+  'questUi.worldQuest.shadow.documents': '되찾은 명령서: {count}/4',
+  'questUi.worldQuest.shadow.suspicion': '의심: {value}',
+  'questUi.worldQuest.shadow.safe':
+    '뒤에서 훔치세요. 등불 경비병의 넓은 빛줄기는 망토를 꿰뚫어 봅니다. 빈틈이 생길 때까지 기다리세요.',
+  'questUi.worldQuest.shadow.behind': '훔치기 전에 경비병 뒤로 이동하세요.',
+  'questUi.worldQuest.shadow.danger': '발각되고 있습니다! 시야에서 벗어나세요!',
+  'questUi.worldQuest.shadow.channel': '훔치는 중... {seconds}초',
+  'questUi.worldQuest.shadow.noTarget': '명령서를 지닌 경비병에게 가까이 가세요.',
+  'questUi.worldQuest.shadow.start': '정찰병 발레리에게 말을 걸어 망토를 빌리세요.',
+  'questUi.worldQuest.shadow.caught':
+    '들켰습니다! 정찰병 발레리에게 돌아가 망토를 다시 받으세요. 명령서는 안전합니다.',
+  'questUi.worldQuest.shadow.complete': '명령서 네 장을 모두 되찾았습니다.',
+  'questUi.worldQuest.investigation.title': '빌린 얼굴',
+  'questUi.worldQuest.investigation.objective': '침입자의 정체를 밝히고 처치하기',
+  'questUi.worldQuest.investigation.briefing':
+    '어떤 괴물이 병사의 얼굴을 훔쳤네. 상시 명령서와 경비 일지를 읽고 경비병 넷을 모두 심문한 뒤, 돌아와서 이야기가 우리 기록과 어긋나는 자를 지목하게.',
+  'questUi.worldQuest.investigation.instructions':
+    '상시 명령서와 경비 일지를 읽은 뒤 경비병 넷을 모두 심문하세요. 그들의 이야기를 기록과 비교하세요.',
+  'questUi.worldQuest.investigation.confront':
+    '알릭 하사에게 보고하고 이야기가 기록과 어긋나는 경비병을 지목하세요.',
+  'questUi.worldQuest.investigation.name': '내 경비병 중 누가 빌린 얼굴을 쓰고 있나?',
+  'questUi.worldQuest.investigation.accuseOption': '{name} 고발',
+  'questUi.worldQuest.investigation.cleared':
+    '알릭 하사: 그 병사는 신원이 확인됐네. 다른 이야기들을 기록과 비교해 보고 다시 시도하게.',
+  'questUi.worldQuest.investigation.guardCleared':
+    '알릭 하사가 이미 이 병사의 신원을 확인했습니다.',
+  'questUi.worldQuest.investigation.revealed': '괴물이 이 얼굴을 벗어던졌습니다. 처치하세요.',
+  'questUi.worldQuest.investigation.defeat': '정체가 드러난 침입자를 처치하세요.',
+  'questUi.worldQuest.investigation.heard': '심문한 경비병: {count}/4',
+  'questUi.worldQuest.investigation.clues': '조사한 기록: {count}/2',
+  'questUi.worldQuest.investigation.clueNames.c0': '상시 명령서',
+  'questUi.worldQuest.investigation.clueNames.c1': '경비 일지',
+  'questUi.worldQuest.investigation.variants.v0.clue0':
+    '남쪽 다리는 새벽부터 폐쇄됐다. 모든 순찰대는 서쪽 길을 이용할 것.',
+  'questUi.worldQuest.investigation.variants.v0.clue1':
+    '오린은 성문 경비를 배정받았다. 넬라, 브람, 테사는 서쪽 길을 순찰했다.',
+  'questUi.worldQuest.investigation.variants.v0.guard0':
+    '오늘 아침 제 순찰대는 서쪽 길로 갔습니다.',
+  'questUi.worldQuest.investigation.variants.v0.guard1': '아침 순찰 때 남쪽 다리를 건넜습니다.',
+  'questUi.worldQuest.investigation.variants.v0.guard2':
+    '넬라, 테사와 함께 서쪽 길을 순찰했습니다.',
+  'questUi.worldQuest.investigation.variants.v0.guard3':
+    '남쪽 다리는 폐쇄됐습니다. 저희는 서쪽 길을 이용했습니다.',
+  'questUi.worldQuest.investigation.variants.v1.clue0':
+    '오늘의 암구호는 갈대감시다. 어제의 암구호 등불은 더 이상 유효하지 않다.',
+  'questUi.worldQuest.investigation.variants.v1.clue1':
+    '경비병 넷 모두 새벽에 새 암구호를 전달받았다.',
+  'questUi.worldQuest.investigation.variants.v1.guard0': '갈대감시. 새벽에 새 암구호를 배웠습니다.',
+  'questUi.worldQuest.investigation.variants.v1.guard1':
+    '등불은 어제의 암구호였습니다. 오늘은 갈대감시를 씁니다.',
+  'questUi.worldQuest.investigation.variants.v1.guard2': '저희 넷 모두 새벽 보고에 참석했습니다.',
+  'questUi.worldQuest.investigation.variants.v1.guard3':
+    '오늘의 암구호는 등불입니다. 새벽 보고 때 들었습니다.',
+  'questUi.worldQuest.investigation.variants.v2.clue0':
+    '주둔지 보급 상자는 모두 파란 밀랍 봉인이 있어야 한다. 빨간 봉인이 붙은 상자는 거부할 것.',
+  'questUi.worldQuest.investigation.variants.v2.clue1':
+    '오늘 도착한 물자를 검수함: 모든 상자에 온전한 파란 밀랍 봉인이 있었다.',
+  'questUi.worldQuest.investigation.variants.v2.guard0':
+    '오늘 도착한 물자를 검수했습니다. 모든 상자에 빨간 밀랍 봉인이 있었습니다.',
+  'questUi.worldQuest.investigation.variants.v2.guard1':
+    '저희는 파란 밀랍으로 봉인된 상자만 받습니다.',
+  'questUi.worldQuest.investigation.variants.v2.guard2':
+    '일지에는 오늘 물자에 파란 봉인이 있었다고 적혀 있습니다.',
+  'questUi.worldQuest.investigation.variants.v2.guard3':
+    '오늘은 빨간 봉인이 붙은 상자를 하나도 받지 않았습니다.',
+  'questUi.worldQuest.investigation.variants.v3.clue0':
+    '야간 경비는 해 질 녘에 동쪽 봉화를 다시 밝힌다. 서쪽 봉화는 나룻배가 신호를 보낼 때까지 꺼 둔다.',
+  'questUi.worldQuest.investigation.variants.v3.clue1':
+    '넬라와 오린은 밤새 성문을 지켰다. 브람과 테사는 둑길을 순찰하고 해 질 녘에 동쪽 봉화를 다시 밝혔다.',
+  'questUi.worldQuest.investigation.variants.v3.guard0':
+    '오린과 저는 밤새 성문을 지켰습니다. 안개 말고는 아무것도 지나가지 않았습니다.',
+  'questUi.worldQuest.investigation.variants.v3.guard1':
+    '넬라와 성문 경비를 섰습니다. 명령대로 해 질 녘에 동쪽 봉화가 켜지는 걸 지켜봤습니다.',
+  'questUi.worldQuest.investigation.variants.v3.guard2':
+    '테사와 저는 둑길을 순찰했습니다. 나룻배가 저희를 볼 수 있게 해 질 녘에 서쪽 봉화를 켰습니다.',
+  'questUi.worldQuest.investigation.variants.v3.guard3':
+    '브람과 둑길 순찰을 했습니다. 해가 지자마자 동쪽 봉화를 다시 밝혔습니다.',
+  'questUi.worldQuest.investigation.variants.v4.clue0':
+    '병참관의 수레는 정오에 북쪽 길로 도착한다. 습지가 범람한 동안에는 물길로 보급품이 오지 않는다.',
+  'questUi.worldQuest.investigation.variants.v4.clue1':
+    '정오 보급품을 북쪽 길에서 인수함. 테사가 서명하고 브람과 넬라가 짐을 내렸으며, 오린은 우물에 있었다.',
+  'questUi.worldQuest.investigation.variants.v4.guard0':
+    '정오에 브람을 도와 수레 짐을 내렸습니다. 늘 그렇듯 소금에 절인 돼지고기와 등잔 기름이었습니다.',
+  'questUi.worldQuest.investigation.variants.v4.guard1':
+    '정오 보급품은 제가 직접 보급선에서 바로 내렸습니다.',
+  'questUi.worldQuest.investigation.variants.v4.guard2':
+    '넬라와 제가 상자를 날랐습니다. 일지에는 테사가 서명했습니다.',
+  'questUi.worldQuest.investigation.variants.v4.guard3':
+    '수레는 정오에 북쪽 길로 올라왔습니다. 제가 인수 서명을 했습니다.',
+  'questUi.worldQuest.investigation.variants.v5.clue0':
+    '지난 습격에서 쓰러진 이들은 예배당 지하 묘실에 잠들어 있다. 하사의 열쇠 없이는 누구도 묘실에 들어갈 수 없다.',
+  'questUi.worldQuest.investigation.variants.v5.clue1':
+    '하사의 열쇠는 습격 이후 한 번도 그의 허리띠를 떠난 적이 없다. 넬라, 오린, 브람은 성벽을 지켰고 테사는 마당을 지켰다.',
+  'questUi.worldQuest.investigation.variants.v5.guard0':
+    '저는 성벽을 지켰습니다. 습격 이후 묘실은 줄곧 잠겨 있었고, 열쇠는 하사님만 갖고 계십니다.',
+  'questUi.worldQuest.investigation.variants.v5.guard1':
+    '넬라, 브람과 성벽 경비를 섰습니다. 개구리 소리 말고는 조용했습니다.',
+  'questUi.worldQuest.investigation.variants.v5.guard2':
+    '종일 성벽에 있었습니다. 묘실 근처에는 아무도 오지 않았습니다.',
+  'questUi.worldQuest.investigation.variants.v5.guard3':
+    '저는 마당을 지키다가 오늘 아침 묘실을 들여다봤습니다. 쓰러진 이들은 편히 잠들어 있습니다.',
+  'questUi.worldQuest.horde.title': '최후의 방책',
+  'questUi.worldQuest.horde.objective': '방책을 지키고 무리의 지휘관 처치하기',
+  'questUi.worldQuest.horde.ready': '방책 대장에게 말을 걸어 시작하세요.',
+  'questUi.worldQuest.horde.countdown': '{seconds}초 후 적 무리가 몰려옵니다!',
+  'questUi.worldQuest.horde.status': '남은 시간 {seconds}초. 처치: {kills}. 방책: {barrier}%.',
+  'questUi.worldQuest.horde.upgrade': '무기: {weapon}',
+  'questUi.worldQuest.horde.loadout': '발사 수: {count} | 속도 +{speed}% | {weapon}',
+  'questUi.worldQuest.horde.exit': '방어 그만두기',
+  'questUi.worldQuest.horde.gained': '강화: {upgrade}',
+  'questUi.worldQuest.horde.killBurst': '+{count} 처치!',
+  'questUi.worldQuest.horde.choices.projectile': '발사 수 +1',
+  'questUi.worldQuest.horde.choices.haste': '연사 속도 +25%',
+  'questUi.worldQuest.horde.choices.pierce': '관통 사격',
+  'questUi.worldQuest.horde.choices.explosive': '폭발 사격',
+  'questUi.worldQuest.horde.choices.double': '발사 수 x2',
+  'questUi.worldQuest.horde.weapons.0': '연발 석궁',
+  'questUi.worldQuest.horde.weapons.2': '관통 사격',
+  'questUi.worldQuest.horde.weapons.3': '폭발 사격',
+  'questUi.worldQuest.horde.controls': '자동 사격. A/D, 방향키 또는 조이스틱. 뒤로: 나가기.',
+  'questUi.worldQuest.horde.supplies': '상자 하나를 부숴 선택하세요. 나머지는 사라집니다!',
+  'questUi.worldQuest.horde.result': '{rating}! 점수: {score}.',
+  'questUi.worldQuest.horde.resultStats': '처치: {kills}. 방책: {barrier}%.',
+  'questUi.worldQuest.horde.failed': '방어 실패. 다시 도전하세요!',
+  'questUi.worldQuest.horde.replay':
+    '대장에게 말을 걸어 재도전하세요. 보상은 주기마다 한 번입니다.',
+  'questUi.worldQuest.horde.medals.silver': '은',
+  'questUi.worldQuest.horde.medals.bronze': '동',
+  'questUi.worldQuest.wispMaze.leave': '미로 나가기',
+  'questUi.worldQuest.wispMaze.title': '위습숲 미로',
+  'questUi.worldQuest.wispMaze.objective': '미로에서 도둑맞은 동전 주머니 모두 되찾기',
+  'questUi.worldQuest.wispMaze.ready': '미로 관리인에게 말을 걸어 시작하세요.',
+  'questUi.worldQuest.wispMaze.controls':
+    '미로를 돌아다니며 동전 주머니를 주우세요. 그림자는 피하세요. 빛나는 위습을 먹으면 잠시 동안 그림자를 쫓아낼 수 있습니다.',
+  'questUi.worldQuest.wispMaze.collected': '동전 주머니: {count}/{total}',
+  'questUi.worldQuest.wispMaze.lives': '생명: {count}/3',
+  'questUi.worldQuest.wispMaze.power': '위습의 힘: {seconds}초',
+  'questUi.worldQuest.wispMaze.countdown': '{seconds}초 후 시작',
+  'questUi.worldQuest.wispMaze.collect': '동전 주머니를 주우세요. 그림자는 피하세요.',
+  'questUi.worldQuest.wispMaze.powered': '힘이 넘칩니다! 그림자에 닿아 쫓아내세요.',
+  'questUi.worldQuest.wispMaze.finished': '동전 주머니를 모두 되찾았습니다!',
+  'questUi.worldQuest.wispMaze.retry': '생명 세 개가 회복됐습니다. 미로에 다시 도전하세요.',
+  'questUi.worldQuest.wispMaze.startNormal': '미로 입장: 보통 (그림자 {shadows})',
+  'questUi.worldQuest.wispMaze.startHard': '미로 입장: 어려움 (그림자 {shadows}, 보너스 주머니)',
+  'questUi.worldQuest.forge.title': '돕는 망치',
+  'questUi.worldQuest.forge.objective': '대장장이 마라를 도와 방패 벼리기',
+  'questUi.worldQuest.forge.ready': '대장장이 마라에게 말을 걸어 시작하세요.',
+  'questUi.worldQuest.forge.countdown': '손을 준비하세요! {seconds}초 후 시작합니다.',
+  'questUi.worldQuest.forge.preparing': '잘했어요! 다음 요청...',
+  'questUi.worldQuest.forge.fuel': '장작더미',
+  'questUi.worldQuest.forge.metal': '주괴 상자',
+  'questUi.worldQuest.forge.tools': '모루',
+  'questUi.worldQuest.forge.request.fuel': '불을 키워요! 장작을 넣어 줘요!',
+  'questUi.worldQuest.forge.request.metal': '금속이 더 필요해요! 주괴 상자를 열어요!',
+  'questUi.worldQuest.forge.request.water': '식혀야 해요! 우물물을 떠 와요!',
+  'questUi.worldQuest.forge.request.tools': '두드려서 모양을 잡아요! 모루를 써요!',
+  'questUi.worldQuest.forge.sequence': '{instruction} 그다음 {next}을(를) 클릭하세요.',
+  'questUi.worldQuest.forge.round': '요청 {round}/{total}: {step}/{steps}단계',
+  'questUi.worldQuest.forge.thresholds': '금: {gold}초 이하. 은: {silver}초 이하.',
+  'questUi.worldQuest.forge.starting': '준비 중...',
+  'questUi.worldQuest.forge.finished': '훌륭한 솜씨예요! 주둔군에게 딱 맞는 방패예요!',
+  'questUi.worldQuest.forge.failed':
+    '실수가 너무 많아요! 금속에 금이 갔어요. 마라에게 말을 걸어 다시 도전하세요.',
+  'questUi.worldQuest.forge.wrong': '잘못된 도구! +{penalty}초. 요청한 물건을 사용하세요.',
+  'questUi.worldQuest.forge.correct': '바로 그거예요! 계속하세요.',
+  'questUi.worldQuest.forge.result': '{rating}! {seconds}초. 실수: {mistakes}.',
+  'questUi.worldQuest.forge.replay':
+    '마라에게 말을 걸어 다시 도전하세요. 보상은 주기마다 한 번만 받을 수 있습니다.',
+  'questUi.worldQuest.forge.medals.silver': '은',
+  'questUi.worldQuest.forge.medals.bronze': '동',
+  'questUi.worldQuest.forge.strike': '내려치기',
+  'questUi.worldQuest.forge.strikeTip':
+    '쇠를 망치로 두드립니다. 바늘이 어두운 띠를 지날 때 누르세요. 제대로 칠 때마다 띠는 좁아지고 바늘은 빨라집니다. 띠 밖에서 치거나 화덕이 식은 상태에서 치면 3초가 추가됩니다.',
+  'questUi.worldQuest.forge.stoke': '불 키우기',
+  'questUi.worldQuest.forge.stokeTip':
+    '불에 장작을 던져 넣습니다. 화덕은 계속 식으니 열기를 {floor} 이상으로 유지하세요. 그렇지 않으면 식은 쇠를 치게 됩니다.',
+  'questUi.worldQuest.forge.strikes': '타격: {count}/{total}',
+  'questUi.worldQuest.forge.heat': '화덕 열기: {value} ({floor} 이상 유지)',
+  'questUi.worldQuest.forge.mistakes': '실수: {count}',
+  'questUi.worldQuest.forge.meterAria': '망치 타이밍 게이지',
+  'questUi.worldQuest.forge.hintStrike': '바늘을 보세요. 어두운 띠 안에서 내려치세요!',
+  'questUi.worldQuest.forge.hintStoke': '화덕이 식고 있어요! 내려치기 전에 불을 키우세요.',
+  'questUi.worldQuest.forge.hit': '정확한 타격! 띠가 좁아집니다.',
+  'questUi.worldQuest.forge.miss': '띠를 벗어났습니다! +{penalty}초.',
+  'questUi.worldQuest.forge.cold': '식은 타격! 먼저 불을 키우세요. +{penalty}초.',
+  'questUi.worldQuest.glider.title': '바람기수 슬라럼',
+  'questUi.worldQuest.glider.boost': '추가 속도',
+  'questUi.worldQuest.glider.boostTip':
+    '비행 속도를 {speed}야드/초 올립니다. 최대 {maximum}야드/초. 비행 중에만 사용할 수 있습니다. {seconds}초 후 재충전됩니다.',
+  'questUi.worldQuest.glider.objective': '바람 고리를 통과해 날아올라 표시된 구역에 착지하기',
+  'questUi.worldQuest.glider.ready': '비행 조련사 제피르에게 말을 걸어 출발하세요.',
+  'questUi.worldQuest.glider.countdown': '출발까지 {count}... 꽉 잡으세요!',
+  'questUi.worldQuest.glider.flying':
+    '고리: {rings}/{total} | 시간: {time}초 | 속도: {speed}야드/초',
+  'questUi.worldQuest.glider.climb': '상승',
+  'questUi.worldQuest.glider.climbTip':
+    '누르고 있으면 기수를 들어 속도를 고도로 바꿉니다. 짧게 누르면 조금만 움직입니다. 느리게 날면 양력을 잃습니다.',
+  'questUi.worldQuest.glider.diveTip':
+    '누르고 있으면 기수를 내려 속도를 얻습니다. 짧게 누르면 조금만 움직입니다.',
+  'questUi.worldQuest.glider.controls':
+    '마우스 오른쪽 버튼을 누른 채 위를 보면 속도를 잃는 대신 상승하고, 아래를 보면 강하하며 속도를 얻습니다. 느리게 날면 양력을 잃습니다. 좌우로 방향을 틀고, 뒤로 가기로 감속합니다. 점프나 수영 상승/하강 키로도 기수 각도를 조절할 수 있습니다. 바람 터널을 앞으로 통과하면 속도가 증가하며, 시도마다 터널당 한 번 적용됩니다.',
+  'questUi.worldQuest.glider.landed':
+    '{rating}! {time}초 만에 고리 {rings}/{total}개를 통과했습니다.',
+  'questUi.worldQuest.glider.failed':
+    '강하 실패! 코스 밖에 착지했거나 고리를 너무 많이 놓쳤습니다.',
+  'questUi.worldQuest.glider.retry':
+    '제피르에게 말을 걸어 재도전하거나, 착지 구역 옆의 스카이에게 말을 걸어 출발 지점으로 돌아가세요.',
+  'questUi.worldQuest.glider.nextRing':
+    '협곡을 따라 다음 바람 고리를 향해 날아가세요. 고리를 {minimum}개 이상 통과한 뒤 표시된 구역에 착지하세요.',
+  'questUi.worldQuest.glider.landing': '모든 고리 통과! 앞쪽 착지 구역으로 방향을 잡으세요.',
+  'questUi.worldQuest.glider.complete': '착지 완료!',
+  'questUi.worldQuest.glider.score': '점수: {score}.',
+  'questUi.worldQuest.glider.medals.silver': '은',
+  'questUi.worldQuest.glider.medals.bronze': '동',
+  'questUi.worldQuest.traceShape.diamond': '마름모',
+  'questUi.worldQuest.traceShape.pentagon': '오각형',
+  'questUi.worldQuest.traceShape.arrow': '화살 룬',
+  'questUi.worldQuest.traceShape.zigzag': '지그재그 인장',
+  'questUi.worldQuest.traceShape.cross': '십자 룬',
+  'questUi.worldQuest.puzzleBonusLevel': '보너스 레벨 {level}/{total}',
+  'questUi.worldQuest.puzzleBonusCharged':
+    '저장고가 보너스 기운으로 웅웅거립니다: 레벨 {level}/{total}이(가) 기다립니다. 지맥 저장고를 다시 만져 추가 금화를 받으세요.',
+  'questUi.worldQuest.puzzleBonusPaid': '보너스 주머니 획득!',
+  'questUi.worldQuest.puzzleBonusDone':
+    '보너스 레벨을 모두 완료했습니다. 다음 제안까지 저장고가 휴식합니다.',
+  'entities.mobs.fenbridge_infiltrator.name': '빌린 얼굴',
+  'entities.npcs.glider_instructor.name': '비행 조련사 제피르',
+  'entities.npcs.glider_instructor.title': '바람기수 교관',
+  'entities.npcs.glider_instructor.greeting':
+    '오늘은 절단 절벽에서 몰아치는 상승 기류가 유난히 거세군. 기계 활공기에 몸을 묶고 슬라럼 코스에서 날개를 시험해 볼 준비가 됐나?',
+  'entities.npcs.glider_apprentice.title': '제피르의 견습생',
+  'entities.npcs.glider_apprentice.greeting':
+    '협곡을 따라 멋지게 날아왔네요. 절단 절벽의 제피르에게 돌아갈 마법 상승 기류가 필요하면 언제든 말을 걸어 주세요.',
+  'entities.npcs.shadow_cloak_scout.name': '정찰병 발레리',
+  'entities.npcs.shadow_cloak_scout.title': '비밀 작전',
+  'entities.npcs.shadow_cloak_scout.greeting':
+    '내 황혼직 망토를 빌려 가. 전령 한 명 한 명의 뒤로 몰래 다가가 명령서를 빼내. 등불 빛줄기 밖에 머물러. 등불 경비병은 마법을 곧장 꿰뚫어 보고, 전령은 네가 스치기만 해도 알아차리니까.',
+  'entities.npcs.shadow_guard_north.name': '전령 경비병',
+  'entities.npcs.shadow_guard_north.title': '전령',
+  'entities.npcs.shadow_guard_north.greeting':
+    '이 봉인된 명령서는 대장님께 드릴 것이오. 거리를 두시오.',
+  'entities.npcs.shadow_guard_south.name': '전령 경비병',
+  'entities.npcs.shadow_guard_south.title': '전령',
+  'entities.npcs.shadow_guard_south.greeting': '전할 급보가 있소. 가던 길 가시오.',
+  'entities.npcs.shadow_guard_east.name': '전령 경비병',
+  'entities.npcs.shadow_guard_east.title': '전령',
+  'entities.npcs.shadow_guard_east.greeting': '지체할 수 없소. 경비대가 이 명령서를 기다리고 있소.',
+  'entities.npcs.shadow_guard_west.name': '전령 경비병',
+  'entities.npcs.shadow_guard_west.title': '전령',
+  'entities.npcs.shadow_guard_west.greeting': '공무 중이오. 길을 비키시오.',
+  'entities.npcs.shadow_sentry_south.name': '등불 보초',
+  'entities.npcs.shadow_sentry_south.title': '진실의 눈',
+  'entities.npcs.shadow_sentry_south.greeting':
+    '내 등불은 그림자 이상을 드러내지. 내 눈에 보이는 곳에 있어라.',
+  'entities.npcs.shadow_sentry_north.name': '등불 보초',
+  'entities.npcs.shadow_sentry_north.title': '진실의 눈',
+  'entities.npcs.shadow_sentry_north.greeting': '등불 경비를 몰래 지나갈 수 있는 건 없다.',
+  'entities.npcs.shadow_watch_west.name': '등불 파수꾼',
+  'entities.npcs.shadow_watch_west.title': '진실의 눈',
+  'entities.npcs.shadow_watch_west.greeting': '거기 멈춰라. 등불은 눈이 놓치는 것을 본다.',
+  'entities.npcs.shadow_watch_east.name': '등불 파수꾼',
+  'entities.npcs.shadow_watch_east.title': '진실의 눈',
+  'entities.npcs.shadow_watch_east.greeting': '누구도 내 빛을 들키지 않고 지나가지 못한다.',
+  'entities.npcs.forge_instructor.name': '대장장이 마라',
+  'entities.npcs.forge_instructor.title': '와이름 감시탑 대장장이',
+  'entities.npcs.forge_instructor.greeting':
+    '방패 마무리하는 걸 도와줘요! 내가 부르는 재료를 클릭하면 돼요. 손이 빠를수록 더 좋은 메달을 받아요.',
+  'entities.npcs.infiltrator_captain.name': '알릭 하사',
+  'entities.npcs.infiltrator_captain.title': '펜브리지 경비대',
+  'entities.npcs.infiltrator_captain.greeting':
+    '어떤 괴물이 병사의 얼굴을 훔쳤네. 상시 명령서와 경비 일지를 읽고 경비병 넷을 모두 심문한 뒤, 돌아와서 이야기가 우리 기록과 어긋나는 자를 지목하게.',
+  'entities.npcs.infiltrator_nella.name': '경비병 넬라',
+  'entities.npcs.infiltrator_nella.title': '펜브리지 경비대',
+  'entities.npcs.infiltrator_nella.greeting': '근무 보고합니다.',
+  'entities.npcs.infiltrator_orin.name': '경비병 오린',
+  'entities.npcs.infiltrator_orin.title': '펜브리지 경비대',
+  'entities.npcs.infiltrator_orin.greeting': '근무 보고합니다.',
+  'entities.npcs.infiltrator_bram.name': '경비병 브람',
+  'entities.npcs.infiltrator_bram.title': '펜브리지 경비대',
+  'entities.npcs.infiltrator_bram.greeting': '근무 보고합니다.',
+  'entities.npcs.infiltrator_tessa.name': '경비병 테사',
+  'entities.npcs.infiltrator_tessa.title': '펜브리지 경비대',
+  'entities.npcs.infiltrator_tessa.greeting': '근무 보고합니다.',
+  'entities.npcs.wisp_maze_keeper.name': '관리인 리오라',
+  'entities.npcs.wisp_maze_keeper.title': '생울타리 미로의 관리인',
+  'entities.npcs.wisp_maze_keeper.greeting':
+    '도둑들이 훔친 금화를 내 미로 곳곳에 숨겼고, 이제는 그림자들이 그걸 지키고 있어요. 동전 주머니를 모두 되찾아 주세요. 수호자들을 피하거나, 빛나는 위습을 먹고 쫓아내세요. 생명을 셋 다 잃으면 입구로 돌아가지만, 모은 주머니는 그대로 남아요.',
+  'entities.zones.farshore_isle.pois.5.label': '난파선',
   'hudChrome.pullTimer.countdown': '{seconds}',
   'hudChrome.pullTimer.pull': '당기다!',
   'hudChrome.pullTimer.start': '{seconds}초 동안 당겨보세요!',

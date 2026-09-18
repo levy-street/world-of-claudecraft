@@ -381,7 +381,10 @@ describe('generated chunk geometry is stable', () => {
     // pads into spaced town-square positions; the terrain generator is unchanged.
     // Desktop/mobile captures and the rendered wolf-route collision checks
     // were reviewed before refreshing this intentional layout fingerprint.
-    expect(digestOf(inRect)).toBe('6750fb67ee25f0addbea3cf2b350775d');
+    // Second release/v0.43.0 merge into feature/world-quests: the handoff's
+    // spaced givers compose with the branch's calm pads (shadow guards, freight
+    // crate and wagon). Measured on the merged tree, twice in separate processes.
+    expect(digestOf(inRect)).toBe('606ee2407082adeef9f271d20e37f91c');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

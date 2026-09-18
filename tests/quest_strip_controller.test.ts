@@ -78,14 +78,18 @@ function quest(id: string, objectiveCount = 1): TrackedQuest {
   };
 }
 
-function mountStrip() {
+function mountStrip(activate?: (questId: string) => boolean) {
   const controls = document.createElement('section');
   controls.id = 'mobile-controls';
   controls.innerHTML = STRIP_MARKUP;
   document.body.append(controls);
   document.body.classList.add('mobile-touch');
   const click = vi.fn();
-  const controller = buildQuestStrip({ writers: writers(), click });
+  const controller = buildQuestStrip({
+    writers: writers(),
+    click,
+    ...(activate ? { activate } : {}),
+  });
   if (!controller) throw new Error('the strip markup did not resolve');
   const el = (id: string) => document.getElementById(id) as HTMLElement;
   return {
@@ -121,6 +125,26 @@ beforeEach(() => {
 });
 
 describe('the quest strip cycles through real pointer events', () => {
+  it('focuses a movement lesson and repaints phase instructions without numeric progress', () => {
+    const rig = mountStrip();
+    const lesson = quest('lesson');
+    const quests = [quest('other'), lesson];
+    rig.controller.update(quests, 0);
+    rig.controller.update(quests, 1, lesson.id);
+    expect(rig.title.textContent).toBe('Title lesson');
+    const drawing = {
+      ...lesson,
+      objectives: [{ label: 'Follow the outline', current: 0, total: 3, instruction: true }],
+    };
+    rig.controller.update([quests[0], drawing], 2, lesson.id);
+    expect(rig.objectives[0].textContent).toBe('Follow the outline');
+    expect(rig.objectives[0].classList.contains('instruction')).toBe(true);
+    rig.controller.update([quests[0], drawing], 3, lesson.id);
+    expect(rig.objectives[0].textContent).toContain('Follow the outline');
+    rig.controller.update([quests[0]], 4);
+    expect(rig.objectives[0].classList.contains('instruction')).toBe(false);
+  });
+
   it('advances on a tap and wraps at the end', () => {
     const rig = mountStrip();
     rig.controller.update([quest('a'), quest('b')], 0);
@@ -195,6 +219,18 @@ describe('the quest strip cycles through real pointer events', () => {
     swipe(rig.surface, -SWIPE_PX);
     expect(rig.title.textContent).toBe('Title a');
     expect(rig.click).not.toHaveBeenCalled();
+  });
+
+  it('activates a single puzzle quest on tap instead of trying to cycle it', () => {
+    const activate = vi.fn(() => true);
+    const rig = mountStrip(activate);
+    rig.controller.update([quest('wq_galecrest_wisps')], 0);
+
+    swipe(rig.surface, 0);
+
+    expect(activate).toHaveBeenCalledWith('wq_galecrest_wisps');
+    expect(rig.title.textContent).toBe('Title wq_galecrest_wisps');
+    expect(rig.click).toHaveBeenCalledOnce();
   });
 
   it('drops a gesture the button never sees through the window backstop', () => {
@@ -310,10 +346,12 @@ describe('the tracker hands its projection to the strip on touch', () => {
       element,
       document,
       world: () =>
-        ({ cfg: { playerClass: 'warrior' }, player: { name: 'Adventurer' }, questLog }) as Pick<
-          IWorld,
-          'questLog' | 'cfg' | 'player'
-        >,
+        ({
+          cfg: { playerClass: 'warrior' },
+          player: { name: 'Adventurer' },
+          questLog,
+          worldQuestLog: new Map(),
+        }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'>,
       settings: {
         available: () => true,
         collapsed: () => false,
@@ -340,6 +378,41 @@ describe('the tracker hands its projection to the strip on touch', () => {
     rig.controller.update(0);
     expect(rig.element.innerHTML).toContain('title:q_wolves');
     expect(rig.root.classList.contains('empty')).toBe(true);
+  });
+
+  it('does not bypass the in-world activator when a minigame strip row is tapped', () => {
+    const rig = mountStrip();
+    const element = document.createElement('div');
+    element.id = 'quest-tracker';
+    document.body.append(element);
+    const questId = 'wq_galecrest_wisps';
+    const controller = new QuestTrackerController({
+      writers: writers(),
+      element,
+      document,
+      world: () =>
+        ({
+          cfg: { playerClass: 'warrior' },
+          player: { name: 'Adventurer' },
+          questLog: new Map(),
+          worldQuestLog: new Map([
+            [questId, { questId, count: 0, state: 'active', puzzleRotations: Array(9).fill(0) }],
+          ]),
+        }) as unknown as Pick<IWorld, 'questLog' | 'cfg' | 'player' | 'worldQuestLog'>,
+      settings: {
+        available: () => true,
+        collapsed: () => false,
+        setCollapsed: () => {},
+      },
+      questTitle: (id) => id,
+      objectiveLabel: (id) => id,
+      click: () => {},
+    });
+    controller.update(0);
+
+    swipe(rig.surface, 0);
+
+    expect(document.getElementById('world-quest-puzzle-window')).toBeNull();
   });
 });
 

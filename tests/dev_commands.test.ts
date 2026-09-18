@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { FARM_CROP_IDS } from '../src/sim/content/farm_crops';
 import { FARM_BED_IDS, farmBedById } from '../src/sim/content/farm_patches';
+import { WORLD_QUEST_MIN_LEVEL } from '../src/sim/content/world_quests';
 import { parseBisGearFor } from '../src/sim/dev/parse_bis_loadouts';
 import { normalizeFarmPlots, serializeFarmPlots } from '../src/sim/professions/farm_persist';
 import { Sim } from '../src/sim/sim';
@@ -24,6 +25,32 @@ function devSpawns(sim: Sim, ownerId = sim.playerId) {
 }
 
 describe('dev commands', () => {
+  // Daily cycles (wq1_<day>) select the weekly layout by calendar week; the
+  // arm lifts the tester to the world-quest floor level.
+  it.each([
+    ['2026-09-02', 'wq1_2', 0],
+    ['2026-09-13', 'wq1_13', 1],
+    ['2026-09-15', 'wq1_15', 2],
+  ] as const)(
+    '/dev salvage arms the weekly layout online on %s',
+    (resetDay, expectedCycle, expectedVariant) => {
+      const sim = devSim();
+      sim.resetDay = resetDay;
+
+      sim.chat('/dev salvage');
+
+      expect(sim.player.level).toBe(WORLD_QUEST_MIN_LEVEL);
+      expect(sim.worldQuestCycle).toBe(expectedCycle);
+      expect(sim.meta(sim.playerId)?.devWorldQuestCycle).toBe(expectedCycle);
+      expect(sim.worldQuestLog.get('wq_farshore_salvage')).toEqual({
+        questId: 'wq_farshore_salvage',
+        count: 0,
+        state: 'active',
+        puzzleVariant: expectedVariant,
+      });
+    },
+  );
+
   it('/dev bis uses the selected spec parse loadout without changing the live spec', () => {
     const sim = new Sim({
       seed: 42,
@@ -729,5 +756,37 @@ describe('/dev farmgrow (farming grow-now)', () => {
     sim.chat('/dev farmgrow');
 
     expect(plotOf(sim, 'bed_eastbrook_1')?.readyAtMs).toBe(FAR);
+  });
+});
+
+describe('/dev rep', () => {
+  it('awards faction standing under the world-quest level cap, per faction or all', () => {
+    const sim = devSim();
+    sim.chat('/dev rep rift_watch 1500');
+    // Level 1 sits under the low-level cap (3,000), so the award lands whole.
+    expect(sim.meta(sim.player.id)?.factions?.rift_watch).toBe(1500);
+    sim.chat('/dev rep rift_watch 5000');
+    expect(sim.meta(sim.player.id)?.factions?.rift_watch).toBe(3000);
+    sim.chat('/dev level 20');
+    sim.chat('/dev rep all 20000');
+    expect(sim.meta(sim.player.id)?.factions).toEqual({
+      rift_watch: 20000,
+      church_order: 20000,
+      automatons: 20000,
+    });
+  });
+
+  it('rejects an unknown faction and is inert without devCommands', () => {
+    const sim = devSim();
+    sim.chat('/dev rep nobody 100');
+    expect(sim.meta(sim.player.id)?.factions?.rift_watch ?? 0).toBe(0);
+    const plain = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
+    plain.chat('/dev rep rift_watch 1500');
+    expect(plain.meta(plain.player.id)?.factions?.rift_watch ?? 0).toBe(0);
   });
 });

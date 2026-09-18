@@ -29,7 +29,11 @@ the `SimContext` seam) runs at the very end of the tick tail (grant
 evaluation over dirty players only, plus a 1 Hz proximity sweep that sets
 visit marks), draws zero rng, grants into `PlayerMeta.deedsEarned`, maintains
 the `renown` sum and the persisted `deedStats` lifetime counters, and emits
-the id-based `deedUnlocked` event (never English text); on world join it
+the id-based `deedUnlocked` event (never English text). Meters read
+already-persisted state rather than a counter: faction standing, for
+example, is the `standing*` meter family over `PlayerMeta.factions`
+(thresholds are the live `STANDING_THRESHOLDS` of `src/sim/factions.ts`),
+marked dirty by the sites that call `awardFactionReputation`. On world join it
 re-evaluates every predicate against loaded state and grants with
 `retro: true`, so veterans get credit for anything their character verifiably
 already did. The same join pass carries the fallback heals

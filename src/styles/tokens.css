@@ -14,6 +14,23 @@
    written per element by the HUD, never on :root. */
 @layer tokens {
   :root {
+    --color-vehicle-integrity: #2f8c4a;
+    --color-vehicle-danger: #b72b27;
+    --color-vehicle-text: #ffffff;
+    /* The forge workshop bar (hud.css .forge-action-bar / .forge-meter): the
+       heat gauge ramp, the iron timing meter, its strike band (cold and in-band
+       hot) and the needle. Fixed craft colors over the vehicle bar; no preset
+       re-emits them. */
+    --color-forge-heat-cold: #7a2d12;
+    --color-forge-heat-hot: #f0a030;
+    --color-forge-meter-iron: #2a2320;
+    --color-forge-meter-iron-light: #4a3a2a;
+    --color-forge-band: rgba(12, 8, 6, 0.85);
+    --color-forge-band-edge: #b07a3a;
+    --color-forge-band-hot: rgba(60, 20, 8, 0.95);
+    --color-forge-band-glow: #ffb347;
+    --color-forge-needle: #f5e6c8;
+    --color-forge-needle-glow: #fff3c4;
     --gold: #ffd100;
     --gold-dim: #c8a838;
     /* The deed-unlock banner plate (#banner.banner-deed). Echoes the Book of
@@ -163,6 +180,59 @@
     --panel-edge: #08080d;
     --color-text-error: #ff8f85;
     --color-text-success: #7fdc4f;
+    --color-candy-berry: #e86b8c;
+    --color-candy-citrus: #f0a33a;
+    --color-candy-mint: #53c990;
+    --color-candy-grape: #8c78dd;
+    --color-candy-star: #55aee8;
+    /* Confection Cascade: crafted wood and velvet remain dark on every theme.
+       The inset focus ring stays light against this fixed dark surface. */
+    --color-ley-night: #07111f;
+    --color-ley-tray: #0a1724;
+    --color-ley-slate: #193247;
+    --color-ley-bronze: #665030;
+    --color-ley-gold: #d4ad64;
+    --color-ley-ivory: #fff0cd;
+    --color-ley-muted: #c8d7db;
+    --color-ley-channel: #286777;
+    --color-ley-blue: #55d8ef;
+    --color-ley-light: #e3fcff;
+    --color-ley-loss: #44323e;
+    --color-ley-grain: #bf9c5510;
+    --color-ley-shadow: #000000b3;
+    --ley-window-width: 568px;
+    --ley-frame-pad: 36px;
+    --ley-grid-pad: 12px;
+    --ley-gap: 10px;
+    --color-confection-wood: #38271d;
+    --color-confection-wood-light: #73523a;
+    --color-confection-wood-shadow: #180f0b;
+    --color-confection-grain: #c69b6126;
+    --color-confection-velvet: #0d211e;
+    --color-confection-velvet-light: #2b4b3b;
+    --color-confection-shadow: #000000a6;
+    --color-confection-focus: #ffe6a6;
+    --color-confection-ivory: #fff0ca;
+    --color-confection-muted: #c7b28d;
+    --color-confection-brass: #b78843;
+    --color-confection-brass-light: #f9dda0;
+    --color-confection-brass-dark: #5b3819;
+    --color-confection-win: #a6efc9;
+    --color-confection-loss: #ecc18d;
+    --color-confection-spark: #fff9e4;
+    --color-confection-loss-velvet: #241e23;
+    --color-confection-backing: #181014;
+    --color-confection-gilding: #d4ad58;
+    --confection-damask: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27120%27%20height%3D%27120%27%20viewBox%3D%270%200%20120%20120%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%23b78843%27%20stroke-opacity%3D%27.15%27%20stroke-width%3D%27.7%27%3E%3Cpath%20d%3D%27M60%200C80%2025%20108%2032%20120%2060C96%2071%2075%2089%2060%20120C43%2091%2020%2072%200%2060C14%2037%2040%2025%2060%200Z%27%2F%3E%3Cpath%20d%3D%27M60%2018C70%2042%2098%2039%20103%2060C83%2059%2075%2077%2060%2098C45%2077%2037%2059%2017%2060C22%2039%2050%2042%2060%2018Z%27%2F%3E%3Cpath%20d%3D%27M60%2092V42M60%2067C37%2070%2031%2049%2045%2045C54%2042%2057%2056%2060%2058C63%2056%2066%2042%2075%2045C89%2049%2083%2070%2060%2067M60%2046C43%2040%2049%2027%2060%2024C71%2027%2077%2040%2060%2046%27%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%27%23f9dda0%27%20fill-opacity%3D%27.12%27%3E%3Cpath%20d%3D%27M60%206L63%2011L60%2016L57%2011ZM60%20104L63%20109L60%20114L57%20109ZM6%2060L11%2057L16%2060L11%2063ZM104%2060L109%2057L114%2060L109%2063Z%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+    --confection-window-width: 584px;
+    --confection-cell-size: 60px;
+    --confection-frame-pad: 28px;
+    --confection-frame-rail: 18px;
+    --confection-header-height: 100px;
+    --confection-footer-height: 124px;
+    --confection-cell-gap: 6px;
+    --confection-box-depth: 12px;
+    --confection-feedback-duration: 160ms;
     /* The signpost guild board's category family (the sprout chip and the
        filter strip, src/ui/hud/guild_board/): one soft green read at four
        strengths through color-mix, its icon tint, its two text weights, and
@@ -360,6 +430,11 @@
     /* active-quest objective areas: the classic translucent blue quest-POI blob */
     --color-map-quest-area-fill: rgba(72, 132, 232, 0.22);
     --color-map-quest-area-stroke: rgba(120, 170, 255, 0.55);
+    /* self-starting world quests: a gold objective ring distinct from log quests */
+    --color-map-world-quest-area-fill: rgba(255, 209, 0, 0.14);
+    --color-map-world-quest-area-stroke: rgba(255, 221, 92, 0.72);
+    --color-map-world-quest-available: #4aa3ff;
+    --color-map-world-boss: #a970ff;
     /* the numbered quest badge on each area (gold circle, dark numeral) */
     --color-map-quest-badge-fill: #ffd100;
     --color-map-quest-badge-text: #3a2b00;
@@ -470,6 +545,9 @@
     --color-minimap-gather-ready: #3ef07a;
     --color-minimap-gather-cooldown: #90989a;
     --color-minimap-station: #d98e4a;
+    --color-minimap-world-quest-available: #4aa3ff;
+    --color-minimap-world-quest-active: #ffd15c;
+    --color-minimap-world-boss: #a970ff;
     /* Tool-tier locked gather node (Professions 2.0): a dark rust
        clearly apart from the ready green, neutral cooldown gray, and the
        bright mob red, so the lock reads at minimap marker size. */
@@ -1147,6 +1225,30 @@
     --color-ranking-text-muted: #a99bc8;
     --color-ranking-place-second: #c9ccd3;
     --color-ranking-place-third: #c98a4b;
+    /* The World Quest rankings window (#world-quest-leaderboard-window, the
+       .wql-* and .lbp-* rules in components.css) and the World Quests tab
+       chips (.lb-wq-*). The window stands on the same fixed ranking ground and
+       reads the --color-ranking-* steps above wherever its value matches one;
+       these are the values it spells that no ranking or gold ramp step
+       matches exactly. Fixed like the ranking family: no preset re-emits them. */
+    --color-wq-ranking-edge: #8f6a2c;
+    --color-wq-ranking-gilt: #d4a955;
+    --color-wq-ranking-heading: #f2d998;
+    --color-wq-ranking-text-bright: #f1e9ff;
+    --color-wq-ranking-text-faint: #8d82a8;
+    --color-wq-ranking-error: #ff9a8a;
+    --color-wq-ranking-art-ground: #120b20;
+    --color-wq-ranking-art-violet: #2b1f4a;
+    --color-wq-ranking-art-bronze: #3a2d12;
+    --color-wq-ranking-medal-ring: #0a0713;
+    --color-wq-ranking-card-deep: #150f24;
+    --color-wq-ranking-head-ground: #130d22;
+    --color-wq-ranking-self-deep: #0e0a1a;
+    --color-wq-ranking-silver-text: #dfe2e8;
+    --color-wq-ranking-bronze-text: #e0a36a;
+    --color-wq-chip-text: #cabb8c;
+    --color-wq-chip-active: #f5c843;
+    --color-wq-chip-active-edge: #b8902a;
     /* target size */
     /* Stance socket on a coarse pointer: the same 40px box, kept as its own
        token so touch can diverge from the desktop row without a rule rewrite. */

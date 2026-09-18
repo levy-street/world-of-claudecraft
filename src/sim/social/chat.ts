@@ -14,6 +14,7 @@
 // at the emit site (the S3 i18n guard scans this file + chat_readouts.ts).
 
 import { type AssistCandidate, resolveAssist } from '../assist';
+import { onEmoteForClueHunt } from '../clue_scrolls';
 import { isHeldInCombat } from '../combat/engaged_combat';
 import { YUMI_TEMPLATE_ID } from '../content/yumi';
 import { CLASSES, zoneAt } from '../data';
@@ -966,6 +967,9 @@ export function chat(ctx: SimContext, text: string, pid?: number): SentChat | nu
       broadcastEmote(ctx, r.meta, r.e, text);
       // A cheer with a live Yumi in earshot counts; range matches the /say emote.
       if (key === 'cheer') deedsMod.onCheerForDeeds(ctx, r.meta, r.e, YUMI_TEMPLATE_ID, SAY_RANGE);
+      // Clue Scrolls: an emote step resolves on the canonical key (aliases
+      // already folded above) when the player stands at the step's landmark.
+      onEmoteForClueHunt(ctx, r.meta, r.e, key);
       return null;
     }
   }

@@ -104,7 +104,12 @@ export function bucketMapAtlasDistance(distance: number): number {
  */
 export function mapSidebarSignature(
   view: MapSidebarView,
-  chrome: { shownRouteQuestId: string | null; i18nRevision: number; trackingRevision: number },
+  chrome: {
+    shownRouteQuestId: string | null;
+    i18nRevision: number;
+    trackingRevision: number;
+    worldQuests?: unknown;
+  },
 ): string {
   return JSON.stringify({
     view: {

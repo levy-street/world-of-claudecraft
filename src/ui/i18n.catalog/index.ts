@@ -7,6 +7,7 @@ import { ITEM_SETS } from '../../sim/data';
 import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
+import { clueStrings } from './clues';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
 import { guideStrings } from './guide';
@@ -19,6 +20,7 @@ import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
+export { clueStrings } from './clues';
 export { editorStrings } from './editor';
 export {
   gameStrings,
@@ -235,6 +237,8 @@ export const en = {
     goldenHarvest: '{finder} reaped a golden harvest!',
   },
   apiError: apiErrorStrings,
+  // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
+  clues: clueStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
@@ -1631,6 +1635,9 @@ export const en = {
       crypt_ritual_circle: { name: 'Ritual Circle' },
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
+      // Clue Scrolls (world quests, Stage 3): the scroll and the casket it buries.
+      clue_scroll: { name: 'Clue Scroll' },
+      treasure_casket: { name: 'Treasure Casket' },
       heroic_mark: { name: 'Heroic Mark' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
@@ -1743,6 +1750,22 @@ export const en = {
       // until the raid loot pass wires them.
       varkhul_forgebreaker: { name: 'Forgebreaker, Engine of Varkhul' },
       varkhul_emberward: { name: 'Emberward, Bulwark of Varkhul' },
+      // Faction Quartermaster vendor items
+      rift_watchers_band: { name: "Rift Watcher's Band" },
+      rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },
+      riftwalkers_tunic: { name: "Riftwalker's Tunic" },
+      riftwarden_voidblade: { name: "Riftwarden's Voidblade" },
+      champion_rift_band: { name: "Champion's Rift Band" },
+      order_prayer_beads: { name: 'Order Prayer Beads' },
+      vestments_of_the_acolyte: { name: 'Vestments of the Acolyte' },
+      templar_dawn_shield: { name: "Templar's Dawn Shield" },
+      dawnkeeper_consecrated_mace: { name: "Dawnkeeper's Consecrated Mace" },
+      champion_dawn_medallion: { name: "Champion's Dawn Medallion" },
+      automaton_cog_ring: { name: 'Automaton Cog Ring' },
+      clockwork_tinkers_pack: { name: "Clockwork Tinker's Pack" },
+      artificers_welding_cowl: { name: "Artificer's Welding Cowl" },
+      forgemaster_crag_cleaver: { name: "Forgemaster's Crag Cleaver" },
+      champion_forged_loop: { name: "Champion's Forged Loop" },
     },
     itemSets: itemSetEntityText,
     mobs: {

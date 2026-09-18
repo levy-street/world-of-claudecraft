@@ -24,6 +24,7 @@ import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
 import { TUNNELS } from './content/tunnels';
+import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy';
 import {
   DUNGEONS,
   ESCORTS,
@@ -158,6 +159,7 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   // The pre-existing anchor set (required: these rings are already minted).
   for (const node of GATHER_NODES) pad('gatherNode', node.pos.x, node.pos.z, 5, 12, false);
   for (const id in NPCS) {
+    if (Object.hasOwn(WORLD_QUEST_CALLIGRAPHY_NPCS, id)) continue;
     const npc = NPCS[id];
     pad('npc', npc.pos.x, npc.pos.z, 6, 14, false);
   }
@@ -217,6 +219,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   // every 8yd along each leg).
   for (const id in ESCORTS) {
     const escort = ESCORTS[id];
+    // World-quest caravans follow already-authored town roads and must not
+    // reshape global terrain merely by joining the rotating event catalog.
+    if (escort.worldQuestId !== undefined) continue;
     const line = [escort.start, ...escort.waypoints];
     for (let i = 0; i < line.length; i++) {
       pad('escortRoute', line[i].x, line[i].z, 4, 10);
@@ -270,6 +275,7 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
   // 5.96yd out, so the pad must reach past both.
   for (const marker of PROPS.delveMarkers ?? []) pad('delveMarker', marker.x, marker.z, 8, 15);
   for (const decor of PROPS.decorProps ?? []) {
+    if (decor.terrainCalm === false) continue;
     // decor.r is the COLLIDER radius (absent on walk-through dressing);
     // the VISUAL footprint tracks scale, so a scale-9 landmark gets a
     // landmark-sized pad, not a crate-sized one.

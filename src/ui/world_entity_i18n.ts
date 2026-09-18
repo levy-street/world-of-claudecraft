@@ -26,6 +26,9 @@ const MOB_IDS = [
   'mudfin_murloc',
   'tunnel_rat',
   'vale_bandit',
+  'eastbrook_freight_caravan',
+  'willowfen_remedy_caravan',
+  'frostveil_supply_caravan',
   'restless_bones',
   'gorrak',
   'mire_prowler',
@@ -33,6 +36,7 @@ const MOB_IDS = [
   'mire_widow',
   'mirefen_broodmother',
   'drowned_dead',
+  'fenbridge_infiltrator',
   'fen_troll',
   'grubjaw',
   'gravecaller_cultist',
@@ -249,6 +253,27 @@ const MOB_IDS = [
 ] as const;
 
 const NPC_IDS = [
+  'glider_instructor',
+  'glider_apprentice',
+  'shadow_cloak_scout',
+  'shadow_guard_north',
+  'shadow_guard_south',
+  'shadow_guard_east',
+  'shadow_guard_west',
+  'shadow_sentry_south',
+  'shadow_sentry_north',
+  'shadow_watch_west',
+  'shadow_watch_east',
+  'forge_instructor',
+  'infiltrator_captain',
+  'infiltrator_nella',
+  'infiltrator_orin',
+  'infiltrator_bram',
+  'infiltrator_tessa',
+  'wisp_maze_keeper',
+  'calligraphy_instructor',
+  'calligraphy_apprentice_1',
+  'calligraphy_apprentice_2',
   'the_merchant',
   'marshal_redbrook',
   'trader_wilkes',
@@ -347,6 +372,12 @@ const NPC_IDS = [
   'bellkeeper_tam',
   'fisher_nell',
   'riftwright_maelis', // the Rift Forge (Gullhaven, Farshore)
+  // The faction quartermasters and the World Quest taskmaster
+  // (src/sim/content/faction_vendors.ts).
+  'npc_rift_watch_quartermaster',
+  'npc_church_order_quartermaster',
+  'npc_automaton_quartermaster',
+  'npc_wq_taskmaster',
   'forgemistress_darva', // crafting-station master: forge (Eastbrook, zone 1)
   'cook_marlow', // crafting-station master: kitchens (Eastbrook, zone 1)
   'weaver_ottilie', // crafting-station master: loom (Eastbrook, zone 1)

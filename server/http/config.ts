@@ -153,6 +153,9 @@ export interface Config {
   // 0-keeps-forever retention contract above.
   readonly levelUpEventsRetentionDays: number;
   readonly ftueEventsRetentionDays: number;
+  // How many days a world-quest scoreboard row (a character's best attempt on
+  // one ladder) survives without being improved. Same 0-keeps-forever contract.
+  readonly worldQuestScoresRetentionDays: number;
   // How many days a CLOSED, fully-disposed $WOC Exchange listing (and, via
   // FK cascade, its bids and settlements) is kept. Sales are the permanent
   // provenance record and never prune. 0 keeps listings forever.
@@ -238,6 +241,7 @@ const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
 // during a paid-campaign burst.
 const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
 const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
+const DEFAULT_WORLD_QUEST_SCORES_RETENTION_DAYS = 365;
 const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
 // Abandon rows are dead once outside every cooldown window (an hour); 30 days
 // keeps generous forensics for tuning the cooldown numbers.
@@ -473,6 +477,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     ftueEventsRetentionDays: numberOr(
       env.FTUE_EVENTS_RETENTION_DAYS,
       DEFAULT_FTUE_EVENTS_RETENTION_DAYS,
+    ),
+    worldQuestScoresRetentionDays: numberOr(
+      env.WORLD_QUEST_SCORES_RETENTION_DAYS,
+      DEFAULT_WORLD_QUEST_SCORES_RETENTION_DAYS,
     ),
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,

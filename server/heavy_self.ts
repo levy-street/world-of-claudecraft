@@ -287,3 +287,9 @@ export const HEAVY_SELF_EVENTS = new Set<string>([
   // buys at most one re-diff per growth cycle per farmer.
   'farmReady',
 ]);
+
+/** Whether a pid-scoped sim event touches a heavy self field: the named set, plus every
+ *  world-quest event, which all move owner-only quest mirrors (wqlog, vehicle, trails). */
+export function isHeavySelfEvent(type: string): boolean {
+  return HEAVY_SELF_EVENTS.has(type) || type.startsWith('worldQuest');
+}

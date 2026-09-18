@@ -188,7 +188,12 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (tsx, no full compile), since these additions could in principle
     // collide on a relic id. Re-confirm with
     // `npx vitest run tests/profile_page.test.ts` once the tree compiles.
-    expect(catalogTotal).toBe(411);
+    // 412 at the release/v0.43.0 merge into feature/world-quests: the Arcane
+    // Calligraphy gold title's slot on the Horizons titles page.
+    // 415 at the faction standing deeds: the three Champion titles
+    // (Riftwarden, Dawnkeeper, Forgemaster) take their slots on the same page.
+    // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
+    expect(catalogTotal).toBe(416);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

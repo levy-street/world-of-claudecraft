@@ -81,6 +81,9 @@ vi.mock('../src/render/quest_objects', () => ({
     if (!state.buildQuestObject) throw new Error('buildQuestObject not stubbed');
     return state.buildQuestObject(itemId, id);
   },
+  // The Farshore salvage prewarm is pinned by world_quest_salvage_assets.test.ts;
+  // this suite counts only the PREWARM_OBJECT_ITEM_IDS copies.
+  prewarmFarshoreSalvageObjects: () => [],
 }));
 
 const ZONE = { id: 'test_zone' } as ZoneDef;

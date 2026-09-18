@@ -1,0 +1,88 @@
+[
+  {
+    "source": "/Users/demihenderson/.codex/generated_images/01a0755a-4bc1-7141-94b0-39009ed6a4b8/exec-fbc070f0-8dd8-4e83-8e94-5bd9037b4c27.png",
+    "sourceHash": "a3f11e8c2009b89dc7cf4a899ee7c3a2ba0c6c462baf53fcbcd8d1ac3970ebc3",
+    "sourceMetadata": {
+      "format": "png",
+      "mediaType": "image/png",
+      "width": 2172,
+      "height": 724,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 72,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 2172,
+        "height": 724
+      }
+    },
+    "dest": "public/ui/minigames/confection-jewels-v6.webp",
+    "hash": "68e8c3b9caf335a8b023d21985657a926b7522078240e121ebb1c813eeb3a0e3",
+    "bytes": 50078,
+    "metadata": {
+      "format": "webp",
+      "mediaType": "image/webp",
+      "width": 768,
+      "height": 256,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "isProgressive": false,
+      "isPalette": false,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 768,
+        "height": 256
+      }
+    }
+  },
+  {
+    "source": "/Users/demihenderson/.codex/generated_images/01a0755a-4bc1-7141-94b0-39009ed6a4b8/exec-a06386c1-4bf0-40b6-8dbe-4d38fbf553e0.png",
+    "sourceHash": "41dcd89c24a8d4b42f3f3cf00744f4b29d4f3ec7d585c5ff2c20a8528054021e",
+    "sourceMetadata": {
+      "format": "png",
+      "mediaType": "image/png",
+      "width": 1774,
+      "height": 887,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "density": 72,
+      "isProgressive": false,
+      "isPalette": false,
+      "bitsPerSample": 8,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 1774,
+        "height": 887
+      }
+    },
+    "dest": "public/ui/minigames/confection-lock-v6.webp",
+    "hash": "88baebef84adab99f2f0f5f9b3a71f196df0292d4adc42a492990e511177cc5d",
+    "bytes": 71626,
+    "metadata": {
+      "format": "webp",
+      "mediaType": "image/webp",
+      "width": 768,
+      "height": 384,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "isProgressive": false,
+      "isPalette": false,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 768,
+        "height": 384
+      }
+    }
+  }
+]

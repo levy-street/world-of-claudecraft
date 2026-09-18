@@ -17,5 +17,28 @@
 // that separation against THIS constant, so widening the radius here fails
 // there instead of silently turning the lock stale.
 
+import { NPCS } from '../sim/data';
+import type { Entity } from '../sim/types';
+import type { IWorld } from '../world_api';
+
 /** Yards past which an open NPC service window closes (see the band notes above). */
 export const NPC_WINDOW_CLOSE_RANGE = 8;
+
+/** The nearest NPC within the service range whose def carries `flag` (the
+ *  Merchant for the market coin, the taskmaster for the board), else null. */
+export function nearbyServiceNpc(
+  world: Pick<IWorld, 'player' | 'entities'>,
+  flag: 'market' | 'worldQuestBoard',
+): Entity | null {
+  const p = world.player;
+  for (const e of world.entities.values()) {
+    if (
+      e.kind === 'npc' &&
+      NPCS[e.templateId]?.[flag] &&
+      Math.hypot(p.pos.x - e.pos.x, p.pos.z - e.pos.z) <= NPC_WINDOW_CLOSE_RANGE
+    ) {
+      return e;
+    }
+  }
+  return null;
+}

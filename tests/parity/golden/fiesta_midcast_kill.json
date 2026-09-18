@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 25,
       "time": 1.25,
-      "nextId": 1010,
-      "state": "6c9c3066",
-      "events": "f66cb03f",
+      "nextId": 1014,
+      "state": "38fdec4f",
+      "events": "8c92e89b",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -41,9 +41,9 @@
     {
       "tick": 50,
       "time": 2.5,
-      "nextId": 1010,
-      "state": "c7a47ab7",
-      "events": "1bd60145",
+      "nextId": 1014,
+      "state": "3a19408e",
+      "events": "3a5da579",
       "rng": {
         "draws": 64,
         "digest": "62eadef0"
@@ -52,9 +52,9 @@
     {
       "tick": 75,
       "time": 3.75,
-      "nextId": 1010,
-      "state": "d8dc3619",
-      "events": "cc883821",
+      "nextId": 1014,
+      "state": "cabb5a6c",
+      "events": "70150bad",
       "rng": {
         "draws": 280,
         "digest": "3d9b7a55"
@@ -63,9 +63,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1010,
-      "state": "a0d6afde",
-      "events": "a4509c69",
+      "nextId": 1014,
+      "state": "4ce1d4e7",
+      "events": "f35a0f3d",
       "rng": {
         "draws": 531,
         "digest": "5e5e6f86"
@@ -74,9 +74,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 1010,
-      "state": "4059b335",
-      "events": "3d38b912",
+      "nextId": 1014,
+      "state": "237955fa",
+      "events": "6307f48a",
       "rng": {
         "draws": 542,
         "digest": "2db21352"
@@ -124,13 +124,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -170,6 +171,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -209,12 +211,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -258,6 +261,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -298,13 +302,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -344,6 +349,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -382,12 +388,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -427,6 +434,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -442,7 +450,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -454,7 +462,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 5,
           "hp": 822,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -505,7 +513,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -558,7 +566,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 6,
           "hp": 4950,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -617,7 +625,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 16,
           "hp": 783,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -661,9 +669,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 1010,
-      "state": "7e457c3f",
-      "events": "6acdaa96",
+      "nextId": 1014,
+      "state": "536ef2c6",
+      "events": "7b856255",
       "rng": {
         "draws": 542,
         "digest": "2db21352"
@@ -711,13 +719,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -757,6 +766,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -796,12 +806,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -845,6 +856,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -885,13 +897,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -931,6 +944,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -969,12 +983,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -1014,6 +1029,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -1029,7 +1045,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1041,7 +1057,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 5,
           "hp": 822,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1092,7 +1108,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1143,7 +1159,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 6,
           "hp": 4900,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1202,7 +1218,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 16,
           "hp": 783,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1246,9 +1262,9 @@
     {
       "tick": 101,
       "time": 5.05,
-      "nextId": 1010,
-      "state": "fd485f20",
-      "events": "e7f3cf61",
+      "nextId": 1014,
+      "state": "693510c1",
+      "events": "4ae6f06e",
       "rng": {
         "draws": 542,
         "digest": "2db21352"
@@ -1297,13 +1313,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -1345,6 +1362,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1384,12 +1402,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -1433,6 +1452,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1474,13 +1494,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -1520,6 +1541,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1558,12 +1580,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -1603,6 +1626,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -1618,7 +1642,7 @@
               "name": "Battle Stance",
               "remaining": 3595,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1630,7 +1654,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 5,
           "hp": 822,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1681,7 +1705,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 41,
           "hp": 665,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1732,7 +1756,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 104.05,
           "healPower": 6,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1791,7 +1815,7 @@
           "fiveSecondRule": 104.05,
           "healPower": 16,
           "hp": 783,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1835,8 +1859,8 @@
     {
       "tick": 125,
       "time": 6.25,
-      "nextId": 1010,
-      "state": "e3a56ed6",
+      "nextId": 1014,
+      "state": "38d70fb3",
       "events": "741638a5",
       "rng": {
         "draws": 800,
@@ -1846,8 +1870,8 @@
     {
       "tick": 142,
       "time": 7.1,
-      "nextId": 1010,
-      "state": "7eb5f915",
+      "nextId": 1014,
+      "state": "ff04ec98",
       "events": "741638a5",
       "rng": {
         "draws": 979,
@@ -1897,13 +1921,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -1945,6 +1970,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1984,12 +2010,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -2033,6 +2060,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2074,13 +2102,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1008,
+          "entityId": 1012,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_dagger",
             "offhand": "rusty_dagger"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -2120,6 +2149,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2158,12 +2188,13 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1009,
+          "entityId": 1013,
           "equipment": {
             "chest": "footpad_jerkin",
             "mainhand": "rusty_hatchet"
           },
           "equipmentInstance": {},
+          "factions": {},
           "fiestaRestore": {
             "level": 1,
             "talents": {
@@ -2203,6 +2234,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -2218,7 +2250,7 @@
               "name": "Battle Stance",
               "remaining": 3592.95,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2231,7 +2263,7 @@
           "fiveSecondRule": 106.1,
           "healPower": 5,
           "hp": 822,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2282,7 +2314,7 @@
           "fiveSecondRule": 106.1,
           "healPower": 41,
           "hp": 665,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2334,7 +2366,7 @@
           "facing": 3.141593,
           "fiveSecondRule": 106.1,
           "healPower": 6,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2393,7 +2425,7 @@
           "fiveSecondRule": 106.1,
           "healPower": 16,
           "hp": 783,
-          "id": 1009,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

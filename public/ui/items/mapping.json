@@ -244,6 +244,30 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_chimeglass_tortoise",
+      "name": "Roadwarden's Bellstrap: Tolliver",
+      "sourcePack": "project-authored",
+      "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_lanternback_troll",
+      "name": "Lamplighter's Yoke: Grumbol",
+      "sourcePack": "woc_owner_supplied_art",
+      "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_rickshaw_mount",
+      "name": "Bonebound Rickshaw Reins",
+      "sourcePack": "woc_item_icon_v1_generated",
+      "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+    },
+    {
       "itemId": "resonant_hide",
       "name": "Resonant Hide",
       "sourcePack": "woc_professions_art",
@@ -376,30 +400,6 @@
       "name": "Wolfhide Satchel",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_06.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "reins_rickshaw_mount",
-      "name": "Bonebound Rickshaw Reins",
-      "sourcePack": "woc_item_icon_v1_generated",
-      "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
-    },
-    {
-      "itemId": "reins_lanternback_troll",
-      "name": "Lamplighter's Yoke: Grumbol",
-      "sourcePack": "woc_owner_supplied_art",
-      "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "reins_chimeglass_tortoise",
-      "name": "Roadwarden's Bellstrap: Tolliver",
-      "sourcePack": "project-authored",
-      "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
@@ -6722,6 +6722,133 @@
         "heroic_stormhymn_chain_grips",
         "stormhymn_chain_treads",
         "heroic_stormhymn_chain_treads"
+      ]
+    },
+    {
+      "batchId": "world-quest-puzzle-activators-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "bridgemere_toll_chest.webp was supplied as the style, lighting, scale, and composition reference for leyline_cache; hearth_ember_cache.webp served the same role for confection_game_box. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Classic dark-fantasy MMORPG painted inventory art of one complete compact magical puzzle chest centered in a square, with tactile metal and aged wood, a strong silhouette at 28px, top-left key light, an opaque near-black painted vignette, and no text, border, watermark, crop, or extra objects.",
+      "itemDirections": {
+        "leyline_cache": {
+          "canonicalDisplayName": "Miniature Ley Cache",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Galecrest ley-beam world quest.",
+          "intendedVisualSubject": "A compact ornate treasure chest whose carved runes and narrow seams glow with vivid blue-cyan ley energy.",
+          "reference": {
+            "path": "public/ui/items/bridgemere_toll_chest.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "confection_game_box": {
+          "canonicalDisplayName": "Confectioner's Game Box",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Palmreach confection match-three world quest.",
+          "intendedVisualSubject": "An ornate tabletop puzzle chest with jewel-like candy motifs and pink-magenta light glowing through narrow seams.",
+          "reference": {
+            "path": "public/ui/items/hearth_ember_cache.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": [
+        "confection_game_box",
+        "leyline_cache"
+      ]
+    },
+    {
+      "batchId": "world-quest-freight-icons-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "supply_crate.webp was supplied as the style, lighting, scale, and composition reference for eastbrook_freight_crate; reins_rickshaw_mount.webp served the same role for eastbrook_freight_wagon. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Fresh premium hand-painted classic dark-fantasy MMORPG inventory icon of one complete Eastbrook freight subject centered in a square, with a strong readable silhouette, tactile wood, iron, cloth, and rope, warm top-left key light, cool rim light, an opaque dark painted vignette, and no text, border, watermark, crop, person, or unrelated objects.",
+      "itemDirections": {
+        "eastbrook_freight_crate": {
+          "canonicalDisplayName": "Eastbrook Freight Crate",
+          "canonicalGameplayMeaningOrAcquisition": "The personal cargo picked up and carried to the wagon during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One sturdy closed wooden cargo crate with iron corner straps, pale-blue Eastbrook cloth, and rope handles, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/supply_crate.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "eastbrook_freight_wagon": {
+          "canonicalDisplayName": "Eastbrook Freight Wagon",
+          "canonicalGameplayMeaningOrAcquisition": "The destination players load during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One four-wheeled wooden merchant wagon with iron rims, an open cargo bed loaded with crates, and empty horse shafts, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/reins_rickshaw_mount.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": [
+        "eastbrook_freight_crate",
+        "eastbrook_freight_wagon"
+      ]
+    },
+    {
+      "batchId": "faction-vendor-icons-2026-09-16",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_vendor_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_vendor_icons.mjs.",
+      "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+      "itemIds": [
+        "artificers_welding_cowl",
+        "automaton_cog_ring",
+        "champion_dawn_medallion",
+        "champion_forged_loop",
+        "champion_rift_band",
+        "clockwork_tinkers_pack",
+        "dawnkeeper_consecrated_mace",
+        "forgemaster_crag_cleaver",
+        "order_prayer_beads",
+        "rift_surveyors_satchel",
+        "rift_watchers_band",
+        "riftwalkers_tunic",
+        "riftwarden_voidblade",
+        "templar_dawn_shield",
+        "vestments_of_the_acolyte"
+      ]
+    },
+    {
+      "batchId": "clue-scroll-icons-2026-09-17",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_clue_scroll_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of both items is the ITEMS_TO_GENERATE table in scripts/generate_clue_scroll_icons.mjs.",
+      "provenanceRecord": "docs/achievements/clue-scroll-icons-2026-09-17/",
+      "itemIds": [
+        "clue_scroll",
+        "treasure_casket"
       ]
     }
   ]

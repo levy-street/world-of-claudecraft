@@ -521,6 +521,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // consumes the chipped tusk, so it is poor grey trash outside the
     // material set again, All-only exactly as before the phase.
     'chipped_tusk',
+    'clockwork_tinkers_pack', // the Automaton quartermaster's bag
     'cracked_fetish',
     'dawnhold_posy',
     // Masterwrought Phase 13 (2026-08-27): the promotion writ, rare
@@ -620,6 +621,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'reins_rallycart_rxt',
     'reins_rickshaw_mount',
     'resonant_weave_bag',
+    'rift_surveyors_satchel', // the Rift Watch quartermaster's bag
     // masterwrought Phase 11k's three apex feasts, the same shape as
     // harvest_feast and All-only for the same reason: a placeable crafted
     // junk-kind item whose click PLACES rather than uses or equips.

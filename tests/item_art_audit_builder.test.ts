@@ -846,13 +846,17 @@ describe('item-art audit builder', () => {
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
+    // Clue Scrolls (2026-09-17): measured again on the tree carrying the 15
+    // faction quartermaster items (which landed without moving this block)
+    // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
+    // the sha/bytes straight from `--verify-only` on this tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '74bd65a9b0efd433b12c9bf0cdaa509eeac3e4986edb8878e8f069f4e24088f0',
-      catalogBytes: 699134,
+      catalogSha256: 'a18f7c07e824f26ccaed56880214023f11a25de9e7578f2c1ca36055c11814d5',
+      catalogBytes: 710267,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1283,
-      liveItemCount: 1301,
+      catalogCount: 1304,
+      liveItemCount: 1322,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -870,7 +874,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'aaa08264b12c4be606ab2ffd06a573c7cf24a78c440bc2198b9f18b16e8062de',
+      shippingCatalogSha256: 'bbb3bfabab4869a54e451003664ee5ea2d4e75c2ef4788536340913231736602',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -431,10 +431,21 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The farming capstone (the celebrations phase): Harvestmaster pages here
   // per the locked titles-page rule like every non-hidden title deed.
   'prog_farming_100',
+  // The Arcane Calligraphy gold rating (world quests): its Runecaller title
+  // pages here per the locked titles-page rule.
+  'exp_arcane_calligraphy_gold',
   // The Crucible raid's flawless title (the obligations closeout,
   // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
   // per the locked titles-page rule.
   'dgn_varkhul_flawless',
+  // The faction standing Champion titles (world quests): the three vanguard
+  // flavor titles page here per the locked titles-page rule.
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
+  // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
+  // Hunter pages here per the locked titles-page rule.
+  'exp_clue_ten_caskets',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

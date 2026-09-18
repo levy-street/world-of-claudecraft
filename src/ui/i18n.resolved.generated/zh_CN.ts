@@ -344,6 +344,43 @@ export const zh_CN: EnTranslations = {
       "nameplate": "＜{title}＞"
     },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
+    "vehicle": {
+      "title": "北望哨火炮",
+      "objective": "守卫北望哨",
+      "lastKeepTitle": "最后的堡垒火炮",
+      "lastKeepObjective": "守住通往最后的堡垒的要道",
+      "cannonball": "实心炮弹",
+      "grapeshot": "霰弹",
+      "incendiary": "燃烧弹",
+      "integrity": "火炮耐久",
+      "exit": "离开火炮",
+      "wave": "Wave {wave}/{total}",
+      "endlessWave": "无尽波次 {wave}（第 {round} 轮）",
+      "resultWaves": "坚守波数：{waves}。",
+      "enemies": "剩余敌人：{count}",
+      "countdown": "准备：{seconds}",
+      "hint": "选择弹种，然后点击地面开火。",
+      "aim": "点击开火。右键或 Esc 取消瞄准。",
+      "sapperWarning": "工兵来袭！在爆破兵抵达防线前将其拦下。",
+      "chargeWarning": "指挥官下令冲锋！所有存活的敌人移动速度加快。",
+      "armorHint": "先用实心炮弹击碎银色盾牌，再使用燃烧弹。",
+      "exposedHint": "护甲已破：燃烧弹造成双倍伤害。",
+      "barrelHint": "敌人聚集在标记的火药桶周围时，射击火药桶。",
+      "barrelRules": "直接命中会引燃火药桶：对 {radius} 码内造成 {damage} 点伤害，并引发连锁爆炸。",
+      "armorRules": "装甲部队受到的伤害降低 {reduction}，直到实心炮弹击破其护甲。护甲被击破后，受到的火焰伤害提高 {bonus}。",
+      "shake": "镜头震动",
+      "gold": "金牌",
+      "silver": "银牌",
+      "bronze": "铜牌",
+      "failed": "防守失败",
+      "result": "{medal}：耐久 {integrity}，命中率 {accuracy}。",
+      "medalRules": "金牌：耐久至少 {goldIntegrity}，命中率至少 {goldAccuracy}。银牌：{silverIntegrity} 与 {silverAccuracy}。其他胜利均获得铜牌。命中敌人或火药桶均计为命中；每发炮弹只计一次。奖牌不提供额外金钱。",
+      "shotDamage": "对落点 {radius} 码内的每个敌人造成 {damage} 点伤害。",
+      "shotSlow": "使被命中的敌人减速 {amount}，持续 {seconds} 秒。",
+      "shotBurn": "留下持续 {seconds} 秒的火焰，每秒对站在其中的敌人造成 {damage} 点伤害。",
+      "shotTiming": "冷却时间：{cooldown} 秒。{flight} 秒后命中。所有弹种共享 {recovery} 秒恢复时间。",
+      "shotRules": "在标记区域内瞄准。不消耗法力。伤害不受装备或天赋影响。"
+    },
     "warlock": {
       "doomLabel": "谴罪",
       "fateThreadsLabel": "命运丝线",
@@ -1261,9 +1298,45 @@ export const zh_CN: EnTranslations = {
       "devTierCol": "徽章",
       "mergedPrs": "已合并 PR",
       "devEmpty": "还没有上榜的贡献者。",
+      "tabWorldQuests": "世界任务",
+      "wqBoardsLabel": "世界任务排行榜",
+      "wqMedal": "奖牌",
+      "wqWaves": "坚守波数",
+      "wqTime": "Time",
+      "wqPoints": "得分",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "银牌",
+        "bronze": "铜牌"
+      },
+      "wqEmpty": "此榜单上还没有成绩。完成该世界任务即可上榜。",
       "podiumLabel": "前三名",
       "unclaimed": "虚位以待",
       "prestigeTitle": "声望 {rank}"
+    },
+    "wqLadder": {
+      "title": "世界任务排行榜",
+      "subtitle": "每位英雄的最佳成绩，每个奖牌世界任务各有一个排行榜。",
+      "close": "关闭世界任务排行榜",
+      "rankedBy": {
+        "waves": "按坚守波数排名",
+        "seconds": "按最快时间排名",
+        "points": "按最高分排名"
+      },
+      "rankedByMedal": {
+        "waves": "按奖牌排名，其次坚守波数",
+        "seconds": "按奖牌排名，其次最快时间",
+        "points": "按奖牌排名，其次最高分"
+      },
+      "podiumLabel": "前三名",
+      "unclaimed": "虚位以待",
+      "totalOne": "1 位英雄上榜",
+      "totalMany": "{count} 位英雄上榜",
+      "selfLabel": "你的最佳成绩",
+      "selfRank": "第 {rank} 名",
+      "selfNone": "你在此榜单上还没有成绩。完成该世界任务即可上榜。"
     },
     "pledge": {
       "open": "接受宣誓",
@@ -2237,9 +2310,94 @@ export const zh_CN: EnTranslations = {
       "stats": "属性",
       "progression": "进度",
       "skills": "技能",
+      "reputation": "声望",
+      "currencies": "货币",
+      "character": "角色",
+      "professions": "专业",
       "gathering": "采集",
       "crafting": "制作",
       "openProfessions": "打开专业"
+    },
+    "currencies": {
+      "intro": "这些都不占背包空间。金币照旧放在背包里。",
+      "activities": "活动",
+      "factions": "阵营",
+      "honor": "荣誉",
+      "delveMark": "探险印记",
+      "wocToken": "WoC 代币",
+      "heroicMarkNote": "英雄地下城 . 在英雄军需官处兑换",
+      "honorNote": "战场与竞技场",
+      "delveMarkNote": "已完成的探险",
+      "wocTokenNote": "已关联钱包的余额",
+      "walletNotLinked": "未关联钱包",
+      "wocPreview": "预览余额，尚未验证",
+      "lifetime": "累计 {amount}",
+      "factionPending": "阵营货币：待第二阶段"
+    },
+    "reputation": {
+      "intro": "三个阵营同时推进：每个世界任务都会计入其所在区域的阵营。",
+      "faction": {
+        "rift_watch": "裂隙守望",
+        "church_order": "教会修会",
+        "automatons": "机械造物"
+      },
+      "hub": {
+        "rift_watch": "漂流港",
+        "church_order": "奥德里克修士",
+        "automatons": "望龙哨"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "陌生",
+        "recognized": "初识",
+        "trusted": "信任",
+        "proven": "认可",
+        "vanguard": "先锋",
+        "champion": "冠军"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "局外人",
+          "recognized": "守望者",
+          "trusted": "裂隙行者",
+          "proven": "守护者",
+          "vanguard": "裂隙守卫",
+          "champion": "冠军"
+        },
+        "church_order": {
+          "unknown": "局外人",
+          "recognized": "侍僧",
+          "trusted": "守护人",
+          "proven": "圣殿骑士",
+          "vanguard": "晨曦守护者",
+          "champion": "冠军"
+        },
+        "automatons": {
+          "unknown": "局外人",
+          "recognized": "操作员",
+          "trusted": "机械师",
+          "proven": "工匠",
+          "vanguard": "锻造大师",
+          "champion": "冠军"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "下一级：{tier}",
+      "maxed": "已达最高声望",
+      "cappedByLevel": "声望在{tier}停留，直到 16 级",
+      "today": "今日",
+      "questsDone": "已完成的世界任务",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "任务板",
+      "resetsUnknown": "今日没有任务板",
+      "title": "阵营头衔",
+      "titleLine": "{faction} . {tier}",
+      "legend": "声望等级",
+      "vendorGate": "需要与{faction}达到{tier}。",
+      "standingGained": "{faction}声望 +{amount}",
+      "tierReachedBanner": "与{faction}的声望达到{tier}",
+      "tierReachedSubtext": "阵营头衔：{title}",
+      "tierReachedLine": "你与{faction}的声望已达到{tier}。你的阵营头衔现在是{title}。"
     },
     "questLog": {
       "completed": "已完成",
@@ -3151,6 +3309,7 @@ export const zh_CN: EnTranslations = {
       "forbiddenReflectionLock": "禁忌映像暂时无法再次准备",
       "internalCooldown": "计时结束前此效果无法再次触发",
       "carriedFlag": "你正携带敌方旗帜。取消该增益即可丢下旗帜。",
+      "carryingFreight": "你正在搬运货物。移动速度降低 {pct}%。",
       "battleStance": "战斗姿态：怒气产生提高 10%",
       "berserkerStance": "狂暴姿态：暴击几率提高 3%，暴击伤害提高 3%",
       "crit": "暴击几率提高 {pct}%",
@@ -5375,6 +5534,8 @@ export const zh_CN: EnTranslations = {
       "level": "等级 {level}",
       "landmarkCount": "{count} 个地标",
       "filtersAria": "地图图层",
+      "railToggle": "侧边栏",
+      "railToggleAria": "显示或隐藏地图侧边栏",
       "filters": {
         "quests": "任务",
         "gather": "采集",
@@ -5390,6 +5551,32 @@ export const zh_CN: EnTranslations = {
       "showRoute": "显示路线",
       "untrack": "取消追踪",
       "track": "追踪",
+      "worldQuests": {
+        "heading": "今日世界任务",
+        "count": "{done} / {total}",
+        "empty": "今日没有世界任务",
+        "replacement": "替换",
+        "state": {
+          "active": "进行中",
+          "completed": "已完成"
+        },
+        "reroll": "替换任务",
+        "rerollNote": "今日还可替换一次",
+        "rerollUsed": "今日已使用替换",
+        "rerollReason": {
+          "noCycle": "今日没有任务板",
+          "usedToday": "今日已使用替换",
+          "completed": "已完成的任务无法替换",
+          "inProgress": "进行中的任务无法替换",
+          "notActive": "此任务不在你的任务板上",
+          "noAlternative": "今日该区域没有其他可用任务",
+          "unknown": "此任务今日无法替换"
+        },
+        "confirmTitle": "要替换这个世界任务吗？",
+        "confirmBody": "每天只能替换一个世界任务，且无法撤销。{quest}将被换成该区域的另一个任务。",
+        "confirmOk": "替换",
+        "confirmCancel": "取消"
+      },
       "legend": {
         "dungeon": "地下城",
         "ore": "矿石",
@@ -5778,6 +5965,9 @@ export const zh_CN: EnTranslations = {
       "invalid_roster_name": "公会名称无效。",
       "unknown": "没有这个名字的公会。"
     },
+    "world_quests": {
+      "unknown_board": "没有该名称的排行榜。"
+    },
     "steam": {
       "disabled": "Steam 关联当前不可用。",
       "invalid_ticket": "Steam 无法验证此关联请求。请在桌面客户端中重试。",
@@ -5877,6 +6067,70 @@ export const zh_CN: EnTranslations = {
       "stepup_signature_invalid": "钱包签名验证失败。请重新发起出售。"
     }
   },
+  "clues": {
+    "items": {
+      "clue_scroll": {
+        "desc": "完成当日全部区域任务栏位后获得的密封谜题。使用它开始一场寻宝；当最后一条线索让你挖掘时，在隐秘地点再次使用。"
+      },
+      "treasure_casket": {
+        "desc": "寻宝终点挖出的上锁宝匣。使用它打开匣子，领取这场寻宝埋藏的东西。"
+      }
+    },
+    "hunt_drakelands_gate_ashes": {
+      "0": "出望龙哨的大路向西通入一片守着关门的古树林。站到门林之下，线索便开始了。",
+      "1": "一位远沙丘的守望者守在东边的沙地上，在驻军以北。找到斥候耶琳，问问风带来了什么。",
+      "2": "驻军仓库的守护者自上次巡逻以来就没吃过东西。给军需官塞拉带去 2 x 农家面包。",
+      "3": "在余烬堆成沙丘之处以东略偏南，一片焦土藏着灰烬掩埋的东西。在那里使用卷轴并挖掘。",
+      "title": "门前余烬"
+    },
+    "hunt_frostveil_aurora_vigil": {
+      "0": "在台地向夜里舞动的光攀升之处，跪在极光台阶上，让天空注意到你。",
+      "1": "读光之人就等在台阶附近。和极光师薇拉谈谈天空拼出了什么。",
+      "2": "呼啸台地以东略偏南，积雪平得反常。在那里使用卷轴并挖掘。",
+      "title": "台阶上的极光"
+    },
+    "hunt_amberfall_lantern_ferry": {
+      "0": "在灯湖镇以北的水边，灯渡船的掌管者知道哪盏灯灭了。和渡船长卡多谈谈。",
+      "1": "大湖东北方，一块比镇子还古老的孤石斜倚着天空。站到斜碑旁。",
+      "2": "鎏金果园的守护者亲手浇灌果园，自己却渴得很。给果园主帕梅琳带去 3 x 冰凉井水。",
+      "3": "烬枫烧得通红的山坡东北方，落叶围成一个不是风摆出来的圆圈。在那里使用卷轴并挖掘。",
+      "title": "湖上灯火"
+    },
+    "hunt_willowfen_fenwitch_salt": {
+      "0": "垂柳湾的沼泽女巫不会理睬空手而来的人。给莎草婆婆带去 1 x 烹饪用盐。",
+      "1": "在沼泽变得平坦、空气让人昏昏欲睡的地方，站在沉眠浅滩上叹气，就像女巫吩咐的那样。",
+      "2": "沼中闪光的水池东南方，有一处旱丘终年干燥。在那里使用卷轴并挖掘。",
+      "title": "沼泽女巫的盐"
+    },
+    "hunt_nightbloom_sleepless_vigil": {
+      "0": "月栖镇东北方，石头守着永不结束的岗，站到守望石阵旁。",
+      "1": "守望处的观星者数星星像别人数钱币一样。和天文学者卡西安谈谈那颗坠落的星。",
+      "2": "镇子以北躺着一座古冢，里面的长眠者从不安息。向不眠古冢敬礼，让长眠者知道有朋友来了。",
+      "3": "暮色聚集的花田东南方，月光积在一块光秃的泥土上。在那里使用卷轴并挖掘。",
+      "title": "不眠者的守望"
+    },
+    "hunt_wraithwood_mournstone_candles": {
+      "0": "绞湖镇的制烛人把光卖给怕黑的人。和遗孀坦茜谈谈那支从未付钱的蜡烛。",
+      "1": "哀石最后的牧师一直只靠祷告果腹。给牧师克里尔带去 2 x 盐渍肉干。",
+      "2": "镇子东北方，穿过乌鸦，有一片林地挂着它自己的怪异果实。站到吊影林地中。",
+      "3": "猎手设下陷阱的林隙东南方，落叶层最近被翻动过。在那里使用卷轴并挖掘。",
+      "title": "哀石的蜡烛"
+    },
+    "hunt_palmreach_sunken_idol": {
+      "0": "在丛林深处、潟湖西北方，藤蔓像瀑布一样倾泻而下。站到垂藤林旁。",
+      "1": "一位走进丛林又走了出来的隐士住在垂藤附近。和奥克里姆谈谈他在下面看到了什么。",
+      "2": "往东，一尊神像半沉水中，仍在注视。在沉没神像前畏缩，就像隐士说的潜水者那样。",
+      "3": "丛林向大海张开的入口东北方，沙子堆得比潮水能到的地方还高。在那里使用卷轴并挖掘。",
+      "title": "神像的秘密"
+    },
+    "hunt_evergarden_beacon_road": {
+      "0": "篱苑镇以北步道旁的花坛园丁发誓她的花床快饿死了。给农妇维贝娜带去 2 x 堆肥。",
+      "1": "在花园的东南角落，一座老磨坊仍在为不存在的磨坊主转动。站到老磨坊旁。",
+      "2": "沿大路向南越过边界进入疾风崖，一直走到海岸。老灯塔的守护者守灯人布拉姆掌握着最后一句话。",
+      "3": "老灯塔西北方，就在从灯塔下来的小路旁，草皮被切开又铺了回去。在那里使用卷轴并挖掘。",
+      "title": "灯塔与花"
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -5899,6 +6153,7 @@ export const zh_CN: EnTranslations = {
       "progression": "升级与进阶",
       "world": "世界",
       "quests": "任务",
+      "factions": "阵营与声望",
       "dungeons": "地下城与团队副本",
       "delves": "探秘",
       "rifts": "裂隙",
@@ -7057,6 +7312,14 @@ export const zh_CN: EnTranslations = {
       "sideWardenBody": "在剧情之外，the Vale 与湿地的法警和守望者们还会发布一份常驻的赏金阶梯。一个敌人接一个敌人地往上爬，就像你之前的每一位赏金猎人赢得自己的位置那样。这是踏实的升级，也是一趟遍历各区域最恶劣捣乱分子的巡礼。",
       "sideCryptTitle": "被遗忘的君王",
       "sideCryptBody": "在高耸的峰巅，潜藏着一桩更幽静的谜团：古老的坟墓刻着无人记得的王冠。读懂死者，收集他们守护之物，再开启一座本该长闭的陵墓。这是一条侦探般的线索，会为你开启通往这片位面十人终局团队副本之路。",
+      "cluesTitle": "线索卷轴",
+      "cluesBody": "在远方的区域，每日世界任务板为清空整个任务栏的人藏着另一份奖励：一张线索卷轴，以及写在上面的寻宝之旅。",
+      "cluesEarnTitle": "获得卷轴",
+      "cluesEarnBody": "当你的角色足够强大后，完成当日世界任务板上的每一个区域栏位，就会在常规奖励之外得到一张线索卷轴。重掷的栏位完成后同样计数；始终开放的日常任务不作要求。你可以同时持有几张卷轴，因此不必在获得当天就用掉。",
+      "cluesHuntTitle": "跟随线索",
+      "cluesHuntBody": "使用卷轴会开始一场寻宝：一连串简短的谜题，会在任务追踪器中逐步显示。每条谜题都指向世界中真实存在的东西：要站到的地标、要交谈的人、要在某处做出的表情，或是一件小差事，而最后一条总会让你挖掘。同一时间只能进行一场寻宝，它会跨越每日重置并在不同游戏时段之间保留你的进度，所以不必着急。",
+      "cluesCasketTitle": "宝匣",
+      "cluesCasketBody": "解开最后一条线索，在它指明的地点使用卷轴，挖出一只宝藏匣；完成寻宝还能获得该地所属阵营的声望。打开它可以得到钱币和一批优质采集材料。偶尔还会有一件装备或几枚英雄徽记，极少数情况下会出现别处无法获得的坐骑“提灯背者格伦博”。你的第一只宝匣和第十只都会记入功绩之书。",
       "sideTempleTitle": "溺没的神庙",
       "sideTempleBody": "高耸峰巅上一座高山湖泊之上，一道苍白光芒的传送门，通往一座沉没的神龛，那里仍有溺亡的邪教在歌唱。它那条短小的任务链独立于主线之外，是一桩自成一体的谜团，留给每一个攀上湖岸、读懂刻在岩石上的警告、并下潜去探明其缘由的人。",
       "availableTitle": "为什么这个 NPC 没有任务给你",
@@ -7231,6 +7494,29 @@ export const zh_CN: EnTranslations = {
       "ladderBody": "每场比赛都会牵动一份与角色绑定的持久战场评级，无论胜负，而历代榜单则为国度的勇士们排定名次。",
       "rewardsHeading": "一场比赛给什么",
       "rewardsBody": "每一场打完的比赛都会给荣誉：获胜给得更多，落败或平局也有一份安慰；此外你每拿下一个击杀、每协助一次，都会额外得到少量荣誉，所以在远离旗帜的地方厮杀同样值得。每天的首胜还会额外给一份奖励，只要这份奖励还等着你，面板就会告诉你。这个“每天”属于荣誉自己，它按自己的时钟翻篇，而不跟着王国的副本重置走。反复遇上同一支队伍，从第二次起比赛本身给的荣誉会减少，但很快就会稳定在一个下限，而不会一路跌到零；被判弃权的比赛则一点都不给。赚到的荣誉可以在任意一位战争军需官处消费。"
+    },
+    "factionsPage": {
+      "heading": "阵营与声望",
+      "intro": "三个盟友阵营各自守护着王国的一隅，你在他们的领地完成的每个世界任务都会提升你在该阵营的声望。声望共有六个等级，每级都有专属头衔，并逐件解锁军需官的货品。",
+      "whoHeading": "三个阵营",
+      "whoBody": "每个阵营都对应一组区域，所以你在哪里做世界任务，就决定了声望记在哪个阵营名下。你不必选边站：三个阵营各自计数，也没有任何一方要求你与另一方为敌。",
+      "riftWatchBody": "裂隙守望守卫海岸，监视深处的裂口。他们的领地是沿海地带：远岸、棕榈滩、疾风崖、柳泽和隐幕谷。他们的据点是棕榈滩的漂流港。",
+      "churchOrderBody": "教团掌管王国的腹地：东溪谷、迷雾沼泽、荆峰高地、夜华林和幽魂林。奥德里克修士在东溪谷代表他们发言。",
+      "automatonsBody": "机械军团看守远方的熔炉：龙岭、霜幕荒野、琥珀瀑和常青园。他们的据点是龙岭的巨龙哨站。",
+      "earningHeading": "获取声望",
+      "earningBody": "声望来自世界任务。每个世界任务都计入其所在区域对应的阵营，而三个阵营覆盖不同的区域，所以当你走遍地图时，三方声望会同时增长。东溪的工头凯伦会在地图上打开世界任务板；如果当天的任务不合心意，也可以在任务板上每天更换一个世界任务。",
+      "lowLevelNote": "低等级角色的声望会在某一等级暂停，随着升级再继续，所以新角色可以尽早开始积累，而不会很快无路可走。",
+      "tiersHeading": "声望等级",
+      "tiersBody": "每个阵营都经历相同的六个等级：陌生、认可、信任、可靠、先锋和冠军。每个阵营会为每一级赋予自己的称呼，那个称呼就是你在该阵营的头衔。",
+      "riftWatchTitles": "在裂隙守望，你依次是局外人、守望者、裂隙行者、守卫、裂隙护卫，最终成为冠军。",
+      "churchOrderTitles": "在教团，你依次是局外人、侍僧、守护者、圣殿骑士、黎明守卫，最终成为冠军。",
+      "automatonsTitles": "在机械军团，你依次是局外人、操作员、机械师、工匠、锻造大师，最终成为冠军。",
+      "quartermastersHeading": "军需官",
+      "quartermastersBody": "每个阵营都在据点设有一名军需官：漂流港的裂隙守望军需官维伦、东溪礼拜堂的教团圣殿骑士阿尔西娅，以及巨龙哨站的机械军团工匠托布林。每人出售少量首饰、护甲、武器和背包，随着你在该阵营的声望提升逐级解锁，以普通金币购买。",
+      "readingHeading": "在哪里查看",
+      "readingBody": "角色面板（C）的声望页会显示每个阵营的当前声望、通往下一等级的进度条，以及声望为你赢得的头衔。聊天记录会在每次获得声望时报告，达到新等级时屏幕上还会显示庆祝横幅。",
+      "deedsHeading": "功绩",
+      "deedsBody": "功绩之书也会记录你的声望：与某个阵营达到信任、与某个阵营达到冠军各记为一项功绩，与三个阵营都达到冠军则是另一项功绩。和所有功绩一样，它们只是装饰，从不带来战力，而冠军功绩会授予一个可佩戴的头衔。"
     },
     "deedsPage": {
       "intro": "功绩之书记录着你在这个世界所做的一切，从走出新手山谷的第一步，到王国所能提供的最艰难的战斗。一边游玩一边赢得功绩，佩戴它们授予的头衔，看着你的名望不断攀升。",
@@ -10123,6 +10409,9 @@ export const zh_CN: EnTranslations = {
         "readyQuest": "可交任务",
         "repeatQuest": "可重复任务",
         "cooldownQuest": "冷却中的任务",
+        "availableWorldQuest": "可用世界任务：{name}",
+        "activeWorldQuest": "进行中的世界任务：{name}",
+        "worldBoss": "世界首领：{name}",
         "questObjective": "任务目标区域",
         "readyOre": "可采集矿点",
         "readyWood": "可采伐木材点",
@@ -10859,6 +11148,7 @@ export const zh_CN: EnTranslations = {
   },
   "questUi": {
     "tracker": {
+      "clueHuntTitle": "{title}（线索 {step}/{total}）",
       "title": "任务",
       "complete": "完成",
       "showOnMap": "在地图上显示{name}",
@@ -10899,6 +11189,8 @@ export const zh_CN: EnTranslations = {
       "browseGoodsAria": "查看 {name} 的货物",
       "worldMarket": "让我看看世界市场。",
       "worldMarketAria": "打开世界市场",
+      "worldQuestBoard": "让我看看世界任务板。",
+      "worldQuestBoardAria": "在地图上打开世界任务板",
       "accept": "接受",
       "decline": "拒绝",
       "continue": "继续",
@@ -10918,12 +11210,356 @@ export const zh_CN: EnTranslations = {
       "objectiveProgress": "{label}：{current}/{total}",
       "requiresLevel": "需要等级 {level}"
     },
+    "worldQuest": {
+      "title": "{zone}：{target}",
+      "unknown": "未知世界任务（{id}）",
+      "itemReward": "物品奖励：{name}",
+      "rewardLine": "奖励：{reward}",
+      "availableStatus": "可用世界任务",
+      "activeStatus": "进行中的世界任务",
+      "expiresIn": "{time}后结束",
+      "mineOre": "开采铜矿石",
+      "recoverObject": "回收{name}",
+      "redirectLeyBeam": "引导魔网光束",
+      "matchConfections": "匹配魔法糖果",
+      "loadFreight": "将货物装上马车",
+      "escortCaravan": "护送{zone}商队",
+      "salvageWreckage": "回收沉船残骸",
+      "banner": {
+        "riftOpens": "海滩上撕开了一道裂隙！劫掠者正冲着残骸物资而来。",
+        "captainSteps": "劫掠者首领穿过裂隙现身了！",
+        "riftRouted": "劫掠者溃败了。海滩重归你们所有。",
+        "championRises": "额外战利品！一名勇士在此地崛起。齐心协力将其击倒。",
+        "championFallen": "额外战利品！勇士已倒下：所有参战者都获得一份额外钱袋。",
+        "endlessBegins": "防线守住了！无尽波次开始，一波比一波更难。你随时可以离开火炮。"
+      },
+      "shadow": {
+        "title": "暗影掩护",
+        "objective": "在不被发现的情况下偷取四份密封命令",
+        "cloak": "暮织斗篷",
+        "pickpocket": "偷窃",
+        "leave": "脱下斗篷",
+        "stealTip": "从背后接近，偷取命令时保持静止。避开提灯光束。",
+        "leaveTip": "脱下斗篷。已取回的命令会保留。",
+        "documents": "已取回命令：{count}/4",
+        "suspicion": "怀疑度：{value}",
+        "safe": "从背后偷取。提灯卫兵扫出的宽阔光束能看穿斗篷；等待空当再行动。",
+        "behind": "偷取前先绕到卫兵身后。",
+        "danger": "你快被发现了！快躲起来！",
+        "channel": "偷取中……{seconds}秒",
+        "noTarget": "靠近携带命令的卫兵。",
+        "start": "与斥候瓦莱丽交谈，借用她的斗篷。",
+        "caught": "被抓住了！回到斥候瓦莱丽处再借一件斗篷。你的命令安然无恙。",
+        "complete": "四份命令已全部取回。"
+      },
+      "investigation": {
+        "title": "借来的面孔",
+        "objective": "揭穿并击败潜入者",
+        "briefing": "有个怪物盗用了一名士兵的面孔。阅读常备命令和值勤日志，询问全部四名卫兵，然后回来指认那个说法与我们记录相矛盾的人。",
+        "instructions": "阅读常备命令和值勤日志，然后询问全部四名卫兵。将他们的说法与记录进行比对。",
+        "confront": "向中士阿尔里克报告，指认说法与记录相矛盾的卫兵。",
+        "name": "我的卫兵里，是谁戴着借来的面孔？",
+        "accuseOption": "指认{name}",
+        "cleared": "中士阿尔里克：那名士兵的去向已经核实。把其他人的说法与记录比对，再试一次。",
+        "guardCleared": "中士阿尔里克已经核实过这名士兵。",
+        "revealed": "那怪物已褪去这张面孔。击败它。",
+        "defeat": "击败现出原形的潜入者。",
+        "heard": "已询问卫兵：{count}/4",
+        "clues": "已查阅记录：{count}/2",
+        "clueNames": {
+          "c0": "常备命令",
+          "c1": "值勤日志"
+        },
+        "variants": {
+          "v0": {
+            "clue0": "南桥自黎明起已封闭。所有巡逻队必须走西路。",
+            "clue1": "奥林被派去守门。奈拉、布拉姆和泰莎在西路巡逻。",
+            "guard0": "我的巡逻队今天早上走的是西路。",
+            "guard1": "我早上巡逻时经过了南桥。",
+            "guard2": "我和奈拉、泰莎一起在西路巡逻。",
+            "guard3": "南桥封闭了。我们走的是西路。"
+          },
+          "v1": {
+            "clue0": "今天的口令是“苇哨”。昨天的口令“提灯”已经失效。",
+            "clue1": "四名卫兵都在黎明时听取了新口令的简报。",
+            "guard0": "苇哨。我在黎明时得知了新口令。",
+            "guard1": "“提灯”是昨天的口令。今天我们用“苇哨”。",
+            "guard2": "我们四个都参加了黎明简报。",
+            "guard3": "今天的口令是“提灯”。我是在黎明简报上听到的。"
+          },
+          "v2": {
+            "clue0": "所有驻军补给箱都必须盖有蓝色蜡封。任何盖红色蜡封的箱子一律拒收。",
+            "clue1": "今天送达的货物已检查：每个箱子的蓝色蜡封都完好无损。",
+            "guard0": "我检查了今天送来的货。每个箱子都盖着红色蜡封。",
+            "guard1": "我们只接收蓝色蜡封的箱子。",
+            "guard2": "日志上记着今天送来的货都是蓝色蜡封。",
+            "guard3": "今天没有接收任何红色蜡封的箱子。"
+          },
+          "v3": {
+            "clue0": "夜间守卫在黄昏时重新点亮东烽火。西烽火保持熄灭，直到渡船发出信号。",
+            "clue1": "奈拉和奥林整夜守着城门。布拉姆和泰莎巡视堤道，并在黄昏时重新点亮了东烽火。",
+            "guard0": "我和奥林整夜守着城门。除了雾，什么也没进来。",
+            "guard1": "和奈拉一起守门。我们按命令看着东烽火在黄昏时亮起。",
+            "guard2": "我和泰莎巡视堤道。我们在黄昏时点亮了西烽火，好让渡船能看见我们。",
+            "guard3": "和布拉姆一起巡逻堤道。太阳一落山，我们就重新点亮了东烽火。"
+          },
+          "v4": {
+            "clue0": "军需官的马车中午经北路抵达。沼泽泛滥期间，不会有补给走水路运来。",
+            "clue1": "已收到经北路送来的午间货物。泰莎签收；布拉姆和奈拉卸货；奥林在井边。",
+            "guard0": "中午我帮布拉姆卸了马车。咸猪肉和灯油，老样子。",
+            "guard1": "午间的货是我亲手卸的，直接从补给驳船上搬下来。",
+            "guard2": "我和奈拉把箱子搬了进去。泰莎在日志上签了字。",
+            "guard3": "马车中午从北路上来。是我签收的。"
+          },
+          "v5": {
+            "clue0": "上次袭击中阵亡的人安息在礼拜堂墓穴里。没有中士的钥匙，谁也不得进入墓穴。",
+            "clue1": "袭击之后，中士的钥匙从未离开过他的腰带。奈拉、奥林和布拉姆守城墙；泰莎看守院子。",
+            "guard0": "我守在城墙上。袭击之后墓穴一直锁着；只有中士有钥匙。",
+            "guard1": "和奈拉、布拉姆一起守城墙。很安静，除了青蛙叫。",
+            "guard2": "一整天都在城墙上。没人靠近过墓穴。",
+            "guard3": "我看守院子，今天早上还去墓穴里看了看。阵亡的人都安息着。"
+          }
+        }
+      },
+      "horde": {
+        "title": "最后的路障",
+        "objective": "守住路障并击败敌群指挥官",
+        "ready": "与路障队长交谈以开始。",
+        "countdown": "敌群将在 {seconds} 秒后来袭！",
+        "status": "剩余 {seconds} 秒。击杀：{kills}。路障：{barrier}%。",
+        "upgrade": "武器：{weapon}",
+        "loadout": "弹道：{count} | +{speed}% 速度 | {weapon}",
+        "exit": "离开防守",
+        "gained": "升级：{upgrade}",
+        "killBurst": "击败 +{count}！",
+        "choices": {
+          "projectile": "弹道 +1",
+          "haste": "射速 +25%",
+          "pierce": "穿透射击",
+          "explosive": "爆炸射击",
+          "double": "弹道 x2"
+        },
+        "weapons": {
+          "0": "连发弩",
+          "1": "Twin Shot",
+          "2": "穿透射击",
+          "3": "爆炸射击"
+        },
+        "controls": "自动射击。使用 A/D、方向键或摇杆移动。后退：离开。",
+        "supplies": "击碎一个箱子来选择。另一个会消失！",
+        "result": "{rating}！得分：{score}。",
+        "resultStats": "击杀：{kills}。路障：{barrier}%。",
+        "failed": "防守失败。再试一次！",
+        "replay": "与队长交谈即可重试。每次轮换只发放一次奖励。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "银牌",
+          "bronze": "铜牌"
+        }
+      },
+      "wispMaze": {
+        "leave": "离开迷宫",
+        "title": "灵火林迷宫",
+        "objective": "从迷宫中找回所有被盗的钱袋",
+        "ready": "与迷宫守护者交谈以开始。",
+        "controls": "在迷宫中穿行，拾取钱袋。避开暗影。光耀灵火能让你在短时间内驱散暗影。",
+        "collected": "钱袋：{count}/{total}",
+        "lives": "生命：{count}/3",
+        "power": "灵火之力：{seconds}秒",
+        "countdown": "{seconds}秒后开始",
+        "collect": "拾取钱袋。避开暗影。",
+        "powered": "力量涌动！触碰暗影即可将其驱散。",
+        "finished": "所有钱袋都已找回！",
+        "retry": "三条生命已恢复。再次挑战迷宫吧。",
+        "startNormal": "进入迷宫：普通（{shadows} 个暗影）",
+        "startHard": "进入迷宫：困难（{shadows} 个暗影，额外钱袋）"
+      },
+      "forge": {
+        "title": "援手之锤",
+        "objective": "帮助铁匠玛拉锻造一面盾牌",
+        "ready": "与铁匠玛拉交谈以开始。",
+        "countdown": "准备好双手！{seconds}秒后开始。",
+        "preparing": "干得漂亮！下一个要求……",
+        "fuel": "柴堆",
+        "metal": "铁锭箱",
+        "water": "Well",
+        "tools": "铁砧",
+        "request": {
+          "fuel": "把火烧旺！加点木柴！",
+          "metal": "再来点金属！打开铁锭箱！",
+          "water": "冷却一下！去井里打水！",
+          "tools": "把它锤打成形！用铁砧！"
+        },
+        "sequence": "{instruction} 然后点击{next}。",
+        "round": "要求 {round}/{total}：步骤 {step}/{steps}",
+        "thresholds": "金牌：{gold}秒以内。银牌：{silver}秒以内。",
+        "starting": "准备中……",
+        "finished": "好手艺！一面配得上驻军的盾牌！",
+        "failed": "失误太多！金属裂开了。与玛拉交谈再试一次。",
+        "wrong": "工具不对！+{penalty}秒。请使用要求的物品。",
+        "correct": "就是这个！继续。",
+        "result": "{rating}！{seconds}秒。失误：{mistakes}。",
+        "replay": "与玛拉交谈再试一次。每次轮换只能获得一次奖励。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "银牌",
+          "bronze": "铜牌"
+        },
+        "strike": "锤击",
+        "strikeTip": "锤打工件。在指针经过深色区间时按下；每次成功锤击后，区间会变窄，指针会加快。在区间外锤击，或在熔炉冷却时锤击，会损失三秒。",
+        "stoke": "添柴",
+        "stokeTip": "往火里添柴。熔炉会持续冷却；让温度保持在 {floor} 以上，否则你的锤击会落在冷铁上。",
+        "strikes": "锤击：{count}/{total}",
+        "heat": "熔炉温度：{value}（保持在 {floor} 以上）",
+        "mistakes": "失误：{count}",
+        "meterAria": "锤击时机计量条",
+        "hintStrike": "盯住指针。在深色区间内锤击！",
+        "hintStoke": "熔炉正在冷却！锤击前先添柴。",
+        "hit": "漂亮的一击！区间变窄了。",
+        "miss": "没打中区间！+{penalty}秒。",
+        "cold": "冷锤！先添柴。+{penalty}秒。"
+      },
+      "glider": {
+        "title": "御风者回旋赛",
+        "boost": "额外速度",
+        "boostTip": "使你的飞行速度提高 {speed} 码/秒，最高 {maximum} 码/秒。仅在飞行时可用。{seconds} 秒后充能完毕。",
+        "objective": "穿过风环翱翔，并在标记区域着陆",
+        "ready": "与飞行管理员泽菲尔交谈以起飞。",
+        "countdown": "倒数 {count}……抓稳了！",
+        "flying": "风环：{rings}/{total} | 时间：{time}秒 | 速度：{speed} 码/秒",
+        "climb": "爬升",
+        "climbTip": "按住以拉起机头，以速度换取高度。轻点可小幅调整。飞得太慢会失去升力。",
+        "dive": "Dive",
+        "diveTip": "按住以压低机头并获得速度。轻点可小幅调整。",
+        "controls": "按住鼠标右键向上看以爬升，但会损失速度；向下看以俯冲并获得速度。飞得太慢会失去升力。左/右键转向；后退减速。跳跃或上浮/下潜也可控制俯仰。向前飞过风洞可获得加速，每次尝试中每个风洞仅限一次。",
+        "landed": "{rating}！在 {time} 秒内穿过了 {rings}/{total} 个风环。",
+        "failed": "下降失败！着陆偏离航线，或错过了太多风环。",
+        "retry": "与泽菲尔交谈重试，或与着陆区旁的丝凯交谈返回起飞点。",
+        "nextRing": "沿峡谷瞄准下一个风环穿过。至少穿过 {minimum} 个风环，然后在标记区域着陆。",
+        "landing": "所有风环已通过！转向前方的着陆区。",
+        "complete": "着陆完成！",
+        "score": "得分：{score}。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "银牌",
+          "bronze": "铜牌"
+        }
+      },
+      "calligraphyTitle": "奥术书法",
+      "traceOutline": "用脚步描绘轮廓",
+      "traceRoundInstruction": "第{round}/{total}轮：{shape}。{instruction}",
+      "traceShape": {
+        "triangle": "三角形",
+        "square": "正方形",
+        "star": "星形",
+        "hourglass": "沙漏",
+        "lightning": "闪电符文",
+        "spiral": "折角螺旋",
+        "double-triangle": "双三角印记",
+        "diamond": "菱形",
+        "pentagon": "五边形",
+        "arrow": "箭头符文",
+        "zigzag": "锯齿符印",
+        "cross": "十字符文"
+      },
+      "traceRating": {
+        "bronze": "铜",
+        "silver": "银",
+        "gold": "金"
+      },
+      "traceScoreResult": "完成！{rating}：{score}/{total}。基础奖励不变。金牌：功绩、称号、+10 声望。",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "此符文需要更新游戏版本。",
+      "traceReaction": {
+        "tessaTriangle": "三个角，每个都在正确的位置！",
+        "pipSquare": "四条边！我想我也能做到！",
+        "elianFinal": "最后一道符文。线条可能交叉或再次经过同一点；跟随亮起的标记前往下一个拐角。",
+        "elianGold": "描绘得真漂亮！你的脚步赢得了金色的荣耀。",
+        "elianComplete": "符文完成了！用心练习，下次一定会更好。"
+      },
+      "traceReady": "与导师交谈开始练习。",
+      "tracePreview": "观察轮廓，金色光点会为你引路。",
+      "traceStart": "走到起点标记，任选一个方向描绘。",
+      "traceDrawing": "沿金色光点走向明亮的拐角。蓝色标记你的足迹。",
+      "traceSuccess": "轮廓完成！",
+      "traceRetry": "与导师交谈重试。",
+      "traceOffPath": "你偏离了轮廓。与导师交谈重试。",
+      "traceMovement": "请下坐骑并留在地面上。与导师交谈重试。",
+      "traceTimeout": "时间已到。与导师交谈重试。",
+      "traceCombat": "脱离战斗后，与导师交谈重试。",
+      "puzzleTitle": "魔网光束校准",
+      "puzzleBeamReach": "已连接水晶：{count}",
+      "puzzleVictoryTitle": "完美校准",
+      "puzzleVictoryDetail": "魔网光束已抵达目的地。",
+      "puzzleDefeatTitle": "校准失败",
+      "puzzleDefeatDetail": "能量已经消散，仪式尚未完成。",
+      "puzzleReturn": "返回世界",
+      "puzzleResultAnnouncement": "{title}。{detail} {reach}。",
+      "puzzleLevel": "每日关卡 {level}",
+      "puzzleBonusLevel": "奖励关卡 {level}/{total}",
+      "puzzleBonusCharged": "秘藏因奖励充能而嗡鸣：奖励关卡 {level}/{total} 正等着你。再次触碰魔网秘藏即可获得额外金币。",
+      "puzzleBonusPaid": "获得奖励钱袋！",
+      "puzzleBonusDone": "所有奖励关卡均已通关。秘藏将静候下一次机会。",
+      "puzzleInstructions": "旋转拼块，将光束从起点引导至终点。",
+      "puzzleRotateTile": "旋转拼块{tile}",
+      "puzzleConnectors": "连接方向：{connectors}。",
+      "puzzlePowered": "光束已到达此拼块。",
+      "puzzleUnpowered": "光束尚未到达此拼块。",
+      "puzzleClose": "关闭魔网光束谜题",
+      "puzzleSource": "起点",
+      "puzzleTarget": "终点",
+      "puzzleSourceEndpoint": "起点：{direction}。",
+      "puzzleTargetEndpoint": "终点：{direction}。",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "puzzleRetry": "重试",
+      "puzzleTimer": "{seconds}s",
+      "puzzleTimerAria": "剩余时间：{seconds} 秒",
+      "startQuest": "开始世界任务",
+      "startEscort": "开始护送",
+      "escortTitle": "商队",
+      "alreadyCompleted": "你已完成本轮世界任务。",
+      "inProgress": "此世界任务已在进行中。",
+      "match3Title": "糖果连锁",
+      "match3Instructions": "选择两个相邻的糖果。只有组成三个或更多相同糖果的一排时，交换才会计入。",
+      "match3Moves": "步数：{current}/{total}",
+      "match3Cleared": "已消除糖果：{current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "第 {row} 行，第 {column} 列：{candy}",
+      "match3Selected": "已选择",
+      "match3Reset": "重新开始关卡",
+      "match3Close": "关闭糖果谜题",
+      "match3OutOfMoves": "没有剩余步数。重新开始关卡再试一次。",
+      "match3VictoryTitle": "甜蜜的胜利",
+      "match3VictoryDetail": "魔法糖果已收集完毕。",
+      "match3DefeatTitle": "苦涩的失败",
+      "match3DefeatDetail": "步数已用尽。新一盘糖果正等着你。",
+      "match3TryAgain": "再试一次",
+      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
+      "match3ResultSummary": "{title}. {detail} {cleared}.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "莓果水晶",
+        "citrus": "柑橘球",
+        "mint": "薄荷三角",
+        "grape": "葡萄方块",
+        "star": "糖霜星"
+      }
+    },
     "logs": {
       "accepted": "已接受任务：{name}",
+      "worldQuestStarted": "世界任务已开始：{name}",
       "abandoned": "已放弃任务：{name}",
       "completed": "已完成任务：{name}",
       "ready": "{name}（{status}）",
-      "progress": "{label}：{current}/{total}"
+      "progress": "{label}：{current}/{total}",
+      "clueScrollEarned": "今日的世界任务已全部完成：你获得了一张线索卷轴。",
+      "clueScrollLost": "今日的世界任务已全部完成，但你无法再持有更多线索卷轴。",
+      "clueHuntStarted": "寻宝开始：{title}",
+      "clueHuntStep": "已解开第{step}/{total}条线索：{title}",
+      "clueHuntDone": "寻宝完成：{title}。宝箱归你了。",
+      "clueHuntAbandoned": "已放弃寻宝：{title}",
+      "clueCasketOpened": "宝箱中有{money}和{items}。"
     },
     "errors": {
       "unavailable": "该任务不可用。",
@@ -14306,6 +14942,18 @@ export const zh_CN: EnTranslations = {
       "sprung_trap": {
         "name": "被触发的沼泽捕兽夹"
       },
+      "leyline_cache": {
+        "name": "微型魔网秘藏"
+      },
+      "confection_game_box": {
+        "name": "糖果师的游戏盒"
+      },
+      "eastbrook_freight_crate": {
+        "name": "东溪货运箱"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "东溪货运马车"
+      },
       "hearthlined_treads": {
         "name": "炉火衬里行靴"
       },
@@ -16322,6 +16970,12 @@ export const zh_CN: EnTranslations = {
       "event_skin_token": {
         "name": "神秘外观宝箱"
       },
+      "clue_scroll": {
+        "name": "线索卷轴"
+      },
+      "treasure_casket": {
+        "name": "宝藏匣"
+      },
       "heroic_mark": {
         "name": "英雄徽记"
       },
@@ -16633,6 +17287,51 @@ export const zh_CN: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "烬卫，瓦库尔的壁垒"
+      },
+      "rift_watchers_band": {
+        "name": "裂隙守望者指环"
+      },
+      "rift_surveyors_satchel": {
+        "name": "裂隙勘测员挎包"
+      },
+      "riftwalkers_tunic": {
+        "name": "裂隙行者外衣"
+      },
+      "riftwarden_voidblade": {
+        "name": "裂隙守卫者虚空之刃"
+      },
+      "champion_rift_band": {
+        "name": "勇士裂隙指环"
+      },
+      "order_prayer_beads": {
+        "name": "教团祈祷念珠"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "侍僧法衣"
+      },
+      "templar_dawn_shield": {
+        "name": "圣殿骑士黎明之盾"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "黎明守护者祝圣锤"
+      },
+      "champion_dawn_medallion": {
+        "name": "勇士黎明勋章"
+      },
+      "automaton_cog_ring": {
+        "name": "机械齿轮指环"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "发条工匠背包"
+      },
+      "artificers_welding_cowl": {
+        "name": "工匠焊接兜帽"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "锻造大师峭壁劈砍斧"
+      },
+      "champion_forged_loop": {
+        "name": "勇士锻造指环"
       }
     },
     "mobs": {
@@ -16660,6 +17359,15 @@ export const zh_CN: EnTranslations = {
       "vale_bandit": {
         "name": "谷地强盗"
       },
+      "eastbrook_freight_caravan": {
+        "name": "东溪货运商队"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "柳泽沼地药品商队"
+      },
+      "frostveil_supply_caravan": {
+        "name": "霜幕之境补给商队"
+      },
       "restless_bones": {
         "name": "不宁骸骨"
       },
@@ -16680,6 +17388,9 @@ export const zh_CN: EnTranslations = {
       },
       "drowned_dead": {
         "name": "溺亡死者"
+      },
+      "fenbridge_infiltrator": {
+        "name": "借面者"
       },
       "fen_troll": {
         "name": "泥沼巨魔"
@@ -17388,6 +18099,111 @@ export const zh_CN: EnTranslations = {
       }
     },
     "npcs": {
+      "glider_instructor": {
+        "name": "飞行管理员泽菲尔",
+        "title": "御风者教官",
+        "greeting": "从断崖峭壁上呼啸而来的热气流今天格外猛烈。准备好系上机械滑翔翼，到回旋赛道上试试你的翅膀了吗？"
+      },
+      "glider_apprentice": {
+        "name": "Skye",
+        "title": "泽菲尔的学徒",
+        "greeting": "顺着峡谷飞得真漂亮。什么时候需要一股魔法上升气流送你回断崖的泽菲尔那里，就来找我。"
+      },
+      "shadow_cloak_scout": {
+        "name": "斥候瓦莱丽",
+        "title": "秘密行动",
+        "greeting": "借我的暮织斗篷去用吧。悄悄绕到每个传令兵身后，拿走他的命令。避开提灯光束：提灯卫兵能直接看穿这层附魔，而你要是蹭到传令兵，他也会察觉到你。"
+      },
+      "shadow_guard_north": {
+        "name": "传令卫兵",
+        "title": "传令兵",
+        "greeting": "这些密封命令是给队长的。离远点。"
+      },
+      "shadow_guard_south": {
+        "name": "传令卫兵",
+        "title": "传令兵",
+        "greeting": "我有份急件要送。走开。"
+      },
+      "shadow_guard_east": {
+        "name": "传令卫兵",
+        "title": "传令兵",
+        "greeting": "不许耽搁。守卫队正等着这些命令。"
+      },
+      "shadow_guard_west": {
+        "name": "传令卫兵",
+        "title": "传令兵",
+        "greeting": "公务在身。别挡路。"
+      },
+      "shadow_sentry_south": {
+        "name": "提灯哨兵",
+        "title": "真视",
+        "greeting": "我的提灯照出的不只是影子。待在我看得见的地方。"
+      },
+      "shadow_sentry_north": {
+        "name": "提灯哨兵",
+        "title": "真视",
+        "greeting": "什么都逃不过提灯守望。"
+      },
+      "shadow_watch_west": {
+        "name": "提灯守夜人",
+        "title": "真视",
+        "greeting": "站住。提灯能看见肉眼看漏的东西。"
+      },
+      "shadow_watch_east": {
+        "name": "提灯守夜人",
+        "title": "真视",
+        "greeting": "谁也别想穿过我的光而不被发现。"
+      },
+      "forge_instructor": {
+        "name": "铁匠玛拉",
+        "title": "望龙哨铁匠",
+        "greeting": "帮我把盾牌打完！点击我喊的材料。手脚越快，奖牌越好。"
+      },
+      "infiltrator_captain": {
+        "name": "中士阿尔里克",
+        "title": "芬桥守卫队",
+        "greeting": "有个怪物盗用了一名士兵的面孔。阅读常备命令和值勤日志，询问全部四名卫兵，然后回来指认那个说法与我们记录相矛盾的人。"
+      },
+      "infiltrator_nella": {
+        "name": "卫兵奈拉",
+        "title": "芬桥守卫队",
+        "greeting": "前来报到。"
+      },
+      "infiltrator_orin": {
+        "name": "卫兵奥林",
+        "title": "芬桥守卫队",
+        "greeting": "前来报到。"
+      },
+      "infiltrator_bram": {
+        "name": "卫兵布拉姆",
+        "title": "芬桥守卫队",
+        "greeting": "前来报到。"
+      },
+      "infiltrator_tessa": {
+        "name": "卫兵泰莎",
+        "title": "芬桥守卫队",
+        "greeting": "前来报到。"
+      },
+      "wisp_maze_keeper": {
+        "name": "守护者莉奥拉",
+        "title": "树篱迷宫看守人",
+        "greeting": "盗贼把偷来的金子藏遍了我的迷宫，如今由暗影看守着。找回每一个钱袋。避开那些守卫，或者拿起光耀灵火驱散它们。失去三条生命会让你回到入口，但你已收集的钱袋依然安全。"
+      },
+      "calligraphy_instructor": {
+        "name": "导师埃利安",
+        "title": "奥术书法",
+        "greeting": "步伐稳，线条才稳。教我的学徒描绘三角形、正方形和高级符文吧。"
+      },
+      "calligraphy_apprentice_1": {
+        "name": "学徒泰莎",
+        "title": "书法学徒",
+        "greeting": "我总是转弯太早。你能教我在哪里转弯吗？"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "学徒皮普",
+        "title": "书法学徒",
+        "greeting": "先画三角形，再画正方形，最后画符文。一步一步稳稳地走！"
+      },
       "the_merchant": {
         "name": "商人",
         "title": "世界市场守护者",
@@ -17822,6 +18638,26 @@ export const zh_CN: EnTranslations = {
         "name": "裂隙锻匠梅莉丝",
         "title": "裂隙熔炉大师",
         "greeting": "裂隙之戒记得造就它的那道裂隙，{className}。把戒指和裂隙散落的精华带来，我会教它记住更多。"
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "军需官维伦",
+        "title": "裂隙守望补给官",
+        "greeting": "裂隙守望守护海岸，监视深处的裂口。我们的库房向获得认可声望的人开放。"
+      },
+      "npc_church_order_quartermaster": {
+        "name": "圣殿骑士阿尔西娅",
+        "title": "教团军需官",
+        "greeting": "行走于黎明之光中。教团为与我们并肩效力者提供补给。"
+      },
+      "npc_automaton_quartermaster": {
+        "name": "工匠托布林",
+        "title": "机械军团征用官",
+        "greeting": "精密齿轮、锻造钢材与校准动力。授权操作员可从我们的库存中领取。"
+      },
+      "npc_wq_taskmaster": {
+        "name": "监工凯伦",
+        "title": "世界任务监工",
+        "greeting": "各盟友阵营每天都会在全境发布任务。若某项任务不适合你的技能，你每天可以申请一次重新分配。"
       },
       "forgemistress_darva": {
         "name": "达尔瓦锻造师",
@@ -20658,6 +21494,9 @@ export const zh_CN: EnTranslations = {
           },
           "4": {
             "label": "裂野"
+          },
+          "5": {
+            "label": "沉船"
           }
         }
       },
