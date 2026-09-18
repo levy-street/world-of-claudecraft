@@ -407,7 +407,13 @@ export function spellFxCue(event: SpellFxEvent): { key: SfxId; anchorId: number 
     return { key, anchorId: event.sourceId };
   }
   if (event.fx === 'nova') {
-    return { key: novaAbilityCue(event.ability), anchorId: event.ability === 'piercing_howl' || event.ability === 'intimidating_shout' ? event.sourceId : event.targetId };
+    return {
+      key: novaAbilityCue(event.ability),
+      anchorId:
+        event.ability === 'piercing_howl' || event.ability === 'intimidating_shout'
+          ? event.sourceId
+          : event.targetId,
+    };
   }
   if (event.fx === 'fearImpact') return { key: 'fear', anchorId: event.targetId };
   if (event.fx === 'ccImpact') {

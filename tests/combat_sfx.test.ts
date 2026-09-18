@@ -319,8 +319,11 @@ describe('combat SFX policy', () => {
 
   it('gives Piercing Howl one voiced nova without a duplicate shout sound', () => {
     const ev = {
-      type: 'spellfx' as const, sourceId: 10, targetId: 20,
-      school: 'physical' as const, ability: 'piercing_howl',
+      type: 'spellfx' as const,
+      sourceId: 10,
+      targetId: 20,
+      school: 'physical' as const,
+      ability: 'piercing_howl',
     };
     expect(spellFxCue({ ...ev, fx: 'nova' })).toEqual({ key: 'piercing_howl', anchorId: 10 });
     expect(spellFxCue({ ...ev, fx: 'shout' })).toBeNull();

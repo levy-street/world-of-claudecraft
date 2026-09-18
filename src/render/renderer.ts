@@ -55,8 +55,8 @@ import { AbilityVfx, AbilityVfxFx, persistentClassVfxPrewarmGroup } from './abil
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
 import * as abilityPreparation from './ability_vfx/primitive_prewarm';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
-import { warriorInsultCue } from './ability_vfx/warrior_insult_core';
 import { isWarriorFuryAuraEvent } from './ability_vfx/warrior_fury_feedback';
+import { warriorInsultCue } from './ability_vfx/warrior_insult_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
 import { shouldDrawLegacyCastSparkle, syncAbilityVfxCast } from './ability_vfx_registry';
 import { ABILITY_VFX_SPECS } from './ability_vfx_specs';

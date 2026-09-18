@@ -131,7 +131,8 @@ describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () 
       defiant_bellow: 'Warrior_Defiant_Bellow',
       rallying_cry: 'Warrior_Valor_Roar',
       intimidating_shout: 'Warrior_Intimidating_Shout',
-    })) expect(map[id], `${id} owns its native voice performance`).toBe(clip);
+    }))
+      expect(map[id], `${id} owns its native voice performance`).toBe(clip);
   });
 });
 
@@ -251,13 +252,22 @@ describe('heroic_leap and piercing_howl reach triggerAttack through the real sel
   });
 
   it('plays one native Intimidating Shout gesture across both authoritative cast phases', () => {
-    for (const phases of [['shout', 'nova'], ['nova', 'shout']]) {
+    for (const phases of [
+      ['shout', 'nova'],
+      ['nova', 'shout'],
+    ]) {
       const { painter, triggerAttack, playShoutAnim } = makePainter();
       for (const fx of phases)
-        expect(painter.handleSpellfx({
-          type: 'spellfx', sourceId: 1, targetId: 1,
-          school: 'physical', fx, ability: 'intimidating_shout',
-        } as never)).toBe(true);
+        expect(
+          painter.handleSpellfx({
+            type: 'spellfx',
+            sourceId: 1,
+            targetId: 1,
+            school: 'physical',
+            fx,
+            ability: 'intimidating_shout',
+          } as never),
+        ).toBe(true);
       expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(1, 'intimidating_shout');
       expect(playShoutAnim).not.toHaveBeenCalled();
     }

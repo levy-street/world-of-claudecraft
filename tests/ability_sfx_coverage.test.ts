@@ -18,9 +18,13 @@ import {
 
 it('lets the Piercing Howl recording carry its whole non-damaging nova', () => {
   for (const moment of ['release', 'impact'] as const)
-    expect(isAbilityMomentRecorded(moment, {
-      school: 'physical', archetype: 'nova', abilityId: 'piercing_howl',
-    })).toBe(true);
+    expect(
+      isAbilityMomentRecorded(moment, {
+        school: 'physical',
+        archetype: 'nova',
+        abilityId: 'piercing_howl',
+      }),
+    ).toBe(true);
 });
 
 describe('release: the launch whoosh belongs to the recorded proj_ pack', () => {
