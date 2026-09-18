@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const diagnostics = await import(
@@ -335,7 +336,7 @@ describe('buildPolishProvenanceMismatchReport', () => {
         return ' M src/render/renderer.ts\n';
       },
     });
-    expect(sealReads).toEqual([`/repo/${POLISH_SEAL_PATH}`]);
+    expect(sealReads).toEqual([path.join('/repo', POLISH_SEAL_PATH)]);
     expect(gitCalls).toHaveLength(1);
     expect(gitCalls[0].slice(-2)).toEqual(['pnpm-lock.yaml', 'src/render/renderer.ts']);
     // The composed report carries all four answers: the fingerprints, the

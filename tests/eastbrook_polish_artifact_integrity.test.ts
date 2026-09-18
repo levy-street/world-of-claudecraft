@@ -1048,12 +1048,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // tone-mapping tail moved realm_builder_monument_fx.ts. No capture was retaken.
 // Re-minted for Studio renderer/material integration; no historical capture retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '07d4629156fe7669eda3f81d321f017a9bf286f8351988181f5e173bcefd3a66';
+  'c334efbeed0b24a9f863c86a6de40f62100b96291eb9e325c57cd7a922e4cc95';
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 // Re-minted again for the PR #3695 review fixes (the impostor fragment tail).
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '7f230d7c9da144d0c2840f1346de7aec8d2f09a1d3dbcb133368c4cce1a7d21c';
+  'd33be6e284a305a2fdfdbadc41197251618baf6fe44229cb059f2d5666d1d842';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2218,7 +2218,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // followed it, then this seal followed the swept bytes. No capture was
       // retaken.
       // Studio renderer/material integration: follows the swept runtime seals.
-    ).toBe('f5cc640baca3f858b2bcca02edfdcc30b023be44711701ece29bff8d03af8f1c');
+    ).toBe('b6ddb35b9c41d45fe04fc94e68ebd20b5497d7502ad9601e2c02886736362697');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
