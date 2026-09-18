@@ -3,13 +3,13 @@ import {
   SLAGSNARE_4PC_MOMENTUM_ICD_SEC,
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
-import { GRAVITY, JUMP_VELOCITY } from '../player_motion';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 import { armorReduction, dist2d } from '../types';
 import { hasUnbreakableMovementLock } from './cc';
 import { grantHunterFocus, onHunterTrailbreak } from './hunter_shared';
+import { trailbreakArcFor } from './hunter_trailbreak_arc';
 
 export const BLOODHOOK_BLEED_ID = 'bloodhook_bleed';
 export const HUNTING_MOMENTUM_ID = 'hunting_momentum';
@@ -363,12 +363,14 @@ export function runShrapnelCharge(
 
 export function trailbreak(ctx: SimContext, hunter: Entity, distance: number): void {
   onHunterTrailbreak(ctx, hunter);
-  const flightSeconds = (2 * JUMP_VELOCITY) / GRAVITY;
-  const horizontalSpeed = distance / flightSeconds;
-  hunter.vx = -Math.sin(hunter.facing) * horizontalSpeed;
-  hunter.vz = -Math.cos(hunter.facing) * horizontalSpeed;
-  hunter.vy = JUMP_VELOCITY;
+  // Airborne BEFORE the plan: the sweep resolves the body with the mantle
+  // lift the kernel grants a jumping body, so a low crate behind the hunter
+  // is footing to carry onto, not a wall that ends the leap at its face.
   hunter.onGround = false;
+  const arc = trailbreakArcFor(ctx, hunter, distance);
+  hunter.vx = arc.vx;
+  hunter.vz = arc.vz;
+  hunter.vy = arc.vy;
   hunter.jumping = true;
   hunter.fallStartY = hunter.pos.y;
   const momentum = hunter.auras.find((aura) => aura.id === HUNTING_MOMENTUM_ID);
