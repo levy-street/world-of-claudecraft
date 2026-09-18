@@ -110,7 +110,7 @@ export function drawFuriousMending(host: SequencerHost, slot: SeqSlot, beat: num
     }
   for (const side of [-1, 1])
     host.bakedAt?.(
-      'warrior_power',
+      'warrior_fervor',
       at.x + dz * side * 0.35,
       at.y,
       at.z - dx * side * 0.35,
@@ -120,7 +120,7 @@ export function drawFuriousMending(host: SequencerHost, slot: SeqSlot, beat: num
       0.38,
       0,
       0.95,
-      facing,
+      side < 0 ? Math.PI : 0,
       true,
       side * 0.45,
       1.4,

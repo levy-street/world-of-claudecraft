@@ -35,6 +35,9 @@ function host(solidReady = true) {
     crestAt: vi.fn(() => solidReady),
     bakedAt: vi.fn(),
     fragmentsAt: vi.fn(),
+    flipbookAt: vi.fn(),
+    shakeAt: vi.fn(),
+    contact: vi.fn(),
     pathRibbon: vi.fn((_color, _width, _life, draw) => {
       const points = Array.from({ length: 24 }, () => new THREE.Vector3());
       const count = draw(points);
@@ -61,10 +64,46 @@ it.each([0, 1, 2])(
         expect(Math.hypot(p.x - 12, p.z + 5)).toBeLessThanOrEqual(6);
       }
     expect(cold.fx.crestAt).toHaveBeenCalledTimes(1);
+    for (const { fx } of [cold, warm]) {
+      const floor = fx.groundYAt(12, -5);
+      expect(fx.flipbookAt).toHaveBeenCalledExactlyOnceWith(
+        12,
+        floor + 0.12,
+        -5,
+        5.5,
+        0xd8d6cf,
+        'contact_crush',
+        1.6,
+        0.13,
+        0,
+        1.8,
+      );
+      expect(fx.shakeAt).toHaveBeenCalledExactlyOnceWith(12, floor, -5, 0.24, true);
+      expect(fx.contact).not.toHaveBeenCalled();
+      expect(fx.bakedAt).toHaveBeenCalledTimes(4);
+      expect(fx.bakedAt.mock.calls.every((call) => call[0] === 'shout_dust')).toBe(true);
+    }
     // No delayed second eruption: the landing owns every dust/sprite release now.
     for (const call of cold.fx.bakedAt.mock.calls) expect(call[8]).toBe(0);
   },
 );
+
+it.each([3, 9])('scales one ground catch with the actual %s-yard landing footprint', (radius) => {
+  const f = host();
+  drawWarriorLeapLanding(f.subject, -8, 11, radius, 0);
+  expect(f.fx.flipbookAt).toHaveBeenCalledTimes(1);
+  expect(f.fx.flipbookAt.mock.calls[0][3]).toBeCloseTo((5.5 * radius) / 6);
+  expect(f.fx.decalXZ.mock.calls[0][2]).toBe(radius);
+  expect(f.paths).toHaveLength(8);
+  for (const path of f.paths) {
+    expect(path.every((p) => Math.hypot(p.x + 8, p.z - 11) <= radius)).toBe(true);
+    expect(Math.max(...path.map((p) => Math.hypot(p.x + 8, p.z - 11)))).toBeCloseTo(
+      (5.95 * radius) / 6,
+    );
+  }
+  expect(f.fx.shakeAt).toHaveBeenCalledExactlyOnceWith(-8, f.fx.groundYAt(-8, 11), 11, 0.24, true);
+  expect(f.fx.contact).not.toHaveBeenCalled();
+});
 
 it.each([
   [NaN, 0, 6],
@@ -77,4 +116,13 @@ it.each([
   expect(drawWarriorLeapLanding(f.subject, x, z, radius, 0)).toBe(0);
   expect(f.fx.crestAt).not.toHaveBeenCalled();
   expect(f.paths).toHaveLength(0);
+  for (const effect of [
+    f.fx.flipbookAt,
+    f.fx.shakeAt,
+    f.fx.contact,
+    f.fx.decalXZ,
+    f.fx.bakedAt,
+    f.fx.fragmentsAt,
+  ])
+    expect(effect).not.toHaveBeenCalled();
 });

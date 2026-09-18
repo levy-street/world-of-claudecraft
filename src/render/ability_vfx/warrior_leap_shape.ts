@@ -23,6 +23,7 @@ export function warriorLeapShape(): THREE.BufferGeometry {
     uvs.push(0, bevel ? 0.01 : 0.65, 1, bevel ? 0.01 : 0.65, 0.5, bevel ? 0.07 : 0.65);
   };
   const stone = (polygon: THREE.Vector3[]) => {
+    const firstUv = uvs.length;
     const center = polygon
       .reduce((sum, p) => sum.add(p), new THREE.Vector3())
       .multiplyScalar(1 / polygon.length);
@@ -57,6 +58,12 @@ export function warriorLeapShape(): THREE.BufferGeometry {
       for (let i = 0; i < polygon.length; i++)
         face(middle, rings[end][i], rings[end][(i + 1) % polygon.length], end ? up : down, false);
     }
+    // One phase for the complete solid, including its inset bevel and caps.
+    // Moving individual vertices would bend fractured stone like rubber.
+    let near = Infinity;
+    for (let i = firstUv / 2; i < positions.length / 3; i++)
+      near = Math.min(near, Math.hypot(positions[i * 3], positions[i * 3 + 2]));
+    for (let i = firstUv; i < uvs.length; i += 2) uvs[i] = near / 6;
   };
   const polar = (radius: number, angle: number, y: number) =>
     new THREE.Vector3(Math.sin(angle) * radius, y, Math.cos(angle) * radius);

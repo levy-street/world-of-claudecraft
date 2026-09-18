@@ -33,19 +33,22 @@ function fixture(cls = 'warrior') {
   const steel = new THREE.Texture();
   vi.spyOn(assets, 'warriorSteelTexture').mockReturnValue(steel);
   const power = new THREE.Texture();
+  const fervor = new THREE.Texture();
   const harvest = new THREE.Texture();
   const bite = new THREE.Texture();
   const shear = new THREE.Texture();
   vi.spyOn(assets, 'bakedTexture').mockImplementation((kind) =>
-    kind === 'warrior_power'
-      ? power
-      : kind === 'harvest_impact'
-        ? harvest
-        : kind === 'warrior_bite'
-          ? bite
-          : kind === 'warrior_shear'
-            ? shear
-            : null,
+    kind === 'warrior_fervor'
+      ? fervor
+      : kind === 'warrior_power'
+        ? power
+        : kind === 'harvest_impact'
+          ? harvest
+          : kind === 'warrior_bite'
+            ? bite
+            : kind === 'warrior_shear'
+              ? shear
+              : null,
   );
   const queue = {
     run: vi.fn(async (work: PrewarmResumeUnit['run']) => {
@@ -72,6 +75,7 @@ function fixture(cls = 'warrior') {
     blood,
     steel,
     power,
+    fervor,
     harvest,
     bite,
     shear,
@@ -84,6 +88,7 @@ function fixture(cls = 'warrior') {
       blood.dispose();
       steel.dispose();
       power.dispose();
+      fervor.dispose();
       harvest.dispose();
       bite.dispose();
       shear.dispose();
@@ -99,23 +104,24 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 115, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 116, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(115);
+    expect(f.queue.run).toHaveBeenCalledTimes(116);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
       expect(call[3]).toEqual({ releaseTail: true });
     }
-    expect(f.upload).toHaveBeenCalledTimes(7);
+    expect(f.upload).toHaveBeenCalledTimes(8);
     expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
     expect(f.upload).toHaveBeenNthCalledWith(4, f.power);
-    expect(f.upload).toHaveBeenNthCalledWith(5, f.harvest);
-    expect(f.upload).toHaveBeenNthCalledWith(6, f.bite);
-    expect(f.upload).toHaveBeenNthCalledWith(7, f.shear);
+    expect(f.upload).toHaveBeenNthCalledWith(5, f.fervor);
+    expect(f.upload).toHaveBeenNthCalledWith(6, f.harvest);
+    expect(f.upload).toHaveBeenNthCalledWith(7, f.bite);
+    expect(f.upload).toHaveBeenNthCalledWith(8, f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
     expect(ACTIVE_WARRIOR_CRESTS).toContain('harvest_cut');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('harvest_eruption');
@@ -135,7 +141,7 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(115);
+    expect(f.queue.run).toHaveBeenCalledTimes(116);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();
@@ -162,7 +168,7 @@ it('surfaces a failed compile without blessing its buffers and retries only unpa
     expect(f.prep.ready('blood_cut')).toBe(false);
     expect(f.host.draw).not.toHaveBeenCalled();
     await ensureActiveAbilityKit(f.scene);
-    expect(f.upload).toHaveBeenCalledTimes(7);
+    expect(f.upload).toHaveBeenCalledTimes(8);
     expect(f.prep.ready('blood_cut')).toBe(true);
   } finally {
     f.close();

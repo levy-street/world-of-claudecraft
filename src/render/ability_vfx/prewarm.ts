@@ -53,11 +53,13 @@ export interface AbilityVfxCompileTarget {
  * this small explicit dependency first, including observers of other classes. */
 export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
   const power = bakedTexture('warrior_power');
+  const fervor = bakedTexture('warrior_fervor');
   const harvest = bakedTexture('harvest_impact');
   const bite = bakedTexture('warrior_bite');
   const shear = bakedTexture('warrior_shear');
   return [
     ...(power ? [power] : []),
+    ...(fervor ? [fervor] : []),
     ...(harvest ? [harvest] : []),
     ...(bite ? [bite] : []),
     ...(shear ? [shear] : []),
@@ -185,6 +187,7 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     'smoke',
     'shout_dust',
     'warrior_power',
+    'warrior_fervor',
     'harvest_impact',
     'warrior_bite',
     'warrior_shear',

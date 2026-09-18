@@ -7,6 +7,7 @@ export type BakedKind =
   | 'smoke'
   | 'shout_dust'
   | 'warrior_power'
+  | 'warrior_fervor'
   | 'harvest_impact'
   | 'warrior_bite'
   | 'warrior_shear'
@@ -19,6 +20,7 @@ export const BAKED_URLS = {
   smoke: '/textures/vfx/production/smoke.webp',
   shout_dust: '/textures/vfx/production/shout_dust.webp',
   warrior_power: '/textures/vfx/production/warrior_power.webp',
+  warrior_fervor: '/textures/vfx/production/warrior_fervor.webp',
   harvest_impact: '/textures/vfx/production/harvest_impact.webp',
   warrior_bite: '/textures/vfx/production/warrior_bite.webp',
   warrior_shear: '/textures/vfx/production/warrior_shear.webp',

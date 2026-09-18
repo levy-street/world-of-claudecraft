@@ -78,6 +78,7 @@ import { WarriorReadiness } from './warrior_readiness';
 import { WarriorStormAnchor } from './warrior_storm_anchor';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
+import { weaponFaceSampler } from './weapon_face_sampler';
 
 export type { DecalStyle } from './decals';
 
@@ -846,6 +847,9 @@ export class AbilityVfxFx implements SequencerHost {
     normal.y = e[9];
     normal.z = e[10];
     return true;
+  }
+  prepareWeaponFace(id: number, hand: 0 | 1) {
+    return weaponFaceSampler(this.weaponAnchor?.(id, hand) ?? null);
   }
   contact(
     sourceId: number,

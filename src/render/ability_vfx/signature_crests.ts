@@ -103,9 +103,6 @@ export class SignatureCrests {
             p.xz=mat2(cos(turn),-sin(turn),sin(turn),cos(turn))*p.xz;
           }
           if(uKind>22.5 && uKind<23.5){
-            float settle=1.0-smoothstep(0.28,1.0,uAge);
-            p.y*=mix(1.0,0.72+0.28*sin(min(uAge*5.0,1.0)*1.5707963),uMotion);
-            p.y*=mix(1.0,max(0.05,settle),uMotion);
             p.y+=pressureGround(p.xz);
           }
           ${HARVEST_VERTEX}

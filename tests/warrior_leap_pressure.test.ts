@@ -18,14 +18,47 @@ it('retains a complete landing primary when all shared attack paths are occupied
   };
   for (let i = 0; i < 20; i++)
     expect(ribbons.spawnPath(0xffffff, 0.2, 1, fill, true, null, false, false, 1)).toBe(true);
+  const camera = new THREE.Vector3(0, 5, 12);
+  const packed = () => {
+    const geo = (ribbons as unknown as { geo: THREE.BufferGeometry }).geo;
+    const index = geo.getIndex();
+    if (!index) throw new Error('Missing ribbon indices');
+    const used = Math.max(...Array.from(index.array).slice(0, geo.drawRange.count)) + 1;
+    return Array.from(geo.getAttribute('position').array).slice(0, used * 3);
+  };
+  ribbons.update(0.02, camera, false);
+  const before = packed();
   const decalXZ = vi.fn();
+  const flipbookAt = vi.fn(),
+    shakeAt = vi.fn(),
+    bakedAt = vi.fn(),
+    contact = vi.fn();
   const admitted: boolean[] = [];
   const host = {
     groundYAt: () => 0,
     crestAt: () => false,
     decalXZ,
-    pathRibbon: (color: number, width: number, life: number, draw: typeof fill) => {
-      const result = ribbons.spawnPath(color, width, life, draw);
+    flipbookAt,
+    shakeAt,
+    bakedAt,
+    contact,
+    pathRibbon: (
+      ...[color, width, life, draw, brushed, motion, preserve, priority, sweep, follow]: Parameters<
+        SequencerHost['pathRibbon']
+      >
+    ) => {
+      const result = ribbons.spawnPath(
+        color,
+        width,
+        life,
+        draw,
+        brushed,
+        motion,
+        preserve,
+        follow,
+        priority,
+        sweep,
+      );
       admitted.push(result);
       return result;
     },
@@ -37,6 +70,26 @@ it('retains a complete landing primary when all shared attack paths are occupied
     admitted.filter(Boolean).length === 8 ||
       decalXZ.mock.calls.some((call) => call[2] === 6 && call[4] === 'leap_fracture'),
   ).toBe(true);
+  expect(admitted).toEqual(Array.from({ length: 8 }, () => false));
+  expect(decalXZ).toHaveBeenCalledExactlyOnceWith(0, 0, 6, 0xffffff, 'leap_fracture', 0.72);
+  expect(flipbookAt).toHaveBeenCalledExactlyOnceWith(
+    0,
+    0.12,
+    0,
+    5.5,
+    0xd8d6cf,
+    'contact_crush',
+    1.6,
+    0.13,
+    0,
+    1.8,
+  );
+  expect(shakeAt).toHaveBeenCalledExactlyOnceWith(0, 0, 0, 0.24, true);
+  expect(contact).not.toHaveBeenCalled();
+  expect(bakedAt.mock.calls.every((call) => call[0] === 'shout_dust' && call[8] === 0)).toBe(true);
+  // A saturated landing cannot evict any of the existing primary attack paths.
+  ribbons.update(0, camera, false);
+  expect(packed()).toEqual(before);
   ribbons.dispose();
   texture.dispose();
 });

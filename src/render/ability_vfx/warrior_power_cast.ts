@@ -11,7 +11,7 @@ export function warriorPowerRelease(host: SequencerHost, slot: SeqSlot): void {
   if (!at) return;
   for (const side of [-1, 1])
     host.bakedAt?.(
-      'warrior_power',
+      'warrior_fervor',
       at.x,
       at.y + 1.1,
       at.z,
@@ -92,7 +92,7 @@ export function drawWarriorPowerCast(host: SequencerHost, slot: SeqSlot, beat: n
     if (!toll) {
       for (const side of [-1, 1])
         host.bakedAt?.(
-          'warrior_power',
+          'warrior_fervor',
           x,
           y + 1.2,
           z,

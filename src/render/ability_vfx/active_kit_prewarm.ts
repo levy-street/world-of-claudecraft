@@ -84,6 +84,14 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
       },
     },
     {
+      id: 'upload-big:active-warrior-fervor',
+      run: () => {
+        const texture = bakedTexture('warrior_fervor');
+        if (!texture) throw new Error('Active Warrior fervor texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
+    {
       id: 'upload-big:active-harvest-impact',
       run: () => {
         const texture = bakedTexture('harvest_impact');

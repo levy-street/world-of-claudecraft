@@ -70,6 +70,10 @@ export interface SequencerHost {
   isWeaponHand?(id: number, hand: 0 | 1): boolean;
   handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
   weaponFace?(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean;
+  prepareWeaponFace?(
+    id: number,
+    hand: 0 | 1,
+  ): ((out: SeqPoint, normal: SeqPoint) => boolean) | null;
   contact?(
     sourceId: number,
     targetId: number,

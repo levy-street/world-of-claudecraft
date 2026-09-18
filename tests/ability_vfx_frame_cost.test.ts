@@ -6,10 +6,11 @@ import { GroundAuras } from '../src/render/ability_vfx/ground_auras';
 import { OverlaySprites } from '../src/render/ability_vfx/overlay_sprites';
 import { AbilityVfxRibbons } from '../src/render/ability_vfx/ribbons';
 import type { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
+import { warriorEquipmentPrepare } from '../src/render/ability_vfx/warrior_equipment_prepare';
 import { ABILITY_VFX_FULL_SPECS } from '../src/render/ability_vfx_full_specs';
 import { createVfxAnchor } from '../src/render/vfx_anchor';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
-import { weaponTrailAnchor } from '../src/render/weapon_trail_anchor';
+import { sampleHandAnchor, weaponTrailAnchor } from '../src/render/weapon_trail_anchor';
 
 // The steady-state combat cost of the ability-VFX subsystem: anchors resolved
 // every frame must not allocate, and the two immediate-mode buffers must upload
@@ -90,6 +91,10 @@ function queuedWeaponHarness() {
   const weapon = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2, 0.1));
   weapon.userData.weaponMesh = true;
   holder.add(weapon);
+  const hand = new THREE.Object3D();
+  hand.name = 'handslotr';
+  hand.position.y = -1;
+  holder.add(hand);
   root.add(holder);
   const resolve = vi.fn((_id: number, hand: 0 | 1) => weaponTrailAnchor(root, hand));
   const fx = new AbilityVfxFx(
@@ -99,6 +104,7 @@ function queuedWeaponHarness() {
     () => 0,
     undefined,
     resolve,
+    (_id, handIndex, out) => sampleHandAnchor(root, handIndex, out),
   );
   const probe = fx as unknown as { overlay: OverlaySprites; orbitBandCount: number };
   const push = vi.spyOn(probe.overlay, 'push');
@@ -116,6 +122,70 @@ function queuedWeaponHarness() {
 }
 
 describe('queued physical weapon readiness', () => {
+  it.each([false, true])(
+    'follows equipment preparation without resolving the weapon again on live frames (guard=%s)',
+    (guarded) => {
+      const h = queuedWeaponHarness();
+      const ribbons = (h.fx as unknown as { ribbons: AbilityVfxRibbons }).ribbons;
+      const probe = ribbons as unknown as {
+        geo: THREE.BufferGeometry;
+        arcs: Array<{ active: boolean; pts: THREE.Vector3[]; refill: unknown }>;
+      };
+      const resolutions = guarded ? 2 : 1;
+      try {
+        expect(warriorEquipmentPrepare(h.fx, 7, guarded)).toBe(2);
+        // Guarding tries the empty offhand once before resolving the mainhand.
+        // The actual renderer factory traverses and allocates when invoked.
+        expect(h.resolve).toHaveBeenCalledTimes(resolutions);
+        expect(h.resolve.mock.calls.map((call) => call[1])).toEqual(guarded ? [1, 0] : [0]);
+        h.step(false, 0.01);
+        expect(probe.geo.drawRange.count).toBeGreaterThan(0);
+        const live = probe.arcs.filter((arc) => arc.active);
+        expect(live).toHaveLength(2);
+        expect(live.every((arc) => typeof arc.refill === 'function')).toBe(true);
+        const before = live.map((arc) => arc.pts.map((point) => point.clone()));
+        const previous = h.holder.matrixWorld.clone();
+        h.holder.position.set(3, 1, -2);
+        h.holder.rotation.set(0.35, 0.6, 0.8);
+        h.holder.updateWorldMatrix(true, false);
+        const delta = h.holder.matrixWorld.clone().multiply(previous.invert());
+        for (let frame = 0; frame < 4; frame++) {
+          h.step(false, 0.01, frame % 2 === 1);
+          expect(h.resolve).toHaveBeenCalledTimes(resolutions);
+          expect(probe.geo.drawRange.count).toBeGreaterThan(0);
+          live.forEach((arc, layer) => {
+            expect(arc.active).toBe(true);
+            arc.pts.forEach((point, i) => {
+              expect(point.distanceTo(before[layer][i].clone().applyMatrix4(delta))).toBeLessThan(
+                1e-9,
+              );
+            });
+          });
+        }
+        h.root.remove(h.holder);
+        h.step(false, 0.01);
+        expect(probe.geo.drawRange.count).toBe(0);
+        expect(live.every((arc) => !arc.active && arc.refill === null)).toBe(true);
+        for (let frame = 0; frame < 40; frame++) h.step(false);
+        expect(h.resolve).toHaveBeenCalledTimes(resolutions);
+
+        // A distinct activation resolves once again, then normal expiry drops
+        // the followed callbacks without another mesh lookup or stale draw.
+        h.root.add(h.holder);
+        expect(warriorEquipmentPrepare(h.fx, 7, guarded)).toBe(2);
+        expect(h.resolve).toHaveBeenCalledTimes(resolutions * 2);
+        h.step(false, 0.01);
+        expect(probe.geo.drawRange.count).toBeGreaterThan(0);
+        for (let frame = 0; frame < 40; frame++) h.step(false);
+        expect(probe.geo.drawRange.count).toBe(0);
+        expect(probe.arcs.every((arc) => !arc.active && arc.refill === null)).toBe(true);
+        expect(h.resolve).toHaveBeenCalledTimes(resolutions * 2);
+      } finally {
+        h.dispose();
+      }
+    },
+  );
+
   it('shows two separate Redhand charges on the blade and drops both on consumption', () => {
     const h = queuedWeaponHarness();
     try {

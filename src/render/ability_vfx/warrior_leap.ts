@@ -63,7 +63,7 @@ export function drawWarriorLeapLanding(
     const dx = Math.sin(angle),
       dz = Math.cos(angle);
     const pathAdmitted = host.pathRibbon(
-      0xd0b392,
+      0xc3c2bc,
       0.23,
       0.42,
       (points) => {
@@ -92,8 +92,8 @@ export function drawWarriorLeapLanding(
         host.groundYAt(px, pz) + 0.08,
         pz,
         5.6 * scale,
-        0xb09b80,
-        0xead7b4,
+        0xa39c90,
+        0xcfc8ba,
         0.72,
         0,
         0,
@@ -117,21 +117,9 @@ export function drawWarriorLeapLanding(
       }
     }
   }
-  host.bakedAt?.(
-    'warrior_power',
-    x,
-    floor + 0.08,
-    z,
-    5.5 * scale,
-    0xf0d9ac,
-    0xa79479,
-    0.3,
-    0,
-    0.8,
-    0,
-    false,
-    0,
-    1.8,
-  );
+  // The touchdown is a compressed physical catch. Dust and whole slabs own
+  // the release; a chest-shaped power plume does not belong under the boots.
+  host.flipbookAt(x, floor + 0.12, z, 5.5 * scale, 0xd8d6cf, 'contact_crush', 1.6, 0.13, 0, 1.8);
+  host.shakeAt(x, floor, z, 0.24, true);
   return count + 1;
 }

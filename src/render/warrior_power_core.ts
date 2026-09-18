@@ -109,7 +109,7 @@ export function warriorPowerPiece(
   }
   const assembly = reduced ? 1 : 1 - (1 - Math.min(1, age / 0.32)) ** 3;
   if (kind === 0 && nativeBone) {
-    // Native left is +X. Arms and shins grow along their joint's +Y,
+    // Native left is +X. Arms and shins seat along their joint's +Y,
     // with shin fronts facing local -Z; no inferred model scale here.
     out.x = out.y = out.z = out.yaw = out.roll = 0;
     if (piece === 0) {
@@ -127,6 +127,22 @@ export function warriorPowerPiece(
       out.sy = 0.14;
       out.sz = 0.65;
     }
+    // The mineral plates arrive as rigid pieces. Stagger chest, bracers and
+    // shins, then seat them into their actual joints without rubber stretching.
+    const delay = piece === 0 ? 0 : piece < 3 ? 0.035 + (piece - 1) * 0.025 : 0.09;
+    const u = reduced ? 1 : Math.max(0, Math.min(1, (age - delay) / 0.24));
+    const remaining = (1 - u) ** 3;
+    if (piece === 0) {
+      out.z += remaining * 0.21;
+      out.y -= remaining * 0.12;
+    } else if (piece < 3) {
+      out.x += (piece === 1 ? 1 : -1) * remaining * 0.17;
+      out.y -= remaining * 0.2;
+    } else {
+      out.z -= remaining * 0.13;
+      out.y -= remaining * 0.3;
+    }
+    return out;
   }
   out.y -= (1 - assembly) * (nativeBone ? (piece < 3 ? 0 : 0.3) : kind === 0 ? 1.15 : 0.5);
   out.x *= 1 + (1 - assembly) * 0.35;

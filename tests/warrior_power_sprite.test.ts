@@ -78,29 +78,32 @@ it('mirrors the authored pivot and plays a real inward extraction instead of an 
   pool.dispose();
 });
 
-it('keeps a decoded power atlas cold until this renderer has completed its upload', () => {
-  const ready = new WeakSet<THREE.Texture>();
-  const pool = new BakedImpactLayers(new THREE.Scene(), (texture) => ready.has(texture));
-  const cast = (target = pool) =>
-    target.spawn('warrior_power', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0);
-  // Queued, cancelled and failed work never enters the renderer's ready set.
-  expect(cast()).toBe(false);
-  const upload = () => {
-    throw Error('upload failed');
-  };
-  expect(upload).toThrow('upload failed');
-  expect(cast()).toBe(false);
-  ready.add(bakedTexture('warrior_power')!);
-  expect(cast()).toBe(true);
-  const replacement = new BakedImpactLayers(new THREE.Scene(), () => false);
-  expect(cast(replacement)).toBe(false);
-  const unprepared = new BakedImpactLayers(new THREE.Scene());
-  expect(cast(unprepared)).toBe(false);
-  expect(unprepared.spawn('smoke', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0)).toBe(true);
-  pool.dispose();
-  replacement.dispose();
-  unprepared.dispose();
-});
+it.each(['warrior_power', 'warrior_fervor'] as const)(
+  'keeps decoded %s cold until this renderer has completed its upload',
+  (kind) => {
+    const ready = new WeakSet<THREE.Texture>();
+    const pool = new BakedImpactLayers(new THREE.Scene(), (texture) => ready.has(texture));
+    const cast = (target = pool) =>
+      target.spawn(kind, 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0);
+    // Queued, cancelled and failed work never enters the renderer's ready set.
+    expect(cast()).toBe(false);
+    const upload = () => {
+      throw Error('upload failed');
+    };
+    expect(upload).toThrow('upload failed');
+    expect(cast()).toBe(false);
+    ready.add(bakedTexture(kind)!);
+    expect(cast()).toBe(true);
+    const replacement = new BakedImpactLayers(new THREE.Scene(), () => false);
+    expect(cast(replacement)).toBe(false);
+    const unprepared = new BakedImpactLayers(new THREE.Scene());
+    expect(cast(unprepared)).toBe(false);
+    expect(unprepared.spawn('smoke', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0)).toBe(true);
+    pool.dispose();
+    replacement.dispose();
+    unprepared.dispose();
+  },
+);
 
 it('gives each power its own physical sentence without enemy impacts or generic rings', () => {
   const paths: Record<string, number[][][]> = {};
@@ -146,9 +149,9 @@ it('gives each power its own physical sentence without enemy impacts or generic 
     const calls = vi.mocked(host.bakedAt!).mock.calls;
     if (id === 'bloodrage') {
       expect(calls).toHaveLength(2);
-      expect(calls.every((c) => c[0] === 'warrior_power' && c[11] === true)).toBe(true);
+      expect(calls.every((c) => c[0] === 'warrior_fervor' && c[11] === true)).toBe(true);
     } else if (id !== 'avatar')
-      expect(calls.filter((c) => c[0] === 'warrior_power')).toHaveLength(2);
+      expect(calls.filter((c) => c[0] === 'warrior_fervor')).toHaveLength(2);
     else expect(calls.every((c) => c[0] === 'shout_dust')).toBe(true);
   }
   expect(new Set(Object.values(paths).map((p) => JSON.stringify(p))).size).toBe(4);

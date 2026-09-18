@@ -73,6 +73,12 @@ it.each([0, 1, 2])(
     expect(drawFuriousMending(host, slot, 0)).toBe(true);
     expect(paths.length).toBe(tier === 0 ? 6 : 2);
     expect(host.bakedAt).toHaveBeenCalledTimes(2);
+    const sheets = vi.mocked(host.bakedAt!).mock.calls;
+    expect(sheets.map((call) => call[0])).toEqual(['warrior_fervor', 'warrior_fervor']);
+    // Camera-facing sheets need opposite mirror signs to converge from both
+    // sides; caster yaw on both sprites sends both fans in the same direction.
+    expect(sheets.map((call) => Math.sign(Math.cos(call[10] ?? 0)))).toEqual([-1, 1]);
+    expect(sheets.every((call) => call[11] === true && call[7] === 0.38)).toBe(true);
     drawFuriousMending(host, slot, 1);
     drawFuriousMending(host, { ...slot, physicalSecondary: true }, 0);
     expect(host.bakedAt).toHaveBeenCalledTimes(2);

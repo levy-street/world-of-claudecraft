@@ -185,6 +185,7 @@ export class BakedImpactLayers {
       // Decoding is not GPU preparation. The new large optional layer stays
       // cold until this renderer's explicit upload has completed successfully.
       ((kind === 'warrior_power' ||
+        kind === 'warrior_fervor' ||
         kind === 'harvest_impact' ||
         kind === 'warrior_bite' ||
         kind === 'warrior_shear') &&
@@ -196,7 +197,8 @@ export class BakedImpactLayers {
     )
       return false;
     const prepared = this.preparation;
-    const strict = kind === 'harvest_impact' || kind === 'warrior_shear';
+    const strict =
+      kind === 'harvest_impact' || kind === 'warrior_shear' || kind === 'warrior_fervor';
     const s = this.slots.find(
       (s, index) => !s.active && (!strict || !prepared || prepared.ready(index)),
     );
@@ -213,7 +215,7 @@ export class BakedImpactLayers {
       kind === 'harvest_impact' ||
       kind === 'warrior_bite' ||
       kind === 'warrior_shear';
-    s.power = kind === 'warrior_power';
+    s.power = kind === 'warrior_power' || kind === 'warrior_fervor';
     s.reverse = reverse;
     s.roll = roll;
     s.rise = s.ground || s.authored || s.power || kind === 'shout_dust' ? 0 : 0.18;

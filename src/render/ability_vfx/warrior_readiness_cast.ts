@@ -1,4 +1,5 @@
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { warriorEquipmentPrepare } from './warrior_equipment_prepare';
 
 const hand = { x: 0, y: 0, z: 0 };
 
@@ -24,7 +25,7 @@ export function drawWarriorReadinessCast(
       // Baked sprite filaments gather at the hilt and release along the blade.
       // They add fine liquid detail without recoloring the body for the buff.
       host.bakedAt?.(
-        'warrior_power',
+        'warrior_fervor',
         at.x,
         at.y,
         at.z,
@@ -44,7 +45,7 @@ export function drawWarriorReadinessCast(
     }
     return true;
   }
-  const color = wide ? 0xe9d8b1 : fury ? 0xc44336 : guarded ? 0xa8cedc : 0xe3e8df;
+  const color = wide ? 0xdce6ea : fury ? 0xc44336 : guarded ? 0xa8cedc : 0xe3e8df;
   host.weaponTrail?.(
     slot.casterId,
     guarded ? 1 : 0,
@@ -53,6 +54,8 @@ export function drawWarriorReadinessCast(
     wide ? 0.35 : 0.22,
   );
   if (fury) host.weaponTrail?.(slot.casterId, 1, color, 0.065, 0.22);
-  host.countPrimitive(id, fury ? 2 : 1);
+  const reflection =
+    beat === 0 && (wide || guarded) ? warriorEquipmentPrepare(host, slot.casterId, guarded) : 0;
+  host.countPrimitive(id, (fury ? 2 : 1) + reflection);
   return true;
 }

@@ -24,6 +24,7 @@ function fixture(cls: string, warriorTextures = true) {
     'steel',
     'pressure',
     'warrior_power',
+    'warrior_fervor',
     'harvest_impact',
     'warrior_bite',
     'warrior_shear',
@@ -57,10 +58,10 @@ function fixture(cls: string, warriorTextures = true) {
   const host = {
     properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
     compile: vi.fn(async () => {
-      expect(uploaded.size).toBe(7);
+      expect(uploaded.size).toBe(8);
     }),
     draw: vi.fn((_group: THREE.Group, root: THREE.Object3D) => {
-      expect(uploaded.size).toBe(7);
+      expect(uploaded.size).toBe(8);
       const mesh = root as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(
         live.some((slot) => slot.geometry === mesh.geometry && slot.material === mesh.material),
@@ -111,7 +112,8 @@ function fixture(cls: string, warriorTextures = true) {
     for (const value of textures.values()) value.dispose();
     smoke.dispose();
   });
-  const spawn = () => pool.spawn('warrior_shear', 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
+  const spawn = (kind: 'warrior_shear' | 'warrior_fervor') =>
+    pool.spawn(kind, 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
   return {
     scene,
     textures,
@@ -131,37 +133,41 @@ function fixture(cls: string, warriorTextures = true) {
   };
 }
 
-it('routes a selected Warrior through texture uploads and awaits every actual baked slot', async () => {
-  const h = fixture('mage');
-  let complete = false;
-  const task = ensureActiveAbilityKit(h.scene, 'warrior').then(() => {
-    complete = true;
-  });
-  expect(h.poolUnits).toHaveBeenCalled();
-  expect(h.spawn()).toBe(false);
-  for (let i = 0; i < 7; i++) await h.next();
-  expect(h.upload.mock.calls.map(([value]) => value)).toEqual([...h.textures.values()]);
-  expect(h.host.compile).not.toHaveBeenCalled();
-  expect(h.host.draw).not.toHaveBeenCalled();
-  for (let i = 0; i < 29; i++) await h.next();
-  expect(h.jobs[0].label).toBe('baked-upload:slot:9');
-  expect(complete).toBe(false);
-  expect(h.seenSlots.size).toBe(9);
-  for (let i = 0; i < 9; i++) expect(h.spawn()).toBe(true);
-  expect(h.spawn()).toBe(false);
-  await h.next();
-  await task;
-  expect(complete).toBe(true);
-  expect(h.host.compile).toHaveBeenCalledTimes(10);
-  expect(h.host.draw).toHaveBeenCalledTimes(10);
-  expect(h.seenSlots.size).toBe(10);
-  expect(h.spawn()).toBe(true);
-  expect(h.spawn()).toBe(false);
-  expect(h.labels).toHaveLength(37);
-  expect(new Set(h.labels).size).toBe(37);
-  await ensureActiveAbilityKit(h.scene, 'warrior');
-  expect(h.labels).toHaveLength(37);
-});
+it.each(['warrior_shear', 'warrior_fervor'] as const)(
+  'routes a selected Warrior through texture uploads and awaits every actual baked slot for %s',
+  async (kind) => {
+    const h = fixture('mage');
+    let complete = false;
+    const task = ensureActiveAbilityKit(h.scene, 'warrior').then(() => {
+      complete = true;
+    });
+    expect(h.poolUnits).toHaveBeenCalled();
+    expect(h.spawn(kind)).toBe(false);
+    for (let i = 0; i < 8; i++) await h.next();
+    expect(h.upload.mock.calls.map(([value]) => value)).toEqual([...h.textures.values()]);
+    expect(h.host.compile).not.toHaveBeenCalled();
+    expect(h.host.draw).not.toHaveBeenCalled();
+    expect(h.spawn(kind)).toBe(false);
+    for (let i = 0; i < 29; i++) await h.next();
+    expect(h.jobs[0].label).toBe('baked-upload:slot:9');
+    expect(complete).toBe(false);
+    expect(h.seenSlots.size).toBe(9);
+    for (let i = 0; i < 9; i++) expect(h.spawn(kind)).toBe(true);
+    expect(h.spawn(kind)).toBe(false);
+    await h.next();
+    await task;
+    expect(complete).toBe(true);
+    expect(h.host.compile).toHaveBeenCalledTimes(10);
+    expect(h.host.draw).toHaveBeenCalledTimes(10);
+    expect(h.seenSlots.size).toBe(10);
+    expect(h.spawn(kind)).toBe(true);
+    expect(h.spawn(kind)).toBe(false);
+    expect(h.labels).toHaveLength(38);
+    expect(new Set(h.labels).size).toBe(38);
+    await ensureActiveAbilityKit(h.scene, 'warrior');
+    expect(h.labels).toHaveLength(38);
+  },
+);
 
 it('keeps other classes and generic dispatch independent of missing Warrior textures', async () => {
   const h = fixture('mage', false);
