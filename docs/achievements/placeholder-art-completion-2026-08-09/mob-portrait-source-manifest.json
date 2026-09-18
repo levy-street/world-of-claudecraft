@@ -6,17 +6,17 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dddd242fe3f5a95440f018b9c3d111c1cc55c0484e3775cdb6c0ac5c6a676f06",
+  "rendererFingerprint": "f39193fa272dd60f47eb6a5f906bf424f559d0a5aec142d7aeab5b5b9c3f52a9",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
     "arch": "arm64",
     "gpuVendor": "Google Inc. (Google)",
     "gpuRenderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
-    "browserMajor": "152",
-    "browserVersion": "Chrome/152.0.7977.84",
+    "browserMajor": "153",
+    "browserVersion": "Chrome/153.0.8010.48",
     "requestedBackend": "swiftshader",
-    "fingerprint": "538069c40c2b7b61ee2b450a871b7bdaa6fa79a2a3a8c4eea900e335ef25949d"
+    "fingerprint": "0a3b64b4bd845e00754f67090cf5f9d89309cc7c18d44ad56c12b92ae55548ce"
   },
   "renderer": {
     "trackedFiles": [
@@ -39,7 +39,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 4910366,
-      "sha256": "f11524a7390cb8b858c582a6025275f16f547cc669e2e8f5d9b335391fd8e10e",
+      "sha256": "98d09dc24ce1dde055f72c08e78fdc5df569dc45df9493d1f9a08c1489d27cc9",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -1194,34 +1194,34 @@
       "id": "deeprock_kobold",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_kobold_digger",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/kobold.glb",
+          "path": "public/models/creatures/kobold.glb",
+          "bytes": 324004,
+          "sha256": "1cb4fe6907ed7c03c17150a4af29cc2bc9bba68a30a73ea461f302732fe219c5"
         },
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#9c7a3c",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "d4079f0e6e13d7c3e941c3752d46f4ac32d71d18fe28c639b7025ed2a22011e3",
+      "sourceFingerprint": "d14de1ffb5600ed1e6249129f16f6943278534a12a6f8a98890b32b9d89cccc4",
       "output": {
         "path": "public/ui/mobs/deeprock_kobold.webp",
-        "bytes": 1698,
-        "sha256": "0ed04dd9e12a8b468245ea090cd80d1e7afabff92ba26c8f675f10739e4e2794"
+        "bytes": 2486,
+        "sha256": "f7df112752ad1275c4563344b1a09bdf76c7ea429f7170724066c16c520fe09e"
       }
     },
     {
@@ -3585,68 +3585,68 @@
       "id": "ironvein_foreman",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_grix",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/grix.glb",
+          "path": "public/models/creatures/grix.glb",
+          "bytes": 485196,
+          "sha256": "224bc3592577b76dbcaca3e3138acea017919cfabf61bbc012828e0994510bd8"
         },
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.07,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": null
       },
       "tint": {
-        "source": "entity",
-        "authored": "entity",
-        "resolved": "#b0823a",
-        "strength": 0.2
+        "source": "none",
+        "authored": null,
+        "resolved": null,
+        "strength": null
       },
-      "sourceFingerprint": "680b401700cf946d9690c5f74fb0ccd9fb74b42541a600d343bf8917d0829858",
+      "sourceFingerprint": "567650aac78238ad2cab1193fe4b46a530e663aec185e3ca66c730639c7d6994",
       "output": {
         "path": "public/ui/mobs/ironvein_foreman.webp",
-        "bytes": 1694,
-        "sha256": "e718dcc469e99a86fd6427aa650362211f8683e4315eefe98eec033329a9630b"
+        "bytes": 2718,
+        "sha256": "3c1e0fc3fb4d21db02ed5a48953990d14f6561d8bee26c178611ba104d87713d"
       }
     },
     {
       "id": "ironvein_sapper",
       "family": "burrower",
       "finderEncounter": false,
-      "visualKey": "mob_kobold",
+      "visualKey": "mob_kobold_digger",
       "renderSpec": {
         "model": {
-          "url": "models/creatures/goblin.glb",
-          "path": "public/models/creatures/goblin.glb",
-          "bytes": 48360,
-          "sha256": "a128051c0b5078e0f76f09ed0e15eafe102ae11ae62e984155ccfefa3b08fb92"
+          "url": "models/creatures/kobold.glb",
+          "path": "public/models/creatures/kobold.glb",
+          "bytes": 324004,
+          "sha256": "1cb4fe6907ed7c03c17150a4af29cc2bc9bba68a30a73ea461f302732fe219c5"
         },
         "idle": "Idle",
         "height": 2.1,
         "yaw": null,
-        "hover": null,
+        "hover": -0.2,
         "show": null,
         "attach": [],
         "weaponFix": null,
-        "tintStrength": 0.2
+        "tintStrength": 0.12
       },
       "tint": {
         "source": "entity",
         "authored": "entity",
         "resolved": "#8f6b34",
-        "strength": 0.2
+        "strength": 0.12
       },
-      "sourceFingerprint": "2693a4ba049f7f402c10e1a91aa6cec0f9ad6a6724066e22bfd587a29695c039",
+      "sourceFingerprint": "f1b69c9d472203040ac5358ad263028a1eaa5e55c559bb6715f7364fa485abfb",
       "output": {
         "path": "public/ui/mobs/ironvein_sapper.webp",
-        "bytes": 1622,
-        "sha256": "d5d4625556f9b95d6cdd2a9c380ddc1d87b5c35528cd181ae91c1fddfdb9441c"
+        "bytes": 2460,
+        "sha256": "ccf28b074ad33921145ee90dd9de2bfe79adb0db0af8564c62f248caad7fdc9c"
       }
     },
     {

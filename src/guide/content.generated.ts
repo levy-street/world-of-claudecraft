@@ -2949,10 +2949,10 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 15,
         "rare": false,
         "templateId": "deeprock_kobold",
-        "model": "mob_kobold",
+        "model": "mob_kobold_digger",
         "tint": "#9c7a3c",
-        "tintStrength": 0.2,
-        "still": "/guide-stills/mob_kobold__9c7a3c__s20.webp"
+        "tintStrength": 0.12,
+        "still": "/guide-stills/mob_kobold_digger__9c7a3c__s12.webp"
       },
       {
         "name": "Gleamfolk Pixie",
@@ -20373,12 +20373,6 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "tintStrength": 0.5
   },
-  "mob_kobold": {
-    "url": "models/creatures/goblin.glb",
-    "idle": "Idle",
-    "height": 2.1,
-    "tintStrength": 0.2
-  },
   "mob_ogre": {
     "url": "models/creatures/ogre.glb",
     "idle": "Idle",
@@ -20461,6 +20455,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.6,
     "hover": 0.4,
     "tintStrength": 0.55
+  },
+  "mob_kobold": {
+    "url": "models/creatures/goblin.glb",
+    "idle": "Idle",
+    "height": 2.1,
+    "tintStrength": 0.2
   },
   "mob_stag": {
     "url": "models/creatures/stag.glb",
