@@ -11,3 +11,7 @@ src/ui/i18n.catalog/translation_keys.generated.ts linguist-generated
 # Windows batch scripts keep their CRLF endings: exempt from text conversion so an
 # LF-normalized checkout (core.autocrlf=input) neither flags nor rewrites them.
 *.bat -text
+
+# RGBE images may contain no NUL bytes. They are binary even when Git's heuristic
+# mistakes their headers/pixels for text; conversion changes media fingerprints.
+*.hdr -text
