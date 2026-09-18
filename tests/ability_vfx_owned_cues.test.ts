@@ -22,6 +22,7 @@ function painter() {
     anchor: () => ({ x: 0, y: 0, z: 0 }),
     spawnAoeRing: vi.fn(),
     triggerAttack: vi.fn(),
+    abilityAudio: vi.fn(),
     hasGestureClip: () => true,
     localPlayerId: () => 1,
     isInstantAbility: () => true,
@@ -31,8 +32,8 @@ function painter() {
     paint: new AbilityVfx(deps, () => time),
     deps,
     fx,
-    next: () => {
-      time += 1.05;
+    next: (seconds = 1.05) => {
+      time += seconds;
     },
   };
 }
@@ -170,19 +171,39 @@ describe('owned physical and ritual event routing', () => {
   it('plays each physical channel pulse without the old circular telegraph or three-second suppression', () => {
     const { paint, deps, fx, next } = painter();
     for (let i = 0; i < 4; i++) {
-      paint.handleSpellfxAt({
-        sourceId: 1,
-        ability: 'bladestorm',
-        school: 'physical',
-        fx: 'nova',
-        x: 0,
-        z: 0,
-        radius: 8,
+      expect(
+        paint.handleSpellfxAt({
+          sourceId: 1,
+          ability: 'bladestorm',
+          school: 'physical',
+          fx: 'nova',
+          x: i * 3,
+          z: -i,
+          radius: 8,
+        }),
+      ).toBe(true);
+      // Every real pulse gets four ground-pressure sprites and four debris
+      // bursts, even inside the generic sequence's three-second repeat window.
+      expect(fx.bakedAt).toHaveBeenCalledTimes((i + 1) * 4);
+      expect(fx.fragmentsAt).toHaveBeenCalledTimes((i + 1) * 4);
+      const calls = vi.mocked(fx.bakedAt as (...args: unknown[]) => void).mock.calls.slice(-4);
+      for (const [kind, x, y, z] of calls) {
+        expect(kind).toBe('shout_dust');
+        expect(y).toBeCloseTo(0.08);
+        expect(Math.hypot(Number(x) - i * 3, Number(z) + i)).toBeCloseTo(8 * 0.64);
+      }
+      expect(deps.abilityAudio).toHaveBeenLastCalledWith('impact', 'physical', 1.35, i * 3, 0, -i, {
+        abilityId: 'bladestorm',
+        lite: false,
       });
-      next();
+      next(0.5);
     }
     expect(deps.spawnAoeRing).not.toHaveBeenCalled();
-    expect(fx.sequenceInstantAt).toHaveBeenCalledTimes(4);
+    expect(deps.abilityAudio).toHaveBeenCalledTimes(4);
+    expect(fx.sequenceInstantAt).not.toHaveBeenCalled();
+    expect(fx.flipbookAt).not.toHaveBeenCalled();
+    expect(fx.contact).not.toHaveBeenCalled();
+    expect(deps.triggerAttack).not.toHaveBeenCalled();
   });
   it('normalizes the real guard and blood-aura cues into one owned cast', () => {
     for (const [id, cue] of [

@@ -1,3 +1,4 @@
+import { Vector3 } from 'three';
 import { expect, it, vi } from 'vitest';
 import { furyAudioClaimed } from '../src/fury_audio_core';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
@@ -28,6 +29,17 @@ function makeContactFx(sound: ReturnType<typeof vi.fn>) {
       return out;
     },
     flipbookAt: vi.fn(),
+    pathRibbon: vi.fn<SequencerHost['pathRibbon']>((_color, _width, _life, fill) => {
+      const points = Array.from({ length: 24 }, () => new Vector3());
+      const used = fill(points);
+      expect(used).toBeGreaterThan(0);
+      expect(used).toBeLessThanOrEqual(points.length);
+      expect(points.slice(0, used).every((point) => point.toArray().every(Number.isFinite))).toBe(
+        true,
+      );
+      return true;
+    }),
+    shakeAt: vi.fn(),
     burstAt: vi.fn(),
     pulseLight: vi.fn(),
     countPrimitive: vi.fn(),
@@ -243,6 +255,7 @@ it('storm_bolt positive damage: ready anchors claim event and play authored impa
   painter.onDamage(event);
 
   expect(furyAudioClaimed(event)).toBe(true);
+  expect(fx.pathRibbon).toHaveBeenCalledTimes(6);
   // Both shared cue functions short-circuit on the claim.
   expect(impactCueForDamage(event, target)).toBeNull();
   expect(playerSwingCueForDamage(event, source)).toBeNull();
@@ -295,6 +308,7 @@ it('storm_bolt damage cold: visible contact preserved, authored impact suppresse
   expect(furyAudioClaimed(event)).toBe(false);
   // drawWarriorHammerContact still ran: flipbook marks the visual contact.
   expect(fx.flipbookAt).toHaveBeenCalled();
+  expect(fx.pathRibbon).toHaveBeenCalledTimes(6);
   // playAudio=false path: the authored impact abilityAudio call is skipped.
   expect(sound.mock.calls.filter(([kind]) => kind === 'impact')).toHaveLength(0);
   // The shared cue is non-null, so the generic impact is available.

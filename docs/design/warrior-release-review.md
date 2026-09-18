@@ -1,4 +1,4 @@
-# Warrior review checkpoint, 18 September
+# Warrior review checkpoint, 19 September
 
 The Warrior art at `876ec612` includes the approved Red Harvest contact work,
 purpose-specific steel and blood attacks, acoustic shouts, equipment-bound
@@ -56,12 +56,45 @@ to perform an operating-system checkout roundtrip.
 
 ## Remaining release status
 
-The canonical contribution gate is still open. Its first isolated attempt
-stopped on Windows line-ending formatting differences; the corrected copy
-then stopped on the HDR manifest mismatch described above. Neither run reached
-the full test/browser/build sequence. Targeted tests and pre-push checks are
-separate evidence and do not substitute for that sequence.
+The canonical contribution gate is still open. The exact committed validation
+copy subsequently completed its full Vitest step with 3,529 passing files,
+103 failing files and 31 skipped files. It stopped there; later canonical
+stages did not run. The retained full log identifies Windows/tooling failures,
+explicit timeouts and real assertion failures. These are not all established
+baseline failures, and the run is not a passing release gate.
+
+The Warrior reconciliation corrected Bloodletting's authored torso lean from
+16 to 10 degrees. Its actual shipped blade now crosses the representative torso
+plane at 0.45990 native units, above the unchanged 0.4 minimum. All other clips,
+contact timing, foot tracks and root motion are unchanged. The original contact,
+performance, clip-map and architecture suites passed all 158 cases. Matching
+captures are retained in `docs/screenshots/warrior-readiness-v25` as
+`bloodletting-contact-before.png` and `bloodletting-contact-after.png`.
+
+Red Harvest's saturated-pool test still expected the retired tall extraction
+columns. It now verifies the approved full-width blade sweeps: two paths with
+over 12 units of lateral reach, under one unit of vertical spread, and both
+receiving seams surviving the same-frame saturated pool. The choreography and
+admission suites passed all 15 cases. No live Harvest effect was changed by this
+test correction. Contact/audio fixtures now check exact receiving-surface
+positions and the authored Bloodletting bite; their three suites passed 93 cases.
+
+The CI screenshot checkout now includes all four referenced Warrior evidence
+folders. The exact set-equality guard passed after the full run released its
+load; earlier timeout attempts remain recorded. The renderer readiness pin and
+actual callback tests preserve rejection, shutdown and generation-retirement
+coverage. Targeted passes do not retroactively turn the full gate green.
+
+The final focused Warrior check ran all 85 suites whose filenames cover Warrior,
+Fury, Harvest, Bloodletting, ribbon admission and shield outcomes: all 785 tests
+passed. The separate held-state and pulse-ownership fixture repairs passed all
+31 tests. These results establish the stated focused scope only.
 
 The public Site has not yet received this checkpoint. Publication must preserve
 the existing audience, original delivery worktree, and exact source/build
 identity. Further classes are outside this Warrior rollout.
+
+Tony has also authorized a subsequent fresh Warrior pass focused on stronger
+variation in swings, footwork, weight shifts and recovery, with coordinated
+effect and sound improvements. That follow-up is additional work, not evidence
+that this checkpoint has already completed another review cycle.

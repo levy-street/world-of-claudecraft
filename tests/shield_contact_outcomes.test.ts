@@ -2,6 +2,7 @@ import { expect, it, vi } from 'vitest';
 import { AbilityVfx, type AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vfx/sequencer';
 import type { AbilityVfxFullSpec } from '../src/render/ability_vfx_core';
+import { meleeContactHeight, meleeImpactProfile } from '../src/render/melee_impact_core';
 import { ABILITIES } from '../src/sim/data';
 
 const abilities = [
@@ -46,8 +47,9 @@ it.each(
         tier: number,
         delay = 0,
         result?: 0 | 1 | 2,
-      ) =>
-        sequencer.start(
+        contactFeedback?: () => void,
+      ) => {
+        const slot = sequencer.start(
           host,
           id,
           spec,
@@ -59,7 +61,11 @@ it.each(
           delay,
           undefined,
           result,
-        ),
+        );
+        if (!slot) return false;
+        slot.contactFeedback = contactFeedback;
+        return true;
+      },
     );
     const painter = new AbilityVfx(
       {
@@ -103,9 +109,27 @@ it.each(
     expect(vi.mocked(host.contact!).mock.calls.filter((call) => call[1] === 2)).toHaveLength(
       !secondary && outcome === 'hit' ? 1 : 0,
     );
-    expect(recipientCalls(host.flipbookAt)).toHaveLength(
-      (secondary ? outcome === 'absorbed' : collision) ? 1 : 0,
-    );
+    // Hits sit on the receiving surface toward the attacker, not the body
+    // centre. This fixture faces +X and has a two-unit-tall receiving body.
+    // Bloodletting's authored bite replaced its generic hit flipbook.
+    const primaryHit = !secondary && outcome === 'hit';
+    const bite = primaryHit && id === 'bloodthirst';
+    const surfaceOffset = primaryHit ? (bite ? 0.4 : id === 'shield_slam' ? 0.28 : 0.24) : 0;
+    const sprites = bite
+      ? vi
+          .mocked(host.bakedAt!)
+          .mock.calls.filter((call) => call[0] === 'warrior_bite')
+          .map((call) => call.slice(1))
+      : vi.mocked(host.flipbookAt).mock.calls;
+    const receivingSprites = sprites.filter((call) => call[0] === 4 - surfaceOffset);
+    expect(receivingSprites).toHaveLength((secondary ? outcome === 'absorbed' : collision) ? 1 : 0);
+    const profile = meleeImpactProfile(id);
+    if (!profile) throw new Error(`Missing tested contact profile: ${id}`);
+    for (const call of receivingSprites) {
+      expect(call[1]).toBe(meleeContactHeight(profile, 0) * 2);
+      // sin(pi/2) gives the exact X offset; cos(pi/2) leaves only roundoff in Z.
+      expect(call[2]).toBeCloseTo(0, 12);
+    }
     if (outcome !== 'hit') {
       expect(recipientCalls(host.burstAt)).toHaveLength(0);
       expect(vi.mocked(host.fragmentsAt!).mock.calls.filter((call) => call[1] === 4)).toHaveLength(

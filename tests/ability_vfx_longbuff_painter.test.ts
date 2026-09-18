@@ -228,7 +228,7 @@ describe('everything else keeps its held read', () => {
     expect(fx.holdGroundAura).not.toHaveBeenCalled();
   });
 
-  it('a physical slow retains its control tell without a generic orbit', () => {
+  it('a physical slow retains its victim mark without a generic orbit or gain swirl', () => {
     const { painter, fx, vfx } = makePainter();
 
     // The long-buff policy does not suppress this real victim-worn slow.
@@ -239,7 +239,18 @@ describe('everything else keeps its held read', () => {
     painter.syncEntity(subject);
 
     expect(fx.holdControlSignals).toHaveBeenCalledWith(subject);
+    // The orbit pool also owns fixed status sprites. Hamstring must request
+    // only its lower-body mark, never a decorative rotating band.
+    expect(fx.orbit.mock.calls).toEqual([[7, 'hamstringMark', 0xc35654, { n: 1 }, 0]]);
+    fx.orbit.mockClear();
+    subject.auras[0].remaining = 0;
+    painter.syncEntity(subject);
     expect(fx.orbit).not.toHaveBeenCalled();
+    subject.auras[0].remaining = 2;
+    subject.hp = 0;
+    painter.syncEntity(subject);
+    expect(fx.orbit).not.toHaveBeenCalled();
+    expect(fx.holdGroundAura).not.toHaveBeenCalled();
     expect(vfx.buffSwirl).not.toHaveBeenCalled();
   });
 });

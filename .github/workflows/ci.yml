@@ -648,6 +648,10 @@ jobs:
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/target-dots/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warrior-control-v25/
+            /docs/screenshots/warrior-mobility-v25/
+            /docs/screenshots/warrior-readiness-v25/
+            /docs/screenshots/warrior-reaver-v25/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -868,6 +872,10 @@ jobs:
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/target-dots/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warrior-control-v25/
+            /docs/screenshots/warrior-mobility-v25/
+            /docs/screenshots/warrior-readiness-v25/
+            /docs/screenshots/warrior-reaver-v25/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -970,6 +978,10 @@ jobs:
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/target-dots/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warrior-control-v25/
+            /docs/screenshots/warrior-mobility-v25/
+            /docs/screenshots/warrior-readiness-v25/
+            /docs/screenshots/warrior-reaver-v25/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -1255,6 +1267,10 @@ jobs:
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/target-dots/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warrior-control-v25/
+            /docs/screenshots/warrior-mobility-v25/
+            /docs/screenshots/warrior-readiness-v25/
+            /docs/screenshots/warrior-reaver-v25/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false
@@ -1355,6 +1371,10 @@ jobs:
             /docs/screenshots/release-v039-icon-art-first-pass-2026-08-16/
             /docs/screenshots/target-dots/
             /docs/screenshots/vault-fine-mark/
+            /docs/screenshots/warrior-control-v25/
+            /docs/screenshots/warrior-mobility-v25/
+            /docs/screenshots/warrior-readiness-v25/
+            /docs/screenshots/warrior-reaver-v25/
             /docs/screenshots/wildheart/
             /docs/screenshots/woc-market/
           sparse-checkout-cone-mode: false

@@ -77,6 +77,8 @@ it('keeps a full-size incision when the optional sculpture and sprite pools are 
     null,
     false,
     1,
+    null,
+    false,
   );
   expect(host.contact).toHaveBeenCalledTimes(1);
 });

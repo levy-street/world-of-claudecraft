@@ -81,7 +81,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-it('retains both Harvest extraction ribbons and receiving seams under same-frame saturation', () => {
+it('retains both full-reach Harvest blade sweeps and receiving seams under same-frame saturation', () => {
   installCanvasStub();
   const { ribbons, probe } = makeRibbons();
   try {
@@ -93,7 +93,18 @@ it('retains both Harvest extraction ribbons and receiving seams under same-frame
           Object.assign(out, { x: id === 1 ? 0 : 4, y: fraction * 2, z: 0 }),
         crestAt: () => false,
         bakedAt: () => false,
-        pathRibbon: ((colour, width, life, fill, brushed, motion, preserve, priority, sweep) =>
+        pathRibbon: ((
+          colour,
+          width,
+          life,
+          fill,
+          brushed,
+          motion,
+          preserve,
+          priority,
+          sweep,
+          follow,
+        ) =>
           ribbons.spawnPath(
             colour,
             width,
@@ -102,7 +113,7 @@ it('retains both Harvest extraction ribbons and receiving seams under same-frame
             brushed,
             motion,
             preserve,
-            false,
+            follow,
             priority,
             sweep,
           )) as SequencerHost['pathRibbon'],
@@ -121,15 +132,26 @@ it('retains both Harvest extraction ribbons and receiving seams under same-frame
       } as SeqSlot,
       2,
     );
-    const extractions = () =>
+    // The approved impact is a wide blade-directed membrane. Tall extraction
+    // columns were removed after the blood-antler review; pin its full lateral
+    // reach and low vertical profile through the actual saturated ribbon pool.
+    const bladeSweeps = () =>
       probe.arcs.filter(
         (a) =>
-          a.active && Math.max(...a.pts.map((p) => p.y)) - Math.min(...a.pts.map((p) => p.y)) > 7.5,
+          a.active && Math.max(...a.pts.map((p) => p.z)) - Math.min(...a.pts.map((p) => p.z)) > 12,
       );
-    expect(extractions()).toHaveLength(2);
+    expect(bladeSweeps()).toHaveLength(2);
+    for (const sweep of bladeSweeps()) {
+      expect(sweep.priority).toBe(1);
+      expect(
+        Math.max(...sweep.pts.map((p) => p.y)) - Math.min(...sweep.pts.map((p) => p.y)),
+      ).toBeLessThan(1);
+      expect(sweep.pts[0].distanceTo(sweep.pts[sweep.pts.length - 1])).toBeGreaterThan(12);
+    }
     expect(probe.arcs.filter((a) => a.active && a.life < 1)).toHaveLength(4);
     ribbons.update(1 / 60, CAM);
-    expect(extractions()).toHaveLength(2);
+    expect(bladeSweeps()).toHaveLength(2);
+    expect(probe.arcs.filter((a) => a.active && a.life < 1)).toHaveLength(4);
   } finally {
     ribbons.dispose();
   }

@@ -14,7 +14,7 @@ interface CompileGateHarness {
     requiredForEntry?: boolean,
   ): Promise<void> | null;
   gateSwapOnCompile(target: THREE.Object3D): void;
-  gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: () => void): void;
+  gateSwapFlagOnCompile(target: THREE.Object3D, onSettled: (prepared: boolean) => void): void;
   compileGate(target: THREE.Object3D, requiredForEntry?: boolean): Promise<unknown>;
   attachZoneFeature(
     view: { group: THREE.Group; glowLights?: THREE.PointLight[]; cullGroups?: THREE.Group[] },
@@ -183,9 +183,33 @@ describe('Renderer live shader compile rejection recovery', () => {
     renderer.gateSwapFlagOnCompile(new THREE.Group(), onSettled);
     await flushGate();
 
-    expect(onSettled).toHaveBeenCalledOnce();
+    expect(onSettled).toHaveBeenCalledExactlyOnceWith(false);
     expect(report).toHaveBeenCalledWith('Live shader compile gate failed', failure);
   });
+
+  it.each(['generation', 'shutdown'] as const)(
+    'suppresses flagged-swap settlement after renderer %s changes',
+    async (invalidation) => {
+      for (const rejects of [false, true]) {
+        const renderer = harness();
+        let finish!: () => void;
+        renderer.compileGate = () =>
+          new Promise((resolve, reject) => {
+            finish = () => (rejects ? reject(new Error('retired gate')) : resolve(true));
+          });
+        const report = vi.spyOn(console, 'error').mockImplementation(() => {});
+        const onSettled = vi.fn();
+        renderer.gateSwapFlagOnCompile(new THREE.Group(), onSettled);
+        if (invalidation === 'generation') renderer.lifecycleGeneration = 8;
+        else renderer.shutdownStarted = true;
+        finish();
+        await flushGate();
+        expect(onSettled).not.toHaveBeenCalled();
+        expect(report).not.toHaveBeenCalled();
+        report.mockRestore();
+      }
+    },
+  );
 
   it('ignores a rejection from a stale renderer generation', async () => {
     const renderer = harness();
