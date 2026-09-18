@@ -1,9 +1,11 @@
 import { WARRIOR_CONTROL_AUDIO } from '../../warrior_control_audio';
 import type { AbilityVfxRibbons } from './ribbons';
 import type { SequencerHost } from './sequencer';
+import { warriorCrushContact } from './warrior_crush_contact';
 
 const source = { x: 0, y: 0, z: 0 };
 const target = { x: 0, y: 0, z: 0 };
+const impact = { x: 0, y: 0, z: 0 };
 
 /** Flight owns the object and wake only. The damage event owns collision,
  * and the existing control painter owns the actual stun duration. */
@@ -20,7 +22,8 @@ export function launchWarriorHammer(
   ribbons.spawnTrailStyled(casterId, targetId, 0xa5bfd1, 0.2, {
     speed: 26,
     style: 'warHammer',
-    headSize: 1.3,
+    // Compensate for the painter's atlas gutter, retaining the visible size.
+    headSize: 1.3 * (70 / 64),
     coreHex: 0xe4f2ff,
     accentHex: 0xc0a269,
     coils: false,
@@ -42,8 +45,8 @@ export function launchWarriorHammer(
     });
 }
 
-/** A blunt steel collision, with a compressed dark dust body and directional
- * metal splinters. No blood, radial ground ring or second caster animation. */
+/** A blunt surface collision, with a short compression catch and directional
+ * metal splinters. No blood, floating dust body or second caster animation. */
 export function drawWarriorHammerContact(
   host: SequencerHost,
   casterId: number,
@@ -59,31 +62,37 @@ export function drawWarriorHammerContact(
   const direction = Math.atan2(at.x - from.x, at.z - from.z);
   const dx = Math.sin(direction),
     dz = Math.cos(direction);
-  host.flipbookAt(at.x, at.y, at.z, 3.1, 0xd2e6f5, 'contact_crush', 1.35, 0.22);
+  let primitives = 1;
+  impact.x = at.x;
+  impact.y = at.y;
+  impact.z = at.z;
   if (outcome === 1) {
-    host.bakedAt?.('shout_dust', at.x, at.y, at.z, 2.8, 0x576172, 0xc2ac8a, 0.32, 0, 0, direction);
+    primitives = warriorCrushContact(host, targetId, at, 0.68, direction, 4.8, tier, impact, 0.13);
     host.fragmentsAt?.(
       'metal_splinter',
-      at.x,
-      at.y,
-      at.z,
-      0xc8bba0,
+      impact.x,
+      impact.y,
+      impact.z,
+      0xc8d5df,
       tier === 0 ? 14 : 6,
       1.1,
       dx,
       dz,
-      0.3,
+      0.24,
     );
-    host.contact?.(casterId, targetId, 'physical', 0.95, 'storm_bolt', 0);
-  }
-  if (tier === 0) host.burstAt(at.x, at.y, at.z, 0xf1d29b, 16, 0.95, 'sparks', 0.23);
+    host.contact?.(casterId, targetId, 'physical-crush', 0.95, 'storm_bolt', 0);
+    host.shakeAt(impact.x, impact.y, impact.z, 0.12, true);
+    primitives++;
+  } else host.flipbookAt(at.x, at.y, at.z, 3.1, 0xd2e6f5, 'contact_crush', 1.35, 0.12);
+  if (tier === 0)
+    host.burstAt(impact.x, impact.y, impact.z, 0xe1ebf2, 16, 0.95, 'sparks', 0.13, 0.018);
   if (outcome === 1 && playAudio)
-    host.abilityAudio?.('impact', 'physical', 0.95, at.x, at.y, at.z, {
+    host.abilityAudio?.('impact', 'physical', 0.95, impact.x, impact.y, impact.z, {
       lite: tier > 0,
       abilityId: 'storm_bolt',
       sample: WARRIOR_CONTROL_AUDIO.storm_bolt.impacts[0],
     });
   host.pulseLight(targetId, 'physical', 0.85, 0.055, 2.5);
-  host.countPrimitive('storm_bolt', 1 + (outcome === 1 ? 2 : 0) + (tier === 0 ? 1 : 0));
+  host.countPrimitive('storm_bolt', primitives + (tier === 0 ? 1 : 0));
   return true;
 }

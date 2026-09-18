@@ -4,7 +4,8 @@ import type { AbilityVfxFx } from './fx';
 import type { SeqSlot, SequencerHost } from './sequencer';
 
 const source = { x: 0, y: 0, z: 0 },
-  target = { x: 0, y: 0, z: 0 };
+  target = { x: 0, y: 0, z: 0 },
+  base = { x: 0, y: 0, z: 0 };
 
 /** These zero-damage casts show the attempted action only. Armor fragments and
  * spell disruption require an authoritative aura event, not a predicted hit. */
@@ -25,7 +26,7 @@ export function drawWarriorControlAttempt(
   const reach = Math.min(1.2, Math.hypot(at.x - from.x, at.z - from.z) * 0.6);
   for (const side of [-1, 1]) {
     host.pathRibbon(
-      punch ? 0xc5d7e1 : 0xe8d0a8,
+      punch ? 0xc5d7e1 : 0xd1dbe2,
       punch ? 0.09 : 0.12,
       0.17,
       (points) => {
@@ -96,46 +97,43 @@ export function drawWarriorControlSuccess(
   const direction = from ? Math.atan2(at.x - from.x, at.z - from.z) : 0;
   const dx = Math.sin(direction),
     dz = Math.cos(direction);
-  if (!armor) {
-    // Depth-tested contact belongs on the receiving jaw surface. A centre
-    // anchor puts the authored sprite's bright core inside the skull.
-    const surface = Math.max(0.18, Math.min(0.65, (at.y - host.groundYAt(at.x, at.z)) * 0.24));
-    at.x -= dx * surface;
-    at.z -= dz * surface;
-  }
+  // The receiving silhouette follows body height, including raised platforms
+  // and large enemies. Neither impact may begin inside the body centre.
+  const feet = host.anchorOf(targetId, 0, base);
+  const bodyHeight = feet ? (at.y - feet.y) / (armor ? 0.52 : 0.78) : 2;
+  const surface = Math.max(0.18, Math.min(0.65, bodyHeight * (armor ? 0.14 : 0.19)));
+  at.x -= dx * surface;
+  at.z -= dz * surface;
   if (armor) {
-    host.flipbookAt(at.x, at.y, at.z, 2.7, 0xe5c9a0, 'contact_cut', 1.25, 0.22);
+    host.flipbookAt(at.x, at.y, at.z, 3.3, 0xdce7ef, 'contact_cut', 1.7, 0.14, 0.42, 0.65);
     for (const side of [-1, 1])
       host.fragmentsAt?.(
         'metal_splinter',
         at.x + dz * side * 0.2,
         at.y,
         at.z - dx * side * 0.2,
-        0xc7b9a0,
-        tier === 0 ? 8 : 4,
-        0.8,
+        side < 0 ? 0x788c9a : 0xd2dce4,
+        tier === 0 ? (side < 0 ? 6 : 10) : 4,
+        side < 0 ? 0.65 : 0.95,
         dx * 0.2 + dz * side,
         dz * 0.2 - dx * side,
-        0.34,
+        side < 0 ? 0.22 : 0.29,
       );
   } else {
     // A compact jaw compression earns its fractured spell core only after
     // the real lockout. No blood, flinch or extra stun stars.
-    host.flipbookAt(at.x, at.y, at.z, 2.4, 0xc6e6f5, 'contact_crush', 1.3, 0.23, 0, 0.65);
+    host.flipbookAt(at.x, at.y, at.z, 3.2, 0xe3eaf0, 'contact_crush', 1.8, 0.13, 0, 0.56);
     for (const side of [-1, 1])
       host.pathRibbon(
-        0xa5d5f2,
-        0.12,
-        0.23,
+        side < 0 ? 0x8fa9bc : 0xd8e5ed,
+        0.095,
+        side < 0 ? 0.15 : 0.18,
         (points) => {
           for (let i = 0; i < points.length; i++) {
             const u = i / (points.length - 1),
-              across = side * (0.12 + u * 0.75);
-            points[i].set(
-              at.x + dz * across,
-              at.y + Math.sin(u * Math.PI) * 0.28 - u * 0.4,
-              at.z - dx * across,
-            );
+              across = side * (0.14 + u * (side < 0 ? 0.85 : 0.68));
+            const fracture = u < 0.42 ? u * 0.24 : 0.1 - (u - 0.42) * 0.48;
+            points[i].set(at.x + dz * across, at.y + fracture * side, at.z - dx * across);
           }
           return points.length;
         },
@@ -144,7 +142,7 @@ export function drawWarriorControlSuccess(
         false,
         1,
       );
-    if (tier === 0) host.burstAt(at.x, at.y, at.z, 0xc6e6f5, 9, 0.55, 'sparks', 0.2);
+    if (tier === 0) host.burstAt(at.x, at.y, at.z, 0xd5e3ec, 9, 0.55, 'sparks', 0.1, 0.018);
   }
   host.abilityAudio?.('impact', 'physical', armor ? 0.8 : 0.6, at.x, at.y, at.z, {
     lite: tier > 0,

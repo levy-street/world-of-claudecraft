@@ -10,6 +10,8 @@ export function warriorCrushContact(
   facing: number,
   size: number,
   tier: number,
+  surfaceAt?: SeqPoint,
+  flashLife = 0.075,
 ): number {
   const body = { x: 0, y: 0, z: 0 };
   const base = host.anchorOf(targetId, 0, body);
@@ -20,6 +22,11 @@ export function warriorCrushContact(
   const relative = facing - (host.facingAt?.(targetId) ?? facing);
   const dx = Math.sin(facing),
     dz = Math.cos(facing);
+  if (surfaceAt) {
+    surfaceAt.x = at.x - dx * surface;
+    surfaceAt.y = at.y;
+    surfaceAt.z = at.z - dz * surface;
+  }
   host.flipbookAt(
     at.x - dx * surface,
     at.y,
@@ -28,7 +35,7 @@ export function warriorCrushContact(
     0xe1eaf0,
     'contact_crush',
     1.9,
-    0.075,
+    flashLife,
     0,
     0.68,
   );

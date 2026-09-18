@@ -56,19 +56,23 @@ function makeContactHost(casterX = 0, targetX = 5) {
   const burstAt = vi.fn();
   const pulseLight = vi.fn();
   const countPrimitive = vi.fn();
+  const pathRibbon = vi.fn<SequencerHost['pathRibbon']>(() => true);
+  const abilityAudio = vi.fn();
+  const shakeAt = vi.fn();
+  const target = { x: targetX, y: 3, z: 0, height: 2, yaw: 0.2, present: true };
   const host = {
-    anchorOf(id: number, _frac: number, out?: { x: number; y: number; z: number }) {
+    anchorOf(id: number, fraction: number, out?: { x: number; y: number; z: number }) {
       const o = out ?? { x: 0, y: 0, z: 0 };
       if (id === CASTER) {
         o.x = casterX;
-        o.y = 1;
+        o.y = 3 + fraction * 2;
         o.z = 0;
         return o;
       }
-      if (id === TARGET) {
-        o.x = targetX;
-        o.y = 1;
-        o.z = 0;
+      if (id === TARGET && target.present) {
+        o.x = target.x;
+        o.y = target.y + fraction * target.height;
+        o.z = target.z;
         return o;
       }
       return null;
@@ -80,8 +84,25 @@ function makeContactHost(casterX = 0, targetX = 5) {
     burstAt,
     pulseLight,
     countPrimitive,
+    pathRibbon,
+    abilityAudio,
+    shakeAt,
+    facingAt: (id: number) => (id === TARGET ? target.yaw : 0),
   } as unknown as SequencerHost;
-  return { host, flipbookAt, bakedAt, fragmentsAt, contact, burstAt, pulseLight, countPrimitive };
+  return {
+    host,
+    flipbookAt,
+    bakedAt,
+    fragmentsAt,
+    contact,
+    burstAt,
+    pulseLight,
+    countPrimitive,
+    pathRibbon,
+    abilityAudio,
+    shakeAt,
+    target,
+  };
 }
 
 // ── warriorHammerCel ─────────────────────────────────────────────────────────
@@ -204,39 +225,124 @@ it('arrival fires no predicted damage callback', () => {
 // ── drawWarriorHammerContact ─────────────────────────────────────────────────
 
 it('outcome zero creates no contact flash or collision VFX', () => {
-  const { host, flipbookAt, contact } = makeContactHost();
+  const {
+    host,
+    flipbookAt,
+    contact,
+    pathRibbon,
+    shakeAt,
+    fragmentsAt,
+    bakedAt,
+    burstAt,
+    abilityAudio,
+  } = makeContactHost();
   drawWarriorHammerContact(host, CASTER, TARGET, 0, 0);
   expect(flipbookAt).not.toHaveBeenCalled();
   expect(contact).not.toHaveBeenCalled();
+  for (const effect of [pathRibbon, shakeAt, fragmentsAt, bakedAt, burstAt, abilityAudio])
+    expect(effect).not.toHaveBeenCalled();
 });
 
 it('absorbed outcome emits a contact flash but no flesh reaction or metal fragments', () => {
-  const { host, flipbookAt, bakedAt, fragmentsAt, contact } = makeContactHost();
+  const {
+    host,
+    flipbookAt,
+    bakedAt,
+    fragmentsAt,
+    contact,
+    pathRibbon,
+    shakeAt,
+    abilityAudio,
+    burstAt,
+  } = makeContactHost();
   drawWarriorHammerContact(host, CASTER, TARGET, 2, 0);
   expect(flipbookAt).toHaveBeenCalledOnce();
   expect(flipbookAt.mock.calls[0][5]).toBe('contact_crush'); // impact sheet
   expect(bakedAt).not.toHaveBeenCalled(); // no shout_dust flesh reaction
   expect(fragmentsAt).not.toHaveBeenCalled(); // no metal_splinter fragments
   expect(contact).not.toHaveBeenCalled(); // no hit registration
+  for (const effect of [pathRibbon, shakeAt, abilityAudio]) expect(effect).not.toHaveBeenCalled();
+  expect(burstAt.mock.calls.every((call) => call[6] === 'sparks')).toBe(true);
 });
 
-it('actual hit registers recipient contact once and does not fire a caster attack', () => {
-  const { host, contact, flipbookAt, bakedAt, fragmentsAt } = makeContactHost();
-  drawWarriorHammerContact(host, CASTER, TARGET, 1, 0);
-
-  // Recipient contact registered exactly once
-  expect(contact).toHaveBeenCalledTimes(1);
-  const [sourceId, targetId] = contact.mock.calls[0] as [number, number];
-  expect(sourceId).toBe(CASTER);
-  expect(targetId).toBe(TARGET);
-
-  // Physical hit adds dust reaction and metal splinters
-  expect(bakedAt).toHaveBeenCalledOnce();
-  expect(fragmentsAt).toHaveBeenCalledOnce();
-
-  // Impact flash present
-  expect(flipbookAt).toHaveBeenCalledOnce();
-});
+it.each([0, 1])(
+  'actual hit owns one surface collision and live body creases at tier %s',
+  (tier) => {
+    const {
+      host,
+      contact,
+      flipbookAt,
+      bakedAt,
+      fragmentsAt,
+      pathRibbon,
+      abilityAudio,
+      shakeAt,
+      burstAt,
+      target,
+    } = makeContactHost();
+    drawWarriorHammerContact(host, CASTER, TARGET, 1, tier);
+    expect(contact).toHaveBeenCalledExactlyOnceWith(
+      CASTER,
+      TARGET,
+      'physical-crush',
+      0.95,
+      'storm_bolt',
+      0,
+    );
+    expect(bakedAt).not.toHaveBeenCalled();
+    expect(fragmentsAt).toHaveBeenCalledOnce();
+    expect(flipbookAt).toHaveBeenCalledOnce();
+    const surface = [target.x - target.height * 0.14, target.y + target.height * 0.68, target.z];
+    const flash = flipbookAt.mock.calls[0];
+    surface.forEach((coordinate, i) => {
+      expect(flash[i]).toBeCloseTo(coordinate);
+    });
+    expect(flash[5]).toBe('contact_crush');
+    expect(flash[3]).toBe(4.8);
+    expect(flash[7]).toBe(0.13);
+    expect(fragmentsAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
+    expect(fragmentsAt.mock.calls[0][5]).toBe(tier === 0 ? 14 : 6);
+    expect(abilityAudio).toHaveBeenCalledTimes(1);
+    expect(abilityAudio.mock.calls[0].slice(3, 6)).toEqual(flash.slice(0, 3));
+    expect(shakeAt).toHaveBeenCalledExactlyOnceWith(...flash.slice(0, 3), 0.12, true);
+    expect(burstAt.mock.calls.every((call) => call[6] === 'sparks')).toBe(true);
+    for (const burst of burstAt.mock.calls) expect(burst.slice(0, 3)).toEqual(flash.slice(0, 3));
+    const creases = pathRibbon.mock.calls;
+    expect(creases).toHaveLength(tier === 0 ? 6 : 2);
+    expect(creases.every((call) => call[9] === true)).toBe(true);
+    const sample = (call: Parameters<SequencerHost['pathRibbon']>) => {
+      const points = Array.from({ length: 25 }, () => new THREE.Vector3());
+      expect(call[3](points)).toBe(points.length);
+      expect(points.every((point) => point.toArray().every(Number.isFinite))).toBe(true);
+      return points;
+    };
+    const before = creases.map(sample);
+    const pivot = new THREE.Vector3(target.x, target.y, target.z);
+    const translation = new THREE.Vector3(2, 1, 3);
+    target.x += translation.x;
+    target.y += translation.y;
+    target.z += translation.z;
+    target.yaw += 0.8;
+    creases.forEach((call, i) => {
+      const after = sample(call);
+      before[i].forEach((point, j) => {
+        const expected = point
+          .clone()
+          .sub(pivot)
+          .applyAxisAngle(new THREE.Vector3(0, 1, 0), 0.8)
+          .add(pivot)
+          .add(translation);
+        expect(after[j].distanceTo(expected)).toBeLessThan(1e-8);
+      });
+    });
+    target.present = false;
+    for (const crease of creases)
+      expect(crease[3]([new THREE.Vector3(), new THREE.Vector3()])).toBe(0);
+    expect(contact).toHaveBeenCalledTimes(1);
+    expect(abilityAudio).toHaveBeenCalledTimes(1);
+    expect(shakeAt).toHaveBeenCalledTimes(1);
+  },
+);
 
 it.each([CASTER, TARGET])('cancels only hammers involving dead participant %s', (entityId) => {
   const { textures, texture } = fakeTextures();

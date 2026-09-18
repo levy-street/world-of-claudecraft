@@ -19,7 +19,7 @@ export function holdWarriorControlMark(
   fx.orbit(
     id,
     armor ? 'armorShear' : 'hamstringMark',
-    armor ? 0xe7c797 : 0xc35654,
+    armor ? 0xd2dce4 : 0xc35654,
     STACKS[stack - 1],
     0,
   );

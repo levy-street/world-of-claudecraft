@@ -87,16 +87,28 @@ export class WarriorReadinessShapes {
     reduced: boolean,
     blood: boolean,
   ): void {
-    // Three short reflections lie on the equipment face. There is no drawn
-    // outline, bolt, or line extending past the tip of the actual weapon.
-    for (let facet = 0; facet < 3; facet++) {
-      const along = -0.35 + facet * 0.43;
-      const light = reduced ? 0.72 : 0.58 + 0.24 * Math.sin(time * 2.2 - facet * 1.7) ** 4;
-      this.points[0].copy(this.center).addScaledVector(this.along, along * this.length);
-      this.points[1].copy(this.points[0]).addScaledVector(this.along, this.length * 0.15);
-      ribbons.appendHeld(this.points, 2, blood ? 0.085 : 0.065, color, light);
+    // One oblique reflection travels across the real face. A white material
+    // catch sits inside the spec tint instead of three disconnected stripes.
+    const phase = reduced ? 0.58 : (((time * 0.6) % 1) + 1) % 1;
+    const along = -0.62 + phase * 1.3;
+    // Disappear before wrapping to the hilt; the return must never pop.
+    const edge = Math.min(1, phase / 0.16, (1 - phase) / 0.16);
+    const envelope = edge * edge * (3 - 2 * edge);
+    const light = reduced ? 0.85 : (0.55 + Math.sin(phase * Math.PI) * 0.55) * envelope;
+    for (let i = 0; i < 4; i++) {
+      const u = i / 3 - 0.5;
+      this.points[i]
+        .copy(this.center)
+        .addScaledVector(this.along, (along + u * 0.2) * this.length)
+        .addScaledVector(this.across, u * Math.min(0.16, this.length * 0.2))
+        .addScaledVector(this.normal, 0.018);
     }
-    this.points[0].copy(this.center).addScaledVector(this.along, this.length * 0.66);
+    ribbons.appendHeld(this.points, 4, blood ? 0.085 : 0.065, color, light);
+    ribbons.appendHeld(this.points, 4, 0.023, blood ? 0xffc9cb : 0xf1f5f6, light * 1.35);
+    this.points[0]
+      .copy(this.center)
+      .addScaledVector(this.along, along * this.length)
+      .addScaledVector(this.normal, 0.025);
     overlay.push(
       this.points[0].x,
       this.points[0].y,
@@ -104,7 +116,7 @@ export class WarriorReadinessShapes {
       blood ? 0xee4951 : 0xe2e8e4,
       blood ? 0.28 : 0.2,
       OVERLAY_CELL.glow,
-      0.38,
+      0.3 * light,
       0.8,
     );
   }

@@ -94,7 +94,11 @@ it('peels the actual recipient on an authoritative armor refresh, without damage
   ).toBe(true);
   h.seq.update(h.host, 0);
   expect(h.host.fragmentsAt).toHaveBeenCalledTimes(2);
-  expect(vi.mocked(h.host.flipbookAt).mock.calls[0].slice(0, 3)).toEqual([6, 1.04, 0]);
+  const impact = vi.mocked(h.host.flipbookAt).mock.calls[0];
+  // Two-unit body, struck from its -X side: the peel sits .28 outside its centre.
+  expect(impact[0]).toBeCloseTo(6 - 2 * 0.14);
+  expect(impact[1]).toBeCloseTo(1.04);
+  expect(impact[2]).toBeCloseTo(0);
   expect(h.host.contact).not.toHaveBeenCalled();
   expect(h.host.burstAt).not.toHaveBeenCalled();
 });
