@@ -1488,7 +1488,11 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    ceiling: 10076,
+    // LOWERED 10076 -> 9993 at the target-echo fix: the input seq fold (the R9
+    // gap booking plus the ack high-water) moved to server/input_seq.ts, now
+    // shared by the input frame and the seq-bearing 'target' command. Measured
+    // with wc -l < server/game.ts after biome. Exact count, zero slack.
+    ceiling: 9993,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1638,7 +1642,12 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the board path builder, the page decode and the
     // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
     // with the book_wire extraction above; exact merged count, zero slack.
-    ceiling: 5498,
+    // LOWERED 5498 -> 5426 at the target-echo fix: the pending-target echo
+    // decision (the hold, its ack release, the valve) moved to
+    // src/net/target_echo.ts, banking the 52 lines of slack the row already
+    // carried with it. Measured with wc -l < src/net/online.ts after biome.
+    // Exact count, zero slack.
+    ceiling: 5426,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

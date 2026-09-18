@@ -312,6 +312,7 @@ import { guildRosterTransport } from './guild_roster_transport';
 import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';
 import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
+import { foldReceivedInputSeq } from './input_seq';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import {
   BG_MATCH_DROP_RADIUS,
@@ -377,7 +378,6 @@ import {
   consumeInboundFrame,
   createMsgRateBucket,
   MSG_RATE_KICK_REASON,
-  MSG_SEQ_GAP_SANITY,
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
@@ -6212,21 +6212,10 @@ export class GameServer {
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = applyMovementInputFrame(session, meta, e, msg, sim.time, sim.ctx);
-      if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
-        const seq = Math.floor(msg.seq);
-        // R9: the client seq is a per-send increment on an ordered socket, so
-        // a forward jump past the receive high-water proves the missing seqs were
-        // sent and never processed (the input-frame-attributed share of the
-        // server's own drops). Guarded to a positive high-water because resume
-        // zeroes it while the client restarts its counter on reconnect, and
-        // capped so a reset mismatch never books a giant gap.
-        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
-          gameMetricsCounters().wsInputSeqGap(
-            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
-          );
-        }
-        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
-      }
+      // R9 gap booking + the ack high-water (server/input_seq.ts).
+      foldReceivedInputSeq(session, msg.seq, (missed) =>
+        gameMetricsCounters().wsInputSeqGap(missed),
+      );
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
     }
@@ -6241,6 +6230,14 @@ export class GameServer {
       this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
+    // A seq-bearing command (the client's 'target') rides the input seq stream
+    // and folds at RECEIPT, before any lane verdict, so the self snapshot's ack
+    // stays an in-order receipt high-water for the whole socket: the online
+    // mirror reads a covering ack as "built after my command" and adopts that
+    // snapshot's target as the verdict (src/net/target_echo.ts). A lane-dropped
+    // command is acked too, and the mirror then yields to the server's value,
+    // which is exactly right for a command that never ran.
+    foldReceivedInputSeq(session, msg.seq, (missed) => gameMetricsCounters().wsInputSeqGap(missed));
     if (session.spectating) {
       if (msg.cmd === 'unstuck') {
         this.sendUnstuckBlocked(session, 'spectating');
