@@ -9,25 +9,85 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "es_ES": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "fr_FR": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "fr_CA": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "de_DE": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "nl_NL": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "pl_PL": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "id_ID": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "tr_TR": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "sv_SE": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "vi_VN": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ],
+  "da_DK": [
+    "entities.zones.eastbrook_vale.welcomeDone",
+    "entities.zones.mirefen_marsh.welcomeDone",
+    "entities.zones.thornpeak_heights.welcomeDone"
+  ]
 };

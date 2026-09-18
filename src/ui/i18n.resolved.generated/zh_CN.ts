@@ -20259,6 +20259,7 @@ export const zh_CN: EnTranslations = {
       "eastbrook_vale": {
         "name": "东溪谷",
         "welcome": "去镇上找雷德布鲁克元帅，他有任务交给你。",
+        "welcomeDone": "一座古朴的海滨小镇，冒险者们在此踏上旅途。",
         "pois": {
           "0": {
             "label": "东溪"
@@ -20304,6 +20305,7 @@ export const zh_CN: EnTranslations = {
       "mirefen_marsh": {
         "name": "泥沼湿地",
         "welcome": "到芬桥大门向守望者芬威克报到。",
+        "welcomeDone": "一处坐落于沼泽湿地深处的聚落。",
         "pois": {
           "0": {
             "label": "芬桥"
@@ -20334,6 +20336,7 @@ export const zh_CN: EnTranslations = {
       "thornpeak_heights": {
         "name": "荆峰高地",
         "welcome": "瑟萨莉队长勉强守住高望城墙。",
+        "welcomeDone": "瑟萨莉队长守卫着高望城墙 - 从来都不轻松，但有了像你这样的冒险者相助，如今总算应付得来。",
         "pois": {
           "0": {
             "label": "高望"

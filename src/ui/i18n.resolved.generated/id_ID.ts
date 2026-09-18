@@ -20259,6 +20259,7 @@ export const id_ID: EnTranslations = {
       "eastbrook_vale": {
         "name": "Lembah Eastbrook",
         "welcome": "Temui Marsekal Redbrook di kota, ia punya tugas untukmu.",
+        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20304,6 +20305,7 @@ export const id_ID: EnTranslations = {
       "mirefen_marsh": {
         "name": "Rawa Mirefen",
         "welcome": "Lapor pada Warden Fenwick di gerbang Jembatan Rawa.",
+        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
         "pois": {
           "0": {
             "label": "Jembatan Rawa"
@@ -20334,6 +20336,7 @@ export const id_ID: EnTranslations = {
       "thornpeak_heights": {
         "name": "Dataran Tinggi Thornpeak",
         "welcome": "Kapten Thessaly mempertahankan tembok di Menara Pengawas, nyaris saja.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Menara Pengawas"

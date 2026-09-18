@@ -286,7 +286,6 @@ import {
   questNarrative,
   questObjectiveLabel,
   questTitle,
-  zoneWelcome,
 } from './entity_display_core';
 import {
   classDisplayName,
@@ -926,6 +925,7 @@ import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
 import { XpBarPainter } from './xp_bar_painter';
 import { YumiMatchPainter } from './yumi_match_painter';
+import { zoneEntryLine } from './zone_entry_line_core';
 
 let lpAdvancedLast = -1;
 
@@ -14080,8 +14080,8 @@ export class Hud {
   }
 
   private logZoneWelcome(zone: ZoneDef): void {
-    if (zone.welcomeQuestId && this.sim.questState(zone.welcomeQuestId) !== 'available') return;
-    this.log(zoneWelcome(zone.id), HUD_LOG.NOTICE);
+    const line = zoneEntryLine(zone, this.sim);
+    if (line) this.log(line, HUD_LOG.NOTICE);
   }
 
   private chatLogFrom(

@@ -20259,6 +20259,7 @@ export const pl_PL: EnTranslations = {
       "eastbrook_vale": {
         "name": "Dolina Wschodniego Strumienia",
         "welcome": "Odszukaj Marszałka Redbrooka w mieście, ma dla ciebie zadanie.",
+        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20304,6 +20305,7 @@ export const pl_PL: EnTranslations = {
       "mirefen_marsh": {
         "name": "Trzęsawisko Mokrzawia",
         "welcome": "Zamelduj się u Strażnika Fenwicka przy bramie Mostu na Trzęsawisku.",
+        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
         "pois": {
           "0": {
             "label": "Most na Trzęsawisku"
@@ -20334,6 +20336,7 @@ export const pl_PL: EnTranslations = {
       "thornpeak_heights": {
         "name": "Wyżyny Ciernistego Szczytu",
         "welcome": "Kapitan Thessaly utrzymuje mur w Wysokiej Strażnicy, ledwie.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Wysoka Strażnica"

@@ -188,6 +188,7 @@ export const ZONE1_ZONE: ZoneDef = {
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
+  welcomeDone: 'A quaint seaside town where adventurers come to start their journey.',
 };
 
 // ---------------------------------------------------------------------------

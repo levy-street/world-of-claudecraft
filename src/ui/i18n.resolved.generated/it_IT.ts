@@ -20259,6 +20259,7 @@ export const it_IT: EnTranslations = {
       "eastbrook_vale": {
         "name": "Valle di Eastbrook",
         "welcome": "Cerca il maresciallo Redbrook in città: ha lavoro per te.",
+        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
         "pois": {
           "0": {
             "label": "Eastbrook"
@@ -20304,6 +20305,7 @@ export const it_IT: EnTranslations = {
       "mirefen_marsh": {
         "name": "Palude di Mirefen",
         "welcome": "Presentati al custode Fenwick al cancello di Fenbridge.",
+        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
         "pois": {
           "0": {
             "label": "Fenbridge"
@@ -20334,6 +20336,7 @@ export const it_IT: EnTranslations = {
       "thornpeak_heights": {
         "name": "Alture di Thornpeak",
         "welcome": "Il capitano Thessaly tiene a stento il muro di Highwatch.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Highwatch"

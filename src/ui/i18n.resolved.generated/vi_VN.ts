@@ -20259,6 +20259,7 @@ export const vi_VN: EnTranslations = {
       "eastbrook_vale": {
         "name": "Thung Lũng Đông Khê",
         "welcome": "Hãy tìm Thống Chế Redbrook trong thị trấn, ông ấy có việc cho ngươi.",
+        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
         "pois": {
           "0": {
             "label": "Đông Khê"
@@ -20304,6 +20305,7 @@ export const vi_VN: EnTranslations = {
       "mirefen_marsh": {
         "name": "Đầm Lầy Bùn Sâu",
         "welcome": "Hãy trình diện Hộ Vệ Fenwick tại cổng Cầu Đầm.",
+        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
         "pois": {
           "0": {
             "label": "Cầu Đầm"
@@ -20334,6 +20336,7 @@ export const vi_VN: EnTranslations = {
       "thornpeak_heights": {
         "name": "Cao Nguyên Đỉnh Gai",
         "welcome": "Đội Trưởng Thessaly đang trấn giữ bức tường ở Vọng Đài Cao, vất vả lắm mới giữ nổi.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Vọng Đài Cao"

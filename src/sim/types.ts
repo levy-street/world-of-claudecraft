@@ -4161,6 +4161,9 @@ export interface ZoneDef {
   pois: { x: number; z: number; label: string; id?: string; hideOnMap?: boolean }[];
   welcome: string; // chat-log hint shown on first entry
   welcomeQuestId?: string; // only show the hint while this quest is available
+  // Replaces the welcome hint on entry once every town quest of the zone is
+  // turned in (sim/town_quests.ts). Zones without it keep the welcome rule only.
+  welcomeDone?: string;
   // The zone's southern border ridge has NO road pass and is raised past the
   // climbable slope: the zone is reachable only by portal (see world.ts).
   sealedSouthBorder?: boolean;

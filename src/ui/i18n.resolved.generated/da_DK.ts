@@ -20259,6 +20259,7 @@ export const da_DK: EnTranslations = {
       "eastbrook_vale": {
         "name": "Østbæk Dal",
         "welcome": "Find Marskal Redbrook i byen, han har arbejde til dig.",
+        "welcomeDone": "A quaint seaside town where adventurers come to start their journey.",
         "pois": {
           "0": {
             "label": "Østbæk"
@@ -20304,6 +20305,7 @@ export const da_DK: EnTranslations = {
       "mirefen_marsh": {
         "name": "Mosekær Sump",
         "welcome": "Meld dig til Vogter Fenwick ved Sumpbroens port.",
+        "welcomeDone": "A settlement sitting deep within the marshy swamplands.",
         "pois": {
           "0": {
             "label": "Sumpbroen"
@@ -20334,6 +20336,7 @@ export const da_DK: EnTranslations = {
       "thornpeak_heights": {
         "name": "Tornetop Højder",
         "welcome": "Kaptajn Thessaly holder muren ved Højvagten, knap nok.",
+        "welcomeDone": "Captain Thessaly holds the wall at Highwatch - it's never easy, but with the help of adventurers like you it's now manageable.",
         "pois": {
           "0": {
             "label": "Højvagten"

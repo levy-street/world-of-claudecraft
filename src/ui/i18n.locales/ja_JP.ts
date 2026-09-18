@@ -5007,6 +5007,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.name': 'イーストブルック渓谷',
   'entities.zones.eastbrook_vale.welcome':
     '町のレッドブルック元帥を訪ねてください。あなたに頼みたい仕事があります。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '冒険者たちが旅立ちの一歩を踏み出す、趣のある海辺の町。',
   'entities.zones.eastbrook_vale.pois.0.label': 'イーストブルック',
   'entities.zones.eastbrook_vale.pois.1.label': '狼の道',
   'entities.zones.eastbrook_vale.pois.2.label': '猪の草地',
@@ -5018,6 +5020,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.name': 'マイアフェン湿地',
   'entities.zones.mirefen_marsh.welcome':
     'フェンブリッジの門で番人フェンウィックに報告してください。',
+  'entities.zones.mirefen_marsh.welcomeDone': '沼地の湿原の奥深くにたたずむ集落。',
   'entities.zones.mirefen_marsh.pois.0.label': 'フェンブリッジ',
   'entities.zones.mirefen_marsh.pois.1.label': '徘徊者の葦原',
   'entities.zones.mirefen_marsh.pois.2.label': 'ディープフェンの浅瀬',
@@ -5029,6 +5032,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.zones.thornpeak_heights.name': 'ソーンピーク高地',
   'entities.zones.thornpeak_heights.welcome':
     'テサリー隊長がかろうじてハイウォッチの壁を保っています。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    'テサリー隊長がハイウォッチの壁を守っています - 決して楽ではありませんが、あなたのような冒険者たちの助けで今は何とか持ちこたえています。',
   'entities.zones.thornpeak_heights.pois.0.label': 'ハイウォッチ',
   'entities.zones.thornpeak_heights.pois.1.label': '追跡者の尾根',
   'entities.zones.thornpeak_heights.pois.2.label': 'ディープロックの巣穴',
