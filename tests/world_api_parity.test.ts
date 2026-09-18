@@ -187,6 +187,8 @@ export const IWORLD_MEMBERS = [
   { name: 'unequipBag', kind: 'method' },
   { name: 'changeSkin', kind: 'method' },
   { name: 'claimEventSkin', kind: 'method' },
+  { name: 'claimFounderPack', kind: 'method' },
+  { name: 'claimFounderSkin', kind: 'method' },
   { name: 'unequipMechChroma', kind: 'method' },
   { name: 'changeWeaponSkin', kind: 'method' },
   { name: 'changeMountSkin', kind: 'method' },
@@ -855,9 +857,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet-file exhaustiveness checks (AssertNever) also pass on the fully
     // resolved production tree.
-    expect(IWORLD_MEMBERS.length).toBe(371);
+    // +2 for claimFounderPack/claimFounderSkin (The Founder Salesman,
+    // sim/content/founder_pack.ts), both methods: 373 members, 103 data, 270
+    // methods.
+    expect(IWORLD_MEMBERS.length).toBe(373);
     expect(DATA_MEMBERS.length).toBe(103);
-    expect(METHOD_MEMBERS.length).toBe(268);
+    expect(METHOD_MEMBERS.length).toBe(270);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -940,6 +945,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'chat',
       'civicServicePlacements',
       'claimEventSkin',
+      'claimFounderPack',
+      'claimFounderSkin',
       'clearGatheringGoal',
       'clearMarker',
       'collectDelveChestLoot',
@@ -1395,6 +1402,8 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'characterProfile',
       'chat',
       'claimEventSkin',
+      'claimFounderPack',
+      'claimFounderSkin',
       'clearGatheringGoal',
       'clearMarker',
       'collectDelveChestLoot',
@@ -1820,6 +1829,8 @@ const FACET_COSMETICS = [
   'accountCosmetics',
   'changeSkin',
   'claimEventSkin',
+  'claimFounderPack',
+  'claimFounderSkin',
   'unequipMechChroma',
   'changeWeaponSkin',
   'changeMountSkin',
@@ -2367,8 +2378,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // tests/world_api_parity.test.ts` before merge lands to confirm the
     // facet arrays actually reconstruct IWORLD_MEMBERS with no gaps or
     // collisions; this pin and the one above must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(371);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(371);
+    // +2 for claimFounderPack/claimFounderSkin (The Founder Salesman).
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(373);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(373);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

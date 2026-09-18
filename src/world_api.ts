@@ -483,6 +483,8 @@ export const COMMAND_NAMES = [
   'change_skin',
   'unequip_mech_chroma',
   'claim_event_skin',
+  'claim_founder_pack',
+  'claim_founder_skin',
   'change_weapon_skin',
   'release',
   'challengeResponse',
@@ -978,6 +980,8 @@ export const COMMAND_FACETS = {
   // IWorldCosmetics: skin + mech-chroma equips (snake_case wire strings, by design).
   change_skin: 'IWorldCosmetics',
   claim_event_skin: 'IWorldCosmetics',
+  claim_founder_pack: 'IWorldCosmetics',
+  claim_founder_skin: 'IWorldCosmetics',
   unequip_mech_chroma: 'IWorldCosmetics',
   change_weapon_skin: 'IWorldCosmetics',
   stow_weapon: 'IWorldCosmetics',

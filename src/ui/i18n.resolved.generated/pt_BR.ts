@@ -1456,6 +1456,9 @@ export const pt_BR: EnTranslations = {
       "name_lanternback_troll": "Grumbol, o Lanterna Dorso",
       "name_chimeglass_tortoise": "Tolliver o Chimeglass",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
+      "name_cinderjaw_rex": "Cinderjaw Rex",
+      "name_ancient_devourer": "Ancient Devourer",
+      "name_shiba_inu": "Shiba Inu",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_stalkglider_snail": "Um caracol valente e de queima lenta que aumenta a velocidade de viagem.",
@@ -1471,6 +1474,9 @@ export const pt_BR: EnTranslations = {
       "desc_mech_bird": "Uma galinha de guerra mecânica construída à mão que corre em servos em movimento, com a chave de corda ainda girando.",
       "desc_lanternback_troll": "Um troll das colinas quebrado no jugo por acendedores de lampiões, carregando um trono de ferro sobre os ombros com uma lanterna de tempestade acesa em cada braço.",
       "desc_chimeglass_tortoise": "Uma tartaruga das salinas que ultrapassou três gerações de caravanas. Os funileiros moeram-lhe óculos de vidro e penduraram um sino de bronze em sua garganta, para que a estrada o ouça muito antes de vê-lo.",
+      "desc_cinderjaw_rex": "A Founder's Pack exclusive: a saddle-broken rex whose jaw still smolders from the volcanic clutch it hatched in.",
+      "desc_ancient_devourer": "A Founder's Pack exclusive: an ancient, ravenous beast broken to the saddle long after every other tamer gave up.",
+      "desc_shiba_inu": "A Founder's Pack exclusive: a very good boy, sized up for the road and utterly unbothered by any of it.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
     },
     "mountTraining": {
@@ -2104,6 +2110,39 @@ export const pt_BR: EnTranslations = {
       "buyAria": "Comprar {item} por {honor}",
       "buyOwnedAria": "Comprar {item} por {honor}, já possuído",
       "buyConfirmBody": "Comprar {item} por {honor}? Compras com Honra não podem ser reembolsadas."
+    },
+    "founderShop": {
+      "gossipOption": "CLAIM YOUR FOUNDER PACK",
+      "gossipOptionAria": "Open the Founder Pack store offered by {name}",
+      "title": "Founder's Packs",
+      "close": "Close",
+      "tierUncommon": "Uncommon Founder Pack",
+      "tierRare": "Rare Founder Pack",
+      "tierEpic": "Epic Founder Pack",
+      "titleReward": "Title: {title}",
+      "mountPicks": "Choose {count} of 3 new mounts",
+      "mountPickOne": "Choose 1 of 3 new mounts",
+      "petReward": "{pet} companion (+{slots} bag slots)",
+      "skinPicks": "{claimed} of {total} full-body skins claimed",
+      "claudiumReward": "+{amount} Claudium for the store",
+      "goldenAuraReward": "Cosmetic: Golden Aura",
+      "walletRequirement": "Requires at least {amount} $WOC in your linked wallet",
+      "walletNotLinked": "Link a wallet to check your $WOC balance.",
+      "tradeableNote": "All Founder's Packs become tradeable starting from version 1.0.",
+      "claimButton": "Claim",
+      "claimedButton": "Claimed",
+      "claimConfirmTitle": "Claim this Founder Pack?",
+      "claimConfirmBody": "You may only claim one Founder Pack per account, ever. Continue?",
+      "pickSkinTitle": "Choose a full-body skin",
+      "pickSkinConfirmBody": "Claim the {skin} skin for your {class}? This uses one of your {remaining} remaining skin picks.",
+      "pickMountTitle": "Choose a mount",
+      "insufficientBalance": "Your linked wallet does not hold enough $WOC for this pack.",
+      "accountNotEligible": "Your account has already claimed a Founder's Pack.",
+      "noPicksRemaining": "You have claimed every skin this pack allows.",
+      "wrongClassForSkin": "This skin is restricted to a different class.",
+      "previewTitle": "Preview",
+      "previewEmpty": "Pick a skin or a mount to preview it here.",
+      "previewSkinAria": "Preview the {skin} skin"
     },
     "charSheet": {
       "offense": "Ataque",
@@ -20460,6 +20499,11 @@ export const pt_BR: EnTranslations = {
         "sender": "O Intendente Heroico",
         "subject": "Seus Núcleos de Wyrmfall",
         "body": "A fera caiu enquanto você lutava montado ou no chão. Sua parte dos Núcleos de Wyrmfall chega até você aqui, em vez de se perder para os saqueadores de cadáveres. Use-os bem em uma bancada.\n\n  O Intendente Heroico"
+      },
+      "founder_pack_reward": {
+        "sender": "The Founder Salesman",
+        "subject": "Your Founder's Pack",
+        "body": "Thank you again for backing World of Claudecraft. Here is a piece of your Founder's Pack, account-bound and yours to keep. Mail it to any other character on your account whenever you like.\n\n- The Founder Salesman"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "A Guilda de Artesanato",

@@ -1598,6 +1598,8 @@ export type { AccountCosmetics } from './account_cosmetics_db';
 // live in server/account_cosmetics_db.ts; re-exported so every caller and test
 // double keeps importing them from here.
 export {
+  claimAccountFounderPackTier,
+  grantAccountFounderSkin,
   grantAccountMechChroma,
   grantAccountMountSkins,
   grantAccountWeaponSkins,

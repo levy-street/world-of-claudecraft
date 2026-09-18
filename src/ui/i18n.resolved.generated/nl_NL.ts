@@ -1456,6 +1456,9 @@ export const nl_NL: EnTranslations = {
       "name_lanternback_troll": "Grumbol de Lantaarnrug",
       "name_chimeglass_tortoise": "Tolliver het klokkenspel",
       "name_rickshaw_mount": "Beengebonden Riksja",
+      "name_cinderjaw_rex": "Cinderjaw Rex",
+      "name_ancient_devourer": "Ancient Devourer",
+      "name_shiba_inu": "Shiba Inu",
       "desc_valorsteed": "Een sterk, standvastig strijdros dat extra reissnelheid geeft.",
       "desc_grag_bear": "Een sterke, standvastige beer die extra reissnelheid geeft.",
       "desc_stalkglider_snail": "Een taaie, langzaam brandende slak die extra reissnelheid geeft.",
@@ -1471,6 +1474,9 @@ export const nl_NL: EnTranslations = {
       "desc_mech_bird": "Een met de hand gebouwde oorlogskip die sprint op klikkende servo's terwijl de opwindsleutel nog draait.",
       "desc_lanternback_troll": "Een heuveltrol die door lantaarnopstekers tot aan zijn juk werd gebroken, met een ijzeren troon op zijn schouders en een stormlantaarn die aan beide armen brandde.",
       "desc_chimeglass_tortoise": "Een zoutvlakteschildpad die drie generaties karavanen is ontlopen. Tinkers hebben een bril van stormglas voor hem geslepen en een bronzen bel om zijn keel gehangen, zodat de weg hem lang hoort voordat hij hem ziet.",
+      "desc_cinderjaw_rex": "A Founder's Pack exclusive: a saddle-broken rex whose jaw still smolders from the volcanic clutch it hatched in.",
+      "desc_ancient_devourer": "A Founder's Pack exclusive: an ancient, ravenous beast broken to the saddle long after every other tamer gave up.",
+      "desc_shiba_inu": "A Founder's Pack exclusive: a very good boy, sized up for the road and utterly unbothered by any of it.",
       "desc_rickshaw_mount": "Een ratelende bottenkar met een benige handlanger aan de disselbomen, die je in volle vaart voortsleurt."
     },
     "mountTraining": {
@@ -2104,6 +2110,39 @@ export const nl_NL: EnTranslations = {
       "buyAria": "Koop {item} voor {honor}",
       "buyOwnedAria": "Koop {item} voor {honor}, al in bezit",
       "buyConfirmBody": "{item} kopen voor {honor}? Aankopen met Eer kunnen niet worden terugbetaald."
+    },
+    "founderShop": {
+      "gossipOption": "CLAIM YOUR FOUNDER PACK",
+      "gossipOptionAria": "Open the Founder Pack store offered by {name}",
+      "title": "Founder's Packs",
+      "close": "Close",
+      "tierUncommon": "Uncommon Founder Pack",
+      "tierRare": "Rare Founder Pack",
+      "tierEpic": "Epic Founder Pack",
+      "titleReward": "Title: {title}",
+      "mountPicks": "Choose {count} of 3 new mounts",
+      "mountPickOne": "Choose 1 of 3 new mounts",
+      "petReward": "{pet} companion (+{slots} bag slots)",
+      "skinPicks": "{claimed} of {total} full-body skins claimed",
+      "claudiumReward": "+{amount} Claudium for the store",
+      "goldenAuraReward": "Cosmetic: Golden Aura",
+      "walletRequirement": "Requires at least {amount} $WOC in your linked wallet",
+      "walletNotLinked": "Link a wallet to check your $WOC balance.",
+      "tradeableNote": "All Founder's Packs become tradeable starting from version 1.0.",
+      "claimButton": "Claim",
+      "claimedButton": "Claimed",
+      "claimConfirmTitle": "Claim this Founder Pack?",
+      "claimConfirmBody": "You may only claim one Founder Pack per account, ever. Continue?",
+      "pickSkinTitle": "Choose a full-body skin",
+      "pickSkinConfirmBody": "Claim the {skin} skin for your {class}? This uses one of your {remaining} remaining skin picks.",
+      "pickMountTitle": "Choose a mount",
+      "insufficientBalance": "Your linked wallet does not hold enough $WOC for this pack.",
+      "accountNotEligible": "Your account has already claimed a Founder's Pack.",
+      "noPicksRemaining": "You have claimed every skin this pack allows.",
+      "wrongClassForSkin": "This skin is restricted to a different class.",
+      "previewTitle": "Preview",
+      "previewEmpty": "Pick a skin or a mount to preview it here.",
+      "previewSkinAria": "Preview the {skin} skin"
     },
     "charSheet": {
       "offense": "Aanval",
@@ -20460,6 +20499,11 @@ export const nl_NL: EnTranslations = {
         "sender": "De heroïsche kwartiermeester",
         "subject": "Je Wyrmval-kernen",
         "body": "Het beest viel terwijl je vanaf zijn rug of vanuit het stof vocht. Jouw deel van zijn Wyrmval-kernen vliegt hier naar je toe, in plaats van verloren te gaan aan de lijkenplukkers. Gebruik ze goed aan een werkbank.\n\n• De heroïsche kwartiermeester"
+      },
+      "founder_pack_reward": {
+        "sender": "The Founder Salesman",
+        "subject": "Your Founder's Pack",
+        "body": "Thank you again for backing World of Claudecraft. Here is a piece of your Founder's Pack, account-bound and yours to keep. Mail it to any other character on your account whenever you like.\n\n- The Founder Salesman"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Het Ambachtsgilde",

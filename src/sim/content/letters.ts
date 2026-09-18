@@ -61,6 +61,23 @@ export const HEROIC_MARK_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// The Founder Salesman's claim delivery (The Founder's Pack, Eastbrook): the
+// mounts and the bag pet ride here rather than the character's live
+// inventory, the same "no proximity, no postage" service contract every
+// other system letter uses. One letter per item stack (a claim mails up to 4:
+// up to 3 mount reins plus the tier's bag), body stays item-count-free so the
+// letterId localizes cleanly.
+export const FOUNDER_PACK_LETTER: LetterDef = {
+  letterId: 'founder_pack_reward',
+  senderName: 'The Founder Salesman',
+  subject: "Your Founder's Pack",
+  body:
+    "Thank you again for backing World of Claudecraft. Here is a piece of your Founder's Pack, " +
+    'account-bound and yours to keep. Mail it to any other character on your account whenever you like.\n\n' +
+    '- The Founder Salesman',
+  delaySeconds: 0,
+};
+
 // Wyrmfall Core reward letter (Masterwrought phase 04): posted to a final-boss
 // participant who entered the run but was absent at the corpse when the cores
 // paid out (awardWyrmfallCores in professions/masterwrought_materials.ts). The
@@ -558,6 +575,7 @@ export function authoredLettersById(): Record<string, LetterDef> {
   const byId: Record<string, LetterDef> = {
     [WELCOME_LETTER.letterId]: WELCOME_LETTER,
     [HEROIC_MARK_LETTER.letterId]: HEROIC_MARK_LETTER,
+    [FOUNDER_PACK_LETTER.letterId]: FOUNDER_PACK_LETTER,
     [WYRMFALL_CORE_LETTER.letterId]: WYRMFALL_CORE_LETTER,
     [MASTERY_RESET_LETTER.letterId]: MASTERY_RESET_LETTER,
     // The $WOC Exchange's three delivery letters, which reached this builder

@@ -1,9 +1,16 @@
 import { applyCourserDaze } from './combat/hunter_shared';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
+import {
+  FOUNDER_PACK_MOUNT_PICKS,
+  FOUNDER_SKIN_CATALOG,
+  founderPackMountReinsItemId,
+  founderPackTierDef,
+} from './content/founder_pack';
 import { MOUNT_SKIN_IDS } from './content/mount_skins';
 import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
+import { setActiveTitle } from './deeds';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
@@ -315,6 +322,56 @@ export function handleDevChat(
       pid,
       `[dev] Granted ${MOUNT_SKIN_IDS.length} mount skins to the account. Wear one from the Cosmetics screen.`,
     );
+    return null;
+  }
+
+  // /dev founders [tier]: offline-only cheat that unlocks the Founder Salesman's
+  // store for local HUD testing (tier: uncommon/rare/epic, default 'epic' since
+  // that is the fullest preview surface). The real claim is server-only
+  // (server/game.ts 'claim_founder_pack' owns the actual $WOC wallet check,
+  // src/sim/sim.ts claimFounderPack/claimFounderSkin always refuse offline for
+  // that reason); this bypasses it entirely by writing the same account-cosmetics
+  // fields the server grant would, the /dev mountskins precedent just above.
+  // Grants every one of the 9 Founder skins regardless of class (an owned skin
+  // always renders as claimed; see founder_pack_window.ts), all 3 mount reins
+  // and the tier's bag pet as real items, the tier's title, and its Claudium
+  // placeholder credit.
+  const foundersMatch = /^\/(?:dev\s+founders?|devfounders?)\s*(\S*)\s*$/i.exec(raw);
+  if (foundersMatch) {
+    const requested = (foundersMatch[1] || 'epic').toLowerCase();
+    const tierDef = founderPackTierDef(requested);
+    if (!tierDef) {
+      ctx.error(
+        pid,
+        `[dev] Unknown Founder Pack tier '${requested}'. Options: uncommon, rare, epic.`,
+      );
+      return null;
+    }
+    const meta = ctx.players.get(pid);
+    const entity = ctx.entities.get(pid);
+    if (meta && entity) {
+      ctx.accountCosmetics = {
+        ...ctx.accountCosmetics,
+        founderPackTier: tierDef.tier,
+        founderSkinIds: FOUNDER_SKIN_CATALOG.map((skin) => skin.catalog),
+        founderPackClaudium: tierDef.claudium,
+      };
+      ctx.grantDeed(meta, tierDef.titleDeedId);
+      setActiveTitle(meta, entity, tierDef.titleDeedId);
+      let mountsGranted = 0;
+      for (const key of FOUNDER_PACK_MOUNT_PICKS) {
+        const itemId = founderPackMountReinsItemId(key);
+        if (!itemId) continue;
+        ctx.addItem(itemId, 1, pid);
+        mountsGranted += 1;
+      }
+      ctx.addItem(tierDef.bagItemId, 1, pid);
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Founder Pack unlocked: '${tierDef.tier}' tier, ${FOUNDER_SKIN_CATALOG.length} skins, ${mountsGranted} mount reins, the '${tierDef.title}' title, and the ${tierDef.bagItemId} bag.`,
+      );
+    }
     return null;
   }
 

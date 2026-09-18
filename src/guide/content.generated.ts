@@ -5852,6 +5852,30 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "crest": "/ui/deeds/col_set_bramblehide.webp"
+  },
+  {
+    "id": "feat_founder_emberborn",
+    "name": "Emberborn",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Emberborn"
+  },
+  {
+    "id": "feat_founder_starforged",
+    "name": "Starforged",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Starforged"
+  },
+  {
+    "id": "feat_founder_worldshaper",
+    "name": "Worldshaper",
+    "category": "feat",
+    "renown": 0,
+    "feat": true,
+    "rewardTitle": "Worldshaper"
   }
 ];
 
@@ -6851,6 +6875,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Dreadspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Cinderjaw Rex"
+      },
+      {
+        "kind": "mount",
+        "name": "Ancient Devourer"
+      },
+      {
+        "kind": "mount",
+        "name": "Shiba Inu"
       }
     ]
   },
@@ -7157,6 +7193,18 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "title",
         "name": "the Unscorched"
+      },
+      {
+        "kind": "title",
+        "name": "Emberborn"
+      },
+      {
+        "kind": "title",
+        "name": "Starforged"
+      },
+      {
+        "kind": "title",
+        "name": "Worldshaper"
       }
     ]
   },

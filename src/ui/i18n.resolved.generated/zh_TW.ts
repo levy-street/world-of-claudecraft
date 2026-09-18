@@ -1456,6 +1456,9 @@ export const zh_TW: EnTranslations = {
       "name_lanternback_troll": "提燈背者格倫博",
       "name_chimeglass_tortoise": "鐘晶的托利弗",
       "name_rickshaw_mount": "白骨人力車",
+      "name_cinderjaw_rex": "Cinderjaw Rex",
+      "name_ancient_devourer": "Ancient Devourer",
+      "name_shiba_inu": "Shiba Inu",
       "desc_valorsteed": "一匹堅韌穩健的駿馬，可提升旅行速度。",
       "desc_grag_bear": "一頭堅韌穩健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一隻堅毅耐久的蝸牛，可提升旅行速度。",
@@ -1471,6 +1474,9 @@ export const zh_TW: EnTranslations = {
       "desc_mech_bird": "一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。",
       "desc_lanternback_troll": "被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。",
       "desc_chimeglass_tortoise": "鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。",
+      "desc_cinderjaw_rex": "A Founder's Pack exclusive: a saddle-broken rex whose jaw still smolders from the volcanic clutch it hatched in.",
+      "desc_ancient_devourer": "A Founder's Pack exclusive: an ancient, ravenous beast broken to the saddle long after every other tamer gave up.",
+      "desc_shiba_inu": "A Founder's Pack exclusive: a very good boy, sized up for the road and utterly unbothered by any of it.",
       "desc_rickshaw_mount": "一輛嘎吱作響的骸骨貨車，一具瘦骨嶙峋的雜兵被套在轅木間，拖著你狂奔向前。"
     },
     "mountTraining": {
@@ -2104,6 +2110,39 @@ export const zh_TW: EnTranslations = {
       "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
       "buyConfirmBody": "用 {honor} 購買 {item}？榮譽購買後無法退款。"
+    },
+    "founderShop": {
+      "gossipOption": "CLAIM YOUR FOUNDER PACK",
+      "gossipOptionAria": "Open the Founder Pack store offered by {name}",
+      "title": "Founder's Packs",
+      "close": "Close",
+      "tierUncommon": "Uncommon Founder Pack",
+      "tierRare": "Rare Founder Pack",
+      "tierEpic": "Epic Founder Pack",
+      "titleReward": "Title: {title}",
+      "mountPicks": "Choose {count} of 3 new mounts",
+      "mountPickOne": "Choose 1 of 3 new mounts",
+      "petReward": "{pet} companion (+{slots} bag slots)",
+      "skinPicks": "{claimed} of {total} full-body skins claimed",
+      "claudiumReward": "+{amount} Claudium for the store",
+      "goldenAuraReward": "Cosmetic: Golden Aura",
+      "walletRequirement": "Requires at least {amount} $WOC in your linked wallet",
+      "walletNotLinked": "Link a wallet to check your $WOC balance.",
+      "tradeableNote": "All Founder's Packs become tradeable starting from version 1.0.",
+      "claimButton": "Claim",
+      "claimedButton": "Claimed",
+      "claimConfirmTitle": "Claim this Founder Pack?",
+      "claimConfirmBody": "You may only claim one Founder Pack per account, ever. Continue?",
+      "pickSkinTitle": "Choose a full-body skin",
+      "pickSkinConfirmBody": "Claim the {skin} skin for your {class}? This uses one of your {remaining} remaining skin picks.",
+      "pickMountTitle": "Choose a mount",
+      "insufficientBalance": "Your linked wallet does not hold enough $WOC for this pack.",
+      "accountNotEligible": "Your account has already claimed a Founder's Pack.",
+      "noPicksRemaining": "You have claimed every skin this pack allows.",
+      "wrongClassForSkin": "This skin is restricted to a different class.",
+      "previewTitle": "Preview",
+      "previewEmpty": "Pick a skin or a mount to preview it here.",
+      "previewSkinAria": "Preview the {skin} skin"
     },
     "charSheet": {
       "offense": "攻擊",
@@ -20460,6 +20499,11 @@ export const zh_TW: EnTranslations = {
         "sender": "英勇軍需官",
         "subject": "你的墜龍核心",
         "body": "巨獸倒下時，你在後排作戰，或已倒在塵土之中。你那一份墜龍核心飛到了這裡，而沒有落入拾荒者之手。把它們用在工作臺上吧。\n\n- 英勇軍需官"
+      },
+      "founder_pack_reward": {
+        "sender": "The Founder Salesman",
+        "subject": "Your Founder's Pack",
+        "body": "Thank you again for backing World of Claudecraft. Here is a piece of your Founder's Pack, account-bound and yours to keep. Mail it to any other character on your account whenever you like.\n\n- The Founder Salesman"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "工匠公會",

@@ -15,6 +15,9 @@ export const EMPTY_LIVE_ACCOUNT_COSMETICS: AccountCosmetics = {
   weaponSkinIds: [],
   weaponSkinLoadout: {},
   mountSkinIds: [],
+  founderSkinIds: [],
+  founderPackTier: null,
+  founderPackClaudium: 0,
 };
 
 /** Merge a fresh cosmetics view into the remembered one. Ownership lists are
@@ -29,6 +32,13 @@ export function mergeAccountCosmetics(a: AccountCosmetics, b: AccountCosmetics):
     weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
     weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
     mountSkinIds: [...new Set([...(a.mountSkinIds ?? []), ...(b.mountSkinIds ?? [])])],
+    // Founder skins are additive ownership, same as the weapon/mount skin
+    // lists above. The tier and Claudium counter are one-time, monotonic
+    // writes (server/game.ts claim_founder_pack), so a fresh value always
+    // wins over an absent one, and the counter never goes backward.
+    founderSkinIds: [...new Set([...(a.founderSkinIds ?? []), ...(b.founderSkinIds ?? [])])],
+    founderPackTier: b.founderPackTier ?? a.founderPackTier ?? null,
+    founderPackClaudium: Math.max(a.founderPackClaudium ?? 0, b.founderPackClaudium ?? 0),
   };
 }
 

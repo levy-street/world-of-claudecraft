@@ -1456,6 +1456,9 @@ export const de_DE: EnTranslations = {
       "name_lanternback_troll": "Grumbol der Laternenrücken",
       "name_chimeglass_tortoise": "Tolliver das Chimeglass",
       "name_rickshaw_mount": "Knochengebundene Rikscha",
+      "name_cinderjaw_rex": "Cinderjaw Rex",
+      "name_ancient_devourer": "Ancient Devourer",
+      "name_shiba_inu": "Shiba Inu",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
       "desc_stalkglider_snail": "Eine herzhafte, ausdauernde Schnecke, die die Reisegeschwindigkeit erhöht.",
@@ -1471,6 +1474,9 @@ export const de_DE: EnTranslations = {
       "desc_mech_bird": "Ein handgefertigtes Uhrwerk-Kriegshuhn, das mit schnappenden Servos sprintet, während sich der Aufziehschlüssel noch dreht.",
       "desc_lanternback_troll": "Ein von Lampenanzündern bis zum Joch gebrochener Bergtroll, der einen eisernen Thron über seinen Schultern trägt und auf beiden Armen eine brennende Sturmlaterne trägt.",
       "desc_chimeglass_tortoise": "Eine Salzschildkröte, die drei Generationen von Wohnwagen überholt hat. Kesselflicker haben ihm eine Brille aus Sturmglas geschliffen und ihm eine Bronzeglocke an den Hals gehängt, damit die Straße ihn hört, lange bevor sie ihn sieht.",
+      "desc_cinderjaw_rex": "A Founder's Pack exclusive: a saddle-broken rex whose jaw still smolders from the volcanic clutch it hatched in.",
+      "desc_ancient_devourer": "A Founder's Pack exclusive: an ancient, ravenous beast broken to the saddle long after every other tamer gave up.",
+      "desc_shiba_inu": "A Founder's Pack exclusive: a very good boy, sized up for the road and utterly unbothered by any of it.",
       "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
     },
     "mountTraining": {
@@ -2104,6 +2110,39 @@ export const de_DE: EnTranslations = {
       "buyAria": "{item} für {honor} kaufen",
       "buyOwnedAria": "{item} für {honor} kaufen, bereits im Besitz",
       "buyConfirmBody": "{item} für {honor} kaufen? Käufe mit Ehre können nicht erstattet werden."
+    },
+    "founderShop": {
+      "gossipOption": "CLAIM YOUR FOUNDER PACK",
+      "gossipOptionAria": "Open the Founder Pack store offered by {name}",
+      "title": "Founder's Packs",
+      "close": "Close",
+      "tierUncommon": "Uncommon Founder Pack",
+      "tierRare": "Rare Founder Pack",
+      "tierEpic": "Epic Founder Pack",
+      "titleReward": "Title: {title}",
+      "mountPicks": "Choose {count} of 3 new mounts",
+      "mountPickOne": "Choose 1 of 3 new mounts",
+      "petReward": "{pet} companion (+{slots} bag slots)",
+      "skinPicks": "{claimed} of {total} full-body skins claimed",
+      "claudiumReward": "+{amount} Claudium for the store",
+      "goldenAuraReward": "Cosmetic: Golden Aura",
+      "walletRequirement": "Requires at least {amount} $WOC in your linked wallet",
+      "walletNotLinked": "Link a wallet to check your $WOC balance.",
+      "tradeableNote": "All Founder's Packs become tradeable starting from version 1.0.",
+      "claimButton": "Claim",
+      "claimedButton": "Claimed",
+      "claimConfirmTitle": "Claim this Founder Pack?",
+      "claimConfirmBody": "You may only claim one Founder Pack per account, ever. Continue?",
+      "pickSkinTitle": "Choose a full-body skin",
+      "pickSkinConfirmBody": "Claim the {skin} skin for your {class}? This uses one of your {remaining} remaining skin picks.",
+      "pickMountTitle": "Choose a mount",
+      "insufficientBalance": "Your linked wallet does not hold enough $WOC for this pack.",
+      "accountNotEligible": "Your account has already claimed a Founder's Pack.",
+      "noPicksRemaining": "You have claimed every skin this pack allows.",
+      "wrongClassForSkin": "This skin is restricted to a different class.",
+      "previewTitle": "Preview",
+      "previewEmpty": "Pick a skin or a mount to preview it here.",
+      "previewSkinAria": "Preview the {skin} skin"
     },
     "charSheet": {
       "offense": "Angriff",
@@ -20460,6 +20499,11 @@ export const de_DE: EnTranslations = {
         "sender": "Der heroische Quartiermeister",
         "subject": "Deine Wyrmfall-Kerne",
         "body": "Das Biest fiel, während du vom Rücken oder aus dem Staub kämpftest. Dein Anteil an den Wyrmfall-Kernen fliegt hier zu dir, statt den Leichenfledderern zu überlassen. Setze sie an einer Werkbank sinnvoll ein.\n\n  Der heroische Quartiermeister"
+      },
+      "founder_pack_reward": {
+        "sender": "The Founder Salesman",
+        "subject": "Your Founder's Pack",
+        "body": "Thank you again for backing World of Claudecraft. Here is a piece of your Founder's Pack, account-bound and yours to keep. Mail it to any other character on your account whenever you like.\n\n- The Founder Salesman"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Die Handwerksgilde",

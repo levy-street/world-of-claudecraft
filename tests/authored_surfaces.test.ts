@@ -139,6 +139,9 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_dragon_egg',
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
+  'mount_cinderjaw_rex',
+  'mount_ancient_devourer',
+  'mount_shiba_inu',
 ];
 
 describe('authored surfaces', () => {

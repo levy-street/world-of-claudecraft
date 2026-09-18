@@ -2007,6 +2007,20 @@ export const VISUALS: Record<string, VisualDef> = {
   player_dawnbreaker: fullBodySkinDef(`${PLAYERS}/FP/Paladin_rigged_ktx2_1024.glb`),
   player_plaguebringer: fullBodySkinDef(`${PLAYERS}/FP/Plaguebringer_rigged_ktx2_1024.glb`),
   player_shinobi: fullBodySkinDef(`${PLAYERS}/FP/Shinobi_rigged_ktx2_1024.glb`),
+  // Not fullBodySkinDef: this GLB's animation library is missing
+  // Hit_B_Stagger (tests/character_clipmaps.test.ts caught it), the one clip
+  // in kaykit()'s hit array its 8 founder-skin siblings all ship. Everything
+  // else about the body matches fullBodySkinDef exactly; only the hit list is
+  // narrowed to the one variant that actually exists, so the rig never
+  // silently falls back to bind pose on that reaction.
+  player_spiritwolf: swims({
+    url: `${PLAYERS}/FP/SpiritWolf_rigged_ktx2_1024.glb`,
+    height: HUMANOID_H,
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), hit: ['Hit_A'] },
+    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
+    lazyPreload: true,
+  }),
 
   // -- forms ---------------------------------------------------------------
   form_sheep: {
@@ -2298,6 +2312,83 @@ export const VISUALS: Record<string, VisualDef> = {
     // MOUNT_RIGGED's names therefore resolve to nothing, which is already a
     // no-op: visual.ts registers actions only for clips that exist.
     clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
+
+  // Founder Pack mounts (The Founder Salesman, sim/content/founder_pack.ts):
+  // three Tripo-lane single-mesh authored bodies, each shipping its OWN small,
+  // mismatched clip set (no shared MOUNT_RIGGED names, and none ships a Death
+  // clip), so each gets its own ClipMap rather than forcing one on it. A
+  // mount never plays a real death (the summon strips on death first), so
+  // `death` holds on the idle clip everywhere, the MOUNT_MECH_BIRD precedent.
+  // Heights are a first-pass estimate (no gait/stride measurement pass yet,
+  // since two of the three ship no Run clip to measure against); retune once
+  // the owner has ridden them in-world.
+  mount_cinderjaw_rex: {
+    url: `${MOUNTS_DIR}/cinderjaw_rex.glb`,
+    authoredAtlas: true,
+    height: 4.2,
+    // A raw pygltflib/Tripo export (rootName Trex_Armature). Its Head/Jaw
+    // bones sit at raw -X and Tail5 (the tip) at raw +X (FK-measured off the
+    // GLB's bind pose, gltf-transform's node dump), the OPPOSITE chirality
+    // from Shiba Inu below despite both being unprocessed Tripo exports (two
+    // different export runs, not one shared convention): +90 degrees here
+    // swings the head onto +z, where -90 would have walked it in tail-first.
+    // Ancient Devourer needs no yaw: its GLB already passed through
+    // gltf-transform, which left it facing correctly.
+    yaw: Math.PI / 2,
+    clips: {
+      idle: 'Mount_IDLE',
+      walk: 'Mount_WALK',
+      run: 'Mount_WALK',
+      attack: [],
+      death: 'Mount_IDLE',
+    },
+    lazyPreload: true,
+  },
+  mount_ancient_devourer: {
+    url: `${MOUNTS_DIR}/ancient_devourer.glb`,
+    authoredAtlas: true,
+    height: 4.5,
+    clips: {
+      idle: 'Idle',
+      // No Walk clip; Run doubles for both bands (the mech-bird/toad precedent
+      // for a rig with one locomotion cycle), separated by walkRef/runRef.
+      walk: 'Run',
+      run: 'Run',
+      // No `jump` clip on purpose: the authored Jump animation bakes real
+      // root-motion translation onto the Insect_Rig scene root (measured
+      // Y +0.02 to -0.38 raw model units across the clip, gltf-transform
+      // inspect on the animation buffer), the same baked-root-motion class
+      // documented on the Drakemaw Raptor above. That extra translation is
+      // never read by the fixed-offset rider seat math
+      // (render/goblin_rocket_sled_fx.ts applyRocketSledAttitude, the
+      // non-jumpTips branch every creature mount here takes), so the rider
+      // visibly sinks below the saddle at the clip's peak. Omitting `jump`
+      // holds Idle through the leap instead (the cinderjaw_rex/shiba_inu
+      // precedent, neither of which ships a Jump clip at all) until a real
+      // rebake strips the translation channel.
+      attack: [],
+      death: 'Idle',
+    },
+    lazyPreload: true,
+  },
+  mount_shiba_inu: {
+    url: `${MOUNTS_DIR}/shiba_inu.glb`,
+    authoredAtlas: true,
+    height: 3.0,
+    // A raw pygltflib/Tripo export (rootName ShibaRig): Head sits at raw +X
+    // and the tail at raw -X (FK-measured off the bind pose), the OPPOSITE
+    // chirality from Cinderjaw Rex above (two separate export runs), so -90
+    // degrees is the correct swing here where Cinderjaw Rex needed +90.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Walk',
+      attack: [],
+      death: 'Idle',
+    },
     lazyPreload: true,
   },
 
@@ -4036,6 +4127,10 @@ const NPC_KEYS: Record<string, string> = {
   cook_marlow: 'npc_villager',
   tanner_hesk: 'npc_villager',
   huntsman_deral: 'npc_scout',
+  // The Founder Salesman (content/founder_pack.ts): reuses the necromancer
+  // body already shared by several undead mob templates below (skel_necromancer,
+  // url models/chars/enemies/necromancer.glb) rather than importing a new GLB.
+  the_founder_salesman: 'skel_necromancer',
 };
 
 // Every replacement-body catalog's visual key, keyed by SkinCatalog id (see
@@ -4051,6 +4146,7 @@ export const FULL_BODY_SKIN_VISUAL_KEYS: Partial<Record<SkinCatalog, string>> = 
   dawnbreaker: 'player_dawnbreaker',
   plaguebringer: 'player_plaguebringer',
   shinobi: 'player_shinobi',
+  spiritwolf: 'player_spiritwolf',
 };
 
 /** The set of `FULL_BODY_SKIN_VISUAL_KEYS` values, for a cheap "is this

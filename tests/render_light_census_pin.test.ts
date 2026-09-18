@@ -98,6 +98,11 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
     reason:
       "the armory store preview's own secondary GL context: key/fill/rim in its own scene, built once at mount and only re-aimed per preset",
   },
+  'founder_pack_mount_preview.ts': {
+    kinds: ['DirectionalLight'],
+    reason:
+      "the Founder Pack mount preview's own secondary GL context: key/fill/rim in its own scene, built once at mount and never re-created",
+  },
   'wildheart_props.ts': {
     kinds: ['HemisphereLight', 'DirectionalLight'],
     reason:
@@ -177,6 +182,7 @@ describe('the src/render light census', () => {
       'characters/portrait.ts',
       'characters/preview.ts',
       'foliage_impostor.ts',
+      'founder_pack_mount_preview.ts',
       'renderer.ts',
       'wildheart_props.ts',
     ]);

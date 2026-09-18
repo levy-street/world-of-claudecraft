@@ -920,9 +920,11 @@ export type ItemSlot = EquipSlot | 'ring';
 // 'mech' is the class-agnostic Combat Mech cosmetic body (multi-chroma, see
 // src/sim/content/skins.ts MECH_CHROMAS). Every id from 'altherion' on is a
 // FULL_BODY_SKIN: a fixed, single-appearance, class-agnostic cosmetic body of
-// its own (src/render/characters/manifest.ts FULL_BODY_SKIN_VISUAL_KEYS),
-// dev/admin-granted only for now (see the "/dev skin <id>" chat cheat in
-// sim/dev_commands.ts), with no chroma variants and no unlock item.
+// its own (src/render/characters/manifest.ts FULL_BODY_SKIN_VISUAL_KEYS), with
+// no chroma variants and no per-character unlock item. The account-wide grant
+// is either the dev/admin "/dev skin <id>" chat cheat (sim/dev_commands.ts) or
+// (the real player-facing path) The Founder Salesman's Founder Pack
+// (sim/content/founder_pack.ts FOUNDER_SKIN_CATALOG, one skin per class).
 export type SkinCatalog =
   | 'class'
   | 'mech'
@@ -933,7 +935,8 @@ export type SkinCatalog =
   | 'frostfire'
   | 'dawnbreaker'
   | 'plaguebringer'
-  | 'shinobi';
+  | 'shinobi'
+  | 'spiritwolf';
 
 /** Every full-body skin catalog id (excludes 'class' and 'mech', which have
  *  their own dedicated handling: class atlases and mech chroma respectively). */
@@ -946,6 +949,7 @@ export const FULL_BODY_SKIN_CATALOGS: readonly SkinCatalog[] = [
   'dawnbreaker',
   'plaguebringer',
   'shinobi',
+  'spiritwolf',
 ] as const;
 
 const ALL_SKIN_CATALOGS: readonly SkinCatalog[] = [
@@ -3960,6 +3964,11 @@ export interface NpcDef {
   // widened. Vending stays emergent from vendorItems; the watch fee is a
   // plant-time bag payment and never gates on this flag (D9).
   farmer?: true;
+  // The Founder Salesman: talking to this NPC opens the Founder Pack store
+  // (sim/content/founder_pack.ts) instead of a vendor stock. A FLAG rather
+  // than a hard-keyed id (the warfareVendor precedent) so a second placement
+  // needs no constant widened.
+  founderVendor?: boolean;
   greeting: string;
   // Registered but not surface-placed at world init. The owning system spawns
   // the entity on demand (e.g. the Nythraxis encounter walks Brother Aldric in

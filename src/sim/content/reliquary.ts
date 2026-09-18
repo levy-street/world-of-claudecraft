@@ -108,11 +108,16 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   gates the call on claim.won AND claim.event, so a dev portal never mints).
  *   The hint is rank-agnostic on purpose: every ranked tier, C included, mints
  *   the rings on its event's first clear.
+ * - founder_pack_claim: server/game.ts's claim_founder_pack handler mails the
+ *   picked mount's reins on a wallet-verified, one-time Founder Pack claim
+ *   (The Founder Salesman, Eastbrook). Not a vendor hint: the salesman has no
+ *   vendorItems counter, the grant is the wallet-gated claim itself.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
+  'founder_pack_claim',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -268,6 +273,9 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'drakemaw_raptor',
   'lanternback_troll',
   'terrorspark_groundshaker',
+  'cinderjaw_rex',
+  'ancient_devourer',
+  'shiba_inu',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -320,6 +328,9 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  cinderjaw_rex: fromActivity('founder_pack_claim'),
+  ancient_devourer: fromActivity('founder_pack_claim'),
+  shiba_inu: fromActivity('founder_pack_claim'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS
@@ -435,6 +446,11 @@ export const RELIQUARY_HORIZON_TITLES = [
   // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
   // per the locked titles-page rule.
   'dgn_varkhul_flawless',
+  // The Founder's Pack tier titles (The Founder Salesman, Eastbrook): every
+  // non-hidden title deed pages here per the locked titles-page rule.
+  'feat_founder_emberborn',
+  'feat_founder_starforged',
+  'feat_founder_worldshaper',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces

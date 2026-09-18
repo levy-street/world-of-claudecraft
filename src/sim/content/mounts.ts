@@ -21,7 +21,10 @@ export type MountKey =
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
   | 'lanternback_troll'
-  | 'terrorspark_groundshaker';
+  | 'terrorspark_groundshaker'
+  | 'cinderjaw_rex'
+  | 'ancient_devourer'
+  | 'shiba_inu';
 
 export type MountRarity = 'common' | 'uncommon' | 'rare' | 'epic';
 
@@ -109,6 +112,30 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // The Founder Pack (The Founder Salesman, content/founder_pack.ts): three
+  // account-bound picks a claiming founder chooses from. Epic tier by
+  // flavor/exclusivity, not by drop rate (see FOUNDER_PACK_MOUNTS below: their
+  // real acquisition path is the pack claim, not any loot table). Placed
+  // ABOVE the developer-only pair below: they are real player-facing mounts,
+  // and the tank stays the pinned tail (tests/mounts.test.ts).
+  cinderjaw_rex: {
+    key: 'cinderjaw_rex',
+    name: 'Cinderjaw Rex',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  ancient_devourer: {
+    key: 'ancient_devourer',
+    name: 'Ancient Devourer',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  shiba_inu: {
+    key: 'shiba_inu',
+    name: 'Shiba Inu',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   // A hill troll broken to the saddle by lamplighters: he carries an iron
   // throne strapped across his shoulders with a storm lantern hung off each
   // arm of it, so the rider travels lit. Developer-only for now.
@@ -147,6 +174,24 @@ export const DEVELOPER_MOUNTS: readonly MountKey[] = [
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {
   return (DEVELOPER_MOUNTS as readonly string[]).includes(key);
+}
+
+/** Founder Pack picks (The Founder Salesman, content/founder_pack.ts): a real
+ *  player-facing acquisition path, just not a heroic/Rift loot table, so they
+ *  are absent from every normal drop pool exactly like DEVELOPER_MOUNTS, for
+ *  the same soulbound-reins reason (a claimable grant, not a market good). A
+ *  SEPARATE registry from DEVELOPER_MOUNTS on purpose: these are not
+ *  under-development, and conflating the two would make a future dev-only
+ *  mount silently "founder-only" or vice versa. */
+export const FOUNDER_PACK_MOUNTS: readonly MountKey[] = [
+  'cinderjaw_rex',
+  'ancient_devourer',
+  'shiba_inu',
+];
+
+/** True for a mount granted only by the Founder Pack claim (see FOUNDER_PACK_MOUNTS). */
+export function isFounderPackMount(key: string): boolean {
+  return (FOUNDER_PACK_MOUNTS as readonly string[]).includes(key);
 }
 
 /** The horse: the default stable pick and the fallback for every unknown/legacy

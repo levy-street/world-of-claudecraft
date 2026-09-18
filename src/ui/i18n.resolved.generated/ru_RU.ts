@@ -1456,6 +1456,9 @@ export const ru_RU: EnTranslations = {
       "name_lanternback_troll": "Грумбол Фонареносец",
       "name_chimeglass_tortoise": "Толливер Звонкостёкл",
       "name_rickshaw_mount": "Костяная рикша",
+      "name_cinderjaw_rex": "Cinderjaw Rex",
+      "name_ancient_devourer": "Ancient Devourer",
+      "name_shiba_inu": "Shiba Inu",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
@@ -1471,6 +1474,9 @@ export const ru_RU: EnTranslations = {
       "desc_mech_bird": "Заводная боевая курица ручной сборки: несётся на щёлкающих сервоприводах, а заводной ключ всё ещё крутится.",
       "desc_lanternback_troll": "Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.",
       "desc_chimeglass_tortoise": "Черепаха солончаков, пережившая в пути три поколения караванов. Приютившие её лудильщики выточили ей очки из штормового стекла и подвесили к горлу бронзовый колокольчик — дорога слышит её задолго до того, как увидит.",
+      "desc_cinderjaw_rex": "A Founder's Pack exclusive: a saddle-broken rex whose jaw still smolders from the volcanic clutch it hatched in.",
+      "desc_ancient_devourer": "A Founder's Pack exclusive: an ancient, ravenous beast broken to the saddle long after every other tamer gave up.",
+      "desc_shiba_inu": "A Founder's Pack exclusive: a very good boy, sized up for the road and utterly unbothered by any of it.",
       "desc_rickshaw_mount": "Дребезжащая костяная повозка, к оглоблям которой впряжен костлявый воин-скелет, тащащий вас во весь опор."
     },
     "mountTraining": {
@@ -2104,6 +2110,39 @@ export const ru_RU: EnTranslations = {
       "buyAria": "Купить {item} за {honor}",
       "buyOwnedAria": "Купить {item} за {honor}, уже получено",
       "buyConfirmBody": "Купить {item} за {honor}? Покупки за честь не подлежат возврату."
+    },
+    "founderShop": {
+      "gossipOption": "CLAIM YOUR FOUNDER PACK",
+      "gossipOptionAria": "Open the Founder Pack store offered by {name}",
+      "title": "Founder's Packs",
+      "close": "Close",
+      "tierUncommon": "Uncommon Founder Pack",
+      "tierRare": "Rare Founder Pack",
+      "tierEpic": "Epic Founder Pack",
+      "titleReward": "Title: {title}",
+      "mountPicks": "Choose {count} of 3 new mounts",
+      "mountPickOne": "Choose 1 of 3 new mounts",
+      "petReward": "{pet} companion (+{slots} bag slots)",
+      "skinPicks": "{claimed} of {total} full-body skins claimed",
+      "claudiumReward": "+{amount} Claudium for the store",
+      "goldenAuraReward": "Cosmetic: Golden Aura",
+      "walletRequirement": "Requires at least {amount} $WOC in your linked wallet",
+      "walletNotLinked": "Link a wallet to check your $WOC balance.",
+      "tradeableNote": "All Founder's Packs become tradeable starting from version 1.0.",
+      "claimButton": "Claim",
+      "claimedButton": "Claimed",
+      "claimConfirmTitle": "Claim this Founder Pack?",
+      "claimConfirmBody": "You may only claim one Founder Pack per account, ever. Continue?",
+      "pickSkinTitle": "Choose a full-body skin",
+      "pickSkinConfirmBody": "Claim the {skin} skin for your {class}? This uses one of your {remaining} remaining skin picks.",
+      "pickMountTitle": "Choose a mount",
+      "insufficientBalance": "Your linked wallet does not hold enough $WOC for this pack.",
+      "accountNotEligible": "Your account has already claimed a Founder's Pack.",
+      "noPicksRemaining": "You have claimed every skin this pack allows.",
+      "wrongClassForSkin": "This skin is restricted to a different class.",
+      "previewTitle": "Preview",
+      "previewEmpty": "Pick a skin or a mount to preview it here.",
+      "previewSkinAria": "Preview the {skin} skin"
     },
     "charSheet": {
       "offense": "Атака",
@@ -20460,6 +20499,11 @@ export const ru_RU: EnTranslations = {
         "sender": "Героический интендант",
         "subject": "Ваши ядра драконопада",
         "body": "Зверь пал, пока вы сражались в тылу или лежали в пыли. Ваша доля ядер драконопада прилетела к вам сюда, а не досталась мародёрам. Пустите их в дело у верстака.\n\n- Героический интендант"
+      },
+      "founder_pack_reward": {
+        "sender": "The Founder Salesman",
+        "subject": "Your Founder's Pack",
+        "body": "Thank you again for backing World of Claudecraft. Here is a piece of your Founder's Pack, account-bound and yours to keep. Mail it to any other character on your account whenever you like.\n\n- The Founder Salesman"
       },
       "guild_trend_engineering_alchemy": {
         "sender": "Гильдия ремесленников",

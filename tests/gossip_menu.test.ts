@@ -20,6 +20,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(true);
   });
@@ -42,6 +43,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(true);
   });
@@ -60,6 +62,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
   });
@@ -78,6 +81,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
   });
@@ -96,6 +100,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     expect(
@@ -111,6 +116,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     expect(
@@ -126,6 +132,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     // The WARFARE quartermaster alone. Its own dimension, because the shop row
@@ -144,6 +151,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     expect(
@@ -159,6 +167,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     expect(
@@ -174,6 +183,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: true,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     // A station master's Train option alone keeps the menu open.
@@ -190,6 +200,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: true,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     // A farmer's husk-trade row alone keeps the menu open (the farming
@@ -209,6 +220,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: true,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
   });
@@ -232,6 +244,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
     // The goods row alone (an unflagged NPC with stock) still keeps it open.
@@ -248,6 +261,7 @@ describe('gossipMenuIsEmpty', () => {
         hasCardMaster: false,
         hasTraining: false,
         hasFarmer: false,
+        hasFounderVendor: false,
       }),
     ).toBe(false);
   });

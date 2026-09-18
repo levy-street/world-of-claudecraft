@@ -27,6 +27,18 @@ export interface AccountCosmetics {
   // its own rollback-safe row, like the weapon skins. The worn skin is per
   // character (characters.state) and never lives here.
   mountSkinIds: string[];
+  // Founder Pack full-body skin entitlements (The Founder Salesman,
+  // sim/content/founder_pack.ts): account-wide, unpaid-style unlocks (a
+  // wallet-balance gate, not a Claudium spend), so they ride the same
+  // accounts.cosmetics JSONB bucket as mechChromaIds rather than a new
+  // rollback-safe table. Optional, like src/world_api/cosmetics.ts's
+  // AccountCosmetics, so the many AccountCosmetics fixtures across the test
+  // suite predating this feature stay valid.
+  founderSkinIds?: string[];
+  // The claimed tier (null/absent = none) and the local Claudium placeholder
+  // credit; see src/world_api/cosmetics.ts for the full contract.
+  founderPackTier?: 'uncommon' | 'rare' | 'epic' | null;
+  founderPackClaudium?: number;
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -50,6 +62,14 @@ function stringRecord(value: unknown): Record<string, string> {
   return out;
 }
 
+const FOUNDER_PACK_TIERS_NORMALIZE = ['uncommon', 'rare', 'epic'] as const;
+
+function normalizeFounderPackTier(value: unknown): 'uncommon' | 'rare' | 'epic' | null {
+  return (FOUNDER_PACK_TIERS_NORMALIZE as readonly unknown[]).includes(value)
+    ? (value as 'uncommon' | 'rare' | 'epic')
+    : null;
+}
+
 export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
   const src = value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
   return {
@@ -58,6 +78,12 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
     weaponSkinIds: uniqueStrings(src.weaponSkinIds),
     weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
     mountSkinIds: uniqueStrings(src.mountSkinIds),
+    founderSkinIds: uniqueStrings(src.founderSkinIds),
+    founderPackTier: normalizeFounderPackTier(src.founderPackTier),
+    founderPackClaudium:
+      typeof src.founderPackClaudium === 'number' && Number.isFinite(src.founderPackClaudium)
+        ? Math.max(0, Math.floor(src.founderPackClaudium))
+        : 0,
   };
 }
 
@@ -104,7 +130,7 @@ export async function loadAccountCosmetics(accountId: number): Promise<AccountCo
 
 async function addAccountCosmeticId(
   accountId: number,
-  key: 'completedQuestIds' | 'mechChromaIds',
+  key: 'completedQuestIds' | 'mechChromaIds' | 'founderSkinIds',
   value: string,
 ): Promise<AccountCosmetics> {
   const res = await pool.query(
@@ -148,6 +174,52 @@ export async function grantAccountMechChroma(
   chromaId: string,
 ): Promise<AccountCosmetics> {
   return addAccountCosmeticId(accountId, 'mechChromaIds', chromaId);
+}
+
+/** Grant a Founder Pack full-body skin entitlement (The Founder Salesman).
+ *  Additive, like grantAccountMechChroma; the caller (server/game.ts) checks
+ *  the wallet balance gate and the tier's skin-pick budget before calling. */
+export async function grantAccountFounderSkin(
+  accountId: number,
+  skinId: string,
+): Promise<AccountCosmetics> {
+  return addAccountCosmeticId(accountId, 'founderSkinIds', skinId);
+}
+
+/** The one-time whole-pack claim: sets founderPackTier and adds to the local
+ *  Claudium placeholder counter, ONLY while no tier is claimed yet (a
+ *  conditional update, defense in depth alongside the in-memory session
+ *  check the caller already did). Returns null when a tier is already
+ *  claimed (races against a second concurrent claim), the refreshed
+ *  cosmetics view otherwise. */
+export async function claimAccountFounderPackTier(
+  accountId: number,
+  tier: 'uncommon' | 'rare' | 'epic',
+  claudium: number,
+): Promise<AccountCosmetics | null> {
+  const res = await pool.query(
+    `WITH updated AS (
+       UPDATE accounts
+          SET cosmetics = jsonb_set(
+            jsonb_set(
+              COALESCE(cosmetics, '{}'::jsonb), ARRAY['founderPackTier'], to_jsonb($2::text)),
+            ARRAY['founderPackClaudium'],
+            to_jsonb(COALESCE((cosmetics -> 'founderPackClaudium')::numeric, 0) + $3::numeric))
+        WHERE id = $1
+          AND (cosmetics -> 'founderPackTier') IS NULL
+        RETURNING id, cosmetics
+     )
+     SELECT updated.cosmetics,
+            awc.skin_ids AS weapon_skin_ids,
+            awc.loadout AS weapon_skin_loadout,
+            amc.skin_ids AS mount_skin_ids
+       FROM updated
+       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id
+       LEFT JOIN account_mount_cosmetics amc ON amc.account_id = updated.id`,
+    [accountId, tier, Math.max(0, Math.floor(claudium))],
+  );
+  if (res.rows.length === 0) return null;
+  return normalizeAccountCosmeticsRow(res.rows[0]);
 }
 
 /** Additive union in the rollback-safe paid-entitlement row. */

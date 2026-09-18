@@ -32,6 +32,10 @@ export interface GossipMenuContent {
    *  the NpcDef farmer flag). Its own field so a farmer with no quest and no
    *  stock still keeps the dialog open for the trade. */
   hasFarmer: boolean;
+  /** The Founder Salesman's Founder Pack store (#founder-pack-window). Its
+   *  own field for the same reason as hasWarfareVendor: a flagged NPC sells
+   *  nothing through the ordinary vendor grid. */
+  hasFounderVendor: boolean;
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -46,6 +50,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasDelveBoard &&
     !content.hasCardMaster &&
     !content.hasTraining &&
-    !content.hasFarmer
+    !content.hasFarmer &&
+    !content.hasFounderVendor
   );
 }

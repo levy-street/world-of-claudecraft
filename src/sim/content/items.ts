@@ -450,6 +450,74 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Founder Pack mounts (The Founder Salesman, content/founder_pack.ts,
+  // FOUNDER_PACK_MOUNTS in content/mounts.ts): mailed on claim, soulbound like
+  // the developer reins above, for the same reason (a claimable grant, never a
+  // market good), even though these have a real player-facing acquisition path.
+  founder_reins_cinderjaw_rex: {
+    id: 'founder_reins_cinderjaw_rex',
+    name: 'Reins of the Cinderjaw Rex',
+    kind: 'mount',
+    mount: 'cinderjaw_rex',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  founder_reins_ancient_devourer: {
+    id: 'founder_reins_ancient_devourer',
+    name: 'Reins of the Ancient Devourer',
+    kind: 'mount',
+    mount: 'ancient_devourer',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  founder_reins_shiba_inu: {
+    id: 'founder_reins_shiba_inu',
+    name: 'Reins of the Shiba Inu',
+    kind: 'mount',
+    mount: 'shiba_inu',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  // Founder Pack bag pets (The Founder Salesman): a mailed, account-bound bag
+  // item per tier, cosmetic-named after the pack's pet flavor. GLB-less for
+  // now (art follows in a separate PR; a Bag item has no 3D model regardless,
+  // see linen_pouch/travelers_knapsack above).
+  founder_bag_phantom: {
+    id: 'founder_bag_phantom',
+    name: 'Phantom',
+    kind: 'bag',
+    quality: 'legendary',
+    bagSlots: 10,
+    soulbound: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  founder_bag_triplet: {
+    id: 'founder_bag_triplet',
+    name: 'TripleT',
+    kind: 'bag',
+    quality: 'legendary',
+    bagSlots: 15,
+    soulbound: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  founder_bag_emberfall_phoenix: {
+    id: 'founder_bag_emberfall_phoenix',
+    name: 'Emberfall Phoenix',
+    kind: 'bag',
+    quality: 'legendary',
+    bagSlots: 20,
+    soulbound: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
   // Legacy cosmetic reins; the spaceship is now a mount skin.
   reins_goblin_rocket_sled: {
     id: 'reins_goblin_rocket_sled',

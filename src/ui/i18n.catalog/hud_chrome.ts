@@ -1708,6 +1708,9 @@ export const hudChromeStrings = {
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
+    name_cinderjaw_rex: 'Cinderjaw Rex',
+    name_ancient_devourer: 'Ancient Devourer',
+    name_shiba_inu: 'Shiba Inu',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
     desc_stalkglider_snail: 'A hearty, slow-burning snail that provides enhanced travel speed.',
@@ -1733,6 +1736,12 @@ export const hudChromeStrings = {
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
     desc_chimeglass_tortoise:
       'A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.',
+    desc_cinderjaw_rex:
+      "A Founder's Pack exclusive: a saddle-broken rex whose jaw still smolders from the volcanic clutch it hatched in.",
+    desc_ancient_devourer:
+      "A Founder's Pack exclusive: an ancient, ravenous beast broken to the saddle long after every other tamer gave up.",
+    desc_shiba_inu:
+      "A Founder's Pack exclusive: a very good boy, sized up for the road and utterly unbothered by any of it.",
     desc_rickshaw_mount:
       'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
   },
@@ -2669,6 +2678,45 @@ export const hudChromeStrings = {
     // confirm gate matches the Heroic Marks shop's, whose title, accept and
     // cancel labels are currency-neutral and reused verbatim.
     buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
+  },
+  // The Founder Salesman's Founder Pack store (#founder-pack-window): three
+  // tiered, one-time, wallet-gated claims. See src/sim/content/founder_pack.ts
+  // for the tier data this window renders.
+  founderShop: {
+    // The gossip row that opens this window (the warfareShop precedent: this
+    // NPC sells nothing through the ordinary vendor grid).
+    gossipOption: 'CLAIM YOUR FOUNDER PACK',
+    gossipOptionAria: 'Open the Founder Pack store offered by {name}',
+    title: "Founder's Packs",
+    close: 'Close',
+    tierUncommon: 'Uncommon Founder Pack',
+    tierRare: 'Rare Founder Pack',
+    tierEpic: 'Epic Founder Pack',
+    titleReward: 'Title: {title}',
+    mountPicks: 'Choose {count} of 3 new mounts',
+    mountPickOne: 'Choose 1 of 3 new mounts',
+    petReward: '{pet} companion (+{slots} bag slots)',
+    skinPicks: '{claimed} of {total} full-body skins claimed',
+    claudiumReward: '+{amount} Claudium for the store',
+    goldenAuraReward: 'Cosmetic: Golden Aura',
+    walletRequirement: 'Requires at least {amount} $WOC in your linked wallet',
+    walletNotLinked: 'Link a wallet to check your $WOC balance.',
+    tradeableNote: "All Founder's Packs become tradeable starting from version 1.0.",
+    claimButton: 'Claim',
+    claimedButton: 'Claimed',
+    claimConfirmTitle: 'Claim this Founder Pack?',
+    claimConfirmBody: 'You may only claim one Founder Pack per account, ever. Continue?',
+    pickSkinTitle: 'Choose a full-body skin',
+    pickSkinConfirmBody:
+      'Claim the {skin} skin for your {class}? This uses one of your {remaining} remaining skin picks.',
+    pickMountTitle: 'Choose a mount',
+    insufficientBalance: 'Your linked wallet does not hold enough $WOC for this pack.',
+    accountNotEligible: "Your account has already claimed a Founder's Pack.",
+    noPicksRemaining: 'You have claimed every skin this pack allows.',
+    wrongClassForSkin: 'This skin is restricted to a different class.',
+    previewTitle: 'Preview',
+    previewEmpty: 'Pick a skin or a mount to preview it here.',
+    previewSkinAria: 'Preview the {skin} skin',
   },
   // Character sheet showcase layout: the two titled stat-panel headings under the
   // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the

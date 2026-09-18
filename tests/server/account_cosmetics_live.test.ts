@@ -13,6 +13,9 @@ const full = (over: Partial<AccountCosmetics> = {}): AccountCosmetics => ({
   weaponSkinIds: [],
   weaponSkinLoadout: {},
   mountSkinIds: [],
+  founderSkinIds: [],
+  founderPackTier: null,
+  founderPackClaudium: 0,
   ...over,
 });
 
@@ -41,7 +44,53 @@ describe('mergeAccountCosmetics', () => {
       weaponSkinIds: ['ice_fang_sword', 'glaciersplit_axe'],
       weaponSkinLoadout: { sword: 'ice_fang_sword' },
       mountSkinIds: ['mech_bird', 'chimeglass_tortoise'],
+      founderSkinIds: [],
+      founderPackTier: null,
+      founderPackClaudium: 0,
     });
+  });
+
+  // The Founder Pack fields: skins are additive ownership like the weapon and
+  // mount skin lists above; the tier and Claudium counter are one-time,
+  // monotonic writes (server/game.ts claim_founder_pack), so a value already
+  // remembered on the stale side survives a fresh side that has not claimed
+  // yet, and the Claudium counter never regresses.
+  it('keeps founder skins additive and the tier/Claudium counter sticky and monotonic', () => {
+    const stale = full({
+      founderSkinIds: ['altherion'],
+      founderPackTier: 'uncommon',
+      founderPackClaudium: 1000,
+    });
+    // A fresh view from a session that has not re-joined since the claim
+    // (its own accountCosmetics still shows no tier) must not erase the
+    // remembered claim.
+    const freshUnclaimed = full();
+    expect(mergeAccountCosmetics(stale, freshUnclaimed)).toEqual(
+      full({
+        founderSkinIds: ['altherion'],
+        founderPackTier: 'uncommon',
+        founderPackClaudium: 1000,
+      }),
+    );
+    // A second skin pick on the fresh side unions in; the tier and counter
+    // carry through unchanged since the fresh side still names the same tier.
+    const freshWithSecondSkin = full({
+      founderSkinIds: ['altherion', 'bonehunter'],
+      founderPackTier: 'uncommon',
+      founderPackClaudium: 1000,
+    });
+    expect(mergeAccountCosmetics(stale, freshWithSecondSkin)).toEqual(
+      full({
+        founderSkinIds: ['altherion', 'bonehunter'],
+        founderPackTier: 'uncommon',
+        founderPackClaudium: 1000,
+      }),
+    );
+    // The counter never regresses even if merged against a stale, lower value.
+    expect(
+      mergeAccountCosmetics(full({ founderPackClaudium: 1500 }), full({ founderPackClaudium: 0 }))
+        .founderPackClaudium,
+    ).toBe(1500);
   });
 
   it('tolerates the older narrower shapes test doubles still hand over', () => {

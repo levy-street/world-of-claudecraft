@@ -73,6 +73,9 @@ await page.evaluate(() => {
     'reins_drakemaw_raptor',
     'reins_terrorspark_groundshaker',
     'reins_lanternback_troll',
+    'founder_reins_cinderjaw_rex',
+    'founder_reins_ancient_devourer',
+    'founder_reins_shiba_inu',
   ])
     sim.addItem(id, 1);
 });

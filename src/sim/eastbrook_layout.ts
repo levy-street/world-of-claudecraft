@@ -1207,6 +1207,15 @@ const FURY_POSITION = { x: 16, z: -78 } as const;
 // sit out on the edges. Each group is spread, not clustered.
 const MARSHAL_POSITION = { x: -58, z: -102 } as const;
 
+// The Founder Salesman (Founder Pack vendor, content/founder_pack.ts): a few
+// yards east of the graveyard's headstone plot (services.graveyard.position
+// below, {x:-2,z:-70}), clear of the headstone footprint (x -2..2.4) and on
+// the same side the graveyard route already approaches from. Duplicated as a
+// literal rather than importing the services block, which is declared further
+// down this same file (see EASTBROOK_LAYOUT.services.graveyard.position).
+const EASTBROOK_GRAVEYARD_POSITION = { x: -2, z: -70 } as const;
+const FOUNDER_SALESMAN_POSITION = { x: 5, z: -71 } as const;
+
 const NPCS = [
   makeNpc('the_merchant', MERCHANT_POSITION, MARKET_STALLS[0].rotation, MARKET_STALLS[0].id),
   makeNpc(
@@ -1246,6 +1255,15 @@ const NPCS = [
   makeNpc('weaver_ottilie', WEAVER_POSITION, WEAVING_HOUSE.rotation, LOOM_STATION.id),
   makeNpc('tinker_gizzel', TINKER_POSITION, TOOLWORKS.rotation, TOOLWORKS_STATION.id),
   makeNpc('fury', FURY_POSITION, facingToward(FURY_POSITION, CIVIC_CENTER), 'eastbrook_chapel'),
+  // The Founder Salesman: a few yards east of Eastbrook Rest's headstones
+  // (graveyard.position {x:-2,z:-70}), facing the plot, along the same
+  // approach the graveyard route already walks.
+  makeNpc(
+    'the_founder_salesman',
+    FOUNDER_SALESMAN_POSITION,
+    facingToward(FOUNDER_SALESMAN_POSITION, EASTBROOK_GRAVEYARD_POSITION),
+    'eastbrook_chapel',
+  ),
 ] as const;
 
 const BURSAR = NPCS.find((npc) => npc.id === 'bursar_fernando');

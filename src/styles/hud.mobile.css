@@ -5802,6 +5802,7 @@
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
   body.mobile-touch #warfare-window,
+  body.mobile-touch #founder-pack-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #spellbook,
   body.mobile-touch #bar-editor,
@@ -5820,16 +5821,27 @@
      the viewport width. The train window also scrolls internally here: it is a
      standalone centered card (never the vendor's split-screen bags pairing).
      Loot Explorer joins it for the same reason: its toolbar (search plus four
-     filter selects) needs the same room as the vendor stock grid. */
+     filter selects) needs the same room as the vendor stock grid. The Founder
+     Pack store joins it too: its tier grid wraps to one column at this width,
+     same as the vendor stock grid does. */
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
   body.mobile-touch #warfare-window,
+  body.mobile-touch #founder-pack-window,
   body.mobile-touch #quest-dialog,
   body.mobile-touch #loot-explorer-window {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
+  }
+  /* The Founder Pack side preview panel is a desktop-only enhancement (a fixed
+     left-edge window beside the store): on a touch viewport there is no room
+     beside a full-width sheet for it, so it stays hidden rather than fighting
+     the store for space. Claiming a skin or mount works identically without
+     it; the preview is a nice-to-have, never load-bearing. */
+  body.mobile-touch #founder-pack-preview-window {
+    display: none;
   }
   /* The WARFARE shop is many sections deep (one per armor family, plus jewelry
      and weapons), so it takes the vendor window's full top-to-bottom treatment

@@ -75,6 +75,8 @@ export interface QuestDialogControllerDeps {
   /** The WARFARE quartermaster's sectioned honor shop. Same opener handoff as
    *  openVendor above: the dialog is hidden before the route fires. */
   openWarfareVendor(npcId: number, opener?: HTMLElement | null): void;
+  /** The Founder Salesman's tiered Founder Pack store. Same opener handoff. */
+  openFounderVendor(npcId: number, opener?: HTMLElement | null): void;
   openTrain(npcId: number): void;
   openUnbind(npcId: number): void;
   /** Open the crafting window straight to `craftId`'s tab (the station
@@ -386,6 +388,7 @@ export class QuestDialogController {
       (delve) => delve.boardNpcId === npc.templateId,
     );
     const hasCardMaster = !!definition?.cardMaster;
+    const hasFounderVendor = !!definition?.founderVendor;
     // A farmer NPC (the farming go-live) offers the husk-to-compost trade,
     // the one UI affordance that sends convert_husks; gated on the NpcDef
     // flag like the card master, never on an id. STATIC BY CONTRACT: the row
@@ -408,6 +411,7 @@ export class QuestDialogController {
         hasCardMaster,
         hasTraining,
         hasFarmer,
+        hasFounderVendor,
       })
     ) {
       this.close();
@@ -514,6 +518,11 @@ export class QuestDialogController {
     if (hasCardMaster) {
       html += `<button type="button" class="qd-list-item" data-card-duel="1" aria-label="${esc(t('cardDuel.title'))}"><span class="gold">&#9824;</span> ${esc(t('cardDuel.title'))}</button>`;
     }
+    if (hasFounderVendor) {
+      // Its OWN label and accessible name: the Founder Pack claim entry
+      // point, never generic "Browse Goods".
+      html += `<button type="button" class="qd-list-item" data-founder-shop="1" aria-label="${esc(t('hudChrome.founderShop.gossipOptionAria', { name: npcName }))}"><span class="gold">${svgIcon('crafting')}</span> ${esc(t('hudChrome.founderShop.gossipOption'))}</button>`;
+    }
     if (hasFarmer) {
       // The trade's feedback is the sim's own: the farmHusksConverted line
       // and the farmDenied toasts (farm_event_feedback.ts), so the row sends
@@ -538,6 +547,7 @@ export class QuestDialogController {
       this.deps.openCrucibleVendor(npc.id, opener),
     );
     this.bindRoute('[data-warfare-shop]', (opener) => this.deps.openWarfareVendor(npc.id, opener));
+    this.bindRoute('[data-founder-shop]', (opener) => this.deps.openFounderVendor(npc.id, opener));
     this.bindRoute('[data-train]', () => this.deps.openTrain(npc.id));
     if (masterCraft !== null) {
       this.bindRoute('[data-crafting]', () => this.deps.openCrafting(masterCraft));

@@ -138,7 +138,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    expect(DEED_ORDER.length).toBe(300);
+    // +3 for the Founder Pack titles (founder_emberborn/starforged/worldshaper,
+    // content/founder_pack.ts), each renown 0, so the sum is unchanged.
+    expect(DEED_ORDER.length).toBe(303);
     expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
   });
 
@@ -175,7 +177,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
       exploration: 11,
-      feat: 3,
+      // +3 for the Founder Salesman's title-reward feats (feat_founder_*):
+      // a wallet-gated purchase, not an achievement, so feat: true per this
+      // file's own convention (see OFF_PREFIX_FEATS below).
+      feat: 6,
       hidden: 10,
     });
   });
@@ -369,6 +374,11 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
+      // The Founder Salesman's three title-reward feats (content/founder_pack.ts),
+      // appended at the true tail.
+      'feat_founder_emberborn',
+      'feat_founder_starforged',
+      'feat_founder_worldshaper',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -752,7 +762,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     });
   });
 
-  it('ships exactly 46 titles and 4 borders', () => {
+  it('ships exactly 49 titles and 4 borders', () => {
     const titles = ALL.filter((d) => d.reward?.kind === 'title');
     const borders = ALL.filter((d) => d.reward?.kind === 'border');
     // Reliquary Curator ranks append 3 titles + 1 border, the WARFARE honor
@@ -762,12 +772,13 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // (phase 06) the tenth, closing the family across the whole ring,
     // prog_farming_100's Harvestmaster (the absorbed packet's D13 title
     // mandate), and the Crucible raid's flawless title (dgn_varkhul_flawless,
-    // the 2026-08-30 release/v0.41.0 sync merge) one more.
-    expect(titles.length).toBe(46);
+    // the 2026-08-30 release/v0.41.0 sync merge) one more, then +3 for the
+    // Founder Salesman's Emberborn/Starforged/Worldshaper titles.
+    expect(titles.length).toBe(49);
     expect(borders.length).toBe(4);
     // Titles and border slugs are unique (one deed per cosmetic).
     const titleTexts = titles.map((d) => (d.reward as { text: string }).text);
-    expect(new Set(titleTexts).size).toBe(46);
+    expect(new Set(titleTexts).size).toBe(49);
     const borderSlugs = borders.map((d) => (d.reward as { slug: string }).slug);
     expect([...borderSlugs].sort()).toEqual([
       'curators_gilt',
@@ -978,7 +989,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  const FROZEN_CATALOG_SHA256 = '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  // Re-minted for the Founder Salesman's three title feats
+  // (feat_founder_emberborn/starforged/worldshaper, content/founder_pack.ts):
+  // a pure tail append, no shipped trigger or renown changed (the
+  // PRE_APPEND_CATALOG_SHA256 proof below reproduces the previous mint
+  // exactly once those three ids are stripped back out).
+  const FROZEN_CATALOG_SHA256 = '499f030faa1a5cb1d1414f84384c63d7e6773a176ca51557f53a4a6c0793e6e0';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1027,8 +1043,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // retune into the new checkpoint; every append AFTER this merge is once
   // again provable the auditable way against it.
   const PRE_APPEND_CATALOG_SHA256 =
-    '516adb010bf37c91076b9a16bdf0e4dc22c72506fcb64e237468d1ee197d1358';
-  const APPENDED_SINCE: readonly string[] = ['col_set_bramblehide', 'hid_forgebreaker'];
+    '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  const APPENDED_SINCE: readonly string[] = [
+    'feat_founder_emberborn',
+    'feat_founder_starforged',
+    'feat_founder_worldshaper',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1039,8 +1059,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // Pin its two predecessors too: this is an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_varkhul_heroic',
-      'dgn_varkhul_flawless',
+      'col_set_bramblehide',
+      'hid_forgebreaker',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1257,8 +1277,9 @@ describe('table shape', () => {
     // that (appended behind the branch's rows; the flawless task is its
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
-    // The one-time Forgebreaker quest's hidden celebration appends after it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
+    // The one-time Forgebreaker quest's hidden celebration appends after it,
+    // and the Founder Salesman's three title feats close the catalog.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('feat_founder_worldshaper');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

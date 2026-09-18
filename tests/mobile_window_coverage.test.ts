@@ -114,6 +114,8 @@ const MOBILE_WINDOW_EXCEPTIONS: Record<string, string> = {
   'lockpick-panel': 'in-run gameplay overlay, not a menu window that docks to a sheet',
   'keyboard-map-window':
     'desktop-only keyboard overview pop-out (dynamic): the Key Bindings panel paints the board and its Pop Out button only off useTouchInterface(), since touch has no physical keyboard, so the window never opens on mobile',
+  'founder-pack-preview-window':
+    'desktop-only side preview panel beside the Founder Pack store: a fixed left-edge window with no room next to a full-width mobile sheet, so hud.mobile.css hides it outright (display: none) rather than sheeting it; claiming a skin or mount works identically without the live preview',
 };
 
 // A src/styles/*.css module contains a positioning/floor rule for #id on touch when

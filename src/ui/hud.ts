@@ -68,9 +68,14 @@ import { bagPools } from '../sim/bags';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
+import {
+  FOUNDER_PACK_MOUNT_PICKS,
+  FOUNDER_SKIN_CATALOG,
+  type FounderPackTier,
+} from '../sim/content/founder_pack';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../sim/content/ignivar_loot';
-import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
+import { isOnMountRaceStartPlatform, MOUNTS, type MountKey } from '../sim/content/mounts';
 import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
@@ -319,6 +324,8 @@ import { fctSpawnShape } from './fct_event';
 import { FctPainter } from './fct_painter';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { type FounderPackPreviewDeps, FounderPackPreviewPanel } from './founder_pack_preview';
+import { buildFounderPackView, renderFounderPackWindow } from './founder_pack_window';
 import {
   PARTY_FRAME_POS_KEY,
   PLAYER_FRAME_POS_KEY,
@@ -1700,6 +1707,18 @@ export class Hud {
   // bags-paired window, so trapping Tab here costs nothing.
   private readonly warfareWindowFocus = this.windowFocus('#warfare-window');
   private warfareVendorOpenerFocus: HTMLElement | null = null;
+  // The Founder Salesman's Founder Pack store: same standalone trapping shape
+  // as the warfare shop above (no bags companion, nothing to fight the trap).
+  private openFounderVendorNpcId: number | null = null;
+  private readonly founderWindowFocus = this.windowFocus('#founder-pack-window');
+  private founderVendorOpenerFocus: HTMLElement | null = null;
+  // The in-progress mount pick, kept here (not derived state) so a re-paint
+  // triggered by an unrelated event never loses a partial selection. Cleared
+  // on open/close and after a successful claim.
+  private founderMountSelection = new Set<MountKey>();
+  // The side preview panel (#founder-pack-preview-window): a skin or mount
+  // click mounts a live model there instead of just toggling the pick.
+  private readonly founderPreview = new FounderPackPreviewPanel();
   // The show-jumping race: a slim, non-interactive bottom strip painted from the
   // authoritative world.mountRaceView() (never a cached copy). hud.ts keeps only
   // the event routing, the start/finish banners, and show/hide.
@@ -2407,6 +2426,7 @@ export class Hud {
       openHeroicVendor: (npcId, opener) => this.openHeroicVendor(npcId, opener),
       openCrucibleVendor: (npcId, opener) => this.openCrucibleVendor(npcId, opener),
       openWarfareVendor: (npcId, opener) => this.openWarfareVendor(npcId, opener),
+      openFounderVendor: (npcId, opener) => this.openFounderVendor(npcId, opener),
       openTrain: (npcId) => this.openTrain(npcId),
       openUnbind: (npcId) => this.openUnbind(npcId),
       openCrafting: (craftId) => this.openCrafting(craftId),
@@ -3693,6 +3713,9 @@ export class Hud {
         break;
       case 'warfare-window':
         this.closeWarfareVendor();
+        break;
+      case 'founder-pack-window':
+        this.closeFounderVendor();
         break;
       case 'train-window':
         this.closeTrain();
@@ -15284,6 +15307,89 @@ export class Hud {
   }
 
   // -------------------------------------------------------------------------
+  // The Founder Salesman (#founder-pack-window)
+  // -------------------------------------------------------------------------
+
+  openFounderVendor(npcId: number, opener?: HTMLElement | null): void {
+    this.closeOtherWindows('#founder-pack-window');
+    this.openFounderVendorNpcId = npcId;
+    this.founderMountSelection.clear();
+    this.renderFounderVendor();
+    this.founderPreview.open($('#founder-pack-preview-window'), this.founderPreviewDeps());
+    const captured = this.founderWindowFocus.captureFocus();
+    this.founderVendorOpenerFocus = opener !== undefined ? opener : captured;
+  }
+
+  private founderPreviewDeps(): FounderPackPreviewDeps {
+    return {
+      mountCharPreview: (container, cls, skin, previewKey) =>
+        this.mountCharPreview(container, cls, skin, previewKey),
+      onClose: () => this.founderPreview.close(),
+    };
+  }
+
+  private renderFounderVendor(): void {
+    if (this.openFounderVendorNpcId === null) return;
+    const npc = this.sim.entities.get(this.openFounderVendorNpcId);
+    if (!npc) return;
+    const view = buildFounderPackView(
+      this.sim.accountCosmetics,
+      this.sim.cfg.playerClass,
+      FOUNDER_PACK_MOUNT_PICKS,
+    );
+    renderFounderPackWindow($('#founder-pack-window'), view, {
+      hideTooltip: () => this.hideTooltip(),
+      selectedMounts: this.founderMountSelection,
+      onToggleMount: (key) => this.toggleFounderMountPick(key),
+      onClaimTier: (tier) => this.requestFounderPackClaim(tier),
+      onClaimSkin: (catalog) => this.requestFounderSkinClaim(catalog),
+      onClose: () => this.closeFounderVendor(),
+      onPreviewMount: (key) => this.founderPreview.showMount(key),
+      onPreviewSkin: (catalog) => {
+        const skin = FOUNDER_SKIN_CATALOG.find((s) => s.catalog === catalog);
+        if (skin) this.founderPreview.showSkin(skin, this.founderPreviewDeps());
+      },
+    });
+  }
+
+  private toggleFounderMountPick(key: MountKey): void {
+    if (this.founderMountSelection.has(key)) this.founderMountSelection.delete(key);
+    else this.founderMountSelection.add(key);
+    this.renderFounderVendor();
+  }
+
+  closeFounderVendor(): void {
+    if (this.openFounderVendorNpcId === null) return;
+    $('#founder-pack-window').style.display = 'none';
+    this.openFounderVendorNpcId = null;
+    this.founderMountSelection.clear();
+    this.founderPreview.close();
+    this.hideTooltip();
+    this.founderWindowFocus.restoreFocus(this.founderVendorOpenerFocus);
+    this.founderVendorOpenerFocus = null;
+  }
+
+  // The whole-pack claim is a one-time, unrefundable, real-wallet-gated grant:
+  // confirm first, exactly like the Warfare/Heroic honor purchases above.
+  private requestFounderPackClaim(tier: FounderPackTier): void {
+    const picks = [...this.founderMountSelection];
+    this.confirmDialog(
+      t('hudChrome.founderShop.claimConfirmTitle'),
+      t('hudChrome.founderShop.claimConfirmBody'),
+      t('hudChrome.founderShop.claimButton'),
+      t('heroicShop.buyConfirmCancel'),
+      () => {
+        this.sim.claimFounderPack(tier, picks);
+        this.founderMountSelection.clear();
+      },
+    );
+  }
+
+  private requestFounderSkinClaim(catalog: SkinCatalog): void {
+    this.sim.claimFounderSkin(catalog);
+  }
+
+  // -------------------------------------------------------------------------
   // Recipe training (Professions 2.0): a station master teaches
   // trainer-acquisition recipes for a tier-priced copper fee. Opens ONLY from
   // the master's gossip dialog (no side-rail button; the rail is at
@@ -16306,6 +16412,8 @@ export class Hud {
       this.renderHeroicVendor();
     if (this.openWarfareVendorNpcId !== null && $('#warfare-window').style.display === 'block')
       this.renderWarfareVendor();
+    if (this.openFounderVendorNpcId !== null && $('#founder-pack-window').style.display === 'block')
+      this.renderFounderVendor();
     if (this.openTrainNpcId !== null && $('#train-window').style.display === 'block')
       this.renderTrain();
     if (this.openUnbindNpcId !== null && $('#unbind-window').style.display === 'block')
@@ -16370,14 +16478,21 @@ export class Hud {
    *  resolve guard a few lines below). The char skin picker mounts through
    *  mountCharPreview too, but only while the char sheet is showing (its click
    *  handler re-checks `#char-window` display before mounting), so it needs no
-   *  signal of its own. A char prewarm unit must pause while either surface is on
-   *  screen: otherwise it draws warmup frames on the visible canvas and warms
-   *  whatever rig that surface has mounted (the INSPECTED player's, not the local
-   *  paperdoll skin the unit was warming). */
+   *  signal of its own. The Founder Pack preview panel is a THIRD surface that
+   *  mounts the same shared preview (founder_pack_preview.ts showSkin), so its
+   *  own open state counts here too, coarse-grained: it pauses the background
+   *  prewarm loop whenever the panel is open at all, not only while it is
+   *  actually showing a skin (open but showing a mount is the rarer case, and
+   *  the cost of an over-cautious pause there is negligible). A char prewarm
+   *  unit must pause while any of these three is on screen: otherwise it draws
+   *  warmup frames on the visible canvas and warms whatever rig that surface
+   *  has mounted (the INSPECTED player's, not the local paperdoll skin the
+   *  unit was warming). */
   private isCharPreviewSurfaceVisible(): boolean {
     return (
       this.charWindow.isOpen ||
-      ($('#inspect-window') as HTMLElement | null)?.style.display === 'block'
+      ($('#inspect-window') as HTMLElement | null)?.style.display === 'block' ||
+      this.founderPreview.isOpen
     );
   }
 

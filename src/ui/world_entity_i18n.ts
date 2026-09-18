@@ -645,6 +645,9 @@ const LETTER_IDS = [
   // The absent-participant Wyrmfall Core delivery (Masterwrought phase 04,
   // WYRMFALL_CORE_LETTER in src/sim/content/letters.ts).
   'wyrmfall_core_reward',
+  // The Founder Salesman's claim delivery (FOUNDER_PACK_LETTER in
+  // src/sim/content/letters.ts).
+  'founder_pack_reward',
   // Guild trend letters (Professions 2.0), one per canonical adjacent
   // pair in CRAFT_RING order (GUILD_TREND_LETTERS in src/sim/content/letters.ts).
   'guild_trend_engineering_alchemy',

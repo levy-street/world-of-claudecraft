@@ -11,6 +11,9 @@ export const EMPTY_ACCOUNT_COSMETICS: AccountCosmetics = {
   weaponSkinIds: [],
   weaponSkinLoadout: {},
   mountSkinIds: [],
+  founderSkinIds: [],
+  founderPackTier: null,
+  founderPackClaudium: 0,
 };
 
 export function reconcileWornMechChromaForJoin(args: {

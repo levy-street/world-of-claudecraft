@@ -19881,4 +19881,150 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  /* The Founder Salesman's Founder Pack store (#founder-pack-window): three
+     tiered cards, colored per rarity (green/blue/purple, the request's own
+     wording), reusing the shared .btn / .x-btn / .panel-title chrome. */
+  #founder-pack-window {
+    max-width: 720px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .founder-tier-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 8px 0;
+  }
+  .founder-tier-card {
+    flex: 1 1 220px;
+    min-width: 200px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .founder-tier-uncommon {
+    background: linear-gradient(160deg, rgba(30, 90, 40, 0.55), rgba(15, 45, 20, 0.75));
+  }
+  .founder-tier-rare {
+    background: linear-gradient(160deg, rgba(30, 70, 140, 0.55), rgba(15, 35, 70, 0.75));
+  }
+  .founder-tier-epic {
+    background: linear-gradient(160deg, rgba(110, 40, 150, 0.55), rgba(55, 20, 75, 0.75));
+  }
+  .founder-tier-title {
+    margin: 0;
+    font-size: 14px;
+  }
+  .founder-tier-line {
+    margin: 0;
+    font-size: 12px;
+    opacity: 0.9;
+  }
+  .founder-tier-wallet {
+    font-style: italic;
+    opacity: 0.75;
+  }
+  .founder-mount-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .founder-mount-chip {
+    font-size: 11px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: transparent;
+    color: inherit;
+  }
+  .founder-mount-chip.checked {
+    background: rgba(255, 255, 255, 0.25);
+  }
+  .founder-claim-btn {
+    margin-top: 6px;
+  }
+  .founder-skin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .founder-skin-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 4px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+  }
+  .founder-skin-row.owned {
+    opacity: 0.6;
+  }
+  .founder-tradeable-note {
+    margin-top: 10px;
+    font-size: 11px;
+    opacity: 0.7;
+    font-style: italic;
+  }
+  /* A skin row's icon + name double as its preview trigger: no button chrome,
+     it reads as part of the row rather than a competing action beside Claim. */
+  .founder-skin-preview {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 0;
+    cursor: pointer;
+    text-align: left;
+  }
+  .founder-skin-preview .portrait-chip {
+    flex: none;
+  }
+  .founder-mount-chip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .founder-mount-chip .item-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* The side preview panel (#founder-pack-preview-window): a fixed left-edge
+     window, independent of wherever the store itself centres, so it never
+     drifts if the store's own width changes. Overrides the generic .window
+     centring (layout.css) entirely: fixed position, no transform. */
+  #founder-pack-preview-window {
+    position: fixed;
+    left: 24px;
+    top: 15vh;
+    width: 260px;
+    max-width: 260px;
+  }
+  .founder-preview-stage {
+    position: relative;
+    width: 100%;
+    height: 260px;
+  }
+  .founder-preview-model,
+  .founder-preview-canvas {
+    width: 100%;
+    height: 100%;
+  }
+  .founder-preview-canvas {
+    display: block;
+  }
+  .founder-preview-empty {
+    margin: 8px 0 0;
+    font-size: 12px;
+    opacity: 0.7;
+    text-align: center;
+  }
 }

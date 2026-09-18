@@ -94,6 +94,7 @@ import {
   type RiftTier,
   type RiteIntensity,
   type SimEvent,
+  type SkinCatalog,
   TICK_RATE,
   type WeaponSkinType,
 } from '../sim/types';
@@ -4093,11 +4094,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldCosmetics: skin + mech-chroma equips. Optimistic local nudge, then
   // the snake_case cmd (change_skin/claim_event_skin/unequip_mech_chroma); the
   // server re-validates and the self-snapshot reconciles. ---
-  changeSkin(skin: number, catalog: 'class' | 'mech' = 'class'): void {
+  changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     const idx =
-      catalog === 'mech'
-        ? Math.max(0, Math.floor(skin))
-        : Math.max(0, Math.min(7, Math.floor(skin)));
+      catalog === 'class'
+        ? Math.max(0, Math.min(7, Math.floor(skin)))
+        : Math.max(0, Math.floor(skin));
     const p = this.entities.get(this.playerId);
     if (p) {
       p.skin = idx;
@@ -4117,6 +4118,16 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  // The Founder Salesman's claims: no optimistic local nudge (unlike
+  // changeSkin above), because the whole point is the server's real
+  // wallet-balance re-check; the self snapshot (accountCosmetics,
+  // skinCatalog/skin) reconciles once it accepts.
+  claimFounderPack(tier: string, mountPicks: readonly string[]): void {
+    this.cmd({ cmd: 'claim_founder_pack', tier, mountPicks: [...mountPicks] });
+  }
+  claimFounderSkin(catalog: string): void {
+    this.cmd({ cmd: 'claim_founder_skin', catalog });
   }
   // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
   // item use, not a mount command, so nothing here sends one. The toggle stays

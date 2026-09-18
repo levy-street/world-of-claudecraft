@@ -1977,6 +1977,9 @@ export class Sim {
     weaponSkinIds: [],
     weaponSkinLoadout: {},
     mountSkinIds: [],
+    founderSkinIds: [],
+    founderPackTier: null,
+    founderPackClaudium: 0,
   };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
@@ -4368,6 +4371,18 @@ export class Sim {
 
   changeSkin(skin: number, catalog: SkinCatalog = 'class'): void {
     this.setPlayerSkin(this.primaryId, skin, catalog);
+  }
+
+  // The Founder Salesman's claim commands are ONLINE ONLY: the real $WOC
+  // balance check needs a linked wallet and the server's own RPC credential
+  // (server/woc_balance.ts), neither of which the offline sandbox has. The
+  // offline Sim always refuses, same as the paid Armory weapon-skin store.
+  claimFounderPack(_tier: string, _mountPicks: readonly string[]): void {
+    this.error(this.primaryId, "The Founder Salesman's packs require an online account.");
+  }
+
+  claimFounderSkin(_catalog: string): void {
+    this.error(this.primaryId, "The Founder Salesman's packs require an online account.");
   }
 
   /** Per-pid mount toggle (the server command path); the IWorld members below

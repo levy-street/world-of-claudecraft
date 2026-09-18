@@ -766,7 +766,10 @@ describe('/dev skin (fixed full-body skins)', () => {
     expect(
       sim
         .drainEvents()
-        .some((event) => event.type === 'error' && event.text.includes("Unknown skin 'nonexistent_body'")),
+        .some(
+          (event) =>
+            event.type === 'error' && event.text.includes("Unknown skin 'nonexistent_body'"),
+        ),
     ).toBe(true);
   });
 
@@ -781,5 +784,72 @@ describe('/dev skin (fixed full-body skins)', () => {
     sim.chat('/dev skin altherion');
 
     expect(sim.meta(sim.playerId)?.skinCatalog).toBe('class');
+  });
+});
+
+describe('/dev founders (offline Founder Pack unlock)', () => {
+  it('defaults to the epic tier: every skin, all 3 reins, the bag, and the title', () => {
+    const sim = devSim();
+
+    sim.chat('/dev founders');
+
+    expect(sim.accountCosmetics.founderPackTier).toBe('epic');
+    expect(sim.accountCosmetics.founderSkinIds).toEqual([
+      'altherion',
+      'boneforged',
+      'bonehunter',
+      'eclipse_wildheart',
+      'frostfire',
+      'dawnbreaker',
+      'plaguebringer',
+      'shinobi',
+      'spiritwolf',
+    ]);
+    expect(sim.accountCosmetics.founderPackClaudium).toBe(2000);
+    expect(sim.countItem('founder_reins_cinderjaw_rex')).toBe(1);
+    expect(sim.countItem('founder_reins_ancient_devourer')).toBe(1);
+    expect(sim.countItem('founder_reins_shiba_inu')).toBe(1);
+    expect(sim.countItem('founder_bag_emberfall_phoenix')).toBe(1);
+    expect(sim.meta(sim.playerId)?.deedsEarned.has('feat_founder_worldshaper')).toBe(true);
+    expect(sim.meta(sim.playerId)?.activeTitle).toBe('feat_founder_worldshaper');
+  });
+
+  it('grants a named lower tier with its own bag and Claudium amount', () => {
+    const sim = devSim();
+
+    sim.chat('/dev founders uncommon');
+
+    expect(sim.accountCosmetics.founderPackTier).toBe('uncommon');
+    expect(sim.accountCosmetics.founderPackClaudium).toBe(1000);
+    expect(sim.countItem('founder_bag_phantom')).toBe(1);
+    expect(sim.meta(sim.playerId)?.activeTitle).toBe('feat_founder_emberborn');
+  });
+
+  it('rejects an unknown tier and changes nothing', () => {
+    const sim = devSim();
+
+    sim.chat('/dev founders mythic');
+
+    expect(sim.accountCosmetics.founderPackTier).toBeNull();
+    expect(
+      sim
+        .drainEvents()
+        .some(
+          (event) => event.type === 'error' && event.text.includes('Unknown Founder Pack tier'),
+        ),
+    ).toBe(true);
+  });
+
+  it('is inert when dev commands are disabled', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      devCommands: false,
+      world: EMPTY_TEST_WORLD,
+    });
+
+    sim.chat('/dev founders');
+
+    expect(sim.accountCosmetics.founderPackTier).toBeNull();
   });
 });

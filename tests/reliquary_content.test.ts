@@ -457,7 +457,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
-    expect(full).toEqual({ owned: 440, total: 440 });
+    expect(full).toEqual({ owned: 446, total: 446 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -484,8 +484,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // THIS merge independently adds its own two character-scoped mount slots
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
-    // deltas, see the overview pair's note above.
-    expect(character).toEqual({ owned: 411, total: 411 });
+    // deltas, see the overview pair's note above. The Founder's Pack vendor
+    // adds 3 character-scoped mount slots and 3 character-scoped title
+    // slots (deeds are per-character): 417.
+    expect(character).toEqual({ owned: 417, total: 417 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -534,11 +536,15 @@ describe('Reliquary Conqueror catalog structure', () => {
     // OSSBrain candidate side of THIS merge independently adds its own two
     // horizons_mounts slots (goblin_rocket_sled, rallycart_rxt): 488,
     // MEASURED on the merged tree. UNION MERGE: base plus both deltas, see
-    // the completion pair note above.
+    // the completion pair note above. The Founder's Pack vendor (The Founder
+    // Salesman, Eastbrook) adds 3 horizons_mounts slots (cinderjaw_rex,
+    // ancient_devourer, shiba_inu) and 3 horizons_titles slots
+    // (feat_founder_emberborn, feat_founder_starforged,
+    // feat_founder_worldshaper): 489.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(483);
+    ).toBe(489);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -3043,14 +3049,15 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_forgebreaker: 1,
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
   // pending-ruling absences resolve to nothing. The storefront door left with
-  // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
-  horizons_mounts: 10,
+  // the Mech Bird: a paid mount is a mount SKIN now, never a relic. The
+  // Founder's Pack claim activity is one more distinct source: 11.
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
-  // Crucible raid's flawless title.
-  horizons_titles: 44,
+  // Crucible raid's flawless title + the three Founder's Pack tier titles.
+  horizons_titles: 47,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -3688,6 +3695,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'corpse_harvest',
       'masterwork_craft',
       'rift_first_clear',
+      'founder_pack_claim',
     ]);
   });
 
@@ -4546,10 +4554,12 @@ describe('Reliquary source hint coverage', () => {
         'mark x activity',
         'mark x boss',
         'mark x zone',
-        // mount: heroic tables, Marla's counter, the rift reins ladder.
+        // mount: heroic tables, Marla's counter, the rift reins ladder, and
+        // the Founder's Pack wallet-gated claim (no vendorItems counter).
         'mount x boss',
         'mount x vendor',
         'mount x rift',
+        'mount x activity',
         // weapon_skin: the account storefront, page-wide.
         'weapon_skin x store',
         // title: the deed that grants it, always.

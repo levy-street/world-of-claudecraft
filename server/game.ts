@@ -14,7 +14,15 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import {
+  FOUNDER_PACK_MOUNT_PICKS,
+  founderPackMountReinsItemId,
+  founderPackTierDef,
+  founderSkinDef,
+} from '../src/sim/content/founder_pack';
+import { FOUNDER_PACK_LETTER } from '../src/sim/content/letters';
 import { isMountSkinId } from '../src/sim/content/mount_skins';
+import type { MountKey } from '../src/sim/content/mounts';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
@@ -86,10 +94,12 @@ import {
   type Entity,
   emptyMoveInput,
   FISHING_CAST_ID,
+  FULL_BODY_SKIN_CATALOGS,
   type InvSlot,
   type ItemInstancePayload,
   isDungeonDifficulty,
   isEquipSlot,
+  isSkinCatalog,
   type MobFamily,
   RUN_SPEED,
   type SimEvent,
@@ -193,8 +203,10 @@ import {
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
 import {
+  claimAccountFounderPackTier,
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
+  grantAccountFounderSkin,
   grantAccountMechChroma,
   grantAccountMountSkins,
   grantAccountWeaponSkins,
@@ -443,7 +455,7 @@ import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
 import { dispatchVaultCommand, emitVaultSelfKeys } from './vault_wire';
-import { holderInfoForPubkey } from './woc_balance';
+import { cachedWocBalance, holderInfoForPubkey } from './woc_balance';
 import type { CharacterSaveArgs } from './woc_market';
 import { isBackpressureExceeded } from './ws_backpressure';
 
@@ -6800,11 +6812,120 @@ export class GameServer {
             if (chroma && session.accountCosmetics.mechChromaIds.includes(chroma.id)) {
               sim.setPlayerSkin(pid, idx, 'mech');
             }
+          } else if (
+            typeof msg.catalog === 'string' &&
+            isSkinCatalog(msg.catalog) &&
+            (FULL_BODY_SKIN_CATALOGS as readonly string[]).includes(msg.catalog)
+          ) {
+            // Founder Pack full-body skins: an account-wide entitlement
+            // (founderSkinIds), the mech-chroma precedent above. `skin` is
+            // always 0 (no chroma on these bodies).
+            if (session.accountCosmetics.founderSkinIds?.includes(msg.catalog)) {
+              sim.setPlayerSkin(pid, 0, msg.catalog);
+            }
           } else {
             sim.setPlayerSkin(pid, msg.skin, 'class');
           }
         }
         break;
+      // The Founder Salesman: the one-time whole-pack claim. Real on-chain
+      // $WOC balance check (server/woc_balance.ts) against the account's
+      // LINKED wallet (server/db.ts walletForAccount), never the client's
+      // self-reported balance.
+      case 'claim_founder_pack': {
+        const tierDef = typeof msg.tier === 'string' ? founderPackTierDef(msg.tier) : null;
+        const mountPicks = Array.isArray(msg.mountPicks)
+          ? msg.mountPicks.filter((k): k is string => typeof k === 'string')
+          : [];
+        if (
+          !tierDef ||
+          mountPicks.length !== tierDef.mountPicks ||
+          new Set(mountPicks).size !== mountPicks.length ||
+          !mountPicks.every((k) => (FOUNDER_PACK_MOUNT_PICKS as readonly string[]).includes(k))
+        ) {
+          this.sendCommandOutcome(session, msg, false);
+          break;
+        }
+        if (session.accountCosmetics.founderPackTier) {
+          // Already claimed a tier, ever: refuse quietly, same as a second
+          // Armory purchase attempt.
+          this.sendCommandOutcome(session, msg, false);
+          break;
+        }
+        void (async () => {
+          const link = session.accountId ? await walletForAccount(session.accountId) : null;
+          const balance = link ? await cachedWocBalance(link.pubkey, true) : null;
+          if (!session.accountId || balance === null || balance < tierDef.wocThreshold) {
+            this.sendCommandOutcome(session, msg, false);
+            return;
+          }
+          const updated = await claimAccountFounderPackTier(
+            session.accountId,
+            tierDef.tier,
+            tierDef.claudium,
+          );
+          if (!updated) {
+            // Raced against a second claim attempt; the DB CAS refused.
+            this.sendCommandOutcome(session, msg, false);
+            return;
+          }
+          session.accountCosmetics = updated;
+          this.cosmetics.updateLive(session.accountId, updated);
+          const meta = sim.meta(pid);
+          if (meta) {
+            sim.ctx.grantDeed(meta, tierDef.titleDeedId);
+            sim.setActiveTitle(tierDef.titleDeedId, pid);
+            for (const key of mountPicks) {
+              const itemId = founderPackMountReinsItemId(key as MountKey);
+              if (itemId) {
+                sim.ctx.mailAuthoredLetter(meta, {
+                  ...FOUNDER_PACK_LETTER,
+                  items: [{ itemId, count: 1 }],
+                });
+              }
+            }
+            sim.ctx.mailAuthoredLetter(meta, {
+              ...FOUNDER_PACK_LETTER,
+              items: [{ itemId: tierDef.bagItemId, count: 1 }],
+            });
+          }
+          this.sendCommandOutcome(session, msg, true);
+        })();
+        break;
+      }
+      // The Founder Salesman: one skin pick, repeatable up to the claimed
+      // tier's skinPicks budget.
+      case 'claim_founder_skin': {
+        const catalog = typeof msg.catalog === 'string' ? msg.catalog : null;
+        const skinDef = catalog ? founderSkinDef(catalog) : null;
+        const tier = session.accountCosmetics.founderPackTier;
+        const tierDef = tier ? founderPackTierDef(tier) : null;
+        const owned = session.accountCosmetics.founderSkinIds ?? [];
+        const meta = sim.meta(pid);
+        if (
+          !skinDef ||
+          !tierDef ||
+          !catalog ||
+          owned.includes(catalog) ||
+          owned.length >= tierDef.skinPicks ||
+          !meta ||
+          meta.cls !== skinDef.requiredClass
+        ) {
+          this.sendCommandOutcome(session, msg, false);
+          break;
+        }
+        void (async () => {
+          if (!session.accountId) {
+            this.sendCommandOutcome(session, msg, false);
+            return;
+          }
+          const updated = await grantAccountFounderSkin(session.accountId, catalog);
+          session.accountCosmetics = updated;
+          this.cosmetics.updateLive(session.accountId, updated);
+          this.sendCommandOutcome(session, msg, true);
+        })();
+        break;
+      }
       case 'unequip_mech_chroma': {
         // The rule (take the chroma off THIS character's current look only; the
         // account-wide unlock is permanent) is the sim's, read off the live

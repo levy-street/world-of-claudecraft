@@ -34,6 +34,7 @@ const baseEnTable = {
   'aura.craftedCollection': 'Crafted Collection',
   'aura.lastflameZeal': "Last Flame's Zeal",
   'log.deathwardSaves': 'A deathward saves you!',
+  'error.founderPackOnlineOnly': "The Founder Salesman's packs require an online account.",
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
   'error.noDeadAlly': 'You must target a dead ally in your group.',

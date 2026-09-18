@@ -3393,6 +3393,45 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
     hidden: true,
   },
+  // Founder Pack titles (The Founder Salesman, content/founder_pack.ts):
+  // manually granted at claim time (grantDeed), never by the trigger scanner,
+  // the cmb_giantslayer precedent for a 'manual' trigger. Cosmetic-only, same
+  // as every other title-reward deed. A wallet-gated purchase, not an
+  // achievement, so it carries feat: true (excluded from Book of Deeds
+  // completion, so 100% never requires buying a Founder Pack) and the feat_
+  // prefix this file's own convention asks new feats to use, rather than
+  // growing the off-prefix allowlist below. Appended at the tail (DEED_ORDER
+  // is append-only from table order).
+  feat_founder_emberborn: {
+    id: 'feat_founder_emberborn',
+    name: 'Emberborn',
+    desc: "Claim the Uncommon Founder's Pack from The Founder Salesman.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Emberborn' },
+    feat: true,
+  },
+  feat_founder_starforged: {
+    id: 'feat_founder_starforged',
+    name: 'Starforged',
+    desc: "Claim the Rare Founder's Pack from The Founder Salesman.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Starforged' },
+    feat: true,
+  },
+  feat_founder_worldshaper: {
+    id: 'feat_founder_worldshaper',
+    name: 'Worldshaper',
+    desc: "Claim the Epic Founder's Pack from The Founder Salesman.",
+    category: 'feat',
+    renown: 0,
+    trigger: { kind: 'manual' },
+    reward: { kind: 'title', text: 'Worldshaper' },
+    feat: true,
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

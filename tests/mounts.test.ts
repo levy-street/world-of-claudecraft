@@ -25,7 +25,9 @@ import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import {
   DEFAULT_MOUNT,
   DEVELOPER_MOUNTS,
+  FOUNDER_PACK_MOUNTS,
   isDeveloperMount,
+  isFounderPackMount,
   MOUNT_KEYS,
   MOUNTS,
   mountDef,
@@ -106,8 +108,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly ten mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(10);
+  it('has exactly thirteen mounts with the horse first and the developer tank last', () => {
+    expect(MOUNT_KEYS).toHaveLength(13);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -184,11 +186,12 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (isDeveloperMount(key)) {
+      if (isDeveloperMount(key) || isFounderPackMount(key)) {
         // Bound reins, for the same leak reason from different doors: a
-        // developer-only mount has no player acquisition path, and the store
-        // mount's reins is a real-money grant (server/claudium.ts). Either
-        // trading hands would turn a grant into an economy leak.
+        // developer-only mount has no player acquisition path, the Founder
+        // Pack pick is a claimable grant, and the store mount's reins is a
+        // real-money grant (server/claudium.ts). Either trading hands would
+        // turn a grant into an economy leak.
         expect(item.soulbound).toBe(true);
       } else {
         // Player reins are NOT soulbound: they trade, mail, list, and store in
@@ -267,7 +270,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
-      if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
+      if (isDeveloperMount(key) || isFounderPackMount(key)) continue; // pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -337,6 +340,70 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
   it.each([...DEVELOPER_MOUNTS])(
     'keeps %s developer-only and absent from every normal acquisition table',
+    (mountKey) => {
+      const itemId = mountItemId(mountKey)!;
+      const item = ITEMS[itemId] as MountItemDef;
+      expect(item).toMatchObject({
+        kind: 'mount',
+        mount: mountKey,
+        quality: 'epic',
+        soulbound: true,
+        noDiscard: true,
+        sellValue: 0,
+      });
+      expect(item.buyValue).toBeUndefined();
+
+      for (const mob of Object.values(MOBS)) {
+        expect(
+          mob.loot.some((entry) => entry.itemId === itemId),
+          `${itemId} must not be on ${mob.id}`,
+        ).toBe(false);
+      }
+      for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
+        expect(
+          loot.some((entry) => entry.itemId === itemId),
+          `${itemId} must not be on heroic boss ${bossId}`,
+        ).toBe(false);
+      }
+      expect([
+        ...RIFT_GREEN_MOUNT_REINS,
+        ...RIFT_BLUE_MOUNT_REINS,
+        ...RIFT_EPIC_MOUNT_REINS,
+      ]).not.toContain(itemId);
+      for (const npc of Object.values(NPCS)) {
+        expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+          itemId,
+        );
+      }
+      expect(
+        HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+        `${itemId} must not be sold by the Heroic Quartermaster`,
+      ).not.toContain(itemId);
+      for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+        expect(
+          offers.map((offer) => offer.itemId),
+          `${itemId} must not be sold by delve shop ${delveId}`,
+        ).not.toContain(itemId);
+      }
+      expect(
+        MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+        `${itemId} must not be seeded by the World Market`,
+      ).not.toContain(itemId);
+      for (const quest of Object.values(QUESTS)) {
+        expect(
+          Object.values(quest.itemRewards),
+          `${itemId} must not be rewarded by ${quest.id}`,
+        ).not.toContain(itemId);
+        expect(
+          quest.requiredItems ?? [],
+          `${itemId} must not be required by ${quest.id}`,
+        ).not.toContain(itemId);
+      }
+    },
+  );
+
+  it.each([...FOUNDER_PACK_MOUNTS])(
+    'keeps %s Founder-Pack-only and absent from every normal acquisition table',
     (mountKey) => {
       const itemId = mountItemId(mountKey)!;
       const item = ITEMS[itemId] as MountItemDef;

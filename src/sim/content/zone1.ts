@@ -757,6 +757,24 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: ['q_spiders'],
     greeting: 'Careful where you step in the northeastern woods, friend.',
   },
+  the_founder_salesman: {
+    id: 'the_founder_salesman',
+    name: 'The Founder Salesman',
+    title: 'Keeper of the Founder Packs',
+    pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.the_founder_salesman.position },
+    facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.the_founder_salesman.facing,
+    color: 0xffd700,
+    questIds: [],
+    founderVendor: true,
+    greeting:
+      "Thank you, brave adventurer, for purchasing a Founder's Pack!\n\n" +
+      'Your support means the world to us and helps bring World of Claudecraft ' +
+      'to life. As a Founder, you are now part of the journey from the very ' +
+      'beginning.\n\n' +
+      'May your adventures be legendary, your loot plentiful, and your name ' +
+      'remembered across the realms!\n\n' +
+      'Welcome to the world of Claudecraft, Founder. Your story begins now!',
+  },
   brother_aldric: {
     id: 'brother_aldric',
     name: 'Brother Aldric',

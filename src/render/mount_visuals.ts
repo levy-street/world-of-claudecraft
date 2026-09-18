@@ -278,6 +278,22 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // on the authored cushion when parked.
 
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
+  // Founder Pack mounts (The Founder Salesman, content/founder_pack.ts):
+  // first-pass seat lifts (height * ~0.55, the valorsteed/griffin ratio), no
+  // saddle-fit pass yet; retune once the owner has ridden them in-world.
+  // Cinderjaw Rex ships its OWN Rider_Seat joint (rare among the Tripo-lane
+  // imports here): forward-kinematics measured its rest-pose world height at
+  // ~3.42 game units against the flat 2.3 estimate above, a rider-floats-off
+  // -the-saddle gap wide enough to read as wrong in play. seatBone reads the
+  // live bone each frame (correct through the walk/run cycle too, not just
+  // standing), so it wins over tuning the flat number further; `seat` stays
+  // as the one-frame fallback before the bone resolves.
+  cinderjaw_rex: spec('mount_cinderjaw_rex', 2.3, true, undefined, 0, null, [], {
+    bone: 'Rider_Seat',
+    offset: [0, 0, 0],
+  }),
+  ancient_devourer: spec('mount_ancient_devourer', 2.5, true),
+  shiba_inu: spec('mount_shiba_inu', 1.7, true),
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
