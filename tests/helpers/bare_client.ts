@@ -227,6 +227,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.ackedInputSeq = 0;
   c.inputEchoSamples = [];
   c.spectateFacingPending = false;
+  c.spectateExitPending = false;
   c.pendingSpectateFacing = null;
   c.dungeonEntrySeq = null;
   c.pendingDungeonEntryFacing = null;

@@ -1750,6 +1750,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   private inputEchoSamples: number[] = [];
   private spectateFacingPending = false;
   private pendingSpectateFacing: number | null = null;
+  // A spectate EXIT frame arrives before the snapshot that rebuilds the self
+  // presentation (known, talentSpec, loadouts) for the moderator's own body.
+  // `spectating` is the HUD's "this self view is mine" signal (the action bar
+  // freezes on it), so it must not clear while those reads still describe the
+  // watched character: the exit is held here until the next self-decode.
+  private spectateExitPending = false;
   private dungeonEntrySeq: number | null = null;
   private pendingDungeonEntryFacing: number | null = null;
 
@@ -2324,6 +2330,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         // the server exits spectate at grace start, so undo the whole client
         // spectate swap too (playerId is already restored from this hello)
         this.spectating = null;
+        this.spectateExitPending = false;
         this.cfg.playerClass = this.ownPlayerClass;
         this.spectateFacingPending = false;
         this.pendingSpectateFacing = null;
@@ -2358,7 +2365,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
     if (msg.t === 'spectate') {
       if (typeof msg.name === 'string') this.worldInteractionRequests?.reset();
-      this.spectating = typeof msg.name === 'string' ? msg.name : null;
+      this.spectateExitPending = typeof msg.name !== 'string';
+      if (!this.spectateExitPending) this.spectating = msg.name as string;
       this.spectateFacingPending = true;
       this.pendingSpectateFacing = null;
       // the spectate swap changes whose record the self-decode writes; a hold
@@ -2367,7 +2375,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
       this.resetReconWireState();
-      if (typeof this.spectating !== 'string') {
+      if (this.spectateExitPending) {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
         // cmd() drops every non-chat command while spectating (see below), so
@@ -3263,6 +3271,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.talentSpec = presentation.mods.spec;
       this.talentRole = presentation.mods.role;
       this.known = presentation.known;
+      if (this.spectateExitPending) {
+        this.spectateExitPending = false;
+        this.spectating = null; // own presentation rebuilt: the view is ours again
+      }
       // --- IWorldParty: party roster + raid markers, delta-omitted self-decode
       // (keep the prior value when absent; `marks: null` clears on disband). ---
       if (s.party !== undefined) this.partyInfo = s.party;

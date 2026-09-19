@@ -526,11 +526,32 @@ describe('spectate client POV', () => {
     expect(client.consumeSpectateFacing()).toBeNull();
 
     internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
-    expect(client.spectating).toBeNull();
+    // Identity restores on the exit frame itself, but `spectating` (the HUD's
+    // "this self view is mine" signal) is held until the next own self-decode
+    // rebuilds the moderator's presentation (tests/spectate_exit_hold.test.ts).
+    expect(client.spectating).toBe('Suspect');
     expect(client.playerId).toBe(1);
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Moderator',
+        lv: 10,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+      },
+    });
+    expect(client.spectating).toBeNull();
   });
 });
 

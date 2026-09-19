@@ -71,6 +71,16 @@ export interface ActionBarControllerDeps {
   // save. Optional so an offline/test controller with no server persistence just
   // skips it and keeps its byte-identical localStorage behavior.
   persistLayout?(profile: ActionBarLayoutProfile, layout: ActionBarLayout): void;
+  // True while this session views ANOTHER character (a moderator's /spectate):
+  // the live deps above (spec, level, known abilities) then describe the
+  // watched character, not the owner of this bar. Every per-frame sync AND every
+  // user-driven mutator (drop, spellbook add/remove, reset, loadout apply, the
+  // saves behind them) freezes until the view returns, so a foreign kit never
+  // prunes, re-seeds, or uploads the moderator's own layout. The ClientWorld
+  // holds the flag through the exit frame until its own presentation is
+  // rebuilt, so "not spectating" always means the deps describe this bar's
+  // owner. Absent means never spectating (offline, tests).
+  spectating?(): boolean;
 }
 
 /** Owns action-bar pages, migrations, persistence, and attack-slot assignment. */
@@ -202,6 +212,7 @@ export class ActionBarController {
    *  the bar in view, never uploaded (the "follow until edited" rule). Later
    *  activations reload the profile's own keys. Returns true on a switch. */
   syncProfile(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.resolveProfile();
     if (next === this.activeProfile) return false;
     // Flush the outgoing profile to storage, as a form swap does, so an
@@ -249,6 +260,7 @@ export class ActionBarController {
   }
 
   replaceActions(actions: HotbarAction[]): void {
+    if (this.isSpectating()) return;
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
   }
@@ -257,6 +269,7 @@ export class ActionBarController {
     actions: HotbarAction[],
     targetKnownAbilityIds: ReadonlySet<string>,
   ): void {
+    if (this.isSpectating()) return;
     this.activeSpecState = this.deps.talentSpec();
     this.actionState = sanitizeHotbarActions(actions, (id) => this.isAbilityPlacementAllowed(id));
     this.unsavedChanges = true;
@@ -272,6 +285,7 @@ export class ActionBarController {
   }
 
   replaceAttackAction(action: HotbarAction): void {
+    if (this.isSpectating()) return;
     this.attackActionState = sanitizeHotbarAction(action, (id) =>
       this.isAbilityPlacementAllowed(id),
     );
@@ -291,6 +305,7 @@ export class ActionBarController {
   }
 
   syncActiveForm(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.resolveActiveForm();
     if (next === this.activeFormState) return false;
     this.saveActions();
@@ -306,6 +321,7 @@ export class ActionBarController {
   }
 
   syncSpec(): boolean {
+    if (this.isSpectating()) return false;
     const next = this.deps.talentSpec();
     if (next === this.activeSpecState) return false;
     this.saveActions();
@@ -318,6 +334,7 @@ export class ActionBarController {
   }
 
   syncKnownAbilities(): void {
+    if (this.isSpectating()) return;
     const liveKnownAbilityIds = [...this.deps.knownAbilityIds()];
     if (
       this.pendingLoadoutKnownAbilityIds &&
@@ -382,6 +399,10 @@ export class ActionBarController {
     this.playerLevelAtLastSync = playerLevel;
   }
 
+  private isSpectating(): boolean {
+    return this.deps.spectating?.() === true;
+  }
+
   private trySeedOwnedSpecDefault(
     knownAbilityIds: readonly string[],
     talentSpec: string | null,
@@ -425,6 +446,7 @@ export class ActionBarController {
   }
 
   addAbility(abilityId: string): boolean {
+    if (this.isSpectating()) return false;
     // A passive is never castable: reject a manual drag/spellbook add so it
     // cannot occupy a dead action slot (auto-place already skips passives).
     if (!this.isAbilityPlacementAllowed(abilityId)) return false;
@@ -443,6 +465,7 @@ export class ActionBarController {
   }
 
   removeAbility(abilityId: string): boolean {
+    if (this.isSpectating()) return false;
     const target = this.actionState.findIndex(
       (action) => action?.type === 'ability' && action.id === abilityId,
     );
@@ -453,6 +476,7 @@ export class ActionBarController {
   }
 
   resetActiveBar(): void {
+    if (this.isSpectating()) return;
     const knownAbilityIds = [...this.deps.knownAbilityIds()];
     const ownedSpecDefault =
       this.activeFormState === 'normal'
@@ -545,12 +569,14 @@ export class ActionBarController {
   }
 
   saveActions(): void {
+    if (this.isSpectating()) return;
     this.writeActions();
     this.persist();
     this.unsavedChanges = false;
   }
 
   saveAttackAction(): void {
+    if (this.isSpectating()) return;
     this.writeAttackAction();
     this.persist();
     this.unsavedChanges = false;
