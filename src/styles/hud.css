@@ -4694,16 +4694,21 @@
   }
 
   /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
-     chrome) that is a #ui-root child, placed by hud.ts against the LIVE primary
-     bar (inline left/top in HUD author px). Never anchored to #actionbar-stack:
+     chrome) that is a #ui-root child, placed by action_bar_bind_banner.ts clear
+     of every LIVE bar (the actionBarBindBannerPlacement core; inline left/top
+     in HUD author px). Never anchored to #actionbar-stack:
      a bar moved with Interface Unlock is reparented to #ui and painted over a
      stack-anchored banner, so its slots ate every Done / Reset click and re-armed
      a capture instead. Sits in the always-above tier (90+, over the 20..89
      window band and the detached frames at 20) so no frame can cover its exit.
-     Built/removed by hud.ts on enter/exit. */
+     The plate itself is a drag handle (its buttons are not), so the player can
+     move it off anything it still covers. Built/removed on enter/exit. */
   #actionbar-bind-banner {
     position: absolute;
     display: flex;
+    cursor: move;
+    touch-action: none;
+    user-select: none;
     flex-direction: column;
     align-items: center;
     gap: 6px;

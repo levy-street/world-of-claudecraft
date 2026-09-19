@@ -1,9 +1,8 @@
 // @vitest-environment jsdom
 //
-// The on-bar key-binding banner as a HUD-root element: built by its own module,
-// its buttons wired to the caller, and placed against the LIVE primary bar in
-// HUD author px (the #ui zoom divided out) so a bar moved with Interface Unlock
-// never paints over its own Done / Reset buttons (the stuck-mode bug).
+// The on-bar key-binding banner's DOM: built by its own module, its buttons
+// wired to the caller, and its status line. Placement and drag are pinned in
+// tests/action_bar_bind_banner_placement.test.ts.
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   mountActionBarBindBanner,

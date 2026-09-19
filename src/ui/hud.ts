@@ -1287,7 +1287,7 @@ export class Hud {
     actionName: (id) =>
       bindActionDisplayName(id, bindActionLabel(id), (slot) => this.slotActionName(slot)),
     closeOptions: () => this.optionsWindow.close(),
-    bannerParent: () => $('#actionbar-stack'),
+    bannerParent: () => $('#ui'),
     syncSlotClasses: (s, active) => {
       this.abilityButtons.forEach(
         ({ btn }, i) => void btn.classList.toggle('bind-selected', i === s),
