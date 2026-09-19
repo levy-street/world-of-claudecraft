@@ -81,6 +81,49 @@ describe('#prompt-stack always paints above any open window', () => {
   });
 });
 
+// The store purchase confirm's own stacking bug: #prompt-stack lives INSIDE
+// #ui, a position:fixed z-index:10 stacking context (base.css), while the
+// Armory and mount inspect overlays mount on <body> at 90. A z-index inside
+// #ui ranks against other #ui children only, so the store decision (96 in
+// #prompt-stack) painted UNDER the body-level inspector: the player clicked
+// Purchase and saw nothing, while the hidden prompt's focused Confirm still
+// took Enter. src/ui/store_prompt_host.ts moves that decision to a body-level
+// host, #store-prompt-stack, which must itself clear the inspector.
+const COMPONENTS_CSS = readFileSync(
+  fileURLToPath(new URL('../src/styles/components.css', import.meta.url)),
+  'utf8',
+);
+
+describe('#store-prompt-stack paints above the body-level inspect overlays', () => {
+  it('the desktop host is fixed against the viewport and outranks .armory-inspect-overlay (90)', () => {
+    const hostBlock = HUD_CSS.match(/#store-prompt-stack\s*\{[^}]*\}/);
+    expect(hostBlock).not.toBeNull();
+    expect(hostBlock?.[0]).toMatch(/position:\s*fixed;/);
+    const hostZ = zIndexOf(HUD_CSS, /#store-prompt-stack\s*\{[^}]*\}/);
+    const inspectorZ = zIndexOf(COMPONENTS_CSS, /\.armory-inspect-overlay\s*\{[^}]*\}/);
+    const uiZ = zIndexOf(BASE_CSS, /#ui\s*\{[^}]*\}/);
+    expect(inspectorZ).toBe(90);
+    // The premise: a #prompt-stack z-index cannot help, because #ui as a whole
+    // sits below the inspector.
+    expect(uiZ).toBeLessThan(inspectorZ);
+    expect(hostZ).toBeGreaterThan(inspectorZ);
+  });
+
+  it('the mobile host clears the inspector and the raised mobile-controls tiers (96)', () => {
+    const mobileHostZ = zIndexOf(
+      HUD_MOBILE_CSS,
+      /body\.mobile-touch #store-prompt-stack\s*\{[^}]*\}/,
+    );
+    expect(mobileHostZ).toBeGreaterThan(96);
+  });
+
+  it('the store prompt geometry reset applies in either host', () => {
+    expect(COMPONENTS_CSS).toMatch(
+      /:is\(#prompt-stack, #store-prompt-stack\) \.woc-store-prompt\s*\{[^}]*position:\s*relative;/,
+    );
+  });
+});
+
 // The inverse bug: #proc-overlay (the Rising Phoenix / Warlock soul-fragment
 // bank) is appended straight to <body> (hud.ts), a SIBLING of #ui rather than
 // a descendant, so its own position:fixed z-index competes with #ui's AS A

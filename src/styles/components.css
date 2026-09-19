@@ -6275,11 +6275,12 @@
     }
   }
 
-  /* Store-owned decision prompt: mounted in #prompt-stack, above the Armory
-     inspector, while the Store root is inert. The generic #confirm-dialog
-     geometry assumes a body-level window, so this scoped rule resets it to a
-     normal stack child. */
-  #prompt-stack .woc-store-prompt {
+  /* Store-owned decision prompt: mounted in #prompt-stack, or in the body-level
+     #store-prompt-stack while an inspect overlay is up (hud.css, the host that
+     can actually clear the inspector), while the Store root is inert. The
+     generic #confirm-dialog geometry assumes a body-level window, so this
+     scoped rule resets it to a normal stack child in either host. */
+  :is(#prompt-stack, #store-prompt-stack) .woc-store-prompt {
     position: relative;
     left: auto;
     top: auto;

@@ -6265,14 +6265,34 @@
     box-sizing: border-box;
     pointer-events: auto;
   }
+  /* The body-level Store decision host (hud.css #store-prompt-stack): the same
+     top-centre touch sheet as #prompt-stack, but it sits OUTSIDE the zoomed #ui,
+     so its width is in unscaled viewport pixels. Above the body-level inspect
+     overlay (90) and the mobile controls' raised tiers (96). */
+  body.mobile-touch #store-prompt-stack {
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(12px, calc(env(safe-area-inset-top) + 12px));
+    transform: none;
+    z-index: 120;
+    align-items: center;
+    pointer-events: none;
+  }
+  body.mobile-touch #store-prompt-stack .prompt {
+    width: min(340px, calc(var(--app-vw) - 20px));
+    min-width: 0;
+    max-width: calc(var(--app-vw) - 20px);
+    box-sizing: border-box;
+    pointer-events: auto;
+  }
   /* The actions row is a flex row now, and a flex row does not wrap: a locale
      with two long verbs used to fall onto a second line inside this 340px
      sheet and now runs off its edge instead. Let it wrap, and let each button
      take the full width when it does, so both stay whole and tappable. */
-  body.mobile-touch #prompt-stack .prompt-actions {
+  body.mobile-touch :is(#prompt-stack, #store-prompt-stack) .prompt-actions {
     flex-wrap: wrap;
   }
-  body.mobile-touch #prompt-stack .prompt-actions .btn {
+  body.mobile-touch :is(#prompt-stack, #store-prompt-stack) .prompt-actions .btn {
     flex: 1 1 auto;
   }
   /* The bank docks its bags companion side by side on touch exactly like the

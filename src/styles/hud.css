@@ -10190,11 +10190,31 @@
     flex-direction: column;
     gap: 10px;
   }
-  /* Store decisions must clear the Armory inspector (z90), and async results
-     remain readable after the Store itself has closed. */
+  /* Store decisions and async results remain readable above every window
+     (the result after the Store itself has closed). This z-index only ranks
+     INSIDE #ui: base.css makes #ui a position:fixed z-index:10 stacking
+     context, so it can never clear a body-level overlay, see the host below. */
   #prompt-stack.store-decision-active,
   #prompt-stack.store-result-active {
     z-index: 96;
+  }
+  /* The body-level host a Store decision takes while an inspect overlay is up
+     (src/ui/store_prompt_host.ts). The Armory and mount inspectors mount on
+     document.body at z-index 90 (components.css .armory-inspect-overlay), above
+     the whole #ui context, so a purchase confirm mounted in #prompt-stack
+     painted under the inspector's dimmer and behind its dialog. Same geometry
+     as #prompt-stack (fixed against the viewport rather than absolute inside
+     #ui), floored above the inspector; it never coexists with the HUD's own
+     #confirm-dialog (95), which the controller refuses to open over. */
+  #store-prompt-stack {
+    position: fixed;
+    left: 50%;
+    top: 34%;
+    transform: translateX(-50%);
+    z-index: 96;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   .prompt {
     padding: 14px 18px;

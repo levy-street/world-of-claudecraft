@@ -1,7 +1,9 @@
 // Store-owned confirmation and result surfaces. Store decisions must not route
 // through the HUD's body-level confirm dialog: the Armory inspector sits above
 // the Store window, and a body-owned dialog leaves both Store surfaces reachable
-// to assistive technology. This controller mounts in #prompt-stack, makes the
+// to assistive technology. This controller mounts in #prompt-stack (or, while a
+// body-level inspect overlay is up, the body-level host store_prompt_host.ts
+// resolves, since nothing inside #ui can paint above that overlay), makes the
 // Store (and an open inspector) inert, owns every teardown path, and can publish
 // a nonmodal result when an async purchase finishes after the Store surface has
 // gone away.
@@ -9,7 +11,14 @@
 import { esc } from './esc';
 import { installPromptDialog, type PromptDialogHandle } from './prompt_dialog';
 import type { StorageRungEchoTimers } from './storage_rung_echo_core';
+import {
+  INSPECT_OVERLAY_SELECTOR,
+  releaseStorePromptHost,
+  resolveStorePromptHost,
+} from './store_prompt_host';
 import { svgIcon } from './ui_icons';
+
+export { MODAL_PROMPT_SELECTOR } from './store_prompt_host';
 
 /** How long the nonmodal result may sit on screen unattended. It is nonmodal
  *  chrome with pointer-events on mobile, published from an async purchase that
@@ -118,12 +127,16 @@ export class StoreDecisionPrompts {
 
   open(options: StoreDecisionPromptOptions): boolean {
     this.dismiss(true);
-    const stack = document.getElementById('prompt-stack');
-    if (!stack || document.getElementById('confirm-dialog')) return false;
+    if (document.getElementById('confirm-dialog')) return false;
+    // #prompt-stack, or the body-level host while an inspect overlay is open:
+    // the overlay mounts on document.body above the whole #ui stacking
+    // context, so a prompt inside #ui would paint under it (store_prompt_host.ts).
+    const stack = resolveStorePromptHost();
+    if (!stack) return false;
 
     const root = this.root();
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const inspector = document.querySelector<HTMLElement>('.armory-inspect-overlay');
+    const inspector = document.querySelector<HTMLElement>(INSPECT_OVERLAY_SELECTOR);
     const inspectorWasInert = inspector?.inert ?? false;
     const prompt = document.createElement('div');
     const bodyId = `woc-store-prompt-body-${promptSeq++}`;
@@ -151,6 +164,7 @@ export class StoreDecisionPrompts {
       if (inspector) inspector.inert = inspectorWasInert;
       prompt.remove();
       stack.classList.remove('store-decision-active');
+      releaseStorePromptHost(stack);
       if (this.active?.prompt === prompt) this.active = null;
       if (!confirmed) options.onCancel?.();
     };
