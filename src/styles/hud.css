@@ -2588,11 +2588,16 @@
     min-width: 0;
     overflow: hidden;
   }
+  /* The bordered plaque keeps the .ui-ribbon inset on the PORTRAIT side (30px:
+     the medallion overlaps the bar stack by 18px and its joint seal reaches
+     7px past that), so the first letter of the name never renders under the
+     portrait. 14px on the open side clears the header pattern motif. Pinned
+     by tests/browser/unit_frame_name_clearance.browser.test.ts. */
   .uf-name-header[data-border]:not([data-border=""]) {
     width: calc(100% - 2px);
     min-width: 76px;
     margin-left: 2px;
-    padding: 1px 14px 1px 6px;
+    padding: 1px 14px 1px 30px;
     background-color: var(--border-accent-frame, transparent);
     --deed-heraldry-plaque-fill: color-mix(
       in srgb,
@@ -2607,7 +2612,7 @@
   .uf-name-header.deed-heraldry-plaque-mirror[data-border]:not([data-border=""]) {
     margin-right: 2px;
     margin-left: 0;
-    padding-right: 6px;
+    padding-right: 30px;
     padding-left: 14px;
   }
   .uf-name-header[data-border]:not([data-border=""]) .uf-name {
