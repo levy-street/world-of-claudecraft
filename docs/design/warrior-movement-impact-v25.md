@@ -108,3 +108,27 @@ A read-only review of15 full-frame Onrush/Leap/Bladestorm/Die by the Sword/Avata
 
 
 Fresh read-only render review found no correctness blocker in the final scoped diff. Larger final Harvest and Bladestorm receiving quads cover approximately3x the prior per-layer area; Twinstrike approximately2.2x. Existing pool limits and lifetimes do not make this performance-neutral. Actual crowded playback and lower-tier visual checks remain required, and automated headless frame intervals are not headed GPU timings. No new shader/material/program key, light or context was introduced. Existing ten-slot pool admission, real-hit/miss/absorb ownership, expiry and tier shedding remain intact.
+
+
+## Final graphics-setting review
+
+Checkpoint22a65f414ed5b6eb65bc5ce78e5661c89741c267 is pushed. The first push was rejected by two20-second guard timeouts while browser capture was active. With the browser closed, the unchanged pre-push checks passed156 tests with3 existing skips in20.64 seconds, and the push succeeded. Both logs are retained; no hook bypass or threshold change was used.
+
+The second full-kit World run captured44/45 abilities and544 frames. The first cold Ultra Avatar configuration timed out; its failure remains in warrior-final-movement-complete-world-sept19/report.json. The later all-setting World run captured Avatar at Ultra successfully after normal preset progression. Thus every unique Warrior ability has a current outdoor visual take across the two reports, while cold-start reliability remains a separate unresolved issue.
+
+The final quality matrix passes98/98 cases and917 frames: fourteen key impact/state abilities across Low, Medium, High, Ultra, Advanced and Insane, followed by fourteen actual reduced-motion cases. All damaging cases contain positive authoritative contacts; all captures have unchanged source, no runtime or console errors, and no missing assets. Evidence: warrior-final-movement-complete-quality-sept19/report.json. Advanced coverage is its captured default configuration, not every possible custom knob combination. The earlier unchanged four-steel-attack matrix remains separately attributed to its own source.
+
+These results close the previously missing warm Insane/reduced Revenge visual cases. They do not erase the earlier cold-loading failures or certify the broader game contribution gate. Sustained current-source crowd playback and final production publication are recorded below when complete.
+
+
+## Sustained combat and review disposition
+
+Current-source outdoor Ultra playback passes for all three specs: Battlecraft21 casts/12 normal attacks, Bloodrush19/20 and Ironguard18/15. Each runs30 simulation seconds with normal resources, cooldowns and auto-attacks and no during-take resets. Actual multiple-recipient contacts occur in each; Bloodrush and Ironguard damage all five controlled dummies. No coverage gaps, runtime or console errors, missing assets or source changes were reported. Evidence: warrior-natural-crowd-review-movement-complete-sept19/report.json.
+
+A separate legal Bladestorm talent-row take covers its complete four-pulse channel against all five dummies, then ordinary combat resumes:20 casts/8 normal attacks over30 seconds. Four distinct authoritative damage ticks and five positive recipients are verified. The broader steel wake and receiving sprays remain visible at the crowd, and later captures show them cleared. Evidence: warrior-natural-crowd-review-movement-storm-sept19/report.json. These four takes total78 casts and55 normal attacks. They do not claim repeated use of every long-cooldown ability or a raid with hostile incoming attacks.
+
+Normal-run median recorded frame intervals were14.0/20.7/20.7ms, with95th percentiles27.9/27.7/27.8ms. The dedicated Bladestorm take recorded20.8ms median and34.7ms95th percentile. These are headless requestAnimationFrame observations including screenshot overhead, not isolated GPU benchmarks or a promise of60fps. Actual screenshots can occur later than their requested threshold; their recorded times take precedence.
+
+A fresh read-only review inspected42 Low/Insane/reduced full-frame comparisons across seven abilities and found no definite missing primary effect or persistent model obstruction. Blood remains red and directional, steel remains angular, and reduced motion preserves contact shapes. Changing world lighting and party-label overlap limit exact brightness and fine-wound comparisons. The dedicated channel take supplies Bladestorm tick-contact evidence beyond the earlier pre-first-tick stills.
+
+The Warrior movement/impact changes are ready for hands-on art review after publication verification.22 native performances were newly developed;23 existing purposeful designs were retained after representative review. This is not a claim of final AAA approval, a green whole-game contribution gate, or resolved cold World loading. Other classes remain outside this review. The latest evidence above supersedes the earlier pending visual-check notes; historical failed candidates and loading failures remain retained.
