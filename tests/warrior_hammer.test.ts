@@ -105,7 +105,7 @@ function makeContactHost(casterX = 0, targetX = 5) {
   };
 }
 
-// â”€â”€ warriorHammerCel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// warriorHammerCel
 
 it('warriorHammerCel cycles through 8 cels at 24 fps and freezes at cel 0 under reduced motion', () => {
   for (let cel = 0; cel < 8; cel++) {
@@ -116,14 +116,14 @@ it('warriorHammerCel cycles through 8 cels at 24 fps and freezes at cel 0 under 
   expect(warriorHammerCel(5, true)).toBe(0);
 });
 
-// â”€â”€ launchWarriorHammer + trail flight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// launchWarriorHammer + trail flight
 
 it('hammer trail head advances at 26 yards per second', () => {
   const { textures, texture } = fakeTextures();
   const ribbons = new AbilityVfxRibbons(new THREE.Scene(), fixedAnchor(0, 26), textures);
   launchWarriorHammer(launchHost(), ribbons, CASTER, TARGET, 0);
 
-  // 26 yd/s Ã— 0.5 s = 13 yd
+  // 26 yd/s x 0.5 s = 13 yd
   ribbons.update(0.5, CAM);
 
   const xs: number[] = [];
@@ -142,7 +142,7 @@ it('drawHeads emits hammer atlas cells and never the glow cell', () => {
   ribbons.update(0.1, CAM);
 
   const cells: number[] = [];
-  // time = 3/24 s â†’ warriorHammerCel(3/24, false) = 3 â†’ emits hammer0 + 3
+  // time = 3/24 s so warriorHammerCel(3/24, false) = 3 so emits hammer0 + 3
   ribbons.drawHeads(3 / 24, (_x, _y, _z, _c, _s, cell) => cells.push(cell));
 
   expect(cells).toHaveLength(1);
@@ -189,12 +189,12 @@ it('reduced motion freezes tumble at cel 0 while flight still advances', () => {
 
   ribbons.update(0.3, CAM, true /* reducedMotion */);
 
-  // With reducedMotion=true, warriorHammerCel(3/24, true) = 0 â†’ cel = hammer0 exactly
+  // With reducedMotion=true, warriorHammerCel(3/24, true) = 0 so cel = hammer0 exactly
   const seen: { x: number; cell: number }[] = [];
   ribbons.drawHeads(3 / 24, (x, _y, _z, _c, _s, cell) => seen.push({ x, cell }), true);
 
   expect(seen).toHaveLength(1);
-  expect(seen[0].x).toBeGreaterThan(0); // flight advanced: 26 yd/s Ã— 0.3 s â‰ˆ 7.8 yd
+  expect(seen[0].x).toBeGreaterThan(0); // flight advanced: 26 yd/s x 0.3 s approximately 7.8 yd
   expect(seen[0].cell).toBe(OVERLAY_CELL.hammer0); // tumble frozen at cel 0
 
   // Without reducedMotion the same time produces cel 3
@@ -229,7 +229,7 @@ it('missing target terminates flight without triggering arrival effects', () => 
 
 it('arrival fires no predicted damage callback', () => {
   const { textures, texture } = fakeTextures();
-  // Target 0.3 yd away: first update step (26 Ã— 0.2 = 5.2 yd) exceeds distance â†’ arrives
+  // Target 0.3 yd away: first update step (26 x 0.2 = 5.2 yd) exceeds distance so arrives
   const ribbons = new AbilityVfxRibbons(new THREE.Scene(), fixedAnchor(0, 0.3), textures);
   const audio = vi.fn();
   launchWarriorHammer(launchHost(audio), ribbons, CASTER, TARGET, 0);
@@ -250,7 +250,7 @@ it('arrival fires no predicted damage callback', () => {
   texture.dispose();
 });
 
-// â”€â”€ drawWarriorHammerContact â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// drawWarriorHammerContact
 
 it('outcome zero creates no contact flash or collision VFX', () => {
   const {
