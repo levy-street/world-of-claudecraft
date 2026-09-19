@@ -6367,6 +6367,20 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
+  // A party loot roll GRANTED its item: fired once per roll, at resolution
+  // (a need/greed win or a direct master-loot assignment), pid-scoped to the
+  // winner. Distinct from the `lootRoll` PROMPT above, which fans one copy out
+  // per candidate before anyone has rolled and so never names a recipient; a
+  // consumer that wants "who received the drop" (the Discord rare-drop card)
+  // reads this event, never the prompt. Never fired when everyone passes or
+  // the winner is gone (the item returns to the corpse instead).
+  | {
+      type: 'lootRollAwarded';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+    }
   | {
       type: 'error';
       text: string;
