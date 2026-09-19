@@ -331,12 +331,17 @@ describe('authored physical compositions', () => {
           seq.update(host, 0.15);
           expect(arrivalPlumes()).toHaveLength(2);
           expect(slot.impactDone).toBe(true);
+          expect(host.onRushArrival).toHaveBeenCalledTimes(id === 'charge' ? 1 : 0);
+          if (id === 'charge') expect(host.onRushArrival).toHaveBeenCalledWith(1, 2);
+          seq.update(host, 0.05);
+          expect(host.onRushArrival).toHaveBeenCalledTimes(id === 'charge' ? 1 : 0);
         } else {
           seq.update(host, 0.3);
           expect(paths).toHaveLength(2);
           expect(arrivalPlumes()).toHaveLength(0);
           expect(slot.impactDone).toBe(false);
           expect(slot.active).toBe(false);
+          expect(host.onRushArrival).not.toHaveBeenCalled();
         }
         expect(host.contact).not.toHaveBeenCalled();
         expect(host.burstAt).not.toHaveBeenCalled();

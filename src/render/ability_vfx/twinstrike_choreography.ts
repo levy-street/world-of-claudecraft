@@ -42,6 +42,18 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
   const body = { x: 0, y: 0, z: 0 };
   const facingOffset = facing - (host.facingAt?.(targetId) ?? facing);
   let count = 0;
+  host.flipbookAt(
+    at.x - dx * 0.18,
+    at.y,
+    at.z - dz * 0.18,
+    reverse ? 3.1 : 2.6,
+    0xea7078,
+    'contact_cut',
+    1.1,
+    0.04,
+    roll,
+  );
+  count++;
   const sculpted =
     primary &&
     host.crestAt &&
@@ -49,10 +61,10 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
       at.x - dx * 0.25,
       at.y,
       at.z - dz * 0.25,
-      reverse ? 1.1 : 1,
+      reverse ? 1.24 : 1.16,
       reverse ? 1.38 : 1.22,
-      0x420d1d,
-      0xe4314d,
+      0x590719,
+      0xd9233d,
       'twinstrike_cut',
       facing,
       0.23,
@@ -62,7 +74,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
   if (
     host.bakedAt &&
     host.bakedAt(
-      'warrior_bite',
+      'harvest_impact',
       at.x - dx * 0.35,
       at.y,
       at.z - dz * 0.35,
@@ -82,7 +94,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     const fallback = primary && !sculpted && layer === 0;
     if (
       host.pathRibbon(
-        layer ? 0xe2e9ed : 0x930d2b,
+        layer ? 0xffe5de : 0x6c0824,
         layer ? 0.13 : fallback ? 0.58 : 0.36,
         layer ? 0.08 : 0.18,
         (points) => {
@@ -93,9 +105,11 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
             sz = Math.cos(yaw);
           for (let i = 0; i < points.length; i++) {
             const u = i / (points.length - 1);
-            const span = fallback ? 5.6 : 2.1;
+            const span = fallback ? (reverse ? 7.4 : 6.9) : 2.1;
             const s = (u - 0.5) * span;
-            const curved = fallback ? Math.sin(u * Math.PI) * 0.85 : Math.sin(u * 27) * 0.035;
+            const curved = fallback
+              ? (Math.cos((u - 0.5) * 2.8) - 1) * 1.15
+              : Math.sin(u * 23) * Math.sin(u * Math.PI) * 0.055;
             points[i].set(
               origin.x + sz * s * Math.cos(roll) - sx * (0.28 - curved),
               origin.y + s * Math.sin(roll),
@@ -108,7 +122,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
         null,
         false,
         1,
-        null,
+        fallback ? { from: reverse ? 1 : 0, to: reverse ? 0 : 1 } : null,
         !fallback,
       ) !== false
     )
@@ -119,8 +133,8 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     at.x,
     at.y,
     at.z,
-    0xa71130,
-    slot.tier === 0 ? (reverse ? 21 : 17) : 7,
+    0x940c2b,
+    slot.tier === 0 ? (reverse ? 10 : 8) : 3,
     reverse ? 1.4 : 1.15,
     'blood',
     0.2 - extractionDelay,

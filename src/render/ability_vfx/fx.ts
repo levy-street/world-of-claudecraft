@@ -817,6 +817,7 @@ export class AbilityVfxFx implements SequencerHost {
   onPresentationMoment:
     | ((id: string, phase: 'release' | 'impact', sourceId: number) => void)
     | null = null;
+  onRushArrival: ((sourceId: number, targetId: number) => boolean | void) | null = null;
   presentationMoment(id: string, phase: 'release' | 'impact', sourceId: number): void {
     this.onPresentationMoment?.(id, phase, sourceId);
   }
@@ -2737,6 +2738,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.screenImpactCb = null;
     this.abilityAudioCb = null;
     this.onPresentationMoment = null;
+    this.onRushArrival = null;
     if (errors.length) throw new AggregateError(errors, 'Ability VFX cleanup failed');
   }
 

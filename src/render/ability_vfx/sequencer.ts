@@ -95,6 +95,7 @@ export interface SequencerHost {
     dz: number,
   ): number;
   presentationMoment?(id: string, phase: 'release' | 'impact', sourceId: number): void;
+  onRushArrival?: ((sourceId: number, targetId: number) => boolean | void) | null;
   bakedAt?(
     kind: BakedKind,
     x: number,

@@ -1080,6 +1080,16 @@ export class CharacterVisual {
       const baseChanged = desired !== this.baseState;
       const previousBase = this.baseState;
       if (baseChanged) this.baseState = desired;
+      if (this.warriorRush.arrivalStarted && this.def.clips.rushArrival) {
+        this.playOneShot(this.def.clips.rushArrival, 1);
+      } else if (
+        this.currentIsOneShot &&
+        this.current?.getClip().name === this.def.clips.rushArrival &&
+        !this.warriorRush.recovering
+      ) {
+        this.currentIsOneShot = false;
+        this.fadeTo(this.baseAction(), 0.06, false);
+      }
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
@@ -1727,7 +1737,7 @@ export class CharacterVisual {
   get isPerformingAbility(): boolean {
     const name = this.current?.getClip().name;
     return (
-      this.warriorRush.active ||
+      this.warriorRush.ownsBody ||
       (this.currentIsOneShot &&
         !!name &&
         (name.startsWith('Signature_') || name === this.def.clips.attackByAbility?.heroic_leap))
@@ -1739,6 +1749,7 @@ export class CharacterVisual {
    * projectile one-shot that would otherwise mask the first part of the channel. */
   beginCastChannel(abilityId?: string): void {
     if (this.deadLock) return;
+    this.warriorRush.cancel();
     this.baseState = 'cast';
     this.castLocomotion?.restart();
     if (abilityId) this.castingAbility = abilityId;
@@ -1764,9 +1775,11 @@ export class CharacterVisual {
   playAttack(abilityId?: string): void {
     if (this.deadLock) return;
     if ((abilityId === 'charge' || abilityId === 'intervene') && this.action(this.def.clips.rush)) {
-      this.warriorRush.begin();
+      this.warriorRush.begin(abilityId);
       return;
     }
+    if (!abilityId && this.warriorRush.ownsBody) return;
+    if (abilityId) this.warriorRush.cancel();
     if (abilityId === 'fire_blast' && this.castingAbility && this.castLocomotion?.triggerFlick())
       return;
     const signature = abilityId ? signatureClipName(abilityId) : null;
@@ -1829,6 +1842,7 @@ export class CharacterVisual {
    *  held Bladestorm channel pose. Repeated AoE hits only refresh the timer. */
   playWhirl(abilityId?: string): void {
     if (this.deadLock) return;
+    this.warriorRush.cancel();
     if (
       (abilityId === 'cleave' || abilityId === 'whirlwind') &&
       this.action(`Signature_${abilityId}`)
@@ -1843,6 +1857,11 @@ export class CharacterVisual {
     if (clips.length > 0) {
       this.playOneShot(clips[this.attackIdx++ % clips.length], SPIN_ATTACK_TIMESCALE);
     }
+  }
+
+  /** Travel's proximity-tested arrival cue, never inferred from a failed stop. */
+  arriveFromOnrush(): boolean {
+    return !this.deadLock && !!this.action(this.def.clips.rushArrival) && this.warriorRush.arrive();
   }
 
   playHit(): void {
@@ -3855,7 +3874,7 @@ export class CharacterVisual {
     // whole 0.18s hand-off fade (a visible T-pose pop after every swing)
     a.clampWhenFinished = true;
     a.timeScale = timeScale;
-    this.beginAction(a, prev, ONESHOT_FADE);
+    this.beginAction(a, prev, name === this.def.clips.rushArrival ? 0.04 : ONESHOT_FADE);
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;
@@ -3994,6 +4013,7 @@ function clipNamesOf(def: VisualDef): string[] {
     c.combatIdle,
     c.walk,
     c.run,
+    c.rushArrival,
     c.death,
     ...(c.attack ?? []),
     ...Object.values(c.attackByAbility ?? {}),

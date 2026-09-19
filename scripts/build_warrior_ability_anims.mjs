@@ -14,6 +14,7 @@ import {
   stripToAnimationsOnly,
 } from './anim/pose_blend.mjs';
 import { bakeWarriorRush } from './anim/warrior_rush.mjs';
+import { bakeWarriorRushArrival } from './anim/warrior_rush_arrival.mjs';
 
 const io = createGlbIO();
 const doc = await io.read('public/models/chars/players/knight.glb');
@@ -155,8 +156,8 @@ function rotate(pose, name, x, y = 0, z = 0) {
   ).normalize();
   pose.set(key, q.toArray());
 }
-function braced(drop, lean) {
-  const pose = new Map(keys.map((key) => [key, [...(guard.get(key) ?? idle.get(key))]]));
+function braced(drop, lean, upperPose = guard) {
+  const pose = new Map(keys.map((key) => [key, [...(upperPose.get(key) ?? idle.get(key))]]));
   for (const key of keys)
     if (/^(root|hips|.*leg\.[lr]|foot\.[lr]|toes\.[lr])\|/.test(key) || !key.endsWith('|rotation'))
       pose.set(key, [...idle.get(key)]);
@@ -227,15 +228,23 @@ const { animation } = bakeClip(doc, {
   donorFor: (k) => donors[0].get(k) ?? donors[1].get(k),
 });
 const rush = bakeWarriorRush(doc, contacts.getRoot());
+const arrivalGuard = samplePose(indexClip(contacts.getRoot(), 'Warrior_Raised_Guard'), 0.15);
+const arrival = bakeWarriorRushArrival(doc, {
+  keys,
+  idle,
+  plant,
+  braced: (drop, lean) => braced(drop, lean, arrivalGuard),
+  donorFor: (key) => donors[0].get(key) ?? donors[1].get(key),
+});
 await mkdir('tmp', { recursive: true });
 if (process.argv.includes('--preview'))
   await io.write('tmp/warrior_ability_anims_preview.glb', doc);
-stripToAnimationsOnly(doc, [animation, rush]);
+stripToAnimationsOnly(doc, [animation, rush, arrival]);
 await doc.transform(prune(), dedup());
 await io.write('public/models/chars/players/warrior_ability_anims.glb', doc);
 console.log(
   JSON.stringify({
-    clips: ['Warrior_Heroic_Leap', 'Warrior_Rush_Loop'],
+    clips: ['Warrior_Heroic_Leap', 'Warrior_Rush_Loop', 'Warrior_Onrush_Arrival'],
     landingSeconds: 0.6,
     duration: 0.96,
     maxFootError,

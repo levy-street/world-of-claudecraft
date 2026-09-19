@@ -85,6 +85,56 @@ it('keeps secondary receiving wounds without a second caster performance', () =>
   expect(host.bakedAt).toHaveBeenCalledTimes(2);
 });
 
+it('shares Red Harvest blood, keeps both opposed sprays, and clears each contact inside the GCD', () => {
+  const { host, slot } = fixture();
+  twinstrikeBeat(host, slot, 0);
+  twinstrikeBeat(host, slot, 1);
+  const crests = vi.mocked(host.crestAt!).mock.calls;
+  expect(crests.map((call) => call.slice(5, 8))).toEqual([
+    [0x590719, 0xd9233d, 'twinstrike_cut'],
+    [0x590719, 0xd9233d, 'twinstrike_cut'],
+  ]);
+  const sprays = vi.mocked(host.bakedAt!).mock.calls;
+  expect(sprays.map((call) => call[0])).toEqual(['harvest_impact', 'harvest_impact']);
+  expect(sprays[0][4]).toBeGreaterThanOrEqual(5.2);
+  expect(sprays[1][4]).toBeGreaterThan(sprays[0][4]);
+  expect(sprays[0][12]).toBeLessThan(0);
+  expect(sprays[1][12]).toBeGreaterThan(0);
+  expect(sprays.every((call) => call[7]! + call[8]! <= 0.2)).toBe(true);
+  expect(vi.mocked(host.flipbookAt).mock.calls.map((call) => call[5])).toEqual([
+    'contact_cut',
+    'contact_cut',
+  ]);
+});
+
+it('keeps the main blade edge centred on the wound instead of floating above it', () => {
+  const geometry = buildTwinstrikeShape();
+  try {
+    const position = geometry.getAttribute('position');
+    const uv = geometry.getAttribute('uv');
+    const centre = Array.from({ length: uv.count }, (_, i) => i).find(
+      (i) => uv.getX(i) === 0.5 && uv.getY(i) === 0,
+    );
+    expect(centre).toBeDefined();
+    expect(new Vector3().fromBufferAttribute(position, centre!).length()).toBeLessThan(1e-6);
+    geometry.computeBoundingBox();
+    expect(geometry.boundingBox!.getSize(new Vector3()).x).toBeGreaterThan(6);
+  } finally {
+    geometry.dispose();
+  }
+});
+
+it('retains opposing travel direction in the full-reach fallback', () => {
+  const { host, slot } = fixture(false);
+  twinstrikeBeat(host, slot, 0);
+  twinstrikeBeat(host, slot, 1);
+  const paths = vi.mocked(host.pathRibbon).mock.calls;
+  expect(paths[0][8]).toEqual({ from: 0, to: 1 });
+  expect(paths[2][8]).toEqual({ from: 1, to: 0 });
+  expect(paths[1][9]).toBe(true);
+  expect(paths[3][9]).toBe(true);
+});
+
 it('builds a finite open cutting surface with separate material identities for its folds', () => {
   const geometry = buildTwinstrikeShape();
   try {

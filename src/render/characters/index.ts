@@ -17,7 +17,11 @@ import { MODULAR_WARRIOR_KEY, type ModularLook } from './modular';
 import { npcModularKeyFor } from './npc_looks';
 import { CharacterVisual } from './visual';
 
-export { type AnimOverrideFacts, applyEntityAnimOverrides } from './anim_state_entity_core';
+export {
+  type AnimOverrideFacts,
+  applyDisplayedAnimMotion,
+  applyEntityAnimOverrides,
+} from './anim_state_entity_core';
 export type { AssembleOptions } from './assets';
 export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
 export { npcLookFor } from './npc_looks';

@@ -90,11 +90,54 @@ Fury, Harvest, Bloodletting, ribbon admission and shield outcomes: all 785 tests
 passed. The separate held-state and pulse-ownership fixture repairs passed all
 31 tests. These results establish the stated focused scope only.
 
-The public Site has not yet received this checkpoint. Publication must preserve
-the existing audience, original delivery worktree, and exact source/build
-identity. Further classes are outside this Warrior rollout.
+The public Site received this checkpoint as version 29. Its exact source is
+game commit `5f9547dd5dd23018b73e8ca91cc9168cd37e249e`; the delivery tree is
+preserved at `43e2b7902b0e5b2a0d7f66d35577ac8a258ab6fa`. The live preview passed
+three Warrior specialization casts, audio-control activation, Ultra, Art view
+and the 390-pixel mobile layout with no browser errors or missing assets. The
+live Bloodletting contact asset matches the reviewed local SHA-256. This does
+not establish subjective sound approval or a passing full contribution gate.
+Further classes are outside this Warrior rollout.
 
-Tony has also authorized a subsequent fresh Warrior pass focused on stronger
-variation in swings, footwork, weight shifts and recovery, with coordinated
-effect and sound improvements. That follow-up is additional work, not evidence
-that this checkpoint has already completed another review cycle.
+Tony requested review before the broader pass on swings, footwork, weight
+shifts and recovery. That pass remains paused. His subsequent Twinstrike blood
+coherence and Onrush ending feedback authorizes those specific corrections;
+it does not reopen the broader movement pass.
+
+## Follow-up: coherent blood and Onrush arrival
+
+Twinstrike now uses Red Harvest's torn blood film and directional impact atlas.
+Its two opposing cuts have wider silhouettes, a brief contact catch and the same
+dark receiving incision. The second cut remains heavier than the first; Red
+Harvest retains the larger final sweep. The actual hit count, victim-following
+wound, miss/block handling and short clear times are unchanged. Matching first
+and second contact images are in `docs/screenshots/warrior-readiness-v25` as
+`twinstrike-blood-before-first.png`, `twinstrike-blood-after-first.png`,
+`twinstrike-blood-before-second.png` and `twinstrike-blood-after-second.png`.
+
+Onrush receives an authored planted arrival brace in its existing animation
+asset. The finish compresses into a short hold and recovers with equipment still
+held, without adding a sword sweep or gameplay damage. The original rush and
+Leap tracks are unchanged. The presentation's old arrival test required a
+separation below 2.5 yards, while the real movement stops within 4 yards. The
+correction shares the gameplay range and distinguishes raw displayed movement
+from the gait's brief anti-jitter hold. Real simulated charges and the Studio
+capture reproduced the original gap; the corrected capture plays the brace
+before returning to idle. The earlier 50ms stepped capture did not itself
+reproduce an unwanted automatic chop, so it does not prove that artifact occurs
+under every timing. `onrush-ending-before.png` and `onrush-ending-after.png`
+record the changed finish in the same evidence folder.
+
+These are specific review corrections. Final visual approval remains Tony's,
+and the broader movement pass and whole-game gate remain open as stated above.
+
+The final focused feedback check passed 23 suites and 324 tests, including the
+actual simulation stopping distance, native arrival asset, two-entity animation
+scratch, movement/cast interruption and blood-contact pool reuse. Native TypeScript
+checking and scoped Biome checks also passed. Natural playback passed eight
+Onrush takes: near/far charges across all three specs plus immediate walking and
+an explicit follow-up cast. Every uninterrupted take recorded at least two real
+autoattack damage events; all takes retained the final runtime hashes and reported
+no errors. This is scoped feedback evidence, not a replacement for the open full
+gate or Tony's visual review. Final quality-matrix evidence is recorded separately
+with the delivery so it retains its actual capture provenance.

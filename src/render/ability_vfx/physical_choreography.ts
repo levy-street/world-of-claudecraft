@@ -1,3 +1,4 @@
+import { MELEE_RANGE } from '../../sim/types';
 import { warriorControlReleaseSample } from '../../warrior_control_audio';
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
 import { drawDirtToss } from './action_contact';
@@ -52,8 +53,17 @@ export function physicalTravel(host: SequencerHost, slot: SeqSlot, dt: number): 
   }
   const arrived = retreat
     ? slot.t > 0.3 && moved > 1 && from.y - host.groundYAt(from.x, from.z) < 0.12
-    : slot.t > 0.08 && moved > 0.2 && remaining < 2.5;
+    : slot.t > 0.08 &&
+      moved > 0.2 &&
+      (slot.abilityId === 'charge' ? remaining <= MELEE_RANGE - 1 : remaining < 2.5);
   if (arrived && slot.abilityId !== 'bloodhook') {
+    if (
+      slot.abilityId === 'charge' &&
+      host.onRushArrival?.(slot.casterId, slot.targetId) === false
+    ) {
+      slot.active = false;
+      return false;
+    }
     slot.ix = from.x;
     slot.iy = from.y + 0.25;
     slot.iz = from.z;

@@ -71,6 +71,8 @@ export interface ClipMap {
   run: string;
   /** Native braced rush, selected by a cast window plus displayed movement. */
   rush?: string;
+  /** Successful Onrush stop, separate from its looping travel pose. */
+  rushArrival?: string;
   /** one-shot swing clips, rotated per attack */
   attack: string[];
   /** Optional per-ability swing or cast-gesture override. */
@@ -1360,6 +1362,7 @@ export const VISUALS: Record<string, VisualDef> = {
       },
       castByAbility: { bladestorm: 'Warrior_Bladestorm_Loop' },
       rush: 'Warrior_Rush_Loop',
+      rushArrival: 'Warrior_Onrush_Arrival',
       castTimeScaleByAbility: { bladestorm: 1 },
       attackTimeScaleByAbility: { heroic_leap: 1 },
       attackByAbility: {

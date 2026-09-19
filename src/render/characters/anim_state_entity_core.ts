@@ -8,7 +8,23 @@
  *
  * Node-only (RENDER_PURE_CORES): no three.js, no DOM.
  */
+import { type LocoState, MOVE_ENTER_SPEED } from '../locomotion';
 import type { AnimState } from './anim_state';
+
+/** Fill the reused scratch for EACH entity; zero-time syncs never retain
+ * another entity's motion. The arrival controller preserves its clock at dt=0. */
+export function applyDisplayedAnimMotion(
+  state: AnimState,
+  loco: LocoState,
+  vx: number,
+  vz: number,
+  dt: number,
+): void {
+  state.speed = loco.speed;
+  state.moving = loco.moving;
+  state.running = loco.running;
+  state.rawMoving = dt > 0 ? Math.hypot(vx, vz) / dt > MOVE_ENTER_SPEED : undefined;
+}
 
 /** The entity facts the overrides read. A structural subset of sim `Entity`, so
  *  the live entity satisfies it directly and a test can pass a literal. */

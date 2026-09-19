@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
+import { BLOOD_FILM_GLSL } from './blood_film_material';
 import { BLOODLETTING_FRAGMENT, BLOODLETTING_VERTEX } from './bloodletting_shape';
 import { CrestPrewarm } from './crest_prewarm';
-import { HARVEST_FRAGMENT, HARVEST_NOISE, HARVEST_VERTEX } from './harvest_material';
+import { HARVEST_FRAGMENT, HARVEST_VERTEX } from './harvest_material';
 import { WARRIOR_STORM_TURN_RATE } from './held_warrior_storm';
 import {
   warriorBloodTexture,
@@ -113,9 +114,10 @@ export class SignatureCrests {
           gl_Position=projectionMatrix*view;
         }`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
-        ${STEEL_SWEEP_GLSL} ${HARVEST_NOISE}
+        ${STEEL_SWEEP_GLSL}
         uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion,uStorm,uFlow; uniform vec3 uTint,uAccent,uSunWorld,uVoice;
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
+        ${BLOOD_FILM_GLSL}
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
         void main(){
           if(((uKind>17.5 && uKind<19.5)||(uKind>20.5 && uKind<21.5)||(uKind>22.5 && uKind<23.5)) && !gl_FrontFacing)discard;
@@ -441,7 +443,8 @@ export class SignatureCrests {
     if (kind === 'bloodletting_pull') u.uKind.value = 27;
     if (kind === 'bark_pressure') u.uKind.value = 28;
     u.uStorm.value = kind === 'steel_storm' ? 1 : 0;
-    u.uFlow.value = kind.startsWith('harvest_') ? (pitch > 0 ? -1 : 1) : 0;
+    u.uFlow.value =
+      kind.startsWith('harvest_') || kind === 'twinstrike_cut' ? (pitch > 0 ? -1 : 1) : 0;
     u.uMotion.value = this.reducedMotion ? 0 : 1;
     return true;
   }

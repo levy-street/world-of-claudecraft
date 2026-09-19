@@ -142,7 +142,7 @@ import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
   type AssembleOptions,
-  applyEntityAnimOverrides,
+  applyDisplayedAnimMotion, applyEntityAnimOverrides,
   type CharacterVisual,
   composedLookPiecesOf,
   createCharacterVisual,
@@ -189,6 +189,7 @@ import { PooledVisualLifecycle } from './characters/pooled_visual_lifecycle';
 import { playerRangedAttackStartsAtLaunch } from './characters/skin_attack';
 import { CharacterVisualPool, characterVisualPoolKey } from './characters/visual_pool';
 import { shouldRetainPooledCharacterVisual } from './characters/visual_pool_policy';
+import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { attackAbilityId, isSpinAttackAbility } from './characters/weapon_attack_style_core';
 import { fogFarForBuiltGround, groundViewConeHalfAngle } from './chunk_residency_core';
 import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './click_marker';
@@ -2993,6 +2994,9 @@ export class Renderer {
       60, this.webgl.domElement.clientHeight,
     );
     this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));
+    this.abilityVfxFx.onRushArrival = createOnrushArrivalHandler(
+      this.sim.entities, this.views, this.activeVisual.bind(this),
+    );
     this.abilityVfxFx.setWorldLightDelegate((at,school,intensity,duration,range)=>this.lightPulses.pulse(at,school,intensity,duration,range));
     this.abilityVfxFx.setSpiritCompileGate(
       this.asyncCompileSupported ? (root: THREE.Object3D) => this.compileGate(root) : null,
@@ -11262,9 +11266,7 @@ export class Renderer {
         );
       }
       const st = this.animScratch;
-      st.speed = loco.speed;
-      st.moving = moving;
-      st.running = loco.running;
+      applyDisplayedAnimMotion(st, loco, vx, vz, dt);
       // A mounted rider stays planted in the saddle: the MOUNT carries the
       // jump arc (its anim scratch below keeps the real airborne flag), while
       // the rider holds the seated pose instead of replaying the jump clip.

@@ -42,7 +42,7 @@ function manifestBlock(startAnchor: string, endAnchor: string): string {
 }
 
 describe('warrior bespoke movement clip (issue #2889 warrior/kobold batch)', () => {
-  const WARRIOR_NEW_CLIPS = ['Warrior_Heroic_Leap', 'Warrior_Rush_Loop'];
+  const WARRIOR_NEW_CLIPS = ['Warrior_Heroic_Leap', 'Warrior_Rush_Loop', 'Warrior_Onrush_Arrival'];
 
   it('ships the new clip in a mesh-free donor GLB', () => {
     const glbPath = 'public/models/chars/players/warrior_ability_anims.glb';

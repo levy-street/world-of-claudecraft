@@ -140,7 +140,7 @@ describe.each(contacts)('$id contact $beat', ({ id, beat, delay, clear, size, li
     expect(required(blood[0][7]) + required(blood[0][8])).toBeCloseTo(clear);
     const baked = vi.mocked(required(host.bakedAt)).mock.calls;
     expect(baked).toHaveLength(1);
-    expect(baked[0][0]).toBe('warrior_bite');
+    expect(baked[0][0]).toBe(id === 'raging_gale' ? 'harvest_impact' : 'warrior_bite');
     expect(baked[0][4]).toBe(size);
     expect(baked[0][7]).toBe(life);
     expect(baked[0][8]).toBe(0);

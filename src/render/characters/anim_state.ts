@@ -3,6 +3,9 @@ export interface AnimState {
   /** horizontal speed, world units/sec */
   speed: number;
   moving: boolean;
+  /** Actual displayed displacement before the gait's anti-jitter hold. A
+   * planted ability recovery must not keep running for that hold's tail. */
+  rawMoving?: boolean;
   /** run-vs-walk gait, hysteresis-picked in locomotion.ts (never a raw
    *  speed-threshold compare: that flips on every noisy frame under load) */
   running: boolean;

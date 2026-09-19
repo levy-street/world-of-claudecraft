@@ -274,24 +274,25 @@ it('uses distinct prepared silhouettes and preserves their direction without reb
   expect(scene.children).toHaveLength(0);
 });
 
-it('reverses the second blood sheet without leaking direction into a reused non-Harvest slot', () => {
-  const scene = new THREE.Scene(),
-    pool = new SignatureCrests(scene);
-  vi.spyOn(pool.preparation, 'ready').mockReturnValue(true);
-  for (const roll of [-0.66, 0.58, 0]) {
+it.each(['harvest_cut', 'twinstrike_cut'] as const)(
+  'reverses %s without leaking direction into a reused non-blood slot',
+  (kind) => {
+    const scene = new THREE.Scene(),
+      pool = new SignatureCrests(scene);
+    vi.spyOn(pool.preparation, 'ready').mockReturnValue(true);
+    for (const roll of [-0.66, 0.58, 0]) {
+      pool.clear();
+      expect(pool.spawn(3, 2, 5, 1.2, 1.15, 0x590719, 0xd9233d, kind, 0.7, 0.16, roll)).toBe(true);
+      const mesh = meshes(scene)[0];
+      expect(mesh.material.uniforms.uFlow.value).toBe(roll > 0 ? -1 : 1);
+      expect(mesh.rotation.z).toBeCloseTo(roll);
+    }
     pool.clear();
-    expect(pool.spawn(3, 2, 5, 1.2, 1.15, 0x590719, 0xd9233d, 'harvest_cut', 0.7, 0.16, roll)).toBe(
-      true,
-    );
-    const mesh = meshes(scene)[0];
-    expect(mesh.material.uniforms.uFlow.value).toBe(roll > 0 ? -1 : 1);
-    expect(mesh.rotation.z).toBeCloseTo(roll);
-  }
-  pool.clear();
-  pool.spawn(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'water');
-  expect(meshes(scene)[0].material.uniforms.uFlow.value).toBe(0);
-  pool.dispose();
-});
+    pool.spawn(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'water');
+    expect(meshes(scene)[0].material.uniforms.uFlow.value).toBe(0);
+    pool.dispose();
+  },
+);
 
 it('two full shouts retain four dust quadrants each beside two other live spell volumes', () => {
   const scene = new THREE.Scene(),
