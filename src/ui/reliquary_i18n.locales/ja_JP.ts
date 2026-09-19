@@ -194,7 +194,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '英雄: 内部るつぼ',
-    desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾と武器。',
+    desc: '最後の炎の鍛造父、ヴァルクルからヒロイックでのみ得られる盾、オフハンド、武器。',
   },
   professions_forgebreaker: {
     name: 'フォージブレイカー',

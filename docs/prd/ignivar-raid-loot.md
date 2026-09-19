@@ -845,24 +845,23 @@ Heroic pays in ACCESS, never in count or numbers. Each kill's two slots are:
 - **Slot two, Normal: the boss's off-set partition**, authored
   `normalOnly` (LootEntry.normalOnly, gated by
   src/sim/loot/loot_difficulty_gate.ts). The old jewelry group keeps the
-  half of the slot it used to own outright (0.50); the old off-set group
-  splits the other half (waists or feet 0.3125, the smaller weapons or held
-  offhands 0.1875). Weights are binary fractions so the partition sums to
-  exactly 1.00 in floating point. That constraint moves the old 70:30
-  armor-to-weapon split inside the half to 62.5:37.5, and the shift is
-  deliberate, not a rounding accident: the three weapons and two held
-  offhands are the most broadly wearable pieces in the slot (hit carriers
-  usable across roles), while each of the ten waists or feet serves one
-  archetype, so leaning the fewer shared pieces slightly up spreads the
-  slot's value across more of the raid.
+  half of the slot it used to own outright (0.50); the other half goes to
+  the waists plus the two melee hit weapons on Ignivar (0.3125 / 0.1875) and
+  to the ten feet alone on Varkhul (0.05 each), after the Heroic
+  redistribution below moved the wand and both held offhands out. Weights
+  are chosen so each partition sums to exactly 1.00 in floating point in
+  table order (binary fractions on Ignivar; ten times 0.05 plus four times
+  0.125 is exact in that order on Varkhul, and the test pins the sum with
+  a strict equality).
 - **Slot two, Heroic: the boss's exclusive partition** (HEROIC_BOSS_LOOT).
   A heroic claim skips the Normal-only off-set group, draws nothing for it,
   and this group pays instead: the Robe sigil that finishes the 5-piece, the
-  marquee weapons, and on Varkhul the shields with Emberward at its
-  unchanged ABSOLUTE 3 percent per heroic kill. So every Heroic kill pays one
-  item Normal can never drop, and Normal remains the only source of necks,
-  waists, feet, rings, held offhands and the smaller weapons: a heroic
-  roster still runs its Normal lock for those.
+  marquee weapons, the Wand of Quenched Sparks, and on Varkhul the shields
+  (Emberward at its unchanged ABSOLUTE 3 percent per heroic kill) and both
+  held offhands. So every Heroic kill pays one item Normal can never drop,
+  and Normal remains the only source of necks, waists, feet, rings and the
+  two melee hit weapons: a heroic roster still runs its Normal lock for
+  those.
 
 Consequences worth stating plainly: a Normal-only group can still finish
 helmet, shoulder, gloves, and legs (the 4-piece bonus) since every one of
@@ -878,14 +877,49 @@ summing to exactly 1.0) in the listed order. Draw order is parity-sensitive
 from this re-cut on: entries append, never reorder, and future additions go
 to the end of their group.
 
+### Heroic redistribution (2026-09-07, maintainer-directed)
+
+Player report after the re-cut: Heroic and Normal drop the same item level,
+so a fresh raider and a fully geared one see identical rewards and rosters
+farm Normal. The maintainer's answer keeps the settled one-tier rule (no
+heroic item-level layer, no heroic_variants pass) and redistributes WHICH
+items are Heroic-exclusive instead:
+
+- The Wand of Quenched Sparks moves from Ignivar's Normal off-set partition
+  to his Heroic exclusive partition, where the weapon half splits evenly
+  across the three marquee weapons and the wand (0.125 each). The Robe share
+  stays at 0.50.
+- Both held offhands (Orb of the Last Spring, Cinder of the First Design)
+  move from Varkhul's Normal off-set partition to his Heroic exclusive
+  partition at 0.05 each, taking their 0.10 from the marquee weapons
+  (0.09 / 0.08 / 0.08). The Robe share (0.35), the shield share (0.30) and
+  Emberward's absolute 3 percent do not move.
+- After the move, every caster weapon, every held offhand, every shield and
+  the Robe sigil of the tier is Heroic-only. Normal keeps exactly two
+  weapons, Cinderfang Kris and Slagrender Cleaver, and keeps them for one
+  reason: the hit program. The Normal floor without a weapon (the lowest
+  waist plus the two lowest rings, 110) reaches the spell cap (110) but not
+  the melee cap (130), so casters can cap from Normal armor and jewelry
+  alone while melee need a 30-hit weapon from Normal. The wand, a 30-hit
+  caster weapon, could therefore move; the two melee weapons could not.
+- Draw order is unchanged: the moved rows APPEND to the end of their new
+  exclusive partition and simply leave the old one, so every kill still
+  makes the same number of rng draws. Item ids, item levels and stats are
+  untouched; the Reliquary pages follow the drops (the three relics move
+  from the Normal pages to the Heroic pages, catalog totals fixed).
+
+Pinned by tests/ignivar_loot.test.ts ("the 2026-09-07 Heroic
+redistribution") and the Reliquary equality pins in
+tests/reliquary_content.test.ts.
+
 ### Ignivar, Herald of the Last Flame
 
 | Group | Difficulty | Entries | Chance each |
 |---|---|---|---|
 | copper | both | 150000 copper (heroic base on a heroic claim) | 1.0 |
 | ignivar_sigils | both | Mantle Sigil of the Anvil / Ember / Tempest, Grip Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
-| ignivar_offset | Normal only | the 4 necks at 0.125 each, the 10 waist pieces at 0.03125 each, Cinderfang Kris / Slagrender Cleaver / Wand of Quenched Sparks at 0.0625 each | sums to 1.0 |
-| ignivar_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.17 / 0.17 / 0.16, Forgefather's Warhammer / Anvilguard Blade / Springtouched Crozier at 0.17 / 0.17 / 0.16 | sums to 1.0 |
+| ignivar_offset | Normal only | the 4 necks at 0.125 each, the 10 waist pieces at 0.03125 each, Cinderfang Kris / Slagrender Cleaver at 0.09375 each | sums to 1.0 |
+| ignivar_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.17 / 0.17 / 0.16, Forgefather's Warhammer / Anvilguard Blade / Springtouched Crozier / Wand of Quenched Sparks at 0.125 each | sums to 1.0 |
 
 ### Varkhul, Forgefather of the Last Flame
 
@@ -893,8 +927,8 @@ to the end of their group.
 |---|---|---|---|
 | copper | both | 200000 copper (heroic base on a heroic claim) | 1.0 |
 | varkhul_sigils | both | Legging Sigil of the Anvil / Ember / Tempest, Helm Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
-| varkhul_offset | Normal only | the 10 feet pieces at 0.03125 each, both held offhands at 0.09375 each, the 4 rings at 0.125 each | sums to 1.0 |
-| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.12 / 0.12 / 0.11, Bulwark of the Inner Crucible 0.135, Ember Warden's Barrier 0.135, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.12 / 0.12 / 0.11 | sums to 1.0 |
+| varkhul_offset | Normal only | the 10 feet pieces at 0.05 each, the 4 rings at 0.125 each | sums to 1.0 |
+| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.12 / 0.12 / 0.11, Bulwark of the Inner Crucible 0.135, Ember Warden's Barrier 0.135, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.09 / 0.08 / 0.08, Orb of the Last Spring / Cinder of the First Design at 0.05 each | sums to 1.0 |
 
 ## Future redistribution
 
