@@ -49,11 +49,16 @@ import { dungeonMapActive } from './dungeon_map_view';
 import { viewerUsableToolTier } from './hud/professions/gathering_view';
 import { dawnholdMapActive, lastKeepMapActive } from './lastkeep_map_view';
 import { overworldDungeonPortals } from './map_dungeon_portals';
+import { MAP_MARKER_SIZES } from './map_marker_icon_art';
 import type { MapMarkerProfile } from './map_marker_profile_core';
 import {
   isNearbyLiveRiftZoneMapEntity,
   STABLE_MAP_NAVIGATION_LANDMARKS,
 } from './map_navigation_landmarks_core';
+import {
+  clearPoiLabelsOffBadges,
+  MAP_POI_LABEL_HEIGHT_BY_PROFILE,
+} from './map_poi_label_clearance_core';
 import { questNumbersByLog } from './map_quest_list_view';
 import {
   DEFAULT_MAP_ATLAS_FILTERS,
@@ -118,7 +123,11 @@ export interface MapViewRect {
 /** A zone POI label: canvas position + the identity the painter localizes. */
 export interface MapPoiMarker {
   mx: number;
+  /** The authored projection: hit-testing and the screen-reader summary read it. */
   my: number;
+  /** The baseline the painter draws the label at: `my`, unless a navigation
+   *  badge on the same spot pushed the text clear (map_poi_label_clearance_core). */
+  labelMy: number;
   zoneId: string;
   poiIndex: number;
 }
@@ -940,7 +949,7 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
 
   // Only the committed zone contributes POIs, even where a rectangular zone's
   // square frame contains ocean beside its terrain plate.
-  const pois: MapPoiMarker[] = [];
+  const pois: Omit<MapPoiMarker, 'labelMy'>[] = [];
   if (labels) {
     for (let poiIndex = 0; poiIndex < zone.pois.length; poiIndex++) {
       const poi = zone.pois[poiIndex];
@@ -1251,12 +1260,24 @@ export function buildOverworldMapModel(input: OverworldMapInput): OverworldMapMo
     if (social.guild) for (const m of social.guild.members) plotAlly(m, 'guild');
   }
 
+  // A navigation badge authored on a named place (a delve door on its hill)
+  // paints after and centered on the POI label baseline; the badge allocator's
+  // 4-yard cap can never clear a label, so the drawn baseline yields instead
+  // (labelMy); `my` stays the authored projection for the a11y summary.
+  const markerProfile = input.markerProfile ?? 'standard';
+  const clearedPois: MapPoiMarker[] = clearPoiLabelsOffBadges(
+    pois,
+    navigation,
+    MAP_MARKER_SIZES[markerProfile === 'compact' ? 'mapNavigationCompact' : 'mapNavigation'],
+    MAP_POI_LABEL_HEIGHT_BY_PROFILE[markerProfile],
+  );
+
   return {
     view: { spanX, spanZ, minX: full.minX, maxX: full.maxX, minZ: full.minZ, maxZ: full.maxZ },
     cursor: zoom > 1 ? 'grab' : 'default',
     region: { minX: region.minX, maxX: region.maxX, minZ: region.minZ, maxZ: region.maxZ },
     zoneId: zone.id,
-    pois,
+    pois: clearedPois,
     portals,
     castles,
     npcs,

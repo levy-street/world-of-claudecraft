@@ -226,6 +226,7 @@ const UI_PURE_CORES = [
   'src/ui/map_entity_disclosure_core.ts',
   'src/ui/map_navigation_landmarks_core.ts',
   'src/ui/map_marker_profile_core.ts',
+  'src/ui/map_poi_label_clearance_core.ts',
   'src/ui/map_marker_semantics_core.ts',
   'src/ui/map_semantic_accessibility_core.ts',
   'src/ui/map_surface_core.ts',

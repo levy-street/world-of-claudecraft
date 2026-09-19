@@ -808,7 +808,7 @@ export class MapWindowPainter {
       lineWidth: geometry.textOutlineWidth,
     };
     for (const poi of model.pois) {
-      this.labels.draw(ctx, zonePoiLabel(poi.zoneId, poi.poiIndex), poi.mx, poi.my, poiLabel);
+      this.labels.draw(ctx, zonePoiLabel(poi.zoneId, poi.poiIndex), poi.mx, poi.labelMy, poiLabel);
     }
 
     // Dungeon entrance portals: a purple dot plus the dungeon name above it. The
