@@ -10732,6 +10732,10 @@ export const pl_PL: EnTranslations = {
       "money": "Pieniądze",
       "copper": "miedziaki",
       "hint": "Kliknij zaoferowany przedmiot, aby go usunąć. Obie strony muszą wcisnąć Zatwierdź wymianę.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Zatwierdź wymianę",
       "waiting": "Oczekiwanie...",
       "cancel": "Anuluj"

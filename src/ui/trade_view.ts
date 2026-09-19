@@ -31,6 +31,18 @@ export function tradeOfferCeiling(inventory: InvSlot[], itemId: string): number 
   return countRawInSlots(inventory, itemId);
 }
 
+/** Resolve the figure typed into a staged row's amount box against the held
+ *  ceiling: an integer in [1, ceiling]. Unparsable input keeps `current` so a
+ *  cleared box never silently unstages the line (the row click owns removal);
+ *  a fraction floors, since the sim offers whole units. Before this box the
+ *  only way to offer a stack was one bag click per unit. */
+export function tradeOfferAmount(raw: string, ceiling: number, current: number): number {
+  const top = Math.max(1, Math.floor(ceiling));
+  const parsed = Number.parseInt(raw, 10);
+  const wanted = Number.isFinite(parsed) ? parsed : current;
+  return Math.min(top, Math.max(1, Math.floor(wanted)));
+}
+
 /** One offer row, resolved for rendering. `item` is undefined for an id this
  *  bundle cannot resolve; the label then shows the raw id and the painter must
  *  swap its icon for the unknown-item fallback rather than dereferencing. */

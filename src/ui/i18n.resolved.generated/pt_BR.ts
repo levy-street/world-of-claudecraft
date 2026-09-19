@@ -10732,6 +10732,10 @@ export const pt_BR: EnTranslations = {
       "money": "Dinheiro",
       "copper": "cobre",
       "hint": "Clique em um item oferecido para removê-lo. Os dois lados precisam clicar em Aceitar troca.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Aceitar troca",
       "waiting": "Aguardando...",
       "cancel": "Cancelar"

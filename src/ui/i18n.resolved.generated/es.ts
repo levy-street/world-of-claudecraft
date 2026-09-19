@@ -10732,6 +10732,10 @@ export const es: EnTranslations = {
       "money": "Dinero",
       "copper": "cobre",
       "hint": "Haz clic en un objeto ofrecido para quitarlo. Ambos deben pulsar Aceptar comercio.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Aceptar comercio",
       "waiting": "Esperando...",
       "cancel": "Cancelar"

@@ -5694,6 +5694,8 @@
   body.mobile-touch .soc-hide-offline,
   body.mobile-touch .soc-sugg-item,
   body.mobile-touch .trade-item.mine,
+  body.mobile-touch .trade-qty-input,
+  body.mobile-touch .trade-qty-max,
   body.mobile-touch #social-window .btn,
   body.mobile-touch #trade-window .btn {
     min-height: 40px;

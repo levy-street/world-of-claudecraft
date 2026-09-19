@@ -10732,6 +10732,10 @@ export const nl_NL: EnTranslations = {
       "money": "Geld",
       "copper": "koper",
       "hint": "Klik op een aangeboden voorwerp om het te verwijderen. Beide partijen moeten op Ruil accepteren drukken.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Ruil accepteren",
       "waiting": "Wachten...",
       "cancel": "Annuleren"

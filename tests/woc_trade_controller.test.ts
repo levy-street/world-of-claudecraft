@@ -515,7 +515,9 @@ describe('the unstage click mutates the LIVE staged object', () => {
     const live = r.host.staged;
     live.items.push({ itemId: 'wolf_fang', count: 2 });
     r.controller.updateTradeWindow();
-    const mine = document.querySelector<HTMLElement>('#trade-window .trade-item.mine');
+    const mine = document.querySelector<HTMLElement>(
+      '#trade-window .trade-item.mine .trade-item-remove',
+    );
     expect(mine).not.toBeNull();
     mine?.click();
     // The click handler must have walked through staged() to the live array:
@@ -523,6 +525,65 @@ describe('the unstage click mutates the LIVE staged object', () => {
     expect(live.items).toEqual([{ itemId: 'wolf_fang', count: 1 }]);
     expect(r.host.staged).toBe(live);
     expect(r.host.pushed).toBe(1);
+  });
+});
+
+describe('the staged row amount box (one step instead of one click per unit)', () => {
+  function stagedRig(held: number, staged: number): Rig {
+    const r = rig();
+    r.host.inventory = [{ itemId: 'wolf_fang', count: held }];
+    openTrade(r, [{ itemId: 'wolf_fang', count: staged }]);
+    r.host.staged.items.push({ itemId: 'wolf_fang', count: staged });
+    r.controller.updateTradeWindow();
+    return r;
+  }
+
+  it('renders a number box capped at the held total and a Max button', () => {
+    const r = stagedRig(112, 1);
+    const box = document.querySelector<HTMLInputElement>('#trade-window .trade-qty-input');
+    expect(box).not.toBeNull();
+    expect(box?.min).toBe('1');
+    expect(box?.max).toBe('112');
+    expect(box?.value).toBe('1');
+    expect(box?.getAttribute('aria-label')).toBe(
+      t('hud.trade.amountLabel', { name: itemDisplayName(ITEMS.wolf_fang) }),
+    );
+    const max = document.querySelector<HTMLButtonElement>('#trade-window .trade-qty-max');
+    expect(max?.textContent).toBe(t('hud.trade.max'));
+  });
+
+  it('a typed amount writes the LIVE staged line and pushes the offer once', () => {
+    const r = stagedRig(112, 1);
+    const live = r.host.staged;
+    const box = document.querySelector<HTMLInputElement>('#trade-window .trade-qty-input');
+    if (!box) throw new Error('amount box missing');
+    box.value = '112';
+    box.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(live.items).toEqual([{ itemId: 'wolf_fang', count: 112 }]);
+    expect(r.host.staged).toBe(live);
+    expect(r.host.pushed).toBe(1);
+  });
+
+  it('clamps a typed amount to the held total', () => {
+    const r = stagedRig(112, 1);
+    const box = document.querySelector<HTMLInputElement>('#trade-window .trade-qty-input');
+    if (!box) throw new Error('amount box missing');
+    box.value = '999';
+    box.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(r.host.staged.items[0]?.count).toBe(112);
+  });
+
+  it('Max stages the whole held total', () => {
+    const r = stagedRig(112, 1);
+    document.querySelector<HTMLButtonElement>('#trade-window .trade-qty-max')?.click();
+    expect(r.host.staged.items).toEqual([{ itemId: 'wolf_fang', count: 112 }]);
+    expect(r.host.pushed).toBe(1);
+  });
+
+  it('a single held unit renders no amount box', () => {
+    stagedRig(1, 1);
+    expect(document.querySelector('#trade-window .trade-qty')).toBeNull();
+    expect(document.querySelector('#trade-window .trade-item-remove')).not.toBeNull();
   });
 });
 

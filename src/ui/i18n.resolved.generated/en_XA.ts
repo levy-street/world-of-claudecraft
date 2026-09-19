@@ -10732,6 +10732,10 @@ export const en_XA: EnTranslations = {
       "money": "[Ɱóñéý]",
       "copper": "[çóþþéŕ]",
       "hint": "[Çļíçķ áñ óƒƒéŕéð íţéɱ ţó ŕéɱóʋé íţ. Ɓóţĥ šíðéš ɱúšţ þŕéšš Áççéþţ Ţŕáðé.]",
+      "amountLabel": "[Áɱóúñţ óƒ {name} ţó ţŕáðé]",
+      "max": "[Ɱáẋ]",
+      "maxLabel": "[Óƒƒéŕ áļļ óƒ {name}]",
+      "removeLabel": "[Ŕéɱóʋé óñé {name}]",
       "accept": "[Áççéþţ Ţŕáðé]",
       "waiting": "[Ŵáíţíñĝ...]",
       "cancel": "[Çáñçéļ]"

@@ -10732,6 +10732,10 @@ export const ko_KR: EnTranslations = {
       "money": "돈",
       "copper": "동화",
       "hint": "제안한 아이템을 클릭하면 제거됩니다. 양쪽 모두 거래 수락을 눌러야 합니다.",
+      "amountLabel": "거래할 {name} 수량",
+      "max": "최대",
+      "maxLabel": "{name} 전부 제시",
+      "removeLabel": "{name} 하나 제거",
       "accept": "거래 수락",
       "waiting": "대기 중...",
       "cancel": "취소"

@@ -10732,6 +10732,10 @@ export const de_DE: EnTranslations = {
       "money": "Geld",
       "copper": "Kupfer",
       "hint": "Klickt einen angebotenen Gegenstand an, um ihn zu entfernen. Beide Seiten müssen Handel annehmen drücken.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Handel annehmen",
       "waiting": "Warten...",
       "cancel": "Abbrechen"

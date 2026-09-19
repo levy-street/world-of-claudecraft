@@ -10732,6 +10732,10 @@ export const fr_CA: EnTranslations = {
       "money": "Argent",
       "copper": "cuivre",
       "hint": "Cliquez sur un objet proposé pour le retirer. Les deux joueurs doivent appuyer sur Accepter l'échange.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Accepter l'échange",
       "waiting": "En attente...",
       "cancel": "Annuler"

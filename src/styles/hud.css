@@ -10343,9 +10343,54 @@
   }
   .trade-item.mine {
     cursor: var(--cursor-point);
+    /* The amount controls drop under the name when the column has no room
+       for both, instead of squeezing a three-word name into four lines. */
+    flex-wrap: wrap;
   }
   .trade-item.mine:hover {
     filter: brightness(1.08);
+  }
+  /* The item face inside a staged row: the remove-one click, drawn as the row
+     itself (a button cannot nest the amount box, so the row is a wrapper). */
+  .trade-item-remove {
+    display: flex;
+    /* No shrink: the name keeps its own width and the controls wrap instead. */
+    flex: 1 0 auto;
+    min-width: 0;
+    gap: 6px;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: var(--cursor-point);
+  }
+  /* Amount box plus Max on a staged row the player holds more than one of. */
+  .trade-qty {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 4px;
+    align-items: center;
+    margin-left: auto;
+  }
+  .trade-item-remove > .ui-socket {
+    flex: 0 0 auto;
+  }
+  .trade-qty-input {
+    width: 52px;
+    min-width: 0;
+    padding: 2px 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Compact so the item name keeps most of the row (the library button's
+     window-action height and padding turned a two-word name into four lines). */
+  .trade-qty-max {
+    height: auto;
+    min-height: 0;
+    padding: 4px 8px;
+    font-size: 12px;
   }
   .trade-empty {
     color: var(--color-text-muted);

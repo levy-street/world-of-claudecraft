@@ -10732,6 +10732,10 @@ export const id_ID: EnTranslations = {
       "money": "Uang",
       "copper": "tembaga",
       "hint": "Klik barang yang ditawarkan untuk menghapusnya. Kedua pihak harus menekan Terima Tukar.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Terima Tukar",
       "waiting": "Menunggu...",
       "cancel": "Batal"

@@ -10,7 +10,12 @@ import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { itemDisplayName } from '../src/ui/entity_i18n';
-import { buildTradeItemRow, tradeOfferCeiling, tradeRowTooltipTarget } from '../src/ui/trade_view';
+import {
+  buildTradeItemRow,
+  tradeOfferAmount,
+  tradeOfferCeiling,
+  tradeRowTooltipTarget,
+} from '../src/ui/trade_view';
 
 describe('tradeOfferCeiling (trade offer stepper cap)', () => {
   it('sums an item split across multiple bag slots instead of capping at one slot', () => {
@@ -223,5 +228,28 @@ describe('tradeRowTooltipTarget (trade slot tooltip wiring, #2693)', () => {
     for (const key of ['constructor', '__proto__', 'toString', 'valueOf', 'hasOwnProperty']) {
       expect(tradeRowTooltipTarget([{ itemId: key, count: 1 }], 0), key).toBeNull();
     }
+  });
+});
+
+describe('tradeOfferAmount (the offered-amount box on a staged row)', () => {
+  // The reported bug: the only way to offer a whole stack was one bag click
+  // per unit (112 clicks for a 112-stack). The row's amount box resolves a
+  // typed figure against the held ceiling in one step.
+  it('accepts a typed amount within the held ceiling', () => {
+    expect(tradeOfferAmount('112', 112, 1)).toBe(112);
+    expect(tradeOfferAmount('40', 112, 1)).toBe(40);
+  });
+  it('clamps above the ceiling and below one', () => {
+    expect(tradeOfferAmount('500', 112, 1)).toBe(112);
+    expect(tradeOfferAmount('0', 112, 5)).toBe(1);
+    expect(tradeOfferAmount('-3', 112, 5)).toBe(1);
+  });
+  it('keeps the current amount on unparsable input and floors fractions', () => {
+    expect(tradeOfferAmount('', 112, 7)).toBe(7);
+    expect(tradeOfferAmount('abc', 112, 7)).toBe(7);
+    expect(tradeOfferAmount('3.9', 112, 7)).toBe(3);
+  });
+  it('never returns below one even for an empty ceiling', () => {
+    expect(tradeOfferAmount('4', 0, 1)).toBe(1);
   });
 });

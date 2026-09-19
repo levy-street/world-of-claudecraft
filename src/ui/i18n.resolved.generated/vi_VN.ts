@@ -10732,6 +10732,10 @@ export const vi_VN: EnTranslations = {
       "money": "Tiền",
       "copper": "đồng",
       "hint": "Nhấp vào vật phẩm đã trao để gỡ ra. Cả hai bên đều phải nhấn Chấp Nhận Giao Dịch.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Chấp Nhận Giao Dịch",
       "waiting": "Đang chờ...",
       "cancel": "Hủy"

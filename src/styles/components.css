@@ -12604,6 +12604,7 @@
   .soc-hide-offline:focus-visible,
   .soc-name.soc-link:focus-visible,
   .soc-sugg-item:focus-visible,
+  .trade-item-remove:focus-visible,
   .trade-item.mine:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;

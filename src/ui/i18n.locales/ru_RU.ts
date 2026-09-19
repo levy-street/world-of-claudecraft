@@ -3044,6 +3044,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.trade.emptyTheirs': 'Пока ничего не предложено',
   'hud.trade.money': 'Деньги',
   'hud.trade.copper': 'медь',
+  'hud.trade.amountLabel': 'Количество {name} для обмена',
+  'hud.trade.max': 'Макс.',
+  'hud.trade.maxLabel': 'Предложить все {name}',
+  'hud.trade.removeLabel': 'Убрать один {name}',
   'hud.trade.hint':
     'Нажмите предложенный предмет, чтобы убрать его. Оба игрока должны нажать Принять обмен.',
   'hud.trade.accept': 'Принять обмен',

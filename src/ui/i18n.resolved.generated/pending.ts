@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "es_ES": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "fr_FR": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "fr_CA": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "de_DE": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "nl_NL": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "pl_PL": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "id_ID": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "tr_TR": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "sv_SE": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "vi_VN": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ],
+  "da_DK": [
+    "hud.trade.amountLabel",
+    "hud.trade.max",
+    "hud.trade.maxLabel",
+    "hud.trade.removeLabel"
+  ]
 };

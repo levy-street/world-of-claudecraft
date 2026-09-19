@@ -10732,6 +10732,10 @@ export const zh_CN: EnTranslations = {
       "money": "金钱",
       "copper": "铜币",
       "hint": "点击已提供的物品可将其移除。双方都必须点击接受交易。",
+      "amountLabel": "交易 {name} 的数量",
+      "max": "最大",
+      "maxLabel": "提供全部 {name}",
+      "removeLabel": "移除一个 {name}",
       "accept": "接受交易",
       "waiting": "等待中...",
       "cancel": "取消"

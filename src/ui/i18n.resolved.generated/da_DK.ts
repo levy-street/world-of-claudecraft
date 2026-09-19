@@ -10732,6 +10732,10 @@ export const da_DK: EnTranslations = {
       "money": "Penge",
       "copper": "kobber",
       "hint": "Klik på en tilbudt genstand for at fjerne den. Begge parter skal trykke på Accepter handel.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Accepter handel",
       "waiting": "Venter...",
       "cancel": "Annuller"

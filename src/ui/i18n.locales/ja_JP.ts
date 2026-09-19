@@ -3019,6 +3019,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.trade.emptyTheirs': 'まだ何も提示されていません',
   'hud.trade.money': '所持金',
   'hud.trade.copper': '銅貨',
+  'hud.trade.amountLabel': '取引する{name}の数',
+  'hud.trade.max': '最大',
+  'hud.trade.maxLabel': '{name}をすべて提示',
+  'hud.trade.removeLabel': '{name}を1つ外す',
   'hud.trade.hint':
     '提示したアイテムをクリックすると取り下げます。双方が取引承認を押す必要があります。',
   'hud.trade.accept': '取引承認',

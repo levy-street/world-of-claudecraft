@@ -10732,6 +10732,10 @@ export const ja_JP: EnTranslations = {
       "money": "所持金",
       "copper": "銅貨",
       "hint": "提示したアイテムをクリックすると取り下げます。双方が取引承認を押す必要があります。",
+      "amountLabel": "取引する{name}の数",
+      "max": "最大",
+      "maxLabel": "{name}をすべて提示",
+      "removeLabel": "{name}を1つ外す",
       "accept": "取引承認",
       "waiting": "待機中...",
       "cancel": "キャンセル"

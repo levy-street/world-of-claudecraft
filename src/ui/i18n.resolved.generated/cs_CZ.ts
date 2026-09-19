@@ -10732,6 +10732,10 @@ export const cs_CZ: EnTranslations = {
       "money": "Peníze",
       "copper": "měď",
       "hint": "Klikni na nabízený předmět a odeber ho. Obě strany musí stisknout Přijmout obchod.",
+      "amountLabel": "Amount of {name} to trade",
+      "max": "Max",
+      "maxLabel": "Offer all of {name}",
+      "removeLabel": "Remove one {name}",
       "accept": "Přijmout obchod",
       "waiting": "Čeká se...",
       "cancel": "Zrušit"
