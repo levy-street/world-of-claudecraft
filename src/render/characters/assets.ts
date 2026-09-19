@@ -30,6 +30,7 @@ import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
+import { padMissingUv } from './far_bake_uv_pad';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
@@ -2892,9 +2893,15 @@ function bakeStaticPose(
   }
 
   if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [] };
-  // uv presence must agree for merging — drop uvs entirely if any geo lacks them
-  const allHaveUv = geos.every((g) => g.getAttribute('uv'));
-  if (!allHaveUv) for (const g of geos) g.deleteAttribute('uv');
+  // uv presence must agree for merging. PAD the parts that lack one rather
+  // than dropping it everywhere: a composed body always carries colour-only
+  // face parts (head, ears, eyes, mouth, brows) with no uv at all, and the old
+  // "delete uv from every geo" arm stripped the atlas-mapped kit beside them
+  // too, so the frozen far mesh drew the whole robe and hat from the single
+  // texel at uv (0,0), a flat untextured body the moment a peer or NPC
+  // crossed into the static band (the "NPCs lose their textures" report).
+  // A zero uv on a part that never samples a map costs nothing.
+  padMissingUv(geos);
 
   // One group per distinct key, fed to the merge in grouped order so each
   // group's members land CONTIGUOUSLY (one addGroup can only cover a run).
