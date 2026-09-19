@@ -9,9 +9,10 @@ export function warriorReaverPerformance(idle, bladePose) {
     }
     return pose;
   };
-  const load = guarded(bladePose(2, 0.23, [0, -0.02, -0.03], -23, -4));
-  const cut = guarded(bladePose(2, 0.39, [0, -0.04, 0.05], 19, 0));
-  const follow = guarded(bladePose(2, 0.61, [0, -0.025, 0.02], 27, 7));
+  const load = guarded(bladePose(2, 0.23, [-0.018, -0.035, -0.05], -31, -6));
+  const cut = guarded(bladePose(2, 0.39, [0.012, -0.055, 0.065], 23, 0));
+  const follow = guarded(bladePose(2, 0.61, [0.035, -0.04, 0.025], 35, -15));
+  const recover = guarded(bladePose(2, 0.72, [0.012, -0.025, -0.01], 12, -20));
   return [
     'Warrior_Reaver_Strike',
     [
@@ -20,6 +21,7 @@ export function warriorReaverPerformance(idle, bladePose) {
       [0.15, cut],
       [0.185, cut],
       [0.32, follow],
+      [0.46, recover],
       [0.62, idle],
     ],
   ];

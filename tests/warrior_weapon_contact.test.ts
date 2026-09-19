@@ -12,12 +12,34 @@ const json = JSON.parse(weapon.toString('utf8', 20, 20 + weapon.readUInt32LE(12)
 const bounds = json.accessors[json.meshes[0].primitives[0].attributes.POSITION];
 
 it.each([
-  'Warrior_Maiming_Strike',
-  'Warrior_Early_Grave',
-  'Warrior_Brute_Swing',
-  'Warrior_Redhand',
-])('%s keeps the entire equipped blade above the floor throughout recovery', async (name) => {
-  const bytes = readFileSync('public/models/chars/players/warrior_contact_anims.glb');
+  ['warrior_contact_anims', 'Warrior_Maiming_Strike', 'r'],
+  ['warrior_contact_anims', 'Warrior_Early_Grave', 'r'],
+  ['warrior_contact_anims', 'Warrior_Brute_Swing', 'r'],
+  ['warrior_contact_anims', 'Warrior_Redhand', 'r'],
+  ['warrior_contact_anims', 'Warrior_Reaping_Arc', 'r'],
+  ['warrior_contact_anims', 'Warrior_Breachmaker', 'r'],
+  ['warrior_contact_anims', 'Warrior_Victory_Rush', 'r'],
+  ['warrior_contact_anims', 'Warrior_Victory_Rush', 'l'],
+  ['warrior_contact_anims', 'Warrior_Bloodletting', 'r'],
+  ['warrior_contact_anims', 'Warrior_Bloodletting', 'l'],
+  ['warrior_contact_anims', 'Warrior_Reaver_Strike', 'r'],
+  ['warrior_contact_anims', 'Warrior_Reaver_Strike', 'l'],
+  ['warrior_contact_anims', 'Warrior_Bladestorm_Loop', 'r'],
+  ['warrior_contact_anims', 'Warrior_Bladestorm_Loop', 'l'],
+  ['warrior_contact_anims', 'Warrior_Iron_Bellow', 'r'],
+  ['warrior_contact_anims', 'Warrior_Iron_Bellow', 'l'],
+  ['warrior_contact_anims', 'Warrior_Emboldening_Roar', 'r'],
+  ['warrior_contact_anims', 'Warrior_Emboldening_Roar', 'l'],
+  ['warrior_contact_anims', 'Warrior_Valor_Roar', 'r'],
+  ['warrior_contact_anims', 'Warrior_Valor_Roar', 'l'],
+  ['warrior_contact_anims', 'Warrior_Intimidating_Shout', 'r'],
+  ['warrior_contact_anims', 'Warrior_Intimidating_Shout', 'l'],
+  ['warrior_contact_anims', 'Warrior_Piercing_Howl', 'r'],
+  ['warrior_contact_anims', 'Warrior_Piercing_Howl', 'l'],
+  ['warrior_fury_anims', 'Fury_Twinstrike', 'r'],
+  ['warrior_fury_anims', 'Fury_Twinstrike', 'l'],
+])('%s %s keeps its %s blade above the floor throughout recovery', async (file, name, side) => {
+  const bytes = readFileSync(`public/models/chars/players/${file}.glb`);
   const gltf = await new GLTFLoader()
     .setMeshoptDecoder(MeshoptDecoder)
     .parseAsync(
@@ -25,13 +47,13 @@ it.each([
       '',
     );
   const clip = gltf.animations.find((candidate) => candidate.name === name);
-  const socket = gltf.scene.getObjectByName('handslotr');
+  const socket = gltf.scene.getObjectByName(`handslot${side}`);
   if (!clip || !socket) throw new Error('Missing native blade performance or socket');
   const mixer = new THREE.AnimationMixer(gltf.scene);
   const action = mixer.clipAction(clip).setLoop(THREE.LoopOnce, 1);
   action.clampWhenFinished = true;
   action.play();
-  const grip = variantGripTransform(bounds.max[1] - bounds.min[1], false, 0.04, 2);
+  const grip = variantGripTransform(bounds.max[1] - bounds.min[1], side === 'l', 0.04, 2);
   const local = new THREE.Matrix4().compose(
     new THREE.Vector3().fromArray(grip.position),
     new THREE.Quaternion().fromArray(grip.quaternion),
@@ -43,6 +65,7 @@ it.each([
   for (let i = 0; i <= Math.ceil(clip.duration / 0.002); i++) {
     const time = Math.min(clip.duration, i * 0.002);
     mixer.setTime(time);
+    expect(action.time).toBeCloseTo(time, 6);
     gltf.scene.updateMatrixWorld(true);
     const held = socket.matrixWorld.clone().multiply(local);
     for (const x of [bounds.min[0], bounds.max[0]])

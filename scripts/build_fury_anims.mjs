@@ -81,10 +81,16 @@ function pose(right, left, turn, lean, spread = 0, torso = idle) {
   }
   return result;
 }
-const rightCoil = pose(sample(1, 0.27), sample(2, 0.28), -38, 3, 8);
+const rightCoil = pose(sample(1, 0.27), sample(2, 0.28), -44, -4, 9);
 const rightCut = pose(sample(1, 0.38), sample(2, 0.28), 35, 15, 2);
-const leftCoil = pose(sample(1, 0.78), sample(2, 0.32), 42, 4, 14);
-const leftCut = pose(sample(1, 0.88), sample(2, 0.87), -42, 18, 7);
+const leftCoil = pose(sample(1, 0.78), sample(2, 0.32), 52, -6, 16);
+// The first sword returns to its native raised guard while the left attacks.
+// Letting its slice donor continue here drove the inactive blade through the floor.
+const leftCut = pose(sample(2, 0.28), sample(2, 0.87), -42, 18, 7);
+// Carry the second blade onward while the first remains guarded. Its donor
+// advances through the exit instead of reversing into another apparent strike.
+const leftExit = pose(sample(2, 0.28), sample(2, 0.94), -50, -4, 8);
+const twinRecover = pose(sample(2, 0.28), sample(2, 1.02), -20, -5, 6);
 // Preserve the native torso with the arm chains: the old Idle torso plus chop
 // arms pointed both actual sword blades behind the caster at the impact peak.
 const reapCut = pose(sample(1, 0.38), sample(2, 0.87), 12, 8, 8, sample(2, 0.87));
@@ -106,6 +112,8 @@ for (const [name, beats] of [
       [0.26, leftCoil],
       [0.34, leftCut],
       [0.36, leftCut],
+      [0.44, leftExit],
+      [0.54, twinRecover],
       [0.66, idle],
     ],
   ],
@@ -136,7 +144,8 @@ for (const [name, beats] of [
       const t = step / steps;
       // Ease in/out retains distinct loaded poses without a robotic stop.
       const striking = name === 'Fury_Red_Harvest' && [0.15, 0.32, 0.49, 0.585].includes(end);
-      const weight = striking ? t * t : t * t * (3 - 2 * t);
+      const twinContact = name === 'Fury_Twinstrike' && [0.15, 0.34].includes(end);
+      const weight = striking || twinContact ? t * t : t * t * (3 - 2 * t);
       const time = start + (end - start) * t;
       const blended = new Map(
         keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)]),

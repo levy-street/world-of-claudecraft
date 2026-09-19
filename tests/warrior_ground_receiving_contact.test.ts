@@ -120,7 +120,7 @@ it('Quaking Blow has a short larger compression followed by one dark body seam a
   );
 });
 
-it.each(['faultline', 'heroic_leap'])('%s preserves its existing receiving dimensions', (id) => {
+it.each(['heroic_leap'])('%s preserves its existing receiving dimensions', (id) => {
   const h = harness();
   drawWarriorAreaContact(h.host, id, 1, 2, 1, 0);
   expect(h.calls.flipbookAt).toHaveBeenCalledWith(
@@ -148,6 +148,40 @@ it.each(['faultline', 'heroic_leap'])('%s preserves its existing receiving dimen
     1,
     0.22,
   );
+});
+
+it('Faultline delivers the larger lower-body compression without replaying its ground area', () => {
+  const h = harness();
+  drawWarriorAreaContact(h.host, 'faultline', 1, 2, 1, 0);
+  expect(h.calls.flipbookAt).toHaveBeenCalledWith(
+    0,
+    1,
+    2.74,
+    5.6,
+    0xe1eaf0,
+    'contact_crush',
+    1.7,
+    0.085,
+    0,
+    0.82,
+  );
+  expect(h.calls.pathRibbon.mock.calls[0].slice(0, 3)).toEqual([0x334650, 0.46, 0.2]);
+  expect(h.calls.fragmentsAt).toHaveBeenCalledWith(
+    'stone_chip',
+    0,
+    1,
+    2.74,
+    0x9da4a7,
+    8,
+    1.6,
+    0,
+    1,
+    0.22,
+  );
+  expect(h.calls.contact).toHaveBeenCalledTimes(1);
+  expect(h.calls.crestAt).not.toHaveBeenCalled();
+  expect(h.calls.bakedAt).not.toHaveBeenCalled();
+  expect(h.calls.shockRing).not.toHaveBeenCalled();
 });
 
 it.each(abilities)(

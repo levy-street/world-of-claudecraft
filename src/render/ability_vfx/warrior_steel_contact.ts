@@ -29,11 +29,15 @@ export function warriorSteelContact(
   const aspect =
     slot.abilityId === 'execute'
       ? 1.45
-      : slot.abilityId === 'mortal_strike'
-        ? 1.25
-        : slot.abilityId === 'slam' || slot.abilityId === 'overpower'
-          ? 1.15
-          : 1;
+      : slot.abilityId === 'breachmaker'
+        ? 1.35
+        : slot.abilityId === 'victory_rush'
+          ? 1.2
+          : slot.abilityId === 'mortal_strike'
+            ? 1.25
+            : slot.abilityId === 'slam' || slot.abilityId === 'overpower'
+              ? 1.15
+              : 1;
   host.flipbookAt(
     x - dx * 0.24,
     y,

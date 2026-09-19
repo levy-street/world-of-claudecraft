@@ -20,7 +20,7 @@ interface BladeStyle {
   contactSize?: number;
 }
 export const WARRIOR_BLADE_STYLES: Readonly<Record<string, BladeStyle | undefined>> = {
-  heroic_strike: { span: 4.2, height: 0.95, roll: -0.95 },
+  heroic_strike: { span: 4.2, height: 0.95, roll: -0.95, contactSize: 6 },
   hamstring: { span: 3.5, height: 0.35, roll: 0.015, blood: true },
   slam: {
     span: 4.8,
@@ -51,7 +51,7 @@ export const WARRIOR_BLADE_STYLES: Readonly<Record<string, BladeStyle | undefine
     contactSize: 9,
   },
   bloodthirst: { span: 4.6, height: 1.45, roll: -0.8, blood: true },
-  victory_rush: { span: 4.8, height: 1.3, roll: 0.35 },
+  victory_rush: { span: 4.8, height: 1.3, roll: 0.35, contactSize: 6.6 },
 };
 const source = { x: 0, y: 0, z: 0 },
   target = { x: 0, y: 0, z: 0 },

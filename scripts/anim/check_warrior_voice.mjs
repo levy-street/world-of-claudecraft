@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { createGlbIO, indexClip, samplePose } from './pose_blend.mjs';
 
 const doc = await (await createGlbIO()).read(
-  'public/models/chars/players/warrior_contact_anims.glb',
+  process.argv[2] ?? 'public/models/chars/players/warrior_contact_anims.glb',
 );
 const root = doc.getRoot(),
   nodes = new Map(root.listNodes().map((n) => [n.getName(), n]));
@@ -17,7 +17,8 @@ const names = [
 ];
 for (const name of names) {
   const clip = indexClip(root, `Warrior_${name}`),
-    duration = name === 'Piercing_Howl' ? 0.57 : 0.72;
+    duration = Math.max(...Array.from(clip.values(), (channel) => channel.times.at(-1)));
+  assert(duration > 0 && duration <= 0.72 + 1e-6, `${name}: invalid recovery duration ${duration}`);
   const initial = samplePose(clip, 0);
   function apply(time) {
     for (const [key, values] of samplePose(clip, time)) {

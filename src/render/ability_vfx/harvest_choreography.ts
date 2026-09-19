@@ -51,7 +51,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     roll,
   );
   count++;
-  // The compact spray starts at its centred wound pivot. The wider world-space
+  // The broad spray starts at its centred wound pivot. The wider world-space
   // membrane carries the blade direction, independently of this contact detail.
   if (
     host.bakedAt &&
@@ -60,7 +60,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       at.x - dx * 0.28,
       at.y,
       at.z - dz * 0.28,
-      final ? 6.4 : beat === 1 ? 4.8 : 4.2,
+      final ? 8.6 : beat === 1 ? 6.4 : 5.8,
       0xffffff,
       0xff8990,
       life - (final ? 0.048 : 0.02),
@@ -69,6 +69,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       facing,
       false,
       roll,
+      final ? 1.65 : beat === 1 ? 1.4 : 1.3,
     ) !== false
   )
     count++;

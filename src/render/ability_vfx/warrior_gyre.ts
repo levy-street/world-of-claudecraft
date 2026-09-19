@@ -10,6 +10,10 @@ export function drawWarriorGyre(host: SequencerHost, slot: SeqSlot, beat: number
   if (beat !== 0 || slot.physicalSecondary) return true;
   const at = host.anchorOf(slot.casterId, 0, origin);
   if (!at) return true;
+  // Retained ribbons belong to this cast, not the reusable anchor scratch.
+  const xAt = at.x,
+    yAt = at.y,
+    zAt = at.z;
   const angle = host.facingAt?.(slot.casterId) ?? 0,
     dx = Math.sin(angle),
     dz = Math.cos(angle);
@@ -25,9 +29,9 @@ export function drawWarriorGyre(host: SequencerHost, slot: SeqSlot, beat: number
         for (let i = 0; i < points.length; i++) {
           warriorGyrePoint(blade, i / (points.length - 1), 0, point);
           points[i].set(
-            at.x + point.x * contactZ + point.z * contactX,
-            at.y + point.y,
-            at.z - point.x * contactX + point.z * contactZ,
+            xAt + point.x * contactZ + point.z * contactX,
+            yAt + point.y,
+            zAt - point.x * contactX + point.z * contactZ,
           );
         }
         return points.length;
@@ -37,10 +41,10 @@ export function drawWarriorGyre(host: SequencerHost, slot: SeqSlot, beat: number
       false,
       1,
     );
-  host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x941d32, 0xe7eff2, 'blood_gyre', angle, 0.4);
+  host.crestAt?.(xAt, yAt, zAt, 1, 1, 0x941d32, 0xe7eff2, 'blood_gyre', angle, 0.4);
   for (const side of [-1, 1]) {
-    const x = at.x + dz * side * 3.6,
-      z = at.z - dx * side * 3.6,
+    const x = xAt + dz * side * 3.6,
+      z = zAt - dx * side * 3.6,
       y = host.groundYAt(x, z) + 0.08;
     host.bakedAt?.('shout_dust', x, y, z, 3.4, 0xb7a494, 0xe1c4ab, 0.38, 0, 0, angle + side * 0.9);
     if (slot.tier === 0)

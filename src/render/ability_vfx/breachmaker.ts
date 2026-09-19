@@ -54,7 +54,7 @@ export function drawBreachmaker(host: SequencerHost, slot: SeqSlot, beat: number
     );
   }
   host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x728797, 0xe2edf2, 'breach_wedge', angle, 0.27);
-  const contacts = warriorSteelContact(host, slot, at, angle, 0.08, 6.8, 0.24, true);
+  const contacts = warriorSteelContact(host, slot, at, angle, 0.08, 8.6, 0.24, true);
   if (slot.tier === 0) {
     for (const side of [-1, 1])
       host.fragmentsAt?.(

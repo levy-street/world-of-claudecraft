@@ -73,6 +73,7 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
       facing,
       false,
       roll,
+      1.4,
     ) !== false
   )
     count++;

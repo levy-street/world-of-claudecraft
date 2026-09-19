@@ -78,7 +78,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
       at.x - dx * 0.35,
       at.y,
       at.z - dz * 0.35,
-      reverse ? 5.8 : 5.2,
+      reverse ? 7.2 : 6.6,
       0xffffff,
       0xff8990,
       0.2,
@@ -87,6 +87,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
       facing,
       false,
       roll,
+      reverse ? 1.45 : 1.35,
     ) !== false
   )
     count++;

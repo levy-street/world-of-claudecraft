@@ -195,13 +195,16 @@ const graveCut = bladePose(3, 0.82, [0, -0.06, 0.045], 0, 19);
 const graveSink = bladePose(3, 0.92, [-0.012, -0.095, 0.045], 9, -10, 5);
 const graveExtract = bladePose(3, 1.14, [-0.025, -0.065, -0.025], 19, -6, 9);
 const graveRecover = bladePose(3, 1.24, [-0.012, -0.03, -0.025], 9, 3, 4);
-const bloodLoad = bladePose(2, 0.27, [0.008, -0.035, -0.03], -35, -6, -8, true);
-const bloodCut = bladePose(2, 0.39, [-0.01, -0.04, 0.045], 40, 10, 12, true);
-const bloodPull = bladePose(2, 0.88, [0, -0.022, -0.018], -14, -6, 0, true);
-const victoryLoad = bladePose(2, 0.5, [0, -0.027, -0.025], -18, 7, -5);
-const victoryCross = bladePose(2, 0.42, [0, -0.02, 0.02], 6, 5, 3);
-const victoryCut = bladePose(2, 0.39, [0, -0.015, 0.035], 20, 0, 9);
-const victoryRise = bladePose(2, 0.27, [0, -0.005, 0.01], 6, -9, 0);
+const bloodLoad = bladePose(2, 0.25, [0.032, -0.04, -0.065], -46, -8, -8, true);
+const bloodCut = bladePose(2, 0.39, [-0.01, -0.035, 0.045], 35, 0, 8, true);
+const bloodExtract = bladePose(2, 0.88, [-0.035, -0.055, 0.015], 46, -12, 10, true);
+const bloodPull = bladePose(2, 0.88, [-0.012, -0.04, -0.05], -8, -10, 3, true);
+const bloodRecover = bladePose(2, 1.05, [0.005, -0.022, -0.018], -4, -3, 0, true);
+const victoryLoad = bladePose(2, 0.46, [-0.025, -0.06, -0.045], -32, -14, -12, true);
+const victoryCross = bladePose(2, 0.42, [0, -0.02, 0.02], 6, -8, 0, true);
+const victoryCut = bladePose(2, 0.39, [0, -0.015, 0.035], 20, 0, 9, true);
+const victoryRise = bladePose(2, 0.24, [0.025, -0.005, 0.015], 30, -16, 12, true);
+const victoryBrake = bladePose(2, 0.18, [0.012, -0.02, -0.022], 12, -8, 5, true);
 // Opposite travel directions from the native two-handed grip. The follow poses
 // keep the actual greatblade above the ground, not merely the hand sockets.
 const bruteLoad = bladePose(3, 0.2, [0.01, -0.055, -0.045], 3, -20, -3);
@@ -213,13 +216,16 @@ const redhandLoad = bladePose(3, 1.04, [-0.038, -0.1, -0.03], -34, 5, -30);
 const redhandCut = bladePose(3, 0.81, [-0.012, -0.02, 0.03], -20, 6, -22);
 const redhandRise = bladePose(3, 0.63, [0.025, -0.015, 0.015], 10, -19, 9);
 const redhandRecover = bladePose(3, 0.54, [0.012, -0.028, -0.015], 21, -5, 11);
-const reapLoad = bladePose(5, 0.1, [0, -0.025, 0.02], -25, -4);
-const reapCut = bladePose(5, 0.24, [0, -0.025, 0.02], 20, 5);
-const reapFollow = bladePose(5, 0.5, [0, -0.025, 0.02], 35, 5);
-const stormA = bladePose(3, 0.83, [0, -0.025, 0], -6, -3, -8);
-const stormB = bladePose(3, 0.83, [0, -0.025, 0], 6, -3, -8);
-const stormC = bladePose(3, 0.83, [0, -0.025, 0], 6, 3, -8);
-const stormD = bladePose(3, 0.83, [0, -0.025, 0], -6, 3, -8);
+const reapLoad = bladePose(5, 0.1, [-0.06, -0.07, -0.035], -38, -6);
+const reapCut = bladePose(5, 0.24, [0.01, -0.065, 0.07], 24, 5);
+const reapFollow = bladePose(5, 0.5, [0.06, -0.055, 0.035], 52, -3);
+const reapRecover = bladePose(5, 0.68, [0.025, -0.035, -0.015], 21, -3);
+// The blade's level and the loaded knee change through the revolution. The
+// root still owns one exact full turn and returns to the same seamless pose.
+const stormA = bladePose(3, 0.83, [0, -0.035, 0], -9, -3, -11);
+const stormB = bladePose(3, 0.81, [0.014, -0.06, 0], 1, 4, -2);
+const stormC = bladePose(3, 0.85, [-0.012, -0.025, 0], 10, -4, 5);
+const stormD = bladePose(3, 0.855, [0.016, -0.05, 0], -2, 3, 1);
 function guardedCounter(time, turn, lean, hip = [0, -0.03, 0.025]) {
   const pose = bladePose(5, time, hip, turn, lean);
   const brace = shieldPose(0.14, [0, 0, 0]);
@@ -259,12 +265,14 @@ const quakeLoad = compressShield(0.14, [0, -0.02, -0.04], -16);
 const quakeHit = compressShield(0.32, [0, -0.12, 0.035], 10);
 const quakeSettle = compressShield(0.46, [0, -0.1, 0], 0);
 const quakeRecover = compressShield(0.55, [0, -0.045, -0.01], -3);
-const faultLoad = compressShield(0.14, [0, -0.04, -0.045], -12, -12);
-const faultHit = compressShield(0.32, [0, -0.09, 0.05], 18, 8);
-const faultRecover = compressShield(0.5, [0, -0.035, 0.025], 4, 6);
-const breachLoad = bladePose(3, 0.8331, [0, -0.035, -0.055], -18, -4);
+const faultLoad = compressShield(0.14, [-0.015, -0.012, -0.06], -21, -15);
+const faultHit = compressShield(0.32, [0.012, -0.145, 0.05], 13, 10);
+const faultRecoil = compressShield(0.43, [0.008, -0.11, 0.005], -3, 7);
+const faultRecover = compressShield(0.55, [0, -0.04, -0.02], -6, 3);
+const breachLoad = bladePose(3, 0.8331, [-0.03, -0.075, -0.095], -28, -9, -5);
 const breachHit = bladePose(3, 0.8331, [0, -0.035, 0.07], 0, 0);
-const breachRecover = bladePose(3, 0.8331, [0, -0.02, 0.015], 7, -5);
+const breachWithdraw = bladePose(3, 0.8331, [-0.02, -0.06, -0.065], -17, -8, -3);
+const breachRecover = bladePose(3, 0.8331, [-0.005, -0.025, -0.025], -5, -3);
 
 // Defense activations borrow only native upper-body rotations. The same
 // offline planted-foot solve owns their short transition, never a long gait lock.
@@ -592,7 +600,8 @@ const performances = [
       [0.09, faultLoad],
       [0.15, faultHit],
       [0.205, faultHit],
-      [0.4, faultRecover],
+      [0.29, faultRecoil],
+      [0.46, faultRecover],
       [0.72, idle],
     ],
   ],
@@ -603,7 +612,8 @@ const performances = [
       [0.085, breachLoad],
       [0.15, breachHit],
       [0.19, breachHit],
-      [0.34, breachRecover],
+      [0.34, breachWithdraw],
+      [0.48, breachRecover],
       [0.68, idle],
     ],
   ],
@@ -614,7 +624,8 @@ const performances = [
       [0.085, reapLoad],
       [0.15, reapCut],
       [0.175, reapCut],
-      [0.33, reapFollow],
+      [0.3, reapFollow],
+      [0.46, reapRecover],
       [0.64, idle],
     ],
   ],
@@ -686,7 +697,9 @@ const performances = [
       [0.075, bloodLoad],
       [0.15, bloodCut],
       [0.19, bloodCut],
-      [0.34, bloodPull],
+      [0.265, bloodExtract],
+      [0.4, bloodPull],
+      [0.52, bloodRecover],
       [0.66, idle],
     ],
   ],
@@ -698,7 +711,8 @@ const performances = [
       [0.12, victoryCross],
       [0.15, victoryCut],
       [0.185, victoryCut],
-      [0.33, victoryRise],
+      [0.3, victoryRise],
+      [0.46, victoryBrake],
       [0.68, idle],
     ],
   ],
@@ -716,7 +730,17 @@ for (const [name, beats] of performances) {
     const [start, from] = beats[b - 1],
       [end, to] = beats[b];
     // Dense offline sampling preserves the foot lock between exported keys too.
-    const steps = Math.max(2, Math.ceil((end - start) * 180));
+    // Stronger planted load/recoil needs denser keys to retain the existing
+    // 0.5 mm foot tolerance between samples; unrelated clips stay unchanged.
+    const samplingRate = [
+      'Warrior_Faultline',
+      'Warrior_Breachmaker',
+      'Warrior_Bloodletting',
+      'Warrior_Victory_Rush',
+    ].includes(name)
+      ? 360
+      : 180;
+    const steps = Math.max(2, Math.ceil((end - start) * samplingRate));
     for (let step = 1; step <= steps; step++) {
       const t = step / steps;
       const weight = end === 0.15 ? t * t : t * t * (3 - 2 * t);
@@ -742,6 +766,11 @@ for (const [name, beats] of performances) {
           'root|rotation',
           spin.multiply(new Quaternion().fromArray(pose.get('root|rotation'))).toArray(),
         );
+      }
+      if (name === 'Warrior_Bladestorm_Loop' && b === beats.length - 1 && step === steps) {
+        // The IK solver can return the equivalent negative quaternion after
+        // a revolution. Close on the identical authored pose and storage sign.
+        pose = new Map([...first].map(([key, value]) => [key, [...value]]));
       }
       if (name === 'Warrior_Breachmaker' || name === 'Warrior_Sword_Guard') {
         const time = start + (end - start) * t;

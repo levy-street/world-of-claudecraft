@@ -24,7 +24,9 @@ export function drawWarriorGroundReceivingContact(
   const dx = Math.sin(facing),
     dz = Math.cos(facing);
   const quake = id === 'thunder_clap',
-    surface = quake ? 0.26 : 0;
+    rupture = id === 'faultline',
+    compression = quake || rupture,
+    surface = compression ? 0.26 : 0;
   const x = at.x - dx * surface,
     y = at.y,
     z = at.z - dz * surface;
@@ -32,17 +34,17 @@ export function drawWarriorGroundReceivingContact(
     x,
     y,
     z,
-    quake ? 4.1 : 2.8,
-    quake ? 0xe1eaf0 : 0xc4c9c9,
+    rupture ? 5.6 : quake ? 4.1 : 2.8,
+    compression ? 0xe1eaf0 : 0xc4c9c9,
     'contact_crush',
     1.7,
-    quake ? 0.07 : 0.21,
-    quake ? 0 : 0.3,
-    quake ? 0.68 : 1,
+    rupture ? 0.085 : quake ? 0.07 : 0.21,
+    compression ? 0 : 0.3,
+    rupture ? 0.82 : quake ? 0.68 : 1,
   );
   host.pathRibbon(
-    quake ? 0x334650 : 0xa8b3b5,
-    quake ? 0.34 : 0.18,
+    compression ? 0x334650 : 0xa8b3b5,
+    rupture ? 0.46 : quake ? 0.34 : 0.18,
     0.2,
     (points) => {
       const origin = host.anchorOf(targetId, meleeContactHeight(profile, 0), body);
@@ -52,9 +54,9 @@ export function drawWarriorGroundReceivingContact(
         sz = Math.cos(yaw);
       for (let i = 0; i < points.length; i++) {
         const u = i / (points.length - 1);
-        if (quake) {
-          point.x = (u - 0.5) * 1.95;
-          point.y = Math.abs(u - 0.46) * 0.32 + Math.sin(u * 19) * 0.035;
+        if (compression) {
+          point.x = (u - 0.5) * (rupture ? 2.45 : 1.95);
+          point.y = Math.abs(u - 0.46) * (rupture ? 0.46 : 0.32) + Math.sin(u * 19) * 0.035;
           point.z = -surface;
         } else meleeContactPoint(profile, u, 0, 0, point);
         points[i].set(
@@ -73,7 +75,18 @@ export function drawWarriorGroundReceivingContact(
     true,
   );
   if (tier === 0)
-    host.fragmentsAt?.('stone_chip', x, y, z, 0x9da4a7, 8, quake ? 1.2 : 0.9, dx, dz, 0.22);
+    host.fragmentsAt?.(
+      'stone_chip',
+      x,
+      y,
+      z,
+      0x9da4a7,
+      8,
+      rupture ? 1.6 : quake ? 1.2 : 0.9,
+      dx,
+      dz,
+      0.22,
+    );
   host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);
   host.countPrimitive(id, tier === 0 ? 3 : 2);
 }
