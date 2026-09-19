@@ -143,7 +143,8 @@ export interface ShaderWarmBlock {
   holdMs: number;
   holdWallMs: number;
   releases: number;
-  /** The A/B arm: 'on', 'off', or '' when no draw ran or the value is not one. */
+  /** The 0.43 D3D11 experiment's arm ('on', 'off', else ''). Clients from 0.44.0
+   *  on no longer send it; kept so a lingering 0.43 tab's rows stay splittable. */
   abArm: string;
 }
 

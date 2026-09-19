@@ -1370,9 +1370,9 @@ export class OptionsWindow {
               // The shell refused the last write: the row says what the next
               // start will really use, over the rung this one is on.
               desktopGpuBackendWriteFailed: desktopGpuBackendWriteFailed(),
-              // The shader warm-up worker is forced off on iOS whatever the
-              // setting, so that host gets no row. The client's resolver owns
-              // that rule; asking it is what keeps the two from drifting.
+              // The row is withdrawn on every host today, and refused on iOS
+              // whenever it is offered. The client's resolver owns both rules;
+              // asking it is what keeps the two from drifting.
               shaderWarmChoice: shaderWarmChoiceAvailable(),
               frameRateCapReadingFor: frameRateCapRowReading,
             },

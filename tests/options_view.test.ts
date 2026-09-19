@@ -1,9 +1,12 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   GRAPHICS_REBUILD_KEYS,
   normalizeGraphicsSettingsSnapshot,
 } from '../src/game/graphics_rebuild_core';
 import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
+import { shaderWarmChoiceAvailable } from '../src/render/shader_warm_client';
 import { AURA_TRACKS } from '../src/ui/hud/aura_tracks';
 import {
   boolToggleNextValue,
@@ -504,6 +507,16 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'hudChrome.options.gpuBackendActive',
     );
     expect(settled?.control === 'choice' && settled.statusAlert).toBeUndefined();
+  });
+
+  it('asks the worker client whether the row is offered, at the one place the window builds it', () => {
+    // The view shows the row when the flag is absent, so the window's call
+    // site is what withdraws it: a dropped or hard-coded prop would bring the
+    // row back with every other suite green.
+    const source = readFileSync(join(__dirname, '../src/ui/options_window.ts'), 'utf8');
+    expect(source.match(/shaderWarmChoice:/g)).toHaveLength(1);
+    expect(source).toContain('shaderWarmChoice: shaderWarmChoiceAvailable(),');
+    expect(shaderWarmChoiceAvailable()).toBe(false);
   });
 
   it('drops the shader warm-up worker row and its note where the worker is forced off', () => {

@@ -2147,7 +2147,6 @@ describe('perf reporter world-entry blocks', () => {
       holdMs: 120,
       holdWallMs: 90,
       releases: 0,
-      abArm: 'on',
       workerStats: {
         pending: 2,
         inFlight: 1,
@@ -2191,7 +2190,6 @@ describe('perf reporter world-entry blocks', () => {
       holdMs: 120,
       holdWallMs: 90,
       releases: 0,
-      abArm: 'on',
     });
     // The two typed fields the server stores as columns.
     expect(body.shaderWarmWorkerActive).toBe(true);

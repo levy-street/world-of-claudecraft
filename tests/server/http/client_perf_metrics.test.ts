@@ -55,7 +55,6 @@ import {
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
 import { RAW_SUMMARY_SHED_RUNG_IDS } from '../../../server/perf_report_shed';
-import { SHADER_WARM_AB_REFUSAL } from '../../../src/render/shader_warm_client_core';
 
 function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
   return {
@@ -651,10 +650,10 @@ describe('perf-report ingest emission', () => {
 });
 
 describe('shaderWarmRefusalLabel', () => {
-  it('keeps the token the client mints for the A/B off arm as a label of its own', () => {
-    // Folded into other, the arm split the experiment reads would vanish.
-    expect(CLIENT_PERF_SHADER_WARM_REFUSALS).toContain(SHADER_WARM_AB_REFUSAL);
-    expect(shaderWarmRefusalLabel(SHADER_WARM_AB_REFUSAL)).toBe(SHADER_WARM_AB_REFUSAL);
+  it('keeps the 0.43 experiment off-arm token as a label of its own for lingering clients', () => {
+    // Folded into other, a 0.43 tab still open would read as an unknown refusal.
+    expect(CLIENT_PERF_SHADER_WARM_REFUSALS).toContain('ab:off');
+    expect(shaderWarmRefusalLabel('ab:off')).toBe('ab:off');
   });
 
   it('maps the empty refusal to none and keeps the known causes whole', () => {

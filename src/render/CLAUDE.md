@@ -688,10 +688,15 @@ GPU work signs. Each rule names its seam and its guard.
   before its first link). The client (`shader_warm_client.ts`, pure policy in
   `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
   backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
-  is `all` where the compile runs off the presenting thread AND there is something to
-  warm AND that was measured (D3D11 only: `WORKER_WORTH_BACKENDS`; Metal reads like
-  Vulkan on its one datapoint and has no in-game measurement, so it stays out until the
-  explicit setting produces one), `off` on every OpenGL and GLES class,
+  is `all` only on a backend a FIELD measurement showed worth the worker, and none is
+  today (`WORKER_WORTH_BACKENDS` is empty, so `auto` is `off` everywhere. The options row is
+  withdrawn meanwhile (`SHADER_WARM_OPTION_OFFERED`): the stored value is kept for the
+  row's return but reads as `auto` for the worker, because a stored On nobody can turn
+  off would run a worker for good, while the character-select corpus still honours a
+  stored Off; only a `?shaderwarm=` pin starts the worker): D3D11 passed on a bench and the 0.43 fleet experiment
+  (half the D3D11 profiles with the worker, half without) found no gain it could detect;
+  Metal reads like Vulkan on its one datapoint and has no in-game measurement; it is
+  `off` on every OpenGL and GLES class,
   where the worker only relocates the stall into the GPU process (measured 2026-08-28
   on Linux NVIDIA, Linux Intel and Android Mali), and `off` on Vulkan, where a cold
   link is already as cheap as a hit and the first draw is free while the worker's own
@@ -796,13 +801,9 @@ GPU work signs. Each rule names its seam and its guard.
   `perfStats().shaderWarmAudit` are the local readout, and of the worker's half only the
   bounded projection `shaderWarmBeaconSummary` builds (`src/game/perf_shader_warm_core.ts`:
   worker state, refusal, mode, setting, backend, counts, hold time summed and as wall
-  time, releases, and the A/B arm) rides the perf beacon, as `rawSummary.shaderWarm`
+  time, releases) rides the perf beacon, as `rawSummary.shaderWarm`
   plus the typed `shaderWarmWorkerActive` and `shaderWarmRefusal` fields; the audit and
-  the adapter string ride none of it. FOR ONE RELEASE `auto` on D3D11 is an A/B
-  experiment (`shaderWarmAbArmFor`, `SHADER_WARM_AB_ACTIVE`): a browser profile draws an
-  arm once (localStorage) and the `off` arm runs the pre-worker path with the refusal
-  token `ab:off`, which is NOT a refusal and a refusal-share reading must exclude; an
-  explicit On or Off is never drawn. The decision PR removes the arm whatever it shows.
+  the adapter string ride none of it.
   The readout also names the first programs the worker failed (`failedPrograms`).
   A capture taken under `?diagnostics` also runs the scene census, whose
   bucket-visibility diffs link programs no live frame asks for: those are charged to
