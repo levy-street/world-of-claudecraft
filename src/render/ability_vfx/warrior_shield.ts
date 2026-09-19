@@ -17,6 +17,11 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
   const from = host.anchorOf(slot.casterId, 0.55, source);
   const at = host.anchorOf(slot.targetId, meleeContactHeight(profile, 0), target);
   if (!from || !at) return true;
+  // The outward transfer belongs to this impact, even if the scratch anchor
+  // is reused for another fighter before the ribbon's next rendered frame.
+  const impactX = at.x,
+    impactY = at.y,
+    impactZ = at.z;
   const sampled = host.weaponFace?.(slot.casterId, 1, shield, normal) === true;
   const angle = sampled ? Math.atan2(normal.x, normal.z) : Math.atan2(at.x - from.x, at.z - from.z);
   const dx = Math.sin(angle),
@@ -33,8 +38,8 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
     z,
     1.4,
     1.4,
-    0x657c91,
-    0xd8efff,
+    0x667782,
+    0xdde5e9,
     'shield_contact',
     angle,
     0.18,
@@ -42,7 +47,7 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
   // A cold/full carrier still retains the complete directional primary shape.
   for (let side = -1; side <= 1; side += 2) {
     host.pathRibbon(
-      0xd8efff,
+      0xe3ebef,
       solid === true ? 0.095 : 0.18,
       0.13,
       (points) => {
@@ -70,7 +75,7 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
   if (sampled) {
     for (const side of [-1, 1])
       host.pathRibbon(
-        0xcbe8f4,
+        0xc9d5dd,
         0.14,
         0.18,
         (points) => {
@@ -78,9 +83,9 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
             const u = i / (points.length - 1);
             const bow = Math.sin(u * Math.PI) * side * 0.45;
             points[i].set(
-              x + (at.x - x) * u + dz * bow,
-              y + (at.y - y) * u,
-              z + (at.z - z) * u - dx * bow,
+              x + (impactX - x) * u + dz * bow,
+              y + (impactY - y) * u,
+              z + (impactZ - z) * u - dx * bow,
             );
           }
           return points.length;
@@ -106,11 +111,30 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
       at,
       meleeContactHeight(profile, 0),
       incoming,
-      4.6,
+      8.2,
       slot.tier,
+      undefined,
+      0.075,
+      1.45,
     );
   if (slot.tier === 0) {
-    host.fragmentsAt?.('metal_splinter', at.x, at.y, at.z, 0xa8b9c5, 13, 1.2, dx, dz, 0.26);
+    const sx = Math.sin(incoming),
+      sz = Math.cos(incoming);
+    // The same thirteen chips split into unequal outward shoulder jets.
+    // They expand from the victim, with no additional area-damage boundary.
+    for (const side of [-1, 1])
+      host.fragmentsAt?.(
+        'metal_splinter',
+        at.x + sz * side * 0.22,
+        at.y + 0.16,
+        at.z - sx * side * 0.22,
+        0xb9c6cd,
+        side < 0 ? 6 : 7,
+        1.6,
+        sx + sz * side * 1.2,
+        sz - sx * side * 1.2,
+        0.32,
+      );
     host.burstAt(at.x, at.y, at.z, 0xe2ecf2, 19, 1.2, 'sparks', 0.16, 0.02);
     const floor = host.groundYAt(from.x, from.z);
     host.bakedAt?.(
@@ -138,7 +162,7 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
       -dz,
       0.25,
     );
-    count += 4;
+    count += 5;
   }
   host.contact?.(slot.casterId, slot.targetId, 'physical-crush', profile.force, slot.abilityId, 0);
   if (!slot.physicalSecondary) host.shakeAt(at.x, at.y, at.z, 0.18, true);

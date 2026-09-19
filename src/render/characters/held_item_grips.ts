@@ -4,6 +4,12 @@ export interface HandGrip {
   scale: number;
 }
 
+/** Native sword mounting used when the exported rig omits accessory nodes. */
+export const KAYKIT_ONE_HAND_SWORD_GRIP: { r: HandGrip; l: HandGrip } = {
+  r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },
+  l: { position: [0, 0.555174, 0], quaternion: [0, 0, 0, 1], scale: 0.8876 },
+};
+
 export const KAYKIT_SHIELD_ACCESSORIES = {
   shield_round: 'Round_Shield',
   shield_square: 'Rectangle_Shield',

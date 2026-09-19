@@ -102,4 +102,13 @@ it('keeps the complete shield and target imprint at reduced detail and during co
   expect(points[0].toArray()).toEqual([0.25, 1.4, 1.6]);
   expect(points.at(-1)!.x).toBeCloseTo(7);
   expect(points.at(-1)!.z).toBeCloseTo(3);
+  // The next actor's anchor reuse must not drag this shield transfer across
+  // the battlefield. The receiving crease has its own live target lookup.
+  const original = points.map((point) => point.clone());
+  targetX = 19;
+  drawWarriorShield(host, slot, 0);
+  link[3](points);
+  points.forEach((point, i) => {
+    expect(point.distanceTo(original[i])).toBeLessThan(1e-8);
+  });
 });

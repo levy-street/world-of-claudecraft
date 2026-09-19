@@ -27,12 +27,13 @@ export function drawWarriorAreaReceivingContact(
     y = at.y,
     z = at.z - dz * 0.28;
   const heavy = id === 'bladestorm';
+  const counter = id === 'revenge';
   const duration = heavy ? 0.27 : 0.23;
   host.flipbookAt(
     x,
     y,
     z,
-    heavy ? 3.5 : 3.1,
+    counter ? 3.8 : heavy ? 3.5 : 3.1,
     0xeaf4fa,
     'contact_cut',
     heavy ? 2.1 : 1.8,
@@ -46,7 +47,7 @@ export function drawWarriorAreaReceivingContact(
       x,
       y,
       z,
-      heavy ? 5.2 : 4.4,
+      counter ? 6 : heavy ? 5.2 : 4.4,
       0xffffff,
       0xdceaf3,
       duration,
@@ -62,7 +63,7 @@ export function drawWarriorAreaReceivingContact(
   if (
     host.pathRibbon(
       0x293b48,
-      heavy ? 0.44 : 0.34,
+      counter ? 0.46 : heavy ? 0.44 : 0.34,
       duration,
       (points) => {
         const origin = host.anchorOf(targetId, meleeContactHeight(profile, 0), body);
@@ -90,7 +91,7 @@ export function drawWarriorAreaReceivingContact(
   )
     count++;
   if (tier === 0 && host.fragmentsAt) {
-    host.fragmentsAt('metal_splinter', x, y, z, 0xc6d2da, 8, 1.2, dx, dz, 0.24);
+    host.fragmentsAt('metal_splinter', x, y, z, 0xc6d2da, 8, counter ? 1.45 : 1.2, dx, dz, 0.24);
     count++;
   }
   host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);

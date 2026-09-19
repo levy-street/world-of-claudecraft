@@ -140,9 +140,9 @@ function shieldPose(time, hipOffset) {
   return pose;
 }
 const guard = shieldPose(0, [0, -0.008, -0.01]);
-const chamber = shieldPose(0.14, [0, -0.025, -0.035]);
-const drive = shieldPose(0.32, [0, -0.008, 0.045]);
-const recoil = shieldPose(0.5, [0, -0.012, 0.015]);
+const chamber = shieldPose(0.14, [0.02, -0.065, -0.07]);
+const drive = shieldPose(0.32, [0, -0.04, 0.08]);
+const recoil = shieldPose(0.5, [-0.012, -0.075, -0.025]);
 const shieldBeats = [
   [0, idle],
   [0.045, guard],
@@ -220,8 +220,8 @@ const stormA = bladePose(3, 0.83, [0, -0.025, 0], -6, -3, -8);
 const stormB = bladePose(3, 0.83, [0, -0.025, 0], 6, -3, -8);
 const stormC = bladePose(3, 0.83, [0, -0.025, 0], 6, 3, -8);
 const stormD = bladePose(3, 0.83, [0, -0.025, 0], -6, 3, -8);
-function guardedCounter(time, turn, lean) {
-  const pose = bladePose(5, time, [0, -0.03, 0.025], turn, lean);
+function guardedCounter(time, turn, lean, hip = [0, -0.03, 0.025]) {
+  const pose = bladePose(5, time, hip, turn, lean);
   const brace = shieldPose(0.14, [0, 0, 0]);
   for (const key of keys)
     if (/^(upperarm|lowerarm|wrist|hand)\.l\|rotation$/.test(key))
@@ -251,12 +251,14 @@ function compressShield(time, hip, lean, turn = 0) {
   }
   return pose;
 }
-const revengeLoad = guardedCounter(0.12, -28, -5);
-const revengeHit = guardedCounter(0.28, 18, 6);
-const revengeFollow = guardedCounter(0.5, 35, 3);
-const quakeLoad = compressShield(0.14, [0, -0.025, -0.03], -8);
-const quakeHit = compressShield(0.32, [0, -0.085, 0.04], 14);
-const quakeRecover = compressShield(0.5, [0, -0.025, 0.015], 6);
+const revengeLoad = guardedCounter(0.1, -43, -8, [-0.035, -0.075, -0.025]);
+const revengeHit = guardedCounter(0.28, 18, 6, [0.012, -0.055, 0.03]);
+const revengeFollow = guardedCounter(0.5, 48, 1, [0.035, -0.07, 0.01]);
+const revengeRecover = guardedCounter(0.63, 18, 0, [0.012, -0.035, -0.015]);
+const quakeLoad = compressShield(0.14, [0, -0.02, -0.04], -16);
+const quakeHit = compressShield(0.32, [0, -0.12, 0.035], 10);
+const quakeSettle = compressShield(0.46, [0, -0.1, 0], 0);
+const quakeRecover = compressShield(0.55, [0, -0.045, -0.01], -3);
 const faultLoad = compressShield(0.14, [0, -0.04, -0.045], -12, -12);
 const faultHit = compressShield(0.32, [0, -0.09, 0.05], 18, 8);
 const faultRecover = compressShield(0.5, [0, -0.035, 0.025], 4, 6);
@@ -566,7 +568,8 @@ const performances = [
       [0.085, revengeLoad],
       [0.15, revengeHit],
       [0.18, revengeHit],
-      [0.34, revengeFollow],
+      [0.31, revengeFollow],
+      [0.46, revengeRecover],
       [0.66, idle],
     ],
   ],
@@ -577,7 +580,8 @@ const performances = [
       [0.085, quakeLoad],
       [0.15, quakeHit],
       [0.19, quakeHit],
-      [0.36, quakeRecover],
+      [0.3, quakeSettle],
+      [0.46, quakeRecover],
       [0.68, idle],
     ],
   ],

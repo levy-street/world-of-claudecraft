@@ -1,7 +1,8 @@
-import { meleeContactHeight, meleeContactPoint, meleeImpactProfile } from '../melee_impact_core';
+import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { drawWarriorAreaReceivingContact } from './warrior_area_receiving_contact';
 import { warriorAreaPoint } from './warrior_area_shapes';
+import { drawWarriorGroundReceivingContact } from './warrior_ground_receiving_contact';
 
 const source = { x: 0, y: 0, z: 0 },
   target = { x: 0, y: 0, z: 0 },
@@ -23,6 +24,10 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
   if (beat > 0 || slot.physicalSecondary) return true;
   const at = host.anchorOf(slot.casterId, 0, source);
   if (!at) return true;
+  // A later cast may overwrite the module scratch while this sweep is alive.
+  const x = at.x,
+    y = at.y,
+    z = at.z;
   const angle = host.facingAt?.(slot.casterId) ?? 0,
     sine = Math.sin(angle),
     cosine = Math.cos(angle);
@@ -42,9 +47,9 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
             point,
           );
           points[i].set(
-            at.x + point.x * cosine + point.z * sine,
-            at.y + point.y,
-            at.z + point.z * cosine - point.x * sine,
+            x + point.x * cosine + point.z * sine,
+            y + point.y,
+            z + point.z * cosine - point.x * sine,
           );
         }
         return points.length;
@@ -55,7 +60,7 @@ export function drawReapingArc(host: SequencerHost, slot: SeqSlot, beat: number)
       strand === 0 ? 1 : 0,
       { from: 0, to: 1 },
     );
-  host.crestAt?.(at.x, at.y, at.z, 1, 1, 0x8c9fae, 0xe4edf2, 'steel_reap', angle, 0.28);
+  host.crestAt?.(x, y, z, 1, 1, 0x8c9fae, 0xe4edf2, 'steel_reap', angle, 0.28);
   host.countPrimitive('cleave', slot.tier > 0 ? 2 : 4);
   return true;
 }
@@ -99,63 +104,13 @@ export function drawWarriorAreaContact(
   if (!profile) return false;
   const at = host.anchorOf(targetId, meleeContactHeight(profile, 0), target);
   if (!at) return false;
-  const groundImpact = id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline';
-  if (!groundImpact && outcome === 1) {
-    drawWarriorAreaReceivingContact(host, id, sourceId, targetId, tier, at, profile);
+  if (outcome === 2) {
+    host.flipbookAt(at.x, at.y, at.z, 2.4, 0xcadce8, 'contact_crush', 1.7, 0.21, 0.3);
     return true;
   }
-  host.flipbookAt(
-    at.x,
-    at.y,
-    at.z,
-    outcome === 2 ? 2.4 : 2.8,
-    outcome === 2 ? 0xcadce8 : groundImpact ? 0xc4c9c9 : 0xe2edf2,
-    outcome === 2 || id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline'
-      ? 'contact_crush'
-      : 'contact_cut',
-    1.7,
-    0.21,
-    0.3,
-  );
-  if (outcome === 2) return true;
-  const from = host.anchorOf(sourceId, 0.5, source);
-  const angle = from ? Math.atan2(at.x - from.x, at.z - from.z) : 0;
-  const dx = Math.sin(angle),
-    dz = Math.cos(angle);
-  host.pathRibbon(
-    groundImpact ? 0xa8b3b5 : 0xe2edf2,
-    0.18,
-    0.2,
-    (points) => {
-      for (let i = 0; i < points.length; i++) {
-        meleeContactPoint(profile, i / (points.length - 1), 0, 0, point);
-        points[i].set(
-          at.x + dz * point.x + dx * point.z,
-          at.y + point.y,
-          at.z - dx * point.x + dz * point.z,
-        );
-      }
-      return points.length;
-    },
-    true,
-    null,
-    true,
-    0,
-  );
-  if (tier === 0)
-    host.fragmentsAt?.(
-      groundImpact ? 'stone_chip' : 'metal_splinter',
-      at.x,
-      at.y,
-      at.z,
-      groundImpact ? 0x9da4a7 : 0xc6d2da,
-      8,
-      0.9,
-      dx,
-      dz,
-      0.22,
-    );
-  host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);
-  host.countPrimitive(id, tier === 0 ? 3 : 2);
+  const groundImpact = id === 'heroic_leap' || id === 'thunder_clap' || id === 'faultline';
+  if (groundImpact)
+    drawWarriorGroundReceivingContact(host, id, sourceId, targetId, tier, at, profile);
+  else drawWarriorAreaReceivingContact(host, id, sourceId, targetId, tier, at, profile);
   return true;
 }

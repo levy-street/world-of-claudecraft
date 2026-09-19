@@ -37,7 +37,7 @@ Required before handover: corrected blade clearance, unchanged unrelated native 
 
 ### Corrected first-batch candidate
 
-Brute now progresses continuously through its post-contact donor phases instead of re-crossing with a rebound. Early Grave and Brute keep their deeper pelvis load while the late upper-body pose keeps the blade clear. Redhand's low chamber also respects the full blade width. New regression coverage checks every corner of the equipped greatblade bounds at2ms intervals, including blended frames. All40 native-contact/foot/clearance checks pass.
+Brute now progresses continuously through its post-contact donor phases instead of re-crossing with a rebound. Early Grave and Brute keep their deeper pelvis load while the late upper-body pose keeps the blade clear. Redhand's low chamber also respects the full blade width. New regression coverage checks every corner of the equipped greatblade bounds at 2ms intervals, including blended frames. All40 native-contact/foot/clearance checks pass.
 
 Final focused run:16 suites,205 tests passed (`tmp/warrior-movement-batch1-final-tests.log`). Native TypeScript check passed (`tmp/warrior-movement-types-final.log`). Scoped Biome native process exited0; existing authoring/test style diagnostics remain (`tmp/warrior-movement-lint-native.log`). Exact decoded-track comparison proves only the intended four clips changed and36 remained identical. Asset SHA b9580a84ceda3d1da55b0149cd39c4d73c686e7257543e891e5159de9adf6d0a.
 
@@ -46,3 +46,21 @@ Matching corrected Studio capture: `warrior-final-movement-impact-corrected-sept
 Outdoor quality report `warrior-final-movement-impact-quality-sept19`:35/35 cases,329 frames, all six presets and five reduced-motion cases, zero errors/console errors/missing assets, source unchanged. Same primary receiving identity retained at Low; final whole-game gate remains open.
 
 Natural outdoor combat report `warrior-natural-crowd-review-movement-batch1-sept19`:2/2 thirty-second takes passed, Battlecraft21 casts/12 normal attacks and Bloodrush19 casts/20 normal attacks. Actual multiple-recipient damage observed in both, no reported coverage gaps, no errors or missing assets, source unchanged. No resource/cooldown/health resets during either take.
+
+
+## Ironguard movement and receiving impact
+
+Shieldcrack loads behind its held shield, drives forward and recoils into guard. Revenge coils behind its shield, cuts across the front and brakes into recovery. Quaking Blow visibly compresses through the knees and settles after the ground impact. Contact remains at 0.15 seconds and all recover inside 0.7 seconds. No extra sword hit was added to Shieldcrack. Decoded channel comparison against 431a19a7 confirms that only these three clips changed; the other 37 are identical.
+
+Shieldcrack now produces an 8.2-unit cold steel collision with a wider body crease and two opposing jets sharing the original 13 fragments. The short flash lasts 0.075 seconds; the shield remains visible. Revenge has a 6-unit horizontal steel discharge. Quaking Blow combines its existing ground fracture with a 4.1-unit lower-body compression and buckled receiving mark. Ground receiving marks follow their own victim through translation/turning and disappear if it is removed. Reaping Arc and shield-transfer ribbons snapshot their own cast origins so overlapping casts cannot move each other's paths. Pool limits, damage events and gameplay footprints remain unchanged.
+
+The new whole-performance gear test initially exposed a validation defect: the first LoopOnce scan paused the action before the shield scan. Each gear scan now resets the action and asserts the actual sampled time. Its conservative box also included empty corners outside the round shield. The corrected test checks every actual decoded mesh vertex at 2ms intervals, preserving the zero-floor threshold. An independent baseline/candidate scan found no actual surface penetration; Quaking Blow's smallest shield clearance is approximately 0.0193 native units. This is a correction to geometric measurement, not a relaxed tolerance. Shared grip constants retain the renderer's exact existing mounting values.
+
+Focused initial integration: 14 suites, 155 tests passed. Final larger Shieldcrack plus corrected surface-clearance run: 3 suites, 7 tests passed (`tmp/warrior-ironguard-surface-clearance.log`). Type/lint, quality and natural-combat results are appended after completion. The whole-game gate remains open.
+
+
+Ironguard final native typecheck and scoped Biome pass. Matched before/after evidence: `warrior-final-ironguard-movement-before-sept19`, `warrior-final-ironguard-movement-candidate1-sept19`, with the larger final Shieldcrack in `warrior-final-shieldcrack-impact-candidate2-sept19`. Representative exact-pixel lossless WebP pairs are committed beside the first batch. One post-capture Shieldcrack change is formatting only.
+
+Outdoor review completed all three abilities at presets1 through5, plus Shieldcrack/Quaking at Insane and reduced motion. Revenge's first configuration failed on cold preparation, so its Insane/reduced cases remain open, as does natural combat for this batch. Preserve the failed reports: `warrior-final-ironguard-movement-quality-sept19` (16/21; the stalled browser was closed before reduced cases), `warrior-final-ironguard-insane-fresh-sept19` and `warrior-final-ironguard-reduced-fresh-sept19` (2/3 each). All reported unchanged runtime source, with no console/missing-asset errors. The last two failures were initial configuration timeouts, not completed visual takes.
+
+Preparation diagnostic `warrior-final-ironguard-insane-queue-diagnostic-sept19` records a real45-second selected-kit deadline failure near the120-second transport deadline. World/character/effect compilation was still progressing. Fix and rerun the outstanding cases without raising deadlines, reducing quality or hiding this evidence. This checkpoint is scoped work, not final visual acceptance or publication; public version30 remains unchanged.

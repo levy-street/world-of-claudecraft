@@ -28,7 +28,12 @@ import { backGripFor } from './back_grips';
 import { prepareBeastAbilityClips } from './beast_ability_clips';
 import { prepareCasterClips } from './caster_clips';
 import { dequantizeAttribute } from './dequantize_attribute';
-import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
+import {
+  type HandGrip,
+  KAYKIT_ONE_HAND_SWORD_GRIP,
+  KAYKIT_SHIELD_ACCESSORIES,
+  KAYKIT_SHIELD_GRIPS,
+} from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
 import { buildMakeupDecal } from './makeup';
@@ -257,10 +262,7 @@ const KAYKIT_HAND_GRIPS: Record<string, { r: HandGrip; l?: HandGrip }> = {
   '2H_Crossbow': {
     r: { position: [0.3381, 0.058, 0], quaternion: [0, 0.7071068, 0, 0.7071067], scale: 0.7204 },
   },
-  '1H_Sword': {
-    r: { position: [0, 0.555174, 0], quaternion: [0, 1, 0, 0], scale: 0.8876 },
-    l: { position: [0, 0.555174, 0], quaternion: [0, 0, 0, 1], scale: 0.8876 },
-  },
+  '1H_Sword': KAYKIT_ONE_HAND_SWORD_GRIP,
   '2H_Sword': {
     r: { position: [0, 0.8148, 0], quaternion: [0, 1, 0, 0], scale: 1.1829 },
   },

@@ -86,7 +86,7 @@ function draw(casts: Cast[]) {
       const receiving = vi.mocked(host.flipbookAt).mock.calls.filter((call) => call[0] === 14);
       expect(receiving).toHaveLength(1);
       expect(receiving[0][2]).toBeCloseTo(1.72);
-      expect(receiving[0][3]).toBe(4.6);
+      expect(receiving[0][3]).toBe(8.2);
       expect(receiving[0][5]).toBe('contact_crush');
       expect(host.contact).toHaveBeenCalledExactlyOnceWith(
         2,

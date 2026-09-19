@@ -12,6 +12,7 @@ export function warriorCrushContact(
   tier: number,
   surfaceAt?: SeqPoint,
   flashLife = 0.075,
+  creaseScale = 1,
 ): number {
   const body = { x: 0, y: 0, z: 0 };
   const base = host.anchorOf(targetId, 0, body);
@@ -55,7 +56,8 @@ export function warriorCrushContact(
               sz = Math.cos(yaw);
             for (let i = 0; i < points.length; i++) {
               const u = i / (points.length - 1);
-              const across = (u - 0.5) * (crease === 0 ? 1.65 : crease === 1 ? 1.1 : 0.8);
+              const across =
+                (u - 0.5) * (crease === 0 ? 1.65 : crease === 1 ? 1.1 : 0.8) * creaseScale;
               const buckle = Math.abs(u - 0.46) * 0.28 + Math.sin(u * 19 + crease) * 0.025;
               points[i].set(
                 origin.x + sz * across - sx * surface,
