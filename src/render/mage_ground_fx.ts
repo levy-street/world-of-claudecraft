@@ -28,6 +28,7 @@
 import * as THREE from 'three';
 import { NYTHRAXIS_GRAVE_ERUPTION_CAST_ID } from '../sim/nythraxis_grave_eruption';
 import type { SimEvent } from '../sim/types';
+import { type FloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import {
   isNythraxisGraveEruption,
@@ -423,7 +424,7 @@ export class MageGroundFx {
     cracks.name = 'mage-meteor-cracks';
     for (const crackGeometry of geometry.cracks) {
       const crack = new THREE.Mesh(crackGeometry, magmaMat);
-      crack.renderOrder = 6;
+      crack.renderOrder = floorVfxRenderOrder('player', 1);
       cracks.add(crack);
     }
     body.add(cracks);
@@ -941,6 +942,15 @@ export class MageGroundFx {
     flameBases: ReadonlyArray<{ x: number; y: number; z: number; phase: number }>;
     ownedGeometries: THREE.BufferGeometry[];
   } {
+    // The same telegraph serves the mage's own Meteor and the sim's world warnings
+    // (Ignivar meteors, Varkhul anvils and forgestorm, Nythraxis grave eruptions),
+    // which arrive with a persistentId: a warning a raid must dodge rides the
+    // encounter band, the player's own cast the player band. Steps are the legacy
+    // order minus one, the encounter band's rule, so the rung reads the same in both.
+    const layer: FloorVfxLayer =
+      opts.persistentId !== undefined || isNythraxisGraveEruption(opts.ability)
+        ? 'encounter'
+        : 'player';
     const group = new THREE.Group();
     group.name = 'mage-meteor-telegraph';
 
@@ -999,7 +1009,7 @@ export class MageGroundFx {
     );
     const footprint = new THREE.Mesh(footprintGeo, footprintMat);
     footprint.name = 'mage-meteor-telegraph-footprint';
-    footprint.renderOrder = 5;
+    footprint.renderOrder = floorVfxRenderOrder(layer, 4);
     group.add(footprint);
 
     const boundaryPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 3);
@@ -1027,7 +1037,7 @@ export class MageGroundFx {
     );
     const boundary = new THREE.LineLoop(boundaryGeo, boundaryMat);
     boundary.name = 'mage-meteor-telegraph-boundary';
-    boundary.renderOrder = 9;
+    boundary.renderOrder = floorVfxRenderOrder(layer, 8);
     group.add(boundary);
 
     const countdownPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 2 * 3);
@@ -1060,7 +1070,7 @@ export class MageGroundFx {
     const countdownRing = new THREE.Mesh(countdownGeo, countdownMat);
     countdownRing.name = 'mage-meteor-telegraph-countdown-ring';
     countdownRing.frustumCulled = false;
-    countdownRing.renderOrder = 8;
+    countdownRing.renderOrder = floorVfxRenderOrder(layer, 7);
     group.add(countdownRing);
 
     const veinVertices: number[] = [];
@@ -1119,7 +1129,7 @@ export class MageGroundFx {
     );
     const veins = new THREE.LineSegments(veinGeo, veinMat);
     veins.name = 'mage-meteor-telegraph-veins';
-    veins.renderOrder = 7;
+    veins.renderOrder = floorVfxRenderOrder(layer, 6);
     group.add(veins);
 
     const flameMat = this.acquireMaterial(
@@ -1138,7 +1148,7 @@ export class MageGroundFx {
     const flames = new THREE.InstancedMesh(flameGeometry, flameMat, METEOR_FLAME_COUNT);
     flames.name = 'mage-meteor-telegraph-flames';
     flames.frustumCulled = false;
-    flames.renderOrder = 9;
+    flames.renderOrder = floorVfxRenderOrder(layer, 8);
     const flameBases: Array<{ x: number; y: number; z: number; phase: number }> = [];
     const dummy = new THREE.Object3D();
     for (let i = 0; i < METEOR_FLAME_COUNT; i++) {
@@ -1185,7 +1195,7 @@ export class MageGroundFx {
     const beaconEmbers = new THREE.Points(beaconGeo, beaconEmberMat);
     beaconEmbers.name = 'mage-meteor-telegraph-beacon-embers';
     beaconEmbers.position.set(opts.x, this.groundY(opts.x, opts.z) + 0.1, opts.z);
-    beaconEmbers.renderOrder = 8;
+    beaconEmbers.renderOrder = floorVfxRenderOrder(layer, 7);
     group.add(beaconEmbers);
 
     return {
@@ -1251,7 +1261,7 @@ export class MageGroundFx {
       const ringGeo = this.createTerrainRing(opts.x, opts.z, radius * 0.82, radius);
       const ring = new THREE.Mesh(ringGeo, mat);
       ring.name = name;
-      ring.renderOrder = 7;
+      ring.renderOrder = floorVfxRenderOrder('player', 2);
       group.add(ring);
       mats.push(mat);
       matKinds.push(kind);
@@ -1283,7 +1293,7 @@ export class MageGroundFx {
       );
       const spoke = new THREE.Mesh(spokeGeo, mat);
       spoke.name = `mage-rune-power-spoke-${i}`;
-      spoke.renderOrder = 7;
+      spoke.renderOrder = floorVfxRenderOrder('player', 2);
       group.add(spoke);
       mats.push(mat);
       matKinds.push(spokeKind);
@@ -1309,7 +1319,7 @@ export class MageGroundFx {
     );
     const glow = new THREE.Mesh(glowGeo, glowMat);
     glow.name = 'mage-rune-power-glow';
-    glow.renderOrder = 6;
+    glow.renderOrder = floorVfxRenderOrder('player', 1);
     group.add(glow);
     mats.push(glowMat);
     matKinds.push(glowKind);

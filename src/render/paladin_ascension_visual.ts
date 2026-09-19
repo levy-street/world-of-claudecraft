@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { surfaceMat } from './gfx';
 import type { PaladinAscensionVisualPlan } from './paladin_ascension_core';
 
@@ -136,7 +137,7 @@ export class PaladinAscensionVisual {
     this.groundSeal.rotation.x = -Math.PI / 2;
     this.groundSeal.position.y = 0.055;
     this.groundSeal.scale.setScalar(1.65 * this.size);
-    this.groundSeal.renderOrder = 8;
+    this.groundSeal.renderOrder = floorVfxRenderOrder('player', 0);
     this.group.add(this.groundSeal);
 
     this.solarCrownMaterial = crownMaterial();

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { DRAPE_AXIS_Y, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
 
@@ -157,7 +158,7 @@ export class GroundDecals {
       };
       const mesh = slot.mesh;
       mesh.visible = false;
-      mesh.renderOrder = 3; // over terrain decals, under the shock rings
+      mesh.renderOrder = floorVfxRenderOrder('player', 0); // over terrain decals, under the shock rings
       mesh.userData.renderCategory = 'vfx';
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every spawn (see spawn).

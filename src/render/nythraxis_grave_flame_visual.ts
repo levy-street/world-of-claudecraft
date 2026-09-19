@@ -23,6 +23,7 @@ import {
   NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
 } from '../sim/nythraxis_grave_eruption';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { MageGroundFx } from './mage_ground_fx';
 import { buildNythraxisBoundCagePrewarmVisual } from './nythraxis_bound_cage_visual';
 import {
@@ -92,7 +93,7 @@ function buildPatchFire(
     kind,
     nythraxisGraveFlameSpriteCount(radius),
     NYTHRAXIS_GRAVE_FLAME_FIRE_NAME,
-    13,
+    floorVfxRenderOrder('encounter', 12),
   );
   for (let index = 0; index < fire.count; index++) {
     const spot = nythraxisSoftFireDiscSpotInto(DISC_SPOT, index, radius);
@@ -133,7 +134,7 @@ export function buildNythraxisGraveFlamePatch(
     fillMaterial,
   );
   fill.name = NYTHRAXIS_GRAVE_FLAME_FILL_NAME;
-  fill.renderOrder = 10;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 9);
   group.add(fill);
 
   const rimMaterial = graveMaterial(palette.rim, 0.9);
@@ -147,7 +148,7 @@ export function buildNythraxisGraveFlamePatch(
   );
   rim.name = NYTHRAXIS_GRAVE_FLAME_RIM_NAME;
   rim.position.y = 0.01;
-  rim.renderOrder = 11;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 10);
   group.add(rim);
 
   const emberMaterial = graveMaterial(palette.ember, 0.32);
@@ -159,7 +160,7 @@ export function buildNythraxisGraveFlamePatch(
   );
   embers.name = NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME;
   embers.position.y = 0.02;
-  embers.renderOrder = 12;
+  embers.renderOrder = floorVfxRenderOrder('encounter', 11);
   group.add(embers);
 
   const fire = buildPatchFire(row.kind, plan.radius);

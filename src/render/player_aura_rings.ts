@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { groundHeight } from '../sim/world';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   type PlayerAuraOrnamentKind,
   type PlayerAuraRingQualityProfile,
@@ -121,6 +122,7 @@ function buildDrapedMesh(
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.frustumCulled = false;
+  mesh.renderOrder = floorVfxRenderOrder('player', 0);
   const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
   const localXZ = new Float32Array(positions.count * 2);
   for (let i = 0; i < positions.count; i++) {

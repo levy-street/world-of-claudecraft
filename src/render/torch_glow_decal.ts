@@ -5,6 +5,7 @@
 // and the Ignivar raid dressing), extracted from DungeonInteriors's private
 // addTorchGlow on the rule of three. Callers own their tier gating.
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { markSharedGeometry, markSharedMaterial, markSharedTexture } from './shared_resource';
 import { radialGlowTexture } from './textures';
 
@@ -39,6 +40,6 @@ export function addTorchGlowDecal(
   const glow = new THREE.Mesh(glowDecalGeo, mat);
   glow.position.set(x, y, z);
   glow.scale.setScalar(scale);
-  glow.renderOrder = 1; // after the floor it floats over
+  glow.renderOrder = floorVfxRenderOrder('ground', 0); // after the floor it floats over
   group.add(glow);
 }

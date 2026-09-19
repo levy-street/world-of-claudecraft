@@ -9,6 +9,7 @@ import {
   VARKHUL_INTERCEPT_BEAM_CAST_SECONDS,
   VARKHUL_INTERCEPT_BEAM_HALF_WIDTH,
 } from '../sim/varkhul_intercept_beam';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 export const VARKHUL_INTERCEPT_BEAM_VISUAL_NAME = 'varkhul-tempering-ray';
 
@@ -62,7 +63,7 @@ function lineMesh(
   );
   mesh.name = name;
   mesh.scale.set(radius, 0.001, radius);
-  mesh.renderOrder = 15;
+  mesh.renderOrder = floorVfxRenderOrder('encounter', 14);
   return mesh;
 }
 
@@ -97,7 +98,7 @@ function createVisual(bossId: number): InterceptBeamVisual {
     material(0xff4a0c, 0.22),
   );
   corridor.name = 'varkhul-tempering-ray-corridor';
-  corridor.renderOrder = 12;
+  corridor.renderOrder = floorVfxRenderOrder('encounter', 11);
 
   const sheath = lineMesh('varkhul-tempering-ray-sheath', SHEATH_RADIUS, 0xff4d0a, 0.58);
   const core = lineMesh('varkhul-tempering-ray-core', CORE_RADIUS, 0xffe08a, 0.94);
@@ -115,8 +116,8 @@ function createVisual(bossId: number): InterceptBeamVisual {
   );
   interceptedSheath.material.blending = THREE.NormalBlending;
   interceptedCore.material.blending = THREE.NormalBlending;
-  interceptedSheath.renderOrder = 18;
-  interceptedCore.renderOrder = 19;
+  interceptedSheath.renderOrder = floorVfxRenderOrder('encounter', 17);
+  interceptedCore.renderOrder = floorVfxRenderOrder('encounter', 18);
   interceptedSheath.visible = false;
   interceptedCore.visible = false;
 

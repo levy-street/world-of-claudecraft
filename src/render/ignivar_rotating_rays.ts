@@ -8,6 +8,7 @@ import {
   IGNIVAR_ROTATING_RAYS_INNER_RANGE,
   IGNIVAR_ROTATING_RAYS_RANGE,
 } from '../sim/ignivar_arena';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   buildIgnivarFireBeam,
   type IgnivarFireBeamPhase,
@@ -76,7 +77,7 @@ function buildLaneFill(): THREE.Mesh {
     telegraphMaterial(0x5a0802, 0.12),
   );
   fill.name = IGNIVAR_ROTATING_RAY_FILL_NAME;
-  fill.renderOrder = 2;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 1);
   fill.userData.telegraphLayer = 'fill';
   return fill;
 }
@@ -97,7 +98,7 @@ function buildLaneBorder(): THREE.Mesh {
   geometry.setIndex(indices);
   const border = new THREE.Mesh(geometry, telegraphMaterial(0xe15a20, 0.68));
   border.name = IGNIVAR_ROTATING_RAY_BORDER_NAME;
-  border.renderOrder = 4;
+  border.renderOrder = floorVfxRenderOrder('encounter', 3);
   border.userData.telegraphLayer = 'border';
   return border;
 }
@@ -127,7 +128,7 @@ function buildHeatTicks(): THREE.Group {
   const material = telegraphMaterial(0xffffff, 0.3);
   material.vertexColors = true;
   const batchedTicks = new THREE.Mesh(geometry, material);
-  batchedTicks.renderOrder = 3;
+  batchedTicks.renderOrder = floorVfxRenderOrder('encounter', 2);
   batchedTicks.userData.visibleTickCount = count;
   ticks.userData.visibleTickCount = count;
   ticks.add(batchedTicks);
@@ -170,7 +171,7 @@ function buildFlameBlade(): THREE.Group {
   }
   tongues.instanceMatrix.needsUpdate = true;
   if (tongues.instanceColor) tongues.instanceColor.needsUpdate = true;
-  tongues.renderOrder = 12;
+  tongues.renderOrder = floorVfxRenderOrder('encounter', 11);
   blade.add(tongues);
   blade.visible = false;
   return blade;

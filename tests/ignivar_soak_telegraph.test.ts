@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import {
   buildIgnivarSoakTelegraph,
   IGNIVAR_SOAK_ARROWS_NAME,
@@ -98,8 +99,10 @@ describe('Varkhul Shared Pyre soak telegraph', () => {
     expect(outer.position.y).toBeGreaterThan(3);
     expect(core.position.y).toBeGreaterThan(3);
     expect(crown.position.y).toBeGreaterThan(6);
-    expect(beacon.renderOrder).toBe(9);
-    expect(crown.renderOrder).toBe(10);
+    expect(beacon.renderOrder).toBe(0);
+    expect(outer.renderOrder).toBe(floorVfxRenderOrder('encounter', 8));
+    expect(core.renderOrder).toBe(floorVfxRenderOrder('encounter', 8));
+    expect(crown.renderOrder).toBe(floorVfxRenderOrder('encounter', 9));
     expect((outer.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.35);
     expect((core.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.75);
     expect((crown.material as THREE.MeshBasicMaterial).opacity).toBeGreaterThanOrEqual(0.75);

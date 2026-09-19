@@ -1431,6 +1431,57 @@ export const TARGETS = [
     },
   },
   {
+    key: 'floor-vfx-layer',
+    label: 'Floor VFX ladder: a boss brand telegraph overlapping a mage meteor footprint',
+    when: ['render/floor_vfx_layer'],
+    // Both fills are normal-blended ground discs, so whichever paints last hides
+    // the other where they overlap: on the base checkout the mage footprint
+    // covers the brand telegraph, on the ladder the telegraph reads over it. The
+    // two modules are the real renderer modules, imported through the dev
+    // server and composed at the player's feet; the camera looks down on them.
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await sweepOverlays(page, 10);
+      const staged = await page.evaluate(async () => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        const renderer = game?.renderer;
+        if (!game || !sim || !player || !renderer?.scene) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        const groundY = (x, z) => renderer.groundSample(x, z);
+        const brandModule = await import('/src/render/ignivar_brand_telegraph.ts');
+        const mageModule = await import('/src/render/mage_ground_fx.ts');
+        const px = player.pos.x;
+        const pz = player.pos.z;
+        const brand = brandModule.buildIgnivarBrandTelegraph();
+        brand.position.set(px + 1.6, groundY(px + 1.6, pz) + 0.02, pz);
+        brandModule.syncIgnivarBrandTelegraph(brand, true, 3, 1, 1, 0.5);
+        renderer.scene.add(brand);
+        const mage = new mageModule.MageGroundFx(renderer.scene, groundY, () => {});
+        mage.spawnMeteor({
+          x: px - 1.2,
+          z: pz + 0.4,
+          radius: 5.5,
+          duration: 600,
+          warningLead: 600,
+          showTelegraph: true,
+        });
+        for (let i = 0; i < 6; i++) mage.update(0.25);
+        game.input.camPitch = 1.15;
+        game.input.camDist = 15;
+        return { ok: true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      await wait(1500);
+      await awaitWorldPainted(page);
+      await sweepOverlays(page, 8);
+      await wait(800);
+      return {};
+    },
+  },
+  {
     key: 'target-dots',
     label: 'Target dots: the player-only tracker frame and the nameplate dot row',
     // Committed frames live in docs/screenshots/target-dots/ (before- and after-

@@ -3,6 +3,7 @@
 // spectacle cannot imply a wider hitbox than the simulation uses.
 
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
 
 export const IGNIVAR_FIRE_BEAM_OUTER_NAME = 'ignivarFireBeamOuter';
@@ -357,35 +358,35 @@ export function buildIgnivarFireBeam(options: IgnivarFireBeamOptions): THREE.Gro
     fireMaterial(0x3a0301, 0.08, THREE.NormalBlending, 'floorHeat'),
   );
   floorGlow.name = IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME;
-  floorGlow.renderOrder = 4;
+  floorGlow.renderOrder = floorVfxRenderOrder('encounter', 3);
 
   const floorBoundary = new THREE.Mesh(
     beamBoundaryGeometry(options, 0.09, 0.088),
     fireMaterial(0xff5a12, 0.5, THREE.NormalBlending, 'floorBoundary'),
   );
   floorBoundary.name = IGNIVAR_FIRE_BEAM_FLOOR_BOUNDARY_NAME;
-  floorBoundary.renderOrder = 5;
+  floorBoundary.renderOrder = floorVfxRenderOrder('encounter', 4);
 
   const outer = new THREE.Mesh(
     beamPrismGeometry(options, 0.92, 0.1, 3.35),
     animatedFireMaterial(0xff4a0b, 0.2, 'outer'),
   );
   outer.name = IGNIVAR_FIRE_BEAM_OUTER_NAME;
-  outer.renderOrder = 6;
+  outer.renderOrder = floorVfxRenderOrder('encounter', 5);
 
   const core = new THREE.Mesh(
     beamPrismGeometry(options, 0.14, 0.12, 1.05),
     fireMaterial(0xffd36a, 0.38, THREE.AdditiveBlending, 'whiteHotCore'),
   );
   core.name = IGNIVAR_FIRE_BEAM_CORE_NAME;
-  core.renderOrder = 8;
+  core.renderOrder = floorVfxRenderOrder('encounter', 7);
 
   const veil = new THREE.Mesh(
     beamVeilGeometry(options, 0.08, 4.1),
     animatedFireMaterial(0xff7412, 0.14, 'veil'),
   );
   veil.name = IGNIVAR_FIRE_BEAM_VEIL_NAME;
-  veil.renderOrder = 7;
+  veil.renderOrder = floorVfxRenderOrder('encounter', 6);
 
   const flameCount = 28;
   const flameGeometry = new THREE.ConeGeometry(1, 1, 5, 1, true);
@@ -395,7 +396,7 @@ export function buildIgnivarFireBeam(options: IgnivarFireBeamOptions): THREE.Gro
     flameCount,
   );
   flames.name = IGNIVAR_FIRE_BEAM_FLAMES_NAME;
-  flames.renderOrder = 9;
+  flames.renderOrder = floorVfxRenderOrder('encounter', 8);
   const dummy = new THREE.Object3D();
   for (let index = 0; index < flameCount; index++) {
     const progress = (index + 1) / (flameCount + 1);
@@ -436,7 +437,7 @@ export function buildIgnivarFireBeam(options: IgnivarFireBeamOptions): THREE.Gro
   emberGeometry.setAttribute('position', new THREE.BufferAttribute(emberPositions, 3));
   const embers = new THREE.Points(emberGeometry, pointsMaterial(0xffa02a, 0.17, 0.46));
   embers.name = IGNIVAR_FIRE_BEAM_EMBERS_NAME;
-  embers.renderOrder = 10;
+  embers.renderOrder = floorVfxRenderOrder('encounter', 9);
 
   group.add(floorGlow, floorBoundary, outer, veil, core, flames, embers);
   syncIgnivarFireBeamPresentation(group, 'active', 1);

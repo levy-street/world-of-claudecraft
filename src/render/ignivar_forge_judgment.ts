@@ -10,6 +10,7 @@ import {
   type IgnivarJudgmentShelterIndex,
   ignivarForgeShelterOffsets,
 } from '../sim/ignivar_forge_judgment';
+import { floorVfxLayerTopOrder, floorVfxRenderOrder } from './floor_vfx_layer';
 import { sharedUniforms } from './gfx';
 import {
   buildIgnivarFireBeam,
@@ -146,7 +147,7 @@ function buildSafeMarker(): THREE.Group {
   safeBoundary.name = IGNIVAR_JUDGMENT_SAFE_BOUNDARY_NAME;
   safeBoundary.rotation.x = -Math.PI / 2;
   safeBoundary.position.y = 0.18;
-  safeBoundary.renderOrder = 10;
+  safeBoundary.renderOrder = floorVfxRenderOrder('encounter', 9);
 
   const chevronPoints: THREE.Vector3[] = [];
   for (let index = 0; index < 8; index++) {
@@ -185,7 +186,7 @@ function buildSafeMarker(): THREE.Group {
     }),
   );
   safeChevrons.name = IGNIVAR_JUDGMENT_SAFE_CHEVRONS_NAME;
-  safeChevrons.renderOrder = 11;
+  safeChevrons.renderOrder = floorVfxRenderOrder('encounter', 10);
   marker.userData.gameplayRadius = IGNIVAR_JUDGMENT_SHELTER_RADIUS;
   marker.add(innerRune, beacon, crown, safeBoundary, safeChevrons);
   return marker;
@@ -208,6 +209,7 @@ function buildShelter(index: number): THREE.Group {
   foundation.name = 'ignivarForgeJudgmentShelterFoundation';
   foundation.rotation.x = -Math.PI / 2;
   foundation.position.y = 0.09;
+  foundation.renderOrder = floorVfxRenderOrder('encounter', 0);
 
   const rim = new THREE.Mesh(
     new THREE.RingGeometry(
@@ -220,6 +222,7 @@ function buildShelter(index: number): THREE.Group {
   rim.name = 'ignivarForgeJudgmentShelterRim';
   rim.rotation.x = -Math.PI / 2;
   rim.position.y = 0.13;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 0);
 
   const cracks: THREE.Vector3[] = [];
   for (let crack = 0; crack < 9; crack++) {
@@ -257,6 +260,7 @@ function buildWarning(index: number): THREE.Group {
   fill.name = 'ignivarForgeJudgmentWarningFill';
   fill.rotation.x = -Math.PI / 2;
   fill.position.y = 0.07;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 0);
   const rim = new THREE.Mesh(
     new THREE.RingGeometry(
       IGNIVAR_JUDGMENT_SHELTER_RADIUS - 0.2,
@@ -268,6 +272,7 @@ function buildWarning(index: number): THREE.Group {
   rim.name = 'ignivarForgeJudgmentWarningRim';
   rim.rotation.x = -Math.PI / 2;
   rim.position.y = 0.1;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 0);
   const dangerScar = new THREE.Group();
   dangerScar.name = IGNIVAR_JUDGMENT_DANGER_SCAR_NAME;
   const scarRing = new THREE.Mesh(
@@ -280,6 +285,7 @@ function buildWarning(index: number): THREE.Group {
   );
   scarRing.rotation.x = -Math.PI / 2;
   scarRing.position.y = 0.105;
+  scarRing.renderOrder = floorVfxRenderOrder('encounter', 0);
   const scarLines: THREE.Vector3[] = [];
   for (let scar = 0; scar < 7; scar++) {
     const angle = (scar * Math.PI * 2) / 7 + index * 0.37;
@@ -335,7 +341,7 @@ function buildCue(index: number): THREE.Group {
     material.toneMapped = false;
   });
   cue.traverse((object) => {
-    if ((object as THREE.Mesh).material) object.renderOrder = 30;
+    if ((object as THREE.Mesh).material) object.renderOrder = floorVfxLayerTopOrder('encounter');
     const material = (object as THREE.Mesh).material as THREE.MeshBasicMaterial | undefined;
     if (!material?.color) return;
     if (object.name === IGNIVAR_FIRE_BEAM_FLOOR_GLOW_NAME) {
@@ -483,10 +489,10 @@ function buildWallCracks(): THREE.Group {
   });
   const halo = new THREE.Mesh(crackRibbonGeometry(WALL_CRACK_HALO_HALF_WIDTH), haloMaterial);
   halo.name = 'ignivarForgeJudgmentWallCrackHalo';
-  halo.renderOrder = 11;
+  halo.renderOrder = floorVfxRenderOrder('encounter', 10);
   const core = new THREE.Mesh(crackRibbonGeometry(WALL_CRACK_CORE_HALF_WIDTH), coreMaterial);
   core.name = 'ignivarForgeJudgmentWallCrackCore';
-  core.renderOrder = 12;
+  core.renderOrder = floorVfxRenderOrder('encounter', 11);
 
   wallCracks.add(halo, core);
   wallCracks.userData.haloMaterial = haloMaterial;
@@ -523,7 +529,7 @@ function buildFire(): THREE.Group {
   );
   surface.name = 'ignivarForgeJudgmentFireSurface';
   surface.position.y = 0.05;
-  surface.renderOrder = 5;
+  surface.renderOrder = floorVfxRenderOrder('encounter', 4);
   const boundary = new THREE.Mesh(
     new THREE.RingGeometry(
       IGNIVAR_JUDGMENT_ARENA_RADIUS - 0.35,
@@ -535,7 +541,7 @@ function buildFire(): THREE.Group {
   boundary.name = 'ignivarForgeJudgmentFireBoundary';
   boundary.rotation.x = -Math.PI / 2;
   boundary.position.y = 0.08;
-  boundary.renderOrder = 8;
+  boundary.renderOrder = floorVfxRenderOrder('encounter', 7);
   fire.add(surface, boundary);
   fire.userData.ignivarFireSurface = surface;
   return fire;

@@ -330,6 +330,7 @@ import {
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
+import { applyFloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
 import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
@@ -2843,7 +2844,10 @@ export class Renderer {
       }
       group.add(ring, cross);
       group.visible = false;
-      group.renderOrder = 3; // draw over terrain decals (depthTest off above)
+      // Player feedback, normal-blended with depthTest off: the top of the player band, so
+      // it reads over every player floor effect and never covers a telegraph. Leaves carry
+      // the order; a Group renderOrder would become groupOrder and outrank the ladder.
+      applyFloorVfxLayer(group, 'player', 9);
       setRenderCategory(group, 'ui3d');
       this.scene.add(group);
       this.clickMarkers.push({
@@ -2874,7 +2878,7 @@ export class Renderer {
       });
       const ring = new THREE.Mesh(aoeRingGeo, mat);
       ring.visible = false;
-      ring.renderOrder = 3; // over terrain decals, like the click marker
+      ring.renderOrder = floorVfxRenderOrder('player', 9); // like the click marker
       setRenderCategory(ring, 'ui3d');
       this.scene.add(ring);
       this.aoeRings.push({ ring, mat, radius: 1, elapsed: AOE_RING_LIFETIME });

@@ -687,7 +687,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // the merged renderer leaf (main's flanking-platform ground lift and
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
-  'f429f724ca7ab90873b4a86950c0046585ef66bec7c2052cda12ae578ecee3d0';
+  'aafb76fb113a1440d477032671036f4d906f3049250e23eb908cc7bf74c69722';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

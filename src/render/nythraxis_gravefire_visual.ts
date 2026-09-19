@@ -15,6 +15,7 @@ import {
   type ActiveNythraxisGravefire,
   NYTHRAXIS_GRAVEFIRE_LENGTH,
 } from '../sim/nythraxis_gravefire';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH,
   NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION,
@@ -385,7 +386,7 @@ export function buildNythraxisGravefireStrip(
     headMaterial,
   ]);
   mesh.name = NYTHRAXIS_GRAVEFIRE_STRIP_NAME;
-  mesh.renderOrder = 14;
+  mesh.renderOrder = floorVfxRenderOrder('encounter', 13);
   mesh.userData.renderCategory = 'ui3d';
   mesh.userData.actionable = true;
   group.add(mesh);
@@ -394,7 +395,7 @@ export function buildNythraxisGravefireStrip(
     'gravefire',
     nythraxisGravefireSpriteCount(),
     NYTHRAXIS_GRAVEFIRE_FIRE_NAME,
-    15,
+    floorVfxRenderOrder('encounter', 14),
   );
   fire.setOpacity(opacity.tongue);
   group.add(fire.mesh);
