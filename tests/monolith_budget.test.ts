@@ -1492,7 +1492,15 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    ceiling: 10076,
+    // LOWERED 10076 -> 9959 at the guild-bank autosave stall fix (PR #4057,
+    // the release/v0.44.0 sync): the branch's own surface was net growth (the
+    // writer-selection comments around the dirty-book autosave), paid by
+    // moving the per-session chat token bucket (consumeChatToken and
+    // refundChatToken plus their constants and session fields) to
+    // server/chat_rate_limit.ts, and the 80 lines of pre-existing slack were
+    // banked in the same step. Exact merged count, zero slack: any further
+    // growth reds again, and the fix is extraction.
+    ceiling: 9959,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
