@@ -184,12 +184,17 @@ function bladePose(donor, time, hipOffset, turn, lean, roll = 0, dualGuard = fal
   }
   return pose;
 }
-const maimLoad = bladePose(3, 0.3, [0.012, -0.022, -0.025], -18, -5, -20);
-const maimCut = bladePose(3, 0.83, [-0.012, -0.025, 0.035], 24, 13, 25);
-const maimFollow = bladePose(3, 1.12, [-0.008, -0.015, 0.025], 30, 9, 18);
-const graveLoad = bladePose(3, 0.3, [0, -0.035, -0.03], 0, -11);
-const graveCut = bladePose(3, 0.82, [0, -0.035, 0.04], 0, 19);
-const graveExtract = bladePose(3, 1.14, [0, -0.02, 0.02], 0, 12);
+// Four different body mechanics, with the same authoritative 150 ms contact.
+// Large loading/exit silhouettes carry the weight; contact stays on the torso.
+const maimLoad = bladePose(3, 0.26, [0.038, -0.075, -0.05], -38, -14, -33);
+const maimCut = bladePose(3, 0.83, [-0.025, -0.055, 0.045], 24, 13, 25);
+const maimFollow = bladePose(3, 1.15, [-0.045, -0.075, 0.025], 46, 16, 29);
+const maimRecover = bladePose(3, 1.24, [-0.018, -0.038, -0.005], 20, 4, 12);
+const graveLoad = bladePose(3, 0.23, [0.02, -0.095, -0.055], -17, -20, -9);
+const graveCut = bladePose(3, 0.82, [0, -0.06, 0.045], 0, 19);
+const graveSink = bladePose(3, 0.92, [-0.012, -0.095, 0.045], 9, -10, 5);
+const graveExtract = bladePose(3, 1.14, [-0.025, -0.065, -0.025], 19, -6, 9);
+const graveRecover = bladePose(3, 1.24, [-0.012, -0.03, -0.025], 9, 3, 4);
 const bloodLoad = bladePose(2, 0.27, [0.008, -0.035, -0.03], -35, -6, -8, true);
 const bloodCut = bladePose(2, 0.39, [-0.01, -0.04, 0.045], 40, 10, 12, true);
 const bloodPull = bladePose(2, 0.88, [0, -0.022, -0.018], -14, -6, 0, true);
@@ -199,12 +204,15 @@ const victoryCut = bladePose(2, 0.39, [0, -0.015, 0.035], 20, 0, 9);
 const victoryRise = bladePose(2, 0.27, [0, -0.005, 0.01], 6, -9, 0);
 // Opposite travel directions from the native two-handed grip. The follow poses
 // keep the actual greatblade above the ground, not merely the hand sockets.
-const bruteLoad = bladePose(3, 0.3, [0, -0.025, -0.025], 8, -6, -10);
-const bruteCut = bladePose(3, 0.83, [0, -0.025, 0.035], 8, 12, -10);
-const bruteFollow = bladePose(3, 1, [0, -0.012, 0.02], 8, 0, -10);
-const redhandLoad = bladePose(3, 0.95, [-0.012, -0.03, -0.02], -20, 6, -22);
+const bruteLoad = bladePose(3, 0.2, [0.01, -0.055, -0.045], 3, -20, -3);
+const bruteCut = bladePose(3, 0.83, [0, -0.06, 0.035], 8, 12, -10);
+const bruteSettle = bladePose(3, 0.9, [0, -0.07, 0.015], 5, -10, -6);
+const bruteFollow = bladePose(3, 1.04, [-0.005, -0.075, 0.015], 10, -8, -7);
+const bruteRecover = bladePose(3, 1.22, [0, -0.025, -0.012], 5, 3, -3);
+const redhandLoad = bladePose(3, 1.04, [-0.038, -0.1, -0.03], -34, 5, -30);
 const redhandCut = bladePose(3, 0.81, [-0.012, -0.02, 0.03], -20, 6, -22);
-const redhandRise = bladePose(3, 0.7, [-0.004, -0.01, 0.015], -20, -12, 0);
+const redhandRise = bladePose(3, 0.63, [0.025, -0.015, 0.015], 10, -19, 9);
+const redhandRecover = bladePose(3, 0.54, [0.012, -0.028, -0.015], 21, -5, 11);
 const reapLoad = bladePose(5, 0.1, [0, -0.025, 0.02], -25, -4);
 const reapCut = bladePose(5, 0.24, [0, -0.025, 0.02], 20, 5);
 const reapFollow = bladePose(5, 0.5, [0, -0.025, 0.02], 35, 5);
@@ -622,8 +630,10 @@ const performances = [
       [0, idle],
       [0.085, bruteLoad],
       [0.15, bruteCut],
-      [0.18, bruteCut],
+      [0.175, bruteCut],
+      [0.22, bruteSettle],
       [0.32, bruteFollow],
+      [0.46, bruteRecover],
       [0.64, idle],
     ],
   ],
@@ -633,8 +643,9 @@ const performances = [
       [0, idle],
       [0.075, redhandLoad],
       [0.15, redhandCut],
-      [0.175, redhandCut],
-      [0.31, redhandRise],
+      [0.17, redhandCut],
+      [0.29, redhandRise],
+      [0.42, redhandRecover],
       [0.62, idle],
     ],
   ],
@@ -646,7 +657,8 @@ const performances = [
       [0.085, maimLoad],
       [0.15, maimCut],
       [0.185, maimCut],
-      [0.36, maimFollow],
+      [0.31, maimFollow],
+      [0.46, maimRecover],
       [0.68, idle],
     ],
   ],
@@ -657,7 +669,9 @@ const performances = [
       [0.095, graveLoad],
       [0.15, graveCut],
       [0.205, graveCut],
-      [0.36, graveExtract],
+      [0.27, graveSink],
+      [0.4, graveExtract],
+      [0.53, graveRecover],
       [0.7, idle],
     ],
   ],

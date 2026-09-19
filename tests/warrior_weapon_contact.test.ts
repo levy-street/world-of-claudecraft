@@ -12,6 +12,49 @@ const json = JSON.parse(weapon.toString('utf8', 20, 20 + weapon.readUInt32LE(12)
 const bounds = json.accessors[json.meshes[0].primitives[0].attributes.POSITION];
 
 it.each([
+  'Warrior_Maiming_Strike',
+  'Warrior_Early_Grave',
+  'Warrior_Brute_Swing',
+  'Warrior_Redhand',
+])('%s keeps the entire equipped blade above the floor throughout recovery', async (name) => {
+  const bytes = readFileSync('public/models/chars/players/warrior_contact_anims.glb');
+  const gltf = await new GLTFLoader()
+    .setMeshoptDecoder(MeshoptDecoder)
+    .parseAsync(
+      bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer,
+      '',
+    );
+  const clip = gltf.animations.find((candidate) => candidate.name === name);
+  const socket = gltf.scene.getObjectByName('handslotr');
+  if (!clip || !socket) throw new Error('Missing native blade performance or socket');
+  const mixer = new THREE.AnimationMixer(gltf.scene);
+  const action = mixer.clipAction(clip).setLoop(THREE.LoopOnce, 1);
+  action.clampWhenFinished = true;
+  action.play();
+  const grip = variantGripTransform(bounds.max[1] - bounds.min[1], false, 0.04, 2);
+  const local = new THREE.Matrix4().compose(
+    new THREE.Vector3().fromArray(grip.position),
+    new THREE.Quaternion().fromArray(grip.quaternion),
+    new THREE.Vector3().setScalar(grip.scale),
+  );
+  // All corners of the real mesh bounds: a centreline-only test can miss a
+  // wide blade clipping the floor. Sample interpolated frames, not just keys.
+  const point = new THREE.Vector3();
+  for (let i = 0; i <= Math.ceil(clip.duration / 0.002); i++) {
+    const time = Math.min(clip.duration, i * 0.002);
+    mixer.setTime(time);
+    gltf.scene.updateMatrixWorld(true);
+    const held = socket.matrixWorld.clone().multiply(local);
+    for (const x of [bounds.min[0], bounds.max[0]])
+      for (const y of [bounds.min[1], bounds.max[1]])
+        for (const z of [bounds.min[2], bounds.max[2]]) {
+          point.set(x, y, z).applyMatrix4(held);
+          expect(point.y, `${name} blade floor clearance at ${time}s`).toBeGreaterThanOrEqual(0);
+        }
+  }
+});
+
+it.each([
   ['warrior_fury_anims', 'Fury_Twinstrike', 0.15, 'r'],
   ['warrior_fury_anims', 'Fury_Twinstrike', 0.34, 'l'],
   ['warrior_fury_anims', 'Fury_Red_Harvest', 0.15, 'r'],

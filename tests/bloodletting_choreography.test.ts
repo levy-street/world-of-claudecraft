@@ -65,7 +65,7 @@ it('keeps a full-size incision when the optional sculpture and sprite pools are 
   const { host, slot, paths } = fixture(false);
   bloodlettingBeat(host, slot, 0);
   expect(paths).toHaveLength(2);
-  expect(paths[0][0].distanceTo(paths[0].at(-1)!)).toBeGreaterThan(5);
+  expect(paths[0][0].distanceTo(paths[0].at(-1)!)).toBeGreaterThan(7.5);
   for (const path of paths)
     for (const point of path) expect(point.toArray().every(Number.isFinite)).toBe(true);
   expect(host.pathRibbon).toHaveBeenCalledWith(
@@ -77,7 +77,7 @@ it('keeps a full-size incision when the optional sculpture and sprite pools are 
     null,
     false,
     1,
-    null,
+    { from: 0, to: 1 },
     false,
   );
   expect(host.contact).toHaveBeenCalledTimes(1);
@@ -106,4 +106,43 @@ it('has a broad non-planar tearing surface with finite geometry', () => {
   } finally {
     geometry.dispose();
   }
+});
+
+it('centres the leading edge on the wound and retains a broad extraction silhouette', () => {
+  const geometry = buildBloodlettingShape();
+  try {
+    const positions = geometry.getAttribute('position');
+    const uv = geometry.getAttribute('uv');
+    const centre = Array.from({ length: uv.count }, (_, i) => i).find(
+      (i) => uv.getX(i) === 0.5 && uv.getY(i) === 0,
+    );
+    expect(centre).toBeDefined();
+    expect(new Vector3().fromBufferAttribute(positions, centre!).length()).toBeLessThan(1e-6);
+    geometry.computeBoundingBox();
+    expect(geometry.boundingBox!.getSize(new Vector3()).x).toBeGreaterThanOrEqual(6.4);
+  } finally {
+    geometry.dispose();
+  }
+});
+
+it.each([0, 1])('retains the shared blood spray and wound on quality tier %s', (tier) => {
+  const { host, slot } = fixture();
+  slot.tier = tier;
+  bloodlettingBeat(host, slot, 0);
+  const crest = vi.mocked(host.crestAt!).mock.calls[0];
+  expect(crest.slice(5, 8)).toEqual([0x590719, 0xd9233d, 'bloodletting_pull']);
+  const spray = vi.mocked(host.bakedAt!).mock.calls[0];
+  expect(spray[0]).toBe('harvest_impact');
+  expect(spray[4]).toBe(7.4);
+  expect(spray[7]).toBe(0.23);
+  expect(spray[8]).toBe(0);
+  expect(spray[12]).toBe(-0.74);
+  expect(vi.mocked(host.flipbookAt).mock.calls[0].slice(5, 8)).toEqual([
+    'contact_cut',
+    1.15,
+    0.045,
+  ]);
+  expect(vi.mocked(host.pathRibbon).mock.calls.every((call) => call[9] === true)).toBe(true);
+  expect(host.contact).toHaveBeenCalledTimes(1);
+  expect(host.ringAt).not.toHaveBeenCalled();
 });

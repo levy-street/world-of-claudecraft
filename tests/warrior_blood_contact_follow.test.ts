@@ -9,7 +9,7 @@ type Ribbon = Parameters<SequencerHost['pathRibbon']>;
 const contacts = [
   { id: 'raging_gale', beat: 0, delay: 0.015, clear: 0.2, size: 5.2, life: 0.2, shake: 0.12 },
   { id: 'raging_gale', beat: 1, delay: 0.022, clear: 0.2, size: 5.8, life: 0.2, shake: 0.18 },
-  { id: 'bloodthirst', beat: 0, delay: 0.02, clear: 0.27, size: 6.2, life: 0.23, shake: 0.15 },
+  { id: 'bloodthirst', beat: 0, delay: 0.02, clear: 0.27, size: 7.4, life: 0.23, shake: 0.15 },
 ] as const;
 
 function required<T>(value: T | null | undefined): T {
@@ -140,7 +140,7 @@ describe.each(contacts)('$id contact $beat', ({ id, beat, delay, clear, size, li
     expect(required(blood[0][7]) + required(blood[0][8])).toBeCloseTo(clear);
     const baked = vi.mocked(required(host.bakedAt)).mock.calls;
     expect(baked).toHaveLength(1);
-    expect(baked[0][0]).toBe(id === 'raging_gale' ? 'harvest_impact' : 'warrior_bite');
+    expect(baked[0][0]).toBe('harvest_impact');
     expect(baked[0][4]).toBe(size);
     expect(baked[0][7]).toBe(life);
     expect(baked[0][8]).toBe(0);

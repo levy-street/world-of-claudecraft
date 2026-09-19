@@ -24,6 +24,16 @@ export function warriorSteelContact(
   const height = meleeContactHeight(profile, 0);
   const offset = facing - (host.facingAt?.(targetId) ?? facing);
   const body = { x: 0, y: 0, z: 0 };
+  // Project material along the blade's exit, rather than inflating the wound
+  // or extending the white collision flash. Finishers throw the widest fan.
+  const aspect =
+    slot.abilityId === 'execute'
+      ? 1.45
+      : slot.abilityId === 'mortal_strike'
+        ? 1.25
+        : slot.abilityId === 'slam' || slot.abilityId === 'overpower'
+          ? 1.15
+          : 1;
   host.flipbookAt(
     x - dx * 0.24,
     y,
@@ -36,7 +46,7 @@ export function warriorSteelContact(
     roll,
   );
   let count = 1;
-  if (
+  const spray =
     host.bakedAt &&
     host.bakedAt(
       'warrior_shear',
@@ -52,9 +62,37 @@ export function warriorSteelContact(
       facing,
       false,
       roll,
-    ) !== false
-  )
-    count++;
+      aspect,
+    ) !== false;
+  if (spray) count++;
+  else {
+    // A rejected atlas must not remove the large receiving response. This
+    // replaces its slot with a broken cold-steel discharge, not another hit.
+    const span = size * aspect * 0.7;
+    if (
+      host.pathRibbon(
+        0xaebdc6,
+        heavy ? 0.28 : 0.19,
+        duration,
+        (points) => {
+          for (let i = 0; i < points.length; i++) {
+            const u = i / (points.length - 1);
+            const along = (u - 0.5) * span;
+            const tear = Math.sin(u * 41) * Math.sin(u * Math.PI) * 0.12;
+            const across = along * Math.cos(roll) - tear * Math.sin(roll);
+            const rise = along * Math.sin(roll) + tear * Math.cos(roll);
+            points[i].set(x + dz * across - dx * 0.28, y + rise, z - dx * across - dz * 0.28);
+          }
+          return points.length;
+        },
+        true,
+        null,
+        false,
+        0,
+      ) !== false
+    )
+      count++;
+  }
   for (let layer = 0; layer < 2; layer++) {
     if (
       host.pathRibbon(

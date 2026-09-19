@@ -91,6 +91,29 @@ function required<T>(value: T | null | undefined): T {
 }
 
 describe('Battlecraft steel receiving contacts', () => {
+  it('keeps a large directional discharge when the atlas pool rejects the contact', () => {
+    const { host } = fixture();
+    vi.mocked(required(host.bakedAt)).mockReturnValue(false);
+    const hit = slot('execute', 1, 1);
+    const at = required(host.anchorOf(2, required(meleeImpactProfile(hit.abilityId)).height));
+    warriorSteelContact(host, hit, at, 0.8, -1.25, 9, 0.28, true);
+    const calls = vi.mocked(host.pathRibbon).mock.calls;
+    const discharge = required(calls.find((call) => !call[9]));
+    const wound = calls.filter((call) => call[9]);
+    expect(wound).toHaveLength(2);
+    const path = sample(discharge);
+    const woundPath = sample(wound[0]);
+    expect(required(path.at(-1)).distanceTo(path[0])).toBeGreaterThan(
+      required(woundPath.at(-1)).distanceTo(woundPath[0]) * 2,
+    );
+    expect(discharge[2]).toBeLessThan(0.3);
+    const before = path.map((point) => point.clone());
+    Object.assign(at, { x: 99, y: 99, z: 99 });
+    Object.assign(hit, slot('slam'), { targetId: 4 });
+    expectPoints(sample(discharge), before);
+    expect(host.contact).not.toHaveBeenCalled();
+  });
+
   it('retains both wound layers on the original moving, turning recipient after slot reuse', () => {
     const { host, actors } = fixture();
     const hit = slot('mortal_strike');

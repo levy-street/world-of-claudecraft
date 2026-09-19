@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
-/** One broad incision pulled into a folded, forked exit. The central material
- * compresses at contact; its exit peels away instead of drawing another slash. */
+/** One wound-centred incision pulls a ragged blood film along the blade exit.
+ * The leading edge stays on the cut while its irregular tail stretches away. */
 export function buildBloodlettingShape(): THREE.BufferGeometry {
   const positions: number[] = [],
     uvs: number[] = [],
@@ -13,11 +13,12 @@ export function buildBloodlettingShape(): THREE.BufferGeometry {
     const taper = Math.sin(Math.PI * u) ** 0.65;
     for (let j = 0; j <= rows; j++) {
       const v = j / rows;
-      const ribs = Math.sin(u * 23 + v * 6) * 0.12 + Math.sin(u * 53) * 0.05;
+      const rag = Math.sin(u * 43) * 0.14 + Math.sin(u * 97) * 0.08;
+      const bow = Math.cos((u - 0.5) * 2.4) - 1;
       positions.push(
-        (u - 0.5) * 5.1 + v * v * taper * 0.48,
-        Math.sin(u * Math.PI) * 0.65 - 0.25 - taper * v * (1.55 + ribs),
-        taper * 0.25 + Math.sin(v * Math.PI * 1.7 + u * 5) * v * taper * 0.54,
+        (u - 0.5) * 6.4 + v * v * taper * 0.65,
+        bow * 0.35 - taper * v * (1.6 + rag),
+        bow * 0.6 + taper * v * (0.42 + 0.18 * u),
       );
       uvs.push(u, v);
       if (i < cols && j < rows) {
@@ -37,27 +38,16 @@ export function buildBloodlettingShape(): THREE.BufferGeometry {
 
 export const BLOODLETTING_VERTEX = `
 if(uKind>26.5&&uKind<27.5){
-  float age=mix(.3,uAge,uMotion);
-  float pull=smoothstep(.15,.85,age)*uv.y*uv.y;
-  p.x+=pull*.85;
-  p.z-=pull*.9;
-  p.y-=pull*.4;
+  float age=mix(0.32,uAge,uMotion);
+  float pull=smoothstep(0.18,1.0,age)*uv.y*uv.y;
+  p=position;
+  p.x+=pull*0.75;
+  p.z+=pull*0.45;
+  p.y-=pull*pull*0.38;
 }`;
 
 export const BLOODLETTING_FRAGMENT = `
 if(uKind>26.5&&uKind<27.5){
-  float age=mix(.3,uAge,uMotion);
-  float fibre=texture2D(uBloodMap,vec2(fract(vUv.x-age*.1),vUv.y)).r;
-  float folds=.5+.5*sin(vUv.y*16.0+vUv.x*11.0+fibre*3.0);
-  float edge=1.0-smoothstep(.018,.065,vUv.y);
-  colour=mix(uTint,uAccent,folds*.75+fibre*.15);
-  colour+=uAccent*smoothstep(.87,.99,folds)*.3;
-  colour=mix(colour,vec3(.86,.91,.95),edge*.9);
-  float head=min(1.12,age*6.0);
-  float reveal=1.0-smoothstep(head-.06,head+.02,vUv.x);
-  float edgeShape=.68+.2*sin(vUv.x*29.0)+.09*sin(vUv.x*67.0);
-  float body=1.0-smoothstep(edgeShape-.03,edgeShape+.025,vUv.y);
-  float decay=smoothstep(.4,.96,age);
-  float breakup=mix(1.0,smoothstep(-.25+decay*1.3,.1+decay*1.3,fibre+sin(vUv.x*51.0-vUv.y*17.0)),decay);
-  alpha=reveal*body*breakup*(.72+edge*.2)*(1.0-smoothstep(.7,1.0,uAge));
+  float age=mix(0.32,uAge,uMotion);
+  warriorBloodFilm(vUv,vLocal.z,age,colour,alpha);
 }`;

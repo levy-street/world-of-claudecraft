@@ -29,6 +29,17 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
   const body = { x: 0, y: 0, z: 0 };
   const facingOffset = facing - (host.facingAt?.(targetId) ?? facing);
   const primary = !slot.physicalSecondary;
+  host.flipbookAt(
+    at.x - dx * 0.18,
+    at.y,
+    at.z - dz * 0.18,
+    3.4,
+    0xea7078,
+    'contact_cut',
+    1.15,
+    0.045,
+    roll,
+  );
   const sculpted =
     primary &&
     !!host.crestAt &&
@@ -36,24 +47,24 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
       at.x - dx * 0.3,
       at.y,
       at.z - dz * 0.3,
-      1.08,
+      1.18,
       1.4,
-      0x490b20,
-      0xe82c49,
+      0x590719,
+      0xd9233d,
       'bloodletting_pull',
       facing,
       0.28,
       roll,
     ) !== false;
-  let count = sculpted ? 1 : 0;
+  let count = sculpted ? 2 : 1;
   if (
     host.bakedAt &&
     host.bakedAt(
-      'warrior_bite',
+      'harvest_impact',
       at.x - dx * 0.4,
       at.y,
       at.z - dz * 0.4,
-      6.2,
+      7.4,
       0xffffff,
       0xff8990,
       0.23,
@@ -69,8 +80,8 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
     const fallback = primary && !sculpted && layer === 0;
     if (
       host.pathRibbon(
-        layer ? 0xe8edf0 : 0x8d0d2c,
-        layer ? 0.14 : 0.48,
+        layer ? 0xffe5de : 0x6c0824,
+        layer ? 0.15 : fallback ? 0.62 : 0.5,
         layer ? 0.075 : 0.2,
         (points) => {
           const origin = fallback ? impact : host.anchorOf(targetId, height, body);
@@ -80,8 +91,10 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
             sz = Math.cos(yaw);
           for (let i = 0; i < points.length; i++) {
             const u = i / (points.length - 1),
-              s = (u - 0.5) * (fallback ? 5.4 : 2.5);
-            const jag = Math.sin(u * 31) * Math.sin(u * Math.PI) * 0.065;
+              s = (u - 0.5) * (fallback ? 7.6 : 2.5);
+            const jag = fallback
+              ? (Math.cos((u - 0.5) * 2.4) - 1) * 0.35
+              : Math.sin(u * 23) * Math.sin(u * Math.PI) * 0.055;
             points[i].set(
               origin.x + sz * s * Math.cos(roll) - sx * 0.24,
               origin.y + s * Math.sin(roll) + jag,
@@ -94,13 +107,13 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
         null,
         false,
         1,
-        null,
+        fallback ? { from: 0, to: 1 } : null,
         !fallback,
       ) !== false
     )
       count++;
   }
-  host.burstAt(at.x, at.y, at.z, 0x940d2b, slot.tier > 0 ? 10 : 30, 1.45, 'blood', 0.25, 0.02);
+  host.burstAt(at.x, at.y, at.z, 0x940c2b, slot.tier > 0 ? 4 : 10, 1.6, 'blood', 0.25, 0.02);
   count++;
   if (slot.tier === 0 && host.fragmentsAt) {
     host.fragmentsAt(
