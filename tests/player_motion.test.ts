@@ -467,10 +467,23 @@ describe('moveSpeedMult: Cat Form passive speed', () => {
     expect(moveSpeedMult(p, 0)).toBeCloseTo(1.15);
   });
 
-  it('does not stack with Dash: form_cat plus buff_speed 1.5 yields 1.5, not 1.65', () => {
+  it('multiplies the strongest speed buff: form_cat plus buff_speed 1.5 yields 1.725', () => {
+    // The form passive is its own layer over the strongest temporary buff
+    // (never 1.5 flat, never 1.65 additive). Speed buffs still never stack
+    // with each other: 1.5 and 1.6 together read as 1.6 x 1.15.
     const p = makeSim().player;
     p.auras.push(cat(p), aura(p, 'buff_speed', 1.5));
-    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.5);
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.15 * 1.5);
+    p.auras.push(aura(p, 'buff_speed', 1.6));
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.15 * 1.6);
+  });
+
+  it('the layer applies to any speed buff a Cat wears, party-sourced included', () => {
+    // Hunter Pack Rally (buff_speed 1.3) lands on party allies: a Cat runs at
+    // 1.3 x 1.15 under it, the same rule as its own Dash.
+    const p = makeSim().player;
+    p.auras.push(cat(p), { ...aura(p, 'buff_speed', 1.3), id: 'pack_rally', sourceId: 999 });
+    expect(moveSpeedMult(p, 0)).toBeCloseTo(1.15 * 1.3);
   });
 
   it('slows still bite multiplicatively: form_cat plus a 0.5 slow yields 0.575', () => {
@@ -491,8 +504,15 @@ describe('moveSpeedMult: Cat Form passive speed', () => {
     const sim = makeSim();
     const p = sim.player;
     p.auras.push(cat(p));
-    const live = (sim as unknown as { moveSpeedMult(e: Entity): number }).moveSpeedMult(p);
+    const asLive = sim as unknown as { moveSpeedMult(e: Entity): number };
+    const live = asLive.moveSpeedMult(p);
     expect(clientDeps(SEED).moveSpeedMult(p)).toBe(live);
     expect(live).toBeCloseTo(1.15);
+    // The stacked case (Cat + Dash) must agree bit for bit too, or a Dashing
+    // Cat would rubber-band against the server's prediction.
+    p.auras.push(aura(p, 'buff_speed', 1.5));
+    const stacked = asLive.moveSpeedMult(p);
+    expect(clientDeps(SEED).moveSpeedMult(p)).toBe(stacked);
+    expect(stacked).toBeCloseTo(1.725);
   });
 });

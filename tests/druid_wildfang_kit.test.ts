@@ -256,7 +256,8 @@ describe('Stalk moves at full speed', () => {
   it('stealths a Cat at 1.0x while rogue Duskveil keeps its 0.5x crawl', () => {
     const { sim, player } = rig();
     cast(sim, 'cat_form');
-    expect(moveSpeedMult(player)).toBeCloseTo(1.6); // the shift's Loping Stride
+    // The shift's Loping Stride (+60%) rides on the Cat Form passive (+15%).
+    expect(moveSpeedMult(player)).toBeCloseTo(CAT_FORM_MOVE_MULT * 1.6);
     dropAura(player, 'loping_stride');
     cast(sim, 'prowl');
     const stealth = player.auras.find((a) => a.kind === 'stealth');
