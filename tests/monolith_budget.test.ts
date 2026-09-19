@@ -473,7 +473,11 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // LOWERED 18309 -> 18284 by the composed player portraits change: the
+    // "which body does this player's frame show" rule moved out to
+    // src/ui/player_portrait_core.ts, so the three frame draws and the
+    // portrait update listener each became one call. Exact count, zero slack.
+    ceiling: 18284,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

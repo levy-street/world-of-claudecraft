@@ -12,6 +12,9 @@ vi.mock('../src/render/characters/portrait', () => ({
   visualPortraitDataUrl: (key: string) => (key === 'player_mech' ? mechUrl : portraitUrl),
   modularPortraitDataUrl: () => portraitUrl,
   portraitsReady: () => true,
+  composedPortraitKey: () => 'player_mage_modular:mod:sig:headshot',
+  isComposedPortraitKey: (key?: string) => key?.includes(':mod:') === true,
+  cachedPortraitByKey: () => null,
 }));
 // Additive, never bare (the reliquary_window_behavior lesson): only the
 // members the fixture steers stay overridden; the rest passes through.

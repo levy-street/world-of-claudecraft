@@ -4,16 +4,17 @@ import { describe, expect, it } from 'vitest';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
-// The COMPOSED portrait (the player's own face, src/render/characters/portrait.ts
-// modularPortraitDataUrl) is captured off the frame that asks for it, so both of
-// its consumers paint a fallback first and have to repaint once the capture
-// lands. Neither can recognize its own update from (visualKey, skin): a composed
-// key carries the look SIGNATURE and its visual key is `player_<cls>_modular`,
+// The COMPOSED portrait (a player's authored face, src/render/characters/portrait.ts
+// modularPortraitDataUrl) is captured off the frame that asks for it, so every
+// consumer paints a fallback first and has to repaint once the capture lands.
+// None can recognize its own update from (visualKey, skin): a composed key
+// carries the look SIGNATURE and its visual key is `player_<cls>_modular`,
 // which is why onPortraitUpdate hands the cache key to its listeners as a third
 // argument. A source scan, because the wiring is one branch inside two
 // coordinators that no unit test can construct without the whole HUD and a real
 // WebGL rig; the capture behavior it rides on is covered behaviorally in
-// portrait_live_capture.test.ts.
+// portrait_live_capture.test.ts, and the frame matching rule in
+// player_portrait_core.test.ts.
 
 // Full-line // comments go first: every line pinned below is explained in
 // prose right beside itself, so a raw read lets the prose (or a commented-out
@@ -36,7 +37,7 @@ const COMPOSED_SEAM = ['src/ui/portrait_chip.ts', 'src/ui/unit_portrait_painter.
  *  chip built from a `look`. Both answer null on the first ask, which is what
  *  makes a repaint hook mandatory rather than optional. */
 function asksForAComposedPortrait(code: string): boolean {
-  if (code.includes('drawModularPlayer(')) return true;
+  if (code.includes('drawModularPlayer(') || code.includes('drawPlayer(')) return true;
   for (
     let at = code.indexOf('portraitChipHtml(');
     at > -1;
@@ -50,15 +51,35 @@ function asksForAComposedPortrait(code: string): boolean {
 }
 
 describe('a landed composed portrait reaches its consumers', () => {
-  it('repaints the player frame, the one frame that is ever composed', () => {
+  it('repaints every frame that holds a player: the player frame and both target frames', () => {
     const handler = hud.slice(hud.indexOf('onPortraitUpdate((visualKey, skin, key) => {'));
-    const composedAt = handler.indexOf('isComposedPortraitKey(key)');
-    const mechAt = handler.indexOf("visualKey === 'player_mech'");
-    expect(composedAt).toBeGreaterThan(-1);
-    // Ahead of the (class, skin) matching that follows: no class name and no
-    // skin index describes a composed body, so that matching would drop it.
-    expect(composedAt).toBeLessThan(mechAt);
-    expect(handler.slice(composedAt, mechAt)).toContain('this.drawPlayerFramePortrait();');
+    const body = handler.slice(0, handler.indexOf('\n    });'));
+    // One matching rule for every frame (player_portrait_core.ts), fed the
+    // cache KEY: no class name and no skin index describes a composed body,
+    // so (visualKey, skin) matching alone would drop every composed landing.
+    expect(body).toContain('portraitUpdateFrames(');
+    expect(body).toContain('{ visualKey, skin, key }');
+    expect(body).toContain('if (framed(this.sim.player)) this.drawPlayerFramePortrait();');
+    // The target frames repaint through their painter's identity gate, which
+    // is what keeps the repaint off the frame the capture lands on.
+    expect(body).toContain(
+      'if (framed(this.targetPortraitSubject)) this.targetFramePainter.invalidatePortrait();',
+    );
+    expect(body).toContain(
+      'if (framed(this.totPortraitSubject)) this.totFramePainter.invalidatePortrait();',
+    );
+  });
+
+  it('draws a player in the target frames through the same body rule as the player frame', () => {
+    // The regression: the target and target-of-target frames used to call
+    // drawClass for every player, the stock art, so a peer's authored face
+    // (which rides the identity wire) never reached them.
+    for (const fn of ['drawTargetPortrait', 'drawTargetOfTargetPortrait']) {
+      const draw = hud.slice(hud.indexOf(`private ${fn}(): void {`));
+      const fnBody = draw.slice(0, draw.indexOf('\n  }'));
+      expect(fnBody).toContain('this.drawPlayerPortrait(');
+      expect(fnBody).not.toContain('drawClass(');
+    }
   });
 
   it('rebuilds the character sheet, whose composed title chip is HTML, not a src', () => {

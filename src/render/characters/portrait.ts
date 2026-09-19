@@ -446,6 +446,27 @@ function modularPortraitKey(
 }
 
 /**
+ * The cache key {@link modularPortraitDataUrl} files a composed capture under,
+ * for a consumer that has to RECOGNIZE that capture landing: a frame matches
+ * the third argument of {@link onPortraitUpdate} against it, a chip carries it
+ * in a data attribute. Pure string work: it never starts a capture.
+ */
+export function composedPortraitKey(
+  visualKey: string,
+  look: ModularLook,
+  framing: PortraitFraming = 'headshot',
+): string {
+  return modularPortraitKey(visualKey, look, framing);
+}
+
+/** The portrait filed under a composed `key`, or null. A PEEK like
+ *  {@link cachedPortraitDataUrl}: never kicks a capture on a miss, so a
+ *  listener can answer a landed key without re-deriving the look. */
+export function cachedPortraitByKey(key: string): string | null {
+  return cache.get(key) ?? null;
+}
+
+/**
  * True for a cache key minted by {@link modularPortraitDataUrl}, the third
  * argument {@link onPortraitUpdate} hands its listeners.
  *

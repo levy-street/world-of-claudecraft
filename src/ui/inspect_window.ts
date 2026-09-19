@@ -57,7 +57,7 @@ import {
   type InspectHolderModel,
 } from './inspect_view';
 import type { PainterHostPresentation } from './painter_host';
-import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { hydratePortraits, type ModularLook, portraitChipHtml } from './portrait_chip';
 import { qualityGlowShadow } from './quality_glow';
 import { curatorRankNameKey } from './reliquary_view';
 import { svgIcon } from './ui_icons';
@@ -129,8 +129,15 @@ export interface InspectWindowDeps extends PainterHostPresentation {
       mainhand: string | null;
       weaponSkinId: string | null;
       offhand: string | null;
+      /** The inspected player's authored look (their `app` identity field),
+       *  so the turntable shows the face they built, not the stock class rig;
+       *  null for a pre-creator character. */
+      look: ModularLook | null;
     },
   ): void;
+  /** The look an in-range entity composes with (the Hud's modularLookFor),
+   *  null when it keeps the fixed class rig. */
+  composedLook(e: InspectEntity): ModularLook | null;
 }
 
 export class InspectWindow {
@@ -264,6 +271,7 @@ export class InspectWindow {
         mainhand: e.equippedItems.mainhand ?? null,
         offhand: e.equippedItems.offhand ?? null,
         weaponSkinId: e.weaponSkinId ?? null,
+        look: this.deps.composedLook(e),
       });
     }
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());

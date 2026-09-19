@@ -389,6 +389,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       slotName: (slot) => slot,
       showDevBadges: () => showDevBadges,
       mountPreview: vi.fn(),
+      composedLook: () => null,
       // The real icon resolver (what Hud.itemIcon binds), so the filled-slot
       // rows carry the `.item-icon q-<quality>` markup the row pins read; its
       // src is a data URL off the stubbed canvas (an empty-string src would

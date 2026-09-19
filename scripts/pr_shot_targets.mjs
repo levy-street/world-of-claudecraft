@@ -664,6 +664,16 @@ async function seedMediumGraphicsPreset(page) {
   );
 }
 
+/** A distinctive authored look for the composed-portrait shots, seeded into the
+ *  creator draft (src/main.ts MODULAR_APPEARANCE_KEY) the offline quick-start
+ *  reads, on top of the lowest graphics preset. */
+async function seedComposedLookOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await page.evaluateOnNewDocument(
+    `try { localStorage.setItem('woc.modularAppearance', JSON.stringify({ gender: 'female', hair: 'curlycap', skinHue: 25, skinSat: 0.55, skinLight: 0.32, hairHue: 285, hairSat: 0.55, hairLight: 0.45, lashes: true })); } catch {}`,
+  );
+}
+
 /** Persist the "Current / Max (Percent)" health text mode (4) for the player and
  *  target frames before boot, on top of the lowest graphics preset. */
 async function seedHealthTextPercentMode(page) {
@@ -9918,6 +9928,74 @@ export const TARGETS = [
           ?.scrollIntoView({ block: 'center' });
       });
       return { clip: '#options-menu' };
+    },
+  },
+  {
+    // A player's composed (authored) face in every frame that holds a player,
+    // not only the player's own: the target frame (self-targeted, the offline
+    // world has no peers) and the player menu's title chip beside the player
+    // frame, then the Inspect card's turntable. The look is seeded before boot
+    // and made deliberately unlike the stock warrior art (female body, dark
+    // skin, violet hair) so the composed face and the class headshot cannot be
+    // mistaken for each other in the frame.
+    key: 'composed-player-portraits',
+    label: 'Composed player face in the target frame, the player menu chip and the Inspect card',
+    when: ['ui/player_portrait_core', 'ui/unit_portrait_painter', 'ui/portrait_chip'],
+    variants: [
+      { key: 'frames', beforeLoad: seedComposedLookOnLowPreset },
+      { key: 'inspect', beforeLoad: seedComposedLookOnLowPreset, clip: '#inspect-window' },
+    ],
+    async capture(page, variant) {
+      await sweepOverlays(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        if (!p.modularAppearance) {
+          return { ok: false, reason: 'the seeded look did not reach the offline player' };
+        }
+        // The target frame holds a PLAYER only when one is targeted; self is the
+        // one player an offline world has (the F1 targetSelf keybind's path).
+        sim.targetEntity(p.id);
+        return { ok: true, targeted: p.targetId === p.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      if (!staged.targeted) throw new Error('self-target did not take');
+      // The composed portrait is captured off the frame that asks for it and
+      // lands a beat later (longer under software GL); give it room.
+      await wait(5000);
+      await sweepOverlays(page, 4);
+      if (variant.key === 'inspect') {
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.hud.openInspect(game.sim.player.id);
+        });
+        if (!(await pollForSize(page, '#inspect-window'))) {
+          throw new Error('inspect window did not open');
+        }
+        await wait(2500);
+        return { clip: variant.clip };
+      }
+      // The player menu opens above the frames so its chip shares the region
+      // with the player frame and the target frame.
+      const region = await page.evaluate(() => {
+        const game = window.__game;
+        const p = game.sim.player;
+        const frame = document.getElementById('player-frame').getBoundingClientRect();
+        game.hud.openContextMenu(p.id, p.name, Math.round(frame.left), Math.round(frame.top - 260));
+        const rects = ['#player-frame', '#target-frame', '#ctx-menu']
+          .map((sel) => document.querySelector(sel)?.getBoundingClientRect())
+          .filter((r) => r && r.width > 0 && r.height > 0);
+        const x0 = Math.min(...rects.map((r) => r.left));
+        const y0 = Math.min(...rects.map((r) => r.top));
+        const x1 = Math.max(...rects.map((r) => r.right));
+        const y1 = Math.max(...rects.map((r) => r.bottom));
+        return { x: x0, y: y0, width: x1 - x0, height: y1 - y0, count: rects.length };
+      });
+      if (region.count < 3) throw new Error('player menu or a unit frame is not visible');
+      await wait(800);
+      return { clip: region };
     },
   },
   {

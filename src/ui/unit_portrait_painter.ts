@@ -12,6 +12,7 @@
 
 import type { ModularLook } from '../render/characters/modular';
 import {
+  cachedPortraitDataUrl,
   modularPortraitDataUrl,
   playerPortraitDataUrl,
   visualPortraitDataUrl,
@@ -19,6 +20,7 @@ import {
 import type { PlayerClass } from '../sim/types';
 import { crestIconUrl } from './crest_icon_art';
 import { iconCanvas } from './icons';
+import type { PlayerPortraitSubject } from './player_portrait_core';
 import {
   CREST_OVERSCAN,
   overscanRect,
@@ -147,13 +149,30 @@ export class UnitPortraitPainter {
     else this.drawClass(canvas, cls, 0);
   }
 
+  /** Paint whichever body a player entity's frame shows, as resolved by
+   *  player_portrait_core.ts: the same rule for the player frame and for a
+   *  player in the target or target-of-target frame. */
+  drawPlayer(canvas: HTMLCanvasElement, subject: PlayerPortraitSubject<ModularLook>): void {
+    if (subject.kind === 'mech') this.drawMech(canvas, subject.chroma, subject.cls);
+    else if (subject.kind === 'composed')
+      this.drawModularPlayer(canvas, subject.visualKey, subject.look, subject.cls, subject.skin);
+    else this.drawClass(canvas, subject.cls, subject.skin);
+  }
+
   /**
-   * Paint a headshot of a COMPOSED character, this player's own face, hair and
+   * Paint a headshot of a COMPOSED character, that player's own face, hair and
    * colours, rather than the stock portrait for their class.
    *
    * Falls back through the class portrait and then the crest, because a look
    * can be unpaintable for a frame or two: the modular GLB is streamed like any
    * other, and a portrait asked for before it lands returns null.
+   *
+   * The class portrait is a PEEK (cachedPortraitDataUrl), never the live
+   * getter: the live getter kicks its own capture on a miss, which for a
+   * composed subject is a second offscreen build, upload and encode of a face
+   * the composed capture replaces a few frames later. With every player a
+   * target frame can hold composed, that doubled the portrait work of a tab
+   * through a crowd; the post-entry prewarm fills the class headshots anyway.
    */
   drawModularPlayer(
     canvas: HTMLCanvasElement,
@@ -163,7 +182,12 @@ export class UnitPortraitPainter {
     skin: number,
   ): void {
     const url = modularPortraitDataUrl(visualKey, look);
-    if (url) this.drawHeadshot(canvas, url);
-    else this.drawClass(canvas, cls, skin);
+    if (url) {
+      this.drawHeadshot(canvas, url);
+      return;
+    }
+    const stock = cachedPortraitDataUrl(`player_${cls}`, skin);
+    if (stock) this.drawHeadshot(canvas, stock);
+    else this.drawCrest(canvas, `class_${cls}`);
   }
 }

@@ -262,6 +262,9 @@ const UI_PURE_CORES = [
   'src/ui/log_event_route.ts',
   'src/ui/mob_idle_sfx.ts',
   'src/ui/unit_portrait.ts',
+  // Which body a player entity's frame shows (mech, composed, stock) and the
+  // matching rule for a landed portrait; unit_portrait_painter.ts draws it.
+  'src/ui/player_portrait_core.ts',
   'src/ui/xp_bar.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/party_frames.ts',
