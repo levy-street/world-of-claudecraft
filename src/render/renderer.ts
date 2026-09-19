@@ -142,7 +142,8 @@ import { characterViewOutsideHysteresis } from './character_view_core';
 import {
   type AnimState,
   type AssembleOptions,
-  applyDisplayedAnimMotion, applyEntityAnimOverrides,
+  applyDisplayedAnimMotion,
+  applyEntityAnimOverrides,
   type CharacterVisual,
   composedLookPiecesOf,
   createCharacterVisual,
