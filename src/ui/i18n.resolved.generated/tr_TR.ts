@@ -5159,6 +5159,7 @@ export const tr_TR: EnTranslations = {
       "tabMounts": "Binekler",
       "tabSkins": "Görünümler",
       "tabMech": "Mek",
+      "tabFounders": "Founders",
       "legend": "Hesap: her karakter paylaşır. Karakter: yalnızca bu karakter.",
       "scopeAccount": "Hesap",
       "scopeCharacter": "Karakter",
@@ -5178,7 +5179,9 @@ export const tr_TR: EnTranslations = {
       "skinsEmpty": "Henüz silah görünümün yok. WOC Mağazasını ziyaret et.",
       "skinsApplyHint": "Bu görünümü uygulamak için bir {type} kuşan.",
       "mechIntro": "Combat Mech bu karakterin bedeninin yerini alır. Aynı anda bir renk varyantı giyilir.",
-      "mechEmpty": "Henüz Combat Mech renk varyantın yok."
+      "mechEmpty": "Henüz Combat Mech renk varyantın yok.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Yadigârlık",

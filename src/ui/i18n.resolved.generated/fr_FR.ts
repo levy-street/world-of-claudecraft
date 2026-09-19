@@ -5159,6 +5159,7 @@ export const fr_FR: EnTranslations = {
       "tabMounts": "Montures",
       "tabSkins": "Habillages",
       "tabMech": "Méca",
+      "tabFounders": "Founders",
       "legend": "Compte : partagé par tous les personnages. Personnage : ce personnage uniquement.",
       "scopeAccount": "Compte",
       "scopeCharacter": "Personnage",
@@ -5178,7 +5179,9 @@ export const fr_FR: EnTranslations = {
       "skinsEmpty": "Aucun habillage d’arme ne vous appartient encore. Rendez-vous dans la boutique WOC.",
       "skinsApplyHint": "Équipez un {type} pour appliquer cet habillage.",
       "mechIntro": "Le Méca de combat remplace le corps de ce personnage. Un seul chroma est équipé à la fois.",
-      "mechEmpty": "Aucun chroma de Méca de combat ne vous appartient encore."
+      "mechEmpty": "Aucun chroma de Méca de combat ne vous appartient encore.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Le Reliquaire",

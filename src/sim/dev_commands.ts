@@ -426,10 +426,11 @@ export function handleDevChat(
         mountsGranted += 1;
       }
       ctx.addItem(tierDef.bagItemId, 1, pid);
+      if (tierDef.goldenAura) ctx.addItem('founder_golden_aura', 1, pid);
       emitDevLog(
         ctx,
         pid,
-        `[dev] Founder Pack unlocked: '${tierDef.tier}' tier, ${FOUNDER_SKIN_CATALOG.length} skins, ${mountsGranted} mount reins, the '${tierDef.title}' title, and the ${tierDef.bagItemId} bag.`,
+        `[dev] Founder Pack unlocked: '${tierDef.tier}' tier, ${FOUNDER_SKIN_CATALOG.length} skins, ${mountsGranted} mount reins, the '${tierDef.title}' title, the ${tierDef.bagItemId} bag${tierDef.goldenAura ? ', and the Golden Aura' : ''}.`,
       );
     }
     return null;

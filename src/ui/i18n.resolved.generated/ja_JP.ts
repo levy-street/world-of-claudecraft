@@ -5159,6 +5159,7 @@ export const ja_JP: EnTranslations = {
       "tabMounts": "マウント",
       "tabSkins": "スキン",
       "tabMech": "メカ",
+      "tabFounders": "Founders",
       "legend": "アカウント：全キャラクターで共有。キャラクター：このキャラクターのみ。",
       "scopeAccount": "アカウント",
       "scopeCharacter": "キャラクター",
@@ -5178,7 +5179,9 @@ export const ja_JP: EnTranslations = {
       "skinsEmpty": "武器スキンをまだ所持していません。WOCストアをご覧ください。",
       "skinsApplyHint": "{type}を装備するとこのスキンを適用できます。",
       "mechIntro": "コンバットメカはこのキャラクターの身体を置き換えます。装着できるクロマは一度に一つです。",
-      "mechEmpty": "コンバットメカのクロマをまだ所持していません。"
+      "mechEmpty": "コンバットメカのクロマをまだ所持していません。",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "聖遺物庫",

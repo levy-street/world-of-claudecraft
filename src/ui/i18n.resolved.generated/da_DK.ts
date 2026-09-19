@@ -5159,6 +5159,7 @@ export const da_DK: EnTranslations = {
       "tabMounts": "Ridedyr",
       "tabSkins": "Skind",
       "tabMech": "Mech",
+      "tabFounders": "Founders",
       "legend": "Konto: deles af alle figurer. Figur: kun denne figur.",
       "scopeAccount": "Konto",
       "scopeCharacter": "Figur",
@@ -5178,7 +5179,9 @@ export const da_DK: EnTranslations = {
       "skinsEmpty": "Du ejer endnu ingen våbenskind. Besøg WOC-butikken.",
       "skinsApplyHint": "Udstyr en {type} for at anvende dette skind.",
       "mechIntro": "Kampmechen erstatter denne figurs krop. Én farvevariant bæres ad gangen.",
-      "mechEmpty": "Du ejer endnu ingen farvevarianter til kampmechen."
+      "mechEmpty": "Du ejer endnu ingen farvevarianter til kampmechen.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Relikvariet",

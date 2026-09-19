@@ -5159,6 +5159,7 @@ export const sv_SE: EnTranslations = {
       "tabMounts": "Riddjur",
       "tabSkins": "Skinn",
       "tabMech": "Mech",
+      "tabFounders": "Founders",
       "legend": "Konto: delas av alla karaktärer. Karaktär: bara den här karaktären.",
       "scopeAccount": "Konto",
       "scopeCharacter": "Karaktär",
@@ -5178,7 +5179,9 @@ export const sv_SE: EnTranslations = {
       "skinsEmpty": "Du äger ännu inga vapenskinn. Besök WOC-butiken.",
       "skinsApplyHint": "Utrusta en {type} för att använda skinnet.",
       "mechIntro": "Stridsmechen ersätter den här karaktärens kropp. En färgvariant bärs åt gången.",
-      "mechEmpty": "Du äger ännu inga färgvarianter för stridsmechen."
+      "mechEmpty": "Du äger ännu inga färgvarianter för stridsmechen.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Relikvariet",

@@ -5159,6 +5159,7 @@ export const nl_NL: EnTranslations = {
       "tabMounts": "Rijdieren",
       "tabSkins": "Skins",
       "tabMech": "Mech",
+      "tabFounders": "Founders",
       "legend": "Account: gedeeld door elk personage. Personage: alleen dit personage.",
       "scopeAccount": "Account",
       "scopeCharacter": "Personage",
@@ -5178,7 +5179,9 @@ export const nl_NL: EnTranslations = {
       "skinsEmpty": "Nog geen wapenskins in bezit. Bezoek de WOC-winkel.",
       "skinsApplyHint": "Rust een {type} uit om deze skin toe te passen.",
       "mechIntro": "De gevechtsmech vervangt het lichaam van dit personage. Er wordt telkens één chroma gedragen.",
-      "mechEmpty": "Nog geen gevechtsmech-chroma’s in bezit."
+      "mechEmpty": "Nog geen gevechtsmech-chroma’s in bezit.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Het Reliquarium",

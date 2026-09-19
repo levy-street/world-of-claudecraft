@@ -1279,6 +1279,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
   if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
+  if (e.goldenAuraActive) out.gau = true; // Golden Aura keepsake toggle (render-only, like msk)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -6912,6 +6913,12 @@ export class GameServer {
               ...FOUNDER_PACK_LETTER,
               items: [{ itemId: tierDef.bagItemId, count: 1 }],
             });
+            if (tierDef.goldenAura) {
+              sim.ctx.mailAuthoredLetter(meta, {
+                ...FOUNDER_PACK_LETTER,
+                items: [{ itemId: 'founder_golden_aura', count: 1 }],
+              });
+            }
           }
           this.sendCommandOutcome(session, msg, true);
         })();

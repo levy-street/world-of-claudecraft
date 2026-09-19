@@ -788,7 +788,7 @@ describe('/dev skin (fixed full-body skins)', () => {
 });
 
 describe('/dev founders (offline Founder Pack unlock)', () => {
-  it('defaults to the epic tier: every skin, all 3 reins, the bag, and the title', () => {
+  it('defaults to the epic tier: every skin, all 3 reins, the bag, the aura, and the title', () => {
     const sim = devSim();
 
     sim.chat('/dev founders');
@@ -810,11 +810,12 @@ describe('/dev founders (offline Founder Pack unlock)', () => {
     expect(sim.countItem('founder_reins_ancient_devourer')).toBe(1);
     expect(sim.countItem('founder_reins_shiba_inu')).toBe(1);
     expect(sim.countItem('founder_bag_emberfall_phoenix')).toBe(1);
+    expect(sim.countItem('founder_golden_aura')).toBe(1);
     expect(sim.meta(sim.playerId)?.deedsEarned.has('feat_founder_worldshaper')).toBe(true);
     expect(sim.meta(sim.playerId)?.activeTitle).toBe('feat_founder_worldshaper');
   });
 
-  it('grants a named lower tier with its own bag and Claudium amount', () => {
+  it('grants a named lower tier with its own bag and Claudium amount, and no Golden Aura', () => {
     const sim = devSim();
 
     sim.chat('/dev founders uncommon');
@@ -822,6 +823,7 @@ describe('/dev founders (offline Founder Pack unlock)', () => {
     expect(sim.accountCosmetics.founderPackTier).toBe('uncommon');
     expect(sim.accountCosmetics.founderPackClaudium).toBe(1000);
     expect(sim.countItem('founder_bag_phantom')).toBe(1);
+    expect(sim.countItem('founder_golden_aura')).toBe(0);
     expect(sim.meta(sim.playerId)?.activeTitle).toBe('feat_founder_emberborn');
   });
 
@@ -851,5 +853,34 @@ describe('/dev founders (offline Founder Pack unlock)', () => {
     sim.chat('/dev founders');
 
     expect(sim.accountCosmetics.founderPackTier).toBeNull();
+  });
+});
+
+describe('Golden Aura keepsake toggle (founder_golden_aura use effect)', () => {
+  it('flips on and off on repeat use, mirrored onto the entity for the wire', () => {
+    const sim = devSim();
+    sim.chat('/dev founders'); // epic tier: mails founder_golden_aura
+    expect(sim.countItem('founder_golden_aura')).toBe(1);
+    const player = () => sim.entities.get(sim.playerId);
+    expect(sim.meta(sim.playerId)?.goldenAuraActive).toBeFalsy();
+    expect(player()?.goldenAuraActive).toBeFalsy();
+
+    sim.useItem('founder_golden_aura');
+    expect(sim.meta(sim.playerId)?.goldenAuraActive).toBe(true);
+    expect(player()?.goldenAuraActive).toBe(true);
+    // Never consumed: it is a permanent, reusable toggle, not a one-shot.
+    expect(sim.countItem('founder_golden_aura')).toBe(1);
+
+    sim.useItem('founder_golden_aura');
+    expect(sim.meta(sim.playerId)?.goldenAuraActive).toBe(false);
+    expect(player()?.goldenAuraActive).toBe(false);
+  });
+
+  it('refuses to toggle for a player who never claimed the keepsake', () => {
+    const sim = devSim();
+
+    sim.useItem('founder_golden_aura');
+
+    expect(sim.meta(sim.playerId)?.goldenAuraActive).toBeFalsy();
   });
 });

@@ -10642,6 +10642,9 @@
     border: 1px solid var(--color-border-default);
     background: color-mix(in srgb, var(--color-white) 5%, transparent);
   }
+  .cos-founder-skin .portrait-chip {
+    align-self: center;
+  }
   .cos-card-actions {
     display: flex;
     flex-wrap: wrap;

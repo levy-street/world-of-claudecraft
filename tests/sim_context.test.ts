@@ -237,6 +237,7 @@ const CALLBACK_KEYS = [
   'startFishing',
   'unlockMechChromaFromItem',
   'openSkinSelect',
+  'toggleGoldenAura',
   'isSwimming',
   // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
   'talkToNpc',
@@ -601,6 +602,7 @@ function makeFakeHost() {
     startFishing: vi.fn(),
     unlockMechChromaFromItem: vi.fn(),
     openSkinSelect: vi.fn(),
+    toggleGoldenAura: vi.fn(),
     isSwimming: vi.fn(() => false),
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: vi.fn(),

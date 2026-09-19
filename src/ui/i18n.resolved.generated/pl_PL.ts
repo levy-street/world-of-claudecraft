@@ -5159,6 +5159,7 @@ export const pl_PL: EnTranslations = {
       "tabMounts": "Wierzchowce",
       "tabSkins": "Skórki",
       "tabMech": "Mech",
+      "tabFounders": "Founders",
       "legend": "Konto: wspólne dla wszystkich postaci. Postać: tylko ta postać.",
       "scopeAccount": "Konto",
       "scopeCharacter": "Postać",
@@ -5178,7 +5179,9 @@ export const pl_PL: EnTranslations = {
       "skinsEmpty": "Nie posiadasz jeszcze skórek broni. Odwiedź Sklep WOC.",
       "skinsApplyHint": "Wyposaż {type}, aby zastosować tę skórkę.",
       "mechIntro": "Mech bojowy zastępuje ciało tej postaci. Można nosić jeden kolor naraz.",
-      "mechEmpty": "Nie posiadasz jeszcze żadnych kolorów Mecha bojowego."
+      "mechEmpty": "Nie posiadasz jeszcze żadnych kolorów Mecha bojowego.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Relikwiarz",

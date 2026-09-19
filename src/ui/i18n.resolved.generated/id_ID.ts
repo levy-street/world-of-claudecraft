@@ -5159,6 +5159,7 @@ export const id_ID: EnTranslations = {
       "tabMounts": "Tunggangan",
       "tabSkins": "Skin",
       "tabMech": "Mecha",
+      "tabFounders": "Founders",
       "legend": "Akun: dibagikan oleh semua karakter. Karakter: hanya karakter ini.",
       "scopeAccount": "Akun",
       "scopeCharacter": "Karakter",
@@ -5178,7 +5179,9 @@ export const id_ID: EnTranslations = {
       "skinsEmpty": "Belum memiliki skin senjata. Kunjungi Toko WOC.",
       "skinsApplyHint": "Kenakan {type} untuk menerapkan skin ini.",
       "mechIntro": "Mecha Tempur menggantikan tubuh karakter ini. Satu kroma dipakai pada satu waktu.",
-      "mechEmpty": "Belum memiliki kroma Mecha Tempur."
+      "mechEmpty": "Belum memiliki kroma Mecha Tempur.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Relikuari",

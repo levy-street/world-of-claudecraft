@@ -209,6 +209,40 @@ describe('GameServer Founder Pack commands', () => {
     expect(server.sim.ctx.mailboxHoldsItem(meta, 'founder_reins_shiba_inu')).toBe(false);
   });
 
+  it('mails the Golden Aura keepsake on an Epic claim, and never on a lower tier', async () => {
+    walletForAccount.mockResolvedValue({ pubkey: 'pub1' });
+    cachedWocBalance.mockResolvedValue(10_000_000);
+    const ws = fakeWs();
+    const server = new GameServer();
+    const session = expectJoined(
+      server.join(ws, 11, 101, 'Founder', 'priest', null, false, {
+        accountCosmetics: baseCosmetics(),
+      }),
+    );
+    claimPack(server, session, 'epic', ['cinderjaw_rex', 'ancient_devourer', 'shiba_inu']);
+    await vi.waitFor(() => expect(lastOutcome(ws)).toBe(true));
+    const meta = server.sim.meta(session.pid);
+    if (!meta) throw new Error('missing meta');
+    expect(server.sim.ctx.mailboxHoldsItem(meta, 'founder_golden_aura')).toBe(true);
+
+    // The uncommon claimant from the test above never receives one.
+    const uncommonWs = fakeWs();
+    const uncommonServer = new GameServer();
+    const uncommonSession = expectJoined(
+      uncommonServer.join(uncommonWs, 12, 102, 'Founder2', 'priest', null, false, {
+        accountCosmetics: baseCosmetics(),
+      }),
+    );
+    cachedWocBalance.mockResolvedValue(1_000_000);
+    claimPack(uncommonServer, uncommonSession, 'uncommon', ['cinderjaw_rex']);
+    await vi.waitFor(() => expect(lastOutcome(uncommonWs)).toBe(true));
+    const uncommonMeta = uncommonServer.sim.meta(uncommonSession.pid);
+    if (!uncommonMeta) throw new Error('missing meta');
+    expect(uncommonServer.sim.ctx.mailboxHoldsItem(uncommonMeta, 'founder_golden_aura')).toBe(
+      false,
+    );
+  });
+
   it('refuses a second whole-pack claim once a tier is already on the account', async () => {
     walletForAccount.mockResolvedValue({ pubkey: 'pub1' });
     cachedWocBalance.mockResolvedValue(10_000_000);

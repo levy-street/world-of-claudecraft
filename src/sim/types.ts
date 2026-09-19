@@ -1025,6 +1025,9 @@ export type ItemUse =
   // Opens the client-side event skin-select overlay. The server rolls a rank on
   // use (see Sim.openSkinSelect) and the player locks one in via claimEventSkin.
   | { type: 'skinSelect'; catalog?: SkinCatalog }
+  // Flips PlayerMeta.goldenAuraActive (see Entity.goldenAuraActive doc). A
+  // permanent keepsake, never consumed: using it again toggles the aura off.
+  | { type: 'toggleGoldenAura' }
   // A base gathering tool (see #1123). `tier` gates which node/material tiers
   // it can gather: see src/sim/professions/tools.ts (canGatherTier). This item
   // type never carries a durability field (this repo has no durability
@@ -5669,6 +5672,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // reads it for gameplay (speed stays on mountKey). Set by Sim.setMountSkin and
   // synced in identity fields (terse `msk`), like `wsk`.
   mountSkinId: string | null;
+  // Golden Aura cosmetic toggle (players only; false otherwise): the Founder's
+  // Pack Epic-tier keepsake item (founder_golden_aura) flips this on use.
+  // Render-only: draws a golden outline plus a glow halo around the character
+  // (src/render/golden_aura.ts). The sim never reads it for gameplay. Set by
+  // Sim.useItem's toggleGoldenAura arm and synced in identity fields (terse `gau`).
+  goldenAuraActive: boolean;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,

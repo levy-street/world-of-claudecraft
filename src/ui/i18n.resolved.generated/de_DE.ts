@@ -5159,6 +5159,7 @@ export const de_DE: EnTranslations = {
       "tabMounts": "Reittiere",
       "tabSkins": "Skins",
       "tabMech": "Mech",
+      "tabFounders": "Founders",
       "legend": "Konto: von allen Charakteren geteilt. Charakter: nur dieser Charakter.",
       "scopeAccount": "Konto",
       "scopeCharacter": "Charakter",
@@ -5178,7 +5179,9 @@ export const de_DE: EnTranslations = {
       "skinsEmpty": "Noch keine Waffenskins im Besitz. Besuche den WOC-Shop.",
       "skinsApplyHint": "Rüste {type} aus, um diesen Skin anzuwenden.",
       "mechIntro": "Der Kampfmech ersetzt den Körper dieses Charakters. Es wird immer nur ein Chroma getragen.",
-      "mechEmpty": "Noch keine Kampfmech-Chromas im Besitz."
+      "mechEmpty": "Noch keine Kampfmech-Chromas im Besitz.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Das Reliquiar",

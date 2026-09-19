@@ -45,6 +45,7 @@ import {
 } from '../render/characters/assets';
 import {
   FULL_BODY_SKIN_VISUAL_KEY_SET,
+  FULL_BODY_SKIN_VISUAL_KEYS,
   mechHeldWeaponOverride,
 } from '../render/characters/manifest';
 import type { ModularLook } from '../render/characters/modular';
@@ -2151,6 +2152,21 @@ export class Hud {
       return this.mechAssetsPromise;
     }
     return preloadFullBodySkinAssets(visualKey);
+  }
+
+  /** Kick the lazy GLB fetch for every Founder Pack skin's replacement body
+   *  (all 9, regardless of ownership: the store shows every skin, owned or
+   *  not, and the Cosmetics window's Founders tab needs the owned ones
+   *  ready). Fire-and-forget: portrait_chip.ts's onPortraitUpdate hook
+   *  repaints any open chip once each fetch resolves, so this needs no
+   *  promise chain of its own. Each entry is memoized inside assets.ts, so
+   *  calling this from more than one window opener is a cheap no-op after
+   *  the first. */
+  private preloadFounderSkinThumbnails(): void {
+    for (const def of FOUNDER_SKIN_CATALOG) {
+      const visualKey = FULL_BODY_SKIN_VISUAL_KEYS[def.catalog];
+      if (visualKey) void this.preloadReplacementBodyAssets(visualKey);
+    }
   }
   private readonly playerCard: PlayerCardController;
   // Shared by the confirm + input modals (one #confirm-dialog id; they never coexist).
@@ -5486,6 +5502,7 @@ export class Hud {
     closeOthers: () => this.closeOtherWindows('#cosmetics-window'),
     hideTooltip: () => this.hideTooltip(),
     store: () => this.dailyRewardsWindow,
+    preloadFounderSkinThumbnails: () => this.preloadFounderSkinThumbnails(),
     ...this.windowFocus('#cosmetics-window'),
   });
   private readonly reliquaryWindow = new ReliquaryWindow({
@@ -15192,6 +15209,7 @@ export class Hud {
     this.closeOtherWindows('#founder-pack-window');
     this.openFounderVendorNpcId = npcId;
     this.founderMountSelection.clear();
+    this.preloadFounderSkinThumbnails();
     this.renderFounderVendor();
     this.founderPreview.open($('#founder-pack-preview-window'), this.founderPreviewDeps());
     const captured = this.founderWindowFocus.captureFocus();
@@ -15202,6 +15220,8 @@ export class Hud {
     return {
       mountCharPreview: (container, cls, skin, previewKey) =>
         this.mountCharPreview(container, cls, skin, previewKey),
+      replacementBodyAssetsReady: (visualKey) => this.replacementBodyAssetsReady(visualKey),
+      preloadReplacementBodyAssets: (visualKey) => this.preloadReplacementBodyAssets(visualKey),
       onClose: () => this.founderPreview.close(),
     };
   }

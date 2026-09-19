@@ -5159,6 +5159,7 @@ export const ko_KR: EnTranslations = {
       "tabMounts": "탈것",
       "tabSkins": "스킨",
       "tabMech": "메카",
+      "tabFounders": "Founders",
       "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
       "scopeAccount": "계정",
       "scopeCharacter": "캐릭터",
@@ -5178,7 +5179,9 @@ export const ko_KR: EnTranslations = {
       "skinsEmpty": "아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.",
       "skinsApplyHint": "{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.",
       "mechIntro": "전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.",
-      "mechEmpty": "아직 보유한 전투 메카 크로마가 없습니다."
+      "mechEmpty": "아직 보유한 전투 메카 크로마가 없습니다.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "성물고",

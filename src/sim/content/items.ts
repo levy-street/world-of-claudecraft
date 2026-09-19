@@ -518,6 +518,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
   },
+  // The Epic tier's Golden Aura (The Founder Salesman): a mailed keepsake
+  // proving the claim, same GLB-less/junk-kind treatment as the reins
+  // souvenirs above. Using it toggles PlayerMeta.goldenAuraActive (see
+  // Entity.goldenAuraActive doc), which the renderer reads to draw a golden
+  // outline and glow halo (src/render/golden_aura.ts). Never consumed.
+  founder_golden_aura: {
+    id: 'founder_golden_aura',
+    name: 'Golden Aura',
+    kind: 'junk',
+    quality: 'legendary',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+    use: { type: 'toggleGoldenAura' },
+  },
   // Legacy cosmetic reins; the spaceship is now a mount skin.
   reins_goblin_rocket_sled: {
     id: 'reins_goblin_rocket_sled',

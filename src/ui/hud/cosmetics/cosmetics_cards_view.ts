@@ -9,15 +9,18 @@
 // always see whether a look is shared by the account or worn by this character.
 
 import { WEAPON_SKINS } from '../../../sim/content/weapon_skins';
-import type { WeaponSkinType } from '../../../sim/types';
+import type { SkinCatalog, WeaponSkinType } from '../../../sim/types';
 import { localizeWeaponSkin, rarityLabel, weaponTypeLabel } from '../../armory_labels';
 import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
 import { t } from '../../i18n';
 import { mountSkinDescription, mountSkinDisplayName } from '../../mount_labels';
+import { portraitChipHtml } from '../../portrait_chip';
 import {
   type CosmeticsScope,
   type CosmeticsSnapshot,
+  type FounderSkinCard,
+  founderSkinCards,
   type MechChromaCard,
   type MountSkinCard,
   mechChromaCards,
@@ -162,6 +165,37 @@ function mechCardHtml(card: MechChromaCard): string {
   );
 }
 
+function founderSkinCardHtml(card: FounderSkinCard): string {
+  const chip = portraitChipHtml({
+    cls: card.requiredClass,
+    catalog: card.catalog,
+    name: card.catalog,
+    variant: 'sm',
+    framing: 'headshot',
+    badge: false,
+  });
+  const state = card.worn
+    ? `<span class="cos-state worn">${esc(t('hudChrome.cosmetics.worn'))}</span>`
+    : card.classMatches
+      ? `<span class="cos-state owned">${esc(t('hudChrome.cosmetics.owned'))}</span>`
+      : `<span class="cos-state store">${esc(t('hudChrome.founderShop.wrongClassForSkin'))}</span>`;
+  const action =
+    card.action === 'wear'
+      ? actionButton('wear-founder-skin', card.catalog, t('hudChrome.cosmetics.wear'))
+      : card.action === 'takeOff'
+        ? actionButton('takeoff-founder-skin', card.catalog, t('hudChrome.cosmetics.takeOff'))
+        : '';
+  return (
+    `<article class="cos-card cos-founder-skin rarity-legendary${card.worn ? ' worn' : ''}" ` +
+    `data-card="${esc(card.catalog)}" aria-label="${esc(t('hudChrome.cosmetics.cardAria', { name: card.catalog, rarity: rarityLabel('legendary') }))}">` +
+    `<div class="cos-card-head">${scopeBadge(card.ownershipScope, false)}${card.worn ? scopeBadge(card.wornScope, true) : ''}` +
+    `<span class="cos-rarity q-legendary">${esc(rarityLabel('legendary'))}</span></div>` +
+    chip +
+    `<h3 class="cos-card-name">${esc(card.catalog)}</h3>` +
+    `<div class="cos-card-actions">${state}${action}</div></article>`
+  );
+}
+
 function emptyHtml(text: string): string {
   return `<p class="cos-empty">${esc(text)}</p>`;
 }
@@ -191,6 +225,14 @@ export function cosmeticsPanelHtml(s: CosmeticsSnapshot): string {
         `<div class="cos-grid">${cards.map(mechCardHtml).join('')}</div>`
       );
     }
+    case 'founders': {
+      const cards = founderSkinCards(s);
+      if (cards.length === 0) return emptyHtml(t('hudChrome.cosmetics.foundersEmpty'));
+      return (
+        `<p class="cos-intro">${esc(t('hudChrome.cosmetics.foundersIntro'))}</p>` +
+        `<div class="cos-grid">${cards.map(founderSkinCardHtml).join('')}</div>`
+      );
+    }
   }
 }
 
@@ -203,7 +245,9 @@ export type CosmeticsAction =
   | { kind: 'apply-skin'; id: string }
   | { kind: 'detach-skin'; weaponType: WeaponSkinType }
   | { kind: 'wear-mech'; index: number }
-  | { kind: 'takeoff-mech'; id: string };
+  | { kind: 'takeoff-mech'; id: string }
+  | { kind: 'wear-founder-skin'; catalog: SkinCatalog }
+  | { kind: 'takeoff-founder-skin' };
 
 export function cosmeticsActionFrom(dataset: {
   act?: string;
@@ -233,6 +277,10 @@ export function cosmeticsActionFrom(dataset: {
     }
     case 'takeoff-mech':
       return id ? { kind: 'takeoff-mech', id } : null;
+    case 'wear-founder-skin':
+      return id ? { kind: 'wear-founder-skin', catalog: id as SkinCatalog } : null;
+    case 'takeoff-founder-skin':
+      return { kind: 'takeoff-founder-skin' };
     default:
       return null;
   }

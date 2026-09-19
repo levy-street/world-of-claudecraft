@@ -5159,6 +5159,7 @@ export const vi_VN: EnTranslations = {
       "tabMounts": "Thú cưỡi",
       "tabSkins": "Ngoại hình",
       "tabMech": "Cỗ máy",
+      "tabFounders": "Founders",
       "legend": "Tài khoản: dùng chung cho mọi nhân vật. Nhân vật: chỉ nhân vật này.",
       "scopeAccount": "Tài khoản",
       "scopeCharacter": "Nhân vật",
@@ -5178,7 +5179,9 @@ export const vi_VN: EnTranslations = {
       "skinsEmpty": "Chưa sở hữu ngoại hình vũ khí nào. Hãy ghé Cửa hàng WOC.",
       "skinsApplyHint": "Trang bị {type} để áp dụng ngoại hình này.",
       "mechIntro": "Cỗ máy Chiến đấu thay thế cơ thể nhân vật này. Mỗi lần chỉ mặc một biến thể.",
-      "mechEmpty": "Chưa sở hữu biến thể nào của Cỗ máy Chiến đấu."
+      "mechEmpty": "Chưa sở hữu biến thể nào của Cỗ máy Chiến đấu.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Kỳ Trân Các",

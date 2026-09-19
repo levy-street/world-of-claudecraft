@@ -5159,6 +5159,7 @@ export const ru_RU: EnTranslations = {
       "tabMounts": "Ездовые животные",
       "tabSkins": "Облики",
       "tabMech": "Мех",
+      "tabFounders": "Founders",
       "legend": "Аккаунт: общее для всех персонажей. Персонаж: только этот персонаж.",
       "scopeAccount": "Аккаунт",
       "scopeCharacter": "Персонаж",
@@ -5178,7 +5179,9 @@ export const ru_RU: EnTranslations = {
       "skinsEmpty": "Обликов оружия пока нет. Загляните в магазин WOC.",
       "skinsApplyHint": "Экипируйте {type}, чтобы применить этот облик.",
       "mechIntro": "Боевой мех заменяет тело этого персонажа. Одновременно надета одна расцветка.",
-      "mechEmpty": "Расцветок боевого меха пока нет."
+      "mechEmpty": "Расцветок боевого меха пока нет.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Реликварий",

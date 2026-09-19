@@ -10,6 +10,7 @@ export const cosmeticsStrings = {
   tabMounts: 'Mounts',
   tabSkins: 'Skins',
   tabMech: 'Mech',
+  tabFounders: 'Founders',
   legend: 'Account: shared by every character. Character: this character only.',
   scopeAccount: 'Account',
   scopeCharacter: 'Character',
@@ -31,4 +32,7 @@ export const cosmeticsStrings = {
   skinsApplyHint: 'Equip a {type} to apply this skin.',
   mechIntro: "The Combat Mech replaces this character's body. One chroma is worn at a time.",
   mechEmpty: 'No Combat Mech chromas owned yet.',
+  foundersIntro:
+    "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+  foundersEmpty: 'No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook.',
 };

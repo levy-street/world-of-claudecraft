@@ -5159,6 +5159,7 @@ export const es_ES: EnTranslations = {
       "tabMounts": "Monturas",
       "tabSkins": "Apariencias",
       "tabMech": "Mecano",
+      "tabFounders": "Founders",
       "legend": "Cuenta: compartido por todos los personajes. Personaje: solo este personaje.",
       "scopeAccount": "Cuenta",
       "scopeCharacter": "Personaje",
@@ -5178,7 +5179,9 @@ export const es_ES: EnTranslations = {
       "skinsEmpty": "Aún no tienes apariencias de arma. Visita la Tienda de WOC.",
       "skinsApplyHint": "Equipa un {type} para aplicar esta apariencia.",
       "mechIntro": "El Mecano de combate reemplaza el cuerpo de este personaje. Solo se lleva un croma a la vez.",
-      "mechEmpty": "Aún no tienes cromas de Mecano de combate."
+      "mechEmpty": "Aún no tienes cromas de Mecano de combate.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "El Relicario",

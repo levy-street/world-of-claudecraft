@@ -14,6 +14,7 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
+import { attachGoldenAuraRim } from '../golden_aura_rim';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MountRideSpec } from '../mount_visuals';
 import {
@@ -650,6 +651,10 @@ export class CharacterVisual {
     new Map<THREE.Material, THREE.Material>(),
   ];
   private ascensionMaterials = new Map<THREE.Material, THREE.Material>();
+  // Golden Aura keepsake (Founder's Pack Epic tier, src/render/golden_aura.ts owns
+  // the surrounding glow halo): a strong gold whole-body lean, its own cache so a
+  // concurrent Thornhollow rune tint below can never stomp or be stomped by it.
+  private goldenAuraMaterials = new Map<THREE.Material, THREE.Material>();
   // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
   // (weakest treatment: every form/death tint above wins). Keyed per source
   // material, one clone each (the live rune color rides the clone's userData);
@@ -768,6 +773,7 @@ export class CharacterVisual {
   private ferocityStage = 0;
   private presentationScale = 1;
   private ascended = false;
+  private goldenAura = false;
   private metamorphLeftWing: THREE.Object3D | null = null;
   private metamorphRightWing: THREE.Object3D | null = null;
   private metamorphLeftWingRest = new THREE.Euler();
@@ -2217,6 +2223,14 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
+  /** Founder's Pack Golden Aura keepsake: a strong gold whole-body tint,
+   *  paired with the surrounding glow halo golden_aura.ts draws. */
+  setGoldenAura(on: boolean): void {
+    if (on === this.goldenAura) return;
+    this.goldenAura = on;
+    this.applyVisualMaterials();
+  }
+
   /** Slight whole-body color lean while a Thornhollow Fields rune buff rides (null = off). */
   setRuneTint(color: number | null): void {
     if (color === this.runeTint) return;
@@ -3087,6 +3101,7 @@ export class CharacterVisual {
       this.soulRendMaterials,
       this.shadowformMaterials,
       this.moonkinMaterials,
+      this.goldenAuraMaterials,
       this.runeTintMaterials,
       this.auraGlowMaterials,
     ]);
@@ -3103,6 +3118,7 @@ export class CharacterVisual {
       ...this.moonkinMaterials.values(),
       ...this.ferocityMaterials.flatMap((cache) => [...cache.values()]),
       ...this.ascensionMaterials.values(),
+      ...this.goldenAuraMaterials.values(),
       ...this.runeTintMaterials.values(),
       ...this.auraGlowMaterials.values(),
     ]);
@@ -3113,6 +3129,7 @@ export class CharacterVisual {
     this.moonkinMaterials.clear();
     for (const cache of this.ferocityMaterials) cache.clear();
     this.ascensionMaterials.clear();
+    this.goldenAuraMaterials.clear();
     this.runeTintMaterials.clear();
     this.auraGlowMaterials.clear();
   }
@@ -3367,6 +3384,7 @@ export class CharacterVisual {
     if (this.shadowform) return this.shadowformMaterial(material);
     if (this.ferocityStage > 0) return this.ferocityMaterial(material, this.ferocityStage);
     if (this.ascended) return this.ascensionMaterial(material);
+    if (this.goldenAura) return this.goldenAuraMaterial(material);
     if (this.runeTint !== null) return this.runeTintMaterial(material, this.runeTint);
     // lowest priority: the ability VFX buff/cast body glow
     if (this.auraGlowIntensity > 0.01) return this.auraGlowMaterial(material);
@@ -3480,6 +3498,18 @@ export class CharacterVisual {
       withColor.emissiveIntensity = 0.48;
     }
     this.ascensionMaterials.set(material, marked);
+    return marked;
+  }
+
+  /** A gold fresnel glow along the character's OUTLINE only (its own shader
+   *  uniform, gfx.ts's addRimGlow recipe): base colors and texture stay put on
+   *  faces pointing at the camera, and the silhouette edge glows gold. */
+  private goldenAuraMaterial(material: THREE.Material): THREE.Material {
+    const cached = this.goldenAuraMaterials.get(material);
+    if (cached) return cached;
+    const marked = cloneMaterialWithHooks(material);
+    attachGoldenAuraRim(marked);
+    this.goldenAuraMaterials.set(material, marked);
     return marked;
   }
 

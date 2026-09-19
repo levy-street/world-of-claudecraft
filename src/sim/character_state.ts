@@ -200,6 +200,9 @@ export interface CharacterState {
   // account state (AccountCosmetics.mountSkinIds), never persisted here; the
   // server clears an unowned worn id at join (content/mount_skins.ts).
   mountSkinId?: string;
+  // Golden Aura keepsake toggle (JSONB; optional so pre-feature saves load as
+  // off). See Entity.goldenAuraActive (src/sim/types.ts) for the full doc.
+  goldenAuraActive?: boolean;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;

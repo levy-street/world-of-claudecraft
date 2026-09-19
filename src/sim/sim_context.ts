@@ -1071,6 +1071,7 @@ export interface SimContextCallbacks {
     chromaId: string,
   ): ItemUseResult | undefined;
   openSkinSelect(meta: PlayerMeta, catalog: SkinCatalog, itemId: string): void;
+  toggleGoldenAura(meta: PlayerMeta): void;
   isSwimming(e: Entity): boolean;
 
   // W3 interaction (src/sim/interaction.ts): the moved `interact` dispatcher fans into
@@ -1759,6 +1760,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     startFishing: host.startFishing,
     unlockMechChromaFromItem: host.unlockMechChromaFromItem,
     openSkinSelect: host.openSkinSelect,
+    toggleGoldenAura: host.toggleGoldenAura,
     isSwimming: host.isSwimming,
     // W3 interaction: the two still-on-Sim quest-NPC delegates the moved interact dispatches to.
     talkToNpc: host.talkToNpc,

@@ -5159,6 +5159,7 @@ export const zh_CN: EnTranslations = {
       "tabMounts": "坐骑",
       "tabSkins": "皮肤",
       "tabMech": "机甲",
+      "tabFounders": "Founders",
       "legend": "账号：所有角色共享。角色：仅此角色。",
       "scopeAccount": "账号",
       "scopeCharacter": "角色",
@@ -5178,7 +5179,9 @@ export const zh_CN: EnTranslations = {
       "skinsEmpty": "尚未拥有武器皮肤。请访问 WOC 商店。",
       "skinsApplyHint": "装备一件{type}后即可应用此皮肤。",
       "mechIntro": "战斗机甲会替换此角色的身体。一次只能穿戴一种配色。",
-      "mechEmpty": "尚未拥有战斗机甲配色。"
+      "mechEmpty": "尚未拥有战斗机甲配色。",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "圣物库",

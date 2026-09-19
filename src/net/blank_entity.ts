@@ -227,6 +227,7 @@ export function blankEntity(id: number): Entity {
     weaponSkinLoadout: {},
     weaponSkinId: null,
     mountSkinId: null,
+    goldenAuraActive: false,
     equippedItems: {},
     equippedInstances: {},
     guild: '',

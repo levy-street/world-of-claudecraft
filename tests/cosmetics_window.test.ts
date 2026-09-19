@@ -11,10 +11,11 @@ import { CosmeticsWindow } from '../src/ui/hud/cosmetics/cosmetics_window';
 vi.mock('../src/game/audio', () => ({ audio: { click: vi.fn() } }));
 
 interface FakeWorld {
+  cfg: { playerClass: string };
   player: {
     templateId: string;
     mainhandItemId: string | null;
-    skinCatalog: 'class' | 'mech';
+    skinCatalog: string;
     skin: number;
     mountSkinId: string | null;
   };
@@ -24,6 +25,7 @@ interface FakeWorld {
     weaponSkinIds: string[];
     weaponSkinLoadout: Record<string, string>;
     mountSkinIds: string[];
+    founderSkinIds: string[];
   };
   ownedMounts: () => string[];
   changeMountSkin: ReturnType<typeof vi.fn>;
@@ -34,6 +36,7 @@ interface FakeWorld {
 
 function fakeWorld(): FakeWorld {
   const world: FakeWorld = {
+    cfg: { playerClass: 'warrior' },
     player: {
       templateId: 'warrior',
       mainhandItemId: 'worn_sword',
@@ -47,13 +50,17 @@ function fakeWorld(): FakeWorld {
       weaponSkinIds: ['ice_fang_sword', 'glaciersplit_axe'],
       weaponSkinLoadout: {},
       mountSkinIds: ['mech_bird'],
+      founderSkinIds: [],
     },
     ownedMounts: () => ['valorsteed'],
     changeMountSkin: vi.fn((id: string | null) => {
       world.player.mountSkinId = id;
     }),
     changeWeaponSkin: vi.fn(),
-    changeSkin: vi.fn(),
+    changeSkin: vi.fn((skin: number, catalog?: string) => {
+      world.player.skin = skin;
+      world.player.skinCatalog = catalog ?? 'class';
+    }),
     unequipMechChroma: vi.fn(),
   };
   return world;
@@ -76,6 +83,7 @@ function makeWindow(
     hideTooltip: vi.fn(),
     captureFocus: () => null,
     restoreFocus: vi.fn(),
+    preloadFounderSkinThumbnails: vi.fn(),
     store: () =>
       store === null
         ? null
@@ -102,7 +110,7 @@ describe('CosmeticsWindow', () => {
     const { w, el } = makeWindow(world);
     w.toggle();
     expect(w.isOpen).toBe(true);
-    expect(el.querySelectorAll('.cos-tab')).toHaveLength(3);
+    expect(el.querySelectorAll('.cos-tab')).toHaveLength(4);
     expect(el.querySelector('.cos-tab.on')?.getAttribute('data-tab')).toBe('mounts');
     expect(card(el, 'mech_bird')).toBeTruthy();
     expect(card(el, 'chimeglass_tortoise')).toBeTruthy();
@@ -207,6 +215,49 @@ describe('CosmeticsWindow', () => {
     expect(card(el, id).classList.contains('worn')).toBe(true);
     action(el, 'takeoff-mech', id)?.click();
     expect(world.unequipMechChroma).toHaveBeenCalledWith(id);
+  });
+
+  it('wears and takes off a Founder skin through changeSkin, disabled for the wrong class', () => {
+    const world = fakeWorld();
+    world.accountCosmetics.founderSkinIds = ['altherion'];
+    const { w, el } = makeWindow(world);
+    w.open('founders');
+    // warrior owns altherion (the priest skin): shown, but no wear action.
+    expect(card(el, 'altherion')).toBeTruthy();
+    expect(action(el, 'wear-founder-skin', 'altherion')).toBeNull();
+    expect(action(el, 'takeoff-founder-skin', 'altherion')).toBeNull();
+
+    world.cfg.playerClass = 'priest';
+    world.player.templateId = 'priest';
+    w.refreshIfChanged();
+    action(el, 'wear-founder-skin', 'altherion')?.click();
+    expect(world.changeSkin).toHaveBeenCalledWith(0, 'altherion');
+    w.refreshIfChanged();
+    expect(card(el, 'altherion').classList.contains('worn')).toBe(true);
+    action(el, 'takeoff-founder-skin')?.click();
+    expect(world.changeSkin).toHaveBeenLastCalledWith(0, 'class');
+  });
+
+  it('preloads Founder skin thumbnails every time the window opens', () => {
+    const world = fakeWorld();
+    const el = document.createElement('div');
+    el.id = 'cosmetics-window';
+    document.body.appendChild(el);
+    const preload = vi.fn();
+    const w = new CosmeticsWindow({
+      root: () => el,
+      world: () => world as never,
+      closeOthers: vi.fn(),
+      hideTooltip: vi.fn(),
+      captureFocus: () => null,
+      restoreFocus: vi.fn(),
+      preloadFounderSkinThumbnails: preload,
+      store: () => null,
+    });
+    w.open();
+    expect(preload).toHaveBeenCalledTimes(1);
+    w.open('founders');
+    expect(preload).toHaveBeenCalledTimes(2);
   });
 
   it('switches tabs from the strip and shows the empty states', () => {

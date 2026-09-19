@@ -5159,6 +5159,7 @@ export const cs_CZ: EnTranslations = {
       "tabMounts": "Jezdecká zvířata",
       "tabSkins": "Vzhledy",
       "tabMech": "Mech",
+      "tabFounders": "Founders",
       "legend": "Účet: sdílený všemi postavami. Postava: pouze tato postava.",
       "scopeAccount": "Účet",
       "scopeCharacter": "Postava",
@@ -5178,7 +5179,9 @@ export const cs_CZ: EnTranslations = {
       "skinsEmpty": "Zatím nevlastníš žádné vzhledy zbraní. Navštiv obchod WOC.",
       "skinsApplyHint": "Vybav si {type}, aby se tento vzhled použil.",
       "mechIntro": "Bojový mech nahrazuje tělo této postavy. Najednou lze nosit jednu barevnou variantu.",
-      "mechEmpty": "Zatím nevlastníš žádné barevné varianty bojového mecha."
+      "mechEmpty": "Zatím nevlastníš žádné barevné varianty bojového mecha.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Relikviář",

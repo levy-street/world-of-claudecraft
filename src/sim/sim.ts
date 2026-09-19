@@ -1375,6 +1375,9 @@ export interface PlayerMeta {
   // Worn account mount skin (content/mount_skins.ts); persisted, mirrored to
   // Entity.mountSkinId for the identity wire. null = the ridden mount's own look.
   mountSkinId: string | null;
+  // Golden Aura cosmetic toggle; see Entity.goldenAuraActive (src/sim/types.ts)
+  // for the full doc. Mirrored onto the entity for the wire and persisted here.
+  goldenAuraActive: boolean;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
   // pending a lock-in. Set on use, cleared on claim. Persisted so the reward
   // survives reconnect; re-using the token re-shows the same rank (no reroll).
@@ -2892,6 +2895,7 @@ export class Sim {
       skin: savedState?.skin ?? 0,
       skinCatalog: isSkinCatalog(savedState?.skinCatalog) ? savedState.skinCatalog : 'class',
       mountSkinId: normalizeMountSkinId(savedState?.mountSkinId),
+      goldenAuraActive: savedState?.goldenAuraActive === true,
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
@@ -3047,6 +3051,7 @@ export class Sim {
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
     player.mountSkinId = meta.mountSkinId;
+    player.goldenAuraActive = meta.goldenAuraActive;
     this.accountCosmetics = accountCosmeticsWithWornMechChroma(
       this.accountCosmetics,
       meta.skinCatalog,
@@ -4193,6 +4198,8 @@ export class Sim {
       skinCatalog: meta.skinCatalog,
       // Absent while no mount skin is worn (zero-default omission; back-compat).
       ...(meta.mountSkinId ? { mountSkinId: meta.mountSkinId } : {}),
+      // Absent while off (zero-default omission; back-compat).
+      ...(meta.goldenAuraActive ? { goldenAuraActive: true } : {}),
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
@@ -4616,6 +4623,15 @@ export class Sim {
       catalog: eventCatalog === 'mech' ? 'mech' : undefined,
       pid: meta.entityId,
     });
+  }
+
+  /** Golden Aura keepsake toggle (Founder's Pack Epic tier): flips the
+   *  cosmetic on and off, mirrored onto the entity for the wire so other
+   *  players see it too. Never consumes the item. */
+  private toggleGoldenAura(meta: PlayerMeta): void {
+    meta.goldenAuraActive = !meta.goldenAuraActive;
+    const p = this.entities.get(meta.entityId);
+    if (p) p.goldenAuraActive = meta.goldenAuraActive;
   }
 
   /** Lock in a chosen skin from the skin-select event. Server-authoritative:
@@ -5794,6 +5810,7 @@ export class Sim {
       unlockMechChromaFromItem: (meta, itemId, chromaId) =>
         unlockMechChromaFromItem(sim, meta, itemId, chromaId),
       openSkinSelect: (meta, catalog, itemId) => sim.openSkinSelect(meta, catalog, itemId),
+      toggleGoldenAura: (meta) => sim.toggleGoldenAura(meta),
       isSwimming: (e) => sim.isSwimming(e),
       revalidateOffhandForSpec: (pid) => items.revalidateOffhandForSpec(sim.ctx, pid),
       // Interaction (W3): the moved interaction.interact dispatches into the quest-NPC

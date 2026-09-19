@@ -242,6 +242,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     weaponSkinLoadout: {},
     weaponSkinId: null,
     mountSkinId: null,
+    goldenAuraActive: false,
     equippedItems: {},
     equippedInstances: {},
     guild: '',

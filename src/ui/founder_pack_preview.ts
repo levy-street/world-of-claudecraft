@@ -23,6 +23,11 @@ export interface FounderPackPreviewDeps {
     skin: number,
     previewKey?: string,
   ): void;
+  /** Whether `visualKey`'s replacement-body GLB is already resident, so
+   *  showSkin can mount immediately instead of waiting on a fetch. */
+  replacementBodyAssetsReady(visualKey: string): boolean;
+  /** Kick (or reuse) the lazy fetch for `visualKey`, resolved once ready. */
+  preloadReplacementBodyAssets(visualKey: string): Promise<void>;
   onClose(): void;
 }
 
@@ -74,12 +79,25 @@ export class FounderPackPreviewPanel {
   }
 
   /** Preview a Founder skin on the class it belongs to: the same body the
-   *  world would render (no chroma; skin index is always 0). */
+   *  world would render (no chroma; skin index is always 0). Waits out the
+   *  lazy GLB fetch when the skin has not been previewed/preloaded yet
+   *  (the founder_pack_window open already kicks all 9, so this is usually
+   *  an instant mount, not a real wait), the renderCharPreview precedent. */
   showSkin(skin: FounderSkinDef, deps: FounderPackPreviewDeps): void {
     if (!this.el || !this.modelHost) return;
     this.setMode('skin');
     const preview = activeCharacterAppearancePreview(skin.requiredClass, 0, skin.catalog);
-    deps.mountCharPreview(this.modelHost, skin.requiredClass, preview.skin, preview.visualKey);
+    if (deps.replacementBodyAssetsReady(preview.visualKey)) {
+      deps.mountCharPreview(this.modelHost, skin.requiredClass, preview.skin, preview.visualKey);
+      return;
+    }
+    void deps
+      .preloadReplacementBodyAssets(preview.visualKey)
+      .then(() => {
+        if (!this.modelHost) return;
+        deps.mountCharPreview(this.modelHost, skin.requiredClass, preview.skin, preview.visualKey);
+      })
+      .catch((err) => console.error('failed to load Founder skin preview:', err));
   }
 
   showMount(key: MountKey): void {

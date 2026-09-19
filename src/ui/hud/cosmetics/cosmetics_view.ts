@@ -11,6 +11,7 @@
 // body, and account state for the weapon-skin loadout. Each card model says
 // which, so the badge is never inferred in markup.
 
+import { FOUNDER_SKIN_CATALOG } from '../../../sim/content/founder_pack';
 import { MOUNT_SKIN_IDS, MOUNT_SKINS, type MountSkinId } from '../../../sim/content/mount_skins';
 import type { MountRarity } from '../../../sim/content/mounts';
 import { MECH_CHROMAS } from '../../../sim/content/skins';
@@ -20,13 +21,13 @@ import {
   WEAPON_SKINS,
   type WeaponSkinRarity,
 } from '../../../sim/content/weapon_skins';
-import type { SkinCatalog, SkinRank, WeaponSkinType } from '../../../sim/types';
+import type { PlayerClass, SkinCatalog, SkinRank, WeaponSkinType } from '../../../sim/types';
 import { type TabStripModel, tabStripModel } from '../../tab_strip_view';
 
 /** Closed on purpose: a future tab (buddies) is a deliberate addition here. */
-export type CosmeticsTab = 'mounts' | 'skins' | 'mech';
+export type CosmeticsTab = 'mounts' | 'skins' | 'mech' | 'founders';
 
-export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech'];
+export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech', 'founders'];
 
 export function isCosmeticsTab(value: string): value is CosmeticsTab {
   return (COSMETICS_TABS as readonly string[]).includes(value);
@@ -47,6 +48,14 @@ export interface CosmeticsSnapshot {
   applicableWeaponTypes: readonly string[];
   mechChromaIds: readonly string[];
   wornMech: { catalog: SkinCatalog; skin: number };
+  /** The account's claimed Founder Pack skins (src/sim/content/founder_pack.ts
+   *  FOUNDER_SKIN_CATALOG ids); `wornMech.catalog` doubles as "which
+   *  replacement body is worn" for these too, since a founder skin rides the
+   *  same skinCatalog field a mech chroma does. */
+  founderSkinIds: readonly string[];
+  /** The acting character's class, so a founder skin owned by the ACCOUNT but
+   *  restricted to a different class shows as owned-but-unwearable here. */
+  playerClass: PlayerClass;
 }
 
 export interface MountSkinCard {
@@ -84,6 +93,19 @@ export interface MechChromaCard {
   rank: SkinRank;
   worn: boolean;
   action: 'wear' | 'takeOff';
+  ownershipScope: CosmeticsScope;
+  wornScope: CosmeticsScope;
+}
+
+export interface FounderSkinCard {
+  catalog: SkinCatalog;
+  requiredClass: PlayerClass;
+  /** False when the account owns this skin but the ACTING character is the
+   *  wrong class for it (account-wide ownership, class-restricted wear). */
+  classMatches: boolean;
+  worn: boolean;
+  /** null: owned but the wrong class for this character (no action fires). */
+  action: 'wear' | 'takeOff' | null;
   ownershipScope: CosmeticsScope;
   wornScope: CosmeticsScope;
 }
@@ -155,6 +177,29 @@ export function mechChromaCards(s: CosmeticsSnapshot): MechChromaCard[] {
   return cards;
 }
 
+/** The OWNED Founder Pack skins (src/sim/content/founder_pack.ts
+ *  FOUNDER_SKIN_CATALOG), in catalog order. A skin the account has not
+ *  claimed never appears here (the Founder Salesman's store is the only
+ *  place to claim one); this tab is purely "what you already unlocked." */
+export function founderSkinCards(s: CosmeticsSnapshot): FounderSkinCard[] {
+  const cards: FounderSkinCard[] = [];
+  for (const def of FOUNDER_SKIN_CATALOG) {
+    if (!s.founderSkinIds.includes(def.catalog)) continue;
+    const classMatches = def.requiredClass === s.playerClass;
+    const worn = s.wornMech.catalog === def.catalog;
+    cards.push({
+      catalog: def.catalog,
+      requiredClass: def.requiredClass,
+      classMatches,
+      worn,
+      action: !classMatches ? null : worn ? 'takeOff' : 'wear',
+      ownershipScope: 'account',
+      wornScope: 'character',
+    });
+  }
+  return cards;
+}
+
 /** The WAI-ARIA tab strip for the window (labels already localized by the caller). */
 export function cosmeticsTabStrip(
   tab: CosmeticsTab,
@@ -186,5 +231,7 @@ export function cosmeticsSig(s: CosmeticsSnapshot): string {
     s.mechChromaIds,
     s.wornMech.catalog,
     s.wornMech.skin,
+    s.founderSkinIds,
+    s.playerClass,
   ]);
 }

@@ -2714,6 +2714,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
         e.mountSkinId = w.msk ?? null; // worn mount skin cosmetic (render-only, like wsk)
+        e.goldenAuraActive = w.gau === true; // Golden Aura keepsake toggle (render-only, like msk)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         // Worn per-slot instance payloads (masterwork/enchant rolls), for the
         // inspect window (terse `eqi`, sparse like `eq`: an absent key on a

@@ -882,6 +882,10 @@ export function useItem(
     ctx.openSkinSelect(meta, def.use.catalog ?? 'class', itemId);
     return;
   }
+  if (def.use?.type === 'toggleGoldenAura') {
+    ctx.toggleGoldenAura(meta);
+    return;
+  }
   // The Field Kit (Intentional Gathering, PR3): a reusable settings tool that
   // opens the shared harvest-preference picker. Placed beside skinSelect,
   // ahead of the busy/dead gates below, on purpose: it is a settings action,

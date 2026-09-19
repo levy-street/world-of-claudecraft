@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { FOUNDER_SKIN_CATALOG } from '../src/sim/content/founder_pack';
 import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
 import {
@@ -6,6 +7,7 @@ import {
   type CosmeticsSnapshot,
   cosmeticsSig,
   cosmeticsTabStrip,
+  founderSkinCards,
   isCosmeticsTab,
   mechChromaCards,
   mountSkinCards,
@@ -22,19 +24,27 @@ const snap = (over: Partial<CosmeticsSnapshot> = {}): CosmeticsSnapshot => ({
   applicableWeaponTypes: [],
   mechChromaIds: [],
   wornMech: { catalog: 'class', skin: 0 },
+  founderSkinIds: [],
+  playerClass: 'warrior',
   ...over,
 });
 
 describe('cosmetics tabs', () => {
-  it('is the closed three-tab set with a WAI-ARIA strip', () => {
-    expect(COSMETICS_TABS).toEqual(['mounts', 'skins', 'mech']);
+  it('is the closed four-tab set with a WAI-ARIA strip', () => {
+    expect(COSMETICS_TABS).toEqual(['mounts', 'skins', 'mech', 'founders']);
     expect(isCosmeticsTab('mech')).toBe(true);
+    expect(isCosmeticsTab('founders')).toBe(true);
     expect(isCosmeticsTab('buddies')).toBe(false);
-    const strip = cosmeticsTabStrip('skins', { mounts: 'M', skins: 'S', mech: 'X' }, 'Sections');
+    const strip = cosmeticsTabStrip(
+      'skins',
+      { mounts: 'M', skins: 'S', mech: 'X', founders: 'F' },
+      'Sections',
+    );
     expect(strip.tabs.map((t) => [t.id, t.label, t.selected])).toEqual([
       ['mounts', 'M', false],
       ['skins', 'S', true],
       ['mech', 'X', false],
+      ['founders', 'F', false],
     ]);
     expect(strip.panelId).toBe('cosmetics-panel');
     expect(strip.tabClass).toBe('cos-tab');
@@ -129,6 +139,48 @@ describe('mech chroma cards', () => {
   });
 });
 
+describe('founder skin cards', () => {
+  it('lists only the owned skins, in catalog order', () => {
+    const cards = founderSkinCards(
+      snap({ founderSkinIds: ['bonehunter', 'altherion'], playerClass: 'priest' }),
+    );
+    // FOUNDER_SKIN_CATALOG order (altherion before bonehunter), not claim order.
+    expect(cards.map((c) => c.catalog)).toEqual(['altherion', 'bonehunter']);
+    expect(cards).toHaveLength(2);
+    expect(cards.length).toBeLessThan(FOUNDER_SKIN_CATALOG.length);
+  });
+
+  it('offers Wear for an owned, class-matched skin and Take off on the worn one', () => {
+    const cards = founderSkinCards(
+      snap({
+        founderSkinIds: ['altherion'],
+        playerClass: 'priest',
+        wornMech: { catalog: 'altherion', skin: 0 },
+      }),
+    );
+    expect(cards[0]).toMatchObject({
+      requiredClass: 'priest',
+      classMatches: true,
+      worn: true,
+      action: 'takeOff',
+      ownershipScope: 'account',
+      wornScope: 'character',
+    });
+  });
+
+  it('shows an owned but wrong-class skin with no action', () => {
+    const cards = founderSkinCards(snap({ founderSkinIds: ['altherion'], playerClass: 'warrior' }));
+    expect(cards[0]).toMatchObject({ classMatches: false, worn: false, action: null });
+  });
+
+  it('never reports a worn founder skin the account does not own', () => {
+    const cards = founderSkinCards(
+      snap({ founderSkinIds: [], wornMech: { catalog: 'altherion', skin: 0 } }),
+    );
+    expect(cards).toEqual([]);
+  });
+});
+
 describe('cosmeticsSig', () => {
   it('changes on every input the cards read and only on those', () => {
     const base = snap();
@@ -139,5 +191,7 @@ describe('cosmeticsSig', () => {
     expect(cosmeticsSig(snap({ wornMech: { catalog: 'mech', skin: 0 } }))).not.toBe(
       cosmeticsSig(base),
     );
+    expect(cosmeticsSig(snap({ founderSkinIds: ['altherion'] }))).not.toBe(cosmeticsSig(base));
+    expect(cosmeticsSig(snap({ playerClass: 'mage' }))).not.toBe(cosmeticsSig(base));
   });
 });

@@ -5159,6 +5159,7 @@ export const it_IT: EnTranslations = {
       "tabMounts": "Cavalcature",
       "tabSkins": "Skin",
       "tabMech": "Mecha",
+      "tabFounders": "Founders",
       "legend": "Account: condiviso da ogni personaggio. Personaggio: solo questo personaggio.",
       "scopeAccount": "Account condiviso",
       "scopeCharacter": "Personaggio",
@@ -5178,7 +5179,9 @@ export const it_IT: EnTranslations = {
       "skinsEmpty": "Nessuna skin per armi posseduta. Visita il Negozio WOC.",
       "skinsApplyHint": "Equipaggia un {type} per applicare questa skin.",
       "mechIntro": "Il Mecha da combattimento sostituisce il corpo del personaggio. Si indossa una cromia alla volta.",
-      "mechEmpty": "Nessuna cromia del Mecha da combattimento posseduta."
+      "mechEmpty": "Nessuna cromia del Mecha da combattimento posseduta.",
+      "foundersIntro": "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
+      "foundersEmpty": "No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook."
     },
     "reliquary": {
       "title": "Il Reliquiario",

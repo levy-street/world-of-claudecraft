@@ -55,6 +55,12 @@ export interface CosmeticsWindowDeps {
    *  host with no store window (a harness) gets an inert Preview and an
    *  unguarded close path rather than a throw. The Hud always has one. */
   store(): CosmeticsPreviewHost | null;
+  /** Kick the lazy GLB fetch for every claimed Founder skin's replacement
+   *  body, so the Founders tab's portrait chips (lazyPreload assets) have
+   *  something to render instead of sitting on the class-crest placeholder
+   *  forever. Fire-and-forget: the shared portrait-update hook repaints any
+   *  open chip once each fetch resolves (portrait_chip.ts onPortraitUpdate). */
+  preloadFounderSkinThumbnails(): void;
 }
 
 export interface CosmeticsPreviewHost {
@@ -82,6 +88,7 @@ export class CosmeticsWindow {
 
   open(tab?: CosmeticsTab): void {
     if (tab) this.tab = tab;
+    this.deps.preloadFounderSkinThumbnails();
     if (this.isOpen) {
       this.render();
       return;
@@ -140,6 +147,8 @@ export class CosmeticsWindow {
         : [],
       mechChromaIds: c.mechChromaIds,
       wornMech: { catalog: p?.skinCatalog ?? 'class', skin: p?.skin ?? 0 },
+      founderSkinIds: c.founderSkinIds ?? [],
+      playerClass: w.cfg.playerClass,
     };
   }
 
@@ -161,6 +170,7 @@ export class CosmeticsWindow {
         mounts: t('hudChrome.cosmetics.tabMounts'),
         skins: t('hudChrome.cosmetics.tabSkins'),
         mech: t('hudChrome.cosmetics.tabMech'),
+        founders: t('hudChrome.cosmetics.tabFounders'),
       },
       t('hudChrome.cosmetics.tabsLabel'),
     );
@@ -240,6 +250,12 @@ export class CosmeticsWindow {
         break;
       case 'takeoff-mech':
         w.unequipMechChroma(action.id);
+        break;
+      case 'wear-founder-skin':
+        w.changeSkin(0, action.catalog);
+        break;
+      case 'takeoff-founder-skin':
+        w.changeSkin(0, 'class');
         break;
     }
     audio.click();
