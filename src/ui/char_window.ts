@@ -30,6 +30,7 @@ import {
   type PaperdollSlot,
 } from './char_view';
 import { currencyIconHtml } from './currency_art';
+import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
@@ -219,6 +220,17 @@ const SHARE_GLYPH =
 export class CharWindow {
   private openerFocus: HTMLElement | null = null;
   private sidebarTab: CharacterSidebarTab = 'stats';
+  // True while a native drag started on one of this window's own equipped-item
+  // rows (dragging a piece off the paperdoll to unequip it) is in flight. A
+  // browser never fires dragend on a source element that has already left the
+  // document, so render()'s innerHTML rebuild (routine here: the 2 Hz staleness
+  // latch repaints an open sheet within 500ms of a loot, deed, or mount gain)
+  // must defer while one of these rows is the live drag source, or the row is
+  // destroyed before its own dragend fires and the shared drag state it feeds
+  // gets stuck for the rest of the session (see deferred_drag_render.ts;
+  // bags_window.ts hit this hazard first, for bag-item drags).
+  private unequipDragActive = false;
+  private readonly dragRenderGate = new DeferredDragRender();
 
   constructor(private readonly deps: CharWindowDeps) {
     this.watchComposedPortrait();
@@ -264,6 +276,15 @@ export class CharWindow {
   }
 
   render(): void {
+    // A native drag's source row dies with the rest of the sheet on an innerHTML
+    // rebuild, and a browser never fires dragend on a row that already left the
+    // document: the shared unequip-drag state it feeds would then stay stuck on
+    // the stale drag for the rest of the session, silently failing every later
+    // drop. Defer the rebuild instead of tearing the dragged row out from under
+    // it; the row's own dragend flushes it once the drag actually concludes
+    // (deferred_drag_render.ts; the same hazard bags_window.ts guards against
+    // for bag-item drags).
+    if (this.dragRenderGate.shouldDefer(this.unequipDragActive)) return;
     const el = this.deps.root();
     // The 2 Hz staleness latch (Hud.refreshCharSheetIfChanged) makes mid-focus
     // rebuilds ROUTINE: a loot, a deed earn, or a mount gain repaints the open
@@ -431,6 +452,13 @@ export class CharWindow {
         : undefined;
       restoreFirstEnabled([sameAct, sameTab, el.querySelector<HTMLElement>('[data-close]')]);
     }
+  }
+
+  /** Catch up a rebuild render() deferred (see its own comment) because an
+   *  equipped-item row was mid-drag. Called from that row's own dragend, after
+   *  unequipDragActive has already cleared. */
+  private flushDeferredRender(): void {
+    this.dragRenderGate.flush(() => this.render());
   }
 
   private sidebarHtml(world: IWorld, selected: CharacterSidebarTab): string {
@@ -656,11 +684,16 @@ export class CharWindow {
       // Drag the piece out onto the bags window to unequip it.
       row.draggable = true;
       row.addEventListener('dragstart', (e) => {
+        this.unequipDragActive = true;
         this.deps.beginUnequipDrag(slot);
         if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
         this.deps.hideTooltip();
       });
-      row.addEventListener('dragend', () => this.deps.endUnequipDrag());
+      row.addEventListener('dragend', () => {
+        this.unequipDragActive = false;
+        this.deps.endUnequipDrag();
+        this.flushDeferredRender();
+      });
     } else {
       // Empty slot: still swallow the native menu so right-click feels consistent.
       row.addEventListener('contextmenu', (ev) => ev.preventDefault());
