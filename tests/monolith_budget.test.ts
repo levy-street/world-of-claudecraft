@@ -1271,7 +1271,17 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // 11281 -> 11282 for delve self-motion prediction (issue #3480): the
+    // module-shell + door clamp chain itself lives entirely in
+    // src/sim/delves/geometry.ts (a new pure leaf), and the frame-state
+    // assembly in src/sim/delves/geometry.ts's delveMotionState; main.ts's
+    // own diff is the one import line plus the same shape of wiring the
+    // existing rift prediction args already use (no net growth at either
+    // call site: the rift-floor argument is widened into one bundled
+    // InstancedMotionState object rather than adding a new positional arg).
+    // One line, genuinely irreducible without leaking world-entity-roster
+    // access into the narrow SelfPredictionWire reconciliation interface.
+    ceiling: 11282,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -1,8 +1,9 @@
 import type { InputTickFrame } from '../game/input_tick_sampler';
 import { type MovementWireClient, MovementWireGlue } from '../game/movement_wire_glue';
+import type { DelveMotionState } from '../sim/delves/geometry';
 import { stepPlayerMotion } from '../sim/player_motion';
 import type { Entity, MoveInput } from '../sim/types';
-import { createClientPlayerMotionDeps } from './client_player_motion';
+import { type ClientDelveMotionState, createClientPlayerMotionDeps } from './client_player_motion';
 import {
   copyMotionState,
   type MotionState,
@@ -82,6 +83,7 @@ export class MovementPredictionPipeline {
   private wire: SelfPredictionWire | null = null;
   private self: Entity | null = null;
   private enabled = false;
+  private delve: DelveMotionState = { delveRun: null, delveSolids: [] };
   private predicted: MotionState | null = null;
   private lastEpoch: number | null = null;
   private lastAckClientTick = -1;
@@ -98,6 +100,8 @@ export class MovementPredictionPipeline {
       seed,
       () => this.wire?.reconMoveSpeedMult ?? 1,
       riftCollisionToken,
+      (): ClientDelveMotionState | null =>
+        this.delve.delveRun ? { run: this.delve.delveRun, solids: this.delve.delveSolids } : null,
     );
     this.stepFn = (state, frame) => stepPlayerMotion(deps, state as Entity, frame.mi);
     this.wireGlue.onFrame = (frame) => this.predictFrame(frame);
@@ -116,10 +120,16 @@ export class MovementPredictionPipeline {
     this.wireGlue.resume();
   }
 
-  prepare(client: SelfPredictionWire, self: Entity, enabled: boolean): void {
+  prepare(
+    client: SelfPredictionWire,
+    self: Entity,
+    enabled: boolean,
+    delve: DelveMotionState = { delveRun: null, delveSolids: [] },
+  ): void {
     this.wire = client;
     this.self = self;
     this.enabled = enabled;
+    this.delve = delve;
   }
 
   advance(

@@ -397,6 +397,7 @@ import {
   setActiveWorldContent,
   ZONES,
 } from './sim/data';
+import { delveMotionState, instancedMotionState } from './sim/delves/geometry';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
@@ -4562,7 +4563,7 @@ async function startGame(
     selfMotionGateArgs.riftFloor = net.riftFloor;
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
-    movementPrediction.prepare(net, pe, selfPredictionEnabled);
+    movementPrediction.prepare(net, pe, selfPredictionEnabled, delveMotionState(net));
     const movementFrameEmitted = sendOnlineMovementFrame(
       net,
       movementPrediction,
@@ -4659,7 +4660,7 @@ async function startGame(
               frameDt,
               Math.max(0, cameraLastSnapAge),
               net.snapInterval,
-              net.riftFloor,
+              instancedMotionState(net.riftFloor, delveMotionState(net)),
             );
     traceStart = perf.startTrace();
     try {
