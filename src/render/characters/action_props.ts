@@ -48,6 +48,7 @@ export class ActionProps {
     if (!melee && !EMPTY_HANDS.has(id) && id !== 'blind' && id !== 'shrapnel_charge') return;
     this.model.traverse((node) => {
       if (!node.userData.heldPropHolder || node === this.blade) return;
+      if (id === 'storm_bolt' && node.userData.heldSlot !== 0) return;
       if ((id === 'blind' || id === 'shrapnel_charge') && node.userData.heldSlot !== 1) return;
       this.hidden.set(node, node.visible);
       node.visible = false;

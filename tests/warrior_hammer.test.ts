@@ -105,7 +105,7 @@ function makeContactHost(casterX = 0, targetX = 5) {
   };
 }
 
-// ── warriorHammerCel ─────────────────────────────────────────────────────────
+// â”€â”€ warriorHammerCel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 it('warriorHammerCel cycles through 8 cels at 24 fps and freezes at cel 0 under reduced motion', () => {
   for (let cel = 0; cel < 8; cel++) {
@@ -116,14 +116,14 @@ it('warriorHammerCel cycles through 8 cels at 24 fps and freezes at cel 0 under 
   expect(warriorHammerCel(5, true)).toBe(0);
 });
 
-// ── launchWarriorHammer + trail flight ───────────────────────────────────────
+// â”€â”€ launchWarriorHammer + trail flight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 it('hammer trail head advances at 26 yards per second', () => {
   const { textures, texture } = fakeTextures();
   const ribbons = new AbilityVfxRibbons(new THREE.Scene(), fixedAnchor(0, 26), textures);
   launchWarriorHammer(launchHost(), ribbons, CASTER, TARGET, 0);
 
-  // 26 yd/s × 0.5 s = 13 yd
+  // 26 yd/s Ã— 0.5 s = 13 yd
   ribbons.update(0.5, CAM);
 
   const xs: number[] = [];
@@ -142,7 +142,7 @@ it('drawHeads emits hammer atlas cells and never the glow cell', () => {
   ribbons.update(0.1, CAM);
 
   const cells: number[] = [];
-  // time = 3/24 s → warriorHammerCel(3/24, false) = 3 → emits hammer0 + 3
+  // time = 3/24 s â†’ warriorHammerCel(3/24, false) = 3 â†’ emits hammer0 + 3
   ribbons.drawHeads(3 / 24, (_x, _y, _z, _c, _s, cell) => cells.push(cell));
 
   expect(cells).toHaveLength(1);
@@ -189,12 +189,12 @@ it('reduced motion freezes tumble at cel 0 while flight still advances', () => {
 
   ribbons.update(0.3, CAM, true /* reducedMotion */);
 
-  // With reducedMotion=true, warriorHammerCel(3/24, true) = 0 → cel = hammer0 exactly
+  // With reducedMotion=true, warriorHammerCel(3/24, true) = 0 â†’ cel = hammer0 exactly
   const seen: { x: number; cell: number }[] = [];
   ribbons.drawHeads(3 / 24, (x, _y, _z, _c, _s, cell) => seen.push({ x, cell }), true);
 
   expect(seen).toHaveLength(1);
-  expect(seen[0].x).toBeGreaterThan(0); // flight advanced: 26 yd/s × 0.3 s ≈ 7.8 yd
+  expect(seen[0].x).toBeGreaterThan(0); // flight advanced: 26 yd/s Ã— 0.3 s â‰ˆ 7.8 yd
   expect(seen[0].cell).toBe(OVERLAY_CELL.hammer0); // tumble frozen at cel 0
 
   // Without reducedMotion the same time produces cel 3
@@ -229,7 +229,7 @@ it('missing target terminates flight without triggering arrival effects', () => 
 
 it('arrival fires no predicted damage callback', () => {
   const { textures, texture } = fakeTextures();
-  // Target 0.3 yd away: first update step (26 × 0.2 = 5.2 yd) exceeds distance → arrives
+  // Target 0.3 yd away: first update step (26 Ã— 0.2 = 5.2 yd) exceeds distance â†’ arrives
   const ribbons = new AbilityVfxRibbons(new THREE.Scene(), fixedAnchor(0, 0.3), textures);
   const audio = vi.fn();
   launchWarriorHammer(launchHost(audio), ribbons, CASTER, TARGET, 0);
@@ -250,7 +250,7 @@ it('arrival fires no predicted damage callback', () => {
   texture.dispose();
 });
 
-// ── drawWarriorHammerContact ─────────────────────────────────────────────────
+// â”€â”€ drawWarriorHammerContact â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 it('outcome zero creates no contact flash or collision VFX', () => {
   const {
@@ -313,7 +313,7 @@ it.each([0, 1])(
       CASTER,
       TARGET,
       'physical-crush',
-      0.95,
+      1.3,
       'storm_bolt',
       0,
     );
@@ -327,15 +327,15 @@ it.each([0, 1])(
       expect(flash[i]).toBeCloseTo(coordinate);
     });
     expect(flash[5]).toBe('contact_crush');
-    expect(flash[3]).toBe(7.6);
+    expect(flash[3]).toBe(10.2);
     expect(flash[7]).toBe(0.085);
     expect(bakedAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
-    expect(bakedAt.mock.calls[0][4]).toBe(7.8);
+    expect(bakedAt.mock.calls[0][4]).toBe(12.4);
     expect(fragmentsAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
     expect(fragmentsAt.mock.calls[0][5]).toBe(tier === 0 ? 14 : 6);
     expect(abilityAudio).toHaveBeenCalledTimes(1);
     expect(abilityAudio.mock.calls[0].slice(3, 6)).toEqual(flash.slice(0, 3));
-    expect(shakeAt).toHaveBeenCalledExactlyOnceWith(...flash.slice(0, 3), 0.12, true);
+    expect(shakeAt).toHaveBeenCalledExactlyOnceWith(...flash.slice(0, 3), 0.2, true);
     expect(burstAt.mock.calls.every((call) => call[6] === 'sparks')).toBe(true);
     for (const burst of burstAt.mock.calls) expect(burst.slice(0, 3)).toEqual(flash.slice(0, 3));
     const creases = pathRibbon.mock.calls;
@@ -401,6 +401,72 @@ it('a missing source view cancels a flying hammer before reaching a live target'
   const sink = vi.fn();
   ribbons.drawHeads(0, sink);
   expect(sink).not.toHaveBeenCalled();
+  ribbons.dispose();
+  texture.dispose();
+});
+
+it('holds the spirit hammer at the animated hand before releasing it on the original arrival schedule', () => {
+  const { textures, texture } = fakeTextures();
+  const hand = new THREE.Vector3(0.5, 2, 0);
+  const ribbons = new AbilityVfxRibbons(
+    new THREE.Scene(),
+    fixedAnchor(0, 26),
+    textures,
+    (_id, out) => {
+      out.copy(hand);
+      return true;
+    },
+  );
+  launchWarriorHammer(launchHost(), ribbons, CASTER, TARGET, 0);
+  const solid = vi.fn((..._args: [number, number, number, number, number, number]) => true),
+    sprite = vi.fn();
+  ribbons.update(0.08, CAM);
+  ribbons.drawHeads(0.08, sprite, false, solid);
+  expect(solid).toHaveBeenCalledTimes(1);
+  expect(solid.mock.calls[0][0]).toBeCloseTo(hand.x);
+  expect(solid.mock.calls[0][5]).toBe(0);
+  hand.x = 1;
+  solid.mockClear();
+  ribbons.update(0.05, CAM);
+  ribbons.drawHeads(0.13, sprite, false, solid);
+  expect(solid.mock.calls[0][0]).toBeCloseTo(1);
+  solid.mockClear();
+  ribbons.update(0.12, CAM);
+  ribbons.drawHeads(0.25, sprite, false, solid);
+  expect(solid.mock.calls[0][0]).toBeGreaterThan(1);
+  expect(solid.mock.calls[0][5]).toBeCloseTo(0.11);
+  ribbons.update(0.76, CAM);
+  solid.mockClear();
+  ribbons.drawHeads(1.01, sprite, false, solid);
+  expect(solid).not.toHaveBeenCalled();
+  ribbons.dispose();
+  texture.dispose();
+});
+
+it('keeps homing after the original flight duration when a target retreats', () => {
+  const { textures, texture } = fakeTextures();
+  let target = 26;
+  const anchor = (id: number, _fraction: number, out?: THREE.Vector3) =>
+    (out ?? new THREE.Vector3()).set(id === CASTER ? 0 : target, 1, 0);
+  const ribbons = new AbilityVfxRibbons(new THREE.Scene(), anchor, textures, (_id, out) => {
+    out.set(0, 1 - 2.1 * (70 / 64) * 0.38, 0);
+    return true;
+  });
+  launchWarriorHammer(launchHost(), ribbons, CASTER, TARGET, 0);
+  for (let frame = 0; frame < 60; frame++) {
+    target += 0.1;
+    ribbons.update(1 / 60, CAM);
+  }
+  const seen: number[] = [];
+  ribbons.drawHeads(1, (x) => seen.push(x));
+  expect(seen).toHaveLength(1);
+  expect(seen[0]).toBeCloseTo(26, 5);
+  expect(target - seen[0]).toBeGreaterThan(5);
+  const second: number[] = [];
+  target += 0.6;
+  ribbons.update(0.1, CAM);
+  ribbons.drawHeads(1.1, (x) => second.push(x));
+  expect(second[0] - seen[0]).toBeCloseTo(2.6, 5);
   ribbons.dispose();
   texture.dispose();
 });

@@ -158,6 +158,8 @@ interface TrailSlot {
   sourceId: number;
   ttl: number;
   flightAge: number;
+  hammerHold: number;
+  hammerDuration: number;
   width: number;
   core: THREE.Color;
   glow: THREE.Color;
@@ -277,6 +279,7 @@ export class AbilityVfxRibbons {
     scene: THREE.Scene,
     private anchor: RibbonAnchor,
     tex: AbilityVfxTextures,
+    private handAnchor?: (id: number, out: THREE.Vector3) => boolean,
   ) {
     this.geo.setAttribute(
       'position',
@@ -360,6 +363,8 @@ export class AbilityVfxRibbons {
         sourceId: 0,
         ttl: 0,
         flightAge: 0,
+        hammerHold: 0,
+        hammerDuration: 0,
         width: 0.2,
         core: new THREE.Color(),
         glow: new THREE.Color(),
@@ -671,6 +676,8 @@ export class AbilityVfxRibbons {
     slot.coils = opts.coils;
     slot.coilPhase = 0;
     slot.flightAge = 0;
+    slot.hammerHold = 0;
+    slot.hammerDuration = 0;
     slot.jagTrail = opts.jagTrail;
     slot.jagTimer = 0;
     slot.forkEvery = opts.forkEvery;
@@ -686,6 +693,13 @@ export class AbilityVfxRibbons {
     if (to) {
       this.s1.copy(to).add(slot.aim).sub(from);
       const dist = this.s1.length();
+      if (slot.style === 'warHammer' && this.handAnchor?.(sourceId, this.s2)) {
+        slot.hammerDuration = dist / slot.speed;
+        slot.hammerHold = Math.min(0.14, slot.hammerDuration * 0.45);
+        slot.head.copy(this.s2);
+        slot.head.y += slot.headSize * 0.38;
+        slot.ring[0].copy(slot.head);
+      }
       if (dist > 1e-6) slot.dir.copy(this.s1).multiplyScalar(1 / dist);
       else slot.dir.set(1, 0, 0);
       slot.ttl = opts.delay + Math.min(10, Math.max(3, dist / slot.speed + 1.5));
@@ -906,10 +920,32 @@ export class AbilityVfxRibbons {
         this.terminateTrail(t);
         continue;
       }
+      const previousAge = t.flightAge;
+      t.flightAge += dt;
+      if (t.style === 'warHammer' && t.hammerHold > 0 && previousAge < t.hammerHold) {
+        if (this.handAnchor?.(t.sourceId, this.s2)) {
+          t.head.copy(this.s2);
+          t.head.y += t.headSize * 0.38;
+          t.ring[0].copy(t.head);
+        }
+        if (t.flightAge < t.hammerHold) continue;
+      }
       this.s1.copy(target).add(t.aim);
       this.t1.subVectors(this.s1, t.head);
       const dist = this.t1.length();
-      const step = t.speed * dt;
+      // Spend part of the existing flight on a visible hand hold, then cover
+      // the distance lost during windup, then homes at ordinary speed. A moving
+      // target can extend the flight; never force arrival at a fixed deadline.
+      const airborne = Math.max(0, t.flightAge - Math.max(previousAge, t.hammerHold));
+      const catchup = Math.min(
+        airborne,
+        Math.max(0, t.hammerDuration - Math.max(previousAge, t.hammerHold)),
+      );
+      const step =
+        t.style === 'warHammer' && t.hammerHold > 0
+          ? t.speed *
+            (airborne + (catchup * t.hammerHold) / Math.max(0.001, t.hammerDuration - t.hammerHold))
+          : t.speed * dt;
       if (dist <= Math.max(0.7, step)) {
         if (t.tracer) this.spawnTracer(t, this.s1.x, this.s1.y, this.s1.z);
         const onArrive = t.onArrive;
@@ -920,7 +956,6 @@ export class AbilityVfxRibbons {
         continue;
       }
       t.dir.copy(this.t1).multiplyScalar(1 / dist);
-      t.flightAge += dt;
       t.head.addScaledVector(t.dir, step);
       if (t.style === 'shadowFang' || t.style === 'essenceLance') this.sampleShadowFang(t);
       else this.appendTrailSample(t, t.head);
@@ -1365,7 +1400,7 @@ export class AbilityVfxRibbons {
               h.z,
               hs,
               Math.atan2(t.dir.x, t.dir.z),
-              t.flightAge,
+              Math.max(0, t.flightAge - t.hammerHold),
               reducedMotion,
             )
           )

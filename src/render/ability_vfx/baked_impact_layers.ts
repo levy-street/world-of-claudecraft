@@ -206,7 +206,12 @@ export class BakedImpactLayers {
     s.active = true;
     s.age = -Math.max(0, delay);
     s.duration = Math.min(3, duration);
-    s.size = Math.min(9, size);
+    // Receiving Warrior impacts are authored above nine yards. Preserve that
+    // hierarchy while keeping the ordinary spell/smoke safety limit intact.
+    s.size = Math.min(
+      kind === 'harvest_impact' || kind === 'warrior_bite' || kind === 'warrior_shear' ? 18 : 9,
+      size,
+    );
     s.ground = kind === 'shockwave';
     s.authored =
       kind === 'pyroblast' ||

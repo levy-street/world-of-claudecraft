@@ -943,6 +943,7 @@ export interface SimContextCallbacks {
       onDealt?: (amount: number) => void;
       onEffectiveDamage?: (amount: number) => void;
       abilityId?: string | null;
+      attackAnimationStarted?: boolean;
     },
   ): boolean;
   effectiveAttackPower(e: Entity): number;

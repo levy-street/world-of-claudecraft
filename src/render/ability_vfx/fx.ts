@@ -743,7 +743,12 @@ export class AbilityVfxFx implements SequencerHost {
     private weaponHand?: (id: number, hand: 0 | 1) => boolean,
   ) {
     const tex = abilityVfxTextures();
-    this.ribbons = new AbilityVfxRibbons(scene, anchor, tex);
+    this.ribbons = new AbilityVfxRibbons(
+      scene,
+      anchor,
+      tex,
+      (id, out) => this.handSample?.(id, 0, out) ?? false,
+    );
     this.water = new RestorativeWaterVolumes(scene);
     this.details = new SignatureDetails(scene);
     this.forms = new ElementalForms(scene);

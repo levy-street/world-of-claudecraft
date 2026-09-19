@@ -58,7 +58,8 @@ it('keeps the native control poses and timing through actual clip preparation', 
     const prepared = clips.get(`Signature_${id}`);
     expect(source, id).toBeDefined();
     expect(prepared, id).toBeDefined();
-    expect(source!.duration).toBeLessThan(0.7);
+    if (id === 'storm_bolt') expect(source!.duration).toBeCloseTo(0.82, 6);
+    else expect(source!.duration).toBeLessThan(0.7);
     expect(prepared!.duration).toBe(source!.duration);
     expect(prepared!.tracks.map((track) => [track.name, track.times, track.values])).toEqual(
       source!.tracks.map((track) => [track.name, track.times, track.values]),

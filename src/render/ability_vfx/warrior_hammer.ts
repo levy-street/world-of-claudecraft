@@ -73,7 +73,7 @@ export function drawWarriorHammerContact(
       at,
       0.68,
       direction,
-      7.6,
+      10.2,
       tier,
       impact,
       0.085,
@@ -85,10 +85,10 @@ export function drawWarriorHammerContact(
         impact.x,
         impact.y,
         impact.z,
-        7.8,
+        12.4,
         0x8ed7ef,
         0xe4f7ff,
-        0.24,
+        0.34,
         0,
         0,
         direction,
@@ -111,8 +111,8 @@ export function drawWarriorHammerContact(
       dz,
       0.24,
     );
-    host.contact?.(casterId, targetId, 'physical-crush', 0.95, 'storm_bolt', 0);
-    host.shakeAt(impact.x, impact.y, impact.z, 0.12, true);
+    host.contact?.(casterId, targetId, 'physical-crush', 1.3, 'storm_bolt', 0);
+    host.shakeAt(impact.x, impact.y, impact.z, 0.2, true);
     primitives++;
   } else host.flipbookAt(at.x, at.y, at.z, 3.1, 0xd2e6f5, 'contact_crush', 1.35, 0.12);
   if (tier === 0)

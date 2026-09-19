@@ -1,6 +1,7 @@
 import {
   claimFuryAudio,
   clearFuryAudioClaim,
+  FURY_AUDIO,
   isMeleeAudioId,
   WARRIOR_GUARD_AUDIO,
   WARRIOR_POWER_AUDIO,
@@ -13,6 +14,7 @@ import { isBleedContinuation, meleeImpactProfile } from '../melee_impact_core';
 import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
 import { warriorReadinessBit } from '../warrior_readiness_core';
+import { HarvestDetonations } from './harvest_detonation';
 import { SIGNATURE_ABILITIES } from './signature_core';
 import {
   drawWarriorAreaContact,
@@ -472,6 +474,7 @@ export class AbilityVfx {
   private semanticFrame = 0;
   private petClaps = new HunterClapContacts();
   private petContact = new HunterPetContact();
+  private readonly harvestDetonations = new HarvestDetonations();
 
   /** A preview take can replace its world while keeping warmed primitives. */
   resetPresentation(): void {
@@ -484,6 +487,7 @@ export class AbilityVfx {
     this.gestureAt.clear();
     this.semanticFrame = 0;
     this.petClaps.reset();
+    this.harvestDetonations.clear();
     this.spawned = 0;
   }
 
@@ -591,6 +595,31 @@ export class AbilityVfx {
     const originalEvent = ev;
     const ability = ev.ability;
     if (!ability) return false;
+    if (
+      ability === 'red_harvest' &&
+      ev.fx === 'selfCast' &&
+      (this.deps.visualVariantOf?.(ability, ev.sourceId) ?? ability) === ability
+    ) {
+      const full = abilityVfxFullSpecFor(ability);
+      if (!full) return false;
+      // Network catch-up may deliver a second cast before the next frame.
+      this.harvestDetonations.flush(this.deps.fx, ev.sourceId);
+      this.releaseGesture(ev.sourceId, ability);
+      // Keep the approved opening. Zero component outcomes mean that blade
+      // gathering/trails play, but no wound or false hit is predicted.
+      this.deps.fx.sequenceInstant(
+        ability,
+        full,
+        ev.sourceId,
+        ev.targetId,
+        0xa91d3b,
+        Math.min(1, this.castTier(ev.sourceId, ability)),
+        0,
+        0,
+      );
+      return true;
+    }
+
     if (ability === 'bloodhook' && ev.fx === 'dotApply') {
       // A primary successful arrival, including refreshed wounds, owns this
       // cue. Snapshot timing, periodic ticks and splash wounds cannot fake it.
@@ -1283,7 +1312,7 @@ export class AbilityVfx {
       this.releaseGesture(ev.sourceId, ev.abilityId);
     if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'heroic_leap') {
       const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
-      const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+      const outcome = ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0;
       return drawWarriorAreaContact(
         this.deps.fx,
         'heroic_leap',
@@ -1297,7 +1326,7 @@ export class AbilityVfx {
     if ((ev.abilityId ?? attackAbilityId(ev.ability)) === 'storm_bolt') {
       this.deps.fx.cancelWarriorHammer(ev.sourceId, ev.targetId);
       const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
-      const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+      const outcome = ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0;
       const hammerAudio =
         outcome === 1 &&
         !!this.deps.audioReady?.(WARRIOR_CONTROL_AUDIO.storm_bolt.impacts[0]) &&
@@ -1314,6 +1343,30 @@ export class AbilityVfx {
       );
     }
     const compoundId = attackAbilityId(ev.ability);
+    if (
+      compoundId === 'red_harvest' &&
+      (this.deps.visualVariantOf?.(compoundId, ev.sourceId) ?? compoundId) === compoundId
+    ) {
+      clearFuryAudioClaim(ev);
+      const full = abilityVfxFullSpecFor(compoundId);
+      if (!full) return false;
+      const outcome = ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0;
+      const audioAnchor = this.deps.anchor(ev.targetId, 0.55);
+      const audio =
+        !!audioAnchor && (this.deps.audioReady?.(FURY_AUDIO.red_harvest.impacts[2]) ?? false);
+      const admitted = this.harvestDetonations.record(
+        ev.sourceId,
+        ev.targetId,
+        outcome,
+        Math.min(1, this.castTier(ev.sourceId, compoundId)),
+        full,
+        audio,
+        audioAnchor,
+      );
+      if (admitted && audio) claimFuryAudio(ev);
+      return admitted;
+    }
+
     if (compoundId === 'bladestorm' || isWarriorAreaInstant(compoundId)) {
       if (
         isMeleeAudioId(compoundId) &&
@@ -1321,7 +1374,7 @@ export class AbilityVfx {
       )
         claimFuryAudio(ev);
       const tier = this.biasFor(ev.sourceId, this.budget.peek(ev.sourceId, this.now()));
-      const outcome = ev.kind === 'hit' ? (ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0) : 0;
+      const outcome = ev.amount > 0 ? 1 : (ev.absorbed ?? 0) > 0 ? 2 : 0;
       if (compoundId && isWarriorAreaInstant(compoundId)) {
         if (!outcome) return true;
         const full = abilityVfxFullSpecFor(compoundId);
@@ -2024,6 +2077,7 @@ export class AbilityVfx {
 
   // Advances the primitive engine (ribbons, rings, decals, orbit/windup draw).
   update(dt: number, reducedMotion = false): void {
+    this.harvestDetonations.flush(this.deps.fx);
     this.deps.fx.update(dt, reducedMotion);
     for (const [entityId, held] of this.heldSemantic) {
       if (held.frameSeen !== this.semanticFrame) this.heldSemantic.delete(entityId);

@@ -42,7 +42,7 @@ export function warriorSteelContact(
     x - dx * 0.24,
     y,
     z - dz * 0.24,
-    size * 0.56,
+    size * 0.72,
     0xe9f3f8,
     'contact_cut',
     heavy ? 1.7 : 1.35,
@@ -57,8 +57,8 @@ export function warriorSteelContact(
       x - dx * 0.28,
       y,
       z - dz * 0.28,
-      size,
-      0xffffff,
+      size * (heavy ? 1.65 : 1.4),
+      0xd9e7ef,
       0xe3eff7,
       duration,
       0,
@@ -72,7 +72,7 @@ export function warriorSteelContact(
   else {
     // A rejected atlas must not remove the large receiving response. This
     // replaces its slot with a broken cold-steel discharge, not another hit.
-    const span = size * aspect * 0.7;
+    const span = size * aspect * (heavy ? 1.15 : 0.98);
     if (
       host.pathRibbon(
         0xaebdc6,

@@ -97,7 +97,7 @@ function setup() {
 }
 
 it.each([
-  ['storm_bolt', 0.02],
+  ['storm_bolt', 0.03],
   ['avatar', 0.05],
   ['sweeping_strikes', 0.05],
 ] as const)(

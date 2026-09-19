@@ -218,6 +218,7 @@ import {
   tickUnbrokenRitual,
 } from './warlock_talents';
 import { hasUmbralAnchor, UMBRAL_ANCHOR_ID, umbralAnchorCastError } from './warlock_utility';
+import { scheduleRedHarvest } from './warrior_harvest';
 
 export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'recklessness',
@@ -2899,7 +2900,8 @@ function applyAbility(
   if (instantResisted) {
     restoreStormcastReservation(ctx, p, stormcastReservation);
   } else {
-    ctx.runEffects(p, meta, target, res);
+    if (ability.id === 'red_harvest') scheduleRedHarvest(ctx, p, meta, target, res);
+    else ctx.runEffects(p, meta, target, res);
     completeStormcastReservation(ctx, p, stormcastReservation);
   }
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a

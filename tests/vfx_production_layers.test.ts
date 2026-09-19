@@ -376,3 +376,30 @@ it('plays the dust sprite frames while moving out across sampled ground, then ho
   expect(floor).toHaveBeenCalledTimes(samples);
   pool.dispose();
 });
+
+it('preserves the authored size of large Warrior hits without lifting unrelated spell limits or pool capacity', () => {
+  const scene = new THREE.Scene(),
+    pool = new BakedImpactLayers(scene, () => true);
+  const original = meshes(scene).slice();
+  for (const [kind, requested, expected] of [
+    ['harvest_impact', 14.5, 14.5],
+    ['warrior_shear', 12.4, 12.4],
+    ['harvest_impact', 100, 18],
+    ['smoke', 100, 9],
+  ] as const) {
+    pool.clear();
+    expect(pool.spawn(kind, 1, 2, 3, requested, 0xffffff, 0xffffff, 0.3, 0, 0, 0)).toBe(true);
+    pool.update(0.05, new THREE.Quaternion(), false);
+    const visible = meshes(scene).filter((m) => m.visible);
+    expect(visible).toHaveLength(1);
+    expect(visible[0].scale.y).toBe(expected);
+  }
+  pool.clear();
+  for (let i = 0; i < 10; i++)
+    expect(pool.spawn('harvest_impact', 1, 2, 3, 14.5, 0xffffff, 0xffffff, 0.3, 0, 0, 0)).toBe(
+      true,
+    );
+  expect(pool.spawn('harvest_impact', 1, 2, 3, 14.5, 0xffffff, 0xffffff, 0.3, 0, 0, 0)).toBe(false);
+  expect(meshes(scene)).toEqual(original);
+  pool.dispose();
+});

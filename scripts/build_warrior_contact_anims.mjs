@@ -12,11 +12,13 @@ import {
   stripToAnimationsOnly,
 } from './anim/pose_blend.mjs';
 import { warriorControlPerformances } from './anim/warrior_control_poses.mjs';
+import { warriorMotionWeight } from './anim/warrior_motion_phasing.mjs';
 import { warriorReadinessPerformances } from './anim/warrior_readiness_poses.mjs';
 import { warriorReaverPerformance } from './anim/warrior_reaver_pose.mjs';
 import { warriorSpinPerformance } from './anim/warrior_spin_poses.mjs';
 import { warriorStompLift } from './anim/warrior_stomp_footwork.mjs';
 import { warriorVoicePerformances } from './anim/warrior_voice_poses.mjs';
+import { createWarriorWeaponClearance } from './anim/warrior_weapon_clearance.mjs';
 
 const io = await createGlbIO();
 const doc = await io.read('public/models/chars/players/knight.glb');
@@ -760,6 +762,13 @@ performances.push(...warriorControlPerformances(idle, bladePose, openAvatarArms)
 performances.push(...warriorReadinessPerformances(idle, bladePose, openAvatarArms));
 performances.push(warriorReaverPerformance(idle, bladePose));
 performances.push(...warriorVoicePerformances(idle, bladePose, openAvatarArms));
+const weaponClearance = await createWarriorWeaponClearance(
+  io,
+  rig,
+  bones,
+  applyPose,
+  setWorldRotation,
+);
 const clips = [],
   reports = [];
 for (const [name, beats] of performances) {
@@ -786,9 +795,18 @@ for (const [name, beats] of performances) {
     const steps = Math.max(2, Math.ceil((end - start) * samplingRate));
     for (let step = 1; step <= steps; step++) {
       const t = step / steps;
-      const weight = end === 0.15 ? t * t : t * t * (3 - 2 * t);
       let pose = plantFeet(
-        new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
+        new Map(
+          keys.map((key) => [
+            key,
+            blendValue(
+              key,
+              from.get(key),
+              to.get(key),
+              warriorMotionWeight(name, key, start, end, t),
+            ),
+          ]),
+        ),
         name,
         start + (end - start) * t,
       );
@@ -830,7 +848,9 @@ for (const [name, beats] of performances) {
           throw new Error(`${name} at ${time}s: ${error.message}`, { cause: error });
         }
       }
-      timeline.push([start + (end - start) * t, (key) => pose.get(key)]);
+      const sampleTime = start + (end - start) * t;
+      pose = weaponClearance.correct(pose, name, sampleTime, beats.at(-1)[0]);
+      timeline.push([sampleTime, (key) => pose.get(key)]);
     }
   }
   clips.push(
@@ -858,6 +878,7 @@ const report = {
   channels: keys.length,
   maxFootError,
   maxGripError,
+  weaponClearance: weaponClearance.report,
 };
 await writeFile(
   'tmp/warrior-contact-authoring/report.json',

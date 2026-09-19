@@ -1,3 +1,4 @@
+import { drainDelayedEvents } from '../src/sim/entity_roster';
 // Cleaving Blows (Fury passive): casting Red Harvest refunds one stored charge
 // of Twinstrike (raging_gale) on the abilityCharges recharge model. The refund
 // re-opens an empty pool (the empty-pool cooldown mirror goes) but never
@@ -53,6 +54,8 @@ describe('Cleaving Blows (Fury): Red Harvest refunds a charge of Twinstrike', ()
     p.resource = 100;
     p.gcdRemaining = 0;
     sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx);
     expect(p.abilityCharges?.raging_gale?.charges).toBe(2); // refunded to full
     expect(p.abilityCharges?.raging_gale?.recharge).toBe(0); // full pool: timer cleared
     expect(p.abilityCharges?.raging_gale?.recharges).toEqual([]); // no orphaned timer
@@ -70,7 +73,9 @@ describe('Cleaving Blows (Fury): Red Harvest refunds a charge of Twinstrike', ()
     sim.castAbility('raging_gale');
     p.resource = 100;
     p.gcdRemaining = 0;
-    sim.castAbility('red_harvest'); // refund back to full
+    sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx); // refund back to full
     p.gcdRemaining = 0;
     sim.castAbility('raging_gale'); // spend again: exactly ONE timer may run
     expect(p.abilityCharges?.raging_gale?.charges).toBe(1);
@@ -88,6 +93,8 @@ describe('Cleaving Blows (Fury): Red Harvest refunds a charge of Twinstrike', ()
     p.resource = 100;
     p.gcdRemaining = 0;
     sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx);
     expect(p.abilityCharges?.raging_gale?.charges).toBe(1);
     expect(p.abilityCharges?.raging_gale?.recharge).toBe(8); // second use still recharging
     expect(p.abilityCharges?.raging_gale?.recharges).toEqual([8]); // refunded charge gave back ITS timer
@@ -106,6 +113,8 @@ describe('Cleaving Blows (Fury): Red Harvest refunds a charge of Twinstrike', ()
     p.resource = 100;
     p.gcdRemaining = 0;
     sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx);
     expect(p.abilityCharges?.raging_gale?.charges).toBe(1);
     expect(p.abilityCharges?.raging_gale?.recharge).toBe(5); // still running
   });
@@ -121,6 +130,8 @@ describe('Cleaving Blows (Fury): Red Harvest refunds a charge of Twinstrike', ()
     p.resource = 100;
     p.gcdRemaining = 0;
     sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx);
     expect(p.abilityCharges?.raging_gale?.charges).toBe(1); // no refund
   });
 
@@ -130,11 +141,15 @@ describe('Cleaving Blows (Fury): Red Harvest refunds a charge of Twinstrike', ()
     sim.castAbility('raging_gale');
     p.resource = 100;
     p.gcdRemaining = 0;
-    sim.castAbility('red_harvest'); // back to full
+    sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx); // back to full
     expect(p.abilityCharges?.raging_gale?.charges).toBe(2);
     p.resource = 100;
     p.gcdRemaining = 0;
-    sim.castAbility('red_harvest'); // full pool: nothing to refund
+    sim.castAbility('red_harvest');
+    sim.time += 0.5;
+    drainDelayedEvents(sim.ctx); // full pool: nothing to refund
     expect(p.abilityCharges?.raging_gale?.charges).toBe(2);
   });
 });

@@ -1,3 +1,4 @@
+import { FURY_AUDIO } from '../../fury_audio_core';
 import { MELEE_RANGE } from '../../sim/types';
 import { warriorControlReleaseSample } from '../../warrior_control_audio';
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
@@ -136,7 +137,10 @@ export function physicalRelease(host: SequencerHost, slot: SeqSlot): void {
     lite: slot.tier > 0,
     archetype: slot.spec.archetype,
     abilityId: slot.abilityId,
-    sample: warriorControlReleaseSample(slot.abilityId),
+    sample:
+      slot.abilityId === 'red_harvest'
+        ? FURY_AUDIO.red_harvest.release
+        : warriorControlReleaseSample(slot.abilityId),
   });
 }
 

@@ -7,7 +7,21 @@ const source = { x: 0, y: 0, z: 0 },
 
 /** A confirmed collision owns every layer. Cleave recipients receive the bite,
  * while only the primary recipient owns the full blade membrane. */
-export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): boolean {
+export function harvestBeat(
+  host: SequencerHost,
+  slot: Pick<
+    SeqSlot,
+    | 'abilityId'
+    | 'componentOutcomes'
+    | 'targetId'
+    | 'casterId'
+    | 'physicalSecondary'
+    | 'tier'
+    | 'spec'
+  >,
+  beat: number,
+  detonation = false,
+): boolean {
   if (slot.abilityId !== 'red_harvest') return false;
   const outcome =
     slot.componentOutcomes === undefined ? 1 : (slot.componentOutcomes >> (beat * 2)) & 3;
@@ -22,7 +36,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
   const final = beat === 2,
     primary = !slot.physicalSecondary;
   const roll = meleeImpactProfile('red_harvest', beat)?.angle ?? profile.angle;
-  const life = final ? 0.24 : 0.16;
+  const life = detonation ? 0.3 : final ? 0.24 : 0.16;
   if (outcome === 2) {
     host.flipbookAt(
       at.x,
@@ -43,7 +57,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     at.x - dx * 0.18,
     at.y,
     at.z - dz * 0.18,
-    final ? 3.8 : beat === 1 ? 2.9 : 2.5,
+    detonation ? 5.4 : final ? 3.8 : beat === 1 ? 2.9 : 2.5,
     final ? 0xffb6ad : 0xea7078,
     'contact_cut',
     final ? 1.25 : 1.05,
@@ -60,13 +74,13 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       at.x - dx * 0.28,
       at.y,
       at.z - dz * 0.28,
-      final ? 8.6 : beat === 1 ? 6.4 : 5.8,
+      detonation ? (primary ? 14.5 : 8.6) : final ? 8.6 : beat === 1 ? 6.4 : 5.8,
       0xffffff,
       0xff8990,
-      life - (final ? 0.048 : 0.02),
-      final ? 0.048 : 0.02,
+      life - (detonation ? 0 : final ? 0.048 : 0.02),
+      detonation ? 0 : final ? 0.048 : 0.02,
       0,
-      facing,
+      detonation ? facing - Math.PI / 2 : facing,
       false,
       roll,
       final ? 1.65 : beat === 1 ? 1.4 : 1.3,
@@ -74,6 +88,7 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
   )
     count++;
   const sculpture =
+    !detonation &&
     primary &&
     host.crestAt &&
     host.crestAt(
@@ -90,7 +105,31 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
       roll,
     ) !== false;
   if (sculpture) count++;
-  else if (primary && final) count += harvestFallback(host, at, facing);
+  else if (primary && final && (!detonation || count === 1))
+    count += harvestFallback(host, at, facing);
+  if (detonation && primary && slot.tier === 0 && host.bakedAt) {
+    for (const side of [-1, 1]) {
+      if (
+        host.bakedAt(
+          'harvest_impact',
+          at.x - dx * 0.28 + dz * side * 0.35,
+          at.y + side * 0.15,
+          at.z - dz * 0.28 - dx * side * 0.35,
+          side < 0 ? 11.5 : 13.5,
+          0xbf6570,
+          0xf55b6b,
+          0.28,
+          side < 0 ? 0 : 0.015,
+          0,
+          facing - Math.PI / 2,
+          false,
+          roll + side * 0.28,
+          1.35,
+        ) !== false
+      )
+        count++;
+    }
+  }
   // Admit the contact first. Dust may only borrow capacity left after its core.
   if (primary && final && slot.tier === 0 && host.bakedAt) {
     const floor = host.groundYAt(from.x, from.z);
@@ -159,11 +198,11 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
     at.y,
     at.z,
     0x940c2b,
-    slot.tier === 0 ? (final ? 12 : beat === 1 ? 7 : 5) : 3,
-    final ? 1.35 : beat === 1 ? 1.0 : 0.85,
+    slot.tier === 0 ? (detonation ? (primary ? 34 : 12) : final ? 12 : beat === 1 ? 7 : 5) : 3,
+    detonation ? 2.5 : final ? 1.35 : beat === 1 ? 1.0 : 0.85,
     'blood',
-    life - (final ? 0.048 : 0.02),
-    final ? 0.048 : 0.02,
+    life - (detonation ? 0 : final ? 0.048 : 0.02),
+    detonation ? 0 : final ? 0.048 : 0.02,
   );
   if (slot.tier === 0) {
     host.fragmentsAt?.(
@@ -182,12 +221,13 @@ export function harvestBeat(host: SequencerHost, slot: SeqSlot, beat: number): b
   }
   const force = profile.force * (final ? 1.65 : beat === 1 ? 1.15 : 1.05);
   host.contact?.(slot.casterId, slot.targetId, 'physical', force, slot.abilityId, beat);
-  host.abilityAudio?.('impact', slot.spec.palette, force, at.x, at.y, at.z, {
-    lite: slot.tier > 0 || !primary,
-    finisher: final,
-    archetype: slot.spec.archetype,
-    abilityId: slot.abilityId,
-  });
+  if (!detonation)
+    host.abilityAudio?.('impact', slot.spec.palette, force, at.x, at.y, at.z, {
+      lite: slot.tier > 0 || !primary,
+      finisher: final,
+      archetype: slot.spec.archetype,
+      abilityId: slot.abilityId,
+    });
   host.pulseLight(slot.targetId, slot.spec.palette, final ? 2 : 1.1, 0.055, 3);
   if (primary && final) host.shakeAt(at.x, at.y, at.z, 0.36, true);
   host.countPrimitive(slot.abilityId, count + 3);

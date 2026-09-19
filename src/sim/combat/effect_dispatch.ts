@@ -651,6 +651,8 @@ export function runEffects(
         // inside the veil consumes the edge and strikes for double.
         weaponMult *= consumeVeiledEdge(ctx, p, ability.id);
         const hit = ctx.meleeSwing(p, target, bonus, ability.name, {
+          // Only Harvest's new committed opening replaces its damage-time swing.
+          attackAnimationStarted: ability.id === 'red_harvest' && attackAnimationStarted,
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
           weaponMult,

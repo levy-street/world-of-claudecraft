@@ -11,6 +11,11 @@ it('borrows only required hands and restores them on recovery, interruption and 
   off.userData = { heldPropHolder: true, heldSlot: 1 };
   model.add(main, off, blade);
   const props = new ActionProps(model, blade);
+  props.action('Signature_storm_bolt');
+  expect(main.visible).toBe(false);
+  expect(off.visible).toBe(true);
+  props.action('Idle');
+  expect(main.visible && off.visible).toBe(true);
   props.action('Signature_blind');
   expect(main.visible).toBe(true);
   expect(off.visible).toBe(false);
