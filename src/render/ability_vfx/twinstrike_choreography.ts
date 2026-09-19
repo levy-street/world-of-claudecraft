@@ -78,7 +78,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
       at.x - dx * 0.35,
       at.y,
       at.z - dz * 0.35,
-      reverse ? 7.2 : 6.6,
+      reverse ? 12.8 : 11.4,
       0xffffff,
       0xff8990,
       0.2,
@@ -87,7 +87,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
       facing,
       false,
       roll,
-      reverse ? 1.45 : 1.35,
+      reverse ? 1.7 : 1.65,
     ) !== false
   )
     count++;
@@ -152,11 +152,12 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
       1.3,
       dx,
       dz,
-      0.2,
+      0.27,
+      true,
     );
     count++;
   }
-  const force = profile.force * (reverse ? 1.35 : 1.1);
+  const force = profile.force * (reverse ? 1.5 : 1.2);
   host.contact?.(slot.casterId, slot.targetId, 'physical', force, slot.abilityId, beat);
   host.abilityAudio?.('impact', slot.spec.palette, force, at.x, at.y, at.z, {
     lite: slot.tier > 0 || !primary,
@@ -165,7 +166,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     abilityId: slot.abilityId,
   });
   host.pulseLight(slot.targetId, slot.spec.palette, reverse ? 1.6 : 1.1, 0.055, 3);
-  if (primary) host.shakeAt(at.x, at.y, at.z, reverse ? 0.18 : 0.12, true);
+  if (primary) host.shakeAt(at.x, at.y, at.z, reverse ? 0.26 : 0.18, true);
   host.countPrimitive(slot.abilityId, count + 3);
   return true;
 }

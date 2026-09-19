@@ -313,7 +313,7 @@ it.each([0, 1])(
       CASTER,
       TARGET,
       'physical-crush',
-      1.3,
+      1.85,
       'storm_bolt',
       0,
     );
@@ -330,15 +330,16 @@ it.each([0, 1])(
     expect(flash[3]).toBe(10.2);
     expect(flash[7]).toBe(0.085);
     expect(bakedAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
-    expect(bakedAt.mock.calls[0][4]).toBe(12.4);
+    expect(bakedAt.mock.calls[0][4]).toBe(16.4);
     expect(fragmentsAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
     expect(fragmentsAt.mock.calls[0][5]).toBe(tier === 0 ? 14 : 6);
     expect(abilityAudio).toHaveBeenCalledTimes(1);
     expect(abilityAudio.mock.calls[0].slice(3, 6)).toEqual(flash.slice(0, 3));
-    expect(shakeAt).toHaveBeenCalledExactlyOnceWith(...flash.slice(0, 3), 0.2, true);
+    expect(shakeAt).toHaveBeenCalledExactlyOnceWith(...flash.slice(0, 3), 0.32, true);
     expect(burstAt.mock.calls.every((call) => call[6] === 'sparks')).toBe(true);
     for (const burst of burstAt.mock.calls) expect(burst.slice(0, 3)).toEqual(flash.slice(0, 3));
-    const creases = pathRibbon.mock.calls;
+    const creases = pathRibbon.mock.calls.filter((call) => call[9]);
+    expect(pathRibbon.mock.calls.filter((call) => !call[9])).toHaveLength(2);
     expect(creases).toHaveLength(tier === 0 ? 6 : 2);
     expect(creases.every((call) => call[9] === true)).toBe(true);
     const sample = (call: Parameters<SequencerHost['pathRibbon']>) => {

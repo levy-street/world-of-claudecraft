@@ -154,6 +154,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
       dx,
       dz,
       duration,
+      !style.blood,
     );
     if (style.blood) host.burstAt(at.x, at.y, at.z, 0x990c2a, 22, 1.2, 'blood', duration);
     else
@@ -212,6 +213,7 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
           dx + dz * side * 0.4,
           dz - dx * side * 0.4,
           0.28,
+          true,
         );
     }
   }
@@ -224,7 +226,14 @@ export function drawWarriorBlade(host: SequencerHost, slot: SeqSlot, beat: numbe
     0,
   );
   host.pulseLight(slot.targetId, slot.spec.palette, style.heavy ? 1.7 : 1.1, 0.06, 3);
-  if (style.heavy && !slot.physicalSecondary) host.shakeAt(at.x, at.y, at.z, 0.25, true);
+  if (!slot.physicalSecondary && !style.blood)
+    host.shakeAt(
+      at.x,
+      at.y,
+      at.z,
+      style.heavy ? 0.32 : slot.abilityId === 'mortal_strike' ? 0.24 : 0.17,
+      true,
+    );
   host.countPrimitive(
     slot.abilityId,
     count +

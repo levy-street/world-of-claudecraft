@@ -40,19 +40,21 @@ it.each([0, 1])('keeps Bloodrush coherent and its finisher largest at tier %s', 
     } as SeqSlot;
     vi.mocked(host.bakedAt!).mockClear();
     vi.mocked(host.contact!).mockClear();
-    for (let beat = 0; beat < beats; beat++) draw(host, slot, beat);
+    if (id === 'red_harvest') harvestBeat(host, slot, 2, true);
+    else for (let beat = 0; beat < beats; beat++) draw(host, slot, beat);
     const sprays = vi
       .mocked(host.bakedAt!)
       .mock.calls.filter((call) => call[0] === 'harvest_impact');
-    expect(sprays).toHaveLength(beats);
-    expect(host.contact).toHaveBeenCalledTimes(beats);
+    expect(sprays).toHaveLength(id === 'red_harvest' ? (tier === 0 ? 3 : 1) : beats);
+    expect(host.contact).toHaveBeenCalledTimes(id === 'red_harvest' ? 1 : beats);
     for (const spray of sprays) {
-      expect(spray.slice(5, 7)).toEqual([0xffffff, 0xff8990]);
+      if (id !== 'red_harvest' || spray === sprays[0])
+        expect(spray.slice(5, 7)).toEqual([0xffffff, 0xff8990]);
       expect(spray[1]).toBeGreaterThan(3);
       expect(spray[4]).toBeGreaterThanOrEqual(5);
-      expect(spray[4]).toBeLessThanOrEqual(9);
+      expect(spray[4]).toBeLessThanOrEqual(18);
       expect(spray[13] ?? 1).toBeLessThanOrEqual(2);
-      expect(spray[7] + (spray[8] ?? 0)).toBeLessThan(0.3);
+      expect(spray[7] + (spray[8] ?? 0)).toBeLessThanOrEqual(0.3);
     }
     sizes.set(
       id,
@@ -63,8 +65,8 @@ it.each([0, 1])('keeps Bloodrush coherent and its finisher largest at tier %s', 
   const harvest = sizes.get('red_harvest')!;
   expect(twin[0]).toBeGreaterThanOrEqual(6);
   expect(twin[1]).toBeGreaterThan(twin[0]);
-  expect(harvest[1]).toBeGreaterThan(harvest[0]);
-  expect(harvest[2]).toBeGreaterThan(Math.max(...twin, ...sizes.get('bloodthirst')!));
+  expect(harvest[0]).toBeCloseTo(14.5 * 1.65);
+  expect(harvest[0]).toBeGreaterThan(Math.max(...twin, ...sizes.get('bloodthirst')!));
   for (const crest of vi.mocked(host.crestAt!).mock.calls)
     expect(crest.slice(5, 7)).toEqual([0x590719, 0xd9233d]);
   expect(host.ringAt).not.toHaveBeenCalled();

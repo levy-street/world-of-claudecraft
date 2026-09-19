@@ -107,22 +107,27 @@ it.each(
       secondary || outcome === 'hit' || (outcome === 'absorbed' && id === 'shield_slam') ? 1 : 0,
     );
     expect(vi.mocked(host.contact!).mock.calls.filter((call) => call[1] === 2)).toHaveLength(
-      !secondary && outcome === 'hit' ? 1 : 0,
+      outcome === 'hit' ? 1 : 0,
     );
     // Hits sit on the receiving surface toward the attacker, not the body
     // centre. This fixture faces +X and has a two-unit-tall receiving body.
     // Bloodletting's authored bite replaced its generic hit flipbook.
-    const primaryHit = !secondary && outcome === 'hit';
-    const bite = primaryHit && id === 'bloodthirst';
-    const surfaceOffset = primaryHit ? (bite ? 0.4 : id === 'shield_slam' ? 0.28 : 0.24) : 0;
+    const hit = outcome === 'hit';
+    const bite = hit && id === 'bloodthirst';
+    const surfaceOffset = hit ? (bite ? 0.4 : id === 'shield_slam' || secondary ? 0.28 : 0.24) : 0;
     const sprites = bite
       ? vi
           .mocked(host.bakedAt!)
-          .mock.calls.filter((call) => call[0] === 'warrior_bite')
+          .mock.calls.filter((call) => call[0] === 'harvest_impact')
           .map((call) => call.slice(1))
       : vi.mocked(host.flipbookAt).mock.calls;
     const receivingSprites = sprites.filter((call) => call[0] === 4 - surfaceOffset);
-    expect(receivingSprites).toHaveLength((secondary ? outcome === 'absorbed' : collision) ? 1 : 0);
+    expect(receivingSprites).toHaveLength(collision ? 1 : 0);
+    if (secondary) {
+      // Only the first target owns the caster performance and camera accent.
+      expect(vi.mocked(host.contact!).mock.calls.filter((call) => call[1] === 3)).toHaveLength(1);
+      expect(host.shakeAt).toHaveBeenCalledTimes(1);
+    }
     const profile = meleeImpactProfile(id);
     if (!profile) throw new Error(`Missing tested contact profile: ${id}`);
     for (const call of receivingSprites) {

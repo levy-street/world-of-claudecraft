@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { sceneKeyLightUniform } from '../scene_sampling';
 import { type FragmentKind, fragmentGeometry } from './production_assets';
 import { warriorFragmentShape } from './warrior_fragment_shape';
+import { warriorMetalEjecta } from './warrior_impact_material';
 
 const PER_KIND = 32;
 const KINDS = ['ice_shard', 'stone_chip', 'metal_splinter'] as const;
@@ -17,6 +18,7 @@ export class SolidImpactFragments {
   private time = 0;
   private serial = 0;
   private readonly fracturedShape = { x: 1, y: 1, z: 1, tint: 1, lift: 1 };
+  private readonly metalShape = { x: 1, y: 1, z: 1, speed: 1, lift: 1, tint: 1 };
   private disposed = false;
   constructor(scene: THREE.Scene) {
     for (const kind of KINDS) {
@@ -113,29 +115,46 @@ export class SolidImpactFragments {
       const phase = (seed * 1.618 + n) * 2.399963,
         radial = 1.2 + ((n * 7 + seed) % 9) * 0.17;
       const mineral = fractured && kind === 'stone_chip';
+      const sheared = fractured && kind === 'metal_splinter';
       if (mineral) warriorFragmentShape(this.fracturedShape, n, seed);
-      const vx = (Math.cos(phase) * radial + dx * 1.4) * force,
-        vz = (Math.sin(phase) * radial + dz * 1.4) * force,
-        vy = (2.2 + (n % 4) * 0.65) * force * (mineral ? this.fracturedShape.lift : 1);
-      const floor = ground(x + vx * 0.65, z + vz * 0.65);
-      if (!Number.isFinite(floor)) continue;
-      const startY = Math.max(y, floor + 0.08),
-        duration =
-          lifetime !== undefined && Number.isFinite(lifetime)
-            ? Math.max(0.05, lifetime)
-            : 1.45 + (n % 3) * 0.28,
-        size = (kind === 'ice_shard' ? 0.22 : 0.13) * (0.7 + (n % 5) * 0.17) * force;
+      if (sheared) warriorMetalEjecta(this.metalShape, n, seed);
+      const speed = sheared ? this.metalShape.speed : 1;
+      const vx = (Math.cos(phase) * radial + dx * 1.4) * force * speed,
+        vz = (Math.sin(phase) * radial + dz * 1.4) * force * speed,
+        vy =
+          (2.2 + (n % 4) * 0.65) *
+          force *
+          (mineral ? this.fracturedShape.lift : sheared ? this.metalShape.lift : 1);
+      const duration =
+        lifetime !== undefined && Number.isFinite(lifetime)
+          ? Math.max(0.05, lifetime)
+          : 1.45 + (n % 3) * 0.28;
+      const horizon = sheared ? Math.min(0.65, duration) : 0.65;
+      const destinationFloor = ground(x + vx * horizon, z + vz * horizon);
+      const sourceFloor = sheared ? ground(x, z) : destinationFloor;
+      if (!Number.isFinite(destinationFloor) || !Number.isFinite(sourceFloor)) continue;
+      // Short-lived swarf starts at the collision, never at the height of a
+      // distant hillside. The single bounce plane cannot lift it uphill at birth.
+      const floor = sheared ? Math.min(sourceFloor, destinationFloor) : destinationFloor;
+      const startY = Math.max(y, sourceFloor + 0.08);
+      const size = (kind === 'ice_shard' ? 0.22 : 0.13) * (0.7 + (n % 5) * 0.17) * force;
       origin.setXYZ(i, x, startY, z);
       velocity.setXYZ(i, vx, vy, vz);
-      life.setXYZW(i, this.time, duration, size, mineral ? -phase : phase);
+      life.setXYZW(i, this.time, duration, size, mineral || sheared ? -phase : phase);
       shape.setXYZW(
         i,
-        mineral ? this.fracturedShape.x : 0.65 + (n % 3) * 0.15,
-        mineral ? this.fracturedShape.y : kind === 'ice_shard' ? 1.7 : 1,
-        mineral ? this.fracturedShape.z : 0.7,
+        mineral ? this.fracturedShape.x : sheared ? this.metalShape.x : 0.65 + (n % 3) * 0.15,
+        mineral
+          ? this.fracturedShape.y
+          : sheared
+            ? this.metalShape.y
+            : kind === 'ice_shard'
+              ? 1.7
+              : 1,
+        mineral ? this.fracturedShape.z : sheared ? this.metalShape.z : 0.7,
         floor + 0.025,
       );
-      const tone = mineral ? this.fracturedShape.tint : 1;
+      const tone = mineral ? this.fracturedShape.tint : sheared ? this.metalShape.tint : 1;
       tints.setXYZ(i, this.color.r * tone, this.color.g * tone, this.color.b * tone);
       for (const attribute of [origin, velocity, life, shape, tints])
         attribute.addUpdateRange(i * attribute.itemSize, attribute.itemSize);

@@ -30,11 +30,31 @@ export function drawWarriorGroundReceivingContact(
   const x = at.x - dx * surface,
     y = at.y,
     z = at.z - dz * surface;
+  let count = 2;
+  const floor = host.groundYAt(x, z);
+  if (
+    Number.isFinite(floor) &&
+    host.bakedAt?.(
+      'shout_dust',
+      x,
+      floor + 0.08,
+      z,
+      rupture ? 6.8 : quake ? 4.8 : 6.2,
+      0x858b90,
+      0xc5cbd0,
+      rupture ? 0.34 : 0.28,
+      0,
+      0,
+      facing,
+    ) !== false &&
+    host.bakedAt
+  )
+    count++;
   host.flipbookAt(
     x,
     y,
     z,
-    rupture ? 5.6 : quake ? 4.1 : 2.8,
+    rupture ? 7.8 : quake ? 5.8 : 5.2,
     compression ? 0xe1eaf0 : 0xc4c9c9,
     'contact_crush',
     1.7,
@@ -78,16 +98,16 @@ export function drawWarriorGroundReceivingContact(
     host.fragmentsAt?.(
       'stone_chip',
       x,
-      y,
+      Number.isFinite(floor) ? floor + 0.15 : y,
       z,
       0x9da4a7,
       8,
-      rupture ? 1.6 : quake ? 1.2 : 0.9,
+      rupture ? 1.6 : quake ? 1.4 : 1.5,
       dx,
       dz,
-      0.22,
+      0.34,
       true,
     );
   host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);
-  host.countPrimitive(id, tier === 0 ? 3 : 2);
+  host.countPrimitive(id, count + (tier === 0 ? 1 : 0));
 }

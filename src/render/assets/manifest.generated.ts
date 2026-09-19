@@ -1701,7 +1701,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/vfx/production/warrior_forged_steel.png": "/media/textures/vfx/production/warrior_forged_steel.081377ac7da1.png",
   "textures/vfx/production/warrior_power.webp": "/media/textures/vfx/production/warrior_power.68450efac5cc.webp",
   "textures/vfx/production/warrior_pressure.png": "/media/textures/vfx/production/warrior_pressure.2a761dd3e3f1.png",
-  "textures/vfx/production/warrior_shear.webp": "/media/textures/vfx/production/warrior_shear.d3e12514f2e4.webp",
+  "textures/vfx/production/warrior_shear.webp": "/media/textures/vfx/production/warrior_shear.817ff3d88678.webp",
   "textures/vfx/signature-atlas.png": "/media/textures/vfx/signature-atlas.2c7aac87ede9.png",
   "textures/water/water_1_normal.jpg": "/media/textures/water/water_1_normal.6d7825469a37.jpg",
   "textures/water/water_2_normal.jpg": "/media/textures/water/water_2_normal.1f6f3fc5af58.jpg",

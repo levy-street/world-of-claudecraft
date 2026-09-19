@@ -64,7 +64,7 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
       at.x - dx * 0.4,
       at.y,
       at.z - dz * 0.4,
-      7.4,
+      11.6,
       0xffffff,
       0xff8990,
       0.23,
@@ -73,7 +73,7 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
       facing,
       false,
       roll,
-      1.4,
+      1.6,
     ) !== false
   )
     count++;
@@ -127,16 +127,17 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
       1.35,
       dx + dz * 0.55,
       dz - dx * 0.55,
-      0.24,
+      0.27,
+      true,
     );
     count++;
   }
   if (host.contact) {
-    host.contact(slot.casterId, slot.targetId, 'physical', profile.force * 1.3, slot.abilityId, 0);
+    host.contact(slot.casterId, slot.targetId, 'physical', profile.force * 1.45, slot.abilityId, 0);
     count++;
   }
   host.pulseLight(slot.targetId, slot.spec.palette, 1.4, 0.055, 3);
-  if (primary) host.shakeAt(at.x, at.y, at.z, 0.15, true);
+  if (primary) host.shakeAt(at.x, at.y, at.z, 0.2, true);
   host.countPrimitive(slot.abilityId, count + 1);
   return true;
 }

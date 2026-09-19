@@ -4,6 +4,7 @@ import {
   meleeContactPoint,
 } from '../melee_impact_core';
 import type { SeqPoint, SequencerHost } from './sequencer';
+import { warriorImpactFan } from './warrior_impact_fan';
 
 /** The wide wake establishes reach; this short split establishes the hit.
  * One retained seam per victim leaves room for a full pack in the ribbon pool. */
@@ -44,13 +45,13 @@ export function drawWarriorAreaReceivingContact(
     profile.angle,
   );
   let count = 1;
-  if (
+  const sprayed =
     host.bakedAt?.(
       'warrior_shear',
       x,
       y,
       z,
-      echo ? 6.6 : counter ? 6 : heavy ? 7.4 : sweep ? 6.4 : gyre ? 6.2 : 4.4,
+      echo ? 10.4 : counter ? 10.6 : heavy ? 12.6 : sweep ? 11 : gyre ? 10.8 : 7.4,
       0xffffff,
       0xdceaf3,
       duration,
@@ -59,11 +60,9 @@ export function drawWarriorAreaReceivingContact(
       facing,
       false,
       profile.angle,
-      heavy ? 1.5 : sweep || gyre || echo ? 1.4 : 1,
-    ) !== false &&
-    host.bakedAt
-  )
-    count++;
+      heavy ? 1.75 : sweep || gyre || echo ? 1.65 : 1.4,
+    ) !== false && !!host.bakedAt;
+  if (sprayed) count++;
   if (
     host.pathRibbon(
       0x293b48,
@@ -94,6 +93,17 @@ export function drawWarriorAreaReceivingContact(
     ) !== false
   )
     count++;
+  // The real body imprint gets the last free slot before optional outgoing material.
+  if (!sprayed)
+    count += warriorImpactFan(
+      host,
+      { x, y, z },
+      facing,
+      profile.angle,
+      heavy ? 4.4 : 3.6,
+      0xa8bdc9,
+      duration,
+    );
   if (tier === 0 && host.fragmentsAt) {
     host.fragmentsAt(
       'metal_splinter',
@@ -105,7 +115,8 @@ export function drawWarriorAreaReceivingContact(
       counter ? 1.45 : heavy ? 1.5 : sweep || gyre ? 1.4 : 1.2,
       dx,
       dz,
-      0.24,
+      0.28,
+      true,
     );
     count++;
   }

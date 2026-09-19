@@ -5,6 +5,7 @@ import { BakedPoolPrewarm } from './baked_pool_prewarm';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { type BakedKind, bakedTexture } from './production_assets';
 import { liquidSurfaceMaps } from './simulation_assets';
+import { warriorShearPhase } from './warrior_impact_material';
 
 const CAPACITY = 10;
 interface Slot {
@@ -22,6 +23,7 @@ interface Slot {
   roll: number;
   dust: boolean;
   harvest: boolean;
+  shear: boolean;
   x: number;
   z: number;
   dx: number;
@@ -60,6 +62,7 @@ export class BakedImpactLayers {
         uGround: { value: 0 },
         uMotion: { value: 1 },
         uAuthored: { value: 0 },
+        uMaterialTint: { value: 0 },
         uGutter: { value: 0.018 },
         uMirror: { value: 1 },
         uPivot: { value: new THREE.Vector2(0.5, 0.5) },
@@ -67,7 +70,7 @@ export class BakedImpactLayers {
       vertexShader: `uniform vec2 uPivot; varying vec2 vUv; varying float vHeight,vDistance,vViewDepth; void main(){vUv=uv;vec3 p=position;p.xy+=vec2(0.5-uPivot.x,uPivot.y-0.5);vec4 world=modelMatrix*vec4(p,1.);vec4 view=viewMatrix*world;vHeight=world.y;vDistance=length(view.xyz);vViewDepth=-view.z;gl_Position=projectionMatrix*view;}`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
       uniform sampler2D uNormal,uFlow,uLighting;uniform float uSurface,uSourceScale;uniform vec3 uSunWorld;
-      uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uGround,uMotion,uAuthored,uGutter,uMirror;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;
+      uniform sampler2D uMap;uniform float uFrame,uOpacity,uHeat,uFloor,uGround,uMotion,uAuthored,uMaterialTint,uGutter,uMirror;uniform vec3 uTint,uHot;varying vec2 vUv;varying float vHeight,vDistance,vViewDepth;
       vec2 cellUv(float f,vec2 local){f=clamp(f,0.,63.);float gutter=uGutter;vec2 content=mix(vec2(gutter),vec2(1.0-gutter),clamp(local,vec2(0.),vec2(1.)));vec2 uv=(content+vec2(mod(f,8.),7.-floor(f/8.)))/8.;return uv;}
       vec4 cell(float f){return texture2D(uMap,cellUv(f,vec2(0.5+(vUv.x-0.5)*uMirror,vUv.y)));}
       void main(){vec4 a=cell(floor(uFrame)),b=cell(floor(uFrame)+1.);float t=fract(uFrame);float alpha=mix(a.a,b.a,t);vec3 premix=mix(a.rgb*a.a,b.rgb*b.a,t);vec3 shade=premix/max(alpha,0.001);
@@ -101,7 +104,7 @@ export class BakedImpactLayers {
         }
         float floorFade=mix(smoothstep(uFloor-0.04,uFloor+0.38,vHeight),1.,uGround);float nearFade=smoothstep(0.7,2.3,vDistance);
         vec3 colour=shade*uTint+uHot*pow(max(shade.r,0.),2.)*uHeat;
-        colour=mix(colour,shade*(1.0+uHeat*0.18),uAuthored);
+        colour=mix(colour,shade*mix(vec3(1.),uTint,uMaterialTint)*(1.0+uHeat*0.18),uAuthored);
         vec2 bend=vec2(shade.r-shade.b,shade.g-shade.r)*uHeat*3.0*uMotion;
         bend+=normal.xy*2.5*uSurface*uMotion;
         colour=sceneRefract(colour,bend,surfaceDepth,min(0.22,uHeat*0.08+uSurface*0.12)*uMotion);
@@ -139,6 +142,7 @@ export class BakedImpactLayers {
         roll: 0,
         dust: false,
         harvest: false,
+        shear: false,
         x: 0,
         z: 0,
         dx: 0,
@@ -229,6 +233,7 @@ export class BakedImpactLayers {
     s.z = z;
     s.dust = kind === 'shout_dust';
     s.harvest = kind === 'harvest_impact' || kind === 'warrior_shear';
+    s.shear = kind === 'warrior_shear';
     s.dx = s.dust ? Math.sin(angle) * s.size * 0.7 : 0;
     s.dz = s.dust ? Math.cos(angle) * s.size * 0.7 : 0;
     if (s.harvest) {
@@ -280,6 +285,7 @@ export class BakedImpactLayers {
     u.uFloor.value = floor;
     u.uGround.value = s.ground ? 1 : 0;
     u.uAuthored.value = s.authored ? 1 : 0;
+    u.uMaterialTint.value = s.shear ? 1 : 0;
     u.uGutter.value = s.authored || s.power || kind === 'shout_dust' ? 4 / 256 : 0.018;
     u.uPivot.value.set(
       s.power ? 0.5 - (1.45 / 5.6) * u.uMirror.value : 0.5,
@@ -311,7 +317,8 @@ export class BakedImpactLayers {
       if (!s.mesh.visible) continue;
       const u = s.mesh.material.uniforms;
       u.uMotion.value = reducedMotion ? 0 : 1;
-      u.uFrame.value = (reducedMotion ? 0.36 : s.reverse ? 1 - p : p) * 63;
+      const phase = s.shear ? warriorShearPhase(p) : p;
+      u.uFrame.value = (reducedMotion ? 0.36 : s.reverse ? 1 - phase : phase) * 63;
       u.uOpacity.value =
         (s.authored ? 0.94 : s.ground || s.power ? 0.75 : 0.64) *
         Math.min(1, p / 0.045) *

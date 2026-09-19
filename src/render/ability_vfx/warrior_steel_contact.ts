@@ -28,15 +28,15 @@ export function warriorSteelContact(
   // or extending the white collision flash. Finishers throw the widest fan.
   const aspect =
     slot.abilityId === 'execute'
-      ? 1.45
+      ? 1.9
       : slot.abilityId === 'breachmaker'
-        ? 1.35
+        ? 1.8
         : slot.abilityId === 'victory_rush'
-          ? 1.2
+          ? 1.55
           : slot.abilityId === 'mortal_strike'
-            ? 1.25
+            ? 1.75
             : slot.abilityId === 'slam' || slot.abilityId === 'overpower'
-              ? 1.15
+              ? 1.65
               : 1;
   host.flipbookAt(
     x - dx * 0.24,
@@ -57,7 +57,7 @@ export function warriorSteelContact(
       x - dx * 0.28,
       y,
       z - dz * 0.28,
-      size * (heavy ? 1.65 : 1.4),
+      Math.min(18, size * (heavy ? 2 : 1.95)),
       0xd9e7ef,
       0xe3eff7,
       duration,

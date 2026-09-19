@@ -99,15 +99,18 @@ for (const tier of [0, 1])
       expect(h.calls.flipbookAt).toHaveBeenCalledTimes(2);
       expect(h.calls.pathRibbon).toHaveBeenCalledTimes(2);
       expect(h.calls.countPrimitive.mock.calls).toEqual([
-        [id, tier === 0 ? 3 : 2],
-        [id, tier === 0 ? 3 : 2],
+        [id, tier === 0 ? 4 : 3],
+        [id, tier === 0 ? 4 : 3],
       ]);
       expect(h.calls.fragmentsAt).toHaveBeenCalledTimes(tier === 0 ? 2 : 0);
       expect(h.calls.crestAt).not.toHaveBeenCalled();
-      expect(h.calls.bakedAt).not.toHaveBeenCalled();
+      expect(
+        h.calls.bakedAt.mock.calls.every((call) => call[0] === 'shout_dust' && call[2] === 0.08),
+      ).toBe(true);
       expect(h.calls.shockRing).not.toHaveBeenCalled();
       expect(h.calls.decalXZ).not.toHaveBeenCalled();
-      expect(h.calls.groundYAt).not.toHaveBeenCalled();
+      expect(h.calls.groundYAt).toHaveBeenCalledTimes(2);
+      expect(h.calls.bakedAt).toHaveBeenCalledTimes(2);
     },
   );
 
@@ -116,7 +119,7 @@ it('Quaking Blow has a short larger compression followed by one dark body seam a
   drawWarriorAreaContact(h.host, 'thunder_clap', 1, 2, 1, 0);
   const flash = vi.mocked(h.host.flipbookAt).mock.calls[0];
   const path = vi.mocked(h.host.pathRibbon).mock.calls[0];
-  expect(flash[3]).toBe(4.1);
+  expect(flash[3]).toBe(5.8);
   expect(flash[5]).toBe('contact_crush');
   expect(flash[7]).toBe(0.07);
   expect(flash[9]).toBe(0.68);
@@ -127,48 +130,51 @@ it('Quaking Blow has a short larger compression followed by one dark body seam a
   expect(h.calls.fragmentsAt).toHaveBeenCalledWith(
     'stone_chip',
     0,
-    1,
+    0.15,
     2.74,
     0x9da4a7,
     8,
-    1.2,
+    1.4,
     0,
     1,
-    0.22,
+    0.34,
     true,
   );
 });
 
-it.each(['heroic_leap'])('%s preserves its existing receiving dimensions', (id) => {
-  const h = harness();
-  drawWarriorAreaContact(h.host, id, 1, 2, 1, 0);
-  expect(h.calls.flipbookAt).toHaveBeenCalledWith(
-    0,
-    1,
-    3,
-    2.8,
-    0xc4c9c9,
-    'contact_crush',
-    1.7,
-    0.21,
-    0.3,
-    1,
-  );
-  expect(vi.mocked(h.host.pathRibbon).mock.calls[0].slice(0, 3)).toEqual([0xa8b3b5, 0.18, 0.2]);
-  expect(h.calls.fragmentsAt).toHaveBeenCalledWith(
-    'stone_chip',
-    0,
-    1,
-    3,
-    0x9da4a7,
-    8,
-    0.9,
-    0,
-    1,
-    0.22,
-    true,
-  );
-});
+it.each(['heroic_leap'])(
+  '%s receives a larger collision while retaining its body-bound imprint',
+  (id) => {
+    const h = harness();
+    drawWarriorAreaContact(h.host, id, 1, 2, 1, 0);
+    expect(h.calls.flipbookAt).toHaveBeenCalledWith(
+      0,
+      1,
+      3,
+      5.2,
+      0xc4c9c9,
+      'contact_crush',
+      1.7,
+      0.21,
+      0.3,
+      1,
+    );
+    expect(vi.mocked(h.host.pathRibbon).mock.calls[0].slice(0, 3)).toEqual([0xa8b3b5, 0.18, 0.2]);
+    expect(h.calls.fragmentsAt).toHaveBeenCalledWith(
+      'stone_chip',
+      0,
+      0.15,
+      3,
+      0x9da4a7,
+      8,
+      1.5,
+      0,
+      1,
+      0.34,
+      true,
+    );
+  },
+);
 
 it('Faultline delivers the larger lower-body compression without replaying its ground area', () => {
   const h = harness();
@@ -177,7 +183,7 @@ it('Faultline delivers the larger lower-body compression without replaying its g
     0,
     1,
     2.74,
-    5.6,
+    7.8,
     0xe1eaf0,
     'contact_crush',
     1.7,
@@ -189,19 +195,21 @@ it('Faultline delivers the larger lower-body compression without replaying its g
   expect(h.calls.fragmentsAt).toHaveBeenCalledWith(
     'stone_chip',
     0,
-    1,
+    0.15,
     2.74,
     0x9da4a7,
     8,
     1.6,
     0,
     1,
-    0.22,
+    0.34,
     true,
   );
   expect(h.calls.contact).toHaveBeenCalledTimes(1);
   expect(h.calls.crestAt).not.toHaveBeenCalled();
-  expect(h.calls.bakedAt).not.toHaveBeenCalled();
+  expect(
+    h.calls.bakedAt.mock.calls.every((call) => call[0] === 'shout_dust' && call[2] === 0.08),
+  ).toBe(true);
   expect(h.calls.shockRing).not.toHaveBeenCalled();
 });
 
@@ -255,7 +263,7 @@ it.each([0, 1])(
     expect(h.calls.pathRibbon).toHaveBeenCalledTimes(1);
     expect(h.calls.flipbookAt).toHaveBeenCalledTimes(1);
     expect(h.calls.contact).toHaveBeenCalledTimes(1);
-    expect(h.calls.countPrimitive).toHaveBeenCalledWith('thunder_clap', tier === 0 ? 3 : 2);
+    expect(h.calls.countPrimitive).toHaveBeenCalledWith('thunder_clap', tier === 0 ? 4 : 3);
     expect(h.calls.fragmentsAt).toHaveBeenCalledTimes(tier === 0 ? 1 : 0);
   },
 );

@@ -82,63 +82,29 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
     face(d, ridge, e, false);
     face(e, ridge, a, false);
     const rim = [a, b, c, d, e];
+    const floor = rim.map((p, edge) => {
+      if (kind !== 'iron_fault') return [p[0], 0.04, p[2]];
+      // Unequal splayed feet twist the two existing wall triangles into
+      // fracture facets. Keep the roof silhouette and the closed 18-triangle
+      // plate rather than adding a fan of triangles to every wall.
+      const flare = 0.08 + (0.5 + 0.5 * Math.sin(seed * 1.91 + edge * 2.4)) * 0.1;
+      const middle = (near + far) * 0.5;
+      return point(
+        (p[0] * cos - p[2] * sin) * (1 + flare),
+        0.04,
+        middle + (p[0] * sin + p[2] * cos - middle) * (1 + flare),
+      );
+    });
     for (let i = 0; i < rim.length; i++) {
       const topA = rim[i],
         topB = rim[(i + 1) % rim.length];
-      const lowA = [topA[0], 0.04, topA[2]],
-        lowB = [topB[0], 0.04, topB[2]];
+      const lowA = floor[i],
+        lowB = floor[(i + 1) % rim.length];
       const first = uvs.length;
-      if (kind === 'iron_fault') {
-        // Split each broad wall around an uneven projecting fracture. This
-        // keeps a solid closed mass instead of a uniform upright panel.
-        const side = [
-          (topA[0] + topB[0]) * 0.5,
-          (topA[1] + topB[1]) * 0.24,
-          (topA[2] + topB[2]) * 0.5,
-        ];
-        const cx = sin * (near + far) * 0.5,
-          cz = cos * (near + far) * 0.5;
-        const mid = point(
-          (side[0] - cx) * cos - (side[2] - cz) * sin,
-          side[1],
-          side[0] * sin + side[2] * cos,
-        );
-        mid[0] += (side[0] - cx) * 0.14;
-        mid[2] += (side[2] - cz) * 0.14;
-        const clamped = point(mid[0] * cos - mid[2] * sin, mid[1], mid[0] * sin + mid[2] * cos);
-        face(topA, topB, clamped, false);
-        face(topB, lowB, clamped, false);
-        face(lowB, lowA, clamped, false);
-        face(lowA, topA, clamped, false);
-        // Only the upper edge carries a bright fresh fracture.
-        uvs.splice(
-          first,
-          24,
-          0,
-          0,
-          1,
-          0,
-          0.5,
-          2,
-          1,
-          0,
-          1,
-          8,
-          0.5,
-          2,
-          1,
-          8,
-          0,
-          8,
-          0.5,
-          2,
-          0,
-          8,
-          0,
-          0,
-          0.5,
-          2,
-        );
+      if (kind === 'iron_fault' && (seed + i) % 2 === 0) {
+        face(topA, topB, lowB, false);
+        face(topA, lowB, lowA, false);
+        uvs.splice(first, 12, 0, 0, 1, 0, 1, 8, 0, 0, 1, 8, 0, 8);
         continue;
       }
       face(topA, topB, lowA, false);
@@ -147,7 +113,6 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
       // triangles instead of four coplanar ones. This leaves room for a cap.
       uvs.splice(first, 12, 0, 0, 1, 0, 0, 8, 1, 0, 1, 8, 0, 8);
     }
-    const floor = rim.map((p) => [p[0], 0.04, p[2]]);
     for (let i = 1; i < floor.length - 1; i++) face(floor[0], floor[i], floor[i + 1], false);
     // Ground materials use world-space texture projection; UV.x is free to
     // carry one coherent travel phase across every face of this plate.

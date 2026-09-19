@@ -1,6 +1,7 @@
 import { physicalContactSheet } from './ability_vfx/physical_choreography_core';
 import { abilityVfxFullSpec } from './ability_vfx_registry';
 import type { CharacterVisual } from './characters/visual';
+import { hasWarriorContactRecoil } from './characters/warrior_contact_recoil';
 import { attackAbilityId } from './characters/weapon_attack_style_core';
 import { isBleedContinuation, meleeImpactProfile } from './melee_impact_core';
 
@@ -33,6 +34,8 @@ export function impactContact(
   if (profile?.bleeding) school = 'physical-blood';
   visual?.respondToElement(school, Math.min(0.95, 0.55 + weight * 0.15), profile);
   if (periodic || abilityId === 'deep_wounds') return;
+  if (!reducedMotion && abilityId && hasWarriorContactRecoil(abilityId))
+    visual?.receiveWarriorImpact?.(abilityId, beat ?? 0, source);
   if (abilityId === 'red_harvest' && beat !== undefined && !reducedMotion)
     visual?.receiveHarvestImpact(beat, source);
   if (!reducedMotion) visual?.holdFrame(0.18, Math.min(0.045, 0.018 + weight * 0.01));

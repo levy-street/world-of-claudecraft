@@ -2,6 +2,7 @@ import { WARRIOR_CONTROL_AUDIO } from '../../warrior_control_audio';
 import type { AbilityVfxRibbons } from './ribbons';
 import type { SequencerHost } from './sequencer';
 import { warriorCrushContact } from './warrior_crush_contact';
+import { warriorImpactFan } from './warrior_impact_fan';
 
 const source = { x: 0, y: 0, z: 0 };
 const target = { x: 0, y: 0, z: 0 };
@@ -85,20 +86,21 @@ export function drawWarriorHammerContact(
         impact.x,
         impact.y,
         impact.z,
-        12.4,
+        16.4,
         0x8ed7ef,
         0xe4f7ff,
-        0.34,
+        0.26,
         0,
         0,
         direction,
         false,
-        -0.22,
-        1.4,
+        0.08,
+        1.75,
       ) !== false &&
       host.bakedAt
     )
       primitives++;
+    primitives += warriorImpactFan(host, impact, direction, 0.08, 3.8, 0x74b9d9);
     host.fragmentsAt?.(
       'metal_splinter',
       impact.x,
@@ -109,10 +111,11 @@ export function drawWarriorHammerContact(
       1.6,
       dx,
       dz,
-      0.24,
+      0.3,
+      true,
     );
-    host.contact?.(casterId, targetId, 'physical-crush', 1.3, 'storm_bolt', 0);
-    host.shakeAt(impact.x, impact.y, impact.z, 0.2, true);
+    host.contact?.(casterId, targetId, 'physical-crush', 1.85, 'storm_bolt', 0);
+    host.shakeAt(impact.x, impact.y, impact.z, 0.32, true);
     primitives++;
   } else host.flipbookAt(at.x, at.y, at.z, 3.1, 0xd2e6f5, 'contact_crush', 1.35, 0.12);
   if (tier === 0)

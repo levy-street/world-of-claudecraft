@@ -1,6 +1,7 @@
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { warriorCrushContact } from './warrior_crush_contact';
+import { warriorImpactFan } from './warrior_impact_fan';
 
 const source = { x: 0, y: 0, z: 0 },
   target = { x: 0, y: 0, z: 0 },
@@ -117,6 +118,30 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
       0.075,
       1.45,
     );
+  const sx = Math.sin(incoming),
+    sz = Math.cos(incoming);
+  const receiving = { x: at.x - sx * 0.28, y: at.y, z: at.z - sz * 0.28 };
+  if (
+    host.bakedAt?.(
+      'warrior_shear',
+      receiving.x,
+      receiving.y,
+      receiving.z,
+      14.2,
+      0xe0e9ef,
+      0xffffff,
+      0.24,
+      0,
+      0,
+      incoming,
+      false,
+      0.08,
+      1.65,
+    ) !== false &&
+    host.bakedAt
+  )
+    count++;
+  count += warriorImpactFan(host, receiving, incoming, 0.08, 3.2, 0x9bafb9);
   if (slot.tier === 0) {
     const sx = Math.sin(incoming),
       sz = Math.cos(incoming);
@@ -133,7 +158,8 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
         1.6,
         sx + sz * side * 1.2,
         sz - sx * side * 1.2,
-        0.32,
+        0.3,
+        true,
       );
     host.burstAt(at.x, at.y, at.z, 0xe2ecf2, 19, 1.2, 'sparks', 0.16, 0.02);
     const floor = host.groundYAt(from.x, from.z);
@@ -164,8 +190,15 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
     );
     count += 5;
   }
-  host.contact?.(slot.casterId, slot.targetId, 'physical-crush', profile.force, slot.abilityId, 0);
-  if (!slot.physicalSecondary) host.shakeAt(at.x, at.y, at.z, 0.18, true);
+  host.contact?.(
+    slot.casterId,
+    slot.targetId,
+    'physical-crush',
+    profile.force * 1.2,
+    slot.abilityId,
+    0,
+  );
+  if (!slot.physicalSecondary) host.shakeAt(at.x, at.y, at.z, 0.29, true);
   host.pulseLight(slot.targetId, slot.spec.palette, 1.35, 0.06, 2.8);
   host.countPrimitive(slot.abilityId, count);
   return true;

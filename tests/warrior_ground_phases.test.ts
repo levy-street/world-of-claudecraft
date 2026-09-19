@@ -57,6 +57,26 @@ it.each([
       expect(pieces).toHaveLength(pieceCount);
       const uv = geometry.getAttribute('uv');
       for (const piece of pieces) {
+        const vertices = new Set(piece);
+        const edges = new Map<string, number>();
+        const position = geometry.getAttribute('position');
+        const key = (i: number) => `${position.getX(i)},${position.getY(i)},${position.getZ(i)}`;
+        let triangles = 0;
+        for (let i = 0; i < index.count; i += 3) {
+          if (!vertices.has(index.getX(i))) continue;
+          triangles++;
+          for (let edge = 0; edge < 3; edge++) {
+            const a = index.getX(i + edge),
+              b = index.getX(i + ((edge + 1) % 3));
+            expect(vertices.has(a) && vertices.has(b)).toBe(true);
+            const pair = [key(a), key(b)].sort().join(':');
+            edges.set(pair, (edges.get(pair) ?? 0) + 1);
+          }
+        }
+        // Extra fracture detail must not consume another plate's budget or
+        // buy a cheaper mesh by leaving the visible slabs open underneath.
+        expect(triangles).toBeLessThanOrEqual(18);
+        expect([...edges.values()].every((uses) => uses === 2)).toBe(true);
         const phase = uv.getX(piece[0]);
         expect(Number.isFinite(phase)).toBe(true);
         expect(phase).toBeGreaterThanOrEqual(0);
@@ -93,7 +113,10 @@ it.each(['iron_quake', 'iron_fault'] as const)(
         const radii = piece.map((i) => Math.hypot(position.getX(i), position.getZ(i)));
         const near = Math.min(...radii);
         const far = Math.max(...radii);
-        bands[far < 3 ? 0 : near > 6.5 ? 2 : 1].push(uv.getX(piece[0]));
+        // Arrival belongs to the closest edge of the whole plate. Faultline's
+        // broad near slabs extend past three yards without arriving later.
+        // Classify from positions, never the UV phase being tested.
+        bands[near < 3 ? 0 : near > 6.5 ? 2 : 1].push(uv.getX(piece[0]));
         maximumRadius = Math.max(maximumRadius, far);
         for (const vertex of piece) {
           const x = position.getX(vertex),
@@ -108,6 +131,9 @@ it.each(['iron_quake', 'iron_fault'] as const)(
         }
       }
       for (const band of bands) expect(band.length).toBeGreaterThan(0);
+      expect(bands.map((band) => band.length)).toEqual(
+        kind === 'iron_fault' ? [7, 12, 7] : [12, 12, 12],
+      );
       expect(Math.max(...bands[0])).toBeLessThan(Math.min(...bands[1]));
       expect(Math.max(...bands[1])).toBeLessThan(Math.min(...bands[2]));
       expect(maximumRadius).toBeCloseTo(8, 5);

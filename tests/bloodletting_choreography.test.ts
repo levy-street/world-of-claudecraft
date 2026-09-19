@@ -133,7 +133,7 @@ it.each([0, 1])('retains the shared blood spray and wound on quality tier %s', (
   expect(crest.slice(5, 8)).toEqual([0x590719, 0xd9233d, 'bloodletting_pull']);
   const spray = vi.mocked(host.bakedAt!).mock.calls[0];
   expect(spray[0]).toBe('harvest_impact');
-  expect(spray[4]).toBe(7.4);
+  expect(spray[4]).toBe(11.6);
   expect(spray[7]).toBe(0.23);
   expect(spray[8]).toBe(0);
   expect(spray[12]).toBe(-0.74);

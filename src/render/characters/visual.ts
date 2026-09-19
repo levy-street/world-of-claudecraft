@@ -114,6 +114,7 @@ import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { warriorActionBlend } from './warrior_action_blend';
+import { WarriorContactRecoil } from './warrior_contact_recoil';
 import { WarriorRushPose } from './warrior_rush_pose';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
@@ -692,6 +693,7 @@ export class CharacterVisual {
   private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
   private readonly surfaceResponse = new CharacterSurfaceResponse();
   private readonly harvestRecoil = new HarvestRecoil();
+  private readonly warriorContactRecoil = new WarriorContactRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
 
@@ -1299,6 +1301,7 @@ export class CharacterVisual {
       // Compress at the start of the pull, back to neutral as the body rises.
       CLIMB_BODY_DUCK * climb * (1 - env01(this.climbPhase, 0.1, 0.55));
     this.harvestRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
+    this.warriorContactRecoil.apply(this.poseWrap, dt, reducedMotion || s.dead);
 
     // distant corpses show the static idle far mesh, tip it over
     if (this.farMesh?.visible) {
@@ -2227,6 +2230,7 @@ export class CharacterVisual {
   }
   clearElementResponse(): void {
     this.harvestRecoil.clear();
+    this.warriorContactRecoil.clear();
     const active = this.surfaceResponse.active;
     this.surfaceResponse.clear();
     if (active && !this.disposed) this.applyVisualMaterials();
@@ -2234,6 +2238,11 @@ export class CharacterVisual {
   receiveHarvestImpact(beat: number, source?: { x: number; z: number }): void {
     if (!this.disposed && !this.deadLock)
       this.harvestRecoil.trigger(beat, this.height, this.root, source);
+  }
+
+  receiveWarriorImpact(id: string, beat: number, source?: { x: number; z: number }): void {
+    if (!this.disposed && !this.deadLock)
+      this.warriorContactRecoil.trigger(id, beat, this.height, this.root, source);
   }
 
   private writeAuraGlow(material: THREE.Material): void {

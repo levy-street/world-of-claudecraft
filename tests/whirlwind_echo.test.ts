@@ -7,9 +7,11 @@
 // interaction the payload never covered.
 import { describe, expect, it } from 'vitest';
 import { AOE_ECHO_MULT } from '../src/sim/combat/area_echo';
+import { RED_HARVEST_IMPACT_DELAY } from '../src/sim/combat/warrior_harvest';
 import { ABILITIES } from '../src/sim/content/classes';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { drainDelayedEvents } from '../src/sim/entity_roster';
 import { Sim } from '../src/sim/sim';
 import type { Aura, Entity, SimEvent } from '../src/sim/types';
 import { localizeSimAuraName } from '../src/ui/sim_i18n';
@@ -166,7 +168,18 @@ describe('single-target casts echo onto enemies near the target', () => {
     sim.castAbility('whirlwind');
     expect(echoAura(p)?.charges).toBe(2);
 
-    const events = recast(sim, p, 'red_harvest');
+    const start = sim.time;
+    const opening = recast(sim, p, 'red_harvest');
+    expect(hitsOn(opening, 'Red Harvest', primary.id)).toEqual([]);
+    expect(hitsOn(opening, 'Red Harvest', near.id)).toEqual([]);
+    expect(echoAura(p)?.charges).toBe(2);
+    sim.time = start + RED_HARVEST_IMPACT_DELAY - 0.00001;
+    drainDelayedEvents(sim.ctx);
+    expect(sim.drainEvents().filter((event) => event.type === 'damage')).toEqual([]);
+    expect(echoAura(p)?.charges).toBe(2);
+    sim.time = start + RED_HARVEST_IMPACT_DELAY;
+    drainDelayedEvents(sim.ctx);
+    const events = sim.drainEvents();
     const primaryHits = hitsOn(events, 'Red Harvest', primary.id);
     expect(primaryHits).toHaveLength(3);
     // Each strike echoes its own resolved amount at the echo fraction, in order.

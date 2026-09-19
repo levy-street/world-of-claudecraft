@@ -1,6 +1,9 @@
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
+import { bloodlettingBeat } from './bloodletting_choreography';
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { drawWarriorAreaReceivingContact } from './warrior_area_receiving_contact';
+import { warriorCrushContact } from './warrior_crush_contact';
+import { warriorImpactFan } from './warrior_impact_fan';
 
 const origin = { x: 0, y: 0, z: 0 };
 const recipient = { x: 0, y: 0, z: 0 };
@@ -75,7 +78,10 @@ export function drawWarriorWideningCast(host: SequencerHost, slot: SeqSlot, beat
 /** The secondary damage event is the only permission to show an echo hit.
  * Keep its real target and source ability; never replay the caster flourish. */
 export function drawWarriorEchoContact(host: SequencerHost, slot: SeqSlot): boolean {
-  if (!slot.physicalSecondary || !ECHO_BLADES.has(slot.abilityId)) return false;
+  if (!slot.physicalSecondary) return false;
+  if (bloodlettingBeat(host, slot, 0)) return true;
+  const shield = slot.abilityId === 'shield_slam';
+  if (!shield && !ECHO_BLADES.has(slot.abilityId)) return false;
   const outcome = slot.componentOutcomes === undefined ? 1 : slot.componentOutcomes & 3;
   if (!outcome || slot.casterId === slot.targetId) return true;
   const profile = meleeImpactProfile(slot.abilityId);
@@ -85,6 +91,31 @@ export function drawWarriorEchoContact(host: SequencerHost, slot: SeqSlot): bool
   if (outcome === 2) {
     host.flipbookAt(at.x, at.y, at.z, 3.2, 0xd3e2eb, 'contact_crush', 1.45, 0.085);
     host.countPrimitive(slot.abilityId, 1);
+    return true;
+  }
+  if (shield) {
+    const from = host.anchorOf(slot.casterId, 0.5, origin);
+    if (!from) return true;
+    const facing = Math.atan2(at.x - from.x, at.z - from.z);
+    let count = warriorCrushContact(
+      host,
+      slot.targetId,
+      at,
+      meleeContactHeight(profile, 0),
+      facing,
+      8.2,
+      slot.tier,
+    );
+    count += warriorImpactFan(host, at, facing, 0.08, 3.2, 0x9bafb9);
+    host.contact?.(
+      slot.casterId,
+      slot.targetId,
+      'physical',
+      profile.force * 1.2,
+      slot.abilityId,
+      0,
+    );
+    host.countPrimitive(slot.abilityId, count);
     return true;
   }
   drawWarriorAreaReceivingContact(
