@@ -57,8 +57,12 @@ describe('resolveStorePromptHost', () => {
     expect(document.querySelectorAll(`#${STORE_PROMPT_HOST_ID}`)).toHaveLength(1);
   });
 
-  it('pins the overlay selector both inspectors stamp', () => {
+  it('pins the literals the CSS and the HUD key gate are written against', () => {
     expect(INSPECT_OVERLAY_SELECTOR).toBe('.armory-inspect-overlay');
+    expect(STORE_PROMPT_HOST_ID).toBe('store-prompt-stack');
+    expect(MODAL_PROMPT_SELECTOR).toBe(
+      '#prompt-stack .prompt[aria-modal="true"], #store-prompt-stack .prompt[aria-modal="true"]',
+    );
   });
 });
 

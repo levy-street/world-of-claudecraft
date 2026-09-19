@@ -15,8 +15,14 @@
 //
 // While an inspect overlay is open the prompt therefore takes a body-level
 // sibling host, #store-prompt-stack, which hud.css floors above the overlay
-// with the same geometry as #prompt-stack. The host exists only while a
-// decision is up; the nonmodal purchase result stays in #prompt-stack.
+// with the same geometry as #prompt-stack. The nonmodal purchase result takes
+// the same rule. The host exists only while a prompt is mounted in it.
+//
+// The host is resolved ONCE, when a prompt opens, and a mounted prompt never
+// migrates. A caller that opens an inspect overlay while a decision is live
+// must dismiss that decision first (daily_rewards_window.ts previewMountSkin
+// invalidates the store surface in the same synchronous block), or the
+// decision it leaves in #prompt-stack paints under the new overlay.
 
 /** The body-level host a Store decision takes while an inspect overlay is up. */
 export const STORE_PROMPT_HOST_ID = 'store-prompt-stack';

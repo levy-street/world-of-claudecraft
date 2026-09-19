@@ -74,13 +74,17 @@ function paintedAt(overlay: HTMLElement, x: number, y: number): Element | null {
   }
 }
 
-function mountStore(): {
+function mountStore(
+  width = 1280,
+  height = 720,
+): {
   root: HTMLElement;
   win: DailyRewardsWindow;
   spend: ReturnType<typeof vi.fn>;
 } {
-  document.documentElement.style.setProperty('--app-vw', '1280px');
-  document.documentElement.style.setProperty('--app-vh', '720px');
+  document.documentElement.style.setProperty('--app-vw', `${width}px`);
+  document.documentElement.style.setProperty('--app-vh', `${height}px`);
+  document.documentElement.style.setProperty('--ui-scale', '1');
   // The real page shape: the canvas the input layer owns, then #ui holding
   // both #prompt-stack and the store window (index.html).
   const canvas = document.createElement('canvas');
@@ -140,7 +144,7 @@ afterEach(() => {
   for (const win of mounted.splice(0)) win.close();
   cleanup();
   document.body.className = '';
-  for (const property of ['--app-vw', '--app-vh']) {
+  for (const property of ['--app-vw', '--app-vh', '--ui-scale']) {
     document.documentElement.style.removeProperty(property);
   }
 });
@@ -219,5 +223,56 @@ describe('Armory purchase confirm over the inspect overlay (real click)', () => 
     expect(document.getElementById('store-prompt-stack')).toBeNull();
     prompt?.querySelector<HTMLButtonElement>('[data-store-prompt-cancel]')?.click();
     expect(document.querySelector('.woc-store-prompt')).toBeNull();
+  });
+
+  // The touch sheet: the same click flow on the mobile landscape profile, where
+  // the host takes the hud.mobile.css top-centre geometry and its pointer-events
+  // shield (the host is click-through, the prompt opts back in).
+  it('on mobile landscape the confirm is painted above the inspector, tappable, and inside the viewport', async () => {
+    await page.viewport(844, 390);
+    document.body.className = 'mobile-touch game-active hud-mobile-compact';
+    const { root } = mountStore(844, 390);
+    await vi.waitFor(() => {
+      expect(root.querySelector(`[data-armory-skin="${SKIN_ID}"]`)).not.toBeNull();
+    });
+    const card = root.querySelector<HTMLElement>(`[data-armory-skin="${SKIN_ID}"]`) as HTMLElement;
+    card.scrollIntoView({ block: 'center' });
+    await userEvent.click(card);
+    await vi.waitFor(() => {
+      expect(document.querySelector('.armory-inspect-overlay [data-armory-buy]')).not.toBeNull();
+    });
+    const overlay = document.querySelector<HTMLElement>('.armory-inspect-overlay') as HTMLElement;
+    const buy = overlay.querySelector<HTMLButtonElement>('[data-armory-buy]') as HTMLButtonElement;
+    await userEvent.click(buy);
+
+    const prompt = document.querySelector<HTMLElement>('.woc-store-prompt') as HTMLElement;
+    expect(prompt).not.toBeNull();
+    expect(prompt.parentElement?.id).toBe('store-prompt-stack');
+    const confirm = prompt.querySelector<HTMLButtonElement>(
+      '[data-store-prompt-confirm]',
+    ) as HTMLButtonElement;
+    const cancel = prompt.querySelector<HTMLButtonElement>(
+      '[data-store-prompt-cancel]',
+    ) as HTMLButtonElement;
+    const rect = prompt.getBoundingClientRect();
+    expect(rect.left).toBeGreaterThanOrEqual(0);
+    expect(rect.right).toBeLessThanOrEqual(window.innerWidth);
+    expect(rect.top).toBeGreaterThanOrEqual(0);
+    expect(rect.bottom).toBeLessThanOrEqual(window.innerHeight);
+    // The 44px touch floor on these buttons comes from a (pointer: coarse)
+    // media rule (components.css) that viewport emulation alone does not
+    // trigger, so it is not asserted here; the paint order and the real tap are.
+    for (const control of [confirm, cancel]) {
+      const at = center(control);
+      const painted = paintedAt(overlay, at.x, at.y);
+      expect(prompt.contains(painted), 'the control must not be covered').toBe(true);
+    }
+    expect(overlay.inert).toBe(true);
+
+    // A real tap on Cancel lands through the host's pointer-events shield.
+    await userEvent.click(cancel);
+    expect(document.querySelector('.woc-store-prompt')).toBeNull();
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    expect(overlay.inert).toBe(false);
   });
 });

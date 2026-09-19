@@ -162,9 +162,67 @@ describe('StoreDecisionPrompts', () => {
       closeText: 'Close',
       onConfirm: vi.fn(),
     });
+    // With an inspector present this is the body-level host path, so the
+    // was-already-inert arm of the restore is exercised THROUGH that host.
+    expect(document.querySelector('#store-prompt-stack #confirm-dialog')).not.toBeNull();
     prompts.dismiss(false);
 
     expect(inspector.inert).toBe(true);
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+  });
+
+  it('refuses to open over the HUD confirm dialog without minting a body-level host', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const inspector = document.createElement('div');
+    inspector.className = 'armory-inspect-overlay';
+    document.body.appendChild(inspector);
+    const hudDialog = document.createElement('div');
+    hudDialog.id = 'confirm-dialog';
+    document.body.appendChild(hudDialog);
+    const cancelled = vi.fn();
+    const prompts = makePrompts(() => root);
+
+    const opened = prompts.open({
+      title: 'Confirm purchase',
+      body: 'Buy the skin?',
+      confirmText: 'Purchase',
+      cancelText: 'Cancel',
+      closeText: 'Close',
+      onConfirm: vi.fn(),
+      onCancel: cancelled,
+    });
+
+    expect(opened).toBe(false);
+    // The refusal runs BEFORE the host is resolved: a host minted on this path
+    // has no prompt to release it and would sit on <body> for the session.
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    expect(document.querySelectorAll('#confirm-dialog')).toHaveLength(1);
+    expect(inspector.inert).toBe(false);
+    expect(root.inert).toBe(false);
+    expect(cancelled).not.toHaveBeenCalled();
+  });
+
+  it('publishes a nonmodal result above an open inspect overlay and releases the host with it', () => {
+    const root = document.getElementById('store') as HTMLElement;
+    const inspector = document.createElement('div');
+    inspector.className = 'armory-inspect-overlay';
+    document.body.appendChild(inspector);
+    const prompts = makePrompts(() => root, manualTimers().timers);
+
+    prompts.showResult({ text: 'Purchase complete', tone: 'success', closeText: 'Close' });
+
+    const host = document.getElementById('store-prompt-stack') as HTMLElement;
+    expect(host, 'the result takes the body-level host over an inspector').not.toBeNull();
+    expect(host.querySelector('.woc-store-global-result')).not.toBeNull();
+    expect(host.classList.contains('store-result-active')).toBe(true);
+    expect(document.querySelector('#prompt-stack .woc-store-global-result')).toBeNull();
+    // A nonmodal status never blocks the inspector or the store.
+    expect(inspector.inert).toBe(false);
+    expect(root.inert).toBe(false);
+
+    expect(prompts.clearResult()).toBe(true);
+    expect(document.getElementById('store-prompt-stack')).toBeNull();
+    expect(document.querySelector('.woc-store-global-result')).toBeNull();
   });
 
   it('cancels a replaced decision once and exposes stale async results nonmodally', async () => {
@@ -299,7 +357,7 @@ describe('StoreDecisionPrompts', () => {
   it('keeps the nonmodal result dismissible through the mobile prompt-stack hit shield', () => {
     const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
     expect(css).toMatch(
-      /body\.mobile-touch #prompt-stack \.woc-store-global-result\s*\{[^}]*pointer-events:\s*auto;/s,
+      /body\.mobile-touch :is\(#prompt-stack, #store-prompt-stack\) \.woc-store-global-result\s*\{[^}]*pointer-events:\s*auto;/s,
     );
   });
 
@@ -381,10 +439,7 @@ describe('StoreDecisionPrompts', () => {
     expect(document.querySelector(MODAL_PROMPT_SELECTOR)).not.toBeNull();
     prompts.dismiss(false);
     expect(document.querySelector(MODAL_PROMPT_SELECTOR)).toBeNull();
-    // The HUD gate reads the same selector, so a modal in either host blocks game keys.
-    const hud = readFileSync(resolve(process.cwd(), 'src/ui/hud.ts'), 'utf8');
-    expect(hud).toMatch(
-      /promptModalOpen\(\): boolean \{\s*return document\.querySelector\(MODAL_PROMPT_SELECTOR\) !== null;/,
-    );
+    // Hud.promptModalOpen reads this same selector; tests/bank_window.test.ts
+    // owns that source pin (the WCAG 2.4.3 focus-return case it was written for).
   });
 });

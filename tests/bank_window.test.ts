@@ -855,9 +855,10 @@ describe('bank_window: keyboard a11y (non-modal activation + prompt Enter)', () 
     // must stay non-blocking), and the shared gameplay gate consults it before
     // every keyboard/gamepad action predicate.
     expect(hud).toContain('promptModalOpen(): boolean {');
-    expect(hud).toContain(
-      `$('#prompt-stack').querySelector('.prompt[aria-modal="true"]') !== null`,
-    );
+    // Both prompt hosts: #prompt-stack and the body-level #store-prompt-stack a
+    // Store decision takes over an inspect overlay (src/ui/store_prompt_host.ts,
+    // whose test pins the selector's literal value).
+    expect(hud).toContain('return document.querySelector(MODAL_PROMPT_SELECTOR) !== null;');
     const gateStart = mainSrc.indexOf('const gameplayInputBlocked = () =>');
     const gate = mainSrc.slice(gateStart, mainSrc.indexOf(';', gateStart));
     expect(gateStart).toBeGreaterThan(0);

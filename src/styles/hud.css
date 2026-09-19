@@ -10205,7 +10205,11 @@
      painted under the inspector's dimmer and behind its dialog. Same geometry
      as #prompt-stack (fixed against the viewport rather than absolute inside
      #ui), floored above the inspector; it never coexists with the HUD's own
-     #confirm-dialog (95), which the controller refuses to open over. */
+     #confirm-dialog (95), which the controller refuses to open over. Like the
+     inspector it floats over and the HUD's own body-level #confirm-dialog
+     (layout.css, the --window-scale: 1 group), it renders OUTSIDE the #ui zoom:
+     a prompt here is deliberately unscaled by the player's UI Scale, matching
+     the overlay beneath it rather than the zoomed HUD. */
   #store-prompt-stack {
     position: fixed;
     left: 50%;

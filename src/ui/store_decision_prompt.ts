@@ -202,7 +202,9 @@ export class StoreDecisionPrompts {
 
   showResult(options: StoreResultOptions): void {
     this.clearResult();
-    const stack = document.getElementById('prompt-stack');
+    // The same host rule as a decision: a purchase outcome published while an
+    // inspect overlay is still up would otherwise paint under it the same way.
+    const stack = resolveStorePromptHost();
     if (!stack) return;
     const result = document.createElement('div');
     result.className = `panel woc-store-global-result ${options.tone}`;
@@ -241,8 +243,10 @@ export class StoreDecisionPrompts {
     if (this.resultExpiry !== null) this.timers.cancel(this.resultExpiry);
     this.resultExpiry = null;
     if (this.result === null) return false;
-    this.result.parentElement?.classList.remove('store-result-active');
+    const host = this.result.parentElement;
+    host?.classList.remove('store-result-active');
     this.result.remove();
+    if (host) releaseStorePromptHost(host);
     this.result = null;
     return true;
   }

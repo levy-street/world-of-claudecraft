@@ -6355,7 +6355,7 @@
   /* The mobile HUD deliberately makes #prompt-stack click-through and restores
      hits only on `.prompt`; this nonmodal status is not a dialog, so opt its
      own dismiss action back into pointer input without misrepresenting it. */
-  body.mobile-touch #prompt-stack .woc-store-global-result {
+  body.mobile-touch :is(#prompt-stack, #store-prompt-stack) .woc-store-global-result {
     pointer-events: auto;
   }
   .woc-store-global-result.success {
