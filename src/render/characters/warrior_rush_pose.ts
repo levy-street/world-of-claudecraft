@@ -11,11 +11,12 @@ export function onrushArrivalAllowed(
 }
 
 export function createOnrushArrivalHandler<View>(
-  entities: ReadonlyMap<number, Entity>,
+  entitiesNow: () => ReadonlyMap<number, Entity>,
   views: ReadonlyMap<number, View>,
   visualOf: (view: View) => { arriveFromOnrush(): boolean } | null,
 ): (sourceId: number, targetId: number) => boolean {
   return (sourceId, targetId) => {
+    const entities = entitiesNow();
     if (!onrushArrivalAllowed(entities.get(sourceId), entities.get(targetId))) return false;
     const view = views.get(sourceId);
     return view ? (visualOf(view)?.arriveFromOnrush() ?? true) : true;

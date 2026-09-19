@@ -1,7 +1,11 @@
-import { expect, it } from 'vitest';
+import { expect, it, vi } from 'vitest';
 import { ArchetypeSequencer, type SequencerHost } from '../src/render/ability_vfx/sequencer';
 import type { AnimState } from '../src/render/characters/anim_state';
-import { onrushArrivalAllowed, WarriorRushPose } from '../src/render/characters/warrior_rush_pose';
+import {
+  createOnrushArrivalHandler,
+  onrushArrivalAllowed,
+  WarriorRushPose,
+} from '../src/render/characters/warrior_rush_pose';
 import { newLocoTrack, updateLocomotion } from '../src/render/locomotion';
 import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 import { DT, type Entity, MELEE_RANGE } from '../src/sim/types';
@@ -96,3 +100,39 @@ it('an in-range interruption or dead/missing recipient never authorizes a succes
     false,
   );
 });
+
+it.each(['alive', 'dead source', 'dead target', 'rooted', 'missing source', 'missing target'])(
+  'a reused renderer resolves the current entity map after a session swap: %s',
+  (state) => {
+    const source = { id: 1, dead: false, auras: [] } as unknown as Entity;
+    const target = { id: 2, dead: false, auras: [] } as unknown as Entity;
+    const previousAllowed = state !== 'alive';
+    let entities = new Map([
+      [1, { ...source, dead: !previousAllowed }],
+      [2, target],
+    ]);
+    const entitiesNow = vi.fn(() => entities);
+    const arriveFromOnrush = vi.fn(() => true);
+    const handler = createOnrushArrivalHandler(
+      entitiesNow,
+      new Map([[1, { arriveFromOnrush }]]),
+      (view) => view,
+    );
+    expect(entitiesNow).not.toHaveBeenCalled();
+    expect(handler(1, 2)).toBe(previousAllowed);
+
+    // Studio keeps the renderer but replaces the world, reusing entity IDs.
+    entities = new Map([
+      [1, { ...source }],
+      [2, { ...target }],
+    ]);
+    if (state === 'dead source') entities.get(1)!.dead = true;
+    if (state === 'dead target') entities.get(2)!.dead = true;
+    if (state === 'rooted') entities.get(1)!.auras = [{ kind: 'root' } as never];
+    if (state === 'missing source') entities.delete(1);
+    if (state === 'missing target') entities.delete(2);
+    expect(handler(1, 2)).toBe(state === 'alive');
+    expect(entitiesNow).toHaveBeenCalledTimes(2);
+    expect(arriveFromOnrush).toHaveBeenCalledTimes(1);
+  },
+);

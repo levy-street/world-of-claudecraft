@@ -2995,7 +2995,7 @@ export class Renderer {
     );
     this.abilityVfxFx.setSpiritBuildScheduler((build) => this.queueSpiritPuppetBuild(build));
     this.abilityVfxFx.onRushArrival = createOnrushArrivalHandler(
-      this.sim.entities, this.views, this.activeVisual.bind(this),
+      () => this.sim.entities, this.views, this.activeVisual.bind(this),
     );
     this.abilityVfxFx.setWorldLightDelegate((at,school,intensity,duration,range)=>this.lightPulses.pulse(at,school,intensity,duration,range));
     this.abilityVfxFx.setSpiritCompileGate(
