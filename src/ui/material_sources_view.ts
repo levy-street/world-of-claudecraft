@@ -28,6 +28,7 @@
 // data; the renderer escapes them.
 
 import { isMaterialItemId } from '../sim/material_ids';
+import { materialSourceUnitPayload } from '../sim/material_inventory_units';
 import {
   isPremiumMaterialSource,
   legacyMaterialComposition,
@@ -171,6 +172,27 @@ export function materialSourcesForDisplay(
   // A refusal (a count the algebra will not read) shows nothing rather than a
   // wrong line; the stack still renders every other tooltip fact it carries.
   return projected.ok ? projected.value : undefined;
+}
+
+/**
+ * Units of this slot the PLAIN bulk pool may treat as fungible: the total
+ * minus any bucket `materialSourceUnitPayload` marks as carrying a payload (a
+ * legacy per-unit instance field, or a premium signature). Mirrors, unit for
+ * unit, the eligibility rule `countFungibleItem`/`countMaterialInventoryForHub`
+ * apply sim-side (`material_inventory_units.ts`), so a surface offering a
+ * sell/list quantity can never promise more than the sim will actually escrow.
+ *
+ * A non-material item, or a material stack with no recorded provenance at
+ * all, has nothing to exclude and returns the plain stack count.
+ */
+export function materialFungibleUnitCount(slot: MaterialSourceSlot): number {
+  const composition = materialSourcesForDisplay(slot);
+  if (composition === undefined) return slot.count;
+  let count = 0;
+  for (const bucket of composition) {
+    if (materialSourceUnitPayload(slot, bucket.source) === undefined) count += bucket.count;
+  }
+  return count;
 }
 
 /**
