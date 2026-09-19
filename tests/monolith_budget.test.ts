@@ -1269,9 +1269,14 @@ const MONOLITHS: MonolithRow[] = [
     // Down 11317 -> 11281 at the v0.42.2 hotfix line forward merge: the
     // interact-key gather extraction (src/game/interact_key_gather.ts took the
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
-    // composed with the release's game_renderer.ts extraction. Exact merged
-    // count, zero slack.
-    ceiling: 11281,
+    // composed with the release's game_renderer.ts extraction.
+    // Then the Discord OAuth flow (web popup, native handoff, and the in-game
+    // link-error notice a failed relink now needs) moved out to
+    // src/net/discord_oauth_flow.ts behind an injected deps bag; main.ts keeps
+    // only the deps bag and the one-time wiring calls. Measured after both
+    // extractions composed on the v0.44.0 line (wc -l < src/main.ts): 11173.
+    // Zero headroom.
+    ceiling: 11173,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

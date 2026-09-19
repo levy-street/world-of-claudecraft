@@ -22,6 +22,18 @@ const UNLINKED: DiscordAccountStatus = {
   passwordSet: true,
 };
 
+const LINKED: DiscordAccountStatus = {
+  linked: true,
+  username: 'maxp',
+  avatar: null,
+  guildMember: true,
+  points: 0,
+  lifetimePoints: 0,
+  statusTier: 1,
+  claimedSwagIds: [],
+  passwordSet: true,
+};
+
 const NO_PRESENCE: DiscordPresenceState = {
   onlineCount: 0,
   memberTotal: 0,
@@ -95,5 +107,57 @@ describe('renderDiscordWidget (unlinked mode)', () => {
     (el.querySelector('[data-action="link"]') as HTMLElement).click();
     expect(deps.onLink).toHaveBeenCalledTimes(1);
     expect(deps.onOpenUrl).not.toHaveBeenCalled();
+  });
+});
+
+// A failed relink used to be invisible: the popup/native flow's only error
+// surface was #login-error, an element hidden once the player is in-game (the
+// only place a relink is ever started from). The panel now shows its own
+// notice, and offers a Relink action while already linked so a player never
+// has to unlink first just to force a fresh OAuth pass (avatar/username sync).
+describe('link-error notice + relink while linked', () => {
+  let el: HTMLElement;
+
+  beforeEach(() => {
+    el = document.createElement('div');
+  });
+
+  it('shows no notice by default', () => {
+    renderDiscordWidget(
+      el,
+      { enabled: true, status: UNLINKED, presence: NO_PRESENCE, inviteUrl: 'u' },
+      makeDeps(),
+    );
+    expect(el.querySelector('.dc-link-error')).toBeNull();
+  });
+
+  it('shows the notice when linkError is set, unlinked or linked', () => {
+    renderDiscordWidget(
+      el,
+      { enabled: true, status: UNLINKED, presence: NO_PRESENCE, inviteUrl: 'u', linkError: true },
+      makeDeps(),
+    );
+    expect(el.querySelector('.dc-link-error')).not.toBeNull();
+
+    renderDiscordWidget(
+      el,
+      { enabled: true, status: LINKED, presence: NO_PRESENCE, inviteUrl: 'u', linkError: true },
+      makeDeps(),
+    );
+    expect(el.querySelector('.dc-link-error')).not.toBeNull();
+  });
+
+  it('offers a Relink action while linked, routed through the same onLink as the CTA', () => {
+    const deps = makeDeps();
+    renderDiscordWidget(
+      el,
+      { enabled: true, status: LINKED, presence: NO_PRESENCE, inviteUrl: 'u' },
+      deps,
+    );
+    const relinkBtn = el.querySelector('[data-action="relink"]') as HTMLElement;
+    expect(relinkBtn).not.toBeNull();
+    relinkBtn.click();
+    expect(deps.onLink).toHaveBeenCalledTimes(1);
+    expect(deps.onUnlink).not.toHaveBeenCalled();
   });
 });
