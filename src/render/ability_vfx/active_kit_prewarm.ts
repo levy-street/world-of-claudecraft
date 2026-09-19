@@ -53,6 +53,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
   return [
     {
       id: 'upload-big:active-warrior-blood',
+      synchronous: true,
       run: () => {
         const texture = warriorBloodTexture();
         if (!texture) throw new Error('Active Warrior blood texture was not loaded');
@@ -61,6 +62,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-warrior-steel',
+      synchronous: true,
       run: () => {
         const texture = warriorSteelTexture();
         if (!texture) throw new Error('Active Warrior steel texture was not loaded');
@@ -69,6 +71,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-warrior-pressure',
+      synchronous: true,
       run: () => {
         const texture = warriorPressureTexture();
         if (!texture) throw new Error('Active Warrior pressure texture was not loaded');
@@ -77,6 +80,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-warrior-power',
+      synchronous: true,
       run: () => {
         const texture = bakedTexture('warrior_power');
         if (!texture) throw new Error('Active Warrior power texture was not loaded');
@@ -85,6 +89,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-warrior-fervor',
+      synchronous: true,
       run: () => {
         const texture = bakedTexture('warrior_fervor');
         if (!texture) throw new Error('Active Warrior fervor texture was not loaded');
@@ -93,6 +98,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-harvest-impact',
+      synchronous: true,
       run: () => {
         const texture = bakedTexture('harvest_impact');
         if (!texture) throw new Error('Red Harvest impact texture was not loaded');
@@ -101,6 +107,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-warrior-bite',
+      synchronous: true,
       run: () => {
         const texture = bakedTexture('warrior_bite');
         if (!texture) throw new Error('Warrior bite texture was not loaded');
@@ -109,6 +116,7 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
     },
     {
       id: 'upload-big:active-warrior-shear',
+      synchronous: true,
       run: () => {
         const texture = bakedTexture('warrior_shear');
         if (!texture) throw new Error('Warrior shear texture was not loaded');
@@ -170,7 +178,9 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
         GPU_WORK_PRIORITY.ACTIONABLE_VIEW,
         unit.id,
         {
-          releaseTail: true,
+          // Synchronous uploads/touches cannot add an asynchronous driver
+          // tail, so unrelated links must not consume their admission slots.
+          releaseTail: unit.synchronous !== true,
         },
       );
       if (state.cancelled) return;

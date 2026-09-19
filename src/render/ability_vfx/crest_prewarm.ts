@@ -92,6 +92,7 @@ export class CrestPrewarm {
       for (let index = 0; index < 2; index++)
         units.push({
           id: `touch:crest:${kind}:${index}`,
+          synchronous: true,
           run: () => {
             if (this.disposed) return;
             const programs = this.compiled.get(kind);
@@ -104,6 +105,7 @@ export class CrestPrewarm {
         });
       units.push({
         id: `crest-upload:${kind}`,
+        synchronous: true,
         run: () => {
           if (this.disposed || this.uploaded.has(kind)) return;
           if (!this.compiled.has(kind)) throw new Error(`Crest ${kind} was not compiled`);

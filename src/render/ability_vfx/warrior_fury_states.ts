@@ -115,6 +115,7 @@ export class WarriorFuryStates {
         : [
             {
               id: `fury-state-${k}:bind`,
+              synchronous: true,
               run: () => {
                 if (this.disposed) return;
                 const texture = k === 2 ? warriorSteelTexture() : warriorBloodTexture();
@@ -126,7 +127,7 @@ export class WarriorFuryStates {
                 }
               },
             },
-            ...prep.units(host).map((u) => ({ id: `fury-state-${k}:${u.id}`, run: u.run })),
+            ...prep.units(host).map((unit) => ({ ...unit, id: `fury-state-${k}:${unit.id}` })),
           ],
     );
   }

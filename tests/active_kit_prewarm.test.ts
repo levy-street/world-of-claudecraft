@@ -7,9 +7,15 @@ import {
   ensureActiveAbilityKit,
   resumeActiveAbilityKit,
 } from '../src/render/ability_vfx/active_kit_prewarm';
+import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
 import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
+import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
+import type { AbilityVfxTextures } from '../src/render/ability_vfx/fx_textures';
 import * as assets from '../src/render/ability_vfx/production_assets';
-import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
+import { WarriorFuryStates } from '../src/render/ability_vfx/warrior_fury_states';
+import { WarriorGuardPlates } from '../src/render/ability_vfx/warrior_guard_plates';
+import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
+import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
 import { prepareStudioAbilityKit } from '../src/vfx_studio/prepare_ability_kit';
 
@@ -111,7 +117,7 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.queue.run).toHaveBeenCalledTimes(116);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
-      expect(call[3]).toEqual({ releaseTail: true });
+      expect(call[3]).toEqual({ releaseTail: String(call[2]).startsWith('crest-compile:') });
     }
     expect(f.upload).toHaveBeenCalledTimes(8);
     expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
@@ -144,6 +150,107 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.queue.run).toHaveBeenCalledTimes(116);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
+    f.close();
+  }
+});
+
+it('keeps synchronous declarations through every production Warrior preparation wrapper', () => {
+  const f = fixture();
+  const guards = new WarriorGuardPlates(f.scene);
+  const powerForms = new WarriorPowerForms(f.scene);
+  const textures = new Proxy({}, { get: () => f.texture }) as AbilityVfxTextures;
+  const furyStates = new WarriorFuryStates(f.scene, () => null, textures);
+  const baked = new BakedImpactLayers(f.scene);
+  const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
+  Object.assign(fx, { crests: { preparation: f.prep }, guards, powerForms, furyStates, baked });
+  try {
+    const units = fx.authoredPrewarmUnits(f.host, ACTIVE_WARRIOR_CRESTS);
+    expect(units).toHaveLength(ACTIVE_WARRIOR_CRESTS.length * 4 + 4 + 16 + 12 + 30);
+    expect(units.filter((unit) => unit.id.includes('compile'))).toHaveLength(45);
+    for (const unit of units)
+      expect(unit.synchronous === true, unit.id).toBe(!unit.id.includes('compile'));
+  } finally {
+    baked.dispose();
+    furyStates.dispose();
+    powerForms.dispose();
+    guards.dispose();
+    f.close();
+  }
+});
+
+it('lets synchronous Warrior uploads and real crest touches pass two released tails while compiling stays capped', async () => {
+  const f = fixture();
+  const queue = createBackgroundGpuQueue();
+  const deferred = () => {
+    let resolve!: () => void;
+    const promise = new Promise<void>((done) => {
+      resolve = done;
+    });
+    return { promise, resolve };
+  };
+  const first = deferred(),
+    second = deferred(),
+    compile = deferred();
+  const tails: Promise<void>[] = [];
+  let task: Promise<void> | undefined;
+  const flush = async () => {
+    for (let i = 0; i < 100; i++) await Promise.resolve();
+  };
+  try {
+    // These are actual producer units, with the first crest already linked.
+    // Its reflection/upload work must proceed even when unrelated links fill
+    // the queue. The second crest still needs an asynchronous compile.
+    const units = f.prep.units(f.host, ['blood_cut', 'harvest_cut']);
+    await units[0].run();
+    f.host.compile.mockImplementationOnce(() => compile.promise);
+    activeKitPrewarmEntry(f.scene, 'warrior', {
+      queue,
+      geometry: () => units.slice(1),
+      texture: f.upload,
+    });
+    tails.push(
+      queue.run(() => first.promise, GPU_WORK_PRIORITY.LIVE_VIEW, 'unrelated-one', {
+        releaseTail: true,
+      }),
+    );
+    tails.push(
+      queue.run(() => second.promise, GPU_WORK_PRIORITY.LIVE_VIEW, 'unrelated-two', {
+        releaseTail: true,
+      }),
+    );
+    await flush();
+    expect(queue.stats().waitingTails).toHaveLength(2);
+
+    task = ensureActiveAbilityKit(f.scene);
+    await flush();
+    expect(f.upload).toHaveBeenCalledTimes(8);
+    expect(f.prep.ready('blood_cut')).toBe(true);
+    expect(f.host.draw).toHaveBeenCalledTimes(1);
+    expect(f.host.compile).toHaveBeenCalledTimes(1);
+    expect(queue.stats().waitingTails.map((tail) => tail.label)).toEqual([
+      'unrelated-one',
+      'unrelated-two',
+    ]);
+    expect(queue.stats().pending).toBe(1);
+
+    first.resolve();
+    await flush();
+    expect(f.host.compile).toHaveBeenCalledTimes(2);
+    expect(queue.stats().waitingTails.map((tail) => tail.label)).toEqual([
+      'unrelated-two',
+      'crest-compile:harvest_cut',
+    ]);
+    expect(f.prep.ready('harvest_cut')).toBe(false);
+    compile.resolve();
+    await task;
+    expect(f.prep.ready('harvest_cut')).toBe(true);
+    expect(f.host.draw).toHaveBeenCalledTimes(2);
+  } finally {
+    first.resolve();
+    second.resolve();
+    compile.resolve();
+    await Promise.allSettled([...tails, ...(task ? [task] : [])]);
+    await queue.shutdown();
     f.close();
   }
 });

@@ -99,6 +99,7 @@ export class WarriorGuardPlates {
     return [
       {
         id: 'guard-bind-steel',
+        synchronous: true,
         run: () => {
           if (this.disposed) return;
           // Both enclosing recipes upload this shared texture before geometry.

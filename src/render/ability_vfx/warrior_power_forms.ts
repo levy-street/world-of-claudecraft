@@ -120,6 +120,7 @@ export class WarriorPowerForms {
         : [
             {
               id: `power-${kind}:bind`,
+              synchronous: true,
               run: () => {
                 if (this.disposed) return;
                 const texture = kind === 1 ? warriorBloodTexture() : warriorSteelTexture();
@@ -131,7 +132,7 @@ export class WarriorPowerForms {
                 }
               },
             },
-            ...prep.units(host).map((unit) => ({ id: `power-${kind}:${unit.id}`, run: unit.run })),
+            ...prep.units(host).map((unit) => ({ ...unit, id: `power-${kind}:${unit.id}` })),
           ],
     );
   }

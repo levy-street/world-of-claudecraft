@@ -90,6 +90,7 @@ export class GuardPrewarm {
       },
       {
         id: 'guard-touch',
+        synchronous: true,
         run: () => {
           if (this.disposed) return;
           const programs = this.compiled;
@@ -104,6 +105,7 @@ export class GuardPrewarm {
       },
       {
         id: 'guard-upload',
+        synchronous: true,
         run: () => {
           if (this.disposed || this.uploaded) return;
           if (this.compiled === null) throw new Error('Guard was not compiled');

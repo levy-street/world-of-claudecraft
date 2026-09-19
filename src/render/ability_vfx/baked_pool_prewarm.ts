@@ -64,8 +64,8 @@ export class BakedPoolPrewarm {
         // The scheduler learns costs from the prefix before the first colon.
         // Keep compile, reflection and upload in separate cost families.
         .map((unit) => ({
+          ...unit,
           id: `baked-${unit.id.slice('guard-'.length)}:slot:${index}`,
-          run: unit.run,
         })),
     );
   }
