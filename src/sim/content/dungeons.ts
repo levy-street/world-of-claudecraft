@@ -121,9 +121,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (legging + helm), slot two the Normal-only
     // feet / held / ring partition; a heroic claim skips slot two
-    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
-    // its place, so Heroic pays the same count at the same ilvl 35 (this raid
-    // has NO heroic item-level layer) and differs only in WHICH items drop.
+    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot (weapons
+    // and shields only) pays in its place, plus ONE guaranteed Robe sigil from
+    // its own heroic group (2026-09-11 re-cut), all at the same ilvl 35 (this
+    // raid has NO heroic item-level layer).
     // Copper rides the raid-finale base on the Ignivar wiring. Re-cut
     // 2026-09-02 from the launch tables' four groups; draw order is
     // parity-sensitive from here: entries APPEND, never reorder.
@@ -311,9 +312,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (mantle + grip), slot two the Normal-only
     // neck / waist / smaller-weapon partition; a heroic claim skips slot two
-    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
-    // its place, so Heroic pays the same count at the same ilvl 35 (this raid
-    // has NO heroic item-level layer) and differs only in WHICH items drop.
+    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot (weapons
+    // and shields only) pays in its place, plus ONE guaranteed Robe sigil from
+    // its own heroic group (2026-09-11 re-cut), all at the same ilvl 35 (this
+    // raid has NO heroic item-level layer).
     // Re-cut 2026-09-02 from the launch tables' four groups; draw order is
     // parity-sensitive from here: entries APPEND, never reorder.
     loot: [
