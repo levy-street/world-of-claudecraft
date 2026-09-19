@@ -3,6 +3,26 @@ import { expect, it, vi } from 'vitest';
 import { harvestFallback } from '../src/render/ability_vfx/harvest_fallback';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';
 
+it('preserves opposing diagonals and opening duration when the membrane pool is full', () => {
+  const paths: Vector3[][] = [];
+  const host = {
+    pathRibbon: vi.fn((_color, width, life, draw) => {
+      expect(width).toBeLessThan(0.32);
+      expect(life).toBe(0.16);
+      const points = Array.from({ length: 9 }, () => new Vector3());
+      draw(points);
+      paths.push(points);
+      return true;
+    }),
+  } as unknown as SequencerHost;
+  const origin = { x: 0, y: 2, z: 0 };
+  harvestFallback(host, origin, 0, -0.66, 3.72 / 6.36);
+  harvestFallback(host, origin, 0, 0.58, 3.72 / 6.36);
+  expect(paths[0][8].y - paths[0][0].y).toBeLessThan(-4);
+  expect(paths[2][8].y - paths[2][0].y).toBeGreaterThan(3.5);
+  for (const points of paths) expect(points.every((p) => Math.abs(p.x) < 3.72)).toBe(true);
+});
+
 it('retains each wound origin after shared scratch reuse across recipients and later frames', () => {
   const draws: Array<(points: Vector3[]) => number> = [];
   const host = {

@@ -6,6 +6,8 @@
 
 The existing opening and Fury character animation are preserved. The three original weapon strikes resolve together 0.50 seconds after activation. Damage, refunds and Enrage follow that delivery; cost and cooldown still start on activation. The impact is driven by the actual damage event, so a miss produces no blood and a fully absorbed hit produces a shield response.
 
+The two original crossing blade membranes now precede the explosion at 0.15 and 0.32 seconds. They retain their original diagonal angles, colour, scale and short lifetime. They describe the weapon swings, with no early wounds, hit sound or shake, and remain bounded to weapon reach if the target retreats. The final explosion remains unchanged; the rejected final eruption membrane is not restored. Priority ribbons preserve the two diagonal gestures when the membrane pool is occupied.
+
 The receiving effect combines a brief hot wound flash, a large detailed Blender spray directed through the target, finer crossing spray, ballistic droplets and body-following wound marks. The full-quality primary spray uses a 14.5 authored size. A hidden nine-unit rendering clamp previously prevented that scale; only the Warrior impact atlas families now allow up to 18. Secondary recipients keep a smaller receiving composition. The existing bounded GPU pools are unchanged.
 
 Two alternate membrane designs were rejected in actual preview captures because their silhouettes resembled antlers or wings. The final detonation omits that membrane and uses the detailed spray. The opening, timing, collision and dissipation remain distinct phases. The impact recording plays with the receiving blast; its coordinates survive a disappearing target view.

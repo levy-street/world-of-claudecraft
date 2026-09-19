@@ -1,4 +1,5 @@
 import { meleeContactHeight, meleeImpactProfile } from '../melee_impact_core';
+import { drawHarvestOpeningCut } from './fury_release';
 import { harvestFallback } from './harvest_fallback';
 import type { SeqSlot, SequencerHost } from './sequencer';
 
@@ -23,6 +24,7 @@ export function harvestBeat(
   detonation = false,
 ): boolean {
   if (slot.abilityId !== 'red_harvest') return false;
+  if (!detonation && slot.componentOutcomes === 0) drawHarvestOpeningCut(host, slot, beat);
   const outcome =
     slot.componentOutcomes === undefined ? 1 : (slot.componentOutcomes >> (beat * 2)) & 3;
   if (outcome === 0) return true;

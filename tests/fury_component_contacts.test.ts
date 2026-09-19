@@ -111,7 +111,12 @@ it('preserves Twinstrike component order and collapses every Harvest hit/miss co
       expect(host.weaponTrail).toHaveBeenCalledTimes(2);
       if (!mask) {
         expect(host.burstAt).not.toHaveBeenCalled();
-        expect(host.crestAt).not.toHaveBeenCalled();
+        if (id === 'red_harvest')
+          expect(vi.mocked(host.crestAt!).mock.calls.map((call) => call[7])).toEqual([
+            'harvest_cut',
+            'harvest_cut',
+          ]);
+        else expect(host.crestAt).not.toHaveBeenCalled();
         expect(host.shakeAt).not.toHaveBeenCalled();
       }
     }
@@ -327,7 +332,14 @@ const harvestHit = {
 it('preserves the opening, plays its recording, and creates no early wound before the authoritative batch', () => {
   const { host, deps, painter } = performance();
   painter.handleSpellfx(harvestStart);
-  for (let i = 0; i < 9; i++) painter.update(0.05);
+  for (let i = 1; i <= 9; i++) {
+    painter.update(0.05);
+    expect(host.crestAt).toHaveBeenCalledTimes(i < 3 ? 0 : i < 7 ? 1 : 2);
+  }
+  expect(vi.mocked(host.crestAt!).mock.calls.map((call) => [call[7], call[10]])).toEqual([
+    ['harvest_cut', -0.66],
+    ['harvest_cut', 0.58],
+  ]);
   expect(deps.triggerAttack).toHaveBeenCalledExactlyOnceWith(1, 'red_harvest');
   expect(host.weaponTrail).toHaveBeenCalledTimes(2);
   expect(host.contact).not.toHaveBeenCalled();
@@ -342,6 +354,7 @@ it('preserves the opening, plays its recording, and creates no early wound befor
   painter.update(0.05);
   expect(host.contact).toHaveBeenCalledTimes(1);
   expect(deps.triggerAttack).toHaveBeenCalledTimes(1);
+  expect(host.crestAt).toHaveBeenCalledTimes(2);
   const impact = vi.mocked(host.abilityAudio!).mock.calls.filter((c) => c[0] === 'impact');
   expect(impact).toHaveLength(1);
   expect(impact[0][6]?.sample).toBe('impact_warrior_red_harvest_finish');

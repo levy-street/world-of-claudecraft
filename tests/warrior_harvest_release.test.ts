@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest';
-import { drawHarvestRelease } from '../src/render/ability_vfx/fury_release';
+import { drawHarvestOpeningCut, drawHarvestRelease } from '../src/render/ability_vfx/fury_release';
 import type { SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
 
 function fixture(sprite: boolean | undefined = true) {
@@ -48,4 +48,31 @@ it('retains the inward weapon gesture when the sprite budget refuses admission',
   h.draw();
   expect(h.host.pathRibbon).toHaveBeenCalledTimes(2);
   expect(h.host.countPrimitive).toHaveBeenCalledWith('red_harvest', 2);
+});
+
+it('keeps opening cuts within weapon reach and skips the finale and secondary recipients', () => {
+  const h = fixture();
+  h.host.anchorOf.mockImplementation((id, _height, out) =>
+    Object.assign(out, { x: id === 1 ? 0 : 100, y: 2, z: 0 }),
+  );
+  const crestAt = vi.fn(() => true);
+  const host = { ...h.host, crestAt } as unknown as SequencerHost;
+  const slot = { ...h.slot, spec: { physical: { reach: 3.65 } } } as SeqSlot;
+  drawHarvestOpeningCut(host, slot, 0);
+  drawHarvestOpeningCut(host, slot, 1);
+  const calls = crestAt.mock.calls as unknown as unknown[][];
+  expect(calls).toHaveLength(2);
+  for (const call of calls) {
+    expect(call[0]).toBeCloseTo(3.4);
+    expect(call[7]).toBe('harvest_cut');
+    expect(call[9]).toBe(0.16);
+  }
+  drawHarvestOpeningCut(host, slot, 2);
+  drawHarvestOpeningCut(host, { ...slot, physicalSecondary: true }, 0);
+  expect(crestAt).toHaveBeenCalledTimes(2);
+  expect(h.host.bakedAt).not.toHaveBeenCalled();
+  expect(h.host.pathRibbon).not.toHaveBeenCalled();
+  crestAt.mockReturnValue(false);
+  drawHarvestOpeningCut(host, slot, 1);
+  expect(h.host.pathRibbon).toHaveBeenCalledTimes(2);
 });
