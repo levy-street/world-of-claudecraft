@@ -18,6 +18,12 @@ import { abilityScalingPower, dotTickBonus, hotTickBonus } from '../spell_scalin
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import type { Aura, AuraKind, Entity } from '../types';
 import { LUNGE_ID, startLunge } from './druid_lunge';
+import {
+  BRUIN_RUSH_WINDOW_ID,
+  BRUIN_RUSH_WINDOW_SECONDS,
+  bruinRushWindowTargetId,
+  openBruinRushWindow,
+} from './druid_rush_window';
 import { wearsSetBonus } from './set_bonus_wearer';
 
 export const MOONTIDE_ID = 'moontide';
@@ -102,30 +108,17 @@ export function longstrideMetrics(): LongstrideMetrics {
 
 // Pin, the Bruin Rush to Cat Form rider (Wildfang kit pass 2). Landing Bruin
 // Rush opens a short window in which Cat Form costs nothing and Pins the
-// Rush target: a 50% slow for 4 sec. The window is an AURA on the druid
-// rather than a new Entity field, the Colossal Might cap precedent: it rides
-// the ordinary aura wire so the online client's resolvedAbility (the shared
-// cost tail in combat/ability_resolution.ts) shows the free cost the server
-// will bill, it expires through the aura tick, a death wipes it with every
-// other aura, and it adds no field to the parity trace. Its value carries the
-// Rush target's entity id, the one piece of state the rider needs.
-export const BRUIN_RUSH_WINDOW_ID = 'bruin_rush_window';
-export const BRUIN_RUSH_WINDOW_SECONDS = 3;
+// Rush target: a 50% slow for 4 sec. The window itself (an aura on the druid,
+// opened by the Rush cast and re-armed by the Rush landing) lives in the
+// druid_rush_window.ts leaf so the charge-route arrival hook can reach it
+// without a cycle; its ids are re-exported here for the engine's consumers.
+export { BRUIN_RUSH_WINDOW_ID, BRUIN_RUSH_WINDOW_SECONDS, bruinRushWindowTargetId };
 export const PIN_ID = 'pin';
 export const PIN_SLOW_MULT = 0.5;
 export const PIN_DURATION = 4;
 // The window is opened by this ability and consumed by this shift.
 const BRUIN_RUSH_ID = 'bear_charge';
 const CAT_FORM_ID = 'cat_form';
-
-// The Rush target's entity id while the window is live, else null. Reads the
-// aura list only, so both the Sim and the online client mirror can ask.
-export function bruinRushWindowTargetId(actor: Pick<Entity, 'auras'>): number | null {
-  for (const aura of actor.auras) {
-    if (aura.id === BRUIN_RUSH_WINDOW_ID && aura.kind === 'internal_cd') return aura.value;
-  }
-  return null;
-}
 
 // The cost tail's question: is Cat Form free for this actor right now?
 export function bruinRushMakesCatFormFree(
@@ -312,17 +305,7 @@ export function druidEngineOnCast(
   // the window Pins that target (never the current target) and closes it.
   // Both arms are talent-free and draw no rng.
   if (abilityId === BRUIN_RUSH_ID && target && !target.dead && ctx.isHostileTo(player, target)) {
-    removeOwnedAura(ctx, player, BRUIN_RUSH_WINDOW_ID);
-    ctx.applyAura(player, {
-      id: BRUIN_RUSH_WINDOW_ID,
-      name: 'Bruin Rush',
-      kind: 'internal_cd',
-      remaining: BRUIN_RUSH_WINDOW_SECONDS,
-      duration: BRUIN_RUSH_WINDOW_SECONDS,
-      value: target.id,
-      sourceId: player.id,
-      school: 'physical',
-    });
+    openBruinRushWindow(ctx, player, target);
   } else if (abilityId === CAT_FORM_ID) {
     const pinTargetId = bruinRushWindowTargetId(player);
     if (pinTargetId !== null) {

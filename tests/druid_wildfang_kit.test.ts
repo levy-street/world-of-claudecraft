@@ -140,13 +140,111 @@ describe('Loping Stride is baseline and Longstride retunes it', () => {
 });
 
 describe('Pin, the Bruin Rush to Cat Form rider', () => {
-  function rushRig() {
+  function rushRig(dist = 12) {
     const { sim, player } = rig();
-    const target = addTargetMob(sim, 12);
+    const target = addTargetMob(sim, dist);
     cast(sim, 'bear_form');
     expect(inForm(player, 'form_bear')).toBe(true);
     return { sim, player, target };
   }
+
+  // The window is armed by the Rush CAST, but the design (and the tooltip's "for
+  // 3 sec afterwards") measures it from the Rush LANDING: from max range the
+  // charge itself runs for over a second, and Bruin Form's own global cooldown
+  // still covers the first 1.5 sec, so a cast-only window left a Cat Form press
+  // at 3 sec after the Rush paying full mana and Pinning nothing (the player
+  // report "does not pin the target, does not make Cat Form free"). Landing
+  // re-arms the window to its full length; the cast-time arm stays so a Rush
+  // that never lands (rooted, cliff, water) keeps what it had.
+  it('re-arms the window to its full length when the Rush lands', () => {
+    const { sim, player, target } = rushRig(18);
+    cast(sim, 'bear_charge', 0);
+    expect(player.chargeTargetId).toBe(target.id);
+    // Mid-route: the cast-time window is already draining.
+    ticks(sim, 0.5);
+    expect(player.chargeTargetId).toBe(target.id);
+    const midRoute = aura(player, BRUIN_RUSH_WINDOW_ID)?.remaining ?? 0;
+    expect(midRoute).toBeLessThan(BRUIN_RUSH_WINDOW_SECONDS - 0.4);
+    let landedAt = -1;
+    for (let tick = 0; tick < 60 && landedAt < 0; tick++) {
+      sim.tick();
+      if (player.chargeTargetId === null) landedAt = tick;
+    }
+    expect(landedAt).toBeGreaterThanOrEqual(0);
+    const landed = aura(player, BRUIN_RUSH_WINDOW_ID);
+    expect(landed?.value).toBe(target.id);
+    // The landing tick re-arms it: at most one tick of drain past the full length.
+    expect(landed?.remaining).toBeGreaterThan(BRUIN_RUSH_WINDOW_SECONDS - 0.1);
+    expect(landed?.duration).toBe(BRUIN_RUSH_WINDOW_SECONDS);
+  });
+
+  it('Pins and is free when Cat Form follows the natural Bruin Form, Rush, Cat combo', () => {
+    const { sim, player } = rig();
+    const target = addTargetMob(sim, 18);
+    // The real key sequence: Bruin Form (its GCD starts), Rush the moment it
+    // is available (off the GCD), then Cat Form once the GCD has cleared and
+    // the Rush has landed: 3 sec after the Rush press, before the fix a
+    // full-mana shift that Pinned nothing.
+    sim.castAbility('bear_form');
+    sim.tick();
+    const parkedBefore = player.savedMana;
+    sim.castAbility('bear_charge');
+    sim.tick();
+    expect(aura(player, BRUIN_RUSH_WINDOW_ID)?.value).toBe(target.id);
+    ticks(sim, 3.1);
+    expect(player.chargeTargetId).toBeNull();
+    expect(player.gcdRemaining).toBe(0);
+    expect(sim.resolvedAbility('cat_form')?.cost).toBe(0);
+    sim.castAbility('cat_form');
+    sim.tick();
+    expect(inForm(player, 'form_cat')).toBe(true);
+    expect(player.savedMana).toBe(parkedBefore);
+    expect(aura(target, PIN_ID)?.value).toBe(PIN_SLOW_MULT);
+    expect(aura(player, BRUIN_RUSH_WINDOW_ID)).toBeUndefined();
+  });
+
+  it('re-arms the window when the Rush is cut short too, since the rider never had a range check', () => {
+    const { sim, player, target } = rushRig(18);
+    cast(sim, 'bear_charge', 0);
+    ticks(sim, 0.3);
+    expect(player.chargeTargetId).toBe(target.id);
+    // A root ends the route without landing (updateChargeMovement's isRooted arm).
+    player.auras.push({
+      id: 'test_root',
+      name: 'Test Root',
+      kind: 'root',
+      remaining: 5,
+      duration: 5,
+      value: 0,
+      sourceId: target.id,
+      school: 'nature',
+    });
+    sim.tick();
+    expect(player.chargeTargetId).toBeNull();
+    expect(dist2d(player.pos, target.pos)).toBeGreaterThan(MELEE_RANGE);
+    expect(aura(player, BRUIN_RUSH_WINDOW_ID)?.remaining).toBeGreaterThan(
+      BRUIN_RUSH_WINDOW_SECONDS - 0.1,
+    );
+  });
+
+  it('does not re-arm the window for a Rush whose target died on the way', () => {
+    const { sim, player, target } = rushRig(18);
+    cast(sim, 'bear_charge', 0);
+    ticks(sim, 0.3);
+    const beforeDeath = aura(player, BRUIN_RUSH_WINDOW_ID)?.remaining ?? 0;
+    const dealDamage = (sim as unknown as { dealDamage(...args: unknown[]): void }).dealDamage.bind(
+      sim,
+    );
+    dealDamage(player, target, target.hp + 1, false, 'physical', null, 'hit');
+    expect(target.dead).toBe(true);
+    sim.tick();
+    expect(player.chargeTargetId).toBeNull();
+    // The kill leaves the druid in combat, so the window is still there: drained,
+    // not re-armed.
+    const after = aura(player, BRUIN_RUSH_WINDOW_ID);
+    expect(after).toBeDefined();
+    expect(after?.remaining ?? 0).toBeLessThan(beforeDeath);
+  });
 
   it('makes Cat Form free inside the 3 sec window and Pins the Rush target', () => {
     const { sim, player, target } = rushRig();
@@ -174,6 +272,8 @@ describe('Pin, the Bruin Rush to Cat Form rider', () => {
   it('charges the full 30 mana and Pins nothing once the window has closed', () => {
     const { sim, player, target } = rushRig();
     cast(sim, 'bear_charge');
+    // The window is measured from the end of the Rush, so let the route end first.
+    while (player.chargeTargetId !== null) sim.tick();
     ticks(sim, BRUIN_RUSH_WINDOW_SECONDS + 0.2);
     expect(aura(player, BRUIN_RUSH_WINDOW_ID)).toBeUndefined();
     expect(sim.resolvedAbility('cat_form')?.cost).toBe(30);

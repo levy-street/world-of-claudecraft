@@ -8,6 +8,7 @@
 import type { SimContext } from '../sim_context';
 import { type Entity, MELEE_RANGE } from '../types';
 import { finishLunge } from './druid_lunge';
+import { finishBruinRush } from './druid_rush_window';
 import { finishBloodhook } from './hunter_fieldcraft';
 
 /** A charge runs at this multiple of normal run speed. */
@@ -26,4 +27,5 @@ export function finishChargeArrival(
 ): void {
   finishBloodhook(ctx, runner, target, arrived);
   finishLunge(ctx, runner, target, arrived);
+  finishBruinRush(ctx, runner, target);
 }

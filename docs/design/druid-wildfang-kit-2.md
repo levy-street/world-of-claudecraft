@@ -17,7 +17,11 @@ to Cat shift could land.
    `tests/talent_tooltip_accuracy.test.ts`.
 2. **Pin.** Landing Bruin Rush opens a 3 sec window: Cat Form costs 0 mana and Pins the
    Rush target (a 50% slow for 4 sec on the target that was Rushed, never the current
-   target). The window is an aura on the druid (`bruin_rush_window`, kind `internal_cd`,
+   target). The window opens on the Rush cast, so the free cost already shows while the
+   route runs, and re-arms to its full length when the route ends (landed or cut short,
+   unless the target died on the way): the 3 sec are measured from AFTER the Rush, never
+   eaten by the charge travel or by Bruin Form's own global cooldown
+   (`combat/druid_rush_window.ts`, the charge-route arrival hook). The window is an aura on the druid (`bruin_rush_window`, kind `internal_cd`,
    value = the target id), the Colossal Might cap precedent, rather than a new Entity
    field: it rides the ordinary aura wire so the shared cost tail
    (`combat/ability_resolution.ts`) shows the free cost in BOTH worlds' tooltips, it
