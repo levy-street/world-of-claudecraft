@@ -40,10 +40,12 @@ export interface PaperdollView {
   weapons: PaperdollSlot[];
 }
 
-export type CharacterSidebarTab = 'stats' | 'progression' | 'skills';
+export type CharacterSidebarTab = 'stats' | 'progression' | 'skills' | 'reputation' | 'currencies';
 
 export const CHARACTER_SIDEBAR_TABS: readonly CharacterSidebarTab[] = [
   'stats',
+  'reputation',
+  'currencies',
   'progression',
   'skills',
 ];

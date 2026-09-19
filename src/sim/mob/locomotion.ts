@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from '../glider_action_lock';
+import { hasShadowCloak } from '../shadow_action_lock';
 // Mob locomotion (M2), extracted from the Sim monolith.
 //
 // This module owns the mob-AI locomotion core: the updateMob dispatcher (its
@@ -544,7 +546,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
         // pad. Ruled acceptable: one 50 ms deferral, uniform across hosts.
         ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
           counters.aggroScanPlayerVisits++;
-          if (e.dead) return;
+          if (
+            e.dead ||
+            hasShadowCloak(e) ||
+            gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+          )
+            return;
           const radius = Math.max(
             4,
             Math.min(MAX_AGGRO_RADIUS, template.aggroRadius + (mob.level - e.level) * 1.5),
@@ -565,7 +572,12 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       const counters = ctx.mobScanCounters;
       ctx.playerGrid.forEachInRadius(mob.pos.x, mob.pos.z, MAX_AGGRO_RADIUS, (e, d2) => {
         counters.aggroScanPlayerVisits++;
-        if (e.dead) return;
+        if (
+          e.dead ||
+          hasShadowCloak(e) ||
+          gliderActionsLocked(ctx.players.get(e.id)?.worldQuestLog)
+        )
+          return;
         if (isTrivialTo(mob, e)) return;
         let radius = Math.max(
           4,

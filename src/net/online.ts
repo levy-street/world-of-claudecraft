@@ -1,6 +1,7 @@
 import type { MaterialComposition } from '../sim/material_sources';
 import type { MaterialStackSelection } from '../sim/material_stack_selection';
 import { materialStorageTransferPayload } from './material_storage_command';
+import { decodeWeeklyRewardInfo, sendWeekly, type WeeklyRewardInfo } from './weekly_rewards_wire';
 
 // Online play: REST auth client + WebSocket world mirror.
 
@@ -86,7 +87,6 @@ import {
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
-  type QuestProgress,
   type QuestState,
   type RiftTier,
   type RiteIntensity,
@@ -196,7 +196,7 @@ import { anchorFields } from './anchor_fields';
 import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
-import { applyBankSelfWire } from './bank_snapshot_wire';
+import { applyBankSelfWire, applyGuildBankSelfWire } from './bank_snapshot_wire';
 import { blankEntity } from './blank_entity';
 import { applyBookOfDeedsWire } from './book_wire';
 import {
@@ -228,6 +228,7 @@ import {
   type MountRaceMirror,
 } from './mount_race_wire';
 import {
+  encodeAnalogMoveInput,
   type MovementFrameV2,
   MovementFrameV2Outbox,
   trackPendingInputSequence,
@@ -1265,8 +1266,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
-  questLog = new Map<string, QuestProgress>();
-  questsDone = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
   // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
   // field (pet state lives on the owned-mob entity wire). ---
@@ -1325,6 +1324,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // `self` block can ever carry it (and only while a banker gates it, like
   // bankInfo above), which leaves this null away from a bursar. ---
   vaultInfo: VaultInfo | null = null;
+  weeklyRewardInfo: WeeklyRewardInfo | null = null;
   // --- IWorldBank: the craft-from-vault stock view (Bank Storage Phase 04),
   // mirrored from the snapshot self (`s.cvault`, delta-omitted). Owner-only
   // like vaultInfo, but gated on the craft-draw context predicate instead of
@@ -1758,6 +1758,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
+    this.bindQuestWorldWire(this.base, (command) => this.cmd(command));
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     // Placeholder until the server's hello supplies the authoritative seed;
@@ -1900,6 +1901,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
     this.worldInteractionRequests?.reset();
+    this.vehicleSession = null;
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
     // SAME physical drop: on the zombie-socket path the visibility handler
@@ -1939,6 +1941,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private endSession(): void {
+    this.vehicleSession = null;
     // Flush a pending layout save BEFORE teardown, while the socket is still open
     // and `connected` is still true: close() calls this before ws.close() and
     // sendLogout() calls it before the logout frame, so the final edit is not
@@ -2190,11 +2193,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         sf: mi.surface ? 1 : 0,
       },
     };
-    // Swim camera steer is sparse: absent means full rate and preserves the
-    // legacy land-frame wire shape.
-    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
-      (msg.mi as Record<string, number>).ss = mi.swimSteer;
-    }
+    Object.assign(msg.mi as object, encodeAnalogMoveInput(mi));
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
     this.ws.send(JSON.stringify(msg));
@@ -2344,6 +2343,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.gatheringGoal = null;
         // Same idea for a corpse-harvest-info query issued just before the drop.
         this.worldInteractionRequests?.resetQuery();
+        this.resetQuestWorldWireState();
         this.onReconnected?.();
       }
       this.connected = true;
@@ -2977,7 +2977,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
 
     // self with extended state (always a full record)
-    const s = snap.self;
+    const s = this.applyNearbyWorldQuestTraceSnapshot(snap);
     const e = s ? applyWire(s, true) : null;
     if (s && e) {
       applyReconSelfWire(this, s, this.movementWireVersion);
@@ -3229,9 +3229,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      if (s.qlog !== undefined)
-        this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
-      if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      this.applyQuestSelfSnapshot(s, timerWire.time);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the
@@ -3289,26 +3287,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // module, where the delta contract, the by-reference adoption rationale,
       // and each key's malformed policy (vault clears, the rest retain) live.
       applyBankSelfWire(this, s);
-      // `guildBank` follows the same delta contract; the server encodes null
-      // away from a banker, on death, and outside a guild (the proximity +
-      // membership gate lives in sim guildBankInfoFor; any rank sees it, the
-      // snapshot's canEdit flag marks officer-plus).
-      if (s.guildBank !== undefined) {
-        // BOTH EDGES of the gate reset the activity log, not just the losing
-        // one. Losing it (walked away, died, left or switched guild)
-        // invalidates the rows: they are one guild's history
-        // read under a membership this client may no longer hold, so they are
-        // dropped rather than left to paint into the next pane that opens.
-        // REGAINING it
-        // has to reset too, because the answer this client is holding was taken
-        // while the gate was shut: a member who opened the log away from the
-        // banker got a `refused`, and without this the pane went on saying
-        // refused for the rest of the TTL after they walked up. Re-arming on
-        // the transition makes it self-correct in one frame.
-        const hadGate = this.guildBankInfo !== null;
-        this.guildBankInfo = s.guildBank;
-        if (hadGate !== (this.guildBankInfo !== null)) this.guildBankLogMirror.reset();
-      }
+      if (s.weeklyRewards !== undefined)
+        this.weeklyRewardInfo = decodeWeeklyRewardInfo(s.weeklyRewards);
+      applyGuildBankSelfWire(this, s, () => this.guildBankLogMirror.reset());
       // --- IWorldDeeds / IWorldReliquary / account-ledger self-decode
       // (`deeds`/`dstats`/`reliq`/`acct` heavy-gated, `renown`/`atitle`/
       // `aborder` per-tick diffed, all delta-omitted): src/net/book_wire.ts. ---
@@ -4745,6 +4726,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   vaultDepositAll(): void {
     this.cmd({ cmd: 'vault_deposit_all' });
+  }
+  claimWeeklyReward(choice: string): void {
+    sendWeekly(this.weeklyRewardInfo, choice, 'claim', (m) => this.cmd(m));
+  }
+  openWeeklyReward(choice: string): void {
+    sendWeekly(this.weeklyRewardInfo, choice, 'open', (m) => this.cmd(m));
   }
   vaultBuyUpgrade(): void {
     this.cmd({ cmd: 'vault_buy_upgrade' });

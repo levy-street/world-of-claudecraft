@@ -1,3 +1,4 @@
+// biome-ignore-all format: Preserve the legacy hand-maintained dictionaries; format new locale modules instead.
 // AUTO-ASSEMBLED localization for sim-emitted system/combat/loot/error log text.
 // The deterministic core (src/sim) is host-agnostic and MUST stay English: it emits
 // SimEvent log/error/loot text in English. The client re-renders it here, exactly
@@ -12,6 +13,12 @@
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
+import {
+  FACTION_IDS,
+  FACTIONS,
+  STANDING_TIER_LABELS,
+  STANDING_TIERS,
+} from '../sim/factions';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
@@ -26,6 +33,8 @@ import {
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 import { localizeTalentTitle } from './talent_i18n';
+import { localizeWorldQuestFreightYell, worldQuestFreightSpeakerName } from './world_quest_freight_i18n';
+import { localizeWorldQuestTraceReaction } from './world_quest_trace_view';
 
 const baseEnTable = {
   'aura.craftedMomentum': 'Crafted Momentum',
@@ -33,6 +42,11 @@ const baseEnTable = {
   'aura.craftedPreservation': 'Crafted Preservation',
   'aura.craftedCollection': 'Crafted Collection',
   'aura.lastflameZeal': "Last Flame's Zeal",
+  'log.gliderReturn': 'A howling updraft carries you swiftly back up to The Shear!',
+  'log.gliderCountdown': 'Prepare for launch! 3... 2... 1...',
+  'log.gliderLaunch': 'The wind catches your glider! Steer through the rings and touch down in the marked landing zone!',
+  'log.gliderRetry': 'The updraft carries you back to Zephyr. Speak with him to try again.',
+
   'log.deathwardSaves': 'A deathward saves you!',
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
@@ -161,6 +175,7 @@ const baseEnTable = {
   'error.noMountYet': "You don't have a mount yet.",
   'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
   'error.mountAlreadyOwned': 'You already own that mount.',
+  'error.mountCarryingFreight': "You can't ride while carrying freight.",
   // Riding skill gate (src/sim/mounts.ts): emitted when the player tries to
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
@@ -304,6 +319,10 @@ const baseEnTable = {
   'error.talentsInCombat': 'You cannot change talents in combat.',
   'error.talentsArena': 'You cannot change talents during an arena match.',
   'error.noItem': "You don't have that item.",
+  'error.clueScrollEmpty': 'This scroll has nothing to reveal.',
+  'error.clueAlreadyFollowing': 'You are already following a clue.',
+  'error.clueNothingToDig': 'There is nothing to dig here.',
+  'error.clueMissingItems': 'You do not have what the clue asks for.',
   'error.cantWhileDead': "You can't do that while dead.",
   'error.cantWhileSwimming': "You can't do that while swimming.",
   'error.shellskinPreventsAttacks': 'Shellskin prevents attacks.',
@@ -395,6 +414,9 @@ const baseEnTable = {
   'groundPickup.ledgerPageDeny': 'The ledger pages are bound too tightly to take.',
   'groundPickup.morthenGrimoireDeny': "The grimoire's clasp is magically sealed.",
   'groundPickup.fenMusterOrderDeny': 'The wax seal holds until the order is yours to claim.',
+  'groundPickup.freightOrderDeny': 'The freight order is not active.',
+  'groundPickup.freightCrateEnough': 'You are already carrying a freight crate.',
+  'groundPickup.freightWagonEnough': 'The wagon is waiting for another crate.',
   'groundPickup.caravanGoodsDeny': "You aren't authorized to salvage these goods yet.",
   'groundPickup.rustedCenserDeny': 'The censer is chained in place.',
   'groundPickup.bastionWardStoneDeny': 'The ward stone will not budge.',
@@ -444,6 +466,11 @@ const baseEnTable = {
   'groundPickup.hollowSealstoneDeny':
     'The sealstone waits, its socket empty. You have nothing that fits it.',
   'groundPickup.hollowSealstoneEnough': 'The seal is set. The sealstone asks nothing more of you.',
+  'groundPickup.leylineCacheDeny': 'The cache is dormant. A ley disturbance may awaken it.',
+  'groundPickup.confectionGameBoxDeny':
+    'The game box is sealed until its confectionery challenge returns.',
+  'groundPickup.leylineCacheEnough': 'This ley alignment is already complete.',
+  'groundPickup.confectionGameBoxEnough': 'This confection challenge is already complete.',
   'groundPickup.monumentOverlookDeny':
     'The verse is worn shallow. Without a reason to read, it stays silent.',
   'groundPickup.monumentOverlookEnough':
@@ -752,6 +779,7 @@ const baseEnTable = {
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
+  'aura.carryingFreight': 'Carrying Freight',
   'aura.sprintRune': 'Sprint',
   'aura.battleRune': 'Battle Rune',
   'aura.wardRune': 'Ward Rune',
@@ -957,6 +985,7 @@ const baseEnTable = {
   'aura.destructionRuin': 'Ruin',
   'aura.ruinousBrand': 'Ruinous Brand',
   'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.duskweaveCloak': 'Duskweave Cloak',
   'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
@@ -1673,6 +1702,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'No puedes cambiar de talentos en combate.',
     'error.talentsArena': 'No puedes cambiar de talentos durante un combate de arena.',
     'error.noItem': 'No tienes ese objeto.',
+    'error.clueScrollEmpty': 'Este pergamino no tiene nada que revelar.',
+    'error.clueAlreadyFollowing': 'Ya estás siguiendo una pista.',
+    'error.clueNothingToDig': 'Aquí no hay nada que desenterrar.',
+    'error.clueMissingItems': 'No tienes lo que pide la pista.',
     'error.cantWhileDead': 'No puedes hacer eso estando muerto.',
     'error.cantWhileSwimming': 'No puedes hacer eso mientras nadas.',
     'error.tameThat': 'No puedes domesticar eso.',
@@ -2484,6 +2517,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'No puedes cambiar de talentos en combate.',
     'error.talentsArena': 'No puedes cambiar de talentos durante un combate de arena.',
     'error.noItem': 'No tienes ese objeto.',
+    'error.clueScrollEmpty': 'Este pergamino no tiene nada que revelar.',
+    'error.clueAlreadyFollowing': 'Ya estás siguiendo una pista.',
+    'error.clueNothingToDig': 'Aquí no hay nada que desenterrar.',
+    'error.clueMissingItems': 'No tienes lo que pide la pista.',
     'error.cantWhileDead': 'No puedes hacer eso mientras estás muerto.',
     'error.cantWhileSwimming': 'No puedes hacer eso mientras nadas.',
     'error.tameThat': 'No puedes domar eso.',
@@ -7042,6 +7079,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '战斗中不能更改天赋。',
     'error.talentsArena': '竞技场比赛中不能更改天赋。',
     'error.noItem': '你没有那件物品。',
+    'error.clueScrollEmpty': '这张卷轴无可揭示。',
+    'error.clueAlreadyFollowing': '你已经在追寻一条线索。',
+    'error.clueNothingToDig': '这里没有什么可挖的。',
+    'error.clueMissingItems': '你没有线索所要求的东西。',
     'error.cantWhileDead': '死亡时不能这样做。',
     'error.cantWhileSwimming': '游泳时不能这样做。',
     'error.tameThat': '你无法驯服它。',
@@ -7790,6 +7831,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '戰鬥中無法變更天賦。',
     'error.talentsArena': '競技場比賽進行中無法變更天賦。',
     'error.noItem': '你沒有那件物品。',
+    'error.clueScrollEmpty': '這張卷軸無可揭示。',
+    'error.clueAlreadyFollowing': '你已經在追尋一條線索。',
+    'error.clueNothingToDig': '這裡沒有什麼可挖的。',
+    'error.clueMissingItems': '你沒有線索所要求的東西。',
     'error.cantWhileDead': '死亡時無法這樣做。',
     'error.cantWhileSwimming': '游泳時無法這樣做。',
     'error.tameThat': '你無法馴服那個目標。',
@@ -8547,6 +8592,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '전투 중에는 특성을 변경할 수 없습니다.',
     'error.talentsArena': '투기장 시합 중에는 특성을 변경할 수 없습니다.',
     'error.noItem': '그 아이템이 없습니다.',
+    'error.clueScrollEmpty': '이 두루마리에는 밝혀낼 것이 없습니다.',
+    'error.clueAlreadyFollowing': '이미 단서를 따르고 있습니다.',
+    'error.clueNothingToDig': '여기에는 파낼 것이 없습니다.',
+    'error.clueMissingItems': '단서가 요구하는 물건이 없습니다.',
     'error.cantWhileDead': '죽은 상태에서는 할 수 없습니다.',
     'error.cantWhileSwimming': '수영 중에는 할 수 없습니다.',
     'error.tameThat': '그것을 길들일 수 없습니다.',
@@ -9345,6 +9394,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': '戦闘中はタレントを変更できません。',
     'error.talentsArena': 'アリーナ試合中はタレントを変更できません。',
     'error.noItem': 'そのアイテムを持っていません。',
+    'error.clueScrollEmpty': 'この巻物には明かすものがない。',
+    'error.clueAlreadyFollowing': 'すでに手がかりを追っている。',
+    'error.clueNothingToDig': 'ここには掘るものがない。',
+    'error.clueMissingItems': '手がかりが求める物を持っていない。',
     'error.cantWhileDead': '死亡中はそれを実行できません。',
     'error.cantWhileSwimming': '泳いでいる間はそれを実行できません。',
     'error.tameThat': 'それは仲間にできません。',
@@ -10980,6 +11033,10 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.talentsInCombat': 'Нельзя менять таланты в бою.',
     'error.talentsArena': 'Нельзя менять таланты во время боя на арене.',
     'error.noItem': 'У вас нет такого предмета.',
+    'error.clueScrollEmpty': 'Этому свитку нечего открыть.',
+    'error.clueAlreadyFollowing': 'Вы уже идёте по подсказке.',
+    'error.clueNothingToDig': 'Здесь нечего копать.',
+    'error.clueMissingItems': 'У вас нет того, о чём просит подсказка.',
     'error.cantWhileDead': 'Вы не можете сделать это, будучи мёртвым.',
     'error.cantWhileSwimming': 'Вы не можете делать это во время плавания.',
     'error.tameThat': 'Это нельзя приручить.',
@@ -13776,12 +13833,33 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
     },
   };
 
+const WORLD_QUEST_DICT: Partial<
+  Record<SupportedLanguage, Partial<Record<SimMessageKey, string>>>
+> = {
+  es: {
+    'groundPickup.leylineCacheDeny':
+      'El alijo está inactivo. Una perturbación ley podría despertarlo.',
+    'groundPickup.confectionGameBoxDeny':
+      'La caja de juego está sellada hasta que vuelva su desafío de confitería.',
+    'aura.carryingFreight': 'Transportando mercancía',
+  },
+  es_ES: {
+    'aura.carryingFreight': 'Transportando mercancía',
+  },
+  zh_CN: { 'aura.carryingFreight': '搬运货物' },
+  zh_TW: { 'aura.carryingFreight': '搬運貨物' },
+  ko_KR: { 'aura.carryingFreight': '화물 운반 중' },
+  ja_JP: { 'aura.carryingFreight': '荷物を運搬中' },
+  ru_RU: { 'aura.carryingFreight': 'Переноска груза' },
+};
+
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
     {
       ...baseEnTable,
       ...BASE_DICT[lang],
+      ...WORLD_QUEST_DICT[lang],
       ...PET_DICT[lang],
       'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
       ...RAID_BOSS_DIALOGUE_DICT[lang],
@@ -13803,6 +13881,7 @@ export function simDictProvidedKeys(lang: SupportedLanguage): ReadonlySet<string
   const provided = new Set<string>();
   const tables: ReadonlyArray<Readonly<Record<string, string>> | undefined> = [
     BASE_DICT[lang],
+    WORLD_QUEST_DICT[lang],
     PET_DICT[lang],
     RAID_BOSS_DIALOGUE_DICT[lang],
     IGNIVAR_DICT[lang],
@@ -14094,6 +14173,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // sprint-rune haste.
   'Carrier Fatigue': 'aura.carrierFatigue',
   'Carrying the Flag': 'aura.carriedFlag',
+  'Carrying Freight': 'aura.carryingFreight',
   Sprint: 'aura.sprintRune',
   'Battle Rune': 'aura.battleRune',
   'Ward Rune': 'aura.wardRune',
@@ -14283,6 +14363,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Ruin: 'aura.destructionRuin',
   'Ruinous Brand': 'aura.ruinousBrand',
   'Duskfire Claim': 'aura.duskfireClaim',
+  'Duskweave Cloak': 'aura.duskweaveCloak',
+  'A howling updraft carries you swiftly back up to The Shear!': 'log.gliderReturn',
+  'Prepare for launch! 3... 2... 1...': 'log.gliderCountdown',
+  'The wind catches your glider! Steer through the rings and touch down in the marked landing zone!': 'log.gliderLaunch',
+  'The updraft carries you back to Zephyr. Speak with him to try again.': 'log.gliderRetry',
+
   'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',
@@ -16618,6 +16704,38 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // Standing-gated vendor row (src/sim/items.ts buyItem): the sim names the
+  // tier and the faction by their English identifiers; resolve both back to
+  // their ids so the catalog carries the words (hudChrome.reputation.*).
+  {
+    re: /^Requires (.+) with (.+)\.$/,
+    build: (m) => {
+      const tier = STANDING_TIERS.find((id) => STANDING_TIER_LABELS[id] === m[1]);
+      const faction = FACTION_IDS.find((id) => FACTIONS[id].name === m[2]);
+      return t('hudChrome.reputation.vendorGate', {
+        tier: tier ? t(`hudChrome.reputation.tier.${tier}` as TranslationKey) : m[1],
+        faction: faction
+          ? t(`hudChrome.reputation.faction.${faction}` as TranslationKey)
+          : m[2],
+      });
+    },
+  },
+  // Standing receipt (src/sim/world_quests.ts turn-in, src/sim/clue_scrolls.ts
+  // finished hunt): the amount and the faction's English name, resolved back to
+  // its id so the catalog carries the words.
+  {
+    re: /^\+(\S+) (.+) Standing\.$/,
+    build: (m) => {
+      const faction = FACTION_IDS.find((id) => FACTIONS[id].name === m[2]);
+      const amount = Number(m[1]);
+      return t('hudChrome.reputation.standingGained', {
+        amount: Number.isFinite(amount) ? formatNumber(amount, { maximumFractionDigits: 0 }) : m[1],
+        faction: faction
+          ? t(`hudChrome.reputation.faction.${faction}` as TranslationKey)
+          : m[2],
+      });
+    },
+  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>
@@ -17824,6 +17942,8 @@ const RULES: Rule[] = [
 export function localizeSimText(text: string): string | null {
   if (text === 'That material selection is no longer available.')
     return t('hudChrome.materialStackSelectionUnavailable');
+  const traceReaction = localizeWorldQuestTraceReaction(text);
+  if (traceReaction !== null) return traceReaction;
   const exactKey = EXACT[text];
   if (exactKey) return tSim(exactKey);
   for (const rule of RULES) {
@@ -17839,7 +17959,7 @@ export function localizeAuthoredYellText(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
-  return localizeSimText(text) ?? text;
+  return localizeWorldQuestFreightYell(text, getLanguage()) ?? localizeSimText(text) ?? text;
 }
 
 export function localizeAuthoredYellSpeakerName(
@@ -17849,6 +17969,8 @@ export function localizeAuthoredYellSpeakerName(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return name;
+  const freightSpeaker = worldQuestFreightSpeakerName(name, speakerKind, templateId);
+  if (freightSpeaker !== null) return freightSpeaker;
   if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
     return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
   }

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { CASKET_MOUNT_CHANCE, CASKET_MOUNT_REINS_ITEM_ID } from '../src/sim/clue_casket';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
 // mirroring tests/snapshots.test.ts.
@@ -291,6 +292,19 @@ describe('mount reins items (the collection: owning the item is owning the mount
         // purpose. Either way it stays out of every heroic table, so the heroic
         // tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
+        if (itemId === CASKET_MOUNT_REINS_ITEM_ID) {
+          // The Treasure Casket's rare mount: the casket is its sole source,
+          // so it stays out of every Rift pool as well.
+          expect(CASKET_MOUNT_CHANCE).toBeGreaterThan(0);
+          for (const pool of [
+            RIFT_EPIC_MOUNT_REINS,
+            RIFT_BLUE_MOUNT_REINS,
+            RIFT_GREEN_MOUNT_REINS,
+          ]) {
+            expect(pool as readonly string[]).not.toContain(itemId);
+          }
+          continue;
+        }
         if (NO_SOURCE_YET.includes(itemId)) {
           // The mob-table sweep above already proved it drops off nothing. Pin
           // the remaining three pools too, so "no path" means no path: the day

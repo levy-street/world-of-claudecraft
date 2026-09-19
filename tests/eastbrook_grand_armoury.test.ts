@@ -174,10 +174,11 @@ describe('Eastbrook Grand Armoury retirement (round 4)', () => {
     // live review, dropping the authored lots to eight rows, and afterwards
     // appended the harbour quarter's three coastal buildings, so the table is
     // eleven rows now.
-    expect(ZONE1_PROPS.buildings).toHaveLength(11);
-    expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual(
-      EASTBROOK_LAYOUT.buildings.map((building) => building.id),
-    );
+    expect(ZONE1_PROPS.buildings).toHaveLength(12);
+    expect(ZONE1_PROPS.buildings.map((building) => building.id)).toEqual([
+      ...EASTBROOK_LAYOUT.buildings.map((building) => building.id),
+      EASTBROOK_LAYOUT.weeklyVault.id,
+    ]);
   });
 
   it('pins the KayKit barracks and watch tower garrison on the freed Wolf Run lot', () => {

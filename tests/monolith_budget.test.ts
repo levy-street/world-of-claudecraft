@@ -473,7 +473,22 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // Re-pinned on feature/wq-standing-online: the map rail and Reputation tab
+    // wiring (11 lines) was paid for by lifting the map zone focus rule into
+    // hud/map/map_zone_focus_core.ts; exact merged count.
+    // RE-PINNED at the merge of release/v0.43.0 (tip f48bebefcb) into
+    // feature/world-quests (the standing and quartermaster round). BOTH parent
+    // pins for the record: ours 18301, the release 18309. The release side's
+    // Unlock Interface menu row and touch engine-indicator drag land +4 on the
+    // coordinator, so the merged file measures 18305 (wc -l < src/ui/hud.ts).
+    // Exact merged count, zero slack.
+    // LOWERED 18305 -> 18300 at the faction standing celebration (2026-09-17):
+    // the skill level-up paint body moved out to
+    // hud/professions/skill_level_toast_painter.ts behind the CelebrationHost
+    // seam, and the new faction tier observer landed as a thin call on the
+    // same seam (hud/reputation/faction_tier_celebration_*.ts). Exact count,
+    // zero slack.
+    ceiling: 18300,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1062,7 +1077,10 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // Weekly Vault (PR 4052) integration: the character storage load/save moved to
+    // src/sim/character_storage.ts and isQuestInteractionEntity to interaction.ts.
+    // Exact merged count, zero slack.
+    ceiling: 11805,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1488,7 +1506,10 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    ceiling: 10076,
+    // Weekly Vault (PR 4052) integration: the guild/weekly bank snapshot emitter
+    // moved to its own module.
+    // Exact merged count, zero slack.
+    ceiling: 9990,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1638,7 +1659,10 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the board path builder, the page decode and the
     // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
     // with the book_wire extraction above; exact merged count, zero slack.
-    ceiling: 5498,
+    // Weekly Vault (PR 4052) integration: the guild-bank self-decode moved to
+    // src/net/bank_snapshot_wire.ts.
+    // Exact merged count, zero slack.
+    ceiling: 5433,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1650,7 +1674,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
     // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
-    ceiling: 4850,
+    // Re-pinned 4850 -> 4720: the world quest minigame layer's three director
+    // hooks were paid for by moving the note-event primitives (the Inst union,
+    // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
+    ceiling: 4720,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {
@@ -2150,7 +2177,9 @@ const MONOLITHS: MonolithRow[] = [
     // exact `wc -l < src/ui/bank_window.ts` measurement on the resolved tree.
     // RE-CONFIRMED at the final line-budget reconciliation: still 1810,
     // below both parent pins. Exact merged count, zero slack.
-    ceiling: 1810,
+    // Held by extracting the pane tab model and markup to bank_tabs_view.
+    // Weekly reward host binding now lives with the weekly pane.
+    ceiling: 1808,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

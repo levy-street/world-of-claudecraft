@@ -57,3 +57,12 @@ export function keepSiteClear(x: number, z: number): boolean {
   const p = KEEP_SITE.pad;
   return x < p.x0 - 4 || x > p.x1 + 4 || z < p.z0 - 4 || z > p.z1 + 4;
 }
+
+// The Last Keep's SITE pad on the Trollmoot rise: one level build floor
+// with a gentle skirt back onto the rise (the castle that held the old
+// terraced grounds is gone; the plan lives in keep_site.ts).
+export function applyKeepSitePad(x: number, z: number, h: number): number {
+  const w = keepSitePadWeight(x, z);
+  if (w <= 0) return h;
+  return h + (KEEP_SITE.pad.h - h) * w;
+}

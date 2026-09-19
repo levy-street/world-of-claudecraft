@@ -107,6 +107,7 @@ import {
   resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
+  underwaterCameraCeiling,
 } from './camera_feel_core';
 import { buildCampBraziers, type CampBraziersView } from './camp_braziers';
 import { canopyDetailPrewarmTextures } from './canopy_detail';
@@ -340,6 +341,7 @@ import {
   setFoliageShadowVolume,
 } from './foliage';
 import { activeFarFieldPolicy } from './foliage_impostor';
+import { updateForgeSpeech } from './forge_speech';
 import { roundMs, summarizeMs } from './frame_ms_stats_core';
 import { type FramePresentHost, presentFrame } from './frame_present';
 import {
@@ -413,7 +415,7 @@ import {
   interiorKeyLightDirection,
   isOpenAirFogState,
 } from './interior_light_rig';
-import { IslandGuidance, type QuestGuidanceOptions } from './island_guidance';
+import type { QuestGuidanceOptions } from './island_guidance';
 import { buildJailScene, type JailSceneView } from './jail_scene';
 import { buildJungleFeatures, type JungleFeaturesView } from './jungle_features';
 import { legendaryRegaliaActive, legendaryRegaliaEmitDt } from './legendary_regalia_core';
@@ -608,9 +610,15 @@ import { runResumeUnit } from './prewarm_resume_runner';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
+import {
+  attachEntityViewBody,
+  buildQuestCaravanBody,
+  isQuestCaravanEntity,
+  type MovingWorldQuestFreightWagonVisual,
+  syncQuestCaravanView,
+} from './quest_entity_presentation';
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
-import { buildGroundQuestObject } from './quest_objects';
-import { RaceLine } from './race_line';
+import { buildGroundQuestObject, farshoreSalvagePrewarmPlan } from './quest_objects';
 import {
   disposeRaidEncounterVisuals,
   raidEncounterBypassesCharacterCulling,
@@ -766,6 +774,7 @@ import {
 import { createPrewarmGroupSlot, createVariantPrewarmSlot } from './variant_prewarm_slot';
 import { routeVarkhulForgeHammer } from './varkhul_forge_hammer';
 import { VarkhulForgestormVisuals } from './varkhul_forgestorm_visual';
+import { createVehicleCamera, stepRendererVehicleCamera } from './vehicle_camera_core';
 import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 import { SCHOOL_COLORS, Vfx } from './vfx';
 import { createOffsetVfxAnchor, createVfxAnchor } from './vfx_anchor';
@@ -815,6 +824,8 @@ import { Weather } from './weather';
 import { precipForBiome } from './weather_field_core';
 import { createRendererWebGL, type WebGLPowerPreference } from './webgl_context_fallback';
 import { buildWorldAmbientSources, footstepSurfaceAt } from './world_audio';
+import { WorldGuidance } from './world_guidance';
+import { syncWorldQuestCarryView, type WorldQuestCarryViewState } from './world_quest_carry_visual';
 import { surfaceDetailPrewarmTextures } from './worn_stone';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
@@ -1004,8 +1015,6 @@ const SWIM_KICK_HZ = 2.6;
 const SWIM_FOOT_TRAIL = 0.19;
 // Depth below the waterline over which the underwater wash fades fully in.
 const UNDERWATER_FADE_DEPTH = 0.45;
-// How far under the line the chase camera is pulled while the player is submerged.
-const UNDERWATER_CAMERA_DIP = 0.5;
 // fire/torch point lights beyond this never shine (their falloff range is
 // shorter anyway); the nearest GFX.maxPointLights within it win the budget
 const LIGHT_BUDGET_RANGE_SQ = 55 * 55;
@@ -1100,7 +1109,7 @@ interface AoeRingSlot {
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
 }
 
-export interface EntityView extends RickshawMountViewState {
+export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewState {
   group: THREE.Group;
   /** Last frame's range verdict, kept off group.visible so the cull cannot latch it. */
   inDrawRange: boolean;
@@ -1157,6 +1166,7 @@ export interface EntityView extends RickshawMountViewState {
   sparkle?: THREE.Sprite; // ground objects
   objectMesh?: THREE.Object3D;
   objectPoolKey: string | null;
+  freightCaravanVisual: MovingWorldQuestFreightWagonVisual | null;
   /** templateId the object mesh was built from. The sim swaps delve interactable
    *  templates in place (plate -> triggered, rope -> pulled); diffing this each
    *  frame drops the stale view so it rebuilds with the new mesh. */
@@ -1376,6 +1386,7 @@ export class Renderer {
   private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
   private readonly camDirector = createCameraDirector();
+  private readonly vehicleCamera = createVehicleCamera();
   private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
@@ -1626,7 +1637,7 @@ export class Renderer {
   private campBraziers: CampBraziersView | null = null;
   private decorTorchFx: DecorTorchFxView | null = null;
   // The island rail's guidance coordinator (beacon fizz + golden trail).
-  private islandGuidance!: IslandGuidance;
+  private worldGuidance!: WorldGuidance;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
@@ -1855,8 +1866,6 @@ export class Renderer {
   // Thornhollow Fields flag/rune per-frame dressing + transition bursts; runs off
   // bgInfo and view userData only (battleground_fx.ts).
   private bgFx!: BattlegroundFx;
-  private raceLine: RaceLine;
-  private mountBeacon: MountBeacon;
   // Per-ability spell VFX subsystem: the spec-driven painter plus the pooled
   // primitive engine (ribbons, shock rings, decals, windup orbs, buff orbits;
   // see src/render/ability_vfx/).
@@ -2055,7 +2064,7 @@ export class Renderer {
     options: RendererCreateOptions = {},
   ) {
     this.canvas = canvas;
-    this.questObjectHidden = makeQuestObjectGate(options);
+    this.questObjectHidden = makeQuestObjectGate(options, this.sim);
     this.nameplateLayer = nameplateLayer;
     this.travelSpeedFx = new TravelSpeedFxPainter(nameplateLayer);
     // ?prep=legacy: admit every unit as before, while the ledger keeps learning
@@ -3144,13 +3153,13 @@ export class Renderer {
     setRenderCategory(this.sentenceVfx.group, 'vfx');
 
     bd('vfx');
-    // Show-jumping racing line: self-scoped course guidance, hidden outside the
-    // player's own race (driven per frame from world.mountRaceView() below).
-    this.raceLine = new RaceLine(this.scene, this.groundSample);
-    // Riding-lesson start platform: the glowing square behind the start arch.
-    this.mountBeacon = new MountBeacon(this.scene, this.groundSample);
-    // The Proving Shore's guidance: beacon fizz, route ribbon, target ring.
-    this.islandGuidance = new IslandGuidance(this.scene, this.groundSample, (t) => this.compileGate(t), options.isQuestTracked, options.isEastbrookGuidanceEnabled);
+    this.worldGuidance = new WorldGuidance(
+      this.scene,
+      this.groundSample,
+      (t, e) => this.compileGate(t, e),
+      options.isQuestTracked,
+      options.isEastbrookGuidanceEnabled,
+    );
 
     // ambient precipitation: biome-driven snow/rain that rides with the camera
     this.weather = new Weather(this.scene, this.lowGfx);
@@ -3303,6 +3312,7 @@ export class Renderer {
     // batch or any renderer DOM surface added after the explicit maps above.
     bestEffort(() => this.nameplateLayer.replaceChildren());
     bestEffort(() => this.travelSpeedFx?.dispose());
+    bestEffort(() => this.worldGuidance?.dispose());
     bestEffort(() => this.varkhulForgestormVisuals?.dispose());
     this.varkhulForgestormVisuals = undefined;
     bestEffort(() => this.nythraxisMechanicVisuals?.dispose());
@@ -4723,7 +4733,7 @@ export class Renderer {
       player.pos,
     ).mandatory;
     const ids = mandatory.map((entity) => entity.id);
-    const compileWaits: Promise<void>[] = [];
+    const compileWaits: Promise<void>[] = [this.worldGuidance.readyForEntry];
     let created = 0;
     for (const entity of mandatory) {
       let view = this.views.get(entity.id);
@@ -6201,7 +6211,7 @@ export class Renderer {
           this.scene.add(objectPrewarmGroup);
         },
         detail: () =>
-          `items=${PREWARM_OBJECT_ITEM_IDS.length};copies=${PREWARM_OBJECT_POOL_COPIES}`,
+          `items=${PREWARM_OBJECT_ITEM_IDS.length};copies=${PREWARM_OBJECT_POOL_COPIES};salvage=${farshoreSalvagePrewarmPlan.length}`,
       },
       {
         id: 'props.material-variants',
@@ -7855,6 +7865,7 @@ export class Renderer {
     let objectMesh: THREE.Object3D | undefined;
     let visualPoolKey: string | null = null;
     let objectPoolKey: string | null = null;
+    let freightCaravanVisual: MovingWorldQuestFreightWagonVisual | null = null;
     const isQuestVision = e.kind === 'mob' && e.templateId.startsWith('vision_');
 
     let portal: THREE.Mesh | undefined;
@@ -7940,6 +7951,10 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = built.group;
+    } else if (isQuestCaravanEntity(e)) {
+      freightCaravanVisual = buildQuestCaravanBody(e);
+      body = objectMesh = freightCaravanVisual.group;
+      height = freightCaravanVisual.height;
     } else if (e.kind === 'object' && e.templateId === 'mailbox') {
       // Ravenpost pillar: bespoke procedural prop (no sparkle; the unread-mail
       // votive in the group is the per-viewer beacon, toggled in sync()).
@@ -8039,20 +8054,22 @@ export class Renderer {
       height = result.object.height;
       if (result.reused) body.rotation.y = (e.id % 7) * 0.45;
       objectMesh = body;
-      if (!this.sparkleMat) {
-        this.sparkleMat = markSharedMaterial(
-          new THREE.SpriteMaterial({
-            map: sparkleTexture(),
-            transparent: true,
-            depthWrite: false,
-          }),
-        );
-        if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
+      if (!e.objectItemId?.startsWith('forge_')) {
+        if (!this.sparkleMat) {
+          this.sparkleMat = markSharedMaterial(
+            new THREE.SpriteMaterial({
+              map: sparkleTexture(),
+              transparent: true,
+              depthWrite: false,
+            }),
+          );
+          if (!this.lowGfx) this.sparkleMat.color.setScalar(SPARKLE_BOOST); // gold glint via bloom
+        }
+        sparkle = new THREE.Sprite(this.sparkleMat);
+        sparkle.scale.set(0.9, 0.9, 1);
+        sparkle.position.y = 1.35;
+        group.add(sparkle);
       }
-      sparkle = new THREE.Sprite(this.sparkleMat);
-      sparkle.scale.set(0.9, 0.9, 1);
-      sparkle.position.y = 1.35;
-      group.add(sparkle);
     } else {
       const visualKey = visualKeyFor(e);
       // The in-flight cooldown stops the deferring entity from burning a
@@ -8114,30 +8131,7 @@ export class Renderer {
       this.sim.cfg.world?.npcs,
     );
 
-    let clickTarget: THREE.Object3D;
-    if (visual) {
-      // raycasting skinned meshes is expensive, pick against the invisible
-      // capsule proxy instead (three's raycaster ignores `visible`)
-      if (!isQuestVision) visual.clickProxy.userData.entityId = e.id;
-      clickTarget = visual.clickProxy;
-    } else {
-      // every object branch above built a body; the bare group is a benign
-      // fallback for the (unreachable) no-body case
-      if (body) {
-        group.add(body);
-        body.traverse((o) => {
-          o.userData.entityId = e.id;
-        });
-        // Prop builders hang their ambience handles (rolling rock, orbiting
-        // shards, pulsing veins, pylon flame, the mail votive) on the BODY they
-        // return, but the per-frame animation pass reads them from the view
-        // GROUP: hoist them across or every one of those animations sits inert.
-        for (const key of ['rollRock', 'riftOrbiters', 'riftPulse', 'riftFlame', 'mailGlow']) {
-          if (body.userData[key] !== undefined) group.userData[key] = body.userData[key];
-        }
-      }
-      clickTarget = body ?? group;
-    }
+    const clickTarget = attachEntityViewBody(group, body, e.id, visual, isQuestVision);
     group.scale.setScalar(e.scale);
     group.position.set(e.pos.x, e.pos.y, e.pos.z);
     group.userData.entityId = e.id;
@@ -8198,6 +8192,7 @@ export class Renderer {
       sparkle,
       objectMesh,
       objectPoolKey,
+      freightCaravanVisual,
       builtTemplateId: e.kind === 'object' ? e.templateId : undefined,
       portal,
       objectCasters,
@@ -9675,6 +9670,7 @@ export class Renderer {
       v.metamorphVisual?.dispose();
       v.fireballTravelVisual?.dispose();
     } else {
+      v.freightCaravanVisual?.dispose();
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
         this.storePooledObject(v.objectPoolKey, {
           group: v.objectMesh,
@@ -10298,8 +10294,10 @@ export class Renderer {
       if (e.kind === 'npc') {
         // The island rail's go-here-next fizz (island_guidance.ts): gentle
         // holy sparkle over beacon NPCs, gold over the current target.
-        this.islandGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
+        this.worldGuidance.npcFizz(this.sim, e, this.vfx, this.time, dt);
       }
+      if (syncQuestCaravanView(this, v, e.id, dt, d2, lodBands)) continue;
+      syncWorldQuestCarryView(v, e);
       const sunVerdictPlan = paladinSunVerdictVisualPlanForAuraInto(
         e.dead,
         sunVerdictAura,
@@ -11601,15 +11599,7 @@ export class Renderer {
     this.bgFx.update(this.time);
     updateBattlegroundViews(this.bgViews, this.bgViewState, this.sim.bgInfo, this.sim.playerId);
     this.vfx.update(dt);
-    // Racing line (cosmetic; reads the self race view only).
-    this.raceLine.update(this.sim.mountRaceView(), this.time, dt);
-    // Island guidance trail (actionable on every tier; island-gated inside).
-    this.islandGuidance.update(this.sim, this.time, dt);
-    // Start platform: visible while the riding quest is active and no race is live.
-    this.mountBeacon.update(
-      this.sim.questState('q_riding_lessons') === 'active' && !this.sim.mountRaceView(),
-      this.time,
-    );
+    this.worldGuidance.update(this.sim, this.time, dt, this.reducedMotion(), this.views.get(p.id));
     this.abilityVfx.update(dt, this.reducedMotion());
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
@@ -12147,6 +12137,7 @@ export class Renderer {
     this.cancelTerrainStreaming();
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
+    this.worldGuidance?.dispose();
     this.varkhulForgestormVisuals?.dispose();
     this.nythraxisMechanicVisuals?.dispose();
     this.blobShadows?.dispose();
@@ -12376,7 +12367,7 @@ export class Renderer {
       (Math.abs(this.camYaw - mirror.yaw) > 1e-4 ||
         Math.abs(this.camPitch - mirror.pitch) > 1e-4 ||
         Math.abs(this.camDist - mirror.dist) > 1e-4);
-    const pose = stepCameraDirector(
+    const directedPose = stepCameraDirector(
       this.camDirector,
       { yaw: this.camYaw, pitch: this.camPitch, dist: this.camDist },
       dt,
@@ -12395,17 +12386,17 @@ export class Renderer {
     // bubbles, the breaststroke you are actually playing) would only ever be
     // visible from a zoomed-in view. The ground clamp below still keeps the
     // camera off the lake bed.
-    const swimWaterLevel = waterLevelAt(selfPos.x, selfPos.z, seed);
-    const underwaterCeilingY =
-      this.selfSubmerged && Number.isFinite(swimWaterLevel)
-        ? swimWaterLevel - UNDERWATER_CAMERA_DIP
-        : Infinity;
+    const underwaterCeilingY = underwaterCameraCeiling(
+      this.selfSubmerged,
+      waterLevelAt(selfPos.x, selfPos.z, seed),
+    );
     // The camera orbits the lagged/led pivot at the player's requested
     // distance. Scene geometry never changes that distance; registered
     // obstructors fade through their subsystem's occluder-fade pass.
-    const px = this.camBoom.x + this.camFeel.leadX;
-    const py = this.camBoom.y;
-    const pz = this.camBoom.z + this.camFeel.leadZ;
+    const pose = stepRendererVehicleCamera(this, directedPose, dt, reduce);
+    const px = pose.x;
+    const py = pose.y;
+    const pz = pose.z;
     const eyeY = py + 2.0;
     const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;
     const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);
@@ -12497,12 +12488,14 @@ export class Renderer {
     // stylesheet default (and the `.yell` border) when a reused bubble switches
     // channel, so say/yell/emote stay byte-identical.
     b.el.style.borderColor = s.border ?? '';
+    b.el.style.marginTop = `${s.offsetY ?? 0}px`;
     // wall-clock ttl: sim/render time can run slower than real time under
     // frame-delta clamping, which would keep bubbles up too long
     b.until = performance.now() + 1000 * (ttlSec ?? Math.min(10, 3.5 + text.length * 0.045));
   }
 
   private updateChatBubbles(): void {
+    updateForgeSpeech(this.sim, this);
     if (this.chatBubbles.size === 0) return;
     const { width: w, height: h } = this.viewport;
     const now = performance.now();

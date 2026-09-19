@@ -96,6 +96,11 @@ const PET_PULL_SCAN = 20;
 const PET_OWNER_IDLE_TICKS = 1200;
 
 export function updatePet(ctx: SimContext, pet: Entity): void {
+  if (pet.ownerId !== null && ctx.players.get(pet.ownerId)?.vehicle) {
+    pet.targetId = null;
+    pet.autoAttack = false;
+    return;
+  }
   const owner = pet.ownerId !== null ? ctx.entities.get(pet.ownerId) : null;
   if (owner?.kind !== 'player' || !ctx.players.has(owner.id)) {
     if (pet.templateId === 'pyre_colossus') ctx.despawnPet(pet);

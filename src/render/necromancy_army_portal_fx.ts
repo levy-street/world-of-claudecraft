@@ -512,8 +512,12 @@ export function spawnArmyPortalBurstEvent(
   },
   lookupEntity: (id: number) => { pos: { x: number; z: number }; facing: number } | undefined,
 ): void {
+  // 'Raider Rift' is the world-quest ambush portal (sim/world_quest_ambush.ts):
+  // the same dark gate the Army of the Dead opens, on the necromancy palette.
   if (
-    (ev.ability !== 'army_of_the_dead' && ev.ability !== 'Forge Legion Portal') ||
+    (ev.ability !== 'army_of_the_dead' &&
+      ev.ability !== 'Forge Legion Portal' &&
+      ev.ability !== 'Raider Rift') ||
     ev.fx !== 'burst'
   ) {
     return;

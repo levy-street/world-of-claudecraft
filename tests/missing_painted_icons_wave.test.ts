@@ -681,7 +681,10 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 300 at THIS release/v0.42.0 merge: the Roots' Bramblehide set collection
     // (col_set_bramblehide, 281 to 282 on the release's own arm) joins the
     // same pending side.
-    expect(DEED_ORDER).toHaveLength(300);
+    // 308 at the release/v0.43.0 merge: plus the eight world-quest deeds.
+    // 315 with the seven faction standing deeds, 317 with the two Clue Scroll
+    // casket deeds; all nine sit on the pending side on category crests.
+    expect(DEED_ORDER).toHaveLength(317);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

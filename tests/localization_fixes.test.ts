@@ -1441,6 +1441,13 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // scan below catches sim.ctx.error), keeping a reword of the emit or
     // the matcher from drifting apart silently.
     fs.readFileSync(path.resolve(process.cwd(), 'server/bank_wire.ts'), 'utf8'),
+    // Clue Scrolls (world quests, Stage 3): the hunt engine's refusals (the
+    // dig-spot, already-following, empty-pool and short-delivery ctx.error
+    // lines) and the casket module (text-free today: every reward line is
+    // ids on clueCasketOpened plus addItem's own receipt). Scanned so the
+    // refusals sit under the drift guard from day one.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_scrolls.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/clue_casket.ts'), 'utf8'),
   ].join('\n');
   // Hardened S3: also scan the authoritative server's player-facing emits. The
   // server (server/game.ts) is language-agnostic like the sim and re-localized

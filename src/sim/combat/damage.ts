@@ -76,6 +76,8 @@ import {
   virtualLevel,
   xpForLevel,
 } from '../types';
+import { onWorldBossKilledForWeeklyQuests } from '../weekly_quests';
+import { recordWeeklyBossKill } from '../weekly_rewards';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
 import {
   afflictionOnDeath,
@@ -1824,6 +1826,7 @@ export function handleDeath(
         );
         if (xpGain > 0) grantXp(ctx, xpGain, member, { fromKill: true });
         ctx.onMobKilledForQuests(e, member);
+        ctx.onMobKilledForWorldQuests(e, member);
       }
       // A destroyed Broodmother egg may hatch a widow that swarms the killer.
       if (e.templateId === 'spider_egg' && killer) spawnWidowHatchlingOnEggDeath(ctx, e, killer);
@@ -1841,6 +1844,7 @@ export function handleDeath(
     // even without player credit so the owning group cannot dodge the lockout;
     // only the participation snapshot above receives marks.
     lockNormalDungeonResetOnBossKill(ctx, e);
+    recordWeeklyBossKill(ctx, e, heroicRewardRecipients, claimedInst);
     ctx.awardHeroicMarks(e, heroicRewardRecipients, claimedInst);
     // Intentional Gathering PR3: the kill-credit priority snapshot for a
     // future corpse-harvest cast, taken from the exact same eligible list the
@@ -1860,6 +1864,7 @@ export function handleDeath(
       ctx.rollWorldBossLoot(e, worldBossContribs);
       // World-boss deeds ride the same never-pruned contributor roster.
       deedsMod.onWorldBossKilledForDeeds(ctx, e, worldBossContribs);
+      onWorldBossKilledForWeeklyQuests(ctx, worldBossContribs);
     }
     // Masterwrought materials (phase 04): Wyrmfall Cores and the weekly ember
     // check for the same participation snapshot. Deliberately BELOW every loot

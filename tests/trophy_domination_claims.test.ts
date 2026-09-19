@@ -217,9 +217,12 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // here and never pasted from prose: a second row landing in the band reds
     // this arm instead of leaving the amendment quietly false.
     const jewelry = pool((d) => d.kind === 'armor' && (d.slot === 'neck' || d.slot === 'ring'));
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(34);
+    // 34 to 40 and 24 to 30 at the wq-reputation merge: the six faction
+    // quartermaster necks and rings (content/faction_vendors.ts) all sell above
+    // 600 and none sits inside the band, so the one-row amendment holds.
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(40);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
-    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(24);
+    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(30);
     // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),

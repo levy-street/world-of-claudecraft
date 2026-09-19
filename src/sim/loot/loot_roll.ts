@@ -32,10 +32,8 @@
 // (enforced by tests/architecture.test.ts).
 
 import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
-import { heroicVariantId } from '../content/heroic_variants';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
-import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
@@ -56,6 +54,7 @@ import type {
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
 import { grantAwardedLootItem, grantOrHoldAwardedLoot } from './awarded_loot_hold';
+import { heroicLootItemId } from './heroic_item';
 import { lootEntryRollsOnClaim } from './loot_difficulty_gate';
 import { isTapGroupMember, LOOT_FFA_DELAY } from './loot_ffa';
 
@@ -258,12 +257,7 @@ export function rollLoot(
     ) !== undefined;
   // Swap a base drop for its Heroic variant when the instance is heroic AND the
   // swap is an upgrade (raid epics, already item level 29, are left as-is).
-  const heroicItem = (id: string): string => {
-    if (!heroicClaim) return id;
-    const variant = ITEMS[heroicVariantId(id)];
-    if (!variant) return id;
-    return (itemLevel(variant) ?? 0) > (itemLevel(ITEMS[id]) ?? 0) ? variant.id : id;
-  };
+  const heroicItem = (id: string): string => heroicLootItemId(id, heroicClaim);
   for (const entry of template.loot) {
     // A Normal-only row is not part of a heroic kill at all: skipped BEFORE the
     // group bookkeeping, so a normalOnly group never draws its partition and the

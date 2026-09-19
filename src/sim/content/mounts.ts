@@ -83,9 +83,9 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   // (content/mount_skins.ts): account-wide cosmetics worn over whatever mount
   // the character rides, so real money never buys a catalog row, a reins item,
   // or a speed tier, the same line the weapon skins hold.
-  // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Terrorspark Groundshaker and the Lanternback Troll are developer-only
-  // for now and have no player-facing acquisition. The tank stays LAST in the
+  // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears,
+  // the Lanternback Troll from Treasure Caskets. The Terrorspark Groundshaker
+  // is developer-only for now and has no player-facing acquisition. The tank stays LAST in the
   // catalog (the tests pin it as the tail, so a new player-facing mount lands
   // above it); see DEVELOPER_MOUNTS below for the shared gate.
   aether_hover_cycle: {
@@ -111,7 +111,8 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   },
   // A hill troll broken to the saddle by lamplighters: he carries an iron
   // throne strapped across his shoulders with a storm lantern hung off each
-  // arm of it, so the rider travels lit. Developer-only for now.
+  // arm of it, so the rider travels lit. The Treasure Casket's rare mount
+  // (src/sim/clue_casket.ts CASKET_MOUNT_CHANCE), its sole source.
   lanternback_troll: {
     key: 'lanternback_troll',
     name: 'Grumbol the Lanternback',
@@ -139,10 +140,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = [
-  'lanternback_troll',
-  'terrorspark_groundshaker',
-];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

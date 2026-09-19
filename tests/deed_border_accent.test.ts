@@ -1145,9 +1145,12 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     // drop-shadow bloom by the tier token; the symbol itself renders at every tier.
     expect(
       allTierShadowDeclarations,
-      // Shipped uses plus the two library glow composites in tokens.css.
-      'the style graph owns 97 reviewed tier-shadow uses',
-    ).toHaveLength(97);
+      // Shipped uses plus the two library glow composites in tokens.css. The
+      // weekly vault opening (components.css, weekly rewards) owns its halo,
+      // ring, streak, star and wide-ray blooms here, all box-shadow or
+      // drop-shadow scaled by the tier, never a blur.
+      'the style graph owns 108 reviewed tier-shadow uses',
+    ).toHaveLength(108);
 
     for (const [name, body] of [
       [

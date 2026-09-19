@@ -50,6 +50,7 @@ import {
   emptyMoveInput,
 } from '../types';
 import { clearCooldownsPreservingUnstuck } from '../unstuck_cooldown';
+import { recordWeeklyPvpWin } from '../weekly_rewards';
 import { duelFor } from './duel';
 
 // Deep-copy the CC diminishing-return map so a snapshot never shares mutable
@@ -1206,6 +1207,7 @@ export function endArenaMatch(
         // (RANKED_ARENA_LOSS_HONOR), so this call site stays a plain report of
         // what happened.
         if (reason !== 'forfeit') {
+          if (won === true && !match.practice) recordWeeklyPvpWin(ctx, pid);
           awardRankedArenaResultHonor(
             ctx,
             meta,

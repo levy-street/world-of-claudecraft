@@ -32,6 +32,10 @@ export interface GossipMenuContent {
    *  the NpcDef farmer flag). Its own field so a farmer with no quest and no
    *  stock still keeps the dialog open for the trade. */
   hasFarmer: boolean;
+  /** The World Quest taskmaster's board row (NpcDef worldQuestBoard): the
+   *  route to the map's world-quest rail. Its own field so the taskmaster,
+   *  who has no quest and no stock, keeps the dialog open for it. */
+  hasWorldQuestBoard: boolean;
 }
 
 export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
@@ -46,6 +50,7 @@ export function gossipMenuIsEmpty(content: GossipMenuContent): boolean {
     !content.hasDelveBoard &&
     !content.hasCardMaster &&
     !content.hasTraining &&
-    !content.hasFarmer
+    !content.hasFarmer &&
+    !content.hasWorldQuestBoard
   );
 }

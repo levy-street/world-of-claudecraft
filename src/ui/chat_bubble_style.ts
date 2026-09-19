@@ -20,6 +20,8 @@
 // bubbles stay byte-identical to before this change.
 
 export interface ChatBubbleStyle {
+  /** Presentation offset for NPC guidance above nearby clickable world props. */
+  offsetY?: number;
   // Apply the existing `.yell` treatment (bold text, red border). Only `yell`.
   yell?: boolean;
   // Inline border colour for a channel bubble. Set for party; omitted for

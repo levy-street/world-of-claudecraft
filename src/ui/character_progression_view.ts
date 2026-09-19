@@ -58,6 +58,29 @@ export function talentSummaryHtml(sim: IWorld): string {
   return `${html}</div>`;
 }
 
+// The Specialization board on the character sheet's stats rail, seated under
+// Defense: the chosen specialization and its role as stat-style rows, then the
+// mastery line. Same shape as the Offense and Defense boards (stat-panel,
+// sp-title, stat-cell rows) so the rail reads as one column. The talents
+// window owns the picker; this is the readout.
+export function specializationPanelHtml(sim: IWorld): string {
+  const ct = talentsFor(sim.cfg.playerClass);
+  if (!ct) return '';
+  const sp = ct.specs.find((s) => s.id === sim.talentSpec);
+  const row = (label: string, value: string): string =>
+    `<span class="stat-cell ui-stat-row char-spec-row">${esc(label)}<b>${esc(value)}</b></span>`;
+  let html = `<div class="stat-panel ui-card char-spec-panel"><div class="sp-title">${esc(t('game.talents.specTab'))}</div>`;
+  html += row(
+    t('game.talents.specTab'),
+    sp ? tTalent({ kind: 'talentSpec', spec: sp, field: 'name' }) : t('game.talents.noSpec'),
+  );
+  if (sp) {
+    html += row(t('game.talents.role'), roleLabel(sp.role));
+    html += `<div class="char-spec-mastery"><span>${esc(t('game.talents.mastery'))}: <b>${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'name' }))}</b></span><span class="cp-none">${esc(tTalent({ kind: 'talentMastery', spec: sp, field: 'description' }))}</span></div>`;
+  }
+  return `${html}</div>`;
+}
+
 // The "Progression" group on the character sheet: total XP, virtual level,
 // prestige rank (when prestiged), unlocked milestone badges, and, at the cap,
 // the opt-in Prestige button.

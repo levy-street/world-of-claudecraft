@@ -1,5 +1,6 @@
 import type { MaterialSourceTransferSelection } from '../sim/material_source_transfer_selection';
 import type { InvSlot } from '../sim/types';
+import type { WeeklyRewardInfo } from '../sim/weekly_rewards';
 
 // ---------------------------------------------------------------------------
 // The Bank (the per-character deposit box). A second pooled item store beside
@@ -102,6 +103,9 @@ export interface VaultSpecialRef {
 }
 
 export interface IWorldBank {
+  readonly weeklyRewardInfo: WeeklyRewardInfo | null;
+  claimWeeklyReward(choice: string): void;
+  openWeeklyReward(choice: string): void;
   // Non-null only while standing at a banker NPC.
   bankInfo: BankInfo | null;
   // Copper- and Claudium-bought ladder slots on the CALLER'S OWN character,

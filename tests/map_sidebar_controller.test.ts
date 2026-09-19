@@ -4,7 +4,9 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { NPCS, QUESTS, zoneAt } from '../src/sim/data';
-import type { QuestProgress } from '../src/sim/types';
+import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
+import { activeWorldQuestsForCycle } from '../src/sim/world_quests';
 import { MapSidebarController } from '../src/ui/map_sidebar_controller';
 import { QuestTrackingState } from '../src/ui/quest_tracking_core';
 import type { IWorld } from '../src/world_api';
@@ -186,6 +188,116 @@ describe('map sidebar controller', () => {
 // positioned child resolves against the PADDING box, so an `inset: 0` pane
 // covers that band and the window stops being draggable at all. jsdom has no
 // layout, so this reads the shipped declarations instead of a computed rect.
+describe('map sidebar controller: the world-quest section', () => {
+  function makeWorldQuestHarness(
+    log: Array<[string, WorldQuestProgress['state']]> = [],
+    canReroll: () => { canReroll: boolean; reason?: string } = () => ({ canReroll: true }),
+  ) {
+    const root = document.createElement('aside');
+    document.body.appendChild(root);
+    const giver = NPCS[QUESTS.q_wolves.giverNpcId];
+    const cycle = worldQuestCycleForResetDay('2026-08-31');
+    const rerollWorldQuest = vi.fn(() => true);
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Adventurer', level: 20, pos: { x: giver.pos.x, y: 0, z: giver.pos.z } },
+      questLog: new Map(),
+      questState: () => 'unavailable',
+      worldQuestCycle: cycle,
+      worldQuestLog: new Map(
+        log.map(([questId, state]) => [questId, { questId, count: 0, state }]),
+      ),
+      worldQuestExpiresAtMs: 10_000,
+      canRerollWorldQuest: canReroll,
+      rerollWorldQuest,
+    } as unknown as IWorld;
+    let selected: string | null = null;
+    const confirmDialog = vi.fn();
+    const onRepaintMap = vi.fn();
+    const controller = new MapSidebarController({
+      root: () => root,
+      click: vi.fn(),
+      onRepaintMap,
+      onShowRoute: vi.fn(),
+      tracking: new QuestTrackingState(fakeStorage()),
+      worldQuests: {
+        selectedId: () => selected,
+        select: (questId) => {
+          selected = questId;
+        },
+        confirmDialog,
+        nowMs: () => 4_000,
+      },
+    });
+    controller.update(world, zoneAt(giver.pos.x, giver.pos.z));
+    return {
+      root,
+      controller,
+      world,
+      confirmDialog,
+      onRepaintMap,
+      rerollWorldQuest,
+      cycle,
+      selectedId: () => selected,
+    };
+  }
+
+  it('renders the day board with its count and a disabled Replace button until a row is selected', () => {
+    const board = activeWorldQuestsForCycle(worldQuestCycleForResetDay('2026-08-31'));
+    const { root } = makeWorldQuestHarness([[board[0].id, 'completed']]);
+    const rows = root.querySelectorAll<HTMLElement>('[data-map-wq]');
+    expect(rows.length).toBe(board.length);
+    expect(root.querySelector('.map-atlas-wq-count')?.textContent).toBe(`1 / ${board.length}`);
+    expect(root.querySelector('.map-atlas-wq.is-completed')).not.toBeNull();
+    const button = root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]');
+    expect(button?.disabled).toBe(true);
+  });
+
+  it('selecting a row shares the selection with the map and repaints it', () => {
+    const { root, onRepaintMap, selectedId } = makeWorldQuestHarness();
+    const first = root.querySelector<HTMLElement>('[data-map-wq]');
+    const questId = first?.dataset.mapWq ?? '';
+    first?.click();
+    expect(selectedId()).toBe(questId);
+    expect(onRepaintMap).toHaveBeenCalled();
+    expect(root.querySelector('.map-atlas-wq.is-selected')?.getAttribute('data-map-wq')).toBe(
+      questId,
+    );
+    expect(root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]')?.disabled).toBe(false);
+    // The same row again clears the selection.
+    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
+    expect(selectedId()).toBeNull();
+  });
+
+  it('Replace never reaches the world without the confirm dialog; confirming rerolls and clears the selection', () => {
+    const { root, confirmDialog, rerollWorldQuest, selectedId } = makeWorldQuestHarness();
+    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
+    const questId = selectedId();
+    root.querySelector<HTMLElement>('[data-map-wq-reroll]')?.click();
+    expect(rerollWorldQuest).not.toHaveBeenCalled();
+    expect(confirmDialog).toHaveBeenCalledTimes(1);
+    const onOk = confirmDialog.mock.calls[0][4] as () => void;
+    onOk();
+    expect(rerollWorldQuest).toHaveBeenCalledWith(questId);
+    expect(selectedId()).toBeNull();
+  });
+
+  it('a refused reroll keeps the button disabled and names the reason by identity', () => {
+    const { root } = makeWorldQuestHarness([], () => ({
+      canReroll: false,
+      reason: 'Daily world quest reroll already used today.',
+    }));
+    root.querySelector<HTMLElement>('[data-map-wq]')?.click();
+    expect(root.querySelector<HTMLButtonElement>('[data-map-wq-reroll]')?.disabled).toBe(true);
+    expect(root.querySelector('.map-atlas-wq-note')?.textContent).toBe('Replacement used today');
+  });
+
+  it('a host without world quests omits the section entirely', () => {
+    const { root } = makeHarness();
+    expect(root.querySelector('.map-atlas-wq-section')).toBeNull();
+  });
+});
+
 describe('map window: the pad band stays the drag handle', () => {
   // join(__dirname, ...) rather than an import.meta URL: the DOM environment
   // rewrites import.meta.url to an http scheme (the bags-window precedent).
