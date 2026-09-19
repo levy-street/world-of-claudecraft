@@ -134,7 +134,12 @@ describe('weekly vault choices', () => {
     expect(meta.weeklyRewards!.raids).toEqual([2, 1, 2]);
     const info = weeklyRewardInfoFor(sim.ctx, pid)!;
     expect(info.readyWeeks).toBe(1);
-    expect(info.state.vaults[0].choices).toHaveLength(7);
+    // Three raid, two dungeon and two pvp choices from the fixture's progress,
+    // plus the two world choices its four completions earn (thresholds 2 and 4).
+    expect(info.state.vaults[0].choices).toHaveLength(9);
+    expect(info.state.vaults[0].choices.filter((choice) => choice.pool === 'world')).toHaveLength(
+      2,
+    );
     expect(info.state.raids).toEqual([0, 0, 0]);
     expect(info.state.dungeons).toEqual([]);
     expect(weeklyRewardInfoFor(sim.ctx, pid)!.state.vaults).toEqual(info.state.vaults);
@@ -284,11 +289,11 @@ describe('weekly vault choices', () => {
     expect(state.raids).toEqual([0, 0, 0]);
     expect(sanitizeWeeklyRewards([])).toBeUndefined();
   });
-  it('unlocks raid pools only at the defeated difficulty and keeps world rewards unavailable', () => {
+  it('unlocks raid pools only at the defeated difficulty and fills every pool for a class', () => {
     expect(weeklyLootPool('raid', 'mage', [0, 0, 0])).toEqual([]);
     expect(weeklyLootPool('raid_heroic', 'mage', [1, 1, 1])).toEqual([]);
     expect(weeklyLootPool('raid', 'mage', [0, 0, 1])).toContain('orb_of_the_last_spring');
-    for (const pool of WEEKLY_POOL_IDS.filter((p) => p !== 'world')) {
+    for (const pool of WEEKLY_POOL_IDS) {
       const ids = weeklyLootPool(pool, 'mage');
       expect(ids.length).toBeGreaterThan(0);
       for (const id of ids)
@@ -296,7 +301,9 @@ describe('weekly vault choices', () => {
     }
     expect(weeklyLootPool('dungeon', 'mage')).not.toContain('boundstone_girdle');
     expect(weeklyLootPool('dungeon', 'mage')).not.toContain('gravewyrm_mantle');
-    expect(weeklyLootPool('world', 'mage')).toEqual([]);
+    // The world row is ungated by raid kills: the previous tier is the catch-up
+    // shelf (tests/weekly_vault_world_row.test.ts pins its tier and contents).
+    expect(weeklyLootPool('world', 'mage', [0, 0, 0])).toEqual(weeklyLootPool('world', 'mage'));
   });
   it('opens rewards at a dedicated keeper without granting bank access', () => {
     const { sim, pid } = make();

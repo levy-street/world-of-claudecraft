@@ -20,7 +20,6 @@ export const WORLD_QUEST_CANNON: WorldQuestDef = {
   area: { x: 384, z: 1842, radius: 48 },
   objective: { type: 'vehicle', stationId: NORTH_WATCH_CANNON.id },
   count: 1,
-  reward: { type: 'copper', base: 2_500, perLevel: 175 },
 };
 
 export const LAST_KEEP_CANNON: Readonly<VehicleStationDef> = {

@@ -197,7 +197,6 @@ export const WORLD_QUEST_SHADOW: WorldQuestDef = {
   area: SHADOW_SITE,
   objective: { type: 'shadow', instructorNpcId: SHADOW_NPC_DEF.id },
   count: 4,
-  reward: { type: 'xp', rate: 0.12 },
 };
 
 export function isShadowNpc(templateId: string): boolean {

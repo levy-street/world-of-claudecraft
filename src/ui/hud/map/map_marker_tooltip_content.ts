@@ -126,7 +126,13 @@ export class MapMarkerTooltipContent {
       `<div>${esc(
         questProgressText(worldQuestObjectiveLabel(marker.questId), current, quest.count),
       )}</div>` +
-      `<div>${esc(worldQuestRewardLine(quest, this.world.player.level))}</div>` +
+      `<div>${esc(
+        worldQuestRewardLine(quest, {
+          level: this.world.player.level,
+          cls: this.world.cfg.playerClass,
+          cycle: this.world.worldQuestCycle,
+        }),
+      )}</div>` +
       (timeRemaining ? `<div>${esc(timeRemaining)}</div>` : '')
     );
   }
@@ -140,7 +146,11 @@ export class MapMarkerTooltipContent {
     const values = {
       name: worldQuestDisplayName(questId),
       progress: questProgressText(worldQuestObjectiveLabel(questId), current, quest.count),
-      reward: worldQuestRewardLine(quest, this.world.player.level),
+      reward: worldQuestRewardLine(quest, {
+        level: this.world.player.level,
+        cls: this.world.cfg.playerClass,
+        cycle: this.world.worldQuestCycle,
+      }),
     };
     const time = worldQuestTimeRemainingText(this.world.worldQuestExpiresAtMs, nowMs);
     return time

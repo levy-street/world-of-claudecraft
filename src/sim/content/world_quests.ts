@@ -17,6 +17,19 @@ import { WORLD_QUEST_WISP_MAZE } from './world_quest_wisp_maze';
 export const WORLD_QUEST_MIN_LEVEL = 5;
 export const WORLD_QUEST_DEFAULT_MIN_LEVEL = 10;
 
+// The shared reward schedule (docs/prd/world-quests/rewards-brief.md, section 8).
+// Every world quest pays XP at this share of the level's XP bar and copper on
+// this level-scaled purse; a def's `reward` only overrides them. The purse is
+// sized so a whole day's circuit at the cap, with every bonus purse on top
+// (a champion encore on most quests, the salvage ambush, the hard wisp maze and
+// both ley boards), stays under WORLD_QUEST_DAILY_COPPER_BUDGET (pinned by
+// tests/world_quest_rewards.test.ts): 31 silver a quest at level 20, about
+// 9.9 gold for the worst-case day.
+export const WORLD_QUEST_XP_RATE = 0.12;
+export const WORLD_QUEST_COPPER = Object.freeze({ base: 700, perLevel: 120 });
+/** Ten gold: the owner's ceiling for completing every world quest in one day at the cap. */
+export const WORLD_QUEST_DAILY_COPPER_BUDGET = 100_000;
+
 export const EASTBROOK_FREIGHT_CARAVAN_MOB_ID = 'eastbrook_freight_caravan';
 export const EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID = 'esc_wq_eastbrook_caravan';
 export const WILLOWFEN_REMEDY_CARAVAN_MOB_ID = 'willowfen_remedy_caravan';
@@ -488,7 +501,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
       deliveryObjectItemId: 'eastbrook_freight_wagon',
     },
     count: 6,
-    reward: { type: 'xp', rate: 0.12 },
   },
   {
     id: 'wq_eastbrook_caravan',
@@ -499,7 +511,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -92, z: -32, radius: 110 },
     objective: { type: 'escort', escortId: EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID },
     count: 1,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_mirefen_gravecallers',
@@ -508,7 +519,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: 0, z: 485, radius: 46 },
     objective: { type: 'kill', targetMobId: 'gravecaller_cultist' },
     count: 6,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_thornpeak_stormcrag',
@@ -517,7 +527,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: 122, z: 778, radius: 46 },
     objective: { type: 'kill', targetMobId: 'stormcrag_elemental' },
     count: 6,
-    reward: { type: 'xp', rate: 0.12 },
   },
   {
     id: 'wq_hollow_sporelings',
@@ -526,7 +535,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -42, z: 1222, radius: 38 },
     objective: { type: 'kill', targetMobId: 'corrupted_sporeling' },
     count: 5,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_drakelands_brood',
@@ -535,7 +543,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: 382, z: 2310, radius: 132 },
     objective: { type: 'kill', targetMobId: 'dragonkin_broodguard' },
     count: 5,
-    reward: { type: 'item', itemId: 'rift_essence', count: 1 },
+    // Rift-forge currency on top of the bundle, never equipment (the day's item slots own gear).
+    reward: { extraItem: { itemId: 'rift_essence', count: 1 } },
   },
   {
     id: 'wq_frostveil_howlers',
@@ -548,7 +557,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -92, z: 1758, radius: 30 },
     objective: { type: 'interact', targetObjectItemId: 'sprung_trap' },
     count: 4,
-    reward: { type: 'xp', rate: 0.12 },
   },
   {
     id: 'wq_amberfall_lurkers',
@@ -557,7 +565,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -298, z: 2192, radius: 46 },
     objective: { type: 'kill', targetMobId: 'mere_lurker' },
     count: 3,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_willowfen_ore',
@@ -566,7 +573,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -370, z: 355, radius: 108 },
     objective: { type: 'gather', nodeType: 'ore' },
     count: 3,
-    reward: { type: 'xp', rate: 0.12 },
   },
   {
     id: 'wq_willowfen_caravan',
@@ -575,7 +581,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -412, z: 442, radius: 145 },
     objective: { type: 'escort', escortId: WILLOWFEN_REMEDY_CARAVAN_ESCORT_ID },
     count: 1,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_frostveil_caravan',
@@ -584,7 +589,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -12, z: 1578, radius: 190 },
     objective: { type: 'escort', escortId: FROSTVEIL_SUPPLY_CARAVAN_ESCORT_ID },
     count: 1,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_nightbloom_barrow',
@@ -593,7 +597,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: -354, z: 1648, radius: 48 },
     objective: { type: 'kill', targetMobId: 'barrow_wight' },
     count: 4,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_wraithwood_restless',
@@ -602,7 +605,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: 360, z: 1592, radius: 72 },
     objective: { type: 'kill', targetMobId: 'wood_wraith' },
     count: 4,
-    reward: { type: 'xp', rate: 0.12 },
   },
   {
     id: 'wq_palmreach_confections',
@@ -615,7 +617,8 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
       levels: PALMREACH_MATCH3_LEVELS,
     },
     count: 72,
-    reward: { type: 'item', itemId: 'rift_essence', count: 1 },
+    // Rift-forge currency on top of the bundle, never equipment (the day's item slots own gear).
+    reward: { extraItem: { itemId: 'rift_essence', count: 1 } },
   },
   {
     id: 'wq_evergarden_watch',
@@ -624,7 +627,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
     area: { x: 410, z: 1110, radius: 42 },
     objective: { type: 'kill', targetMobId: 'hedge_knight' },
     count: 3,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   {
     id: 'wq_galecrest_wisps',
@@ -637,7 +639,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
       puzzles: GALECREST_LEY_PUZZLES,
     },
     count: 1,
-    reward: { type: 'xp', rate: 0.12 },
   },
   {
     id: 'wq_farshore_salvage',
@@ -652,7 +653,6 @@ export const WORLD_QUESTS: readonly WorldQuestDef[] = [
       layouts: FARSHORE_SALVAGE_LAYOUTS,
     },
     count: 8,
-    reward: { type: 'copper', base: 2_500, perLevel: 175 },
   },
   WORLD_QUEST_CALLIGRAPHY_QUEST,
   WORLD_QUEST_CANNON,

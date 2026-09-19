@@ -94,6 +94,11 @@ const questStringsEn = {
       title: '{zone}: {target}',
       unknown: 'Unknown world quest ({id})',
       itemReward: 'Item reward: {name}',
+      // The day's item slot on the map hover and the board: the exact piece this
+      // class receives today, with both levels the scope doc asks for.
+      itemRewardWithLevels: '{name} (item level {itemLevel}, equips at level {requiredLevel})',
+      factionLine: 'Faction: {faction}',
+      standingReward: '+{amount} {faction} standing',
       rewardLine: 'Rewards: {reward}',
       availableStatus: 'Available world quest',
       activeStatus: 'Active world quest',

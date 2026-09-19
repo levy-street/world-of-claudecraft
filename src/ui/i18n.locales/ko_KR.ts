@@ -17975,4 +17975,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.eastbrook_vault_keeper.title': '주간 보상',
   'entities.npcs.eastbrook_vault_keeper.greeting':
     '주간 보상이 기다리고 있습니다. 도가니 초기화 후 얻은 선택지에서 아이템 하나를 고르세요.',
+  // World-quest reward line (the daily item slot, the faction line and the standing text).
+  'questUi.worldQuest.itemRewardWithLevels':
+    '{name} (아이템 레벨 {itemLevel}, {requiredLevel}레벨부터 착용 가능)',
+  'questUi.worldQuest.factionLine': '세력: {faction}',
+  'questUi.worldQuest.standingReward': '{faction} 평판 +{amount}',
 };

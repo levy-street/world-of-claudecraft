@@ -313,23 +313,23 @@ describe('world quest UI display lines', () => {
     const riftQuest = WORLD_QUESTS_BY_ID.wq_farshore_salvage;
     expect(worldQuestFactionName(riftQuest)).toBe('Rift Watch');
     expect(worldQuestFactionLine(riftQuest)).toBe('Faction: Rift Watch');
-    expect(worldQuestStandingRewardText(riftQuest, 20)).toBe('+80 Rift Watch Standing');
+    expect(worldQuestStandingRewardText(riftQuest, 20)).toBe('+80 Rift Watch standing');
 
     const churchQuest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
     expect(worldQuestFactionName(churchQuest)).toBe('Church Order');
     expect(worldQuestFactionLine(churchQuest)).toBe('Faction: Church Order');
-    expect(worldQuestStandingRewardText(churchQuest, 10)).toBe('+30 Church Order Standing');
+    expect(worldQuestStandingRewardText(churchQuest, 10)).toBe('+30 Church Order standing');
 
     const autoQuest = WORLD_QUESTS_BY_ID.wq_drakelands_brood;
     expect(worldQuestFactionName(autoQuest)).toBe('Automatons');
     expect(worldQuestFactionLine(autoQuest)).toBe('Faction: Automatons');
-    expect(worldQuestStandingRewardText(autoQuest, 20)).toBe('+100 Automatons Standing');
+    expect(worldQuestStandingRewardText(autoQuest, 20)).toBe('+100 Automatons standing');
   });
 
   it('includes standing in the unified reward line', () => {
     const autoQuest = WORLD_QUESTS_BY_ID.wq_drakelands_brood;
-    const line = worldQuestRewardLine(autoQuest, 20);
-    expect(line).toContain('+100 Automatons Standing');
+    const line = worldQuestRewardLine(autoQuest, { level: 20, cls: 'warrior', cycle: 'wq1_0' });
+    expect(line).toContain('+100 Automatons standing');
   });
 });
 describe('simulation WQ completion standing integration', () => {

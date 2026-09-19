@@ -10,6 +10,7 @@ import {
 import { Sim } from '../src/sim/sim';
 import type { Entity, SimEvent, WorldContent } from '../src/sim/types';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
+import { worldQuestCopperReward } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 const QUEST_ID = 'wq_eastbrook_caravan';
@@ -166,6 +167,8 @@ describe('Eastbrook world-quest caravan', () => {
     const starterCopper = sim.meta(starterPid)?.copper ?? 0;
     const helperCopper = sim.meta(helperPid)?.copper ?? 0;
     const farCopper = sim.meta(farPid)?.copper ?? 0;
+    const starterLevel = sim.entities.get(starterPid)?.level ?? 0;
+    const helperLevel = sim.entities.get(helperPid)?.level ?? 0;
     const waveSizes: number[] = [];
     let sawPause = false;
     let completed = false;
@@ -210,8 +213,12 @@ describe('Eastbrook world-quest caravan', () => {
     expect(sim.meta(starterPid)?.worldQuestLog.get(QUEST_ID)?.state).toBe('completed');
     expect(sim.meta(helperPid)?.worldQuestLog.get(QUEST_ID)?.state).toBe('completed');
     expect(sim.meta(farPid)?.worldQuestLog.get(QUEST_ID)?.state).toBe('active');
-    expect((sim.meta(starterPid)?.copper ?? 0) - starterCopper).toBe(4_250);
-    expect((sim.meta(helperPid)?.copper ?? 0) - helperCopper).toBe(4_250);
+    expect((sim.meta(starterPid)?.copper ?? 0) - starterCopper).toBe(
+      worldQuestCopperReward(WORLD_QUESTS_BY_ID[QUEST_ID], starterLevel),
+    );
+    expect((sim.meta(helperPid)?.copper ?? 0) - helperCopper).toBe(
+      worldQuestCopperReward(WORLD_QUESTS_BY_ID[QUEST_ID], helperLevel),
+    );
     expect((sim.meta(farPid)?.copper ?? 0) - farCopper).toBe(0);
     expect(caravan(sim)).toBeUndefined();
   }, 60_000);

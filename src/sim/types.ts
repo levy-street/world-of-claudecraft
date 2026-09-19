@@ -4658,10 +4658,26 @@ export interface QuestProgress {
   rev?: number;
 }
 
-export type WorldQuestReward =
-  | { type: 'xp'; rate: number }
-  | { type: 'copper'; base: number; perLevel: number }
-  | { type: 'item'; itemId: string; count: number };
+/** A level-scaled copper purse: `base + perLevel * level`. */
+export interface WorldQuestCopperSchedule {
+  base: number;
+  perLevel: number;
+}
+
+/** Per-quest overrides of what a world quest pays. Every world quest pays XP,
+ *  copper and faction standing (src/sim/world_quests.ts awardWorldQuest); a def
+ *  only names what differs from the shared schedule. The day's item rewards are
+ *  never authored here: three zone slots per cycle carry one, chosen per cycle
+ *  and per class (src/sim/world_quest_item_slots.ts). */
+export interface WorldQuestReward {
+  /** XP as a share of xpForLevel(level); WORLD_QUEST_XP_RATE when omitted. */
+  xpRate?: number;
+  /** Copper purse override; WORLD_QUEST_COPPER when omitted. */
+  copper?: WorldQuestCopperSchedule;
+  /** A fixed extra item on top of the bundle (the two rift essence quests),
+   *  never equipment: gear comes only from the day's item slots. */
+  extraItem?: { itemId: string; count: number };
+}
 
 export type WorldQuestBeamSide = 'north' | 'east' | 'south' | 'west';
 
@@ -4821,7 +4837,9 @@ export interface WorldQuestDef {
   area: { x: number; z: number; radius: number };
   objective: WorldQuestObjective;
   count: number;
-  reward: WorldQuestReward;
+  /** Overrides of the shared reward schedule; omitted means XP, copper and
+   *  standing at the defaults. */
+  reward?: WorldQuestReward;
 }
 
 /** Per-character state for the current host-provided UTC cycle. Available

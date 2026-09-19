@@ -18082,4 +18082,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "entities.npcs.eastbrook_vault_keeper.name": "Смотритель хранилища",
   "entities.npcs.eastbrook_vault_keeper.title": "Еженедельные награды",
   "entities.npcs.eastbrook_vault_keeper.greeting": "Ваши еженедельные награды ждут. После сброса Горнила выберите один предмет из заработанных вариантов.",
+  // World-quest reward line (the daily item slot, the faction line and the standing text).
+  "questUi.worldQuest.itemRewardWithLevels": "{name} (уровень предмета {itemLevel}, надевается с {requiredLevel} уровня)",
+  "questUi.worldQuest.factionLine": "Фракция: {faction}",
+  "questUi.worldQuest.standingReward": "Репутация с фракцией {faction}: +{amount}",
 };

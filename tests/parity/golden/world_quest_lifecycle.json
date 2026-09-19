@@ -679,8 +679,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "48fc465f",
-      "events": "043d914d",
+      "state": "ee2dacea",
+      "events": "2e9e090a",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -710,6 +710,7 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
+          "copper": 3100,
           "counters": {
             "questProgress": 6,
             "questsCompleted": 1,
@@ -767,6 +768,20 @@
           ],
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 1
           },
           "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
@@ -854,8 +869,8 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "8b68ecd0",
-      "events": "a1378836",
+      "state": "a761d62d",
+      "events": "0de17699",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -885,11 +900,11 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 6000,
+          "copper": 9300,
           "counters": {
             "questProgress": 22,
             "questsCompleted": 3,
-            "xpGained": 2784
+            "xpGained": 8352
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -935,7 +950,7 @@
               "itemId": "rift_essence"
             }
           ],
-          "lifetimeXp": 169984,
+          "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -954,6 +969,20 @@
           ],
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 3
           },
           "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
@@ -1057,7 +1086,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "92f206c7",
+      "state": "93c48bea",
       "events": "f061f193",
       "rng": {
         "draws": 0,
@@ -1088,11 +1117,11 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 6000,
+          "copper": 9300,
           "counters": {
             "questProgress": 22,
             "questsCompleted": 3,
-            "xpGained": 2784
+            "xpGained": 8352
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1138,7 +1167,7 @@
               "itemId": "rift_essence"
             }
           ],
-          "lifetimeXp": 169984,
+          "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -1152,6 +1181,20 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 3
           },
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
@@ -1238,7 +1281,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "92f206c7",
+      "state": "93c48bea",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1269,11 +1312,11 @@
           "bgRating": 1500,
           "cls": "warrior",
           "companionUpgrades": {},
-          "copper": 6000,
+          "copper": 9300,
           "counters": {
             "questProgress": 22,
             "questsCompleted": 3,
-            "xpGained": 2784
+            "xpGained": 8352
           },
           "craftDaily": {},
           "craftSkills": {},
@@ -1319,7 +1362,7 @@
               "itemId": "rift_essence"
             }
           ],
-          "lifetimeXp": 169984,
+          "lifetimeXp": 175552,
           "mailWelcomed": true,
           "nodeHarvestReadyAt": {},
           "recipesGrandfathered": true,
@@ -1333,6 +1376,20 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 3
           },
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [

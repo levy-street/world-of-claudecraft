@@ -368,6 +368,11 @@ describe('i18n Localization Key Coverage', () => {
     ability: 'Fireball',
     action: 'Open Chat',
     amount: 42,
+    // The map hover item line (questUi.worldQuest.itemRewardWithLevels).
+    itemLevel: 24,
+    requiredLevel: 20,
+    // The map hover faction line and standing text (questUi.worldQuest.factionLine, standingReward).
+    faction: 'Rift Watch',
     answered: 6,
     // The elixir use line's granted-buff name (itemUi.tooltip.useElixirAura).
     aura: 'Might of the Boar',

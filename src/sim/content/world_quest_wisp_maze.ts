@@ -22,5 +22,4 @@ export const WORLD_QUEST_WISP_MAZE: WorldQuestDef = {
   area: { ...WISP_MAZE_SITE, radius: 40 },
   objective: { type: 'wisp_maze', instructorNpcId: WISP_MAZE_NPC_DEF.id },
   count: 1,
-  reward: { type: 'xp', rate: 0.12 },
 };

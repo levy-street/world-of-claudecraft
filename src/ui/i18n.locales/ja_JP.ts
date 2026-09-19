@@ -18003,4 +18003,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.eastbrook_vault_keeper.title': '週間報酬',
   'entities.npcs.eastbrook_vault_keeper.greeting':
     '週間報酬が待っています。るつぼのリセット後、獲得した選択肢から一品を選んでください。',
+  // World-quest reward line (the daily item slot, the faction line and the standing text).
+  'questUi.worldQuest.itemRewardWithLevels':
+    '{name}（アイテムレベル{itemLevel}、レベル{requiredLevel}で装備可能）',
+  'questUi.worldQuest.factionLine': '勢力：{faction}',
+  'questUi.worldQuest.standingReward': '{faction}の評判 +{amount}',
 };

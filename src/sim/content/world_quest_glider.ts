@@ -142,5 +142,6 @@ export const WORLD_QUEST_GLIDER: WorldQuestDef = {
     courseId: GLIDER_COURSE_ID,
   },
   count: 1,
-  reward: { type: 'copper', base: 3_000, perLevel: 200 },
+  // A longer flight than the ordinary circuit: a richer purse than the shared schedule.
+  reward: { copper: { base: 3_000, perLevel: 200 } },
 };

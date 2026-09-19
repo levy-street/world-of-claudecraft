@@ -68,5 +68,4 @@ export const WORLD_QUEST_FORGING: WorldQuestDef = {
   area: { x: 429, z: 1891, radius: 24 },
   objective: { type: 'forging', instructorNpcId: FORGE_NPC_DEF.id },
   count: 1,
-  reward: { type: 'xp', rate: 0.12 },
 };

@@ -52,8 +52,9 @@ import {
   sanitizeWorldQuestCycle,
   sanitizeWorldQuestProgress,
   updateWorldQuests,
+  worldQuestCopperReward,
   worldQuestCycleForResetDay,
-  worldQuestRewardAmount,
+  worldQuestXpReward,
 } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
@@ -360,7 +361,12 @@ describe('world quest content', () => {
         Object.values(NPCS).some((npc) => npc.questIds.includes(quest.id)),
         quest.id,
       ).toBe(false);
-      if (quest.reward.type === 'item') expect(ITEMS[quest.reward.itemId], quest.id).toBeDefined();
+      if (quest.reward?.extraItem) {
+        const extra = ITEMS[quest.reward.extraItem.itemId];
+        expect(extra, quest.id).toBeDefined();
+        // Gear comes only from the day's item slots; a fixed extra is never equipment.
+        expect(extra.slot, `${quest.id} extra item is not gear`).toBeUndefined();
+      }
     }
     expect([...zoneFrequency.values()].every((count) => count >= 1)).toBe(true);
     expect(zoneFrequency.get('eastbrook_vale')).toBe(4);
@@ -1245,12 +1251,13 @@ describe('world quest lifecycle', () => {
     finishQuest(sim, quest);
     expect(sim.worldQuestLog.get(quest.id)?.state).toBe('completed');
     expect(sim.meta(sim.playerId)?.counters.questsCompleted).toBe(1);
-    if (quest.reward.type !== 'xp') throw new Error('Expected XP reward');
-    expect(worldQuestRewardAmount(quest.reward, 20)).toBe(2_784);
+    expect(worldQuestXpReward(quest, 20)).toBe(2_784);
     expect(sim.lifetimeXp - before).toBe(2_784);
   });
 
-  it('automatically grants level-scaled copper and authored item rewards', () => {
+  it('pays the bundle on every quest: level-scaled copper beside the XP, plus any authored extra', () => {
+    // A quest that used to pay only copper now pays XP too, and one that used
+    // to pay only XP now pays copper too: the shared schedule, not the def.
     const goldQuest = WORLD_QUESTS_BY_ID.wq_mirefen_gravecallers;
     const goldSim = new Sim({
       seed: 44,
@@ -1259,11 +1266,20 @@ describe('world quest lifecycle', () => {
     });
     enterQuest(goldSim, goldQuest, 10);
     const copperBefore = goldSim.copper;
+    const xpBefore = goldSim.lifetimeXp;
     finishQuest(goldSim, goldQuest);
-    if (goldQuest.reward.type !== 'copper') throw new Error('Expected copper reward');
-    expect(worldQuestRewardAmount(goldQuest.reward, 10)).toBe(4_250);
-    expect(worldQuestRewardAmount(goldQuest.reward, 20)).toBe(6_000);
-    expect(goldSim.copper - copperBefore).toBe(4_250);
+    expect(worldQuestCopperReward(goldQuest, 10)).toBe(1_900);
+    expect(worldQuestCopperReward(goldQuest, 20)).toBe(3_100);
+    expect(goldSim.copper - copperBefore).toBe(1_900);
+    expect(goldSim.lifetimeXp - xpBefore).toBe(worldQuestXpReward(goldQuest, 10));
+
+    const xpQuest = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const xpSim = new Sim({ seed: 47, playerClass: 'warrior', autoEquip: true });
+    enterQuest(xpSim, xpQuest, 20);
+    const bothBefore = { copper: xpSim.copper, xp: xpSim.lifetimeXp };
+    finishQuest(xpSim, xpQuest);
+    expect(xpSim.copper - bothBefore.copper).toBe(3_100);
+    expect(xpSim.lifetimeXp - bothBefore.xp).toBe(2_784);
 
     const itemQuest = WORLD_QUESTS_BY_ID.wq_palmreach_confections;
     const itemSim = new Sim({

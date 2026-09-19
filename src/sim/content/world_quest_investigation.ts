@@ -178,5 +178,4 @@ export const WORLD_QUEST_INVESTIGATION: WorldQuestDef = {
   area: { x: -6, z: 284, radius: 35 },
   objective: { type: 'investigation', targetMobId: INVESTIGATION_MOB_ID },
   count: 1,
-  reward: { type: 'xp', rate: 0.12 },
 };

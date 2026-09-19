@@ -29,7 +29,11 @@ content and equipment tiers:
   at that difficulty for future vaults.
 - Dungeons: 1, 4 and 8 clears. The first, fourth and eighth best clears determine
   each choice's difficulty. WoC supports Normal and Heroic tiers.
-- World quests: 2, 4 and 8 completions, reserved until PR #3847 lands.
+- World quests: 2, 4 and 8 completions. Every rotating world quest turn-in counts
+  once, through the same once-per-cycle claim guard the quest itself uses; story
+  quests never count. The row pays the catch-up shelf: every Normal drop of the
+  previous raid tier (Nythraxis, item level 29), ungated by raid kills and with no
+  Heroic rung, filtered to what the character's class can wear.
 - PvP: 1, 3 and 5 ranked arena or rated battleground wins. Practice matches,
   developer-ended battlegrounds and forfeits do not count.
 
@@ -63,11 +67,18 @@ predating this field drop it on save; deployment rollback requires preservation.
 
 ## World quest integration
 
-Base: release v0.43.0, tracker #3966. Per the owner's decision, PR #3847 is not
-merged. The row remains visibly unavailable and ordinary quests do not count.
-When that PR lands, call `recordWeeklyWorldQuest(ctx, pid)` after the once-only
-`creditWorldQuest` guard, register its equipment in `weeklyLootPool`, and enable
-`worldQuestsAvailable`. Test repeated completion and rotation behavior.
+Landed on the quests integration branch (release v0.44.0, tracker #4086) once
+PR #3847 and this vault shared a tree. `creditWorldQuest` calls
+`recordWeeklyWorldQuest(ctx, pid)` immediately after writing the quest's
+once-per-cycle claim token, so a completion counts exactly once and a replayed
+or re-credited quest cannot count again; no client command reaches the counter.
+`weeklyLootPool('world')` walks the Nythraxis raid's spawns at Normal difficulty
+through the same collector the raid and dungeon rows use, without the raid-kill
+gate, and applies the shared usability filter. `worldQuestsAvailable` is true
+whenever that pool holds something the character's class can wear (every
+shipped class today), so a class with nothing to wear would see the row
+unavailable rather than an empty roll. The tier, the per-class usability and
+the completion path are pinned by `tests/weekly_vault_world_row.test.ts`.
 
 ## Local playtest and render budget
 

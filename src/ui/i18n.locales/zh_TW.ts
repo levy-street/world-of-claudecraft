@@ -17107,4 +17107,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.eastbrook_vault_keeper.title': '每週獎勵',
   'entities.npcs.eastbrook_vault_keeper.greeting':
     '你的每週獎勵正等著你。熔爐重置後，從你獲得的選項中選擇一件物品。',
+  // World-quest reward line (the daily item slot, the faction line and the standing text).
+  'questUi.worldQuest.itemRewardWithLevels':
+    '{name}（物品等級{itemLevel}，{requiredLevel}級可裝備）',
+  'questUi.worldQuest.factionLine': '陣營：{faction}',
+  'questUi.worldQuest.standingReward': '{faction}聲望 +{amount}',
 };

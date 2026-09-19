@@ -29,6 +29,9 @@ function makeWorld(
     questLog: options.questLog ?? new Map(),
     worldQuestLog: options.worldQuestLog ?? new Map(),
     worldQuestExpiresAtMs: options.worldQuestExpiresAtMs ?? 0,
+    // The reward line resolves the day's item from the cycle and the viewer's class.
+    worldQuestCycle: 'wq1_0',
+    cfg: { seed: 1, playerClass: 'warrior' },
     player: { level: 10 },
     inventory: [],
     gatheringProficiency: {},

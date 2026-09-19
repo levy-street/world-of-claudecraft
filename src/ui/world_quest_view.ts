@@ -1,7 +1,10 @@
 import { ITEMS, WORLD_QUESTS_BY_ID } from '../sim/data';
 import { factionDisplayName, worldQuestFaction, worldQuestStandingReward } from '../sim/factions';
-import type { WorldQuestDef } from '../sim/types';
-import { worldQuestRewardAmount } from '../sim/world_quests';
+import { itemLevel } from '../sim/item_level';
+import { requiredLevelFor } from '../sim/item_level_req';
+import type { PlayerClass, WorldQuestDef } from '../sim/types';
+import { worldQuestItemRewardForQuest } from '../sim/world_quest_item_slots';
+import { worldQuestCopperReward, worldQuestXpReward } from '../sim/world_quests';
 import { mobDisplayName, vehicleStationDisplayName } from './entity_display_core';
 import { itemDisplayName, zoneDisplayName } from './entity_i18n';
 import { formatList, formatMoney, formatNumber, t } from './i18n';
@@ -66,19 +69,47 @@ export function worldQuestStatusText(state: 'available' | 'active'): string {
   );
 }
 
+/** The bundle every world quest pays at this level: XP, then copper, then any
+ *  authored extra item. The day's gear is a separate line (worldQuestItemRewardText). */
 export function worldQuestRewardText(quest: WorldQuestDef, level: number): string {
-  if (quest.reward.type === 'xp') {
-    const amount = worldQuestRewardAmount(quest.reward, level);
-    return t('questUi.detail.xpReward', {
-      xp: formatNumber(amount, { maximumFractionDigits: 0 }),
-    });
+  const parts = [
+    t('questUi.detail.xpReward', {
+      xp: formatNumber(worldQuestXpReward(quest, level), { maximumFractionDigits: 0 }),
+    }),
+  ];
+  const copper = worldQuestCopperReward(quest, level);
+  if (copper > 0) parts.push(formatMoney(copper));
+  const extra = quest.reward?.extraItem;
+  if (extra) {
+    const item = ownEntry(ITEMS, extra.itemId);
+    parts.push(
+      t('questUi.worldQuest.itemReward', { name: item ? itemDisplayName(item) : extra.itemId }),
+    );
   }
-  if (quest.reward.type === 'copper') {
-    return formatMoney(worldQuestRewardAmount(quest.reward, level));
-  }
-  const item = ownEntry(ITEMS, quest.reward.itemId);
-  const name = item ? itemDisplayName(item) : quest.reward.itemId;
-  return t('questUi.worldQuest.itemReward', { name });
+  return parts.join(' · ');
+}
+
+/** The viewer's context for the day's item: who is looking and which cycle. */
+export interface WorldQuestRewardViewer {
+  level: number;
+  cls: PlayerClass;
+  cycle: string;
+}
+
+/** The exact piece this class receives from this quest today, with both levels
+ *  the scope doc asks for, or null when the quest carries no item for this viewer. */
+export function worldQuestItemRewardText(
+  quest: WorldQuestDef,
+  viewer: WorldQuestRewardViewer,
+): string | null {
+  const itemId = worldQuestItemRewardForQuest(viewer.cycle, quest, viewer.cls, viewer.level);
+  const item = itemId ? ownEntry(ITEMS, itemId) : undefined;
+  if (!item) return null;
+  return t('questUi.worldQuest.itemRewardWithLevels', {
+    name: itemDisplayName(item),
+    itemLevel: formatNumber(itemLevel(item) ?? 0, { maximumFractionDigits: 0 }),
+    requiredLevel: formatNumber(requiredLevelFor(item), { maximumFractionDigits: 0 }),
+  });
 }
 
 export function worldQuestFactionName(quest: WorldQuestDef): string {
@@ -86,20 +117,24 @@ export function worldQuestFactionName(quest: WorldQuestDef): string {
 }
 
 export function worldQuestFactionLine(quest: WorldQuestDef): string {
-  return `Faction: ${worldQuestFactionName(quest)}`;
+  return t('questUi.worldQuest.factionLine', { faction: worldQuestFactionName(quest) });
 }
 
 export function worldQuestStandingRewardText(quest: WorldQuestDef, level: number): string {
-  const amount = worldQuestStandingReward(quest, level);
-  const factionName = worldQuestFactionName(quest);
-  return `+${amount} ${factionName} Standing`;
+  return t('questUi.worldQuest.standingReward', {
+    amount: formatNumber(worldQuestStandingReward(quest, level), { maximumFractionDigits: 0 }),
+    faction: worldQuestFactionName(quest),
+  });
 }
 
-export function worldQuestRewardLine(quest: WorldQuestDef, level: number): string {
-  const baseReward = worldQuestRewardText(quest, level);
-  const standingReward = worldQuestStandingRewardText(quest, level);
-  const reward = baseReward ? `${baseReward} · ${standingReward}` : standingReward;
-  return t('questUi.worldQuest.rewardLine', { reward });
+/** One line for the map hover and the screen-reader summary: the bundle, the
+ *  standing, and the day's item when the viewer has one coming from this quest. */
+export function worldQuestRewardLine(quest: WorldQuestDef, viewer: WorldQuestRewardViewer): string {
+  const parts = [worldQuestRewardText(quest, viewer.level)];
+  const item = worldQuestItemRewardText(quest, viewer);
+  if (item) parts.push(item);
+  parts.push(worldQuestStandingRewardText(quest, viewer.level));
+  return t('questUi.worldQuest.rewardLine', { reward: parts.join(' · ') });
 }
 
 function durationUnit(value: number, unit: 'day' | 'hour' | 'minute'): string {

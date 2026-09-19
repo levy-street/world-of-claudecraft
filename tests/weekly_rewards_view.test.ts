@@ -3,18 +3,28 @@ import { earnedWeeklyRolls, emptyWeeklyRewards } from '../src/sim/weekly_rewards
 import { buildWeeklyRewardsView, weeklyCountdown } from '../src/ui/weekly_rewards_view';
 
 describe('weekly reward presentation', () => {
-  it('keeps the four requested rows ordered and disables the future world quest pool', () => {
+  it('keeps the four requested rows ordered and follows the world row availability flag', () => {
     const state = emptyWeeklyRewards(604800000);
     state.raidUnlocks = [1, 0, 0];
     state.raids = [1, 0, 0];
+    state.world = 2;
     const rows = buildWeeklyRewardsView(
       { state, nowMs: 0, canClaim: true, worldQuestsAvailable: false, readyWeeks: 0 },
       'mage',
     );
     expect(rows.map((r) => r.category)).toEqual(['raid', 'dungeon', 'world', 'pvp']);
     expect(rows[0].pools[0].earned).toBe(1);
+    // The previous-tier pool lists either way; the flag alone gates the row and
+    // its milestones, so a class with nothing to wear never shows a hollow tick.
     expect(rows[2].available).toBe(false);
-    expect(rows[2].pools[0].items).toEqual([]);
+    expect(rows[2].milestones.map((m) => m.completed)).toEqual([false, false, false]);
+    expect(rows[2].pools[0].items).not.toHaveLength(0);
+    const live = buildWeeklyRewardsView(
+      { state, nowMs: 0, canClaim: true, worldQuestsAvailable: true, readyWeeks: 0 },
+      'mage',
+    );
+    expect(live[2].available).toBe(true);
+    expect(live[2].milestones.map((m) => m.completed)).toEqual([true, false, false]);
     expect(rows[0].pools[0].qualities).not.toHaveLength(0);
   });
   it('shows days, hours, minutes and seconds and clamps expired resets to zero', () => {

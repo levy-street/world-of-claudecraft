@@ -11,6 +11,7 @@ import { Sim } from '../src/sim/sim';
 import { type SimEvent, TICK_RATE } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { worldQuestCycleOfferingQuest } from '../src/sim/world_quest_rotation';
+import { worldQuestCopperReward } from '../src/sim/world_quests';
 import { WORLD_SEED } from '../src/sim/world_seed';
 
 function rig(station = NORTH_WATCH_CANNON) {
@@ -167,7 +168,9 @@ describe('authoritative personal vehicles', () => {
       expect(meta.worldQuestLog.get(station.questId)?.state).toBe('completed');
       for (const other of VEHICLE_STATIONS.filter((candidate) => candidate.id !== station.id))
         expect(meta.worldQuestLog.get(other.questId)?.state).not.toBe('completed');
-      expect(sim.copper).toBe(copper + 2_500 + 175 * player.level);
+      expect(sim.copper).toBe(
+        copper + worldQuestCopperReward(WORLD_QUESTS_BY_ID[station.questId], player.level),
+      );
       const awarded = sim.copper;
       // Leaving during endless play ends the session with no second reward and
       // no retry lockout; a fresh entry starts a fresh authored defense.

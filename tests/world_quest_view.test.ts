@@ -32,13 +32,19 @@ describe('world quest view', () => {
     expect(worldQuestStatusText('available')).toBe('Available world quest');
     expect(worldQuestStatusText('active')).toBe('Active world quest');
 
-    const xp = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
-    const copper = WORLD_QUESTS_BY_ID.wq_mirefen_gravecallers;
-    const item = WORLD_QUESTS_BY_ID.wq_palmreach_confections;
-    expect(worldQuestRewardText(xp, 20)).toBe('2,784 experience');
-    expect(worldQuestRewardText(copper, 10)).toContain('42');
-    expect(worldQuestRewardText(item, 20)).toContain('Item reward:');
-    expect(worldQuestRewardLine(item, 20)).toContain('Rewards: Item reward:');
+    // Every quest pays the bundle: XP and the shared copper purse, plus any extra.
+    const plain = WORLD_QUESTS_BY_ID.wq_eastbrook_bandits;
+    const formerCopper = WORLD_QUESTS_BY_ID.wq_mirefen_gravecallers;
+    const extra = WORLD_QUESTS_BY_ID.wq_palmreach_confections;
+    expect(worldQuestRewardText(plain, 20)).toContain('2,784 experience');
+    expect(worldQuestRewardText(plain, 20)).toContain('31');
+    expect(worldQuestRewardText(formerCopper, 10)).toContain('experience');
+    expect(worldQuestRewardText(formerCopper, 10)).toContain('19');
+    expect(worldQuestRewardText(extra, 20)).toContain('Item reward:');
+    const viewer = { level: 20, cls: 'warrior' as const, cycle: 'wq1_0' };
+    expect(worldQuestRewardLine(extra, viewer)).toContain('Rewards: ');
+    expect(worldQuestRewardLine(extra, viewer)).toContain('Item reward:');
+    expect(worldQuestRewardLine(extra, viewer)).toContain('standing');
   });
 
   it('uses a localized sentence rather than exposing a raw unknown id', () => {

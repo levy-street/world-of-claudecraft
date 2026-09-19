@@ -19,6 +19,7 @@ export function prepareWeeklyVaultPlaytest(ctx: SimContext, pid: number, rollove
   state.raids = [2, 1, 2];
   state.dungeons = [2, 2, 2, 2, 1];
   state.pvp = 3;
+  state.world = 4;
   state.raidUnlocks = [2, 2, 2];
   // The rollover fixture leaves earning progress for the real reset path to roll
   // on the next read. It must not open the window before the tester interacts.
@@ -29,7 +30,7 @@ export function prepareWeeklyVaultPlaytest(ctx: SimContext, pid: number, rollove
           resetAtMs: Math.max(1, state.resetAtMs - 604800000),
           raidUnlocks: [2, 2, 2],
           choices: (
-            ['raid', 'raid_heroic', 'dungeon', 'dungeon_heroic', 'pvp'] as WeeklyPoolId[]
+            ['raid', 'raid_heroic', 'dungeon', 'dungeon_heroic', 'world', 'pvp'] as WeeklyPoolId[]
           ).map((pool) => ({ pool })),
         },
       ];

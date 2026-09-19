@@ -1836,7 +1836,9 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       ),
     ).toHaveLength(6);
     expect(rec.notes.xpReward).toBe(2_784);
-    expect(rec.notes.copperReward).toBe(6_000);
+    // The shared copper schedule (content/world_quests.ts WORLD_QUEST_COPPER):
+    // 700 + 120 * 20 at the cap, paid on every quest beside the XP.
+    expect(rec.notes.copperReward).toBe(3_100);
     expect(rec.notes.itemReward).toBe(1);
     expect(rec.notes.questProgress).toBe(22);
     expect(rec.notes.questsCompleted).toBe(3);

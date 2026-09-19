@@ -167,7 +167,6 @@ export const WORLD_QUEST_CALLIGRAPHY_QUEST: WorldQuestDef = {
     ],
   },
   count: 3,
-  reward: { type: 'xp', rate: 0.12 },
 };
 
 /** Session-spawned teachers leave the legacy roster and terrain unchanged. */
