@@ -4,6 +4,8 @@
 // merges those records into the flat tables the rest of the engine consumes,
 // and owns the world-layout constants.
 
+import { GRAND_TELEPORT_ITEMS } from './content/grand_teleports';
+import { HELLGATE_QUEST_ORDER, HELLGATE_QUESTS } from './content/hellgate';
 import { BASE_ITEMS } from './content/items';
 import type {
   CampDef,
@@ -365,6 +367,7 @@ export { STATIONS };
 
 export const ITEMS: Record<string, ItemDef> = mergeItems(
   BASE_ITEMS,
+  GRAND_TELEPORT_ITEMS,
   PROFESSION_ITEMS,
   APEX_PATTERN_ITEMS,
   FARM_PATTERN_ITEMS,
@@ -502,6 +505,7 @@ export const QUESTS: Record<string, QuestDef> = {
   ...PROVING_SHORE_QUESTS,
   ...IGNIVAR_RAID_LORE_QUESTS,
   ...HUB_PRACTICE_QUESTS,
+  ...HELLGATE_QUESTS,
 };
 
 export const QUEST_ORDER: string[] = [
@@ -523,6 +527,7 @@ export const QUEST_ORDER: string[] = [
   ...PROVING_SHORE_QUEST_ORDER,
   ...IGNIVAR_RAID_LORE_QUEST_ORDER,
   ...HUB_PRACTICE_QUEST_ORDER,
+  ...HELLGATE_QUEST_ORDER,
 ];
 
 // The Book of Deeds catalog (content/deeds.ts) is deliberately NOT re-exported

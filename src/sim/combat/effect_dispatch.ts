@@ -16,6 +16,7 @@
 // shared `ctx.rng` stream, drawn in the exact pre-move order.
 
 import { isDebuffAura, isDispellableAura, isPlayerRemovableAura } from '../aura_classify';
+import { HELLGATE_ABILITY_ID, HELLGATE_BLEED_AURA_ID } from '../content/hellgate';
 import {
   EMBERFURY_4PC_BLOODLETTING_HEAL_PCT_MAX,
   SPRINGMENDER_4PC_BONUS_JUMPS,
@@ -40,6 +41,7 @@ import {
   isDivineAscensionActive,
   syncDivineAscensionAura,
 } from '../paladin_devotion';
+import { summonGrandPortal, summonHellgate } from '../party_gate';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { scalePrimaryHealing } from '../primary_healing';
 import { scheduleProjectile } from '../projectile_travel';
@@ -448,6 +450,15 @@ function advanceSunGodVerdictForHit(
   const verdict = sunGodVerdictDefinition();
   if (!verdict) return;
   advanceSunGodVerdict(ctx, caster, target, abilityId, mark, verdict.effect, verdict.name);
+}
+
+/** A gate with no footprint or a corrupt destination: the cost site already
+ *  spent the reagent and armed the cooldown, so both come back (the mana does
+ *  not: a resolved cast keeps its mana). */
+function refundFailedSummon(ctx: SimContext, p: Entity, ability: AbilityDef): void {
+  if (ability.reagent) ctx.addItem(ability.reagent.itemId, ability.reagent.count, p.id);
+  p.cooldowns.delete(ability.id);
+  ctx.error(p.id, 'There is not enough room here.');
 }
 
 export function runEffects(
@@ -4253,6 +4264,37 @@ export function runEffects(
         if (!summonSoulwell(ctx, p, eff.duration)) {
           ctx.error(p.id, 'Line of sight.');
         }
+        break;
+      }
+      case 'summonGrandPortal': {
+        if (!summonGrandPortal(ctx, p, eff.destination, eff.duration)) {
+          refundFailedSummon(ctx, p, ability);
+        }
+        break;
+      }
+      case 'summonHellgate': {
+        if (!summonHellgate(ctx, p, eff.duration)) {
+          refundFailedSummon(ctx, p, ability);
+        }
+        break;
+      }
+      case 'selfDotPctMax': {
+        // selfHotPctMax's mirror: a self dot valued off MAXIMUM health. Keyed by
+        // HELLGATE_BLEED_AURA_ID so auras.ts ticks it as a non-lethal toll and
+        // the gate sweep (party_gate.ts) can end it with the gate.
+        ctx.applyAura(p, {
+          id: ability.id === HELLGATE_ABILITY_ID ? HELLGATE_BLEED_AURA_ID : ability.id,
+          name: ability.name,
+          kind: 'dot',
+          remaining: eff.duration,
+          duration: eff.duration,
+          value: Math.max(1, Math.round(p.maxHp * eff.pct)),
+          tickInterval: eff.interval,
+          tickTimer: eff.interval,
+          sourceId: p.id,
+          school: ability.school,
+          ...(eff.noRegen ? { noRegen: true as const } : {}),
+        });
         break;
       }
     }

@@ -437,6 +437,15 @@
         }
       ],
       "generationPrompt": "Create one finished square fantasy MMORPG ability icon for the World of ClaudeCraft Warlock pet action “Gloomshade Abyssal Chain”. Use the supplied images only as visual references: the Gloomshade still establishes the hulking indigo abyssal guardian identity, while the three skill icons establish the game’s premium hand-painted, borderless, full-composition icon style. Paint a massive spectral chain of dark iron and violet void energy whipping forward from one Gloomshade fist, the nearest links large and unmistakable, hooked around a distant enemy silhouette as it pulls them through smoky shadow. Deep indigo, black-purple and restrained cold cyan highlights, strong rim lighting, centered diagonal action, subject fills 75 to 88 percent with safe margins, readable at 28 px, crisp focal links and softer peripheral atmosphere. Opaque full-square artwork. Fresh original composition. No text, letters, numbers, runes, pseudo-writing, UI frame, border, rarity chrome, logo, watermark, photorealism, flat vector glyph, or cropped subject."
+    },
+    {
+      "abilityId": "hellgate",
+      "sourcePack": "project-authored",
+      "sourceFile": "hand-authored SVG fel gate rasterized offline (sharp, 512px master downscaled to 128px)",
+      "output": "hellgate.webp",
+      "source": "World of ClaudeCraft hand-authored vector art",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
   ],
   "deferredStayProcedural": {},

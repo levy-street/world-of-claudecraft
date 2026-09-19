@@ -29,8 +29,13 @@ export function objectDisplayName(entity: Entity): string {
   if (entity.templateId === REALM_BUILDER_MONUMENT_TEMPLATE_ID) {
     return t('worldContent.realmBuilderMonumentName');
   }
-  if (entity.templateId === 'soulwell') {
-    return tEntity({ kind: 'ability', id: 'soulwell', field: 'name' });
+  if (entity.templateId === 'soulwell' || entity.templateId === 'hellgate') {
+    return tEntity({ kind: 'ability', id: entity.templateId, field: 'name' });
+  }
+  // The Grand Portal's label is the sim-authored object name re-localized
+  // through the sim text matcher (the summoned objects carry no ability id).
+  if (entity.templateId === 'grand_portal') {
+    return localizeSimText(entity.name) ?? entity.name;
   }
   if (entity.templateId === 'delve_locked_chest') {
     return t('worldContent.delveLockedChestInteract');

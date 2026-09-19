@@ -48,6 +48,7 @@ import {
   lootSlotVisibleTo,
   pruneCorpseLoot,
 } from './loot/loot_roll';
+import { interactPartyGate } from './party_gate';
 import { startCorpseHarvest } from './professions/corpse_harvest_session';
 import { isQuestGatedGroundObjectHidden } from './quest_gated_entity';
 import { corpseHasDecayed } from './respawn_policy';
@@ -328,6 +329,7 @@ export function pickUpObject(
   const objectItemId = obj.objectItemId;
   if (!objectItemId) return false;
   if (interactSoulwell(ctx, obj, meta.entityId)) return true;
+  if (interactPartyGate(ctx, obj, meta.entityId)) return true;
   const beforeCastingAbility = p.castingAbility;
   const beforeChanneling = p.channeling;
   if (tryStartNythraxisWardChannel(ctx, obj, p)) {

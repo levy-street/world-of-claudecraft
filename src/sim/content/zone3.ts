@@ -1365,7 +1365,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     pos: { x: 12, z: 655 },
     facing: -1.2,
     color: 0x3b6ea5,
-    questIds: ['q_kobold_tunnels', 'q_elementals', 'q_shard_cores', 'q_kazzix'],
+    questIds: ['q_kobold_tunnels', 'q_elementals', 'q_shard_cores', 'q_kazzix', 'q_hellgate_gate'],
     greeting:
       'Mind the loose shale, $C. The mountain has been... restless of late. I intend to learn why.',
   },

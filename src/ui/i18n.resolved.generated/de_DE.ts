@@ -12952,6 +12952,14 @@ export const de_DE: EnTranslations = {
         "name": "Chor der Erlösung",
         "description": "Kanalisiert 6 Sek. lang und heilt Gruppenmitglieder im Umkreis von 30 Metern alle 2 Sek. um {damage}. Die Heilung steigt mit Zaubermacht."
       },
+      "grand_teleport_highwatch": {
+        "name": "Grand Teleport: Highwatch",
+        "description": "Opens a Grand Portal to Highwatch for 5 min. Only members of your group at the moment of casting can step through. Consumes a Rune of Passage. 10 sec cast."
+      },
+      "hellgate": {
+        "name": "Hellgate",
+        "description": "Tears open a Hellgate at your feet for 99 sec. Click the gate while targeting a group member to pull them to it. While it stands, the demons beyond it bleed you for 1% of your maximum health every second and stop your health from regenerating. 10 sec cast."
+      },
       "bear_charge": {
         "name": "Bruin-Ansturm",
         "description": "Stürmt auf einen Gegner zu, erzeugt 9 Wut und betäubt ihn für 1 Sek. 3 Sek. lang danach ist die Wolfsgestalt kostenlos und nagelt das Ziel fest, was es 4 Sek. lang um 50% verlangsamt. Reichweite 8-25 m. Nur in Bruin Form."
@@ -15851,6 +15859,9 @@ export const de_DE: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "Sturmhymnen-Kettenstiefel"
+      },
+      "rune_of_passage": {
+        "name": "Rune of Passage"
       },
       "conjured_water4": {
         "name": "Herbeigezaubertes Quellwasser"
@@ -20198,6 +20209,36 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Effektive Heilung an der Heilungsattrappe gewirkt"
+          }
+        }
+      },
+      "q_hellgate_pact": {
+        "title": "The Unquiet Pact",
+        "text": "You carry a demon on a leash, {playerName}, and you think that makes you its master. The old pacts say otherwise: a gate is only ever opened from the far side. If you would learn to tear one open yourself, start by proving the dead of the chapel yard cannot hold you. Lay 8 Restless Bones to rest and bring me what you learn.",
+        "completion": "The bones lie still, and you are still standing. Good. The next words of the pact were carried north into the marsh by a scout who keeps her own counsel. Find Scout Maren in Fenbridge.",
+        "objectives": {
+          "0": {
+            "label": "Restless Bones laid to rest"
+          }
+        }
+      },
+      "q_hellgate_rite": {
+        "title": "Rites of the Gravecallers",
+        "text": "Lin sent you? Then you already know the Gravecallers are not raising the drowned for company. Their cultists chant a rite that thins the veil, the same rite the pact needs. Silence 6 Gravecaller Cultists and listen to what they say before they fall.",
+        "completion": "You heard it too, then: the gate answers the one who is bled for it. There is a loremaster in Highwatch who has the last of it, and he will not like being asked. Seek Loremaster Caddis.",
+        "objectives": {
+          "0": {
+            "label": "Gravecaller Cultist silenced"
+          }
+        }
+      },
+      "q_hellgate_gate": {
+        "title": "The Hellgate",
+        "text": "So Maren sends the marsh to my door now. Very well, {playerName}. The pact is written in the shale: the Boneclad that walk the peaks were the last to hold a gate open, and they paid for it in blood. Break 5 Boneclad Revenants and the mountain will give you the words.",
+        "completion": "The words are yours. Remember what they cost the Boneclad: every second a Hellgate stands, it feeds on the one who opened it. Use it for your friends, and close it before it closes you.",
+        "objectives": {
+          "0": {
+            "label": "Boneclad Revenant broken"
           }
         }
       },

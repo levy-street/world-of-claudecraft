@@ -402,6 +402,14 @@
       "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "rune_of_passage",
+      "name": "Rune of Passage",
+      "sourcePack": "project-authored",
+      "sourceFile": "glowing rune stone, hand-authored SVG scene rasterized offline (sharp: 512px master over the item-icon vignette, downscaled to the 128px opaque woc-item-icon-v1 shipping format)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
   ],
   "generatedBatches": [

@@ -93,7 +93,7 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 300 deeds worth 3310 total Renown', () => {
+  it('ships exactly 301 deeds worth 3320 total Renown', () => {
     // Release base (262 / 3145 after the WARFARE lifetime-honor ladder) plus
     // four Reliquary Curator rank bridges and the five Phase 18 completion
     // ladder deeds (all nine renown 0: catalog prestige never scores the
@@ -138,8 +138,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    expect(DEED_ORDER.length).toBe(300);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
+    expect(DEED_ORDER.length).toBe(301);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3320);
   });
 
   it('ships the audited per-category counts', () => {
@@ -156,7 +156,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +1 the Proving Shore graduation (prog_ready_for_an_adventure) at the
       // release/v0.41.0 merge (the release's own chain read 58), then
       // +1 the Phase 13 promotion capstone prog_legendmaker.
-      progression: 68,
+      // +1 the Hellgate pact (prog_hellgate_pact).
+      progression: 69,
       combat: 10,
       // +2 Rift coverage deeds (dgn_rift, dgn_rift_s_rank), +5 Crucible raid
       // deeds (per-boss clear pairs plus the Varkhul flawless task).
@@ -369,6 +370,7 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
+      'prog_hellgate_pact',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -978,7 +980,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  const FROZEN_CATALOG_SHA256 = '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  // Re-baselined for #3932: prog_hellgate_pact appended, nothing retro-edited.
+  const FROZEN_CATALOG_SHA256 = '3ea3687059ae958fa292826d360cfc84117a62f857b69d4033c28aaf6d6229ee';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1028,7 +1031,11 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // again provable the auditable way against it.
   const PRE_APPEND_CATALOG_SHA256 =
     '516adb010bf37c91076b9a16bdf0e4dc22c72506fcb64e237468d1ee197d1358';
-  const APPENDED_SINCE: readonly string[] = ['col_set_bramblehide', 'hid_forgebreaker'];
+  const APPENDED_SINCE: readonly string[] = [
+    'col_set_bramblehide',
+    'hid_forgebreaker',
+    'prog_hellgate_pact',
+  ];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1258,7 +1265,7 @@ describe('table shape', () => {
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('prog_hellgate_pact');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

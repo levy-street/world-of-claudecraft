@@ -17113,4 +17113,30 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
+  // Fast travel (#3932): the pact quests, the rune and the two spells (M16).
+  'entities.quests.q_hellgate_pact.title': '安らがぬ契約',
+  'entities.quests.q_hellgate_pact.text':
+    'あなたは悪魔を鎖につないで、{playerName}、それで自分が主人だと思っている。古い契約は違うと言う。門は常に向こう側からしか開かれない。自らの手で門を裂く術を学びたいなら、まず礼拝堂の墓地の死者があなたを止められないことを証明しなさい。安らがぬ骨を8体眠らせ、学んだことを持ち帰りなさい。',
+  'entities.quests.q_hellgate_pact.completion':
+    '骨は静まり、あなたはまだ立っている。よろしい。契約の続きの言葉は、口の堅い斥候が北の湿地へ運んでいった。フェンブリッジの斥候マレンを訪ねなさい。',
+  'entities.quests.q_hellgate_pact.objectives.0.label': '安らがぬ骨を眠らせた',
+  'entities.quests.q_hellgate_rite.title': 'グレイブコーラーの儀式',
+  'entities.quests.q_hellgate_rite.text':
+    'リンの使いか。ならグレイブコーラーが溺れ人を起こすのが慰めのためではないと、もう知っているな。あの信徒どもは帳を薄くする儀式を唱える。契約が求めるのと同じ儀式だ。グレイブコーラーの信徒を6人黙らせ、倒れる前に何を言うか聞き取れ。',
+  'entities.quests.q_hellgate_rite.completion':
+    'お前も聞いたのだな。門は、そのために血を流す者に応える。ハイウォッチの博識者が最後の一節を持っている。訊かれるのを嫌がるだろうがな。博識者キャディスを訪ねろ。',
+  'entities.quests.q_hellgate_rite.objectives.0.label': 'グレイブコーラーの信徒を黙らせた',
+  'entities.quests.q_hellgate_gate.title': '地獄門',
+  'entities.quests.q_hellgate_gate.text':
+    'マレンは湿地までわしの戸口へ送り込むようになったか。よかろう、{playerName}。契約は頁岩に刻まれている。峰々を歩く骨まといどもが門を開いて保った最後の者であり、その代償を血で払った。骨まといの亡霊を5体砕けば、山が言葉を授けるだろう。',
+  'entities.quests.q_hellgate_gate.completion':
+    '言葉はお前のものだ。骨まといが払った代償を忘れるな。地獄門が立つ一瞬ごとに、門は開いた者を喰らう。友のために使い、門に喰われる前に閉じろ。',
+  'entities.quests.q_hellgate_gate.objectives.0.label': '骨まといの亡霊を砕いた',
+  'entities.items.rune_of_passage.name': '通行のルーン',
+  'entities.abilities.grand_teleport_highwatch.name': 'グランドテレポート：ハイウォッチ',
+  'entities.abilities.grand_teleport_highwatch.description':
+    'ハイウォッチへのグランドポータルを5分間開きます。詠唱した瞬間にあなたのグループにいたメンバーだけが通れます。通行のルーンを1つ消費します。詠唱10秒。',
+  'entities.abilities.hellgate.name': '地獄門',
+  'entities.abilities.hellgate.description':
+    '足元に地獄門を99秒間裂き開きます。グループメンバーを対象にした状態で門をクリックすると、その相手を門へ引き寄せます。門が立っている間、向こう側の悪魔が毎秒あなたの最大体力の1%を吸い取り、体力の自然回復を止めます。詠唱10秒。',
 };

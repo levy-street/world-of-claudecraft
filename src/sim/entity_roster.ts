@@ -31,6 +31,7 @@ import { DELVES, DUNGEON_X_THRESHOLD, dungeonAt, zoneAt } from './data';
 import { clearDrownedLitanyBellsAndMarks } from './delves/drowned_litany_boss';
 import { recalcPlayerStats } from './entity';
 import { guardAndReportPose, isPosFinite } from './finite_pose_guard';
+import { updatePartyGates } from './party_gate';
 import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
 import type { SimContext } from './sim_context';
@@ -218,6 +219,8 @@ export function rebucketEntity(ctx: SimContext, e: Entity): void {
 // despawn timers, expire overhead emotes. Collects ids first, then drops AFTER the
 // loop so dropEntity never mutates the entities map under the iterator.
 export function runDespawnDecay(ctx: SimContext): void {
+  // Party gates (party_gate.ts) sweep first: a dead warlock's Hellgate drops here.
+  updatePartyGates(ctx);
   const despawnIds: number[] = [];
   for (const e of ctx.entities.values()) {
     // A player whose pose went non-finite since its last step (a forced

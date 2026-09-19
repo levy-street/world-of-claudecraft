@@ -858,4 +858,8 @@ export const table: DeedLocaleTable = {
 
     name: '传奇缔造者',
   },
+  prog_hellgate_pact: {
+    name: '不安的契约',
+    desc: '走完唤墓者的契约，学会撕开一道地狱之门。',
+  },
 };

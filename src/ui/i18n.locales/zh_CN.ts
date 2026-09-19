@@ -16254,4 +16254,30 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字传送到城镇中心。',
   'devCommand.actions.town.label': '城镇中心',
   'devCommand.fields.town': '镇',
+  // Fast travel (#3932): the pact quests, the rune and the two spells (M16).
+  'entities.quests.q_hellgate_pact.title': '不安的契约',
+  'entities.quests.q_hellgate_pact.text':
+    '你牵着一只恶魔的链子，{playerName}，就以为自己是它的主人。古老的契约却说，门永远只能从另一边打开。你若想学会亲手撕开一道门，先证明礼拜堂墓地里的亡者困不住你。让8具不宁骸骨安息，再把你学到的东西告诉我。',
+  'entities.quests.q_hellgate_pact.completion':
+    '骸骨已归于平静，而你还站着。很好。契约的下一段文字被一个守口如瓶的斥候带去了北边的沼泽。去芬桥找玛伦斥候。',
+  'entities.quests.q_hellgate_pact.objectives.0.label': '不宁骸骨已安息',
+  'entities.quests.q_hellgate_rite.title': '唤墓者的仪式',
+  'entities.quests.q_hellgate_rite.text':
+    '是林派你来的？那你已经知道，唤墓者唤起溺亡者不是为了作伴。他们的教徒吟诵一种能撕薄帷幕的仪式，正是契约需要的那种。让6个唤墓者教徒闭嘴，并在他们倒下前听清他们说了什么。',
+  'entities.quests.q_hellgate_rite.completion':
+    '这么说你也听见了：门会回应为它流血的人。高望有位博学者掌握着最后的部分，他不会乐意被人问起。去找凯迪斯博学者。',
+  'entities.quests.q_hellgate_rite.objectives.0.label': '唤墓者教徒已被肃清',
+  'entities.quests.q_hellgate_gate.title': '地狱之门',
+  'entities.quests.q_hellgate_gate.text':
+    '这下玛伦把沼泽都送到我门口了。好吧，{playerName}。契约写在页岩里：行走于群峰的骨甲亡魂是最后一批撑开过门的人，他们为此付出了鲜血。击碎5个骨甲亡魂，山会把咒文给你。',
+  'entities.quests.q_hellgate_gate.completion':
+    '咒文归你了。记住它让骨甲亡魂付出了什么：地狱之门每开一秒，都在吞噬开门的人。为你的朋友使用它，并在它吞掉你之前把它关上。',
+  'entities.quests.q_hellgate_gate.objectives.0.label': '骨甲亡魂已被击碎',
+  'entities.items.rune_of_passage.name': '通行符文',
+  'entities.abilities.grand_teleport_highwatch.name': '宏大传送：高望',
+  'entities.abilities.grand_teleport_highwatch.description':
+    '开启一道通往高望的宏大传送门，持续5分钟。只有施法瞬间处于你队伍中的成员才能穿过。消耗一枚通行符文。施法时间10秒。',
+  'entities.abilities.hellgate.name': '地狱之门',
+  'entities.abilities.hellgate.description':
+    '在你脚下撕开一道地狱之门，持续99秒。选中队伍成员后点击门，即可将其拉到门前。门存在期间，门后的恶魔每秒使你流失最大生命值的1%，并阻止你的生命值回复。施法时间10秒。',
 };

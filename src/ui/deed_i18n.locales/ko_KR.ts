@@ -1078,4 +1078,8 @@ export const table: DeedLocaleTable = {
 
     name: '전설을 빚는 자',
   },
+  prog_hellgate_pact: {
+    name: '불안한 계약',
+    desc: '무덤부름의 계약을 끝까지 걸어 지옥문을 찢어 여는 법을 배우십시오.',
+  },
 };

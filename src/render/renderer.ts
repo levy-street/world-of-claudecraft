@@ -735,7 +735,6 @@ import {
 import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
-import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
 import { SpiritGrade } from './spirit_grade';
 import {
   freezeStaticMatrices,
@@ -748,6 +747,7 @@ import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
+import * as summonedObjects from './summoned_objects';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -7977,11 +7977,11 @@ export class Renderer {
       body = built.group;
       height = built.height;
       objectMesh = body;
-    } else if (e.kind === 'object' && e.objectItemId === 'soulwell') {
-      // Temporary Warlock party utility: bespoke procedural prop today, kept
-      // behind buildSoulwell so a generated GLB can replace it later.
+    } else if (e.kind === 'object' && summonedObjects.isSummonedObjectItem(e.objectItemId)) {
+      // Summoned party utilities (Soulwell, Grand Portal, Hellgate): bespoke
+      // procedural props behind the summoned_objects.ts registry, one per item.
       objectPoolKey = null;
-      const built = buildSoulwell(e.id);
+      const built = summonedObjects.buildSummonedObject(e.objectItemId, e.id);
       body = built.group;
       height = built.height;
       objectMesh = body;
@@ -9699,7 +9699,7 @@ export class Renderer {
         });
       } else {
         // Unshared object-view resources dispose BELOW the state-visual disposes.
-        if (v.objectMesh) disposeSoulwellVisual(v.objectMesh);
+        if (v.objectMesh) summonedObjects.disposeSummonedObjectVisual(v.objectMesh);
         disposeObjectResources = true;
       }
     }
@@ -10307,8 +10307,8 @@ export class Renderer {
             }
           }
         }
-        if (vis && e.objectItemId === 'soulwell' && v.objectMesh) {
-          syncSoulwellVisual(v.objectMesh, this.time, e.id);
+        if (vis && v.objectMesh && summonedObjects.isSummonedObjectItem(e.objectItemId)) {
+          summonedObjects.syncSummonedObjectVisual(e.objectItemId, v.objectMesh, this.time, e.id);
         }
         continue;
       }

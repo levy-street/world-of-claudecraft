@@ -125,9 +125,10 @@ const build = await buildItemArtAudit({
     // reins_rallycart_rxt, on the shared 1069 / 1087 base); both deltas are
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
     // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
-    // --verify-only` against the merged tree.
-    catalogCount: 1283,
-    liveItemCount: 1301,
+    // --verify-only` against the merged tree. Fast travel (#3932) adds the
+    // Rune of Passage (one committed icon, one live item): 1284 / 1302.
+    catalogCount: 1284,
+    liveItemCount: 1302,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

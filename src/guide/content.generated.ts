@@ -1645,6 +1645,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "fireball_form",
         "name": "Ember Form"
+      },
+      {
+        "id": "grand_teleport_highwatch",
+        "name": "Grand Teleport: Highwatch"
       }
     ],
     "model": "player_mage",
@@ -1887,6 +1891,10 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       {
         "id": "army_of_the_dead",
         "name": "Army of the Dead"
+      },
+      {
+        "id": "hellgate",
+        "name": "Hellgate"
       }
     ],
     "model": "player_warlock",
@@ -5853,6 +5861,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "crest": "/ui/deeds/col_set_bramblehide.webp"
+  },
+  {
+    "id": "prog_hellgate_pact",
+    "name": "The Unquiet Pact",
+    "category": "progression",
+    "renown": 10,
+    "feat": false
   }
 ];
 

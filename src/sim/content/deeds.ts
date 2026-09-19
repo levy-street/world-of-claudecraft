@@ -3393,6 +3393,16 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
     hidden: true,
   },
+  // The Hellgate pact (content/hellgate.ts): keyed on the warlock chain's final
+  // quest so the whole pact must be walked; the class gate is the quest's own.
+  prog_hellgate_pact: {
+    id: 'prog_hellgate_pact',
+    name: 'The Unquiet Pact',
+    desc: "Walk the Gravecallers' pact to its end and learn to tear open a Hellgate.",
+    category: 'progression',
+    renown: 10,
+    trigger: { kind: 'quest', questId: 'q_hellgate_gate' },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

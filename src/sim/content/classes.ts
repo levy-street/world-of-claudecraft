@@ -24,6 +24,8 @@ import {
   TEMPORAL_ECHO_DURATION_SECONDS,
   TEMPORAL_ECHO_SINGLE_CONVERSION,
 } from './chronomancy_tuning';
+import { GRAND_TELEPORT_ABILITIES, GRAND_TELEPORT_ABILITY_IDS } from './grand_teleports';
+import { HELLGATE_ABILITY } from './hellgate';
 import {
   CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE,
   GROVESPRING_2PC_SWIFTMEND_HEAL_MULT,
@@ -239,6 +241,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'temporal_acceleration',
       'perfect_moment',
       'fireball_form',
+      ...GRAND_TELEPORT_ABILITY_IDS,
     ],
     color: 0x33c1f1,
   },
@@ -548,6 +551,7 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
       'sacrifice_undead',
       'raise_gravewing',
       'army_of_the_dead',
+      HELLGATE_ABILITY.id,
     ],
     color: 0xa785e6,
   },
@@ -632,6 +636,8 @@ const MAGE_TEMPORAL_BARRIER_SPELL_POWER_COEFF = 0.25;
 
 export const ABILITIES: Record<string, AbilityDef> = {
   ...PALADIN_CORE_ABILITIES,
+  ...GRAND_TELEPORT_ABILITIES,
+  [HELLGATE_ABILITY.id]: HELLGATE_ABILITY,
   // ====================== WARRIOR ======================
   heroic_strike: {
     id: 'heroic_strike',

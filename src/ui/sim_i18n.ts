@@ -36,6 +36,17 @@ const baseEnTable = {
   'log.deathwardSaves': 'A deathward saves you!',
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
+  // The party gates (src/sim/party_gate.ts) and the reagent gate: EXACT rows,
+  // plus the {town} RULES entry below (town names are content text).
+  'log.portalStep': 'You step through the portal to {town}.',
+  'log.hellgatePulled': 'You are pulled through the Hellgate.',
+  'error.portalCannotStepFrom': 'You cannot step through from here.',
+  'error.hellgateOwnerOnly': 'Only the warlock who opened the gate can use it.',
+  'error.summonTargetGroupMember': 'Target a group member to summon them.',
+  'error.summonAllyUnreachable': 'That ally cannot be summoned from where they are.',
+  'error.missingReagent': 'You do not have the required reagent.',
+  'error.noRoomHere': 'There is not enough room here.',
+  'entityName.grandPortal': 'Grand Portal',
   'error.noDeadAlly': 'You must target a dead ally in your group.',
   'error.noDeadGroupMembers': 'There are no dead group members to resurrect.',
   'error.bagsFull': 'Your bags are full.',
@@ -16618,6 +16629,11 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // The Grand Portal step (src/sim/party_gate.ts): anchored on the full phrase.
+  {
+    re: /^You step through the portal to (.+)\.$/,
+    build: (m) => tSim('log.portalStep', { town: m[1] }),
+  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>

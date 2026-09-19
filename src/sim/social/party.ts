@@ -18,6 +18,7 @@
 
 import { revokeMasterLooterAuthority } from '../loot/loot_roll';
 import { effectiveMasterLooter } from '../loot_master';
+import { rememberPartyGateEligibility } from '../party_gate';
 import type { Party } from '../sim';
 import type { SimContext } from '../sim_context';
 import { rememberSoulwellPartyEligibility } from '../soulwell';
@@ -210,6 +211,7 @@ export class PartyMachine {
     party.raidGroups.set(r.meta.entityId, raidGroup);
     this.partyByPid.set(r.meta.entityId, party.id);
     rememberSoulwellPartyEligibility(this.ctx, party);
+    rememberPartyGateEligibility(this.ctx, party);
     this.ctx.inheritDungeonResetLocks(r.meta.entityId);
     this.syncPersistentPaladinPartyAuras(party);
     // Forming the party is the inviter's join too; the accepter counts on
@@ -501,6 +503,7 @@ export class PartyMachine {
         party.raidGroups.set(pid, raidGroup);
         this.partyByPid.set(pid, party.id);
         rememberSoulwellPartyEligibility(this.ctx, party);
+        rememberPartyGateEligibility(this.ctx, party);
         // A finder merge is a join like any other: without this, a
         // finder-formed member escapes the reset-cooldown inheritance the
         // invite path (acceptInvite above) enforces.

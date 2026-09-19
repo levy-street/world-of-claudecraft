@@ -723,6 +723,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'tough_jerky',
       'minor_healing_potion',
       'minor_mana_potion',
+      'rune_of_passage',
       'linen_pouch',
       'travelers_knapsack',
       // Gathering tools, TIER 1 ONLY (#2343's rule: each zone hub stocks the
@@ -754,7 +755,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     pos: { ...EASTBROOK_NPC_PLACEMENTS_BY_ID.apothecary_lin.position },
     facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.apothecary_lin.facing,
     color: 0x7d3c98,
-    questIds: ['q_spiders'],
+    questIds: ['q_spiders', 'q_hellgate_pact'],
     greeting: 'Careful where you step in the northeastern woods, friend.',
   },
   brother_aldric: {

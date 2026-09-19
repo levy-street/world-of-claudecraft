@@ -1030,4 +1030,8 @@ export const table: DeedLocaleTable = {
 
     name: '伝説を生む者',
   },
+  prog_hellgate_pact: {
+    name: '安らがぬ契約',
+    desc: 'グレイブコーラーの契約を最後まで歩み、地獄門を裂き開く術を学ぶ。',
+  },
 };

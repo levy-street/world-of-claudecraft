@@ -731,6 +731,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     color: 0x1e8449,
     questIds: ['q_prowler_pelts', 'q_fen_supplies', 'q_the_codfather', 'q_grubjaw'],
     vendorItems: [
+      'rune_of_passage',
       'fenbridge_rye',
       'marsh_mint_tea',
       'smoked_eel',
@@ -783,7 +784,7 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     pos: { ...FENBRIDGE_NPC_PLACEMENTS_BY_ID.scout_maren.position },
     facing: FENBRIDGE_NPC_PLACEMENTS_BY_ID.scout_maren.facing,
     color: 0x7d6608,
-    questIds: ['q_troll_fetishes', 'q_cult_camp', 'q_olen'],
+    questIds: ['q_troll_fetishes', 'q_cult_camp', 'q_olen', 'q_hellgate_rite'],
     greeting:
       'Quiet feet and a short blade keep you breathing out here. Speak quick, for I am due back in the reeds.',
   },

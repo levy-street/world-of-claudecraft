@@ -37,6 +37,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
+import { HELLGATE_BLEED_AURA_ID } from '../content/hellgate';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
@@ -145,7 +146,8 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
   // === 0): that shape heals nothing itself and is the sim's documented dev
   // freeze idiom (see startCascadePlaytest/startDevSandbox in sim.ts), which
   // still needs natural regen suppressed to hold a scripted hp bar in place.
-  if (!p.inCombat && p.hp < p.maxHp && p.eating?.hpPer2s !== 0) {
+  // A `noRegen` aura (the Hellgate toll) suspends natural HEALTH regen only.
+  if (!p.inCombat && p.hp < p.maxHp && p.eating?.hpPer2s !== 0 && !p.auras.some((a) => a.noRegen)) {
     const regen = p.stats.sta * 0.3 + 2;
     p.hp = Math.min(p.maxHp, p.hp + Math.round(regen));
   }
@@ -329,6 +331,32 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
           tickMaledictGaze(ctx, e, a);
         } else if (a.kind === 'affliction_violence') {
           tickHexOfViolence(ctx, e, a);
+        } else if (a.kind === 'dot' && a.id === HELLGATE_BLEED_AURA_ID) {
+          // The Hellgate toll is a plain hp toll, not an attack: no combat entry,
+          // no threat, floored at 1 hp so real attackers own the death path.
+          // Keyed on the aura id, never "any self-sourced dot": the delve Bad
+          // Air affix is one too and must stay on dealDamage below.
+          const toll = Math.min(a.value, Math.max(0, e.hp - 1));
+          if (toll > 0) {
+            e.hp -= toll;
+            ctx.emit({
+              type: 'spellfx',
+              sourceId: e.id,
+              targetId: e.id,
+              school: a.school,
+              fx: 'tick',
+            });
+            ctx.emit({
+              type: 'damage',
+              sourceId: e.id,
+              targetId: e.id,
+              amount: toll,
+              crit: false,
+              school: a.school,
+              ability: a.name,
+              kind: 'hit',
+            });
+          }
         } else if (a.kind === 'dot') {
           const dotSource = ctx.entities.get(a.sourceId) ?? null;
           let tickDamage = a.value;

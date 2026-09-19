@@ -3427,6 +3427,15 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   // The Soul Stone well: the stored heart under glass, 25% back on a claim
   // (procedural fallback; painted art ships beside it).
   soulwell: r('shadow', 'venom', ['gem', { p: 'heart', ...BR }], ['glow']),
+  // The Hellgate: the warlock's summoning gate, a cracked fel maw with a demon watching.
+  hellgate: r('shadow', 'venom', ['tendrils', { p: 'imp_head', ...BR }], ['crack']),
+  // Grand Teleport: an arcane sigil badged with Highwatch's peak shield.
+  grand_teleport_highwatch: r(
+    'arcane',
+    'silverWhite',
+    ['sigil_rune', { p: 'shield', ...BR }],
+    ['arcs'],
+  ),
   howl_of_terror: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
   curse_of_exhaustion: r('shadow', 'shadowPurple', ['boot', { p: 'skull', ...TR }], ['motion']),
   death_coil: r('shadow', 'blood', ['skull', { p: 'heart', ...BR }], ['drips']),
@@ -4438,6 +4447,7 @@ const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
   'wlk_r20_curse_mastery',
 ]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
+  'hellgate',
   // paladin (original project art for the overhaul and talent abilities, plus
   // the existing CraftPix premium "RPG Paladin skill icons" base set)
   'divine_ascension',

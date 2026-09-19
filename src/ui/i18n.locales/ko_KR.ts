@@ -17074,4 +17074,30 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '이름을 사용하여 타운 허브로 순간이동합니다.',
   'devCommand.actions.town.label': '타운 허브',
   'devCommand.fields.town': '도시',
+  // Fast travel (#3932): the pact quests, the rune and the two spells (M16).
+  'entities.quests.q_hellgate_pact.title': '불안한 계약',
+  'entities.quests.q_hellgate_pact.text':
+    '당신은 악마를 사슬에 매어 끌고 다니면서, {playerName}, 그것으로 자신이 주인이 되었다고 여기는군요. 옛 계약은 달리 말합니다. 문은 언제나 저편에서만 열리는 법이지요. 스스로 문을 찢어 여는 법을 배우고 싶다면, 먼저 예배당 묘지의 죽은 자들이 당신을 붙들지 못한다는 것을 증명하십시오. 불안한 뼈무더기 8구를 잠재우고, 배운 것을 가져오십시오.',
+  'entities.quests.q_hellgate_pact.completion':
+    '뼈는 잠잠해졌고 당신은 아직 서 있군요. 좋습니다. 계약의 다음 구절은 입이 무거운 정찰병이 북쪽 늪으로 가져갔습니다. 펜브리지에서 정찰병 마렌을 찾으십시오.',
+  'entities.quests.q_hellgate_pact.objectives.0.label': '불안한 뼈무더기 잠재우기',
+  'entities.quests.q_hellgate_rite.title': '무덤부름의 의식',
+  'entities.quests.q_hellgate_rite.text':
+    '린이 보냈다고? 그렇다면 무덤부름 교단이 익사자들을 말동무로 삼으려 일으키는 게 아니라는 건 이미 알겠군. 그 교단원들은 장막을 얇게 만드는 의식을 읊지. 계약에 필요한 바로 그 의식이다. 무덤부름 교단원 6명을 침묵시키고, 쓰러지기 전에 뭐라 말하는지 들어 두어라.',
+  'entities.quests.q_hellgate_rite.completion':
+    '너도 들었구나. 문은 자신을 위해 피 흘린 자에게 응답한다. 하이워치의 현자가 마지막 구절을 갖고 있는데, 묻는 걸 달가워하진 않을 거다. 현자 캐디스를 찾아가라.',
+  'entities.quests.q_hellgate_rite.objectives.0.label': '무덤부름 교단원 침묵시키기',
+  'entities.quests.q_hellgate_gate.title': '지옥문',
+  'entities.quests.q_hellgate_gate.text':
+    '이제 마렌이 늪을 통째로 내 문 앞에 보내는군. 좋다, {playerName}. 계약은 혈암에 새겨져 있다. 봉우리를 걷는 뼈갑옷들은 문을 열어 둔 마지막 자들이었고, 그 대가를 피로 치렀지. 뼈갑옷 망령 5구를 부수면 산이 그 말을 내어 줄 것이다.',
+  'entities.quests.q_hellgate_gate.completion':
+    '그 말은 이제 네 것이다. 뼈갑옷들이 치른 대가를 기억해라. 지옥문이 서 있는 매 순간, 문은 그것을 연 자를 갉아먹는다. 친구들을 위해 쓰되, 문이 너를 닫아 버리기 전에 네가 먼저 닫아라.',
+  'entities.quests.q_hellgate_gate.objectives.0.label': '뼈갑옷 망령 부수기',
+  'entities.items.rune_of_passage.name': '통행의 룬',
+  'entities.abilities.grand_teleport_highwatch.name': '대규모 순간이동: 하이워치',
+  'entities.abilities.grand_teleport_highwatch.description':
+    '하이워치(으)로 통하는 대규모 차원문을 5분 동안 엽니다. 시전 순간에 당신의 파티에 있던 파티원만 통과할 수 있습니다. 통행의 룬 1개를 소모합니다. 시전 시간 10초.',
+  'entities.abilities.hellgate.name': '지옥문',
+  'entities.abilities.hellgate.description':
+    '발밑에 지옥문을 찢어 열어 99초 동안 유지합니다. 파티원을 대상으로 지정한 채 문을 클릭하면 그 파티원을 문으로 끌어옵니다. 문이 서 있는 동안 저편의 악마들이 매초 당신의 최대 생명력의 1%를 앗아 가고 생명력 재생을 막습니다. 시전 시간 10초.',
 };
