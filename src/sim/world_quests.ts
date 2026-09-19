@@ -34,6 +34,7 @@ import type {
 import { xpForLevel } from './types';
 import { vehicleStationById } from './vehicle_stations';
 import { ensureWeeklyEmissary } from './weekly_quests';
+import { recordWeeklyWorldQuest } from './weekly_rewards';
 import {
   FARSHORE_SALVAGE_AMBUSH,
   triggerWorldQuestAmbush,
@@ -630,6 +631,9 @@ function creditWorldQuest(
   meta.worldQuestAreas.delete(quest.id);
   meta.counters.questsCompleted++;
   meta.unlockedMilestones.add(claimToken(meta.worldQuestCycle, quest.id));
+  // The Weekly Vault's world row counts this completion once: the claim token
+  // above is the once-per-cycle guard, and no client command reaches the counter.
+  recordWeeklyWorldQuest(ctx, meta.entityId);
   awardWorldQuest(ctx, meta, quest);
   // Clue Scrolls: with the day's rewards and standing already landed above,
   // the last zone slot of the slate pays the scroll (once per cycle).

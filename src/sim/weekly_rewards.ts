@@ -278,7 +278,10 @@ export function weeklyRewardInfoFor(ctx: SimContext, pid: number): WeeklyRewardI
     },
     nowMs: Math.floor(ctx.lockoutNowMs() / 1000) * 1000,
     canClaim: true,
-    worldQuestsAvailable: false,
+    // Live whenever the previous raid tier holds something this class can wear
+    // (every shipped class today); a class with no wearable piece sees the row
+    // unavailable rather than an empty roll.
+    worldQuestsAvailable: weeklyLootPool('world', r.meta.cls).length > 0,
     readyWeeks: state.vaults.length,
   };
 }
@@ -325,6 +328,30 @@ export function recordWeeklyBossKill(
     }
   }
 }
+// Every loot-table id an instance's spawns drop at a difficulty (quest items and
+// dead entries excluded); heroic swaps in the generated variant and adds the
+// bespoke heroic boss table.
+function collectInstanceLoot(
+  dungeon: (typeof DUNGEONS)[keyof typeof DUNGEONS],
+  difficulty: 'normal' | 'heroic',
+  ids: Set<string>,
+): void {
+  for (const spawn of dungeon.spawns) {
+    for (const entry of MOBS[spawn.mobId]?.loot ?? []) {
+      if (
+        entry.itemId &&
+        !entry.questId &&
+        entry.chance > 0 &&
+        !(difficulty === 'heroic' && entry.normalOnly)
+      )
+        ids.add(heroicLootItemId(entry.itemId, difficulty === 'heroic'));
+    }
+    if (difficulty === 'heroic')
+      for (const entry of HEROIC_BOSS_LOOT[spawn.mobId] ?? []) {
+        if (entry.itemId && !entry.questId && entry.chance > 0) ids.add(entry.itemId);
+      }
+  }
+}
 // Exact catalog shared by preview and claim. Each eligible item is equally likely;
 // class locks are respected, chase legendaries and non-equipment are excluded.
 export function weeklyLootPool(
@@ -334,7 +361,15 @@ export function weeklyLootPool(
 ): string[] {
   const ids = new Set<string>();
   if (pool === 'pvp') for (const id of FURY_STOCK) ids.add(id);
-  else if (pool !== 'world') {
+  else if (pool === 'world') {
+    // The world row is the catch-up shelf: every Normal drop of the previous raid
+    // tier (Nythraxis, item level 29), ungated by kills because world quests earn
+    // it, not the raid. The tier is pinned by tests/weekly_vault_world_row.test.ts.
+    for (const dungeon of Object.values(DUNGEONS)) {
+      if (HEROIC_DUNGEON_TUNING[dungeon.id]?.finalBossId !== NYTHRAXIS_BOSS_ID) continue;
+      collectInstanceLoot(dungeon, 'normal', ids);
+    }
+  } else {
     const kind = pool.startsWith('raid') ? 'raid' : 'dungeon';
     const difficulty = pool.endsWith('heroic') ? 'heroic' : 'normal';
     for (const dungeon of Object.values(DUNGEONS)) {
@@ -347,21 +382,7 @@ export function weeklyLootPool(
         const index = WEEKLY_RAID_BOSSES.indexOf(HEROIC_DUNGEON_TUNING[dungeon.id].finalBossId);
         if (index < 0 || (raidUnlocks[index] ?? 0) < (difficulty === 'heroic' ? 2 : 1)) continue;
       }
-      for (const spawn of dungeon.spawns) {
-        for (const entry of MOBS[spawn.mobId]?.loot ?? []) {
-          if (
-            entry.itemId &&
-            !entry.questId &&
-            entry.chance > 0 &&
-            !(difficulty === 'heroic' && entry.normalOnly)
-          )
-            ids.add(heroicLootItemId(entry.itemId, difficulty === 'heroic'));
-        }
-        if (difficulty === 'heroic')
-          for (const entry of HEROIC_BOSS_LOOT[spawn.mobId] ?? []) {
-            if (entry.itemId && !entry.questId && entry.chance > 0) ids.add(entry.itemId);
-          }
-      }
+      collectInstanceLoot(dungeon, difficulty, ids);
     }
   }
   return [...ids]

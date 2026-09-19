@@ -679,7 +679,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1012,
-      "state": "48fc465f",
+      "state": "75c4f6e1",
       "events": "043d914d",
       "rng": {
         "draws": 0,
@@ -768,6 +768,20 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 1
+          },
           "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
             [
@@ -854,7 +868,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "8b68ecd0",
+      "state": "1ca05a2c",
       "events": "a1378836",
       "rng": {
         "draws": 0,
@@ -954,6 +968,20 @@
           ],
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 3
           },
           "worldQuestCycle": "wq1_0",
           "worldQuestLog": [
@@ -1057,7 +1085,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "92f206c7",
+      "state": "f8ed87eb",
       "events": "f061f193",
       "rng": {
         "draws": 0,
@@ -1153,6 +1181,20 @@
           "vault": {
             "stock": {}
           },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 3
+          },
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
             [
@@ -1238,7 +1280,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "92f206c7",
+      "state": "f8ed87eb",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -1333,6 +1375,20 @@
           "townFocus": {},
           "vault": {
             "stock": {}
+          },
+          "weeklyRewards": {
+            "raidUnlocks": [
+              0,
+              0,
+              0
+            ],
+            "raids": [
+              0,
+              0,
+              0
+            ],
+            "resetAtMs": 604800000,
+            "world": 3
           },
           "worldQuestCycle": "wq1_3",
           "worldQuestLog": [
