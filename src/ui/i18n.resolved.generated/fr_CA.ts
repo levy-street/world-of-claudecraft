@@ -2692,6 +2692,8 @@ export const fr_CA: EnTranslations = {
       "hint": "Les points de priorité ajoutent un bonus au rendement de base de chaque composante. Les composantes sans priorité restent au rendement de base.",
       "tierHint": "Chaque {points} points sur un composant font monter son palier de récolte d'un cran, jusqu'à {steps} crans ; moins de {points} points boostent quand même le rendement.",
       "townOnlyHint": "Le focus ne peut être modifié que lorsque vous êtes en ville.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Points restants : {remaining} / {budget}",
       "saveButton": "Enregistrer les priorités",
       "notInTownHint": "Vous devez être en ville pour définir vos priorités.",
@@ -5405,7 +5407,9 @@ export const fr_CA: EnTranslations = {
         "herb": "Herbe",
         "mail": "Mail",
         "passage": "Passage"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Niveau requis : {level}"

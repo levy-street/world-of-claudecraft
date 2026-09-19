@@ -160,6 +160,7 @@ export const IWORLD_MEMBERS = [
   { name: 'activeMasterLootRolls', kind: 'method' }, // read-returning
   { name: 'pickUpObject', kind: 'method' },
   { name: 'townFocus', kind: 'data' },
+  { name: 'townFocusPending', kind: 'data' },
   { name: 'civicServicePlacements', kind: 'data' },
   { name: 'setTownFocus', kind: 'method' },
   { name: 'acceptQuest', kind: 'method' },
@@ -864,9 +865,10 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // resolved production tree. The merged tree carries the Market Sweep
     // methods, the Who tab data and method, CPU-hygiene entityRosterVersion,
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
-    // directly off the resolved IWORLD_MEMBERS literal.
-    expect(IWORLD_MEMBERS.length).toBe(378);
-    expect(DATA_MEMBERS.length).toBe(107);
+    // directly off the resolved IWORLD_MEMBERS literal. The pending Town
+    // Focus fix adds the townFocusPending data read (interaction facet).
+    expect(IWORLD_MEMBERS.length).toBe(379);
+    expect(DATA_MEMBERS.length).toBe(108);
     expect(METHOD_MEMBERS.length).toBe(271);
   });
   it('has no duplicate member names', () => {
@@ -1228,6 +1230,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'toggleWeaponStow',
       'toolEffectSlots',
       'townFocus',
+      'townFocusPending',
       'trackGatheringCommission',
       'trackGatheringRecipe',
       'tradeAccept',
@@ -1362,6 +1365,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'talents',
       'toolEffectSlots',
       'townFocus',
+      'townFocusPending',
       'tradeInfo',
       'unlockedMilestones',
       'vaultInfo',
@@ -1794,6 +1798,7 @@ const FACET_INTERACTION = [
   'corpseHarvestInfo',
   'pickUpObject',
   'townFocus',
+  'townFocusPending',
   'setTownFocus',
   'autoLoot',
 ] as const satisfies readonly (keyof IWorldInteraction)[];
@@ -2391,8 +2396,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(378);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(378);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(379);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(379);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

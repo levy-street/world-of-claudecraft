@@ -92,7 +92,7 @@ import {
   attachMaterialSourcesContextMenu,
   closeMaterialSourcesDialogForOwner,
 } from './material_sources_dialog';
-import { materialSourcesForDisplay } from './material_sources_view';
+import { materialFungibleUnitCount, materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -1238,13 +1238,14 @@ export class MarketWindow {
 
   // Fungible stock only: the plain listing form's quantity cap must match what
   // marketList can actually escrow (an instanced copy is never swept into a
-  // bulk listing), or a qty above the fungible stock just bounces off the
-  // sim's denial. An instanced staging is single-copy and never reads this.
+  // bulk listing, and a material stack's premium/signed buckets never are
+  // either), or a qty above the fungible stock just bounces off the sim's
+  // denial. An instanced staging is single-copy and never reads this.
   private fungibleBagCount(itemId: string): number {
     return this.deps
       .world()
       .inventory.filter((s) => s.itemId === itemId && !s.instance)
-      .reduce((n, s) => n + s.count, 0);
+      .reduce((n, s) => n + materialFungibleUnitCount(s), 0);
   }
 
   // ---- Filter chrome (the browse-tab type/subtype/rarity dropdowns) ----

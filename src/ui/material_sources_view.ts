@@ -27,7 +27,8 @@
 // never looked up, never resolved against a live profile, and carry no account
 // data; the renderer escapes them.
 
-import { isMaterialItemId } from '../sim/material_ids';
+import { isMaterialItemId, materialItemIds } from '../sim/material_ids';
+import { materialSourceUnitPayload } from '../sim/material_inventory_units';
 import {
   isPremiumMaterialSource,
   legacyMaterialComposition,
@@ -37,6 +38,7 @@ import {
   materialSourceKey,
   totalMaterialCount,
 } from '../sim/material_sources';
+import { normalizeMaterialStack } from '../sim/material_stack';
 import type { InvSlot } from '../sim/types';
 
 /** One displayed bucket. `kind` decides the wording, `premium` the marker. */
@@ -171,6 +173,32 @@ export function materialSourcesForDisplay(
   // A refusal (a count the algebra will not read) shows nothing rather than a
   // wrong line; the stack still renders every other tooltip fact it carries.
   return projected.ok ? projected.value : undefined;
+}
+
+/**
+ * Units of this slot the PLAIN bulk pool may treat as fungible: the total
+ * minus any bucket `materialSourceUnitPayload` marks as carrying a payload (a
+ * legacy per-unit instance field, or a premium signature). Mirrors, unit for
+ * unit, the eligibility rule `countFungibleItem`/`countMaterialInventoryForHub`
+ * apply sim-side (`material_inventory_units.ts`), so a surface offering a
+ * sell/list quantity can never promise more than the sim will actually escrow.
+ *
+ * Non-material items keep the legacy raw-count read. Material stacks are read
+ * through the same normalizer as the sim hub instead of through
+ * `materialSourcesForDisplay`, because display intentionally hides legacy
+ * empty-string signers while the sim still treats them as their own payload.
+ */
+export function materialFungibleUnitCount(slot: MaterialSourceSlot): number {
+  if (!isMaterialItemId(slot.itemId)) return slot.count;
+  const normalized = normalizeMaterialStack(slot, materialItemIds());
+  if (!normalized.ok) return 0;
+  const materialSlot = normalized.value;
+  if (materialSlot.instance?.locked === true) return 0;
+  let count = 0;
+  for (const bucket of materialSlot.materialSources ?? []) {
+    if (materialSourceUnitPayload(materialSlot, bucket.source) === undefined) count += bucket.count;
+  }
+  return count;
 }
 
 /**

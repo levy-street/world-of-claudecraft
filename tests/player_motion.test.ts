@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { isBlocked, moverHeight, resolveMovement } from '../src/sim/colliders';
 import { mountMoveSpeedPct } from '../src/sim/content/mounts';
-import { BUILTIN_WORLD, DUNGEON_FLOOR_Y } from '../src/sim/data';
+import { BUILTIN_WORLD, DELVES, DUNGEON_FLOOR_Y } from '../src/sim/data';
+import {
+  clampDelveDoorSolids,
+  clampDelveModuleBounds,
+  DELVE_DOOR_AISLE_HALF_DEPTH,
+  delveDoorClampSolidsFromEntities,
+} from '../src/sim/delves/geometry';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE } from '../src/sim/pathfind';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../src/sim/player_motion';
 import { Sim } from '../src/sim/sim';
@@ -253,6 +259,84 @@ describe('player motion kernel parity with the live Sim', () => {
     // Actually reached and was actually held by the wall, not just idle parity.
     expect(sim.player.pos.x - origin.x).toBeGreaterThan(33);
     expect(sim.player.pos.x - origin.x).toBeLessThan(34.5);
+  });
+
+  // Issue #3480 (enable self-motion prediction inside delves): the instanced
+  // kernel branch (stepInstancedRegion, gated by isInstancedRegion on
+  // isDelvePos) chained through a delve-aware resolveMove, the same
+  // clampDelveModuleBounds-then-clampDelveDoorSolids order Sim.resolveMove
+  // runs server-side. The client dep here rebuilds the solids list from
+  // sim.entities the way src/render/client_player_motion.ts does, rather than
+  // reading the server's own run.objectState, so this also exercises the two
+  // derivations end to end (unlike tests/delve_geometry.test.ts's parity pin,
+  // which compares them directly against a fixed solids snapshot).
+  it('resolves a closed delve door identically through the client-shaped kernel deps', () => {
+    const sim = makeSim();
+    sim.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const doorEntryPos = DELVES.collapsed_reliquary.doorPos;
+    teleport(sim, doorEntryPos.x, doorEntryPos.z);
+    sim.enterDelve('collapsed_reliquary', 'normal');
+    const run = sim.delveRunForPlayer(sim.player.id);
+    if (!run) throw new Error('delve run did not spawn');
+    run.modules = ['reliquary_sunken_ossuary'];
+    run.moduleIndex = 0;
+    (sim as any).spawnDelveModule(run);
+    // Freeze the room's plates pre-triggered so the door the test approaches
+    // stays closed regardless of where the walked path happens to cross them.
+    for (const id of run.objectIds) {
+      const state = run.objectState[id];
+      if (state?.kind === 'pressure_plate') state.triggered = true;
+    }
+    const doorEntry = run.objectIds
+      .map((id) => ({ id, state: run.objectState[id] }))
+      .find((o) => o.state?.kind === 'locked_door');
+    if (!doorEntry) throw new Error('module spawned no locked_door');
+    const door = sim.entities.get(doorEntry.id);
+    if (!door) throw new Error('door entity missing');
+
+    const p = sim.player;
+    p.pos.x = door.pos.x;
+    p.pos.z = door.pos.z - 15;
+    p.pos.y = door.pos.y;
+    p.prevPos = { ...p.pos };
+    p.vy = 0;
+    p.onGround = true;
+    p.facing = 0; // +z, straight at the door
+
+    const actor = mirrorActor(sim);
+    // Mirrors client_player_motion.ts's delve-aware resolveMove: re-derive
+    // the run and the entity-sourced solids list fresh each call, exactly
+    // like the online predictor does per frame.
+    const deps: PlayerMotionDeps = {
+      ...clientDeps(SEED),
+      resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) => {
+        const currentRun = sim.delveRunForPlayer(sim.player.id);
+        const res = resolveMovement(
+          SEED,
+          fromX,
+          fromZ,
+          nx,
+          nz,
+          r,
+          ignoreFences,
+          currentRun?.modules,
+          moverHeight(e),
+          0,
+        );
+        if (!currentRun) return res;
+        const bounded = clampDelveModuleBounds(currentRun, res.x, res.z, r);
+        const solids = delveDoorClampSolidsFromEntities(sim.entities.values());
+        return clampDelveDoorSolids(solids, bounded.x, bounded.z, r);
+      },
+    };
+    for (let i = 0; i < 20 * 4; i++) {
+      tickBoth(sim, actor, deps, mi({ forward: true }));
+      expectSamePose(sim, actor, `delve door tick ${i}`);
+    }
+    // Actually reached and was actually held by the door, not just idle parity.
+    const stopDepth = door.pos.z - sim.player.pos.z;
+    expect(stopDepth).toBeGreaterThan(DELVE_DOOR_AISLE_HALF_DEPTH);
+    expect(stopDepth).toBeLessThan(DELVE_DOOR_AISLE_HALF_DEPTH + PLAYER_BODY_RADIUS + 0.5);
   });
 
   it('blocks uphill walls and slides off steep footing identically', () => {

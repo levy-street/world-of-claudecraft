@@ -719,6 +719,7 @@ const RENDER_PURE_CORES = [
   'src/render/character_cull_core.ts',
   'src/render/characters/anim_state_entity_core.ts',
   'src/render/characters/death_grounding_core.ts',
+  'src/render/characters/stonebound_shell_core.ts',
   'src/render/entry_detail_horizon_core.ts',
   'src/render/gather_batch_reach_core.ts',
   'src/render/zone_feature_cells_core.ts',

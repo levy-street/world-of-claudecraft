@@ -47,7 +47,6 @@ import {
   delveModuleEntry as delveLayoutEntry,
 } from '../delve_layout';
 import { isLitanyModuleId, litanyModuleGeometry } from '../delve_litany_layout';
-import { DUNGEON_WALL_HW, DUNGEON_WALL_X } from '../dungeon_layout';
 import { createGroundObject, createMob, recalcPlayerStats } from '../entity';
 import { restorePetFromDelveStash, stowPetForDelve } from '../pet/pet_commands';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
@@ -89,13 +88,14 @@ import {
   pullLitanyBellRope,
   tickDrownedLitanyRooms,
 } from './drowned_litany_rooms';
+import {
+  clampDelveDoorSolids,
+  clampDelveModuleBounds,
+  type DelveDoorClampSolid,
+  delveModuleZOffset,
+  isDelveDoorClampKind,
+} from './geometry';
 
-// Push-out radii (yards) for solid delve props, kept under the chest/grave interact
-// range (DELVE_PLATE_RADIUS + 2 = 4.5) so you can still loot from adjacent. Pressure
-// plates and open passages stay walkable (no entry here = radius 0).
-const DELVE_CHEST_SOLID_R = 2.4; // matches the enlarged reliquary chest footprint
-const DELVE_GRAVE_SOLID_R = 1.0;
-const DELVE_WALL_SOLID_R = 3.2; // an intact (undestroyed) destructible wall
 const DELVE_INTERACT_RANGE = 6;
 const DELVE_BAD_AIR_INTERVAL = 8;
 // Static Blackwater hazard: while a player stands in a module hazard zone, deal a
@@ -145,10 +145,6 @@ export const DELVE_IMPLEMENTED_AFFIXES = new Set<string>([
 
 export function delveOriginOf(run: DelveRun): { x: number; z: number } {
   return delveOrigin(DELVES[run.delveId].index, run.slot);
-}
-
-export function delveModuleZOffset(run: DelveRun, moduleIndex = run.moduleIndex): number {
-  return delveModuleZOffsetLayout(run.modules, moduleIndex);
 }
 
 export function delveOccupancyRadius(run: DelveRun): number {
@@ -216,44 +212,20 @@ export function delveRunForEntity(ctx: SimContext, e: Entity): DelveRun | null {
   return delveRunForMob(ctx, e.id);
 }
 
-// Confine an entity to the active module's interior box. Module-to-module
-// travel is teleport-only (advanceDelveModule), so the 16u inter-module gap is
-// never meant to be walkable: without this clamp the gap is an unsealed dead
-// zone (no side walls) the player can slip into and walk out of the map, and
-// it lets a freshly-transitioned player backtrack south into the prior room.
-// Bounds come straight from the active module's own layout so they always
-// match the room the player is actually standing in.
-export function clampDelveModuleBounds(
-  run: DelveRun,
-  x: number,
-  z: number,
-  r: number,
-): { x: number; z: number } {
-  const moduleId = run.modules[run.moduleIndex] as DelveModuleId;
-  const layout = DELVE_MODULE_LAYOUTS[moduleId];
-  if (!layout) return { x, z };
-  // Irregular Litany rooms are already enclosed by their exact polygon-shell
-  // OBBs. Applying the legacy rectangular clamp as well creates invisible
-  // walls across every lobe that extends beyond layout.wallX/zMin/zMax.
-  if (layout.shellPolygon?.length) return { x, z };
-  const wallX = layout.wallX ?? DUNGEON_WALL_X;
-  const halfX = wallX - DUNGEON_WALL_HW - r; // inner wall face minus body radius
-  const zBase = delveModuleZOffset(run);
-  const localX = x - run.origin.x;
-  const localZ = z - (run.origin.z + zBase);
-  const clampedX = Math.max(-halfX, Math.min(halfX, localX));
-  // Front/back end walls are DUNGEON_WALL_HW thick at zMin/zMax; keep the body
-  // inside their inner faces.
-  const minZ = layout.zMin + DUNGEON_WALL_HW + r;
-  const maxZ = layout.zMax - DUNGEON_WALL_HW - r;
-  const clampedZ = Math.max(minZ, Math.min(maxZ, localZ));
-  return { x: clampedX + run.origin.x, z: clampedZ + run.origin.z + zBase };
-}
+// Module-bounds clamp + the door/prop solids clamp are pure delve interior
+// geometry shared with src/render/ (the self-motion predictor): they live in
+// the sibling leaf module geometry.ts, which carries no SimContext, rather
+// than here (imported above). Re-exported so runsMod.clampDelveModuleBounds /
+// runsMod.delveModuleZOffset (sim.ts, unstuck.ts) keep resolving unchanged.
+export { clampDelveModuleBounds, delveModuleZOffset };
 
 // Closed portcullis doors block the full walkable aisle until all plates fire;
 // solid props (chests, cracked graves, an intact destructible wall) block as
 // circles so you cannot walk through them. Pressure plates and open passages
-// stay walkable. Mobs and the companion route through the same clamp.
+// stay walkable. Mobs and the companion route through the same clamp. Builds
+// the explicit solids list from the run's authoritative object state (same
+// iteration order and kind checks as before the extraction) and delegates the
+// actual clamp math to clampDelveDoorSolids.
 export function clampDelveDoors(
   ctx: SimContext,
   run: DelveRun,
@@ -261,6 +233,7 @@ export function clampDelveDoors(
   z: number,
   r: number,
 ): { x: number; z: number } {
+  const solids: DelveDoorClampSolid[] = [];
   for (const id of run.objectIds) {
     const state = run.objectState[id];
     if (!state) continue;
@@ -268,42 +241,14 @@ export function clampDelveDoors(
     if (!obj) continue;
     if (state.kind === 'locked_door') {
       if (state.open) continue;
-      // Span the full walkable aisle (delve side walls at |x|=25, hw=1) so the
-      // portcullis cannot be bypassed by skirting the centre mesh.
-      const hw = 24,
-        hd = 1.2;
-      const dx = x - obj.pos.x,
-        dz = z - obj.pos.z;
-      const ox = Math.abs(dx) - hw - r;
-      const oz = Math.abs(dz) - hd - r;
-      if (ox < 0 && oz < 0) {
-        if (ox > oz) x = obj.pos.x + Math.sign(dx || 1) * (hw + r);
-        else z = obj.pos.z + Math.sign(dz || 1) * (hd + r);
-      }
+      solids.push({ kind: 'locked_door', x: obj.pos.x, z: obj.pos.z, hp: obj.hp });
       continue;
     }
-    let solidR = 0;
-    if (
-      state.kind === 'reward_chest' ||
-      state.kind === 'locked_chest' ||
-      state.kind === 'drowned_reliquary'
-    )
-      solidR = DELVE_CHEST_SOLID_R;
-    else if (state.kind === 'cracked_grave') solidR = DELVE_GRAVE_SOLID_R;
-    else if (state.kind === 'destructible_wall') solidR = obj.hp > 0 ? DELVE_WALL_SOLID_R : 0;
-    if (solidR <= 0) continue;
-    const dx = x - obj.pos.x,
-      dz = z - obj.pos.z;
-    const dist = Math.hypot(dx, dz);
-    const min = solidR + r;
-    if (dist < min) {
-      if (dist > 1e-6) {
-        x = obj.pos.x + (dx / dist) * min;
-        z = obj.pos.z + (dz / dist) * min;
-      } else x = obj.pos.x + min;
+    if (isDelveDoorClampKind(state.kind)) {
+      solids.push({ kind: state.kind, x: obj.pos.x, z: obj.pos.z, hp: obj.hp });
     }
   }
-  return { x, z };
+  return clampDelveDoorSolids(solids, x, z, r);
 }
 
 export function delveModuleEntry(ctx: SimContext, run: DelveRun): Vec3 {

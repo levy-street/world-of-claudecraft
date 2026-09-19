@@ -473,7 +473,17 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    ceiling: 18309,
+    // LOWERED 18309 -> 18299 by the map atlas rail's collapse toggle: the new
+    // MapSidebarController settings port would have added 8 lines, so it moved
+    // (with the quest tracker's identical existing port literal) behind a
+    // shared trackerCollapseSettings factory in src/ui/tracker_collapse_settings.ts,
+    // leaving both call sites one line each. Exact count, zero slack.
+    // Re-pinned to the exact composed v0.44.0 batch count after #4087's Town
+    // Focus pending HUD state and #4096's spectate action-bar hold merged
+    // beside #4099. The shared collapse-settings extraction still paid its
+    // own map work; this is the integrated release tree's measured zero-slack
+    // count (`wc -l < src/ui/hud.ts`).
+    ceiling: 18307,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1066,7 +1076,14 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    ceiling: 11822,
+    // LOWERED 11822 -> 11809 at the pending Town Focus fix: the townFocus /
+    // harvestPreference load and save pair moved out to
+    // src/sim/professions/gathering_settings_persist.ts (where the queued
+    // re-spec's persistence joined them), and the private
+    // updateTownFocusRespec wrapper retired in favor of the module call.
+    // The residual is the two townFocusPending delegates. Exact count
+    // (wc -l < src/sim/sim.ts), zero slack.
+    ceiling: 11809,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1269,9 +1286,17 @@ const MONOLITHS: MonolithRow[] = [
     // Down 11317 -> 11281 at the v0.42.2 hotfix line forward merge: the
     // interact-key gather extraction (src/game/interact_key_gather.ts took the
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
-    // composed with the release's game_renderer.ts extraction. Exact merged
-    // count, zero slack.
-    ceiling: 11281,
+    // composed with the release's game_renderer.ts extraction.
+    // Then the Discord OAuth flow (web popup, native handoff, and the in-game
+    // link-error notice a failed relink now needs) moved out to
+    // src/net/discord_oauth_flow.ts behind an injected deps bag; main.ts keeps
+    // only the deps bag and the one-time wiring calls. Delve self-motion
+    // prediction then adds one import/wiring line plus the frame-scratch state
+    // needed to keep its module-shell and door clamp data off the rAF allocation
+    // path. Measured after formatting those changes on the v0.44.0 line
+    // (wc -l < src/main.ts): 11181.
+    // Zero headroom.
+    ceiling: 11181,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1492,7 +1517,15 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    ceiling: 10076,
+    // LOWERED 10076 -> 9959 at the guild-bank autosave stall fix (PR #4057,
+    // the release/v0.44.0 sync): the branch's own surface was net growth (the
+    // writer-selection comments around the dirty-book autosave), paid by
+    // moving the per-session chat token bucket (consumeChatToken and
+    // refundChatToken plus their constants and session fields) to
+    // server/chat_rate_limit.ts, and the 80 lines of pre-existing slack were
+    // banked in the same step. Exact merged count, zero slack: any further
+    // growth reds again, and the fix is extraction.
+    ceiling: 9959,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

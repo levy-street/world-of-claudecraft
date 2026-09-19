@@ -2692,6 +2692,8 @@ export const nl_NL: EnTranslations = {
       "hint": "Focuspunten geven een bonus bovenop de basisopbrengst van elk onderdeel. Onderdelen zonder focus blijven op het basisniveau.",
       "tierHint": "Elke {points} punten op een onderdeel verhogen het oogstniveau een stap, maximaal {steps} stappen; minder dan {points} punten boosten nog steeds de opbrengst.",
       "townOnlyHint": "Focus kan alleen worden gewijzigd terwijl je in de stad bent.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Punten over: {remaining} / {budget}",
       "saveButton": "Focus opslaan",
       "notInTownHint": "Je moet in de stad zijn om je focus in te stellen.",
@@ -5405,7 +5407,9 @@ export const nl_NL: EnTranslations = {
         "herb": "Kruid",
         "mail": "Mail",
         "passage": "Passage"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Vereist niveau {level}"

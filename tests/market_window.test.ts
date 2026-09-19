@@ -120,6 +120,32 @@ describe('market_window: instance-effective icon rims (phase 13 fix round)', () 
   });
 });
 
+// Bug: the Sell tab's quantity cap summed a stack's raw slot.count, so a
+// gathered-material stack holding a premium/signed bucket (several
+// benefactors merged into one slot) advertised the WHOLE stack as sellable
+// even though the sim excludes a signed bucket from the plain bulk-listing
+// pool (material_exchange_transfer.ts's eligibleSource / countFungibleItem).
+// Submitting the advertised quantity always bounced off "You do not have
+// that many to sell." The fix routes the sum through materialFungibleUnitCount
+// (tests/material_sources_view.test.ts), the client-side mirror of that same
+// sim gate, so the cap can never promise more than marketList will escrow.
+describe('market_window: Sell tab quantity cap matches the sim escrow gate', () => {
+  it('imports the source-aware unit counter instead of summing raw slot.count', () => {
+    expect(painter).toContain(
+      "import { materialFungibleUnitCount, materialSourcesForDisplay } from './material_sources_view';",
+    );
+  });
+
+  it('fungibleBagCount sums materialFungibleUnitCount per slot, not the raw stack count', () => {
+    const method = painterCode.slice(
+      painterCode.indexOf('private fungibleBagCount('),
+      painterCode.indexOf('private fungibleBagCount(') + 300,
+    );
+    expect(method).toContain('materialFungibleUnitCount(s)');
+    expect(method).not.toContain('n + s.count');
+  });
+});
+
 describe('market_window: the Collect tab sale ledger', () => {
   // The ledger is its own repaint axis: a sale whose proceeds floor to 0 copper
   // moves neither collectionCopper nor collectionItems, so a signature watching

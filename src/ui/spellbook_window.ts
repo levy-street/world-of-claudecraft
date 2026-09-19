@@ -55,6 +55,7 @@ import { ABILITIES, CLASSES } from '../sim/data';
 import type { ResolvedAbility } from '../sim/sim';
 import type { AbilityDef } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, tEntity } from './entity_i18n';
 import { esc } from './esc';
@@ -181,6 +182,17 @@ export class SpellbookWindow {
   private lastAttackOnBar = false;
   private lastHasFree = false;
   private readonly lastSlotIds: (string | null)[] = [];
+  // True while a native drag started on this window's own Attack row or an
+  // ability row is in flight. A browser never fires dragend on a source
+  // element that has already left the document, so render()'s innerHTML
+  // rebuild (driven by tickOpen's per-frame cooldown watch, which fires on
+  // almost every tick some known ability is cooling down) must defer while
+  // one of these rows is the live drag source, or the row is destroyed
+  // before its own dragend fires and the shared drag state it feeds gets
+  // stuck for the rest of the session (see deferred_drag_render.ts;
+  // bags_window.ts hit this hazard first).
+  private dragActive = false;
+  private readonly dragRenderGate = new DeferredDragRender();
 
   constructor(private readonly deps: SpellbookWindowDeps) {}
 
@@ -318,6 +330,15 @@ export class SpellbookWindow {
   }
 
   render(): void {
+    // A native drag's source row dies with the rest of the list on an innerHTML
+    // rebuild, and a browser never fires dragend on a row that already left the
+    // document: the shared hotbar-eligible dragAction it feeds would then stay
+    // stuck on the stale drag for the rest of the session, silently failing every
+    // later drop on the action bar. Defer the rebuild instead of tearing the
+    // dragged row out from under it; the row's own dragend flushes it once the
+    // drag actually concludes (deferred_drag_render.ts; the same hazard
+    // bags_window.ts guards against for bag-item drags).
+    if (this.dragRenderGate.shouldDefer(this.dragActive)) return;
     const el = this.deps.root();
     const world = this.deps.world();
     this.captureKnown(world.known);
@@ -383,6 +404,13 @@ export class SpellbookWindow {
       this.deps.resetFormBar();
       audio.click();
     });
+  }
+
+  /** Catch up a rebuild render() deferred (see its own comment) because the Attack
+   *  row or an ability row was mid-drag. Called from that row's own dragend, after
+   *  dragActive has already cleared. */
+  private flushDeferredRender(): void {
+    this.dragRenderGate.flush(() => this.render());
   }
 
   // Force the +/- toggles to match the bar as it stands right now.
@@ -571,6 +599,7 @@ export class SpellbookWindow {
     // on (restoring Attack to slot 0). The +/- toggle above stays for touch/keyboard.
     el.draggable = true;
     el.addEventListener('dragstart', (e) => {
+      this.dragActive = true;
       if (e.dataTransfer) {
         e.dataTransfer.setData(HOTBAR_ATTACK_MIME, '1');
         e.dataTransfer.effectAllowed = 'move';
@@ -578,7 +607,9 @@ export class SpellbookWindow {
       this.deps.hideTooltip();
     });
     el.addEventListener('dragend', () => {
+      this.dragActive = false;
       this.deps.clearActionDropTargets();
+      this.flushDeferredRender();
     });
     this.deps.attachTooltip(
       el,
@@ -703,6 +734,7 @@ export class SpellbookWindow {
       el.appendChild(toggle);
       el.draggable = true;
       el.addEventListener('dragstart', (e) => {
+        this.dragActive = true;
         const action = { type: 'ability' as const, id: known.def.id };
         this.deps.setDragAction(action);
         this.writeDraggedAction(e.dataTransfer, action);
@@ -710,8 +742,10 @@ export class SpellbookWindow {
         this.deps.hideTooltip();
       });
       el.addEventListener('dragend', () => {
+        this.dragActive = false;
         this.deps.setDragAction(null);
         this.deps.clearActionDropTargets();
+        this.flushDeferredRender();
       });
     }
     if (known) {

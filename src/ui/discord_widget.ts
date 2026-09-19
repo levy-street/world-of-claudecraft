@@ -82,6 +82,8 @@ export function renderDiscordWidget(
     presence: DiscordPresenceState;
     inviteUrl: string;
     characterName?: string | null;
+    /** A link/relink attempt just failed; see DiscordWidgetView.linkError. */
+    linkError?: boolean;
   },
   deps: DiscordWidgetDeps,
 ): void {
@@ -89,6 +91,9 @@ export function renderDiscordWidget(
   const header =
     `<div class="panel-title"><span>${esc(t('hudChrome.discord.panelTitle'))}</span>` +
     `<button type="button" class="x-btn" data-close aria-label="${esc(t('hudChrome.discord.close'))}">${svgIcon('close')}</button></div>`;
+  const linkErrorHtml = view.linkError
+    ? `<p class="dc-link-error" role="alert">${esc(t('hudChrome.discord.link.error'))}</p>`
+    : '';
 
   let account = '';
   if (view.mode === 'unlinked') {
@@ -138,7 +143,11 @@ export function renderDiscordWidget(
       `</div>` +
       (view.showJoinCta
         ? `<button type="button" class="dc-btn dc-btn-primary dc-join" data-action="join">${esc(t('hudChrome.discord.joinCta'))}</button>`
-        : '');
+        : '') +
+      // Forces a fresh OAuth pass (re-consent + a server-side upsert), which is
+      // the only way the game learns about a changed Discord username/avatar:
+      // the link row is written only on link/relink, never polled.
+      `<button type="button" class="dc-btn dc-btn-ghost dc-relink" data-action="relink">${esc(t('hudChrome.discord.link.relink'))}</button>`;
   }
 
   const ladder =
@@ -161,7 +170,7 @@ export function renderDiscordWidget(
     `<div class="dc-voice"><div class="dc-voice-head">${voiceHead}</div>${voiceMembers}</div>` +
     `</section>`;
 
-  el.innerHTML = `${header}<div class="dc-body">${account}${ladder}${community}</div>`;
+  el.innerHTML = `${header}<div class="dc-body">${linkErrorHtml}${account}${ladder}${community}</div>`;
 
   // If the linked Discord avatar fails to load from the CDN, degrade to exactly the
   // no-avatar rendering (a single clean tier badge, replacing the pfp + corner-badge
@@ -180,6 +189,12 @@ export function renderDiscordWidget(
   // ── wire clicks ────────────────────────────────────────────────────────────
   el.querySelector<HTMLElement>('[data-close]')?.addEventListener('click', () => deps.onClose());
   el.querySelector<HTMLElement>('[data-action="link"]')?.addEventListener('click', () =>
+    deps.onLink(),
+  );
+  // Relink starts the normal in-game OAuth flow, but the server accepts it only
+  // as a same-Discord refresh. Moving to a different Discord id requires unlink
+  // plus the explicit keep-account reauth path.
+  el.querySelector<HTMLElement>('[data-action="relink"]')?.addEventListener('click', () =>
     deps.onLink(),
   );
   el.querySelector<HTMLElement>('[data-action="unlink"]')?.addEventListener('click', () =>

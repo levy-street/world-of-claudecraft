@@ -72,6 +72,7 @@ import {
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
+import { DeferredDragRender } from './deferred_drag_render';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
 import {
@@ -363,8 +364,9 @@ export class BagsWindow {
   // Set when render() or refreshGrid() skipped a rebuild because a bag row was
   // mid-drag (see render()'s own comment). Flushed by flushDeferredRender(),
   // called from the dragged row's own end-of-drag handlers once the drag
-  // concludes.
-  private renderDeferredForDrag = false;
+  // concludes. Shared shape (also used by spellbook_window.ts and
+  // char_window.ts): see deferred_drag_render.ts.
+  private readonly dragRenderGate = new DeferredDragRender();
 
   // Native HTML5 drop fires before dragend. A bag-cell drop consumes dragState
   // in the drop handler, but the source row still needs to survive until its
@@ -500,7 +502,7 @@ export class BagsWindow {
     // instead of tearing the dragged row out from under it; the row's own dragend
     // (or the touch drag's onEnd) flushes it once the drag actually concludes.
     const drag = this.deps.dragState.get();
-    if (drag || this.nativeBagCellDropAwaitingDragEnd) {
+    if (this.dragRenderGate.shouldDefer(!!drag || this.nativeBagCellDropAwaitingDragEnd)) {
       // Inventory snapshots still have one small paint obligation while the
       // grid rebuild is deferred: keep the paperdoll promise tied to the exact
       // dragged copy. This covers desktop and touch alike without polling from
@@ -510,7 +512,6 @@ export class BagsWindow {
         if (named === null) this.deps.markEquipDropTargets(null);
         else this.deps.markEquipDropTargets(drag.itemId, named);
       }
-      this.renderDeferredForDrag = true;
       return;
     }
     // Rebuild tears down hovered cells without mouseleave; drop any tracker glow.
@@ -604,10 +605,10 @@ export class BagsWindow {
    *  dragend/onEnd teardown runs first), so this only needs to check the latch,
    *  not the live drag state again. */
   private flushDeferredRender(): void {
-    if (!this.renderDeferredForDrag) return;
-    this.renderDeferredForDrag = false;
-    this.nativeBagCellDropAwaitingDragEnd = false;
-    this.render();
+    this.dragRenderGate.flush(() => {
+      this.nativeBagCellDropAwaitingDragEnd = false;
+      this.render();
+    });
   }
 
   // The classic bag bar: the implicit backpack, the 4 equip sockets, and the
@@ -1644,7 +1645,7 @@ export class BagsWindow {
       const from = drag.index;
       this.deps.dragState.end();
       this.nativeBagCellDropAwaitingDragEnd = true;
-      this.renderDeferredForDrag = true;
+      this.dragRenderGate.arm();
       this.dropOnBagCell(from, cell);
     });
   }
@@ -2023,8 +2024,11 @@ export class BagsWindow {
     // Same hazard as render() (see its comment): an innerHTML wipe here would tear a
     // mid-drag row out of the document just as easily. Defer to the same latch; the
     // eventual flush runs a full render(), a strict superset of a grid-only refresh.
-    if (this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd) {
-      this.renderDeferredForDrag = true;
+    if (
+      this.dragRenderGate.shouldDefer(
+        !!this.deps.dragState.get() || this.nativeBagCellDropAwaitingDragEnd,
+      )
+    ) {
       return;
     }
     // Grid rebuild tears down hovered cells without mouseleave.

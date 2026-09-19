@@ -887,6 +887,7 @@ import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { tradeOfferCeiling } from './trade_view';
@@ -2277,6 +2278,8 @@ export class Hud {
       // save; offline, Sim.saveActionBarLayout is a no-op (localStorage is the
       // store). The controller always writes the localStorage mirror itself.
       persistLayout: (profile, layout) => this.sim.saveActionBarLayout(profile, layout),
+      // A /spectate view remaps every live dep above to the watched character.
+      spectating: () => typeof this.sim.spectating === 'string',
     });
     this.delveTracker = new DelveTrackerController({
       element: $('#delve-body'), // never the frame root: rebuilds wipe chrome
@@ -2339,6 +2342,7 @@ export class Hud {
       click: () => audio.click(),
       onRepaintMap: () => this.repaintOpenMap(),
       onShowRoute: (route) => this.showFinderOnMap(route.x, route.z),
+      settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
     });
     this.fiesta = new FiestaController({
       document,
@@ -2361,14 +2365,7 @@ export class Hud {
       element: $('#qt-body'),
       document,
       world: () => this.sim,
-      settings: {
-        available: () => this.optionsHooks !== null,
-        collapsed: () =>
-          (this.optionsHooks?.settings.get('questTrackerCollapsed') ?? false) === true,
-        setCollapsed: (collapsed) => {
-          this.optionsHooks?.settings.set('questTrackerCollapsed', collapsed);
-        },
-      },
+      settings: trackerCollapseSettings(() => this.optionsHooks, 'questTrackerCollapsed'),
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),
@@ -7266,6 +7263,7 @@ export class Hud {
   }
 
   private syncSlotMap(): void {
+    if (typeof this.sim.spectating === 'string') return; // a foreign kit must not reseed any bar
     this.actionBarController.syncKnownAbilities();
     // The pad's bar gets the same offer minus passives, and stances ride along
     // because pad mode hides the stance bar: a stance learned after the seed
@@ -15307,7 +15305,8 @@ export class Hud {
       return;
     }
     this.closeOtherWindows('#town-focus-window');
-    this.townFocusDraft = { ...this.sim.townFocus };
+    // Open on the QUEUED allocation when one waits: re-saving it never restarts the clock.
+    this.townFocusDraft = { ...(this.sim.townFocusPending?.allocation ?? this.sim.townFocus) };
     this.townFocusRespecTier = 'time';
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
@@ -15325,7 +15324,8 @@ export class Hud {
   private renderTownFocus(): void {
     const inTown = this.isInTown();
     const allocation = this.townFocusDraft ?? this.sim.townFocus;
-    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown);
+    const pending = this.sim.townFocusPending;
+    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown, pending);
     // Re-arm the latch on EVERY paint, whatever caused it (the open, a step, a
     // language switch), so the slow-band probe below elides against the state
     // actually on screen rather than against the last thing the probe itself
@@ -15377,6 +15377,7 @@ export class Hud {
         this.townFocusDraft ?? this.sim.townFocus,
         FOCUS_POINT_BUDGET,
         this.isInTown(),
+        this.sim.townFocusPending,
       ),
     );
     if (sig === this.lastTownFocusSig) return;
@@ -18211,7 +18212,9 @@ export class Hud {
   /** What an untouched cross hotbar is filled from: this character's action bar,
    *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
-    return crossHotbarSeedActions(this.hotbarActions, this.sim.known);
+    // A spectated kit never seeds the pad bar (same freeze as syncSlotMap).
+    const known = typeof this.sim.spectating === 'string' ? [] : this.sim.known;
+    return crossHotbarSeedActions(this.hotbarActions, known);
   }
 
   /** The bar's own arrange surface, whole rather than proxied method by method. */

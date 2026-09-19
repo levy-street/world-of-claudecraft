@@ -177,6 +177,12 @@ import {
   pushMuteChange,
   pushStrikesChange,
 } from './chat_mod_live';
+import {
+  type ChatRateLimitState,
+  consumeChatToken as consumeChatRateToken,
+  createChatRateLimitState,
+  refundChatToken as refundChatRateToken,
+} from './chat_rate_limit';
 import { chatSenderFlair } from './chat_sender_flair';
 import {
   applyCheaterMarkLive as applyCheaterMarkLiveRuntime,
@@ -503,11 +509,6 @@ const MARKET_WRITE_QUEUE_WARN_DEPTH = 16;
 const IGNORE_USAGE = 'Usage: /ignore <name>, /unignore <name>, /ignorelist.';
 const BLOCK_USAGE = 'Usage: /block <name>, /unblock <name>, /blocklist.';
 
-const CHAT_RATE_BURST = 5;
-const CHAT_RATE_REFILL_PER_SECOND = 1 / 3; // sustained 20 messages/minute
-const CHAT_RATE_ERROR_COOLDOWN_SECONDS = 4;
-const CHAT_COOLDOWN_SECONDS = 20;
-const CHAT_RATE_VIOLATIONS_FOR_COOLDOWN = 3;
 // One live session per account: Ravenpost mail (v0.20.0) moves coin and goods
 // between an account's characters, so the old allowance of a second online
 // character (self-trade by dual-boxing) is no longer needed. GMs are exempt.
@@ -888,7 +889,10 @@ const DAILY_REWARD_ACTIVITY_MS = 60_000;
 const RELAY_COOLDOWN_MS = 8_000; // min gap between a player's "!" community posts
 const ADMIN_LOCATION_POI_RADIUS = 32;
 
-export interface ClientSession extends MovementInputSessionState, HotbarLayoutState {
+export interface ClientSession
+  extends MovementInputSessionState,
+    HotbarLayoutState,
+    ChatRateLimitState {
   ws: WebSocket;
   accountId: number;
   accountCosmetics: AccountCosmetics;
@@ -934,11 +938,6 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   // next to the close/error handlers in ws_auth.ts) clears it. Still set at
   // the next sweep means the socket is black-holed: terminate into the grace.
   awaitingPong: boolean;
-  chatTokens: number;
-  chatLastRefill: number;
-  chatLastRateError: number;
-  chatRateViolations: number;
-  chatCooldownUntil: number;
   // Advances only when rememberedChat is written (rememberChatChannel), so the
   // async General quota path can fence its sticky-channel set against a NEWER
   // channel selection without unrelated commands (/who, /unstuck) tripping it.
@@ -1706,24 +1705,27 @@ export class GameServer {
   // One FIFO per character so a burst of debounced client saves cannot commit on
   // separate pool clients in reverse order and persist a stale layout.
   readonly hotbarLayouts = new HotbarLayoutStore();
-  // Serializes every write of the single global Market blob (the 30s autosave
-  // and the leave-path combined save). Both serialize the whole market; without
-  // a queue their transactions could commit out of capture order and persist an
-  // older snapshot over a newer one. Snapshots are captured inside the queued
-  // thunk, so commit order equals capture order equals freshness order.
-  // ACCEPTED (Guild Bank Phase 3 QA, database-performance review): dirty-book
-  // character autosaves ALSO ride this one writer (the locked design: the
-  // leave flush writes market, mail, AND books in one transaction, so a
-  // second queue would reopen the interleaving this writer exists to
-  // prevent), which collapses their effective save concurrency to 1 and can
-  // queue a leave flush behind an autosave batch. The depth watch below makes
-  // that collapse loud; if the warn fires in production, the escalation path
-  // is a per-guild serializer for the autosave arm (state.md records it).
+  // Serializes every write of the single global Market blob (the 30s periodic
+  // saveMarket/saveMail/saveRifts and the leave-path combined save). All
+  // serialize whole-blob shared state; without a queue their transactions
+  // could commit out of capture order and persist an older snapshot over a
+  // newer one. Snapshots are captured inside the queued thunk, so commit
+  // order equals capture order equals freshness order.
+  // A dirty-book character autosave (opts.withMarket false) does NOT ride
+  // this writer: Direction B (docs/guild-bank/escrow-fix-plan.md section 3.6)
+  // made book writes a read-modify-write under a per-guild row lock,
+  // commutative and order-independent, so they no longer need this writer's
+  // commit-order guarantee, and no longer pay for whatever else is queued
+  // here (this used to collapse their effective save concurrency to 1 and
+  // could stall the world loop for every dirty-book officer at once, every
+  // AUTOSAVE_SECONDS). The leave flush still rides it: it writes market,
+  // mail, AND books in one transaction, so a second queue would reopen the
+  // interleaving this writer exists to prevent.
   private readonly onSaveMs = createTickSaveObserver(() => this.tickProfiler);
   private readonly enqueueMarketWrite = createDepthWarnedSerialWriter(
     MARKET_WRITE_QUEUE_WARN_DEPTH,
     (depth) =>
-      `market serial writer queue depth ${depth}: dirty-book autosaves are queueing behind the shared writer; escrow save latency is rising`,
+      `market serial writer queue depth ${depth}: leave flushes are queueing behind the shared market/mail/rift writer; escrow save latency is rising`,
     this.onSaveMs,
   );
   private readonly enqueueRiftWrite = createSerialWriter(this.onSaveMs);
@@ -3489,11 +3491,7 @@ export class GameServer {
       linkdead: false,
       graceUntil: 0,
       awaitingPong: false,
-      chatTokens: CHAT_RATE_BURST,
-      chatLastRefill: Date.now() / 1000,
-      chatLastRateError: 0,
-      chatRateViolations: 0,
-      chatCooldownUntil: 0,
+      ...createChatRateLimitState(Date.now() / 1000),
       chatChannelSequence: 0,
       generalChatRateLimit: meta.generalChatRateLimit ?? null,
       msgRate: createMsgRateBucket(Date.now() / 1000),
@@ -4296,57 +4294,69 @@ export class GameServer {
         if (opts.withMarket || carriesGuildBooks) {
           // Market/mail/books and the character blob share one fenced queued
           // transaction. Capture their snapshots at write time.
+          const writeThunk = () => {
+            // Capture both escrow halves after the queue wait. If teardown
+            // removed the player, the pre-wait snapshot is still consistent
+            // with its pre-wait book work. Deed publication remains T0-bound.
+            const fresh = this.sim.serializeCharacter(session.pid);
+            const snap = fresh ? applyFixups(fresh) : state;
+            if (fresh) {
+              carriedStorageEffects = snapshotStorageAppliedEffects(
+                session.pendingStorageAppliedEffects,
+              );
+              carriedLedgerSnapshot = session.bankLedgerJournal.outbox.snapshot();
+            }
+            persistedLevel = snap.level;
+            const guildDeltas = collectDeltas();
+            // Drained here, at persist-BUILD time, not inside the closure:
+            // this is the same entry-snapshot moment as `snap`, and the outer
+            // mailPartitionsForRearm exists so the catch arm can re-arm them.
+            // A cancelled enqueue rejects into that same arm, so an abort
+            // while waiting on a background-db permit puts them back too.
+            if (opts.withMarket) mailPartitionsForRearm = this.sim.takeDirtyMailPartitions();
+            const persist = () =>
+              opts.withMarket
+                ? saveCharacterAndMarketState(
+                    session.characterId,
+                    snap.level,
+                    snap,
+                    this.sim.serializeMarket(),
+                    mailPartitionsForRearm,
+                    session.leaseNonce,
+                    guildDeltas,
+                    guildBankResults,
+                    carriedStorageEffects,
+                    bankLedgerSaveEffects(carriedLedgerSnapshot),
+                    opts.signal,
+                  )
+                : saveCharacterAndGuildBankState(
+                    session.characterId,
+                    snap.level,
+                    snap,
+                    guildDeltas,
+                    session.leaseNonce,
+                    guildBankResults,
+                    carriedStorageEffects,
+                    bankLedgerSaveEffects(carriedLedgerSnapshot),
+                    opts.signal,
+                  );
+            return opts.backgroundDbPermit
+              ? this.withBackgroundDbPermit(persist, opts.signal)
+              : persist();
+          };
+          // The leave flush (opts.withMarket) still needs the shared writer's
+          // commit-order guarantee: it writes the whole-blob market and mail
+          // state, which can commit out of capture order without it. A
+          // guild-book-only save no longer needs the shared writer: Direction B
+          // made book writes a read-modify-write under a per-guild row lock
+          // (docs/guild-bank/escrow-fix-plan.md section 3.6), commutative and
+          // order-independent, so it no longer has to queue behind whatever
+          // else the shared 'market' writer is doing (a market/mail autosave,
+          // or every other guild's dirty-book autosave).
           try {
-            saved = await this.enqueueMarketWriteForSave(opts.signal, () => {
-              // Capture both escrow halves after the queue wait. If teardown
-              // removed the player, the pre-wait snapshot is still consistent
-              // with its pre-wait book work. Deed publication remains T0-bound.
-              const fresh = this.sim.serializeCharacter(session.pid);
-              const snap = fresh ? applyFixups(fresh) : state;
-              if (fresh) {
-                carriedStorageEffects = snapshotStorageAppliedEffects(
-                  session.pendingStorageAppliedEffects,
-                );
-                carriedLedgerSnapshot = session.bankLedgerJournal.outbox.snapshot();
-              }
-              persistedLevel = snap.level;
-              const guildDeltas = collectDeltas();
-              // Drained here, at persist-BUILD time, not inside the closure:
-              // this is the same entry-snapshot moment as `snap`, and the outer
-              // mailPartitionsForRearm exists so the catch arm can re-arm them.
-              // A cancelled enqueue rejects into that same arm, so an abort
-              // while waiting on a background-db permit puts them back too.
-              if (opts.withMarket) mailPartitionsForRearm = this.sim.takeDirtyMailPartitions();
-              const persist = () =>
-                opts.withMarket
-                  ? saveCharacterAndMarketState(
-                      session.characterId,
-                      snap.level,
-                      snap,
-                      this.sim.serializeMarket(),
-                      mailPartitionsForRearm,
-                      session.leaseNonce,
-                      guildDeltas,
-                      guildBankResults,
-                      carriedStorageEffects,
-                      bankLedgerSaveEffects(carriedLedgerSnapshot),
-                      opts.signal,
-                    )
-                  : saveCharacterAndGuildBankState(
-                      session.characterId,
-                      snap.level,
-                      snap,
-                      guildDeltas,
-                      session.leaseNonce,
-                      guildBankResults,
-                      carriedStorageEffects,
-                      bankLedgerSaveEffects(carriedLedgerSnapshot),
-                      opts.signal,
-                    );
-              return opts.backgroundDbPermit
-                ? this.withBackgroundDbPermit(persist, opts.signal)
-                : persist();
-            });
+            saved = opts.withMarket
+              ? await this.enqueueMarketWriteForSave(opts.signal, writeThunk)
+              : await writeThunk();
           } catch (err) {
             rearmMailPartitionsOnFailure(this.sim, mailPartitionsForRearm); // mail half of the rollback
             this.acknowledgeDurableLedgerPrefixAfterError(session, carriedLedgerSnapshot, err);
@@ -9819,62 +9829,15 @@ export class GameServer {
   }
 
   private consumeChatToken(session: ClientSession): boolean {
-    const now = Date.now() / 1000;
-    if (session.chatCooldownUntil > now) {
-      if (now - session.chatLastRateError >= CHAT_RATE_ERROR_COOLDOWN_SECONDS) {
-        session.chatLastRateError = now;
-        const remaining = Math.ceil(session.chatCooldownUntil - now);
-        this.send(session, {
-          t: 'events',
-          list: [{ type: 'error', text: `Chat is on cooldown for ${remaining}s.` }],
-        });
-      }
-      return false;
+    const verdict = consumeChatRateToken(session, Date.now() / 1000);
+    if (verdict.notice !== null) {
+      this.send(session, { t: 'events', list: [{ type: 'error', text: verdict.notice }] });
     }
-    if (session.chatCooldownUntil > 0) {
-      session.chatCooldownUntil = 0;
-      session.chatRateViolations = 0;
-      session.chatTokens = CHAT_RATE_BURST;
-    }
-    const elapsed = Math.max(0, now - session.chatLastRefill);
-    session.chatTokens = Math.min(
-      CHAT_RATE_BURST,
-      session.chatTokens + elapsed * CHAT_RATE_REFILL_PER_SECOND,
-    );
-    session.chatLastRefill = now;
-    if (session.chatTokens >= 1) {
-      session.chatTokens -= 1;
-      session.chatRateViolations = 0;
-      return true;
-    }
-    session.chatRateViolations++;
-    if (session.chatRateViolations >= CHAT_RATE_VIOLATIONS_FOR_COOLDOWN) {
-      session.chatCooldownUntil = now + CHAT_COOLDOWN_SECONDS;
-      session.chatTokens = 0;
-      session.chatLastRateError = now;
-      this.send(session, {
-        t: 'events',
-        list: [
-          {
-            type: 'error',
-            text: `Chat locked for ${CHAT_COOLDOWN_SECONDS}s because you are sending messages too quickly.`,
-          },
-        ],
-      });
-      return false;
-    }
-    if (now - session.chatLastRateError >= CHAT_RATE_ERROR_COOLDOWN_SECONDS) {
-      session.chatLastRateError = now;
-      this.send(session, {
-        t: 'events',
-        list: [{ type: 'error', text: 'You are sending messages too quickly. Slow down.' }],
-      });
-    }
-    return false;
+    return verdict.ok;
   }
 
   private refundChatToken(session: ClientSession): void {
-    session.chatTokens = Math.min(CHAT_RATE_BURST, session.chatTokens + 1);
+    refundChatRateToken(session);
   }
 
   private isChatMuted(session: ClientSession): boolean {

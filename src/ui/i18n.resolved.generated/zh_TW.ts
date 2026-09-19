@@ -2692,6 +2692,8 @@ export const zh_TW: EnTranslations = {
       "hint": "專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。",
       "tierHint": "每在一種材料上投入{points}點專注，其採集品階就會提升一階，最多提升{steps}階；不足{points}點時仍會提高產出。",
       "townOnlyHint": "專注只能在城鎮中調整。",
+      "preferenceHint": "專注會提高你採集材料的品級和數量。若只想採集一種材料，請在野外工具包或專業視窗中設定採集偏好。",
+      "pendingLine": "已儲存。切換到此分配將在{time}後完成。",
       "budgetLabel": "剩餘點數：{remaining} / {budget}",
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
@@ -5405,7 +5407,9 @@ export const zh_TW: EnTranslations = {
         "herb": "草藥",
         "mail": "信箱",
         "passage": "通道"
-      }
+      },
+      "collapseHint": "摺疊地圖側欄",
+      "expandHint": "展開地圖側欄"
     },
     "arenaGate": {
       "minLevelNote": "需要等級 {level}"

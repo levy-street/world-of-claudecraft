@@ -2692,6 +2692,8 @@ export const ja_JP: EnTranslations = {
       "hint": "フォーカスポイントは各素材の基本産出量にボーナスを加算します。フォーカスしていない素材は基本産出量のままです。",
       "tierHint": "素材にフォーカスを{points}ポイント割り振るごとに採取ティアが1段階上がります（最大{steps}段階）。{points}ポイント未満でも産出量は増えます。",
       "townOnlyHint": "フォーカスは町の中でのみ変更できます。",
+      "preferenceHint": "フォーカスは採取する素材の品質と量を高めます。ひとつの素材だけを採取するには、フィールドキットまたは専門技能ウィンドウから採取設定を選んでください。",
+      "pendingLine": "保存しました。この割り振りへの再設定は{time}で完了します。",
       "budgetLabel": "残りポイント：{remaining} / {budget}",
       "saveButton": "フォーカスを保存",
       "notInTownHint": "フォーカスを設定するには町にいる必要があります。",
@@ -5405,7 +5407,9 @@ export const ja_JP: EnTranslations = {
         "herb": "薬草",
         "mail": "郵便",
         "passage": "通路"
-      }
+      },
+      "collapseHint": "マップサイドバーを折りたたむ",
+      "expandHint": "マップサイドバーを展開"
     },
     "arenaGate": {
       "minLevelNote": "レベル {level} が必要です"

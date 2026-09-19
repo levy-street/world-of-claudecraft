@@ -78,6 +78,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { VARKHUL_FORGE_PORTAL_ABILITY_ID } from '../varkhul_forge_intermission';
+import { attemptLost } from './attempt_wipe';
 import { resolveEncounterWipe } from './encounter_wipe';
 import {
   IGNIVAR_DIALOGUE,
@@ -1602,7 +1603,10 @@ export function updateIgnivarEncounter(ctx: SimContext, boss: Entity, pursueTarg
   if (boss.templateId !== IGNIVAR_BOSS_ID || boss.dead) return;
   const allPlayers = playersInEncounter(ctx, boss, true);
   let players = allPlayers.filter((player) => !player.dead);
-  if (players.length === 0) {
+  // A wipe is "no participant of THIS attempt left alive", not "nobody alive
+  // in the room": a raider who zoned in as the last participant died must not
+  // keep the fight alive at his current health (encounters/attempt_wipe.ts).
+  if (players.length === 0 || attemptLost(boss.ignivar?.attemptParticipantIds, players)) {
     boss.aiState = 'evade';
     for (const playerId of boss.ignivar?.attemptParticipantIds ?? []) {
       const player = ctx.entities.get(playerId);

@@ -821,10 +821,29 @@ export function assignMasterLoot(
         text: `${r.meta.name} assigned [[i:${roll.itemId}]] to ${targetName}.`,
         pid,
       });
+    emitLootRollAwarded(ctx, roll, targets[0]);
     grantOrHoldAwardedLoot(ctx, roll.mobId, roll.itemId, targets[0], roll.windowEligible);
     return;
   }
   convertMasterRollToNeedGreed(ctx, roll, targets);
+}
+
+// The award-time signal (winner-scoped) that a roll granted its item: the one
+// event a consumer may read as "this player received the drop". Emitted by
+// both ROLL grant paths (the need/greed resolve and a direct master
+// assignment) immediately before grantOrHoldAwardedLoot, so a held-on-corpse
+// grant (full bags) still names its rightful owner. The no-roll award paths
+// (round-robin, looter-takes-all, a solo pickup) deliberately never emit it:
+// no roll happened, so there is no roll id to name.
+function emitLootRollAwarded(ctx: SimContext, roll: PendingLootRoll, winnerPid: number): void {
+  ctx.emit({
+    type: 'lootRollAwarded',
+    rollId: roll.id,
+    itemId: roll.itemId,
+    itemName: roll.itemName,
+    quality: roll.quality,
+    pid: winnerPid,
+  });
 }
 
 // Turn a curate-phase master roll into a normal need/greed roll for `targets` (a
@@ -967,6 +986,7 @@ export function resolveLootRoll(ctx: SimContext, roll: PendingLootRoll): void {
       });
     return;
   }
+  emitLootRollAwarded(ctx, roll, winner.pid);
   grantOrHoldAwardedLoot(ctx, roll.mobId, roll.itemId, winner.pid, roll.windowEligible);
 }
 

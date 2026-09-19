@@ -165,6 +165,7 @@ const GUARDED_SCRIPTS = [
   'scripts/catalog_program_census.mjs',
   'scripts/charselect_zone_shot.mjs',
   'scripts/chat_mute_resume_shot.mjs',
+  'scripts/spectate_action_bar_shot.mjs',
   'scripts/geared_arrival_bench.mjs',
   'scripts/guild_pledge_shot.mjs',
   // The kick-then-clear-then-retry operator E2E (Masterwrought phase 18): it

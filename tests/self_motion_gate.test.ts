@@ -90,13 +90,16 @@ describe('selfMotionPredictionEnabled', () => {
     }
   });
 
-  it('is off inside a delve and inside a rift before the rift floor descriptor arrives', () => {
-    const delveX = DELVE_X_MIN;
+  it('is off inside a rift before the rift floor descriptor arrives', () => {
     const riftX = RIFT_X_MIN;
-    expect(isDelvePos(delveX)).toBe(true);
     expect(isRiftPos(riftX)).toBe(true);
-    expect(selfMotionPredictionEnabled(enabledArgs({ posX: delveX }))).toBe(false);
     expect(selfMotionPredictionEnabled(enabledArgs({ posX: riftX }))).toBe(false);
+  });
+
+  it('is on inside a delve (issue #3480): no delve exclusion left in the gate', () => {
+    const delveX = DELVE_X_MIN;
+    expect(isDelvePos(delveX)).toBe(true);
+    expect(selfMotionPredictionEnabled(enabledArgs({ posX: delveX }))).toBe(true);
   });
 
   it('is on inside a rift once the mirrored rift floor descriptor is present', () => {

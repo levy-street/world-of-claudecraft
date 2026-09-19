@@ -531,6 +531,12 @@ export const BOOL_SETTINGS = {
   // collapsed to just its header. Toggled by clicking the tracker header (the
   // quest-tracker convention); kept here so the choice persists.
   recipeTrackerCollapsed: { def: false },
+  // off by default (expanded): when on, the World Map window's left atlas rail
+  // (zone name, level range, layer filters, tracked/nearby quests) collapses to
+  // a slim toggle strip and the window shrinks to match. Toggled by clicking
+  // the rail's own collapse button (map_sidebar_controller.ts); kept here so
+  // the choice persists across sessions like the tracker collapses above.
+  mapAtlasSidebarCollapsed: { def: false },
   // on by default: the on-screen Reliquary tracker (pinned pages, or the
   // nearly-complete default before any pin) is shown at all. The master
   // switch above the collapse: off removes the strip entirely. Flipped from

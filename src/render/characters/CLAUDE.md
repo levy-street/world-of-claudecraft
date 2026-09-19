@@ -147,6 +147,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `registerWeapon` returns the held-model decision as a follow-up action);
   `tests/authored_surfaces.test.ts` scans the shipped GLBs and fails any
   authored atlas that is neither flagged nor on its explicit legacy list.
+- `stonebound_shell_core.ts`: the Stonebound weapon-shell style. Wireframe on any
+  antialiased frame; a solid translucent sheath when NO AA pass runs (Low, and the
+  memory-constrained WebKit profiles), because a one-pixel GPU wireframe crawls
+  over the dense weapon mesh without AA. Keyed on the `GfxSettings` AA facts
+  (`smaa`/`fxaa`/`msaaSamples`), never on a tier name; cosmetic only.
 - Perf cores: `skeleton_update_cache.ts`/`skeleton_update_core.ts` (skeleton
   palette update elision), `skin_gpu_layout.ts` (bone-texture compaction
   without changing weights, matrices, draws, or shader math),

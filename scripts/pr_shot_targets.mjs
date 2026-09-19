@@ -1951,6 +1951,61 @@ export const TARGETS = [
     },
   },
   {
+    key: 'town-focus',
+    label: 'Town Focus panel: a queued free-tier re-spec (the Saved line and the countdown)',
+    when: [
+      'ui/town_focus_view.ts',
+      'ui/town_focus_window.ts',
+      'sim/professions/town_focus_pending.ts',
+      'sim/professions/town_focus_commands.ts',
+    ],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', beforeLoad: lowGraphicsSeed, mobile: true },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      await awaitVeilSettled(page);
+      // Stand in the Eastbrook hub (zone 1, `ZONES[0].hub`; the panel is
+      // town-gated), the reliquary targets' teleport idiom.
+      const moved = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        const ground = sim.groundPos(-14, -100);
+        p.pos.x = ground.x;
+        p.pos.y = ground.y;
+        p.pos.z = ground.z;
+        p.prevPos = { ...p.pos };
+        sim.rebucket?.(p);
+        return { ok: true };
+      });
+      if (!moved.ok) return { skip: moved.reason };
+      // The cross-zone teleport re-arms the loading veil while the hub streams
+      // in; the panel and its shot must both land on a painted world.
+      await awaitVeilSettled(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim || !game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        // Queue a free-tier re-spec the way a player does: ten points on silk,
+        // Save. The baseline shows the same panel with the old committed rows.
+        sim.setTownFocus({ silk: 10 }, 'time');
+        game.hud.toggleTownFocus?.();
+        return { ok: true, open: game.hud.townFocusOpen === true };
+      });
+      if (!staged.ok) return { skip: staged.reason };
+      if (!staged.open) return { skip: 'the Town Focus panel never opened' };
+      const ready = await pollForSize(page, '#town-focus-window');
+      if (!ready) return { skip: 'the Town Focus panel never became visible' };
+      await wait(400);
+      return { clip: '#town-focus-window' };
+    },
+  },
+  {
     key: 'dev-command-travel',
     label: 'Developer Command Center: the Travel tab (teleport, town hub, dungeon, raid cards)',
     when: ['ui/dev_command_view.ts', 'ui/dev_command_window.ts', 'sim/dev/town_teleport.ts'],
@@ -2814,6 +2869,107 @@ export const TARGETS = [
         const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
         await page.screenshot({
           path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/weapon-vfx-shed-${variant.key}-closeup.png`,
+          clip: { x, y, width, height },
+        });
+      }
+      return {};
+    },
+  },
+  {
+    key: 'stonebound-shell',
+    label: 'Stonebound weapon shell: wireframe on an antialiased tier, solid sheath with no AA',
+    when: ['characters/stonebound_shell_core', 'render/characters/visual.ts'],
+    variants: [
+      // The bug arm: Low runs with no antialiasing pass at all, so the wireframe
+      // shell crawled over the weapon. This is a graphics COMPARISON, the one
+      // sanctioned reason a shot keeps a preset other than the lowest.
+      {
+        key: 'low-desktop',
+        charClass: 'shaman',
+        charName: 'Ashka',
+        beforeLoad: lowGraphicsSeed,
+      },
+      // The control arm: Medium carries the fused FXAA grade pass, so the
+      // wireframe stays and the pair must be IDENTICAL before and after.
+      {
+        key: 'medium-desktop',
+        charClass: 'shaman',
+        charName: 'Ashka',
+        beforeLoad: async (page) => {
+          await page.evaluateOnNewDocument(
+            `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 2; s.graphicsDefaultApplied = true; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+          );
+        },
+      },
+    ],
+    async capture(page, variant) {
+      await awaitWorldPainted(page);
+      await awaitVeilSettled(page);
+      // The shell is a DISPLAY derivation of the worn aura ids
+      // (character_effects.ts characterWeaponAuraMode), so the recipe seeds the
+      // Stonebound Weapon aura directly: the claim is about how the shell is
+      // drawn, never about how the buff came to exist.
+      const staged = await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p || !Array.isArray(p.auras)) {
+          return { ok: false, reason: 'offline world is unavailable' };
+        }
+        if (!p.auras.some((a) => a.id === 'rockbiter_weapon')) {
+          p.auras.push({
+            id: 'rockbiter_weapon',
+            name: 'Stonebound Weapon',
+            kind: 'buff_ap',
+            remaining: 1800,
+            duration: 1800,
+            value: 0,
+            sourceId: p.id,
+            school: 'nature',
+          });
+        }
+        // Face the camera so the held weapon reads, and pull the camera in.
+        p.facing = Math.PI;
+        p.prevFacing = p.facing;
+        game.input.camDist = 4.5;
+        return { ok: true, id: p.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      // Hold until the rig has actually built the shell meshes: the aura mode
+      // rides the per-frame view sync and the held weapon its own GLB load.
+      await page.waitForFunction(
+        (id) =>
+          (window.__game?.renderer?.views?.get(id)?.visual?.weaponAuraMeshes?.length ?? 0) > 0,
+        { timeout: 45000, polling: 250 },
+        staged.id,
+      );
+      await wait(1500);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const spot = await page.evaluate((id) => {
+        const r = window.__game?.renderer;
+        const v = r?.views?.get?.(id);
+        if (!r || !v) return null;
+        const p = v.group.position.clone();
+        p.y += (v.height ?? 1.8) * 0.55;
+        p.project(r.camera);
+        return {
+          x: (p.x * 0.5 + 0.5) * window.innerWidth,
+          y: (-p.y * 0.5 + 0.5) * window.innerHeight,
+          w: window.innerWidth,
+          h: window.innerHeight,
+        };
+      }, staged.id);
+      if (spot) {
+        const width = Math.min(640, spot.w);
+        const height = Math.min(640, spot.h);
+        const x = Math.max(0, Math.min(spot.w - width, spot.x - width / 2));
+        const y = Math.max(0, Math.min(spot.h - height, spot.y - height / 2));
+        await page.screenshot({
+          path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/stonebound-shell-${variant.key}-closeup.png`,
           clip: { x, y, width, height },
         });
       }
@@ -5900,6 +6056,43 @@ export const TARGETS = [
       return open ? { clip: '#map-window' } : {};
     },
   },
+  {
+    key: 'map-atlas-sidebar-collapse',
+    label: 'World map atlas rail collapse toggle',
+    when: ['ui/map_sidebar_controller', 'ui/map_sidebar_view', 'ui/tracker_collapse_settings'],
+    // Desktop only: the toggle (and the whole atlas rail it collapses) is
+    // hidden on body.mobile-touch by design, so a mobile shot of this target
+    // would be identical to the plain world-map one above.
+    variants: [{ key: 'desktop' }],
+    // Same landmark as the world-map target (Boar Meadow, Eastbrook Vale), open
+    // the map, then click the rail's own collapse toggle if it exists (the
+    // market-collapse-toggle precedent: present only on this branch, absent on
+    // the base commit, which leaves the "before" half of the pair the plain
+    // uncollapsed rail).
+    async capture(page) {
+      await page.evaluate(() => {
+        const p = window.__game?.sim?.player;
+        if (p?.pos) {
+          p.pos.x = 65;
+          p.pos.z = 0;
+        }
+      });
+      await wait(400);
+      await page.evaluate(() => window.__game?.hud?.toggleMap?.());
+      await wait(600);
+      const open = await page.evaluate(() => {
+        const w = document.querySelector('#map-window');
+        return !!w && getComputedStyle(w).display !== 'none';
+      });
+      if (!open) return {};
+      await page.evaluate(() => {
+        const toggle = document.querySelector('[data-map-sidebar-toggle]');
+        if (toggle instanceof HTMLElement) toggle.click();
+      });
+      await wait(300);
+      return { clip: '#map-window' };
+    },
+  },
   // The Wildheart Basin's light grade: the caldera used to add its own fill
   // pair to the world scene (a light census change that relinked every
   // material for the rest of the session); the grade now lives in
@@ -8531,6 +8724,68 @@ export const TARGETS = [
     },
   },
   {
+    // The Crucible raid's Reliquary pages are the one in-game surface that
+    // lists WHICH items each difficulty drops (the Normal pages derive from the
+    // bosses' normalOnly partitions, the Heroic pages from HEROIC_BOSS_LOOT),
+    // so a loot redistribution between the two difficulties is shot here.
+    key: 'crucible-loot-pages',
+    label: 'The Reliquary: Crucible of the Last Spring Normal and Heroic pages',
+    when: ['sim/content/heroic_loot', 'prd/ignivar-raid-loot'],
+    variants: [
+      {
+        key: 'ignivar-heroic',
+        pageId: 'conquerors_ignivar_heroic',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      {
+        key: 'varkhul-heroic',
+        pageId: 'conquerors_varkhul_heroic',
+        beforeLoad: seedLowGraphicsPreset,
+      },
+      { key: 'ignivar-normal', pageId: 'conquerors_ignivar', beforeLoad: seedLowGraphicsPreset },
+      { key: 'varkhul-normal', pageId: 'conquerors_varkhul', beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+      });
+      await clearReliquaryPins(page);
+      await openReliquaryConquerorsShelf(page);
+      // The Proving Shore greeting note would otherwise sit over the grid.
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      // Enter the page once to learn its relic ids, mark every one discovered
+      // (the live itemsDiscovered set, exactly what a find does minus the
+      // event) so the grid paints art instead of silhouettes, then re-enter so
+      // the repaint shows the owned state.
+      for (let pass = 0; pass < 2; pass++) {
+        await page.evaluate((id) => {
+          document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+        }, variant.pageId);
+        await wait(300);
+        if (pass === 0) {
+          await page.evaluate(() => {
+            const discovered = window.__game?.sim?.deedStats?.itemsDiscovered;
+            for (const cell of document.querySelectorAll('#reliquary-window .reliquary-cell')) {
+              if (cell.dataset.cellKind === 'item' && cell.dataset.cellId)
+                discovered?.add(cell.dataset.cellId);
+            }
+            document.querySelector('#reliquary-window [data-back]')?.click();
+          });
+          await wait(250);
+        }
+      }
+      const entered = await page.evaluate(
+        () => document.querySelectorAll('#reliquary-window .reliquary-cell').length > 0,
+      );
+      if (!entered) throw new Error(`reliquary page ${variant.pageId} did not open`);
+      await wait(400);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
     key: 'reliquary-window',
     label: 'The Reliquary: Overview shelf with completion and Curator rank',
     when: [
@@ -8576,6 +8831,36 @@ export const TARGETS = [
       const opened = await pollForSize(page, '#reliquary-window');
       if (!opened) throw new Error('reliquary window did not open');
       return { clip: '#reliquary-window' };
+    },
+  },
+  {
+    key: 'loot-explorer-crucible-heroic',
+    label: 'Loot Explorer: Encounters tab searched to the Crucible Robe sigils (Heroic odds)',
+    when: ['sim/content/heroic_loot'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.getElementById('tutorial-greeting')?.remove();
+        window.__game?.hud?.toggleLootExplorer?.();
+      });
+      const opened = await pollForSize(page, '#loot-explorer-window');
+      if (!opened) throw new Error('loot explorer window did not open');
+      await page.evaluate(() => {
+        const el = document.querySelector('#loot-explorer-window');
+        el?.querySelector('.loot-explorer-tab[data-tab="encounters"]')?.click();
+        const input = el?.querySelector('input[data-search]');
+        if (input) {
+          input.value = 'Robe Sigil';
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      });
+      await wait(400);
+      return { clip: '#loot-explorer-window' };
     },
   },
   {

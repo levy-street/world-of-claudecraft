@@ -69,6 +69,7 @@ import {
   noteSelfIdentity,
   updateSelfRenderPosition,
 } from '../../src/render/self_render_position_core';
+import { delveMotionState } from '../../src/sim/delves/geometry';
 import { parseMoveInputFrame } from '../../src/sim/move_input';
 import { type Entity, emptyMoveInput, type MoveInput, type PlayerClass } from '../../src/sim/types';
 import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
@@ -530,7 +531,8 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
     selfMotionGateArgs.leaping = pe.leaping;
     selfMotionGateArgs.riftFloor = client.riftFloor;
     const predictionEnabled = selfMotionPredictionEnabled(selfMotionGateArgs);
-    movementPrediction.prepare(client, pe, predictionEnabled);
+    const delve = delveMotionState(client);
+    movementPrediction.prepare(client, pe, predictionEnabled, delve);
     // The unconditional 50 ms lane runs beside this from ClientWorld's own timer.
     Object.assign(client.moveInput, wireMi);
     client.setMouselookFacing(netFacing);
@@ -572,7 +574,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
             frameDt,
             Math.max(0, cameraLastSnapAge),
             client.snapInterval,
-            client.riftFloor,
+            { riftFloor: client.riftFloor, ...delve },
           );
 
     let drawnYaw = interpServerFacing;

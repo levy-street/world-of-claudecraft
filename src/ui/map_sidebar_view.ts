@@ -104,7 +104,15 @@ export function bucketMapAtlasDistance(distance: number): number {
  */
 export function mapSidebarSignature(
   view: MapSidebarView,
-  chrome: { shownRouteQuestId: string | null; i18nRevision: number; trackingRevision: number },
+  chrome: {
+    shownRouteQuestId: string | null;
+    i18nRevision: number;
+    trackingRevision: number;
+    /** The player's own collapse choice: folded in because it changes the
+     *  toggle button's aria-expanded and title text, which the view itself
+     *  carries no field for. */
+    sidebarCollapsed: boolean;
+  },
 ): string {
   return JSON.stringify({
     view: {

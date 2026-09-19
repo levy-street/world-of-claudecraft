@@ -259,6 +259,15 @@ import {
   desktopWalletManagerView,
   disconnectDesktopWalletSession,
 } from './net/desktop_wallet_manager';
+import {
+  DISCORD_ONBOARD_KEY,
+  type DiscordOAuthFlowDeps,
+  discordLinkErrorActive,
+  handleNativeDiscordResult,
+  installDiscordPopupListener,
+  showLoginDiscordError,
+  startDiscordOAuth,
+} from './net/discord_oauth_flow';
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
 import { watchWorldEntry } from './net/entry_watch';
@@ -273,13 +282,7 @@ import {
 } from './net/native_apple_auth';
 import { createNativeAttestationProof } from './net/native_attestation';
 import { primeNativeDeviceMemoryHint } from './net/native_device_info';
-import {
-  createNativeDiscordProof,
-  installNativeDiscordUrlHandler,
-  type NativeDiscordResult,
-  openNativeDiscordOAuth,
-  takeNativeDiscordVerifier,
-} from './net/native_discord';
+import { installNativeDiscordUrlHandler } from './net/native_discord';
 import { notifyOtaAppReady } from './net/native_ota';
 import {
   createNativeSolanaWalletClient,
@@ -397,6 +400,7 @@ import {
   setActiveWorldContent,
   ZONES,
 } from './sim/data';
+import { refreshDelveMotionState, refreshInstancedMotionState } from './sim/delves/geometry';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
@@ -4214,6 +4218,8 @@ async function startGame(
     world.cfg.seed,
     world.riftCollisionToken,
   );
+  const frameDelveMotionState = { delveRun: null, delveSolids: [] };
+  const frameInstancedMotionState = { riftFloor: null, delveRun: null, delveSolids: [] };
   if (online) movementPrediction.connect(online);
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
@@ -4562,7 +4568,8 @@ async function startGame(
     selfMotionGateArgs.riftFloor = net.riftFloor;
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
-    movementPrediction.prepare(net, pe, selfPredictionEnabled);
+    refreshDelveMotionState(frameDelveMotionState, net);
+    movementPrediction.prepare(net, pe, selfPredictionEnabled, frameDelveMotionState);
     const movementFrameEmitted = sendOnlineMovementFrame(
       net,
       movementPrediction,
@@ -4659,7 +4666,11 @@ async function startGame(
               frameDt,
               Math.max(0, cameraLastSnapAge),
               net.snapInterval,
-              net.riftFloor,
+              refreshInstancedMotionState(
+                frameInstancedMotionState,
+                net.riftFloor,
+                frameDelveMotionState,
+              ),
             );
     traceStart = perf.startTrace();
     try {
@@ -8358,145 +8369,33 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // server-fed value is not known yet (logged out, offline), so every caller
 // gets the fail-open behavior for free.
 const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
-const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
-let discordPopup: Window | null = null;
 
-function flashDiscordError(): void {
-  const el = document.getElementById('login-error');
-  if (el) el.textContent = t('hudChrome.discord.link.error');
-}
-
-function startDiscordOAuth(mode: 'login' | 'link'): void {
-  // Mark a Discord LOGIN so the next boot drops the user straight into online play.
-  if (mode === 'login') {
-    try {
-      localStorage.setItem(DISCORD_ONBOARD_KEY, '1');
-    } catch {
-      /* storage disabled */
-    }
-    if (NATIVE_APP) {
-      void createNativeDiscordProof()
-        .then(async ({ verifier, challenge }) => {
-          const attestation = await createNativeAttestationProof(api.base, 'discord');
-          const { url } = await api.discordStart('login', true, challenge, attestation);
-          await openNativeDiscordOAuth(url, verifier);
-        })
-        .catch((err) => {
-          console.error('[discord] could not start native oauth', err);
-          flashDiscordError();
-        });
-      return;
-    }
-    // LOGIN from the auth screen: a FULL-PAGE redirect, not a popup. The popup's
-    // window.opener is severed by the cross-origin hop to Discord (COOP), so the
-    // result never returns; a same-tab redirect always lands the callback, which
-    // writes the session + onboard flag and reloads us into play. The desktop shell
-    // opens THIS login screen at /desktop-login in the OS browser (electron/main.cjs
-    // openDesktopLogin, via shell.openExternal), never inside Electron itself, so
-    // NATIVE_APP/DESKTOP_APP are both false here: the signal that this is a desktop
-    // handoff is the page we are ON, not the runtime. Pass it through so the callback
-    // bounces back to /desktop-login (which mints the worldofclaudecraft:// deep-link
-    // code, see completeDesktopBrowserLogin) instead of the plain web '/'.
-    void api
-      .discordStart('login', false, '', undefined, isDesktopLoginPage())
-      .then(({ url }) => {
-        window.location.href = url;
-      })
-      .catch((err) => {
-        console.error('[discord] could not start oauth', err);
-        flashDiscordError();
-      });
-    return;
-  }
-  if (NATIVE_APP) {
-    void createNativeDiscordProof()
-      .then(async ({ verifier, challenge }) => {
-        const attestation = await createNativeAttestationProof(api.base, 'discord');
-        const { url } = await api.discordStart('link', true, challenge, attestation);
-        await openNativeDiscordOAuth(url, verifier);
-      })
-      .catch((err) => {
-        console.error('[discord] could not start native oauth', err);
-        flashDiscordError();
-      });
-    return;
-  }
-  // LINK (in-game): keep a popup so we never navigate away from a running game.
-  const popup = window.open('about:blank', 'woc-discord', 'width=520,height=720');
-  discordPopup = popup;
-  void api
-    .discordStart('link')
-    .then(({ url }) => {
-      if (popup) popup.location.href = url;
-      else flashDiscordError();
-    })
-    .catch((err) => {
-      console.error('[discord] could not start oauth', err);
-      popup?.close();
-      flashDiscordError();
-    });
-}
-
-async function handleNativeDiscordResult(result: NativeDiscordResult): Promise<void> {
-  if (!result.ok) {
-    flashDiscordError();
-    return;
-  }
-  if (result.mode === 'link') {
-    takeNativeDiscordVerifier();
-    await refreshDiscordStatus();
-    return;
-  }
-  if (!result.code) {
-    flashDiscordError();
-    return;
-  }
-  const verifier = takeNativeDiscordVerifier();
-  if (!verifier) {
-    flashDiscordError();
-    return;
-  }
-  try {
-    const exchange = await api.exchangeNativeDiscordCode(result.code, verifier);
-    if (exchange.choose && exchange.linkToken) {
-      localStorage.setItem(
-        DISCORD_CHOICE_KEY,
-        JSON.stringify({
-          linkToken: exchange.linkToken,
-          username: exchange.username,
-          ts: Date.now(),
-        }),
-      );
-    } else {
-      api.saveSession();
-    }
-    window.location.reload();
-  } catch (err) {
-    console.error('[discord] could not exchange native login code', err);
-    flashDiscordError();
-  }
-}
+// The OAuth flow itself (web popup, native handoff, and the in-game link-error
+// notice a failed relink now surfaces) lives in src/net/discord_oauth_flow.ts;
+// this is its deps bag plus the one-time wiring main.ts owns.
+const discordFlowDeps: DiscordOAuthFlowDeps = {
+  api,
+  isDesktopLoginPage,
+  onLinkSuccess: () => refreshDiscordStatus(),
+  onLinkPanelUpdate: () => {
+    if (discordPanelOpen) renderDiscordPanel();
+  },
+  onNativeChoosePending: (linkToken, username) => {
+    localStorage.setItem(
+      DISCORD_CHOICE_KEY,
+      JSON.stringify({ linkToken, username, ts: Date.now() }),
+    );
+  },
+};
 
 if (NATIVE_APP && DISCORD_BUILD_ENABLED) {
-  void installNativeDiscordUrlHandler(handleNativeDiscordResult).catch((err) => {
+  void installNativeDiscordUrlHandler((result) =>
+    handleNativeDiscordResult(result, discordFlowDeps),
+  ).catch((err) => {
     console.error('[discord] could not install native url handler', err);
   });
 }
-
-// Popup bounce-page result (link mode; login uses a full redirect). Same-origin only.
-window.addEventListener('message', (e: MessageEvent) => {
-  if (e.origin !== location.origin) return;
-  const d = e.data as { source?: string; ok?: boolean; mode?: string } | null;
-  if (d?.source !== 'woc-discord') return;
-  discordPopup?.close();
-  discordPopup = null;
-  if (!d.ok) {
-    flashDiscordError();
-    return;
-  }
-  if (d.mode === 'login') window.location.reload();
-  else void refreshDiscordStatus(); // link succeeded: refresh the in-game panel
-});
+installDiscordPopupListener(discordFlowDeps);
 
 // ── GitHub link (developer badge) on the character-select screen ───────────────
 // Link-only OAuth (the player is already logged in), mirroring the wallet link
@@ -8698,7 +8597,7 @@ function openDiscordEntry(): void {
 
 function wireDiscordCtaBanner(): void {
   document.getElementById('discord-cta-link')?.addEventListener('click', () => {
-    startDiscordOAuth('link');
+    startDiscordOAuth('link', discordFlowDeps);
   });
   document.getElementById('discord-cta-close')?.addEventListener('click', () => {
     try {
@@ -8724,11 +8623,12 @@ function renderDiscordPanel(): void {
       presence: discordPresence(),
       inviteUrl: discordInviteUrl(),
       characterName: null,
+      linkError: discordLinkErrorActive(),
     },
     {
       attachTooltip: () => {},
       hideTooltip: () => {},
-      onLink: () => startDiscordOAuth('link'),
+      onLink: () => startDiscordOAuth('link', discordFlowDeps),
       onUnlink: () => {
         // A Discord-provisioned account (no real password) must set one first, or
         // unlinking would strand it. Collect it via the keep-account modal.
@@ -10555,14 +10455,14 @@ function wireStartScreens(): void {
       startDiscordLogin({
         desktopApp: DESKTOP_APP,
         bridge: DESKTOP_APP ? desktopBridge() : null,
-        startWebOAuth: () => startDiscordOAuth('login'),
+        startWebOAuth: () => startDiscordOAuth('login', discordFlowDeps),
         openBrowserFailed: (error) => {
           console.error('[discord] could not open browser login', error);
-          flashDiscordError();
+          showLoginDiscordError();
         },
         bridgeUnavailable: () => {
           console.error('[discord] desktop login bridge unavailable');
-          flashDiscordError();
+          showLoginDiscordError();
         },
       });
     });

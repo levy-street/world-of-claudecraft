@@ -7,6 +7,10 @@
 // bank_snapshot_wire.ts precedent.
 
 import type { HarvestPreference } from '../sim/professions/harvest_preference';
+import {
+  parseTownFocusPendingView,
+  type TownFocusPendingView,
+} from '../sim/professions/town_focus_pending';
 import type {
   CraftingIdentityView,
   FarmPlotView,
@@ -34,6 +38,7 @@ export interface ProfessionsSelfMirrors {
   gatheringProficiency: Record<string, number>;
   toolEffectSlots: readonly ToolEffectSlotView[];
   harvestPreference: HarvestPreference | null;
+  townFocusPending: TownFocusPendingView | null;
   gatheringGoal: GatheringGoalView | null;
   myFarmPlots: readonly FarmPlotView[];
   professionsState: PlayerProfessionsView;
@@ -55,6 +60,7 @@ export function applyProfessionsSelfMirror(
     gprof?: Record<string, number> | null;
     tslot?: readonly ToolEffectSlotView[] | null;
     hpref?: unknown;
+    tfpend?: unknown;
     ggoal?: unknown;
     fplot?: readonly FarmPlotView[] | null;
     prof?: PlayerProfessionsView | null;
@@ -80,6 +86,11 @@ export function applyProfessionsSelfMirror(
   // hpref: delta-omitted; present decodes via the shared wire leaf, which
   // refuses a malformed value to null rather than reviving All.
   if (s.hpref !== undefined) target.harvestPreference = decodeHarvestPreferenceWire(s.hpref);
+  // tfpend (#1144): delta-omitted; explicit null is the queue resolving or
+  // being cancelled; anything else re-parses through the sim's own strict
+  // leaf, which refuses a malformed frame to null rather than rendering a
+  // partial queue.
+  if (s.tfpend !== undefined) target.townFocusPending = parseTownFocusPendingView(s.tfpend);
   // ggoal (Intentional Gathering PR4): delta-omitted; present decodes via
   // the shared strict wire leaf, which refuses a malformed frame to null
   // rather than rendering a partial or stale projection.

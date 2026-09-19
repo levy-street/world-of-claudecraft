@@ -11,6 +11,8 @@
 export const pending: Record<string, readonly string[]> = {
   "es": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -19,10 +21,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "es_ES": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -31,10 +37,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "fr_FR": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -43,10 +53,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "fr_CA": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -55,11 +69,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "en_CA": [],
   "it_IT": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -68,10 +86,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "de_DE": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -80,7 +102,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "zh_CN": [
     "hudChrome.options.frameRateCapSixty",
@@ -100,6 +124,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "pt_BR": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -108,7 +134,9 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "ru_RU": [
     "hudChrome.options.frameRateCapSixty",
@@ -116,6 +144,8 @@ export const pending: Record<string, readonly string[]> = {
   ],
   "cs_CZ": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -124,10 +154,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "nl_NL": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -136,10 +170,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "pl_PL": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -148,10 +186,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "id_ID": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -160,10 +202,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "tr_TR": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -172,10 +218,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "sv_SE": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -184,10 +234,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "vi_VN": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -196,10 +250,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ],
   "da_DK": [
     "guide.settingsPage.rowFrameRateCap",
+    "hudChrome.mapAtlas.collapseHint",
+    "hudChrome.mapAtlas.expandHint",
     "hudChrome.options.frameRateCap",
     "hudChrome.options.frameRateCapAuto",
     "hudChrome.options.frameRateCapDisplay",
@@ -208,6 +266,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.options.frameRateCapStatusInert",
     "hudChrome.options.frameRateCapStatusPaced",
     "hudChrome.options.frameRateCapStatusUnpaced",
-    "hudChrome.options.frameRateCapThirty"
+    "hudChrome.options.frameRateCapThirty",
+    "hudChrome.townFocus.pendingLine",
+    "hudChrome.townFocus.preferenceHint"
   ]
 };
