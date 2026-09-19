@@ -37,13 +37,20 @@ export type FrameRateCapReading =
   | { kind: 'unpaced'; fps: number };
 
 /** What an intent does on the display as it is read right now. Computed from
- *  the display reading alone, so the row is right the instant it is picked. */
+ *  the display reading alone, so the row is right the instant it is picked.
+ *  `displayRead` is false while the estimator has not had its say yet (the first
+ *  seconds in the world): `unknown` then means "not read yet", not "no display
+ *  rhythm", and the row states nothing rather than the vsync-off wording on a
+ *  display that is about to read as paced. The line is resolved when the panel
+ *  is built and never corrects itself, so it must not be wrong when it appears. */
 export function frameRateCapReading(
   intent: FrameCeilingIntent,
   verdict: RefreshVerdict,
   refreshHz: number,
+  displayRead = true,
 ): FrameRateCapReading {
   if (intent === 0) return { kind: 'none' };
+  if (verdict === 'unknown' && !displayRead) return { kind: 'none' };
   if (verdict !== 'paced' || !(refreshHz > 0)) return { kind: 'unpaced', fps: intent };
   const divisor = ceilingDivisor(refreshHz, intent);
   if (divisor === 1) return { kind: 'inert' };

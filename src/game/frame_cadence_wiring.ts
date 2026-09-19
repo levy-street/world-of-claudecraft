@@ -97,6 +97,11 @@ export interface FrameCadenceDeps {
 export interface FrameCadenceSnapshot {
   /** Whether the automatic mode resolves the intent. */
   auto: boolean;
+  /** The estimator has seen enough callbacks since its last reset for `unknown`
+   *  to mean "no display rhythm" rather than "not read yet". */
+  displayRead: boolean;
+  /** The automatic mode is holding the governor's recovery (a verdict is forming). */
+  autoHoldsQuality: boolean;
   /** Where the automatic mode stands, 'off' under an explicit choice. */
   autoPhase: FrameCadenceAutoPhase | 'off';
   autoConfirmed: boolean;
@@ -145,6 +150,8 @@ export class FrameCadenceWiring {
   private readonly autoState = createFrameCadenceAuto();
   private readonly snapshotOut: FrameCadenceSnapshot = {
     auto: false,
+    displayRead: false,
+    autoHoldsQuality: false,
     autoPhase: 'off',
     autoConfirmed: false,
     autoFailStreak: 0,
@@ -184,6 +191,7 @@ export class FrameCadenceWiring {
   private skipped = 0;
   private reprobing = false;
   private unreadCallbacks = 0;
+  private callbacksSinceEstimatorReset = 0;
   /** Whether the callback in flight has armed its successor yet. */
   armedThisCallback = false;
   private readonly autoFrame: FrameCadenceAutoFrame = {
@@ -266,8 +274,12 @@ export class FrameCadenceWiring {
       resetRefreshEstimatorWindow(this.estimator);
       this.dropAutoReadings();
       this.lastRenderAt = 0;
-    } else if (this.lastCallbackAt > 0 && !crossedTimer) {
-      noteRefreshDelta(this.estimator, delta, this.lastWasIdle);
+      this.callbacksSinceEstimatorReset = 0;
+    } else {
+      this.callbacksSinceEstimatorReset++;
+      if (this.lastCallbackAt > 0 && !crossedTimer) {
+        noteRefreshDelta(this.estimator, delta, this.lastWasIdle);
+      }
     }
     this.wasExempt = exempt;
     this.lastCallbackAt = now;
@@ -398,6 +410,8 @@ export class FrameCadenceWiring {
   snapshot(): FrameCadenceSnapshot {
     const out = this.snapshotOut;
     out.auto = this.auto;
+    out.displayRead = this.callbacksSinceEstimatorReset >= UNREAD_BEFORE_SLEEP;
+    out.autoHoldsQuality = this.auto && frameCadenceAutoHoldsQuality(this.autoState);
     out.autoPhase = this.auto ? this.autoState.phase : 'off';
     out.autoConfirmed = this.auto && this.autoState.confirmed && !this.autoState.unprobed;
     out.autoFailStreak = this.autoState.failStreak;
@@ -609,7 +623,7 @@ export function frameCadenceBeaconFields(budgetTargetFps: number): FrameCadenceB
 /** One `?perf` overlay line (dev diagnostics, English like the rest of it). */
 export function frameCadenceOverlayLine(): string {
   const s = sharedFrameCadence().snapshot();
-  const phase = s.autoPhase === 'held' && !s.autoConfirmed ? 'settling' : s.autoPhase;
+  const phase = s.autoPhase === 'held' && s.autoHoldsQuality ? 'settling' : s.autoPhase;
   const cap = `${s.auto ? `auto-${phase} ` : ''}${s.intent === 0 ? 'display' : s.intent}`;
   const target =
     s.targetIntervalMs > 0 ? `${s.targetIntervalMs.toFixed(1)}ms /${s.divisor}` : 'inert';
@@ -622,7 +636,7 @@ export function frameRateCapRowReading(storedValue: number): FrameRateCapReading
   const explicit = explicitCeilingIntent(frameRateCapChoiceFromValue(storedValue));
   // Auto reads what it is doing right now, which is only known while it runs.
   const intent = explicit ?? (s.auto ? s.intent : 0);
-  return frameRateCapReading(intent, s.verdict, s.refreshHz);
+  return frameRateCapReading(intent, s.verdict, s.refreshHz, s.displayRead);
 }
 
 /** The chosen cadence for the frame-health readers, or null when there is none.

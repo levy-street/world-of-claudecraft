@@ -44,7 +44,10 @@ describe('frame rate limit fairness', () => {
         .filter((f) => /^chosen_cadence/.test(basename(f.file)))
         .map((f) => `src/render/${f.file}`),
     ];
-    expect(cluster.length).toBeGreaterThanOrEqual(8);
+    // The real count, so narrowing the glob back to a prefix fails here.
+    expect(cluster.length).toBeGreaterThanOrEqual(10);
+    expect(cluster).toContain('src/game/display_refresh_estimator_core.ts');
+    expect(cluster).toContain('src/game/frame_rate_cap_setting.ts');
     // The memory is the one carve-out, pinned by its own case below.
     const unlisted = cluster.filter(
       (f) => !CADENCE_MODULES.includes(f) && f !== 'src/game/frame_cadence_auto_memory.ts',

@@ -69,4 +69,18 @@ describe('frame rate cap setting', () => {
     expect(frameRateCapReading(30, 'unknown', 0)).toEqual({ kind: 'unpaced', fps: 30 });
     expect(frameRateCapReading(0, 'paced', 60)).toEqual({ kind: 'none' });
   });
+
+  it('states nothing while the display has not been read yet, rather than the vsync-off wording', () => {
+    // The first seconds in the world: `unknown` means "not read yet".
+    expect(frameRateCapReading(30, 'unknown', 0, false)).toEqual({ kind: 'none' });
+    // Once the estimator had its say, `unknown` is the vsync-off steady state.
+    expect(frameRateCapReading(30, 'unknown', 0, true)).toEqual({ kind: 'unpaced', fps: 30 });
+    // A verdict is a verdict, however early it came.
+    expect(frameRateCapReading(30, 'paced', 60, false)).toEqual({
+      kind: 'paced',
+      fps: 30,
+      refreshHz: 60,
+    });
+    expect(frameRateCapReading(30, 'unpaced', 0, false)).toEqual({ kind: 'unpaced', fps: 30 });
+  });
 });

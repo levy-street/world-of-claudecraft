@@ -754,6 +754,24 @@ describe('frame loop survival', () => {
     expect(r.callbacks - steady.callbacks).toBeLessThan(300);
   });
 
+  it('says when the display has had time to be read, and starts over after a cover', () => {
+    const read: Array<{ at: number; displayRead: boolean }> = [];
+    runHost({
+      refreshMs: 1000 / 60,
+      costMs: 5,
+      seconds: 30,
+      intent: 30,
+      cover: (t) => t > 15_000 && t < 16_000,
+      onFrame: (t, wiring) => read.push({ at: t, displayRead: wiring.snapshot().displayRead }),
+    });
+    const at = (ms: number) => read.filter((r) => r.at <= ms).pop()?.displayRead;
+    expect(at(1_000)).toBe(false);
+    expect(at(10_000)).toBe(true);
+    // The cover reset the estimator's window: not read again until it had its say.
+    expect(at(16_500)).toBe(false);
+    expect(at(25_000)).toBe(true);
+  });
+
   it('a hidden web tab goes back to rAF, which the browser pauses: no timer chain renders it', () => {
     const shown = runHost({ ...busyGpuHost(), seconds: 20 });
     expect(shown.timerArms).toBeGreaterThan(100);
@@ -816,6 +834,7 @@ describe('automatic frame rate limit', () => {
     // A few seconds of evidence never outlive the session.
     expect(r.saved).toEqual([]);
     expect(r.published.hold).toBe(true);
+    expect(r.wiring.snapshot().autoHoldsQuality).toBe(true);
   });
 
   it('a weak machine, second session: the remembered verdict holds for half an hour, untouched', () => {
@@ -954,6 +973,8 @@ describe('automatic frame rate limit', () => {
     expect(snap.autoProbesFailed).toBe(0);
     // The fleet must be able to tell this hold from a probed one.
     expect(snap.autoConfirmed).toBe(false);
+    // Nothing more is owed, so the dev overlay must not call it settling.
+    expect(snap.autoHoldsQuality).toBe(false);
     expect(snap.intent).toBe(30);
     expect(r.published.hold).toBe(false);
     expect(r.saved).toEqual([]);
@@ -1273,6 +1294,8 @@ describe('automatic frame rate limit', () => {
 describe('frame cadence beacon fields', () => {
   const base: FrameCadenceSnapshot = {
     auto: false,
+    displayRead: true,
+    autoHoldsQuality: false,
     autoPhase: 'off',
     autoConfirmed: false,
     autoFailStreak: 0,

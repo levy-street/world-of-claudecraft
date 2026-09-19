@@ -24,8 +24,9 @@
 //
 // Readings that straddle a stall of a second or more are dropped (they are not
 // readings), so the rules need whole bursts of play between stalls: the floor
-// is the 120-frame recent ring. A machine stalling every second or two is read
-// as paced and never limited; every three seconds or more, it is.
+// is the 120-frame recent ring. Measured through the wiring: a machine stalling
+// after every 0.8 s of play is never even read as paced; every one or two
+// seconds it is paced but never limited; every three seconds or more, it is.
 //
 // Pure: rendered frames in, the ceiling intent out. Every threshold is a share
 // of frames, a count of frames or a duration of play, never a frame time
@@ -56,7 +57,7 @@ export const AUTO_CONFIRM_CLEAN_S = 60;
  *  this much READABLE play without its probe, the descent stands as settled.
  *  Readable: the clock advances at checkpoints, and a checkpoint needs 60 frames
  *  clear of exempt spans, so covers every few seconds stall it (as they stall
- *  the 120 s probation clock). */
+ *  the checkpoint that ends the 120 s probation). */
 export const AUTO_PROVISIONAL_MAX_S = 300;
 /** A checkpoint counts toward a confirmed hold's evidence run under this
  *  share: the governor's own allowed miss share, since released it refills
@@ -220,7 +221,6 @@ export function restoreFrameCadenceAuto(
   }
   state.phase = 'held';
   state.confirmed = record.confirmed;
-  state.unprobed = false;
   state.provisionalS = 0;
 }
 
@@ -490,6 +490,8 @@ export function stepFrameCadenceAuto(
     if (stepDown(state, frame.refreshHz, fastRule)) return true;
     // At the bottom rung there is nowhere to go, and the bound still applies: a
     // machine uneven even there must not keep the governor's recovery frozen.
+    // (No "no budget" arm here: that one needs the clean minute an uneven stream
+    // never has.)
     return provisional && settleUnprobedIfOverdue(state, false);
   }
 

@@ -55,6 +55,10 @@ describe('frame health window', () => {
     expect(
       isBadFrameWindow(steady60, { targetIntervalMs: 1000 / 60, missShare: 0, auto: true }),
     ).toBe(false);
+    // Just above the line is not: 60 asked for on a 100 Hz display is a steady 50.
+    expect(
+      isBadFrameWindow(win(50, 20.2), { targetIntervalMs: 1000 / 50, missShare: 0, auto: true }),
+    ).toBe(false);
     // The line itself is evidence: 60 asked for on a 90 Hz display is exactly 45.
     expect(
       isBadFrameWindow(win(45, 22.4), { targetIntervalMs: 1000 / 45, missShare: 0, auto: true }),
