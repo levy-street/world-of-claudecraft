@@ -23,6 +23,7 @@ function fixture(cls: string, warriorTextures = true) {
     'blood',
     'steel',
     'pressure',
+    'rock',
     'warrior_power',
     'warrior_fervor',
     'harvest_impact',
@@ -36,6 +37,7 @@ function fixture(cls: string, warriorTextures = true) {
   vi.spyOn(assets, 'warriorBloodTexture').mockImplementation(() => texture('blood'));
   vi.spyOn(assets, 'warriorSteelTexture').mockImplementation(() => texture('steel'));
   vi.spyOn(assets, 'warriorPressureTexture').mockImplementation(() => texture('pressure'));
+  vi.spyOn(assets, 'warriorRockTexture').mockImplementation(() => texture('rock'));
   const bakedTexture = vi
     .spyOn(assets, 'bakedTexture')
     .mockImplementation((kind) => (kind === 'smoke' ? smoke : texture(kind)));
@@ -50,6 +52,7 @@ function fixture(cls: string, warriorTextures = true) {
     crests: { preparation: empty() },
     guards: empty(),
     powerForms: empty(),
+    spiritHammers: empty(),
     furyStates: empty(),
     baked: pool,
   });
@@ -58,10 +61,10 @@ function fixture(cls: string, warriorTextures = true) {
   const host = {
     properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
     compile: vi.fn(async () => {
-      expect(uploaded.size).toBe(8);
+      expect(uploaded.size).toBe(9);
     }),
     draw: vi.fn((_group: THREE.Group, root: THREE.Object3D) => {
-      expect(uploaded.size).toBe(8);
+      expect(uploaded.size).toBe(9);
       const mesh = root as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(
         live.some((slot) => slot.geometry === mesh.geometry && slot.material === mesh.material),
@@ -143,7 +146,7 @@ it.each(['warrior_shear', 'warrior_fervor'] as const)(
     });
     expect(h.poolUnits).toHaveBeenCalled();
     expect(h.spawn(kind)).toBe(false);
-    for (let i = 0; i < 8; i++) await h.next();
+    for (let i = 0; i < 9; i++) await h.next();
     expect(h.upload.mock.calls.map(([value]) => value)).toEqual([...h.textures.values()]);
     expect(h.host.compile).not.toHaveBeenCalled();
     expect(h.host.draw).not.toHaveBeenCalled();
@@ -162,10 +165,10 @@ it.each(['warrior_shear', 'warrior_fervor'] as const)(
     expect(h.seenSlots.size).toBe(10);
     expect(h.spawn(kind)).toBe(true);
     expect(h.spawn(kind)).toBe(false);
-    expect(h.labels).toHaveLength(38);
-    expect(new Set(h.labels).size).toBe(38);
+    expect(h.labels).toHaveLength(39);
+    expect(new Set(h.labels).size).toBe(39);
     await ensureActiveAbilityKit(h.scene, 'warrior');
-    expect(h.labels).toHaveLength(38);
+    expect(h.labels).toHaveLength(39);
   },
 );
 

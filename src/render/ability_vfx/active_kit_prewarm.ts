@@ -6,6 +6,7 @@ import {
   bakedTexture,
   warriorBloodTexture,
   warriorPressureTexture,
+  warriorRockTexture,
   warriorSteelTexture,
 } from './production_assets';
 import type { CrestKind } from './signature_shapes';
@@ -75,6 +76,15 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
       run: () => {
         const texture = warriorPressureTexture();
         if (!texture) throw new Error('Active Warrior pressure texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
+    {
+      id: 'upload-big:active-warrior-rock',
+      synchronous: true,
+      run: () => {
+        const texture = warriorRockTexture();
+        if (!texture) throw new Error('Active Warrior rock texture was not loaded');
         state.host.texture(texture);
       },
     },

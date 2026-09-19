@@ -206,6 +206,9 @@ it('binds exact shared Warrior textures to every slot without owning disposal', 
   const steel = new THREE.Texture();
   const steelDispose = vi.spyOn(steel, 'dispose');
   const steelSource = vi.spyOn(productionAssets, 'warriorSteelTexture').mockReturnValue(steel);
+  const rock = new THREE.Texture();
+  const rockDispose = vi.spyOn(rock, 'dispose');
+  const rockSource = vi.spyOn(productionAssets, 'warriorRockTexture').mockReturnValue(rock);
   const scene = new THREE.Scene(),
     crests = new SignatureCrests(scene);
   try {
@@ -218,12 +221,16 @@ it('binds exact shared Warrior textures to every slot without owning disposal', 
       expect(mesh.material.uniforms.uPressureMap.value).toBe(texture);
       expect(mesh.material.uniforms.uBloodMap.value).toBe(blood);
       expect(mesh.material.uniforms.uSteelMap.value).toBe(steel);
+      expect(mesh.material.uniforms.uRockMap.value).toBe(rock);
     }
   } finally {
     crests.dispose();
     source.mockRestore();
     bloodSource.mockRestore();
     steelSource.mockRestore();
+    rockSource.mockRestore();
+    expect(rockDispose).not.toHaveBeenCalled();
+    rock.dispose();
   }
   expect(dispose).not.toHaveBeenCalled();
   expect(bloodDispose).not.toHaveBeenCalled();

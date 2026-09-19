@@ -25,6 +25,9 @@ function source() {
     animations: [
       new THREE.AnimationClip('Idle', 1, []),
       new THREE.AnimationClip('1H_Melee_Attack_Chop', 1, []),
+      new THREE.AnimationClip('Warrior_Storm_Bolt', 0.62, []),
+      new THREE.AnimationClip('Warrior_Avatar', 0.74, []),
+      new THREE.AnimationClip('Warrior_Widening_Arc', 0.66, []),
       new THREE.AnimationClip(NATIVE, 0.45, [
         new THREE.QuaternionKeyframeTrack(
           'root.quaternion',
@@ -92,6 +95,47 @@ function setup() {
   const visual = new CharacterVisual('player_warrior', 0xffffff, 0);
   return { visual, peek: visual as unknown as Peek };
 }
+
+it.each([
+  ['storm_bolt', 0.02],
+  ['avatar', 0.05],
+  ['sweeping_strikes', 0.05],
+] as const)(
+  '%s reaches its full authored pose before the loading beat while keeping the outgoing blend normalized',
+  (id, time) => {
+    const { visual, peek } = setup();
+    try {
+      const idle = state({ spinning: false, casting: false, castingAbility: null });
+      visual.update(0.3, idle, true);
+      visual.playAttack(id);
+      visual.update(time, idle, true);
+      expect(peek.current?.getClip().name).toBe(`Signature_${id}`);
+      expect(peek.current?.getEffectiveWeight()).toBeCloseTo(1, 6);
+      const total = [...peek.actions.values()]
+        .filter((a) => a.isRunning() || a === peek.current)
+        .reduce((sum, a) => sum + a.getEffectiveWeight(), 0);
+      expect(total).toBeCloseTo(1, 6);
+      visual.playAttack(id);
+      visual.update(0.005, idle, true);
+      expect(peek.current?.getEffectiveWeight()).toBe(1);
+    } finally {
+      visual.dispose();
+    }
+  },
+);
+
+it('retains the ordinary entry blend for the generic fallback', () => {
+  const { visual, peek } = setup();
+  try {
+    const idle = state({ spinning: false, casting: false, castingAbility: null });
+    visual.update(0.3, idle, true);
+    peek.playOneShot('1H_Melee_Attack_Chop', 1);
+    visual.update(0.05, idle, true);
+    expect(peek.current?.getEffectiveWeight()).toBeCloseTo(0.5, 5);
+  } finally {
+    visual.dispose();
+  }
+});
 
 it('lets the selected native loop own exactly one world-space turn without wrapper rotation', () => {
   const { visual, peek } = setup();

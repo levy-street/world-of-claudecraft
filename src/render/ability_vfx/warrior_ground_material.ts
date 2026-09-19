@@ -1,13 +1,16 @@
 /** Each plate carries its own travel phase in UV.x, so a pressure front raises
- * whole pieces instead of bending their vertices into rubber. The flat full
- * footprint is visible immediately; no actionable area waits for the wave. */
+ * whole pieces instead of bending their vertices into rubber. Cast-owned
+ * ground fractures retain the immediate footprint while solid pieces erupt. */
 export const WARRIOR_GROUND_VERTEX = `
 if((uKind>17.5&&uKind<19.5)||(uKind>22.5&&uKind<23.5)){
   float travel=uKind>22.5?.18:uKind>18.5?.30:.24;
   float plateAge=uAge-uv.x*travel;
   float rise=smoothstep(0.,.105,plateAge);
-  float settle=1.-.82*smoothstep(.44,1.,uAge);
-  p.y*=mix(1.,(.055+.945*rise)*settle,uMotion);
+  // Translate the complete stone, including its caps. Scaling Y produced
+  // inflatable wedges and moved highlights across stretching rock faces.
+  float buried=uKind>18.5&&uKind<19.5?3.6:1.8;
+  float settle=smoothstep(.58,1.,uAge);
+  p.y-=((1.-rise)*buried+settle*buried)*uMotion;
 }`;
 
 export const WARRIOR_GROUND_FRAGMENT = `
@@ -19,5 +22,5 @@ if((uKind>17.5&&uKind<19.5)||(uKind>22.5&&uKind<23.5)){
   colour+=uAccent*fresh*pressure*.35*uMotion;
   // Faultline's tall outer wall carries the eruption. Its inner fracture
   // remains full size but translucent, keeping the attacking rig readable.
-  if(uKind>18.5&&uKind<19.5)alpha*=mix(.28,1.,smoothstep(.1,.48,vUv.x));
+  if(uKind>18.5&&uKind<19.5)alpha*=mix(.72,1.,smoothstep(.1,.48,vUv.x));
 }`;

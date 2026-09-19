@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import {
   warriorBloodTexture,
-  warriorSteelTexture,
+  warriorRockTexture,
 } from '../src/render/ability_vfx/production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from '../src/render/ability_vfx/ribbons';
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
@@ -11,7 +11,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const { Texture } = await import('three');
   const steel = new Texture(),
     blood = new Texture();
-  return { warriorSteelTexture: () => steel, warriorBloodTexture: () => blood };
+  return { warriorRockTexture: () => steel, warriorBloodTexture: () => blood };
 });
 const aura = { duration: 20, remaining: 17 };
 function fixture(ready = true) {
@@ -221,7 +221,7 @@ it('caps ambient particles to one pulse after a stalled frame and disables them 
 it('disposes its own geometry and instances without releasing either shared texture', () => {
   const h = fixture();
   const blood = vi.spyOn(warriorBloodTexture()!, 'dispose'),
-    steel = vi.spyOn(warriorSteelTexture()!, 'dispose');
+    steel = vi.spyOn(warriorRockTexture()!, 'dispose');
   const owned = h.pool.meshes.map((m) => [
     vi.spyOn(m.geometry, 'dispose'),
     vi.spyOn(m.material, 'dispose'),

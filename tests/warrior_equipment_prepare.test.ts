@@ -35,6 +35,7 @@ function fixture() {
     bodyGlow: vi.fn(),
   };
   const recorded = {
+    anchorOf: () => ({ x: 0, y: 0, z: 0 }),
     prepareWeaponFace,
     handPoint,
     pathRibbon,
@@ -175,7 +176,8 @@ it('activates new equipment reflections only for the first wide or guard beat, n
           !physicalSecondary &&
           beat === 0 &&
           ['sweeping_strikes', 'defensive_stance'].includes(abilityId);
-        expect(h.recorded.pathRibbon).toHaveBeenCalledTimes(reflection ? 2 : 0);
+        const flourish = reflection && abilityId === 'sweeping_strikes' ? 2 : 0;
+        expect(h.recorded.pathRibbon).toHaveBeenCalledTimes((reflection ? 2 : 0) + flourish);
         if (physicalSecondary) {
           expect(h.recorded.weaponTrail).not.toHaveBeenCalled();
           expect(h.recorded.bakedAt).not.toHaveBeenCalled();
@@ -188,7 +190,7 @@ it('activates new equipment reflections only for the first wide or guard beat, n
           expect(h.recorded.weaponTrail).toHaveBeenCalledTimes(trails);
           expect(h.recorded.countPrimitive).toHaveBeenCalledExactlyOnceWith(
             abilityId,
-            trails + (reflection ? 2 : 0),
+            trails + (reflection ? 2 : 0) + flourish,
           );
           expect(h.recorded.bakedAt).not.toHaveBeenCalled();
         }

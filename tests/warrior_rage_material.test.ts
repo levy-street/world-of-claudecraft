@@ -6,7 +6,12 @@ import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms
 vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const { Texture } = await import('three');
   const texture = new Texture();
-  return { warriorSteelTexture: () => texture, warriorBloodTexture: () => texture };
+  return {
+    warriorPressureTexture: () => texture,
+    warriorRockTexture: () => texture,
+    warriorSteelTexture: () => texture,
+    warriorBloodTexture: () => texture,
+  };
 });
 
 it('keeps the prepared material and uniforms while reduced motion disables all wave displacement', () => {

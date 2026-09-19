@@ -86,6 +86,7 @@ export function drawWarriorGroundReceivingContact(
       dx,
       dz,
       0.22,
+      true,
     );
   host.contact?.(sourceId, targetId, 'physical', profile.force, id, 0);
   host.countPrimitive(id, tier === 0 ? 3 : 2);

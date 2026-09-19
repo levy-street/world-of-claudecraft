@@ -75,6 +75,7 @@ import {
 import { launchWarriorHammer } from './warrior_hammer';
 import { WarriorPowerForms } from './warrior_power_forms';
 import { WarriorReadiness } from './warrior_readiness';
+import { WarriorSpiritHammers } from './warrior_spirit_hammers';
 import { WarriorStormAnchor } from './warrior_storm_anchor';
 import { drawWarriorWornMark } from './warrior_worn_marks';
 import { RestorativeWaterVolumes } from './water_volumes';
@@ -483,6 +484,7 @@ export class AbilityVfxFx implements SequencerHost {
   private crests: SignatureCrests;
   private guards: WarriorGuardPlates;
   private powerForms: WarriorPowerForms;
+  private spiritHammers: WarriorSpiritHammers;
   private furyStates: WarriorFuryStates;
   private guardDt = 0;
   private guardFacing = (id: number) => this.facingAt(id) ?? null;
@@ -688,6 +690,15 @@ export class AbilityVfxFx implements SequencerHost {
       }
     }
   };
+  private hammerSink = (
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    yaw: number,
+    time: number,
+    reduced: boolean,
+  ): boolean => this.spiritHammers.draw(x, y, z, size, yaw, time, reduced);
   private headSink = (
     x: number,
     y: number,
@@ -739,6 +750,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.crests = new SignatureCrests(scene, this.groundY);
     this.guards = new WarriorGuardPlates(scene);
     this.powerForms = new WarriorPowerForms(scene);
+    this.spiritHammers = new WarriorSpiritHammers(scene);
     this.furyStates = new WarriorFuryStates(scene, anchor, tex);
     this.baked = new BakedImpactLayers(scene, textureReady);
     this.fragments = new SolidImpactFragments(scene);
@@ -1374,6 +1386,7 @@ export class AbilityVfxFx implements SequencerHost {
       ...this.crests.preparation.units(host, kinds),
       ...this.guards.units(host),
       ...this.powerForms.units(host),
+      ...this.spiritHammers.units(host),
       ...this.furyStates.units(host),
       ...(kinds?.includes('harvest_cut') ? this.baked.units(host) : []),
     ];
@@ -1855,8 +1868,22 @@ export class AbilityVfxFx implements SequencerHost {
     dx: number,
     dz: number,
     duration?: number,
+    fractured = false,
   ): void {
-    this.fragments.burst(kind, x, y, z, tint, count, power, dx, dz, this.groundY, duration);
+    this.fragments.burst(
+      kind,
+      x,
+      y,
+      z,
+      tint,
+      count,
+      power,
+      dx,
+      dz,
+      this.groundY,
+      duration,
+      fractured,
+    );
   }
   detailAt(
     x: number,
@@ -2632,7 +2659,9 @@ export class AbilityVfxFx implements SequencerHost {
       camPosScratch.z,
     );
     this.spirits.update(dt);
-    this.ribbons.drawHeads(this.time, this.headSink, reducedMotion);
+    this.spiritHammers.beginFrame();
+    this.ribbons.drawHeads(this.time, this.headSink, reducedMotion, this.hammerSink);
+    this.spiritHammers.endFrame();
     this.overlay.commit();
     for (const [id, g] of this.glows) {
       if (g.stamp === this.frame) {
@@ -2658,6 +2687,7 @@ export class AbilityVfxFx implements SequencerHost {
   clear(): void {
     this.guards.clear();
     this.powerForms.clear();
+    this.spiritHammers.clear();
     this.furyStates.clear();
     this.warriorAttention.clear();
     this.warriorReadiness.clear();
@@ -2719,6 +2749,7 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.crests.dispose());
     release(() => this.guards.dispose());
     release(() => this.powerForms.dispose());
+    release(() => this.spiritHammers.dispose());
     release(() => this.furyStates.dispose());
     release(() => this.rings.dispose());
     release(() => this.flipbooks.dispose());

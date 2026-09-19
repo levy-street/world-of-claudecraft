@@ -15,6 +15,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     bakedTexture: (kind: keyof typeof textures) => textures[kind],
     fragmentGeometry: () => source,
     warriorPressureTexture: () => null,
+    warriorRockTexture: () => null,
     warriorBloodTexture: () => null,
     warriorSteelTexture: () => null,
   };

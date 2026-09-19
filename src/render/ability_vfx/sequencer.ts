@@ -123,6 +123,7 @@ export interface SequencerHost {
     dx: number,
     dz: number,
     duration?: number,
+    fractured?: boolean,
   ): void;
   residueAt?(x: number, z: number, radius: number, tint: number, substance: Substance): void;
   worldLightAt?(

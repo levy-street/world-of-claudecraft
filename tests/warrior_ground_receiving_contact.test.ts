@@ -1,5 +1,6 @@
 import { Vector3 } from 'three';
 import { expect, it, vi } from 'vitest';
+import { drawIronguard } from '../src/render/ability_vfx/ironguard';
 import type { SeqPoint, SeqSlot, SequencerHost } from '../src/render/ability_vfx/sequencer';
 import { drawReapingArc, drawWarriorAreaContact } from '../src/render/ability_vfx/warrior_area';
 
@@ -30,6 +31,7 @@ function harness() {
     shockRing: vi.fn(),
     decalXZ: vi.fn(),
     groundYAt: vi.fn(() => 0),
+    shakeAt: vi.fn(),
   };
   return { actors, yaw, host: calls as unknown as SequencerHost, calls };
 }
@@ -39,6 +41,22 @@ function sample(fill: Parameters<SequencerHost['pathRibbon']>[3]): Vector3[] {
   expect(fill(points)).toBe(points.length);
   return points;
 }
+
+it.each(['revenge', 'thunder_clap', 'faultline'])(
+  '%s keeps its cast footprint fixed across concurrent casts and moving casters',
+  (id) => {
+    const h = harness();
+    const slot = { abilityId: id, casterId: 1, tier: 0, physicalSecondary: false } as SeqSlot;
+    drawIronguard(h.host, slot, 0);
+    const paths = [...vi.mocked(h.host.pathRibbon).mock.calls];
+    const original = paths.map((path) => sample(path[3]));
+    drawIronguard(h.host, { ...slot, casterId: 4 }, 0);
+    h.actors.set(1, { x: 40, y: 3, z: -20 });
+    paths.forEach((path, i) => {
+      expect(sample(path[3])).toEqual(original[i]);
+    });
+  },
+);
 
 for (const tier of [0, 1])
   it.each(abilities)(
@@ -117,6 +135,7 @@ it('Quaking Blow has a short larger compression followed by one dark body seam a
     0,
     1,
     0.22,
+    true,
   );
 });
 
@@ -147,6 +166,7 @@ it.each(['heroic_leap'])('%s preserves its existing receiving dimensions', (id) 
     0,
     1,
     0.22,
+    true,
   );
 });
 
@@ -177,6 +197,7 @@ it('Faultline delivers the larger lower-body compression without replaying its g
     0,
     1,
     0.22,
+    true,
   );
   expect(h.calls.contact).toHaveBeenCalledTimes(1);
   expect(h.calls.crestAt).not.toHaveBeenCalled();

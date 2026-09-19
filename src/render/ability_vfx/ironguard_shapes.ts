@@ -36,6 +36,7 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
   const positions: number[] = [],
     uvs: number[] = [],
     indices: number[] = [];
+  let plateIndex = 0;
   function face(a: number[], b: number[], c: number[], bevel: boolean) {
     const start = positions.length / 3;
     positions.push(...a, ...b, ...c);
@@ -43,6 +44,13 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
     indices.push(start, start + 1, start + 2);
   }
   function plate(angle: number, near: number, far: number, width: number, height: number) {
+    const seed = ++plateIndex;
+    // Broad split slabs, oblique wedges and narrow teeth share a closed mesh
+    // budget, but never the same roof or silhouette. Variation is authored at
+    // preparation, so combat does not allocate or regenerate geometry.
+    const cut = 0.5 + 0.5 * Math.sin(seed * 2.399963);
+    const lean = Math.sin(seed * 1.73) * width * 0.48;
+    const shoulder = 0.35 + cut * 0.55;
     const firstUv = uvs.length;
     const sin = Math.sin(angle),
       cos = Math.cos(angle);
@@ -54,12 +62,20 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
       const r = Math.min(8, Math.hypot(x, z));
       return [Math.sin(a) * r, y, Math.cos(a) * r];
     };
-    const a = point(-width, height * 0.4, near),
-      b = point(width, height * 0.48, near);
-    const c = point(width * 0.65, height * 0.75, far - 0.4);
-    const d = point(0, height, far),
-      e = point(-width * 0.65, height * 0.68, far - 0.4);
-    const ridge = point(0, height * 0.88, near + (far - near) * 0.48);
+    const a = point(-width * (0.72 + cut * 0.28), height * (0.18 + cut * 0.38), near),
+      b = point(width, height * (0.62 - cut * 0.31), near + cut * 0.12);
+    const c = point(width * shoulder, height * (0.38 + cut * 0.56), far - 0.18 - cut * 0.38);
+    const d = point(
+        kind === 'iron_quake' && far === 8 && Math.abs(Math.sin(angle)) < 1e-6 ? 0 : lean,
+        height,
+        far,
+      ),
+      e = point(-width * (1.02 - cut * 0.4), height * (0.88 - cut * 0.56), far - 0.63 + cut * 0.39);
+    const ridge = point(
+      -lean * 0.65,
+      height * (0.69 + cut * 0.25),
+      near + (far - near) * (0.3 + cut * 0.36),
+    );
     face(a, ridge, b, false);
     face(b, ridge, c, false);
     face(c, ridge, d, false);
@@ -72,6 +88,59 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
       const lowA = [topA[0], 0.04, topA[2]],
         lowB = [topB[0], 0.04, topB[2]];
       const first = uvs.length;
+      if (kind === 'iron_fault') {
+        // Split each broad wall around an uneven projecting fracture. This
+        // keeps a solid closed mass instead of a uniform upright panel.
+        const side = [
+          (topA[0] + topB[0]) * 0.5,
+          (topA[1] + topB[1]) * 0.24,
+          (topA[2] + topB[2]) * 0.5,
+        ];
+        const cx = sin * (near + far) * 0.5,
+          cz = cos * (near + far) * 0.5;
+        const mid = point(
+          (side[0] - cx) * cos - (side[2] - cz) * sin,
+          side[1],
+          side[0] * sin + side[2] * cos,
+        );
+        mid[0] += (side[0] - cx) * 0.14;
+        mid[2] += (side[2] - cz) * 0.14;
+        const clamped = point(mid[0] * cos - mid[2] * sin, mid[1], mid[0] * sin + mid[2] * cos);
+        face(topA, topB, clamped, false);
+        face(topB, lowB, clamped, false);
+        face(lowB, lowA, clamped, false);
+        face(lowA, topA, clamped, false);
+        // Only the upper edge carries a bright fresh fracture.
+        uvs.splice(
+          first,
+          24,
+          0,
+          0,
+          1,
+          0,
+          0.5,
+          2,
+          1,
+          0,
+          1,
+          8,
+          0.5,
+          2,
+          1,
+          8,
+          0,
+          8,
+          0.5,
+          2,
+          0,
+          8,
+          0,
+          0,
+          0.5,
+          2,
+        );
+        continue;
+      }
       face(topA, topB, lowA, false);
       face(topB, lowB, lowA, false);
       // A narrow material bevel at the wall's upper edge, using two wall
@@ -138,14 +207,25 @@ export function buildIronguardShape(kind: IronguardShape): THREE.BufferGeometry 
       const angle = kind === 'iron_quake' ? (branch * Math.PI) / 6 : -2.2 + (branch * 4.4) / 6;
       for (let step = 0; step < 3; step++) {
         const near =
-            (step === 0 ? 0.7 : step === 1 ? 3.6 : 6.7) +
-            (step === 2 ? 0 : Math.sin(branch * 2.1 + step) * 0.18),
+            (step === 0
+              ? kind === 'iron_fault'
+                ? 2.45
+                : 0.7
+              : step === 1
+                ? kind === 'iron_fault'
+                  ? 4.7
+                  : 3.6
+                : 6.7) + (step === 2 ? 0 : Math.sin(branch * 2.1 + step) * 0.18),
           far = step === 2 ? 8 : near + 1.6 + (branch % 3) * 0.15;
         plate(
-          angle,
+          angle +
+            (step === 2 || branch === 0 || branch === branches - 1
+              ? 0
+              : Math.sin(branch * 2.4 + step * 1.8) * 0.12),
           near,
           far,
-          (kind === 'iron_quake' ? 0.62 : 0.83) + step * 0.18,
+          ((kind === 'iron_quake' ? 0.62 : 0.83) + step * 0.18) *
+            (0.8 + 0.35 * (0.5 + 0.5 * Math.sin(branch * 1.7 + step * 2.8))),
           (kind === 'iron_quake'
             ? 0.85 + (branch % 3) * 0.11
             : 1.65 + Math.max(0, 1 - Math.abs(branch - 3) / 2) * 1.45) +

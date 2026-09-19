@@ -154,6 +154,34 @@ it('drawHeads emits hammer atlas cells and never the glow cell', () => {
   texture.dispose();
 });
 
+it('uses the prepared solid on the same flight, falls back and expires without duplicating heads', () => {
+  const { textures, texture } = fakeTextures();
+  const ribbons = new AbilityVfxRibbons(new THREE.Scene(), fixedAnchor(0, 26), textures);
+  launchWarriorHammer(launchHost(), ribbons, CASTER, TARGET, 0);
+  ribbons.update(0.1, CAM);
+  const sprite = vi.fn(),
+    solid = vi.fn((_x: number) => true);
+  ribbons.drawHeads(0.1, sprite, false, solid);
+  expect(sprite).not.toHaveBeenCalled();
+  expect(solid).toHaveBeenCalledOnce();
+  expect(solid.mock.calls[0][0]).toBeCloseTo(2.6);
+  solid.mockClear();
+  ribbons.drawHeads(400, sprite, false, solid);
+  expect((solid.mock.calls[0] as unknown[])[5]).toBeCloseTo(0.1);
+  solid.mockReturnValue(false);
+  ribbons.drawHeads(0.1, sprite, true, solid);
+  expect(sprite).toHaveBeenCalledOnce();
+  expect(sprite.mock.calls[0][5]).toBe(OVERLAY_CELL.hammer0);
+  ribbons.update(1, CAM);
+  solid.mockClear();
+  sprite.mockClear();
+  ribbons.drawHeads(1.1, sprite, false, solid);
+  expect(solid).not.toHaveBeenCalled();
+  expect(sprite).not.toHaveBeenCalled();
+  ribbons.dispose();
+  texture.dispose();
+});
+
 it('reduced motion freezes tumble at cel 0 while flight still advances', () => {
   const { textures, texture } = fakeTextures();
   const ribbons = new AbilityVfxRibbons(new THREE.Scene(), fixedAnchor(0, 26), textures);
@@ -289,7 +317,8 @@ it.each([0, 1])(
       'storm_bolt',
       0,
     );
-    expect(bakedAt).not.toHaveBeenCalled();
+    expect(bakedAt).toHaveBeenCalledOnce();
+    expect(bakedAt.mock.calls[0][0]).toBe('warrior_shear');
     expect(fragmentsAt).toHaveBeenCalledOnce();
     expect(flipbookAt).toHaveBeenCalledOnce();
     const surface = [target.x - target.height * 0.14, target.y + target.height * 0.68, target.z];
@@ -298,8 +327,10 @@ it.each([0, 1])(
       expect(flash[i]).toBeCloseTo(coordinate);
     });
     expect(flash[5]).toBe('contact_crush');
-    expect(flash[3]).toBe(4.8);
-    expect(flash[7]).toBe(0.13);
+    expect(flash[3]).toBe(7.6);
+    expect(flash[7]).toBe(0.085);
+    expect(bakedAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
+    expect(bakedAt.mock.calls[0][4]).toBe(7.8);
     expect(fragmentsAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
     expect(fragmentsAt.mock.calls[0][5]).toBe(tier === 0 ? 14 : 6);
     expect(abilityAudio).toHaveBeenCalledTimes(1);

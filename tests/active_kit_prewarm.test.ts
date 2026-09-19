@@ -15,6 +15,7 @@ import * as assets from '../src/render/ability_vfx/production_assets';
 import { WarriorFuryStates } from '../src/render/ability_vfx/warrior_fury_states';
 import { WarriorGuardPlates } from '../src/render/ability_vfx/warrior_guard_plates';
 import { WarriorPowerForms } from '../src/render/ability_vfx/warrior_power_forms';
+import { WarriorSpiritHammers } from '../src/render/ability_vfx/warrior_spirit_hammers';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
 import type { PrewarmResumeUnit } from '../src/render/prewarm_resume';
 import { prepareStudioAbilityKit } from '../src/vfx_studio/prepare_ability_kit';
@@ -36,6 +37,8 @@ function fixture(cls = 'warrior') {
   vi.spyOn(assets, 'warriorPressureTexture').mockReturnValue(texture);
   const blood = new THREE.Texture();
   vi.spyOn(assets, 'warriorBloodTexture').mockReturnValue(blood);
+  const rock = new THREE.Texture();
+  vi.spyOn(assets, 'warriorRockTexture').mockReturnValue(rock);
   const steel = new THREE.Texture();
   vi.spyOn(assets, 'warriorSteelTexture').mockReturnValue(steel);
   const power = new THREE.Texture();
@@ -80,6 +83,7 @@ function fixture(cls = 'warrior') {
     texture,
     blood,
     steel,
+    rock,
     power,
     fervor,
     harvest,
@@ -93,6 +97,7 @@ function fixture(cls = 'warrior') {
       texture.dispose();
       blood.dispose();
       steel.dispose();
+      rock.dispose();
       power.dispose();
       fervor.dispose();
       harvest.dispose();
@@ -110,24 +115,25 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     expect(f.entry).not.toHaveProperty('resumeUnits');
     expect(f.entry).not.toHaveProperty('deadlineExempt');
     expect(f.queue.run).not.toHaveBeenCalled();
-    expect(f.entry.progress()).toEqual({ done: 0, planned: 116, trimmed: true });
+    expect(f.entry.progress()).toEqual({ done: 0, planned: 117, trimmed: true });
     // A dropped/skipped manifest never ran entry.run(), but kept registration.
     resumeActiveAbilityKit(f.scene);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(116);
+    expect(f.queue.run).toHaveBeenCalledTimes(117);
     for (const call of f.queue.run.mock.calls as unknown[][]) {
       expect(call[1]).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
       expect(call[3]).toEqual({ releaseTail: String(call[2]).startsWith('crest-compile:') });
     }
-    expect(f.upload).toHaveBeenCalledTimes(8);
+    expect(f.upload).toHaveBeenCalledTimes(9);
     expect(f.upload).toHaveBeenNthCalledWith(1, f.blood);
     expect(f.upload).toHaveBeenNthCalledWith(2, f.steel);
     expect(f.upload).toHaveBeenNthCalledWith(3, f.texture);
-    expect(f.upload).toHaveBeenNthCalledWith(4, f.power);
-    expect(f.upload).toHaveBeenNthCalledWith(5, f.fervor);
-    expect(f.upload).toHaveBeenNthCalledWith(6, f.harvest);
-    expect(f.upload).toHaveBeenNthCalledWith(7, f.bite);
-    expect(f.upload).toHaveBeenNthCalledWith(8, f.shear);
+    expect(f.upload).toHaveBeenNthCalledWith(4, f.rock);
+    expect(f.upload).toHaveBeenNthCalledWith(5, f.power);
+    expect(f.upload).toHaveBeenNthCalledWith(6, f.fervor);
+    expect(f.upload).toHaveBeenNthCalledWith(7, f.harvest);
+    expect(f.upload).toHaveBeenNthCalledWith(8, f.bite);
+    expect(f.upload).toHaveBeenNthCalledWith(9, f.shear);
     expect(f.host.draw).toHaveBeenCalledTimes(27);
     expect(ACTIVE_WARRIOR_CRESTS).toContain('harvest_cut');
     expect(ACTIVE_WARRIOR_CRESTS).toContain('harvest_eruption');
@@ -147,7 +153,7 @@ it('registers without GPU work and resumes only the twenty-seven selected Warrio
     for (const kind of ACTIVE_WARRIOR_CRESTS) expect(f.prep.ready(kind)).toBe(true);
     expect(f.prep.ready('fire')).toBe(false);
     await ensureActiveAbilityKit(f.scene);
-    expect(f.queue.run).toHaveBeenCalledTimes(116);
+    expect(f.queue.run).toHaveBeenCalledTimes(117);
     expect(f.entry.progress().trimmed).toBe(false);
   } finally {
     f.close();
@@ -158,21 +164,30 @@ it('keeps synchronous declarations through every production Warrior preparation 
   const f = fixture();
   const guards = new WarriorGuardPlates(f.scene);
   const powerForms = new WarriorPowerForms(f.scene);
+  const spiritHammers = new WarriorSpiritHammers(f.scene);
   const textures = new Proxy({}, { get: () => f.texture }) as AbilityVfxTextures;
   const furyStates = new WarriorFuryStates(f.scene, () => null, textures);
   const baked = new BakedImpactLayers(f.scene);
   const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
-  Object.assign(fx, { crests: { preparation: f.prep }, guards, powerForms, furyStates, baked });
+  Object.assign(fx, {
+    crests: { preparation: f.prep },
+    guards,
+    powerForms,
+    spiritHammers,
+    furyStates,
+    baked,
+  });
   try {
     const units = fx.authoredPrewarmUnits(f.host, ACTIVE_WARRIOR_CRESTS);
-    expect(units).toHaveLength(ACTIVE_WARRIOR_CRESTS.length * 4 + 4 + 16 + 12 + 30);
-    expect(units.filter((unit) => unit.id.includes('compile'))).toHaveLength(45);
+    expect(units).toHaveLength(ACTIVE_WARRIOR_CRESTS.length * 4 + 4 + 16 + 3 + 12 + 30);
+    expect(units.filter((unit) => unit.id.includes('compile'))).toHaveLength(46);
     for (const unit of units)
       expect(unit.synchronous === true, unit.id).toBe(!unit.id.includes('compile'));
   } finally {
     baked.dispose();
     furyStates.dispose();
     powerForms.dispose();
+    spiritHammers.dispose();
     guards.dispose();
     f.close();
   }
@@ -223,7 +238,7 @@ it('lets synchronous Warrior uploads and real crest touches pass two released ta
 
     task = ensureActiveAbilityKit(f.scene);
     await flush();
-    expect(f.upload).toHaveBeenCalledTimes(8);
+    expect(f.upload).toHaveBeenCalledTimes(9);
     expect(f.prep.ready('blood_cut')).toBe(true);
     expect(f.host.draw).toHaveBeenCalledTimes(1);
     expect(f.host.compile).toHaveBeenCalledTimes(1);
@@ -275,7 +290,7 @@ it('surfaces a failed compile without blessing its buffers and retries only unpa
     expect(f.prep.ready('blood_cut')).toBe(false);
     expect(f.host.draw).not.toHaveBeenCalled();
     await ensureActiveAbilityKit(f.scene);
-    expect(f.upload).toHaveBeenCalledTimes(8);
+    expect(f.upload).toHaveBeenCalledTimes(9);
     expect(f.prep.ready('blood_cut')).toBe(true);
   } finally {
     f.close();

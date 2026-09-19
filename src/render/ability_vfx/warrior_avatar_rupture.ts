@@ -24,14 +24,14 @@ export function warriorAvatarRuptureShape(): THREE.BufferGeometry {
   SLABS.forEach(([x, z, width, depth, height, yaw], slab) => {
     const rings = [0.035, height * 0.8, height].map((y, ring) =>
       Array.from({ length: 6 }, (_, i) => {
-        const angle = (i * Math.PI) / 3;
-        const cut = 0.86 + 0.14 * Math.sin(i * 2.1 + slab * 1.3);
-        const inset = ring === 2 ? 0.81 : 1;
+        const angle = (i * Math.PI) / 3 + Math.sin(i * 2.4 + slab) * 0.12;
+        const cut = 0.76 + 0.24 * Math.sin(i * 2.1 + slab * 1.3);
+        const inset = ring === 2 ? 0.74 + 0.13 * Math.sin(slab * 1.6) : 1;
         const px = Math.cos(angle) * width * cut * inset;
         const pz = Math.sin(angle) * depth * cut * inset;
         return new THREE.Vector3(
           x + px * Math.cos(yaw) + pz * Math.sin(yaw),
-          y + (ring ? Math.cos(angle + slab) * height * 0.12 : 0),
+          y + (ring ? Math.cos(angle + slab) * height * 0.21 : 0),
           z + pz * Math.cos(yaw) - px * Math.sin(yaw),
         );
       }),
@@ -81,8 +81,8 @@ export function drawWarriorAvatarRupture(
     z,
     1,
     1,
-    0x969284,
-    0xead5a9,
+    0x818c94,
+    0xdce5dd,
     'avatar_rupture',
     facing,
     0.66,
@@ -97,9 +97,9 @@ export function drawWarriorAvatarRupture(
       sx,
       floor + 0.08,
       sz,
-      5.4,
-      0xf2e4cb,
-      0xcbbf9f,
+      6.8,
+      0xa6afb1,
+      0xe1e4d8,
       0.62,
       0,
       0,
@@ -110,24 +110,28 @@ export function drawWarriorAvatarRupture(
       sx,
       floor + 0.24,
       sz,
-      0xb4ac93,
-      full ? 24 : 8,
-      2.6,
+      0xa4b0b5,
+      full ? 12 : 8,
+      1.6,
       cos * side,
       -sin * side,
       0.62,
+      true,
     );
     // Mineral seams retain the complete vertical statement when the solid
     // pool is cold/full. Neither tier loses the main transformation silhouette.
     host.pathRibbon(
-      0xd5bd8a,
-      0.23,
+      0xc5d1d2,
+      0.52,
       0.55,
       (points) => {
         for (let i = 0; i < points.length; i++) {
           const u = i / (points.length - 1);
-          const across = side * (1.2 + u * 0.7 + Math.sin(u * 12) * 0.07);
-          const forward = -0.6 - u * 0.8;
+          // Three offset fracture planes replace the flowing wisp silhouette.
+          // Sharp load-bearing edges catch light as the stone mantle rises.
+          const bend = u < 0.35 ? u / 0.35 : u < 0.68 ? 1 - (u - 0.35) / 0.33 : (u - 0.68) / 0.32;
+          const across = side * (1.35 + u * 1.3 + bend * 0.4);
+          const forward = -0.6 - u * 1.6 - bend * 0.18;
           const px = x + cos * across + sin * forward,
             pz = z - sin * across + cos * forward;
           points[i].set(px, host.groundYAt(px, pz) + 0.08 + u * 3.4, pz);

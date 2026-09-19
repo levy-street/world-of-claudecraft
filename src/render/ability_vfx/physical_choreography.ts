@@ -26,6 +26,7 @@ import { drawWarriorPowerCast, warriorPowerRelease } from './warrior_power_cast'
 import { drawWarriorReadinessCast } from './warrior_readiness_cast';
 import { drawWarriorShield } from './warrior_shield';
 import { drawWarriorShout } from './warrior_shouts';
+import { drawWarriorEchoContact } from './warrior_widening_arc';
 
 const origin = { x: 0, y: 0, z: 0 };
 const point = { x: 0, y: 0, z: 0 };
@@ -169,6 +170,11 @@ export function physicalImpact(host: SequencerHost, slot: SeqSlot): void {
     slot.abilityId !== 'raging_gale' &&
     slot.abilityId !== 'red_harvest'
   ) {
+    if (drawWarriorEchoContact(host, slot)) {
+      slot.lingerUntil = slot.t + 0.23;
+      slot.motifLoops = p.beats.length;
+      return;
+    }
     const outcome = slot.componentOutcomes === undefined ? 1 : slot.componentOutcomes & 3;
     const profile = meleeImpactProfile(slot.abilityId);
     const at = host.anchorOf(

@@ -33,6 +33,7 @@ import {
   bakedTexture,
   warriorBloodTexture,
   warriorPressureTexture,
+  warriorRockTexture,
   warriorSteelTexture,
 } from './production_assets';
 import { signatureTexture } from './signature_texture';
@@ -221,6 +222,13 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     id: 'warrior-pressure',
     build: () => {
       const texture = warriorPressureTexture();
+      return texture ? [texture] : [];
+    },
+  });
+  steps.push({
+    id: 'warrior-rock',
+    build: () => {
+      const texture = warriorRockTexture();
       return texture ? [texture] : [];
     },
   });

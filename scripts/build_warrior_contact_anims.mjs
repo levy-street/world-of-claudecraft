@@ -15,6 +15,7 @@ import { warriorControlPerformances } from './anim/warrior_control_poses.mjs';
 import { warriorReadinessPerformances } from './anim/warrior_readiness_poses.mjs';
 import { warriorReaverPerformance } from './anim/warrior_reaver_pose.mjs';
 import { warriorSpinPerformance } from './anim/warrior_spin_poses.mjs';
+import { warriorStompLift } from './anim/warrior_stomp_footwork.mjs';
 import { warriorVoicePerformances } from './anim/warrior_voice_poses.mjs';
 
 const io = await createGlbIO();
@@ -84,6 +85,7 @@ const legs = ['l', 'r'].map((side) => {
     .addScaledVector(axis, -knee.clone().sub(hip).dot(axis))
     .normalize();
   return {
+    side,
     upper,
     lower,
     foot,
@@ -105,11 +107,13 @@ function pointJoint(bone, child, target) {
   setWorldRotation(bone, new Quaternion().setFromUnitVectors(from, to).multiply(orientation(bone)));
 }
 let maxFootError = 0;
-function plantFeet(pose) {
+function plantFeet(pose, name = '', time = 0) {
   applyPose(pose);
   for (const leg of legs) {
+    const lift = warriorStompLift(name, leg.side, time);
+    const target = leg.ankle.clone().add(new Vector3(0, lift, -lift * 0.25));
     const hip = position(leg.upper);
-    const axis = leg.ankle.clone().sub(hip);
+    const axis = target.clone().sub(hip);
     const distance = axis.length();
     if (distance >= leg.a + leg.b || distance <= Math.abs(leg.a - leg.b))
       throw new Error('Authored hip pose puts planted foot outside native leg reach');
@@ -119,9 +123,9 @@ function plantFeet(pose) {
     const bend = leg.bend.clone().addScaledVector(axis, -leg.bend.dot(axis)).normalize();
     const knee = hip.clone().addScaledVector(axis, along).addScaledVector(bend, height);
     pointJoint(leg.upper, leg.lower, knee);
-    pointJoint(leg.lower, leg.foot, leg.ankle);
+    pointJoint(leg.lower, leg.foot, target);
     setWorldRotation(leg.foot, leg.rotation);
-    maxFootError = Math.max(maxFootError, position(leg.foot).distanceTo(leg.ankle));
+    maxFootError = Math.max(maxFootError, position(leg.foot).distanceTo(target));
     for (const bone of [leg.upper, leg.lower, leg.foot])
       pose.set(`${bone.name}|rotation`, bone.quaternion.toArray());
   }
@@ -375,8 +379,42 @@ function openAvatarArms(pose, weight, targets = null) {
 }
 
 // Candidate offensive-state poses: no gameplay or runtime body scaling.
-const avatarLoad = openAvatarArms(bladePose(7, 0.35, [0, -0.065, 0], -6, 9), 0.3);
-const avatarRise = openAvatarArms(bladePose(7, 1.8, [0, -0.005, 0], 0, -8), 1);
+function raiseAvatarWeapons(pose, height) {
+  applyPose(pose);
+  for (const side of ['l', 'r']) {
+    const wrist = bones.get(`wrist.${side}`),
+      slot = bones.get(`handslot.${side}`);
+    const current = new Vector3(0, 1, 0).applyQuaternion(orientation(slot));
+    const desired = new Vector3(side === 'l' ? 0.65 : -0.65, height, 0.14).normalize();
+    setWorldRotation(
+      wrist,
+      new Quaternion().setFromUnitVectors(current, desired).multiply(orientation(wrist)),
+    );
+    pose.set(`wrist.${side}|rotation`, wrist.quaternion.toArray());
+  }
+  return pose;
+}
+const avatarLoad = raiseAvatarWeapons(
+  openAvatarArms(bladePose(7, 0.35, [0, -0.15, -0.035], -16, 23, -8), 1, [
+    [0.3, -0.12, 0.34],
+    [-0.3, -0.12, 0.34],
+  ]),
+  0.7,
+);
+const avatarRise = raiseAvatarWeapons(
+  openAvatarArms(bladePose(7, 1.8, [0, -0.015, 0.03], 9, -14, 5), 1, [
+    [0.56, 0.18, 0.06],
+    [-0.56, 0.18, 0.06],
+  ]),
+  0.5,
+);
+const avatarSettle = raiseAvatarWeapons(
+  openAvatarArms(bladePose(7, 1.8, [0, -0.055, 0.015], 3, -5, -3), 1, [
+    [0.58, -0.02, 0.07],
+    [-0.58, -0.02, 0.07],
+  ]),
+  0.6,
+);
 const recklessLoad = bladePose(8, 0.18, [0, -0.04, 0], -12, 8);
 const recklessTear = bladePose(8, 0.76, [0, -0.008, 0], 12, -9);
 const tollLoad = bladePose(6, 0.14, [0, -0.018, 0], -8, 3);
@@ -504,6 +542,7 @@ const performances = [
       [0.08, avatarLoad],
       [0.15, avatarRise],
       [0.29, avatarRise],
+      [0.44, avatarSettle],
       [0.74, idle],
     ],
   ],
@@ -737,6 +776,10 @@ for (const [name, beats] of performances) {
       'Warrior_Breachmaker',
       'Warrior_Bloodletting',
       'Warrior_Victory_Rush',
+      'Warrior_Storm_Bolt',
+      'Warrior_Widening_Arc',
+      'Warrior_Avatar',
+      'Warrior_Quaking_Blow',
     ].includes(name)
       ? 360
       : 180;
@@ -746,6 +789,8 @@ for (const [name, beats] of performances) {
       const weight = end === 0.15 ? t * t : t * t * (3 - 2 * t);
       let pose = plantFeet(
         new Map(keys.map((key) => [key, blendValue(key, from.get(key), to.get(key), weight)])),
+        name,
+        start + (end - start) * t,
       );
       if (name === 'Warrior_Bladed_Gyre' || name === 'Warrior_Bladestorm_Loop') {
         // Bake the complete pivot into the native root after solving the

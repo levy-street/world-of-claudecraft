@@ -118,14 +118,15 @@ export function paintWarriorHammer(
   };
   // Steel tang runs through the head. Narrow leather wraps leave the steel
   // silhouette intact; broad end faces make the object read as blunt weight.
-  box(0, 6, 0, 4.5, 35, 4.5, [99, 116, 129]);
-  box(0, 10, 0, 5.3, 22, 5.3, [97, 64, 47]);
-  for (let wrap = 0; wrap < 6; wrap++) box(0, 1 + wrap * 3.6, 0, 5.8, 1.1, 5.8, [47, 43, 42]);
-  box(0, 23, 0, 8, 4, 8, [165, 182, 192]);
-  box(0, -14, 0, 36, 13, 12, [137, 159, 176]);
+  box(0, 6, 0, 4.5, 35, 4.5, [73, 174, 202]);
+  box(0, 10, 0, 5.3, 22, 5.3, [37, 94, 117]);
+  for (let wrap = 0; wrap < 6; wrap++) box(0, 1 + wrap * 3.6, 0, 5.8, 1.1, 5.8, [123, 212, 231]);
+  box(0, 23, 0, 8, 4, 8, [176, 237, 247]);
+  box(0, -14, 0, 36, 13, 12, [54, 126, 153]);
   for (const side of [-1, 1]) {
-    box(side * 19, -14, 0, 6, 17, 14, [172, 190, 201]);
-    box(side * 12, -14, 0, 2.2, 14, 12.8, [179, 153, 101]);
+    box(side * 19, -14, 0, 6, 17, 14, [127, 219, 238]);
+    box(side * 12, -14, 0, 2.2, 14, 12.8, [208, 244, 247]);
+    box(side * 18, -14, 0, 1.3, 18, 14.8, [197, 243, 255]);
   }
   // Inset angular thunder mark on the front face, hidden naturally on the
   // back half of the tumble by the depth-sorted solid head.

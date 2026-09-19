@@ -205,7 +205,16 @@ it.each([
     bones.forEach((b, j) => {
       const expectedPosition = initial[j].position.clone().applyQuaternion(pivot);
       const expectedRotation = pivot.clone().multiply(initial[j].rotation);
-      expect(position(b).distanceTo(expectedPosition)).toBeLessThan(0.0005);
+      if (id === 'thunder_clap' && (j === 1 || j === 3) && i * 0.005 > 0.02 && i * 0.005 < 0.15) {
+        // This deliberate stomp has one airborne foot before contact. The
+        // support foot, root and every post-impact sample retain the old lock.
+        const actual = position(b);
+        expect(Math.abs(actual.x - expectedPosition.x)).toBeLessThan(0.0005);
+        expect(actual.y - expectedPosition.y).toBeGreaterThanOrEqual(-0.0005);
+        expect(actual.y - expectedPosition.y).toBeLessThanOrEqual(0.1605);
+        expect(actual.z - expectedPosition.z).toBeGreaterThanOrEqual(-0.0405);
+        expect(actual.z - expectedPosition.z).toBeLessThanOrEqual(0.0005);
+      } else expect(position(b).distanceTo(expectedPosition)).toBeLessThan(0.0005);
       expect(rotation(b).angleTo(expectedRotation)).toBeLessThan(0.005);
     });
   }
@@ -226,6 +235,33 @@ it.each([
     f.clip.tracks.map((t) => [t.name, t.times, t.values]),
   );
   expect(VISUALS.player_warrior.clips.attackByAbility?.[id]).toBe(name);
+});
+
+it('Quaking Blow lifts one foot, accelerates into its exact contact plant and holds that plant through recovery', async () => {
+  const f = await fixture('Warrior_Quaking_Blow'),
+    foot = f.bone('footr');
+  f.pose(0);
+  const start = position(foot);
+  f.pose(0.085);
+  expect(position(foot).y - start.y).toBeCloseTo(0.16, 3);
+  let prior = 0;
+  for (let t = 0.02; t <= 0.085; t += 0.002) {
+    f.pose(t);
+    const lift = position(foot).y - start.y;
+    expect(lift).toBeGreaterThanOrEqual(prior - 0.0005);
+    prior = lift;
+  }
+  prior = 0.16;
+  for (let t = 0.085; t <= 0.15; t += 0.002) {
+    f.pose(t);
+    const lift = position(foot).y - start.y;
+    expect(lift).toBeLessThanOrEqual(prior + 0.0005);
+    prior = lift;
+  }
+  for (const t of [0.15, 0.155, 0.18, 0.3, f.clip.duration]) {
+    f.pose(t);
+    expect(position(foot).distanceTo(start)).toBeLessThan(0.0005);
+  }
 });
 
 it('keeps both feet and toes planted between baked frames while driving the shield ahead of the sword', async () => {

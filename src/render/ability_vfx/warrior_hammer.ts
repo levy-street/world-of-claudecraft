@@ -19,13 +19,13 @@ export function launchWarriorHammer(
 ): void {
   const at = host.anchorOf(casterId, 0.62, source);
   if (!at) return;
-  ribbons.spawnTrailStyled(casterId, targetId, 0xa5bfd1, 0.2, {
+  ribbons.spawnTrailStyled(casterId, targetId, 0x78cce9, 0.32, {
     speed: 26,
     style: 'warHammer',
     // Compensate for the painter's atlas gutter, retaining the visible size.
-    headSize: 1.3 * (70 / 64),
+    headSize: 2.1 * (70 / 64),
     coreHex: 0xe4f2ff,
-    accentHex: 0xc0a269,
+    accentHex: 0x81cce1,
     coils: false,
     jagTrail: false,
     forkEvery: 0,
@@ -67,7 +67,38 @@ export function drawWarriorHammerContact(
   impact.y = at.y;
   impact.z = at.z;
   if (outcome === 1) {
-    primitives = warriorCrushContact(host, targetId, at, 0.68, direction, 4.8, tier, impact, 0.13);
+    primitives = warriorCrushContact(
+      host,
+      targetId,
+      at,
+      0.68,
+      direction,
+      7.6,
+      tier,
+      impact,
+      0.085,
+      1.3,
+    );
+    if (
+      host.bakedAt?.(
+        'warrior_shear',
+        impact.x,
+        impact.y,
+        impact.z,
+        7.8,
+        0x8ed7ef,
+        0xe4f7ff,
+        0.24,
+        0,
+        0,
+        direction,
+        false,
+        -0.22,
+        1.4,
+      ) !== false &&
+      host.bakedAt
+    )
+      primitives++;
     host.fragmentsAt?.(
       'metal_splinter',
       impact.x,
@@ -75,7 +106,7 @@ export function drawWarriorHammerContact(
       impact.z,
       0xc8d5df,
       tier === 0 ? 14 : 6,
-      1.1,
+      1.6,
       dx,
       dz,
       0.24,

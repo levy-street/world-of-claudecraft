@@ -15,6 +15,7 @@ export function drawWarriorAreaReceivingContact(
   tier: number,
   at: SeqPoint,
   profile: MeleeImpactProfile,
+  echo = false,
 ): void {
   const body = { x: 0, y: 0, z: 0 },
     point = { x: 0, y: 0, z: 0 };
@@ -35,7 +36,7 @@ export function drawWarriorAreaReceivingContact(
     x,
     y,
     z,
-    counter || gyre ? 3.8 : heavy ? 4.6 : sweep ? 3.7 : 3.1,
+    echo ? 4.2 : counter || gyre ? 3.8 : heavy ? 4.6 : sweep ? 3.7 : 3.1,
     0xeaf4fa,
     'contact_cut',
     heavy ? 2.1 : 1.8,
@@ -49,7 +50,7 @@ export function drawWarriorAreaReceivingContact(
       x,
       y,
       z,
-      counter ? 6 : heavy ? 7.4 : sweep ? 6.4 : gyre ? 6.2 : 4.4,
+      echo ? 6.6 : counter ? 6 : heavy ? 7.4 : sweep ? 6.4 : gyre ? 6.2 : 4.4,
       0xffffff,
       0xdceaf3,
       duration,
@@ -58,7 +59,7 @@ export function drawWarriorAreaReceivingContact(
       facing,
       false,
       profile.angle,
-      heavy ? 1.5 : sweep || gyre ? 1.4 : 1,
+      heavy ? 1.5 : sweep || gyre || echo ? 1.4 : 1,
     ) !== false &&
     host.bakedAt
   )

@@ -113,6 +113,7 @@ import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorRushPose } from './warrior_rush_pose';
 import { SPIN_ATTACK_VISUAL_DURATION, weaponAttackStyle } from './weapon_attack_style_core';
 import {
@@ -3874,7 +3875,11 @@ export class CharacterVisual {
     // whole 0.18s hand-off fade (a visible T-pose pop after every swing)
     a.clampWhenFinished = true;
     a.timeScale = timeScale;
-    this.beginAction(a, prev, name === this.def.clips.rushArrival ? 0.04 : ONESHOT_FADE);
+    this.beginAction(
+      a,
+      prev,
+      name === this.def.clips.rushArrival ? 0.04 : warriorActionBlend(this.key, name, ONESHOT_FADE),
+    );
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;

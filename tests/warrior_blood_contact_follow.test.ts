@@ -7,8 +7,8 @@ import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 
 type Ribbon = Parameters<SequencerHost['pathRibbon']>;
 const contacts = [
-  { id: 'raging_gale', beat: 0, delay: 0.015, clear: 0.2, size: 5.2, life: 0.2, shake: 0.12 },
-  { id: 'raging_gale', beat: 1, delay: 0.022, clear: 0.2, size: 5.8, life: 0.2, shake: 0.18 },
+  { id: 'raging_gale', beat: 0, delay: 0.015, clear: 0.2, size: 6.6, life: 0.2, shake: 0.12 },
+  { id: 'raging_gale', beat: 1, delay: 0.022, clear: 0.2, size: 7.2, life: 0.2, shake: 0.18 },
   { id: 'bloodthirst', beat: 0, delay: 0.02, clear: 0.27, size: 7.4, life: 0.23, shake: 0.15 },
 ] as const;
 

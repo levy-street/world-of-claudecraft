@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { sceneKeyLightUniform } from '../scene_sampling';
 import { type FragmentKind, fragmentGeometry } from './production_assets';
+import { warriorFragmentShape } from './warrior_fragment_shape';
 
 const PER_KIND = 32;
 const KINDS = ['ice_shard', 'stone_chip', 'metal_splinter'] as const;
@@ -15,6 +16,7 @@ export class SolidImpactFragments {
   private readonly color = new THREE.Color();
   private time = 0;
   private serial = 0;
+  private readonly fracturedShape = { x: 1, y: 1, z: 1, tint: 1, lift: 1 };
   private disposed = false;
   constructor(scene: THREE.Scene) {
     for (const kind of KINDS) {
@@ -52,7 +54,8 @@ export class SolidImpactFragments {
           float after=max(0.,t-hit);float bounceV=0.24*max(0.,gravity*hit-aVelocity.y);
           vec3 travel=aVelocity*t;travel.y-=0.5*gravity*t*t;
           if(t>hit){travel.xz=aVelocity.xz*(hit+after*0.3);travel.y=floorY-aOrigin.y+max(0.,bounceV*after-0.5*gravity*after*after);}
-          float angle=aLife.w+t*5.;float c=cos(angle),s=sin(angle);mat3 rot=mat3(c,0.,s,s*0.6,0.8,-c*0.6,-s*0.8,0.6,c*0.8);
+          float spin=aLife.w<0.?(3.+mod(abs(aLife.w)*1.73,8.))*sign(sin(aLife.w)):5.;
+          float angle=abs(aLife.w)+t*spin;float c=cos(angle),s=sin(angle);mat3 rot=mat3(c,0.,s,s*0.6,0.8,-c*0.6,-s*0.8,0.6,c*0.8);
           float shrink=1.-smoothstep(0.66,1.,p);vec3 local=rot*(position*aShape.xyz)*aLife.z*shrink*live;
           vec4 view=modelViewMatrix*vec4(aOrigin+travel+local,1.);vNormal=normalize(normalMatrix*rot*(normal/max(aShape.xyz,vec3(0.001))));vView=-view.xyz;vTint=aTint;vLight=mat3(viewMatrix)*uSun;vFade=live;gl_Position=projectionMatrix*view;
           if(live<0.5)gl_Position=vec4(2.,2.,2.,1.);
@@ -86,6 +89,7 @@ export class SolidImpactFragments {
     dz: number,
     ground: (x: number, z: number) => number,
     lifetime?: number,
+    fractured = false,
   ): number {
     if (this.disposed || ![x, y, z, count, power, dx, dz].every(Number.isFinite)) return 0;
     const batch = this.batches.get(kind);
@@ -108,9 +112,11 @@ export class SolidImpactFragments {
       if (batch.ends[i] > this.time) continue;
       const phase = (seed * 1.618 + n) * 2.399963,
         radial = 1.2 + ((n * 7 + seed) % 9) * 0.17;
+      const mineral = fractured && kind === 'stone_chip';
+      if (mineral) warriorFragmentShape(this.fracturedShape, n, seed);
       const vx = (Math.cos(phase) * radial + dx * 1.4) * force,
         vz = (Math.sin(phase) * radial + dz * 1.4) * force,
-        vy = (2.2 + (n % 4) * 0.65) * force;
+        vy = (2.2 + (n % 4) * 0.65) * force * (mineral ? this.fracturedShape.lift : 1);
       const floor = ground(x + vx * 0.65, z + vz * 0.65);
       if (!Number.isFinite(floor)) continue;
       const startY = Math.max(y, floor + 0.08),
@@ -121,9 +127,16 @@ export class SolidImpactFragments {
         size = (kind === 'ice_shard' ? 0.22 : 0.13) * (0.7 + (n % 5) * 0.17) * force;
       origin.setXYZ(i, x, startY, z);
       velocity.setXYZ(i, vx, vy, vz);
-      life.setXYZW(i, this.time, duration, size, phase);
-      shape.setXYZW(i, 0.65 + (n % 3) * 0.15, kind === 'ice_shard' ? 1.7 : 1, 0.7, floor + 0.025);
-      tints.setXYZ(i, this.color.r, this.color.g, this.color.b);
+      life.setXYZW(i, this.time, duration, size, mineral ? -phase : phase);
+      shape.setXYZW(
+        i,
+        mineral ? this.fracturedShape.x : 0.65 + (n % 3) * 0.15,
+        mineral ? this.fracturedShape.y : kind === 'ice_shard' ? 1.7 : 1,
+        mineral ? this.fracturedShape.z : 0.7,
+        floor + 0.025,
+      );
+      const tone = mineral ? this.fracturedShape.tint : 1;
+      tints.setXYZ(i, this.color.r * tone, this.color.g * tone, this.color.b * tone);
       for (const attribute of [origin, velocity, life, shape, tints])
         attribute.addUpdateRange(i * attribute.itemSize, attribute.itemSize);
       batch.ends[i] = this.time + duration;

@@ -157,6 +157,7 @@ interface TrailSlot {
   targetId: number;
   sourceId: number;
   ttl: number;
+  flightAge: number;
   width: number;
   core: THREE.Color;
   glow: THREE.Color;
@@ -358,6 +359,7 @@ export class AbilityVfxRibbons {
         targetId: 0,
         sourceId: 0,
         ttl: 0,
+        flightAge: 0,
         width: 0.2,
         core: new THREE.Color(),
         glow: new THREE.Color(),
@@ -668,6 +670,7 @@ export class AbilityVfxRibbons {
     slot.delay = opts.delay;
     slot.coils = opts.coils;
     slot.coilPhase = 0;
+    slot.flightAge = 0;
     slot.jagTrail = opts.jagTrail;
     slot.jagTimer = 0;
     slot.forkEvery = opts.forkEvery;
@@ -917,6 +920,7 @@ export class AbilityVfxRibbons {
         continue;
       }
       t.dir.copy(this.t1).multiplyScalar(1 / dist);
+      t.flightAge += dt;
       t.head.addScaledVector(t.dir, step);
       if (t.style === 'shadowFang' || t.style === 'essenceLance') this.sampleShadowFang(t);
       else this.appendTrailSample(t, t.head);
@@ -1212,6 +1216,15 @@ export class AbilityVfxRibbons {
       brightness: number,
     ) => void,
     reducedMotion = false,
+    hammerSink?: (
+      x: number,
+      y: number,
+      z: number,
+      size: number,
+      yaw: number,
+      time: number,
+      reduced: boolean,
+    ) => boolean,
   ): void {
     for (const t of this.trails) {
       if (!t.active || t.headSize <= 0 || t.delay > 0) continue;
@@ -1345,8 +1358,20 @@ export class AbilityVfxRibbons {
           sink(h.x, h.y, h.z, t.colorHex, 0.3 * hs, OVERLAY_CELL.glow, 0.6, 1.1);
           break;
         case 'warHammer': {
+          if (
+            hammerSink?.(
+              h.x,
+              h.y,
+              h.z,
+              hs,
+              Math.atan2(t.dir.x, t.dir.z),
+              t.flightAge,
+              reducedMotion,
+            )
+          )
+            break;
           const cel = OVERLAY_CELL.hammer0 + warriorHammerCel(time, reducedMotion);
-          sink(h.x, h.y, h.z, 0xffffff, 1.5 * hs, cel, 1, 0.5);
+          sink(h.x, h.y, h.z, 0xffffff, 1.5 * hs, cel, 1, 1.15);
           break;
         }
         case 'rock': {

@@ -9,17 +9,21 @@ export function warriorControlPerformances(idle, bladePose, openArms) {
   const pryPull = bladePose(5, 0.16, [0, -0.03, -0.025], -22, -5);
   // The native overhead windup becomes a compact throw, then follows through
   // across the body. The projectile event remains the only release authority.
-  const throwLoad = openArms(bladePose(2, 0.27, [0, -0.018, -0.025], -23, -8), 1, [
-    [0.4, -0.12, 0.18],
-    [-0.4, 0.23, -0.13],
+  const throwLoad = openArms(bladePose(2, 0.27, [0, -0.045, -0.035], -38, -12, -6), 1, [
+    [0.48, -0.04, 0.22],
+    [-0.4, 0.28, -0.18],
   ]);
-  const throwRelease = openArms(bladePose(2, 0.39, [0, -0.025, 0.055], 26, 10, 8), 1, [
-    [0.4, -0.12, 0.18],
-    [-0.13, 0.02, 0.5],
+  const throwRelease = openArms(bladePose(2, 0.39, [0, -0.05, 0.075], 34, 18, 12), 1, [
+    [0.43, -0.13, 0.08],
+    [-0.13, 0.05, 0.5],
   ]);
-  const throwFollow = openArms(bladePose(2, 0.68, [0, -0.015, 0.03], 32, 8, 4), 1, [
-    [0.4, -0.12, 0.18],
-    [-0.05, -0.12, 0.32],
+  const throwFollow = openArms(bladePose(2, 0.68, [0, -0.055, 0.055], 48, 21, 8), 1, [
+    [0.46, -0.04, 0.08],
+    [0.12, -0.16, 0.36],
+  ]);
+  const throwBrake = openArms(bladePose(2, 0.68, [0, -0.035, 0.015], 23, 8, -7), 1, [
+    [0.42, -0.08, 0.16],
+    [-0.12, -0.11, 0.27],
   ]);
   const jabLoad = bladePose(9, 0.14, [0, -0.025, -0.02], -3, -2);
   const jabContact = bladePose(9, 0.32, [0, -0.035, 0.04], 4, 3);
@@ -64,8 +68,9 @@ export function warriorControlPerformances(idle, bladePose, openArms) {
         [0, idle],
         [0.018, throwLoad],
         [0.04, throwRelease],
-        [0.075, throwRelease],
-        [0.2, throwFollow],
+        [0.075, throwFollow],
+        [0.16, throwFollow],
+        [0.29, throwBrake],
         [0.62, idle],
       ],
     ],

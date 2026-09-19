@@ -6,6 +6,30 @@ const anchor = { x: 0, y: 0, z: 0 };
 /** Blood Toll draws its payment inward during the load, meeting the fist at
  * the .15-second clench. The same source volume plays forward for releases. */
 export function warriorPowerRelease(host: SequencerHost, slot: SeqSlot): void {
+  if (slot.abilityId === 'avatar' && !slot.physicalSecondary) {
+    const at = host.anchorOf(slot.casterId, 0, anchor);
+    if (!at) return;
+    const facing = host.facingAt?.(slot.casterId) ?? 0;
+    for (const side of [-1, 1])
+      host.bakedAt?.(
+        'shout_dust',
+        at.x + Math.cos(facing) * side,
+        at.y + 0.12,
+        at.z - Math.sin(facing) * side,
+        3.8,
+        0x59646c,
+        0xcbd7d8,
+        0.15,
+        0,
+        0,
+        facing + side * 1.1,
+        true,
+        0,
+        1.4,
+      );
+    host.countPrimitive('avatar', 2);
+    return;
+  }
   if (slot.abilityId !== 'bloodrage' || slot.physicalSecondary) return;
   const at = host.anchorOf(slot.casterId, 0, anchor);
   if (!at) return;

@@ -10,7 +10,7 @@ import {
 } from '../warrior_power_core';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { GuardPrewarm } from './guard_prewarm';
-import { warriorBloodTexture, warriorSteelTexture } from './production_assets';
+import { warriorBloodTexture, warriorRockTexture } from './production_assets';
 import type { AbilityVfxRibbons, RibbonAnchor } from './ribbons';
 import { warriorAvatarBracerShape } from './warrior_avatar_bracer';
 import { warriorAvatarChestShape } from './warrior_avatar_shape';
@@ -75,11 +75,11 @@ export class WarriorPowerForms {
         new THREE.MeshStandardMaterial({
           color: 0xffffff,
           vertexColors: true,
-          map: blood ? warriorBloodTexture() : warriorSteelTexture(),
-          roughness: blood ? 0.42 : 0.82,
-          metalness: blood ? 0.08 : 0.18,
+          map: blood ? warriorBloodTexture() : warriorRockTexture(),
+          roughness: blood ? 0.42 : 0.96,
+          metalness: blood ? 0.08 : 0.025,
           emissive: 0xffffff,
-          emissiveIntensity: blood ? 0.85 : 0.42,
+          emissiveIntensity: blood ? 0.85 : 0.16,
         }),
       );
       if (blood) animateWarriorRage(material, this.rageTime, this.rageMotion);
@@ -123,7 +123,7 @@ export class WarriorPowerForms {
               synchronous: true,
               run: () => {
                 if (this.disposed) return;
-                const texture = kind === 1 ? warriorBloodTexture() : warriorSteelTexture();
+                const texture = kind === 1 ? warriorBloodTexture() : warriorRockTexture();
                 if (!texture) throw Error('Warrior power texture is not prepared');
                 const material = this.meshes[kind].material;
                 if (material.map !== texture) {

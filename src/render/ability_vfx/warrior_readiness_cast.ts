@@ -1,5 +1,6 @@
 import type { SeqSlot, SequencerHost } from './sequencer';
 import { warriorEquipmentPrepare } from './warrior_equipment_prepare';
+import { drawWarriorWideningCast } from './warrior_widening_arc';
 
 const hand = { x: 0, y: 0, z: 0 };
 
@@ -50,12 +51,13 @@ export function drawWarriorReadinessCast(
     slot.casterId,
     guarded ? 1 : 0,
     color,
-    wide ? 0.14 : 0.065,
+    wide ? 0.34 : 0.065,
     wide ? 0.35 : 0.22,
   );
   if (fury) host.weaponTrail?.(slot.casterId, 1, color, 0.065, 0.22);
   const reflection =
     beat === 0 && (wide || guarded) ? warriorEquipmentPrepare(host, slot.casterId, guarded) : 0;
-  host.countPrimitive(id, (fury ? 2 : 1) + reflection);
+  const flourish = wide ? drawWarriorWideningCast(host, slot, beat) : 0;
+  host.countPrimitive(id, (fury ? 2 : 1) + reflection + flourish);
   return true;
 }

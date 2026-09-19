@@ -18,6 +18,8 @@ export function drawIronguard(host: SequencerHost, slot: SeqSlot, beat: number):
   if (slot.physicalSecondary || beat > 0) return true;
   const at = host.anchorOf(slot.casterId, 0, origin);
   if (!at) return true;
+  const originX = at.x,
+    originZ = at.z;
   const kind: IronguardShape =
     id === 'revenge' ? 'iron_counter' : id === 'thunder_clap' ? 'iron_quake' : 'iron_fault';
   const angle = host.facingAt?.(slot.casterId) ?? 0,
@@ -35,8 +37,8 @@ export function drawIronguard(host: SequencerHost, slot: SeqSlot, beat: number):
       (points) => {
         for (let i = 0; i < points.length; i++) {
           ironguardPath(kind, branch, i / (points.length - 1), point);
-          const x = at.x + point.x * cos + point.z * sin,
-            z = at.z + point.z * cos - point.x * sin;
+          const x = originX + point.x * cos + point.z * sin,
+            z = originZ + point.z * cos - point.x * sin;
           points[i].set(x, host.groundYAt(x, z) + point.y, z);
         }
         return points.length;
@@ -76,6 +78,7 @@ export function drawIronguard(host: SequencerHost, slot: SeqSlot, beat: number):
         x - at.x,
         z - at.z,
         0.32,
+        id !== 'revenge',
       );
     }
   }

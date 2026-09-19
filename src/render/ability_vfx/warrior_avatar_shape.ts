@@ -24,7 +24,7 @@ export function warriorAvatarChestShape(): THREE.BufferGeometry {
   // Mineral masses use broad facets on every side, rather than flat caps
   // whose sidewalls become rectangular panels from the gameplay camera.
   const shoulders = [-1, 1].map((side) =>
-    warriorAvatarShape()
+    warriorAvatarShape(side < 0 ? 1 : 2)
       .scale(0.9, 0.32, 0.72)
       .rotateY(side * 0.45)
       .rotateZ(-side * 0.38)
@@ -107,7 +107,7 @@ function avatarBeveledShell(
 }
 
 /** Asymmetric weathered bedrock with broad mineral facets on every side. */
-export function warriorAvatarShape(): THREE.BufferGeometry {
+export function warriorAvatarShape(variant = 0): THREE.BufferGeometry {
   const rings = [
     [0, 0.18, 0.22, -0.06],
     [0.24, 0.45, 0.36, 0],
@@ -119,11 +119,12 @@ export function warriorAvatarShape(): THREE.BufferGeometry {
   ];
   const vertices = rings.map(([y, rx, rz, ox], ring) =>
     Array.from({ length: 8 }, (_, side) => {
-      const angle = (side * Math.PI) / 4 + 0.16;
+      const angle = (side * Math.PI) / 4 + 0.16 + Math.sin(side * 2.3 + variant) * 0.12;
+      const fracture = 0.86 + 0.14 * Math.sin(side * 1.8 + ring * 0.63 + variant * 2.4);
       return new THREE.Vector3(
-        ox + Math.cos(angle) * rx,
-        y + (ring === 6 ? Math.sin(side * 2.3) * 0.14 : (side % 2) * 0.055),
-        Math.sin(angle) * rz,
+        ox + Math.cos(angle) * rx * fracture,
+        y + (ring === 6 ? Math.sin(side * 2.3 + variant) * 0.14 : (side % 2) * 0.055),
+        Math.sin(angle) * rz * (1.03 - (1 - fracture) * 0.6),
       );
     }),
   );

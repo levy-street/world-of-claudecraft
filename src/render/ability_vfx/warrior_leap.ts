@@ -32,6 +32,7 @@ export function drawWarriorLeapLaunch(host: SequencerHost, sourceId: number): nu
       -Math.sin(angle),
       -Math.cos(angle),
       0.3,
+      true,
     );
   }
   return 4;
@@ -112,6 +113,7 @@ export function drawWarriorLeapLanding(
           dx,
           dz,
           0.62,
+          true,
         );
         count++;
       }

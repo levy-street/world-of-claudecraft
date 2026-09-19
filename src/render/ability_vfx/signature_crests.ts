@@ -8,6 +8,7 @@ import { WARRIOR_STORM_TURN_RATE } from './held_warrior_storm';
 import {
   warriorBloodTexture,
   warriorPressureTexture,
+  warriorRockTexture,
   warriorSteelTexture,
 } from './production_assets';
 import { buildSignatureShapes, type CrestKind } from './signature_shapes';
@@ -50,6 +51,7 @@ export class SignatureCrests {
         uPressureMap: { value: null },
         uBloodMap: { value: null },
         uSteelMap: { value: null },
+        uRockMap: { value: null },
         uSunWorld: sceneKeyLightUniform(scene),
         uKind: { value: 0 },
         uMotion: { value: 1 },
@@ -96,7 +98,7 @@ export class SignatureCrests {
           if((uKind>20.5 && uKind<21.5)){
             float lift=smoothstep(0.0,0.16,uAge);
             float settle=1.0-smoothstep(0.3,1.0,uAge);
-            p.y*=mix(1.0,0.12+0.88*lift*settle,uMotion);
+            p.y-=((1.0-lift)*2.1+(1.0-settle)*2.1)*uMotion;
             p.y+=pressureGround(p.xz);
           }
           if(uKind>21.5 && uKind<22.5){
@@ -115,7 +117,7 @@ export class SignatureCrests {
         }`,
       fragmentShader: `${SCENE_SAMPLE_GLSL}
         ${STEEL_SWEEP_GLSL}
-        uniform sampler2D uPressureMap,uBloodMap,uSteelMap; uniform float uAge,uKind,uMotion,uStorm,uFlow; uniform vec3 uTint,uAccent,uSunWorld,uVoice;
+        uniform sampler2D uPressureMap,uBloodMap,uSteelMap,uRockMap; uniform float uAge,uKind,uMotion,uStorm,uFlow; uniform vec3 uTint,uAccent,uSunWorld,uVoice;
         varying vec2 vUv,vSurface; varying vec3 vNormal,vView,vLocal,vLocalNormal;
         ${BLOOD_FILM_GLSL}
         vec2 groundSteelUv(vec2 p){return 1.0-abs(mod(p*0.24+0.37,2.0)-1.0);}
@@ -184,9 +186,9 @@ export class SignatureCrests {
               // stretches one texel column down the entire raised fracture.
               vec3 weights=pow(abs(normalize(vLocalNormal)),vec3(4.0));
               weights/=max(0.0001,weights.x+weights.y+weights.z);
-              vec3 surface=texture2D(uSteelMap,groundSteelUv(vLocal.yz)).rgb*weights.x
-                +texture2D(uSteelMap,groundSteelUv(vLocal.xz)).rgb*weights.y
-                +texture2D(uSteelMap,groundSteelUv(vLocal.xy)).rgb*weights.z;
+              vec3 surface=texture2D(uRockMap,groundSteelUv(vLocal.yz)).rgb*weights.x
+                +texture2D(uRockMap,groundSteelUv(vLocal.xz)).rgb*weights.y
+                +texture2D(uRockMap,groundSteelUv(vLocal.xy)).rgb*weights.z;
               float grain=dot(surface,vec3(0.333333));
               if(dot(n,normalize(vView))<0.0)n=-n;
               float incidence=max(0.0,dot(n,sun));
@@ -194,19 +196,19 @@ export class SignatureCrests {
               colour=uTint*(0.58+grain*1.5)*faceLight;
               colour+=uAccent*bevel*(0.06+0.2*incidence)*(0.45+grain);
               colour+=uAccent*fresnel*0.055;
-              if(uKind>22.5||(uKind>17.5&&uKind<19.5)){
-                // Matte fault faces use the existing surface's mineral grain,
-                // with compressed highlights and dark sediment seams. The thin
-                // fresh edge catches light without reading as a forged blade.
-                float strata=sin(vLocal.y*6.0+vLocal.x*0.6+vLocal.z*0.3+grain*0.45);
-                float seam=1.0-smoothstep(0.04,0.16,abs(strata));
-                float mineral=texture2D(uPressureMap,fract(vLocal.xz*1.31+vLocal.y*.43)).r;
-                float bed=(.66+.19*grain+.15*mineral)*(1.0-seam*.30);
-                colour=uTint*bed*(0.52+incidence*0.65);
-                colour+=uAccent*bevel*(0.045+incidence*0.12);
-              }
+              // Native terrain stone supplies real strata, pores and mineral
+              // breaks. Three texture projections cover caps and side walls;
+              // no repeating metallic scoring or synthetic lightning veins.
+              float stoneLight=.48+incidence*.82+max(0.,normalize(vLocalNormal).y)*.22;
+              colour=mix(vec3(grain),surface,.18)*stoneLight;
+              colour*=mix(vec3(1.),uTint,.3);
+              colour+=uAccent*bevel*(.025+incidence*.06);
             }
             alpha=1.0-smoothstep(0.48,1.0,uAge);
+            // Stone settles into the ground as a solid mass. Early alpha fade
+            // exposed every rear triangle and made it resemble hollow glass.
+            if((uKind>17.5&&uKind<19.5)||(uKind>20.5&&uKind<21.5)||(uKind>22.5&&uKind<23.5))
+              alpha=1.0-smoothstep(.94,1.0,uAge);
           }
           ${WARRIOR_GROUND_FRAGMENT}
           ${WARRIOR_STEEL_FRAGMENT}
@@ -264,6 +266,7 @@ export class SignatureCrests {
       mesh.material.uniforms.uPressureMap.value = warriorPressureTexture();
       mesh.material.uniforms.uBloodMap.value = warriorBloodTexture();
       mesh.material.uniforms.uSteelMap.value = warriorSteelTexture();
+      mesh.material.uniforms.uRockMap.value = warriorRockTexture();
       mesh.material.uniforms.uPressureGround.value = new Float32Array(25);
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'signatureCrest';
@@ -364,6 +367,7 @@ export class SignatureCrests {
     ground.fill(0);
     const ironGround =
       kind.startsWith('iron_') || kind === 'avatar_rupture' || kind === 'leap_rupture';
+    s.mesh.material.depthWrite = ironGround && kind !== 'iron_counter';
     const groundSpan = kind === 'leap_rupture' ? 12 : kind === 'avatar_rupture' ? 8 : 16;
     if (((s.pressure && kind !== 'bark_pressure') || ironGround) && this.groundY) {
       const cosine = Math.cos(angle),

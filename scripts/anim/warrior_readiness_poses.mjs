@@ -13,9 +13,10 @@ export function warriorReadinessPerformances(idle, bladePose, openArms) {
     [0.42, -0.08, 0.16],
     [-0.4, 0.07, 0.22],
   ]);
-  const wideLoad = bladePose(5, 0.13, [0, -0.015, -0.02], -26, -4);
-  const wideEdge = bladePose(5, 0.32, [0, -0.025, 0.035], 20, 2);
-  const wideFollow = bladePose(5, 0.5, [0, -0.02, 0.015], 29, 1);
+  const wideLoad = bladePose(5, 0.13, [0, -0.065, -0.035], -42, -8, -9);
+  const wideEdge = bladePose(5, 0.32, [0, -0.07, 0.065], 35, 13, 8);
+  const wideFollow = bladePose(5, 0.55, [0, -0.055, 0.045], 48, 10, 13);
+  const wideBrake = bladePose(5, 0.48, [0, -0.03, 0.012], 17, 3, -6);
   const battleLoad = bladePose(6, 0.1, [0, -0.012, 0], -8, -2);
   const battleLock = bladePose(6, 0.17, [0, -0.015, 0.01], -3, 0);
   const guardLoad = bladePose(6, 0.14, [0, -0.018, 0], 9, 2);
@@ -47,7 +48,9 @@ export function warriorReadinessPerformances(idle, bladePose, openArms) {
         [0.07, wideLoad],
         [0.15, wideEdge],
         [0.19, wideEdge],
+        [0.28, wideFollow],
         [0.36, wideFollow],
+        [0.48, wideBrake],
         [0.66, idle],
       ],
     ],
