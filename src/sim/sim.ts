@@ -291,7 +291,7 @@ import {
   sanitizeSlotInstanceOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
-import { isMergeableInstancePayload } from './item_instance_merge';
+import { isChargeBearingPayload } from './item_instance_merge';
 import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
@@ -3250,7 +3250,7 @@ export class Sim {
         if (
           !preservesMaterialCountOnLoad(slot) &&
           slot.instance &&
-          !isMergeableInstancePayload(slot.instance)
+          isChargeBearingPayload(slot.instance)
         )
           slot.count = 1;
         return normalizeLoadedMaterialSlot(slot);
