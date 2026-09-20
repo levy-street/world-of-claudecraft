@@ -85,7 +85,7 @@ describe('Shieldcrack receiving compression', () => {
       const hit = required(vi.mocked(host.flipbookAt).mock.calls.at(-1));
       expect(hit[0]).toBeCloseTo(actor.x - Math.sin(yaw) * surface);
       expect(hit[2]).toBeCloseTo(actor.z - Math.cos(yaw) * surface);
-      expect(hit[5]).toBe('contact_crush');
+      expect(hit.slice(3, 10)).toEqual([11.07, 0xb1d3e8, 'warrior_crush_flash', 5, 0.34, 0, 1.15]);
       expect(vi.mocked(required(host.crestAt)).mock.calls.at(-1)?.slice(0, 5)).toEqual([
         0.25, 1.4, 1.6, 1.4, 1.4,
       ]);

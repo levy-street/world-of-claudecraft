@@ -42,12 +42,13 @@ export function warriorSteelContact(
     x - dx * 0.24,
     y,
     z - dz * 0.24,
-    size * 0.72,
-    0xe9f3f8,
-    'contact_cut',
-    heavy ? 1.7 : 1.35,
-    heavy ? 0.065 : 0.045,
+    size * 1.55,
+    0xb5d5ed,
+    'warrior_steel_flash',
+    heavy ? 6 : 4.6,
+    heavy ? 0.4 : 0.32,
     roll,
+    1.35,
   );
   let count = 1;
   const spray =

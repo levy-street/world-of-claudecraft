@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
 import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
+import { WARRIOR_FLASH_GLSL, type WarriorFlashStyle, warriorFlashStyle } from './warrior_flash';
 
 // Camera-facing impact flipbooks, ported from the gallery's spawnFlipbook /
 // updateFlipbooks (arc_bolt_preview.js): one additive quad stepping an 8x8
@@ -49,14 +50,21 @@ export class ImpactFlipbooks {
         uTint: { value: new THREE.Color(1, 1, 1) },
         uHdr: { value: 1 },
         uInset: { value: 0.008 },
+        uWarriorStyle: { value: 0 },
+        uWarriorPhase: { value: 0 },
+        uWarriorFloor: { value: -1e6 },
+        uWarriorFloorBlend: { value: 0.85 },
       },
       vertexShader: `
         varying vec2 vUv;
+        varying float vWorldY;
         void main() {
           vUv = uv;
+          vWorldY = (modelMatrix * vec4(position, 1.0)).y;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: `
+        ${WARRIOR_FLASH_GLSL}
         uniform sampler2D uMap;
         uniform float uFrame;
         uniform float uOpacity;
@@ -64,6 +72,9 @@ export class ImpactFlipbooks {
         uniform float uHdr;
         uniform float uInset;
         varying vec2 vUv;
+        varying float vWorldY;
+        uniform float uWarriorFloor;
+        uniform float uWarriorFloorBlend;
         vec4 cell(float f) {
           f = clamp(f, 0.0, 63.0);
           float col = mod(f, 8.0);
@@ -72,11 +83,16 @@ export class ImpactFlipbooks {
           return texture2D(uMap, uv);
         }
         void main() {
-          float fi = floor(uFrame);
-          vec4 a = cell(fi);
-          vec4 b = cell(fi + 1.0);
-          vec4 s = mix(a, b, fract(uFrame));
-          gl_FragColor = vec4(s.rgb * uTint * uHdr, s.a) * uOpacity;
+          if (uWarriorStyle > .5) {
+            gl_FragColor = warriorFlash(vUv, uWarriorPhase, uTint, uHdr) * uOpacity;
+            gl_FragColor.rgb *= smoothstep(uWarriorFloor + .03, uWarriorFloor + uWarriorFloorBlend, vWorldY);
+          } else {
+            float fi = floor(uFrame);
+            vec4 a = cell(fi);
+            vec4 b = cell(fi + 1.0);
+            vec4 s = mix(a, b, fract(uFrame));
+            gl_FragColor = vec4(s.rgb * uTint * uHdr, s.a) * uOpacity;
+          }
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }`,
@@ -112,13 +128,19 @@ export class ImpactFlipbooks {
     size: number,
     colorHex: number,
     hdr: number,
-    style: FlipbookStyle | ContactSheet,
+    style: FlipbookStyle | ContactSheet | WarriorFlashStyle,
     duration = FLIP_DUR,
     rotation = 0,
     aspect = 1,
+    groundY = Number.NaN,
   ): void {
     if (this.disposed) return;
-    const texture = isContactSheet(style) ? contactTexture(style) : flipbookSheet(style);
+    const warrior = warriorFlashStyle(style);
+    const texture = warrior
+      ? contactTexture('contact_cut')
+      : isContactSheet(style)
+        ? contactTexture(style)
+        : flipbookSheet(style as FlipbookStyle);
     if (!texture) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
@@ -134,6 +156,14 @@ export class ImpactFlipbooks {
     (slot.mat.uniforms.uTint.value as THREE.Color).setHex(colorHex);
     slot.mat.uniforms.uHdr.value = hdr;
     slot.mat.uniforms.uFrame.value = 0;
+    slot.mat.uniforms.uWarriorStyle.value = warrior;
+    slot.mat.uniforms.uWarriorPhase.value = 0;
+    slot.mat.uniforms.uWarriorFloor.value = warrior && Number.isFinite(groundY) ? groundY : -1e6;
+    // Keep a low landing core bright while softening the wider body-height bursts.
+    slot.mat.uniforms.uWarriorFloorBlend.value =
+      warrior && Number.isFinite(groundY)
+        ? Math.min(0.85, Math.max(0.12, (y - groundY) * 1.5))
+        : 0.85;
     slot.mat.uniforms.uOpacity.value = 1;
     slot.mesh.position.set(x, y, z);
     slot.mesh.scale.setScalar(size * 0.65);
@@ -147,15 +177,19 @@ export class ImpactFlipbooks {
     for (const style of FLIPBOOK_STYLES) this.spawn(x, y, z, 1, 0xffffff, 1, style);
   }
 
-  update(dt: number, camQuat: THREE.Quaternion): void {
+  update(dt: number, camQuat: THREE.Quaternion, reducedMotion = false): void {
     if (this.disposed) return;
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
       const t = Math.min(1, slot.age / slot.duration);
       slot.mat.uniforms.uFrame.value = t * LAST_FRAME;
+      slot.mat.uniforms.uWarriorPhase.value = reducedMotion ? 0.32 : t;
       slot.mat.uniforms.uOpacity.value = t > 0.7 ? 1 - (t - 0.7) / 0.3 : 1;
-      const scale = slot.size * (0.65 + 0.55 * easeOutCubic(t));
+      const scale =
+        slot.size *
+        (0.65 +
+          0.55 * easeOutCubic(reducedMotion && slot.mat.uniforms.uWarriorStyle.value ? 0.32 : t));
       slot.mesh.scale.set(scale * slot.aspect, scale, scale);
       slot.mesh.quaternion.copy(camQuat);
       if (slot.rotation) slot.mesh.rotateZ(slot.rotation);

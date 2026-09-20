@@ -65,6 +65,7 @@ import {
 import type { SteelSweepRange } from './steel_sweep';
 import { WarriorAttention } from './warrior_attention';
 import { drawWarriorControlMark, evictDecorationForWarriorMark } from './warrior_control_marks';
+import { type WarriorFlashStyle, warriorFlashStyle } from './warrior_flash';
 import { drawBloodlettingRecovery } from './warrior_fury_feedback';
 import { WarriorFuryStates } from './warrior_fury_states';
 import {
@@ -1557,10 +1558,15 @@ export class AbilityVfxFx implements SequencerHost {
       size,
       colorHex,
       hdr * this.intensity(),
-      isContactSheet(sheet) ? sheet : asFlipbookStyle(sheet),
+      warriorFlashStyle(sheet)
+        ? (sheet as WarriorFlashStyle)
+        : isContactSheet(sheet)
+          ? sheet
+          : asFlipbookStyle(sheet),
       duration,
       rotation,
       aspect,
+      warriorFlashStyle(sheet) ? this.groundY(x, z) : undefined,
     );
   }
 
@@ -2650,7 +2656,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.baked.update(dt, this.camera.quaternion, reducedMotion);
     this.fragments.update(dt, reducedMotion);
     this.rings.update(dt, this.camera.quaternion);
-    this.flipbooks.update(dt, this.camera.quaternion);
+    this.flipbooks.update(dt, this.camera.quaternion, reducedMotion);
     this.decals.update(dt);
     this.pillars.update(dt);
     this.shells.update(dt, this.time, this.frame, this.anchor);

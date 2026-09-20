@@ -192,9 +192,9 @@ describe('Battlecraft steel receiving contacts', () => {
         id,
         0,
       );
-      expect(vi.mocked(host.flipbookAt).mock.calls.some((call) => call[5] === 'contact_cut')).toBe(
-        true,
-      );
+      expect(
+        vi.mocked(host.flipbookAt).mock.calls.some((call) => call[5] === 'warrior_steel_flash'),
+      ).toBe(true);
       expect(vi.mocked(host.pathRibbon).mock.calls.length).toBeGreaterThan(0);
     }
   });
@@ -222,7 +222,7 @@ describe('Battlecraft steel receiving contacts', () => {
       const { host } = fixture();
       draw(host, slot(id));
       const sprite = required(
-        vi.mocked(host.flipbookAt).mock.calls.find((call) => call[5] === 'contact_cut'),
+        vi.mocked(host.flipbookAt).mock.calls.find((call) => call[5] === 'warrior_steel_flash'),
       );
       return { id, size: sprite[3], brightness: sprite[6] };
     });

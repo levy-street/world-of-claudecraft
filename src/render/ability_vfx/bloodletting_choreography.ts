@@ -33,11 +33,11 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
     at.x - dx * 0.18,
     at.y,
     at.z - dz * 0.18,
-    3.4,
-    0xea7078,
-    'contact_cut',
-    1.15,
-    0.045,
+    10.4,
+    0xff2345,
+    'warrior_blood_flash',
+    5,
+    0.32,
     roll,
   );
   const sculpted =
@@ -136,7 +136,7 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
     host.contact(slot.casterId, slot.targetId, 'physical', profile.force * 1.45, slot.abilityId, 0);
     count++;
   }
-  host.pulseLight(slot.targetId, slot.spec.palette, 1.4, 0.055, 3);
+  host.pulseLight(slot.targetId, slot.spec.palette, 3, 0.15, 5);
   if (primary) host.shakeAt(at.x, at.y, at.z, 0.2, true);
   host.countPrimitive(slot.abilityId, count + 1);
   return true;

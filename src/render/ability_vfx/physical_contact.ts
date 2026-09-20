@@ -1,6 +1,7 @@
 import { meleeContactPoint, meleeImpactProfile } from '../melee_impact_core';
 import { physicalContactSheet } from './physical_choreography_core';
 import type { SeqSlot, SequencerHost } from './sequencer';
+import { warriorFallbackFlash } from './warrior_flash';
 
 const origin = { x: 0, y: 0, z: 0 };
 const point = { x: 0, y: 0, z: 0 };
@@ -24,17 +25,19 @@ export function physicalContact(
   )
     return 0;
   const crescendo = 1 + beat * 0.13;
+  const warrior = warriorFallbackFlash(slot.abilityId);
   const size = (1.05 + p.weight * 0.75) * crescendo;
   // The short sheet crosses the contact plane without claiming a damage radius.
   host.flipbookAt(
     x,
     y,
     z,
-    size,
-    p.material === 'blood' || p.material === 'venom' ? slot.color : slot.accent,
-    sheet,
-    1.5 + p.weight * 0.3,
-    0.23,
+    warrior?.size ?? size,
+    warrior?.colour ??
+      (p.material === 'blood' || p.material === 'venom' ? slot.color : slot.accent),
+    warrior?.style ?? sheet,
+    warrior?.hdr ?? 1.5 + p.weight * 0.3,
+    warrior ? 0.3 : 0.23,
     (beat % 2 ? -1 : 1) * p.tilt * 0.6,
     sheet === 'contact_cut' ? 1.15 : sheet === 'contact_pierce' ? 0.85 : 1,
   );

@@ -59,12 +59,13 @@ export function harvestBeat(
     at.x - dx * 0.18,
     at.y,
     at.z - dz * 0.18,
-    detonation ? 5.4 : final ? 3.8 : beat === 1 ? 2.9 : 2.5,
-    final ? 0xffb6ad : 0xea7078,
-    'contact_cut',
-    final ? 1.25 : 1.05,
-    final ? 0.055 : 0.04,
+    detonation ? 15 : final ? 3.8 : beat === 1 ? 2.9 : 2.5,
+    detonation ? 0xff193e : final ? 0xffb6ad : 0xea7078,
+    detonation ? 'warrior_blood_flash' : 'contact_cut',
+    detonation ? 6.4 : final ? 1.25 : 1.05,
+    detonation ? 0.42 : final ? 0.055 : 0.04,
     roll,
+    detonation ? 1.15 : 1,
   );
   count++;
   // The broad spray starts at its centred wound pivot. The wider world-space

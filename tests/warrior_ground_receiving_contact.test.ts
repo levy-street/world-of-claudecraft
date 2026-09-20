@@ -119,10 +119,12 @@ it('Quaking Blow has a short larger compression followed by one dark body seam a
   drawWarriorAreaContact(h.host, 'thunder_clap', 1, 2, 1, 0);
   const flash = vi.mocked(h.host.flipbookAt).mock.calls[0];
   const path = vi.mocked(h.host.pathRibbon).mock.calls[0];
-  expect(flash[3]).toBe(5.8);
-  expect(flash[5]).toBe('contact_crush');
-  expect(flash[7]).toBe(0.07);
-  expect(flash[9]).toBe(0.68);
+  expect(flash[3]).toBe(11);
+  expect(flash[4]).toBe(0xc1d8e7);
+  expect(flash[5]).toBe('warrior_crush_flash');
+  expect(flash[6]).toBe(4.5);
+  expect(flash[7]).toBe(0.32);
+  expect(flash[9]).toBe(1.2);
   expect(path.slice(0, 3)).toEqual([0x334650, 0.34, 0.2]);
   const points = sample(path[3]);
   expect(Math.max(...points.map((p) => p.x)) - Math.min(...points.map((p) => p.x))).toBeLessThan(2);
@@ -151,11 +153,11 @@ it.each(['heroic_leap'])(
       0,
       1,
       3,
-      5.2,
-      0xc4c9c9,
-      'contact_crush',
-      1.7,
-      0.21,
+      10,
+      0xc1d8e7,
+      'warrior_crush_flash',
+      4.5,
+      0.32,
       0.3,
       1,
     );
@@ -183,13 +185,13 @@ it('Faultline delivers the larger lower-body compression without replaying its g
     0,
     1,
     2.74,
-    7.8,
-    0xe1eaf0,
-    'contact_crush',
-    1.7,
-    0.085,
+    13,
+    0xc1d8e7,
+    'warrior_crush_flash',
+    5.6,
+    0.38,
     0,
-    0.82,
+    1.3,
   );
   expect(h.calls.pathRibbon.mock.calls[0].slice(0, 3)).toEqual([0x334650, 0.46, 0.2]);
   expect(h.calls.fragmentsAt).toHaveBeenCalledWith(

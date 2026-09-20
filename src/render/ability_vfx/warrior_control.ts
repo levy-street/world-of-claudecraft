@@ -105,7 +105,7 @@ export function drawWarriorControlSuccess(
   at.x -= dx * surface;
   at.z -= dz * surface;
   if (armor) {
-    host.flipbookAt(at.x, at.y, at.z, 3.3, 0xdce7ef, 'contact_cut', 1.7, 0.14, 0.42, 0.65);
+    host.flipbookAt(at.x, at.y, at.z, 7.2, 0xb5d5ed, 'warrior_steel_flash', 3.7, 0.27, 0.42, 0.9);
     for (const side of [-1, 1])
       host.fragmentsAt?.(
         'metal_splinter',
@@ -122,7 +122,7 @@ export function drawWarriorControlSuccess(
   } else {
     // A compact jaw compression earns its fractured spell core only after
     // the real lockout. No blood, flinch or extra stun stars.
-    host.flipbookAt(at.x, at.y, at.z, 3.2, 0xe3eaf0, 'contact_crush', 1.8, 0.13, 0, 0.56);
+    host.flipbookAt(at.x, at.y, at.z, 7, 0xb1d3e8, 'warrior_crush_flash', 4.2, 0.25, 0, 0.85);
     for (const side of [-1, 1])
       host.pathRibbon(
         side < 0 ? 0x8fa9bc : 0xd8e5ed,

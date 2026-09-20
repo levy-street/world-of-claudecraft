@@ -70,11 +70,11 @@ it.each([0, 1, 2])(
         12,
         floor + 0.12,
         -5,
-        5.5,
-        0xd8d6cf,
-        'contact_crush',
-        1.6,
-        0.13,
+        9,
+        0xc1d8e7,
+        'warrior_crush_flash',
+        4.5,
+        0.3,
         0,
         1.8,
       );
@@ -92,7 +92,7 @@ it.each([3, 9])('scales one ground catch with the actual %s-yard landing footpri
   const f = host();
   drawWarriorLeapLanding(f.subject, -8, 11, radius, 0);
   expect(f.fx.flipbookAt).toHaveBeenCalledTimes(1);
-  expect(f.fx.flipbookAt.mock.calls[0][3]).toBeCloseTo((5.5 * radius) / 6);
+  expect(f.fx.flipbookAt.mock.calls[0][3]).toBeCloseTo((9 * radius) / 6);
   expect(f.fx.decalXZ.mock.calls[0][2]).toBe(radius);
   expect(f.paths).toHaveLength(8);
   for (const path of f.paths) {

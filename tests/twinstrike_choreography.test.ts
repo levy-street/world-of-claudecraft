@@ -101,9 +101,9 @@ it('shares Red Harvest blood, keeps both opposed sprays, and clears each contact
   expect(sprays[0][12]).toBeLessThan(0);
   expect(sprays[1][12]).toBeGreaterThan(0);
   expect(sprays.every((call) => call[7]! + call[8]! <= 0.2)).toBe(true);
-  expect(vi.mocked(host.flipbookAt).mock.calls.map((call) => call[5])).toEqual([
-    'contact_cut',
-    'contact_cut',
+  expect(vi.mocked(host.flipbookAt).mock.calls.map((call) => call.slice(3, 9))).toEqual([
+    [8.8, 0xff2345, 'warrior_blood_flash', 4.2, 0.28, -0.68],
+    [10.2, 0xff2345, 'warrior_blood_flash', 5, 0.32, 0.62],
   ]);
 });
 

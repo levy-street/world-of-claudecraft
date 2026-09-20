@@ -121,7 +121,7 @@ export function drawWarriorLeapLanding(
   }
   // The touchdown is a compressed physical catch. Dust and whole slabs own
   // the release; a chest-shaped power plume does not belong under the boots.
-  host.flipbookAt(x, floor + 0.12, z, 5.5 * scale, 0xd8d6cf, 'contact_crush', 1.6, 0.13, 0, 1.8);
+  host.flipbookAt(x, floor + 0.12, z, 9 * scale, 0xc1d8e7, 'warrior_crush_flash', 4.5, 0.3, 0, 1.8);
   host.shakeAt(x, floor, z, 0.24, true);
   return count + 1;
 }

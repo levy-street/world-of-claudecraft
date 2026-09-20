@@ -79,6 +79,7 @@ export function drawWarriorHammerContact(
       impact,
       0.085,
       1.3,
+      'warrior_storm_flash',
     );
     if (
       host.bakedAt?.(
@@ -126,7 +127,7 @@ export function drawWarriorHammerContact(
       abilityId: 'storm_bolt',
       sample: WARRIOR_CONTROL_AUDIO.storm_bolt.impacts[0],
     });
-  host.pulseLight(targetId, 'physical', 0.85, 0.055, 2.5);
+  host.pulseLight(targetId, 'frost', outcome === 1 ? 3.6 : 0.85, outcome === 1 ? 0.18 : 0.055, 6);
   host.countPrimitive('storm_bolt', primitives + (tier === 0 ? 1 : 0));
   return true;
 }

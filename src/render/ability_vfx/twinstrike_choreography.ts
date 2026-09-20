@@ -46,11 +46,11 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     at.x - dx * 0.18,
     at.y,
     at.z - dz * 0.18,
-    reverse ? 3.1 : 2.6,
-    0xea7078,
-    'contact_cut',
-    1.1,
-    0.04,
+    reverse ? 10.2 : 8.8,
+    0xff2345,
+    'warrior_blood_flash',
+    reverse ? 5 : 4.2,
+    reverse ? 0.32 : 0.28,
     roll,
   );
   count++;
@@ -165,7 +165,7 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     archetype: slot.spec.archetype,
     abilityId: slot.abilityId,
   });
-  host.pulseLight(slot.targetId, slot.spec.palette, reverse ? 1.6 : 1.1, 0.055, 3);
+  host.pulseLight(slot.targetId, slot.spec.palette, reverse ? 3.2 : 2.6, 0.14, 5);
   if (primary) host.shakeAt(at.x, at.y, at.z, reverse ? 0.26 : 0.18, true);
   host.countPrimitive(slot.abilityId, count + 3);
   return true;

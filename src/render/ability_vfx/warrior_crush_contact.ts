@@ -1,4 +1,5 @@
 import type { SeqPoint, SequencerHost } from './sequencer';
+import type { WarriorFlashStyle } from './warrior_flash';
 
 /** A short compression mark sits on the receiving surface. Unequal creases
  * collapse toward the impact, while the bright material catch clears first. */
@@ -13,6 +14,7 @@ export function warriorCrushContact(
   surfaceAt?: SeqPoint,
   flashLife = 0.075,
   creaseScale = 1,
+  flashStyle: WarriorFlashStyle = 'warrior_crush_flash',
 ): number {
   const body = { x: 0, y: 0, z: 0 };
   const base = host.anchorOf(targetId, 0, body);
@@ -32,13 +34,13 @@ export function warriorCrushContact(
     at.x - dx * surface,
     at.y,
     at.z - dz * surface,
-    size,
-    0xe1eaf0,
-    'contact_crush',
-    1.9,
-    flashLife,
+    size * 1.35,
+    flashStyle === 'warrior_storm_flash' ? 0x40bfff : 0xb1d3e8,
+    flashStyle,
+    flashStyle === 'warrior_storm_flash' ? 6.2 : 5,
+    Math.max(0.34, flashLife),
     0,
-    0.68,
+    1.15,
   );
   let count = 1;
   for (let crease = 0; crease < (tier > 0 ? 1 : 3); crease++) {

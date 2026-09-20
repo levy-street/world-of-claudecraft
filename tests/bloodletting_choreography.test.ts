@@ -137,10 +137,13 @@ it.each([0, 1])('retains the shared blood spray and wound on quality tier %s', (
   expect(spray[7]).toBe(0.23);
   expect(spray[8]).toBe(0);
   expect(spray[12]).toBe(-0.74);
-  expect(vi.mocked(host.flipbookAt).mock.calls[0].slice(5, 8)).toEqual([
-    'contact_cut',
-    1.15,
-    0.045,
+  expect(vi.mocked(host.flipbookAt).mock.calls[0].slice(3, 9)).toEqual([
+    10.4,
+    0xff2345,
+    'warrior_blood_flash',
+    5,
+    0.32,
+    -0.74,
   ]);
   expect(vi.mocked(host.pathRibbon).mock.calls.every((call) => call[9] === true)).toBe(true);
   expect(host.contact).toHaveBeenCalledTimes(1);

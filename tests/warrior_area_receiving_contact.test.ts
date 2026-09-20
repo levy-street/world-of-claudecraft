@@ -3,9 +3,14 @@ import { expect, it, vi } from 'vitest';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';
 import { drawWarriorAreaContact } from '../src/render/ability_vfx/warrior_area';
 
-it.each(['cleave', 'whirlwind', 'bladestorm', 'revenge'])(
+it.each([
+  ['cleave', 10.5, 4.2, 0.28],
+  ['whirlwind', 10, 4.2, 0.28],
+  ['bladestorm', 12, 5.2, 0.32],
+  ['revenge', 10, 4.2, 0.28],
+] as const)(
   '%s retains its receiving seam on the moving enemy without replaying an area effect',
-  (id) => {
+  (id, flashSize, flashHdr, flashDuration) => {
     const target = { x: 0, y: 1, z: 3 };
     let visible = true,
       yaw = 0;
@@ -44,7 +49,14 @@ it.each(['cleave', 'whirlwind', 'bladestorm', 'revenge'])(
     expect(host.contact).toHaveBeenCalledTimes(1);
     const flash = vi.mocked(host.flipbookAt).mock.calls[0];
     expect(flash[2]).toBeLessThan(3);
-    expect(flash[7]).toBeLessThanOrEqual(0.07);
+    expect(flash.slice(3, 8)).toEqual([
+      flashSize,
+      0xb5d5ed,
+      'warrior_steel_flash',
+      flashHdr,
+      flashDuration,
+    ]);
+    expect(flash[9]).toBe(1.3);
     const translated = points.map((p) => p.clone());
     yaw = Math.PI / 2;
     expect(fill(points)).toBe(25);

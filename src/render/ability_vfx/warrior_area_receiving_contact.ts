@@ -37,12 +37,13 @@ export function drawWarriorAreaReceivingContact(
     x,
     y,
     z,
-    echo ? 4.2 : counter || gyre ? 3.8 : heavy ? 4.6 : sweep ? 3.7 : 3.1,
-    0xeaf4fa,
-    'contact_cut',
-    heavy ? 2.1 : 1.8,
-    0.065,
+    echo ? 9 : heavy ? 12 : counter || gyre ? 10 : sweep ? 10.5 : 8,
+    0xb5d5ed,
+    'warrior_steel_flash',
+    heavy ? 5.2 : 4.2,
+    heavy ? 0.32 : 0.28,
     profile.angle,
+    1.3,
   );
   let count = 1;
   const sprayed =

@@ -326,9 +326,12 @@ it.each([0, 1])(
     surface.forEach((coordinate, i) => {
       expect(flash[i]).toBeCloseTo(coordinate);
     });
-    expect(flash[5]).toBe('contact_crush');
-    expect(flash[3]).toBe(10.2);
-    expect(flash[7]).toBe(0.085);
+    expect(flash[5]).toBe('warrior_storm_flash');
+    expect(flash[3]).toBe(13.77);
+    expect(flash[4]).toBe(0x40bfff);
+    expect(flash[6]).toBe(6.2);
+    expect(flash[7]).toBe(0.34);
+    expect(flash[9]).toBe(1.15);
     expect(bakedAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
     expect(bakedAt.mock.calls[0][4]).toBe(16.4);
     expect(fragmentsAt.mock.calls[0].slice(1, 4)).toEqual(flash.slice(0, 3));
