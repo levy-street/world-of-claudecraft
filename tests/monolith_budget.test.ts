@@ -1804,7 +1804,15 @@ const MONOLITHS: MonolithRow[] = [
     // server/guild_board_db.ts beside the new officer-roster read. Merged with
     // the DEEDS_SCHEMA / ACCOUNT_LEDGER_SCHEMA move above; exact merged count,
     // zero slack.
-    ceiling: 4641,
+    // The numbered appearance-redesign grants (PR #3927) moved the reroll
+    // UPDATE to server/appearance_reroll_db.ts beside the grant column's
+    // schema (the pool-as-parameter realm_builder_db shape); the rule itself
+    // is pure in server/appearance_reroll_grants.ts. What remains here is the
+    // schema import, the one apply line, and the row field. Re-pinned at the
+    // release/v0.44.0 sync to the exact merged count (two unused imports the
+    // scoped lint surfaced, CharacterSaveFence and recordCharacterCreation,
+    // dropped in the same sync), zero slack.
+    ceiling: 4429,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
