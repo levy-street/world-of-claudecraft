@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { ENTRY_HEARTBEAT_MS } from '../src/game/entry_crash_guard';
 import {
   checkpointActiveEntryDiagnostics,
   createEntryDiagnosticsController,
@@ -8,7 +9,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from '../src/game/entry_diagnostics';
 
-function harness() {
+function harness(opts: { heartbeat?: boolean; hidden?: () => boolean } = {}) {
   let wallNow = 1_000;
   const events: string[] = [];
   const logged: string[] = [];
@@ -16,6 +17,7 @@ function harness() {
     start: vi.fn((preset) => events.push(`start:${preset}`)),
     checkpoint: vi.fn((checkpoint) => events.push(checkpoint)),
     clear: vi.fn(() => events.push('clear')),
+    ...(opts.heartbeat ? { heartbeat: vi.fn((now: number) => events.push(`alive:${now}`)) } : {}),
   };
   const controller = createEntryDiagnosticsController({
     baseSnapshot: () => ({ phase: 'base' }),
@@ -23,6 +25,7 @@ function harness() {
     persistence,
     wallNow: () => wallNow,
     log: vi.fn((message: string) => logged.push(message)),
+    isHidden: opts.hidden ?? (() => false),
   });
   return {
     controller,
@@ -223,6 +226,97 @@ describe('entry diagnostics controller', () => {
       'start:4',
       'runtime-stable',
     ]);
+  });
+
+  it('heartbeats from the frame loop at the cadence, before and after stable alike', () => {
+    const { controller, events, setWallNow } = harness({ heartbeat: true });
+    controller.start(2);
+    setWallNow(5_000);
+    controller.renderedFrame(100); // first frame: immediate heartbeat
+    setWallNow(6_000);
+    controller.renderedFrame(2_000); // inside the cadence: no stamp
+    setWallNow(11_000);
+    controller.renderedFrame(100 + ENTRY_HEARTBEAT_MS); // cadence elapsed
+    controller.markStable();
+    setWallNow(30_000);
+    controller.renderedFrame(100 + ENTRY_HEARTBEAT_MS * 3); // still heartbeating after stable
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'alive:5000',
+      'first-frame',
+      'alive:11000',
+      'rendering',
+      'runtime-stable',
+      'alive:30000',
+    ]);
+  });
+
+  it('does not heartbeat while suspended, and re-stamps on foreground once the frame loop had run', () => {
+    const { controller, events, setWallNow } = harness({ heartbeat: true });
+    controller.start(2);
+    setWallNow(2_000);
+    controller.renderedFrame(50);
+    suspendActiveEntryDiagnostics();
+    setWallNow(60_000);
+    controller.renderedFrame(50 + ENTRY_HEARTBEAT_MS * 10); // hidden: nothing persists
+    setWallNow(61_000);
+    resumeActiveEntryDiagnostics();
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'alive:2000',
+      'first-frame',
+      'clear',
+      'start:2',
+      'first-frame',
+      'alive:61000',
+    ]);
+  });
+
+  it('does not claim liveness on foreground when no frame had ever rendered', () => {
+    const { controller, events } = harness({ heartbeat: true });
+    controller.start(2);
+    controller.checkpoint('assets-await');
+    suspendActiveEntryDiagnostics();
+    resumeActiveEntryDiagnostics();
+    expect(events).toEqual([
+      'start:2',
+      'scene-build-start',
+      'assets-await',
+      'clear',
+      'start:2',
+      'assets-await',
+    ]);
+  });
+
+  it('arms without persisting when the boot starts hidden, then persists on the first foreground', () => {
+    let hidden = true;
+    const { controller, events, logged } = harness({ heartbeat: true, hidden: () => hidden });
+    controller.start(3);
+    controller.checkpoint('assets-await');
+    controller.renderedFrame(100);
+    expect(events).toEqual([]);
+    expect(logged.at(-1)).toContain('started hidden');
+    hidden = false;
+    resumeActiveEntryDiagnostics();
+    expect(events).toEqual(['start:3', 'scene-build-start']);
+    controller.renderedFrame(200);
+    expect(events.slice(2)).toEqual(['alive:1000', 'first-frame']);
+  });
+
+  it('keeps heartbeating while a sticky dialog checkpoint is held', () => {
+    // The reported iOS shape: the More dialog is open (sticky, so routine checkpoints
+    // are refused) for minutes before the reload. Liveness must keep flowing anyway,
+    // or the verdict would read every such session as backgrounded.
+    const { controller, events, setWallNow } = harness({ heartbeat: true });
+    controller.start(2);
+    controller.renderedFrame(100);
+    controller.markStable();
+    checkpointActiveEntryDiagnostics('mobile-more-open');
+    setWallNow(90_000);
+    controller.renderedFrame(100 + ENTRY_HEARTBEAT_MS * 20);
+    expect(events.slice(-2)).toEqual(['mobile-more-open', 'alive:90000']);
   });
 
   it('uses wall time for persisted checkpoints rather than animation time', () => {
