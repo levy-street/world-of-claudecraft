@@ -1,0 +1,13 @@
+# One-shot self-update unit. Pair with woc-autoupdate.timer for scheduled
+# updates, or trigger via the admin API. Adjust WOC_HOME / WOC_SERVICE.
+[Unit]
+Description=World of ClaudeCraft self-update
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+Environment=WOC_WARN_SECONDS=60
+Environment=WOC_BRANCH=main
+WorkingDirectory=/opt/world-of-claudecraft
+ExecStart=/usr/bin/env bash scripts/admin/update.sh
