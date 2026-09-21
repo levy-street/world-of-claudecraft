@@ -384,6 +384,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/feast_tooltip_view.ts',
   'src/ui/stack_size_tooltip_view.ts',
   'src/ui/hud/professions/craft_name_view.ts',
+  'src/ui/hud/professions/archetype_title_view.ts',
   'src/ui/hud/professions/cooking_catch_hint_view.ts',
   'src/ui/bag_instance_glyph_view.ts',
   'src/ui/item_instance_glyph_mark.ts',

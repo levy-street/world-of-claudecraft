@@ -1,4 +1,5 @@
 export * from './apex_recipe_view';
+export * from './archetype_title_view';
 export * from './commission_order_feedback';
 export * from './commission_order_view';
 export * from './commission_order_window';

@@ -184,8 +184,8 @@ function premiumMaterialUnits(meta: PlayerMeta, itemId?: string, signer?: string
  *  Builds a fresh two-player world on the pinned seed for grant-arithmetic
  *  tests. Unchanged from the pre-migration suite: every literal seed here
  *  keeps drawing exactly the same world-gen rng stream it always has. */
-function setup(seed = 11) {
-  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world: CORPSE_TEST_WORLD });
+function setup(seed = 11, world = CORPSE_TEST_WORLD) {
+  const sim = new Sim({ seed, playerClass: 'warrior', noPlayer: true, world });
   const internals = sim as unknown as SimInternals;
   const a = sim.addPlayer('warrior', 'Alpha');
   const b = sim.addPlayer('warrior', 'Bravo');
@@ -281,11 +281,12 @@ function grantCommand(
   components: string[] | undefined,
   opts: {
     seed?: number;
+    world?: WorldContent;
     corpseId?: number;
     arrange?: (rig: ReturnType<typeof setup>, corpse: Entity) => void;
   } = {},
 ) {
-  const rig = setup(opts.seed ?? 5);
+  const rig = setup(opts.seed ?? 5, opts.world);
   const { sim, internals, a } = rig;
   const meta = mustPlayer(internals, a);
   const template = MOBS[templateId];
@@ -2825,7 +2826,8 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
         for (let mask = 0; mask < 1 << tags.length; mask++) {
           const selected = tags.filter((_, i) => mask & (1 << i));
           const label = `${id} ${JSON.stringify(selected)}`;
-          const r = harvestAt(id, selected);
+          // This corpus checks grant invariants, not world-generation RNG.
+          const r = grantCommand(id, selected, { world: PUBLIC_TEST_WORLD });
           const results = r.events.filter(
             (e): e is Extract<typeof e, { type: 'harvestResult' }> => e.type === 'harvestResult',
           );
@@ -2890,7 +2892,7 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
               EXPECTED_FAMILY_ITEMS[family],
             );
           }
-          const r = harvestAt(id, selected);
+          const r = grantCommand(id, selected, { world: PUBLIC_TEST_WORLD });
           if (r.claimedBy === null) continue;
           extracted += expectedSet.length;
           expect(r.draws, `${label} draws`).toBe(2 * expectedSet.length);
