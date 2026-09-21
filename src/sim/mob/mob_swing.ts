@@ -815,8 +815,9 @@ export function runMobSwingAffixes(
   // `updateFearMovement` drives the panicked run — no new aura kind or hook.
   // Guarded on `hostile` (a friendly pet never fears the party) and on a player
   // target (mobs can't flee via this path). `diminishedCrowdControlDuration`
-  // returns the full duration for a mob source (DR is PvP-only), so the victim
-  // gets the authored fear length.
+  // returns the full duration for an unowned mob source (DR is PvP-only), so
+  // the victim gets the authored fear length; a player-owned mob resolves to
+  // its owner and rides that player's PvP DR chain instead.
   const dread = MOBS[mob.templateId]?.dread;
   if (
     dread &&
@@ -853,8 +854,9 @@ export function runMobSwingAffixes(
   // incap, not a hard lock. Unlike the player-cast version we deliberately do
   // NOT heal the victim to full on apply (a monster shouldn't restore its prey),
   // but keep the aura's inherent regen tick. Guarded on `hostile` + a player
-  // target; `diminishedCrowdControlDuration` returns the full duration for a
-  // mob source (DR is PvP-only).
+  // target; `diminishedCrowdControlDuration` returns the full duration for an
+  // unowned mob source (DR is PvP-only; a player-owned mob resolves to its
+  // owner and diminishes on that player's chain).
   const hex = MOBS[mob.templateId]?.polymorphHex;
   if (
     hex &&
