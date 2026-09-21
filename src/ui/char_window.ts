@@ -37,6 +37,7 @@ import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { currenciesTabHtml } from './hud/currencies';
+import { archetypeTitleText } from './hud/professions/archetype_title_view';
 import { craftNameText } from './hud/professions/craft_name_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
 import { buildGatheringProficiencyRows } from './hud/professions/gathering_view';
@@ -71,24 +72,6 @@ import { wornItemCellParts } from './worn_item_cell_view';
 const SLOT_EMPTY_TEXT_COLOR = 'var(--color-slot-empty-text)';
 const SLOT_EMPTY_BORDER_COLOR = 'var(--color-slot-empty-border)';
 
-// The ten pair-archetype title keys (issue 1130, pair-named under Professions
-// 2.0), one per canonical pair id (see src/sim/professions/archetype.ts
-// ARCHETYPE_PAIR_TARGETS and getArchetypeTitle: the title identifier IS the
-// pair id). Every player-visible string is a t() key, so this is a literal
-// id-to-key table, never a built string.
-const ARCHETYPE_PAIR_TITLE_KEYS: Record<string, TranslationKey> = {
-  'engineering+alchemy': 'hudChrome.archetypePair.engineering+alchemy',
-  'alchemy+cooking': 'hudChrome.archetypePair.alchemy+cooking',
-  'cooking+leatherworking': 'hudChrome.archetypePair.cooking+leatherworking',
-  'leatherworking+tailoring': 'hudChrome.archetypePair.leatherworking+tailoring',
-  'tailoring+inscription': 'hudChrome.archetypePair.tailoring+inscription',
-  'inscription+enchanting': 'hudChrome.archetypePair.inscription+enchanting',
-  'enchanting+jewelcrafting': 'hudChrome.archetypePair.enchanting+jewelcrafting',
-  'jewelcrafting+weaponcrafting': 'hudChrome.archetypePair.jewelcrafting+weaponcrafting',
-  'weaponcrafting+armorcrafting': 'hudChrome.archetypePair.weaponcrafting+armorcrafting',
-  'armorcrafting+engineering': 'hudChrome.archetypePair.armorcrafting+engineering',
-};
-
 const CHARACTER_SIDEBAR_LABEL_KEYS: Record<CharacterSidebarTab, TranslationKey> = {
   stats: 'hudChrome.charSidebar.character',
   progression: 'hudChrome.charSidebar.progression',
@@ -104,16 +87,7 @@ const charSidebarTabId = (id: CharacterSidebarTab): string => `char-sidebar-tab-
 // a pure core may not import a *_window module). Re-exported here so the
 // historical import sites (crafting window, identity card, quest dialog,
 // train window, professions window, hud) keep resolving unchanged.
-export { craftNameText };
-
-/** Localized text for the granted pair-archetype title (the input is the
- *  canonical pair id from IWorld `archetypeTitle`), or the "no title yet" copy
- *  when the player has not completed the zone-1 acceptance quest (or the id is
- *  somehow unrecognized). Exported for the view-model test. */
-export function archetypeTitleText(pairId: string | null): string {
-  const key = pairId !== null ? ARCHETYPE_PAIR_TITLE_KEYS[pairId] : undefined;
-  return t(key ?? 'hudChrome.archetypeTitle.none');
-}
+export { archetypeTitleText, craftNameText };
 
 /** Localized text for the hobby craft (issue 1294): a hobby id IS a craft id
  *  on the ring, so this renders the per-craft display name, or the "no hobby
