@@ -2332,7 +2332,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'character.takeOver': '接管',
   'character.inWorldHint': '已在世界中。请在别处登出，或接管会话。',
   'character.currentLocation': '当前位置：{zone}',
-  'character.lockouts': '锁定',
+  'character.lockouts': '锁定（{count}）',
   'character.lockoutRaids': '团队副本',
   'character.lockoutDungeons': '地下城',
   'character.lockoutWorldBosses': '世界首领',

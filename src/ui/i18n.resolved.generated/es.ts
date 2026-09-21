@@ -9943,7 +9943,7 @@ export const es: EnTranslations = {
     "takeOver": "Tomar control",
     "inWorldHint": "Ya está en el mundo. Cierra la sesión en otro lugar, o toma el control.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

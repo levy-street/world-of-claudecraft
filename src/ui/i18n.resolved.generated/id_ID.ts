@@ -9943,7 +9943,7 @@ export const id_ID: EnTranslations = {
     "takeOver": "Ambil Alih",
     "inWorldHint": "Sudah berada di dunia. Keluar di tempat lain, atau ambil alih.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

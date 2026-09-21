@@ -1303,7 +1303,11 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
     // the roster row hint markup call is inlined into its template and the
     // disclosure event isolation lives in src/ui/charselect_hints.ts.
-    ceiling: 11280,
+    // LOWERED 11280 -> 11276 at the PR 4137 review round: the roster row's
+    // click / Enter-Space / double-click wiring moved into wireCharselectRow
+    // (src/ui/charselect_hints.ts), which skips activations from inside the
+    // lockout disclosure instead of stopping propagation there.
+    ceiling: 11276,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

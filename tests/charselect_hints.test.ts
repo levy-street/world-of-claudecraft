@@ -10,9 +10,11 @@ import {
   charselectLockoutRows,
   charselectLockoutsHtml,
   charselectZoneLabel,
-  isolateLockoutDisclosure,
+  inLockoutDisclosure,
+  wireCharselectRow,
 } from '../src/ui/charselect_hints';
 import { zoneDisplayName } from '../src/ui/entity_i18n';
+import { esc } from '../src/ui/esc';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
 
 // A fixed wall clock for the countdowns (the roster passes Date.now() in main.ts).
@@ -159,8 +161,7 @@ describe('charselectLockoutsHtml', () => {
       NOW,
     );
     expect(html).toBe(
-      '<details class="char-lockout-hint"><summary class="char-lockout-label">Lockouts ' +
-        '<span class="char-lockout-count ui-num">3</span></summary>' +
+      '<details class="char-lockout-hint"><summary class="char-lockout-label">Lockouts (3)</summary>' +
         '<span class="char-lockout-group" data-kind="raid"><span class="char-lockout-group-name">Raids</span>' +
         '<span class="char-lockout-item" title="You are locked to Nythraxis Raid Arena. Unlocks in 2d 3h.">' +
         '<span class="char-lockout-name">Nythraxis Raid Arena</span> ' +
@@ -180,15 +181,24 @@ describe('charselectLockoutsHtml', () => {
 
   it('omits a group that has no locked entry', () => {
     setLanguage('en');
-    const html = charselectLockoutsHtml(
+    const bossOnly = charselectLockoutsHtml(
       { online: false, raidLockouts: { 'worldboss:thunzharr_waking_peak': NOW + HOUR } },
       NOW,
     );
-    expect(html).toContain('data-kind="worldBoss"');
-    expect(html).not.toContain('data-kind="raid"');
-    expect(html).not.toContain('data-kind="dungeon"');
-    expect(html).not.toContain('Raids');
-    expect(html).not.toContain('Dungeons');
+    expect(bossOnly).toContain('data-kind="worldBoss"');
+    expect(bossOnly).not.toContain('data-kind="raid"');
+    expect(bossOnly).not.toContain('data-kind="dungeon"');
+    expect(bossOnly).not.toContain('Raids');
+    expect(bossOnly).not.toContain('Dungeons');
+    // The other arm: a raid-only row omits the World bosses heading too.
+    const raidOnly = charselectLockoutsHtml(
+      { online: false, raidLockouts: { nythraxis_boss_arena: NOW + HOUR } },
+      NOW,
+    );
+    expect(raidOnly).toContain('data-kind="raid"');
+    expect(raidOnly).not.toContain('data-kind="worldBoss"');
+    expect(raidOnly).not.toContain('World bosses');
+    expect(raidOnly).toContain('Lockouts (1)');
   });
 
   it('renders nothing when no raid is locked', () => {
@@ -215,7 +225,7 @@ describe('charselectLockoutsHtml', () => {
         { online: false, raidLockouts: { nythraxis_boss_arena: NOW + HOUR } },
         NOW,
       );
-      expect(html).toContain(t('character.lockouts'));
+      expect(html).toContain(esc(t('character.lockouts', { count: '1' })));
       expect(html).not.toContain('Lockouts');
     } finally {
       setLanguage('en');
@@ -254,47 +264,56 @@ describe('charselectHintsHtml with lockouts', () => {
   });
 });
 
-describe('isolateLockoutDisclosure', () => {
-  type Listener = (e: { key?: string; stopPropagation(): void }) => void;
-  const fakeRow = (hasDisclosure: boolean) => {
-    const listeners = new Map<string, Listener>();
-    const row = {
-      queried: [] as string[],
-      querySelector(selector: string) {
-        row.queried.push(selector);
-        if (!hasDisclosure) return null;
-        return { addEventListener: (type: string, fn: Listener) => listeners.set(type, fn) };
-      },
+describe('wireCharselectRow', () => {
+  type Ev = { target: unknown; key?: string; preventDefault(): void };
+  const inside = { closest: (sel: string) => (sel === '.char-lockout-hint' ? {} : null) };
+  const outside = { closest: () => null };
+  const rig = () => {
+    const listeners = new Map<string, (e: Ev) => void>();
+    const log: string[] = [];
+    wireCharselectRow(
+      { addEventListener: (type, fn) => listeners.set(type, fn) },
+      { select: () => log.push('select'), enter: () => log.push('enter') },
+    );
+    const fire = (type: string, target: unknown, key?: string) => {
+      let prevented = false;
+      listeners.get(type)?.({ target, key, preventDefault: () => (prevented = true) });
+      return prevented;
     };
-    return { row, listeners };
-  };
-  const fire = (fn: Listener | undefined, key?: string) => {
-    let stopped = false;
-    fn?.({ key, stopPropagation: () => (stopped = true) });
-    return stopped;
+    return { listeners, log, fire };
   };
 
-  it('stops click, double click and Enter/Space at the disclosure', () => {
-    const { row, listeners } = fakeRow(true);
-    isolateLockoutDisclosure(row);
-    expect(row.queried).toEqual(['.char-lockout-hint']);
+  it('classifies an activation target by the disclosure it sits in', () => {
+    expect(inLockoutDisclosure(inside)).toBe(true);
+    expect(inLockoutDisclosure(outside)).toBe(false);
+    expect(inLockoutDisclosure(null)).toBe(false);
+    expect(inLockoutDisclosure('text-node-without-closest')).toBe(false);
+  });
+
+  it('selects on click and Enter/Space, selects then enters on double click', () => {
+    const { listeners, log, fire } = rig();
     expect([...listeners.keys()].sort()).toEqual(['click', 'dblclick', 'keydown']);
-    expect(fire(listeners.get('click'))).toBe(true);
-    expect(fire(listeners.get('dblclick'))).toBe(true);
-    expect(fire(listeners.get('keydown'), 'Enter')).toBe(true);
-    expect(fire(listeners.get('keydown'), ' ')).toBe(true);
+    fire('click', outside);
+    expect(fire('keydown', outside, 'Enter')).toBe(true);
+    expect(fire('keydown', outside, ' ')).toBe(true);
+    fire('dblclick', outside);
+    expect(log).toEqual(['select', 'select', 'select', 'select', 'enter']);
   });
 
-  it('lets every other key bubble on to the row', () => {
-    const { row, listeners } = fakeRow(true);
-    isolateLockoutDisclosure(row);
-    expect(fire(listeners.get('keydown'), 'Tab')).toBe(false);
-    expect(fire(listeners.get('keydown'), 'Escape')).toBe(false);
+  it('ignores every activation from inside the lockout disclosure, without swallowing it', () => {
+    const { log, fire } = rig();
+    fire('click', inside);
+    fire('dblclick', inside);
+    // Enter/Space must reach the summary's native toggle: no preventDefault.
+    expect(fire('keydown', inside, 'Enter')).toBe(false);
+    expect(fire('keydown', inside, ' ')).toBe(false);
+    expect(log).toEqual([]);
   });
 
-  it('is a no-op for a row with no lockouts', () => {
-    const { row, listeners } = fakeRow(false);
-    isolateLockoutDisclosure(row);
-    expect(listeners.size).toBe(0);
+  it('leaves other keys alone on the row itself', () => {
+    const { log, fire } = rig();
+    expect(fire('keydown', outside, 'Tab')).toBe(false);
+    expect(fire('keydown', outside, 'Escape')).toBe(false);
+    expect(log).toEqual([]);
   });
 });

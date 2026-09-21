@@ -92,6 +92,7 @@ export function charselectLockoutsHtml(c: CharselectHintSource, nowMs: number): 
   const rows = charselectLockoutRows(c, nowMs);
   if (rows.length === 0) return '';
   const count = formatNumber(rows.length, { maximumFractionDigits: 0, useGrouping: false });
+  const summary = t('character.lockouts', { count });
   const item = (r: CharselectLockoutRow) =>
     `<span class="char-lockout-item" title="${esc(
       t('hudChrome.raidLockout.lockedToast', { raid: r.name, time: r.time }),
@@ -101,36 +102,56 @@ export function charselectLockoutsHtml(c: CharselectHintSource, nowMs: number): 
     if (inKind.length === 0) return '';
     return `<span class="char-lockout-group" data-kind="${kind}"><span class="char-lockout-group-name">${esc(t(LOCKOUT_GROUP_KEY[kind]))}</span>${inKind.map(item).join('')}</span>`;
   }).join('');
-  return `<details class="char-lockout-hint"><summary class="char-lockout-label">${esc(t('character.lockouts'))} <span class="char-lockout-count ui-num">${esc(count)}</span></summary>${groups}</details>`;
+  return `<details class="char-lockout-hint"><summary class="char-lockout-label">${esc(summary)}</summary>${groups}</details>`;
 }
 
-/** The structural slice of a roster row this module wires: the row's own
- *  querySelector and the disclosure's addEventListener. Duck-typed so this
- *  module stays host-agnostic (no DOM globals; a test passes a fake). */
-export interface LockoutDisclosureRow {
-  querySelector(selector: string): {
-    addEventListener(type: string, listener: (e: LockoutDisclosureEvent) => void): void;
-  } | null;
-}
-export interface LockoutDisclosureEvent {
+/** The slice of a DOM event the row wiring reads. Duck-typed (with the row
+ *  host below) so this module stays host-agnostic: no DOM globals, and a test
+ *  passes fakes. */
+export interface CharselectRowEvent {
+  target: unknown;
   key?: string;
-  stopPropagation(): void;
+  preventDefault(): void;
+}
+export interface CharselectRowHost {
+  addEventListener(
+    type: 'click' | 'dblclick' | 'keydown',
+    listener: (e: CharselectRowEvent) => void,
+  ): void;
+}
+export interface CharselectRowActions {
+  /** Select the row: the stage, the Enter World button and the name label follow. */
+  select(): void;
+  /** Enter the world with the selected character (the double-click path). */
+  enter(): void;
 }
 
-/** The row's listeners select it on click and Enter/Space and enter the world
- *  on double click, and the disclosure sits inside the row. Stop those three
- *  events at the disclosure so toggling it (mouse or keyboard) never selects
- *  the character, never enters the world, and never has its native Enter/Space
- *  activation swallowed by the row's preventDefault. Every other key (Tab,
- *  Escape) still bubbles. A row without a disclosure is a no-op. */
-export function isolateLockoutDisclosure(row: LockoutDisclosureRow): void {
-  const disclosure = row.querySelector('.char-lockout-hint');
-  if (!disclosure) return;
-  const stop = (e: LockoutDisclosureEvent) => e.stopPropagation();
-  disclosure.addEventListener('click', stop);
-  disclosure.addEventListener('dblclick', stop);
-  disclosure.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+/** True when an activation landed inside the lockout disclosure: its summary
+ *  toggles natively, and a toggle must neither select the row, nor enter the
+ *  world, nor have its native Enter/Space activation swallowed. */
+export function inLockoutDisclosure(target: unknown): boolean {
+  const el = target as { closest?: (selector: string) => unknown } | null;
+  return Boolean(el?.closest?.('.char-lockout-hint'));
+}
+
+/** The roster row's own activations: click and Enter/Space select, double
+ *  click selects then enters. Each handler returns early for an event from
+ *  inside the lockout disclosure instead of stopping propagation there, so the
+ *  document-level listeners (the realm and sort dropdowns' outside-click
+ *  closers) still see every click on the row. */
+export function wireCharselectRow(row: CharselectRowHost, actions: CharselectRowActions): void {
+  row.addEventListener('click', (e) => {
+    if (!inLockoutDisclosure(e.target)) actions.select();
+  });
+  row.addEventListener('keydown', (e) => {
+    if ((e.key !== 'Enter' && e.key !== ' ') || inLockoutDisclosure(e.target)) return;
+    e.preventDefault();
+    actions.select();
+  });
+  row.addEventListener('dblclick', (e) => {
+    if (inLockoutDisclosure(e.target)) return;
+    actions.select();
+    actions.enter();
   });
 }
 

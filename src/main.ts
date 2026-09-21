@@ -452,7 +452,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
-import { charselectHintsHtml, isolateLockoutDisclosure } from './ui/charselect_hints';
+import { charselectHintsHtml, wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -6706,7 +6706,6 @@ async function refreshCharacters(): Promise<void> {
               ? `<span class="char-actions"><button class="btn take-over-btn" title="${esc(t('character.takeOverConfirm'))}" aria-label="${esc(t('character.takeOverConfirm'))}">${esc(t('character.takeOver'))}</button>${rerollBtn}${deleteCharButtonHtml(true)}</span>`
               : `<span class="char-actions"><button class="btn enter-world-btn">${esc(t('auth.enterWorld'))}</button>${rerollBtn}${deleteCharButtonHtml(false)}</span>`
         }`;
-      isolateLockoutDisclosure(row);
 
       row.querySelector('.delete-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -6763,13 +6762,6 @@ async function refreshCharacters(): Promise<void> {
         setCharselectPreviewName(c.name);
       };
 
-      row.addEventListener('click', selectRow);
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          selectRow();
-        }
-      });
       row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         // Captured before selectRow(), whose own close(false) call (on
@@ -6783,22 +6775,26 @@ async function refreshCharacters(): Promise<void> {
         selectRow();
         redesignEditor.open(c, opener);
       });
-      // Double-click a row to jump straight into the world (classic-select
-      // muscle memory). It routes through the shared desktop Enter World button
-      // so entry owns its loading state; the button only exists in the docked
-      // desktop layout, so this is a no-op on mobile (where the per-row button
-      // is a single tap away). Entry is gated on that shared button being visible
-      // AND enabled: for a forced-rename selection it is disabled (so the rename
-      // input/button on such a row cannot trigger entry), and Delete opens a
-      // full-screen modal on the first click, so the second click retargets and
-      // the browser synthesises no dblclick. Keep entry gated on the shared
-      // button's enabled state for any per-row action added later.
-      row.addEventListener('dblclick', () => {
-        selectRow();
-        const enterBtn = document.getElementById(
-          'btn-charselect-enter',
-        ) as HTMLButtonElement | null;
-        if (enterBtn && enterBtn.offsetParent !== null && !enterBtn.disabled) enterBtn.click();
+      // Click or Enter/Space selects the row; double-click jumps straight into
+      // the world (classic-select muscle memory) through the shared desktop
+      // Enter World button so entry owns its loading state (the button only
+      // exists in the docked desktop layout, so this is a no-op on mobile, where
+      // the per-row button is a single tap away). Entry is gated on that shared
+      // button being visible AND enabled: for a forced-rename selection it is
+      // disabled (so the rename input/button on such a row cannot trigger entry),
+      // and Delete opens a full-screen modal on the first click, so the second
+      // click retargets and the browser synthesises no dblclick. Keep entry gated
+      // on the shared button's enabled state for any per-row action added later.
+      // The wiring (src/ui/charselect_hints.ts) skips activations that landed
+      // inside the lockout disclosure, whose summary toggles natively.
+      wireCharselectRow(row, {
+        select: selectRow,
+        enter: () => {
+          const enterBtn = document.getElementById(
+            'btn-charselect-enter',
+          ) as HTMLButtonElement | null;
+          if (enterBtn && enterBtn.offsetParent !== null && !enterBtn.disabled) enterBtn.click();
+        },
       });
 
       listEl.appendChild(row);

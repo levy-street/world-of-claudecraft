@@ -249,10 +249,10 @@ export const shellStrings = {
       inWorldHint: 'Already in world. Log out elsewhere, or take over.',
       // The roster row's zone line ({zone} = the localized zone name).
       currentLocation: 'Current location: {zone}',
-      // Summary of the roster row's collapsible lockout list, then its three
-      // group headings; each locked entry inside reads "<name> <countdown>"
-      // (hudChrome.raidLockout templates).
-      lockouts: 'Lockouts',
+      // Summary of the roster row's collapsible lockout list ({count} = how
+      // many are locked), then its three group headings; each locked entry
+      // inside reads "<name> <countdown>" (hudChrome.raidLockout templates).
+      lockouts: 'Lockouts ({count})',
       lockoutRaids: 'Raids',
       lockoutDungeons: 'Dungeons',
       lockoutWorldBosses: 'World bosses',

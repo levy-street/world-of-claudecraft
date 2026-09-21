@@ -5,6 +5,7 @@
 // quietly: the sub-minute tail never reads "0m", and the digits stay
 // ungrouped however long the lockout.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { setLanguage } from '../src/ui/i18n';
 import { formatLockoutDuration, raidLockoutDisplayName } from '../src/ui/raid_lockout_format';
@@ -56,5 +57,16 @@ describe('raidLockoutDisplayName', () => {
     expect(raidLockoutDisplayName('worldboss:thunzharr_waking_peak')).toBe(
       'Thunzharr, the Waking Peak',
     );
+  });
+});
+
+// The one consumer no unit test drives: the minimap badge panel's raidName
+// arm in hud.ts must be THIS resolver (tests/raid_lockout_view.test.ts injects
+// its own fake, so a drift there would fail nothing). Pinned by source.
+describe('raidLockoutDisplayName wiring', () => {
+  it('is the minimap badge panel resolver in hud.ts', () => {
+    const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+    expect(hud).toContain('raidName: raidLockoutDisplayName,');
+    expect(hud).not.toContain('worldBossIdFromLockout');
   });
 });

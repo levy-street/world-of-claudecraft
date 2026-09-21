@@ -9943,7 +9943,7 @@ export const ja_JP: EnTranslations = {
     "takeOver": "引き継ぐ",
     "inWorldHint": "すでに世界にいます。別の場所からログアウトするか、引き継いでください。",
     "currentLocation": "現在地: {zone}",
-    "lockouts": "ロックアウト",
+    "lockouts": "ロックアウト（{count}）",
     "lockoutRaids": "レイド",
     "lockoutDungeons": "ダンジョン",
     "lockoutWorldBosses": "ワールドボス",

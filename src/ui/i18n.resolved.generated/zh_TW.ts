@@ -9943,7 +9943,7 @@ export const zh_TW: EnTranslations = {
     "takeOver": "接管",
     "inWorldHint": "已在世界中。請在別處登出，或接管工作階段。",
     "currentLocation": "目前位置：{zone}",
-    "lockouts": "鎖定",
+    "lockouts": "鎖定（{count}）",
     "lockoutRaids": "團隊副本",
     "lockoutDungeons": "地城",
     "lockoutWorldBosses": "世界首領",

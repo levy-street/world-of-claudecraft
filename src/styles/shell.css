@@ -2657,14 +2657,26 @@
     margin-top: 2px;
     line-height: 1.3;
   }
+  /* The summary is a tap target: min-height plus line-height bring it to the
+     24px WCAG 2.2 SC 2.5.8 absolute floor on desktop and the 40px touch floor
+     under body.mobile-touch (the gathering goal's Sources summary sets the
+     same two floors), without changing the visible text. */
   .char-row .char-lockout-label {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 4px;
+    min-height: 24px;
+    padding: 2px 0;
+    line-height: 20px;
     cursor: pointer;
     list-style: none;
     color: var(--color-accent);
     user-select: none;
+  }
+  body.mobile-touch .char-row .char-lockout-label {
+    min-height: 40px;
+    line-height: 40px;
+    padding: 0;
   }
   .char-row .char-lockout-label::-webkit-details-marker {
     display: none;
@@ -2682,9 +2694,6 @@
   .char-row .char-lockout-label:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
-  }
-  .char-row .char-lockout-count {
-    color: var(--color-text-muted);
   }
   .char-row .char-lockout-group {
     display: block;
@@ -3445,6 +3454,12 @@
        only showed once the lockout rows right-aligned their countdowns. */
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-id {
       min-width: 0;
+    }
+    /* With the column at its true track width the level line may no longer
+       fit on one line at the narrow end of the desktop range; wrap it rather
+       than let the nowrap flex rule overflow it under the action buttons. */
+    body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-sub {
+      white-space: normal;
     }
     body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-actions {
       display: grid;

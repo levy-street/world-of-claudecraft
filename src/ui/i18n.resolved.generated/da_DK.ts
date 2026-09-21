@@ -9943,7 +9943,7 @@ export const da_DK: EnTranslations = {
     "takeOver": "Overtag",
     "inWorldHint": "Allerede i verden. Log ud et andet sted, eller overtag.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

@@ -9943,7 +9943,7 @@ export const en_XA: EnTranslations = {
     "takeOver": "[Ţáķé Óʋéŕ]",
     "inWorldHint": "[Áļŕéáðý íñ ŵóŕļð. Ļóĝ óúţ éļšéŵĥéŕé, óŕ ţáķé óʋéŕ.]",
     "currentLocation": "[Çúŕŕéñţ ļóçáţíóñ: {zone}]",
-    "lockouts": "[Ļóçķóúţš]",
+    "lockouts": "[Ļóçķóúţš ({count})]",
     "lockoutRaids": "[Ŕáíðš]",
     "lockoutDungeons": "[Ðúñĝéóñš]",
     "lockoutWorldBosses": "[Ŵóŕļð ƀóššéš]",

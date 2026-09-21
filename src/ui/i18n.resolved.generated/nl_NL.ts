@@ -9943,7 +9943,7 @@ export const nl_NL: EnTranslations = {
     "takeOver": "Overnemen",
     "inWorldHint": "Al in de wereld. Log elders uit, of neem over.",
     "currentLocation": "Current location: {zone}",
-    "lockouts": "Lockouts",
+    "lockouts": "Lockouts ({count})",
     "lockoutRaids": "Raids",
     "lockoutDungeons": "Dungeons",
     "lockoutWorldBosses": "World bosses",

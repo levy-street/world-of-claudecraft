@@ -9943,7 +9943,7 @@ export const ko_KR: EnTranslations = {
     "takeOver": "넘겨받기",
     "inWorldHint": "이미 세계에 있습니다. 다른 곳에서 로그아웃하거나 넘겨받으세요.",
     "currentLocation": "현재 위치: {zone}",
-    "lockouts": "잠금",
+    "lockouts": "잠금 ({count})",
     "lockoutRaids": "공격대",
     "lockoutDungeons": "던전",
     "lockoutWorldBosses": "월드 보스",
