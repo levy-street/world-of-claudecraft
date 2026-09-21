@@ -7,9 +7,9 @@ import { WARRIOR_VFX_FULL_SPECS } from '../src/render/warrior_vfx_specs';
 
 type Ribbon = Parameters<SequencerHost['pathRibbon']>;
 const contacts = [
-  { id: 'raging_gale', beat: 0, delay: 0.015, clear: 0.2, size: 6.6, life: 0.2, shake: 0.12 },
-  { id: 'raging_gale', beat: 1, delay: 0.022, clear: 0.2, size: 7.2, life: 0.2, shake: 0.18 },
-  { id: 'bloodthirst', beat: 0, delay: 0.02, clear: 0.27, size: 7.4, life: 0.23, shake: 0.15 },
+  { id: 'raging_gale', beat: 0, delay: 0.015, clear: 0.2, size: 11.4, life: 0.2, shake: 0.18 },
+  { id: 'raging_gale', beat: 1, delay: 0.022, clear: 0.2, size: 12.8, life: 0.2, shake: 0.26 },
+  { id: 'bloodthirst', beat: 0, delay: 0.02, clear: 0.27, size: 11.6, life: 0.23, shake: 0.2 },
 ] as const;
 
 function required<T>(value: T | null | undefined): T {
@@ -153,6 +153,12 @@ describe.each(contacts)('$id contact $beat', ({ id, beat, delay, clear, size, li
       beat,
     );
     const actor = required(actors.get(2));
+    const caster = required(actors.get(1));
+    const flash = vi.mocked(host.flipbookAt).mock.calls;
+    expect(flash).toHaveLength(1);
+    expect(flash[0][5]).toBe('warrior_blood_flash');
+    expect(flash[0][8]).toBe(id === 'bloodthirst' ? -0.74 : beat === 1 ? 0.62 : -0.68);
+    expect(flash[0][10]).toBe(Math.atan2(actor.x - caster.x, actor.z - caster.z));
     expect(host.shakeAt).toHaveBeenCalledExactlyOnceWith(
       actor.x,
       expect.any(Number),

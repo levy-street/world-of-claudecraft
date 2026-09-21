@@ -30,6 +30,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     harvest_impact: new Texture(),
     warrior_bite: new Texture(),
     warrior_shear: new Texture(),
+    warrior_crush: new Texture(),
     shockwave: new Texture(),
     pyroblast: new Texture(),
     frost_nova: new Texture(),
@@ -128,12 +129,13 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     expect(ids).toContain('production:harvest_impact');
     expect(ids).toContain('production:warrior_bite');
     expect(ids).toContain('production:warrior_shear');
+    expect(ids).toContain('production:warrior_crush');
     expect(ids).toContain('production:shockwave');
     for (const key of ['normal', 'motion', 'lighting'])
       expect(ids).toContain(`liquid-surface:${key}`);
     for (const id of ['contact_cut', 'contact_crush', 'contact_pierce']) expect(ids).toContain(id);
     expect(ids).toContain('warrior-rock');
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 23);
+    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 24);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
@@ -150,6 +152,15 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     expect(second).toEqual(first);
   });
 
+  it('gives the crush atlas its own ordinary upload unit and preserves the shear atlas', () => {
+    const steps = abilityVfxTexturePrewarmSteps();
+    const crush = steps.find((step) => step.id === 'production:warrior_crush');
+    const shear = steps.find((step) => step.id === 'production:warrior_shear');
+    expect(crush?.build()).toEqual([bakedTexture('warrior_crush')]);
+    expect(shear?.build()).toEqual([bakedTexture('warrior_shear')]);
+    expect(bakedTexture('warrior_crush')).not.toBe(bakedTexture('warrior_shear'));
+  });
+
   it('does not build anything until a unit actually runs', () => {
     // No canvas stub installed: constructing the steps must stay inert, since
     // the renderer builds the unit list inside the entry-time manifest loop.
@@ -160,12 +171,14 @@ describe('abilityVfxTexturePrewarmSteps', () => {
 describe('abilityVfxBootTextureDependencies', () => {
   it('returns every authored Warrior sprite dependency before boot draws', () => {
     const deps = abilityVfxBootTextureDependencies();
-    expect(deps).toHaveLength(5);
+    expect(deps).toHaveLength(6);
     expect(deps).toContain(bakedTexture('warrior_fervor'));
     expect(deps).toContain(bakedTexture('warrior_power'));
     expect(deps).toContain(bakedTexture('harvest_impact'));
     expect(deps).toContain(bakedTexture('warrior_bite'));
     expect(deps).toContain(bakedTexture('warrior_shear'));
+    expect(deps).toContain(bakedTexture('warrior_crush'));
+    expect(new Set(deps).size).toBe(6);
   });
 });
 

@@ -9,6 +9,7 @@ vi.mock('../src/render/ability_vfx/production_assets', async () => {
     shockwave: new three.Texture(),
     harvest_impact: new three.Texture(),
     warrior_shear: new three.Texture(),
+    warrior_crush: new three.Texture(),
   };
   const source = new three.IcosahedronGeometry(1, 0);
   return {
@@ -34,37 +35,40 @@ function meshes(scene: THREE.Scene) {
 }
 
 describe('baked impact volumes', () => {
-  it('prepares actual slot draws before admitting authored contact sprites', async () => {
-    const scene = new THREE.Scene(),
-      pool = new BakedImpactLayers(scene, () => true);
-    const live = meshes(scene).slice();
-    const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
-    const host = {
-      properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
-      compile: vi.fn(async () => {}),
-      draw: vi.fn(),
-    };
-    const units = pool.units(host);
-    expect(units).toHaveLength(30);
-    const spawn = () => pool.spawn('warrior_shear', 1, 2, 3, 6, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
-    expect(spawn()).toBe(false);
-    for (const unit of units.slice(0, 3)) await unit.run();
-    expect(spawn()).toBe(true);
-    expect(spawn()).toBe(false);
-    for (const unit of units.slice(3)) await unit.run();
-    for (let i = 0; i < 9; i++) expect(spawn()).toBe(true);
-    expect(spawn()).toBe(false);
-    expect(host.draw).toHaveBeenCalledTimes(10);
-    const disposal = live.map((mesh) => vi.spyOn(mesh.material, 'dispose'));
-    const carrier = scene.children.find((child) => child.name === 'guard-prewarm');
-    expect(carrier).toBeDefined();
-    carrier?.addEventListener('removed', () => {
-      throw new Error('listener failure');
-    });
-    expect(() => pool.dispose()).toThrow('Baked impact cleanup failed');
-    for (const spy of disposal) expect(spy).toHaveBeenCalledOnce();
-    expect(() => pool.dispose()).not.toThrow();
-  });
+  it.each(['warrior_shear', 'warrior_crush'] as const)(
+    'prepares actual slot draws before admitting authored contact sprites for %s',
+    async (kind) => {
+      const scene = new THREE.Scene(),
+        pool = new BakedImpactLayers(scene, () => true);
+      const live = meshes(scene).slice();
+      const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
+      const host = {
+        properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
+        compile: vi.fn(async () => {}),
+        draw: vi.fn(),
+      };
+      const units = pool.units(host);
+      expect(units).toHaveLength(30);
+      const spawn = () => pool.spawn(kind, 1, 2, 3, 6, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
+      expect(spawn()).toBe(false);
+      for (const unit of units.slice(0, 3)) await unit.run();
+      expect(spawn()).toBe(true);
+      expect(spawn()).toBe(false);
+      for (const unit of units.slice(3)) await unit.run();
+      for (let i = 0; i < 9; i++) expect(spawn()).toBe(true);
+      expect(spawn()).toBe(false);
+      expect(host.draw).toHaveBeenCalledTimes(10);
+      const disposal = live.map((mesh) => vi.spyOn(mesh.material, 'dispose'));
+      const carrier = scene.children.find((child) => child.name === 'guard-prewarm');
+      expect(carrier).toBeDefined();
+      carrier?.addEventListener('removed', () => {
+        throw new Error('listener failure');
+      });
+      expect(() => pool.dispose()).toThrow('Baked impact cleanup failed');
+      for (const spy of disposal) expect(spy).toHaveBeenCalledOnce();
+      expect(() => pool.dispose()).not.toThrow();
+    },
+  );
   it.each([-0.66, 0.58, 0])(
     'pins blood to the wound and projects cut roll %s across camera angles',
     (roll) => {
@@ -123,6 +127,85 @@ describe('baked impact volumes', () => {
       pool.dispose();
     },
   );
+  it('requires the crush texture upload and reuses the same ten slots across crush, shear and smoke', () => {
+    const scene = new THREE.Scene();
+    const crush = bakedTexture('warrior_crush')!;
+    const shear = bakedTexture('warrior_shear')!;
+    const ready = new Set([shear]);
+    const pool = new BakedImpactLayers(scene, (texture) => ready.has(texture));
+    const original = meshes(scene).slice();
+    const geometry = original.map((mesh) => mesh.geometry);
+    const materials = original.map((mesh) => mesh.material);
+    const camera = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.4, 0.8, 0));
+    const spawn = (kind: 'warrior_crush' | 'warrior_shear' | 'smoke') =>
+      pool.spawn(
+        kind,
+        3,
+        2,
+        5,
+        12.4,
+        0xaabbcc,
+        0xffffff,
+        0.3,
+        0,
+        0,
+        0,
+        0.7,
+        undefined,
+        false,
+        0.58,
+        1.4,
+      );
+    expect(crush).not.toBe(shear);
+    expect(spawn('warrior_crush')).toBe(false);
+    expect(spawn('warrior_shear')).toBe(true);
+    pool.update(0.06, camera, false);
+    const shearFrame = original[0].material.uniforms.uFrame.value;
+    const shearRotation = original[0].quaternion.clone();
+    pool.clear();
+    ready.add(crush);
+    for (let i = 0; i < 10; i++) expect(spawn('warrior_crush')).toBe(true);
+    expect(spawn('warrior_crush')).toBe(false);
+    pool.update(0.06, camera, false);
+    for (const mesh of original) {
+      const u = mesh.material.uniforms;
+      expect(u.uMap.value).toBe(crush);
+      expect(u.uFrame.value).toBe(shearFrame);
+      expect(u.uAuthored.value).toBe(1);
+      expect(u.uMaterialTint.value).toBe(0.18);
+      expect(u.uPivot.value.toArray()).toEqual([0.5, 0.5]);
+      expect(u.uMirror.value).toBe(-1);
+      expect(u.uTint.value.getHex()).toBe(0xaabbcc);
+      expect(mesh.quaternion.angleTo(shearRotation)).toBeCloseTo(0);
+      expect(mesh.position.toArray()).toEqual([3, 2, 5]);
+      expect(mesh.scale.y).toBe(12.4);
+    }
+    pool.update(0.04, camera, true);
+    for (const mesh of original) {
+      expect(mesh.material.uniforms.uFrame.value).toBeCloseTo(0.36 * 63);
+      expect(mesh.material.uniforms.uMotion.value).toBe(0);
+    }
+    pool.update(0.3, camera, false);
+    expect(original.every((mesh) => !mesh.visible)).toBe(true);
+    expect(spawn('smoke')).toBe(true);
+    pool.update(0.06, camera, false);
+    expect(original[0].material.uniforms.uMap.value).toBe(bakedTexture('smoke'));
+    expect(original[0].material.uniforms.uAuthored.value).toBe(0);
+    expect(original[0].material.uniforms.uMaterialTint.value).toBe(0);
+    expect(original[0].material.uniforms.uMirror.value).toBe(1);
+    expect(original[0].scale.y).toBe(9);
+    pool.clear();
+    expect(spawn('warrior_shear')).toBe(true);
+    pool.update(0.06, camera, false);
+    expect(original[0].material.uniforms.uMap.value).toBe(shear);
+    expect(original[0].material.uniforms.uMaterialTint.value).toBe(1);
+    expect(original[0].material.uniforms.uFrame.value).toBe(shearFrame);
+    expect(meshes(scene)).toEqual(original);
+    expect(original.map((mesh) => mesh.geometry)).toEqual(geometry);
+    expect(original.map((mesh) => mesh.material)).toEqual(materials);
+    pool.dispose();
+  });
+
   it('drapes a turned shockwave onto sloped ground without changing it every frame', () => {
     const scene = new THREE.Scene(),
       pool = new BakedImpactLayers(scene);
@@ -384,6 +467,9 @@ it('preserves the authored size of large Warrior hits without lifting unrelated 
   for (const [kind, requested, expected] of [
     ['harvest_impact', 14.5, 14.5],
     ['warrior_shear', 12.4, 12.4],
+    ['warrior_crush', 12.4, 12.4],
+    ['warrior_shear', 100, 18],
+    ['warrior_crush', 100, 18],
     ['harvest_impact', 100, 18],
     ['smoke', 100, 9],
   ] as const) {

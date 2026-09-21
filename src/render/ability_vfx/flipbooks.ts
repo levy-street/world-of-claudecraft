@@ -27,6 +27,9 @@ interface FlipSlot {
   rotation: number;
   aspect: number;
   size: number;
+  worldDirected: boolean;
+  strikeAxis: THREE.Vector3;
+  projectedRoll: number;
   active: boolean;
 }
 
@@ -39,6 +42,9 @@ export class ImpactFlipbooks {
   private next = 0;
   private readonly geometry: THREE.PlaneGeometry;
   private disposed = false;
+  private readonly cameraInverse = new THREE.Quaternion();
+  private readonly projectedStrike = new THREE.Vector3();
+  private readonly projectedDown = new THREE.Vector3();
 
   constructor(scene: THREE.Scene) {
     this.geometry = new THREE.PlaneGeometry(1, 1);
@@ -52,6 +58,8 @@ export class ImpactFlipbooks {
         uInset: { value: 0.008 },
         uWarriorStyle: { value: 0 },
         uWarriorPhase: { value: 0 },
+        uWarriorDown: { value: new THREE.Vector2(0, -1) },
+        uLowRangeTarget: { value: 1 },
         uWarriorFloor: { value: -1e6 },
         uWarriorFloorBlend: { value: 0.85 },
       },
@@ -71,6 +79,7 @@ export class ImpactFlipbooks {
         uniform vec3 uTint;
         uniform float uHdr;
         uniform float uInset;
+        uniform float uLowRangeTarget;
         varying vec2 vUv;
         varying float vWorldY;
         uniform float uWarriorFloor;
@@ -85,7 +94,9 @@ export class ImpactFlipbooks {
         void main() {
           if (uWarriorStyle > .5) {
             gl_FragColor = warriorFlash(vUv, uWarriorPhase, uTint, uHdr) * uOpacity;
-            gl_FragColor.rgb *= smoothstep(uWarriorFloor + .03, uWarriorFloor + uWarriorFloorBlend, vWorldY);
+            float floorFade = smoothstep(uWarriorFloor + .03, uWarriorFloor + uWarriorFloorBlend, vWorldY);
+            gl_FragColor.rgb *= floorFade;
+            if (uWarriorStyle > 1.5 && uWarriorStyle < 2.5) gl_FragColor.a *= floorFade;
           } else {
             float fi = floor(uFrame);
             vec4 a = cell(fi);
@@ -95,9 +106,21 @@ export class ImpactFlipbooks {
           }
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
+          // Preserve the previous source-alpha additive RGB for ordinary
+          // effects, using one fixed blend state prepared before any cast.
+          if (uWarriorStyle < 1.5 || uWarriorStyle > 2.5) {
+            // Fixed-point targets clamp a source before hardware blending.
+            // Preserve that ordering on the non-HDR quality paths as well.
+            if (uLowRangeTarget > .5) gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
+            gl_FragColor.rgb *= gl_FragColor.a;
+            gl_FragColor.a = 0.;
+          }
         }`,
       transparent: true,
-      blending: THREE.AdditiveBlending,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.OneFactor,
+      blendDst: THREE.OneMinusSrcAlphaFactor,
+      blendEquation: THREE.AddEquation,
       depthWrite: false,
     });
     for (let i = 0; i < FLIP_SLOTS; i++) {
@@ -106,6 +129,11 @@ export class ImpactFlipbooks {
       mesh.visible = false;
       mesh.renderOrder = 8; // over the shock rings: the sheet IS the impact
       mesh.userData.renderCategory = 'vfx';
+      mesh.onBeforeRender = (renderer, _scene, _camera, _geometry, material) => {
+        const target = renderer.getRenderTarget();
+        (material as THREE.ShaderMaterial).uniforms.uLowRangeTarget.value =
+          !target || target.texture.type === THREE.UnsignedByteType ? 1 : 0;
+      };
       scene.add(mesh);
       this.slots.push({
         mesh,
@@ -115,6 +143,9 @@ export class ImpactFlipbooks {
         rotation: 0,
         aspect: 1,
         size: 1,
+        worldDirected: false,
+        strikeAxis: new THREE.Vector3(),
+        projectedRoll: 0,
         active: false,
       });
     }
@@ -133,6 +164,7 @@ export class ImpactFlipbooks {
     rotation = 0,
     aspect = 1,
     groundY = Number.NaN,
+    worldFacing = Number.NaN,
   ): void {
     if (this.disposed) return;
     const warrior = warriorFlashStyle(style);
@@ -149,6 +181,13 @@ export class ImpactFlipbooks {
     slot.size = size;
     slot.duration = Number.isFinite(duration) ? Math.max(0.05, duration) : FLIP_DUR;
     slot.rotation = Number.isFinite(rotation) ? rotation : 0;
+    slot.projectedRoll = slot.rotation;
+    slot.worldDirected = warrior > 0 && Number.isFinite(worldFacing);
+    slot.strikeAxis.set(
+      slot.worldDirected ? Math.cos(worldFacing) * Math.cos(slot.rotation) : 0,
+      slot.worldDirected ? Math.sin(slot.rotation) : 0,
+      slot.worldDirected ? -Math.sin(worldFacing) * Math.cos(slot.rotation) : 0,
+    );
     slot.aspect = Number.isFinite(aspect) ? Math.max(0.25, Math.min(4, aspect)) : 1;
     slot.mat.uniforms.uMap.value = texture;
     slot.mat.uniforms.uInset.value =
@@ -158,6 +197,7 @@ export class ImpactFlipbooks {
     slot.mat.uniforms.uFrame.value = 0;
     slot.mat.uniforms.uWarriorStyle.value = warrior;
     slot.mat.uniforms.uWarriorPhase.value = 0;
+    (slot.mat.uniforms.uWarriorDown.value as THREE.Vector2).set(0, -1);
     slot.mat.uniforms.uWarriorFloor.value = warrior && Number.isFinite(groundY) ? groundY : -1e6;
     // Keep a low landing core bright while softening the wider body-height bursts.
     slot.mat.uniforms.uWarriorFloorBlend.value =
@@ -179,6 +219,8 @@ export class ImpactFlipbooks {
 
   update(dt: number, camQuat: THREE.Quaternion, reducedMotion = false): void {
     if (this.disposed) return;
+    this.cameraInverse.copy(camQuat).invert();
+    this.projectedDown.set(0, -1, 0).applyQuaternion(this.cameraInverse);
     for (const slot of this.slots) {
       if (!slot.active) continue;
       slot.age += dt;
@@ -192,7 +234,27 @@ export class ImpactFlipbooks {
           0.55 * easeOutCubic(reducedMotion && slot.mat.uniforms.uWarriorStyle.value ? 0.32 : t));
       slot.mesh.scale.set(scale * slot.aspect, scale, scale);
       slot.mesh.quaternion.copy(camQuat);
-      if (slot.rotation) slot.mesh.rotateZ(slot.rotation);
+      let roll = slot.rotation;
+      if (slot.worldDirected) {
+        const direction = this.projectedStrike
+          .copy(slot.strikeAxis)
+          .applyQuaternion(this.cameraInverse);
+        // End-on cuts have no meaningful screen direction. Retain the last
+        // valid roll, initially authored, rather than magnifying projection noise.
+        if (direction.x * direction.x + direction.y * direction.y > 0.0001)
+          slot.projectedRoll = Math.atan2(direction.y, direction.x);
+        roll = slot.projectedRoll;
+      }
+      if (roll) slot.mesh.rotateZ(roll);
+      const c = Math.cos(roll),
+        s = Math.sin(roll),
+        down = this.projectedDown;
+      // Gravity remains world-down even as the blade and camera rotate. Undo
+      // the billboard roll and its aspect stretch before applying UV drift.
+      (slot.mat.uniforms.uWarriorDown.value as THREE.Vector2).set(
+        (c * down.x + s * down.y) / slot.aspect,
+        -s * down.x + c * down.y,
+      );
       if (t >= 1) {
         slot.active = false;
         slot.mesh.visible = false;

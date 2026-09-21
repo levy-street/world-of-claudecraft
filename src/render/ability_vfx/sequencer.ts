@@ -185,6 +185,7 @@ export interface SequencerHost {
     duration?: number,
     rotation?: number,
     aspect?: number,
+    worldFacing?: number,
   ): void;
   pillarAt(
     x: number,

@@ -1549,6 +1549,7 @@ export class AbilityVfxFx implements SequencerHost {
     duration?: number,
     rotation?: number,
     aspect?: number,
+    worldFacing?: number,
   ): void {
     if (this.disposed) return;
     this.flipbooks.spawn(
@@ -1567,6 +1568,7 @@ export class AbilityVfxFx implements SequencerHost {
       rotation,
       aspect,
       warriorFlashStyle(sheet) ? this.groundY(x, z) : undefined,
+      worldFacing,
     );
   }
 

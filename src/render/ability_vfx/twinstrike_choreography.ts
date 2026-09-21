@@ -52,6 +52,8 @@ export function twinstrikeBeat(host: SequencerHost, slot: SeqSlot, beat: number)
     reverse ? 5 : 4.2,
     reverse ? 0.32 : 0.28,
     roll,
+    1,
+    facing,
   );
   count++;
   const sculpted =

@@ -192,7 +192,8 @@ export class BakedImpactLayers {
         kind === 'warrior_fervor' ||
         kind === 'harvest_impact' ||
         kind === 'warrior_bite' ||
-        kind === 'warrior_shear') &&
+        kind === 'warrior_shear' ||
+        kind === 'warrior_crush') &&
         !this.textureReady?.(bakedTexture(kind)!)) ||
       ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
       aspect <= 0 ||
@@ -202,7 +203,10 @@ export class BakedImpactLayers {
       return false;
     const prepared = this.preparation;
     const strict =
-      kind === 'harvest_impact' || kind === 'warrior_shear' || kind === 'warrior_fervor';
+      kind === 'harvest_impact' ||
+      kind === 'warrior_shear' ||
+      kind === 'warrior_crush' ||
+      kind === 'warrior_fervor';
     const s = this.slots.find(
       (s, index) => !s.active && (!strict || !prepared || prepared.ready(index)),
     );
@@ -213,7 +217,12 @@ export class BakedImpactLayers {
     // Receiving Warrior impacts are authored above nine yards. Preserve that
     // hierarchy while keeping the ordinary spell/smoke safety limit intact.
     s.size = Math.min(
-      kind === 'harvest_impact' || kind === 'warrior_bite' || kind === 'warrior_shear' ? 18 : 9,
+      kind === 'harvest_impact' ||
+        kind === 'warrior_bite' ||
+        kind === 'warrior_shear' ||
+        kind === 'warrior_crush'
+        ? 18
+        : 9,
       size,
     );
     s.ground = kind === 'shockwave';
@@ -223,7 +232,8 @@ export class BakedImpactLayers {
       kind === 'chain_heal' ||
       kind === 'harvest_impact' ||
       kind === 'warrior_bite' ||
-      kind === 'warrior_shear';
+      kind === 'warrior_shear' ||
+      kind === 'warrior_crush';
     s.power = kind === 'warrior_power' || kind === 'warrior_fervor';
     s.reverse = reverse;
     s.roll = roll;
@@ -232,8 +242,8 @@ export class BakedImpactLayers {
     s.x = x;
     s.z = z;
     s.dust = kind === 'shout_dust';
-    s.harvest = kind === 'harvest_impact' || kind === 'warrior_shear';
-    s.shear = kind === 'warrior_shear';
+    s.harvest = kind === 'harvest_impact' || kind === 'warrior_shear' || kind === 'warrior_crush';
+    s.shear = kind === 'warrior_shear' || kind === 'warrior_crush';
     s.dx = s.dust ? Math.sin(angle) * s.size * 0.7 : 0;
     s.dz = s.dust ? Math.cos(angle) * s.size * 0.7 : 0;
     if (s.harvest) {
@@ -285,7 +295,7 @@ export class BakedImpactLayers {
     u.uFloor.value = floor;
     u.uGround.value = s.ground ? 1 : 0;
     u.uAuthored.value = s.authored ? 1 : 0;
-    u.uMaterialTint.value = s.shear ? 1 : 0;
+    u.uMaterialTint.value = kind === 'warrior_crush' ? 0.18 : s.shear ? 1 : 0;
     u.uGutter.value = s.authored || s.power || kind === 'shout_dust' ? 4 / 256 : 0.018;
     u.uPivot.value.set(
       s.power ? 0.5 - (1.45 / 5.6) * u.uMirror.value : 0.5,

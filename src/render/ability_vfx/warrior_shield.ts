@@ -123,7 +123,7 @@ export function drawWarriorShield(host: SequencerHost, slot: SeqSlot, beat: numb
   const receiving = { x: at.x - sx * 0.28, y: at.y, z: at.z - sz * 0.28 };
   if (
     host.bakedAt?.(
-      'warrior_shear',
+      'warrior_crush',
       receiving.x,
       receiving.y,
       receiving.z,

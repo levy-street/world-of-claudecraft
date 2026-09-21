@@ -318,7 +318,7 @@ it.each([0, 1])(
       0,
     );
     expect(bakedAt).toHaveBeenCalledOnce();
-    expect(bakedAt.mock.calls[0][0]).toBe('warrior_shear');
+    expect(bakedAt.mock.calls[0][0]).toBe('warrior_crush');
     expect(fragmentsAt).toHaveBeenCalledOnce();
     expect(flipbookAt).toHaveBeenCalledOnce();
     const surface = [target.x - target.height * 0.14, target.y + target.height * 0.68, target.z];

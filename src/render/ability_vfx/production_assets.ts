@@ -11,6 +11,7 @@ export type BakedKind =
   | 'harvest_impact'
   | 'warrior_bite'
   | 'warrior_shear'
+  | 'warrior_crush'
   | 'shockwave'
   | 'pyroblast'
   | 'frost_nova'
@@ -24,6 +25,7 @@ export const BAKED_URLS = {
   harvest_impact: '/textures/vfx/production/harvest_impact.webp',
   warrior_bite: '/textures/vfx/production/warrior_bite.webp',
   warrior_shear: '/textures/vfx/production/warrior_shear.webp',
+  warrior_crush: '/textures/vfx/production/warrior_crush.ktx2',
   shockwave: '/textures/vfx/production/shockwave.webp',
   pyroblast: '/textures/vfx/production/pyroblast.ktx2',
   frost_nova: '/textures/vfx/production/frost_nova.ktx2',

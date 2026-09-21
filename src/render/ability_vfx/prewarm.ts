@@ -58,12 +58,14 @@ export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
   const harvest = bakedTexture('harvest_impact');
   const bite = bakedTexture('warrior_bite');
   const shear = bakedTexture('warrior_shear');
+  const crush = bakedTexture('warrior_crush');
   return [
     ...(power ? [power] : []),
     ...(fervor ? [fervor] : []),
     ...(harvest ? [harvest] : []),
     ...(bite ? [bite] : []),
     ...(shear ? [shear] : []),
+    ...(crush ? [crush] : []),
   ];
 }
 
@@ -192,6 +194,7 @@ export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] 
     'harvest_impact',
     'warrior_bite',
     'warrior_shear',
+    'warrior_crush',
     'shockwave',
     'pyroblast',
     'frost_nova',

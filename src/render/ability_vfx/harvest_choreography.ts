@@ -66,6 +66,7 @@ export function harvestBeat(
     detonation ? 0.42 : final ? 0.055 : 0.04,
     roll,
     detonation ? 1.15 : 1,
+    detonation ? facing - Math.PI / 2 : undefined,
   );
   count++;
   // The broad spray starts at its centred wound pivot. The wider world-space

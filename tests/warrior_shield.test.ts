@@ -77,7 +77,7 @@ it('keeps the complete shield and target imprint at reduced detail and during co
     0,
   );
   expect(host.bakedAt).toHaveBeenCalledTimes(1);
-  expect(vi.mocked(host.bakedAt!).mock.calls[0][0]).toBe('warrior_shear');
+  expect(vi.mocked(host.bakedAt!).mock.calls[0][0]).toBe('warrior_crush');
   expect(vi.mocked(host.bakedAt!).mock.calls[0][4]).toBe(14.2);
   targetX = 7;
   drawWarriorShield(host, slot, 0);

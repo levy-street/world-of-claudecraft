@@ -44,6 +44,7 @@ export function drawWarriorAreaReceivingContact(
     heavy ? 0.32 : 0.28,
     profile.angle,
     1.3,
+    facing,
   );
   let count = 1;
   const sprayed =

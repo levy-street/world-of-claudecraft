@@ -55,14 +55,17 @@ afterEach(() => {
 });
 
 it.each(styles)(
-  'routes %s through the existing additive carrier with distinct style %i',
+  'routes %s through the existing pooled carrier with distinct style %i',
   (style, id) => {
     const { pool, meshes } = fixture();
     spawn(pool, style);
     const mesh = meshes[0];
     expect(mesh.visible).toBe(true);
     expect(mesh.position.toArray()).toEqual([2, 3, 5]);
-    expect(mesh.material.blending).toBe(THREE.AdditiveBlending);
+    expect(mesh.material.blending).toBe(THREE.CustomBlending);
+    expect(mesh.material.blendSrc).toBe(THREE.OneFactor);
+    expect(mesh.material.blendDst).toBe(THREE.OneMinusSrcAlphaFactor);
+    expect(mesh.material.blendEquation).toBe(THREE.AddEquation);
     expect(mesh.material.transparent).toBe(true);
     expect(mesh.material.depthWrite).toBe(false);
     expect(mesh.material.uniforms.uWarriorStyle.value).toBe(id);
@@ -77,6 +80,193 @@ it.each(styles)(
         new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), 0.35),
       ),
     ).toBeCloseTo(0);
+  },
+);
+
+it.each(['contact_cut', 'flame', 'warrior_steel_flash'] as const)(
+  'clears blood routing without changing the prepared blend state on reuse for %s',
+  (style) => {
+    const { pool, meshes } = fixture();
+    for (let i = 0; i < 6; i++) spawn(pool, 'warrior_blood_flash');
+    const material = meshes[0].material;
+    expect(material.blending).toBe(THREE.CustomBlending);
+    expect(material.blendSrc).toBe(THREE.OneFactor);
+    expect(material.blendDst).toBe(THREE.OneMinusSrcAlphaFactor);
+    expect(material.blendEquation).toBe(THREE.AddEquation);
+    expect(material.uniforms.uWarriorStyle.value).toBe(2);
+    pool.spawn(2, 3, 5, 8, 0xffffff, 4, style);
+    expect(meshes[0].material).toBe(material);
+    expect(material.uniforms.uWarriorStyle.value).toBe(style === 'warrior_steel_flash' ? 1 : 0);
+    expect(material.blending).toBe(THREE.CustomBlending);
+    expect(material.blendSrc).toBe(THREE.OneFactor);
+    expect(material.blendDst).toBe(THREE.OneMinusSrcAlphaFactor);
+    expect(material.blendEquation).toBe(THREE.AddEquation);
+    pool.update(0.05, camera);
+    expect(material.uniforms.uWarriorStyle.value).toBe(style === 'warrior_steel_flash' ? 1 : 0);
+    expect(material.blending).toBe(THREE.CustomBlending);
+    expect(material.blendSrc).toBe(THREE.OneFactor);
+    expect(material.blendDst).toBe(THREE.OneMinusSrcAlphaFactor);
+    expect(material.blendEquation).toBe(THREE.AddEquation);
+    expect(meshes[0].visible).toBe(true);
+  },
+);
+
+it.each([
+  ['warrior_steel_flash', 0.7, 0.42],
+  ['warrior_blood_flash', -1.1, -0.65],
+  ['warrior_storm_flash', 1.9, 0],
+  ['warrior_crush_flash', -0.4, 0.2],
+] as const)('projects %s along the world strike under camera orbit', (style, facing, roll) => {
+  const { pool, meshes } = fixture();
+  pool.spawn(2, 3, 5, 8, 0x63aadd, 4.5, style, 1, roll, 1.7, 0, facing);
+  const strike = new THREE.Vector3(
+    Math.cos(facing) * Math.cos(roll),
+    Math.sin(roll),
+    -Math.sin(facing) * Math.cos(roll),
+  );
+  for (const view of [
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.35, 0.9, 0.14)),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.62, -1.3, -0.2)),
+  ]) {
+    pool.update(0.05, view);
+    const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(view);
+    const projectedStrike = strike.clone().addScaledVector(normal, -strike.dot(normal));
+    expect(projectedStrike.length()).toBeGreaterThan(0.1);
+    projectedStrike.normalize();
+    const visibleAxis = new THREE.Vector3(1, 0, 0).applyQuaternion(meshes[0].quaternion);
+    const visibleNormal = new THREE.Vector3(0, 0, 1).applyQuaternion(meshes[0].quaternion);
+    expect(visibleAxis.dot(projectedStrike)).toBeCloseTo(1, 7);
+    expect(visibleNormal.dot(normal)).toBeCloseTo(1, 7);
+    expect(meshes[0].scale.x / meshes[0].scale.y).toBeCloseTo(1.7);
+  }
+});
+
+it('keeps legacy screen roll under oblique camera rotations without a world facing', () => {
+  const { pool, meshes } = fixture();
+  const roll = -0.45;
+  pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_steel_flash', 1, roll);
+  pool.spawn(2, 3, 5, 8, 0xffffff, 1, 'contact_cut', 1, roll);
+  for (const yaw of [0.9, -1.3]) {
+    const view = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.4, yaw, 0.15));
+    const expected = view
+      .clone()
+      .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll));
+    pool.update(0.05, view);
+    for (const mesh of meshes.slice(0, 2)) {
+      expect(mesh.quaternion.angleTo(expected)).toBeCloseTo(0);
+    }
+  }
+});
+
+it.each(['warrior_steel_flash', 'contact_cut'] as const)(
+  'clears the old world-facing direction when a slot is reused for %s without it',
+  (style) => {
+    const { pool, meshes } = fixture();
+    for (let i = 0; i < 6; i++) {
+      pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_blood_flash', 1, 0.6, 1.3, 0, 1.2);
+    }
+    const view = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.5, -0.8, 0.1));
+    pool.update(0.05, view);
+    const prior = meshes[0].quaternion.clone();
+    const roll = -0.3;
+    pool.spawn(2, 3, 5, 8, 0xffffff, 4, style, 1, roll);
+    pool.update(0.05, view);
+    const expected = view
+      .clone()
+      .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll));
+    expect(prior.angleTo(expected)).toBeGreaterThan(0.1);
+    expect(meshes[0].quaternion.angleTo(expected)).toBeCloseTo(0);
+  },
+);
+
+it('falls back to the authored roll when the world strike points directly at the camera', () => {
+  const { pool, meshes } = fixture();
+  const facing = 0.7,
+    roll = 0.4;
+  const strike = new THREE.Vector3(
+    Math.cos(facing) * Math.cos(roll),
+    Math.sin(roll),
+    -Math.sin(facing) * Math.cos(roll),
+  );
+  const view = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), strike);
+  const expected = view
+    .clone()
+    .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll));
+  pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_steel_flash', 1, roll, 1, 0, facing);
+  pool.update(0.05, view);
+  expect(meshes[0].quaternion.toArray().every(Number.isFinite)).toBe(true);
+  expect(meshes[0].quaternion.length()).toBeCloseTo(1);
+  expect(meshes[0].quaternion.angleTo(expected)).toBeCloseTo(0);
+});
+
+it('retains the last valid projected roll when an orbit makes the strike camera end-on', () => {
+  const { pool, meshes } = fixture();
+  const facing = 0.7,
+    roll = 0.4;
+  const firstView = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.5, -0.8, 0.1));
+  pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_steel_flash', 1, roll, 1.7, 0, facing);
+  pool.update(0.05, firstView);
+  const retainedRotation = firstView.clone().invert().multiply(meshes[0].quaternion);
+  const authoredRotation = new THREE.Quaternion().setFromAxisAngle(
+    new THREE.Vector3(0, 0, 1),
+    roll,
+  );
+  expect(retainedRotation.angleTo(authoredRotation)).toBeGreaterThan(0.1);
+  const strike = new THREE.Vector3(
+    Math.cos(facing) * Math.cos(roll),
+    Math.sin(roll),
+    -Math.sin(facing) * Math.cos(roll),
+  );
+  const endOnView = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), strike);
+  const expected = endOnView.clone().multiply(retainedRotation);
+  for (let i = 0; i < 2; i++) {
+    pool.update(0.05, endOnView);
+    expect(meshes[0].quaternion.toArray().every(Number.isFinite)).toBe(true);
+    expect(meshes[0].quaternion.angleTo(expected)).toBeCloseTo(0);
+  }
+});
+
+it('reconstructs projected world-down from gravity UVs despite camera, strike roll and aspect', () => {
+  const { pool, meshes } = fixture();
+  pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_blood_flash', 1, -0.65, 2.3, 0, -1.1);
+  pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_steel_flash', 1, 0.72, 0.6, 0, 0.7);
+  const worldDown = new THREE.Vector3(0, -1, 0);
+  for (const view of [
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.35, 0.9, 0.14)),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.62, -1.3, -0.2)),
+  ]) {
+    pool.update(0.05, view);
+    const normal = new THREE.Vector3(0, 0, 1).applyQuaternion(view);
+    const projectedDown = worldDown.clone().addScaledVector(normal, -worldDown.dot(normal));
+    expect(projectedDown.length()).toBeGreaterThan(0.1);
+    for (const mesh of meshes.slice(0, 2)) {
+      const down = mesh.material.uniforms.uWarriorDown.value as THREE.Vector2;
+      expect(down.toArray().every(Number.isFinite)).toBe(true);
+      const reconstructed = new THREE.Vector3(
+        down.x * (mesh.scale.x / mesh.scale.y),
+        down.y,
+        0,
+      ).applyQuaternion(mesh.quaternion);
+      expect(reconstructed.distanceTo(projectedDown)).toBeLessThan(1e-8);
+      expect(reconstructed.dot(worldDown)).toBeGreaterThan(0);
+    }
+  }
+});
+
+it.each([Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
+  'uses finite legacy orientation for invalid world facing %s',
+  (facing) => {
+    const { pool, meshes } = fixture();
+    const roll = 0.35;
+    const view = new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.5, 0.8, 0.1));
+    const expected = view
+      .clone()
+      .multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 0, 1), roll));
+    pool.spawn(2, 3, 5, 8, 0xffffff, 4, 'warrior_steel_flash', 1, roll, 1, 0, facing);
+    pool.update(0.05, view);
+    expect(meshes[0].quaternion.toArray().every(Number.isFinite)).toBe(true);
+    expect(meshes[0].quaternion.length()).toBeCloseTo(1);
+    expect(meshes[0].quaternion.angleTo(expected)).toBeCloseTo(0);
   },
 );
 
@@ -205,4 +395,28 @@ it('disposes owned resources once and ignores late spawns without disposing the 
   for (const dispose of materialDisposals) expect(dispose).toHaveBeenCalledTimes(1);
   expect(geometryDisposal).toHaveBeenCalledTimes(1);
   expect(textureDisposal).not.toHaveBeenCalled();
+});
+
+it('tracks default, byte and floating targets through pooled render reuse', () => {
+  const { scene, meshes } = fixture();
+  const mesh = meshes[0];
+  let target: THREE.WebGLRenderTarget | null = null;
+  const renderer = { getRenderTarget: () => target } as THREE.WebGLRenderer;
+  const render = () =>
+    mesh.onBeforeRender(renderer, scene, new THREE.Camera(), mesh.geometry, mesh.material, null!);
+  render();
+  expect(mesh.material.uniforms.uLowRangeTarget.value).toBe(1);
+  for (const [type, expected] of [
+    [THREE.UnsignedByteType, 1],
+    [THREE.HalfFloatType, 0],
+    [THREE.FloatType, 0],
+  ] as const) {
+    target = new THREE.WebGLRenderTarget(1, 1, { type });
+    render();
+    expect(mesh.material.uniforms.uLowRangeTarget.value).toBe(expected);
+    target.dispose();
+  }
+  target = null;
+  render();
+  expect(mesh.material.uniforms.uLowRangeTarget.value).toBe(1);
 });

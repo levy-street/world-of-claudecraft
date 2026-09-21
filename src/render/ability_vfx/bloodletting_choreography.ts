@@ -39,6 +39,8 @@ export function bloodlettingBeat(host: SequencerHost, slot: SeqSlot, beat: numbe
     5,
     0.32,
     roll,
+    1,
+    facing,
   );
   const sculpted =
     primary &&

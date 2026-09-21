@@ -41,6 +41,7 @@ export function warriorCrushContact(
     Math.max(0.34, flashLife),
     0,
     1.15,
+    facing,
   );
   let count = 1;
   for (let crease = 0; crease < (tier > 0 ? 1 : 3); crease++) {

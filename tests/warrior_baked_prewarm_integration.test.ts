@@ -29,6 +29,7 @@ function fixture(cls: string, warriorTextures = true) {
     'harvest_impact',
     'warrior_bite',
     'warrior_shear',
+    'warrior_crush',
   ] as const;
   const textures = new Map<string, THREE.Texture>(names.map((name) => [name, new THREE.Texture()]));
   const smoke = new THREE.Texture();
@@ -61,10 +62,10 @@ function fixture(cls: string, warriorTextures = true) {
   const host = {
     properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
     compile: vi.fn(async () => {
-      expect(uploaded.size).toBe(9);
+      expect(uploaded.size).toBe(10);
     }),
     draw: vi.fn((_group: THREE.Group, root: THREE.Object3D) => {
-      expect(uploaded.size).toBe(9);
+      expect(uploaded.size).toBe(10);
       const mesh = root as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(
         live.some((slot) => slot.geometry === mesh.geometry && slot.material === mesh.material),
@@ -115,7 +116,7 @@ function fixture(cls: string, warriorTextures = true) {
     for (const value of textures.values()) value.dispose();
     smoke.dispose();
   });
-  const spawn = (kind: 'warrior_shear' | 'warrior_fervor') =>
+  const spawn = (kind: 'warrior_shear' | 'warrior_crush' | 'warrior_fervor') =>
     pool.spawn(kind, 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
   return {
     scene,
@@ -136,7 +137,7 @@ function fixture(cls: string, warriorTextures = true) {
   };
 }
 
-it.each(['warrior_shear', 'warrior_fervor'] as const)(
+it.each(['warrior_shear', 'warrior_crush', 'warrior_fervor'] as const)(
   'routes a selected Warrior through texture uploads and awaits every actual baked slot for %s',
   async (kind) => {
     const h = fixture('mage');
@@ -146,7 +147,7 @@ it.each(['warrior_shear', 'warrior_fervor'] as const)(
     });
     expect(h.poolUnits).toHaveBeenCalled();
     expect(h.spawn(kind)).toBe(false);
-    for (let i = 0; i < 9; i++) await h.next();
+    for (let i = 0; i < 10; i++) await h.next();
     expect(h.upload.mock.calls.map(([value]) => value)).toEqual([...h.textures.values()]);
     expect(h.host.compile).not.toHaveBeenCalled();
     expect(h.host.draw).not.toHaveBeenCalled();
@@ -165,10 +166,10 @@ it.each(['warrior_shear', 'warrior_fervor'] as const)(
     expect(h.seenSlots.size).toBe(10);
     expect(h.spawn(kind)).toBe(true);
     expect(h.spawn(kind)).toBe(false);
-    expect(h.labels).toHaveLength(39);
-    expect(new Set(h.labels).size).toBe(39);
+    expect(h.labels).toHaveLength(40);
+    expect(new Set(h.labels).size).toBe(40);
     await ensureActiveAbilityKit(h.scene, 'warrior');
-    expect(h.labels).toHaveLength(39);
+    expect(h.labels).toHaveLength(40);
   },
 );
 

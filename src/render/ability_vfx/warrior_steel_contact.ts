@@ -49,6 +49,7 @@ export function warriorSteelContact(
     heavy ? 0.4 : 0.32,
     roll,
     1.35,
+    facing,
   );
   let count = 1;
   const spray =

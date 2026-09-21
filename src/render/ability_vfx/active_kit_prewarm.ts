@@ -133,6 +133,15 @@ function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
         state.host.texture(texture);
       },
     },
+    {
+      id: 'upload-big:active-warrior-crush',
+      synchronous: true,
+      run: () => {
+        const texture = bakedTexture('warrior_crush');
+        if (!texture) throw new Error('Warrior crush texture was not loaded');
+        state.host.texture(texture);
+      },
+    },
     ...state.host.geometry(ACTIVE_WARRIOR_CRESTS),
   ].filter((unit) => !state.done.has(unit.id));
 }

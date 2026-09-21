@@ -83,7 +83,7 @@ export function drawWarriorHammerContact(
     );
     if (
       host.bakedAt?.(
-        'warrior_shear',
+        'warrior_crush',
         impact.x,
         impact.y,
         impact.z,

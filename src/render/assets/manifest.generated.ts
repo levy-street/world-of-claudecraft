@@ -1697,6 +1697,8 @@ export const MEDIA_ASSETS: Record<string, string> =
   "textures/vfx/production/smoke.webp": "/media/textures/vfx/production/smoke.df9f30d5f4fb.webp",
   "textures/vfx/production/warrior_bite.webp": "/media/textures/vfx/production/warrior_bite.8bceea94e9ec.webp",
   "textures/vfx/production/warrior_blood_blade.png": "/media/textures/vfx/production/warrior_blood_blade.32d3ddaef39c.png",
+  "textures/vfx/production/warrior_crush.ktx2": "/media/textures/vfx/production/warrior_crush.0fb7b1a8ed15.ktx2",
+  "textures/vfx/production/warrior_crush.webp": "/media/textures/vfx/production/warrior_crush.973467decde4.webp",
   "textures/vfx/production/warrior_fervor.webp": "/media/textures/vfx/production/warrior_fervor.b3df1b5bcff5.webp",
   "textures/vfx/production/warrior_forged_steel.png": "/media/textures/vfx/production/warrior_forged_steel.081377ac7da1.png",
   "textures/vfx/production/warrior_power.webp": "/media/textures/vfx/production/warrior_power.68450efac5cc.webp",
