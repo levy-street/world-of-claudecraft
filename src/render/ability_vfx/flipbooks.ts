@@ -1,7 +1,12 @@
 import * as THREE from 'three';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
 import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
-import { WARRIOR_FLASH_GLSL, type WarriorFlashStyle, warriorFlashStyle } from './warrior_flash';
+import {
+  WARRIOR_FLASH_GLSL,
+  WARRIOR_IMPACT_REACH,
+  type WarriorFlashStyle,
+  warriorFlashStyle,
+} from './warrior_flash';
 
 // Camera-facing impact flipbooks, ported from the gallery's spawnFlipbook /
 // updateFlipbooks (arc_bolt_preview.js): one additive quad stepping an 8x8
@@ -206,7 +211,7 @@ export class ImpactFlipbooks {
         : 0.85;
     slot.mat.uniforms.uOpacity.value = 1;
     slot.mesh.position.set(x, y, z);
-    slot.mesh.scale.setScalar(size * 0.65);
+    slot.mesh.scale.setScalar(size * 0.65 * (warrior ? WARRIOR_IMPACT_REACH : 1));
     slot.mesh.visible = true;
   }
 
@@ -230,6 +235,7 @@ export class ImpactFlipbooks {
       slot.mat.uniforms.uOpacity.value = t > 0.7 ? 1 - (t - 0.7) / 0.3 : 1;
       const scale =
         slot.size *
+        (slot.mat.uniforms.uWarriorStyle.value ? WARRIOR_IMPACT_REACH : 1) *
         (0.65 +
           0.55 * easeOutCubic(reducedMotion && slot.mat.uniforms.uWarriorStyle.value ? 0.32 : t));
       slot.mesh.scale.set(scale * slot.aspect, scale, scale);

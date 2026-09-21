@@ -35,6 +35,21 @@ const styles = [
   ['warrior_crush_flash', 4],
 ] as const;
 
+it.each(styles)('expands %s reach without scaling ordinary contacts on pooled reuse', (style) => {
+  const { pool, meshes } = fixture();
+  pool.spawn(0, 1, 0, 8, 0xffffff, 4, style, 0.4);
+  pool.spawn(0, 1, 0, 8, 0xffffff, 4, 'contact_cut', 0.4);
+  pool.update(0.08, camera);
+  const ordinary = meshes[1].scale.x;
+  expect(meshes[0].scale.x).toBeCloseTo(ordinary * 1.7);
+  expect(meshes[0].position.equals(meshes[1].position)).toBe(true);
+  for (let i = 0; i < 5; i++) pool.spawn(0, 1, 0, 8, 0xffffff, 4, 'contact_cut', 0.4);
+  pool.update(0.08, camera);
+  expect(meshes[0].scale.x).toBeCloseTo(ordinary);
+  expect(meshes[0].material.uniforms.uWarriorStyle.value).toBe(0);
+  expect(meshes).toHaveLength(6);
+});
+
 function fixture() {
   const scene = new THREE.Scene();
   const pool = new ImpactFlipbooks(scene);
