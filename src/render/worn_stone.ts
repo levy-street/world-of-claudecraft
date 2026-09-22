@@ -808,20 +808,27 @@ export function applySurfaceDetail(
           // surface within ~33deg of a projection axis exactly one-hot, so a
           // flat wall pays one tap instead of three. The branch is coherent
           // per surface (weights are constant across a facet).
-          if ( w.x >= 0.999 ) return texture2D( tex, p.zy ).r;
-          if ( w.y >= 0.999 ) return texture2D( tex, p.xz ).r;
-          if ( w.z >= 0.999 ) return texture2D( tex, p.xy ).r;
+          // ONE exit on purpose: ANGLE rewrites every early return for HLSL
+          // and the D3D compiler then pays for the rewrite. Measured on an
+          // RTX 3060 (D3D11) as 25 ms per program with the same taps and the
+          // same branches, for no run-time change.
+          float r;
+          if ( w.x >= 0.999 ) r = texture2D( tex, p.zy ).r;
+          else if ( w.y >= 0.999 ) r = texture2D( tex, p.xz ).r;
+          else if ( w.z >= 0.999 ) r = texture2D( tex, p.xy ).r;
           // Exact geometric-axis zeroes are coherent across the flat facets
           // used by town kits. Preserve the two active terms in their
           // original order and omit only the fetch multiplied by exact zero.
-          if ( axis.x <= 0.0 )
-            return texture2D( tex, p.xz ).r * w.y + texture2D( tex, p.xy ).r * w.z;
-          if ( axis.y <= 0.0 )
-            return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xy ).r * w.z;
-          if ( axis.z <= 0.0 )
-            return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y;
-          return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y
-            + texture2D( tex, p.xy ).r * w.z;
+          else if ( axis.x <= 0.0 )
+            r = texture2D( tex, p.xz ).r * w.y + texture2D( tex, p.xy ).r * w.z;
+          else if ( axis.y <= 0.0 )
+            r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xy ).r * w.z;
+          else if ( axis.z <= 0.0 )
+            r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y;
+          else
+            r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y
+              + texture2D( tex, p.xy ).r * w.z;
+          return r;
         }`,
       )
       .replace(

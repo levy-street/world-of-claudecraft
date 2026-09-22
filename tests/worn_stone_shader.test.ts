@@ -113,21 +113,21 @@ describe('insane worn-surface fragment shader', () => {
   });
 
   it('uses exact-zero two-plane fast paths for scalar and normal maps', () => {
-    expect(fragmentShader).toContain('if ( axis.x <= 0.0 )');
-    expect(fragmentShader).toContain('if ( axis.y <= 0.0 )');
-    expect(fragmentShader).toContain('if ( axis.z <= 0.0 )');
+    expect(fragmentShader).toContain('else if ( axis.x <= 0.0 )');
+    expect(fragmentShader).toContain('else if ( axis.y <= 0.0 )');
+    expect(fragmentShader).toContain('else if ( axis.z <= 0.0 )');
     expect(fragmentShader).toContain('else if ( wornAxis.x <= 0.0 )');
     expect(fragmentShader).toContain('else if ( wornAxis.y <= 0.0 )');
     expect(fragmentShader).toContain('else if ( wornAxis.z <= 0.0 )');
     expect(fragmentShader).toContain('vec3 wornGN = wornUnitN * faceDirection;');
     expect(fragmentShader).toContain(
-      'return texture2D( tex, p.xz ).r * w.y + texture2D( tex, p.xy ).r * w.z;',
+      'r = texture2D( tex, p.xz ).r * w.y + texture2D( tex, p.xy ).r * w.z;',
     );
     expect(fragmentShader).toContain(
-      'return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xy ).r * w.z;',
+      'r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xy ).r * w.z;',
     );
     expect(fragmentShader).toContain(
-      'return texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y;',
+      'r = texture2D( tex, p.zy ).r * w.x + texture2D( tex, p.xz ).r * w.y;',
     );
     expect(fragmentShader).toContain(
       'wornWorldN = normalize( wornNy.xzy * wornW.y + wornNz.xyz * wornW.z );',
@@ -138,6 +138,14 @@ describe('insane worn-surface fragment shader', () => {
     expect(fragmentShader).toContain(
       'wornWorldN = normalize( wornNx.zyx * wornW.x + wornNy.xzy * wornW.y );',
     );
+  });
+
+  it('leaves wornTriR one exit: ANGLE pays for every early return it rewrites', () => {
+    const start = fragmentShader.indexOf('float wornTriR(');
+    const body = fragmentShader.slice(start, fragmentShader.indexOf('return r;', start) + 9);
+    const code = body.replace(/\/\/.*$/gm, '');
+    expect(code.match(/\breturn\b/g)).toHaveLength(1);
+    expect(body).toContain('return r;');
   });
 
   it('keeps the existing distance tap culling, now driven by fade uniforms and live taps', () => {
