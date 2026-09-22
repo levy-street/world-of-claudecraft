@@ -88,6 +88,17 @@ export function buildSharedInterestCandidates(
   /** Optional wide band: anchor cells whose center the predicate covers query
    *  at the wider radius (the raised same-slot battleground interest). */
   wideBand: WideBandQuery | null = null,
+  /**
+   * Entities appended to EVERY cell's candidate list regardless of the query radius.
+   *
+   * For the handful of entities whose interest range is far wider than any grid query the
+   * broadcast can afford (a world-boss landmark: a zone-sized radius, against a 130 yard
+   * query). Widening the query itself would scale the scanned cell count with the square of
+   * the radius for every viewer in the realm, to find one entity the caller already has a
+   * direct reference to. The caller still applies its own per-viewer cutoff to these, so
+   * appending one does not admit it: it only makes it visible to the cutoff at all.
+   */
+  always: readonly Entity[] = [],
 ): SharedInterestCandidates {
   const cellSize = grid.cellSize;
   const radius = sharedQueryRadius(baseRadius, cellSize);
@@ -125,6 +136,10 @@ export function buildSharedInterestCandidates(
     grid.forEachInRadius(centerX, centerZ, cellRadius, (e) => {
       list.push(e);
     });
+    // Appended, not merged: a landmark inside the query radius is already in `list`, and the
+    // per-viewer loop is keyed on entity id (`sentEnts`, `present`), so a duplicate visit
+    // costs one redundant distance test and changes nothing it writes.
+    for (const e of always) if (!list.includes(e)) list.push(e);
     cellCandidates.set(key, list);
     cellQueryCount++;
   }

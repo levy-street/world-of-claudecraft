@@ -319,7 +319,11 @@ describe('item webp icons', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04) to 136. This merge unions both waves
     // plus this branch's own Crucible professions weapon additions; re-counted directly
     // off the merged src/ui/weapon_variants.ts (Object.keys(ITEM_WEAPON_VARIANTS).size).
-    expect(WEAPON_IMAGE_IDS.size).toBe(138);
+    // 140 at the Mirefen world-boss forward-port: the boss's signature maul
+    // (foremans_barrowmaul) and Skerrit's Shardpike, whose quest tool got its
+    // own held model and therefore its own painted icon, are both disjoint
+    // additions to that registry.
+    expect(WEAPON_IMAGE_IDS.size).toBe(140);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {

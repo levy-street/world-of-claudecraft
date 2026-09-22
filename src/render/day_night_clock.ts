@@ -6,11 +6,8 @@
 // the HUD (minimap dial) both read currentDayNightPhase(), so a single override
 // drives them together and they never disagree.
 
+import { NOON_PHASE } from '../sim/day_night';
 import { cyclePhase, DAY_ONLY, lunarPhase } from './day_night_core';
-
-/** Phase 0.5 is solar noon (see globalDayness in day_night_core). While DAY_ONLY
- *  holds, the live clock reports this instead of the UTC-anchored phase. */
-const NOON_PHASE = 0.5;
 
 let phaseOverride: number | null = null;
 

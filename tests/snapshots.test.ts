@@ -5266,8 +5266,11 @@ const ALL_DELTA_KEYS = [
   'hpw',
   'hrat',
   'inv',
+  'lance',
+  'lguide',
   'lhonor',
   'lockouts',
+  'lrest',
   'lroll',
   'lrollg',
   'lxp',
@@ -5383,8 +5386,10 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
   inv: 'inventory',
+  lance: 'lanceTrial',
   lhonor: 'lifetimeHonor',
   lockouts: 'selfLockouts',
+  lrest: 'lanceRestRemaining',
   lroll: 'lootRollPrompts',
   lrollg: 'lootRollGroup',
   lxp: 'lifetimeXp',
@@ -5471,6 +5476,13 @@ function dirtyEveryDeltaField(): {
   // `cbt`: the authoritative in-combat bit; a fresh character is out of combat,
   // so the fixture flags it the way the sim's engaged pass would.
   p.inCombat = true;
+
+  // The Shardpike trial (lance + lrest): pike in hand, brace live, rest stamp set.
+  // Brace FIRST (the verb refuses while resting), then stamp the rest window.
+  meta.equipment.mainhand = 'skerrits_shardpike';
+  p.onGround = true;
+  sim.lanceBrace(lp);
+  meta.lanceRestUntil = sim.time + 3;
 
   // Poke the encoder's exact sources for the mutually-exclusive cases.
   const run = sim.delveRunForPlayer(lp) as any;
@@ -6516,7 +6528,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 98 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6524,7 +6536,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // hrat/hirat/xp/lxp/rxp/prk/copper/ddiff) moved off the always-present
     // self record and behind this same delta gate, for 83, then +1 reliq
     // (Reliquary Phase 3 sparse blob), +1 aborder (the Book of Deeds nameplate
-    // border echo, atitle's sibling), and +1 `app` (the release's authored
+    // border echo, atitle's sibling), +2 lance/lrest (the Shardpike trial's
+    // self view + rest cooldown), and +1 `app` (the release's authored
     // modular look, which cannot come from the entity list because the
     // broadcast loop skips the viewer's own entity, and which is heavy and
     // immutable so it rides this channel instead of re-serializing per tick),
@@ -6560,8 +6573,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
     // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
-    expect(ALL_DELTA_KEYS).toHaveLength(95);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
+    // The Mirefen world boss then adds the Shardpike trial's three self keys:
+    // lance (the balance-trial self view) and lrest (the rest cooldown), plus
+    // lguide (the guidance the loud on-screen prompt paints: null between
+    // pikes, so the delta only ever ships it to a wielder), for 98, counted
+    // from the merged registry above rather than from either side.
+    expect(ALL_DELTA_KEYS).toHaveLength(98);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(98);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6723,8 +6741,10 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
-    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
-    expect(scraped.size).toBe(95);
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95. The
+    // Mirefen world boss then adds the Shardpike trial's three self emits,
+    // lance, lrest and lguide (server/game.ts bcastSelf), for 98.
+    expect(scraped.size).toBe(98);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

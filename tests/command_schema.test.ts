@@ -170,8 +170,16 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // realm roster answered by the `who` frame; the chat /who stays as it was).
 // Market Sweep composes on top of it with `market_sweep_quote` and
 // `market_sweep`, both client-sent and server-dispatched.
-const EXPECTED_SEND_COUNT = 225;
-const EXPECTED_DISPATCH_COUNT = 239;
+// The Mirefen world boss sync composes again and CONFLICTED: the feature
+// parent read 202/215/13 on its own, ours 225/239/14. The Shardpike balance
+// trial's three commands (lance_brace, lance_thrust, lance_release) are each a
+// client send plus a server dispatch, so both counts move together by three
+// and the dispatch-only allowlist is untouched: 228/242/14. Re-derived by
+// replaying this suite's own scans over the merged tree (src/net recursively
+// for the sends, server/game.ts dispatchMessage for the labels, and
+// COMMAND_NAMES for the table), never by adding the two sides' deltas on paper.
+const EXPECTED_SEND_COUNT = 228;
+const EXPECTED_DISPATCH_COUNT = 242;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

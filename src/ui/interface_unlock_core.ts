@@ -189,6 +189,28 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 180, h: 44 },
     detachToUiRoot: true,
   },
+  // The Shardpike bar (src/ui/hud/shardpike/): the Balgath quest tool's three verbs,
+  // standing in the transformed #actionbar-stack beside the stance and pet bars, so it
+  // detaches exactly as they do. It is a REGISTERED row rather than an exemption because it
+  // is an action bar the player presses under boss pressure: leaving it the one immovable
+  // bar in the stack would drop it on top of whatever a player with a rearranged HUD has
+  // already docked there, and the stock slot is chosen for a stock layout only.
+  //
+  // Content-scoped, not class-scoped, so it needs no classGatedFrameActive arm: any class
+  // can carry the pike. It falls through to isHudFrameActive's default (true), which is the
+  // posture the cast bar, both swing timers and the Delve / Rift trackers already take:
+  // hidden in play until its content exists, shown as a dimmed placeholder while editing so
+  // the frame can be placed before the fight rather than during it.
+  {
+    id: 'shardpikeBar',
+    elementId: 'shardpike-bar',
+    storageKey: 'woc_hud_frame_shardpike_bar',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.shardpikeBar',
+    // Three 40px verbs in a 4px-gapped, 4px-padded, 2px-bordered group (140 x 52), plus the
+    // 10px balance beam and its 4px gap once the pike is couched.
+    fallbackSize: { w: 140, h: 66 },
+    detachToUiRoot: true,
+  },
   {
     id: 'xpBar',
     elementId: 'xpbar',

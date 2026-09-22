@@ -344,6 +344,33 @@ export const pl_PL: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Ten wybór materiału nie jest już dostępny.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Potępienie",
       "fateThreadsLabel": "Nici Przeznaczenia",
@@ -3270,6 +3297,7 @@ export const pl_PL: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Zmniejsza wszelkie otrzymywane obrażenia o {pct}%",
+      "slumber": "Śpi do świtu. Nie można go zaatakować i nie obudzi się dla nikogo.",
       "guardianWard": "Kolejny śmiertelny cios wroga zamiast tego przywraca cię do {pct}% zdrowia",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -3346,7 +3374,9 @@ export const pl_PL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} powstaje nad Wyżynami Ciernistego Szczytu!"
+      "spawn": "{name} wznosi się nad {zone}!",
+      "wake": "{name} budzi się nad {zone}!",
+      "sleep": "{name} śpi do świtu."
     },
     "auth": {
       "appleLoginCta": "Kontynuuj przez Apple",
@@ -3480,6 +3510,7 @@ export const pl_PL: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Pasek postaw",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Pasek doświadczenia",
         "chat": "Czat",
         "actionBarGroup": "Paski akcji",
@@ -6399,6 +6430,7 @@ export const pl_PL: EnTranslations = {
       "framesGovernedExtra": "Edycja ramek odblokowuje także stos śledzonych elementów poniżej: śledzone zadania i ich cele, postęp dokonań, strony Reliquarium, przypięte receptury rzemieślnicze, aktywną wyprawę, każdą trwającą szczelinę oraz śledzoną recepturę lub zlecenie. Obejmuje też pasek akcji pupila obok jego ramki, ramkę kropek Celu dla osłabień pobliskich wrogów, medalion Oddania paladyna, Pasek utrapień czarnoksiężnika, nakładkę wyzwalacza zaklęć, zegar uderzeń broni podręcznej dla walczących dwiema broniami oraz okno miernika obrażeń z kartami. Każdy element ma własną etykietę, gdy zostanie odblokowany.",
       "framesGovernedAuraTracks": "Edycja ramek odblokowuje także sześć dobrowolnych ścieżek aur, gdy włączysz je na karcie Walka tych samych opcji interfejsu: ścieżkę Moje premie, ścieżkę defensywnych czasów odnowienia, ścieżkę Moich tarcz, ścieżkę ofensywnych czasów odnowienia, ścieżkę Ruchu i ukrycia oraz ścieżkę Moich premii na sojusznikach. Każda ścieżka jest domyślnie wyłączona i każda nosi własną etykietę, gdy zostanie odblokowana.",
       "framesGovernedTalkingHead": "Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Paski, liczniki i tekst walki",
       "barsBody": "Twój pasek rzucania pojawia się na środku ekranu, tuż nad paskami akcji, gdy tylko rzucasz zaklęcie lub kanałujesz, i pokazuje nazwę zaklęcia oraz pozostały czas. Twój cel dostaje własny pasek rzucania na swojej ramce, więc widzisz, co nadchodzi, i możesz na to odpowiedzieć.\n\nCienki pasek zamachu leży pod paskiem rzucania i wypełnia się między zamachami twojej broni, więc wojownik walczący wręcz lub na dystans widzi, kiedy padnie następne automatyczne trafienie.\n\nTwój pasek doświadczenia biegnie na całą szerokość pod paskami akcji, podzielony na odcinki, a jaśniejszy fragment pokazuje zgromadzone doświadczenie z wypoczęcia.\n\nZanurz się pod wodą, a na górze ekranu pojawi się niebieski pasek oddechu. Opróżnia się, dopóki twoja głowa jest pod wodą, błyska na czerwono, gdy się wyczerpie i zaczynasz tonąć, i szybko napełnia się ponownie, gdy tylko wynurzysz się na powierzchnię. Spacja unosi cię w górę, a klawisz Nurkowania w dół, domyślnie Ctrl, zabiera cię głębiej.\n\nObrażenia i leczenie unoszą się nad tym, w co trafiły, jako małe liczby, więc możesz odczytać przebieg walki bez czytania tekstu. Zakładka Walka w twoim oknie czatu prowadzi pełny pisemny zapis.",
       "aurasTitle": "Wzmocnienia i osłabienia",
@@ -14075,6 +14107,30 @@ export const pl_PL: EnTranslations = {
       "fenshadow_maul": {
         "name": "Obuch Bagiennego Cienia"
       },
+      "foremans_barrowmaul": {
+        "name": "Kurhanowy Młot Sztygara"
+      },
+      "skerrits_shardpike": {
+        "name": "Odłamkowa Pika Skerrita"
+      },
+      "loomshard_eye": {
+        "name": "Oko Odłamka Krosna"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Kurhanowe Naramienniki"
+      },
+      "mirestone_stride": {
+        "name": "Krok Bagiennego Kamienia"
+      },
+      "foremans_wage_band": {
+        "name": "Pierścień zapłaty Brygadzisty"
+      },
+      "mirelight_locket": {
+        "name": "Medalion Bagiennego Blasku"
+      },
+      "fenwright_grips": {
+        "name": "Chwyty Bagiennego Rzemieślnika"
+      },
       "wildgrove_cinch": {
         "name": "Pas Dzikich Ostępów"
       },
@@ -17011,6 +17067,9 @@ export const pl_PL: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Budzący się Szczyt"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Zbudzony Burzowiec"
       },
@@ -17503,6 +17562,11 @@ export const pl_PL: EnTranslations = {
         "name": "Strażnik Fenwick",
         "title": "Strażnik Fenbridge",
         "greeting": "Zatrzymaj się przy bramie, {className}. Za tym sitowiem trzęsawisko zabija za nas."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Brat Aldric",
@@ -18212,6 +18276,16 @@ export const pl_PL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Rozkaz zaciągu z Fenbridge"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const pl_PL: EnTranslations = {
           },
           "7": {
             "label": "Zatopiony Bastion"
+          },
+          "8": {
+            "label": "Włości Kurhanu"
+          },
+          "9": {
+            "label": "Krater Spadającej Gwiazdy"
           }
         }
       },

@@ -102,9 +102,12 @@ export type RuntimeSimConfig = Required<
     | 'storagePrices'
     | 'vaultConsumptionAdmission'
     | 'gathererIdentity'
+    // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+    // (dayNightPhase() answers null), which tests and the RL env rely on.
+    | 'dayNightNowMs'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds' | 'dayNightNowMs'>;
 
 export interface DamageResolution {
   landedHpLoss: number;
@@ -442,6 +445,11 @@ export interface SimContextCallbacks {
   // raid rooms' normal and heroic lockouts expire on (host-owned like raidResetMs;
   // offline/headless fall back to a flat 7-day week).
   weeklyRaidResetMs(nowMs: number): number;
+  // The world day/night phase in [0,1) (0 midnight, 0.5 noon; src/sim/day_night.ts) off
+  // the host clock SimConfig.dayNightNowMs, or null when the host supplies no such
+  // clock (tests, the RL env): null means "there is no night", and every nocturnal
+  // rule must treat it as permanent day so those worlds stay the pre-cycle world.
+  dayNightPhase(): number | null;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -1537,6 +1545,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
     weeklyRaidResetMs: host.weeklyRaidResetMs,
+    dayNightPhase: host.dayNightPhase,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,

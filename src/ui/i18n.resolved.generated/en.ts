@@ -344,6 +344,33 @@ export const en: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "That material selection is no longer available.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Condemnation",
       "fateThreadsLabel": "Fate Threads",
@@ -3270,6 +3297,7 @@ export const en: EnTranslations = {
       "dodge": "Increases dodge chance by {pct}%",
       "dodgeReduce": "Reduces dodge chance by {pct}%",
       "damageReduction": "Reduces all damage taken by {pct}%",
+      "slumber": "Asleep until dawn. Cannot be attacked and will not wake for anyone.",
       "guardianWard": "The next lethal enemy hit restores you to {pct}% health instead",
       "armorFlat": "Reduces armor by {value}",
       "armorFlatStacks": "Reduces armor by {value} ({stacks} stacks)",
@@ -3346,7 +3374,9 @@ export const en: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rises over Thornpeak Heights!"
+      "spawn": "{name} rises over {zone}!",
+      "wake": "{name} wakes over {zone}!",
+      "sleep": "{name} sleeps until dawn."
     },
     "auth": {
       "appleLoginCta": "Continue with Apple",
@@ -3480,6 +3510,7 @@ export const en: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Stance Bar",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP Bar",
         "chat": "Chat",
         "actionBarGroup": "Action Bars",
@@ -6399,6 +6430,7 @@ export const en: EnTranslations = {
       "framesGovernedExtra": "Edit Frames also loosens the tracker stack below (your tracked quests and their objectives, your deed progress, your Reliquary pages, recipes you pinned from crafting, the delve you are in, any rift you are taking part in, and the recipe or commission you are tracking), the pet action bar beside your pet frame, the Target dots frame for your debuffs across nearby enemies, the paladin's Devotion medallion, the warlock's Affliction Bar, the spell-proc overlay, the off-hand swing timer for dual-wielders, and the tabbed damage meter window, each wearing its own name chip while it is loose.",
       "framesGovernedAuraTracks": "Edit Frames also loosens the six opt-in aura tracks once you have switched them on from the Combat tab of the same Interface options: the My Buffs track, the Defensive Cooldowns track, the My Shields track, the Offensive Cooldowns track, the Movement and Stealth track, and the My Buffs on Allies track. Every track is off by default, and each wears its own name chip while it is loose.",
       "framesGovernedTalkingHead": "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Bars, timers, and combat text",
       "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",
@@ -14075,6 +14107,30 @@ export const en: EnTranslations = {
       "fenshadow_maul": {
         "name": "Fenshadow Maul"
       },
+      "foremans_barrowmaul": {
+        "name": "Foreman's Barrowmaul"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrit's Shardpike"
+      },
+      "loomshard_eye": {
+        "name": "The Loomshard Eye"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Barrowhide Pauldrons"
+      },
+      "mirestone_stride": {
+        "name": "Mirestone Stride"
+      },
+      "foremans_wage_band": {
+        "name": "Foreman's Wage Band"
+      },
+      "mirelight_locket": {
+        "name": "Mirelight Locket"
+      },
+      "fenwright_grips": {
+        "name": "Fenwright Grips"
+      },
       "wildgrove_cinch": {
         "name": "Wildgrove Cinch"
       },
@@ -17011,6 +17067,9 @@ export const en: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, the Waking Peak"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Roused Stormling"
       },
@@ -17503,6 +17562,11 @@ export const en: EnTranslations = {
         "name": "Warden Fenwick",
         "title": "Warden of Fenbridge",
         "greeting": "Hold at the gate, {className}. Past those reeds, the fen does the killing for us."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Brother Aldric",
@@ -18212,6 +18276,16 @@ export const en: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Muster Order"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const en: EnTranslations = {
           },
           "7": {
             "label": "The Sunken Bastion"
+          },
+          "8": {
+            "label": "Barrowmound Reach"
+          },
+          "9": {
+            "label": "Starfall Crater"
           }
         }
       },

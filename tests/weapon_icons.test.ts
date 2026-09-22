@@ -58,7 +58,13 @@ describe('painted weapon inventory icons', () => {
     // `npx vitest run tests/weapon_icons.test.ts` run on the merged tree:
     // this assertion, and the 19-heroic-copy count in the next test, both
     // pass as-is.
-    expect(baseWeapons).toHaveLength(138);
+    //
+    // 140 at the Mirefen world-boss forward-port: the boss's signature maul
+    // (foremans_barrowmaul, balgath-boss-icons-2026-08-18) and Skerrit's
+    // Shardpike (shardpike-mechanic-icons-2026-08-20) are both disjoint
+    // additions to the registry, so 138 + 2 = 140. Re-counted directly off
+    // the merged src/ui/weapon_variants.ts.
+    expect(baseWeapons).toHaveLength(140);
     expect([...WEAPON_IMAGE_IDS].sort()).toEqual(baseWeapons);
     expect(Object.keys(ITEM_WEAPON_VARIANTS).sort()).toEqual(baseWeapons);
     for (const id of baseWeapons) {
@@ -99,7 +105,12 @@ describe('painted weapon inventory icons', () => {
     // this release-branch merge, the Nythraxis gap-fill one-handers
     // (nythraxis-gap-weapon-renders-2026-09-04, asserted below as
     // `gapBatch`).
-    expect(weaponBatches).toHaveLength(7);
+    // Nine at the Mirefen world-boss forward-port: the boss batch
+    // (balgath-boss-icons-2026-08-18), whose maul is a weapon-registry item,
+    // and the Shardpike mechanic batch (shardpike-mechanic-icons-2026-08-20),
+    // whose pike is another. Re-counted off the merged
+    // public/ui/items/mapping.json.
+    expect(weaponBatches).toHaveLength(9);
     const historicalBatch = weaponBatches.find(
       ({ batchId }) => batchId === 'placeholder-art-completion-weapons-2026-08-09',
     );
@@ -206,6 +217,29 @@ describe('painted weapon inventory icons', () => {
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(gapWeaponIds).toEqual(['courtiers_bonefang', 'gravecourt_hewer', 'thornpeak_wardblade']);
+    // The Mirefen world boss's maul ships in its own batch
+    // (balgath-boss-icons-2026-08-18): a batch that lands after the
+    // historical one OWNS its ids, so the historical batch's frozen scope
+    // excludes them.
+    const bossBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'balgath-boss-icons-2026-08-18',
+    );
+    expect(bossBatch).toBeDefined();
+    const bossWeaponIds = (bossBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(bossWeaponIds).toEqual(['foremans_barrowmaul']);
+    // Same shape again for the Shardpike mechanic batch
+    // (shardpike-mechanic-icons-2026-08-20), whose quest-tool pike gained a
+    // held model and therefore its own painted inventory art.
+    const shardpikeBatch = weaponBatches.find(
+      ({ batchId }) => batchId === 'shardpike-mechanic-icons-2026-08-20',
+    );
+    expect(shardpikeBatch).toBeDefined();
+    const shardpikeWeaponIds = (shardpikeBatch?.itemIds ?? [])
+      .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
+      .sort();
+    expect(shardpikeWeaponIds).toEqual(['skerrits_shardpike']);
     expect(historicalBatch?.itemIds).toEqual(
       expected.filter(
         (id) =>
@@ -214,7 +248,9 @@ describe('painted weapon inventory icons', () => {
           !masterwroughtWeaponIds.includes(id) &&
           !crucibleWeaponIds.includes(id) &&
           !varkhulWeaponIds.includes(id) &&
-          !gapWeaponIds.includes(id),
+          !gapWeaponIds.includes(id) &&
+          !bossWeaponIds.includes(id) &&
+          !shardpikeWeaponIds.includes(id),
       ),
     );
     expect(
@@ -256,15 +292,20 @@ describe('painted weapon inventory icons', () => {
     // The chunk records are the frozen weapon campaign's generation reports:
     // they slice the pre-integration weapon roster, without the four
     // integration daggers, the two Masterwrought phase 09 weapons, the nine
-    // Crucible raid weapons, or the Ignivar legendary, all of which postdate
-    // the campaign.
+    // Crucible raid weapons, the Ignivar legendary, the Nythraxis gap-fill
+    // one-handers, the Mirefen world-boss maul, or Skerrit's Shardpike, all
+    // of which postdate the campaign and own their own art. Any weapon added
+    // from here on has to be excluded here too, or it shifts every slice
+    // boundary and all four chunk assertions fail at once.
     const campaignExpected = expected.filter(
       (id) =>
         !integrationWeaponIds.includes(id) &&
         !masterwroughtWeaponIds.includes(id) &&
         !crucibleWeaponIds.includes(id) &&
         !varkhulWeaponIds.includes(id) &&
-        !gapWeaponIds.includes(id),
+        !gapWeaponIds.includes(id) &&
+        !bossWeaponIds.includes(id) &&
+        !shardpikeWeaponIds.includes(id),
     );
     expect(chunkA.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(0, 40));
     expect(chunkB.assets.map(({ id }) => id)).toEqual(campaignExpected.slice(40, 80));

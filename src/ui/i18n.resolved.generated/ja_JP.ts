@@ -344,6 +344,33 @@ export const ja_JP: EnTranslations = {
       "nameplate": "＜{title}＞"
     },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
+    "shardpike": {
+      "braceLabel": "シャードパイクを構える",
+      "braceTooltip": "石突きを地面に突き立て、穂先を上げる。横移動キーがバランス棒だ：ビームは自然に流れ、彼が地面を叩くたびに弾かれる。両端に触れさせず {set} 秒保てば穂先が定まる。固い地面が必要で、騎乗中は不可。",
+      "thrustLabel": "ルームシャード・スラスト",
+      "thrustTooltip": "定まった穂先を眼に突き入れ、{damage} のダメージを与える。レベルも攻撃力もパイク自体も、何一つこの値を伸ばさない。番人を盲目にしバロウハイドを剥ぎ取るので、湿地の他のあらゆる武器がようやく通るようになる。定まったパイクだけが放てる一撃で、射程 {reach} ヤード、猶予は {seconds} 秒。",
+      "releaseLabel": "シャードパイクを下ろす",
+      "releaseTooltip": "パイクを収める。降りるのに罰則はない：失うのは構えだけで機会そのものではなく、{rest} 秒後に再び構えられる。",
+      "whyResting": "パイクを下ろしたばかりだ。アイコンの残り時間を待て。",
+      "whyAlreadyCouched": "パイクはすでに構えている。構え直す前に下ろせ。",
+      "whyNotSet": "穂先が定まっていない。まず構えて支えろ。",
+      "whyNothingCouched": "下ろすものがない：パイクを構えていない。",
+      "beamLabel": "シャードパイクの均衡",
+      "beamStatus": "パイクの均衡 {balance}、定着 {set} パーセント。",
+      "beamDanger": "パイクの均衡 {balance}、取り落としかけている。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "横移動キーでパイクを支えろ",
+      "promptCatchIt": "立て直せ、パイクが倒れる",
+      "promptEyeOut": "眼が潰れた、残り {seconds} 秒：全力で叩き込め",
+      "promptSealed": "眼は閉じている。{seconds} 秒後に再び開く",
+      "promptResetting": "パイクを構え直している、{seconds} 秒",
+      "promptCloser": "番人に近づけ、あと {yards} ヤード",
+      "promptBrace": "シャードパイクを構え、そのまま支えろ",
+      "promptFindBoss": "スケリットのシャードパイク：これで番人の眼を潰せ",
+      "promptTally": "{count} put out",
+      "promptLabel": "シャードパイクの指示",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
@@ -3270,6 +3297,7 @@ export const ja_JP: EnTranslations = {
       "dodge": "回避率を{pct}%上昇させる",
       "dodgeReduce": "回避率を{pct}%低下させる",
       "damageReduction": "受けるすべてのダメージを{pct}%軽減する",
+      "slumber": "夜明けまで眠っている。攻撃できず、誰が来ても目を覚まさない。",
       "guardianWard": "次に受ける敵の致死攻撃を防ぎ、代わりに体力を{pct}%まで回復する",
       "armorFlat": "防御力を{value}低下させる",
       "armorFlatStacks": "防御力を{value}低下させる({stacks}スタック)",
@@ -3346,7 +3374,9 @@ export const ja_JP: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}がソーンピーク高地に立ち上がった！"
+      "spawn": "{name}が{zone}にそびえ立つ！",
+      "wake": "{name}が{zone}で目を覚ました！",
+      "sleep": "{name}は夜明けまで眠っている。"
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
@@ -3480,6 +3510,7 @@ export const ja_JP: EnTranslations = {
         "menu": "メニュー",
         "minimap": "ミニマップ",
         "stanceBar": "スタンスバー",
+        "shardpikeBar": "シャードパイクバー",
         "xpBar": "経験値バー",
         "chat": "チャット",
         "actionBarGroup": "アクションバー",
@@ -6399,6 +6430,7 @@ export const ja_JP: EnTranslations = {
       "framesGovernedExtra": "「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。",
       "framesGovernedAuraTracks": "「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。",
       "framesGovernedTalkingHead": "「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。",
+      "framesGovernedShardpike": "「フレームを編集」ではシャードパイクバーも動かせるようになります。シャードパイクバーは、シャードパイクを持っているあいだだけアクションバーの横に現れるクエスト道具の短い列で、ロック解除中は名前チップを表示します。戦闘中ではなく戦闘前に配置しておけます。",
       "barsTitle": "バー、タイマー、戦闘テキスト",
       "barsBody": "詠唱やチャネルを行うと、画面中央、アクションバーのすぐ上にキャストバーが現れ、呪文の名前と残り時間を伝えます。ターゲットにもそのフレーム上に専用のキャストバーが出るので、何が来るのかを見て応じられます。\n\nキャストバーの下には細いスイングバーがあり、武器を振るたびに満ちていきます。近接や遠隔で戦う人は、次の自動攻撃がいつ当たるのかを見て取れます。\n\n経験値バーはアクションバーの下を画面幅いっぱいに走り、区切りが刻まれ、明るく伸びた部分が蓄えている休息経験値を示します。\n\n水中を泳ぐと、画面上部に青い息バーが現れます。頭が沈んでいる間は減り続け、尽きて溺れ始めると赤く点滅し、水面に出た瞬間に素早く戻ります。スペースで浮上し、初期設定でCtrlの「潜水」キーを押せばさらに深く潜れます。\n\nダメージと回復は、当たった相手の上に小さな数字となって浮かび上がるので、文字を読まなくても戦いの流れがつかめます。書かれた記録はすべて、チャットボックスの「戦闘」タブに残ります。",
       "aurasTitle": "バフとデバフ",
@@ -14075,6 +14107,30 @@ export const ja_JP: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影の大槌"
       },
+      "foremans_barrowmaul": {
+        "name": "監督の塚砕き"
+      },
+      "skerrits_shardpike": {
+        "name": "スケリットのシャードパイク"
+      },
+      "loomshard_eye": {
+        "name": "織機片の眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "塚山の肩当て"
+      },
+      "mirestone_stride": {
+        "name": "泥石の歩み"
+      },
+      "foremans_wage_band": {
+        "name": "職長の賃金の指輪"
+      },
+      "mirelight_locket": {
+        "name": "沼灯りのロケット"
+      },
+      "fenwright_grips": {
+        "name": "沼地職人のグリップ"
+      },
       "wildgrove_cinch": {
         "name": "野林の締め帯"
       },
@@ -17011,6 +17067,9 @@ export const ja_JP: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "サンザール、目覚めし峰"
       },
+      "balgath_cyclops": {
+        "name": "バルガス、単眼の監督"
+      },
       "thunzharr_stormling": {
         "name": "目覚めた嵐の精"
       },
@@ -17503,6 +17562,11 @@ export const ja_JP: EnTranslations = {
         "name": "番人フェンウィック",
         "title": "フェンブリッジの番人",
         "greeting": "門で止まりなさい、{className}。葦の向こうでは沼が我々の代わりに命を奪います。"
+      },
+      "socketwright_skerrit": {
+        "name": "マベン・スケリット",
+        "title": "嵌め込み職人",
+        "greeting": "あの眼を研いで彼の眼窩に据えてから四十年、一日分の払いももらっていない。番人に痛い目を見せたいのか、{className}？なら俺の仕事を狙え。"
       },
       "brother_aldric_fen": {
         "name": "アルドリック修道士",
@@ -18212,6 +18276,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "フェンブリッジ召集令"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "嵌め込み職人の未払い",
+        "text": "あの眼窩にルームシャードを据えたのは俺だ。レンズを研ぎ、座らせ、楔で正しく固めた。塚の主たちは銅貨一枚も払わず、いま俺の仕事が湿地を踏み均して歩き回っている。俺のシャードパイクを持って行け。石突きを突き立て、穂先を据えて、どれだけかかろうと保て。腕が定まったら、それを眼に通せ。彼のまとう皮はあの欠片に縛られている、{playerName}：盲目にすれば、湿地のあらゆる刃がようやく通る。",
+        "completion": "手応えがあっただろう？四十年分の利息、眼窩を通して払わせた。パイクはあんたのものだ。彼は治る、いつもそうだ。だから気が向いたらまた取り立てに行けばいい。",
+        "objectives": {
+          "0": {
+            "label": "番人の眼を潰す"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const ja_JP: EnTranslations = {
           },
           "7": {
             "label": "沈んだ砦"
+          },
+          "8": {
+            "label": "塚山の領域"
+          },
+          "9": {
+            "label": "星落ちのクレーター"
           }
         }
       },

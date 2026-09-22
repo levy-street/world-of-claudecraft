@@ -56,6 +56,10 @@ export function buildRealmSimConfig(
     // pulled someone.
     idleMobTickRadius: PLAYER_INTEREST_DROP_RADIUS,
     lockoutNowMs: () => Date.now(),
+    // The day/night cycle the clients draw is UTC-anchored (src/sim/day_night.ts), so
+    // the realm hands the sim the same clock: the boss who sleeps at night lies down
+    // under the very sky every player sees darken, with no wire traffic to agree on it.
+    dayNightNowMs: () => Date.now(),
     // Raid lockouts end at the next 3 AM (the classic daily reset) in this realm's civil
     // time zone, so the whole realm shares one predictable reset (via REALM_RESET_TZ).
     raidResetMs: (nowMs) => nextRaidResetMs(nowMs, REALM_RESET_TIME_ZONE),

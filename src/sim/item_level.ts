@@ -190,7 +190,17 @@ function buildSourceIndex(): Map<string, ItemSource> {
   for (const mob of Object.values(MOBS)) {
     if (!mob.loot) continue;
     const raid = isRaidMob(mob.id);
-    for (const entry of mob.loot) bump(entry.itemId, mob.maxLevel, raid);
+    for (const entry of mob.loot) {
+      // A world boss's level-gated personal entry (LootEntry.maxPlayerLevel) is content
+      // for the level it can fall to, not for the level of the boss: the locals' share
+      // of a level-20 boss in a level 6 to 13 zone is level-13 gear, budgeted and
+      // level-gated as such, rather than a level-20 epic quietly handed to a level eight.
+      const level =
+        entry.maxPlayerLevel === undefined
+          ? mob.maxLevel
+          : Math.min(mob.maxLevel, entry.maxPlayerLevel);
+      bump(entry.itemId, level, raid);
+    }
   }
   // Quest rewards: gated behind the quest's hardest combat source: direct kill
   // objectives, or collected quest items traced back to the mob that drops them.

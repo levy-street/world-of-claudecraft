@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, probouzející se štít',
     desc: 'Osobní epická kořist od světového bosse Probouzejícího se štítu.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, Pohřbený Předák',
+    desc: 'Kořist vyrvaná zpět z mohyl Mirefenu.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Zhroucený relikviář',
     desc: 'Příznačné vzácnosti z truhly na zámek ve Zhrouceném relikviáři.',

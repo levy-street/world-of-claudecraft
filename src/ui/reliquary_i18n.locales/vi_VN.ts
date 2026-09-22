@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, Đỉnh Núi Thức Giấc',
     desc: 'Chiến lợi phẩm sử thi riêng từ trùm thế giới của Đỉnh Núi Thức Giấc.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, Đốc Công Bị Chôn Vùi',
+    desc: 'Chiến lợi phẩm lôi ra từ những gò mộ Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Thánh Tích Sụp Đổ',
     desc: 'Vật phẩm hiếm tiêu biểu từ rương khóa trong Thánh Tích Sụp Đổ.',

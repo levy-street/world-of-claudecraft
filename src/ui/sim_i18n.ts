@@ -96,6 +96,20 @@ const baseEnTable = {
   'error.vaultMaxUpgrades': 'Your vault cannot be upgraded further.',
   'log.vaultUnlocked': 'You unlock the Materials Vault.',
   'log.vaultUpgraded': 'You upgrade the Materials Vault.',
+  // The Shardpike trial (src/sim/lance_trial.ts): the brace/thrust refusals and the
+  // set/fumble/blind notices. Placeholder-free, so all register in the EXACT matcher.
+  'error.lanceNeedPike': "You need Skerrit's Shardpike in hand.",
+  'error.lanceResting': 'The pike needs a moment to be re-set.',
+  'error.lanceNeedGround': 'You need solid ground under you.',
+  'error.lanceMounted': 'Not from the saddle.',
+  'error.lanceNotSet': 'The pike is not set.',
+  'error.lanceNoTarget': 'Nothing worth the point in reach.',
+  'error.lanceShoved': 'The stance is broken!',
+  'error.lanceFumbled': 'You fumble the Shardpike!',
+  'error.lanceWindowOver': 'The moment passes.',
+  'log.lanceBraced': 'You couch the Shardpike. Hold it true.',
+  'log.lanceSet': 'The pike is set. STRIKE!',
+  'log.lanceBlinded': 'Your thrust finds the Loomshard. The Barrowhide sloughs away!',
   // Guild Bank (src/sim/guild_bank.ts): the officer-plus shared treasury +
   // item store. The error.* lines are the refusal toasts (too-far, quest-item,
   // and "Not enough money." reuse the existing rows above / the hud arm); the
@@ -16727,8 +16741,17 @@ const RULES: Rule[] = [
   },
   { re: /^(.+) awakens!$/, build: (m) => tQuestExtra('awakens', { name: locMob(m[1]) }) },
   {
-    re: /^(.+) rises over Thornpeak Heights!$/,
-    build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]) }),
+    re: /^(.+) rises over (.+)!$/,
+    build: (m) => t('hudChrome.worldBoss.spawn', { name: locMob(m[1]), zone: locZone(m[2]) }),
+  },
+  // A slumbering world boss's dawn wake and dusk lie-down (src/sim/mob/slumber.ts).
+  {
+    re: /^(.+) wakes over (.+)!$/,
+    build: (m) => t('hudChrome.worldBoss.wake', { name: locMob(m[1]), zone: locZone(m[2]) }),
+  },
+  {
+    re: /^(.+) sleeps until dawn\.$/,
+    build: (m) => t('hudChrome.worldBoss.sleep', { name: locMob(m[1]) }),
   },
   {
     re: /^Fallen Captain Aldren yells, "None shall disturb the king's rest! For Thornpeak!"$/,

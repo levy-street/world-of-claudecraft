@@ -84,6 +84,18 @@ export function onMobKilledForQuests(ctx: SimContext, mob: Entity, meta: PlayerM
   );
 }
 
+/**
+ * Credit a named world event (objective type 'event'). The emitting system module is the
+ * authority on when the event happened; this only counts it against active quests.
+ */
+export function onQuestEventForQuests(ctx: SimContext, meta: PlayerMeta, eventId: string): void {
+  creditDiscreteQuestObjectives(
+    ctx,
+    meta,
+    (objective) => objective.type === 'event' && objective.eventId === eventId,
+  );
+}
+
 /** Credit a recipe objective only after the authoritative craft resolver succeeds. */
 export function onRecipeCraftedForQuests(
   ctx: SimContext,

@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, le Pic Éveillé',
     desc: 'Butins épiques personnels du boss de monde du Pic Éveillé.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, le Contremaître Enseveli',
+    desc: 'Butin arraché aux tertres funéraires du Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Le Reliquaire effondré',
     desc: 'Objets rares emblématiques du coffre à crocheter du Reliquaire effondré.',

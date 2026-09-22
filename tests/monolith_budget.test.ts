@@ -511,7 +511,14 @@ const MONOLITHS: MonolithRow[] = [
     // Regeneration exemption) moved out of the heal2 arm into
     // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
     // count, zero slack.
-    ceiling: 18235,
+    // RE-PINNED at the forward-port of feature/mirefen-world-boss (the Mirefen
+    // world boss) onto release/v0.44.0. BOTH parent pins for the record: the
+    // release 18235, the boss branch 19400. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/ui/hud.ts), neither parent's
+    // literal. The boss branch's own row was measured against a tree 5820 commits
+    // older, so it is a historical record here, not a budget. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 18255,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -931,7 +938,14 @@ const MONOLITHS: MonolithRow[] = [
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
     // gained its assets line). Exact count.
-    ceiling: 12789,
+    // RE-PINNED at the forward-port of feature/mirefen-world-boss (the Mirefen
+    // world boss) onto release/v0.44.0. BOTH parent pins for the record: the
+    // release 12789, the boss branch 13546. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/render/renderer.ts), neither parent's
+    // literal. The boss branch's own row was measured against a tree 5820 commits
+    // older, so it is a historical record here, not a budget. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 12862,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1125,7 +1139,14 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the loot identity receipt
     // and projection helpers moved to dedicated siblings, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 11750,
+    // RE-PINNED at the forward-port of feature/mirefen-world-boss (the Mirefen
+    // world boss) onto release/v0.44.0. BOTH parent pins for the record: the
+    // release 11750, the boss branch 12606. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/sim/sim.ts), neither parent's
+    // literal. The boss branch's own row was measured against a tree 5820 commits
+    // older, so it is a historical record here, not a budget. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 11859,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1337,7 +1358,14 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    ceiling: 11276,
+    // RE-PINNED at the forward-port of feature/mirefen-world-boss (the Mirefen
+    // world boss) onto release/v0.44.0. BOTH parent pins for the record: the
+    // release 11276, the boss branch 11414. Set to the exact merged count
+    // measured on the merged working tree (wc -l < src/main.ts), neither parent's
+    // literal. The boss branch's own row was measured against a tree 5820 commits
+    // older, so it is a historical record here, not a budget. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 11283,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1565,7 +1593,14 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
     // projection moved to server/equipped_instance_wire.ts, composed with the
     // release extractions above. Exact merged count, zero slack.
-    ceiling: 9979,
+    // RE-PINNED at the forward-port of feature/mirefen-world-boss (the Mirefen
+    // world boss) onto release/v0.44.0. BOTH parent pins for the record: the
+    // release 9979, the boss branch 10870. Set to the exact merged count
+    // measured on the merged working tree (wc -l < server/game.ts), neither parent's
+    // literal. The boss branch's own row was measured against a tree 5820 commits
+    // older, so it is a historical record here, not a budget. Exact merged count,
+    // zero slack: any further growth reds again.
+    ceiling: 10019,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1720,7 +1755,12 @@ const MONOLITHS: MonolithRow[] = [
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
     // Exact count, zero slack.
-    ceiling: 5426,
+    // RE-PINNED at the forward-port of feature/mirefen-world-boss onto release/v0.44.0.
+    // The release pin was 5426; ClientWorld has to implement the new IWorldLanceTrial
+    // facet (the Shardpike self view, its rest clock and the guidance mirror), which is
+    // the online half of a seam that cannot be satisfied anywhere else. Exact merged
+    // count measured on the merged working tree (wc -l < src/net/online.ts), zero slack.
+    ceiling: 5456,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

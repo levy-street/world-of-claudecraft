@@ -241,6 +241,8 @@ const ALLOWED_REFERENCE_ROLES = [
 // Choice-row talents, modifier art, retired summon paintings, and pet signature
 // actions are image ids without live ABILITIES rows by design.
 const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
+  // The Shardpike bar's three verbs: painted art on a quest tool's ACTIONS, which have no
+  // ABILITIES row of their own to be image-backed from.
   'anger_management',
   'attack',
   'battle_rhythm',
@@ -254,6 +256,9 @@ const PRESERVED_IMAGE_BACKED_MODIFIER_IDS = [
   'elemental_convergence',
   'emberkin_felbolt',
   'gloomshade_abyssal_chain',
+  'lance_brace',
+  'lance_release',
+  'lance_thrust',
   'lingering_dread',
   'overflowing_power',
   'pet_aggressive',
@@ -681,8 +686,13 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 300 at THIS release/v0.42.0 merge: the Roots' Bramblehide set collection
     // (col_set_bramblehide, 281 to 282 on the release's own arm) joins the
     // same pending side.
-    expect(DEED_ORDER).toHaveLength(300);
+    // 302 at the Mirefen world-boss forward-port: the boss's own two combat
+    // deeds (cmb_balgath, cmb_balgath_ten) append at the DEED_ORDER tail and
+    // join the same pending side on the deed_cat_combat crest.
+    expect(DEED_ORDER).toHaveLength(302);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
+    expect(DEED_ART_PENDING.has('cmb_balgath')).toBe(true);
+    expect(DEED_ART_PENDING.has('cmb_balgath_ten')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

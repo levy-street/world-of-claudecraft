@@ -39,6 +39,7 @@ import {
   usesLiveDayNightLighting,
   warmDuskGrade,
 } from '../src/render/day_night_core';
+import { NOON_PHASE } from '../src/sim/day_night';
 import type { BiomeId } from '../src/sim/types';
 
 // The day_night_core: the pure clock-to-grade math of the world day/night cycle.
@@ -762,6 +763,9 @@ describe('day/night clock override (the /daynight dev command)', () => {
     setDayNightPhaseOverride(0.5);
     expect(dayNightPhaseOverride()).toBe(0.5);
     expect(currentDayNightPhase()).toBe(0.5);
+    // The sim leaf's noon, the one definition the render clock reports under DAY_ONLY.
+    expect(NOON_PHASE).toBe(0.5);
+    expect(currentDayNightPhase()).toBe(NOON_PHASE);
     setDayNightPhaseOverride(null);
     expect(dayNightPhaseOverride()).toBeNull();
     const live = currentDayNightPhase();

@@ -310,6 +310,12 @@ describe('v0.36 placeholder-art completion evidence', () => {
       'courtiers_bonefang',
       'thornpeak_wardblade',
       'gravecourt_hewer',
+      // The Mirefen world boss's maul (balgath-boss-icons-2026-08-18) and
+      // Skerrit's Shardpike (shardpike-mechanic-icons-2026-08-20) postdate
+      // the campaign the same way, each painted in its own later batch.
+      // Every weapon added after the campaign belongs on this list.
+      'foremans_barrowmaul',
+      'skerrits_shardpike',
     ];
     expect(targets.weaponItems).toEqual(
       sorted(

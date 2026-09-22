@@ -486,6 +486,10 @@ describe('Fenbridge content projection and preservation', () => {
       { id: 'troll_mounds', x: -95, z: 440 },
       { id: 'gravecaller_encampment', x: 0, z: 485 },
       { id: 'the_sunken_bastion', x: 45, z: 515 },
+      // Appended, never inserted: the locale overlays key POI labels by index.
+      { id: 'barrowmound_reach', x: 0, z: 390 },
+      // The world boss's crater lair (MIREFEN_IMPACT_CRATER), appended in its turn.
+      { id: 'starfall_crater', x: 149.5, z: 295 },
     ]);
     expect(ZONE2_ROADS).toEqual(
       FENBRIDGE_LAYOUT.roads.map((road) => road.points.map((point) => ({ ...point }))),
@@ -553,6 +557,9 @@ describe('Fenbridge content projection and preservation', () => {
   it('preserves quest order and non-muster ground objects while moving exactly two orders', () => {
     expect(ZONE2_QUEST_ORDER).toEqual([
       'q_fenbridge_muster',
+      // The world boss's level-spread mechanic: Skerrit lends the Shardpike, and the quest
+      // sits second because he stands on the approach, before the prowler work in the fen.
+      'q_socketwrights_due',
       'q_prowlers',
       'q_prowler_pelts',
       'q_fen_supplies',
@@ -644,9 +651,30 @@ describe('Fenbridge content projection and preservation', () => {
   });
 
   it('pins the complete stable NPC payload while projecting only position and facing', () => {
-    expect(Object.keys(ZONE2_NPCS)).toEqual(FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id));
+    // The layout places FENBRIDGE TOWN's service NPCs, and until now every zone-2 NPC was
+    // one. Socketwright Skerrit is the first that is not: he stands out in the fen at
+    // (-22, 358), deliberately off the boss's x=0 marching spine, so a town placement would
+    // be wrong for him. The allowlist keeps the pin's teeth: a FUTURE town NPC that forgets
+    // its placement still fails here rather than being absorbed by a loosened comparison.
+    const OUTSIDE_TOWN = new Set(['socketwright_skerrit']);
+    expect(Object.keys(ZONE2_NPCS).filter((id) => !OUTSIDE_TOWN.has(id))).toEqual(
+      FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id),
+    );
+    // ...and every allowlisted NPC really is outside the town's own footprint, so the list
+    // cannot become a place to hide a missing placement.
+    for (const id of OUTSIDE_TOWN) {
+      expect(Object.keys(ZONE2_NPCS), id).toContain(id);
+      expect(
+        FENBRIDGE_LAYOUT.services.npcs.map((npc) => npc.id),
+        id,
+      ).not.toContain(id);
+    }
     // Re-pinned for q_rite_of_redemption joining brother_aldric_fen's quest
     // list (the only NPC-payload delta vs the prior pin; zone2.ts diff-checked).
+    // Re-pinned again for Socketwright Skerrit, the world boss's Shardpike lender: a whole
+    // new NPC record rather than a delta on an existing one. He is outside the town layout
+    // (see the allowlist above), so this payload grows while the placement list does not.
+    // Both digests below were re-measured on the MERGED tree with his record in.
     // Re-pinned again for the farming go-live: farmer_teasel joined ZONE2_NPCS
     // (and this layout's services.npcs) as the ninth Fenbridge NPC; the eight
     // prior payloads are byte-identical (zone2.ts diff-checked).
@@ -731,12 +759,12 @@ describe('Fenbridge content projection and preservation', () => {
     expect(
       createHash('sha256').update(JSON.stringify(withoutPr3FieldKitRows())).digest('hex'),
       'stripping exactly the two PR3 field_kit rows reproduces the pre-PR3 digest',
-    ).toBe('27011def4d1208cee33aaee8a80283204e5b639ff95294e8b11f51ae10dbfc24');
+    ).toBe('c48d636424501e45551ad2c4566eb2877a7a31cbeed80738d0300e9b9d3e4945');
     // CURRENT digest, WITH the two field_kit rows. Measured on the merged
     // working tree; the counterfactual above already proves the only content
     // difference from the pre-PR3 payload is those two rows.
     expect(createHash('sha256').update(JSON.stringify(stableNpcPayload())).digest('hex')).toBe(
-      '553c58cfd811e8af35894c5aeacadb3effed7a563bf5caf51216878c06a4fe20',
+      'bb6cc41ee66b3ec4cafeda81e9dec7f8609ed517e7fdf94fc29b604d44af6632',
     );
     for (const placement of FENBRIDGE_LAYOUT.services.npcs) {
       expect(FENBRIDGE_NPC_PLACEMENTS_BY_ID[placement.id]).toBe(placement);

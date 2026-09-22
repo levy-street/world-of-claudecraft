@@ -14,6 +14,57 @@ import { professionTrainerStrings } from './profession_trainers';
 export const hudChromeStrings = {
   professionTrainers: professionTrainerStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
+  // The Shardpike bar: the second action bar the Mirefen world boss's level-spread
+  // mechanic is reached through (src/ui/hud/shardpike/). Three verbs on a quest tool, not
+  // abilities, so they have no spellbook entry to borrow a name or a tooltip from.
+  //
+  // Every number in these tooltips is a {placeholder} the bar resolves from the sim's own
+  // constants (src/sim/lance_balance_core.ts). A literal here would read correctly on the
+  // day it was written and quietly lie after the first retune.
+  //
+  // The thrust window's placeholder is {seconds}, NOT {window}: a `{`-wrapped bare
+  // `window` is indistinguishable from a browser-global reach to the src/ui host-purity
+  // sweep (UI_HOST_VALUE_RE in tests/architecture.test.ts), and it flags this catalog plus
+  // every resolved locale bundle the key lands in.
+  shardpike: {
+    braceLabel: 'Couch the Shardpike',
+    braceTooltip:
+      'Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.',
+    thrustLabel: 'Loomshard Thrust',
+    thrustTooltip:
+      'Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.',
+    releaseLabel: 'Ground the Shardpike',
+    releaseTooltip:
+      'Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.',
+    // Why a greyed verb is greyed (src/ui/hud/shardpike/shardpike_tooltip.ts). Deliberately
+    // clock-free: the hover card is resolved once when the pointer arrives and never
+    // refreshed, so a number in here would freeze while the one on the icon kept ticking.
+    // Each one names the fix rather than only the obstacle, since a player reading it is
+    // mid-fight and looking for the next press.
+    whyResting: 'You just grounded the pike. Wait out the timer on the icon.',
+    whyAlreadyCouched: 'The pike is already couched. Ground it before you re-set.',
+    whyNotSet: 'The pike is not set. Couch it and hold it steady first.',
+    whyNothingCouched: 'Nothing to ground: the pike is not couched.',
+    beamLabel: 'Shardpike balance',
+    beamStatus: 'Pike balance {balance}, set {set} percent.',
+    beamDanger: 'Pike balance {balance}, about to fumble.',
+    // The loud one-line prompt (src/ui/hud/shardpike/shardpike_prompt_view.ts). Exactly one
+    // shows at a time, so each has to stand alone: name the action, name the target, and
+    // where a clock is the reason for waiting, show the clock. Written as commands, because
+    // a player reading this is mid-fight and looking for an instruction, not a description.
+    promptStrike: 'STRIKE THE EYE now, {seconds}s',
+    promptHoldSteady: 'Hold the pike steady with your strafe keys',
+    promptCatchIt: 'Catch it, the pike is going over',
+    promptEyeOut: 'The eye is out, {seconds}s: hit him with everything',
+    promptSealed: 'His eye is shut. It opens again in {seconds}s',
+    promptResetting: 'Re-setting the pike, {seconds}s',
+    promptCloser: 'Get within reach of the Foreman, {yards} yards out',
+    promptBrace: 'Couch the Shardpike, then hold it steady',
+    promptFindBoss: "Skerrit's Shardpike: put out the Foreman's eye with it",
+    promptTally: '{count} put out',
+    promptLabel: 'Shardpike instruction',
+    blindBanner: 'BARROWHIDE BROKEN',
+  },
   warlock: {
     doomLabel: 'Condemnation',
     fateThreadsLabel: 'Fate Threads',
@@ -4478,6 +4529,8 @@ export const hudChromeStrings = {
     dodge: 'Increases dodge chance by {pct}%',
     dodgeReduce: 'Reduces dodge chance by {pct}%',
     damageReduction: 'Reduces all damage taken by {pct}%',
+    // The slumbering world boss (src/sim/mob/slumber.ts): asleep from dusk to dawn.
+    slumber: 'Asleep until dawn. Cannot be attacked and will not wake for anyone.',
     guardianWard: 'The next lethal enemy hit restores you to {pct}% health instead',
     armorFlat: 'Reduces armor by {value}',
     armorFlatStacks: 'Reduces armor by {value} ({stacks} stacks)',
@@ -4580,7 +4633,11 @@ export const hudChromeStrings = {
   // world boss rises; src/ui/sim_i18n.ts re-localizes it through this key, splicing
   // the localized boss name. English-only domain so an English-only PR compiles.
   worldBoss: {
-    spawn: '{name} rises over Thornpeak Heights!',
+    spawn: '{name} rises over {zone}!',
+    // A slumbering world boss (src/sim/mob/slumber.ts): the dawn wake is the daily call
+    // to arms, the dusk line tells the realm he is gone for the night.
+    wake: '{name} wakes over {zone}!',
+    sleep: '{name} sleeps until dawn.',
   },
   // Password-reset ("forgot password") flow: the login-panel entry link, the
   // request-a-link panel, and the set-a-new-password panel (index.html +
@@ -4831,6 +4888,9 @@ export const hudChromeStrings = {
       menu: 'Menu',
       minimap: 'Minimap',
       stanceBar: 'Stance Bar',
+      // The Balgath quest tool's bar, named for the item so a player who has never
+      // taken the quest can still tell what the placeholder in the editor belongs to.
+      shardpikeBar: 'Shardpike Bar',
       xpBar: 'XP Bar',
       chat: 'Chat',
       actionBarGroup: 'Action Bars',

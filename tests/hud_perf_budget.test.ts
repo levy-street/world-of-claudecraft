@@ -609,6 +609,36 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   // accessible-name attributes, routes through the elided facet, which is what
   // lets six instances share the per-frame band the aura strips run on.
   { file: 'hud/aura_tracks/aura_track_painter.ts', allow: { '.innerHTML': 1 }, reflowAllow: {} },
+  // Shardpike bar: every raw write sits in the ONE-TIME build() that mints the beam
+  // track, its two fills, the button group and the three buttons. Eight className
+  // assignments, three setAttribute calls (the beam's role and its label, each button's
+  // aria-label) and one dataset write (the focus key the shared focus-restore helper
+  // reads). That build runs on the first frame the quest pike is in hand
+  // and never again, and every per-frame write (the beam position, the set fill, each
+  // button's enabled/primed/cooldown state, the live aria-disabled) is facet-routed.
+  // Building once is the point: the beam moves every sim tick, so a signature-keyed
+  // innerHTML rebuild like the pet bar's would re-mint the row 20 times a second and
+  // drop focus and any in-flight press with it.
+  {
+    file: 'hud/shardpike/shardpike_bar_painter.ts',
+    // 9 with the availability-window ring each button now carries: a bright conic sweep that
+    // drains, which is the visual OPPOSITE of a cooldown and must never share its element.
+    // No `.dataset` any more: the row carried a `data-focus-key` it never read, and that
+    // attribute is the shared identity the focus-restore contract keys off
+    // (src/ui/focus_restore.ts, #2528). This bar builds once and only re-states, so nothing
+    // is ever destroyed under a keyboard player and there is nothing to restore.
+    allow: { '.className': 9, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
+  // The prompt is one line and a tally, built once on the first visible paint and then only
+  // re-stated behind a signature gate. Two className assignments (body, tally) and three
+  // setAttribute calls (role, aria-live, aria-label) in that build; every per-frame write
+  // (the text, the tone classes, the tally's display) is facet-routed.
+  {
+    file: 'hud/shardpike/shardpike_prompt_painter.ts',
+    allow: { '.className': 2, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
   // The portrait rest badge. Cold by cadence (the caller gates it on the
   // resting flag changing, and the language fan-out clears that memo so a

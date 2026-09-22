@@ -235,6 +235,8 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   tome_voidbound: 'VAR_BOOK',
   hammer_varkhul: 'VAR_HAMMER', // Ignivar raid legendary (Varkhul drop)
   ...KAYKIT_SHIELD_ACCESSORIES,
+  balgath_barrowmaul_hammer: 'VAR_HAMMER',
+  shardpike_spear: 'VAR_POLEARM',
 };
 
 // Per-family grip for the variant pack. The model origin IS the grip, so we attach

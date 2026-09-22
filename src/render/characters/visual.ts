@@ -13,6 +13,7 @@ import {
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
+import type { EyeWardMarkerPlan } from '../eye_ward_marker_core';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
@@ -65,6 +66,7 @@ import {
   takeFarBakeBudget,
   tintedFarMaterials,
 } from './assets';
+import { ChargeGlow } from './charge_glow';
 import { deathGroundingOffset } from './death_grounding_core';
 import {
   createGhostEffectMaterial,
@@ -73,6 +75,8 @@ import {
   type GhostStyle,
   ghostEffectOpacity,
 } from './effect_materials';
+import { EyeGlow } from './eye_glow';
+import { EyeWardMarker } from './eye_ward_marker';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
@@ -686,6 +690,21 @@ export class CharacterVisual {
 
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
+  /** Fist glow for telegraphed abilities. Built on first use; null on rigs with no hands. */
+  private chargeGlow: ChargeGlow | null = null;
+  /** A permanently lit eye, for a VisualDef that declares one. */
+  private eyeGlow: EyeGlow | null = null;
+  /**
+   * The Shardpike aim reticle around that same eye. Built alongside the glow because it
+   * shares its measured offset: the ring and the thing it rings must never drift apart.
+   */
+  private eyeWardMarker: EyeWardMarker | null = null;
+  /**
+   * This frame's reticle plan, or null to hide it. Pushed in by the renderer rather than
+   * derived here: the plan needs the LOCAL player's held item and distance, which is
+   * viewer state a per-entity visual has no business knowing about.
+   */
+  private eyeWardPlan: EyeWardMarkerPlan | null = null;
   private currentIsOneShot = false;
   /** Seconds until the next idle-breaker; -1 means "rearm on the next idle". */
   private idleVariantIn = -1;
@@ -878,6 +897,19 @@ export class CharacterVisual {
           this.model.getObjectByName('R_Hand') ??
           null;
       }
+      // A permanently lit eye, parented to its own bone. Built here beside the halo for
+      // the same reason: both are additive meshes hung on a bone, and both must be added
+      // AFTER applyMaterials so their material is not re-mapped, and BEFORE the
+      // originalMaterials snapshot so ghost and stealth swaps restore them like any mesh.
+      if (this.def.eyeGlow) {
+        const spec = this.def.eyeGlow;
+        const bone =
+          this.model?.getObjectByName(spec.bone) ??
+          this.model?.getObjectByName(spec.bone.toLowerCase()) ??
+          null;
+        this.eyeGlow = new EyeGlow(spec, bone);
+        this.eyeWardMarker = new EyeWardMarker(spec, bone);
+      }
       // Class halo (the priest's Light): a glowing ring behind the head bone.
       // Added AFTER applyMaterials (its additive material must not be re-mapped)
       // and BEFORE the originalMaterials snapshot, so ghost/stealth material
@@ -1030,6 +1062,9 @@ export class CharacterVisual {
       this.syncFarVisibility();
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
+    this.chargeGlow?.update(dt);
+    this.eyeGlow?.update(dt, reducedMotion, s.asleep === true);
+    this.eyeWardMarker?.update(this.eyeWardPlan, dt, reducedMotion);
     this.updateMetamorphWings(dt, s, reducedMotion);
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
@@ -1081,6 +1116,14 @@ export class CharacterVisual {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (baseChanged && previousBase === 'sleep' && this.wakeAction()) {
+        // The dawn rise. Leaving the sleep loop plays the authored wake ONCE (it begins
+        // in the sleep pose, so the hand-off is a continuation rather than a cut) and
+        // onFinished fades it into whatever base the machine now wants; an interrupting
+        // one-shot (a hit, an attack) simply replaces it, as with any other one-shot.
+        // Ahead of the idle-breaker arm below: leaving 'sleep' is a BASE change, so the
+        // rig is never mid-fidget here, and the ordering keeps the rise unmissable.
+        this.playOneShot(this.def.clips.wake as string, 1);
       } else if (this.currentIsOneShot && this.currentOneShotIsIdleVariant && desired !== 'idle') {
         // An idle-breaker must die the instant the rig stops standing still.
         // It is a one-shot, so without this it suppresses BOTH the fade to
@@ -1780,6 +1823,11 @@ export class CharacterVisual {
     const rawOverride = abilityId ? this.def.clips.attackByAbility?.[abilityId] : undefined;
     const overrideIsNonRanged =
       rawOverride?.startsWith('Hunter_Melee_') || rawOverride === 'Spellcast_Raise';
+    // Light the fist BEFORE the clip choice, so an ability that declares a glow gets one
+    // even on a rig whose authored clip is missing: the telegraph is the load-bearing half
+    // of a slam, and it must not depend on the animation having been baked.
+    const glow = abilityId ? this.def.clips.chargeGlowByAbility?.[abilityId] : undefined;
+    if (glow) this.ensureChargeGlow()?.ignite(glow);
     const override = !skinAttack || overrideIsNonRanged ? rawOverride : undefined;
     if (override && this.action(override)) {
       const authoredTimeScale = abilityId
@@ -1806,6 +1854,30 @@ export class CharacterVisual {
     const name = clips[this.attackIdx++ % clips.length];
     this.playOneShot(name, skinAttack?.timeScale ?? this.def.attackTimeScale ?? 1.3);
     this.currentOneShotIsAttack = true;
+  }
+
+  /**
+   * The fist-glow rig, built on first use.
+   *
+   * Resolved through the same bone-name variants the weapon-attach path tries, because
+   * GLTFLoader sanitizes `handslot.r` to `handslotr` and the creature rigs name their
+   * hands `R_Hand` outright. A rig with neither returns a glow that simply never draws,
+   * rather than throwing on a boss mid-fight.
+   */
+  private ensureChargeGlow(): ChargeGlow | null {
+    if (this.chargeGlow) return this.chargeGlow;
+    const find = (...names: string[]): THREE.Object3D | null => {
+      for (const n of names) {
+        const found = this.model?.getObjectByName(n);
+        if (found) return found;
+      }
+      return null;
+    };
+    this.chargeGlow = new ChargeGlow(
+      find('handslotl', 'handslot.l', 'L_Hand'),
+      find('handslotr', 'handslot.r', 'R_Hand'),
+    );
+    return this.chargeGlow;
   }
 
   /** Bladed Gyre is instant, so it uses one short body spin instead of the
@@ -3348,10 +3420,26 @@ export class CharacterVisual {
     });
   }
 
+  /** Set (or clear, with null) the Shardpike aim reticle on this creature's eye. */
+  setEyeWardMarker(plan: EyeWardMarkerPlan | null): void {
+    this.eyeWardPlan = plan;
+  }
+
+  /** Fire the landed-thrust burst on the reticle. No-op on a rig that has no eye. */
+  strikeEyeWardMarker(): void {
+    this.eyeWardMarker?.strike();
+  }
+
   dispose(): void {
     this.actionProps?.restore();
     this.disposed = true;
     disposeHeldPropIdles(this.model);
+    this.chargeGlow?.dispose();
+    this.chargeGlow = null;
+    this.eyeGlow?.dispose();
+    this.eyeGlow = null;
+    this.eyeWardMarker?.dispose();
+    this.eyeWardMarker = null;
     this.bastionSweepFx?.dispose();
     this.bastionSweepFx = null;
     this.bastionSweepAction = null;
@@ -3422,6 +3510,7 @@ export class CharacterVisual {
       !!this.action(this.def.clips.combatIdle),
       !!this.action(this.def.clips.prowlIdle),
       !!this.action(this.def.clips.prowlWalk),
+      !!this.action(this.def.clips.sleep),
     );
   }
 
@@ -3678,6 +3767,10 @@ export class CharacterVisual {
         return this.action(c.wade) ?? this.action(c.walk) ?? this.action(c.idle);
       case 'sit':
         return this.action(c.sitDown) ?? this.action(c.sitIdle) ?? this.action(c.idle);
+      case 'sleep':
+        // Only ever entered when the rig HAS the clip (desiredBase gates on it), so the
+        // idle fallback is belt-and-braces rather than a state anything runs in.
+        return this.action(c.sleep) ?? this.action(c.idle);
       case 'jump':
         return this.action(c.jump) ?? this.action(c.idle);
       case 'fall':
@@ -3946,6 +4039,12 @@ export class CharacterVisual {
     });
   }
 
+  /** The authored wake one-shot, if the ClipMap names one AND the loaded rig has it. */
+  private wakeAction(): THREE.AnimationAction | null {
+    const clip = this.def.clips.wake;
+    return clip ? this.action(clip) : null;
+  }
+
   /** One-shot the flourish clip (skeleton awaken / boss taunt / the dragonkin
    *  brood's Shout and the whelp's hatch pounce), off the 'shout'/'flourish'
    *  spellfx cues. No-op for rigs without a flourish clip. */
@@ -4037,7 +4136,7 @@ export class CharacterVisual {
   }
 }
 
-function clipNamesOf(def: VisualDef): string[] {
+export function clipNamesOf(def: VisualDef): string[] {
   const c = def.clips;
   return [
     c.idle,
@@ -4074,6 +4173,11 @@ function clipNamesOf(def: VisualDef): string[] {
     // fidgets. Silent: no throw, no warning, just a clip that is never seen.
     ...(c.idleVariants ?? []),
     c.idleBeat?.clip,
+    // The night pair (mob/slumber.ts): a slot named here is the ONLY way a clip becomes an
+    // action, so a new ClipMap field joins this list or it never plays (pinned per rig by
+    // tests/character_clipmaps.test.ts against the gate's own required-clip list).
+    c.sleep,
+    c.wake,
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }

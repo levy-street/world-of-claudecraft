@@ -679,6 +679,7 @@ interface AttributionTargetFixture {
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
+  // Re-minted for the Mirefen world-boss forward-port onto release/v0.44.0: the renderer leaf gained the boss ground layer, the far-impostor sync and the wade-depth read, and entity_view_policy_core gained the created-view classifier. No capture was retaken.
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -689,7 +690,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  'b13f66dd992efd23dd3f402758018a37bf164bc2c9a3884f16474055f4acf8d2';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

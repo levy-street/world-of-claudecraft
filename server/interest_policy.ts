@@ -5,7 +5,7 @@
 // imports this leaf directly and the broadcast pass in server/game.ts stays
 // a thin consumer.
 
-import { bgOriginAt, isBgPos } from '../src/sim/data';
+import { bgOriginAt, isBgPos, MOBS } from '../src/sim/data';
 import { type Entity, PLAYER_INTEREST_DROP_RADIUS, PLAYER_INTEREST_RADIUS } from '../src/sim/types';
 
 // Interest management: new entities enter interest at the shared sim edge
@@ -44,10 +44,26 @@ export const INTEREST_QUERY_RADIUS = NPC_DROP_RADIUS;
 export const BG_MATCH_INTEREST_RADIUS = 300;
 export const BG_MATCH_DROP_RADIUS = 320;
 
+/**
+ * How far a LANDMARK mob stays in interest, or null for everything else.
+ *
+ * A world boss (`MobTemplate.landmarkRange`) is thirteen yards of granite that the client
+ * draws as a far sprite from across the zone, and it cannot draw an entity it was never
+ * sent. The cost is one wire entity per viewer inside a zone-sized radius, for the one
+ * creature an hour that opts in; every other mob returns null and keeps the ordinary band.
+ */
+export function landmarkInterestSq(e: Entity): number | null {
+  if (e.kind !== 'mob') return null;
+  const range = MOBS[e.templateId]?.landmarkRange;
+  return range ? range * range : null;
+}
+
 // npcs stay visible to the legacy radius (see the constants above);
 // everything else enters at INTEREST_RADIUS and known entities persist to
 // the drop radius: hysteresis against churn at the boundary
 export function interestLimitSq(e: Entity, known: boolean): number {
+  const landmark = landmarkInterestSq(e);
+  if (landmark !== null) return landmark;
   if (e.kind === 'npc') {
     return known ? NPC_DROP_RADIUS * NPC_DROP_RADIUS : NPC_INTEREST_RADIUS * NPC_INTEREST_RADIUS;
   }
@@ -82,4 +98,44 @@ export function bgWideInterestApplies(
   const subjectId = e.kind === 'player' ? e.id : e.ownerId;
   if (subjectId === null) return true; // flags, runes, props, npcs, wild mobs
   return viewerBgTeam?.includes(subjectId) ?? false;
+}
+
+/**
+ * Rescan cadence for the landmark roster, in ticks (20 per second).
+ *
+ * A world boss rises about once an hour and stands for minutes, so a full entity scan every
+ * tick would be paying a per-tick O(entities) walk for an event that changes on the order of
+ * once per thousand ticks. One second of latency before he enters far interest is invisible
+ * next to the several seconds his rise announcement already takes.
+ */
+export const LANDMARK_RESCAN_TICKS = 20;
+
+/**
+ * The live landmark mobs, refreshed on a slow cadence.
+ *
+ * Held as a roster rather than recomputed per viewer because the broadcast pass is per
+ * viewer and this list is realm-wide: building it once per pass (at most once per second) is
+ * the same build-once rule the shared candidate query and the realm readout memo follow.
+ */
+export class LandmarkRoster {
+  private list: Entity[] = [];
+  private nextScanTick = 0;
+
+  /** The landmarks alive right now, rescanning if the cadence is due. */
+  refresh(tick: number, entities: Iterable<Entity>): readonly Entity[] {
+    if (tick < this.nextScanTick) {
+      // Between scans the cached ENTITIES are still live objects (positions and hp track
+      // themselves), so only death and despawn need filtering, and both are cheap to check
+      // over a list that is realistically zero or one long.
+      if (this.list.some((e) => e.dead)) this.list = this.list.filter((e) => !e.dead);
+      return this.list;
+    }
+    this.nextScanTick = tick + LANDMARK_RESCAN_TICKS;
+    const next: Entity[] = [];
+    for (const e of entities) {
+      if (!e.dead && landmarkInterestSq(e) !== null) next.push(e);
+    }
+    this.list = next;
+    return this.list;
+  }
 }

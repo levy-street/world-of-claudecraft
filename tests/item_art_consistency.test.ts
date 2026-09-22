@@ -839,7 +839,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // (14 base pieces + their 14 auto-generated heroic variants) = 1,299. The
     // OSSBrain PR #3781 reconcile's two disjoint reins item definitions
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,301.
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    // The Mirefen world-boss forward-port adds its eight disjoint spoils
+    // (four boss drops, Skerrit's Shardpike, three Foreman's Wage rares):
+    // 1,309. Re-measured with `node scripts/item_art_audit.mjs --verify-only`
+    // on the merged tree.
+    expect(Object.keys(ITEMS)).toHaveLength(1309);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -994,9 +998,11 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04 + roots-bramblehide-icons-2026-09-07)
     // = 1,281. The OSSBrain PR #3781 reconcile's two disjoint reins owners
     // (reins_goblin_rocket_sled, reins_rallycart_rxt) add two more: 1,283.
-    expect(new Set(currentOwnerIds).size).toBe(1283);
-    expect(shippingIds).toHaveLength(1283);
-    expect(Object.keys(ITEMS)).toHaveLength(1301);
+    // The Mirefen world-boss forward-port's three batches add eight more
+    // owners, each with its own shipping WebP: 1,291.
+    expect(new Set(currentOwnerIds).size).toBe(1291);
+    expect(shippingIds).toHaveLength(1291);
+    expect(Object.keys(ITEMS)).toHaveLength(1309);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1020,7 +1026,10 @@ describe('item-art consistency accepted-art provenance', () => {
       .flatMap(({ itemIds }) => itemIds);
     expect(releaseBatchIds).toHaveLength(25);
     // The OSSBrain PR #3781 reconcile's two reins owners are additive beyond
-    // this whole historical chain too, the same way the Field Kit is.
+    // this whole historical chain too, the same way the Field Kit is, and so
+    // are the Mirefen world boss's eight spoils: their three batches
+    // (balgath-boss-icons-2026-08-18, shardpike-mechanic-icons-2026-08-20,
+    // foremans-wage-icons-2026-08-25) all postdate this dated verdict.
     expect(
       sorted([
         ...oldPassIds,
@@ -1028,6 +1037,14 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        'foremans_barrowmaul',
+        'loomshard_eye',
+        'barrowhide_pauldrons',
+        'mirestone_stride',
+        'skerrits_shardpike',
+        'foremans_wage_band',
+        'mirelight_locket',
+        'fenwright_grips',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1186,7 +1203,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // (nythraxis-gap-weapon-renders-2026-09-04, roots-bramblehide-icons-2026-09-07) = 29.
     // OSSBrain PR #3781 reconcile adds its own 2 disjoint batches
     // (goblin-rocket-sled-icon-2026-08-12, rallycart-rxt-icon-2026-08-20) = 31.
-    expect(mapping.generatedBatches).toHaveLength(31);
+    // The Mirefen world-boss forward-port appends its own 3 disjoint batches
+    // (balgath-boss-icons-2026-08-18, shardpike-mechanic-icons-2026-08-20,
+    // foremans-wage-icons-2026-08-25) = 34.
+    expect(mapping.generatedBatches).toHaveLength(34);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1247,14 +1267,17 @@ describe('item-art consistency accepted-art provenance', () => {
     // Nythraxis gap-fill weapon renders and 22 Bramblehide wave paintings
     // (+25) = 753. OSSBrain PR #3781 reconcile adds its own two disjoint
     // batches (goblin-rocket-sled-icon-2026-08-12,
-    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755.
-    expect(priorGeneratedIds).toHaveLength(755);
+    // rallycart-rxt-icon-2026-08-20), one id each: 753 + 2 = 755. The Mirefen
+    // world-boss forward-port adds its three disjoint batches (four boss
+    // spoils, the Shardpike, the three Foreman's Wage spoils): 755 + 8 = 763.
+    expect(priorGeneratedIds).toHaveLength(763);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1283);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1283);
+    // 1283 + the Mirefen world-boss forward-port's eight disjoint spoils = 1291.
+    expect(allCurrentOwnerIds).toHaveLength(1291);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1291);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1263,7 +1286,7 @@ describe('item-art consistency accepted-art provenance', () => {
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
-      priorGenerated: 755,
+      priorGenerated: 763,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1292,6 +1315,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // chain too (like the Field Kit): neither the dated Masterwrought verdict
     // nor the Nythraxis/Bramblehide release batches know about them, so they
     // join the same way the Field Kit does, bringing the total to 1,283.
+    // The Mirefen world-boss forward-port's eight spoils are additive beyond
+    // the whole chain in exactly the same way (their three batches postdate
+    // every record above, which is why the frozen 2026-08-09 campaign record
+    // does not carry them), bringing the total to 1,291.
     const datedMasterwroughtVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const releaseBatchIdsForCatalog = mapping.generatedBatches
       .filter(
@@ -1326,8 +1353,20 @@ describe('item-art consistency accepted-art provenance', () => {
         'field_kit',
         'reins_goblin_rocket_sled',
         'reins_rallycart_rxt',
+        // The Mirefen world boss's own three batches:
+        // balgath-boss-icons-2026-08-18,
+        // shardpike-mechanic-icons-2026-08-20 and
+        // foremans-wage-icons-2026-08-25.
+        'foremans_barrowmaul',
+        'loomshard_eye',
+        'barrowhide_pauldrons',
+        'mirestone_stride',
+        'skerrits_shardpike',
+        'foremans_wage_band',
+        'mirelight_locket',
+        'fenwright_grips',
       ]),
-      'the dated catalog plus the release batches, the Field Kit, and the OSSBrain reins icons is the full current catalog',
+      'the dated catalog plus the release batches, the Field Kit, the OSSBrain reins icons, and the Mirefen world-boss spoils is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
     expect(batch?.provenanceRecords).toEqual([
       `${evidenceDir}/accepted-art.json`,
@@ -1453,12 +1492,12 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    // Matches the mapping-owner sum above: 43 entries + 755 prior-generated
+    // Matches the mapping-owner sum above: 43 entries + 763 prior-generated
     // batch ids + 274 historical-audit batch ids + 165 Masterwrought-completion
-    // batch ids + 46 Crucible-professions batch ids = 1283.
-    if (ownerIds.length !== 1283)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1283`);
-    if (fileIds.length !== 1283) violations.push(`shipping WebP count: ${fileIds.length} != 1283`);
+    // batch ids + 46 Crucible-professions batch ids = 1291.
+    if (ownerIds.length !== 1291)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1291`);
+    if (fileIds.length !== 1291) violations.push(`shipping WebP count: ${fileIds.length} != 1291`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -344,6 +344,33 @@ export const ko_KR: EnTranslations = {
       "nameplate": "＜{title}＞"
     },
     "materialStackSelectionUnavailable": "해당 재료 선택을 더 이상 사용할 수 없습니다.",
+    "shardpike": {
+      "braceLabel": "조각창 자세 잡기",
+      "braceTooltip": "창 밑동을 땅에 박고 창끝을 세운다. 좌우 이동 키가 균형 막대다: 빔은 저절로 흐르고, 그가 땅을 내리칠 때마다 튕긴다. 양쪽 끝에 닿지 않게 {set}초간 버티면 창이 고정된다. 단단한 땅이 필요하고, 탈것에 탄 채로는 불가능하다.",
+      "thrustLabel": "룸샤드 찌르기",
+      "thrustTooltip": "고정된 창을 눈에 찔러 넣어 {damage}의 피해를 입힌다. 레벨도, 공격력도, 창 자체도 이 값을 키우지 못한다. 감독관을 실명시키고 무덤가죽을 벗겨내므로, 늪의 다른 모든 무기가 마침내 먹히기 시작한다. 고정된 창만이 이 일격을 낼 수 있고, 사거리는 {reach}야드, 기회는 {seconds}초 동안 열린다.",
+      "releaseLabel": "조각창 내리기",
+      "releaseTooltip": "창을 거둔다. 물러나도 벌칙은 없다: 잃는 것은 자세뿐이고 기회 자체는 아니며, {rest}초 후 다시 자세를 잡을 수 있다.",
+      "whyResting": "방금 창을 내렸다. 아이콘의 시간이 끝날 때까지 기다려라.",
+      "whyAlreadyCouched": "창은 이미 자세를 잡았다. 다시 잡기 전에 내려라.",
+      "whyNotSet": "창이 고정되지 않았다. 먼저 자세를 잡고 버텨라.",
+      "whyNothingCouched": "내릴 것이 없다: 창의 자세를 잡지 않았다.",
+      "beamLabel": "조각창 균형",
+      "beamStatus": "창 균형 {balance}, 고정 {set}퍼센트.",
+      "beamDanger": "창 균형 {balance}, 놓치기 직전.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "좌우 이동 키로 창을 버텨라",
+      "promptCatchIt": "붙잡아라, 창이 넘어간다",
+      "promptEyeOut": "눈이 터졌다, {seconds}초 남았다: 전력으로 때려라",
+      "promptSealed": "그의 눈이 닫혔다. {seconds}초 후 다시 열린다",
+      "promptResetting": "창을 다시 잡는 중, {seconds}초",
+      "promptCloser": "감독관에게 접근하라, {yards}야드 남았다",
+      "promptBrace": "조각창 자세를 잡고, 그대로 버텨라",
+      "promptFindBoss": "스케릿의 조각창: 이것으로 감독관의 눈을 찔러라",
+      "promptTally": "{count} put out",
+      "promptLabel": "조각창 지시",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
@@ -3270,6 +3297,7 @@ export const ko_KR: EnTranslations = {
       "dodge": "회피 확률을 {pct}% 증가시킵니다",
       "dodgeReduce": "회피 확률을 {pct}% 감소시킵니다",
       "damageReduction": "받는 모든 피해가 {pct}% 감소합니다",
+      "slumber": "새벽까지 잠들어 있습니다. 공격할 수 없으며 누가 와도 깨어나지 않습니다.",
       "guardianWard": "다음 적의 치명적인 공격을 막고 대신 생명력을 {pct}%까지 회복합니다",
       "armorFlat": "방어도를 {value} 감소시킵니다",
       "armorFlatStacks": "방어도를 {value} 감소시킵니다 ({stacks}중첩)",
@@ -3346,7 +3374,9 @@ export const ko_KR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}이(가) 쏜피크 고지에 솟아올랐습니다!"
+      "spawn": "{name}이(가) {zone} 위로 일어섰습니다!",
+      "wake": "{name}이(가) {zone}에서 깨어났습니다!",
+      "sleep": "{name}이(가) 새벽까지 잠들었습니다."
     },
     "auth": {
       "appleLoginCta": "Apple로 계속하기",
@@ -3480,6 +3510,7 @@ export const ko_KR: EnTranslations = {
         "menu": "메뉴",
         "minimap": "미니맵",
         "stanceBar": "태세 바",
+        "shardpikeBar": "조각창 바",
         "xpBar": "경험치 바",
         "chat": "채팅",
         "actionBarGroup": "액션 바",
@@ -6399,6 +6430,7 @@ export const ko_KR: EnTranslations = {
       "framesGovernedExtra": "\"프레임 편집\"은 그 아래 쌓이는 추적기 무리(추적 중인 퀘스트와 그 목표, 업적 진행도, 성물고 페이지, 제작에서 고정해 둔 제작법, 지금 들어와 있는 탐굴, 참여 중인 균열, 그리고 추적 중인 제작법이나 의뢰)와 소환수 프레임 옆 소환수 행동 단축바, 주변 적에게 건 약화 효과를 모아 보여주는 \"대상 디버프\" 프레임, 성기사의 \"헌신\" 메달, 흑마법사의 \"고통 자원 막대\", 주문 발동 오버레이, 이도류일 때의 보조 무기 공격 속도 바, 그리고 탭으로 나뉜 피해 측정기 창까지 함께 풀어 주며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "framesGovernedAuraTracks": "\"프레임 편집\"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 \"내 버프\" 트랙, \"방어 재사용 대기시간\" 트랙, \"내 보호막\" 트랙, \"공격 재사용 대기시간\" 트랙, \"이동 및 은신\" 트랙, \"아군에게 건 내 버프\" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "framesGovernedTalkingHead": "프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.",
+      "framesGovernedShardpike": "프레임 편집은 조각창 바도 해제합니다. 조각창 바는 조각창을 들고 있는 동안에만 행동 단축바 옆에 나타나는 퀵스트 도구 행동의 짧은 줄이며, 해제된 동안에는 자신의 이름 칩을 표시합니다. 덕분에 전투 중이 아니라 전투 전에 자리를 잡아 둘 수 있습니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
       "aurasTitle": "강화 효과와 약화 효과",
@@ -14075,6 +14107,30 @@ export const ko_KR: EnTranslations = {
       "fenshadow_maul": {
         "name": "늪그림자 철퇴"
       },
+      "foremans_barrowmaul": {
+        "name": "감독관의 봉분망치"
+      },
+      "skerrits_shardpike": {
+        "name": "스케릿의 조각창"
+      },
+      "loomshard_eye": {
+        "name": "베틀조각의 눈"
+      },
+      "barrowhide_pauldrons": {
+        "name": "봉분 어깨보호구"
+      },
+      "mirestone_stride": {
+        "name": "진흙돌 발걸음"
+      },
+      "foremans_wage_band": {
+        "name": "감독관의 임금 반지"
+      },
+      "mirelight_locket": {
+        "name": "늪빛 로켓"
+      },
+      "fenwright_grips": {
+        "name": "늪지 장인의 장갑"
+      },
       "wildgrove_cinch": {
         "name": "야생숲 허리띠"
       },
@@ -17011,6 +17067,9 @@ export const ko_KR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "천자르, 깨어나는 봉우리"
       },
+      "balgath_cyclops": {
+        "name": "발가스, 외눈의 감독관"
+      },
       "thunzharr_stormling": {
         "name": "깨어난 폭풍 정령"
       },
@@ -17503,6 +17562,11 @@ export const ko_KR: EnTranslations = {
         "name": "감시관 펜윅",
         "title": "펜브리지 감시관",
         "greeting": "문 앞에서 멈추십시오, {className}. 갈대 너머의 수렁은 우리 대신 사람을 죽입니다."
+      },
+      "socketwright_skerrit": {
+        "name": "마벤 스케릿",
+        "title": "박음 장인",
+        "greeting": "그 눈을 갈아 그의 눈구멍에 박아 넣은 지 사십 년, 하루치 값도 못 받았다. 감독관에게 아픔을 주고 싶나, {className}? 그렇다면 내 작품을 노려라."
       },
       "brother_aldric_fen": {
         "name": "알드릭 수사",
@@ -18212,6 +18276,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "펜브리지 소집 명령서"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "박음 장인의 미수금",
+        "text": "그 눈구멍에 룸샤드를 박은 건 나였다. 렌즈를 갈고, 앉히고, 쐐기로 곧게 고정했지. 봉분의 주인들은 동화 한 푼 주지 않았고, 이제 내 작품이 늪을 짓밟으며 돌아다닌다. 내 조각창을 가져가라. 밑동을 박고, 창끝을 세워 얼마가 걸리든 버텨라. 팔이 확실해지면 그것을 눈에 꽂아라. 그가 걸친 가죽은 그 조각에 묶여 있다, {playerName}. 그를 실명시켜라. 그러면 늪의 모든 칼날이 마침내 먹힌다.",
+        "completion": "뚫리는 느낌이 들었지? 사십 년치 이자를 눈구멍으로 받아냈다. 창은 네 것이다, 친구. 그는 낫는다, 늘 그러니까. 그러니 마음이 동할 때 또 받으러 가면 된다.",
+        "objectives": {
+          "0": {
+            "label": "감독관의 눈을 찌르기"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const ko_KR: EnTranslations = {
           },
           "7": {
             "label": "가라앉은 요새"
+          },
+          "8": {
+            "label": "봉분의 영역"
+          },
+          "9": {
+            "label": "별똥 분화구"
           }
         }
       },

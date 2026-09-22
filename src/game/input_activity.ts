@@ -4,7 +4,7 @@ const WINDOW_MS = 60_000;
 
 export class InputActivityMeter {
   private readonly times: number[] = []; // edge timestamps (ms), oldest first
-  private sinceDrain = 0;                // edges since the last drainCount()
+  private sinceDrain = 0; // edges since the last drainCount()
 
   /** Record one discrete player input edge at `nowMs`. */
   record(nowMs: number): void {

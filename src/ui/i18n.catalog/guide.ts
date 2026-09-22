@@ -754,6 +754,12 @@ export const guideStrings = {
     // for the same reason as the aura tracks. Wordy (M16): non-Latin fills ride along.
     framesGovernedTalkingHead:
       "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+    // The Shardpike bar (src/ui/hud/shardpike/) joined HUD_FRAME_SPECS with the
+    // Balgath world boss. Own key for the same reason as the two above: a
+    // reword of framesGovernedExtra would go stale in every non-Latin fill.
+    // Wordy (M16): the five non-Latin fills land in this same change.
+    framesGovernedShardpike:
+      'Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.',
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:

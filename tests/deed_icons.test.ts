@@ -370,10 +370,16 @@ describe('Book of Deeds webp icons', () => {
     // (which also carry the release-side additions, including the Roots'
     // Bramblehide collection crest from roots-bramblehide-icons-2026-09-07).
     // The self-crafted hammer's hidden celebration adds one explicit pending crest.
-    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(300);
+    // 302 at the Mirefen world-boss forward-port: its two combat deeds
+    // (cmb_balgath, cmb_balgath_ten) append at the DEED_ORDER tail behind
+    // hid_forgebreaker, and both ride the deed_cat_combat fallback, so the
+    // pending ledger grows to 13 while the painted count stays at 289.
+    // Re-counted off the merged src/sim/content/deeds.ts DEEDS table and
+    // src/ui/deed_image_ids.ts.
+    expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(302);
     expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(289);
-    expect(DEED_ART_PENDING_IDS).toHaveLength(11);
-    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('hid_forgebreaker');
+    expect(DEED_ART_PENDING_IDS).toHaveLength(13);
+    expect(DEED_ART_PENDING_IDS.at(-1)).toBe('cmb_balgath_ten');
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

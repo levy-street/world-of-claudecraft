@@ -3955,6 +3955,289 @@
     display: flex;
     gap: var(--socket-gap);
   }
+  /* The Shardpike PROMPT (src/ui/hud/shardpike/shardpike_prompt_view.ts): the one loud
+     instruction, parked where the eyes already are during a fight rather than down with the
+     bars where the hands are. Above the subzone banner's 35% so the two never collide.
+
+     Tone drives colour and weight and nothing else moves: the line must not jump position
+     between states, or the player re-reads it from scratch every time it changes.
+
+     Seated ABOVE #banner (28%) rather than below it, and this is measured, not guessed: the
+     success banner and the success prompt fire on the same frame by design, and at 24% the
+     38px "BARROWHIDE BROKEN" landed straight through the prompt and its tally. The two now
+     stack, banner under line, which is also the reading order. */
+  #shardpike-prompt {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 16%;
+    transform: translateX(-50%);
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    pointer-events: none;
+    text-align: center;
+    font-family: var(--title-font);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    z-index: 6;
+  }
+  .pike-prompt-body {
+    font-size: 21px;
+    font-weight: bold;
+    color: var(--color-pike-prompt-text);
+    text-shadow:
+      0 0 16px var(--color-pike-prompt-halo),
+      1px 1px 4px var(--color-keyline);
+  }
+  .pike-prompt-tally {
+    display: none;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--color-pike-tally-text);
+    text-shadow: 1px 1px 3px var(--color-keyline);
+  }
+  /* Urgent is the set window and a fumbling beam: the two moments where a second of
+     hesitation loses the attempt, so this is the only tone that moves. */
+  #shardpike-prompt.tone-urgent .pike-prompt-body {
+    color: var(--color-pike-urgent-text);
+    font-size: 25px;
+    text-shadow:
+      0 0 22px var(--color-pike-urgent-glow),
+      1px 1px 4px var(--color-keyline);
+    animation: pike-prompt-pulse 0.7s ease-in-out infinite;
+  }
+  #shardpike-prompt.tone-active .pike-prompt-body {
+    color: var(--color-pike-active-text);
+  }
+  #shardpike-prompt.tone-directive .pike-prompt-body {
+    color: var(--color-pike-prompt-text);
+  }
+  /* The eye is out: the fight's payoff line, and the one the whole raid is acting on. */
+  #shardpike-prompt.tone-success .pike-prompt-body {
+    color: var(--color-pike-success-text);
+    text-shadow:
+      0 0 20px var(--color-pike-success-glow),
+      1px 1px 4px var(--color-keyline);
+  }
+  /* Sealed or re-setting: a reason to wait, deliberately quiet so it does not read as an
+     instruction the player is failing to follow. */
+  #shardpike-prompt.tone-idle .pike-prompt-body {
+    color: var(--color-pike-idle-text);
+    font-size: 17px;
+    font-weight: normal;
+  }
+  @keyframes pike-prompt-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #shardpike-prompt.tone-urgent .pike-prompt-body {
+      animation: none;
+    }
+  }
+  /* The Shardpike bar (src/ui/hud/shardpike/): a second action bar that only exists while
+     the quest pike is in hand. Seated above the pet bar's row rather than beside it: the
+     two are never both up in practice (the pike is a two-hander and the trial is a world
+     boss fight), but a stacked seat keeps the main hotbar from ever shifting under the
+     player's cursor if they are. */
+  #shardpike-bar {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: -104px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+  }
+  .pike-group {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    border: 2px solid var(--color-keyline);
+    outline: 1px solid var(--color-pike-rim);
+    border-radius: 6px;
+    background: linear-gradient(170deg, var(--color-pike-group-hi), var(--color-pike-group-lo));
+    box-shadow: 0 2px 8px var(--color-pike-group-shadow);
+  }
+  /* The balance beam. Hidden until the pike is actually couched: a track showing a
+     centred pip while nothing is happening reads as a meter that is broken. */
+  .pike-beam {
+    height: 0;
+    opacity: 0;
+    transition: opacity 120ms linear;
+  }
+  .pike-beam.active {
+    height: 10px;
+    opacity: 1;
+  }
+  .pike-beam-track {
+    position: relative;
+    height: 100%;
+    border: 2px solid var(--color-keyline);
+    outline: 1px solid var(--color-pike-rim);
+    border-radius: 5px;
+    background: linear-gradient(
+      90deg,
+      var(--color-pike-beam-danger),
+      var(--color-pike-beam-track) 28%,
+      var(--color-pike-beam-track) 72%,
+      var(--color-pike-beam-danger)
+    );
+    overflow: hidden;
+  }
+  /* Set progress fills from the centre out, so "nearly set" reads as the safe band
+     widening rather than as a bar racing toward a rail. */
+  .pike-beam-set {
+    position: absolute;
+    inset: 0;
+    transform: scaleX(var(--pike-set, 0));
+    transform-origin: center;
+    background: linear-gradient(
+      90deg,
+      var(--color-pike-set-edge),
+      var(--color-pike-primed),
+      var(--color-pike-set-edge)
+    );
+    opacity: 0.55;
+  }
+  .pike-beam-pip {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    margin-left: -3px;
+    left: calc(var(--pike-balance, 0.5) * 100%);
+    border-radius: 3px;
+    background: var(--color-pike-pip);
+    box-shadow: 0 0 6px var(--color-pike-pip-glow);
+  }
+  .pike-beam.danger .pike-beam-pip {
+    background: var(--color-pike-pip-danger);
+    box-shadow: 0 0 8px var(--color-pike-pip-danger-glow);
+  }
+  .pike-btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 2px solid var(--color-pike-btn-rim);
+    border-radius: 6px;
+    background: radial-gradient(
+      circle at 35% 30%,
+      var(--color-pike-btn-hi),
+      var(--color-pike-btn-lo)
+    );
+    color: var(--color-pike-btn-text);
+    cursor: var(--cursor-point);
+    position: relative;
+    touch-action: manipulation;
+    user-select: none;
+  }
+  .pike-btn-icon {
+    position: absolute;
+    inset: 1px;
+    width: calc(100% - 2px);
+    height: calc(100% - 2px);
+    border-radius: 4px;
+    object-fit: cover;
+  }
+  /* Primed is the whole point of the bar: it names the one verb the fight wants next. */
+  .pike-btn.primed {
+    border-color: var(--color-pike-primed);
+    box-shadow: 0 0 9px var(--color-pike-primed-glow);
+  }
+  /* Dimmed, not extinguished. grayscale(0.75) + brightness(0.55) on painted art left three
+     near-black tiles, and since only ONE verb of the three is ever available at a time, the
+     bar read as mostly broken rather than mostly not-yet. A player has to be able to see
+     what the pike CAN do while it is not doing it, because that is how they learn the
+     sequence. Desaturated and darkened enough to be clearly out of reach, bright enough to
+     still be a picture. */
+  .pike-btn.disabled {
+    filter: grayscale(0.45) brightness(0.78);
+    opacity: 0.86;
+    border-color: var(--color-pike-btn-rim-disabled);
+    /* --cursor-arrow is what the family spells for the global default arrow
+       (base.css sets it on body), the same way it spells --cursor-point for the
+       interactive one. */
+    cursor: var(--cursor-arrow);
+  }
+  /* An AVAILABILITY WINDOW, which is the opposite of a cooldown and must never look like
+     one: the action is live and this is how long that lasts. So the ring is bright, sits on
+     the border, and DRAINS (conic-gradient sweep driven by --pike-window, 1 down to 0),
+     rather than a dark overlay filling up. The League-of-Legends reading: the glow running
+     out is your remaining time, and the button underneath stays lit the whole way. */
+  /* The border stays DIM here on purpose. A solid gold border plus the sweep on top means the
+     draining arc has nothing to drain against: the button reads as fully ringed at 10 percent
+     remaining exactly as it does at 90. The glow says "live", and the arc alone carries the
+     time. */
+  .pike-btn.windowed {
+    border-color: var(--color-pike-window-rim);
+    box-shadow:
+      0 0 12px var(--color-pike-window-glow),
+      inset 0 0 8px var(--color-pike-window-inset);
+  }
+  .pike-btn-window {
+    position: absolute;
+    inset: -3px;
+    display: none;
+    border-radius: 8px;
+    pointer-events: none;
+    /* The sweep itself: an opaque arc over a transparent remainder, masked to a thin ring so
+       it reads as a draining border and never as a pie chart over the art. */
+    background: conic-gradient(
+      from -90deg,
+      var(--color-pike-window-arc) 0turn,
+      var(--color-pike-window-arc) calc(var(--pike-window, 1) * 1turn),
+      var(--color-pike-window-arc-off) calc(var(--pike-window, 1) * 1turn),
+      var(--color-pike-window-arc-off) 1turn
+    );
+    -webkit-mask:
+      linear-gradient(var(--color-keyline) 0 0) content-box,
+      linear-gradient(var(--color-keyline) 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(var(--color-keyline) 0 0) content-box,
+      linear-gradient(var(--color-keyline) 0 0);
+    mask-composite: exclude;
+    padding: 3px;
+  }
+  .pike-btn.windowed .pike-btn-window {
+    display: block;
+  }
+  /* The seconds share the centred slot a cooldown uses, deliberately: same position, and the
+     dark backdrop that would make it read as a cooldown comes from `.cooldown`, which a
+     windowed button never carries. Bright digits over live art, not white-on-black. */
+  .pike-btn.windowed .pike-btn-cd {
+    color: var(--color-pike-window-text);
+    text-shadow:
+      0 0 8px var(--color-pike-window-text-glow),
+      0 1px 3px var(--color-keyline);
+  }
+  .pike-btn-cd {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--color-pike-cd-text);
+    text-shadow: 0 1px 2px var(--color-keyline);
+    pointer-events: none;
+  }
+  .pike-btn.cooldown .pike-btn-cd {
+    background: var(--color-pike-cd-scrim);
+    border-radius: 4px;
+  }
   .pet-btn {
     --ui-socket-size: var(--socket-size-pet);
     flex: none;

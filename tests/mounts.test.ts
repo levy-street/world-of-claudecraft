@@ -244,20 +244,26 @@ describe('mount reins items (the collection: owning the item is owning the mount
     // takes equal-rate secondary paths to both rather than a fifth signature
     // mount (owner call, 2026-08-01). Rate parity below is what keeps that
     // honest: every path still pays the one rarity rate.
-    // NO SOURCE YET (owner call, 2026-08-04): the Drakemaw Raptor briefly took an
-    // open-world-rare path, dropping off the four Drakemaw Broodlords. That is
-    // reverted: the broodlord is the 90% source of the quest chain's own
-    // emberwing_scale, so hanging the only farmable epic mount on it camped the
-    // Drakemaw belt and tap-blocked every leveler questing through. The reins move
-    // to a dedicated world boss in a follow-up; until then the def ships with no
-    // acquisition path at all. Listed EXPLICITLY so a sourceless mount is a
-    // decision and never an accident: when the world boss lands, delete the entry
-    // and the rarity-derived rule below takes back over.
-    const NO_SOURCE_YET: readonly string[] = [
-      'reins_drakemaw_raptor',
-      'reins_goblin_rocket_sled',
-      'reins_rallycart_rxt',
-    ];
+    // NO SOURCE YET: a def that ships with no acquisition path at all, listed
+    // EXPLICITLY so a sourceless mount is a decision and never an accident. The
+    // Drakemaw Raptor used to head this list (owner call, 2026-08-04: an
+    // open-world-rare path off the four Drakemaw Broodlords camped the Drakemaw
+    // belt and tap-blocked every leveler questing through, so it was reverted and
+    // the reins were held for a dedicated world boss). THIS change is that
+    // follow-up, so its entry is gone and WORLD_BOSS_SOURCES below carries it.
+    const NO_SOURCE_YET: readonly string[] = ['reins_goblin_rocket_sled', 'reins_rallycart_rxt'];
+    // WORLD-BOSS MOUNTS (2026-08-25): the Drakemaw Raptor's reins ride the Mirefen
+    // world boss Balgath's table as a personal, ungrouped 1% draw (content/zone2.ts),
+    // the "dedicated world boss" the 2026-08-04 owner call held them back for after
+    // the broodlord path camped the Drakemaw belt. A world boss is the one MOB table
+    // a mount may sit on: the kill takes a raid, the loot is personal, and the
+    // world-boss lockout makes it once a day per character, so the 1% is a daily roll
+    // rather than a farm. Pinned EXPLICITLY (boss id and rate) so a second table or a
+    // rate change is a decision here, never an accident.
+    const WORLD_BOSS_MOUNT_CHANCE = 0.01;
+    const WORLD_BOSS_SOURCES: Record<string, readonly string[]> = {
+      reins_drakemaw_raptor: ['balgath_cyclops'],
+    };
     const FIVE_MAN_SOURCES: Record<string, readonly string[]> = {
       reins_stormfeather_griffin: ['morthen'],
       reins_shadowjump_toad: ['vael_the_mistcaller'],
@@ -270,12 +276,23 @@ describe('mount reins items (the collection: owning the item is owning the mount
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
-      // No mount is ever on a NORMAL mob table, at any rarity.
+      // No mount is ever on a NORMAL mob table, at any rarity. The only mob tables a
+      // mount may ride are the pinned world bosses', and there it is an ungrouped
+      // draw at the world-boss rate.
+      const bossSources = WORLD_BOSS_SOURCES[itemId] ?? [];
       for (const mob of Object.values(MOBS)) {
-        expect(
-          mob.loot.find((l) => l.itemId === itemId),
-          `${itemId} must not be on normal table ${mob.id}`,
-        ).toBeUndefined();
+        const row = mob.loot.find((l) => l.itemId === itemId);
+        if (bossSources.includes(mob.id)) {
+          expect(mob.worldBoss, `${mob.id} carries a mount, so it must be a world boss`).toBe(true);
+          expect(row, `${itemId} is missing from world boss ${mob.id}`).toBeDefined();
+          expect(row?.chance, `${itemId} on ${mob.id} pays the world-boss rate`).toBe(
+            WORLD_BOSS_MOUNT_CHANCE,
+          );
+          expect(row?.rollGroup, `${itemId} is an independent draw`).toBeUndefined();
+          expect(row?.maxPlayerLevel, `${itemId} is for everyone who fought`).toBeUndefined();
+          continue;
+        }
+        expect(row, `${itemId} must not be on normal table ${mob.id}`).toBeUndefined();
       }
 
       const heroicEntries = Object.entries(HEROIC_BOSS_LOOT).flatMap(([bossId, entries]) =>
@@ -287,14 +304,15 @@ describe('mount reins items (the collection: owning the item is owning the mount
       // every catalog reins below has an in-world story or is dev-only.
 
       if (rarity === 'epic') {
-        // Rift S clears are the sole source, EXCEPT a mount held sourceless on
-        // purpose. Either way it stays out of every heroic table, so the heroic
-        // tier's mount supply is unchanged.
+        // Rift S clears are the sole source, EXCEPT a world-boss mount (whose ONE
+        // source is its boss) and a mount held sourceless on purpose. Either way it
+        // stays out of every heroic table, so the heroic tier's mount supply is
+        // unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
         if (NO_SOURCE_YET.includes(itemId)) {
           // The mob-table sweep above already proved it drops off nothing. Pin
           // the remaining three pools too, so "no path" means no path: the day
-          // its world boss lands, it gets ONE source, not a quiet second one.
+          // its source lands, it gets ONE, not a quiet second one.
           for (const [pool, name] of [
             [RIFT_EPIC_MOUNT_REINS, 'rift S'],
             [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
@@ -303,6 +321,21 @@ describe('mount reins items (the collection: owning the item is owning the mount
             expect(
               pool as readonly string[],
               `${itemId} has no source yet: not in ${name}`,
+            ).not.toContain(itemId);
+          }
+          continue;
+        }
+        if (bossSources.length > 0) {
+          // The mob-table sweep above proved it drops off exactly its boss. Pin the
+          // three rift pools too, so ONE source means one: never a quiet second door.
+          for (const [pool, name] of [
+            [RIFT_EPIC_MOUNT_REINS, 'rift S'],
+            [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
+            [RIFT_GREEN_MOUNT_REINS, 'rift green'],
+          ] as const) {
+            expect(
+              pool as readonly string[],
+              `${itemId} is a world-boss mount: not in ${name}`,
             ).not.toContain(itemId);
           }
           continue;

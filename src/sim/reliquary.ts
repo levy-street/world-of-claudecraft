@@ -1621,8 +1621,10 @@ export const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>>
  * never a score (the pinned doctrine), and no completion read may depend on
  * how many copies the world handed over.
  *
- * col_reliquary_complete remains blocked by source-pending catalog mounts.
- * See content/reliquary.ts; paid mount skins do not score Curator rank.
+ * col_reliquary_complete remains blocked by source-pending catalog mounts
+ * (reins_drakemaw_raptor left that list when it joined the Mirefen world
+ * boss's table). See content/reliquary.ts; paid mount skins do not score
+ * Curator rank.
  * Tests may still reach owned === total by granting marks and reins directly.
  * The deed carries feat: true so this pending window can never dead-end
  * feat_book_complete (see the record's comment in content/deeds.ts).

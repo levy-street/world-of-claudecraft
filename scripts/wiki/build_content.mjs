@@ -696,6 +696,9 @@ function reliquaryRelicName(relic) {
 // Reliquary keeps the full page name; the public wiki uses a safe label.
 const RELIQUARY_WIKI_PAGE_NAME = {
   conquerors_thunzharr: 'The Waking Peak (World Boss)',
+  // Same spoiler rule: the page name carries the boss's own name, which
+  // tests/guide.test.ts forbids in generated content.
+  conquerors_balgath: 'Starfall Crater (World Boss)',
 };
 
 const reliquary = RELIQUARY_PAGES.filter(

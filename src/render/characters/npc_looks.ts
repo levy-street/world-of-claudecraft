@@ -694,6 +694,29 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('knight'),
     props: 'sword_shield',
   },
+  // Maben Skerrit, the Socketwright: seventy, bald, bench-stooped, squinting at
+  // close work since before the Foreman wore his eye; verdigris and copper, bare
+  // hands for the setting, and a grievance he keeps as sharp as his graver.
+  socketwright_skerrit: {
+    app: {
+      gender: 'male',
+      hair: 'bald',
+      ...hair(32, 0.12, 0.58),
+      beard: 'full',
+      brows: 'bushy',
+      eyeShape: 'sleepy',
+      ...eyes(88, 0.3, 0.26),
+      ...skin(26, 0.4, 0.46),
+      mouth: 'frown',
+      face: face({ eyes: -0.25, brow: 0.25, cheeks: -0.35, nose: 0.2 }),
+      body: body({ shoulders: -0.25, chest: -0.2, hands: 0.25 }),
+      earrings: 'hoop',
+      earringMaterial: 'copper',
+      outfit: 'verdigris',
+    },
+    worn: kit('rogue', { hands: null }),
+    props: 'knife',
+  },
   // Provisioner Hale: two dry things out of three on a good day, and a wry
   // grin about it.
   provisioner_hale: {

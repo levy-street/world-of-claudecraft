@@ -2164,7 +2164,9 @@ export const GUIDE_ZONES: GuideZoneInfo[] = [
       "Drowned Chapel",
       "Troll Mounds",
       "Gravecaller Encampment",
-      "The Sunken Bastion"
+      "The Sunken Bastion",
+      "Barrowmound Reach",
+      "Starfall Crater"
     ],
     "welcome": "Report to Warden Fenwick at the Fenbridge gate.",
     "families": [
@@ -5853,6 +5855,20 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "crest": "/ui/deeds/col_set_bramblehide.webp"
+  },
+  {
+    "id": "cmb_balgath",
+    "name": "Foreman No More",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
+  },
+  {
+    "id": "cmb_balgath_ten",
+    "name": "The Mound Keeps Nothing",
+    "category": "combat",
+    "renown": 10,
+    "feat": false
   }
 ];
 
@@ -6469,6 +6485,41 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Vestments of the Waking Grove"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_balgath",
+    "shelf": "conquerors",
+    "name": "Starfall Crater (World Boss)",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Foreman's Barrowmaul"
+      },
+      {
+        "kind": "item",
+        "name": "Barrowhide Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Mirestone Stride"
+      },
+      {
+        "kind": "item",
+        "name": "The Loomshard Eye"
+      },
+      {
+        "kind": "item",
+        "name": "Foreman's Wage Band"
+      },
+      {
+        "kind": "item",
+        "name": "Mirelight Locket"
+      },
+      {
+        "kind": "item",
+        "name": "Fenwright Grips"
       }
     ]
   },

@@ -69,6 +69,7 @@ const MOB_AURA_ICON_IDENTITIES: ReadonlyMap<string, string> = new Map([
   ['stackpoison_rift_boss_venom', 'mob_stack_poison'],
   ['stagger_deeprock_kobold', 'mob_stagger_hit'],
   ['stoneskin_ancient_guardian', 'mob_stoneskin'],
+  ['stoneskin_balgath_cyclops', 'mob_stoneskin'],
   ['stoneskin_marrowlord_varkas', 'mob_stoneskin'],
   ['stoneskin_old_marrowshell', 'mob_stoneskin'],
   ['stoneskin_rift_boss_arcane', 'mob_stoneskin'],

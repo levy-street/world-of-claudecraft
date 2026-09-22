@@ -126,12 +126,20 @@ describe('ability icons', () => {
     const ids = abilityRecipeIds();
     expect(ids).toEqual([...new Set(ids)].sort((left, right) => left.localeCompare(right)));
     // 464: 450 plus the fourteen Nythraxis Raid Boss Guide mechanic recipes;
-    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite).
-    expect(ids).toHaveLength(469);
+    // 469: plus the Wildfang kit pass 2 glyphs (lunge, hamstring_bite);
+    // 472: plus the Mirefen world boss's Shardpike bar verbs (lance_brace,
+    // lance_thrust, lance_release). They also ship painted art, so these
+    // recipes are the documented fallback path, and they stay pinned here
+    // like every other ability's. Re-counted off the merged
+    // src/ui/icons.ts ABILITY_RECIPES literal.
+    expect(ids).toHaveLength(472);
     for (const id of ids) expect(hasExplicitAbilityIcon(id), id).toBe(true);
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('a1cfefa489b1e5490554bd7a1faa7a37aab75bc8f7b225678217851790c199ba');
+    // Re-minted over the merged ABILITY_RECIPES literal (neither parent's
+    // digest describes the union): recomputed with this test's own
+    // stableSerialize over the 472 merged recipes.
+    expect(hash).toBe('5c0ceff7ad88d47c110c9100531edaa9c24eff0ba5f2fcf65e9bf48ac6970a10');
   });
 });

@@ -344,6 +344,33 @@ export const de_DE: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Diese Materialauswahl ist nicht mehr verfügbar.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Verdammnis",
       "fateThreadsLabel": "Schicksalsfäden",
@@ -3270,6 +3297,7 @@ export const de_DE: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Verringert allen erlittenen Schaden um {pct}%",
+      "slumber": "Schläft bis zur Dämmerung. Kann nicht angegriffen werden und erwacht für niemanden.",
       "guardianWard": "Der naechste todliche Feindtreffer stellt stattdessen {pct}% deiner Gesundheit wieder her",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -3346,7 +3374,9 @@ export const de_DE: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} erhebt sich über den Thornpeak-Höhen!"
+      "spawn": "{name} erhebt sich über {zone}!",
+      "wake": "{name} erwacht über {zone}!",
+      "sleep": "{name} schläft bis zur Dämmerung."
     },
     "auth": {
       "appleLoginCta": "Mit Apple fortfahren",
@@ -3480,6 +3510,7 @@ export const de_DE: EnTranslations = {
         "menu": "Menü",
         "minimap": "Minikarte",
         "stanceBar": "Haltungsleiste",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Erfahrungsleiste",
         "chat": "Chat",
         "actionBarGroup": "Aktionsleisten",
@@ -6399,6 +6430,7 @@ export const de_DE: EnTranslations = {
       "framesGovernedExtra": "Rahmen bearbeiten löst außerdem den Trackerstapel darunter: verfolgte Quests und Ziele, Fortschritt im Buch der Taten, Reliquiarseiten, vom Handwerk angepinnte Rezepte, das aktuelle Delve, jeden Riss, an dem du teilnimmst, und das verfolgte Rezept oder die Kommission. Ebenfalls enthalten sind die Haustieraktionsleiste neben dem Haustierrahmen, der Zielpunkte-Rahmen für deine Schwächungen auf nahen Gegnern, das Paladin-Medaillon der Hingabe, die Affliction-Leiste des Hexenmeisters, das Zauberproc-Overlay, der Nebenhandschwungtimer für Beidhänder und das Register-Schadensmeterfenster. Jeder Bereich trägt seinen eigenen Namenschip, sobald er gelöst ist.",
       "framesGovernedAuraTracks": "Rahmen bearbeiten löst außerdem die sechs optionalen Aurenleisten, sobald du sie im Reiter Kampf der Interfaceoptionen einschaltest: Meine Stärkungen, defensive Abklingzeiten, meine Schilde, offensive Abklingzeiten, Bewegung und Verstohlenheit sowie Meine Stärkungen auf Verbündeten. Jede Leiste ist zunächst aus und trägt beim Lösen ihren eigenen Namenschip.",
       "framesGovernedTalkingHead": "Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Leisten, Timer und Kampftext",
       "barsBody": "Deine Zauberleiste erscheint in der Mitte des Bildschirms, direkt über deinen Aktionsleisten, sobald du zauberst oder kanalisierst, und zeigt den Namen des Zaubers sowie die verbleibende Zeit. Dein Ziel bekommt eine eigene Zauberleiste auf seinem Fenster, sodass du siehst, was kommt, und darauf reagieren kannst.\n\nEine dünne Schwungleiste liegt unter deiner Zauberleiste und füllt sich zwischen deinen Waffenschwüngen, sodass ein Nah- oder Fernkämpfer sehen kann, wann der nächste automatische Treffer landet.\n\nDeine Erfahrungsleiste läuft über die volle Breite unter deinen Aktionsleisten, in Segmente unterteilt, mit einem helleren Abschnitt, der die ausgeruhte Erfahrung zeigt, die du angesammelt hast.\n\nSchwimme unter Wasser, und am oberen Bildschirmrand erscheint eine blaue Atemleiste. Sie leert sich, während dein Kopf unter Wasser ist, blinkt rot auf, sobald sie aufgebraucht ist und du zu ertrinken beginnst, und füllt sich schnell wieder, sobald du auftauchst. Die Leertaste lässt dich nach oben schwimmen, und die Taste zum Abtauchen, standardmäßig Strg, bringt dich tiefer.\n\nSchaden und Heilung schweben als kleine Zahlen über dem auf, was sie getroffen haben, sodass du einen Kampf lesen kannst, ohne Text lesen zu müssen. Der Kampf-Reiter in deinem Chatfenster führt das vollständige schriftliche Protokoll.",
       "aurasTitle": "Stärkungs- und Schwächungszauber",
@@ -14075,6 +14107,30 @@ export const de_DE: EnTranslations = {
       "fenshadow_maul": {
         "name": "Moorschatten-Streitkolben"
       },
+      "foremans_barrowmaul": {
+        "name": "Hügelgrabhammer des Vorarbeiters"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Splitterpike"
+      },
+      "loomshard_eye": {
+        "name": "Das Websplitter-Auge"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Hügelgrab-Schulterstücke"
+      },
+      "mirestone_stride": {
+        "name": "Moorsteinschritt"
+      },
+      "foremans_wage_band": {
+        "name": "Lohnring des Vorarbeiters"
+      },
+      "mirelight_locket": {
+        "name": "Sumpflicht-Medaillon"
+      },
+      "fenwright_grips": {
+        "name": "Griffe des Moorbauers"
+      },
       "wildgrove_cinch": {
         "name": "Wildhain-Gürtel"
       },
@@ -17011,6 +17067,9 @@ export const de_DE: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, der Erwachende Gipfel"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Geweckter Sturmling"
       },
@@ -17503,6 +17562,11 @@ export const de_DE: EnTranslations = {
         "name": "Wärter Fenwick",
         "title": "Wärter von Fenbridge",
         "greeting": "Halt am Tor, {className}. Hinter dem Schilf tötet das Moor für uns."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Bruder Aldric",
@@ -18212,6 +18276,16 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Musterungsbefehl von Fenbridge"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const de_DE: EnTranslations = {
           },
           "7": {
             "label": "Die versunkene Bastion"
+          },
+          "8": {
+            "label": "Hügelgrab-Revier"
+          },
+          "9": {
+            "label": "Sternenfall-Krater"
           }
         }
       },

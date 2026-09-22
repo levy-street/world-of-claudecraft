@@ -1373,6 +1373,7 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // CPU-hygiene renderer leaf and the druid Cat Form renderer leaf compose in
 // one tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
+  // Re-minted for the Mirefen world-boss forward-port onto release/v0.44.0: the renderer leaf gained the boss ground layer, the far-impostor sync and the wade-depth read, and entity_view_policy_core gained the created-view classifier. No capture was retaken.
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1383,8 +1384,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'd8d1ff3e12d29df640618feb3c4b4fcbc77eb65b6ae9224620f9977d33230778';
+  '39f1dd8e59dbffdc95fc048966c7974d29231809f1f4c790dbe5fcb0096f5a0d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
+  // Re-minted for the Mirefen world-boss forward-port onto release/v0.44.0: the renderer leaf gained the boss ground layer, the far-impostor sync and the wade-depth read, and entity_view_policy_core gained the created-view classifier. No capture was retaken.
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1395,7 +1397,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // plateau-aware ground cues over the release's CPU-hygiene and Cat Form
   // leaves) matches neither parent. No capture was retaken.
   // Re-minted for the devalue audit floor: pnpm-lock.yaml moved (devalue 5.8.1 to 5.9.4), no renderer input changed. No capture was retaken.
-  'e651995fbf1ac8413176d75b35b5da91b9a241918ea183430642a9c6b51d3fd5';
+  'b13f66dd992efd23dd3f402758018a37bf164bc2c9a3884f16474055f4acf8d2';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2772,7 +2774,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // capture was retaken.
       // devalue audit floor: recomputed LAST again over the re-swept evidence. No
       // capture was retaken.
-    ).toBe('7c84c7c53ca7d33345e15966eda0f4e73b8c6cfdba707b4f26aa04db5fe37065');
+    ).toBe('2bd48cca125405b00f3ee32283dca4ddd18e1ec7a24e7e0528cf0ba26d00a69d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

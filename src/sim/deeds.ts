@@ -207,6 +207,7 @@ const ENCOUNTER_ROOM_RADIUS: Record<string, number> = {
 };
 
 const THUNZHARR_ID = 'thunzharr_waking_peak';
+const BALGATH_ID = 'balgath_cyclops';
 const WOLF_PACK_TEMPLATE = 'forest_wolf';
 const BOG_BLOAT_TEMPLATE = 'bog_bloat';
 const MENDER_TEMPLATE = 'gravecaller_mender';
@@ -1885,6 +1886,17 @@ export function onWorldBossKilledForDeeds(
   mob: Entity,
   contributors: PlayerMeta[],
 ): void {
+  // Per-boss credit, matched on template id. An explicit branch per boss rather than a
+  // table because the deeds differ in SHAPE: only Thunzharr has an unbroken-run deed, so a
+  // table would carry optionals most bosses never use.
+  if (mob.templateId === BALGATH_ID) {
+    for (const meta of contributors) {
+      grantDeed(ctx, meta, 'cmb_balgath');
+      bumpDeedStat(ctx, meta, 'balgathKills', 1);
+    }
+    ctx.deedRuntime.encounters.delete(mob.id);
+    return;
+  }
   if (mob.templateId !== THUNZHARR_ID) return;
   const st = ctx.deedRuntime.encounters.get(mob.id);
   for (const meta of contributors) {

@@ -205,18 +205,21 @@ describe('the tier-1 starter tools have no route to copper or market value', () 
   });
 
   it('every requiredItems quest anywhere keeps its item out of the stores the predicate cannot see', () => {
-    // The accept-time predicate reads bags, bank, mailbox, and LIVE market
-    // escrow. Four player-recoverable stores sit outside it: the vendor
-    // buy-back list, the expired-listing market collection (an expired
-    // listing is spliced OUT of marketListings before the player claims it),
-    // the equipment slots, and the bag sockets. Today no required item can
-    // reach any of them: quest kind or the noVendorSell/noMarketList pair
-    // fences buy-back and the collection, and the slot/kind arms below fence
-    // equipping (neither flag does: equipItem gates on def.slot plus the
-    // weapon/armor kinds, equipBag on kind bag). This sweep is the fence: a
-    // FUTURE quest requiring a sellable, listable, equippable, or bag item
-    // re-opens the duplicate-mint loop through an unscanned store, and must
-    // widen the predicate first.
+    // The accept-time predicate reads bags, bank, mailbox, LIVE market escrow, and (since
+    // the world boss's wieldable Shardpike) the EQUIPMENT SLOTS. Two player-recoverable
+    // stores sit outside it: the vendor buy-back list and the expired-listing market
+    // collection (an expired listing is spliced OUT of marketListings before the player
+    // claims it), plus the bag sockets (equipBag parks the item id in meta.bags, recoverable
+    // through unequipBag). Today no required item can reach any of them: quest kind or the
+    // noVendorSell/noMarketList pair fences buy-back and the collection, and the bag-kind arm
+    // below fences the sockets. This sweep is the fence: a FUTURE quest requiring a sellable,
+    // listable, or bag item re-opens the duplicate-mint loop through an unscanned store, and
+    // must widen the predicate first.
+    //
+    // "Equippable" is deliberately NOT asserted any more, and dropping it was a predicate
+    // widening rather than a relaxation: `skerrits_shardpike` is required by
+    // q_socketwrights_due AND meant to be wielded, so the equip gate that used to fence that
+    // store stopped applying, and playerHoldsQuestItem now scans the paperdoll instead.
     const swept = Object.values(QUESTS).filter((q) => (q.requiredItems?.length ?? 0) > 0);
     expect(swept.length, 'the requiredItems quests exist').toBeGreaterThanOrEqual(5);
     for (const quest of swept) {
@@ -229,7 +232,6 @@ describe('the tier-1 starter tools have no route to copper or market value', () 
           fenced,
           `${quest.id}: ${itemId} must be unreachable from buy-back and collections`,
         ).toBe(true);
-        expect(def.slot, `${quest.id}: ${itemId} must not be equippable`).toBeUndefined();
         expect(def.kind, `${quest.id}: ${itemId} must not be a bag`).not.toBe('bag');
       }
     }

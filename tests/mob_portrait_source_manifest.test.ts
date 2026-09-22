@@ -94,7 +94,10 @@ describe('mob portrait source manifest', () => {
     // (hub_training_dummy, hub_healing_dummy).
     // 250: plus the five Eastbrook healing-training role dummies, each with
     // its own rendered portrait.
-    expect(liveIds).toHaveLength(250);
+    // 251: plus the Mirefen world boss (balgath_cyclops). Only the LIVE-mob
+    // floor moves here; the two fixture-driven counts below build synthetic
+    // rows and are unrelated.
+    expect(liveIds).toHaveLength(251);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);

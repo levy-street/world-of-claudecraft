@@ -89,10 +89,22 @@ describe('deed_i18n English resolution', () => {
     // set collection (col_set_bramblehide, no title reward; the release's own
     // chain read 282 * 2 + 43), so the title count stays at 46.
     // Retired Vale Cup and Fiesta deeds keep names but drop 19 descriptions.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(300);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(281);
-    expect(manifest.length).toBe(627);
+    // 302 since the merge of feature/mirefen-world-boss brought in the world
+    // boss pair (cmb_balgath, cmb_balgath_ten); both author a desc and
+    // neither carries a title reward, so the desc count moves to 283 and the
+    // title count stays at 46. MEASURED on the merged catalog.
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(302);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(283);
+    expect(manifest.length).toBe(631);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
+    expect(manifest.filter((row) => row.id === 'cmb_balgath')).toEqual([
+      { id: 'cmb_balgath', field: 'name', source: 'Foreman No More' },
+      {
+        id: 'cmb_balgath',
+        field: 'desc',
+        source: 'Put the Buried Foreman back in his barrow.',
+      },
+    ]);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },
       {

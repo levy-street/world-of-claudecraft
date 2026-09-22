@@ -413,6 +413,10 @@ export function weaponHand(item: WeaponItemDef): WeaponItemDef['hand'] {
 }
 
 export function canEquipItem(cls: PlayerClass, item: ItemDef): boolean {
+  // A quest implement is wieldable by EVERYONE, ahead of every proficiency gate below
+  // (including the rogue two-hander ban): those gates protect combat identity, and a
+  // questTool item has none to protect; locking one out gates a MECHANIC, not power.
+  if (item.questTool) return true;
   if (isShieldItem(item)) {
     return !item.requiredClass || item.requiredClass.includes(cls);
   }

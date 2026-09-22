@@ -6723,6 +6723,58 @@
         "stormhymn_chain_treads",
         "heroic_stormhymn_chain_treads"
       ]
+    },
+    {
+      "batchId": "balgath-boss-icons-2026-08-18",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated under item-icon contract woc-item-icon-v1 as an image edit against two accepted catalog paintings (public/ui/items/fenshadow_maul.webp and marshlight_hauberk.webp) used for house style, lighting and material only. Exact per-item prompts, reference roles, master and accepted hashes, and processing are retained in docs/achievements/balgath-boss-icons-2026-08-18/.",
+      "commonPrompt": "Premium hand-painted classic-fantasy MMORPG inventory painting of the Mirefen world boss spoils: quarried grey barrow granite veined with bog moss, tarnished iron, peat-stained leather, and one cracked teal Loom-shard accent tying each piece to the boss. Opaque square painted vignette, centered complete silhouette at 68-76 percent fill, warm top-left key light, grounded contact shadow, no text, border or transparency.",
+      "provenanceRecord": "docs/achievements/balgath-boss-icons-2026-08-18/generation-report.json",
+      "itemIds": [
+        "foremans_barrowmaul",
+        "loomshard_eye",
+        "barrowhide_pauldrons",
+        "mirestone_stride"
+      ]
+    },
+    {
+      "batchId": "shardpike-mechanic-icons-2026-08-20",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated at 1024x1024 with gpt-image-2 under item-icon contract woc-item-icon-v1 after visual review of public/ui/skills/mage/ice_lance.webp, public/ui/items/kingsbane_last_oath.webp, and public/ui/items/arcanite_mining_pick.webp. The original generated PNG is retained only in ignored tmp/codex provenance staging.",
+      "commonPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Skerrit's Shardpike, a rare quest tool used to extinguish a stone giant's single enormous glowing eye\nScene/backdrop: wet grey barrow granite in a deep charcoal-blue painted vignette, subtle mist and grounded contact shadow, dark corners\nSubject: one complete crude improvised two-handed pike, a socketwright's field-made tool rather than a soldier's weapon; worn lashed timber haft, rough cord bindings, cold iron collar, and a single raw faceted teal Loomshard crystal as the spearhead, inner-lit in #76e0d8 and #5fe8d2\nStyle/medium: premium hand-painted classic fantasy MMO inventory art matching World of ClaudeCraft ability and item icons; tactile wood, iron, cord and crystal; crisp focal edges with softer peripheral brushwork\nComposition/framing: object portrait only, whole pike angled corner to corner from bottom-left butt to top-right crystal head, complete tip and butt visible with safe margin, strong silhouette filling about 74 percent of the square, readable at 22px and 32px\nLighting/mood: restrained warm top-left key light, cool deep bottom-right shadow, genuine teal crystal glow kept subordinate to the pike silhouette; worn and handmade but rare\nConstraints: one opaque full-square icon, one pike only, no hands, no action, no eye, no character, no text, letters, numbers, pseudo-writing, runes, border, UI frame, rarity chrome, transparency, watermark, signature, split sheet, collage, photorealism, raw 3D render, flat vector, cel shading, cartoon outline, cropped weapon, or exterior drop shadow",
+      "itemIds": [
+        "skerrits_shardpike"
+      ]
+    },
+    {
+      "batchId": "foremans-wage-icons-2026-08-25",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Generated at 1024x1024 under item-icon contract woc-item-icon-v1 as a gpt-image-2 image edit against accepted catalog paintings used for house style, lighting, material and composition only: the ring and locket against public/ui/items/loomshard_eye.webp, foremans_barrowmaul.webp and eastbrook_buckler.webp; the gloves against barrowhide_pauldrons.webp, mirestone_stride.webp and linen_pouch.webp. Exact per-item prompts, reference roles, and shipped hashes are retained in docs/achievements/foremans-wage-icons-2026-08-25/generation-report.json; the original generated masters stay in ignored tmp/imagegen staging.",
+      "commonPrompt": "Premium hand-painted classic-fantasy MMORPG inventory painting of the Mirefen world boss's Foreman's Wage spoils, the rare level-13 drops from Balgath, the one-eyed granite cyclops of Mirefen Marsh: rough hammered bog-iron, wet dark barrow granite and dark oiled peat-stained leather, with one small teal Loomshard crystal chip (#76e0d8 and #5fe8d2) glowing faintly like marsh-light to tie each piece to the boss. Scene and backdrop: wet dark barrow granite in a deep charcoal-blue painted vignette, faint marsh mist, grounded contact shadow, dark corners; opaque full-square painted ground, never a flat black void. Style: premium hand-painted classic fantasy MMO inventory art matching the World of ClaudeCraft item catalog; tactile materials (hammered iron with a controlled edge highlight and broad reflected value, wet stone with damp sheen, oiled leather with grain and warm wear, crystal with a crisp rim and a small specular accent); crisp focal edges with softer peripheral brushwork; restrained magical accent. Lighting and mood: warm top-left key light, cool deep bottom-right shadow; the teal crystal glow is kept subordinate to the object silhouette; worn, handmade, but rare. Framing: square, borderless, centered complete silhouette; about 72 percent subject fill; safe padding on all four sides; readable at 22px, 28px, 40px and inside a 64px circular crop. Input roles: every attached image controls house style, lighting, material rendering, value range and composition only; their objects and shapes are never copied. Constraints: one inventory icon only; one opaque full-square painted ground; no text, letters, numbers, pseudo-writing, runes, label, UI border, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, contact sheet, mannequin, hand, body, held presentation or cropped subject; no photorealism, raw 3D render, flat vector, cel shading, pixel art, sketch lines or cartoon outline; no exterior drop shadow.",
+      "provenanceRecord": "docs/achievements/foremans-wage-icons-2026-08-25/generation-report.json",
+      "itemIds": [
+        "foremans_wage_band",
+        "mirelight_locket",
+        "fenwright_grips"
+      ]
     }
   ]
 }

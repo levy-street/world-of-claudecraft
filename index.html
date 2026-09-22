@@ -441,6 +441,11 @@
           </div>
           <div id="stancebar"></div>
             <div id="petbar" class="panel"></div>
+            <!-- The Shardpike bar: a second action bar that appears only while the quest
+                 pike is in hand (src/ui/hud/shardpike/). Empty here; the painter builds
+                 its buttons on the first visible frame, so a session that never takes the
+                 quest carries no extra chrome. -->
+            <div id="shardpike-bar" class="panel" style="display: none"></div>
           <div id="actionbar-group">
             <div id="actionbar3" class="panel"></div>
             <div id="actionbar2" class="panel"></div>
@@ -655,6 +660,7 @@
     </div>
     <div id="low-health-vignette"></div>
     <div id="subzone-banner" class="ui-cin"></div>
+    <div id="shardpike-prompt"></div>
 
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">

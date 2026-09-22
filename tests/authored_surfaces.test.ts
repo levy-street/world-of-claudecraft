@@ -140,6 +140,7 @@ const AUTHORED_ATLAS_DEFS = [
   'mob_dragon_egg',
   'mount_goblin_rocket_sled',
   'mount_rallycart_rxt',
+  'mob_balgath_cyclops',
 ];
 
 describe('authored surfaces', () => {
@@ -160,7 +161,7 @@ describe('authored surfaces', () => {
     // a creature or player GLB can never match the held-model set
     expect(isAuthoredHeldModelUrl('models/creatures/ogre.glb')).toBe(false);
     expect(isAuthoredHeldModelUrl('')).toBe(false);
-    expect(AUTHORED_HELD_MODELS.size).toBe(2);
+    expect(AUTHORED_HELD_MODELS.size).toBe(4);
   });
 
   it('flags exactly the replaced creature and mount rigs, never a player body', () => {

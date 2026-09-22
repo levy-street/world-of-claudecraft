@@ -344,6 +344,33 @@ export const pt_BR: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Essa seleção de material não está mais disponível.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Condenação",
       "fateThreadsLabel": "Fios do Destino",
@@ -3270,6 +3297,7 @@ export const pt_BR: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Reduz em {pct}% o dano recebido",
+      "slumber": "Adormecido até o amanhecer. Não pode ser atacado e não acordará por ninguém.",
       "guardianWard": "O próximo golpe inimigo letal restaura sua vida para {pct}% em vez de matar",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -3346,7 +3374,9 @@ export const pt_BR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} ergue-se sobre as Alturas de Thornpeak!"
+      "spawn": "{name} se ergue sobre {zone}!",
+      "wake": "{name} despertou sobre {zone}!",
+      "sleep": "{name} dorme até o amanhecer."
     },
     "auth": {
       "appleLoginCta": "Continuar com a Apple",
@@ -3480,6 +3510,7 @@ export const pt_BR: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Barra de Postura",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Barra de XP",
         "chat": "Chat",
         "actionBarGroup": "Barras de Ação",
@@ -6399,6 +6430,7 @@ export const pt_BR: EnTranslations = {
       "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
       "aurasTitle": "Benefícios e penalidades",
@@ -14075,6 +14107,30 @@ export const pt_BR: EnTranslations = {
       "fenshadow_maul": {
         "name": "Martelo da Sombra do Brejo"
       },
+      "foremans_barrowmaul": {
+        "name": "Malho Tumular do Capataz"
+      },
+      "skerrits_shardpike": {
+        "name": "Pique de Estilhaços de Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "O Olho de Estilhaço do Tear"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Ombreiras Tumulares"
+      },
+      "mirestone_stride": {
+        "name": "Passada de Pedralodo"
+      },
+      "foremans_wage_band": {
+        "name": "Anel do Salário do Capataz"
+      },
+      "mirelight_locket": {
+        "name": "Medalhão da Luz do Pântano"
+      },
+      "fenwright_grips": {
+        "name": "Manoplas do Artesão do Pântano"
+      },
       "wildgrove_cinch": {
         "name": "Cinto do Bosque Selvagem"
       },
@@ -17011,6 +17067,9 @@ export const pt_BR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, o Pico Desperto"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Elemental de tormenta desperto"
       },
@@ -17503,6 +17562,11 @@ export const pt_BR: EnTranslations = {
         "name": "Guardião Fenwick",
         "title": "Guardião de Fenbridge",
         "greeting": "Pare no portão, {className}. Além dos juncos, o pântano mata por nós."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Irmão Aldric",
@@ -18212,6 +18276,16 @@ export const pt_BR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ordem de concentração de Fenbridge"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const pt_BR: EnTranslations = {
           },
           "7": {
             "label": "O Bastião Submerso"
+          },
+          "8": {
+            "label": "Domínio dos Túmulos"
+          },
+          "9": {
+            "label": "Cratera da Estrela Cadente"
           }
         }
       },

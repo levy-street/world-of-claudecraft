@@ -220,12 +220,17 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul_flawless',
       // The personal hammer quest ships with the explicit category-crest fallback.
       'hid_forgebreaker',
+      // The Mirefen world boss's own combat pair, appended at the DEED_ORDER
+      // tail by the world-boss forward-port; both ride the deed_cat_combat
+      // crest until their commissioned art lands.
+      'cmb_balgath',
+      'cmb_balgath_ten',
     ]);
-    // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
-    // 300 live (counted directly off the resolved src/sim/content/deeds.ts
+    // RE-PINNED at the Mirefen world-boss forward-port onto release/v0.44.0:
+    // 302 live (counted directly off the resolved src/sim/content/deeds.ts
     // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
-    // tests/deed_i18n.test.ts) - 11 explicitly pending = 289 painted.
-    expect(DEED_ORDER).toHaveLength(300);
+    // tests/deed_i18n.test.ts) - 13 explicitly pending = 289 painted.
+    expect(DEED_ORDER).toHaveLength(302);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

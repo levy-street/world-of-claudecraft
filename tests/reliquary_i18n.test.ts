@@ -78,16 +78,22 @@ describe('reliquary_i18n English resolution', () => {
     // by a name row in every M16 locale chunk, so a new page cannot quietly
     // render English to a CJK or Cyrillic reader. The 39 original pages plus
     // the Roots' Bramblehide set page keep all-locale coverage (40); the
-    // Crucible collection and Forgebreaker personal-hammer pages add two more.
-    expect(pageCount).toBe(42);
-    expect(descCount).toBe(42);
+    // Crucible collection and Forgebreaker personal-hammer pages add two more
+    // (42), and the Mirefen world boss page adds the last one (43).
+    expect(pageCount).toBe(43);
+    expect(descCount).toBe(43);
     expect(manifest.length).toBe(pageCount + descCount);
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(42);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(42);
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(43);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(43);
     expect(manifest).toContainEqual({
       id: 'professions_forgebreaker',
       field: 'name',
       source: 'Forgebreaker',
+    });
+    expect(manifest).toContainEqual({
+      id: 'conquerors_balgath',
+      field: 'name',
+      source: 'Balgath, the Buried Foreman',
     });
     expect(manifest).toContainEqual({
       id: 'conquerors_thunzharr',
@@ -176,12 +182,16 @@ describe('reliquary locale chunks (all shipped locales)', () => {
 
   it('carries only real catalog page ids, and no empty values', () => {
     for (const lang of tableLocales()) {
-      // Preserve the 40 original pages plus both profession pages in every
-      // locale. Release fill now includes all names and narrative descriptions.
+      // Vacuity floor: an emptied chunk would satisfy every for-loop in this
+      // suite silently. One row per catalog page, in every shipped locale.
+      // Preserve the 41 original pages (the 40 that predate the profession
+      // pair plus the Mirefen world boss page) alongside both profession
+      // pages in every locale. Release fill now includes all names and
+      // narrative descriptions.
       expect(
         Object.keys(tables[lang]).filter((id) => !NEW_PROFESSION_PAGES.has(id)).length,
         `${lang} original row count`,
-      ).toBe(40);
+      ).toBe(41);
       for (const id of NEW_PROFESSION_PAGES) {
         expect(Object.hasOwn(tables[lang], id), `${lang}.${id}`).toBe(true);
         const description = tables[lang][id]?.desc;

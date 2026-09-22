@@ -71,6 +71,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'サンザール、目覚めし峰',
     desc: '目覚めし峰のワールドボスから得られる個人用エピック戦利品。',
   },
+  conquerors_balgath: {
+    name: 'バルガス、埋もれし監督',
+    desc: 'マイアフェンの塚から引きずり出された戦利品。',
+  },
   conquerors_collapsed_reliquary: {
     name: '崩れた聖遺物庫',
     desc: '崩れた聖遺物庫の施錠された宝箱から出る象徴的なレア品。',
