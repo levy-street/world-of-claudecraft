@@ -18,6 +18,7 @@ import {
   isDaylightPhase,
   phaseToCycleMs,
 } from '../src/sim/day_night';
+import { respawnMob } from '../src/sim/mob/lifecycle';
 import { SLUMBER_AURA_ID, tickSlumber } from '../src/sim/mob/slumber';
 import { Sim } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
@@ -339,9 +340,60 @@ describe('the night in a live world', () => {
       expect(boss.aiState).toBe('idle');
       expect(dist2d(boss.pos, bed)).toBeLessThan(1e-6);
     }
-    // The hold is over: the ordinary AI runs and finds the player in his aggro ring.
-    tick(20 * 3);
+    // The hold is over: the ordinary AI runs and finds the player in his aggro ring on its
+    // very first tick (the idle scan has no cadence), so two ticks is all it takes.
+    tick(2);
+    expect(boss.aggroTargetId).toBe(sim.player.id);
     expect(['chase', 'attack']).toContain(boss.aiState);
+  });
+
+  it('carries an opener landed during the rise into the fight, from beyond the idle scan', () => {
+    // The raid does not wait for him to finish standing up. Threat built during the hold
+    // has to be what the AI acts on when the hold ends, from ANY range: the idle aggro
+    // scan is capped at 20 yards, so a 30-yard opener that only seeded threat would leave
+    // him standing there idle with a full hate table if the hold had stomped his state.
+    clock.set(0.8);
+    tick();
+    expect(boss.asleep).toBe(true);
+    sim.player.pos.x = boss.pos.x - 30;
+    sim.player.pos.z = boss.pos.z;
+    sim.player.prevPos = { ...sim.player.pos };
+    clock.set(DAWN_PHASE);
+    tick();
+    expect(boss.asleep).toBe(false);
+    expect(boss.slumberRise ?? 0).toBeGreaterThan(0);
+    const bed = { ...boss.pos };
+    ctx.dealDamage(sim.player, boss, 200, false, 'physical', null, 'melee');
+    expect(boss.threat.get(sim.player.id) ?? 0).toBeGreaterThan(0);
+    // Still held: hostile, hurt, not moving, for the rest of the rise.
+    const rise = MOBS[BALGATH]?.slumber?.riseSeconds ?? 0;
+    for (let i = 1; i < Math.round(rise / DT); i++) {
+      tick();
+      expect(dist2d(boss.pos, bed)).toBeLessThan(1e-6);
+    }
+    expect(boss.hp).toBeLessThan(boss.maxHp);
+    // Hold over: he goes for the one who hit him.
+    tick(2);
+    expect(boss.aggroTargetId).toBe(sim.player.id);
+    expect(['chase', 'attack']).toContain(boss.aiState);
+    tick(20);
+    expect(dist2d(boss.pos, bed)).toBeGreaterThan(1);
+  });
+
+  it('comes back awake and unheld from an in-place respawn, with no wake call', () => {
+    // No slumbering template respawns in place today (the world boss is scheduler-owned,
+    // respawnTimer Infinity), so this is the unit-level pin on the defensive arm: a respawn
+    // that inherited the bed bits would either replay the realm-wide dawn call by day or
+    // come back hostile but AI-frozen for the rest of a stale rise.
+    boss.asleep = true;
+    boss.slumberRise = 2;
+    events = [];
+    respawnMob(ctx, boss);
+    expect(boss.asleep).toBe(false);
+    expect(boss.slumberRise ?? 0).toBe(0);
+    tick(3);
+    expect(logs().some((l) => l.includes('wakes over'))).toBe(false);
+    expect(boss.aiState).toBe('idle');
   });
 
   it('answers "rising" to the dispatcher for exactly the hold, then "awake"', () => {
@@ -389,10 +441,13 @@ describe('two hosts fed the same clock agree', () => {
     // built on one seed and handed the identical sequence of clock readings must agree
     // tick for tick through dusk, the night, the dawn wake, a kill and the dawn rise.
     const script = (i: number): number => {
-      // 0.5 for 40 ticks, then night, then dawn, then a long day.
+      // Day, a night he sleeps through, the dawn he wakes at (and rises through), a kill
+      // by day, a second night he is dead for, and the dawn that brings him back.
       if (i < 40) return 0.5;
       if (i < 200) return 0.9;
-      if (i < 400) return DAWN_PHASE + 0.001;
+      if (i < 320) return DAWN_PHASE + 0.001;
+      if (i < 440) return 0.9;
+      if (i < 560) return DAWN_PHASE + 0.001;
       return 0.6;
     };
     const build = () => {
@@ -418,20 +473,21 @@ describe('two hosts fed the same clock agree', () => {
     const b = build();
     const bossOf = (sim: Sim) => [...sim.entities.values()].find((e) => e.templateId === BALGATH);
     const trace: string[][] = [[], []];
-    for (let t = 0; t < 420; t++) {
+    for (let t = 0; t < 580; t++) {
       for (const [k, host] of [a, b].entries()) {
         const events = host.step();
         const boss = bossOf(host.sim);
-        if (t === 120) {
-          // Kill him in his sleep from outside the fight (only the schedule is under test).
+        if (t === 300) {
+          // Kill him by day from outside the fight (only the schedule is under test).
           if (boss) {
             boss.hp = 0;
             boss.dead = true;
             boss.corpseTimer = 0;
           }
         }
+        const rising = boss && (boss.slumberRise ?? 0) > 0 ? 'r' : '-';
         trace[k].push(
-          `${t}:${boss ? `${boss.id}/${boss.asleep}/${boss.hostile}/${boss.hp}` : 'none'}:${events
+          `${t}:${boss ? `${boss.id}/${boss.asleep}/${boss.hostile}/${boss.hp}/${rising}` : 'none'}:${events
             .filter((e) => e.type === 'log' || e.type === 'chat')
             .map((e) => (e as { text: string }).text)
             .join('|')}`,
@@ -442,8 +498,13 @@ describe('two hosts fed the same clock agree', () => {
     // And the trace actually visited every arm, so the equality proved something.
     const joined = trace[0].join('\n');
     expect(joined).toContain('sleeps until dawn.');
-    expect(joined).toContain('rises over');
-    expect(joined).toMatch(/:\d+\/true\/false\//);
+    expect(joined).toContain('wakes over');
+    // Exactly two rises: the boot spawn and the dawn respawn after the kill (a lone match
+    // would be satisfied by the boot line alone, proving nothing about the schedule).
+    expect(joined.match(/rises over/g)).toHaveLength(2);
+    expect(joined).toMatch(/:\d+\/true\/false\//); // asleep and neutral
+    expect(joined).toMatch(/\/false\/true\/\d+\/r:/); // awake, hostile, mid-rise
+    expect(joined).toContain(':none:'); // dead and gone, waiting for sunrise
   });
 });
 

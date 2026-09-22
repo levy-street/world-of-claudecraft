@@ -173,6 +173,24 @@ function requiredClipNames(clips: ClipMap): string[] {
   ].filter((name): name is string => !!name);
 }
 
+/** The two ClipMap fields that name no clip; every other leaf string IS a clip name. */
+const NON_CLIP_FIELDS = new Set<keyof ClipMap>(['attackTimeScaleByAbility', 'chargeGlowByAbility']);
+
+/** Every clip name a ClipMap carries, walked generically off the data. */
+function clipNamesInMap(clips: ClipMap): string[] {
+  const out: string[] = [];
+  for (const [field, value] of Object.entries(clips)) {
+    if (NON_CLIP_FIELDS.has(field as keyof ClipMap) || value === undefined) continue;
+    if (typeof value === 'string') out.push(value);
+    else if (Array.isArray(value))
+      out.push(...value.filter((v): v is string => typeof v === 'string'));
+    else if (field === 'emote')
+      for (const spec of Object.values(value as ClipMap['emote'] & object)) out.push(...spec.clips);
+    else out.push(...Object.values(value as Record<string, string>));
+  }
+  return out;
+}
+
 /** Emote specs are a fallback CHAIN (firstLoadedEmoteClip), so one is enough. */
 function emoteChains(clips: ClipMap): [string, readonly string[]][] {
   return Object.entries(clips.emote ?? {}).map(([id, spec]) => [id, spec.clips]);
@@ -260,8 +278,13 @@ describe('character ClipMaps match the shipped GLBs', () => {
     // enumerations agree by construction here, per rig, name for name.
     for (const [key, def] of rigs) {
       const bound = new Set(clipNamesOf(def));
-      const unbound = requiredClipNames(def.clips).filter((name) => !bound.has(name));
-      expect(unbound, `${key}: required clips visual.ts never binds`).toEqual([]);
+      // Every clip NAME the map carries, derived from the data rather than from this
+      // file's own hand list (requiredClipNames), so a slot registered only in
+      // COVERED_CLIP_FIELDS (the escape hatch for non-clip fields) cannot slip past.
+      const named = clipNamesInMap(def.clips);
+      expect(named.length).toBeGreaterThanOrEqual(requiredClipNames(def.clips).length);
+      const unbound = named.filter((name) => !bound.has(name));
+      expect(unbound, `${key}: clips the map names that visual.ts never binds`).toEqual([]);
     }
     // The gate is only as wide as its own list: the slots that motivated it are on it.
     const balgath = VISUALS.mob_balgath_cyclops.clips;
