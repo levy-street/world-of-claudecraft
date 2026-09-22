@@ -26,6 +26,7 @@ import {
   isDelvePos,
   isRiftPos,
   isYumiMazePos,
+  MOBS,
   YUMI_MAZE_SLOT_COUNT,
   yumiMazeOrigin,
   ZONES,
@@ -69,6 +70,8 @@ import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
+import { BalgathFx, routeBalgathSpellfxAt } from './balgath_fx';
+import { slamShakeFalloff } from './balgath_fx_core';
 import { attachBankerChestToNpcView } from './banker_chest';
 import type { BattlegroundView } from './battleground';
 import { BattlegroundFx } from './battleground_fx';
@@ -93,6 +96,8 @@ import {
   createBlobShadowSlot,
 } from './blob_shadow_core';
 import { BlobShadows } from './blob_shadows';
+import { BossImpostorField } from './boss_impostor';
+import { rigShownFromView } from './boss_impostor_core';
 import { createBuildLedger } from './build_ledger_core';
 import { BuildRetryGate } from './build_retry_gate';
 import { setBuildSpanSink } from './build_spans';
@@ -310,6 +315,8 @@ import {
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
+import { EyeWardBadgeField, visualHeightFor } from './eye_ward_badge_field';
+import { eyeWardPlanFor } from './eye_ward_marker_drive';
 import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
 import {
   buildFarTerrain,
@@ -720,6 +727,7 @@ import {
   resetShadowCadence,
   updateShadowCadence,
 } from './shadow_cadence_core';
+import { collectCasters } from './shadow_casters';
 import {
   createShadowExtent,
   resetShadowExtent,
@@ -1184,6 +1192,7 @@ export interface EntityView extends RickshawMountViewState {
   viewLights: THREE.PointLight[]; // point lights this view contributes to the budget
   shadowOn: boolean;
   isFar: boolean;
+  rangeHidden: boolean; // hidden by the 80/96 yd range band this frame (not a gate or cull)
   // hidden until its shader programs finish linking off-thread (async-compile gate)
   compilePending: boolean;
   // Resolves when compilePending clears after the non-cancellable link settles.
@@ -1269,12 +1278,6 @@ export interface EntityView extends RickshawMountViewState {
   tiltSampleT: number;
   tiltSample: EntityGroundSample;
   groundSample: EntityGroundSample;
-}
-
-function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
-  root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) into.push(o);
-  });
 }
 
 function sleep(ms: number): Promise<void> {
@@ -1893,6 +1896,11 @@ export class Renderer {
     range?: number,
   ) => void;
   private frozenOrbFx!: FrozenOrbFx;
+  private balgathFx!: BalgathFx;
+  /** Far sprites for landmark mobs, drawn well past the 80yd entity band. */
+  private bossImpostors!: BossImpostorField;
+  /** One ward-state badge per warded boss in view (eye_ward_badge_field.ts). */
+  private eyeWardBadges!: EyeWardBadgeField;
   private mageGroundFx!: MageGroundFx;
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
   private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
@@ -1959,6 +1967,9 @@ export class Renderer {
   // seed-bound ground sampler, built once so per-frame drape updates
   // allocate no closure.
   private groundSample = (x: number, z: number): number => groundHeight(x, z, this.sim.cfg.seed);
+  /** Impostor exclusion: the rig counts as shown unless the RANGE band hid it (not the
+   *  compile gate or the cull, either of which would draw the flat sprite at 30 yards). */
+  private rigShownFor = (id: number): boolean => rigShownFromView(this.views.get(id));
   /** Bound once: the puff runs per landing and must not allocate a closure. */
   private surfaceAtForPuff = (x: number, z: number, y: number) => this.surfaceAt(x, z, y);
   private selectionDrapeSupportY = 0;
@@ -2905,6 +2916,19 @@ export class Renderer {
     // Frostglobe: the roaming ice-sphere visual, animated locally from the one
     // 'orb' release event (see src/render/frozen_orb_fx.ts).
     this.frozenOrbFx = new FrozenOrbFx(this.scene, (x, z) => groundHeight(x, z, this.sim.cfg.seed));
+    // The Mirefen world boss's ground layer (src/render/balgath_fx.ts).
+    this.balgathFx = new BalgathFx(
+      this.scene,
+      this.groundSample,
+      // Trauma falls off with how far the CAMERA is from the impact: his slams land all
+      // over the zone, and a wreck two hundred yards away must not punch the viewer.
+      (t, x, z) => this.addShake(t * slamShakeFalloff(this.camera.position, x, z)),
+      (x, z, y) => this.surfaceAt(x, z, y),
+    );
+    // A world boss stays visible from across the zone as a baked sprite, long after his rig
+    // has left the entity band (src/render/boss_impostor.ts).
+    this.bossImpostors = new BossImpostorField(this.scene);
+    this.eyeWardBadges = new EyeWardBadgeField(this.scene);
     this.glacialFrontVisual = new GlacialFrontVisual(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -4956,6 +4980,7 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -7427,7 +7452,15 @@ export class Renderer {
         }
         break;
       }
+      // A Loomshard Thrust broke the ward: burst the reticle on the eye it went through.
+      // Keyed on the event's own targetId rather than on the wielder's current target, so
+      // the burst lands on the boss that was actually hit.
+      case 'lanceBlind': {
+        this.views.get(ev.targetId)?.visual?.strikeEyeWardMarker();
+        break;
+      }
       case 'spellfxAt': {
+        if (routeBalgathSpellfxAt(ev, this.balgathFx, () => this.sim.entities.values())) break;
         if (ev.fx === 'soulTravel') {
           if (ev.targetId !== undefined) {
             const gy = groundHeight(ev.x, ev.z, this.sim.cfg.seed);
@@ -8188,6 +8221,7 @@ export class Renderer {
       viewLights,
       shadowOn: true,
       isFar: false,
+      rangeHidden: false,
       compilePending: false,
       compileReady: null,
       mountCompilePending: false,
@@ -9939,6 +9973,7 @@ export class Renderer {
     // Contact blobs are refilled from scratch inside the loop below (null on
     // every tier that casts real shadows).
     this.blobShadows?.begin();
+    this.eyeWardBadges.begin();
 
     for (const [id, v] of this.views) {
       const e = sim.entities.get(id);
@@ -9962,9 +9997,26 @@ export class Renderer {
       if (e.castingAbility === FISHING_CAST_ID) this.fishingBobbers.noteAngler(e.id);
       if (!inDrawRange) {
         v.group.visible = false;
+        v.rangeHidden = true;
         continue;
       }
+      v.rangeHidden = false;
       this.syncDrainChannelVisual(id, e);
+      // The ward's on-model cues (eye_ward_marker_drive.ts owns every decision). The RETICLE
+      // only aims for a pike carrier; the STATE badge shows for everyone, because "his ward
+      // is down, your damage lands" is what the whole raid is waiting to be told.
+      const wardPlan = eyeWardPlanFor(this.sim, p.pos, e);
+      v.visual?.setEyeWardMarker(wardPlan);
+      if (wardPlan)
+        this.eyeWardBadges.mark(
+          id,
+          wardPlan,
+          e.pos,
+          visualHeightFor(e),
+          this.camera,
+          dt,
+          this.reducedMotion(),
+        );
       // form swaps (polymorph sheep, druid forms), computed up front because
       // the shadow gates below must not run the base rig's proxy under a form.
       // One pass over the aura list instead of repeated .some() scans per entity per
@@ -10698,7 +10750,8 @@ export class Renderer {
         !e.dead && feetDepth >= floorSampleDepth
           ? wl - groundHeight(ax, az, this.sim.cfg.seed)
           : Number.NEGATIVE_INFINITY;
-      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth);
+      const wadeDepth = e.kind === 'mob' ? MOBS[e.templateId]?.wadeDepth : undefined;
+      const swimming = isSwimmingAtDepth(v.wasSwimming, e.dead, feetDepth, floorDepth, wadeDepth);
       // ...and the band under it, where the feet are wet but the ground is
       // still doing the work. Read off the SAME displayed depth as the swim
       // latch, so a body crossing a shoreline can never be both at once.
@@ -10884,6 +10937,7 @@ export class Renderer {
       st.reverseBackpedal = ghostWolf;
       st.dead = visuallyDead;
       st.casting = characterCasting;
+      st.asleep = e.asleep === true; // in bed (mob/slumber.ts): the sleep loop holds
       // Which ability, so the pose layer can tell a drawn shot from a pet
       // utility cast (tame_beast is a 6s cast; a bow must not sit aimed for it).
       st.castingAbility = characterCasting ? (e.castingAbility ?? null) : null;
@@ -11348,6 +11402,8 @@ export class Renderer {
       // stays in scene: three culls its colour draw on the padded sphere.
       if (!charOnScreen && (cullBits & CHARACTER_CULL_CASTS) === 0) v.group.visible = false;
     }
+    // Dispose any badge whose boss left view this frame.
+    this.eyeWardBadges.end();
     this.lastVisibleRigCount = visibleRigCount;
     this.blobShadows?.commit();
     this.drainWeaponSkinApplies();
@@ -11601,6 +11657,19 @@ export class Renderer {
     this.needleOfFateVfx.update(dt, this.reducedMotion());
     this.sentenceVfx.update(dt, this.reducedMotion());
     this.frozenOrbFx.update(dt);
+    this.balgathFx.update(dt, this.reducedMotion(), this.sim.entities.values());
+    // From the PLAYER, not the camera; draws only while the rig is range-hidden; rig's grade.
+    this.bossImpostors.sync(
+      this.webgl,
+      this.sim.entities.values(),
+      this.camera,
+      p.pos,
+      this.scene.fog instanceof THREE.Fog ? this.scene.fog : null,
+      this.rigShownFor,
+      this.lowGfx ? NEUTRAL_DAY_GRADE : this.dnGrade,
+      now,
+      alpha,
+    );
     this.mageGroundFx.syncWorldMeteorWarnings(this.sim);
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
@@ -12142,6 +12211,10 @@ export class Renderer {
     this.varkhulForgestormVisuals?.dispose();
     this.nythraxisMechanicVisuals?.dispose();
     this.blobShadows?.dispose();
+    // Holds a baked render target; the graphics rebuild mints a whole new Renderer, so
+    // leaving it would strand an atlas per rebuild for the rest of the session.
+    this.bossImpostors.dispose();
+    this.eyeWardBadges.dispose();
   }
 
   /**

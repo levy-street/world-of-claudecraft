@@ -9,6 +9,7 @@ import {
   type VisualDef,
   visualAssetUrlForGraphics,
 } from '../src/render/characters/manifest';
+import { clipNamesOf } from '../src/render/characters/visual';
 
 // A clip name the shipped GLB does not carry fails SILENTLY at every layer:
 // baseAction() falls back, fadeTo()/playOneShot() return early, and the
@@ -169,6 +170,8 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.walkBack,
     clips.flourish,
     clips.stow,
+    clips.sleep,
+    clips.wake,
     ...clips.attack,
     ...(clips.idleVariants ?? []),
     clips.idleBeat?.clip,
@@ -180,6 +183,34 @@ function requiredClipNames(clips: ClipMap): string[] {
     // the recovery and bring the snap-to-idle back
     ...(clips.castPlayOut ?? []),
   ].filter((name): name is string => !!name);
+}
+
+/** The ClipMap fields that name no clip; every other leaf string IS a clip name.
+ *  The two timescale maps and the cast hold point carry NUMBERS, and a charge-glow
+ *  row carries a spec object, so the generic walk below would otherwise read their
+ *  values as clip names that nothing binds. */
+const NON_CLIP_FIELDS = new Set<keyof ClipMap>([
+  'attackTimeScaleByAbility',
+  'castTimeScaleByAbility',
+  'castHoldPointSeconds',
+  'chargeGlowByAbility',
+]);
+
+/** Every clip name a ClipMap carries, walked generically off the data. */
+function clipNamesInMap(clips: ClipMap): string[] {
+  const out: string[] = [];
+  for (const [field, value] of Object.entries(clips)) {
+    if (NON_CLIP_FIELDS.has(field as keyof ClipMap) || value === undefined) continue;
+    if (typeof value === 'string') out.push(value);
+    else if (Array.isArray(value))
+      out.push(...value.filter((v): v is string => typeof v === 'string'));
+    else if (field === 'emote')
+      for (const spec of Object.values(value as ClipMap['emote'] & object)) out.push(...spec.clips);
+    // idleBeat is a record of ONE clip plus its cadence numbers; only the clip is a name.
+    else if (field === 'idleBeat') out.push((value as ClipMap['idleBeat'] & object).clip);
+    else out.push(...Object.values(value as Record<string, string>));
+  }
+  return out;
 }
 
 /** Emote specs are a fallback CHAIN (firstLoadedEmoteClip), so one is enough. */
@@ -213,6 +244,8 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'walkBack',
   'flourish',
   'stow',
+  'sleep',
+  'wake',
   'attack',
   'hit',
   'attackByAbility',
@@ -221,6 +254,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'castTimeScaleByAbility',
   'castHoldPointSeconds',
   'castPlayOut',
+  'chargeGlowByAbility',
   'attackByHand',
   'emote',
   'idleVariants',
@@ -275,12 +309,54 @@ describe('character ClipMaps match the shipped GLBs', () => {
     }
   });
 
+  it('binds every gate-required clip as a mixer action (visual.ts clipNamesOf)', () => {
+    // visual.ts creates an AnimationAction ONLY for the names clipNamesOf enumerates, so a
+    // ClipMap slot this gate requires the GLB to carry but that list forgets is a clip that
+    // ships, passes the gate, and never plays: the state machine refuses a state it has no
+    // action for (desiredBaseState's hasSleepClip/hasWadeClip gates) and the one-shots
+    // resolve to null. Balgath's sleep loop shipped exactly that way once. The two
+    // enumerations agree by construction here, per rig, name for name.
+    for (const [key, def] of rigs) {
+      const bound = new Set(clipNamesOf(def));
+      // Every clip NAME the map carries, derived from the data rather than from this
+      // file's own hand list (requiredClipNames), so a slot registered only in
+      // COVERED_CLIP_FIELDS (the escape hatch for non-clip fields) cannot slip past.
+      const named = clipNamesInMap(def.clips);
+      expect(named.length).toBeGreaterThanOrEqual(requiredClipNames(def.clips).length);
+      const unbound = named.filter((name) => !bound.has(name));
+      expect(unbound, `${key}: clips the map names that visual.ts never binds`).toEqual([]);
+    }
+    // The gate is only as wide as its own list: the slots that motivated it are on it.
+    const balgath = VISUALS.mob_balgath_cyclops.clips;
+    expect(balgath.sleep).toBe('Balgath_Sleep');
+    expect(balgath.wake).toBe('Balgath_Wake');
+    expect(requiredClipNames(balgath)).toEqual(
+      expect.arrayContaining(['Balgath_Sleep', 'Balgath_Wake']),
+    );
+  });
+
   it('checks every ClipMap field (a new field must join the gate)', () => {
     for (const [key, def] of rigs) {
       const unknown = Object.keys(def.clips).filter(
         (field) => !COVERED_CLIP_FIELDS.has(field as keyof ClipMap),
       );
       expect(unknown, `${key} has ClipMap fields the gate does not check`).toEqual([]);
+    }
+  });
+
+  it('keeps every charge-glow spec inside its own mechanic', () => {
+    // `chargeGlowByAbility` names no clip, so it rides the covered-fields list rather than
+    // requiredClipNames; this is the check that replaces the one it skips. A glow that
+    // outlives its windup is still burning when the blow lands, which reads as a mechanic
+    // that never resolved, and a rise longer than the whole life never reaches full at all.
+    for (const [key, def] of rigs) {
+      for (const [ability, spec] of Object.entries(def.clips.chargeGlowByAbility ?? {})) {
+        expect(spec.seconds, `${key}/${ability} glow has no life`).toBeGreaterThan(0);
+        expect(spec.rise, `${key}/${ability} glow never reaches full`).toBeLessThanOrEqual(
+          spec.seconds,
+        );
+        expect(spec.radius, `${key}/${ability} glow has no size`).toBeGreaterThan(0);
+      }
     }
   });
 

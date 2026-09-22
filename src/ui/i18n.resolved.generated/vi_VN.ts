@@ -344,6 +344,33 @@ export const vi_VN: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Lựa chọn nguyên liệu đó không còn khả dụng.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Kết Án",
       "fateThreadsLabel": "Sợi Định Mệnh",
@@ -3270,6 +3297,7 @@ export const vi_VN: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Giảm {pct}% toàn bộ sát thương nhận vào",
+      "slumber": "Ngủ đến bình minh. Không thể bị tấn công và sẽ không thức giấc vì bất kỳ ai.",
       "guardianWard": "Đòn chí mạng tiếp theo của kẻ địch thay vào đó hồi bạn lên {pct}% máu",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -3346,7 +3374,9 @@ export const vi_VN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} trỗi dậy trên Cao Nguyên Đỉnh Gai!"
+      "spawn": "{name} trỗi dậy trên {zone}!",
+      "wake": "{name} thức giấc trên {zone}!",
+      "sleep": "{name} ngủ đến bình minh."
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
@@ -3480,6 +3510,7 @@ export const vi_VN: EnTranslations = {
         "menu": "Menu",
         "minimap": "Bản Đồ Nhỏ",
         "stanceBar": "Thanh Thế Đứng",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Thanh Kinh Nghiệm",
         "chat": "Trò Chuyện",
         "actionBarGroup": "Các Thanh Hành Động",
@@ -6399,6 +6430,7 @@ export const vi_VN: EnTranslations = {
       "framesGovernedExtra": "Chỉnh Sửa Khung cũng nới khóa cụm theo dõi bên dưới (các nhiệm vụ bạn đang theo dõi cùng mục tiêu của chúng, tiến độ kỳ công, các trang Kỳ Trân Các của bạn, các công thức bạn đã ghim từ chế tác, hang sâu bạn đang khám phá, bất kỳ Vết Nứt nào bạn đang tham gia, và công thức hay đơn đặt hàng bạn đang theo dõi), thanh hành động của thú cưỡi bên cạnh khung thú cưỡi, khung điểm mục tiêu cho các hiệu ứng bất lợi của bạn trên các kẻ địch gần đó, mề đay Sùng Tín của Thánh Kỵ Sĩ, Thanh Sa Đọa của Thuật Sĩ Hắc Ám, lớp phủ hiệu ứng kích hoạt phép, đồng hồ đòn tay phụ cho người dùng vũ khí đôi, và cửa sổ đo sát thương theo tab, mỗi thứ mang nhãn tên riêng khi được nới lỏng.",
       "framesGovernedAuraTracks": "Chỉnh Khung cũng mở khóa sáu thanh hào quang tùy chọn sau khi bạn bật chúng trong thẻ Chiến Đấu của cùng cửa sổ tùy chọn Giao Diện: Bùa Lợi Của Tôi, Hồi Chiêu Phòng Thủ, Lá Chắn Của Tôi, Hồi Chiêu Tấn Công, Di Chuyển Và Tàng Hình, và Bùa Lợi Của Tôi Trên Đồng Minh. Mặc định mọi thanh đều tắt; mỗi thanh hiện nhãn tên riêng khi được mở khóa.",
       "framesGovernedTalkingHead": "Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Các thanh, bộ đếm giờ, và chữ chiến đấu",
       "barsBody": "Thanh niệm chú của bạn xuất hiện giữa màn hình, ngay phía trên thanh kỹ năng, bất cứ khi nào bạn niệm hoặc duy trì một phép, và hiển thị tên phép cùng thời gian còn lại. Mục tiêu của bạn cũng có thanh niệm chú riêng trên khung của nó, để bạn biết điều gì sắp xảy ra và đối phó kịp thời.\n\nMột thanh vung đòn mảnh nằm dưới thanh niệm chú và đầy dần giữa hai lần vung vũ khí, để một người đánh cận chiến hay tầm xa biết khi nào đòn đánh tự động tiếp theo sẽ trúng.\n\nThanh kinh nghiệm của bạn chạy suốt chiều rộng bên dưới thanh kỹ năng, chia thành từng đoạn, với một dải sáng hơn cho biết lượng kinh nghiệm nghỉ ngơi bạn đã tích lũy.\n\nBơi xuống dưới nước và một thanh hơi thở màu xanh sẽ xuất hiện ở đầu màn hình. Nó cạn dần khi đầu bạn còn ở dưới nước, chớp đỏ khi cạn hết và bạn bắt đầu chết đuối, rồi đầy lại nhanh chóng ngay khi bạn nổi lên mặt nước. Phím Nhảy đưa bạn bơi lên, còn phím Bơi Xuống, mặc định là Ctrl, đưa bạn xuống sâu hơn.\n\nSát thương và hồi máu bay lên trên bất cứ thứ gì chúng vừa tác động, dưới dạng những con số nhỏ, để bạn có thể đọc hiểu một trận đánh mà không cần đọc chữ. Tab Chiến Đấu trong khung trò chuyện của bạn giữ lại toàn bộ ghi chép bằng văn bản.",
       "aurasTitle": "Buff và debuff",
@@ -14075,6 +14107,30 @@ export const vi_VN: EnTranslations = {
       "fenshadow_maul": {
         "name": "Búa Bóng Đầm Lầy"
       },
+      "foremans_barrowmaul": {
+        "name": "Búa Gò Mộ của Đốc Công"
+      },
+      "skerrits_shardpike": {
+        "name": "Giáo Mảnh của Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "Mắt Mảnh Khung Cửi"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Giáp Vai Gò Mộ"
+      },
+      "mirestone_stride": {
+        "name": "Bước Đá Đầm Lầy"
+      },
+      "foremans_wage_band": {
+        "name": "Nhẫn Tiền Công của Đốc Công"
+      },
+      "mirelight_locket": {
+        "name": "Mặt Dây Ánh Đầm Lầy"
+      },
+      "fenwright_grips": {
+        "name": "Bao Tay Thợ Đầm Lầy"
+      },
       "wildgrove_cinch": {
         "name": "Đai Lưng Rừng Hoang"
       },
@@ -17011,6 +17067,9 @@ export const vi_VN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Đỉnh Núi Thức Giấc"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Tinh Linh Bão Trỗi Dậy"
       },
@@ -17503,6 +17562,11 @@ export const vi_VN: EnTranslations = {
         "name": "Vệ Quan Fenwick",
         "title": "Vệ Quan của Fenbridge",
         "greeting": "Hãy dừng lại ở cổng, {className}. Vượt qua đám lau sậy kia, đầm lầy sẽ thay ta giết chóc."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Tu Huynh Aldric",
@@ -18212,6 +18276,16 @@ export const vi_VN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Lệnh Tập Hợp Fenbridge"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const vi_VN: EnTranslations = {
           },
           "7": {
             "label": "Pháo Đài Chìm"
+          },
+          "8": {
+            "label": "Lãnh Địa Gò Mộ"
+          },
+          "9": {
+            "label": "Hố Sao Rơi"
           }
         }
       },

@@ -2379,6 +2379,16 @@ const ITEM_ENTITY_IDS = [
   'marshlight_hauberk',
   'duskthorn_mantle',
   'fenshadow_maul',
+  // Mirefen world-boss spoils.
+  'foremans_barrowmaul',
+  'skerrits_shardpike',
+  'loomshard_eye',
+  'barrowhide_pauldrons',
+  'mirestone_stride',
+  // The Foreman's Wage: the world boss's level-gated personal drops for the locals.
+  'foremans_wage_band',
+  'mirelight_locket',
+  'fenwright_grips',
   'wildgrove_cinch',
   'cragward_pauldrons',
   'cragthorn_greatstaff',
@@ -3050,6 +3060,17 @@ type ItemEntityTranslation = { name: string };
 type ItemEntityTranslations = Record<ItemEntityId, ItemEntityTranslation>;
 
 const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
+  // Mirefen world-boss spoils.
+  foremans_barrowmaul: "Foreman's Barrowmaul",
+  // The quest tool the world boss's level-spread mechanic runs on, not a spoil.
+  skerrits_shardpike: "Skerrit's Shardpike",
+  loomshard_eye: 'The Loomshard Eye',
+  barrowhide_pauldrons: 'Barrowhide Pauldrons',
+  mirestone_stride: 'Mirestone Stride',
+  // The Foreman's Wage (level-gated personal drops for the locals).
+  foremans_wage_band: "Foreman's Wage Band",
+  mirelight_locket: 'Mirelight Locket',
+  fenwright_grips: 'Fenwright Grips',
   rimefang: 'Rimefang',
   marrowpoint: 'Marrowpoint',
   duskwhisper: 'Duskwhisper',

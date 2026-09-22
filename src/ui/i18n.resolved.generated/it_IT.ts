@@ -344,6 +344,33 @@ export const it_IT: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Quella selezione di materiali non è più disponibile.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Condanna",
       "fateThreadsLabel": "Filamenti del Fato",
@@ -3270,6 +3297,7 @@ export const it_IT: EnTranslations = {
       "dodge": "Aumenta la probabilità di schivata del {pct}%",
       "dodgeReduce": "Riduce la probabilità di schivata del {pct}%",
       "damageReduction": "Riduce tutti i danni subiti del {pct}%",
+      "slumber": "Dorme fino all'alba. Non può essere attaccato e non si sveglierà per nessuno.",
       "guardianWard": "Il prossimo colpo nemico letale ti ripristina al {pct}% della salute",
       "armorFlat": "Riduce l'armatura di {value}",
       "armorFlatStacks": "Riduce l'armatura di {value} ({stacks} accumuli)",
@@ -3346,7 +3374,9 @@ export const it_IT: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} si erge sulle Alture di Thornpeak!"
+      "spawn": "{name} si erge su {zone}!",
+      "wake": "{name} si sveglia su {zone}!",
+      "sleep": "{name} dorme fino all'alba."
     },
     "auth": {
       "appleLoginCta": "Continua con Apple",
@@ -3480,6 +3510,7 @@ export const it_IT: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimappa",
         "stanceBar": "Barra delle posizioni",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Barra PE",
         "chat": "Chat",
         "actionBarGroup": "Barre delle azioni",
@@ -6399,6 +6430,7 @@ export const it_IT: EnTranslations = {
       "framesGovernedExtra": "Modifica Strutture allenta anche la pila di tracciatori sottostante, con le missioni e gli obiettivi tracciati, il progresso delle imprese, le pagine del Reliquiario, le ricette che hai appuntato dalla fabbricazione, la spedizione in corso, lo squarcio a cui partecipi e la ricetta o commissione seguita, oltre alla barra delle azioni del famiglio, ai punti del bersaglio per le tue debilitazioni sui nemici vicini, al medaglione Devozione del paladino, alla Barra Afflizione dello stregone, alla sovrapposizione dei proc degli incantesimi, al timer del colpo della mano secondaria per chi impugna due armi e alla finestra a schede dei misuratori dei danni. Ognuno porta il proprio chip con il nome quando è allentato.",
       "framesGovernedAuraTracks": "Modifica Strutture allenta anche le sei tracce aura opzionali dopo che le hai attivate dalla scheda Combattimento delle stesse opzioni Interfaccia: la traccia I miei benefici, la traccia Recuperi difensivi, la traccia I miei scudi, la traccia Recuperi offensivi, la traccia Movimento e furtività e la traccia I miei benefici sugli alleati. Ogni traccia è disattivata per impostazione predefinita e, quando è allentata, porta il proprio chip con il nome.",
       "framesGovernedTalkingHead": "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Barre, timer e testo di combattimento",
       "barsBody": "La tua barra di lancio appare al centro dello schermo, appena sopra le barre delle azioni, ogni volta che lanci o canalizzi un incantesimo, e riporta il nome dell'incantesimo e il tempo rimanente. Anche il tuo bersaglio ha una propria barra di lancio sul suo riquadro, così puoi vedere cosa sta arrivando e rispondere.\n\nUna sottile barra dell'attacco sta sotto la tua barra di lancio e si riempie tra un colpo d'arma e l'altro, così chi attacca in mischia o a distanza può vedere quando arriverà il prossimo colpo automatico.\n\nLa tua barra dell'esperienza occupa tutta la larghezza sotto le barre delle azioni, suddivisa in segmenti, con un tratto più chiaro che mostra l'esperienza da riposo che hai accumulato.\n\nNuota sott'acqua e in cima allo schermo compare una barra del Fiato blu. Si consuma finché hai la testa sott'acqua, lampeggia di rosso quando si esaurisce e inizi ad annegare, e si riempie di nuovo in fretta non appena riemergi. Barra spaziatrice ti fa nuotare verso l'alto, e il tasto Nuota Verso il Basso, Ctrl di default, ti porta più in profondità.\n\nI danni e le cure salgono fluttuando sopra ciò che hanno colpito come piccoli numeri, così puoi leggere uno scontro senza leggere del testo. La scheda Combattimento nella tua chat conserva il resoconto scritto completo.",
       "aurasTitle": "Potenziamenti e indebolimenti",
@@ -14075,6 +14107,30 @@ export const it_IT: EnTranslations = {
       "fenshadow_maul": {
         "name": "Maglio dell'Ombra Paludosa"
       },
+      "foremans_barrowmaul": {
+        "name": "Mazza Tumulare del Caposquadra"
+      },
+      "skerrits_shardpike": {
+        "name": "Picca di Schegge di Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "L'Occhio di Scheggia del Telaio"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Spallacci Tumulari"
+      },
+      "mirestone_stride": {
+        "name": "Passo di Pietrafanghiglia"
+      },
+      "foremans_wage_band": {
+        "name": "Anello della paga del Caposquadra"
+      },
+      "mirelight_locket": {
+        "name": "Medaglione della luce di palude"
+      },
+      "fenwright_grips": {
+        "name": "Guanti dell'Artigiano di Palude"
+      },
       "wildgrove_cinch": {
         "name": "Cintura del Bosco Selvaggio"
       },
@@ -17011,6 +17067,9 @@ export const it_IT: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, il Picco Risvegliato"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Elementale di tempesta ridestato"
       },
@@ -17503,6 +17562,11 @@ export const it_IT: EnTranslations = {
         "name": "Custode Fenwick",
         "title": "Custode di Fenbridge",
         "greeting": "Fermo al cancello, {className}. Oltre le canne, la palude uccide per noi."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Fratello Aldric",
@@ -18212,6 +18276,16 @@ export const it_IT: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Ordine di adunata di Fenbridge"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const it_IT: EnTranslations = {
           },
           "7": {
             "label": "Il Bastione Sommerso"
+          },
+          "8": {
+            "label": "Dominio dei Tumuli"
+          },
+          "9": {
+            "label": "Cratere della Stella Caduta"
           }
         }
       },

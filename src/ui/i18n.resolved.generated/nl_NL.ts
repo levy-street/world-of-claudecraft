@@ -344,6 +344,33 @@ export const nl_NL: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Die materiaalkeuze is niet langer beschikbaar.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Verdoemenis",
       "fateThreadsLabel": "Lotsdraden",
@@ -3270,6 +3297,7 @@ export const nl_NL: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Vermindert alle schade die je oploopt met {pct}%",
+      "slumber": "Slaapt tot de dageraad. Kan niet worden aangevallen en wordt voor niemand wakker.",
       "guardianWard": "De volgende dodelijke vijandelijke treffer herstelt je in plaats daarvan naar {pct}% gezondheid",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -3346,7 +3374,9 @@ export const nl_NL: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} verrijst boven Doorntop-Hoogten!"
+      "spawn": "{name} verrijst boven {zone}!",
+      "wake": "{name} ontwaakt boven {zone}!",
+      "sleep": "{name} slaapt tot de dageraad."
     },
     "auth": {
       "appleLoginCta": "Ga verder met Apple",
@@ -3480,6 +3510,7 @@ export const nl_NL: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimap",
         "stanceBar": "Houdingsbalk",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP-balk",
         "chat": "Chat",
         "actionBarGroup": "Actiebalken",
@@ -6399,6 +6430,7 @@ export const nl_NL: EnTranslations = {
       "framesGovernedExtra": "Frames bewerken maakt ook de tracker-stapel eronder los, met je gevolgde queesten en doelen, je deedvoortgang, je Reliquary-pagina's, recepten die je vanuit het ambacht hebt vastgezet, de delve waarin je zit, elke rift waaraan je deelneemt en het recept of de opdracht die je volgt. Ook de huisdieractiebar naast je huisdierframe, het Doel-puntenframe voor je debuffs op nabije vijanden, de Toewijding-medaille van de paladijn, de Affliction-balk van de warlock, de spreukproc-overlay, de zwaai-timer voor de vrije hand van dubbelzwaaiers en het venster met tabbladen voor de schademeter worden losgemaakt, elk met zijn eigen naamlabel.",
       "framesGovernedAuraTracks": "Frames bewerken maakt ook de zes optionele aurastromen los zodra je ze hebt ingeschakeld op het tabblad Gevecht van dezelfde Interface-opties: de stroom Mijn buffs, de stroom Verdedigingsafkoelingen, de stroom Mijn schilden, de stroom Aanvalsafkoelingen, de stroom Beweging en sluipen, en de stroom Mijn buffs op bondgenoten. Elke stroom staat standaard uit en draagt zijn eigen naamlabel zolang hij losstaat.",
       "framesGovernedTalkingHead": "Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Balken, timers en gevechtstekst",
       "barsBody": "Je spreukbalk verschijnt in het midden van het scherm, net boven je actiebalken, telkens wanneer je een spreuk uitspreekt of kanaliseert, en toont de naam van de spreuk en de resterende tijd. Je doelwit krijgt een eigen spreukbalk op zijn frame, zodat je kunt zien wat eraan komt en erop kunt reageren.\n\nEen dunne wapenslagbalk zit onder je spreukbalk en vult zich tussen je wapenslagen, zodat een nabij- of afstandsaanvaller kan zien wanneer de volgende automatische treffer landt.\n\nJe ervaringsbalk loopt over de volle breedte onder je actiebalken, verdeeld in segmenten, met een lichter stuk dat de uitgeruste ervaring toont die je hebt opgespaard.\n\nZwem onder water en een blauwe adembalk verschijnt bovenaan het scherm. Hij loopt leeg terwijl je hoofd onder water is, knippert rood zodra hij leeg is en je begint te verdrinken, en vult zich snel weer zodra je boven water komt. Spatie zwemt je omhoog, en de toets Omlaag Zwemmen, standaard Ctrl, brengt je dieper.\n\nSchade en genezing zweven als kleine getallen omhoog boven wat ze raken, zodat je een gevecht kunt lezen zonder tekst te lezen. Het tabblad Gevecht in je chatbox houdt het volledige geschreven verslag bij.",
       "aurasTitle": "Buffs en debuffs",
@@ -14075,6 +14107,30 @@ export const nl_NL: EnTranslations = {
       "fenshadow_maul": {
         "name": "Moeraschaduw-Knuppel"
       },
+      "foremans_barrowmaul": {
+        "name": "Grafheuvelhamer van de Opzichter"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Splinterpiek"
+      },
+      "loomshard_eye": {
+        "name": "Het Weefsplinter-Oog"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Grafheuvelschouderstukken"
+      },
+      "mirestone_stride": {
+        "name": "Moersteentred"
+      },
+      "foremans_wage_band": {
+        "name": "Loonring van de Voorman"
+      },
+      "mirelight_locket": {
+        "name": "Moeraslicht-medaillon"
+      },
+      "fenwright_grips": {
+        "name": "Grepen van de Moerasbouwer"
+      },
       "wildgrove_cinch": {
         "name": "Wildwoud-Gordel"
       },
@@ -17011,6 +17067,9 @@ export const nl_NL: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, de Ontwakende Piek"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Gewekte Stormling"
       },
@@ -17503,6 +17562,11 @@ export const nl_NL: EnTranslations = {
         "name": "Wachter Fenwick",
         "title": "Wachter van Fenbridge",
         "greeting": "Houd halt bij de poort, {className}. Voorbij dat riet doet het veen het doden voor ons."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Broeder Aldric",
@@ -18212,6 +18276,16 @@ export const nl_NL: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge-Oproepbevel"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const nl_NL: EnTranslations = {
           },
           "7": {
             "label": "Het Verzonken Bastion"
+          },
+          "8": {
+            "label": "Grafheuvelgebied"
+          },
+          "9": {
+            "label": "Sterrenvalkrater"
           }
         }
       },

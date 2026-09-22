@@ -344,6 +344,33 @@ export const da_DK: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Det materialevalg er ikke længere tilgængeligt.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Fordømmelse",
       "fateThreadsLabel": "Skæbnetråde",
@@ -3270,6 +3297,7 @@ export const da_DK: EnTranslations = {
       "dodge": "Erhöht Ausweichchance um {pct}%",
       "dodgeReduce": "Verringert Ausweichchance um {pct}%",
       "damageReduction": "Reducerer al skade modtaget med {pct}%",
+      "slumber": "Sover til daggry. Kan ikke angribes og vågner ikke for nogen.",
       "guardianWard": "Det næste dødelige fjendtlige slag genopretter dig til {pct}% helbred i stedet",
       "armorFlat": "Verringert Rüstung um {value}",
       "armorFlatStacks": "Verringert Rüstung um {value} ({stacks} Stapel)",
@@ -3346,7 +3374,9 @@ export const da_DK: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} rejser sig over Tornetop Højder!"
+      "spawn": "{name} rejser sig over {zone}!",
+      "wake": "{name} vågner over {zone}!",
+      "sleep": "{name} sover til daggry."
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",
@@ -3480,6 +3510,7 @@ export const da_DK: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minikort",
         "stanceBar": "Stillingsbjælke",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Erfaringsbjælke",
         "chat": "Chat",
         "actionBarGroup": "Handlingsbjælker",
@@ -6399,6 +6430,7 @@ export const da_DK: EnTranslations = {
       "framesGovernedExtra": "Rediger rammer løsner også sporingsstakken nedenunder (dine sporede opgaver og deres mål, din bedriftstatus, dine Relikvarium-sider, opskrifter du har fastgjort fra håndværk, den udgravning du er i, enhver rift du deltager i, og opskriften eller bestillingen du sporer), kæledyrets handlingslinje ved siden af kæledyrsrammen, Mål-prikkerammen for dine debuffs på fjender i nærheden, paladinens Hengivenhedsmedaljon, troldmandens Affektionslinje, besværgelsesproc-overlayet, svingtimeren for sekundærhånd for dobbelthåndsbrugere og det fanebladede skademålervindue, hver med sin egen navnebrik, mens den er løsnet.",
       "framesGovernedAuraTracks": "Rediger rammer løsner også de seks valgfri aurabaner, når du har slået dem til fra Kamp-fanen i de samme grænsefladeindstillinger: Mine fordele-banen, Defensive nedkølinger-banen, Mine skjolde-banen, Offensive nedkølinger-banen, Bevægelse og stealth-banen samt Mine fordele på allierede-banen. Alle baner er slået fra som standard, og hver har sin egen navnebrik, mens den er løsnet.",
       "framesGovernedTalkingHead": "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Bjælker, timere og kamptekst",
       "barsBody": "Din castbjælke dukker op midt på skærmen, lige over dine handlingsbjælker, når du kaster eller kanaliserer, og viser besværgelsens navn og den resterende tid. Dit mål får sin egen castbjælke på sin ramme, så du kan se, hvad der er på vej, og svare på det.\n\nEn tynd svingbjælke sidder under din castbjælke og fyldes op mellem dine våbensving, så en nærkamps- eller afstandsangriber kan se, hvornår det næste automatiske slag lander.\n\nDin erfaringsbjælke løber i fuld bredde under dine handlingsbjælker, inddelt i segmenter, med en lysere strækning, der viser den udhvilede erfaring, du har opsparet.\n\nSvøm under vandet, og en blå åndedrætsbjælke dukker op øverst på skærmen. Den tømmes, mens dit hoved er under, blinker rødt, når den løber ud, og du begynder at drukne, og fyldes hurtigt op igen, i det øjeblik du dukker op. Mellemrum svømmer dig op, og tasten Svøm ned, Ctrl som standard, tager dig dybere.\n\nSkade og helbredelse svæver op over det, de rammer, som små tal, så du kan læse en kamp uden at læse tekst. Fanen Kamp i dit chatvindue holder den fulde skriftlige log.",
       "aurasTitle": "Forstærkninger og svækkelser",
@@ -14075,6 +14107,30 @@ export const da_DK: EnTranslations = {
       "fenshadow_maul": {
         "name": "Kærskygge-Hammer"
       },
+      "foremans_barrowmaul": {
+        "name": "Formandens Gravhøjshammer"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrits Skårspyd"
+      },
+      "loomshard_eye": {
+        "name": "Væverskår-Øjet"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Gravhøjsskulderværn"
+      },
+      "mirestone_stride": {
+        "name": "Mosestensskridt"
+      },
+      "foremans_wage_band": {
+        "name": "Formandens Lønring"
+      },
+      "mirelight_locket": {
+        "name": "Sumplys-medaljon"
+      },
+      "fenwright_grips": {
+        "name": "Mosebyggerens Greb"
+      },
       "wildgrove_cinch": {
         "name": "Vildlund-Livbælte"
       },
@@ -17011,6 +17067,9 @@ export const da_DK: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, den Vågnende Tinde"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Vækket Stormling"
       },
@@ -17503,6 +17562,11 @@ export const da_DK: EnTranslations = {
         "name": "Vogter Fenwick",
         "title": "Vogter af Fenbridge",
         "greeting": "Hold ved porten, {className}. Bag de siv klarer mosen drabet for os."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Broder Aldric",
@@ -18212,6 +18276,16 @@ export const da_DK: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Mønstringsordre"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const da_DK: EnTranslations = {
           },
           "7": {
             "label": "Den Sunkne Bastion"
+          },
+          "8": {
+            "label": "Gravhøjsområdet"
+          },
+          "9": {
+            "label": "Stjernefaldskrateret"
           }
         }
       },

@@ -126,13 +126,22 @@ const build = await buildItemArtAudit({
     // additive over that shared base, so 1069 + 212 + 2 = 1283 and
     // 1087 + 212 + 2 = 1301. Verified with `node scripts/item_art_audit.mjs
     // --verify-only` against the merged tree.
-    catalogCount: 1283,
-    liveItemCount: 1301,
+    // Mirefen world-boss forward-port: the boss branch adds eight disjoint
+    // item definitions, each with its own shipping WebP (the balgath-boss,
+    // shardpike-mechanic and foremans-wage batches in
+    // public/ui/items/mapping.json), so both terms move by exactly eight:
+    // 1283 + 8 = 1291 and 1301 + 8 = 1309. The boss spoils land in the
+    // existing weapon and armor groups, so the group count is unchanged; the
+    // eight extra records push one group past an 80-id page boundary, so the
+    // contact-sheet page count moves 31 to 32. Both re-measured with
+    // `node scripts/item_art_audit.mjs --verify-only` on the merged tree.
+    catalogCount: 1291,
+    liveItemCount: 1309,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 31,
+    sheetPageCount: 32,
     groupCount: 25,
   },
 });

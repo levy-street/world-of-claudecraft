@@ -344,6 +344,33 @@ export const cs_CZ: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Odsouzení",
       "fateThreadsLabel": "Nitě osudu",
@@ -3270,6 +3297,7 @@ export const cs_CZ: EnTranslations = {
       "dodge": "Zvyšuje šanci na vyhnutí o {pct} %",
       "dodgeReduce": "Snižuje šanci na vyhnutí o {pct} %",
       "damageReduction": "Snižuje veškeré utrpěné poškození o {pct} %",
+      "slumber": "Spí až do úsvitu. Nelze na něj zaútočit a pro nikoho se neprobudí.",
       "guardianWard": "Příští smrtící nepřátelský útok místo toho obnoví tvoje zdraví na {pct} %",
       "armorFlat": "Snižuje brnění o {value}",
       "armorFlatStacks": "Snižuje brnění o {value} ({stacks} stacků)",
@@ -3346,7 +3374,9 @@ export const cs_CZ: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} povstává nad Thornpeak Heights!"
+      "spawn": "{name} povstává nad {zone}!",
+      "wake": "{name} se probouzí nad {zone}!",
+      "sleep": "{name} spí až do úsvitu."
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
@@ -3480,6 +3510,7 @@ export const cs_CZ: EnTranslations = {
         "menu": "Menu",
         "minimap": "Minimapa",
         "stanceBar": "Lišta postojů",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Lišta zkušeností",
         "chat": "Chat",
         "actionBarGroup": "Akční lišty",
@@ -6399,6 +6430,7 @@ export const cs_CZ: EnTranslations = {
       "framesGovernedExtra": "Upravit rámečky uvolní také zásobník trackerů pod nimi, tedy sledované úkoly a jejich cíle, postup skutků, stránky Reliquiáře, recepty, které sis připnul(a) z řemesel, delve, ve kterém jsi, rift, jehož se účastníš, a sledovaný recept či zakázku, dále akční lištu mazlíčka vedle jeho rámečku, rámeček teček cíle pro tvé záporné účinky na blízkých nepřátelích, paladinův medailon Oddanosti, čarodějův Panel trápení, překryv procs kouzel, časovač švihu vedlejší ruky pro bojovníky se dvěma zbraněmi a záložkové okno měřiče poškození. Každý při uvolnění nosí vlastní štítek se jménem.",
       "framesGovernedAuraTracks": "Upravit rámečky po zapnutí v kartě Boj stejných možností Rozhraní uvolní také šest volitelných stop aur: stopu Mých posílení, stopu Obranných obnov, stopu Mých štítů, stopu Útočných obnov, stopu Pohybu a utajení a stopu Mých posílení na spojencích. Každá stopa je ve výchozím stavu vypnutá a po uvolnění nosí vlastní štítek se jménem.",
       "framesGovernedTalkingHead": "Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Lišty, časovače a bojový text",
       "barsBody": "Tvá lišta sesílání se objeví uprostřed obrazovky, těsně nad tvými akčními lištami, kdykoli sesíláš nebo kanáluješ kouzlo, a nese jméno kouzla a zbývající čas. Tvůj cíl má na svém rámu vlastní lištu sesílání, takže vidíš, co přichází, a můžeš na to zareagovat.\n\nPod tvou lištou sesílání sedí tenká lišta švihu, která se plní mezi švihy tvé zbraně, takže útočník na blízko nebo na dálku vidí, kdy dopadne další automatický zásah.\n\nTvá lišta zkušeností běží přes celou šířku pod akčními lištami, rozdělená do úseků, se světlejším pruhem, který ukazuje naspořené odpočaté zkušenosti.\n\nPlav pod vodou a nahoře na obrazovce se objeví modrá lišta dechu. Vyprazdňuje se, dokud máš hlavu pod hladinou, jakmile dojde, zabliká červeně a začneš se topit, a jakmile se vynoříš, rychle se doplní. Mezerník tě žene nahoru a klávesa Plavat dolů, ve výchozím stavu Ctrl, tě táhne hlouběji.\n\nPoškození a léčení vyplouvají nad tím, co zasáhly, jako malá čísla, takže boj přečteš, aniž bys musel číst text. Záložka Bojový záznam v tvém chatu drží úplný písemný záznam.",
       "aurasTitle": "Buffy a debuffy",
@@ -14075,6 +14107,30 @@ export const cs_CZ: EnTranslations = {
       "fenshadow_maul": {
         "name": "Palice bahenního stínu"
       },
+      "foremans_barrowmaul": {
+        "name": "Předákovo mohylové kladivo"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerritova střepová píka"
+      },
+      "loomshard_eye": {
+        "name": "Oko z útržku Stavu"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Mohylové nárameníky"
+      },
+      "mirestone_stride": {
+        "name": "Bahnokamenný krok"
+      },
+      "foremans_wage_band": {
+        "name": "Prsten předákovy mzdy"
+      },
+      "mirelight_locket": {
+        "name": "Medailon bažinného světla"
+      },
+      "fenwright_grips": {
+        "name": "Rukavice bažinného řemeslníka"
+      },
       "wildgrove_cinch": {
         "name": "Opasek divoké hájovny"
       },
@@ -17011,6 +17067,9 @@ export const cs_CZ: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, probouzející se štít"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Probuzený bouřník"
       },
@@ -17503,6 +17562,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Strážce Fenwick",
         "title": "Strážce Fenbridge",
         "greeting": "Zastav se u brány, {className}. Za tím rákosím zabíjí močál za nás."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Bratr Aldric",
@@ -18212,6 +18276,16 @@ export const cs_CZ: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridgeský svolávací rozkaz"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const cs_CZ: EnTranslations = {
           },
           "7": {
             "label": "Potopená bašta"
+          },
+          "8": {
+            "label": "Mohylové panství"
+          },
+          "9": {
+            "label": "Kráter padlé hvězdy"
           }
         }
       },

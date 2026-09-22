@@ -108,6 +108,17 @@ export const VOICE_PROMPTS = [
       "Hold at the gate. Past those reeds, the fen does the killing for us — and it's never short of work.",
   },
   {
+    npcId: 'socketwright_skerrit',
+    name: 'Maben Skerrit',
+    voiceDescription:
+      'Thin, reedy old craftsman\u2019s tenor \u2014 forty years of unpaid grievance worn smooth into ' +
+      'flat, matter-of-fact bitterness. Precise about his own work, dismissive of everything else. ' +
+      'Age 70s. Male.',
+    sampleText:
+      'I ground that lens myself. Seated it, wedged it true, and never saw a copper for it \u2014 so aim ' +
+      'for my work, and we are square.',
+  },
+  {
     npcId: 'provisioner_hale',
     name: 'Provisioner Hale',
     voiceDescription:

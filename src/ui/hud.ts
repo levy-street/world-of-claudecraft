@@ -174,6 +174,7 @@ import {
   createAurasView,
   isToggleAuraKind,
 } from './auras_view';
+import { claudiumLauncherHtml } from './bag_currency_html';
 import { BagItemActionMenu, CTX_MENU_PICKER_CLASS } from './bag_item_action_menu';
 import { bagSlotsLineKey, bagsWindowShown } from './bags_view';
 import { BagsWindow, dismissBagPrompts } from './bags_window';
@@ -270,6 +271,10 @@ import { dropdownKeyNav } from './dropdown_nav';
 import { DungeonFinderProposalPopup } from './dungeon_finder_proposal_popup';
 import { DungeonFinderWindow } from './dungeon_finder_window';
 import { emoteIconUrl } from './emote_icons';
+import {
+  emoteWheelSlotsKey,
+  emoteWheelVersionKey as emoteWheelVersionKeyFor,
+} from './emote_wheel_keys';
 import { crossHotbarActionSlot, EmpowerHold } from './empower_hold_core';
 import {
   combatAbilityName,
@@ -564,6 +569,7 @@ import { QuestLogWindow } from './hud/quest/questlog_window';
 import { RiftMapPainter } from './hud/rift';
 import { RiftFloorTrackerController } from './hud/rift/rift_floor_tracker_controller';
 import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
+import { createShardpikeBar, shardpikeBlindFeedback } from './hud/shardpike';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
@@ -4237,11 +4243,11 @@ export class Hud {
   // -------------------------------------------------------------------------
 
   private emoteWheelKey(): string {
-    return `woc_emote_wheel_${this.sim.cfg.playerClass}_${this.sim.player.name}`;
+    return emoteWheelSlotsKey(this.sim.cfg.playerClass, this.sim.player.name);
   }
 
   private emoteWheelVersionKey(): string {
-    return `${this.emoteWheelKey()}_v2`;
+    return emoteWheelVersionKeyFor(this.sim.cfg.playerClass, this.sim.player.name);
   }
 
   private loadEmoteWheelSlots(): OverheadEmoteId[] {
@@ -4528,6 +4534,11 @@ export class Hud {
     this.paladinAscensionCharges,
     this.paladinAscensionStatusEl,
   );
+  /** The Shardpike bar: the world boss trial's only input surface (hud/shardpike/). */
+  private readonly shardpikeBar = createShardpikeBar(document, this.writerFacet, () => this.sim, {
+    attachTooltip: (el, html) => this.attachTooltip(el, html),
+    consumePeek: () => this.peekGuard.consume(),
+  });
   private readonly doomMeter = createDoomMeter(
     document,
     this.playerFrameEl.parentElement as HTMLElement,
@@ -6113,10 +6124,7 @@ export class Hud {
   private claudiumLauncherHtml(): string {
     if (!this.claudiumHooks) return '';
     this.claudiumBalance.refresh();
-    const balance = this.claudiumBalance.balance;
-    const label = balance === null ? '--' : formatNumber(balance, { maximumFractionDigits: 0 });
-    const aria = t('hudChrome.claudium.open');
-    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+    return claudiumLauncherHtml(this.claudiumBalance.balance);
   }
 
   // Complete aura tooltip body. A buff created by a known ability first shows that
@@ -6166,6 +6174,14 @@ export class Hud {
     return `<div class="tt-effect">${esc(t(effect.key as TranslationKey, values))}</div>`;
   }
 
+  /**
+   * Bind one element to the shared `#tooltip` box.
+   *
+   * The choreography itself lives in tooltip_attach.ts; this stays here because it is the
+   * seam every HUD component and sub-painter reaches for (they are handed
+   * `(el, html) => this.attachTooltip(el, html)`), and because the five things it needs are
+   * all coordinator-private state.
+   */
   attachTooltip(el: HTMLElement, html: () => string): void {
     let touchTimer: number | undefined;
     // tooltip box size, measured once in showAt (right after the content is set)
@@ -9370,6 +9386,7 @@ export class Hud {
       this.actionBarWorldInput = actionBarWorld;
     }
     this.renderPetBar(pet);
+    this.shardpikeBar.paint(p.dead);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
     if (this.spellbookWindow.isOpen) this.spellbookWindow.tickOpen();
@@ -11555,6 +11572,9 @@ export class Hud {
           deedUnlocks.push(ev);
           break;
         }
+        case 'lanceBlind':
+          shardpikeBlindFeedback(this, ev.count);
+          break;
         case 'reliquaryUnlock': {
           reliquaryUnlocks.push(ev);
           break;

@@ -1211,6 +1211,8 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // variable-routed via FATIGUE_WARNING but matched by the sim_i18n EXACT
     // map (log.seaFatigue); scanning keeps future literal emits guarded.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/fatigue.ts'), 'utf8'),
+    // The Shardpike trial (brace/thrust refusals + the set/fumble/blind notices).
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/lance_trial.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/runs.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/lockpick_controller.ts'), 'utf8'),
     // DL1: Drowned Litany boss/rite/rooms emit surfaces.

@@ -815,7 +815,12 @@ describe('Masterwrought art completion evidence', () => {
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
     // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners;
     // these do not alter the dated completion/approval universe below.
-    expect(currentOwnerIds).toHaveLength(1283);
+    // The LIVE owner count, which grows with the catalog: 1283 plus the eight items this
+    // PR mints for the Mirefen world boss (the maul, the Shardpike, the Loomshard Eye, the
+    // three Foreman's Wage pieces and the two barrow pieces). The 1209 completion union
+    // below is the FROZEN historical figure and is deliberately left alone: keeping the two
+    // apart is the whole point of this test.
+    expect(currentOwnerIds).toHaveLength(1291);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -850,6 +855,24 @@ describe('Masterwrought art completion evidence', () => {
     expect(bramblehideIds).toHaveLength(22);
     expect(duplicateValues(bramblehideIds)).toEqual([]);
 
+    // The Mirefen world boss's three batches: another later additive wave, pinned the same
+    // way (batch identity and size asserted, ids stripped by exact value) so a rename,
+    // split or merge of any of them fails loudly rather than quietly changing the frozen
+    // completion union below.
+    const balgathBatchIds = [
+      'balgath-boss-icons-2026-08-18',
+      'shardpike-mechanic-icons-2026-08-20',
+      'foremans-wage-icons-2026-08-25',
+    ];
+    const balgathIds = new Set<string>();
+    for (const batchId of balgathBatchIds) {
+      const batches = mapping.generatedBatches.filter(({ batchId: id }) => id === batchId);
+      expect(batches, batchId).toHaveLength(1);
+      for (const id of batches[0].itemIds) balgathIds.add(id);
+    }
+    expect(balgathIds.size).toBe(8);
+    expect(datedIds.filter((id) => balgathIds.has(id))).toEqual([]);
+
     // These 25 ids are a later additive wave that never appears in the dated file's own
     // 1,255-item passIds union at all: confirm that up front (no overlap with datedIds)
     // before stripping them back out below, so a future id collision between a new batch
@@ -869,9 +892,9 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
-    // Strip all five later additive waves (Crucible professions, the Field Kit, the
+    // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // and the OSSBrain mount reins)
+    // the OSSBrain mount reins, and the Mirefen world boss's three icon batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -882,7 +905,8 @@ describe('Masterwrought art completion evidence', () => {
         !crucibleIds.has(id) &&
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
-        !ossBrainMountIds.has(id),
+        !ossBrainMountIds.has(id) &&
+        !balgathIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

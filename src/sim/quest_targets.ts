@@ -399,6 +399,15 @@ export function questObjectiveAreas(
         if (npc) push(ref, { x: npc.pos.x, z: npc.pos.z }, POINT_AREA_RADIUS);
         break;
       }
+      case 'event':
+        // Deliberately draws nothing, for the same reason as 'craft' below: an
+        // eventId is a named moment in an encounter (the Foreman's eye put out),
+        // not a place, so there is no point the map could honestly circle. The
+        // quests that carry one also carry the objective that DOES have an
+        // anchor (the boss himself), which is what the marker follows. An
+        // explicit arm rather than a fall-through so the exhaustiveness guard
+        // below keeps its value if a future event ever does earn a location.
+        break;
       case 'craft':
         // Deliberately draws nothing: a craft objective has no world anchor
         // the map could honestly circle (any matching station serves), and

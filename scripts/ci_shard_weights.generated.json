@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4064,
+    "files": 4088,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -23,6 +23,50 @@
           22
         ]
       },
+      "tests/balgath_aura_core.test.ts": {
+        "ms": 19,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          26,
+          19,
+          18
+        ]
+      },
+      "tests/balgath_boss_assets.test.ts": {
+        "ms": 381,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          381,
+          475,
+          369
+        ]
+      },
+      "tests/balgath_debris_core.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          13,
+          14,
+          13
+        ]
+      },
+      "tests/balgath_fx_core.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          23,
+          20,
+          22
+        ]
+      },
       "tests/bloodletting_choreography.test.ts": {
         "ms": 23,
         "method": "local-median",
@@ -30,6 +74,61 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           23
+        ]
+      },
+      "tests/boss_collateral.test.ts": {
+        "ms": 3683,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          3084,
+          3683,
+          3834
+        ]
+      },
+      "tests/boss_glow_cues.test.ts": {
+        "ms": 32,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          37,
+          32,
+          32
+        ]
+      },
+      "tests/boss_impostor_core.test.ts": {
+        "ms": 25,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          18,
+          25,
+          64
+        ]
+      },
+      "tests/boss_slams.test.ts": {
+        "ms": 81658,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          107307,
+          81658,
+          57876
+        ]
+      },
+      "tests/boss_test_drive.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          8,
+          8,
+          8
         ]
       },
       "tests/camera_impact_core.test.ts": {
@@ -50,6 +149,17 @@
           116
         ]
       },
+      "tests/day_night_dev_command.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
       "tests/deferred_contact_bursts.test.ts": {
         "ms": 9,
         "method": "local-median",
@@ -59,6 +169,28 @@
           9
         ]
       },
+      "tests/eye_ward.test.ts": {
+        "ms": 7312,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          6903,
+          7312,
+          22065
+        ]
+      },
+      "tests/eye_ward_marker_drive.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/fct_stage_core.test.ts": {
         "ms": 15,
         "method": "local-median",
@@ -66,6 +198,17 @@
         "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
         "runs": [
           15
+        ]
+      },
+      "tests/foremans_wage.test.ts": {
+        "ms": 153,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          157,
+          152,
+          153
         ]
       },
       "tests/fury_audio_integration.test.ts": {
@@ -246,6 +389,28 @@
           402
         ]
       },
+      "tests/lance_balance_core.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/lance_guidance.test.ts": {
+        "ms": 999,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          996,
+          999,
+          1063
+        ]
+      },
       "tests/practice_dps_controller.test.ts": {
         "ms": 13,
         "method": "local-median",
@@ -315,6 +480,50 @@
           16
         ]
       },
+      "tests/shardpike_bar_view.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          7,
+          6,
+          6
+        ]
+      },
+      "tests/shardpike_equip_gate.test.ts": {
+        "ms": 802,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          798,
+          802,
+          808
+        ]
+      },
+      "tests/shardpike_prompt_view.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          14,
+          20,
+          15
+        ]
+      },
+      "tests/shardpike_tooltip.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          7,
+          7,
+          6
+        ]
+      },
       "tests/shield_contact_outcomes.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -322,6 +531,28 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           69
+        ]
+      },
+      "tests/slumber.test.ts": {
+        "ms": 973,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          840,
+          1253,
+          973
+        ]
+      },
+      "tests/slumber_wire.test.ts": {
+        "ms": 1179,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          1179,
+          1213,
+          1148
         ]
       },
       "tests/steel_sweep.test.ts": {
@@ -349,6 +580,28 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           18
+        ]
+      },
+      "tests/wade_depth.test.ts": {
+        "ms": 193,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          192,
+          198,
+          193
+        ]
+      },
+      "tests/warpath.test.ts": {
+        "ms": 3866,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          3917,
+          3866,
+          3813
         ]
       },
       "tests/warrior_ability_clips.test.ts": {
@@ -1070,6 +1323,17 @@
         "runs": [
           10
         ]
+      },
+      "tests/world_boss_schedule.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "Mirefen world-boss branch: 24 suites added after the newest CI harvest, measured locally (3 runs each, median) so the shard coverage floor keeps grading a real population; discharged by the next full-mode harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
       }
     },
     "removed": {
@@ -1393,6 +1657,10 @@
   "tests/bags_window_vendor_sell_menu.test.ts": 48,
   "tests/baked_pool_prewarm.test.ts": 22,
   "tests/balance_diet.test.ts": 6,
+  "tests/balgath_aura_core.test.ts": 19,
+  "tests/balgath_boss_assets.test.ts": 381,
+  "tests/balgath_debris_core.test.ts": 13,
+  "tests/balgath_fx_core.test.ts": 22,
   "tests/bandwidth.test.ts": 5647,
   "tests/bank.test.ts": 5092,
   "tests/bank_audit.test.ts": 121,
@@ -1477,7 +1745,12 @@
   "tests/border_ridge_skirt.test.ts": 488,
   "tests/border_waters.test.ts": 4789,
   "tests/boss_add_leash.test.ts": 6366,
+  "tests/boss_collateral.test.ts": 3683,
   "tests/boss_corpse_hold.test.ts": 3876,
+  "tests/boss_glow_cues.test.ts": 32,
+  "tests/boss_impostor_core.test.ts": 25,
+  "tests/boss_slams.test.ts": 81658,
+  "tests/boss_test_drive.test.ts": 8,
   "tests/bot_detector_stub.test.ts": 10,
   "tests/breath.test.ts": 2952,
   "tests/broker_custody.test.ts": 3252,
@@ -1857,6 +2130,7 @@
   "tests/dawnhold_map_baked.test.ts": 12,
   "tests/dawnhold_map_view.test.ts": 2137,
   "tests/day_night.test.ts": 46,
+  "tests/day_night_dev_command.test.ts": 4,
   "tests/db_retention_prune.test.ts": 8,
   "tests/db_search.test.ts": 7,
   "tests/dead_party_loot.test.ts": 2794,
@@ -2225,6 +2499,8 @@
   "tests/exchange_eligibility.test.ts": 2064,
   "tests/exclusive_aura.test.ts": 7,
   "tests/extension_drift_sentinel.test.ts": 12,
+  "tests/eye_ward.test.ts": 7312,
+  "tests/eye_ward_marker_drive.test.ts": 3,
   "tests/facing_smooth.test.ts": 11,
   "tests/facing_stability.test.ts": 3271,
   "tests/falling_command.test.ts": 2743,
@@ -2340,6 +2616,7 @@
   "tests/foliage_shore_gate_core.test.ts": 277,
   "tests/foliage_vertex_pipeline.test.ts": 767,
   "tests/follow.test.ts": 2428,
+  "tests/foremans_wage.test.ts": 153,
   "tests/forgebreaker_commission.test.ts": 2540,
   "tests/forgebreaker_quest.test.ts": 2221,
   "tests/forgefather_fortress.test.ts": 2976,
@@ -2853,6 +3130,8 @@
   "tests/ktx2_support.test.ts": 30,
   "tests/ladder_crafting.test.ts": 4483,
   "tests/lake_shores.test.ts": 13198,
+  "tests/lance_balance_core.test.ts": 6,
+  "tests/lance_guidance.test.ts": 999,
   "tests/landing_backdrop.test.ts": 5,
   "tests/landing_theme.test.ts": 13,
   "tests/language_fanout_registry.test.ts": 12670,
@@ -4455,6 +4734,10 @@
   "tests/shaman_warspirit_engine.test.ts": 1754,
   "tests/shapeshift_form_compile_gate.test.ts": 17,
   "tests/shapeshift_resource_persist.test.ts": 2607,
+  "tests/shardpike_bar_view.test.ts": 6,
+  "tests/shardpike_equip_gate.test.ts": 802,
+  "tests/shardpike_prompt_view.test.ts": 15,
+  "tests/shardpike_tooltip.test.ts": 7,
   "tests/sheathe_toggle.test.ts": 5,
   "tests/shield_block.test.ts": 3613,
   "tests/shield_contact_outcomes.test.ts": 69,
@@ -4492,6 +4775,8 @@
   "tests/sky_zone_haze.test.ts": 11,
   "tests/sloomtooth_drowned.test.ts": 1149,
   "tests/sloppy_pick.test.ts": 8,
+  "tests/slumber.test.ts": 973,
+  "tests/slumber_wire.test.ts": 1179,
   "tests/snapshot_alpha.test.ts": 4,
   "tests/snapshot_timer_wire.test.ts": 20,
   "tests/snapshots.test.ts": 29921,
@@ -4891,6 +5176,7 @@
   "tests/voss_controllability.test.ts": 2260,
   "tests/voxel.test.ts": 62,
   "tests/voxel_mesh.test.ts": 343,
+  "tests/wade_depth.test.ts": 193,
   "tests/wall_backface_cull_core.test.ts": 30,
   "tests/wallet.test.ts": 35,
   "tests/wallet_balance.test.ts": 11,
@@ -4936,6 +5222,7 @@
   "tests/warlock_pets.test.ts": 14891,
   "tests/warlock_utility.test.ts": 1786,
   "tests/warlock_viability_fixes.test.ts": 2440,
+  "tests/warpath.test.ts": 3866,
   "tests/warrior_ability_clips.test.ts": 6,
   "tests/warrior_action_props.test.ts": 5,
   "tests/warrior_area_receiving_contact.test.ts": 9,
@@ -5109,6 +5396,7 @@
   "tests/world_auth_scripts.test.ts": 72,
   "tests/world_boss.test.ts": 7221,
   "tests/world_boss_cc.test.ts": 2919,
+  "tests/world_boss_schedule.test.ts": 5,
   "tests/world_content_services.test.ts": 2329,
   "tests/world_edge_coast.test.ts": 1547,
   "tests/world_grid.test.ts": 199,

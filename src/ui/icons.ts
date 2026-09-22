@@ -2525,6 +2525,23 @@ function r(
 }
 
 const ABILITY_RECIPES: Record<string, IconRecipe> = {
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Not real abilities, so the
+  // ability FALLBACK would normally paint them, and it derived three visually identical
+  // tiles from ids that differ only in their last word: a bar whose entire job is "which
+  // of these three do I press" showed the same glyph three times. Authored here instead,
+  // in the frost/ice pair the Loomshard's own teal reads as.
+  //
+  // The pike is `staff` (the closest primitive to a shaft) in all three, so the family
+  // reads as one item, and the SECOND mark is the verb: a hand gripping it to brace, the
+  // eye it goes through to thrust, a cancel cross to ground it.
+  //
+  // All three now also ship PAINTED art (ABILITY_IMAGE_IDS below), so `abilityImageUrl`
+  // wins and these are the fallback path only. They stay for the reason `intervene`'s does:
+  // every ability owes an explicit, distinct recipe (tests/ability_icons.test.ts), and a
+  // painted file failing to load must still land on three different tiles.
+  lance_brace: r('frost', 'ice', ['staff', { p: 'hand', ...BR }], ['glow']),
+  lance_thrust: r('frost', 'ice', ['staff', { p: 'eye', ...TL }], ['sparkle']),
+  lance_release: r('frost', 'ice', ['staff', { p: 'cross', ...BR }]),
   // Talents 2.0 ground-targeted spells (each aimed AoE gets a distinct recipe;
   // grouped here so the family reads together, order within the map is cosmetic).
   flamestrike: r('fire', 'ember', ['meteor', { p: 'sunburst', ...BIG }], ['glow']),
@@ -3777,6 +3794,10 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // Physical-only damage-reduction buffs (Raised Guard's cut), mirroring
   // aura_buff_dr on the steel palette
   aura_buff_dr_phys: r('steel', 'steel', ['shield', { p: 'heart', ...TR }], ['glow']),
+  // The slumbering world boss in bed (src/sim/mob/slumber.ts): keyed by the bare aura id,
+  // which is how a dedicated per-aura recipe is found (hasAuraRecipe), so the frame reads
+  // "asleep" under a moon rather than the generic shield its buff_dr kind falls back to.
+  slumber: r('shadow', 'shadowPurple', ['moon'], ['glow']),
   // Breachmaker's source-scoped vulnerability debuff (kind 'vuln_source'), shown
   // on the target's debuff frame: a cracked guard struck by a blade
   aura_vuln_source: r('blood', 'earthBrown', ['sword', { p: 'sunburst', ...BR }], ['crack']),
@@ -4438,6 +4459,14 @@ const WARLOCK_TALENT_IMAGE_IDS = new Set<string>([
   'wlk_r20_curse_mastery',
 ]);
 export const ABILITY_IMAGE_IDS = new Set<string>([
+  // The Shardpike bar's three verbs (src/ui/hud/shardpike/). Painted rather than procedural
+  // because the player's entire job in this mechanic is choosing between these three under
+  // pressure, and three composited tiles built from the same primitives read as one tile at
+  // the 32px they are actually seen at. They are not class abilities, so `abilityImageUrl`
+  // maps them to their own folder below rather than deriving one from ABILITIES.
+  'lance_brace',
+  'lance_thrust',
+  'lance_release',
   // paladin (original project art for the overhaul and talent abilities, plus
   // the existing CraftPix premium "RPG Paladin skill icons" base set)
   'divine_ascension',
@@ -4968,6 +4997,11 @@ export const ABILITY_ART_PENDING = new Set<string>([
 export function abilityImageUrl(id: string): string | null {
   if (ABILITY_ART_PENDING.has(id)) return null;
   if (!ABILITY_IMAGE_IDS.has(id)) return null;
+  // The Shardpike verbs first: they are quest-tool actions with no ABILITIES row at all, so
+  // every arm below would fall through to a class that does not own them.
+  if (id === 'lance_brace' || id === 'lance_thrust' || id === 'lance_release') {
+    return `${SKILL_ICON_DIR}/shardpike/${id}.webp`;
+  }
   if (PET_ACTION_IMAGE_IDS.has(id)) return `${SKILL_ICON_DIR}/pet/${id}.webp`;
   const cls =
     ABILITIES[id]?.class ??
@@ -5534,6 +5568,10 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul_flawless',
   // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
   'hid_forgebreaker',
+  // The Mirefen world boss pair: both are 'combat', so both fall back to the
+  // deed_cat_combat crest until their commissioned art lands.
+  'cmb_balgath',
+  'cmb_balgath_ten',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

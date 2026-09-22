@@ -160,6 +160,18 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `customDepthMaterial` on alpha-free skinned casters so three's one global
   depth material stops flipping per caster),
   `visual_pool.ts`/`visual_pool_policy.ts` (own section below).
+- On-model cues: `charge_glow.ts` + `_core` (a fist lighting up before a
+  telegraphed slam, parented to the hand bone and animated in bone-local space)
+  and `eye_glow.ts` + `_core` (a permanently lit eye, for a creature whose eye
+  IS its identity). Both are declared as DATA, `ClipMap.chargeGlowByAbility` and
+  `VisualDef.eyeGlow`, so a second creature earns them by adding a row. One trap
+  is shared and has bitten twice: a radius in a spec is BONE-LOCAL, and the rig's
+  normalize-and-scale chain (16x on a 4.2x-scaled boss) sits between it and world
+  units. A mesh radius rides that chain for free; `PointsMaterial.size` under
+  `sizeAttenuation` does NOT, because three's point shader never consults the
+  object's world matrix, so it must be multiplied through by hand
+  (`moteWorldSize`). Both directions of the mistake render a plausible frame:
+  a beach ball, or a sub-pixel nothing.
 - Appearance decals/motion: `stubble.ts` (own section below), `makeup.ts`
   (blush/eyeshadow on the same decal machinery; lipstick is deliberately a
   material tint on the mouth PART instead), `look_pieces.ts` (a composed

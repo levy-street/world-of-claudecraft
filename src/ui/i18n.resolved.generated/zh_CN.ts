@@ -344,6 +344,33 @@ export const zh_CN: EnTranslations = {
       "nameplate": "＜{title}＞"
     },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
+    "shardpike": {
+      "braceLabel": "架起碎晶长矛",
+      "braceTooltip": "将矛尾插入地面，矛尖朝上。你的横移键就是平衡杆：光束会自行漂移，他每次砸地都会把它踢偏。让它离开两端轨道并保持 {set} 秒即可架稳长矛。需要坚实的地面，且不能在坐骑上。",
+      "thrustLabel": "织影核心突刺",
+      "thrustTooltip": "将架稳的长矛刺入眼中，造成 {damage} 点伤害。没有任何东西能加成它：等级、攻击强度、长矛本身都不行。它会使工头失明并剥离石冢之皮，让泥沼中其他所有武器终于能咬进去。只有架稳的长矛才能送出这一击，射程 {reach} 码，窗口持续 {seconds} 秒。",
+      "releaseLabel": "放下碎晶长矛",
+      "releaseTooltip": "把长矛收起。中途放弃没有惩罚：你失去的是架势，不是这次机会，{rest} 秒后即可重新架起。",
+      "whyResting": "你刚刚放下了长矛。等图标上的计时走完。",
+      "whyAlreadyCouched": "长矛已经架起。重新架矛前先把它放下。",
+      "whyNotSet": "长矛尚未架稳。先架起它并稳住。",
+      "whyNothingCouched": "没有可放下的：长矛并未架起。",
+      "beamLabel": "碎晶长矛平衡",
+      "beamStatus": "长矛平衡 {balance}，架稳 {set}%。",
+      "beamDanger": "长矛平衡 {balance}，即将脱手。",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "用横移键稳住长矛",
+      "promptCatchIt": "接住，长矛快要倒了",
+      "promptEyeOut": "眼睛已经瞎了，还有 {seconds} 秒：全力打他",
+      "promptSealed": "他的眼睛闭上了。{seconds} 秒后重新睁开",
+      "promptResetting": "正在重新架矛，{seconds} 秒",
+      "promptCloser": "靠近工头，还差 {yards} 码",
+      "promptBrace": "架起碎晶长矛，然后稳住它",
+      "promptFindBoss": "斯克里特的碎晶长矛：用它戳瞎工头的眼睛",
+      "promptTally": "{count} put out",
+      "promptLabel": "碎晶长矛指示",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "谴罪",
       "fateThreadsLabel": "命运丝线",
@@ -3270,6 +3297,7 @@ export const zh_CN: EnTranslations = {
       "dodge": "躲闪几率提高 {pct}%",
       "dodgeReduce": "躲闪几率降低 {pct}%",
       "damageReduction": "受到的所有伤害降低 {pct}%",
+      "slumber": "沉睡至黎明。无法被攻击，任何人都无法将其唤醒。",
       "guardianWard": "下一次敌人的致命攻击会改为将你的生命值恢复至 {pct}%",
       "armorFlat": "护甲降低 {value}",
       "armorFlatStacks": "护甲降低 {value}（{stacks} 层）",
@@ -3346,7 +3374,9 @@ export const zh_CN: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}在荆峰高地崛起！"
+      "spawn": "{name}在{zone}上空崛起！",
+      "wake": "{name}在{zone}上空苏醒！",
+      "sleep": "{name}沉睡至黎明。"
     },
     "auth": {
       "appleLoginCta": "通过 Apple 继续",
@@ -3480,6 +3510,7 @@ export const zh_CN: EnTranslations = {
         "menu": "菜单",
         "minimap": "小地图",
         "stanceBar": "姿态栏",
+        "shardpikeBar": "碎晶长矛栏",
         "xpBar": "经验条",
         "chat": "聊天",
         "actionBarGroup": "动作条组",
@@ -6399,6 +6430,7 @@ export const zh_CN: EnTranslations = {
       "framesGovernedExtra": "“编辑框体”还会一并松开下方的追踪器堆栈(你追踪的任务及其目标、你的功绩进度、你的圣物库页面、你从制作中置顶的配方、你所在的探秘、你正在参与的任何裂隙，以及你正在追踪的配方或委托)、宠物框体旁的宠物动作条、显示你对附近敌人所施减益的“目标减益”框体、圣骑士的“虔诚”勋章、术士的“痛苦资源条”、法术触发浮层、双持武器时的副手挥击条，以及带标签页的伤害统计窗口，松开期间每一件都挂着自己的名牌。",
       "framesGovernedAuraTracks": "“编辑框体”还会松开六条可选的光环轨道，前提是你已在同一“界面”选项的“战斗”页中开启它们：“我的增益”轨道、“防御性冷却”轨道、“我的护盾”轨道、“攻击性冷却”轨道、“移动与潜行”轨道，以及“我给队友的增益”轨道。所有轨道默认关闭，松开期间每一条都挂着自己的名牌。",
       "framesGovernedTalkingHead": "“编辑框体”也会解锁对话面板：当某个 NPC 不在你的视野内时，它承载该 NPC 说出的台词；处于解锁状态时它会显示自己的名称标签。",
+      "framesGovernedShardpike": "“编辑框体”也会解锁碎晶长矛栏：这一小排任务道具动作只在你携带碎晶长矛时才会出现在动作条旁；处于解锁状态时它会显示自己的名称标签，因此你可以在战斗开始前就把它摆好，而不必临阵调整。",
       "barsTitle": "各类条、计时与战斗文字",
       "barsBody": "你施法或引导时，施法条会出现在屏幕中央、动作条正上方，并带着法术的名称与剩余时间。你的目标在它自己的框体上也有一条施法条，好让你看清接下来会发生什么并作出应对。\n\n施法条下方是一条细细的挥击条，它在你两次武器挥击之间填充，让近战或远程攻击者看清下一次自动攻击何时落下。\n\n你的经验条横贯动作条下方的整个宽度，被刻成一段一段，其中较亮的一截表示你已经存下的休息经验。\n\n潜入水下时，屏幕顶部会出现一条蓝色的呼吸条。头没在水里时它会一直下降，耗尽后会闪红并让你开始溺水，而你一浮出水面它就迅速回满。空格键让你上浮，下潜键（默认为 Ctrl）带你潜得更深。\n\n伤害与治疗会以小小的数字从命中之处向上飘起，让你不必读文字也能看懂一场战斗。聊天框里的“战斗”标签页保留着完整的文字记录。",
       "aurasTitle": "增益与减益",
@@ -14075,6 +14107,30 @@ export const zh_CN: EnTranslations = {
       "fenshadow_maul": {
         "name": "沼影重锤"
       },
+      "foremans_barrowmaul": {
+        "name": "工头的冢锤"
+      },
+      "skerrits_shardpike": {
+        "name": "斯克里特的碎晶长矛"
+      },
+      "loomshard_eye": {
+        "name": "织机碎片之眼"
+      },
+      "barrowhide_pauldrons": {
+        "name": "古冢护肩"
+      },
+      "mirestone_stride": {
+        "name": "沼石步履"
+      },
+      "foremans_wage_band": {
+        "name": "工头的工钱指环"
+      },
+      "mirelight_locket": {
+        "name": "沼光吊坠"
+      },
+      "fenwright_grips": {
+        "name": "沼泽工匠握手"
+      },
       "wildgrove_cinch": {
         "name": "野林束带"
       },
@@ -17011,6 +17067,9 @@ export const zh_CN: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "桑扎尔，觉醒之峰"
       },
+      "balgath_cyclops": {
+        "name": "巴尔加斯，独眼工头"
+      },
       "thunzharr_stormling": {
         "name": "被惊醒的风暴元素"
       },
@@ -17503,6 +17562,11 @@ export const zh_CN: EnTranslations = {
         "name": "芬威克守望者",
         "title": "芬桥守望者",
         "greeting": "在门口停下，{className}。芦苇后面的沼泽会替我们杀人。"
+      },
+      "socketwright_skerrit": {
+        "name": "马本·斯克里特",
+        "title": "镶嵌匠",
+        "greeting": "四十年前我磨好那颗眼珠，把它嵌进他的眼窝，一天工钱都没拿到。你想让工头吃点苦头，{className}？那就冲着我的手艺去。"
       },
       "brother_aldric_fen": {
         "name": "奥德里克修士",
@@ -18212,6 +18276,16 @@ export const zh_CN: EnTranslations = {
         "objectives": {
           "0": {
             "label": "芬桥集结令"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "镶嵌匠的欠账",
+        "text": "织影核心是我亲手嵌进那眼窝的：磨好透镜，安放到位，楔紧对齐。冢主们一个铜板都没付过我，如今我的手艺却在泥沼里四处踏平一切。拿走我的碎晶长矛。矛尾插地，稳住矛尖，需要多久就撑多久，等你手臂笃定了，就把它送进那只眼睛。他披的那层皮与那块晶石相连，{playerName}：戳瞎他，泥沼里的每一把刀刃终于都能咬进去。",
+        "completion": "你感觉到它松了，是吧？四十年的利息，从那眼窝里付清了。长矛归你了，朋友。他会复原的，他总是会，所以你什么时候想再来收账都行。",
+        "objectives": {
+          "0": {
+            "label": "戳瞎工头的眼睛"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const zh_CN: EnTranslations = {
           },
           "7": {
             "label": "沉没堡垒"
+          },
+          "8": {
+            "label": "冢丘领地"
+          },
+          "9": {
+            "label": "星陨坑"
           }
         }
       },

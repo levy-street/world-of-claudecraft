@@ -344,6 +344,33 @@ export const id_ID: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Pilihan material itu tidak lagi tersedia.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Kecaman",
       "fateThreadsLabel": "Benang Takdir",
@@ -3270,6 +3297,7 @@ export const id_ID: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Mengurangi semua kerusakan yang diterima sebesar {pct}%",
+      "slumber": "Tertidur hingga fajar. Tidak dapat diserang dan tidak akan bangun untuk siapa pun.",
       "guardianWard": "Serangan musuh mematikan berikutnya memulihkanmu menjadi {pct}% kesehatan",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -3346,7 +3374,9 @@ export const id_ID: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name} bangkit di atas Dataran Tinggi Thornpeak!"
+      "spawn": "{name} bangkit di atas {zone}!",
+      "wake": "{name} terbangun di atas {zone}!",
+      "sleep": "{name} tertidur hingga fajar."
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",
@@ -3480,6 +3510,7 @@ export const id_ID: EnTranslations = {
         "menu": "Menu",
         "minimap": "Peta Mini",
         "stanceBar": "Bilah Kuda-kuda",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "Bilah XP",
         "chat": "Obrolan",
         "actionBarGroup": "Bilah Aksi",
@@ -6399,6 +6430,7 @@ export const id_ID: EnTranslations = {
       "framesGovernedExtra": "Edit Bingkai juga melonggarkan tumpukan pelacak di bawahnya, yaitu misi dan tujuan yang kamu lacak, kemajuan jasamu, halaman Relikvarium, resep yang kamu sematkan dari kerajinan, delve yang sedang kamu jalani, rift yang sedang kamu ikuti, serta resep atau komisi yang kamu lacak, bilah aksi pet di samping bingkai pet, bingkai Titik Sasaran untuk debuffmu pada musuh terdekat, medali Devosi paladin, Bilah Penderitaan warlock, hamparan proc mantra, timer ayunan tangan kedua untuk pemakai dua senjata, dan jendela meter kerusakan bertab, semuanya memakai chip nama sendiri saat dilonggarkan.",
       "framesGovernedAuraTracks": "Edit Bingkai juga melonggarkan enam jalur aura pilihan setelah kamu menyalakannya dari tab Tempur pada opsi Antarmuka yang sama: jalur Buffku, jalur Masa Tunggu Defensif, jalur Perisaiku, jalur Masa Tunggu Ofensif, jalur Pergerakan dan Sembunyi, serta jalur Buffku pada Sekutu. Semua jalur mati secara bawaan, dan masing-masing memakai chip nama sendiri saat dilonggarkan.",
       "framesGovernedTalkingHead": "Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Bilah, penghitung waktu, dan teks pertarungan",
       "barsBody": "Bilah rapalanmu muncul di tengah layar, tepat di atas bilah aksimu, setiap kali kamu merapal atau menyalurkan mantra, dan menampilkan nama mantra serta waktu yang tersisa. Targetmu mendapatkan bilah rapalannya sendiri pada bingkainya, sehingga kamu bisa melihat apa yang akan datang dan meresponsnya.\n\nSebuah bilah ayunan tipis berada di bawah bilah rapalanmu dan terisi di antara ayunan senjatamu, sehingga penyerang jarak dekat atau jarak jauh bisa melihat kapan pukulan otomatis berikutnya akan mendarat.\n\nBilah pengalamanmu membentang selebar penuh di bawah bilah aksimu, terbagi menjadi segmen-segmen, dengan sebuah bagian yang lebih terang menunjukkan pengalaman istirahat yang telah kamu tabung.\n\nBerenang di bawah air dan sebuah bilah napas biru muncul di bagian atas layar. Bilah itu berkurang selama kepalamu terendam, berkedip merah begitu habis dan kamu mulai tenggelam, lalu terisi cepat begitu kamu muncul ke permukaan. Space membuatmu berenang ke atas, dan tombol Berenang Turun, Ctrl secara bawaan, membawamu lebih dalam.\n\nKerusakan dan penyembuhan melayang ke atas dari apa pun yang menerimanya sebagai angka-angka kecil, sehingga kamu bisa membaca sebuah pertarungan tanpa membaca teks. Tab Catatan Tempur di kotak obrolanmu menyimpan catatan tertulis yang lengkap.",
       "aurasTitle": "Buff dan debuff",
@@ -14075,6 +14107,30 @@ export const id_ID: EnTranslations = {
       "fenshadow_maul": {
         "name": "Gada Bayangan Rawa"
       },
+      "foremans_barrowmaul": {
+        "name": "Godam Gundukan Sang Mandor"
+      },
+      "skerrits_shardpike": {
+        "name": "Tombak Serpih Skerrit"
+      },
+      "loomshard_eye": {
+        "name": "Mata Serpihan Alat Tenun"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Bahuan Gundukan"
+      },
+      "mirestone_stride": {
+        "name": "Langkah Batu Rawa"
+      },
+      "foremans_wage_band": {
+        "name": "Cincin Upah Mandor"
+      },
+      "mirelight_locket": {
+        "name": "Liontin Cahaya Rawa"
+      },
+      "fenwright_grips": {
+        "name": "Genggaman Tukang Rawa"
+      },
       "wildgrove_cinch": {
         "name": "Sabuk Rumpun Liar"
       },
@@ -17011,6 +17067,9 @@ export const id_ID: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Puncak yang Terjaga"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Anak Badai Terjaga"
       },
@@ -17503,6 +17562,11 @@ export const id_ID: EnTranslations = {
         "name": "Penjaga Fenwick",
         "title": "Penjaga Fenbridge",
         "greeting": "Bertahan di gerbang, {className}. Di balik gelagah itu, rawa yang membunuh demi kita."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Bruder Aldric",
@@ -18212,6 +18276,16 @@ export const id_ID: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Perintah Pengerahan Fenbridge"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const id_ID: EnTranslations = {
           },
           "7": {
             "label": "Benteng Karam"
+          },
+          "8": {
+            "label": "Wilayah Gundukan"
+          },
+          "9": {
+            "label": "Kawah Bintang Jatuh"
           }
         }
       },

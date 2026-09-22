@@ -2691,17 +2691,13 @@ describe('Reliquary catalog index memo', () => {
     // A hand-carried literal, not the production filter restated (which would
     // prove nothing): base 39 pages minus the vault and riftbound flags (37).
     //
-    // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought.
-    // BOTH parent pins for the record: ours 41 pages / 38 scoring (the vault,
-    // riftbound and personal-Forgebreaker flags; Crucible crafts remain part
-    // of completion), the release 40 pages / 38 scoring (the vault and
-    // riftbound flags only). Counted directly off the resolved
-    // src/sim/content/reliquary.ts RELIQUARY_PAGES literal: 42 top-level page
+    // RE-PINNED at the merge of feature/mirefen-world-boss into
+    // release/v0.44.0. Counted directly off the resolved
+    // src/sim/content/reliquary.ts RELIQUARY_PAGES literal: 43 top-level page
     // entries, 3 carrying excludeFromCompletion (the vault, riftbound and
-    // personal-Forgebreaker flags), so 39 scoring pages, matching the
-    // arithmetic reconciliation (base 39 + ours' delta +2 + theirs' delta +1
-    // = 42; flagged base 2 + ours' delta +1 + theirs' delta +0 = 3).
-    expect(first?.length).toBe(39);
+    // personal-Forgebreaker flags), so 40 scoring pages. The Mirefen world
+    // boss page is an ordinary conquerors page, so it scores.
+    expect(first?.length).toBe(40);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 
     // An UNFLAGGED synthetic table answers the caller's own array by identity:

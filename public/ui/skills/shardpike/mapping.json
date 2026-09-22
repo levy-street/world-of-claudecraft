@@ -1,0 +1,56 @@
+{
+  "class": "shardpike",
+  "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+  "iconSize": 128,
+  "sourcePacks": [
+    "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs"
+  ],
+  "runtimeDir": "public/ui/skills/shardpike",
+  "abilities": [
+    {
+      "abilityId": "lance_brace",
+      "sourcePack": "woc_openai_shardpike_mechanic_icons_2026_08_20",
+      "sourceFile": "tmp/codex/shardpike-icons/raw/lance_brace.png",
+      "output": "lance_brace.webp",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Two hands gripping the Shardpike with its butt planted in cracked granite while teal light gathers along the rising haft.",
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square fantasy MMORPG mechanic ability icon\nPrimary request: paint the bracing action for Skerrit's Shardpike, instantly readable as \"set your feet and hold\"\nScene/backdrop: cracked wet grey barrow-granite ground fading into a deep charcoal-blue painted vignette with dark corners\nSubject: the same crude field-made two-handed pike with a lashed timber haft, rough bindings, cold iron collar, and raw faceted teal Loomshard crystal head; two rugged gloved hands grip the haft firmly while the iron-shod butt is visibly planted into cracked stone, the shaft forms a strong rising diagonal and exits near the upper-right edge\nStyle/medium: premium hand-painted classic fantasy MMO ability icon matching World of ClaudeCraft skill art; bold simplified action silhouette, tactile materials, crisp focal edges, energetic brushwork\nComposition/framing: close action crop dominated by planted butt, crossed gripping hands and one rising shaft; stable triangular silhouette, no eye or impact; readable at 32px and clearly distinct from thrust and release\nLighting/mood: medium-high contrast; teal-cyan #76e0d8 and #5fe8d2 light is gathering in narrow veins along the haft toward the crystal, contained tension rather than an explosion\nConstraints: show exactly two hands gripping and the butt planted in stone; opaque full-square artwork; no text, letters, numbers, pseudo-writing, runes, border, UI frame, rarity chrome, transparency, watermark, signature, split sheet, collage, photorealism, flat vector glyph, cartoon outline, giant eye, strike impact, explosion, lowered pike, or releasing hands"
+    },
+    {
+      "abilityId": "lance_thrust",
+      "sourcePack": "woc_openai_shardpike_mechanic_icons_2026_08_20",
+      "sourceFile": "tmp/codex/shardpike-icons/raw/lance_thrust.png",
+      "output": "lance_thrust.webp",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "The Shardpike crystal head driving into a huge cracked stone eye socket in a white-hot teal impact burst.",
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square fantasy MMORPG mechanic ability icon\nPrimary request: paint the committed strike of Skerrit's Shardpike, the brightest and most violent icon, instantly readable as \"thrust now\"\nScene/backdrop: a monumental wet grey barrow-granite face reduced to one huge cracked stone eye socket, surrounded by near-black cold stone vignette corners\nSubject: the same crude field-made pike with lashed timber haft, cold iron collar and single raw faceted teal Loomshard crystal head; the crystal head drives forcefully from lower-left toward upper-right directly into the center of the enormous stone eye socket\nStyle/medium: premium hand-painted classic fantasy MMO ability icon matching World of ClaudeCraft skill art; bold readable action, sharp focal contact, vigorous painterly motion\nComposition/framing: extreme close action crop, large forward crystal head at the impact point, clear spear direction, huge cracked circular eye socket behind it, long motion streaks behind the head; instantly distinct from planted brace and grounded release at 32px\nLighting/mood: maximum contrast and brightness; explosive teal-cyan #76e0d8 and #5fe8d2 burst at contact, white-hot teal core, flying granite chips and radial cracks, controlled dark corners\nConstraints: one unmistakable forward thrust into one giant stone eye socket; opaque full-square artwork; no blood, gore, normal human eye, extra weapons, text, letters, numbers, pseudo-writing, runes, border, UI frame, rarity chrome, transparency, watermark, signature, split sheet, collage, photorealism, flat vector glyph, cartoon outline, planted brace pose, or lowered resting pose"
+    },
+    {
+      "abilityId": "lance_release",
+      "sourcePack": "woc_openai_shardpike_mechanic_icons_2026_08_20",
+      "sourceFile": "tmp/codex/shardpike-icons/raw/lance_release.png",
+      "output": "lance_release.webp",
+      "source": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "Open hands releasing a lowered, grounded Shardpike whose crystal has dimmed to a dull teal ember.",
+      "generationPrompt": "Use case: stylized-concept\nAsset type: borderless square fantasy MMORPG mechanic ability icon\nPrimary request: paint the standing-down action for Skerrit's Shardpike, instantly readable as \"release and nothing happens\"\nScene/backdrop: cold wet grey barrow granite in a deep desaturated charcoal-blue painted vignette, heavy dark corners, quiet after the danger\nSubject: the same crude field-made two-handed pike with lashed timber haft, rough bindings, cold iron collar and raw faceted teal Loomshard crystal head; the pike is lowered on a shallow downward diagonal and grounded harmlessly against stone while two rugged gloved hands visibly open and pull away from the haft\nStyle/medium: premium hand-painted classic fantasy MMO ability icon matching World of ClaudeCraft skill art; bold simple spent silhouette, tactile materials, soft restrained peripheral brushwork\nComposition/framing: lowered shaft and grounded crystal head dominate the lower half, open releasing hands provide the focal gesture, no eye and no impact; quiet horizontal/downward shape unmistakably distinct from the rising planted brace and explosive forward thrust at 32px\nLighting/mood: muted cool low contrast; the crystal is dimmed to one small dull teal ember, no gathering light, no burst, desaturated spent atmosphere\nConstraints: visibly lowered and grounded pike, hands releasing rather than gripping; opaque full-square artwork; no text, letters, numbers, pseudo-writing, runes, border, UI frame, rarity chrome, transparency, watermark, signature, split sheet, collage, photorealism, flat vector glyph, cartoon outline, eye socket, impact, explosion, motion streaks, raised shaft, or bright crystal glow"
+    }
+  ],
+  "generatedBatches": [
+    {
+      "name": "shardpike-mechanic-icons-2026-08-20",
+      "generator": "OpenAI gpt-image-2 via scripts/asset_pipeline/lib/openai_image.mjs",
+      "artDirection": "Three original borderless painted dark-fantasy MMORPG mechanic icons using one field-made Shardpike and stepped action silhouettes and brightness: brace gathers, thrust detonates, release is spent.",
+      "abilityIds": [
+        "lance_brace",
+        "lance_thrust",
+        "lance_release"
+      ]
+    }
+  ]
+}

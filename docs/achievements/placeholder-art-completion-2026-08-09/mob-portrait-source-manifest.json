@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "dddd242fe3f5a95440f018b9c3d111c1cc55c0484e3775cdb6c0ac5c6a676f06",
+  "rendererFingerprint": "e4ea17679acb46da256e103b1c3c6c31096c217bb6e5e2a1d0abac51fefcb6c1",
   "renderEnv": {
     "schemaVersion": 1,
     "platform": "darwin",
@@ -38,8 +38,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4910366,
-      "sha256": "f11524a7390cb8b858c582a6025275f16f547cc669e2e8f5d9b335391fd8e10e",
+      "bytes": 4565267,
+      "sha256": "db0f31ae5f2de9e44b9116cccfbb1072325d53a5a7f346024d3456cb0b06f08a",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -51,7 +51,7 @@
       "backdrop": "scripts/lib/mob_portrait_background.mjs"
     }
   },
-  "portraitCount": 250,
+  "portraitCount": 251,
   "portraits": [
     {
       "id": "acolyte_tessa",
@@ -285,6 +285,40 @@
         "path": "public/ui/mobs/aurelhorn.webp",
         "bytes": 2800,
         "sha256": "cf1405d4ae85cdefb71a8a1c76a94e5a7739ceb544e1b00d93c9e9e01de224b9"
+      }
+    },
+    {
+      "id": "balgath_cyclops",
+      "family": "elemental",
+      "finderEncounter": false,
+      "visualKey": "mob_balgath_cyclops",
+      "renderSpec": {
+        "model": {
+          "url": "models/creatures/balgath_cyclops.glb",
+          "path": "public/models/creatures/balgath_cyclops.glb",
+          "bytes": 1505480,
+          "sha256": "a8604ddd1e515ea27c163495e53d792033a708f7f066fa852cb0d1997f1476ac"
+        },
+        "idle": "Idle",
+        "height": 3.2,
+        "yaw": -1.5707963267948966,
+        "hover": null,
+        "show": null,
+        "attach": [],
+        "weaponFix": null,
+        "tintStrength": 0.12
+      },
+      "tint": {
+        "source": "fixed",
+        "authored": "#a8a496",
+        "resolved": "#a8a496",
+        "strength": 0.12
+      },
+      "sourceFingerprint": "8d50b5b81b5f9b66ff6458ebf90390d611a48899f5510e1ca13af21e8cb76640",
+      "output": {
+        "path": "public/ui/mobs/balgath_cyclops.webp",
+        "bytes": 2490,
+        "sha256": "4120d56df8f84513ce69f422baa7fc708b4385aa3a7c1f43ceeba7e9de6c6402"
       }
     },
     {

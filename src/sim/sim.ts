@@ -17,6 +17,8 @@ import type {
   DelveCompanionInfo,
   DelveRunInfo,
   GuildPledgeSettings,
+  LanceGuidanceView,
+  LanceTrialView,
   LockpickView,
   MountRaceView,
   PlayerProfessionsView,
@@ -225,6 +227,7 @@ import {
   SPIRIT_HEALER_NPC_ID,
   zoneAt,
 } from './data';
+import { cyclePhase, isDaylightPhase } from './day_night';
 import { refusedWhileDead } from './dead_gate';
 import { deckFloorHeight } from './deck_floor';
 import * as deedsMod from './deeds';
@@ -294,6 +297,9 @@ import { isMergeableInstancePayload } from './item_instance_merge';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
+import * as lanceGuidanceMod from './lance_guidance';
+import * as lanceTrialMod from './lance_trial';
+import { advanceLanceBrace, type LanceSession } from './lance_trial';
 import {
   type DeedsLeaderboardPage,
   type DevLeaderboardPage,
@@ -689,8 +695,9 @@ import { updateTutorialGreeting } from './tutorial/greeting';
 import * as unstuckMod from './unstuck';
 import {
   rollWorldBossLoot as rollWorldBossLootImpl,
-  scaleWorldBossHp,
+  tickWorldBossSchedule,
   WORLD_BOSSES,
+  type WorldBossClock,
   type WorldBossDef,
 } from './world_boss';
 
@@ -1358,6 +1365,18 @@ export interface PlayerMeta {
   // persisted: src/sim/mount_race.ts owns the rules. Strictly per-player, so
   // simultaneous racers never share or contend on anything.
   mountRace?: MountRaceSession | null;
+  // The active Shardpike brace, or absent. Session state, never persisted (a relog is a
+  // dropped pike): src/sim/lance_trial.ts owns the rules, and the per-tick step runs in
+  // the movement ladder, so there is no separate tick phase to keep in order.
+  lance?: LanceSession;
+  // Sim-time the pike can next be braced (set by a fumble, a shove, or a thrust).
+  lanceRestUntil?: number;
+  /**
+   * Loomshard Thrusts this character has landed. Persisted with the character (unlike the
+   * session above) because it is the ONLY number telling a level 6 that the windows the
+   * raid spent were theirs, and a tally that resets on relog says the opposite.
+   */
+  lanceThrusts?: number;
   // Optional QoL preference (issue #1358): when true, every target-switch
   // selector in targeting.ts (targetEntity, tabTarget, targetNearestEnemy,
   // targetNearestFriendly, friendlyTabTarget) disengages auto-attack instead of
@@ -2183,6 +2202,11 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
+  // Slumbering bosses (MobTemplate.slumber) only: set once a slain boss's corpse is gone,
+  // and held until the next DAWN spawns him again (world_boss.ts tickWorldBossSchedule).
+  private worldBossRiseAtDawn: boolean[] = WORLD_BOSSES.map(() => false);
+  // The day/night phase the previous scheduler pass observed, for the dawn edge.
+  private worldBossClock: WorldBossClock = { lastPhase: null };
   // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
   // ClientWorld's null-out pattern so the offline arm honors the same
   // consumed-once contract instead of returning the 'noop' value forever.
@@ -2211,6 +2235,9 @@ export class Sim {
       raidResetMs: cfg.raidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_RAID_LOCKOUT_MS),
       weeklyRaidResetMs:
         cfg.weeklyRaidResetMs ?? ((nowMs: number) => nowMs + DEFAULT_WEEKLY_RAID_LOCKOUT_MS),
+      // Deliberately NOT defaulted: undefined is the "no day/night clock" world
+      // (dayNightPhase() answers null), which tests and the RL env rely on.
+      dayNightNowMs: cfg.dayNightNowMs,
       // Carried through so the renderer (which reaches the Sim as IWorld) can read
       // the same custom world via sim.cfg.world. Undefined for the built-in world.
       world: cfg.world,
@@ -2638,6 +2665,15 @@ export class Sim {
     return this.cfg.lockoutNowMs?.() ?? Math.floor(this.time * 1000);
   }
 
+  // The world day/night phase (src/sim/day_night.ts) off the host clock, or null when
+  // the host supplies none: no clock means no night, so every nocturnal rule (a
+  // slumbering world boss, his dawn respawn) sees permanent day and the pre-cycle world.
+  // Public so the hosts' dev tooling and the tests can read what the sim believes.
+  dayNightPhase(): number | null {
+    const clock = this.cfg.dayNightNowMs;
+    return clock ? cyclePhase(clock()) : null;
+  }
+
   // -------------------------------------------------------------------------
   // Entity roster: every add/remove/teleport goes through these so the
   // spatial indexes always match the entities map
@@ -2676,42 +2712,20 @@ export class Sim {
     }
   }
 
-  // World-boss scheduler. Per WORLD_BOSSES slot: when the live boss is gone, clear
-  // the slot (and once its lootable corpse window has elapsed, remove the corpse +
-  // any stormlings it left). When the interval comes due, advance it and, if no
-  // boss is currently up, spawn a fresh one. Draws no rng and allocates no ids until
-  // a spawn actually fires (which never happens inside the short parity scenarios),
-  // so existing determinism traces are unaffected.
+  // World-boss scheduler: the per-slot lifecycle lives in world_boss.ts
+  // (tickWorldBossSchedule); the STATE stays here as live views, and so does the spawn
+  // primitive, which needs createMob/addEntity/groundPos. Draws no rng.
   private updateWorldBosses(): void {
-    for (let i = 0; i < WORLD_BOSSES.length; i++) {
-      const def = WORLD_BOSSES[i];
-      const liveId = this.worldBossEntityIds[i];
-      if (liveId !== null) {
-        const boss = this.entities.get(liveId);
-        if (!boss) {
-          this.worldBossEntityIds[i] = null;
-        } else if (!boss.dead) {
-          // Grow the HP pool with the raid size (retail-style, up to the cap).
-          scaleWorldBossHp(this.ctx, boss, def);
-        }
-        if (boss?.dead) {
-          // Lootable corpse lingers WORLD_BOSS_CORPSE_SECONDS for contributors to
-          // loot, then is removed; respawnTimer is Infinity (handleDeath) so the
-          // normal in-place respawn never fires; only this scheduler respawns it.
-          if (boss.corpseTimer <= 0) {
-            for (const addId of boss.summonedIds) this.dropEntity(addId);
-            this.dropEntity(liveId);
-            this.worldBossEntityIds[i] = null;
-          }
-        }
-      }
-      if (this.time >= this.worldBossNextAt[i]) {
-        this.worldBossNextAt[i] += def.intervalSeconds;
-        if (this.worldBossEntityIds[i] === null) {
-          this.worldBossEntityIds[i] = this.spawnWorldBoss(def);
-        }
-      }
-    }
+    tickWorldBossSchedule(
+      this.ctx,
+      {
+        nextAt: this.worldBossNextAt,
+        entityIds: this.worldBossEntityIds,
+        riseAtDawn: this.worldBossRiseAtDawn,
+        clock: this.worldBossClock,
+      },
+      (def) => this.spawnWorldBoss(def),
+    );
   }
 
   // Spawn a world boss at its fixed point and announce it server-wide. Returns the
@@ -2728,15 +2742,28 @@ export class Sim {
     // starts at the def base rather than the template's level-formula HP.
     mob.maxHp = def.hpScale.base;
     mob.hp = def.hpScale.base;
+    // A slumbering boss spawned into the NIGHT (a realm booting after dark) is already
+    // in bed: neutral and asleep at his spawn point, with the "rises" announcement held
+    // back for the dawn wake that actually opens the fight (mob/slumber.ts). Spawned
+    // into the day he rises awake, exactly like every other world boss.
+    const phase = this.dayNightPhase();
+    const asleep = !!template.slumber && phase !== null && !isDaylightPhase(phase);
+    if (template.slumber) mob.asleep = asleep;
+    if (asleep) mob.hostile = false;
     this.addEntity(mob);
     // Anchorless log (no pid, no entityId) => routeEvents broadcasts to every
     // connected player as a system notice. Localized by sim_i18n's worldBossSpawn
     // RULE (matched on this exact literal shape).
-    this.emit({
-      type: 'log',
-      text: `${template.name} rises over Thornpeak Heights!`,
-      color: '#ffd100',
-    });
+    // Name the boss's OWN zone. The literal here used to hardcode Thornpeak Heights,
+    // which was harmless while Thunzharr was the only world boss and is actively wrong
+    // the moment a second one rises anywhere else.
+    if (!asleep) {
+      this.emit({
+        type: 'log',
+        text: `${template.name} rises over ${zoneAt(mob.pos.x, mob.pos.z).name}!`,
+        color: '#ffd100',
+      });
+    }
     return mob.id;
   }
 
@@ -3616,6 +3643,32 @@ export class Sim {
 
   // /dev vendor: spawn the free-epic Test Quartermaster next to the caller
   // (dev-command realms only). Returns the vendor entity id, or -1 on failure.
+  /**
+   * Drop a mob template into the world at an exact spot, for a dev playtest.
+   *
+   * Sibling of spawnDevBot / spawnDevVendor and dev-only for the same reason: it
+   * bypasses every spawner (camps, world-boss scheduler, rift stamping) and answers to
+   * a caller rather than to the world's own rules. Its one consumer is the boss
+   * test-drive URL param (src/game/boss_test_drive.ts), which is DEV-build gated.
+   *
+   * Draws no rng, so calling it cannot perturb the shared draw stream and desync a
+   * seeded run: the level is the template's own maximum and the facing is fixed, the
+   * same discipline spawnWorldBoss keeps for the same reason.
+   */
+  spawnDevBoss(templateId: string, x: number, z: number): number {
+    const template = MOBS[templateId];
+    if (!template) return -1;
+    const mob = createMob(this.nextId++, template, template.maxLevel, this.groundPos(x, z));
+    mob.facing = 0;
+    mob.prevFacing = 0;
+    // A dev-spawned sleeper is dropped in awake, wherever the clock is: the slumber
+    // driver puts him to bed on its own if it is night (mob/slumber.ts), which is exactly
+    // what a test drive of the sleep set piece wants to watch happen.
+    if (template.slumber) mob.asleep = false;
+    this.addEntity(mob);
+    return mob.id;
+  }
+
   spawnDevVendor(pid?: number): number {
     const me = this.entities.get(pid ?? this.primaryId);
     if (!me) return -1;
@@ -5507,6 +5560,7 @@ export class Sim {
       // weekly resets); offline/headless fall back to the flat defaults above.
       raidResetMs: (nowMs: number) => sim.cfg.raidResetMs(nowMs),
       weeklyRaidResetMs: (nowMs: number) => sim.cfg.weeklyRaidResetMs(nowMs),
+      dayNightPhase: () => sim.dayNightPhase(),
       instanceKeyFor: sim.instanceKeyFor.bind(sim),
       instanceOriginOf: sim.instanceOriginOf.bind(sim),
       instanceClaimIdAt: sim.instanceClaimIdAt.bind(sim),
@@ -6747,6 +6801,11 @@ export class Sim {
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
     if (meta.mountRace?.phase === 'countdown') return;
     if (advanceHeroicLeap(this.ctx, p)) return;
+    // A couched Shardpike owns movement while it holds (src/sim/lance_trial.ts): the
+    // strafe axis becomes the balance stick and locomotion is suppressed. A shove or a
+    // fumble ends the session INSIDE the call and falls through, so the tick that breaks
+    // the stance is the same tick ordinary motion (and the shove's velocities) resume.
+    if (advanceLanceBrace(this.ctx, p, meta.moveInput)) return;
     // A ledge climb owns movement while it runs, and an airborne body that
     // gets its hands on a reachable ledge starts one. Sits after the leap arc
     // (a leap has its own landing contract) and before charge/follow/fear so
@@ -8006,7 +8065,16 @@ export class Sim {
       e.pos.x = nx;
       e.pos.z = nz;
       const g = groundHeight(nx, nz, this.cfg.seed);
-      e.pos.y = Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed)); // ride the surface while phasing, don't sink under terrain/water
+      // Ride the surface while phasing rather than sink under terrain or water, EXCEPT
+      // a body tall enough to wade this water: its feet stay on the bed and the surface
+      // rides up its legs (MobTemplate.wadeDepth). The first Balgath floated across the
+      // Mirefen lakes at travel speed with his boots on the waterline, which is what a
+      // thirteen-yard giant in four yards of fen must never do.
+      const wadeDepth = MOBS[e.templateId]?.wadeDepth;
+      e.pos.y =
+        wadeDepth !== undefined && g >= waterLevelAt(nx, nz, this.cfg.seed) - wadeDepth
+          ? g
+          : Math.max(g, swimSurfaceY(nx, nz, this.cfg.seed));
       return d - step < 0.3;
     }
     // Mobs have no nav mesh. Try the straight path first; only if a prop or the
@@ -8081,8 +8149,12 @@ export class Sim {
       e.kind === 'player'
         ? floorHeightAt(this.cfg.seed, bestX, bestZ, BODY_RADIUS, e.pos.y + 1e-3)
         : groundHeight(bestX, bestZ, this.cfg.seed);
+    // A body with its own wade depth (MobTemplate.wadeDepth) keeps its feet on the bed
+    // through water a smaller body would already be swimming in; everyone else swims
+    // past the players' swim depth, exactly as before.
+    const wadeDepth = MOBS[e.templateId]?.wadeDepth ?? SWIM_DEPTH;
     e.pos.y =
-      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - SWIM_DEPTH
+      canSwim && g < waterLevelAt(bestX, bestZ, this.cfg.seed) - wadeDepth
         ? swimSurfaceY(bestX, bestZ, this.cfg.seed)
         : g;
     return dist2d(e.pos, dest) < 0.3;
@@ -11404,6 +11476,43 @@ export class Sim {
 
   get lockpickState(): LockpickView | null {
     return this.lockpickViewFor(this.primaryId);
+  }
+
+  // --- The Shardpike trial (src/sim/lance_trial.ts): facade delegates + primary view ---
+  lanceBrace(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceBrace(this.ctx, pid);
+  }
+
+  lanceThrust(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceThrust(this.ctx, pid);
+  }
+
+  lanceRelease(pid: number = this.primaryId): void {
+    lanceTrialMod.lanceRelease(this.ctx, pid);
+  }
+
+  lanceTrialFor(pid: number): LanceTrialView | null {
+    return lanceTrialMod.lanceTrialViewFor(this.ctx, pid);
+  }
+
+  lanceRestRemainingFor(pid: number): number {
+    return lanceTrialMod.lanceRestRemainingFor(this.ctx, pid);
+  }
+
+  lanceGuidanceFor(pid: number): LanceGuidanceView | null {
+    return lanceGuidanceMod.lanceGuidanceFor(this.ctx, pid, lanceTrialMod.LANCE_THRUST_RANGE);
+  }
+
+  get lanceTrial(): LanceTrialView | null {
+    return this.lanceTrialFor(this.primaryId);
+  }
+
+  get lanceRestRemaining(): number {
+    return this.lanceRestRemainingFor(this.primaryId);
+  }
+
+  get lanceGuidance(): LanceGuidanceView | null {
+    return this.lanceGuidanceFor(this.primaryId);
   }
 
   get delveMarks(): number {

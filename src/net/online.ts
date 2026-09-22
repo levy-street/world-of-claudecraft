@@ -146,6 +146,8 @@ import {
   type GuildRosterInfo,
   type IWorld,
   isOverheadEmoteId,
+  type LanceGuidanceView,
+  type LanceTrialView,
   type LeaderboardEntry,
   type LeaderboardPage,
   type LockpickView,
@@ -1422,6 +1424,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Lockpicking: rebuilt from the lockpick* events (there is no snapshot field).
   // Holds only the fog-windowed cells the server discloses.
   lockpickState: LockpickView | null = null;
+  // The Shardpike trial: mirrored from the self snapshot's `lance`/`lrest` delta keys
+  // (null between sessions, so the field only churns while a brace is live).
+  lanceTrial: LanceTrialView | null = null;
+  lanceRestRemaining = 0;
+  lanceGuidance: LanceGuidanceView | null = null;
   // Show-jumping race: updated immediately from mountRace* events and reconciled
   // from the authoritative self snapshot after reconnects. The mirror shape and
   // both decodes live in mount_race_wire.ts (performance.now scale anchors,
@@ -2912,6 +2919,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.leaping = !!w.lp;
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
+      e.bracing = !!w.brc; // Shardpike couched: remote clients pose the brace off this bit
+      // Slumbering world boss (mob/slumber.ts): defined only once the wire has ever said
+      // so, mirroring the sim's defined-only-on-a-sleeper discipline, so the rig can lie
+      // down while the bit rides and wake on the edge where it stops.
+      if (w.slp) e.asleep = true;
+      else if (e.asleep) e.asleep = false;
+      // Warpath phase + unharried clock, for the phase aura (balgath_aura_core.ts).
+      e.warpathPhase = w.wp ?? undefined;
+      e.warpathUnharried = w.wu ?? (e.warpathPhase ? 0 : undefined);
       e.weaponStowed = !!w.ws;
       e.helmHidden = !!w.hh;
       e.aggroTargetId = w.aggro ?? null;
@@ -3007,6 +3023,11 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // corpse position while a ghost (null once resurrected). Delta-guarded: kept
       // unchanged when the server omits it; drives the corpse marker + resurrect button.
       if (s.corpse !== undefined) e.corpsePos = s.corpse ?? null;
+      // The Shardpike trial's self view + rest cooldown (delta-guarded like corpse).
+      if (s.lance !== undefined) this.lanceTrial = (s.lance as LanceTrialView | null) ?? null;
+      if (s.lrest !== undefined) this.lanceRestRemaining = (s.lrest as number) ?? 0;
+      if (s.lguide !== undefined)
+        this.lanceGuidance = (s.lguide as LanceGuidanceView | null) ?? null;
       if (timerWire.mode === 'stable' && timerWire.time !== null && s.cds !== undefined) {
         if (this.stableCooldownSchedules === undefined) this.stableCooldownSchedules = new Map();
         this.stableCooldownSchedules.clear();
@@ -4982,6 +5003,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
   lockpickAbort(): void {
     this.cmd({ cmd: 'lockpick_abort', sid: this.lockpickState?.sessionId });
+  }
+  lanceBrace(): void {
+    this.cmd({ cmd: 'lance_brace' });
+  }
+  lanceThrust(): void {
+    this.cmd({ cmd: 'lance_thrust' });
+  }
+  lanceRelease(): void {
+    this.cmd({ cmd: 'lance_release' });
   }
   collectDelveChestLoot(chestId: number): void {
     this.cmd({ cmd: 'collect_delve_chest_loot', objectId: chestId });

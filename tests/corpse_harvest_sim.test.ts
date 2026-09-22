@@ -2535,8 +2535,13 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // Bone Spike above: they are struck or healed, never harvested, so they grow MOBS
     // without touching `tagged` either. Plus the five Eastbrook healing-training
     // role dummies (src/sim/content/healing_training.ts), which are friendly
-    // practice targets, not corpses to butcher: 196.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(196);
+    // practice targets, not corpses to butcher: 196. Plus the Mirefen world boss
+    // balgath_cyclops (src/sim/content/zone2.ts): an elemental-family body of carved
+    // stone, untagged for the same reason the other 27 boss templates are (only
+    // mirefen_broodmother carries a tag, its spider silk), so he grows MOBS without
+    // touching `tagged`: 197. The sibling census in tests/gathering.test.ts
+    // ('answers for every shipped template') carries the same 197 and the same reason.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(197);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

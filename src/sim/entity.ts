@@ -819,6 +819,13 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.scale = template.scale;
   e.color = template.color;
   e.swingTimer = 0;
+  // An authored boss that opts into telegraphed mechanics carries the same per-spawn
+  // spacing a rift stamps on its bosses, which is also what arms the ground-ring windup.
+  // Set ONLY when the template asks for it: defining the field on every mob would churn
+  // the parity golden's entity samples for mobs whose behaviour has not changed.
+  if (template.telegraphedMechanics !== undefined) {
+    e.riftMechanicSpacing = template.telegraphedMechanics;
+  }
   // Telegraph the first War Stomp: delay it one full interval after engage.
   if (template.stomp) e.stompTimer = template.stomp.every;
   // Telegraph the first pulse blast the same way: one full interval after engage.

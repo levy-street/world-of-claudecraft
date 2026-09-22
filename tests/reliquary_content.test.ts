@@ -373,12 +373,13 @@ describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
-    // set page (the eighth epic armor family).
-    expect(CONQUEROR_PAGES.length).toBe(32);
+    // set page (the eighth epic armor family) + the Mirefen world boss page
+    // (conquerors_balgath).
+    expect(CONQUEROR_PAGES.length).toBe(33);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(42);
+    expect(RELIQUARY_PAGES.length).toBe(43);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -456,8 +457,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // side of THIS merge independently adds two more SOURCE_PENDING_RULING
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
-    // and release branches content is disjoint.
-    expect(full).toEqual({ owned: 440, total: 440 });
+    // and release branches content is disjoint. THIS merge of
+    // feature/mirefen-world-boss adds the seven Mirefen world boss relics
+    // (the Foreman's four arms plus the three Foreman's Wage rares, all on
+    // conquerors_balgath; his reins already held a horizons_mounts slot):
+    // 447, MEASURED on the merged tree.
+    expect(full).toEqual({ owned: 447, total: 447 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -484,8 +489,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // THIS merge independently adds its own two character-scoped mount slots
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
-    // deltas, see the overview pair's note above.
-    expect(character).toEqual({ owned: 411, total: 411 });
+    // deltas, see the overview pair's note above. The seven Mirefen world
+    // boss relics are character-scoped items, so they move this pair by the
+    // same seven as the overview: 418, MEASURED on the merged tree.
+    expect(character).toEqual({ owned: 418, total: 418 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -538,14 +545,15 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(483);
+    ).toBe(490);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
     // masterwrought Phase 18 gather_event:golden_harvest field note. Neither
     // branch's new content (Crucible/Forgebreaker items, Roots' Bramblehide
-    // set, the Nythraxis gap-fill drops, the two new pending mounts) is a
-    // mark, so this total is unchanged by the merge.
+    // set, the Nythraxis gap-fill drops, the two new pending mounts, the
+    // seven Mirefen world boss items) is a mark, so this total is unchanged
+    // by the merge.
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
@@ -765,9 +773,10 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // the page/overview/character/slot/mark literals nearby.
     // 33 Crucible collection items plus the personal Forgebreaker shaping: 319.
     // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
-    // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
-    // completion pair note above.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(333);
+    // gap-fill drops: 333. Plus the seven Mirefen world boss items (the
+    // Foreman's four arms and the three Foreman's Wage rares): 340.
+    // UNION MERGE: base plus both deltas, see the completion pair note above.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(340);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -2073,6 +2082,7 @@ describe('Reliquary growth sweeps (new content must page or opt out)', () => {
     // pages; a NEW worldBoss: true mob reds here until it is paged and mapped.
     const WORLD_BOSS_PAGES: Record<string, string> = {
       thunzharr_waking_peak: 'conquerors_thunzharr',
+      balgath_cyclops: 'conquerors_balgath',
     };
     const bossIds = Object.values(MOBS)
       .filter((m) => m.worldBoss === true)
@@ -2910,20 +2920,21 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The five gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The two gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
   // comparable route it really has).
   //
-  // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
-  // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
-  // slot stays listed and sourceless until the mount gets a route.
+  // drakemaw_raptor LEFT this list on 2026-08-25: the reins now ride the
+  // Mirefen world boss's table (content/zone2.ts, the "dedicated world boss"
+  // the 2026-08-04 owner call held them back for), so its Horizons slot names
+  // that door (MOUNT_SOURCES in content/reliquary.ts).
   // terrorspark_groundshaker and lanternback_troll: DEVELOPER_MOUNTS,
   // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
+  horizons_mounts: ['lanternback_troll', 'terrorspark_groundshaker'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3015,6 +3026,8 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_varkhul: 1,
   conquerors_varkhul_heroic: 1,
   conquerors_thunzharr: 1,
+  // One door: everything on his page comes off the boss himself.
+  conquerors_balgath: 1,
   conquerors_collapsed_reliquary: 2,
   conquerors_drowned_litany: 2,
   conquerors_set_deathlord: 4,
@@ -3041,10 +3054,11 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   professions_specimens: 7,
   professions_crucible: 3,
   professions_forgebreaker: 1,
-  // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
-  // pending-ruling absences resolve to nothing. The storefront door left with
-  // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
-  horizons_mounts: 10,
+  // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the Mirefen
+  // world boss, whose reins joined his table; the two pending-ruling absences
+  // resolve to nothing. The storefront door left with the Mech Bird: a paid
+  // mount is a mount SKIN now, never a relic.
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
@@ -4002,7 +4016,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the five mounts content awards no route at all', () => {
+  it('the surviving pending rows are the two mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4010,10 +4024,10 @@ describe('Reliquary source hint coverage', () => {
     // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
     // (masterwork:engineering was a row here too until masterwrought Phase
-    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
+    // 11o's stats-bearing ocular un-pended it; see the pending-table comment.
+    // drakemaw_raptor left it when the Mirefen world boss took its reins.)
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
-      'drakemaw_raptor',
       'lanternback_troll',
       'terrorspark_groundshaker',
     ]);
@@ -4409,7 +4423,7 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the five pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
     // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
@@ -4570,11 +4584,11 @@ describe('Reliquary source hint coverage', () => {
       if (inherited === 0) offenders.push(`${page.id} defaults but every relic owns a hint`);
     }
     expect(offenders).toEqual([]);
-    // All fifteen defaults are live today (nine boss pages, the storefront
-    // on the skins page, the four Crucible raid pages, and Forgebreaker's
-    // one Weaponcrafting door); update
+    // All sixteen defaults are live today (nine boss pages, the Mirefen world
+    // boss page, the storefront on the skins page, the four Crucible raid
+    // pages, and Forgebreaker's one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(15);
+    expect(defaults).toBe(16);
   });
 });
 

@@ -62,6 +62,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Thunzharr, il Picco Risvegliato',
     desc: 'Bottini epici personali del boss mondiale del Picco Risvegliato.',
   },
+  conquerors_balgath: {
+    name: 'Balgath, il Caposquadra Sepolto',
+    desc: 'Bottino trascinato fuori dai tumuli di Mirefen.',
+  },
   conquerors_collapsed_reliquary: {
     name: 'Il Reliquiario Crollato',
     desc: 'Rari distintivi dallo scrigno da scassinare del Reliquiario Crollato.',

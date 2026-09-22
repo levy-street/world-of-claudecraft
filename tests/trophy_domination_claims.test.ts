@@ -216,10 +216,18 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
     // derivation the record defers to, so these four numbers are re-derived
     // here and never pasted from prose: a second row landing in the band reds
     // this arm instead of leaving the amendment quietly false.
+    // RE-DERIVED for the Mirefen world boss: the pool is 37 rows, not 34, and
+    // the high half is 27 rather than 24. Balgath adds three uncrafted pieces,
+    // all of them well above the 460 ceiling, so all three land in the high
+    // half and NONE of them lands in the band: loomshard_eye (neck, epic,
+    // 8,400), mirelight_locket (neck, rare, 1,200) and foremans_wage_band
+    // (ring, rare, 1,150). The honor count is untouched at 9, because none of
+    // the three is honor stock. The amendment's load-bearing claim is the
+    // one-row band below, and it still holds.
     const jewelry = pool((d) => d.kind === 'armor' && (d.slot === 'neck' || d.slot === 'ring'));
-    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(34);
+    expect(jewelry.length, 'uncrafted neck and ring pool').toBe(37);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
-    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(24);
+    expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(27);
     // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),

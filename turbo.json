@@ -78,6 +78,7 @@
     "LEAN",
     "ONLY",
     "OUT",
+    "OUT_DIR",
     "PERF_TICK_LOG",
     "PROBE",
     "RIFT_FORGE_ENABLED",

@@ -83,6 +83,11 @@ const ALLOWED: Readonly<Record<string, CensusEntry>> = {
     reason:
       'the impostor atlas bake lights a PRIVATE scene rendered into a render target, so it is never part of the world light census',
   },
+  'boss_impostor.ts': {
+    kinds: ['DirectionalLight', 'HemisphereLight'],
+    reason:
+      'same shape as foliage_impostor.ts: the dome and key light a PRIVATE scene (a local THREE.Scene inside bakeBossAtlas) rendered into a render target and then dropped, so neither is ever in the world light census; BossImpostorField adds only a Group to the world scene, and the bake runs once per session behind the atlasKey latch',
+  },
   'characters/preview.ts': {
     kinds: ['HemisphereLight', 'DirectionalLight'],
     reason:
@@ -174,6 +179,7 @@ describe('the src/render light census', () => {
     // purpose, and it fails here first.
     expect(Object.keys(ALLOWED).sort()).toEqual([
       'armory_preview.ts',
+      'boss_impostor.ts',
       'characters/portrait.ts',
       'characters/preview.ts',
       'foliage_impostor.ts',

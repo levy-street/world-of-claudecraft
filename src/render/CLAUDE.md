@@ -56,6 +56,39 @@ Everything else is a sibling module in one of these families:
   (`chosen_cadence_pressure_core.ts`), never the wall interval, and every consumer that
   reads a frame interval as load goes through `frameLoadMs`. A new renderer clears the
   renderer-side readings (`resetChosenCadenceForRenderer`).
+- **Far-visible landmarks:** `boss_impostor.ts` (+ its `_core`) keeps a WORLD
+  BOSS on screen from across the zone, long past the 80yd entity band, by
+  baking a ring of yaw views of his real model into one atlas and drawing a
+  camera-facing quad that blends the two bracketing views. Same technique as
+  the far-foliage impostors, but the subject MOVES and TURNS, so the bearing is
+  taken relative to his own facing. The HANDOFF to the rig is a hard cut keyed
+  off the rig's own visibility (`bossImpostorShows`: the sprite draws only while
+  the renderer is NOT drawing his rig), never a second distance curve: a curve
+  of its own has to reproduce the rig's 80-in/96-out hysteresis to the frame or
+  it opens a double-draw band each way, which is what the first cut shipped. The
+  cut is invisible because the quad sits on the far mesh's exact frame
+  (`bossImpostorFrameMetrics` / `bossImpostorQuadPlacement`, on the same
+  interpolated pose), is baked from the same `idleGeo` the far LOD draws, and is
+  re-graded by the live day/night grade (`bossImpostorLightGrade`), so a
+  midnight sprite is as dark as the rig it replaces. A sleeping boss draws no
+  sprite at all (he is a landmark at his lair, not on the horizon). Three
+  enforcement points must agree or the feature is a silent no-op: this module,
+  the server's interest widening (`server/interest_policy.ts` `landmarkRange`),
+  and the shared candidate query that would otherwise never return him. When
+  copying the bake loop, copy the `setRenderTarget`-per-cell too: three latches
+  a target's viewport and scissor at BIND time, so mutating them on an
+  already-bound target puts every view in one cell and the sprite draws as a
+  grey rectangle.
+- **World-boss ward cues** (`eye_ward_marker_core.ts` + `characters/eye_ward_marker.ts`,
+  `eye_ward_badge.ts` + `eye_ward_badge_field.ts`, driven by
+  `eye_ward_marker_drive.ts`): the reticle on the boss's eye and the state badge
+  over his head. The split that matters is the `EyeWardMarkerRole`: "aim the pike
+  HERE" is an instruction and is gated on carrying the pike, while "his ward is
+  down, your damage lands" is the raid's damage window and shows for EVERYONE.
+  Collapsing the two is how the twenty players doing the damage ended up never
+  being told. State is read off the boss's own ward AURAS, which the sim already
+  maintains as pure presentation of two timestamps, so a second viewer needs no
+  new wire field.
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
   Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
   `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts

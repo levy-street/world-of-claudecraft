@@ -716,6 +716,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the pet bar; rebuilds its buttons behind a signature latch',
   },
   {
+    call: 'this.shardpikeBar.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: "the world-boss trial's whole input surface: the three pike verbs, the balance beam, and the loud centre-screen instruction. Ungated and per-frame on purpose, because the beam moves every sim tick and the thrust window drains in real time; BOTH halves build once on the first visible paint and then only re-state, and the prompt additionally holds a signature latch so its text and classes are written only when the line actually changes rather than sixty times a second for a once-a-second countdown'",
+  },
+  {
     call: 'this.renderStanceBar',
     band: 'frame',
     gate: '',
@@ -1796,7 +1803,12 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 90 -> 91: the always-on pinned-recipe tracker
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
-    ).toEqual({ window: 49, chrome: 91, none: 17 });
+      // chrome 91 -> 92 at the Mirefen world-boss sync: the Shardpike trial's
+      // one ungated per-frame call (this.shardpikeBar.paint, which drives both
+      // the balance bar and the centre-screen prompt). The feature arm read
+      // window 47 / chrome 83 / none 17 on its own; this split was counted from
+      // the MERGED table, never reconciled by arithmetic across the merge.
+    ).toEqual({ window: 49, chrome: 92, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

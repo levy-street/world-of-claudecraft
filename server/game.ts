@@ -324,11 +324,14 @@ import {
   INTEREST_RADIUS,
   interestLimitSq,
   isStealthed,
+  LandmarkRoster,
+  landmarkInterestSq,
   NPC_DROP_RADIUS,
 } from './interest_policy';
 import { IpBlockList } from './ip_block';
 import { loadActiveBlockedIps } from './ip_block_db';
 import { keepaliveSweepDelayed, shouldReapSession, WS_KEEPALIVE_PING_MS } from './keepalive_sweep';
+import { roundLanceGuidance } from './lance_wire';
 import { LINKDEAD_GRACE_MS, planJoin } from './linkdead';
 import {
   consumeListReadToken,
@@ -1384,6 +1387,16 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
+  if (e.bracing) out.brc = 1; // Shardpike couched (lance_trial.ts): remote clients pose the brace
+  // A slumbering world boss in bed (mob/slumber.ts): remote rigs lie down and wake with him.
+  if (e.asleep) out.slp = 1;
+  // Warpath circuit phase (mob/warpath.ts), for the phase aura and travel cues a raid
+  // reads the fight by (balgath_aura_core.ts). Omitted for every mob without one; the
+  // unharried clock rides only while he travels, which is the only phase that reads it.
+  if (e.warpathPhase) {
+    out.wp = e.warpathPhase;
+    if (e.warpathPhase === 'travel' && e.warpathUnharried) out.wu = round2(e.warpathUnharried);
+  }
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1792,6 +1805,8 @@ export class GameServer {
   // crowd, vs the comparatively tiny entity-JSON build time (`serializeMs`).
   private bcSerializeNs = 0n;
   private bcVisits = 0;
+  /** Live world-boss landmarks, rescanned on a slow cadence (server/interest_policy.ts). */
+  private landmarks = new LandmarkRoster();
   private bcSerializes = 0;
   private bcBaseSerializes = 0;
   private bcLegacySerializes = 0;
@@ -7958,6 +7973,17 @@ export class GameServer {
         sim.collectDelveChestLoot(msg.objectId, pid);
         break;
       }
+      // The Shardpike trial: three no-argument verbs; the beam is steered by ordinary
+      // movement intent, so there is nothing here to validate beyond the token itself.
+      case 'lance_brace':
+        sim.lanceBrace(pid);
+        break;
+      case 'lance_thrust':
+        sim.lanceThrust(pid);
+        break;
+      case 'lance_release':
+        sim.lanceRelease(pid);
+        break;
       // client telemetry should not be considered as unknown command. Used for offline stats computing.
       case 'telemetry':
         break;
@@ -8086,6 +8112,8 @@ export class GameServer {
         radius: BG_MATCH_DROP_RADIUS,
         covers: isBgPos,
       },
+      // A world boss is visible from far outside any radius this query can afford to run.
+      this.landmarks.refresh(this.sim.tickCount, this.sim.entities.values()),
     );
     if (this.perfDetailActive) this.bcastGridNs += process.hrtime.bigint() - sharedStart;
     const queryLimitSq = INTEREST_QUERY_RADIUS * INTEREST_QUERY_RADIUS;
@@ -8113,7 +8141,11 @@ export class GameServer {
           const dx = e.pos.x - anchorEntity.pos.x;
           const dz = e.pos.z - anchorEntity.pos.z;
           const d2 = dx * dx + dz * dz;
-          if (d2 > (isBgPos(anchorEntity.pos.x) ? bgQueryLimitSq : queryLimitSq)) continue;
+          // A landmark carries its own, far wider reach: the shared query did not find it by
+          // radius (it was appended), so the query cutoff must not be the thing that drops it.
+          const landmarkSq = landmarkInterestSq(e);
+          if (d2 > (landmarkSq ?? (isBgPos(anchorEntity.pos.x) ? bgQueryLimitSq : queryLimitSq)))
+            continue;
           // bcVisits counts the exact per-viewer in-range set (self included):
           // increment only AFTER the exact-d2 cutoff, never on the padded
           // per-cell candidate list. Band viewers use the wider battleground
@@ -8501,6 +8533,14 @@ export class GameServer {
     // Delta-guarded: ships on death-release and clears on resurrect. The client
     // draws the corpse marker and gates the resurrect-at-corpse button on it.
     maybe('corpse', p.corpsePos);
+    // The Shardpike trial: the wielder's own beam at 20Hz (null between sessions, so the
+    // delta only ships while a brace is live) and the rest cooldown for the bar's swirl.
+    maybe('lance', this.sim.lanceTrialFor(anchorSession.pid));
+    maybe('lrest', round2(this.sim.lanceRestRemainingFor(anchorSession.pid)));
+    // ...and the guidance the loud prompt paints: null between pikes, so the delta only
+    // ships to a wielder. Distances are rounded before the delta compares them, or a
+    // walking player re-ships this every single tick on float noise alone.
+    maybe('lguide', roundLanceGuidance(this.sim.lanceGuidanceFor(anchorSession.pid)));
     if (stableTimerWire) {
       maybeSerialized('auras', this.stableAuraWireFor(p).json);
       maybeSerialized(

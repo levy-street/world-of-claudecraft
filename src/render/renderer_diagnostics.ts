@@ -289,3 +289,57 @@ export function collectRenderDiagnostics(
     lastTextures: textures,
   };
 }
+
+/**
+ * Every texture reachable from an object's materials.
+ *
+ * Lifted out of renderer.ts because it needs nothing from the coordinator: a traversal, a
+ * fixed key list, and a caller-owned Set. The types it reads (`TextureBackedMaterial`,
+ * `TextureMaterialKey`) already live here, so this is the module that owned the concept all
+ * along.
+ *
+ * `visibleOnly` picks `traverseVisible` over `traverse`, which is the difference between
+ * "what is on screen right now" (the boot-time residency snapshot) and "everything this
+ * subtree could ever draw" (the per-view accounting). The Set is threaded through rather
+ * than merged by the caller so several subtrees can accumulate into one without allocating
+ * a Set per subtree.
+ */
+export function collectObjectTextures(
+  obj: THREE.Object3D,
+  visibleOnly: boolean,
+  textures = new Set<THREE.Texture>(),
+): Set<THREE.Texture> {
+  const textureKeys: TextureMaterialKey[] = [
+    'map',
+    'alphaMap',
+    'aoMap',
+    'bumpMap',
+    'displacementMap',
+    'emissiveMap',
+    'envMap',
+    'lightMap',
+    'metalnessMap',
+    'normalMap',
+    'roughnessMap',
+    'specularMap',
+    'gradientMap',
+  ];
+  const collect = (child: THREE.Object3D): void => {
+    const renderable = child as RenderableDiagnosticObject;
+    const materials = Array.isArray(renderable.material)
+      ? renderable.material
+      : renderable.material
+        ? [renderable.material]
+        : [];
+    for (const material of materials) {
+      const textureMaterial = material as TextureBackedMaterial;
+      for (const key of textureKeys) {
+        const texture = textureMaterial[key];
+        if (texture) textures.add(texture);
+      }
+    }
+  };
+  if (visibleOnly) obj.traverseVisible(collect);
+  else obj.traverse(collect);
+  return textures;
+}

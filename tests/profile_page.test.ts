@@ -188,7 +188,14 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (tsx, no full compile), since these additions could in principle
     // collide on a relic id. Re-confirm with
     // `npx vitest run tests/profile_page.test.ts` once the tree compiles.
-    expect(catalogTotal).toBe(411);
+    //
+    // RE-PINNED at the merge of feature/mirefen-world-boss into
+    // release/v0.44.0: the Mirefen world boss page adds seven item relics
+    // (the Foreman's arms plus the three Foreman's Wage rares), and its reins
+    // already held a horizons_mounts slot, so the character-scoped total
+    // moves by exactly seven to 418. MEASURED with the same standalone probe
+    // against the merged src/sim/content/reliquary.ts.
+    expect(catalogTotal).toBe(418);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

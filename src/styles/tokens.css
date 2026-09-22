@@ -974,6 +974,76 @@
       0 0 calc(10px * var(--fx-shadow, 1)) color-mix(in srgb, var(--gold) 80%, transparent),
       inset 0 0 0 2px var(--gold);
 
+    /* the Shardpike trial (Balgath, the One-Eyed Foreman) */
+    /* The balance-trial bar and its centre-screen prompt (src/ui/hud/shardpike/,
+       the hud.css Shardpike sections). Both float over the live 3D world on a
+       FIXED dark surface, so no preset re-emits any of these; the prompt's tone
+       drives colour and weight only, never position. */
+    /* The resting instruction line, and the tone-directive line that repeats it. */
+    --color-pike-prompt-text: #cfe9e4;
+    /* The soft ink halo that keeps the line readable over any lit terrain. */
+    --color-pike-prompt-halo: #000a;
+    /* The attempt tally under the line, quieter than the instruction above it. */
+    --color-pike-tally-text: #76e0d8;
+    /* The urgent tone (the set window, a fumbling beam). Its own token rather than
+       the library's --color-text-on-gold-btn, which happens to share the value: that
+       one is a button-plate foreground pinned per preset by tests/ui_library.test.ts,
+       this is a world overlay that stays fixed. The same deliberate split as
+       --color-minimap-npc-quest-repeat beside --color-map-npc-quest-repeat. */
+    --color-pike-urgent-text: #ffe9a8;
+    /* The urgent line's warm halo, the one moment the prompt raises its voice. */
+    --color-pike-urgent-glow: #ffcf6688;
+    /* The tone-active line: the pike is couched and the beam is live. */
+    --color-pike-active-text: #9ff0e6;
+    /* The payoff line when the eye is out, and its green halo. */
+    --color-pike-success-text: #a8ffcf;
+    --color-pike-success-glow: #4fe08e66;
+    /* The idle tone: a reason to wait, deliberately quiet so it never reads as an
+       instruction the player is failing to follow. */
+    --color-pike-idle-text: #9aa8a5;
+    /* The bar group's and beam track's shared teal rim, its plate gradient stops,
+       and the lift shadow under the plate. */
+    --color-pike-rim: #2f5f58;
+    --color-pike-group-hi: #101c1cdd;
+    --color-pike-group-lo: #06100edd;
+    --color-pike-group-shadow: #000c;
+    /* The balance beam: a calm centre track running out to a danger red at both
+       rails, with the set progress filling from the centre out. */
+    --color-pike-beam-track: #101c1c;
+    --color-pike-beam-danger: #4a1d1d;
+    --color-pike-set-edge: #1d5f55;
+    /* The live teal the whole bar speaks in: the set fill's centre, the primed
+       button rim, and the balance pip's halo. */
+    --color-pike-primed: #5fe8d2;
+    --color-pike-primed-glow: #5fe8d2aa;
+    --color-pike-pip: #eaf7f4;
+    --color-pike-pip-glow: #5fe8d2cc;
+    /* The pip while the beam is sliding toward a rail: warm body, hot halo. */
+    --color-pike-pip-danger: #ffd9a0;
+    --color-pike-pip-danger-glow: #d8412aee;
+    /* The pike buttons: rim, radial plate stops, glyph ink, and the dimmed rim a
+       not-yet-available verb keeps (dimmed, never extinguished). */
+    --color-pike-btn-rim: #1d4a44;
+    --color-pike-btn-hi: #1b2c2c;
+    --color-pike-btn-lo: #0b1518;
+    --color-pike-btn-text: #d6f2ec;
+    --color-pike-btn-rim-disabled: #16302d;
+    /* The AVAILABILITY WINDOW, the opposite of a cooldown: the rim stays dim so the
+       draining arc has something to drain against, the glow says "live", and the arc
+       runs from its gold down to the same gold at zero alpha (a hard stop, so the
+       tail must keep the hue rather than become a generic transparent). */
+    --color-pike-window-rim: #4a4436;
+    --color-pike-window-glow: #ffcf6699;
+    --color-pike-window-inset: #ffcf6626;
+    --color-pike-window-arc: #ffd98a;
+    --color-pike-window-arc-off: #ffd98a00;
+    /* The seconds left in that window: bright digits over live art. */
+    --color-pike-window-text: #fff6dc;
+    --color-pike-window-text-glow: #ffcf66;
+    /* The ordinary cooldown digits and the dark backdrop behind them. */
+    --color-pike-cd-text: #fff3d0;
+    --color-pike-cd-scrim: #000000a8;
+
     /* unit and party frames */
     /* Shared authored geometry for the plateless unit-frame family. */
     --unit-frame-w: 278px;

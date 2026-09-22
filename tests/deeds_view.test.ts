@@ -868,13 +868,16 @@ describe('real catalog integration', () => {
     // Recomputed directly against the merged live catalog
     // (src/sim/content/deeds.ts) with a standalone probe calling
     // buildDeedsView + countsTowardCompletion directly (tsx, no full
-    // compile), since the tree does not compile yet:
-    // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character.
-    expect(view.summary.visibleTotal).toBe(268);
+    // compile), since the tree does not compile yet. The merge of
+    // feature/mirefen-world-boss appends the world boss pair (cmb_balgath,
+    // cmb_balgath_ten), neither feat-flagged nor hidden, so both subtrahends
+    // are unchanged and the identity moves with the total alone:
+    // 302 deeds - 22 feats - 10 hidden = 270 visible to a fresh character.
+    expect(view.summary.visibleTotal).toBe(270);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
-    // from visibleTotal): 268 + 22 = 290.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(290);
+    // from visibleTotal): 270 + 22 = 292.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(292);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

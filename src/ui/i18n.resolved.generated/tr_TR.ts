@@ -344,6 +344,33 @@ export const tr_TR: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "Bu malzeme seçimi artık kullanılamıyor.",
+    "shardpike": {
+      "braceLabel": "Couch the Shardpike",
+      "braceTooltip": "Plant the butt and hold the point up. Your strafe keys are the balance stick: the beam drifts on its own, and every slam he lands kicks it. Hold it off the rails for {set} seconds to set the pike. Needs solid ground, and not from the saddle.",
+      "thrustLabel": "Loomshard Thrust",
+      "thrustTooltip": "Drive the set pike through the eye for {damage} damage. Nothing scales it: not your level, not your attack power, not the pike. Blinds the Foreman and strips Barrowhide, so every other weapon in the mire finally bites. Only a set pike can deliver it, within {reach} yards, and the window lasts {seconds} seconds.",
+      "releaseLabel": "Ground the Shardpike",
+      "releaseTooltip": "Put the pike up. No penalty for bailing out: you lose the set, not the attempt, and it can be re-couched after {rest} seconds.",
+      "whyResting": "You just grounded the pike. Wait out the timer on the icon.",
+      "whyAlreadyCouched": "The pike is already couched. Ground it before you re-set.",
+      "whyNotSet": "The pike is not set. Couch it and hold it steady first.",
+      "whyNothingCouched": "Nothing to ground: the pike is not couched.",
+      "beamLabel": "Shardpike balance",
+      "beamStatus": "Pike balance {balance}, set {set} percent.",
+      "beamDanger": "Pike balance {balance}, about to fumble.",
+      "promptStrike": "STRIKE THE EYE now, {seconds}s",
+      "promptHoldSteady": "Hold the pike steady with your strafe keys",
+      "promptCatchIt": "Catch it, the pike is going over",
+      "promptEyeOut": "The eye is out, {seconds}s: hit him with everything",
+      "promptSealed": "His eye is shut. It opens again in {seconds}s",
+      "promptResetting": "Re-setting the pike, {seconds}s",
+      "promptCloser": "Get within reach of the Foreman, {yards} yards out",
+      "promptBrace": "Couch the Shardpike, then hold it steady",
+      "promptFindBoss": "Skerrit's Shardpike: put out the Foreman's eye with it",
+      "promptTally": "{count} put out",
+      "promptLabel": "Shardpike instruction",
+      "blindBanner": "BARROWHIDE BROKEN"
+    },
     "warlock": {
       "doomLabel": "Mahkûmiyet",
       "fateThreadsLabel": "Kader İplikleri",
@@ -3270,6 +3297,7 @@ export const tr_TR: EnTranslations = {
       "dodge": "Aumenta la probabilidad de esquivar un {pct}%",
       "dodgeReduce": "Reduce la probabilidad de esquivar un {pct}%",
       "damageReduction": "Alınan tüm hasarı {pct}% azaltır",
+      "slumber": "Şafağa kadar uyuyor. Saldırılamaz ve kimse için uyanmaz.",
       "guardianWard": "Seni öldürecek bir sonraki düşman darbesi engellenir ve yerine canın {pct}%'e geri döner",
       "armorFlat": "Reduce la armadura en {value}",
       "armorFlatStacks": "Reduce la armadura en {value} ({stacks} acumulaciones)",
@@ -3346,7 +3374,9 @@ export const tr_TR: EnTranslations = {
       }
     },
     "worldBoss": {
-      "spawn": "{name}, Dikenzirve Tepeleri'nin üzerinde yükseliyor!"
+      "spawn": "{name}, {zone} üzerinde yükseliyor!",
+      "wake": "{name}, {zone} üzerinde uyanıyor!",
+      "sleep": "{name} şafağa kadar uyuyor."
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
@@ -3480,6 +3510,7 @@ export const tr_TR: EnTranslations = {
         "menu": "Menü",
         "minimap": "Mini Harita",
         "stanceBar": "Duruş Çubuğu",
+        "shardpikeBar": "Shardpike Bar",
         "xpBar": "XP Çubuğu",
         "chat": "Sohbet",
         "actionBarGroup": "Eylem Çubukları",
@@ -6399,6 +6430,7 @@ export const tr_TR: EnTranslations = {
       "framesGovernedExtra": "Çerçeveleri Düzenle, aşağıdaki takipçi yığınını da gevşetir: takip ettiğin görevler ve hedefleri, yiğitlik ilerlemen, Reliquary sayfaların, üretimden sabitlediğin tarifler, içinde olduğun delve, katıldığın her yarık ve takip ettiğin tarif veya komisyon. Ayrıca evcil hayvan çerçevesinin yanındaki evcil hayvan eylem çubuğu, yakındaki düşmanlardaki zayıflatmaların için Hedef noktaları çerçevesi, paladinin Adanmışlık madalyası, büyücünün Lanet Çubuğu, büyü tetikleme kaplaması, çift elli savaşçılar için yardımcı el savurma sayacı ve sekmeli hasar ölçer penceresi de her biri kendi ad çipini taşırken gevşetilir.",
       "framesGovernedAuraTracks": "Arayüz seçeneklerinin aynı Arayüz sekmesindeki Savaş sekmesinden açtığın altı isteğe bağlı aura izini de Çerçeveleri Düzenle gevşetir: Takviyelerim izi, Savunma Bekleme Süreleri izi, Kalkanlarım izi, Saldırı Bekleme Süreleri izi, Hareket ve Gizlilik izi ve Müttefiklerde Takviyelerim izi. Her iz varsayılan olarak kapalıdır ve gevşekken kendi ad çipini taşır.",
       "framesGovernedTalkingHead": "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
+      "framesGovernedShardpike": "Edit Frames also loosens the Shardpike bar, the short row of quest-tool verbs that appears beside your action bars only while you are carrying the Shardpike itself; it wears its name chip while it is loose, so you can place it before the fight rather than during it.",
       "barsTitle": "Çubuklar, sayaçlar ve savaş metni",
       "barsBody": "Büyü çubuğun, büyü okuduğunda ya da kanalize ettiğinde eylem çubuklarının hemen üzerinde, ekranın ortasında belirir ve büyünün adını ve kalan süreyi taşır. Hedefin de kendi çerçevesinde kendi büyü çubuğuna sahiptir, böylece neyin geldiğini görüp buna karşılık verebilirsin.\n\nBüyü çubuğunun altında ince bir vuruş çubuğu durur ve silah vuruşların arasında dolar, böylece yakın dövüş ya da menzilli bir saldırgan bir sonraki otomatik vuruşun ne zaman ineceğini görebilir.\n\nTecrübe çubuğun eylem çubuklarının altında tam genişlikte uzanır, dilimlere bölünmüştür ve biriktirdiğin dinlenmiş tecrübeyi gösteren daha açık bir bölüm taşır.\n\nSuyun altında yüzersen ekranın üstünde mavi bir nefes çubuğu belirir. Başın suyun altındayken azalır, tükendiğinde kırmızıya döner ve boğulmaya başlarsın, yüzeye çıktığın anda hızla dolar. Boşluk tuşu seni yukarı yüzdürür, varsayılan olarak Ctrl olan Aşağı Yüz tuşu ise seni derine götürür.\n\nHasar ve iyileştirme, indikleri şeyin üzerinde küçük sayılar olarak yükselir, böylece bir dövüşü metin okumadan takip edebilirsin. Sohbet kutundaki Savaş sekmesi tam yazılı kaydı tutar.",
       "aurasTitle": "Takviyeler ve zayıflatmalar",
@@ -14075,6 +14107,30 @@ export const tr_TR: EnTranslations = {
       "fenshadow_maul": {
         "name": "Bataklık Gölgesi Balyozu"
       },
+      "foremans_barrowmaul": {
+        "name": "Ustabaşının Höyük Balyozu"
+      },
+      "skerrits_shardpike": {
+        "name": "Skerrit’in Kıymık Kargısı"
+      },
+      "loomshard_eye": {
+        "name": "Tezgah Kırığı Gözü"
+      },
+      "barrowhide_pauldrons": {
+        "name": "Höyük Omuzlukları"
+      },
+      "mirestone_stride": {
+        "name": "Bataklıktaşı Adımı"
+      },
+      "foremans_wage_band": {
+        "name": "Ustabaşının Ücret Yüzüğü"
+      },
+      "mirelight_locket": {
+        "name": "Bataklık Işığı Madalyonu"
+      },
+      "fenwright_grips": {
+        "name": "Bataklık Ustası Eldivenleri"
+      },
       "wildgrove_cinch": {
         "name": "Vahşi Koruluk Kemeri"
       },
@@ -17011,6 +17067,9 @@ export const tr_TR: EnTranslations = {
       "thunzharr_waking_peak": {
         "name": "Thunzharr, Uyanan Zirve"
       },
+      "balgath_cyclops": {
+        "name": "Balgath, the One-Eyed Foreman"
+      },
       "thunzharr_stormling": {
         "name": "Uyanmış Fırtına Dölü"
       },
@@ -17503,6 +17562,11 @@ export const tr_TR: EnTranslations = {
         "name": "Muhafız Fenwick",
         "title": "Fenbridge Muhafızı",
         "greeting": "Kapıda dur, {className}. Şu sazlıkların ötesinde, öldürme işini bataklık bizim için yapar."
+      },
+      "socketwright_skerrit": {
+        "name": "Maben Skerrit",
+        "title": "the Socketwright",
+        "greeting": "Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, {className}? Aim for my work."
       },
       "brother_aldric_fen": {
         "name": "Birader Aldric",
@@ -18212,6 +18276,16 @@ export const tr_TR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Fenbridge Toplanma Emri"
+          }
+        }
+      },
+      "q_socketwrights_due": {
+        "title": "The Socketwright's Due",
+        "text": "I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, {playerName}: blind him, and every blade in the mire will finally bite.",
+        "completion": "You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.",
+        "objectives": {
+          "0": {
+            "label": "The Foreman's eye put out"
           }
         }
       },
@@ -20396,6 +20470,12 @@ export const tr_TR: EnTranslations = {
           },
           "7": {
             "label": "Batık Kale"
+          },
+          "8": {
+            "label": "Höyük Sahası"
+          },
+          "9": {
+            "label": "Yıldız Düşüşü Krateri"
           }
         }
       },

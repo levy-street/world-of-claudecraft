@@ -48,6 +48,14 @@ export const ZONE2_ZONE: ZoneDef = {
     { x: -95, z: 440, label: 'Troll Mounds', id: 'troll_mounds' },
     { x: 0, z: 485, label: 'Gravecaller Encampment', id: 'gravecaller_encampment' },
     { x: 45, z: 515, label: 'The Sunken Bastion', id: 'the_sunken_bastion' },
+    // APPENDED, never inserted: `entities.zones.<id>.pois.<n>.label` is keyed by index in
+    // the locale overlays, so adding a POI anywhere but the end shifts every later label
+    // onto the wrong translation and drops the last one entirely.
+    { x: 0, z: 390, label: 'Barrowmound Reach', id: 'barrowmound_reach' },
+    // Where Brother Aldric's star came down (MIREFEN_IMPACT_CRATER in world.ts) and where
+    // the world boss sleeps and wakes (world_boss.ts): the map needs a name for the place
+    // the whole zone is told to come back to at dawn.
+    { x: 149.5, z: 295, label: 'Starfall Crater', id: 'starfall_crater' },
   ],
   welcome: 'Report to Warden Fenwick at the Fenbridge gate.',
   welcomeDone:
@@ -296,6 +304,357 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
     loot: [{ copper: 8, chance: 0.5 }],
     scale: 0.55,
     color: 0x3a2740,
+  },
+  // Balgath, the Buried Foreman: the Mirefen world boss.
+  //
+  // Mirefen is the churn choke point, so this boss exists to give the zone a reason to
+  // gather. He is level 20 in a level 6 to 13 zone deliberately: that is what pulls
+  // geared players back to Fenbridge, and the mechanics are shaped so the locals who
+  // live here are participants rather than corpses.
+  //
+  // He is in no CAMPS list: the world-boss scheduler owns his spawns (world_boss.ts). He
+  // rises on the Starfall Crater's rim at the zone's east edge, and unlike Thunzharr he
+  // keeps hours (`slumber` below): awake from sunrise to sunset, asleep beside the fallen
+  // star through the night, and a kill puts him down until the next dawn. Structure
+  // otherwise follows the Thunzharr template so the two read the same to a raid.
+  balgath_cyclops: {
+    id: 'balgath_cyclops',
+    name: 'Balgath, the One-Eyed Foreman',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'elemental',
+    worldBoss: true,
+    boss: true,
+    elite: true,
+    canSwim: false,
+    // A fen is all water and reed banks; pathing a 9-unit giant around them wedges him
+    // on the first collider, so he walks the straight line as Thunzharr does.
+    phasesThroughObstacles: true,
+    // He WADES. A phasing mover otherwise rides the water surface, and the first cut of
+    // this boss crossed the Mirefen lakes with his boots on the waterline like a cork:
+    // thirteen yards of granite floating in four yards of fen. With this, his feet stay
+    // on the bed and the surface climbs his shins instead. Nine is about two thirds of
+    // his 13.4-unit height, so a lake deeper than that (there is none in the marsh)
+    // would still float him rather than drown him. The circuit below still avoids the
+    // lakes for a different reason: HE can wade, the raid chasing him cannot.
+    wadeDepth: 9,
+    // A daytime boss (mob/slumber.ts). At dusk, once whatever pull is running has ended,
+    // he walks back to the crater rim he spawns on and lies down; asleep he is neutral,
+    // unattackable and a landmark; at dawn he wakes with a yell the zone hears and the
+    // realm gets the "wakes over Mirefen" call. Killed, he rises again at the next dawn
+    // (the scheduler in sim.ts reads this same field), so the fight is a once-a-day event
+    // with a window everyone can plan around rather than an hourly respawn.
+    slumber: {
+      auraName: 'Barrow Slumber',
+      sleepYell: 'Dark. The star sleeps. So does the Foreman.',
+      wakeYell: 'DAWN. The star woke me once. The sun wakes me every day.',
+      yellRange: 160,
+      // Inside this of the spawn point he lies down: his own body length, so he never
+      // paces on the spot hunting for an exact coordinate a slope or the pad denies him.
+      bedRadius: 6,
+      // Balgath_Wake runs 3.95 s (scripts/build_balgath_anims.mjs); the hold outlasts it.
+      riseSeconds: 4,
+    },
+    quietMechanics: true,
+    // THE mechanic of this fight. Without it his AoEs fire instantly with no warning,
+    // which makes "walk out of the circle" impossible and reduces him to a damage check
+    // you either out-gear or die to. With it, both slams draw a ground ring at their true
+    // blast radius, wind up, and detonate from the ring's centre even if he has walked
+    // on: what you were shown is what you have to leave. 4.5s also spaces the mechanics
+    // so two never land together.
+    telegraphedMechanics: 4.5,
+    // The circuit, and the reason this fight is an event rather than a health bar. He
+    // holds ground and trades for a while, then sets off for the next landmark and RUNS
+    // there while the raid chases, then brings both fists down on whatever he arrived at.
+    // Mechanics doc: mob/warpath.ts.
+    warpath: {
+      // Long enough for two Barrow Smashes at their 14s cadence, so melee gets a real
+      // window rather than a glance at him before he leaves again.
+      focusSeconds: 30,
+      // 5.0 * 1.25 = 6.25 u/s. Deliberately BETWEEN a player's 7 run and their walk: a
+      // raid that runs stays with him and a raid that dawdles does not, which is what
+      // makes the regen below bite. It is also above the renderer's GAIT_RUN_ENTER of
+      // 5.2, so travelling is the one thing that puts him in his RUN clip; his 5.0 combat
+      // speed stays under it and keeps the walk. One boss, two gaits, neither of them
+      // near the clip clamps that made him skate.
+      travelSpeedMult: 1.25,
+      // The longest leg is the opening march from the crater to the chapel, about 175
+      // units, roughly 28s at travel speed (the longest leg inside the loop is 140). 45
+      // leaves room for a slow and still gives up on a landmark he cannot reach, so a
+      // wedged body can never leave him travelling (and healing) forever.
+      travelTimeoutSeconds: 45,
+      arriveRadius: 9,
+      // 1.4s of telegraph ring plus the follow-through, timed so his slam clip lands its
+      // blow on the detonation rather than before it.
+      wreckSeconds: 3.4,
+      // Walked IN ORDER, wrapping, starting at index 0. He wakes on the Starfall Crater's
+      // rim at the zone's east edge (world_boss.ts), so a pull opens with the long march
+      // west across the fen that the whole zone can watch, then the circuit brings him
+      // home to his own mound, to the town gate, and out to the gravecallers before it
+      // wraps back to the chapel; he never returns to the crater mid-fight (that is what
+      // dusk is for).
+      //
+      // ORDER IS CONSTRAINED, not chosen freely, and the constraint is water. He walks the
+      // straight line between stops, and although he now WADES (wadeDepth above) the raid
+      // chasing him does not: a leg that clips a Mirefen lake still turns the chase into a
+      // swim for everyone but him, and melee simply cannot follow. The first cut of this
+      // circuit did exactly that, caught in an in-engine capture with the player treading
+      // water and the boss half a lake away. Every consecutive pair below, and the opening
+      // leg from the crater, is dry end to end, measured rather than eyeballed, and
+      // tests/warpath.test.ts re-measures them against the real heightfield. The chapel
+      // is first rather than the town for the same reason in a different shape: every
+      // straight line from the crater to Fenbridge runs through the Widow Thicket spider
+      // camps, and a raid dragged through seven spiders on the way to the fight is not a
+      // chase, it is a wipe for the level eights in it.
+      //
+      // The town stop sits at z 345, and that number is a blast-radius decision. Fenbridge
+      // fills a 34-unit hub at z 300 with its wall near 334 and its northernmost building
+      // at 325.5; a 16-yard slam from 345 reaches 329, so it lands ON the north gate and
+      // the wall (which is the drama) and stops short of the buildings and the vendors
+      // behind them. Move him closer and a level-8 quester standing at the gate dies to a
+      // mechanic aimed at a raid.
+      destinations: [
+        {
+          x: 100,
+          z: 435,
+          label: 'the Drowned Chapel',
+          yell: 'The chapel bell woke me. Let it toll one last time.',
+        },
+        {
+          x: 0,
+          z: 390,
+          label: 'Barrowmound Reach',
+          yell: 'Back to the mound. Back to the digging. ALWAYS the digging.',
+        },
+        {
+          x: 0,
+          z: 345,
+          label: 'the Fenbridge gate',
+          yell: 'FENBRIDGE. I hauled the stone for that wall. I will have it back.',
+        },
+        {
+          x: 0,
+          z: 485,
+          label: 'the Gravecaller Encampment',
+          yell: 'The gravecallers sang my crew down into the mud. Their turn now.',
+        },
+      ],
+      // He is thirteen units tall and the whole zone should hear him coming.
+      yellRange: 160,
+      // 1.5% of his pool a second after three seconds unpunished. Against his world-boss
+      // scaling that is proportional, so it costs the same fraction of the fight whether
+      // five players or forty are on him: a raid that stops attacking to run loses ground
+      // at exactly the rate it stopped attacking.
+      regen: { unharriedSeconds: 3, pctPerSecond: 0.015, name: 'Barrowmend' },
+      // The travelling backhand, on one random player inside his reach. Between the
+      // aoePulse (36 to 50) and the stomp (18 to 28) in weight: escorting him is meant to
+      // cost, not to be a death sentence for whoever draws the short straw. Named for the
+      // clip it plays and NOT "Backhand", which is already the label on his knockback
+      // proc: two different mechanics under one name in the combat log is a fight nobody
+      // can read.
+      swipe: {
+        every: 2.6,
+        radius: 12,
+        min: 28,
+        max: 40,
+        name: 'Barrowsweep',
+        school: 'physical',
+      },
+      // The arrival slam: wider and heavier than the Barrow Smash, because it is the
+      // payoff for the chase and the one mechanic he only ever does at a landmark.
+      wreck: { radius: 16, min: 62, max: 86, name: 'Barrowfall', school: 'physical' },
+      wreckYell: 'DOWN! ALL OF IT DOWN!',
+    },
+    // The two AIMED attacks, which exist because everything else he throws is a circle
+    // centred on his own feet and dodged by walking out of it. These are dodged two other
+    // ways, so the fight asks for three different reactions instead of one repeated.
+    slams: {
+      // Whack-a-mole. He picks whoever has his attention, raises one fist, and drops it
+      // where they were standing 1.3s ago. The radius is small ON PURPOSE: this is beaten
+      // by taking three steps, so it punishes standing still rather than standing close,
+      // and it keeps chasing whoever it picked instead of parking the raid at max range.
+      hammer: {
+        every: 17,
+        windup: 1.3,
+        radius: 6,
+        min: 44,
+        max: 62,
+        name: 'Foreman\u2019s Hammer',
+        school: 'physical',
+      },
+      // The cleave, and the one mechanic in this fight that is beaten by JUMPING. His arm
+      // comes across the ground at shin height through a 120-degree arc, so backing out of
+      // 20 yards of reach inside the wind is not on the table: you leave the ground or you
+      // wear it. Clearing it hands you a ride instead of a hit, which is the reward for
+      // reading a telegraph correctly rather than merely surviving it.
+      //
+      // Deliberately the rarest thing he does. A jump check every 20 seconds is a
+      // heartbeat the raid learns to feel; one every five is a rhythm game.
+      cleave: {
+        every: 26,
+        windup: 1.5,
+        range: 20,
+        halfArcDeg: 60,
+        sweepSpeed: 26,
+        min: 78,
+        max: 104,
+        name: 'Barrow Cleave',
+        school: 'physical',
+      },
+    },
+    // Every heavy slam he lands PUNTS rather than shoves (mob/boss_slams.ts). He is
+    // thirteen units of quarried granite and his whole identity is his fists; a victim who
+    // slides two yards along the floor reads as having been pushed by a large man, and one
+    // thrown four yards into the air reads as having been hit by a building.
+    //
+    // up 11 gives an apex of 11^2/32 = 3.8 yards and about 1.4s of air. That is under the
+    // 12-yard FALL_SAFE_DISTANCE with room to spare, so the landing that follows can never
+    // quietly add fall damage on top of the slam that caused it.
+    launch: { distance: 6, up: 11, outSpeed: 7, edgeScale: 0.55 },
+    // He is loose in an inhabited zone, so his craters take the wildlife with them. A third
+    // of the raid number: a mirefen boar has a fraction of a raider's pool, and at full
+    // strength one warpath lap would sterilize every camp on the circuit and leave the zone
+    // empty for everyone who was not in the raid.
+    collateral: { mult: 0.34 },
+    // Thirteen yards of moss-grown granite walking around an open zone. Seeing him from the
+    // far shore of the mire IS the encounter's advertisement, and it is the difference
+    // between a world boss and a dungeon boss standing outdoors. 460 covers the mire and its
+    // approaches without pushing him into a neighbouring zone's snapshot.
+    landmarkRange: 460,
+    // Barrowhide: the level-spread mechanic (mob/eye_ward.ts). While the ward stands he
+    // shrugs off most of every hit, and only the Shardpike's eye thrust (lance_trial.ts,
+    // fixed damage, level-blind) can pry it open. Low levels open the window, high levels
+    // spend it; the seal after each window sets the fight's breathing rhythm.
+    eyeWard: {
+      name: 'Barrowhide',
+      reduction: 0.6,
+      blindSeconds: 14,
+      refractorySeconds: 40,
+      blindName: 'Blinded',
+      blindYell: 'MY EYE! The little wrights come for their due!',
+      yellRange: 160,
+    },
+    ccImmune: true,
+    slowImmune: true,
+    hpBase: 4000,
+    hpPerLevel: 800,
+    dmgBase: 54,
+    dmgPerLevel: 10.3,
+    attackSpeed: 2.4,
+    armorPerLevel: 46,
+    // 5.0 is doing two jobs and neither is arbitrary.
+    //
+    // Design: it is well under a player's base run of 7, so he can always be outrun.
+    // His damage lives in telegraphed circles you walk out of, which only works as
+    // counterplay if walking out is possible.
+    //
+    // Animation: it sits just under the renderer's GAIT_RUN_ENTER (5.2), so he is
+    // ALWAYS in the walk gait and never flip-flops across that threshold mid-chase,
+    // and 5.0 divided by his measured walkRef of 4.14 is 1.21x the clip's natural
+    // rate, which is inside the clamp and therefore actually plants his feet. The
+    // previous 6.4 divided out to 2.3x, pinned at the 1.8 ceiling, and read as a
+    // giant jogging frantically in place while sliding forward.
+    moveSpeed: 5.0,
+    // Wide, because he is 13 units tall and visible from far outside it: an aggro
+    // radius smaller than his silhouette reads as a statue you can walk up and touch.
+    aggroRadius: 26,
+    // Deliberately the literal, not an import: `src/sim/` may never import from
+    // `src/render/`, and this has a render-side twin (BALGATH_SCALE) the gait refs were
+    // measured at. A test welds the two rather than a cross-layer import.
+    //
+    // It also sets his melee reach through `scaledDefaultMobMeleeRange`, and that is
+    // wanted here: unlike Thunzharr, who is rendered at scale 8 and has his reach pinned
+    // down to a scale-5 body so he cannot swing past his own model at kiters, Balgath is
+    // MEANT to be outrun. His reach matching his arms is the honest read.
+    scale: 4.2,
+    // The circle smash: big, slow, telegraphed. Long cadence and a wide footprint so
+    // the ground ring reads from across the fen.
+    aoePulse: {
+      min: 36,
+      max: 50,
+      radius: 12,
+      every: 14,
+      name: 'Barrow Smash',
+      school: 'physical',
+      fx: 'nova',
+    },
+    // The shockwave stomp: tighter and quicker, and the smaller radius is also how the
+    // renderer tells the two slams apart when it draws their ground rings.
+    stomp: {
+      radius: 7,
+      every: 22,
+      duration: 1.5,
+      min: 18,
+      max: 28,
+      name: 'Shockwave Stomp',
+      school: 'physical',
+    },
+    // The scry: his one channelled ability, which is why `cast` in the shared BALGATH
+    // ClipMap is the eye rather than a generic cast. The bar and the pose are one event.
+    bigCast: {
+      castId: 'balgath_scry',
+      name: 'Loomshard Scry',
+      castTime: 3.5,
+      every: 40,
+      radius: 30,
+      min: 70,
+      max: 90,
+      school: 'arcane',
+      yell: 'The shard sees you. All of you.',
+    },
+    // The heavy mitigation the concept called for: what makes him want numbers rather
+    // than gear, since a small group cannot out-damage the refresh.
+    stoneskin: {
+      amount: 500,
+      every: 27,
+      duration: 9,
+      name: 'Barrowhide',
+      school: 'physical',
+    },
+    knockback: { chance: 0.3, distance: 7, name: 'Backhand' },
+    // Four items of his OWN, and the reason they had to be authored rather than borrowed.
+    // An item's level derives from its highest source level, so a level-20 boss dropping
+    // this zone's level-10 gear silently re-levels it; sharing the existing level-20 tier
+    // instead drags in four class-set Reliquary pages that would have to start naming a
+    // Mirefen boss. Both were tried and both were wrong, which is what forced the
+    // `balgath_spoils` set below into existence: `worldBoss: true` obliges a Reliquary
+    // page, and a page with no relics of his own is one you complete without meeting him.
+    //
+    // Three more rows make the kill worth turning up for twice, which is the actual
+    // design problem this table has to solve for a boss in the zone players quit in:
+    //
+    // THE FOREMAN'S WAGE (`foremans_wage`, maxPlayerLevel 13): the locals' share. Rolled
+    // only for a contributor at or below the zone's top level, one of three level-13
+    // rares at 30% each (so nine kills in ten pay a local something wearable), and
+    // listed FIRST so the one-gear-item cap in rollWorldBossLoot hands a level eight the
+    // blue they can wear rather than a level-20 epic they cannot. A level twenty on the
+    // same kill never sees these rows at all. The gate is also what sets the items'
+    // level (item_level.ts): they are level-13 content, not re-levelled boss loot.
+    //
+    // THE REINS (`reins_drakemaw_raptor`): the one epic mount with no acquisition path,
+    // held back by owner call for "a dedicated world boss" (content/drakelands.ts). One
+    // percent, ungrouped so it rides independently of the gear roll, personal per
+    // contributor and once a day per character through the world-boss lockout. That is
+    // the retail world-boss mount rate (Sha of Anger's serpent, the Galleon), and against
+    // a daily lockout it is a mount most of the realm will see on someone before they see
+    // it in their own bags, which is what makes a horizon out of it.
+    loot: [
+      { copper: 2500, chance: 1 },
+      { itemId: 'bogiron_nugget', chance: 1 },
+      { itemId: 'foremans_wage_band', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
+      { itemId: 'mirelight_locket', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
+      { itemId: 'fenwright_grips', chance: 0.3, rollGroup: 'foremans_wage', maxPlayerLevel: 13 },
+      { itemId: 'foremans_barrowmaul', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'barrowhide_pauldrons', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'mirestone_stride', chance: 0.1, rollGroup: 'balgath_spoils' },
+      { itemId: 'loomshard_eye', chance: 0.08, rollGroup: 'balgath_spoils' },
+      { itemId: 'reins_drakemaw_raptor', chance: 0.01 },
+    ],
+    yells: {
+      engage: 'One eye is enough to find you.',
+      enrage: 'The mound breaks! Let it all come down!',
+    },
+    color: 0xa8a496,
   },
   mirefen_broodmother: {
     id: 'mirefen_broodmother',
@@ -702,6 +1061,21 @@ export const ZONE2_NPCS: Record<string, NpcDef> = {
     ],
     greeting: 'Hold at the gate, $C. Past those reeds, the fen does the killing for us.',
   },
+  socketwright_skerrit: {
+    id: 'socketwright_skerrit',
+    name: 'Maben Skerrit',
+    title: 'the Socketwright',
+    // West of the Fenbridge gate stop on Balgath's circuit, on measured dry ground
+    // (terrainHeight 0.15 vs water -4.3), 25 yards off the x=0 spine he marches along:
+    // close enough to watch his own handiwork stamp past, far enough that no slam,
+    // shockwave, or wreck telegraph ever reaches the man handing out the counter to them.
+    pos: { x: -22, z: 358 },
+    facing: 1.71,
+    color: 0x8a6d3b,
+    questIds: ['q_socketwrights_due'],
+    greeting:
+      'Forty years since I ground that eye and set it in his socket, and never a day paid. You want to hurt the Foreman, $C? Aim for my work.',
+  },
   brother_aldric_fen: {
     id: 'brother_aldric_fen',
     name: 'Brother Aldric',
@@ -874,6 +1248,26 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
     copperReward: 200,
     itemRewards: {},
     minLevel: 6,
+  },
+  q_socketwrights_due: {
+    id: 'q_socketwrights_due',
+    name: "The Socketwright's Due",
+    giverNpcId: 'socketwright_skerrit',
+    turnInNpcId: 'socketwright_skerrit',
+    text: 'I set the Loomshard in that socket myself: ground the lens, seated it, wedged it true. The barrow-masters never paid me a copper, and now my work walks around flattening the fen. Take my Shardpike. Plant the butt, hold the point steady, however long it takes, and when your arms are sure, put it through the eye. The hide he wears is bound to that shard, $N: blind him, and every blade in the mire will finally bite.',
+    completionText:
+      'You felt it give, did you? Forty years of interest, paid through the socket. The pike is yours, friend. He will heal, he always does, so go collect again whenever the fancy takes you.',
+    objectives: [
+      { type: 'event', eventId: 'balgath_blinded', count: 1, label: "The Foreman's eye put out" },
+    ],
+    xpReward: 900,
+    copperReward: 500,
+    itemRewards: {},
+    // The pike is granted ON ACCEPT (and re-granted on a re-accept if it was lost),
+    // which is the whole quest: the objective is proof the player used it.
+    requiredItems: ['skerrits_shardpike'],
+    minLevel: 6,
+    suggestedPlayers: 5,
   },
   q_prowlers: {
     id: 'q_prowlers',
@@ -1340,6 +1734,7 @@ export const ZONE2_QUESTS: Record<string, QuestDef> = {
 
 export const ZONE2_QUEST_ORDER = [
   'q_fenbridge_muster',
+  'q_socketwrights_due',
   'q_prowlers',
   'q_prowler_pelts',
   'q_fen_supplies',
@@ -1378,6 +1773,7 @@ export const ZONE2_CAMPS: CampDef[] = [
   // Murlocs: shores of the big east lake — camps straddle the waterline
   { mobId: 'deepfen_murloc', center: { x: -82, z: 273 }, radius: 15, count: 8 },
   { mobId: 'deepfen_murloc', center: { x: -120, z: 350 }, radius: 13, count: 6 },
+
   { mobId: 'mirejaw_the_ravenous', center: { x: -132, z: 333 }, radius: 5, count: 1 },
   // Widows: thicket west of Fenbridge
   { mobId: 'mire_widow', center: { x: 70, z: 300 }, radius: 20, count: 7 },
@@ -1488,7 +1884,143 @@ const CASTER_WEAPON_CLASSES: PlayerClass[] = [
 ];
 
 export const ZONE2_ITEMS: Record<string, ItemDef> = {
+  // ---- Balgath, the Mirefen world boss: his own spoils --------------------
+  //
+  // A world boss needs loot that is HIS. Sharing another boss's tier looks like a
+  // shortcut and behaves like one: an item's level derives from its highest source, so
+  // handing him the zone's level-10 gear silently re-levels it, and handing him
+  // Thunzharr's tier-20 set means four class-set Reliquary pages have to start naming a
+  // Mirefen boss. One epic per archetype plus a trinket, so any group that kills him has
+  // someone who wants a drop, and the drop is unambiguously from this fight.
+  //
+  // Stat totals are NOT chosen. An item's level derives from its highest source (a
+  // level-20 boss), and tests/item_level.test.ts then enforces an exact primary-stat
+  // LINE for that level and slot: 23 on the two-hander, 14 on the shoulders, 12 on the
+  // neck and the boots. On top of that line every budgeted item carries a free stamina
+  // baseline of a third of it (item_budget.ts): a physical piece holds that stamina
+  // INSIDE its line, so the three of those below total their line exactly, while a
+  // caster piece carries it on top, so the neck's 12-point int/spi line totals 16. The
+  // split between stats is the design decision; the total is arithmetic, and inventing a
+  // bigger one just fails the gate.
+  foremans_barrowmaul: {
+    id: 'foremans_barrowmaul',
+    name: "Foreman's Barrowmaul",
+    kind: 'weapon',
+    slot: 'mainhand',
+    quality: 'epic',
+    hand: 'twohand',
+    weapon: { min: 46, max: 67, speed: 3.4 },
+    stats: { str: 14, sta: 9 },
+    sellValue: 9200,
+    requiredClass: WAR,
+  },
+  loomshard_eye: {
+    id: 'loomshard_eye',
+    name: 'The Loomshard Eye',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'epic',
+    stats: { int: 7, spi: 5, sta: 4 },
+    sellValue: 8400,
+  },
+  barrowhide_pauldrons: {
+    id: 'barrowhide_pauldrons',
+    name: 'Barrowhide Pauldrons',
+    kind: 'armor',
+    slot: 'shoulder',
+    armorType: 'mail',
+    quality: 'epic',
+    stats: { armor: 148, sta: 8, str: 6 },
+    sellValue: 8800,
+  },
+  mirestone_stride: {
+    id: 'mirestone_stride',
+    name: 'Mirestone Stride',
+    kind: 'armor',
+    slot: 'feet',
+    armorType: 'leather',
+    quality: 'epic',
+    stats: { armor: 96, agi: 7, sta: 5 },
+    sellValue: 8600,
+  },
+  // The Foreman's Wage: the LOCALS' share of the world boss, three level-13 rares.
+  //
+  // These drop only to a contributor at or below level 13 (LootEntry.maxPlayerLevel on
+  // his table), and that gate is also their level: item_level.ts derives a level-gated
+  // personal entry from the gate rather than from the level-20 boss, so they budget as
+  // ilvl 16 rares (13 + 3), the zone's own tier and a real upgrade until twenty, instead
+  // of re-levelling to boss loot a level eight could never wear. Budgets are exact to
+  // primaryStatBudget (ring 5, neck 6, gloves 6) so the level-band budget sweep stays
+  // honest. Those are LINES, and the stamina baseline model (item_budget.ts) puts a free
+  // third on top of each: the two physical pieces hold theirs inside the line and total
+  // it exactly, and the caster locket carries a 2-point baseline above its 6-point line
+  // for a total of 8, of which it spends 2 line points buying 2 stamina over the
+  // baseline (STAMINA_PREMIUM, one for one) to keep the even int/stamina identity it was
+  // authored with. The armor follows the epic set's per-ilvl line (leather gloves 110 at
+  // ilvl 26). Jewelry for two of the three because it is class-agnostic and, in the
+  // classic era, nearly absent before level twenty: a level-ten neck is a real event.
+  //
+  // `requiredLevel: 11` is the classic blue rule (item level minus five) written down
+  // explicitly, because a rare otherwise gates at its SOURCE level (13) and half the zone
+  // would carry the reward around unable to wear it; item_level_req.ts sanctions the
+  // override for exactly this.
+  foremans_wage_band: {
+    id: 'foremans_wage_band',
+    name: "Foreman's Wage Band",
+    kind: 'armor',
+    slot: 'ring',
+    quality: 'rare',
+    stats: { sta: 3, str: 2 },
+    requiredLevel: 11,
+    sellValue: 1150,
+  },
+  mirelight_locket: {
+    id: 'mirelight_locket',
+    name: 'Mirelight Locket',
+    kind: 'armor',
+    slot: 'neck',
+    quality: 'rare',
+    stats: { int: 4, sta: 4 },
+    requiredLevel: 11,
+    sellValue: 1200,
+  },
+  fenwright_grips: {
+    id: 'fenwright_grips',
+    name: 'Fenwright Grips',
+    kind: 'armor',
+    slot: 'gloves',
+    armorType: 'leather',
+    quality: 'rare',
+    stats: { armor: 68, agi: 3, sta: 3 },
+    requiredLevel: 11,
+    sellValue: 1250,
+  },
+
   // --- quest items ---
+  skerrits_shardpike: {
+    id: 'skerrits_shardpike',
+    name: "Skerrit's Shardpike",
+    kind: 'weapon',
+    slot: 'mainhand',
+    hand: 'twohand',
+    quality: 'rare',
+    // Deliberately worthless as a WEAPON: swinging it is not the point (lance_trial.ts
+    // does fixed damage through its own verb), and a pike with real stats would be a
+    // free rare for every level 6 who talks to Skerrit once.
+    weapon: { min: 1, max: 2, speed: 3.4 },
+    // Explicitly ungated, the override item_level_req.ts sanctions. Rare quality with no
+    // derivable drop source falls back to the rare band (level 12), which silently locked
+    // this out for exactly the players the trial exists for: its quest is minLevel 6, and
+    // the whole point of the fixed-damage thrust is that a level 6 opens the window a
+    // level 20 spends. The colour is flavour, not power; the weapon rolls 1 to 2.
+    requiredLevel: 1,
+    questTool: true,
+    sellValue: 0,
+    noVendorSell: true,
+    noMarketList: true,
+    noDiscard: true,
+    questId: 'q_socketwrights_due',
+  },
   fen_muster_order: {
     id: 'fen_muster_order',
     name: 'Fenbridge Muster Order',

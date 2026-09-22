@@ -329,6 +329,12 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };
   }
+  // A slumbering world boss in bed (src/sim/mob/slumber.ts): a value-zero buff_dr whose
+  // whole job is to tell the raid he is asleep, so it must never fall through to the
+  // generic "reduces damage by 0%" line.
+  if (a.id === 'slumber' && a.kind === 'buff_dr') {
+    return { key: `${KEY}.slumber`, nums: {} };
+  }
   if (a.id === 'heating_up' && a.kind === 'internal_cd') {
     return { key: `${KEY}.heatingUp`, nums: {} };
   }
