@@ -171,6 +171,7 @@ export class CosmeticsWindow {
         skins: t('hudChrome.cosmetics.tabSkins'),
         mech: t('hudChrome.cosmetics.tabMech'),
         founders: t('hudChrome.cosmetics.tabFounders'),
+        raid: t('hudChrome.cosmetics.tabRaid'),
       },
       t('hudChrome.cosmetics.tabsLabel'),
     );

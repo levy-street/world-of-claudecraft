@@ -9,11 +9,11 @@
 // already-patched clone is a no-op.
 //
 // PBR (MeshStandardMaterial) only, matching addRimGlow's own gate: the
-// Lambert tier has no per-fragment view vector worth paying for. On that
-// tier the character keeps its normal colors and the surrounding glow halo
-// (golden_aura.ts) is the only cue, which is fine: this is a rare account
-// cosmetic, never a gameplay signal, so a lower-tier presentation gap is
-// purely a fidelity tradeoff, not a fairness one.
+// Lambert tier has no per-fragment view vector worth paying for, so that
+// tier keeps the character's normal colors with no rim at all, which is
+// fine: this is a rare account cosmetic, never a gameplay signal, so a
+// lower-tier presentation gap is purely a fidelity tradeoff, not a fairness
+// one.
 import * as THREE from 'three';
 
 const GOLDEN_AURA_RIM_MARKER = 'WOC_GOLDEN_AURA_RIM';
@@ -22,10 +22,16 @@ const LIGHTS_BEGIN_ANCHOR = '#include <lights_fragment_begin>';
 
 export const GOLDEN_AURA_RIM_COLOR = new THREE.Color(0xffc830);
 
-/** Adds the character's OUTLINE, not a whole-body recolor. Deliberately a
- *  wider, stronger fresnel than the ambient character rim (power 1.6 instead
- *  of 3.0, roughly 5x the strength): the ambient rim is a subtle silhouette
- *  separator, while this is a deliberate cosmetic meant to read at a glance. */
+/** Adds the character's OUTLINE, not a whole-body recolor. A thin silhouette
+ *  line (power 2.6, still much tighter than the old 1.6 wide band) whose
+ *  strength is picked to just clear the post pipeline's bloom threshold at
+ *  the sharpest grazing angles (post.ts BLOOM_THRESHOLD, see EMISSIVE_GLOW in
+ *  gfx.ts): that lets the brightest edge bleed a little OUTWARD past the
+ *  actual mesh silhouette in screen space, rather than thickening inward
+ *  across the surface, which a fresnel term alone cannot do (it only reads
+ *  the existing geometry's normals, never displaces it). Front-facing
+ *  surfaces stay untouched either way, since the fresnel term is already
+ *  near zero there regardless of strength. */
 function patchGoldenAuraFragmentShader(source: string): string {
   if (source.includes(GOLDEN_AURA_RIM_MARKER)) return source;
   if (!source.includes(COMMON_ANCHOR) || !source.includes(LIGHTS_BEGIN_ANCHOR)) {
@@ -41,8 +47,8 @@ function patchGoldenAuraFragmentShader(source: string): string {
     .replace(
       LIGHTS_BEGIN_ANCHOR,
       `${LIGHTS_BEGIN_ANCHOR}
-      totalEmissiveRadiance += uGoldenAuraColor * 0.65 *
-        pow(1.0 - saturate(dot(normal, geometryViewDir)), 1.6);`,
+      totalEmissiveRadiance += uGoldenAuraColor * 1.3 *
+        pow(1.0 - saturate(dot(normal, geometryViewDir)), 2.6);`,
     );
 }
 

@@ -87,6 +87,20 @@ export const WEAPON_GRIP_OVERRIDES: Record<string, WeaponGripOverride> = {
     scale: 1.65,
   },
   ice_fang: { scale: 1.25 },
+  // Heart of the End Greatblade: the raw model leans ~40 degrees off vertical with its origin at
+  // the pommel end. rot points the blade straight along the wearer's facing in the idle
+  // pose (measured in game against the hand bone), and pos seats the middle of the
+  // cylindrical handle in the palm. Measured against the loaded (optimized) geometry, whose
+  // units are about twice the raw file's. The grip parameter is -0.26 along the blade axis from
+  // the centroid: the palm renders about 0.19 behind the bone, so this lands mid-tube in game.
+  heart_of_the_end_greatblade: {
+    pos: [-0.0256, 0.9381, -0.2578],
+    rot: [51.07, 6.59, 21.23],
+    scale: 1,
+  },
+  // Nythraxis raid scepter: an upright, pommel-origin model. Shrunk, and pos drops the
+  // origin so the palm sits mid-tube on the handle (loaded geometry spans y -1..1, tube -1..-0.2).
+  scepter_of_the_deathless_court: { scale: 0.75, pos: [0, 0.23, 0] },
   // The three non-KayKit rogue daggers below all have their mesh ORIGIN at the
   // blade center (native height ~1.28, 0.64 node scale), so the family grip
   // seats the hand mid-blade. Raise each along the grip axis (+Y) so the handle

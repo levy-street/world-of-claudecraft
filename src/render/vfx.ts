@@ -2110,6 +2110,87 @@ export class Vfx {
     }
   }
 
+  /** Founder's Pack Golden Aura keepsake (continuous, called per frame while
+   *  worn, src/render/characters/visual.ts setGoldenAura): a fire-style
+   *  column of gold embers rising off the body, a scatter of tiny blue spark
+   *  motes clinging to the silhouette, and the odd crackling white-gold
+   *  electric arc. Paired with golden_aura_rim.ts's static silhouette glow,
+   *  kept deliberately faint so this particle layer stays the main read. */
+  goldenAuraFx(entityId: number, dt: number): void {
+    const at = this.anchor(entityId, 0.32);
+    if (!at) return;
+    const emberN = this.emitCount(60, dt);
+    for (let k = 0; k < emberN; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.32 + Math.random() * 0.35;
+      const flame = Math.random() < 0.6;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 0.3,
+        at.z + Math.cos(a) * r,
+        Math.sin(a) * 0.18,
+        1.1 + Math.random() * 0.9,
+        Math.cos(a) * 0.18,
+        flame ? 0xffa020 : 0xffe89a,
+        flame ? 0.4 : 0.2,
+        0.5 + Math.random() * 0.35,
+        -0.2,
+        flame ? SPR.flame : SPR.sparkBurst,
+      );
+    }
+    // Small bluish spark motes scattered across the whole body: a cool accent
+    // riding alongside the warm fire/gold, tiny and nearly stationary so they
+    // read as clinging to the silhouette rather than a second particle system.
+    const sparkN = this.emitCount(55, dt);
+    for (let k = 0; k < sparkN; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.22 + Math.random() * 0.48;
+      this.spawn(
+        at.x + Math.sin(a) * r,
+        at.y + Math.random() * 1.85,
+        at.z + Math.cos(a) * r,
+        (Math.random() - 0.5) * 0.15,
+        0.15 + Math.random() * 0.25,
+        (Math.random() - 0.5) * 0.15,
+        0x8fd6ff,
+        0.08 + Math.random() * 0.05,
+        0.3 + Math.random() * 0.25,
+        0,
+        SPR.sparkle,
+      );
+    }
+    // Crackling electric arc: rare, a short jagged trail of pale gold-white
+    // sparks (same zig-zag idea as the lightning projectile's flying head).
+    if (this.emitChance(2.2, dt)) {
+      const a = Math.random() * Math.PI * 2;
+      const r = 0.3 + Math.random() * 0.4;
+      const ax = at.x + Math.sin(a) * r;
+      const ay = at.y + Math.random() * 1.2;
+      const az = at.z + Math.cos(a) * r;
+      let lx = 0;
+      let ly = 0;
+      let lz = 0;
+      for (let s = 0; s < 4; s++) {
+        lx += (Math.random() - 0.5) * 0.22;
+        ly += (Math.random() - 0.5) * 0.18;
+        lz += (Math.random() - 0.5) * 0.22;
+        this.spawn(
+          ax + lx,
+          ay + ly,
+          az + lz,
+          0,
+          0,
+          0,
+          0xfff6d8,
+          s === 0 ? 0.24 : 0.14,
+          0.14,
+          0,
+          SPR.sparkle,
+        );
+      }
+    }
+  }
+
   /** Mossy slime path a gliding snail mount leaves while moving: near-still
    *  ground-level motes that linger, so the ride draws a fading trail. */
   mountSlimeTrail(at: THREE.Vector3, dt: number): void {

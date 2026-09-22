@@ -1176,6 +1176,8 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
 export const AUTHORED_HELD_MODELS: ReadonlySet<string> = new Set([
   'hammer_varkhul', // Varkhul Forgebreaker (Ignivar raid legendary)
   'varkhul_emberward', // Varkhul Emberward (Ignivar raid legendary)
+  'heart_of_the_end_greatblade', // Tripo-painted atlas; the kit polish washed it out white
+  'scepter_of_the_deathless_court', // same: Tripo-painted atlas
 ]);
 
 /** True when a held-prop GLB url resolves to one of AUTHORED_HELD_MODELS. */
@@ -1483,6 +1485,23 @@ function fullBodySkinDef(url: string): VisualDef {
     clips: kaykit(['1H_Melee_Attack_Chop']),
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
+    // Full-body skins are baked Tripo atlases: fully diffuse (no sheen), no env reflections.
+    matte: true,
+    envMapIntensity: 0,
+    lazyPreload: true,
+  });
+}
+
+function crucibleSkinDef(url: string): VisualDef {
+  return swims({
+    url,
+    height: HUMANOID_H,
+    clips: { ...kaykit(['1H_Melee_Attack_Chop']), hit: ['Hit_A'] },
+    attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
+    weaponSlots: [0],
+    // Full-body skins are baked Tripo atlases: fully diffuse (no sheen), no env reflections.
+    matte: true,
+    envMapIntensity: 0,
     lazyPreload: true,
   });
 }
@@ -2066,8 +2085,26 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: { ...kaykit(['1H_Melee_Attack_Chop']), hit: ['Hit_A'] },
     attach: [{ url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' }],
     weaponSlots: [0],
+    // Full-body skins are baked Tripo atlases: fully diffuse (no sheen), no env reflections.
+    matte: true,
+    envMapIntensity: 0,
     lazyPreload: true,
   }),
+
+  // The Inner Crucible raid-reward bodies (sim/content/crucible_skins.ts).
+  // Same Rig_Medium skeleton and clip library as the founder skins, minus
+  // Hit_B_Stagger (tests/character_clipmaps.test.ts), so the hit list is
+  // narrowed to the one variant every one of these ships. Draco-decoded: the
+  // project's GLTFLoader has no DracoLoader, so a compressed mesh never loads.
+  player_ashen_dawn: crucibleSkinDef(`${PLAYERS}/Crucible/AshenDawn_paladin.glb`),
+  player_basalt_maw: crucibleSkinDef(`${PLAYERS}/Crucible/BasaltMaw_Shaman.glb`),
+  player_brimstone_pact: crucibleSkinDef(`${PLAYERS}/Crucible/BrimstonePact_warlock.glb`),
+  player_cinder_thorn: crucibleSkinDef(`${PLAYERS}/Crucible/CinderThorn_rogue.glb`),
+  player_craterstalker: crucibleSkinDef(`${PLAYERS}/Crucible/Craterstalker_hunter.glb`),
+  player_emberbark: crucibleSkinDef(`${PLAYERS}/Crucible/Emberbark_druid.glb`),
+  player_emberstone: crucibleSkinDef(`${PLAYERS}/Crucible/Emberstone_mage.glb`),
+  player_ember_vestal: crucibleSkinDef(`${PLAYERS}/Crucible/EmberVestal_priest.glb`),
+  player_magmaraith: crucibleSkinDef(`${PLAYERS}/Crucible/Magmaraith_warrior.glb`),
 
   // -- forms ---------------------------------------------------------------
   form_sheep: {
@@ -4219,6 +4256,15 @@ export const FULL_BODY_SKIN_VISUAL_KEYS: Partial<Record<SkinCatalog, string>> = 
   plaguebringer: 'player_plaguebringer',
   shinobi: 'player_shinobi',
   spiritwolf: 'player_spiritwolf',
+  ashen_dawn: 'player_ashen_dawn',
+  basalt_maw: 'player_basalt_maw',
+  brimstone_pact: 'player_brimstone_pact',
+  cinder_thorn: 'player_cinder_thorn',
+  craterstalker: 'player_craterstalker',
+  emberbark: 'player_emberbark',
+  emberstone: 'player_emberstone',
+  ember_vestal: 'player_ember_vestal',
+  magmaraith: 'player_magmaraith',
 };
 
 /** The set of `FULL_BODY_SKIN_VISUAL_KEYS` values, for a cheap "is this

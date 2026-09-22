@@ -201,6 +201,7 @@ import {
 } from './content/weapon_skin_rules';
 import { WEAPON_SKINS } from './content/weapon_skins';
 import { type AbilityChargeState, applyCooldowns, serializeCooldowns } from './cooldown_persist';
+import { claimCrucibleSkinOffline } from './crucible_skin_claim';
 import { dailyRewardsStub } from './daily_rewards_stub';
 import type { DelveShopGate, DelveShopOffer } from './data';
 import {
@@ -4342,6 +4343,17 @@ export class Sim {
 
   claimFounderSkin(_catalog: string): void {
     this.error(this.primaryId, "The Founder Salesman's packs require an online account.");
+  }
+
+  /** Inner Crucible raid-reward skin; rules in src/sim/crucible_skin_claim.ts. */
+  claimCrucibleSkin(catalog: string): void {
+    const next = claimCrucibleSkinOffline(
+      this.ctx,
+      this.players.get(this.primaryId),
+      this.accountCosmetics,
+      catalog,
+    );
+    if (next) this.accountCosmetics = next;
   }
 
   /** Per-pid mount toggle (the server command path); the IWorld members below

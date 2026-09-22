@@ -366,7 +366,6 @@ import {
 } from './gfx';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
-import { buildGoldenAura, type GoldenAuraView } from './golden_aura';
 import { createGpuPrepAdmission } from './gpu_prep_admission';
 import { createGpuPrepBudget } from './gpu_prep_budget_core';
 import { gpuPrepEventsSnapshot } from './gpu_prep_events';
@@ -1630,7 +1629,6 @@ export class Renderer {
   private islandGuidance!: IslandGuidance;
   private nightAccents: NightAccentsView | null = null;
   private mobNightGlow: MobNightGlowView | null = null;
-  private goldenAura: GoldenAuraView | null = null;
   // Contact blobs under nearby bodies, built ONLY on the tiers that cast no
   // dynamic shadow (null everywhere else), plus the one scratch slot the
   // entity loop refills per character.
@@ -2668,9 +2666,6 @@ export class Renderer {
     this.mobNightGlow = buildMobNightGlow();
     setRenderCategory(this.mobNightGlow.group, 'ui3d');
     this.scene.add(this.mobNightGlow.group);
-    this.goldenAura = buildGoldenAura();
-    setRenderCategory(this.goldenAura.group, 'ui3d');
-    this.scene.add(this.goldenAura.group);
     // Contact-blob grounding, and ONLY where the real shadow pass is off: on
     // those tiers a body has no contact cue whatsoever and reads as floating.
     // The tier is fixed for this renderer's lifetime (a graphics change tears
@@ -11314,6 +11309,7 @@ export class Renderer {
           this.vfx.castSparkle(e.id, 'shadow', dt * 3.2);
         }
         if (veilboundState !== 'none') this.vfx.castSparkle(e.id, 'holy', dt * 2.4);
+        if (!e.dead && e.goldenAuraActive) this.vfx.goldenAuraFx(e.id, dt);
         if (!e.dead && (ferocityStage > 0 || petFrenzy)) {
           this.vfx.castSparkle(
             e.id,
@@ -11397,7 +11393,6 @@ export class Renderer {
       p.pos.z,
       hasNightLightField() ? 0 : bodyGlow,
     );
-    this.goldenAura?.emit(this.views, sim.entities);
     this.nightBodyLightCount =
       hasNightLightField() && bodyGlow > 0.001
         ? collectBodyNightLights(this.views, sim.entities, p.pos.x, p.pos.z, this.nightBodyLights)

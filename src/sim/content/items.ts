@@ -522,7 +522,7 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // proving the claim, same GLB-less/junk-kind treatment as the reins
   // souvenirs above. Using it toggles PlayerMeta.goldenAuraActive (see
   // Entity.goldenAuraActive doc), which the renderer reads to draw a golden
-  // outline and glow halo (src/render/golden_aura.ts). Never consumed.
+  // silhouette rim (src/render/golden_aura_rim.ts). Never consumed.
   founder_golden_aura: {
     id: 'founder_golden_aura',
     name: 'Golden Aura',
@@ -533,6 +533,109 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noVendorSell: true,
     sellValue: 0,
     use: { type: 'toggleGoldenAura' },
+  },
+  // The Inner Crucible raid-reward skins (sim/content/crucible_skins.ts): each
+  // is a collection-log marker only, never held or mailed. Claiming the skin
+  // writes it into the account's first-find record (markItemDiscovered) so
+  // the Reliquary "Armor Cosmetics" page shows it obtained.
+  crucible_skin_magmaraith: {
+    id: 'crucible_skin_magmaraith',
+    name: 'Magmaraith',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_ashen_dawn: {
+    id: 'crucible_skin_ashen_dawn',
+    name: 'Ashen Dawn',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_craterstalker: {
+    id: 'crucible_skin_craterstalker',
+    name: 'Craterstalker',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_cinder_thorn: {
+    id: 'crucible_skin_cinder_thorn',
+    name: 'Cinder Thorn',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_ember_vestal: {
+    id: 'crucible_skin_ember_vestal',
+    name: 'Ember Vestal',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_basalt_maw: {
+    id: 'crucible_skin_basalt_maw',
+    name: 'Basalt Maw',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_emberstone: {
+    id: 'crucible_skin_emberstone',
+    name: 'Emberstone',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_brimstone_pact: {
+    id: 'crucible_skin_brimstone_pact',
+    name: 'Brimstone Pact',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
+  },
+  crucible_skin_emberbark: {
+    id: 'crucible_skin_emberbark',
+    name: 'Emberbark',
+    kind: 'junk',
+    stackSize: 1,
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    noVendorSell: true,
+    sellValue: 0,
   },
   // Legacy cosmetic reins; the spaceship is now a mount skin.
   reins_goblin_rocket_sled: {

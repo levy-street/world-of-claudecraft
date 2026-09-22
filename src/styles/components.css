@@ -10642,8 +10642,12 @@
     border: 1px solid var(--color-border-default);
     background: color-mix(in srgb, var(--color-white) 5%, transparent);
   }
-  .cos-founder-skin .portrait-chip {
+  .cos-founder-skin .portrait-chip,
+  .cos-raid-skin .portrait-chip {
     align-self: center;
+  }
+  .cos-raid-skin.locked .portrait-ring {
+    filter: grayscale(1) brightness(0.35);
   }
   .cos-card-actions {
     display: flex;
@@ -11165,6 +11169,75 @@
     margin: 0;
     font-size: 12px;
     line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+  /* Armor Cosmetics claim panel (reliquary_armor_panel.ts): the unlock text,
+     the class's Crucible set pieces (dark until obtained), and the reward
+     skin box with its Claim button. */
+  .reliquary-armor-panel {
+    display: grid;
+    gap: var(--space-2, 8px);
+    margin: var(--space-2, 8px) 0;
+  }
+  .reliquary-armor-panel h4 {
+    margin: 0 0 4px;
+    font-size: 12px;
+    color: var(--color-primary);
+  }
+  .reliquary-armor-how p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+  .reliquary-armor-set {
+    margin-bottom: 6px;
+  }
+  .reliquary-armor-set-name {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-bottom: 3px;
+  }
+  .reliquary-armor-pieces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .reliquary-armor-piece {
+    position: relative;
+    display: inline-flex;
+  }
+  .reliquary-armor-piece.is-missing {
+    filter: grayscale(1) brightness(0.35);
+  }
+  .reliquary-armor-check {
+    position: absolute;
+    right: 1px;
+    bottom: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-shadow: 0 0 2px #000;
+  }
+  .reliquary-armor-reward-box {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid var(--color-primary-dim);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--color-white) 5%, transparent);
+  }
+  .reliquary-armor-reward--locked .portrait-ring {
+    filter: grayscale(1) brightness(0.35);
+  }
+  .reliquary-armor-reward-name {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .reliquary-armor-claim-hint {
+    font-size: 11px;
     color: var(--color-text-muted);
   }
   /* The population line under the blurb (the .deed-rarity sibling): a muted

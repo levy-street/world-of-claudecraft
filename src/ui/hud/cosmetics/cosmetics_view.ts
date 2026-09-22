@@ -11,6 +11,7 @@
 // body, and account state for the weapon-skin loadout. Each card model says
 // which, so the badge is never inferred in markup.
 
+import { CRUCIBLE_SKIN_CATALOG } from '../../../sim/content/crucible_skins';
 import { FOUNDER_SKIN_CATALOG } from '../../../sim/content/founder_pack';
 import { MOUNT_SKIN_IDS, MOUNT_SKINS, type MountSkinId } from '../../../sim/content/mount_skins';
 import type { MountRarity } from '../../../sim/content/mounts';
@@ -25,9 +26,15 @@ import type { PlayerClass, SkinCatalog, SkinRank, WeaponSkinType } from '../../.
 import { type TabStripModel, tabStripModel } from '../../tab_strip_view';
 
 /** Closed on purpose: a future tab (buddies) is a deliberate addition here. */
-export type CosmeticsTab = 'mounts' | 'skins' | 'mech' | 'founders';
+export type CosmeticsTab = 'mounts' | 'skins' | 'mech' | 'founders' | 'raid';
 
-export const COSMETICS_TABS: readonly CosmeticsTab[] = ['mounts', 'skins', 'mech', 'founders'];
+export const COSMETICS_TABS: readonly CosmeticsTab[] = [
+  'mounts',
+  'skins',
+  'mech',
+  'founders',
+  'raid',
+];
 
 export function isCosmeticsTab(value: string): value is CosmeticsTab {
   return (COSMETICS_TABS as readonly string[]).includes(value);
@@ -105,6 +112,22 @@ export interface FounderSkinCard {
   classMatches: boolean;
   worn: boolean;
   /** null: owned but the wrong class for this character (no action fires). */
+  action: 'wear' | 'takeOff' | null;
+  ownershipScope: CosmeticsScope;
+  wornScope: CosmeticsScope;
+}
+
+/** One Inner Crucible raid-reward skin (sim/content/crucible_skins.ts). Unlike
+ *  the Founders tab every skin is listed, owned or not, so the tab doubles as
+ *  the catalog of what the raid can unlock; an unowned one is dark. */
+export interface RaidSkinCard {
+  catalog: SkinCatalog;
+  requiredClass: PlayerClass;
+  owned: boolean;
+  /** False when the acting character is the wrong class for this skin. */
+  classMatches: boolean;
+  worn: boolean;
+  /** null: not owned, or owned but the wrong class (no action fires). */
   action: 'wear' | 'takeOff' | null;
   ownershipScope: CosmeticsScope;
   wornScope: CosmeticsScope;
@@ -198,6 +221,26 @@ export function founderSkinCards(s: CosmeticsSnapshot): FounderSkinCard[] {
     });
   }
   return cards;
+}
+
+/** The nine Inner Crucible raid-reward skins in catalog order. Ownership rides
+ *  the same account-wide full-body-skin list the Founder Pack uses. */
+export function raidSkinCards(s: CosmeticsSnapshot): RaidSkinCard[] {
+  return CRUCIBLE_SKIN_CATALOG.map((def) => {
+    const owned = s.founderSkinIds.includes(def.catalog);
+    const classMatches = def.requiredClass === s.playerClass;
+    const worn = owned && s.wornMech.catalog === def.catalog;
+    return {
+      catalog: def.catalog,
+      requiredClass: def.requiredClass,
+      owned,
+      classMatches,
+      worn,
+      action: !owned || !classMatches ? null : worn ? 'takeOff' : 'wear',
+      ownershipScope: 'account',
+      wornScope: 'character',
+    };
+  });
 }
 
 /** The WAI-ARIA tab strip for the window (labels already localized by the caller). */

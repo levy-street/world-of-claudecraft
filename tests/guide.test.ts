@@ -1037,13 +1037,14 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      ['horizons_armor_cosmetics', 'personal'],
     ]);
     // ...and the rendered catalog SHOWS the label: the tag beside the page
     // heading and the explanatory note, one pair per flagged page, resolved
     // through t() (never hardcoded English), with none on ordinary pages.
     const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(3);
-    expect(html.match(/guide-reliquary-note/g)?.length).toBe(3);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(4);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(4);
     expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
     expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
     expect(html).toContain(t('guide.reliquaryPage.retiredNote'));

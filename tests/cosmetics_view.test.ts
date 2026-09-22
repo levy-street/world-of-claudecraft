@@ -30,14 +30,14 @@ const snap = (over: Partial<CosmeticsSnapshot> = {}): CosmeticsSnapshot => ({
 });
 
 describe('cosmetics tabs', () => {
-  it('is the closed four-tab set with a WAI-ARIA strip', () => {
-    expect(COSMETICS_TABS).toEqual(['mounts', 'skins', 'mech', 'founders']);
+  it('is the closed five-tab set with a WAI-ARIA strip', () => {
+    expect(COSMETICS_TABS).toEqual(['mounts', 'skins', 'mech', 'founders', 'raid']);
     expect(isCosmeticsTab('mech')).toBe(true);
     expect(isCosmeticsTab('founders')).toBe(true);
     expect(isCosmeticsTab('buddies')).toBe(false);
     const strip = cosmeticsTabStrip(
       'skins',
-      { mounts: 'M', skins: 'S', mech: 'X', founders: 'F' },
+      { mounts: 'M', skins: 'S', mech: 'X', founders: 'F', raid: 'R' },
       'Sections',
     );
     expect(strip.tabs.map((t) => [t.id, t.label, t.selected])).toEqual([
@@ -45,6 +45,7 @@ describe('cosmetics tabs', () => {
       ['skins', 'S', true],
       ['mech', 'X', false],
       ['founders', 'F', false],
+      ['raid', 'R', false],
     ]);
     expect(strip.panelId).toBe('cosmetics-panel');
     expect(strip.tabClass).toBe('cos-tab');

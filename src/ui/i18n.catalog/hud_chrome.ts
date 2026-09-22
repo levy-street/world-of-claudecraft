@@ -7903,6 +7903,21 @@ export const hudChromeStrings = {
     // vendor, or quest in between.
     sourceActivityCorpseHarvest: 'Recovered while harvesting creature corpses',
     sourceActivityMasterworkCraft: 'Earned by crafting a masterwork',
+    sourceActivityCrucibleSetClaim:
+      'Claimed after completing a full Inner Crucible set for your class',
+    // The Armor Cosmetics page's claim panel (reliquary_armor_panel.ts).
+    armorHowTitle: 'How to unlock',
+    armorHow:
+      'Complete any full five-piece Inner Crucible tier set for your class (the sets sold by the Crucible Quartermaster for raid sigils). Then press Claim to unlock your class armor skin. Wear it from the Cosmetics window, Raid Cosmetics tab.',
+    armorSetsTitle: 'Your class sets',
+    armorSetProgress: '{name}: {owned} of {total} pieces',
+    armorRewardTitle: 'Reward skin',
+    armorClaim: 'Claim',
+    armorClaimed: 'Claimed',
+    armorClaimLocked: 'Complete a full set to claim',
+    armorClaimAria: 'Claim the {name} armor skin',
+    armorClaimedAria: '{name} armor skin claimed',
+    armorNoClass: 'No armor skin is available for this class.',
     // The Riftbound bands: minted per participant for the party that wins a
     // ranked rift's first-clear race (addRiftProgressionLoot), any rank. The
     // English names the RACE, not a personal milestone: a party that clears a

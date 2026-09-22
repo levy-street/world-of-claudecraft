@@ -928,7 +928,18 @@ export type SkinCatalog =
   | 'dawnbreaker'
   | 'plaguebringer'
   | 'shinobi'
-  | 'spiritwolf';
+  | 'spiritwolf'
+  // The Inner Crucible raid-reward set (sim/content/crucible_skins.ts): one
+  // per class, unlocked by completing a full Crucible tier set of that class.
+  | 'ashen_dawn'
+  | 'basalt_maw'
+  | 'brimstone_pact'
+  | 'cinder_thorn'
+  | 'craterstalker'
+  | 'emberbark'
+  | 'emberstone'
+  | 'ember_vestal'
+  | 'magmaraith';
 
 /** Every full-body skin catalog id (excludes 'class' and 'mech', which have
  *  their own dedicated handling: class atlases and mech chroma respectively). */
@@ -942,6 +953,15 @@ export const FULL_BODY_SKIN_CATALOGS: readonly SkinCatalog[] = [
   'plaguebringer',
   'shinobi',
   'spiritwolf',
+  'ashen_dawn',
+  'basalt_maw',
+  'brimstone_pact',
+  'cinder_thorn',
+  'craterstalker',
+  'emberbark',
+  'emberstone',
+  'ember_vestal',
+  'magmaraith',
 ] as const;
 
 const ALL_SKIN_CATALOGS: readonly SkinCatalog[] = [
@@ -5675,7 +5695,7 @@ export interface Entity extends ClientMirroredEntityFields {
   // Golden Aura cosmetic toggle (players only; false otherwise): the Founder's
   // Pack Epic-tier keepsake item (founder_golden_aura) flips this on use.
   // Render-only: draws a golden outline plus a glow halo around the character
-  // (src/render/golden_aura.ts). The sim never reads it for gameplay. Set by
+  // (src/render/golden_aura_rim.ts). The sim never reads it for gameplay. Set by
   // Sim.useItem's toggleGoldenAura arm and synced in identity fields (terse `gau`).
   goldenAuraActive: boolean;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of

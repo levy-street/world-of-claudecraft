@@ -375,9 +375,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // set page (the eighth epic armor family).
     expect(CONQUEROR_PAGES.length).toBe(32);
     expect(PROFESSION_PAGES.length).toBe(5);
-    expect(HORIZON_PAGES.length).toBe(5);
+    expect(HORIZON_PAGES.length).toBe(6);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(42);
+    expect(RELIQUARY_PAGES.length).toBe(43);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -389,6 +389,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       'horizons_titles',
       'horizons_vault_of_ages',
       'horizons_riftbound',
+      'horizons_armor_cosmetics',
     ]);
   });
 
@@ -539,11 +540,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Salesman, Eastbrook) adds 3 horizons_mounts slots (cinderjaw_rex,
     // ancient_devourer, shiba_inu) and 3 horizons_titles slots
     // (feat_founder_emberborn, feat_founder_starforged,
-    // feat_founder_worldshaper): 489.
+    // feat_founder_worldshaper): 489. The Armor Cosmetics page (the nine Inner
+    // Crucible raid-reward skin markers) adds nine more: 498.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(489);
+    ).toBe(498);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -772,7 +774,7 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
     // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
     // completion pair note above.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(333);
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(342);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1277,6 +1279,7 @@ describe('Reliquary outside-completion pages (the flagged set)', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      ['horizons_armor_cosmetics', 'personal'],
     ]);
     // Both reasons are live, so neither arm of the reason-driven chrome
     // (window chip, styles) is pinned against an empty set. Sorting keeps
@@ -2426,6 +2429,7 @@ describe('Reliquary Horizons shelf (Phase 8)', () => {
     ).toEqual([
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
+      ['horizons_armor_cosmetics', 'personal'],
     ]);
   });
 
@@ -3063,6 +3067,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   conquerors_the_rift: 29,
   // The one first-clear activity door, on all three bands (Phase 21).
   horizons_riftbound: 1,
+  horizons_armor_cosmetics: 1,
   // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
   // hollow, drakelands).
   conquerors_rares_of_the_realm: 24,
@@ -3695,6 +3700,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'masterwork_craft',
       'rift_first_clear',
       'founder_pack_claim',
+      'crucible_set_claim',
     ]);
   });
 
@@ -4583,7 +4589,7 @@ describe('Reliquary source hint coverage', () => {
     // on the skins page, the four Crucible raid pages, and Forgebreaker's
     // one Weaponcrafting door); update
     // deliberately with the authoring.
-    expect(defaults).toBe(15);
+    expect(defaults).toBe(16);
   });
 });
 

@@ -110,7 +110,7 @@ describe('CosmeticsWindow', () => {
     const { w, el } = makeWindow(world);
     w.toggle();
     expect(w.isOpen).toBe(true);
-    expect(el.querySelectorAll('.cos-tab')).toHaveLength(4);
+    expect(el.querySelectorAll('.cos-tab')).toHaveLength(5);
     expect(el.querySelector('.cos-tab.on')?.getAttribute('data-tab')).toBe('mounts');
     expect(card(el, 'mech_bird')).toBeTruthy();
     expect(card(el, 'chimeglass_tortoise')).toBeTruthy();

@@ -4044,6 +4044,9 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimFounderSkin(catalog: string): void {
     this.cmd({ cmd: 'claim_founder_skin', catalog });
   }
+  claimCrucibleSkin(catalog: string): void {
+    this.cmd({ cmd: 'claim_crucible_skin', catalog });
+  }
   // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
   // item use, not a mount command, so nothing here sends one. The toggle stays
   // authoritative because the server's combat gate can refuse it, and the active

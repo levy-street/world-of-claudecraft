@@ -7937,6 +7937,50 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
         "name": "Forgebreaker, Engine of Varkhul"
       }
     ]
+  },
+  {
+    "id": "horizons_armor_cosmetics",
+    "shelf": "horizons",
+    "name": "Armor Cosmetics",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Magmaraith"
+      },
+      {
+        "kind": "item",
+        "name": "Ashen Dawn"
+      },
+      {
+        "kind": "item",
+        "name": "Craterstalker"
+      },
+      {
+        "kind": "item",
+        "name": "Cinder Thorn"
+      },
+      {
+        "kind": "item",
+        "name": "Ember Vestal"
+      },
+      {
+        "kind": "item",
+        "name": "Basalt Maw"
+      },
+      {
+        "kind": "item",
+        "name": "Emberstone"
+      },
+      {
+        "kind": "item",
+        "name": "Brimstone Pact"
+      },
+      {
+        "kind": "item",
+        "name": "Emberbark"
+      }
+    ]
   }
 ];
 

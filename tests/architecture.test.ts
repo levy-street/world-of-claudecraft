@@ -564,6 +564,7 @@ const UI_PURE_CORES = [
   'src/ui/deed_heraldry_plaque_core.ts',
   'src/ui/deeds_view.ts',
   'src/ui/reliquary_cell_art.ts',
+  'src/ui/reliquary_armor_view.ts',
   'src/ui/reliquary_view.ts',
   'src/ui/reliquary_sheet_view.ts',
   'src/ui/character_progression_view.ts',

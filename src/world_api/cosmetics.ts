@@ -70,4 +70,9 @@ export interface IWorldCosmetics {
   // reason as claimFounderPack (the claim is gated on having claimed a tier
   // for real, which only the server's persisted account state can answer).
   claimFounderSkin(catalog: string): void;
+  // Claim the Inner Crucible raid-reward skin for `catalog` (sim/content/
+  // crucible_skins.ts): allowed once the acting character's class has
+  // completed a full Crucible tier set (crucibleClaimVerdict, the same rule on
+  // the server and the offline Sim). Grants the account-wide entitlement.
+  claimCrucibleSkin(catalog: string): void;
 }

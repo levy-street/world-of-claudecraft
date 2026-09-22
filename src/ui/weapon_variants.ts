@@ -110,7 +110,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   corpse_candle_focus: 'wand_a',
   nhalias_litany_rod: 'wand_b',
   stormcallers_focus: 'wand_b', // EPIC: Nythraxis raid caster focus
-  scepter_of_the_deathless_court: 'adv_wand', // EPIC: Nythraxis raid scepter
+  scepter_of_the_deathless_court: 'scepter_of_the_deathless_court', // EPIC: Nythraxis raid scepter
 
   // ---- maces (only 4 hammer models for ~9 maces) -----------------------------
   training_mace: 'hammer_a',
@@ -167,7 +167,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   cinderfang_kris: 'adv_dagger',
   slagrender_cleaver: 'adv_axe_1handed',
   anvilguard_blade: 'adv_sword_1handed',
-  heart_of_the_end_greatblade: 'adv_sword_2handed_color',
+  heart_of_the_end_greatblade: 'heart_of_the_end_greatblade',
   staff_of_the_last_spring: 'adv_staff',
   forgefire_spire: 'adv_staff',
   wand_of_quenched_sparks: 'adv_wand',

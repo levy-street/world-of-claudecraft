@@ -196,6 +196,7 @@ import {
   consumeCosmeticOpToken,
   createCosmeticOpGuard,
 } from './cosmetic_op_guard';
+import { handleClaimCrucibleSkin } from './crucible_skin_claim';
 import { stampCuratorStanding } from './curator_standing';
 import { dailyRewardService } from './daily_rewards';
 import type { AccountChatMuteStatus, AccountCosmetics, RequestMetadata } from './db';
@@ -6957,6 +6958,19 @@ export class GameServer {
         })();
         break;
       }
+      // The Inner Crucible raid-reward skin (server/crucible_skin_claim.ts).
+      case 'claim_crucible_skin':
+        handleClaimCrucibleSkin(
+          {
+            sim,
+            pid,
+            session,
+            cosmetics: this.cosmetics,
+            outcome: (ok) => this.sendCommandOutcome(session, msg, ok),
+          },
+          msg.catalog,
+        );
+        break;
       case 'unequip_mech_chroma': {
         // The rule (take the chroma off THIS character's current look only; the
         // account-wide unlock is permanent) is the sim's, read off the live

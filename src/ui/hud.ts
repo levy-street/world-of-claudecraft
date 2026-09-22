@@ -65,6 +65,7 @@ import {
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
 import { warriorParryChance } from '../sim/combat/warrior_hit_table';
+import { CRUCIBLE_SKIN_CATALOG } from '../sim/content/crucible_skins';
 import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import {
@@ -2163,7 +2164,7 @@ export class Hud {
    *  calling this from more than one window opener is a cheap no-op after
    *  the first. */
   private preloadFounderSkinThumbnails(): void {
-    for (const def of FOUNDER_SKIN_CATALOG) {
+    for (const def of [...FOUNDER_SKIN_CATALOG, ...CRUCIBLE_SKIN_CATALOG]) {
       const visualKey = FULL_BODY_SKIN_VISUAL_KEYS[def.catalog];
       if (visualKey) void this.preloadReplacementBodyAssets(visualKey);
     }

@@ -172,8 +172,8 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // frame; the chat /who stays as it was) and +2 for Market Sweep
 // (`market_sweep_quote`, `market_sweep`, both client-sent and
 // server-dispatched).
-const EXPECTED_SEND_COUNT = 227;
-const EXPECTED_DISPATCH_COUNT = 241;
+const EXPECTED_SEND_COUNT = 228;
+const EXPECTED_DISPATCH_COUNT = 242;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

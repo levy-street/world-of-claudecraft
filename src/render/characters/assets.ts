@@ -27,7 +27,7 @@ import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
 import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
-import { backGripFor } from './back_grips';
+import { backGripFor, backGripOverrideFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
@@ -203,6 +203,8 @@ export const KAYKIT_WEAPON_ACCESSORY: Record<string, string> = {
   whittler_s_knife: 'VAR_DAGGER',
   winterbite: 'VAR_BOW',
   cinderbrand: 'VAR_SWORD',
+  heart_of_the_end_greatblade: 'VAR_SWORD',
+  scepter_of_the_deathless_court: 'VAR_WAND',
   emberbite: 'VAR_AXE',
   smoulderfall: 'VAR_HAMMER',
   ashspark_shiv: 'VAR_DAGGER',
@@ -455,7 +457,10 @@ function attachProp(
   // space; the caller resolved the chest bone) but keep the SCALE the normal
   // grip pass just computed, so variant-pack size clamps carry over.
   if (stowed && isHandslotBone(att.bone)) {
-    const grip = backGripFor(kaykitAccessoryFor(att.url), handSide(att.bone));
+    const side = handSide(att.bone);
+    const grip =
+      backGripOverrideFor(modelBasename(att.url), side) ??
+      backGripFor(kaykitAccessoryFor(att.url), side);
     payload.position.set(...grip.position);
     payload.quaternion.set(...grip.quaternion);
   }

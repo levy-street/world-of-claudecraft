@@ -11,6 +11,7 @@ export const cosmeticsStrings = {
   tabSkins: 'Skins',
   tabMech: 'Mech',
   tabFounders: 'Founders',
+  tabRaid: 'Raid Cosmetics',
   legend: 'Account: shared by every character. Character: this character only.',
   scopeAccount: 'Account',
   scopeCharacter: 'Character',
@@ -35,4 +36,17 @@ export const cosmeticsStrings = {
   foundersIntro:
     "A Founder skin replaces this character's body. It is restricted to the class it was claimed for.",
   foundersEmpty: 'No Founder Pack skins claimed yet. Visit The Founder Salesman in Eastbrook.',
+  raidIntro:
+    'Full-body armor skins from the Inner Crucible raid. Complete any full five-piece Crucible set for your class, then claim its skin in the Reliquary (Armor Cosmetics page). Each skin is restricted to its class.',
+  raidLocked: 'Locked',
+  raidOtherClass: 'Other class',
+  raidName_magmaraith: 'Magmaraith',
+  raidName_ashen_dawn: 'Ashen Dawn',
+  raidName_craterstalker: 'Craterstalker',
+  raidName_cinder_thorn: 'Cinder Thorn',
+  raidName_ember_vestal: 'Ember Vestal',
+  raidName_basalt_maw: 'Basalt Maw',
+  raidName_emberstone: 'Emberstone',
+  raidName_brimstone_pact: 'Brimstone Pact',
+  raidName_emberbark: 'Emberbark',
 };

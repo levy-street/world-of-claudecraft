@@ -25,6 +25,7 @@
 
 import { audio } from '../game/audio';
 import { accountDeedLookup, accountRelicLookup } from '../sim/account_ledger';
+import { crucibleSkinByItemId } from '../sim/content/crucible_skins';
 import { mountDef } from '../sim/content/mounts';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { WEAPON_SKINS } from '../sim/content/weapon_skins';
@@ -48,6 +49,12 @@ import { iconDataUrl } from './icons';
 import { knownItemDef, ownEntry } from './known_item';
 import { ReannounceMarker } from './live_region_reannounce';
 import type { PainterHostPresentation } from './painter_host';
+import {
+  armorPanelHtml,
+  armorSkinChipHtml,
+  preloadArmorSkinThumbnails,
+} from './reliquary_armor_panel';
+import { armorPanelModel } from './reliquary_armor_view';
 import {
   type ReliquaryArtSlot,
   reliquaryCellArt,
@@ -1473,9 +1480,29 @@ export class ReliquaryWindow {
       )}">` +
       `<span class="reliquary-page-progress">${esc(progress)}</span>` +
       this.barHtml(pct, 'reliquary-page-bar') +
-      `</div>${clears}${secondaryClears}${this.filterBarHtml()}${grid}` +
+      `</div>${clears}${secondaryClears}${this.armorPanelFor(page.pageId)}${this.filterBarHtml()}${grid}` +
       `</section>`
     );
+  }
+
+  /** The Armor Cosmetics page's claim panel (how to unlock, the acting
+   *  class's Crucible set progress, the reward skin and its Claim button); empty
+   *  for every other page. */
+  private armorPanelFor(pageId: string): string {
+    if (pageId !== 'horizons_armor_cosmetics') return '';
+    preloadArmorSkinThumbnails();
+    const world = this.deps.world();
+    const ledger = { relics: world.reliquaryAccountFinds, deeds: world.accountDeeds };
+    const has = accountRelicLookup(world.deedStats.itemsDiscovered, ledger, 'item');
+    const model = armorPanelModel({
+      playerClass: world.cfg.playerClass,
+      has: (itemId) => has.has(itemId),
+      ownedSkinIds: world.accountCosmetics.founderSkinIds ?? [],
+    });
+    return armorPanelHtml(model, (itemId) => {
+      const def = knownItemDef(ITEMS, itemId);
+      return def ? this.deps.itemIcon(def) : unknownItemIconHtml(itemId, 'epic');
+    });
   }
 
   /**
@@ -1654,6 +1681,9 @@ export class ReliquaryWindow {
     quality: string,
     art: ReturnType<typeof reliquaryCellArt> = reliquaryCellArt(cell),
   ): string {
+    // An Inner Crucible skin's marker item paints the skin's own portrait.
+    const raidSkin = cell.kind === 'item' ? crucibleSkinByItemId(cell.id) : null;
+    if (raidSkin) return armorSkinChipHtml(raidSkin.catalog, raidSkin.requiredClass);
     if (art !== null) {
       if (art.kind === 'item') {
         // Straight through the shared itemIcon painter, so a relic cell and the
@@ -1914,6 +1944,12 @@ export class ReliquaryWindow {
     search?.addEventListener('compositionend', () => {
       this.composing = false;
       applySearch();
+    });
+    el.querySelector<HTMLElement>('[data-armor-claim]')?.addEventListener('click', (ev) => {
+      const catalog = (ev.currentTarget as HTMLElement).dataset.armorClaim;
+      if (!catalog) return;
+      audio.click();
+      this.deps.world().claimCrucibleSkin(catalog);
     });
     for (const btn of el.querySelectorAll<HTMLElement>('[data-nav]')) {
       btn.addEventListener('click', () => {

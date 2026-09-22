@@ -128,6 +128,8 @@ describe('weapon type classification', () => {
       if (/^hammer/.test(variant)) return 'mace';
       if (/^(adv_)?axe/.test(variant)) return 'axe';
       if (/^(adv_)?wand/.test(variant)) return 'wand';
+      if (variant === 'scepter_of_the_deathless_court') return 'wand';
+      if (variant === 'heart_of_the_end_greatblade') return 'sword';
       if (/^spear|^scythe/.test(variant)) return 'polearm';
       // The Armory bow GLBs double as held-model variants for real bow items
       // (the Crucible longbow is the first); crossbow names must match first.

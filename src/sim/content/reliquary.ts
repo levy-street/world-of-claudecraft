@@ -18,6 +18,7 @@
 // catalogued: markItemDiscovered already credits the base id, so listing both
 // would double-count completion.
 
+import { CRUCIBLE_SKIN_CATALOG } from './crucible_skins';
 import { FURY_STOCK, WARFARE_ITEMS } from './pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -112,12 +113,16 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   picked mount's reins on a wallet-verified, one-time Founder Pack claim
  *   (The Founder Salesman, Eastbrook). Not a vendor hint: the salesman has no
  *   vendorItems counter, the grant is the wallet-gated claim itself.
+ * - crucible_set_claim: server/crucible_skin_claim.ts (offline:
+ *   Sim.claimCrucibleSkin) grants an Inner Crucible raid-reward skin once the
+ *   character has completed a full Crucible tier set of its class.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
   'founder_pack_claim',
+  'crucible_set_claim',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -1863,6 +1868,22 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     excludeFromCompletion: 'personal',
     sourceDefault: fromProfession('weaponcrafting'),
     relics: items('varkhul_forgebreaker'),
+  },
+  // Armor Cosmetics (Horizons): the nine Inner Crucible raid-reward bodies,
+  // one per class (content/crucible_skins.ts). Each relic is the claim's
+  // collection-log marker item, so the grid shows a skin dark until it is
+  // claimed. excludeFromCompletion 'personal' for the Riftbound reason: the
+  // skins are class-locked, so one character can never fill the whole page and
+  // the Curator completion ladder must not gain a nine-class requirement.
+  {
+    id: 'horizons_armor_cosmetics',
+    shelf: 'horizons',
+    name: 'Armor Cosmetics',
+    desc: 'Full-body class armor skins from the Inner Crucible raid. Complete any full five-piece Crucible set for your class, then claim its skin here. Cosmetic only: never power.',
+    clearSource: { kind: 'none' },
+    excludeFromCompletion: 'personal',
+    sourceDefault: fromActivity('crucible_set_claim'),
+    relics: items(...CRUCIBLE_SKIN_CATALOG.map((def) => def.itemId)),
   },
 ]);
 

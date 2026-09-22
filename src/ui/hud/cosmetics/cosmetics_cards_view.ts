@@ -16,6 +16,7 @@ import { focusKeyAttr } from '../../focus_restore';
 import { t } from '../../i18n';
 import { mountSkinDescription, mountSkinDisplayName } from '../../mount_labels';
 import { portraitChipHtml } from '../../portrait_chip';
+import { raidSkinName } from '../../raid_skin_labels';
 import {
   type CosmeticsScope,
   type CosmeticsSnapshot,
@@ -25,6 +26,8 @@ import {
   type MountSkinCard,
   mechChromaCards,
   mountSkinCards,
+  type RaidSkinCard,
+  raidSkinCards,
   type WeaponSkinGroup,
   weaponSkinGroups,
 } from './cosmetics_view';
@@ -196,6 +199,40 @@ function founderSkinCardHtml(card: FounderSkinCard): string {
   );
 }
 
+function raidSkinCardHtml(card: RaidSkinCard): string {
+  const name = raidSkinName(card.catalog);
+  const chip = portraitChipHtml({
+    cls: card.requiredClass,
+    catalog: card.catalog,
+    name,
+    variant: 'sm',
+    framing: 'headshot',
+    badge: false,
+  });
+  const state = !card.owned
+    ? `<span class="cos-state store">${esc(t('hudChrome.cosmetics.raidLocked'))}</span>`
+    : card.worn
+      ? `<span class="cos-state worn">${esc(t('hudChrome.cosmetics.worn'))}</span>`
+      : card.classMatches
+        ? `<span class="cos-state owned">${esc(t('hudChrome.cosmetics.owned'))}</span>`
+        : `<span class="cos-state store">${esc(t('hudChrome.cosmetics.raidOtherClass'))}</span>`;
+  const action =
+    card.action === 'wear'
+      ? actionButton('wear-founder-skin', card.catalog, t('hudChrome.cosmetics.wear'))
+      : card.action === 'takeOff'
+        ? actionButton('takeoff-founder-skin', card.catalog, t('hudChrome.cosmetics.takeOff'))
+        : '';
+  return (
+    `<article class="cos-card cos-raid-skin rarity-epic${card.owned ? '' : ' locked'}${card.worn ? ' worn' : ''}" ` +
+    `data-card="${esc(card.catalog)}" aria-label="${esc(t('hudChrome.cosmetics.cardAria', { name, rarity: rarityLabel('epic') }))}">` +
+    `<div class="cos-card-head">${scopeBadge(card.ownershipScope, false)}${card.worn ? scopeBadge(card.wornScope, true) : ''}` +
+    `<span class="cos-rarity q-epic">${esc(rarityLabel('epic'))}</span></div>` +
+    chip +
+    `<h3 class="cos-card-name">${esc(name)}</h3>` +
+    `<div class="cos-card-actions">${state}${action}</div></article>`
+  );
+}
+
 function emptyHtml(text: string): string {
   return `<p class="cos-empty">${esc(text)}</p>`;
 }
@@ -233,6 +270,11 @@ export function cosmeticsPanelHtml(s: CosmeticsSnapshot): string {
         `<div class="cos-grid">${cards.map(founderSkinCardHtml).join('')}</div>`
       );
     }
+    case 'raid':
+      return (
+        `<p class="cos-intro">${esc(t('hudChrome.cosmetics.raidIntro'))}</p>` +
+        `<div class="cos-grid">${raidSkinCards(s).map(raidSkinCardHtml).join('')}</div>`
+      );
   }
 }
 

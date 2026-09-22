@@ -651,9 +651,9 @@ export class CharacterVisual {
     new Map<THREE.Material, THREE.Material>(),
   ];
   private ascensionMaterials = new Map<THREE.Material, THREE.Material>();
-  // Golden Aura keepsake (Founder's Pack Epic tier, src/render/golden_aura.ts owns
-  // the surrounding glow halo): a strong gold whole-body lean, its own cache so a
-  // concurrent Thornhollow rune tint below can never stomp or be stomped by it.
+  // Golden Aura keepsake (Founder's Pack Epic tier): a thick gold silhouette
+  // rim (golden_aura_rim.ts owns the shader), its own cache so a concurrent
+  // Thornhollow rune tint below can never stomp or be stomped by it.
   private goldenAuraMaterials = new Map<THREE.Material, THREE.Material>();
   // Thornhollow Fields rune buffs: a slight whole-body lean toward the rune's color
   // (weakest treatment: every form/death tint above wins). Keyed per source
@@ -2223,8 +2223,10 @@ export class CharacterVisual {
     this.applyVisualMaterials();
   }
 
-  /** Founder's Pack Golden Aura keepsake: a strong gold whole-body tint,
-   *  paired with the surrounding glow halo golden_aura.ts draws. */
+  /** Founder's Pack Golden Aura keepsake: a gold silhouette rim
+   *  (golden_aura_rim.ts). The fire-ember-plus-electric-crackle particle
+   *  layer (vfx.ts goldenAuraFx) is driven straight off Entity.goldenAuraActive
+   *  by the renderer's per-entity loop, so it needs no state here. */
   setGoldenAura(on: boolean): void {
     if (on === this.goldenAura) return;
     this.goldenAura = on;

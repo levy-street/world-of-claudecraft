@@ -132,6 +132,25 @@ const SIDE_AGNOSTIC_BACK_GRIPS: ReadonlySet<string> = new Set([
   'VAR_CROSSBOW',
 ]);
 
+/** Per-model on-back carries, keyed by held-model basename. Only for models whose
+ *  authored geometry is offset or leaning off the family assumption (origin at the
+ *  grip, blade along +Y), so the family carry misplaces them. Right-hand only
+ *  (mainhand); a left-hand prop falls back to its family. Computed from the loaded
+ *  geometry: the blade axis aligned to the family's 2H diagonal, the handle centre
+ *  anchored at the shoulder, and pushed back to clear bulky full-body skins. */
+const BACK_GRIP_OVERRIDES: Record<string, BackGripTransform> = {
+  heart_of_the_end_greatblade: {
+    position: [-0.207, -0.137, -0.5],
+    quaternion: [0.12749, 0.24078, 0.94846, 0.16183],
+  },
+};
+
+export function backGripOverrideFor(model: string, side: 'r' | 'l'): BackGripTransform | null {
+  return side === 'r' && Object.hasOwn(BACK_GRIP_OVERRIDES, model)
+    ? BACK_GRIP_OVERRIDES[model]
+    : null;
+}
+
 /** The on-back transform for a sheathed prop: family-specific, mirrored across X
  *  (position and lean) for a left-hand prop, defaulting for unknown families.
  *  The ranged families opt out of the mirror (see above). */
