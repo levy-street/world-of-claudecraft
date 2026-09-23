@@ -13,7 +13,13 @@ import {
 import { feedRealmCalendar, type SimCalendarSink } from '../server/sim_calendar_feed';
 
 function freshSink(): SimCalendarSink {
-  return { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+  return {
+    utcDay: '',
+    resetDay: '',
+    eventLeadDay: '',
+    dailyResetRemainingSec: 0,
+    worldQuestExpiresAtMs: 0,
+  };
 }
 
 describe('feedRealmCalendar', () => {

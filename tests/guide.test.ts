@@ -6601,6 +6601,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       castles: null,
       navigation: null,
       allies: null,
+      // The world-quest and world-boss pins: live-rotation layers the interface
+      // page does not describe yet, on the same recorded-follow-up footing.
+      worldQuests: null,
+      worldBosses: null,
       player: 'with your own arrow on it',
       pois: 'the points of interest around you',
       npcs: 'the quest givers with their marks',

@@ -13,6 +13,7 @@
 // the clock-free primitives the feed and the tests share.
 
 import { DOUBLE_HONOR_LEAD_MS } from '../sim/pvp/honor_event';
+import { worldQuestCycleForResetDay } from '../sim/world_quest_rotation';
 
 // The civil hour a daily window opens. Mirrors RAID_RESET_HOUR in
 // server/raid_reset.ts, which is the authority for the online realm; the two are
@@ -48,6 +49,22 @@ export function resetDayOf(at: Date): string {
   const d = new Date(at.getTime());
   if (d.getHours() < DAILY_RESET_HOUR) d.setDate(d.getDate() - 1);
   return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+/** Next local 3 AM boundary that advances the three-day world-quest cycle. */
+export function nextWorldQuestRotationOf(at: Date): number {
+  const currentCycle = worldQuestCycleForResetDay(resetDayOf(at));
+  const boundary = new Date(at.getTime());
+  boundary.setHours(DAILY_RESET_HOUR, 0, 0, 0);
+  if (boundary.getTime() <= at.getTime()) boundary.setDate(boundary.getDate() + 1);
+  for (let day = 0; day < 3; day++) {
+    if (worldQuestCycleForResetDay(resetDayOf(boundary)) !== currentCycle) {
+      return boundary.getTime();
+    }
+    boundary.setDate(boundary.getDate() + 1);
+    boundary.setHours(DAILY_RESET_HOUR, 0, 0, 0);
+  }
+  throw new Error(`nextWorldQuestRotationOf found no boundary after ${at.toISOString()}`);
 }
 
 /**
@@ -86,7 +103,13 @@ export function resetRemainingSecOf(at: Date): number {
 }
 
 let calendarRefreshAtMs = 0;
-const calendarCache = { utcDay: '', resetDay: '', eventLeadDay: '', dailyResetRemainingSec: 0 };
+const calendarCache = {
+  utcDay: '',
+  resetDay: '',
+  eventLeadDay: '',
+  dailyResetRemainingSec: 0,
+  worldQuestExpiresAtMs: 0,
+};
 
 /**
  * Feed the offline sim its whole host calendar in one call: the frame loop's
@@ -99,6 +122,7 @@ export function feedSimCalendar(sim: {
   resetDay: string;
   eventLeadDay: string;
   dailyResetRemainingSec: number;
+  worldQuestExpiresAtMs: number;
 }): void {
   // ONE instant for all four values (the server twin's shape,
   // server/sim_calendar_feed.ts). The retired per-key caches each carried
@@ -115,10 +139,12 @@ export function feedSimCalendar(sim: {
     calendarCache.resetDay = resetDayOf(at);
     calendarCache.eventLeadDay = eventLeadDayOf(at);
     calendarCache.dailyResetRemainingSec = resetRemainingSecOf(at);
+    calendarCache.worldQuestExpiresAtMs = nextWorldQuestRotationOf(at);
     calendarRefreshAtMs = now + 1000;
   }
   sim.utcDay = calendarCache.utcDay;
   sim.resetDay = calendarCache.resetDay;
   sim.eventLeadDay = calendarCache.eventLeadDay;
   sim.dailyResetRemainingSec = calendarCache.dailyResetRemainingSec;
+  sim.worldQuestExpiresAtMs = calendarCache.worldQuestExpiresAtMs;
 }

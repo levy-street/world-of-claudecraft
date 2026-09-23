@@ -151,6 +151,7 @@ import { USER_ASSETS_SCHEMA } from './user_assets_db';
 import { bustWocAuthGuardAccount, bustWocAuthGuardToken } from './woc_auth_guard_cache';
 import { WOC_MARKET_SCHEMA } from './woc_market_db';
 import { bustWocMarketActivity } from './woc_market_read_cache';
+import { WORLD_QUEST_SCORES_SCHEMA } from './world_quest_scores_db';
 
 export type { BankLedgerSaveEffects } from './bank_ledger_save_effects_db';
 export { GUILD_BANK_ROW_MAX_BYTES } from './guild_bank_receipt_db';
@@ -1281,6 +1282,7 @@ export async function ensureSchema(): Promise<void> {
     // FK-references accounts(id) and characters(id), so they run after SCHEMA.
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(PROGRESS_EVENTS_SCHEMA);
+    await client.query(WORLD_QUEST_SCORES_SCHEMA);
     // The chance-based crafting outcome audit (craft_roll_events). Same FK
     // shape as the progress logs, so it runs after SCHEMA; idempotent.
     await client.query(CRAFT_ROLL_EVENTS_SCHEMA);
@@ -1455,7 +1457,6 @@ export async function ensureSchema(): Promise<void> {
     await client.end().catch(() => {});
   }
 }
-
 /**
  * The post-commit CONCURRENTLY index builds. Split out of ensureSchema and run
  * AFTER the realm is listening (server/main.ts), which is a deliberate change
@@ -1539,7 +1540,6 @@ export async function runConcurrentIndexMigrations(): Promise<void> {
     await client.end().catch(() => {});
   }
 }
-
 export interface AccountRow {
   id: number;
   username: string;

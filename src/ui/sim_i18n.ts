@@ -1,3 +1,4 @@
+// biome-ignore-all format: Preserve the legacy hand-maintained dictionaries; format new locale modules instead.
 // AUTO-ASSEMBLED localization for sim-emitted system/combat/loot/error log text.
 // The deterministic core (src/sim) is host-agnostic and MUST stay English: it emits
 // SimEvent log/error/loot text in English. The client re-renders it here, exactly
@@ -12,6 +13,12 @@
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
 import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
+import {
+  FACTION_IDS,
+  FACTIONS,
+  STANDING_TIER_LABELS,
+  STANDING_TIERS,
+} from '../sim/factions';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
@@ -26,6 +33,8 @@ import {
 } from './i18n';
 import { ARENA_NEW, BASE_NEW, ITEM_NEW, PET_NEW, QUEST_NEW, RAID_NEW } from './sim_i18n.newlocales';
 import { localizeTalentTitle } from './talent_i18n';
+import { localizeWorldQuestFreightYell, worldQuestFreightSpeakerName } from './world_quest_freight_i18n';
+import { localizeWorldQuestTraceReaction } from './world_quest_trace_view';
 
 const baseEnTable = {
   'aura.craftedMomentum': 'Crafted Momentum',
@@ -33,6 +42,11 @@ const baseEnTable = {
   'aura.craftedPreservation': 'Crafted Preservation',
   'aura.craftedCollection': 'Crafted Collection',
   'aura.lastflameZeal': "Last Flame's Zeal",
+  'log.gliderReturn': 'A howling updraft carries you swiftly back up to The Shear!',
+  'log.gliderCountdown': 'Prepare for launch! 3... 2... 1...',
+  'log.gliderLaunch': 'The wind catches your glider! Steer through the rings and touch down in the marked landing zone!',
+  'log.gliderRetry': 'The updraft carries you back to Zephyr. Speak with him to try again.',
+
   'log.deathwardSaves': 'A deathward saves you!',
   'error.lineOfSight': 'Line of sight.',
   'error.notInGroup': 'That ally is not in your group.',
@@ -161,6 +175,7 @@ const baseEnTable = {
   'error.noMountYet': "You don't have a mount yet.",
   'error.mountBuyLevel': 'You must be level 20 to buy a mount.',
   'error.mountAlreadyOwned': 'You already own that mount.',
+  'error.mountCarryingFreight': "You can't ride while carrying freight.",
   // Riding skill gate (src/sim/mounts.ts): emitted when the player tries to
   // mount or select a mount without having purchased the riding skill from Marla.
   // Placeholder-free, so it registers in the EXACT matcher automatically.
@@ -395,6 +410,9 @@ const baseEnTable = {
   'groundPickup.ledgerPageDeny': 'The ledger pages are bound too tightly to take.',
   'groundPickup.morthenGrimoireDeny': "The grimoire's clasp is magically sealed.",
   'groundPickup.fenMusterOrderDeny': 'The wax seal holds until the order is yours to claim.',
+  'groundPickup.freightOrderDeny': 'The freight order is not active.',
+  'groundPickup.freightCrateEnough': 'You are already carrying a freight crate.',
+  'groundPickup.freightWagonEnough': 'The wagon is waiting for another crate.',
   'groundPickup.caravanGoodsDeny': "You aren't authorized to salvage these goods yet.",
   'groundPickup.rustedCenserDeny': 'The censer is chained in place.',
   'groundPickup.bastionWardStoneDeny': 'The ward stone will not budge.',
@@ -444,6 +462,11 @@ const baseEnTable = {
   'groundPickup.hollowSealstoneDeny':
     'The sealstone waits, its socket empty. You have nothing that fits it.',
   'groundPickup.hollowSealstoneEnough': 'The seal is set. The sealstone asks nothing more of you.',
+  'groundPickup.leylineCacheDeny': 'The cache is dormant. A ley disturbance may awaken it.',
+  'groundPickup.confectionGameBoxDeny':
+    'The game box is sealed until its confectionery challenge returns.',
+  'groundPickup.leylineCacheEnough': 'This ley alignment is already complete.',
+  'groundPickup.confectionGameBoxEnough': 'This confection challenge is already complete.',
   'groundPickup.monumentOverlookDeny':
     'The verse is worn shallow. Without a reason to read, it stays silent.',
   'groundPickup.monumentOverlookEnough':
@@ -752,6 +775,7 @@ const baseEnTable = {
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
+  'aura.carryingFreight': 'Carrying Freight',
   'aura.sprintRune': 'Sprint',
   'aura.battleRune': 'Battle Rune',
   'aura.wardRune': 'Ward Rune',
@@ -957,6 +981,7 @@ const baseEnTable = {
   'aura.destructionRuin': 'Ruin',
   'aura.ruinousBrand': 'Ruinous Brand',
   'aura.duskfireClaim': 'Duskfire Claim',
+  'aura.duskweaveCloak': 'Duskweave Cloak',
   'aura.pyreGuardian': 'Pyre Guardian',
   'aura.umbralMastery': 'Umbral Mastery',
   'aura.improvedFear': 'Improved Fear',
@@ -13778,12 +13803,33 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
     },
   };
 
+const WORLD_QUEST_DICT: Partial<
+  Record<SupportedLanguage, Partial<Record<SimMessageKey, string>>>
+> = {
+  es: {
+    'groundPickup.leylineCacheDeny':
+      'El alijo está inactivo. Una perturbación ley podría despertarlo.',
+    'groundPickup.confectionGameBoxDeny':
+      'La caja de juego está sellada hasta que vuelva su desafío de confitería.',
+    'aura.carryingFreight': 'Transportando mercancía',
+  },
+  es_ES: {
+    'aura.carryingFreight': 'Transportando mercancía',
+  },
+  zh_CN: { 'aura.carryingFreight': '搬运货物' },
+  zh_TW: { 'aura.carryingFreight': '搬運貨物' },
+  ko_KR: { 'aura.carryingFreight': '화물 운반 중' },
+  ja_JP: { 'aura.carryingFreight': '荷物を運搬中' },
+  ru_RU: { 'aura.carryingFreight': 'Переноска груза' },
+};
+
 export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Object.fromEntries(
   supportedLanguages.map((lang) => [
     lang,
     {
       ...baseEnTable,
       ...BASE_DICT[lang],
+      ...WORLD_QUEST_DICT[lang],
       ...PET_DICT[lang],
       'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang],
       ...RAID_BOSS_DIALOGUE_DICT[lang],
@@ -13805,6 +13851,7 @@ export function simDictProvidedKeys(lang: SupportedLanguage): ReadonlySet<string
   const provided = new Set<string>();
   const tables: ReadonlyArray<Readonly<Record<string, string>> | undefined> = [
     BASE_DICT[lang],
+    WORLD_QUEST_DICT[lang],
     PET_DICT[lang],
     RAID_BOSS_DIALOGUE_DICT[lang],
     IGNIVAR_DICT[lang],
@@ -14097,6 +14144,7 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // sprint-rune haste.
   'Carrier Fatigue': 'aura.carrierFatigue',
   'Carrying the Flag': 'aura.carriedFlag',
+  'Carrying Freight': 'aura.carryingFreight',
   Sprint: 'aura.sprintRune',
   'Battle Rune': 'aura.battleRune',
   'Ward Rune': 'aura.wardRune',
@@ -14286,6 +14334,12 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Ruin: 'aura.destructionRuin',
   'Ruinous Brand': 'aura.ruinousBrand',
   'Duskfire Claim': 'aura.duskfireClaim',
+  'Duskweave Cloak': 'aura.duskweaveCloak',
+  'A howling updraft carries you swiftly back up to The Shear!': 'log.gliderReturn',
+  'Prepare for launch! 3... 2... 1...': 'log.gliderCountdown',
+  'The wind catches your glider! Steer through the rings and touch down in the marked landing zone!': 'log.gliderLaunch',
+  'The updraft carries you back to Zephyr. Speak with him to try again.': 'log.gliderRetry',
+
   'Pyre Guardian': 'aura.pyreGuardian',
   'Umbral Mastery': 'aura.umbralMastery',
   'Improved Fear': 'aura.improvedFear',
@@ -16621,6 +16675,22 @@ function locTalentTail(s: string): string {
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
 const RULES: Rule[] = [
+  // Standing-gated vendor row (src/sim/items.ts buyItem): the sim names the
+  // tier and the faction by their English identifiers; resolve both back to
+  // their ids so the catalog carries the words (hudChrome.reputation.*).
+  {
+    re: /^Requires (.+) with (.+)\.$/,
+    build: (m) => {
+      const tier = STANDING_TIERS.find((id) => STANDING_TIER_LABELS[id] === m[1]);
+      const faction = FACTION_IDS.find((id) => FACTIONS[id].name === m[2]);
+      return t('hudChrome.reputation.vendorGate', {
+        tier: tier ? t(`hudChrome.reputation.tier.${tier}` as TranslationKey) : m[1],
+        faction: faction
+          ? t(`hudChrome.reputation.faction.${faction}` as TranslationKey)
+          : m[2],
+      });
+    },
+  },
   {
     re: /^Your Umbral Anchor is out of range\.$/,
     build: () =>
@@ -17827,6 +17897,8 @@ const RULES: Rule[] = [
 export function localizeSimText(text: string): string | null {
   if (text === 'That material selection is no longer available.')
     return t('hudChrome.materialStackSelectionUnavailable');
+  const traceReaction = localizeWorldQuestTraceReaction(text);
+  if (traceReaction !== null) return traceReaction;
   const exactKey = EXACT[text];
   if (exactKey) return tSim(exactKey);
   for (const rule of RULES) {
@@ -17842,7 +17914,7 @@ export function localizeAuthoredYellText(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return text;
-  return localizeSimText(text) ?? text;
+  return localizeWorldQuestFreightYell(text, getLanguage()) ?? localizeSimText(text) ?? text;
 }
 
 export function localizeAuthoredYellSpeakerName(
@@ -17852,6 +17924,8 @@ export function localizeAuthoredYellSpeakerName(
   classId?: PlayerClass,
 ): string {
   if (speakerKind === 'player' || classId !== undefined) return name;
+  const freightSpeaker = worldQuestFreightSpeakerName(name, speakerKind, templateId);
+  if (freightSpeaker !== null) return freightSpeaker;
   if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
     return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
   }

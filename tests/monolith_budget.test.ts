@@ -475,43 +475,9 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    // LOWERED 18309 -> 18284 by the composed player portraits change: the
-    // "which body does this player's frame show" rule moved out to
-    // src/ui/player_portrait_core.ts, so the three frame draws and the
-    // portrait update listener each became one call. Exact count, zero slack.
-    // Re-measured at the release/v0.44.0 sync of that change (the release's
-    // frame-rate-limit wiring plus the per-call portrait lookups compose to
-    // 18291 by wc -l on the merged tree, still under the 18309 the branch
-    // started from). Exact count, zero slack.
-    // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
-    // travels as an openInspect parameter (no InspectEntity cast dep), and
-    // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
-    // LOWERED 18289 -> 18286 at the trade quantity prompt sync: the merge queue
-    // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
-    // wrapper folded into the bags binding (the trade-open gate plus the pure
-    // core read on one dependency line). Exact count, zero slack.
-    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
-    // revive change: the Keeper dialog copy moved out to
-    // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
-    // per-frame healer-range scan (the Keeper is talked to). wc -l on the
-    // merged tree. Exact count, zero slack.
-    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
-    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
-    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
-    // and the minimap badge name a lockout identically. Exact count, zero slack.
-    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
-    // on top of the character-select lockouts landing: the item tooltip column
-    // composition moved to item_combat_tooltip_view.ts and the loot receipt
-    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
-    // guarded log() call through a thin lootReceiptBody adapter), composed
-    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
-    // tree. Exact count, zero slack.
-    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
-    // the heal audio policy (potion cue, HoT silence, the Frenzied
-    // Regeneration exemption) moved out of the heal2 arm into
-    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
-    // count, zero slack.
-    ceiling: 18235,
+    // Re-measured after bringing the world-quest character and faction wiring
+    // together with the release's HUD extractions. Exact merged count.
+    ceiling: 18231,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1736,7 +1702,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
     // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
-    ceiling: 4850,
+    // Re-pinned 4850 -> 4720: the world quest minigame layer's three director
+    // hooks were paid for by moving the note-event primitives (the Inst union,
+    // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
+    ceiling: 4720,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

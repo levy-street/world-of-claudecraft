@@ -78,6 +78,7 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
+import type { IWorldVehicles } from '../src/world_api/vehicles';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
@@ -131,7 +132,18 @@ export const IWORLD_MEMBERS = [
   { name: 'activeTemporalHourglasses', kind: 'data' },
   { name: 'questLog', kind: 'data' },
   { name: 'questsDone', kind: 'data' },
+  { name: 'worldQuestCycle', kind: 'data' },
+  { name: 'worldQuestExpiresAtMs', kind: 'data' },
+  { name: 'worldQuestLeaderboard', kind: 'method' }, // async
+  { name: 'worldQuestLog', kind: 'data' },
+  { name: 'worldQuestTime', kind: 'data' },
+  { name: 'nearbyWorldQuestTraces', kind: 'data' },
+  { name: 'factions', kind: 'data' },
+  { name: 'worldQuestReplacements', kind: 'data' },
+  { name: 'worldQuestRerollCycle', kind: 'data' },
   // --- commands + read-returning methods ---
+  { name: 'canRerollWorldQuest', kind: 'method' },
+  { name: 'rerollWorldQuest', kind: 'method' },
   { name: 'questState', kind: 'method' }, // read-returning (1/6)
   { name: 'reactiveAbilityWindowRemaining', kind: 'method' },
   { name: 'groundAimPlacementPreview', kind: 'method' },
@@ -166,7 +178,15 @@ export const IWORLD_MEMBERS = [
   { name: 'turnInQuest', kind: 'method' },
   { name: 'reportTelemetry', kind: 'method' },
   { name: 'abandonQuest', kind: 'method' },
+  { name: 'accuseWorldQuestSuspect', kind: 'method' },
+  { name: 'startWorldQuestActivity', kind: 'method' },
+  { name: 'shadowWorldQuestAction', kind: 'method' },
   { name: 'acceptLinkedQuest', kind: 'method' },
+  { name: 'rotateWorldQuestPuzzleTile', kind: 'method' },
+  { name: 'swapWorldQuestMatch3Tiles', kind: 'method' },
+  { name: 'resetWorldQuestMatch3', kind: 'method' },
+  { name: 'resetWorldQuestPuzzle', kind: 'method' },
+  { name: 'boostWorldQuestGlider', kind: 'method' },
   { name: 'equipItem', kind: 'method' },
   { name: 'equipItemToSlot', kind: 'method' },
   { name: 'moveInventoryItem', kind: 'method' },
@@ -434,6 +454,7 @@ export const IWORLD_MEMBERS = [
   { name: 'swapPerfectingRanks', kind: 'method' },
   { name: 'perfectingSwapInfo', kind: 'method' },
   { name: 'raidLockouts', kind: 'method' }, // read-returning (5/6)
+  { name: 'worldBossActive', kind: 'method' }, // realm liveness, separate from loot lockout
   { name: 'riftFloor', kind: 'data' }, // active procedural rift floor (null outside)
   { name: 'riftCollisionToken', kind: 'data' }, // per-Sim rift collision registry key
   { name: 'riftBossDeathZones', kind: 'method' }, // live lethal zones on the boss floor
@@ -479,6 +500,10 @@ export const IWORLD_MEMBERS = [
   { name: 'mountRaceStart', kind: 'method' },
   { name: 'mountRaceCancel', kind: 'method' },
   { name: 'mountRaceView', kind: 'method' }, // read-returning
+  { name: 'vehicleSession', kind: 'data' },
+  { name: 'enterVehicle', kind: 'method' },
+  { name: 'useVehicleAction', kind: 'method' },
+  { name: 'leaveVehicle', kind: 'method' },
   // --- Dungeon Finder facet (IWorldDungeonFinder) ---
   { name: 'dungeonFinderInfo', kind: 'data' },
   { name: 'dungeonFinderBoard', kind: 'data' },
@@ -864,10 +889,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // resolved production tree. The merged tree carries the Market Sweep
     // methods, the Who tab data and method, CPU-hygiene entityRosterVersion,
     // and the account-wide Book of Deeds / Reliquary read halves. Counted
-    // directly off the resolved IWORLD_MEMBERS literal.
-    expect(IWORLD_MEMBERS.length).toBe(378);
-    expect(DATA_MEMBERS.length).toBe(107);
-    expect(METHOD_MEMBERS.length).toBe(271);
+    // 402/116/286 on feature/wq-reputation: 397/113/284 plus factions,
+    // worldQuestReplacements, worldQuestRerollCycle (+3 data), and canRerollWorldQuest,
+    // rerollWorldQuest (+2 methods).
+    expect(IWORLD_MEMBERS.length).toBe(402);
+    expect(DATA_MEMBERS.length).toBe(116);
+    expect(METHOD_MEMBERS.length).toBe(286);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -887,6 +914,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountCosmetics',
       'accountDeeds',
       'accountFlair',
+      'accuseWorldQuestSuspect',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -932,10 +960,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgRespond',
       'blockAdd',
       'blockRemove',
+      'boostWorldQuestGlider',
       'buyBackItem',
       'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'canRerollWorldQuest',
       'cancelAura',
       'cancelCommissionOrder',
       'cardMinigameInfo',
@@ -1007,6 +1037,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderSetRoles',
       'enterDelve',
       'enterDungeon',
+      'enterVehicle',
       'entities',
       'entityRosterVersion',
       'equipBag',
@@ -1015,6 +1046,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'equipment',
       'equipmentInstances',
       'extractEssence',
+      'factions',
       'farmNowMs',
       'farmPatches',
       'feedPet',
@@ -1075,6 +1107,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
+      'leaveVehicle',
       'lifetimeHonor',
       'lifetimeXp',
       'loadouts',
@@ -1111,6 +1144,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'moveInventoryItem',
       'moveRaidMember',
       'myFarmPlots',
+      'nearbyWorldQuestTraces',
       'nodeHarvestableByMe',
       'nodeRespawnSeconds',
       'openCommissionOrder',
@@ -1167,6 +1201,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'renamePet',
       'renown',
       'reportTelemetry',
+      'rerollWorldQuest',
+      'resetWorldQuestMatch3',
+      'resetWorldQuestPuzzle',
       'resolvedAbility',
       'respec',
       'respondToResurrection',
@@ -1179,6 +1216,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'riftCollisionToken',
       'riftEventMsRemaining',
       'riftFloor',
+      'rotateWorldQuestPuzzleTile',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -1203,6 +1241,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'shadowWorldQuestAction',
       'slotToolEffect',
       'socialInfo',
       'socketRiftGem',
@@ -1210,10 +1249,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'spectating',
       'spinDailyReward',
       'startAutoAttack',
+      'startWorldQuestActivity',
       'stationPlacements',
       'stopAutoAttack',
       'submitLootRoll',
       'swapPerfectingRanks',
+      'swapWorldQuestMatch3Tiles',
       'switchLoadout',
       'tabTarget',
       'tabTargetPrev',
@@ -1247,14 +1288,24 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
+      'useVehicleAction',
       'vaultBuyUpgrade',
       'vaultDeposit',
       'vaultDepositAll',
       'vaultInfo',
       'vaultWithdraw',
+      'vehicleSession',
       'vendorBuyback',
       'whoInfo',
       'whoRequest',
+      'worldBossActive',
+      'worldQuestCycle',
+      'worldQuestExpiresAtMs',
+      'worldQuestLeaderboard',
+      'worldQuestLog',
+      'worldQuestReplacements',
+      'worldQuestRerollCycle',
+      'worldQuestTime',
       'xp',
     ]);
   });
@@ -1310,6 +1361,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'entityRosterVersion',
       'equipment',
       'equipmentInstances',
+      'factions',
       'farmPatches',
       'gatheringGoal',
       'gatheringProficiency',
@@ -1334,6 +1386,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'marketInfo',
       'moveInput',
       'myFarmPlots',
+      'nearbyWorldQuestTraces',
       'partyInfo',
       'petSpecialCommandsSupported',
       'player',
@@ -1365,8 +1418,15 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'tradeInfo',
       'unlockedMilestones',
       'vaultInfo',
+      'vehicleSession',
       'vendorBuyback',
       'whoInfo',
+      'worldQuestCycle',
+      'worldQuestExpiresAtMs',
+      'worldQuestLog',
+      'worldQuestReplacements',
+      'worldQuestRerollCycle',
+      'worldQuestTime',
       'xp',
     ]);
   });
@@ -1379,6 +1439,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'acceptLinkedQuest',
       'acceptQuest',
       'accountFlair',
+      'accuseWorldQuestSuspect',
       'activeLootRolls',
       'activeMasterLootRolls',
       'applyEnchant',
@@ -1400,10 +1461,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'bgRespond',
       'blockAdd',
       'blockRemove',
+      'boostWorldQuestGlider',
       'buyBackItem',
       'buyCrucibleVendorItem',
       'buyHeroicVendorItem',
       'buyItem',
+      'canRerollWorldQuest',
       'cancelAura',
       'cancelCommissionOrder',
       'castAbility',
@@ -1457,6 +1520,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'dungeonFinderSetRoles',
       'enterDelve',
       'enterDungeon',
+      'enterVehicle',
       'equipBag',
       'equipItem',
       'equipItemToSlot',
@@ -1507,6 +1571,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'leaveCardDuelQueue',
       'leaveDelve',
       'leaveDungeon',
+      'leaveVehicle',
       'lockpickAbort',
       'lockpickAction',
       'lockpickEngage',
@@ -1572,6 +1637,9 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'reliquaryRarity',
       'renamePet',
       'reportTelemetry',
+      'rerollWorldQuest',
+      'resetWorldQuestMatch3',
+      'resetWorldQuestPuzzle',
       'resolvedAbility',
       'respec',
       'respondToResurrection',
@@ -1581,6 +1649,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'ridingTrained',
       'riftBossDeathZones',
       'riftEventMsRemaining',
+      'rotateWorldQuestPuzzleTile',
       'salvageItem',
       'saveActionBarLayout',
       'saveLoadout',
@@ -1605,14 +1674,17 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'shadowWorldQuestAction',
       'slotToolEffect',
       'socketRiftGem',
       'sortInventory',
       'spinDailyReward',
       'startAutoAttack',
+      'startWorldQuestActivity',
       'stopAutoAttack',
       'submitLootRoll',
       'swapPerfectingRanks',
+      'swapWorldQuestMatch3Tiles',
       'switchLoadout',
       'tabTarget',
       'tabTargetPrev',
@@ -1639,11 +1711,14 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'unstuck',
       'upgradeRiftItem',
       'useItem',
+      'useVehicleAction',
       'vaultBuyUpgrade',
       'vaultDeposit',
       'vaultDepositAll',
       'vaultWithdraw',
       'whoRequest',
+      'worldBossActive',
+      'worldQuestLeaderboard',
     ]);
   });
 });
@@ -1858,11 +1933,30 @@ type _ExhaustCosmetics = AssertNever<
 const FACET_QUESTS = [
   'questLog',
   'questsDone',
+  'worldQuestCycle',
+  'worldQuestExpiresAtMs',
+  'worldQuestLeaderboard',
+  'worldQuestLog',
+  'worldQuestTime',
+  'nearbyWorldQuestTraces',
   'questState',
   'acceptQuest',
   'turnInQuest',
   'abandonQuest',
+  'rotateWorldQuestPuzzleTile',
+  'swapWorldQuestMatch3Tiles',
+  'resetWorldQuestMatch3',
+  'resetWorldQuestPuzzle',
+  'boostWorldQuestGlider',
+  'accuseWorldQuestSuspect',
+  'shadowWorldQuestAction',
+  'startWorldQuestActivity',
   'acceptLinkedQuest',
+  'factions',
+  'worldQuestReplacements',
+  'worldQuestRerollCycle',
+  'canRerollWorldQuest',
+  'rerollWorldQuest',
 ] as const satisfies readonly (keyof IWorldQuests)[];
 type _ExhaustQuests = AssertNever<Exclude<keyof IWorldQuests, (typeof FACET_QUESTS)[number]>>;
 
@@ -2089,6 +2183,7 @@ const FACET_DUNGEONS = [
   'enterDungeon',
   'leaveDungeon',
   'raidLockouts',
+  'worldBossActive',
   'riftFloor',
   'riftCollisionToken',
   'riftBossDeathZones',
@@ -2148,6 +2243,13 @@ const FACET_MOUNTS = [
   'mountRaceView',
 ] as const satisfies readonly (keyof IWorldMounts)[];
 type _ExhaustMounts = AssertNever<Exclude<keyof IWorldMounts, (typeof FACET_MOUNTS)[number]>>;
+const FACET_VEHICLES = [
+  'vehicleSession',
+  'enterVehicle',
+  'useVehicleAction',
+  'leaveVehicle',
+] as const satisfies readonly (keyof IWorldVehicles)[];
+type _ExhaustVehicles = AssertNever<Exclude<keyof IWorldVehicles, (typeof FACET_VEHICLES)[number]>>;
 const FACET_DUNGEON_FINDER = [
   'dungeonFinderInfo',
   'dungeonFinderBoard',
@@ -2293,6 +2395,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   telemetry: FACET_TELEMETRY,
   professions: FACET_PROFESSIONS,
   mounts: FACET_MOUNTS,
+  vehicles: FACET_VEHICLES,
   dungeonFinder: FACET_DUNGEON_FINDER,
   deeds: FACET_DEEDS,
   reliquary: FACET_RELIQUARY,
@@ -2310,7 +2413,9 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // program's Vale Cup retirement, 32 total. The v0.41.0 sync carries both
     // arms (farming in, vale_cup out): 33 total, measured as the facet files
     // on disk minus appearance.ts (the sweep below).
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(33);
+    // 34 at the release/v0.43.0 merge: the release's 33 plus this branch's
+    // vehicles facet.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2389,10 +2494,10 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
 
   it('the facet union equals the pinned IWORLD_MEMBERS set', () => {
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
-    // Mirrors the IWORLD_MEMBERS.length pin above; this pin and the one above
+    // Mirrors the IWORLD_MEMBERS.length pin above (402); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(378);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(378);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(402);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(402);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

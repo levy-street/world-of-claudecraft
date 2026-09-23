@@ -1,3 +1,6 @@
+import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
+import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
+import { ESCORTS } from '../sim/data';
 import type { FarmPlotView } from '../world_api/farming';
 import { handleEscortPress } from './escort_interact';
 import {
@@ -143,11 +146,22 @@ export function tryNearbyInteraction(
   }
   if (candidate?.kind === 'npc') {
     const npc = candidate.entity;
+    // A shadow-mission mark (every shadow npc but the mission giver) is selected,
+    // never talked to: the pickpocket and leave actions ride the target.
+    if (isShadowNpc(npc.templateId) && npc.id !== SHADOW_NPC_ID) {
+      world.targetEntity(candidate.id);
+      return true;
+    }
     if (npc.templateId === 'spirit_healer') {
       // The scan only picks a spirit healer for a ghost; route the revive
       // through the HUD's confirm gate rather than sending the command
       // directly (it applies The Keeper's Toll).
       hud.requestSpiritHealerResurrect();
+    } else if (isInvestigationNpc(npc.templateId)) {
+      // The infiltrator investigation's suspects answer through the sim's own
+      // interact, which emits the questioning dialogue event.
+      world.targetEntity(candidate.id);
+      world.interact();
     } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
       hud.openDelveBoard(candidate.id);
     } else {
@@ -160,6 +174,16 @@ export function tryNearbyInteraction(
   // front of you beats the node you happen to be over. Corpses still win, so
   // looting the ambush wave is never swallowed.
   if (candidate?.kind === 'escort') {
+    // A world-quest caravan opens its own start dialog instead of starting on
+    // the press, so the player sees what they are signing up for.
+    const worldQuestEscort = Object.values(ESCORTS).some(
+      (entry) => entry.npcMobId === candidate.entity.templateId && entry.worldQuestId !== undefined,
+    );
+    if (worldQuestEscort) {
+      world.targetEntity(candidate.id);
+      hud.openQuestDialog(candidate.id);
+      return true;
+    }
     return handleEscortPress(world, hud, { kind: 'start', entityId: candidate.id }, escortAwayText);
   }
   // The gather-node arm: the nearest node in reach, through the SAME core

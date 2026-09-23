@@ -344,6 +344,43 @@ export const ja_JP: EnTranslations = {
       "nameplate": "＜{title}＞"
     },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
+    "vehicle": {
+      "title": "北の見張りの大砲",
+      "objective": "北の見張り所を守れ",
+      "lastKeepTitle": "最後の砦の大砲",
+      "lastKeepObjective": "最後の砦への道を守れ",
+      "cannonball": "砲弾",
+      "grapeshot": "ぶどう弾",
+      "incendiary": "焼夷弾",
+      "integrity": "大砲の耐久度",
+      "exit": "大砲を離れる",
+      "wave": "Wave {wave}/{total}",
+      "endlessWave": "エンドレスウェーブ {wave}（ラウンド{round}）",
+      "resultWaves": "耐えたウェーブ数：{waves}。",
+      "enemies": "残りの敵：{count}",
+      "countdown": "準備：{seconds}",
+      "hint": "弾種を選び、地面をクリックして発射。",
+      "aim": "クリックで発射。右クリックかEscで照準を解除。",
+      "sapperWarning": "工兵が接近中！爆薬運びが防衛線に届く前に止めろ。",
+      "chargeWarning": "指揮官が突撃を命じた！生き残った敵全員の移動が速くなる。",
+      "armorHint": "砲弾で銀の盾を砕き、それから焼夷弾を撃て。",
+      "exposedHint": "鎧破壊：焼夷弾のダメージが2倍になる。",
+      "barrelHint": "印のついた火薬樽の周りに敵が集まったら、樽を撃て。",
+      "barrelRules": "直撃すると火薬樽に引火し、{radius}yd以内に{damage}のダメージを与える。爆発は連鎖する。",
+      "armorRules": "装甲兵は砲弾で鎧を砕かれるまで、受けるダメージが{reduction}減少する。鎧を砕かれると、受ける火炎ダメージが{bonus}増加する。",
+      "shake": "画面の揺れ",
+      "gold": "金メダル",
+      "silver": "銀メダル",
+      "bronze": "銅メダル",
+      "failed": "防衛失敗",
+      "result": "{medal}：耐久度{integrity}、命中率{accuracy}。",
+      "medalRules": "金：耐久度{goldIntegrity}以上かつ命中率{goldAccuracy}以上。銀：耐久度{silverIntegrity}以上かつ命中率{silverAccuracy}以上。それ以外の勝利は銅。敵か樽への命中を数え、1発につき1回だけ数える。メダルによる追加の報酬金はない。",
+      "shotDamage": "着弾点から{radius}yd以内の各敵に{damage}のダメージを与える。",
+      "shotSlow": "命中した敵の移動速度を{seconds}秒間、{amount}低下させる。",
+      "shotBurn": "{seconds}秒間炎を残し、その中にいる敵に毎秒{damage}のダメージを与える。",
+      "shotTiming": "クールダウン：{cooldown}秒。{flight}秒後に着弾。全弾種で{recovery}秒の回復時間を共有する。",
+      "shotRules": "印のついた範囲内を狙う。マナ消費なし。ダメージは装備やタレントの影響を受けない。"
+    },
     "warlock": {
       "doomLabel": "断罪",
       "fateThreadsLabel": "運命の糸",
@@ -1282,9 +1319,45 @@ export const ja_JP: EnTranslations = {
       "devTierCol": "バッジ",
       "mergedPrs": "マージ済みPR",
       "devEmpty": "ランク入りのコントリビューターはまだいません。",
+      "tabWorldQuests": "ワールドクエスト",
+      "wqBoardsLabel": "ワールドクエストのスコアボード",
+      "wqMedal": "メダル",
+      "wqWaves": "耐えたウェーブ",
+      "wqTime": "Time",
+      "wqPoints": "スコア",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "銀",
+        "bronze": "銅"
+      },
+      "wqEmpty": "このボードにはまだスコアがありません。ワールドクエストを完了して、ランクに名を刻もう。",
       "podiumLabel": "トップ3",
       "unclaimed": "空席",
       "prestigeTitle": "威信 {rank}"
+    },
+    "wqLadder": {
+      "title": "ワールドクエストランキング",
+      "subtitle": "各ヒーローの最高記録。メダル付きワールドクエストごとのランキングです。",
+      "close": "ワールドクエストランキングを閉じる",
+      "rankedBy": {
+        "waves": "耐えたウェーブ数順",
+        "seconds": "最速タイム順",
+        "points": "最高スコア順"
+      },
+      "rankedByMedal": {
+        "waves": "メダル順、次に耐えたウェーブ数",
+        "seconds": "メダル順、次に最速タイム",
+        "points": "メダル順、次に最高スコア"
+      },
+      "podiumLabel": "トップ3",
+      "unclaimed": "空席",
+      "totalOne": "1人がランクイン",
+      "totalMany": "{count}人がランクイン",
+      "selfLabel": "自己ベスト",
+      "selfRank": "{rank}位",
+      "selfNone": "このボードにはまだ記録がありません。ワールドクエストをクリアしてランキングに参加しましょう。"
     },
     "pledge": {
       "open": "誓約受付中",
@@ -2268,9 +2341,93 @@ export const ja_JP: EnTranslations = {
       "stats": "能力値",
       "progression": "進行状況",
       "skills": "スキル",
+      "reputation": "評判",
+      "currencies": "通貨",
+      "character": "キャラクター",
+      "professions": "専門技能",
       "gathering": "採集",
       "crafting": "製作",
       "openProfessions": "職業を開く"
+    },
+    "currencies": {
+      "intro": "いずれもバッグの枠を使いません。コインはこれまで通りバッグにあります。",
+      "activities": "アクティビティ",
+      "factions": "勢力",
+      "honor": "名誉",
+      "delveMark": "デルブの印",
+      "wocToken": "WoCトークン",
+      "heroicMarkNote": "ヒロイックダンジョン . ヒロイック補給官で使用",
+      "honorNote": "戦場とアリーナ",
+      "delveMarkNote": "完了したデルブ",
+      "wocTokenNote": "連携済みウォレットの残高",
+      "walletNotLinked": "ウォレット未連携",
+      "wocPreview": "プレビュー残高（未検証）",
+      "lifetime": "累計 {amount}",
+      "factionPending": "勢力通貨：第2段階で決定"
+    },
+    "reputation": {
+      "intro": "3つの勢力は同時に進行します。各ワールドクエストは、その地域の勢力に加算されます。",
+      "faction": {
+        "rift_watch": "リフトの見張り",
+        "church_order": "教会修道会",
+        "automatons": "オートマトン"
+      },
+      "hub": {
+        "rift_watch": "ドリフトヘイヴン",
+        "church_order": "アルドリック修士",
+        "automatons": "ワームウォッチ"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "未知",
+        "recognized": "認知",
+        "trusted": "信頼",
+        "proven": "実証",
+        "vanguard": "先鋒",
+        "champion": "チャンピオン"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "部外者",
+          "recognized": "見張り",
+          "trusted": "リフトウォーカー",
+          "proven": "守護者",
+          "vanguard": "リフトの守り手",
+          "champion": "チャンピオン"
+        },
+        "church_order": {
+          "unknown": "部外者",
+          "recognized": "侍者",
+          "trusted": "守り人",
+          "proven": "聖堂騎士",
+          "vanguard": "暁の守り手",
+          "champion": "チャンピオン"
+        },
+        "automatons": {
+          "unknown": "部外者",
+          "recognized": "操作者",
+          "trusted": "機械技師",
+          "proven": "工匠",
+          "vanguard": "鍛冶頭",
+          "champion": "チャンピオン"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "次：{tier}",
+      "maxed": "最高の評判に到達",
+      "cappedByLevel": "レベル16まで評判は{tier}で止まります",
+      "today": "今日",
+      "questsDone": "完了したワールドクエスト",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "掲示板",
+      "resetsUnknown": "今日は掲示板がありません",
+      "title": "勢力の称号",
+      "titleLine": "{faction} . {tier}",
+      "legend": "評判の段階",
+      "vendorGate": "{faction}との評判が{tier}以上必要です。",
+      "tierReachedBanner": "{faction}との評判が{tier}になりました",
+      "tierReachedSubtext": "勢力の称号：{title}",
+      "tierReachedLine": "{faction}との評判が{tier}になりました。勢力の称号は{title}になりました。"
     },
     "questLog": {
       "completed": "完了済み",
@@ -3191,6 +3348,7 @@ export const ja_JP: EnTranslations = {
       "forbiddenReflectionLock": "フォービドゥン・リフレクションはまだ再準備できない",
       "internalCooldown": "タイマー終了までこの効果は再発動しない",
       "carriedFlag": "敵の旗を運搬中です。このバフを解除すると旗を落とします。",
+      "carryingFreight": "荷物を運搬中です。移動速度が{pct}%低下します。",
       "battleStance": "バトルスタンス: 怒りの生成量が10%増加",
       "berserkerStance": "バーサーカースタンス: クリティカル率が3%上昇し、与えるダメージが3%増加",
       "crit": "クリティカル率を{pct}%上昇させる",
@@ -5424,6 +5582,8 @@ export const ja_JP: EnTranslations = {
       "level": "レベル {level}",
       "landmarkCount": "ランドマーク {count} 個",
       "filtersAria": "マップレイヤー",
+      "railToggle": "サイドパネル",
+      "railToggleAria": "地図のサイドパネルを表示または非表示",
       "filters": {
         "quests": "クエスト",
         "gather": "採集",
@@ -5439,6 +5599,32 @@ export const ja_JP: EnTranslations = {
       "showRoute": "ルートを表示",
       "untrack": "追跡を解除",
       "track": "追跡",
+      "worldQuests": {
+        "heading": "今日のワールドクエスト",
+        "count": "{done} / {total}",
+        "empty": "今日はワールドクエストがありません",
+        "replacement": "差し替え",
+        "state": {
+          "active": "進行中",
+          "completed": "完了"
+        },
+        "reroll": "クエストを差し替える",
+        "rerollNote": "今日はあと1回差し替えできます",
+        "rerollUsed": "今日の差し替えは使用済みです",
+        "rerollReason": {
+          "noCycle": "今日は掲示板がありません",
+          "usedToday": "今日の差し替えは使用済みです",
+          "completed": "完了したクエストは差し替えできません",
+          "inProgress": "進行中のクエストは差し替えできません",
+          "notActive": "このクエストはあなたの掲示板にありません",
+          "noAlternative": "今日はその地域に他のクエストがありません",
+          "unknown": "このクエストは今日は差し替えできません"
+        },
+        "confirmTitle": "このワールドクエストを差し替えますか？",
+        "confirmBody": "ワールドクエストの差し替えは1日1回だけで、元に戻せません。{quest}は同じ地域の別のクエストに差し替えられます。",
+        "confirmOk": "差し替える",
+        "confirmCancel": "キャンセル"
+      },
       "legend": {
         "dungeon": "ダンジョン",
         "ore": "鉱石",
@@ -5827,6 +6013,9 @@ export const ja_JP: EnTranslations = {
       "invalid_roster_name": "ギルド名が無効です。",
       "unknown": "その名前のギルドはありません。"
     },
+    "world_quests": {
+      "unknown_board": "その名前のスコアボードはありません。"
+    },
     "steam": {
       "disabled": "Steam連携は現在利用できません。",
       "invalid_ticket": "Steamがこの連携リクエストを確認できませんでした。デスクトップアプリからもう一度お試しください。",
@@ -5948,6 +6137,7 @@ export const ja_JP: EnTranslations = {
       "progression": "レベリングと成長",
       "world": "ワールド",
       "quests": "クエスト",
+      "factions": "勢力と評判",
       "dungeons": "ダンジョンとレイド",
       "delves": "デルヴ",
       "rifts": "リフト",
@@ -7284,6 +7474,29 @@ export const ja_JP: EnTranslations = {
       "ladderBody": "どの試合も、キャラクターに結び付いた戦場レートを勝敗にかかわらず動かし、歴代の表がワールドの勇者たちを順に並べます。",
       "rewardsHeading": "試合が支払うもの",
       "rewardsBody": "試合を最後まで戦えば、必ず名誉が支払われます。勝てば多く、敗北や引き分けでも慰めの分があり、さらに自分が決めた止めの一撃と、助太刀した撃破のそれぞれにわずかな上乗せがつくので、旗から離れた場所で戦うことにも意味があります。その日の初勝利にはさらにボーナスが加わり、そのボーナスがまだ残っているあいだはパネルが教えてくれます。この一日は名誉が持つ独自のもので、レルムのインスタンスリセットとは別の時計で切り替わります。同じ相手と何度も当たると、初回のあとは試合そのものの支払いが減りますが、すぐに下限で落ち着き、まったくのゼロまで落ちることはありません。放棄した試合には何も支払われません。稼いだものは、どちらのウォーフェア補給官のもとでも使えます。"
+    },
+    "factionsPage": {
+      "heading": "勢力と評判",
+      "intro": "三つの同盟勢力がそれぞれ王国の一角を見守っており、彼らの土地でワールドクエストを終えるたびに、その勢力からの評判が上がります。評判は六つの段階を昇り、段階ごとに固有の称号があり、補給係の品揃えを一つずつ開いていきます。",
+      "whoHeading": "三つの勢力",
+      "whoBody": "各勢力は一群のゾーンに結びついており、どこでワールドクエストをこなすかで、どの勢力に評判が入るかが決まります。陣営を選ぶ必要はありません。三勢力はそれぞれ独自に集計し、他の勢力と敵対するよう求めることもありません。",
+      "riftWatchBody": "裂け目の監視団は岸を守り、深い裂け目を見張っています。彼らの土地は沿岸部です。ファーショア、パームリーチ、ゲイルクレスト、ウィローフェン、ヴェールド・ホロウ。拠点はパームリーチのドリフトヘイヴンです。",
+      "churchOrderBody": "教団は王国の中心地を治めています。イーストブルック渓谷、マイアフェン湿地、ソーンピーク高地、ナイトブルーム、レイスウッド。ブラザー・アルドリックがイーストブルック渓谷から彼らを代表して語ります。",
+      "automatonsBody": "オートマトンは辺境の炉を守っています。ドレイクランド、フロストヴェイル、アンバーフォール、エヴァーガーデン。拠点はドレイクランドのワームウォッチです。",
+      "earningHeading": "評判を得る",
+      "earningBody": "評判はワールドクエストから得られます。各ワールドクエストは、それが置かれたゾーンの勢力に加算され、三勢力は異なるゾーンを担当しているので、地図を渡り歩くうちに三つの評判が同時に進みます。イーストブルックの現場監督ケイレンが地図上のワールドクエスト掲示板を開いてくれ、その日の割り当てが気に入らなければ、掲示板で一日に一つだけワールドクエストを差し替えることもできます。",
+      "lowLevelNote": "低レベルのキャラクターは評判がある段階で一時停止し、レベルが上がると再開します。若いキャラクターでも早くから稼ぎ始められ、すぐに行き止まりになることはありません。",
+      "tiersHeading": "評判の段階",
+      "tiersBody": "どの勢力も同じ六つの段階を昇ります。未知、承認、信頼、実証、先鋒、そしてチャンピオンです。各勢力はそれぞれの段階に独自の名を与え、その名がその勢力におけるあなたの称号になります。",
+      "riftWatchTitles": "裂け目の監視団では、部外者から始まり、監視者、裂け目歩き、守護者、裂け目の番人、そして最後にチャンピオンとなります。",
+      "churchOrderTitles": "教団では、部外者から始まり、侍祭、守り手、テンプラー、暁の番人、そして最後にチャンピオンとなります。",
+      "automatonsTitles": "オートマトンでは、部外者から始まり、操作者、機械技師、工匠、鍛冶長、そして最後にチャンピオンとなります。",
+      "quartermastersHeading": "補給係",
+      "quartermastersBody": "各勢力は拠点に補給係を置いています。ドリフトヘイヴンの裂け目の監視団の補給係ヴェイレン、イーストブルック礼拝堂の教団のテンプラー・アルセア、ワームウォッチのオートマトンの工匠トブリンです。それぞれが装飾品、防具、武器、バッグの小さな品揃えを持ち、その勢力での評判が上がるにつれて段階ごとに解放され、通常の硬貨で買えます。",
+      "readingHeading": "どこで確認するか",
+      "readingBody": "キャラクターシート（C）の評判タブに、各勢力の現在の評判、次の段階までのバー、評判で得た称号が表示されます。チャットログは評判を得るたびに報告し、新しい段階に達すると画面に祝いのバナーが出ます。",
+      "deedsHeading": "偉業",
+      "deedsBody": "偉業の書も評判を記録します。ある勢力で信頼に達すること、ある勢力でチャンピオンに達することがそれぞれ偉業として記録され、三勢力すべてでチャンピオンに達することは独自の偉業です。他の偉業と同じく、これらは見た目だけで力にはならず、チャンピオンの偉業は身に着けられる称号を授けます。"
     },
     "deedsPage": {
       "intro": "功績の書は、始まりの谷を出る最初の一歩から、この王国が用意する最も過酷な戦いまで、あなたが成し遂げたすべてを世界が記録する場所です。遊びながら功績を獲得し、授かった称号を身にまとい、名声が高まっていくのを見届けましょう。",
@@ -10186,6 +10399,9 @@ export const ja_JP: EnTranslations = {
         "readyQuest": "報告可能なクエスト",
         "repeatQuest": "繰り返し可能なクエスト",
         "cooldownQuest": "再受注待ちのクエスト",
+        "availableWorldQuest": "利用可能なワールドクエスト: {name}",
+        "activeWorldQuest": "進行中のワールドクエスト: {name}",
+        "worldBoss": "ワールドボス: {name}",
         "questObjective": "クエスト目標エリア",
         "readyOre": "採掘可能な鉱脈",
         "readyWood": "採集可能な木材",
@@ -10965,6 +11181,8 @@ export const ja_JP: EnTranslations = {
       "browseGoodsAria": "{name}の品物を見る",
       "worldMarket": "ワールドマーケットを見せてください。",
       "worldMarketAria": "ワールドマーケットを開く",
+      "worldQuestBoard": "ワールドクエスト掲示板を見せてくれ。",
+      "worldQuestBoardAria": "地図でワールドクエスト掲示板を開く",
       "accept": "受諾",
       "decline": "辞退",
       "continue": "続ける",
@@ -10984,8 +11202,345 @@ export const ja_JP: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "レベル{level}が必要"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "不明なワールドクエスト（{id}）",
+      "itemReward": "アイテム報酬: {name}",
+      "rewardLine": "報酬: {reward}",
+      "availableStatus": "利用可能なワールドクエスト",
+      "activeStatus": "進行中のワールドクエスト",
+      "expiresIn": "終了まで{time}",
+      "mineOre": "銅鉱石を採掘",
+      "recoverObject": "{name}を回収",
+      "redirectLeyBeam": "レイビームを目的地へ導く",
+      "matchConfections": "魔法のお菓子を揃える",
+      "loadFreight": "荷物を荷馬車に積み込む",
+      "escortCaravan": "{zone}の隊商を護衛する",
+      "salvageWreckage": "難破船の残骸を回収",
+      "banner": {
+        "riftOpens": "浜辺に裂け目が開いた！略奪者たちが引き揚げ品を狙ってくる。",
+        "captainSteps": "略奪者の頭領が裂け目から現れた！",
+        "riftRouted": "略奪者たちは敗走した。浜辺は再びあなたのものだ。",
+        "championRises": "追加の戦利品！現場にチャンピオンが現れた。力を合わせて倒せ。",
+        "championFallen": "追加の戦利品！チャンピオンが倒れた。戦った全員にボーナスの財布が贈られる。",
+        "endlessBegins": "防衛線は持ちこたえた！次第に手強くなるエンドレスウェーブが始まる。大砲はいつ離れてもよい。"
+      },
+      "shadow": {
+        "title": "影に紛れて",
+        "objective": "見つからずに封印された命令書を4通盗み出す",
+        "cloak": "宵織りのマント",
+        "pickpocket": "スリ",
+        "leave": "マントを脱ぐ",
+        "stealTip": "背後から近づき、命令書を取る間は動かずにいること。ランタンの光に入らないように。",
+        "leaveTip": "マントを脱ぐ。回収した命令書は失われない。",
+        "documents": "回収した命令書：{count}/4",
+        "suspicion": "疑念：{value}",
+        "safe": "背後から盗め。ランタンの衛兵はマントを見破る光で広く照らす。隙ができるまで待とう。",
+        "behind": "盗む前に衛兵の背後に回れ。",
+        "danger": "見つかりかけている！視界から逃れろ！",
+        "channel": "盗み取り中… {seconds}秒",
+        "noTarget": "命令書を持つ衛兵に近づこう。",
+        "start": "斥候ヴァレリーに話しかけてマントを借りよう。",
+        "caught": "見つかった！斥候ヴァレリーのもとへ戻り、新しいマントを借りよう。命令書は無事だ。",
+        "complete": "命令書を4通すべて回収した。"
+      },
+      "investigation": {
+        "title": "借り物の顔",
+        "objective": "潜入者の正体を暴いて倒す",
+        "briefing": "化け物が兵士の顔を奪った。常備命令書と見張り台帳を読み、衛兵4人全員に話を聞いてから戻ってきてくれ。そして、話が記録と食い違う者の名を挙げるのだ。",
+        "instructions": "常備命令書と見張り台帳を読み、衛兵4人全員に話を聞こう。彼らの話を記録と照らし合わせること。",
+        "confront": "軍曹アルリックに報告し、話が記録と食い違う衛兵の名を挙げよう。",
+        "name": "私の衛兵のうち、借り物の顔をしているのは誰だ？",
+        "accuseOption": "{name}を告発する",
+        "cleared": "軍曹アルリック：その兵士の身元は確かだ。他の者の話を記録と照らし合わせて、もう一度考えてくれ。",
+        "guardCleared": "軍曹アルリックはすでにこの兵士の身元を確かめている。",
+        "revealed": "化け物はこの顔を脱ぎ捨てた。倒せ。",
+        "defeat": "正体を現した潜入者を倒せ。",
+        "heard": "話を聞いた衛兵：{count}/4",
+        "clues": "調べた記録：{count}/2",
+        "clueNames": {
+          "c0": "常備命令書",
+          "c1": "見張り台帳"
+        },
+        "variants": {
+          "v0": {
+            "clue0": "南の橋は夜明けから封鎖されている。巡回はすべて西の道を使うこと。",
+            "clue1": "オリンは門の当番。ネラ、ブラム、テッサは西の道を巡回した。",
+            "guard0": "今朝、私の巡回は西の道を通った。",
+            "guard1": "朝の巡回で南の橋を渡った。",
+            "guard2": "ネラとテッサと一緒に西の道を巡回した。",
+            "guard3": "南の橋は封鎖されている。私たちは西の道を使った。"
+          },
+          "v1": {
+            "clue0": "本日の合言葉は「リードウォッチ」。昨日の合言葉「ランタン」はもう無効である。",
+            "clue1": "衛兵4人全員が、夜明けに新しい合言葉の説明を受けた。",
+            "guard0": "「リードウォッチ」。夜明けに新しい合言葉を教わった。",
+            "guard1": "「ランタン」は昨日の合言葉だ。今日は「リードウォッチ」を使う。",
+            "guard2": "夜明けの説明には4人全員が出席した。",
+            "guard3": "今日の合言葉は「ランタン」だ。夜明けの説明で聞いた。"
+          },
+          "v2": {
+            "clue0": "守備隊の補給箱にはすべて青い封蝋が必要。赤い封蝋の箱は受け取らないこと。",
+            "clue1": "本日の搬入品は検査済み。どの箱にも青い封蝋が無傷で付いていた。",
+            "guard0": "今日の搬入品を検査した。どの箱にも赤い封蝋が付いていた。",
+            "guard1": "受け取るのは青い封蝋の箱だけだ。",
+            "guard2": "台帳には、今日の搬入品は青い封蝋だったと記録されている。",
+            "guard3": "今日は赤い封蝋の箱は一つも受け取っていない。"
+          },
+          "v3": {
+            "clue0": "夜警は日暮れに東のかがり火を灯し直す。西のかがり火は、渡し船の合図があるまで灯さない。",
+            "clue1": "ネラとオリンは夜通し門を守った。ブラムとテッサは堤道を歩き、日暮れに東のかがり火を灯し直した。",
+            "guard0": "オリンと私は一晩中門にいた。霧のほかは何も通らなかった。",
+            "guard1": "ネラと門の当番だ。命令どおり、日暮れに東のかがり火が灯るのを見届けた。",
+            "guard2": "テッサと私は堤道を歩いた。渡し船から見えるよう、日暮れに西のかがり火を灯した。",
+            "guard3": "ブラムと堤道の巡回だ。日が沈んだ瞬間に東のかがり火を灯し直した。"
+          },
+          "v4": {
+            "clue0": "補給係の荷馬車は正午に北の道を通って到着する。湿地が水浸しの間は、水路での補給はない。",
+            "clue1": "正午の搬入品を北の道から受領。テッサが署名し、ブラムとネラが荷を降ろし、オリンは井戸にいた。",
+            "guard0": "正午にブラムを手伝って荷馬車の荷を降ろした。塩漬け豚肉とランプの油、いつもの品だ。",
+            "guard1": "正午の搬入品は、補給船から直接、私が自分で降ろした。",
+            "guard2": "ネラと私で箱を運び入れた。台帳にはテッサが署名した。",
+            "guard3": "荷馬車は正午に北の道を上ってきた。受領の署名は私がした。"
+          },
+          "v5": {
+            "clue0": "先の襲撃で倒れた者たちは、礼拝堂の地下墓所に眠っている。軍曹の鍵なしには誰も地下墓所に入れない。",
+            "clue1": "襲撃以来、軍曹の鍵はベルトから一度も離れていない。ネラ、オリン、ブラムは城壁に立ち、テッサは中庭を守った。",
+            "guard0": "私は城壁に立っていた。襲撃以来、地下墓所は施錠されたままだ。鍵を持つのは軍曹だけだ。",
+            "guard1": "ネラとブラムと城壁の当番だ。カエルの声のほかは静かなものだった。",
+            "guard2": "一日中、城壁にいた。地下墓所に近づいた者はいない。",
+            "guard3": "私は中庭を守りながら、今朝地下墓所の様子を見に行った。倒れた者たちは安らかに眠っている。"
+          }
+        }
+      },
+      "horde": {
+        "title": "最後のバリケード",
+        "objective": "バリケードを守り、大群の指揮官を倒す",
+        "ready": "バリケードの隊長に話しかけて開始しよう。",
+        "countdown": "{seconds}秒後に大群が襲来！",
+        "status": "残り{seconds}秒。撃破数：{kills}。バリケード：{barrier}%。",
+        "upgrade": "武器：{weapon}",
+        "loadout": "弾数：{count} | 速度+{speed}% | {weapon}",
+        "exit": "防衛をやめる",
+        "gained": "強化：{upgrade}",
+        "killBurst": "+{count}体撃破！",
+        "choices": {
+          "projectile": "弾数+1",
+          "haste": "連射速度+25%",
+          "pierce": "貫通弾",
+          "explosive": "爆裂弾",
+          "double": "弾数x2"
+        },
+        "weapons": {
+          "0": "連発銃",
+          "1": "Twin Shot",
+          "2": "貫通射撃",
+          "3": "爆裂射撃"
+        },
+        "controls": "自動射撃。A/D、矢印キー、スティックで移動。後退で離脱。",
+        "supplies": "箱を1つ壊して選ぼう。もう一方は消える！",
+        "result": "{rating}！スコア：{score}。",
+        "resultStats": "撃破数：{kills}。バリケード：{barrier}%。",
+        "failed": "防衛失敗。もう一度挑戦しよう！",
+        "replay": "隊長に話しかけて再挑戦。報酬はローテーションごとに1回。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "銀",
+          "bronze": "銅"
+        }
+      },
+      "wispMaze": {
+        "leave": "迷宮を出る",
+        "title": "ウィスプウッドの迷宮",
+        "objective": "盗まれた財布を迷宮からすべて取り戻す",
+        "ready": "迷宮の番人に話しかけて開始しよう。",
+        "controls": "迷宮を進んで財布を拾おう。影は避けること。輝くウィスプを取ると、短い間だけ影を追い払える。",
+        "collected": "財布：{count}/{total}",
+        "lives": "ライフ：{count}/3",
+        "power": "ウィスプの力：{seconds}秒",
+        "countdown": "{seconds}秒後に開始",
+        "collect": "財布を拾おう。影は避けること。",
+        "powered": "力がみなぎる！影に触れて追い払え。",
+        "finished": "財布をすべて取り戻した！",
+        "retry": "ライフが3つに回復した。もう一度迷宮に挑もう。",
+        "startNormal": "迷宮に入る：ノーマル（影{shadows}体）",
+        "startHard": "迷宮に入る：ハード（影{shadows}体、ボーナスの財布）"
+      },
+      "forge": {
+        "title": "手助けのハンマー",
+        "objective": "鍛冶師マーラの盾作りを手伝う",
+        "ready": "鍛冶師マーラに話しかけて開始しよう。",
+        "countdown": "手を構えて！{seconds}秒後に開始。",
+        "preparing": "お見事！次の注文は…",
+        "fuel": "薪の山",
+        "metal": "インゴットの箱",
+        "water": "Well",
+        "tools": "金床",
+        "request": {
+          "fuel": "火を強めて！薪をくべて！",
+          "metal": "金属が足りない！インゴットの箱を開けて！",
+          "water": "冷やして！井戸の水を！",
+          "tools": "叩いて形を整えて！金床を使って！"
+        },
+        "sequence": "{instruction} 次に{next}をクリック。",
+        "round": "注文{round}/{total}：工程{step}/{steps}",
+        "thresholds": "金：{gold}秒以内。銀：{silver}秒以内。",
+        "starting": "準備中…",
+        "finished": "見事な仕事だ！守備隊にふさわしい盾ができた！",
+        "failed": "ミスが多すぎた！金属が割れてしまった。マーラに話しかけて再挑戦しよう。",
+        "wrong": "道具が違う！+{penalty}秒。頼まれた物を選ぼう。",
+        "correct": "それだ！その調子。",
+        "result": "{rating}！{seconds}秒。ミス：{mistakes}。",
+        "replay": "マーラに話しかけて再挑戦。報酬はローテーションごとに1回のみ。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "銀",
+          "bronze": "銅"
+        },
+        "strike": "打つ",
+        "strikeTip": "金属を叩く。針が暗い帯を横切るときに押そう。うまく打つたびに帯は狭まり、針は速くなる。帯の外で打つか、炉が冷えているときに打つと3秒のペナルティ。",
+        "stoke": "くべる",
+        "stokeTip": "火に薪をくべる。炉は常に冷えていく。熱を{floor}より上に保たないと、冷えたまま打つことになる。",
+        "strikes": "打撃：{count}/{total}",
+        "heat": "炉の熱：{value}（{floor}より上に保つ）",
+        "mistakes": "ミス：{count}",
+        "meterAria": "ハンマーのタイミングメーター",
+        "hintStrike": "針をよく見て、暗い帯の中で打て！",
+        "hintStoke": "炉が冷えてきた！打つ前に火に薪をくべよう。",
+        "hit": "会心の一撃！帯が狭まった。",
+        "miss": "帯を外した！+{penalty}秒。",
+        "cold": "冷えた一撃！先に火に薪をくべよう。+{penalty}秒。"
+      },
+      "glider": {
+        "title": "ウィンドライダー・スラローム",
+        "boost": "加速",
+        "boostTip": "飛行速度を{speed}yd/秒上げる（最大{maximum}yd/秒）。飛行中に使用可能。{seconds}秒で再充填される。",
+        "objective": "風の輪をくぐり抜け、指定の区域に着地する",
+        "ready": "フライトマスター・ゼファーに話しかけて飛び立とう。",
+        "countdown": "発進まで{count}…しっかりつかまれ！",
+        "flying": "輪：{rings}/{total} | タイム：{time}秒 | 速度：{speed}yd/秒",
+        "climb": "上昇",
+        "climbTip": "押し続けると機首を上げ、速度と引き換えに高度を得る。タップで小さく調整。低速で飛ぶと揚力を失う。",
+        "dive": "Dive",
+        "diveTip": "押し続けると機首を下げ、速度を得る。タップで小さく調整。",
+        "controls": "右クリックを押したまま上を向くと、速度と引き換えに上昇する。下を向くと降下して加速する。低速で飛ぶと揚力を失う。左右で旋回、後退でブレーキ。ジャンプや水泳の上昇・下降でも機首の角度を操作できる。風のトンネルを前進して通り抜けると加速する（1回の挑戦につきトンネルごとに1回）。",
+        "landed": "{rating}！{time}秒で輪を{rings}/{total}個通過。",
+        "failed": "降下失敗！コース外に着地したか、通過できなかった輪が多すぎた。",
+        "retry": "ゼファーに話しかけて再挑戦するか、着地区域のそばにいるスカイに話しかけて発進地点へ戻ろう。",
+        "nextRing": "峡谷沿いの次の風の輪を狙おう。少なくとも{minimum}個の輪を通過してから、指定の区域に着地すること。",
+        "landing": "すべての輪を通過！前方の着地区域へ向かおう。",
+        "complete": "着地完了！",
+        "score": "スコア：{score}。",
+        "medals": {
+          "gold": "Gold",
+          "silver": "銀",
+          "bronze": "銅"
+        }
+      },
+      "calligraphyTitle": "秘術の書道",
+      "traceOutline": "足取りで輪郭をなぞる",
+      "traceRoundInstruction": "{round}/{total}回目：{shape}。{instruction}",
+      "traceShape": {
+        "triangle": "三角形",
+        "square": "正方形",
+        "star": "星形",
+        "hourglass": "砂時計",
+        "lightning": "稲妻のルーン",
+        "spiral": "角張った渦巻き",
+        "double-triangle": "双三角の印",
+        "diamond": "ひし形",
+        "pentagon": "五角形",
+        "arrow": "矢のルーン",
+        "zigzag": "ジグザグの印",
+        "cross": "十字のルーン"
+      },
+      "traceRating": {
+        "bronze": "銅",
+        "silver": "銀",
+        "gold": "金"
+      },
+      "traceScoreResult": "完成！{rating}：{score}/{total}。基本報酬は不変。ゴールド：功績、称号、名声+10。",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "このルーンには新しいゲーム版が必要。",
+      "traceReaction": {
+        "tessaTriangle": "三つの角が全部ぴったり！",
+        "pipSquare": "辺が四つ！私にもできそう！",
+        "elianFinal": "最後のルーンだ。線が交差したり同じ点を通り直したりすることもある。明るい印をたどって次の角へ進もう。",
+        "elianGold": "見事な線だ！その足取りは金の評価にふさわしい。",
+        "elianComplete": "ルーンが完成した！丁寧に練習すれば次はもっと上手くなる。"
+      },
+      "traceReady": "先生に話しかけて始めよう。",
+      "tracePreview": "輪郭を見よう。金色の光が道を示してくれる。",
+      "traceStart": "開始地点の印へ。どちら向きでもなぞれる。",
+      "traceDrawing": "金色の光をたどって輝く角へ。青い線が歩いた跡だ。",
+      "traceSuccess": "輪郭が完成！",
+      "traceRetry": "先生に話しかけて再挑戦しよう。",
+      "traceOffPath": "輪郭から外れた。先生に話しかけて再挑戦しよう。",
+      "traceMovement": "騎乗せず地面を歩こう。先生に話しかけて再挑戦しよう。",
+      "traceTimeout": "時間切れ。先生に話しかけて再挑戦しよう。",
+      "traceCombat": "戦闘を離れ、先生に話しかけて再挑戦しよう。",
+      "puzzleTitle": "レイビームの調整",
+      "puzzleBeamReach": "接続した水晶：{count}",
+      "puzzleVictoryTitle": "調整完了",
+      "puzzleVictoryDetail": "レイビームが目的地に到達しました。",
+      "puzzleDefeatTitle": "調整失敗",
+      "puzzleDefeatDetail": "力が消え、儀式は未完のままです。",
+      "puzzleReturn": "世界に戻る",
+      "puzzleResultAnnouncement": "{title}。{detail} {reach}。",
+      "puzzleLevel": "デイリーレベル {level}",
+      "puzzleBonusLevel": "ボーナスレベル {level}/{total}",
+      "puzzleBonusCharged": "宝箱にボーナスの力が満ちている。レベル{level}/{total}が待っている。レイライン宝箱にもう一度触れて、追加のゴールドを手に入れよう。",
+      "puzzleBonusPaid": "ボーナスの財布を獲得！",
+      "puzzleBonusDone": "ボーナスレベルをすべてクリア。次の機会まで宝箱は眠りにつく。",
+      "puzzleInstructions": "タイルを回転させ、光線を始点から目的地までつなげてください。",
+      "puzzleRotateTile": "タイル{tile}を回転",
+      "puzzleConnectors": "接続方向: {connectors}。",
+      "puzzlePowered": "このタイルまで光線が届いています。",
+      "puzzleUnpowered": "このタイルには光線が届いていません。",
+      "puzzleClose": "レイビームパズルを閉じる",
+      "puzzleSource": "始点",
+      "puzzleTarget": "目的地",
+      "puzzleSourceEndpoint": "始点: {direction}。",
+      "puzzleTargetEndpoint": "目的地: {direction}。",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "puzzleRetry": "もう一度",
+      "puzzleTimer": "{seconds}s",
+      "puzzleTimerAria": "残り時間：{seconds}秒",
+      "startQuest": "ワールドクエストを開始",
+      "startEscort": "護衛を開始",
+      "escortTitle": "キャラバン",
+      "alreadyCompleted": "このサイクルのワールドクエストは完了済みです。",
+      "inProgress": "このワールドクエストは進行中です。",
+      "match3Title": "お菓子の連鎖",
+      "match3Instructions": "隣り合うお菓子を2つ選んでください。3つ以上の列ができる入れ替えだけが手数に数えられます。",
+      "match3Moves": "手数：{current}/{total}",
+      "match3Cleared": "消したお菓子：{current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "{row} 行 {column} 列：{candy}",
+      "match3Selected": "選択中",
+      "match3Reset": "レベルをやり直す",
+      "match3Close": "お菓子パズルを閉じる",
+      "match3OutOfMoves": "手数が残っていません。レベルをやり直してください。",
+      "match3VictoryTitle": "甘い勝利",
+      "match3VictoryDetail": "魔法のお菓子がすべて集まりました。",
+      "match3DefeatTitle": "苦い敗北",
+      "match3DefeatDetail": "手数を使い切りました。新しいお菓子が待っています。",
+      "match3TryAgain": "もう一度挑戦",
+      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
+      "match3ResultSummary": "{title}. {detail} {cleared}.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "ベリークリスタル",
+        "citrus": "シトラスオーブ",
+        "mint": "ミントトライアングル",
+        "grape": "グレープスクエア",
+        "star": "シュガースター"
+      }
+    },
     "logs": {
       "accepted": "クエスト受諾: {name}",
+      "worldQuestStarted": "ワールドクエスト開始: {name}",
       "abandoned": "クエスト破棄: {name}",
       "completed": "クエスト完了: {name}",
       "ready": "{name}（{status}）",
@@ -14372,6 +14927,18 @@ export const ja_JP: EnTranslations = {
       "sprung_trap": {
         "name": "弾かれた沼の罠"
       },
+      "leyline_cache": {
+        "name": "ミニチュア・レイライン宝箱"
+      },
+      "confection_game_box": {
+        "name": "菓子職人のゲーム箱"
+      },
+      "eastbrook_freight_crate": {
+        "name": "イーストブルックの貨物箱"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "イーストブルックの貨物荷馬車"
+      },
       "hearthlined_treads": {
         "name": "炉火裏地の足具"
       },
@@ -16699,6 +17266,51 @@ export const ja_JP: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "エンバーウォード、ヴァルクールの大盾"
+      },
+      "rift_watchers_band": {
+        "name": "裂け目の監視者の指輪"
+      },
+      "rift_surveyors_satchel": {
+        "name": "裂け目測量士の鞄"
+      },
+      "riftwalkers_tunic": {
+        "name": "裂け目歩きのチュニック"
+      },
+      "riftwarden_voidblade": {
+        "name": "裂け目の守護者の虚空剣"
+      },
+      "champion_rift_band": {
+        "name": "勇者の裂け目の指輪"
+      },
+      "order_prayer_beads": {
+        "name": "教団の祈りの数珠"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "侍祭の法衣"
+      },
+      "templar_dawn_shield": {
+        "name": "テンプラーの暁の盾"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "暁の守り手の聖別メイス"
+      },
+      "champion_dawn_medallion": {
+        "name": "勇者の暁のメダリオン"
+      },
+      "automaton_cog_ring": {
+        "name": "オートマトンの歯車の指輪"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "ぜんまい職人の背嚢"
+      },
+      "artificers_welding_cowl": {
+        "name": "工匠の溶接フード"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "鍛冶頭の岩壁の大鉈"
+      },
+      "champion_forged_loop": {
+        "name": "勇者の鍛造の指輪"
       }
     },
     "mobs": {
@@ -16726,6 +17338,15 @@ export const ja_JP: EnTranslations = {
       "vale_bandit": {
         "name": "谷の盗賊"
       },
+      "eastbrook_freight_caravan": {
+        "name": "イーストブルック貨物隊"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "ウィローフェン薬品隊商"
+      },
+      "frostveil_supply_caravan": {
+        "name": "フロストヴェイル補給隊商"
+      },
       "restless_bones": {
         "name": "安らがぬ骨"
       },
@@ -16746,6 +17367,9 @@ export const ja_JP: EnTranslations = {
       },
       "drowned_dead": {
         "name": "溺れ死者"
+      },
+      "fenbridge_infiltrator": {
+        "name": "借り物の顔"
       },
       "fen_troll": {
         "name": "マイアフェン・トロル"
@@ -17454,6 +18078,111 @@ export const ja_JP: EnTranslations = {
       }
     },
     "npcs": {
+      "glider_instructor": {
+        "name": "フライトマスター・ゼファー",
+        "title": "ウィンドライダー教官",
+        "greeting": "今日はザ・シアーの断崖から吹き上がる上昇気流が猛烈だ。機械仕掛けのグライダーに身を固定して、スラロームコースで翼を試す準備はいいか？"
+      },
+      "glider_apprentice": {
+        "name": "Skye",
+        "title": "ゼファーの弟子",
+        "greeting": "峡谷を下る見事な飛行だった。魔法の上昇気流でザ・シアーのゼファーのもとへ戻りたくなったら、いつでも声をかけてくれ。"
+      },
+      "shadow_cloak_scout": {
+        "name": "斥候ヴァレリー",
+        "title": "隠密作戦",
+        "greeting": "私の宵織りのマントを貸そう。伝令一人ひとりの背後に忍び寄り、命令書を抜き取るんだ。ランタンの光には入らないこと。ランタンの衛兵にはこの魔法が通じないし、伝令は体が触れれば気づく。"
+      },
+      "shadow_guard_north": {
+        "name": "伝令の衛兵",
+        "title": "伝令",
+        "greeting": "この封印された命令書は隊長宛てだ。近寄るな。"
+      },
+      "shadow_guard_south": {
+        "name": "伝令の衛兵",
+        "title": "伝令",
+        "greeting": "届けねばならん伝令がある。立ち止まるな。"
+      },
+      "shadow_guard_east": {
+        "name": "伝令の衛兵",
+        "title": "伝令",
+        "greeting": "遅れは許されん。見張りがこの命令書を待っている。"
+      },
+      "shadow_guard_west": {
+        "name": "伝令の衛兵",
+        "title": "伝令",
+        "greeting": "公務だ。道を空けろ。"
+      },
+      "shadow_sentry_south": {
+        "name": "ランタンの歩哨",
+        "title": "真実の目",
+        "greeting": "私のランタンは影以上のものを照らし出す。見える所にいろ。"
+      },
+      "shadow_sentry_north": {
+        "name": "ランタンの歩哨",
+        "title": "真実の目",
+        "greeting": "ランタンの見張りから逃れられる者はいない。"
+      },
+      "shadow_watch_west": {
+        "name": "ランタンの見張り番",
+        "title": "真実の目",
+        "greeting": "そこで止まれ。ランタンは目が見逃すものを見る。"
+      },
+      "shadow_watch_east": {
+        "name": "ランタンの見張り番",
+        "title": "真実の目",
+        "greeting": "私の光を気づかれずに越えられる者はいない。"
+      },
+      "forge_instructor": {
+        "name": "鍛冶師マーラ",
+        "title": "ワームウォッチの鍛冶師",
+        "greeting": "盾を仕上げるのを手伝って！私が頼む材料をクリックしてね。手早くやれば、もっと良いメダルがもらえるよ。"
+      },
+      "infiltrator_captain": {
+        "name": "軍曹アルリック",
+        "title": "フェンブリッジ守備隊",
+        "greeting": "化け物が兵士の顔を奪った。常備命令書と見張り台帳を読み、衛兵4人全員に話を聞いてから戻ってきてくれ。そして、話が記録と食い違う者の名を挙げるのだ。"
+      },
+      "infiltrator_nella": {
+        "name": "衛兵ネラ",
+        "title": "フェンブリッジ守備隊",
+        "greeting": "任務に就いております。"
+      },
+      "infiltrator_orin": {
+        "name": "衛兵オリン",
+        "title": "フェンブリッジ守備隊",
+        "greeting": "任務に就いております。"
+      },
+      "infiltrator_bram": {
+        "name": "衛兵ブラム",
+        "title": "フェンブリッジ守備隊",
+        "greeting": "任務に就いております。"
+      },
+      "infiltrator_tessa": {
+        "name": "衛兵テッサ",
+        "title": "フェンブリッジ守備隊",
+        "greeting": "任務に就いております。"
+      },
+      "wisp_maze_keeper": {
+        "name": "守り手リオラ",
+        "title": "生垣迷宮の番人",
+        "greeting": "盗賊どもが盗んだ金を迷宮のあちこちに隠し、今は影がそれを守っている。財布をすべて取り戻してほしい。守護者は避けるか、輝くウィスプを取って追い払うこと。ライフを3つ失うと入口に戻されるが、集めた財布は無事なままだ。"
+      },
+      "calligraphy_instructor": {
+        "name": "エリアン先生",
+        "title": "秘術の書道",
+        "greeting": "安定した足取りは安定した線を生む。弟子たちに三角形、四角形、高度なルーンを教えてくれ。"
+      },
+      "calligraphy_apprentice_1": {
+        "name": "見習いテッサ",
+        "title": "書道の生徒",
+        "greeting": "いつも早く曲がりすぎちゃうの。どこが角なのか教えてくれる？"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "見習いピップ",
+        "title": "書道の生徒",
+        "greeting": "まず三角形、次は四角形、それからルーン。一歩ずつしっかり歩こう！"
+      },
       "the_merchant": {
         "name": "商人",
         "title": "世界市場の守り手",
@@ -17888,6 +18617,26 @@ export const ja_JP: EnTranslations = {
         "name": "リフトライトのマエリス",
         "title": "リフト鍛冶の親方",
         "greeting": "リフトバウンドリングは、自分を生んだ裂け目を覚えている、{className}。リングと、裂け目が落とすエッセンスを持ってくれば、もっと多くを覚えさせてやろう。"
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "需品係ヴェイレン",
+        "title": "裂け目の監視団の補給係",
+        "greeting": "裂け目の監視団は岸を守り、深き裂け目を見張っている。我らの物資は、認められた地位を持つ者に開かれている。"
+      },
+      "npc_church_order_quartermaster": {
+        "name": "テンプラー・アルセア",
+        "title": "教団の需品係",
+        "greeting": "暁の光の中を歩め。教団は我らと共に仕える者に物資を供する。"
+      },
+      "npc_automaton_quartermaster": {
+        "name": "工匠トブリン",
+        "title": "オートマトンの調達官",
+        "greeting": "精密な歯車、鍛えた鋼、調整済みの動力。認可された操作者は我らの在庫から受け取れる。"
+      },
+      "npc_wq_taskmaster": {
+        "name": "監督官ケイレン",
+        "title": "ワールドクエスト監督官",
+        "greeting": "同盟の各勢力は毎日、領土中に任務を掲示する。任務が自分の技能に合わなければ、一日に一度だけ再割り当てを求められる。"
       },
       "forgemistress_darva": {
         "name": "鍛冶長ダルヴァ",
@@ -20727,6 +21476,9 @@ export const ja_JP: EnTranslations = {
           },
           "4": {
             "label": "裂け目野"
+          },
+          "5": {
+            "label": "難破船"
           }
         }
       },

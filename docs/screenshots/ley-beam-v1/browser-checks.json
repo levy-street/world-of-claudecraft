@@ -1,0 +1,71 @@
+{
+  "checks": [
+    {
+      "name": "after-desktop",
+      "outcome": "playing",
+      "rootWidth": 568,
+      "frameWidth": 394,
+      "rootOverflow": false,
+      "titleContained": true,
+      "minTile": 92,
+      "resultVisible": false,
+      "animations": 0
+    },
+    {
+      "name": "after-phone",
+      "outcome": "playing",
+      "rootWidth": 370,
+      "frameWidth": 322,
+      "rootOverflow": false,
+      "titleContained": true,
+      "minTile": 78.65625,
+      "resultVisible": false,
+      "animations": 0
+    },
+    {
+      "name": "after-phone-large-ui",
+      "outcome": "playing",
+      "rootWidth": 362,
+      "frameWidth": 322,
+      "rootOverflow": false,
+      "titleContained": true,
+      "minTile": 56.796875,
+      "resultVisible": false,
+      "animations": 0
+    },
+    {
+      "name": "victory",
+      "outcome": "won",
+      "rootWidth": 568,
+      "frameWidth": 394,
+      "rootOverflow": false,
+      "titleContained": true,
+      "minTile": 92,
+      "resultVisible": true,
+      "animations": 0
+    },
+    {
+      "name": "defeat-design",
+      "outcome": "lost",
+      "rootWidth": 568,
+      "frameWidth": 394,
+      "rootOverflow": false,
+      "titleContained": true,
+      "minTile": 92,
+      "resultVisible": true,
+      "animations": 0
+    },
+    {
+      "name": "completed-without-board",
+      "outcome": "won",
+      "rootWidth": 568,
+      "frameWidth": 394,
+      "rootOverflow": false,
+      "titleContained": true,
+      "minTile": null,
+      "resultVisible": true,
+      "animations": 0
+    }
+  ],
+  "errors": []
+}

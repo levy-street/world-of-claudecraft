@@ -105,11 +105,19 @@ describe('char_view: paperdoll data model', () => {
 
 describe('char_view: sidebar tabs', () => {
   it('models the Stats, Progression, and Skills tabs with one selected tab', () => {
-    expect(CHARACTER_SIDEBAR_TABS).toEqual(['stats', 'progression', 'skills']);
+    expect(CHARACTER_SIDEBAR_TABS).toEqual([
+      'stats',
+      'reputation',
+      'currencies',
+      'progression',
+      'skills',
+    ]);
     expect(buildCharacterSidebarView('progression')).toEqual({
       selected: 'progression',
       tabs: [
         { id: 'stats', selected: false },
+        { id: 'reputation', selected: false },
+        { id: 'currencies', selected: false },
         { id: 'progression', selected: true },
         { id: 'skills', selected: false },
       ],

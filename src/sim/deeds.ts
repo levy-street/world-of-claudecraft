@@ -906,6 +906,14 @@ export const METER_DIRTY_KEYS: Record<DeedMeterId, readonly string[]> = {
   // accepted rather than fixed: adding a mark to the per-kill path would put deed
   // work on a combat hot path to make a title appear slightly sooner.
   lifetimeHonor: [],
+  // Faction standing reads PlayerMeta.factions directly, never a deedStats
+  // ledger, so no narrow key could name it. The two award sites (the world
+  // quest turn-in in world_quests.ts and /dev rep in dev_commands.ts) mark a
+  // full pass right after awardFactionReputation, so a tier crossing grants
+  // on the tick it happens.
+  standingRiftWatch: [],
+  standingChurchOrder: [],
+  standingAutomatons: [],
   vcupWins: [],
   vcupGuildWins: [],
   bankPurchasedSlots: [],
@@ -1017,6 +1025,12 @@ const METERS: Record<DeedMeterId, (meta: PlayerMeta) => number> = {
   // LIFETIME honor, never the spendable balance: a rank once earned survives
   // every purchase at the WARFARE quartermaster.
   lifetimeHonor: (m) => m.lifetimeHonor,
+  // Faction standing per allied faction (awardFactionReputation only adds).
+  // Optional chaining: a legacy save restores without the block until the
+  // first award seeds it.
+  standingRiftWatch: (m) => m.factions?.rift_watch ?? 0,
+  standingChurchOrder: (m) => m.factions?.church_order ?? 0,
+  standingAutomatons: (m) => m.factions?.automatons ?? 0,
   vcupWins: (m) => m.vcupWins,
   vcupGuildWins: (m) => m.vcupGuildWins,
   bankPurchasedSlots: (m) => m.bank.purchasedSlots,

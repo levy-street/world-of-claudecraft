@@ -15,6 +15,8 @@ import { esc } from '../../esc';
 import { focusKeyAttr } from '../../focus_restore';
 import { t } from '../../i18n';
 import { mountSkinDescription, mountSkinDisplayName } from '../../mount_labels';
+import { svgIcon } from '../../ui_icons';
+import { armorySkinArt, mountSkinArt } from '../../woc_store_view';
 import {
   type CosmeticsScope,
   type CosmeticsSnapshot,
@@ -56,7 +58,7 @@ function actionButton(
   disabled = false,
 ): string {
   return (
-    `<button type="button" class="cos-action" data-act="${esc(act)}" data-id="${esc(id)}"${focusKeyAttr(`cosmetic:${id}`)}${extra}` +
+    `<button type="button" class="cos-action ui-btn ui-btn--gold" data-act="${esc(act)}" data-id="${esc(id)}"${focusKeyAttr(`cosmetic:${id}`)}${extra}` +
     `${disabled ? ' disabled aria-disabled="true"' : ''}>${esc(label)}</button>`
   );
 }
@@ -79,14 +81,21 @@ function mountCardHtml(card: MountSkinCard): string {
   // player sees the skin on their own character before buying it.
   const preview = previewButton('preview-mount', card.id, name);
   return (
-    `<article class="cos-card rarity-${esc(card.rarity)}${card.owned ? ' owned' : ''}${card.worn ? ' worn' : ''}" ` +
+    `<article class="cos-card ui-card cos-mount rarity-${esc(card.rarity)}${card.owned ? ' owned' : ''}${card.worn ? ' worn' : ''}" ` +
     `data-card="${esc(card.id)}" aria-label="${esc(t('hudChrome.cosmetics.cardAria', { name, rarity: mountRarityLabel(card.rarity) }))}">` +
+    cardArtHtml(mountSkinArt(card.id), 'mount') +
     `<div class="cos-card-head">${scopeBadge(card.ownershipScope, false)}${card.worn ? scopeBadge(card.wornScope, true) : ''}` +
     `<span class="cos-rarity q-${esc(card.rarity)}">${esc(mountRarityLabel(card.rarity))}</span></div>` +
     `<h3 class="cos-card-name">${esc(name)}</h3>` +
     (desc ? `<p class="cos-card-desc">${esc(desc)}</p>` : '') +
     `<div class="cos-card-actions">${state}${preview}${action}</div></article>`
   );
+}
+
+/** The catalog art is decorative: the adjacent heading supplies its name.
+ *  Keep the existing Preview button as the only interactive preview target. */
+function cardArtHtml(url: string, kind: 'mount' | 'weapon'): string {
+  return `<div class="cos-card-art cos-card-art-${kind}" aria-hidden="true"><img class="cos-card-image" src="${esc(url)}" alt="" loading="lazy" decoding="async"></div>`;
 }
 
 /** The preview action: its own class, NEVER `.cos-action`, so the wear /
@@ -96,7 +105,7 @@ function mountCardHtml(card: MountSkinCard): string {
  *  40px touch floor as `.cos-action`. */
 function previewButton(act: 'preview-mount' | 'preview-skin', id: string, name: string): string {
   return (
-    `<button type="button" class="cos-preview" data-act="${esc(act)}" data-id="${esc(id)}"${focusKeyAttr(`cosmetic-preview:${id}`)} ` +
+    `<button type="button" class="cos-preview ui-btn" data-act="${esc(act)}" data-id="${esc(id)}"${focusKeyAttr(`cosmetic-preview:${id}`)} ` +
     `aria-label="${esc(t('hudChrome.cosmetics.previewAria', { name }))}">${esc(t('hudChrome.cosmetics.preview'))}</button>`
   );
 }
@@ -124,8 +133,9 @@ function weaponGroupHtml(group: WeaponSkinGroup): string {
           ? `<p class="cos-card-hint">${esc(t('hudChrome.cosmetics.skinsApplyHint', { type: typeLabel }))}</p>`
           : '';
       return (
-        `<article class="cos-card cos-row rarity-${esc(row.rarity)} owned${row.applied ? ' worn' : ''}" ` +
+        `<article class="cos-card ui-card cos-row rarity-${esc(row.rarity)} owned${row.applied ? ' worn' : ''}" ` +
         `data-card="${esc(row.id)}" aria-label="${esc(t('hudChrome.cosmetics.cardAria', { name, rarity: rarityLabel(row.rarity) }))}">` +
+        cardArtHtml(armorySkinArt(row.id), 'weapon') +
         `<div class="cos-card-head">${scopeBadge(row.ownershipScope, false)}${row.applied ? scopeBadge(row.appliedScope, true) : ''}` +
         `<span class="cos-rarity q-${esc(row.rarity)}">${esc(rarityLabel(row.rarity))}</span></div>` +
         `<h3 class="cos-card-name">${esc(name)}</h3>${hint}` +
@@ -152,18 +162,18 @@ function mechCardHtml(card: MechChromaCard): string {
           ` data-index="${card.index}"`,
         );
   return (
-    `<article class="cos-card cos-mech rarity-${esc(card.rank)} owned${card.worn ? ' worn' : ''}" ` +
+    `<article class="cos-card ui-card cos-mech rarity-${esc(card.rank)} owned${card.worn ? ' worn' : ''}" ` +
     `data-card="${esc(card.id)}" aria-label="${esc(t('hudChrome.cosmetics.cardAria', { name, rarity: rankName }))}">` +
     `<div class="cos-card-head">${scopeBadge(card.ownershipScope, false)}${card.worn ? scopeBadge(card.wornScope, true) : ''}` +
     `<span class="cos-rarity q-${esc(card.rank)}">${esc(rankName)}</span></div>` +
-    `<div class="cos-mech-swatch chroma-${esc(card.id)}" aria-hidden="true"></div>` +
+    `<div class="cos-mech-swatch chroma-${esc(card.id)}" aria-hidden="true">${svgIcon('character')}</div>` +
     `<h3 class="cos-card-name">${esc(name)}</h3>` +
     `<div class="cos-card-actions">${state}${action}</div></article>`
   );
 }
 
 function emptyHtml(text: string): string {
-  return `<p class="cos-empty">${esc(text)}</p>`;
+  return `<div class="cos-empty ui-card"><span class="cos-empty-icon" aria-hidden="true">${svgIcon('character')}</span><p class="cos-empty-title">${esc(text)}</p></div>`;
 }
 
 /** The whole tab panel for the snapshot's selected tab. */

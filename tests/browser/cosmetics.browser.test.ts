@@ -39,6 +39,45 @@ function mountWindow() {
   return { root, world, win };
 }
 describe('cosmetics accessibility and interaction', () => {
+  it.each([
+    { width: 1920, height: 1080, mobile: false },
+    { width: 1366, height: 768, mobile: false },
+    { width: 390, height: 844, mobile: true },
+    { width: 844, height: 390, mobile: true },
+  ])('gives collection art and actions room at $width x $height', async (size) => {
+    await page.viewport(size.width, size.height);
+    if (size.mobile) document.body.classList.add('mobile-touch');
+    const { root, win } = mountWindow();
+    for (const tab of ['mounts', 'skins', 'mech'] as const) {
+      win.open(tab);
+      await document.fonts.ready;
+      expect.soft(root.scrollWidth, tab).toBeLessThanOrEqual(root.clientWidth + 1);
+      const cards = root.querySelectorAll<HTMLElement>('.cos-card');
+      expect(cards.length).toBeGreaterThan(0);
+      if (tab !== 'mech') expect(root.querySelectorAll('.cos-card img').length).toBeGreaterThan(0);
+      for (const card of cards) {
+        if (!size.mobile)
+          expect.soft(card.getBoundingClientRect().width, tab).toBeGreaterThanOrEqual(250);
+        const art = card.querySelector<HTMLImageElement>('img');
+        if (art && tab !== 'mech') {
+          expect.soft(art.getBoundingClientRect().height, `${tab} art`).toBeGreaterThanOrEqual(96);
+          expect.soft(art.getBoundingClientRect().width, `${tab} art`).toBeGreaterThanOrEqual(96);
+        }
+      }
+      const actions = root.querySelectorAll<HTMLButtonElement>('.cos-action, .cos-preview');
+      expect(actions.length).toBeGreaterThan(0);
+      for (const action of actions) {
+        action.scrollIntoView({ block: 'center', behavior: 'instant' });
+        const rect = action.getBoundingClientRect();
+        expect.soft(rect.height, tab).toBeGreaterThanOrEqual(40);
+        expect.soft(rect.width, tab).toBeGreaterThanOrEqual(40);
+        expect.soft(rect.left, tab).toBeGreaterThanOrEqual(0);
+        expect.soft(rect.right, tab).toBeLessThanOrEqual(size.width + 1);
+        expect.soft(rect.top, tab).toBeGreaterThanOrEqual(0);
+        expect.soft(rect.bottom, tab).toBeLessThanOrEqual(size.height + 1);
+      }
+    }
+  });
   it.each(['mounts', 'skins', 'mech'] as const)(
     '%s has a named dialog and no serious WCAG violations',
     async (tab) => {
@@ -62,7 +101,7 @@ describe('cosmetics accessibility and interaction', () => {
     expect(document.activeElement).toBe(control());
     expect(control().dataset.act).toBe('takeoff-mount');
     await page.screenshot({
-      path: '../../docs/screenshots/cosmetics-window/review-keyboard-focus.png',
+      path: '../../docs/screenshots/clue-character-panel/current-polish-keyboard-focus.png',
     });
     world.accountCosmetics.mountSkinIds = ['mech_bird'];
     win.refreshIfChanged();
@@ -85,7 +124,7 @@ describe('cosmetics accessibility and interaction', () => {
       expect(tab.getBoundingClientRect().width).toBeGreaterThanOrEqual(40);
     }
     await page.screenshot({
-      path: '../../docs/screenshots/cosmetics-window/review-mobile-tabs.png',
+      path: '../../docs/screenshots/clue-character-panel/current-polish-mobile-tabs.png',
     });
     for (const id of MOUNT_SKIN_IDS) {
       const button = root.querySelector<HTMLButtonElement>(

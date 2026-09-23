@@ -27,7 +27,9 @@ import {
 } from '../../src/ui/hud/quest/quest_strip_core';
 import type { TrackedQuest } from '../../src/ui/hud/quest/quest_tracker';
 import '../../src/styles/index.css';
+import { ensureLocaleLoaded, setLanguage, t } from '../../src/ui/i18n';
 import { makeWriterFacet } from '../../src/ui/painter_host';
+import { worldQuestTraceScoreText } from '../../src/ui/world_quest_trace_view';
 import { cleanup } from './_harness';
 
 // Both are real landscape phone viewports the touch HUD ships to: 844x390 is the
@@ -221,6 +223,7 @@ function overlaps(a: DOMRect, b: DOMRect): boolean {
 }
 
 afterEach(() => {
+  setLanguage('en');
   cleanup();
   document.body.className = '';
   document.documentElement.style.removeProperty('--app-vw');
@@ -235,6 +238,79 @@ describe.each(VIEWPORTS)('the touch quest strip at $label', ({ width, height, ti
     document.documentElement.style.setProperty('--app-vh', `${height}px`);
     return mountHud();
   }
+
+  it('shows full calligraphy instructions at the minimum strip width without overlapping controls', async () => {
+    const rig = await setup();
+    for (const language of ['en', 'zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const) {
+      await ensureLocaleLoaded(language);
+      setLanguage(language);
+      const labels: { label: string; key: string; complete: boolean }[] = [];
+      for (const [shapeIndex, kind] of (
+        [
+          'triangle',
+          'square',
+          'star',
+          'hourglass',
+          'lightning',
+          'spiral',
+          'double-triangle',
+        ] as const
+      ).entries()) {
+        for (const key of [
+          'tracePreview',
+          'traceStart',
+          'traceDrawing',
+          'traceOffPath',
+          'traceMovement',
+          'traceTimeout',
+          'traceCombat',
+        ] as const) {
+          const label = t('questUi.worldQuest.traceRoundInstruction', {
+            round: String(Math.min(shapeIndex + 1, 3)),
+            total: '3',
+            shape: t(`questUi.worldQuest.traceShape.${kind}`),
+            instruction: t(`questUi.worldQuest.${key}`),
+          });
+          labels.push({ label, key: `${kind}/${key}`, complete: false });
+        }
+      }
+      for (const rating of ['bronze', 'silver', 'gold'] as const) {
+        labels.push({
+          label: worldQuestTraceScoreText({ score: 100, rating }),
+          key: rating,
+          complete: true,
+        });
+      }
+      for (const { label, key, complete } of labels) {
+        const lesson: TrackedQuest = {
+          id: 'wq_eastbrook_calligraphy',
+          number: 1,
+          title: t('questUi.worldQuest.calligraphyTitle'),
+          complete,
+          objectives: [{ label, current: 0, total: 1, instruction: true }],
+        };
+        rig.controller.update([lesson], 0, lesson.id);
+        rig.root.style.width = '150px';
+        rig.root.style.maxWidth = '150px';
+        expect(rig.objective.textContent).toBe(label);
+        expect(getComputedStyle(rig.objective).whiteSpace).toBe('normal');
+        expect(rig.objective.scrollWidth, `${language}/${key} width`).toBeLessThanOrEqual(
+          rig.objective.clientWidth + 1,
+        );
+        expect(rig.objectives.scrollHeight, `${language}/${key} height`).toBeLessThanOrEqual(
+          rig.objectives.clientHeight + 1,
+        );
+        expect(overlaps(rig.root.getBoundingClientRect(), rig.ring.getBoundingClientRect())).toBe(
+          false,
+        );
+        const moveZone = document.getElementById('mobile-move-zone');
+        if (!moveZone) throw new Error('missing movement controls');
+        expect(overlaps(rig.root.getBoundingClientRect(), moveZone.getBoundingClientRect())).toBe(
+          false,
+        );
+      }
+    }
+  });
 
   it('seats itself in the top band, clear of the target frame it is derived from', async () => {
     const rig = await setup();

@@ -1,0 +1,33 @@
+{
+  "results": [
+    {
+      "case": "six preview controls fit 360px with 40px targets",
+      "passed": true
+    },
+    {
+      "case": "forced colors won",
+      "outcome": "won",
+      "frameDisplay": "none",
+      "glyphVisibility": "visible",
+      "color": "rgb(0, 0, 0)",
+      "background": "rgb(255, 255, 255)",
+      "canvas": "rgb(255, 255, 255)",
+      "copy": "Sweet victory\n\nThe enchanted collection is complete.",
+      "focused": true,
+      "effects": 0
+    },
+    {
+      "case": "forced colors lost",
+      "outcome": "lost",
+      "frameDisplay": "none",
+      "glyphVisibility": "visible",
+      "color": "rgb(0, 0, 0)",
+      "background": "rgb(255, 255, 255)",
+      "canvas": "rgb(255, 255, 255)",
+      "copy": "The enchantment fades\n\nYour moves are spent. A fresh collection awaits.",
+      "focused": true,
+      "effects": 0
+    }
+  ],
+  "errors": []
+}

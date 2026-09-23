@@ -4,8 +4,13 @@
 // the seam exactly once with the right arguments, the tab strip must switch and
 // refocus, an unowned card must offer nothing, and a changed snapshot must
 // repaint the worn state.
+
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MECH_CHROMAS } from '../src/sim/content/skins';
+import { WEAPON_SKIN_LIST } from '../src/sim/content/weapon_skins';
 import { CosmeticsWindow } from '../src/ui/hud/cosmetics/cosmetics_window';
 
 vi.mock('../src/game/audio', () => ({ audio: { click: vi.fn() } }));
@@ -97,6 +102,48 @@ beforeEach(() => {
 });
 
 describe('CosmeticsWindow', () => {
+  it('renders shipped decorative art for every catalog mount and owned weapon skin', () => {
+    const world = fakeWorld();
+    world.accountCosmetics.weaponSkinIds = WEAPON_SKIN_LIST.map((skin) => skin.id);
+    const { w, el } = makeWindow(world);
+    w.open();
+    for (const id of MOUNT_SKIN_IDS) {
+      const image = card(el, id).querySelector<HTMLImageElement>('.cos-card-art-mount img');
+      expect(image?.getAttribute('src')).toBe(`/ui/store/mount_skins/${id}.webp`);
+      expect(image?.alt).toBe('');
+      expect(image?.getAttribute('loading')).toBe('lazy');
+      expect(image?.parentElement?.getAttribute('aria-hidden')).toBe('true');
+      const src = image?.getAttribute('src');
+      if (!src) throw new Error(`Missing mount art: ${id}`);
+      expect(existsSync(resolve('public', src.slice(1)))).toBe(true);
+      expect(card(el, id).classList.contains('ui-card')).toBe(true);
+    }
+    w.open('skins');
+    for (const { id } of WEAPON_SKIN_LIST) {
+      const image = card(el, id).querySelector<HTMLImageElement>('.cos-card-art-weapon img');
+      expect(image?.getAttribute('src')).toBe(`/ui/store/armory/${id}.webp`);
+      expect(image?.alt).toBe('');
+      expect(image?.getAttribute('decoding')).toBe('async');
+      const src = image?.getAttribute('src');
+      if (!src) throw new Error(`Missing weapon art: ${id}`);
+      expect(existsSync(resolve('public', src.slice(1)))).toBe(true);
+    }
+  });
+
+  it('ignores unknown cosmetic ids without requesting fabricated image paths', () => {
+    const world = fakeWorld();
+    world.accountCosmetics.weaponSkinIds = ['unknown-weapon'];
+    world.accountCosmetics.mechChromaIds = ['unknown-chroma'];
+    const { w, el } = makeWindow(world);
+    for (const tab of ['skins', 'mech'] as const) {
+      w.open(tab);
+      expect(el.querySelector('.cos-empty.ui-card')).not.toBeNull();
+      expect(el.querySelector('.cos-empty-title')?.textContent).not.toBe('');
+      expect(el.querySelector('.cos-card-image')).toBeNull();
+      expect(el.querySelector('.cos-action')).toBeNull();
+    }
+  });
+
   it('opens on the Mounts tab with every catalog skin, actions only on owned ones', () => {
     const world = fakeWorld();
     const { w, el } = makeWindow(world);

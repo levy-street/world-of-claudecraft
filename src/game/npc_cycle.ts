@@ -1,3 +1,8 @@
+import {
+  type InvestigationVisibilityReader,
+  investigationDisguiseHidden,
+} from '../sim/world_quest_investigation_visibility';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 // Stepping through the NPCs standing near you, for the pad's d-pad.
 //
 // Why this is not the sim's friendly cycle: `isFriendlyTo` answers "may I heal or
@@ -32,10 +37,17 @@ export function nearbyNpcs(
   entities: Iterable<CycleEntity>,
   origin: { x: number; z: number },
   range = NPC_CYCLE_RANGE,
+  world: InvestigationVisibilityReader = {},
 ): CycleEntity[] {
   const found: { e: CycleEntity; d: number }[] = [];
   for (const e of entities) {
-    if (e.kind !== 'npc' || e.dead) continue;
+    if (
+      e.kind !== 'npc' ||
+      e.dead ||
+      investigationDisguiseHidden({ id: e.id, kind: 'npc' }, world) ||
+      shadowGuardHidden({ id: e.id, kind: 'npc' }, world)
+    )
+      continue;
     const d = distance2d(origin, e.pos);
     if (d <= range) found.push({ e, d });
   }
@@ -57,10 +69,30 @@ export function nextNpcTarget(
   currentTargetId: number | null,
   step: 1 | -1 = 1,
   range = NPC_CYCLE_RANGE,
+  world: InvestigationVisibilityReader = {},
 ): number | null {
-  const list = nearbyNpcs(entities, origin, range);
+  const list = nearbyNpcs(entities, origin, range, world);
   if (list.length === 0) return null;
   const at = list.findIndex((e) => e.id === currentTargetId);
   if (at < 0) return list[step === 1 ? 0 : list.length - 1].id;
   return list[(at + step + list.length) % list.length].id;
+}
+
+/** The world the pad cycles through: its entities, the viewer's own player, and the
+ *  personal quest visibility that hides disguised and shadow guards. */
+export interface NpcCycleWorld extends InvestigationVisibilityReader {
+  entities: { values(): Iterable<CycleEntity> };
+  player: { pos: { x: number; z: number }; targetId?: number | null };
+}
+
+/** nextNpcTarget from the world's own player and target, honoring its visibility. */
+export function nextNpcTargetForWorld(world: NpcCycleWorld, step: 1 | -1): number | null {
+  return nextNpcTarget(
+    world.entities.values(),
+    world.player.pos,
+    world.player.targetId ?? null,
+    step,
+    NPC_CYCLE_RANGE,
+    world,
+  );
 }
