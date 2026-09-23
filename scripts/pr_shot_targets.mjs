@@ -4464,6 +4464,63 @@ export const TARGETS = [
     },
   },
   {
+    key: 'faction-quartermaster-ladder',
+    label: 'Faction quartermaster: the standing ladder at Vanguard (Champion rows still gated)',
+    when: ['sim/content/faction_vendors'],
+    // The Church Order quartermaster in Eastbrook Vale with the buyer at
+    // Vanguard standing: every row through the Vanguard weapon and shield is
+    // open, the Champion jewels still show their gate line. On a base
+    // checkout the same recipe shoots the old five-row stock.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'npc_church_order_quartermaster',
+        );
+        if (!vendor) return { ok: false, reason: 'no quartermaster entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        const meta = sim.players.get(p.id);
+        if (!meta) return { ok: false, reason: 'no player meta' };
+        meta.factions = { ...meta.factions, church_order: 13_000 };
+        meta.copper = 1_000_000;
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`faction-quartermaster-ladder setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      // The lowest-preset first boot can keep the loading curtain up past the
+      // entry settle (main.ts hideLoadingScreen fades it on the first painted
+      // frame); shoot only once it has cleared, or the curtain is the shot.
+      for (let i = 0; i < 60; i++) {
+        const curtainUp = await page.evaluate(() =>
+          document.querySelector('#loading-screen')?.classList.contains('visible'),
+        );
+        if (!curtainUp) break;
+        await wait(500);
+      }
+      await wait(600);
+      return {};
+    },
+  },
+  {
     key: 'bank-chips',
     label: 'Bank window with its bags companion: category chips and Deposit materials',
     when: ['ui/bank', 'ui/bag_filter', 'sim/material_taxonomy'],
