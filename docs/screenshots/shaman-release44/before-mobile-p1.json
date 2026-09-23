@@ -1,0 +1,133 @@
+{
+  "castGate": { "ready": true, "refused": 0, "pending": 12, "forced": true },
+  "label": "before",
+  "port": "5177",
+  "preset": "1",
+  "viewport": {
+    "width": 932,
+    "height": 430,
+    "deviceScaleFactor": 1,
+    "isMobile": true,
+    "hasTouch": true
+  },
+  "evidence": [
+    {
+      "ability": "lightning_bolt",
+      "hit": true,
+      "ticks": 47,
+      "events": [
+        {
+          "type": "castStart",
+          "entityId": 999,
+          "ability": "lightning_bolt",
+          "time": 2.181818181818182
+        },
+        {
+          "type": "spellfx",
+          "sourceId": 999,
+          "targetId": 90001,
+          "school": "nature",
+          "fx": "lightning",
+          "ability": "lightning_bolt"
+        },
+        {
+          "type": "damage",
+          "sourceId": 999,
+          "targetId": 90001,
+          "amount": 148,
+          "crit": false,
+          "school": "nature",
+          "ability": "Arc Bolt",
+          "abilityId": "lightning_bolt",
+          "kind": "hit"
+        }
+      ],
+      "gpu": {
+        "programs": 165,
+        "calls": 252
+      },
+      "position": {
+        "x": -281,
+        "y": -3.398267380525904,
+        "z": -18
+      }
+    },
+    {
+      "ability": "earth_shock",
+      "hit": true,
+      "ticks": 3,
+      "events": [
+        {
+          "type": "spellfx",
+          "sourceId": 999,
+          "targetId": 90001,
+          "school": "nature",
+          "fx": "projectile",
+          "ability": "earth_shock"
+        },
+        {
+          "type": "damage",
+          "sourceId": 999,
+          "targetId": 90001,
+          "amount": 104,
+          "crit": false,
+          "school": "nature",
+          "ability": "Earthen Jolt",
+          "abilityId": "earth_shock",
+          "kind": "hit"
+        }
+      ],
+      "gpu": {
+        "programs": 165,
+        "calls": 247
+      },
+      "position": {
+        "x": -281,
+        "y": -3.398267380525904,
+        "z": -18
+      }
+    },
+    {
+      "ability": "flame_shock",
+      "hit": true,
+      "ticks": 3,
+      "events": [
+        {
+          "type": "spellfx",
+          "sourceId": 999,
+          "targetId": 90001,
+          "school": "fire",
+          "fx": "projectile",
+          "ability": "flame_shock"
+        },
+        {
+          "type": "damage",
+          "sourceId": 999,
+          "targetId": 90001,
+          "amount": 108,
+          "crit": true,
+          "school": "fire",
+          "ability": "Cinder Jolt",
+          "abilityId": "flame_shock",
+          "kind": "hit"
+        }
+      ],
+      "gpu": {
+        "programs": 165,
+        "calls": 246
+      },
+      "position": {
+        "x": -281,
+        "y": -3.398267380525904,
+        "z": -18
+      }
+    }
+  ],
+  "errors": [
+    "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "Failed to load resource: the server responded with a status of 502 (Bad Gateway)",
+    "character visual unavailable, skipping view (mob_training_dummy): Error: character asset not preloaded: models/creatures/training_dummy.glb",
+    "character visual unavailable, skipping view (npc_modular_walking_staff): Error: character asset not preloaded: models/weapons/brasscrown_walking_staff.glb",
+    "Failed to load resource: the server responded with a status of 502 (Bad Gateway)"
+  ]
+}
