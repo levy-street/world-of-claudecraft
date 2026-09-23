@@ -4740,10 +4740,18 @@ export const zh_CN: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "武器蚀刻：莹光法术强度",
       "enchant_chest_lucent_stamina": "胸甲蚀刻：莹光耐力",
       "enchant_feet_lucent_agility": "长靴蚀刻：莹光敏捷",
-      "enchant_lucent_infusion": "莹光灌注"
+      "enchant_lucent_infusion": "莹光灌注",
+      "enchant_weapon_riftwalkers_grace": "裂隙行者之优雅",
+      "enchant_weapon_dawnfire_etching": "武器蚀刻：黎明之火",
+      "enchant_weapon_dawns_benediction": "武器蚀刻：黎明祝福",
+      "enchant_weapon_piston_drive": "武器蚀刻：活塞驱动"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。"
+      "enchant_weapon_lastflame_zeal": "命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。",
+      "enchant_weapon_riftwalkers_grace": "命中的近战攻击有几率使你获得60点敏捷，并使你的近战攻击速度提高2%，持续15秒。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。豹形态改用其1秒的基础挥击速度。",
+      "enchant_weapon_dawnfire_etching": "为一把武器永久蚀刻18点法术强度。法术强度同样计入治疗强度。固定加成，不会随任何属性缩放。",
+      "enchant_weapon_dawns_benediction": "为一把武器永久蚀刻34点治疗强度。治疗强度只提高治疗效果，从不提高法术伤害。固定加成，不会随任何属性缩放。",
+      "enchant_weapon_piston_drive": "为一把双手武器永久蚀刻12点力量和25点暴击等级。无法施加于单手武器。固定加成，不会随任何属性缩放。"
     },
     "professions": {
       "title": "专业",
@@ -17517,6 +17525,57 @@ export const zh_CN: EnTranslations = {
       },
       "champion_forged_loop": {
         "name": "勇士锻造指环"
+      },
+      "tidewatchers_locket": {
+        "name": "守潮者挂坠盒"
+      },
+      "riftwalkers_cord": {
+        "name": "裂隙行者束带"
+      },
+      "riftwalkers_treads": {
+        "name": "裂隙行者踏靴"
+      },
+      "formula_riftwalkers_grace": {
+        "name": "配方：裂隙行者之优雅"
+      },
+      "riftwardens_pendant": {
+        "name": "裂隙守卫者坠饰"
+      },
+      "acolytes_signet": {
+        "name": "侍僧印戒"
+      },
+      "cord_of_the_dawn": {
+        "name": "黎明束带"
+      },
+      "dawnlit_slippers": {
+        "name": "黎明之光便鞋"
+      },
+      "formula_dawnfire_etching": {
+        "name": "配方：黎明之火蚀刻"
+      },
+      "formula_dawns_benediction": {
+        "name": "配方：黎明祝福"
+      },
+      "champions_dawn_loop": {
+        "name": "勇士黎明指环"
+      },
+      "dawnkeepers_circle": {
+        "name": "黎明守护者之环"
+      },
+      "cogwork_choker": {
+        "name": "齿轮项圈"
+      },
+      "forgemasters_girdle": {
+        "name": "锻造大师腰带"
+      },
+      "forgemasters_sabatons": {
+        "name": "锻造大师铁靴"
+      },
+      "formula_piston_drive": {
+        "name": "配方：活塞驱动"
+      },
+      "forgewall_gorget": {
+        "name": "锻炉壁垒护喉"
       }
     },
     "mobs": {

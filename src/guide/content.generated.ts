@@ -19766,6 +19766,113 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
           "value": 13
         }
       ]
+    },
+    {
+      "id": "enchant_weapon_riftwalkers_grace",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": []
+    },
+    {
+      "id": "enchant_weapon_dawnfire_etching",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "spellPower",
+          "value": 18
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_dawns_benediction",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "healPower",
+          "value": 34
+        }
+      ]
+    },
+    {
+      "id": "enchant_weapon_piston_drive",
+      "slot": "mainhand",
+      "tier": "greater",
+      "skillReq": 100,
+      "perfectedOnly": false,
+      "requiresFormula": true,
+      "hasDescription": true,
+      "reagents": [
+        {
+          "itemId": "arcane_shard",
+          "name": "Chime Shard",
+          "count": 2
+        },
+        {
+          "itemId": "arcane_essence",
+          "name": "Chime Essence",
+          "count": 4
+        }
+      ],
+      "bonus": [
+        {
+          "stat": "str",
+          "value": 12
+        },
+        {
+          "stat": "critRating",
+          "value": 25
+        }
+      ]
     }
   ],
   "salvageByQuality": [

@@ -140,6 +140,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "emissary_cache",
+      "name": "Emissary's Cache",
+      "sourcePack": "project-authored",
+      "sourceFile": "weekly-emissary/cofre.png master (1250px square, opaque violet ground, generated for this game on 2026-09-14), normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "game_meat",
       "name": "Game Meat",
       "sourcePack": "woc_professions_art",
@@ -400,14 +408,6 @@
       "name": "Wolfhide Satchel",
       "sourcePack": "woc_bags",
       "sourceFile": "WoC_Bag_06.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "emissary_cache",
-      "name": "Emissary's Cache",
-      "sourcePack": "project-authored",
-      "sourceFile": "weekly-emissary/cofre.png master (1250px square, opaque violet ground, generated for this game on 2026-09-14), normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
@@ -6840,6 +6840,38 @@
         "riftwarden_voidblade",
         "templar_dawn_shield",
         "vestments_of_the_acolyte"
+      ]
+    },
+    {
+      "batchId": "faction-ladder-icons-2026-09-23",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_vendor_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_vendor_icons.mjs.",
+      "provenanceRecord": "docs/achievements/faction-ladder-icons-2026-09-23/",
+      "itemIds": [
+        "acolytes_signet",
+        "champions_dawn_loop",
+        "cogwork_choker",
+        "cord_of_the_dawn",
+        "dawnkeepers_circle",
+        "dawnlit_slippers",
+        "forgemasters_girdle",
+        "forgemasters_sabatons",
+        "forgewall_gorget",
+        "formula_dawnfire_etching",
+        "formula_dawns_benediction",
+        "formula_piston_drive",
+        "formula_riftwalkers_grace",
+        "riftwalkers_cord",
+        "riftwalkers_treads",
+        "riftwardens_pendant",
+        "tidewatchers_locket"
       ]
     },
     {

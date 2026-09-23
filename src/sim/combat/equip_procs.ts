@@ -88,17 +88,38 @@ export function runWeaponProcs(
   // per-hand id suffix let the two hands grant 100 Strength together). Either
   // hand's trigger lands on the same id, which applyAura treats as a REFRESH
   // (timer back to full, no second application, `refresh: true` on the event).
+  // The stat the buff grants is the proc's own axis: Zeal's Strength, or a
+  // faction formula's Agility (Riftwalker's Grace). A haste term rides a
+  // SIBLING aura keyed off the same id so it refreshes with the stat buff and
+  // obeys the same never-stacks rule; buff_haste is a swing multiplier
+  // (sim.ts swingIntervalMult), which is what "2% faster melee attacks" means.
+  const statKind = enchantProc.agility !== undefined ? 'buff_agi' : 'buff_str';
+  const statValue = enchantProc.agility ?? enchantProc.strength ?? 0;
   ctx.applyAura(wielder, {
     id: enchant.id,
     name: enchant.name,
-    kind: 'buff_str',
-    value: enchantProc.strength,
+    kind: statKind,
+    value: statValue,
     remaining: enchantProc.duration,
     duration: enchantProc.duration,
     sourceId: wielder.id,
     school: 'holy',
   });
-  ctx.applyHeal(wielder, wielder, enchantProc.heal, enchant.name, enchant.id, false, false);
+  if (enchantProc.hasteMult !== undefined) {
+    ctx.applyAura(wielder, {
+      id: `${enchant.id}_haste`,
+      name: enchant.name,
+      kind: 'buff_haste',
+      value: enchantProc.hasteMult,
+      remaining: enchantProc.duration,
+      duration: enchantProc.duration,
+      sourceId: wielder.id,
+      school: 'holy',
+    });
+  }
+  if (enchantProc.heal !== undefined && enchantProc.heal > 0) {
+    ctx.applyHeal(wielder, wielder, enchantProc.heal, enchant.name, enchant.id, false, false);
+  }
 }
 
 function fireEffect(

@@ -4740,10 +4740,18 @@ export const it_IT: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "Incisione dell’arma: Potere magico lucente",
       "enchant_chest_lucent_stamina": "Incisione del petto: Vigore lucente",
       "enchant_feet_lucent_agility": "Incisione degli stivali: Agilità lucente",
-      "enchant_lucent_infusion": "Infusione lucente"
+      "enchant_lucent_infusion": "Infusione lucente",
+      "enchant_weapon_riftwalkers_grace": "Riftwalker's Grace",
+      "enchant_weapon_dawnfire_etching": "Weapon Etching: Dawnfire",
+      "enchant_weapon_dawns_benediction": "Weapon Etching: Dawn's Benediction",
+      "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s."
+      "enchant_weapon_lastflame_zeal": "I tuoi attacchi in mischia che colpiscono possono concedere 50 Forza per 15 s e curarti di 200 salute. Si applicano i modificatori di cura. Ogni colpo ha una probabilità dell’1% per ogni 0,6 s della velocità base dell’arma. Nessun tempo di recupero interno. Entrambe le mani condividono un unico beneficio; ogni attivazione lo rinnova e non si accumula mai. Gli attacchi a distanza non attivano l’effetto. Forma di Lupo usa invece la sua velocità base di 1 s.",
+      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
+      "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
+      "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
     },
     "professions": {
       "title": "Professioni",
@@ -17517,6 +17525,57 @@ export const it_IT: EnTranslations = {
       },
       "champion_forged_loop": {
         "name": "Champion's Forged Loop"
+      },
+      "tidewatchers_locket": {
+        "name": "Tidewatcher's Locket"
+      },
+      "riftwalkers_cord": {
+        "name": "Riftwalker's Cord"
+      },
+      "riftwalkers_treads": {
+        "name": "Riftwalker's Treads"
+      },
+      "formula_riftwalkers_grace": {
+        "name": "Formula: Riftwalker's Grace"
+      },
+      "riftwardens_pendant": {
+        "name": "Riftwarden's Pendant"
+      },
+      "acolytes_signet": {
+        "name": "Acolyte's Signet"
+      },
+      "cord_of_the_dawn": {
+        "name": "Cord of the Dawn"
+      },
+      "dawnlit_slippers": {
+        "name": "Dawnlit Slippers"
+      },
+      "formula_dawnfire_etching": {
+        "name": "Formula: Dawnfire Etching"
+      },
+      "formula_dawns_benediction": {
+        "name": "Formula: Dawn's Benediction"
+      },
+      "champions_dawn_loop": {
+        "name": "Champion's Dawn Loop"
+      },
+      "dawnkeepers_circle": {
+        "name": "Dawnkeeper's Circle"
+      },
+      "cogwork_choker": {
+        "name": "Cogwork Choker"
+      },
+      "forgemasters_girdle": {
+        "name": "Forgemaster's Girdle"
+      },
+      "forgemasters_sabatons": {
+        "name": "Forgemaster's Sabatons"
+      },
+      "formula_piston_drive": {
+        "name": "Formula: Piston Drive"
+      },
+      "forgewall_gorget": {
+        "name": "Forgewall Gorget"
       }
     },
     "mobs": {

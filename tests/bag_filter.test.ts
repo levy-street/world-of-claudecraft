@@ -533,7 +533,11 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'duskweave_bag',
     'foragers_haversack',
     // Formula scrolls follow the existing bag-side kind-'recipe' ruling.
+    'formula_dawnfire_etching',
+    'formula_dawns_benediction',
     'formula_lastflame_zeal',
+    'formula_piston_drive',
+    'formula_riftwalkers_grace',
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',

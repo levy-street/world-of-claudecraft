@@ -152,8 +152,11 @@ const STAT_DRIFT_ALLOWLIST: ReadonlySet<string> = new Set([
 // proxy floor binds on (see the catalog test).
 const STAT_DRIFT_ALLOWLIST_CEILING = 103;
 // 63 with the faction quartermaster stock: 12 untiered pieces whose own line
-// rounds to a floor (the Order Prayer Beads' spi 1 rounds to none).
-const UNTIERED_WITH_PROXY_FLOOR = 63;
+// rounds to a floor (the Order Prayer Beads' spi 1 rounds to none). 77 with
+// the faction ladder rework: 28 untiered equipment rows, every one carrying a
+// real line now (the two untiered feet rows carry sta 6, one over their tiered
+// raid mirror, because the proxy floor rounds an 11-point line up to 6).
+const UNTIERED_WITH_PROXY_FLOOR = 77;
 const GENERATED_ITEM_COUNT = 111;
 const WARFARE_STOCK_COUNT = 47;
 const HEROIC_VARIANT_COUNT = 78;

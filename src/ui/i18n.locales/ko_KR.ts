@@ -144,9 +144,25 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crucible_healer_cloth.bonus2':
     '전투 중인 아군을 치유하면 초과 치유량의 20%가 해당 아군을 6초 동안 보호하는 보호막으로 전환됩니다. 지속 치유와 피해에서 전환된 치유도 포함됩니다. 전투 중 자신을 치유할 때도 적용됩니다. 모든 착용자가 부여한 이 보호막의 총량은 보호받는 대상 최대 생명력의 5%를 넘지 않습니다. 추가 초과 치유는 보호막을 채우지만 지속시간을 늘리지 않습니다. 이 보호막은 다른 치유 효과를 발동시키지 않습니다. 보호받는 아군이 전투에서 벗어나거나 자신이 죽거나 이 세트를 2개 이상 착용하지 않게 되면 자신이 부여한 보호막이 사라집니다.',
   'entities.items.formula_lastflame_zeal.name': '공식: 마지막 불꽃의 열의',
+  'entities.items.formula_riftwalkers_grace.name': '공식: 균열 방랑자의 기품',
+  'entities.items.formula_dawnfire_etching.name': '공식: 여명불꽃 새김',
+  'entities.items.formula_dawns_benediction.name': '공식: 여명의 축복',
+  'entities.items.formula_piston_drive.name': '공식: 피스톤 구동',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '마지막 불꽃의 열의',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
     '적중한 근접 공격은 일정 확률로 15초 동안 힘을 50 증가시키고 자신의 생명력을 200 회복합니다. 치유량 보정이 적용됩니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 강화 효과는 양손이 하나를 공유하며, 어느 손으로 발동하든 지속시간이 갱신되고 중첩되지 않습니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 늑대 형상에서는 대신 1초의 기본 공격 속도를 사용합니다.',
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': '균열 방랑자의 기품',
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    '적중한 근접 공격은 일정 확률로 15초 동안 민첩성을 60 증가시키고 근접 공격 속도를 2% 높입니다. 적중마다 공격한 무기의 기본 속도 0.6초당 1%의 확률로 발동합니다. 내부 재사용 대기시간이 없습니다. 강화 효과는 양손이 하나를 공유하며, 어느 손으로 발동하든 지속시간이 갱신되고 중첩되지 않습니다. 원거리 공격은 이 효과를 발동시키지 않습니다. 표범 변신에서는 대신 1초의 기본 공격 속도를 사용합니다.',
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': '무기 새김: 여명불꽃',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    '무기에 주문력 18을 영구적으로 새깁니다. 주문력은 치유력에도 합산됩니다. 고정 보너스이며 다른 능력치에 따라 변하지 않습니다.',
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction': '무기 새김: 여명의 축복',
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    '무기에 치유력 34를 영구적으로 새깁니다. 치유력은 치유량만 높이며 주문 피해는 높이지 않습니다. 고정 보너스이며 다른 능력치에 따라 변하지 않습니다.',
+  'hudChrome.enchantName.enchant_weapon_piston_drive': '무기 새김: 피스톤 구동',
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    '양손 무기에 힘 12와 치명타 등급 25를 영구적으로 새깁니다. 한손 무기에는 적용할 수 없습니다. 고정 보너스이며 다른 능력치에 따라 변하지 않습니다.',
   'hudChrome.enchanting.recipeNotLearned': '이 마법부여를 적용하려면 먼저 공식을 배워야 합니다.',
   'hudChrome.pattern.teachesEnchant': '사용 효과: {enchant} 부여 방법을 배웁니다.',
   'hudChrome.barEditor.pageTab': '페이지 {page}',
@@ -17203,6 +17219,19 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '기술자의 용접 두건',
   'entities.items.forgemaster_crag_cleaver.name': '대장장이 장인의 바위 절단기',
   'entities.items.champion_forged_loop.name': '용사의 단조 반지',
+  'entities.items.tidewatchers_locket.name': '조수지기의 로켓 목걸이',
+  'entities.items.riftwalkers_cord.name': '균열 방랑자의 허리끈',
+  'entities.items.riftwalkers_treads.name': '균열 방랑자의 장화',
+  'entities.items.riftwardens_pendant.name': '균열 수호자의 펜던트',
+  'entities.items.acolytes_signet.name': '수련사의 인장 반지',
+  'entities.items.cord_of_the_dawn.name': '여명의 허리끈',
+  'entities.items.dawnlit_slippers.name': '여명빛 덧신',
+  'entities.items.champions_dawn_loop.name': '용사의 여명 반지',
+  'entities.items.dawnkeepers_circle.name': '여명 수호자의 고리',
+  'entities.items.cogwork_choker.name': '톱니 장치 초커',
+  'entities.items.forgemasters_girdle.name': '대장장이 장인의 허리띠',
+  'entities.items.forgemasters_sabatons.name': '대장장이 장인의 철제 장화',
+  'entities.items.forgewall_gorget.name': '대장간 성벽 목가리개',
   // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
   'entities.items.clue_scroll.name': '단서 두루마리',
   'entities.items.treasure_casket.name': '보물 상자',

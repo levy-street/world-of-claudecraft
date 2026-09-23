@@ -143,9 +143,25 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crucible_healer_cloth.bonus2':
     'Исцеление союзника, находящегося в бою, превращает 20% вашего избыточного исцеления в щит на нем на 6 сек. Учитываются периодическое исцеление и исцеление, полученное преобразованием урона. Действует и при исцелении себя в бою. Общая защита от всех владельцев комплекта ограничена 5% максимального здоровья получателя. Дополнительное избыточное исцеление пополняет щит, но не продлевает его. Эта защита не вызывает других эффектов исцеления. Ваши щиты исчезают, когда защищенный союзник выходит из боя, когда вы умираете или когда на вас остается меньше двух предметов этого комплекта.',
   'entities.items.formula_lastflame_zeal.name': 'Формула: Рвение Последнего Пламени',
+  'entities.items.formula_riftwalkers_grace.name': 'Формула: Грация Странника Разлома',
+  'entities.items.formula_dawnfire_etching.name': 'Формула: Травление Рассветного пламени',
+  'entities.items.formula_dawns_benediction.name': 'Формула: Благословение Рассвета',
+  'entities.items.formula_piston_drive.name': 'Формула: Поршневой привод',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': 'Рвение Последнего Пламени',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
     'Попавшие в цель атаки ближнего боя могут повысить силу на 50 на 15 сек. и восстановить вам 200 ед. здоровья. Действуют модификаторы исцеления. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Обе руки дают одно общее усиление; любое срабатывание обновляет его, и оно никогда не суммируется. Дальние атаки не вызывают этот эффект. В облике волка вместо этого используется базовая скорость атаки в 1 сек.',
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': 'Грация Странника Разлома',
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    'Попавшие в цель атаки ближнего боя могут повысить ловкость на 60 и ускорить атаки ближнего боя на 2% на 15 сек. При каждом попадании шанс срабатывания равен 1% за каждые 0,6 сек. базовой скорости атакующего оружия. Внутренней перезарядки нет. Обе руки дают одно общее усиление; любое срабатывание обновляет его, и оно никогда не суммируется. Дальние атаки не вызывают этот эффект. В облике кота вместо этого используется базовая скорость атаки в 1 сек.',
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': 'Травление оружия: Рассветное пламя',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    'Навсегда наносит на оружие травление, дающее 18 к силе заклинаний. Сила заклинаний также учитывается в силе исцеления. Фиксированный бонус, он не масштабируется.',
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction': 'Травление оружия: Благословение Рассвета',
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    'Навсегда наносит на оружие травление, дающее 34 к силе исцеления. Сила исцеления усиливает только исцеление, но никогда не урон от заклинаний. Фиксированный бонус, он не масштабируется.',
+  'hudChrome.enchantName.enchant_weapon_piston_drive': 'Травление оружия: Поршневой привод',
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    'Навсегда наносит на двуручное оружие травление, дающее 12 к силе и 25 к рейтингу критического удара. Нельзя применить к одноручному оружию. Фиксированный бонус, он не масштабируется.',
   'hudChrome.enchanting.recipeNotLearned': 'Изучите формулу, прежде чем накладывать эти чары.',
   'hudChrome.pattern.teachesEnchant': 'Использование: обучает наложению чар «{enchant}».',
   'hudChrome.barEditor.pageTab': 'Страница {page}',
@@ -17444,6 +17460,19 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': 'Сварочный Капюшон Механика',
   'entities.items.forgemaster_crag_cleaver.name': 'Утёсный Колун Мастера-Кузнеца',
   'entities.items.champion_forged_loop.name': 'Кованое Кольцо Чемпиона',
+  'entities.items.tidewatchers_locket.name': 'Медальон Стража приливов',
+  'entities.items.riftwalkers_cord.name': 'Кушак Странника Разлома',
+  'entities.items.riftwalkers_treads.name': 'Поступь Странника Разлома',
+  'entities.items.riftwardens_pendant.name': 'Подвеска Хранителя Разлома',
+  'entities.items.acolytes_signet.name': 'Печатка Послушника',
+  'entities.items.cord_of_the_dawn.name': 'Кушак Рассвета',
+  'entities.items.dawnlit_slippers.name': 'Туфли Рассветного Сияния',
+  'entities.items.champions_dawn_loop.name': 'Кольцо Рассвета Чемпиона',
+  'entities.items.dawnkeepers_circle.name': 'Круг Хранителя Рассвета',
+  'entities.items.cogwork_choker.name': 'Шестерёнчатое Ожерелье',
+  'entities.items.forgemasters_girdle.name': 'Пояс Мастера-Кузнеца',
+  'entities.items.forgemasters_sabatons.name': 'Сабатоны Мастера-Кузнеца',
+  'entities.items.forgewall_gorget.name': 'Горжет Кузнечной Стены',
   // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
   'entities.items.clue_scroll.name': 'Свиток с подсказкой',
   'entities.items.treasure_casket.name': 'Ларец с сокровищами',

@@ -144,9 +144,25 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crucible_healer_cloth.bonus2':
     '戦闘中の味方を回復すると、超過回復量の20%を、その味方を6秒間守るシールドに変換する。継続回復とダメージから変換された回復も対象となる。戦闘中に自分を回復した場合も有効。全装備者が与えるこのシールドの合計は、保護対象の最大体力の5%まで。追加の超過回復はシールドを補充するが、持続時間は延長しない。このシールドは他の回復効果を発動させない。保護された味方が戦闘を離れるか、自分が死亡するか、このセットを2部位以上装備しなくなると、自分が与えたシールドは消える。',
   'entities.items.formula_lastflame_zeal.name': '製法書：最後の炎の熱情',
+  'entities.items.formula_riftwalkers_grace.name': '製法書：裂け目歩きの優雅',
+  'entities.items.formula_dawnfire_etching.name': '製法書：暁火の銘刻',
+  'entities.items.formula_dawns_benediction.name': '製法書：暁の祝福',
+  'entities.items.formula_piston_drive.name': '製法書：ピストン駆動',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '最後の炎の熱情',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
     '命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。',
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': '裂け目歩きの優雅',
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    '命中した近接攻撃は、確率で15秒間敏捷性を60増加させ、近接攻撃速度を2%上昇させる。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。キャットフォームでは代わりに1秒の基本攻撃速度を使う。',
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': '武器銘刻：暁火',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    '武器に呪文威力18を永続的に銘刻する。呪文威力は治癒力にも加算される。固定値のボーナスで、他の能力値によって増減しない。',
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction': '武器銘刻：暁の祝福',
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    '武器に治癒力34を永続的に銘刻する。治癒力は回復のみを高め、呪文ダメージは高めない。固定値のボーナスで、他の能力値によって増減しない。',
+  'hudChrome.enchantName.enchant_weapon_piston_drive': '武器銘刻：ピストン駆動',
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    '両手武器に筋力12とクリティカルレーティング25を永続的に銘刻する。片手武器には施せない。固定値のボーナスで、他の能力値によって増減しない。',
   'hudChrome.enchanting.recipeNotLearned': 'この付呪を施すには、先に製法書で習得してください。',
   'hudChrome.pattern.teachesEnchant': '使用：{enchant}の付与方法を習得する。',
   'hudChrome.barEditor.pageTab': 'ページ{page}',
@@ -17237,6 +17253,19 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '工匠の溶接フード',
   'entities.items.forgemaster_crag_cleaver.name': '鍛冶頭の岩壁の大鉈',
   'entities.items.champion_forged_loop.name': '勇者の鍛造の指輪',
+  'entities.items.tidewatchers_locket.name': '潮見のロケット',
+  'entities.items.riftwalkers_cord.name': '裂け目歩きの腰紐',
+  'entities.items.riftwalkers_treads.name': '裂け目歩きのブーツ',
+  'entities.items.riftwardens_pendant.name': '裂け目の守護者のペンダント',
+  'entities.items.acolytes_signet.name': '侍祭の印章指輪',
+  'entities.items.cord_of_the_dawn.name': '暁の腰紐',
+  'entities.items.dawnlit_slippers.name': '暁光のスリッパ',
+  'entities.items.champions_dawn_loop.name': '勇者の暁の指輪',
+  'entities.items.dawnkeepers_circle.name': '暁の守り手の環',
+  'entities.items.cogwork_choker.name': '歯車仕掛けのチョーカー',
+  'entities.items.forgemasters_girdle.name': '鍛冶頭の腰帯',
+  'entities.items.forgemasters_sabatons.name': '鍛冶頭のサバトン',
+  'entities.items.forgewall_gorget.name': '鍛冶壁の喉当て',
   // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
   'entities.items.clue_scroll.name': '手がかりの巻物',
   'entities.items.treasure_casket.name': '宝の小箱',

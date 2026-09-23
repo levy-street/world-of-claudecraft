@@ -15,8 +15,21 @@ import { xpForLevel } from '../src/sim/types';
 type Axis = 'str' | 'agi' | 'sta' | 'int' | 'spi' | 'armor';
 const AXES: readonly Axis[] = ['str', 'agi', 'sta', 'int', 'spi', 'armor'];
 const PROC_ENCHANT_ID = 'enchant_weapon_lastflame_zeal';
-// One explicitly approved proc, not a blanket exception for future proc rows.
-const isStaticEnchant = (enchant: EnchantDef) => enchant.id !== PROC_ENCHANT_ID;
+// The LEARNED class: Zeal plus the four faction formulas
+// (content/faction_vendors.ts, docs/design/factions.md). Every learned row is
+// `acquisition: 'drop'`, skill-gated at 100, and sized against the raid
+// budgets rather than the static ladder; the static sweeps below exclude
+// exactly this set, and the learned block at the end pins each row by hand
+// so a new learned row is still a deliberate red here, never a quiet pass.
+const LEARNED_ENCHANT_IDS = [
+  PROC_ENCHANT_ID,
+  'enchant_weapon_riftwalkers_grace',
+  'enchant_weapon_dawnfire_etching',
+  'enchant_weapon_dawns_benediction',
+  'enchant_weapon_piston_drive',
+] as const;
+const isLearnedEnchant = (enchant: EnchantDef) => enchant.acquisition === 'drop';
+const isStaticEnchant = (enchant: EnchantDef) => !isLearnedEnchant(enchant);
 
 // Tier identity is derived from the reagent contract, exactly the doctrine the
 // table's section comments state: Lucent (the apex tier) consumes
@@ -42,7 +55,10 @@ const axisOf = (e: EnchantDef): Axis => AXES.filter((a) => (e.statBonus[a] ?? 0)
 
 /** Best statBonus value on `axis` among enchants passing `include`, per slot,
  *  summed with the ring slot counted twice (a character wears two rings). */
-function bestPerSlotTotal(axis: Axis, include: (e: EnchantDef) => boolean = () => true): number {
+function bestPerSlotTotal(
+  axis: Axis,
+  include: (e: EnchantDef) => boolean = isStaticEnchant,
+): number {
   const bySlot = new Map<string, number>();
   for (const e of Object.values(ENCHANTS)) {
     if (!include(e)) continue;
@@ -62,7 +78,7 @@ function bestPerSlotTotal(axis: Axis, include: (e: EnchantDef) => boolean = () =
  *  the reachable stack is different in both directions, and it is the one the
  *  R5 envelope pays for. */
 function loadoutStack(axis: Axis, loadout: 'shieldOrHeld' | 'dualWield'): number {
-  const best = (slot: string): number => bestValue(slot, axis, () => true);
+  const best = (slot: string): number => bestValue(slot, axis, isStaticEnchant);
   const slots = [
     'mainhand',
     'chest',
@@ -103,12 +119,17 @@ describe('enchant table magnitude invariants', () => {
     }
   });
 
-  it('Zeal is the sole learned weapon proc and bakes no permanent stats into its copy', () => {
+  it('the learned class is exactly Zeal plus the four faction formulas, and Zeal bakes no permanent stats', () => {
     expect(
       Object.values(ENCHANTS)
         .filter((enchant) => enchant.weaponProc)
         .map((enchant) => enchant.id),
-    ).toEqual([PROC_ENCHANT_ID]);
+    ).toEqual([PROC_ENCHANT_ID, 'enchant_weapon_riftwalkers_grace']);
+    expect(
+      Object.values(ENCHANTS)
+        .filter(isLearnedEnchant)
+        .map((e) => e.id),
+    ).toEqual([...LEARNED_ENCHANT_IDS]);
     const zeal = ENCHANTS[PROC_ENCHANT_ID];
     expect(zeal.statBonus).toEqual({});
     expect(zeal.weaponProc).toEqual({ ppm: 1, strength: 50, duration: 15, heal: 200 });
@@ -284,7 +305,7 @@ describe('enchant table magnitude invariants', () => {
         .map((e) => e.id),
     ).toEqual(['enchant_lucent_infusion']);
     // Ordinary static enchants outside Lucent keep the historical free floor.
-    // Zeal's separate learned skill-100 contract is pinned above.
+    // The learned class's separate skill-100 contract is pinned in its own block.
     for (const e of Object.values(ENCHANTS).filter((x) => isStaticEnchant(x) && !isApex(x))) {
       expect(e.skillReq, `${e.id}: free floor`).toBeUndefined();
       expect(e.requiresPerfected, `${e.id}: any-copy`).toBeUndefined();
@@ -367,6 +388,10 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
     );
     expect(all).toEqual({
       enchant_weapon_lastflame_zeal: {},
+      enchant_weapon_riftwalkers_grace: {},
+      enchant_weapon_dawnfire_etching: { spellPower: 18 },
+      enchant_weapon_dawns_benediction: { healPower: 34 },
+      enchant_weapon_piston_drive: { str: 12, critRating: 25 },
       enchant_weapon_might: { str: 2 },
       enchant_weapon_intellect: { int: 2 },
       enchant_offhand_stamina: { sta: 3 },
@@ -432,6 +457,9 @@ describe('ordinary EnchantDef rows stay stat-only, with one explicit Crucible pr
     'requiresPerfected',
   ] as const;
   const ZEAL_KEYS = [...ALLOWED_ENCHANT_KEYS, 'acquisition', 'weaponProc', 'description'];
+  // The faction formulas add the two-hander gate; a flat learned row still
+  // has no proc, and no learned row gets movement or on-use either.
+  const LEARNED_KEYS = [...ZEAL_KEYS, 'weaponHand'];
 
   it('every row carries only allowlisted keys, and the required ones', () => {
     const rows = Object.values(ENCHANTS);
@@ -439,7 +467,11 @@ describe('ordinary EnchantDef rows stay stat-only, with one explicit Crucible pr
     for (const enchant of rows) {
       for (const key of Object.keys(enchant)) {
         expect(
-          enchant.id === PROC_ENCHANT_ID ? ZEAL_KEYS : ALLOWED_ENCHANT_KEYS,
+          enchant.id === PROC_ENCHANT_ID
+            ? ZEAL_KEYS
+            : isLearnedEnchant(enchant)
+              ? LEARNED_KEYS
+              : ALLOWED_ENCHANT_KEYS,
           `${enchant.id} carries "${key}": if this is a new authored field, decide against ` +
             'the static/proc contract before allowlisting it here',
         ).toContain(key);
@@ -460,5 +492,75 @@ describe('ordinary EnchantDef rows stay stat-only, with one explicit Crucible pr
       (k) => !(ALLOWED_ENCHANT_KEYS as readonly string[]).includes(k),
     );
     expect(unknown).toEqual(['moveSpeed']);
+  });
+});
+
+// The faction formulas (content/enchants.ts, "Faction formulas" block). Each
+// figure is derived, never invented, and the derivation is restated here so a
+// retune has to argue with the source it was sized from:
+//   Grace     Zeal's 50 Strength times the classic Mongoose-to-Crusader ratio
+//             (120 Agility to 100 Strength) = 60 Agility; the classic 2% haste.
+//   Dawnfire  about a fifth of the raid caster lane's 86 Spell Power.
+//   Benediction  about a fifth of the raid healer lane's 172 Healing Power.
+//   Piston Drive  twice the Lucent weapon rung (6, halved for dual-wield) on a
+//             weapon with no second hand, plus the raid jewel's 25 rating.
+describe('the learned faction formulas (world-quest reputation)', () => {
+  const ZEAL = ENCHANTS.enchant_weapon_lastflame_zeal;
+  const GRACE = ENCHANTS.enchant_weapon_riftwalkers_grace;
+  const DAWNFIRE = ENCHANTS.enchant_weapon_dawnfire_etching;
+  const BENEDICTION = ENCHANTS.enchant_weapon_dawns_benediction;
+  const PISTON = ENCHANTS.enchant_weapon_piston_drive;
+
+  it('every faction formula shares the learned contract: drop-acquired, skill 100, weapon slot, shard reagents', () => {
+    for (const e of [GRACE, DAWNFIRE, BENEDICTION, PISTON]) {
+      expect(e.acquisition, e.id).toBe('drop');
+      expect(e.skillReq, e.id).toBe(100);
+      expect(e.requiresPerfected, e.id).toBeUndefined();
+      expect(e.itemSlot, e.id).toBe('mainhand');
+      expect(e.reagents, e.id).toEqual([
+        { itemId: 'arcane_shard', count: 2 },
+        { itemId: 'arcane_essence', count: 4 },
+      ]);
+      expect(e.description?.trim().length ?? 0, e.id).toBeGreaterThan(0);
+    }
+  });
+
+  it("Riftwalker's Grace is Zeal's Agility sibling at the classic Mongoose ratio, with haste and no heal", () => {
+    expect(GRACE.statBonus).toEqual({});
+    expect(GRACE.weaponProc).toEqual({ ppm: 1, agility: 60, hasteMult: 1.02, duration: 15 });
+    expect(GRACE.weaponProc?.agility).toBe((ZEAL.weaponProc?.strength ?? 0) * 1.2);
+    expect(GRACE.weaponProc?.ppm).toBe(ZEAL.weaponProc?.ppm);
+    expect(GRACE.weaponProc?.duration).toBe(ZEAL.weaponProc?.duration);
+    expect(GRACE.weaponProc?.heal).toBeUndefined();
+    expect(GRACE.weaponHand).toBeUndefined();
+  });
+
+  it('the two Church Order etchings are flat power lines about a fifth of the raid lane totals', () => {
+    expect(DAWNFIRE.statBonus).toEqual({ spellPower: 18 });
+    expect(BENEDICTION.statBonus).toEqual({ healPower: 34 });
+    expect(DAWNFIRE.weaponProc).toBeUndefined();
+    expect(BENEDICTION.weaponProc).toBeUndefined();
+    // Neither touches a static axis, so the static stacks above are untouched.
+    for (const axis of AXES) {
+      expect(DAWNFIRE.statBonus[axis], `${DAWNFIRE.id} ${axis}`).toBeUndefined();
+      expect(BENEDICTION.statBonus[axis], `${BENEDICTION.id} ${axis}`).toBeUndefined();
+    }
+  });
+
+  it('Piston Drive is two-hander-only: twice the Lucent weapon rung plus one jewel rating', () => {
+    expect(PISTON.weaponHand).toBe('twohand');
+    expect(PISTON.statBonus).toEqual({ str: 12, critRating: 25 });
+    expect(PISTON.statBonus.str).toBe(
+      (ENCHANTS.enchant_weapon_lucent_might.statBonus.str ?? 0) * 2,
+    );
+  });
+
+  it('no static enchant carries a learned-only axis or the two-hander gate', () => {
+    for (const e of Object.values(ENCHANTS).filter(isStaticEnchant)) {
+      expect(e.weaponHand, e.id).toBeUndefined();
+      for (const axis of ['spellPower', 'healPower', 'critRating', 'hasteRating'] as const) {
+        expect(e.statBonus[axis], `${e.id} ${axis}`).toBeUndefined();
+      }
+    }
   });
 });

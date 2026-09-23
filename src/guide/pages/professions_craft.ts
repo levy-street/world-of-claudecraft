@@ -21,6 +21,7 @@ import type { AuraKind } from '../../sim/types';
 import { esc } from '../../ui/esc';
 import { WELLFED_STAT_KEYS } from '../../ui/hud/professions/wellfed_stat_keys';
 import { formatMoney, formatNumber, type TranslationKey, t } from '../../ui/i18n';
+import { statNameKey } from '../../ui/stat_tooltip_view';
 import {
   GUIDE_PROF_CRAFTS,
   GUIDE_PROF_CURVE,
@@ -42,7 +43,25 @@ export function stationLabel(type: string): string {
 }
 const qualityLabel = (q: string): string => t(`itemUi.quality.${q}` as TranslationKey);
 const slotLabel = (slot: string): string => t(`itemUi.slots.${slot}` as TranslationKey);
-const statLabel = (stat: string): string => t(`itemUi.stats.${stat}` as TranslationKey);
+// Primary stats and armor label through itemUi.stats; the rating and power
+// axes the learned faction formulas bake (content/enchants.ts EnchantStatAxis)
+// label through the character-sheet names, the same split the item tooltip's
+// itemStatName makes (ui/item_instance_tooltip.ts, which the guide must not
+// import: its module graph reaches the deeds catalog, a spoiler boundary).
+const PRIMARY_STAT_LABELS: ReadonlySet<string> = new Set([
+  'armor',
+  'str',
+  'agi',
+  'sta',
+  'int',
+  'spi',
+]);
+const statLabel = (stat: string): string =>
+  PRIMARY_STAT_LABELS.has(stat)
+    ? t(`itemUi.stats.${stat}` as TranslationKey)
+    : stat === 'healPower'
+      ? t('hudChrome.statInfo.names.healPower')
+      : t(statNameKey(stat as Parameters<typeof statNameKey>[0]) as TranslationKey);
 const enchantLabel = (id: string): string => t(`hudChrome.enchantName.${id}` as TranslationKey);
 
 export function craftById(id: string): GuideProfCraft | undefined {

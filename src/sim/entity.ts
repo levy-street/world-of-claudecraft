@@ -375,6 +375,9 @@ export function recalcPlayerStats(
       s.spi += Number.isFinite(rolled.spi) ? rolled.spi : 0;
       s.armor += Number.isFinite(rolled.armor) ? rolled.armor : 0;
       bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
+      // Dawn's Benediction (content/enchants.ts) is the one writer of a baked
+      // healPower line; a plain copy stays a no-op here like the axes above.
+      bonusHealPower += Number.isFinite(rolled.healPower) ? rolled.healPower : 0;
       bonusCritRating += Number.isFinite(rolled.critRating) ? rolled.critRating : 0;
       bonusHasteRating += Number.isFinite(rolled.hasteRating) ? rolled.hasteRating : 0;
       // A Riftbound band's verdant gem line (rift/band_ladder.ts); no other
