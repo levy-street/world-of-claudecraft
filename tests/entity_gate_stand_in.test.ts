@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { farMeshShown } from '../src/render/characters/far_lod_reveal_core';
 import {
   characterFormReadyMask,
@@ -8,6 +8,7 @@ import {
   requestedCharacterForm,
   resolvedCharacterForm,
 } from '../src/render/characters/form_visual_selection_core';
+import type { CharacterVisual } from '../src/render/characters/visual';
 import {
   anyCharacterRigDrawing,
   applyCharacterFormVisibility,
@@ -23,6 +24,7 @@ import {
 } from '../src/render/farm_patches';
 import { gpuPrepEventsSnapshot, resetGpuPrepEventsForTest } from '../src/render/gpu_prep_events';
 import { NAMEPLATE_RANGE, nameplatePlanInto, newNameplatePlan } from '../src/render/nameplate_view';
+import { gateSurfaceReplacement } from '../src/render/surface_receiver_preparation';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
 import type { Entity } from '../src/sim/types';
 import { INTERACT_RANGE } from '../src/sim/types';
@@ -68,6 +70,11 @@ const GATE_CALL_SITES: readonly {
     gate: 'gateSwapFlagOnCompile',
     file: 'src/render/renderer.ts',
     marker: 'this.gateSwapFlagOnCompile(',
+  },
+  {
+    gate: 'gateSwapFlagOnCompile',
+    file: 'src/render/surface_receiver_preparation.ts',
+    marker: '(host as Host).gateSwapFlagOnCompile(',
   },
   {
     gate: 'spiritCompileGate',
@@ -136,6 +143,24 @@ describe('entity gate stand-in registry', () => {
     expect(new Set(GATE_CALL_SITES.map((entry) => entry.gate))).toEqual(
       new Set(ENTITY_GATE_STAND_INS.map((row) => row.gate)),
     );
+    expect(new Set(GATE_CALL_SITES.map(({ gate, file }) => `${gate}:${file}`))).toEqual(
+      new Set(ENTITY_GATE_STAND_INS.map(({ gate, file }) => `${gate}:${file}`)),
+    );
+  });
+
+  it('derives extracted helper gate wrappers and pins both renderer delegates', () => {
+    const file = 'src/render/surface_receiver_preparation.ts';
+    const derived = deriveRendererGateNames(sourceOf(file));
+    expect(derived.size).toBeGreaterThan(0);
+    expect(derived).toEqual(
+      new Set(ENTITY_GATE_STAND_INS.filter((row) => row.file === file).map((row) => row.gate)),
+    );
+    expect(derived).toEqual(
+      new Set(GATE_CALL_SITES.filter((row) => row.file === file).map((row) => row.gate)),
+    );
+    const renderer = sourceOf('src/render/renderer.ts');
+    expect(renderer).toContain('gateSurfaceForm(this, built, v, gateCompile);');
+    expect(renderer).toContain('gateSurfaceReplacement(this, v, next, outgoing);');
   });
 
   it('derives the renderer gate wrappers from the source, so a new one cannot escape', () => {
@@ -183,7 +208,9 @@ describe('entity gate stand-in registry', () => {
       const lines = sourceOf(file).split('\n');
       const callSites = lines.filter((line) => line.includes(marker));
       expect(callSites.length, `${gate} has call sites`).toBeGreaterThan(0);
-      const registered = ENTITY_GATE_STAND_INS.filter((row) => row.gate === gate);
+      const registered = ENTITY_GATE_STAND_INS.filter(
+        (row) => row.gate === gate && row.file === file,
+      );
       for (const line of callSites) {
         const match = registered.find((row) => line.includes(row.callSite));
         expect(
@@ -205,6 +232,39 @@ describe('entity gate stand-in registry', () => {
 });
 
 describe('entity gate stand-ins actually stand in', () => {
+  it('the extracted replacement helper retains the outgoing body until its gate settles', () => {
+    const group = new THREE.Group();
+    const outgoing = { root: new THREE.Group(), dispose: vi.fn() };
+    const next = { root: new THREE.Group(), stageSurfaceResponsePreparation: () => null };
+    group.add(outgoing.root, next.root);
+    const view = { group, visualCompilePending: false };
+    let settle: (() => void) | undefined;
+    const host = {
+      gateSwapFlagOnCompile: vi.fn((root: THREE.Object3D, callback: () => void) => {
+        expect(root).toBe(next.root);
+        expect(view.visualCompilePending).toBe(true);
+        expect(outgoing.root.parent).toBe(group);
+        settle = callback;
+      }),
+    };
+    gateSurfaceReplacement(
+      host,
+      view,
+      next as unknown as CharacterVisual,
+      outgoing as unknown as CharacterVisual,
+    );
+    expect(host.gateSwapFlagOnCompile).toHaveBeenCalledOnce();
+    expect(view.visualCompilePending).toBe(true);
+    expect(outgoing.root.visible).toBe(true);
+    expect(outgoing.root.parent).toBe(group);
+    expect(outgoing.dispose).not.toHaveBeenCalled();
+    if (!settle) throw new Error('replacement gate did not register its settlement');
+    settle();
+    expect(view.visualCompilePending).toBe(false);
+    expect(outgoing.root.parent).toBeNull();
+    expect(outgoing.dispose).toHaveBeenCalledOnce();
+    expect(next.root.parent).toBe(group);
+  });
   it('arrival gate: no body at all, so the nameplate is forced on', () => {
     // The one gate with no in-world stand-in: it hides the whole group, so
     // entityHasNoBody reports true and nameplatePlanInto overrides the toggles.

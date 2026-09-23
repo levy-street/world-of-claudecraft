@@ -48,16 +48,20 @@ describe('greyjaw bespoke attack (issue #2889 round 2)', () => {
     expect(greyjawBlock).not.toContain('clips: WOLF_BAKED,');
 
     // WOLF_BAKED itself (the constant definition) must still build off the
-    // shared animal() core with the plain Attack: mob_wolf and form_cat, the
-    // other two families sharing it by reference, must be untouched.
+    // shared animal() core with the plain Attack: the world wolf still uses
+    // it, while Shadewolf now owns an independent asset and locomotion map.
     const wolfBakedConstBlock = manifestBlock('const WOLF_BAKED: ClipMap = {', '};');
     expect(wolfBakedConstBlock).toContain("...animal(['Attack'])");
 
-    // Exactly 2 remaining direct `clips: WOLF_BAKED,` usages (3 as of this
-    // branch's base off upstream/release/v0.35.0, minus the one migrated to
-    // GREYJAW_WOLF above): mob_wolf, form_cat.
+    // Pin the remaining consumer as well as its count so another creature
+    // cannot silently replace it while this regression still passes.
     const remaining = [...MANIFEST_SRC.matchAll(/clips: WOLF_BAKED,/g)].length;
-    expect(remaining).toBe(2);
+    expect(remaining).toBe(1);
+    expect(manifestBlock('mob_wolf: {', 'mob_mushroom_pixie: {')).toContain('clips: WOLF_BAKED,');
+    const shadewolf = manifestBlock('form_ghost_wolf: {', 'form_travel: {');
+    expect(shadewolf).toContain('shaman_spirit_wolf.glb');
+    expect(shadewolf).toContain("run: 'Run'");
+    expect(shadewolf).not.toContain('clips: WOLF_BAKED,');
   });
 
   it('is attack-only: greyjaw already wires both hit-react clips via animal(), no hit-variety change needed', () => {

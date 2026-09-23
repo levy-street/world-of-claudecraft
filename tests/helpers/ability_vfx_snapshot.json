@@ -21,8 +21,8 @@
       "full": "1d1e40eb73a1dda03e318afbbfefba758e3eadc0910aabff2ffb1f7e13629348"
     },
     "ancestor_return": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "3c208d3788804c9c33361579c55c7207e8b9ff44f2a96d97ae5615f165022d31",
+      "full": "3dbe86dd2f00f1b38e68425c2fcef7474c51c85d4baa9b0fb8598292f14bed4e"
     },
     "arcane_explosion": {
       "spec": "e67b9c09bc802e5bd283164f47adb94967b2a36413f148e59c5ae282f84cc707",
@@ -145,8 +145,8 @@
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "bloodlust": {
-      "spec": "f64a08b33246f83dc5f44c7e1e14fdfbbe283186a030d05338b6ade5b19c04dd",
-      "full": "93b116be3505089e067432a49d5e8e73660df5a0742c18736c87e490cb19f389"
+      "spec": "f6975c771c2b9d7210d5553d6b56f47ffe07eeaffff462ae11c533995b31d3f1",
+      "full": "aade66d2c6a3f9ed7367f3ad41dda66659ffa61ff509188dbfbd0ad65a9dd4ce"
     },
     "bloodtrail_assault": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
@@ -169,12 +169,12 @@
       "full": "784fd74578ced1a9fbfe752ebad026f243097a48d3add99f17ba7cb5a6dce061"
     },
     "chain_heal": {
-      "spec": "cb8256898fc8fa07871c8b27737d01d956950c45a2c71ece7ab9819210aefbd8",
-      "full": "6542195660b15447eff17300a36b538e32f694d7330c4ef8e3a39fad9e415014"
+      "spec": "9916cc99b61013660c6996ae66f7bc4531c2c8c7a2501f15c674ef2055515d3c",
+      "full": "4b16f0ba49c1c9ccfec5cbdfbec18927f40dc36c099718b4c2121debe949af65"
     },
     "chain_lightning": {
-      "spec": "16413972422aa8a6f797c1045f5efa3618e5fef175619feb8e44f76cf62bf522",
-      "full": "db2d4b31336afd8068f920cad4412c5d36750457558733294d835b4b945231ca"
+      "spec": "60963062dfac584426d74e41567719d831133b09708ea86b53372d4f11d9ed24",
+      "full": "4cc05d28301520e8aed7bbe7bcdf1a90c0a53e72146f94d1349a55e0754f6057"
     },
     "challenging_roar": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
@@ -369,24 +369,24 @@
       "full": "a72303263195588cb9f1cb1065e0ce31529a41bd89039d07c52ca94eab0f4f3b"
     },
     "earth_shock": {
-      "spec": "a337c2918d6f56e46cb05d18238f94b1f9003882e722bc48badff2f749954fb5",
-      "full": "ccef65b95f91afe2de17a9c7f08a1328d3db9659784e2b2eeb0fc927cb05debd"
+      "spec": "051d40d81116b5bc60a163e9e36367a3f7997832f8ab504d01dc94c662fbe295",
+      "full": "eafc98223915578f170fee698bfadcf97c94498804e01ea18da1015889420887"
     },
     "earthbind": {
-      "spec": "eaa9009ba6afae2c8a60f1e75f033cc707c71c2affe076a3ce010c03bdb4b3c4",
-      "full": "dc357daf9e4e5250a648ed0ec5f8c1884433a087d1ea2ce8bd8242428d1c50d1"
+      "spec": "ca085f19b62d986bfee35320e7ba04c5fbc884410b82e7af44681ac2613cb45d",
+      "full": "11b51f7370d77e7a7de1c3310990e91f0679ce3f722d3eb5ce4ca5c9b582f538"
     },
     "earthquake": {
-      "spec": "70fd2bd2e506f6cd06e7a1897c5c4913dea74801586d8b8e115d67c2c4aaf852",
-      "full": "d463bc1e4e20767638f89c35c90a2223682c16a3be2e1620d855272ed0d79b5c"
+      "spec": "088f50ce8ef1783941e05f02513dc2b63416bfd52b5e3647b9be043909133ca1",
+      "full": "d1ffcb8e5a3b2e7fc7940c477eb0b1f6afcb6c308f1a285965956fd11a304209"
     },
     "elemental_mastery": {
-      "spec": "b79ad423659583810b80f5647901e0cc30e36738f58c9f790f5639f0fac50290",
-      "full": "d1f9085dfcd35bb7555971048af757bf1d821417e24cab5c692d06aae84ed3b3"
+      "spec": "8bf6419d537fd623c56447436997584e17cf5edf037c566c060acf683ccf3658",
+      "full": "f04f047f40c3549194ff3025c96fc3cec418dbf73317db2f4735902e95349c8b"
     },
     "elemental_trance": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "ed1396bc2f73f328d9e982646ddb5ce899a23aac555a157cd67ce43ffad01ec0",
+      "full": "e27a29d404d67c3cca70a7247c377619ecb586df89d88943ad905aefcc6d1b2e"
     },
     "enrage": {
       "spec": "2434281a9697f63d4f60ee59e12ab31d109a6452250dbd29a2bd228aca2038ce",
@@ -465,16 +465,16 @@
       "full": "67a1b2382b12dbfef30acfa5d05f341cc2c2b91ae1e2f3fa066a4f5ad7284525"
     },
     "flame_shock": {
-      "spec": "13e8db2ff12bc10c780aa62f003f03a261b59e579cd116796a5b24d82906240e",
-      "full": "0acf68067d5f12808d067de166b6033deb4768db8ab10bf27b554388767d71bd"
+      "spec": "24d2ed3bb0994f7a7c91d084a501e306032a2607837a1458bcc87d00b4d40854",
+      "full": "68b9c789cc0e00a116e470996c9826194d7cbe1b26671e5052242827afdef580"
     },
     "flamestrike": {
       "spec": "a781cc619231dc63c38311ad3e8c7b9afec5a4b9fb0a1727df21e3ca2c602291",
       "full": "aa673dbc875db11ac89947806e5ccdb97ffd9619d866237698a8b82b625283b4"
     },
     "flametongue_weapon": {
-      "spec": "7c2fcdc73ca2ba8f8584856a13052ccbfc458f7da2f0ec17e605a2e95c8fa3da",
-      "full": "2e84ab3e0118ddfa903b5c49994bd2ad37afa2db99d55e7fbfc985452b87a2a5"
+      "spec": "e88acb0086a28b4d07461a148e0c6156b036008eb173409d1c15b088fe6bc276",
+      "full": "4eb418022403d0625c1498f4b6732e38b9be5a49b4bb1263bac0b5dcecea6c2b"
     },
     "flash_heal": {
       "spec": "d3cd0e61011dc87e4e63c8c75f67916f56fab6c056c9f901b12831774fa09fca",
@@ -505,8 +505,8 @@
       "full": "9ec5935103b532289eb1f141c80de2b267baf35411ab29877e31358f1288a850"
     },
     "frost_shock": {
-      "spec": "4c81c7045ac729b5213071406b42eca6744e87b5b6a13764c2b2f191b04da4e3",
-      "full": "ea75943ba4416e91f70e79cce146ee06b988466b0d989ed74b3d95ba1bffde8b"
+      "spec": "8943ccea8bd720c8654c97164d16f6590e6da66b093575badcaee31901ff7bac",
+      "full": "ed578f5d51176f20c72815bb19bafcfa883c41d1abd1fd46bca09dc50dd28ab6"
     },
     "frost_trap": {
       "spec": "a8c8d586b1bc8bfd2a5d15ac7f6632cac909df8e1f90fcdb5e37a247cc2d0226",
@@ -533,16 +533,16 @@
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "galeheart_weapon": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "16df7a4dcadfd98324d6b7ed5cff01a67f6692df420e225d3e0ace63a28d59db",
+      "full": "431dc62dae23d3428cdc5e8e0f3d7c5bbf586e9ce28f81c6010cad36c5f6f888"
     },
     "garrote": {
       "spec": "9642becdf49b85d1134f85b8c8d34a57d958407b59b3886320d186da7b2bde15",
       "full": "4e5f3c9d9584e58ccc5d791e34944df5435e3e58376992bfad3f973e9da22620"
     },
     "ghost_wolf": {
-      "spec": "42c7efd43a065e9bb3d1d2bd2ae780fe1d0e2542c60a9049a8851f7d52406480",
-      "full": "fa1f7fc01640ede7ac4ea3d1728adb1ed77a63c7813fba5bd3ad6b64dc6a8713"
+      "spec": "50a84abcaf194695f765a199fb784b665614c495199faebe8b2d2b42071655ba",
+      "full": "4417d02a891fca3e3c054c6eb9453a01ebbb94ad306b525f0a8f401598fd9a99"
     },
     "ghostly_strike": {
       "spec": "7d184851cad572d4d1cbb9a97f50a1ea31b58b18f21ab8095e3c77a28825c62e",
@@ -609,8 +609,8 @@
       "full": "3210b204d18cdcb0800181611276758644574d359b16e09e71bef4fff5fe04fd"
     },
     "healing_wave": {
-      "spec": "de9da2c9e758e2147149a305a69b74c4ac77de6aeccf9accd95202a20881b0cb",
-      "full": "008d57b7c51c14eb705ee3e1aba2d2bcbe5d4f78d55b3dfd77de088efcacba3c"
+      "spec": "d63037b8410b52de804a40449a99b42ab5dd4963090eee12f33d68903dad07c6",
+      "full": "556f81777ef0811ee07de0e3e1e2e339e4e4be3de0a8776e0a9a9bd3f4069be2"
     },
     "hemorrhage": {
       "spec": "df4da9f40ce1b75a0fc8a469db7c934fddffa083750b01c039a9d7e65eeb8688",
@@ -741,16 +741,16 @@
       "full": "79ab76979820a8a3c7677ba89a36f2be6dbed18b0d8d7a8d918bb706fb5b0080"
     },
     "lifespring_weapon": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "1092606960aec50b8603a79d5eea85d07c8769e0468ea96096a3394ad9b2424e",
+      "full": "4787e7c755d21e3f9a6ad8a8b666b3b5ade7b8deb0a60715106dc2ae5454913e"
     },
     "lightning_bolt": {
-      "spec": "6d9be376c5fb8ee17acd3cd6863ba99559487f8000e75245a3dbb994eb9cb1b4",
-      "full": "accae84272725d6a14ccc04c873ab2e193a76ee971672d6c7a82ad2c972b3696"
+      "spec": "c9e86490e7f32aaf2b02b451c59c5fabae8abcd615b60a3f9777c4e120f6c7f7",
+      "full": "ba20d9d9df5b3806e699b601bd7ac1a8ed487aa5864449d780e15ed38fa53ae4"
     },
     "lightning_shield": {
-      "spec": "08bad9d480d4f223bd514d079f0310f3f94516711409ccd3b44855e374edbdfe",
-      "full": "5b8c2222624fd1ac2b229832304ed4c4c56ca65ed40204569b10b41c43a43c89"
+      "spec": "56420a1bdea97e0bdbcfa954a3fd3b7cb2b46796501210f96015c57bd5f0d553",
+      "full": "c21dfa760c633a5500340d10d2d574cb4f9aa6ac615f7b69f5451ce0a49a12d0"
     },
     "litany_of_guilt": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
@@ -925,8 +925,8 @@
       "full": "868fb430b73dd555bfa2a9f90b090eebb81be237f9af89ea1a3b38c021c6f6fb"
     },
     "primal_exaltation": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "becbeba49d3e2448e595cb9a508c6cef52722b607316efed0cbc7b7290124014",
+      "full": "e14dfe5af66a490e770349869f5995e84121889c99a0a8dafa8fa45a96251d56"
     },
     "primal_reflexes": {
       "spec": "db198b0241fbe14744f06692ddea3f54b4185335dac316b70315ad806b163c7b",
@@ -1033,8 +1033,8 @@
       "full": "c94d538b4cdaa1b6bb3dce38c3667d82bc4231d791933f8f907bff5ee639dacc"
     },
     "rockbiter_weapon": {
-      "spec": "df206eafa98256cc538b2701b30b0dee94bee2a1f6ce64a30d9adab2e179f4b3",
-      "full": "b67f6b38a8a8cc022a2ef98d80de38d2f885c8527726eb7bb28cc8740b0f3371"
+      "spec": "f9a6a5c7b287f6fceea7861d2440bfde328c916833a2692472c537a94cb3af86",
+      "full": "ad94cc71a83f14f5aa123469ec7d47a440a18a7bc00f482f4107a103fc3ced20"
     },
     "ruinous_brand": {
       "spec": "f4f8900379ef07ba9c3d1bff48db642436ca6546f2f9a83e68268d91efe1dc05",
@@ -1209,12 +1209,12 @@
       "full": "fcadf410b1a15fd9ac2d27b3589c46fe525c221fed34237f35dca897466de195"
     },
     "stoneward": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "5d1b01a0ffd50eaa59011e944b75c51f69f8edee030854236e6c74bf9af1a58e",
+      "full": "c4f8b82aee9f7eff81ce6db235ea98dadb7602c9811faea1d52ad95598eb5b6f"
     },
     "stormstrike": {
-      "spec": "d50e2535eb152040faf7cd68d0ac45f954f688d1dfac5037c1cd5fc07b3fae02",
-      "full": "7dc56ee96d2b175466e4ba7453e354774d08283b7a2e8371f84c947e52af3bf8"
+      "spec": "55e641830e528bdfa3a6f0cdcda3be32bdbf608c98f190fc8c0289587b218f9c",
+      "full": "1e46715df54a611936f1845ef04dc3211f58b6b04ab347f84d39207290c54e2e"
     },
     "stormsurge": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
@@ -1309,8 +1309,8 @@
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "tidecall": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "ae8c12612792822969f1b64a53abb4b5892b7e2e1b7e9fbafbfe410f77f2f7c9",
+      "full": "47e0f2470bdc6dc0e098d4a47a9620431cf88403e3690da57f51b2492e3a9f25"
     },
     "tigers_fury": {
       "spec": "910b37da36ee937fc016538b96a06f88c74655f5e3bb8f483a1b282331436738",
@@ -1349,8 +1349,8 @@
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "unleash_weapon": {
-      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
-      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+      "spec": "31b4c7ecd5437b79ab3e1d1dfd12fb94f398299104cca31ef28f4ee5139e4d2a",
+      "full": "41c973276f5eb659246f890fa7e8d5d51e0ab4b9c51c3faaa88dc5dc1d6d621e"
     },
     "valkyrs_calling": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",

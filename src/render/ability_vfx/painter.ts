@@ -1200,6 +1200,7 @@ export class AbilityVfx {
         this.recordStat(ev.ability, true);
         return true;
       }
+      this.releaseGesture(casterId, ev.ability);
       // Fractured perimeters mark the quake lifetime or the brief grip cast
       // footprint. Keep the fallback if validation or saturation rejects one.
       if (ev.radius && !fieldOwnsBoundary)
@@ -2238,7 +2239,12 @@ export class AbilityVfx {
     )
       return;
     if (!d.hasGestureClip?.(sourceId, abilityId)) return;
-    if (ABILITIES[abilityId]?.class !== 'warrior') {
+    // Point fields can carry both a caster cue and a ground cue on the same
+    // tick. Either must start the motion alone, but together they own one cast.
+    if (
+      ABILITIES[abilityId]?.class !== 'warrior' &&
+      abilityVfxFullSpecFor(abilityId)?.shaman?.action !== 'field'
+    ) {
       d.triggerAttack(sourceId, abilityId);
       return;
     }

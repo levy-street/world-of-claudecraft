@@ -238,9 +238,12 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     expect(entry.slice(programsStart)).toContain(
       'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
     );
-    expect(renderer).toContain(
-      'castVfxProgramUnits(this.scene, () => abilityMaterialSlot.group, this.compileArms, this.webgl);',
-    );
+    expect(
+      /castVfxProgramUnits\(\s*this\.scene,\s*\(\) => abilityMaterialSlot\.group,\s*this\.compileArms,\s*this\.webgl,?\s*\);/.test(
+        renderer,
+      ),
+      'cast preparation retains the scene, lazy material group, compile arms and renderer',
+    ).toBe(true);
     // run() links the same set behind the curtain; the spawn binds textures only.
     expect(entry).toContain('await Promise.all(castVfxUnits().map((unit) => unit.run()));');
     // Replaying prewarmSpawn live would pop a white primitive burst.

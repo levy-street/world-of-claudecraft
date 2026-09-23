@@ -92,7 +92,7 @@ export function shamanEarthContact(
     spreadSide: number,
     spreadForward: number,
     scale: number,
-    thickness: number,
+    fragmentDepth: number,
     life: number,
     tint: number,
   ) => {
@@ -111,7 +111,7 @@ export function shamanEarthContact(
       true,
       scale,
       true,
-      thickness,
+      fragmentDepth,
     );
   };
   const grit = (

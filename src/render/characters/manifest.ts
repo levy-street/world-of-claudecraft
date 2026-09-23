@@ -528,10 +528,9 @@ const WOLF_BAKED: ClipMap = {
 // mob_wolf's separate wolf_basic.glb) that ships unused bonus donor clips
 // (Bark, Howl, "Idle Alert", Sneak) specific to this named rare; this
 // blends Howl's rear-back windup into Attack's lunge for a howl-then-pounce,
-// more dramatic than the plain Attack every other WOLF_BAKED user (mob_wolf,
-// form_ghost_wolf) still plays. WOLF_BAKED itself is untouched: both still read it,
-// and changing the shared base would change player shaman form combat
-// feel, out of scope here. greyjaw already ships and wires BOTH
+// more dramatic than the plain Attack the world wolf still plays.
+// WOLF_BAKED itself remains shared by those two creature maps; Shadewolf
+// has its own asset and clips. greyjaw already ships and wires BOTH
 // Idle_HitReact_Left and Idle_HitReact_Right (via animal()), so no
 // hit-variety work is needed here: this override is attack-only.
 const GREYJAW_WOLF: ClipMap = {
@@ -2116,7 +2115,7 @@ export const VISUALS: Record<string, VisualDef> = {
   },
   form_cat: {
     url: `${CREATURES}/druid_cat_form.glb`,
-    // Sized a fifth above the world wolves (mob_wolf / form_ghost_wolf are 1.6)
+    // Sized a fifth above the standard world wolf (mob_wolf is 1.6).
     // so the druid's cat reads as the bigger predator on the field.
     height: 1.92,
     clips: DRUID_CAT_FORM,

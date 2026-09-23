@@ -1,13 +1,17 @@
 import { readFileSync } from 'node:fs';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { describe, expect, it, vi } from 'vitest';
+import type { CharacterVisual } from '../src/render/characters/visual';
+import { gateSurfaceForm } from '../src/render/surface_receiver_preparation';
 
 // Renderer.ts is a coordinator that needs a live WebGL/DOM context to instantiate
 // (see tests/CLAUDE.md), so its wiring is pinned by scanning the actual source, the
 // same pattern tests/prewarm_policy.test.ts and tests/prewarm_resume.test.ts use for
-// the sibling compile-gate/prewarm wiring in this file. settlePendingSwap's own
-// behavior (including the rapid form-swap race this gate exists to survive) is
-// covered directly in tests/compile_gate.test.ts.
+// the sibling compile-gate/prewarm wiring in this file. The extracted form
+// helper's ownership check is also exercised below with out-of-order settlements.
 const renderer = () => readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+const formGate = () =>
+  readFileSync(new URL('../src/render/surface_receiver_preparation.ts', import.meta.url), 'utf8');
 
 describe('shapeshift-form compile gate (#2571)', () => {
   it('declares one shared pending-root token on EntityView, not one flag per form', () => {
@@ -49,8 +53,7 @@ describe('shapeshift-form compile gate (#2571)', () => {
       "this.buildFormVisual(e, v, 'form_metamorph', 'metamorphVisual', false)",
     );
 
-    // ...and the builder still attaches, marks pending, gates, and settles, in
-    // that order, behind the gateCompile arm.
+    // The builder still attaches before handing ownership to the shared helper.
     const builderStart = source.indexOf('  private buildFormVisual(');
     expect(builderStart).toBeGreaterThan(-1);
     const builder = source.slice(builderStart, source.indexOf('\n  private ', builderStart + 10));
@@ -58,21 +61,40 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(assignAt, 'slot assignment').toBeGreaterThan(-1);
     const addAt = builder.indexOf('v.group.add(built.root)', assignAt);
     expect(addAt, 'group.add').toBeGreaterThan(assignAt);
-    const skipAt = builder.indexOf('if (!gateCompile) return;', addAt);
-    expect(skipAt, 'ungated early return').toBeGreaterThan(addAt);
-    const pendingAt = builder.indexOf('v.formCompilePending = built.root;', skipAt);
+    const delegateAt = builder.indexOf('gateSurfaceForm(this, built, v, gateCompile);', addAt);
+    expect(delegateAt, 'form gate delegation').toBeGreaterThan(addAt);
+    const helperSource = formGate();
+    const helperStart = helperSource.indexOf('export function gateSurfaceForm(');
+    expect(helperStart).toBeGreaterThan(-1);
+    const helperEnd = helperSource.indexOf('export function stageSurfaceReceiver(', helperStart);
+    expect(helperEnd).toBeGreaterThan(helperStart);
+    const helper = helperSource.slice(helperStart, helperEnd);
+    const prepareAt = helper.indexOf(
+      'const settle = stageSurfaceReceiver(host, visual, gateCompile);',
+    );
+    expect(prepareAt, 'receiver preparation').toBeGreaterThan(-1);
+    const skipAt = helper.indexOf('if (!gateCompile) return;', prepareAt);
+    expect(skipAt, 'ungated early return').toBeGreaterThan(prepareAt);
+    const pendingAt = helper.indexOf('view.formCompilePending = visual.root;', skipAt);
     expect(pendingAt, 'pending set').toBeGreaterThan(skipAt);
-    const gateAt = builder.indexOf('this.gateSwapFlagOnCompile(built.root, () => {', pendingAt);
+    const gateAt = helper.indexOf(
+      '(host as Host).gateSwapFlagOnCompile(visual.root, () => {',
+      pendingAt,
+    );
     expect(gateAt, 'gate call').toBeGreaterThan(pendingAt);
-    const settleAt = builder.indexOf(
-      'v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);',
+    const settleAt = helper.indexOf(
+      'if (view.formCompilePending === visual.root) view.formCompilePending = null;',
       gateAt,
     );
     expect(settleAt, 'settle callback').toBeGreaterThan(gateAt);
+    const surfaceSettleAt = helper.indexOf('settle();', gateAt);
+    expect(surfaceSettleAt).toBeGreaterThan(gateAt);
+    expect(surfaceSettleAt).toBeLessThan(settleAt);
 
     // Uses the flag shape (gateSwapFlagOnCompile), not the direct-hide shape
     // (gateSwapOnCompile): the visibility lines right below recompute every tick.
     expect(builder).not.toContain('this.gateSwapOnCompile(built.root)');
+    expect(helper).not.toContain('.gateSwapOnCompile(');
   });
 
   it('feeds the pending token to the readiness mask, so the BASE body stands in', () => {
@@ -114,10 +136,25 @@ describe('shapeshift-form compile gate (#2571)', () => {
     expect(source).not.toContain('formVisibility.base && !v.visualCompilePending');
   });
 
-  it('imports settlePendingSwap from the shared compile_gate core', () => {
-    const source = renderer();
-    expect(source).toContain(
-      "import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';",
-    );
+  it('keeps a newer pending form when an older helper callback settles', () => {
+    const pending: Array<() => void> = [];
+    const view = { formCompilePending: null as THREE.Object3D | null };
+    const host = {
+      gateSwapFlagOnCompile: vi.fn((root: THREE.Object3D, settled: () => void) => {
+        expect(view.formCompilePending).toBe(root);
+        pending.push(settled);
+      }),
+    };
+    const first = { root: new THREE.Group(), stageSurfaceResponsePreparation: () => null };
+    const second = { root: new THREE.Group(), stageSurfaceResponsePreparation: () => null };
+    gateSurfaceForm(host, first as unknown as CharacterVisual, view, true);
+    gateSurfaceForm(host, second as unknown as CharacterVisual, view, true);
+    expect(host.gateSwapFlagOnCompile).toHaveBeenCalledTimes(2);
+    pending[0]();
+    expect(view.formCompilePending).toBe(second.root);
+    pending[1]();
+    expect(view.formCompilePending).toBeNull();
+    pending[0]();
+    expect(view.formCompilePending).toBeNull();
   });
 });
