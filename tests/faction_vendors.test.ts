@@ -230,24 +230,26 @@ describe('faction ladder budgets mirror the raid and heroic tables', () => {
     }
   });
 
-  it('Proven waist and feet mirror the raid offset rows exactly (feet one stamina over, for the proxy floor)', () => {
-    const pairs: Array<[string, string, number]> = [
-      ['riftwalkers_cord', 'slagstalker_belt', 0],
-      ['riftwalkers_treads', 'ashrunner_boots', 1],
-      ['cord_of_the_dawn', 'cord_of_the_last_flame', 0],
-      ['dawnlit_slippers', 'steps_of_quiet_water', 0],
-      ['forgemasters_girdle', 'warforged_waistguard', 0],
-      ['forgemasters_sabatons', 'furnace_march_greaves', 1],
+  it('Proven waist and feet carry the raid offset ratings and armor with the line one point under', () => {
+    // One under on BOTH axes the pickers score, never a tie: dev/bis_gear.ts
+    // scores armor plus the class line and the max-armor tank kit
+    // (tests/heroic_difficulty_floors.test.ts) breaks an armor tie by id, so
+    // an exact mirror would hand the faction row every /dev bis kit and the
+    // tank reference pools (both moved by that tie before this rule).
+    const pairs: Array<[string, string]> = [
+      ['riftwalkers_cord', 'slagstalker_belt'],
+      ['riftwalkers_treads', 'ashrunner_boots'],
+      ['cord_of_the_dawn', 'cord_of_the_last_flame'],
+      ['dawnlit_slippers', 'steps_of_quiet_water'],
+      ['forgemasters_girdle', 'warforged_waistguard'],
+      ['forgemasters_sabatons', 'furnace_march_greaves'],
     ];
-    for (const [id, mirror, staOver] of pairs) {
+    for (const [id, mirror] of pairs) {
       expect(ITEMS[id].quality, id).toBe('epic');
       expect(ITEMS[id].slot, id).toBe(ITEMS[mirror].slot);
       expect(ITEMS[id].armorType, id).toBe(ITEMS[mirror].armorType);
-      const own = { ...stats(id) };
-      const theirs = { ...stats(mirror) };
-      expect(own.sta, id).toBe((theirs.sta ?? 0) + staOver);
-      own.sta = theirs.sta;
-      expect(own, `${id} vs ${mirror}`).toEqual(theirs);
+      expect(stats(id).armor, `${id} armor vs ${mirror}`).toBe((stats(mirror).armor ?? 0) - 1);
+      expect(line(id), `${id} line vs ${mirror}`).toBe(line(mirror) - 1);
       expect(ratings(id), `${id} ratings vs ${mirror}`).toEqual(ratings(mirror));
     }
   });

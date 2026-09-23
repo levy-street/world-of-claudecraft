@@ -854,12 +854,14 @@ describe('item-art audit builder', () => {
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
       // faction quartermaster owners, the Emissary's Cache chest and the two
-      // Clue Scroll items (1305 / 1323).
-      catalogSha256: 'd41d1a47f8a01c48b612b257a550503997319a1ff7cd090f8cff2b1bf7ab47c6',
-      catalogBytes: 710773,
+      // Clue Scroll items (1305 / 1323). Re-minted again with the faction
+      // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
+      // 1340, sha and bytes straight from `--verify-only` on this tree.
+      catalogSha256: '98cbeb3bb04f7dcc50cc0404f2c5f75a05557a730e2103ea89c44f73c393d3ff',
+      catalogBytes: 719724,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1305,
-      liveItemCount: 1323,
+      catalogCount: 1322,
+      liveItemCount: 1340,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -877,7 +879,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'f19748b98126115136a11b738eba3097a76b9c25732623407e71a4f902188fe4',
+      shippingCatalogSha256: 'c02f91e573ee7c09e368fb2e4585370cf6b0f68d31f3fd83d01320a787bb8257',
       machineChecksPassed: true,
       verdict: null,
     });

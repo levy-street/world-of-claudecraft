@@ -10,8 +10,11 @@
 //   Recognized  a neck at the heroic five-man vendor's budget (one 25 rating)
 //   Trusted     a ring at the same budget, plus the faction's bag
 //   Proven      the two thinnest armor slots (waist, feet) at the raid OFFSET
-//               budget, a pre-raid set-slot piece at the heroic five-man
-//               budget, and the faction's learned enchant formula(s)
+//               budget (its ratings; armor AND line one point under, the
+//               same never-a-tie rule as Champion: the max-armor tank kit in
+//               tests/heroic_difficulty_floors.test.ts breaks an armor tie
+//               by id), a pre-raid set-slot piece at the heroic five-man
+//               budget, and the faction's formulas
 //   Vanguard    a proc weapon at the heroic five-man weapon bar (the only
 //               non-legendary proc weapons outside the two 1.7 daggers)
 //   Champion    the jewelry gaps: Agility jewels, stamina-line tank jewels,
@@ -28,8 +31,8 @@
 // Budgets are COPIED from the live raid and heroic tables, never invented:
 // jewelry mirrors content/ignivar_loot.ts IGNIVAR_JEWELRY_ITEMS (one 25
 // rating, 15 to 16 primary) and content/heroic_vendor.ts; waist and feet
-// mirror IGNIVAR_OFFSET_ITEMS (25 + 60 ratings; untiered feet carry one more
-// stamina than the tiered row so they meet the proxy floor); set-slot pieces mirror the
+// mirror IGNIVAR_OFFSET_ITEMS (25 + 60 ratings; armor and line one point
+// under; the proxy stamina floor of item_stamina_baseline still holds); set-slot pieces mirror the
 // heroic five-man drops (one 40 rating); weapons sit on the heroic five-man
 // weapon bar (FIVE_MAN_WEAPON_RATING). Faction stock is UNTIERED in
 // item_level.ts (no source registers it), so tests/faction_vendors.test.ts
@@ -185,7 +188,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     armorType: 'leather',
     quality: 'epic',
-    stats: { armor: 150, agi: 11, sta: 6 },
+    stats: { armor: 149, agi: 10, sta: 6 },
     critRating: 25,
     hitRating: 60,
     sellValue: sell('proven'),
@@ -198,7 +201,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     armorType: 'leather',
     quality: 'epic',
-    stats: { armor: 145, agi: 11, sta: 6 },
+    stats: { armor: 144, agi: 10, sta: 5 },
     critRating: 60,
     hasteRating: 25,
     sellValue: sell('proven'),
@@ -313,7 +316,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     armorType: 'cloth',
     quality: 'epic',
-    stats: { armor: 75, int: 11, spi: 6, sta: 6 },
+    stats: { armor: 74, int: 10, spi: 6, sta: 6 },
     spellPower: 4,
     critRating: 25,
     hitRating: 60,
@@ -327,7 +330,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     armorType: 'cloth',
     quality: 'epic',
-    stats: { armor: 70, int: 8, spi: 8, sta: 5 },
+    stats: { armor: 69, int: 8, spi: 7, sta: 5 },
     healPower: 8,
     critRating: 25,
     hasteRating: 60,
@@ -493,7 +496,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'waist',
     armorType: 'mail',
     quality: 'epic',
-    stats: { armor: 270, str: 11, sta: 6 },
+    stats: { armor: 269, str: 10, sta: 6 },
     critRating: 25,
     hitRating: 60,
     sellValue: sell('proven'),
@@ -506,7 +509,7 @@ export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
     slot: 'feet',
     armorType: 'mail',
     quality: 'epic',
-    stats: { armor: 255, str: 11, sta: 6 },
+    stats: { armor: 254, str: 10, sta: 5 },
     critRating: 60,
     hasteRating: 25,
     sellValue: sell('proven'),

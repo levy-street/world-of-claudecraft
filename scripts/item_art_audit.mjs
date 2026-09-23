@@ -133,9 +133,10 @@ const build = await buildItemArtAudit({
     // emissary's cache chest (feature/weekly-quests: 1303 / 1321), + the two
     // Clue Scroll items (clue_scroll, treasure_casket; clue-scroll-icons-2026-09-17):
     // 1305 / 1323 on the quests integration branch, measured with
-    // `node scripts/item_art_audit.mjs --verify-only`.
-    catalogCount: 1305,
-    liveItemCount: 1323,
+    // `node scripts/item_art_audit.mjs --verify-only`. + the faction ladder
+    // rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 / 1340.
+    catalogCount: 1322,
+    liveItemCount: 1340,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,

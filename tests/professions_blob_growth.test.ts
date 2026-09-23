@@ -890,7 +890,9 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(new Set(s2.knownRecipes)).toEqual(RETAINABLE_KNOWN_IDS);
     expect(MAX_KNOWN_RECIPE_IDS).toBe(512);
     expect(new Set(ALL_RECIPES.map((recipe) => recipe.id)).size).toBe(204);
-    expect(RETAINABLE_KNOWN_IDS.size).toBe(205);
+    // 209 with the four learned faction formulas (content/enchants.ts), each
+    // a retained `acquisition: 'drop'` enchant id like Zeal.
+    expect(RETAINABLE_KNOWN_IDS.size).toBe(209);
     expect(RETAINABLE_KNOWN_IDS.size).toBeLessThan(MAX_KNOWN_RECIPE_IDS);
     expect(s2.knownRecipes).toContain('enchant_weapon_lastflame_zeal');
     // Derived from the refusal policy so a profession becoming slottable
@@ -1165,13 +1167,19 @@ describe('the professions blob growth bound (phase 16)', () => {
     // boundTo digits for this fixture's. The edge stays measurement plus one
     // and the floor measurement minus 380 (the 11m rule); the 18 KiB
     // structural ceiling holds with 836 bytes of headroom.
+    //
+    // Faction ladder rework: 18,975 measured (the four learned faction
+    // formula ids joining retained knowledge, content/enchants.ts: 134 bytes
+    // at their widths plus quotes and commas, and the worn copy's widest
+    // enchant marker growing with the longest new id). Edge measurement plus
+    // one, floor measurement minus 380.
     const bytes = professionsBytes(s2);
     // Crucible 2026-09-05: 18,807 = 17,596 + 1,189 (33 new recipe ids) + 32
     // (Zeal) - 10 (legal equipment payloads, including new binding/provenance,
     // replacing the invented three-stat rolls). Same narrow tracking band.
     // One quest recipe adds exactly 30 UTF-8 bytes to retained knowledge.
-    expect(bytes).toBeGreaterThan(18457);
-    expect(bytes).toBeLessThan(18838);
+    expect(bytes).toBeGreaterThan(18595);
+    expect(bytes).toBeLessThan(18976);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.
@@ -1956,8 +1964,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // professions arm pins, so the two measurements can never describe
     // different fixtures.
     const professions = professionsBytes(s2);
-    expect(professions).toBeGreaterThan(18457);
-    expect(professions).toBeLessThan(18838);
+    expect(professions).toBeGreaterThan(18595);
+    expect(professions).toBeLessThan(18976);
 
     // Every container really reached its ceiling through the load (the
     // `field in state` and non-empty pins above are the pattern): a load clamp
@@ -2181,13 +2189,19 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // Intellect and Spirit (tierDeltaStats, item_budget.ts), so every baked
     // copy in the maximal bags and bank is a few bytes longer and the
     // equipped-instance delta shrinks by the same shape.
+    // Faction ladder rework: knownRecipes +134 (the four learned faction
+    // formula ids at their widths plus quotes and commas), equipmentInstance
+    // +11 (the worn copy's widest legal enchant marker is now a faction
+    // formula id); the professions band above re-measured at 18,975.
     expect(fixtureDelta).toEqual({
       equipment: 115,
-      equipmentInstance: -17,
+      equipmentInstance: -6,
       inventory: 16400,
       bank: 36080,
       vendorBuyback: 756,
-      knownRecipes: 62,
+      // 62 + 134: the four learned faction formula ids retained in
+      // knownRecipes (content/enchants.ts, the faction ladder rework).
+      knownRecipes: 196,
     });
     // field_kit (below) is the ONE Field Kit deedStats entry inside this same
     // settled state; the fixture-repair deltas above are Crucible-only and
@@ -2360,7 +2374,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // item ids).
         282 +
         17 +
-        105,
+        105 +
+        // Plus 371 at the faction ladder rework: the 17 new faction rows
+        // (13 periphery pieces and 4 formulas) in the maximal character's
+        // deedStats.itemsDiscovered, 320 characters of ids plus 3 bytes of
+        // quoting and comma each. Predicted from the literals BEFORE the run
+        // (56,508 to 56,879; the deedStats row below moves by the same 371).
+        371,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2389,7 +2409,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 469 -> 486 at the weekly emissary rebase (+17 above). deeds 599 -> 672
       // and deedStats 486 -> 518 at the Clue Scroll content (+73 and +32 of the
       // +105 above).
-    ).toEqual({ questsDone: 100, knownRecipes: 30, deeds: 672, deedStats: 518, reliquary: 80 });
+    ).toEqual({
+      // Faction ladder rework: knownRecipes 30 + 134 (the four learned formula
+      // ids), deedStats 518 + 371 (the 17 faction ladder rows), the same two
+      // terms the settled-ceiling equation above names.
+      questsDone: 100,
+      knownRecipes: 164,
+      deeds: 672,
+      deedStats: 889,
+      reliquary: 80,
+    });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
     // applied: 3884 alone measured 209,261 here (hammer content absent); the
@@ -2411,7 +2440,11 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 210,506 -> 210,788 at the faction standing deeds (+282), in the deeds
       // row this counterfactual keeps; +17 at the weekly emissary rebase;
       // +105 at the Clue Scroll content (the two deed ids and the two item ids).
-    ).toBe(210910);
+      // 210,910 -> 211,426 at the faction ladder rework (+516: the 17 faction
+      // rows in deedStats, +371, the four learned formula ids in knownRecipes,
+      // +134, and the worn copy's wider enchant marker, +11), all attributed
+      // in the growth equation above.
+    ).toBe(211426);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 49-byte
@@ -2428,7 +2461,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 211,745 -> 212,103 at the wq-reputation merge (+358, the faction items).
       // 212,103 -> 212,385 at the faction standing deeds (+282); +17 at the
       // weekly emissary rebase; +105 at the Clue Scroll content.
-    ).toBe(212507);
+      // 212,507 -> 213,023 at the faction ladder rework (+516, as above).
+    ).toBe(213023);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2498,8 +2532,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // above; no container or ceiling changed shape. On the quests integration
     // branch: 212,519 bytes. Floor at measurement minus 380, edge at
     // measurement plus one: 212,139..212,520.
-    expect(bytes, reMint).toBeGreaterThan(212139);
-    expect(bytes, reMint).toBeLessThan(212520);
+    // RE-BASED at the faction ladder rework: +516 (the 17 faction rows in
+    // deedStats.itemsDiscovered, +371; the four learned formula ids in
+    // knownRecipes, +134; the worn copy's wider enchant marker, +11), all
+    // attributed in the growth equation above: 213,035 bytes. Floor at
+    // measurement minus 380, edge at measurement plus one: 212,655..213,036.
+    expect(bytes, reMint).toBeGreaterThan(212655);
+    expect(bytes, reMint).toBeLessThan(213036);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was
