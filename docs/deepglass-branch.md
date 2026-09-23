@@ -71,6 +71,10 @@ to rebuild the registry so the public tree never needs Studio to list its maps.
 ## Contributing to the city
 
 - Branch from `feature/deepglass`, open the pull request against `feature/deepglass`.
+- ClaudeCraft Studio itself lives in the private `levy-street/woc-studio` repository and
+  is never committed here. `tests/editor_public_allowlist.test.ts` pins the public
+  `src/editor/` file list (the player editor plus the seam) and fails any change that
+  adds a Studio file; extend the allowlist only for a new PUBLIC editor module.
 - The map document is one JSON file. Two people editing it at once will conflict, so
   coordinate districts through the integrator, and keep Studio's serialization stable
   (sorted, one record per line) so non-overlapping edits merge.
