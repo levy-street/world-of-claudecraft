@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as contactAssets from '../src/render/ability_vfx/contact_assets';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
+  abilityVfxBootTextureDependencies,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
@@ -24,6 +25,8 @@ function installCanvasStub(): void {
   const context = {
     arc: noop,
     beginPath: noop,
+    bezierCurveTo: noop,
+    quadraticCurveTo: noop,
     clip: noop,
     closePath: noop,
     createImageData: (width: number, height: number) => ({
@@ -67,10 +70,15 @@ describe('abilityVfxTexturePrewarmSteps', () => {
   it('gives each procedural, contact and production texture its own preparation unit', () => {
     const steps = abilityVfxTexturePrewarmSteps();
     const ids = steps.map((step) => step.id);
-    for (const style of FLIPBOOK_STYLES) expect(ids).toContain(`flipbook:${style}`);
+    for (const style of FLIPBOOK_STYLES) {
+      if (style.startsWith('shaman_')) expect(ids).not.toContain(`flipbook:${style}`);
+      else expect(ids).toContain(`flipbook:${style}`);
+    }
     expect(ids).toContain('shared-canvases');
     expect(ids).toEqual([
-      ...FLIPBOOK_STYLES.map((style) => `flipbook:${style}`),
+      ...FLIPBOOK_STYLES.filter((style) => !style.startsWith('shaman_')).map(
+        (style) => `flipbook:${style}`,
+      ),
       'shared-canvases',
       ...contactAssets.CONTACT_SHEETS,
       'smoke',
@@ -117,6 +125,15 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     // the canvases: the pools bind these exact instances.
     const second = abilityVfxTexturePrewarmSteps().map((step) => step.build());
     expect(second).toEqual(first);
+  });
+
+  it('prepares every retained sheet and shared decal texture at boot even when there are more styles than visible slots', () => {
+    installCanvasStub();
+    const expected = abilityVfxTexturePrewarmSteps().flatMap((step) => step.build());
+    const boot = abilityVfxBootTextureDependencies();
+    expect(FLIPBOOK_STYLES.length).toBeGreaterThan(6);
+    for (const texture of expected) expect(boot).toContain(texture);
+    expect(new Set(boot).size).toBe(boot.length);
   });
 
   it('keeps deferred asset units empty until their actual loaders finish', () => {
@@ -222,7 +239,7 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
       'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
     );
     expect(renderer).toContain(
-      'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);',
+      'castVfxProgramUnits(this.scene, () => abilityMaterialSlot.group, this.compileArms, this.webgl);',
     );
     // run() links the same set behind the curtain; the spawn binds textures only.
     expect(entry).toContain('await Promise.all(castVfxUnits().map((unit) => unit.run()));');

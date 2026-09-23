@@ -13,6 +13,9 @@ import {
   MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
+import { drawRestorativeStream } from '../restorative_water';
+import { drawShamanCascade } from '../shaman_cascade';
+import type { ShamanParticleKind } from '../shaman_particle_core';
 import { tanHalfVerticalFov } from '../vfx_screen_bounds_core';
 import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
@@ -29,6 +32,7 @@ import { asFlipbookStyle, ImpactFlipbooks } from './flipbooks';
 import { FuryAudioQueue } from './fury_audio';
 import { abilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { GroundAuras } from './ground_auras';
+import { HeldConduction } from './held_conduction';
 import { HeldWarriorStorm } from './held_warrior_storm';
 import { OverlaySprites } from './overlay_sprites';
 import { LightPillars } from './pillars';
@@ -41,6 +45,10 @@ import {
 } from './ribbons';
 import { ShockRings } from './rings';
 import { ArchetypeSequencer, type SeqPoint, type SequencerHost } from './sequencer';
+import { SHAMAN_GRIP_FOOTPRINT_LIFE, ShamanFields } from './shaman_fields';
+import { ShamanHeld, type ShamanHeldEntity } from './shaman_held';
+import { shamanImpactStyle } from './shaman_impact_flash';
+import { sampleShamanOrigin } from './shaman_origins';
 import { BuffShells } from './shells';
 import { SIGNATURE_CONTACT_TIME } from './signature_core';
 import { SignatureCrests } from './signature_crests';
@@ -71,13 +79,20 @@ import { WarriorReadiness } from './warrior_readiness';
 import { WarriorSpiritHammers } from './warrior_spirit_hammers';
 import { WarriorStormAnchor } from './warrior_storm_anchor';
 import { drawWarriorWornMark } from './warrior_worn_marks';
+import { RestorativeWaterVolumes } from './water_volumes';
 import { weaponFaceSampler } from './weapon_face_sampler';
 
 export type { DecalStyle } from './decals';
 
 // Particle bursts delegate to the pooled Vfx cloud through this seam (the
 // painter wires deps.vfx.burst in); kind picks the sprite family.
-export type ParticleBurstKind = 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood';
+export type ParticleBurstKind =
+  | 'sparks'
+  | 'embers'
+  | 'debris'
+  | 'smoke'
+  | 'blood'
+  | ShamanParticleKind;
 export type ParticleBurst = (
   x: number,
   y: number,
@@ -99,6 +114,7 @@ const camFwdScratch = new THREE.Vector3();
 const anchorScratchA = new THREE.Vector3();
 const anchorScratchB = new THREE.Vector3();
 const weaponFaceScratch = new THREE.Matrix4();
+const weaponTipScratch = new THREE.Vector3();
 const hostAnchorScratch = new THREE.Vector3();
 
 // The Three-side engine of the per-ability VFX system: owns the pooled
@@ -559,6 +575,11 @@ export class AbilityVfxFx implements SequencerHost {
   private shakeRecent = 0;
   private baked: BakedImpactLayers;
   private fragments: SolidImpactFragments;
+  private water: RestorativeWaterVolumes;
+  private heldConduction = new HeldConduction();
+  private readonly shamanHeld = new ShamanHeld();
+  private readonly shamanFields = new ShamanFields();
+  private presentationClock: (() => number) | null = null;
   private sequencer = new ArchetypeSequencer();
   // Body-glow envelopes (the gallery casterGlowV): attack fast while fed each
   // frame, decay 0.9/s for held-shell buffs else 2.2/s once the source drops.
@@ -586,6 +607,28 @@ export class AbilityVfxFx implements SequencerHost {
     }
   >();
   private drawPriorityStorms = (): void => {
+    for (const [id, bands] of this.orbits) {
+      for (const band of bands) {
+        if (
+          band.stamp !== this.frame ||
+          (band.style !== 'wardCharges' && band.style !== 'conduction')
+        )
+          continue;
+        const at = this.anchor(id, ORBIT_DNA[band.style].frac, anchorScratchA);
+        if (at)
+          this.heldConduction.draw(
+            this.ribbons,
+            band.style,
+            at,
+            this.facingAt(id) ?? 0,
+            this.reducedMotionActive ? 0 : this.time,
+            band.o?.n ?? 3,
+            band.colorHex,
+            Math.min(1, band.age / 0.25),
+            band.tier === 0,
+          );
+      }
+    }
     for (const [id, storm] of this.warriorStorms) {
       if (storm.surface) continue;
       const at = this.anchor(id, 0, anchorScratchA);
@@ -616,6 +659,25 @@ export class AbilityVfxFx implements SequencerHost {
       this.ribbons,
       this.powerDetail,
       this.bodyAnchor,
+    );
+    this.shamanFields.draw(
+      this.frame,
+      this.presentationClock?.() ?? this.time,
+      this.reducedMotionActive,
+      this.qualityLevel,
+      this,
+      this.ribbons,
+      this.overlay,
+    );
+    this.shamanHeld.draw(
+      this.frame,
+      this.time,
+      this.reducedMotionActive,
+      this.qualityLevel,
+      this,
+      this.ribbons,
+      this.overlay,
+      this.weaponAnchor,
     );
   };
   private powerDetail = (kind: number, x: number, y: number, z: number): void => {
@@ -696,6 +758,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.furyStates = new WarriorFuryStates(scene, anchor, tex);
     this.baked = new BakedImpactLayers(scene, textureReady);
     this.fragments = new SolidImpactFragments(scene);
+    this.water = new RestorativeWaterVolumes(scene);
     this.rings = new ShockRings(scene, tex, groundY);
     this.decals = new GroundDecals(scene, tex, groundY);
     this.overlay = new OverlaySprites(scene, tex);
@@ -790,6 +853,13 @@ export class AbilityVfxFx implements SequencerHost {
 
   handPoint(id: number, hand: 0 | 1, out: { x: number; y: number; z: number }): typeof out | null {
     return this.handSample?.(id, hand, out) ? out : null;
+  }
+  weaponPoint(id: number, hand: 0 | 1, out: SeqPoint): boolean {
+    if (!this.weaponAnchor?.(id, hand)?.(weaponTipScratch)) return false;
+    out.x = weaponTipScratch.x;
+    out.y = weaponTipScratch.y;
+    out.z = weaponTipScratch.z;
+    return true;
   }
   weaponFace(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean {
     if (!this.weaponAnchor?.(id, hand)?.frame?.(weaponFaceScratch)) return false;
@@ -945,6 +1015,105 @@ export class AbilityVfxFx implements SequencerHost {
     return true;
   }
 
+  /** Caster motion/launch only. Authoritative outcomes own every recipient contact. */
+  sequenceShamanRelease(
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    targetId: number,
+    tier: number,
+  ): boolean {
+    if (this.disposed || !spec.shaman) return false;
+    const slot = this.sequencer.start(
+      this,
+      abilityId,
+      spec,
+      casterId,
+      targetId,
+      abilityHexColor(spec.tint ?? '#428bcf'),
+      tier,
+      true,
+    );
+    if (!slot) return false;
+    if (
+      abilityId === 'lightning_bolt' ||
+      abilityId === 'flame_shock' ||
+      abilityId === 'frost_shock'
+    ) {
+      this.ribbons.spawnTrailStyled(
+        casterId,
+        targetId,
+        slot.color,
+        0.31,
+        {
+          speed: 26,
+          style: spec.shaman.element === 'ice' ? 'shard' : 'comet',
+          headSize: 0.88,
+          coreHex: slot.accent,
+          accentHex: slot.color,
+          coils: false,
+          jagTrail: spec.shaman.element === 'storm',
+          forkEvery: 0,
+          tracer: true,
+          delay: 0,
+          aimX: 0,
+          aimY: 0,
+          aimZ: 0,
+          groundY: this.groundY,
+          sourceAnchor: (_id, out) => sampleShamanOrigin(this, abilityId, casterId, out),
+        },
+        null,
+        null,
+      );
+    }
+    // Release emits its prepared transient shapes synchronously. Retaining a
+    // prediction slot would let a later timer invent a successful hit/heal.
+    slot.active = false;
+    return true;
+  }
+
+  /** An actual damage/heal event paints only its real, currently visible recipient. */
+  sequenceShamanContact(
+    abilityId: string,
+    spec: AbilityVfxFullSpec,
+    casterId: number,
+    targetId: number,
+    tier: number,
+    outcome: 0 | 1 | 2 = 1,
+  ): boolean {
+    if (this.disposed || !spec.shaman || outcome === 0) return false;
+    const at = this.anchor(targetId, 0.5, anchorScratchB);
+    if (!at) return false;
+    const x = at.x,
+      y = at.y,
+      z = at.z;
+    const slot = this.sequencer.start(
+      this,
+      abilityId,
+      spec,
+      casterId,
+      targetId,
+      abilityHexColor(spec.tint ?? '#428bcf'),
+      tier,
+      true,
+      0,
+      undefined,
+      outcome,
+      true,
+    );
+    if (!slot) return false;
+    if (spec.shaman.action === 'strike') {
+      // The simulation resolves an instant weapon attack immediately. Its
+      // confirmed cosmetic contact follows the authored 150ms body contact;
+      // this never changes damage, RNG, or the result already received.
+      slot.impactAt = SIGNATURE_CONTACT_TIME;
+      return true;
+    }
+    this.sequencer.triggerImpact(this, slot, x, y, z);
+    slot.active = slot.shamanClimaxAt !== undefined;
+    return true;
+  }
+
   sequenceWarriorAreaContact(
     spec: AbilityVfxFullSpec,
     casterId: number,
@@ -1020,14 +1189,27 @@ export class AbilityVfxFx implements SequencerHost {
     colorHex: number,
     tier: number,
     windupDelay = 0,
+    shamanThunderSpend = false,
   ): void {
     if (this.disposed) return;
     const y = this.groundY(x, z) + 0.4;
-    this.sequencer.start(this, abilityId, spec, casterId, -1, colorHex, tier, false, windupDelay, {
-      x,
-      y,
-      z,
-    });
+    const slot = this.sequencer.start(
+      this,
+      abilityId,
+      spec,
+      casterId,
+      -1,
+      colorHex,
+      tier,
+      false,
+      windupDelay,
+      {
+        x,
+        y,
+        z,
+      },
+    );
+    if (slot && abilityId === 'earthquake') slot.shamanThunderSpend = shamanThunderSpend;
     if (wantsScreenFx(spec, tier))
       this.scheduleScreenFx(
         windupDelay + SIGNATURE_CONTACT_TIME,
@@ -1330,6 +1512,9 @@ export class AbilityVfxFx implements SequencerHost {
     ];
   }
 
+  impactFragmentPrewarmUnits(host: CrestPrewarmHost) {
+    return this.fragments.prewarmUnits(host);
+  }
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
     if (this.disposed) return;
     const gy = this.groundY(x, z);
@@ -1343,6 +1528,8 @@ export class AbilityVfxFx implements SequencerHost {
       this.fragmentsAt(kind, x, y, z, 0xffffff, 1, 1, 0, 1);
     this.baked.update(0.1, this.camera.quaternion, false);
     this.fragments.update(0.1, false);
+    this.water.spawn({ x, y, z }, { x: x + 1, y: y + 1, z }, 0x319cac, 0xbbeee8, 0.15);
+    this.water.update(0.05, false);
     this.rings.spawn(x, gy + 0.15, z, 2, 0.7, 0xffffff, 1, false);
     this.rings.spawn(x, gy + 1.2, z, 1.6, 0.7, 0xffffff, 1, true);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'ember', 1.2);
@@ -1350,7 +1537,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'rune', 1.2);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'crack', 1.2);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'char', 1.2);
-    // builds all six flipbook sheets and binds one per slot for the texture walk
+    // Stages representative sheets; exhaustive uploads belong to prewarm.ts.
     this.flipbooks.prewarm(x, y + 1.1, z);
     this.pillars.spawn(x, gy, z, 1, 6, 0xffffff, 0.7);
     this.shells.flash(entityId, 0xffffff, 0.7);
@@ -1438,6 +1625,7 @@ export class AbilityVfxFx implements SequencerHost {
       style === 'ember' ||
       style === 'rime' ||
       style === 'crack' ||
+      style === 'shaman_fracture' ||
       style === 'char' ||
       style === 'leap_fracture'
         ? style
@@ -1474,7 +1662,7 @@ export class AbilityVfxFx implements SequencerHost {
       duration,
       rotation,
       aspect,
-      warriorFlashStyle(sheet) ? this.groundY(x, z) : undefined,
+      warriorFlashStyle(sheet) || shamanImpactStyle(sheet) === 3 ? this.groundY(x, z) : undefined,
       worldFacing,
     );
   }
@@ -1521,6 +1709,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.powerForms.sleep(entityId);
     this.furyStates.sleep(entityId);
     this.warriorAttention.sleep(entityId);
+    this.shamanHeld.sleep(entityId);
     this.warriorStorms.delete(entityId);
     this.crests.releaseHeld(entityId);
     if (!keepCcBand) this.ccBands.delete(entityId);
@@ -1585,6 +1774,30 @@ export class AbilityVfxFx implements SequencerHost {
   ): void {
     if (this.disposed) return;
     this.ribbons.spawnBolt(sourceId, targetId, colorHex, life, width, jag);
+  }
+
+  /** Skybranch lands from above; only later resolved hops link actual victims. */
+  shamanChainLink(sourceId: number, targetId: number, firstHop: boolean): void {
+    if (
+      this.disposed ||
+      firstHop ||
+      !sampleShamanOrigin(this, 'chain_lightning', sourceId, anchorScratchA, true)
+    )
+      return;
+    const target = this.anchor(targetId, 0.5, anchorScratchB);
+    if (!target) return;
+    this.boltPoints(
+      anchorScratchA.x,
+      anchorScratchA.y,
+      anchorScratchA.z,
+      target.x,
+      target.y,
+      target.z,
+      0x70bde9,
+      0.16,
+      0.11,
+      0.85,
+    );
   }
 
   boltPoints(
@@ -1706,6 +1919,9 @@ export class AbilityVfxFx implements SequencerHost {
     dz: number,
     duration?: number,
     fractured = false,
+    sizeScale = 1,
+    mineralDetail = false,
+    thicknessScale = 1,
   ): void {
     this.fragments.burst(
       kind,
@@ -1720,6 +1936,9 @@ export class AbilityVfxFx implements SequencerHost {
       this.groundY,
       duration,
       fractured,
+      sizeScale,
+      mineralDetail,
+      thicknessScale,
     );
   }
   setWorldLightDelegate(
@@ -2062,6 +2281,43 @@ export class AbilityVfxFx implements SequencerHost {
   }
 
   // ---- per-frame state (refreshed every frame by painter.syncEntity) ------
+
+  /** Read the complete authoritative aura snapshot on its actual wearer. */
+  holdShamanState(entity: ShamanHeldEntity, preferredOwnerId?: number): void {
+    if (this.disposed) return;
+    this.shamanHeld.sync(this.frame, entity, preferredOwnerId);
+    this.shamanFields.syncEntity(this.frame, entity);
+  }
+
+  setPresentationClock(clock: () => number): void {
+    this.presentationClock = clock;
+  }
+
+  shamanField(event: Parameters<ShamanFields['quake']>[0]): boolean {
+    const grip = event.ability === 'earthbind';
+    const clock = this.presentationClock?.() ?? this.time;
+    const duration = grip ? SHAMAN_GRIP_FOOTPRINT_LIFE : event.duration;
+    if (
+      this.disposed ||
+      event.radius === undefined ||
+      duration === undefined ||
+      !(grip ? this.shamanFields.grip(event, clock) : this.shamanFields.quake(event, clock))
+    )
+      return false;
+    // Quake marks its producer lifetime; Gripping Earth only marks the cast
+    // footprint. Actual root and slow lifetimes remain aura-owned.
+    this.decals.spawn(
+      event.x,
+      this.groundY(event.x, event.z),
+      event.z,
+      event.radius * 0.96,
+      0x7d8984,
+      'shaman_fracture',
+      duration,
+      !grip && !this.reducedMotionActive ? 0.65 : 0,
+    );
+    return true;
+  }
 
   holdWarriorAttention(
     entityId: number,
@@ -2439,6 +2695,7 @@ export class AbilityVfxFx implements SequencerHost {
     );
     this.baked.update(dt, this.camera.quaternion, reducedMotion);
     this.fragments.update(dt, reducedMotion);
+    this.water.update(dt, reducedMotion);
     this.rings.update(dt, this.camera.quaternion);
     this.flipbooks.update(
       dt,
@@ -2485,12 +2742,41 @@ export class AbilityVfxFx implements SequencerHost {
     this.frame++;
   }
 
+  waterVolume(
+    from: SeqPoint,
+    to: SeqPoint,
+    tint: number,
+    accent: number,
+    width: number,
+    duration = 0.8,
+    priority: 0 | 1 = 0,
+    flow: 0 | 1 | 2 | 3 | 4 = 0,
+  ): void {
+    if (!this.disposed) this.water.spawn(from, to, tint, accent, width, duration, priority, flow);
+  }
+
+  healStream(sourceId: number, targetId: number, firstHop?: boolean): void {
+    const from = firstHop
+      ? sampleShamanOrigin(this, 'chain_heal', sourceId, anchorScratchA)
+        ? anchorScratchA
+        : null
+      : this.anchor(sourceId, firstHop === false ? 0.5 : 0.62, anchorScratchA);
+    const to = this.anchor(targetId, 0.55);
+    if (from && to) {
+      if (firstHop !== undefined)
+        drawShamanCascade(this, from, to, this.qualityLevel, this.reducedMotionActive);
+      else drawRestorativeStream(this, from, to);
+    }
+  }
+
   clear(): void {
     this.guards.clear();
     this.powerForms.clear();
     this.spiritHammers.clear();
     this.furyStates.clear();
     this.warriorAttention.clear();
+    this.shamanHeld.clear();
+    this.shamanFields.clear();
     this.warriorReadiness.clear();
     this.warriorStorms.clear();
     this.furyAudio.clear();
@@ -2498,6 +2784,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.ribbons.clear();
     this.baked.clear();
     this.fragments.clear();
+    this.water.clear();
     this.crests.clear();
     this.rings.clear();
     this.flipbooks.clear();
@@ -2539,11 +2826,14 @@ export class AbilityVfxFx implements SequencerHost {
     release(() => this.ribbons.dispose());
     release(() => this.baked.dispose());
     release(() => this.fragments.dispose());
+    release(() => this.water.dispose());
     release(() => this.crests.dispose());
     release(() => this.guards.dispose());
     release(() => this.powerForms.dispose());
     release(() => this.spiritHammers.dispose());
     release(() => this.furyStates.dispose());
+    release(() => this.shamanHeld.dispose());
+    release(() => this.shamanFields.dispose());
     release(() => this.rings.dispose());
     release(() => this.flipbooks.dispose());
     release(() => this.decals.dispose());
@@ -2826,6 +3116,7 @@ export class AbilityVfxFx implements SequencerHost {
     // this same slot before the queued cue overwrites it later in syncEntity.
     band.weaponSample = null;
     band.weaponRetryAt = 0;
+    if (band.style === 'wardCharges' || band.style === 'conduction') return;
     const dna = ORBIT_DNA[band.style];
     const at = this.anchor(entityId, dna.frac, anchorScratchA);
     if (!at) return;

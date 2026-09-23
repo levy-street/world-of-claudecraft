@@ -7049,6 +7049,8 @@ export type SimEvent = { pid?: number } & (
       dirZ?: number;
       speed?: number;
       duration?: number;
+      /** Faultwake only: Thunder actually consumed after the field resolved, before any refill. */
+      thunderSpent?: number;
       // 'meteorFall' only: seconds where the ground warning is visible before
       // the falling body appears. Included inside duration, so impact timing stays shared.
       warningLead?: number;

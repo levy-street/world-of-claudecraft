@@ -27,6 +27,34 @@ const meshOf = (...materials: THREE.Material[]): THREE.Mesh =>
   new THREE.Mesh(new THREE.BufferGeometry(), materials);
 
 describe('markProgramsReadyUnder', () => {
+  it.each(['Points', 'Line', 'Sprite'] as const)(
+    'records a settled %s program, matching the renderer compile traversal',
+    (kind) => {
+      const drawable =
+        kind === 'Points'
+          ? new THREE.Points()
+          : kind === 'Line'
+            ? new THREE.Line()
+            : new THREE.Sprite();
+      const material = drawable.material as THREE.Material;
+      const handle = program(kind);
+      const props = propertiesFor(new Map([[material, { currentProgram: handle }]]));
+      expect(isProgramKnownReady(handle)).toBe(false);
+      expect(markProgramsReadyUnder(props, new THREE.Group().add(drawable))).toBe(1);
+      expect(isProgramKnownReady(handle)).toBe(true);
+      expect(markProgramsReadyUnder(props, drawable)).toBe(0);
+    },
+  );
+
+  it('does not prove a material attached to an object the renderer does not compile', () => {
+    const material = new THREE.MeshBasicMaterial();
+    const handle = program('not-renderable');
+    const object = Object.assign(new THREE.Object3D(), { material });
+    const props = propertiesFor(new Map([[material, { currentProgram: handle }]]));
+    expect(markProgramsReadyUnder(props, object)).toBe(0);
+    expect(isProgramKnownReady(handle)).toBe(false);
+  });
+
   it('records the current program of every material under the target', () => {
     const body = new THREE.MeshStandardMaterial({ name: 'body' });
     const trim = new THREE.MeshStandardMaterial({ name: 'trim' });

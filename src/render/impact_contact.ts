@@ -32,7 +32,7 @@ export function impactContact(
             : school;
   }
   if (profile?.bleeding) school = 'physical-blood';
-  visual?.respondToElement(school, Math.min(0.95, 0.55 + weight * 0.15), profile);
+  visual?.respondToElement(school, Math.min(0.95, 0.55 + weight * 0.15), profile, reducedMotion);
   if (periodic || abilityId === 'deep_wounds') return;
   if (!reducedMotion && abilityId && hasWarriorContactRecoil(abilityId))
     visual?.receiveWarriorImpact?.(abilityId, beat ?? 0, source);

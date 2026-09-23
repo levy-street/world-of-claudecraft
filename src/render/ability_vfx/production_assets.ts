@@ -88,24 +88,26 @@ export function ensureWarriorKitAssets(constrainedMemory: boolean): Promise<bool
 async function loadWarriorKitAssets(): Promise<void> {
   await Promise.all([
     ensureContactSheets(),
-    ...Object.entries(BAKED_URLS).map(async ([kind, url]) => {
-      const compressed = url.endsWith('.ktx2');
-      const texture = (
-        await (compressed
-          ? loadKtx2Texture(url, { large: true })
-          : loadTexture(url, { srgb: true }))
-      ).clone();
-      // The authored cells carry baked gutters, so a mip chain cannot bleed
-      // between them, and it is what keeps a 2048px sheet cheap to sample once
-      // the contact is a few yards away (no chain means every distant texel
-      // walk misses the cache and shimmers). A KTX2 sheet ships whatever chain
-      // its encoder wrote, so its filters stay as loaded.
-      texture.generateMipmaps = !compressed;
-      texture.minFilter = compressed ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      texture.needsUpdate = true;
-      textures.set(kind as BakedKind, texture);
-    }),
+    ...Object.entries(BAKED_URLS)
+      .filter(([kind]) => kind !== 'smoke')
+      .map(async ([kind, url]) => {
+        const compressed = url.endsWith('.ktx2');
+        const texture = (
+          await (compressed
+            ? loadKtx2Texture(url, { large: true })
+            : loadTexture(url, { srgb: true }))
+        ).clone();
+        // The authored cells carry baked gutters, so a mip chain cannot bleed
+        // between them, and it is what keeps a 2048px sheet cheap to sample once
+        // the contact is a few yards away (no chain means every distant texel
+        // walk misses the cache and shimmers). A KTX2 sheet ships whatever chain
+        // its encoder wrote, so its filters stay as loaded.
+        texture.generateMipmaps = !compressed;
+        texture.minFilter = compressed ? THREE.LinearFilter : THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.needsUpdate = true;
+        textures.set(kind as BakedKind, texture);
+      }),
   ]);
   // Grain data map: sampled at a fixed screen scale, so no chain.
   pressureTexture = (await loadTexture(PRESSURE_URL, { srgb: false })).clone();
@@ -120,19 +122,7 @@ async function loadWarriorKitAssets(): Promise<void> {
   steelTexture.generateMipmaps = true;
   steelTexture.minFilter = THREE.LinearMipmapLinearFilter;
   steelTexture.magFilter = THREE.LinearFilter;
-  rockTexture = (await loadTexture(ROCK_URL, { srgb: true })).clone();
-  rockTexture.generateMipmaps = true;
-  rockTexture.minFilter = THREE.LinearMipmapLinearFilter;
-  rockTexture.magFilter = THREE.LinearFilter;
-  const model = await loadGltf(FRAGMENT_URL);
-  model.scene.updateMatrixWorld(true);
-  for (const name of ['ice_shard', 'stone_chip', 'metal_splinter'] as const) {
-    const mesh = model.scene.getObjectByName(name) as THREE.Mesh | undefined;
-    if (!mesh?.isMesh) throw new Error(`Missing production fragment: ${name}`);
-    // Shared preparation-owned source; per-renderer pools clone it and dispose their clone.
-    geometry.set(name, mesh.geometry.clone().applyMatrix4(mesh.matrixWorld));
-  }
-  releaseGltf(FRAGMENT_URL);
+  await ensureSharedImpactAssets();
 }
 
 export const productionAssetInternalsForTest = {
@@ -143,6 +133,7 @@ export const productionAssetInternalsForTest = {
     rockTexture = steelTexture = bloodTexture = pressureTexture = null;
     assetsState = 'idle';
     assetsTask = null;
+    sharedTask = null;
   },
 };
 export function bakedTexture(kind: BakedKind): THREE.Texture | null {
@@ -150,4 +141,39 @@ export function bakedTexture(kind: BakedKind): THREE.Texture | null {
 }
 export function fragmentGeometry(kind: FragmentKind): THREE.BufferGeometry | null {
   return geometry.get(kind) ?? null;
+}
+
+let sharedTask: Promise<void> | null = null;
+/** Shared optional debris is loaded once, independently of Warrior-only art. */
+function ensureSharedImpactAssets(): Promise<void> {
+  if (sharedTask) return sharedTask;
+  sharedTask = (async () => {
+    const smoke = (await loadTexture(BAKED_URLS.smoke, { srgb: true })).clone();
+    smoke.generateMipmaps = true;
+    smoke.minFilter = THREE.LinearMipmapLinearFilter;
+    smoke.magFilter = THREE.LinearFilter;
+    textures.set('smoke', smoke);
+    rockTexture = (await loadTexture(ROCK_URL, { srgb: true })).clone();
+    rockTexture.generateMipmaps = true;
+    rockTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    rockTexture.magFilter = THREE.LinearFilter;
+    const model = await loadGltf(FRAGMENT_URL);
+    model.scene.updateMatrixWorld(true);
+    for (const name of ['ice_shard', 'stone_chip', 'metal_splinter'] as const) {
+      const mesh = model.scene.getObjectByName(name) as THREE.Mesh | undefined;
+      if (!mesh?.isMesh) throw new Error(`Missing production fragment: ${name}`);
+      // Shared preparation-owned source; per-renderer pools clone it and dispose their clone.
+      geometry.set(name, mesh.geometry.clone().applyMatrix4(mesh.matrixWorld));
+    }
+    releaseGltf(FRAGMENT_URL);
+  })().catch((error: unknown) => {
+    sharedTask = null;
+    throw error;
+  });
+  return sharedTask;
+}
+export async function ensureShamanKitAssets(constrainedMemory: boolean): Promise<boolean> {
+  if (constrainedMemory) return false;
+  await ensureSharedImpactAssets();
+  return true;
 }

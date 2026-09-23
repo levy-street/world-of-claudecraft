@@ -311,7 +311,7 @@ describe('character visual effects', () => {
     expect(characterVeilboundState(entity({ auras: [mark] }))).toBe('mark');
   });
 
-  it('resolves the shaman imbues to their full-duration weapon soak colors', () => {
+  it('leaves current Shaman imbues to held detail while preserving legacy Rimebound', () => {
     const imbue = (id: string, school: 'fire' | 'frost' | 'physical') =>
       ({
         id,
@@ -325,13 +325,13 @@ describe('character visual effects', () => {
       }) as const;
 
     expect(characterWeaponAuraColor(entity({ auras: [imbue('flametongue_weapon', 'fire')] }))).toBe(
-      0xff5a26,
+      null,
     );
     expect(characterWeaponAuraColor(entity({ auras: [imbue('frostbrand_weapon', 'frost')] }))).toBe(
       0xbfe4ff,
     );
-    // Rockbiter authors no weaponAura knob (owner opted only the two elemental
-    // imbues in): its orbit band keeps carrying the read alone.
+    // Current imbues retain their lasting read through the equipped-weapon
+    // detail owner, without a second whole-blade wash from the old gallery.
     expect(
       characterWeaponAuraColor(entity({ auras: [imbue('rockbiter_weapon', 'physical')] })),
     ).toBe(null);

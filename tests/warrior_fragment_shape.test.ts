@@ -1,16 +1,18 @@
 import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
+import { prepareImpactFragments } from './helpers/impact_fragment_prewarm';
 
 vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const { IcosahedronGeometry } = await import('three');
   const geometry = new IcosahedronGeometry(1, 0);
-  return { fragmentGeometry: () => geometry };
+  return { fragmentGeometry: () => geometry, warriorRockTexture: () => null };
 });
 
-it('varies Warrior stone aspect, tint and rotation inside the existing shared pool', () => {
+it('varies Warrior stone aspect, tint and rotation inside the existing shared pool', async () => {
   const scene = new THREE.Scene(),
     pool = new SolidImpactFragments(scene);
+  await prepareImpactFragments(pool);
   const mesh = scene.children.find((n) => n.name === 'solidImpact:stone_chip') as THREE.Mesh<
     THREE.InstancedBufferGeometry,
     THREE.ShaderMaterial

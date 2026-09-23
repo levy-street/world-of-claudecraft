@@ -1782,49 +1782,87 @@ export const VISUALS: Record<string, VisualDef> = {
     clips: {
       ...kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
       attackByHand: { twohand: '2H_Melee_Attack_Chop' },
-      // Ability-specific spellcasts (scripts/build_shaman_ability_anims.mjs,
-      // issue #2889): the shaman had zero attackByAbility overrides across
-      // its kit, so every spell played the same melee chop/slice. Mapped by
-      // school (src/sim/content/classes.ts): Cast_Bolt is the class's
-      // signature nature bolt (its longest cast, 1.5 to 3.0s); Earthen/
-      // Cinder/Rime Jolt are all instant (0s cast) and differ only in damage
-      // school, so they share Cast_Shock's snappy point-and-release;
-      // Mending Waters and the Spiritcall signature Chain Heal share
-      // Cast_Heal's sustained mending channel instead of a sharp release;
-      // Earthquake borrows the two-hand chop's committed downswing energy
-      // for Cast_Quake, the same "slam and radiate outward" read the mage's
-      // Cast_Nova makes; Ancestral Strike (physical) gets its own charged
-      // diagonal slice, Storm_Strike. The weapon imbues (Stonebound,
-      // Pyrebrand, Rimebound Weapon) and the short self buffs (Shadewolf,
-      // Primal Mastery) have no swing to author, so they read fine on the
-      // rig's existing Spellcast_Raise gesture, the same no-bake call the
-      // priest's renew and the warlock's sanguine_aura make; Thunder
-      // Ward reads as a defensive ward instead, so it reuses Block, the
-      // same call the warrior's raised_guard makes. This covers every
-      // ability tagged class: 'shaman' in classes.ts.
+      // Shaman-only authored release gestures. Contact is 0.15s, with a
+      // nonlinear anticipation, contact hold and planted recovery. The old
+      // five-clip donor remains available for saved/legacy presentations.
       attackByAbility: {
-        lightning_bolt: 'Cast_Bolt',
-        earth_shock: 'Cast_Shock',
-        flame_shock: 'Cast_Shock',
-        frost_shock: 'Cast_Shock',
-        healing_wave: 'Cast_Heal',
-        chain_heal: 'Cast_Heal',
-        earthquake: 'Cast_Quake',
-        stormstrike: 'Storm_Strike',
-        rockbiter_weapon: 'Spellcast_Raise',
-        flametongue_weapon: 'Spellcast_Raise',
+        lightning_bolt: 'Shaman_Arc_Bolt',
+        chain_lightning: 'Shaman_Skybranch',
+        earth_shock: 'Shaman_Earthen_Jolt',
+        flame_shock: 'Shaman_Cinder_Jolt',
+        frost_shock: 'Shaman_Rime_Jolt',
+        stormstrike: 'Shaman_Ancestral_Strike',
+        healing_wave: 'Shaman_Mending_Waters',
+        chain_heal: 'Shaman_Cascading_Mend',
+        tidecall: 'Shaman_Tidecall',
+        stoneward: 'Shaman_Stoneward',
+        lightning_shield: 'Shaman_Thunder_Ward',
+        rockbiter_weapon: 'Shaman_Stonebound_Weapon',
+        flametongue_weapon: 'Shaman_Pyrebrand_Weapon',
+        galeheart_weapon: 'Shaman_Galeheart_Weapon',
+        lifespring_weapon: 'Shaman_Lifespring_Weapon',
+        earthbind: 'Shaman_Gripping_Earth',
+        earthquake: 'Shaman_Faultwake',
+        elemental_mastery: 'Shaman_Primal_Mastery',
+        primal_exaltation: 'Shaman_Primal_Exaltation',
+        bloodlust: 'Shaman_Storm_Chorus',
+        elemental_trance: 'Shaman_Elemental_Trance',
+        ghost_wolf: 'Shaman_Shadewolf',
+        ancestor_return: 'Shaman_Ancestors_Return',
+        unleash_weapon: 'Shaman_Unleash_Weapon',
+        healing_stream: 'Shaman_Springwell',
         frostbrand_weapon: 'Spellcast_Raise',
-        ghost_wolf: 'Spellcast_Raise',
-        elemental_mastery: 'Spellcast_Raise',
-        lightning_shield: 'Block',
+      },
+      attackTimeScaleByAbility: {
+        lightning_bolt: 1,
+        chain_lightning: 1,
+        earth_shock: 1,
+        flame_shock: 1,
+        frost_shock: 1,
+        stormstrike: 1,
+        healing_wave: 1,
+        chain_heal: 1,
+        tidecall: 1,
+        stoneward: 1,
+        lightning_shield: 1,
+        rockbiter_weapon: 1,
+        flametongue_weapon: 1,
+        galeheart_weapon: 1,
+        lifespring_weapon: 1,
+        earthbind: 1,
+        earthquake: 1,
+        elemental_mastery: 1,
+        primal_exaltation: 1,
+        bloodlust: 1,
+        elemental_trance: 1,
+        ghost_wolf: 1,
+        ancestor_return: 1,
+        unleash_weapon: 1,
+        healing_stream: 1,
+      },
+      // Charge loops contain no release; completing a cast owns its gesture.
+      castByAbility: {
+        lightning_bolt: 'Shaman_Arc_Bolt_Charge',
+        chain_lightning: 'Shaman_Skybranch_Charge',
+        healing_wave: 'Shaman_Mending_Waters_Charge',
+        chain_heal: 'Shaman_Cascading_Mend_Charge',
+        ghost_wolf: 'Shaman_Shadewolf_Charge',
+        ancestor_return: 'Shaman_Ancestors_Return_Charge',
+      },
+      castTimeScaleByAbility: {
+        lightning_bolt: 1,
+        chain_lightning: 1,
+        healing_wave: 1,
+        chain_heal: 1,
+        ghost_wolf: 1,
+        ancestor_return: 1,
       },
     },
-    // Ability-specific spellcast clips (scripts/build_shaman_ability_anims.mjs):
-    // a mesh-free clip donor GLB baked off this rig's own spellcasting poses.
-    // The hit-variety donor (scripts/build_hit_variety_anims.mjs, second
-    // KayKit hit-reaction clip, issue #2889 area B) ships alongside it on the
-    // same rig, so both donors are listed here.
-    animUrls: [`${PLAYERS}/barbarian_hit_variety_anims.glb`, `${PLAYERS}/shaman_ability_anims.glb`],
+    animUrls: [
+      `${PLAYERS}/barbarian_hit_variety_anims.glb`,
+      `${PLAYERS}/shaman_ability_anims.glb`,
+      `${PLAYERS}/shaman_polish_anims.glb`,
+    ],
     show: ['Barbarian_BearHat'], // v2 barbarian renamed Hat→BearHat and dropped the round shield mesh
     attach: [
       { url: `${WEAPONS}/axe_1handed.glb`, bone: 'handslot.r' },
@@ -2098,13 +2136,28 @@ export const VISUALS: Record<string, VisualDef> = {
     attackTimeScale: 1,
     deathTimeScale: 1,
   },
-  // Shaman Shadewolf retains the original wolf, tint and ghost-material overlay.
+  // Dedicated ancestral wolf, with its own authored atlas and planted idle.
+  // The original world wolf and the Druid cat keep their independent assets.
   form_ghost_wolf: {
-    url: `${CREATURES}/wolf_basic.glb`,
-    height: 1.6,
-    clips: WOLF_BAKED,
-    tint: 0xd08b45,
-    tintStrength: 0.35,
+    url: `${CREATURES}/shaman_spirit_wolf.glb`,
+    height: 2.25,
+    yaw: -Math.PI / 2,
+    authoredAtlas: true,
+    // Measured on the skinned soles at this height: 2.80 walking, 9.66 to 9.81
+    // running. Each paw uses its own grounded stance and airborne recovery.
+    walkRef: 2.8,
+    runRef: 9.8,
+    runTimeScaleMin: 0.3,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      death: 'Death',
+      swim: 'Walk',
+    },
+    attackTimeScale: 1,
+    deathTimeScale: 1,
   },
   // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint: its
   // authored cow-spots/comb/beak colours carry the look.

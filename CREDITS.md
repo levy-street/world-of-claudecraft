@@ -359,6 +359,7 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Generated prop model (varkhul_grand_forge) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Ancestral Shaman wolf (shaman_spirit_wolf) | World of ClaudeCraft | Tripo text-to-3D and quadruped rig; local idle, IK walk/run, attack and death authoring via scripts/build_shaman_wolf_anims.mjs | Project asset | With the project only |
 
 Crucible profession collection equipment, manuals, and enchant formula paintings are project-generated art, made with OpenAI's built-in image generation for World of ClaudeCraft. Provenance: `docs/achievements/crucible-professions-2026-09-05/`. Project asset, with the project only.
 

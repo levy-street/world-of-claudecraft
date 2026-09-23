@@ -1,9 +1,12 @@
 import * as THREE from 'three';
+import { weaponSurfaceAnchor } from './weapon_surface_anchor';
 
 export interface WeaponAnchorSampler {
   (out: THREE.Vector3): boolean;
   /** Unit equipment axes at its exposed face, without multiplying grip scale. */
   frame?: (out: THREE.Matrix4) => boolean;
+  /** Complete equipped prop: long axis Y, thin axis Z, world half-extents. */
+  surface?: (frame: THREE.Matrix4, extents: THREE.Vector3) => boolean;
 }
 
 const handCache = new WeakMap<THREE.Object3D, (THREE.Object3D | null)[]>();
@@ -103,6 +106,17 @@ export function weaponTrailAnchor(root: THREE.Object3D, hand: 0 | 1): WeaponAnch
     center.copy(face).applyMatrix4(weapon.matrixWorld).addScaledVector(z, 0.045);
     out.makeBasis(x, y, z).setPosition(center);
     return true;
+  };
+  // Ordinary tip/face consumers do not pay for whole-prop bounds. A cached
+  // persistent surface user prepares them once, then samples without allocation.
+  let surface: ReturnType<typeof weaponSurfaceAnchor>;
+  let surfacePrepared = false;
+  sample.surface = (frame, extents) => {
+    if (!surfacePrepared) {
+      surface = weaponSurfaceAnchor(root, holder as THREE.Object3D);
+      surfacePrepared = true;
+    }
+    return surface?.(frame, extents) ?? false;
   };
   return sample;
 }

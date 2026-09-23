@@ -119,7 +119,7 @@ export function createCharacterVisual(
   // must win over the authored look (composing over it hid a purchased skin).
   const look = formKey || isMechWearer(e) ? null : (modularLookProvider?.(e) ?? null);
   const key = formKey
-    ? characterFormAssetKey(formKey, e.auras)
+    ? characterFormAssetKey(formKey, e.auras, e.kind === 'player' ? e.templateId : undefined)
     : look
       ? modularKeyFor(e)
       : visualKeyFor(e);

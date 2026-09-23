@@ -60,9 +60,21 @@ export function markProgramsReadyUnder(
 ): number {
   let marked = 0;
   target.traverse((obj) => {
-    const mesh = obj as THREE.Mesh;
-    if (!mesh.isMesh) return;
-    const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    const renderable = obj as THREE.Object3D & {
+      isMesh?: boolean;
+      isPoints?: boolean;
+      isLine?: boolean;
+      isSprite?: boolean;
+      material?: THREE.Material | THREE.Material[];
+    };
+    // Match WebGLRenderer.compile: settled particle clouds, lines and sprites
+    // are proofs too. Skipping them left the cast gate pending after every
+    // compile unit had completed, until its fallback deadline opened it.
+    if (!renderable.isMesh && !renderable.isPoints && !renderable.isLine && !renderable.isSprite)
+      return;
+    const materials = Array.isArray(renderable.material)
+      ? renderable.material
+      : [renderable.material];
     for (const material of materials) {
       if (!material) continue;
       const current = (properties.get(material) as MaterialCurrentProgramLike | undefined)

@@ -108,8 +108,10 @@ import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
+import { weaponAuraTargets } from './stonebound_weapon_targets';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
+import { SurfaceResponsePreparation } from './surface_response_preparation';
 import { warriorActionBlend } from './warrior_action_blend';
 import { WarriorActionProps } from './warrior_action_props';
 import { WarriorBodyEffects } from './warrior_body_effects';
@@ -680,6 +682,7 @@ export class CharacterVisual {
   // writing emissive on those would leak the glow across every same-skin rig.
   private auraGlowMaterials = new Map<THREE.Material, THREE.Material>();
   private readonly surfaceResponse = new CharacterSurfaceResponse();
+  private readonly surfacePreparation = new SurfaceResponsePreparation();
   private readonly harvestRecoil = new HarvestRecoil();
   private auraGlowColor = 0xffffff;
   private auraGlowIntensity = 0;
@@ -2052,6 +2055,7 @@ export class CharacterVisual {
    *  renderer generation dropped must not strand this visual articulated or
    *  keep a superseded far set's tinted lease. */
   setFarBakeGate(gate: FarBakeGate | null): void {
+    this.surfacePreparation.clear();
     this.farBakeGate = gate;
     this.sanguineSheath.setGate(gate);
     if (this.weaponAuraSanguine) this.rebuildWeaponAura();
@@ -2196,9 +2200,32 @@ export class CharacterVisual {
     if (!on) return;
     for (const glow of this.auraGlowMaterials.values()) this.writeAuraGlow(glow);
   }
-  respondToElement(school: string, strength = 0.75, contact?: MeleeImpactProfile): void {
+  /** Join the normal hidden view compile, without starting a contact timer. */
+  stageSurfaceResponsePreparation() {
+    if (this.disposed) return null;
+    return this.surfacePreparation.begin(
+      this.poseWrap,
+      this.originalMaterials,
+      this.surfaceResponse,
+      this.linkedEffectMaterials,
+      this.farMesh,
+      this.farMaterials,
+    );
+  }
+  private prepareSurfaceResponse(): void {
+    if (!this.farBakeGate) return;
+    const ticket = this.stageSurfaceResponsePreparation();
+    if (ticket) this.farBakeGate(ticket.root, (ready) => ticket.settle(ready?.() ?? false));
+  }
+  respondToElement(
+    school: string,
+    strength = 0.75,
+    contact?: MeleeImpactProfile,
+    reducedMotion = false,
+  ): void {
     if (this.disposed || this.deadLock) return;
-    if (this.surfaceResponse.trigger(school, strength, contact)) this.applyVisualMaterials();
+    if (this.surfaceResponse.trigger(school, strength, contact, reducedMotion))
+      this.applyVisualMaterials();
   }
   clearElementResponse(): void {
     this.harvestRecoil.clear();
@@ -2608,6 +2635,7 @@ export class CharacterVisual {
       this.stageFarMaterials(mats, claims);
     }
     this.applyVisualMaterials();
+    this.prepareSurfaceResponse();
   }
 
   /** Take a rebuilt far material set live: claim the new lease, release the
@@ -2617,6 +2645,8 @@ export class CharacterVisual {
     this.tintedFarClaims = claims;
     this.farMaterials = mats;
     releaseTintedMaterials(prevFarClaims);
+    this.surfacePreparation.clear();
+    this.prepareSurfaceResponse();
   }
 
   /** A re-skinned far set is new programs too (an emissive atlas toggles a
@@ -2726,7 +2756,7 @@ export class CharacterVisual {
     }
     this.rebuildCasters();
     this.applyVisualMaterials();
-    if (this.weaponAuraSanguine) this.rebuildWeaponAura();
+    if (this.weaponAuraSanguine || this.weaponAuraMode === 'stonebound') this.rebuildWeaponAura();
     return payloads;
   }
 
@@ -2903,9 +2933,8 @@ export class CharacterVisual {
     this.rebuildWeaponAura();
   }
 
-  /** Structural weapon/body presentation (Stonebound's stone shell + armor
-   *  shards). Orthogonal to the imbue COLOR overlay above: a shaman can carry
-   *  both, so they are separate channels that both feed rebuildWeaponAura. */
+  /** Stonebound's structural stone shell and armor shards use a separate
+   * channel from the imbue color; both feed rebuildWeaponAura. */
   setWeaponAuraMode(mode: WeaponAuraMode): void {
     if (mode === this.weaponAuraMode) return;
     this.weaponAuraMode = mode;
@@ -2917,14 +2946,14 @@ export class CharacterVisual {
     const stonebound = this.weaponAuraMode === 'stonebound';
     if (this.weaponAuraColor === null && !stonebound) return;
 
-    const weaponHolders: THREE.Object3D[] = [];
-    this.model.traverse((o) => {
-      if (o.userData.swapWeaponHolder) weaponHolders.push(o);
-    });
+    const weaponHolders = weaponAuraTargets(
+      this.model,
+      stonebound,
+      this.weaponItemId,
+      this.offhandItemId,
+    );
 
-    // Structural channel: Stonebound sheathes EVERY held weapon in a wireframe
-    // stone shell and plates the body with shards. Independent of the imbue
-    // color below, whose Sanguine channel also coats an equipped second weapon.
+    // Stonebound sheathes both melee hands and independently plates the body.
     if (stonebound) {
       for (const holder of weaponHolders) {
         holder?.traverse((o) => {
@@ -3223,6 +3252,7 @@ export class CharacterVisual {
   }
 
   private disposeEffectMaterials(): void {
+    this.surfacePreparation.clear();
     // The scratch set wears clones this sweep is about to dispose, so they are
     // dropped WITHOUT being recorded as linked (a disposed program is not one).
     this.dropPendingEffectSwap(false);

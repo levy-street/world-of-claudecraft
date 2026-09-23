@@ -130,6 +130,7 @@ function depositRawMendingCurrent(
       targetId: target.id,
       school: 'nature',
       fx: 'wardBloom',
+      ability: MENDING_CURRENT_ID,
     });
   }
   return next - previous;
@@ -230,6 +231,7 @@ export function consumeMendingCurrent(ctx: SimContext, source: Entity, target: E
       targetId: target.id,
       school: 'nature',
       fx: 'echoBurst',
+      ability: MENDING_CURRENT_ID,
     });
     if (shamanTalentSelected(ctx, source, SHAMAN_TALENT_IDS.echoingElements)) {
       ctx.applyAura(target, {
@@ -291,6 +293,7 @@ export function unleashMendingCurrent(ctx: SimContext, source: Entity, target: E
     targetId: target.id,
     school: 'nature',
     fx: 'echoBurst',
+    ability: 'unleash_weapon',
   });
   return healed;
 }

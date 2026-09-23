@@ -45,6 +45,7 @@ import {
 } from '../src/render/ability_vfx/painter';
 import {
   bakedTexture,
+  ensureShamanKitAssets,
   ensureWarriorKitAssets,
   productionAssetInternalsForTest,
   warriorBloodTexture,
@@ -64,6 +65,27 @@ beforeEach(() => {
   loadKtx2Texture.mockClear();
 });
 afterEach(() => vi.restoreAllMocks());
+
+describe('Shaman shared art demand loading', () => {
+  it('loads only shared smoke, rock and fragments and reuses them for Warrior', async () => {
+    await expect(ensureShamanKitAssets(false)).resolves.toBe(true);
+    expect(loadTexture.mock.calls.map(([url]) => url)).toEqual([
+      '/textures/vfx/production/smoke.webp',
+      '/textures/terrain/Rock051_Color.jpg',
+    ]);
+    expect(loadKtx2Texture).not.toHaveBeenCalled();
+    expect(warriorBloodTexture()).toBeNull();
+    expect(warriorSteelTexture()).toBeNull();
+    await ensureWarriorKitAssets(false);
+    expect(loadTexture).toHaveBeenCalledTimes(12);
+    expect(loadTexture.mock.calls.filter(([url]) => url.endsWith('/smoke.webp'))).toHaveLength(1);
+  });
+  it('declines optional heavy art on constrained devices without starting downloads', async () => {
+    await expect(ensureShamanKitAssets(true)).resolves.toBe(false);
+    expect(loadTexture).not.toHaveBeenCalled();
+    expect(loadKtx2Texture).not.toHaveBeenCalled();
+  });
+});
 
 describe('ensureWarriorKitAssets', () => {
   it('declines on a constrained-memory device without touching a loader', async () => {
@@ -157,7 +179,13 @@ describe('the eager preload is gone for good', () => {
     expect(source).toContain(
       'resumeActiveAbilityKit(this.scene, options.resumeAfterFirstPaint, this.sim.cfg.playerClass);',
     );
-    expect(source).toContain('assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),');
+    const host = readFileSync(
+      new URL('../src/render/ability_vfx/class_kit_prewarm.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain('classKitPrewarmEntry(');
+    expect(host).toContain('ensureWarriorKitAssets(constrainedMemory)');
+    expect(host).toContain("selected === 'shaman'");
     expect(source).not.toContain('abilityVfxBootTextureDependencies');
   });
 });

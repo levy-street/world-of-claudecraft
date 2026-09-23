@@ -51,9 +51,10 @@ import {
   buildAbilityMaterialPrewarmGroup,
 } from './ability_material_prewarm';
 import { type AbilityVfx, type AbilityVfxFx, abilityVfxTexturePrewarmSteps } from './ability_vfx';
-import { activeKitPrewarmEntry, resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
+import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
+import { classKitPrewarmEntry } from './ability_vfx/class_kit_prewarm';
 import type { AbilityVfxTextures } from './ability_vfx/fx_textures';
-import { ensureWarriorKitAssets } from './ability_vfx/production_assets';
+import { isShamanAuraEvent } from './ability_vfx/shaman_aura_core';
 import { isWarriorFuryAuraEvent } from './ability_vfx/warrior_fury_feedback';
 import { warriorInsultCue } from './ability_vfx/warrior_insult_core';
 import { ABILITY_VFX_FULL_SPECS } from './ability_vfx_full_specs';
@@ -217,7 +218,7 @@ import { CLICK_MARKER_LIFETIME, clickMarkerAnim, clickMarkerColor } from './clic
 import { buildCliffScree, type CliffScreeView } from './cliff_scree';
 import { type CompileArmHost, linkColorPrograms, linkShadowPrograms } from './compile_arms';
 import type { CompileGateResult } from './compile_gate';
-import { CompileGateQueue, SerialGateLane, settlePendingSwap } from './compile_gate';
+import { CompileGateQueue, SerialGateLane } from './compile_gate';
 import { linkPieceWork } from './compile_gate_pieces';
 import {
   castingAtPlayerPredicate,
@@ -758,6 +759,11 @@ import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
 import { strideHit } from './stride_audio_core';
+import {
+  gateSurfaceForm,
+  gateSurfaceReplacement,
+  stageSurfaceReceiver,
+} from './surface_receiver_preparation';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -1188,6 +1194,7 @@ export interface EntityView extends RickshawMountViewState {
   compilePending: boolean;
   // Resolves when compilePending clears after the non-cancellable link settles.
   compileReady: Promise<void> | null;
+  surfaceCompilePending?: boolean;
   // A live material-variant swap (gateSwapFlagOnCompile) is still linking off-thread
   // for a target whose .visible the per-frame loop recomputes every tick (the mount
   // root, the base visual root after a skin/visual-key swap): those lines AND this
@@ -4849,11 +4856,7 @@ export class Renderer {
     // its own Soul Rend programs (other meshes, other skinning): it cannot
     // inherit the base rig's warmed variant.
     encounterPrewarm.queueLiveSoulRendPrewarm(this, built, null, e.kind);
-    if (!gateCompile) return;
-    v.formCompilePending = built.root;
-    this.gateSwapFlagOnCompile(built.root, () => {
-      v.formCompilePending = settlePendingSwap(v.formCompilePending, built.root);
-    });
+    gateSurfaceForm(this, built, v, gateCompile);
   }
 
   private prewarmWorldFrame(dt: number): void {
@@ -5516,7 +5519,12 @@ export class Renderer {
       },
     );
     const castVfxUnits = (): PrewarmResumeUnit[] =>
-      castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
+      castVfxProgramUnits(
+        this.scene,
+        () => abilityMaterialSlot.group,
+        this.compileArms,
+        this.webgl,
+      );
     let mountPrewarmGroup: THREE.Group | null = null;
     const mountPrewarmPlannedKeys = mountPrewarmKeysFor(this.sim);
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);
@@ -6429,20 +6437,7 @@ export class Renderer {
         },
         detail: () => `objects=${weaponVfxPrewarmGroup?.children.length ?? 0}`,
       },
-      activeKitPrewarmEntry(this.scene, this.sim.cfg.playerClass, {
-        queue: this.backgroundGpuWork,
-        assets: () => ensureWarriorKitAssets(GFX.constrainedMemory),
-        geometry: (kinds) =>
-          this.abilityVfxFx.authoredPrewarmUnits(
-            {
-              properties: this.webgl.properties,
-              compile: (root, offscreen) => this.compilePrewarmColorPrograms(root, offscreen),
-              draw: (group, child) => this.renderBoundedPrewarmRoot(group, child),
-            },
-            kinds,
-          ),
-        texture: (texture) => this.prewarmTexture(texture),
-      }),
+      classKitPrewarmEntry(this, this.sim.cfg.playerClass, GFX.constrainedMemory),
       {
         // The cast VFX (cast_vfx_prewarm.ts): stage the lazy stand-ins, link
         // every cast program through the compile arms; the spawn only binds
@@ -7345,7 +7340,7 @@ export class Renderer {
           }
         } else if (ev.fx === 'evilEyeGaze') {
           this.vfx.evilEyeGaze(ev.sourceId, ev.targetId, ev.duration ?? 0.28);
-        } else if (ev.fx === 'chainHeal') this.vfx.chainHealArc(ev.sourceId, ev.targetId);
+        } else if (ev.fx === 'chainHeal') this.abilityVfxFx.healStream(ev.sourceId, ev.targetId);
         else if (ev.fx === 'procSurge') {
           this.vfx.procSurge(ev.targetId, ev.school);
           this.pulseAt(ev.targetId, ev.school, 5, 0.4);
@@ -7558,7 +7553,7 @@ export class Renderer {
         );
         if (ev.school === 'physical' && ev.sourceId !== -1 && startsAttackAnimation)
           this.triggerAttack(ev.sourceId, attackAbilityId(ev.ability));
-        const authoredContact = warrior && this.abilityVfx.onDamage(ev) === true;
+        const authoredContact = this.abilityVfx.onDamage(ev) === true;
         if (ev.kind === 'hit' && ev.amount > 0 && !authoredContact) {
           if (warrior && ev.ability) {
             const victim = this.views.get(ev.targetId);
@@ -7575,10 +7570,10 @@ export class Renderer {
         }
         // spec-driven per-ability impact accent (no-op for unknown abilities)
         if (attackAbilityId(ev.ability) === 'drain_life') this.vfx.drainLifeTick(ev.sourceId);
-        if (!warrior) this.abilityVfx.onDamage(ev);
         break;
       }
       case 'heal2':
+        if (this.abilityVfx.onHeal(ev)) break;
         if (this.abilityVfxFx.warriorRecovery(ev, this.sim.entities.get(ev.targetId)?.maxHp ?? 0))
           break;
         // Throttle the particle bloom to one per target per 110ms so a burst of tiny
@@ -7597,7 +7592,11 @@ export class Renderer {
         break;
       case 'aura': {
         const tgt = this.sim.entities.get(ev.targetId);
-        if (isWarriorFuryAuraEvent(ev, tgt) || this.abilityVfx.onWarriorControlAura(ev, tgt?.auras))
+        if (
+          isShamanAuraEvent(ev, tgt) ||
+          isWarriorFuryAuraEvent(ev, tgt) ||
+          this.abilityVfx.onWarriorControlAura(ev, tgt?.auras)
+        )
           break;
         // Set-proc auras announce themselves with a themed swirl: on the wearer
         // for the self buffs, on the struck mob for the bleeds (so this arm is
@@ -8251,6 +8250,7 @@ export class Renderer {
     });
     const view = this.views.get(e.id);
     if (visual && view) encounterPrewarm.queueLiveSoulRendPrewarm(this, visual, view, e.kind);
+    const surface = stageSurfaceReceiver(this, visual, view ?? false);
     // Never gate the player's OWN view: it must be on screen immediately, its
     // class is already prewarmed, and the self render path does not re-evaluate
     // the compilePending flag (only the non-self loop does), so gating it would
@@ -8266,6 +8266,7 @@ export class Renderer {
         requiredForEntry,
       );
     }
+    surface();
     // Warm an already-mounted entity's engine clips at view creation too: the
     // mountKey-edge preload below only fires on a CHANGE, but a remote rider
     // entering interest range, or an already-mounted player logging in, is
@@ -8516,15 +8517,7 @@ export class Renderer {
     // rig's, so the encounter prewarm has to warm it like a body that just
     // arrived (v carries the look `next` was built holding).
     encounterPrewarm.queueLiveSoulRendPrewarm(this, next, v, e.kind);
-    // A live base-visual replace (race/mech toggle) is exactly a brand-new
-    // rig's materials linking for the first time; gate it the same as a
-    // gear swap rather than freezing the frame it lands on (#2571).
-    v.visualCompilePending = true;
-    this.gateSwapFlagOnCompile(next.root, () => {
-      v.visualCompilePending = false;
-      v.group.remove(outgoing.root);
-      outgoing.dispose();
-    });
+    gateSurfaceReplacement(this, v, next, outgoing);
   }
 
   // Weapon-skin cosmetics waiting to be applied to a live view, at most one

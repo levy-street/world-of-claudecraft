@@ -21,6 +21,11 @@ import {
   LEGENDARY_REGALIA_RATE_PER_SEC,
 } from './legendary_regalia_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import {
+  isShamanParticleKind,
+  type ShamanParticleSample,
+  writeShamanParticleSample,
+} from './shaman_particle_core';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import { bubbleBeamMaterialOptions } from './vfx_basic_materials';
 import {
@@ -371,6 +376,19 @@ export class Vfx {
   private readonly pendingBurstScratch = new THREE.Vector3();
   private drainLifeVfx: DrainLifeVfx;
   private tmpColor = new THREE.Color();
+  private readonly shamanParticleColor = new THREE.Color();
+  private shamanParticleSerial = 0;
+  private readonly shamanParticleSample: ShamanParticleSample = {
+    vx: 0,
+    vy: 0,
+    vz: 0,
+    size: 0,
+    lifetime: 0,
+    gravity: 0,
+    rotation: 0,
+    brightness: 0,
+    sprite: 'trace',
+  };
   private tmpDirection = new THREE.Vector3();
   private readonly beamUp = new THREE.Vector3(0, 1, 0);
   // Per-frame anchor scratch (see vfx_anchor.ts): update() resolves a bubble
@@ -1527,6 +1545,41 @@ export class Vfx {
     color?: number,
     duration?: number,
   ): void {
+    if (isShamanParticleKind(school)) {
+      if (
+        this.disposed ||
+        !Number.isFinite(count) ||
+        count <= 0 ||
+        !Number.isFinite(power) ||
+        power < 0 ||
+        !Number.isFinite(at.x) ||
+        !Number.isFinite(at.y) ||
+        !Number.isFinite(at.z)
+      )
+        return;
+      const seed = ++this.shamanParticleSerial;
+      const sample = this.shamanParticleSample;
+      const amount = this.scaledCount(count);
+      for (let i = 0; i < amount; i++) {
+        if (!writeShamanParticleSample(sample, school, seed, i, power, duration)) continue;
+        this.shamanParticleColor.setHex(color ?? 0xffffff).multiplyScalar(sample.brightness);
+        this.spawn(
+          at.x,
+          at.y,
+          at.z,
+          sample.vx,
+          sample.vy,
+          sample.vz,
+          this.shamanParticleColor,
+          sample.size,
+          sample.lifetime,
+          sample.gravity,
+          SPR[sample.sprite],
+          sample.rotation,
+        );
+      }
+      return;
+    }
     const c = new THREE.Color(color ?? SCHOOL_COLORS[school] ?? 0xffffff).multiplyScalar(hdr(1.6));
     const isFire = school === 'fire';
     const scaledCount = this.scaledCount(count);

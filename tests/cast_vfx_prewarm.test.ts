@@ -11,8 +11,9 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { castVfxProgramUnits, createSceneCastVfxReadiness } from '../src/render/cast_vfx_prewarm';
 import type { CompileArmHost } from '../src/render/compile_arms';
-import { markProgramReady } from '../src/render/linked_program_readiness';
+import { isProgramKnownReady, markProgramReady } from '../src/render/linked_program_readiness';
 import type { LinkedProgramLike } from '../src/render/linked_program_touch';
+import { createVariantPrewarmSlot } from '../src/render/variant_prewarm_slot';
 
 /** A pooled VFX mesh: `renderCategory` is the tag abilityVfxCompileMaterials
  *  selects on, so this is what the gate's scene walk collects. */
@@ -28,7 +29,9 @@ function program(): LinkedProgramLike {
   return { getUniforms: () => ({}), getAttributes: () => ({}) } as unknown as LinkedProgramLike;
 }
 
-function harness(meshes: THREE.Mesh[]) {
+type CastDrawable = THREE.Mesh | THREE.Points | THREE.Line | THREE.Sprite;
+
+function harness(meshes: CastDrawable[]) {
   const scene = new THREE.Scene();
   for (const mesh of meshes) scene.add(mesh);
   const programs = new Map<THREE.Material, LinkedProgramLike | null | undefined>();
@@ -47,11 +50,69 @@ function harness(meshes: THREE.Mesh[]) {
     () => [],
     () => 0,
   );
-  const materialOf = (mesh: THREE.Mesh) => mesh.material as THREE.Material;
+  const materialOf = (mesh: CastDrawable) => mesh.material as THREE.Material;
   return { scene, host, webgl, readiness, programs, materialOf };
 }
 
 describe('the scene cast-VFX gate over three', () => {
+  it('proves all three point-cloud programs only as their compile units settle', async () => {
+    const points = Array.from({ length: 3 }, (_, index) => {
+      const object = new THREE.Points(new THREE.BufferGeometry(), new THREE.PointsMaterial());
+      object.name = `cloud-${index}`;
+      object.userData.renderCategory = 'vfx';
+      return object;
+    });
+    const h = harness(points);
+    const handles = points.map((object) => {
+      const handle = program();
+      h.programs.set(h.materialOf(object), handle);
+      return handle;
+    });
+    const settles: Array<() => void> = [];
+    const units = castVfxProgramUnits(
+      h.scene,
+      null,
+      h.host,
+      h.webgl,
+      () => new Promise<void>((resolve) => settles.push(resolve)),
+    );
+    expect(units).toHaveLength(3);
+    const running = units.map((unit) => unit.run());
+    expect(h.readiness.snapshot()).toMatchObject({ ready: false, pending: 3, forced: false });
+    for (let i = 0; i < units.length; i++) {
+      settles[i]();
+      await running[i];
+      expect(isProgramKnownReady(handles[i])).toBe(true);
+      expect(h.readiness.snapshot()).toMatchObject({
+        ready: i === 2,
+        pending: 2 - i,
+        forced: false,
+      });
+    }
+  });
+
+  it.each(['Points', 'Line', 'Sprite'] as const)(
+    'does not prove a %s program when compilation rejects',
+    async (kind) => {
+      const object =
+        kind === 'Points'
+          ? new THREE.Points()
+          : kind === 'Line'
+            ? new THREE.Line()
+            : new THREE.Sprite();
+      object.userData.renderCategory = 'vfx';
+      const h = harness([object]);
+      const handle = program();
+      h.programs.set(h.materialOf(object), handle);
+      const [unit] = castVfxProgramUnits(h.scene, null, h.host, h.webgl, () =>
+        Promise.reject(new Error('not linked')),
+      );
+      await expect(unit.run()).rejects.toThrow('not linked');
+      expect(isProgramKnownReady(handle)).toBe(false);
+      expect(h.readiness.snapshot()).toMatchObject({ ready: false, pending: 1, forced: false });
+    },
+  );
+
   it('is not ready while a material has no program at all', () => {
     const { readiness } = harness([vfxMesh('ring')]);
     expect(readiness.ready()).toBe(false);
@@ -145,6 +206,103 @@ describe('the scene cast-VFX gate over three', () => {
 });
 
 describe('the units the resume lane runs', () => {
+  it('collects an unstaged slot and proves its eventual root only after the link settles', async () => {
+    const h = harness([]);
+    const mesh = vfxMesh('lazy-stand-in');
+    const handle = program();
+    h.programs.set(h.materialOf(mesh), handle);
+    const slot = createVariantPrewarmSlot(
+      { scene: h.scene, compileColorPrograms: async () => {} },
+      'ability-materials',
+      () => new THREE.Group().add(mesh),
+    );
+    let settle = () => {};
+    const compiled: THREE.Object3D[] = [];
+    const units = castVfxProgramUnits(
+      h.scene,
+      () => slot.group,
+      h.host,
+      h.webgl,
+      (root) => {
+        compiled.push(root);
+        return new Promise<void>((resolve) => {
+          settle = resolve;
+        });
+      },
+    );
+    const gate = createSceneCastVfxReadiness(
+      h.scene,
+      h.webgl,
+      () => (slot.group ? [h.materialOf(mesh)] : null),
+      () => 0,
+    );
+    expect(units).toHaveLength(1);
+    expect(units[0].roots).toEqual([]);
+    expect(gate.snapshot()).toMatchObject({ ready: false, pending: null, forced: false });
+    await slot.resumeUnits()[0].run();
+    expect(slot.group?.visible).toBe(false);
+    expect(units[0].roots).toEqual([slot.group]);
+    const run = units[0].run();
+    expect(compiled).toEqual([slot.group]);
+    expect(gate.ready()).toBe(false);
+    expect(isProgramKnownReady(handle)).toBe(false);
+    settle();
+    await run;
+    expect(gate.snapshot()).toMatchObject({ ready: true, pending: 0, forced: false });
+  });
+
+  it('rejects a missing deferred stand-in stage without compiling or marking anything', async () => {
+    const h = harness([]);
+    let compiled = false;
+    const [unit] = castVfxProgramUnits(
+      h.scene,
+      () => null,
+      h.host,
+      h.webgl,
+      async () => {
+        compiled = true;
+      },
+    );
+    await expect(unit.run()).rejects.toThrow('ability-materials:compile has no staged root');
+    expect(compiled).toBe(false);
+  });
+
+  it('does not prove a deferred stand-in whose compile rejects', async () => {
+    const h = harness([]);
+    const mesh = vfxMesh('failed-stand-in');
+    const handle = program();
+    h.programs.set(h.materialOf(mesh), handle);
+    let root: THREE.Object3D | null = null;
+    const [unit] = castVfxProgramUnits(
+      h.scene,
+      () => root,
+      h.host,
+      h.webgl,
+      async () => {
+        throw new Error('compile failed');
+      },
+    );
+    root = new THREE.Group().add(mesh);
+    await expect(unit.run()).rejects.toThrow('compile failed');
+    expect(isProgramKnownReady(handle)).toBe(false);
+  });
+
+  it('still proves an already-staged stand-in passed directly', async () => {
+    const h = harness([]);
+    const mesh = vfxMesh('present-stand-in');
+    const handle = program();
+    h.programs.set(h.materialOf(mesh), handle);
+    const root = new THREE.Group().add(mesh);
+    const compiled: THREE.Object3D[] = [];
+    const [unit] = castVfxProgramUnits(h.scene, root, h.host, h.webgl, async (target) => {
+      compiled.push(target);
+    });
+    expect(unit.roots).toEqual([root]);
+    await unit.run();
+    expect(compiled).toEqual([root]);
+    expect(isProgramKnownReady(handle)).toBe(true);
+  });
+
   it('links through the colour arm by default, and marks the program on the settle', async () => {
     // The shipped arm, with no compile injected: the unit must reach
     // linkColorPrograms, which submits the root under each colour target the

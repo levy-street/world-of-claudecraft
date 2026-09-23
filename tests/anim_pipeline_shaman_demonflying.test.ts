@@ -60,7 +60,10 @@ describe('shaman ability-specific spellcasts (issue #2889)', () => {
     const block = manifestBlock('player_shaman: swims({', 'player_mage: swims({');
     expect(block).toContain('shaman_ability_anims.glb');
     expect(block).toContain('attackByAbility');
-    for (const clip of SHAMAN_CAST_CLIPS) expect(block).toContain(`'${clip}'`);
+    // The original donor remains loaded; the polish donor now owns releases.
+    expect(block).toContain('shaman_polish_anims.glb');
+    for (const clip of SHAMAN_CAST_CLIPS)
+      expect(clipNamesOf('public/models/chars/players/shaman_ability_anims.glb')).toContain(clip);
   });
 
   it('every mapped ability id is a real shaman ability, and every referenced bespoke clip is shipped', () => {
@@ -71,41 +74,40 @@ describe('shaman ability-specific spellcasts (issue #2889)', () => {
     expect(abilityEnd).toBeGreaterThan(abilityStart);
     const block = shamanBlock.slice(abilityStart, abilityEnd);
     const rows = [...block.matchAll(/^\s*([a-z_]+): '([A-Za-z_]+)',$/gm)];
-    // 14 real shaman-tagged abilities exist in classes.ts (base kit plus the
-    // Thundercall/Spiritcall spec signatures); this batch maps every one.
-    expect(rows.length).toBe(14);
+    // 24 review actions, retained Springwell talent and legacy Rimebound.
+    // Passives have no cast gesture. The original 14-map contract is expanded.
+    expect(rows.length).toBe(26);
+    const polishClips = clipNamesOf('public/models/chars/players/shaman_polish_anims.glb');
     for (const [, abilityId, clip] of rows) {
       expect(
         ABILITIES[abilityId],
         `attackByAbility key '${abilityId}' is not a real ability id`,
       ).toBeTruthy();
       expect(ABILITIES[abilityId]?.class, `'${abilityId}' is not a shaman ability`).toBe('shaman');
-      const isBespoke = SHAMAN_CAST_CLIPS.includes(clip);
+      const isBespoke = SHAMAN_CAST_CLIPS.includes(clip) || polishClips.includes(clip);
       const isNoBakeGesture = clip === 'Spellcast_Raise' || clip === 'Block';
       expect(
         isBespoke || isNoBakeGesture,
         `attackByAbility value '${clip}' for '${abilityId}' is neither a shipped bespoke clip nor a known no-bake gesture`,
       ).toBe(true);
     }
-    // Every school-differentiated damage/heal spell gets its own bespoke
-    // clip; the instant shocks share one gesture (VFX carries the school),
-    // and the weapon imbues/short self buffs stay on existing gestures
-    // (no swing to author).
+    // Previously mapped actions retain explicit coverage, now with distinct
+    // school and ability silhouettes in the new Shaman-only donor.
     const map = Object.fromEntries(rows.map(([, id, clip]) => [id, clip]));
-    expect(map.lightning_bolt).toBe('Cast_Bolt');
-    expect(map.earth_shock).toBe('Cast_Shock');
-    expect(map.flame_shock).toBe('Cast_Shock');
-    expect(map.frost_shock).toBe('Cast_Shock');
-    expect(map.healing_wave).toBe('Cast_Heal');
-    expect(map.chain_heal).toBe('Cast_Heal');
-    expect(map.earthquake).toBe('Cast_Quake');
-    expect(map.stormstrike).toBe('Storm_Strike');
-    expect(map.rockbiter_weapon).toBe('Spellcast_Raise');
-    expect(map.flametongue_weapon).toBe('Spellcast_Raise');
+    expect(map.lightning_bolt).toBe('Shaman_Arc_Bolt');
+    expect(map.earth_shock).toBe('Shaman_Earthen_Jolt');
+    expect(map.flame_shock).toBe('Shaman_Cinder_Jolt');
+    expect(map.frost_shock).toBe('Shaman_Rime_Jolt');
+    expect(map.healing_wave).toBe('Shaman_Mending_Waters');
+    expect(map.chain_heal).toBe('Shaman_Cascading_Mend');
+    expect(map.earthquake).toBe('Shaman_Faultwake');
+    expect(map.stormstrike).toBe('Shaman_Ancestral_Strike');
+    expect(map.rockbiter_weapon).toBe('Shaman_Stonebound_Weapon');
+    expect(map.flametongue_weapon).toBe('Shaman_Pyrebrand_Weapon');
     expect(map.frostbrand_weapon).toBe('Spellcast_Raise');
-    expect(map.ghost_wolf).toBe('Spellcast_Raise');
-    expect(map.elemental_mastery).toBe('Spellcast_Raise');
-    expect(map.lightning_shield).toBe('Block');
+    expect(map.ghost_wolf).toBe('Shaman_Shadewolf');
+    expect(map.elemental_mastery).toBe('Shaman_Primal_Mastery');
+    expect(map.lightning_shield).toBe('Shaman_Thunder_Ward');
   });
 });
 

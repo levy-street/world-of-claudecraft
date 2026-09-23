@@ -27,6 +27,7 @@ function fakeTex(): AbilityVfxTextures {
     rime: t(),
     crack: t(),
     leapFracture: t(),
+    shamanFracture: t(),
     char: t(),
     overlay: t(),
   };

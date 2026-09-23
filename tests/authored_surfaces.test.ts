@@ -67,7 +67,6 @@ function authoredMaterialsOf(file: string): string[] {
 const LEGACY_UNFLAGGED_DEFS = new Set([
   'delve_mob_acolyte',
   'form_bear',
-  'form_ghost_wolf',
   'form_metamorph',
   'mob_boar',
   'mob_duskwisp',
@@ -120,6 +119,7 @@ const LEGACY_POLISHED_HELD_MODELS = new Set([
 /** The creature and mount defs whose authored atlas showed the low-tier film. */
 const AUTHORED_ATLAS_DEFS = [
   'form_cat',
+  'form_ghost_wolf',
   'mob_wolf',
   'greyjaw',
   'mob_ogre',

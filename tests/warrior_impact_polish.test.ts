@@ -7,15 +7,20 @@ import { drawWarriorAreaContact } from '../src/render/ability_vfx/warrior_area';
 import { warriorImpactFan } from '../src/render/ability_vfx/warrior_impact_fan';
 import { warriorShearPhase } from '../src/render/ability_vfx/warrior_impact_material';
 import { drawWarriorLeapLanding } from '../src/render/ability_vfx/warrior_leap';
+import { prepareImpactFragments } from './helpers/impact_fragment_prewarm';
 
 vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const three = await import('three');
   const texture = new three.Texture();
   const geometry = new three.IcosahedronGeometry(1, 0);
-  return { bakedTexture: () => texture, fragmentGeometry: () => geometry };
+  return {
+    bakedTexture: () => texture,
+    fragmentGeometry: () => geometry,
+    warriorRockTexture: () => texture,
+  };
 });
 
-it('honors spirit tint only on steel-family sprites and preserves approved blood playback', () => {
+it('honors spirit tint only on steel-family sprites and preserves approved blood playback', async () => {
   const scene = new THREE.Scene();
   const pool = new BakedImpactLayers(scene, () => true);
   for (const kind of ['warrior_shear', 'harvest_impact', 'smoke'] as const)
@@ -35,7 +40,7 @@ it('honors spirit tint only on steel-family sprites and preserves approved blood
   pool.dispose();
 });
 
-it('keeps steel breakup continuous, forward-only and within the original lifetime', () => {
+it('keeps steel breakup continuous, forward-only and within the original lifetime', async () => {
   let prior = -1;
   for (let i = 0; i <= 100; i++) {
     const phase = warriorShearPhase(i / 100);
@@ -49,9 +54,10 @@ it('keeps steel breakup continuous, forward-only and within the original lifetim
   expect(warriorShearPhase(0.72)).toBeCloseTo(0.72);
 });
 
-it('throws varied metal chips far enough to read while preserving shared pool limits and default fragments', () => {
+it('throws varied metal chips far enough to read while preserving shared pool limits and default fragments', async () => {
   const scene = new THREE.Scene();
   const pool = new SolidImpactFragments(scene);
+  await prepareImpactFragments(pool);
   const mesh = scene.children.find(
     (n) => n.name === 'solidImpact:metal_splinter',
   ) as THREE.Mesh<THREE.InstancedBufferGeometry>;
@@ -78,7 +84,7 @@ it('throws varied metal chips far enough to read while preserving shared pool li
   pool.dispose();
 });
 
-it('keeps unequal receiving exits at their original contact after scratch reuse, and yields to occupied ribbons', () => {
+it('keeps unequal receiving exits at their original contact after scratch reuse, and yields to occupied ribbons', async () => {
   const pathRibbon = vi.fn<SequencerHost['pathRibbon']>(() => true);
   const host = { pathRibbon } as unknown as SequencerHost;
   const at = { x: 2, y: 3, z: 5 };
@@ -101,7 +107,7 @@ it('keeps unequal receiving exits at their original contact after scratch reuse,
   expect(warriorImpactFan(host, at, 0, 0, 4, 0xc5d5e1)).toBe(0);
 });
 
-it('reserves the last available area ribbon for the enemy imprint when the atlas pool rejects', () => {
+it('reserves the last available area ribbon for the enemy imprint when the atlas pool rejects', async () => {
   let free = 1;
   const admitted: Parameters<SequencerHost['pathRibbon']>[] = [];
   const host = new Proxy(
@@ -131,9 +137,10 @@ it('reserves the last available area ribbon for the enemy imprint when the atlas
   expect(host.pathRibbon).toHaveBeenCalledTimes(3);
 });
 
-it('keeps short-lived metal at the impact when distant terrain rises beyond its visible trajectory', () => {
+it('keeps short-lived metal at the impact when distant terrain rises beyond its visible trajectory', async () => {
   const scene = new THREE.Scene();
   const pool = new SolidImpactFragments(scene);
+  await prepareImpactFragments(pool);
   const ground = vi.fn((x: number, z: number) => (Math.hypot(x, z) > 6 ? 30 : 0));
   expect(pool.burst('metal_splinter', 0, 2, 0, 0xffffff, 14, 1.6, 0, 1, ground, 0.28, true)).toBe(
     14,
@@ -147,9 +154,10 @@ it('keeps short-lived metal at the impact when distant terrain rises beyond its 
   pool.dispose();
 });
 
-it('admits debris on all four sides of a landing inside the real fixed pool', () => {
+it('admits debris on all four sides of a landing inside the real fixed pool', async () => {
   const scene = new THREE.Scene();
   const pool = new SolidImpactFragments(scene);
+  await prepareImpactFragments(pool);
   const host = new Proxy(
     {
       groundYAt: () => 0,

@@ -33,7 +33,14 @@ const DECAL_SLOTS = 12;
 const DECAL_SEGMENTS = 24;
 const DRAPE_LIFT = 0.06; // yards above the sampled ground, against z-fighting
 
-export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char' | 'leap_fracture';
+export type DecalStyle =
+  | 'ember'
+  | 'rime'
+  | 'rune'
+  | 'crack'
+  | 'char'
+  | 'leap_fracture'
+  | 'shaman_fracture';
 
 interface DecalSlot {
   mesh: THREE.Mesh;
@@ -42,6 +49,8 @@ interface DecalSlot {
   spin: number;
   active: boolean;
   immediate: boolean;
+  revealDuration: number;
+  reveal: number;
   // Per-slot shader state, pushed into the SHARED material by onBeforeRender.
   map: THREE.Texture;
   color: THREE.Color;
@@ -81,6 +90,7 @@ export class GroundDecals {
       crack: tex.crack,
       char: tex.char,
       leap_fracture: tex.leapFracture,
+      shaman_fracture: tex.shamanFracture,
     };
     // Rotation baked into the geometry (instead of mesh.rotation.x) so the
     // local Y IS the up-axis the drape attribute displaces along.
@@ -101,6 +111,7 @@ export class GroundDecals {
         uDissolve: { value: 1 },
         uHdr: { value: 1.6 },
         uSpin: { value: 0 },
+        uReveal: { value: 1 },
         uDrapeAxis: { value: DRAPE_AXIS_Y },
       },
       vertexShader: DRAPED_VERTEX_SHADER,
@@ -138,10 +149,23 @@ export class GroundDecals {
     this.stoneMaterial.fragmentShader = `
       uniform sampler2D uMap;
       uniform float uDissolve;
+      uniform float uReveal;
       varying vec2 vUv;
       void main() {
         vec4 tex = texture2D(uMap, vUv);
-        float alpha = tex.a * (1.0 - smoothstep(0.0, 1.0, uDissolve));
+        float revealed = 1.0;
+        if (uReveal < 1.0) {
+          vec2 p = (vUv - 0.5) * 2.0;
+          float angle = atan(p.y, p.x + 0.000001);
+          // Different fault branches arrive at different times. Mask the
+          // existing mineral ink only; never draw or brighten a circular rim.
+          float arrival = length(p) * (0.83 + sin(angle * 3.0 + 0.7) * 0.12
+            + sin(angle * 7.0 - 1.1) * 0.08);
+          float aa = max(0.008, fwidth(arrival) * 1.5);
+          float front = uReveal * 1.14 - 0.06;
+          revealed = 1.0 - smoothstep(front - aa, front + aa, arrival);
+        }
+        float alpha = tex.a * revealed * (1.0 - smoothstep(0.0, 1.0, uDissolve));
         if (alpha < 0.004) discard;
         gl_FragColor = vec4(tex.rgb, alpha);
       }`;
@@ -164,6 +188,8 @@ export class GroundDecals {
         spin: 0,
         active: false,
         immediate: false,
+        revealDuration: 0,
+        reveal: 1,
         map: tex.rune,
         color: new THREE.Color(),
         dissolve: 1,
@@ -188,6 +214,7 @@ export class GroundDecals {
         (uniforms.uColor.value as THREE.Color).copy(slot.color);
         uniforms.uDissolve.value = slot.dissolve;
         uniforms.uSpin.value = slot.spinPhase;
+        uniforms.uReveal.value = slot.reveal;
         material.uniformsNeedUpdate = true;
       };
       scene.add(mesh);
@@ -210,6 +237,8 @@ export class GroundDecals {
     this.camKnown = true;
   }
 
+  /** revealDuration only masks Shaman fracture ink. Zero preserves the full
+   * static mark; its carrier, terrain drape and expiry never change. */
   spawn(
     x: number,
     y: number,
@@ -218,6 +247,7 @@ export class GroundDecals {
     colorHex: number,
     style: DecalStyle,
     dur: number,
+    revealDuration = 0,
   ): void {
     if (this.disposed) return;
     const slot = this.slots[this.next];
@@ -226,7 +256,12 @@ export class GroundDecals {
     slot.age = 0;
     slot.dur = dur;
     slot.spin = style === 'rune' ? 0.35 : 0;
-    slot.immediate = style === 'leap_fracture';
+    slot.immediate = style === 'leap_fracture' || style === 'shaman_fracture';
+    slot.revealDuration =
+      style === 'shaman_fracture' && Number.isFinite(revealDuration) && revealDuration > 0
+        ? Math.min(dur, revealDuration)
+        : 0;
+    slot.reveal = slot.revealDuration > 0 ? 0 : 1;
     slot.mesh.material = slot.immediate ? this.stoneMaterial : this.material;
     slot.map = this.maps[style];
     slot.color.setHex(colorHex);
@@ -281,6 +316,7 @@ export class GroundDecals {
       const dissolve =
         t < 0.18 ? 1 - (t / 0.18) * 0.85 : t < 0.55 ? 0.15 : 0.15 + ((t - 0.55) / 0.45) * 0.85;
       slot.dissolve = slot.immediate ? Math.max(0, (t - 0.35) / 0.65) : dissolve;
+      if (slot.revealDuration > 0) slot.reveal = Math.min(1, slot.age / slot.revealDuration);
       if (slot.spin > 0) slot.spinPhase = slot.age * slot.spin;
     }
   }

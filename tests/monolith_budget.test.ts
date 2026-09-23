@@ -931,7 +931,8 @@ const MONOLITHS: MonolithRow[] = [
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
     // gained its assets line). Exact count.
-    ceiling: 12789,
+    // Shaman class preparation and receiver swaps live in their owning modules.
+    ceiling: 12782,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

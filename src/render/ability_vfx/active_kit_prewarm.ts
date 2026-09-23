@@ -2,6 +2,7 @@ import type * as THREE from 'three';
 import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../background_gpu_queue';
 import type { PrewarmManifestEntry } from '../prewarm_entry';
 import type { PrewarmResumeUnit } from '../prewarm_resume';
+import { abilityVfxTexturePrewarmSteps } from './prewarm';
 import {
   bakedTexture,
   warriorBloodTexture,
@@ -40,7 +41,8 @@ interface ActiveKitHost {
   /** Start (or join) the kit's demand-loaded assets before any unit runs;
    *  false means the device declined them, so the kit stays cold and no unit
    *  runs. Absent in tests that inject textures directly. */
-  assets?(): Promise<boolean>;
+  assets?(cls: string): Promise<boolean>;
+  fragments?(): readonly PrewarmResumeUnit[];
   geometry(kinds: readonly CrestKind[]): readonly PrewarmResumeUnit[];
   texture(texture: THREE.Texture): void;
 }
@@ -48,12 +50,31 @@ interface Preparation {
   host: ActiveKitHost;
   localClass: string;
   task: Promise<void> | null;
+  taskClass: string | null;
   done: Set<string>;
   cancelled: boolean;
 }
 const preparations = new WeakMap<object, Preparation>();
 
+const SHAMAN_TEXTURE_STEPS = ['shared-canvases', 'warrior-rock', 'smoke'] as const;
+
 function recipe(state: Preparation, cls: string): readonly PrewarmResumeUnit[] {
+  if (cls === 'shaman') {
+    // Selecting a recipe stays lazy: each memoized builder runs only inside
+    // its admitted upload unit. Shared canvases include the fracture atlas.
+    const steps = abilityVfxTexturePrewarmSteps();
+    return SHAMAN_TEXTURE_STEPS.map((id) => ({
+      id: `upload-big:active-shaman-${id}`,
+      synchronous: true,
+      run: () => {
+        const step = steps.find((candidate) => candidate.id === id);
+        if (!step) throw new Error(`Missing active Shaman texture step: ${id}`);
+        const textures = step.build();
+        if (!textures.length) throw new Error(`Active Shaman texture was not loaded: ${id}`);
+        for (const texture of textures) state.host.texture(texture);
+      },
+    })).filter((unit) => !state.done.has(unit.id));
+  }
   if (cls !== 'warrior') return [];
   return [
     {
@@ -159,6 +180,7 @@ export function activeKitPrewarmEntry(scene: object, cls: string, host: ActiveKi
     host,
     localClass: cls,
     task: null,
+    taskClass: null,
     done: new Set(),
     cancelled: false,
   };
@@ -186,16 +208,31 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
   const state = preparations.get(scene);
   if (!state || state.cancelled) return Promise.resolve();
   const selected = cls ?? state.localClass;
-  if (selected !== 'warrior') return Promise.resolve();
+  if (selected !== 'warrior' && selected !== 'shaman') return Promise.resolve();
   state.localClass = selected;
-  if (state.task) return state.task;
+  if (state.task) {
+    const activeClass = state.taskClass;
+    const continueSelected = () => {
+      // A concurrent class selection must pay its own recipe after the active
+      // one settles, never inherit another kit's readiness or a retired scene.
+      if (!state.cancelled && preparations.get(scene) === state)
+        return ensureActiveAbilityKit(scene, selected);
+    };
+    return state.task.then(continueSelected, (error: unknown) => {
+      if (activeClass === selected) throw error;
+      return continueSelected();
+    });
+  }
   const units = recipe(state, selected);
   if (!units.length) return Promise.resolve();
   const task = (async () => {
-    if (state.host.assets && !(await state.host.assets())) return;
+    const assetsReady = !state.host.assets || (await state.host.assets(selected));
+    if (!assetsReady && selected === 'warrior') return;
     if (state.cancelled) return;
-    for (const unit of units) {
+    const work = assetsReady ? [...(state.host.fragments?.() ?? []), ...units] : units;
+    for (const unit of work) {
       if (state.cancelled) return;
+      if (!assetsReady && unit.id !== 'upload-big:active-shaman-shared-canvases') continue;
       await state.host.queue.run(
         () => {
           if (!state.cancelled) return unit.run();
@@ -213,8 +250,10 @@ export function ensureActiveAbilityKit(scene: object, cls?: string): Promise<voi
     }
   })();
   state.task = task;
+  state.taskClass = selected;
   const release = () => {
     state.task = null;
+    state.taskClass = null;
   };
   void task.then(release, release);
   return task;
@@ -232,6 +271,16 @@ export function resumeActiveAbilityKit(
     .catch((error) => {
       console.warn('Active ability preparation failed', error);
     });
+}
+
+/** Production entry prepares only the selected kit after first paint.
+ * Remote classes request their own assets on the first visible entity. */
+export function resumeSceneAbilityKits(
+  scene: object,
+  firstPaint: Promise<unknown> | undefined,
+  cls: string,
+): void {
+  resumeActiveAbilityKit(scene, firstPaint, cls);
 }
 
 export function cancelActiveAbilityKit(scene: object): void {

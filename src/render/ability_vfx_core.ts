@@ -178,6 +178,7 @@ export interface AbilityVfxBuffSpec {
 }
 
 export interface AbilityVfxFullSpec {
+  shaman?: import('./shaman_vfx_specs').ShamanComposition;
   physical?: PhysicalChoreography;
   archetype: AbilityVfxArchetype;
   palette: string;

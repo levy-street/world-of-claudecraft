@@ -142,7 +142,7 @@ describe('druid cat production animation runtime', () => {
   };
   const active = () => peek(visual).current.getClip().name;
 
-  it('binds the full cat set while the shaman still builds the original wolf', () => {
+  it('binds the full cat set while the shaman builds its independent ancestral wolf', () => {
     expect(peek(visual).key).toBe('form_cat');
     expect(visual.swimHeadHeight).toBe(1.74);
     expect(visual.gait).toEqual({ runEnter: 3.2, runExit: 2.6 });
@@ -151,7 +151,7 @@ describe('druid cat production animation runtime', () => {
     ).toEqual([...CAT_CLIPS].sort());
     const wolf = create(entity(true), 'form_cat');
     expect(wolf && peek(wolf).key).toBe('form_ghost_wolf');
-    expect(wolf?.swimHeadHeight).toBe(1.6 * 0.42);
+    expect(wolf?.swimHeadHeight).toBe(2.25 * 0.42);
     expect(wolf?.gait).toBeUndefined();
     wolf?.dispose();
   });

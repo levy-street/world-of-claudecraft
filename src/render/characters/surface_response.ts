@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
+import { SHAMAN_SURFACE_SCORCH_GLSL } from './shaman_surface_scorch';
 
 export const SURFACE_RESPONSE_PROGRAM = 'wocSurfaceResponseProgram';
 export function surfaceResponseUniforms() {
@@ -8,6 +9,7 @@ export function surfaceResponseUniforms() {
     uSurfaceAge: { value: 1 },
     uSurfaceKind: { value: 0 },
     uSurfaceAmount: { value: 0 },
+    uSurfaceMotion: { value: 1 },
     uSurfaceOrigin: { value: new THREE.Vector3() },
     uSurfaceHeight: { value: 2 },
     uSurfaceContact: { value: new THREE.Vector2(0.56, -0.28) },
@@ -36,7 +38,7 @@ export function createSurfaceResponseMaterial(
     );
     shader.fragmentShader =
       `varying vec3 vSurfacePoint;
-      uniform float uSurfaceAge,uSurfaceKind,uSurfaceAmount,uSurfaceHeight;
+      uniform float uSurfaceAge,uSurfaceKind,uSurfaceAmount,uSurfaceHeight,uSurfaceMotion;
       uniform vec3 uSurfaceOrigin;
       uniform vec2 uSurfaceContact,uSurfaceRight;\n` + shader.fragmentShader;
     shader.fragmentShader = shader.fragmentShader.replace(
@@ -100,13 +102,15 @@ export function createSurfaceResponseMaterial(
         float infection=surfaceVein*(1.0-smoothstep(0.12,0.4,abs(surfaceHeight-0.57)))*surfaceFade;
         diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.055,0.12,0.025),infection*0.65);
         surfaceEmission=vec3(0.3,0.9,0.06)*infection*1.4;
-      } else {
+      } else if(uSurfaceKind<10.5) {
         float cut=1.0-smoothstep(0.008,0.043,abs(woundLine+sin(woundSide*53.0)*0.012));
         float dripLane=pow(max(0.0,sin(woundSide*73.0)),18.0);
         float seep=dripLane*smoothstep(-0.24*uSurfaceAge,-0.02,woundLine)*(1.0-smoothstep(-0.008,0.008,woundLine));
         float wound=max(cut,seep*0.7)*surfaceFade;
         diffuseColor.rgb=mix(diffuseColor.rgb,vec3(0.16,0.004,0.012),wound*0.96);
         surfaceEmission=vec3(0.8,0.018,0.035)*cut*surfaceFade*pow(max(0.0,1.0-uSurfaceAge),2.0)*1.6;
+      } else {
+        ${SHAMAN_SURFACE_SCORCH_GLSL}
       }
     `,
     );
@@ -119,7 +123,7 @@ export function createSurfaceResponseMaterial(
       '#include <emissivemap_fragment>\ntotalEmissiveRadiance+=surfaceEmission;',
     );
   };
-  material.customProgramCacheKey = () => `${previousKey}:surface-response-v4`;
+  material.customProgramCacheKey = () => `${previousKey}:surface-response-v5`;
   return material;
 }
 
@@ -130,48 +134,58 @@ export class CharacterSurfaceResponse {
   private age = 0;
   private duration = 2.5;
   active = false;
-  trigger(school: string, strength: number, contact?: MeleeImpactProfile): boolean {
+  trigger(
+    school: string,
+    strength: number,
+    contact?: MeleeImpactProfile,
+    reducedMotion = false,
+  ): boolean {
     const kind =
-      school === 'fire'
-        ? 0
-        : school === 'frost'
-          ? 1
-          : school === 'heal'
-            ? 2
-            : school === 'nature' || school === 'storm'
-              ? 3
-              : school === 'shadow'
-                ? 4
-                : school === 'physical'
-                  ? 5
-                  : school === 'holy' || school === 'holy-heal'
-                    ? 6
-                    : school === 'physical-crush'
-                      ? 7
-                      : school === 'physical-pierce'
-                        ? 8
-                        : school === 'physical-venom'
-                          ? 9
-                          : school === 'physical-blood'
-                            ? 10
-                            : -1;
+      school === 'shaman-storm'
+        ? 11
+        : school === 'fire'
+          ? 0
+          : school === 'frost'
+            ? 1
+            : school === 'heal'
+              ? 2
+              : school === 'nature' || school === 'storm'
+                ? 3
+                : school === 'shadow'
+                  ? 4
+                  : school === 'physical'
+                    ? 5
+                    : school === 'holy' || school === 'holy-heal'
+                      ? 6
+                      : school === 'physical-crush'
+                        ? 7
+                        : school === 'physical-pierce'
+                          ? 8
+                          : school === 'physical-venom'
+                            ? 9
+                            : school === 'physical-blood'
+                              ? 10
+                              : -1;
     if (kind < 0 || !Number.isFinite(strength) || strength <= 0) return false;
     const edge = !this.active;
     this.active = true;
     this.age = 0;
     this.duration =
-      kind === 5 || kind >= 7
-        ? 0.22
-        : kind === 6
-          ? 0.55
-          : kind === 3
-            ? 0.75
-            : kind === 1
-              ? 2.9
-              : 2.5;
+      kind === 11
+        ? 0.7
+        : kind === 5 || kind >= 7
+          ? 0.22
+          : kind === 6
+            ? 0.55
+            : kind === 3
+              ? 0.75
+              : kind === 1
+                ? 2.9
+                : 2.5;
     this.uniforms.uSurfaceAge.value = 0;
     this.uniforms.uSurfaceKind.value = kind;
     this.uniforms.uSurfaceAmount.value = Math.min(0.95, strength);
+    this.uniforms.uSurfaceMotion.value = reducedMotion ? 0 : 1;
     this.uniforms.uSurfaceContact.value.set(contact?.height ?? 0.56, contact?.angle ?? -0.28);
     return edge;
   }

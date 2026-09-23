@@ -48,14 +48,17 @@ export interface AbilityVfxCompileTarget {
  * blocks a live frame for long.
  */
 export function abilityVfxTexturePrewarmSteps(): AbilityVfxPrewarmTextureStep[] {
-  const steps: AbilityVfxPrewarmTextureStep[] = FLIPBOOK_STYLES.map((style) => ({
+  // Analytic Shaman contacts use the prepared contact_cut binding, not atlases.
+  const steps: AbilityVfxPrewarmTextureStep[] = FLIPBOOK_STYLES.filter(
+    (style) => !style.startsWith('shaman_'),
+  ).map((style) => ({
     id: `flipbook:${style}`,
     build: () => [flipbookSheet(style)],
   }));
   steps.push({
     id: 'shared-canvases',
-    // ~140 KB of small canvases built in one memoized call, so they stay one
-    // unit rather than eight that would each re-enter the same builder.
+    // Cached shared canvases, including the 4 MiB Shaman fracture. One unit
+    // avoids repeatedly entering the shared builder; nothing is drawn here.
     build: () => Object.values(abilityVfxTextures()),
   });
   for (const kind of CONTACT_SHEETS)
@@ -160,4 +163,11 @@ export function collectAbilityVfxCompileTargets(root: THREE.Object3D): AbilityVf
     targets.push({ id: `${child.name || child.type}:${targets.length}`, object: child });
   });
   return targets;
+}
+
+/** The successful boot path and resumed path have the same texture contract.
+ * A visible pool has fewer slots than sheet styles; walking its final bindings
+ * cannot prove that every cached sheet and registry-only decal is resident. */
+export function abilityVfxBootTextureDependencies(): THREE.Texture[] {
+  return [...new Set(abilityVfxTexturePrewarmSteps().flatMap((step) => step.build()))];
 }

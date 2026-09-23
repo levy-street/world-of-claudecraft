@@ -28,6 +28,7 @@ function fakeTextures(): AbilityVfxTextures {
     rime: texture(),
     crack: texture(),
     leapFracture: texture(),
+    shamanFracture: texture(),
     char: texture(),
     overlay: texture(),
   };
