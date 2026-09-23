@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4114,
+    "files": 4115,
     "harvestedFiles": 3948,
     "carried": {
       "tests/cannon_emplacement.test.ts": {
@@ -212,6 +212,17 @@
           2184,
           2144,
           2184
+        ]
+      },
+      "tests/faction_enchants.test.ts": {
+        "ms": 177,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "faction ladder rework added tests/faction_enchants.test.ts between CI harvests",
+        "runs": [
+          177,
+          177,
+          175
         ]
       },
       "tests/farshore_shipwreck.test.ts": {
@@ -2998,6 +3009,7 @@
   "tests/extension_drift_sentinel.test.ts": 12,
   "tests/facing_smooth.test.ts": 11,
   "tests/facing_stability.test.ts": 3271,
+  "tests/faction_enchants.test.ts": 177,
   "tests/falling_command.test.ts": 2743,
   "tests/far_lod_reveal_core.test.ts": 8,
   "tests/far_surface_core.test.ts": 4757,
