@@ -1010,6 +1010,7 @@ describe('Renderer base-visual swap keeps a body on screen', () => {
     return {
       root: new THREE.Group(),
       height: 2,
+      stageSurfaceResponsePreparation: () => null,
       clickProxy: Object.assign(new THREE.Object3D(), { userData: {} }),
       dispose: vi.fn(),
       setShadow: vi.fn(),
