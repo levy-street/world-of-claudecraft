@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { paintShamanFracture } from './shaman_fracture_atlas';
+import { drawShamanImpactSprite } from './shaman_impact_sprites';
 import { paintWarriorAttention } from './warrior_attention_atlas';
 import { paintWarriorControlMark, paintWarriorHammer } from './warrior_control_atlas';
 import { paintWarriorFracture } from './warrior_fracture_atlas';
@@ -398,6 +400,11 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
 
 export const FLIPBOOK_GRID = 8;
 export const FLIPBOOK_STYLES = [
+  'shaman_storm',
+  'shaman_ember',
+  'shaman_rime',
+  'shaman_dust',
+  'shaman_gale',
   'flame',
   'shatter',
   'electric',
@@ -435,8 +442,18 @@ export function flipbookSheet(style: FlipbookStyle): THREE.CanvasTexture {
   let tex = flipbookCache.get(style);
   if (!tex) {
     const cell = FLIP_AUTHOR_CELL_PX;
-    tex = makeCanvas(FLIPBOOK_GRID * FLIP_CELL_PX, (g) => {
-      g.scale(FLIP_CELL_PX / cell, FLIP_CELL_PX / cell);
+    // Matched captures show storm and fracture cels over 300 screen pixels.
+    // Give those two 192px sampling (9MiB each), fire/ice/wind keep128 (4MiB each).
+    // The legacy coin-sized sheets stay64; no mipmaps or duplicate caches.
+    const authored = style.startsWith('shaman_');
+    const shipped =
+      style === 'shaman_storm' || style === 'shaman_dust'
+        ? 192
+        : authored
+          ? FLIP_AUTHOR_CELL_PX
+          : FLIP_CELL_PX;
+    tex = makeCanvas(FLIPBOOK_GRID * shipped, (g) => {
+      g.scale(shipped / cell, shipped / cell);
       for (let f = 0; f < FLIPBOOK_GRID * FLIPBOOK_GRID; f++) {
         const t = f / (FLIPBOOK_GRID * FLIPBOOK_GRID - 1);
         const cx = (f % FLIPBOOK_GRID) * cell + cell / 2;
@@ -450,6 +467,10 @@ export function flipbookSheet(style: FlipbookStyle): THREE.CanvasTexture {
         g.restore();
       }
     });
+    // These painters contain actual sRGB colours, not legacy grayscale masks.
+    // Decode before HDR tint/bloom so midtones retain mineral/ion detail rather
+    // than being treated as linear emission and clipping into a white slab.
+    if (authored) tex.colorSpace = THREE.SRGBColorSpace;
     flipbookCache.set(style, tex);
   }
   return tex;
@@ -461,6 +482,11 @@ const FLIP_FRAME: Record<
   FlipbookStyle,
   (g: CanvasRenderingContext2D, cx: number, cy: number, t: number) => void
 > = {
+  shaman_storm: (g, x, y, t) => drawShamanImpactSprite(g, x, y, t, 'shaman_storm'),
+  shaman_ember: (g, x, y, t) => drawShamanImpactSprite(g, x, y, t, 'shaman_ember'),
+  shaman_rime: (g, x, y, t) => drawShamanImpactSprite(g, x, y, t, 'shaman_rime'),
+  shaman_dust: (g, x, y, t) => drawShamanImpactSprite(g, x, y, t, 'shaman_dust'),
+  shaman_gale: (g, x, y, t) => drawShamanImpactSprite(g, x, y, t, 'shaman_gale'),
   electric(g, cx, cy, t) {
     // the original: flash ? eroding ring ? filaments
     const flashA = Math.max(0, 1 - t * 2.6) ** 1.7;
@@ -715,15 +741,20 @@ export interface AbilityVfxTextures {
   rime: THREE.CanvasTexture;
   crack: THREE.CanvasTexture;
   leapFracture: THREE.CanvasTexture;
+  shamanFracture: THREE.CanvasTexture;
   char: THREE.CanvasTexture;
   overlay: THREE.CanvasTexture;
 }
 
 let cached: AbilityVfxTextures | null = null;
 
-// Build the whole set once (roughly 140 KB of canvases); every pool shares it.
+// Build once and share across pools. Includes the 1024px Shaman fracture
+// (4 MiB RGBA without mipmaps), plus the smaller shared canvases.
 export function abilityVfxTextures(): AbilityVfxTextures {
   if (!cached) {
+    // Opaque slate is authored in display colour, unlike emissive light masks.
+    const shamanFracture = makeCanvas(1024, paintShamanFracture);
+    shamanFracture.colorSpace = THREE.SRGBColorSpace;
     cached = {
       noise: fbmTexture(),
       ribbon: ribbonTexture(),
@@ -732,6 +763,7 @@ export function abilityVfxTextures(): AbilityVfxTextures {
       rime: rimeTexture(),
       crack: crackTexture(),
       leapFracture: makeCanvas(512, paintWarriorFracture),
+      shamanFracture,
       char: charTexture(),
       overlay: overlayAtlasTexture(),
     };

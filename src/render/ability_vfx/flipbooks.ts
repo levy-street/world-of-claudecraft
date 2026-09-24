@@ -1,7 +1,19 @@
 import * as THREE from 'three';
 import { boundQuadSize, IMPACT_QUAD_MAX_SCREEN_FRACTION } from '../vfx_screen_bounds_core';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
-import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
+import {
+  abilityVfxTextures,
+  FLIPBOOK_GRID,
+  FLIPBOOK_STYLES,
+  type FlipbookStyle,
+  flipbookSheet,
+} from './fx_textures';
+import {
+  SHAMAN_IMPACT_GLSL,
+  type ShamanImpactStyle,
+  shamanImpactStyle,
+  shamanImpactVariant,
+} from './shaman_impact_flash';
 import {
   WARRIOR_FLASH_GLSL,
   WARRIOR_IMPACT_REACH,
@@ -32,6 +44,7 @@ interface FlipSlot {
   duration: number;
   rotation: number;
   aspect: number;
+  shamanAspect: boolean;
   size: number;
   worldDirected: boolean;
   strikeAxis: THREE.Vector3;
@@ -39,7 +52,8 @@ interface FlipSlot {
   active: boolean;
 }
 
-export function asFlipbookStyle(s: string): FlipbookStyle {
+export function asFlipbookStyle(s: string): FlipbookStyle | ShamanImpactStyle {
+  if (shamanImpactStyle(s)) return s as FlipbookStyle | ShamanImpactStyle;
   return (FLIPBOOK_STYLES as readonly string[]).includes(s) ? (s as FlipbookStyle) : 'electric';
 }
 
@@ -62,6 +76,10 @@ export class ImpactFlipbooks {
         uTint: { value: new THREE.Color(1, 1, 1) },
         uHdr: { value: 1 },
         uInset: { value: 0 },
+        uAuthoredColor: { value: 0 },
+        uShamanStyle: { value: 0 },
+        uShamanPhase: { value: 0 },
+        uShamanVariant: { value: 1 },
         uWarriorStyle: { value: 0 },
         uWarriorPhase: { value: 0 },
         uWarriorDown: { value: new THREE.Vector2(0, -1) },
@@ -79,12 +97,15 @@ export class ImpactFlipbooks {
         }`,
       fragmentShader: `
         ${WARRIOR_FLASH_GLSL}
+        ${SHAMAN_IMPACT_GLSL}
+        uniform float uShamanStyle, uShamanPhase, uShamanVariant;
         uniform sampler2D uMap;
         uniform float uFrame;
         uniform float uOpacity;
         uniform vec3 uTint;
         uniform float uHdr;
         uniform float uInset;
+        uniform float uAuthoredColor;
         uniform float uLowRangeTarget;
         varying vec2 vUv;
         varying float vWorldY;
@@ -103,6 +124,12 @@ export class ImpactFlipbooks {
             float floorFade = smoothstep(uWarriorFloor + .03, uWarriorFloor + uWarriorFloorBlend, vWorldY);
             gl_FragColor.rgb *= floorFade;
             if (uWarriorStyle > 1.5 && uWarriorStyle < 2.5) gl_FragColor.a *= floorFade;
+          } else if (uShamanStyle > .5) {
+            gl_FragColor = shamanImpact(vUv, uShamanPhase, uShamanStyle, uShamanVariant, uTint, uHdr) * uOpacity;
+            if (uShamanStyle > 2.5 && uShamanStyle < 3.5) {
+              float floorFade = smoothstep(uWarriorFloor + .03, uWarriorFloor + uWarriorFloorBlend, vWorldY);
+              gl_FragColor.rgb *= floorFade;
+            }
           } else {
             float fi = floor(uFrame);
             vec4 a = cell(fi);
@@ -110,13 +137,18 @@ export class ImpactFlipbooks {
             vec4 s = mix(a, b, fract(uFrame));
             gl_FragColor = vec4(s.rgb * uTint * uHdr, s.a) * uOpacity;
           }
-          if (uWarriorStyle > .5 || uInset > 0.) {
+          if (uWarriorStyle > .5 || uInset > 0. || uAuthoredColor > .5) {
             #include <tonemapping_fragment>
             #include <colorspace_fragment>
           } else if (gl_FragColor.a < .004) discard;
           // Preserve the previous source-alpha additive RGB for ordinary
           // effects, using one fixed blend state prepared before any cast.
-          if (uWarriorStyle < 1.5 || uWarriorStyle > 2.5) {
+          if ((uShamanStyle > 1.5 && uShamanStyle < 2.5) || (uShamanStyle > 3.5 && uShamanStyle < 4.5)) {
+            // Mineral and ice faces need coverage to retain dark recesses. The shared
+            // fixed blend state supports this without a material/program swap.
+            if (uLowRangeTarget > .5) gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
+            gl_FragColor.rgb *= gl_FragColor.a;
+          } else if (uWarriorStyle < 1.5 || uWarriorStyle > 2.5) {
             // Fixed-point targets clamp a source before hardware blending.
             // Preserve that ordering on the non-HDR quality paths as well.
             if (uLowRangeTarget > .5) gl_FragColor.rgb = clamp(gl_FragColor.rgb, 0., 1.);
@@ -150,6 +182,7 @@ export class ImpactFlipbooks {
         duration: FLIP_DUR,
         rotation: 0,
         aspect: 1,
+        shamanAspect: false,
         size: 1,
         worldDirected: false,
         strikeAxis: new THREE.Vector3(),
@@ -167,7 +200,7 @@ export class ImpactFlipbooks {
     size: number,
     colorHex: number,
     hdr: number,
-    style: FlipbookStyle | ContactSheet | WarriorFlashStyle,
+    style: FlipbookStyle | ContactSheet | WarriorFlashStyle | ShamanImpactStyle,
     duration = FLIP_DUR,
     rotation = 0,
     aspect = 1,
@@ -176,11 +209,14 @@ export class ImpactFlipbooks {
   ): void {
     if (this.disposed) return;
     const warrior = warriorFlashStyle(style);
-    const texture = warrior
-      ? contactTexture('contact_cut')
-      : isContactSheet(style)
-        ? contactTexture(style)
-        : flipbookSheet(style as FlipbookStyle);
+    const shaman = shamanImpactStyle(style);
+    const texture = shaman
+      ? abilityVfxTextures().noise
+      : warrior
+        ? contactTexture('contact_cut')
+        : isContactSheet(style)
+          ? contactTexture(style)
+          : flipbookSheet(style as FlipbookStyle);
     if (!texture) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
@@ -197,6 +233,11 @@ export class ImpactFlipbooks {
       slot.worldDirected ? -Math.sin(worldFacing) * Math.cos(slot.rotation) : 0,
     );
     slot.aspect = Number.isFinite(aspect) ? Math.max(0.25, Math.min(4, aspect)) : 1;
+    slot.shamanAspect = style.startsWith('shaman_');
+    slot.mat.uniforms.uAuthoredColor.value = slot.shamanAspect ? 1 : 0;
+    slot.mat.uniforms.uShamanStyle.value = shaman;
+    slot.mat.uniforms.uShamanVariant.value = shamanImpactVariant(style);
+    slot.mat.uniforms.uShamanPhase.value = 0;
     slot.mat.uniforms.uMap.value = texture;
     slot.mat.uniforms.uInset.value =
       warrior || isContactSheet(style)
@@ -208,12 +249,15 @@ export class ImpactFlipbooks {
     slot.mat.uniforms.uWarriorStyle.value = warrior;
     slot.mat.uniforms.uWarriorPhase.value = 0;
     (slot.mat.uniforms.uWarriorDown.value as THREE.Vector2).set(0, -1);
-    slot.mat.uniforms.uWarriorFloor.value = warrior && Number.isFinite(groundY) ? groundY : -1e6;
+    slot.mat.uniforms.uWarriorFloor.value =
+      (warrior || shaman === 3) && Number.isFinite(groundY) ? groundY : -1e6;
     // Keep a low landing core bright while softening the wider body-height bursts.
     slot.mat.uniforms.uWarriorFloorBlend.value =
-      warrior && Number.isFinite(groundY)
-        ? Math.min(0.85, Math.max(0.12, (y - groundY) * 1.5))
-        : 0.85;
+      shaman === 3 && Number.isFinite(groundY)
+        ? 0.65
+        : warrior && Number.isFinite(groundY)
+          ? Math.min(0.85, Math.max(0.12, (y - groundY) * 1.5))
+          : 0.85;
     slot.mat.uniforms.uOpacity.value = 1;
     slot.mesh.position.set(x, y, z);
     slot.mesh.scale.setScalar(size * 0.65 * (warrior ? WARRIOR_IMPACT_REACH : 1));
@@ -253,6 +297,7 @@ export class ImpactFlipbooks {
       const t = Math.min(1, slot.age / slot.duration);
       slot.mat.uniforms.uFrame.value = t * LAST_FRAME;
       slot.mat.uniforms.uWarriorPhase.value = reducedMotion ? 0.32 : t;
+      slot.mat.uniforms.uShamanPhase.value = reducedMotion ? 0.32 : t;
       slot.mat.uniforms.uOpacity.value = t > 0.7 ? 1 - (t - 0.7) / 0.3 : 1;
       if (slot.mat.uniforms.uWarriorStyle.value) {
         const scale =
@@ -262,17 +307,28 @@ export class ImpactFlipbooks {
             0.55 * easeOutCubic(reducedMotion && slot.mat.uniforms.uWarriorStyle.value ? 0.32 : t));
         slot.mesh.scale.set(scale * slot.aspect, scale, scale);
       } else {
-        const grown = slot.size * (0.65 + 0.55 * easeOutCubic(t));
-        slot.mesh.scale.setScalar(
-          bounded
-            ? boundQuadSize(
-                grown,
-                slot.mesh.position.distanceTo(camPos as THREE.Vector3),
-                tanHalfVFov as number,
-                IMPACT_QUAD_MAX_SCREEN_FRACTION,
-              )
-            : grown,
-        );
+        // Analytic art animates inside a stable carrier. Growing that carrier
+        // again moves every edge and contact core, softening a sharp impact.
+        const grown =
+          slot.size * (slot.mat.uniforms.uShamanStyle.value ? 1.2 : 0.65 + 0.55 * easeOutCubic(t));
+        // Shaman impact aspect was previously discarded here, turning authored
+        // columns, ground shelves and fans into the same square silhouette.
+        // Bound the LONGEST axis so a wide fault still respects screen coverage.
+        const aspect = slot.shamanAspect ? slot.aspect : 1;
+        // Extend the authored axis rather than shrinking the previous square;
+        // introducing shape must not quietly reduce the existing impact scale.
+        const stretchX = Math.max(1, aspect);
+        const stretchY = Math.max(1, 1 / aspect);
+        const longest = Math.max(stretchX, stretchY);
+        const scale = bounded
+          ? boundQuadSize(
+              grown * longest,
+              slot.mesh.position.distanceTo(camPos as THREE.Vector3),
+              tanHalfVFov as number,
+              IMPACT_QUAD_MAX_SCREEN_FRACTION,
+            ) / longest
+          : grown;
+        slot.mesh.scale.set(scale * stretchX, scale * stretchY, scale);
       }
       slot.mesh.quaternion.copy(camQuat);
       let roll = slot.rotation;

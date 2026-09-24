@@ -66,8 +66,9 @@ export interface CharacterWeaponAura {
  *  scratch (allocation-free per frame), or null when no worn aura asks for
  *  one. Data-driven off the full spec's buff.weaponAura knob (aura id ==
  *  ability id, the painter's own matching rule): Sanguine Blade's blood soak,
- *  the shaman imbues (Pyrebrand/Rimebound), and the rogue poisons (Festering
- *  Venom's full-blade wash, Adder's Bite's green tip) all resolve here, and
+ *  legacy Rimebound, and the rogue poisons (Festering Venom's full-blade wash,
+ *  Adder's Bite's green tip) resolve here. Current Shaman imbues instead retain
+ *  their material through ShamanHeld's weapon-edge detail and particles, and
  *  the overlay lives exactly as long as the aura - gained on cast, dropped
  *  with the buff. First worn match wins (weapon-imbue auras are exclusive in
  *  the sim, so concurrent winners cannot happen in practice). */
@@ -76,6 +77,15 @@ export function characterWeaponAuraInto(
   out: CharacterWeaponAura,
 ): CharacterWeaponAura | null {
   for (const a of e.auras) {
+    // Exact held-owner IDs only. Do not suppress unrelated or legacy weapon
+    // auras, and do not paint a second blanket over the equipped material.
+    if (
+      a.id === 'rockbiter_weapon' ||
+      a.id === 'flametongue_weapon' ||
+      a.id === 'galeheart_weapon' ||
+      a.id === 'lifespring_weapon'
+    )
+      continue;
     const buff = ABILITY_VFX_FULL_SPECS[a.id]?.buff;
     const tint = buff?.weaponAura;
     if (tint !== undefined) {

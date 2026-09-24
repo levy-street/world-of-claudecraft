@@ -63,8 +63,12 @@ export type CharacterFormKey =
 export function characterFormAssetKey(
   formKey: CharacterFormKey,
   auras: readonly AuraIdentity[],
+  playerClass?: string,
 ): CharacterFormKey | 'form_ghost_wolf' {
-  return formKey === 'form_cat' && auras.some((aura) => aura.id === 'ghost_wolf')
+  // Studio and runtime may prepare this shared slot before the aura exists.
+  // Resolve from immutable class identity then, or the cache retains a cat.
+  return formKey === 'form_cat' &&
+    (playerClass === 'shaman' || auras.some((aura) => aura.id === 'ghost_wolf'))
     ? 'form_ghost_wolf'
     : formKey;
 }

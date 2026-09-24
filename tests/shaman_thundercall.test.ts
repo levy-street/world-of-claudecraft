@@ -227,7 +227,20 @@ describe('Shaman v0.29 Thundercall', () => {
     const firstEvents = resolveCast(mastered.sim);
     const firstDamage = earthenJoltDamage(firstEvents, mastered.shaman.id, mastered.target.id);
     expect(Math.abs(firstDamage - baselineDamage * 1.25)).toBeLessThanOrEqual(1);
-    expect(procSurges(firstEvents, mastered.shaman.id)).toHaveLength(1);
+    const surges = procSurges(firstEvents, mastered.shaman.id);
+    expect(surges).toHaveLength(2);
+    expect(
+      surges.filter((event) => event.type === 'spellfx' && event.ability === undefined),
+    ).toHaveLength(1);
+    expect(
+      surges.filter((event) => event.type === 'spellfx' && event.ability === 'earth_shock'),
+    ).toEqual([
+      expect.objectContaining({
+        level: 5,
+        sourceId: mastered.shaman.id,
+        targetId: mastered.target.id,
+      }),
+    ]);
 
     seedThunderBank(mastered.shaman, 5);
     expect(thundercallDamageMultiplier(mastered.sim.ctx, mastered.shaman, 'earth_shock')).toBe(

@@ -31,7 +31,8 @@ export interface LinkedProgramSource {
 }
 
 /** One link unit per distinct pooled program, plus one for the staged lazy
- *  stand-ins (null before their stage). Each unit names its root, so the
+ *  stand-ins. A getter preserves that unit when collection precedes staging.
+ *  Each unit names its current root, so the
  *  resume lane warms it through the worker ahead of the link (a hit where
  *  the worker is on, an announced link for the audit everywhere), links it
  *  through the colour arm (the canvas variant: the pools draw in the world
@@ -40,23 +41,31 @@ export interface LinkedProgramSource {
  *  test seam. */
 export function castVfxProgramUnits(
   scene: THREE.Object3D,
-  standIns: THREE.Object3D | null,
+  standIns: THREE.Object3D | null | (() => THREE.Object3D | null),
   host: CompileArmHost,
   webgl: LinkedProgramSource,
   compile: (root: THREE.Object3D) => Promise<void> = (root) => linkColorPrograms(host, root, false),
 ): PrewarmResumeUnit[] {
-  const unit = (id: string, root: THREE.Object3D): PrewarmResumeUnit => ({
+  const unit = (id: string, rootNow: () => THREE.Object3D | null): PrewarmResumeUnit => ({
     id,
-    roots: [root],
-    run: () =>
-      compile(root).then(() => {
-        markProgramsReadyUnder(webgl.properties, root);
-      }),
+    get roots() {
+      const root = rootNow();
+      return root ? [root] : [];
+    },
+    run: async () => {
+      const root = rootNow();
+      if (!root) throw new Error(`${id} has no staged root`);
+      await compile(root);
+      markProgramsReadyUnder(webgl.properties, root);
+    },
   });
   const units: PrewarmResumeUnit[] = [];
-  if (standIns) units.push(unit('ability-materials:compile', standIns));
+  if (standIns)
+    units.push(
+      unit('ability-materials:compile', typeof standIns === 'function' ? standIns : () => standIns),
+    );
   for (const target of collectAbilityVfxCompileTargets(scene)) {
-    units.push(unit(`program:${target.id}`, target.object));
+    units.push(unit(`program:${target.id}`, () => target.object));
   }
   return units;
 }

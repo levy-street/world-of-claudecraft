@@ -24,6 +24,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as assets from '../src/render/characters/assets';
 import { SanguineWeaponSheath } from '../src/render/characters/sanguine_weapon_sheath';
 import { CharacterSurfaceResponse } from '../src/render/characters/surface_response';
+import { SurfaceResponsePreparation } from '../src/render/characters/surface_response_preparation';
 import { CharacterVisual, type FarBakeGate } from '../src/render/characters/visual';
 
 function readSource(file: string): string {
@@ -72,6 +73,8 @@ function fakeVisual(overrides: Record<string, unknown> = {}): AnyVisual {
     runeTint: null,
     // Object.create skips the real class field initializer.
     surfaceResponse: new CharacterSurfaceResponse(),
+    surfacePreparation: new SurfaceResponsePreparation(),
+    linkedEffectMaterials: new WeakSet<THREE.Material>(),
     sanguineSheath: new SanguineWeaponSheath(),
     weaponAuraSanguine: false,
     auraGlowIntensity: 0,
@@ -246,8 +249,27 @@ describe('the composed far bake links hidden behind the gate', () => {
     const fake = fakeVisual({ farBakeGate: gate });
     fake.setFar(true);
     expect(fake.farCompilePending).toBe(true);
+    const previousSurface = fake.stageSurfaceResponsePreparation();
+    expect(previousSurface).not.toBeNull();
+    expect(previousSurface.root.parent).toBe(fake.poseWrap);
+    const surfaceMaterial = (previousSurface.root.children[0] as THREE.Mesh)
+      .material as THREE.Material;
+    expect(fake.linkedEffectMaterials.has(surfaceMaterial)).toBe(false);
     fake.setFarBakeGate(gate);
     expect(fake.farCompilePending).toBe(false);
+    expect(previousSurface.root.parent).toBeNull();
+    expect(previousSurface.root.children).toHaveLength(0);
+    // A renderer re-acquire also invalidates the old surface ticket. Its
+    // delayed proof must neither bless materials nor clear the new ticket.
+    const currentSurface = fake.stageSurfaceResponsePreparation();
+    expect(currentSurface).not.toBeNull();
+    expect(currentSurface).not.toBe(previousSurface);
+    previousSurface.settle(true);
+    expect(fake.linkedEffectMaterials.has(surfaceMaterial)).toBe(false);
+    expect(currentSurface.root.parent).toBe(fake.poseWrap);
+    currentSurface.settle(true);
+    expect(fake.linkedEffectMaterials.has(surfaceMaterial)).toBe(true);
+    expect(currentSurface.root.parent).toBeNull();
   });
 
   it('reveals immediately without a gate (previews, hosts without one)', () => {

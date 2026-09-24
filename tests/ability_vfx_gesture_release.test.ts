@@ -29,6 +29,9 @@ function makePainter(hasGestureClip: (id: number, ability: string) => boolean, i
     sequenceInstantAt: vi.fn(),
     sequenceBolt: vi.fn(),
     sequenceBoltAt: vi.fn(),
+    sequenceShamanRelease: vi.fn(),
+    sequenceShamanContact: vi.fn(),
+    shamanField: vi.fn(),
     groundYAt: vi.fn().mockReturnValue(0),
   };
   const vfx = {
@@ -147,6 +150,49 @@ describe('player gesture release on cast fx (review #2961)', () => {
     });
     expect(triggerAttack).toHaveBeenCalledWith(SOURCE_ID, 'earthquake');
   });
+
+  it.each([true, false])(
+    'plays one field gesture for companion cues, point first: %s',
+    (pointFirst) => {
+      const { painter, triggerAttack } = makePainter((_id, ability) => ability === 'earthquake');
+      const point = () =>
+        painter.handleSpellfxAt({
+          x: 0,
+          z: 0,
+          school: 'physical',
+          fx: 'nova',
+          ability: 'earthquake',
+          radius: 8,
+          sourceId: SOURCE_ID,
+        });
+      const caster = () =>
+        painter.handleSpellfx({
+          sourceId: SOURCE_ID,
+          targetId: SOURCE_ID,
+          school: 'physical',
+          fx: 'selfCast',
+          ability: 'earthquake',
+        });
+      if (pointFirst) {
+        point();
+        caster();
+      } else {
+        caster();
+        point();
+      }
+      expect(triggerAttack).toHaveBeenCalledExactlyOnceWith(SOURCE_ID, 'earthquake');
+      painter.handleSpellfxAt({
+        x: 0,
+        z: 0,
+        school: 'physical',
+        fx: 'tick',
+        ability: 'earthquake',
+        radius: 8,
+        sourceId: SOURCE_ID,
+      });
+      expect(triggerAttack).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it('does not play a swing for an ability with no authored gesture clip', () => {
     const { painter, triggerAttack } = makePainter(() => false);

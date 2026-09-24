@@ -109,6 +109,9 @@ export interface StyledTrailOpts {
   aimY: number;
   aimZ: number;
   groundY: ((x: number, z: number) => number) | null;
+  /** Opt-in authored release point. Re-sampled at launch after any delay;
+   * returning false cancels rather than silently launching from the body. */
+  sourceAnchor?: (id: number, out: THREE.Vector3) => boolean;
 }
 
 const LEGACY_TRAIL_OPTS: StyledTrailOpts = {
@@ -154,6 +157,7 @@ interface BoltSlot {
 
 interface TrailSlot {
   active: boolean;
+  sourceAnchor: StyledTrailOpts['sourceAnchor'] | null;
   targetId: number;
   sourceId: number;
   ttl: number;
@@ -389,6 +393,7 @@ export class AbilityVfxRibbons {
     for (let i = 0; i < TRAIL_SLOTS; i++) {
       this.trails.push({
         active: false,
+        sourceAnchor: null,
         targetId: 0,
         sourceId: 0,
         ttl: 0,
@@ -674,13 +679,18 @@ export class AbilityVfxRibbons {
     onArrive: ((x: number, y: number, z: number) => void) | null,
     onTerminate: ((x: number, y: number, z: number) => void) | null,
   ): void {
-    const from = this.anchor(sourceId, 0.62, this.a1);
+    const from = opts.sourceAnchor
+      ? opts.sourceAnchor(sourceId, this.a1)
+        ? this.a1
+        : null
+      : this.anchor(sourceId, 0.62, this.a1);
     if (!from) return;
     const slot = this.trails.find((t) => !t.active) ?? this.trails[0];
     if (slot.active) this.terminateTrail(slot);
     slot.active = true;
     slot.targetId = targetId;
     slot.sourceId = sourceId;
+    slot.sourceAnchor = opts.sourceAnchor ?? null;
     slot.fixedTarget = fixedTo !== null;
     if (fixedTo) slot.fixedTo.copy(fixedTo);
     slot.width = width;
@@ -933,7 +943,15 @@ export class AbilityVfxRibbons {
         // staggered volley follower: ride the caster's hand until launch
         t.delay -= dt;
         t.ttl -= dt;
-        const from = this.anchor(t.sourceId, 0.62, this.a1);
+        const from = t.sourceAnchor
+          ? t.sourceAnchor(t.sourceId, this.a1)
+            ? this.a1
+            : null
+          : this.anchor(t.sourceId, 0.62, this.a1);
+        if (!from && t.sourceAnchor) {
+          this.terminateTrail(t);
+          continue;
+        }
         if (from) {
           t.head.copy(from);
           t.origin.copy(from);
@@ -943,6 +961,20 @@ export class AbilityVfxRibbons {
           t.ringCount = 1;
         }
         continue;
+      }
+      if (t.sourceAnchor) {
+        if (!t.sourceAnchor(t.sourceId, this.a1)) {
+          this.terminateTrail(t);
+          continue;
+        }
+        t.head.copy(this.a1);
+        t.origin.copy(this.a1);
+        t.samplePos.copy(this.a1);
+        t.ring[0].copy(this.a1);
+        t.ringHead = 1 % TRAIL_PTS;
+        t.ringCount = 1;
+        // Once airborne it belongs to the projectile, not the moving hand.
+        t.sourceAnchor = null;
       }
       t.ttl -= dt;
       const target = t.fixedTarget ? t.fixedTo : this.anchor(t.targetId, 0.5, this.a1);
@@ -982,6 +1014,7 @@ export class AbilityVfxRibbons {
         t.onArrive = null;
         t.onTerminate = null;
         t.active = false;
+        t.sourceAnchor = null;
         onArrive?.(this.s1.x, this.s1.y, this.s1.z);
         continue;
       }
@@ -1205,6 +1238,7 @@ export class AbilityVfxRibbons {
       t.active = false;
       t.onArrive = null;
       t.onTerminate = null;
+      t.sourceAnchor = null;
     }
     for (const a of this.arcs) {
       a.active = false;
@@ -1232,6 +1266,7 @@ export class AbilityVfxRibbons {
     t.onArrive = null;
     t.onTerminate = null;
     t.active = false;
+    t.sourceAnchor = null;
     onTerminate?.(t.head.x, t.head.y, t.head.z);
   }
 

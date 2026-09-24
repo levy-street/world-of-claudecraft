@@ -14,6 +14,7 @@ import { warriorFuryStateKind } from '../warrior_fury_state_core';
 import { warriorPowerIntent, warriorPowerKind } from '../warrior_power_core';
 import { warriorReadinessBit } from '../warrior_readiness_core';
 import { HarvestDetonations } from './harvest_detonation';
+import { type ShamanHealEvent, shamanCast, shamanDamage, shamanHeal } from './shaman_events';
 import {
   drawWarriorAreaContact,
   drawWarriorStormPulse,
@@ -57,6 +58,14 @@ import { attackAbilityId } from '../characters/weapon_attack_style_core';
 import { ignivarAllowsBodyGlow } from '../ignivar_encounter_core';
 import { abilityVfxFullSpecFor, abilityVfxSpecFor } from './encounter_specs';
 import { type AbilityVfxFx, asOrbitStyle, type ParticleBurstKind } from './fx';
+
+const THUNDER_CHARGES = [0, 1, 2, 3].map((n) => ({
+  n,
+  size: 0.3,
+  radius: 0.7,
+  up: 0.65,
+  rate: 1.8,
+}));
 
 interface VfxPoint {
   x: number;
@@ -134,6 +143,7 @@ export interface AbilityVfxDeps {
   // First sighting of a class whose kit loads on demand (a remote Warrior for
   // a non-Warrior local player): the host starts that kit's assets and prewarm.
   requestClassKit?: (cls: string) => void;
+  isShaman?: (entityId: number) => boolean;
   warriorSpecOf?: (entityId: number) => string | null;
   visualVariantOf?: (abilityId: string, casterId: number) => string;
   // True when the entity's rig authors a per-ability one-shot clip
@@ -198,6 +208,7 @@ export interface AbilityVfxSpellfxEvent {
   fx: string;
   ability?: string;
   attackAnimation?: 'ranged-shot';
+  level?: number;
 }
 
 // Structural slice of the point-anchored SimEvent member ('spellfxAt').
@@ -208,7 +219,9 @@ export interface AbilityVfxSpellfxAtEvent {
   fx: string;
   ability?: string;
   radius?: number;
+  duration?: number;
   sourceId?: number;
+  thunderSpent?: number;
 }
 
 export interface AbilityVfxDamageEvent {
@@ -263,6 +276,7 @@ export interface AbilityVfxEntityState {
   // optional so tests can omit them (an absent hp reads as alive).
   dead?: boolean;
   hp?: number;
+  maxHp?: number;
   kind?: string;
   templateId?: string;
   // On-next-swing queue (heroic-strike style ability id while armed). Present
@@ -412,6 +426,12 @@ const FEAR_BREAK_SPEC_ID = 'intimidating_shout';
 
 // Particle sprite family per burst kind, mapped onto Vfx.burst's school hint.
 const BURST_SCHOOL_BY_KIND: Record<ParticleBurstKind, string> = {
+  shaman_sparks: 'shaman_sparks',
+  shaman_embers: 'shaman_embers',
+  shaman_grit: 'shaman_grit',
+  shaman_mist: 'shaman_mist',
+  shaman_droplets: 'shaman_droplets',
+  shaman_runoff: 'shaman_runoff',
   sparks: 'arcane',
   embers: 'fire',
   debris: 'physical',
@@ -509,6 +529,16 @@ export class AbilityVfx {
     now?: () => number,
   ) {
     this.now = now ?? (() => performance.now() / 1000);
+    this.shamanHost = {
+      fx: deps.fx,
+      isShaman: deps.isShaman,
+      variant: (id, source) => deps.visualVariantOf?.(id, source) ?? id,
+      tier: (source, id) => this.castTier(source, id),
+      gesture: (source, id, windup = false) => {
+        if (windup) deps.triggerAttack(source, id);
+        else this.releaseGesture(source, id);
+      },
+    };
     // Particle bursts ride the pooled Vfx cloud; sequencer light pulses ride
     // the renderer's pooled point lights; sequencer spawns feed the probe stats.
     deps.fx.setDelegates(
@@ -606,6 +636,12 @@ export class AbilityVfx {
     return (this.deps.castVfxReady ?? this.deps.castVfxAdmit)?.() ?? true;
   }
 
+  private readonly shamanHost: Parameters<typeof shamanCast>[0];
+
+  onHeal(ev: ShamanHealEvent): boolean {
+    return this.admitted() && shamanHeal(this.shamanHost, ev);
+  }
+
   handleSpellfx(ev: AbilityVfxSpellfxEvent): boolean {
     // Physical Warrior ticks are wounds. The wire's tick companion has no
     // ability label, so preserve its recipient cue without an ivory magic puff.
@@ -622,6 +658,7 @@ export class AbilityVfx {
         return true;
       }
     }
+    if (this.admitted() && shamanCast(this.shamanHost, ev)) return true;
     const originalEvent = ev;
     const ability = ev.ability;
     if (!ability) return false;
@@ -780,6 +817,19 @@ export class AbilityVfx {
         break;
       }
       case 'lightning':
+        if (full?.shaman) {
+          fx.sequenceInstant(
+            ability,
+            full,
+            ev.sourceId,
+            ev.targetId,
+            plan.color,
+            Math.min(1, tier),
+          );
+          this.releaseGesture(ev.sourceId, ability);
+          this.spawned++;
+          break;
+        }
         this.deps.vfx.lightningProjectile(ev.sourceId, ev.targetId, plan.color);
         this.spawned++;
         if (tier < 2) {
@@ -1140,6 +1190,41 @@ export class AbilityVfx {
       this.recordStat('bladestorm', true);
       return true;
     }
+    const shamanFieldSpec = abilityVfxFullSpecFor(ev.ability);
+    if (shamanFieldSpec?.shaman?.action === 'field') {
+      const tier = Math.min(1, this.biasFor(casterId, this.budget.peek(casterId, nowSec)));
+      const fieldOwnsBoundary = fx.shamanField(ev);
+      // The held fracture owns the active area. Resolved victim damage paints
+      // the local aftershock; a point tick must not replay the opening eruption.
+      if (ev.fx === 'tick') {
+        this.recordStat(ev.ability, true);
+        return true;
+      }
+      this.releaseGesture(casterId, ev.ability);
+      // Fractured perimeters mark the quake lifetime or the brief grip cast
+      // footprint. Keep the fallback if validation or saturation rejects one.
+      if (ev.radius && !fieldOwnsBoundary)
+        this.deps.spawnAoeRing(
+          ev.x,
+          ev.z,
+          ev.radius,
+          ev.school,
+          abilityHexColor(shamanFieldSpec.tint!),
+        );
+      fx.sequenceInstantAt(
+        ev.ability,
+        shamanFieldSpec,
+        casterId,
+        ev.x,
+        ev.z,
+        abilityHexColor(shamanFieldSpec.tint!),
+        tier,
+        0,
+        ev.ability === 'earthquake' && ev.thunderSpent === 5,
+      );
+      this.recordStat(ev.ability, true);
+      return true;
+    }
     if (ev.fx === 'tick') {
       // Zone-pulse re-hits ride the accent window, never the cast budget: a
       // 6s earthquake must not starve its caster's next cast.
@@ -1305,6 +1390,7 @@ export class AbilityVfx {
 
   onDamage(ev: AbilityVfxDamageEvent): boolean | void {
     if (!this.admitted()) return;
+    if (shamanDamage(this.shamanHost, ev)) return true;
     // The resource payment is already presented by selfCast. Claim only this
     // self cost so the renderer retains health text without a duplicate hit.
     if (
@@ -1653,7 +1739,7 @@ export class AbilityVfx {
     const spec = abilityVfxSpecFor(abilityId);
     if (!spec) return;
     const full = abilityVfxFullSpecFor(abilityId);
-    if (full?.physical) return;
+    if (full?.physical || full?.shaman) return;
     this.deps.vfx.buffSwirl(ev.targetId, planCast(spec, this.quality, 0).swirlColor);
   }
 
@@ -1674,9 +1760,13 @@ export class AbilityVfx {
     // The held state below is kept either way; only the draws wait.
     const gateHeld = renderEffects && !this.ready();
     const fx = this.deps.fx;
-    if (e.kind === 'player' && e.templateId === 'warrior' && !this.kitsRequested.has('warrior')) {
-      this.kitsRequested.add('warrior');
-      this.deps.requestClassKit?.('warrior');
+    if (
+      e.kind === 'player' &&
+      (e.templateId === 'warrior' || e.templateId === 'shaman') &&
+      !this.kitsRequested.has(e.templateId)
+    ) {
+      this.kitsRequested.add(e.templateId);
+      this.deps.requestClassKit?.(e.templateId);
     }
     if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) fx.cancelWarriorHammer?.(e.id);
     let held = this.heldSemantic.get(e.id);
@@ -1704,6 +1794,7 @@ export class AbilityVfx {
       this.latchHeldState(held, e);
       return;
     }
+    fx.holdShamanState?.(e, this.deps.localPlayerId?.());
     const attentionSource = warriorAttentionSource(e);
     if (attentionSource !== null && this.deps.isLivingWarrior?.(attentionSource))
       fx.holdWarriorAttention?.(
@@ -1741,7 +1832,7 @@ export class AbilityVfx {
         glowColor = rimColorOf(full, spec);
         // Preserve armour and skin detail throughout the cast. Physical
         // channels carry weapon motion, never an emissive whole-body wash.
-        glowStrength = full?.physical ? 0 : 1.2 * (full?.power ?? 1);
+        glowStrength = full?.physical || full?.shaman ? 0 : 1.2 * (full?.power ?? 1);
         // the local player is priority: guaranteed a windup slot even when
         // a crowded hub saturates the pool
         const windupStarted = fx.windup(
@@ -1855,6 +1946,9 @@ export class AbilityVfx {
       // maintenance passives (stances, spellbook traits): no read at all
       if (isPassiveAura(auraId)) continue;
       const full = abilityVfxFullSpecFor(auraId);
+      // The Shaman held painter owns enchantments and empowerment. Only Ward
+      // retains a separate charge read; Shadewolf has no orbiting particles.
+      if (full?.shaman && auraId !== 'lightning_shield') continue;
       if (
         aura.kind === 'dot' &&
         ABILITIES[aura.id]?.class === 'warrior' &&
@@ -1906,7 +2000,7 @@ export class AbilityVfx {
         full !== undefined &&
         (full.buff !== undefined || full.archetype === 'buff' || full.barrier === true)
       ) {
-        if (isTransformativeBuff(full)) {
+        if (!full.shaman && isTransformativeBuff(full)) {
           const strength =
             TRANSFORMATIVE_RIM_SCALE * (full.buff?.shellDur ? 2 : 1.3) * (full.power ?? 1);
           if (strength > glowStrength) {
@@ -1942,7 +2036,12 @@ export class AbilityVfx {
       }
       if (bands >= 3) continue;
       if (orbitTier < 0) orbitTier = this.biasFor(e.id, this.budget.peek(e.id, this.now()));
-      const bandO = wornDebuff ? full?.debuff?.o : (full?.debuff?.o ?? full?.buff?.o);
+      const bandO =
+        auraId === 'lightning_shield'
+          ? THUNDER_CHARGES[Math.max(0, Math.min(3, aura.charges ?? 3))]
+          : wornDebuff
+            ? full?.debuff?.o
+            : (full?.debuff?.o ?? full?.buff?.o);
       if (fx.orbit(e.id, style, abilityVfxColor(spec), bandO, orbitTier)) {
         if (auraWasHeld) {
           bands++;
@@ -1956,7 +2055,8 @@ export class AbilityVfx {
         // bless its victim with rising buff sparkles.
         const buffish =
           !wornDebuff && (full?.buff !== undefined || (full?.archetype ?? spec.a) === 'buff');
-        if (buffish) this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
+        if (buffish && !full?.shaman)
+          this.deps.vfx.buffSwirl(e.id, planCast(spec, this.quality, 0).swirlColor);
         this.spawned = buffish ? 2 : 1;
         this.recordStat(auraId, false);
         // A debuff band that starts while its ability's _root aura is ON the
@@ -2139,7 +2239,12 @@ export class AbilityVfx {
     )
       return;
     if (!d.hasGestureClip?.(sourceId, abilityId)) return;
-    if (ABILITIES[abilityId]?.class !== 'warrior') {
+    // Point fields can carry both a caster cue and a ground cue on the same
+    // tick. Either must start the motion alone, but together they own one cast.
+    if (
+      ABILITIES[abilityId]?.class !== 'warrior' &&
+      abilityVfxFullSpecFor(abilityId)?.shaman?.action !== 'field'
+    ) {
       d.triggerAttack(sourceId, abilityId);
       return;
     }

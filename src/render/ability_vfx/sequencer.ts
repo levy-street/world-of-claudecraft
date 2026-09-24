@@ -10,6 +10,7 @@ import {
   STUN_STAR_RATE,
   STUN_STAR_SIZE,
 } from '../ability_vfx_core';
+import type { ShamanParticleKind } from '../shaman_particle_core';
 import {
   physicalFollowThrough,
   physicalImpact,
@@ -17,6 +18,8 @@ import {
   physicalTravel,
 } from './physical_choreography';
 import type { BakedKind, FragmentKind } from './production_assets';
+import { shamanFollowThrough, shamanImpact, shamanRelease } from './shaman_choreography';
+import type { ShamanWaterFlow } from './shaman_water_material';
 import { SIGNATURE_CONTACT_TIME, type Substance } from './signature_core';
 import type { CrestKind } from './signature_shapes';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
@@ -62,6 +65,7 @@ export interface SequencerHost {
   /** Actual item classification: shields and empty hands are not weapons. */
   isWeaponHand?(id: number, hand: 0 | 1): boolean;
   handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
+  weaponPoint?(id: number, hand: 0 | 1, out: SeqPoint): boolean;
   weaponFace?(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean;
   prepareWeaponFace?(
     id: number,
@@ -117,6 +121,9 @@ export interface SequencerHost {
     dz: number,
     duration?: number,
     fractured?: boolean,
+    sizeScale?: number,
+    mineralDetail?: boolean,
+    thicknessScale?: number,
   ): void;
   residueAt?(x: number, z: number, radius: number, tint: number, substance: Substance): void;
   worldLightAt?(
@@ -197,7 +204,7 @@ export interface SequencerHost {
     colorHex: number,
     count: number,
     power: number,
-    kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood',
+    kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood' | ShamanParticleKind,
     duration?: number,
     delay?: number,
   ): void;
@@ -242,6 +249,8 @@ export interface SequencerHost {
     accent: number,
     width: number,
     duration?: number,
+    priority?: 0 | 1,
+    flow?: ShamanWaterFlow,
   ): void;
   tetherRibbon?(
     color: number,
@@ -352,6 +361,8 @@ interface Beat {
 }
 
 export interface SeqSlot {
+  shamanClimaxAt?: number;
+  shamanThunderSpend?: boolean;
   /** One admitted contact owns its local critical-hit feedback. */
   contactFeedback?: () => void;
   /** Ordered component outcomes: two bits per cut, 0 avoided, 1 wound, 2 absorbed. */
@@ -599,13 +610,14 @@ export class ArchetypeSequencer {
     slot.targetId = targetId;
     slot.spec = spec;
     slot.color = colorHex;
-    slot.accent = !owned
-      ? lighten(colorHex, 0.4)
-      : typeof spec.accent === 'number'
-        ? spec.accent
-        : spec.accent
-          ? abilityHexColor(spec.accent)
-          : lighten(colorHex, 0.4);
+    slot.accent =
+      !owned && !spec.shaman
+        ? lighten(colorHex, 0.4)
+        : typeof spec.accent === 'number'
+          ? spec.accent
+          : spec.accent
+            ? abilityHexColor(spec.accent)
+            : lighten(colorHex, 0.4);
     slot.tier = tier;
     slot.t = 0;
     slot.power = spec.power ?? 1;
@@ -613,6 +625,8 @@ export class ArchetypeSequencer {
     slot.releaseDone = windupDelay <= 0;
     slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + SIGNATURE_CONTACT_TIME;
     slot.impactDone = false;
+    slot.shamanClimaxAt = undefined;
+    slot.shamanThunderSpend = false;
     slot.flip2Done = true;
     slot.ring2Done = true;
     slot.ring3Done = true;
@@ -723,6 +737,7 @@ export class ArchetypeSequencer {
           continue;
         }
       }
+      if (slot.impactDone) shamanFollowThrough(host, slot);
       if (spec.physical) {
         if (slot.impactDone) {
           physicalFollowThrough(host, slot);
@@ -1024,6 +1039,7 @@ export class ArchetypeSequencer {
 
   // Release: the 100ms hot flash at the caster plus per-archetype openers.
   private release(host: SequencerHost, slot: SeqSlot): void {
+    if (shamanRelease(host, slot)) return;
     const spec = slot.spec;
     if (spec.physical) {
       physicalRelease(host, slot);
@@ -1116,6 +1132,7 @@ export class ArchetypeSequencer {
 
   // The full impact stack at (ix, iy, iz), honoring every spec impact flag.
   private impact(host: SequencerHost, slot: SeqSlot): void {
+    if (shamanImpact(host, slot)) return;
     const spec = slot.spec;
     if (spec.physical) {
       physicalImpact(host, slot);
@@ -2242,6 +2259,11 @@ export class ArchetypeSequencer {
     // seeded world point
     if (slot.targetId < 0) return { x: slot.ix, y: slot.iy, z: slot.iz };
     const spec = slot.spec;
+    // A confirmed Shaman recipient beat belongs only to that visible recipient.
+    // It can disappear during the authored strike delay; never redirect its hit,
+    // sound or feedback to the caster (nor replay it if the target returns).
+    if (spec.shaman && slot.physicalSecondary)
+      return host.anchorOf(slot.targetId, 0.4, transientAnchor);
     const selfCentered =
       spec.self === true ||
       spec.archetype === 'nova' ||

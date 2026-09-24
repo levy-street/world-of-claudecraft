@@ -156,6 +156,7 @@ function makeFakeTextures(): AbilityVfxTextures {
     rime: makeFakeTex(),
     crack: makeFakeTex(),
     leapFracture: makeFakeTex(),
+    shamanFracture: makeFakeTex(),
     char: makeFakeTex(),
     overlay: makeFakeTex(),
   };
@@ -282,5 +283,32 @@ it('discovers the Warrior stone program before any visible decal spawn and keeps
   expect(
     (scene.children[1] as THREE.Mesh<THREE.BufferGeometry, THREE.Material>).material.blending,
   ).toBe(THREE.AdditiveBlending);
+  decals.dispose();
+});
+
+it('Shaman fracture uses its exact map and prepared stone program, then returns the reused slot to an additive rune', () => {
+  const scene = new THREE.Scene();
+  const tex = makeFakeTextures();
+  const decals = new GroundDecals(scene, tex, groundY);
+  const prepared = abilityVfxCompileMaterials(scene);
+  const stone = prepared.find((material) => material.blending === THREE.NormalBlending);
+  decals.spawn(0, 0, 0, 8, 0xffffff, 'shaman_fracture', 6);
+  const slots = (
+    decals as unknown as {
+      slots: { map: THREE.Texture; dissolve: number; immediate: boolean; mesh: THREE.Mesh }[];
+    }
+  ).slots;
+  expect(slots[0].map).toBe(tex.shamanFracture);
+  expect(slots[0].immediate).toBe(true);
+  expect(slots[0].dissolve).toBe(0);
+  expect(slots[0].mesh.material).toBe(stone);
+  expect(new Set(abilityVfxCompileMaterials(scene))).toEqual(new Set(prepared));
+  expect(scene.children).toHaveLength(12);
+  for (let i = 0; i < 12; i++) decals.spawn(0, 0, 0, 2, 0xffffff, 'rune', 3);
+  expect(slots[0].map).toBe(tex.rune);
+  expect(slots[0].immediate).toBe(false);
+  expect(slots[0].dissolve).toBe(1);
+  expect((slots[0].mesh.material as THREE.Material).blending).toBe(THREE.AdditiveBlending);
+  expect(new Set(abilityVfxCompileMaterials(scene))).toEqual(new Set(prepared));
   decals.dispose();
 });

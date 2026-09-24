@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4064,
+    "files": 4108,
     "harvestedFiles": 3948,
     "carried": {
       "tests/active_kit_prewarm.test.ts": {
@@ -12,6 +12,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           69
+        ]
+      },
+      "tests/active_kit_shaman_prewarm.test.ts": {
+        "ms": 74,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          72,
+          78,
+          74
         ]
       },
       "tests/baked_pool_prewarm.test.ts": {
@@ -39,6 +50,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           12
+        ]
+      },
+      "tests/character_shaman_weapon_aura.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          5,
+          7,
+          6
         ]
       },
       "tests/crest_prewarm.test.ts": {
@@ -138,6 +160,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           1625
+        ]
+      },
+      "tests/held_conduction.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          8,
+          8,
+          9
         ]
       },
       "tests/hub_dummy_drill.test.ts": {
@@ -288,6 +321,17 @@
           35
         ]
       },
+      "tests/ribbon_source_anchor.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
       "tests/sanguine_weapon_hands.test.ts": {
         "ms": 13,
         "method": "local-median",
@@ -315,6 +359,391 @@
           16
         ]
       },
+      "tests/shaman_aura.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          7,
+          16,
+          12
+        ]
+      },
+      "tests/shaman_authored_motion.test.ts": {
+        "ms": 3519,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          3179,
+          3905,
+          3519
+        ]
+      },
+      "tests/shaman_cascade.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          12,
+          11,
+          11
+        ]
+      },
+      "tests/shaman_ceremonies.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          17,
+          17,
+          16
+        ]
+      },
+      "tests/shaman_contact_composition.test.ts": {
+        "ms": 437,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          414,
+          580,
+          437
+        ]
+      },
+      "tests/shaman_decal_reveal.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          14,
+          12,
+          12
+        ]
+      },
+      "tests/shaman_earth_impacts.test.ts": {
+        "ms": 19,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          19,
+          23,
+          18
+        ]
+      },
+      "tests/shaman_event_ownership.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          17,
+          17,
+          17
+        ]
+      },
+      "tests/shaman_field_presentation.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          21,
+          17,
+          16
+        ]
+      },
+      "tests/shaman_fields.test.ts": {
+        "ms": 1606,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          1606,
+          1611,
+          1413
+        ]
+      },
+      "tests/shaman_fire_impacts.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          6,
+          8,
+          6
+        ]
+      },
+      "tests/shaman_flipbook_shape.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          10,
+          9,
+          9
+        ]
+      },
+      "tests/shaman_followthrough.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          9,
+          8,
+          7
+        ]
+      },
+      "tests/shaman_fracture_art.test.ts": {
+        "ms": 2015,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          1798,
+          2484,
+          2015
+        ]
+      },
+      "tests/shaman_gale_art.test.ts": {
+        "ms": 1589,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          1417,
+          1877,
+          1589
+        ]
+      },
+      "tests/shaman_held.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          18,
+          20,
+          14
+        ]
+      },
+      "tests/shaman_held_integration.test.ts": {
+        "ms": 221,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          217,
+          272,
+          221
+        ]
+      },
+      "tests/shaman_impact_flash.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          10,
+          13,
+          10
+        ]
+      },
+      "tests/shaman_impact_sprites.test.ts": {
+        "ms": 403,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          403,
+          447,
+          355
+        ]
+      },
+      "tests/shaman_material_variant.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
+      "tests/shaman_origins.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/shaman_particle_core.test.ts": {
+        "ms": 146,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          144,
+          190,
+          146
+        ]
+      },
+      "tests/shaman_presentation_events.test.ts": {
+        "ms": 4525,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          4525,
+          4411,
+          4906
+        ]
+      },
+      "tests/shaman_proc_events.test.ts": {
+        "ms": 24,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          24,
+          25,
+          22
+        ]
+      },
+      "tests/shaman_release_loading.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          10,
+          9,
+          10
+        ]
+      },
+      "tests/shaman_restorative_events.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/shaman_sheet_colour.test.ts": {
+        "ms": 89,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          89,
+          98,
+          87
+        ]
+      },
+      "tests/shaman_skybranch_routing.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          10,
+          10,
+          10
+        ]
+      },
+      "tests/shaman_storm_impacts.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          19,
+          17,
+          15
+        ]
+      },
+      "tests/shaman_surface_scorch.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          8,
+          9,
+          8
+        ]
+      },
+      "tests/shaman_unleash_guard_visual.test.ts": {
+        "ms": 1317,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          1303,
+          1541,
+          1317
+        ]
+      },
+      "tests/shaman_vent.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          9,
+          8,
+          8
+        ]
+      },
+      "tests/shaman_water_impacts.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/shaman_weapon_enchantments.test.ts": {
+        "ms": 58,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          53,
+          59,
+          58
+        ]
+      },
+      "tests/shaman_wolf_asset.test.ts": {
+        "ms": 1106,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          1104,
+          1335,
+          1106
+        ]
+      },
       "tests/shield_contact_outcomes.test.ts": {
         "ms": 69,
         "method": "local-median",
@@ -322,6 +751,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           69
+        ]
+      },
+      "tests/solid_impact_fragments.test.ts": {
+        "ms": 26,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          26,
+          32,
+          26
         ]
       },
       "tests/steel_sweep.test.ts": {
@@ -333,6 +773,17 @@
           28
         ]
       },
+      "tests/stonebound_weapon_targets.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          9,
+          10,
+          9
+        ]
+      },
       "tests/surface_response.test.ts": {
         "ms": 5,
         "method": "local-median",
@@ -340,6 +791,17 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           5
+        ]
+      },
+      "tests/surface_response_preparation.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          9,
+          8,
+          8
         ]
       },
       "tests/twinstrike_choreography.test.ts": {
@@ -1070,6 +1532,28 @@
         "runs": [
           10
         ]
+      },
+      "tests/water_volumes.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          11,
+          11,
+          11
+        ]
+      },
+      "tests/weapon_surface_sampler.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "Shaman PR suites added after the latest full CI harvest",
+        "runs": [
+          16,
+          13,
+          13
+        ]
       }
     },
     "removed": {
@@ -1135,6 +1619,7 @@
   "tests/action_replacement.test.ts": 16,
   "tests/active_animation_timer.test.ts": 8,
   "tests/active_kit_prewarm.test.ts": 69,
+  "tests/active_kit_shaman_prewarm.test.ts": 74,
   "tests/adaptive_link_budget_core.test.ts": 18,
   "tests/admin.test.ts": 190,
   "tests/admin/account_flair.test.ts": 18,
@@ -1571,6 +2056,7 @@
   "tests/character_save_statement_pg_integration.test.ts": 16587,
   "tests/character_shadow_policy.test.ts": 6,
   "tests/character_shadow_proxy.test.ts": 581,
+  "tests/character_shaman_weapon_aura.test.ts": 6,
   "tests/character_sheet.test.ts": 43,
   "tests/character_skeleton_update.test.ts": 10,
   "tests/character_state_backcompat.test.ts": 3315,
@@ -2582,6 +3068,7 @@
   "tests/heap_sawtooth.test.ts": 9,
   "tests/heavy_self_arm_marks.test.ts": 13,
   "tests/heavy_self_arm_marks_online.test.ts": 3538,
+  "tests/held_conduction.test.ts": 8,
   "tests/held_prop_idle.test.ts": 16,
   "tests/held_weapon_models.test.ts": 36,
   "tests/helm_visibility.test.ts": 4556,
@@ -4005,6 +4492,7 @@
   "tests/reward_counters.test.ts": 2192,
   "tests/rewind.test.ts": 4890,
   "tests/ribbon_contact_admission.test.ts": 35,
+  "tests/ribbon_source_anchor.test.ts": 9,
   "tests/rickshaw_mount.test.ts": 20,
   "tests/rickshaw_mount_asset.test.ts": 97,
   "tests/ride_height.test.ts": 78,
@@ -4441,18 +4929,53 @@
   "tests/shadow_render_wiring.test.ts": 9,
   "tests/shadow_texel_snap_core.test.ts": 7,
   "tests/shadowform_heal_break.test.ts": 1915,
+  "tests/shaman_aura.test.ts": 12,
+  "tests/shaman_authored_motion.test.ts": 3519,
+  "tests/shaman_cascade.test.ts": 11,
+  "tests/shaman_ceremonies.test.ts": 17,
   "tests/shaman_class_spec_kits.test.ts": 2679,
+  "tests/shaman_contact_composition.test.ts": 437,
+  "tests/shaman_decal_reveal.test.ts": 12,
+  "tests/shaman_earth_impacts.test.ts": 19,
   "tests/shaman_elemental_trance.test.ts": 2163,
+  "tests/shaman_event_ownership.test.ts": 17,
+  "tests/shaman_field_presentation.test.ts": 17,
+  "tests/shaman_fields.test.ts": 1606,
+  "tests/shaman_fire_impacts.test.ts": 6,
+  "tests/shaman_flipbook_shape.test.ts": 9,
+  "tests/shaman_followthrough.test.ts": 8,
+  "tests/shaman_fracture_art.test.ts": 2015,
+  "tests/shaman_gale_art.test.ts": 1589,
+  "tests/shaman_held.test.ts": 18,
+  "tests/shaman_held_integration.test.ts": 221,
+  "tests/shaman_impact_flash.test.ts": 10,
+  "tests/shaman_impact_sprites.test.ts": 403,
   "tests/shaman_lifecycle.test.ts": 10759,
+  "tests/shaman_material_variant.test.ts": 5,
+  "tests/shaman_origins.test.ts": 8,
+  "tests/shaman_particle_core.test.ts": 146,
+  "tests/shaman_presentation_events.test.ts": 4525,
+  "tests/shaman_proc_events.test.ts": 24,
+  "tests/shaman_release_loading.test.ts": 10,
+  "tests/shaman_restorative_events.test.ts": 6,
+  "tests/shaman_sheet_colour.test.ts": 89,
+  "tests/shaman_skybranch_routing.test.ts": 10,
   "tests/shaman_spiritmend.test.ts": 20396,
   "tests/shaman_spiritmend_engine.test.ts": 2302,
   "tests/shaman_stonebound_benchmark.test.ts": 1514,
+  "tests/shaman_storm_impacts.test.ts": 17,
+  "tests/shaman_surface_scorch.test.ts": 8,
   "tests/shaman_talents_v029.test.ts": 5881,
   "tests/shaman_thundercall.test.ts": 23029,
   "tests/shaman_thundercall_engine.test.ts": 2985,
+  "tests/shaman_unleash_guard_visual.test.ts": 1317,
   "tests/shaman_unleash_weapon.test.ts": 11170,
+  "tests/shaman_vent.test.ts": 8,
   "tests/shaman_warspirit.test.ts": 13971,
   "tests/shaman_warspirit_engine.test.ts": 1754,
+  "tests/shaman_water_impacts.test.ts": 8,
+  "tests/shaman_weapon_enchantments.test.ts": 58,
+  "tests/shaman_wolf_asset.test.ts": 1106,
   "tests/shapeshift_form_compile_gate.test.ts": 17,
   "tests/shapeshift_resource_persist.test.ts": 2607,
   "tests/sheathe_toggle.test.ts": 5,
@@ -4509,6 +5032,7 @@
   "tests/social_window.test.ts": 23,
   "tests/software_render_notice.test.ts": 9,
   "tests/software_renderer.test.ts": 11,
+  "tests/solid_impact_fragments.test.ts": 26,
   "tests/soul_rend_overlay.test.ts": 8,
   "tests/soul_rend_prewarm_core.test.ts": 8,
   "tests/soulwell.test.ts": 4539,
@@ -4562,6 +5086,7 @@
   "tests/steel_sweep.test.ts": 28,
   "tests/steep_ground_freeze.test.ts": 2005,
   "tests/step_smooth_core.test.ts": 16,
+  "tests/stonebound_weapon_targets.test.ts": 9,
   "tests/storage_charters.test.ts": 6236,
   "tests/storage_grant_monotonic.test.ts": 8,
   "tests/storage_price_guard.test.ts": 1404,
@@ -4596,6 +5121,7 @@
   "tests/summoned_add_respawn.test.ts": 2675,
   "tests/surface_detail_fade.test.ts": 5,
   "tests/surface_response.test.ts": 5,
+  "tests/surface_response_preparation.test.ts": 8,
   "tests/surface_texture_ktx2.test.ts": 79,
   "tests/suspicion_flag_list.test.ts": 12,
   "tests/suspicion_flag_workflow.test.ts": 7,
@@ -5038,6 +5564,7 @@
   "tests/water_swell_gate.test.ts": 5,
   "tests/water_terrain_awareness.test.ts": 2389,
   "tests/water_tile_cull.test.ts": 34,
+  "tests/water_volumes.test.ts": 11,
   "tests/water_wave_field.test.ts": 23,
   "tests/weakening_hex.test.ts": 2755,
   "tests/weapon_icons.test.ts": 492,
@@ -5047,6 +5574,7 @@
   "tests/weapon_skin_sim.test.ts": 3089,
   "tests/weapon_skins.test.ts": 539,
   "tests/weapon_stow.test.ts": 2888,
+  "tests/weapon_surface_sampler.test.ts": 13,
   "tests/weapon_type_label.test.ts": 8,
   "tests/weapon_type_tooltip.test.ts": 22,
   "tests/weapon_vfx_apply_queue_core.test.ts": 17,

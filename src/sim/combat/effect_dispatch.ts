@@ -916,7 +916,18 @@ export function runEffects(
           triggerWardCycle(ctx, p);
         }
         if (ability.id === 'earth_shock') {
-          consumeThunderVent(ctx, p, ability.id, target, finalDamage);
+          const thunderSpent = consumeThunderVent(ctx, p, ability.id, target, finalDamage);
+          if (thunderSpent === 5) {
+            ctx.emit({
+              type: 'spellfx',
+              sourceId: p.id,
+              targetId: target.id,
+              school: ability.school,
+              fx: 'procSurge',
+              ability: ability.id,
+              level: thunderSpent,
+            });
+          }
           applyStoneboundJolt(ctx, p, target);
         }
         if (ability.id === 'solar_invocation') {
@@ -1502,6 +1513,7 @@ export function runEffects(
             school: ability.school,
             fx: 'chainHeal',
             ability: ability.id,
+            level: i,
           });
           const hopAmount = Math.max(1, Math.round(baseAmount * eff.falloff ** i));
           if (ctx.applyHeal(p, chain[i], hopAmount, ability.name, ability.id) > 0) {
@@ -2726,6 +2738,8 @@ export function runEffects(
                   count: hitList.length + 1,
                 }
               : {}),
+            // Distinguish resolved Shaman hops from the untagged launch cue.
+            ...(ability.id === 'chain_lightning' ? { level: i, count: hitList.length } : {}),
           });
           let dmg = baseAmount * eff.falloff ** i;
           if (isSpell) dmg *= spellDamageMultFromAuras(p);
@@ -2929,7 +2943,7 @@ export function runEffects(
             ability: ability.id,
           });
         }
-        if (p.castAim && !isRainOfFire) {
+        if (p.castAim && !isRainOfFire && ability.id !== 'earthquake') {
           ctx.emit({
             type: 'spellfxAt',
             x: zoneCenter.x,
@@ -2940,7 +2954,7 @@ export function runEffects(
             radius: eff.radius,
             ability: ability.id,
           });
-        } else {
+        } else if (ability.id !== 'earthquake') {
           ctx.emit({
             type: 'spellfx',
             sourceId: p.id,
@@ -2973,7 +2987,23 @@ export function runEffects(
             spBonus: (groundEffect.spBonus ?? 0) * 0.4,
           });
         }
-        consumeThunderVent(ctx, p, ability.id);
+        const thunderSpent = consumeThunderVent(ctx, p, ability.id);
+        if (ability.id === 'earthquake') {
+          // Keep gameplay resolution/consumption ordered above. Publish this one
+          // point cue afterward so its bank is the actual spend, not the refill.
+          ctx.emit({
+            type: 'spellfxAt',
+            x: zoneCenter.x,
+            z: zoneCenter.z,
+            sourceId: p.id,
+            school: ability.school,
+            fx: 'nova',
+            ability: ability.id,
+            radius: eff.radius,
+            duration: eff.duration,
+            ...(thunderSpent > 0 ? { thunderSpent } : {}),
+          });
+        }
         break;
       }
       case 'aoeAttackSpeed': {

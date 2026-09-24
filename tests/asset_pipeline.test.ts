@@ -1253,8 +1253,10 @@ describe('asset library registry parsers', () => {
     const map = library.parseVisualUrls(src);
     expect(map.get('models/chars/players/knight.glb')).toContain('player_warrior');
     expect(map.get('models/creatures/wolf_basic.glb')).toEqual(
-      expect.arrayContaining(['form_ghost_wolf', 'mob_wolf']),
+      expect.arrayContaining(['mob_wolf']),
     );
+    expect(map.get('models/creatures/wolf_basic.glb')).not.toContain('form_ghost_wolf');
+    expect(map.get('models/creatures/shaman_spirit_wolf.glb')).toEqual(['form_ghost_wolf']);
     expect(map.get('models/creatures/druid_cat_form.glb')).toEqual(['form_cat']);
     // Attach urls are attributed too (the knight's default sword).
     expect(map.get('models/weapons/sword_1handed.glb')).toContain('player_warrior');

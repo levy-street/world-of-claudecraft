@@ -16,6 +16,7 @@ function fakeTextures(): AbilityVfxTextures {
     rime: texture(),
     crack: texture(),
     leapFracture: texture(),
+    shamanFracture: texture(),
     char: texture(),
     overlay: texture(),
   };
@@ -83,6 +84,7 @@ function liveWindupHarness() {
     furyStates: { draw: vi.fn() },
     baked: noopUpdate,
     fragments: noopUpdate,
+    water: noopUpdate,
     spiritHammers: { beginFrame: vi.fn(), endFrame: vi.fn() },
     ribbons: { update: vi.fn(), drawHeads: vi.fn() },
     rings: noopUpdate,

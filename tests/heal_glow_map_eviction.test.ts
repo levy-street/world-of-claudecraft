@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { AbilityVfxFx } from '../src/render/ability_vfx';
+import { AbilityVfx, AbilityVfxFx } from '../src/render/ability_vfx';
+import type { AbilityVfxDeps } from '../src/render/ability_vfx/painter';
 import { Renderer } from '../src/render/renderer';
 import type { Entity, SimEvent } from '../src/sim/types';
 
@@ -28,6 +29,7 @@ interface LifecycleView {
 interface LifecycleHarness {
   sim: { entities: Map<number, Entity> };
   abilityVfxFx: Pick<AbilityVfxFx, 'warriorRecovery'>;
+  abilityVfx: AbilityVfx;
   views: Map<number, LifecycleView>;
   healGlowAt: Map<number, number>;
   scene: { remove(object: THREE.Object3D): void };
@@ -70,6 +72,11 @@ function harness(views: Map<number, LifecycleView>, healGlowAt: Map<number, numb
   // fallthrough path; its unrelated GPU pools are never needed by this event.
   renderer.sim = { entities: new Map() };
   renderer.abilityVfxFx = Object.assign(Object.create(AbilityVfxFx.prototype), { disposed: false });
+  // Keep the real Shaman discriminator too: a Druid heal must still fall
+  // through to the generic glow and its existing eviction/throttle contract.
+  renderer.abilityVfx = new AbilityVfx({
+    fx: { setDelegates: vi.fn() },
+  } as unknown as AbilityVfxDeps);
   renderer.views = views;
   renderer.healGlowAt = healGlowAt;
   renderer.scene = { remove: vi.fn() };

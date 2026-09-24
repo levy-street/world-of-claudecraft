@@ -16,6 +16,11 @@ function maskFor(auras: ReadonlyArray<{ kind: string; id?: string }>): number {
 }
 
 describe('character form visual selection', () => {
+  it('prepares an aura-free Shaman as a wolf before the retained shared slot is used', () => {
+    expect(characterFormAssetKey('form_cat', [], 'shaman')).toBe('form_ghost_wolf');
+    expect(characterFormAssetKey('form_cat', [], 'druid')).toBe('form_cat');
+    expect(characterFormAssetKey('form_sheep', [], 'shaman')).toBe('form_sheep');
+  });
   it('keeps the shaman wolf asset independent of the druid cat in the shared form slot', () => {
     expect(characterFormAssetKey('form_cat', [{ kind: 'form_cat' }])).toBe('form_cat');
     expect(characterFormAssetKey('form_cat', [{ kind: 'buff_speed', id: 'ghost_wolf' }])).toBe(

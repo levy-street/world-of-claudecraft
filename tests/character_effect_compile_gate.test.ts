@@ -154,6 +154,40 @@ async function makeVisual(): Promise<CharacterVisual> {
 }
 
 describe('a transparent character effect swaps in only once its programs are linked', () => {
+  it('re-prepares contact materials after a live body-color replacement', async () => {
+    const visual = await makeVisual();
+    const calls: { target: THREE.Object3D; settle: (ready?: () => boolean) => void }[] = [];
+    visual.setFarBakeGate((target, settle) => calls.push({ target, settle }));
+    visual.stageSurfaceResponsePreparation()?.settle(true);
+    visual.setEntityColor(0x763d28);
+    expect(calls.length).toBeGreaterThan(0);
+    for (let i = 0; i < calls.length; i++) calls[i].settle(() => true);
+    visual.update(0, anim(), true);
+    for (let i = 0; i < calls.length; i++) calls[i].settle(() => true);
+    calls.length = 0;
+    visual.respondToElement('shaman-storm', 0.8);
+    expect(calls).toHaveLength(0);
+    expect(rigMaterials(visual).every((m) => m.userData.wocSurfaceResponseProgram)).toBe(true);
+    visual.dispose();
+  });
+
+  it('mounts the first lightning scorch immediately after its normal view preparation settles', async () => {
+    const visual = await makeVisual();
+    const gate = vi.fn();
+    visual.setFarBakeGate(gate);
+    const original = rigMaterials(visual);
+    const prep = visual.stageSurfaceResponsePreparation();
+    expect(prep).not.toBeNull();
+    expect(rigMaterials(visual)).toEqual(original);
+    prep?.settle(true);
+    visual.respondToElement('shaman-storm', 0.8);
+    expect(gate).not.toHaveBeenCalled();
+    expect(rigMaterials(visual).every((m) => m.userData.wocSurfaceResponseProgram)).toBe(true);
+    visual.update(0.71, anim(), true);
+    expect(rigMaterials(visual)).toEqual(original);
+    visual.dispose();
+  });
+
   it('keeps the body drawing, compiles the clones hidden, and commits in update()', async () => {
     const visual = await makeVisual();
     const gateCalls: GateCall[] = [];

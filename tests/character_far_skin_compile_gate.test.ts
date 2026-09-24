@@ -12,6 +12,7 @@
 // GLTF/texture loader (the harness of tests/character_far_mesh_skin.test.ts).
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import type { FarBakeGate } from '../src/render/characters/visual';
 
 const VISUAL_KEY = 'player_paladin';
 
@@ -79,6 +80,7 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     await charactersReady();
     const released = vi.spyOn(assets, 'releaseTintedMaterials');
     const { CharacterVisual } = await import('../src/render/characters/visual');
+    const { SURFACE_RESPONSE_PROGRAM } = await import('../src/render/characters/surface_response');
     const { SKINS } = await import('../src/render/characters/manifest');
     const altSkinUrl = SKINS[VISUAL_KEY]?.[1];
     expect(altSkinUrl).toBeTruthy();
@@ -103,7 +105,23 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
       expect(farMapName(farMesh)).not.toBe(altSkinUrl);
     });
 
-    const gateCalls: { target: THREE.Object3D; settle: () => void }[] = [];
+    const gateCalls: { target: THREE.Object3D; settle: Parameters<FarBakeGate>[1] }[] = [];
+    const farScratchCalls = () =>
+      gateCalls.filter((call) => call.target.name === 'character_far_skin_scratch');
+    const surfaceCalls = () =>
+      gateCalls.filter((call) => call.target.name === 'character_surface_prepare');
+    const effectCalls = () =>
+      gateCalls.filter((call) => call.target.name === 'character_effect_compile_scratch');
+    const expectSurface = (target: THREE.Object3D) => {
+      expect(target.visible).toBe(false);
+      expect(target.parent).not.toBeNull();
+      expect(visual.root.getObjectById(target.id)).toBe(target);
+      expect(target.children.length).toBeGreaterThan(0);
+      for (const twin of target.children as THREE.Mesh[]) {
+        expect(twin.visible).toBe(false);
+        expect((twin.material as THREE.Material).userData[SURFACE_RESPONSE_PROGRAM]).toBe(true);
+      }
+    };
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     // A fixed rig bakes its far mesh in the constructor, where the view's own
     // creation gate covers it: installing the gate afterwards gates nothing
@@ -126,8 +144,15 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     expect(farMesh.visible).toBe(true);
     // ...while the new set links on a hidden scratch under the far wrap, with
     // the far mesh's geometry and flags (the same program key)
-    expect(gateCalls).toHaveLength(1);
-    const scratch = gateCalls[0].target as THREE.Mesh;
+    expect(farScratchCalls()).toHaveLength(1);
+    expect(surfaceCalls()).toHaveLength(1);
+    expect(gateCalls.map(({ target }) => target.name)).toEqual([
+      'character_far_skin_scratch',
+      'character_surface_prepare',
+    ]);
+    const initialSurface = surfaceCalls()[0];
+    expectSurface(initialSurface.target);
+    const scratch = farScratchCalls()[0].target as THREE.Mesh;
     expect(scratch.name).toBe('character_far_skin_scratch');
     expect(scratch.parent).toBe(farWrap);
     expect(scratch.visible).toBe(false);
@@ -140,12 +165,26 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     // set that is still drawing keeps its lease until the swap.
     expect(released).toHaveBeenCalledTimes(1);
 
-    gateCalls[0].settle();
+    farScratchCalls()[0].settle();
 
     // Swapped in, scratch gone, the previous far set's lease released (once).
     expect(farMapName(farMesh)).toBe(altSkinUrl);
     expect(scratch.parent).toBeNull();
     expect(farWrap.getObjectByName('character_far_skin_scratch')).toBeUndefined();
+    expect(released).toHaveBeenCalledTimes(2);
+    // The committed far material needs its own contact variant. Its ticket
+    // supersedes the near-rig preparation, whose late settle must do nothing.
+    expect(surfaceCalls()).toHaveLength(2);
+    const committedSurface = surfaceCalls()[1];
+    expect(initialSurface.target.parent).toBeNull();
+    expectSurface(committedSurface.target);
+    initialSurface.settle(() => true);
+    expectSurface(committedSurface.target);
+    expect(farMapName(farMesh)).toBe(altSkinUrl);
+    expect(released).toHaveBeenCalledTimes(2);
+    committedSurface.settle(() => true);
+    expect(committedSurface.target.parent).toBeNull();
+    expect(farMapName(farMesh)).toBe(altSkinUrl);
     expect(released).toHaveBeenCalledTimes(2);
 
     // A newer skin before settle supersedes the one in flight: the superseded
@@ -154,18 +193,38 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     released.mockClear();
     visual.setSkin(0);
     expect(released).toHaveBeenCalledTimes(1); // rig sweep only
+    expect(surfaceCalls()).toHaveLength(3);
+    const supersededSurface = surfaceCalls()[2];
+    expectSurface(supersededSurface.target);
     visual.setSkin(1);
-    expect(gateCalls).toHaveLength(3);
-    const superseded = gateCalls[1].target;
+    expect(farScratchCalls()).toHaveLength(3);
+    expect(surfaceCalls()).toHaveLength(4);
+    const latestSurface = surfaceCalls()[3];
+    expect(supersededSurface.target.parent).toBeNull();
+    expectSurface(latestSurface.target);
+    const superseded = farScratchCalls()[1].target;
     expect(superseded.parent).toBeNull();
     expect(released).toHaveBeenCalledTimes(3); // rig sweep + the superseded far set
-    gateCalls[1].settle();
+    farScratchCalls()[1].settle();
+    supersededSurface.settle(() => true);
+    expectSurface(latestSurface.target);
+    expect(surfaceCalls()).toHaveLength(4);
     expect(farMapName(farMesh)).toBe(altSkinUrl);
     expect(released).toHaveBeenCalledTimes(3); // the stale settle released nothing
-    gateCalls[2].settle();
+    farScratchCalls()[2].settle();
     expect(farMapName(farMesh)).toBe(altSkinUrl);
     expect(farWrap.getObjectByName('character_far_skin_scratch')).toBeUndefined();
     expect(released).toHaveBeenCalledTimes(4); // the set it replaced
+    expect(surfaceCalls()).toHaveLength(5);
+    expect(latestSurface.target.parent).toBeNull();
+    const finalSurface = surfaceCalls()[4];
+    expectSurface(finalSurface.target);
+    latestSurface.settle(() => true);
+    expectSurface(finalSurface.target);
+    finalSurface.settle(() => true);
+    expect(finalSurface.target.parent).toBeNull();
+    expect(farMapName(farMesh)).toBe(altSkinUrl);
+    expect(released).toHaveBeenCalledTimes(4);
 
     // The far mesh draws effectMaterial(farMaterials): with a ghost on, the
     // gated scratch must wear the overlay clones (a clone is another program
@@ -173,10 +232,9 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     // injected gate (the character-effect swap, tests/
     // character_effect_compile_gate.test.ts), so the far scratch is picked by
     // name rather than by call index.
-    const farScratchCalls = () =>
-      gateCalls.filter((call) => call.target.name === 'character_far_skin_scratch');
     visual.setGhost(true);
-    expect(gateCalls[3].target.name).toBe('character_effect_compile_scratch');
+    expect(effectCalls()).toHaveLength(1);
+    expect(effectCalls()[0].target.name).toBe('character_effect_compile_scratch');
     visual.setSkin(0);
     const ghostedCall = farScratchCalls()[farScratchCalls().length - 1];
     const ghostMats = (ghostedCall.target as THREE.Mesh).material as THREE.MeshStandardMaterial[];
@@ -200,20 +258,27 @@ describe('a far re-skin swaps in only once its programs are linked', () => {
     // detaches its scratch.
     visual.setFarBakeGate((target, onSettled) => gateCalls.push({ target, settle: onSettled }));
     visual.setSkin(0);
-    const inFlightCall = gateCalls[gateCalls.length - 1];
+    const inFlightCall = farScratchCalls()[farScratchCalls().length - 1];
+    const inFlightSurface = surfaceCalls()[surfaceCalls().length - 1];
     const inFlight = inFlightCall.target;
     expect(inFlight.name).toBe('character_far_skin_scratch');
     expect(inFlight.parent).toBe(farWrap);
+    expectSurface(inFlightSurface.target);
     released.mockClear();
     visual.dispose();
     expect(inFlight.parent).toBeNull();
+    expect(inFlightSurface.target.parent).toBeNull();
     // dispose releases the rig lease, the far set's lease AND the pending
     // set's lease (three distinct sets), and the late settle releases nothing
     expect(released).toHaveBeenCalledTimes(3);
     const releasedSets = released.mock.calls.map((call) => call[0]);
     expect(new Set(releasedSets).size).toBe(3);
     inFlightCall.settle();
+    inFlightSurface.settle(() => true);
     expect(released).toHaveBeenCalledTimes(3);
+    expect(gateCalls.length).toBe(
+      farScratchCalls().length + surfaceCalls().length + effectCalls().length,
+    );
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();
   });

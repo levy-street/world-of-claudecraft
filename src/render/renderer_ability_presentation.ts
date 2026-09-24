@@ -6,11 +6,13 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import { shamanLightningSurface } from './characters/shaman_surface_scorch';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { shamanVisualVariant } from './shaman_vfx_specs';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
 import { sampleWarriorPowerBone } from './warrior_power_anchor';
@@ -79,6 +81,7 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
       return !!itemId && ITEMS[itemId]?.kind === 'weapon';
     },
   );
+  fx.setPresentationClock(h.time);
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
@@ -101,6 +104,12 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
       castingAbilityOf: (id) => h.world().entities.get(id)?.castingAbility ?? null,
       isMidOneShot: (id) => !!visual(id)?.isMidOneShot,
       localPlayerId: () => h.world().player.id,
+      visualVariantOf: (ability, id) =>
+        shamanVisualVariant(
+          ability,
+          h.world().entities.get(id)?.auras ?? [],
+          id === h.world().playerId ? h.world().talentSpec : null,
+        ),
       warriorSpecOf: (id) => (id === h.world().playerId ? h.world().talentSpec : null),
       isLivingWarrior: (id) => isLivingWarriorAttentionSource(h.world().entities.get(id)),
       isWarrior: (id) => {
@@ -110,6 +119,10 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
       // A remote Warrior's kit (textures, contact sheets, crests) loads the first
       // time the painter sees one; a local Warrior's is resumed by the renderer.
       requestClassKit: (cls) => resumeActiveAbilityKit(h.scene, undefined, cls),
+      isShaman: (id) => {
+        const entity = h.world().entities.get(id);
+        return entity?.kind === 'player' && entity.templateId === 'shaman';
+      },
       hasGestureClip: (id, abilityId) => visual(id)?.hasAttackClipOverride(abilityId) ?? false,
       isInstantAbility: (id) => {
         const def = ABILITIES[id];
@@ -125,10 +138,14 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   );
   fx.onContact = (source, target, school, weight, abilityId, beat) => {
     const entity = h.world().entities.get(source);
-    if (entity?.kind !== 'player' || entity.templateId !== 'warrior') return;
+    if (
+      entity?.kind !== 'player' ||
+      (entity.templateId !== 'warrior' && entity.templateId !== 'shaman')
+    )
+      return;
     impactContact(
       visual(target),
-      school,
+      entity.templateId === 'shaman' && shamanLightningSurface(abilityId) ? 'shaman-storm' : school,
       weight,
       beat !== 0 && source === h.world().playerId,
       h.reducedMotion(),
