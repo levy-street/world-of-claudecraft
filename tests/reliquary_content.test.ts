@@ -34,7 +34,13 @@ import {
   GATHERING_PROFESSIONS,
   HARVEST_COMPONENT_SPECIMENS,
 } from '../src/sim/content/professions';
-import { FURY_NPC_ID, FURY_STOCK, WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import {
+  FURY_NPC_ID,
+  FURY_STOCK,
+  HONOR_VENDOR_STOCK,
+  WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
+} from '../src/sim/content/pvp_honor';
 import {
   isCataloguedRelicItem,
   isCataloguedRelicMark,
@@ -462,7 +468,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Champion titles (Riftwarden, Dawnkeeper, Forgemaster) join it: 444. The
     // Clue Scroll Treasure Hunter title joins it: 445.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
-    expect(full).toEqual({ owned: 446, total: 446 });
+    // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
+    expect(full).toEqual({ owned: 463, total: 463 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -492,8 +499,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // deltas, see the overview pair's note above.
     // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
     // 415 with the three faction standing Champion title slots. 416 with the
-    // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
-    expect(character).toEqual({ owned: 417, total: 417 });
+    // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
+    expect(character).toEqual({ owned: 434, total: 434 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -549,7 +556,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(489);
+      // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
+    ).toBe(511);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -711,8 +719,9 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // (47 stock ids on both NPCS rows) and nothing rides it that could also
     // be bought for copper (a dual-priced row would fall back into the sweep
     // above by construction; this pins the classifier's copper half live).
-    expect(honorExempt).toBe(FURY_STOCK.length * 2);
-    expect(FURY_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
+    // The two honor trinkets ride the same exemption on both counters.
+    expect(honorExempt).toBe(HONOR_VENDOR_STOCK.length * 2);
+    expect(HONOR_VENDOR_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
     expect(honorOnly(priceOf('deacon_reliquary_helm'))).toBe(false);
     // The DUAL-PRICED arm, which the live catalog exhibits nowhere today: an
     // item purchasable with BOTH honor and copper is not exempt, because the
@@ -778,7 +787,10 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
     // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
     // completion pair note above.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(333);
+    // Plus the twelve trinkets (content/trinkets.ts), one page each: 345.
+    // Plus the five Crucible raid trinkets (each on its boss's Normal and
+    // Heroic page, one id each): 350.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(350);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1136,7 +1148,8 @@ describe('Reliquary Rift page pins against live rift content', () => {
       ...RIFT_EPIC_ITEM_IDS,
       ...RIFT_LEGENDARY_ITEM_IDS,
     ]);
-    expect(page.relics.length).toBe(17);
+    // 17 plus the two rift trinkets (sundered_prism, gamblers_die): 19.
+    expect(page.relics.length).toBe(19);
     // Band absence stated directly, so a re-added band reds on the claim it
     // breaks rather than only on the ordered equality above. The floor keeps
     // the loop from running zero times on an emptied source array (the
@@ -1436,17 +1449,19 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // ashstalker, cinderweave, thornhide, helmet to feet within each), NOT
     // the shop window's armor-class re-sort (WARFARE_SHOP_SET_ORDER stays a
     // display concern).
+    // The two honor trinkets (WARFARE_TRINKET_STOCK) close the armory: they
+    // are set-less honor purchases from the same counters, outside FURY_STOCK.
     const setTagged = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
     const setless = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
     expect(itemRelicIds(gallery)).toEqual(setTagged);
-    expect(itemRelicIds(armory)).toEqual(setless);
+    expect(itemRelicIds(armory)).toEqual([...setless, ...WARFARE_TRINKET_STOCK]);
     expect([...itemRelicIds(gallery), ...itemRelicIds(armory)].sort()).toEqual(
-      [...FURY_STOCK].sort(),
+      [...HONOR_VENDOR_STOCK].sort(),
     );
     // Snug vacuity floors (a defs edit that dropped the set tags would
     // otherwise drain the gallery into the armory with the union still green).
     expect(itemRelicIds(gallery).length).toBe(35);
-    expect(itemRelicIds(armory).length).toBe(12);
+    expect(itemRelicIds(armory).length).toBe(14);
     // The kit half really is the five Warfare families at seven pieces each,
     // pinned against the item_sets.ts set ids (the partition's other axis).
     const byKit = new Map<string, number>();
@@ -1491,8 +1506,8 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     expect(FURY_NPC_ID).toBe('fury');
     for (const npcId of ['fury', 'warmarshal_draven_kole']) {
       const stock = new Set(NPCS[npcId]?.vendorItems ?? []);
-      expect(stock.size, npcId).toBe(FURY_STOCK.length);
-      for (const id of FURY_STOCK) expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
+      expect(stock.size, npcId).toBe(HONOR_VENDOR_STOCK.length);
+      for (const id of HONOR_VENDOR_STOCK) expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
     }
     for (const page of [gallery, armory]) {
       for (const relic of page.relics) {
@@ -1769,8 +1784,9 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
-  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 17 },
-  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 15 },
+  // The floors count the raid trinkets (three on Ignivar, two on Varkhul).
+  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 20 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 18 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
@@ -4494,16 +4510,26 @@ describe('Reliquary source hint coverage', () => {
     // ids (essence + the three gems) stay outside the catalog. Equality in
     // both directions: a new RIFT_ITEMS id cannot quietly join a page, nor
     // sit unwatched, without a decision landing here.
+    // The two rift trinkets ride RIFT_EPIC_ITEM_IDS but their defs live in
+    // TRINKET_ITEMS (content/trinkets.ts), not RIFT_ITEMS: they are pinned
+    // catalogued directly below instead.
     const riftItemIds = Object.keys(RIFT_ITEMS);
     expect(riftItemIds.length).toBeGreaterThanOrEqual(23);
     const cataloguedRift = riftItemIds.filter((id) => watchedAwardIds.has(id)).sort();
+    const RIFT_TRINKETS = ['sundered_prism', 'gamblers_die'];
+    expect((RIFT_EPIC_ITEM_IDS as readonly string[]).filter((id) => !(id in RIFT_ITEMS))).toEqual(
+      RIFT_TRINKETS,
+    );
+    for (const id of RIFT_TRINKETS) expect(watchedAwardIds.has(id), id).toBe(true);
     expect(cataloguedRift).toEqual(
       [
         ...RIFT_RARE_ITEM_IDS,
         ...RIFT_GEAR_ITEM_IDS,
         ...RIFT_EPIC_ITEM_IDS,
         ...RIFT_LEGENDARY_ITEM_IDS,
-      ].sort(),
+      ]
+        .filter((id) => !RIFT_TRINKETS.includes(id))
+        .sort(),
     );
   });
 

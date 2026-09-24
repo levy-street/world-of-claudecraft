@@ -185,7 +185,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '英雄：最后泉源熔炉',
-    desc: '伊格尼瓦，末焰使者身上仅限英雄难度掉落的武器。',
+    desc: '伊格尼瓦，末焰使者身上仅限英雄难度掉落的武器，以及团队副本饰品。',
   },
   conquerors_varkhul: {
     name: '内环熔炉',
@@ -193,7 +193,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '英雄：内环熔炉',
-    desc: '末焰锻父瓦尔库尔身上仅限英雄难度掉落的盾牌与武器。',
+    desc: '末焰锻父瓦尔库尔身上仅限英雄难度掉落的盾牌与武器，以及团队副本饰品。',
   },
   professions_forgebreaker: {
     name: '碎炉者',

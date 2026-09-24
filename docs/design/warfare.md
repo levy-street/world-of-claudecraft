@@ -41,6 +41,16 @@ top-up that rewards completion, not the main event. The 18.2 percent base is a
 rise over the 16.8 the tier shipped with, so no partial kit is a per-piece
 regression while a player is mid-grind.
 
+The two honor trinkets sold beside the kit (`WARFARE_TRINKET_STOCK` in
+`src/sim/content/pvp_honor.ts`, 800 honor each, defs in
+`src/sim/content/trinkets.ts`) carry Warfare on the jewelry rule: one attribute
+at `WARFARE_JEWELRY_STAT_FRACTION` of the item-level-31 trinket line (10 of 13,
+with no stamina top-up because the trinket slot is outside the stamina model)
+and Offense and Defense Rating at the full line (13 each). They sit outside the
+eleven-slot kit and carry no set tag, so the table above is unchanged: both
+trinkets on top of the complete kit read 208 / 208 (20.8 percent) before any set
+bonus, and the kit plus the seven-piece set stays clamped at the 30 percent cap.
+
 Read the 2- and 4-piece rows as progress rather than as builds. Armor is ranked,
 so a class equips its own weight and anything below it: cloth wearers have
 exactly one usable family, leather wearers would never drop to cloth and lose
@@ -69,7 +79,7 @@ number:
 | Constant | Value | Applies to |
 | --- | ---: | --- |
 | `WARFARE_STAT_FRACTION` | 0.90 | primary stats on armor and weapons |
-| `WARFARE_JEWELRY_STAT_FRACTION` | 0.75 | primary stats on neck and rings |
+| `WARFARE_JEWELRY_STAT_FRACTION` | 0.75 | primary stats on neck, rings and the honor trinkets |
 | `WARFARE_RATING_FRACTION` | 1.00 | Warfare Offense and Defense Rating, every slot |
 
 Armor mitigation and weapon damage are the slot's inherent baseline rather than
@@ -432,7 +442,8 @@ matchmaking property, not a pricing one, and the response is not a price change.
 
 The current equipment model has main hand, offhand, helmet, neck, shoulder,
 chest, waist, legs, gloves, feet, and two ring positions (`EquipSlot` in
-`src/sim/types.ts`). It does not yet have cloak, wrist, trinket, or ranged
+`src/sim/types.ts`), plus the trinket positions, where the honor counters sell
+the two honor trinkets above. It does not yet have cloak, wrist, or ranged
 equipment positions. FURY sells nothing for the offhand; the PvE tables do fill
 it, with shields, held offhands, quivers, and their heroic variants.
 

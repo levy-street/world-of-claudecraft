@@ -872,7 +872,8 @@ export type EquipSlot =
   | 'gloves'
   | 'feet'
   | 'ring1'
-  | 'ring2';
+  | 'ring2'
+  | 'trinket';
 
 // Every live equipment key, including the redesigned Warrior's additive
 // offhand. THE equipment surface: stat derivation, command validators, and
@@ -895,6 +896,7 @@ export const ALL_EQUIP_SLOTS: readonly EquipSlot[] = [
   'feet',
   'ring1',
   'ring2',
+  'trinket',
 ];
 
 /** Narrow an untrusted slot string (a wire field, a DOM dataset value, a
@@ -1277,7 +1279,7 @@ export interface ItemSet {
 
 export interface ArmorItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: Exclude<EquipSlot, 'mainhand' | 'neck' | 'ring1' | 'ring2'>;
+  slot: Exclude<EquipSlot, 'mainhand' | 'neck' | 'ring1' | 'ring2' | 'trinket'>;
   armorType: ArmorType;
   weapon?: never;
   // A shield stays inside v0.26's established armor item kind, avoiding a new
@@ -1287,13 +1289,13 @@ export interface ArmorItemDef extends BaseItemDef {
   blockValue?: number;
 }
 
-// Jewelry: neck and ring pieces. kind 'armor' so the equip/budget/tooltip paths
+// Jewelry: neck, ring, and trinket pieces. kind 'armor' so the equip/budget/tooltip paths
 // treat it as gear, but it carries NO armor class: equipment_rules falls through
 // the armorType gate, so any class can wear jewelry (requiredClass still applies
 // when set). Rings declare slot 'ring'; see resolveEquipSlot.
 export interface JewelryItemDef extends BaseItemDef {
   kind: 'armor';
-  slot: 'neck' | 'ring';
+  slot: 'neck' | 'ring' | 'trinket';
   armorType?: never;
   weapon?: never;
 }
@@ -6740,6 +6742,9 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  /** The Gambler's Die landed (src/sim/combat/trinkets.ts): the client names the
+   *  fortune it rolled. */
+  | { type: 'trinketGamble'; fortune: 'keenEdge' | 'luckyHeal' | 'gildedGuard' | 'snakeEyes' }
   | { type: 'worldQuestStarted'; questId: string }
   // The weekly emissary (src/sim/weekly_quests.ts): open the window, the pick,
   // progress, and the paid completion. All personal (pid); the client owns

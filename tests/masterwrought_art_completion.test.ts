@@ -822,7 +822,8 @@ describe('Masterwrought art completion evidence', () => {
     // cache chest (feature/weekly-quests). The Clue Scroll items add their two
     // (clue-scroll-icons-2026-09-17): 1,305.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1,306.
-    expect(currentOwnerIds).toHaveLength(1306);
+    // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,324.
+    expect(currentOwnerIds).toHaveLength(1324);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -902,6 +903,16 @@ describe('Masterwrought art completion evidence', () => {
     expect(clueScrollIds.size).toBe(2);
     expect(datedIds.filter((id) => clueScrollIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => clueScrollIds.has(id))).toHaveLength(2);
+    // The trinket slot's icons, one batch (trinket-slot-icons-2026-09-23, PR
+    // 4173): 18 ids, additive the same way.
+    const trinketIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'trinket-slot-icons-2026-09-23')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(trinketIds.size).toBe(18);
+    expect(datedIds.filter((id) => trinketIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => trinketIds.has(id))).toHaveLength(18);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
@@ -927,6 +938,7 @@ describe('Masterwrought art completion evidence', () => {
         !worldQuestObjectIds.has(id) &&
         !factionVendorIds.has(id) &&
         !clueScrollIds.has(id) &&
+        !trinketIds.has(id) &&
         // The weekly emissary's cache chest (feature/weekly-quests) is additive
         // beyond the dated completion union, like the Field Kit.
         id !== 'emissary_cache' &&

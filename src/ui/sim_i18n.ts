@@ -1125,6 +1125,31 @@ const baseEnTable = {
   'dfinder.proposalReady': 'A dungeon group is ready. Confirm your slot now.',
   'dfinder.groupChanged': 'Your group changed and left the Dungeon Finder queue.',
   'dfinder.listingFull': 'Your group listing is now full.',
+  // The trinkets (src/sim/combat/trinkets.ts): the aura names the worn trinket
+  // applies (resolved through AURA_NAME_KEY) and useWornTrinket's refusals
+  // (matched by the EXACT map). Auras that share their trinket's name resolve
+  // through the item's entity name instead (TRINKET_NAMED_AURA_ITEM_IDS).
+  'aura.trinketRetaliationWard': 'Retaliation Ward',
+  'aura.trinketMoored': 'Moored',
+  'aura.trinketWellspring': 'Wellspring',
+  'aura.trinketTalonWound': 'Talon Wound',
+  'aura.trinketKeenEdge': 'Keen Edge',
+  'aura.trinketLuckyStreak': 'Lucky Streak',
+  'aura.trinketGildedGuard': 'Gilded Guard',
+  'aura.trinketWayfarersStride': "Wayfarer's Stride",
+  'aura.trinketLastBastion': 'Last Bastion',
+  'aura.trinketRetaliation': 'Retaliation',
+  'error.trinketNotReady': 'That item is not ready yet.',
+  'error.trinketIncapacitated': "Can't do that while incapacitated.",
+  'error.trinketHourglassEmpty': 'The hourglass is empty.',
+  'error.trinketNoTallyMarks': 'You have no tally marks to spend.',
+  'error.trinketJarEmpty': 'The jar holds no charge.',
+  'error.trinketNeedEnemyPlayer': 'You need an enemy player as your target.',
+  'aura.trinketTempered': 'Tempered',
+  'aura.trinketForgeHeat': 'Forge Heat',
+  'aura.trinketMoltenIgnite': 'Molten Ignite',
+  'aura.trinketCrucibleHeat': 'Crucible Heat',
+  'error.trinketNoHeat': 'Your heart holds no heat.',
 } as const;
 
 const petEnTable = {
@@ -2207,6 +2232,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'La proyección de Maelin crepita: «Los primeros caparazones contuvieron la llama, pero nada vivía dentro.»',
     'lore.ignivarWardenEcho':
       'La proyección de Maelin crepita: «Varkhul forzó la Última Fuente dentro del metal. El agua se convirtió en su sangre.»',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': 'Égida de represalia',
+    'aura.trinketMoored': 'Amarrado',
+    'aura.trinketWellspring': 'Manantial',
+    'aura.trinketTalonWound': 'Herida de garra',
+    'aura.trinketKeenEdge': 'Filo agudo',
+    'aura.trinketLuckyStreak': 'Racha de suerte',
+    'aura.trinketGildedGuard': 'Guardia dorada',
+    'aura.trinketWayfarersStride': 'Zancada del caminante',
+    'aura.trinketLastBastion': 'Último bastión',
+    'aura.trinketRetaliation': 'Represalia',
+    'error.trinketNotReady': 'Ese objeto aún no está listo.',
+    'error.trinketIncapacitated': 'No puedes hacer eso mientras estás incapacitado.',
+    'error.trinketHourglassEmpty': 'El reloj de arena está vacío.',
+    'error.trinketNoTallyMarks': 'No tienes marcas de cuenta que gastar.',
+    'error.trinketJarEmpty': 'La jarra no tiene ninguna carga.',
+    'error.trinketNeedEnemyPlayer': 'Necesitas un jugador enemigo como objetivo.',
+    'aura.trinketTempered': 'Templado',
+    'aura.trinketForgeHeat': 'Calor de la forja',
+    'aura.trinketMoltenIgnite': 'Ignición fundida',
+    'aura.trinketCrucibleHeat': 'Calor del crisol',
+    'error.trinketNoHeat': 'Tu corazón no guarda calor.',
   },
   es_ES: {
     'log.passingStoneKneel':
@@ -3034,6 +3081,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
       'La proyección de Maelin crepita: «Los primeros caparazones contuvieron la llama, pero nada vivía dentro.»',
     'lore.ignivarWardenEcho':
       'La proyección de Maelin crepita: «Varkhul forzó la Última Fuente dentro del metal. El agua se convirtió en su sangre.»',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': 'Égida de represalia',
+    'aura.trinketMoored': 'Amarrado',
+    'aura.trinketWellspring': 'Manantial',
+    'aura.trinketTalonWound': 'Herida de garra',
+    'aura.trinketKeenEdge': 'Filo agudo',
+    'aura.trinketLuckyStreak': 'Racha de suerte',
+    'aura.trinketGildedGuard': 'Guardia dorada',
+    'aura.trinketWayfarersStride': 'Zancada del caminante',
+    'aura.trinketLastBastion': 'Último bastión',
+    'aura.trinketRetaliation': 'Represalia',
+    'error.trinketNotReady': 'Ese objeto aún no está listo.',
+    'error.trinketIncapacitated': 'No puedes hacer eso mientras estás incapacitado.',
+    'error.trinketHourglassEmpty': 'El reloj de arena está vacío.',
+    'error.trinketNoTallyMarks': 'No tienes marcas de cuenta que gastar.',
+    'error.trinketJarEmpty': 'La jarra no tiene ninguna carga.',
+    'error.trinketNeedEnemyPlayer': 'Necesitas un jugador enemigo como objetivo.',
+    'aura.trinketTempered': 'Templado',
+    'aura.trinketForgeHeat': 'Calor de la forja',
+    'aura.trinketMoltenIgnite': 'Ignición fundida',
+    'aura.trinketCrucibleHeat': 'Calor del crisol',
+    'error.trinketNoHeat': 'Tu corazón no guarda calor.',
   },
   fr_FR: {
     'log.passingStoneKneel':
@@ -7456,6 +7525,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'lore.ignivarHeraldKeyRecordName': '使者之钥记录',
     'lore.ignivarLivingMetal': '淬火记录 II：“泉源排斥每一具躯壳。用活体核心重新开始。”',
     'lore.ignivarLivingMetalRecordName': '活体金属记录',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': '报复结界',
+    'aura.trinketMoored': '系泊',
+    'aura.trinketWellspring': '涌泉',
+    'aura.trinketTalonWound': '利爪之伤',
+    'aura.trinketKeenEdge': '锐锋',
+    'aura.trinketLuckyStreak': '好运连连',
+    'aura.trinketGildedGuard': '镀金护卫',
+    'aura.trinketWayfarersStride': '旅者疾步',
+    'aura.trinketLastBastion': '最后堡垒',
+    'aura.trinketRetaliation': '报复',
+    'error.trinketNotReady': '该物品尚未就绪。',
+    'error.trinketIncapacitated': '失去行动能力时无法那样做。',
+    'error.trinketHourglassEmpty': '沙漏是空的。',
+    'error.trinketNoTallyMarks': '你没有可消耗的计数标记。',
+    'error.trinketJarEmpty': '罐中没有任何充能。',
+    'error.trinketNeedEnemyPlayer': '你需要以一名敌对玩家为目标。',
+    'aura.trinketTempered': '淬火',
+    'aura.trinketForgeHeat': '锻炉之热',
+    'aura.trinketMoltenIgnite': '熔火点燃',
+    'aura.trinketCrucibleHeat': '熔炉之热',
+    'error.trinketNoHeat': '你的心中没有热量。',
   },
   zh_TW: {
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
@@ -8208,6 +8299,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'lore.ignivarHeraldKeyRecordName': '使者之鑰紀錄',
     'lore.ignivarLivingMetal': '淬火紀錄 II：「泉源排斥每一具軀殼。用活體核心重新開始。」',
     'lore.ignivarLivingMetalRecordName': '活體金屬紀錄',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': '報復結界',
+    'aura.trinketMoored': '繫泊',
+    'aura.trinketWellspring': '湧泉',
+    'aura.trinketTalonWound': '利爪之傷',
+    'aura.trinketKeenEdge': '銳鋒',
+    'aura.trinketLuckyStreak': '好運連連',
+    'aura.trinketGildedGuard': '鍍金護衛',
+    'aura.trinketWayfarersStride': '旅者疾步',
+    'aura.trinketLastBastion': '最後堡壘',
+    'aura.trinketRetaliation': '報復',
+    'error.trinketNotReady': '該物品尚未就緒。',
+    'error.trinketIncapacitated': '失去行動能力時無法那樣做。',
+    'error.trinketHourglassEmpty': '沙漏是空的。',
+    'error.trinketNoTallyMarks': '你沒有可消耗的計數標記。',
+    'error.trinketJarEmpty': '罐中沒有任何充能。',
+    'error.trinketNeedEnemyPlayer': '你需要以一名敵對玩家為目標。',
+    'aura.trinketTempered': '淬火',
+    'aura.trinketForgeHeat': '鍛爐之熱',
+    'aura.trinketMoltenIgnite': '熔火點燃',
+    'aura.trinketCrucibleHeat': '熔爐之熱',
+    'error.trinketNoHeat': '你的心中沒有熱量。',
   },
   ko_KR: {
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
@@ -9000,6 +9113,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'lore.ignivarLivingMetal':
       '담금질 기록 II: "샘은 모든 껍질을 거부한다. 살아 있는 핵으로 다시 시작하라."',
     'lore.ignivarLivingMetalRecordName': '살아 있는 금속 기록',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': '보복의 결계',
+    'aura.trinketMoored': '정박',
+    'aura.trinketWellspring': '샘물',
+    'aura.trinketTalonWound': '발톱 상처',
+    'aura.trinketKeenEdge': '예리한 칼날',
+    'aura.trinketLuckyStreak': '행운의 연속',
+    'aura.trinketGildedGuard': '황금 수호',
+    'aura.trinketWayfarersStride': '방랑자의 걸음',
+    'aura.trinketLastBastion': '최후의 보루',
+    'aura.trinketRetaliation': '보복',
+    'error.trinketNotReady': '그 아이템은 아직 사용할 수 없습니다.',
+    'error.trinketIncapacitated': '행동 불가 상태에서는 할 수 없습니다.',
+    'error.trinketHourglassEmpty': '모래시계가 비어 있습니다.',
+    'error.trinketNoTallyMarks': '소모할 집계 표식이 없습니다.',
+    'error.trinketJarEmpty': '항아리에 충전이 없습니다.',
+    'error.trinketNeedEnemyPlayer': '적 플레이어를 대상으로 지정해야 합니다.',
+    'aura.trinketTempered': '담금질됨',
+    'aura.trinketForgeHeat': '용광로의 열기',
+    'aura.trinketMoltenIgnite': '용융 점화',
+    'aura.trinketCrucibleHeat': '도가니의 열기',
+    'error.trinketNoHeat': '심장에 열기가 없습니다.',
   },
   ja_JP: {
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
@@ -9796,6 +9931,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'lore.ignivarLivingMetal':
       '焼入れの記録 II：「泉はどの殻も拒む。生きた核で最初からやり直せ。」',
     'lore.ignivarLivingMetalRecordName': '生きた金属の記録',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': '報復の護り',
+    'aura.trinketMoored': '係留',
+    'aura.trinketWellspring': '湧き泉',
+    'aura.trinketTalonWound': '鉤爪の傷',
+    'aura.trinketKeenEdge': '鋭き刃',
+    'aura.trinketLuckyStreak': '幸運の連続',
+    'aura.trinketGildedGuard': '金色の守り',
+    'aura.trinketWayfarersStride': '旅人の歩み',
+    'aura.trinketLastBastion': '最後の砦',
+    'aura.trinketRetaliation': '報復',
+    'error.trinketNotReady': 'そのアイテムはまだ使用できません。',
+    'error.trinketIncapacitated': '行動不能の間はそれを行えません。',
+    'error.trinketHourglassEmpty': '砂時計は空です。',
+    'error.trinketNoTallyMarks': '消費できる集計の印がありません。',
+    'error.trinketJarEmpty': '壺にチャージがありません。',
+    'error.trinketNeedEnemyPlayer': '敵対プレイヤーをターゲットにする必要があります。',
+    'aura.trinketTempered': '焼き入れ',
+    'aura.trinketForgeHeat': '炉の熱',
+    'aura.trinketMoltenIgnite': '溶岩の発火',
+    'aura.trinketCrucibleHeat': 'るつぼの熱',
+    'error.trinketNoHeat': '心臓に熱がありません。',
   },
   pt_BR: {
     'log.passingStoneKneel':
@@ -11451,6 +11608,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'lore.ignivarLivingMetal':
       'Запись о закалке II: «Источник отвергает любую оболочку. Начни заново с живым ядром».',
     'lore.ignivarLivingMetalRecordName': 'Запись о живом металле',
+    // The trinkets (src/sim/combat/trinkets.ts).
+    'aura.trinketRetaliationWard': 'Оберег возмездия',
+    'aura.trinketMoored': 'На якоре',
+    'aura.trinketWellspring': 'Родник',
+    'aura.trinketTalonWound': 'Рана от когтя',
+    'aura.trinketKeenEdge': 'Острая грань',
+    'aura.trinketLuckyStreak': 'Полоса удачи',
+    'aura.trinketGildedGuard': 'Позолоченная защита',
+    'aura.trinketWayfarersStride': 'Шаг странника',
+    'aura.trinketLastBastion': 'Последний бастион',
+    'aura.trinketRetaliation': 'Возмездие',
+    'error.trinketNotReady': 'Этот предмет еще не готов.',
+    'error.trinketIncapacitated': 'Нельзя сделать это, пока вы выведены из строя.',
+    'error.trinketHourglassEmpty': 'Песочные часы пусты.',
+    'error.trinketNoTallyMarks': 'У вас нет меток счета, которые можно потратить.',
+    'error.trinketJarEmpty': 'В сосуде нет заряда.',
+    'error.trinketNeedEnemyPlayer': 'Нужно выбрать целью вражеского игрока.',
+    'aura.trinketTempered': 'Закаленное оружие',
+    'aura.trinketForgeHeat': 'Жар кузни',
+    'aura.trinketMoltenIgnite': 'Расплавленный поджог',
+    'aura.trinketCrucibleHeat': 'Жар горнила',
+    'error.trinketNoHeat': 'В вашем сердце нет жара.',
   },
   ...BASE_NEW,
   cs_CZ: {
@@ -14068,6 +14247,22 @@ function locPetGrowlAutoState(state: string): string {
 // player (stun/incapacitate/absorb aura) and as the boss "unleashes" combat-log line, so
 // they share a single English source here.
 const AURA_NAME_KEY: Record<string, SimMessageKey> = {
+  // The trinkets' auras and the Bastion Sigil's strike-back damage label
+  // (src/sim/combat/trinkets.ts).
+  'Retaliation Ward': 'aura.trinketRetaliationWard',
+  Moored: 'aura.trinketMoored',
+  Wellspring: 'aura.trinketWellspring',
+  'Talon Wound': 'aura.trinketTalonWound',
+  'Keen Edge': 'aura.trinketKeenEdge',
+  'Lucky Streak': 'aura.trinketLuckyStreak',
+  'Gilded Guard': 'aura.trinketGildedGuard',
+  "Wayfarer's Stride": 'aura.trinketWayfarersStride',
+  'Last Bastion': 'aura.trinketLastBastion',
+  Retaliation: 'aura.trinketRetaliation',
+  Tempered: 'aura.trinketTempered',
+  'Forge Heat': 'aura.trinketForgeHeat',
+  'Molten Ignite': 'aura.trinketMoltenIgnite',
+  'Crucible Heat': 'aura.trinketCrucibleHeat',
   'Crafted Momentum': 'aura.craftedMomentum',
   'Crafted Shelter': 'aura.craftedShelter',
   'Crafted Preservation': 'aura.craftedPreservation',
@@ -14468,9 +14663,28 @@ const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
   Lunge: 'lunge',
 };
 
+/** Aura and damage-label names the sim takes from the trinket's own item name. */
+const TRINKET_NAMED_AURA_ITEM_IDS: Readonly<Record<string, string>> = {
+  'Bastion Sigil': 'bastion_sigil',
+  "Mender's Hourglass": 'menders_hourglass',
+  'Paired Talons': 'paired_talons',
+  "Hunter's Tally": 'hunters_tally',
+  Stormjar: 'stormjar',
+  'Echoing Lens': 'echoing_lens',
+  'Sundered Prism': 'sundered_prism',
+  "Duelist's Brand": 'duelists_brand',
+  "Forgefather's Temper": 'forgefathers_temper',
+  'Kindling Orb': 'kindling_orb',
+  'Molten Fletching': 'molten_fletching',
+  'Last Flame Lantern': 'last_flame_lantern',
+  'Heart of the Crucible': 'heart_of_the_crucible',
+};
+
 export function localizeSimAuraName(name: string): string | null {
   const key = AURA_NAME_KEY[name];
   if (key) return tSim(key);
+  const trinketItemId = TRINKET_NAMED_AURA_ITEM_IDS[name];
+  if (trinketItemId) return tEntity({ kind: 'item', id: trinketItemId, field: 'name' });
   const namedAbilityId = ABILITY_NAMED_AURA_IDS[name];
   if (namedAbilityId) return tEntity({ kind: 'ability', id: namedAbilityId, field: 'name' });
   if (name === 'Condemnation') return t('hudChrome.warlock.doomLabel');

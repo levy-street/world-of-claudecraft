@@ -29,17 +29,18 @@ describe('char_view: paperdoll data model', () => {
     // 5/5. Inspect inherits this since it reuses these arrays via buildPaperdollView.
     expect(PAPERDOLL_LEFT_SLOTS).toEqual(['helmet', 'neck', 'shoulder', 'chest', 'gloves']);
     expect(PAPERDOLL_RIGHT_SLOTS).toEqual(['waist', 'legs', 'feet', 'ring1', 'ring2']);
-    expect(PAPERDOLL_WEAPON_SLOTS).toEqual(['mainhand', 'offhand']);
+    expect(PAPERDOLL_WEAPON_SLOTS).toEqual(['mainhand', 'offhand', 'trinket']);
   });
 
   it('resolves every equipped slot to its item, in column order', () => {
     const view = buildPaperdollView(FULL, ITEMS);
     expect(view.left.map((c) => c.slot)).toEqual(['helmet', 'neck', 'shoulder', 'chest', 'gloves']);
     expect(view.right.map((c) => c.slot)).toEqual(['waist', 'legs', 'feet', 'ring1', 'ring2']);
-    expect(view.weapons.map((c) => c.slot)).toEqual(['mainhand', 'offhand']);
+    expect(view.weapons.map((c) => c.slot)).toEqual(['mainhand', 'offhand', 'trinket']);
     expect(view.left[0].item).toBe(ITEMS.cryptbone_helm);
     expect(view.weapons[0].item).toBe(ITEMS.worn_sword);
     expect(view.weapons[1].item).toBeNull(); // offhand: unequipped in FULL
+    expect(view.weapons[2].item).toBeNull(); // trinket: present even when empty
     expect(view.right[2].item).toBe(ITEMS.oiled_boots);
   });
 

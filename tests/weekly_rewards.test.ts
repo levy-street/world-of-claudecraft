@@ -14,7 +14,7 @@ import { freshInstanceSlot } from '../src/sim/instances/instance_slot';
 import { Sim } from '../src/sim/sim';
 import { endArenaMatch, startArenaMatch } from '../src/sim/social/arena';
 import { endBgMatch, startBgMatch } from '../src/sim/social/battleground';
-import { ALL_CLASSES, IGNIVAR_BOSS_ID, type PlayerClass } from '../src/sim/types';
+import { ALL_CLASSES, type PlayerClass } from '../src/sim/types';
 import { weeklyChoiceExhausted } from '../src/sim/weekly_reward_availability';
 import { weeklyRewardTableOptions } from '../src/sim/weekly_reward_options';
 import {
@@ -337,8 +337,12 @@ describe('weekly vault choices', () => {
           // test above proves that exhausting this shelf still permits a claim.
           // Warlocks exclude Healing Power gear, leaving fewer heroic raid items;
           // the regression below pins a successful claim after that pool exhausts.
+          // Rogues' Varkhul heroic shelf is the two Crucible trinkets (PR 4173,
+          // the trinket slot), both also on the Normal shelf, so the Varkhul-only
+          // heroic unlock beside three Normal clears cannot cover the overlap
+          // either; the same exhaustion regression covers it.
           expect(pool.ids.length, `${cls} ${unlocks} ${pool.pool}`).toBeGreaterThanOrEqual(
-            cls === 'warlock' && pool.pool === 'raid_heroic'
+            (cls === 'warlock' || cls === 'rogue') && pool.pool === 'raid_heroic'
               ? 1
               : pool.pool === 'world' || pool.pool === 'raid'
                 ? pool.maximum
@@ -348,15 +352,21 @@ describe('weekly vault choices', () => {
       }
   });
 
-  it('can claim a Warlock heroic raid reward after class filtering exhausts another slot', () => {
-    const { sim, pid, meta } = make(42, true, 'warlock');
+  it('can claim a Rogue heroic raid reward after class filtering exhausts another slot', () => {
+    // Anchored on a Warlock with Ignivar and Varkhul unlocked until the trinket
+    // slot (PR 4173) put three Crucible trinkets on every class's heroic shelf,
+    // so no two-boss heroic pool empties any more. The class filter still
+    // empties a shelf: Varkhul's heroic weapons and armor are plate or caster
+    // gear, so a Rogue sees only the two trinkets there, and a third heroic
+    // row from the same boss is exhausted after the two open.
+    const { sim, pid, meta } = make(42, true, 'rogue');
     const state = emptyWeeklyRewards(WEEK);
-    state.bossUnlocks = { [IGNIVAR_BOSS_ID]: 2, varkhul_forgefather_of_the_last_flame: 2 };
+    state.bossUnlocks = { varkhul_forgefather_of_the_last_flame: 2 };
     state.vaults = [
       {
         resetAtMs: 1000,
         bossUnlocks: { ...state.bossUnlocks },
-        choices: [{ pool: 'raid_heroic' }, { pool: 'raid_heroic' }],
+        choices: [{ pool: 'raid_heroic' }, { pool: 'raid_heroic' }, { pool: 'raid_heroic' }],
       },
     ];
     meta.weeklyRewards = state;
@@ -364,10 +374,15 @@ describe('weekly vault choices', () => {
     openSelected(sim, '1000:0', pid);
     const itemId = batch.choices[0].itemId;
     expect(itemId).toBeDefined();
-    if (!itemId) throw new Error('Missing filtered Warlock reward');
+    if (!itemId) throw new Error('Missing filtered Rogue reward');
     openSelected(sim, '1000:1', pid);
-    expect(batch.choices[1].itemId).toBeUndefined();
-    expect(weeklyChoiceExhausted(batch, batch.choices[1], 'warlock', 20)).toBe(true);
+    expect(batch.choices[1].itemId).toBeDefined();
+    expect(new Set([itemId, batch.choices[1].itemId])).toEqual(
+      new Set(['forgefathers_temper', 'heart_of_the_crucible']),
+    );
+    openSelected(sim, '1000:2', pid);
+    expect(batch.choices[2].itemId).toBeUndefined();
+    expect(weeklyChoiceExhausted(batch, batch.choices[2], 'rogue', 20)).toBe(true);
     const before = sim.ctx.countItem(itemId, pid);
     sim.claimWeeklyReward('1000:0', pid);
     expect(state.vaults).toHaveLength(0);

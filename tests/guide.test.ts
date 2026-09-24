@@ -80,7 +80,7 @@ import {
   STATION_TYPE_BY_CRAFT,
   STATIONS,
 } from '../src/sim/content/professions';
-import { WARFARE_ITEMS } from '../src/sim/content/pvp_honor';
+import { WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
@@ -5903,8 +5903,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
     const honorRows = [...stocked].filter((id) => (ITEMS[id].priceHonor ?? 0) > 0);
     expect(honorRows.length).toBeGreaterThan(0);
+    // The two honor trinkets (WARFARE_TRINKET_STOCK) carry Warfare but live
+    // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
+    // soulbound, no-sell-value shape.
     for (const id of honorRows) {
-      expect(id in WARFARE_ITEMS, id).toBe(true);
+      expect(id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id), id).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }
@@ -6184,10 +6187,14 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       expect(item.hasteRating ?? 0, item.id).toBe(0);
       expect(primaryStatSum(item), item.id).toBeGreaterThan(0);
     }
+    // Trinkets carry no combat rating at any tier (one attribute plus a use
+    // effect; pinned in tests/combat_rating.test.ts), so they are not the
+    // rated PvE epics this comparison is about.
     const pveEpics = Object.values(ITEMS).filter(
       (i) =>
         i.quality === 'epic' &&
         i.slot !== undefined &&
+        i.slot !== 'trinket' &&
         !(i.id in WARFARE_ITEMS) &&
         itemLevel(i) === tier,
     );

@@ -38,6 +38,21 @@ const ONE_HAND_WEAPON = ITEMS.training_mace;
 const TWO_HAND_WEAPON = ITEMS.eastbrook_greatsword;
 
 describe('paperdollDropAction', () => {
+  it('accepts a trinket only on its own socket, for any class', () => {
+    const trinket: ItemDef = {
+      ...RING,
+      id: 'test_trinket',
+      kind: 'armor',
+      slot: 'trinket',
+      armorType: undefined,
+      weapon: undefined,
+    };
+    expect(paperdollDropAction(trinket, 'trinket', 'warrior', 60)).toBe('equip');
+    expect(paperdollDropAction(trinket, 'trinket', 'mage', 60)).toBe('equip');
+    expect(paperdollDropAction(trinket, 'ring1', 'warrior', 60)).toBe('blockedSlot');
+    expect(paperdollDropAction(RING, 'trinket', 'warrior', 60)).toBe('blockedSlot');
+    expect(paperdollDropAction(POTION, 'trinket', 'warrior', 60)).toBe('blockedSlot');
+  });
   it('equips a ring dropped on EITHER finger', () => {
     expect(paperdollDropAction(RING, 'ring1', 'warrior', 20)).toBe('equip');
     expect(paperdollDropAction(RING, 'ring2', 'warrior', 20)).toBe('equip');

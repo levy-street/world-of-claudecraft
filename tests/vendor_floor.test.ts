@@ -822,8 +822,10 @@ describe('stock rows: the phase 11n pulls', () => {
       farmer_verbena: 6,
       provisioner_fenna: 7,
       armorer_hode: 5,
-      warmarshal_draven_kole: 47,
-      fury: 47,
+      // The two honor trinkets (WARFARE_TRINKET_STOCK) joined both honor
+      // counters: 47 to 49 each.
+      warmarshal_draven_kole: 49,
+      fury: 49,
       stablemaster_marla: 2,
       wardsmith_orun: 3,
       // The three faction quartermasters (faction_vendors.ts), five rows each.

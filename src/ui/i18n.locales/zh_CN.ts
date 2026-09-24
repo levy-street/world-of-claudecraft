@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_CN: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.trinketSlot': '饰品',
   'questUi.worldQuest.practiceRewards': '练习：可以再次游玩，但不会额外获得钱币、经验或声望。',
   'questUi.worldQuest.replay': '再玩一次',
   'questUi.worldQuest.glider.replay': '再次飞行',
@@ -17114,6 +17115,142 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.town.description': '按名字传送到城镇中心。',
   'devCommand.actions.town.label': '城镇中心',
   'devCommand.fields.town': '镇',
+  'entities.items.bastion_sigil.name': '堡垒徽印',
+  'entities.items.mooring_stone.name': '系泊之石',
+  'entities.items.menders_hourglass.name': '愈者沙漏',
+  'entities.items.wellspring_seed.name': '涌泉之种',
+  'entities.items.paired_talons.name': '双生利爪',
+  'entities.items.hunters_tally.name': '猎手计数',
+  'entities.items.stormjar.name': '风暴之罐',
+  'entities.items.echoing_lens.name': '回响透镜',
+  'entities.items.gamblers_die.name': '赌徒之骰',
+  'entities.items.sundered_prism.name': '碎裂棱镜',
+  'entities.items.wayfarers_lodestone.name': '旅者磁石',
+  'entities.items.medallion_of_defiance.name': '反抗勋章',
+  'entities.items.duelists_brand.name': '决斗者烙印',
+  'entities.items.forgefathers_temper.name': '熔铸之父的淬火',
+  'entities.items.kindling_orb.name': '引燃宝珠',
+  'entities.items.molten_fletching.name': '熔火箭羽',
+  'entities.items.last_flame_lantern.name': '最后之焰提灯',
+  'entities.items.heart_of_the_crucible.name': '熔炉之心',
+  'hudChrome.trinkets.equipLine': '装备：{effect}',
+  'hudChrome.trinkets.useLine': '使用：{effect}（{cooldown}冷却）',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes} 分钟',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds} 秒',
+  'hudChrome.trinkets.gambleResult': '{item}：{fortune}！',
+  'hudChrome.trinkets.snakeEyes': '蛇眼',
+  'hudChrome.trinkets.equippedLine': '已装备',
+  'hudChrome.trinkets.equipLockout':
+    '装备后，其使用效果会进入 {seconds} 秒的冷却；如果被替换的饰品剩余冷却更长，则改为该剩余冷却。',
+  'hudChrome.trinkets.equip.lastStand':
+    '在生命值低于 {threshold}% 时受到伤害，会获得一个吸收 {absorb} 点伤害（你最大生命值的 {absorbPct}%）的护盾，持续 {duration} 秒。每 {icd} 秒只能触发一次。',
+  'hudChrome.trinkets.equip.hourglass':
+    '你的直接治疗产生的过量治疗会储存在沙漏中，最多 {cap} 点（你最大生命值的 {capPct}%）。储存的治疗量在最后一次增加后 {fade} 秒消散。',
+  'hudChrome.trinkets.equip.twinStrike':
+    '你的自动攻击命中有 {chance}% 的几率额外进行一次主手近战挥击。每 {icd} 秒只能触发一次。',
+  'hudChrome.trinkets.equip.tally':
+    '你的自动攻击暴击和你的致命一击各增加一个计数标记，最多 {max} 个。标记持续 {duration} 秒，每获得一个便会刷新。',
+  'hudChrome.trinkets.equip.storm':
+    '你每施放一个法术便增加一层充能，最多 {max} 层。充能持续 {duration} 秒，每获得一层便会刷新。',
+  'hudChrome.trinkets.equip.heat':
+    '你的近战和远程武器每次命中增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。',
+  'hudChrome.trinkets.equip.ignite':
+    '你的近战和远程武器暴击会点燃目标，每 {every} 秒造成 {tick} 点火焰伤害，持续 {duration} 秒。新的暴击会刷新该效果。伤害随攻击强度或远程攻击强度中较高者提高。',
+  'hudChrome.trinkets.equip.guardHeat':
+    '你每招架、躲闪或格挡一次攻击，便增加一层热量，最多 {max} 层。热量持续 {duration} 秒，每获得一层便会刷新。',
+  'hudChrome.trinkets.use.retaliate':
+    '在 {duration} 秒内，直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。',
+  'hudChrome.trinkets.use.anchor':
+    '在 {duration} 秒内，受到的伤害降低 {reduction}%，但移动速度变为 {speed}%。移除你身上的昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械和失去行动能力效果，并在持续期间无视新的此类效果和击退。',
+  'hudChrome.trinkets.use.hourglass':
+    '将所有储存的治疗量转化为护盾，施加于 {range} 码内生命值百分比最低的队伍成员（包括你自己）。护盾持续 {duration} 秒。需要有储存的治疗量。',
+  'hudChrome.trinkets.use.wellspring':
+    '在 {duration} 秒内，每 {every} 秒为你和 {radius} 码内的队伍成员恢复 {tick} 点生命值。治疗量随治疗强度提高。',
+  'hudChrome.trinkets.use.bleedEdge':
+    '在 {duration} 秒内，你的自动攻击命中会施加利爪之伤，每层每 {every} 秒造成 {tick} 点物理伤害，持续 {bleedDuration} 秒，最多叠加 {stacks} 层。伤害随攻击强度提高。',
+  'hudChrome.trinkets.use.tallyStrike':
+    '消耗所有计数标记，打击 {range} 码内的目标，每个标记造成 {perMark} 点物理伤害（{maxMarks} 个标记时为 {max} 点）。伤害随攻击强度提高。需要至少一个计数标记。',
+  'hudChrome.trinkets.use.stormjar':
+    '将所有充能化为一道闪电射向 {range} 码内的目标，并在 {jumpRange} 码内跳跃至最多 {extra} 个其他敌人。每个敌人每层充能受到 {perCharge} 点自然伤害（{maxCharges} 层充能时为 {max} 点）。伤害随法术强度提高。需要至少一层充能。',
+  'hudChrome.trinkets.use.echo':
+    '在 {duration} 秒内，你接下来的 {casts} 次直接治疗或直接非物理伤害命中会以其数值的 {pct}% 重复一次。',
+  'hudChrome.trinkets.use.gamble':
+    '掷出四种运势之一，持续 {duration} 秒：{keenEdge}（造成的伤害提高 {keenPct}%）、{luckyStreak}（在持续时间内恢复 {heal} 点生命值）、{gildedGuard}（一个吸收 {absorb} 点伤害的护盾）或{snakeEyes}（无效果，但此冷却时间减半）。',
+  'hudChrome.trinkets.use.blink':
+    '向前跨越 {yards} 码，然后在 {guard} 秒内受到的伤害降低 {reduction}%。',
+  'hudChrome.trinkets.use.sprint':
+    '使你的移动速度提高 {speed}%，持续 {duration} 秒。不与其他速度提高效果叠加。',
+  'hudChrome.trinkets.use.defiance':
+    '移除你身上所有的昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械和失去行动能力效果。昏迷时可用。',
+  'hudChrome.trinkets.use.brand':
+    '为 {range} 码内的一名敌对玩家打上烙印，使其受到的治疗效果降低 {cut}%，持续 {duration} 秒。',
+  'hudChrome.trinkets.use.temper':
+    '消耗所有热量为你的武器淬火，持续 {duration} 秒。你的近战和远程武器命中额外造成 {damage} 点火焰伤害，每消耗一层热量提高 {perHeat}%（{maxHeat} 层时最多提高 {maxBonus}%）。每次致命一击延长 {killExtend} 秒，总计最多 {maxDuration} 秒。伤害随攻击强度或远程攻击强度中较高者提高。',
+  'hudChrome.trinkets.use.kindlingOrb':
+    '在你身旁召唤一颗余烬宝珠，持续 {duration} 秒。你每对敌人施放一个法术，它便向该敌人射出一道火焰弹，造成 {damage} 点火焰伤害。伤害随法术强度提高。',
+  'hudChrome.trinkets.use.pierce':
+    '在 {duration} 秒内，你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {share}%。',
+  'hudChrome.trinkets.use.lantern':
+    '在你脚下放置一盏提灯，持续 {duration} 秒。任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {share}% 治疗灯光中受伤最重的另一名队伍成员。',
+  'hudChrome.trinkets.use.heartNova':
+    '消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人每层热量造成 {perHeat} 点火焰伤害（{maxHeat} 层时为 {max} 点），并嘲讽其命中的每个生物。伤害随攻击强度提高。需要至少一层热量。',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    '堡垒徽印的最后堡垒护盾已被使用。在此效果结束前，生命值低于 {threshold}% 时无法再次触发。',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    '吸收 {value} 点伤害。你在生命值低于 {threshold}% 时受到伤害，堡垒徽印为你升起了此护盾。',
+  'hudChrome.auraEffect.trinket.retaliate':
+    '直接击中你的敌人会受到相当于该次攻击令你损失生命值 {pct}% 的物理伤害。周期性伤害不会触发此效果。',
+  'hudChrome.auraEffect.trinket.moored':
+    '你受到的伤害降低 {reduction}%，但移动速度变为 {speed}%。你无视昏迷、定身、减速、恐惧、变形、沉默、致盲、妖术、缴械、失去行动能力效果和击退。',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    '储存了来自你过量治疗的 {stored} 点治疗量。使用愈者沙漏可将其转化为护盾，施加于 {range} 码内生命值百分比最低的队伍成员（包括你自己）。',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    '吸收 {value} 点伤害。由愈者沙漏储存的治疗量转化而成。',
+  'hudChrome.auraEffect.trinket.wellspring': '每 {every} 秒恢复 {tick} 点生命值。',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    '双生利爪刚刚进行了一次额外挥击。在此效果结束前无法再次进行。',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    '你的自动攻击命中会施加利爪之伤：每层每 {every} 秒造成 {tick} 点物理伤害，持续 {duration} 秒，最多叠加 {max} 层。',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    '自动攻击命中会施加利爪之伤，一种最多叠加 {max} 层的物理流血效果。伤害随攻击强度提高。',
+  'hudChrome.auraEffect.trinket.talonWound':
+    '每 {every} 秒造成 {damage} 点物理伤害（{stacks}/{max} 层）。每新增一层都会增加伤害并刷新持续时间。',
+  'hudChrome.auraEffect.trinket.tally':
+    '计数标记：{stacks}/{max}。使用猎手计数可消耗所有标记打击你的目标，造成 {damage} 点物理伤害（每个标记 {perMark} 点）。',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    '计数标记：{stacks}/{max}。猎手计数会消耗所有标记进行一次物理打击，每个标记都会提高伤害。',
+  'hudChrome.auraEffect.trinket.storm':
+    '充能：{stacks}/{max}。使用风暴之罐可将其化为一道闪电，击中你的目标以及彼此相距 {jumpRange} 码内的最多 {extra} 个其他敌人，对每个敌人造成 {damage} 点自然伤害（每层充能 {perCharge} 点）。',
+  'hudChrome.auraEffect.trinket.stormOther':
+    '充能：{stacks}/{max}。风暴之罐会将其化为一道自然闪电，击中目标以及最多 {extra} 个其他敌人，每层充能都会提高伤害。',
+  'hudChrome.auraEffect.trinket.echo':
+    '你接下来的 {casts} 次直接治疗或直接非物理伤害命中会以其数值的 {pct}% 重复一次。',
+  'hudChrome.auraEffect.trinket.keenEdge': '赌徒之骰运势：你造成的伤害提高 {pct}%。',
+  'hudChrome.auraEffect.trinket.luckyStreak': '赌徒之骰运势：每 {every} 秒恢复 {tick} 点生命值。',
+  'hudChrome.auraEffect.trinket.gildedGuard': '赌徒之骰运势：吸收 {value} 点伤害。',
+  'hudChrome.auraEffect.trinket.riftGuard': '你受到的伤害降低 {pct}%。',
+  'hudChrome.auraEffect.trinket.sprint': '移动速度提高 {pct}%。不与其他速度提高效果叠加。',
+  'hudChrome.auraEffect.trinket.brand': '受到的治疗效果降低 {pct}%。',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    '热量：{stacks}/{max}。使用熔铸之父的淬火会消耗所有热量，使其武器火焰伤害提高 {pct}%。',
+  'hudChrome.auraEffect.trinket.tempered':
+    '你的近战和远程武器命中额外造成 {damage} 点火焰伤害（消耗的热量使其提高 {pct}%）。每次致命一击延长 {killExtend} 秒，总计最多 {maxDuration} 秒。',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    '近战和远程武器命中额外造成火焰伤害，消耗的热量使其提高 {pct}%。伤害随攻击强度或远程攻击强度中较高者提高。',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    '你每对敌人施放一个法术，宝珠便向该敌人射出一道火焰弹，造成 {damage} 点火焰伤害。宝珠不会攻击处于变形、失去行动能力或致盲状态的敌人。',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    '每对敌人施放一个法术，宝珠便向该敌人射出一道火焰弹，造成火焰伤害。伤害随法术强度提高。',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    '每 {every} 秒造成 {damage} 点火焰伤害。新的武器暴击会刷新该效果。',
+  'hudChrome.auraEffect.trinket.pierce':
+    '你的自动攻击、射击和物理技能（流血除外）命中还会打击距离你的目标最近的、{reach} 码内的一个敌人，造成所造成伤害的 {pct}%。',
+  'hudChrome.auraEffect.trinket.lantern':
+    '任何人对提灯 {radius} 码内的你或队伍成员施放的直接治疗，还会以该治疗量的 {pct}% 治疗灯光中受伤最重的另一名队伍成员。',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    '热量：{stacks}/{max}。使用熔炉之心可消耗所有热量释放一道火焰新星，对 {radius} 码内的每个敌人造成 {damage} 点火焰伤害，并嘲讽其命中的每个生物。',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    '热量：{stacks}/{max}。熔炉之心会消耗所有热量在 {radius} 码内释放一道火焰新星，每层热量都会提高火焰伤害，并嘲讽其命中的每个生物。',
   // The Weekly Vault (PR 4052): the bank's rewards tab, the keeper prompt and the claim flow.
   'hudChrome.weeklyRewards.title': '每周宝库',
   'hudChrome.weeklyRewards.tab': '每周奖励',

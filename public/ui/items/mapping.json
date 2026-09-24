@@ -140,6 +140,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "emissary_cache",
+      "name": "Emissary's Cache",
+      "sourcePack": "project-authored",
+      "sourceFile": "weekly-emissary/cofre.png master (1250px square, opaque violet ground, generated for this game on 2026-09-14), normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "game_meat",
       "name": "Game Meat",
       "sourcePack": "woc_professions_art",
@@ -242,6 +250,20 @@
       "sourceFile": "batch-9/masters/pristine_venom_gland.png (accepted v4)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_avian_strider",
+      "name": "Reins of the Viridian Valestrider",
+      "sourcePack": "OpenAI built-in image generation",
+      "sourceFile": "generated artifact 019feece-5cd7-7990-94e8-4f385b7a528b/exec-f10ddbed-5945-470c-91d1-35126189c311.png",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)",
+      "model": "OpenAI built-in image_gen tool (underlying model identifier is not exposed)",
+      "reference": "/mnt/e/avian-rig-diagnostics/animation/previews/idle/three-quarter-00.png",
+      "referenceRole": "approved textured-model subject reference",
+      "exactPrompt": "Use case: stylized-concept; Asset type: World of ClaudeCraft inventory icon for mount reins, square master; Primary request: Create a polished classic dark-fantasy MMORPG painted inventory icon depicting the exact teal-blue fantasy flightless bird mount from the reference image, including its long feathered neck, black heavy taloned legs, folded layered tail and wing feathers, and brown leather saddle and harness. Preserve the creature's recognizable silhouette and colors. Scene/backdrop: opaque very dark navy-charcoal painted background with subtle atmospheric vignette, no transparency. Style/medium: tactile hand-painted game inventory art, detailed feathers and leather, painterly but sharply readable at small size. Composition/framing: centered complete three-quarter portrait of the bird mount, head and feet both inside frame with generous padding, dynamic proud stance, no crop, no border or frame. Lighting/mood: warm top-left key light, cool teal rim light, high readable contrast. Constraints: one mount only; no rider; no text; no letters; no symbols; no watermark; no UI border; square; opaque; preserve the saddle and bird identity from the reference. Avoid: photorealistic screenshot, 3D viewport grid, transparent background, extra creatures, cropped feet, cropped head, glowing magic effects.",
+      "sourceSha256": "a9316033ba0274bd8bc7c415d6892c46bf7ded6dae4656487da8f604c386560a",
+      "shippingSha256": "eb7b5284e1ec311f7a334a8c8fda90fb6525e6076ca8358f2a04786fd7e59307"
     },
     {
       "itemId": "reins_chimeglass_tortoise",
@@ -402,28 +424,6 @@
       "sourceFile": "WoC_Bag_06.png",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "emissary_cache",
-      "name": "Emissary's Cache",
-      "sourcePack": "project-authored",
-      "sourceFile": "weekly-emissary/cofre.png master (1250px square, opaque violet ground, generated for this game on 2026-09-14), normalized to the 128px woc-item-icon-v1 shipping square by scripts/convert_item_icons_webp.mjs",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
-    },
-    {
-      "itemId": "reins_avian_strider",
-      "name": "Reins of the Viridian Valestrider",
-      "sourcePack": "OpenAI built-in image generation",
-      "sourceFile": "generated artifact 019feece-5cd7-7990-94e8-4f385b7a528b/exec-f10ddbed-5945-470c-91d1-35126189c311.png",
-      "confidence": "high",
-      "license": "World of ClaudeCraft original art (project-owned, created for this game)",
-      "model": "OpenAI built-in image_gen tool (underlying model identifier is not exposed)",
-      "reference": "/mnt/e/avian-rig-diagnostics/animation/previews/idle/three-quarter-00.png",
-      "referenceRole": "approved textured-model subject reference",
-      "exactPrompt": "Use case: stylized-concept; Asset type: World of ClaudeCraft inventory icon for mount reins, square master; Primary request: Create a polished classic dark-fantasy MMORPG painted inventory icon depicting the exact teal-blue fantasy flightless bird mount from the reference image, including its long feathered neck, black heavy taloned legs, folded layered tail and wing feathers, and brown leather saddle and harness. Preserve the creature's recognizable silhouette and colors. Scene/backdrop: opaque very dark navy-charcoal painted background with subtle atmospheric vignette, no transparency. Style/medium: tactile hand-painted game inventory art, detailed feathers and leather, painterly but sharply readable at small size. Composition/framing: centered complete three-quarter portrait of the bird mount, head and feet both inside frame with generous padding, dynamic proud stance, no crop, no border or frame. Lighting/mood: warm top-left key light, cool teal rim light, high readable contrast. Constraints: one mount only; no rider; no text; no letters; no symbols; no watermark; no UI border; square; opaque; preserve the saddle and bird identity from the reference. Avoid: photorealistic screenshot, 3D viewport grid, transparent background, extra creatures, cropped feet, cropped head, glowing magic effects.",
-      "sourceSha256": "a9316033ba0274bd8bc7c415d6892c46bf7ded6dae4656487da8f604c386560a",
-      "shippingSha256": "eb7b5284e1ec311f7a334a8c8fda90fb6525e6076ca8358f2a04786fd7e59307"
     }
   ],
   "generatedBatches": [
@@ -6744,6 +6744,38 @@
         "heroic_stormhymn_chain_grips",
         "stormhymn_chain_treads",
         "heroic_stormhymn_chain_treads"
+      ]
+    },
+    {
+      "batchId": "trinket-slot-icons-2026-09-23",
+      "source": "Tripo text-to-image (openapi.tripo3d.ai v3 /generation/text-to-image), one text-prompt call per item; square crop to about 72 percent subject fill, 512px sRGB master, 128px opaque WebP (sharp) reviewed locally",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Parent reviewed the painted jewelry and trinket catalog (briny_idol, final_oath_medallion, makers_charm, gleamstag_charm, locket_of_the_last_flame) plus the firebottle glass anchor before writing the prompt; no images were passed as generation inputs.",
+      "commonPrompt": "Digital fantasy painting of one single small trinket object, isolated and floating in the middle of a dark painted background. Object: [per-item subject: the trinket object, its materials and its magic]. The whole object is fully visible, centered, filling about 70 percent of the image, gentle three-quarter view. Background: seamless deep charcoal and dark umber smoky painted vignette that fills the entire image edge to edge, soft contact shadow under the object. Classic fantasy MMORPG hand-painted inventory art, tactile materials, crisp edges, warm top-left key light, cool deep shadow, restrained magical glow. No tile, no plaque, no slab, no stone base, no rounded square, no border, no frame, no people, no figures, no text, no letters, no watermark.",
+      "itemIds": [
+        "bastion_sigil",
+        "mooring_stone",
+        "menders_hourglass",
+        "wellspring_seed",
+        "paired_talons",
+        "hunters_tally",
+        "stormjar",
+        "echoing_lens",
+        "gamblers_die",
+        "sundered_prism",
+        "wayfarers_lodestone",
+        "medallion_of_defiance",
+        "duelists_brand",
+        "forgefathers_temper",
+        "kindling_orb",
+        "molten_fletching",
+        "last_flame_lantern",
+        "heart_of_the_crucible"
       ]
     },
     {

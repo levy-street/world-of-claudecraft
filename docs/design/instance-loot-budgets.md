@@ -26,9 +26,28 @@ items compete within this budget instead of creating bonus equipment drops.
 
 Normal's second slot draws from the epic pool. The existing duplicate resolver
 falls forward within that pool if it selects the first slot's item.
-Heroic skips this Normal-only slot and pays one existing heroic-exclusive weapon
-instead. The first slot still upgrades eligible base equipment to its existing
+Heroic skips this Normal-only slot and pays one heroic-exclusive item instead:
+one of the three bespoke weapons (half the group) or one of the four raid
+trinkets (the other half, `content/trinkets.ts`). The first slot still upgrades eligible base equipment to its existing
 heroic variant.
+
+## Ignivar and Varkhul
+
+The Crucible keeps its two slots per kill (`docs/prd/ignivar-raid-loot.md`,
+"Boss loot tables"). Its five raid trinkets (`content/trinkets.ts`, item level
+35) drop on both difficulties, always as weighted entries inside an existing
+slot rather than an extra drop. Ignivar carries three and Varkhul two.
+
+- Normal: in each boss's Normal-only off-set partition, at 1/8 each. The
+  partition's other rows keep their old shape scaled down (5/8 on Ignivar, 3/4
+  on Varkhul), on binary fractions so the group sums to exactly 1.00.
+- Heroic: in each boss's Heroic exclusive partition, beside the Robe sigils,
+  the marquee weapons and Varkhul's shields, at 0.12 each. The older rows
+  scaled down together so each group still sums to 1.0, and Emberward keeps its
+  absolute 3 percent.
+
+This raid has no heroic item-level layer or heroic variants, so the trinkets
+read item level 35 on both difficulties.
 
 ## Five-player heroics
 
@@ -38,6 +57,10 @@ upgraded base drops and bespoke Heroic drops. Relative weights are normalized
 within the combined partition. Optional rare encounters, including the Fanglord
 Beastmaster, keep their existing bonus-drop rules. Newly moved base-path entries retain their
 existing source tier, so changing the loot table does not increase item stats.
+
+The trinket slot added one trinket to four final bosses' partitions (Morthen,
+Vael the Mistcaller, Ysolei and the Wildheart High Priest), each in a different
+dungeon, as a weighted entry rather than an extra drop.
 
 Normal-only flags apply to entire exclusive groups. Where a Normal group mixes
 equipment and a bag, its Heroic bag chance remains separate from the equipment

@@ -45,6 +45,7 @@ import {
   ownedDruidFormDefaultAbilityIds,
   shouldSeedOwnedSpecDefault,
 } from './owned_class_spec_defaults';
+import { isUsableTrinketId } from './trinket_slot_core';
 
 export { ACTION_BAR_ABILITY_SLOTS } from './action_bar_layout_core';
 
@@ -517,8 +518,11 @@ export class ActionBarController {
     // Elixirs: same useItem dispatch (kind 'elixir' -> applyAura), usable in
     // combat with no shared potion cooldown, so they are placeable exactly
     // like a potion; the view paints no cooldown swipe on their slot.
+    // Trinkets with a use effect: pressed through the same useItem, which uses
+    // the WORN copy (the slot state reads the equipment, trinket_slot_core.ts).
     const item = ITEMS[itemId];
     return (
+      isUsableTrinketId(itemId) ||
       item?.kind === 'food' ||
       item?.kind === 'drink' ||
       item?.kind === 'potion' ||

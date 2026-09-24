@@ -204,8 +204,19 @@ describe('combat-rating tier ladder', () => {
       'varkhul_forgebreaker',
       'varkhul_emberward',
     ]);
+    // Trinkets (content/trinkets.ts) sit outside the ladder too: each carries
+    // exactly one attribute and no combat rating by owner decision, its use
+    // effect is its differentiator. Carved out by SLOT and pinned below: every
+    // trinket at every item level carries zero ratings.
+    const trinkets = Object.values(ITEMS).filter((item) => item.slot === 'trinket');
+    expect(trinkets.length).toBeGreaterThan(0);
+    for (const item of trinkets) expect(ratingCount(item), item.id).toBe(0);
     const allGear = Object.values(ITEMS).filter(
-      (item) => item.slot && itemLevel(item) !== undefined && !ILVL_HONESTY_RELABELED.has(item.id),
+      (item) =>
+        item.slot &&
+        item.slot !== 'trinket' &&
+        itemLevel(item) !== undefined &&
+        !ILVL_HONESTY_RELABELED.has(item.id),
     );
     for (const id of ILVL_HONESTY_RELABELED) {
       expect(ITEMS[id], `${id} still exists (carve-out is not stale)`).toBeDefined();

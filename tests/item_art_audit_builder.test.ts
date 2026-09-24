@@ -856,29 +856,32 @@ describe('item-art audit builder', () => {
       // Re-minted on the quests integration branch: the catalog carries the 15
       // faction quartermaster owners, the Emissary's Cache chest and the two
       // Clue Scroll items (1305 / 1323).
-      catalogSha256: '946640531d8ac01e5aa747216686e2958cb04159cbad13e4382b8ed818fec20a',
-      catalogBytes: 711308,
+      // With the trinket slot's 18 trinkets (PR 4173, trinket-slot-icons-2026-09-23)
+      // landed against the integration branch: 1324 / 1342, a 26th group and a
+      // 32nd sheet page, re-measured with `--verify-only` on the merged tree.
+      catalogSha256: '504bb47b91b21682d28e82c38470d005609a6ba13bc674ac8e8a15d6ece358b4',
+      catalogBytes: 721492,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1306,
-      liveItemCount: 1324,
+      catalogCount: 1324,
+      liveItemCount: 1342,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
-      groupCount: 25,
-      sheetPageCount: 31,
-      sheetCount: 248,
+      groupCount: 26,
+      sheetPageCount: 32,
+      sheetCount: 256,
       sheetModeCounts: {
-        '128-color': 31,
-        '40-color': 31,
-        '28-color': 31,
-        '22-color': 31,
-        '28-grayscale': 31,
-        '64-circle': 31,
-        'small-multiview': 31,
-        identity: 31,
+        '128-color': 32,
+        '40-color': 32,
+        '28-color': 32,
+        '22-color': 32,
+        '28-grayscale': 32,
+        '64-circle': 32,
+        'small-multiview': 32,
+        identity: 32,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '1d282d616a072cd9a6e0f8fa027c73541aa7e36b7fa68f5b08b853617d832d6c',
+      shippingCatalogSha256: 'c4cba93efb0b8d8b617a60ca85cff2c187b06a8ffd048c0f81ef3e4f969d71c5',
       machineChecksPassed: true,
       verdict: null,
     });

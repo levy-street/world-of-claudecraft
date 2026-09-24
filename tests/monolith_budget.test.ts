@@ -516,7 +516,10 @@ const MONOLITHS: MonolithRow[] = [
     // focus, faction tier celebration, noticeboard dispatch; ours 18286
     // against the base 18309) compose with the release chain above.
     // wc -l on the merged tree. Exact count, zero slack.
-    ceiling: 18218,
+    // Then the usable trinkets (PR 4173): the action-bar drag payload moved to
+    // hotbar.ts, paying for the trinket tooltip, slot-state and fortune-notice
+    // wiring (ours 18231 against the base 18235). wc -l on the merged tree.
+    ceiling: 18214,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

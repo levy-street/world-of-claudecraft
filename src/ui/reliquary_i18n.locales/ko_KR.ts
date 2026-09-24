@@ -186,7 +186,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '영웅: 마지막 샘의 도가니',
-    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기.',
+    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기와 공격대 장신구.',
   },
   conquerors_varkhul: {
     name: '내부 용광로',
@@ -194,7 +194,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '영웅: 내부 용광로',
-    desc: '마지막 불꽃의 대장장이 발쿨에게서 영웅 난이도에서만 나오는 방패와 무기.',
+    desc: '마지막 불꽃의 대장장이 발쿨에게서 영웅 난이도에서만 나오는 방패와 무기, 그리고 공격대 장신구.',
   },
   professions_forgebreaker: {
     name: '화로파괴자',

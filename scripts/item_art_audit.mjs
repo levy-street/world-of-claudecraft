@@ -136,14 +136,16 @@ const build = await buildItemArtAudit({
     // 1305 / 1323 on the quests integration branch, measured with
     // `node scripts/item_art_audit.mjs --verify-only`. + the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge):
     // 1306 / 1324, measured the same way.
-    catalogCount: 1306,
-    liveItemCount: 1324,
+    // + the trinket slot's 18 trinkets (PR 4173, trinket-slot-icons-2026-09-23),
+    // landed against the integration branch: 1324 / 1342.
+    catalogCount: 1324,
+    liveItemCount: 1342,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 78,
     heroicDefinitionsWithOwnWebp: 59,
     heroicWeaponArtAliases: 19,
-    sheetPageCount: 31,
-    groupCount: 25,
+    sheetPageCount: 32,
+    groupCount: 26,
   },
 });
 assertItemArtAuditPass(build);

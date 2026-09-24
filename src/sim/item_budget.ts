@@ -59,6 +59,8 @@ export const SLOT_STAT_MULT: Record<ItemSlot, number> = {
   ring: 0.6,
   ring1: 0.6,
   ring2: 0.6,
+  // Trinkets use the existing unarmored accessory budget, like rings.
+  trinket: 0.6,
 };
 
 // Primary-stat points granted per item level at full (rare-mult x chest-mult = 1).
@@ -239,6 +241,19 @@ export function healerLaneHpTotal(level: number): number {
 // line. docs/design/gear-stamina-baseline-2026-09-10.md has the measurements.
 export const STAMINA_BASELINE_SHARE = 1 / 3;
 export const STAMINA_PREMIUM = 1;
+
+// Slots outside the stamina baseline model (owner decision, 2026-09-23): every
+// trinket carries exactly ONE attribute, the whole line budget on it, and no
+// free stamina on top, so a caster trinket (int 13) and a physical one (agi 13)
+// total the same and give the same health (none), which is the parity the model
+// exists for. The model's floor and exact-line checks skip these slots
+// (tests/item_stamina_baseline.test.ts), and expectedStatBudget in item_level.ts
+// prices them at the plain line with no caster baseline added.
+export const STAMINA_MODEL_EXEMPT_SLOTS: ReadonlySet<ItemSlot> = new Set<ItemSlot>(['trinket']);
+
+export function staminaModelExempt(item: Pick<ItemDef, 'slot'>): boolean {
+  return item.slot !== undefined && STAMINA_MODEL_EXEMPT_SLOTS.has(item.slot);
+}
 
 export type StatIdentity = 'caster' | 'physical';
 

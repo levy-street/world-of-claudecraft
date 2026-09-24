@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4631,
+    "files": 4640,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -1110,6 +1110,15 @@
         "reason": "release/v0.44.0 base merge into integration/world-quests-v0440: branch-added suites the release table has never measured, one local run each",
         "runs": [
           960
+        ]
+      },
+      "tests/equip_trinket.test.ts": {
+        "ms": 942,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          942
         ]
       },
       "tests/escort_story.test.ts": {
@@ -4039,6 +4048,78 @@
         "reason": "release/v0.44.0 base merge into integration/world-quests-v0440: branch-added suites the release table has never measured, one local run each",
         "runs": [
           176
+        ]
+      },
+      "tests/trinket_aura_tooltip.test.ts": {
+        "ms": 1011,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1011
+        ]
+      },
+      "tests/trinket_relics.test.ts": {
+        "ms": 38,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          38
+        ]
+      },
+      "tests/trinket_slot_core.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          6
+        ]
+      },
+      "tests/trinket_tooltip_view.test.ts": {
+        "ms": 5747,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5747
+        ]
+      },
+      "tests/trinket_vfx.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/trinket_wire.test.ts": {
+        "ms": 1517,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1517
+        ]
+      },
+      "tests/trinkets.test.ts": {
+        "ms": 11675,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          11675
+        ]
+      },
+      "tests/trinkets_raid.test.ts": {
+        "ms": 4042,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4042
         ]
       },
       "tests/tutorial_bag_controller_step.test.ts": {
@@ -7427,6 +7508,7 @@
   "tests/equip_procs.test.ts": 11,
   "tests/equip_router_v026.test.ts": 7747,
   "tests/equip_target_slot.test.ts": 4352,
+  "tests/equip_trinket.test.ts": 942,
   "tests/equipment_instances_wire.test.ts": 7,
   "tests/equipment_proficiency.test.ts": 4407,
   "tests/error_text_i18n_core.test.ts": 24,
@@ -10270,6 +10352,14 @@
   "tests/transmission_neutralize.test.ts": 651,
   "tests/travel_speed_fx.test.ts": 18,
   "tests/tree_hide_fade.test.ts": 176,
+  "tests/trinket_aura_tooltip.test.ts": 1011,
+  "tests/trinket_relics.test.ts": 38,
+  "tests/trinket_slot_core.test.ts": 6,
+  "tests/trinket_tooltip_view.test.ts": 5747,
+  "tests/trinket_vfx.test.ts": 12,
+  "tests/trinket_wire.test.ts": 1517,
+  "tests/trinkets.test.ts": 11675,
+  "tests/trinkets_raid.test.ts": 4042,
   "tests/trivial_mob_passive.test.ts": 1659,
   "tests/trophy_domination_claims.test.ts": 16,
   "tests/turnstile.test.ts": 13,

@@ -27,6 +27,10 @@ export const RIFT_EPIC_ITEM_IDS = [
   'voidweave_mantle',
   'abysswrought_band',
   'rimefang',
+  // The two rift trinkets (content/trinkets.ts): no combat rating, their use
+  // effect is the differentiator.
+  'sundered_prism',
+  'gamblers_die',
 ] as const;
 /** The S-rank chase items. Each rolls its OWN independent chance in
  *  addRiftClearGearLoot rather than being picked from this pool, so a clear that

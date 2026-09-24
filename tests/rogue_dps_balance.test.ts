@@ -80,7 +80,8 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
       // order held, so only the identity pins move. The Champion-standing
       // faction rings (content/faction_vendors.ts) are tuned to sit below the
       // Nythraxis jewelry on every line, so standing stock never places here.
-      expect(Object.keys(gear).length, `${spec} fills every slot`).toBe(12);
+      // 13 with the trinket slot (PR 4173).
+      expect(Object.keys(gear).length, `${spec} fills every slot`).toBe(13);
       expect(gear.neck, `${spec} neck is the physical Ignivar choker`).toBe(
         'ignivars_ember_choker',
       );
@@ -112,12 +113,18 @@ describe('Rogue fight-6498 deterministic DPS bands', () => {
     // 152.7 Subtlety, which is what the bounds below anchor to. The
     // rebalance's two moves cross the sibling order, so the ordering
     // assertion re-anchors to combat > assassination > subtlety.
-    expect(first.combat).toBeGreaterThanOrEqual(195);
-    expect(first.combat).toBeLessThanOrEqual(211);
-    expect(first.assassination).toBeGreaterThanOrEqual(174);
-    expect(first.assassination).toBeLessThanOrEqual(190);
-    expect(first.subtlety).toBeGreaterThanOrEqual(145);
-    expect(first.subtlety).toBeLessThanOrEqual(161);
+    // The trinket slot (PR 4173) then gives the fixture's BiS picker a
+    // thirteenth slot, filled by Forgefather's Temper (the Varkhul raid trinket
+    // whose Strength line and on-use crit feed every spec). MEASURED on the
+    // merged tree with the same three seeds: approximately 212.8 Combat, 191.1
+    // Assassination, and 156.6 Subtlety; the bands below re-center at 8 either
+    // side of those, and the sibling ordering holds.
+    expect(first.combat).toBeGreaterThanOrEqual(205);
+    expect(first.combat).toBeLessThanOrEqual(221);
+    expect(first.assassination).toBeGreaterThanOrEqual(183);
+    expect(first.assassination).toBeLessThanOrEqual(199);
+    expect(first.subtlety).toBeGreaterThanOrEqual(149);
+    expect(first.subtlety).toBeLessThanOrEqual(165);
     expect(first.combat).toBeGreaterThan(first.assassination);
     expect(first.assassination).toBeGreaterThan(first.subtlety);
   }, 30_000);

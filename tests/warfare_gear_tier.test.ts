@@ -291,8 +291,11 @@ describe('the WARFARE tier is authored from named fractions', () => {
     // the game carries one of these three and no WARFARE piece does, which is
     // what keeps a complete honor kit from substituting for the heroic tier.
     // Measured against the live catalog rather than asserted in prose.
+    // Trinkets carry no combat rating at any tier (one attribute plus a use
+    // effect, owner decision; pinned in tests/combat_rating.test.ts), so they
+    // are not the PvE epics this claim is about.
     const pveIlvl31 = Object.values(ITEMS).filter(
-      (item) => itemLevel(item) === 31 && !FURY_STOCK.includes(item.id),
+      (item) => itemLevel(item) === 31 && !FURY_STOCK.includes(item.id) && item.slot !== 'trinket',
     );
     expect(pveIlvl31.length).toBeGreaterThan(20);
     for (const item of pveIlvl31) {

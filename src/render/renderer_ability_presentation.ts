@@ -11,6 +11,7 @@ import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
 import type { LightPulses } from './light_pulses';
 import type { EntityView } from './renderer';
+import { TrinketRelics } from './trinket_relics';
 import type { Vfx } from './vfx';
 import type { VfxAnchorResolver } from './vfx_anchor';
 import { sampleWarriorPowerBone } from './warrior_power_anchor';
@@ -86,9 +87,22 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   fx.setWorldLightDelegate((at, school, intensity, duration, range) =>
     h.light.pulse(at, school, intensity, duration, range),
   );
+  // The raid trinket relics' pooled scene objects, built hidden here so the
+  // cast-VFX prewarm links them with the rest of the 'vfx' programs.
+  const trinketRelics = new TrinketRelics({
+    scene: h.scene,
+    world: () => h.world(),
+    views: h.views,
+    anchor: h.anchor,
+    ground: (x, z) => h.ground(x, z),
+    vfx: h.vfx,
+    time: () => h.time(),
+    ready: () => h.painter.castVfxReady?.() ?? h.painter.castVfxAdmit?.() ?? true,
+  });
   const painter = new AbilityVfx(
     {
       ...h.painter,
+      trinketRelics,
       vfx: h.vfx,
       fx,
       anchor: h.anchor,
