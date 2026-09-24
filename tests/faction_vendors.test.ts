@@ -61,20 +61,25 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(Object.keys(FACTION_VENDOR_NPCS)).toHaveLength(4);
   });
 
-  it('the stock lists, the gate table and the item table name exactly the same 32 rows', () => {
+  it('the stock lists and the gate table name the same 33 rows; the item table authors all but the reins', () => {
     const stockIds = FACTION_IDS.flatMap((f) => [...FACTION_VENDOR_STOCK[f]]);
-    expect(stockIds).toHaveLength(32);
-    expect(new Set(stockIds).size).toBe(32);
+    expect(stockIds).toHaveLength(33);
+    expect(new Set(stockIds).size).toBe(33);
     expect([...stockIds].sort()).toEqual(Object.keys(FACTION_VENDOR_GATES).sort());
-    expect([...stockIds].sort()).toEqual(Object.keys(FACTION_VENDOR_ITEMS).sort());
+    // The Valestrider reins def lives with the other reins in content/items.ts.
+    expect([...stockIds].filter((id) => id !== 'reins_avian_strider').sort()).toEqual(
+      Object.keys(FACTION_VENDOR_ITEMS).sort(),
+    );
     for (const factionId of FACTION_IDS) {
       for (const id of FACTION_VENDOR_STOCK[factionId]) {
         expect(FACTION_VENDOR_GATES[id].factionId, id).toBe(factionId);
         expect(ITEMS[id], id).toBeDefined();
         expect(ITEMS[id].buyValue, id).toBeGreaterThan(0);
-        // Formulas are bind-on-pickup knowledge and never vendor back.
-        if (ITEMS[id].kind === 'recipe') expect(ITEMS[id].sellValue, id).toBe(0);
-        else expect(ITEMS[id].sellValue, id).toBeGreaterThan(0);
+        // Formulas are bind-on-pickup knowledge and mount reins never vendor
+        // back (the mount contract in tests/mounts.test.ts); every other row sells.
+        if (ITEMS[id].kind === 'recipe' || ITEMS[id].kind === 'mount') {
+          expect(ITEMS[id].sellValue, id).toBe(0);
+        } else expect(ITEMS[id].sellValue, id).toBeGreaterThan(0);
       }
     }
   });
@@ -109,6 +114,8 @@ describe('Faction Vendors & Reroll NPC content', () => {
         expect.arrayContaining(['neck', 'ring']),
       );
     }
+    // The one mount a faction sells: the Rift Watch's Champion reward.
+    expect(slotsAt('rift_watch', 'champion')).toEqual(['mount', 'neck', 'ring']);
     expect(slotsAt('rift_watch', 'trusted')).toEqual(['bag', 'ring']);
     expect(slotsAt('automatons', 'trusted')).toEqual(['bag', 'ring']);
   });
@@ -121,7 +128,7 @@ describe('Faction Vendors & Reroll NPC content', () => {
     }
   });
 
-  it('prices climb the tier ladder and sell back at a quarter (formulas excepted)', () => {
+  it('prices climb the tier ladder and sell back at a quarter (formulas and the mount excepted)', () => {
     const PRICE = {
       recognized: 5_000,
       trusted: 15_000,
@@ -130,10 +137,18 @@ describe('Faction Vendors & Reroll NPC content', () => {
       champion: 150_000,
     };
     for (const [id, gate] of Object.entries(FACTION_VENDOR_GATES)) {
+      if (id === 'reins_avian_strider') continue;
       const tier = gate.standingTier as keyof typeof PRICE;
       expect(ITEMS[id].buyValue, id).toBe(PRICE[tier]);
       if (ITEMS[id].kind !== 'recipe') expect(ITEMS[id].sellValue, id).toBe(PRICE[tier] / 4);
     }
+    // The mount: ten times the Valorsteed's 10 gold (the classic epic-mount
+    // ratio), an ordinary player reins that never vendor-sells back.
+    const reins = ITEMS.reins_avian_strider;
+    expect(reins.buyValue).toBe((ITEMS.reins_valorsteed.buyValue ?? 0) * 10);
+    expect(reins.sellValue).toBe(0);
+    expect(reins.noVendorSell).toBe(true);
+    expect(reins.soulbound).toBeFalsy();
   });
 
   it('evaluates resolveFactionVendorRowGate accurately', () => {
@@ -386,6 +401,47 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     sim.buyItem(qm.id, 'formula_dawnfire_etching');
     expect(sim.countItem('formula_dawnfire_etching')).toBe(1);
     expect(meta.copper).toBe(45_000); // 80,000 - 35,000 buyValue
+  });
+
+  it('sells the Valestrider reins at Champion behind the riding and one-per-account gates', () => {
+    const sim = new Sim({ seed: 779, playerClass: 'rogue', autoEquip: false });
+    sim.setPlayerLevel(20);
+    const pid = sim.playerId;
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('fixture player missing');
+    meta.copper = 2_500_000;
+    meta.ridingTrained = true;
+    const qm = [...sim.entities.values()].find(
+      (e) => e.templateId === 'npc_rift_watch_quartermaster',
+    );
+    if (!qm) throw new Error('quartermaster missing');
+    sim.player.pos.x = qm.pos.x;
+    sim.player.pos.z = qm.pos.z;
+    // Vanguard is not enough.
+    meta.factions.rift_watch = 13_000;
+    sim.drainEvents();
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text.includes('Requires Champion')),
+    ).toBe(true);
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
+    // Champion, but the riding skill gate comes first.
+    meta.factions.rift_watch = 20_000;
+    meta.ridingTrained = false;
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
+    meta.ridingTrained = true;
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
+    expect(meta.copper).toBe(1_500_000);
+    // One per account: owning the reins IS owning the mount.
+    sim.drainEvents();
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text.includes('already own')),
+    ).toBe(true);
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
+    expect(meta.copper).toBe(1_500_000);
   });
 
   it('a bought formula teaches its enchant once the buyer holds Enchanting 100', () => {

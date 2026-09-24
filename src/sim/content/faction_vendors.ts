@@ -17,7 +17,9 @@
 //               budget, and the faction's formulas
 //   Vanguard    a proc weapon at the heroic five-man weapon bar (the only
 //               non-legendary proc weapons outside the two 1.7 daggers)
-//   Champion    the jewelry gaps: Agility jewels, stamina-line tank jewels,
+//   Champion    the Rift Watch's Viridian Valestrider mount (its reins def
+//               stays in content/items.ts beside the other reins), and
+//               the jewelry gaps: Agility jewels, stamina-line tank jewels,
 //               a SECOND caster and healer ring, each carrying the raid
 //               jewel's 25 rating with its primary line ONE point under the
 //               raid row it mirrors (a rival, never a tie: dev/bis_gear.ts
@@ -71,6 +73,7 @@ export const FACTION_VENDOR_GATES: Readonly<Record<string, FactionVendorGate>> =
   riftwarden_voidblade: gate('rift_watch', 'vanguard'),
   champion_rift_band: gate('rift_watch', 'champion'),
   riftwardens_pendant: gate('rift_watch', 'champion'),
+  reins_avian_strider: gate('rift_watch', 'champion'),
 
   // Church Order
   order_prayer_beads: gate('church_order', 'recognized'),
@@ -130,7 +133,9 @@ const PRICE: Readonly<Record<StandingTier, number>> = Object.freeze({
 });
 const sell = (tier: StandingTier) => PRICE[tier] / 4;
 
-/** The faction vendor stock (32 rows: 28 equipment and bag rows + 4 formulas). */
+/** The faction vendor stock authored HERE (32 rows: 28 equipment and bag rows + 4
+ *  formulas); the Rift Watch ladder also sells the Valestrider reins from
+ *  content/items.ts. */
 export const FACTION_VENDOR_ITEMS: Record<string, ItemDef> = {
   // ------------------------------------------------------------------ Rift Watch
   // Recognized: the heroic vendor's Agility neck shape (Yumi's Keepsake Locket).
@@ -595,6 +600,9 @@ export const FACTION_VENDOR_STOCK: Readonly<Record<FactionId, readonly string[]>
     'riftwarden_voidblade',
     'champion_rift_band',
     'riftwardens_pendant',
+    // The Viridian Valestrider (content/items.ts, PR 4175): the ladder's
+    // headline reward, the only mount a faction sells.
+    'reins_avian_strider',
   ]),
   church_order: Object.freeze([
     'order_prayer_beads',

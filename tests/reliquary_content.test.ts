@@ -2934,12 +2934,9 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: [
-    'drakemaw_raptor',
-    'avian_strider',
-    'lanternback_troll',
-    'terrorspark_groundshaker',
-  ],
+  // avian_strider left this list when the Rift Watch quartermaster's Champion
+  // row gave it a route (content/faction_vendors.ts; MOUNT_SOURCES hints it).
+  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3060,7 +3057,9 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
   // pending-ruling absences resolve to nothing. The storefront door left with
   // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
-  horizons_mounts: 10,
+  // 11 with the Rift Watch quartermaster's door: the Viridian Valestrider's
+  // Champion-standing reins (content/faction_vendors.ts).
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
@@ -4019,7 +4018,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the four mounts content awards no route at all', () => {
+  it('the surviving pending rows are the three mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4031,7 +4030,6 @@ describe('Reliquary source hint coverage', () => {
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
-      'avian_strider',
       'lanternback_troll',
       'terrorspark_groundshaker',
     ]);

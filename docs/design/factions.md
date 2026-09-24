@@ -75,6 +75,14 @@ and the character sheet shows the current title.
   - Champion: the jewelry gaps: Agility jewels, stamina-line tank jewels, a
     second caster and healer ring, each carrying the raid jewel's rating with
     its line one point under the raid row it mirrors (a rival, never a tie).
+    The Rift Watch's Champion row also sells the Viridian Valestrider's reins
+    (the faction mount: a teal coast-runner on the Agility line; the reins def
+    stays with the other reins in `content/items.ts`) at the classic epic-mount
+    ratio, ten times the Valorsteed, behind the same riding and
+    one-per-account gates every reins purchase carries. The Reliquary hints the
+    mount at the quartermaster and it leaves the pending-ruling list. The
+    Church Order and the Automatons get their own mounts when their assets
+    land (Terrid's Dawn Strider is the Church Order's).
   A fresh 20 holds no standing, so the dev kit excludes the ladder outright
   (`isFreshTwentyItem`); the epic BiS picker sees the Champion jewels but the
   one-point margin keeps every dev kit and DPS fixture on its release loadout.
