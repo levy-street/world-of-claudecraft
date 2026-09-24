@@ -6,7 +6,7 @@ import { type FogSceneState, isOpenAirFogState } from '../src/render/interior_li
 
 describe('isOpenAirFogState', () => {
   it('shows the sky dome over the overworld, the Wildheart field and the Thornhollow hollow only', () => {
-    const openAir: FogSceneState[] = ['outdoor', 'wildheartField', 'battleground'];
+    const openAir: FogSceneState[] = ['outdoor', 'hoardValley', 'wildheartField', 'battleground'];
     const covered: FogSceneState[] = [
       'dungeon',
       'temple',

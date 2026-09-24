@@ -188,9 +188,17 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (tsx, no full compile), since these additions could in principle
     // collide on a relic id. Re-confirm with
     // `npx vitest run tests/profile_page.test.ts` once the tree compiles.
-    // +1 on the 411 above: the Viridian Valestrider takes a horizons_mounts
-    // slot (RELIQUARY_HORIZON_MOUNTS, src/sim/content/reliquary.ts).
-    expect(catalogTotal).toBe(412);
+    // 412 at the release/v0.43.0 merge into feature/world-quests: the Arcane
+    // Calligraphy gold title's slot on the Horizons titles page.
+    // 415 at the faction standing deeds: the three Champion titles
+    // (Riftwarden, Dawnkeeper, Forgemaster) take their slots on the same page.
+    // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
+    // 448 with the 32 Buried Hoard pieces (character-scoped items), the same
+    // +32 as reliquary_content.test.ts's character pair.
+    // 449 at the release/v0.44.0 merge into feature/buried-hoards: the
+    // Viridian Valestrider takes a horizons_mounts slot
+    // (RELIQUARY_HORIZON_MOUNTS, src/sim/content/reliquary.ts).
+    expect(catalogTotal).toBe(449);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

@@ -136,6 +136,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/characters/armor_dye.ts': 2,
   'src/render/dungeon.ts': 1,
   'src/render/foliage_shader_core.ts': 1,
+  'src/render/hoard_entrance.ts': 3,
   'src/render/ignivar_fire_vfx.ts': 10,
   'src/render/ignivar_model_vfx.ts': 1,
   'src/render/nythraxis_soft_fire.ts': 1,

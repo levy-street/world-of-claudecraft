@@ -610,7 +610,10 @@ export const EVERGARDEN_KNIGHT_CAMPS: CampDef[] = [
   // the maze patrol: lone knights pacing three of the Great Maze's dead-end
   // corridors (tight radius keeps each on its corridor cell; mob movement
   // honors the hedge walls, so they pace instead of drifting through)
-  { mobId: 'hedge_knight', center: { x: 414, z: 1079.5 }, radius: 3, count: 1 },
+  // Formerly the corridor beside the Wispwood maze (414, 1079.5): a lone knight
+  // pacing there read as a stray inside the maze trial, so he joins the north
+  // watch post instead (same array slot, camp order is rng-draw-order load-bearing).
+  { mobId: 'hedge_knight', center: { x: 402, z: 1110 }, radius: 3, count: 1 },
   { mobId: 'hedge_knight', center: { x: 324, z: 1007.5 }, radius: 3, count: 1 },
   { mobId: 'hedge_knight', center: { x: 396, z: 971.5 }, radius: 3, count: 1 },
 ];
@@ -684,7 +687,9 @@ export const EVERGARDEN_PROPS: ZonePropsDef = {
     { x: 264, z: 850, r: 2.8 },
     { x: 390, z: 902, r: 2.6 },
     { x: 316, z: 1122, r: 3.0 },
-    { x: 462, z: 1068, r: 2.6 },
+    // moved off (462, 1068): its modeled root flare (reaching about 11yd from
+    // the trunk at this scale) grew 5yd into the wisp maze trial's south wall
+    { x: 474, z: 1084, r: 2.6 },
     { x: 244, z: 1034, r: 2.6 },
   ],
   // The built garden (KayKit Medieval Hexagon buildings + the wrought-iron

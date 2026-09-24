@@ -11,8 +11,9 @@
 import { beaconSpiralLift } from './beacon_spiral';
 import { forgefatherStairSurface } from './content/ember_coast';
 import { dawnholdLift } from './dawnhold_layout';
+import { gliderTowerSurface } from './glider_tower_layout';
 
 export function overworldWalkSurface(x: number, z: number, terrain: number): number {
   const lifted = terrain + beaconSpiralLift(x, z) + dawnholdLift(x, z);
-  return Math.max(lifted, forgefatherStairSurface(x, z));
+  return Math.max(lifted, forgefatherStairSurface(x, z), gliderTowerSurface(x, z));
 }

@@ -7,6 +7,7 @@
 // drive window.__game directly: sim.addItem, hud.toggleBags/toggleMap, sim.player.pos).
 
 import { dismissEntryOverlays } from './enter_offline_game.mjs';
+import { hoardTideReviewTargets } from './lib/pr_shot_hoard_tide.mjs';
 import { masterwroughtReviewTargets } from './lib/pr_shot_masterwrought.mjs';
 
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1182,6 +1183,7 @@ async function stageWheelBinds(page) {
 }
 
 export const TARGETS = [
+  ...hoardTideReviewTargets(),
   {
     key: 'fen-features-cull',
     label:

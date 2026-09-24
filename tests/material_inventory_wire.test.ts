@@ -7,8 +7,10 @@ const source = { gatherer: { kind: 'character' as const, id: 11, name: 'Ana' } }
 const row: InvSlot = { itemId: 'copper_ore', count: 2, materialSources: [{ source, count: 2 }] };
 describe('mixed material inventory wire', () => {
   it('requires the combined material-source and expanded-ability client and server epoch', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(29);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-29');
+    // Epoch 42 at the release/v0.43.0 merge into feature/world-quests (past both
+    // parents; tests/bank_wire_epoch.test.ts holds the history).
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(42);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-42');
   });
   it('retains both mirrors for omitted and malformed source frames', () => {
     const mirror = { inventory: [row], vendorBuyback: [row] };

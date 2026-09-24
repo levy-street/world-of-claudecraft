@@ -24,6 +24,7 @@ import { riftMechanicSuppressed, riftRankTemplate, riftRankTuningFor } from '../
 import { riftInstanceAtPos } from '../rift/runs';
 import type { SimContext } from '../sim_context';
 import { addThreat, SUMMONED_ADD_THREAT_SEED, threatEntries } from '../threat';
+import { vaultScaledTuning } from '../treasure_vault';
 import { DT, dist2d, type Entity, LEASH_DISTANCE } from '../types';
 import { mobCombatProfile } from './combat_profile';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
@@ -382,7 +383,11 @@ export function spawnBossAdds(ctx: SimContext, boss: Entity, mobId: string, coun
   // EVERY rank take the rift add tuning (rift/ranks.ts). The rank derives
   // from the instance descriptor, so all hosts agree.
   const riftInst = isRiftPos(boss.pos.x) ? riftInstanceAtPos(ctx, boss.pos) : null;
-  const riftTuning = riftInst ? riftRankTuningFor(riftInst.baseLevel) : null;
+  // Inside a Buried Hoard the adds take the room's head-count scaling too: a lone
+  // reader's boss must not summon a full party's worth of skeletons.
+  const riftTuning = riftInst
+    ? vaultScaledTuning(riftRankTuningFor(riftInst.baseLevel), riftInst.vault)
+    : null;
   for (let k = 0; k < count; k++) {
     const ang = (k / count) * Math.PI * 2 + 0.7;
     const pos = ctx.groundPos(

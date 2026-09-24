@@ -131,6 +131,7 @@ const SUMMON_CROSSFADE_SEC = 0.45;
 // an open portal should read as a clear nearby presence, not a wallpaper bed
 // like campfire/forge, but must still sit under foreground one-shots.
 const RIFT_AMBIENCE_GAIN = 0.4;
+const HOARD_AMBIENCE_GAIN = 0.12;
 const FOOTSTEP_CUES: Partial<Record<string, string>> = {
   grass: 'foot_grass',
   dirt: 'foot_dirt',
@@ -221,7 +222,13 @@ interface PendingLoop {
 // same pattern, no changes needed to the override mechanism itself.
 interface AmbientPointSource {
   readonly id: string;
-  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
+  readonly kind:
+    | 'campfire'
+    | 'forge'
+    | 'rift_portal'
+    | 'rift_roller'
+    | 'rift_ice_glide'
+    | 'hoard_entrance';
   readonly x: number;
   readonly y: number;
   readonly z: number;
@@ -1723,6 +1730,10 @@ class Sfx {
         key = 'amb_forge';
         gain = FORGE_AMBIENCE_GAIN;
         break;
+      case 'hoard_entrance':
+        key = 'hoard_entrance_hum';
+        gain = HOARD_AMBIENCE_GAIN;
+        break;
       case 'rift_portal':
         key = 'rift_portal_drone';
         gain = RIFT_AMBIENCE_GAIN;
@@ -1809,23 +1820,24 @@ class Sfx {
       this.pointAmbient(points[i]);
     }
     // Unlike the static campfire/forge set (the same fixed sources every frame,
-    // culled only by distance), a rift portal/roller/gliding-player source can
+    // culled only by distance), a rift or buried-hoard source can
     // disappear entirely between frames (instance ends, portal expires, the
     // glide stops) without ever crossing the tooFar threshold: sweep any such
     // loop no longer present.
-    const isDynamicRiftId = (id: string): boolean =>
+    const isDynamicEntityId = (id: string): boolean =>
       id.startsWith('rift_portal:') ||
       id.startsWith('rift_roller:') ||
-      id.startsWith('rift_ice_glide:');
+      id.startsWith('rift_ice_glide:') ||
+      id.startsWith('hoard_entrance:');
     for (const id of this.loops.keys()) {
-      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
+      if (isDynamicEntityId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
     for (const id of this.pendingLoops.keys()) {
       // unloop drops all three pending maps together, and delegating keeps
       // that contract in ONE place: hand-deleting only pendingLoops here is
       // the exact drift that once stranded a load/variant pair for every rift
       // source that vanished mid-load, for the rest of the session.
-      if (isDynamicRiftId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
+      if (isDynamicEntityId(id) && !activeIds.has(id)) this.unloop(id, 0.7);
     }
   }
 

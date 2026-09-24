@@ -144,6 +144,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'リフト',
     desc: '移ろうリフトの象徴的な戦利品。徘徊する恐怖から、Sランク追跡の二つの秘宝まで。',
   },
+  conquerors_buried_hoards: {
+    name: '埋もれた財宝',
+    desc: '宝の地図が導く財宝の戦利品。財宝を守る番人ごとに四つ。',
+  },
   // Rares of the Realm pages (Phase 21): composed in the chronicle rare
   // deeds' register (chr_marsh_rares ja reads 霧に名だたる者); no mob names
   // inside page names.

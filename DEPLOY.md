@@ -357,6 +357,23 @@ For off-box safety, sync the directory to S3 occasionally:
   migration) while leaving every partition row written since then in place, and
   `loadMail` does not de-duplicate by letter id, so the next load can contain the
   same letter, and its escrow, twice.
+- **Custody-overlay rollback after recipient-scoped baking**: the fixed
+  partition writer removes a parcel's overlay row in the same transaction that
+  saves its recipient's mailbox. The immediately preceding partitioned-mail
+  binary does not do that. Do not roll back to that binary after a custody
+  parcel has been collected or deleted: it can save the changed mailbox while
+  leaving the old overlay row, and a later roll-forward can replay the parcel
+  and duplicate its contents. Restore a consistent database snapshot or
+  reconcile the affected custody refs before roll-forward instead. Do not run
+  both binaries against the same realm during a rolling deployment.
+- **Treasure Vault retry/reward rollback boundary**: a binary predating the
+  durable `vaultAttempt` character field drops that field on its next character
+  save. After a map was consumed, this erases the owner's right to retry its
+  unfinished vault. Older mail binaries also do not recognize the
+  `vault_reward` custody letter. Do not run old and new processes for the same
+  realm together, and do not binary-rollback after anyone opens a map or earns
+  a vault reward. Restore a consistent database snapshot or complete a
+  forward-only repair before serving affected characters again.
 - **Bank Storage rollback caveats**: same governing rule as the professions bullet
   above, and here it is ITEM-DESTRUCTIVE rather than capacity-lossy, so treat a
   rollback past this release as destructive and plan a restore from backup.

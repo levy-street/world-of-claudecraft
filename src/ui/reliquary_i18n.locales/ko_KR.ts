@@ -144,6 +144,10 @@ export const table: ReliquaryLocaleTable = {
     name: '균열',
     desc: '끊임없이 변하는 균열의 상징적인 전리품. 떠도는 공포부터 S등급 사냥의 두 보물까지.',
   },
+  conquerors_buried_hoards: {
+    name: '묻힌 보물',
+    desc: '보물 지도가 이끄는 보물의 전리품. 보물을 지키는 수호자마다 네 점씩.',
+  },
   // Rares of the Realm pages (Phase 21): composed in the chronicle rare
   // deeds' register (chr_marsh_rares ko reads 안개 속의 이름들); no mob names
   // inside page names.

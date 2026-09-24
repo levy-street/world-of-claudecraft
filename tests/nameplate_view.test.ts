@@ -451,6 +451,9 @@ describe('nameplate_view - import absence (two-controller + purity, source scan)
       // three/painter/gfx; imported so the discriminator cannot drift from
       // the sim's own id (the frontend-seam review's ask).
       '../sim/professions/feast',
+      // The hoard brood egg template id, the same kind of sim content leaf: an
+      // egg shows no nameplate (it has no health to read and cannot be hit).
+      '../sim/rift/hoard_boss_kits',
       '../sim/types',
       './nameplate_combo',
       './nameplate_threat',

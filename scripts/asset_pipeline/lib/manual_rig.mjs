@@ -256,7 +256,22 @@ export async function manualRigOntoReference(rawGlbPath, referenceGlbPath, outPa
   const rawArmY = armYSum / Math.max(1, armN) - min[1]; // above feet
   const scale = wristAbove / rawArmY;
   const midX = (min[0] + max[0]) / 2;
-  const midZ = (min[2] + max[2]) / 2;
+  let midZ = (min[2] + max[2]) / 2;
+  if (opts.centerTorso) {
+    // A tail or a long snout drags the bounds' middle off the body. Centre the
+    // depth on the torso instead: the column round the spine, hips to chest.
+    let lo = Infinity;
+    let hi = -Infinity;
+    for (const arr of rotatedPerPrim) {
+      for (let v = 0; v < arr.length; v += 3) {
+        const up = (arr[v + 1] - min[1]) / (max[1] - min[1]);
+        if (up < 0.3 || up > 0.6 || Math.abs(arr[v] - midX) > 0.25 * maxAbsX) continue;
+        if (arr[v + 2] < lo) lo = arr[v + 2];
+        if (arr[v + 2] > hi) hi = arr[v + 2];
+      }
+    }
+    if (hi > lo) midZ = (lo + hi) / 2;
+  }
 
   // Pass 2: final positions (feet at y=0, centered XZ) + weights.
   const report = {

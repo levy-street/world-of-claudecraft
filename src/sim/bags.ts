@@ -692,6 +692,10 @@ export function equipBag(
     return;
   }
   if (!inRange(target)) return;
+  if (def.unique && meta.bags.some((b, i) => i !== target && b === itemId)) {
+    ctx.error(meta.entityId, 'You can only equip one of those.');
+    return;
+  }
   const old = meta.bags[target];
   const newBags = meta.bags.slice();
   newBags[target] = itemId;

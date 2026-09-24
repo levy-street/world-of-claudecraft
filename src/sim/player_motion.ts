@@ -58,6 +58,10 @@ import {
   terrainWallStandoff,
   waterLevelAt,
 } from './world';
+import {
+  WORLD_QUEST_DELIVERY_AURA_ID,
+  WORLD_QUEST_DELIVERY_SPEED_MULT,
+} from './world_quest_delivery';
 
 export const BACKPEDAL_MULT = 0.65;
 export const GRAVITY = 16;
@@ -84,7 +88,13 @@ const moveParams: CharacterMoveParams = {
   swimming: false,
   ignoreFences: false,
 };
-const moveOut: CharacterMoveResult = { x: 0, y: 0, z: 0, blocked: false, stepped: 0 };
+const moveOut: CharacterMoveResult = {
+  x: 0,
+  y: 0,
+  z: 0,
+  blocked: false,
+  stepped: 0,
+};
 // Coyote time: seconds after WALKING off a ledge (never after a jump) during
 // which a jump still fires. Stateless on purpose: a walk-off starts at vy = 0,
 // so "recently left the ledge" is exactly vy > -GRAVITY * COYOTE_TIME.
@@ -224,7 +234,8 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   // cannot be slowed): short-circuit the aura scan with the ghost-run multiplier.
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
-    speed = 1;
+    speed = 1,
+    cargo = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
@@ -238,6 +249,9 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
     // Druid Cat Form: +15% passive move speed. form_cat's value is the threat
     // multiplier, not a speed, so the constant is what rides the max.
     if (a.kind === 'form_cat') speed = Math.max(speed, CAT_FORM_MOVE_MULT);
+    if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
+      cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
+    }
   }
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
@@ -246,7 +260,7 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;
-  return slow * speed;
+  return slow * speed * cargo;
 }
 
 // Fiesta "Moon Boots" power-up: a buff_jump aura multiplies jump height.
@@ -684,9 +698,15 @@ function verticalPass(
     p.fallStartY = p.pos.y;
   }
   if (!p.onGround) {
-    p.vy -= GRAVITY * DT;
+    const gliderIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
+    if (gliderIdx >= 0) {
+      p.vy = Math.max(p.vy - GRAVITY * DT, -2.5);
+      p.fallStartY = p.pos.y;
+    } else {
+      p.vy -= GRAVITY * DT;
+      p.fallStartY = Math.max(p.fallStartY, p.pos.y);
+    }
     p.pos.y += p.vy * DT;
-    p.fallStartY = Math.max(p.fallStartY, p.pos.y);
     if (deepWater && p.pos.y <= waterHere - 0.75) {
       // Splashing into deep water breaks the fall — and the harder the hit,
       // the deeper the body drives under before buoyancy lifts it back
@@ -708,6 +728,8 @@ function verticalPass(
       p.onGround = true;
       p.jumping = false;
       p.fallStartY = p.pos.y;
+      const gWaterIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
+      if (gWaterIdx >= 0) p.auras.splice(gWaterIdx, 1);
       return;
     }
     if (p.pos.y <= support) {
@@ -721,14 +743,22 @@ function verticalPass(
       p.vz = 0;
       p.onGround = true;
       p.jumping = false;
-      const drop = p.fallStartY - support;
-      if (drop > FALL_SAFE_DISTANCE) {
-        const dmg = Math.round(p.maxHp * (drop - FALL_SAFE_DISTANCE) * 0.07);
-        if (dmg > 0) deps.dealDamage(null, p, dmg, false, 'physical', 'Falling', 'hit', true);
+      const gLandIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
+      if (gLandIdx >= 0) {
+        p.auras.splice(gLandIdx, 1);
+        p.fallStartY = support;
+      } else {
+        const drop = p.fallStartY - support;
+        if (drop > FALL_SAFE_DISTANCE) {
+          const dmg = Math.round(p.maxHp * (drop - FALL_SAFE_DISTANCE) * 0.07);
+          if (dmg > 0) deps.dealDamage(null, p, dmg, false, 'physical', 'Falling', 'hit', true);
+        }
+        p.fallStartY = support;
       }
-      p.fallStartY = support;
     }
   } else {
+    const gGroundIdx = p.auras.findIndex((a) => a.id === 'rift_feather_glider');
+    if (gGroundIdx >= 0) p.auras.splice(gGroundIdx, 1);
     // Distinguish a walkable downhill slope from a genuine cliff/ledge. The
     // drop the surface can take in one tick scales with how far we moved: a
     // slope no steeper than MAX_CLIMB_SLOPE (the same gate that blocks uphill

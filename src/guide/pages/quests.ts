@@ -34,6 +34,14 @@ const SAGA = [
   ['guide.questsPage.sagaPeaksTitle', 'guide.questsPage.sagaPeaksBody'],
 ] as const;
 
+// Clue Scrolls: the treasure hunts the daily world-quest board can earn (spoiler-safe:
+// no coordinates, no answers, no reward odds).
+const CLUES = [
+  ['guide.questsPage.cluesEarnTitle', 'guide.questsPage.cluesEarnBody'],
+  ['guide.questsPage.cluesHuntTitle', 'guide.questsPage.cluesHuntBody'],
+  ['guide.questsPage.cluesCasketTitle', 'guide.questsPage.cluesCasketBody'],
+] as const;
+
 // The optional side-chains.
 const SIDE = [
   ['guide.questsPage.sideWardenTitle', 'guide.questsPage.sideWardenBody'],
@@ -51,6 +59,7 @@ export const quests: GuidePage = {
     const types = TYPES.map(([title, body]) => loreBeat(title, body)).join('');
     const saga = SAGA.map(([title, body]) => loreBeat(title, body)).join('');
     const side = SIDE.map(([title, body]) => loreBeat(title, body)).join('');
+    const clues = CLUES.map(([title, body]) => loreBeat(title, body)).join('');
     return `
       <article class="guide-article">
         <h1>${esc(t('guide.questsPage.heading'))}</h1>
@@ -82,8 +91,15 @@ export const quests: GuidePage = {
           <div class="guide-beat-grid">${side}</div>
         </section>
 
+        <section class="guide-block">
+          <h2>${esc(t('guide.questsPage.cluesTitle'))}</h2>
+          <p>${esc(t('guide.questsPage.cluesBody'))}</p>
+          <div class="guide-beat-grid">${clues}</div>
+        </section>
+
         ${related([
           { href: hrefFor('world'), key: 'guide.nav.world' },
+          { href: hrefFor('factions'), key: 'guide.nav.factions' },
           { href: hrefFor('dungeons'), key: 'guide.nav.dungeons' },
           { href: hrefFor('how-to-play'), key: 'guide.nav.howToPlay' },
         ])}

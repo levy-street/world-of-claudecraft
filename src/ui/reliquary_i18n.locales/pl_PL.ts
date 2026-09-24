@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Szczelina',
     desc: 'Charakterystyczne łupy zmiennej Szczeliny, od jej wędrownych okropieństw po dwa skarby polowania na rangę S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Zakopane skarby',
+    desc: 'Łupy ze skarbów, do których prowadzą mapy skarbów, po cztery od każdego strażnika, który jednego pilnuje.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rzadkie Bestie Królestwa',
     desc: 'Dowód na każdą nazwaną rzadką bestię powaloną w całym królestwie.',

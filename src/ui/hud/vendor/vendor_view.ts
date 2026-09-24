@@ -10,7 +10,12 @@
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
 import { stackSizeOf } from '../../../sim/bags';
+import {
+  type FactionVendorGate,
+  resolveFactionVendorRowGate,
+} from '../../../sim/content/faction_vendors';
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
+import type { FactionId } from '../../../sim/factions';
 import { junkSellableSlot } from '../../../sim/items';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { bulkBuyQuantity, vendorCountForced } from '../../../sim/vendor_buy_stack';
@@ -45,6 +50,8 @@ export interface VendorGoodsRow {
   /** The row's gate when it carries one, met or not, so the painter can name
    *  the requirement. Ids and numbers only; this core stays i18n-free. */
   requirement?: VendorRowGate;
+  /** Faction standing requirement when the row carries one. */
+  factionRequirement?: FactionVendorGate;
   /** Present when a bulk ("Buy Stack") purchase is offered for this row: as many
    *  units as the buyer can currently afford in one purchase, capped at the
    *  item's real bag stack size (bulkBuyQuantity, the same helper buyItem uses
@@ -81,6 +88,11 @@ export interface VendorPrice {
   copper: number;
   /** Honor is authored as a per-purchase price and is not stack-multiplied. */
   honor: number;
+  /** Faction currency cost when the item is a faction vendor reward. */
+  factionMarks?: {
+    factionId: FactionId;
+    amount: number;
+  };
 }
 
 export interface VendorBalances {
@@ -95,6 +107,12 @@ export interface VendorBalances {
    *  tool they earned, with nothing red anywhere. Required turns that into a
    *  compile error naming every call site. */
   gatheringProficiency: Readonly<Record<string, number>>;
+  /** Persistent faction standing across allied factions. */
+  factions?: Readonly<Record<FactionId, number>>;
+  /** Persistent faction currency balances across allied factions. */
+  factionCurrencies?: Readonly<Record<FactionId, number>>;
+  /** Faction ID if the current vendor is an allied faction quartermaster. */
+  vendorFactionId?: FactionId;
 }
 
 export interface VendorBuybackRow {
@@ -118,6 +136,10 @@ export interface VendorView {
   buyback: VendorBuybackRow[];
   honorBalance: number;
   hasHonorGoods: boolean;
+  /** Faction of the current vendor if it is an allied faction quartermaster. */
+  vendorFactionId?: FactionId;
+  /** Player's currency balance for this vendor's faction. */
+  factionCurrencyBalance?: number;
   /** The selected control-row multiple this view was built for, so the
    *  painter renders the pressed state from the same source of truth. */
   multiple: VendorMultiple;
@@ -150,17 +172,26 @@ export function buildVendorView(
     const item = items[itemId];
     if (!item) continue;
     const quantity = vendorStackSize(item);
+    const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
+    const factionGate = resolveFactionVendorRowGate(itemId, balances.factions);
+    const factionMarks = factionGate.requirement?.factionId
+      ? {
+          factionId: factionGate.requirement.factionId,
+          amount: factionGate.requirement.currencyCost,
+        }
+      : undefined;
     const price: VendorPrice = {
       copper: Math.max(0, item.buyValue ?? 0) * quantity,
       honor: Math.max(0, Math.floor(item.priceHonor ?? 0)),
+      ...(factionMarks ? { factionMarks } : {}),
     };
-    if (price.copper <= 0 && price.honor <= 0) continue;
-    // The same resolver every advisory surface shares
-    // (content/vendor_row_gates.ts), whose numbers alias the wield table the
-    // harvest gate enforces, so the line a counter shows can never disagree
-    // with the requirement the tool will actually ask. The buy path itself
-    // runs no proficiency check any more (R22: counters sell ahead freely).
-    const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
+    if (
+      price.copper <= 0 &&
+      price.honor <= 0 &&
+      (!price.factionMarks || price.factionMarks.amount <= 0)
+    ) {
+      continue;
+    }
     // Bulk eligibility mirrors buyItem's server-side gate exactly (items.ts):
     // plain copper price, no Honor component, never a mount (buying several
     // copies of the same reins would only waste gold), never soulbound (the
@@ -172,6 +203,7 @@ export function buildVendorView(
       item.kind !== 'mount' &&
       !item.soulbound &&
       price.honor <= 0 &&
+      !price.factionMarks &&
       unitCopper > 0 &&
       stackSizeOf(item) > 1;
     const bulkQuantity = bulkEligible
@@ -182,7 +214,7 @@ export function buildVendorView(
     // path would collapse back to 1. Eligible rows at a fixed multiple carry
     // the whole-count total and an affordability that TRACKS the selection;
     // at 'custom' they only flag that a click opens the capped prompt.
-    const countable = !vendorCountForced(item);
+    const countable = !vendorCountForced(item) && !price.factionMarks;
     const countBuy =
       countable && multiple !== 'custom' && multiple > 1
         ? {
@@ -191,14 +223,21 @@ export function buildVendorView(
             affordable: balances.copper >= price.copper * multiple,
           }
         : undefined;
+    const playerFactionMarks =
+      factionMarks && balances.factionCurrencies
+        ? (balances.factionCurrencies[factionMarks.factionId] ?? 0)
+        : 0;
+    const canAffordFaction = !factionMarks || playerFactionMarks >= factionMarks.amount;
     goods.push({
       itemId,
       item,
       price,
       quantity,
-      affordable: balances.copper >= price.copper && balances.honor >= price.honor,
-      requirementUnmet: gate.locked,
+      affordable:
+        balances.copper >= price.copper && balances.honor >= price.honor && canAffordFaction,
+      requirementUnmet: gate.locked || factionGate.locked,
       ...(gate.requirement ? { requirement: gate.requirement } : {}),
+      ...(factionGate.requirement ? { factionRequirement: factionGate.requirement } : {}),
       ...(bulkQuantity !== undefined && {
         bulkQuantity,
         bulkAffordable: balances.copper >= unitCopper * bulkQuantity,
@@ -221,11 +260,18 @@ export function buildVendorView(
       ...(slot.craftedRecipeId === undefined ? {} : { craftedRecipeId: slot.craftedRecipeId }),
     });
   });
+  const vendorFactionId = balances.vendorFactionId;
+  const factionCurrencyBalance =
+    vendorFactionId && balances.factionCurrencies
+      ? (balances.factionCurrencies[vendorFactionId] ?? 0)
+      : undefined;
   return {
     goods,
     buyback,
     honorBalance: Math.max(0, Math.floor(balances.honor)),
     hasHonorGoods: goods.some((row) => row.price.honor > 0),
+    ...(vendorFactionId !== undefined ? { vendorFactionId } : {}),
+    ...(factionCurrencyBalance !== undefined ? { factionCurrencyBalance } : {}),
     multiple,
   };
 }

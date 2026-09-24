@@ -8,7 +8,10 @@ import type { ChatSenderFlair, StreamerLinks } from './account_flair';
 import type { MountKey } from './content/mounts';
 import type { CraftDef, GatheringProfessionId, ToolEffectId } from './content/professions';
 import type { RealmBuilderHonour } from './content/realm_builders';
+import type { TreasureMapRarity } from './content/treasure_maps';
 import type { LockSession, LootTier, PickAction, StepResult, VisibleCell } from './lockpick';
+import type { GliderFlightResult, GliderFlightState } from './minigames/glider_flight';
+import type { WispMazeState } from './minigames/wisp_maze';
 import type { FishingCatchBand } from './professions/fishing_bands';
 import type { HarvestYield } from './professions/harvest_yields';
 import type {
@@ -16,6 +19,7 @@ import type {
   PerfectingSwapRequest,
 } from './professions/perfecting_swap';
 import type { RespawnWindow } from './respawn_policy';
+import type { HoardControlCast } from './rift/hoard_control_casts';
 import type {
   VarkhulAssemblyDifficulty,
   VarkhulAssemblyPhase,
@@ -23,6 +27,7 @@ import type {
 } from './varkhul_assembly';
 import type { VarkhulEngageState } from './varkhul_engage';
 import type { VarkhulForgeBeamWindow } from './varkhul_forge_intermission';
+import type { WorldQuestMedal } from './world_quest_scoreboards';
 
 export const TICK_RATE = 20; // sim ticks per second
 export const DT = 1 / TICK_RATE;
@@ -191,6 +196,7 @@ export const TOOL_RECHARGE_CAST_ID = 'tool_recharge';
 // harvest_admission.ts) is the frozen duration; professions/
 // corpse_harvest_session.ts owns the whole session.
 export const CORPSE_HARVEST_CAST_ID = 'corpse_harvest';
+export const ALLIED_HEARTHSTONE_CAST_ID = 'allied_hearthstone';
 // The non-spell casts: castingAbility sentinels that are activities, not
 // abilities. They share one semantics bundle at the casting choke points:
 // exempt from silence and school lockouts, no blink-through, no spell queue,
@@ -208,7 +214,8 @@ export function isNonSpellCast(castId: string | null): boolean {
     castId === SALVAGE_CAST_ID ||
     castId === SUNDER_CAST_ID ||
     castId === TOOL_RECHARGE_CAST_ID ||
-    castId === CORPSE_HARVEST_CAST_ID
+    castId === CORPSE_HARVEST_CAST_ID ||
+    castId === ALLIED_HEARTHSTONE_CAST_ID
   );
 }
 
@@ -353,6 +360,7 @@ export type AiState = 'idle' | 'chase' | 'attack' | 'flee' | 'evade' | 'dead';
 export type AuraKind =
   | 'dot'
   | 'doctrine'
+  | 'slow_fall'
   // Temporary authoritative displacement state (Oath Chain). It is harmful for
   // UI/dispel classification, but intentionally bypasses root/slow immunity.
   | 'forced_move'
@@ -640,6 +648,10 @@ export type AuraKind =
   // carry: applied at the pickup, removed by clearCarrierAuras on every path the
   // flag leaves the carrier.
   | 'flag_carried'
+  // Eastbrook freight World Quest: an inert, public marker worn exactly while
+  // the player carries a crate. The movement kernel applies its value as the
+  // cargo speed multiplier; no combat or stat-recalc path consumes it.
+  | 'world_quest_cargo'
   // Chronomancy Temporal Echo mark (docs/prd/mage-chronomancy.md section 13): a
   // per-caster (sourceId) buff on ONE ally; while it rides, a fraction of the
   // mage's Arcane damage heals the marked ally. Value is unused (1); the
@@ -959,6 +971,16 @@ export type ItemUse =
   // player meets their first death somewhere nothing is hunting them.
   // Consumed on use and refused unless the lesson is active.
   | { type: 'passingStone' }
+  // A Clue Scroll (src/sim/clue_scrolls.ts): with no hunt active, consumed to
+  // start one; on a dig step, used on the spot to advance it (not consumed);
+  // refused otherwise.
+  | { type: 'clueScroll' }
+  // A Treasure Casket (src/sim/clue_casket.ts): consumed to pay the hunt's reward.
+  | { type: 'clueCasket' }
+  /** A treasure map (src/sim/treasure_vault.ts): read it, then dig on the X. */
+  | { type: 'treasureMap'; rarity: TreasureMapRarity }
+  /** Cartographer's Ink: redraws the read treasure map one rarity finer. */
+  | { type: 'cartographersInk' }
   // Starts the one-time hammer quest; the Ember is consumed by crafting.
   | { type: 'forgebreakerEmber' }
   | { type: 'mechChroma'; chromaId: string }
@@ -992,7 +1014,16 @@ export type ItemUse =
   // narrowest named craft-id type the professions content has (there is no
   // craft-id union today; CRAFT_RING types its ids as string), so this
   // documents the domain without changing the checked type.
-  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] };
+  | { type: 'placeMobileStation'; stationCraftId: CraftDef['id'] }
+  | { type: 'alliedHearthstone' }
+  | { type: 'riftGlider' }
+  | { type: 'targetDummy' }
+  | { type: 'dawnStandard' }
+  | { type: 'manaElixir' }
+  | { type: 'invisibility' }
+  | { type: 'sharpeningStone' }
+  | { type: 'shockBomb' }
+  | { type: 'armorKit' };
 
 // Rarity ranks for the cosmetic skin-select event, ordered low → high. A rolled
 // rank unlocks its own tier and every tier below it (epic unlocks rare+uncommon).
@@ -1134,6 +1165,8 @@ interface BaseItemDef {
   // `duration` the buff length in seconds. Folds through the normal aura/stat path.
   elixir?: TimedStatBuffPayload;
   quality?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'; // gray/white/green/blue/purple/orange name colors
+  // Unique: only one copy of this item can be carried or equipped at a time.
+  unique?: boolean;
   // bags (kind:'bag'): extra inventory slots granted while equipped in one of
   // the 4 bag sockets (see src/sim/bags.ts; the 16-slot backpack is implicit).
   bagSlots?: number;
@@ -1160,6 +1193,11 @@ interface BaseItemDef {
   // key of its own and the heroic distinction shows as the separate "[HEROIC]"
   // tag instead (the item tooltip's quality line, the Apply Enchant target row).
   heroicOf?: string;
+  // Collection identity only: this item is another TIER of `relicOf` (the Buried
+  // Hoard pieces, content/hoard_loot.ts), so obtaining it also discovers that
+  // item and fills its Reliquary slot. Unlike heroicOf it changes nothing else:
+  // the tier keeps its own name, art, item level and unique-equip family.
+  relicOf?: string;
   // Marks a bespoke heroic-tier item (e.g. the Heroic Nythraxis raid epics) for
   // tooltip chrome; these keep their own name key, unlike heroicOf variants.
   heroic?: boolean;
@@ -3890,6 +3928,9 @@ export interface NpcDef {
   // The Heroic Quartermaster: talking to this NPC opens the Heroic Marks
   // shop (src/sim/content/heroic_vendor.ts) instead of a copper vendor stock.
   heroicVendor?: boolean;
+  // The World Quest taskmaster: talking to this NPC offers the world-quest
+  // board (the map's world-quest rail, where the daily reroll lives).
+  worldQuestBoard?: boolean;
   // A WARFARE quartermaster: talking to this NPC opens the set-divided honor
   // shop instead of the flat vendor grid. A FLAG rather than a hard-keyed NPC id
   // deliberately, so a second placement needs no constant widened: the Heroic
@@ -3949,10 +3990,14 @@ export interface CampDef {
 }
 
 // Ground interactables (sparkle objects)
+export const STABLE_GROUND_OBJECT_ENTITY_ID_MIN = 2_147_000_000;
+
 export interface GroundObjectDef {
   itemId: string;
   name: string;
   positions: { x: number; z: number }[];
+  /** Optional ids in the reserved high range, used without shifting the legacy roster. */
+  entityIds?: readonly number[];
 }
 
 // Gatherable world nodes (ore/wood/herb). Permanent, unowned fixtures: this
@@ -4364,6 +4409,8 @@ export interface ZonePropsDef {
   // keep r and h matched to the SCALED footprint by hand.
   decorProps?: {
     key: string;
+    /** Small dressing seated on verified existing ground may opt out of terrain flattening. */
+    terrainCalm?: false;
     x: number;
     z: number;
     rot?: number;
@@ -4459,19 +4506,19 @@ export interface EscortAmbushDef {
   atWaypoint: number;
   mobId: string;
   count: number;
+  // Optional authored level for scaled public-event waves. Ordinary quest
+  // escorts omit it and keep using the template's minimum level.
+  level?: number;
   // Spawn scatter ring around the escortee (world yards).
   radius?: number;
 }
 
-export interface EscortDef {
+interface EscortDefBase {
   id: string;
   // MobTemplate of the escortee: a non-hostile mob with moveSpeed 0 (the run
   // drives all movement) and aggroRadius 0. Players cannot attack it; mobs
   // damage it through seeded ambush threat; players may heal it while live.
   npcMobId: string;
-  // The quest carrying this escort's { type: 'escort' } objective. Interacting
-  // with the idle escortee while this quest is active starts the run.
-  questId: string;
   start: { x: number; z: number };
   waypoints: { x: number; z: number }[];
   moveSpeed: number;
@@ -4487,7 +4534,29 @@ export interface EscortDef {
   startText: string;
   successText: string;
   failText: string;
+  // Optional checkpoint story, spoken only between ambushes. Each line becomes
+  // eligible after arriving at its waypoint, then waits for reading space.
+  story?: {
+    speaker: string;
+    lineSpacingSeconds: number;
+    ambushText: string;
+    lines: { atWaypoint: number; text: string }[];
+  };
 }
+
+export type EscortDef = EscortDefBase &
+  (
+    | {
+        // The ordinary quest carrying this escort objective.
+        questId: string;
+        worldQuestId?: never;
+      }
+    | {
+        // The public world quest carrying this escort objective.
+        worldQuestId: string;
+        questId?: never;
+      }
+  );
 
 // Live per-def escort state (src/sim/escort.ts; the backing map stays on Sim).
 // Exactly one of three phases: idle (npcId set, run null), live (npcId set,
@@ -4501,6 +4570,7 @@ export interface EscortRunState {
     startedAt: number;
     ambushIds: number[];
     fired: boolean[];
+    story?: { nextLine: number; nextSpeechAt: number; finaleAt?: number };
     // Stuck-advance bookkeeping: a walker pinned against a collider for a few
     // seconds counts its current waypoint as reached (escort.ts).
     lastX: number;
@@ -4622,6 +4692,227 @@ export interface QuestProgress {
   // resets the run when the def's rev has moved (quest_progress_migration.ts),
   // dropping the per-run scratch (burnedObjects, creditedObjects) with it.
   rev?: number;
+}
+
+export type WorldQuestReward =
+  | { type: 'xp'; rate: number }
+  | { type: 'copper'; base: number; perLevel: number }
+  | { type: 'item'; itemId: string; count: number };
+
+export type WorldQuestBeamSide = 'north' | 'east' | 'south' | 'west';
+
+export interface WorldQuestBeamPuzzleDef {
+  columns: number;
+  rows: number;
+  source: { tileIndex: number; side: WorldQuestBeamSide };
+  target: { tileIndex: number; side: WorldQuestBeamSide };
+  tiles: readonly {
+    kind: 'straight' | 'corner';
+    initialRotation: number;
+  }[];
+}
+
+export type WorldQuestMatch3Candy = 0 | 1 | 2 | 3 | 4;
+
+export interface WorldQuestMatch3LevelDef {
+  columns: number;
+  rows: number;
+  board: readonly WorldQuestMatch3Candy[];
+  refill: readonly WorldQuestMatch3Candy[];
+  target: number;
+  maxMoves: number;
+}
+
+export interface WorldQuestTraceDef {
+  kind:
+    | 'triangle'
+    | 'square'
+    | 'star'
+    | 'hourglass'
+    | 'lightning'
+    | 'spiral'
+    | 'double-triangle'
+    | 'diamond'
+    | 'pentagon'
+    | 'arrow'
+    | 'zigzag'
+    | 'cross';
+  /** Closed outline, with the first vertex repeated at the end. */
+  points: readonly { x: number; z: number }[];
+}
+
+export interface WorldQuestTraceRoundScore {
+  precision: number;
+  efficiency: number;
+  time: number;
+}
+
+export interface WorldQuestTraceResult extends WorldQuestTraceRoundScore {
+  score: number;
+  rating: 'bronze' | 'silver' | 'gold';
+}
+
+export interface WorldQuestTraceMetrics {
+  startedAt: number;
+  distance: number;
+  deviationDistance: number;
+}
+
+export interface WorldQuestTraceState {
+  questId: string;
+  shapeIndex: number;
+  phase: 'preview' | 'drawing' | 'failed' | 'success';
+  previewUntil: number;
+  expiresAt: number;
+  /** Authoritative bounded trail, never supplied by a client or persisted. */
+  trail: { x: number; z: number }[];
+  lastPosition: { x: number; z: number };
+  segment: number;
+  direction: -1 | 0 | 1;
+  started: boolean;
+  /** Private scoring accumulation, never a client authority or persistence field. */
+  metrics?: WorldQuestTraceMetrics;
+  reason?: 'off-path' | 'movement' | 'timeout' | 'combat';
+}
+
+export type ForgeStationId = 'fuel' | 'metal' | 'water' | 'tools';
+
+export interface WorldQuestForgeResult {
+  elapsed: number;
+  mistakes: number;
+  adjustedTime: number;
+  rating: 'bronze' | 'silver' | 'gold';
+}
+
+export interface WorldQuestForgeState {
+  phase: 'countdown' | 'working' | 'success' | 'failed';
+  /** Last authoritative clock sample, published at bounded cadence for both hosts. */
+  observedAt: number;
+  /** Isolated stream for the band centres (minigames/forge_workshop.ts). */
+  seed: number;
+  readyAt: number;
+  startedAt: number;
+  /** Good strikes landed so far (FORGE_STRIKES finishes the piece). */
+  strikes: number;
+  /** The strike band: centre and half-width on the 0..1 bar. */
+  band: number;
+  bandHalf: number;
+  /** Heat sample (0..100) and the clock it was taken at; decays lazily from there. */
+  heat: number;
+  heatAt: number;
+  stokeReadyAt: number;
+  lockUntil: number;
+  mistakes: number;
+  feedback: 'ready' | 'hit' | 'miss' | 'cold' | 'stoked';
+  result?: WorldQuestForgeResult;
+}
+
+export type WorldQuestObjective =
+  | { type: 'glider'; instructorNpcId: string; courseId: string }
+  | { type: 'investigation'; targetMobId: string }
+  | { type: 'shadow'; instructorNpcId: string }
+  | { type: 'forging'; instructorNpcId: string }
+  | { type: 'wisp_maze'; instructorNpcId: string }
+  | { type: 'vehicle'; stationId: string }
+  | {
+      type: 'tracing';
+      instructorNpcId: string;
+      shapes: readonly WorldQuestTraceDef[];
+      advancedShapes?: readonly WorldQuestTraceDef[];
+    }
+  | { type: 'kill'; targetMobId: string }
+  | { type: 'escort'; escortId: string }
+  | { type: 'interact'; targetObjectItemId: string }
+  | {
+      type: 'salvage';
+      objectItemId: string;
+      /** Stable ground-object entity ids, one eight-piece arrangement per week. */
+      layouts: readonly (readonly number[])[];
+    }
+  | { type: 'gather'; nodeType: GatherNodeType }
+  | {
+      type: 'delivery';
+      pickupObjectItemId: string;
+      deliveryObjectItemId: string;
+    }
+  | {
+      type: 'puzzle';
+      activationObjectItemId: string;
+      puzzles: readonly WorldQuestBeamPuzzleDef[];
+    }
+  | {
+      type: 'match3';
+      activationObjectItemId: string;
+      levels: readonly WorldQuestMatch3LevelDef[];
+    };
+
+/** A repeatable open-world objective. World quests have no giver or turn-in:
+ *  entering the authored area starts them and completing the objective pays
+ *  the reward immediately. */
+export interface WorldQuestDef {
+  id: string;
+  zoneId: string;
+  faction?: 'rift_watch' | 'church_order' | 'automatons';
+  minLevel: number;
+  area: { x: number; z: number; radius: number };
+  objective: WorldQuestObjective;
+  count: number;
+  reward: WorldQuestReward;
+}
+
+/** Per-character state for the current host-provided UTC cycle. Available
+ *  quests are absent; only started and completed entries are persisted. */
+export interface WorldQuestInvestigationState {
+  heard: number;
+  clues: number;
+  cleared: number;
+  mobId?: number;
+}
+
+export interface WorldQuestShadowState {
+  /** Internal fixed-tick guard, never wired. */
+  lastTick?: number;
+  phase: 'cloaked' | 'caught';
+  suspicion: number;
+  cooldown: number;
+  stealing?: { targetId: number; remaining: number; x: number; z: number };
+}
+
+export interface WorldQuestProgress {
+  /** Personal borrowed cloak and channel, omitted from saves. */
+  shadow?: WorldQuestShadowState;
+  /** Personal investigation clues and live summon reference, omitted from saves. */
+  investigation?: WorldQuestInvestigationState;
+  questId: string;
+  count: number;
+  state: 'active' | 'completed';
+  /** Private maze actors and collection, session only. */
+  wispMaze?: WispMazeState & { paused?: boolean };
+  forging?: WorldQuestForgeState;
+  /** Best completed workshop result for this rotation. */
+  forgeResult?: WorldQuestForgeResult;
+  /** Personal glider flight, omitted from saves. */
+  glider?: GliderFlightState;
+  gliderResult?: GliderFlightResult;
+  /** Session-only tracing readout. Omitted from character saves. */
+  tracing?: WorldQuestTraceState;
+  /** Stable advanced figure id and earned scores survive interruption and save/load. */
+  traceVariant?: string;
+  traceScores?: WorldQuestTraceRoundScore[];
+  traceResult?: WorldQuestTraceResult;
+  creditedObjects?: string[];
+  puzzleVariant?: number;
+  /** Ley bonus boards past the daily solve (sim/world_quest_ley_bonus.ts): the
+   *  charged level (1 or 2) and how many this offer already paid. Persisted. */
+  puzzleBonusLevel?: number;
+  puzzleBonusClaimed?: number;
+  /** Deterministic daily generation marker; absent on authored legacy/dev attempts. */
+  puzzleDay?: number;
+  puzzleRotations?: number[];
+  puzzleExpiresAt?: number;
+  match3Board?: WorldQuestMatch3Candy[];
+  match3Moves?: number;
+  match3RefillIndex?: number;
 }
 
 export function questObjectiveRequired(
@@ -5483,9 +5774,40 @@ export interface Entity extends ClientMirroredEntityFields {
   // both hosts render above the portal and the Heroic Mark payout on sealing.
   // Absent on dev-spawned portals.
   riftTier?: RiftTier;
+  // Treasure vault portals (src/sim/treasure_vault.ts): the character whose map
+  // opened it (only they and their party may enter), the map's rarity, and the
+  // sim time the unentered portal closes.
+  vaultOwnerPid?: number;
+  /** Stable owner identity across disconnect/reconnect; runtime pid may change. */
+  vaultOwnerCharacterId?: number;
+  /** Frozen before map consumption, so an owner who disconnects before the
+   * first party entrant still has a reward claim when the boss falls. */
+  vaultOwnerRewardSnapshot?: {
+    characterId: number;
+    name: string;
+    cls: PlayerClass;
+    level: number;
+    mountOwned: boolean;
+    guestCapped: boolean;
+    guestCycle: string;
+  };
+  /** Party members already with the owner when the map was consumed remain
+   * authorized if the owner's connection drops before the first entry. */
+  vaultInitialPartyCharacterIds?: number[];
+  vaultAttemptId?: string;
+  vaultOpenPending?: boolean;
+  vaultRarity?: TreasureMapRarity;
+  vaultExpiresAt?: number;
+  // Dev only (`/dev hoard ... goblin`, src/sim/dev/hoard_travel.ts): the hoard
+  // this descriptor opens always holds a Coinsack Scurrier.
+  devForceHoardGoblin?: true;
   // Sim time of the last "level too low" rift denial shown to this player, so
   // standing inside the portal trigger radius does not spam the toast per tick.
   riftDeniedAt?: number;
+  // A hard control this mob is CASTING inside a Buried Hoard instead of landing
+  // it instantly (src/sim/rift/hoard_control_casts.ts). Sim-only, never wired:
+  // the cast bar itself rides castingAbility / castRemaining.
+  hoardControlCast?: HoardControlCast;
   // Sim time of the last "pool full" / "event already cleared" denial shown to
   // this player on walk-in, so a 20 Hz trigger does not spam the error toast.
   riftPoolFullAt?: number;
@@ -6424,6 +6746,81 @@ export type SimEvent = { pid?: number } & (
     }
   | { type: 'questReady'; questId: string }
   | { type: 'questDone'; questId: string }
+  | { type: 'worldQuestStarted'; questId: string }
+  /** A big on-screen line for a shared world-quest moment (the client owns the
+   *  wording under questUi.worldQuest.banner.<banner>). */
+  | { type: 'worldQuestBanner'; banner: WorldQuestBannerId }
+  | ({ type: 'cannonResult' } & CannonResult)
+  /** One finished scoreboard attempt (src/sim/world_quest_scoreboards.ts); the
+   *  server keeps the character's best row per board. */
+  | { type: 'worldQuestScore'; board: string; medal: WorldQuestMedal | null; metric: number }
+  | {
+      type: 'worldQuestProgress';
+      questId: string;
+      count: number;
+      required: number;
+    }
+  | { type: 'worldQuestPuzzleOpened'; questId: string }
+  | { type: 'worldQuestPuzzleClosed'; questId: string }
+  | {
+      type: 'worldQuestPuzzleUpdated';
+      questId: string;
+      tileIndex: number;
+      rotation: number;
+    }
+  | { type: 'worldQuestPuzzleFailed'; questId: string }
+  | { type: 'worldQuestMatch3Updated'; questId: string }
+  | {
+      type: 'worldQuestDone';
+      questId: string;
+      traceResult?: Pick<WorldQuestTraceResult, 'score' | 'rating'>;
+    }
+  // Clue Scrolls (src/sim/clue_scrolls.ts, src/sim/clue_casket.ts): ids and
+  // indices only, the client resolves every clue and line (clues.<huntId>.<step>).
+  /** The day's slate paid a scroll and it landed in the bags. */
+  | { type: 'clueScrollEarned' }
+  /** The slate paid a scroll but the stack or the bags could not hold it: lost for the day. */
+  | { type: 'clueScrollLost' }
+  | { type: 'clueHuntStarted'; huntId: string; total: number }
+  /** `step` is the index of the step that just completed; `total` is steps.length. */
+  | { type: 'clueHuntStep'; huntId: string; step: number; total: number }
+  | { type: 'clueHuntDone'; huntId: string }
+  | { type: 'clueHuntAbandoned'; huntId: string }
+  /** One id per grant (the Heroic Marks stack appears once) plus the copper paid. */
+  | { type: 'clueCasketOpened'; itemIds: string[]; copper: number }
+  // Treasure maps and vaults (src/sim/treasure_vault.ts). The sim emits ids
+  // only; the client resolves the prose and opens the map window on a read.
+  | { type: 'treasureMapEarned'; rarity: TreasureMapRarity }
+  | { type: 'treasureMapLost' }
+  | { type: 'treasureMapRead'; rarity: TreasureMapRarity; siteId: string; fresh: boolean }
+  | { type: 'treasureMapUpgraded'; rarity: TreasureMapRarity; inks: number }
+  | { type: 'treasureVaultOpened'; rarity: TreasureMapRarity }
+  /** Server-only durable settlement input, never forwarded to clients. */
+  | {
+      type: 'treasureVaultOutcomePending';
+      attemptId: string;
+      ownerCharacterId: number;
+      claims: {
+        characterId: number;
+        recipientName: string;
+        items: { itemId: string; count: number }[];
+        copper: number;
+        guestCycle?: string;
+      }[];
+    }
+  /** Server-only request; the chest grants nothing until the fenced save commits. */
+  | { type: 'treasureVaultClaimRequested'; attemptId: string; characterId: number }
+  | {
+      type: 'treasureVaultLooted';
+      rarity: TreasureMapRarity;
+      capped: boolean;
+      itemIds?: string[];
+      copper?: number;
+    }
+  /** The room this player just climbed into holds a living Coinsack Scurrier
+   *  (src/sim/rift/hoard_goblin.ts): its escape bar length and the seconds it
+   *  has left before leaving untouched, so the explanation never drifts. */
+  | { type: 'hoardGoblinSighted'; escapeSec: number; idleSec: number }
   | {
       type: 'varkhulCallout';
       sourceId: number;
@@ -6552,6 +6949,7 @@ export type SimEvent = { pid?: number } & (
       current: RealmBuilderHonour;
       past: readonly RealmBuilderHonour[];
     }
+  | { type: 'worldQuestInvestigationDialogue'; targetId: number }
   // `boardId` is the authored NoticeboardDef id (every board shares one
   // templateId), so the client can tell the Proving Shore's recruits' signpost
   // from a town board and open the guild board on its default view.
@@ -7021,6 +7419,7 @@ export type SimEvent = { pid?: number } & (
       // 'tick' is a ground-zone pulse (Consecration et al) anchored at the
       // ZONE, not the caster; the other kinds are impact/lifetime visuals.
       fx:
+        | 'hoardDig'
         | 'burst'
         | 'nova'
         | 'orb'
@@ -7577,6 +7976,25 @@ export type SimEvent = { pid?: number } & (
       name: string;
       themeName: string;
       tier: RiftTier | null;
+      hoardCues?: Array<{
+        instanceId: number;
+        cueId: number;
+        kind: 'sweep' | 'mark';
+        variant?: import('./rift/types').HoardBossCueVariant;
+        phase: 'warning' | 'hazard';
+        x: number;
+        z: number;
+        radius: number;
+        remaining: number;
+        total: number;
+        facing?: number;
+        halfAngle?: number;
+        innerRadius?: number;
+        waveGap?: number;
+        waveSpan?: number;
+        waveLead?: number;
+        targetId?: number;
+      }>;
       // Epoch-ms deadline (via ctx.lockoutNowMs, the same conversion
       // rift/persistence.ts uses for save/load) after which the rift's backing
       // world event stops admitting new parties. Null for a dev-spawned rift
@@ -7842,6 +8260,27 @@ export type SimEvent = { pid?: number } & (
   // phantom "about to detonate" telegraph for the rest of the fuse. Personal
   // (pid = each instance member) so delivery never depends on interest radius.
   | { type: 'riftDeathZoneClear'; pid: number }
+  | {
+      type: 'hoardBossCue';
+      pid: number;
+      instanceId: number;
+      cueId: number;
+      kind: 'sweep' | 'mark';
+      variant?: import('./rift/types').HoardBossCueVariant;
+      phase: 'warning' | 'hazard';
+      x: number;
+      z: number;
+      radius: number;
+      durationSecs: number;
+      facing?: number;
+      halfAngle?: number;
+      innerRadius?: number;
+      waveGap?: number;
+      waveSpan?: number;
+      waveLead?: number;
+      targetId?: number;
+    }
+  | { type: 'hoardBossCueClear'; pid: number }
   // Trend nudge (Professions 2.0): a soft, at-most-once-per-window
   // reminder that an unattuned crafter's skills are leaning toward an adjacent
   // pair (professions/prof_nudges.ts). Personal (pid = the crafter) and
@@ -8055,6 +8494,9 @@ export interface MoveInput {
    *  key binding, a bot, and any client that never sends it all read as 1
    *  (`swimSteerRate`), which is exactly the old on/off behaviour. */
   swimSteer?: number;
+  /** Signed flight pitch intent, -1 dive to +1 climb. Absent uses keyboard
+   * controls; zero explicitly requests a neutral glide. */
+  gliderPitch?: number;
 }
 
 // A bounded height edit (the sculpt brush stamp), applied inside terrainHeight()
@@ -8455,6 +8897,7 @@ export interface SimConfig {
 
 export function emptyMoveInput(): MoveInput {
   return {
+    gliderPitch: undefined,
     forward: false,
     back: false,
     turnLeft: false,
@@ -8693,7 +9136,10 @@ export type DeedStatKey =
   // Orange promotions performed (Masterwrought phase 13): bumped once per
   // legendary promotion at the promotePerfectedCopy stamp site
   // (professions/perfecting.ts, reached via resolvePerfectingAttempt's internal promotion arm), feeding prog_legendmaker.
-  | 'legendariesForged';
+  | 'legendariesForged'
+  // Coinsack Scurriers caught in a Buried Hoard (rift/hoard_goblin.ts): bumped
+  // for every player paid off one, feeding cmb_coinsack_caught.
+  | 'hoardGoblinKills';
 
 // The canonical counter key list (init/serialize iterate it in this fixed
 // order so equal states always serialize byte-equal).
@@ -8726,6 +9172,7 @@ export const DEED_STAT_KEYS: readonly DeedStatKey[] = [
   'riftSRankClears',
   'tutorialGraduations',
   'legendariesForged',
+  'hoardGoblinKills',
 ];
 
 // Numeric readings computed from already-persisted PlayerMeta state (never new
@@ -8751,7 +9198,16 @@ export type DeedMeterId =
   | 'poorItemsDiscoveredCount'
   // Career Honor earned, never spent: PlayerMeta.lifetimeHonor is monotonic, so
   // spending at the WARFARE quartermaster can never cost a rank title.
-  | 'lifetimeHonor';
+  | 'lifetimeHonor'
+  // Faction standing (PlayerMeta.factions, src/sim/factions.ts): one meter
+  // per allied faction. awardFactionReputation only ever adds, so a standing
+  // tier once reached is never lost.
+  | 'standingRiftWatch'
+  | 'standingChurchOrder'
+  | 'standingAutomatons'
+  // Clue Scrolls: lifetime Treasure Caskets opened (PlayerMeta.clueCasketsOpened,
+  // src/sim/clue_casket.ts). Only ever climbs.
+  | 'clueCasketsOpened';
 
 // Boolean predicates over already-persisted state (see the flag table in
 // deeds.ts). Like meters, they retro-grant on load.
@@ -9440,4 +9896,132 @@ export interface DelveRestlessPending {
   x: number;
   z: number;
   mobId: string;
+}
+
+/** Vehicle encounters are private runtime actors, never shared combat entities. */
+export type CannonActionId = 'cannonball' | 'grapeshot' | 'incendiary';
+export type CannonEnemyKind = 'infantry' | 'runner' | 'armored' | 'commander' | 'sapper';
+export interface CannonPoint {
+  x: number;
+  z: number;
+}
+export interface CannonField {
+  minX: number;
+  maxX: number;
+  minZ: number;
+  maxZ: number;
+}
+export interface CannonActionDef {
+  damage: number;
+  radius: number;
+  cooldownTicks: number;
+  flightTicks: number;
+  slowTicks: number;
+  slowMultiplier: number;
+  burnTicks: number;
+  burnDamage: number;
+}
+export interface CannonEnemyDef {
+  hp: number;
+  speed: number;
+  breachDamage: number;
+}
+export interface CannonSpawnDef {
+  atTick: number;
+  lane: number;
+  kind: CannonEnemyKind;
+}
+export interface CannonEnemy extends CannonPoint {
+  id: number;
+  kind: CannonEnemyKind;
+  hp: number;
+  slowUntilTick: number;
+  armorBroken?: boolean;
+}
+export interface CannonBarrel extends CannonPoint {
+  id: number;
+  active: boolean;
+}
+export interface CannonFeedback extends CannonPoint {
+  id: number;
+  tick: number;
+  kind: 'shot' | 'impact' | 'barrel' | 'armor' | 'charge' | 'death';
+  enemyId?: number;
+}
+export const WORLD_QUEST_BANNER_IDS = [
+  'riftOpens',
+  'captainSteps',
+  'riftRouted',
+  'championRises',
+  'championFallen',
+  'endlessBegins',
+] as const;
+export type WorldQuestBannerId = (typeof WORLD_QUEST_BANNER_IDS)[number];
+
+export interface CannonResult {
+  medal: 'bronze' | 'silver' | 'gold' | null;
+  integrity: number;
+  shotsFired: number;
+  shotsHit: number;
+  /** Waves held in total, endless rounds included (absent on pre-endless payloads). */
+  wavesCleared?: number;
+}
+export interface CannonShot extends CannonPoint {
+  id: number;
+  action: CannonActionId;
+  firedTick: number;
+  impactTick: number;
+}
+export interface CannonFirePatch extends CannonPoint {
+  id: number;
+  nextPulseTick: number;
+  expiresTick: number;
+  hitCredited?: boolean;
+}
+/** Caller owns this state. Tick/action functions have no hidden world state. */
+export interface CannonEncounterState {
+  tick: number;
+  phase: 'countdown' | 'wave' | 'intermission' | 'won' | 'failed';
+  phaseUntilTick: number;
+  wave: number;
+  waveStartTick: number;
+  spawnCursor: number;
+  integrity: number;
+  killed: number;
+  breached: number;
+  commanderKilled: boolean;
+  nextId: number;
+  recoveryUntilTick: number;
+  readyAt: Record<CannonActionId, number>;
+  enemies: CannonEnemy[];
+  shots: CannonShot[];
+  fires: CannonFirePatch[];
+  barrels: CannonBarrel[];
+  feedback: CannonFeedback[];
+  shotsFired: number;
+  shotsHit: number;
+  commanderCharging: boolean;
+  /** Endless play past the authored victory (minigames/cannon_endless.ts): the
+   *  medal latched at the victory, and the running count of waves held. */
+  endless?: boolean;
+  wavesCleared?: number;
+  victoryMedal?: CannonResult['medal'];
+}
+
+export interface VehicleStationDef {
+  id: string;
+  entityId: number;
+  questId: string;
+  x: number;
+  z: number;
+  field: CannonField;
+}
+
+/** Transient personal vehicle session. Never included in character saves. */
+export interface VehicleSession {
+  kind: 'cannon';
+  stationId: string;
+  cycle: string;
+  origin: Vec3;
+  encounter: CannonEncounterState;
 }

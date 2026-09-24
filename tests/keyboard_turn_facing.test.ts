@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  applyKeyboardTurnInput,
   type KeyboardTurnArgs,
   newKeyboardTurnState,
   seedKeyboardTurnRelease,
@@ -24,6 +25,38 @@ const args = (over: Partial<KeyboardTurnArgs> = {}): KeyboardTurnArgs => ({
 });
 
 describe('stepKeyboardTurnFacing', () => {
+  it('streams held lateral turn intent throughout a scripted lane and drops stale facing commits', () => {
+    const state = newKeyboardTurnState();
+    stepKeyboardTurnFacing(state, args({ turnLeft: true }));
+    stepKeyboardTurnFacing(state, args({ turnLeft: true }));
+    expect(state.suppressTurnFlags).toBe(true);
+    const wire = { turnLeft: false, turnRight: false, back: false };
+    for (let frame = 0; frame < 120; frame++) {
+      expect(
+        stepKeyboardTurnFacing(state, args({ rawTurnIntent: true, turnLeft: true })),
+      ).toBeNull();
+      applyKeyboardTurnInput(wire, { turnLeft: true, turnRight: false, back: false }, state);
+      expect(wire).toEqual({ turnLeft: true, turnRight: false, back: false });
+      expect(state.wireFacing).toBeNull();
+      expect(state.pendingReleaseCommit).toBeNull();
+    }
+    expect(stepKeyboardTurnFacing(state, args({ turnRight: true, serverFacing: 1 }))).toBeCloseTo(
+      1 - TURN_SPEED * FRAME_60,
+    );
+  });
+
+  it('still suppresses ordinary streamed turns while preserving other movement flags', () => {
+    const state = newKeyboardTurnState();
+    const source = { turnLeft: true, turnRight: false, back: true };
+    const wire = { ...source };
+    stepKeyboardTurnFacing(state, args({ turnLeft: true }));
+    applyKeyboardTurnInput(wire, source, state);
+    expect(wire.turnLeft).toBe(true);
+    stepKeyboardTurnFacing(state, args({ turnLeft: true }));
+    applyKeyboardTurnInput(wire, source, state);
+    expect(wire).toEqual({ turnLeft: false, turnRight: false, back: true });
+    expect(source.turnLeft).toBe(true);
+  });
   it('integrates a right turn as a DECREASING facing at TURN_SPEED', () => {
     const st = newKeyboardTurnState();
     const f = stepKeyboardTurnFacing(st, args({ turnRight: true, serverFacing: 1.0 }));

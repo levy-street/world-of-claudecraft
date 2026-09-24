@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Riften',
     desc: 'Kendetegnende bytte fra den skiftende Rift, fra dens omvandrende rædsler til de to skatte i jagten på rang S.',
   },
+  conquerors_buried_hoards: {
+    name: 'De nedgravede skatte',
+    desc: 'Bytte fra de skatte, som skattekortene fører til, fire fra hver vogter, der bevogter en.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rigets sjældenheder',
     desc: 'Beviset på hver navngiven sjældenhed, der er fældet i riget.',

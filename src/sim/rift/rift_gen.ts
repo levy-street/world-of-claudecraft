@@ -10,6 +10,7 @@
 // global draw order and is reproducible anywhere.
 
 import type { Collider } from '../colliders';
+import { CAVE_THEMES } from '../content/rift/cave_themes';
 import {
   buildInfernalCitadelFloor,
   INFERNAL_FLOOR_COUNT,
@@ -27,6 +28,7 @@ import { polygonIsStarShaped, polygonSelfIntersects, polygonSignedArea } from '.
 import { Rng } from '../rng';
 import { authoredLiftAt } from './authored';
 import { riftMinSpawnZ } from './entry_clearance';
+import { buildHoardValleyLayout } from './hoard_valley';
 import { RIFT_RANK_BASE_LEVEL, riftFloorLevel, riftHeroicTuningFor } from './ranks';
 import { buildStyle, mixSeed } from './style';
 import type {
@@ -41,6 +43,13 @@ import type {
   RiftUpgradeManifest,
 } from './types';
 import { applyRiftUpgrade } from './upgrade';
+import {
+  type VaultSizeTier,
+  vaultSeedCaveBoss,
+  vaultSeedOpen,
+  vaultSeedTier,
+  vaultSeedZone,
+} from './vault_seed';
 
 // ---- Tuning -----------------------------------------------------------------
 const MIN_FLOORS = 3;
@@ -64,7 +73,9 @@ function entryZFor(layout: DungeonLayout): number {
   return layout.zMin + ENTRY_Z_OFFSET;
 }
 
-const RIFT_SUFFIXES = [
+/** The procedural rift name suffixes ("The <noun> <suffix>"); exported for the
+ * client name localizer (src/ui/rift_text_i18n.ts), which rebuilds the grammar. */
+export const RIFT_SUFFIXES = [
   'Abyss',
   'Depths',
   'Descent',
@@ -83,6 +94,7 @@ const SET_PIECE_CHANCE = 0.15;
 /** Whether this SEED rolls the hand-authored Infernal Citadel (pure seed
  * property; whether it actually OPENS depends on the rank, see isSetPieceRift). */
 export function isSetPieceSeed(seed: number): boolean {
+  if (vaultSeedTier(seed) !== null) return false; // a treasure vault is never the citadel
   return new Rng(mixSeed(seed, 0x1f3e)).chance(SET_PIECE_CHANCE);
 }
 
@@ -100,11 +112,20 @@ export function isSetPieceRift(seed: number, baseLevel: number): boolean {
  * defaults to the C-rank baseline for legacy seed-only callers. */
 export function riftFloorCount(seed: number, baseLevel: number = RIFT_RANK_BASE_LEVEL.C): number {
   if (isSetPieceRift(seed, baseLevel)) return INFERNAL_FLOOR_COUNT;
+  // A treasure vault is one room: the boss waits at the far end of it.
+  if (vaultSeedTier(seed) !== null) return 1;
   return new Rng(mixSeed(seed, 0x510f)).int(MIN_FLOORS, MAX_FLOORS);
 }
 
 function themeForFloor(seed: number, floorIndex: number): RiftTheme {
   const rng = new Rng(mixSeed(seed, 0x7000 + floorIndex));
+  // A common or rare hoard is a cave: its boss comes from the cave bosses, built
+  // for a room that size (content/rift/cave_themes.ts). One pick either way, on
+  // this floor's own stream, so no other stream moves. A saved legacy map keeps
+  // the boss it was dug up with.
+  if (vaultSeedCaveBoss(seed) && CAVE_THEMES.length > 0) {
+    return rng.pick(CAVE_THEMES as RiftTheme[]);
+  }
   return rng.pick(RIFT_THEMES as RiftTheme[]);
 }
 
@@ -162,6 +183,10 @@ interface GeneratedGeometry {
    * are kept inside it). For a rectangle this is a constant. */
   halfWidthAt: (z: number) => number;
   archetype: string;
+  /** Outdoor hoards keep every encounter beyond the gorge reveal. */
+  spawnStartZ?: number;
+  gorgeEndZ?: number;
+  valleyStartZ?: number;
 }
 
 // Room silhouettes. Each is a symmetric half-width PROFILE over the room length
@@ -225,25 +250,67 @@ function makeProfile(rng: Rng, archetype: string, wMin: number, wMax: number): P
   }
 }
 
-function buildLayout(rng: Rng, _floorIndex: number, isBoss: boolean): GeneratedGeometry {
+// Treasure vault rooms (vault_seed.ts), by size tier: a common map is a small
+// chamber, a legendary one a hall as long and wide as the region allows, open
+// like a battlefield. WORKING RULES. Lengths stay inside RIFT_REGION_HALF_Z.
+const VAULT_LENGTH = [82, 112, 140, 164] as const;
+const VAULT_WIDTH: readonly (readonly [number, number])[] = [
+  [20, 24],
+  [24, 29],
+  [29, 34],
+  [34, 37],
+];
+const VAULT_ARCHETYPES: readonly (readonly string[])[] = [
+  ['apse', 'taper'],
+  ['apse', 'taper'],
+  ['hall', 'taper'],
+  ['hall'],
+];
+/** Trash per pack in a vault, by size tier (a rift boss floor runs 1 to 2). */
+const VAULT_PACK_SIZE: readonly (readonly [number, number])[] = [
+  [1, 2],
+  [2, 3],
+  [2, 3],
+  [3, 4],
+];
+
+function buildLayout(
+  rng: Rng,
+  _floorIndex: number,
+  isBoss: boolean,
+  vault: VaultSizeTier | null = null,
+): GeneratedGeometry {
   const zMin = -19;
   // Bigger, more spread-out floors: a longer nave and a wider envelope so a run
   // feels grand and exploratory rather than a short cramped corridor. Kept within
   // the rift region bounds (data.ts RIFT_REGION_HALF_Z 160 / HALF_X 40): the dais +
   // descent at the far end must stay inside HALF_Z, and the side walls inside HALF_X,
   // or the region's trigger/collision checks stop firing there.
-  const length = isBoss ? rng.int(120, 146) : rng.int(130, 168);
+  const length =
+    vault !== null
+      ? VAULT_LENGTH[vault] + rng.int(0, 6)
+      : isBoss
+        ? rng.int(120, 146)
+        : rng.int(130, 168);
   const zMax = zMin + length;
   const midZ = (zMin + zMax) / 2;
   const range = zMax - zMin;
 
-  const archetype = isBoss
-    ? rng.pick(BOSS_ARCHETYPES as unknown as string[])
-    : rng.pick(ROOM_ARCHETYPES as unknown as string[]);
+  const archetype =
+    vault !== null
+      ? rng.pick(VAULT_ARCHETYPES[vault] as string[])
+      : isBoss
+        ? rng.pick(BOSS_ARCHETYPES as unknown as string[])
+        : rng.pick(ROOM_ARCHETYPES as unknown as string[]);
   // Narrowest half-width keeps the spine + a walkable margin (>= AISLE_HALF + ~4);
   // widest drives how grand the room feels (capped so wallX stays < HALF_X 40).
   const wMin = rng.range(11, 15);
-  const wMax = isBoss ? rng.range(28, 37) : rng.range(22, 36);
+  const wMax =
+    vault !== null
+      ? rng.range(VAULT_WIDTH[vault][0], VAULT_WIDTH[vault][1])
+      : isBoss
+        ? rng.range(28, 37)
+        : rng.range(22, 36);
   const profile = makeProfile(rng, archetype, wMin, Math.max(wMin + 4, wMax));
   const halfWidthAt = (z: number): number =>
     Math.max(wMin, profile(Math.max(0, Math.min(1, (z - zMin) / range))));
@@ -384,6 +451,7 @@ function planSpawns(
   geo: GeneratedGeometry,
   floorLevel: number,
   isBoss: boolean,
+  vault: VaultSizeTier | null = null,
 ): RiftSpawn[] {
   const { layout, colliders, halfWidthAt } = geo;
   const out: RiftSpawn[] = [];
@@ -393,7 +461,7 @@ function planSpawns(
   // The band start absorbs the per-spawn jitter so the whole first pack sits beyond it.
   const minSpawnZ = riftMinSpawnZ(entryZFor(layout));
   const rawStartZ = layout.zMin + 22;
-  const packStartZ = Math.max(rawStartZ, minSpawnZ + PACK_Z_JITTER);
+  const packStartZ = Math.max(rawStartZ, minSpawnZ + PACK_Z_JITTER, geo.spawnStartZ ?? -Infinity);
   const packEndZ = layout.dais.z - (isBoss ? 22 : 14);
   const packGap = rng.pick([16, 18, 20]);
   // packCount stays keyed to the ORIGINAL band start, so pushing the packs back off the
@@ -405,7 +473,12 @@ function planSpawns(
 
   for (let i = 0; i < packCount; i++) {
     const z = packStartZ + i * packStride;
-    const size = isBoss ? rng.int(1, 2) : rng.int(2, 3);
+    const size =
+      vault !== null
+        ? rng.int(VAULT_PACK_SIZE[vault][0], VAULT_PACK_SIZE[vault][1])
+        : isBoss
+          ? rng.int(1, 2)
+          : rng.int(2, 3);
     for (let j = 0; j < size; j++) {
       const templateId = rng.pick(theme.trash as string[]);
       // Spread the pack across the aisle within the local width, then pull any
@@ -791,7 +864,8 @@ export function generateRiftPlan(seed: number, baseLevel: number): RiftPlan {
   return {
     seed,
     baseLevel,
-    name: `The ${noun} ${suffix}`,
+    // A Buried Hoard (vault_seed.ts) is named for what it is, never a rift.
+    name: vaultSeedTier(seed) !== null ? `The Buried ${noun} Hoard` : `The ${noun} ${suffix}`,
     themeId: bossTheme.id,
     floorCount,
   };
@@ -835,23 +909,25 @@ export function generateRiftFloor(
   const theme = themeForFloor(seed, clampedIndex);
   const rng = new Rng(mixSeed(seed, 0xf100 + clampedIndex));
 
-  const geo = buildLayout(rng, clampedIndex, isBoss);
+  const vault = vaultSeedTier(seed);
+  const outdoorZone = vaultSeedOpen(seed) ? vaultSeedZone(seed) : null;
+  const geo =
+    vault !== null && outdoorZone !== null
+      ? buildHoardValleyLayout(rng, vault)
+      : buildLayout(rng, clampedIndex, isBoss, vault);
   const style = buildStyle(rng, theme);
   const floorLevel = floorLevelFor(baseLevel, clampedIndex);
   const puzzle = planPuzzle(rng, isBoss);
   const iceZone = puzzle.kind === 'ice_slide' ? iceZoneFor(geo) : null;
   // Ice-maze rocks go in BEFORE spawns/objects so both place onto clear tiles.
   if (iceZone) addIceBlockers(rng, geo, iceZone);
-  const spawns = planSpawns(rng, theme, geo, floorLevel, isBoss);
+  const spawns = planSpawns(rng, theme, geo, floorLevel, isBoss, vault);
   const objects = planObjects(rng, geo, isBoss, puzzle, iceZone);
   const hazards = planHazards(rng, geo, isBoss, iceZone !== null);
   const rollers = planRollers(rng, geo, isBoss, iceZone !== null, hazards.length > 0);
-  const platform = planPlatform(
-    rng,
-    geo,
-    isBoss,
-    rollers.length > 0 || iceZone !== null || hazards.length > 0,
-  );
+  const platform = outdoorZone
+    ? null
+    : planPlatform(rng, geo, isBoss, rollers.length > 0 || iceZone !== null || hazards.length > 0);
   // A switch-gate is the mechanic for a subset of otherwise-plain floors (no puzzle,
   // hazard, roller, ice, or platform), so exactly one headline mechanic reads.
   const gate =
@@ -875,10 +951,22 @@ export function generateRiftFloor(
     floorIndex: clampedIndex,
     floorCount,
     isBoss,
-    name: `${theme.name} ${isBoss ? 'Sanctum' : 'Reaches'}: Depth ${clampedIndex + 1}`,
+    name:
+      vault !== null
+        ? `${theme.name} Buried Hoard`
+        : `${theme.name} ${isBoss ? 'Sanctum' : 'Reaches'}: Depth ${clampedIndex + 1}`,
     themeName: theme.name,
     layout: geo.layout,
     style,
+    ...(outdoorZone && geo.gorgeEndZ !== undefined && geo.valleyStartZ !== undefined
+      ? {
+          outdoor: {
+            zoneId: outdoorZone,
+            gorgeEndZ: geo.gorgeEndZ,
+            valleyStartZ: geo.valleyStartZ,
+          },
+        }
+      : {}),
     entry: { x: 0, z: entryZFor(geo.layout) },
     spawns,
     objects,

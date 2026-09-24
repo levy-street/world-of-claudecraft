@@ -7,6 +7,15 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_arcane_calligraphy: {
+    name: '揺るがぬ筆運び',
+    desc: 'イーストブルック渓谷で秘術の書道を完了する。',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: '星明かりに記されて',
+    desc: 'イーストブルック渓谷の秘術の書道でゴールド評価を獲得する。',
+    title: 'ルーンを呼ぶ者',
+  },
   exp_dawnhold_castle: {
     name: '庭園に開かれた扉',
     desc: 'ドーンホールド城を訪ね、日差しあふれる庭園の広間を巡ろう。',

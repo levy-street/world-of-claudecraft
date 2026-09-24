@@ -73,7 +73,7 @@ export const RIFT_THEMES: readonly RiftTheme[] = [
     torch: { flame: 0xe8e0c8, emissive: 0xbfa870, light: 0xd8c8a0 },
     fog: { color: 0x0d0c0a, near: 18, far: 84 },
     wallTint: 0xd8cfb0,
-    trash: ['rift_boneclad', 'rift_marrow_troll'],
+    trash: ['rift_boneclad', 'rift_marrow_golem'],
     boss: 'rift_boss_necro',
   },
   {

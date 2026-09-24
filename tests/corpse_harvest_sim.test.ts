@@ -2536,7 +2536,10 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // without touching `tagged` either. Plus the five Eastbrook healing-training
     // role dummies (src/sim/content/healing_training.ts), which are friendly
     // practice targets, not corpses to butcher: 196.
-    expect(Object.keys(MOBS).length - tagged.length).toBe(196);
+    // 200, not 196: the world-quest infiltrator and the three regional freight
+    // caravans ship untagged the same way (a disguised NPC and three wagons).
+    // The summoned Hoard Healing Tide Totem raises that total to 201.
+    expect(Object.keys(MOBS).length - tagged.length).toBe(201);
     withMixedTemplates(() => {
       const mixed = mixedTemplates();
       expect(mixed.map(([id]) => id).sort()).toEqual(

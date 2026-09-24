@@ -1,8 +1,31 @@
+import { ABILITIES } from '../../../sim/data';
+import type { ResolvedAbility } from '../../../sim/sim';
 import type { AbilityEffect, Entity } from '../../../sim/types';
 
 export interface AimPoint {
   x: number;
   z: number;
+}
+
+/** A living, non-self selected target seeds precise aim only if attackable.
+ * Quick targeting intentionally accepts friendly targets too, as before. */
+export function selectedGroundAimPoint(
+  player: Pick<Entity, 'id' | 'targetId' | 'pos'>,
+  entities: ReadonlyMap<number, Entity>,
+  attackable?: (id: number) => boolean,
+): AimPoint | null {
+  const target = player.targetId !== null ? entities.get(player.targetId) : null;
+  if (!target || target.dead || target.id === player.id || (attackable && !attackable(target.id)))
+    return null;
+  return { x: target.pos.x, z: target.pos.z };
+}
+
+// Where a ground-targeted ability should land: the current target's position if
+// one is selected (the usual "cast on that pack" intent), else the caster's own
+// spot for an open-ground cast. The sim clamps this to the ability's range.
+/** Without a valid selected target, instant desktop casts use the player's feet. */
+export function quickGroundTarget(player: Entity, entities: ReadonlyMap<number, Entity>): AimPoint {
+  return selectedGroundAimPoint(player, entities) ?? { x: player.pos.x, z: player.pos.z };
 }
 
 export interface GroundAimState {
@@ -127,4 +150,17 @@ export function abilityAoeRadius(res: { effects: readonly AbilityEffect[] }): nu
   );
   if (effect?.type === 'temporalHourglass') return effect.captureRadius;
   return effect && 'radius' in effect ? effect.radius : DEFAULT_GROUND_AOE_RADIUS;
+}
+
+export function resolveGroundAimAbility(
+  known: ReadonlyArray<ResolvedAbility>,
+  id: string,
+): ResolvedAbility | null {
+  const match = known.find((k) => k.def.id === id);
+  if (match) return match;
+  if (id === 'clockwork_shock_bomb' && ABILITIES.clockwork_shock_bomb) {
+    const def = ABILITIES.clockwork_shock_bomb;
+    return { def, effects: def.effects ?? [] } as ResolvedAbility;
+  }
+  return null;
 }

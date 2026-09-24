@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'La Faille',
     desc: 'Butins emblématiques de la Faille changeante, de ses horreurs errantes aux deux trésors de la chasse de rang S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Les trésors enfouis',
+    desc: 'Butin des trésors auxquels mènent les cartes au trésor, quatre pièces pour chaque gardien qui en protège un.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rares du royaume',
     desc: 'La preuve de chaque rare nommé abattu à travers le royaume.',

@@ -7,6 +7,12 @@
 // stays in Hud because it needs Hud's private state; this module only renders
 // one panel and reports clicks back through the injected callbacks.
 
+import {
+  FACTION_CURRENCY_IDS,
+  factionCurrencyName,
+  factionDisplayName,
+  STANDING_TIER_LABELS,
+} from '../../../sim/factions';
 import type { ItemInstancePayload } from '../../../sim/types';
 import type { VendorBuyOptions } from '../../../sim/vendor_buy_stack';
 import { currencyIconHtml } from '../../currency_art';
@@ -72,10 +78,16 @@ function honorText(amount: number): string {
 }
 
 function goodsPriceText(price: VendorPrice): string {
-  const money = price.copper > 0 ? formatLocalizedMoney(price.copper) : '';
-  const honor = price.honor > 0 ? honorText(price.honor) : '';
-  if (money && honor) return t('hudChrome.warfare.dualPrice', { money, honor });
-  return money || honor;
+  const parts: string[] = [];
+  if (price.copper > 0) parts.push(formatLocalizedMoney(price.copper));
+  if (price.honor > 0) parts.push(honorText(price.honor));
+  if (price.factionMarks && price.factionMarks.amount > 0) {
+    const curName = factionCurrencyName(price.factionMarks.factionId);
+    parts.push(
+      `${formatNumber(price.factionMarks.amount, { maximumFractionDigits: 0 })} ${curName}`,
+    );
+  }
+  return parts.join(' + ');
 }
 
 /** The advisory requirement line under a row's name (R22): the localized
@@ -91,6 +103,13 @@ function goodsPriceText(price: VendorPrice): string {
  *  merchant. Empty string for a profession with no display-name key, matching
  *  every other consumer of that table: no name is printable, so no line is. */
 function requirementText(row: VendorGoodsRow): string {
+  if (row.factionRequirement) {
+    const tier = STANDING_TIER_LABELS[row.factionRequirement.standingTier];
+    const faction = row.factionRequirement.factionId
+      ? factionDisplayName(row.factionRequirement.factionId)
+      : 'an Allied Faction';
+    return `Requires ${tier} with ${faction}`;
+  }
   const requirement = row.requirement;
   if (!requirement) return '';
   const nameKey = gatheringProfessionNameKey(requirement.professionId);
@@ -107,6 +126,14 @@ function goodsPriceHtml(row: VendorGoodsRow, deps: VendorWindowDeps): string {
   if (row.price.honor > 0) {
     parts.push(
       `<span class="warfare-price">${currencyIconHtml('honor')}${esc(honorText(row.price.honor))}</span>`,
+    );
+  }
+  if (row.price.factionMarks && row.price.factionMarks.amount > 0) {
+    const curId = FACTION_CURRENCY_IDS[row.price.factionMarks.factionId];
+    const curName = factionCurrencyName(row.price.factionMarks.factionId);
+    const amountStr = formatNumber(row.price.factionMarks.amount, { maximumFractionDigits: 0 });
+    parts.push(
+      `<span class="faction-currency-price">${currencyIconHtml(curId)}<span>${amountStr} ${esc(curName)}</span></span>`,
     );
   }
   return parts.join('<span aria-hidden="true"> + </span>');
@@ -150,6 +177,15 @@ export function renderVendorWindow(
         amount: formatNumber(view.honorBalance, { maximumFractionDigits: 0 }),
       }),
     )}`;
+    el.appendChild(balance);
+  }
+
+  if (view.vendorFactionId && view.factionCurrencyBalance !== undefined) {
+    const balance = document.createElement('div');
+    balance.className = 'faction-currency-balance';
+    const curId = FACTION_CURRENCY_IDS[view.vendorFactionId];
+    const curName = factionCurrencyName(view.vendorFactionId);
+    balance.innerHTML = `${currencyIconHtml(curId)}<span>${esc(curName)}: <strong>${formatNumber(view.factionCurrencyBalance, { maximumFractionDigits: 0 })}</strong></span>`;
     el.appendChild(balance);
   }
 
@@ -209,7 +245,8 @@ export function renderVendorWindow(
     // gates on the whole-count total; force-1 and custom rows keep the 1x
     // baseline (the custom prompt's typed amount decides the rest).
     const countBuy = goods.countBuy;
-    row.disabled = countBuy ? !countBuy.affordable : !goods.affordable;
+    const lockedByFaction = goods.requirementUnmet && !!goods.factionRequirement;
+    row.disabled = lockedByFaction || (countBuy ? !countBuy.affordable : !goods.affordable);
     const price = countBuy ? formatLocalizedMoney(countBuy.copper) : goodsPriceText(goods.price);
     const itemName = itemDisplayName(item);
     const stack =

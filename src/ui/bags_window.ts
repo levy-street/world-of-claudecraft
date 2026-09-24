@@ -19,6 +19,7 @@
 
 import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
+import { getItemCooldownDuration } from '../sim/content/item_cooldowns';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
@@ -297,6 +298,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  handler consumed the use (nearest matching node + autorun stop); false
    *  falls back to the plain useItem command. */
   useGatherTool(item: ItemDef): boolean;
+  /** Arm ground targeting for ground-aimable consumables (e.g. shock bomb). */
+  startGroundAimForItem?(itemId: string): boolean;
   // Hotbar drag plumbing (cross-window drag state lives on the HUD).
   isHotbarItemId(itemId: string): boolean;
   setDragAction(action: { type: 'item'; id: string } | null): void;
@@ -1121,20 +1124,29 @@ export class BagsWindow {
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
       row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
-      // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
-      // 5s throw pacing is visible in the bag. The bag is a cold window with no
-      // per-frame driver, so the sweep is a self-contained CSS animation seeded from
-      // the wired remaining seconds (world.player.firebottleCdRemaining), not a
-      // per-frame-repainted --cd-fill like the action bar. Appended after the
-      // innerHTML build so the quest seal markup above is not overwritten.
-      if (item.id === FIREBOTTLE_ITEM_ID && world.player.firebottleCdRemaining > 0) {
-        const remaining = world.player.firebottleCdRemaining;
+      // An item mid-cooldown (the firebottle's 5s throw pacing, the faction
+      // quartermaster goods in ITEM_BASE_COOLDOWNS) paints a draining curtain on
+      // its slot. The bag is a cold window with no per-frame driver, so the sweep
+      // is a self-contained CSS animation seeded from the wired remaining seconds,
+      // not a per-frame-repainted --cd-fill like the action bar. Only an item
+      // with a cooldown reads the player's timers, so an ordinary stack never
+      // touches world.player.
+      const itemTotalCd =
+        getItemCooldownDuration(item.id) ||
+        (item.id === FIREBOTTLE_ITEM_ID ? FIREBOTTLE_COOLDOWN_SECS : 0);
+      const itemCd =
+        itemTotalCd > 0
+          ? (world.player.cooldowns.get(item.id) ??
+            (item.id === FIREBOTTLE_ITEM_ID ? world.player.firebottleCdRemaining : 0))
+          : 0;
+      if (itemCd > 0 && itemTotalCd > 0) {
+        const remaining = itemCd;
         const curtain = document.createElement('span');
         curtain.className = 'bag-cd-curtain';
         curtain.setAttribute('aria-hidden', 'true');
         curtain.style.setProperty(
           '--cd-start',
-          `${Math.min(100, (remaining / FIREBOTTLE_COOLDOWN_SECS) * 100)}%`,
+          `${Math.min(100, (remaining / itemTotalCd) * 100)}%`,
         );
         curtain.style.setProperty('--cd-dur', `${remaining}s`);
         row.appendChild(curtain);
@@ -1938,6 +1950,10 @@ export class BagsWindow {
         break;
       }
       case 'use': {
+        if (this.deps.startGroundAimForItem?.(s.itemId)) {
+          this.deps.hideTooltip();
+          break;
+        }
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.

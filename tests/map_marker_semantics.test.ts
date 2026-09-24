@@ -23,6 +23,7 @@ describe('classifyMapObjectMarker', () => {
     ['dungeon_door', { kind: 'dungeon', role: 'entrance' }],
     ['dungeon_exit', { kind: 'dungeon', role: 'exit' }],
     ['rift_portal', { kind: 'rift-entrance', rank: null }],
+    ['hoard_entrance', { kind: 'hoard-entrance' }],
     ['rift_descent', { kind: 'rift-descent' }],
     ['rift_beacon', { kind: 'rift-return', route: 'beacon', rank: null }],
     ['rift_exit', { kind: 'rift-return', route: 'egress', rank: null }],
@@ -143,6 +144,7 @@ describe('mapMarkerSemanticLayer', () => {
       classifyMapObjectMarker(object('delve_locked_chest'), BASE_CONTEXT),
       classifyMapObjectMarker(object('rift_pylon'), BASE_CONTEXT),
       classifyMapObjectMarker(object('dungeon_door'), BASE_CONTEXT),
+      classifyMapObjectMarker(object('hoard_entrance'), BASE_CONTEXT),
       classifyMapObjectMarker(object('rift_descent'), BASE_CONTEXT),
       classifyMapObjectMarker(object('delve_surface_exit'), BASE_CONTEXT),
     ];
@@ -151,6 +153,7 @@ describe('mapMarkerSemanticLayer', () => {
       'reward',
       'reward',
       'mechanic',
+      'navigation',
       'navigation',
       'navigation',
       'navigation',

@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Разлом',
     desc: 'Знаковая добыча изменчивого разлома: от бродящих в нём ужасов до двух сокровищ охоты ранга S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Зарытые клады',
+    desc: 'Добыча из кладов, к которым ведут карты сокровищ: по четыре предмета от каждого хранителя клада.',
+  },
   // Rares of the Realm pages (Phase 21): composed in the chronicle rare
   // deeds' register (chr_marsh_rares ru reads Имена в тумане); no mob names
   // inside page names.

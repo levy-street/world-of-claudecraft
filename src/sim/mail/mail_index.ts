@@ -28,6 +28,9 @@ export interface IndexedLetter {
   recipientKey: string;
   read: boolean;
   deliverAt: number;
+  letterId?: string;
+  copper?: number;
+  items?: readonly unknown[];
   /** Exchange custody parcels only; absent on ordinary letters. */
   custodyRef?: string;
 }
@@ -55,6 +58,10 @@ export class MailIndex<M extends IndexedLetter> {
   // unique, but the index must stay correct even if two letters ever carry
   // one ref (an untrack of one must not erase the other's presence).
   private custodyRefs = new Map<string, number>();
+  // A vault letter with unclaimed escrow occupies one of the recipient's
+  // bounded vault-mail slots. Other system letters have no booking cap, so
+  // checking the bucket on every due claim would grow with mailbox history.
+  private vaultEscrow = new Map<string, number>();
   // Recipient keys whose bucket CONTENT (not just delivery/unread
   // bookkeeping) changed since the last takeDirty(): the persistence seam for
   // #3561's incremental autosave. track/untrack/rekey/markRead each mark the
@@ -76,6 +83,7 @@ export class MailIndex<M extends IndexedLetter> {
   // path.
   private trackQuiet(m: M, now: number): void {
     this.bucketAdd(m);
+    if (this.hasVaultEscrow(m)) this.adjustVaultEscrow(m.recipientKey, 1);
     if (m.custodyRef !== undefined) {
       this.custodyRefs.set(m.custodyRef, (this.custodyRefs.get(m.custodyRef) ?? 0) + 1);
     }
@@ -92,6 +100,7 @@ export class MailIndex<M extends IndexedLetter> {
     // Idempotent: the unread decrement rides only on an ACTUAL bucket
     // removal, so a double untrack (unreachable today) under-counts nothing.
     if (!this.bucketRemove(m)) return;
+    if (this.hasVaultEscrow(m)) this.adjustVaultEscrow(m.recipientKey, -1);
     if (m.custodyRef !== undefined) {
       const left = (this.custodyRefs.get(m.custodyRef) ?? 0) - 1;
       if (left > 0) this.custodyRefs.set(m.custodyRef, left);
@@ -113,6 +122,10 @@ export class MailIndex<M extends IndexedLetter> {
     if (m.recipientKey === newKey) return;
     const oldKey = m.recipientKey;
     const removed = this.bucketRemove(m);
+    if (removed && this.hasVaultEscrow(m)) {
+      this.adjustVaultEscrow(oldKey, -1);
+      this.adjustVaultEscrow(newKey, 1);
+    }
     if (removed && !m.read && now >= m.deliverAt) {
       this.dec(oldKey);
       this.inc(newKey);
@@ -142,6 +155,14 @@ export class MailIndex<M extends IndexedLetter> {
     this.dirty.add(key);
   }
 
+  // mailTake mutates attachments in place. Account for an escrow-to-empty
+  // transition without untracking/retracking (which would change bucket order).
+  refreshVaultEscrow(m: M, previouslyHeld: boolean): void {
+    const currentlyHeld = this.hasVaultEscrow(m);
+    if (previouslyHeld !== currentlyHeld)
+      this.adjustVaultEscrow(m.recipientKey, currentlyHeld ? 1 : -1);
+  }
+
   // Drain and clear the dirty set: the autosave boundary. A quiet interval
   // with no mutations returns an empty array, so the caller can skip writing
   // anything at all.
@@ -150,6 +171,10 @@ export class MailIndex<M extends IndexedLetter> {
     const out = [...this.dirty];
     this.dirty.clear();
     return out;
+  }
+
+  takeDirtyKey(key: string): boolean {
+    return this.dirty.delete(key);
   }
 
   // Per-tick: land any in-flight letter whose delivery time has arrived,
@@ -179,6 +204,7 @@ export class MailIndex<M extends IndexedLetter> {
     this.unread.clear();
     this.undelivered.clear();
     this.custodyRefs.clear();
+    this.vaultEscrow.clear();
     this.dirty.clear();
     for (const m of book) this.trackQuiet(m, now);
   }
@@ -187,6 +213,10 @@ export class MailIndex<M extends IndexedLetter> {
   // booking dedupe; O(1) where the pre-index read walked the whole book.
   hasCustodyRef(ref: string): boolean {
     return this.custodyRefs.has(ref);
+  }
+
+  vaultEscrowFor(key: string): number {
+    return this.vaultEscrow.get(key) ?? 0;
   }
 
   // Delivered-and-unread count for one key bucket (callers union the stable
@@ -247,5 +277,17 @@ export class MailIndex<M extends IndexedLetter> {
     const next = (this.unread.get(key) ?? 0) - 1;
     if (next > 0) this.unread.set(key, next);
     else this.unread.delete(key);
+  }
+
+  private hasVaultEscrow(m: M): boolean {
+    return (
+      m.letterId === 'hoard_vault_reward' && ((m.copper ?? 0) > 0 || (m.items?.length ?? 0) > 0)
+    );
+  }
+
+  private adjustVaultEscrow(key: string, delta: number): void {
+    const next = (this.vaultEscrow.get(key) ?? 0) + delta;
+    if (next > 0) this.vaultEscrow.set(key, next);
+    else this.vaultEscrow.delete(key);
   }
 }

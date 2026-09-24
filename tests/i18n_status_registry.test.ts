@@ -302,8 +302,10 @@ describe('i18n status registry: states', () => {
       module: { exports: {} as { simDictProvidedKeys: (lang: string) => Set<string> } },
       BASE_DICT: { cs_CZ: { owned: 'Překlad', blank: '   ' } },
       PET_DICT: { cs_CZ: { pet: 'Společník' } },
+      WORLD_QUEST_DICT: {},
       RAID_BOSS_DIALOGUE_DICT: {},
       IGNIVAR_DICT: {},
+      HOARD_BOSS_DICT: {},
       ARENA_QUEUE_AUTO_LEAVE_1V1: {},
       DICT: { cs_CZ: { owned: 'Překlad', blank: 'English', omitted: 'English' } },
     };

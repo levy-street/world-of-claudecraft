@@ -14,6 +14,49 @@ import { professionTrainerStrings } from './profession_trainers';
 export const hudChromeStrings = {
   professionTrainers: professionTrainerStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
+  vehicle: {
+    title: 'North Watch Cannon',
+    objective: 'Defend the north watch',
+    lastKeepTitle: 'The Last Keep Cannon',
+    lastKeepObjective: 'Defend the approach to The Last Keep',
+    cannonball: 'Cannonball',
+    grapeshot: 'Grapeshot',
+    incendiary: 'Incendiary Shot',
+    integrity: 'Cannon integrity',
+    exit: 'Leave cannon',
+    wave: 'Wave {wave}/{total}',
+    endlessWave: 'Endless wave {wave} (round {round})',
+    resultWaves: 'Waves held: {waves}.',
+    enemies: 'Enemies remaining: {count}',
+    countdown: 'Prepare: {seconds}',
+    hint: 'Choose a shot, then click the ground to fire.',
+    aim: 'Click to fire. Right click or Escape cancels aiming.',
+    sapperWarning: 'Sapper incoming! Stop the explosive carrier before it reaches the line.',
+    chargeWarning: 'Commander orders a charge! All surviving enemies move faster.',
+    armorHint: 'Break the silver shields with Cannonball, then use Incendiary Shot.',
+    exposedHint: 'Broken armor: Incendiary Shot deals double damage.',
+    barrelHint: 'Shoot the marked powder barrels when enemies gather around them.',
+    barrelRules:
+      'Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.',
+    armorRules:
+      'Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.',
+    shake: 'Camera shake',
+    gold: 'Gold medal',
+    silver: 'Silver medal',
+    bronze: 'Bronze medal',
+    failed: 'Defense failed',
+    result: '{medal}: integrity {integrity}, accuracy {accuracy}.',
+    medalRules:
+      'Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.',
+    shotDamage: 'Deal {damage} damage to each enemy within {radius} yards of the impact.',
+    shotSlow: 'Slow enemies hit by {amount} for {seconds} sec.',
+    shotBurn:
+      'Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.',
+    shotTiming:
+      'Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.',
+    shotRules:
+      'Aim inside the marked field. No mana cost. Damage does not scale with gear or talents.',
+  },
   warlock: {
     doomLabel: 'Condemnation',
     fateThreadsLabel: 'Fate Threads',
@@ -678,6 +721,10 @@ export const hudChromeStrings = {
     objectiveValue: '{current} / {total}',
     collapseHint: 'Collapse quest tracker',
     expandHint: 'Expand quest tracker',
+    // The tracker's own section for active world quests (quest_tracker_controller.ts).
+    worldQuests: 'World Quests',
+    worldQuestsCollapseHint: 'Collapse world quests',
+    worldQuestsExpandHint: 'Expand world quests',
   },
   interfaceTabs: {
     general: 'General',
@@ -1392,6 +1439,19 @@ export const hudChromeStrings = {
     devTierCol: 'Badge',
     mergedPrs: 'Merged PRs',
     devEmpty: 'No ranked contributors yet.',
+    // World Quests tab: the medal world quests' public ladders (best attempt
+    // per character). One chip per scoreboard, then rank / name / medal and
+    // the board's own number (waves held, seconds, or points).
+    tabWorldQuests: 'World Quests',
+    wqBoardsLabel: 'World quest scoreboards',
+    wqMedal: 'Medal',
+    wqWaves: 'Waves held',
+    wqTime: 'Time',
+    wqPoints: 'Score',
+    wqSeconds: '{seconds}s',
+    wqNoMedal: 'None',
+    wqMedals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
+    wqEmpty: 'No scores on this board yet. Finish the world quest to claim a spot.',
     // The top-three podium every tab shows on its first page: its list label and
     // the stand-in name on a place nobody holds yet.
     podiumLabel: 'Top three',
@@ -1399,6 +1459,32 @@ export const hudChromeStrings = {
     // The prestige star's tooltip on a ladder row and on a podium card: one key
     // with the rank interpolated, never a translated word glued to a number.
     prestigeTitle: 'Prestige {rank}',
+  },
+  // The World Quest rankings window (world_quest_leaderboard_window.ts): a
+  // card per medal world quest, the top-three podium, the rest of the ladder,
+  // and the viewer's own best pinned at the bottom. Column headers, the
+  // loading / error / empty lines, and the medal names reuse the leaderboard keys.
+  wqLadder: {
+    title: 'World Quest Rankings',
+    subtitle: 'The best attempt of every hero, one ladder per medal world quest.',
+    close: 'Close World Quest Rankings',
+    rankedBy: {
+      waves: 'Ranked by waves held',
+      seconds: 'Ranked by fastest time',
+      points: 'Ranked by highest score',
+    },
+    rankedByMedal: {
+      waves: 'Ranked by medal, then waves held',
+      seconds: 'Ranked by medal, then fastest time',
+      points: 'Ranked by medal, then highest score',
+    },
+    podiumLabel: 'Top three',
+    unclaimed: 'Unclaimed',
+    totalOne: 'One hero ranked',
+    totalMany: '{count} heroes ranked',
+    selfLabel: 'Your best',
+    selfRank: 'Rank {rank}',
+    selfNone: 'You have no score on this board yet. Finish the world quest to join the ladder.',
   },
   // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
   // guild high-score tab's pledge affordances AND the social window's Pledges
@@ -1543,6 +1629,12 @@ export const hudChromeStrings = {
   // separator stays a plain colon, like every other HUD clock (vcup, finder).
   riftTracker: {
     title: 'Rift',
+    // A Buried Hoard (a treasure map's vault) replaces the floor line with its goal.
+    hoardTitle: 'Buried Hoard',
+    hoardGoal: 'Defeat the hoard keeper',
+    // Once the keeper falls the goal becomes the reward chest it leaves, then rests.
+    hoardChestGoal: 'Open the hoard chest',
+    hoardClaimedGoal: 'The hoard is yours',
     // {current}/{total} are 1-based floor numbers (e.g. "Floor 2 of 5").
     floor: 'Floor {current} of {total}',
     // {time} is a pre-built clock string (see clockMs/clockHms below). This is
@@ -2916,9 +3008,145 @@ export const hudChromeStrings = {
     stats: 'Stats',
     progression: 'Progression',
     skills: 'Skills',
+    reputation: 'Reputation',
+    currencies: 'Currencies',
+    // The sheet's bottom tab strip: the paperdoll tab and the skills tab read
+    // as Character and Professions there (stats/skills keep their ids).
+    character: 'Character',
+    professions: 'Professions',
     gathering: 'Gathering',
     crafting: 'Crafting',
     openProfessions: 'Open Professions',
+  },
+  // The Currencies tab (src/ui/hud/currencies/): every spendable balance that
+  // is not coin. The faction rows stay pending until the World Quests scope's
+  // Stage 2 chooses the currency model.
+  // The treasure map window (src/ui/hud/treasure/): the parchment a read map
+  // opens, and the faction-currency offer to raise it a rarity.
+  treasureMap: {
+    close: 'Close treasure map',
+    zone: 'Somewhere in {zone}',
+    hint: 'Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.',
+    upgradeNote:
+      "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
+    upgradeMaxed: 'No cartographer could better this map.',
+    rarity: {
+      common: 'Common',
+      rare: 'Rare',
+      epic: 'Epic',
+      legendary: 'Legendary',
+    },
+  },
+  currencies: {
+    intro: 'None of these take bag space. Coin stays in your bag as always.',
+    activities: 'Activities',
+    factions: 'Factions',
+    honor: 'Honor',
+    delveMark: 'Delve Mark',
+    wocToken: 'WoC Token',
+    heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
+    honorNote: 'Battlegrounds and the arena',
+    delveMarkNote: 'Delves completed',
+    wocTokenNote: 'Linked wallet balance',
+    walletNotLinked: 'No wallet linked',
+    wocPreview: 'Preview balance, not yet verified',
+    lifetime: 'Lifetime {amount}',
+    factionPending: 'Faction currency: pending Stage 2',
+    riftWatchMark: 'Rift Watch Mark',
+    riftWatchMarkNote: 'World Quests in Rift Watch zones',
+    churchOrderCrest: 'Order Crest',
+    churchOrderCrestNote: 'World Quests in Church Order zones',
+    automatonCog: 'Automaton Cog',
+    automatonCogNote: 'World Quests in Automaton zones',
+  },
+  // The world quest hover card (src/ui/hud/map/world_quest_tooltip_view.ts) and the
+  // plain reward texts world_quest_view.ts builds for the screen-reader summary.
+  worldQuestTooltip: {
+    factionLine: 'Faction: {faction}',
+    timeRemaining: 'Time remaining:',
+    standingAmount: '{amount} {faction}',
+    currencyAmount: '{amount} {currency}',
+    standingReward: '+{amount} {faction} Standing',
+    currencyReward: '+{amount} {currency}',
+  },
+  // The world quest entry banner (src/ui/hud/quest/world_quest_banner_view.ts):
+  // the smaller line under the quest name when a world quest becomes active.
+  worldQuestBanner: {
+    subtitle: 'World Quest',
+  },
+  // The Reputation tab (src/ui/hud/reputation/). Faction and tier names are
+  // PROVISIONAL: the World Quests scope leaves the final names to narrative.
+  reputation: {
+    intro:
+      'All three factions progress at once: every world quest counts toward the faction of its zone.',
+    faction: {
+      rift_watch: 'Rift Watch',
+      church_order: 'Church Order',
+      automatons: 'Automatons',
+    },
+    hub: {
+      rift_watch: 'Drifthaven',
+      church_order: 'Brother Aldric',
+      automatons: 'Wyrmwatch',
+    },
+    hubLine: '{hub} . {zone}',
+    tier: {
+      unknown: 'Unknown',
+      recognized: 'Recognized',
+      trusted: 'Trusted',
+      proven: 'Proven',
+      vanguard: 'Vanguard',
+      champion: 'Champion',
+    },
+    factionTitle: {
+      rift_watch: {
+        unknown: 'Outsider',
+        recognized: 'Watcher',
+        trusted: 'Riftwalker',
+        proven: 'Warden',
+        vanguard: 'Riftwarden',
+        champion: 'Champion',
+      },
+      church_order: {
+        unknown: 'Outsider',
+        recognized: 'Acolyte',
+        trusted: 'Keeper',
+        proven: 'Templar',
+        vanguard: 'Dawnkeeper',
+        champion: 'Champion',
+      },
+      automatons: {
+        unknown: 'Outsider',
+        recognized: 'Operator',
+        trusted: 'Mechanist',
+        proven: 'Artificer',
+        vanguard: 'Forgemaster',
+        champion: 'Champion',
+      },
+    },
+    progress: '{current} / {next}',
+    next: 'Next: {tier}',
+    maxed: 'Highest standing reached',
+    cappedByLevel: 'Standing pauses at {tier} until level 16',
+    today: 'Today',
+    questsDone: 'World quests completed',
+    questsDoneValue: '{done} / {total}',
+    resetsIn: 'Board',
+    resetsUnknown: 'No board today',
+    title: 'Faction title',
+    titleLine: '{faction} . {tier}',
+    legend: 'Standing tiers',
+    // The authoritative purchase refusal on a standing-gated vendor row
+    // (src/sim/items.ts buyItem), re-localized by identity in sim_i18n.ts.
+    vendorGate: 'Requires {tier} with {faction}.',
+    // The standing receipt a world quest turn-in or a finished clue hunt logs
+    // (src/sim/world_quests.ts, src/sim/clue_scrolls.ts), re-localized in sim_i18n.ts.
+    standingGained: '+{amount} {faction} Standing.',
+    // The tier-reached celebration (src/ui/hud/reputation/): the plate, its
+    // faction-title subtext, and the durable gold chat line.
+    tierReachedBanner: 'Now {tier} with the {faction}',
+    tierReachedSubtext: 'Faction title: {title}',
+    tierReachedLine: 'You are now {tier} with the {faction}. Your faction title is now {title}.',
   },
   questLog: {
     completed: 'Completed',
@@ -4375,6 +4603,7 @@ export const hudChromeStrings = {
     // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
     // affordance is spelled out, so the player can find it without folklore.
     carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
+    carryingFreight: 'You are carrying freight. Movement speed is reduced by {pct}%.',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',
@@ -5420,11 +5649,23 @@ export const hudChromeStrings = {
     // and cross-posts to Discord (looking-for-group, trade, recruiting, events).
     relay: {
       tooFast: 'You are posting too fast. Wait a moment and try again.',
-      lfg: { label: 'Looking for Group', hint: 'Find players for a dungeon or quest' },
-      wts: { label: 'Want to Sell', hint: 'Advertise an item or service for sale' },
+      lfg: {
+        label: 'Looking for Group',
+        hint: 'Find players for a dungeon or quest',
+      },
+      wts: {
+        label: 'Want to Sell',
+        hint: 'Advertise an item or service for sale',
+      },
       wtb: { label: 'Want to Buy', hint: 'Request an item you want to buy' },
-      recruit: { label: 'Guild Recruiting', hint: 'Recruit players for your guild' },
-      event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
+      recruit: {
+        label: 'Guild Recruiting',
+        hint: 'Recruit players for your guild',
+      },
+      event: {
+        label: 'Event / Raid',
+        hint: 'Announce a raid, meetup or event',
+      },
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
   },
@@ -6677,10 +6918,35 @@ export const hudChromeStrings = {
     enchant_chest_lucent_stamina: 'Chest Etching: Lucent Stamina',
     enchant_feet_lucent_agility: 'Boot Etching: Lucent Agility',
     enchant_lucent_infusion: 'Lucent Infusion',
+    enchant_offhand_spirit: 'Offhand Etching: Spirit',
+    enchant_feet_shadowstride: 'Boot Etching: Shadowstride',
+    enchant_gloves_forged_might: 'Glove Etching: Forged Might',
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
       "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+  },
+  factionRewards: {
+    alliedHearthstoneUse:
+      'Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)',
+    alliedHearthstoneAttuned: 'Attuned to: {hub}',
+    hub_none: 'None (Use near a faction hub to attune)',
+    hub_rift_watch: 'Drifthaven (The Rift Watch)',
+    hub_church_order: 'Eastbrook Vale (The Church Order)',
+    hub_automatons: 'South Reach (The Automaton Foundry)',
+    riftGliderUse:
+      'Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)',
+    targetDummyUse:
+      'Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)',
+    battleStandardUse:
+      'Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)',
+    shockBombUse:
+      'Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)',
+    invisibilityUse: 'Use: Shrouds you in stealth for 6 sec. (2 min cooldown)',
+    armorKitUse: 'Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.',
+    sharpeningStoneUse:
+      'Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.',
+    manaElixirUse: 'Use: Increases Spirit by 6 for 1 hour.',
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
@@ -7965,6 +8231,10 @@ export const hudChromeStrings = {
     // the old fills carried the race reading but not those qualifiers).
     sourceActivityRiftFirstClear:
       "Awarded to every member of the party that wins a ranked Rift's first clear",
+    // The Buried Hoard pieces (content/hoard_loot.ts): rolled from the reward
+    // chest, never from the keeper's own loot, and at the tier the map buys.
+    sourceActivityBuriedHoard:
+      'Found in the reward chest of a Buried Hoard, the vault a treasure map leads to',
     // The aria label folds the lines through formatList (Intl.ListFormat), so
     // there is no join key to translate: CLDR owns the separators per locale,
     // including the final-conjunction shapes a pairwise key cannot express.
@@ -8197,6 +8467,9 @@ export const hudChromeStrings = {
     level: 'Level {level}',
     landmarkCount: '{count} landmarks',
     filtersAria: 'Map layers',
+    // The Side panel button folds the rail away (mapSidebarCollapsed).
+    railToggle: 'Side panel',
+    railToggleAria: 'Show or hide the map side panel',
     filters: {
       quests: 'Quests',
       gather: 'Gather',
@@ -8215,6 +8488,37 @@ export const hudChromeStrings = {
     // the quest log's per-quest toggle, which is the way back from untracked.
     untrack: 'Untrack',
     track: 'Track',
+    // The rail's world-quest section (src/ui/hud/map/world_quest_rail_*): the
+    // day's board, the shared marker selection, and the one daily replacement,
+    // which always confirms before it reaches the world. The refusal reasons
+    // re-localize the sim's canRerollWorldQuest texts by identity.
+    worldQuests: {
+      heading: 'World quests today',
+      count: '{done} / {total}',
+      empty: 'No world quests today',
+      replacement: 'Replacement',
+      state: {
+        active: 'In progress',
+        completed: 'Done',
+      },
+      reroll: 'Replace quest',
+      rerollNote: 'One replacement available today',
+      rerollUsed: 'Replacement used today',
+      rerollReason: {
+        noCycle: 'No board today',
+        usedToday: 'Replacement used today',
+        completed: 'A completed quest cannot be replaced',
+        inProgress: 'A quest in progress cannot be replaced',
+        notActive: 'This quest is not on your board',
+        noAlternative: 'No other quest is available in that zone today',
+        unknown: 'This quest cannot be replaced today',
+      },
+      confirmTitle: 'Replace this world quest?',
+      confirmBody:
+        'You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.',
+      confirmOk: 'Replace',
+      confirmCancel: 'Cancel',
+    },
     legend: {
       dungeon: 'Dungeon',
       ore: 'Ore',

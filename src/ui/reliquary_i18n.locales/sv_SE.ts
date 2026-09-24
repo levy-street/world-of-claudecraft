@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Revan',
     desc: 'Utmärkande byte ur den skiftande Revan, från dess kringströvande fasor till de två skatterna i jakten på S-rang.',
   },
+  conquerors_buried_hoards: {
+    name: 'De nedgrävda skatterna',
+    desc: 'Byte från skatterna som skattkartorna leder till, fyra från varje väktare som vaktar en.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rikets sällsyntheter',
     desc: 'Beviset på varje namngiven sällsynthet som fällts i riket.',

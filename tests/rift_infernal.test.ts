@@ -141,6 +141,10 @@ describe('infernal citadel: seed selection', () => {
   // the same packs are spread across a shorter band. Verified narrow before re-pinning,
   // by digesting every floor field EXCEPT `spawns` across seeds 1 to 200 on both sides of
   // the change: that digest is byte-identical, so only spawn positions moved here.
+  // DELIBERATE re-pin (Marrow Golem): the Boneyard theme's second trash template is
+  // rift_marrow_golem instead of rift_marrow_troll (the troll stays the Warcamp's).
+  // Only that template id moved: swapping the roster entry back reproduces the old
+  // digest exactly, so every position, count and draw is unchanged.
   it('regenerates procedural floors byte-identically to the pre-set-piece baseline', () => {
     // Hand-picked on the base branch, so the seed list itself cannot drift with the
     // set-piece roll.
@@ -156,7 +160,7 @@ describe('infernal citadel: seed selection', () => {
       }
     }
     expect(h.digest('hex')).toBe(
-      'c1bdf1d27a9d3a5450c758d7e0aadda33cd9c765ed40e11ed308c3ae8de5db1a',
+      '856e241afea36abbcc922de85eefd82055482495fe89037df7de319b93405ca7',
     );
   });
 });

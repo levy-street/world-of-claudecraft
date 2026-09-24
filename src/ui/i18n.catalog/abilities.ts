@@ -143,6 +143,12 @@ const classAbilityNamesEn = {
         'A fair harvest-truce shoulder. Sends them tumbling off the ball.',
       ],
       ['sport_second_wind', 'Fresh Legs', 'Find your legs: move 50% faster for 4 sec.'],
+      // The Automaton Foundry's faction reward (content/faction_rewards.ts).
+      [
+        'clockwork_shock_bomb',
+        'Clockwork Shock Bomb',
+        'Throws a Clockwork Shock Bomb at the target location, dealing 120 to 160 Nature damage to enemies within 5 yards.',
+      ],
       [
         'flamestrike',
         'Flamestrike',

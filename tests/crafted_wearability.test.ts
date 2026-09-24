@@ -180,7 +180,10 @@ describe('crafted wearability: the level-20 shelf is unmoved (masterwrought R5 s
     // no existing shelf row moved.
     // The Crucible crafting tier adds 33 items without moving any old shelf gate.
     expect(Object.keys(CRUCIBLE_COLLECTION_ITEMS)).toHaveLength(33);
-    expect(shelf.length).toBe(515);
+    // Re-pinned 515 -> 611 by the Buried Hoard boss loot (content/hoard_loot.ts):
+    // 32 pieces at three tiers, 96 new gated equippables sourced at 23 and 26,
+    // every one deriving the same level-20 gate; no existing shelf row moved.
+    expect(shelf.length).toBe(611);
     for (const def of shelf) {
       expect(requiredLevelFor(def), `${def.id} shelf gate`).toBe(20);
     }

@@ -42,7 +42,7 @@ const THEME_ROSTERS: Readonly<Record<string, readonly string[]>> = {
   frost: ['rift_frost_revenant', 'rift_rime_elemental', 'rift_boss_frost'],
   ember: ['rift_ember_fiend', 'rift_magma_brute', 'rift_boss_ember'],
   venom: ['rift_venom_weaver', 'rift_thornback', 'rift_boss_venom'],
-  bone: ['rift_boneclad', 'rift_marrow_troll', 'rift_boss_necro', 'rift_bonewalker'],
+  bone: ['rift_boneclad', 'rift_marrow_golem', 'rift_boss_necro', 'rift_bonewalker'],
   brute: ['rift_stone_ogre', 'rift_marrow_troll', 'rift_boss_brute'],
   void: ['rift_void_acolyte', 'rift_dread_stalker', 'rift_boss_arcane', 'rift_spawnling'],
   storm: ['rift_storm_caller', 'rift_stormscale', 'rift_boss_storm'],

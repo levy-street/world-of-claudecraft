@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Der Riss',
     desc: 'Bezeichnende Beute des wandelbaren Risses, von seinen streifenden Schrecken bis zu den zwei Schätzen der S-Rang-Jagd.',
   },
+  conquerors_buried_hoards: {
+    name: 'Die vergrabenen Horte',
+    desc: 'Beute aus den Horten, zu denen die Schatzkarten führen, vier Stücke von jedem Hüter, der einen bewacht.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Raritäten des Reichs',
     desc: 'Der Beweis für jede benannte Rarität, die im Reich zur Strecke gebracht wurde.',

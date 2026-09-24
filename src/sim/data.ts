@@ -1,3 +1,5 @@
+import { INVESTIGATION_MOB, INVESTIGATION_NPCS } from './content/world_quest_investigation';
+import { SHADOW_GUARDS, SHADOW_NPC_DEF } from './content/world_quest_shadow';
 // Content merge layer. Actual game content lives in sim/content/* — one
 // module per zone plus classes (abilities), shared items, and dungeons —
 // so content can grow without everything colliding in one file. This module
@@ -26,6 +28,15 @@ import type {
 } from './types';
 
 export type { FishingEntry } from './content/items';
+export {
+  EASTBROOK_FREIGHT_CARAVAN_ESCORT_ID,
+  EASTBROOK_FREIGHT_CARAVAN_MOB_ID,
+  WORLD_QUEST_DEFAULT_MIN_LEVEL,
+  WORLD_QUEST_MIN_LEVEL,
+  WORLD_QUESTS,
+  WORLD_QUESTS_BY_ID,
+} from './content/world_quests';
+export type { WorldQuestDef } from './types';
 
 import {
   AMBERFALL_CAMPS,
@@ -80,6 +91,7 @@ import {
   EVERGARDEN_ROADS,
   EVERGARDEN_ZONE,
 } from './content/evergarden';
+import { FACTION_VENDOR_ITEMS, FACTION_VENDOR_NPCS } from './content/faction_vendors';
 import {
   FARSHORE_CAMPS,
   FARSHORE_ESCORTS,
@@ -134,6 +146,7 @@ import {
 } from './content/graveyards';
 import { GROUND_PICKUP_LINES } from './content/ground_pickup_lines';
 import { HEALING_TRAINING_MOBS } from './content/healing_training';
+import { HOARD_ITEMS } from './content/hoard_loot';
 import {
   IGNIVAR_RAID_LORE_NPCS,
   IGNIVAR_RAID_LORE_QUEST_ORDER,
@@ -211,7 +224,7 @@ import {
   TOOL_RECIPES as TOOL_RECIPES_CONTENT,
 } from './content/recipes';
 import { RIFT_ITEMS } from './content/rift/items';
-import { RIFT_MOBS } from './content/rift/mobs';
+import { HOARD_MOBS, RIFT_MOBS } from './content/rift/mobs';
 import {
   TEMPLE_CAMPS,
   TEMPLE_DUNGEON_DEFS,
@@ -240,6 +253,16 @@ import {
   WILLOWFEN_ROADS,
   WILLOWFEN_ZONE,
 } from './content/willowfen';
+import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy';
+import { FORGE_NPC_DEF } from './content/world_quest_forging';
+import { GLIDER_APPRENTICE_NPC_DEF, GLIDER_NPC_DEF } from './content/world_quest_glider';
+import { WISP_MAZE_NPC_DEF } from './content/world_quest_wisp_maze';
+import {
+  WORLD_QUEST_ESCORTS,
+  WORLD_QUEST_ITEMS,
+  WORLD_QUEST_MOBS,
+  WORLD_QUEST_OBJECTS,
+} from './content/world_quests';
 import {
   WRAITHWOOD_CAMPS,
   WRAITHWOOD_ESCORTS,
@@ -394,6 +417,9 @@ export const ITEMS: Record<string, ItemDef> = mergeItems(
   DUNGEON_KEEPSAKE_ITEMS,
   IGNIVAR_DROP_ITEMS,
   CRUCIBLE_PROFESSION_ITEMS,
+  WORLD_QUEST_ITEMS,
+  FACTION_VENDOR_ITEMS,
+  HOARD_ITEMS,
 );
 
 export type { AggregatedSetEffect } from './content/item_sets';
@@ -402,6 +428,7 @@ export { aggregateSetBonuses, ITEM_SETS } from './content/item_sets';
 export const MOBS: Record<string, MobTemplate> = {
   ...ZONE1_MOBS,
   ...ZONE2_MOBS,
+  [INVESTIGATION_MOB.id]: INVESTIGATION_MOB,
   ...ZONE3_MOBS,
   ...PRACTICE_DUMMY_MOBS,
   ...HEALING_TRAINING_MOBS,
@@ -413,6 +440,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...TEMPLE_DUNGEON_MOBS,
   ...DELVE_MOBS,
   ...RIFT_MOBS,
+  ...HOARD_MOBS,
   ...YUMI_MOBS,
   ...REALM_MOBS,
   ...DRAKELANDS_MOBS,
@@ -427,6 +455,7 @@ export const MOBS: Record<string, MobTemplate> = {
   ...GALECREST_MOBS,
   ...FARSHORE_MOBS,
   ...PROVING_SHORE_MOBS,
+  ...WORLD_QUEST_MOBS,
 };
 
 // Heroic upgraded drop variants: generated from the base item + mob loot tables and
@@ -470,6 +499,15 @@ export const NPCS: Record<string, NpcDef> = {
   // dynamic, spawned after the player by sim/hub_practice.ts, so his
   // presence in this record moves no id.
   ...HUB_PRACTICE_NPCS,
+  ...WORLD_QUEST_CALLIGRAPHY_NPCS,
+  [FORGE_NPC_DEF.id]: FORGE_NPC_DEF,
+  [WISP_MAZE_NPC_DEF.id]: WISP_MAZE_NPC_DEF,
+  [SHADOW_NPC_DEF.id]: SHADOW_NPC_DEF,
+  ...Object.fromEntries(SHADOW_GUARDS.map(({ npc }) => [npc.id, npc])),
+  [GLIDER_NPC_DEF.id]: GLIDER_NPC_DEF,
+  [GLIDER_APPRENTICE_NPC_DEF.id]: GLIDER_APPRENTICE_NPC_DEF,
+  ...Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
+  ...FACTION_VENDOR_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the
@@ -596,6 +634,7 @@ export const ESCORTS: Record<string, EscortDef> = {
   ...WRAITHWOOD_ESCORTS,
   ...PALMREACH_ESCORTS,
   ...FARSHORE_ESCORTS,
+  ...WORLD_QUEST_ESCORTS,
 };
 
 export const GROUND_OBJECTS: GroundObjectDef[] = [
@@ -615,6 +654,7 @@ export const GROUND_OBJECTS: GroundObjectDef[] = [
   ...GALECREST_OBJECTS,
   ...FARSHORE_OBJECTS,
   ...PROVING_SHORE_OBJECTS,
+  ...WORLD_QUEST_OBJECTS,
 ];
 
 export const GATHER_NODES: GatherNodeDef[] = [...GATHER_NODES_CONTENT];

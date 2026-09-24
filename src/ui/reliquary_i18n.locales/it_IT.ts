@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Lo Squarcio',
     desc: 'Bottini distintivi dello Squarcio mutevole, dai suoi orrori erranti ai due tesori della caccia di rango S.',
   },
+  conquerors_buried_hoards: {
+    name: 'I tesori sepolti',
+    desc: 'Bottino dei tesori a cui conducono le mappe del tesoro, quattro pezzi per ogni custode che ne sorveglia uno.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Rari del reame',
     desc: 'La prova di ogni raro con nome abbattuto in tutto il reame.',

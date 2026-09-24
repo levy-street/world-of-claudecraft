@@ -3,6 +3,9 @@ import { IGNIVAR_BOSS_ID, MELEE_RANGE } from '../types';
 import { feralMeleeReachBonus, type MeleeReachActor } from './feral_reach';
 
 export const RAID_BOSS_PLAYER_MELEE_RANGE = 8;
+/** The Buried Hoard bosses are big bodies too: their own swing reaches a player
+ *  the player's could not reach back (playtest). */
+export const HOARD_BOSS_PLAYER_MELEE_RANGE = 7;
 
 interface AttackTarget {
   kind: string;
@@ -27,6 +30,13 @@ export function effectivePlayerAttackRange(
     (target.templateId === IGNIVAR_BOSS_ID || target.templateId === VARKHUL_BOSS_ID)
   ) {
     return RAID_BOSS_PLAYER_MELEE_RANGE + bonus;
+  }
+  if (
+    baseRange <= MELEE_RANGE &&
+    target.kind === 'mob' &&
+    target.templateId.startsWith('rift_boss_')
+  ) {
+    return HOARD_BOSS_PLAYER_MELEE_RANGE + bonus;
   }
   return baseRange + bonus;
 }

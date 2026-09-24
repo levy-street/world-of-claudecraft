@@ -4664,6 +4664,82 @@ export const TROPHY_RECIPES: ProfessionRecipeRecord[] = [
 // recipe omitted from recipeList was unreachable in normal play; the same
 // applies to the tool recipes de-stubbed here (#1135's crafted base tools).
 
+export const FACTION_REWARD_RECIPES: ProfessionRecipeRecord[] = [
+  {
+    id: 'recipe_elixir_of_mana_regeneration',
+    professionId: 'alchemy',
+    resultItemId: 'elixir_of_mana_regeneration',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'silverleaf_herb', count: 3 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 40,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'recipe_potion_of_invisibility',
+    professionId: 'alchemy',
+    resultItemId: 'potion_of_invisibility',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'goldleaf_herb', count: 3 },
+      { itemId: 'silverleaf_herb', count: 3 },
+      { itemId: 'glass_vial', count: 1 },
+    ],
+    skillReq: 40,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['drop'],
+    stationType: 'apothecary',
+  },
+  {
+    id: 'pattern_reinforced_armor_kit',
+    professionId: 'leatherworking',
+    resultItemId: 'reinforced_armor_kit',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'rough_hide', count: 5 },
+      { itemId: 'iron_ore', count: 3 },
+    ],
+    skillReq: 40,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['drop'],
+    stationType: 'tannery',
+  },
+  {
+    id: 'schematic_clockwork_shock_bomb',
+    professionId: 'engineering',
+    resultItemId: 'clockwork_shock_bomb',
+    resultCount: 1,
+    reagents: [
+      { itemId: 'iron_ore', count: 3 },
+      { itemId: 'copper_ore', count: 4 },
+    ],
+    skillReq: 40,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['drop'],
+    stationType: 'toolworks',
+  },
+  {
+    id: 'plans_dense_sharpening_stone',
+    professionId: 'weaponcrafting',
+    resultItemId: 'dense_sharpening_stone',
+    resultCount: 1,
+    reagents: [{ itemId: 'iron_ore', count: 4 }],
+    skillReq: 40,
+    itemLevelBudget: 16,
+    level: 15,
+    acquisition: ['drop'],
+    stationType: 'forge',
+  },
+];
+
 export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...COMMON_RECIPES,
   ...TOOL_RECIPES,
@@ -4686,6 +4762,7 @@ export const ALL_RECIPES: ProfessionRecipeRecord[] = [
   ...ENGINEERING_ONRAMP_RECIPES,
   ...CRUCIBLE_COLLECTION_RECIPES,
   ...FORGEBREAKER_RECIPES,
+  ...FACTION_REWARD_RECIPES,
 ];
 
 // O(1) indexes for the two per-lookup resolvers below (the recipe table grows

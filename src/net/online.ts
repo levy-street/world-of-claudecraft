@@ -86,7 +86,6 @@ import {
   type MasterLootThreshold,
   type MoveInput,
   type PlayerClass,
-  type QuestProgress,
   type QuestState,
   type RiftTier,
   type RiteIntensity,
@@ -228,6 +227,7 @@ import {
   type MountRaceMirror,
 } from './mount_race_wire';
 import {
+  encodeAnalogMoveInput,
   type MovementFrameV2,
   MovementFrameV2Outbox,
   trackPendingInputSequence,
@@ -1257,8 +1257,6 @@ export class ClientWorld extends ReconWireState implements IWorld {
   talentRole: Role | null = null;
   loadouts: SavedLoadout[] = [];
   activeLoadout = -1;
-  questLog = new Map<string, QuestProgress>();
-  questsDone = new Set<string>();
   // --- IWorldParty: party/raid roster, mirrored from the snapshot self (`party`).
   // The raid-target markers ride the `markers` map below; IWorldPet keeps no mirror
   // field (pet state lives on the owned-mob entity wire). ---
@@ -1750,6 +1748,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
+    this.bindQuestWorldWire(this.base, (command) => this.cmd(command));
     this.clientSeed = clientSeed;
     this.ownPlayerClass = cls;
     // Placeholder until the server's hello supplies the authoritative seed;
@@ -1892,6 +1891,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // any new transport can accept input; the next capable snapshot re-arms it.
     this.petSpecialCommandsSupported = false;
     this.worldInteractionRequests?.reset();
+    this.vehicleSession = null;
     if (this.sessionEnded) return;
     // A pending reconnect timer means this close is a duplicate signal of the
     // SAME physical drop: on the zombie-socket path the visibility handler
@@ -1931,6 +1931,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   }
 
   private endSession(): void {
+    this.vehicleSession = null;
     // Flush a pending layout save BEFORE teardown, while the socket is still open
     // and `connected` is still true: close() calls this before ws.close() and
     // sendLogout() calls it before the logout frame, so the final edit is not
@@ -2182,11 +2183,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         sf: mi.surface ? 1 : 0,
       },
     };
-    // Swim camera steer is sparse: absent means full rate and preserves the
-    // legacy land-frame wire shape.
-    if (mi.swimSteer !== undefined && mi.swimSteer !== 1) {
-      (msg.mi as Record<string, number>).ss = mi.swimSteer;
-    }
+    Object.assign(msg.mi as object, encodeAnalogMoveInput(mi));
     if (this.mouselookFacing !== null) msg.facing = this.mouselookFacing;
     if (this.dungeonEntrySeq !== null) msg.de = this.dungeonEntrySeq;
     this.ws.send(JSON.stringify(msg));
@@ -2336,6 +2333,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.gatheringGoal = null;
         // Same idea for a corpse-harvest-info query issued just before the drop.
         this.worldInteractionRequests?.resetQuery();
+        this.resetQuestWorldWireState();
         this.onReconnected?.();
       }
       this.connected = true;
@@ -2429,6 +2427,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.applyRiftStateEvent(ev as SimEvent);
         this.applyRiftDeathZoneSpawnEvent(ev as SimEvent);
         this.applyRiftDeathZoneClearEvent(ev as SimEvent);
+        this.hoardBossCueMirror?.apply(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
         this.applyDisenchantResultEvent(ev as SimEvent);
         this.applyEnchantResultEvent(ev as SimEvent);
@@ -2764,6 +2763,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.color = w.c ?? 0xffffff;
         e.dungeonId = w.dgn ?? null;
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
+        e.vaultRarity = ['common', 'rare', 'epic', 'legendary'].includes(w.vr) ? w.vr : undefined;
         e.objectItemId = w.obj ?? null;
         e.guild = w.gd ?? '';
         e.pledgeGuild = w.pg ?? '';
@@ -2969,7 +2969,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     }
 
     // self with extended state (always a full record)
-    const s = snap.self;
+    const s = this.applyNearbyWorldQuestTraceSnapshot(snap);
     const e = s ? applyWire(s, true) : null;
     if (s && e) {
       applyReconSelfWire(this, s, this.movementWireVersion);
@@ -3221,9 +3221,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         this.accountCosmetics = normalizeAccountCosmetics(s.cosmetics);
         this.cosmeticsChanged = true;
       }
-      if (s.qlog !== undefined)
-        this.questLog = new Map((s.qlog as QuestProgress[]).map((q) => [q.questId, q]));
-      if (s.qdone !== undefined) this.questsDone = new Set(s.qdone);
+      this.applyQuestSelfSnapshot(s, timerWire.time);
       if (s.lockouts !== undefined) this.selfLockouts = s.lockouts as Record<string, number>;
       // IWorldMounts self-decode: mntOwn is delta-guarded (omitted keeps the prior
       // mirror). The owned collection is mirrored VERBATIM (no horse prepend): the

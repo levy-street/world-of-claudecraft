@@ -22,9 +22,14 @@ import type { SimEvent } from '../src/sim/types';
 // craftRoll (the craft_roll_events audit record, server/craft_roll_events.ts)
 // is server-side evidence in the same sense: its consumer is the database
 // observer, and the roll values it carries are nothing a client renders.
+// treasureVaultOutcomePending / treasureVaultClaimRequested (Buried Hoard
+// vaults) are server-side handoffs to the vault outcome journal and the
+// claim persister, with no client consumer either.
 const SERVER_ONLY_EVENT_TYPES: ReadonlySet<SimEvent['type']> = new Set<SimEvent['type']>([
   'vaultCraftConsume',
   'craftRoll',
+  'treasureVaultOutcomePending',
+  'treasureVaultClaimRequested',
 ]);
 
 export function filterRoutableEvents(events: readonly SimEvent[]): readonly SimEvent[] {

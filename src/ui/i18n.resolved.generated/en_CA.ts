@@ -344,6 +344,43 @@ export const en_CA: EnTranslations = {
       "nameplate": "<{title}>"
     },
     "materialStackSelectionUnavailable": "That material selection is no longer available.",
+    "vehicle": {
+      "title": "North Watch Cannon",
+      "objective": "Defend the north watch",
+      "lastKeepTitle": "The Last Keep Cannon",
+      "lastKeepObjective": "Defend the approach to The Last Keep",
+      "cannonball": "Cannonball",
+      "grapeshot": "Grapeshot",
+      "incendiary": "Incendiary Shot",
+      "integrity": "Cannon integrity",
+      "exit": "Leave cannon",
+      "wave": "Wave {wave}/{total}",
+      "endlessWave": "Endless wave {wave} (round {round})",
+      "resultWaves": "Waves held: {waves}.",
+      "enemies": "Enemies remaining: {count}",
+      "countdown": "Prepare: {seconds}",
+      "hint": "Choose a shot, then click the ground to fire.",
+      "aim": "Click to fire. Right click or Escape cancels aiming.",
+      "sapperWarning": "Sapper incoming! Stop the explosive carrier before it reaches the line.",
+      "chargeWarning": "Commander orders a charge! All surviving enemies move faster.",
+      "armorHint": "Break the silver shields with Cannonball, then use Incendiary Shot.",
+      "exposedHint": "Broken armor: Incendiary Shot deals double damage.",
+      "barrelHint": "Shoot the marked powder barrels when enemies gather around them.",
+      "barrelRules": "Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.",
+      "armorRules": "Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.",
+      "shake": "Camera shake",
+      "gold": "Gold medal",
+      "silver": "Silver medal",
+      "bronze": "Bronze medal",
+      "failed": "Defense failed",
+      "result": "{medal}: integrity {integrity}, accuracy {accuracy}.",
+      "medalRules": "Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.",
+      "shotDamage": "Deal {damage} damage to each enemy within {radius} yards of the impact.",
+      "shotSlow": "Slow enemies hit by {amount} for {seconds} sec.",
+      "shotBurn": "Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.",
+      "shotTiming": "Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.",
+      "shotRules": "Aim inside the marked field. No mana cost. Damage does not scale with gear or talents."
+    },
     "warlock": {
       "doomLabel": "Condemnation",
       "fateThreadsLabel": "Fate Threads",
@@ -960,7 +997,10 @@ export const en_CA: EnTranslations = {
       "count": "({count})",
       "objectiveValue": "{current} / {total}",
       "collapseHint": "Collapse quest tracker",
-      "expandHint": "Expand quest tracker"
+      "expandHint": "Expand quest tracker",
+      "worldQuests": "World Quests",
+      "worldQuestsCollapseHint": "Collapse world quests",
+      "worldQuestsExpandHint": "Expand world quests"
     },
     "interfaceTabs": {
       "general": "General",
@@ -1282,9 +1322,45 @@ export const en_CA: EnTranslations = {
       "devTierCol": "Badge",
       "mergedPrs": "Merged PRs",
       "devEmpty": "No ranked contributors yet.",
+      "tabWorldQuests": "World Quests",
+      "wqBoardsLabel": "World quest scoreboards",
+      "wqMedal": "Medal",
+      "wqWaves": "Waves held",
+      "wqTime": "Time",
+      "wqPoints": "Score",
+      "wqSeconds": "{seconds}s",
+      "wqNoMedal": "None",
+      "wqMedals": {
+        "gold": "Gold",
+        "silver": "Silver",
+        "bronze": "Bronze"
+      },
+      "wqEmpty": "No scores on this board yet. Finish the world quest to claim a spot.",
       "podiumLabel": "Top three",
       "unclaimed": "Unclaimed",
       "prestigeTitle": "Prestige {rank}"
+    },
+    "wqLadder": {
+      "title": "World Quest Rankings",
+      "subtitle": "The best attempt of every hero, one ladder per medal world quest.",
+      "close": "Close World Quest Rankings",
+      "rankedBy": {
+        "waves": "Ranked by waves held",
+        "seconds": "Ranked by fastest time",
+        "points": "Ranked by highest score"
+      },
+      "rankedByMedal": {
+        "waves": "Ranked by medal, then waves held",
+        "seconds": "Ranked by medal, then fastest time",
+        "points": "Ranked by medal, then highest score"
+      },
+      "podiumLabel": "Top three",
+      "unclaimed": "Unclaimed",
+      "totalOne": "One hero ranked",
+      "totalMany": "{count} heroes ranked",
+      "selfLabel": "Your best",
+      "selfRank": "Rank {rank}",
+      "selfNone": "You have no score on this board yet. Finish the world quest to join the ladder."
     },
     "pledge": {
       "open": "Accepting pledges",
@@ -1366,6 +1442,10 @@ export const en_CA: EnTranslations = {
     },
     "riftTracker": {
       "title": "Rift",
+      "hoardTitle": "Buried Hoard",
+      "hoardGoal": "Defeat the hoard keeper",
+      "hoardChestGoal": "Open the hoard chest",
+      "hoardClaimedGoal": "The hoard is yours",
       "floor": "Floor {current} of {total}",
       "closesIn": "Closes in {time}",
       "clockMs": "{minutes}:{seconds}",
@@ -2270,9 +2350,124 @@ export const en_CA: EnTranslations = {
       "stats": "Stats",
       "progression": "Progression",
       "skills": "Skills",
+      "reputation": "Reputation",
+      "currencies": "Currencies",
+      "character": "Character",
+      "professions": "Professions",
       "gathering": "Gathering",
       "crafting": "Crafting",
       "openProfessions": "Open Professions"
+    },
+    "treasureMap": {
+      "close": "Close treasure map",
+      "zone": "Somewhere in {zone}",
+      "hint": "Find the ground this map shows, stand on the X, and use the map again to dig. A buried hoard opens for you and your party.",
+      "upgradeNote": "Redrawing it as a {rarity} map takes {inks} Cartographer's Ink (you hold {held}). The faction quartermasters sell it.",
+      "upgradeMaxed": "No cartographer could better this map.",
+      "rarity": {
+        "common": "Common",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      }
+    },
+    "currencies": {
+      "intro": "None of these take bag space. Coin stays in your bag as always.",
+      "activities": "Activities",
+      "factions": "Factions",
+      "honor": "Honor",
+      "delveMark": "Delve Mark",
+      "wocToken": "WoC Token",
+      "heroicMarkNote": "Heroic dungeons . spend at the heroic quartermaster",
+      "honorNote": "Battlegrounds and the arena",
+      "delveMarkNote": "Delves completed",
+      "wocTokenNote": "Linked wallet balance",
+      "walletNotLinked": "No wallet linked",
+      "wocPreview": "Preview balance, not yet verified",
+      "lifetime": "Lifetime {amount}",
+      "factionPending": "Faction currency: pending Stage 2",
+      "riftWatchMark": "Rift Watch Mark",
+      "riftWatchMarkNote": "World Quests in Rift Watch zones",
+      "churchOrderCrest": "Order Crest",
+      "churchOrderCrestNote": "World Quests in Church Order zones",
+      "automatonCog": "Automaton Cog",
+      "automatonCogNote": "World Quests in Automaton zones"
+    },
+    "worldQuestTooltip": {
+      "factionLine": "Faction: {faction}",
+      "timeRemaining": "Time remaining:",
+      "standingAmount": "{amount} {faction}",
+      "currencyAmount": "{amount} {currency}",
+      "standingReward": "+{amount} {faction} Standing",
+      "currencyReward": "+{amount} {currency}"
+    },
+    "worldQuestBanner": {
+      "subtitle": "World Quest"
+    },
+    "reputation": {
+      "intro": "All three factions progress at once: every world quest counts toward the faction of its zone.",
+      "faction": {
+        "rift_watch": "Rift Watch",
+        "church_order": "Church Order",
+        "automatons": "Automatons"
+      },
+      "hub": {
+        "rift_watch": "Drifthaven",
+        "church_order": "Brother Aldric",
+        "automatons": "Wyrmwatch"
+      },
+      "hubLine": "{hub} . {zone}",
+      "tier": {
+        "unknown": "Unknown",
+        "recognized": "Recognized",
+        "trusted": "Trusted",
+        "proven": "Proven",
+        "vanguard": "Vanguard",
+        "champion": "Champion"
+      },
+      "factionTitle": {
+        "rift_watch": {
+          "unknown": "Outsider",
+          "recognized": "Watcher",
+          "trusted": "Riftwalker",
+          "proven": "Warden",
+          "vanguard": "Riftwarden",
+          "champion": "Champion"
+        },
+        "church_order": {
+          "unknown": "Outsider",
+          "recognized": "Acolyte",
+          "trusted": "Keeper",
+          "proven": "Templar",
+          "vanguard": "Dawnkeeper",
+          "champion": "Champion"
+        },
+        "automatons": {
+          "unknown": "Outsider",
+          "recognized": "Operator",
+          "trusted": "Mechanist",
+          "proven": "Artificer",
+          "vanguard": "Forgemaster",
+          "champion": "Champion"
+        }
+      },
+      "progress": "{current} / {next}",
+      "next": "Next: {tier}",
+      "maxed": "Highest standing reached",
+      "cappedByLevel": "Standing pauses at {tier} until level 16",
+      "today": "Today",
+      "questsDone": "World quests completed",
+      "questsDoneValue": "{done} / {total}",
+      "resetsIn": "Board",
+      "resetsUnknown": "No board today",
+      "title": "Faction title",
+      "titleLine": "{faction} . {tier}",
+      "legend": "Standing tiers",
+      "vendorGate": "Requires {tier} with {faction}.",
+      "standingGained": "+{amount} {faction} Standing.",
+      "tierReachedBanner": "Now {tier} with the {faction}",
+      "tierReachedSubtext": "Faction title: {title}",
+      "tierReachedLine": "You are now {tier} with the {faction}. Your faction title is now {title}."
     },
     "questLog": {
       "completed": "Completed",
@@ -3193,6 +3388,7 @@ export const en_CA: EnTranslations = {
       "forbiddenReflectionLock": "Forbidden Reflection cannot be prepared again yet",
       "internalCooldown": "This effect cannot trigger again until the timer expires",
       "carriedFlag": "You are carrying the enemy flag. Cancel this buff to drop it.",
+      "carryingFreight": "You are carrying freight. Movement speed is reduced by {pct}%.",
       "battleStance": "Battle Stance: 10% more rage generation",
       "berserkerStance": "Berserker Stance: crits 3% more often and hit 3% harder",
       "crit": "Increases critical strike chance by {pct}%",
@@ -4517,10 +4713,29 @@ export const en_CA: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "Weapon Etching: Lucent Spellpower",
       "enchant_chest_lucent_stamina": "Chest Etching: Lucent Stamina",
       "enchant_feet_lucent_agility": "Boot Etching: Lucent Agility",
-      "enchant_lucent_infusion": "Lucent Infusion"
+      "enchant_lucent_infusion": "Lucent Infusion",
+      "enchant_offhand_spirit": "Offhand Etching: Spirit",
+      "enchant_feet_shadowstride": "Boot Etching: Shadowstride",
+      "enchant_gloves_forged_might": "Glove Etching: Forged Might"
     },
     "enchantDescription": {
       "enchant_weapon_lastflame_zeal": "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead."
+    },
+    "factionRewards": {
+      "alliedHearthstoneUse": "Use: Teleports you to your attuned faction hub. (10 sec cast, 15 min cooldown)",
+      "alliedHearthstoneAttuned": "Attuned to: {hub}",
+      "hub_none": "None (Use near a faction hub to attune)",
+      "hub_rift_watch": "Drifthaven (The Rift Watch)",
+      "hub_church_order": "Eastbrook Vale (The Church Order)",
+      "hub_automatons": "South Reach (The Automaton Foundry)",
+      "riftGliderUse": "Use: Unfolds the glider, slowing falling speed for 30 sec. Landing or taking damage cancels the effect. (2 min cooldown)",
+      "targetDummyUse": "Use: Deploys a mechanical target dummy in the open world for 2 minutes to practice combat abilities. (5 min cooldown)",
+      "battleStandardUse": "Use: Plants the Consecrated Dawn Battle Standard for 5 minutes, significantly increasing out-of-combat health and mana regeneration for all nearby allies. Remaining near it for 10 seconds also grants Blessing of the Dawn (+5% to all stats for 30 min). (5 min cooldown)",
+      "shockBombUse": "Use: Throws a shock bomb up to 30 yards, dealing 120 to 160 Nature damage to all enemies within 5 yards. (1 min cooldown)",
+      "invisibilityUse": "Use: Shrouds you in stealth for 6 sec. (2 min cooldown)",
+      "armorKitUse": "Use: Reinforces your chest armor, increasing Armor by 12 for 1 hour.",
+      "sharpeningStoneUse": "Use: Sharpens your main hand weapon, increasing Attack Power by 6 for 30 min.",
+      "manaElixirUse": "Use: Increases Spirit by 6 for 1 hour."
     },
     "professions": {
       "title": "Professions",
@@ -5292,6 +5507,7 @@ export const en_CA: EnTranslations = {
       "sourceActivityCorpseHarvest": "Recovered while harvesting creature corpses",
       "sourceActivityMasterworkCraft": "Earned by crafting a masterwork",
       "sourceActivityRiftFirstClear": "Awarded to every member of the party that wins a ranked Rift's first clear",
+      "sourceActivityBuriedHoard": "Found in the reward chest of a Buried Hoard, the vault a treasure map leads to",
       "cellMissingSourceAria": "{name}, not yet found, {source}",
       "cellOwnedClearsAria": "{name}, catalogued, first found on clear {count}",
       "searchPlaceholder": "Search relics",
@@ -5426,6 +5642,8 @@ export const en_CA: EnTranslations = {
       "level": "Level {level}",
       "landmarkCount": "{count} landmarks",
       "filtersAria": "Map layers",
+      "railToggle": "Side panel",
+      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Quests",
         "gather": "Gather",
@@ -5441,6 +5659,32 @@ export const en_CA: EnTranslations = {
       "showRoute": "Show Route",
       "untrack": "Untrack",
       "track": "Track",
+      "worldQuests": {
+        "heading": "World quests today",
+        "count": "{done} / {total}",
+        "empty": "No world quests today",
+        "replacement": "Replacement",
+        "state": {
+          "active": "In progress",
+          "completed": "Done"
+        },
+        "reroll": "Replace quest",
+        "rerollNote": "One replacement available today",
+        "rerollUsed": "Replacement used today",
+        "rerollReason": {
+          "noCycle": "No board today",
+          "usedToday": "Replacement used today",
+          "completed": "A completed quest cannot be replaced",
+          "inProgress": "A quest in progress cannot be replaced",
+          "notActive": "This quest is not on your board",
+          "noAlternative": "No other quest is available in that zone today",
+          "unknown": "This quest cannot be replaced today"
+        },
+        "confirmTitle": "Replace this world quest?",
+        "confirmBody": "You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.",
+        "confirmOk": "Replace",
+        "confirmCancel": "Cancel"
+      },
       "legend": {
         "dungeon": "Dungeon",
         "ore": "Ore",
@@ -5789,7 +6033,8 @@ export const en_CA: EnTranslations = {
       "taken_over": "Your character was taken over by another session.",
       "rename_required": "This character must be renamed before entering the world.",
       "invalid_appearance": "That appearance could not be saved. Adjust the design and try again.",
-      "reroll_unavailable": "This character does not have a free redesign available."
+      "reroll_unavailable": "This character does not have a free redesign available.",
+      "vault_mail_recovering": "Your vault reward mail is being restored. Try again shortly."
     },
     "moderation": {
       "suspended_until": "This account is suspended until {date}.",
@@ -5828,6 +6073,9 @@ export const en_CA: EnTranslations = {
     "guilds": {
       "invalid_roster_name": "Invalid guild name.",
       "unknown": "No guild by that name."
+    },
+    "world_quests": {
+      "unknown_board": "No scoreboard by that name."
     },
     "steam": {
       "disabled": "Steam linking is not available right now.",
@@ -5928,6 +6176,98 @@ export const en_CA: EnTranslations = {
       "stepup_signature_invalid": "The wallet signature did not verify. Start the sale again."
     }
   },
+  "clues": {
+    "items": {
+      "clue_scroll": {
+        "desc": "A sealed riddle earned by finishing every zone slot of the day. Use it to begin a treasure hunt, and use it again on the hidden spot when the last clue says to dig."
+      },
+      "treasure_casket": {
+        "desc": "A locked casket dug up at the end of a treasure hunt. Use it to open it and claim what the hunt buried."
+      }
+    },
+    "hunt_drakelands_gate_ashes": {
+      "0": "The road out of Wyrmwatch runs west into a stand of old trees that guards the gate. Stand beneath the Gatewood and the trail begins.",
+      "1": "A far-dune watcher keeps to the eastern sands, north of the garrison. Find Scout Yerrin and ask what the wind carried in.",
+      "2": "The keeper of the garrison stores has not eaten since the last patrol. Bring Quartermaster Sela 2 x Cottage Loaf.",
+      "3": "East and a little south of where the cinders drift into dunes, a scorched patch of ground hides what the ash buried. Use the scroll there and dig.",
+      "title": "Ashes at the Gate",
+      "reply": {
+        "1": "The wind came off the eastern dunes carrying ash, and ash does not blow in from empty sand. Sela at the garrison stores logs every patrol. She will talk, once someone feeds her.",
+        "2": "Bread at last, bless you. The patrol swore it saw smoke rising from bare sand, east and a little south of the dunes, where nothing is left to burn."
+      }
+    },
+    "hunt_frostveil_aurora_vigil": {
+      "0": "Where the terraces climb toward the lights that dance at night, kneel on the Aurora Steps and let the sky notice you.",
+      "1": "The one who reads the lights waits close by the steps. Speak with Aurorist Veyla about what the sky spelled out.",
+      "2": "East of the howling terraces, a little to the south, the snow lies flatter than it should. Use the scroll there and dig.",
+      "title": "Lights over the Steps",
+      "reply": {
+        "1": "You knelt, and the lights answered. Last night they bent east past the terraces and pointed straight down at the snow."
+      }
+    },
+    "hunt_amberfall_lantern_ferry": {
+      "0": "At the water's edge north of Lanternmere, the keeper of the lantern ferries knows which light went out. Speak with Ferrymaster Caddow.",
+      "1": "A single stone leans against the sky northeast of the great mere, older than the town. Stand at the Leaning Monolith.",
+      "2": "The keeper of the gilded rows waters her orchard by hand and thirsts for it. Bring Orchardist Pomeline 3 x Cold Well Water.",
+      "3": "Northeast of the rise where the cindermaples burn red, the leaves lie in a circle that no wind made. Use the scroll there and dig.",
+      "title": "Lanterns on the Mere",
+      "reply": {
+        "0": "One lantern went dark last night, the one that faces the old stone across the water. My ferrymen will not go near it. Perhaps you will.",
+        "2": "Cold well water, just what the trees wanted. Up past the red maples the leaves have been falling in a ring, and no tree of mine drops its leaves that neatly."
+      }
+    },
+    "hunt_willowfen_fenwitch_salt": {
+      "0": "The fen-witch of Willowweep will not talk to anyone who comes empty-handed. Bring Mother Sedge 1 x Cooking Salt.",
+      "1": "Where the fen goes flat and the air makes everyone drowsy, stand on the Drowsy Flats and sigh, as the witch told you.",
+      "2": "Southeast of the pools that shine in the bog, a hummock of dry ground stays dry all year. Use the scroll there and dig.",
+      "title": "The Fen-Witch's Salt",
+      "reply": {
+        "0": "Salt. Good, you listen. The flats beyond the reeds make everyone drowsy. Go and sigh there like you mean it, and the fen will show you the rest."
+      }
+    },
+    "hunt_nightbloom_sleepless_vigil": {
+      "0": "Northeast of Moonrest, where the stones keep a watch that never ends, stand at the Standing Vigil.",
+      "1": "The watcher at the vigil counts stars the way others count coins. Speak with Astronomer Cassian about the one that fell.",
+      "2": "North of the town lies a barrow whose sleeper never rests. Salute the Sleepless Barrow so the sleeper knows a friend has come.",
+      "3": "Southeast of the field where the gloam gathers, the moonlight pools on one bare patch of soil. Use the scroll there and dig.",
+      "title": "Vigil of the Sleepless",
+      "reply": {
+        "1": "A star fell three nights ago, and it fell toward the old barrow north of town. The dead there never sleep. Greet them as a soldier would."
+      }
+    },
+    "hunt_wraithwood_mournstone_candles": {
+      "0": "The candlewright of Gibbetmere sells light to people who fear the dark. Speak with Widow Tansy about a candle that was never paid for.",
+      "1": "The last vicar of the Mournstone has been fasting on prayers alone. Bring Vicar Creel 2 x Salted Jerky.",
+      "2": "Northeast of the town, past the crows, a glade hangs its own strange fruit. Stand in the Hanging Glade.",
+      "3": "Southeast of the clearing where the huntsman set his snares, the leaf litter has been turned over recently. Use the scroll there and dig.",
+      "title": "Candles for the Mournstone",
+      "reply": {
+        "0": "The vicar ordered that candle and never paid for it. He has been fasting ever since, praying and nothing else. Take him something to chew and ask him why.",
+        "1": "Thank you, friend. I never lit that candle. Something walks the glade past the crows at night, and I could not face it. Go and stand there, if you can."
+      }
+    },
+    "hunt_palmreach_sunken_idol": {
+      "0": "Deep in the tangle, northwest of the lagoon, the vines pour down like a waterfall. Stand at the Vinefall.",
+      "1": "A hermit who went into the tangle and came back out lives close to the falling vines. Speak with Okrim about what he saw down there.",
+      "2": "To the east, an idol sits half-drowned and still watching. Cower before the Sunken Idol, the way the hermit said the divers do.",
+      "3": "Northeast of where the tangle opens its mouth to the sea, the sand has been heaped higher than the tide reaches. Use the scroll there and dig.",
+      "title": "The Idol's Secret",
+      "reply": {
+        "1": "Below the vines the divers found an idol, and the idol did not like them. Anyone who stood tall before it did not come back. Be small before it."
+      }
+    },
+    "hunt_evergarden_beacon_road": {
+      "0": "The parterre gardener along the walk north of Hedgewick swears her beds are starving. Bring Farmer Verbena 2 x Compost.",
+      "1": "In the far southeast corner of the garden, an old mill still turns for no miller. Stand at the Old Mill.",
+      "2": "Follow the road south over the border into the Galecrest and out to the coast. The keeper of the old beacon, Keeper Bram, has the last word.",
+      "3": "Northwest of the old beacon, just off the path down from the light, the turf has been cut and laid back. Use the scroll there and dig.",
+      "title": "Beacon and Bloom",
+      "reply": {
+        "0": "Proper compost, the beds will live. The old miller buried something before he left. His mill still turns in the far corner of the gardens. Go and stand by it.",
+        "2": "So the mill sent you down the coast road. The beacon keeps one last secret: northwest of it, just off the path, the turf was cut and laid back. Dig there."
+      }
+    }
+  },
   "guide": {
     "brand": "World of ClaudeCraft",
     "brandShort": "ClaudeCraft",
@@ -5950,6 +6290,7 @@ export const en_CA: EnTranslations = {
       "progression": "Leveling & Progression",
       "world": "World",
       "quests": "Quests",
+      "factions": "Factions & Standing",
       "dungeons": "Dungeons & Raids",
       "delves": "Delves",
       "rifts": "Rifts",
@@ -7112,6 +7453,14 @@ export const en_CA: EnTranslations = {
       "sideWardenBody": "Alongside the story, the marshals and wardens of the Vale and the fen hand out a standing bounty ladder. Work your way up it, foe by foe, the way every bounty hunter before you earned their place. It is honest leveling and a tour of each zone's worst troublemakers.",
       "sideCryptTitle": "The forgotten king",
       "sideCryptBody": "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to the realm's ten-player endgame raid.",
+      "cluesTitle": "Clue Scrolls",
+      "cluesBody": "Out in the far zones, the daily world-quest board hides one more reward for anyone who clears the whole slate: a Clue Scroll, and the treasure hunt written on it.",
+      "cluesEarnTitle": "Earning a scroll",
+      "cluesEarnBody": "Once your character is far enough along, completing every zone slot on the day's world-quest board hands you a Clue Scroll on top of the usual rewards. A rerolled slot counts once it is done; the always-open dailies are not required. You can hold a few scrolls at a time, so there is no need to spend one the day you earn it.",
+      "cluesHuntTitle": "Following the clues",
+      "cluesHuntBody": "Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.",
+      "cluesCasketTitle": "The casket",
+      "cluesCasketBody": "Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.",
       "sideTempleTitle": "The drowned temple",
       "sideTempleBody": "A gate of pale light on a high tarn in the peaks opens onto a sunken shrine where a drowned cult still sings. Its short chain stands apart from the main story, a self-contained mystery for anyone who climbs to the shore, reads the warnings carved on the rocks, and goes down to see what they were for.",
       "availableTitle": "Why an NPC has nothing for you",
@@ -7286,6 +7635,29 @@ export const en_CA: EnTranslations = {
       "ladderBody": "Every match moves a persistent per-character battleground rating, win or lose, and the all-time board ranks the realm champions.",
       "rewardsHeading": "What a match pays",
       "rewardsBody": "Every finished match pays Honor: more for a win, a consolation for a loss or a draw, plus a small amount for every killing blow you land and every one you help with, so fighting away from the flags is still worth doing. Your first win of each day pays a bonus on top, and the panel tells you while that bonus is still waiting for you. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset. Meeting the same team over and over pays less for the match itself after the first, quickly settling at a floor instead of falling away to nothing, and a forfeited match pays nothing at all. Spend what you earn at either Warfare quartermaster."
+    },
+    "factionsPage": {
+      "heading": "Factions and Standing",
+      "intro": "Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.",
+      "whoHeading": "The three factions",
+      "whoBody": "Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.",
+      "riftWatchBody": "The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.",
+      "churchOrderBody": "The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.",
+      "automatonsBody": "The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.",
+      "earningHeading": "Earning standing",
+      "earningBody": "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+      "lowLevelNote": "Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.",
+      "tiersHeading": "Standing tiers",
+      "tiersBody": "Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.",
+      "riftWatchTitles": "With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.",
+      "churchOrderTitles": "With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.",
+      "automatonsTitles": "With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.",
+      "quartermastersHeading": "Quartermasters",
+      "quartermastersBody": "Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.",
+      "readingHeading": "Where to read it",
+      "readingBody": "The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.",
+      "deedsHeading": "Deeds",
+      "deedsBody": "The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear."
     },
     "deedsPage": {
       "intro": "The Book of Deeds is where the world keeps score of all you have done, from your first steps out of the starting valley to the hardest fights the realm can offer. Earn deeds as you play, wear the titles they grant, and watch your Renown climb.",
@@ -9163,6 +9535,11 @@ export const en_CA: EnTranslations = {
       "pylonLit": "A rune pylon flares to life ({lit}/{total}).",
       "wayDownOpens": "The way down tears open.",
       "exitOpens": "The rift shudders. A way home tears open behind the fallen.",
+      "hoardEnter": "You climb down into {name}.",
+      "hoardExitOpens": "The hoard is yours. Return to the entrance to climb out.",
+      "hoardStepBack": "You climb back out through the hoard entrance.",
+      "hoardNotYours": "This hoard was dug up by another party.",
+      "hoardEntrantsFull": "This hoard has already admitted five adventurers.",
       "portalOpens": "A {tier}-rank rift tears open in {zone}!",
       "portalSealed": "The {tier}-rank rift in {zone} has been sealed.",
       "portalCollapses": "The {tier}-rank rift in {zone} collapses.",
@@ -9202,7 +9579,152 @@ export const en_CA: EnTranslations = {
       "detonateLightningRod": "Lightning Rod strikes!",
       "detonateStormcallersWrath": "Stormcaller's Wrath erupts!",
       "detonateAbyssalMaw": "Abyssal Maw closes!",
-      "detonateCrushingDepth": "Crushing Depth crushes!"
+      "detonateCrushingDepth": "Crushing Depth crushes!",
+      "yell": {
+        "mushroomEngage": "The spores will have you.",
+        "mushroomSummon": "Grow, my little ones!",
+        "moleEngage": "The ground is mine.",
+        "moleSummon": "Down you come!",
+        "batEngage": "Screeeee!",
+        "batSummon": "To me, my flock!",
+        "mimicEngage": "Hungry... so hungry.",
+        "mimicSummon": "More gold, more gold!",
+        "frostBigCast": "The white wind rises.",
+        "frostDeathZoneCast": "The frost claims you.",
+        "frostDeathZoneStrike": "Nothing survives the deep cold.",
+        "frostEngage": "The cold takes all things in the end.",
+        "frostEnrage": "FREEZE!",
+        "emberBigCast": "BURN.",
+        "emberDeathZoneCast": "The magma rises.",
+        "emberDeathZoneStrike": "THE FORGE CONSUMES ALL.",
+        "emberEngage": "The forge hungers.",
+        "emberSummon": "Rise from the slag!",
+        "emberEnrage": "ASH AND CINDER!",
+        "venomBigCast": "Drown in venom!",
+        "venomDeathZoneCast": "Drown in poison.",
+        "venomDeathZoneStrike": "YOU CANNOT FLEE MY CHILDREN.",
+        "venomEngage": "My children are always hungry.",
+        "venomSummon": "Feast, little ones!",
+        "necroBigCast": "Your souls are forfeit.",
+        "necroDeathZoneCast": "Your soul is forfeit.",
+        "necroDeathZoneStrike": "DEATH CLAIMS ALL.",
+        "necroEngage": "Death is only the beginning.",
+        "necroSummon": "Rise!",
+        "bruteBigCast": "I BREAK YOU!",
+        "bruteDeathZoneCast": "THE EARTH SHATTERS.",
+        "bruteDeathZoneStrike": "YOU FALL HERE.",
+        "bruteEngage": "I will crush you!",
+        "bruteEnrage": "RAAAGH!",
+        "arcaneBigCast": "Witness true power.",
+        "arcaneDeathZoneCast": "Reality tears.",
+        "arcaneDeathZoneStrike": "ANNIHILATED.",
+        "arcaneEngage": "You should not have come.",
+        "arcaneEnrage": "KNEEL!",
+        "stormBigCast": "The sky answers!",
+        "stormDeathZoneCast": "The sky answers your call.",
+        "stormDeathZoneStrike": "THE STORM DEVOURS.",
+        "stormEngage": "The storm answers to me!",
+        "stormEnrage": "THE SKY FALLS!",
+        "tideDeathZoneCast": "The deep takes you.",
+        "tideDeathZoneStrike": "DRAWN INTO THE ABYSS.",
+        "tideEngage": "The deep claims you.",
+        "tideSummon": "Rise from the depths!",
+        "ritualistBigCast": "The pact is sealed in fire!",
+        "ritualistEngage": "You trespass on bound ground.",
+        "ritualistSummon": "Answer me, things below!",
+        "pitlordBigCast": "THE PIT CLAIMS YOU.",
+        "pitlordEngage": "Kneel, or burn.",
+        "pitlordEnrage": "THE CITADEL DEVOURS!"
+      },
+      "place": {
+        "hoardFloor": "{theme} Buried Hoard",
+        "sanctumFloor": "{theme} Sanctum: Depth {depth}",
+        "reachesFloor": "{theme} Reaches: Depth {depth}",
+        "upgradedFloor": "{title}: {theme} Depth {depth}",
+        "hoardPlan": "The Buried {noun} Hoard",
+        "riftPlan": "The {noun} {suffix}",
+        "citadelPlan": "The {noun} Citadel",
+        "infernalCitadel": "The Infernal Citadel",
+        "hoardEntrance": "Buried Hoard entrance",
+        "theme": {
+          "frost": "Frostbound",
+          "ember": "Emberforge",
+          "venom": "Venomweald",
+          "bone": "Boneyard",
+          "brute": "Warcamp",
+          "void": "Voidscar",
+          "storm": "Stormspire",
+          "tide": "Sunken",
+          "spore": "Spore Hollow",
+          "burrow": "Deep Burrow",
+          "roost": "Bat Roost",
+          "mimic": "False Vault",
+          "infernal": "Infernal Citadel"
+        },
+        "noun": {
+          "rime": "Rime",
+          "hoarfrost": "Hoarfrost",
+          "glacier": "Glacier",
+          "frost": "Frost",
+          "ember": "Ember",
+          "cinder": "Cinder",
+          "magma": "Magma",
+          "ash": "Ash",
+          "venom": "Venom",
+          "thorn": "Thorn",
+          "bramble": "Bramble",
+          "spider": "Spider",
+          "bone": "Bone",
+          "marrow": "Marrow",
+          "ossuary": "Ossuary",
+          "grave": "Grave",
+          "war": "War",
+          "skull": "Skull",
+          "iron": "Iron",
+          "blood": "Blood",
+          "void": "Void",
+          "shadow": "Shadow",
+          "umbral": "Umbral",
+          "dusk": "Dusk",
+          "storm": "Storm",
+          "tempest": "Tempest",
+          "thunder": "Thunder",
+          "gale": "Gale",
+          "sunken": "Sunken",
+          "abyssal": "Abyssal",
+          "drowned": "Drowned",
+          "tide": "Tide",
+          "spore": "Spore",
+          "toadstool": "Toadstool",
+          "mould": "Mould",
+          "mycelium": "Mycelium",
+          "burrow": "Burrow",
+          "tunnel": "Tunnel",
+          "delve": "Delve",
+          "loam": "Loam",
+          "roost": "Roost",
+          "echo": "Echo",
+          "guano": "Guano",
+          "hollow": "Hollow",
+          "coffer": "Coffer",
+          "strongbox": "Strongbox",
+          "tithe": "Tithe",
+          "gilt": "Gilt",
+          "brimstone": "Brimstone",
+          "pitfire": "Pitfire",
+          "pactbound": "Pactbound"
+        },
+        "suffix": {
+          "abyss": "Abyss",
+          "depths": "Depths",
+          "descent": "Descent",
+          "hollow": "Hollow",
+          "labyrinth": "Labyrinth",
+          "warren": "Warren",
+          "sanctum": "Sanctum",
+          "rift": "Rift"
+        }
+      }
     },
     "delve": {
       "cannotEnterNow": "You cannot enter a delve right now.",
@@ -9272,6 +9794,9 @@ export const en_CA: EnTranslations = {
       "moveCloserStairs": "Move closer to the stairs.",
       "nhaliaCantorShield": "Cantors, hold the note!",
       "nhaliaBlackwaterMark": "{name} marks {player} with Blackwater!"
+    },
+    "factionVendor": {
+      "currencyRequired": "You need {amount} {currency} to purchase that."
     },
     "lockpick": {
       "lockYields": "The lock yields! {tier} spoils.",
@@ -10188,6 +10713,9 @@ export const en_CA: EnTranslations = {
         "readyQuest": "Quest ready to turn in",
         "repeatQuest": "Repeatable quest",
         "cooldownQuest": "Quest on cooldown",
+        "availableWorldQuest": "Available world quest: {name}",
+        "activeWorldQuest": "Active world quest: {name}",
+        "worldBoss": "World boss: {name}",
         "questObjective": "Quest objective area",
         "readyOre": "Ready ore node",
         "readyWood": "Ready wood node",
@@ -10215,6 +10743,8 @@ export const en_CA: EnTranslations = {
         "dungeonExit": "Dungeon exit",
         "delveEntrance": "Delve entrance: {name}",
         "worldPassage": "Passage to {zone}",
+        "hoardEntrance": "Buried Hoard entrance",
+        "hoardReturnEntrance": "Hoard return entrance",
         "riftEntrance": "Rift entrance: {name}",
         "hostileEnemy": "Hostile enemy",
         "aggressiveEnemy": "Enemy attacking you",
@@ -10922,11 +11452,40 @@ export const en_CA: EnTranslations = {
       "rift_storm_execution": "Lightning Rod",
       "rift_storm_strike": "Stormcaller's Wrath",
       "rift_tide_execution": "Abyssal Maw",
-      "rift_tide_strike": "Crushing Depth"
+      "rift_tide_strike": "Crushing Depth",
+      "hoard_cast_fear": "Terrifying Roar",
+      "hoard_cast_stun": "Stunning Blow",
+      "hoard_cast_drowning_hook": "Drowning Hook",
+      "hoard_cast_rime_beam": "Rime Beam",
+      "hoard_cast_cinder_bolt": "Cinder Bolt",
+      "hoard_cast_void_empower": "Void Empowerment",
+      "hoard_cast_webbing": "Webbing",
+      "hoard_cast_doom_ritual": "Doom Ritual",
+      "hoard_cast_charge": "Charge",
+      "hoard_cast_silk_snare": "Silk Snare",
+      "hoard_cast_silence": "Silencing Shriek",
+      "hoard_cast_hex": "Hex",
+      "hoard_lightning_strike": "Lightning Strike",
+      "hoard_ice_age": "Ice Age",
+      "hoard_pulsar_overload": "Pulsar Overload",
+      "hoard_rolling_boulder": "Rolling Boulder",
+      "hoard_goblin_escape": "Escaping",
+      "hoard_cast_mole_rake": "Claw Rake",
+      "hoard_cast_burrow": "Burrow",
+      "hoard_cast_tunnel": "Tunneling",
+      "hoard_cast_emerge": "Eruption",
+      "hoard_cast_collapse": "Ceiling Collapse",
+      "hoard_cast_bat_dive_aim": "Plunging Dive",
+      "hoard_cast_bat_dive": "Diving",
+      "hoard_cast_screech": "Deafening Screech",
+      "hoard_cast_mimic_bite": "Voracious Bite",
+      "hoard_cast_mimic_leap": "Crushing Leap",
+      "hoard_cast_coin_spit": "Cursed Coins"
     }
   },
   "questUi": {
     "tracker": {
+      "clueHuntTitle": "{title} (clue {step} of {total})",
       "title": "Quests",
       "complete": "Complete",
       "showOnMap": "Show {name} on the map",
@@ -10967,6 +11526,8 @@ export const en_CA: EnTranslations = {
       "browseGoodsAria": "Browse goods from {name}",
       "worldMarket": "Show me the World Market.",
       "worldMarketAria": "Open the World Market",
+      "worldQuestBoard": "Show me the world quest board.",
+      "worldQuestBoardAria": "Open the world quest board on the map",
       "accept": "Accept",
       "decline": "Decline",
       "continue": "Continue",
@@ -10986,12 +11547,366 @@ export const en_CA: EnTranslations = {
       "objectiveProgress": "{label}: {current}/{total}",
       "requiresLevel": "Requires Level {level}"
     },
+    "worldQuest": {
+      "title": "{zone}: {target}",
+      "unknown": "Unknown world quest ({id})",
+      "itemReward": "Item reward: {name}",
+      "rewardLine": "Rewards: {reward}",
+      "availableStatus": "Available world quest",
+      "activeStatus": "Active world quest",
+      "expiresIn": "Expires in {time}",
+      "mineOre": "Mine copper ore",
+      "recoverObject": "Recover {name}",
+      "redirectLeyBeam": "Redirect the ley beam",
+      "matchConfections": "Match enchanted confections",
+      "loadFreight": "Load freight into the wagon",
+      "escortCaravan": "Escort the caravan: {zone}",
+      "salvageWreckage": "Salvage debris washed along the strand from the wreck northwest of Gullhaven",
+      "banner": {
+        "riftOpens": "A rift tears open on the strand! Raiders are coming for the salvage.",
+        "captainSteps": "The raider captain steps through the rift!",
+        "riftRouted": "The raiders are routed. The strand is yours again.",
+        "championRises": "Extra loot! A champion rises at the site. Bring it down together.",
+        "championFallen": "Extra loot! The champion falls: a bonus purse for everyone who fought it.",
+        "endlessBegins": "The line holds! Endless waves begin, each one harder. Leave the cannon whenever you like."
+      },
+      "shadow": {
+        "title": "Under Cover of Shadow",
+        "objective": "Steal four sealed orders without being caught",
+        "cloak": "Duskweave Cloak",
+        "pickpocket": "Pick Pocket",
+        "leave": "Remove Cloak",
+        "stealTip": "Approach from behind and remain still while taking the orders. Stay out of the lantern beams.",
+        "leaveTip": "Remove the cloak. Your recovered orders are kept.",
+        "documents": "Orders recovered: {count}/4",
+        "suspicion": "Suspicion: {value}",
+        "safe": "Steal from behind. Lantern guards sweep wide beams that see through the cloak; wait for a clear opening.",
+        "behind": "Move behind the guard before stealing.",
+        "danger": "You are being spotted! Get out of sight!",
+        "channel": "Stealing... {seconds}s",
+        "noTarget": "Move close to a guard carrying orders.",
+        "start": "Speak with Scout Valerie to borrow her cloak.",
+        "caught": "Caught! Return to Scout Valerie for another cloak. Your orders are safe.",
+        "complete": "All four orders recovered."
+      },
+      "investigation": {
+        "title": "A Borrowed Face",
+        "objective": "Unmask and defeat the infiltrator",
+        "briefing": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records.",
+        "instructions": "Read the standing orders and watch ledger, then question all four guards. Compare their stories with the records.",
+        "confront": "Report to Sergeant Alric and name the guard whose story contradicts the records.",
+        "name": "Which of my guards is wearing a borrowed face?",
+        "accuseOption": "Accuse {name}",
+        "cleared": "Sergeant Alric: That soldier is accounted for. Compare the other stories with our records and try again.",
+        "guardCleared": "Sergeant Alric has already accounted for this soldier.",
+        "revealed": "The creature has shed this face. Defeat it.",
+        "defeat": "Defeat the revealed infiltrator.",
+        "heard": "Guards questioned: {count}/4",
+        "clues": "Records examined: {count}/2",
+        "clueNames": {
+          "c0": "Standing Orders",
+          "c1": "Watch Ledger"
+        },
+        "variants": {
+          "v0": {
+            "clue0": "The south bridge has been closed since dawn. All patrols must use the western road.",
+            "clue1": "Orin was assigned to gate duty. Nella, Bram and Tessa patrolled the western road.",
+            "guard0": "My patrol took the western road this morning.",
+            "guard1": "I crossed the south bridge on my morning patrol.",
+            "guard2": "I patrolled the western road with Nella and Tessa.",
+            "guard3": "The south bridge is closed. We used the western road."
+          },
+          "v1": {
+            "clue0": "Today's password is Reedwatch. Yesterday's password, Lantern, is no longer valid.",
+            "clue1": "All four guards were briefed on the new password at dawn.",
+            "guard0": "Reedwatch. I learned the new password at dawn.",
+            "guard1": "Lantern was yesterday's password. Today we use Reedwatch.",
+            "guard2": "All four of us attended the dawn briefing.",
+            "guard3": "Today's password is Lantern. I heard it at the dawn briefing."
+          },
+          "v2": {
+            "clue0": "All garrison supply crates must carry blue wax seals. Reject any crate with a red seal.",
+            "clue1": "Today's delivery was inspected: every crate had an intact blue wax seal.",
+            "guard0": "I inspected today's delivery. Every crate had a red wax seal.",
+            "guard1": "We only accept crates sealed with blue wax.",
+            "guard2": "The ledger records blue seals on today's delivery.",
+            "guard3": "No crates with red seals were accepted today."
+          },
+          "v3": {
+            "clue0": "The night watch relights the east beacon at dusk. The west beacon stays dark until the ferry signals.",
+            "clue1": "Nella and Orin held the gate through the night. Bram and Tessa walked the causeway and relit the east beacon at dusk.",
+            "guard0": "Orin and I had the gate all night. Nothing came through but the fog.",
+            "guard1": "Gate duty with Nella. We watched the east beacon come alight at dusk, as ordered.",
+            "guard2": "Tessa and I walked the causeway. We lit the west beacon at dusk so the ferry could see us.",
+            "guard3": "Causeway patrol with Bram. We relit the east beacon the moment the sun went down."
+          },
+          "v4": {
+            "clue0": "The quartermaster's cart arrives at noon by the north road. No supplies come by water while the marsh is flooded.",
+            "clue1": "Noon delivery received from the north road. Tessa signed for it; Bram and Nella unloaded; Orin was at the well.",
+            "guard0": "I helped Bram unload the cart at noon. Salt pork and lamp oil, the usual.",
+            "guard1": "I unloaded the noon delivery myself, straight off the supply barge.",
+            "guard2": "Nella and I carried the crates in. Tessa signed the ledger.",
+            "guard3": "The cart came up the north road at noon. I signed for it."
+          },
+          "v5": {
+            "clue0": "The fallen from the last raid lie in the chapel crypt. Nobody enters the crypt without the sergeant's key.",
+            "clue1": "The sergeant's key has not left his belt since the raid. Nella, Orin and Bram stood the wall; Tessa kept the yard.",
+            "guard0": "I stood the wall. The crypt has stayed locked since the raid; only the sergeant holds the key.",
+            "guard1": "Wall duty with Nella and Bram. Quiet, except for the frogs.",
+            "guard2": "The wall, all day. Nobody has been near the crypt.",
+            "guard3": "I kept the yard and looked in on the crypt this morning. The fallen are resting."
+          }
+        }
+      },
+      "horde": {
+        "title": "The Last Barricade",
+        "objective": "Defend the barricade and defeat the horde commander",
+        "ready": "Speak to the barricade captain to begin.",
+        "countdown": "Horde incoming in {seconds}s!",
+        "status": "{seconds}s left. Kills: {kills}. Barricade: {barrier}%.",
+        "upgrade": "Weapon: {weapon}",
+        "loadout": "Shots: {count} | +{speed}% speed | {weapon}",
+        "exit": "Leave defense",
+        "gained": "Upgrade: {upgrade}",
+        "killBurst": "+{count} defeated!",
+        "choices": {
+          "projectile": "+1 shot",
+          "haste": "+25% fire rate",
+          "pierce": "Piercing shots",
+          "explosive": "Explosive shots",
+          "double": "x2 shots"
+        },
+        "weapons": {
+          "0": "Repeater",
+          "1": "Twin Shot",
+          "2": "Piercing Shot",
+          "3": "Explosive Shot"
+        },
+        "controls": "Auto-fire. A/D, arrows or joystick. Backward: leave.",
+        "supplies": "Break one crate to choose. The other disappears!",
+        "result": "{rating}! Score: {score}.",
+        "resultStats": "Kills: {kills}. Barricade: {barrier}%.",
+        "failed": "Defense failed. Try again!",
+        "replay": "Speak to the captain to retry. Rewards once per rotation.",
+        "medals": {
+          "gold": "Gold",
+          "silver": "Silver",
+          "bronze": "Bronze"
+        }
+      },
+      "wispMaze": {
+        "leave": "Leave maze",
+        "title": "Wispwood Maze",
+        "objective": "Recover every stolen coin purse from the maze",
+        "ready": "Speak to the maze keeper to begin.",
+        "controls": "Move through the maze to pick up the coin purses. Avoid the shadows. Radiant wisps let you banish shadows for a short time.",
+        "collected": "Coin purses: {count}/{total}",
+        "lives": "Lives: {count}/3",
+        "power": "Wisp power: {seconds}s",
+        "countdown": "Starting in {seconds}s",
+        "collect": "Pick up the coin purses. Avoid shadows.",
+        "powered": "Power surge! Touch shadows to banish them.",
+        "finished": "Every coin purse is recovered!",
+        "retry": "Three lives restored. Try the maze again.",
+        "startNormal": "Enter the maze: Normal ({shadows} shadows)",
+        "startHard": "Enter the maze: Hard ({shadows} shadows, bonus purse)"
+      },
+      "forge": {
+        "title": "A Helping Hammer",
+        "objective": "Help Smith Mara forge a shield",
+        "ready": "Speak to Smith Mara to begin.",
+        "countdown": "Ready your hands! Starting in {seconds}s.",
+        "preparing": "Nicely done! Next request...",
+        "fuel": "Woodpile",
+        "metal": "Ingot Crate",
+        "water": "Well",
+        "tools": "Anvil",
+        "request": {
+          "fuel": "Stoke the fire! Add some wood!",
+          "metal": "More metal! Open the ingot crate!",
+          "water": "Cool it down! Water from the well!",
+          "tools": "Hammer it into shape! Use the anvil!"
+        },
+        "sequence": "{instruction} Then click the {next}.",
+        "round": "Request {round}/{total}: step {step}/{steps}",
+        "thresholds": "Gold: {gold}s or less. Silver: {silver}s or less.",
+        "starting": "Getting ready...",
+        "finished": "Fine work! A shield fit for the garrison!",
+        "failed": "Too many mistakes! The metal cracked. Speak to Mara to try again.",
+        "wrong": "Wrong tool! +{penalty}s. Try the requested object.",
+        "correct": "That is it! Keep going.",
+        "result": "{rating}! {seconds}s. Mistakes: {mistakes}.",
+        "replay": "Speak to Mara to try again. Rewards are earned once per rotation.",
+        "medals": {
+          "gold": "Gold",
+          "silver": "Silver",
+          "bronze": "Bronze"
+        },
+        "strike": "Strike",
+        "strikeTip": "Hammer the piece. Press when the needle crosses the dark band; the band narrows and the needle quickens with every good blow. A blow outside the band, or on a cold forge, costs three seconds.",
+        "stoke": "Stoke",
+        "stokeTip": "Throw wood on the fire. The forge cools all the time; keep its heat above {floor} or your blows land cold.",
+        "strikes": "Strikes: {count}/{total}",
+        "heat": "Forge heat: {value} (keep above {floor})",
+        "mistakes": "Mistakes: {count}",
+        "meterAria": "Hammer timing meter",
+        "hintStrike": "Watch the needle. Strike inside the dark band!",
+        "hintStoke": "The forge is cooling! Stoke the fire before you strike.",
+        "hit": "Clean blow! The band narrows.",
+        "miss": "Missed the band! +{penalty}s.",
+        "cold": "Cold strike! Stoke the fire first. +{penalty}s."
+      },
+      "glider": {
+        "title": "Windrider Slalom",
+        "boost": "Extra Speed",
+        "boostTip": "Increase your flight speed by {speed} yd/s, up to {maximum} yd/s. Available while flying. Recharges in {seconds} seconds.",
+        "objective": "Soar through the wind rings and land in the marked zone",
+        "ready": "Speak to Flightmaster Zephyr to launch.",
+        "countdown": "Launch in {count}... Hold tight!",
+        "flying": "Rings: {rings}/{total} | Time: {time}s | Speed: {speed} yd/s",
+        "climb": "Climb",
+        "climbTip": "Hold to pull the nose up and trade speed for height. Tap for a short nudge. Slow flight loses lift.",
+        "dive": "Dive",
+        "diveTip": "Hold to point the nose down and gain speed. Tap for a short nudge.",
+        "controls": "Hold right mouse and look up to climb at the cost of speed; look down to dive and gain speed. Slow flight loses lift. Left/right steer; backward brakes. Jump or swim up/down also control pitch. Fly forward through wind tunnels for a speed boost, once per tunnel per attempt.",
+        "landed": "{rating}! Passed {rings}/{total} rings in {time}s.",
+        "failed": "Descent failed! Landed off course or missed too many rings.",
+        "retry": "Talk to Zephyr to retry, or to Skye by the landing zone to return to the launch point.",
+        "nextRing": "Aim through the next wind ring along the canyon. Clear at least {minimum} rings, then land in the marked zone.",
+        "landing": "All rings cleared! Steer onto the landing zone ahead.",
+        "complete": "Landing complete!",
+        "score": "Score: {score}.",
+        "medals": {
+          "gold": "Gold",
+          "silver": "Silver",
+          "bronze": "Bronze"
+        }
+      },
+      "calligraphyTitle": "Arcane Calligraphy",
+      "traceOutline": "Trace the outline with your footsteps",
+      "traceRoundInstruction": "Round {round} of {total}: {shape}. {instruction}",
+      "traceShape": {
+        "triangle": "Triangle",
+        "square": "Square",
+        "star": "Star",
+        "hourglass": "Hourglass",
+        "lightning": "Lightning Rune",
+        "spiral": "Angular Spiral",
+        "double-triangle": "Twin-Triangle Sigil",
+        "diamond": "Diamond",
+        "pentagon": "Pentagon",
+        "arrow": "Arrow Rune",
+        "zigzag": "Zigzag Sigil",
+        "cross": "Cross Rune"
+      },
+      "traceRating": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold"
+      },
+      "traceScoreResult": "Complete! {rating}: {score}/{total}. Base reward unchanged. Gold: deed, title, +10 Renown.",
+      "traceCompletionLog": "{completion} {result}",
+      "traceUnavailable": "This rune needs a newer game version.",
+      "traceReaction": {
+        "tessaTriangle": "Three corners, and every one in its place!",
+        "pipSquare": "Four sides! I think I can do that too!",
+        "elianFinal": "Final rune. A line may cross or revisit a point; follow the bright marker to the next corner.",
+        "elianGold": "Beautifully traced! Your steps have earned their place in gold.",
+        "elianComplete": "A complete rune! Care and practice will make your next one even finer."
+      },
+      "traceReady": "Speak to the instructor to begin.",
+      "tracePreview": "Watch the outline. Golden sparkles will guide you.",
+      "traceStart": "Move to the start marker. Trace either way.",
+      "traceDrawing": "Follow golden sparkles to the bright corner. Blue marks your trail.",
+      "traceSuccess": "Outline complete!",
+      "traceRetry": "Speak to the instructor to try again.",
+      "traceOffPath": "You left the outline. Speak to the instructor to retry.",
+      "traceMovement": "Stay on foot and on the ground. Speak to the instructor to retry.",
+      "traceTimeout": "Time ran out. Speak to the instructor to retry.",
+      "traceCombat": "Leave combat, then speak to the instructor to retry.",
+      "puzzleTitle": "Ley Beam Alignment",
+      "puzzleBeamReach": "Crystals reached: {count}",
+      "puzzleVictoryTitle": "Perfect alignment",
+      "puzzleVictoryDetail": "The ley beam has reached its destination.",
+      "puzzleDefeatTitle": "Alignment lost",
+      "puzzleDefeatDetail": "The current has faded. The ritual is unfinished.",
+      "puzzleReturn": "Return to realm",
+      "puzzleResultAnnouncement": "{title}. {detail} {reach}.",
+      "puzzleLevel": "Daily level {level}",
+      "puzzleBonusLevel": "Bonus level {level} of {total}",
+      "puzzleBonusCharged": "The cache hums with a bonus charge: level {level} of {total} awaits. Touch the Ley Cache again for extra gold.",
+      "puzzleBonusPaid": "Bonus purse earned!",
+      "puzzleBonusDone": "Every bonus level cleared. The cache rests until the next offer.",
+      "puzzleInstructions": "Rotate the tiles to carry the beam from the source to the destination.",
+      "puzzleRotateTile": "Rotate tile {tile}",
+      "puzzleConnectors": "Connectors: {connectors}.",
+      "puzzlePowered": "The beam reaches this tile.",
+      "puzzleUnpowered": "The beam does not reach this tile.",
+      "puzzleClose": "Close ley beam puzzle",
+      "puzzleSource": "Source",
+      "puzzleTarget": "Destination",
+      "puzzleSourceEndpoint": "Source: {direction}.",
+      "puzzleTargetEndpoint": "Destination: {direction}.",
+      "puzzleTileAria": "{rotation} {connectors} {power} {source} {target}",
+      "puzzleRetry": "Try again",
+      "puzzleTimer": "{seconds}s",
+      "puzzleTimerAria": "Time remaining: {seconds} seconds",
+      "startQuest": "Start World Quest",
+      "startEscort": "Start Escort",
+      "escortTitle": "Caravan",
+      "alreadyCompleted": "You have already completed this World Quest for this cycle.",
+      "inProgress": "This World Quest is already underway.",
+      "match3Title": "Confection Cascade",
+      "match3Instructions": "Select two adjacent confections. A swap only counts when it creates a line of three or more.",
+      "match3Moves": "Moves: {current}/{total}",
+      "match3Cleared": "Confections cleared: {current}/{total}",
+      "match3Announcement": "{moves}. {cleared}.",
+      "match3Cell": "Row {row}, column {column}: {candy}",
+      "match3Selected": "Selected",
+      "match3Reset": "Restart level",
+      "match3Close": "Close confection puzzle",
+      "match3OutOfMoves": "No moves remain. Restart the level to try again.",
+      "match3VictoryTitle": "Sweet victory",
+      "match3VictoryDetail": "The enchanted collection is complete.",
+      "match3DefeatTitle": "Bitter defeat",
+      "match3DefeatDetail": "Your moves are spent. A fresh collection awaits.",
+      "match3TryAgain": "Try again",
+      "match3ResultAnnouncement": "{title}. {detail} {moves}. {cleared}.",
+      "match3ResultSummary": "{title}. {detail} {cleared}.",
+      "semanticSummary": "{name}. {progress}. {reward}.",
+      "semanticSummaryTimed": "{name}. {progress}. {reward}. {time}.",
+      "match3Candy": {
+        "berry": "berry crystal",
+        "citrus": "citrus orb",
+        "mint": "mint triangle",
+        "grape": "grape square",
+        "star": "sugar star"
+      }
+    },
     "logs": {
       "accepted": "Quest accepted: {name}",
+      "worldQuestStarted": "World quest started: {name}",
       "abandoned": "Quest abandoned: {name}",
       "completed": "Quest completed: {name}",
       "ready": "{name} ({status})",
-      "progress": "{label}: {current}/{total}"
+      "progress": "{label}: {current}/{total}",
+      "clueScrollEarned": "Every world quest of the day is done: a Clue Scroll is yours.",
+      "clueScrollLost": "Every world quest of the day is done, but you cannot hold another Clue Scroll.",
+      "clueHuntStarted": "Treasure hunt begun: {title}",
+      "clueHuntStep": "Clue {step} of {total} solved: {title}",
+      "clueHuntDone": "Treasure hunt complete: {title}. The casket is yours.",
+      "clueHuntAbandoned": "Treasure hunt abandoned: {title}",
+      "clueCasketOpened": "The casket holds {money} and {items}.",
+      "treasureMapEarned": "Every world quest of the day is done: you found a {map}.",
+      "treasureMapLost": "Every world quest of the day is done, but your bags have no room for the treasure map.",
+      "treasureMapRead": "You study the {map}. The X lies somewhere in {zone}.",
+      "treasureMapUpgraded": "The map is redrawn in finer ink: it is now a {map}.",
+      "treasureVaultOpened": "The ground gives way. A buried hoard lies open before you.",
+      "treasureVaultLooted": "The hoard holds {money} and {items}.",
+      "treasureVaultCapped": "You have shared in enough hoards today; this one pays you nothing.",
+      "hoardGoblinSighted": "A goblin thief appears!",
+      "hoardGoblinSightedHint": "Kill it before it escapes with the gold!",
+      "hoardGoblinExplain": "A goblin thief is hiding in this hoard with a sack of stolen gold. It never fights back, it only runs. Your first hit starts a {seconds}-second escape bar: if it is still alive when the bar runs out, it opens a portal and is gone with the gold. Left alone, it slips away after {minutes} minutes. Kill it in time and everyone in the room is paid in gold."
     },
     "errors": {
       "unavailable": "That quest is not available.",
@@ -11355,6 +12270,10 @@ export const en_CA: EnTranslations = {
       "sport_second_wind": {
         "name": "Fresh Legs",
         "description": "Find your legs: move 50% faster for 4 sec."
+      },
+      "clockwork_shock_bomb": {
+        "name": "Clockwork Shock Bomb",
+        "description": "Throws a Clockwork Shock Bomb at the target location, dealing 120 to 160 Nature damage to enemies within 5 yards."
       },
       "flamestrike": {
         "name": "Flamestrike",
@@ -14386,6 +15305,18 @@ export const en_CA: EnTranslations = {
       "sprung_trap": {
         "name": "Sprung Fen Trap"
       },
+      "leyline_cache": {
+        "name": "Miniature Ley Cache"
+      },
+      "confection_game_box": {
+        "name": "Confectioner's Game Box"
+      },
+      "eastbrook_freight_crate": {
+        "name": "Eastbrook Freight Crate"
+      },
+      "eastbrook_freight_wagon": {
+        "name": "Eastbrook Freight Wagon"
+      },
       "hearthlined_treads": {
         "name": "Hearth-Lined Treads"
       },
@@ -15925,6 +16856,363 @@ export const en_CA: EnTranslations = {
       "stormhymn_chain_treads": {
         "name": "Stormhymn Chain Treads"
       },
+      "allied_hearthstone": {
+        "name": "Allied Hearthstone"
+      },
+      "allied_vanguard_duffel": {
+        "name": "Allied Vanguard Duffel"
+      },
+      "rift_feather_glider": {
+        "name": "Rift Feather Glider"
+      },
+      "formula_enchant_feet_shadowstride": {
+        "name": "Formula: Enchant Boots - Shadowstride"
+      },
+      "recipe_potion_of_invisibility": {
+        "name": "Recipe: Potion of Invisibility"
+      },
+      "potion_of_invisibility": {
+        "name": "Potion of Invisibility"
+      },
+      "pattern_reinforced_armor_kit": {
+        "name": "Pattern: Reinforced Armor Kit"
+      },
+      "reinforced_armor_kit": {
+        "name": "Reinforced Armor Kit"
+      },
+      "dawn_battle_standard": {
+        "name": "Dawn Battle Standard"
+      },
+      "formula_enchant_offhand_spirit": {
+        "name": "Formula: Enchant Off-Hand - Spirit"
+      },
+      "recipe_elixir_of_mana_regeneration": {
+        "name": "Recipe: Elixir of Mana Regeneration"
+      },
+      "elixir_of_mana_regeneration": {
+        "name": "Elixir of Mana Regeneration"
+      },
+      "clockwork_target_dummy": {
+        "name": "Clockwork Target Dummy"
+      },
+      "schematic_clockwork_shock_bomb": {
+        "name": "Schematic: Clockwork Shock Bomb"
+      },
+      "clockwork_shock_bomb": {
+        "name": "Clockwork Shock Bomb"
+      },
+      "plans_dense_sharpening_stone": {
+        "name": "Plans: Dense Sharpening Stone"
+      },
+      "dense_sharpening_stone": {
+        "name": "Dense Sharpening Stone"
+      },
+      "formula_enchant_gloves_forged_might": {
+        "name": "Formula: Enchant Gloves - Forged Might"
+      },
+      "treasure_map_common": {
+        "name": "Weathered Treasure Map"
+      },
+      "treasure_map_rare": {
+        "name": "Inked Treasure Map"
+      },
+      "treasure_map_epic": {
+        "name": "Gilded Treasure Map"
+      },
+      "treasure_map_legendary": {
+        "name": "Sovereign Treasure Map"
+      },
+      "cartographers_ink": {
+        "name": "Cartographer's Ink"
+      },
+      "collapsar_band_of_nyxaris": {
+        "name": "Collapsar Band of Nyxaris"
+      },
+      "rare_collapsar_band_of_nyxaris": {
+        "name": "Tarnished Collapsar Band of Nyxaris"
+      },
+      "legendary_collapsar_band_of_nyxaris": {
+        "name": "Sovereign Collapsar Band of Nyxaris"
+      },
+      "orb_collapsing_void": {
+        "name": "Orb of Collapsing Void"
+      },
+      "rare_orb_collapsing_void": {
+        "name": "Tarnished Orb of Collapsing Void"
+      },
+      "legendary_orb_collapsing_void": {
+        "name": "Sovereign Orb of Collapsing Void"
+      },
+      "cowl_of_event_horizon": {
+        "name": "Cowl of the Event Horizon"
+      },
+      "rare_cowl_of_event_horizon": {
+        "name": "Tarnished Cowl of the Event Horizon"
+      },
+      "legendary_cowl_of_event_horizon": {
+        "name": "Sovereign Cowl of the Event Horizon"
+      },
+      "mantle_of_singularity": {
+        "name": "Mantle of Singularity"
+      },
+      "rare_mantle_of_singularity": {
+        "name": "Tarnished Mantle of Singularity"
+      },
+      "legendary_mantle_of_singularity": {
+        "name": "Sovereign Mantle of Singularity"
+      },
+      "glacier_hewn_bulwark": {
+        "name": "Glacier-Hewn Bulwark"
+      },
+      "rare_glacier_hewn_bulwark": {
+        "name": "Tarnished Glacier-Hewn Bulwark"
+      },
+      "legendary_glacier_hewn_bulwark": {
+        "name": "Sovereign Glacier-Hewn Bulwark"
+      },
+      "permafrost_legguards": {
+        "name": "Permafrost Legguards"
+      },
+      "rare_permafrost_legguards": {
+        "name": "Tarnished Permafrost Legguards"
+      },
+      "legendary_permafrost_legguards": {
+        "name": "Sovereign Permafrost Legguards"
+      },
+      "frostbitten_rime_slippers": {
+        "name": "Frostbitten Rime Slippers"
+      },
+      "rare_frostbitten_rime_slippers": {
+        "name": "Tarnished Frostbitten Rime Slippers"
+      },
+      "legendary_frostbitten_rime_slippers": {
+        "name": "Sovereign Frostbitten Rime Slippers"
+      },
+      "rime_crusted_grips": {
+        "name": "Rime-Crusted Grips"
+      },
+      "rare_rime_crusted_grips": {
+        "name": "Tarnished Rime-Crusted Grips"
+      },
+      "legendary_rime_crusted_grips": {
+        "name": "Sovereign Rime-Crusted Grips"
+      },
+      "ember_wrought_crown": {
+        "name": "Ember-Wrought Crown"
+      },
+      "rare_ember_wrought_crown": {
+        "name": "Tarnished Ember-Wrought Crown"
+      },
+      "legendary_ember_wrought_crown": {
+        "name": "Sovereign Ember-Wrought Crown"
+      },
+      "cinder_stitched_robes": {
+        "name": "Cinder-Stitched Robes"
+      },
+      "rare_cinder_stitched_robes": {
+        "name": "Tarnished Cinder-Stitched Robes"
+      },
+      "legendary_cinder_stitched_robes": {
+        "name": "Sovereign Cinder-Stitched Robes"
+      },
+      "chained_ember_choker": {
+        "name": "Chained Ember Choker"
+      },
+      "rare_chained_ember_choker": {
+        "name": "Tarnished Chained Ember Choker"
+      },
+      "legendary_chained_ember_choker": {
+        "name": "Sovereign Chained Ember Choker"
+      },
+      "molten_clinker_girdle": {
+        "name": "Molten Clinker Girdle"
+      },
+      "rare_molten_clinker_girdle": {
+        "name": "Tarnished Molten Clinker Girdle"
+      },
+      "legendary_molten_clinker_girdle": {
+        "name": "Sovereign Molten Clinker Girdle"
+      },
+      "storm_tuned_buckler": {
+        "name": "Storm-Tuned Buckler"
+      },
+      "rare_storm_tuned_buckler": {
+        "name": "Tarnished Storm-Tuned Buckler"
+      },
+      "legendary_storm_tuned_buckler": {
+        "name": "Sovereign Storm-Tuned Buckler"
+      },
+      "hauberk_tempest_gale": {
+        "name": "Hauberk of the Tempest Gale"
+      },
+      "rare_hauberk_tempest_gale": {
+        "name": "Tarnished Hauberk of the Tempest Gale"
+      },
+      "legendary_hauberk_tempest_gale": {
+        "name": "Sovereign Hauberk of the Tempest Gale"
+      },
+      "gale_strider_boots": {
+        "name": "Gale-Strider Boots"
+      },
+      "rare_gale_strider_boots": {
+        "name": "Tarnished Gale-Strider Boots"
+      },
+      "legendary_gale_strider_boots": {
+        "name": "Sovereign Gale-Strider Boots"
+      },
+      "tempest_strike_grips": {
+        "name": "Tempest-Strike Grips"
+      },
+      "rare_tempest_strike_grips": {
+        "name": "Tarnished Tempest-Strike Grips"
+      },
+      "legendary_tempest_strike_grips": {
+        "name": "Sovereign Tempest-Strike Grips"
+      },
+      "breastplate_tectonic_might": {
+        "name": "Breastplate of Tectonic Might"
+      },
+      "rare_breastplate_tectonic_might": {
+        "name": "Tarnished Breastplate of Tectonic Might"
+      },
+      "legendary_breastplate_tectonic_might": {
+        "name": "Sovereign Breastplate of Tectonic Might"
+      },
+      "band_mountains_weight": {
+        "name": "Band of the Mountain's Weight"
+      },
+      "rare_band_mountains_weight": {
+        "name": "Tarnished Band of the Mountain's Weight"
+      },
+      "legendary_band_mountains_weight": {
+        "name": "Sovereign Band of the Mountain's Weight"
+      },
+      "monolithic_shoulderguards": {
+        "name": "Monolithic Shoulderguards"
+      },
+      "rare_monolithic_shoulderguards": {
+        "name": "Tarnished Monolithic Shoulderguards"
+      },
+      "legendary_monolithic_shoulderguards": {
+        "name": "Sovereign Monolithic Shoulderguards"
+      },
+      "earthshaker_warboots": {
+        "name": "Earthshaker Warboots"
+      },
+      "rare_earthshaker_warboots": {
+        "name": "Tarnished Earthshaker Warboots"
+      },
+      "legendary_earthshaker_warboots": {
+        "name": "Sovereign Earthshaker Warboots"
+      },
+      "silkstalker_woven_vest": {
+        "name": "Woven Vest of the Silkstalker"
+      },
+      "rare_silkstalker_woven_vest": {
+        "name": "Tarnished Woven Vest of the Silkstalker"
+      },
+      "legendary_silkstalker_woven_vest": {
+        "name": "Sovereign Woven Vest of the Silkstalker"
+      },
+      "spun_venom_spaulders": {
+        "name": "Spun-Venom Spaulders"
+      },
+      "rare_spun_venom_spaulders": {
+        "name": "Tarnished Spun-Venom Spaulders"
+      },
+      "legendary_spun_venom_spaulders": {
+        "name": "Sovereign Spun-Venom Spaulders"
+      },
+      "broodmother_chitin_cowl": {
+        "name": "Chitin Cowl of the Broodmother"
+      },
+      "rare_broodmother_chitin_cowl": {
+        "name": "Tarnished Chitin Cowl of the Broodmother"
+      },
+      "legendary_broodmother_chitin_cowl": {
+        "name": "Sovereign Chitin Cowl of the Broodmother"
+      },
+      "venom_etched_waistcord": {
+        "name": "Venom-Etched Waistcord"
+      },
+      "rare_venom_etched_waistcord": {
+        "name": "Tarnished Venom-Etched Waistcord"
+      },
+      "legendary_venom_etched_waistcord": {
+        "name": "Sovereign Venom-Etched Waistcord"
+      },
+      "bone_studded_pauldrons": {
+        "name": "Bone-Studded Pauldrons"
+      },
+      "rare_bone_studded_pauldrons": {
+        "name": "Tarnished Bone-Studded Pauldrons"
+      },
+      "legendary_bone_studded_pauldrons": {
+        "name": "Sovereign Bone-Studded Pauldrons"
+      },
+      "legguards_of_the_ossuary": {
+        "name": "Legguards of the Ossuary"
+      },
+      "rare_legguards_of_the_ossuary": {
+        "name": "Tarnished Legguards of the Ossuary"
+      },
+      "legendary_legguards_of_the_ossuary": {
+        "name": "Sovereign Legguards of the Ossuary"
+      },
+      "seal_of_the_cryptwalker": {
+        "name": "Seal of the Cryptwalker"
+      },
+      "rare_seal_of_the_cryptwalker": {
+        "name": "Tarnished Seal of the Cryptwalker"
+      },
+      "legendary_seal_of_the_cryptwalker": {
+        "name": "Sovereign Seal of the Cryptwalker"
+      },
+      "ossuary_bone_crown": {
+        "name": "Ossuary Bone Crown"
+      },
+      "rare_ossuary_bone_crown": {
+        "name": "Tarnished Ossuary Bone Crown"
+      },
+      "legendary_ossuary_bone_crown": {
+        "name": "Sovereign Ossuary Bone Crown"
+      },
+      "chalice_of_living_tides": {
+        "name": "Chalice of the Living Tides"
+      },
+      "rare_chalice_of_living_tides": {
+        "name": "Tarnished Chalice of the Living Tides"
+      },
+      "legendary_chalice_of_living_tides": {
+        "name": "Sovereign Chalice of the Living Tides"
+      },
+      "pendant_continuous_flow": {
+        "name": "Pendant of Continuous Flow"
+      },
+      "rare_pendant_continuous_flow": {
+        "name": "Tarnished Pendant of Continuous Flow"
+      },
+      "legendary_pendant_continuous_flow": {
+        "name": "Sovereign Pendant of Continuous Flow"
+      },
+      "coral_encrusted_girdle": {
+        "name": "Coral-Encrusted Girdle"
+      },
+      "rare_coral_encrusted_girdle": {
+        "name": "Tarnished Coral-Encrusted Girdle"
+      },
+      "legendary_coral_encrusted_girdle": {
+        "name": "Sovereign Coral-Encrusted Girdle"
+      },
+      "riptide_handwraps": {
+        "name": "Riptide Handwraps"
+      },
+      "rare_riptide_handwraps": {
+        "name": "Tarnished Riptide Handwraps"
+      },
+      "legendary_riptide_handwraps": {
+        "name": "Sovereign Riptide Handwraps"
+      },
       "conjured_water4": {
         "name": "Conjured Springwater"
       },
@@ -16405,6 +17693,12 @@ export const en_CA: EnTranslations = {
       "event_skin_token": {
         "name": "Mysterious Cosmetic Cache"
       },
+      "clue_scroll": {
+        "name": "Clue Scroll"
+      },
+      "treasure_casket": {
+        "name": "Treasure Casket"
+      },
       "heroic_mark": {
         "name": "Heroic Mark"
       },
@@ -16716,6 +18010,51 @@ export const en_CA: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "Emberward, Bulwark of Varkhul"
+      },
+      "rift_watchers_band": {
+        "name": "Rift Watcher's Band"
+      },
+      "rift_surveyors_satchel": {
+        "name": "Rift Surveyor's Satchel"
+      },
+      "riftwalkers_tunic": {
+        "name": "Riftwalker's Tunic"
+      },
+      "riftwarden_voidblade": {
+        "name": "Riftwarden's Voidblade"
+      },
+      "champion_rift_band": {
+        "name": "Champion's Rift Band"
+      },
+      "order_prayer_beads": {
+        "name": "Order Prayer Beads"
+      },
+      "vestments_of_the_acolyte": {
+        "name": "Vestments of the Acolyte"
+      },
+      "templar_dawn_shield": {
+        "name": "Templar's Dawn Shield"
+      },
+      "dawnkeeper_consecrated_mace": {
+        "name": "Dawnkeeper's Consecrated Mace"
+      },
+      "champion_dawn_medallion": {
+        "name": "Champion's Dawn Medallion"
+      },
+      "automaton_cog_ring": {
+        "name": "Automaton Cog Ring"
+      },
+      "clockwork_tinkers_pack": {
+        "name": "Clockwork Tinker's Pack"
+      },
+      "artificers_welding_cowl": {
+        "name": "Artificer's Welding Cowl"
+      },
+      "forgemaster_crag_cleaver": {
+        "name": "Forgemaster's Crag Cleaver"
+      },
+      "champion_forged_loop": {
+        "name": "Champion's Forged Loop"
       }
     },
     "mobs": {
@@ -16743,6 +18082,15 @@ export const en_CA: EnTranslations = {
       "vale_bandit": {
         "name": "Vale Bandit"
       },
+      "eastbrook_freight_caravan": {
+        "name": "Eastbrook Freight Caravan"
+      },
+      "willowfen_remedy_caravan": {
+        "name": "Willowfen Remedy Caravan"
+      },
+      "frostveil_supply_caravan": {
+        "name": "Frostveil Supply Caravan"
+      },
       "restless_bones": {
         "name": "Restless Bones"
       },
@@ -16763,6 +18111,9 @@ export const en_CA: EnTranslations = {
       },
       "drowned_dead": {
         "name": "Drowned Dead"
+      },
+      "fenbridge_infiltrator": {
+        "name": "The Borrowed Face"
       },
       "fen_troll": {
         "name": "Mirefen Troll"
@@ -17034,6 +18385,51 @@ export const en_CA: EnTranslations = {
       "stable_horse": {
         "name": "Stable Horse"
       },
+      "hoard_brood_egg": {
+        "name": "Brood Clutch"
+      },
+      "hoard_brood_hatchling": {
+        "name": "Vysska's Hatchling"
+      },
+      "hoard_healing_tide_totem": {
+        "name": "Healing Tide Totem"
+      },
+      "hoard_bound_pulsar": {
+        "name": "Bound Pulsar"
+      },
+      "hoard_abyssal_tentacle": {
+        "name": "Tentacle of the Maw"
+      },
+      "hoard_silk_cocoon": {
+        "name": "Silk Cocoon"
+      },
+      "hoard_brood_cocoon": {
+        "name": "Brood Cocoon"
+      },
+      "hoard_coinsack_scurrier": {
+        "name": "Coinsack Scurrier"
+      },
+      "hoard_boss_mushroom": {
+        "name": "Mother of Mushrooms"
+      },
+      "hoard_sporeling": {
+        "name": "Sporeling"
+      },
+      "hoard_bloat_cap": {
+        "name": "Bloated Cap"
+      },
+      "hoard_boss_mole": {
+        "name": "Deeprake"
+      },
+      "hoard_boss_bat": {
+        "name": "Colossal Bat"
+      },
+      "hoard_boss_mimic": {
+        "name": "Voracious Chest"
+      },
+      "hoard_bat_swarmling": {
+        "name": "Cave Swarmer"
+      },
       "rift_spawnling": {
         "name": "Rift Spawnling"
       },
@@ -17063,6 +18459,9 @@ export const en_CA: EnTranslations = {
       },
       "rift_marrow_troll": {
         "name": "Marrow Troll"
+      },
+      "rift_marrow_golem": {
+        "name": "Marrow Golem"
       },
       "rift_void_acolyte": {
         "name": "Voidscar Acolyte"
@@ -17471,6 +18870,111 @@ export const en_CA: EnTranslations = {
       }
     },
     "npcs": {
+      "glider_instructor": {
+        "name": "Flightmaster Zephyr",
+        "title": "Windrider Instructor",
+        "greeting": "The thermals howling off the cliffs of The Shear are fierce today. Ready to strap into the mechanical glider and test your wings through the slalom course?"
+      },
+      "glider_apprentice": {
+        "name": "Skye",
+        "title": "Zephyrs Apprentice",
+        "greeting": "Great flight down the canyon. Speak with me whenever you need a magical updraft back to Zephyr at The Shear."
+      },
+      "shadow_cloak_scout": {
+        "name": "Scout Valerie",
+        "title": "Covert Operations",
+        "greeting": "Borrow my duskweave cloak. Slip in behind each dispatch carrier and lift his orders. Stay out of the lantern beams: a lantern guard sees straight through the enchantment, and a carrier feels you if you brush against him."
+      },
+      "shadow_guard_north": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "These sealed orders are for the captain. Keep your distance."
+      },
+      "shadow_guard_south": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "I have a dispatch to deliver. Move along."
+      },
+      "shadow_guard_east": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "No delays. The watch is waiting for these orders."
+      },
+      "shadow_guard_west": {
+        "name": "Dispatch Guard",
+        "title": "Dispatch Carrier",
+        "greeting": "Official business. Keep the path clear."
+      },
+      "shadow_sentry_south": {
+        "name": "Lantern Sentry",
+        "title": "True Sight",
+        "greeting": "My lantern reveals more than shadows. Stay where I can see you."
+      },
+      "shadow_sentry_north": {
+        "name": "Lantern Sentry",
+        "title": "True Sight",
+        "greeting": "Nothing slips past the lantern watch."
+      },
+      "shadow_watch_west": {
+        "name": "Lantern Watchman",
+        "title": "True Sight",
+        "greeting": "Hold there. The lantern sees what the eye misses."
+      },
+      "shadow_watch_east": {
+        "name": "Lantern Watchman",
+        "title": "True Sight",
+        "greeting": "Nobody crosses my light unseen."
+      },
+      "forge_instructor": {
+        "name": "Smith Mara",
+        "title": "Wyrmwatch Smith",
+        "greeting": "Help me finish a shield! Click the supplies I call for. Quick hands earn a better medal."
+      },
+      "infiltrator_captain": {
+        "name": "Sergeant Alric",
+        "title": "Fenbridge Watch",
+        "greeting": "A creature has stolen a soldier's face. Read the standing orders and the watch ledger, question all four guards, then come back and name the one whose story contradicts our records."
+      },
+      "infiltrator_nella": {
+        "name": "Guard Nella",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "infiltrator_orin": {
+        "name": "Guard Orin",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "infiltrator_bram": {
+        "name": "Guard Bram",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "infiltrator_tessa": {
+        "name": "Guard Tessa",
+        "title": "Fenbridge Watch",
+        "greeting": "Reporting for duty."
+      },
+      "wisp_maze_keeper": {
+        "name": "Keeper Liora",
+        "title": "Warden of the Hedge Maze",
+        "greeting": "Thieves hid their stolen gold all through my maze, and the shadows guard it now. Recover every coin purse. Avoid the guardians, or take a radiant wisp to banish them. Three lost lives return you to the entrance, but the purses you gathered remain safe."
+      },
+      "calligraphy_instructor": {
+        "name": "Instructor Elian",
+        "title": "Arcane Calligraphy",
+        "greeting": "A steady step makes a steady line. Teach my apprentices a triangle, a square, and an advanced rune."
+      },
+      "calligraphy_apprentice_1": {
+        "name": "Apprentice Tessa",
+        "title": "Student of Calligraphy",
+        "greeting": "I keep turning too soon. Will you show me where the corners belong?"
+      },
+      "calligraphy_apprentice_2": {
+        "name": "Apprentice Pip",
+        "title": "Student of Calligraphy",
+        "greeting": "A triangle first, then a square, then a rune. One steady step at a time!"
+      },
       "the_merchant": {
         "name": "The Merchant",
         "title": "Keeper of the World Market",
@@ -17905,6 +19409,26 @@ export const en_CA: EnTranslations = {
         "name": "Riftwright Maelis",
         "title": "Rift Forgemaster",
         "greeting": "A Riftbound band remembers the break that made it, {className}. Bring me the band, and the essence the breaks shed, and I will teach it to remember more."
+      },
+      "npc_rift_watch_quartermaster": {
+        "name": "Quartermaster Vaelen",
+        "title": "Rift Watch Provisioner",
+        "greeting": "The Rift Watch protects the shore and watches the deep tears. Our stores are open to those of recognized standing."
+      },
+      "npc_church_order_quartermaster": {
+        "name": "Templar Althea",
+        "title": "Church Order Quartermaster",
+        "greeting": "Walk in the Light of the Dawn. The Church Order supplies those who stand with us in service."
+      },
+      "npc_automaton_quartermaster": {
+        "name": "Artificer Tobrin",
+        "title": "Automaton Requisitioner",
+        "greeting": "Precision gears, forged steel, and calibrated power. Authorized operators may draw from our inventory."
+      },
+      "npc_wq_taskmaster": {
+        "name": "Taskmaster Kaelen",
+        "title": "World Quest Taskmaster",
+        "greeting": "The allied factions post assignments across the realm every day. If an assignment does not suit your skills, you may request one daily reassignment."
       },
       "forgemistress_darva": {
         "name": "Forgemistress Darva",
@@ -20744,6 +22268,9 @@ export const en_CA: EnTranslations = {
           },
           "4": {
             "label": "The Riftfields"
+          },
+          "5": {
+            "label": "The Wreck"
           }
         }
       },
@@ -21053,6 +22580,11 @@ export const en_CA: EnTranslations = {
         "sender": "The Exchange Broker",
         "subject": "Your Exchange listing sold",
         "body": "Your listing sold and the buyer settled in full. The Exchange ledger carries the record of the sale, and your Exchange activity shows the settled amount and its breakdown.\n\n- The Exchange Broker"
+      },
+      "hoard_vault_reward": {
+        "sender": "The Ravenpost",
+        "subject": "Your vault reward",
+        "body": "The vault was cleared, but your share was not collected from the chest. The ravens have brought it to you here, with the goods and coin you earned attached.\n\n- The Ravenpost"
       }
     },
     "itemSets": {

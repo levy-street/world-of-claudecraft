@@ -186,6 +186,32 @@ describe('ClientWorld visibilitychange reconnect (mobile background/foreground)'
     });
   });
 
+  it('clears optional world-quest mirrors before a reconnected realm resends them', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const wire = world as unknown as { onMessage(raw: string): void };
+      const first = StubWebSocket.instances[0];
+      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+      world.worldQuestCycle = 'wq3_9';
+      world.worldQuestExpiresAtMs = 123;
+      world.worldQuestLog = new Map([
+        ['wq_galecrest_wisps', { questId: 'wq_galecrest_wisps', count: 1, state: 'active' }],
+      ]);
+      world.applyWorldBossWire(['morthen']);
+
+      first.readyState = StubWebSocket.CLOSED;
+      first.onclose?.();
+      harness.fire(harness.timers[0].id);
+      wire.onMessage(JSON.stringify({ t: 'hello', pid: 1, seed: 42 }));
+
+      expect(world.worldQuestCycle).toBe('');
+      expect(world.worldQuestExpiresAtMs).toBe(0);
+      expect(world.worldQuestLog.size).toBe(0);
+      expect(world.worldBossActive('morthen')).toBe(false);
+      world.close();
+    });
+  });
+
   it('foregrounding onto a zombie socket (still "open" per JS state, but the real transport is dead) drives a fresh reconnect', () => {
     withDomStubs((doc) => {
       const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');

@@ -1,0 +1,44 @@
+{
+  "name": "VoraciousChest",
+  "key": "hoard_boss_mimic",
+  "seam": { "point": [0, 0, 0.055], "normal": [0.19, 0.04, 1] },
+  "teethBand": 0.07,
+  "footRegion": { "armY": 0.29, "maxZ": -0.09, "maxX": 0.03, "radius": 0.07 },
+  "mawColor": [0.11, 0.015, 0.018],
+  "tongue": {
+    "y": 0.02,
+    "start": 0.03,
+    "lip": 0.272,
+    "segments": [0.07, 0.08, 0.075],
+    "width": [0.09, 0.104, 0.064],
+    "thick": [0.03, 0.021],
+    "sink": 0.003,
+    "hang": [58, 34, -42],
+    "loll": [4, 10, 16],
+    "blend": [0.02, 0.026, 0.026],
+    "liftOpen": [14, 22],
+    "color": [0.604, 0.227, 0.353],
+    "tipColor": [0.77, 0.416, 0.525]
+  },
+  "motion": {
+    "footDrop": 0.035,
+    "idleBob": 0.006,
+    "idleCrack": 9,
+    "walkStride": 22,
+    "runStride": 32,
+    "biteOpen": 70,
+    "castOpen": 75,
+    "deathOpen": 105,
+    "deathDrop": 0.075,
+    "deathRoll": 10
+  },
+  "bones": [
+    ["Root", null, [0, 0, -0.333], [0, 0, -0.28]],
+    ["Body", "Root", [-0.05, 0, -0.2], [-0.05, 0, 0.0]],
+    ["Lid", "Body", [-0.245, 0, 0.105], [0.2, 0, 0.1]],
+    ["ArmUpper.*", "Body", [-0.02, 0.17, -0.05], [0.01, 0.39, -0.08]],
+    ["ArmLower.*", "ArmUpper.*", [0.01, 0.39, -0.08], [0.03, 0.42, -0.2]],
+    ["Hand.*", "ArmLower.*", [0.03, 0.42, -0.2], [0.09, 0.44, -0.31]],
+    ["HindFoot.*", "Root", [-0.08, 0.16, -0.12], [-0.08, 0.16, -0.29]]
+  ]
+}

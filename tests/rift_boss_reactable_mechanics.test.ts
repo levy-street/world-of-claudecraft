@@ -255,8 +255,8 @@ describe('rift boss instant mechanics wind up', () => {
 
 describe('the anti-kite snare respects telegraph escape windows', () => {
   it('holds at due while a death-zone telegraph is in flight, fires after it clears', () => {
-    const { sim, mob } = enterRiftWithBoss('rift_boss_venom');
-    const zone = MOBS.rift_boss_venom.deathZoneCast!;
+    const { sim, mob } = enterRiftWithBoss('rift_boss_arcane');
+    const zone = MOBS.rift_boss_arcane.deathZoneCast!;
     mob.swingTimer = 999; // no swings: keep the on-hit procs out of this test
     mob.aoeSlowTimer = 999;
     mob.deathZoneCastTimer = 0.001;
@@ -297,7 +297,7 @@ describe('the anti-kite snare respects telegraph escape windows', () => {
 
 describe('death-zone fuses scale with the anchor movement impairment', () => {
   function spawnZoneAndCaptureFuse(impair: 'none' | 'slow' | 'root'): number {
-    const { sim, mob } = enterRiftWithBoss('rift_boss_venom');
+    const { sim, mob } = enterRiftWithBoss('rift_boss_arcane');
     mob.swingTimer = 999;
     mob.aoeSlowTimer = 999; // the boss's own silk must not contaminate the fuse
     if (impair === 'slow') {
@@ -332,17 +332,17 @@ describe('death-zone fuses scale with the anchor movement impairment', () => {
   }
 
   it('an unimpaired anchor keeps the authored fuse', () => {
-    const zone = MOBS.rift_boss_venom.deathZoneCast!;
+    const zone = MOBS.rift_boss_arcane.deathZoneCast!;
     expect(spawnZoneAndCaptureFuse('none')).toBeCloseTo(zone.castTime, 5);
   });
 
   it('a 50% slowed anchor gets a doubled fuse (capped)', () => {
-    const zone = MOBS.rift_boss_venom.deathZoneCast!;
+    const zone = MOBS.rift_boss_arcane.deathZoneCast!;
     expect(spawnZoneAndCaptureFuse('slow')).toBeCloseTo(zone.castTime * RIFT_IMPAIRED_FUSE_CAP, 5);
   });
 
   it('a rooted anchor gets the full fuse cap', () => {
-    const zone = MOBS.rift_boss_venom.deathZoneCast!;
+    const zone = MOBS.rift_boss_arcane.deathZoneCast!;
     expect(spawnZoneAndCaptureFuse('root')).toBeCloseTo(zone.castTime * RIFT_IMPAIRED_FUSE_CAP, 5);
   });
 });
@@ -565,8 +565,8 @@ describe('windup lifecycle and invariants', () => {
   });
 
   it('a kite-frozen telegraph bar cannot pin the escape window open', () => {
-    const { sim, mob } = enterRiftWithBoss('rift_boss_venom');
-    const zone = MOBS.rift_boss_venom.deathZoneCast!;
+    const { sim, mob } = enterRiftWithBoss('rift_boss_arcane');
+    const zone = MOBS.rift_boss_arcane.deathZoneCast!;
     mob.swingTimer = 999;
     mob.deathZoneCastTimer = 0.001;
     sim.tick();

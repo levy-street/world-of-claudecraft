@@ -16,7 +16,25 @@
 // zone; per-frame work is opacity writes and one scale write).
 
 import * as THREE from 'three';
-import type { RiftBossDeathZoneView } from '../world_api/dungeons';
+import type { SimEvent } from '../sim/types';
+import type { IWorld } from '../world_api';
+import type { HoardBossCueView, RiftBossDeathZoneView } from '../world_api/dungeons';
+import { HoardBoneReaperFx } from './hoard_bone_reaper';
+import { HoardBossDressing } from './hoard_boss_dressing';
+import { HoardBossFx } from './hoard_boss_fx';
+import { HoardBossGestures } from './hoard_boss_gestures';
+import { HoardBossPresentation } from './hoard_boss_presentation';
+import { HoardBoulderFx } from './hoard_boulder';
+import { HoardCocoonFx } from './hoard_cocoon';
+import { HoardEncounterAccents } from './hoard_encounter_accents';
+import { HoardForgeHammerFx } from './hoard_forge_hammer';
+import { HoardGoblinCoinsFx } from './hoard_goblin_coins';
+import { HoardIceAgeFx } from './hoard_ice_age';
+import { HoardMimicCoinsFx } from './hoard_mimic_coins';
+import { HoardOrbitalLightning } from './hoard_orbital_lightning';
+import { HoardPulsarFx } from './hoard_pulsars';
+import { HoardSpellFx } from './hoard_spell_fx';
+import { HoardTentaclesFx } from './hoard_tentacles';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -56,17 +74,96 @@ interface ZoneVisual {
  * other ground-ring systems (ringOfFrostVisuals, etc.). */
 export class RiftDeathZoneVisuals {
   private readonly zones = new Map<string, ZoneVisual>();
+  private readonly hoardBossFx: HoardBossFx;
+  private readonly hoardPresentation: HoardBossPresentation;
+  private readonly hoardGestures: HoardBossGestures;
+  private readonly hoardDressing: HoardBossDressing;
+  private readonly hoardAccents: HoardEncounterAccents;
+  private readonly hoardSpells: HoardSpellFx;
+  private readonly hoardOrbital: HoardOrbitalLightning;
+  private readonly hoardBoneReaper: HoardBoneReaperFx;
+  private readonly hoardIceAge: HoardIceAgeFx;
+  private readonly hoardPulsars: HoardPulsarFx;
+  private readonly hoardForgeHammer: HoardForgeHammerFx;
+  private readonly hoardTentacles: HoardTentaclesFx;
+  private readonly hoardBoulder: HoardBoulderFx;
+  private readonly hoardCocoon: HoardCocoonFx;
+  private readonly hoardGoblinCoins: HoardGoblinCoinsFx;
+  private readonly hoardMimicCoins: HoardMimicCoinsFx;
 
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
-  ) {}
+    compileGate?: (target: THREE.Object3D) => Promise<unknown>,
+    private readonly world?: IWorld,
+    shake?: (amount: number) => void,
+    reducedMotion?: () => boolean,
+    playGesture?: (entityId: number, gesture: string) => void,
+  ) {
+    this.hoardGestures = new HoardBossGestures(world, playGesture);
+    this.hoardBossFx = new HoardBossFx(scene, groundY, compileGate);
+    this.hoardPresentation = new HoardBossPresentation(world, shake);
+    this.hoardDressing = new HoardBossDressing(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardAccents = new HoardEncounterAccents(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+    );
+    this.hoardSpells = new HoardSpellFx(scene, groundY, compileGate, reducedMotion);
+    this.hoardOrbital = new HoardOrbitalLightning(scene, groundY, compileGate, reducedMotion);
+    this.hoardBoneReaper = new HoardBoneReaperFx(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardIceAge = new HoardIceAgeFx(scene, groundY, compileGate, reducedMotion, shake);
+    this.hoardPulsars = new HoardPulsarFx(scene, groundY, world, compileGate, reducedMotion, shake);
+    this.hoardForgeHammer = new HoardForgeHammerFx(
+      scene,
+      groundY,
+      compileGate,
+      reducedMotion,
+      shake,
+    );
+    this.hoardTentacles = new HoardTentaclesFx(scene, groundY, compileGate, reducedMotion, shake);
+    this.hoardBoulder = new HoardBoulderFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+      shake,
+    );
+    this.hoardCocoon = new HoardCocoonFx(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardMimicCoins = new HoardMimicCoinsFx(scene, groundY, world, compileGate, reducedMotion);
+    this.hoardGoblinCoins = new HoardGoblinCoinsFx(
+      scene,
+      groundY,
+      world,
+      compileGate,
+      reducedMotion,
+    );
+  }
 
   /** Called each frame with the current zone list from IWorld.riftBossDeathZones().
    * Zones are keyed by position + radius (short-lived, so a simple position key
    * is sufficient; two coincident zones on the same tick are collapsed, which is
    * fine for gameplay). */
-  sync(zones: readonly RiftBossDeathZoneView[]): void {
+  sync(zones: readonly RiftBossDeathZoneView[], hoardCues: readonly HoardBossCueView[] = []): void {
+    this.hoardPresentation.sync(hoardCues);
+    this.hoardGestures.sync(hoardCues);
+    this.hoardBossFx.setTheme(this.world?.riftFloor?.seed);
+    this.hoardBossFx.sync(hoardCues);
+    this.hoardDressing.sync(hoardCues);
+    this.hoardAccents.sync(hoardCues);
+    this.hoardSpells.sync(hoardCues);
+    this.hoardOrbital.sync(hoardCues);
+    this.hoardBoneReaper.sync(hoardCues);
+    this.hoardIceAge.sync(hoardCues);
+    this.hoardPulsars.sync(hoardCues);
+    this.hoardForgeHammer.sync(hoardCues);
+    this.hoardTentacles.sync(hoardCues);
+    this.hoardBoulder.sync(hoardCues);
+    this.hoardCocoon.sync(hoardCues);
+    this.hoardMimicCoins.sync(hoardCues);
     const seen = new Set<string>();
     for (const z of zones) {
       const key = `${z.x.toFixed(1)}:${z.z.toFixed(1)}:${z.radius.toFixed(1)}`;
@@ -93,6 +190,20 @@ export class RiftDeathZoneVisuals {
 
   /** Called each frame with the elapsed frame time in seconds. */
   update(dt: number): void {
+    this.hoardBossFx.update(dt);
+    this.hoardDressing.update(dt);
+    this.hoardAccents.update(dt);
+    this.hoardSpells.update(dt);
+    this.hoardOrbital.update(dt);
+    this.hoardBoneReaper.update(dt);
+    this.hoardIceAge.update(dt);
+    this.hoardPulsars.update(dt);
+    this.hoardForgeHammer.update(dt);
+    this.hoardTentacles.update(dt);
+    this.hoardBoulder.update(dt);
+    this.hoardCocoon.update(dt);
+    this.hoardGoblinCoins.update(dt);
+    this.hoardMimicCoins.update(dt);
     for (const visual of this.zones.values()) {
       visual.phase = (visual.phase + dt * deathZonePulseSpeed(visual.remaining)) % (Math.PI * 2);
       const plan = deathZonePlan(visual.phase, visual.remaining, visual.total);
@@ -105,6 +216,29 @@ export class RiftDeathZoneVisuals {
       const [sx, sy, sz] = deathZoneSweepScale(plan.sweepFraction);
       visual.sweep.scale.set(sx, sy, sz);
     }
+  }
+
+  dispose(): void {
+    this.sync([]);
+    this.hoardBossFx.dispose();
+    this.hoardDressing.dispose();
+    this.hoardAccents.dispose();
+    this.hoardSpells.dispose();
+    this.hoardOrbital.dispose();
+    this.hoardBoneReaper.dispose();
+    this.hoardIceAge.dispose();
+    this.hoardPulsars.dispose();
+    this.hoardForgeHammer.dispose();
+    this.hoardTentacles.dispose();
+    this.hoardBoulder.dispose();
+    this.hoardCocoon.dispose();
+    this.hoardGoblinCoins.dispose();
+    this.hoardMimicCoins.dispose();
+    this.hoardPresentation.dispose();
+  }
+
+  handleEvent(event: SimEvent): void {
+    this.hoardPresentation.handleEvent(event);
   }
 
   private create(key: string, zone: RiftBossDeathZoneView): void {

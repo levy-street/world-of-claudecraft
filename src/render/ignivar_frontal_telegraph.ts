@@ -10,6 +10,11 @@ export const IGNIVAR_FRONTAL_BORDER_NAME = 'ignivarFrontalBorder';
 export const IGNIVAR_FRONTAL_HEAT_BANDS_NAME = 'ignivarFrontalHeatBands';
 export const IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME = 'ignivarFrontalFlameCurtains';
 
+export interface IgnivarFrontalTelegraphShape {
+  range?: number;
+  halfAngle?: number;
+}
+
 function material(color: number, opacity: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({
     color,
@@ -34,11 +39,16 @@ function addQuad(
   indices.push(vertex, vertex + 1, vertex + 2, vertex + 1, vertex + 3, vertex + 2);
 }
 
-function wedgeGeometry(radius: number, segments: number, y: number): THREE.BufferGeometry {
+function wedgeGeometry(
+  radius: number,
+  halfAngle: number,
+  segments: number,
+  y: number,
+): THREE.BufferGeometry {
   const positions: number[] = [0, y, 0];
   const indices: number[] = [];
   for (let index = 0; index <= segments; index++) {
-    const angle = -IGNIVAR_FRONTAL_HALF_ANGLE + (index / segments) * IGNIVAR_FRONTAL_HALF_ANGLE * 2;
+    const angle = -halfAngle + (index / segments) * halfAngle * 2;
     positions.push(Math.sin(angle) * radius, y, Math.cos(angle) * radius);
   }
   for (let index = 0; index < segments; index++) indices.push(0, index + 1, index + 2);
@@ -48,13 +58,13 @@ function wedgeGeometry(radius: number, segments: number, y: number): THREE.Buffe
   return geometry;
 }
 
-function borderGeometry(): THREE.BufferGeometry {
+function borderGeometry(range: number, halfAngle: number): THREE.BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
   const width = 0.24;
   for (const side of [-1, 1]) {
-    const outerAngle = IGNIVAR_FRONTAL_HALF_ANGLE * side;
-    const innerAngle = (IGNIVAR_FRONTAL_HALF_ANGLE - 0.014) * side;
+    const outerAngle = halfAngle * side;
+    const innerAngle = (halfAngle - 0.014) * side;
     const outerDirection = new THREE.Vector3(Math.sin(outerAngle), 0, Math.cos(outerAngle));
     const innerDirection = new THREE.Vector3(Math.sin(innerAngle), 0, Math.cos(innerAngle));
     addQuad(
@@ -62,32 +72,22 @@ function borderGeometry(): THREE.BufferGeometry {
       indices,
       outerDirection.clone().multiplyScalar(0.3).setY(0.073),
       innerDirection.clone().multiplyScalar(0.3).setY(0.073),
-      outerDirection.clone().multiplyScalar(IGNIVAR_FRONTAL_RANGE).setY(0.073),
-      innerDirection.clone().multiplyScalar(IGNIVAR_FRONTAL_RANGE).setY(0.073),
+      outerDirection.clone().multiplyScalar(range).setY(0.073),
+      innerDirection.clone().multiplyScalar(range).setY(0.073),
     );
   }
   const segments = 36;
-  const inner = IGNIVAR_FRONTAL_RANGE - width;
+  const inner = range - width;
   for (let index = 0; index < segments; index++) {
-    const angleA =
-      -IGNIVAR_FRONTAL_HALF_ANGLE + (index / segments) * IGNIVAR_FRONTAL_HALF_ANGLE * 2;
-    const angleB =
-      -IGNIVAR_FRONTAL_HALF_ANGLE + ((index + 1) / segments) * IGNIVAR_FRONTAL_HALF_ANGLE * 2;
+    const angleA = -halfAngle + (index / segments) * halfAngle * 2;
+    const angleB = -halfAngle + ((index + 1) / segments) * halfAngle * 2;
     addQuad(
       positions,
       indices,
       new THREE.Vector3(Math.sin(angleA) * inner, 0.073, Math.cos(angleA) * inner),
-      new THREE.Vector3(
-        Math.sin(angleA) * IGNIVAR_FRONTAL_RANGE,
-        0.073,
-        Math.cos(angleA) * IGNIVAR_FRONTAL_RANGE,
-      ),
+      new THREE.Vector3(Math.sin(angleA) * range, 0.073, Math.cos(angleA) * range),
       new THREE.Vector3(Math.sin(angleB) * inner, 0.073, Math.cos(angleB) * inner),
-      new THREE.Vector3(
-        Math.sin(angleB) * IGNIVAR_FRONTAL_RANGE,
-        0.073,
-        Math.cos(angleB) * IGNIVAR_FRONTAL_RANGE,
-      ),
+      new THREE.Vector3(Math.sin(angleB) * range, 0.073, Math.cos(angleB) * range),
     );
   }
   const geometry = new THREE.BufferGeometry();
@@ -96,18 +96,16 @@ function borderGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-function heatBandsGeometry(): THREE.BufferGeometry {
+function heatBandsGeometry(range: number, halfAngle: number): THREE.BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
   const segments = 18;
   for (const progress of [0.24, 0.42, 0.6, 0.78]) {
-    const outer = IGNIVAR_FRONTAL_RANGE * progress;
+    const outer = range * progress;
     const inner = outer - 0.34;
     for (let index = 0; index < segments; index++) {
-      const angleA =
-        -IGNIVAR_FRONTAL_HALF_ANGLE + (index / segments) * IGNIVAR_FRONTAL_HALF_ANGLE * 2;
-      const angleB =
-        -IGNIVAR_FRONTAL_HALF_ANGLE + ((index + 1) / segments) * IGNIVAR_FRONTAL_HALF_ANGLE * 2;
+      const angleA = -halfAngle + (index / segments) * halfAngle * 2;
+      const angleB = -halfAngle + ((index + 1) / segments) * halfAngle * 2;
       addQuad(
         positions,
         indices,
@@ -124,16 +122,16 @@ function heatBandsGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-function flameCurtainsGeometry(): THREE.BufferGeometry {
+function flameCurtainsGeometry(range: number, halfAngle: number): THREE.BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
   const slices = 12;
   for (const side of [-1, 1]) {
-    const angle = side * (IGNIVAR_FRONTAL_HALF_ANGLE - 0.006);
+    const angle = side * (halfAngle - 0.006);
     const direction = new THREE.Vector3(Math.sin(angle), 0, Math.cos(angle));
     for (let index = 0; index < slices; index++) {
-      const start = 0.35 + (index / slices) * (IGNIVAR_FRONTAL_RANGE - 0.35);
-      const end = 0.35 + ((index + 1) / slices) * (IGNIVAR_FRONTAL_RANGE - 0.35);
+      const start = 0.35 + (index / slices) * (range - 0.35);
+      const end = 0.35 + ((index + 1) / slices) * (range - 0.35);
       const heightA = 0.68 + ((index * 7) % 5) * 0.15;
       const heightB = 0.68 + (((index + 1) * 7) % 5) * 0.15;
       addQuad(
@@ -152,28 +150,34 @@ function flameCurtainsGeometry(): THREE.BufferGeometry {
   return geometry;
 }
 
-export function buildIgnivarFrontalTelegraph(): THREE.Group {
+export function buildIgnivarFrontalTelegraph(
+  shape: IgnivarFrontalTelegraphShape = {},
+): THREE.Group {
+  const range = shape.range ?? IGNIVAR_FRONTAL_RANGE;
+  const halfAngle = shape.halfAngle ?? IGNIVAR_FRONTAL_HALF_ANGLE;
   const root = new THREE.Group();
   root.name = IGNIVAR_FRONTAL_VISUAL_NAME;
   root.userData.renderCategory = 'ui3d';
 
-  const fill = new THREE.Mesh(
-    wedgeGeometry(IGNIVAR_FRONTAL_RANGE, 36, 0.047),
-    material(0xd91808, 0.2),
-  );
+  const fill = new THREE.Mesh(wedgeGeometry(range, halfAngle, 36, 0.047), material(0xd91808, 0.2));
   fill.name = IGNIVAR_FRONTAL_FILL_NAME;
   fill.renderOrder = 2;
-  const border = new THREE.Mesh(borderGeometry(), material(0xff9b2f, 0.88));
+  const border = new THREE.Mesh(borderGeometry(range, halfAngle), material(0xff9b2f, 0.88));
   border.name = IGNIVAR_FRONTAL_BORDER_NAME;
   border.renderOrder = 4;
-  const heatBands = new THREE.Mesh(heatBandsGeometry(), material(0xff4a12, 0.42));
+  const heatBands = new THREE.Mesh(heatBandsGeometry(range, halfAngle), material(0xff4a12, 0.42));
   heatBands.name = IGNIVAR_FRONTAL_HEAT_BANDS_NAME;
   heatBands.renderOrder = 3;
-  const flameCurtains = new THREE.Mesh(flameCurtainsGeometry(), material(0xff6514, 0.58));
+  const flameCurtains = new THREE.Mesh(
+    flameCurtainsGeometry(range, halfAngle),
+    material(0xff6514, 0.58),
+  );
   flameCurtains.name = IGNIVAR_FRONTAL_FLAME_CURTAINS_NAME;
   flameCurtains.renderOrder = 6;
 
   root.add(fill, heatBands, border, flameCurtains);
+  root.userData.range = range;
+  root.userData.halfAngle = halfAngle;
   root.visible = false;
   return root;
 }

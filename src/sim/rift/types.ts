@@ -7,9 +7,12 @@
 //
 // Sim layer: no DOM/Three imports. This file is types only.
 
+import type { TreasureMapRarity } from '../content/treasure_maps';
 import type { DungeonLayout, InteriorStyle } from '../dungeon_layout';
 import type { LockSession } from '../lockpick';
-import type { DelveHazardZone, RiftTier } from '../types';
+import type { DelveHazardZone, PlayerClass, RiftTier } from '../types';
+import type { HoardReward } from './hoard_reward_roll';
+import type { VaultZoneId } from './vault_seed';
 
 export type RiftEventStatus = 'open' | 'active' | 'cleared' | 'collapsed';
 export type RiftInstanceOutcome = 'active' | 'won' | 'lost' | 'abandoned';
@@ -216,6 +219,9 @@ export interface RiftFloorPlan {
   themeName: string;
   layout: DungeonLayout;
   style: InteriorStyle;
+  /** Outdoor Buried Hoards reproduce the map's dig-site biome. The reveal
+   * markers let render and UI stage the narrow gorge opening into the basin. */
+  outdoor?: { zoneId: VaultZoneId; gorgeEndZ: number; valleyStartZ: number };
   /** Player arrival point, instance-local (just inside the entrance porch). */
   entry: { x: number; z: number };
   spawns: RiftSpawn[];
@@ -325,6 +331,31 @@ export interface RiftInstance {
   /** True once the final boss kill has paid out (gear + seal), so a slot that
    * lingers after the kill never double-pays. */
   rewarded: boolean;
+  /** Set when the run is a treasure vault (src/sim/treasure_vault.ts): the map's
+   *  rarity, its owner, and the head count the mobs were scaled for. Null on
+   *  every ordinary rift. */
+  vault: {
+    rarity: TreasureMapRarity;
+    /** Stable consumed-map attempt identity, absent on dev portals. */
+    attemptId?: string;
+    ownerPid: number;
+    /** Stable identity used to rebind the owner after a reconnect. */
+    ownerCharacterId?: number;
+    /** Runtime pid -> durable character id for entrants with saved characters. */
+    memberCharacterIds?: Map<number, number>;
+    /** Character-keyed reward inputs survive a member's disconnect. */
+    entrantSnapshots?: Map<number, HoardEntrantSnapshot>;
+    /** Rolled once at victory, then persisted before the online chest unlocks. */
+    rewardClaims?: Map<number, HoardReward>;
+    headCount: number;
+    /** The owner's level on entry: the hoard's mobs never exceed it. */
+    level: number;
+    /** The reward chest the final boss leaves (hoard_reward_chest.ts). */
+    chest?: HoardRewardChestState;
+    /** Dev only (`/dev hoard ... goblin`): the room always holds a Coinsack
+     *  Scurrier (hoard_goblin.ts). The spawn roll is drawn either way. */
+    forceGoblin?: boolean;
+  } | null;
   /** The sealed reward cache the giga-boss drops (`rift_locked_chest`), opened via
    * the shared lockpicking minigame; null until the boss falls. */
   cacheId: number | null;
@@ -341,6 +372,164 @@ export interface RiftInstance {
    * to the boss's cast time; at zero it detonates (lethal to anyone inside `radius`).
    * Cleared on boss death or floor reset. */
   bossDeathZones: Array<{ x: number; z: number; radius: number; remaining: number; total: number }>;
+  /** Runtime-only Buried Hoard boss kit. Ordinary Rifts never create it. */
+  hoardBoss?: HoardBossState;
+  /** Runtime-only Storm Caller Lightning Strikes (hoard_lightning_strike.ts). */
+  hoardStrikes?: import('./hoard_lightning_strike').HoardLightningStrikeState;
+  hoardAddCasts?: import('./hoard_add_casts').HoardAddCastState;
+  /** Runtime-only Coinsack Scurrier, when the room rolled one (hoard_goblin.ts). */
+  hoardGoblin?: HoardGoblinState;
+}
+
+/** The Coinsack Scurrier's run state (hoard_goblin.ts). Declared here, not in
+ *  the module, so a type reference never pulls its runtime graph along. */
+export interface HoardGoblinState {
+  id: number;
+  /** Sim time it spawned; it leaves untouched at spawnedAt + HOARD_GOBLIN_IDLE_SEC. */
+  spawnedAt: number;
+  /** Sim time the escape bar ends, once the first blow lands. */
+  escapeAt: number | null;
+  /** Floor-local run points (the room's clear spawn spots). */
+  points: Array<{ x: number; z: number }>;
+  /** Index into points it is running to, or -1 while it stands. */
+  goal: number;
+  repickIn: number;
+  /** Set once the gold has been paid (it died) or taken (it escaped). */
+  settled: boolean;
+}
+
+export type HoardBossCueVariant =
+  | 'buried-mark'
+  | 'ember-frontal'
+  | 'ember-fire'
+  | 'frost-gust'
+  | 'frost-ice'
+  | 'brute-wide'
+  | 'brute-medium'
+  | 'brute-long'
+  | 'frost-blizzard'
+  | 'frost-ring'
+  | 'arcane-voidfall'
+  | 'arcane-horizon'
+  | 'arcane-collapse'
+  | 'storm-charge'
+  | 'storm-field'
+  | 'storm-static'
+  | 'storm-strike'
+  | 'storm-orbital'
+  | 'storm-orbital-impact'
+  | 'tide-wave'
+  | 'tide-tether'
+  | 'bone-scythe'
+  | 'bone-harvest'
+  | 'bone-soul'
+  | 'frost-iceage'
+  | 'frost-pillar'
+  | 'arcane-pulsar-ward'
+  | 'arcane-pulsar'
+  | 'arcane-pulsar-lock'
+  | 'arcane-pulsar-beam'
+  | 'ember-hammer'
+  | 'ember-hammer-strike'
+  | 'tide-tentacle'
+  | 'tide-tentacle-up'
+  | 'tide-grab'
+  | 'tide-grab-hold'
+  | 'tide-tentacle-fall'
+  | 'tide-whip'
+  | 'tide-sweep'
+  | 'brute-boulder-throw'
+  | 'brute-charge'
+  | 'venom-silk'
+  | 'brute-boulder'
+  | 'brute-boulder-return'
+  | 'brute-boulder-crush'
+  | 'brood-cocoon'
+  | 'brood-cocoon-end'
+  | 'mushroom-spore'
+  | 'mushroom-bloat'
+  | 'mushroom-burst'
+  | 'mole-swipe'
+  | 'mole-burrow'
+  | 'mole-rock'
+  | 'bat-dive'
+  | 'bat-screech'
+  | 'mimic-bite'
+  | 'mimic-leap'
+  | 'mimic-coins';
+
+export type HoardBossCue =
+  | {
+      id: number;
+      kind: 'sweep';
+      variant?: HoardBossCueVariant;
+      x: number;
+      z: number;
+      facing: number;
+      radius: number;
+      halfAngle: number;
+      remaining: number;
+      total: number;
+      /** Runtime-only per-player contact ledger for traveling tide waves. */
+      hitIds?: Set<number>;
+      waveGap?: number;
+      waveSpan?: number;
+      waveLead?: number;
+      /** Runtime-only next Orbital Lightning wave to telegraph. */
+      orbitalNextWave?: number;
+    }
+  | {
+      id: number;
+      kind: 'mark';
+      variant?: HoardBossCueVariant;
+      phase: 'warning' | 'hazard';
+      x: number;
+      z: number;
+      radius: number;
+      remaining: number;
+      total: number;
+      pulseTimer?: number;
+      innerRadius?: number;
+      targetId?: number;
+    };
+
+export interface HoardBossState {
+  sweepTimer: number;
+  markTimer: number;
+  targetCursor: number;
+  nextCueId: number;
+  cues: HoardBossCue[];
+  sequenceStep: number;
+  sequenceTimer: number;
+  sequenceFacing: number;
+  tidePattern?: import('./hoard_tide_pattern').HoardTidePatternWave[];
+  specialTriggered: boolean;
+  totemId: number | null;
+  totemPulseTimer: number;
+  /** Bonelord Xarreth's Wandering Scythe and Soul Harvest (hoard_bone_reaper.ts). */
+  boneReaper?: import('./hoard_bone_reaper').HoardBoneReaperState;
+  iceAge?: import('./hoard_ice_age').HoardIceAgeState;
+  pulsars?: import('./hoard_pulsars').HoardPulsarState;
+  forgeHammer?: import('./hoard_forge_hammer').HoardForgeHammerState;
+  tentacles?: import('./hoard_tentacles').HoardTentacleState;
+  boulder?: import('./hoard_boulder').HoardBoulderState;
+  charge?: import('./hoard_charge').HoardChargeState;
+  silkSnare?: import('./hoard_silk_snare').HoardSilkSnareState;
+  cocoon?: import('./hoard_cocoon').HoardCocoonState;
+  /** The Mother of Mushrooms' clocks and Bloated Cap (hoard_mushroom.ts). */
+  mushroom?: import('./hoard_mushroom').HoardMushroomState;
+  /** The cave bosses (hoard_mole.ts, hoard_bat.ts, hoard_mimic.ts), and the hold
+   *  their modules set while they move the boss (hoard_cave_kit.ts). */
+  mole?: import('./hoard_mole').HoardMoleState;
+  bat?: import('./hoard_bat').HoardBatState;
+  mimic?: import('./hoard_mimic').HoardMimicState;
+  caveHeld?: boolean;
+  /** Storm Surge (src/sim/rift/hoard_storm_surge.ts): Vharok's stacks while he
+   *  stands in his own charged ground, and the size he returns to. */
+  stormSurgeStacks?: number;
+  stormSurgeTimer?: number;
+  stormSurgeInField?: boolean;
+  stormSurgeBaseScale?: number;
 }
 
 /** The rift as a whole (derived from the descriptor's seed + baseLevel), used for
@@ -353,4 +542,30 @@ export interface RiftPlan {
   /** Theme id of the final (boss) floor, which names the rift. */
   themeId: string;
   floorCount: number;
+}
+
+/** A Buried Hoard's reward chest (hoard_reward_chest.ts). Declared here, in the
+ *  types leaf, so RiftInstance never imports the chest's logic (and, through it,
+ *  the payout and the deeds catalog) into every bundle that only reads types. */
+export interface HoardRewardChestState {
+  entityId: number;
+  /** Frozen at the kill: the entrants this run pays. */
+  eligible: number[];
+  claimed: number[];
+  /** Online chests remain sealed until the outcome and claims commit. */
+  pendingSave?: boolean;
+  /** At most one DB claim attempt per entrant is live at once. */
+  claiming?: number[];
+  /** The boss that fell: its template picks the hoard's own loot table. */
+  bossTemplateId?: string;
+}
+
+export interface HoardEntrantSnapshot {
+  characterId: number;
+  name: string;
+  cls: PlayerClass;
+  level: number;
+  mountOwned: boolean;
+  guestCapped: boolean;
+  guestCycle: string;
 }

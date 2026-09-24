@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Yarık',
     desc: "Sürekli değişen Yarık'ın simge ganimetleri: gezinen dehşetlerinden S derecesi avının ikiz hazinelerine kadar.",
   },
+  conquerors_buried_hoards: {
+    name: 'Gömülü Hazineler',
+    desc: 'Hazine haritalarının götürdüğü hazinelerin ganimetleri, birini koruyan her bekçiden dört parça.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Diyarın Nadirleri',
     desc: 'Diyar boyunca alaşağı edilen her adlı nadirin kanıtı.',

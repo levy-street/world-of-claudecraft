@@ -248,6 +248,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'chat_violations',
       'level_up_events',
       'ftue_events',
+      'world_quest_scores',
       'craft_roll_events',
       'woc_market_buy_now_abandons',
       'woc_market_directed_offers',

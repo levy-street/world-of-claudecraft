@@ -27,9 +27,14 @@ import type {
   MapQuestAreaMarker,
   MapServiceMarker,
   MapStationMarker,
+  MapWorldBossMarker,
+  MapWorldQuestMarker,
 } from './map_window_view';
 
-export type MapInstanceSemantic = Exclude<MapMarkerSemantic, { kind: 'dungeon' | 'rift-entrance' }>;
+export type MapInstanceSemantic = Exclude<
+  MapMarkerSemantic,
+  { kind: 'dungeon' | 'rift-entrance' | 'hoard-entrance' }
+>;
 
 export type MapMarkerDirection =
   | 'center'
@@ -265,6 +270,9 @@ export type MapSemanticLabelId =
   | 'readyQuest'
   | 'repeatQuest'
   | 'cooldownQuest'
+  | 'availableWorldQuest'
+  | 'activeWorldQuest'
+  | 'worldBoss'
   | 'questObjective'
   | 'readyOre'
   | 'readyWood'
@@ -292,6 +300,7 @@ export type MapSemanticLabelId =
   | 'dungeonExit'
   | 'delveEntrance'
   | 'worldPassage'
+  | 'hoardEntrance'
   | 'riftEntrance'
   | 'hostileEnemy'
   | 'aggressiveEnemy'
@@ -308,6 +317,7 @@ export type MapSemanticLabelId =
   | 'riftDescent'
   | 'riftReturnBeacon'
   | 'riftReturnExit'
+  | 'hoardReturnEntrance'
   | 'riftTreasureAvailable'
   | 'riftTreasureLocked'
   | 'riftTreasureOpened'
@@ -378,10 +388,12 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'dungeonExit':
     case 'delveEntrance':
     case 'worldPassage':
+    case 'hoardEntrance':
     case 'riftEntrance':
     case 'riftDescent':
     case 'riftReturnBeacon':
     case 'riftReturnExit':
+    case 'hoardReturnEntrance':
     case 'delvePassageSealed':
     case 'delvePassageOpen':
     case 'delveSurfaceExit':
@@ -390,6 +402,8 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'readyQuest':
     case 'repeatQuest':
     case 'cooldownQuest':
+    case 'availableWorldQuest':
+    case 'activeWorldQuest':
       return 'quest';
     case 'readyOre':
     case 'readyWood':
@@ -422,6 +436,7 @@ function mapSummaryCategory(label: MapSemanticLabelId): MapSummaryCategory {
     case 'aggressiveEnemy':
     case 'bossEnemy':
     case 'bossAggressiveEnemy':
+    case 'worldBoss':
     case 'lootableEnemy':
     case 'corpse':
     case 'teammate':
@@ -476,7 +491,11 @@ export function mapSemanticLabelId(semantic: MapInstanceSemantic): MapSemanticLa
     case 'rift-descent':
       return 'riftDescent';
     case 'rift-return':
-      return semantic.route === 'beacon' ? 'riftReturnBeacon' : 'riftReturnExit';
+      return semantic.route === 'beacon'
+        ? 'riftReturnBeacon'
+        : semantic.route === 'hoard'
+          ? 'hoardReturnEntrance'
+          : 'riftReturnExit';
     case 'rift-reward':
       if (semantic.reward === 'treasure') {
         if (semantic.state === 'available') return 'riftTreasureAvailable';
@@ -542,7 +561,8 @@ type ArgumentKind =
   | 'rift'
   | 'service'
   | 'npc'
-  | 'mob';
+  | 'mob'
+  | 'worldQuest';
 
 interface SummaryGroup extends MapMarkerLocation {
   label: MapSemanticLabelId;
@@ -576,6 +596,7 @@ export interface MapSemanticNameResolvers {
   rift(name: string, rank: string | null): string;
   npc(npcId: string): string;
   mob(mobId: string): string;
+  worldQuest(questId: string): string;
 }
 
 export interface DelveSemanticMapModel {
@@ -589,6 +610,8 @@ export interface DelveSemanticMapModel {
 
 export interface OverworldSemanticMapModel {
   questAreas: readonly MapQuestAreaMarker[];
+  worldQuests?: readonly MapWorldQuestMarker[];
+  worldBosses?: readonly MapWorldBossMarker[];
   npcs: readonly MapNpcMarker[];
   gatherNodes: readonly MapGatherNodeMarker[];
   stations: readonly MapStationMarker[];
@@ -755,6 +778,8 @@ export class MapSemanticAccessibilityCore {
         return this.names.npc(argument);
       case 'mob':
         return this.names.mob(argument);
+      case 'worldQuest':
+        return this.names.worldQuest(argument);
     }
   }
 
@@ -780,7 +805,10 @@ export class MapSemanticAccessibilityCore {
       label === 'bossAggressiveEnemy' ||
       label === 'dungeonEntrance' ||
       label === 'delveEntrance' ||
-      label === 'riftEntrance'
+      label === 'riftEntrance' ||
+      label === 'availableWorldQuest' ||
+      label === 'activeWorldQuest' ||
+      label === 'worldBoss'
     )
       values = { name };
     else if (label === 'worldPassage') values = { zone: name };
@@ -1044,6 +1072,7 @@ export class MapSemanticAccessibilityCore {
         this.add(marker.mx, marker.my, 'delveEntrance', 'delve', marker.delveId);
       else if (marker.kind === 'world-passage')
         this.add(marker.mx, marker.my, 'worldPassage', 'zone', marker.destinationZoneId);
+      else if (marker.kind === 'hoard-entrance') this.add(marker.mx, marker.my, 'hoardEntrance');
       else
         this.add(marker.mx, marker.my, 'riftEntrance', 'rift', marker.name, 0, marker.rank ?? '');
     }
@@ -1064,6 +1093,16 @@ export class MapSemanticAccessibilityCore {
         );
     for (const areaMarker of model.questAreas)
       this.add(areaMarker.mx, areaMarker.my, 'questObjective');
+    for (const worldQuest of model.worldQuests ?? [])
+      this.add(
+        worldQuest.mx,
+        worldQuest.my,
+        worldQuest.state === 'active' ? 'activeWorldQuest' : 'availableWorldQuest',
+        'worldQuest',
+        worldQuest.questId,
+      );
+    for (const worldBoss of model.worldBosses ?? [])
+      this.add(worldBoss.mx, worldBoss.my, 'worldBoss', 'mob', worldBoss.bossId);
     for (const node of model.gatherNodes) {
       const label = node.ready
         ? node.locked
@@ -1154,6 +1193,7 @@ export class MapSemanticAccessibilityCore {
       return this.labelText('delveEntrance', 'delve', marker.delveId);
     if (marker.kind === 'world-passage')
       return this.labelText('worldPassage', 'zone', marker.destinationZoneId);
+    if (marker.kind === 'hoard-entrance') return this.labelText('hoardEntrance', 'none', '');
     return this.labelText('riftEntrance', 'rift', marker.name, marker.rank ?? '');
   }
 

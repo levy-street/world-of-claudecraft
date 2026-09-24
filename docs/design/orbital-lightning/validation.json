@@ -1,0 +1,20 @@
+{
+  "result": "PASS",
+  "blender": "5.2.1 LTS",
+  "frames_checked": 122,
+  "stationary_boss": true,
+  "nonoverlapping_shots": {
+    "1": [60, 61, 62],
+    "2": [66, 67, 68],
+    "3": [72, 73, 74],
+    "4": [78, 79, 80],
+    "5": [84, 85, 86],
+    "6": [90, 91, 92]
+  },
+  "beam_origins_attached": true,
+  "clean_end": true,
+  "asset_objects": 123,
+  "peak_visible_objects": 41,
+  "evaluated_triangles_at_charge_sample": 33504,
+  "notes": "Authored geometry count is not engine draw calls or a runtime performance measurement."
+}

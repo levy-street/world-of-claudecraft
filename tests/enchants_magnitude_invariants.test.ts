@@ -93,7 +93,7 @@ function bestValue(slot: string, axis: Axis, include: (e: EnchantDef) => boolean
 describe('enchant table magnitude invariants', () => {
   it('every static enchant grants exactly one stat axis (the tier and stack sweeps below rely on it)', () => {
     const statics = Object.values(ENCHANTS).filter(isStaticEnchant);
-    expect(statics).toHaveLength(47);
+    expect(statics).toHaveLength(50);
     for (const e of statics) {
       // Nonzero, not positive: a negative side axis would slip past the
       // positive-only filters in axisOf and bestPerSlotTotal unseen.
@@ -150,10 +150,8 @@ describe('enchant table magnitude invariants', () => {
     expect(bestPerSlotTotal('sta')).toBe(33);
     expect(bestPerSlotTotal('agi')).toBe(26); // 25 before the Lucent boots step
     expect(bestPerSlotTotal('str')).toBe(20); // 19 before the Lucent weapon step
-    // Spirit rides only neck, chest, and the two rings, so its stack sits
-    // below the band by construction; accepted and recorded rather than
-    // padded with new enchants.
-    expect(bestPerSlotTotal('spi')).toBe(12); // 13 percent of the 93 spi budget
+    // Spirit rides neck, chest, the two rings, and now the faction offhand enchant.
+    expect(bestPerSlotTotal('spi')).toBe(15);
     expect(bestPerSlotTotal('armor')).toBe(35); // helmet 15 plus chest 20, the halved reinforcement pair
   });
 
@@ -414,6 +412,9 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       enchant_chest_lucent_stamina: { sta: 10 },
       enchant_feet_lucent_agility: { agi: 3 },
       enchant_lucent_infusion: { sta: 13 },
+      enchant_offhand_spirit: { spi: 3 },
+      enchant_feet_shadowstride: { agi: 2 },
+      enchant_gloves_forged_might: { str: 3 },
     });
   });
 });
@@ -430,8 +431,9 @@ describe('ordinary EnchantDef rows stay stat-only, with one explicit Crucible pr
     'statBonus',
     'skillReq',
     'requiresPerfected',
+    'acquisition',
   ] as const;
-  const ZEAL_KEYS = [...ALLOWED_ENCHANT_KEYS, 'acquisition', 'weaponProc', 'description'];
+  const ZEAL_KEYS = [...ALLOWED_ENCHANT_KEYS, 'weaponProc', 'description'];
 
   it('every row carries only allowlisted keys, and the required ones', () => {
     const rows = Object.values(ENCHANTS);

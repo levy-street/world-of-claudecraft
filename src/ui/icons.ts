@@ -5250,6 +5250,9 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'crimson_amber_armor_plate',
   'cyan_magenta_armor_plate',
   'event_skin_token',
+  // Clue Scrolls (world quests, Stage 3): the scroll and the casket.
+  'clue_scroll',
+  'treasure_casket',
   'forest_pink_armor_plate',
   'imperial_crimson_armor_plate',
   'imperial_gold_armor_plate',
@@ -5542,6 +5545,31 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul_flawless',
   // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
   'hid_forgebreaker',
+  // Arcane Calligraphy's completion and Gold-rating deeds are both
+  // 'exploration'. They use the category crest until their commissioned
+  // paintings land (docs/achievements/icon-brief.md).
+  'exp_arcane_calligraphy',
+  'exp_arcane_calligraphy_gold',
+  // World-quest completion deeds use the exploration category crest pending art.
+  'exp_forge_helper',
+  'exp_last_barricade',
+  'exp_borrowed_face',
+  'exp_windrider_slalom',
+  'exp_duskweave_dispatches',
+  'exp_wisp_maze',
+  // Faction standing deeds use the progression category crest pending art.
+  'prog_rift_watch_trusted',
+  'prog_church_order_trusted',
+  'prog_automatons_trusted',
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
+  'prog_faction_champion_all',
+  // Clue Scroll casket deeds use the exploration category crest pending art.
+  'exp_clue_first_casket',
+  'exp_clue_ten_caskets',
+  // The Buried Hoard goblin catch uses the combat category crest pending art.
+  'cmb_coinsack_caught',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

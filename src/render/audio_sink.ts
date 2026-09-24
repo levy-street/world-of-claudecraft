@@ -19,9 +19,15 @@ export interface MountEnginePhase {
 export interface AmbientPointSource {
   readonly id: string;
   // 'rift_portal'/'rift_roller'/'rift_ice_glide' are dynamic (spawn/move/
-  // despawn during play, or track a gliding player), unlike the static
+  // despawn during play, or track a gliding player), as is 'hoard_entrance', unlike the static
   // world-built campfire/forge set; see src/render/rift_ambience.ts.
-  readonly kind: 'campfire' | 'forge' | 'rift_portal' | 'rift_roller' | 'rift_ice_glide';
+  readonly kind:
+    | 'campfire'
+    | 'forge'
+    | 'rift_portal'
+    | 'rift_roller'
+    | 'rift_ice_glide'
+    | 'hoard_entrance';
   readonly x: number;
   readonly y: number;
   readonly z: number;

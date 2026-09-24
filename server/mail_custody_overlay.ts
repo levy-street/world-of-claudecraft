@@ -1,34 +1,30 @@
-// Durable per-parcel overlay for $WOC custody mail. Booking a custody parcel
+// Durable per-parcel overlay for marketplace and vault reward mail. Booking a custody parcel
 // used to persist by re-serializing and rewriting the ENTIRE per-realm mail
 // blob (89 MB in production, roughly 250 ms of main-thread stringify per
 // parcel on the shared market serial writer), so each delivered item, return,
 // and sold notice cost the world loop an amount proportional to the book, not
 // the parcel. Instead, each booked parcel writes ONE small row here, durable
 // before the settlement advances. The parcel itself lives in the in-memory
-// book as before and reaches the blob on the next full book write (the 30 s
-// autosave or the leave-path atomic save), after which its row is deleted
-// ("baked").
+// book as before and reaches its recipient partition on the next autosave or
+// leave-path atomic save, after which its row is deleted ("baked").
 //
-// Crash contract. A durable FULL-BOOK write is also the collection-durability
-// event, so rows are deleted only for parcels booked BEFORE that write
-// serialized (the pendingBake snapshot below), never by comparing book
-// contents: a parcel collected fast still gets its row deleted (the book
-// without it is durable truth), while a parcel booked mid-write keeps its
-// row. At boot, surviving rows REPLAY through the sim's book-once
+// Crash contract. A durable recipient-partition write is also that recipient's
+// collection-durability event. Only refs for written recipients, booked BEFORE
+// the write serialized, are deleted (the pendingBake snapshot below), never
+// by comparing book contents: a parcel collected fast still gets its row
+// deleted (the book without it is durable truth), while a parcel booked
+// mid-write keeps its row. At boot, surviving rows REPLAY through the sim's book-once
 // mailSystemParcel: a parcel already inside the loaded blob dedupes on its
 // custodyRef, and one the crash window lost is re-booked (the letter re-dates
 // to the reboot, which is the existing crash-window semantics). Replay runs
 // only after a SUCCESSFUL book load; merging onto an unloaded book would
 // re-book parcels the stored blob still owns.
 //
-// The rollback guard is the accounting watermark (mail_custody_watermark):
-// rows at or before `accounted_through` are provably inside a committed book
-// write or durably collected out of it, so the boot merge deletes them
-// instead of replaying them (replaying could re-book a parcel COLLECTED
-// under an old binary running without the bake). The soundness argument
-// lives on advanceCustodyWatermarkIn; the watermark only ever advances
-// inside a committed book-write transaction, and only after a boot merge
-// that examined every surviving row.
+// The historical rollback guard is the accounting watermark
+// (mail_custody_watermark). A partial recipient write cannot advance a
+// realm-wide cutoff: another recipient's older parcel may not be durable.
+// The watermark therefore stays frozen on partitioned writes. The legacy
+// full-book test path alone advances it, under the old full-book proof.
 //
 // Retention: healthy rows are cleaned by the bake and the watermark cutoff;
 // the constant-window residue prune below joins the nightly retention sweep
@@ -36,6 +32,7 @@
 // rows an operator never resolved, and rows for realms no process serves).
 
 import {
+  HOARD_REWARD_LETTER,
   type LetterDef,
   WOC_MARKET_DELIVERY_LETTER,
   WOC_MARKET_RETURN_LETTER,
@@ -56,8 +53,10 @@ CREATE TABLE IF NOT EXISTS mail_custody_parcels (
   recipient_name TEXT NOT NULL,
   letter TEXT NOT NULL,
   items JSONB NOT NULL,
+  copper BIGINT NOT NULL DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE mail_custody_parcels ADD COLUMN IF NOT EXISTS copper BIGINT NOT NULL DEFAULT 0;
 CREATE INDEX IF NOT EXISTS mail_custody_parcels_realm_created
   ON mail_custody_parcels (realm, created_at);
 CREATE TABLE IF NOT EXISTS mail_custody_watermark (
@@ -67,15 +66,15 @@ CREATE TABLE IF NOT EXISTS mail_custody_watermark (
 );
 `;
 
-export type CustodyParcelLetter = 'delivery' | 'return' | 'sold_notice';
+export type CustodyParcelLetter = 'delivery' | 'return' | 'sold_notice' | 'vault_reward';
 
-/** The letter templates by overlay kind: the same mapping the custody bridge
- *  books with, so a replayed parcel is byte-for-byte the letter the delivery
- *  path would have sent. */
+/** The letter templates by overlay kind. A replayed parcel uses the same
+ *  static letter and its own stored coin and item payload. */
 export const CUSTODY_PARCEL_LETTERS: Record<CustodyParcelLetter, LetterDef> = {
   delivery: WOC_MARKET_DELIVERY_LETTER,
   return: WOC_MARKET_RETURN_LETTER,
   sold_notice: WOC_MARKET_SOLD_LETTER,
+  vault_reward: HOARD_REWARD_LETTER,
 };
 
 export interface CustodyParcelRow {
@@ -83,7 +82,13 @@ export interface CustodyParcelRow {
   recipient: { key: string; name: string };
   letter: CustodyParcelLetter;
   items: InvSlot[];
+  copper?: number;
 }
+
+type CustodyParcelQuery = (
+  text: string,
+  values: unknown[],
+) => Promise<{ rows: unknown[]; rowCount?: number | null }>;
 
 /** The slice of Sim the boot merge needs (the real Sim satisfies it). */
 export interface CustodyParcelBook {
@@ -97,10 +102,36 @@ export interface CustodyParcelBook {
 }
 
 // Refs booked in THIS process (inserted here or replayed by the boot merge)
-// whose parcels sit in the in-memory book but are not yet baked into a
-// durable full-book write. One custody bridge per realm process, so
-// module-level like the escrow counters in woc_market_custody.ts.
-const pendingBake = new Set<string>();
+// whose parcels sit in the in-memory book but are not yet baked into their
+// recipient's durable partition. Keep the recipient with each ref: a partial
+// mailbox write must never bake another recipient's still-unwritten parcel.
+const pendingBake = new Map<string, string>();
+const pendingByRecipient = new Map<string, Set<string>>();
+
+function trackPendingBake(ref: string, recipientKey: string): void {
+  const previous = pendingBake.get(ref);
+  if (previous && previous !== recipientKey) {
+    const oldBucket = pendingByRecipient.get(previous);
+    oldBucket?.delete(ref);
+    if (oldBucket?.size === 0) pendingByRecipient.delete(previous);
+  }
+  pendingBake.set(ref, recipientKey);
+  let bucket = pendingByRecipient.get(recipientKey);
+  if (!bucket) {
+    bucket = new Set();
+    pendingByRecipient.set(recipientKey, bucket);
+  }
+  bucket.add(ref);
+}
+
+function forgetPendingBake(ref: string): void {
+  const recipientKey = pendingBake.get(ref);
+  if (recipientKey === undefined) return;
+  pendingBake.delete(ref);
+  const bucket = pendingByRecipient.get(recipientKey);
+  bucket?.delete(ref);
+  if (bucket?.size === 0) pendingByRecipient.delete(recipientKey);
+}
 
 // True once THIS boot's merge examined every surviving overlay row (all
 // pages drained, no error). Until then the watermark must not advance: an
@@ -109,35 +140,66 @@ const pendingBake = new Set<string>();
 // later boot's merge delete it unreplayed.
 let bootMergeComplete = false;
 
-/** Persist one booked parcel. Idempotent per custodyRef (a retry after a
- *  crash re-inserts harmlessly; the book-once dedupe owns exactly-once on
- *  the mail side). Resolving is the parcel's durability: callers must not
- *  advance a settlement until this resolves. */
-export async function persistCustodyParcelRow(row: CustodyParcelRow): Promise<void> {
-  await pool.query(
-    `INSERT INTO mail_custody_parcels (custody_ref, realm, recipient_key, recipient_name, letter, items)
-     VALUES ($1, $2, $3, $4, $5, $6::jsonb)
+/** Insert one parcel on the caller's transaction client. Idempotent by
+ *  custodyRef and exact payload, but does not mark the parcel bakeable until
+ *  the transaction commits and confirmCustodyParcelBooked is called. */
+export async function insertCustodyParcelRowIn(
+  query: CustodyParcelQuery,
+  row: CustodyParcelRow,
+): Promise<void> {
+  const copper = row.copper ?? 0;
+  if (!Number.isSafeInteger(copper) || copper < 0) {
+    throw new Error(`Invalid mail custody parcel copper: ${row.custodyRef}`);
+  }
+  const values = [
+    row.custodyRef,
+    REALM,
+    row.recipient.key,
+    row.recipient.name,
+    row.letter,
+    JSON.stringify(row.items),
+    copper,
+  ];
+  const inserted = await query(
+    `INSERT INTO mail_custody_parcels (custody_ref, realm, recipient_key, recipient_name, letter, items, copper)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
      ON CONFLICT (custody_ref) DO NOTHING`,
-    [
-      row.custodyRef,
-      REALM,
-      row.recipient.key,
-      row.recipient.name,
-      row.letter,
-      JSON.stringify(row.items),
-    ],
+    values,
   );
-  pendingBake.add(row.custodyRef);
+  if (inserted.rowCount === 0) {
+    const existing = await query(
+      `SELECT recipient_key FROM mail_custody_parcels
+        WHERE custody_ref = $1 AND realm = $2 AND recipient_key = $3
+          AND recipient_name = $4 AND letter = $5 AND items = $6::jsonb AND copper = $7`,
+      values,
+    );
+    if (existing.rows.length !== 1) {
+      throw new Error(`Conflicting or missing mail custody parcel: ${row.custodyRef}`);
+    }
+  }
 }
 
-/** Snapshot the refs pending bake, taken by a full-book writer AT ENTRY,
- *  before anything awaits: no awaited gap separates the caller's
- *  serializeMail() argument from the callee's first statement, so every
- *  snapshotted parcel is inside the book being written or durably collected
- *  out of it, and a parcel booked later (necessarily across an await) is
- *  never snapshotted. */
-export function snapshotPendingCustodyRefs(): string[] {
-  return [...pendingBake];
+/** Call only after the transaction that inserted this row commits and its
+ *  matching parcel has been booked in the live post office. */
+export function confirmCustodyParcelBooked(row: CustodyParcelRow): void {
+  trackPendingBake(row.custodyRef, row.recipient.key);
+}
+
+export async function persistCustodyParcelRow(row: CustodyParcelRow): Promise<void> {
+  await insertCustodyParcelRowIn((text, values) => pool.query(text, values), row);
+  confirmCustodyParcelBooked(row);
+}
+
+/** Snapshot only refs whose recipient partitions this writer captured.
+ *  Omit the argument only for the legacy whole-book test path. The snapshot
+ *  is taken before the writer's first await, so a later booking survives. */
+export function snapshotPendingCustodyRefs(recipientKeys?: readonly string[]): string[] {
+  if (!recipientKeys) return [...pendingBake.keys()];
+  const refs: string[] = [];
+  for (const key of new Set(recipientKeys)) {
+    for (const ref of pendingByRecipient.get(key) ?? []) refs.push(ref);
+  }
+  return refs;
 }
 
 /** Issue the bake DELETE on the SAME client, INSIDE the transaction that
@@ -194,8 +256,17 @@ export async function advanceCustodyWatermarkIn(
 /** Forget the baked refs AFTER their transaction committed (never before: a
  *  rollback must leave them pending so the next write re-bakes them). */
 export function confirmBakedCustodyRefs(refs: readonly string[]): void {
-  for (const ref of refs) pendingBake.delete(ref);
+  for (const ref of refs) forgetPendingBake(ref);
 }
+
+/** Partition writers bake only the recipients they actually saved. The
+ *  realm-wide watermark stays frozen: a partial write cannot prove that an
+ *  unrelated recipient's older overlay row is in durable mail. */
+export const MAIL_PARTITION_CUSTODY_BAKE = {
+  snapshot: (recipientKeys: readonly string[]) => snapshotPendingCustodyRefs(recipientKeys),
+  deleteIn: deleteBakedCustodyRefsIn,
+  confirm: confirmBakedCustodyRefs,
+};
 
 // The last boot merge's counts plus the live bake-set size, for the market
 // monitor readout: a growing overlay table, a stuck refused row, or a
@@ -216,7 +287,8 @@ export function custodyOverlayStats(): {
  *  more. The window is a constant (deliberately no env knob, the
  *  stepup-challenges pattern): far past any plausible investigation, and
  *  rows this old describe parcels whose settlement machinery gave up long
- *  ago. */
+ *  ago. Vault rewards are excluded: their booked claim will not be re-mailed,
+ *  so only the atomic mailbox bake may remove their custody copy. */
 export const MAIL_CUSTODY_RESIDUE_RETENTION_DAYS = 30;
 
 export async function pruneMailCustodyParcelsBatch(batchSize: number): Promise<number> {
@@ -225,7 +297,7 @@ export async function pruneMailCustodyParcelsBatch(batchSize: number): Promise<n
       WHERE ctid IN (
         SELECT ctid FROM mail_custody_parcels
          WHERE created_at < now() - ($1 || ' days')::interval
-         ORDER BY created_at
+           AND letter <> 'vault_reward'
          LIMIT $2)`,
     [String(MAIL_CUSTODY_RESIDUE_RETENTION_DAYS), Math.max(1, Math.floor(batchSize))],
   );
@@ -233,7 +305,19 @@ export async function pruneMailCustodyParcelsBatch(batchSize: number): Promise<n
 }
 
 function isCustodyParcelLetter(value: unknown): value is CustodyParcelLetter {
-  return value === 'delivery' || value === 'return' || value === 'sold_notice';
+  return (
+    value === 'delivery' ||
+    value === 'return' ||
+    value === 'sold_notice' ||
+    value === 'vault_reward'
+  );
+}
+
+function validParcelCopper(value: unknown): number | null {
+  if (typeof value !== 'number' && typeof value !== 'string') return null;
+  if (typeof value === 'string' && !/^(0|[1-9][0-9]*)$/.test(value)) return null;
+  const copper = Number(value);
+  return Number.isSafeInteger(copper) && copper >= 0 ? copper : null;
 }
 
 /** The boot merge's page size. Pages continue until the table drains or
@@ -311,7 +395,7 @@ export async function mergeCustodyParcelOverlay(
         break;
       }
       const res = await pool.query(
-        `SELECT custody_ref, recipient_key, recipient_name, letter, items
+        `SELECT custody_ref, recipient_key, recipient_name, letter, items, copper
          FROM mail_custody_parcels WHERE realm = $1 AND custody_ref > $2
          ORDER BY custody_ref LIMIT ${MERGE_PAGE_LIMIT}`,
         [REALM, afterRef],
@@ -319,13 +403,15 @@ export async function mergeCustodyParcelOverlay(
       for (const r of res.rows) {
         const ref = String(r.custody_ref);
         const letter: unknown = r.letter;
-        if (!isCustodyParcelLetter(letter) || !Array.isArray(r.items)) {
+        const copper = validParcelCopper(r.copper);
+        if (!isCustodyParcelLetter(letter) || !Array.isArray(r.items) || copper === null) {
           counts.refused++;
           console.error(`[mail_custody] overlay row malformed for custodyRef ${ref}`);
           continue;
         }
         const recipient = { key: String(r.recipient_key), name: String(r.recipient_name) };
-        if (book.mailSystemParcel(recipient, CUSTODY_PARCEL_LETTERS[letter], r.items, ref)) {
+        const template = CUSTODY_PARCEL_LETTERS[letter];
+        if (book.mailSystemParcel(recipient, { ...template, copper }, r.items, ref)) {
           counts.replayed++;
         } else if (book.hasCustodyParcel(ref)) {
           counts.present++;
@@ -334,7 +420,7 @@ export async function mergeCustodyParcelOverlay(
           console.error(`[mail_custody] overlay replay refused for custodyRef ${ref}`);
           continue;
         }
-        pendingBake.add(ref);
+        trackPendingBake(ref, recipient.key);
       }
       if (res.rows.length < MERGE_PAGE_LIMIT) {
         counts.ok = true;
@@ -363,6 +449,7 @@ export async function mergeCustodyParcelOverlay(
  *  survive across cases otherwise. */
 export function resetCustodyParcelOverlayForTests(): void {
   pendingBake.clear();
+  pendingByRecipient.clear();
   lastMergeCounts = null;
   bootMergeComplete = false;
 }

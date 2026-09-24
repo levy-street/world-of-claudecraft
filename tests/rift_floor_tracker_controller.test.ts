@@ -128,3 +128,47 @@ describe('RiftFloorTrackerController', () => {
     expect(tracker.writes()).toBe(2);
   });
 });
+
+describe('RiftFloorTrackerController hoard goal', () => {
+  it('moves from the keeper to the chest to claimed, walking the roster only when it changes', () => {
+    const { element } = trackerElement();
+    // A vault seed: flag 0xC0000000 plus a tier.
+    const hoardFloor = floor({ seed: (0xc0000000 | (2 << 28) | 77) >>> 0 });
+    const entities = new Map<number, { id: number; kind: string; templateId: string }>();
+    let walks = 0;
+    const world = {
+      riftFloor: hoardFloor,
+      riftEventMsRemaining: () => null,
+      entityRosterVersion: 1,
+      entities: {
+        get: (id: number) => entities.get(id),
+        values: () => {
+          walks++;
+          return entities.values();
+        },
+      },
+    };
+    const controller = new RiftFloorTrackerController({
+      element,
+      world: () => world as unknown as IWorld,
+    });
+    controller.update();
+    expect(element.innerHTML).toContain('Defeat the hoard keeper');
+    controller.update();
+    controller.update();
+    expect(walks).toBe(1);
+
+    // The keeper falls: the chest arrives, which IS a roster change.
+    entities.set(9, { id: 9, kind: 'object', templateId: 'hoard_reward_chest' });
+    world.entityRosterVersion = 2;
+    controller.update();
+    expect(element.innerHTML).toContain('Open the hoard chest');
+    expect(walks).toBe(2);
+
+    // Opening it swaps the template on the SAME entity: no roster change, no walk.
+    entities.set(9, { id: 9, kind: 'object', templateId: 'hoard_reward_chest_open' });
+    controller.update();
+    expect(element.innerHTML).toContain('The hoard is yours');
+    expect(walks).toBe(2);
+  });
+});

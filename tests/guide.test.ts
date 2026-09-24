@@ -3781,8 +3781,10 @@ describe('Guide professions pages and routes', () => {
     const rows = GUIDE_PROF_CRAFTS.flatMap((c) =>
       c.recipes.map((r) => ({ cap: c.maxSkill, gain: r.gain })),
     );
-    // 33 Crucible crafts and the one-time Forgebreaker quest recipe.
-    expect(rows.length, 'published recipe rows').toBe(204);
+    // 33 Crucible crafts and the one-time Forgebreaker quest recipe. 209 with
+    // the five recipes the faction quartermasters sell
+    // (src/sim/content/faction_vendors.ts).
+    expect(rows.length, 'published recipe rows').toBe(209);
     expect(
       rows.filter((r) => r.gain.zeroAt > r.cap).length,
       'rows carrying at least one unreachable boundary',
@@ -6601,6 +6603,10 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
       castles: null,
       navigation: null,
       allies: null,
+      // The world-quest and world-boss pins: live-rotation layers the interface
+      // page does not describe yet, on the same recorded-follow-up footing.
+      worldQuests: null,
+      worldBosses: null,
       player: 'with your own arrow on it',
       pois: 'the points of interest around you',
       npcs: 'the quest givers with their marks',

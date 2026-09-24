@@ -1,3 +1,6 @@
+import { gliderActionsLocked } from './glider_action_lock';
+import { shadowActionsLocked } from './shadow_action_lock';
+import { useCartographersInk, useTreasureMap } from './treasure_vault';
 // Inventory items + vendor: the player-facing equip/use/discard and buy/sell/buyback
 // command bodies. Extracted from sim.ts (session W2) as a pure MOVE behind SimContext,
 // exactly as PR #943 did for market.ts / loot/loot_roll.ts, and aligned to the
@@ -25,7 +28,21 @@ import {
   equipBag as equipBagCmd,
   stackSizeOf,
 } from './bags';
+import { openTreasureCasket } from './clue_casket';
+import { useClueScroll } from './clue_scrolls';
 import { buildConsuming } from './consuming';
+import {
+  useAlliedHearthstone,
+  useClockworkShockBomb,
+  useClockworkTargetDummy,
+  useDawnBattleStandard,
+  useDenseSharpeningStone,
+  useManaRegenerationElixir,
+  usePotionOfInvisibility,
+  useReinforcedArmorKit,
+  useRiftFeatherGlider,
+} from './content/faction_rewards';
+import { resolveFactionVendorRowGate, vendorFactionForNpc } from './content/faction_vendors';
 import { isRawCookingCatch } from './content/items';
 import { ITEMS, NPCS } from './data';
 import { markItemDiscovered } from './deeds';
@@ -46,6 +63,12 @@ import {
   uniqueEquipFamily,
   weaponHand,
 } from './equipment_rules';
+import {
+  type FactionId,
+  factionCurrencyName,
+  factionDisplayName,
+  STANDING_TIER_LABELS,
+} from './factions';
 import { formatMoney } from './format_money';
 import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
@@ -103,6 +126,7 @@ import {
   type VendorBuyOptions,
   vendorCountForced,
 } from './vendor_buy_stack';
+import { wispMazeActionsLocked } from './wisp_maze_action_lock';
 
 const VENDOR_BUYBACK_LIMIT = 12;
 
@@ -812,11 +836,19 @@ export function useItem(
   itemId: string,
   pid?: number,
   slotIndex?: number,
+  aimPoint?: { x: number; z: number },
 ): ItemUseResult | undefined {
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
   const def = ITEMS[itemId];
+  if (
+    meta.vehicle ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return;
   // Every consumable use branch (food/drink, potion, and the shared
   // elixir/scroll arm) consumes one unit, so the selection is honored here
   // once instead of at each arm. Returns the consumed
@@ -959,6 +991,61 @@ export function useItem(
   }
   if (def.use?.type === 'passingStone') {
     usePassingStone(ctx, p, meta);
+    return;
+  }
+  // Clue Scrolls: the module owns every rule (start / dig / refuse) and decides
+  // whether the scroll is spent; the arm's consumeOneUnit is threaded so the
+  // clicked copy is the one spent, like every consumable arm here.
+  if (def.use?.type === 'clueScroll') {
+    useClueScroll(ctx, meta, p, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'cartographersInk') {
+    useCartographersInk(ctx, meta);
+    return;
+  }
+  if (def.use?.type === 'treasureMap') {
+    useTreasureMap(ctx, meta, p, def.use.rarity, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'clueCasket') {
+    openTreasureCasket(ctx, meta, p, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'alliedHearthstone') {
+    useAlliedHearthstone(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'riftGlider') {
+    useRiftFeatherGlider(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'targetDummy') {
+    useClockworkTargetDummy(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'dawnStandard') {
+    useDawnBattleStandard(ctx, p, meta);
+    return;
+  }
+  if (def.use?.type === 'manaElixir') {
+    useManaRegenerationElixir(ctx, p, meta, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'invisibility') {
+    usePotionOfInvisibility(ctx, p, meta, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'sharpeningStone') {
+    useDenseSharpeningStone(ctx, p, meta, consumeOneUnit);
+    return;
+  }
+  if (def.use?.type === 'shockBomb') {
+    useClockworkShockBomb(ctx, p, meta, consumeOneUnit, aimPoint);
+    return;
+  }
+  if (def.use?.type === 'armorKit') {
+    useReinforcedArmorKit(ctx, p, meta, consumeOneUnit);
     return;
   }
   // Buff dishes mint their Well Fed aura at COMPLETION of the sit-restore,
@@ -1237,6 +1324,26 @@ export function buyItem(
     ctx.error(meta.entityId, 'That item is not for sale to you yet.');
     return;
   }
+  // Faction standing gate (FACTION_VENDOR_GATES): the row is sold only once
+  // the buyer's standing with the faction meets or exceeds the required threshold.
+  const factionGate = resolveFactionVendorRowGate(itemId, meta.factions);
+  if (factionGate.locked && factionGate.requirement) {
+    const title = STANDING_TIER_LABELS[factionGate.requirement.standingTier];
+    const factionName = factionGate.requirement.factionId
+      ? factionDisplayName(factionGate.requirement.factionId)
+      : 'an Allied Faction';
+    ctx.error(meta.entityId, `Requires ${title} with ${factionName}.`);
+    return;
+  }
+  if (
+    def?.unique &&
+    (ctx.countItem(itemId, meta.entityId) > 0 ||
+      meta.bags?.includes(itemId) ||
+      Object.values(meta.equipment).includes(itemId))
+  ) {
+    ctx.error(meta.entityId, 'You can only carry one of that item.');
+    return;
+  }
   // Dev free-epic vendor: on a dev-command realm this vendor sells its whole
   // epic stock for free, bypassing the price requirement below.
   const freeVendor = ctx.devCommands && npc.devVendor === true;
@@ -1248,11 +1355,18 @@ export function buyItem(
     def?.priceHonor !== undefined && Number.isFinite(def.priceHonor) && def.priceHonor > 0
       ? Math.floor(def.priceHonor)
       : 0;
+  const factionCurrencyCost = factionGate.requirement?.currencyCost ?? 0;
   const hasCopperPrice = copperUnitPrice > 0;
   const hasHonorPrice = honorPrice > 0;
-  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice)) {
+  const hasFactionPrice = factionCurrencyCost > 0;
+  if (!def || (!freeVendor && !hasCopperPrice && !hasHonorPrice && !hasFactionPrice)) {
     ctx.error(meta.entityId, 'That item is not for sale.');
     return;
+  }
+  let requiredFaction: FactionId | undefined;
+  if (hasFactionPrice && factionGate.requirement) {
+    requiredFaction =
+      factionGate.requirement.factionId ?? vendorFactionForNpc(npc.templateId) ?? 'church_order';
   }
   // Dead players (released ghosts included) cannot buy, matching the rest of
   // the vendor family (sellItem / sellAllJunk / buyBackItem below).
@@ -1366,6 +1480,14 @@ export function buyItem(
     copperCost = totals.copper;
     honorCost = totals.honor;
   }
+  if (hasFactionPrice && requiredFaction && !freeVendor) {
+    const currentMarks = meta.factionCurrencies?.[requiredFaction] ?? 0;
+    if (currentMarks < factionCurrencyCost) {
+      const curName = factionCurrencyName(requiredFaction);
+      ctx.error(meta.entityId, `You need ${factionCurrencyCost} ${curName} to purchase that.`);
+      return;
+    }
+  }
   if (meta.copper < copperCost) {
     ctx.error(meta.entityId, 'Not enough money.');
     return;
@@ -1377,6 +1499,12 @@ export function buyItem(
   if (!ctx.canAddItem(itemId, qty, meta.entityId)) {
     bagsFullError(ctx, meta.entityId);
     return;
+  }
+  if (hasFactionPrice && requiredFaction && !freeVendor) {
+    if (!meta.factionCurrencies) {
+      meta.factionCurrencies = { rift_watch: 0, church_order: 0, automatons: 0 };
+    }
+    meta.factionCurrencies[requiredFaction] -= factionCurrencyCost;
   }
   meta.copper -= copperCost;
   meta.honor -= honorCost;

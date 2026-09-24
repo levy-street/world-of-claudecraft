@@ -162,6 +162,10 @@ export const WEAPON_TYPE_BY_ITEM: Record<string, ItemWeaponType> = {
   staff_of_the_last_spring: 'staff',
   forgefire_spire: 'staff',
   wand_of_quenched_sparks: 'wand',
+  // Faction quartermaster epics (content/faction_vendors.ts).
+  riftwarden_voidblade: 'sword',
+  dawnkeeper_consecrated_mace: 'mace',
+  forgemaster_crag_cleaver: 'axe',
 };
 
 /**

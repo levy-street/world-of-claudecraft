@@ -13,6 +13,11 @@ import { saveMailPartitions } from './db';
 export interface MailPartitionRearmSim {
   markMailPartitionsDirty(recipientKeys: readonly string[]): void;
   takeDirtyMailPartitions(): { recipientKey: string; letters: MailSave['mail'] }[];
+  postOffice?: {
+    takeDirtyMailPartition(
+      recipientKey: string,
+    ): { recipientKey: string; letters: MailSave['mail'] }[];
+  };
 }
 
 export function rearmMailPartitionsOnFailure(
@@ -20,6 +25,32 @@ export function rearmMailPartitionsOnFailure(
   partitions: readonly { recipientKey: string }[],
 ): void {
   if (partitions.length > 0) sim.markMailPartitionsDirty(partitions.map((p) => p.recipientKey));
+}
+
+/** A character+mail escrow save may persist its own protected mailbox, but
+ * must leave every other in-flight vault take for that recipient's own save. */
+export function takeMailPartitionsForCharacterSave(
+  sim: MailPartitionRearmSim,
+  characterId: number,
+  blockedRecipientKeys: ReadonlySet<string>,
+  onlyOwn = false,
+): { recipientKey: string; letters: MailSave['mail'] }[] {
+  const ownKey = String(characterId);
+  const postOffice = sim.postOffice;
+  if (onlyOwn && !postOffice) throw new Error('targeted mail drain unavailable');
+  const drained =
+    postOffice && onlyOwn
+      ? postOffice.takeDirtyMailPartition(ownKey)
+      : sim.takeDirtyMailPartitions();
+  const deferred = drained.filter(
+    (partition) =>
+      partition.recipientKey !== ownKey && blockedRecipientKeys.has(partition.recipientKey),
+  );
+  rearmMailPartitionsOnFailure(sim, deferred);
+  return drained.filter(
+    (partition) =>
+      partition.recipientKey === ownKey || !blockedRecipientKeys.has(partition.recipientKey),
+  );
 }
 
 // The shared body of GameServer.saveMail/persistMailBlob: drain inside the
@@ -34,9 +65,19 @@ export async function writeDirtyMailPartitions<WriteContext = unknown>(
   enqueueWrite: <T>(write: () => Promise<T>, context?: WriteContext) => Promise<T>,
   propagate: boolean,
   context?: WriteContext,
+  blockedRecipientKeys?: ReadonlySet<string>,
 ): Promise<void> {
   await enqueueWrite(async () => {
-    const partitions = sim.takeDirtyMailPartitions();
+    const drained = sim.takeDirtyMailPartitions();
+    const partitions = blockedRecipientKeys
+      ? drained.filter((partition) => !blockedRecipientKeys.has(partition.recipientKey))
+      : drained;
+    if (blockedRecipientKeys) {
+      rearmMailPartitionsOnFailure(
+        sim,
+        drained.filter((partition) => blockedRecipientKeys.has(partition.recipientKey)),
+      );
+    }
     if (partitions.length === 0) return;
     try {
       await saveMailPartitions(partitions);

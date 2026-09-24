@@ -19,6 +19,7 @@
 // idiom elsewhere in src/render.
 
 import { isFeastTemplateId } from '../sim/professions/feast';
+import { HOARD_BROOD_EGG_TEMPLATE } from '../sim/rift/hoard_boss_kits';
 import type { Entity } from '../sim/types';
 import { INTERACT_RANGE } from '../sim/types';
 import { comboPipsFor } from './nameplate_combo';
@@ -120,6 +121,7 @@ export function nameplatePlanInto(
   const isDelveInteract =
     e.templateId === 'delve_locked_chest' ||
     e.templateId === 'delve_reward_chest' ||
+    e.templateId === 'hoard_reward_chest' ||
     e.templateId === 'delve_surface_exit' ||
     e.templateId === 'delve_drowned_reliquary' ||
     e.templateId === 'delve_drowned_reliquary_open' ||
@@ -149,6 +151,8 @@ export function nameplatePlanInto(
 
   out.hidden =
     (isSelf && !hasOverheadEmote && !showOwnNameplate) ||
+    // Encounter scenery (Vysska's clutch hatches on HER health): no plate, no bar.
+    e.templateId === HOARD_BROOD_EGG_TEMPLATE ||
     (e.dead && !e.lootable && e.kind === 'mob') ||
     (isDoor && e.dungeonId === UNLABELED_DOOR_DUNGEON_ID) ||
     (!standIn &&

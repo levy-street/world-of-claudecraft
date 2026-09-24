@@ -59,6 +59,7 @@ import { priestActionGlowActive } from '../../../sim/combat/priest/presentation'
 import { mendingCurrentTargetCapped } from '../../../sim/combat/shaman_spiritmend';
 import { flowStateDiscountedCost } from '../../../sim/combat/shaman_talents';
 import { thundercallPayoffGlowActive } from '../../../sim/combat/shaman_thundercall';
+import { getItemCooldownDuration } from '../../../sim/content/item_cooldowns';
 import { countRawInSlots } from '../../../sim/item_lock';
 import { isAscensionEmpoweredAbility } from '../../../sim/paladin_devotion';
 import {
@@ -579,29 +580,35 @@ export function createActionBarView(
 
         if (item !== null) {
           const count = countRawInSlots(world.inventory, item.id);
-          // Potions share one global cooldown, so any potion slot paints the same
-          // swipe; other items have no cooldown.
           const potionCd = item.kind === 'potion' ? player.potionCdRemaining : 0;
+          const directCd = player.cooldowns.get(item.id) ?? 0;
+          const cdRemaining = potionCd > 0 ? potionCd : directCd;
+          const baseCd = getItemCooldownDuration(item.id);
+          const totalCd = potionCd > 0 ? POTION_COOLDOWN : baseCd > 0 ? baseCd : cdRemaining;
+
           slot.kind = 'item';
           slot.abilityId = null;
           slot.itemId = item.id;
           slot.iconKey = `${ITEM_ICON_PREFIX}${item.id}`;
-          slot.cooldownRemaining = potionCd;
-          slot.cooldownTotal = potionCd > 0 ? POTION_COOLDOWN : 0;
+          slot.cooldownRemaining = cdRemaining;
+          slot.cooldownTotal = cdRemaining > 0 ? totalCd : 0;
           slot.cooldownPercent =
-            potionCd > 0
+            cdRemaining > 0
               ? Math.min(
                   MAX_COOLDOWN_PERCENT,
-                  (potionCd / Math.max(COOLDOWN_DENOM_FLOOR, POTION_COOLDOWN)) *
-                    MAX_COOLDOWN_PERCENT,
+                  (cdRemaining / Math.max(COOLDOWN_DENOM_FLOOR, totalCd)) * MAX_COOLDOWN_PERCENT,
                 )
               : 0;
           slot.cdText =
-            potionCd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(potionCd)) : '';
+            cdRemaining > COOLDOWN_TEXT_THRESHOLD
+              ? cdRemaining >= 60
+                ? `${Math.ceil(cdRemaining / 60)}m`
+                : deps.formatCount(Math.ceil(cdRemaining))
+              : '';
           slot.count = deps.formatCount(count);
           slot.isCharges = false;
           slot.rechargePercent = 0;
-          slot.usable = !(count <= 0 || player.dead);
+          slot.usable = !(count <= 0 || player.dead || cdRemaining > 0);
           slot.outOfRange = false;
           slot.queued = false;
           slot.procGlow = false;

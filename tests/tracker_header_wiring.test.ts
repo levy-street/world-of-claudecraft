@@ -34,6 +34,9 @@ describe('wireTrackerHeader', () => {
     wireTrackerHeader(s.root, { toggle });
     s.header.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(toggle).toHaveBeenCalledTimes(1);
+    // The activated header control (not the clicked descendant) rides along,
+    // so a multi-section tracker knows which header it was.
+    expect(toggle).toHaveBeenLastCalledWith(s.root.querySelector('.dt-header'));
     s.other.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     s.row.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(toggle).toHaveBeenCalledTimes(1);

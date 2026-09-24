@@ -23,6 +23,7 @@ import { FARM_PROP_CONTRACTS, FARM_PROP_IDS } from './farm_props/model.js';
 import { farmPropsSourceFingerprint } from './farm_props/source_fingerprint.mjs';
 import { FENBRIDGE_TOWN_ASSET_IDS, FENBRIDGE_TOWN_CONTRACTS } from './fenbridge_town/model.js';
 import { fenbridgeTownSourceFingerprint } from './fenbridge_town/source_fingerprint.mjs';
+import { hoardEntranceSourceFingerprint } from './hoard_entrance/source_fingerprint.mjs';
 import { inscriptionTomesSourceFingerprint } from './inscription_tomes/source_fingerprint.mjs';
 import { tankSourceFingerprint } from './terrorspark_groundshaker/source_fingerprint.mjs';
 
@@ -51,6 +52,7 @@ const FARM_PROPS_ASSETS = FARM_PROP_IDS.map((id) => ({
 }));
 
 const ASSETS = [
+  { rel: 'public/models/props/hoard_entrance.glb', kind: 'hoard' },
   { rel: 'public/models/props/eastbrook_bank.glb', kind: 'town' },
   { rel: 'public/models/props/eastbrook_smithy.glb', kind: 'town' },
   { rel: 'public/models/props/eastbrook_inn.glb', kind: 'town' },
@@ -112,6 +114,7 @@ function replaceAllHex(buf, fromHex, toHex) {
 }
 
 const fps = {
+  hoard: hoardEntranceSourceFingerprint(ROOT),
   town: eastbrookTownSourceFingerprint(ROOT),
   mailbox: eastbrookMailboxSourceFingerprint(ROOT),
   notice: eastbrookNoticeboardSourceFingerprint(ROOT),

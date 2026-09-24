@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'De Rift',
     desc: 'Kenmerkende buit van de wisselende Rift, van haar zwervende verschrikkingen tot de twee schatten van de S-rangjacht.',
   },
+  conquerors_buried_hoards: {
+    name: 'De begraven schatten',
+    desc: 'Buit uit de schatten waar de schatkaarten naartoe leiden, vier van elke hoeder die er een bewaakt.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Zeldzamen van het Rijk',
     desc: 'Het bewijs van elke benoemde zeldzame die in het rijk is geveld.',

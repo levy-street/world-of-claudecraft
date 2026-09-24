@@ -7,6 +7,7 @@ import { ITEM_SETS } from '../../sim/data';
 import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
+import { clueStrings } from './clues';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
 import { guideStrings } from './guide';
@@ -19,6 +20,7 @@ import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
+export { clueStrings } from './clues';
 export { editorStrings } from './editor';
 export {
   gameStrings,
@@ -235,6 +237,8 @@ export const en = {
     goldenHarvest: '{finder} reaped a golden harvest!',
   },
   apiError: apiErrorStrings,
+  // Clue Scroll hunt titles and per-step riddles (src/ui/i18n.catalog/clues.ts).
+  clues: clueStrings,
   guide: guideStrings,
   editor: editorStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
@@ -898,6 +902,12 @@ export const en = {
       pylonLit: 'A rune pylon flares to life ({lit}/{total}).',
       wayDownOpens: 'The way down tears open.',
       exitOpens: 'The rift shudders. A way home tears open behind the fallen.',
+      // The Buried Hoard (a treasure map's vault) keeps its own entry and clear lines.
+      hoardEnter: 'You climb down into {name}.',
+      hoardExitOpens: 'The hoard is yours. Return to the entrance to climb out.',
+      hoardStepBack: 'You climb back out through the hoard entrance.',
+      hoardNotYours: 'This hoard was dug up by another party.',
+      hoardEntrantsFull: 'This hoard has already admitted five adventurers.',
       portalOpens: 'A {tier}-rank rift tears open in {zone}!',
       portalSealed: 'The {tier}-rank rift in {zone} has been sealed.',
       portalCollapses: 'The {tier}-rank rift in {zone} collapses.',
@@ -943,6 +953,163 @@ export const en = {
       detonateStormcallersWrath: "Stormcaller's Wrath erupts!",
       detonateAbyssalMaw: 'Abyssal Maw closes!',
       detonateCrushingDepth: 'Crushing Depth crushes!',
+      // Rift and Buried Hoard boss yells (MobTemplate.yells + the bigCast /
+      // deathZoneCast / deathZoneStrike .yell lines in src/sim/content/rift/mobs.ts).
+      // The sim emits the English as yell-channel chat; src/ui/rift_text_i18n.ts
+      // re-localizes it by exact text. Key = boss short id + the content slot.
+      yell: {
+        mushroomEngage: 'The spores will have you.',
+        mushroomSummon: 'Grow, my little ones!',
+        moleEngage: 'The ground is mine.',
+        moleSummon: 'Down you come!',
+        batEngage: 'Screeeee!',
+        batSummon: 'To me, my flock!',
+        mimicEngage: 'Hungry... so hungry.',
+        mimicSummon: 'More gold, more gold!',
+        frostBigCast: 'The white wind rises.',
+        frostDeathZoneCast: 'The frost claims you.',
+        frostDeathZoneStrike: 'Nothing survives the deep cold.',
+        frostEngage: 'The cold takes all things in the end.',
+        frostEnrage: 'FREEZE!',
+        emberBigCast: 'BURN.',
+        emberDeathZoneCast: 'The magma rises.',
+        emberDeathZoneStrike: 'THE FORGE CONSUMES ALL.',
+        emberEngage: 'The forge hungers.',
+        emberSummon: 'Rise from the slag!',
+        emberEnrage: 'ASH AND CINDER!',
+        venomBigCast: 'Drown in venom!',
+        venomDeathZoneCast: 'Drown in poison.',
+        venomDeathZoneStrike: 'YOU CANNOT FLEE MY CHILDREN.',
+        venomEngage: 'My children are always hungry.',
+        venomSummon: 'Feast, little ones!',
+        necroBigCast: 'Your souls are forfeit.',
+        necroDeathZoneCast: 'Your soul is forfeit.',
+        necroDeathZoneStrike: 'DEATH CLAIMS ALL.',
+        necroEngage: 'Death is only the beginning.',
+        necroSummon: 'Rise!',
+        bruteBigCast: 'I BREAK YOU!',
+        bruteDeathZoneCast: 'THE EARTH SHATTERS.',
+        bruteDeathZoneStrike: 'YOU FALL HERE.',
+        bruteEngage: 'I will crush you!',
+        bruteEnrage: 'RAAAGH!',
+        arcaneBigCast: 'Witness true power.',
+        arcaneDeathZoneCast: 'Reality tears.',
+        arcaneDeathZoneStrike: 'ANNIHILATED.',
+        arcaneEngage: 'You should not have come.',
+        arcaneEnrage: 'KNEEL!',
+        stormBigCast: 'The sky answers!',
+        stormDeathZoneCast: 'The sky answers your call.',
+        stormDeathZoneStrike: 'THE STORM DEVOURS.',
+        stormEngage: 'The storm answers to me!',
+        stormEnrage: 'THE SKY FALLS!',
+        tideDeathZoneCast: 'The deep takes you.',
+        tideDeathZoneStrike: 'DRAWN INTO THE ABYSS.',
+        tideEngage: 'The deep claims you.',
+        tideSummon: 'Rise from the depths!',
+        ritualistBigCast: 'The pact is sealed in fire!',
+        ritualistEngage: 'You trespass on bound ground.',
+        ritualistSummon: 'Answer me, things below!',
+        pitlordBigCast: 'THE PIT CLAIMS YOU.',
+        pitlordEngage: 'Kneel, or burn.',
+        pitlordEnrage: 'THE CITADEL DEVOURS!',
+      },
+      // Generated rift and Buried Hoard place names (src/sim/rift/rift_gen.ts
+      // generateRiftPlan / generateRiftFloor, src/sim/content/rift/infernal_citadel.ts).
+      // The sim composes English from a theme name, a noun, a suffix and a depth;
+      // src/ui/rift_text_i18n.ts parses that grammar and rebuilds it from these keys.
+      place: {
+        hoardFloor: '{theme} Buried Hoard',
+        sanctumFloor: '{theme} Sanctum: Depth {depth}',
+        reachesFloor: '{theme} Reaches: Depth {depth}',
+        upgradedFloor: '{title}: {theme} Depth {depth}',
+        hoardPlan: 'The Buried {noun} Hoard',
+        riftPlan: 'The {noun} {suffix}',
+        citadelPlan: 'The {noun} Citadel',
+        infernalCitadel: 'The Infernal Citadel',
+        hoardEntrance: 'Buried Hoard entrance',
+        // Theme names, keyed by RiftTheme.id (themes.ts, cave_themes.ts) plus the
+        // authored Infernal Citadel.
+        theme: {
+          frost: 'Frostbound',
+          ember: 'Emberforge',
+          venom: 'Venomweald',
+          bone: 'Boneyard',
+          brute: 'Warcamp',
+          void: 'Voidscar',
+          storm: 'Stormspire',
+          tide: 'Sunken',
+          spore: 'Spore Hollow',
+          burrow: 'Deep Burrow',
+          roost: 'Bat Roost',
+          mimic: 'False Vault',
+          infernal: 'Infernal Citadel',
+        },
+        // RiftTheme.nouns plus INFERNAL_NOUNS, keyed by the lowercased English noun.
+        noun: {
+          rime: 'Rime',
+          hoarfrost: 'Hoarfrost',
+          glacier: 'Glacier',
+          frost: 'Frost',
+          ember: 'Ember',
+          cinder: 'Cinder',
+          magma: 'Magma',
+          ash: 'Ash',
+          venom: 'Venom',
+          thorn: 'Thorn',
+          bramble: 'Bramble',
+          spider: 'Spider',
+          bone: 'Bone',
+          marrow: 'Marrow',
+          ossuary: 'Ossuary',
+          grave: 'Grave',
+          war: 'War',
+          skull: 'Skull',
+          iron: 'Iron',
+          blood: 'Blood',
+          void: 'Void',
+          shadow: 'Shadow',
+          umbral: 'Umbral',
+          dusk: 'Dusk',
+          storm: 'Storm',
+          tempest: 'Tempest',
+          thunder: 'Thunder',
+          gale: 'Gale',
+          sunken: 'Sunken',
+          abyssal: 'Abyssal',
+          drowned: 'Drowned',
+          tide: 'Tide',
+          spore: 'Spore',
+          toadstool: 'Toadstool',
+          mould: 'Mould',
+          mycelium: 'Mycelium',
+          burrow: 'Burrow',
+          tunnel: 'Tunnel',
+          delve: 'Delve',
+          loam: 'Loam',
+          roost: 'Roost',
+          echo: 'Echo',
+          guano: 'Guano',
+          hollow: 'Hollow',
+          coffer: 'Coffer',
+          strongbox: 'Strongbox',
+          tithe: 'Tithe',
+          gilt: 'Gilt',
+          brimstone: 'Brimstone',
+          pitfire: 'Pitfire',
+          pactbound: 'Pactbound',
+        },
+        // RIFT_SUFFIXES (rift_gen.ts), keyed by the lowercased English suffix.
+        suffix: {
+          abyss: 'Abyss',
+          depths: 'Depths',
+          descent: 'Descent',
+          hollow: 'Hollow',
+          labyrinth: 'Labyrinth',
+          warren: 'Warren',
+          sanctum: 'Sanctum',
+          rift: 'Rift',
+        },
+      },
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',
@@ -1026,6 +1193,12 @@ export const en = {
       moveCloserStairs: 'Move closer to the stairs.',
       nhaliaCantorShield: 'Cantors, hold the note!',
       nhaliaBlackwaterMark: '{name} marks {player} with Blackwater!',
+    },
+    // The faction quartermaster refusal (src/sim/items.ts, the faction-price
+    // arm of a vendor purchase). The sim emits English; sim_i18n.ts matches it
+    // and localizes {currency} through hudChrome.currencies.
+    factionVendor: {
+      currencyRequired: 'You need {amount} {currency} to purchase that.',
     },
     lockpick: {
       lockYields: 'The lock yields! {tier} spoils.',
@@ -1631,6 +1804,9 @@ export const en = {
       crypt_ritual_circle: { name: 'Ritual Circle' },
       kings_signet: { name: "King's Signet" },
       event_skin_token: { name: 'Mysterious Cosmetic Cache' },
+      // Clue Scrolls (world quests, Stage 3): the scroll and the casket it buries.
+      clue_scroll: { name: 'Clue Scroll' },
+      treasure_casket: { name: 'Treasure Casket' },
       heroic_mark: { name: 'Heroic Mark' },
       wyrmfall_core: { name: 'Wyrmfall Core' },
       sundered_essence: { name: 'Sundered Essence' },
@@ -1743,6 +1919,22 @@ export const en = {
       // until the raid loot pass wires them.
       varkhul_forgebreaker: { name: 'Forgebreaker, Engine of Varkhul' },
       varkhul_emberward: { name: 'Emberward, Bulwark of Varkhul' },
+      // Faction Quartermaster vendor items
+      rift_watchers_band: { name: "Rift Watcher's Band" },
+      rift_surveyors_satchel: { name: "Rift Surveyor's Satchel" },
+      riftwalkers_tunic: { name: "Riftwalker's Tunic" },
+      riftwarden_voidblade: { name: "Riftwarden's Voidblade" },
+      champion_rift_band: { name: "Champion's Rift Band" },
+      order_prayer_beads: { name: 'Order Prayer Beads' },
+      vestments_of_the_acolyte: { name: 'Vestments of the Acolyte' },
+      templar_dawn_shield: { name: "Templar's Dawn Shield" },
+      dawnkeeper_consecrated_mace: { name: "Dawnkeeper's Consecrated Mace" },
+      champion_dawn_medallion: { name: "Champion's Dawn Medallion" },
+      automaton_cog_ring: { name: 'Automaton Cog Ring' },
+      clockwork_tinkers_pack: { name: "Clockwork Tinker's Pack" },
+      artificers_welding_cowl: { name: "Artificer's Welding Cowl" },
+      forgemaster_crag_cleaver: { name: "Forgemaster's Crag Cleaver" },
+      champion_forged_loop: { name: "Champion's Forged Loop" },
     },
     itemSets: itemSetEntityText,
     mobs: {

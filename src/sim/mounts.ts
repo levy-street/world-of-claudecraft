@@ -1,3 +1,5 @@
+import { gliderActionsLocked } from './glider_action_lock';
+import { shadowActionsLocked } from './shadow_action_lock';
 // Rideable ground mounts: collection + mount/dismount rules, a sibling sim
 // system behind the SimContext seam (module-first; sim.ts keeps thin delegates).
 //
@@ -34,6 +36,8 @@ import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { bgInMatch } from './social/battleground';
 import { DT, type Entity, FORM_AURA_KINDS, isNonSpellCast } from './types';
+import { wispMazeActionsLocked } from './wisp_maze_action_lock';
+import { hasWorldQuestDeliveryCargo } from './world_quest_delivery';
 
 // Summon channel duration (seconds). Mounting is a short cast the player can
 // interrupt by moving into combat or water. Dismounting has NO channel: it is
@@ -154,6 +158,7 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
   // Silent (no toast): the caller is unreachable from inside a match, so a
   // refusal line here would be text no player can ever see.
   if (bgInMatch(ctx, e.id)) return false;
+  if (hasWorldQuestDeliveryCargo(e)) return false;
   e.mountKey = TRAINING_MOUNT_KEY;
   e.mountCastRemaining = 0;
   e.mountCastKey = '';
@@ -166,6 +171,7 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
 // what a player can actually learn, and the carrier case is a subset of it.
 const IN_BATTLEGROUND_MSG = "You can't ride in a battleground.";
 const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
+const CARRYING_FREIGHT_MSG = "You can't ride while carrying freight.";
 
 /** Strip all active form auras (FORM_AURA_KINDS), ghost_wolf, and stealth from the
  *  entity, emitting aura-removal events for each one removed. Called before a mount
@@ -183,7 +189,12 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
     const aura = e.auras[i];
     if (FORM_AURA_KINDS.has(aura.kind) || aura.id === 'ghost_wolf') {
       e.auras.splice(i, 1);
-      ctx.emit({ type: 'aura', targetId: e.id, name: aura.name, gained: false });
+      ctx.emit({
+        type: 'aura',
+        targetId: e.id,
+        name: aura.name,
+        gained: false,
+      });
       stripped = true;
     }
   }
@@ -235,6 +246,12 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
+  if (
+    wispMazeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return false;
   const def = mountDef(key);
   if (!def) return false;
   // Clicking the reins you are currently riding puts the mount away.
@@ -261,6 +278,10 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
   // swap below, which is not a summon and would otherwise slip past every gate.
   if (bgInMatch(ctx, pid)) {
     ctx.error(pid, IN_BATTLEGROUND_MSG);
+    return false;
+  }
+  if (hasWorldQuestDeliveryCargo(e)) {
+    ctx.error(pid, CARRYING_FREIGHT_MSG);
     return false;
   }
   if (e.dead || e.ghost) return false;
@@ -295,6 +316,12 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
   const meta = ctx.players.get(pid);
   const e = ctx.entities.get(pid);
   if (!meta || !e) return false;
+  if (
+    wispMazeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return false;
   // A toggle while a summon/dismount is already channeling is ignored.
   if ((e.mountCastRemaining ?? 0) > 0) return false;
   if (e.mountKey) {
@@ -322,6 +349,10 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     // running when the queue popped must not become a way to ride the field.
     if (bgInMatch(ctx, pid)) {
       ctx.error(pid, IN_BATTLEGROUND_MSG);
+      return false;
+    }
+    if (hasWorldQuestDeliveryCargo(e)) {
+      ctx.error(pid, CARRYING_FREIGHT_MSG);
       return false;
     }
     if (e.dead || e.ghost) return false;

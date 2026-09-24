@@ -125,6 +125,7 @@ export const API_ERROR_KEYS = {
   'deeds.invalid_input': 'apiError.deeds.invalid_input',
   'guilds.invalid_roster_name': 'apiError.guilds.invalid_roster_name',
   'guilds.unknown': 'apiError.guilds.unknown',
+  'world_quests.unknown_board': 'apiError.world_quests.unknown_board',
 
   // steam: the env-gated Steam link family (server/steam/).
   'steam.disabled': 'apiError.steam.disabled',
@@ -381,6 +382,8 @@ export function userFacingApiError(err: unknown): string {
     return t('errors.api.notAuthenticated');
   if (normalized === 'this account has been banned.') return t('errors.api.accountBanned');
   if (normalized === 'character already in world') return t('errors.api.alreadyInWorld');
+  if (normalized === 'vault reward mail is still recovering. please retry shortly.')
+    return t('apiError.character.vault_mail_recovering');
   if (normalized === 'too many characters on this account are already in the world')
     return t('errors.api.accountSessionLimit');
   if (normalized === 'character taken over') return t('errors.api.takenOver');

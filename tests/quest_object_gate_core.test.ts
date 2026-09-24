@@ -2,11 +2,14 @@
 // sim rule at all. The rule itself (which objects are gated, and in which quest states)
 // is the sim's, covered by tests/quest_gated_ground_object.test.ts.
 
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { groundObjectPoolKey } from '../src/render/ground_object_pool';
 import { makeQuestObjectGate } from '../src/render/quest_object_gate_core';
 import { ITEMS } from '../src/sim/data';
-import type { Entity, QuestProgress } from '../src/sim/types';
+import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
+import type { Entity, QuestProgress, WorldQuestProgress } from '../src/sim/types';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quests';
 
 // An overworld position (x = 0 is in no instance band): the sim rule consults the
 // dungeon a collectable stands in for the interact-only exemption.
@@ -30,6 +33,11 @@ const onQuest = (): Map<string, QuestProgress> => {
 };
 
 describe('makeQuestObjectGate', () => {
+  it('receives the live world mirrors from the renderer integration seam', () => {
+    const renderer = readFileSync('src/render/renderer.ts', 'utf8');
+    expect(renderer).toContain('makeQuestObjectGate(options, this.sim)');
+  });
+
   it('withholds an off-quest collectable by default (the game viewer)', () => {
     const gate = makeQuestObjectGate({});
     expect(gate(crate(), new Map())).toBe(true);
@@ -45,6 +53,35 @@ describe('makeQuestObjectGate', () => {
   it('treats an absent flag as the game default, never as opt-out', () => {
     const gate = makeQuestObjectGate({ showAllQuestObjects: undefined });
     expect(gate(crate(), new Map())).toBe(true);
+  });
+
+  it('admits only the current personal shipwreck-salvage pieces', () => {
+    const cycle = worldQuestCycleForResetDay('2026-09-06');
+    const worldQuestLog = new Map<string, WorldQuestProgress>();
+    const gate = makeQuestObjectGate({}, { worldQuestCycle: cycle, worldQuestLog });
+    const piece = {
+      ...crate(),
+      id: 2_147_100_100,
+      objectItemId: 'wreckfield_flotsam_crate',
+      pos: { x: 277, y: 0, z: 82 },
+    };
+    const rotatedOut = {
+      ...piece,
+      id: 2_147_100_108,
+      pos: { x: 273, y: 0, z: 78 },
+    };
+
+    expect(gate(piece, new Map())).toBe(false);
+    expect(gate(rotatedOut, new Map())).toBe(true);
+
+    worldQuestLog.set('wq_farshore_salvage', {
+      questId: 'wq_farshore_salvage',
+      count: 1,
+      state: 'active',
+      puzzleVariant: 0,
+      creditedObjects: [interactObjectCreditKey(0, piece.pos)],
+    });
+    expect(gate(piece, new Map())).toBe(true);
   });
 });
 

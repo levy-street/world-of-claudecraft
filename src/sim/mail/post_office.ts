@@ -20,6 +20,7 @@ import { bagPools, canGrantCopies, instancedCountCap } from '../bags';
 import { rekeySigner } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
+  HOARD_REWARD_LETTER,
   isWocMarketLetterId,
   type LetterDef,
   QUEST_LETTERS,
@@ -96,6 +97,7 @@ export function mailHoldsEscrow(m: { copper: number; items: readonly unknown[] }
 // remain (the never-auto-deleted rule), like a system parcel.
 export const MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 * 24 * 3600;
 const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse new)
+const MAIL_MAX_VAULT_REWARDS = 32; // unclaimed vault escrow letters; overflow stays in the claim ledger
 // #3561: the window every still-live letter with a finite expiresAt gets its
 // persisted deliverIn/secondsLeft refreshed at least once, staggered by id
 // (one ~1/3600th slice of the book per sim-second, never a synchronized
@@ -191,6 +193,9 @@ export interface MailMessage {
   // "letter booked" and "settlement row advanced" reconciles to exactly one
   // delivery. Absent on every other letter. Persisted.
   custodyRef?: string;
+  /** Vault mail has already advanced the lifetime casket deed meter. This
+   * travels with the recipient partition and its character in one save. */
+  vaultRewardCredited?: true;
   // The one return-to-sender cycle has run. The sweep's delete arm requires
   // this flag, so attachments are never destroyed without a return flight.
   returned?: boolean;
@@ -219,9 +224,18 @@ export interface MailSave {
     secondsLeft: number; // seconds until expiry; -1 = never expires
     read: boolean;
     custodyRef?: string; // broker book-once reference; absent off custody mail
+    vaultRewardCredited?: true;
     returned?: boolean; // the return cycle has run; absent = false
   }[];
   nextMailId: number;
+}
+
+export interface VaultMailRecoveryLetter {
+  recipientName: string;
+  copper: number;
+  items: InvSlot[];
+  read: boolean;
+  vaultRewardCredited?: true;
 }
 
 export class PostOffice {
@@ -790,6 +804,8 @@ export class PostOffice {
     // Escrow in the expiry sense (sub-silver coin alone does not count): the
     // clock write at the tail keys on this, the coin grant below on any coin.
     const hadAttachments = mailHoldsEscrow(m);
+    const hadVaultEscrow =
+      m.letterId === 'hoard_vault_reward' && (m.copper > 0 || m.items.length > 0);
     // Bump only when something observable moved: the revision is realm-global,
     // so an unconditional bump would let a repeat-take on an already-emptied,
     // already-read letter force an inbox rebuild for every near-pillar viewer
@@ -839,6 +855,7 @@ export class PostOffice {
           s.instance,
           s.craftedRecipeId,
           s.materialSources,
+          m.letterId === 'hoard_vault_reward',
         );
       } else {
         kept.push(s);
@@ -846,6 +863,12 @@ export class PostOffice {
     }
     if (kept.length !== m.items.length) mutated = true;
     m.items = kept;
+    this.index.refreshVaultEscrow(m, hadVaultEscrow);
+    if (mutated && m.letterId === 'hoard_vault_reward' && !m.vaultRewardCredited) {
+      m.vaultRewardCredited = true;
+      meta.clueCasketsOpened = (meta.clueCasketsOpened ?? 0) + 1;
+      this.ctx.markDeedsDirty(meta.entityId);
+    }
     // Tending the letter marks it read (drops it from the unread index once).
     const flippedRead = !m.read;
     if (flippedRead) {
@@ -1013,6 +1036,68 @@ export class PostOffice {
     // production six-figure-letter class) would put a whole-array walk on
     // the world loop. Pinned by tests/mail_custody_parcels.test.ts.
     return this.index.hasCustodyRef(custodyRef);
+  }
+
+  canBookVaultRewardMail(characterId: number): boolean {
+    return this.index.vaultEscrowFor(String(characterId)) < MAIL_MAX_VAULT_REWARDS;
+  }
+
+  vaultCustodyRefFor(mailId: number, pid: number): string | null {
+    const r = this.ctx.resolve(pid);
+    return r?.meta
+      ? (this.deliveredFor(r.meta).find((mail) => mail.id === mailId)?.custodyRef ?? null)
+      : null;
+  }
+
+  restoreVaultLetter(
+    recipientKey: string,
+    custodyRef: string,
+    source: VaultMailRecoveryLetter,
+  ): boolean {
+    if (
+      !custodyRef.startsWith('vault:') ||
+      !Number.isSafeInteger(source.copper) ||
+      source.copper < 0
+    )
+      return false;
+    if (
+      source.items.some(
+        (item) =>
+          !Object.hasOwn(ITEMS, item.itemId) || !Number.isSafeInteger(item.count) || item.count < 1,
+      )
+    )
+      return false;
+    let mail = this.index
+      .bucketFor(recipientKey)
+      .find(
+        (candidate) =>
+          candidate.recipientKey === recipientKey && candidate.custodyRef === custodyRef,
+      );
+    if (mail) this.index.untrack(mail, this.ctx.time);
+    else {
+      if (
+        !this.mailSystemParcel(
+          { key: recipientKey, name: source.recipientName },
+          { ...HOARD_REWARD_LETTER, copper: source.copper },
+          source.items,
+          custodyRef,
+        )
+      )
+        return false;
+      mail = this.mail.at(-1);
+      if (!mail) return false;
+      this.index.untrack(mail, this.ctx.time);
+    }
+    mail.items = source.items.map(cloneInvSlot);
+    mail.copper = source.copper;
+    mail.read = source.read;
+    mail.vaultRewardCredited = source.vaultRewardCredited;
+    mail.expiresAt = mailHoldsEscrow(mail) ? Infinity : this.emptiedExpiresAt(mail, this.ctx.time);
+    mail.announced = true;
+    this.index.track(mail, this.ctx.time);
+    this.index.markDirty(recipientKey);
+    this.bumpRev();
+    return true;
   }
 
   // The one-time service letter; the caller flips meta.mailWelcomed.
@@ -1313,6 +1398,7 @@ export class PostOffice {
       secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
       read: m.read,
       custodyRef: m.custodyRef,
+      vaultRewardCredited: m.vaultRewardCredited,
       returned: m.returned,
     };
   }
@@ -1345,6 +1431,19 @@ export class PostOffice {
       recipientKey,
       letters: this.index.bucketFor(recipientKey).map((m) => this.serializeLetter(m, now)),
     }));
+  }
+
+  takeDirtyMailPartition(
+    recipientKey: string,
+  ): { recipientKey: string; letters: MailSave['mail'] }[] {
+    if (!this.index.takeDirtyKey(recipientKey)) return [];
+    const now = this.ctx.time;
+    return [
+      {
+        recipientKey,
+        letters: this.index.bucketFor(recipientKey).map((mail) => this.serializeLetter(mail, now)),
+      },
+    ];
   }
 
   // Undo half of takeDirtyMailPartitions: re-mark these recipients dirty after
@@ -1502,6 +1601,7 @@ export class PostOffice {
         expiresAt,
         read,
         ...(typeof m.custodyRef === 'string' ? { custodyRef: m.custodyRef } : {}),
+        ...(m.vaultRewardCredited === true ? { vaultRewardCredited: true } : {}),
         returned,
         // Already-delivered letters never re-toast after a restart.
         announced: deliverIn <= 0,

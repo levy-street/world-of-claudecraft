@@ -19,12 +19,19 @@ import {
   openMarketWriteGate,
   saveCharacterAndMarketState,
 } from '../server/db';
+import {
+  persistCustodyParcelRow,
+  resetCustodyParcelOverlayForTests,
+  snapshotPendingCustodyRefs,
+} from '../server/mail_custody_overlay';
 import { REALM } from '../server/realm';
 import type { CharacterState, MailSave, MarketSave } from '../src/sim/sim';
 
 beforeEach(() => {
   dbMock.query.mockReset();
+  dbMock.query.mockResolvedValue({ rows: [], rowCount: 1 });
   dbMock.connect.mockReset();
+  resetCustodyParcelOverlayForTests();
   // The escrow flush writes the realm-market row and, when it carries any
   // dirty mail partition, the realm-scoped mail rows too; both are gated on
   // their own boot backfill. Open both by default so the escrow-transaction
@@ -69,6 +76,41 @@ const MAIL_PARTITIONS: { recipientKey: string; letters: MailSave['mail'] }[] = [
 ];
 
 describe('saveCharacterAndMarketState', () => {
+  it('does not bake a parcel booked after the leave snapshot while its DB permit waits', async () => {
+    const parcel = (custodyRef: string) => ({
+      custodyRef,
+      recipient: { key: 'char-99', name: 'Testchar' },
+      letter: 'delivery' as const,
+      items: [{ itemId: 'rusty_hatchet', count: 1 }],
+    });
+    await persistCustodyParcelRow(parcel('before'));
+    const captured = snapshotPendingCustodyRefs(['char-99']);
+    await persistCustodyParcelRow(parcel('after'));
+    const client = clientStub();
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    await saveCharacterAndMarketState(
+      42,
+      7,
+      STATE,
+      MARKET,
+      MAIL_PARTITIONS,
+      undefined,
+      undefined,
+      undefined,
+      [],
+      undefined,
+      undefined,
+      captured,
+    );
+
+    const bake = client.query.mock.calls.find((c) =>
+      /DELETE FROM mail_custody_parcels/.test(String(c[0])),
+    );
+    expect(bake?.[1]?.[0]).toEqual(['before']);
+    expect(snapshotPendingCustodyRefs(['char-99'])).toEqual(['after']);
+  });
+
   it('writes the character row, the market row, and the dirty mail row in ONE transaction (atomic escrow)', async () => {
     const client = clientStub();
     dbMock.connect.mockResolvedValueOnce(client as any);
@@ -88,6 +130,26 @@ describe('saveCharacterAndMarketState', () => {
     // Nothing leaks onto the bare pool: atomicity would be lost otherwise.
     expect(dbMock.query).not.toHaveBeenCalled();
     expect(client.release).toHaveBeenCalled();
+  });
+
+  it('saves vault mail with its character but never serializes or writes the global Market', async () => {
+    closeMarketWriteGateForTests();
+    const client = clientStub();
+    dbMock.connect.mockResolvedValueOnce(client as any);
+
+    await expect(saveCharacterAndMarketState(42, 7, STATE, null, MAIL_PARTITIONS)).resolves.toBe(
+      true,
+    );
+
+    const calls = client.query.mock.calls;
+    const sqls = calls.map((call) => String(call[0]));
+    expect(sqls[0]).toMatch(/^BEGIN/);
+    expect(sqls.at(-1)).toMatch(/^COMMIT/);
+    expect(sqls.some((sql) => /UPDATE characters/i.test(sql))).toBe(true);
+    const worldCalls = calls.filter((call) => /world_state/i.test(String(call[0])));
+    expect(worldCalls).toHaveLength(1);
+    expect(worldCalls[0][1][0]).toEqual([`mail:${REALM}:r:char-99`]);
+    expect(dbMock.query).not.toHaveBeenCalled();
   });
 
   it('an empty mail partitions array issues no mail SQL at all (a session that never touched mail)', async () => {

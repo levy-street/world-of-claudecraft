@@ -211,6 +211,10 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   // tests/purchase_intent_durability.test.ts pins the two equal, so this
   // allowance cannot hide a drift.
   ['src/ui/purchase_intent_record.ts', 1000000, 'PURCHASE_INTENT_MAX_COST_CLAUDIUM'],
+  // The world-quest cannon result validator's shot-count sanity bound, not money.
+  ['src/ui/hud/vehicle/cannon_tactics_view.ts', 1000000, 'result.shotsFired > 1000000'],
+  // The vehicle session wire decoder's finite-number bound, not money.
+  ['src/net/vehicle_session_wire.ts', 1000000, 'Math.abs(value) <='],
 ];
 const usedTreeAnchors = new Set<string>();
 const treeAllowed: AllowFn = anchoredAllow(TREE_ALLOWANCES, usedTreeAnchors);

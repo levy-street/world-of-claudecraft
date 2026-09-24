@@ -1,0 +1,40 @@
+{
+  "name": "RimeElemental",
+  "key": "rime_elemental",
+  "motion": {
+    "chestUp": 0,
+    "headUp": 0,
+    "walkStride": 16,
+    "runStride": 24,
+    "bob": 0.012,
+    "idleBob": 0.02,
+    "deathDrop": 0.3,
+    "deathRoll": 38,
+    "deathCurl": -1.6
+  },
+  "bones": [
+    ["Root", null, [0, 0, -0.399], [0, 0, -0.33], 0.0],
+    ["Hips", "Root", [0, 0, -0.14], [0, 0, 0.0], 0.26],
+    ["Spine", "Hips", [0, 0, 0.0], [0, 0, 0.1], 0.26],
+    ["Chest", "Spine", [0, 0, 0.1], [0.02, 0, 0.2], 0.24],
+    ["Head", "Chest", [0.05, 0, 0.26], [0.08, 0, 0.4], 0.1],
+    ["ArmUpper.*", "Chest", [0, 0.2, 0.06], [0, 0.34, -0.04], 0.1],
+    ["ArmLower.*", "ArmUpper.*", [0, 0.34, -0.04], [0.02, 0.42, -0.24], 0.12]
+  ],
+  "sideLimbs": [
+    {
+      "upper": "ArmUpper.L",
+      "lower": "ArmLower.L",
+      "dir": [0, 1],
+      "side": 1,
+      "phase": 0.0
+    },
+    {
+      "upper": "ArmUpper.R",
+      "lower": "ArmLower.R",
+      "dir": [0, -1],
+      "side": -1,
+      "phase": 0.5
+    }
+  ]
+}

@@ -30,6 +30,7 @@ import {
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
 import { dockSurfaceHeight } from './deck_surfaces';
+import { isExcludedDecoration } from './decoration_exclusions';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
 import { eastbrookDeckSurface } from './eastbrook_harbor';
@@ -63,6 +64,7 @@ import { cragLayer, highlandMask, reliefBase, ridged2, warpedCoords } from './te
 import type { BiomeId, HeightStamp, ZoneDef } from './types';
 import { overworldWalkSurface } from './walk_lifts';
 import { wildheartFieldHeight } from './wildheart_field';
+import { applyWispMazePad } from './wisp_maze_ground';
 
 // Terrain is a pure function of (x, z, seed): both the sim (ground clamping)
 // and the renderer (mesh) sample the same heightfield, so they always agree.
@@ -3958,6 +3960,8 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
       h = h * blend + ch * (1 - blend);
     }
   }
+  // the wisp maze trial's lawn, level with the east bed terrace (wisp_maze_ground.ts)
+  h = applyWispMazePad(x, z, h, (ax, az) => terrainHeightUnpadded(ax, az, seed));
   // The Bridgemere island: one level pad inside the widened moat ring,
   // over the finished height, so the doubled town floor stays dry wall to
   // wall (the natural fen dips below the waterline inside the wider ring;
@@ -4905,14 +4909,7 @@ export interface Decoration {
   biome: BiomeId;
 }
 
-const DECORATION_EXCLUSION_RADIUS = 1.2;
-const DECORATION_EXCLUSIONS = [{ x: 2.456450840458274, z: 211.33819991815835 }];
-
-function isExcludedDecoration(x: number, z: number): boolean {
-  return DECORATION_EXCLUSIONS.some(
-    (p) => Math.hypot(x - p.x, z - p.z) < DECORATION_EXCLUSION_RADIUS,
-  );
-}
+// Shared by render scatter and its collision grid; independent of terrain shaping.
 
 export function zoneBiomeAt(x: number, z: number): BiomeId {
   // Delegates to zoneAt rather than repeating its rect walk over the static

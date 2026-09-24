@@ -645,4 +645,40 @@ export const ENCHANTS: Record<string, EnchantDef> = {
     skillReq: 125,
     requiresPerfected: true,
   },
+  enchant_offhand_spirit: {
+    id: 'enchant_offhand_spirit',
+    name: 'Offhand Etching: Spirit',
+    itemSlot: 'offhand',
+    acquisition: 'drop',
+    skillReq: 40,
+    reagents: [
+      { itemId: 'arcane_dust', count: 3 },
+      { itemId: 'arcane_essence', count: 1 },
+    ],
+    statBonus: { spi: 3 },
+  },
+  enchant_feet_shadowstride: {
+    id: 'enchant_feet_shadowstride',
+    name: 'Boot Etching: Shadowstride',
+    itemSlot: 'feet',
+    acquisition: 'drop',
+    skillReq: 40,
+    reagents: [
+      { itemId: 'arcane_dust', count: 2 },
+      { itemId: 'arcane_essence', count: 1 },
+    ],
+    statBonus: { agi: 2 },
+  },
+  enchant_gloves_forged_might: {
+    id: 'enchant_gloves_forged_might',
+    name: 'Glove Etching: Forged Might',
+    itemSlot: 'gloves',
+    acquisition: 'drop',
+    skillReq: 40,
+    reagents: [
+      { itemId: 'arcane_dust', count: 3 },
+      { itemId: 'arcane_essence', count: 1 },
+    ],
+    statBonus: { str: 3 },
+  },
 };

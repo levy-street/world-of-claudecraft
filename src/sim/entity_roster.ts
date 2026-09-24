@@ -33,6 +33,7 @@ import { recalcPlayerStats } from './entity';
 import { guardAndReportPose, isPosFinite } from './finite_pose_guard';
 import { cancelCorpseHarvestForCorpse } from './professions/corpse_harvest_session';
 import { aurasSurvivingDeath } from './resurrection';
+import { isRiftEntranceTemplate } from './rift/vault_seed';
 import type { SimContext } from './sim_context';
 import type { Entity, SimEvent, Vec3 } from './types';
 import { CAST_COMPLETE_EPS, DT, emptyMoveInput } from './types';
@@ -157,7 +158,7 @@ export function addEntityToRoster(ctx: SimContext, e: Entity): void {
   ctx.grid.insert(e);
   if (e.kind === 'player') ctx.playerGrid.insert(e);
   if (e.templateId === 'dungeon_door' && ctx.dungeonDoorIds) ctx.dungeonDoorIds.push(e.id);
-  if (e.templateId === 'rift_portal' && ctx.riftPortalIds) ctx.riftPortalIds.push(e.id);
+  if (isRiftEntranceTemplate(e.templateId) && ctx.riftPortalIds) ctx.riftPortalIds.push(e.id);
 }
 
 export function dropEntityFromRoster(ctx: SimContext, id: number): void {
@@ -194,7 +195,7 @@ export function dropEntityFromRoster(ctx: SimContext, id: number): void {
   // and reopen for the world's whole lifetime, so an unspliced id would leak
   // (and cost the walk-in scan) forever. Doors are never dropped today, but the
   // registries must stay symmetric either way.
-  if (e.templateId === 'rift_portal' && ctx.riftPortalIds) {
+  if (isRiftEntranceTemplate(e.templateId) && ctx.riftPortalIds) {
     const at = ctx.riftPortalIds.indexOf(id);
     if (at >= 0) ctx.riftPortalIds.splice(at, 1);
   }

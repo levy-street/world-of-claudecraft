@@ -280,6 +280,15 @@ describe('batched canvas nameplate state', () => {
     expect(state.castSource).toBe('fireball');
     expect(state.castLabel).not.toBe('fireball');
 
+    // A scripted mob cast is no ABILITIES row: the plate must still name it
+    // (the bar a player reads to decide an interrupt), never show the raw id.
+    target.castingAbility = 'hoard_cast_fear';
+    painter.update(true);
+    expect(state.castSource).toBe('hoard_cast_fear');
+    expect(state.castLabel).toBe('Terrifying Roar');
+    target.castingAbility = 'fireball';
+    painter.update(true);
+
     target.guild = 'New Banner';
     painter.update(true);
     expect(state.guild).toBe('New Banner');

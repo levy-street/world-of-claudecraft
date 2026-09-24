@@ -625,6 +625,102 @@ parses at a glance, and the register already offers the cogwheel).
   (recipe_<output item id>, the shipped derived contract; ids are never
   player-visible anyway).
 
+### Buried Hoard boss loot (web-verified 2026-09-20)
+
+Scope: the 32 item names `src/sim/content/hoard_loot.ts` mints (each also ships
+as "Tarnished X" and "Sovereign X", the rare-map and legendary-map tiers), plus
+the two tier words themselves. Method per the standing bar: quoted exact-phrase
+search for every name, the coined or distinctive token alone, and an adversarial
+pass against WoW, Diablo, GW2, FFXIV, PoE, RuneScape, EverQuest, Dota and the
+Souls family. No name was an exact full-name match to an item in another game.
+
+Renamed before shipping (ids were never released, so both the id and the display
+name moved):
+
+- **Singularity Band of Nyxaris** became **Collapsar Band of Nyxaris**
+  (collapsar_band_of_nyxaris). "Singularity Band" is an exact Risk of Rain 2 item,
+  a void ring that spawns black holes: same slot word, same theme. "Collapsar" is
+  an astronomy term; nothing surveyed is named "Collapsar Band".
+- **Emberforged Crown** became **Ember-Wrought Crown** (ember_wrought_crown).
+  "Emberforged" as an item word surfaced only in WoW (Emberforged Elementium
+  Boots, Light Emberforged Hammer): the single-game fused token this audit
+  renames. "-wrought" joins our own Masterwrought register.
+- **Silk-Woven Vest of the Venomstalker** became **Woven Vest of the Silkstalker**
+  (silkstalker_woven_vest). WoW has the Naxxramas spider Venom Stalker and the
+  armor piece Venom Stalker's Strap: same spider theme, same armor role.
+- **Bone-Inlaid Pauldrons** became **Bone-Studded Pauldrons**
+  (bone_studded_pauldrons). WoW uses the exact modifier on armor (Bone-Inlaid
+  Legguards, Bone-Inlaid Bracers) and no other game surfaced with it.
+- **Glacial Bulwark of Hoarfrost** became **Glacier-Hewn Bulwark**
+  (glacier_hewn_bulwark). "Glacial Bulwark" is a current WoW Frost mage talent;
+  it is also a Breach Wanderers and a Dulst card, so it was borderline rather
+  than a collision, and it moved anyway. "Glacier-Hewn Bulwark" is zero-hit.
+
+Kept under the bar, recorded as borderline (shared vocabulary across several
+properties, different role from every neighbour):
+
+- **Gale-Strider Boots**: "Galestrider" is a WoW mount family, a Century: Age of
+  Ashes creature and a Prodigy NPC. Ours is a hyphenated adjective on footwear.
+- **Earthshaker Warboots**: "Earthshaker" is Poseidon's epithet, used by WoW PvP
+  shaman sets, a Diablo II unique hammer and a Dota 2 hero. No surveyed item is
+  named "Earthshaker Warboots", "Boots" or "Greaves".
+- **Seal of the Cryptwalker**: EverQuest has Cryptwalker's Ring of Protection;
+  the token is also a Sea of Stars character, an itch.io game and a band. WoW's
+  near neighbours are "Cryptstalker" and the NPC "Crypt Walker", not this token.
+
+Clear with no recorded neighbour worth keeping: the other 24 names.
+
+The tier words: **Tarnished** is an ordinary adjective (Elden Ring uses it as a
+noun for the player character, never as an item prefix; Old School RuneScape
+ships "Tarnished" as an item prefix, so it is shared vocabulary). **Sovereign**
+is generic English and already names our own legendary treasure map, which is
+why the legendary tier uses it. The tier was first drafted as "Gilded" and moved
+for an in-repo reason, not an outside one: "Gilded Treasure Map" is our EPIC
+map, so a Gilded piece from a Sovereign map would have read wrong. One standing
+caution from the sweep: never add "Weathered", "Carved" or "Runed" as further
+tier words beside "Gilded", which would reproduce WoW's upgrade-crest ladder
+(our common map is already "Weathered Treasure Map"; keep it at that).
+
+### Buried Hoard boss mechanics: Ice Age and the pulsars (web-verified 2026-09-20)
+
+Exact-phrase and coined-token searches against the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Ice Age | Hoarfrost's survival cast | KEEP. A geological term and common English; used as a generic spell or card name across many unrelated games, distinctive to none. |
+| Falling Icicle | the icicle's damage line | KEEP. Plain descriptive English. |
+| Bound Pulsar | the attackable orb mob | KEEP. No match. "Pulsar" is an astronomy word; the pairing is ours. |
+| Twin Pulsars | the mechanic | KEEP. No match. |
+| Bound Pulsars | the boss aura | KEEP. No match. |
+| Pulsar Ward | the boss's immunity aura | KEEP. No match. |
+| Pulsar Overload | the phase's deadline cast | KEEP. No match as a named ability ("Beams: Overload" in Star Trek Online is a different phrase). |
+| Pulsar Beam | REJECTED before shipping | A named technology in StarCraft and a named weapon in Homeworld. Replaced. |
+| Pulsar Lance | REJECTED before shipping | A named Aeldari weapon in Warhammer 40,000. Never used. |
+| Tracking Beam | the beam's damage line | KEEP. Plain descriptive English, chosen to replace the two above. |
+
+### Buried Hoard boss mechanics: the forge hammer and the tentacles (web-verified 2026-09-21)
+
+Exact-phrase and coined-token searches against the major game wikis.
+
+| Name | Where | Verdict |
+|---|---|---|
+| Hammer of the Forge | Emberforge's arena cast | KEEP. Plain descriptive English. One match, a level 90 spear in Wynncraft: an item in one game, not a coined term, and nothing of ours resembles it. |
+| Forgefire Ring | the ring's damage line | KEEP. No match for the phrase. "Forgefire" alone is a shared compound (an ability in Total War: Warhammer, an item in a 5th Edition supplement), distinctive to neither. |
+| Tentacles of the Abyss | the Abyssal Maw's arena cast | KEEP. No match as a named ability; plain descriptive English. |
+| Abyssal Tentacle | REJECTED before shipping | A well known weapon in Old School RuneScape, and a gun in Enter the Gungeon. The mob's id keeps the word (ids are never shown); its display name does not. |
+| Tentacle of the Maw | the attackable tentacle mob | KEEP. No match. Named for its owner, the Abyssal Maw. |
+| Abyssal Lash | the line whip's damage line | KEEP. One match, a spell on a tabletop homebrew wiki; adjective plus common noun. |
+| Drowning Sweep | the circular sweep's damage line | KEEP. No match. |
+| Crushing Coil | the grasp's damage line (web-verified 2026-09-21) | KEEP. No match for the phrase. Nearest is "Coil Crush", an attack card in the Chaotic card game: different wording, and both are plain descriptions of a constrictor's squeeze. |
+| Constricted | the held player's root | KEEP. A single common English word. |
+| Rolling Boulder | Warlord Grask's arena cast (web-verified 2026-09-21) | KEEP. Plain descriptive English for a rolling rock, a stock hazard across games and film. One match as a named ability (Earth Spirit in Dota 2, where the hero rides it); ours is a thrown hazard a party answers, and shares nothing but the two common words. |
+| Rooted in Dread | the marked player's root | KEEP. No match. |
+| Crushed / Staggered | the fail stun, and Grask's stun when it is thrown back | KEEP. Single common English words. |
+| Silk Cocoon | the attackable cocoon round a wrapped player (web-verified 2026-09-21) | KEEP. Plain English for the real thing (a silkworm's cocoon); crafting materials of near names exist in several games, none a coined term. |
+| Brood Cocoon | the lone player's attackable cocoon | KEEP. No match. |
+| Cocoon / Cocooned | Vysska's cast and the wrapped player's stun | KEEP. Single common English words. |
+| Draining Silk | her feeding's damage line | KEEP. No match. |
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.
@@ -2325,6 +2421,7 @@ frozen).
 | Marrow and Ash | GENERIC |  | quest:q_dk_marrow_and_ash |
 | Marrow Harvest | GENERIC |  | mobMechanic:rift_boss_necro.bigCast |
 | Marrow Rot | GENERIC |  | mobMechanic:marrowlord_varkas.aoePulse |
+| Marrow Golem | GENERIC |  | mob:rift_marrow_golem |
 | Marrow Troll | GENERIC |  | mob:rift_marrow_troll |
 | Marrowlord Boneboots | GENERIC |  | item:marrowlord_boneboots |
 | Marrowtread Boots | GENERIC |  | item:marrowtread_boots |

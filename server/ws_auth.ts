@@ -16,6 +16,7 @@ import type { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import type { WebSocket, WebSocketServer } from 'ws';
 import { type AccountLedger, freshAccountLedger } from '../src/sim/account_ledger';
+import { worldQuestCycleForResetDay } from '../src/sim/world_quest_rotation';
 import {
   type BankBonusSource,
   DUNGEON_ENTRY_FACING_WIRE_VERSION,
@@ -155,6 +156,7 @@ export interface WsAuthDeps {
   bankBonusForAccount: (
     accountId: number,
   ) => Promise<{ bonusSlots: number; sources: BankBonusSource[] }>;
+  guestPayoutsForCycle: (characterId: number, cycle: string) => Promise<number>;
 }
 
 export interface WsAuthHandlers {
@@ -184,6 +186,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
     acquireCharacterLease,
     releaseCharacterLease,
     bankBonusForAccount,
+    guestPayoutsForCycle,
   } = deps;
 
   // Character ids whose lease-acquire-through-join section is in flight in THIS
@@ -526,6 +529,21 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
               throw err;
             }
             const moderation = chatModerationHydration.resolve(freshModeration);
+            const vaultGuestCycle = worldQuestCycleForResetDay(game.sim.resetDay);
+            let vaultGuestPayouts = 0;
+            try {
+              if (vaultGuestCycle)
+                vaultGuestPayouts = await guestPayoutsForCycle(
+                  admittedCharacter.id,
+                  vaultGuestCycle,
+                );
+            } catch (error) {
+              await releaseCharacterLease(character.id, leaseNonce).catch((releaseError) =>
+                console.error('lease release failed:', releaseError),
+              );
+              leaseNonce = undefined;
+              throw error;
+            }
             result = game.join(
               ws,
               accountId,
@@ -542,6 +560,7 @@ export function createWsAuth(deps: WsAuthDeps): WsAuthHandlers {
                 hotbarLayout: queuedHotbarLayout ?? admittedCharacter.hotbar_layout ?? null,
                 leaseNonce,
                 bankBonus,
+                vaultGuestUsage: { cycle: vaultGuestCycle, payouts: vaultGuestPayouts },
                 mutedUntil: moderation.mutedUntil,
                 reason: moderation.reason,
                 chatStrikes: moderation.strikes,

@@ -18,6 +18,7 @@
 // catalogued: markItemDiscovered already credits the base id, so listing both
 // would double-count completion.
 
+import { HOARD_BASE_ITEM_IDS } from './hoard_loot';
 import { FURY_STOCK, WARFARE_ITEMS } from './pvp_honor';
 import {
   RIFT_EPIC_ITEM_IDS,
@@ -108,11 +109,16 @@ export const RELIQUARY_STORE_SOURCE_ID = 'woc_store' as const;
  *   gates the call on claim.won AND claim.event, so a dev portal never mints).
  *   The hint is rank-agnostic on purpose: every ranked tier, C included, mints
  *   the rings on its event's first clear.
+ * - buried_hoard: src/sim/treasure_vault.ts payOne rolls one piece off the fallen
+ *   keeper's table (content/hoard_loot.ts rollHoardBossDrop) when an entrant
+ *   opens the hoard's reward chest. The piece is never on the keeper's own mob
+ *   loot, so a boss hint would name a door that does not hold it.
  */
 export const RELIQUARY_ACTIVITY_SOURCE_IDS = [
   'corpse_harvest',
   'masterwork_craft',
   'rift_first_clear',
+  'buried_hoard',
 ] as const;
 export type ReliquaryActivitySourceId = (typeof RELIQUARY_ACTIVITY_SOURCE_IDS)[number];
 
@@ -433,10 +439,21 @@ export const RELIQUARY_HORIZON_TITLES = [
   // The farming capstone (the celebrations phase): Harvestmaster pages here
   // per the locked titles-page rule like every non-hidden title deed.
   'prog_farming_100',
+  // The Arcane Calligraphy gold rating (world quests): its Runecaller title
+  // pages here per the locked titles-page rule.
+  'exp_arcane_calligraphy_gold',
   // The Crucible raid's flawless title (the obligations closeout,
   // docs/prd/ignivar-raid-loot.md): every non-hidden title deed pages here
   // per the locked titles-page rule.
   'dgn_varkhul_flawless',
+  // The faction standing Champion titles (world quests): the three vanguard
+  // flavor titles page here per the locked titles-page rule.
+  'prog_rift_watch_champion',
+  'prog_church_order_champion',
+  'prog_automatons_champion',
+  // The Clue Scroll tenth-casket title (world quests, Stage 3): Treasure
+  // Hunter pages here per the locked titles-page rule.
+  'exp_clue_ten_caskets',
 ] as const;
 
 // Profession lifetime mark ids (Phase 7). Prefer existing visited namespaces
@@ -813,7 +830,8 @@ export const RELIQUARY_HEROIC_GEAR = {
 // src/sim/content/rift/themes.ts, loot rows src/sim/content/rift/mobs.ts):
 // the theme boss's fat roll first, then its trash's slim ones in mobs.ts
 // table order. graskbreaker_girdle has one trash carrier (the Warcamp theme
-// shares rift_marrow_troll with Boneyard, whose loot stays bonelord_mantle),
+// keeps rift_marrow_troll, whose loot still carries bonelord_mantle beside the
+// Boneyard's own rift_marrow_golem),
 // pactbound_vestments spans both citadel bosses plus both citadel trash, and
 // pitlords_cleaver is the pit lord's alone.
 const RIFT_RARE_SOURCES = {
@@ -835,6 +853,7 @@ const RIFT_RARE_SOURCES = {
   bonelord_mantle: [
     fromBoss('rift_boss_necro'),
     fromBoss('rift_boneclad'),
+    fromBoss('rift_marrow_golem'),
     fromBoss('rift_marrow_troll'),
   ],
   graskbreaker_girdle: [fromBoss('rift_boss_brute'), fromBoss('rift_stone_ogre')],
@@ -1507,6 +1526,25 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       ...RIFT_EPIC_ITEM_IDS.map((id) => [id, fromRift('B')] as const),
       ...RIFT_LEGENDARY_ITEM_IDS.map((id) => [id, fromRift('S')] as const),
     ),
+  },
+
+  // ---- The Buried Hoards: what the treasure maps dig up ----
+  {
+    id: 'conquerors_buried_hoards',
+    shelf: 'conquerors',
+    name: 'The Buried Hoards',
+    desc: 'Spoils of the hoards the treasure maps lead to, four from each keeper that guards one.',
+    // No clear count: the only counter a hoard moves (clueCasketsOpened) also
+    // counts every Treasure Casket, so it would not be this page's number.
+    clearSource: { kind: 'none' },
+    // One slot per PIECE, never per tier. A piece drops Tarnished, plain or
+    // Sovereign by the map's rarity (content/hoard_loot.ts), and the three are
+    // the same relic the way a heroic_<base> copy is: listing the tiers would
+    // triple the page and make completion mean owning every piece three times.
+    // The plain id is the slot, and the hoard generator folds the other two
+    // tiers onto it (ItemDef.relicOf) at the first-obtain hub. Spread from the
+    // live piece list, keeper by keeper.
+    relics: items(...HOARD_BASE_ITEM_IDS.map((id) => [id, fromActivity('buried_hoard')] as const)),
   },
 
   // ---- Rares of the Realm (Phase 21): every named overworld rare, as marks ----

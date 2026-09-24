@@ -36,13 +36,17 @@ import { ABILITIES } from '../src/sim/data';
 import type { ResolvedAbility } from '../src/sim/sim';
 import type { AbilityDef, Entity } from '../src/sim/types';
 import { Hud } from '../src/ui/hud';
-import { type AimPoint, XHB_ONLY_AIM_SLOT } from '../src/ui/hud/action_bar/ground_aim';
+import {
+  type AimPoint,
+  quickGroundTarget,
+  selectedGroundAimPoint,
+  XHB_ONLY_AIM_SLOT,
+} from '../src/ui/hud/action_bar/ground_aim';
 import { GroundAimController } from '../src/ui/hud/action_bar/ground_aim_controller';
 
 interface GroundAimHarness {
+  playerGroundAim: GroundAimController;
   groundAim: GroundAimController;
-  groundAimSeedTarget(): AimPoint | null;
-  groundTargetAim(): AimPoint;
   sim: {
     player: Entity;
     entities: Map<number, Entity>;
@@ -150,11 +154,16 @@ function makeHud(
   };
   hud.renderer = { setGroundAimReticle: vi.fn() };
   // Mirrors Hud's field initializer, which Object.create(Hud.prototype) skips.
-  hud.groundAim = new GroundAimController({
+  hud.playerGroundAim = new GroundAimController({
     player: () => hud.sim.player,
     resolveAbility: (id) => hud.sim.known.find((k) => k.def.id === id) ?? null,
-    seedTargetPoint: () => hud.groundAimSeedTarget(),
-    fallbackPoint: () => hud.groundTargetAim(),
+    seedTargetPoint: () =>
+      selectedGroundAimPoint(
+        hud.sim.player,
+        hud.sim.entities,
+        hud.optionsHooks?.groundAimTargetAttackable,
+      ),
+    fallbackPoint: () => quickGroundTarget(hud.sim.player, hud.sim.entities),
     castAt: (id, point) => (hud.sim.castAbilityAt as (i: string, p: AimPoint) => void)(id, point),
     clearReticle: () => (hud.renderer.setGroundAimReticle as (r: null) => void)(null),
     projectPlacement: (id, point) =>

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GATHER_NODES } from '../src/sim/data';
+import { GATHER_NODES, WORLD_QUESTS } from '../src/sim/data';
 import type { QuestObjectiveRef } from '../src/sim/quest_targets';
-import type { QuestProgress } from '../src/sim/types';
+import type { QuestProgress, WorldQuestProgress } from '../src/sim/types';
 import { MapMarkerTooltipContent } from '../src/ui/hud/map/map_marker_tooltip_content';
 import { ensureLocaleLoaded, setLanguage } from '../src/ui/i18n';
 import type {
@@ -10,6 +10,7 @@ import type {
   MapNpcMarker,
   MapServiceMarker,
   MapStationMarker,
+  MapWorldQuestMarker,
 } from '../src/ui/map_window_view';
 import type { IWorld } from '../src/world_api';
 
@@ -18,12 +19,17 @@ const GATHER_NODE = GATHER_NODES[0];
 function makeWorld(
   options: {
     questLog?: Map<string, QuestProgress>;
+    worldQuestLog?: Map<string, WorldQuestProgress>;
+    worldQuestExpiresAtMs?: number;
     harvestable?: (nodeId: string) => boolean;
     respawnSeconds?: (nodeId: string) => number | null;
   } = {},
 ): IWorld {
   return {
     questLog: options.questLog ?? new Map(),
+    worldQuestLog: options.worldQuestLog ?? new Map(),
+    worldQuestExpiresAtMs: options.worldQuestExpiresAtMs ?? 0,
+    player: { level: 10 },
     inventory: [],
     gatheringProficiency: {},
     toolEffectSlots: [],
@@ -175,5 +181,60 @@ describe('MapMarkerTooltipContent', () => {
     expect(html).toContain('Wolves at the Door');
     expect(html).toContain('Forest Wolf slain: 8/8');
     expect(html).not.toContain('Stolen Supplies');
+  });
+
+  it('renders a world quest title, live progress, and scaled reward', () => {
+    const quest = WORLD_QUESTS[0];
+    const content = new MapMarkerTooltipContent(
+      makeWorld({
+        worldQuestLog: new Map([[quest.id, { questId: quest.id, count: 2, state: 'active' }]]),
+        worldQuestExpiresAtMs: Date.UTC(2026, 8, 3, 2, 16),
+      }),
+    );
+    const marker = {
+      questId: quest.id,
+      mx: 100,
+      my: 100,
+      radius: 40,
+      state: 'active',
+    } satisfies MapWorldQuestMarker;
+
+    const html = content.worldQuest(marker, Date.UTC(2026, 7, 31, 12, 0));
+
+    expect(html).toContain('<div class="wq-tt">');
+    expect(html).toContain('Eastbrook Vale: Load freight into the wagon');
+    expect(html).toContain('<div class="wq-tt-faction">Church Order</div>');
+    expect(html).toContain(`Load freight into the wagon: 2/${quest.count}`);
+    expect(html).toContain('<div class="wq-tt-rewards-head">Rewards</div>');
+    expect(html).toContain('912 experience');
+    expect(html).toContain('30 Church Order');
+    expect(html).toContain('5 Order Crest');
+    expect(html).toContain(
+      '<span class="wq-tt-label">Time remaining:</span><span>2 days, 14 hours, and 16 minutes</span>',
+    );
+    const semantic = content.worldQuestSemantic(quest.id, Date.UTC(2026, 7, 31, 12, 0));
+    expect(semantic).toContain(`Load freight into the wagon: 2/${quest.count}`);
+    expect(semantic).toContain(
+      'Rewards: 912 experience · +30 Church Order Standing · +5 Order Crest',
+    );
+    expect(semantic).toContain('Expires in 2 days, 14 hours, and 16 minutes');
+  });
+
+  it('embeds the host item card for an item-reward world quest', () => {
+    const quest = WORLD_QUESTS.find((row) => row.reward.type === 'item');
+    if (quest?.reward.type !== 'item') throw new Error('no item-reward world quest');
+    const itemIds: string[] = [];
+    const content = new MapMarkerTooltipContent(makeWorld(), {
+      itemTooltip: (item) => {
+        itemIds.push(item.id);
+        return '<div class="tt-title">host card</div>';
+      },
+    });
+    const html = content.worldQuest(
+      { questId: quest.id, mx: 0, my: 0, radius: 40, state: 'available' },
+      Date.UTC(2026, 7, 31, 12, 0),
+    );
+    expect(itemIds).toEqual([quest.reward.itemId]);
+    expect(html).toContain('<div class="wq-tt-item-card"><div class="tt-title">host card</div>');
   });
 });

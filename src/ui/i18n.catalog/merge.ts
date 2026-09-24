@@ -538,6 +538,44 @@ const mergeStringsEn = {
       rift_storm_strike: "Stormcaller's Wrath",
       rift_tide_execution: 'Abyssal Maw',
       rift_tide_strike: 'Crushing Depth',
+      // Buried Hoard control casts (src/sim/rift/hoard_control_casts.ts): a fear,
+      // stun, silence or hex a hoard mob CASTS, so it can be interrupted.
+      hoard_cast_fear: 'Terrifying Roar',
+      hoard_cast_stun: 'Stunning Blow',
+      hoard_cast_drowning_hook: 'Drowning Hook',
+      hoard_cast_rime_beam: 'Rime Beam',
+      hoard_cast_cinder_bolt: 'Cinder Bolt',
+      hoard_cast_void_empower: 'Void Empowerment',
+      hoard_cast_webbing: 'Webbing',
+      hoard_cast_doom_ritual: 'Doom Ritual',
+      hoard_cast_charge: 'Charge',
+      hoard_cast_silk_snare: 'Silk Snare',
+      hoard_cast_silence: 'Silencing Shriek',
+      hoard_cast_hex: 'Hex',
+      hoard_lightning_strike: 'Lightning Strike',
+      // Hoarfrost's survival cast (src/sim/rift/hoard_ice_age.ts): read, never kicked.
+      hoard_ice_age: 'Ice Age',
+      // Nyxaris's pulsar phase (src/sim/rift/hoard_pulsars.ts): the bar is the
+      // deadline the orbs must die by.
+      hoard_pulsar_overload: 'Pulsar Overload',
+      // Grask's throw (src/sim/rift/hoard_boulder.ts): read and answered, never kicked.
+      hoard_rolling_boulder: 'Rolling Boulder',
+      // The Coinsack Scurrier's bar (src/sim/rift/hoard_goblin.ts): when it ends,
+      // the goblin is gone with the gold. Never kicked.
+      hoard_goblin_escape: 'Escaping',
+      // The cave bosses of the common and rare hoards (hoard_mole.ts, hoard_bat.ts,
+      // hoard_mimic.ts). Only the Deafening Screech can be kicked.
+      hoard_cast_mole_rake: 'Claw Rake',
+      hoard_cast_burrow: 'Burrow',
+      hoard_cast_tunnel: 'Tunneling',
+      hoard_cast_emerge: 'Eruption',
+      hoard_cast_collapse: 'Ceiling Collapse',
+      hoard_cast_bat_dive_aim: 'Plunging Dive',
+      hoard_cast_bat_dive: 'Diving',
+      hoard_cast_screech: 'Deafening Screech',
+      hoard_cast_mimic_bite: 'Voracious Bite',
+      hoard_cast_mimic_leap: 'Crushing Leap',
+      hoard_cast_coin_spit: 'Cursed Coins',
     },
     actionBar: {
       ...abilityStrings.en.abilityUi.actionBar,

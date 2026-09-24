@@ -42,15 +42,30 @@ export interface MailPartitionTransactionPool {
   connect(): Promise<MailPartitionWriteClient & { release(): void }>;
 }
 
+export interface MailPartitionCustodyBake {
+  snapshot(recipientKeys: readonly string[]): string[];
+  deleteIn(
+    query: (text: string, values: unknown[]) => Promise<unknown>,
+    refs: readonly string[],
+  ): Promise<void>;
+  confirm(refs: readonly string[]): void;
+}
+
 export async function writeMailPartitionsInTransaction(
   pool: MailPartitionTransactionPool,
   realm: string,
   partitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
+  custody: MailPartitionCustodyBake,
 ): Promise<void> {
+  if (partitions.length === 0) return;
+  // Capture before the first await. A parcel booked during this write belongs
+  // to a later dirty partition and must not be baked by this transaction.
+  const bakedRefs = custody.snapshot(partitions.map((p) => p.recipientKey));
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
     await writeMailPartitions(client, realm, partitions);
+    await custody.deleteIn((text, values) => client.query(text, values), bakedRefs);
     await client.query('COMMIT');
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
@@ -58,6 +73,7 @@ export async function writeMailPartitionsInTransaction(
   } finally {
     client.release();
   }
+  custody.confirm(bakedRefs);
 }
 
 // The incremental autosave write (#3561): persists ONLY the given recipient

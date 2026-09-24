@@ -10,7 +10,11 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
-import { WOC_MARKET_DELIVERY_LETTER, WOC_MARKET_RETURN_LETTER } from '../src/sim/content/letters';
+import {
+  HOARD_REWARD_LETTER,
+  WOC_MARKET_DELIVERY_LETTER,
+  WOC_MARKET_RETURN_LETTER,
+} from '../src/sim/content/letters';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemInstancePayload } from '../src/sim/types';
 
@@ -46,6 +50,28 @@ function parcelFor(sim: Sim, pid: number, itemId: string): InvSlot {
 }
 
 describe('mailSystemParcel', () => {
+  it('limits new vault escrow while preserving already-booked system parcels', () => {
+    const sim = makeWorld();
+    const recipient = { key: '4242', name: 'Sleeper' };
+    for (let i = 0; i < 32; i++) {
+      expect(sim.canBookVaultRewardMail(4242)).toBe(true);
+      expect(
+        sim.mailSystemParcel(
+          recipient,
+          HOARD_REWARD_LETTER,
+          [{ itemId: 'thorium_ore', count: 1 }],
+          `vault:test:${i}`,
+        ),
+      ).toBe(true);
+    }
+    expect(sim.canBookVaultRewardMail(4242)).toBe(false);
+    expect(sim.postOffice.mail).toHaveLength(32);
+    const pid = sim.addPlayer('warrior', 'Sleeper', { characterId: 4242 });
+    moveToMailbox(sim, pid);
+    sim.mailTake(sim.postOffice.mail[0].id, pid);
+    expect(sim.canBookVaultRewardMail(4242)).toBe(true);
+  });
+
   it('books an instant system letter with the exact payload, deep-cloned and cell-stripped', () => {
     const sim = makeWorld();
     const pid = sim.addPlayer('warrior', 'Buyer');

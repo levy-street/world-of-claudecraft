@@ -24,6 +24,7 @@ import {
   tOptional,
 } from './i18n';
 import { ownEntry } from './known_item';
+import { localizeRiftPlaceName } from './rift_text_i18n';
 
 export type EntityTranslationGroup = 'classAbility' | 'item' | 'itemSet' | 'world';
 export type EntityTranslationKind =
@@ -543,7 +544,10 @@ export function dungeonDisplayName(dungeonId: string): string {
  *  map-window summary format it identically instead of each re-declaring the
  *  same rank ? label ternary. */
 export function riftFloorLabel(name: string, rank: string | null): string {
-  return rank ? t('hud.core.riftLabelRanked', { name, rank }) : t('hud.core.riftLabel', { name });
+  const shown = localizeRiftPlaceName(name) ?? name;
+  return rank
+    ? t('hud.core.riftLabelRanked', { name: shown, rank })
+    : t('hud.core.riftLabel', { name: shown });
 }
 
 export function resetEntityTranslationFallbackLog(): void {

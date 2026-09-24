@@ -405,15 +405,22 @@ describe('the density model covers the shipped world', () => {
       .sort();
     expect(noXp).toEqual([
       'dragonkin_egg',
+      'hoard_abyssal_tentacle',
+      'hoard_bound_pulsar',
+      'hoard_brood_cocoon',
+      'hoard_brood_egg',
+      'hoard_healing_tide_totem',
+      'hoard_silk_cocoon',
       'nythraxis_bone_spike',
       'spider_egg',
       'spider_egg_sac',
       'yumi_cat',
     ]);
-    // Two are camp-spawned: the sac is placed by delve room logic, the ball
-    // and the cat are battleground objectives, and the Nythraxis Bone Spike is
-    // raised by the raid encounter script under an impaled raider, so no camp
-    // cluster can ever hold those and the density model never sees them.
+    // Two are camp-spawned: the sac is placed by delve room logic, the cat is a
+    // battleground objective, the Nythraxis Bone Spike is raised by the raid
+    // encounter script, and the Healing Tide Totem, the Brood Clutch and the Bound
+    // Pulsars are raised by Hoard bosses,
+    // so no camp cluster can ever hold those and the density model never sees them.
     //
     // spider_egg is the second, and it is deliberately NOT added to the
     // dense-by-design exemption: the Broodmother clutch sits in ordinary Widow

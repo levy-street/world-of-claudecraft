@@ -28,6 +28,8 @@
 import * as THREE from 'three';
 import { NYTHRAXIS_GRAVE_ERUPTION_CAST_ID } from '../sim/nythraxis_grave_eruption';
 import type { SimEvent } from '../sim/types';
+import type { HoardBossCueView } from '../world_api/dungeons';
+import { hoardSweepMeteorWarnings } from './hoard_boss_fx_core';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import {
   isNythraxisGraveEruption,
@@ -315,13 +317,14 @@ export class MageGroundFx {
     leanX: 0,
     leanZ: 0,
   };
-  /** The four authoritative warning sources, preallocated: only `rows` is
+  /** The authoritative warning sources, preallocated: only `rows` is
    *  reassigned per frame. Order matches syncWorldMeteorWarnings. */
   private readonly worldWarningSources: MeteorWarningSource[] = [
     { rows: [] },
     { rows: [] },
     { rows: [] },
     { rows: [], ability: NYTHRAXIS_GRAVE_ERUPTION_CAST_ID, school: 'shadow' },
+    { rows: [], ability: 'Hoard Sweep', school: 'fire' },
   ];
 
   constructor(
@@ -619,12 +622,14 @@ export class MageGroundFx {
     activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
     activeVarkhulForgestormWarnings: readonly MeteorWarningState[];
     activeNythraxisGraveEruptions?: readonly MeteorWarningState[];
+    hoardBossCues?: () => readonly HoardBossCueView[];
   }): void {
     const sources = this.worldWarningSources;
     sources[0].rows = world.activeIgnivarMeteors;
     sources[1].rows = world.activeVarkhulAnvilMeteors;
     sources[2].rows = world.activeVarkhulForgestormWarnings;
     sources[3].rows = world.activeNythraxisGraveEruptions ?? EMPTY_WARNINGS;
+    sources[4].rows = hoardSweepMeteorWarnings(world.hoardBossCues?.() ?? []);
     this.syncMeteorWarningSources(sources);
   }
 

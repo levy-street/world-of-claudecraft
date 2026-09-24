@@ -815,8 +815,17 @@ describe('Masterwrought art completion evidence', () => {
     // weapon_icons.test.ts, so their mapping owners are genuine, not fabricated.
     // OSSBrain adds the Goblin Rocket Sled and Rallycart RXT reins owners, and
     // the Viridian Valestrider adds its own; none of the three alter the dated
-    // completion/approval universe below.
-    expect(currentOwnerIds).toHaveLength(1284);
+    // completion/approval universe below (1,284 on the release line).
+    // The world-quest branch adds its two batches (four quest-object icons) at
+    // the release/v0.43.0 merge, the wq-reputation merge adds the 15 faction
+    // quartermaster icons (faction-vendor-icons-2026-09-16), and the Clue
+    // Scroll items add their two (clue-scroll-icons-2026-09-17): 1,305.
+    // The Buried Hoards branch adds the 18 faction reward paintings
+    // (faction-rewards-icons-2026-09-17), the five treasure-map family icons
+    // (buried-hoard-treasure-maps-2026-09-19), and the 96 hoard boss loot
+    // icons (hoard-boss-loot-icons-2026-09-20): 1,424 at the release/v0.44.0
+    // merge into feature/buried-hoards.
+    expect(currentOwnerIds).toHaveLength(1424);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -867,6 +876,51 @@ describe('Masterwrought art completion evidence', () => {
     expect(completionDatedIds).toHaveLength(1209);
 
     const ossBrainMountIds = new Set(['reins_goblin_rocket_sled', 'reins_rallycart_rxt']);
+    // The world-quest branch's two quest-object batches (release/v0.43.0 merge).
+    const worldQuestObjectIds = new Set([
+      'confection_game_box',
+      'leyline_cache',
+      'eastbrook_freight_crate',
+      'eastbrook_freight_wagon',
+    ]);
+    expect(datedIds.filter((id) => worldQuestObjectIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => worldQuestObjectIds.has(id))).toHaveLength(4);
+    // The wq-reputation merge's faction quartermaster stock, one SVG batch
+    // (faction-vendor-icons-2026-09-16): 15 ids, additive the same way.
+    const factionVendorIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'faction-vendor-icons-2026-09-16')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(factionVendorIds.size).toBe(15);
+    expect(datedIds.filter((id) => factionVendorIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => factionVendorIds.has(id))).toHaveLength(15);
+    // The Clue Scroll items, one SVG batch (clue-scroll-icons-2026-09-17): 2
+    // ids, additive the same way.
+    const clueScrollIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => batchId === 'clue-scroll-icons-2026-09-17')
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(clueScrollIds.size).toBe(2);
+    expect(datedIds.filter((id) => clueScrollIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => clueScrollIds.has(id))).toHaveLength(2);
+    // The Buried Hoards branch's three batches (faction reward paintings,
+    // treasure-map family, hoard boss loot): 18 + 5 + 96 = 119 ids, additive
+    // the same way.
+    const hoardBranchBatchIds: readonly (string | undefined)[] = [
+      'faction-rewards-icons-2026-09-17',
+      'buried-hoard-treasure-maps-2026-09-19',
+      'hoard-boss-loot-icons-2026-09-20',
+    ];
+    const hoardBranchIds = new Set(
+      mapping.generatedBatches
+        .filter(({ batchId }) => hoardBranchBatchIds.includes(batchId))
+        .flatMap(({ itemIds }) => itemIds),
+    );
+    expect(hoardBranchIds.size).toBe(119);
+    expect(datedIds.filter((id) => hoardBranchIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => hoardBranchIds.has(id))).toHaveLength(119);
     expect(datedIds.filter((id) => ossBrainMountIds.has(id))).toEqual([]);
     expect(currentOwnerIds.filter((id) => ossBrainMountIds.has(id))).toHaveLength(2);
 
@@ -875,9 +929,11 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds).not.toContain('reins_avian_strider');
     expect(currentOwnerIds).toContain('reins_avian_strider');
 
-    // Strip all six later additive waves (Crucible professions, the Field Kit, the
+    // Strip all the later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
-    // the OSSBrain mount reins, and the Valestrider's reins)
+    // the OSSBrain mount reins, the Valestrider's reins, the world-quest,
+    // faction quartermaster, and Clue Scroll batches, and the Buried Hoards
+    // branch's three batches)
     // back out of the live mapping by their EXACT ids, so the underlying 1,209-item
     // completion union equation below stays isolated to exactly the same set as
     // completionDatedIds above. This filters by the exact ids of those additions only,
@@ -889,6 +945,10 @@ describe('Masterwrought art completion evidence', () => {
         id !== 'field_kit' &&
         !laterGapFillIds.has(id) &&
         !ossBrainMountIds.has(id) &&
+        !worldQuestObjectIds.has(id) &&
+        !factionVendorIds.has(id) &&
+        !clueScrollIds.has(id) &&
+        !hoardBranchIds.has(id) &&
         id !== 'reins_avian_strider',
     );
     expect(completionOwnerIds).toHaveLength(1209);

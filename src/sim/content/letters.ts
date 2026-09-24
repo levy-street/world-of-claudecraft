@@ -171,6 +171,21 @@ export const WOC_MARKET_SOLD_LETTER: LetterDef = {
   delaySeconds: 0,
 };
 
+// A vault reward not collected from its chest reaches the character through
+// the Ravenpost. The actual item copies and coin are attached per clear, so
+// this text stays true for every rarity and party size.
+export const HOARD_REWARD_LETTER: LetterDef = {
+  letterId: 'hoard_vault_reward',
+  senderName: 'The Ravenpost',
+  subject: 'Your vault reward',
+  body:
+    'The vault was cleared, but your share was not collected from the ' +
+    'chest. The ravens have brought it to you here, with the goods and coin ' +
+    'you earned attached.\n\n' +
+    '- The Ravenpost',
+  delaySeconds: 0,
+};
+
 // Quest follow-up letters: the questgiver writes to you a little while after
 // the turn-in. Keyed by quest id; quests without an entry send nothing.
 export const QUEST_LETTERS: Record<string, LetterDef> = {
@@ -584,6 +599,7 @@ export function authoredLettersById(): Record<string, LetterDef> {
     [WOC_MARKET_DELIVERY_LETTER.letterId]: WOC_MARKET_DELIVERY_LETTER,
     [WOC_MARKET_RETURN_LETTER.letterId]: WOC_MARKET_RETURN_LETTER,
     [WOC_MARKET_SOLD_LETTER.letterId]: WOC_MARKET_SOLD_LETTER,
+    [HOARD_REWARD_LETTER.letterId]: HOARD_REWARD_LETTER,
   };
   for (const letter of Object.values(QUEST_LETTERS)) byId[letter.letterId] = letter;
   for (const letter of Object.values(GUILD_TREND_LETTERS)) byId[letter.letterId] = letter;

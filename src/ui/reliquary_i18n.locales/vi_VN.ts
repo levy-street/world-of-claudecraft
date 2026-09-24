@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Rạn Nứt',
     desc: 'Chiến lợi phẩm tiêu biểu của Rạn Nứt luôn đổi thay, từ những nỗi kinh hoàng lang thang tới hai báu vật của cuộc săn hạng S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Kho báu bị chôn vùi',
+    desc: 'Chiến lợi phẩm từ những kho báu mà bản đồ kho báu dẫn tới, bốn món từ mỗi kẻ canh giữ.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Quái Hiếm Của Vương Quốc',
     desc: 'Bằng chứng về mọi quái hiếm có tên đã bị hạ khắp vương quốc.',

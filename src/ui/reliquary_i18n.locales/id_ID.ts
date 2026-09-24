@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Rift',
     desc: 'Rampasan khas dari Rift yang selalu berubah, dari makhluk mengerikan yang berkeliaran sampai dua pusaka buruan peringkat S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Harta Karun Terpendam',
+    desc: 'Rampasan dari harta karun yang ditunjukkan peta harta karun, empat dari setiap penjaga yang menjaganya.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Makhluk Langka Negeri Ini',
     desc: 'Bukti setiap makhluk langka bernama yang ditumbangkan di seluruh negeri.',

@@ -22,6 +22,22 @@ import { DUNGEON_MINIBOSS_STOMP_ABILITY_ID } from '../../sim/mob/dungeon_minibos
 import { VARKHUL_CRUCIBLE_QUAKE_CAST_ID } from '../../sim/mob/healer_channel';
 import { NYTHRAXIS_BONE_SPIKE_ID } from '../../sim/nythraxis_bone_spike';
 import {
+  HOARD_CAST_BAT_DIVE,
+  HOARD_CAST_BAT_DIVE_AIM,
+  HOARD_CAST_BURROW,
+  HOARD_CAST_COIN_SPIT,
+  HOARD_CAST_COLLAPSE,
+  HOARD_CAST_EMERGE,
+  HOARD_CAST_ICE_AGE,
+  HOARD_CAST_MIMIC_BITE,
+  HOARD_CAST_MIMIC_LEAP,
+  HOARD_CAST_MOLE_RAKE,
+  HOARD_CAST_PULSAR_OVERLOAD,
+  HOARD_CAST_SCREECH,
+  HOARD_CAST_TUNNEL,
+  HOARD_GOBLIN_ESCAPE_CAST,
+} from '../../sim/rift/hoard_control_cast_ids';
+import {
   ALL_CLASSES,
   type Entity,
   IGNIVAR_BOSS_ID,
@@ -34,6 +50,13 @@ import {
 } from '../../sim/varkhul_cinder_artificer';
 import { ITEM_WEAPON_VARIANTS } from '../../ui/weapon_variants';
 import type { OverheadEmoteId } from '../../world_api';
+import {
+  HOARD_GESTURE_CALL_HAMMER,
+  HOARD_GESTURE_CALL_STORM,
+  HOARD_GESTURE_EMBER_FRONTAL,
+  HOARD_GESTURE_FROST_GUST,
+  HOARD_GESTURE_ICE_AGE_RELEASE,
+} from '../hoard_boss_gestures_core';
 import type { LocoGaitThresholds } from '../locomotion';
 import { VARKHUL_FORGING_STRIKE_TIMESCALE } from '../varkhul_forge_hammer';
 import { NPC_PROP_SET_IDS, type NpcPropSet } from './npc_looks';
@@ -1194,6 +1217,14 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   bonewrought_bulwark: 'shield_square',
   duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
+  // The Buried Hoard shields, one row per map-rarity tier (the tier clones are
+  // their own items, not heroicOf copies, so none inherits a row).
+  glacier_hewn_bulwark: 'shield_square',
+  rare_glacier_hewn_bulwark: 'shield_square',
+  legendary_glacier_hewn_bulwark: 'shield_square',
+  storm_tuned_buckler: 'shield_round',
+  rare_storm_tuned_buckler: 'shield_round',
+  legendary_storm_tuned_buckler: 'shield_round',
   // The inscription tomes: the first held_offhand item models, procedural GLBs
   // from scripts/assets/inscription_tomes (VAR_BOOK grips). The phase 09 apex
   // grimoire joined the family at phase 18, and with it left the conscious
@@ -1206,6 +1237,7 @@ export const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   bulwark_of_the_inner_crucible: 'shield_square',
   ember_wardens_barrier: 'shield_round',
   votive_ward_of_the_deathless_court: 'shield_round', // Nythraxis gap-fill healer shield
+  templar_dawn_shield: 'shield_square', // Church Order quartermaster's mail shield (faction_vendors.ts)
   varkhul_emberward: 'varkhul_emberward', // Ignivar raid legendary (Varkhul drop)
 };
 
@@ -3759,6 +3791,567 @@ export const VISUALS: Record<string, VisualDef> = {
       death: 'Idle',
     },
   },
+  // Buried Hoard Healing Tide Totem. The quest prop is already a curated,
+  // chunky carved totem and ships without clips, so it uses the static prop lane.
+  mob_healing_tide_totem: {
+    url: 'models/quest/ogre_war_totem.glb',
+    height: 2.5,
+    clips: STATIC_PROP,
+    authoredAtlas: true,
+    tint: 'entity',
+    tintStrength: 0.35,
+    selfIllumination: 0.14,
+  },
+  // Nyxaris's Bound Pulsar (src/sim/rift/hoard_pulsars.ts): an unbound orb holding
+  // its station in the room. This body is the NUCLEUS alone, hovering where the
+  // players can reach it, so targeting, the nameplate and the health bar are the
+  // ordinary ones; its armour, rings, links and beam are drawn round it by
+  // src/render/hoard_pulsars.ts. Original Blender art (docs/design/pulsars/), no
+  // clips, so it uses the static prop lane.
+  mob_bound_pulsar: {
+    url: 'models/creatures/hoard_pulsar_core.glb',
+    height: 1.5,
+    hover: 2.25,
+    clips: STATIC_PROP,
+    selfIllumination: 0.9,
+    clickRadius: 2,
+  },
+  // The Abyssal Maw's tentacle (src/sim/rift/hoard_tentacles.ts). This body is
+  // only the ROOT COLLAR it grows out of, so targeting, the nameplate and the
+  // health bar are the ordinary ones; the living tentacle, bent every frame, is
+  // drawn over it by src/render/hoard_tentacles.ts. Original Blender art
+  // (docs/design/tentacles/), no clips, so it uses the static prop lane. The
+  // click volume is the standing tentacle's, not the collar's.
+  mob_abyssal_tentacle: {
+    url: 'models/creatures/hoard_tentacle_trunk.glb',
+    height: 1.5,
+    clips: STATIC_PROP,
+    selfIllumination: 0.12,
+    clickRadius: 2.2,
+  },
+  // The Buried Hoard (and rift) bosses with a body of their own, generated with
+  // the asset pipeline (scripts/asset_pipeline/, see CREDITS.md) instead of their
+  // family's shared model. Each atlas is authored, so none takes the entity tint.
+  // Their heights are a boss's: about a third over the family models they replace
+  // (playtest), which is a look only, the templates' scale and reach are untouched.
+  // The Abyssal Maw: a four-legged abyssal angler. Tripo's quadruped auto-rig
+  // folded his head under his chest and ships one walk preset, so his skeleton
+  // (with a jaw, a tail, chin tentacles and the lure) and every clip are authored
+  // in Blender: scripts/assets/hoard_bosses/maw_rig.py. Cast is his roar.
+  mob_hoard_abyssal_maw: {
+    url: `${CREATURES}/hoard_abyssal_maw.glb`,
+    height: 2.3,
+    // The generated model faces +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Hoarfrost Warden: generated arms-down and far too top-heavy for the local
+  // KayKit rig, so he rides Tripo's biped rig. Its presets are repaired in Blender
+  // (rigid gauntlet weights, arms relaxed to his sides) and his Attack is an
+  // authored two-fisted slam: see CREDITS.md.
+  mob_hoard_hoarfrost_warden: {
+    url: `${CREATURES}/hoard_hoarfrost_warden.glb`,
+    height: 2.6,
+    // The Tripo rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      jump: 'Jump',
+      // Authored in Blender (scripts/assets/hoard_bosses/frost_fix.py). Ice Age is
+      // his held channel for the whole cast bar; the blast and the Whiteout Gust
+      // frontal are one-shots the cue clock starts (hoard_boss_gestures_core.ts),
+      // played at their authored speed so the key frame meets the hit.
+      castByAbility: { [HOARD_CAST_ICE_AGE]: 'IceAge' },
+      castTimeScaleByAbility: { [HOARD_CAST_ICE_AGE]: 1 },
+      attackByAbility: {
+        [HOARD_GESTURE_FROST_GUST]: 'FrostFrontal',
+        [HOARD_GESTURE_ICE_AGE_RELEASE]: 'IceAgeRelease',
+      },
+      attackTimeScaleByAbility: {
+        [HOARD_GESTURE_FROST_GUST]: 1,
+        [HOARD_GESTURE_ICE_AGE_RELEASE]: 1,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+  },
+  // Emberforge Tyrant, Archon Nyxaris and Tempest Vharok were generated in a
+  // T-pose and rigged locally onto the KayKit skeleton (rig-manual), so they carry
+  // the full KayKit clip vocabulary and real handslot bones.
+  mob_hoard_emberforge_tyrant: {
+    url: `${CREATURES}/hoard_emberforge_tyrant.glb`,
+    height: 2.6,
+    // (The locally rigged bodies carry the knight's clip library: one hit clip.)
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+      // Started off the cue clock (hoard_boss_gestures_core.ts): he thrusts the
+      // maul at the sky to call the Hammer of the Forge (authored,
+      // scripts/assets/hoard_bosses/build_boss_gestures.mjs), and brings it down
+      // on his frontal.
+      attackByAbility: {
+        [HOARD_GESTURE_CALL_HAMMER]: 'CallHammer',
+        [HOARD_GESTURE_EMBER_FRONTAL]: '2H_Melee_Attack_Chop',
+      },
+      attackTimeScaleByAbility: {
+        [HOARD_GESTURE_CALL_HAMMER]: 1,
+        [HOARD_GESTURE_EMBER_FRONTAL]: 1,
+      },
+    },
+    // He carries the hammer he calls down: the held variant of the arena model
+    // (scripts/assets/hoard_bosses/held_forge_maul.mjs).
+    attach: [{ url: `${WEAPONS}/hoard_forge_maul.glb`, bone: 'handslot.r' }],
+    authoredAtlas: true,
+    selfIllumination: 0.45,
+  },
+  // He FLOATS (the generated legs were taken out from under the robe in Blender):
+  // he hovers, and glides on his idle instead of running on legs he does not have.
+  mob_hoard_archon_nyxaris: {
+    url: `${CREATURES}/hoard_archon_nyxaris.glb`,
+    height: 2.4,
+    hover: 0.45,
+    clips: {
+      ...kaykit(['Spellcast_Shoot']),
+      hit: ['Hit_A'],
+      walk: 'Idle',
+      run: 'Idle',
+      walkBack: 'Idle',
+      // The whole Pulsar Overload bar is one held, breathing channel (authored).
+      castByAbility: { [HOARD_CAST_PULSAR_OVERLOAD]: 'PulsarChannel' },
+      castTimeScaleByAbility: { [HOARD_CAST_PULSAR_OVERLOAD]: 1 },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  mob_hoard_tempest_vharok: {
+    url: `${CREATURES}/hoard_tempest_vharok.glb`,
+    height: 2.5,
+    clips: {
+      // He fights bare-clawed: a two-handed weapon chop with empty hands read as a
+      // broken swing, and the dual-wield chop CROSSES the arms, which his long
+      // clawed arms turn into a tangle (both playtest). One arm at a time: a
+      // diagonal rake, a level swipe, a punch.
+      // The open-handed rakes rolled his whole body (playtest): the right-hand punch alone.
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+      // He throws both claws at the sky to call the orbital storm (authored).
+      attackByAbility: { [HOARD_GESTURE_CALL_STORM]: 'CallStorm' },
+      attackTimeScaleByAbility: { [HOARD_GESTURE_CALL_STORM]: 1 },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The hoard rooms' own rank and file (docs/design/boss-rooms/README.md): Tripo
+  // bodies on the shared KayKit rig, so they carry its whole clip vocabulary.
+  // The Abyssal Maw's drowned thrall fights with his hands.
+  mob_hoard_tide_thrall: {
+    url: `${CREATURES}/hoard_tide_thrall.glb`,
+    height: 4.6,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Coinsack Scurrier (src/sim/rift/hoard_goblin.ts): a small goblin under a
+  // huge sack of stolen gold, on the shared KayKit rig. The sack and the face
+  // are made rigid by scripts/assets/hoard_mobs/rigid_pack.mjs. It never
+  // fights; its escape bar keeps it running, so the bar plays the run clip.
+  mob_hoard_coinsack_scurrier: {
+    url: `${CREATURES}/hoard_coinsack_scurrier.glb`,
+    height: 2.0,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+      castByAbility: { [HOARD_GOBLIN_ESCAPE_CAST]: 'Running_A' },
+      castTimeScaleByAbility: { [HOARD_GOBLIN_ESCAPE_CAST]: 1 },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Mother of Mushrooms, the first cave boss of the common and rare hoards
+  // (content/rift/cave_themes.ts). A Tripo body on the shared KayKit rig, but her
+  // arms reach nearly twice as far as the knight's: she is rigged onto a copy of
+  // the rig with longer arms (scripts/assets/hoard_mobs/stretch_arms.mjs), her cap
+  // is made rigid on the head (rigid_pack.mjs) and every loose growth on one bone
+  // (rigid_islands.mjs). She casts her spores with her arms raised.
+  mob_hoard_boss_mushroom: {
+    url: `${CREATURES}/hoard_boss_mushroom.glb`,
+    height: 2.2,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+      cast: 'Spellcast_Raise',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Deeprake, the burrowing mole of the cave hoards (src/sim/rift/hoard_mole.ts):
+  // rigged and animated in Blender (scripts/assets/hoard_mobs/quadruped_rig.py,
+  // specs/hoard_boss_mole.json). His scripted casts play their own clips: the
+  // rake is his claw Attack slowed so the strike lands as the telegraph ends, the
+  // burrow digs in, the tunnel holds him wholly under the floor, the collapse is
+  // his rear-up slam timed to the cast.
+  mob_hoard_boss_mole: {
+    url: `${CREATURES}/hoard_boss_mole.glb`,
+    height: 1.4,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [HOARD_CAST_MOLE_RAKE]: 'Attack',
+        [HOARD_CAST_BURROW]: 'Burrow',
+        [HOARD_CAST_TUNNEL]: 'Underground',
+        [HOARD_CAST_EMERGE]: 'Emerge',
+        [HOARD_CAST_COLLAPSE]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        // The strike (40% into the 0.96 s clip) lands as the 1.8 s telegraph ends.
+        [HOARD_CAST_MOLE_RAKE]: 0.21,
+        [HOARD_CAST_BURROW]: 0.94,
+        [HOARD_CAST_TUNNEL]: 1,
+        [HOARD_CAST_EMERGE]: 1,
+        [HOARD_CAST_COLLAPSE]: 0.72,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Colossal Bat of the cave hoards (src/sim/rift/hoard_bat.ts): rigged and
+  // animated in Blender (scripts/assets/hoard_mobs/bat_rig.py,
+  // specs/hoard_boss_bat.json). It never lands: every clip is a flying pose and
+  // `hover` lifts it (the spec's hoverFrac, 0.35 of its height, which its Death
+  // clip is tuned to so the corpse drops onto the floor). It takes aim flying in
+  // place, dives with its wings folded, and screeches reared back.
+  mob_hoard_boss_bat: {
+    url: `${CREATURES}/hoard_boss_bat.glb`,
+    height: 1.5,
+    hover: 0.525,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [HOARD_CAST_BAT_DIVE_AIM]: 'Walk',
+        [HOARD_CAST_BAT_DIVE]: 'Dive',
+        [HOARD_CAST_SCREECH]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        [HOARD_CAST_BAT_DIVE_AIM]: 1,
+        [HOARD_CAST_BAT_DIVE]: 1,
+        [HOARD_CAST_SCREECH]: 1,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Its swarm: the same body, small and dusky.
+  mob_hoard_bat_swarmling: {
+    url: `${CREATURES}/hoard_boss_bat.glb`,
+    height: 1.5,
+    hover: 0.525,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.2,
+    tint: 0x9a8a8a,
+    tintStrength: 0.5,
+  },
+  // The Voracious Chest of the cave hoards (src/sim/rift/hoard_mimic.ts): rigged
+  // and animated in Blender (scripts/assets/hoard_mobs/mimic_rig.py, which cuts
+  // the lid free along the line of teeth and hinges it at the back). Its bite is
+  // its Attack slowed so the lid snaps shut as the telegraph ends; its leap plays
+  // the Leap clip over the whole crouch and flight (the sim carries it along the
+  // arc); it spits its coins with the lid held open.
+  mob_hoard_boss_mimic: {
+    url: `${CREATURES}/hoard_boss_mimic.glb`,
+    height: 1.6,
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+      castByAbility: {
+        [HOARD_CAST_MIMIC_BITE]: 'Attack',
+        [HOARD_CAST_MIMIC_LEAP]: 'Leap',
+        [HOARD_CAST_COIN_SPIT]: 'Cast',
+      },
+      castTimeScaleByAbility: {
+        // The snap (55% into the 1.04 s clip) lands as the 1.6 s telegraph ends.
+        [HOARD_CAST_MIMIC_BITE]: 0.36,
+        [HOARD_CAST_MIMIC_LEAP]: 0.55,
+        [HOARD_CAST_COIN_SPIT]: 1,
+      },
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Her sporelings: little copies of her (the template scale shrinks them),
+  // washed pale and sickly so they never read as a second Mother.
+  mob_hoard_sporeling: {
+    url: `${CREATURES}/hoard_boss_mushroom.glb`,
+    height: 2.2,
+    clips: { ...kaykit(['2H_Melee_Attack_Chop']), hit: ['Hit_A'] },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+    tint: 0xd8e08a,
+    tintStrength: 0.55,
+  },
+  // Her Bloated Cap (src/sim/rift/hoard_mushroom.ts): a Tripo text-to-model
+  // mushroom, a stationary prop mob with no rig and no clips (registered in
+  // CLIPLESS_RIGS, tests/character_clipmaps.test.ts). Its fuse ring is the
+  // generic hoard cue; it swells toward the burst through its own entity scale
+  // (the sim grows it on the fuse, hoard_mushroom_core.ts bloatSwell).
+  mob_hoard_bloat_cap: {
+    url: `${CREATURES}/hoard_bloat_cap.glb`,
+    height: 2.0,
+    yaw: 0,
+    clips: STATIC_PROP,
+    authoredAtlas: true,
+    selfIllumination: 0.3,
+    clickRadius: 1.4,
+  },
+  // The Maw's bottom-dweller: low, wide, all mouth. Its own Blender rig and clips
+  // (scripts/assets/hoard_mobs/quadruped_rig.py).
+  mob_hoard_deep_lurker: {
+    url: `${CREATURES}/hoard_deep_lurker.glb`,
+    // Height is the top of its lure; the body is about half of it.
+    height: 2.0,
+    // The generated model faces +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Hoarfrost Warden's dead throne guard.
+  mob_hoard_frost_revenant: {
+    url: `${CREATURES}/hoard_frost_revenant.glb`,
+    height: 3.6,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The forge imp: small, wiry, all claws.
+  mob_hoard_ember_fiend: {
+    url: `${CREATURES}/hoard_ember_fiend.glb`,
+    height: 2.9,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The forge brute: a slab of volcanic rock that hits with its fists.
+  mob_hoard_magma_brute: {
+    url: `${CREATURES}/hoard_magma_brute.glb`,
+    height: 4.1,
+    clips: {
+      // The punch wobbled his whole slab of a body (playtest); the chop alone.
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Nyxaris's astronomer cultist.
+  mob_hoard_void_acolyte: {
+    url: `${CREATURES}/hoard_void_acolyte.glb`,
+    height: 4.2,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop', 'Spellcast_Shoot']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vharok's storm shaman.
+  mob_hoard_storm_caller: {
+    url: `${CREATURES}/hoard_storm_caller.glb`,
+    height: 4.4,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop', 'Spellcast_Shoot']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Xarreth's bone-armoured skeleton, shield on his arm.
+  mob_hoard_boneclad_warrior: {
+    url: `${CREATURES}/hoard_boneclad_warrior.glb`,
+    height: 3.5,
+    clips: {
+      ...kaykit(['2H_Melee_Attack_Chop']),
+      hit: ['Hit_A'],
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Nyxaris's eyeless void hound. Own Blender rig and clips (scripts/assets/hoard_mobs/).
+  mob_hoard_dread_stalker: {
+    url: `${CREATURES}/hoard_dread_stalker.glb`,
+    height: 2.5,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vharok's young storm drake. Own Blender rig and clips (scripts/assets/hoard_mobs/).
+  mob_hoard_stormscale_drake: {
+    url: `${CREATURES}/hoard_stormscale_drake.glb`,
+    height: 3.0,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vysska's web-spinner: eight found legs on the side-limb rig (scripts/assets/hoard_mobs/spider_spec.py).
+  mob_hoard_venom_weaver: {
+    url: `${CREATURES}/hoard_venom_weaver.glb`,
+    height: 1.8,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // Vysska's nest beast, a fan of thorns down its back. Own Blender rig and clips.
+  mob_hoard_thornback_stalker: {
+    url: `${CREATURES}/hoard_thornback_stalker.glb`,
+    height: 3.4,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.25,
+  },
+  // The Warden's frost elemental: it floats, and its arms are its only limbs. Tripo read the ice as
+  // steel, so the shipped body is made matte (scripts/assets/hoard_mobs/matte.mjs) and leans on its
+  // entity colour for the blue.
+  mob_hoard_rime_elemental: {
+    url: `${CREATURES}/hoard_rime_elemental.glb`,
+    height: 3.9,
+    // The rig rests facing +x; yaw swings it onto the game's facing.
+    yaw: -Math.PI / 2,
+    clips: {
+      idle: 'Idle',
+      walk: 'Walk',
+      run: 'Run',
+      attack: ['Attack'],
+      hit: ['Hit'],
+      death: 'Death',
+      cast: 'Cast',
+    },
+    authoredAtlas: true,
+    selfIllumination: 0.35,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // Vysska's cocoons (src/sim/rift/hoard_cocoon.ts): the silk cocoon a wrapped
+  // player stands inside, and the brood cocoon she spins for a lone player. Each
+  // is the whole body of its attackable mob, so targeting, the nameplate and the
+  // health bar are the ordinary ones; the web mark, the hanging strand, the
+  // rescue ring and her feeding are drawn by src/render/hoard_cocoon.ts. Original
+  // Blender art (docs/design/cocoon/), no clips, so they use the static prop lane.
+  mob_silk_cocoon: {
+    url: 'models/creatures/hoard_silk_cocoon.glb',
+    height: 3.5,
+    clips: STATIC_PROP,
+    selfIllumination: 0.18,
+    clickRadius: 1.6,
+  },
+  mob_brood_cocoon: {
+    url: 'models/creatures/hoard_brood_cocoon.glb',
+    height: 2.5,
+    clips: STATIC_PROP,
+    selfIllumination: 0.3,
+    clickRadius: 1.7,
+  },
   // Bone Spike (the Nythraxis raid, src/sim/nythraxis_bone_spike.ts): the
   // Tripo cluster of bone spikes erupting from cracked flagstones with violet
   // tips that pins an impaled raider until the raid shatters it. A stationary
@@ -3969,6 +4562,21 @@ const MOB_KEYS: Record<string, string> = {
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
   spider_egg_sac: 'mob_spider_egg_sac',
+  hoard_brood_egg: 'mob_spider_egg_sac',
+  hoard_healing_tide_totem: 'mob_healing_tide_totem',
+  hoard_bound_pulsar: 'mob_bound_pulsar',
+  hoard_abyssal_tentacle: 'mob_abyssal_tentacle',
+  hoard_silk_cocoon: 'mob_silk_cocoon',
+  hoard_brood_cocoon: 'mob_brood_cocoon',
+  hoard_coinsack_scurrier: 'mob_hoard_coinsack_scurrier',
+  // The Mother of Mushrooms and her brood.
+  hoard_boss_mushroom: 'mob_hoard_boss_mushroom',
+  hoard_sporeling: 'mob_hoard_sporeling',
+  hoard_boss_mole: 'mob_hoard_boss_mole',
+  hoard_boss_bat: 'mob_hoard_boss_bat',
+  hoard_bat_swarmling: 'mob_hoard_bat_swarmling',
+  hoard_boss_mimic: 'mob_hoard_boss_mimic',
+  hoard_bloat_cap: 'mob_hoard_bloat_cap',
   // Broodmother clutch (q_broodmother): the destructible eggs reuse the egg-sac
   // model (not a live spider), and the hatchling is a small spider.
   spider_egg: 'mob_spider_egg_sac',
@@ -4104,6 +4712,25 @@ const MOB_KEYS: Record<string, string> = {
   // (mob_demonalt), re-tinted deep red by the templates.
   rift_pact_acolyte: 'mob_dark_caster',
   rift_boss_ritualist: 'rift_ritualist',
+  rift_boss_tide: 'mob_hoard_abyssal_maw',
+  rift_boss_frost: 'mob_hoard_hoarfrost_warden',
+  rift_boss_ember: 'mob_hoard_emberforge_tyrant',
+  rift_boss_arcane: 'mob_hoard_archon_nyxaris',
+  rift_boss_storm: 'mob_hoard_tempest_vharok',
+  rift_tide_thrall: 'mob_hoard_tide_thrall',
+  rift_deep_lurker: 'mob_hoard_deep_lurker',
+  rift_venom_weaver: 'mob_hoard_venom_weaver',
+  rift_thornback: 'mob_hoard_thornback_stalker',
+  rift_rime_elemental: 'mob_hoard_rime_elemental',
+  rift_frost_revenant: 'mob_hoard_frost_revenant',
+  rift_ember_fiend: 'mob_hoard_ember_fiend',
+  rift_magma_brute: 'mob_hoard_magma_brute',
+  rift_void_acolyte: 'mob_hoard_void_acolyte',
+  rift_dread_stalker: 'mob_hoard_dread_stalker',
+  rift_storm_caller: 'mob_hoard_storm_caller',
+  rift_stormscale: 'mob_hoard_stormscale_drake',
+  rift_boneclad: 'mob_hoard_boneclad_warrior',
+  rift_marrow_golem: 'skel_golem',
 };
 
 const FAMILY_KEYS: Record<string, string> = {
@@ -4127,6 +4754,14 @@ const FAMILY_KEYS: Record<string, string> = {
 };
 
 const NPC_KEYS: Record<string, string> = {
+  infiltrator_captain: 'npc_knight',
+  infiltrator_nella: 'npc_knight',
+  infiltrator_orin: 'npc_knight',
+  infiltrator_bram: 'npc_knight',
+  infiltrator_tessa: 'npc_knight',
+  calligraphy_instructor: 'npc_villager_robed',
+  calligraphy_apprentice_1: 'npc_villager',
+  calligraphy_apprentice_2: 'npc_villager',
   bursar_fernando: 'npc_fernando',
   card_master: 'npc_villager_robed',
   marshal_redbrook: 'npc_knight',

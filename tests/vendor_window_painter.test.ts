@@ -1689,3 +1689,39 @@ describe('buy_quantity_prompt_window: force-close backstop and focus landing net
     }
   });
 });
+
+describe('renderVendorWindow faction currencies', () => {
+  it('renders faction currency balance in header and currency price in item row', () => {
+    const goodsRow: VendorGoodsRow = {
+      itemId: 'rift_feather_glider',
+      item: item('rift_feather_glider'),
+      price: {
+        copper: 0,
+        honor: 0,
+        factionMarks: { factionId: 'rift_watch', amount: 15 },
+      },
+      quantity: 1,
+      affordable: true,
+      requirementUnmet: false,
+    };
+    const view: VendorView = {
+      goods: [goodsRow],
+      buyback: [],
+      honorBalance: 0,
+      hasHonorGoods: false,
+      vendorFactionId: 'rift_watch',
+      factionCurrencyBalance: 45,
+      multiple: 1,
+    };
+    const el = document.createElement('div');
+    renderVendorWindow(el, 'Quartermaster Kaelen', view, deps());
+
+    const balance = el.querySelector('.faction-currency-balance');
+    expect(balance).not.toBeNull();
+    expect(balance?.textContent).toContain('Rift Watch Mark: 45');
+
+    const price = el.querySelector('.faction-currency-price');
+    expect(price).not.toBeNull();
+    expect(price?.textContent).toContain('15 Rift Watch Mark');
+  });
+});

@@ -64,7 +64,7 @@ export const DAY_ONLY = false;
  * must advance with the same live grade as the sky dome. Authored interiors
  * keep their own fixed lighting rigs even when they happen to show a sky. */
 export function usesLiveDayNightLighting(fogState: string): boolean {
-  return fogState === 'outdoor' || fogState === 'battleground';
+  return fogState === 'outdoor' || fogState === 'hoardValley' || fogState === 'battleground';
 }
 
 /** The identity grade: the world exactly as its authored daylight rig paints it.

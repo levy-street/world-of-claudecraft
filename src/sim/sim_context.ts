@@ -80,6 +80,7 @@ import type {
   VaultConsumptionReservation,
   VaultConsumptionTake,
   Vec3,
+  WorldQuestDef,
 } from './types';
 
 /** Shared inert success handle for hosts with no durable audit sink. Reused by
@@ -104,7 +105,10 @@ export type RuntimeSimConfig = Required<
     | 'gathererIdentity'
   >
 > &
-  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'>;
+  Pick<SimConfig, 'world' | 'perfLap' | 'respawnSeconds'> & {
+    vaultOpenNeedsSave?: boolean;
+    vaultRewardNeedsSave?: boolean;
+  };
 
 export interface DamageResolution {
   landedHpLoss: number;
@@ -1174,6 +1178,19 @@ export interface SimContextCallbacks {
    *  affordance rather than a plain buff, so the generic aura splice must not
    *  run for it (a carrier's cancel drops the flag; anyone else's is a no-op). */
   bgCancelFlagAura(e: Entity, auraId: string): boolean;
+
+  // World-quest credit and activation seam. Append-only after the prior callback tail.
+  onMobKilledForWorldQuests(mob: Entity, meta: PlayerMeta): void;
+  onNodeGatheredForWorldQuests(node: GatherNodeDef, meta: PlayerMeta): void;
+  onObjectInteractedForWorldQuests(object: Entity, meta: PlayerMeta): boolean;
+  currentWorldQuestRotation(): Readonly<{ cycle: string; quests: readonly WorldQuestDef[] }>;
+  hasActiveWorldQuest(meta: PlayerMeta, questId: string): boolean;
+  completeWorldQuestEscort(
+    meta: PlayerMeta,
+    questId: string,
+    escortId: string,
+    escortee: Entity,
+  ): void;
 }
 
 // The seam consumed by extracted modules.
@@ -1785,6 +1802,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     bgOnPlayerDamaged: host.bgOnPlayerDamaged,
     bgOnPlayerHealed: host.bgOnPlayerHealed,
     bgCancelFlagAura: host.bgCancelFlagAura,
+    onMobKilledForWorldQuests: host.onMobKilledForWorldQuests,
+    onNodeGatheredForWorldQuests: host.onNodeGatheredForWorldQuests,
+    onObjectInteractedForWorldQuests: host.onObjectInteractedForWorldQuests,
+    currentWorldQuestRotation: host.currentWorldQuestRotation,
+    hasActiveWorldQuest: host.hasActiveWorldQuest,
+    completeWorldQuestEscort: host.completeWorldQuestEscort,
   };
 }
 

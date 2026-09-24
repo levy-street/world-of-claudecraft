@@ -18,6 +18,7 @@ import {
   RETIRED_HEROIC_ITEMS,
 } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
+import { HOARD_BASE_ITEM_IDS } from '../src/sim/content/hoard_loot';
 import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../src/sim/content/ignivar_drops';
 import {
   SET_WARFARE_ASHSTALKER,
@@ -373,12 +374,12 @@ describe('Reliquary Conqueror catalog structure', () => {
   it('ships Conquerors + Professions + Horizons (full three-shelf product)', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
-    // set page (the eighth epic armor family).
-    expect(CONQUEROR_PAGES.length).toBe(32);
+    // set page (the eighth epic armor family) + the Buried Hoards page.
+    expect(CONQUEROR_PAGES.length).toBe(33);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(42);
+    expect(RELIQUARY_PAGES.length).toBe(43);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -457,7 +458,14 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
-    expect(full).toEqual({ owned: 441, total: 441 });
+    // The world-quest branch's Arcane Calligraphy gold title joins the titles
+    // page at the release/v0.43.0 merge: 441. The three faction standing
+    // Champion titles (Riftwarden, Dawnkeeper, Forgemaster) join it: 444. The
+    // Clue Scroll Treasure Hunter title joins it: 445. The Buried Hoards page
+    // adds its 32 pieces (one slot per piece, never per tier): 477. The
+    // release's Viridian Valestrider horizons_mounts slot joins at the
+    // release/v0.44.0 merge into feature/buried-hoards: 478.
+    expect(full).toEqual({ owned: 478, total: 478 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -485,7 +493,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
     // deltas, see the overview pair's note above.
-    expect(character).toEqual({ owned: 412, total: 412 });
+    // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
+    // 415 with the three faction standing Champion title slots. 416 with the
+    // Clue Scroll Treasure Hunter title slot. 448 with the 32 Buried Hoard
+    // pieces (character-scoped items). 449 with the release's Viridian
+    // Valestrider mount slot (release/v0.44.0 merge).
+    expect(character).toEqual({ owned: 449, total: 449 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -534,11 +547,16 @@ describe('Reliquary Conqueror catalog structure', () => {
     // OSSBrain candidate side of THIS merge independently adds its own two
     // horizons_mounts slots (goblin_rocket_sled, rallycart_rxt): 488,
     // MEASURED on the merged tree. UNION MERGE: base plus both deltas, see
-    // the completion pair note above.
+    // the completion pair note above. The Arcane Calligraphy gold title adds
+    // one titles-page slot at the release/v0.43.0 merge into feature/world-quests:
+    // 484. The three faction standing Champion titles add three more: 487.
+    // The Clue Scroll Treasure Hunter title adds one more: 488. The Buried
+    // Hoards page adds 32: 520. The release's Viridian Valestrider
+    // horizons_mounts slot joins at the release/v0.44.0 merge: 521.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(484);
+    ).toBe(521);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -766,8 +784,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // 33 Crucible collection items plus the personal Forgebreaker shaping: 319.
     // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
     // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
-    // completion pair note above.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(333);
+    // completion pair note above. Plus the 32 Buried Hoard pieces: 365.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(365);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -2701,6 +2719,10 @@ const ACTIVITY_AWARDS: Readonly<Record<string, readonly string[]>> = {
   // mint literals live in shellForClass); the mint-site arm in the Rift page
   // describe pins it over every class.
   rift_first_clear: RIFT_GEAR_ITEM_IDS,
+  // Derived from the live piece list: treasure_vault.ts payOne rolls one piece
+  // (at the tier the map buys, each tier discovering its piece through
+  // ItemDef.relicOf) when an entrant opens a hoard's reward chest.
+  buried_hoard: HOARD_BASE_ITEM_IDS,
 };
 
 /**
@@ -3054,12 +3076,15 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
-  // Crucible raid's flawless title.
-  horizons_titles: 44,
+  // Crucible raid's flawless title + the three faction standing Champion
+  // titles + the Clue Scroll Treasure Hunter title.
+  horizons_titles: 49,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
-  conquerors_the_rift: 29,
+  conquerors_the_rift: 30,
+  // The one reward-chest activity door, on all 32 pieces.
+  conquerors_buried_hoards: 1,
   // The one first-clear activity door, on all three bands (Phase 21).
   horizons_riftbound: 1,
   // 24 = the 19 rares plus the 5 zones they camp across (vale, marsh, peaks,
@@ -3693,6 +3718,7 @@ describe('Reliquary source hints resolve against live content', () => {
       'corpse_harvest',
       'masterwork_craft',
       'rift_first_clear',
+      'buried_hoard',
     ]);
   });
 

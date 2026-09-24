@@ -1,0 +1,20 @@
+[
+  {
+    "file": "orb_components.glb",
+    "triangles": 1988,
+    "meshes": 4,
+    "bytes": 67676,
+    "pivot": "local center, glTF Y-up",
+    "animation": false,
+    "preview_objects": false
+  },
+  {
+    "file": "impact_components.glb",
+    "triangles": 1484,
+    "meshes": 5,
+    "bytes": 59088,
+    "pivot": "local center, glTF Y-up",
+    "animation": false,
+    "preview_objects": false
+  }
+]

@@ -254,6 +254,34 @@ describe('MailIndex custody-ref presence', () => {
   });
 });
 
+describe('MailIndex vault escrow count', () => {
+  it('stays constant-time on a grown non-vault mailbox and follows take, rekey, and rebuild', () => {
+    const index = new MailIndex<FakeLetter>();
+    for (let id = 1; id <= 10_000; id++) index.track(letter(id, 'alice'), 0);
+    const vault = {
+      ...letter(10_001, 'alice'),
+      letterId: 'hoard_vault_reward',
+      copper: 100,
+      items: [] as unknown[],
+    };
+    index.track(vault, 0);
+    expect(index.vaultEscrowFor('alice')).toBe(1);
+    index.rekey(vault, 'bob', 0);
+    expect(index.vaultEscrowFor('alice')).toBe(0);
+    expect(index.vaultEscrowFor('bob')).toBe(1);
+    vault.copper = 0;
+    index.refreshVaultEscrow(vault, true);
+    expect(index.vaultEscrowFor('bob')).toBe(0);
+    vault.items = [{ itemId: 'ore' }];
+    index.refreshVaultEscrow(vault, false);
+    expect(index.vaultEscrowFor('bob')).toBe(1);
+    index.untrack(vault, 0);
+    expect(index.vaultEscrowFor('bob')).toBe(0);
+    index.rebuild([vault], 0);
+    expect(index.vaultEscrowFor('bob')).toBe(1);
+  });
+});
+
 // #3561's incremental-autosave seam: which recipient keys takeDirty() reports
 // after each kind of mutation. A missed mark here means a real production bug
 // (a mailbox mutation that autosave never persists), so every mutating method

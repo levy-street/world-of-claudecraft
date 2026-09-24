@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Trhlina',
     desc: 'Příznačná kořist proměnlivé Trhliny, od jejích potulných hrůz až po dvojici pokladů z honby za hodností S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Zakopané poklady',
+    desc: 'Kořist z pokladů, ke kterým vedou mapy pokladů, čtyři kusy od každého strážce, který některý hlídá.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Vzácní tvorové říše',
     desc: 'Důkaz o každém pojmenovaném vzácném tvorovi skoleném napříč říší.',

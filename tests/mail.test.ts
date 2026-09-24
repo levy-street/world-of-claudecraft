@@ -5,10 +5,12 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { HEROIC_MARK_ITEM_ID } from '../src/sim/content/dungeon_difficulty';
+import { HOARD_BASE_ITEM_IDS, hoardLootVariantId } from '../src/sim/content/hoard_loot';
 import {
   HEROIC_MARK_LETTER,
+  HOARD_REWARD_LETTER,
   QUEST_LETTERS,
   WELCOME_LETTER,
   WOC_MARKET_DELIVERY_LETTER,
@@ -40,6 +42,93 @@ const MAIL_TEST_WORLD: WorldContent = {
 
 const makeWorld = () =>
   new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: MAIL_TEST_WORLD });
+
+describe('vault reward mail', () => {
+  it('counts a mailed hoard find as world-sourced exactly once', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Owner', { characterId: 77 });
+    const meta = sim.meta(pid)!;
+    const baseId = HOARD_BASE_ITEM_IDS[0];
+    const tierId = hoardLootVariantId(baseId, 'rare');
+    moveToMailbox(sim, pid);
+    expect(
+      sim.mailSystemParcel(
+        { key: '77', name: 'Owner' },
+        HOARD_REWARD_LETTER,
+        [{ itemId: tierId, count: 1 }],
+        'vault:test:77:relic:77',
+      ),
+    ).toBe(true);
+    const letter = sim.postOffice.mail.find((mail) => mail.custodyRef === 'vault:test:77:relic:77');
+    if (!letter) throw new Error('vault relic letter missing');
+    const before = meta.reliquary.counts[baseId] ?? 0;
+    sim.mailTake(letter.id, pid);
+    expect(meta.reliquary.counts[baseId]).toBe(before + 1);
+    sim.mailTake(letter.id, pid);
+    expect(meta.reliquary.counts[baseId]).toBe(before + 1);
+  });
+
+  it('credits the lifetime casket meter once when attachments are first taken', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Owner', { characterId: 77 });
+    const meta = sim.meta(pid)!;
+    moveToMailbox(sim, pid);
+    expect(
+      sim.mailSystemParcel(
+        { key: '77', name: 'Owner' },
+        { ...HOARD_REWARD_LETTER, copper: 123 },
+        [{ itemId: 'thorium_ore', count: 2 }],
+        'vault:test:77:1:77',
+      ),
+    ).toBe(true);
+    const mail = sim
+      .mailInfoFor(pid)
+      ?.messages.find((message) => message.letterId === 'hoard_vault_reward');
+    if (!mail) throw new Error('vault mail missing');
+    const before = meta.clueCasketsOpened ?? 0;
+    sim.mailTake(mail.id, pid);
+    expect(meta.clueCasketsOpened).toBe(before + 1);
+    sim.mailTake(mail.id, pid);
+    expect(meta.clueCasketsOpened).toBe(before + 1);
+    expect(
+      sim.serializeMail().mail.find((message) => message.id === mail.id)?.vaultRewardCredited,
+    ).toBe(true);
+  });
+
+  it('restores only an uncommitted vault letter from its durable parcel', () => {
+    const sim = makeWorld();
+    const pid = sim.addPlayer('warrior', 'Owner', { characterId: 77 });
+    moveToMailbox(sim, pid);
+    const ref = 'vault:test:77:2:77';
+    sim.mailSystemParcel(
+      { key: '77', name: 'Owner' },
+      { ...HOARD_REWARD_LETTER, copper: 123 },
+      [{ itemId: 'thorium_ore', count: 2 }],
+      ref,
+    );
+    const mail = sim
+      .mailInfoFor(pid)
+      ?.messages.find((message) => message.letterId === 'hoard_vault_reward');
+    if (!mail) throw new Error('vault mail missing');
+    expect(sim.postOffice.vaultCustodyRefFor(mail.id, pid)).toBe(ref);
+    sim.mailTake(mail.id, pid);
+    const globalScan = vi.spyOn(sim.postOffice.mail, 'find');
+    expect(
+      sim.postOffice.restoreVaultLetter('77', ref, {
+        recipientName: 'Owner',
+        copper: 123,
+        items: [{ itemId: 'thorium_ore', count: 2 }],
+        read: false,
+      }),
+    ).toBe(true);
+    expect(globalScan).not.toHaveBeenCalled();
+    globalScan.mockRestore();
+    const restored = sim.mailInfoFor(pid)?.messages.find((message) => message.id === mail.id);
+    expect(restored?.copper).toBe(123);
+    expect(restored?.items).toEqual([{ itemId: 'thorium_ore', count: 2 }]);
+    expect(sim.hasCustodyParcel(ref)).toBe(true);
+  });
+});
 
 function moveToMailbox(sim: Sim, pid: number): void {
   const box = sim.entities.get(sim.postOffice.mailboxIds[0]);

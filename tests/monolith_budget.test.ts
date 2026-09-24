@@ -1736,7 +1736,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned 4943 -> 4935: the molten-assembly music row paid for itself by
     // moving the DUNGEON_MUSIC table to dungeon_music_zones.ts. Exact count.
     // Pure location/rift routing moved to music_zones.ts; floor streams reuse the director.
-    ceiling: 4850,
+    // Re-pinned 4850 -> 4720: the world quest minigame layer's three director
+    // hooks were paid for by moving the note-event primitives (the Inst union,
+    // NoteEvent/Theme, and the push* composition helpers) to music_notes.ts.
+    ceiling: 4720,
     seam: 'a src/game sibling module (the refactor/game-music split is the template)',
   },
   {

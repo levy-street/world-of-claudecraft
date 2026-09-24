@@ -12,6 +12,7 @@
 
 import { clearRiftRegion, resolveMovement, setRiftRegion } from '../colliders';
 import { delveChestItemsForTier } from '../content/delves/lockpick_tiers';
+import { HOARD_MIN_LEVEL } from '../content/treasure_maps';
 import {
   DUNGEON_FLOOR_Y,
   isRiftPos,
@@ -30,9 +31,29 @@ import {
 } from '../professions/masterwrought_materials';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
 import type { SimContext } from '../sim_context';
+import { mayEnterVaultPortal, vaultForPortal, vaultScaledTuning } from '../treasure_vault';
 import { DT, dist2d, type Entity, type SimEvent, type Vec3 } from '../types';
 import { isInWaterBody } from '../world';
 import { riftFx } from './fx';
+import { tickHoardAddCasts } from './hoard_add_casts';
+import { hoardBossCueViews, tickHoardBossMechanics } from './hoard_boss';
+import { tickHoardControlCasts } from './hoard_control_casts';
+import {
+  announceHoardGoblin,
+  dropHoardGoblin,
+  maybeSpawnHoardGoblin,
+  tickHoardGoblins,
+} from './hoard_goblin';
+import { rebindVaultEntrant, rememberVaultEntrant } from './hoard_identity';
+import { tickHoardLightningStrikes } from './hoard_lightning_strike';
+import { rescaleVaultForEntrants } from './hoard_rescale';
+import {
+  clearHoardRewardChest,
+  HOARD_REWARD_CHEST_DAIS_GAP,
+  settleHoardRewardChest,
+  spawnHoardRewardChest,
+} from './hoard_reward_chest';
+import { rollHoardReward } from './hoard_reward_roll';
 import {
   RIFT_LOOT_RECOVERY_GRACE,
   RIFT_MIN_LEVEL,
@@ -53,6 +74,7 @@ import {
 import { generateRiftFloor, isSetPieceRift, riftLiftAt } from './rift_gen';
 import { riftLockpickAbort, tickRiftLockpick } from './rift_lockpick';
 import type { RiftInstance, RiftRoller } from './types';
+import { isRiftEntranceTemplate } from './vault_seed';
 
 const PORTAL_TRIGGER_RADIUS = 2.2; // walk this close to a rift portal to use it
 const PYLON_TRIGGER_RADIUS = 3.0; // walk this close to light a rune pylon
@@ -259,6 +281,7 @@ function buildRiftStateEvent(
     name: floor.name,
     themeName: floor.themeName,
     tier: inst.tier,
+    hoardCues: active && hoardBossCueViews(inst).length ? hoardBossCueViews(inst) : undefined,
     expiresAtMs,
   };
 }
@@ -279,8 +302,15 @@ export function riftStateEventFor(ctx: SimContext, pid: number): RiftStateEvent 
   const p = ctx.entities.get(pid);
   if (!p || !isRiftPos(p.pos.x)) return null;
   const inst = riftInstanceAtPos(ctx, p.pos);
-  if (!inst || !inst.memberIds.has(pid)) return null;
+  if (!inst?.memberIds.has(pid)) return null;
   return buildRiftStateEvent(ctx, pid, inst, true);
+}
+
+export function hoardBossCueViewsForPlayer(ctx: SimContext, pid: number) {
+  const player = ctx.entities.get(pid);
+  if (!player) return [];
+  const inst = riftInstanceAtPos(ctx, player.pos);
+  return inst && inst.partyKey !== null ? hoardBossCueViews(inst) : [];
 }
 
 // ---- Floor spawn / teardown -------------------------------------------------
@@ -315,10 +345,13 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   inst.lockpick = null;
   inst.gateId = null;
   inst.switchId = null;
-  inst.gateOpen = floor.gate === null;
+  // A treasure vault is a straight fight: no floor puzzle, no gate, no bonus
+  // cache (its payout is the boss's, src/sim/treasure_vault.ts).
+  inst.gateOpen = floor.gate === null || inst.vault !== null;
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  delete inst.hoardBoss;
 
   // Every rank is stat-scaled: a spawn-time stat transform plus the per-entity
   // mechanic multipliers, mirroring instances/difficulty.ts. C takes the
@@ -326,7 +359,9 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   // descriptor's baseLevel, so every host regenerates it. Boss and trash take
   // DIFFERENT multipliers (rift/ranks.ts), so each spawn resolves its role first.
   const rank = riftRankForBaseLevel(inst.baseLevel);
-  const tuning = riftRankTuningFor(inst.baseLevel);
+  // A vault scales the rank tuning (balanced for a full party) to the head
+  // count its owner brought; an ordinary rift passes through unchanged.
+  const tuning = vaultScaledTuning(riftRankTuningFor(inst.baseLevel), inst.vault);
   for (const spawn of floor.spawns) {
     const template = MOBS[spawn.templateId];
     if (!template) continue;
@@ -334,7 +369,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
     const mob = createMob(
       ctx.nextId++,
       riftRankTemplate(template, tuning, role),
-      spawn.level,
+      inst.vault ? Math.min(spawn.level, inst.vault.level) : spawn.level,
       ctx.groundPos(origin.x + spawn.x, origin.z + spawn.z),
     );
     if (spawn.name) mob.name = spawn.name;
@@ -357,7 +392,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
       // kit SIZE, not about letting mechanics stack).
       mob.riftMechanicSpacing = RIFT_MECHANIC_SPACING_SEC;
       if (!isSetPieceRift(inst.seed, inst.baseLevel)) {
-        mob.riftMechanicLimit = RIFT_RANK_MECHANIC_BUDGET[rank];
+        mob.riftMechanicLimit = inst.vault && spawn.boss ? 0 : RIFT_RANK_MECHANIC_BUDGET[rank];
       }
     }
     // Per-run re-grade: a fresh tint (and a little scale variance) so the same
@@ -384,6 +419,7 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
   };
 
   for (const obj of floor.objects) {
+    if (inst.vault && obj.kind !== 'descent') continue;
     switch (obj.kind) {
       case 'descent':
         // Spawned only once the floor is cleared (see updateRiftInstances).
@@ -435,13 +471,29 @@ function spawnRiftFloor(ctx: SimContext, inst: RiftInstance): void {
 
   // The always-available "way out": a beacon at the floor entry. Walking onto it
   // (or clicking it) returns you to the overworld, so a run is never a trap.
-  inst.beaconId = spawnObj('rift_beacon', 'Rift Beacon', floor.entry.x, floor.entry.z - 3);
+  inst.beaconId = spawnObj(
+    inst.vault ? 'hoard_entrance' : 'rift_beacon',
+    inst.vault ? 'Buried Hoard entrance' : 'Rift Beacon',
+    floor.entry.x,
+    floor.entry.z - 3,
+  );
+  if (inst.vault) {
+    const hatch = ctx.entities.get(inst.beaconId);
+    if (hatch) hatch.vaultRarity = inst.vault.rarity;
+  }
 
   // Rolling-boulder hazards: one entity per lane, staggered along it by `phase`.
   for (const roller of floor.rollers) {
     const z = roller.z0 + (roller.z1 - roller.z0) * roller.phase;
     inst.rollerIds.push(spawnObj('rift_roller', 'Rolling Boulder', roller.x, z));
   }
+
+  // A hoard sometimes holds a Coinsack Scurrier; it runs between the pack spots.
+  maybeSpawnHoardGoblin(
+    ctx,
+    inst,
+    floor.spawns.filter((spawn) => !spawn.boss && !spawn.miniboss),
+  );
 
   inst.emptyFor = 0;
 }
@@ -475,6 +527,8 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
     }
     ctx.dropEntity(id);
   }
+  clearHoardRewardChest(ctx, inst);
+  dropHoardGoblin(ctx, inst);
   dropObjects(ctx, inst.objectIds);
   if (inst.descentId !== null) dropObjects(ctx, [inst.descentId]);
   if (inst.exitId !== null) dropObjects(ctx, [inst.exitId]);
@@ -505,6 +559,7 @@ function freeRiftFloorEntities(ctx: SimContext, inst: RiftInstance): void {
   inst.minibossId = null;
   inst.orbId = null;
   inst.orbActive = false;
+  delete inst.hoardBoss;
   clearRiftBossDeathZones(ctx, inst);
 }
 
@@ -557,16 +612,36 @@ export function enterRift(
   // Gated on the PORTAL path (walk-in + interaction click, which always pass
   // the portal entity); the direct programmatic call stays open for tests.
   // Throttled so standing inside the trigger radius does not spam per tick.
-  if (portal && r.e.level < RIFT_MIN_LEVEL) {
+  // A Buried Hoard opens from level 16 (the daily board's bracket) and its
+  // mobs never outlevel the map's owner (spawnRiftFloor), so its gate is lower.
+  const minLevel = portal?.vaultOwnerPid !== undefined ? HOARD_MIN_LEVEL : RIFT_MIN_LEVEL;
+  if (portal && r.e.level < minLevel) {
     if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
       r.e.riftDeniedAt = ctx.time;
       ctx.error(
         r.meta.entityId,
-        `Only adventurers of level ${RIFT_MIN_LEVEL} or higher may enter this rift.`,
+        `Only adventurers of level ${minLevel} or higher may enter this rift.`,
       );
     }
     return;
   }
+  if (portal?.vaultOpenPending) {
+    if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
+      r.e.riftDeniedAt = ctx.time;
+      ctx.error(r.meta.entityId, 'All rifts are unstable right now. Try again soon.');
+    }
+    return;
+  }
+  // A treasure vault is private: only the map's owner and their party may
+  // step through (src/sim/treasure_vault.ts). Portal path only, like the gate above.
+  if (portal && !mayEnterVaultPortal(ctx, portal, r.meta.entityId)) {
+    if (ctx.time >= (r.e.riftDeniedAt ?? -Infinity) + 4) {
+      r.e.riftDeniedAt = ctx.time;
+      ctx.error(r.meta.entityId, 'This hoard was dug up by another party.');
+    }
+    return;
+  }
+  rebindVaultEntrant(ctx, portal ?? null, r.meta.entityId);
   const key = riftKeyFor(ctx, r.meta.entityId);
   const eventId = portal?.riftEventId ?? null;
   // Death rules (2026-07-21 S-raid playtest): a dead player (ghost) may enter
@@ -651,12 +726,51 @@ export function enterRift(
       ) ?? null;
     if (!inst) return; // a ghost never allocates a fresh run
   } else {
-    // 1. Binding wins over everything, including the entrant's current party.
-    inst =
-      ctx.riftInstances.find(
+    // A won vault is bound to its frozen reward roster, not the current party
+    // or an old entity id. The owner may be entitled without ever entering.
+    // Never allocate a second run for the same completed attempt.
+    if (portal?.vaultAttemptId) {
+      const won = ctx.riftInstances.find(
         (candidate) =>
-          liveMatch(candidate) && candidate.progressed && candidate.memberIds.has(r.meta.entityId),
-      ) ?? null;
+          candidate.partyKey !== null &&
+          candidate.outcome === 'won' &&
+          candidate.portalId === portal.id &&
+          candidate.vault?.attemptId === portal.vaultAttemptId,
+      );
+      if (won) {
+        if (
+          r.meta.characterId === undefined ||
+          !won.vault?.entrantSnapshots?.has(r.meta.characterId)
+        ) {
+          ctx.error(r.meta.entityId, 'This hoard was dug up by another party.');
+          return;
+        }
+        inst = won;
+      }
+    }
+    // 1. Binding wins over everything, including the entrant's current party.
+    if (inst === null)
+      inst =
+        ctx.riftInstances.find(
+          (candidate) =>
+            liveMatch(candidate) &&
+            candidate.progressed &&
+            candidate.memberIds.has(r.meta.entityId),
+        ) ?? null;
+    // A reconnecting vault entrant has already been rebound by durable
+    // character identity. Preserve even an unprogressed room: party teardown
+    // during disconnect must not recycle their still-live vault underneath
+    // the other entrants.
+    if (inst === null && portal?.vaultOwnerCharacterId !== undefined) {
+      inst =
+        ctx.riftInstances.find(
+          (candidate) =>
+            liveMatch(candidate) &&
+            candidate.vault?.ownerCharacterId === portal.vaultOwnerCharacterId &&
+            candidate.memberIds.has(r.meta.entityId),
+        ) ?? null;
+      if (inst) inst.partyKey = key;
+    }
     // 2. The current group's run: exact key match first, then any live run a
     //    CURRENT party member is inside of or bound to (covers party-id churn
     //    and mid-run replacement invites). Entering a progressed run binds the
@@ -746,11 +860,40 @@ export function enterRift(
     inst.portalId = portal?.id ?? null;
     inst.rewarded = false;
     inst.progressed = false;
+    inst.vault = vaultForPortal(ctx, portal ?? null);
     markRiftEventActive(ctx, eventId);
     spawnRiftFloor(ctx, inst);
   }
 
+  // A five-person party can rotate members while a run remains open. Freeze
+  // eligibility to five distinct characters, not five simultaneous pids:
+  // otherwise a sixth reward claim would make the durable outcome invalid and
+  // leave the whole group's chest sealed forever.
+  const entrantId = r.meta.characterId;
+  const snapshots = inst.vault?.entrantSnapshots;
+  if (
+    inst.vault &&
+    entrantId !== undefined &&
+    !snapshots?.has(entrantId) &&
+    (snapshots?.size ?? 0) >= 5
+  ) {
+    ctx.error(r.meta.entityId, 'This hoard has already admitted five adventurers.');
+    return;
+  }
   inst.memberIds.add(r.meta.entityId);
+  rememberVaultEntrant(ctx, inst, r.meta.entityId);
+  // The map owner can have a frozen claim without ever stepping into the
+  // room. On a post-clear return, make that already-entitled share clickable.
+  if (inst.outcome === 'won' && inst.vault?.chest) {
+    const chest = inst.vault.chest;
+    if (!chest.eligible.includes(r.meta.entityId)) chest.eligible.push(r.meta.entityId);
+    const object = ctx.entities.get(chest.entityId);
+    if (object && !chest.pendingSave && !chest.claimed.includes(r.meta.entityId))
+      object.lootable = true;
+  }
+  // A player who joined the owner's party after the door opened walks into a
+  // room scaled for fewer: scale it up to everyone who has entered.
+  rescaleVaultForEntrants(ctx, inst);
 
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
@@ -769,10 +912,13 @@ export function enterRift(
   riftFx(ctx, p.pos.x, p.pos.z, 'arcane', 'burst', 'rift_portal_enter', r.meta.entityId);
   ctx.emit({
     type: 'log',
-    text: `You step through the rift into ${floor.name}.`,
+    text: inst.vault
+      ? `You climb down into ${floor.name}.`
+      : `You step through the rift into ${floor.name}.`,
     color: '#b9f',
     pid: r.meta.entityId,
   });
+  announceHoardGoblin(ctx, inst, r.meta.entityId);
   if (inst.upgrade) {
     const detail = floor.isBoss
       ? inst.upgrade.boss.concept
@@ -879,7 +1025,9 @@ export function leaveRift(ctx: SimContext, pid?: number): void {
   forceExitRiftPlayer(ctx, inst, r.meta.entityId, false);
   ctx.emit({
     type: 'log',
-    text: 'You step back through the rift.',
+    text: inst.vault
+      ? 'You climb back out through the hoard entrance.'
+      : 'You step back through the rift.',
     color: '#b9f',
     pid: r.meta.entityId,
   });
@@ -897,6 +1045,7 @@ function forceExitRiftPlayer(
   if (!p) return;
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   if (!inRiftFloorRegion(p.pos, origin) && forced) return;
+  settleHoardRewardChest(ctx, inst, pid);
   const dest = inst.returnPos;
   // Walk-in grace so the overworld portal cannot re-swallow the player the
   // tick they land next to it (clicking it deliberately still re-enters).
@@ -1208,7 +1357,7 @@ export function updateRiftTriggers(ctx: SimContext, p: Entity): void {
   if (ctx.riftPortalIds === null) {
     ctx.riftPortalIds = [];
     for (const e of ctx.entities.values()) {
-      if (e.templateId === 'rift_portal') ctx.riftPortalIds.push(e.id);
+      if (isRiftEntranceTemplate(e.templateId)) ctx.riftPortalIds.push(e.id);
     }
   }
   for (const portalId of ctx.riftPortalIds) {
@@ -1292,6 +1441,18 @@ export function riftOpenTreasure(ctx: SimContext, objectId: number, pid?: number
 
 function openExit(ctx: SimContext, inst: RiftInstance): void {
   if (inst.exitId !== null) return;
+  if (inst.vault) {
+    inst.exitId = inst.beaconId;
+    for (const pid of instancePlayerIds(ctx, inst)) {
+      ctx.emit({
+        type: 'log',
+        text: 'The hoard is yours. Return to the entrance to climb out.',
+        color: '#fd7',
+        pid,
+      });
+    }
+    return;
+  }
   const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
   const floor = floorForInstance(inst);
   const chest = floor.objects.find((o) => o.kind === 'chest');
@@ -1316,7 +1477,8 @@ function openExit(ctx: SimContext, inst: RiftInstance): void {
   // scan targets it; the pick, not a grab, opens it (see interaction.ts + rift_lockpick).
   // COMPLETION loot, so race losers get the egress but no cache (maintainer
   // decision, 2026-07-30: a loser keeps only what dropped off the mobs).
-  if (inst.outcome !== 'lost') {
+  // A vault's payout is the boss's alone: no sealed lockpick cache either.
+  if (inst.outcome !== 'lost' && !inst.vault) {
     const cache = createGroundObject(
       ctx.nextId++,
       '',
@@ -1395,10 +1557,25 @@ function creditRiftClearDeeds(ctx: SimContext, inst: RiftInstance, participants:
  * open for loot and egress; losing the race only forfeits the first-clear
  * extras, never the run. Returns true when this run is decided and should get
  * its exit spawned. */
+/** Where the hoard's reward chest stands: in front of the dais, the room's own
+ *  reward anchor, clear of the boss's corpse and of the way home behind it. */
+function hoardRewardChestPos(inst: RiftInstance): { x: number; z: number } {
+  const origin = riftInstanceOrigin(inst.slot, inst.floorIndex);
+  const dais = floorForInstance(inst).layout.dais;
+  return { x: origin.x + dais.x, z: origin.z + dais.z - HOARD_REWARD_CHEST_DAIS_GAP };
+}
+
 function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | null): boolean {
   if (inst.rewarded) return inst.outcome !== 'active';
   const present = instancePlayerIds(ctx, inst);
-  const participants = present.length > 0 ? present : [...inst.memberIds];
+  // A hoard belongs to everyone who entered it, including the map's owner
+  // after they have stepped outside. The remaining party may finish the run
+  // without silently dropping an earlier entrant from the reward chest.
+  const participants = inst.vault
+    ? [...inst.memberIds]
+    : present.length > 0
+      ? present
+      : [...inst.memberIds];
   creditRiftClearDeeds(ctx, inst, participants);
   const claim = claimRiftFirstClear(ctx, inst, participants);
   if (!claim.won) {
@@ -1413,9 +1590,52 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   inst.rewarded = true;
   inst.outcome = 'won';
   inst.finishedAt = ctx.time;
+  if (inst.vault?.attemptId && inst.vault.ownerCharacterId && ctx.cfg.vaultRewardNeedsSave) {
+    const claims = [...(inst.vault.entrantSnapshots?.values() ?? [])].map((entrant) => {
+      const reward = rollHoardReward(ctx.rng, {
+        rarity: inst.vault!.rarity,
+        bossTemplateId: boss?.templateId,
+        cls: entrant.cls,
+        level: entrant.level,
+        owner: entrant.characterId === inst.vault!.ownerCharacterId,
+        guestCapped: entrant.guestCapped,
+        mountOwned: entrant.mountOwned,
+      });
+      inst.vault!.rewardClaims ??= new Map();
+      inst.vault!.rewardClaims.set(entrant.characterId, reward);
+      return {
+        characterId: entrant.characterId,
+        recipientName: entrant.name,
+        items: reward.items.map((item) => ({ ...item })),
+        copper: reward.copper,
+        ...(entrant.characterId === inst.vault!.ownerCharacterId
+          ? {}
+          : { guestCycle: entrant.guestCycle }),
+      };
+    });
+    ctx.emit({
+      type: 'treasureVaultOutcomePending',
+      attemptId: inst.vault.attemptId,
+      ownerCharacterId: inst.vault.ownerCharacterId,
+      claims,
+    });
+  }
   // Rank-gated payout on the corpse (every winning clear, ranked or dev): C a
   // guaranteed themed rare + coin, B/A/S the epic ladder. No Heroic Marks.
-  if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
+  // A treasure vault pays its own table to every entrant instead (the rank
+  // gear ladder would make a daily map a raid-gear faucet).
+  // The hoard pays through a chest the entrants open (hoard_reward_chest.ts);
+  // an unopened share is settled the moment its owner leaves.
+  if (inst.vault)
+    spawnHoardRewardChest(
+      ctx,
+      inst,
+      participants,
+      hoardRewardChestPos(inst),
+      boss?.templateId,
+      !!ctx.cfg.vaultRewardNeedsSave && !!inst.vault.attemptId,
+    );
+  else if (boss) addRiftClearGearLoot(ctx, boss, inst.baseLevel);
 
   // A cleared rift seals its way in: no LIVING entrant may ever walk into a
   // finished run and farm it (enterRift denies every one the moment the event
@@ -1425,7 +1645,7 @@ function completeRiftClear(ctx: SimContext, inst: RiftInstance, boss: Entity | n
   // in for their corpse loot; this arm covers portals outside the race (dev
   // portals), which carry no such recovery window and whose entity would
   // otherwise stay open forever.
-  if (!claim.event && inst.portalId !== null) {
+  if (!claim.event && !inst.vault && inst.portalId !== null) {
     if (ctx.entities.has(inst.portalId)) ctx.dropEntity(inst.portalId);
     inst.portalId = null;
   }
@@ -1680,6 +1900,11 @@ export function liftRiftEntities(ctx: SimContext): void {
     if (inst.descentId !== null) lift(inst.descentId);
     if (inst.exitId !== null) lift(inst.exitId);
     if (inst.cacheId !== null) lift(inst.cacheId);
+    // A hoard's reward chest is not a rift object (it belongs to the vault), and
+    // it stands on the dais tier like everything else: without this it spawned
+    // at ground height, under the raised floor of a common or rare hoard, and
+    // only its prompt was reachable (playtest).
+    if (inst.vault?.chest) lift(inst.vault.chest.entityId);
   }
 }
 
@@ -1747,6 +1972,11 @@ export function updateRiftInstances(ctx: SimContext): void {
       clearRiftBossDeathZones(ctx, inst);
     }
   }
+  tickHoardBossMechanics(ctx);
+  tickHoardControlCasts(ctx);
+  tickHoardLightningStrikes(ctx);
+  tickHoardAddCasts(ctx);
+  tickHoardGoblins(ctx);
   if (ctx.tickCount % 20 !== 0) return; // once a second
   for (const inst of ctx.riftInstances) {
     if (inst.partyKey === null) continue;
@@ -1816,8 +2046,9 @@ export function updateRiftInstances(ctx: SimContext): void {
     if (floor.isBoss) {
       // Clears are claimed AFTER this loop, in boss-death order (see below).
     } else if (!inst.descentOpen) {
-      const puzzleDone =
-        floor.puzzle.kind === 'rune_pylons'
+      const puzzleDone = inst.vault
+        ? true
+        : floor.puzzle.kind === 'rune_pylons'
           ? inst.litPylons.size >= inst.pylonTotal
           : inst.puzzleSolved;
       if (trashCleared(ctx, inst) && puzzleDone) openDescent(ctx, inst);

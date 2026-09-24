@@ -17,7 +17,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -31,9 +31,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1009,
-      "state": "8c23abf5",
-      "events": "afa35e79",
+      "nextId": 1013,
+      "state": "e711d990",
+      "events": "8a3da7fd",
       "rng": {
         "draws": 5,
         "digest": "b85de2ee"
@@ -79,13 +79,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -111,6 +113,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -152,12 +156,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -187,6 +193,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -202,7 +210,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -215,7 +223,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 999947,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -267,7 +275,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 999986,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -308,7 +316,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -319,7 +327,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -358,9 +366,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1010,
-      "state": "e4b1c668",
-      "events": "99bd0656",
+      "nextId": 1014,
+      "state": "f470d17d",
+      "events": "71c2fa11",
       "rng": {
         "draws": 10,
         "digest": "c8a57c95"
@@ -406,13 +414,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -438,6 +448,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -479,12 +491,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -514,6 +528,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -529,7 +545,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -538,7 +554,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -551,7 +567,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 999870,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -603,7 +619,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "comboUntil": -1,
@@ -614,7 +630,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 999970,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -655,7 +671,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -666,7 +682,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -701,7 +717,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -712,7 +728,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -750,9 +766,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1011,
-      "state": "6806627c",
-      "events": "3623c9f2",
+      "nextId": 1015,
+      "state": "cc4dfd44",
+      "events": "3ac092ee",
       "rng": {
         "draws": 13,
         "digest": "d051f004"
@@ -798,13 +814,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -830,6 +848,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -871,12 +891,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -906,6 +928,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -921,7 +945,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -930,7 +954,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -943,7 +967,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -995,7 +1019,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             },
             {
               "breaksOnDamage": true,
@@ -1005,7 +1029,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1010,
+              "sourceId": 1014,
               "value": -0.564087
             }
           ],
@@ -1017,7 +1041,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1058,7 +1082,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -1069,7 +1093,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1104,7 +1128,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -1115,7 +1139,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1149,7 +1173,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -1161,7 +1185,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1010,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1200,8 +1224,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1012,
-      "state": "1f0413fe",
+      "nextId": 1016,
+      "state": "9cfd70b2",
       "events": "741638a5",
       "rng": {
         "draws": 15,
@@ -1248,13 +1272,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -1280,6 +1306,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1321,12 +1349,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -1356,6 +1386,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -1371,7 +1403,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -1380,7 +1412,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -1393,7 +1425,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1445,7 +1477,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             },
             {
               "breaksOnDamage": true,
@@ -1455,7 +1487,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1010,
+              "sourceId": 1014,
               "value": -0.564087
             }
           ],
@@ -1467,7 +1499,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1508,7 +1540,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -1519,7 +1551,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -1554,7 +1586,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -1565,7 +1597,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -1599,7 +1631,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -1611,7 +1643,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1010,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -1657,7 +1689,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -1698,8 +1730,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1013,
-      "state": "da276adb",
+      "nextId": 1017,
+      "state": "e5a73bef",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -1746,13 +1778,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -1778,6 +1812,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1819,12 +1855,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -1854,6 +1892,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -1869,7 +1909,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -1878,7 +1918,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -1891,7 +1931,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1943,7 +1983,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             },
             {
               "breaksOnDamage": true,
@@ -1953,7 +1993,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1010,
+              "sourceId": 1014,
               "value": -0.564087
             }
           ],
@@ -1965,7 +2005,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2006,7 +2046,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -2017,7 +2057,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2052,7 +2092,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -2063,7 +2103,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2097,7 +2137,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -2109,7 +2149,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1010,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2155,7 +2195,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2203,7 +2243,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1012,
+          "id": 1016,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2239,9 +2279,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1014,
-      "state": "100f66bf",
-      "events": "59e9db9e",
+      "nextId": 1018,
+      "state": "345df986",
+      "events": "4f5f359a",
       "rng": {
         "draws": 16,
         "digest": "b3c83c71"
@@ -2287,13 +2327,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -2319,6 +2361,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2360,12 +2404,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -2395,6 +2441,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -2410,7 +2458,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -2419,7 +2467,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -2432,7 +2480,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2484,7 +2532,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             },
             {
               "breaksOnDamage": true,
@@ -2494,7 +2542,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1010,
+              "sourceId": 1014,
               "value": -0.564087
             }
           ],
@@ -2506,7 +2554,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2547,7 +2595,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -2558,7 +2606,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2593,7 +2641,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -2604,7 +2652,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -2638,7 +2686,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -2650,7 +2698,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1010,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -2696,7 +2744,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2744,7 +2792,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1012,
+          "id": 1016,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -2776,7 +2824,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "flee",
           "combatTimer": 99.05,
           "comboUntil": -1,
@@ -2789,7 +2837,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 1013,
+          "id": 1017,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -2825,8 +2873,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1014,
-      "state": "c2416a38",
+      "nextId": 1018,
+      "state": "3d5ec955",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -2873,13 +2921,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -2905,6 +2955,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2946,12 +2998,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -2981,6 +3035,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -2996,7 +3052,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -3005,7 +3061,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -3018,7 +3074,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3070,7 +3126,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             },
             {
               "breaksOnDamage": true,
@@ -3080,7 +3136,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1010,
+              "sourceId": 1014,
               "value": -0.564087
             }
           ],
@@ -3092,7 +3148,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3133,7 +3189,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -3144,7 +3200,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3179,7 +3235,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -3190,7 +3246,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -3224,7 +3280,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -3236,7 +3292,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1010,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -3282,7 +3338,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3330,7 +3386,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1012,
+          "id": 1016,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3362,7 +3418,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -3376,7 +3432,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 1013,
+          "id": 1017,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3412,8 +3468,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1014,
-      "state": "c2416a38",
+      "nextId": 1018,
+      "state": "3d5ec955",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -3460,13 +3516,15 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -3492,6 +3550,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -3533,12 +3593,14 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factionCurrencies": {},
+          "factions": {},
           "gatheringProficiency": {},
           "harvestPreference": {
             "kind": "all"
@@ -3568,6 +3630,8 @@
           "vault": {
             "stock": {}
           },
+          "vaultAttemptDurable": true,
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -3583,7 +3647,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             },
             {
               "duration": 1.5,
@@ -3592,7 +3656,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             }
           ],
           "blockChance": 0.05,
@@ -3605,7 +3669,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3657,7 +3721,7 @@
               "name": "Shuddering Stomp",
               "remaining": 1.5,
               "school": "physical",
-              "sourceId": 1009
+              "sourceId": 1013
             },
             {
               "breaksOnDamage": true,
@@ -3667,7 +3731,7 @@
               "name": "Keening Wail",
               "remaining": 3,
               "school": "shadow",
-              "sourceId": 1010,
+              "sourceId": 1014,
               "value": -0.564087
             }
           ],
@@ -3679,7 +3743,7 @@
           "fiveSecondRule": 99,
           "healPower": 13,
           "hp": 1000000,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3720,7 +3784,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -3731,7 +3795,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1357,
-          "id": 1008,
+          "id": 1012,
           "inCombat": true,
           "kind": "mob",
           "level": 6,
@@ -3766,7 +3830,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
@@ -3777,7 +3841,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2171,
-          "id": 1009,
+          "id": 1013,
           "inCombat": true,
           "kind": "mob",
           "level": 20,
@@ -3811,7 +3875,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 99.05,
@@ -3823,7 +3887,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 2277,
-          "id": 1010,
+          "id": 1014,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -3869,7 +3933,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3917,7 +3981,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 96,
-          "id": 1012,
+          "id": 1016,
           "kind": "mob",
           "level": 5,
           "lootFfaTimer": "Infinity",
@@ -3949,7 +4013,7 @@
           }
         },
         {
-          "aggroTargetId": 1006,
+          "aggroTargetId": 1010,
           "aiState": "flee",
           "combatTimer": 99.1,
           "comboUntil": -1,
@@ -3963,7 +4027,7 @@
           "hasFled": true,
           "hostile": true,
           "hp": 20,
-          "id": 1013,
+          "id": 1017,
           "inCombat": true,
           "kind": "mob",
           "level": 6,

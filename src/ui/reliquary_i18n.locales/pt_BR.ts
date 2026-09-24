@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'A Fenda',
     desc: 'Espólios marcantes da Fenda mutável, dos seus horrores errantes aos dois tesouros da caça de grau S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Os tesouros enterrados',
+    desc: 'Espólios dos tesouros aos quais os mapas do tesouro levam, quatro de cada guardião que protege um.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Raros do Reino',
     desc: 'Prova de cada raro nomeado abatido por todo o reino.',

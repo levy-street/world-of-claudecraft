@@ -1,7 +1,7 @@
 // The durable per-parcel custody overlay (server/mail_custody_overlay.ts):
 // SQL shapes against a mocked pool, the snapshot/bake set semantics that keep
-// a row alive until its parcel is provably inside a committed full-book
-// write, the accounting watermark's advance gate, and the boot merge driven
+// a row alive until its recipient's partition is durably written, the
+// historical whole-book watermark's advance gate, and the boot merge driven
 // against a REAL Sim post office, because the replay-through-book-once-dedupe
 // is exactly what a fake book would paper over. The transaction-level
 // contract (one client, ordered statements, rollback keeps refs) is proven
@@ -24,8 +24,12 @@ import {
   advanceCustodyWatermarkIn,
   CUSTODY_PARCEL_LETTERS,
   confirmBakedCustodyRefs,
+  confirmCustodyParcelBooked,
   custodyOverlayStats,
   deleteBakedCustodyRefsIn,
+  insertCustodyParcelRowIn,
+  MAIL_CUSTODY_PARCELS_SCHEMA,
+  MAIL_PARTITION_CUSTODY_BAKE,
   MERGE_MAX_PAGES,
   MERGE_PAGE_LIMIT,
   mergeCustodyParcelOverlay,
@@ -34,6 +38,7 @@ import {
   resetCustodyParcelOverlayForTests,
   snapshotPendingCustodyRefs,
 } from '../../server/mail_custody_overlay';
+import { writeMailPartitionsInTransaction } from '../../server/mail_db';
 import { REALM } from '../../server/realm';
 import { Sim } from '../../src/sim/sim';
 
@@ -57,6 +62,13 @@ beforeEach(() => {
 });
 
 describe('persistCustodyParcelRow', () => {
+  it('migrates old custody tables with a zero-default copper column', () => {
+    expect(MAIL_CUSTODY_PARCELS_SCHEMA).toMatch(/copper BIGINT NOT NULL DEFAULT 0/);
+    expect(MAIL_CUSTODY_PARCELS_SCHEMA).toMatch(
+      /ALTER TABLE mail_custody_parcels ADD COLUMN IF NOT EXISTS copper BIGINT NOT NULL DEFAULT 0/,
+    );
+  });
+
   it('writes one idempotent realm-scoped row per parcel, keyed by custodyRef', async () => {
     await persistCustodyParcelRow(row('settlement:9'));
     expect(query).toHaveBeenCalledTimes(1);
@@ -72,12 +84,200 @@ describe('persistCustodyParcelRow', () => {
       'Buyer',
       'delivery',
       JSON.stringify(GOOD_ITEMS),
+      0,
     ]);
     expect(snapshotPendingCustodyRefs()).toEqual(['settlement:9']);
+  });
+
+  it('accepts an identical durable retry and never rekeys a conflicting ref', async () => {
+    const original = row('same-ref');
+    query.mockResolvedValueOnce({ rows: [], rowCount: 1 });
+    await persistCustodyParcelRow(original);
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    query.mockResolvedValueOnce({ rows: [{ recipient_key: original.recipient.key }] });
+    await persistCustodyParcelRow(original);
+    const verifySql = query.mock.calls[2][0];
+    expect(verifySql).toMatch(/items = \$6::jsonb/);
+    expect(verifySql).toMatch(/copper = \$7/);
+
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    query.mockResolvedValueOnce({ rows: [] });
+    await expect(
+      persistCustodyParcelRow({ ...original, recipient: { key: 'other', name: 'Other' } }),
+    ).rejects.toThrow('Conflicting');
+    expect(snapshotPendingCustodyRefs([original.recipient.key])).toEqual(['same-ref']);
+    expect(snapshotPendingCustodyRefs(['other'])).toEqual([]);
+  });
+
+  it('refuses a vanished duplicate row instead of tracking an unverified bake', async () => {
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    query.mockResolvedValueOnce({ rows: [] });
+    await expect(persistCustodyParcelRow(row('missing'))).rejects.toThrow('missing');
+    expect(snapshotPendingCustodyRefs()).toEqual([]);
+  });
+
+  it('pins copper in a vault parcel and rejects a retry with a different amount', async () => {
+    const reward = { ...row('vault:1:4242'), letter: 'vault_reward' as const, copper: 275 };
+    query.mockResolvedValueOnce({ rows: [], rowCount: 1 });
+    await persistCustodyParcelRow(reward);
+    expect(query.mock.calls[0][1]).toEqual([
+      reward.custodyRef,
+      REALM,
+      '4242',
+      'Buyer',
+      'vault_reward',
+      JSON.stringify(GOOD_ITEMS),
+      275,
+    ]);
+
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    query.mockResolvedValueOnce({ rows: [] });
+    await expect(persistCustodyParcelRow({ ...reward, copper: 276 })).rejects.toThrow(
+      'Conflicting',
+    );
+    expect(snapshotPendingCustodyRefs()).toEqual([reward.custodyRef]);
+  });
+
+  it('refuses negative or fractional copper before issuing a database query', async () => {
+    await expect(persistCustodyParcelRow({ ...row('bad:1'), copper: -1 })).rejects.toThrow(
+      'copper',
+    );
+    await expect(persistCustodyParcelRow({ ...row('bad:2'), copper: 1.5 })).rejects.toThrow(
+      'copper',
+    );
+    await expect(
+      persistCustodyParcelRow({ ...row('bad:3'), copper: Number.MAX_SAFE_INTEGER + 1 }),
+    ).rejects.toThrow('copper');
+    expect(query).not.toHaveBeenCalled();
+  });
+
+  it('lets a caller book on its transaction client and tracks only after commit', async () => {
+    const reward = { ...row('vault:tx:4242'), letter: 'vault_reward' as const, copper: 275 };
+    const txQuery = vi.fn<TestQuery>().mockResolvedValue({ rows: [], rowCount: 1 });
+    await insertCustodyParcelRowIn(txQuery, reward);
+    expect(query).not.toHaveBeenCalled();
+    expect(txQuery).toHaveBeenCalledTimes(1);
+    expect(snapshotPendingCustodyRefs()).toEqual([]);
+    confirmCustodyParcelBooked(reward);
+    expect(snapshotPendingCustodyRefs()).toEqual([reward.custodyRef]);
   });
 });
 
 describe('the bake set', () => {
+  it('does not replay a parcel collected before its first partition save', async () => {
+    const ref = 'settlement:claimed-before-save';
+    let overlayRow: Record<string, unknown> | null = null;
+    query.mockImplementation(async (sql, values) => {
+      if (sql.includes('INSERT INTO mail_custody_parcels')) {
+        overlayRow = {
+          custody_ref: values?.[0],
+          recipient_key: values?.[2],
+          recipient_name: values?.[3],
+          letter: values?.[4],
+          items: JSON.parse(String(values?.[5])),
+          copper: values?.[6],
+        };
+        return { rows: [], rowCount: 1 };
+      }
+      if (sql.includes('SELECT custody_ref')) {
+        return { rows: overlayRow ? [overlayRow] : [], rowCount: overlayRow ? 1 : 0 };
+      }
+      return { rows: [], rowCount: 0 };
+    });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Buyer', {
+      characterId: 4242,
+      tutorialGreetingSent: true,
+    });
+    const parcel = row(ref);
+    expect(
+      sim.mailSystemParcel(parcel.recipient, CUSTODY_PARCEL_LETTERS.delivery, parcel.items, ref),
+    ).toBe(true);
+    await persistCustodyParcelRow(parcel);
+    const mailbox = sim.entities.get(sim.postOffice.mailboxIds[0]);
+    const player = sim.entities.get(pid);
+    if (!mailbox || !player) throw new Error('mailbox or player missing');
+    player.pos = { ...mailbox.pos };
+    player.prevPos = { ...mailbox.pos };
+    sim.rebucket(player);
+    const letter = sim.postOffice.mail.find((mail) => mail.custodyRef === ref);
+    if (!letter) throw new Error('custody letter missing');
+    sim.mailTake(letter.id, pid);
+    sim.mailDelete(letter.id, pid);
+    expect(sim.players.get(pid)?.inventory.some((slot) => slot.itemId === 'rusty_hatchet')).toBe(
+      true,
+    );
+    const savedBook = sim.serializeMail();
+    const writer = {
+      connect: async () => ({
+        query: async (sql: string, values?: unknown[]) => {
+          if (sql.includes('DELETE FROM mail_custody_parcels')) {
+            if (Array.isArray(values?.[0]) && values[0].includes(ref)) overlayRow = null;
+          }
+          return { rows: [], rowCount: 1 };
+        },
+        release: () => {},
+      }),
+    };
+    await writeMailPartitionsInTransaction(
+      writer,
+      REALM,
+      sim.takeDirtyMailPartitions(),
+      MAIL_PARTITION_CUSTODY_BAKE,
+    );
+    expect(overlayRow).toBeNull();
+
+    resetCustodyParcelOverlayForTests();
+    const reboot = new Sim({ seed: 43, playerClass: 'warrior', noPlayer: true });
+    reboot.loadMail(savedBook);
+    expect((await mergeCustodyParcelOverlay(reboot)).replayed).toBe(0);
+    expect(reboot.hasCustodyParcel(ref)).toBe(false);
+  });
+
+  it('never bakes a recipient whose mailbox was not in the partition write', async () => {
+    await persistCustodyParcelRow(row('a'));
+    await persistCustodyParcelRow({ ...row('b'), recipient: { key: 'other', name: 'Other' } });
+    expect(snapshotPendingCustodyRefs(['4242'])).toEqual(['a']);
+    expect(snapshotPendingCustodyRefs(['other'])).toEqual(['b']);
+    expect(snapshotPendingCustodyRefs()).toEqual(['a', 'b']);
+  });
+
+  it('a partial write leaves another recipient replayable after restart', async () => {
+    await persistCustodyParcelRow(row('a'));
+    await persistCustodyParcelRow({ ...row('b'), recipient: { key: 'other', name: 'Other' } });
+    const writer = {
+      connect: async () => ({
+        query: async () => ({ rows: [], rowCount: 1 }),
+        release: () => {},
+      }),
+    };
+    await writeMailPartitionsInTransaction(
+      writer,
+      REALM,
+      [{ recipientKey: '4242', letters: [] }],
+      MAIL_PARTITION_CUSTODY_BAKE,
+    );
+    expect(snapshotPendingCustodyRefs()).toEqual(['b']);
+
+    resetCustodyParcelOverlayForTests();
+    query.mockResolvedValueOnce({ rows: [], rowCount: 0 });
+    query.mockResolvedValueOnce({
+      rows: [
+        {
+          custody_ref: 'b',
+          recipient_key: 'other',
+          recipient_name: 'Other',
+          letter: 'delivery',
+          items: GOOD_ITEMS,
+          copper: 0,
+        },
+      ],
+    });
+    const reboot = new Sim({ seed: 44, playerClass: 'warrior', noPlayer: true });
+    expect((await mergeCustodyParcelOverlay(reboot)).replayed).toBe(1);
+    expect(reboot.hasCustodyParcel('b')).toBe(true);
+  });
+
   it('deletes exactly the snapshot on the writer client; refs booked after it stay pending', async () => {
     await persistCustodyParcelRow(row('a'));
     await persistCustodyParcelRow(row('b'));
@@ -117,6 +317,7 @@ describe('the bake set', () => {
     const [sql, params] = query.mock.calls[0];
     expect(sql).toMatch(/DELETE FROM mail_custody_parcels/);
     expect(sql).toMatch(/created_at < now\(\) - \(\$1 \|\| ' days'\)::interval/);
+    expect(sql).toMatch(/letter <> 'vault_reward'/);
     expect(sql).toMatch(/LIMIT \$2/);
     expect(params).toEqual(['30', 500]);
   });
@@ -178,8 +379,50 @@ describe('mergeCustodyParcelOverlay', () => {
       recipient_name: 'Buyer',
       letter,
       items,
+      copper: 0,
     }));
   }
+
+  it('replays a vault reward with its exact coin and items into the real post office', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({
+      rows: [{ ...overlayRows(['vault:1:4242'], 'vault_reward')[0], copper: '275' }],
+    });
+    const first = await mergeCustodyParcelOverlay(sim);
+    expect(first).toEqual({ replayed: 1, present: 0, refused: 0, stale: 0, ok: true });
+    expect(sim.postOffice.mail).toHaveLength(1);
+    expect(sim.postOffice.mail[0]).toMatchObject({
+      custodyRef: 'vault:1:4242',
+      letterId: 'hoard_vault_reward',
+      copper: 275,
+    });
+    expect(sim.postOffice.mail[0].items.map((item) => item.itemId)).toEqual(['rusty_hatchet']);
+
+    resetCustodyParcelOverlayForTests();
+    mockStaleDelete(0);
+    query.mockResolvedValueOnce({
+      rows: [{ ...overlayRows(['vault:1:4242'], 'vault_reward')[0], copper: '275' }],
+    });
+    expect((await mergeCustodyParcelOverlay(sim)).present).toBe(1);
+    expect(sim.postOffice.mail).toHaveLength(1);
+  });
+
+  it('keeps an unsafe copper row for operator recovery rather than rounding its reward', async () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      mockStaleDelete(0);
+      query.mockResolvedValueOnce({
+        rows: [{ ...overlayRows(['vault:unsafe'], 'vault_reward')[0], copper: '9007199254740992' }],
+      });
+      expect((await mergeCustodyParcelOverlay(sim)).refused).toBe(1);
+      expect(sim.postOffice.mail).toHaveLength(0);
+      expect(snapshotPendingCustodyRefs()).toEqual([]);
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
 
   /** First query of every merge: the in-SQL watermark cutoff DELETE. */
   function mockStaleDelete(rowCount: number) {
@@ -409,6 +652,9 @@ describe('bake and merge wiring order', () => {
   const gameSrc = stripComments(
     readFileSync(path.resolve(process.cwd(), 'server/game.ts'), 'utf8'),
   );
+  const vaultSrc = stripComments(
+    readFileSync(path.resolve(process.cwd(), 'server/vault_game_services.ts'), 'utf8'),
+  );
 
   it('saveMailState snapshots at entry; bake and watermark ride the book transaction', () => {
     const body = boundedBody(dbSrc, 'export async function saveMailState', '\nexport ');
@@ -443,13 +689,13 @@ describe('bake and merge wiring order', () => {
     expect(confirmAt).toBeGreaterThan(commitAt);
   });
 
-  it('the atomic leave-path save bakes and advances inside the fenced transaction', () => {
+  it('the atomic leave-path save bakes only written recipients without a global watermark', () => {
     const body = boundedBody(
       dbSrc,
       'export async function saveCharacterAndMarketState',
       '\nexport ',
     );
-    const snapshotAt = body.indexOf('snapshotPendingCustodyRefs()');
+    const snapshotAt = body.indexOf('snapshotPendingCustodyRefs(');
     const firstAwaitAt = body.indexOf('await ');
     const deleteAt = body.indexOf('deleteBakedCustodyRefsIn(');
     const advanceAt = body.indexOf('advanceCustodyWatermarkIn(');
@@ -458,19 +704,39 @@ describe('bake and merge wiring order', () => {
     // abort-driven pg_cancel_backend, so the commit goes through it too.
     const commitAt = body.indexOf('await transaction.commit()');
     const confirmAt = body.indexOf('confirmBakedCustodyRefs(');
-    for (const at of [snapshotAt, firstAwaitAt, deleteAt, advanceAt, commitAt, confirmAt]) {
+    for (const at of [snapshotAt, firstAwaitAt, deleteAt, commitAt, confirmAt]) {
       expect(at).toBeGreaterThan(-1);
     }
-    // Snapshot at entry, before the first await; the DELETE and the advance
-    // inside the transaction; the confirm on the committed arm only, so
+    // Snapshot at entry, before the first await; the DELETE is inside the
+    // transaction, and confirm is on the committed arm only, so
     // neither the fence-refused false arm nor a rollback can forget a
-    // pending ref.
+    // pending ref. A partial mailbox write cannot advance a realm watermark.
     expect(snapshotAt).toBeLessThan(firstAwaitAt);
-    expect(deleteAt).toBeLessThan(advanceAt);
-    expect(advanceAt).toBeLessThan(commitAt);
+    expect(body).toContain('mailPartitions.map((partition) => partition.recipientKey)');
+    expect(deleteAt).toBeLessThan(commitAt);
+    expect(advanceAt).toBe(-1);
     expect(confirmAt).toBeGreaterThan(commitAt);
     expect(body.split('deleteBakedCustodyRefsIn(')).toHaveLength(2);
     expect(body.split('confirmBakedCustodyRefs(')).toHaveLength(2);
+  });
+
+  it('the periodic save supplies the recipient-scoped custody hooks', () => {
+    const body = boundedBody(dbSrc, 'export async function saveMailPartitions', '\nexport ');
+    expect(body).toContain(
+      'writeMailPartitionsInTransaction(pool, REALM, partitions, MAIL_PARTITION_CUSTODY_BAKE)',
+    );
+    const mailDb = stripComments(
+      readFileSync(path.resolve(process.cwd(), 'server/mail_db.ts'), 'utf8'),
+    );
+    const writer = boundedBody(
+      mailDb,
+      'export async function writeMailPartitionsInTransaction',
+      '\nexport ',
+    );
+    expect(writer).toContain('custody.snapshot(partitions.map((p) => p.recipientKey))');
+    expect(writer).toContain('custody.deleteIn(');
+    expect(writer).toContain('custody.confirm(bakedRefs)');
+    expect(writer).not.toContain('advanceCustodyWatermarkIn');
   });
 
   it('serializeMail is a deep snapshot: later book mutations cannot reach written bytes', () => {
@@ -518,11 +784,21 @@ describe('bake and merge wiring order', () => {
     // permit) so a dirty-book character save cannot invert against a periodic
     // mail save, and it still carries the profiler sample through.
     expect(gameSrc).toMatch(
-      /await writeDirtyMailPartitions<TickProfilerSample>\(\s*this\.sim,\s*\(write, context\) => this\.enqueueBackgroundMarketWrite\(write, context\),\s*false,\s*sample,\s*\)/,
+      /await writeDirtyMailPartitions<TickProfilerSample>\(\s*this\.sim,\s*\(write, context\) => this\.enqueueBackgroundMarketWrite\(write, context\),\s*false,\s*sample,\s*this\.vault\.guard\.blocked,\s*\)/,
     );
-    expect(gameSrc).toContain('mailPartitionsForRearm = this.sim.takeDirtyMailPartitions()');
+    // The vault-aware drain is composed in server/vault_game_services.ts
+    // (captureMailSave); the coordinator keeps the rearm handle.
+    expect(gameSrc).toContain('vaultMail = this.vault.captureMailSave(session, withMarket);');
+    expect(gameSrc).toContain('mailPartitionsForRearm = vaultMail.partitions;');
+    expect(vaultSrc).toContain('const partitions = takeMailPartitionsForCharacterSave(');
     expect(gameSrc).toMatch(
-      /saveCharacterAndMarketState\(\s*session\.characterId,\s*snap\.level,\s*snap,\s*this\.sim\.serializeMarket\(\),\s*mailPartitionsForRearm,/,
+      /saveCharacterAndMarketState\(\s*session\.characterId,\s*snap\.level,\s*snap,\s*withMarket \? this\.sim\.serializeMarket\(\) : null,\s*mailPartitionsForRearm,/,
     );
+    expect(gameSrc).toContain('const withMarket = opts.withMarket === true;');
+    expect(gameSrc).toMatch(
+      /case 'mail_take':\s*if \(typeof msg\.id === 'number'\) this\.vault\.mailTake\(session, msg\.id\);/,
+    );
+    expect(gameSrc).toContain('save: (session) => this.saveCharacter(session),');
+    expect(vaultSrc).toContain('() => this.host.save(session),');
   });
 });

@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "batch": {
+    "id": "buried-hoard-treasure-maps-2026-09-19",
+    "acceptedDate": "2026-09-19",
+    "rasterGenerator": "OpenAI built-in image generation",
+    "useCase": "stylized-concept",
+    "attempts": 5,
+    "retries": 0,
+    "owner": "World of ClaudeCraft",
+    "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+  },
+  "scope": {
+    "acceptedAuditAssets": 5,
+    "itemPaintings": 5,
+    "addedItemPaintings": 5,
+    "replacedItemPaintings": 0,
+    "supersessions": 0
+  },
+  "contracts": {
+    "item": {
+      "width": 128,
+      "height": 128,
+      "maxBytes": 15360,
+      "alpha": "opaque"
+    }
+  },
+  "styleContracts": {
+    "item": {
+      "id": "woc-item-icon-v1",
+      "document": "docs/design/item-icon-art-style.md"
+    }
+  },
+  "targetSets": {
+    "items": [
+      "cartographers_ink",
+      "treasure_map_common",
+      "treasure_map_rare",
+      "treasure_map_epic",
+      "treasure_map_legendary"
+    ]
+  },
+  "prompt": {
+    "shared": "Use case: stylized-concept. Asset type: one opaque square fantasy MMORPG inventory item icon for World of ClaudeCraft, item style contract woc-item-icon-v1. Premium hand-painted classic fantasy MMO inventory art with tactile materials, crisp focal edges, softer peripheral brushwork, warm top-left key light, cool deep bottom-right shadow, a complete centered silhouette, safe padding and an opaque dark painted vignette. No text, pseudo-writing, label, UI border, rarity frame, watermark, transparency, person, portal, crop or photorealism.",
+    "cartographers_ink": "Paint Cartographer's Ink as one stout old glass bottle filled with deep midnight blue-black ink, sealed by worn cork. A short clean feather quill rests through a brass neck loop, a tiny rolled blank parchment strip is tied to the bottle, and one simple compass-star emblem is embossed directly in the glass. It must read first as ink, not a potion or explosive.",
+    "treasure_map_common": "Paint the Weathered Treasure Map as one old partly unrolled cream parchment map with frayed dirt-smudged paper, faded green cord, a few broad dark route marks and one bold red X. Keep the common quality modest and practical.",
+    "treasure_map_rare": "Paint the Inked Treasure Map as one carefully inked partly unrolled parchment with dark blue coastlines, a broad dotted route, one bold red X, navy cord and a compact blue wax seal. Keep it practical but visibly finer than the common map.",
+    "treasure_map_epic": "Paint the Gilded Treasure Map as one luxurious partly unrolled parchment with subtle hammered gold caps and edge, rich purple cord, amethyst-purple wax seal, broad map lines, a dotted route and one bold red X. Use restrained purple and gold accents without a baked border.",
+    "treasure_map_legendary": "Paint the Sovereign Treasure Map as one magnificent royal partly unrolled parchment with aged gold end caps and corners, burnt orange silk cord, amber-orange wax seal with a simple crown-like compass emblem, fine broad cartographic lines, a dotted route and one bold red X. Make it legendary at a glance without overwhelming glow."
+  },
+  "references": [
+    {
+      "path": "public/ui/items/clue_scroll.webp",
+      "bytes": 1720,
+      "sha256": "529772bc60e21e63bc5631aa8da440bd252c1a13ebe09235036b2cedcf201768",
+      "role": "Supplied reference for scroll readability and small-size composition"
+    },
+    {
+      "path": "public/ui/items/linen_pouch.webp",
+      "bytes": 3534,
+      "sha256": "b526923bf6aa8e9c06395c80fcb97f3bdbe87e0f1f5a55eee4217f7389b08937",
+      "role": "Supplied reference for tactile hand-painted materials and the dark vignette"
+    },
+    {
+      "path": "public/ui/items/eastbrook_buckler.webp",
+      "bytes": 3286,
+      "sha256": "2c4d58c9050f1fdfd88b4e3aacbeeb90e4b859709145bee38be3db380685e156",
+      "role": "Supplied reference for controlled highlights and focal edge treatment"
+    },
+    {
+      "path": "public/ui/items/firebottle.webp",
+      "bytes": 2636,
+      "sha256": "c3965ddb8daa75ba1b8eb5adb75845ac3220e2eb2af0f5db3ad8d28cebd7b122",
+      "role": "Supplied reference for the Cartographer's Ink bottle silhouette and contained liquid"
+    }
+  ],
+  "processing": [
+    "Retained every generated original byte for byte in ignored local provenance staging",
+    "Sharp rotate; exact 512x512 fit fill Lanczos3; sRGB; PNG compression 9 with adaptive filtering",
+    "npm run assets:items: canonical 128px opaque WebP at quality 82, all outputs below 15 KiB"
+  ],
+  "review": {
+    "reviewer": "parent",
+    "sizesInspected": [512, 128, 40, 28, 22],
+    "sheetPath": "tmp/imagegen/buried-hoard-treasure-maps-2026-09-19/review/size-review.png",
+    "sheetRetention": "Local only; tmp is gitignored. Regenerate from the retained originals if needed.",
+    "verdict": "Accepted. Every item has a distinct readable silhouette and material tier at bag size. The four maps remain one visual family, the red X stays readable, and the ink reads as a cartography tool."
+  },
+  "assets": [
+    {
+      "kind": "item",
+      "id": "cartographers_ink",
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/cartographers_ink.webp",
+      "acceptedSha256": "abd1cc58c590e0f76f2f0097036ab3c1dddc482d5676d0a45a4dd1feb000b61b",
+      "acceptedBytes": 3182,
+      "masterSha256": "7a9063667579add58d2c84bf16e4604b431b49c7268f4b898dc8d769748d6d5f",
+      "sourceSha256": "ae44d5773aa0e0e9bbdcf2a115945ec6133a93c72602c7f5365f8a425560fa3e"
+    },
+    {
+      "kind": "item",
+      "id": "treasure_map_common",
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/treasure_map_common.webp",
+      "acceptedSha256": "911696b105aae5d1ef56825f1eee65d36e6e92117b97d54635a1b598dd1e8907",
+      "acceptedBytes": 3376,
+      "masterSha256": "eef01c6961c7f6bbef09caa20c09a0e592475a592dfed16618f89d0c74f2756d",
+      "sourceSha256": "186028bb51db678c4d1380d3693f141fe30d6c4c20f2e506e16094fecd25bd84"
+    },
+    {
+      "kind": "item",
+      "id": "treasure_map_rare",
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/treasure_map_rare.webp",
+      "acceptedSha256": "59fd8be0e2d504b6ca808c287e9023eaf478e6cbad67a0a7f7b1556adba6114b",
+      "acceptedBytes": 4094,
+      "masterSha256": "2c5ce33a023a5c430d1132348a70accb710f8972ce83062cd21bf959db442a80",
+      "sourceSha256": "8d9c803c9d07b20683479349e8d70e093e984e258a47ff04452ee767dca9f788"
+    },
+    {
+      "kind": "item",
+      "id": "treasure_map_epic",
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/treasure_map_epic.webp",
+      "acceptedSha256": "cabac10b91fbd4d2351f16195820580d3519ac4ec7733ddb8d37d5812bf883a7",
+      "acceptedBytes": 3728,
+      "masterSha256": "e4e358867af89e3922cc7f8c37f4d1bc924c2f79bcbfb22dc708c549f7fd4c0f",
+      "sourceSha256": "004d77736238075e7eda746acfa9b240a270928180245a6e88f599a3ccbf5201"
+    },
+    {
+      "kind": "item",
+      "id": "treasure_map_legendary",
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "change": "added-painting",
+      "runtimeUrl": "/ui/items/treasure_map_legendary.webp",
+      "acceptedSha256": "2e09d704746254d5859997f0ab65b0205fbf9a9006eb3363f52d029e4e07b3a5",
+      "acceptedBytes": 4426,
+      "masterSha256": "749cecd390f5a455ff33331cf4e4a6b17c391d00894209b9c8837050f6f9c366",
+      "sourceSha256": "d38649930a7695105f3b3319cebd48199d31114e43e06e096a6de7c72cd6ecc0"
+    }
+  ]
+}

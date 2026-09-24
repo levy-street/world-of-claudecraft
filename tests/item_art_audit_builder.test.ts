@@ -846,32 +846,41 @@ describe('item-art audit builder', () => {
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
-    // Viridian Valestrider: measured again with its reins icon, 1284 / 1302.
+    // Clue Scrolls (2026-09-17): measured again on the tree carrying the 15
+    // faction quartermaster items (which landed without moving this block)
+    // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
+    // the sha/bytes straight from `--verify-only` on this tree.
+    // The release's own arm measured the Viridian Valestrider reins at
+    // 1284 / 1302. At the release/v0.44.0 merge into feature/buried-hoards the
+    // tree carries both arms plus the Buried Hoards branch's 18 faction reward
+    // paintings, five treasure-map family icons and 96 hoard boss loot
+    // paintings: 1424 / 1442 on 34 sheet pages, the sha/bytes straight from
+    // `--verify-only` on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '79595f2b1b56601456e75cc242c8c2fd1dc9942a4c3d1c3900327927a3e0db51',
-      catalogBytes: 699669,
+      catalogSha256: '04e91e35f492b6974cd679b8aa6cfcd4027b88b3a841a40956792cb7e1b06648',
+      catalogBytes: 778846,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1284,
-      liveItemCount: 1302,
+      catalogCount: 1424,
+      liveItemCount: 1442,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
       groupCount: 25,
-      sheetPageCount: 31,
-      sheetCount: 248,
+      sheetPageCount: 34,
+      sheetCount: 272,
       sheetModeCounts: {
-        '128-color': 31,
-        '40-color': 31,
-        '28-color': 31,
-        '22-color': 31,
-        '28-grayscale': 31,
-        '64-circle': 31,
-        'small-multiview': 31,
-        identity: 31,
+        '128-color': 34,
+        '40-color': 34,
+        '28-color': 34,
+        '22-color': 34,
+        '28-grayscale': 34,
+        '64-circle': 34,
+        'small-multiview': 34,
+        identity: 34,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '30bf3c995d551dd8f9683d2a75432ea70cf93533ebe65e36d5eaa2d09b3ab87e',
+      shippingCatalogSha256: '66986cfaab22f34815cf107c428bec5092b9d2cf14bbe59afc2b34bbf8f5b98f',
       machineChecksPassed: true,
       verdict: null,
     });

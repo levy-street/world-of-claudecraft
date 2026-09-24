@@ -502,6 +502,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // gear, a consumable, or a material, so it matches no chip and reaching it
   // through All is the settled behavior rather than a gap.
   const ALL_ONLY = [
+    'allied_vanguard_duffel',
     'amber_hide',
     // masterwrought Phase 11l removed the five promoted trophy drops
     // (bandit_bandana, cracked_ogre_tusk, cracked_wyrm_scale, mudfin_scale,
@@ -521,6 +522,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     // consumes the chipped tusk, so it is poor grey trash outside the
     // material set again, All-only exactly as before the phase.
     'chipped_tusk',
+    'clockwork_tinkers_pack', // the Automaton quartermaster's bag
     'cracked_fetish',
     'dawnhold_posy',
     // Masterwrought Phase 13 (2026-08-27): the promotion writ, rare
@@ -532,6 +534,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'duskweave_bag',
     'foragers_haversack',
     // Formula scrolls follow the existing bag-side kind-'recipe' ruling.
+    'formula_enchant_feet_shadowstride',
+    'formula_enchant_gloves_forged_might',
+    'formula_enchant_offhand_spirit',
     'formula_lastflame_zeal',
     'frayed_prayer_beads',
     'gleamstag_charm',
@@ -592,6 +597,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_masters_field_forge',
     'pattern_peppered_deepbarb_catfish',
     'pattern_prismglass_loop',
+    'pattern_reinforced_armor_kit',
     'pattern_ridgebreaker',
     'pattern_roast_hollowgill_sturgeon',
     'pattern_runewater_flask',
@@ -613,6 +619,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'pattern_warspice_feast',
     'pattern_warspice_skewers',
     'pattern_wyrmfall_pendant',
+    'plans_dense_sharpening_stone',
+    'recipe_elixir_of_mana_regeneration',
+    'recipe_potion_of_invisibility',
     // Retired premium reins remain inert saved items, with no use or material role.
     'reins_chimeglass_tortoise',
     'reins_goblin_rocket_sled',
@@ -620,10 +629,12 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'reins_rallycart_rxt',
     'reins_rickshaw_mount',
     'resonant_weave_bag',
+    'rift_surveyors_satchel', // the Rift Watch quartermaster's bag
     // masterwrought Phase 11k's three apex feasts, the same shape as
     // harvest_feast and All-only for the same reason: a placeable crafted
     // junk-kind item whose click PLACES rather than uses or equips.
     'sageleaf_feast',
+    'schematic_clockwork_shock_bomb',
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',

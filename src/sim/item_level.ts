@@ -28,6 +28,7 @@ import {
   NYTHRAXIS_RAID_LOOT_SOURCE_LEVEL,
 } from './content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from './content/heroic_vendor';
+import { hoardLootSourceLevels } from './content/hoard_loot';
 import { IGNIVAR_LOOT_ITEM_IDS, IGNIVAR_RAID_LOOT_SOURCE_LEVEL } from './content/ignivar_loot';
 import { FURY_STOCK, WARFARE_SOURCE_LEVEL } from './content/pvp_honor';
 import {
@@ -281,6 +282,9 @@ function buildSourceIndex(): Map<string, ItemSource> {
   // createRiftGearInstance. They have no static loot source, so we skip registration
   // here. Their tooltip defers to the instance payload's rolled quality.
   void RIFT_GEAR_ITEM_IDS; // referenced to keep the import non-dead
+  // Buried Hoard boss drops (content/hoard_loot.ts): the tier, not a mob level,
+  // sets the source, so the three tiers of one piece land on 26, 29 and 32.
+  for (const { id, sourceLevel } of hoardLootSourceLevels()) bump(id, sourceLevel, false);
   // Crafted gear (content/recipes.ts): a recipe's output is current at the recipe's
   // own level (the level a character can learn/use it, mirroring how a mob's level
   // stands in for its loot). Without this, any crafted item with primary stats has

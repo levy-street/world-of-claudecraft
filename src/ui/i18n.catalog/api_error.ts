@@ -126,6 +126,7 @@ export const apiErrorStrings = {
     invalid_appearance: 'That appearance could not be saved. Adjust the design and try again.',
     // the ordinary redesign failure: token already spent, or two racing tabs
     reroll_unavailable: 'This character does not have a free redesign available.',
+    vault_mail_recovering: 'Your vault reward mail is being restored. Try again shortly.',
   },
   // moderation: enforcement states set by a moderator.
   moderation: {
@@ -186,6 +187,10 @@ export const apiErrorStrings = {
   guilds: {
     invalid_roster_name: 'Invalid guild name.',
     unknown: 'No guild by that name.',
+  },
+  // The public world-quest scoreboard read (server/world_quest_leaderboard.ts).
+  world_quests: {
+    unknown_board: 'No scoreboard by that name.',
   },
   // steam: the env-gated Steam link family (server/steam/). Linking mirrors
   // deed unlocks to Steam achievements; it is never a sign-in method.

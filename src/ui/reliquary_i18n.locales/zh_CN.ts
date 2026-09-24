@@ -143,6 +143,10 @@ export const table: ReliquaryLocaleTable = {
     name: '裂隙',
     desc: '变幻不定的裂隙的标志性战利品，从游荡其中的恐怖造物，到S级追逐的两件珍宝。',
   },
+  conquerors_buried_hoards: {
+    name: '埋藏的宝藏',
+    desc: '藏宝图所指引的宝藏中的战利品，每位宝藏守护者各有四件。',
+  },
   // Rares of the Realm pages (Phase 21): composed in the chronicle rare
   // deeds' register (chr_vale_rares zh_CN reads 溪谷群凶, chr_marsh_rares
   // 雾中恶名); no mob names inside page names.

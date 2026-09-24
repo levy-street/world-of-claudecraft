@@ -247,11 +247,21 @@ const CLIPLESS_RIGS = new Set([
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',
+  'mob_healing_tide_totem',
+  // Nyxaris's Bound Pulsar: the nucleus as a static prop; every motion it has is
+  // drawn round it procedurally (src/render/hoard_pulsars.ts)
+  'mob_bound_pulsar',
+  'mob_abyssal_tentacle',
+  'mob_silk_cocoon',
+  'mob_brood_cocoon',
   // the dragonkin clutch shell: a two-state prop whose GLB ships no clips
   // (alive/dead is a mesh-visibility swap, VisualDef.corpseMeshSwap)
   'mob_dragon_egg',
   // the Nythraxis Bone Spike: a stationary Tripo prop mob, no rig, no clips
   'mob_nythraxis_bone_spike',
+  // the Mother of Mushrooms' Bloated Cap: a stationary Tripo prop mob, no rig,
+  // no clips; it swells through its entity scale (src/sim/rift/hoard_mushroom.ts)
+  'mob_hoard_bloat_cap',
 ]);
 
 /** mob_yumi_cat is a single-clip objective prop: its ClipMap names the one real

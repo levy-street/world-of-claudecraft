@@ -37,6 +37,7 @@
 // (enforced by tests/architecture.test.ts).
 
 import { shouldFireConsumeTickSfx } from '../consume_sfx';
+import { updateDawnBattleStandards } from '../content/faction_rewards';
 import { pctValue, recalcPlayerStats } from '../entity';
 import { manaRegenPer2s } from '../mana_regen';
 import { CHEATER_MARK_AURA_ID } from '../moderation';
@@ -105,6 +106,7 @@ export function isRejectedFriendlyNpcAura(aura: Aura): boolean {
 
 export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void {
   if (ctx.tickCount % 40 !== 0) return; // every 2 seconds (the classic tick)
+  updateDawnBattleStandards(ctx, p, meta);
   regenerateRuinOutOfCombat(ctx, p, meta);
   regenerateSoulFragmentsOutOfCombat(ctx, p, meta);
   // Lifesap restores whichever resource bar is currently live, including across
@@ -278,6 +280,20 @@ export function updateAuras(ctx: SimContext, e: Entity): void {
   if (e.dead) {
     e.stealthed = e.auras.some((a) => a.kind === 'stealth');
     return;
+  }
+  if (e.inCombat || e.onGround) {
+    const gIdx = e.auras.findIndex((a) => a.id === 'rift_feather_glider');
+    if (gIdx >= 0) {
+      const removed = e.auras.splice(gIdx, 1)[0];
+      ctx.emit({
+        type: 'aura',
+        targetId: e.id,
+        name: removed.name,
+        gained: false,
+        sourceId: removed.sourceId,
+        abilityId: removed.id,
+      });
+    }
   }
   let statsDirty = false;
   // Talent-proc internal cooldowns age at the same cadence as auras.

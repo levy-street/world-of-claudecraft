@@ -126,6 +126,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'La Brecha',
     desc: 'Botines emblemáticos de la Brecha cambiante, desde sus horrores errantes hasta los dos tesoros de la caza de rango S.',
   },
+  conquerors_buried_hoards: {
+    name: 'Los tesoros enterrados',
+    desc: 'Botines de los tesoros a los que llevan los mapas del tesoro, cuatro de cada guardián que custodia uno.',
+  },
   conquerors_rares_of_the_realm: {
     name: 'Raros del reino',
     desc: 'Prueba de todos los raros con nombre abatidos por el reino.',

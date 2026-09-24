@@ -1178,6 +1178,21 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: 'publicReadRateLimited',
     requireOwnedExpected: null,
   },
+  {
+    // The World Quest rankings: one medal world quest's public best-attempt
+    // ladder, paged, with the named viewer's own standing (public, behind the
+    // shared public read limiter; no account scope).
+    dispatcher: DISPATCH.mainApi,
+    method: 'GET',
+    path: '/api/world-quests/leaderboard',
+    handler:
+      'server/world_quest_leaderboard.ts worldQuestLeaderboardHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'publicReadRateLimited',
+    requireOwnedExpected: null,
+  },
+
   // The signpost guild board's roster drill-in: registry-only RouteDef born
   // after the migration, no legacy ladder arm (server/http/CLAUDE.md).
   {

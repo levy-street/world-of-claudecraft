@@ -6737,6 +6737,297 @@
         "stormhymn_chain_treads",
         "heroic_stormhymn_chain_treads"
       ]
+    },
+    {
+      "batchId": "world-quest-puzzle-activators-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "bridgemere_toll_chest.webp was supplied as the style, lighting, scale, and composition reference for leyline_cache; hearth_ember_cache.webp served the same role for confection_game_box. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Classic dark-fantasy MMORPG painted inventory art of one complete compact magical puzzle chest centered in a square, with tactile metal and aged wood, a strong silhouette at 28px, top-left key light, an opaque near-black painted vignette, and no text, border, watermark, crop, or extra objects.",
+      "itemDirections": {
+        "leyline_cache": {
+          "canonicalDisplayName": "Miniature Ley Cache",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Galecrest ley-beam world quest.",
+          "intendedVisualSubject": "A compact ornate treasure chest whose carved runes and narrow seams glow with vivid blue-cyan ley energy.",
+          "reference": {
+            "path": "public/ui/items/bridgemere_toll_chest.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "confection_game_box": {
+          "canonicalDisplayName": "Confectioner's Game Box",
+          "canonicalGameplayMeaningOrAcquisition": "Physical activator for the rotating Palmreach confection match-three world quest.",
+          "intendedVisualSubject": "An ornate tabletop puzzle chest with jewel-like candy motifs and pink-magenta light glowing through narrow seams.",
+          "reference": {
+            "path": "public/ui/items/hearth_ember_cache.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": [
+        "confection_game_box",
+        "leyline_cache"
+      ]
+    },
+    {
+      "batchId": "world-quest-freight-icons-2026-09-01",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "supply_crate.webp was supplied as the style, lighting, scale, and composition reference for eastbrook_freight_crate; reins_rickshaw_mount.webp served the same role for eastbrook_freight_wagon. Both references are World of ClaudeCraft project-generated art.",
+      "commonPrompt": "Fresh premium hand-painted classic dark-fantasy MMORPG inventory icon of one complete Eastbrook freight subject centered in a square, with a strong readable silhouette, tactile wood, iron, cloth, and rope, warm top-left key light, cool rim light, an opaque dark painted vignette, and no text, border, watermark, crop, person, or unrelated objects.",
+      "itemDirections": {
+        "eastbrook_freight_crate": {
+          "canonicalDisplayName": "Eastbrook Freight Crate",
+          "canonicalGameplayMeaningOrAcquisition": "The personal cargo picked up and carried to the wagon during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One sturdy closed wooden cargo crate with iron corner straps, pale-blue Eastbrook cloth, and rope handles, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/supply_crate.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        },
+        "eastbrook_freight_wagon": {
+          "canonicalDisplayName": "Eastbrook Freight Wagon",
+          "canonicalGameplayMeaningOrAcquisition": "The destination players load during the Eastbrook freight world quest.",
+          "intendedVisualSubject": "One four-wheeled wooden merchant wagon with iron rims, an open cargo bed loaded with crates, and empty horse shafts, viewed in three-quarter perspective.",
+          "reference": {
+            "path": "public/ui/items/reins_rickshaw_mount.webp",
+            "role": "style, lighting, scale, and composition reference",
+            "provenance": "World of ClaudeCraft project-generated art",
+            "license": "Project asset, rights reserved"
+          }
+        }
+      },
+      "itemIds": [
+        "eastbrook_freight_crate",
+        "eastbrook_freight_wagon"
+      ]
+    },
+    {
+      "batchId": "faction-vendor-icons-2026-09-16",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_vendor_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_vendor_icons.mjs.",
+      "provenanceRecord": "docs/achievements/faction-vendor-icons-2026-09-16/",
+      "itemIds": [
+        "artificers_welding_cowl",
+        "automaton_cog_ring",
+        "champion_dawn_medallion",
+        "champion_forged_loop",
+        "champion_rift_band",
+        "clockwork_tinkers_pack",
+        "dawnkeeper_consecrated_mace",
+        "forgemaster_crag_cleaver",
+        "order_prayer_beads",
+        "rift_surveyors_satchel",
+        "rift_watchers_band",
+        "riftwalkers_tunic",
+        "riftwarden_voidblade",
+        "templar_dawn_shield",
+        "vestments_of_the_acolyte"
+      ]
+    },
+    {
+      "batchId": "clue-scroll-icons-2026-09-17",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_clue_scroll_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of both items is the ITEMS_TO_GENERATE table in scripts/generate_clue_scroll_icons.mjs.",
+      "provenanceRecord": "docs/achievements/clue-scroll-icons-2026-09-17/",
+      "itemIds": [
+        "clue_scroll",
+        "treasure_casket"
+      ]
+    },
+    {
+      "batchId": "faction-rewards-icons-2026-09-17",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_faction_reward_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (per-item vector art over a three-stop radial ground) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every item is the ITEMS_TO_GENERATE table in scripts/generate_faction_reward_icons.mjs.",
+      "provenanceRecord": "scripts/generate_faction_reward_icons.mjs",
+      "itemIds": [
+        "allied_hearthstone",
+        "allied_vanguard_duffel",
+        "clockwork_shock_bomb",
+        "clockwork_target_dummy",
+        "dawn_battle_standard",
+        "dense_sharpening_stone",
+        "elixir_of_mana_regeneration",
+        "formula_enchant_feet_shadowstride",
+        "formula_enchant_gloves_forged_might",
+        "formula_enchant_offhand_spirit",
+        "pattern_reinforced_armor_kit",
+        "plans_dense_sharpening_stone",
+        "potion_of_invisibility",
+        "recipe_elixir_of_mana_regeneration",
+        "recipe_potion_of_invisibility",
+        "reinforced_armor_kit",
+        "rift_feather_glider",
+        "schematic_clockwork_shock_bomb"
+      ]
+    },
+    {
+      "batchId": "buried-hoard-treasure-maps-2026-09-19",
+      "source": "OpenAI built-in image generation, one dedicated generation per rarity; reviewed and normalized locally",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "clue_scroll.webp controlled scroll readability and small-size composition; linen_pouch.webp and eastbrook_buckler.webp controlled the hand-painted material treatment, lighting, dark vignette and focal edges. firebottle.webp controlled the ink bottle silhouette and contained liquid rendering.",
+      "commonPrompt": "Premium hand-painted classic fantasy MMORPG inventory art for the Buried Hoard treasure map family on an opaque dark painted vignette. Each map rarity keeps the parchment and red X silhouette while gaining distinct cord, seal and metalwork. Cartographer's Ink uses a stout blue-black ink bottle, quill and blank parchment strip. Warm top-left key light, cool deep shadow, safe margins, no text, UI border, watermark, transparency, person, chest, portal or crop.",
+      "provenanceRecord": "docs/achievements/buried-hoard-treasure-maps-2026-09-19/accepted-art.json",
+      "itemIds": [
+        "cartographers_ink",
+        "treasure_map_common",
+        "treasure_map_rare",
+        "treasure_map_epic",
+        "treasure_map_legendary"
+      ]
+    },
+    {
+      "batchId": "hoard-boss-loot-icons-2026-09-20",
+      "source": "Deterministic SVG compositions rendered to WebP with Sharp (scripts/generate_hoard_loot_icons.mjs); no image model",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "woc-item-icon-v1; existing painted item catalog (opaque dark vignette, warm top-left key, cool bottom-right shadow, centered silhouette with safe padding)",
+      "commonPrompt": "Not a text-to-image prompt: each icon is an authored SVG composition (a slot silhouette, the dropping boss palette and emblem, and a tier finish) rasterized to an opaque 128x128 sRGB WebP. The exact vector source of every icon is scripts/generate_hoard_loot_icons.mjs.",
+      "provenanceRecord": "scripts/generate_hoard_loot_icons.mjs",
+      "itemIds": [
+        "band_mountains_weight",
+        "bone_studded_pauldrons",
+        "breastplate_tectonic_might",
+        "broodmother_chitin_cowl",
+        "chained_ember_choker",
+        "chalice_of_living_tides",
+        "cinder_stitched_robes",
+        "collapsar_band_of_nyxaris",
+        "coral_encrusted_girdle",
+        "cowl_of_event_horizon",
+        "earthshaker_warboots",
+        "ember_wrought_crown",
+        "frostbitten_rime_slippers",
+        "gale_strider_boots",
+        "glacier_hewn_bulwark",
+        "hauberk_tempest_gale",
+        "legendary_band_mountains_weight",
+        "legendary_bone_studded_pauldrons",
+        "legendary_breastplate_tectonic_might",
+        "legendary_broodmother_chitin_cowl",
+        "legendary_chained_ember_choker",
+        "legendary_chalice_of_living_tides",
+        "legendary_cinder_stitched_robes",
+        "legendary_collapsar_band_of_nyxaris",
+        "legendary_coral_encrusted_girdle",
+        "legendary_cowl_of_event_horizon",
+        "legendary_earthshaker_warboots",
+        "legendary_ember_wrought_crown",
+        "legendary_frostbitten_rime_slippers",
+        "legendary_gale_strider_boots",
+        "legendary_glacier_hewn_bulwark",
+        "legendary_hauberk_tempest_gale",
+        "legendary_legguards_of_the_ossuary",
+        "legendary_mantle_of_singularity",
+        "legendary_molten_clinker_girdle",
+        "legendary_monolithic_shoulderguards",
+        "legendary_orb_collapsing_void",
+        "legendary_ossuary_bone_crown",
+        "legendary_pendant_continuous_flow",
+        "legendary_permafrost_legguards",
+        "legendary_rime_crusted_grips",
+        "legendary_riptide_handwraps",
+        "legendary_seal_of_the_cryptwalker",
+        "legendary_silkstalker_woven_vest",
+        "legendary_spun_venom_spaulders",
+        "legendary_storm_tuned_buckler",
+        "legendary_tempest_strike_grips",
+        "legendary_venom_etched_waistcord",
+        "legguards_of_the_ossuary",
+        "mantle_of_singularity",
+        "molten_clinker_girdle",
+        "monolithic_shoulderguards",
+        "orb_collapsing_void",
+        "ossuary_bone_crown",
+        "pendant_continuous_flow",
+        "permafrost_legguards",
+        "rare_band_mountains_weight",
+        "rare_bone_studded_pauldrons",
+        "rare_breastplate_tectonic_might",
+        "rare_broodmother_chitin_cowl",
+        "rare_chained_ember_choker",
+        "rare_chalice_of_living_tides",
+        "rare_cinder_stitched_robes",
+        "rare_collapsar_band_of_nyxaris",
+        "rare_coral_encrusted_girdle",
+        "rare_cowl_of_event_horizon",
+        "rare_earthshaker_warboots",
+        "rare_ember_wrought_crown",
+        "rare_frostbitten_rime_slippers",
+        "rare_gale_strider_boots",
+        "rare_glacier_hewn_bulwark",
+        "rare_hauberk_tempest_gale",
+        "rare_legguards_of_the_ossuary",
+        "rare_mantle_of_singularity",
+        "rare_molten_clinker_girdle",
+        "rare_monolithic_shoulderguards",
+        "rare_orb_collapsing_void",
+        "rare_ossuary_bone_crown",
+        "rare_pendant_continuous_flow",
+        "rare_permafrost_legguards",
+        "rare_rime_crusted_grips",
+        "rare_riptide_handwraps",
+        "rare_seal_of_the_cryptwalker",
+        "rare_silkstalker_woven_vest",
+        "rare_spun_venom_spaulders",
+        "rare_storm_tuned_buckler",
+        "rare_tempest_strike_grips",
+        "rare_venom_etched_waistcord",
+        "rime_crusted_grips",
+        "riptide_handwraps",
+        "seal_of_the_cryptwalker",
+        "silkstalker_woven_vest",
+        "spun_venom_spaulders",
+        "storm_tuned_buckler",
+        "tempest_strike_grips",
+        "venom_etched_waistcord"
+      ]
     }
   ]
 }

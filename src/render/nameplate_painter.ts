@@ -12,8 +12,11 @@ import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import { ambientNpcQuestMarkerKind } from '../sim/quests/ambient_quest_marker';
 import { type QuestMarkerKind, strongerQuestMarker } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { resolveHudAuraIconId } from '../ui/aura_icon_runtime';
+import { castDisplayName } from '../ui/cast_display_name';
 import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
@@ -61,6 +64,7 @@ import { type NameplatePlan, nameplatePlanInto, newNameplatePlan } from './namep
 import { npcRoleLabel, npcRoleLineCarriesTrainerTitle } from './npc_role_label';
 import { FRIENDLY, isFriendlyPet, mobNameColor } from './reaction';
 import type { EntityView } from './renderer';
+import { WorldQuestTraceLabels } from './world_quest_trace_labels';
 
 const NAMEPLATE_LEVEL_NUMBER_OPTIONS = { maximumFractionDigits: 0 } as const;
 // The dot countdown's two shapes, hoisted for the same reason the level options
@@ -166,6 +170,14 @@ export interface NameplatePainterDeps {
   isHostilePlayer: (e: Entity) => boolean;
 }
 
+/** A scripted mob cast (a rift execution, a Buried Hoard control) is no ABILITIES
+ *  row, so it names itself through the shared cast resolver; anything that one
+ *  does not know keeps the source-name matcher it always had. */
+function scriptedCastLabel(castId: string): string {
+  const named = castDisplayName(castId);
+  return named !== castId ? named : abilityDisplayNameFromSource(castId);
+}
+
 export class NameplatePainter {
   private readonly views: Map<number, EntityView>;
   private readonly camera: THREE.PerspectiveCamera;
@@ -182,6 +194,7 @@ export class NameplatePainter {
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
   private readonly states = new Map<number, NameplateCanvasState>();
+  private readonly traceLabels = new WorldQuestTraceLabels();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
   private readonly plan: NameplatePlan = newNameplatePlan();
@@ -273,6 +286,9 @@ export class NameplatePainter {
       // The canvas pass draws only what it reaches, so skipping the entity is the
       // whole hide (the removed DOM-era hideNameplate had to clear styles instead).
       if (isQuestGatedEntityHidden(entity, world.questLog)) continue;
+      // The courier guards exist only for a cloaked infiltrator (their bodies are
+      // withheld by the renderer gate; the plate must not outlive the body).
+      if (shadowGuardHidden(entity, world) || investigationDisguiseHidden(entity, world)) continue;
       // A compile gate can leave this entity with no body at all (the arrival
       // gate hides the whole group). Its plate is then the only thing that says
       // an enemy is there, so it is forced on over the nameplate toggles for
@@ -403,6 +419,7 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawBase(state, anchor.sx, anchor.sy);
     }
+    this.traceLabels.draw(world, this.surface, this.camera, width, height);
     // Emotes paint last on the same canvas so they remain legible over other
     // nameplates without restoring a per-entity compositor layer.
     for (let i = 0; i < this.anchorCount; i++) {
@@ -517,7 +534,7 @@ export class NameplatePainter {
           ? t('abilityUi.cast.gathering')
           : ABILITIES[cast.label]
             ? tEntity({ kind: 'ability', id: cast.label, field: 'name' })
-            : abilityDisplayNameFromSource(cast.label);
+            : scriptedCastLabel(cast.label);
     } else if (!cast.visible) {
       state.castSource = '';
       state.castLabel = '';

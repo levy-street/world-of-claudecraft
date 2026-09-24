@@ -1,0 +1,57 @@
+{
+  "settings": {
+    "orb_count": 6,
+    "orbit_radius": 3.2,
+    "orbit_height": 2.9,
+    "orbit_speed": 0.52,
+    "charge_duration": 1.8,
+    "shot_delay": 0.25,
+    "orb_size": 0.46,
+    "orb_brightness": 7.0,
+    "lightning_shot_length": 4.8,
+    "lightning_thickness": 0.026,
+    "branch_count": 5,
+    "impact_size": 1.05,
+    "residual_duration": 0.55,
+    "emission_intensity": 1.0,
+    "summon_duration": 0.65,
+    "shot_duration": 0.125,
+    "prefire_duration": 0.2,
+    "fps": 24,
+    "seed": 1731
+  },
+  "duration": 5.05,
+  "shots": [
+    {
+      "orb": 1,
+      "seconds": 2.45,
+      "frame": 60
+    },
+    {
+      "orb": 2,
+      "seconds": 2.7,
+      "frame": 66
+    },
+    {
+      "orb": 3,
+      "seconds": 2.95,
+      "frame": 72
+    },
+    {
+      "orb": 4,
+      "seconds": 3.2,
+      "frame": 78
+    },
+    {
+      "orb": 5,
+      "seconds": 3.45,
+      "frame": 84
+    },
+    {
+      "orb": 6,
+      "seconds": 3.7,
+      "frame": 90
+    }
+  ],
+  "scope": "VFX preview only; no targeting, damage, collision or combat logic"
+}

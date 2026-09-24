@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DELVE_LIST, PORTALS, zoneContaining } from '../src/sim/data';
 import { LIVE_MAP_ENTITY_DISCLOSURE_RADIUS } from '../src/ui/map_entity_disclosure_core';
 import {
+  classifyNearbyLiveZoneMapEntrance,
   isNearbyLiveRiftZoneMapEntity,
   STABLE_MAP_NAVIGATION_LANDMARKS,
 } from '../src/ui/map_navigation_landmarks_core';
@@ -124,5 +125,18 @@ describe('live rift zone-map visibility', () => {
         player,
       ),
     ).toBe(false);
+  });
+
+  it('classifies a Buried Hoard without collapsing it into Rift semantics', () => {
+    const hoard = { kind: 'object', templateId: 'hoard_entrance', pos: { ...player } };
+    expect(classifyNearbyLiveZoneMapEntrance(hoard, player)).toBe('hoard-entrance');
+    expect(isNearbyLiveRiftZoneMapEntity(hoard, player)).toBe(false);
+    hoard.pos.x = player.x + 80;
+    expect(classifyNearbyLiveZoneMapEntrance(hoard, player)).toBe('hoard-entrance');
+    hoard.pos.x = player.x + 80.01;
+    expect(classifyNearbyLiveZoneMapEntrance(hoard, player)).toBeNull();
+    expect(
+      classifyNearbyLiveZoneMapEntrance({ ...hoard, kind: 'mob', pos: player }, player),
+    ).toBeNull();
   });
 });

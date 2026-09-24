@@ -54,7 +54,7 @@ export interface IWorldInventory {
   equipBag(itemId: string, socket?: number, target?: { slotIndex: number }): void;
   /** Return the bag in `socket` to the inventory (refused when items would not fit). */
   unequipBag(socket: number): void;
-  useItem(itemId: string, target?: { slotIndex: number }): void;
+  useItem(itemId: string, target?: { slotIndex?: number; aim?: { x: number; z: number } }): void;
   /** `target.anchor` is the OPTIONAL ordinal-plus-count description of the copy
    *  the player clicked (src/sim/item_copy_anchor.ts). The slot index alone
    *  proves only that the cell still holds this ITEM; the anchor proves it
