@@ -48,7 +48,11 @@ describe('quest event router', () => {
       "private readonly questBanner = new QuestProgressBanner($('#quest-banner'));",
       'private readonly questDialog: QuestDialogController;',
       'private readonly worldQuestPuzzleWindow = new WorldQuestPuzzleWindow({',
-      '  log(\n    text: string,',
+      // The release/v0.44.0 permanent loot quality change gave log() a node
+      // body arm (the exact-copy loot receipt link), so the anchor is the
+      // signature line rather than the old string-only parameter.
+      '  log(\n    // A string body',
+      '    text: string | readonly Node[],\n    color = ',
       '  showBanner(\n    text: string,',
       'if (applyQuestEventPresentation(this, ev)) continue;',
     ]) {
