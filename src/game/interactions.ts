@@ -398,8 +398,15 @@ export function handlePickedEntity(
       // left-click talks too — Mac trackpads make right-click a chore;
       // out of range it just targets (no error spam while exploring)
       const d = dist2d(world.player.pos, e.pos);
-      // No quest dialog while dead (the server refuses quest talk too); a ghost
-      // takes the Spirit Healer res via right-click or the death panel button.
+      // A ghost's left-click on the Pale Keeper talks to it as well: the raise is
+      // a conversation now (the ghost hint says "talk to the Pale Keeper"), so it
+      // routes through the same confirm gate as the right-click arm above.
+      if (d <= INTERACT_RANGE + 2 && e.templateId === 'spirit_healer' && world.player.ghost) {
+        hud.requestSpiritHealerResurrect();
+        return true;
+      }
+      // No quest dialog while dead (the server refuses quest talk too); the
+      // Keeper above is the one conversation a ghost has.
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
         if (isInvestigationNpc(e.templateId)) {
           world.interact();

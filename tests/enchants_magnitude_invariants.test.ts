@@ -390,7 +390,7 @@ describe('frozen enchant magnitudes (the #2415 replace-exactness premise)', () =
       enchant_weapon_lastflame_zeal: {},
       enchant_weapon_riftwalkers_grace: {},
       enchant_weapon_dawnfire_etching: { spellPower: 18 },
-      enchant_weapon_dawns_benediction: { healPower: 34 },
+      enchant_weapon_dawns_benediction: { healingPower: 34 },
       enchant_weapon_piston_drive: { str: 12, critRating: 25 },
       enchant_weapon_might: { str: 2 },
       enchant_weapon_intellect: { int: 2 },
@@ -537,7 +537,7 @@ describe('the learned faction formulas (world-quest reputation)', () => {
 
   it('the two Church Order etchings are flat power lines about a fifth of the raid lane totals', () => {
     expect(DAWNFIRE.statBonus).toEqual({ spellPower: 18 });
-    expect(BENEDICTION.statBonus).toEqual({ healPower: 34 });
+    expect(BENEDICTION.statBonus).toEqual({ healingPower: 34 });
     expect(DAWNFIRE.weaponProc).toBeUndefined();
     expect(BENEDICTION.weaponProc).toBeUndefined();
     // Neither touches a static axis, so the static stacks above are untouched.
@@ -558,7 +558,7 @@ describe('the learned faction formulas (world-quest reputation)', () => {
   it('no static enchant carries a learned-only axis or the two-hander gate', () => {
     for (const e of Object.values(ENCHANTS).filter(isStaticEnchant)) {
       expect(e.weaponHand, e.id).toBeUndefined();
-      for (const axis of ['spellPower', 'healPower', 'critRating', 'hasteRating'] as const) {
+      for (const axis of ['spellPower', 'healingPower', 'critRating', 'hasteRating'] as const) {
         expect(e.statBonus[axis], `${e.id} ${axis}`).toBeUndefined();
       }
     }

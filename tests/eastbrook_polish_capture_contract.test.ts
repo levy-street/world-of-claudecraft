@@ -695,7 +695,9 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // authoritative layout gains the weeklyVault site. No capture was retaken.
   // Re-minted for the shipwreck salvage landing: the renderer leaf moved.
   // No Eastbrook capture or measured value changed.
-  'e3f907101f39355f8a6e28e9d000d944277a582108761efa0fec54376862b7f8';
+  // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
+  // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '709de6097154d9e6956f90f47dbd103283399f6550bedd0046a84ade79c24ed0';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

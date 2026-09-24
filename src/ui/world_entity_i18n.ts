@@ -747,7 +747,12 @@ type QuestTranslation = {
 type QuestTranslations = Record<QuestId, QuestTranslation>;
 type ZoneTranslations = Record<
   ZoneId,
-  { name: string; welcome: string; pois: Record<number, { label: string }> }
+  {
+    name: string;
+    welcome: string;
+    welcomeDone?: string;
+    pois: Record<number, { label: string }>;
+  }
 >;
 type DungeonTranslations = Record<
   DungeonId,
@@ -839,6 +844,9 @@ function makeEnglishWorldEntities(): WorldEntityTranslations {
     zones[zone.id as ZoneId] = {
       name: zone.name,
       welcome: normalizeSourceText(zone.welcome),
+      ...(zone.welcomeDone !== undefined
+        ? { welcomeDone: normalizeSourceText(zone.welcomeDone) }
+        : {}),
       pois: poiRecord,
     };
   });

@@ -465,6 +465,42 @@ describe('the stocked pane', () => {
     );
   });
 
+  it('a special row wears the loot-quality tier badge as its own labelled mark (mark family)', () => {
+    // The all-surfaces mark rule reaches the vault strip too: a special row
+    // whose payload carries a permanent quality descriptor paints the same
+    // tier badge the bag, bank and guild bank cells paint, positioned by a
+    // .vault-row rule of its own (the row is a wide flex button, so the cell
+    // corner rule cannot reach it). The badge is the row's only channel for
+    // the quality word, so it is labelled here (decorative in named cells).
+    const h = harness(
+      vaultInfo({
+        special: [
+          {
+            itemId: 'copper_ore',
+            count: 1,
+            instance: {
+              signer: 'Ada',
+              lootQuality: { version: 1, tier: 3, weights: [1, 2, 3, 4, 5] },
+            },
+          },
+          { itemId: 'copper_ore', count: 1, instance: { signer: 'Rin' } },
+        ],
+      }),
+    );
+    h.window.open();
+    clickVaultTab(h);
+    const marked = h.root.querySelector<HTMLElement>('[data-vault-special-index="0"]');
+    const plain = h.root.querySelector<HTMLElement>('[data-vault-special-index="1"]');
+    const badge = marked?.querySelector<HTMLElement>(':scope > .loot-quality-badge');
+    expect(badge).not.toBeNull();
+    expect(badge?.textContent).toBe('III');
+    expect(badge?.getAttribute('role')).toBe('img');
+    expect(badge?.getAttribute('aria-label')).toBe('Magnificent');
+    expect(plain?.querySelector('.loot-quality-badge')).toBeNull();
+    const css = readFileSync(resolve(process.cwd(), 'src/styles/components.css'), 'utf8');
+    expect(css).toMatch(/\.vault-row > \.loot-quality-badge \{\s*position: absolute;/);
+  });
+
   it('renders a special instance with canonical glyph/lock marks and withdraws its exact ref whole', () => {
     const h = harness(
       vaultInfo({

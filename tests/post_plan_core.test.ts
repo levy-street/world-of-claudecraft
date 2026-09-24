@@ -32,7 +32,7 @@ const mediumInput: PostPlanInput = {
 };
 
 describe('post pipeline plan', () => {
-  it('pins the insane chain to eighteen targets and twenty-one fullscreen stages', () => {
+  it('pins the insane chain to nineteen targets and twenty-one fullscreen stages', () => {
     const plan = postPipelinePlan(insaneInput);
 
     expect(plan.scene).toEqual({
@@ -44,7 +44,7 @@ describe('post pipeline plan', () => {
     expect(plan.singleComposerBuffer).toBe(false);
     expect(plan.supportsDynamicResolution).toBe(false);
     expect(plan.resolveCount).toBe(0);
-    expect(plan.renderTargets).toHaveLength(18);
+    expect(plan.renderTargets).toHaveLength(19);
     expect(plan.fullscreenStages).toHaveLength(21);
     expect(plan.fullscreenStages.map((stage) => stage.id)).toEqual([
       'n8ao-evaluate',
@@ -97,6 +97,15 @@ describe('post pipeline plan', () => {
       },
       { id: 'n8ao-ao-a', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
       { id: 'n8ao-ao-b', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
+      // The VFX opaque copy sits with the n8ao block on purpose: the beauty
+      // target's sampled depth is the only source it can copy from.
+      {
+        id: 'vfx-opaque-copy',
+        scale: 1,
+        format: 'rgba16f',
+        samples: 0,
+        depth: 'depth32ui-texture',
+      },
       { id: 'bloom-bright', scale: 0.5, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-h-0', scale: 0.5, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-v-0', scale: 0.5, format: 'rgba16f', samples: 0, depth: 'none' },
@@ -180,6 +189,9 @@ describe('post pipeline plan', () => {
     expect(plan.gradeFxaa).toBe(false);
     expect(plan.singleComposerBuffer).toBe(true);
     expect(plan.supportsDynamicResolution).toBe(true);
+    // The mobile target's shape is unchanged by the VFX opaque copy: one
+    // composer target with a depth RENDERBUFFER, no sampled depth texture and
+    // no copy target. Its ability VFX fall back unsampled, as they do on low.
     expect(plan.renderTargets).toEqual([
       {
         id: 'composer-a',
@@ -259,7 +271,7 @@ describe('post pipeline plan', () => {
       samples: 0,
       depth: 'none',
     });
-    expect(plan.renderTargets).toHaveLength(19);
+    expect(plan.renderTargets).toHaveLength(20);
     expect(plan.fullscreenStages).toHaveLength(22);
     expect(plan.resolveCount).toBe(0);
   });
@@ -280,6 +292,10 @@ describe('post pipeline plan', () => {
     expect(plan.composerSamples).toBe(0);
     expect(plan.resolveCount).toBe(0);
     expect(plan.renderTargets.some((target) => target.id.startsWith('n8ao-'))).toBe(false);
+    // No beauty target means no sampled depth to copy from, so no copy target
+    // either: the VFX opaque copy follows the scene pass, not the tier name.
+    expect(plan.renderTargets.some((target) => target.id === 'vfx-opaque-copy')).toBe(false);
+    expect(plan.renderTargets.every((target) => target.depth !== 'depth32ui-texture')).toBe(true);
   });
 
   it('keeps distinct composer buffers for ScreenFx when SMAA is disabled', () => {

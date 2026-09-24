@@ -1,3 +1,4 @@
+import { chosenCadenceFrameMs, NO_CHOSEN_CADENCE } from './chosen_cadence_pressure_core';
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
 import {
   type PostShedChain,
@@ -104,6 +105,14 @@ export interface RenderBudgetSample {
   createdViews: number;
   minRenderScale: number;
   maxRenderScale: number;
+  /** Share of frames missing the client's own chosen cadence (the frame rate
+   *  ceiling), or NO_CHOSEN_CADENCE. While set it replaces the wall interval on
+   *  the frame axis, and no external cap is looked for: the cadence is known. */
+  chosenCadenceMissShare?: number;
+  /** The automatic frame rate ceiling is in force: recovery is held, so new
+   *  headroom goes to the cadence and not to quality that would fail its next
+   *  return trial (frame_cadence_auto_core.ts owns the hierarchy). */
+  holdRecovery?: boolean;
 }
 
 export interface RenderBudgetGovernorOptions {
@@ -519,7 +528,11 @@ export class RenderBudgetGovernor {
 
   update(sample: RenderBudgetSample, out?: RenderBudgetState): RenderBudgetState {
     if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state(out);
-    const frameMs = Math.min(250, Math.max(0, sample.frameMs));
+    const chosenMissShare = sample.chosenCadenceMissShare ?? NO_CHOSEN_CADENCE;
+    const chosenCadence = chosenMissShare >= 0;
+    const frameMs = chosenCadence
+      ? chosenCadenceFrameMs(chosenMissShare, this.budget.dropFrameMs, this.budget.recoverFrameMs)
+      : Math.min(250, Math.max(0, sample.frameMs));
     const totalMs = Math.min(250, Math.max(0, sample.totalMs));
     const rawSubmitMs = Math.max(0, sample.submitMs);
     const submitMs = Math.min(250, rawSubmitMs);
@@ -589,7 +602,15 @@ export class RenderBudgetGovernor {
     // shedding does move is a GPU-bound frame, refused as a cap and shed
     // again under the normal rules. A latched cap, a probe or a refusal
     // lapses once the candidate has failed for a few consecutive frames.
+    // A ceiling that engages while a probe is in flight ends the probe without
+    // a verdict: the question it was asking (is a cap pacing these frames) is
+    // now answered by the client itself. The levels it shed come back; left to
+    // lapse, the probe would read the synthetic held reading as "shedding
+    // moved the cadence", refuse a cap nobody tested, and leave quality at the
+    // probe floors, which an automatic ceiling's recovery hold then freezes.
+    if (chosenCadence && this.capProbe) this.abandonCapProbe(sample);
     const externalFrameCapCandidate =
+      !chosenCadence &&
       rawFramePressure >= 1 &&
       cadenceMs >= EXTERNAL_FRAME_CAP_MIN_MS &&
       cadenceMs <= EXTERNAL_FRAME_CAP_MAX_MS &&
@@ -735,6 +756,7 @@ export class RenderBudgetGovernor {
     // Measured headroom, the gate on ALL recovery: every clause is a real cost
     // reading, never inferred from wall cadence.
     const canRecover =
+      sample.holdRecovery !== true &&
       (this.externalFrameCap || this.frameMsEma <= this.budget.recoverFrameMs) &&
       totalMs <= this.budget.recoverFrameMs &&
       submitMs <= Math.max(8, this.budget.recoverFrameMs * 0.7) &&
@@ -784,6 +806,48 @@ export class RenderBudgetGovernor {
     return this.state(out);
   }
 
+  /** A chosen cadence engaged while a cap probe was in flight: the probe is
+   *  dropped and what it shed comes back. A probe that lost its origin (a
+   *  submit stall during a dwell sheds for real and clears it) or that shed
+   *  nothing (the session was already at the floors) gets the band baselines,
+   *  as it does in advanceCapProbe. */
+  private abandonCapProbe(sample: RenderBudgetSample): void {
+    // The same choice advanceCapProbe makes for the same state: a probe that
+    // shed nothing (the session was already at the floors) has an origin equal to
+    // the floors, and the baselines are what a paced session holds.
+    const origin =
+      this.capProbeOrigin && this.capProbe?.shedMoved
+        ? this.capProbeOrigin
+        : this.capProbeBaselines(sample.maxRenderScale);
+    if (this.capProbe) {
+      this.levels.grass = origin.grass;
+      this.levels.foliage = origin.foliage;
+      this.levels.vfx = origin.vfx;
+      this.levels.lighting = origin.lighting;
+      this.levels.resolution = Math.min(
+        sample.maxRenderScale,
+        Math.max(sample.minRenderScale, origin.resolution),
+      );
+      this.restoreDetailAfterCapProbe(origin.detail);
+      if (this.pinnedPostLevel == null) this.levels.post = origin.post;
+    }
+    this.capProbe = null;
+    this.capProbeOrigin = null;
+    this.capMissFrames = 0;
+  }
+
+  private capProbeBaselines(maxRenderScale: number): RenderBudgetLevels {
+    return {
+      grass: this.bands.grass.baseline,
+      foliage: this.bands.foliage.baseline,
+      vfx: this.bands.vfx.baseline,
+      lighting: this.bands.lighting.baseline,
+      resolution: maxRenderScale,
+      detail: this.bands.detail.baseline,
+      post: this.bands.post.baseline,
+    };
+  }
+
   /** Advances the cap probe's two dwells. Returns true while a dwell holds
    *  the ladder still. The 'shed' phase is driven by degrade() itself. At
    *  the end of the floor dwell the levels the probe started from come back
@@ -807,15 +871,7 @@ export class RenderBudgetGovernor {
       const high: RenderBudgetLevels =
         this.capProbeOrigin && probe.shedMoved
           ? this.capProbeOrigin
-          : {
-              grass: this.bands.grass.baseline,
-              foliage: this.bands.foliage.baseline,
-              vfx: this.bands.vfx.baseline,
-              lighting: this.bands.lighting.baseline,
-              resolution: maxRenderScale,
-              detail: this.bands.detail.baseline,
-              post: this.bands.post.baseline,
-            };
+          : this.capProbeBaselines(maxRenderScale);
       this.levels.grass = high.grass;
       this.levels.foliage = high.foliage;
       this.levels.vfx = high.vfx;
@@ -961,6 +1017,28 @@ export class RenderBudgetGovernor {
       if (this.reduceLevel('resolution', minRenderScale, resolutionStep)) changed = true;
     }
     return changed ? 'changed' : eligible ? 'exhausted' : 'idle';
+  }
+
+  /** Everything pressure took is back and nothing is moving: what recover()'s
+   *  first phase restores sits at its baseline, render scale at its maximum.
+   *  The automatic frame rate ceiling reads it as its headroom evidence. A
+   *  disabled governor never took anything. */
+  atBaseline(maxRenderScale: number): boolean {
+    if (!this.enabled) return true;
+    // A recover step is a one-frame reading of a governor that is doing well.
+    if (this.mode === 'degrading') return false;
+    if (this.reason !== 'stable' && this.reason !== 'recover') return false;
+    const eps = 0.001;
+    return (
+      this.levels.grass >= this.bands.grass.baseline - eps &&
+      this.levels.lighting >= this.bands.lighting.baseline - eps &&
+      this.levels.vfx >= this.bands.vfx.baseline - eps &&
+      this.levels.foliage >= this.bands.foliage.baseline - eps &&
+      (this.pinnedPostLevel != null ||
+        !this.postShedChain ||
+        this.levels.post >= this.bands.post.baseline - eps) &&
+      this.levels.resolution >= maxRenderScale - eps
+    );
   }
 
   /** Phase A restores what pressure took, quality buckets before render scale, and runs on

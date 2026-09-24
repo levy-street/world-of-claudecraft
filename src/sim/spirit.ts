@@ -191,18 +191,34 @@ export function releasePlayerSpirit(
 }
 
 /**
+ * Which charge a /unstuck outcome applies: the level-scaled Unstuck Sickness, or nothing.
+ * The unstuck system (./unstuck) decides it from the sickness window: the first
+ * completion in an hour passes 'none', a repeat inside the window passes 'unstuck'. The
+ * outcome functions below default to 'unstuck' so a direct caller keeps the historical
+ * "never free" contract unless it says otherwise.
+ */
+export type UnstuckSicknessCharge = 'unstuck' | 'none';
+
+/**
  * Finish Unstuck for a LIVING player: move them to the nearest graveyard and leave them
- * alive. No death and no corpse; the whole price is Unstuck Sickness. The graveyard (rather
- * than a nearby safe spot) is the destination because it is the one point in every zone
- * guaranteed to be reachable open ground.
+ * alive. No death and no corpse; the whole price, when one is owed, is Unstuck Sickness.
+ * The graveyard (rather than a nearby safe spot) is the destination because it is the one
+ * point in every zone guaranteed to be reachable open ground.
  *
  * The countdown's own gates (blockedReason/cancelReason in ./unstuck) guarantee that a
  * player who reaches this point is out of combat, standing still, and not casting, eating,
  * sitting, charging, or following, so none of that state needs unwinding here.
+ *
+ * Returns whether Unstuck Sickness actually landed (false when no charge was owed, below
+ * the level floor, or when the player was not a living body to move).
  */
-export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+export function moveToGraveyardForUnstuck(
+  ctx: SimContext,
+  pid?: number,
+  sickness: UnstuckSicknessCharge = 'unstuck',
+): boolean {
   const r = ctx.resolve(pid);
-  if (!r || r.e.dead || r.e.ghost) return;
+  if (!r || r.e.dead || r.e.ghost) return false;
   const { meta, e: p } = r;
   // The unstuck gates reject a casting player, so no live gather or fishing
   // session can reach this today; the shared displacement teardown still
@@ -241,24 +257,41 @@ export function moveToGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
   // Applied last: the sickness drains stamina, so recalcPlayerStats (via applyAura) rebuilds
   // the pools and carries the current hp/mana FRACTIONS into the reduced maxima. A player at
   // full health arrives at full health of a smaller bar rather than over the top of it.
-  applyUnstuckSickness(ctx, p);
+  return sickness === 'unstuck' && applyUnstuckSickness(ctx, p);
 }
 
 /**
  * Finish Unstuck for a player who was dead or a released ghost: pull them to the nearest
  * graveyard and raise them there at RES_HEALER_HP_FRACTION of their pools. This is the
- * escape hatch for a spirit that cannot reach its corpse or an angel. It charges Unstuck
- * Sickness, not The Keeper's Toll, so it is a shorter penalty than walking to the Pale
- * Keeper would have been but it is never free.
+ * escape hatch for a spirit that cannot reach its corpse or an angel. When a charge is
+ * owed it is Unstuck Sickness, not The Keeper's Toll, so a repeat is still a shorter
+ * penalty than walking to the Pale Keeper would have been; the first use in an hour
+ * charges nothing (see UnstuckSicknessCharge). A free revive leaves an existing Keeper's
+ * Toll exactly as it was: only an applied Unstuck Sickness displaces it.
+ *
+ * Returns whether Unstuck Sickness actually landed (false when no charge was owed, below
+ * the level floor, or when there was no dead body to raise).
  */
-export function reviveAtGraveyardForUnstuck(ctx: SimContext, pid?: number): void {
+export function reviveAtGraveyardForUnstuck(
+  ctx: SimContext,
+  pid?: number,
+  sickness: UnstuckSicknessCharge = 'unstuck',
+): boolean {
   const r = ctx.resolve(pid);
-  if (!r?.e.dead) return;
+  if (!r?.e.dead) return false;
   const { meta, e: p } = r;
   // Resolve the graveyard before the revive moves the body out of its instance band.
   const gy = ghostGraveyard(ctx, p);
-  reviveAt(ctx, meta, p, { x: gy.x, y: p.pos.y, z: gy.z }, RES_HEALER_HP_FRACTION, 'unstuck');
+  const charged = reviveAt(
+    ctx,
+    meta,
+    p,
+    { x: gy.x, y: p.pos.y, z: gy.z },
+    RES_HEALER_HP_FRACTION,
+    sickness,
+  );
   ctx.emit({ type: 'respawn', pid: meta.entityId });
+  return charged;
 }
 
 function releaseAtNearestGraveyard(
@@ -343,6 +376,11 @@ export function resurrectAtCorpse(ctx: SimContext, pid?: number): void {
   creditDeathLesson(ctx, meta, true);
 }
 
+/** Whether The Keeper's Toll is on the player (nothing is charged below level 10). */
+export function hasResurrectionSickness(p: Entity): boolean {
+  return p.auras.some((a) => a.id === RESURRECTION_SICKNESS_ID);
+}
+
 // Resurrect at the Spirit Healer: instant, in place, but with Resurrection Sickness.
 export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean {
   const r = ctx.resolve(pid);
@@ -354,7 +392,14 @@ export function resurrectAtSpiritHealer(ctx: SimContext, pid?: number): boolean 
   // The Spirit Healer always inflicts Resurrection Sickness and returns you at only
   // RES_HEALER_HP_FRACTION of your pools (the corpse run is the penalty-free choice).
   reviveAt(ctx, meta, p, p.pos, RES_HEALER_HP_FRACTION, 'resurrection');
-  ctx.emit({ type: 'respawn', pid: meta.entityId });
+  // The client reads the sickness tag to say "revived, but weaker" rather than
+  // the penalty-free line; nothing below RES_SICKNESS_MIN_LEVEL is charged, so the
+  // tag only travels when the Toll actually landed.
+  ctx.emit({
+    type: 'respawn',
+    pid: meta.entityId,
+    ...(hasResurrectionSickness(p) ? { sickness: 'resurrection' as const } : {}),
+  });
   // Credited too, deliberately: the lesson teaches the corpse run, but a
   // player who took the Keeper instead has no corpse left to walk to, and a
   // quest they can no longer finish is worse than one finished the long way.
@@ -400,7 +445,8 @@ function spiritHealerInRange(ctx: SimContext, p: Entity): boolean {
 type SicknessKind = 'none' | 'resurrection' | 'unstuck';
 
 // Shared resurrection: clear the ghost/corpse state, place the body, restore half
-// pools, and (when penalized) apply the named sickness.
+// pools, and (when penalized) apply the named sickness. Returns whether a sickness aura
+// actually landed (false for 'none' and below the level floor).
 function reviveAt(
   ctx: SimContext,
   meta: PlayerMeta,
@@ -408,7 +454,7 @@ function reviveAt(
   pos: Vec3,
   hpFrac: number,
   sickness: SicknessKind,
-): void {
+): boolean {
   p.dead = false;
   p.ghost = false;
   p.corpsePos = null;
@@ -443,14 +489,19 @@ function reviveAt(
   p.inCombat = false;
   // Apply sickness last: applyAura -> recalcPlayerStats preserves the hp/resource
   // fractions just set, so hp settles at RES_HP_FRACTION of the reduced max.
-  if (sickness === 'resurrection') applyResurrectionSickness(ctx, p);
-  else if (sickness === 'unstuck') applyUnstuckSickness(ctx, p);
+  const charged =
+    sickness === 'resurrection'
+      ? applyResurrectionSickness(ctx, p)
+      : sickness === 'unstuck'
+        ? applyUnstuckSickness(ctx, p)
+        : false;
   // Last of all, and here rather than in each caller, because EVERY way back to
   // life funnels through this one body: the pet the player's death took comes back
   // with them. Placed after the body has been moved and its pools rebuilt, so the
   // pet is put down beside where its owner actually stands and reads a finished
   // owner. No-ops when the death took no pet.
   restorePetOnOwnerRevive(ctx, p);
+  return charged;
 }
 
 // Apply one of the two sicknesses, dropping the other first. Both are `buff_allstats_pct`
@@ -463,8 +514,8 @@ function applySickness(
   name: string,
   value: number,
   dur: number,
-): void {
-  if (dur <= 0) return;
+): boolean {
+  if (dur <= 0) return false;
   const other = p.auras.findIndex((a) => SICKNESS_AURA_IDS.has(a.id) && a.id !== id);
   if (other >= 0) {
     // Emit the fade the client cannot infer, exactly as applyAura does for its own
@@ -489,13 +540,14 @@ function applySickness(
     // relogging already do (aurasSurvivingDeath). Only the timer clears it.
     undispellable: true,
   });
+  return true;
 }
 
 // Apply Resurrection Sickness. Fresh application uses the level-scaled duration (nothing
 // below RES_SICKNESS_MIN_LEVEL); a relog restore passes the SAVED remaining so the penalty
-// resumes rather than resets.
-export function applyResurrectionSickness(ctx: SimContext, p: Entity, remaining?: number): void {
-  applySickness(
+// resumes rather than resets. Returns whether the aura landed (false below the level floor).
+export function applyResurrectionSickness(ctx: SimContext, p: Entity, remaining?: number): boolean {
+  return applySickness(
     ctx,
     p,
     RESURRECTION_SICKNESS_ID,
@@ -507,9 +559,10 @@ export function applyResurrectionSickness(ctx: SimContext, p: Entity, remaining?
 
 // Apply Unstuck Sickness, the price of a completed /unstuck. Same shape as The Keeper's
 // Toll (level-scaled, nothing below UNSTUCK_SICKNESS_MIN_LEVEL, saved remaining on a relog
-// restore) but capped at 5 minutes rather than 10.
-export function applyUnstuckSickness(ctx: SimContext, p: Entity, remaining?: number): void {
-  applySickness(
+// restore) but capped at 5 minutes rather than 10. Returns whether the aura landed (false
+// below the level floor), which is what the completed unstuck event reports.
+export function applyUnstuckSickness(ctx: SimContext, p: Entity, remaining?: number): boolean {
+  return applySickness(
     ctx,
     p,
     UNSTUCK_SICKNESS_ID,

@@ -281,6 +281,14 @@ export const RETIRED_KEYS = [
   // carry the market flag; the successor worldWindowsBodyStationMaster says
   // what the game does, and its five non-Latin fills rode the same change.
   'guide.interfacePage.worldWindowsBody',
+  // -- v0.44.0 Unstuck Sickness window. The first /unstuck in an hour is free and only a
+  // repeat inside the window charges the sickness, so these three rows (which promise a
+  // price on every use) were superseded by the *Window keys rather than reworded: every
+  // overlay's reviewed translation of the old rule would otherwise keep rendering the
+  // wrong fact (docs/i18n-scaling/translation-workflow.md, reword staleness).
+  'guide.combat.unstuckBody',
+  'guide.commandsPage.unstuck',
+  'guide.glossary.unstuckDef',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

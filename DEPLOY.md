@@ -874,6 +874,33 @@ For off-box safety, sync the directory to S3 occasionally:
   while the worker was standing down after a release, which were refused at
   once and hid nothing. For D3D11 `auto` sessions `raw_summary.shaderWarm.mode`
   also shifts during the experiment: the `off` arm resolves to `off`.
+  `woc_client_cadence_reports_total` (same module, same stored gameplay reports)
+  is the frame rate ceiling cut: `frame_cap` is the ceiling the player chose
+  (`none`, `30`, `60`) and `cadence` is `reduced` when the client renders fewer
+  frames than the display offers on purpose (a cadence divisor above one, or a
+  ceiling with no display reading, which is the unpaced limiter), `full`
+  otherwise. Six series, pre-registered at zero. The fps and p95 series carry
+  no such label (their label sets are a pinned contract), so read a fleet-wide
+  rise in slow frames against this share first. The SQL drill-down is three
+  client_perf_reports columns, `frame_cap_intent` (0, 30 or 60),
+  `cadence_divisor` (1 to 16, 1 = ceiling inert) and `refresh_hz` (0 =
+  unknown, whole Hz), which survive the shed ladder where `raw_summary.cadence`
+  (mode, verdict, intent, refreshHz, divisor, targetIntervalMs, missShare,
+  rendered, skipped, and the automatic mode's readout: autoPhase,
+  autoConfirmed, autoFailStreak, autoLateShare, autoDescents, autoProbes,
+  autoProbesFailed, autoProbesInconclusive, autoFirstCeilingS) can be dropped.
+  That block adds about 340 bytes to every gameplay report BEFORE the ladder
+  runs, so expect the shed-rung distribution to sit one rung deeper from this
+  release on for a reason unrelated to client health: compare rungs within a
+  release, never across this one. The cadence label `reduced` also covers an
+  explicit ceiling with no display reading, which on a 60 Hz display with a
+  ceiling of 60 reduces nothing: read its share as an upper bound. A session
+  with `cadence_divisor > 1` or `frame_cap_intent <> 0`
+  renders slowly ON PURPOSE: split it out before reading `frame_p95_ms` or
+  `fps_avg`. From the same release on, `target_fps` is the effective target
+  (the ceiling's own rate while it is active): its meaning changes at this
+  release with no marker in the column, so split any window that straddles it
+  on `release_version`.
   `raw_summary` itself is capped in bytes by a priority shed ladder
   (`server/perf_report_shed.ts`): an oversized report loses its biggest,
   least diagnostic blocks one rung at a time and records them under

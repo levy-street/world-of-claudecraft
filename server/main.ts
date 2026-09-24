@@ -154,6 +154,8 @@ import {
 } from './claudium';
 import { claudiumSpendDetailed } from './claudium_proxy';
 import { configureCommunityTestAccounts } from './community_test_accounts';
+import { craftRollEventsIdle } from './craft_roll_events';
+import { pruneCraftRollEventsBatch } from './craft_roll_events_db';
 import {
   bustDailyRewardBoardCache,
   bustDailyRewardWinnersCache,
@@ -4101,6 +4103,13 @@ export async function startServer(): Promise<http.Server> {
           pruneWorldQuestScoresBatch(pool, config.worldQuestScoresRetentionDays, n),
       },
       {
+        // The chance-based crafting outcome audit (one row per masterwork
+        // proc draw or Perfecting attempt); append-only, observer-written
+        // (server/craft_roll_events.ts).
+        name: 'craft_roll_events',
+        pruneBatch: (n) => pruneCraftRollEventsBatch(pool, config.craftRollEventsRetentionDays, n),
+      },
+      {
         // The buy-now abandon ledger (claim-cooldown evidence): dead once
         // outside every cooldown window; kept a month for tuning forensics.
         name: 'woc_market_buy_now_abandons',
@@ -4292,6 +4301,9 @@ export async function startServer(): Promise<http.Server> {
     // unlike deeds these rows have no reconcile heal path, so a row dropped by
     // pool.end() is gone. Rejections log inside the writer; never throws.
     await progressEventsIdle();
+    // The craft_roll_events FIFO drains on the same reasoning: an audit row
+    // has no reconcile heal path, so a row rejected by pool.end() is gone.
+    await craftRollEventsIdle();
     // Drain the market sold-volume FIFO too (qr-19-sold-volume-four-seam-wiring):
     // each queued accumulator entry stands for many coalesced sales, and an entry
     // still on the tail would be rejected by pool.end() with a burst of failure

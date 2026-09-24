@@ -5818,7 +5818,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Inclut 5 % de chances de base communes à tous les aventuriers.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Une estimation, elle exclut les coups critiques et les dégâts des capacités.',
-  'hudChrome.perf.title': 'Surcouche de performance',
+  'hudChrome.perf.overlaySection': 'Surcouche de performance',
   'hudChrome.perf.enable': 'Afficher la surcouche de performance',
   'hudChrome.perf.description':
     "Choisissez les statistiques à afficher, l'emplacement de la surcouche et son apparence.",
@@ -11354,7 +11354,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     "Pluie et neige ambiantes. Ambiance uniquement, et l'éteindre permet d'économiser un peu lors des orages.",
   'guide.settingsPage.tableFoot':
-    "Vous cherchez une limite de FPS ? Il n'y a rien à chercher : la cadence d'images suit votre écran. La distance d'affichage est un réglage à part entière, Distance de vue, dans la carte Détail du monde, et chaque préréglage la règle pour vous jusqu'à ce que vous y touchiez.",
+    "La distance d'affichage est un réglage à part entière, Distance de vue, dans la carte Détail du monde, et chaque préréglage la règle pour vous jusqu'à ce que vous y touchiez.",
   'guide.settingsPage.tableHeading': 'Chaque option graphique, expliquée',
   'guide.settingsPage.tagReload': 'appuyer sur Appliquer',
   'guide.settingsPage.value100': '100%',

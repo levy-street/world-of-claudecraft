@@ -19,17 +19,19 @@ interface ConfirmCall {
   ok: string;
   cancel: string;
   onOk: () => void;
+  onCancel?: () => void;
 }
 
 interface GateHarness {
   onResurrectAtSpiritHealer: (() => void) | null;
-  sim: { buyHeroicVendorItem(itemId: string): void };
+  sim: { player?: { level: number }; buyHeroicVendorItem(itemId: string): void };
   confirmDialog(
     title: string,
     body: string,
     okText: string,
     cancelText: string,
     onOk: () => void,
+    onCancel?: () => void,
   ): void;
   requestSpiritHealerResurrect(): void;
   requestHeroicVendorPurchase(itemId: string): void;
@@ -38,8 +40,8 @@ interface GateHarness {
 function harness() {
   const confirmations: ConfirmCall[] = [];
   const hud = Object.create(Hud.prototype) as unknown as GateHarness;
-  hud.confirmDialog = (title, body, ok, cancel, onOk) => {
-    confirmations.push({ title, body, ok, cancel, onOk });
+  hud.confirmDialog = (title, body, ok, cancel, onOk, onCancel) => {
+    confirmations.push({ title, body, ok, cancel, onOk, onCancel });
   };
   return { hud, confirmations };
 }
@@ -48,8 +50,17 @@ const stockOffer = HEROIC_VENDOR_STOCK[0];
 if (!stockOffer) throw new Error('heroic vendor stock fixture not found');
 
 describe('spirit healer revive confirmation', () => {
-  it('opens the confirm and revives only from OK, never from the bare tap', () => {
-    const { hud, confirmations } = harness();
+  // Talking to the Keeper is two steps: its dialogue (Leave / Revive Me), then a
+  // confirmation. Only the confirmation's OK sends the command, and both bodies
+  // are worded for whether The Keeper's Toll lands at this level.
+  const withLevel = (level: number) => {
+    const rig = harness();
+    rig.hud.sim = { player: { level }, buyHeroicVendorItem: () => {} };
+    return rig;
+  };
+
+  it('opens the dialogue, then the confirm, and revives only from the second OK', () => {
+    const { hud, confirmations } = withLevel(20);
     const revive = vi.fn();
     hud.onResurrectAtSpiritHealer = revive;
 
@@ -57,11 +68,22 @@ describe('spirit healer revive confirmation', () => {
 
     expect(revive).not.toHaveBeenCalled();
     expect(confirmations).toHaveLength(1);
-    const confirm = confirmations[0];
+    const talk = confirmations[0];
+    expect(talk.title).toBe('The Pale Keeper');
+    expect(talk.body).toContain("Keeper's Toll");
+    expect(talk.body).toContain('75%');
+    expect(talk.body).toContain('no penalty');
+    expect(talk.body).not.toMatch(/spare/i);
+    expect(talk.ok).toBe('Revive Me');
+    expect(talk.cancel).toBe('Leave');
+
+    talk.onOk();
+    expect(revive).not.toHaveBeenCalled();
+    expect(confirmations).toHaveLength(2);
+    const confirm = confirmations[1];
     expect(confirm.title).toBe("Accept the Keeper's Toll?");
-    expect(confirm.body).toContain("Keeper's Toll");
+    expect(confirm.body).toContain('weaker');
     expect(confirm.body).toContain('75%');
-    expect(confirm.body).toContain('no penalty');
     expect(confirm.ok).toBe('Revive Me');
     expect(confirm.cancel).toBe('Cancel');
 
@@ -69,17 +91,39 @@ describe('spirit healer revive confirmation', () => {
     expect(revive).toHaveBeenCalledOnce();
   });
 
-  it('sends nothing when the dialog is dismissed', () => {
-    const { hud, confirmations } = harness();
-    const revive = vi.fn();
-    hud.onResurrectAtSpiritHealer = revive;
+  it('tells a newcomer the Toll is waived, at both steps', () => {
+    const { hud, confirmations } = withLevel(1);
+    hud.onResurrectAtSpiritHealer = vi.fn();
 
     hud.requestSpiritHealerResurrect();
+    expect(confirmations[0].body).toMatch(/spare/);
+    confirmations[0].onOk();
+    expect(confirmations[1].title).toBe('Let the Keeper raise you?');
+    expect(confirmations[1].body).toContain('will not weaken you');
+  });
 
-    // cancel/Escape tear the dialog down without running onOk (see
-    // Hud.confirmDialog); dismissing must leave the command unsent.
-    expect(confirmations).toHaveLength(1);
-    expect(revive).not.toHaveBeenCalled();
+  it('sends nothing when either dialog is dismissed', () => {
+    // cancel/Escape tear the dialog down and run only the no-choice callback
+    // (see Hud.confirmDialog); dismissing must leave the command unsent at
+    // either step and open nothing further.
+    const first = withLevel(20);
+    const reviveA = vi.fn();
+    first.hud.onResurrectAtSpiritHealer = reviveA;
+    first.hud.requestSpiritHealerResurrect();
+    expect(first.confirmations).toHaveLength(1);
+    first.confirmations[0].onCancel?.();
+    expect(first.confirmations).toHaveLength(1);
+    expect(reviveA).not.toHaveBeenCalled();
+
+    const second = withLevel(20);
+    const reviveB = vi.fn();
+    second.hud.onResurrectAtSpiritHealer = reviveB;
+    second.hud.requestSpiritHealerResurrect();
+    second.confirmations[0].onOk();
+    expect(second.confirmations).toHaveLength(2);
+    second.confirmations[1].onCancel?.();
+    expect(second.confirmations).toHaveLength(2);
+    expect(reviveB).not.toHaveBeenCalled();
   });
 });
 

@@ -116,6 +116,31 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       rawSummary: { roundtrip: true, seconds: 77 },
       shaderWarmWorkerActive: true,
       shaderWarmRefusal: 'extension-drift:ext_roundtrip',
+      frameCapIntent: 30,
+      cadenceDivisor: 4,
+      refreshHz: 144,
+      // The host-essentials block, appended LAST to both halves of the
+      // statement. The numbers are pairwise distinct. Three booleans cannot all
+      // differ from each other AND from the pre-existing gl_laptop (false)
+      // with only two values, so the pattern chosen is: every ADJACENT pair in
+      // COLUMN ORDER differs, which is what a slipped placeholder actually
+      // produces. In column order the block runs
+      //   ... app_gpu_ws_mb, host_on_battery, host_power_plan, host_power_mode,
+      //       host_hags, host_game_mode
+      // so host_on_battery is TRUE (its neighbours are a number and a string,
+      // and it differs from gl_laptop false), and host_hags FALSE beside
+      // host_game_mode TRUE. The only same-valued pair, host_on_battery and
+      // host_game_mode, is the furthest-apart pair in the whole appended run.
+      hostMemTotalMb: 32512,
+      hostMemFreeMb: 9088,
+      appWorkingSetMb: 1733,
+      appRendererWsMb: 911,
+      appGpuWsMb: 407,
+      hostOnBattery: true,
+      hostPowerPlan: 'high_performance',
+      hostPowerMode: 'best_performance',
+      hostHags: false,
+      hostGameMode: true,
     });
 
     const res = await db.pool.query('SELECT * FROM client_perf_reports WHERE session_id = $1', [
@@ -175,6 +200,23 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.shader_warm_worker_active).toBe(true);
     expect(r.shader_warm_refusal).toBe('extension-drift:ext_roundtrip');
     expect(r.desktop_shell).toBe(true);
+    // Last in the column list: a slipped placeholder would land them elsewhere.
+    expect(r.frame_cap_intent).toBe(30);
+    expect(r.cadence_divisor).toBe(4);
+    expect(r.refresh_hz).toBe(144);
+    // The host-essentials block, now last in the column list: every one read
+    // back BY NAME, so a slipped placeholder anywhere in the appended run
+    // lands a value in the wrong column and flips at least one of these.
+    expect(r.host_mem_total_mb).toBe(32512);
+    expect(r.host_mem_free_mb).toBe(9088);
+    expect(r.app_working_set_mb).toBe(1733);
+    expect(r.app_renderer_ws_mb).toBe(911);
+    expect(r.app_gpu_ws_mb).toBe(407);
+    expect(r.host_on_battery).toBe(true);
+    expect(r.host_power_plan).toBe('high_performance');
+    expect(r.host_power_mode).toBe('best_performance');
+    expect(r.host_hags).toBe(false);
+    expect(r.host_game_mode).toBe(true);
   });
 
   it('serves the row back through clientPerfRaw with the dimensions and suggestion ids mapped', async () => {
@@ -197,6 +239,23 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.glModel).toBe('roundtrip-model');
     expect(row?.glLaptop).toBe(false);
     expect(row?.gpuHpAdapter).toBe('roundtrip-hp-adapter');
+    expect(row?.targetFps).toBe(61);
+    expect(row?.frameCapIntent).toBe(30);
+    expect(row?.cadenceDivisor).toBe(4);
+    expect(row?.refreshHz).toBe(144);
+    // The admin raw reader's explicit SELECT list and mapper carry the
+    // host-essentials columns too: a column added to the insert but forgotten
+    // there reads back undefined here.
+    expect(row?.hostMemTotalMb).toBe(32512);
+    expect(row?.hostMemFreeMb).toBe(9088);
+    expect(row?.appWorkingSetMb).toBe(1733);
+    expect(row?.appRendererWsMb).toBe(911);
+    expect(row?.appGpuWsMb).toBe(407);
+    expect(row?.hostOnBattery).toBe(true);
+    expect(row?.hostPowerPlan).toBe('high_performance');
+    expect(row?.hostPowerMode).toBe('best_performance');
+    expect(row?.hostHags).toBe(false);
+    expect(row?.hostGameMode).toBe(true);
   });
 
   it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {
@@ -281,7 +340,11 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     const res = await db.pool.query(
       `SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
               suggestion_ids, gl_backend, gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter,
-              shader_warm_worker_active, shader_warm_refusal, desktop_shell
+              shader_warm_worker_active, shader_warm_refusal, desktop_shell,
+              frame_cap_intent, cadence_divisor, refresh_hz,
+              host_mem_total_mb, host_mem_free_mb, app_working_set_mb, app_renderer_ws_mb,
+              app_gpu_ws_mb, host_on_battery, host_power_plan, host_power_mode,
+              host_hags, host_game_mode
          FROM client_perf_reports WHERE session_id = $1`,
       [`${MARKER}-legacy`],
     );
@@ -303,6 +366,24 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       shader_warm_worker_active: false,
       shader_warm_refusal: '',
       desktop_shell: false,
+      // A row older than the frame rate ceiling had none: no intent, every
+      // refresh rendered, display rate never read.
+      frame_cap_intent: 0,
+      cadence_divisor: 1,
+      refresh_hz: 0,
+      // A row older than the host-essentials block, and equally every web and
+      // mobile row: NULL is "could not be read / not collected", '' is the
+      // unknown member of the two closed vocabularies.
+      host_mem_total_mb: null,
+      host_mem_free_mb: null,
+      app_working_set_mb: null,
+      app_renderer_ws_mb: null,
+      app_gpu_ws_mb: null,
+      host_on_battery: null,
+      host_power_plan: '',
+      host_power_mode: '',
+      host_hags: null,
+      host_game_mode: null,
     });
   });
 

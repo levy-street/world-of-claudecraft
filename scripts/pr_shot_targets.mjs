@@ -142,6 +142,14 @@ const advancedLowMixSeed = async (page) => {
 
 // Controller layout evidence needs the cross hotbar enabled, PlayStation glyphs,
 // and the reported remap already staged: Cross jumps while Triangle is unbound.
+// The Frame Rate Limit row at 30, on the standing lowest preset, so its status
+// line (the rate really obtained on this display) is part of the shot.
+const frameRateLimitSeed = async (page) => {
+  await page.evaluateOnNewDocument(
+    `try { const k = 'woc_settings'; const s = JSON.parse(localStorage.getItem(k) || '{}'); s.graphicsPreset = 1; s.graphicsDefaultApplied = true; s.frameRateCap = 3; localStorage.setItem(k, JSON.stringify(s)); } catch {}`,
+  );
+};
+
 // Seed before boot so both the manager and the options painter read one state.
 const controllerRemapSeed = async (page) => {
   await lowGraphicsSeed(page);
@@ -653,6 +661,16 @@ async function dismissTutorialGreetingUntilSettled(page, attempts = 8) {
 async function seedMediumGraphicsPreset(page) {
   await page.evaluateOnNewDocument(
     `try { const s = JSON.parse(localStorage.getItem('woc_settings') ?? '{}') || {}; s.graphicsPreset = 2; s.graphicsDefaultApplied = true; localStorage.setItem('woc_settings', JSON.stringify(s)); } catch {}`,
+  );
+}
+
+/** A distinctive authored look for the composed-portrait shots, seeded into the
+ *  creator draft (src/main.ts MODULAR_APPEARANCE_KEY) the offline quick-start
+ *  reads, on top of the lowest graphics preset. */
+async function seedComposedLookOnLowPreset(page) {
+  await seedLowGraphicsPreset(page);
+  await page.evaluateOnNewDocument(
+    `try { localStorage.setItem('woc.modularAppearance', JSON.stringify({ gender: 'female', hair: 'curlycap', skinHue: 25, skinSat: 0.55, skinLight: 0.32, hairHue: 285, hairSat: 0.55, hairLight: 0.45, lashes: true })); } catch {}`,
   );
 }
 
@@ -10108,6 +10126,41 @@ export const TARGETS = [
     },
   },
   {
+    key: 'graphics-options-frame-rate-limit',
+    label: 'Graphics options panel (System card, Frame Rate Limit row)',
+    when: ['game/frame_rate_cap_setting', 'game/frame_cadence'],
+    variants: [
+      { key: 'desktop', beforeLoad: frameRateLimitSeed },
+      { key: 'mobile', mobile: true, beforeLoad: frameRateLimitSeed },
+    ],
+    async capture(page) {
+      await dismissArrivalGreeting(page);
+      // The row states what the limit does on the display as measured, and the
+      // reading needs a few seconds of frames before it exists.
+      await wait(4000);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        document.querySelector('#options-menu .opt-btn[data-menu-action="graphics"]')?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      // On a base without the row the System card itself is the "before".
+      await page.evaluate(() => {
+        const row =
+          document.querySelector('[data-focus-key="frameRateCap:0"]') ??
+          document.querySelector('[data-focus-key="browserEffects:0"]');
+        row?.scrollIntoView({ block: 'center' });
+      });
+      await wait(300);
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     key: 'controller-options-button-layout',
     label: 'Controller options panel (remapped face-button layout)',
     when: ['ui/options_window', 'game/gamepad_bindings', 'game/gamepad_map'],
@@ -10204,6 +10257,74 @@ export const TARGETS = [
           ?.scrollIntoView({ block: 'center' });
       });
       return { clip: '#options-menu' };
+    },
+  },
+  {
+    // A player's composed (authored) face in every frame that holds a player,
+    // not only the player's own: the target frame (self-targeted, the offline
+    // world has no peers) and the player menu's title chip beside the player
+    // frame, then the Inspect card's turntable. The look is seeded before boot
+    // and made deliberately unlike the stock warrior art (female body, dark
+    // skin, violet hair) so the composed face and the class headshot cannot be
+    // mistaken for each other in the frame.
+    key: 'composed-player-portraits',
+    label: 'Composed player face in the target frame, the player menu chip and the Inspect card',
+    when: ['ui/player_portrait_core', 'ui/unit_portrait_painter', 'ui/portrait_chip'],
+    variants: [
+      { key: 'frames', beforeLoad: seedComposedLookOnLowPreset },
+      { key: 'inspect', beforeLoad: seedComposedLookOnLowPreset, clip: '#inspect-window' },
+    ],
+    async capture(page, variant) {
+      await sweepOverlays(page);
+      const staged = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const p = sim?.player;
+        if (!game || !sim || !p) return { ok: false, reason: 'offline world is unavailable' };
+        if (!p.modularAppearance) {
+          return { ok: false, reason: 'the seeded look did not reach the offline player' };
+        }
+        // The target frame holds a PLAYER only when one is targeted; self is the
+        // one player an offline world has (the F1 targetSelf keybind's path).
+        sim.targetEntity(p.id);
+        return { ok: true, targeted: p.targetId === p.id };
+      });
+      if (!staged.ok) throw new Error(staged.reason);
+      if (!staged.targeted) throw new Error('self-target did not take');
+      // The composed portrait is captured off the frame that asks for it and
+      // lands a beat later (longer under software GL); give it room.
+      await wait(5000);
+      await sweepOverlays(page, 4);
+      if (variant.key === 'inspect') {
+        await page.evaluate(() => {
+          const game = window.__game;
+          game.hud.openInspect(game.sim.player.id);
+        });
+        if (!(await pollForSize(page, '#inspect-window'))) {
+          throw new Error('inspect window did not open');
+        }
+        await wait(2500);
+        return { clip: variant.clip };
+      }
+      // The player menu opens above the frames so its chip shares the region
+      // with the player frame and the target frame.
+      const region = await page.evaluate(() => {
+        const game = window.__game;
+        const p = game.sim.player;
+        const frame = document.getElementById('player-frame').getBoundingClientRect();
+        game.hud.openContextMenu(p.id, p.name, Math.round(frame.left), Math.round(frame.top - 260));
+        const rects = ['#player-frame', '#target-frame', '#ctx-menu']
+          .map((sel) => document.querySelector(sel)?.getBoundingClientRect())
+          .filter((r) => r && r.width > 0 && r.height > 0);
+        const x0 = Math.min(...rects.map((r) => r.left));
+        const y0 = Math.min(...rects.map((r) => r.top));
+        const x1 = Math.max(...rects.map((r) => r.right));
+        const y1 = Math.max(...rects.map((r) => r.bottom));
+        return { x: x0, y: y0, width: x1 - x0, height: y1 - y0, count: rects.length };
+      });
+      if (region.count < 3) throw new Error('player menu or a unit frame is not visible');
+      await wait(800);
+      return { clip: region };
     },
   },
   {
@@ -13571,7 +13692,9 @@ export const TARGETS = [
           }
         });
         await wait(600);
-        await page.evaluate(() => document.querySelector('#resurrect-healer-btn')?.click());
+        // The Keeper's raise is a conversation now (no ghost-prompt button): open the
+        // same gate the world click and the interact key reach.
+        await page.evaluate(() => window.__game?.hud.requestSpiritHealerResurrect());
       } else if (variant.scene === 'heroic') {
         await page.evaluate(() => {
           const game = window.__game;
@@ -15817,6 +15940,175 @@ export const TARGETS = [
       // on the new one.
       await wait(1000);
       return { clip: '#ui' };
+    },
+  },
+  {
+    // Nature's Boon (src/sim/combat/druid_natures_boon.ts). The change is a HUD
+    // STATE, not a window, so the evidence is the action bar while a window is
+    // live: an ability the window pays for wears the golden rim
+    // (.action-btn.natures-boon, src/styles/hud.css).
+    //
+    // The pair of desktop variants IS the proof, and the Cat one is the
+    // negative half: the same armed window, the same Oakhide slot, no rim,
+    // because Oakhide is a Bruin payoff and naturesBoonFormAllows refuses it
+    // out of Bruin Form. A positive frame alone would not tell a working form
+    // gate from a rim painted on everything. The window's other member
+    // (Wildbloom) is not in the curated druid form-bar defaults
+    // (ui/hud/action_bar/owned_class_spec_defaults.ts DRUID_FORM_DEFAULTS), so
+    // it has no slot to light on a stock form bar and is deliberately not what
+    // these frames are shot against.
+    //
+    // The window is armed the way a player arms it, by auto-attacking in form
+    // until the 1-in-15 roll lands, because the rim is painted off the real
+    // aura and nothing shorter proves the auto-attack hook fires at all. On the
+    // BASE branch the passive does not exist, so the identical recipe waits out
+    // its window and shoots the plain bar: that is the honest BEFORE frame, and
+    // the reason this recipe must never throw when the aura never arrives.
+    key: 'natures-boon-glow',
+    label: "Nature's Boon armed: Oakhide rims in Bruin Form and nowhere else",
+    when: [
+      'sim/combat/druid_natures_boon',
+      'ui/hud/action_bar/action_bar_painter',
+      'ui/hud/action_bar/action_bar_view.ts',
+    ],
+    variants: [
+      {
+        key: 'cat-form-desktop',
+        charClass: 'druid',
+        charName: 'Wildfang',
+        formAbility: 'cat_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+      {
+        key: 'bruin-form-desktop',
+        charClass: 'druid',
+        charName: 'Wildfang',
+        formAbility: 'bear_form',
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page, variant) {
+      await page.waitForFunction(
+        () => {
+          const loading = document.querySelector('#loading-screen');
+          const ui = document.querySelector('#ui');
+          return (
+            document.body.classList.contains('game-active') &&
+            !!ui &&
+            getComputedStyle(ui).display !== 'none' &&
+            !!loading &&
+            !loading.classList.contains('visible')
+          );
+        },
+        { timeout: 90000, polling: 200 },
+      );
+      // Stage: high enough to know both members of the window, committed to the
+      // feral spec (the passive's gate reads playerMods().spec, so a specless
+      // druid never rolls at all), then shifted through the REAL cast so the
+      // form aura and the form's own bar page are both live.
+      const staged = await page.evaluate((formAbility) => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        sim.setPlayerLevel?.(40, player.id);
+        if (sim.setSpec?.('feral', player.id) !== true) {
+          return { ok: false, reason: 'the feral spec never took' };
+        }
+        player.resource = player.maxResource;
+        player.hp = player.maxHp;
+        sim.castAbility?.(formAbility, player.id);
+        return { ok: true };
+      }, variant.formAbility);
+      if (!staged.ok) throw new Error(staged.reason);
+      await page.waitForFunction(
+        () => {
+          const player = window.__game?.sim?.player;
+          return (
+            !!player &&
+            player.auras.some((a) => a.kind.startsWith('form_')) &&
+            player.gcdRemaining <= 0 &&
+            player.castingAbility === null
+          );
+        },
+        { timeout: 30000, polling: 100 },
+      );
+      // Let the level-up deed banners clear the middle of the screen before the
+      // bar shot, the way the swing-timer target does.
+      await wait(5200);
+      // Plant a durable hostile inside the (now feral) melee reach and engage
+      // auto-attack through the public toggle: the roll hangs off a LANDED
+      // melee swing, so nothing arms without a real target being really hit.
+      const engaged = await page.evaluate(() => {
+        const sim = window.__game?.sim;
+        const player = sim?.player;
+        if (!sim || !player) return { ok: false, reason: 'offline world is unavailable' };
+        let mob = null;
+        let best = Infinity;
+        for (const e of sim.entities.values()) {
+          if (e.kind !== 'mob' || e.hp <= 0 || e.id === player.id) continue;
+          const d = (e.pos.x - player.pos.x) ** 2 + (e.pos.z - player.pos.z) ** 2;
+          if (d < best) {
+            best = d;
+            mob = e;
+          }
+        }
+        if (!mob) return { ok: false, reason: 'no living mob in the offline world' };
+        // Deep enough to outlast a full arming window at level 40 in form, so
+        // the shot is never a corpse and the swings never stop.
+        mob.maxHp = 200000;
+        mob.hp = 200000;
+        mob.hostile = true;
+        mob.pos.x = player.pos.x + Math.sin(player.facing) * 2;
+        mob.pos.z = player.pos.z + Math.cos(player.facing) * 2;
+        mob.pos.y = player.pos.y;
+        if (mob.prevPos) {
+          mob.prevPos.x = mob.pos.x;
+          mob.prevPos.y = mob.pos.y;
+          mob.prevPos.z = mob.pos.z;
+        }
+        mob.spawnPos = { ...mob.pos };
+        mob.leashAnchor = { ...mob.pos };
+        sim.rebucket?.(mob);
+        player.targetId = mob.id;
+        sim.startAutoAttack?.(player.id);
+        return { ok: true, mobId: mob.id };
+      });
+      if (!engaged.ok) throw new Error(engaged.reason);
+      // Poll for the armed window rather than sleeping a fixed span: the offline
+      // sim advances on animation frames, so a wall-clock guess is either short
+      // (an unarmed AFTER frame, the exact false negative this target exists to
+      // avoid) or wastefully long. Topped up each pass so the druid never dies,
+      // runs out of resource, or loses the target mid-wait.
+      const armed = await page
+        .waitForFunction(
+          (mobId) => {
+            const sim = window.__game?.sim;
+            const player = sim?.player;
+            if (!sim || !player) return false;
+            player.hp = player.maxHp;
+            player.resource = player.maxResource;
+            const mob = sim.entities?.get(mobId);
+            if (mob) {
+              mob.hp = mob.maxHp;
+              if (player.targetId !== mob.id) player.targetId = mob.id;
+            }
+            return player.auras.some((a) => a.id === 'natures_boon');
+          },
+          { timeout: 120000, polling: 100 },
+          engaged.mobId,
+        )
+        .then(() => true)
+        .catch(() => false);
+      // Deliberately NOT a throw: on the base branch nothing ever arms, and that
+      // plain bar is the BEFORE half of this comparison.
+      if (!armed) console.log(`[shot] ${variant.key}: no window armed (expected on the base arm)`);
+      // Desktop only, deliberately: the rim is painted by action_bar_painter
+      // onto a .action-btn, and the mobile radial ring is a different painter
+      // that never receives the class, so a touch variant here would shoot a
+      // frame that cannot show the change either way.
+      return { clip: '#actionbar' };
     },
   },
   {

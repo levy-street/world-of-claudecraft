@@ -67,6 +67,7 @@ const abilityStringsEn = {
     forms: {
       bear: 'Bruin',
       cat: 'Cat',
+      bearOrCat: 'Bruin or Cat',
     },
   },
 };
@@ -1231,7 +1232,7 @@ const classAbilityNamesEn = {
         'Heals a friendly target for {damage} and an additional amount over 21 sec.',
         { restoration: 'Planting a NEW bloom adds 1 Verdance (max 5).' },
       ],
-      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 150 for 15 sec.'],
+      ['barkskin', 'Oakhide', 'Your skin hardens like bark, increasing armor by 20% for 15 sec.'],
       // Tank defensive cooldowns (paladin / druid), one distinct mechanic each.
       [
         'sacred_bulwark',
@@ -1273,12 +1274,12 @@ const classAbilityNamesEn = {
       [
         'pounce',
         'Slinkstrike',
-        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge.',
+        'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
       ],
       [
         'lunge',
         'Lunge',
-        'Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only.',
+        'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form.',
       ],
       [
         'hamstring_bite',
@@ -1877,7 +1878,7 @@ const classAbilityNamesEn = {
       [
         'frenzied_regeneration',
         'Savage Mending',
-        'Restores 40% of your maximum health over 10 sec. Bruin Form only.',
+        'Restores 40% of your maximum health over 10 sec. Bruin or Cat Form only.',
       ],
       [
         'frost_trap',

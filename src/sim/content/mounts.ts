@@ -20,6 +20,7 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'avian_strider'
   | 'lanternback_troll'
   | 'terrorspark_groundshaker';
 
@@ -109,6 +110,17 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
+  // Developer mount while its acquisition path is art-directed; the display
+  // name is final. The internal key stays `avian_strider` because the shipped
+  // GLB, icon, asset spec, and KTX2 seals are all named from it. The soulbound
+  // reins live in content/items.ts so /dev mounts can exercise the complete
+  // ownership/summon path in-world.
+  avian_strider: {
+    key: 'avian_strider',
+    name: 'Viridian Valestrider',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
   // A hill troll broken to the saddle by lamplighters: he carries an iron
   // throne strapped across his shoulders with a storm lantern hung off each
   // arm of it, so the rider travels lit. The Treasure Casket's rare mount
@@ -140,7 +152,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['avian_strider', 'terrorspark_groundshaker'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

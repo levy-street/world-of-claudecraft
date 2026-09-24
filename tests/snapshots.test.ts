@@ -1637,6 +1637,62 @@ describe('delta snapshots', () => {
     expect(lastSnap(fc.sent).self.ack).toBe(7);
   });
 
+  it("folds a seq-bearing 'target' command into the same input ack, beside its target echo", () => {
+    // The online mirror's pending-target echo (src/net/target_echo.ts) reads a
+    // covering ack as "this snapshot was built after my command", so the
+    // command's seq must ride the one high-water the movement frames use.
+    const other = joinServer(server, fakeWs(), 2, 'Other', 'mage');
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'cmd', cmd: 'target', id: other.pid, seq: 8 }),
+    );
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBe(8);
+    expect(snap.self.target).toBe(other.pid);
+
+    // A refused target (an unknown id) is still acked: the mirror then adopts
+    // the server's unchanged value from that very snapshot.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'target', id: 424242, seq: 9 }));
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.ack).toBe(9);
+    expect(lastSnap(fc.sent).self.target).toBe(other.pid);
+
+    // A seq-less 'target' (an older client) leaves the high-water alone.
+    server.handleMessage(session, JSON.stringify({ t: 'cmd', cmd: 'target', id: null }));
+    fc.sent.length = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.ack).toBe(9);
+    expect(lastSnap(fc.sent).self.target).toBeNull();
+  });
+
+  it("acks a lane-dropped 'target' command without running it, so the mirror yields to the server", () => {
+    // The fold sits at receipt, ahead of the lane verdict: a command the flood
+    // defense drops still advances the ack, and the client's hold then adopts
+    // the server's unchanged target from that snapshot (a command that never
+    // ran has no other correct outcome). Pinned by stubbing the lane verdict.
+    const other = joinServer(server, fakeWs(), 2, 'Other', 'mage');
+    // biome-ignore lint/suspicious/noExplicitAny: consumeLane is a private dispatcher method
+    const priv = server as any;
+    const realConsumeLane = priv.consumeLane;
+    priv.consumeLane = (s: unknown, lane: string, nowSec: number) =>
+      lane === 'command' ? false : realConsumeLane.call(server, s, lane, nowSec);
+    try {
+      server.handleMessage(
+        session,
+        JSON.stringify({ t: 'cmd', cmd: 'target', id: other.pid, seq: 12 }),
+      );
+    } finally {
+      priv.consumeLane = realConsumeLane;
+    }
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.ack).toBe(12);
+    expect(snap.self.target).toBeNull();
+  });
+
   it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
     const v2Server = new GameServer();
     const v2Client = fakeWs();

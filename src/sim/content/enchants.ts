@@ -94,7 +94,10 @@ import type { ItemSlot } from '../types';
  *  classic axes are the static tier ladder (content/enchants.ts header); the
  *  four rating and power axes belong to the LEARNED faction formulas only
  *  (world-quest reputation, docs/design/factions.md) and never join a static
- *  tier: recalcPlayerStats (../entity.ts) reads all ten from the instance. */
+ *  tier: recalcPlayerStats (../entity.ts) reads all ten from the instance.
+ *  Healing power is spelled `healingPower` on an INSTANCE (the key the
+ *  permanent loot quality core bakes, loot_quality/core.ts), against the item
+ *  definition's `healPower`; the tooltips label both. */
 export type EnchantStatAxis =
   | 'str'
   | 'agi'
@@ -103,7 +106,7 @@ export type EnchantStatAxis =
   | 'spi'
   | 'armor'
   | 'spellPower'
-  | 'healPower'
+  | 'healingPower'
   | 'critRating'
   | 'hasteRating';
 
@@ -742,7 +745,7 @@ export const ENCHANTS: Record<string, EnchantDef> = {
       { itemId: 'arcane_shard', count: 2 },
       { itemId: 'arcane_essence', count: 4 },
     ],
-    statBonus: { healPower: 34 },
+    statBonus: { healingPower: 34 },
     description:
       'Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.',
   },

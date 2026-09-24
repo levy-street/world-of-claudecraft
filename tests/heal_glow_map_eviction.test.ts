@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { AbilityVfxFx } from '../src/render/ability_vfx';
 import { Renderer } from '../src/render/renderer';
-import type { SimEvent } from '../src/sim/types';
+import type { Entity, SimEvent } from '../src/sim/types';
 
 type HealEvent = Extract<SimEvent, { type: 'heal2' }>;
 
@@ -25,6 +26,8 @@ interface LifecycleView {
 }
 
 interface LifecycleHarness {
+  sim: { entities: Map<number, Entity> };
+  abilityVfxFx: Pick<AbilityVfxFx, 'warriorRecovery'>;
   views: Map<number, LifecycleView>;
   healGlowAt: Map<number, number>;
   scene: { remove(object: THREE.Object3D): void };
@@ -62,6 +65,11 @@ function objectView(clickTarget: THREE.Object3D): LifecycleView {
 
 function harness(views: Map<number, LifecycleView>, healGlowAt: Map<number, number>) {
   const renderer = Object.create(Renderer.prototype) as unknown as LifecycleHarness;
+  // This narrow lifecycle fixture bypasses the renderer constructor. Keep the
+  // real recovery discriminator so ordinary heals still exercise the actual
+  // fallthrough path; its unrelated GPU pools are never needed by this event.
+  renderer.sim = { entities: new Map() };
+  renderer.abilityVfxFx = Object.assign(Object.create(AbilityVfxFx.prototype), { disposed: false });
   renderer.views = views;
   renderer.healGlowAt = healGlowAt;
   renderer.scene = { remove: vi.fn() };

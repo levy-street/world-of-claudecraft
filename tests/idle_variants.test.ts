@@ -125,9 +125,14 @@ describe('idle-breaker clips', () => {
     expect(end).toBeGreaterThan(start);
     const actionMap = characterVisualSource.slice(start, end);
 
-    expect(characterVisualSource).toContain(
-      'for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {',
+    const registration = characterVisualSource.match(
+      /for \(const name of \[([\s\S]*?)\]\) \{([\s\S]*?)\n {6}\}/,
     );
+    expect(registration, 'the constructor must register each declared action').not.toBeNull();
+    expect(registration?.[1]).toContain('...clipNamesOf(prep.def)');
+    expect(registration?.[1]).toContain('...SKIN_ATTACK_CLIP_NAMES');
+    expect(registration?.[2]).toContain('const clip = prep.clips.get(name);');
+    expect(registration?.[2]).toContain('this.actions.set(name, this.mixer.clipAction(clip))');
     expect(actionMap).toContain('...(c.idleVariants ?? []),');
     expect(actionMap).toContain('c.idleBeat?.clip,');
   });

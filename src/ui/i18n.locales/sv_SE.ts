@@ -9147,7 +9147,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jade',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Färgkodade varningar',
-  'hudChrome.perf.title': 'Prestandaöverlägg',
+  'hudChrome.perf.overlaySection': 'Prestandaöverlägg',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',
@@ -10515,7 +10515,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Omgivande regn och snö. Endast atmosfär, och att stänga av den sparar lite under stormar.',
   'guide.settingsPage.tableFoot':
-    'Letar du efter ett FPS-tak? Det finns inget att leta efter: bildtakten följer din skärm. Ritavståndet är en egen ratt, Siktavstånd, i kortet Världsdetaljer, och varje förinställning ställer den åt dig tills du flyttar den själv.',
+    'Ritavståndet är en egen ratt, Siktavstånd, i kortet Världsdetaljer, och varje förinställning ställer den åt dig tills du flyttar den själv.',
   'guide.settingsPage.tableHeading': 'Varje grafikalternativ, förklarat',
   'guide.settingsPage.tagReload': 'tryck Tillämpa',
   'guide.settingsPage.value100': '100 %',

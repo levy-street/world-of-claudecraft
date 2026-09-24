@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { maybeAutoEquip } from '../src/sim/auto_equip';
 import { bagCapacity } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -707,14 +708,12 @@ describe('masterwrought cap enforcement (equipItem)', () => {
     // An epic def worn as a legendary-rolled copy: it occupies the sub-cap.
     meta.equipmentInstance.ring1 = { rolled: { quality: 'legendary' } };
 
-    // addItemInstance has no auto-equip hook, so the arm is driven directly;
+    // addItemInstance has no auto-equip hook, so the arm is driven directly
+    // through its module (src/sim/auto_equip.ts, the seam addItem calls into);
     // addItem's only job here would be to call it.
     sim.addItemInstance(AMULET_ID, { rolled: { quality: 'legendary' } });
     sim.tick();
-    (sim as unknown as { maybeAutoEquip(id: string, m: typeof meta): void }).maybeAutoEquip(
-      AMULET_ID,
-      meta,
-    );
+    maybeAutoEquip(sim.ctx, AMULET_ID, meta);
     expect(tickErrors(sim)).toHaveLength(0);
     expect(sim.equipment.neck).toBeUndefined();
 
@@ -722,10 +721,7 @@ describe('masterwrought cap enforcement (equipItem)', () => {
     // the very same call equips it. So the skip above was the rolled quality
     // talking, not an inert reach-in.
     grant(sim, AMULET_ID);
-    (sim as unknown as { maybeAutoEquip(id: string, m: typeof meta): void }).maybeAutoEquip(
-      AMULET_ID,
-      meta,
-    );
+    maybeAutoEquip(sim.ctx, AMULET_ID, meta);
     expect(sim.equipment.neck).toBe(AMULET_ID);
   });
 

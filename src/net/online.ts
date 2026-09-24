@@ -256,6 +256,7 @@ import {
   stableDeadlineRemaining,
 } from './snapshot_timer_wire';
 import { socialInfoFromFrame } from './social_frame_wire';
+import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
@@ -1200,15 +1201,6 @@ const INCOMPATIBLE_WORLD_VERSION_ERROR = ONLINE_WORLD_INCOMPATIBLE_MESSAGE;
 // DESPAWN_GRACE_MS before vanishing — acceptable, since you can only see a
 // stealthed unit at that range when far out-leveling it.
 const DESPAWN_GRACE_MIN_DIST_SQ = 70 * 70;
-// How many self snapshots a pending target echo may hold the optimistic value
-// before the server's value wins regardless (the reconcile valve: a server
-// REFUSAL, an invalid, dead, or out-of-interest target, must still win). Self
-// snapshots broadcast once per 50 ms server loop callback, so 3 spans ~150 ms,
-// comfortably past the typical command round trip; on a slower link the worst
-// case degrades to the pre-fix one-snapshot blink, never a stuck target. A
-// snapshot COUNT rather than wall-clock keeps the valve deterministic in tests
-// (and needs no clock at all in the decode path).
-const TARGET_ECHO_SNAPSHOT_BUDGET = 3;
 
 export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
@@ -1722,13 +1714,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // idiom as pendingQuestCommands / quest_state_optimistic.ts. targetEntity
   // writes the optimistic targetId locally, but a snapshot the server generated
   // BEFORE processing the 'target' command is nearly always already in flight
-  // and still carries the OLD target; applying it blanks the target frame for
-  // one snapshot (and re-toggles the party-frames below-target push), the
-  // select flicker. While set, every self targetId write routes through
-  // applySelfTargetFromServer, which keeps displaying the optimistic id until
-  // the server echoes it or the snapshot budget runs out (server authority is
-  // untouched: a refusal still wins via that valve).
-  private pendingTargetEcho: { id: number | null; snapshotsLeft: number } | null = null;
+  // and still carries the OLD target; applying it shows the previous target
+  // (or blanks the frame) until the echo lands, the select bounce. While set,
+  // every self targetId write routes through applySelfTargetFromServer, which
+  // keeps displaying the optimistic id until a snapshot whose input ack covers
+  // the command's seq (the decision core is the pure target_echo.ts; server
+  // authority is untouched: that snapshot's value wins, refusal included).
+  private pendingTargetEcho: PendingTargetEcho | null = null;
   // Lazy holder (the bareClient idiom): requests() below creates this on first use.
   private worldInteractionRequests: WorldInteractionRequests | undefined;
   private mouselookFacing: number | null = null;
@@ -3503,38 +3495,22 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // applyWire and the precise `target` self-decode, same server-side value per
   // server/game.ts selfWireJson) and both must apply the same echo protection,
   // else the unguarded one re-introduces the clobber. `countStale` is true only
-  // for the self-decode, so one snapshot never burns two units of the budget.
+  // for the self-decode, so one snapshot never burns two units of the valve
+  // budget; the self-decode also runs after the snapshot's ack has been folded
+  // into ackedInputSeq, so it is the write that sees the release.
   private applySelfTargetFromServer(
     e: Entity,
     serverTarget: number | null,
     countStale: boolean,
   ): void {
-    const pending = this.pendingTargetEcho;
-    if (!pending) {
-      e.targetId = serverTarget;
-      return;
-    }
-    if (serverTarget === pending.id) {
-      // The echo landed: the server agrees, resume normal mirroring so a LATER
-      // server-initiated change (target death, out of interest) applies again.
-      this.pendingTargetEcho = null;
-      e.targetId = serverTarget;
-      return;
-    }
-    if (countStale) {
-      pending.snapshotsLeft -= 1;
-      if (pending.snapshotsLeft <= 0) {
-        // Reconciliation valve: the server never echoed the command (it refused
-        // an invalid, dead, or out-of-interest target). Server authority wins.
-        this.pendingTargetEcho = null;
-        e.targetId = serverTarget;
-        return;
-      }
-    }
-    // A stale pre-command snapshot: keep displaying the optimistic value.
-    // Assigned (not merely skipped) so the applyWire write earlier in the same
-    // snapshot pass cannot leave the clobbered value behind.
-    e.targetId = pending.id;
+    const r = resolveSelfTarget(
+      this.pendingTargetEcho,
+      serverTarget,
+      this.ackedInputSeq,
+      countStale,
+    );
+    this.pendingTargetEcho = r.pending;
+    e.targetId = r.targetId;
   }
 
   // --- IWorldTargeting: target selection + tab cycling ---
@@ -3544,25 +3520,29 @@ export class ClientWorld extends ReconWireState implements IWorld {
     // Armed only when the optimistic write actually happened, and never while
     // spectating: cmd() drops non-chat commands in spectate, so no echo would
     // ever arrive to release the hold on the spectated player's mirror.
+    // The command rides the input seq stream (server/game.ts folds a command's
+    // seq into the same lastInputSeq the self snapshot acks), so the mirror can
+    // tell a snapshot built after the command from a stale in-flight one. Not
+    // drawn in spectate, where cmd() drops the command: a hole in the seq stream
+    // reads server-side as a lost frame. (A send rawCmd drops on a closed socket
+    // burns a seq harmlessly: the input frames behind it drop the same way, and
+    // the reconnect hello restarts both counters.)
+    const seq = typeof this.spectating === 'string' ? null : ++this.inputSeq;
     const p = this.entities.get(this.playerId);
     if (p) {
       if (id === null) {
         p.targetId = null;
-        if (typeof this.spectating !== 'string') {
-          // last write wins: a newer call replaces any older pending record
-          this.pendingTargetEcho = { id: null, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
-        }
+        // last write wins: a newer call replaces any older pending record
+        if (seq !== null) this.pendingTargetEcho = armTargetEcho(null, seq);
       } else {
         const e = this.entities.get(id);
         if (e && (!e.dead || deadTargetSelectable(e, this.playerId))) {
           p.targetId = id;
-          if (typeof this.spectating !== 'string') {
-            this.pendingTargetEcho = { id, snapshotsLeft: TARGET_ECHO_SNAPSHOT_BUDGET };
-          }
+          if (seq !== null) this.pendingTargetEcho = armTargetEcho(id, seq);
         }
       }
     }
-    this.cmd({ cmd: 'target', id });
+    this.cmd(seq === null ? { cmd: 'target', id } : { cmd: 'target', id, seq });
   }
   tabTarget(): void {
     // Server-resolved retarget: its result must apply from the very next

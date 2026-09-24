@@ -6972,6 +6972,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Viridian Valestrider"
+      },
+      {
+        "kind": "mount",
         "name": "Grumbol the Lanternback"
       },
       {
@@ -19838,7 +19842,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       ],
       "bonus": [
         {
-          "stat": "healPower",
+          "stat": "healingPower",
           "value": 34
         }
       ]

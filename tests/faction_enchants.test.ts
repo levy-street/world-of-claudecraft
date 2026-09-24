@@ -122,7 +122,7 @@ describe("Riftwalker's Grace: the Agility proc through the shared enchant hub", 
 describe('the Church Order etchings: baked power lines the stat sum reads back', () => {
   it.each([
     [DAWNFIRE, 'spellPower', 18],
-    [BENEDICTION, 'healPower', 34],
+    [BENEDICTION, 'healingPower', 34],
   ] as const)(
     '%s bakes %s %d into the copy and it reaches the entity',
     (enchantId, axis, amount) => {

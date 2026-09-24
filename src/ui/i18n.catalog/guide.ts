@@ -465,6 +465,8 @@ export const guideStrings = {
       'Ambient rain and snow. Atmosphere only, and switching it off saves a little during storms.',
     rowBrowserEffects:
       'How fancy the interface itself is allowed to be: glass blur, glow, animated menus. Auto matches your browser; the 3D world is untouched either way.',
+    rowFrameRateCap:
+      'A ceiling on how many images the game draws each second. A computer that cannot keep up with its display lands on an uneven rhythm; a steady 30 looks smoother than that, halves the work, and keeps the computer cooler. Display means no limit.',
     rowTerrainDetail: 'Rich, blended ground textures versus a simpler, faster terrain look.',
     rowFoliageDensity: 'How far and how thick the grass grows around your character.',
     rowEffectsQuality:
@@ -477,7 +479,7 @@ export const guideStrings = {
     rowPerfOverlay:
       'An on-screen readout of FPS, frame time, and more. Turn it on while you tune this page, then hide it again.',
     tableFoot:
-      'Looking for an FPS cap? There is nothing to hunt for: frame pacing follows your display. Draw distance is a dial of its own, View Distance, in the World Detail card, and each preset sets it for you until you move it.',
+      'Draw distance is a dial of its own, View Distance, in the World Detail card, and each preset sets it for you until you move it.',
     mobileTitle: 'On phones and tablets',
     mobileBody:
       'On a phone or tablet the game starts you on Low. Every touch device lands there on its first launch, on purpose, so you can get into the world and play; raise it yourself from the Graphics panel any time. On an Android browser the whole ladder is open to you and your choice sticks. On iPhone and iPad you can still pick the top presets and they take hold as soon as you press Apply, but the game sets you back to High the next time you launch, because iOS can end the tab while a scene that large is being built. The downloaded app is shorter still: its preset list stops at High and the per-system dials are hidden, because the app manages those itself.',
@@ -671,6 +673,11 @@ export const guideStrings = {
     unstuckTitle: 'When you are truly stuck',
     unstuckBody:
       "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
+    // v0.44.0: the first use in an hour is free; only a repeat inside the window pays.
+    // New key rather than a reword, so the shipped translations of the row above (which
+    // promise a price on every use) are never shown for the new rule.
+    unstuckBodyWindow:
+      "If the world traps you somewhere you cannot get out of, type /unstuck. You need to be out of combat and standing still, not held by a stun or a root, and not in a duel or an arena match: a short countdown runs, and moving or taking damage cancels it. When it finishes you are set down at the nearest graveyard. It never kills you and it leaves no corpse, and if you were already down it raises you there instead. The first use in an hour costs you nothing. Use it again within an hour of the last and the price is Unstuck Sickness, a temporary weakening of all you are that has worn off by the time you could use the command again, and like the Keeper's Toll it spares brand-new characters entirely.",
     // The ledge climb (src/sim/climb.ts): the scripted pull-up that ends a jump on a
     // lip above the head. A movement MODE, so it owns motion while it runs, a stun
     // drops it, and a stunned or rooted body cannot start one.
@@ -1025,6 +1032,9 @@ export const guideStrings = {
     groupRecovery: 'Recovery and presence',
     unstuck:
       'The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. It leaves you weakened by Unstuck Sickness for a while afterwards, so it is a last resort rather than a shortcut.',
+    // v0.44.0 wording (first use in an hour free); new key, see unstuckBodyWindow.
+    unstuckWindow:
+      'The way out when the world has trapped you. Stand still through a short countdown and you are moved to the nearest graveyard, and raised there if you had already fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you weakened by Unstuck Sickness for a while afterwards, so it is a rescue rather than a shortcut.',
     afk: 'Mark yourself Away From Keyboard, with an optional message that anyone who whispers you gets as an automatic reply. Repeat it with no message to clear it; any other chat clears it too.',
     dnd: 'Do Not Disturb: like away, except whispers sent to you are held back instead of delivered.',
     sit: 'Sit down where you are, and stand back up. You stand automatically the moment you move, cast, or take a hit.',
@@ -1197,6 +1207,9 @@ export const guideStrings = {
     unstuckTerm: 'Unstuck Sickness',
     unstuckDef:
       'The price of using Unstuck from the game menu. Stand still through the countdown and it sets you down at the nearest graveyard, and you carry a temporary weakness for a while afterwards.',
+    // v0.44.0 wording (first use in an hour free); new key, see combat.unstuckBodyWindow.
+    unstuckDefWindow:
+      'The price of leaning on Unstuck from the game menu more than once in an hour. Stand still through the countdown and it sets you down at the nearest graveyard. The first use in an hour is free, and a repeat within an hour of the last also leaves you carrying a temporary weakness for a while afterwards.',
     itemLevelTerm: 'Item level',
     itemLevelDef:
       'One number summing up how strong a piece of gear is, handy when you want to compare two pieces quickly. Turn on Show Item Level in the options to see it on tooltips. Only gear with a known source carries one, so plain vendor basics and starter gear show nothing, and a missing figure is normal rather than a fault.',

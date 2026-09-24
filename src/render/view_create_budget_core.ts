@@ -13,6 +13,9 @@ export interface ViewCreateBudgetInput {
   entryElapsedMs: number;
   /** The frame's delta in seconds. */
   dt: number;
+  /** The delta as a load reading in ms (chosen_cadence.ts frameLoadMs), when the
+   *  client paces its own frames; absent, the delta itself is the reading. */
+  frameLoadMs?: number;
   /** The governor's smoothed frame ms. */
   frameMsEma: number;
   /** The tier's drop-frame threshold (GFX.budget.dropFrameMs). */
@@ -41,7 +44,7 @@ export function runtimeViewCreateBudget(
   if (base === 0) return 0;
   const dt = input.dt;
   if (!Number.isFinite(dt) || dt <= 0) return base;
-  const frameMs = Math.min(250, dt * 1000);
+  const frameMs = Math.min(250, input.frameLoadMs ?? dt * 1000);
   if (frameMs >= VIEW_CREATE_HITCH_FRAME_MS) state.backoffSeconds = VIEW_CREATE_BACKOFF_SECONDS;
   if (state.backoffSeconds > 0) {
     state.backoffSeconds = Math.max(0, state.backoffSeconds - dt);

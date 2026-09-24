@@ -5325,7 +5325,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Incluye un 5% de probabilidad base que comparten todos los aventureros.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Es una estimación, no incluye los golpes críticos ni el daño de habilidades.',
-  'hudChrome.perf.title': 'Superposición de rendimiento',
+  'hudChrome.perf.overlaySection': 'Superposición de rendimiento',
   'hudChrome.perf.enable': 'Mostrar superposición de rendimiento',
   'hudChrome.perf.description':
     'Elige qué estadísticas mostrar, dónde se ubica la superposición y cómo se ve.',
@@ -10966,7 +10966,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Ambiente de lluvia y nieve. Sólo la atmósfera, y apagarlo ahorra un poco durante las tormentas.',
   'guide.settingsPage.tableFoot':
-    '¿Buscas un límite de FPS? No hay nada que buscar: el ritmo de fotogramas sigue a tu pantalla. La distancia de dibujado es un control propio, Distancia de visión, en la tarjeta Detalle del mundo, y cada ajuste preestablecido la fija por ti hasta que tú la muevas.',
+    'La distancia de dibujado es un control propio, Distancia de visión, en la tarjeta Detalle del mundo, y cada ajuste preestablecido la fija por ti hasta que tú la muevas.',
   'guide.settingsPage.tableHeading': 'Cada opción de gráficos, explicada',
   'guide.settingsPage.tagReload': 'pulsa Aplicar',
   'guide.settingsPage.value100': '100%',

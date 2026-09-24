@@ -6,6 +6,9 @@ node_modules
 
 # build outputs
 dist/
+# committed on purpose: the shipped host diagnostic bundle is byte-pinned by its
+# manifest (tests/host_diag_bundle.test.ts), so it is reviewed in diffs, not built blind
+!electron/host_diag/dist/
 dist-env/
 dist-ota/
 dist-server/

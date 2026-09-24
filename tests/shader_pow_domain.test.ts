@@ -123,6 +123,13 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/battleground_rune_vfx.ts': 3,
   'src/render/battleground_ward.ts': 1,
   'scripts/asset_pipeline/weapon_vfx.js': 4,
+  // Authored Warrior materials are part of the same fail-closed domain scan.
+  'src/render/ability_vfx/baked_impact_layers.ts': 1,
+  'src/render/ability_vfx/ribbons.ts': 1,
+  'src/render/ability_vfx/signature_crests.ts': 4,
+  'src/render/ability_vfx/solid_impact_fragments.ts': 2,
+  'src/render/ability_vfx/warrior_rage_material.ts': 1,
+  'src/render/characters/surface_response.ts': 5,
   'src/render/ability_vfx/rings.ts': 1,
   'src/render/ability_vfx/shells.ts': 1,
   // the armour-dye sRGB<->linear pair (bases clamped with max(c, 0))

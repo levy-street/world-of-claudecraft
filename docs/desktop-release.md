@@ -924,6 +924,134 @@ product exist. Coding and merge stay dark-safe without those credentials.
   inside the OS-sandboxed renderer (sandbox and context isolation stay on), not the
   main process; the cache holds application bytecode only, never player data.
 
+## Host diagnostic
+
+The player-triggered machine report: the shell collects one JSON file the player
+saves and sends to support. Two halves, one file (`electron/host_diag.cjs`, whose
+behavior is pinned by `tests/electron_host_diag.test.ts`):
+
+- **Every platform**: whitelisted Electron readings (versions, CPU and memory,
+  `getAppMetrics` per process, the displays, battery, `getGPUFeatureStatus`, a
+  reduced `getGPUInfo`) plus the shell's own launch decisions (distribution, the
+  GPU-force flags, the backend rung). No user name, no path, no machine name and no
+  raw API object rides along: every field passes a fixed key list or a type filter.
+- **Windows only**: the JSON printed by the shipped PowerShell tool, whose contract
+  is `electron/host_diag/SCHEMA.md`. That layer is where a performance complaint is
+  usually answered (NVIDIA profile, Windows per-app GPU preference, power mode,
+  single-channel memory, hybrid adapters). Off Windows the file says
+  `native.status: "unsupported-platform"` rather than hiding the gap.
+
+### The sibling: host essentials in the automatic perf report
+
+Not to be confused with the diagnostic above. `electron/host_essentials.cjs` is a
+much smaller, unattended collector behind the `desktop-host-essentials` IPC channel
+(`DesktopBridge.getHostEssentials` in `src/runtime.ts`): a handful of scalars the
+browser sandbox cannot see, attached to every automatic perf report as TOP-LEVEL
+fields by `src/game/desktop_host_essentials.ts` and `src/game/perf_reporter.ts`, and
+stored as typed columns (`server/perf_report_host.ts`,
+`server/client_perf_reports_schema.ts`). Web and mobile reports simply lack them.
+
+It never spawns PowerShell: the four Windows settings (power plan, power mode,
+hardware-accelerated GPU scheduling, Game Mode) come from `reg.exe` through the
+sanctioned `queryRegValue` reader in `electron/gpu_preference.cjs`, async, with a
+fixed argv and a strict key allowlist. It is never invoked on the startup path (the
+first read is the renderer's first request), a collection younger than a minute is
+reused, and concurrent requests share one run.
+
+Privacy shapes every field, because the perf endpoint accepts anonymous posts: the
+memory sizes are rounded hard (256 MB total, 64 MB free) and the two power settings
+are folded to CLOSED VOCABULARIES inside the shell, so the raw Windows power-scheme
+GUID (which for a custom plan identifies one machine) never leaves it. The three
+copies of those vocabularies are kept equal by
+`tests/host_essentials_vocabulary_parity.test.ts`, which also ties the power-mode map
+to `electron/host_diag/win/collectors/Power.ps1`.
+
+### What ships where, and the hash check
+
+`build.extraResources` copies `electron/host_diag/dist/HostDiag.ps1` to
+`<resourcesPath>/host-diag/HostDiag.ps1`, OUTSIDE the asar, because PowerShell
+cannot read a file inside an archive. `build.files` therefore excludes the `win/`
+sources, a second copy of the script and the directory's `.md` files, while
+`dist/manifest.json` stays INSIDE the asar on purpose.
+
+That split is the integrity model. The shipped NSIS installer is per-user, so its
+install directory is writable by anything running as that player: the `.ps1` is a
+loose file where the asar is not (the asar is covered by the `onlyLoadAppFromAsar`
+and `enableEmbeddedAsarIntegrityValidation` fuses in the build block above). So the
+shell reads the script's bytes, hashes them, compares the digest to the in-asar
+manifest, and spawns nothing unless they match; a mismatch or an unreadable file
+answers `native.status: "unavailable"` with the reason, and the player still gets the
+Electron half. The spawn is a fixed argv array through `powershell.exe` resolved
+absolutely from `%SystemRoot%`, never a shell, with the run capped at 120 s and stdout
+at 2 MB.
+
+Be precise about what that check buys, because it is easy to overclaim:
+
+- **It does defeat** a script that was corrupted (a partial update, a truncated
+  download), one an antivirus quarantined and something later restored wrong, and one
+  swapped passively at rest (a stale or tampered install directory, a file dropped
+  there by something that is no longer running). Those are the realistic cases, and
+  they are the ones the manifest catches.
+- **It does not defeat** a verify-then-spawn race. Malware already running as the
+  player can swap the file between the hash read and the moment PowerShell opens it,
+  and no arrangement of read-then-spawn inside one process closes that window. It is
+  also not the threat to design against: such malware already owns the player's
+  account, so editing a diagnostic script is a strictly worse option than what it can
+  already do directly. The window is also wider than the first spawn: the script
+  re-spawns itself from the same path once per isolated collector and once more on
+  the 32-bit relaunch arm, so it is re-read from the install directory throughout
+  the run, and the hash pins the FIRST read only. Same trust domain, same
+  conclusion, but the check should not be read as covering the later reads.
+
+### Rebuilding it
+
+Edit the sources under `electron/host_diag/win/`, run `npm run host-diag:build`, and
+commit `dist/`. Freshness is a build GATE, not a warning: `scripts/electron-build.mjs`
+runs `scripts/host_diag_build.mjs --check` right after the vendor bundle, so a stale
+`dist/` fails the desktop build instead of shipping a diagnostic the shell would
+refuse to run (`tests/host_diag_bundle.test.ts` pins the same check in CI).
+
+### Signing the script (the stronger control, and order matters)
+
+Authenticode-signing the `.ps1` is not done today: the tool runs under
+`-ExecutionPolicy Bypass`, so no policy needs a signature, and the hash pin is what
+the shell trusts. Signing is nonetheless the stronger control to add next, for exactly
+the reason the previous section gives: a signature is validated by Windows when the
+file is loaded, not by this process against a copy of the bytes read beforehand, so it
+has no verify-then-use gap to lose. It also removes the shape heuristic engines
+dislike (see the checklist below).
+
+If a release signs it, the signing step must run in the release pipeline BEFORE the
+manifest hash is computed, because signing appends a signature block and so changes
+the bytes; signing after the build would produce exactly the `hash-mismatch` the check
+exists to catch.
+
+### Antivirus test checklist (per release, Windows)
+
+A signed installer carrying an unsigned PowerShell script that spawns PowerShell at
+runtime is the shape heuristic engines dislike, so verify by hand:
+
+1. On-demand scan of `electron/host_diag/dist/HostDiag.ps1` and of the built
+   installer with Microsoft Defender (plus one third-party engine where available):
+   both clean, nothing quarantined.
+2. Install with real-time protection ON: no block, no prompt, and the script is
+   present at `<install dir>\resources\host-diag\HostDiag.ps1` afterward.
+3. Click-to-run: trigger the diagnostic in the game, confirm no console window
+   flashes over the game, the save dialog appears, the saved file carries
+   `native.status: "ok"` or `"partial"`, and the log shows one
+   `[diag] host diagnostic` line.
+4. If an engine does quarantine the script, confirm the shell degrades cleanly:
+   `native.status: "unavailable"`, reason `missing`, and the Electron half still
+   saved.
+
+Two behaviors are the first suspects when an engine flags the script, so triage a
+false positive against both: the `Add-Type` compile into `%TEMP%` (see
+`electron/host_diag/CLAUDE.md`), and the Browsers collector reading each Chromium
+browser's `Local State` file. That file is single-line JSON, so extracting the one
+hardware-acceleration boolean means reading it whole, and it also holds the
+DPAPI-wrapped `os_crypt` key, which makes "PowerShell spawned by a game reads
+`Local State`" a classic infostealer indicator. Only the boolean is kept.
+
 ## Post-release verification checklist (each OS, each channel)
 
 1. Fresh install, launch: window appears, no Gatekeeper/SmartScreen block (signed

@@ -15,6 +15,37 @@ interface VibrationActuator {
 
 const gate = createHapticGate();
 
+// The one owner of the player's haptics opt-out preference and of the
+// contact-hit throttle: a melee/ranged impact lands far more often than an
+// aura proc, so it gets its own, much tighter minimum gap on the same gate
+// primitive above.
+const HAPTICS_STORE_KEY = 'woc_haptics_on';
+const contactGate = createHapticGate(90);
+
+/** Whether the player has haptics on (defaults on; opt-out only). */
+export function hapticsEnabled(): boolean {
+  try {
+    return typeof localStorage === 'undefined' || localStorage.getItem(HAPTICS_STORE_KEY) !== '0';
+  } catch {
+    return true; // an unavailable/blocked store is silent, not a refusal
+  }
+}
+
+/** Short phone-vibrate contact-hit feedback (melee/ranged impact), independent
+ *  of the gamepad-capable aura-proc pulse above: a hit lands too often to
+ *  also occupy a pad's actuator every time. `durationMs` is the caller's
+ *  weight-scaled buzz length; this owns only the opt-out check, the throttle,
+ *  and the actuator call. */
+export function playContactHaptic(durationMs: number, nowMs = performance.now()): void {
+  if (!hapticsEnabled() || !contactGate.allow(nowMs)) return;
+  if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return;
+  try {
+    navigator.vibrate(durationMs);
+  } catch {
+    // Blocked by a permissions policy or an engine that only pretends to support it.
+  }
+}
+
 /** Fire one pulse on whatever haptic hardware is present. Silent no-op otherwise. */
 export function playAuraHaptic(shape: HapticShape, nowMs = Date.now()): void {
   if (!gate.allow(nowMs)) return;

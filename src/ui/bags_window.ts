@@ -18,7 +18,7 @@
 // (not a literal white hex).
 
 import { audio } from '../game/audio';
-import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
+import { BACKPACK_SLOTS, bagSlotsOf, stackSizeOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
 import { baggedCopyAnchor } from '../sim/item_copy_anchor';
@@ -69,6 +69,7 @@ import {
   carriedPools,
   materialsOnlyEmptyCells,
   resolveDepositSubmit,
+  tradeOfferOpensPrompt,
 } from './bags_view';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
@@ -111,11 +112,13 @@ import { materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { BAG_ITEM_ROW_ATTR } from './panel_key_guard';
 import {
+  dismissInstalledPrompt,
   installPromptDialog as installModalPromptDialog,
   type PromptDialogHandle,
 } from './prompt_dialog';
 import { tSim } from './sim_i18n';
 import { bindTouchItemDrag } from './touch_item_drag';
+import { resolveTradeOfferSubmit } from './trade_view';
 import { svgIcon } from './ui_icons';
 import { unknownItemIconHtml } from './unknown_item_icon';
 import { type VendorSellConfirmPolicy, vendorSaleNeedsConfirm } from './vendor_sell_confirm_policy';
@@ -137,7 +140,7 @@ const SORT_SETTLE_STAGGER_CAP = 20;
 // an orphaned aria-modal dialog floating over the closed window (the show* paths
 // already clear a prior same-type prompt with these classes).
 const BAG_PROMPT_SELECTOR =
-  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt';
+  '.discard-item-prompt, .sell-quantity-prompt, .sell-confirm-prompt, .bank-deposit-prompt, .trade-offer-prompt';
 // Exported for the HUD's mobile cluster-close paths (closeVendor / onBankClosed),
 // which hide #bags without running close(): they must not strand a still-visible
 // prompt in #prompt-stack (promptModalOpen() would keep gating game keys on it).
@@ -145,7 +148,11 @@ export function dismissBagPrompts(
   owner: HTMLElement | null = document.getElementById('bags'),
 ): void {
   if (owner) closeMaterialSourcesDialogForOwner(owner);
-  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) p.remove();
+  // Through each prompt's own dismiss() (prompt_dialog.ts registry), so the
+  // root a prompt made inert is cleared by the sweep, never left behind. The
+  // selector names only prompts THIS window owns: the trade window's remove
+  // prompt carries its own class and is never swept from here.
+  for (const p of document.querySelectorAll(BAG_PROMPT_SELECTOR)) dismissInstalledPrompt(p);
 }
 
 // An item row runs a GAME action (use / summon / equip / sell / deposit), so it
@@ -265,7 +272,14 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  closing the bank; dropping the docking class lets the mobile standalone
    *  full-screen rule take over instead of leaving a half-width orphan). */
   onClosed(): void;
-  addItemToTrade(itemId: string): void;
+  /** Stage `count` (default 1) units of a bag item into the open trade's
+   *  offer; the HUD clamps to tradeOfferHeadroom and skips a no-op. */
+  addItemToTrade(itemId: string, count?: number): void;
+  /** How many more units of the item the open trade can still take (the live
+   *  held total minus what is already staged; 0 when no trade is open or a
+   *  new line would exceed the offer's line cap). The shift-click quantity
+   *  prompt's ceiling AND its submit-time stale guard. */
+  tradeOfferHeadroom(itemId: string): number;
   /** Stage a bag item for a Market listing (selects it + repaints the market).
    *  `instance` is the clicked slot's payload (issue 1165): an instanced copy stages
    *  as ITSELF (single-copy listing), a plain stack stages fungibly. */
@@ -1091,7 +1105,7 @@ export class BagsWindow {
       row.setAttribute(
         'aria-label',
         t(itemAriaKey, {
-          item: itemName,
+          item: parts.ariaName,
           count: formatNumber(s.count, { maximumFractionDigits: 0 }),
         }),
       );
@@ -1106,7 +1120,7 @@ export class BagsWindow {
       // .bi-quest-seal-ready (static; optional pulse is CSS-only).
       const cornerSeal = cornerMarkHtml(cornerMark, { questReady });
       const lockSeal = lockMarkHtml(locked);
-      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
+      row.innerHTML = `${this.deps.itemIcon(item, parts.quality)}${parts.qualityBadge}${cornerSeal}${lockSeal}<span class="bi-count">${s.count > 1 ? esc(t('itemUi.bags.stackCount', { count: formatNumber(s.count, { maximumFractionDigits: 0 }) })) : ''}</span>`;
       // A firebottle mid-throw-cooldown paints a draining curtain on its slot so the
       // 5s throw pacing is visible in the bag. The bag is a cold window with no
       // per-frame driver, so the sweep is a self-contained CSS animation seeded from
@@ -1745,9 +1759,18 @@ export class BagsWindow {
       case 'transferBlockedSoulbound':
         this.deps.showError(t('hudChrome.itemSoulbound'));
         return;
-      case 'trade':
+      case 'trade': {
+        // A click on a splittable stack opens the offer-quantity prompt (the
+        // bank withdraw prompt's trade twin) instead of staging one unit per
+        // click; a single unit or an instanced copy stages directly.
+        const headroom = this.deps.tradeOfferHeadroom(s.itemId);
+        if (tradeOfferOpensPrompt(s, headroom)) {
+          this.showTradeQuantityPrompt(s.itemId, headroom);
+          break;
+        }
         this.deps.addItemToTrade(s.itemId);
         break;
+      }
       case 'mailAttachBlocked':
         this.deps.showError(t('hudChrome.mailbox.cannotMail'));
         return;
@@ -1969,6 +1992,14 @@ export class BagsWindow {
       const link = bagShiftLinks(mode)
         ? `<div class="tt-sub">${esc(t('hudChrome.itemShare.linkHint'))}</div>`
         : '';
+      // Say that the click will ask for a quantity, on the trade-offer hint
+      // arm only (a blocked soulbound copy never shows it) and only when the
+      // prompt would actually open (a splittable stack with room left).
+      const tradePartial =
+        key === 'itemUi.tooltip.clickTradeOffer' &&
+        tradeOfferOpensPrompt(s, this.deps.tradeOfferHeadroom(s.itemId))
+          ? `<div class="tt-sub">${esc(t('hudChrome.trade.offerQuantityHint'))}</div>`
+          : '';
       // The stack's own per-unit provenance travels with it: the card lists
       // each contributor and how many of their units are in THIS stack. Through
       // the shared projection, so a LEGACY signed material stack reads as
@@ -1979,7 +2010,8 @@ export class BagsWindow {
         partial +
         equipDrag +
         destroy +
-        link
+        link +
+        tradePartial
       );
     });
   }
@@ -2607,6 +2639,69 @@ export class BagsWindow {
           // Land focus on the always-present close button rather than letting
           // it drop to <body> (the opener slot is gone on both arms).
           (this.deps.root().querySelector('[data-close]') as HTMLElement | null)?.focus();
+        },
+      },
+    );
+  }
+
+  // The offer-quantity prompt (click a splittable stack while a trade is
+  // open): the bank withdraw prompt's trade twin, with the vault's whole-stack
+  // step pair around the unit pair. The shared builder (bank_quantity_prompt.ts)
+  // owns the chrome; this owns the trade closures:
+  // the ceiling is the LIVE headroom the HUD reports (held total minus what the
+  // offer already carries), the submit re-resolves that headroom so a prompt
+  // left open across a closed trade or a spent stack refuses instead of staging
+  // a phantom, and the send is the same addItemToTrade a plain click uses.
+  private showTradeQuantityPrompt(itemId: string, maxCount: number): void {
+    // knownItemDef, not a raw ITEMS index: the release's stale-client sweep
+    // made every bags item read tolerate an id this client does not know.
+    const item = knownItemDef(ITEMS, itemId);
+    const itemName = item ? itemDisplayName(item) : itemId;
+    // The clicked row SURVIVES a stage (nothing rebuilds the grid), so focus
+    // can go back to it after a submit; the always-present close button is
+    // the fallback for a row that left the bags under the prompt. (The dialog
+    // recipe captures its own opener for the Cancel / Escape return.)
+    const clickedRow = document.activeElement as HTMLElement | null;
+    // One big press moves a whole bag stack (the item's stack size), the
+    // vault withdraw prompt's rule, so 45 held is two presses and a nudge.
+    const stepSize = stackSizeOf(item);
+    const stepCount = formatNumber(stepSize, { maximumFractionDigits: 0 });
+    const unitCount = formatNumber(1, { maximumFractionDigits: 0 });
+    showQuantityPrompt(
+      {
+        installPromptDialog: (prompt, opener, close) =>
+          this.installPromptDialog(prompt, opener, close),
+        dismissSiblings: dismissBagPrompts,
+      },
+      {
+        className: 'trade-offer-prompt',
+        step: {
+          size: stepSize,
+          downAriaText: t('hudChrome.bank.quantityStepDownAria', { count: stepCount }),
+          upAriaText: t('hudChrome.bank.quantityStepUpAria', { count: stepCount }),
+          unitDownAriaText: t('hudChrome.bank.quantityStepDownAria', { count: unitCount }),
+          unitUpAriaText: t('hudChrome.bank.quantityStepUpAria', { count: unitCount }),
+        },
+        titleText: t('hudChrome.trade.offerQuantityTitle', { item: itemName }),
+        inputAriaText: t('hudChrome.trade.offerQuantityInput'),
+        confirmText: t('hudChrome.trade.offerQuantityConfirm'),
+        // One press stages every unit the offer can take (the prompt's own
+        // ceiling, clamped again to the live headroom at submit).
+        confirmAllText: t('hudChrome.trade.offerQuantityAll'),
+        cancelText: t('itemUi.vendor.sellQuantityCancel'),
+        maxCount,
+        resolveCount: (requested) =>
+          resolveTradeOfferSubmit(this.deps.tradeOfferHeadroom(itemId), requested),
+        send: (count) => {
+          this.deps.addItemToTrade(itemId, count);
+          this.deps.hideTooltip();
+        },
+        afterClose: () => {
+          const landing =
+            clickedRow?.isConnected && this.deps.root().contains(clickedRow)
+              ? clickedRow
+              : (this.deps.root().querySelector('[data-close]') as HTMLElement | null);
+          landing?.focus();
         },
       },
     );

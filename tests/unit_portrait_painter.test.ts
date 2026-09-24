@@ -11,9 +11,19 @@ vi.mock('../src/render/characters/portrait', () => ({
   playerPortraitDataUrl: vi.fn(),
   visualPortraitDataUrl: vi.fn(),
   modularPortraitDataUrl: vi.fn(),
+  cachedPortraitDataUrl: vi.fn(),
 }));
 
+import type { ModularLook } from '../src/render/characters/modular';
+import {
+  cachedPortraitDataUrl,
+  modularPortraitDataUrl,
+  playerPortraitDataUrl,
+  visualPortraitDataUrl,
+} from '../src/render/characters/portrait';
 import { UnitPortraitPainter } from '../src/ui/unit_portrait_painter';
+
+const LOOK = { app: {}, worn: {} } as unknown as ModularLook;
 
 type ImageListener = () => void;
 
@@ -193,5 +203,68 @@ describe('UnitPortraitPainter', () => {
     painter.drawHeadshot(canvas, '/mob-0.webp');
 
     expect(FakeImage.instances).toHaveLength(34);
+  });
+
+  describe('a composed subject', () => {
+    beforeEach(() => {
+      for (const fn of [
+        playerPortraitDataUrl,
+        visualPortraitDataUrl,
+        modularPortraitDataUrl,
+        cachedPortraitDataUrl,
+      ]) {
+        vi.mocked(fn).mockReset();
+      }
+    });
+
+    it('never kicks a class capture while its own runs: peeks the stock face, else the crest', () => {
+      const { canvas, context } = fakeCanvas();
+      const painter = new UnitPortraitPainter(() => 1);
+      vi.mocked(modularPortraitDataUrl).mockReturnValue(null);
+      vi.mocked(cachedPortraitDataUrl).mockReturnValue(null);
+
+      painter.drawModularPlayer(canvas, 'player_warrior_modular', LOOK, 'warrior', 2);
+
+      // The live class getter would start a second offscreen capture of a face
+      // the composed capture replaces; the peek asks the cache only.
+      expect(playerPortraitDataUrl).not.toHaveBeenCalled();
+      expect(cachedPortraitDataUrl).toHaveBeenCalledWith('player_warrior', 2);
+      expect(context.drawImage.mock.calls[0][0]).toBe(crestCanvas);
+
+      vi.mocked(cachedPortraitDataUrl).mockReturnValue('/stock.png');
+      painter.drawModularPlayer(canvas, 'player_warrior_modular', LOOK, 'warrior', 2);
+      expect(canvas.dataset.portrait).toBe('/stock.png');
+
+      vi.mocked(modularPortraitDataUrl).mockReturnValue('/composed.png');
+      painter.drawModularPlayer(canvas, 'player_warrior_modular', LOOK, 'warrior', 2);
+      expect(canvas.dataset.portrait).toBe('/composed.png');
+      expect(playerPortraitDataUrl).not.toHaveBeenCalled();
+    });
+
+    it('routes each subject kind of drawPlayer to its body', () => {
+      const { canvas } = fakeCanvas();
+      const painter = new UnitPortraitPainter(() => 1);
+      vi.mocked(visualPortraitDataUrl).mockReturnValue('/mech.png');
+      vi.mocked(modularPortraitDataUrl).mockReturnValue('/composed.png');
+      vi.mocked(playerPortraitDataUrl).mockReturnValue('/class.png');
+
+      painter.drawPlayer(canvas, { kind: 'mech', cls: 'warrior', chroma: 3 });
+      expect(visualPortraitDataUrl).toHaveBeenCalledWith('player_mech', 3);
+      expect(canvas.dataset.portrait).toBe('/mech.png');
+
+      painter.drawPlayer(canvas, {
+        kind: 'composed',
+        cls: 'warrior',
+        skin: 2,
+        visualKey: 'player_warrior_modular',
+        look: LOOK,
+      });
+      expect(modularPortraitDataUrl).toHaveBeenCalledWith('player_warrior_modular', LOOK);
+      expect(canvas.dataset.portrait).toBe('/composed.png');
+
+      painter.drawPlayer(canvas, { kind: 'class', cls: 'mage', skin: 1 });
+      expect(playerPortraitDataUrl).toHaveBeenCalledWith('mage', 1);
+      expect(canvas.dataset.portrait).toBe('/class.png');
+    });
   });
 });

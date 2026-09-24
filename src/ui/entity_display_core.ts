@@ -93,6 +93,10 @@ export function zoneWelcome(zoneId: string): string {
   return tEntity({ kind: 'zone', id: zoneId, field: 'welcome' });
 }
 
+export function zoneWelcomeDone(zoneId: string): string {
+  return tEntity({ kind: 'zone', id: zoneId, field: 'welcomeDone' });
+}
+
 export function dungeonText(dungeonId: string, field: 'enterText' | 'leaveText'): string {
   return tEntity({ kind: 'dungeon', id: dungeonId, field });
 }

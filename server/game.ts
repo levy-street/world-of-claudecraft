@@ -255,6 +255,7 @@ import { isUpdateDue } from './entity_update_cadence';
 // every test that partial-mocks the db, the known overlay-mock breakage class.
 // Dual fan-out (D21): Steam and Epic reconcile independently.
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
+import { equippedInstanceWire } from './equipped_instance_wire';
 import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
 import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
@@ -313,6 +314,7 @@ import { guildRosterTransport } from './guild_roster_transport';
 import { heavySelfMarkOnAccept, heavySelfMarkOnReceipt, isHeavySelfEvent } from './heavy_self';
 import { type HotbarLayoutState, HotbarLayoutStore, hotbarLayoutState } from './hotbar_layout';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
+import { foldReceivedInputSeq } from './input_seq';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import {
   BG_MATCH_DROP_RADIUS,
@@ -378,7 +380,6 @@ import {
   consumeInboundFrame,
   createMsgRateBucket,
   MSG_RATE_KICK_REASON,
-  MSG_SEQ_GAP_SANITY,
   type MsgRateBucketState,
   tallyDrop,
 } from './msg_rate_limit';
@@ -403,8 +404,9 @@ import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
-import { recordFtueDeath, recordFtueQuest, recordLevelUp } from './progress_events';
+import { recordLevelUp } from './progress_events';
 import * as questWire from './quest_command_wire';
 import {
   activePublicWorldQuestTracePids,
@@ -1326,23 +1328,8 @@ function identityFields(e: Entity): Record<string, unknown> {
     // payload in full via the self `inv` mirror. 2026-08-27: `name` (the
     // player-chosen legendary name, Masterwrought phase 13) is the FIRST
     // cosmetic JOIN since the rule was written. The visible Perfected marker
-    // now lets inspect resolve active versus dormant enchants accurately.
-    let eqi: Record<string, unknown> | undefined;
-    for (const [slot, inst] of Object.entries(e.equippedInstances)) {
-      if (!inst) continue;
-      const pub: Record<string, unknown> = {};
-      if (inst.signer !== undefined) pub.signer = inst.signer;
-      if (inst.enchant !== undefined) pub.enchant = inst.enchant;
-      if (inst.rolled !== undefined) pub.rolled = inst.rolled;
-      if (inst.name !== undefined) pub.name = inst.name;
-      if (inst.perfected === true) pub.perfected = inst.perfected;
-      if (inst.rift !== undefined) pub.rift = inst.rift;
-      for (const _ in pub) {
-        if (eqi === undefined) eqi = {};
-        eqi[slot] = pub;
-        break;
-      }
-    }
+    // also exposes loot quality; binding and custody stay private.
+    const eqi = equippedInstanceWire(e);
     if (eqi) out.eqi = eqi;
   }
   if (e.holderTier) out.ht = e.holderTier; // $WOC holder-tier flair (cosmetic)
@@ -6228,21 +6215,10 @@ export class GameServer {
       const e = sim.entities.get(pid);
       if (!meta || !e) return;
       const frame = applyMovementInputFrame(session, meta, e, msg, sim.time, sim.ctx);
-      if (typeof msg.seq === 'number' && Number.isFinite(msg.seq) && msg.seq > 0) {
-        const seq = Math.floor(msg.seq);
-        // R9: the client seq is a per-send increment on an ordered socket, so
-        // a forward jump past the receive high-water proves the missing seqs were
-        // sent and never processed (the input-frame-attributed share of the
-        // server's own drops). Guarded to a positive high-water because resume
-        // zeroes it while the client restarts its counter on reconnect, and
-        // capped so a reset mismatch never books a giant gap.
-        if (session.lastInputSeq > 0 && seq > session.lastInputSeq + 1) {
-          gameMetricsCounters().wsInputSeqGap(
-            Math.min(seq - session.lastInputSeq - 1, MSG_SEQ_GAP_SANITY),
-          );
-        }
-        session.lastInputSeq = Math.max(session.lastInputSeq, seq);
-      }
+      // R9 gap booking + the ack high-water (server/input_seq.ts).
+      foldReceivedInputSeq(session, msg.seq, (missed) =>
+        gameMetricsCounters().wsInputSeqGap(missed),
+      );
       this.botDetector.observeInput(session.botTrackingContext, frame, receivedAtMs);
       return;
     }
@@ -6257,6 +6233,14 @@ export class GameServer {
       this.consumeLane(session, 'command', receivedAtMs / 1000);
       return;
     }
+    // A seq-bearing command (the client's 'target') rides the input seq stream
+    // and folds at RECEIPT, before any lane verdict, so the self snapshot's ack
+    // stays an in-order receipt high-water for the whole socket: the online
+    // mirror reads a covering ack as "built after my command" and adopts that
+    // snapshot's target as the verdict (src/net/target_echo.ts). A lane-dropped
+    // command is acked too, and the mirror then yields to the server's value,
+    // which is exactly right for a command that never ran.
+    foldReceivedInputSeq(session, msg.seq, (missed) => gameMetricsCounters().wsInputSeqGap(missed));
     if (session.spectating) {
       if (msg.cmd === 'unstuck') {
         this.sendUnstuckBlocked(session, 'spectating');
@@ -9150,24 +9134,9 @@ export class GameServer {
           recordLevelUp(session, ev.level);
         }
       }
-      if ((ev.type === 'questAccepted' || ev.type === 'questDone') && ev.pid !== undefined) {
-        const s = this.clients.get(ev.pid);
-        const entity = this.sim.entities.get(ev.pid);
-        // Skip when the entity is gone rather than defaulting the level: the
-        // level is the gate that bounds ftue_events growth, so it must never
-        // fail open (the death arm has the same direction).
-        if (s && entity)
-          recordFtueQuest(
-            s,
-            ev.type === 'questAccepted' ? 'quest_accepted' : 'quest_done',
-            ev.questId,
-            entity.level,
-          );
-      }
-      if (ev.type === 'death' && this.clients.has(ev.entityId)) {
-        const s = this.clients.get(ev.entityId);
-        if (s) recordFtueDeath(s, this.sim, ev.entityId, ev.killerId);
-      }
+      // The database RECORD arms (ftue_events quest/death rows, the
+      // craft_roll_events audit) live in server/event_record_observers.ts.
+      observeEventRecords(ev, this.sim, this.clients);
       if (ev.type === 'levelup' && (ev.level === 2 || ev.level === 5) && ev.pid !== undefined) {
         const s = this.clients.get(ev.pid);
         // Level 2 and 5 ad conversions, email-enriched for match quality

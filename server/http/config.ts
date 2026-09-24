@@ -156,6 +156,11 @@ export interface Config {
   // How many days a world-quest scoreboard row (a character's best attempt on
   // one ladder) survives without being improved. Same 0-keeps-forever contract.
   readonly worldQuestScoresRetentionDays: number;
+  // How many days of the chance-based crafting outcome audit
+  // (craft_roll_events: one row per masterwork proc draw or Perfecting
+  // attempt, server/craft_roll_events_db.ts) to keep. Same 0-keeps-forever
+  // contract.
+  readonly craftRollEventsRetentionDays: number;
   // How many days a CLOSED, fully-disposed $WOC Exchange listing (and, via
   // FK cascade, its bids and settlements) is kept. Sales are the permanent
   // provenance record and never prune. 0 keeps listings forever.
@@ -242,6 +247,11 @@ const DEFAULT_CHAT_VIOLATION_RETENTION_DAYS = 90;
 const DEFAULT_LEVEL_UP_EVENTS_RETENTION_DAYS = 365;
 const DEFAULT_FTUE_EVENTS_RETENTION_DAYS = 90;
 const DEFAULT_WORLD_QUEST_SCORES_RETENTION_DAYS = 365;
+// craft_roll_events answers "what did the server really roll" for slow-paced
+// systems (a Perfecting attempt costs a once-a-week Maker's Ember), so a
+// year keeps a whole item's walk auditable; the intake is one row per
+// eligible craft, far below ftue_events' per-character burst.
+const DEFAULT_CRAFT_ROLL_EVENTS_RETENTION_DAYS = 365;
 const DEFAULT_WOC_MARKET_LISTINGS_RETENTION_DAYS = 180;
 // Abandon rows are dead once outside every cooldown window (an hour); 30 days
 // keeps generous forensics for tuning the cooldown numbers.
@@ -481,6 +491,10 @@ export function loadConfig(env: NodeJS.ProcessEnv): Config {
     worldQuestScoresRetentionDays: numberOr(
       env.WORLD_QUEST_SCORES_RETENTION_DAYS,
       DEFAULT_WORLD_QUEST_SCORES_RETENTION_DAYS,
+    ),
+    craftRollEventsRetentionDays: numberOr(
+      env.CRAFT_ROLL_EVENTS_RETENTION_DAYS,
+      DEFAULT_CRAFT_ROLL_EVENTS_RETENTION_DAYS,
     ),
     chatViolationRetentionDays: numberOr(
       env.CHAT_VIOLATION_RETENTION_DAYS,

@@ -363,7 +363,11 @@ per part.
     composed body. Composed bodies bake their own (`modularFarBake`), keyed by
     part set and minted on the first crossing into the far band; the colours are
     resolved per character from their own materials. Face/body sliders are not
-    in that silhouette, deliberately.
+    in that silhouette, deliberately. The bake merges atlas-mapped kit pieces
+    with colour-only face parts that ship NO uv: `far_bake_uv_pad.ts` gives those
+    an inert zero uv so the merge keeps the kit's real uv (dropping uv from every
+    part instead made the frozen mesh sample one atlas texel, a flat untextured
+    body at distance; `tests/far_bake_uv_pad.test.ts`).
     The bake hands back geometry GROUPS and each character resolves group N
     against its own captured `userData.farMaterials[N]`, so the two walks have to
     be one list: both go through `composedFarMeshes`, which drops held props for

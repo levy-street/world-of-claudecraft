@@ -560,7 +560,7 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
   it('preserves the submit action and the no-text / in-flight / failure states', () => {
     const bug = painter.slice(
       painter.indexOf('private renderBugReport'),
-      painter.indexOf('private localizeBugReportError'),
+      painter.indexOf('// Controller (cluster 5)'),
     );
     // no-text guard short-circuits with the describe-first message
     expect(bug).toContain("error.textContent = t('hudChrome.bugReport.describeFirst')");
@@ -575,13 +575,13 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
     expect(bug).toContain('hudChrome.bugReport.submittedNoShot');
     // failure: re-enable + localized error
     expect(bug).toContain('submit.disabled = false');
-    expect(bug).toContain('this.localizeBugReportError(err)');
+    expect(bug).toContain('bugReportErrorText(err)');
   });
 
   it('paints the form before the deferred screenshot capture and gates submit on it', () => {
     const bug = painter.slice(
       painter.indexOf('private renderBugReport'),
-      painter.indexOf('private localizeBugReportError'),
+      painter.indexOf('// Controller (cluster 5)'),
     );
     expect(bug).toContain('const capturePromise = new Promise<string | null>');
     expect(bug).toContain('requestIdleCallback(capture, { timeout: 500 })');

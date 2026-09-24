@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  CADENCE_VERDICTS,
   sanitizeBootPhases,
+  sanitizeCadence,
   sanitizePostRevealLinks,
   sanitizeShaderWarm,
   shaderWarmToken,
@@ -291,6 +293,99 @@ describe('sanitizeShaderWarm', () => {
       holdWallMs: 0,
       releases: 0,
       abArm: '',
+    });
+  });
+});
+
+describe('sanitizeCadence', () => {
+  const block = {
+    mode: 'auto',
+    verdict: 'paced',
+    intent: 30,
+    refreshHz: 60,
+    divisor: 2,
+    targetIntervalMs: 33,
+    missShare: 0.0123,
+    autoPhase: 'held',
+    autoConfirmed: 1,
+    autoFailStreak: 2,
+    autoLateShare: 0.4,
+    autoDescents: 1,
+    autoProbes: 1,
+    autoProbesFailed: 1,
+    autoProbesInconclusive: 0,
+    autoFirstCeilingS: 6,
+    rendered: 1800,
+    skipped: 1800,
+  };
+
+  it('is undefined without a known mode', () => {
+    expect(sanitizeCadence(null)).toBeUndefined();
+    expect(sanitizeCadence([])).toBeUndefined();
+    expect(sanitizeCadence({ ...block, mode: 'turbo' })).toBeUndefined();
+    expect(sanitizeCadence({ ...block, mode: 7 })).toBeUndefined();
+  });
+
+  it('keeps a well-formed block, shares at three decimals', () => {
+    expect(sanitizeCadence(block)).toEqual({ ...block, missShare: 0.012 });
+  });
+
+  it('keeps the closed vocabulary of display verdicts', () => {
+    // `unknown` is also the fallback, so only the literal list pins it.
+    expect(CADENCE_VERDICTS).toEqual(['unknown', 'paced', 'unpaced']);
+    for (const verdict of ['paced', 'unpaced']) {
+      expect(sanitizeCadence({ ...block, verdict })?.verdict).toBe(verdict);
+    }
+  });
+
+  it.each(['off', 'observe', 'held', 'probe', 'probation'])(
+    'keeps the automatic phase %s',
+    (phase) => {
+      expect(sanitizeCadence({ ...block, autoPhase: phase })?.autoPhase).toBe(phase);
+    },
+  );
+
+  it('lets no client text or extra key through, and bounds every number', () => {
+    const out = sanitizeCadence({
+      mode: 'manual',
+      verdict: '<script>alert(1)</script>',
+      intent: 45,
+      refreshHz: 1e9,
+      divisor: 0,
+      targetIntervalMs: -5,
+      missShare: 7,
+      autoPhase: '<img src=x>',
+      autoConfirmed: 'yes',
+      autoFailStreak: 1e9,
+      autoLateShare: 'NaN',
+      autoDescents: 1e9,
+      autoProbes: -4,
+      autoProbesFailed: 2.9,
+      autoProbesInconclusive: {},
+      autoFirstCeilingS: -1,
+      rendered: 1e12,
+      skipped: {},
+      note: 'x'.repeat(10_000),
+    });
+    expect(out).toEqual({
+      mode: 'manual',
+      verdict: 'unknown',
+      intent: 0,
+      refreshHz: 1000,
+      divisor: 1,
+      targetIntervalMs: 0,
+      missShare: 1,
+      autoPhase: 'off',
+      autoConfirmed: 0,
+      autoFailStreak: 16,
+      autoLateShare: 0,
+      autoDescents: 1000,
+      autoProbes: 0,
+      autoProbesFailed: 2,
+      autoProbesInconclusive: 0,
+      autoFirstCeilingS: 0,
+      rendered: 50_000_000,
+      skipped: 0,
     });
   });
 });

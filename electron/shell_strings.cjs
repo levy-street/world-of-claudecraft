@@ -23,6 +23,14 @@ const DEFAULT_SHELL_STRINGS = {
   crashQuit: 'Quit',
   fatalTitle: 'World of ClaudeCraft',
   fatalBody: 'World of ClaudeCraft hit an unexpected error and needs to close.',
+  // The host diagnostic's native save dialog (electron/host_diag.cjs): its
+  // title, its confirm button, and the file-type label in the format dropdown.
+  // Same contract as the crash strings above, for the same reason: the dialog is
+  // a native OS surface the main process opens, so the renderer pushes the
+  // localized text and these English values are only the pre-push fallback.
+  hostDiagSaveTitle: 'Save system report',
+  hostDiagSaveButton: 'Save',
+  hostDiagFileType: 'JSON file',
 };
 
 const MAX_SHELL_STRING_LENGTH = 300;

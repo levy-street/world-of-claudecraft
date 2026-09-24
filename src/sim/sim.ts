@@ -24,8 +24,7 @@ import type {
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
-import type { AbilityOutputScaling } from './ability_output_scaling';
-import { autoEquipFamilyConflict } from './auto_equip_gate';
+import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
   addStacked,
@@ -265,7 +264,6 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
@@ -280,6 +278,7 @@ import * as interaction from './interaction';
 import * as inventoryConsumption from './inventory_consumption';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
 import { grantInventoryInstances, type InventoryGrantOptions } from './inventory_grant';
+import { emitInventoryReceipt } from './inventory_receipt';
 import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
@@ -288,7 +287,6 @@ import {
   warnDroppedInstanceKeys,
 } from './item_instance_load';
 import { isMergeableInstancePayload } from './item_instance_merge';
-import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
@@ -647,6 +645,7 @@ import {
   reliquarySaveFragment,
 } from './reliquary';
 import { sanitizeRemovedZone1Content } from './removed_zone1_content';
+import type { ResolvedAbility } from './resolved_ability';
 import { freshCounters, type RewardCounters } from './reward_counters';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
 import { Rng } from './rng';
@@ -1271,40 +1270,10 @@ export interface InstanceSlot {
   raidBossWelcomeKeys: Set<string>;
 }
 
-export interface ResolvedAbility {
-  def: AbilityDef;
-  outputScaling?: AbilityOutputScaling;
-  rank: number;
-  cost: number;
-  castTime: number;
-  cooldown: number; // base def.cooldown, after talent cooldown modifiers
-  /** Cooldown map key when a cooldown-carrying transform shares the base
-   *  button's clock (one slot, one clock); absent for every other resolve. */
-  cooldownId?: string;
-  effects: AbilityEffect[];
-  threatFlat: number; // classic bonus threat on a successful use
-  threatMult: number; // classic multiplier on this ability's damage-threat
-  castWhileMoving?: boolean; // talent-granted mobility (def.castWhileMoving covers baseline)
-  damagePushbackImmune?: boolean; // talent-granted immunity to damage-driven cast pushback
-  ignoreStealthRequirement?: boolean; // Cheap Trick: the resolved ability drops requiresStealth
-  // Set when a next_cast_free/next_execute_free empowerment (e.g. Borrowed Tempo)
-  // zeroed this cast's cost: a spendsCombo finisher cast this way banks its combo
-  // points instead of spending them (issue #2426), since "free" means the whole
-  // cast, not just the resource bill. Never set by a next_cast_cheap/next_cast_instant
-  // consume (those only discount cost/cast time, e.g. Knife's Dividend/Formrush).
-  freeCast?: boolean;
-  charges?: number; // authored stored uses; undefined means one use
-  bonusCharges?: number; // talent-added uses, kept distinct from native maxCharges
-  /** Individual Temporal Echo conversion after worn-set resolution. */
-  echoConvertSingle?: number;
-  /** Destruction-only cast-time reservation; consumed once even if a projectile resists/fizzles. */
-  ruinousBrandCopy?: { targetId: number; value: number };
-  /** 1-based authoritative charge stage for hold-to-charge spells. */
-  empowerLevel?: number;
-  hunterApex?: boolean;
-  hunterOverdraw?: boolean;
-  hunterRhythm?: boolean;
-}
+// The per-cast resolved ability lives in its own module (./resolved_ability.ts)
+// so a new cast-scoped marker never grows this coordinator; re-exported here
+// because every consumer imports it from the sim barrel.
+export type { ResolvedAbility } from './resolved_ability';
 
 export interface SentChat {
   channel:
@@ -3501,7 +3470,7 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
-      (id) => id === unstuckMod.UNSTUCK_COOLDOWN_ID || ABILITIES[id] !== undefined,
+      (id) => unstuckMod.isUnstuckSystemCooldown(id) || ABILITIES[id] !== undefined,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
@@ -8267,24 +8236,13 @@ export class Sim {
     // shelf are why this passes `count` rather than 1. Pinned in
     // tests/reliquary_content.test.ts.
     if (!opts?.movement) noteRelicObtain(meta, itemId, count);
-    this.emit({
-      type: 'loot',
-      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
-      pid: meta.entityId,
-      // Conditional, not `silent: opts?.silent`: writing the key even as
-      // `undefined` on every grant moved every loot event's parity digest
-      // (the canonicalizer keeps `undefined` keys, tests/parity/trace.ts),
-      // dragging goldens with no professions content into every regen.
-      ...(opts?.silent ? { silent: true } : {}),
-      ...(opts?.callerLogs ? { callerLogs: true } : {}),
-    });
+    emitInventoryReceipt(this.ctx, meta.entityId, itemId, def?.name ?? itemId, count, opts);
     this.ctx.onInventoryChangedForQuests(meta);
     if (
       meta.autoEquip &&
       (def?.kind === 'weapon' || def?.kind === 'armor' || def?.kind === 'held_offhand')
     ) {
-      this.maybeAutoEquip(itemId, meta);
+      maybeAutoEquip(this.ctx, itemId, meta);
     }
   }
 
@@ -8325,16 +8283,17 @@ export class Sim {
     // per call by definition, an id is either new or it is not) a windfall of
     // three copies really is three acquisitions.
     if (!opts?.movement) noteRelicObtain(meta, itemId, count);
-    this.emit({
-      type: 'loot',
-      // biome-ignore lint/style/useTemplate: keep this scanner-friendly shape for i18n extraction.
-      text: `You receive: ${def?.name ?? itemId}${count > 1 ? ' x' + count : ''}.`,
-      pid: meta.entityId,
-      // Conditional, see the matching comment in addItem above.
-      ...(opts?.silent ? { silent: true } : {}),
-      ...(opts?.callerLogs ? { callerLogs: true } : {}),
-    });
+    emitInventoryReceipt(
+      this.ctx,
+      meta.entityId,
+      itemId,
+      def?.name ?? itemId,
+      count,
+      opts,
+      instance,
+    );
     this.ctx.onInventoryChangedForQuests(meta);
+    if (meta.autoEquip && instance.lootQuality) maybeAutoEquip(this.ctx, itemId, meta, instance);
   }
 
   // Returns the `instance` payload of every instanced UNIT actually consumed
@@ -9000,37 +8959,6 @@ export class Sim {
 
   lastEnchantResultFor(pid: number): ApplyEnchantResult | null {
     return this.players.get(pid)?.lastEnchantResult ?? null;
-  }
-
-  private maybeAutoEquip(itemId: string, meta: PlayerMeta): void {
-    const def = ITEMS[itemId];
-    if (!def?.slot) return;
-    if (!canEquipItem(meta.cls, def)) return;
-    // Skip silently (no error toast) if the piece is gated above the player's
-    // level: auto-equip is a convenience, the explicit equip path is where the
-    // "must be level N" message belongs.
-    const e = this.entities.get(meta.entityId);
-    if (e && !meetsLevelRequirement(e.level, def)) return;
-    // Skip silently when an explicit equip would be refused by a worn-family
-    // rule (the unique-equipped legendary family, or the Masterwrought counted
-    // cap): the refusal toast belongs to the explicit path. Both rules and the
-    // reason auto-equip declines rather than displacing live in
-    // src/sim/auto_equip_gate.ts.
-    if (autoEquipFamilyConflict(def, itemId, meta, (id) => ITEMS[id])) return;
-    if (def.kind === 'weapon') {
-      const cur = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand]?.weapon : null;
-      const next = def.weapon;
-      if (next && (!cur || next.min + next.max > cur.min + cur.max))
-        this.equipItem(itemId, meta.entityId);
-    } else {
-      // resolveEquipSlot maps a ring item to its concrete ring1/ring2 key
-      // (empty-first), so auto-equip fills an open jewelry slot too.
-      const slot = resolveEquipSlot(def, meta.equipment);
-      const curId = slot ? meta.equipment[slot] : undefined;
-      const cur = curId ? ITEMS[curId] : null;
-      if (!cur || (def.stats?.armor ?? 0) > (cur.stats?.armor ?? 0))
-        this.equipItem(itemId, meta.entityId);
-    }
   }
 
   // -------------------------------------------------------------------------

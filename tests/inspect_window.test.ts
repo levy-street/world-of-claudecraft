@@ -13,6 +13,7 @@ vi.mock('../src/ui/portrait_chip', () => ({
   portraitChipHtml: () => '',
 }));
 
+import type { ModularLook } from '../src/render/characters/modular';
 import { ITEMS } from '../src/sim/data';
 import type { EquipSlot, ItemInstancePayload, PlayerClass } from '../src/sim/types';
 import { borderAccent, borderMotifPrimitives } from '../src/ui/deed_border_view';
@@ -361,14 +362,17 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
   // Hud dep, so the SELF-override pin below can see exactly what a hover reads.
   const tooltipCalls: Array<{ itemId: string; instance: ItemInstancePayload | undefined }> = [];
   const attachedTooltips: Array<{ el: HTMLElement; build: () => string }> = [];
+  const mountPreview = vi.fn();
   const openWith = (
     e: InspectEntity,
     selfStanding?: { curatorRank: number; owned: number; total: number } | null,
     showDevBadges = false,
     selfEquippedInstances?: Partial<Record<EquipSlot, ItemInstancePayload>>,
+    look?: ModularLook | null,
   ): HTMLElement => {
     tooltipCalls.length = 0;
     attachedTooltips.length = 0;
+    mountPreview.mockClear();
     const realCreate = document.createElement.bind(document);
     vi.spyOn(document, 'createElement').mockImplementation((tag: string) => {
       const el = realCreate(tag);
@@ -388,7 +392,7 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
       restoreFocus: vi.fn(),
       slotName: (slot) => slot,
       showDevBadges: () => showDevBadges,
-      mountPreview: vi.fn(),
+      mountPreview,
       // The real icon resolver (what Hud.itemIcon binds), so the filled-slot
       // rows carry the `.item-icon q-<quality>` markup the row pins read; its
       // src is a data URL off the stubbed canvas (an empty-string src would
@@ -405,9 +409,51 @@ describe('inspect_window: the real painter over a Sim-shaped and a ranked entity
         attachedTooltips.push({ el, build });
       },
     });
-    win.openInspect(e, 1_700_000_000_000, selfStanding, selfEquippedInstances);
+    win.openInspect(e, 1_700_000_000_000, selfStanding, selfEquippedInstances, look);
     return root;
   };
+
+  it('hands the inspected player look to the turntable mount, null when none', () => {
+    // The Inspect arm of the composed-face fix: without this the card mounts
+    // the stock class rig for a player whose world body is their own face.
+    const look = { app: { gender: 'female' }, worn: {} } as unknown as ModularLook;
+    // Read the recorded params rather than matching the call: a DOM node in
+    // a failed toHaveBeenCalledWith diff recurses happy-dom's tree on print.
+    const paramsOf = (): { look?: unknown; cls?: unknown } => {
+      expect(mountPreview.mock.calls.length).toBe(1);
+      const [stage, params] = mountPreview.mock.calls[0] as [HTMLElement, { look?: unknown }];
+      expect(stage.id).toBe('inspect-model-preview');
+      return params;
+    };
+    openWith(baseEntity, null, false, undefined, look);
+    expect(paramsOf().look).toBe(look);
+    expect(paramsOf().cls).toBe(baseEntity.templateId);
+  });
+
+  it('mounts the turntable with a null look for a pre-creator character', () => {
+    // Its own case: openWith re-spies document.createElement per call, and a
+    // second call in one test wraps the spy in itself.
+    openWith(baseEntity);
+    expect(mountPreview.mock.calls.length).toBe(1);
+    const [, params] = mountPreview.mock.calls[0] as [HTMLElement, { look?: unknown }];
+    expect(params.look).toBeNull();
+  });
+
+  it('lets the Combat Mech win over the look on the Hud side of the mount', () => {
+    // The precedence the world applies (createCharacterVisual never composes
+    // over a mech) restated at the turntable, pinned as the full statement.
+    const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
+    const at = hud.indexOf('private mountInspectPreview(');
+    expect(at).toBeGreaterThan(-1);
+    const body = hud.slice(at, at + 1600);
+    expect(body).toContain("const mech = preview.visualKey === 'player_mech';");
+    expect(body).toContain('look: mech ? null : params.look,');
+    // And the Hud resolves the look from the LIVE entity as a parameter, the
+    // selfStanding doctrine: no cast of the wire mirror back to an Entity.
+    const open = hud.slice(hud.indexOf('openInspect(pid: number): void {'));
+    expect(open.slice(0, 900)).toContain('modularLookFor(e),');
+    expect(hud).not.toContain('composedLook');
+  });
 
   it('renders NO Reliquary line and NO sigil for an entity with no curator fields', () => {
     // The offline / pre-Curator shape: the fields are absent entirely, not zero.

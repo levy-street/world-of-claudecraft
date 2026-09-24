@@ -842,8 +842,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The wq-reputation merge's 15 faction quartermaster items: 1,320.
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
-    // (13 periphery pieces + 4 formulas): 1,340.
-    expect(Object.keys(ITEMS)).toHaveLength(1340);
+    // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341.
+    expect(Object.keys(ITEMS)).toHaveLength(1341);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1005,10 +1005,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest (feature/weekly-quests): 1,303. The Clue
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
-    // compositions) join: 1,322.
-    expect(new Set(currentOwnerIds).size).toBe(1322);
-    expect(shippingIds).toHaveLength(1322);
-    expect(Object.keys(ITEMS)).toHaveLength(1340);
+    // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
+    expect(new Set(currentOwnerIds).size).toBe(1323);
+    expect(shippingIds).toHaveLength(1323);
+    expect(Object.keys(ITEMS)).toHaveLength(1341);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1116,6 +1116,7 @@ describe('item-art consistency accepted-art provenance', () => {
         'reins_rallycart_rxt',
         // The weekly emissary's cache chest, additive the same way.
         'emissary_cache',
+        'reins_avian_strider',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1267,8 +1268,9 @@ describe('item-art consistency accepted-art provenance', () => {
     ).toBeUndefined();
     // The completion wave consolidates 68 interim per-entry/SVG owners into
     // one generated batch. The surviving ordinary-art cohort stays explicit.
-    // 43 -> 44 at the weekly emissary: the Emissary's Cache chest.
-    expect(mapping.entries).toHaveLength(44);
+    // 43 -> 44 at the weekly emissary: the Emissary's Cache chest; 45 with
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge).
+    expect(mapping.entries).toHaveLength(45);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
     // 24 base + this branch's 3 Masterwrought-completion batches (fine
     // materials, apex-flask, professions coverage) + the release's 2
@@ -1352,8 +1354,8 @@ describe('item-art consistency accepted-art provenance', () => {
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1322);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1322);
+    expect(allCurrentOwnerIds).toHaveLength(1323);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1323);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1361,7 +1363,9 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
       crucibleProfessions: crucibleBatch?.itemIds.length,
     }).toEqual({
-      entries: 44,
+      // 44 -> 45 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0
+      // base merge), an entries row beside the Emissary's Cache chest.
+      entries: 45,
       // 755 + the world-quest branch's four batch ids (release/v0.43.0 merge)
       // + the 15 faction quartermaster ids (wq-reputation merge) = 774
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
@@ -1412,7 +1416,8 @@ describe('item-art consistency accepted-art provenance', () => {
           (id) =>
             !completionIdSet.has(id) &&
             id !== 'reins_goblin_rocket_sled' &&
-            id !== 'reins_rallycart_rxt',
+            id !== 'reins_rallycart_rxt' &&
+            id !== 'reins_avian_strider',
         ),
         ...(completionBatch?.itemIds ?? []),
         ...(crucibleBatch?.itemIds ?? []),
@@ -1448,6 +1453,7 @@ describe('item-art consistency accepted-art provenance', () => {
         // The weekly emissary's cache chest (feature/weekly-quests), additive
         // beyond the historical chain like the Field Kit.
         'emissary_cache',
+        'reins_avian_strider',
       ]),
       'the dated catalog plus the release batches, the world-quest, faction-vendor, faction-ladder and clue-scroll batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -1581,10 +1587,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322.
-    if (ownerIds.length !== 1322)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1322`);
-    if (fileIds.length !== 1322) violations.push(`shipping WebP count: ${fileIds.length} != 1322`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323.
+    if (ownerIds.length !== 1323)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1323`);
+    if (fileIds.length !== 1323) violations.push(`shipping WebP count: ${fileIds.length} != 1323`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

@@ -33,6 +33,7 @@ import {
   moveToGraveyardForUnstuck,
   nearestOverworldGraveyard,
   RES_HEALER_HP_FRACTION,
+  reviveAtGraveyardForUnstuck,
 } from '../src/sim/spirit';
 import {
   type BlockerDef,
@@ -48,6 +49,13 @@ import {
   UNSTUCK_SUCCESS_COOLDOWN_SECONDS,
   unstuckLocationAt,
 } from '../src/sim/unstuck';
+import {
+  clearCooldownsPreservingUnstuck,
+  markUnstuckCompleted,
+  restoreCooldownsPreservingUnstuck,
+  UNSTUCK_RECENT_ID,
+  UNSTUCK_SICKNESS_WINDOW_SECONDS,
+} from '../src/sim/unstuck_cooldown';
 
 type Event = Extract<SimEvent, { type: 'unstuck' }>;
 
@@ -542,6 +550,9 @@ describe('unstuck graveyard move while alive', () => {
   } {
     const sim = makeWorld();
     sim.setPlayerLevel(level);
+    // A repeat inside the sickness window, so the completion charges the sickness these
+    // tests are about. The free first use has its own block ('unstuck sickness window').
+    markUnstuckCompleted(sim.player.cooldowns);
     const { player } = accepted(sim);
     const events = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20));
     const event = events.find(
@@ -573,8 +584,9 @@ describe('unstuck graveyard move while alive', () => {
   });
 
   it('charges Unstuck Sickness rather than The Keeper’s Toll, and clears momentum', () => {
-    const { player } = runCompletion();
+    const { player, event } = runCompletion();
 
+    expect(event.sickness).toBe(true);
     expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(false);
     const sickness = required(
       player.auras.find((aura) => aura.id === UNSTUCK_SICKNESS_ID),
@@ -598,14 +610,17 @@ describe('unstuck graveyard move while alive', () => {
     ).toBe(UNSTUCK_SICKNESS_DURATION);
     expect(UNSTUCK_SICKNESS_DURATION).toBe(5 * 60);
 
-    const { player: exempt } = runCompletion(9);
+    const { player: exempt, event: exemptEvent } = runCompletion(9);
     expect(exempt.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID)).toBe(false);
+    // The event reports what actually landed: nothing, even though this was a repeat.
+    expect(exemptEvent.sickness).toBe(false);
     expect(exempt.dead).toBe(false);
   });
 
   it('never stacks a second whole-stat drain on top of The Keeper’s Toll', () => {
     const sim = makeWorld();
     sim.setPlayerLevel(MAX_LEVEL);
+    markUnstuckCompleted(sim.player.cooldowns);
     const { player } = accepted(sim);
     applyResurrectionSickness(sim.ctx, player);
     const drained = player.stats.str;
@@ -624,6 +639,7 @@ describe('unstuck graveyard move while alive', () => {
   it('logs the displaced Keeper’s Toll fading, which no snapshot would reveal', () => {
     const sim = makeWorld();
     sim.setPlayerLevel(MAX_LEVEL);
+    markUnstuckCompleted(sim.player.cooldowns);
     const { player } = accepted(sim);
     applyResurrectionSickness(sim.ctx, player);
     sim.drainEvents();
@@ -782,12 +798,16 @@ describe('unstuck while dead', () => {
     const player = killed(sim);
     const graveyard = nearestOverworldGraveyard(START.x, START.z);
     expect(player.ghost).toBe(false);
+    // A repeat inside the sickness window; the free first revive is covered in the
+    // 'unstuck sickness window' block.
+    markUnstuckCompleted(player.cooldowns);
 
     expect(sim.unstuck(player.id)).toBe(true);
     sim.drainEvents();
     const completed = completionOf(sim);
 
     expect(completed?.reason).toBe('revived_at_graveyard');
+    expect(completed?.sickness).toBe(true);
     expect(completed?.destination).toMatchObject(graveyard);
     expect(player.pos).toMatchObject(graveyard);
     expect(player.prevPos).toEqual(player.pos);
@@ -820,6 +840,8 @@ describe('unstuck while dead', () => {
     sim.drainEvents();
     expect(player.ghost).toBe(true);
     const graveyard = nearestOverworldGraveyard(player.pos.x, player.pos.z);
+    // A repeat inside the sickness window (see the block above).
+    markUnstuckCompleted(player.cooldowns);
 
     expect(sim.unstuck(player.id)).toBe(true);
     sim.drainEvents();
@@ -1528,5 +1550,312 @@ describe('unstuck area identity', () => {
     const sim = makeWorld();
     const privateBand = sim.groundPos(INSTANCE_X_BASE + 7_000, -1_000);
     expect(unstuckLocationAt(sim.ctx, sim.player.id, privateBand)).toBeNull();
+  });
+});
+
+// The Unstuck Sickness window (src/sim/unstuck_cooldown.ts): the first completed /unstuck
+// in an hour is free, a repeat inside the window opened by the previous completion charges
+// the sickness, and the window slides from the latest use. Measured in played time like
+// every persisted cooldown, so a relog can never shorten it.
+describe('unstuck sickness window', () => {
+  type Completed = Extract<Event, { phase: 'completed' }>;
+
+  function complete(sim: Sim): Completed {
+    expect(sim.unstuck(sim.player.id)).toBe(true);
+    sim.drainEvents();
+    return required(
+      eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+        (event): event is Completed => event.phase === 'completed',
+      ),
+      'completed event',
+    );
+  }
+
+  // The success cooldown alone blocks a second attempt for five minutes. These tests are
+  // about the window (an hour of played time), so they lift that cooldown between
+  // attempts rather than ticking through it.
+  function readyAgain(sim: Sim): void {
+    sim.player.cooldowns.delete(UNSTUCK_COOLDOWN_ID);
+  }
+
+  function hasUnstuckSickness(player: Sim['player']): boolean {
+    return player.auras.some((aura) => aura.id === UNSTUCK_SICKNESS_ID);
+  }
+
+  it('charges nothing on the first unstuck in an hour and opens the window', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    const maxHpBefore = player.maxHp;
+
+    const event = complete(sim);
+
+    expect(event.reason).toBe('moved_to_graveyard');
+    expect(event.sickness).toBe(false);
+    // Free means free of the debuff, never free of the move itself.
+    expect(player.pos).toMatchObject(nearestOverworldGraveyard(START.x, START.z));
+    expect(hasUnstuckSickness(player)).toBe(false);
+    expect(player.auras.some((aura) => aura.kind === 'buff_allstats_pct')).toBe(false);
+    expect(player.maxHp).toBe(maxHpBefore);
+    expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+    expect(player.cooldowns.get(UNSTUCK_COOLDOWN_ID)).toBe(UNSTUCK_SUCCESS_COOLDOWN_SECONDS);
+    expect(UNSTUCK_SICKNESS_WINDOW_SECONDS).toBe(60 * 60);
+    // Both ids are persisted JSONB keys (cooldowns.abilities) and restore-allowlist tokens:
+    // renaming either would orphan every in-flight timer on live characters.
+    expect(UNSTUCK_RECENT_ID).toBe('system_unstuck_recent');
+    expect(UNSTUCK_COOLDOWN_ID).toBe('system_unstuck');
+  });
+
+  it('charges Unstuck Sickness on a second unstuck inside the window', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    complete(sim);
+    tickMany(sim, 20 * 60); // a minute later: well inside the hour
+    readyAgain(sim);
+
+    const event = complete(sim);
+
+    expect(event.sickness).toBe(true);
+    const sickness = required(
+      player.auras.find((aura) => aura.id === UNSTUCK_SICKNESS_ID),
+      'unstuck sickness aura',
+    );
+    expect(sickness.remaining).toBe(unstuckSicknessDuration(player.level));
+  });
+
+  it('slides the window from the latest completion rather than the first', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    complete(sim);
+    // Half a minute of window left from the first use (more than the countdown, since the
+    // charge is decided at completion): still a repeat, and the repeat re-opens the window
+    // in full, so a chain of uses stays charged until a whole quiet hour has passed.
+    player.cooldowns.set(UNSTUCK_RECENT_ID, 30);
+    readyAgain(sim);
+
+    const repeat = complete(sim);
+
+    expect(repeat.sickness).toBe(true);
+    expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+  });
+
+  it('is free again once the window has run out', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    complete(sim);
+    // Let the tick retire the marker the way an hour of play would (the timer update
+    // deletes a cooldown once it reaches zero) rather than deleting it by hand.
+    player.cooldowns.set(UNSTUCK_RECENT_ID, 0.01);
+    tickMany(sim, 1);
+    expect(player.cooldowns.has(UNSTUCK_RECENT_ID)).toBe(false);
+    readyAgain(sim);
+
+    const event = complete(sim);
+
+    expect(event.sickness).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+  });
+
+  it('reports no sickness for a repeat by a character below the sickness floor', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(9);
+    const player = sim.player;
+    markUnstuckCompleted(player.cooldowns);
+
+    const event = complete(sim);
+
+    expect(event.sickness).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+  });
+
+  it('applies the same free first use to a revive from death', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    expect(player.dead).toBe(true);
+    sim.drainEvents();
+
+    const event = complete(sim);
+
+    expect(event.reason).toBe('revived_at_graveyard');
+    expect(event.sickness).toBe(false);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+    expect(player.auras.some((aura) => aura.id === RESURRECTION_SICKNESS_ID)).toBe(false);
+    expect(player.hp).toBe(Math.max(1, Math.round(player.maxHp * RES_HEALER_HP_FRACTION)));
+    expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+  });
+
+  it('applies the same free first use to a released ghost', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    sim.releaseSpirit();
+    sim.drainEvents();
+    expect(player.ghost).toBe(true);
+
+    const event = complete(sim);
+
+    expect(event.reason).toBe('revived_at_graveyard');
+    expect(event.sickness).toBe(false);
+    expect(player.dead).toBe(false);
+    expect(player.ghost).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+    expect(player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+  });
+
+  it("leaves an existing Keeper's Toll untouched on a free revive", () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const player = sim.player;
+    applyResurrectionSickness(sim.ctx, player);
+    const tollBefore = required(
+      player.auras.find((aura) => aura.id === RESURRECTION_SICKNESS_ID),
+      'the toll',
+    ).remaining;
+    sim.ctx.dealDamage(null, player, player.maxHp * 10, false, 'physical', null, 'hit');
+    expect(player.dead).toBe(true);
+    sim.drainEvents();
+
+    const event = complete(sim);
+
+    // A charged revive would have displaced the 10-minute Toll with the 5-minute Unstuck
+    // drain; a free one launders nothing: the Toll survives at its full remaining (auras
+    // freeze on a corpse, so the countdown burnt none of it off).
+    expect(event.sickness).toBe(false);
+    expect(player.dead).toBe(false);
+    expect(hasUnstuckSickness(player)).toBe(false);
+    const toll = required(
+      player.auras.find((aura) => aura.id === RESURRECTION_SICKNESS_ID),
+      'the toll after the free revive',
+    );
+    expect(toll.remaining).toBe(tollBefore);
+    expect(player.auras.filter((aura) => aura.kind === 'buff_allstats_pct')).toHaveLength(1);
+  });
+
+  it('charges by default when the outcome helpers are called directly', () => {
+    // The unstuck system passes the charge explicitly; a direct caller that omits it keeps
+    // the historical "never free" contract, which is what makes the default load-bearing.
+    const moved = makeWorld();
+    moved.setPlayerLevel(MAX_LEVEL);
+    expect(moveToGraveyardForUnstuck(moved.ctx, moved.player.id)).toBe(true);
+    expect(hasUnstuckSickness(moved.player)).toBe(true);
+
+    const revived = makeWorld();
+    revived.setPlayerLevel(MAX_LEVEL);
+    const body = revived.player;
+    revived.ctx.dealDamage(null, body, body.maxHp * 10, false, 'physical', null, 'hit');
+    expect(body.dead).toBe(true);
+    expect(reviveAtGraveyardForUnstuck(revived.ctx, body.id)).toBe(true);
+    expect(body.dead).toBe(false);
+    expect(hasUnstuckSickness(body)).toBe(true);
+
+    // And the return value reports what landed: nothing below the sickness floor.
+    const exempt = makeWorld();
+    exempt.setPlayerLevel(9);
+    expect(moveToGraveyardForUnstuck(exempt.ctx, exempt.player.id)).toBe(false);
+    expect(hasUnstuckSickness(exempt.player)).toBe(false);
+  });
+
+  it('keeps the window through a relog, so logging out cannot reset it', () => {
+    const sim = makeWorld();
+    sim.setPlayerLevel(MAX_LEVEL);
+    const pid = sim.player.id;
+    complete(sim);
+    tickMany(sim, 20 * 30); // half a minute burnt off the window
+    const remaining = required(sim.player.cooldowns.get(UNSTUCK_RECENT_ID), 'window marker');
+    expect(remaining).toBeLessThan(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+    const state = required(sim.serializeCharacter(pid), 'serialized character');
+    expect(state.cooldowns?.abilities?.[UNSTUCK_RECENT_ID]).toBe(remaining);
+
+    const restored = new Sim({ seed: SEED, playerClass: 'warrior', noPlayer: true });
+    const restoredPid = restored.addPlayer('warrior', 'Wayfinder', { state });
+    const restoredPlayer = required(restored.entities.get(restoredPid), 'restored player');
+    expect(restoredPlayer.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(remaining);
+
+    // And it still counts: the next completion in the restored world is a charged repeat.
+    restoredPlayer.combatTimer = 999;
+    restoredPlayer.inCombat = false;
+    restoredPlayer.onGround = true;
+    restoredPlayer.jumping = false;
+    restoredPlayer.vx = 0;
+    restoredPlayer.vy = 0;
+    restoredPlayer.vz = 0;
+    readyAgain(restored);
+    restored.drainEvents();
+    const event = complete(restored);
+    expect(event.sickness).toBe(true);
+    expect(hasUnstuckSickness(restoredPlayer)).toBe(true);
+  });
+
+  it('survives the competitive reset that clears ability cooldowns', () => {
+    const cooldowns = new Map<string, number>([
+      ['charge', 12],
+      [UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS],
+      [UNSTUCK_RECENT_ID, 1234],
+    ]);
+
+    clearCooldownsPreservingUnstuck(cooldowns);
+
+    expect([...cooldowns]).toEqual([
+      [UNSTUCK_COOLDOWN_ID, UNSTUCK_RETRY_SECONDS],
+      [UNSTUCK_RECENT_ID, 1234],
+    ]);
+  });
+
+  it('survives the match-exit pool restore that hands pre-match cooldowns back', () => {
+    // Carried in: an ability cooldown and a nearly spent retry timer. Live at match end: a
+    // window opened inside the match, a fresher retry timer, and an ability cooldown the
+    // parenthesis must NOT hand back.
+    const carriedIn = new Map<string, number>([
+      ['charge', 12],
+      [UNSTUCK_COOLDOWN_ID, 3],
+    ]);
+    const live = new Map<string, number>([
+      ['bloodrage', 20],
+      [UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS],
+      [UNSTUCK_RECENT_ID, UNSTUCK_SICKNESS_WINDOW_SECONDS - 30],
+    ]);
+
+    const restored = restoreCooldownsPreservingUnstuck(live, carriedIn);
+
+    expect([...restored].sort()).toEqual(
+      [
+        ['charge', 12],
+        [UNSTUCK_COOLDOWN_ID, UNSTUCK_SUCCESS_COOLDOWN_SECONDS],
+        [UNSTUCK_RECENT_ID, UNSTUCK_SICKNESS_WINDOW_SECONDS - 30],
+      ].sort(),
+    );
+    // Neither input is touched, and a carried-in value that is LARGER than the live one
+    // wins the other way round (the parenthesis never shortens either timer).
+    expect(live.get('bloodrage')).toBe(20);
+    expect(carriedIn.get(UNSTUCK_COOLDOWN_ID)).toBe(3);
+    expect(
+      restoreCooldownsPreservingUnstuck(
+        new Map([[UNSTUCK_RECENT_ID, 5]]),
+        new Map([[UNSTUCK_RECENT_ID, 500]]),
+      ).get(UNSTUCK_RECENT_ID),
+    ).toBe(500);
+  });
+
+  it('stays out of the /cooldowns readout like the retry cooldown', () => {
+    const sim = makeWorld();
+    const pid = sim.player.id;
+    complete(sim);
+    expect(sim.player.cooldowns.get(UNSTUCK_RECENT_ID)).toBe(UNSTUCK_SICKNESS_WINDOW_SECONDS);
+    sim.drainEvents();
+
+    sim.chat('/cooldowns', pid);
+
+    const readout = sim
+      .drainEvents()
+      .find((event): event is Extract<SimEvent, { type: 'error' }> => event.type === 'error');
+    expect(readout?.text).toBe('No abilities are on cooldown.');
   });
 });

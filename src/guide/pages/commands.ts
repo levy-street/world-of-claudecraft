@@ -156,7 +156,7 @@ const GROUPS: Group[] = [
   {
     heading: 'guide.commandsPage.groupRecovery',
     rows: [
-      { cmds: ['/unstuck'], desc: 'guide.commandsPage.unstuck' },
+      { cmds: ['/unstuck'], desc: 'guide.commandsPage.unstuckWindow' },
       { cmds: ['/afk [message]'], desc: 'guide.commandsPage.afk' },
       { cmds: ['/dnd [message]'], desc: 'guide.commandsPage.dnd' },
       { cmds: ['/sit', '/stand'], desc: 'guide.commandsPage.sit' },

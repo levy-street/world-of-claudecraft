@@ -484,7 +484,9 @@ describe('market_window: behavior preserved through the core', () => {
     // Buy now lands behind the confirm prompt (the id it sends is the one the
     // prompt captured and rechecked); the behavior itself is driven end to end in
     // tests/market_buy_confirm.test.ts. Reclaim is unchanged: one click.
-    expect(painter).toContain('this.promptBuy(l, itemName)');
+    // The prompt names the row's resolved copy (quality label included), the
+    // same aria name the buy button announces.
+    expect(painter).toContain('this.promptBuy(l, parts.ariaName)');
     expect(painter).toContain('.marketBuy(pending.listingId)');
     expect(painter).toContain('.marketCancel(l.id)');
     expect(painter).toContain('.marketList(view.form.itemId, qty, each * qty)');

@@ -108,7 +108,12 @@ ranks at `PERFECTING_SUCCESS_CHANCE` (0.8) per attempt, every resolved
 attempt consuming the `PERFECTING_ATTEMPT_COST` bill (one Maker's Ember,
 one Sundered Essence, one Prismglass Setting) on success and failure
 alike. Fail-forward ONLY: a failed attempt consumes the materials and
-never harms or downgrades the piece. Perfecting is self-service and
+never harms or downgrades the piece. Every resolved attempt (and every
+masterwork proc draw on the craft path) emits the server-only `craftRoll`
+audit event, which the online server persists as one `craft_roll_events`
+row (roll, chance, verdict, rank walked; `server/craft_roll_events_db.ts`,
+`docs/analytics-instrumentation.md`), so the real per-attempt success rate
+is read from the ledger rather than inferred from chat. Perfecting is self-service and
 skill-gated at `PERFECTING_SKILL_REQ` (125) in the craft that made the
 piece (masterwrought R13; `craftForApexItem` resolves which craft that
 is). Reaching the top rank stamps `perfected` and merges the bonus

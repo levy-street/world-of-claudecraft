@@ -125,10 +125,13 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'You mutter to yourself. Nobody hears it.': 'hud.errors.whisperSelf',
     'You are not in a party.': 'hud.errors.notInParty',
     'You must be in a party to start a ready check.': 'hudChrome.readyCheck.notInPartyError',
+    'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.':
+      'hudChrome.unstuck.helpUnstuckWindow',
+    // Pre-window (v0.32.1 to v0.43.x) wording: still arrives from a not-yet-updated
+    // server when an OTA bundle runs ahead of it, so keep it re-localizable.
     'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.':
       'hudChrome.unstuck.helpUnstuckSickness',
-    // Pre-0.32.1 wording: still arrives from a not-yet-updated server when an OTA
-    // bundle runs ahead of it, so keep it re-localizable.
+    // Pre-0.32.1 wording: same reason.
     "Recovery: /unstuck starts a stationary countdown, then sends your spirit to the nearest graveyard. Returning through the Pale Keeper requires The Keeper's Toll.":
       'hudChrome.unstuck.helpAtGraveyard',
     'A ready check is already in progress.': 'hudChrome.readyCheck.inProgressError',
@@ -183,10 +186,20 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   const key = exact[text];
   if (key) return t(key);
 
-  let match = /^You must be in (Bruin|Cat) Form\.$/.exec(text);
+  // The three shapes the cast gate's refusal ladder emits (castAbility in
+  // sim/combat/casting_lifecycle.ts): one form, or the Bruin-and-Cat pair that
+  // Savage Mending shares. Keep this vocabulary byte-identical to those
+  // literals.
+  let match = /^You must be in (Bruin or Cat|Bruin|Cat) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.requiresForm', {
-      form: t(match[1] === 'Bruin' ? 'hud.errors.bear' : 'hud.errors.cat'),
+      form: t(
+        match[1] === 'Bruin'
+          ? 'hud.errors.bear'
+          : match[1] === 'Cat'
+            ? 'hud.errors.cat'
+            : 'hud.errors.bearOrCat',
+      ),
     });
   match = /^You can't do that in (Bruin|Cat|Fleet) Form\.$/.exec(text);
   if (match)

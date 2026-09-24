@@ -37,6 +37,7 @@ import {
   requestDesktopRestart,
 } from '../game/desktop_next_launch_settings';
 import { desktopDiscordPresenceSupported } from '../game/discord_presence';
+import { frameRateCapRowReading } from '../game/frame_cadence_wiring';
 import {
   GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
@@ -77,6 +78,7 @@ import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
 import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
+import { bugReportErrorText } from './bug_report_error_text';
 import { controllerDeviceStatusView } from './controller_options_view';
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
@@ -110,6 +112,7 @@ import {
   buildInterfaceUnlockRow,
 } from './options_interface_rows';
 import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
+import { optionsText } from './options_text_values';
 import {
   type BoolToggleControl,
   boolToggleNextValue,
@@ -986,9 +989,7 @@ export class OptionsWindow {
       // not take, polite for the one that just reports what is running.
       status.setAttribute('role', c.statusAlert ? 'alert' : 'status');
       if (!c.statusAlert) status.setAttribute('aria-live', 'polite');
-      const values: Record<string, string> = {};
-      for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
-      status.textContent = c.statusValueKeys ? t(c.statusKey, values) : t(c.statusKey);
+      status.textContent = optionsText(c.statusKey, c.statusValueKeys, c.statusNumbers);
       row.appendChild(status);
     }
     parent.appendChild(row);
@@ -1004,9 +1005,7 @@ export class OptionsWindow {
     note.className = 'set-note';
     // The view names its placeholders as keys and this resolves them, so the
     // whole sentence including the value stays one translatable string.
-    const values: Record<string, string> = {};
-    for (const [name, key] of Object.entries(valueKeys ?? {})) values[name] = t(key);
-    note.textContent = valueKeys ? t(textKey, values) : t(textKey);
+    note.textContent = optionsText(textKey, valueKeys);
     parent.appendChild(note);
   }
 
@@ -1376,6 +1375,7 @@ export class OptionsWindow {
               // setting, so that host gets no row. The client's resolver owns
               // that rule; asking it is what keeps the two from drifting.
               shaderWarmChoice: shaderWarmChoiceAvailable(),
+              frameRateCapReadingFor: frameRateCapRowReading,
             },
           )
         : [];
@@ -1967,6 +1967,7 @@ export class OptionsWindow {
       onBack: () => this.goBack(),
       closeIconHtml: svgIcon('close'),
       backIconHtml: svgIcon('prev'),
+      hostDiag: { world: () => this.deps.world(), options: () => this.deps.options() },
     };
   }
 
@@ -2119,7 +2120,7 @@ export class OptionsWindow {
           })
           .catch((err: unknown) => {
             submit.disabled = false;
-            error.textContent = this.localizeBugReportError(err);
+            error.textContent = bugReportErrorText(err);
           });
       });
     });
@@ -2130,17 +2131,6 @@ export class OptionsWindow {
       ?.addEventListener('click', () => this.close());
     // Focus the description so a keyboard/screen-reader user lands in the field.
     window.setTimeout(() => desc.focus(), 0);
-  }
-
-  private localizeBugReportError(err: unknown): string {
-    const text = err instanceof Error ? err.message : '';
-    const keyByMessage: Record<string, TranslationKey> = {
-      'describe the bug': 'hudChrome.bugReport.describeFirst',
-      'bug report too large': 'hudChrome.bugReport.tooLarge',
-      'too many bug reports, try again later': 'hudChrome.bugReport.rateLimited',
-    };
-    const key = keyByMessage[text.toLowerCase()];
-    return key ? t(key) : t('hudChrome.bugReport.failed');
   }
 
   // -------------------------------------------------------------------------

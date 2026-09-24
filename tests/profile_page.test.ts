@@ -193,7 +193,8 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // 415 at the faction standing deeds: the three Champion titles
     // (Riftwarden, Dawnkeeper, Forgemaster) take their slots on the same page.
     // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
-    expect(catalogTotal).toBe(416);
+    // 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) on the Horizons mounts page.
+    expect(catalogTotal).toBe(417);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

@@ -10,7 +10,17 @@ import {
   STUN_STAR_RATE,
   STUN_STAR_SIZE,
 } from '../ability_vfx_core';
+import {
+  physicalFollowThrough,
+  physicalImpact,
+  physicalRelease,
+  physicalTravel,
+} from './physical_choreography';
+import type { BakedKind, FragmentKind } from './production_assets';
+import { SIGNATURE_CONTACT_TIME, type Substance } from './signature_core';
+import type { CrestKind } from './signature_shapes';
 import { SPECTACLE, usesCrescendoScale } from './spectacle';
+import type { SteelSweepRange } from './steel_sweep';
 
 // The archetype sequencer, ported from the gallery interpreters
 // (arc_bolt_preview.js): each claimed cast becomes one pooled sequence slot
@@ -49,6 +59,98 @@ export interface SeqPoint {
 
 // The host surface fx.ts implements: every primitive the sequences drive.
 export interface SequencerHost {
+  /** Actual item classification: shields and empty hands are not weapons. */
+  isWeaponHand?(id: number, hand: 0 | 1): boolean;
+  handPoint?(id: number, hand: 0 | 1, out: SeqPoint): SeqPoint | null;
+  weaponFace?(id: number, hand: 0 | 1, out: SeqPoint, normal: SeqPoint): boolean;
+  prepareWeaponFace?(
+    id: number,
+    hand: 0 | 1,
+  ): ((out: SeqPoint, normal: SeqPoint) => boolean) | null;
+  contact?(
+    sourceId: number,
+    targetId: number,
+    school: string,
+    weight: number,
+    abilityId?: string,
+    beat?: number,
+  ): void;
+  facingAt?(id: number): number | null;
+  weaponTrail?(id: number, hand: 0 | 1, color: number, width: number, duration: number): void;
+  elementalImpact?(
+    id: string,
+    spec: AbilityVfxFullSpec,
+    at: SeqPoint,
+    tier: number,
+    colour: number,
+    accent: number,
+    dx: number,
+    dz: number,
+  ): number;
+  presentationMoment?(id: string, phase: 'release' | 'impact', sourceId: number): void;
+  onRushArrival?: ((sourceId: number, targetId: number) => boolean | void) | null;
+  bakedAt?(
+    kind: BakedKind,
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    hot: number,
+    duration: number,
+    delay: number,
+    heat: number,
+    angle?: number,
+    reverse?: boolean,
+    roll?: number,
+    aspect?: number,
+  ): boolean | void;
+  fragmentsAt?(
+    kind: FragmentKind,
+    x: number,
+    y: number,
+    z: number,
+    tint: number,
+    count: number,
+    power: number,
+    dx: number,
+    dz: number,
+    duration?: number,
+    fractured?: boolean,
+  ): void;
+  residueAt?(x: number, z: number, radius: number, tint: number, substance: Substance): void;
+  worldLightAt?(
+    x: number,
+    y: number,
+    z: number,
+    palette: string,
+    intensity: number,
+    duration: number,
+  ): void;
+  detailAt?(
+    x: number,
+    y: number,
+    z: number,
+    size: number,
+    tint: number,
+    accent: number,
+    substance: Substance,
+    delay?: number,
+    duration?: number,
+  ): void;
+  crestAt?(
+    x: number,
+    y: number,
+    z: number,
+    radius: number,
+    height: number,
+    tint: number,
+    accent: number,
+    substance: CrestKind,
+    angle?: number,
+    duration?: number,
+    pitch?: number,
+  ): boolean | void;
   /** Resolve an entity anchor. Pass `out` from a per-frame path to fill a
    *  caller-owned point instead of allocating (see src/render/vfx_anchor.ts);
    *  the reading is only valid until that scratch is reused. */
@@ -73,6 +175,10 @@ export interface SequencerHost {
     colorHex: number,
     sheet: string,
     hdr: number,
+    duration?: number,
+    rotation?: number,
+    aspect?: number,
+    worldFacing?: number,
   ): void;
   pillarAt(
     x: number,
@@ -92,6 +198,8 @@ export interface SequencerHost {
     count: number,
     power: number,
     kind: 'sparks' | 'embers' | 'debris' | 'smoke' | 'blood',
+    duration?: number,
+    delay?: number,
   ): void;
   pulseLight(
     entityId: number,
@@ -127,12 +235,32 @@ export interface SequencerHost {
     style: string,
     scale?: number,
   ): void;
+  waterVolume?(
+    from: SeqPoint,
+    to: SeqPoint,
+    tint: number,
+    accent: number,
+    width: number,
+    duration?: number,
+  ): void;
+  tetherRibbon?(
+    color: number,
+    width: number,
+    life: number,
+    fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
+  ): void;
   pathRibbon(
     colorHex: number,
     width: number,
     life: number,
     fill: (pts: { set(x: number, y: number, z: number): unknown }[]) => number,
-  ): void;
+    brushed?: boolean,
+    motion?: null,
+    preserveActive?: boolean,
+    priority?: 0 | 1,
+    sweep?: SteelSweepRange | null,
+    follow?: boolean,
+  ): boolean | void;
   pushOverlay(
     x: number,
     y: number,
@@ -159,7 +287,7 @@ export interface SequencerHost {
   countPrimitive(abilityId: string, n: number): void;
   // Camera trauma at a world point (the host applies distance falloff and a
   // rolling budget so spam can never stack shake).
-  shakeAt(x: number, y: number, z: number, amount: number): void;
+  shakeAt(x: number, y: number, z: number, amount: number, crunch?: boolean): void;
   // Per-ability audio (src/game/sfx.ts: sampled pack + procedural recipes) at
   // the sequence's exact release and impact moments - a projectile's boom
   // lands when the bolt does, a ground cast's boom lands AT the zone - plus
@@ -224,6 +352,12 @@ interface Beat {
 }
 
 export interface SeqSlot {
+  /** One admitted contact owns its local critical-hit feedback. */
+  contactFeedback?: () => void;
+  /** Ordered component outcomes: two bits per cut, 0 avoided, 1 wound, 2 absorbed. */
+  componentOutcomes?: number;
+  componentCount?: number;
+  physicalSecondary: boolean;
   active: boolean;
   abilityId: string;
   casterId: number;
@@ -260,6 +394,8 @@ export interface SeqSlot {
   afterglowUntil: number;
   afterglowTimer: number;
   afterglowSpan: number;
+  sourceX: number;
+  sourceZ: number;
   // impact anchor captured at impact time (world point)
   ix: number;
   iy: number;
@@ -316,6 +452,13 @@ const SHEET_BY_PALETTE: Record<string, string> = {
 };
 
 export class ArchetypeSequencer {
+  cancelOwned(casterId: number, abilityId: string): void {
+    for (const slot of this.slots)
+      if (slot.casterId === casterId && slot.abilityId === abilityId) {
+        slot.active = false;
+        slot.contactFeedback = undefined;
+      }
+  }
   private slots: SeqSlot[] = [];
   private beats: Beat[] = [];
 
@@ -341,6 +484,7 @@ export class ArchetypeSequencer {
     }
     for (let i = 0; i < SEQ_SLOTS; i++) {
       this.slots.push({
+        physicalSecondary: false,
         active: false,
         abilityId: '',
         casterId: 0,
@@ -353,7 +497,9 @@ export class ArchetypeSequencer {
         power: 1,
         releaseAt: 0,
         releaseDone: true,
-        impactAt: 0.15,
+        sourceX: 0,
+        sourceZ: 0,
+        impactAt: SIGNATURE_CONTACT_TIME,
         impactDone: false,
         flip2At: 0,
         flip2Done: true,
@@ -400,30 +546,72 @@ export class ArchetypeSequencer {
     awaitTravel: boolean,
     windupDelay = 0,
     at?: { x: number; y: number; z: number },
+    componentOutcome?: 0 | 1 | 2,
+    recipientOnly = false,
   ): SeqSlot | null {
     if (tier >= 2) return null;
+    // One simulation cast can emit several damage components or hit several
+    // victims in the same tick. Weapon motion belongs to that cast once.
+    const owned = !!spec.physical;
+    const sameCast = (s: SeqSlot) =>
+      s.active && s.abilityId === abilityId && s.casterId === casterId && s.t < 0.025;
+    const duplicate =
+      owned && !awaitTravel
+        ? this.slots.find((s) => sameCast(s) && s.targetId === targetId)
+        : undefined;
+    if (duplicate) {
+      if (componentOutcome !== undefined) {
+        const count = duplicate.componentCount ?? 0;
+        // A two-bit mask can hold sixteen results. Extra transport events must
+        // never wrap a shift and rewrite an earlier authored contact.
+        const limit = Math.min(16, spec.physical?.beats.length ?? 16);
+        if (count < limit) {
+          duplicate.componentOutcomes =
+            (duplicate.componentOutcomes ?? 0) | (componentOutcome << (count * 2));
+          duplicate.componentCount = count + 1;
+        }
+      }
+      return duplicate;
+    }
+    const physicalPrimary = spec.physical && !awaitTravel ? this.slots.find(sameCast) : undefined;
     // steal the oldest running sequence when the pool is saturated: a fresh
     // cast always reads louder than a stale linger tail
     let slot = this.slots.find((s) => !s.active) ?? null;
     if (!slot) {
       for (const cand of this.slots) {
+        // Recipient decoration cannot evict a cast before its main contact.
+        // At saturation shed an older recipient/linger, or decline this one.
+        if (recipientOnly && !cand.physicalSecondary && !cand.impactDone) continue;
         if (!slot || cand.t > slot.t) slot = cand;
       }
     }
     if (!slot) return null;
+    slot.contactFeedback = undefined;
     slot.active = true;
+    slot.componentOutcomes = componentOutcome;
+    slot.componentCount = componentOutcome === undefined ? undefined : 1;
+    slot.physicalSecondary = recipientOnly || !!physicalPrimary;
     slot.abilityId = abilityId;
     slot.casterId = casterId;
+    const origin = host.anchorOf(casterId, 0.5);
+    slot.sourceX = origin?.x ?? 0;
+    slot.sourceZ = origin?.z ?? 0;
     slot.targetId = targetId;
     slot.spec = spec;
     slot.color = colorHex;
-    slot.accent = lighten(colorHex, 0.4);
+    slot.accent = !owned
+      ? lighten(colorHex, 0.4)
+      : typeof spec.accent === 'number'
+        ? spec.accent
+        : spec.accent
+          ? abilityHexColor(spec.accent)
+          : lighten(colorHex, 0.4);
     slot.tier = tier;
     slot.t = 0;
     slot.power = spec.power ?? 1;
     slot.releaseAt = windupDelay;
     slot.releaseDone = windupDelay <= 0;
-    slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + 0.15;
+    slot.impactAt = awaitTravel ? Number.POSITIVE_INFINITY : windupDelay + SIGNATURE_CONTACT_TIME;
     slot.impactDone = false;
     slot.flip2Done = true;
     slot.ring2Done = true;
@@ -442,6 +630,9 @@ export class ArchetypeSequencer {
       slot.ix = at.x;
       slot.iy = at.y;
       slot.iz = at.z;
+    } else if (spec.physical?.shape === 'rush' || spec.physical?.shape === 'retreat') {
+      slot.ix = slot.sourceX;
+      slot.iz = slot.sourceZ;
     }
     slot.gavel = false;
     slot.ccStars = 0;
@@ -461,6 +652,25 @@ export class ArchetypeSequencer {
     this.impact(host, slot);
   }
 
+  /** Confirmation changes the pending zero-damage action, never its clock. */
+  confirmWarriorControl(abilityId: string, casterId: number, targetId: number): boolean {
+    for (const slot of this.slots) {
+      if (
+        !slot.active ||
+        slot.impactDone ||
+        slot.physicalSecondary ||
+        slot.abilityId !== abilityId ||
+        slot.casterId !== casterId ||
+        slot.targetId !== targetId
+      )
+        continue;
+      slot.componentOutcomes = 1;
+      slot.componentCount = 1;
+      return true;
+    }
+    return false;
+  }
+
   update(host: SequencerHost, dt: number): void {
     // staggered motif beats fire before the slot walk so a beat scheduled last
     // frame lands on time even if its sequence ended
@@ -475,6 +685,16 @@ export class ArchetypeSequencer {
       if (!slot.active) continue;
       slot.t += dt;
       const spec = slot.spec;
+      if (
+        (spec.physical?.shape === 'rush' || spec.physical?.shape === 'retreat') &&
+        !slot.impactDone
+      ) {
+        if (physicalTravel(host, slot, dt)) {
+          slot.impactDone = true;
+          this.impact(host, slot);
+        }
+        continue;
+      }
       if (!slot.releaseDone) {
         if (slot.t < slot.releaseAt) {
           // pre-release: the caster performs the authored windup ceremony
@@ -499,8 +719,17 @@ export class ArchetypeSequencer {
           this.impact(host, slot);
         } else {
           slot.active = false;
+          slot.contactFeedback = undefined;
           continue;
         }
+      }
+      if (spec.physical) {
+        if (slot.impactDone) {
+          physicalFollowThrough(host, slot);
+          if (slot.t >= slot.lingerUntil) slot.active = false;
+        }
+        if (slot.t > 12) slot.active = false;
+        continue;
       }
       // second staggered flipbook (crescendo tier 0)
       if (!slot.flip2Done && slot.t >= slot.flip2At) {
@@ -540,26 +769,28 @@ export class ArchetypeSequencer {
         const rs = this.ringScale(slot) * (usesCrescendoScale(spec) ? SPECTACLE.followRing : 1);
         // the gallery critFinisher death-sentence beat at +0.12s: a huge
         // second ground wave PLUS the white-hot vertical halo
-        host.ringAt(
-          slot.ix,
-          this.groundOf(host, slot),
-          slot.iz,
-          SPECTACLE.finisherWaveR * this.ringScale(slot),
-          0.6,
-          slot.accent,
-          1.6,
-          false,
-        );
-        host.ringAt(
-          slot.ix,
-          slot.iy + 0.6,
-          slot.iz,
-          SPECTACLE.finisherWaveVR * rs,
-          0.55,
-          0xffffff,
-          1.5,
-          true,
-        );
+        if (!spec.physical || spec.impact?.ring !== false)
+          host.ringAt(
+            slot.ix,
+            this.groundOf(host, slot),
+            slot.iz,
+            SPECTACLE.finisherWaveR * this.ringScale(slot),
+            0.6,
+            slot.accent,
+            1.6,
+            false,
+          );
+        if (!spec.physical || spec.impact?.vRing !== false)
+          host.ringAt(
+            slot.ix,
+            slot.iy + 0.6,
+            slot.iz,
+            SPECTACLE.finisherWaveVR * rs,
+            0.55,
+            0xffffff,
+            1.5,
+            true,
+          );
         host.countPrimitive(slot.abilityId, 2);
       }
       // strike second swing / follow-through echo: a full contact beat of its
@@ -573,29 +804,36 @@ export class ArchetypeSequencer {
         } else {
           const at = host.anchorOf(slot.targetId, 0.55);
           if (at) {
-            host.slashStyled(at, slot.color, spec.strike?.arc ?? 'horizontal', SPECTACLE.strikeArc);
+            host.slashStyled(
+              at,
+              slot.color,
+              spec.strike?.arc ?? 'horizontal',
+              spec.physical && spec.filler ? 1 : SPECTACLE.strikeArc,
+            );
             host.burstAt(at.x, at.y, at.z, slot.color, 18, 1.2, 'sparks');
             const rs2 = this.ringScale(slot) * SPECTACLE.followRing;
-            host.ringAt(
-              at.x,
-              this.groundOf(host, slot),
-              at.z,
-              4.2 * rs2,
-              0.75,
-              slot.accent,
-              1.5,
-              false,
-            );
-            host.ringAt(
-              at.x,
-              at.y + 0.3,
-              at.z,
-              2.4 * this.ringScale(slot) * SPECTACLE.vRing,
-              0.5,
-              slot.accent,
-              1.4,
-              true,
-            );
+            if (!spec.physical || spec.impact?.ring !== false)
+              host.ringAt(
+                at.x,
+                this.groundOf(host, slot),
+                at.z,
+                4.2 * rs2,
+                0.75,
+                slot.accent,
+                1.5,
+                false,
+              );
+            if (!spec.physical || spec.impact?.vRing !== false)
+              host.ringAt(
+                at.x,
+                at.y + 0.3,
+                at.z,
+                2.4 * this.ringScale(slot) * SPECTACLE.vRing,
+                0.5,
+                slot.accent,
+                1.4,
+                true,
+              );
             // the echo is a contact beat of its own: white-hot star + camera bite
             host.pushOverlay(
               at.x,
@@ -676,13 +914,17 @@ export class ArchetypeSequencer {
   }
 
   clear(): void {
-    for (const slot of this.slots) slot.active = false;
+    for (const slot of this.slots) {
+      slot.active = false;
+      slot.contactFeedback = undefined;
+    }
     for (const beat of this.beats) beat.active = false;
   }
 
   cancel(slot: SeqSlot): void {
     if (!slot.active) return;
     slot.active = false;
+    slot.contactFeedback = undefined;
   }
 
   // ---- staggered motif beats ----------------------------------------------
@@ -783,6 +1025,11 @@ export class ArchetypeSequencer {
   // Release: the 100ms hot flash at the caster plus per-archetype openers.
   private release(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
+    if (spec.physical) {
+      physicalRelease(host, slot);
+      return;
+    }
+
     // spectacle calibration: targeted crescendos measured 4.5-12.7x under the
     // gallery's release moment while radial/held families sat at parity
     const boost = usesCrescendoScale(spec);
@@ -870,6 +1117,15 @@ export class ArchetypeSequencer {
   // The full impact stack at (ix, iy, iz), honoring every spec impact flag.
   private impact(host: SequencerHost, slot: SeqSlot): void {
     const spec = slot.spec;
+    if (spec.physical) {
+      physicalImpact(host, slot);
+      const feedback = slot.contactFeedback;
+      slot.contactFeedback = undefined;
+      if (feedback && host.anchorOf(slot.casterId, 0.55) && host.anchorOf(slot.targetId, 0.55))
+        feedback();
+      return;
+    }
+
     const o = spec.impact ?? {};
     const cs = slot.power;
     const rs = this.ringScale(slot);
@@ -2000,15 +2256,6 @@ export class ArchetypeSequencer {
       host.anchorOf(slot.casterId, 0.4)
     );
   }
-
-  // The strangle contact (strike arc 'wire', Throat Wire): no sword-sweep
-  // ribbon at the victim. A taut silver filament snaps between the CASTER's
-  // raised fists (the choke one-shot holds them at neck height) while the
-  // VICTIM wears a brief throat-height constriction - a steel spark pinch, a
-  // gasp of smoke, and the bleed's blood flecks where the wire bites. Kept
-  // deliberately small: a level-1 stealth opener reads sinister, never
-  // spectacular. Runs for the first contact AND the echo (the re-tightened
-  // pull), which replaces the generic echo's rings/star/shake outright.
   private wireContact(host: SequencerHost, slot: SeqSlot): void {
     let n = 0;
     const hands = host.anchorOf(slot.casterId, 0.68);

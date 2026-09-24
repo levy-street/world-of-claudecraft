@@ -1204,13 +1204,6 @@
         rgba(255, 184, 68, 0) 100%
       );
   }
-  /* The death lesson dims the Keeper's paid revive so the free corpse walk
-     it is teaching is the obvious one. Still clickable: a player who wants
-     to pay may, this only takes it out of the eye's path. */
-  .bc-dimmed {
-    opacity: 0.35;
-    filter: grayscale(0.8);
-  }
   /* The interface lessons (bags, character sheet) have no world direction:
      the answer is the row of buttons along the bottom, so the bloom sits
      there instead of past a side edge. */
@@ -4708,6 +4701,32 @@
     box-shadow: var(--glow-action-empowered);
     animation: action-empowered-pulse 1.15s ease-in-out infinite;
   }
+  /* Nature's Boon (druid): the golden rim on the three spells an armed window
+     pays for. Listed AFTER .empowered so it wins on a slot that is both (the
+     window is a next_cast_free aura, so it lights the generic empowered state
+     too). Actionable info: never gated by a graphics tier. The pulse is motion
+     only, so reduced motion keeps the steady rim and drops the animation. */
+  .action-btn.natures-boon {
+    border-color: var(--gold);
+    box-shadow: var(--glow-action-natures-boon);
+    animation: action-natures-boon-pulse 1.3s ease-in-out infinite alternate;
+  }
+  @keyframes action-natures-boon-pulse {
+    from {
+      box-shadow: var(--glow-action-natures-boon);
+    }
+    to {
+      box-shadow: var(--glow-action-natures-boon-strong);
+    }
+  }
+  @media (forced-colors: active) {
+    .action-btn.natures-boon {
+      forced-color-adjust: none;
+      border: 3px double Highlight;
+      outline: 1px solid CanvasText;
+      box-shadow: none;
+    }
+  }
   .action-btn.ascension-spender::after {
     content: attr(data-ascension-cost);
     position: absolute;
@@ -4788,6 +4807,7 @@
   @media (prefers-reduced-motion: reduce) {
     .action-btn.proc,
     .action-btn.empowered,
+    .action-btn.natures-boon,
     .action-btn.fate-consume-ready,
     .action-btn.fate-sentence-ready,
     .mobile-action-slot.fate-consume-ready,
@@ -4797,6 +4817,7 @@
   }
   body.reduce-motion .action-btn.proc,
   body.reduce-motion .action-btn.empowered,
+  body.reduce-motion .action-btn.natures-boon,
   body.reduce-motion .action-btn.fate-consume-ready,
   body.reduce-motion .action-btn.fate-sentence-ready,
   body.reduce-motion .mobile-action-slot.fate-consume-ready,
@@ -5495,6 +5516,38 @@
     margin-top: 6px;
     border: 1px solid var(--color-border-showcase);
     border-radius: var(--radius-sm);
+  }
+
+  /* ---------- system report (Options > Performance section) ----------
+     src/ui/host_diag_section_controller.ts: one sentence, one primary button and
+     one live region; the tone classes ride the region so a verdict reads at a
+     glance without a second element per tone. */
+  .hostdiag-action {
+    display: flex;
+    margin-top: 10px;
+  }
+  /* Busy state is aria-disabled (keyboard focus survives a run), so it borrows
+     the .btn:disabled family look explicitly. The #options-menu prefix is load
+     bearing: that window resets its buttons with an ID-specific
+     `all: revert-layer`, which would erase a class-only filter. */
+  #options-menu .hostdiag-action .btn[aria-disabled="true"] {
+    filter: grayscale(1) brightness(0.7);
+    cursor: default;
+  }
+  .hostdiag-live {
+    min-height: 18px;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .hostdiag-live.is-success .hostdiag-message {
+    color: var(--color-text-success);
+  }
+  .hostdiag-live.is-info .hostdiag-message {
+    color: var(--color-text-light);
+  }
+  .hostdiag-live.is-error .hostdiag-message {
+    color: var(--color-text-error);
   }
 
   /* ---------- right tracker stack (quest tracker + delve tracker) ----------
@@ -9023,8 +9076,9 @@
     gap: 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
-     reach of its corpse or a Spirit Healer. pointer-events:none on the panel so a ghost
-     moves and clicks the world freely; only the buttons themselves are clickable. */
+     reach of its corpse (the Pale Keeper's raise is a conversation, not a button here).
+     pointer-events:none on the panel so a ghost moves and clicks the world freely; only
+     the button itself is clickable. */
   #ghost-prompt {
     position: absolute;
     left: 50%;
@@ -9041,6 +9095,29 @@
   }
   #ghost-prompt .btn {
     pointer-events: auto;
+  }
+  /* Ghost hint: the standing top-center line for the whole ghost run ("run to
+     your body or talk to the Pale Keeper"). Sits under the compass strip in the
+     #arena-status band and reads like the zone banner (light text, no plate),
+     pointer-inert so it never eats a click meant for the world. The letter
+     spacing and title shadow come from the ui-cin primitive on the element. */
+  #ghost-hint {
+    --color-text-light: var(--color-white);
+    position: absolute;
+    left: 50%;
+    top: 74px;
+    transform: translateX(-50%);
+    display: none;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    box-sizing: border-box;
+    color: var(--color-text-light);
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-align: center;
+    pointer-events: none;
+    z-index: 30;
   }
   /* Interact affordance: a small, NON-BLOCKING line shown only while an interact
      press is ambiguous between two farming targets in reach (a placed feast over

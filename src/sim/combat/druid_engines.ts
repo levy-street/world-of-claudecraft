@@ -138,7 +138,24 @@ export function bruinRushMakesCatFormFree(
 const ENGINE_AURA_IDS = new Set([MOONTIDE_ID, OLD_BLOOD_ID, VERDANCE_ID, BRUIN_RUSH_WINDOW_ID]);
 const FORM_ABILITY_IDS = new Set(['bear_form', 'cat_form', 'travel_form', 'moonkin_form']);
 const MOONTIDE_BUILDER_IDS = new Set(['wrath', 'starfire', 'moonseed']);
-const OLD_BLOOD_STRIKE_IDS = new Set(['claw', 'rake', 'rip', 'ferocious_bite', 'maul', 'swipe']);
+// Every landed feral strike that banks one Old Blood. Slinkstrike ('pounce')
+// and Lunge joined the list in the v0.43 feral pass: the stealth opener banks
+// on the tick its stun lands (the stun arm of effect_dispatch.ts reports here
+// beside the combo point it already pays), and Lunge banks on ARRIVAL, when
+// its parked strike actually rolls through ctx.meleeSwing (combat/
+// druid_lunge.ts). A Lunge that ends short strikes nothing and so banks
+// nothing, exactly as it awards no combo point. The OLD_BLOOD_STAGES cap of 3
+// holds for both through addStage.
+const OLD_BLOOD_STRIKE_IDS = new Set([
+  'claw',
+  'rake',
+  'rip',
+  'ferocious_bite',
+  'maul',
+  'swipe',
+  'pounce',
+  'lunge',
+]);
 const VERDANCE_SOWING_IDS = new Set(['rejuvenation', 'regrowth']);
 
 function specOf(ctx: SimContext, player: Entity): string | null {

@@ -7,6 +7,7 @@ import {
   type PerfSuggestionId,
   type PerfSuggestionSeverity,
 } from './perf_doctor';
+import { isBadFrameWindow } from './perf_frame_health_core';
 
 export type PerfDiagnosisConfidence = 'high' | 'medium' | 'low';
 
@@ -258,11 +259,7 @@ function addFinding(findings: PerfDiagnosisFinding[], finding: PerfDiagnosisFind
 }
 
 function badFrameWindow(snapshot: PerfSnapshot): boolean {
-  const recent = snapshot.windows.last10s;
-  return (
-    recent.frames !== 0 &&
-    (recent.fps < 45 || recent.frameMs.p95 >= 28 || recent.frameMs.long50 >= 3)
-  );
+  return isBadFrameWindow(snapshot.windows.last10s, snapshot.cadence);
 }
 
 /**

@@ -218,6 +218,11 @@ describe('no test file registers the same block twice (#2506)', () => {
       // the harness's confirm mock reconfigured to swallow onOk (a callback
       // accessor on the same `test` rig identifier as the row above).
       'test.confirm.mockImplementation',
+      // The exact-copy tooltip rig in tests/loot_roll_controller.test.ts
+      // (permanent loot quality): the harness's itemTooltip mock searched for
+      // the call that carried the rolled copy (a callback accessor on the same
+      // `test` rig identifier as the rows above).
+      'test.itemTooltip.mock.calls.some',
       'test.scheduled.some',
     ]);
   });

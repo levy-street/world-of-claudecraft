@@ -10,7 +10,7 @@ export interface DeathControllerGamepad {
   kind(): GamepadKind;
 }
 
-const DEATH_BUTTON_IDS = ['release-btn', 'resurrect-corpse-btn', 'resurrect-healer-btn'] as const;
+const DEATH_BUTTON_IDS = ['release-btn', 'resurrect-corpse-btn'] as const;
 let paintedDocument: Document | null = null;
 let paintedLabel: string | null | undefined;
 

@@ -974,6 +974,50 @@ describe('guildBankDepositGoldFor / guildBankWithdrawGoldFor', () => {
 });
 
 describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
+  it('round-trips a permanent loot quality descriptor through deposit, save, reload, withdraw', () => {
+    // The guild bank is the third persisted container (bags and the personal
+    // bank are pinned in tests/loot_quality_transfers.test.ts): the same load
+    // sanitizer keeps the exact descriptor, never re-rolls or merges it.
+    const lootQuality = {
+      version: 1 as const,
+      tier: 3 as const,
+      weights: [4, 900, 200, 6, 7] as [number, number, number, number, number],
+    };
+    const sim = makeOfficerSim();
+    expect(ITEMS.greyjaw_hide_boots.soulbound).toBeFalsy(); // fixture guard
+    sim.addItemInstance('greyjaw_hide_boots', { lootQuality: structuredClone(lootQuality) });
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === 'greyjaw_hide_boots'),
+    );
+    expect(meta(sim).inventory.some((s) => s.itemId === 'greyjaw_hide_boots')).toBe(false);
+    expect(book(sim).inventory[0]).toEqual({
+      itemId: 'greyjaw_hide_boots',
+      count: 1,
+      instance: { lootQuality },
+    });
+    const save = JSON.parse(JSON.stringify(sim.serializeGuildBank(GUILD_ID)));
+    // A fresh boot loads the saved book once (makeOfficerSim would already
+    // have loaded an empty one for this guild).
+    const restored = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      autoEquip: false,
+      world: GUILD_BANK_TEST_WORLD,
+    });
+    moveToBanker(restored);
+    restored.setPlayerGuildMembership(restored.playerId, { guildId: GUILD_ID, rank: 'officer' });
+    restored.loadGuildBank(GUILD_ID, save);
+    expect(book(restored).inventory[0].instance).toEqual({ lootQuality });
+    restored.guildBankWithdrawFor(restored.playerId, 0, 1);
+    expect(book(restored).inventory).toHaveLength(0);
+    const withdrawn = meta(restored).inventory.find((s) => s.itemId === 'greyjaw_hide_boots');
+    expect(withdrawn?.instance).toEqual({ lootQuality });
+    // The withdrawn copy is its own object: editing it never reaches the save.
+    withdrawn!.instance!.lootQuality!.weights[1] = 1;
+    expect(save.inventory[0].instance).toEqual({ lootQuality });
+  });
+
   it('refuses quest items with the GUILD-worded error, never the personal-bank line', () => {
     const sim = makeOfficerSim();
     meta(sim).inventory.push({ itemId: 'boar_hide', count: 2 }); // kind: 'quest'

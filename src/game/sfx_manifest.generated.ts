@@ -19,8 +19,8 @@ export interface SfxEntry {
   hash: string;
   variants: readonly SfxVariant[];
 }
-export const SFX_CATALOG_HASH = '77475257efebc1f4fb73a47d810c561da4f01be17a790982bc80b5ff5e06789b';
-export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","ambush","arcane_blast","backstab","battle_shout","blind","blink","blizzard","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","cheap_shot","cloak_of_shadows","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","defiant_bellow","demoralizing_shout","emboldening_roar","entangling_roots","eviscerate","fear","fear_shout","flamestrike","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","frost_nova","frozen_orb","garrote","glacial_spike","hammer_of_justice","heal_impact","ice_block","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_metal","impact_nature","impact_shadow","intimidating_shout","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","meteor","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_beast_hurt","mob_beast_idle","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_boar_hurt","mob_boar_idle","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_burrower_hurt","mob_burrower_idle","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_demon_hurt","mob_demon_idle","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_dragonkin_hurt","mob_dragonkin_idle","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_elemental_hurt","mob_elemental_idle","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_humanoid_hurt","mob_humanoid_idle","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_mudfin_hurt","mob_mudfin_idle","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_ogre_hurt","mob_ogre_idle","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_reptile_hurt","mob_reptile_idle","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_spider_hurt","mob_spider_idle","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_troll_hurt","mob_troll_idle","mob_undead_aggro","mob_undead_attack","mob_undead_death","mob_undead_hurt","mob_undead_idle","mount_idle_mech_bird","mount_jump_mech_bird","mount_jump_rallycart_rxt","mount_land_mech_bird","mount_land_rallycart_rxt","mount_loop_rickshaw_mount","mount_run_aether_hover_cycle","mount_run_drakemaw_raptor","mount_run_goblin_rocket_sled","mount_run_goblin_rocket_sled_reverse","mount_run_goblin_rocket_sled_reverse_start","mount_run_goblin_rocket_sled_reverse_stop","mount_run_goblin_rocket_sled_start","mount_run_goblin_rocket_sled_stop","mount_run_grag_bear","mount_run_mech_bird","mount_run_rallycart_rxt","mount_run_rallycart_rxt_idle","mount_run_rallycart_rxt_reverse","mount_run_rallycart_rxt_reverse_start","mount_run_rallycart_rxt_reverse_stop","mount_run_rallycart_rxt_start","mount_run_rallycart_rxt_stop","mount_run_shadowjump_toad","mount_run_stalkglider_snail","mount_run_stormfeather_griffin","mount_run_terrorspark_groundshaker","mount_run_terrorspark_groundshaker_start","mount_run_terrorspark_groundshaker_stop","mount_run_thunderstrut_gobbler","mount_run_valorsteed","mount_summon_goblin_rocket_sled","mount_summon_rallycart_rxt","mount_summon_rickshaw_mount","move_jump","move_land","move_splash","move_swim","player_death","player_death_female","player_drink_potion","player_drink_water","player_eat_food","player_hurt","player_hurt_female","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","pyroblast","quest_accept","quest_complete","quest_ready","rallying_cry","rift_boulder_impact","rift_boulder_roll","rift_gate_grind","rift_ice_glide","rift_ice_start","rift_ice_stop","rift_lava_tick","rift_portal_drone","rift_portal_enter","rift_portal_spawn","sap","scorch","shadowstep","sinister_strike","spell_nova","stealth","temporal_clock","ui_achievement","ui_arena_loss","ui_aura_anvil_strike","ui_aura_blaring_horn","ui_aura_bubble_pop","ui_aura_car_klaxon","ui_aura_cat_meow","ui_aura_coin_drop","ui_aura_electric_zap","ui_aura_frog_croak","ui_aura_glass_ping","ui_aura_hard_bell","ui_aura_music_box","ui_aura_owl_hoot","ui_aura_soft_chime","ui_aura_sonar_ping","ui_aura_steam_hiss","ui_aura_sword_draw","ui_aura_temple_gong","ui_aura_water_drop","ui_aura_wind_whoosh","ui_aura_wolf_howl","ui_bag_close","ui_bag_open","ui_card_play","ui_card_reveal","ui_card_round_push","ui_card_shuffle","ui_click","ui_coin","ui_cosmetic_unlock","ui_craft_alchemy","ui_craft_armorcrafting","ui_craft_cast","ui_craft_cooking","ui_craft_disenchant","ui_craft_enchanting","ui_craft_engineering","ui_craft_inscription","ui_craft_jewelcrafting","ui_craft_leatherworking","ui_craft_salvage","ui_craft_tailoring","ui_craft_weaponcrafting","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_farm_feast","ui_farm_golden","ui_farm_harvest","ui_farm_plant","ui_farm_ready","ui_farm_withered","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_fish_bite","ui_fish_cast","ui_fish_reel","ui_gather_cast","ui_gather_cast_herb","ui_gather_cast_ore","ui_gather_cast_wood","ui_gather_epic","ui_gather_herb","ui_gather_legendary","ui_gather_ore","ui_gather_rare","ui_gather_wood","ui_legendary_forged","ui_level_up","ui_loot_item","ui_masterwork","ui_perfecting_attempt","ui_perfecting_success","ui_quest_done","ui_ready_check","ui_sheep","ui_sunder_complete","ui_weapon_sheathe","ui_weapon_unsheathe","ui_whisper","vanish","wand_arcane","wand_holy","wand_shadow"] as const;
+export const SFX_CATALOG_HASH = '7e8fbe8ae171f27554cc0ca5076c0926e67e6ac37ef4ab5de3c5eb3065a3fa6e';
+export const SFX_FIXED_CATALOG_KEYS = ["amb_birds","amb_campfire","amb_dungeon","amb_forge","amb_rain","amb_snow","amb_water","amb_wind_marsh","amb_wind_peaks","amb_wind_vale","ambush","arcane_blast","backstab","battle_shout","blind","blink","blizzard","buff_apply","cast_arcane","cast_chain_heal","cast_fire","cast_frost","cast_holy","cast_lightning_bolt","cast_nature","cast_shadow","cheap_shot","cloak_of_shadows","combat_block","combat_crit","combat_dodge","combat_parry","debuff_apply","defiant_bellow","demoralizing_shout","emboldening_roar","entangling_roots","eviscerate","fear","fear_shout","flamestrike","foot_dirt","foot_grass","foot_snow","foot_stone","foot_water","foot_wood","frost_nova","frozen_orb","garrote","glacial_spike","hammer_of_justice","heal_impact","ice_block","impact_arcane","impact_bone","impact_fire","impact_flesh","impact_frost","impact_holy","impact_leather","impact_masterwork_execution","impact_metal","impact_nature","impact_shadow","impact_warrior_avatar_rise","impact_warrior_blood_recovery","impact_warrior_bloodletting","impact_warrior_breachmaker","impact_warrior_brute","impact_warrior_early_grave","impact_warrior_faultline","impact_warrior_goad_bark","impact_warrior_guard_lock","impact_warrior_gyre_sweep","impact_warrior_hammer_land","impact_warrior_hobble_cut","impact_warrior_jawcrack_break","impact_warrior_maiming","impact_warrior_mending_lock","impact_warrior_quake","impact_warrior_reaver","impact_warrior_reckless_tear","impact_warrior_red_harvest_finish","impact_warrior_red_harvest_first","impact_warrior_red_harvest_second","impact_warrior_redhand","impact_warrior_resolve_lock","impact_warrior_revenge","impact_warrior_seething_release","impact_warrior_shear_peel","impact_warrior_shieldcrack","impact_warrior_sword_guard_lock","impact_warrior_toll_clench","impact_warrior_twinstrike_first","impact_warrior_twinstrike_second","impact_warrior_victory","intimidating_shout","lockpick_advanced_1","lockpick_advanced_2","lockpick_advanced_3","lockpick_advanced_4","lockpick_begin","lockpick_bind","lockpick_bonus","lockpick_end","lockpick_fail","lockpick_page_cleared","lockpick_retry","lockpick_slip","lockpick_success","lockpick_trap","melee_bow","melee_swing_blade","melee_swing_heavy","melee_swing_light","melee_unarmed","melee_warrior_avatar_release","melee_warrior_bloodletting_release","melee_warrior_breachmaker_release","melee_warrior_brute_release","melee_warrior_early_grave_release","melee_warrior_faultline_release","melee_warrior_goad_release","melee_warrior_guard_release","melee_warrior_gyre_release","melee_warrior_hammer_throw","melee_warrior_hobble_release","melee_warrior_jawcrack_release","melee_warrior_maiming_release","melee_warrior_mending_release","melee_warrior_quake_release","melee_warrior_reaver_release","melee_warrior_reckless_release","melee_warrior_red_harvest_release","melee_warrior_redhand_release","melee_warrior_resolve_release","melee_warrior_revenge_release","melee_warrior_seething_release","melee_warrior_shear_release","melee_warrior_shieldcrack_release","melee_warrior_sword_guard_release","melee_warrior_toll_release","melee_warrior_twinstrike_release","melee_warrior_victory_release","meteor","mob_beast_aggro","mob_beast_attack","mob_beast_death","mob_beast_hurt","mob_beast_idle","mob_boar_aggro","mob_boar_attack","mob_boar_death","mob_boar_hurt","mob_boar_idle","mob_burrower_aggro","mob_burrower_attack","mob_burrower_death","mob_burrower_hurt","mob_burrower_idle","mob_demon_aggro","mob_demon_attack","mob_demon_death","mob_demon_hurt","mob_demon_idle","mob_dragonkin_aggro","mob_dragonkin_attack","mob_dragonkin_death","mob_dragonkin_hurt","mob_dragonkin_idle","mob_elemental_aggro","mob_elemental_attack","mob_elemental_death","mob_elemental_hurt","mob_elemental_idle","mob_humanoid_aggro","mob_humanoid_attack","mob_humanoid_death","mob_humanoid_hurt","mob_humanoid_idle","mob_mudfin_aggro","mob_mudfin_attack","mob_mudfin_death","mob_mudfin_hurt","mob_mudfin_idle","mob_ogre_aggro","mob_ogre_attack","mob_ogre_death","mob_ogre_hurt","mob_ogre_idle","mob_reptile_aggro","mob_reptile_attack","mob_reptile_death","mob_reptile_hurt","mob_reptile_idle","mob_spider_aggro","mob_spider_attack","mob_spider_death","mob_spider_hurt","mob_spider_idle","mob_troll_aggro","mob_troll_attack","mob_troll_death","mob_troll_hurt","mob_troll_idle","mob_undead_aggro","mob_undead_attack","mob_undead_death","mob_undead_hurt","mob_undead_idle","mount_flap_avian_strider","mount_idle_mech_bird","mount_jump_avian_strider","mount_jump_mech_bird","mount_jump_rallycart_rxt","mount_land_avian_strider","mount_land_mech_bird","mount_land_rallycart_rxt","mount_loop_rickshaw_mount","mount_run_aether_hover_cycle","mount_run_avian_strider","mount_run_drakemaw_raptor","mount_run_goblin_rocket_sled","mount_run_goblin_rocket_sled_reverse","mount_run_goblin_rocket_sled_reverse_start","mount_run_goblin_rocket_sled_reverse_stop","mount_run_goblin_rocket_sled_start","mount_run_goblin_rocket_sled_stop","mount_run_grag_bear","mount_run_mech_bird","mount_run_rallycart_rxt","mount_run_rallycart_rxt_idle","mount_run_rallycart_rxt_reverse","mount_run_rallycart_rxt_reverse_start","mount_run_rallycart_rxt_reverse_stop","mount_run_rallycart_rxt_start","mount_run_rallycart_rxt_stop","mount_run_shadowjump_toad","mount_run_stalkglider_snail","mount_run_stormfeather_griffin","mount_run_terrorspark_groundshaker","mount_run_terrorspark_groundshaker_start","mount_run_terrorspark_groundshaker_stop","mount_run_thunderstrut_gobbler","mount_run_valorsteed","mount_squawk_avian_strider","mount_summon_avian_strider","mount_summon_goblin_rocket_sled","mount_summon_rallycart_rxt","mount_summon_rickshaw_mount","move_jump","move_land","move_splash","move_swim","piercing_howl","player_death","player_death_female","player_drink_potion","player_drink_water","player_eat_food","player_hurt","player_hurt_female","proj_arcane","proj_fire","proj_frost","proj_holy","proj_nature","proj_shadow","pyroblast","quest_accept","quest_complete","quest_ready","rallying_cry","rift_boulder_impact","rift_boulder_roll","rift_gate_grind","rift_ice_glide","rift_ice_start","rift_ice_stop","rift_lava_tick","rift_portal_drone","rift_portal_enter","rift_portal_spawn","sap","scorch","shadowstep","sinister_strike","spell_nova","stealth","temporal_clock","ui_achievement","ui_arena_loss","ui_aura_anvil_strike","ui_aura_blaring_horn","ui_aura_bubble_pop","ui_aura_car_klaxon","ui_aura_cat_meow","ui_aura_coin_drop","ui_aura_electric_zap","ui_aura_frog_croak","ui_aura_glass_ping","ui_aura_hard_bell","ui_aura_music_box","ui_aura_owl_hoot","ui_aura_soft_chime","ui_aura_sonar_ping","ui_aura_steam_hiss","ui_aura_sword_draw","ui_aura_temple_gong","ui_aura_water_drop","ui_aura_wind_whoosh","ui_aura_wolf_howl","ui_bag_close","ui_bag_open","ui_card_play","ui_card_reveal","ui_card_round_push","ui_card_shuffle","ui_click","ui_coin","ui_cosmetic_unlock","ui_craft_alchemy","ui_craft_armorcrafting","ui_craft_cast","ui_craft_cooking","ui_craft_disenchant","ui_craft_enchanting","ui_craft_engineering","ui_craft_inscription","ui_craft_jewelcrafting","ui_craft_leatherworking","ui_craft_salvage","ui_craft_tailoring","ui_craft_weaponcrafting","ui_death","ui_duel_challenge","ui_duel_countdown","ui_duel_end","ui_duel_start","ui_error","ui_farm_feast","ui_farm_golden","ui_farm_harvest","ui_farm_plant","ui_farm_ready","ui_farm_withered","ui_fiesta_augment","ui_fiesta_down","ui_fiesta_revive","ui_fiesta_score_mine","ui_fiesta_score_other","ui_fiesta_wave","ui_fiesta_word_0","ui_fiesta_word_1","ui_fiesta_word_2","ui_fiesta_word_3","ui_fish_bite","ui_fish_cast","ui_fish_reel","ui_gather_cast","ui_gather_cast_herb","ui_gather_cast_ore","ui_gather_cast_wood","ui_gather_epic","ui_gather_herb","ui_gather_legendary","ui_gather_ore","ui_gather_rare","ui_gather_wood","ui_legendary_forged","ui_level_up","ui_loot_item","ui_masterwork","ui_perfecting_attempt","ui_perfecting_success","ui_quest_done","ui_ready_check","ui_sheep","ui_sunder_complete","ui_weapon_sheathe","ui_weapon_unsheathe","ui_whisper","vanish","wand_arcane","wand_holy","wand_shadow"] as const;
 export const SFX_MOB_EXTENSION_FAMILIES = ["beast","boar","burrower","demon","dragonkin","elemental","humanoid","mudfin","ogre","reptile","spider","troll","undead"] as const;
 export const SFX_MOB_EXTENSION_KEY_SOURCE = "^mob_([a-z0-9]+)_([a-z0-9]+(?:_[a-z0-9]+)*)_(aggro|attack|death|hurt|idle)$";
 export const SFX_RUNTIME_PACK_URL = '/audio/sfx/runtime-pack.json';
@@ -28,7 +28,7 @@ export const SFX_MAX_TRACKS_PER_KEY = 8;
 export const SFX_MAX_TRACK_BYTES = 4194304;
 export const SFX_MAX_TOTAL_AUDIO_BYTES = 134217728;
 export const SFX_MAX_RUNTIME_PACK_BYTES = 524288;
-export const SFX_GAIN_LIMITS = {"amb_birds":1,"amb_campfire":1,"amb_dungeon":1,"amb_forge":1.778279,"amb_rain":1,"amb_snow":1,"amb_water":1,"amb_wind_marsh":1,"amb_wind_peaks":1,"amb_wind_vale":1,"ambush":1.798871,"arcane_blast":1.995262,"backstab":1.819701,"battle_shout":2.041738,"blind":2.018366,"blink":2.041738,"blizzard":1.949845,"buff_apply":2.483133,"cast_arcane":1,"cast_chain_heal":1.678804,"cast_fire":1,"cast_frost":1,"cast_holy":1,"cast_lightning_bolt":1.778279,"cast_nature":1,"cast_shadow":1,"cheap_shot":1.840772,"cloak_of_shadows":2.041738,"combat_block":1.717908,"combat_crit":3.273407,"combat_dodge":1.840772,"combat_parry":1.819701,"debuff_apply":2.018366,"defiant_bellow":1.819701,"demoralizing_shout":1.819701,"emboldening_roar":2.041738,"entangling_roots":1.883649,"eviscerate":1.798871,"fear":2.238721,"fear_shout":2.06538,"flamestrike":2.041738,"foot_dirt":1.819701,"foot_grass":1.798871,"foot_snow":1.819701,"foot_stone":1.819701,"foot_water":1.819701,"foot_wood":1.819701,"frost_nova":2.041738,"frozen_orb":2.018366,"garrote":1.862087,"glacial_spike":1.972423,"hammer_of_justice":2.06538,"heal_impact":2.018366,"ice_block":2.06538,"impact_arcane":2.06538,"impact_bone":2.018366,"impact_fire":2.041738,"impact_flesh":1.995262,"impact_frost":1.949845,"impact_holy":2.113489,"impact_leather":2.06538,"impact_metal":1.927525,"impact_nature":2.06538,"impact_shadow":2.018366,"intimidating_shout":2.041738,"lockpick_advanced_1":1.698244,"lockpick_advanced_2":1.717908,"lockpick_advanced_3":1.678804,"lockpick_advanced_4":1.717908,"lockpick_begin":1.798871,"lockpick_bind":1.698244,"lockpick_bonus":1.698244,"lockpick_end":1.778279,"lockpick_fail":1.678804,"lockpick_page_cleared":1.778279,"lockpick_retry":1.757924,"lockpick_slip":1.698244,"lockpick_success":1.757924,"lockpick_trap":1.737801,"melee_bow":1.819701,"melee_swing_blade":1.819701,"melee_swing_heavy":1.819701,"melee_swing_light":1.798871,"melee_unarmed":1.819701,"meteor":2.041738,"mob_beast_aggro":1.840772,"mob_beast_attack":1.840772,"mob_beast_death":2.06538,"mob_beast_hurt":1.840772,"mob_beast_idle":2.985383,"mob_beast_wolf_aggro":1.840772,"mob_beast_wolf_attack":1.840772,"mob_beast_wolf_death":1.840772,"mob_beast_wolf_hurt":1.840772,"mob_beast_wolf_idle":1.819701,"mob_boar_aggro":1.905461,"mob_boar_attack":1.840772,"mob_boar_death":2.041738,"mob_boar_hurt":2.137962,"mob_boar_idle":1.819701,"mob_burrower_aggro":1.819701,"mob_burrower_attack":1.819701,"mob_burrower_death":1.840772,"mob_burrower_hurt":1.819701,"mob_burrower_idle":1.840772,"mob_demon_aggro":2.317395,"mob_demon_attack":2.317395,"mob_demon_death":2.317395,"mob_demon_hurt":2.317395,"mob_demon_idle":2.041738,"mob_dragonkin_aggro":2.041738,"mob_dragonkin_attack":1.819701,"mob_dragonkin_death":2.041738,"mob_dragonkin_hurt":2.041738,"mob_dragonkin_idle":2.290868,"mob_elemental_aggro":1.819701,"mob_elemental_attack":1.840772,"mob_elemental_death":2.041738,"mob_elemental_hurt":2.041738,"mob_elemental_idle":1.840772,"mob_elemental_ignivar_aggro":2.041738,"mob_elemental_ignivar_attack":1.995262,"mob_elemental_ignivar_death":2.041738,"mob_elemental_ignivar_hurt":1.798871,"mob_elemental_ignivar_idle":1.678804,"mob_elemental_varkhul_aggro":2.722701,"mob_elemental_varkhul_attack":2.290868,"mob_elemental_varkhul_death":2.540973,"mob_elemental_varkhul_hurt":1.905461,"mob_elemental_varkhul_idle":2.041738,"mob_humanoid_aggro":1.883649,"mob_humanoid_attack":1.972423,"mob_humanoid_death":2.041738,"mob_humanoid_hurt":2.041738,"mob_humanoid_idle":1.819701,"mob_mudfin_aggro":1.840772,"mob_mudfin_attack":1.819701,"mob_mudfin_death":1.819701,"mob_mudfin_hurt":1.840772,"mob_mudfin_idle":1.819701,"mob_ogre_aggro":1.883649,"mob_ogre_attack":1.819701,"mob_ogre_death":2.06538,"mob_ogre_hurt":2.238721,"mob_ogre_idle":1.840772,"mob_reptile_aggro":1.717908,"mob_reptile_attack":1.819701,"mob_reptile_death":2.041738,"mob_reptile_hurt":1.905461,"mob_reptile_idle":2.60016,"mob_spider_aggro":1.819701,"mob_spider_attack":1.819701,"mob_spider_death":1.819701,"mob_spider_hurt":1.840772,"mob_spider_idle":2.317395,"mob_troll_aggro":1.819701,"mob_troll_attack":1.840772,"mob_troll_death":2.041738,"mob_troll_hurt":2.041738,"mob_troll_idle":2.290868,"mob_undead_aggro":1.698244,"mob_undead_attack":1.840772,"mob_undead_death":2.041738,"mob_undead_hurt":2.187762,"mob_undead_idle":2.187762,"mob_undead_skeleton_aggro":1.819701,"mob_undead_skeleton_attack":1.840772,"mob_undead_skeleton_death":1.840772,"mob_undead_skeleton_hurt":1.840772,"mob_undead_skeleton_idle":1.883649,"mount_idle_mech_bird":2.985383,"mount_jump_mech_bird":2.917427,"mount_jump_rallycart_rxt":1.778279,"mount_land_mech_bird":2.985383,"mount_land_rallycart_rxt":1.778279,"mount_loop_rickshaw_mount":1.778279,"mount_run_aether_hover_cycle":1.819701,"mount_run_drakemaw_raptor":1.819701,"mount_run_goblin_rocket_sled":2.722701,"mount_run_goblin_rocket_sled_reverse":2.06538,"mount_run_goblin_rocket_sled_reverse_start":2.06538,"mount_run_goblin_rocket_sled_reverse_stop":1.995262,"mount_run_goblin_rocket_sled_start":2.018366,"mount_run_goblin_rocket_sled_stop":2.06538,"mount_run_grag_bear":1.840772,"mount_run_mech_bird":2.290868,"mount_run_rallycart_rxt":2.06538,"mount_run_rallycart_rxt_idle":5.128614,"mount_run_rallycart_rxt_reverse":5.128614,"mount_run_rallycart_rxt_reverse_start":5.754399,"mount_run_rallycart_rxt_reverse_stop":5.248075,"mount_run_rallycart_rxt_start":2.317395,"mount_run_rallycart_rxt_stop":2.213095,"mount_run_shadowjump_toad":1.840772,"mount_run_stalkglider_snail":1.840772,"mount_run_stormfeather_griffin":1.819701,"mount_run_terrorspark_groundshaker":2.041738,"mount_run_terrorspark_groundshaker_start":1.840772,"mount_run_terrorspark_groundshaker_stop":1.840772,"mount_run_thunderstrut_gobbler":1.819701,"mount_run_valorsteed":1.819701,"mount_summon_goblin_rocket_sled":2.041738,"mount_summon_rallycart_rxt":2.691535,"mount_summon_rickshaw_mount":2.06538,"move_jump":1.698244,"move_land":1.717908,"move_splash":1.995262,"move_swim":2.018366,"player_death":2.06538,"player_death_female":1.819701,"player_drink_potion":2.851018,"player_drink_water":2.06538,"player_eat_food":2.06538,"player_hurt":1.819701,"player_hurt_female":1.819701,"proj_arcane":2.018366,"proj_fire":2.041738,"proj_frost":1.972423,"proj_holy":1.905461,"proj_nature":2.018366,"proj_shadow":1.949845,"pyroblast":2.041738,"quest_accept":2.238721,"quest_complete":2.06538,"quest_ready":4.570882,"rallying_cry":1.840772,"rift_boulder_impact":1.778279,"rift_boulder_roll":1.698244,"rift_gate_grind":2.041738,"rift_ice_glide":2.041738,"rift_ice_start":1.819701,"rift_ice_stop":1.840772,"rift_lava_tick":2.42661,"rift_portal_drone":8.317638,"rift_portal_enter":2.660725,"rift_portal_spawn":3.935501,"sap":1.927525,"scorch":1.840772,"shadowstep":1.840772,"sinister_strike":2.660725,"spell_nova":2.113489,"stealth":2.162719,"temporal_clock":1.757924,"ui_achievement":1.757924,"ui_arena_loss":2.344229,"ui_aura_anvil_strike":1,"ui_aura_blaring_horn":1,"ui_aura_bubble_pop":1,"ui_aura_car_klaxon":1,"ui_aura_cat_meow":1,"ui_aura_coin_drop":1,"ui_aura_electric_zap":1,"ui_aura_frog_croak":1,"ui_aura_glass_ping":1,"ui_aura_hard_bell":1,"ui_aura_music_box":1,"ui_aura_owl_hoot":1,"ui_aura_soft_chime":1,"ui_aura_sonar_ping":1,"ui_aura_steam_hiss":1,"ui_aura_sword_draw":1,"ui_aura_temple_gong":1,"ui_aura_water_drop":1,"ui_aura_wind_whoosh":1,"ui_aura_wolf_howl":1,"ui_bag_close":1.798871,"ui_bag_open":1.778279,"ui_card_play":1.778279,"ui_card_reveal":1.737801,"ui_card_round_push":1.778279,"ui_card_shuffle":1.778279,"ui_click":1.778279,"ui_coin":1.927525,"ui_cosmetic_unlock":1.949845,"ui_craft_alchemy":1.778279,"ui_craft_armorcrafting":1.778279,"ui_craft_cast":1,"ui_craft_cooking":1.798871,"ui_craft_disenchant":2.089296,"ui_craft_enchanting":1.757924,"ui_craft_engineering":1.757924,"ui_craft_inscription":1.778279,"ui_craft_jewelcrafting":1.778279,"ui_craft_leatherworking":1.778279,"ui_craft_salvage":1.819701,"ui_craft_tailoring":1.757924,"ui_craft_weaponcrafting":1.778279,"ui_death":1,"ui_duel_challenge":1.840772,"ui_duel_countdown":1.778279,"ui_duel_end":1.717908,"ui_duel_start":1.717908,"ui_error":1.778279,"ui_farm_feast":1,"ui_farm_golden":1,"ui_farm_harvest":1,"ui_farm_plant":1,"ui_farm_ready":1,"ui_farm_withered":1,"ui_fiesta_augment":1,"ui_fiesta_down":1,"ui_fiesta_revive":1,"ui_fiesta_score_mine":1,"ui_fiesta_score_other":1,"ui_fiesta_wave":1,"ui_fiesta_word_0":1,"ui_fiesta_word_1":1,"ui_fiesta_word_2":1,"ui_fiesta_word_3":1,"ui_fish_bite":1.819701,"ui_fish_cast":1.840772,"ui_fish_reel":1.840772,"ui_gather_cast":1,"ui_gather_cast_herb":1.840772,"ui_gather_cast_ore":1.819701,"ui_gather_cast_wood":1.819701,"ui_gather_epic":2.660725,"ui_gather_herb":1.905461,"ui_gather_legendary":2.041738,"ui_gather_ore":1.819701,"ui_gather_rare":1.883649,"ui_gather_wood":1.840772,"ui_legendary_forged":1,"ui_level_up":1.798871,"ui_loot_item":1.778279,"ui_masterwork":1.737801,"ui_perfecting_attempt":1,"ui_perfecting_success":1,"ui_quest_done":1,"ui_ready_check":1.717908,"ui_sheep":1.798871,"ui_sunder_complete":1,"ui_weapon_sheathe":1.778279,"ui_weapon_unsheathe":1.798871,"ui_whisper":1.717908,"vanish":2.06538,"wand_arcane":2.398833,"wand_holy":2.851018,"wand_shadow":2.187762} as const satisfies Record<string, number>;
+export const SFX_GAIN_LIMITS = {"amb_birds":1,"amb_campfire":1,"amb_dungeon":1,"amb_forge":1.778279,"amb_rain":1,"amb_snow":1,"amb_water":1,"amb_wind_marsh":1,"amb_wind_peaks":1,"amb_wind_vale":1,"ambush":1.798871,"arcane_blast":1.995262,"backstab":1.819701,"battle_shout":2.041738,"blind":2.018366,"blink":2.041738,"blizzard":1.949845,"buff_apply":2.483133,"cast_arcane":1,"cast_chain_heal":1.678804,"cast_fire":1,"cast_frost":1,"cast_holy":1,"cast_lightning_bolt":1.778279,"cast_nature":1,"cast_shadow":1,"cheap_shot":1.840772,"cloak_of_shadows":2.041738,"combat_block":1.717908,"combat_crit":3.273407,"combat_dodge":1.840772,"combat_parry":1.819701,"debuff_apply":2.018366,"defiant_bellow":1.819701,"demoralizing_shout":1.819701,"emboldening_roar":2.041738,"entangling_roots":1.883649,"eviscerate":1.798871,"fear":2.238721,"fear_shout":2.06538,"flamestrike":2.041738,"foot_dirt":1.819701,"foot_grass":1.798871,"foot_snow":1.819701,"foot_stone":1.819701,"foot_water":1.819701,"foot_wood":1.819701,"frost_nova":2.041738,"frozen_orb":2.018366,"garrote":1.862087,"glacial_spike":1.972423,"hammer_of_justice":2.06538,"heal_impact":2.018366,"ice_block":2.06538,"impact_arcane":2.06538,"impact_bone":2.018366,"impact_fire":2.041738,"impact_flesh":1.995262,"impact_frost":1.949845,"impact_holy":2.113489,"impact_leather":2.06538,"impact_masterwork_execution":1.883649,"impact_metal":1.927525,"impact_nature":2.06538,"impact_shadow":2.018366,"impact_warrior_avatar_rise":1.840772,"impact_warrior_blood_recovery":1.819701,"impact_warrior_bloodletting":1.819701,"impact_warrior_breachmaker":1.819701,"impact_warrior_brute":1.819701,"impact_warrior_early_grave":1.798871,"impact_warrior_faultline":1.819701,"impact_warrior_goad_bark":1.819701,"impact_warrior_guard_lock":1.840772,"impact_warrior_gyre_sweep":1.778279,"impact_warrior_hammer_land":1.798871,"impact_warrior_hobble_cut":1.819701,"impact_warrior_jawcrack_break":1.840772,"impact_warrior_maiming":1.819701,"impact_warrior_mending_lock":1.819701,"impact_warrior_quake":1.840772,"impact_warrior_reaver":1.840772,"impact_warrior_reckless_tear":1.819701,"impact_warrior_red_harvest_finish":2.691535,"impact_warrior_red_harvest_first":2.660725,"impact_warrior_red_harvest_second":2.660725,"impact_warrior_redhand":1.840772,"impact_warrior_resolve_lock":1.840772,"impact_warrior_revenge":1.798871,"impact_warrior_seething_release":1.819701,"impact_warrior_shear_peel":1.840772,"impact_warrior_shieldcrack":1.819701,"impact_warrior_sword_guard_lock":1.819701,"impact_warrior_toll_clench":1.840772,"impact_warrior_twinstrike_first":1.757924,"impact_warrior_twinstrike_second":1.798871,"impact_warrior_victory":1.819701,"intimidating_shout":2.041738,"lockpick_advanced_1":1.698244,"lockpick_advanced_2":1.717908,"lockpick_advanced_3":1.678804,"lockpick_advanced_4":1.717908,"lockpick_begin":1.798871,"lockpick_bind":1.698244,"lockpick_bonus":1.698244,"lockpick_end":1.778279,"lockpick_fail":1.678804,"lockpick_page_cleared":1.778279,"lockpick_retry":1.757924,"lockpick_slip":1.698244,"lockpick_success":1.757924,"lockpick_trap":1.737801,"melee_bow":1.819701,"melee_swing_blade":1.819701,"melee_swing_heavy":1.819701,"melee_swing_light":1.798871,"melee_unarmed":1.819701,"melee_warrior_avatar_release":1.819701,"melee_warrior_bloodletting_release":1.819701,"melee_warrior_breachmaker_release":1.840772,"melee_warrior_brute_release":1.840772,"melee_warrior_early_grave_release":1.819701,"melee_warrior_faultline_release":1.819701,"melee_warrior_goad_release":1.840772,"melee_warrior_guard_release":1.798871,"melee_warrior_gyre_release":1.819701,"melee_warrior_hammer_throw":1.819701,"melee_warrior_hobble_release":1.819701,"melee_warrior_jawcrack_release":1.819701,"melee_warrior_maiming_release":1.840772,"melee_warrior_mending_release":1.840772,"melee_warrior_quake_release":1.819701,"melee_warrior_reaver_release":1.819701,"melee_warrior_reckless_release":1.819701,"melee_warrior_red_harvest_release":1.819701,"melee_warrior_redhand_release":1.840772,"melee_warrior_resolve_release":1.819701,"melee_warrior_revenge_release":1.840772,"melee_warrior_seething_release":1.840772,"melee_warrior_shear_release":1.819701,"melee_warrior_shieldcrack_release":1.819701,"melee_warrior_sword_guard_release":1.840772,"melee_warrior_toll_release":1.819701,"melee_warrior_twinstrike_release":1.840772,"melee_warrior_victory_release":1.840772,"meteor":2.041738,"mob_beast_aggro":1.840772,"mob_beast_attack":1.840772,"mob_beast_death":2.06538,"mob_beast_hurt":1.840772,"mob_beast_idle":2.985383,"mob_beast_wolf_aggro":1.840772,"mob_beast_wolf_attack":1.840772,"mob_beast_wolf_death":1.840772,"mob_beast_wolf_hurt":1.840772,"mob_beast_wolf_idle":1.819701,"mob_boar_aggro":1.905461,"mob_boar_attack":1.840772,"mob_boar_death":2.041738,"mob_boar_hurt":2.137962,"mob_boar_idle":1.819701,"mob_burrower_aggro":1.819701,"mob_burrower_attack":1.819701,"mob_burrower_death":1.840772,"mob_burrower_hurt":1.819701,"mob_burrower_idle":1.840772,"mob_demon_aggro":2.317395,"mob_demon_attack":2.317395,"mob_demon_death":2.317395,"mob_demon_hurt":2.317395,"mob_demon_idle":2.041738,"mob_dragonkin_aggro":2.041738,"mob_dragonkin_attack":1.819701,"mob_dragonkin_death":2.041738,"mob_dragonkin_hurt":2.041738,"mob_dragonkin_idle":2.290868,"mob_elemental_aggro":1.819701,"mob_elemental_attack":1.840772,"mob_elemental_death":2.041738,"mob_elemental_hurt":2.041738,"mob_elemental_idle":1.840772,"mob_elemental_ignivar_aggro":2.041738,"mob_elemental_ignivar_attack":1.995262,"mob_elemental_ignivar_death":2.041738,"mob_elemental_ignivar_hurt":1.798871,"mob_elemental_ignivar_idle":1.678804,"mob_elemental_varkhul_aggro":2.722701,"mob_elemental_varkhul_attack":2.290868,"mob_elemental_varkhul_death":2.540973,"mob_elemental_varkhul_hurt":1.905461,"mob_elemental_varkhul_idle":2.041738,"mob_humanoid_aggro":1.883649,"mob_humanoid_attack":1.972423,"mob_humanoid_death":2.041738,"mob_humanoid_hurt":2.041738,"mob_humanoid_idle":1.819701,"mob_mudfin_aggro":1.840772,"mob_mudfin_attack":1.819701,"mob_mudfin_death":1.819701,"mob_mudfin_hurt":1.840772,"mob_mudfin_idle":1.819701,"mob_ogre_aggro":1.883649,"mob_ogre_attack":1.819701,"mob_ogre_death":2.06538,"mob_ogre_hurt":2.238721,"mob_ogre_idle":1.840772,"mob_reptile_aggro":1.717908,"mob_reptile_attack":1.819701,"mob_reptile_death":2.041738,"mob_reptile_hurt":1.905461,"mob_reptile_idle":2.60016,"mob_spider_aggro":1.819701,"mob_spider_attack":1.819701,"mob_spider_death":1.819701,"mob_spider_hurt":1.840772,"mob_spider_idle":2.317395,"mob_troll_aggro":1.819701,"mob_troll_attack":1.840772,"mob_troll_death":2.041738,"mob_troll_hurt":2.041738,"mob_troll_idle":2.290868,"mob_undead_aggro":1.698244,"mob_undead_attack":1.840772,"mob_undead_death":2.041738,"mob_undead_hurt":2.187762,"mob_undead_idle":2.187762,"mob_undead_skeleton_aggro":1.819701,"mob_undead_skeleton_attack":1.840772,"mob_undead_skeleton_death":1.840772,"mob_undead_skeleton_hurt":1.840772,"mob_undead_skeleton_idle":1.883649,"mount_flap_avian_strider":1.757924,"mount_idle_mech_bird":2.985383,"mount_jump_avian_strider":1.778279,"mount_jump_mech_bird":2.917427,"mount_jump_rallycart_rxt":1.778279,"mount_land_avian_strider":1.778279,"mount_land_mech_bird":2.985383,"mount_land_rallycart_rxt":1.778279,"mount_loop_rickshaw_mount":1.778279,"mount_run_aether_hover_cycle":1.819701,"mount_run_avian_strider":1.737801,"mount_run_drakemaw_raptor":1.819701,"mount_run_goblin_rocket_sled":2.722701,"mount_run_goblin_rocket_sled_reverse":2.06538,"mount_run_goblin_rocket_sled_reverse_start":2.06538,"mount_run_goblin_rocket_sled_reverse_stop":1.995262,"mount_run_goblin_rocket_sled_start":2.018366,"mount_run_goblin_rocket_sled_stop":2.06538,"mount_run_grag_bear":1.840772,"mount_run_mech_bird":2.290868,"mount_run_rallycart_rxt":2.06538,"mount_run_rallycart_rxt_idle":5.128614,"mount_run_rallycart_rxt_reverse":5.128614,"mount_run_rallycart_rxt_reverse_start":5.754399,"mount_run_rallycart_rxt_reverse_stop":5.248075,"mount_run_rallycart_rxt_start":2.317395,"mount_run_rallycart_rxt_stop":2.213095,"mount_run_shadowjump_toad":1.840772,"mount_run_stalkglider_snail":1.840772,"mount_run_stormfeather_griffin":1.819701,"mount_run_terrorspark_groundshaker":2.041738,"mount_run_terrorspark_groundshaker_start":1.840772,"mount_run_terrorspark_groundshaker_stop":1.840772,"mount_run_thunderstrut_gobbler":1.819701,"mount_run_valorsteed":1.819701,"mount_squawk_avian_strider":1.717908,"mount_summon_avian_strider":2.238721,"mount_summon_goblin_rocket_sled":2.041738,"mount_summon_rallycart_rxt":2.691535,"mount_summon_rickshaw_mount":2.06538,"move_jump":1.698244,"move_land":1.717908,"move_splash":1.995262,"move_swim":2.018366,"piercing_howl":1.819701,"player_death":2.06538,"player_death_female":1.819701,"player_drink_potion":2.851018,"player_drink_water":2.06538,"player_eat_food":2.06538,"player_hurt":1.819701,"player_hurt_female":1.819701,"proj_arcane":2.018366,"proj_fire":2.041738,"proj_frost":1.972423,"proj_holy":1.905461,"proj_nature":2.018366,"proj_shadow":1.949845,"pyroblast":2.041738,"quest_accept":2.238721,"quest_complete":2.06538,"quest_ready":4.570882,"rallying_cry":1.840772,"rift_boulder_impact":1.778279,"rift_boulder_roll":1.698244,"rift_gate_grind":2.041738,"rift_ice_glide":2.041738,"rift_ice_start":1.819701,"rift_ice_stop":1.840772,"rift_lava_tick":2.42661,"rift_portal_drone":8.317638,"rift_portal_enter":2.660725,"rift_portal_spawn":3.935501,"sap":1.927525,"scorch":1.840772,"shadowstep":1.840772,"sinister_strike":2.660725,"spell_nova":2.113489,"stealth":2.162719,"temporal_clock":1.757924,"ui_achievement":1.757924,"ui_arena_loss":2.344229,"ui_aura_anvil_strike":1,"ui_aura_blaring_horn":1,"ui_aura_bubble_pop":1,"ui_aura_car_klaxon":1,"ui_aura_cat_meow":1,"ui_aura_coin_drop":1,"ui_aura_electric_zap":1,"ui_aura_frog_croak":1,"ui_aura_glass_ping":1,"ui_aura_hard_bell":1,"ui_aura_music_box":1,"ui_aura_owl_hoot":1,"ui_aura_soft_chime":1,"ui_aura_sonar_ping":1,"ui_aura_steam_hiss":1,"ui_aura_sword_draw":1,"ui_aura_temple_gong":1,"ui_aura_water_drop":1,"ui_aura_wind_whoosh":1,"ui_aura_wolf_howl":1,"ui_bag_close":1.798871,"ui_bag_open":1.778279,"ui_card_play":1.778279,"ui_card_reveal":1.737801,"ui_card_round_push":1.778279,"ui_card_shuffle":1.778279,"ui_click":1.778279,"ui_coin":1.927525,"ui_cosmetic_unlock":1.949845,"ui_craft_alchemy":1.778279,"ui_craft_armorcrafting":1.778279,"ui_craft_cast":1,"ui_craft_cooking":1.798871,"ui_craft_disenchant":2.089296,"ui_craft_enchanting":1.757924,"ui_craft_engineering":1.757924,"ui_craft_inscription":1.778279,"ui_craft_jewelcrafting":1.778279,"ui_craft_leatherworking":1.778279,"ui_craft_salvage":1.819701,"ui_craft_tailoring":1.757924,"ui_craft_weaponcrafting":1.778279,"ui_death":1,"ui_duel_challenge":1.840772,"ui_duel_countdown":1.778279,"ui_duel_end":1.717908,"ui_duel_start":1.717908,"ui_error":1.778279,"ui_farm_feast":1,"ui_farm_golden":1,"ui_farm_harvest":1,"ui_farm_plant":1,"ui_farm_ready":1,"ui_farm_withered":1,"ui_fiesta_augment":1,"ui_fiesta_down":1,"ui_fiesta_revive":1,"ui_fiesta_score_mine":1,"ui_fiesta_score_other":1,"ui_fiesta_wave":1,"ui_fiesta_word_0":1,"ui_fiesta_word_1":1,"ui_fiesta_word_2":1,"ui_fiesta_word_3":1,"ui_fish_bite":1.819701,"ui_fish_cast":1.840772,"ui_fish_reel":1.840772,"ui_gather_cast":1,"ui_gather_cast_herb":1.840772,"ui_gather_cast_ore":1.819701,"ui_gather_cast_wood":1.819701,"ui_gather_epic":2.660725,"ui_gather_herb":1.905461,"ui_gather_legendary":2.041738,"ui_gather_ore":1.819701,"ui_gather_rare":1.883649,"ui_gather_wood":1.840772,"ui_legendary_forged":1,"ui_level_up":1.798871,"ui_loot_item":1.778279,"ui_masterwork":1.737801,"ui_perfecting_attempt":1,"ui_perfecting_success":1,"ui_quest_done":1,"ui_ready_check":1.717908,"ui_sheep":1.798871,"ui_sunder_complete":1,"ui_weapon_sheathe":1.778279,"ui_weapon_unsheathe":1.798871,"ui_whisper":1.717908,"vanish":2.06538,"wand_arcane":2.398833,"wand_holy":2.851018,"wand_shadow":2.187762} as const satisfies Record<string, number>;
 export const SFX_CLIPS =
 {
   "amb_birds": {
@@ -1436,6 +1436,25 @@ export const SFX_CLIPS =
       }
     ]
   },
+  "impact_masterwork_execution": {
+    "url": "/audio/sfx/impact_masterwork_execution.mp3?v=aac729b724d5",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 47064,
+    "hash": "aac729b724d5",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/impact_masterwork_execution.mp3?v=aac729b724d5",
+        "bytes": 47064,
+        "sha256": "aac729b724d51745e8f984d6361bb64d9ef622926e9ba1a548ade0ce254abe31"
+      }
+    ]
+  },
   "impact_metal": {
     "url": "/audio/sfx/impact_metal_1.mp3?v=fdfe938a68c8",
     "loop": false,
@@ -1508,6 +1527,806 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/impact_shadow.mp3?v=1b746f7ec984",
         "bytes": 30763,
         "sha256": "1b746f7ec984ca5368462bc3747f8135057ebf209f565828df12bb061358d584"
+      }
+    ]
+  },
+  "impact_warrior_avatar_rise": {
+    "url": "/audio/sfx/impact_warrior_avatar_rise_1.mp3?v=3c1e2a2610cf",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 11955,
+    "hash": "3c1e2a2610cf",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_avatar_rise_1.mp3?v=3c1e2a2610cf",
+        "bytes": 11955,
+        "sha256": "3c1e2a2610cfab8939c43b2a173157ef9092529e6ea3533267fdfaa76313ac55"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_avatar_rise_2.mp3?v=93eb1ae7909a",
+        "bytes": 11955,
+        "sha256": "93eb1ae7909a0a5451945d1d6d7744863b5383c73b6a90231a32be73df963f14"
+      }
+    ]
+  },
+  "impact_warrior_blood_recovery": {
+    "url": "/audio/sfx/impact_warrior_blood_recovery_1.mp3?v=dc62b6c8c76f",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "dc62b6c8c76f",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_blood_recovery_1.mp3?v=dc62b6c8c76f",
+        "bytes": 6940,
+        "sha256": "dc62b6c8c76ff11b2c999bf16473a4087b4d38c676f2e42a2d21a81e114cbf35"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_blood_recovery_2.mp3?v=fbd947e7382e",
+        "bytes": 6940,
+        "sha256": "fbd947e7382e9e31a5f04d5cf462c0b11ff7904c45a754507a56c08501d75e3f"
+      }
+    ]
+  },
+  "impact_warrior_bloodletting": {
+    "url": "/audio/sfx/impact_warrior_bloodletting_1.mp3?v=0ef2ddb807a4",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "0ef2ddb807a4",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_bloodletting_1.mp3?v=0ef2ddb807a4",
+        "bytes": 6940,
+        "sha256": "0ef2ddb807a47f973ae9a05c53d9e97f24fe24b88dd0c0bd2a7b0c2f66dca5ce"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_bloodletting_2.mp3?v=a48fdff820f5",
+        "bytes": 6940,
+        "sha256": "a48fdff820f54f112712af1531fcea715524ceb4f050cae7995a4cf11017e7eb"
+      }
+    ]
+  },
+  "impact_warrior_breachmaker": {
+    "url": "/audio/sfx/impact_warrior_breachmaker_1.mp3?v=d0cbacbc3ef2",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 8821,
+    "hash": "d0cbacbc3ef2",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_breachmaker_1.mp3?v=d0cbacbc3ef2",
+        "bytes": 8821,
+        "sha256": "d0cbacbc3ef23fa6b036a96861d3b1aecf0aef57f3cad6685d3d1ce27c8dd1c0"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_breachmaker_2.mp3?v=d7a9413f8a3d",
+        "bytes": 8821,
+        "sha256": "d7a9413f8a3d10c33745426699d55afe7a22d027419f54f0ea8c2ec24422246c"
+      }
+    ]
+  },
+  "impact_warrior_brute": {
+    "url": "/audio/sfx/impact_warrior_brute_1.mp3?v=82473d1d1faa",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "82473d1d1faa",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_brute_1.mp3?v=82473d1d1faa",
+        "bytes": 6940,
+        "sha256": "82473d1d1faada17da2d42636fa07a057b5ecc92823adc31114c1f55d52a1683"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_brute_2.mp3?v=fe69127dc27a",
+        "bytes": 6940,
+        "sha256": "fe69127dc27a2a40eabab296468cc578ad6cb6153cc9973eeae04cd0ae5d9421"
+      }
+    ]
+  },
+  "impact_warrior_early_grave": {
+    "url": "/audio/sfx/impact_warrior_early_grave_1.mp3?v=f1fe520491cd",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 8821,
+    "hash": "f1fe520491cd",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_early_grave_1.mp3?v=f1fe520491cd",
+        "bytes": 8821,
+        "sha256": "f1fe520491cd7f37045d2e73fbd6a40d77c776961f211411def4754e0f5d3505"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_early_grave_2.mp3?v=9b53700e2758",
+        "bytes": 8821,
+        "sha256": "9b53700e2758b6fcf7f8f1bef05455a85aafdc34cff7cc2ee60e7312e0304ce2"
+      }
+    ]
+  },
+  "impact_warrior_faultline": {
+    "url": "/audio/sfx/impact_warrior_faultline_1.mp3?v=0d925cf14998",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 11955,
+    "hash": "0d925cf14998",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_faultline_1.mp3?v=0d925cf14998",
+        "bytes": 11955,
+        "sha256": "0d925cf1499849dd42f5d0a8ac685377dbfb1bb249ed460bf638b918a1a7a24e"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_faultline_2.mp3?v=bf672826adef",
+        "bytes": 11955,
+        "sha256": "bf672826adefa4f10ced5cf3a5633a8a96c89c3f28e7e4061eda89bd8ab229c1"
+      }
+    ]
+  },
+  "impact_warrior_goad_bark": {
+    "url": "/audio/sfx/impact_warrior_goad_bark_1.mp3?v=b0cefd0e05f3",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 9448,
+    "hash": "b0cefd0e05f3",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_goad_bark_1.mp3?v=b0cefd0e05f3",
+        "bytes": 9448,
+        "sha256": "b0cefd0e05f3424aa31e674d3480255f500d5e2af9f37662edb787cba54a722b"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_goad_bark_2.mp3?v=9a38609dde19",
+        "bytes": 9448,
+        "sha256": "9a38609dde1979feb7de8cc4d85307f0e98691b602d1bd413679d0191476f865"
+      }
+    ]
+  },
+  "impact_warrior_guard_lock": {
+    "url": "/audio/sfx/impact_warrior_guard_lock_1.mp3?v=b526c46e022b",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 7567,
+    "hash": "b526c46e022b",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_guard_lock_1.mp3?v=b526c46e022b",
+        "bytes": 7567,
+        "sha256": "b526c46e022b2bee8bc55003fc7e0341c8fecfcf7f2a5c95a246cb1e78f0fa1f"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_guard_lock_2.mp3?v=df0aec28e05e",
+        "bytes": 7567,
+        "sha256": "df0aec28e05eb8ed7b6588c0adc66067cb77eb5acf209fe3ab1998ba6cf9fc09"
+      }
+    ]
+  },
+  "impact_warrior_gyre_sweep": {
+    "url": "/audio/sfx/impact_warrior_gyre_sweep_1.mp3?v=c12cfc9d82e4",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 10075,
+    "hash": "c12cfc9d82e4",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_gyre_sweep_1.mp3?v=c12cfc9d82e4",
+        "bytes": 10075,
+        "sha256": "c12cfc9d82e4987c30e9484e259e3ff964a7e150f112b158126855d6db0f4f5a"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_gyre_sweep_2.mp3?v=fcabf79f889a",
+        "bytes": 10075,
+        "sha256": "fcabf79f889ab5eabc43779f13a5f40d41d1441b66ab60d74e4f94dbddf44404"
+      }
+    ]
+  },
+  "impact_warrior_hammer_land": {
+    "url": "/audio/sfx/impact_warrior_hammer_land_1.mp3?v=898cb89c1564",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 9448,
+    "hash": "898cb89c1564",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_hammer_land_1.mp3?v=898cb89c1564",
+        "bytes": 9448,
+        "sha256": "898cb89c156467a18b3b8841f859149837f22ba7cf8bd14d1e57061cc9ab8da0"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_hammer_land_2.mp3?v=3749af23e57e",
+        "bytes": 9448,
+        "sha256": "3749af23e57edb52646e38f338cfd41a3c859a5f184fa1c551cb19739c86d41f"
+      }
+    ]
+  },
+  "impact_warrior_hobble_cut": {
+    "url": "/audio/sfx/impact_warrior_hobble_cut_1.mp3?v=55f52281062f",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "55f52281062f",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_hobble_cut_1.mp3?v=55f52281062f",
+        "bytes": 6940,
+        "sha256": "55f52281062fe1ee751737bbb40b7e2d2b145e6397e7a31974c3c365f52542b8"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_hobble_cut_2.mp3?v=c43598f77f3a",
+        "bytes": 6940,
+        "sha256": "c43598f77f3a85baf4126b23c1fbff64d308aa73f48d334ec1bc0403bd16039a"
+      }
+    ]
+  },
+  "impact_warrior_jawcrack_break": {
+    "url": "/audio/sfx/impact_warrior_jawcrack_break_1.mp3?v=596aa386cf8f",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "596aa386cf8f",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_jawcrack_break_1.mp3?v=596aa386cf8f",
+        "bytes": 6940,
+        "sha256": "596aa386cf8f9d598479df627ced7ab52c9d6d7b84b749b13ce66db3fc32576f"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_jawcrack_break_2.mp3?v=77ce9df155c3",
+        "bytes": 6940,
+        "sha256": "77ce9df155c3d759967b8f72d33447c777e50a98d6c4f96040bd28c0d64b4d04"
+      }
+    ]
+  },
+  "impact_warrior_maiming": {
+    "url": "/audio/sfx/impact_warrior_maiming_1.mp3?v=c8247a731f1c",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "c8247a731f1c",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_maiming_1.mp3?v=c8247a731f1c",
+        "bytes": 6940,
+        "sha256": "c8247a731f1c47b7ee9d9373e081425259f996ea35ffe7399e8ce1e83410350f"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_maiming_2.mp3?v=741fdce59e74",
+        "bytes": 6940,
+        "sha256": "741fdce59e741d95349399062081b29c569b5cd0cfb6e588f864b748e85958aa"
+      }
+    ]
+  },
+  "impact_warrior_mending_lock": {
+    "url": "/audio/sfx/impact_warrior_mending_lock_1.mp3?v=d507fd265e9c",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 9448,
+    "hash": "d507fd265e9c",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_mending_lock_1.mp3?v=d507fd265e9c",
+        "bytes": 9448,
+        "sha256": "d507fd265e9c3cc3e749e34ce0b0c1158ff3892b33643a85f54194c9cc44ab80"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_mending_lock_2.mp3?v=dc10fc0a39e8",
+        "bytes": 9448,
+        "sha256": "dc10fc0a39e8f6bd1aee2bcf0013a1957b98392d38def947c2df248a555ff357"
+      }
+    ]
+  },
+  "impact_warrior_quake": {
+    "url": "/audio/sfx/impact_warrior_quake_1.mp3?v=ac7ca9bca34d",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 10075,
+    "hash": "ac7ca9bca34d",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_quake_1.mp3?v=ac7ca9bca34d",
+        "bytes": 10075,
+        "sha256": "ac7ca9bca34deb16b943f668e7488d09e60d4393996b6a3ce14289f3022450e3"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_quake_2.mp3?v=eef720bb38e2",
+        "bytes": 10075,
+        "sha256": "eef720bb38e299344fcdcf31ec3e12f2825b9c022ae59adb474cc92d60cf4e51"
+      }
+    ]
+  },
+  "impact_warrior_reaver": {
+    "url": "/audio/sfx/impact_warrior_reaver_1.mp3?v=a000652b85eb",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "a000652b85eb",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_reaver_1.mp3?v=a000652b85eb",
+        "bytes": 6940,
+        "sha256": "a000652b85ebb917ba484b849d51a6366795ec3a572726394a3070fe4d2c2ac0"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_reaver_2.mp3?v=b20993a271ef",
+        "bytes": 6940,
+        "sha256": "b20993a271ef93a48d328a03d1b30364c964a2ed1a649beb9569aa3bcecde71f"
+      }
+    ]
+  },
+  "impact_warrior_reckless_tear": {
+    "url": "/audio/sfx/impact_warrior_reckless_tear_1.mp3?v=4a72c7eaed7d",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 10075,
+    "hash": "4a72c7eaed7d",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_reckless_tear_1.mp3?v=4a72c7eaed7d",
+        "bytes": 10075,
+        "sha256": "4a72c7eaed7de06a52ac295d85107699b2177a149968db3d34ba7c9f2cf773cb"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_reckless_tear_2.mp3?v=c49fb3dd5be9",
+        "bytes": 10075,
+        "sha256": "c49fb3dd5be9bd61f48265e12399bd81e0ccb26676ec6ea88753d5a59bbae8cc"
+      }
+    ]
+  },
+  "impact_warrior_red_harvest_finish": {
+    "url": "/audio/sfx/impact_warrior_red_harvest_finish_1.mp3?v=5d4841e1a12b",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1.230269,
+    "playbackRate": 0.96,
+    "bytes": 7567,
+    "hash": "5d4841e1a12b",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_red_harvest_finish_1.mp3?v=5d4841e1a12b",
+        "bytes": 7567,
+        "sha256": "5d4841e1a12b35a37bc1c945d15e4f27233840de6a7da3c7bb83484db3c9b494"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_red_harvest_finish_2.mp3?v=4668eabe990c",
+        "bytes": 7567,
+        "sha256": "4668eabe990c46f799e74a6513066081838e34e3efe4b92f8e60e5d960f31690"
+      }
+    ]
+  },
+  "impact_warrior_red_harvest_first": {
+    "url": "/audio/sfx/impact_warrior_red_harvest_first_1.mp3?v=b294de3b9ce0",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1.047129,
+    "playbackRate": 1,
+    "bytes": 5686,
+    "hash": "b294de3b9ce0",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_red_harvest_first_1.mp3?v=b294de3b9ce0",
+        "bytes": 5686,
+        "sha256": "b294de3b9ce05d36868f32b2844e43657059772da1699b63caf82c5ecd92354f"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_red_harvest_first_2.mp3?v=27280593d526",
+        "bytes": 5686,
+        "sha256": "27280593d5265904d562bf53331dbff0011d193cf9b99b11a516275804766e6a"
+      }
+    ]
+  },
+  "impact_warrior_red_harvest_second": {
+    "url": "/audio/sfx/impact_warrior_red_harvest_second_1.mp3?v=2dd774cf6cb4",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1.109175,
+    "playbackRate": 1,
+    "bytes": 5686,
+    "hash": "2dd774cf6cb4",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_red_harvest_second_1.mp3?v=2dd774cf6cb4",
+        "bytes": 5686,
+        "sha256": "2dd774cf6cb4c68707991a5e62b8bb27450933bb9dfc76a6112a8240f62a993e"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_red_harvest_second_2.mp3?v=288458e5f2b0",
+        "bytes": 5686,
+        "sha256": "288458e5f2b0930d6d13b6f7a47517d57f6124d893df0aa4838b6454d6232e1d"
+      }
+    ]
+  },
+  "impact_warrior_redhand": {
+    "url": "/audio/sfx/impact_warrior_redhand_1.mp3?v=dfc35196a9cf",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "dfc35196a9cf",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_redhand_1.mp3?v=dfc35196a9cf",
+        "bytes": 6940,
+        "sha256": "dfc35196a9cfda7fe6ecdf68b240b83a3b2e918a4460a854542a67e8a697b823"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_redhand_2.mp3?v=f4ed2b4250c3",
+        "bytes": 6940,
+        "sha256": "f4ed2b4250c3e1f737e4c7cc2a40f74dd653d73d77a06ac75f153518be311f20"
+      }
+    ]
+  },
+  "impact_warrior_resolve_lock": {
+    "url": "/audio/sfx/impact_warrior_resolve_lock_1.mp3?v=0c1b7f486fd4",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 9448,
+    "hash": "0c1b7f486fd4",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_resolve_lock_1.mp3?v=0c1b7f486fd4",
+        "bytes": 9448,
+        "sha256": "0c1b7f486fd41dce1369e3c59d861b97fe7adc5a5be387529b844b3fefee9d45"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_resolve_lock_2.mp3?v=a3c6d003861e",
+        "bytes": 9448,
+        "sha256": "a3c6d003861e15d13fd8b495b8f2fcede6157c350f6ef27889facd68aad4294a"
+      }
+    ]
+  },
+  "impact_warrior_revenge": {
+    "url": "/audio/sfx/impact_warrior_revenge_1.mp3?v=72acaf5b1d9f",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 8194,
+    "hash": "72acaf5b1d9f",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_revenge_1.mp3?v=72acaf5b1d9f",
+        "bytes": 8194,
+        "sha256": "72acaf5b1d9fa4e3f4231f6e553a105ea8ad4499f90efb845dd51eaa99933af6"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_revenge_2.mp3?v=a19dea0a0a96",
+        "bytes": 8194,
+        "sha256": "a19dea0a0a96d71dd725785d22f4515adfbb7f37cdc5eed692ab9257c77cf4e7"
+      }
+    ]
+  },
+  "impact_warrior_seething_release": {
+    "url": "/audio/sfx/impact_warrior_seething_release_1.mp3?v=1999d374926e",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 8821,
+    "hash": "1999d374926e",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_seething_release_1.mp3?v=1999d374926e",
+        "bytes": 8821,
+        "sha256": "1999d374926ef0d7669e9085d8f8982c0608bdb8da522da1516ef2a0673548c3"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_seething_release_2.mp3?v=08ac6faebe4e",
+        "bytes": 8821,
+        "sha256": "08ac6faebe4e36f2b66a9565480ce013b19d39f96ef15dc82a570db66e557d01"
+      }
+    ]
+  },
+  "impact_warrior_shear_peel": {
+    "url": "/audio/sfx/impact_warrior_shear_peel_1.mp3?v=7b25738b4023",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 9448,
+    "hash": "7b25738b4023",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_shear_peel_1.mp3?v=7b25738b4023",
+        "bytes": 9448,
+        "sha256": "7b25738b402374f85d00bfae37f287b679a2eb7689fc7bc8f9359086091089f2"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_shear_peel_2.mp3?v=2cb965d290f4",
+        "bytes": 9448,
+        "sha256": "2cb965d290f4e1454b199afd5a4d7066751196e1ef1899699b9033c4405ce4b9"
+      }
+    ]
+  },
+  "impact_warrior_shieldcrack": {
+    "url": "/audio/sfx/impact_warrior_shieldcrack_1.mp3?v=84284eb1dfac",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 7567,
+    "hash": "84284eb1dfac",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_shieldcrack_1.mp3?v=84284eb1dfac",
+        "bytes": 7567,
+        "sha256": "84284eb1dfac17396737445ee363d23f346cee735bd38a1413db79079470a570"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_shieldcrack_2.mp3?v=424a414e652e",
+        "bytes": 7567,
+        "sha256": "424a414e652e0429a1e595add098d562a9ba3b1a91b363f78f5948eb2c27192e"
+      }
+    ]
+  },
+  "impact_warrior_sword_guard_lock": {
+    "url": "/audio/sfx/impact_warrior_sword_guard_lock_1.mp3?v=668bed6dbd69",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 7567,
+    "hash": "668bed6dbd69",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_sword_guard_lock_1.mp3?v=668bed6dbd69",
+        "bytes": 7567,
+        "sha256": "668bed6dbd698a1a49acb8d4e3c4d63a543872f068b4cf276e0aa3ea6d821fba"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_sword_guard_lock_2.mp3?v=aee0cd1e7e41",
+        "bytes": 7567,
+        "sha256": "aee0cd1e7e41ec6f07974d82533b29818176daf0e655eeb387fbbb60ff7d472b"
+      }
+    ]
+  },
+  "impact_warrior_toll_clench": {
+    "url": "/audio/sfx/impact_warrior_toll_clench_1.mp3?v=d2409eeea8bb",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 7567,
+    "hash": "d2409eeea8bb",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_toll_clench_1.mp3?v=d2409eeea8bb",
+        "bytes": 7567,
+        "sha256": "d2409eeea8bb8882dcf45d93328be72c65449e0e6fa4233b8f4aac40b9c3cea7"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_toll_clench_2.mp3?v=f0b9f9e8fcde",
+        "bytes": 7567,
+        "sha256": "f0b9f9e8fcde2b9e585197f231bf48b834a58b07093329f7f296d1b824095ce9"
+      }
+    ]
+  },
+  "impact_warrior_twinstrike_first": {
+    "url": "/audio/sfx/impact_warrior_twinstrike_first_1.mp3?v=93304be6c998",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5686,
+    "hash": "93304be6c998",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_twinstrike_first_1.mp3?v=93304be6c998",
+        "bytes": 5686,
+        "sha256": "93304be6c99896d6d587f35ddc5265fa47cc40ecc82d98fa1e5f9ff86c1aeb98"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_twinstrike_first_2.mp3?v=4d0926556fee",
+        "bytes": 5686,
+        "sha256": "4d0926556feeb067c352200bc4c9d128b142a4a101b36d4f4e33a5bb54e9f97c"
+      }
+    ]
+  },
+  "impact_warrior_twinstrike_second": {
+    "url": "/audio/sfx/impact_warrior_twinstrike_second_1.mp3?v=67d67f1a4447",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6940,
+    "hash": "67d67f1a4447",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_twinstrike_second_1.mp3?v=67d67f1a4447",
+        "bytes": 6940,
+        "sha256": "67d67f1a444724867fa1db29cd9c063a2ebfc81f6a4a1e5f8a577a2af1d7aafd"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_twinstrike_second_2.mp3?v=82c15d0074c0",
+        "bytes": 6940,
+        "sha256": "82c15d0074c00b77f057f775b814946cdfc2acb971029395656e044753a269f6"
+      }
+    ]
+  },
+  "impact_warrior_victory": {
+    "url": "/audio/sfx/impact_warrior_victory_1.mp3?v=e024c06920f4",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 7567,
+    "hash": "e024c06920f4",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/impact_warrior_victory_1.mp3?v=e024c06920f4",
+        "bytes": 7567,
+        "sha256": "e024c06920f471ecf970d334b47b5933fbaedad734d06ced31556def1baf7207"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/impact_warrior_victory_2.mp3?v=a878e841c0e7",
+        "bytes": 7567,
+        "sha256": "a878e841c0e7225af916260e206158d381918094267c02480b2564dbca5859b5"
       }
     ]
   },
@@ -2056,6 +2875,706 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/melee_unarmed_7.mp3?v=093248a09f9d",
         "bytes": 11328,
         "sha256": "093248a09f9dbb06b8fa0aa7d94901bb598166bb0b488a172ca3cb5b2bf794fc"
+      }
+    ]
+  },
+  "melee_warrior_avatar_release": {
+    "url": "/audio/sfx/melee_warrior_avatar_release_1.mp3?v=fb135c66fab8",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "fb135c66fab8",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_avatar_release_1.mp3?v=fb135c66fab8",
+        "bytes": 5059,
+        "sha256": "fb135c66fab862d6c0f20de43f0cc1192fddd59f024db5d91ed78b23f2c5a5a5"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_avatar_release_2.mp3?v=5e8e1a5e94b4",
+        "bytes": 5059,
+        "sha256": "5e8e1a5e94b4ef5e7752c80895ce2b30d1a76dfce2d7b6d91c2d1b83df7a36f4"
+      }
+    ]
+  },
+  "melee_warrior_bloodletting_release": {
+    "url": "/audio/sfx/melee_warrior_bloodletting_release_1.mp3?v=85fa118df086",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "85fa118df086",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_bloodletting_release_1.mp3?v=85fa118df086",
+        "bytes": 4432,
+        "sha256": "85fa118df0868c5aacec9f7cae040877f588420cec4348d6f2ce5a41d2c520b6"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_bloodletting_release_2.mp3?v=d6c3f17b044d",
+        "bytes": 4432,
+        "sha256": "d6c3f17b044dfb90f1f8d43a4405cbcf97014ab914456aba796c5afd82c3787a"
+      }
+    ]
+  },
+  "melee_warrior_breachmaker_release": {
+    "url": "/audio/sfx/melee_warrior_breachmaker_release_1.mp3?v=01837521d430",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "01837521d430",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_breachmaker_release_1.mp3?v=01837521d430",
+        "bytes": 4432,
+        "sha256": "01837521d430516b1f60cf28796b6ce3209e538f406420523f78f69c118c9280"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_breachmaker_release_2.mp3?v=5a2992b4e959",
+        "bytes": 4432,
+        "sha256": "5a2992b4e959c3f84f874990e4e12ee7fdd996d5b8dec3b4202224979f4b0ae6"
+      }
+    ]
+  },
+  "melee_warrior_brute_release": {
+    "url": "/audio/sfx/melee_warrior_brute_release_1.mp3?v=cb27437013c5",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "cb27437013c5",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_brute_release_1.mp3?v=cb27437013c5",
+        "bytes": 4432,
+        "sha256": "cb27437013c5e5b21db392e20f21538dbf2537de6303fd857020ea713df2f652"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_brute_release_2.mp3?v=cbe623d76b58",
+        "bytes": 4432,
+        "sha256": "cbe623d76b58b627a658b3b4485777ec241030ce0d5e17eb1c643747be0c084f"
+      }
+    ]
+  },
+  "melee_warrior_early_grave_release": {
+    "url": "/audio/sfx/melee_warrior_early_grave_release_1.mp3?v=19485f3d4fd9",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "19485f3d4fd9",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_early_grave_release_1.mp3?v=19485f3d4fd9",
+        "bytes": 5059,
+        "sha256": "19485f3d4fd942643e14701aae0937ddd105d69155377f5befde7684e71ee13d"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_early_grave_release_2.mp3?v=db9f797aaa37",
+        "bytes": 5059,
+        "sha256": "db9f797aaa37e471c722aed8bdf2b97b46a9c5f468246bb45e8101ec51e196be"
+      }
+    ]
+  },
+  "melee_warrior_faultline_release": {
+    "url": "/audio/sfx/melee_warrior_faultline_release_1.mp3?v=62d36486a649",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "62d36486a649",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_faultline_release_1.mp3?v=62d36486a649",
+        "bytes": 5059,
+        "sha256": "62d36486a649c68cb301c4a4c52b0683993ab4aa4e4b11a4719e919a1344eb5a"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_faultline_release_2.mp3?v=cabfc74d62d6",
+        "bytes": 5059,
+        "sha256": "cabfc74d62d6145de01836fd75cd265dac06c572228369c18f7aa4661fa99ad7"
+      }
+    ]
+  },
+  "melee_warrior_goad_release": {
+    "url": "/audio/sfx/melee_warrior_goad_release_1.mp3?v=d7a4c836f242",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "d7a4c836f242",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_goad_release_1.mp3?v=d7a4c836f242",
+        "bytes": 4432,
+        "sha256": "d7a4c836f2424422e4673a3f27c7ce8b73758ed9f1768a498dbce1dfce939803"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_goad_release_2.mp3?v=40b3848280d0",
+        "bytes": 4432,
+        "sha256": "40b3848280d061d7015d406b009d3591a58d3033c4c004db81a6a7d7cdd77390"
+      }
+    ]
+  },
+  "melee_warrior_guard_release": {
+    "url": "/audio/sfx/melee_warrior_guard_release_1.mp3?v=dd9b21ffc769",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "dd9b21ffc769",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_guard_release_1.mp3?v=dd9b21ffc769",
+        "bytes": 4432,
+        "sha256": "dd9b21ffc76935c49644e8c1fd28832e05d2106f6d6cd00ec396b20d1b796680"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_guard_release_2.mp3?v=34605a24893b",
+        "bytes": 4432,
+        "sha256": "34605a24893be428d844b38ec1f29ad95c06222ee3f7f6e6caa28392a52099ad"
+      }
+    ]
+  },
+  "melee_warrior_gyre_release": {
+    "url": "/audio/sfx/melee_warrior_gyre_release_1.mp3?v=81aec3f67e56",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "81aec3f67e56",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_gyre_release_1.mp3?v=81aec3f67e56",
+        "bytes": 4432,
+        "sha256": "81aec3f67e5676ef533c62763f7c8599f9908cf1769787b71a7c942aec440aca"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_gyre_release_2.mp3?v=353743c35145",
+        "bytes": 4432,
+        "sha256": "353743c3514574c392c5293a87f72f276e3d8fee23613a1747597382ef03f8e4"
+      }
+    ]
+  },
+  "melee_warrior_hammer_throw": {
+    "url": "/audio/sfx/melee_warrior_hammer_throw_1.mp3?v=f54ff3ebeaa8",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5686,
+    "hash": "f54ff3ebeaa8",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_hammer_throw_1.mp3?v=f54ff3ebeaa8",
+        "bytes": 5686,
+        "sha256": "f54ff3ebeaa8aeddccabbb71a93bb95816e18e00e5844e43a4274d5faaaa953e"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_hammer_throw_2.mp3?v=7fa73d6dd941",
+        "bytes": 5686,
+        "sha256": "7fa73d6dd941d180c840227e04ebb1c42ec81106c1c3ddd12d53f4bcfefecee6"
+      }
+    ]
+  },
+  "melee_warrior_hobble_release": {
+    "url": "/audio/sfx/melee_warrior_hobble_release_1.mp3?v=0c10b66add36",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "0c10b66add36",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_hobble_release_1.mp3?v=0c10b66add36",
+        "bytes": 4432,
+        "sha256": "0c10b66add3649a4849e958d0d6e9ca47b147c42aa741623e04c12b05fe24d21"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_hobble_release_2.mp3?v=4bc535c2ea02",
+        "bytes": 4432,
+        "sha256": "4bc535c2ea02eeb6345304ed50ddade74b5e447e91d6c64149102d7cc0986e93"
+      }
+    ]
+  },
+  "melee_warrior_jawcrack_release": {
+    "url": "/audio/sfx/melee_warrior_jawcrack_release_1.mp3?v=55bf5174d529",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "55bf5174d529",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_jawcrack_release_1.mp3?v=55bf5174d529",
+        "bytes": 4432,
+        "sha256": "55bf5174d5294b50f3219316361d5fe3dc6da2c7ad4212bf804802312bfd84a1"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_jawcrack_release_2.mp3?v=f21c90c0131f",
+        "bytes": 4432,
+        "sha256": "f21c90c0131fe94b2ab181c4c2395bcc9e780b140772d5d35e03f1708347e7b1"
+      }
+    ]
+  },
+  "melee_warrior_maiming_release": {
+    "url": "/audio/sfx/melee_warrior_maiming_release_1.mp3?v=85ff35c147d3",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "85ff35c147d3",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_maiming_release_1.mp3?v=85ff35c147d3",
+        "bytes": 4432,
+        "sha256": "85ff35c147d3b22a5c2a0a5c43c0130e1fa767bbac3ed1c57dac8755f393902b"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_maiming_release_2.mp3?v=350545b74577",
+        "bytes": 4432,
+        "sha256": "350545b745776601091f6d328c7624faa887006fde9ac20f8817e71e73c10b4d"
+      }
+    ]
+  },
+  "melee_warrior_mending_release": {
+    "url": "/audio/sfx/melee_warrior_mending_release_1.mp3?v=2c5c66166759",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "2c5c66166759",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_mending_release_1.mp3?v=2c5c66166759",
+        "bytes": 5059,
+        "sha256": "2c5c661667596df144e0d4e56a5c30dc9ac0ce478f3dd80ce97feb67c47a2162"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_mending_release_2.mp3?v=17de380e63ab",
+        "bytes": 5059,
+        "sha256": "17de380e63abeee7d3a81789b6e6cb2a9588a6519224ddeb4192711476a39fdc"
+      }
+    ]
+  },
+  "melee_warrior_quake_release": {
+    "url": "/audio/sfx/melee_warrior_quake_release_1.mp3?v=a3bd8c941833",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "a3bd8c941833",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_quake_release_1.mp3?v=a3bd8c941833",
+        "bytes": 4432,
+        "sha256": "a3bd8c941833e1c0b52ed2abeef6616c8fda19d7586ee24c49a993316d0e30c8"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_quake_release_2.mp3?v=20cb97926a40",
+        "bytes": 4432,
+        "sha256": "20cb97926a40b74175efcc1cdde5cb6c19dd7ddac0b1f0257b7ecf19687e52f4"
+      }
+    ]
+  },
+  "melee_warrior_reaver_release": {
+    "url": "/audio/sfx/melee_warrior_reaver_release_1.mp3?v=632913dda310",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "632913dda310",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_reaver_release_1.mp3?v=632913dda310",
+        "bytes": 4432,
+        "sha256": "632913dda3106e11a81a9736dc704439fa03223bc520f45e663c5a7138cb01ef"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_reaver_release_2.mp3?v=f1b1900bb920",
+        "bytes": 4432,
+        "sha256": "f1b1900bb9200b3289d2f0121d7df393228e6857210e35909a86fdf3cdccdae1"
+      }
+    ]
+  },
+  "melee_warrior_reckless_release": {
+    "url": "/audio/sfx/melee_warrior_reckless_release_1.mp3?v=5756dfec13e0",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "5756dfec13e0",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_reckless_release_1.mp3?v=5756dfec13e0",
+        "bytes": 5059,
+        "sha256": "5756dfec13e026f78e4cfc834a1095dfc6e988aebedfe635b8e77996e287bb16"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_reckless_release_2.mp3?v=cb379914f6a1",
+        "bytes": 5059,
+        "sha256": "cb379914f6a1f82816d461c35f64e929f51ae09adc21ea4db3adf8f1b7b4175d"
+      }
+    ]
+  },
+  "melee_warrior_red_harvest_release": {
+    "url": "/audio/sfx/melee_warrior_red_harvest_release_1.mp3?v=680d31bdce1d",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 0.870964,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "680d31bdce1d",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_red_harvest_release_1.mp3?v=680d31bdce1d",
+        "bytes": 5059,
+        "sha256": "680d31bdce1d98cecd20554038687b87e2e82cc3d80b0dda4b424201938c2096"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_red_harvest_release_2.mp3?v=e110a89fe078",
+        "bytes": 5059,
+        "sha256": "e110a89fe07846a1f76a3aa0ca22512412b47fa4f3e6fc0d45f8bfde4dc6e661"
+      }
+    ]
+  },
+  "melee_warrior_redhand_release": {
+    "url": "/audio/sfx/melee_warrior_redhand_release_1.mp3?v=1e319d395276",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "1e319d395276",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_redhand_release_1.mp3?v=1e319d395276",
+        "bytes": 4432,
+        "sha256": "1e319d395276e679dd2cafe1207168781ed8f75388f6a10f9e186f541e2f6af6"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_redhand_release_2.mp3?v=63f80784a19c",
+        "bytes": 4432,
+        "sha256": "63f80784a19ccee8b78b1dac79e6284b4ac5e6d14dc6fa7e7a2e632f0e549a88"
+      }
+    ]
+  },
+  "melee_warrior_resolve_release": {
+    "url": "/audio/sfx/melee_warrior_resolve_release_1.mp3?v=4982396b4234",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5686,
+    "hash": "4982396b4234",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_resolve_release_1.mp3?v=4982396b4234",
+        "bytes": 5686,
+        "sha256": "4982396b42349bbc1c78c1a3faacc14b24360f602b717bf085a36ffa32a7e58a"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_resolve_release_2.mp3?v=33312178760e",
+        "bytes": 5686,
+        "sha256": "33312178760ebc31094c2c8a5e915eab9f489d0ba5d9fd750d6cff98618bef02"
+      }
+    ]
+  },
+  "melee_warrior_revenge_release": {
+    "url": "/audio/sfx/melee_warrior_revenge_release_1.mp3?v=556fd9f1974c",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "556fd9f1974c",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_revenge_release_1.mp3?v=556fd9f1974c",
+        "bytes": 4432,
+        "sha256": "556fd9f1974cde1db6113941fc7e7f7c1d6aceca3d075a921a00d2aaa015b75d"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_revenge_release_2.mp3?v=10dbea89dec1",
+        "bytes": 4432,
+        "sha256": "10dbea89dec1831b172566b29487e0e277b54e0b026a81771ea4fd2538d5b271"
+      }
+    ]
+  },
+  "melee_warrior_seething_release": {
+    "url": "/audio/sfx/melee_warrior_seething_release_1.mp3?v=a29705caa1e6",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "a29705caa1e6",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_seething_release_1.mp3?v=a29705caa1e6",
+        "bytes": 4432,
+        "sha256": "a29705caa1e61367a8ac65cff00798d10c764be6ca39556b003f783395a05deb"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_seething_release_2.mp3?v=5f75f0bb3d21",
+        "bytes": 4432,
+        "sha256": "5f75f0bb3d218ad9cb4f337b4d72725f6725c66200ac0a01494d453607fac578"
+      }
+    ]
+  },
+  "melee_warrior_shear_release": {
+    "url": "/audio/sfx/melee_warrior_shear_release_1.mp3?v=ea3b7f644981",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "ea3b7f644981",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_shear_release_1.mp3?v=ea3b7f644981",
+        "bytes": 5059,
+        "sha256": "ea3b7f6449815e7965f85e91099edc7e3b1d01f58fae8f977e93cb1e68600dff"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_shear_release_2.mp3?v=92147a1d53a1",
+        "bytes": 5059,
+        "sha256": "92147a1d53a1c973b05a282abcb65a829e988105ce68ed2e4b390a070ac5c70c"
+      }
+    ]
+  },
+  "melee_warrior_shieldcrack_release": {
+    "url": "/audio/sfx/melee_warrior_shieldcrack_release_1.mp3?v=ec779c26def3",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "ec779c26def3",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_shieldcrack_release_1.mp3?v=ec779c26def3",
+        "bytes": 4432,
+        "sha256": "ec779c26def3fe3fae736dc863bdab033a8c359466151982d3975b50d16c6dc7"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_shieldcrack_release_2.mp3?v=ffb9e8061d17",
+        "bytes": 4432,
+        "sha256": "ffb9e8061d172a88240e7bcba8bab863b587f5e7fc0ab516a32b69c4389c3305"
+      }
+    ]
+  },
+  "melee_warrior_sword_guard_release": {
+    "url": "/audio/sfx/melee_warrior_sword_guard_release_1.mp3?v=485b3d63847a",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "485b3d63847a",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_sword_guard_release_1.mp3?v=485b3d63847a",
+        "bytes": 4432,
+        "sha256": "485b3d63847ae243dc556aa01a214c2a81a7039ab3f6e5828501a2f61d5b103a"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_sword_guard_release_2.mp3?v=a7627920ef31",
+        "bytes": 4432,
+        "sha256": "a7627920ef31a5b75c62fce17f6e25e506ca0c145080aa6caf7ec7008600187c"
+      }
+    ]
+  },
+  "melee_warrior_toll_release": {
+    "url": "/audio/sfx/melee_warrior_toll_release_1.mp3?v=354ea4e840e6",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "354ea4e840e6",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_toll_release_1.mp3?v=354ea4e840e6",
+        "bytes": 4432,
+        "sha256": "354ea4e840e6c15b6125b3b90c314a93b9012f0a81211615d504cfcace245ed9"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_toll_release_2.mp3?v=8302230e9db1",
+        "bytes": 4432,
+        "sha256": "8302230e9db1914dda030fe2a9dff03d663d35c9c3e3de624eb6f25a02b75d20"
+      }
+    ]
+  },
+  "melee_warrior_twinstrike_release": {
+    "url": "/audio/sfx/melee_warrior_twinstrike_release_1.mp3?v=4356b09cea1e",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 5059,
+    "hash": "4356b09cea1e",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_twinstrike_release_1.mp3?v=4356b09cea1e",
+        "bytes": 5059,
+        "sha256": "4356b09cea1eaff78e8d0fa6605c7091c23a5ae731543710dc48ebb29eacac7e"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_twinstrike_release_2.mp3?v=5730ac489a65",
+        "bytes": 5059,
+        "sha256": "5730ac489a65060d9fa04bf9fc08da117c13b482b67716c79867dbc9334f7b46"
+      }
+    ]
+  },
+  "melee_warrior_victory_release": {
+    "url": "/audio/sfx/melee_warrior_victory_release_1.mp3?v=e9e9f080ebf2",
+    "loop": false,
+    "category": "combat",
+    "preload": "startup",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 4432,
+    "hash": "e9e9f080ebf2",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/melee_warrior_victory_release_1.mp3?v=e9e9f080ebf2",
+        "bytes": 4432,
+        "sha256": "e9e9f080ebf202de7c57d968ef2f7db8016ab8da6ec483abffbd319817345f07"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/melee_warrior_victory_release_2.mp3?v=5003b0c4567e",
+        "bytes": 4432,
+        "sha256": "5003b0c4567e97fb58d36c3eeba550babc88a51759a26f95f8eb63c85a841079"
       }
     ]
   },
@@ -4287,6 +5806,37 @@ export const SFX_CLIPS =
       }
     ]
   },
+  "mount_flap_avian_strider": {
+    "url": "/audio/sfx/mount_flap_avian_strider_1.mp3?v=37611b813849",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.678804,
+    "playbackRate": 1,
+    "bytes": 15089,
+    "hash": "37611b813849",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mount_flap_avian_strider_1.mp3?v=37611b813849",
+        "bytes": 15089,
+        "sha256": "37611b813849c4a0df26dd24639a53ba6fe1b5705061c499c59566188f725f23"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mount_flap_avian_strider_2.mp3?v=2685e4142d09",
+        "bytes": 14462,
+        "sha256": "2685e4142d0966b8f6ae8f12e07585309450d1e8e82e7d9335792d1022446984"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mount_flap_avian_strider_3.mp3?v=c5618a77a924",
+        "bytes": 16343,
+        "sha256": "c5618a77a9243fc4be3c6151680292cd52a2df7dca72bfd72be8b3613b21fbb0"
+      }
+    ]
+  },
   "mount_idle_mech_bird": {
     "url": "/audio/sfx/mount_idle_mech_bird.mp3?v=95b62ab97f76",
     "loop": true,
@@ -4303,6 +5853,25 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/mount_idle_mech_bird.mp3?v=95b62ab97f76",
         "bytes": 235772,
         "sha256": "95b62ab97f76cf832a15eed0d4fa9f9c6750e9bc350efde691ae1ff86963e994"
+      }
+    ]
+  },
+  "mount_jump_avian_strider": {
+    "url": "/audio/sfx/mount_jump_avian_strider.mp3?v=926cbef0c529",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 12581,
+    "hash": "926cbef0c529",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_jump_avian_strider.mp3?v=926cbef0c529",
+        "bytes": 12581,
+        "sha256": "926cbef0c529b02b8d31c135579f8c6658d68047a7839e17a2581b52570e0fbd"
       }
     ]
   },
@@ -4365,6 +5934,25 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/mount_jump_rallycart_rxt_5.mp3?v=3eb062c62c63",
         "bytes": 14462,
         "sha256": "3eb062c62c633fb02094857a8b853d1cfc7fe02754bcc2c578dc388e62b8ec4a"
+      }
+    ]
+  },
+  "mount_land_avian_strider": {
+    "url": "/audio/sfx/mount_land_avian_strider.mp3?v=94218ba01507",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 6939,
+    "hash": "94218ba01507",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_land_avian_strider.mp3?v=94218ba01507",
+        "bytes": 6939,
+        "sha256": "94218ba01507857ad6673f7623b2534b177267282e4f52e8e1a01c70dcf1c4e8"
       }
     ]
   },
@@ -4459,6 +6047,55 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/mount_run_aether_hover_cycle.mp3?v=355a7b665113",
         "bytes": 17102,
         "sha256": "355a7b6651139d8737500829ebd23ae3d0dba02fb2d3ccb8b3506864346b8c3c"
+      }
+    ]
+  },
+  "mount_run_avian_strider": {
+    "url": "/audio/sfx/mount_run_avian_strider_1.mp3?v=588a0c0404b8",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 7566,
+    "hash": "588a0c0404b8",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mount_run_avian_strider_1.mp3?v=588a0c0404b8",
+        "bytes": 7566,
+        "sha256": "588a0c0404b84511083ff13ca168c2da016503cead7b53e89a92d6c04fda88fc"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mount_run_avian_strider_2.mp3?v=6a43d6916cd1",
+        "bytes": 7566,
+        "sha256": "6a43d6916cd19e7c9c4eb85563e4db6d24e16e9b0d7f5c94f77fb8894ff6f933"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mount_run_avian_strider_3.mp3?v=4ed021635fe3",
+        "bytes": 7566,
+        "sha256": "4ed021635fe3eb80ee0120ca6619ae16c37f6a915c418f0689d1f24166a5d652"
+      },
+      {
+        "id": "4",
+        "url": "/audio/sfx/mount_run_avian_strider_4.mp3?v=b9313677189b",
+        "bytes": 7566,
+        "sha256": "b9313677189bd5650173b67646ba15d7a34afc1d286cdd0d5f65c4fdd01c0b34"
+      },
+      {
+        "id": "5",
+        "url": "/audio/sfx/mount_run_avian_strider_5.mp3?v=bb318c7fe250",
+        "bytes": 7566,
+        "sha256": "bb318c7fe250a29f738e1b898ce761653d06f9778f1f93f47a5dbc272df61837"
+      },
+      {
+        "id": "6",
+        "url": "/audio/sfx/mount_run_avian_strider_6.mp3?v=b26934b064db",
+        "bytes": 7566,
+        "sha256": "b26934b064dbc7b9c9a12d55ee8168f0f19d988de3eec6dac95c660df03dc683"
       }
     ]
   },
@@ -4918,6 +6555,56 @@ export const SFX_CLIPS =
       }
     ]
   },
+  "mount_squawk_avian_strider": {
+    "url": "/audio/sfx/mount_squawk_avian_strider_1.mp3?v=bc1983640c5d",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1.678804,
+    "playbackRate": 1,
+    "bytes": 19478,
+    "hash": "bc1983640c5d",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/mount_squawk_avian_strider_1.mp3?v=bc1983640c5d",
+        "bytes": 19478,
+        "sha256": "bc1983640c5df72caee098220a05237cc437af6b00f912cc1d5ccbf59650913a"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/mount_squawk_avian_strider_2.mp3?v=9cd1462856a5",
+        "bytes": 16970,
+        "sha256": "9cd1462856a58c5c118f69a7c20577b7abc7f2cd76505ad761e336efa5f91704"
+      },
+      {
+        "id": "3",
+        "url": "/audio/sfx/mount_squawk_avian_strider_3.mp3?v=5956564938de",
+        "bytes": 15716,
+        "sha256": "5956564938deb7582de0d8af2673e400c238b27d6868f0b10931058db2c06ef4"
+      }
+    ]
+  },
+  "mount_summon_avian_strider": {
+    "url": "/audio/sfx/mount_summon_avian_strider.mp3?v=027e86bcf442",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 2.238721,
+    "playbackRate": 1,
+    "bytes": 30763,
+    "hash": "027e86bcf442",
+    "variants": [
+      {
+        "id": "main",
+        "url": "/audio/sfx/mount_summon_avian_strider.mp3?v=027e86bcf442",
+        "bytes": 30763,
+        "sha256": "027e86bcf442e89459c2e0a0b9d39c2f4febe4053df6173ebfb9c9d46ceb2d51"
+      }
+    ]
+  },
   "mount_summon_goblin_rocket_sled": {
     "url": "/audio/sfx/mount_summon_goblin_rocket_sled.mp3?v=6b3c967d6c91",
     "loop": false,
@@ -5126,6 +6813,31 @@ export const SFX_CLIPS =
         "url": "/audio/sfx/move_swim_5.mp3?v=2265551eb476",
         "bytes": 25747,
         "sha256": "2265551eb4764cee4d9d259f7b895cee42d7ea89e749e6e52903dfcec5426a40"
+      }
+    ]
+  },
+  "piercing_howl": {
+    "url": "/audio/sfx/piercing_howl_1.mp3?v=64e8edef3de9",
+    "loop": false,
+    "category": "other",
+    "preload": "lazy",
+    "spatial": true,
+    "gain": 1,
+    "playbackRate": 1,
+    "bytes": 12582,
+    "hash": "64e8edef3de9",
+    "variants": [
+      {
+        "id": "1",
+        "url": "/audio/sfx/piercing_howl_1.mp3?v=64e8edef3de9",
+        "bytes": 12582,
+        "sha256": "64e8edef3de9634d6b5718d5dba6176da79eb425c2431913ce032b9adf033c41"
+      },
+      {
+        "id": "2",
+        "url": "/audio/sfx/piercing_howl_2.mp3?v=00d77394ee99",
+        "bytes": 12582,
+        "sha256": "00d77394ee9996070587605af035e4b9ce61033d79a0f86a88b2e3d1b27f0566"
       }
     ]
   },

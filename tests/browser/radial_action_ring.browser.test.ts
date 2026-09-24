@@ -110,6 +110,7 @@ function emptySlotState(kind: ActionBarSlotState['kind']): ActionBarSlotState {
     aiming: false,
     procGlow: false,
     empowered: false,
+    naturesBoonGlow: false,
     ascensionSpender: false,
     ascensionCostLabel: '',
     fateConsumeReady: false,

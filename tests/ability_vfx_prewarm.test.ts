@@ -8,11 +8,13 @@
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import * as contactAssets from '../src/render/ability_vfx/contact_assets';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
+import * as productionAssets from '../src/render/ability_vfx/production_assets';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -58,20 +60,54 @@ function vfxMesh(name: string, material: THREE.Material | THREE.Material[]): THR
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe('abilityVfxTexturePrewarmSteps', () => {
-  it('gives every impact sheet its own unit, plus one for the shared canvases', () => {
+  it('gives each procedural, contact and production texture its own preparation unit', () => {
     const steps = abilityVfxTexturePrewarmSteps();
     const ids = steps.map((step) => step.id);
     for (const style of FLIPBOOK_STYLES) expect(ids).toContain(`flipbook:${style}`);
     expect(ids).toContain('shared-canvases');
-    expect(ids).toHaveLength(FLIPBOOK_STYLES.length + 1);
+    expect(ids).toEqual([
+      ...FLIPBOOK_STYLES.map((style) => `flipbook:${style}`),
+      'shared-canvases',
+      ...contactAssets.CONTACT_SHEETS,
+      'smoke',
+      'shockwave',
+      'shout_dust',
+      'warrior_power',
+      'warrior_fervor',
+      'harvest_impact',
+      'warrior_bite',
+      'warrior_shear',
+      'warrior_crush',
+      'warrior-blood',
+      'warrior-pressure',
+      'warrior-rock',
+      'warrior-steel',
+    ]);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('builds real textures and returns the memoized instances on a second pass', () => {
     installCanvasStub();
+    // Remote assets are loaded by deferred preparation, never by these sync
+    // steps. Supply real loaded textures and prove the units retain identity.
+    const textures = new Map<string, THREE.Texture>();
+    const loaded = (id: string) => {
+      if (!textures.has(id)) textures.set(id, new THREE.Texture());
+      return textures.get(id)!;
+    };
+    vi.spyOn(contactAssets, 'contactTexture').mockImplementation(loaded);
+    vi.spyOn(productionAssets, 'bakedTexture').mockImplementation(loaded);
+    for (const getter of [
+      'warriorBloodTexture',
+      'warriorPressureTexture',
+      'warriorRockTexture',
+      'warriorSteelTexture',
+    ] as const)
+      vi.spyOn(productionAssets, getter).mockImplementation(() => loaded(getter));
     const first = abilityVfxTexturePrewarmSteps().map((step) => step.build());
     for (const textures of first) {
       expect(textures.length).toBeGreaterThan(0);
@@ -81,6 +117,23 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     // the canvases: the pools bind these exact instances.
     const second = abilityVfxTexturePrewarmSteps().map((step) => step.build());
     expect(second).toEqual(first);
+  });
+
+  it('keeps deferred asset units empty until their actual loaders finish', () => {
+    vi.spyOn(contactAssets, 'contactTexture').mockReturnValue(null);
+    vi.spyOn(productionAssets, 'bakedTexture').mockReturnValue(null);
+    for (const getter of [
+      'warriorBloodTexture',
+      'warriorPressureTexture',
+      'warriorRockTexture',
+      'warriorSteelTexture',
+    ] as const)
+      vi.spyOn(productionAssets, getter).mockReturnValue(null);
+    const deferred = abilityVfxTexturePrewarmSteps().filter(
+      (step) => !step.id.startsWith('flipbook:') && step.id !== 'shared-canvases',
+    );
+    expect(deferred).toHaveLength(16);
+    for (const step of deferred) expect(step.build()).toEqual([]);
   });
 
   it('does not build anything until a unit actually runs', () => {

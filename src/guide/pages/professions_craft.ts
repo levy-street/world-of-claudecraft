@@ -59,7 +59,7 @@ const PRIMARY_STAT_LABELS: ReadonlySet<string> = new Set([
 const statLabel = (stat: string): string =>
   PRIMARY_STAT_LABELS.has(stat)
     ? t(`itemUi.stats.${stat}` as TranslationKey)
-    : stat === 'healPower'
+    : stat === 'healPower' || stat === 'healingPower'
       ? t('hudChrome.statInfo.names.healPower')
       : t(statNameKey(stat as Parameters<typeof statNameKey>[0]) as TranslationKey);
 const enchantLabel = (id: string): string => t(`hudChrome.enchantName.${id}` as TranslationKey);

@@ -118,12 +118,16 @@ async function clearIntentionalPageCloseProbe(page) {
 // One guarded shot: a failure in one frame must not lose the others, so the run always
 // keeps whatever it managed to capture. `clip` is an optional CSS selector; when given
 // and found, the shot is cropped to that element (plus a small margin) instead of full frame.
+// A capture whose subject spans several elements (the unit frames plus the player menu)
+// hands back a viewport-space `{ x, y, width, height }` region instead of a selector.
 async function shoot(page, name, clip) {
   try {
     await new Promise((r) => setTimeout(r, 300));
     const file = `${OUT}/${name}.png`;
     let region;
-    if (clip) {
+    if (clip && typeof clip === 'object') {
+      region = clip;
+    } else if (clip) {
       region = await page.evaluate((sel) => {
         const el = document.querySelector(sel);
         if (!el) return null;

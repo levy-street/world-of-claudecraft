@@ -47,6 +47,11 @@ import {
 // the drift sweep cancels an open session once they wander past TRADE_RANGE + 4.
 const TRADE_RANGE = 10;
 
+/** The most offer LINES one side of a trade may stage. The UI's offer
+ *  headroom (src/ui/trade_view.ts) imports this same constant, so the client
+ *  can never let a player stage a line the server silently drops. */
+export const TRADE_OFFER_MAX_LINES = 6;
+
 // The one trade-locked predicate (Professions 2.0). A copy is
 // trade-locked once its payload carries boundTo: a bound instance stays with
 // its owner and is never offered, revalidated-in, or consumed by a swap.
@@ -301,7 +306,7 @@ export function tradeSetOffer(
   // validate the offer against the player's bags; merge duplicate slots so
   // the offered total per item is checked, not each slot in isolation
   const merged = new Map<string, number>();
-  for (const slot of items.slice(0, 6)) {
+  for (const slot of items.slice(0, TRADE_OFFER_MAX_LINES)) {
     // slots come straight off the wire — reject anything malformed
     if (!slot || typeof slot.itemId !== 'string' || !Number.isFinite(slot.count)) continue;
     const count = Math.max(1, Math.floor(slot.count));

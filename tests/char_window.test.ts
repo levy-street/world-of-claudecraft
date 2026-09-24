@@ -1115,8 +1115,10 @@ describe('char_window: the socket row consumes the worn payload (source pins)', 
   });
 
   it('the unequip aria interpolates the worn-copy name as a t() value', () => {
+    // The worn cell's resolved parts carry the copy's aria name (its quality
+    // label included, worn_item_cell_view.ts), falling back to the def name.
     expect(src).toContain(
-      "t('hudChrome.paperdoll.unequipAria', { item: wornName ?? itemDisplayName(item) })",
+      "t('hudChrome.paperdoll.unequipAria', { item: parts?.ariaName ?? itemDisplayName(item) })",
     );
   });
 

@@ -1,4 +1,8 @@
 import * as THREE from 'three';
+import { paintWarriorAttention } from './warrior_attention_atlas';
+import { paintWarriorControlMark, paintWarriorHammer } from './warrior_control_atlas';
+import { paintWarriorFracture } from './warrior_fracture_atlas';
+import { paintWarriorMark } from './warrior_mark_atlas';
 
 // Procedural canvas textures for the ability VFX primitives, ported from the
 // Ability VFX Gallery (arc_bolt_preview.js texture section). Built once at
@@ -285,17 +289,34 @@ function charTexture(): THREE.CanvasTexture {
   });
 }
 
-// 2x2 overlay sprite atlas: soft glow, four-point star, rune diamond, spark.
-// Cell indices are the OVERLAY_CELL constants; append means a bigger grid.
-export const OVERLAY_ATLAS_GRID = 2;
-export const OVERLAY_CELL = { glow: 0, star: 1, rune: 2, spark: 3 } as const;
+// Stable numeric identities in a row-major atlas. New etched armor cells share
+// the existing upload/compile lane and the same bounded overlay draw.
+export const OVERLAY_ATLAS_GRID = 5;
+export const OVERLAY_CELL = {
+  glow: 0,
+  star: 1,
+  rune: 2,
+  spark: 3,
+  breachMark: 4,
+  quakeBurden: 5,
+  attention0: 6,
+  attention1: 7,
+  attention2: 8,
+  hammer0: 9,
+  armorShear0: 17,
+  hamstring: 22,
+} as const;
 
 function overlayAtlasTexture(): THREE.CanvasTexture {
   const cell = 64;
   return makeCanvas(cell * OVERLAY_ATLAS_GRID, (g) => {
     const at = (ix: number, iy: number, draw: (cx: number, cy: number) => void): void => {
       g.save();
-      draw(ix * cell + cell / 2, iy * cell + cell / 2);
+      const index = ix + iy * 3;
+      draw(
+        (index % OVERLAY_ATLAS_GRID) * cell + cell / 2,
+        Math.floor(index / OVERLAY_ATLAS_GRID) * cell + cell / 2,
+      );
       g.restore();
     };
     // glow: soft radial dot
@@ -322,7 +343,7 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
       g.fill();
     });
     // rune: hollow diamond with a center tick
-    at(0, 1, (cx, cy) => {
+    at(2, 0, (cx, cy) => {
       g.translate(cx, cy);
       g.strokeStyle = 'rgba(255,255,255,0.95)';
       g.lineWidth = 4;
@@ -339,7 +360,7 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
       g.stroke();
     });
     // spark: thin elongated flash
-    at(1, 1, (cx, cy) => {
+    at(0, 1, (cx, cy) => {
       g.translate(cx, cy);
       const grad = g.createLinearGradient(0, -cell * 0.42, 0, cell * 0.42);
       grad.addColorStop(0, 'rgba(255,255,255,0)');
@@ -349,6 +370,23 @@ function overlayAtlasTexture(): THREE.CanvasTexture {
       g.fillRect(-cell * 0.07, -cell * 0.42, cell * 0.14, cell * 0.84);
       g.fillRect(-cell * 0.24, -cell * 0.07, cell * 0.48, cell * 0.14);
     });
+    at(1, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, true));
+    at(2, 1, (cx, cy) => paintWarriorMark(g, cx, cy, cell, false));
+    for (let cel = 0; cel < 3; cel++)
+      at(cel, 2, (cx, cy) => paintWarriorAttention(g, cx, cy, cell, cel));
+    for (let cel = 0; cel < 8; cel++) {
+      const index = OVERLAY_CELL.hammer0 + cel;
+      at(index % 3, Math.floor(index / 3), (cx, cy) => paintWarriorHammer(g, cx, cy, cell, cel));
+    }
+    for (let stacks = 1; stacks <= 5; stacks++) {
+      const index = OVERLAY_CELL.armorShear0 + stacks - 1;
+      at(index % 3, Math.floor(index / 3), (cx, cy) =>
+        paintWarriorControlMark(g, cx, cy, cell, stacks),
+      );
+    }
+    at(OVERLAY_CELL.hamstring % 3, Math.floor(OVERLAY_CELL.hamstring / 3), (cx, cy) =>
+      paintWarriorControlMark(g, cx, cy, cell, 0),
+    );
   });
 }
 
@@ -676,6 +714,7 @@ export interface AbilityVfxTextures {
   ember: THREE.CanvasTexture;
   rime: THREE.CanvasTexture;
   crack: THREE.CanvasTexture;
+  leapFracture: THREE.CanvasTexture;
   char: THREE.CanvasTexture;
   overlay: THREE.CanvasTexture;
 }
@@ -692,6 +731,7 @@ export function abilityVfxTextures(): AbilityVfxTextures {
       ember: emberRingTexture(),
       rime: rimeTexture(),
       crack: crackTexture(),
+      leapFracture: makeCanvas(512, paintWarriorFracture),
       char: charTexture(),
       overlay: overlayAtlasTexture(),
     };

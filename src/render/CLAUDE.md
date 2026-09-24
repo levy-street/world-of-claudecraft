@@ -48,6 +48,14 @@ Everything else is a sibling module in one of these families:
   the camera + `dnGrade.fog` per frame; `?zonehaze=off` is the A/B switch.
 - **The nameplate suite** (below) owns all overhead text and badges.
 - **Pure logic cores** (below) hold Node-tested per-frame decisions.
+- **Chosen cadence:** `chosen_cadence.ts` is module state (like `arrival_cover.ts`)
+  between the frame loop's Frame Rate Limit wiring (`src/game/frame_cadence_wiring.ts`,
+  the writer of the chosen interval, its miss share and the quality hold) and the
+  renderer (the writer of the governor readings the automatic limit waits on: shedding,
+  at baseline, in combat). Under a chosen cadence the governor judges the MISS SHARE
+  (`chosen_cadence_pressure_core.ts`), never the wall interval, and every consumer that
+  reads a frame interval as load goes through `frameLoadMs`. A new renderer clears the
+  renderer-side readings (`resetChosenCadenceForRenderer`).
 - **Perf governors:** `render_budget.ts` (adaptive frame budget, see
   Performance) and `crowd_lod.ts` (pure character LOD policy: the band plan
   `characterLodBands` returns, which pulls shadow/anim cadence in as rig counts

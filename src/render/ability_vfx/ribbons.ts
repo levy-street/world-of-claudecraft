@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { type AbilityVfxTextures, OVERLAY_CELL } from './fx_textures';
 import { slashWidthScale } from './spectacle';
+import { type SteelSweepRange, steelSweepGain } from './steel_sweep';
+import { warriorHammerCel } from './warrior_control_atlas';
 
 // Camera-facing ribbon trails, ported from the gallery's RibbonMesh +
 // genBolt/smoothArc (arc_bolt_preview.js, ribbons section). One pooled dynamic
@@ -10,7 +12,12 @@ import { slashWidthScale } from './spectacle';
 // Vfx projectile, and slash arcs (melee strike reads). Hard caps on verts and
 // slots; every point buffer is preallocated, so steady state allocates nothing.
 
-const MAX_VERTS = 4096;
+// Preserve the former 4096-vertex allowance in full and reserve 768 more for
+// two complete three-point power outlines on each of 64 visible Warriors.
+// A further 640 retain Iron Resolve's second five-point shield on all 64
+// cold wearers without displacing authored attack ribbons.
+// Fixed constructor allocation; no resize or GPU allocation during combat.
+const MAX_VERTS = 5504;
 const MAX_INDICES = MAX_VERTS * 3;
 const BOLT_SLOTS = 10;
 const BOLT_PTS = 17; // 4 midpoint-displacement passes on a 2-point seed
@@ -31,6 +38,7 @@ const SHADOW_FANG_SAMPLE_YARDS = 0.4;
 export type BoltTrailStyle =
   | 'comet'
   | 'rock'
+  | 'warHammer'
   | 'shard'
   | 'arrow'
   | 'wisp'
@@ -46,6 +54,7 @@ const TRAIL_DNA: Record<
   { wGlow: number; mGlow: number; wCore: number; mCore: number }
 > = {
   comet: { wGlow: 1, mGlow: 1, wCore: 1, mCore: 1 },
+  warHammer: { wGlow: 0.75, mGlow: 0.55, wCore: 0.38, mCore: 0.95 },
   rock: { wGlow: 1.35, mGlow: 1, wCore: 1.2, mCore: 0.7 }, // fat dim molten wake
   shard: { wGlow: 0.65, mGlow: 0.85, wCore: 0.6, mCore: 1.3 }, // narrow crisp glint
   arrow: { wGlow: 0.4, mGlow: 0.55, wCore: 0.4, mCore: 1.1 }, // whisper-thin streak
@@ -148,6 +157,9 @@ interface TrailSlot {
   targetId: number;
   sourceId: number;
   ttl: number;
+  flightAge: number;
+  hammerHold: number;
+  hammerDuration: number;
   width: number;
   core: THREE.Color;
   glow: THREE.Color;
@@ -185,7 +197,23 @@ interface TrailSlot {
   seed: number; // per-slot phase for head shimmer/writhe
 }
 
+export interface PathMotion {
+  x: number;
+  y: number;
+  z: number;
+  duration: number;
+  delay: number;
+  onArrive?: () => void;
+}
+
 interface ArcSlot {
+  sweep: SteelSweepRange | null;
+  refill: ((pts: THREE.Vector3[]) => number) | null;
+  motion: PathMotion | null;
+  brushed: boolean;
+  samplePrimed: boolean;
+  sampleClock: number;
+  sample: ((out: THREE.Vector3) => boolean) | null;
   active: boolean;
   age: number;
   life: number;
@@ -193,6 +221,7 @@ interface ArcSlot {
   core: THREE.Color;
   glow: THREE.Color;
   pts: THREE.Vector3[];
+  priority: 0 | 1;
 }
 
 // The shared VFX anchor resolver (src/render/vfx_anchor.ts). `out` lets a
@@ -207,10 +236,14 @@ export interface RibbonPoint {
 }
 
 export class AbilityVfxRibbons {
+  private arcAdmissionCursor = 0;
+  private readonly arcCurve = new THREE.CatmullRomCurve3();
+  private readonly arcSmooth = allocPts(34);
   private geo = new THREE.BufferGeometry();
   private pos = new Float32Array(MAX_VERTS * 3);
   private col = new Float32Array(MAX_VERTS * 3);
   private uv = new Float32Array(MAX_VERTS * 2);
+  private warriorStyle = new Float32Array(MAX_VERTS);
   private idx = new Uint32Array(MAX_INDICES);
   private mat: THREE.ShaderMaterial;
   private mesh: THREE.Mesh;
@@ -244,12 +277,14 @@ export class AbilityVfxRibbons {
   private ordered: THREE.Vector3[] = allocPts(TRAIL_PTS + 1); // scratch, holds refs only
   private coilScratch: THREE.Vector3[] = allocPts(COIL_PTS); // reused for both helices
   private shadowHeadScratch: THREE.Vector3[] = allocPts(3); // directional fang, reused per trail
+  private heldColor = new THREE.Color();
   private disposed = false;
 
   constructor(
     scene: THREE.Scene,
     private anchor: RibbonAnchor,
     tex: AbilityVfxTextures,
+    private handAnchor?: (id: number, out: THREE.Vector3) => boolean,
   ) {
     this.geo.setAttribute(
       'position',
@@ -263,6 +298,10 @@ export class AbilityVfxRibbons {
       'uv',
       new THREE.BufferAttribute(this.uv, 2).setUsage(THREE.DynamicDrawUsage),
     );
+    this.geo.setAttribute(
+      'aWarrior',
+      new THREE.BufferAttribute(this.warriorStyle, 1).setUsage(THREE.DynamicDrawUsage),
+    );
     this.geo.setIndex(new THREE.BufferAttribute(this.idx, 1).setUsage(THREE.DynamicDrawUsage));
     // Explicit, like ../vfx.ts: the default range is Infinity, which would make
     // the first submit (before any commit) draw the whole zeroed index buffer.
@@ -274,17 +313,21 @@ export class AbilityVfxRibbons {
       uniforms: { uMap: { value: tex.ribbon }, uNoise: { value: tex.noise }, uTime: { value: 0 } },
       vertexShader: `
         attribute vec3 aCol;
+        attribute float aWarrior;
+        varying float vWarrior;
         varying vec2 vUv;
         varying vec3 vColor;
         void main() {
           vUv = uv;
           vColor = aCol;
+          vWarrior = aWarrior;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }`,
       fragmentShader: `
         uniform sampler2D uMap;
         uniform sampler2D uNoise;
         uniform float uTime;
+        varying float vWarrior;
         varying vec2 vUv;
         varying vec3 vColor;
         void main() {
@@ -296,6 +339,14 @@ export class AbilityVfxRibbons {
           // the bloom re-reads (../vfx.ts / overlay_sprites.ts idiom).
           if (a < 0.004) discard;
           gl_FragColor = vec4(vColor * flow, a);
+          if (vWarrior > .5) {
+            float crossSection = abs(vUv.y * 2.0 - 1.0);
+            float filament = pow(max(0.0, 1.0 - crossSection), 10.0);
+            float edge = 1.0 - smoothstep(0.72, 1.0, crossSection);
+            gl_FragColor = vec4(vColor * (0.48 + flow * 0.46 + filament * 0.38), base.a * edge * min(flow, 1.0));
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,
@@ -341,6 +392,9 @@ export class AbilityVfxRibbons {
         targetId: 0,
         sourceId: 0,
         ttl: 0,
+        flightAge: 0,
+        hammerHold: 0,
+        hammerDuration: 0,
         width: 0.2,
         core: new THREE.Color(),
         glow: new THREE.Color(),
@@ -377,6 +431,13 @@ export class AbilityVfxRibbons {
     }
     for (let i = 0; i < ARC_SLOTS; i++) {
       this.arcs.push({
+        sweep: null,
+        refill: null,
+        motion: null,
+        brushed: false,
+        samplePrimed: false,
+        sampleClock: 0,
+        sample: null,
         active: false,
         age: 0,
         life: 0,
@@ -384,6 +445,7 @@ export class AbilityVfxRibbons {
         core: new THREE.Color(),
         glow: new THREE.Color(),
         pts: allocPts(ARC_PTS),
+        priority: 0,
       });
     }
   }
@@ -447,6 +509,44 @@ export class AbilityVfxRibbons {
     slot.count = 0;
   }
 
+  // Admission chooser for arc slots: no allocation, no closures.
+  // Prefers inactive slots; if preserveActive is true never evicts; otherwise
+  // selects among active slots with priority <= incomingPriority, choosing
+  // lowest priority first and oldest normalized age (age/life) as a tie-break.
+  private chooseArcSlot(incomingPriority: 0 | 1, preserveActive: boolean): ArcSlot | null {
+    for (let offset = 0; offset < this.arcs.length; offset++) {
+      const index = (this.arcAdmissionCursor + offset) % this.arcs.length;
+      const arc = this.arcs[index];
+      if (!arc.active) {
+        this.arcAdmissionCursor = (index + 1) % this.arcs.length;
+        return arc;
+      }
+    }
+    if (preserveActive) return null;
+    let best: ArcSlot | null = null;
+    // Rotate equal-age admission so several contacts born in one update do
+    // not repeatedly overwrite the same freshly admitted ribbon.
+    for (let offset = 0; offset < this.arcs.length; offset++) {
+      const a = this.arcs[(this.arcAdmissionCursor + offset) % this.arcs.length];
+      if (a.priority > incomingPriority) continue;
+      if (!best) {
+        best = a;
+        continue;
+      }
+      if (a.priority < best.priority) {
+        best = a;
+        continue;
+      }
+      if (a.priority === best.priority) {
+        const normAge = a.life > 0 ? a.age / a.life : 1;
+        const bestNormAge = best.life > 0 ? best.age / best.life : 1;
+        if (normAge > bestNormAge) best = a;
+      }
+    }
+    if (best) this.arcAdmissionCursor = (this.arcs.indexOf(best) + 1) % this.arcs.length;
+    return best;
+  }
+
   // A generic short-lived path ribbon: the caller fills the slot's
   // preallocated points (helix climbs, chain sags, fountain streams, gavel
   // strokes) and returns how many it wrote. Spawn-time-only closure cost.
@@ -455,18 +555,58 @@ export class AbilityVfxRibbons {
     width: number,
     life: number,
     fill: (pts: THREE.Vector3[]) => number,
-  ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    brushed = false,
+    motion: PathMotion | null = null,
+    preserveActive = false,
+    follow = false,
+    priority: 0 | 1 = 0,
+    sweep: SteelSweepRange | null = null,
+  ): boolean {
+    const slot = this.chooseArcSlot(priority, preserveActive);
+    if (!slot) return false;
+    slot.sample = null;
+    slot.sweep = sweep;
+    slot.motion = motion;
+    slot.refill = follow ? fill : null;
+    slot.brushed = brushed;
     const count = Math.min(ARC_PTS, Math.max(0, fill(slot.pts)));
-    if (count < 2) return;
+    if (count < 2) return false;
     // pad the unwritten tail onto the last point so the strip stays degenerate
     for (let i = count; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[count - 1]);
+    slot.priority = priority;
     slot.active = true;
-    slot.age = 0;
+    slot.age = -(motion?.delay ?? 0);
     slot.life = life;
     slot.width = width;
-    slot.core.setHex(colorHex).lerp(WHITE, 0.5);
+    slot.core.setHex(colorHex).lerp(WHITE, brushed ? 0.28 : 0.5);
     slot.glow.setHex(colorHex);
+    return true;
+  }
+
+  spawnTrackedPath(
+    color: number,
+    width: number,
+    life: number,
+    sample: (out: THREE.Vector3) => boolean,
+  ): void {
+    const slot = this.chooseArcSlot(1, false);
+    if (!slot) return;
+    if (!sample(slot.pts[0])) return;
+    for (let i = 1; i < ARC_PTS; i++) slot.pts[i].copy(slot.pts[0]);
+    slot.priority = 1;
+    slot.sample = sample;
+    slot.motion = null;
+    slot.sweep = null;
+    slot.refill = null;
+    slot.brushed = true;
+    slot.active = true;
+    slot.age = 0;
+    slot.samplePrimed = true;
+    slot.sampleClock = 0;
+    slot.life = life;
+    slot.width = width;
+    slot.core.setHex(color).lerp(WHITE, 0.2);
+    slot.glow.setHex(color);
   }
 
   // A comet trail chasing the pooled Vfx projectile: advances with the same
@@ -565,6 +705,9 @@ export class AbilityVfxRibbons {
     slot.delay = opts.delay;
     slot.coils = opts.coils;
     slot.coilPhase = 0;
+    slot.flightAge = 0;
+    slot.hammerHold = 0;
+    slot.hammerDuration = 0;
     slot.jagTrail = opts.jagTrail;
     slot.jagTimer = 0;
     slot.forkEvery = opts.forkEvery;
@@ -580,6 +723,13 @@ export class AbilityVfxRibbons {
     if (to) {
       this.s1.copy(to).add(slot.aim).sub(from);
       const dist = this.s1.length();
+      if (slot.style === 'warHammer' && this.handAnchor?.(sourceId, this.s2)) {
+        slot.hammerDuration = dist / slot.speed;
+        slot.hammerHold = Math.min(0.14, slot.hammerDuration * 0.45);
+        slot.head.copy(this.s2);
+        slot.head.y += slot.headSize * 0.38;
+        slot.ring[0].copy(slot.head);
+      }
       if (dist > 1e-6) slot.dir.copy(this.s1).multiplyScalar(1 / dist);
       else slot.dir.set(1, 0, 0);
       slot.ttl = opts.delay + Math.min(10, Math.max(3, dist / slot.speed + 1.5));
@@ -670,7 +820,14 @@ export class AbilityVfxRibbons {
     life: number,
     width: number,
   ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(0, false);
+    if (!slot) return;
+    slot.priority = 0;
+    slot.sample = null;
+    slot.motion = null;
+    slot.sweep = null;
+    slot.refill = null;
+    slot.brushed = false;
     slot.active = true;
     slot.age = 0;
     slot.life = life;
@@ -700,7 +857,14 @@ export class AbilityVfxRibbons {
     lift: number,
     width: number,
   ): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(0, false);
+    if (!slot) return;
+    slot.priority = 0;
+    slot.sample = null;
+    slot.motion = null;
+    slot.sweep = null;
+    slot.refill = null;
+    slot.brushed = false;
     slot.active = true;
     slot.age = 0;
     slot.life = life;
@@ -726,11 +890,20 @@ export class AbilityVfxRibbons {
     }
   }
 
-  update(dt: number, camPos: THREE.Vector3, reducedMotion = false): void {
+  update(
+    dt: number,
+    camPos: THREE.Vector3,
+    reducedMotion = false,
+    drawHeld?: () => void,
+    drawPriorityHeld?: () => void,
+  ): void {
     this.time += dt;
     this.camPos.copy(camPos);
     this.v = 0;
     this.i = 0;
+    // A live damage channel keeps a compact primary when its sculpture is
+    // unavailable. Decoration still uses only the remaining tail below.
+    drawPriorityHeld?.();
 
     for (const b of this.bolts) {
       if (!b.active) continue;
@@ -752,6 +925,10 @@ export class AbilityVfxRibbons {
 
     for (const t of this.trails) {
       if (!t.active) continue;
+      if (t.style === 'warHammer' && !this.anchor(t.sourceId, 0.62, this.a1)) {
+        this.terminateTrail(t);
+        continue;
+      }
       if (t.delay > 0) {
         // staggered volley follower: ride the caster's hand until launch
         t.delay -= dt;
@@ -773,10 +950,32 @@ export class AbilityVfxRibbons {
         this.terminateTrail(t);
         continue;
       }
+      const previousAge = t.flightAge;
+      t.flightAge += dt;
+      if (t.style === 'warHammer' && t.hammerHold > 0 && previousAge < t.hammerHold) {
+        if (this.handAnchor?.(t.sourceId, this.s2)) {
+          t.head.copy(this.s2);
+          t.head.y += t.headSize * 0.38;
+          t.ring[0].copy(t.head);
+        }
+        if (t.flightAge < t.hammerHold) continue;
+      }
       this.s1.copy(target).add(t.aim);
       this.t1.subVectors(this.s1, t.head);
       const dist = this.t1.length();
-      const step = t.speed * dt;
+      // Spend part of the existing flight on a visible hand hold, then cover
+      // the distance lost during windup, then homes at ordinary speed. A moving
+      // target can extend the flight; never force arrival at a fixed deadline.
+      const airborne = Math.max(0, t.flightAge - Math.max(previousAge, t.hammerHold));
+      const catchup = Math.min(
+        airborne,
+        Math.max(0, t.hammerDuration - Math.max(previousAge, t.hammerHold)),
+      );
+      const step =
+        t.style === 'warHammer' && t.hammerHold > 0
+          ? t.speed *
+            (airborne + (catchup * t.hammerHold) / Math.max(0.001, t.hammerDuration - t.hammerHold))
+          : t.speed * dt;
       if (dist <= Math.max(0.7, step)) {
         if (t.tracer) this.spawnTracer(t, this.s1.x, this.s1.y, this.s1.z);
         const onArrive = t.onArrive;
@@ -882,17 +1081,122 @@ export class AbilityVfxRibbons {
 
     for (const a of this.arcs) {
       if (!a.active) continue;
+      const previousAge = a.age;
       a.age += dt;
-      if (a.age >= a.life) {
+      if (a.age < 0) continue;
+      if (a.refill && a.refill(a.pts) < 2) {
         a.active = false;
+        a.refill = null;
         continue;
       }
+      if (a.motion) {
+        const m = a.motion;
+        const elapsed =
+          Math.min(m.duration, a.age) - Math.max(0, Math.min(m.duration, previousAge));
+        const travel = m.duration > 0 ? elapsed / m.duration : 0;
+        for (const p of a.pts) {
+          p.x += m.x * travel;
+          p.y += m.y * travel;
+          p.z += m.z * travel;
+        }
+        if (previousAge < m.duration && a.age >= m.duration) m.onArrive?.();
+      }
+      if (a.age >= a.life) {
+        a.active = false;
+        a.sample = null;
+        a.motion = null;
+        a.sweep = null;
+        a.refill = null;
+        continue;
+      }
+      if (a.sample && dt > 0) {
+        if (!a.sample(this.a1)) {
+          a.active = false;
+          a.sample = null;
+          continue;
+        }
+        // Reset on a teleport; a long line across the arena is never a swing.
+        const distance = this.a1.distanceToSquared(a.pts[ARC_PTS - 1]);
+        if (!a.samplePrimed || distance > 16) {
+          for (const p of a.pts) p.copy(this.a1);
+          a.samplePrimed = true;
+        } else {
+          a.sampleClock += dt;
+          const steps = Math.min(ARC_PTS, Math.floor(a.sampleClock * 60 + 1e-8));
+          a.sampleClock -= steps / 60;
+          this.a2.copy(a.pts[ARC_PTS - 1]);
+          for (let step = 0; step < steps; step++) {
+            for (let i = 0; i < ARC_PTS - 1; i++) a.pts[i].copy(a.pts[i + 1]);
+            a.pts[ARC_PTS - 1].lerpVectors(this.a2, this.a1, (step + 1) / steps);
+          }
+        }
+      }
       const k = (1 - a.age / a.life) ** 2;
-      this.add(a.pts, ARC_PTS, a.width * 2.4, a.glow, 1.1 * k, 0.9);
-      this.add(a.pts, ARC_PTS, a.width, a.core, 2.4 * k, 0.9);
+      if (a.brushed) {
+        // Resample existing control points into one reusable scratch strip.
+        // The vertex and arc pool budgets remain unchanged.
+        this.arcCurve.points = a.pts;
+        for (let i = 0; i < this.arcSmooth.length; i++)
+          this.arcCurve.getPoint(i / (this.arcSmooth.length - 1), this.arcSmooth[i]);
+        const sweep = reducedMotion ? null : a.sweep;
+        this.add(
+          this.arcSmooth,
+          this.arcSmooth.length,
+          a.width * 2.8,
+          a.glow,
+          0.55 * k,
+          1,
+          3,
+          sweep,
+          a.age / a.life,
+          true,
+        );
+        this.add(
+          this.arcSmooth,
+          this.arcSmooth.length,
+          a.width * 0.38,
+          a.core,
+          0.95 * k,
+          1,
+          3,
+          sweep,
+          a.age / a.life,
+          true,
+        );
+      } else {
+        this.add(a.pts, ARC_PTS, a.width * 2.4, a.glow, 1.1 * k, 0.9);
+        this.add(a.pts, ARC_PTS, a.width, a.core, 2.4 * k, 0.9);
+      }
     }
 
+    // After channel primaries and transient attacks, held decoration uses remaining
+    // vertices only, without occupying or restarting any timed effect slot.
+    drawHeld?.();
     this.commit();
+  }
+
+  /** Immediate held geometry, valid only inside update's drawHeld callback. */
+  appendHeld(
+    points: THREE.Vector3[],
+    count: number,
+    width: number,
+    color: number,
+    light: number,
+  ): void {
+    this.heldColor.setHex(color);
+    this.add(points, count, width, this.heldColor, light, 0.1, 1, null, 0, true);
+  }
+
+  /** End one resolved throw, or every throw involving a dead participant. */
+  cancelWarriorHammer(entityId: number, targetId?: number): void {
+    for (const t of this.trails) {
+      if (!t.active || t.style !== 'warHammer') continue;
+      const matches =
+        targetId === undefined
+          ? t.sourceId === entityId || t.targetId === entityId
+          : t.sourceId === entityId && t.targetId === targetId;
+      if (matches) this.terminateTrail(t);
+    }
   }
 
   clear(): void {
@@ -902,7 +1206,13 @@ export class AbilityVfxRibbons {
       t.onArrive = null;
       t.onTerminate = null;
     }
-    for (const a of this.arcs) a.active = false;
+    for (const a of this.arcs) {
+      a.active = false;
+      a.sample = null;
+      a.motion = null;
+      a.sweep = null;
+      a.refill = null;
+    }
     this.geo.setDrawRange(0, 0);
     this.wasEmpty = true;
     this.mesh.visible = !this.warmed;
@@ -974,6 +1284,15 @@ export class AbilityVfxRibbons {
       brightness: number,
     ) => void,
     reducedMotion = false,
+    hammerSink?: (
+      x: number,
+      y: number,
+      z: number,
+      size: number,
+      yaw: number,
+      time: number,
+      reduced: boolean,
+    ) => boolean,
   ): void {
     for (const t of this.trails) {
       if (!t.active || t.headSize <= 0 || t.delay > 0) continue;
@@ -1106,6 +1425,23 @@ export class AbilityVfxRibbons {
           sink(h.x, h.y, h.z, t.coreHex, 0.4 * hs * pulse, OVERLAY_CELL.spark, 0.95, 2.8);
           sink(h.x, h.y, h.z, t.colorHex, 0.3 * hs, OVERLAY_CELL.glow, 0.6, 1.1);
           break;
+        case 'warHammer': {
+          if (
+            hammerSink?.(
+              h.x,
+              h.y,
+              h.z,
+              hs,
+              Math.atan2(t.dir.x, t.dir.z),
+              Math.max(0, t.flightAge - t.hammerHold),
+              reducedMotion,
+            )
+          )
+            break;
+          const cel = OVERLAY_CELL.hammer0 + warriorHammerCel(time, reducedMotion);
+          sink(h.x, h.y, h.z, 0xffffff, 1.5 * hs, cel, 1, 1.15);
+          break;
+        }
         case 'rock': {
           // molten boulder: a dim fat glow with two embers tumbling around it
           sink(h.x, h.y, h.z, t.colorHex, 0.5 * hs, OVERLAY_CELL.glow, 0.9, 1.15);
@@ -1180,7 +1516,14 @@ export class AbilityVfxRibbons {
   // The etched flight path left behind on arrival: a slow-fading narrow
   // ribbon from the launch point to the impact, on an arc slot.
   private spawnTracer(t: TrailSlot, x: number, y: number, z: number): void {
-    const slot = this.arcs.find((a) => !a.active) ?? this.arcs[0];
+    const slot = this.chooseArcSlot(0, false);
+    if (!slot) return;
+    slot.priority = 0;
+    slot.sample = null;
+    slot.motion = null;
+    slot.sweep = null;
+    slot.refill = null;
+    slot.brushed = false;
     slot.active = true;
     slot.age = 0;
     slot.life = 1.1;
@@ -1241,6 +1584,9 @@ export class AbilityVfxRibbons {
     mul: number,
     taper: number,
     uvRepeats = 3,
+    sweep: SteelSweepRange | null = null,
+    age = 0,
+    warrior = false,
   ): void {
     if (n < 2 || this.v + n * 2 > MAX_VERTS || this.i + (n - 1) * 6 > MAX_INDICES) return;
     const base = this.v;
@@ -1263,15 +1609,18 @@ export class AbilityVfxRibbons {
       this.pos[vi + 3] = p.x - this.t1.x * w;
       this.pos[vi + 4] = p.y - this.t1.y * w;
       this.pos[vi + 5] = p.z - this.t1.z * w;
-      const r = color.r * mul;
-      const g = color.g * mul;
-      const bl = color.b * mul;
+      const gain = sweep ? steelSweepGain(sweep.from + (sweep.to - sweep.from) * u, age) : 1;
+      const r = color.r * mul * gain;
+      const g = color.g * mul * gain;
+      const bl = color.b * mul * gain;
       this.col[vi] = r;
       this.col[vi + 1] = g;
       this.col[vi + 2] = bl;
       this.col[vi + 3] = r;
       this.col[vi + 4] = g;
       this.col[vi + 5] = bl;
+      this.warriorStyle[base + k * 2] = warrior ? 1 : 0;
+      this.warriorStyle[base + k * 2 + 1] = warrior ? 1 : 0;
       const ui = (base + k * 2) * 2;
       this.uv[ui] = u * uvRepeats;
       this.uv[ui + 1] = 0;
@@ -1310,6 +1659,10 @@ export class AbilityVfxRibbons {
     // set. Everything past the prefix is stale by design and unreachable,
     // because setDrawRange below stops at this.i. clearUpdateRanges first, so
     // a range queued on a frame the mesh was never submitted cannot pile up.
+    const warriorAttr = this.geo.attributes.aWarrior as THREE.BufferAttribute;
+    warriorAttr.clearUpdateRanges();
+    warriorAttr.addUpdateRange(0, this.v);
+    warriorAttr.needsUpdate = true;
     const posAttr = this.geo.attributes.position as THREE.BufferAttribute;
     const colAttr = this.geo.attributes.aCol as THREE.BufferAttribute;
     const uvAttr = this.geo.attributes.uv as THREE.BufferAttribute;

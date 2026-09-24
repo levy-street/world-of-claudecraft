@@ -22,6 +22,21 @@ import { t } from './i18n';
 import type { UnitFrameDescriptor } from './unit_frame';
 
 /**
+ * The identity a target or target-of-target portrait gate keys on: the entity
+ * id, byte-faithful to the old lastPortraitTarget for everything but a player
+ * hiding their helm. A player's composed portrait is keyed on the look's full
+ * signature, and the helm is the one part of that signature a player flips
+ * LIVE (the paperdoll eye), so without this bit a persistently targeted peer
+ * who hides their helm keeps the helmed face until re-targeted. A redesign
+ * (a new authored look mid-session, a once-per-character token spend) is left
+ * to re-targeting on purpose: folding the look in would put a signature on
+ * the per-paint path for an event that is rare by construction.
+ */
+export function targetPortraitKey(target: Entity): string {
+  return target.kind === 'player' && target.helmHidden ? `${target.id}:helm` : String(target.id);
+}
+
+/**
  * Fill the target frame's descriptor for one entity. Mutates the caller-owned
  * `d` in place (allocation-light, the per-frame HUD path) and returns it.
  * `raidMarker` is the target's party mark (IWorld.markerFor: 0..7 or null).
@@ -60,9 +75,10 @@ export function fillTargetFrameDescriptor(
   // Explicit player-kind gate: stale/malformed NPC or mob identity data
   // must never inherit a player reward surface.
   d.borderSlug = deedTargetBorderSlug(target.kind, target.border ?? null);
-  // id-keyed gate, byte-faithful to the old lastPortraitTarget !== target.id;
-  // the painter resets it on hide so an id reused by a new mob still redraws.
-  d.portraitKey = String(target.id);
+  // The id-keyed gate (the painter resets it on hide so an id reused by a new
+  // mob still redraws), widened by the helm bit for a player: see
+  // targetPortraitKey.
+  d.portraitKey = targetPortraitKey(target);
   d.absorb = target.dead ? null : target;
   d.dead = false;
   d.outOfRange = false;

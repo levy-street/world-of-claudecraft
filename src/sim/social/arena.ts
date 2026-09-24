@@ -49,7 +49,10 @@ import {
   type Entity,
   emptyMoveInput,
 } from '../types';
-import { clearCooldownsPreservingUnstuck } from '../unstuck_cooldown';
+import {
+  clearCooldownsPreservingUnstuck,
+  restoreCooldownsPreservingUnstuck,
+} from '../unstuck_cooldown';
 import { recordWeeklyPvpWin } from '../weekly_rewards';
 import { duelFor } from './duel';
 
@@ -101,7 +104,9 @@ export function snapshotArenaReturnPools(e: Entity): ArenaReturnPools {
 // player, so the hp/resource clamp below has to see the drained maxHp, not the
 // healthy one. Everything else is a straight restore.
 export function restoreArenaReturnPools(ctx: SimContext, e: Entity, pools: ArenaReturnPools): void {
-  e.cooldowns = new Map(pools.cooldowns);
+  // The two hidden /unstuck timers are the one thing the parenthesis does not swallow: a
+  // recovery inside the match keeps its cooldown and its sickness window on the way out.
+  e.cooldowns = restoreCooldownsPreservingUnstuck(e.cooldowns, pools.cooldowns);
   e.abilityCharges =
     Object.keys(pools.abilityCharges).length > 0
       ? cloneAbilityCharges(pools.abilityCharges)

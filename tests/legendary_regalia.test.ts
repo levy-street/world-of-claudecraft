@@ -372,31 +372,50 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     }
   });
 
-  it('matches the eqi wire allowlist in server/game.ts and reads only rolled', () => {
+  it('matches the eqi wire allowlist in server/equipped_instance_wire.ts and reads only rolled', () => {
     // Source-scrape the eqi projection loop (the item_instance_transfer.test.ts
     // cross-pin) so widening the wire without re-judging this predicate reds.
-    const game = read('server/game.ts');
-    const assigns = [...game.matchAll(/pub\.(\w+) = inst\.(\w+);/g)];
+    // Permanent loot quality moved the loop out of server/game.ts into
+    // server/equipped_instance_wire.ts (game.ts keeps the one call site and
+    // the `out.eqi` write) and added lootQuality to the allowlist; the pin
+    // follows the code there.
+    const wire = read('server/equipped_instance_wire.ts');
+    const assigns = [...wire.matchAll(/pub\.(\w+) = inst\.(\w+);/g)];
     // no cross-wire: every projected field copies from ITS OWN source field
     for (const m of assigns) expect(m[2], `cross-wired eqi projection: ${m[0]}`).toBe(m[1]);
     const projected = assigns.map((m) => m[1]).sort();
-    expect(projected).toEqual(['enchant', 'name', 'perfected', 'rift', 'rolled', 'signer']);
+    expect(projected).toEqual([
+      'enchant',
+      'lootQuality',
+      'name',
+      'perfected',
+      'rift',
+      'rolled',
+      'signer',
+    ]);
     // Perfected is public for accurate equipped-copy tooltip comparisons; the
     // cosmetic predicate above must still ignore it after a rank exchange.
     // rift (Rift gear progression: tier/power/upgradeLevel/gemSlots/...) is
     // public for the same equipped-copy inspect comparison, and the cosmetic
-    // predicate above never reads it either.
-    // The pub block itself carries exactly the six assignment-shaped writes
+    // predicate above never reads it either. lootQuality (the permanent
+    // quality descriptor) is public so an inspected copy's resolved stats
+    // match its owner's tooltip; the predicate never reads it either.
+    // The pub block itself carries exactly the seven assignment-shaped writes
     // and no spread, so a widened wire SHAPE (a spread, a conditional copy in
     // another form) reds this alarm instead of slipping past the scrape above.
-    const pubAt = game.indexOf('let eqi: Record<string, unknown> | undefined;');
+    const pubAt = wire.indexOf('let eqi: Record<string, unknown> | undefined;');
     expect(pubAt, 'the eqi projection block is missing').toBeGreaterThan(-1);
-    const pubEnd = game.indexOf('if (eqi) out.eqi = eqi;', pubAt);
+    const pubEnd = wire.indexOf('return eqi;', pubAt);
     expect(pubEnd).toBeGreaterThan(pubAt);
-    const pubBlock = game.slice(pubAt, pubEnd);
-    expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(6);
-    expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(6);
+    const pubBlock = wire.slice(pubAt, pubEnd);
+    expect([...pubBlock.matchAll(/pub\.(\w+) = inst\.(\w+);/g)]).toHaveLength(7);
+    expect(pubBlock.match(/\bpub\.\w+\s*=/g) ?? []).toHaveLength(7);
     expect(pubBlock).not.toContain('...');
+    // game.ts still owns the one call site and the wire write.
+    const game = read('server/game.ts');
+    expect(game).toContain('const eqi = equippedInstanceWire(e);');
+    expect(game).toContain('if (eqi) out.eqi = eqi;');
+    expect(game).not.toMatch(/pub\.\w+ = inst\.\w+;/);
     // ... and none of the KNOWN non-dotted write shapes either (the Phase 16
     // QA): Object.assign, Reflect writes, defineProperty, a cast that opens
     // computed keys ('pub as'), or a direct pub[...] index all evade the

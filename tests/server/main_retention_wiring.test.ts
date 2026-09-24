@@ -57,6 +57,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'pruneChatViolationsBatch(',
       'pruneLevelUpEventsBatch(',
       'pruneFtueEventsBatch(',
+      'pruneCraftRollEventsBatch(',
       'pruneWocBuyNowAbandonsBatch(',
       'pruneResolvedWocOffersBatch(',
       'pruneBookedWocCustodyClaimsBatch(',
@@ -121,6 +122,9 @@ describe('retention sweep wiring in server/main.ts', () => {
       // per event; each registers its bounded prune with the sweep.
       'pruneLevelUpEventsBatch(',
       'pruneFtueEventsBatch(',
+      // The chance-based crafting outcome audit (craft_roll_events) grows per
+      // eligible craft and Perfecting attempt; same bounded prune.
+      'pruneCraftRollEventsBatch(',
       // The $WOC Exchange retention set; exactly-once is what catches the
       // splice-duplication hazard the listings entry's own comment records.
       // Custody claims prune BOOKED rows only (unbooked rows are the operator
@@ -245,6 +249,7 @@ describe('retention sweep wiring in server/main.ts', () => {
       'level_up_events',
       'ftue_events',
       'world_quest_scores',
+      'craft_roll_events',
       'woc_market_buy_now_abandons',
       'woc_market_directed_offers',
       'woc_market_custody_claims',

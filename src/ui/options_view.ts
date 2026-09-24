@@ -139,6 +139,9 @@ export interface ChoiceControl {
    *  cell. Placeholders are KEYS the painter resolves, like NoteControl's. */
   statusKey?: TranslationKey;
   statusValueKeys?: Record<string, TranslationKey>;
+  /** Numeric placeholders of the same line; the painter formats them for the
+   *  active locale (formatNumber), so the view stays string-free. */
+  statusNumbers?: Record<string, number>;
   /** Render that line as an ASSERTIVE live region (role="alert") rather than a
    *  polite one: the reading is a verdict a player has to act on (their choice
    *  did not take), and it arrives long after the panel was built, so assistive
@@ -251,6 +254,12 @@ export interface OptionsEnv {
    *  phone-class WebKit), so the row and its note would both be lies. Absent
    *  means yes, which is what every non-iOS caller wants. */
   shaderWarmChoice?: boolean;
+  /** What a stored frame rate ceiling does on the display as it reads right
+   *  now (src/game/frame_rate_cap_setting.ts frameRateCapReading): the rate is
+   *  a divisor of the measured refresh, so "about 30" is 36 on a 144 Hz display
+   *  and nothing at all on a 30 Hz one, and the row owes the player that
+   *  number. Absent (the offline callers, tests) means no reading line. */
+  frameRateCapReadingFor?: (storedValue: number) => FrameRateCapRowReading;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -359,6 +368,23 @@ function gpuBackendActiveNameKey(active: string): TranslationKey {
     ? 'hudChrome.options.gpuBackendActiveNameVulkan'
     : 'hudChrome.options.gpuBackendActiveNameOpenGL';
 }
+
+/** The options row's copy of the game-side reading, so the view imports no
+ *  game module (the shape is structural on purpose). */
+export type FrameRateCapRowReading =
+  | { kind: 'none' }
+  | { kind: 'inert' }
+  | { kind: 'paced'; fps: number; refreshHz: number }
+  | { kind: 'unpaced'; fps: number };
+
+// The frame rate ceiling; the stored numbers are
+// src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES.
+const frameRateCapOptions: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+  { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+  { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+  { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
+];
 
 // The shader warm-up worker: auto follows the GPU backend (on where the
 // compile runs off the presenting thread, off on OpenGL); the stored numbers
@@ -661,6 +687,25 @@ export function buildGraphicsSections(
     ]),
     note('hudChrome.options.browserEffectsNote'),
   ];
+  // Re-renders on a pick: the reading under the buttons belongs to the value.
+  const capRow = choice(
+    s,
+    'frameRateCap',
+    'hudChrome.options.frameRateCap',
+    frameRateCapOptions,
+    true,
+  );
+  const capReading = env.frameRateCapReadingFor?.(capRow.current);
+  if (capReading?.kind === 'paced') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusPaced';
+    capRow.statusNumbers = { fps: capReading.fps, hz: capReading.refreshHz };
+  } else if (capReading?.kind === 'unpaced') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusUnpaced';
+    capRow.statusNumbers = { fps: capReading.fps };
+  } else if (capReading?.kind === 'inert') {
+    capRow.statusKey = 'hudChrome.options.frameRateCapStatusInert';
+  }
+  system.push(capRow, note('hudChrome.options.frameRateCapNote'));
   // iOS forces the worker off whatever the setting says, so the row would be a
   // control that changes nothing under a note promising On is forced
   // everywhere. Absent means yes: every other host keeps the pair byte for byte.

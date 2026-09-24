@@ -996,7 +996,7 @@ describe('ENCHANTS table integrity', () => {
     // The learned faction formulas' axes (content/enchants.ts EnchantStatAxis);
     // recalcPlayerStats reads all four from a copy's rolled stats.
     'spellPower',
-    'healPower',
+    'healingPower',
     'critRating',
     'hasteRating',
   ]);

@@ -76,6 +76,7 @@ import {
 } from './community_test_accounts';
 import { CONCURRENT_INDEX_MIGRATIONS } from './concurrent_indexes';
 import { CONTENT_MODERATION_SCHEMA } from './content_moderation_db';
+import { CRAFT_ROLL_EVENTS_SCHEMA } from './craft_roll_events_db';
 import { cancelDetachedBackend } from './db_backend_cancel';
 import { dbConnectionBudgetWarning } from './db_connection_budget';
 import type { RankedDeedsAccount } from './deeds_board';
@@ -1282,6 +1283,9 @@ export async function ensureSchema(): Promise<void> {
     // Applied unconditionally (idempotent), like the other schema modules.
     await client.query(PROGRESS_EVENTS_SCHEMA);
     await client.query(WORLD_QUEST_SCORES_SCHEMA);
+    // The chance-based crafting outcome audit (craft_roll_events). Same FK
+    // shape as the progress logs, so it runs after SCHEMA; idempotent.
+    await client.query(CRAFT_ROLL_EVENTS_SCHEMA);
     // First-touch signup attribution (one row per account, written at
     // registration). FK-references accounts(id), so it runs after SCHEMA.
     await client.query(ACCOUNT_ATTRIBUTION_SCHEMA);
@@ -2408,6 +2412,18 @@ export async function exportAccountData(
        FROM ftue_events WHERE account_id = $1 ORDER BY occurred_at`,
     [accountId],
   );
+  // The raw `roll` is deliberately NOT exported: the world rng is mulberry32
+  // (src/sim/rng.ts), whose 32-bit state is recoverable from one exact
+  // output, so handing a player their own draws at full precision would be
+  // an rng oracle (the account_export_state.ts farm-plot roll strip is the
+  // same rule). The verdict, the chance and the rank walked are the player's
+  // record; the draw itself is the operator's evidence.
+  const craftRollEvents = await pool.query(
+    `SELECT character_id, kind, recipe_id, item_id, chance, success,
+            rank_before, rank_after, rolled_at
+       FROM craft_roll_events WHERE account_id = $1 ORDER BY rolled_at, id`,
+    [accountId],
+  );
   return {
     exportedAt: new Date().toISOString(),
     account: {
@@ -2423,6 +2439,7 @@ export async function exportAccountData(
     signupAttribution: attribution,
     levelUpEvents: levelUpEvents.rows,
     ftueEvents: ftueEvents.rows,
+    craftRollEvents: craftRollEvents.rows,
     characters: characters.map((c) => ({
       id: c.id,
       name: c.name,

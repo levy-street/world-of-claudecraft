@@ -185,7 +185,10 @@ function canReturnEquippedItemToBags(
   return countFit(meta.inventory, bagPools(meta.bags), itemId, 1, instance, craftedRecipeId) >= 1;
 }
 
-function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
+/** The hand (or slot) an unaimed equip lands in: rings empty-first, weapons
+ *  routed between hands from the committed spec. Exported so auto_equip.ts
+ *  compares a grant against the copy this resolver would actually displace. */
+export function desiredEquipSlot(meta: PlayerMeta, itemId: string): EquipSlot | null {
   const def = ITEMS[itemId];
   if (!def?.slot) return null;
   if (def.kind !== 'weapon') return resolveEquipSlot(def, meta.equipment);

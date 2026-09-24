@@ -6461,6 +6461,14 @@
   body.mobile-touch.vendor-open #vendor-window .panel-title .x-btn {
     display: none;
   }
+  /* The ghost hint's desktop size wraps to two lines on a phone and lands on the
+     subzone banner; a smaller size keeps it to one line in landscape and clear of
+     the compass strip in both orientations. */
+  body.mobile-touch #ghost-hint {
+    top: 52px;
+    font-size: 14px;
+    max-width: calc(var(--app-vw) / var(--ui-scale, 1) - 96px);
+  }
   /* The death and ghost panels are authored at min(360px, 100vw - 32px), but
      they live inside #ui, which carries zoom: var(--ui-scale). A raw vw length
      is measured before that zoom, so at any UI Scale other than 1 the panel

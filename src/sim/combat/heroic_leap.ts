@@ -13,7 +13,16 @@ const EXTERNAL_RELOCATION_EPSILON = 0.05;
 /** The one sweep body both the live cast and the preview run: steps toward the
  * aim, refusing deep water and unclimbable rises, resolving each step through
  * the caller's collision resolvers (grounded, then at the flight crest for
- * props the arc clears), and seating the end point on whatever stands there. */
+ * props the arc clears), and seating the end point on whatever stands there.
+ *
+ * Sibling: hunter_trailbreak_arc.ts walks the same half-yard line for the
+ * hunter's Trailbreak, but gates differently on purpose: this is a SCRIPTED
+ * flight that owns the body until touchdown, so it must refuse any rise the
+ * walker could not climb and any aim in deep water; Trailbreak plans a launch
+ * for the real jump physics, which flies over a short steep feature within
+ * mantle reach of walkable footing and splashes into water like any jump. Two
+ * copies is inside the rule of three; a third leap-shaped ability should pull
+ * the line walk into one core with per-ability gates. */
 function sweepLeapLanding(
   seed: number,
   fromX: number,

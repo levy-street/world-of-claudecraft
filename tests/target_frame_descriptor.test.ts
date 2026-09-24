@@ -8,7 +8,7 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import type { Entity } from '../src/sim/types';
 import { ensureLocaleLoaded, setLanguage, t } from '../src/ui/i18n';
-import { fillTargetFrameDescriptor } from '../src/ui/target_frame_descriptor';
+import { fillTargetFrameDescriptor, targetPortraitKey } from '../src/ui/target_frame_descriptor';
 import { type UnitFrameDescriptor, unitFrameView } from '../src/ui/unit_frame';
 
 function entity(over: Partial<Entity> & { id: number }): Entity {
@@ -66,6 +66,22 @@ const NO_TITLE = { pre: '', post: '' };
 beforeAll(async () => {
   await ensureLocaleLoaded('en');
   setLanguage('en');
+});
+
+describe('targetPortraitKey', () => {
+  it('is the bare id for a mob, helm bit or not', () => {
+    expect(targetPortraitKey(entity({ id: 7 }))).toBe('7');
+    expect(targetPortraitKey(entity({ id: 7, helmHidden: true }))).toBe('7');
+  });
+
+  it('folds a player helm toggle into the gate so the composed face follows it', () => {
+    const shown = entity({ id: 7, kind: 'player', helmHidden: false });
+    const hidden = entity({ id: 7, kind: 'player', helmHidden: true });
+    expect(targetPortraitKey(shown)).toBe('7');
+    expect(targetPortraitKey(hidden)).toBe('7:helm');
+    const d = fillTargetFrameDescriptor(blank(), hidden, NO_TITLE, null);
+    expect(d.portraitKey).toBe('7:helm');
+  });
 });
 
 describe('fillTargetFrameDescriptor', () => {

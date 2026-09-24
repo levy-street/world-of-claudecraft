@@ -177,3 +177,72 @@ function shaderWarmArm(value: unknown): string {
   const arm = shaderWarmToken(value);
   return arm === 'on' || arm === 'off' ? arm : '';
 }
+
+export interface CadenceBlock {
+  mode: string;
+  verdict: string;
+  intent: number;
+  refreshHz: number;
+  divisor: number;
+  targetIntervalMs: number;
+  missShare: number;
+  autoPhase: string;
+  autoConfirmed: number;
+  autoFailStreak: number;
+  autoLateShare: number;
+  autoDescents: number;
+  autoProbes: number;
+  autoProbesFailed: number;
+  autoProbesInconclusive: number;
+  /** Seconds of play before the first automatic descent; only meaningful
+   *  while `autoDescents` is above zero. */
+  autoFirstCeilingS: number;
+  rendered: number;
+  skipped: number;
+}
+
+const CADENCE_MODES = ['auto', 'manual'];
+const CADENCE_AUTO_PHASES = ['off', 'observe', 'held', 'probe', 'probation'];
+// Per-session counts of the automatic mode's moves: a handful by design.
+const CADENCE_AUTO_MOVES_MAX = 1000;
+export const CADENCE_VERDICTS = ['unknown', 'paced', 'unpaced'];
+// A session's callback count: a day at 500 Hz, past any real tab.
+const CALLBACKS_MAX = 50_000_000;
+
+function boundedShare(value: unknown): number {
+  const n = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.round(Math.min(1, Math.max(0, n)) * 1000) / 1000;
+}
+
+/** The frame rate ceiling block (src/game/frame_cadence_wiring.ts
+ *  frameCadenceBeaconBlock). Undefined without a known `mode`: every token is
+ *  a closed vocabulary, so no client text reaches storage through this block. */
+export function sanitizeCadence(value: unknown): CadenceBlock | undefined {
+  if (!isRecord(value)) return undefined;
+  const mode = typeof value.mode === 'string' ? value.mode : '';
+  if (!CADENCE_MODES.includes(mode)) return undefined;
+  const verdict = typeof value.verdict === 'string' ? value.verdict : '';
+  const intent = boundedInt(value.intent, 1000);
+  const autoPhase = typeof value.autoPhase === 'string' ? value.autoPhase : '';
+  return {
+    mode,
+    verdict: CADENCE_VERDICTS.includes(verdict) ? verdict : 'unknown',
+    intent: intent === 30 || intent === 60 ? intent : 0,
+    refreshHz: boundedInt(value.refreshHz, 1000),
+    divisor: Math.max(1, boundedInt(value.divisor, 16)),
+    targetIntervalMs: boundedInt(value.targetIntervalMs, 1000),
+    missShare: boundedShare(value.missShare),
+    autoPhase: CADENCE_AUTO_PHASES.includes(autoPhase) ? autoPhase : 'off',
+    autoConfirmed: value.autoConfirmed === 1 ? 1 : 0,
+    autoFailStreak: boundedInt(value.autoFailStreak, 16),
+    autoLateShare: boundedShare(value.autoLateShare),
+    autoDescents: boundedInt(value.autoDescents, CADENCE_AUTO_MOVES_MAX),
+    autoProbes: boundedInt(value.autoProbes, CADENCE_AUTO_MOVES_MAX),
+    autoProbesFailed: boundedInt(value.autoProbesFailed, CADENCE_AUTO_MOVES_MAX),
+    autoProbesInconclusive: boundedInt(value.autoProbesInconclusive, CADENCE_AUTO_MOVES_MAX),
+    autoFirstCeilingS: boundedInt(value.autoFirstCeilingS, SESSION_MS_MAX / 1000),
+    rendered: boundedInt(value.rendered, CALLBACKS_MAX),
+    skipped: boundedInt(value.skipped, CALLBACKS_MAX),
+  };
+}

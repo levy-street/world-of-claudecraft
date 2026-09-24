@@ -200,10 +200,48 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       // System card (full width).
       'browserEffects',
       'note:hudChrome.options.browserEffectsNote',
+      'frameRateCap',
+      'note:hudChrome.options.frameRateCapNote',
       'shaderWarm',
       'note:hudChrome.options.shaderWarmNote',
       'interfaceMode',
       'note:hudChrome.options.interfaceModeNote',
+    ]);
+  });
+
+  it('states under the frame rate limit what it really does on this display', () => {
+    const capRow = (reading: ReturnType<NonNullable<OptionsEnv['frameRateCapReadingFor']>>) => {
+      const seen: number[] = [];
+      const row = flattenGraphicsSections(
+        buildGraphicsSections(makeSource({ graphicsPreset: 4, frameRateCap: 3 }), {
+          ...WEB_ENV,
+          frameRateCapReadingFor: (value) => {
+            seen.push(value);
+            return reading;
+          },
+        }),
+      ).find((c) => c.control === 'choice' && c.key === 'frameRateCap');
+      expect(seen).toEqual([3]);
+      if (row?.control !== 'choice') throw new Error('no frame rate limit row');
+      return row;
+    };
+    const paced = capRow({ kind: 'paced', fps: 36, refreshHz: 144 });
+    expect(paced.statusKey).toBe('hudChrome.options.frameRateCapStatusPaced');
+    expect(paced.statusNumbers).toEqual({ fps: 36, hz: 144 });
+    expect(paced.rerender).toBe(true);
+    const unpaced = capRow({ kind: 'unpaced', fps: 30 });
+    expect(unpaced.statusKey).toBe('hudChrome.options.frameRateCapStatusUnpaced');
+    expect(unpaced.statusNumbers).toEqual({ fps: 30 });
+    expect(capRow({ kind: 'inert' }).statusKey).toBe('hudChrome.options.frameRateCapStatusInert');
+    expect(capRow({ kind: 'none' }).statusKey).toBeUndefined();
+    // The stored value each label stands for is what the game resolves
+    // (src/game/frame_rate_cap_setting.ts FRAME_RATE_CAP_VALUES): a swap here
+    // would make the 60 button ask for 30.
+    expect(capRow({ kind: 'none' }).options).toEqual([
+      { value: 0, labelKey: 'hudChrome.options.frameRateCapAuto' },
+      { value: 1, labelKey: 'hudChrome.options.frameRateCapDisplay' },
+      { value: 2, labelKey: 'hudChrome.options.frameRateCapSixty' },
+      { value: 3, labelKey: 'hudChrome.options.frameRateCapThirty' },
     ]);
   });
 
@@ -1326,6 +1364,21 @@ describe('options_view: main menu routing', () => {
       expect(touch[0]?.labelKey).toBe('hud.options.keyBindings');
       expect(touch).toEqual(locked.slice(1));
     }
+  });
+
+  it('carries NO System Report row: it is a section inside the Performance view', () => {
+    // The owner's decision: the feature was a whole menu row and a whole
+    // sub-panel, which was more room than it deserves. Performance is followed
+    // straight by the transfer row on every host, with nothing between them.
+    const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
+    expect(rows.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    expect(rows.some((e) => e.action.kind === 'goto' && e.action.view === 'performance')).toBe(
+      true,
+    );
+    const perfAt = rows.findIndex((e) => e.labelKey === 'hudChrome.perf.title');
+    expect(rows[perfAt + 1]?.labelKey, 'nothing sits between them now').toBe(
+      'hudChrome.fullTransfer.menu',
+    );
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

@@ -850,18 +850,20 @@ describe('item-art audit builder', () => {
     // faction quartermaster items (which landed without moving this block)
     // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
     // the sha/bytes straight from `--verify-only` on this tree.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
       // faction quartermaster owners, the Emissary's Cache chest and the two
       // Clue Scroll items (1305 / 1323). Re-minted again with the faction
       // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
-      // 1340, sha and bytes straight from `--verify-only` on this tree.
-      catalogSha256: '98cbeb3bb04f7dcc50cc0404f2c5f75a05557a730e2103ea89c44f73c393d3ff',
-      catalogBytes: 719724,
+      // 1340, sha and bytes straight from `--verify-only` on this tree; 1323 / 1341
+      // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way.
+      catalogSha256: '9241744131c251a9aea26884a78466a0503b6cc8860bbcda0ad19d6ed963d966',
+      catalogBytes: 720259,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1322,
-      liveItemCount: 1340,
+      catalogCount: 1323,
+      liveItemCount: 1341,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -879,7 +881,7 @@ describe('item-art audit builder', () => {
         identity: 31,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'c02f91e573ee7c09e368fb2e4585370cf6b0f68d31f3fd83d01320a787bb8257',
+      shippingCatalogSha256: '7155ded86e3c484705ef4fcaa76cdd44de6970beba0f2caf7447602ffc91594b',
       machineChecksPassed: true,
       verdict: null,
     });

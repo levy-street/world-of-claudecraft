@@ -224,6 +224,16 @@ export function shedRungLabel(rawSummary: unknown): ClientPerfShedRung {
 // different population.
 export const WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL = 'woc_client_shader_warm_reports_total';
 
+// The frame rate ceiling cut of the same stored reports. Its own counter, never
+// a label on the fps or p95 series (their label sets are a pinned contract): it
+// says what share of the fleet renders slowly ON PURPOSE, so a rise in slow
+// frames can be read against it.
+export const WOC_CLIENT_CADENCE_REPORTS_TOTAL = 'woc_client_cadence_reports_total';
+export const CLIENT_PERF_FRAME_CAPS = ['none', '30', '60'] as const;
+export type ClientPerfFrameCap = (typeof CLIENT_PERF_FRAME_CAPS)[number];
+export const CLIENT_PERF_CADENCES = ['full', 'reduced'] as const;
+export type ClientPerfCadence = (typeof CLIENT_PERF_CADENCES)[number];
+
 // Bucket edges are part of the exporter's public contract (a bucket edit
 // silently rewrites every dashboard quantile), so they are exported and pinned
 // by the tests like the RED exporter's duration buckets.
@@ -271,6 +281,9 @@ export interface ClientPerfSample {
   suggestionIds: string[];
   shaderWarmWorkerActive: boolean;
   shaderWarmRefusal: string;
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
   rawSummary: Record<string, unknown>;
 }
 
@@ -354,6 +367,28 @@ export function shaderWarmRefusalLabel(refusal: string): ClientPerfShaderWarmRef
   return (CLIENT_PERF_SHADER_WARM_REFUSALS as readonly string[]).includes(family)
     ? (family as ClientPerfShaderWarmRefusal)
     : 'other';
+}
+
+export function frameCapLabel(frameCapIntent: number): ClientPerfFrameCap {
+  if (frameCapIntent === 30) return '30';
+  if (frameCapIntent === 60) return '60';
+  return 'none';
+}
+
+/**
+ * 'reduced' when the client renders fewer frames than the display offers: a
+ * divisor above one (the paced ceiling), or a ceiling with no display reading,
+ * which is the unpaced limiter (it holds the divisor at one and sleeps instead).
+ */
+export function cadenceLabel(sample: {
+  frameCapIntent: number;
+  cadenceDivisor: number;
+  refreshHz: number;
+}): ClientPerfCadence {
+  if (sample.cadenceDivisor > 1) return 'reduced';
+  return frameCapLabel(sample.frameCapIntent) !== 'none' && !(sample.refreshHz > 0)
+    ? 'reduced'
+    : 'full';
 }
 
 function tierIn(value: string): ClientPerfGfxTier {
@@ -462,6 +497,12 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     labelNames: ['shader_warm_active', 'shader_warm_refusal'] as const,
     registers: [registry],
   });
+  const cadenceReports = new Counter({
+    name: WOC_CLIENT_CADENCE_REPORTS_TOTAL,
+    help: 'Stored gameplay perf reports by the frame rate ceiling the player chose (none, 30, 60) and whether the client renders every display refresh (full) or fewer on purpose (reduced).',
+    labelNames: ['frame_cap', 'cadence'] as const,
+    registers: [registry],
+  });
   const suggestions = new Counter({
     name: WOC_CLIENT_SUGGESTIONS_TOTAL,
     help: 'Perf-doctor suggestion ids carried by stored gameplay perf reports.',
@@ -522,6 +563,11 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
       shaderWarmReports.inc({ shader_warm_active: active, shader_warm_refusal: refusal }, 0);
     }
   }
+  for (const frameCap of CLIENT_PERF_FRAME_CAPS) {
+    for (const cadence of CLIENT_PERF_CADENCES) {
+      cadenceReports.inc({ frame_cap: frameCap, cadence }, 0);
+    }
+  }
   for (const suggestion of CLIENT_PERF_SUGGESTION_IDS) suggestions.inc({ suggestion }, 0);
   for (const rung of CLIENT_PERF_SHED_RUNGS) shed.inc({ rung }, 0);
 
@@ -547,6 +593,10 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
         shaderWarmReports.inc({
           shader_warm_active: sample.shaderWarmWorkerActive ? 'true' : 'false',
           shader_warm_refusal: shaderWarmRefusalLabel(sample.shaderWarmRefusal),
+        });
+        cadenceReports.inc({
+          frame_cap: frameCapLabel(sample.frameCapIntent),
+          cadence: cadenceLabel(sample),
         });
         frameP95.observe(
           { ...tierDevice, backend, runtime },

@@ -28,9 +28,15 @@ import { afflictionPossessionEmpowers } from '../../../sim/combat/affliction';
 import { aetherDartsProcGlowActive } from '../../../sim/combat/chronomancy';
 import { destructionProcGlowActive, ruinAmountFromAuras } from '../../../sim/combat/destruction';
 import {
+  NATURES_BOON_ID,
+  naturesBoonArmedFor,
+  naturesBoonFormAllows,
+} from '../../../sim/combat/druid_natures_boon';
+import {
   freeCostAuraActive,
   nextCastCheapMultiplierFromAuras,
 } from '../../../sim/combat/empower_next';
+import type { MeleeReachActor } from '../../../sim/combat/feral_reach';
 import { willAutoUnshift } from '../../../sim/combat/form_auto_unshift';
 import { frostProcGlowActive } from '../../../sim/combat/frost_mage';
 import { packlordActionGlowActive } from '../../../sim/combat/hunter_packlord';
@@ -61,6 +67,7 @@ import {
   dist2d,
   GCD,
   type ItemDef,
+  type PlayerClass,
   POTION_COOLDOWN,
   type ResourceType,
   type Vec3,
@@ -268,8 +275,15 @@ export interface ActionBarWorldInput {
   inventory: readonly { itemId: string; count: number }[];
   /** Aura-derived because the online player entity's local cache is not wired. */
   stealthed: boolean;
-  /** Committed Paladin spec: the redesigned bar swaps a slot per spec. */
+  /** The committed spec of EVERY class (the HUD hands in `IWorld.talentSpec`,
+   *  which both worlds fill for every class; the name predates its wider use).
+   *  The redesigned Paladin bar swaps a slot per spec, and the melee-reach
+   *  question below reads a druid's 'feral' from the same field. */
   paladinSpec?: string | null;
+  /** The player's class. Paired with `paladinSpec` it answers the attacker half
+   *  of the melee-reach question (sim/combat/feral_reach.ts), so the bar's
+   *  out-of-range tint agrees with the server's range gate for a feral druid. */
+  playerClass?: PlayerClass | null;
   /** Fate Threads attached to this Warlock's primary Evil Eye, 0 to 3. */
   fateThreads?: number;
   entities: Iterable<OwnedDominionServant>;
@@ -307,6 +321,11 @@ export interface ActionBarSlotState {
    *  NEVER shed by a graphics tier. */
   procGlow: boolean;
   empowered: boolean;
+  /** An armed Nature's Boon window names this ability (sim/combat/
+   *  druid_natures_boon.ts): the slot wears a golden rim so the three spells
+   *  the window pays for are readable at a glance. Actionable information, so
+   *  it is never gated by a graphics tier. */
+  naturesBoonGlow: boolean;
   /** This ability will consume one Ascension charge if used now. Kept
    *  separate from generic empowerment so the painter can show an explicit
    *  cost marker instead of relying on glow alone. */
@@ -353,6 +372,7 @@ export function makeSlotState(): ActionBarSlotState {
     aiming: false,
     procGlow: false,
     empowered: false,
+    naturesBoonGlow: false,
     ascensionSpender: false,
     ascensionCostLabel: '',
     fateConsumeReady: false,
@@ -392,7 +412,16 @@ function hasEmpoweringAura(
 ): boolean {
   if (!auras) return false;
   for (const aura of auras) {
-    if (auraCanEmpowerAbility(aura, ability)) return true;
+    if (!auraCanEmpowerAbility(aura, ability)) continue;
+    // Nature's Boon is the one empower aura whose scope is narrowed further by
+    // the druid's FORM: its bear-only member (Oakhide) is refused out of Bruin
+    // Form by the cast gate AND by the free-cost tail, so the empowered
+    // highlight has to ask the same predicate. Without this the bar promises a
+    // free Oakhide to a Cat Form druid that the sim then refuses, which is the
+    // exact affordance-versus-behavior split the passive's form gate exists to
+    // avoid. Keyed on the aura id so no other empower aura changes behavior.
+    if (aura.id === NATURES_BOON_ID && !naturesBoonFormAllows(auras, ability.def.id)) continue;
+    return true;
   }
   return false;
 }
@@ -439,6 +468,13 @@ export function createActionBarView(
     tick(world: ActionBarWorldInput): ActionBarState {
       const { player, target } = world;
       const tgtDist = target !== null && !target.dead ? dist2d(player.pos, target.pos) : null;
+      // The attacker half of every range question below. Built once per tick
+      // and handed to effectivePlayerAttackRange so the bar's out-of-range
+      // tint answers exactly what the server's range gate will.
+      const reachActor: MeleeReachActor = {
+        cls: world.playerClass ?? null,
+        spec: world.paladinSpec ?? null,
+      };
       const ruin = ruinAmountFromAuras(player.auras);
       let dominionComposition: number | null = null;
       let soulFragments = 0;
@@ -490,10 +526,13 @@ export function createActionBarView(
           slot.rechargePercent = 0;
           slot.usable = true;
           slot.outOfRange =
-            tgtDist !== null && target !== null && tgtDist > effectivePlayerAttackRange(target, 0);
+            tgtDist !== null &&
+            target !== null &&
+            tgtDist > effectivePlayerAttackRange(target, 0, reachActor);
           slot.queued = player.autoAttack;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.naturesBoonGlow = false;
           slot.ascensionSpender = false;
           slot.ascensionCostLabel = '';
           slot.fateConsumeReady = false;
@@ -527,6 +566,7 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.naturesBoonGlow = false;
           slot.ascensionSpender = false;
           slot.ascensionCostLabel = '';
           slot.fateConsumeReady = false;
@@ -566,6 +606,7 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.naturesBoonGlow = false;
           slot.ascensionSpender = false;
           slot.ascensionCostLabel = '';
           slot.fateConsumeReady = false;
@@ -604,6 +645,7 @@ export function createActionBarView(
           slot.queued = false;
           slot.procGlow = false;
           slot.empowered = false;
+          slot.naturesBoonGlow = false;
           slot.ascensionSpender = false;
           slot.ascensionCostLabel = '';
           slot.fateConsumeReady = false;
@@ -752,7 +794,7 @@ export function createActionBarView(
           def.requiresTarget &&
           tgtDist !== null &&
           target !== null &&
-          (tgtDist > effectivePlayerAttackRange(target, def.range) ||
+          (tgtDist > effectivePlayerAttackRange(target, def.range, reachActor) ||
             (def.minRange !== undefined && tgtDist < def.minRange));
         slot.queued = player.queuedOnSwing === def.id;
         // Spec resources/procs share pure sim predicates so the bar and combat
@@ -788,6 +830,7 @@ export function createActionBarView(
           priestActionGlowActive(player.auras ?? [], def.id) ||
           sunVerdictAbilityGlowActive(target?.auras, player.id, def.id) ||
           (def.id === 'divine_ascension' && ascensionReady);
+        slot.naturesBoonGlow = naturesBoonArmedFor(player.auras, def.id);
         slot.empowered =
           reflectionReady ||
           hasEmpoweringAura(player.auras, ability) ||

@@ -91,6 +91,75 @@ composition; tier 1 keeps ONE signature beat per motif (halved counts, lite
 audio) and sheds decals and lingers; tier 2 keeps color-only minimal particles
 and never reaches the sequencer.
 
+## The Warrior kit (authored physical presentation)
+
+The Warrior is the first class whose whole kit is authored rather than
+gallery-derived. It lives beside the generic engine, never inside it, and is
+selected by ability id only:
+
+- **Selection.** `../warrior_vfx_specs.ts` builds `WARRIOR_VFX_FULL_SPECS` /
+  `WARRIOR_VFX_SPECS` from `WARRIOR_CHOREOGRAPHY` (one `PhysicalChoreography`
+  per ability: shape, reach, beats, material, weapon) layered over the
+  GENERATED gallery row (`ABILITY_VFX_FULL_SPECS[id]`) plus the small
+  `WARRIOR_FILLER` table in `../warrior_base_profiles.ts`. The registry
+  (`../ability_vfx_registry.ts`) consults the warrior tables FIRST, so a new
+  authored class kit registers there the same way and must never shadow
+  another class's id (pinned by `tests/warrior_release_scope.test.ts` against
+  the committed `tests/helpers/ability_vfx_snapshot.json`; regenerate that
+  snapshot only for a deliberate, reviewed spec change:
+  `npx tsx scripts/ability_vfx_snapshot.ts --write`).
+- **Never touch the actionable reads.** The terrain-draped area ring keeps the
+  generated `rg` for every warrior AoE and shout and draws whenever a point
+  event carries a radius, on every tier, cold or refused (the `areaTelegraph`
+  helper beside `spawnRing`; `tests/warrior_area_telegraph.test.ts`). Authored
+  ground figures (`warrior_area*.ts`, `warrior_ground_*.ts`, `warrior_leap*.ts`)
+  are additions to that read, never substitutes: they yield to pools, tiers and
+  the cast gate, the ring does not.
+- **Ownership / admission protocol.** `painter.ts` claims a warrior event by
+  ability id and returns `true` only when an authored contact actually played
+  (`onDamage` for the blade families in `warrior_blades.ts`, the crush and
+  steel contacts, the hammer). The renderer skips the generic hit flinch and
+  melee spark on `true`, so every authored contact MUST play a victim-side
+  response of its own (`../characters/warrior_contact_recoil.ts`,
+  `warrior_area_receiving_contact.ts`, `warrior_ground_receiving_contact.ts`).
+  A cold kit (unprepared geometry, refused sequence, tier 2) returns
+  `undefined` and the generic path runs unchanged;
+  `tests/warrior_blade_contact_ownership.test.ts` pins both arms, local and
+  remote.
+- **Timing is presentation-side.** The sim resolves every warrior instant on the
+  cast tick (`src/sim/combat/warrior_harvest.ts` emits the opening cue, then
+  the strikes carry `attackAnimationStarted`). The contact beats come from
+  `src/game/fury_audio_core.ts` (`FURY_AUDIO.<id>.times`, one table shared by
+  audio, contacts and the HUD's beat-staged combat text): Red Harvest's three
+  damage events are folded by `harvest_detonation.ts` and its detonation is
+  staged to the final beat on the painter's frame clock (`advance(host, dt)`),
+  flushed early only for a caster whose opening was never seen (remote
+  catch-up) or on a recast. Never move a beat into the sim to "match" a clip.
+- **Families.** Choreography per ability (`*_choreography.ts`, `steel_sweep.ts`,
+  `breachmaker.ts`), shapes as pure geometry (`*_shape.ts`, `*_shapes.ts`,
+  `physical_choreography_core.ts`, `signature_core.ts`, registered
+  RENDER_PURE_CORES), materials (`*_material.ts`, `blood_film_material.ts`),
+  atlases and contact assets (`*_atlas.ts`, `contact_assets.ts`,
+  `production_assets.ts`, WebP/KTX2 only, never raw PNG in `public/`), state
+  readouts (`warrior_fury_states.ts`, `warrior_readiness*.ts`,
+  `warrior_attention*.ts`, `warrior_control*.ts`), and prewarm
+  (`active_kit_prewarm.ts`, `crest_prewarm.ts`, `guard_prewarm.ts`,
+  `baked_pool_prewarm.ts`) registered through the renderer's manifest entry.
+  The kit's textures (`production_assets.ts`, `contact_assets.ts`: nine baked
+  sheets, three contact sheets, the material maps, the fragment GLB) never ride
+  the deferred preload lane: `ensureWarriorKitAssets` loads them once, on
+  demand, when a local Warrior enters or the painter first sees a remote one
+  (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
+  on constrained-memory devices, where the kit stays cold and the generic
+  presentation runs (`tests/warrior_kit_assets.test.ts`,
+  `tests/active_kit_prewarm.test.ts`). Generic sheets (smoke, dust,
+  shockwave, the harvest splash) ship at 1024px; only signature sheets earn
+  2048px, and a new sheet needs the same justification.
+- **Cost rules still apply.** The shared families it extends (`ribbons.ts`
+  vertex budget, `flipbooks.ts` blending, `fx_textures.ts` overlay atlas) are
+  drawn by every class, so a change there is a change for every class: state
+  it in the PR body and show a before/after.
+
 Verification: `scripts/ability_vfx_probe.mjs` (dev server + headless browser)
 asserts every spec'd ability clears its per-archetype primitive bar in the
 real client via the dev-only `window.__game.abilityVfxStats` hook. All

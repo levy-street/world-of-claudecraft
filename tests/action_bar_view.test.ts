@@ -1898,3 +1898,56 @@ describe('actionBarView: watched proc glow from the Auras panel', () => {
     expect(view.tick(world()).slots[0].procGlow).toBe(false);
   });
 });
+
+describe("actionBarView: Nature's Boon is form-scoped in every highlight", () => {
+  // Regression (v0.44 feral pass): the rim asked naturesBoonFormAllows but the
+  // generic `empowered` highlight did not, so a Cat Form druid holding an armed
+  // window saw Oakhide lit as a free cast that combat/empower_next.ts then
+  // refused. Both flags must answer the same question, in both forms, or the bar
+  // promises something the sim will not honour.
+  const boonAura = {
+    id: 'natures_boon',
+    kind: 'next_cast_free',
+    empowerAbilities: ['rejuvenation', 'barkskin'],
+  } as const;
+  const oakhide = () => slot(4, { ability: ability('barkskin', { cost: 120 }) });
+  const wildbloom = () => slot(5, { ability: ability('rejuvenation', { cost: 100 }) });
+
+  it('refuses both highlights on the bear-only member out of Bruin Form', () => {
+    const view = createActionBarView(descriptor(oakhide(), wildbloom()), fakeDeps());
+    const slots = view.tick(world({ auras: [{ ...boonAura }, { kind: 'form_cat' }] })).slots;
+    // Oakhide: dark on BOTH flags, because the window will not pay for it here.
+    expect(slots[0].naturesBoonGlow).toBe(false);
+    expect(slots[0].empowered).toBe(false);
+    // Wildbloom is not bear-scoped, so the same window still lights it in Cat
+    // Form. Without this arm the test would pass on a gate that darkens the
+    // whole window rather than just its bear-only member.
+    expect(slots[1].naturesBoonGlow).toBe(true);
+    expect(slots[1].empowered).toBe(true);
+  });
+
+  it('lights both highlights on the bear-only member in Bruin Form', () => {
+    const view = createActionBarView(descriptor(oakhide(), wildbloom()), fakeDeps());
+    const slots = view.tick(world({ auras: [{ ...boonAura }, { kind: 'form_bear' }] })).slots;
+    expect(slots[0].naturesBoonGlow).toBe(true);
+    expect(slots[0].empowered).toBe(true);
+    expect(slots[1].naturesBoonGlow).toBe(true);
+    expect(slots[1].empowered).toBe(true);
+  });
+
+  it('leaves an unrelated empower aura alone', () => {
+    // The fix is keyed on the Nature's Boon aura id, so an ordinary scoped
+    // empower aura over the same ability still empowers in any form.
+    const view = createActionBarView(descriptor(oakhide()), fakeDeps());
+    const slots = view.tick(
+      world({
+        auras: [
+          { id: 'clearcasting', kind: 'next_cast_free', empowerAbilities: ['barkskin'] },
+          { kind: 'form_cat' },
+        ],
+      }),
+    ).slots;
+    expect(slots[0].empowered).toBe(true);
+    expect(slots[0].naturesBoonGlow).toBe(false);
+  });
+});

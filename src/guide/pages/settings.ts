@@ -275,6 +275,12 @@ const SETTING_ROWS: SettingRow[] = [
     impact: 'light',
   },
   {
+    setting: 'hudChrome.options.frameRateCap',
+    where: [GFX, 'hudChrome.options.gfxSectionSystem'],
+    body: 'guide.settingsPage.rowFrameRateCap',
+    impact: 'heavy',
+  },
+  {
     setting: 'hudChrome.options.interfaceMode',
     where: [GFX, 'hudChrome.options.gfxSectionSystem'],
     body: 'guide.settingsPage.rowInterfaceMode',

@@ -9995,7 +9995,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Giok',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Peringatan Berkode Warna',
-  'hudChrome.perf.title': 'Lapisan Performa',
+  'hudChrome.perf.overlaySection': 'Lapisan Performa',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',
@@ -11335,7 +11335,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Hujan dan salju sekitar. Hanya atmosfer saja, dan mematikannya akan menghemat sedikit saat terjadi badai.',
   'guide.settingsPage.tableFoot':
-    'Mencari batas FPS? Tidak ada yang perlu dicari: laju bingkai mengikuti layarmu. Jarak gambar adalah tombol tersendiri, Jarak Pandang, di kartu Detail Dunia, dan setiap prasetel menyetelnya untukmu sampai kamu sendiri menggesernya.',
+    'Jarak gambar adalah tombol tersendiri, Jarak Pandang, di kartu Detail Dunia, dan setiap prasetel menyetelnya untukmu sampai kamu sendiri menggesernya.',
   'guide.settingsPage.tableHeading': 'Setiap opsi grafik, dijelaskan',
   'guide.settingsPage.tagReload': 'tekan Terapkan',
   'guide.settingsPage.value100': '100%',

@@ -927,6 +927,12 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.loot.bindConfirmTitle': '拾取後綁定',
   'hudChrome.loot.bindConfirmBody':
     '這批戰利品中有一件物品在拾取後將與你綁定。綁定的物品只能在限定時間內交易給共同獲得該掉落的玩家。',
+  'hudChrome.lootQuality.ordinary': '普通',
+  'hudChrome.lootQuality.superior': '優良',
+  'hudChrome.lootQuality.exceptional': '卓越',
+  'hudChrome.lootQuality.magnificent': '華麗',
+  'hudChrome.lootQuality.transcendent': '超凡',
+  'hudChrome.lootQuality.tooltip': '{quality}：+{levels} 物品等級。強化後仍會保留。',
   'hudChrome.itemTooltip.requiresLevel': '需要等級 {level}',
   'hudChrome.spellbook.addToBarAria': '將 {name} 加入動作列',
   'hudChrome.spellbook.removeFromBarAria': '將 {name} 從動作列移除',
@@ -1680,7 +1686,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.notes.minorForClass': '對你的職業助益甚微。',
   'hudChrome.statInfo.notes.baseChance': '包含所有冒險者共享的 5% 基礎機率。',
   'hudChrome.statInfo.notes.dpsApprox': '此為估計值，不計入暴擊與技能傷害。',
-  'hudChrome.perf.title': '效能監視器',
+  'hudChrome.perf.title': '效能',
+  'hudChrome.perf.overlaySection': '效能監視器',
   'hudChrome.perf.enable': '顯示效能監視器',
   'hudChrome.perf.description': '選擇要顯示的數據、監視器的位置及其外觀。',
   'hudChrome.perf.sectionPosition': '位置',
@@ -1756,6 +1763,14 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bugReport.tooLarge': '此回報過大，無法傳送。請移除截圖後重試。',
   'hudChrome.bugReport.rateLimited': '你最近已傳送多份回報。請稍候再傳送。',
   'hudChrome.bugReport.failed': '無法傳送錯誤回報。請重試。',
+  'hudChrome.hostDiag.title': '系統報告',
+  'hudChrome.hostDiag.intro':
+    '將這台電腦的詳細資訊(包括占用最多處理器與記憶體的程式)收集到一個檔案中，協助診斷效能問題。不會傳送任何內容：該檔案只保存在你的電腦上。',
+  'hudChrome.hostDiag.create': '產生系統報告',
+  'hudChrome.hostDiag.running': '正在收集系統資訊...',
+  'hudChrome.hostDiag.saved': '報告已儲存為 {fileName}。',
+  'hudChrome.hostDiag.savedNoName': '報告已儲存。',
+  'hudChrome.hostDiag.failed': '無法建立報告。請再試一次。',
   'hudChrome.keybinds.emoteWheel': '表情輪盤',
   'hudChrome.keybinds.sheathe': '收起/拔出武器',
   'hudChrome.keybinds.hideInterface': '隱藏介面',
@@ -1817,6 +1832,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.forceHighPerfGpu': '使用獨立遊戲顯示卡',
   'hudChrome.options.forceHighPerfGpuNote':
     '預設開啟：桌面版會向本機要求使用獨立遊戲顯示卡。若遊戲無法啟動、啟動後黑屏，或筆記型電腦螢幕沒有畫面，請關閉此選項。此設定會在下次啟動遊戲時生效。',
+  'hudChrome.options.frameRateCap': '影格率上限',
+  'hudChrome.options.frameRateCapAuto': '自動',
+  'hudChrome.options.frameRateCapDisplay': '顯示器',
+  'hudChrome.options.frameRateCapNote':
+    '限制遊戲每秒繪製的畫面數量。如果電腦跟不上顯示器的速度，較低的上限會讓畫面更平穩，也能讓電腦更涼爽。上限會跟隨你的顯示器，因此實際數值可能與數字略有不同。自動：僅當這台電腦跟不上顯示器時才降低上限，之後保持穩定（建議）。顯示器：不限制。',
+  'hudChrome.options.frameRateCapStatusPaced': '正在 {hz} Hz 的顯示器上每秒繪製 {fps} 幀。',
+  'hudChrome.options.frameRateCapStatusUnpaced': '限制為每秒 {fps} 幀。',
+  'hudChrome.options.frameRateCapStatusInert':
+    '此顯示器的更新率已不高於該上限，因此上限不會帶來任何變化。',
   'hudChrome.options.shaderWarm': '著色器預熱工作執行緒',
   'hudChrome.options.shaderWarmAuto': '自動',
   'hudChrome.options.shaderWarmOff': '關閉',
@@ -2407,6 +2431,11 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'character.inWorld': '在世界中',
   'character.takeOver': '接管',
   'character.inWorldHint': '已在世界中。請在別處登出，或接管工作階段。',
+  'character.currentLocation': '目前位置：{zone}',
+  'character.lockouts': '鎖定（{count}）',
+  'character.lockoutRaids': '團隊副本',
+  'character.lockoutDungeons': '地城',
+  'character.lockoutWorldBosses': '世界首領',
   'character.takeOverConfirm': '這會使該角色從另一個工作階段中斷並切換到此處。是否繼續？',
   'character.renameRequired': '需要更名',
   'character.delete': '刪除',
@@ -2761,6 +2790,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.system.deathRecapDrowned': '你已經死亡。你溺死了。',
   'hud.system.deathRecapCauterized': '你已經死亡。灼燒術的烈焰吞噬了你。',
   'hud.system.respawn': '你再次感到精力恢復、身體完整。',
+  'hud.system.respawnKeeperToll':
+    '靈魂醫者復活了你，但你因此變得虛弱：在復活後遺症消退之前，你的所有屬性都會被削弱。',
   'hud.system.ignoringChat': '已封鎖來自 {name} 的聊天。',
   'hud.system.noLongerIgnoring': '不再封鎖 {name}。',
   'hud.system.playerNotNearby': '該玩家不在附近。',
@@ -2793,6 +2824,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresForm': '你必須處於{form}形態。',
   'hud.errors.bear': '巨熊',
   'hud.errors.cat': '貓',
+  'hud.errors.bearOrCat': '巨熊或貓',
   'hud.errors.travel': '迅捷',
   'hud.errors.cantInForm': '{form}形態下無法這樣做。',
   'hud.errors.shapeshifted': '變形狀態下不能這樣做。',
@@ -3047,6 +3079,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.energy': '能量',
   'abilityUi.forms.bear': '巨熊',
   'abilityUi.forms.cat': '貓',
+  'abilityUi.forms.bearOrCat': '巨熊或貓',
   'abilityUi.cast.fishing': '釣魚',
   'abilityUi.cast.gathering': '採集',
   'abilityUi.cast.thunzharrStormcall': '風暴召喚',
@@ -4402,7 +4435,20 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '靈魂醫者可以就地復活你，但復活虛弱會使你的全部屬性降低75%，高等級時最長持續10分鐘。讓靈魂返回屍體復活則沒有任何懲罰。',
   'hudChrome.death.healerConfirmAccept': '復活',
   'hudChrome.death.healerConfirmCancel': '取消',
+  'hudChrome.death.keeperTalkTitle': '靈魂醫者',
+  'hudChrome.death.keeperTalkAccept': '復活',
+  'hudChrome.death.keeperTalkLeave': '離開',
+  'hudChrome.death.keeperConfirmSparedTitle': '讓靈魂醫者復活你？',
+  'hudChrome.death.keeperTalkBody':
+    '我可以讓你就地復活，但代價隨之而來：復活後遺症會使你的所有屬性降低75%，等級越高持續越久，最長10分鐘。讓你的靈魂跑回倒下的地方復活則沒有任何懲罰。',
+  'hudChrome.death.keeperTalkSparedBody':
+    '我可以讓你就地復活。通常這會附帶復活後遺症，讓你的一切在一段時間內變得虛弱，但你初來乍到，所以我會免去你的代價。無論如何，讓你的靈魂跑回倒下的地方復活都沒有任何懲罰。',
+  'hudChrome.death.keeperConfirmBody':
+    '確定嗎？靈魂醫者會復活你，但你會因此變得虛弱：復活後遺症會使你的所有屬性降低75%，直到它消退，等級越高持續越久，最長10分鐘。',
+  'hudChrome.death.keeperConfirmSparedBody':
+    '確定嗎？靈魂醫者會在此復活你。你還不到10級，所以這次復活後遺症不會削弱你。',
   'hudChrome.death.spiritHealerAlive': '靈魂醫者只看護逝者。你仍是生者。',
+  'hudChrome.death.ghostHint': '跑回你死亡的地點，或與靈魂醫者交談以復活',
   'entities.npcs.spirit_healer.name': '靈魂醫者',
   'entities.npcs.spirit_healer.title': '亡者的守護者',
   'entities.npcs.spirit_healer.greeting':
@@ -4961,6 +5007,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_tarn_waders.objectives.0.label': '微光湖涉者已被擊殺',
   'entities.zones.eastbrook_vale.name': '東溪谷',
   'entities.zones.eastbrook_vale.welcome': '去鎮上找雷德布魯克元帥，他有任務交給你。',
+  'entities.zones.eastbrook_vale.welcomeDone':
+    '雷德布魯克元帥已沒有任務交給你了 - 這座你踏上旅途的古樸海濱小鎮因你而安寧。',
   'entities.zones.eastbrook_vale.pois.0.label': '東溪',
   'entities.zones.eastbrook_vale.pois.1.label': '狼徑',
   'entities.zones.eastbrook_vale.pois.2.label': '野豬草地',
@@ -4971,6 +5019,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.eastbrook_vale.pois.7.label': '倒塌禮拜堂',
   'entities.zones.mirefen_marsh.name': '泥沼濕地',
   'entities.zones.mirefen_marsh.welcome': '到芬橋大門向守望者芬威克報到。',
+  'entities.zones.mirefen_marsh.welcomeDone':
+    '守望者芬威克已沒有命令交給你了 - 這處沼澤濕地深處的聚落因你而更加安全。',
   'entities.zones.mirefen_marsh.pois.0.label': '芬橋',
   'entities.zones.mirefen_marsh.pois.1.label': '潛伏者蘆葦地',
   'entities.zones.mirefen_marsh.pois.2.label': '深沼淺灘',
@@ -4981,6 +5031,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.zones.mirefen_marsh.pois.7.label': '沉沒堡壘',
   'entities.zones.thornpeak_heights.name': '荊峰高地',
   'entities.zones.thornpeak_heights.welcome': '瑟薩莉隊長勉強守住高望城牆。',
+  'entities.zones.thornpeak_heights.welcomeDone':
+    '瑟薩莉隊長守衛著高望城牆 - 從來都不輕鬆，但有了像你這樣的冒險者相助，如今總算應付得來。',
   'entities.zones.thornpeak_heights.pois.0.label': '高望',
   'entities.zones.thornpeak_heights.pois.1.label': '潛獵者山脊',
   'entities.zones.thornpeak_heights.pois.2.label': '深岩洞穴',
@@ -6990,8 +7042,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '移除介面動畫，讓視窗立即出現。首先是無障礙選項，順帶帶來少許效能提升。',
   'guide.settingsPage.rowPerfOverlay':
     '在畫面上即時顯示 FPS、影格時間等數據。調整本頁設定時先開著，調完再關掉。',
+  'guide.settingsPage.rowFrameRateCap':
+    '遊戲每秒繪製畫面數量的上限。跟不上顯示器的電腦會落入不均勻的節奏；穩定的 30 看起來比那更流暢，工作量減半，電腦也更涼爽。「顯示器」表示不限制。',
   'guide.settingsPage.tableFoot':
-    '在找幀數上限？沒什麼可找的：畫面節奏跟隨你的顯示器。繪製距離是一個獨立的旋鈕，即世界細節卡片中的「視野距離」，每個預設都會替你設定它，直到你親自調動為止。',
+    '繪製距離是一個獨立的旋鈕，即世界細節卡片中的「視野距離」，每個預設都會替你設定它，直到你親自調動為止。',
   'guide.settingsPage.mobileTitle': '在手機與平板上',
   'guide.settingsPage.mobileBody':
     '在手機或平板上，遊戲會讓你從 Low 起步。所有觸控裝置首次啟動時都會落在這一檔，這是刻意為之，好讓你進入世界開始遊玩；隨時可以在圖形面板中自行調高。在 Android 瀏覽器上整條階梯都向你敞開，你的選擇也會保留。在 iPhone 和 iPad 上你依然可以選擇最高的幾檔預設，按下「套用」後它們會立即生效，但遊戲會在你下次啟動時把你退回 High，因為 iOS 可能在建構這麼大的場景時終止分頁。下載的應用程式更為收緊：它的預設列表止於 High，各項系統旋鈕也被隱藏，因為應用程式會自行管理它們。',
@@ -9019,6 +9073,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'desktop.crash.reload': '重新載入',
   'desktop.crash.quit': '離開',
   'desktop.titlebar.exitGame': '離開遊戲',
+  'desktop.hostDiag.saveTitle': '儲存系統報告',
+  'desktop.hostDiag.saveButton': '儲存',
+  'desktop.hostDiag.fileType': 'JSON 檔案',
   'desktop.crash.fatalBody': 'World of ClaudeCraft 發生未預期的錯誤，必須關閉。',
   'gpuNotice.bodyDesktop':
     '遊戲目前在沒有 GPU 加速的情況下執行，會非常緩慢。請更新顯示卡驅動程式後重新啟動遊戲。在 Windows 上，還請在 設定 > 系統 > 顯示器 > 顯示卡 中將本遊戲設為「高效能」。',
@@ -11269,6 +11326,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影躍蟾蜍卡瑪影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天風暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龍喉迅猛龍',
+  'hudChrome.mounts.name_avian_strider': '蒼翠谷行者',
   'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
@@ -11276,6 +11334,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_mech_bird': '發條機械鳥',
   'hudChrome.mounts.desc_mech_bird':
     '一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。',
+  'hudChrome.mounts.desc_avian_strider':
+    '高大的坐騎巨鳥，粗壯的利爪與收攏的雙翼讓每一段旅程都化作雷鳴般的疾馳。',
   'hudChrome.mounts.desc_lanternback_troll':
     '被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。',
   'hudChrome.mounts.desc_chimeglass_tortoise':
@@ -11391,11 +11451,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   // Unstuck recovery (M16 non-Latin fills).
   'hudChrome.unstuck.helpUnstuckSickness':
     '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。你將帶著脫困虛弱，最多持續 5 分鐘。',
+  'hudChrome.unstuck.helpUnstuckWindow':
+    '脫困：/unstuck 會啟動原地倒數，結束後將你移動到最近的墓地，若你已倒下則會復活你。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，你將帶著脫困虛弱，最多持續 5 分鐘。',
   'hudChrome.unstuck.menuButton': '脫困',
   'hudChrome.unstuck.help': '脫困：/unstuck 會啟動原地倒數，之後將你移動到附近可到達的安全位置。',
   'hudChrome.unstuck.helpAtGraveyard':
     '脫困：/unstuck 會啟動原地倒數，結束後將你的靈魂送往最近的墓地。你必須向靈魂醫者接受守護者的代價才能復活。',
   'hudChrome.unstuck.movedToGraveyard': '你已被移動到最近的墓地。脫困虛弱正壓在你身上。',
+  'hudChrome.unstuck.movedToGraveyardFree':
+    '你已被移動到最近的墓地。一小時內再次使用脫困將讓你帶上脫困虛弱。',
+  'hudChrome.unstuck.revivedAtGraveyardFree':
+    '你已被移動到最近的墓地並復活。一小時內再次使用脫困將讓你帶上脫困虛弱。',
   'hudChrome.unstuck.revivedAtGraveyardUnstuck':
     '你已被移動到最近的墓地並復活。脫困虛弱正壓在你身上。',
   'hudChrome.unstuck.started':
@@ -12163,6 +12229,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.reins_terrorspark_groundshaker.name': '駭雷撼地者點火鑰匙',
+  'entities.items.reins_avian_strider.name': '蒼翠谷行者的韁繩',
   'entities.items.reins_lanternback_troll.name': '點燈人之軛：格倫博',
   'entities.items.reins_chimeglass_tortoise.name': '守道人的鈴帶：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力車縛繩',
@@ -14193,6 +14260,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.combat.threatTitle': '敵人會打誰',
   'guide.combat.unstuckBody':
     '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。代價是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
+  'guide.combat.unstuckBodyWindow':
+    '若這個世界把你困在某個出不去的地方，請輸入 /unstuck。你必須脫離戰鬥並原地站定，不能被昏迷或定身控制，也不能身處決鬥或競技場對戰中：接著會跑一段短短的倒數，移動或受到傷害都會中斷它。倒數結束後，你會被放置在最近的墓地。它從不會殺死你，也不會留下屍體，而若你當時已經倒下，它會就地將你扶起。一小時內的首次使用不付任何代價。若在上次使用後一小時內再次使用，代價便是脫困虛弱：一種對你全身上下的暫時削弱，等到你能再次使用這道指令時它早已消退，而且和守護者的代價一樣，全新的角色可完全免除。',
   'guide.combat.unstuckTitle': '當你真的卡住時',
   'guide.commandsPage.abilities': '你已學會的技能。',
   'guide.commandsPage.afk':
@@ -14319,6 +14388,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.commandsPage.unknownHeading': '如果某道指令沒有作用',
   'guide.commandsPage.unstuck':
     '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。之後你會帶著脫困虛弱一陣子，所以它是最後手段，而不是抄近路的辦法。',
+  'guide.commandsPage.unstuckWindow':
+    '當這個世界把你困住時的出路。原地站定撐過一段短短的倒數，你就會被移動到最近的墓地，若你已經倒下，還會在那裡被扶起。一小時內的首次使用不付代價。若在上次使用後一小時內再次使用，之後你會帶著脫困虛弱一陣子，所以它是救援手段，而不是抄近路的辦法。',
   'guide.commandsPage.where': '你所站的區域、它的等級範圍，以及你的座標。',
   'guide.commandsPage.whisper':
     '向一位在線的玩家發送私訊。只要不會與別人混淆，你輸入的大小寫怎麼寫都能對上他的名字。',
@@ -14503,6 +14574,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.glossary.toolCharmTerm': '工具符物',
   'guide.glossary.unstuckDef':
     '從遊戲選單使用「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地，而此後一段時間你會帶著一份暫時的虛弱。',
+  'guide.glossary.unstuckDefWindow':
+    '一小時內不只一次倚賴遊戲選單「脫困」所付出的代價。在倒數期間站著不動，它就會把你放到最近的墓地。一小時內的首次使用不付代價，而在上次使用後一小時內再次使用，此後一段時間你還會帶著一份暫時的虛弱。',
   'guide.glossary.unstuckTerm': '脫困虛弱',
   'guide.glossary.warfareDef':
     '玩家對戰的裝備那一面。軍需官以榮譽販售整套戰爭護甲，而它們所帶的戰爭等級，只在對抗其他玩家的戰鬥中計算。',
@@ -15561,6 +15634,15 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.thornhollowPage.backfillNote':
     '接下遞補的席位是刻意不帶風險的：你落入的是一份與你無關的比分，因此無論勝負，這場比賽都不會觸動你的戰場評分，中途離開也不欠任何代價。當一場比賽已接近尾聲、新來者再也無法改變結果時，邀請也就不再發出，所以你絕不會被安置進別人的結局裡。',
   'hudChrome.trade.windowClosed': '交易視窗已關閉。',
+  'hudChrome.trade.offerQuantityHint': '將詢問你要提供的數量',
+  'hudChrome.trade.offerQuantityTitle': '提供 {item}',
+  'hudChrome.trade.offerQuantityInput': '要提供的數量',
+  'hudChrome.trade.offerQuantityConfirm': '提供',
+  'hudChrome.trade.offerQuantityAll': '全部提供',
+  'hudChrome.trade.offerRemoveTitle': '移除 {item}',
+  'hudChrome.trade.offerRemoveInput': '要移除的數量',
+  'hudChrome.trade.offerRemove': '移除',
+  'hudChrome.trade.offerRemoveAll': '全部移除',
   'hudChrome.trade.woc.hintInsufficientBalance': '這超出了你已連接錢包持有的 $WOC 數量。',
   'hudChrome.trade.woc.priceLabel': '價格（美元）',
   'hudChrome.trade.woc.equivalent': '按目前匯率約為 {tokens} $WOC',

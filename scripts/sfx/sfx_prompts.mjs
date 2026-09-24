@@ -18,7 +18,11 @@
 // single-event, "no music, no speech" where it matters. Footsteps/impacts are ONE
 // hit (the engine pitch-randomizes and alternates to avoid repetition).
 
+import { FURY_SFX } from './fury_sfx.mjs';
 import { UI_SFX_CATALOG } from './ui_sfx.mjs';
+import { WARRIOR_CONTACT_SFX } from './warrior_contact_sfx.mjs';
+import { WARRIOR_FALLBACK_SFX } from './warrior_fallback_sfx.mjs';
+import { WARRIOR_VOICE_SFX } from './warrior_voice_sfx.mjs';
 
 // UI cues in the baked-tone generator's list that already have a real
 // recording dropped in over the synth placeholder (see gen_ui_sfx.mjs's
@@ -84,6 +88,10 @@ const mob = (family, who, aggro, attack, death, hurt, idle) => {
 };
 
 export const SFX = [
+  ...FURY_SFX,
+  ...WARRIOR_CONTACT_SFX,
+  ...WARRIOR_VOICE_SFX,
+  ...WARRIOR_FALLBACK_SFX,
   // --- Movement & footsteps -------------------------------------------------
   FOOT('foot_grass', 'on soft grass and dry leaves, light leather boot'),
   FOOT('foot_dirt', 'in wet mud and soft dirt, faint squelch'),
@@ -231,6 +239,42 @@ export const SFX = [
   },
   {
     key: 'mount_run_terrorspark_groundshaker_stop',
+    custom: true,
+  },
+  {
+    // The Viridian Valestrider's summon call: an authored bird cry played once
+    // when the 1.5s summon channel completes and the mount appears.
+    // Sfx.mountSummon resolves `mount_summon_<key>` per mount and stays silent
+    // for a mount with no authored take, so the other mounts are unaffected.
+    key: 'mount_summon_avian_strider',
+    custom: true,
+  },
+  {
+    // The Valestrider's gait beat, six variants. Rotated per stride by playAt's
+    // variant pool, which is what stops a bird jogging past sounding like a
+    // metronome. This REPLACES the rider's own footsteps while mounted: it is
+    // part of the world mix and does not answer to the on-foot footstep toggle.
+    key: 'mount_run_avian_strider',
+    custom: true,
+  },
+  {
+    // Takeoff and touchdown, on the airborne edges.
+    key: 'mount_jump_avian_strider',
+    custom: true,
+  },
+  {
+    key: 'mount_land_avian_strider',
+    custom: true,
+  },
+  {
+    // Fired together at the APEX of a jump, not at takeoff: the bird calls out
+    // and beats its wings at the top of the arc. Two keys rather than one baked
+    // pair so the variants rotate independently and the mix can be tuned apart.
+    key: 'mount_squawk_avian_strider',
+    custom: true,
+  },
+  {
+    key: 'mount_flap_avian_strider',
     custom: true,
   },
   {

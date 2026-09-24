@@ -266,6 +266,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'aether_hover_cycle',
   'thunderstrut_gobbler',
   'drakemaw_raptor',
+  'avian_strider',
   'lanternback_troll',
   'terrorspark_groundshaker',
 ] as const;
@@ -283,8 +284,9 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
-// player acquisition path. Paid mount skins are deliberately absent here.
+// Drakemaw Raptor, Viridian Valestrider, Lanternback Troll and Dreadspark
+// Groundshaker have no player acquisition path. Paid mount skins are
+// deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending

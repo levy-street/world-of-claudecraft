@@ -525,6 +525,50 @@ reed, mushroom or log cell goes at 224 to 287 yd against a 340 yd fog) the objec
 already 48 to 76 percent blended into it, so the pop is fainter there than on the vista
 tiers, where it happens in clear air.
 
+### The Frame Rate Limit is a pacing choice, not a tier knob (2026-09-18)
+
+The Frame Rate Limit (`src/game/frame_cadence_core.ts`, the System card's `frameRateCap`
+option) renders on a divisor of the display's measured refresh rate: about 30 on a 60 Hz
+display is every second refresh. It is a new class in this document. It is not a tier
+knob (no ceiling is ever decided from the preset, and the preset never reads the limit;
+the preset only SCOPES what the automatic mode remembers, in
+`src/game/frame_cadence_auto_memory.ts`, because a verdict learned on Ultra must not be
+reused on Low) and it is not a governor
+bucket (it removes no richness itself; while the automatic mode is still forming a
+verdict it does hold the governor's RECOVERY, so richness the governor already shed
+stays shed a little longer, cosmetic only and bounded: a provisional hold ends within
+300 s of readable play, a probe within 90 frames, a probation within 120 s of
+readable play); it changes how often the whole picture is
+redrawn, exactly as a slower display would.
+
+Why it is fair. Nothing a player reads is hidden, thinned or delayed relative to the
+picture: the cast bar, the debuff strips, target and party health are all painted on
+every rendered frame, so they are as current as the world they sit on. The price is
+presentation latency, and it is bounded and stated: at most one chosen interval, 33 ms
+at a ceiling of 30 on a 60 Hz display, which is what a 30 Hz display costs and well
+inside the redraw tolerance above (about 200 ms). The limit never paces under 24 images
+per second (`MIN_CEILING_FPS`), which also keeps a rendered interval under the 50 ms
+input tick. Most of what a player DOES is not frame-paced at all: keyboard and mouse
+ability presses fire from the key event, and movement reaches the server as 50 ms wall-clock input ticks whatever the
+frame rate, so movement speed is identical on every machine and at every limit; only
+how soon a change of movement intent is noticed follows the rendered frame, which is
+the same one-interval bound. A gamepad is the exception: it has no events, its buttons
+are polled once per rendered frame (`gamepad.poll` in `frame()`), so a pad press is also
+noticed up to one chosen interval later, again what a slower display costs. A machine the limit is meant for already runs at that
+rhythm, unevenly; the limit makes it even.
+
+The automatic mode is measurement-driven by design, like the governor's sheds: it
+lowers the limit only on a machine that demonstrably misses its display's slots, and a
+player's explicit choice always wins over it. Once it has settled it holds: the limit
+then changes only on something the player did (a preset, the render scale, the display,
+the window's size class, choosing Auto again), downward when the rhythm in force is
+demonstrably missed, or through a small per-session budget of probes that last a few
+frames. The one gameplay reading it takes, `player.inCombat`, only ever POSTPONES or
+ABORTS a probe: a fight never changes what is drawn or when, it only keeps the automatic mode
+from spending frames during one (`src/game/frame_cadence_calm_core.ts`). The static-preset rule still holds in
+full for the HUD: the limit is never an input of `src/game/ui_effects_profile.ts` or
+`src/game/ui_tier_knobs.ts`, so no HUD knob can ever move with it.
+
 ## Enforcing guards
 
 - `tests/auras_painter.test.ts`: a debuff past the buff cap still renders; an all-debuff bar
@@ -707,6 +751,12 @@ tiers, where it happens in clear air.
   burst's length. Each band is also separated from the others on two axes at once, colour and
   motion signature (ring position, sprite shape, and the fear band's vertical bob), so the
   distinction survives for a colourblind player rather than resting on hue alone.
+
+- `tests/frame_cadence.test.ts`: the divisor tables, the 24 images per second floor and the
+  one-input-tick bound on every display rate, and that the limit yields to a loading cover,
+  a held world draw and a hidden desktop shell. `tests/frame_cadence_fairness.test.ts`: the
+  limit is never an input of the HUD tier resolvers, and the tier resolvers are never an
+  input of the limit.
 
 ## Resolved: negative-value stat-sap auras now classify as debuffs in both worlds
 

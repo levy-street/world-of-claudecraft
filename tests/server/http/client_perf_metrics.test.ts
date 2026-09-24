@@ -22,8 +22,10 @@ vi.mock('../../../server/db', () => ({
 import { insertClientPerfReport } from '../../../server/db';
 import { GL_BACKEND_LABELS } from '../../../server/gl_backend';
 import {
+  CLIENT_PERF_CADENCES,
   CLIENT_PERF_DEVICE_CLASSES,
   CLIENT_PERF_FPS_AVG_BUCKETS,
+  CLIENT_PERF_FRAME_CAPS,
   CLIENT_PERF_FRAME_P95_BUCKETS_SECONDS,
   CLIENT_PERF_GFX_TIERS,
   CLIENT_PERF_GPU_FAMILIES,
@@ -38,13 +40,16 @@ import {
   CLIENT_PERF_SUGGESTION_IDS,
   CLIENT_PERF_WORST10S_BUCKETS_SECONDS,
   type ClientPerfSample,
+  cadenceLabel,
   classifyClientPerfGpuFamily,
   classifyClientPerfScene,
   clientPerfMetricsSink,
+  frameCapLabel,
   noopClientPerfMetricsSink,
   registerClientPerfMetrics,
   setClientPerfMetricsSink,
   shaderWarmRefusalLabel,
+  WOC_CLIENT_CADENCE_REPORTS_TOTAL,
   WOC_CLIENT_RAW_SUMMARY_SHED_TOTAL,
   WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
@@ -70,6 +75,9 @@ function sample(overrides: Partial<ClientPerfSample> = {}): ClientPerfSample {
     suggestionIds: [],
     shaderWarmWorkerActive: true,
     shaderWarmRefusal: '',
+    frameCapIntent: 0,
+    cadenceDivisor: 1,
+    refreshHz: 60,
     desktopShell: false,
     rawSummary: {},
     ...overrides,
@@ -799,5 +807,91 @@ describe('woc_client_shader_warm_reports_total', () => {
         /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="ios-webkit"\} (\d+)$/m,
       ),
     ).toBe(0);
+  });
+});
+
+describe('woc_client_cadence_reports_total', () => {
+  const series = (frameCap: string, cadence: string): RegExp =>
+    new RegExp(
+      `^woc_client_cadence_reports_total\\{frame_cap="${frameCap}",cadence="${cadence}"\\} (\\d+)$`,
+      'm',
+    );
+
+  it('pins the series name and both label vocabularies as literals', () => {
+    expect(WOC_CLIENT_CADENCE_REPORTS_TOTAL).toBe('woc_client_cadence_reports_total');
+    expect([...CLIENT_PERF_FRAME_CAPS]).toEqual(['none', '30', '60']);
+    expect([...CLIENT_PERF_CADENCES]).toEqual(['full', 'reduced']);
+  });
+
+  it('zero-backfills the whole cross product at registration', async () => {
+    const registry = new Registry();
+    registerClientPerfMetrics(registry);
+
+    const text = await registry.metrics();
+    expect(text).toContain('# TYPE woc_client_cadence_reports_total counter');
+    expect((text.match(/^woc_client_cadence_reports_total\{[^}]*\}/gm) ?? []).length).toBe(6);
+    for (const frameCap of CLIENT_PERF_FRAME_CAPS) {
+      for (const cadence of CLIENT_PERF_CADENCES) {
+        expect(value(text, series(frameCap, cadence))).toBe(0);
+      }
+    }
+  });
+
+  it('counts a session with no ceiling as none and full', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample());
+
+    const text = await registry.metrics();
+    expect(value(text, series('none', 'full'))).toBe(1);
+    expect(value(text, series('none', 'reduced'))).toBe(0);
+  });
+
+  it('counts a paced 30 ceiling on a 60 Hz display as 30 and reduced', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample({ frameCapIntent: 30, cadenceDivisor: 2, refreshHz: 60 }));
+
+    const text = await registry.metrics();
+    expect(value(text, series('30', 'reduced'))).toBe(1);
+    expect(value(text, series('30', 'full'))).toBe(0);
+  });
+
+  it('counts the unpaced limiter as reduced: a ceiling with no display reading', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample({ frameCapIntent: 30, cadenceDivisor: 1, refreshHz: 0 }));
+
+    expect(value(await registry.metrics(), series('30', 'reduced'))).toBe(1);
+  });
+
+  it('keeps an inert ceiling full: 60 asked for on a 60 Hz display', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample({ frameCapIntent: 60, cadenceDivisor: 1, refreshHz: 59.9 }));
+
+    const text = await registry.metrics();
+    expect(value(text, series('60', 'full'))).toBe(1);
+    expect(value(text, series('60', 'reduced'))).toBe(0);
+  });
+
+  it('never reads an unknown display as reduced when no ceiling was asked for', () => {
+    expect(cadenceLabel({ frameCapIntent: 0, cadenceDivisor: 1, refreshHz: 0 })).toBe('full');
+    expect(frameCapLabel(45)).toBe('none');
+  });
+
+  it('increments once per gameplay report and skips benchmark reports', async () => {
+    const registry = new Registry();
+    const sink = registerClientPerfMetrics(registry);
+
+    sink.perfReportStored(sample({ source: 'benchmark', frameCapIntent: 30, cadenceDivisor: 2 }));
+    sink.perfReportStored(sample({ frameCapIntent: 30, cadenceDivisor: 2 }));
+    sink.perfReportStored(sample({ frameCapIntent: 30, cadenceDivisor: 2 }));
+
+    expect(value(await registry.metrics(), series('30', 'reduced'))).toBe(2);
   });
 });

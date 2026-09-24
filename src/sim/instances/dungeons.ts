@@ -44,6 +44,7 @@ import {
 import { updateIgnivarRaidProgression } from '../ignivar_raid_progression';
 import { PLAYER_BODY_RADIUS } from '../pathfind';
 import { cancelProfessionSessionOnDisplacement } from '../professions/session_teardown';
+import { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS } from '../raid_rooms';
 import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
@@ -300,23 +301,11 @@ export function heroicLockoutId(dungeonId: string): string {
   return `${dungeonId}:heroic`;
 }
 
-// The rooms whose lockouts run on the WEEKLY reset boundary, one lock per
-// difficulty (normal locks under the plain dungeon id, heroic under
-// heroicLockoutId): the Ignivar raid's two encounter rooms. Explicit by
-// maintainer ruling rather than derived from suggestedPlayers, so the older
-// Nythraxis arena deliberately keeps its shipped daily boundary.
-export const WEEKLY_LOCKOUT_RAID_ROOMS: ReadonlySet<string> = new Set([
-  'ignivar_raid_arena',
-  'ignivar_inner_crucible',
-]);
-
-// The raid boss rooms that keep the realm-DAILY boundary, by the same explicit
-// maintainer ruling. Every raid-tier room with a final boss must appear in
-// exactly one of these two sets: the at-the-door lock check below reads their
-// union, and the guard in tests/ignivar_weekly_lockout.test.ts fails any new
-// raid boss room that names neither, so a future room cannot silently ship on
-// an undeclared boundary.
-export const DAILY_LOCKOUT_RAID_ROOMS: ReadonlySet<string> = new Set(['nythraxis_boss_arena']);
+// The raid boss rooms and their reset boundaries live in the dependency-free
+// leaf src/sim/raid_rooms.ts (character select classifies lockout ids through
+// it without this module's instance machinery); re-exported here so every
+// existing consumer and test keeps its import.
+export { DAILY_LOCKOUT_RAID_ROOMS, WEEKLY_LOCKOUT_RAID_ROOMS };
 
 // The reset boundary a final-boss kill in this dungeon locks until: the weekly
 // boundary for the raid rooms above, the realm-daily boundary everywhere else.

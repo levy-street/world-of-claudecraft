@@ -148,6 +148,7 @@ const FRAME_EXEMPT: Record<string, string> = {
   'subzone-banner': 'transient subzone name fade',
   'death-overlay': 'death veil with the Release Spirit prompt, modal by design',
   'ghost-prompt': 'transient ghost-state prompt',
+  'ghost-hint': 'ghost-state top-of-screen line naming both ways back, pointer-inert',
   'interact-affordance':
     'transient nearby-interaction press-to-act prompt (farm_press_affordance_controller.ts drives its .is-shown class); positioned near the reticle, never standing chrome',
   'mount-race-strip': 'event-scoped race timer strip, hidden outside a race',

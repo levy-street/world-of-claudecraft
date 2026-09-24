@@ -9343,7 +9343,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perf.themes.jade': 'Jadeit',
   'hudChrome.perf.themes.mono': 'Mono',
   'hudChrome.perf.thresholds': 'Ostrzeżenia kodowane kolorami',
-  'hudChrome.perf.title': 'Nakładka wydajności',
+  'hudChrome.perf.overlaySection': 'Nakładka wydajności',
   'hudChrome.perf.units.hz': '{value} Hz',
   'hudChrome.perf.units.mb': '{value} MB',
   'hudChrome.perf.units.memPair': '{used} / {limit} MB',
@@ -10704,7 +10704,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Deszcz i śnieg w otoczeniu. Tylko atmosfera, a wyłączenie jej trochę oszczędza podczas burz.',
   'guide.settingsPage.tableFoot':
-    'Szukasz limitu FPS? Nie ma czego szukać: tempo klatek podąża za twoim ekranem. Zasięg rysowania to osobne pokrętło, Zasięg widzenia, w karcie Szczegóły świata, a każde ustawienie wstępne ustawia go za ciebie, dopóki sam go nie ruszysz.',
+    'Zasięg rysowania to osobne pokrętło, Zasięg widzenia, w karcie Szczegóły świata, a każde ustawienie wstępne ustawia go za ciebie, dopóki sam go nie ruszysz.',
   'guide.settingsPage.tableHeading': 'Każda opcja graficzna, objaśniona',
   'guide.settingsPage.tagReload': 'naciśnij Zastosuj',
   'guide.settingsPage.value100': '100%',

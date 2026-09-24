@@ -838,11 +838,11 @@ describe("R1: report-target errors map to the server's exact emitted bytes", () 
 
 // --- R2: bug-report error matcher keys MUST byte-match the server's actual
 // emissions. Same drift class as R1, for the /api/bug-reports lane: the server
-// emits lowercase / no trailing period and the hud localizeBugReportError
+// emits lowercase / no trailing period and the ui bugReportErrorText
 // keyByMessage must contain those exact bytes or every failure falls to the
 // generic hudChrome.bugReport.failed. ---
 describe("R2: bug-report errors map to the server's exact emitted bytes", () => {
-  it('server bug-report error strings appear verbatim as localizeBugReportError keys', () => {
+  it('server bug-report error strings appear verbatim as bugReportErrorText keys', () => {
     const serverErrors = [
       'describe the bug', // 400, empty description (server/main.ts)
       'bug report too large', // 413, body cap (server/main.ts)
@@ -859,11 +859,15 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
       expect(serverSrc.includes(`'${e}'`), `server no longer emits "${e}"`).toBe(true);
     }
 
-    // localizeBugReportError moved to the options window painter.
-    const hudSrc = fs.readFileSync(path.resolve(process.cwd(), 'src/ui/options_window.ts'), 'utf8');
-    const fnStart = hudSrc.indexOf('localizeBugReportError(err: unknown)');
-    expect(fnStart, 'localizeBugReportError not found in options_window.ts').toBeGreaterThan(-1);
-    const start = hudSrc.indexOf('keyByMessage: Record<string, TranslationKey> = {', fnStart);
+    // The ladder moved out of the options window painter into its own module
+    // (the *_reason_text.ts family): src/ui/bug_report_error_text.ts.
+    const hudSrc = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/ui/bug_report_error_text.ts'),
+      'utf8',
+    );
+    const fnStart = hudSrc.indexOf('bugReportErrorText(err: unknown)');
+    expect(fnStart, 'bugReportErrorText not found in bug_report_error_text.ts').toBeGreaterThan(-1);
+    const start = hudSrc.indexOf('KEY_BY_MESSAGE: Readonly<Record<string, TranslationKey>> = {');
     const body = hudSrc.slice(start, hudSrc.indexOf('};', start));
     const keys = new Set(
       [...body.matchAll(/(^|\n)\s*('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")\s*:/g)].map((m) =>
@@ -874,7 +878,7 @@ describe("R2: bug-report errors map to the server's exact emitted bytes", () => 
     for (const err of serverErrors) {
       expect(
         keys.has(err),
-        `bug error "${err}" is not a localizeBugReportError key (would fall to hudChrome.bugReport.failed)`,
+        `bug error "${err}" is not a bugReportErrorText key (would fall to hudChrome.bugReport.failed)`,
       ).toBe(true);
     }
   });
@@ -1159,6 +1163,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
   const socialSrc = socialSourceUnder(socialDir);
   const simSrc = [
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/sim.ts'), 'utf8'),
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/inventory_receipt.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/damage.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/casting_lifecycle.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/combat/effect_dispatch.ts'), 'utf8'),

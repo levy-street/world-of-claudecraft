@@ -3,6 +3,9 @@ export interface AnimState {
   /** horizontal speed, world units/sec */
   speed: number;
   moving: boolean;
+  /** Actual displayed displacement before the gait's anti-jitter hold. A
+   * planted ability recovery must not keep running for that hold's tail. */
+  rawMoving?: boolean;
   /** run-vs-walk gait, hysteresis-picked in locomotion.ts (never a raw
    *  speed-threshold compare: that flips on every noisy frame under load) */
   running: boolean;
@@ -456,6 +459,44 @@ export function desiredBaseState(
   return 'idle';
 }
 
+/** Default cadence ceilings. A rig whose authored gait is slower than the body
+ *  it carries can be pushed past these per VisualDef: a MOUNT travels at one
+ *  fixed speed, so its time scale is a constant and the ceiling, not the
+ *  reference, becomes the binding constraint (lowering runRef below
+ *  speed/ceiling then changes nothing at all, which reads as a dead knob). */
+export const DEFAULT_WALK_TIME_SCALE_MAX = 1.8;
+export const DEFAULT_RUN_TIME_SCALE_MAX = 1.6;
+
+/** Fraction of the crossfade the outgoing gait spends braking to a HOLD. The
+ *  rest of the fade blends that held pose across, so the cycle stops advancing
+ *  almost immediately and the legs travel to idle by blending rather than by
+ *  playing. Short but non-zero: cutting cadence dead on a single frame is a
+ *  visible hitch, where braking over ~a fifth of the fade is not. */
+export const GAIT_WIND_DOWN_SETTLE = 0.2;
+
+/**
+ * Cadence for a locomotion clip that is fading OUT, `elapsed` seconds into a
+ * `fade`-second crossfade, from the `from` scale it was last playing at.
+ *
+ * The per-frame speed matching only ever drives the CURRENT action, and the
+ * state it hands off to (idle) has no cadence of its own, so an outgoing gait
+ * otherwise keeps whatever scale it last held for the whole crossfade: the body
+ * decelerates while its legs keep sprinting, and the harder the clip was pushed
+ * the more the exit reads as the cycle racing to finish.
+ *
+ * Braking to a hold is what makes a stop read as a stop. Once the outgoing
+ * clip is frozen, the mixer is blending a STILL stride pose into idle, so the
+ * legs return from wherever they happened to be instead of running out the
+ * rest of the cycle first. The alternative (matching the idle frame nearest the
+ * current pose) needs a pose database and a distance metric, i.e. motion
+ * matching; freezing gets the same read for none of that machinery.
+ */
+export function gaitWindDownTimeScale(from: number, elapsed: number, fade: number): number {
+  const brake = fade * GAIT_WIND_DOWN_SETTLE;
+  if (brake <= 0) return 0;
+  return from * (1 - clamp(elapsed / brake, 0, 1));
+}
+
 export function locomotionTimeScale(
   baseState: BaseState,
   s: Pick<AnimState, 'speed' | 'backwards' | 'reverseBackpedal'>,
@@ -464,6 +505,8 @@ export function locomotionTimeScale(
   prowlRef = walkRef,
   walkBackRef = walkRef,
   runTimeScaleMin = 0.6,
+  walkMax = DEFAULT_WALK_TIME_SCALE_MAX,
+  runMax = DEFAULT_RUN_TIME_SCALE_MAX,
 ): number | null {
   if (baseState === 'swim' || baseState === 'swimSurface') {
     // Stroke rate follows swim speed: the slow opening strokes of a dive read as
@@ -480,7 +523,7 @@ export function locomotionTimeScale(
     return s.backwards ? -stalkScale : stalkScale;
   }
   if (baseState === 'walk' || baseState === 'walkBack') {
-    timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, 1.8);
+    timeScale = clamp(s.speed / (baseState === 'walkBack' ? walkBackRef : walkRef), 0.6, walkMax);
   } else if (baseState === 'wade') {
     // One cycle covers the whole wade band, and the band is slow by
     // construction (the sim drags the body down to ~0.7 run), so the clip is
@@ -488,7 +531,7 @@ export function locomotionTimeScale(
     // through water reads wrong the moment it starts to sprint.
     timeScale = clamp(s.speed / DEFAULT_WADE_REF, 0.65, 1.45);
   } else if (baseState === 'run') {
-    timeScale = clamp(s.speed / runRef, runTimeScaleMin, 1.6);
+    timeScale = clamp(s.speed / runRef, runTimeScaleMin, runMax);
   } else {
     return null;
   }

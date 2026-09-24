@@ -34,6 +34,7 @@ describe('unstuck feedback', () => {
       type: 'unstuck',
       phase: 'completed',
       reason: 'moved_to_graveyard',
+      sickness: true,
       area,
       origin,
       destination: { ...origin, z: 1, localZ: 1 },
@@ -59,6 +60,7 @@ describe('unstuck feedback', () => {
       type: 'unstuck',
       phase: 'completed',
       reason: 'revived_at_graveyard',
+      sickness: true,
       area,
       origin,
       destination: { ...origin, z: 1, localZ: 1 },
@@ -78,6 +80,50 @@ describe('unstuck feedback', () => {
     expect(t('hudChrome.unstuck.movedToGraveyard')).not.toContain('revived');
     expect(t(revived.key)).toContain('Unstuck Sickness');
     expect(t(revived.key)).not.toContain('Pale Keeper');
+  });
+
+  it('names the free first use and warns about the repeat instead of a debuff', () => {
+    const base = {
+      type: 'unstuck',
+      phase: 'completed',
+      area,
+      origin,
+      destination: { ...origin, z: 1, localZ: 1 },
+      duration: 10,
+      distance: 1,
+    } as const;
+
+    const moved = unstuckFeedback({ ...base, reason: 'moved_to_graveyard', sickness: false });
+    expect(moved).toEqual({
+      key: 'hudChrome.unstuck.movedToGraveyardFree',
+      kind: 'success',
+      banner: true,
+      log: true,
+      clearBanner: true,
+    });
+    // No debuff landed, so the text must not claim one; it warns about the repeat instead.
+    // (The positive control: the charged copy really does carry the phrase being excluded.)
+    expect(t('hudChrome.unstuck.movedToGraveyard')).toContain('weighs on you');
+    expect(t('hudChrome.unstuck.revivedAtGraveyardUnstuck')).toContain('weighs on you');
+    expect(t(moved.key)).not.toContain('weighs on you');
+    expect(t(moved.key)).toContain('within the hour');
+    expect(t(moved.key)).toContain('Unstuck Sickness');
+    expect(t(moved.key)).not.toContain('revived');
+
+    const revived = unstuckFeedback({ ...base, reason: 'revived_at_graveyard', sickness: false });
+    expect(revived.key).toBe('hudChrome.unstuck.revivedAtGraveyardFree');
+    expect(t(revived.key)).toContain('revived');
+    expect(t(revived.key)).not.toContain('weighs on you');
+    expect(t(revived.key)).toContain('within the hour');
+
+    // Only an explicit false is free: a pre-window server omits the flag and always
+    // charged, so an absent value keeps the charged text.
+    expect(unstuckFeedback({ ...base, reason: 'moved_to_graveyard' }).key).toBe(
+      'hudChrome.unstuck.movedToGraveyard',
+    );
+    expect(unstuckFeedback({ ...base, reason: 'revived_at_graveyard', sickness: true }).key).toBe(
+      'hudChrome.unstuck.revivedAtGraveyardUnstuck',
+    );
   });
 
   it('keeps the retired safe-spot outcome on its own legacy key', () => {

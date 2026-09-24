@@ -82,9 +82,19 @@ const FERAL_LOADOUT = {
 // jewelry (5896 to 6378 and 2803 to 3082, payoffs 10 to 12 and 3 to 4). The
 // Bruin tank probe below did not leave its bands (snap threat 990.99 to
 // 1003.86) and keeps its 2026-09-08 anchors.
+// RE-MEASURED 2026-09-20 for the wildfang arm only, at the v0.43 feral pass:
+// Nature's Boon (src/sim/combat/druid_natures_boon.ts) draws one rng per
+// LANDED feral melee auto-attack, so every feral trace after the first landed
+// swing re-rolls. Not a rotation or tuning change: with that one draw
+// commented out this seed reproduces the 2026-09-10 row exactly (6378/286/
+// 7473.827/12), and across seeds 42421 to 42425 the same rotation lands 6316
+// to 6801 with the draw and 5299 to 6928 without it, so seed 42420 simply
+// re-rolled onto a low trace (8 payoffs, 4921). Moongrove is Balance (the
+// draw is feral-gated) and Bruin stayed inside its bands, so both keep their
+// 2026-09-10 anchors.
 const LIVE_MOB_MEASURED = {
   moongrove: { damage: 5956, incomingDamage: 212, threat: 5957, payoffs: 7 },
-  wildfang: { damage: 6378, incomingDamage: 286, threat: 7473.827, payoffs: 12 },
+  wildfang: { damage: 4921, incomingDamage: 159, threat: 5766.952, payoffs: 8 },
   bruin: { damage: 3082, incomingDamage: 131, threat: 10651.925, payoffs: 4 },
 } as const;
 const BRUIN_TANK_MEASURED = {

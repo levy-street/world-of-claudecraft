@@ -94,6 +94,7 @@ import {
   suspendActiveEntryDiagnostics,
 } from './game/entry_diagnostics';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
+import { armFrameAndSkip } from './game/frame_cadence_wiring';
 import { createGameRenderer, validateGameRenderer } from './game/game_renderer';
 import { GamepadManager } from './game/gamepad';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
@@ -452,7 +453,7 @@ import { assembleBugReportMeta } from './ui/bug_report';
 import { cameraPromptOpen, dismissCameraPrompt } from './ui/camera_prompt';
 import { deleteCharButtonHtml, normalizeDeleteConfirmation } from './ui/char_delete_button';
 import { resetComposedRows, trackComposedChipRow } from './ui/charselect_composed_refresh';
-import { charselectHintsHtml } from './ui/charselect_hints';
+import { charselectHintsHtml, wireCharselectRow } from './ui/charselect_hints';
 import { loadCharselectNews } from './ui/charselect_news';
 import { CharselectRedesignEditor } from './ui/charselect_redesign';
 import { ChatCommandMenu } from './ui/chat_command_menu';
@@ -569,8 +570,7 @@ import {
   needsWalletReauth,
   walletChangeErrorText,
 } from './ui/wallet_reauth_prompt';
-import type { IWorld } from './world_api';
-import { ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
+import { type IWorld, ONLINE_WORLD_INCOMPATIBLE_MESSAGE } from './world_api';
 
 const CLICK_MOVE_TURN_RATE = 4.2; // rad/sec; responsive turning while the camera stays decoupled from click spam
 const CLICK_MOVE_WAYPOINT_STOP = 0.8; // yards; intermediate A* corners should roll through, not stutter-stop
@@ -4221,7 +4221,7 @@ async function startGame(
   // synchronously before returning a shared frozen decision.
   const gateInput = newPresentationGateInput(DESKTOP_APP);
   function frame(now: number): void {
-    requestAnimationFrame(frame);
+    if (armFrameAndSkip(frame, now, gateInput)) return;
     // The desktop shell keeps rAF running while hidden (backgroundThrottling is
     // off), so document.hidden never flips there and the shell push is the only
     // truthful hidden signal.
@@ -6671,8 +6671,6 @@ async function refreshCharacters(): Promise<void> {
       row.dataset.skin = String(c.skin ?? 0);
       const className = classDisplayName(c.class);
       const statusText = c.online ? '' : c.forceRename ? ` (${t('character.renameRequired')})` : '';
-      // Zone line plus the in-world notice (src/ui/charselect_hints.ts).
-      const hintsHtml = charselectHintsHtml(c);
       // One-shot redesign token (server-decided: pre-creator character, token
       // unspent). Rendered on every action arm; gone for good once spent.
       const rerollBtn = c.appearanceRerollAvailable
@@ -6697,7 +6695,7 @@ async function refreshCharacters(): Promise<void> {
         <div class="char-id">
           <span class="char-name">${esc(c.name)}</span>
           <span class="char-sub">${esc(t('character.levelClass', { level: c.level, className }))}${esc(statusText)}</span>
-          ${hintsHtml}
+          ${charselectHintsHtml(c, Date.now())}
         </div>
         ${
           c.forceRename
@@ -6762,13 +6760,6 @@ async function refreshCharacters(): Promise<void> {
         setCharselectPreviewName(c.name);
       };
 
-      row.addEventListener('click', selectRow);
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          selectRow();
-        }
-      });
       row.querySelector('.reroll-char-btn')?.addEventListener('click', (e) => {
         e.stopPropagation();
         // Captured before selectRow(), whose own close(false) call (on
@@ -6782,22 +6773,26 @@ async function refreshCharacters(): Promise<void> {
         selectRow();
         redesignEditor.open(c, opener);
       });
-      // Double-click a row to jump straight into the world (classic-select
-      // muscle memory). It routes through the shared desktop Enter World button
-      // so entry owns its loading state; the button only exists in the docked
-      // desktop layout, so this is a no-op on mobile (where the per-row button
-      // is a single tap away). Entry is gated on that shared button being visible
-      // AND enabled: for a forced-rename selection it is disabled (so the rename
-      // input/button on such a row cannot trigger entry), and Delete opens a
-      // full-screen modal on the first click, so the second click retargets and
-      // the browser synthesises no dblclick. Keep entry gated on the shared
-      // button's enabled state for any per-row action added later.
-      row.addEventListener('dblclick', () => {
-        selectRow();
-        const enterBtn = document.getElementById(
-          'btn-charselect-enter',
-        ) as HTMLButtonElement | null;
-        if (enterBtn && enterBtn.offsetParent !== null && !enterBtn.disabled) enterBtn.click();
+      // Click or Enter/Space selects the row; double-click jumps straight into
+      // the world (classic-select muscle memory) through the shared desktop
+      // Enter World button so entry owns its loading state (the button only
+      // exists in the docked desktop layout, so this is a no-op on mobile, where
+      // the per-row button is a single tap away). Entry is gated on that shared
+      // button being visible AND enabled: for a forced-rename selection it is
+      // disabled (so the rename input/button on such a row cannot trigger entry),
+      // and Delete opens a full-screen modal on the first click, so the second
+      // click retargets and the browser synthesises no dblclick. Keep entry gated
+      // on the shared button's enabled state for any per-row action added later.
+      // The wiring (src/ui/charselect_hints.ts) skips activations that landed
+      // inside the lockout disclosure, whose summary toggles natively.
+      wireCharselectRow(row, {
+        select: selectRow,
+        enter: () => {
+          const enterBtn = document.getElementById(
+            'btn-charselect-enter',
+          ) as HTMLButtonElement | null;
+          if (enterBtn && enterBtn.offsetParent !== null && !enterBtn.disabled) enterBtn.click();
+        },
       });
 
       listEl.appendChild(row);

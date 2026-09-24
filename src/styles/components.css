@@ -9051,6 +9051,71 @@
      specificity, and the bag reset is above while the bank reset is far
      below. Order against the cell focus rings is not load-bearing (they are
      outline-based). */
+  /* The permanent loot-quality tier mark (loot_quality_view.ts). Owns its
+     WHOLE look here rather than composing the ui-badge primitive: a later
+     layer silently beats the library on every property both declare
+     (src/styles/CLAUDE.md), so the markup carries this class alone. An
+     all-surfaces item mark like the glyph family below, minted beside it
+     (not in item_instance_glyph_mark.ts) because it is a text tier mark
+     that composes WITH the corner marks and also paints where the family
+     never does: worn slots, loot rows, roll prompts, the Exchange. */
+  .loot-quality-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 10px;
+    color: var(--gold);
+    border: 1px solid currentColor;
+    border-radius: 3px;
+    background: var(--color-bg-dark);
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 2px 3px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+  .bag-item > .loot-quality-badge,
+  .bank-item > .loot-quality-badge,
+  .mkt-ico > .loot-quality-badge,
+  .ui-socket > .loot-quality-badge {
+    position: absolute;
+    right: 1px;
+    top: 1px;
+  }
+  /* The Materials Vault row strip (the fourth owned-stack surface): the row is
+     a wide flex button, so the mark sits over the leading 28px icon's top-right
+     corner (7px row padding + 28px icon, minus the mark's own box), the corner
+     every cell surface above uses. */
+  .vault-row > .loot-quality-badge {
+    position: absolute;
+    top: 3px;
+    left: 20px;
+  }
+  .equip-quality-socket {
+    display: inline-flex;
+    position: relative;
+    flex: 0 0 auto;
+  }
+  .equip-quality-socket > .loot-quality-badge {
+    position: absolute;
+    right: 1px;
+    bottom: 1px;
+  }
+  .equip-col-right .equip-quality-socket > .loot-quality-badge {
+    right: auto;
+    left: 1px;
+  }
+  .loot-quality-line {
+    color: var(--gold);
+  }
+  @media (forced-colors: active) {
+    .loot-quality-badge {
+      color: CanvasText;
+      background: Canvas;
+      border-color: CanvasText;
+    }
+  }
   .bag-item .bi-count {
     position: absolute;
     right: 2px;

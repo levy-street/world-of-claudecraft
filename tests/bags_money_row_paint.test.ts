@@ -88,6 +88,7 @@ function harness(startCopper = 1000, inventory: InvSlot[] = SWORD): Harness {
     closeBank: noop,
     onClosed: noop,
     addItemToTrade: noop,
+    tradeOfferHeadroom: () => 0,
     stageMarketSell: noop,
     stageMailParcel: noop,
     insertItemChatLink: noop,

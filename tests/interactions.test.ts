@@ -845,6 +845,23 @@ describe('handlePickedEntity while dead (the ghost/death loop)', () => {
     expect(calls).not.toContain('openQuestDialog');
   });
 
+  it('a ghost left-clicking the Spirit Healer routes through the same confirm gate', () => {
+    // The raise is a conversation (no ghost-prompt button any more), and the
+    // left-click arm "talks too" for trackpad players, so a ghost's left-click on
+    // the Keeper must not be a silent target-only no-op.
+    const healer = stubEntity({
+      id: 2,
+      kind: 'npc',
+      templateId: 'spirit_healer',
+      pos: { x: 3, y: 0, z: 0 },
+    });
+    const { world, hud, calls } = rig({ dead: true, ghost: true }, healer);
+    expect(handlePickedEntity(world, hud, 2, 0, 10, 20)).toBe(true);
+    expect(calls).toContain('requestSpiritHealerResurrect');
+    expect(calls).not.toContain('resurrectAtSpiritHealer');
+    expect(calls).not.toContain('openQuestDialog');
+  });
+
   it('a ghost clicking a mailbox does not open it', () => {
     const mailbox = stubEntity({
       id: 2,

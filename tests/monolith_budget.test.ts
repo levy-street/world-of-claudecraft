@@ -106,7 +106,9 @@ const MONOLITHS: MonolithRow[] = [
     // the fourth tab's window glue landed under the old ceiling (net of the
     // v0.43.0 sync merge, which trimmed overlapping browse markup). Exact
     // count, zero slack.
-    ceiling: 2419,
+    // LOWERED for permanent loot quality: item-cell markup moved into
+    // woc_market_chrome.ts, keeping tooltip registration in the window.
+    ceiling: 2414,
     seam: 'a pure view-core module beside it (src/ui/woc_market_view.ts) that this window renders from',
   },
   {
@@ -473,23 +475,48 @@ const MONOLITHS: MonolithRow[] = [
     // screenshot and HUD extractions compose with aura overlay wiring and the
     // account-wide Book of Deeds / Reliquary work to 18309 by wc -l on the
     // merged tree. Exact count, zero slack.
-    // Re-pinned on feature/wq-standing-online: the map rail and Reputation tab
-    // wiring (11 lines) was paid for by lifting the map zone focus rule into
-    // hud/map/map_zone_focus_core.ts; exact merged count.
-    // RE-PINNED at the merge of release/v0.43.0 (tip f48bebefcb) into
-    // feature/world-quests (the standing and quartermaster round). BOTH parent
-    // pins for the record: ours 18301, the release 18309. The release side's
-    // Unlock Interface menu row and touch engine-indicator drag land +4 on the
-    // coordinator, so the merged file measures 18305 (wc -l < src/ui/hud.ts).
-    // Exact merged count, zero slack.
-    // LOWERED 18305 -> 18300 at the faction standing celebration (2026-09-17):
-    // the skill level-up paint body moved out to
-    // hud/professions/skill_level_toast_painter.ts behind the CelebrationHost
-    // seam, and the new faction tier observer landed as a thin call on the
-    // same seam (hud/reputation/faction_tier_celebration_*.ts). Exact count,
-    // zero slack.
-    // Noticeboard dispatch extracted to noticeboard_event.ts for the glider sign.
-    ceiling: 18286,
+    // LOWERED 18309 -> 18284 by the composed player portraits change: the
+    // "which body does this player's frame show" rule moved out to
+    // src/ui/player_portrait_core.ts, so the three frame draws and the
+    // portrait update listener each became one call. Exact count, zero slack.
+    // Re-measured at the release/v0.44.0 sync of that change (the release's
+    // frame-rate-limit wiring plus the per-call portrait lookups compose to
+    // 18291 by wc -l on the merged tree, still under the 18309 the branch
+    // started from). Exact count, zero slack.
+    // LOWERED 18291 -> 18289 at the PR 4100 review round: the Inspect look now
+    // travels as an openInspect parameter (no InspectEntity cast dep), and
+    // the target-of-target key reads targetPortraitKey. Exact count, zero slack.
+    // LOWERED 18289 -> 18286 at the trade quantity prompt sync: the merge queue
+    // measured that branch at 18291 against this pin, so its tradeOfferHeadroom
+    // wrapper folded into the bags binding (the trade-open gate plus the pure
+    // core read on one dependency line). Exact count, zero slack.
+    // LOWERED 18286 -> 18276 at the release/v0.44.0 sync of the Pale Keeper
+    // revive change: the Keeper dialog copy moved out to
+    // src/ui/keeper_revive_dialog_core.ts and the ghost prompt lost its
+    // per-frame healer-range scan (the Keeper is talked to). wc -l on the
+    // merged tree. Exact count, zero slack.
+    // LOWERED 18276 -> 18263 with the character-select raid lockouts: the
+    // lockout-id -> raid-name rule moved out of raidLockoutPanelView into
+    // src/ui/raid_lockout_format.ts (raidLockoutDisplayName) so the roster
+    // and the minimap badge name a lockout identically. Exact count, zero slack.
+    // LOWERED 18263 -> 18253 at the permanent loot quality (PR 4054) sync
+    // on top of the character-select lockouts landing: the item tooltip column
+    // composition moved to item_combat_tooltip_view.ts and the loot receipt
+    // body decision to loot_quality_receipt.ts (the loot arm keeps its one
+    // guarded log() call through a thin lootReceiptBody adapter), composed
+    // with the trade quantity prompt fold (18263 - 10). wc -l on the merged
+    // tree. Exact count, zero slack.
+    // LOWERED 18253 -> 18235 at the Warrior presentation (PR 4139) base sync:
+    // the heal audio policy (potion cue, HoT silence, the Frenzied
+    // Regeneration exemption) moved out of the heal2 arm into
+    // combat_sfx.healAudioPlan (18253 - 18). wc -l on the merged tree. Exact
+    // count, zero slack.
+    // RE-MEASURED at the release/v0.44.0 base merge into
+    // integration/world-quests-v0440: the branch's own extractions (map zone
+    // focus, faction tier celebration, noticeboard dispatch; ours 18286
+    // against the base 18309) compose with the release chain above.
+    // wc -l on the merged tree. Exact count, zero slack.
+    ceiling: 18218,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -509,7 +536,17 @@ const MONOLITHS: MonolithRow[] = [
     // Interface entry that joined it) moved to
     // src/ui/options_main_menu_controller.ts; the window keeps only the
     // routing and the touch gate. Exact count, zero slack.
-    ceiling: 2831,
+    // LOWERED 2831 -> 2830 when the placeholder resolver the choice status line
+    // and the notes both carried moved to src/ui/options_text_values.ts (the
+    // Frame Rate Limit row and its numeric status line arrived in the same
+    // change). Exact count, zero slack.
+    // LOWERED 2830 -> 2821 when the bug report's server-message ladder moved
+    // to src/ui/bug_report_error_text.ts. System Report adds nothing here: it
+    // is a section of the Performance panel module
+    // (src/ui/host_diag_section_controller.ts over the pure
+    // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
+    // zero slack.
+    ceiling: 2821,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -892,7 +929,14 @@ const MONOLITHS: MonolithRow[] = [
     // CPU-hygiene review: the ranked and required view candidates share the
     // scan module's liveViewCandidate check (present, view-less, admitted),
     // which drops the coordinator's own admission call. Exact count.
-    ceiling: 12850,
+    // Warrior integration moves painter wiring and prewarm types to sibling modules.
+    // PR 4139 review-fix round: endDraw gained the matching
+    // refreshFrozenWorldMatrix guard (one line), paid for by moving the Fiesta
+    // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
+    // 12790 -> 12789 when the Warrior kit textures moved to demand loading
+    // (the boot-time sheet upload loop and its comment went, the kit host
+    // gained its assets line). Exact count.
+    ceiling: 12789,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1078,10 +1122,19 @@ const MONOLITHS: MonolithRow[] = [
     // retire hooks to src/sim/loot/bop_trade_persistence.ts (main, v0.42.1),
     // composed with the release's own extractions above. Exact merged count,
     // zero slack.
-    // Weekly Vault (PR 4052) integration: the character storage load/save moved to
-    // src/sim/character_storage.ts and isQuestInteractionEntity to interaction.ts.
-    // Exact merged count, zero slack.
-    ceiling: 11805,
+    // Down 11822 -> 11792 at the feral Wildfang pass fix round: the per-cast
+    // ResolvedAbility interface moved to src/sim/resolved_ability.ts (a new
+    // cast-scoped marker, naturesBoonPower, would otherwise have grown this
+    // file); sim.ts keeps the type import and the barrel re-export. Exact
+    // count, zero slack.
+    // Permanent loot quality (PR 4054) base merge: the loot identity receipt
+    // and projection helpers moved to dedicated siblings, composed with the
+    // release extractions above. Exact merged count, zero slack.
+    // Weekly Vault (PR 4052) integration on the world-quests branch: the
+    // character storage load/save moved to src/sim/character_storage.ts and
+    // isQuestInteractionEntity to interaction.ts (ours 11805 against the base
+    // 11822), composed at the release/v0.44.0 base merge. Exact merged count.
+    ceiling: 11733,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1286,7 +1339,14 @@ const MONOLITHS: MonolithRow[] = [
     // R40 confirm gate and the node bundle out of interactKey, main v0.42.1)
     // composed with the release's game_renderer.ts extraction. Exact merged
     // count, zero slack.
-    ceiling: 11281,
+    // LOWERED 11281 -> 11280 with the character-select lockout disclosure:
+    // the roster row hint markup call is inlined into its template and the
+    // disclosure event isolation lives in src/ui/charselect_hints.ts.
+    // LOWERED 11280 -> 11276 at the PR 4137 review round: the roster row's
+    // click / Enter-Space / double-click wiring moved into wireCharselectRow
+    // (src/ui/charselect_hints.ts), which skips activations from inside the
+    // lockout disclosure instead of stopping propagation there.
+    ceiling: 11276,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1507,10 +1567,22 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the guild_pledge_settings dispatch arm's field
     // validation moved to server/guild_pledge_settings_cmd.ts. Merged with the
     // account-wide books extraction above; exact merged count, zero slack.
-    // Weekly Vault (PR 4052) integration: the guild/weekly bank snapshot emitter
-    // moved to its own module.
+    // LOWERED 10076 -> 9993 at the target-echo fix: the input seq fold (the R9
+    // gap booking plus the ack high-water) moved to server/input_seq.ts, now
+    // shared by the input frame and the seq-bearing 'target' command. Measured
+    // with wc -l < server/game.ts after biome. Exact count, zero slack.
+    // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
+    // projection moved to server/equipped_instance_wire.ts, composed with the
+    // release extractions above. Exact merged count, zero slack.
+    // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
+    // quest/death record arms of the event drain moved to
+    // server/event_record_observers.ts (which also hosts the new craftRoll
+    // arm), so the audit landed as a net shrink. Exact count, zero slack.
+    // Weekly Vault (PR 4052) integration on the world-quests branch: the
+    // guild/weekly bank snapshot emitter moved to its own module (ours 9990
+    // against the base 10076), composed at the release/v0.44.0 base merge.
     // Exact merged count, zero slack.
-    ceiling: 9990,
+    ceiling: 9959,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1660,10 +1732,16 @@ const MONOLITHS: MonolithRow[] = [
     // Guild board categories: the board path builder, the page decode and the
     // pledge-settings frame decode moved to src/net/guild_board_wire.ts. Merged
     // with the book_wire extraction above; exact merged count, zero slack.
-    // Weekly Vault (PR 4052) integration: the guild-bank self-decode moved to
-    // src/net/bank_snapshot_wire.ts.
+    // LOWERED 5498 -> 5426 at the target-echo fix: the pending-target echo
+    // decision (the hold, its ack release, the valve) moved to
+    // src/net/target_echo.ts, banking the 52 lines of slack the row already
+    // carried with it. Measured with wc -l < src/net/online.ts after biome.
+    // Exact count, zero slack.
+    // Weekly Vault (PR 4052) integration on the world-quests branch: the
+    // guild-bank self-decode moved to src/net/bank_snapshot_wire.ts (ours 5433
+    // against the base 5498), composed at the release/v0.44.0 base merge.
     // Exact merged count, zero slack.
-    ceiling: 5433,
+    ceiling: 5413,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

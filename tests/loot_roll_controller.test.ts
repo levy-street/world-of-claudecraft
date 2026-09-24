@@ -98,6 +98,8 @@ function harness() {
   const submitLootRoll = vi.fn();
   const assignMasterLoot = vi.fn();
   const hideTooltip = vi.fn();
+  const itemTooltip = vi.fn(() => 'tooltip');
+  const attachTooltip = vi.fn();
   const writerCounts = { writes: 0, skips: 0 };
   // Retained so a test can read back the elided style props the painter wrote
   // (the timer fraction is only ever a CSS custom property).
@@ -132,13 +134,15 @@ function harness() {
     now: () => now,
     isMobileLayout: () => false,
     itemIcon: () => '<img class="test-item-icon">',
-    itemTooltip: () => 'tooltip',
-    attachTooltip: () => {},
+    itemTooltip,
+    attachTooltip,
     hideTooltip,
     writers,
   });
   return {
     controller,
+    itemTooltip,
+    attachTooltip,
     root,
     submitLootRoll,
     assignMasterLoot,
@@ -687,5 +691,38 @@ describe('bind-on-pickup note on roll prompts', () => {
     });
     const row = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
     expect(row?.innerHTML).toContain('Binds when picked up');
+  });
+});
+
+describe('LootRollController exact quality copies', () => {
+  it('shows the fixed descriptor in tooltip and closes only the resolved roll', () => {
+    const test = harness();
+    const instance = {
+      lootQuality: {
+        version: 1 as const,
+        tier: 3 as const,
+        weights: [900, 100, 250, 750, 500] as [number, number, number, number, number],
+      },
+    };
+    const first = { ...rollEvent(7), instance };
+    const second = {
+      ...rollEvent(8),
+      instance: {
+        ...instance,
+        lootQuality: {
+          ...instance.lootQuality,
+          tier: 4 as const,
+        },
+      },
+    };
+    test.controller.showRoll(first);
+    test.controller.showRoll(second);
+    expect(test.root.querySelectorAll('.loot-roll')).toHaveLength(2);
+    expect(test.root.querySelectorAll('.loot-roll')[0].innerHTML).toContain('Magnificent');
+    for (const [, callback] of test.attachTooltip.mock.calls) callback();
+    expect(test.itemTooltip.mock.calls.some((args: unknown[]) => args[1] === instance)).toBe(true);
+    test.controller.closeForItem('winner', 7);
+    expect(test.root.querySelectorAll('.loot-roll')).toHaveLength(1);
+    expect(test.root.querySelectorAll<HTMLElement>('.loot-roll')[0].dataset.rollId).toBe('8');
   });
 });

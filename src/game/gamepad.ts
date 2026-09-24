@@ -938,6 +938,10 @@ export class GamepadManager {
       // Confirm FIRST, interact second. With a control focused the press belongs
       // to the interface; with none it is the world's, which is what makes one
       // button both "confirm" and "talk to this NPC" the way FFXIV has it.
+      // Known edge: a ghost whose corpse is within reach of the Pale Keeper has
+      // the pad mark parked on the corpse button (dpad_focus_nav lands it the
+      // moment the ghost prompt appears), so this press is the corpse rez; B
+      // clears the mark and the next press reaches the Keeper as an interact.
       if (!pressDpadFocus()) this.cb.onAction('interact');
       return;
     }

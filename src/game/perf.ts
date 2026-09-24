@@ -1,5 +1,6 @@
 import type { NetPipelineSummary } from '../net/net_pipeline_stats';
 import { type AssetTimingSnapshot, assetTimingSnapshot } from '../render/assets/stats';
+import { frameLoadMs } from '../render/chosen_cadence';
 import { gpuTimerOverlayLines } from '../render/gpu_timer_probe_core';
 import { postRevealLinksSnapshot } from '../render/live_program_watch';
 import type { PostRevealLinksSnapshot } from '../render/post_reveal_links_core';
@@ -15,6 +16,7 @@ import {
   type ShaderWarmSnapshot,
   shaderWarmSnapshot,
 } from '../render/shader_warm_client';
+import { frameCadenceHealth, frameCadenceOverlayLine } from './frame_cadence_wiring';
 import {
   createHeapSawtooth,
   type HeapFloorTrend,
@@ -27,6 +29,7 @@ import {
   type HitchForensicsState,
 } from './hitch_forensics';
 import type { PerfDiagnosticsPanel } from './perf_diagnostics_panel';
+import type { FrameHealthCadence } from './perf_frame_health_core';
 import { bindPerfPageVisibility } from './perf_page_visibility';
 import { NumberSampleRing, TimedNumberSampleRing } from './sample_ring';
 import { createWorstWindow, type WorstWindowSummary } from './worst_window';
@@ -43,6 +46,9 @@ export interface PerfSnapshot {
   // frame would fake a healthy fps and p95), so this counter is the only
   // evidence the skip is working.
   hiddenPresentSkips: number;
+  // The chosen frame rate ceiling (frame_cadence_wiring.ts), or null when the
+  // display paces the frames: what the frame-health readers judge against.
+  cadence: FrameHealthCadence | null;
   fps: number;
   frameMs: { avg: number; p50: number; p95: number; p99: number; max: number; long50: number };
   windows: {
@@ -549,7 +555,7 @@ export class PerfMonitor {
     this.lastFrameMs = ms;
     this.frameMs.push(ms);
     // The warm worker's pause signal rides the same reading.
-    noteShaderWarmFrameMs(ms);
+    noteShaderWarmFrameMs(frameLoadMs(ms));
     this.frameWindow.push(now, ms);
     this.frameWindow.pruneBefore(now - MAX_WINDOW_MS);
   }
@@ -1089,6 +1095,7 @@ export class PerfMonitor {
       visibleSeconds: round(visibleSeconds),
       frames: this.frames,
       hiddenPresentSkips: this.hiddenPresentSkips,
+      cadence: frameCadenceHealth(),
       fps: round(this.frames / visibleSeconds),
       frameMs: summarizeFrames(this.frameMs.toArray()),
       windows: {
@@ -1320,6 +1327,7 @@ export class PerfMonitor {
         ? `net ${net.connected ? 'up' : 'down'} snap ${net.snapInterval}ms age ${net.lastSnapAge}ms a ${net.alpha}`
         : 'net offline',
       ...(hitchLine ? [hitchLine] : []),
+      frameCadenceOverlayLine(),
       ...gpuTimerOverlayLines(r?.gpuTimer),
       ...censusLines,
       'click: copy json',

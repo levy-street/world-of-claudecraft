@@ -6434,10 +6434,14 @@ export const ABILITIES: Record<string, AbilityDef> = {
     school: 'physical',
     requiresTarget: true,
     offGcd: true,
-    requiresForm: 'bear',
+    // No form requirement since v0.43: Bruin Rush is pressable from ANY form
+    // and from caster form, and shifts the druid into Bruin Form on the way in
+    // (combat/druid_form_entry.ts). usableInForm keeps the shapeshift lock from
+    // refusing the press while wearing Cat, Fleet or Moonwing.
+    usableInForm: true,
     effects: [{ type: 'charge' }, { type: 'stun', duration: 1 }],
     description:
-      'Rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Bruin Form only.',
+      'Shift into Bruin Form if you are not already, then rush an enemy, generating 9 rage and stunning it for 1 sec. For 3 sec afterwards, or until you leave combat, Cat Form is free and Pins that target (the one you Rushed), slowing it by 50% for 4 sec. 8-25 yd range. Usable in any form.',
   },
   maul: {
     id: 'maul',
@@ -6566,13 +6570,20 @@ export const ABILITIES: Record<string, AbilityDef> = {
     range: 0,
     school: 'physical',
     requiresTarget: false,
-    requiresForm: 'cat',
+    // No form requirement since v0.43: Stalk is pressable from ANY form and
+    // from caster form, and shifts the druid into Cat Form on the way in
+    // (combat/druid_stalk.ts). usableInForm keeps the shapeshift lock from
+    // refusing the press while wearing Bruin, Fleet or Moonwing, and keeps the
+    // auto-unshift rule from stripping the form instead. It stays ON the
+    // global cooldown (no offGcd), so the shift costs a GCD like any shift.
+    usableInForm: true,
     requiresOutOfCombat: true,
     // 1.0: feral stealth moves at full speed (Wildfang kit pass 2; it was a
     // 0.95 near-full crawl before), the feral scouting identity. The rogue
     // Duskveil family deliberately keeps its slower 0.5 crawl.
     effects: [{ type: 'selfBuff', kind: 'stealth', value: 1.0, duration: 3600 }],
-    description: 'Enter stealth while in Cat Form. Cannot be used in combat.',
+    description:
+      'Shift into Cat Form if you are not already, and enter stealth. Usable in any form. Cannot be used in combat.',
   },
   rake: {
     id: 'rake',
@@ -6719,8 +6730,18 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // A tank cooldown, so it must fire mid-fight in Bruin Form (or Cat Form)
     // like Primal Reflexes/Primal Surge below, not just pre-cast in caster form.
     usableInForm: true,
-    effects: [{ type: 'selfBuff', kind: 'buff_armor', value: 150, duration: 15 }],
-    description: 'Your skin hardens like bark, increasing armor by 150 for 15 sec.',
+    // A PERCENTAGE since v0.43, not the old flat 150. buff_armor_pct carries
+    // integer percentage POINTS (25 = +25%) and recalcPlayerStats folds it last
+    // (entity.ts), after the form multiplier and the armor masteries, so a bear
+    // tank's Oakhide scales with the armor it actually has instead of decaying
+    // into noise as gear grows. The flat arm was worth about 4% of a geared
+    // bear pool.
+    effects: [{ type: 'selfBuff', kind: 'buff_armor_pct', value: 20, duration: 15 }],
+    // Literal, not the $b resolved-value placeholder: introducing a token into
+    // this row breaks the en-vs-locale interpolation-parity guard
+    // (tests/i18n_completeness.test.ts) for all 20 overlays, whose translations
+    // carry no token. Same shape the flat 150 shipped with.
+    description: 'Your skin hardens like bark, increasing armor by 20% for 15 sec.',
   },
   // Druid tank cooldown: a dodge-based defensive (distinct from Oakhide's armor
   // boost). Usable while shapeshifted so a bear tank pops it mid-fight; buff_dodge
@@ -6882,7 +6903,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // pounce id; Lunge is never learned as a second action.
     actionReplacement: { abilityId: 'lunge', absentAuraKind: 'stealth' },
     description:
-      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Cat Form only. Out of stealth this button is Lunge.',
+      'A stealth opener that stuns the target for 2 sec. Awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3). Cat Form only. Out of stealth this button is Lunge.',
   },
   lunge: {
     id: 'lunge',
@@ -6894,19 +6915,31 @@ export const ABILITIES: Record<string, AbilityDef> = {
     cost: 40,
     castTime: 0,
     cooldown: 12,
-    range: 12,
+    // 25 yd since v0.43, matching Bruin Rush's outer reach. minRange stays 0,
+    // so unlike Bruin Rush (which needs 8 yd of runway) Lunge is pressable at
+    // any distance inside its range.
+    range: 25,
     minRange: 0,
     school: 'physical',
     requiresTarget: true,
     awardsCombo: 1,
-    requiresForm: 'cat',
+    // Off the global cooldown, like Bruin Rush: a gap closer that ate a GCD on
+    // arrival left the druid standing in melee unable to strike for the rest of
+    // it, which is the opposite of what a gap closer is for. The 12 sec
+    // cooldown is what paces it, not the GCD.
+    offGcd: true,
+    // No form requirement since v0.43: Lunge is pressable from ANY form and
+    // from caster form, and shifts the druid into Cat Form on the way in
+    // (combat/druid_form_entry.ts). Entering Cat Form hands over a full 100
+    // energy, so the 40 this costs is always payable on the press that shifts.
+    usableInForm: true,
     // The cast only starts the charge route; the 60% weapon strike and the
     // combo point land on ARRIVAL through combat/druid_lunge.ts (the
     // Bloodhook shape), so a route that ends short strikes nothing and hands
     // the cooldown back. LUNGE_WEAPON_MULT there owns the 60.
     effects: [{ type: 'charge' }],
     description:
-      'Lunge at an enemy up to 12 yd away. On arrival, deals 60% weapon damage and awards 1 combo point; a lunge cut short refunds its cooldown. Cat Form only.',
+      'Shift into Cat Form if you are not already, then lunge at an enemy up to 25 yd away. On arrival, deals 60% weapon damage, awards 1 combo point and, as Wildfang, adds 1 Old Blood (max 3); a lunge cut short refunds its cooldown. Usable in any form.',
   },
   hamstring_bite: {
     id: 'hamstring_bite',

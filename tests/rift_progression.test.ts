@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { ITEMS } from '../src/sim/data';
+import { sanitizeItemInstancePayloadOnLoad } from '../src/sim/item_instance_load';
 import { primaryStatSum } from '../src/sim/item_level';
 import { resolveApplyEnchant } from '../src/sim/professions/enchanting';
 import {
@@ -311,18 +312,31 @@ describe('Rift band progression: the load-time rebuild', () => {
     expect(clean?.rolled?.stats).not.toHaveProperty(RIFT_GEM_RATING_STAT[CRIMSON]);
   });
 
-  it('carries the player item lock through the rebuild and nothing else', () => {
-    const locked = sanitizeRiftGearInstance(
-      'riftbound_band_of_might',
-      { ...legacyProdPayload(), locked: true, signer: 'nobody', charges: { x: 1 } },
-      5,
-    );
+  it('carries the player item lock and an unread lootQuality through the rebuild, nothing else', () => {
+    // Forward compatibility: a later release stamps a permanent per-copy
+    // `lootQuality` descriptor on bands. This binary prices nothing from it
+    // (the ladder line below is unchanged), but a rollback to this binary must
+    // never strip it: the load bound admits the unknown key, and the rebuild
+    // carries it through as-is.
+    const lootQuality = { version: 1, tier: 2, weights: [1, 2, 3, 4, 5] };
+    const loaded = sanitizeItemInstancePayloadOnLoad({
+      ...legacyProdPayload(),
+      locked: true,
+      signer: 'nobody',
+      charges: { x: 1 },
+      lootQuality,
+    });
+    expect(loaded.dropped).toEqual([]);
+    const locked = sanitizeRiftGearInstance('riftbound_band_of_might', loaded.payload!, 5);
     expect(locked?.locked).toBe(true);
+    expect((locked as { lootQuality?: unknown })?.lootQuality).toEqual(lootQuality);
+    expect(locked?.rolled?.stats).toEqual(riftBandPrimaryStats(MIGHT, riftBandItemLevel('S', 0)));
+    expect(JSON.parse(JSON.stringify(locked))).toHaveProperty('lootQuality', lootQuality);
     expect(locked).not.toHaveProperty('signer');
     expect(locked).not.toHaveProperty('charges');
-    expect(
-      sanitizeRiftGearInstance('riftbound_band_of_might', legacyProdPayload(), 5),
-    ).not.toHaveProperty('locked');
+    const plain = sanitizeRiftGearInstance('riftbound_band_of_might', legacyProdPayload(), 5);
+    expect(plain).not.toHaveProperty('locked');
+    expect(plain).not.toHaveProperty('lootQuality');
   });
 
   it('the forge refuses a rift record riding a non-band id, spending nothing', () => {

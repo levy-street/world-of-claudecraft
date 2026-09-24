@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/avian_strider/avian_strider.glb",
+      "out": "models/mounts/avian_strider.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Run", "WalkBackward", "Jump"],
+      "keepExtras": true
+    }
+  ]
+}

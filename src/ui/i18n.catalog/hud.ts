@@ -451,6 +451,11 @@ const hudStringsEn = {
       // "Slain by Cauterized", which sounds like an enemy landed the kill.
       deathRecapCauterized: "You have died. Cauterize's burn overwhelmed you.",
       respawn: 'You feel rested and whole again.',
+      // The Pale Keeper's revive: alive again, but under the Keeper's Toll (the
+      // respawn event carries sickness: 'resurrection'). WORDY by M16, so the five
+      // non-Latin overlays carry real fills.
+      respawnKeeperToll:
+        "The Pale Keeper has revived you, but you are weaker for it: the Keeper's Toll drains your attributes until it fades.",
       ignoringChat: 'Ignoring chat from {name}.',
       noLongerIgnoring: 'No longer ignoring {name}.',
       playerNotNearby: 'That player is not nearby.',
@@ -488,6 +493,7 @@ const hudStringsEn = {
       cantInForm: "You can't do that in {form} Form.",
       bear: 'Bruin',
       cat: 'Cat',
+      bearOrCat: 'Bruin or Cat',
       travel: 'Fleet',
       shapeshifted: 'You cannot do that while shapeshifted.',
       stealthed: 'You must be stealthed.',

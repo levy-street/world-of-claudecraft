@@ -118,13 +118,38 @@ export const hudChromeStrings = {
   // ghost-state additions shown once the spirit has been released.
   death: {
     resurrectAtCorpse: 'Resurrect at Corpse',
+    // RETIRED in place: the ghost prompt's Pale Keeper button is gone (the ghost
+    // talks to the Keeper instead). The key stays, already filled in all 20
+    // locales, per the hud.core.mobileTarget retired-but-translated precedent.
     resurrectAtHealer: "The Pale Keeper (Keeper's Toll)",
+    // The standing top-of-screen line for the whole ghost run (#ghost-hint).
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
+    ghostHint: 'Run to the location of your death or talk to the Pale Keeper to revive',
     spiritHealerAlive: 'The Pale Keeper watches over the dead. You are still among the living.',
-    // Confirm dialog gating the Pale Keeper revive (the corpse run stays one-tap:
-    // it carries no penalty, so a confirm there would only add friction).
+    // The Pale Keeper's two-step revive (keeper_revive_dialog_core.ts). Step one is
+    // the Keeper's dialogue, opened by talking to it; step two is the confirmation
+    // Revive Me opens. Both are worded for whether the Toll lands on this character:
+    // a levelled hero is never told a waiver exists, a newcomer is told the Toll
+    // exists but that they are spared it. The corpse run stays one-tap: it carries
+    // no penalty, so a confirm there would only add friction. The four bodies are
+    // WORDY by M16, so the five non-Latin overlays carry real fills.
+    keeperTalkTitle: 'The Pale Keeper',
+    keeperTalkBody:
+      "I can raise you where you stand, but my Toll comes with it: the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to where you fell revives you with no penalty.",
+    keeperTalkSparedBody:
+      'I can raise you where you stand. My Toll would normally come with it, a weakening of all you are for a time, but you are new to this world, so I will spare you it. Walking your spirit back to where you fell revives you with no penalty either way.',
+    keeperTalkAccept: 'Revive Me',
+    keeperTalkLeave: 'Leave',
     healerConfirmTitle: "Accept the Keeper's Toll?",
+    // RETIRED in place: the single confirm's body, superseded by the two level-aware
+    // bodies below (the hud.core.mobileTarget retired-but-translated precedent).
     healerConfirmBody:
       "The Pale Keeper will revive you here, but the Keeper's Toll reduces all of your attributes by 75%, for up to 10 minutes at higher levels. Walking your spirit back to your corpse revives you with no penalty.",
+    keeperConfirmBody:
+      "Are you sure? The Pale Keeper will revive you, but you will be weaker for it: the Keeper's Toll reduces all of your attributes by 75% until it fades, up to 10 minutes at higher levels.",
+    keeperConfirmSparedTitle: 'Let the Keeper raise you?',
+    keeperConfirmSparedBody:
+      "Are you sure? The Pale Keeper will revive you here. You are below level 10, so the Keeper's Toll will not weaken you this time.",
     healerConfirmAccept: 'Revive Me',
     healerConfirmCancel: 'Cancel',
   },
@@ -151,6 +176,11 @@ export const hudChromeStrings = {
     // still promise the old outcome.
     helpUnstuckSickness:
       'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. It leaves you with Unstuck Sickness for up to 5 minutes.',
+    // v0.44.0: the first use in an hour is free and only a repeat inside the window
+    // charges the sickness. New key for the same reason again: the shipped rows above
+    // promise a charge on every use.
+    helpUnstuckWindow:
+      'Recovery: /unstuck starts a stationary countdown, then moves you to the nearest graveyard, reviving you if you had fallen. The first use in an hour is free. Use it again within an hour of the last and it leaves you with Unstuck Sickness for up to 5 minutes.',
     started:
       'Unstuck in {seconds} seconds. Moving, fighting, taking damage, or starting another action cancels it.',
     countdown: 'Unstuck: {seconds}',
@@ -165,6 +195,12 @@ export const hudChromeStrings = {
       'You have been moved to the nearest graveyard. Unstuck Sickness weighs on you.',
     revivedAtGraveyardUnstuck:
       'You have been moved to the nearest graveyard and revived. Unstuck Sickness weighs on you.',
+    // v0.44.0: the same two outcomes when no sickness was charged (the first use in an
+    // hour). They warn about the repeat instead of announcing a debuff that never landed.
+    movedToGraveyardFree:
+      'You have been moved to the nearest graveyard. Using Unstuck again within the hour will leave you with Unstuck Sickness.',
+    revivedAtGraveyardFree:
+      'You have been moved to the nearest graveyard and revived. Using Unstuck again within the hour will leave you with Unstuck Sickness.',
     cancelledMoved: 'Unstuck cancelled because you moved.',
     cancelledDamaged: 'Unstuck cancelled because you took damage.',
     cancelledCombat: 'Unstuck cancelled because you entered combat.',
@@ -287,6 +323,23 @@ export const hudChromeStrings = {
     // en-only domain, and a completed sale should not wait on twenty locale
     // blocks to stop calling itself cancelled.
     windowClosed: 'Trade window closed.',
+    // The bags-side offer-quantity prompt (click a splittable stack while a
+    // trade is open): the bank withdraw prompt's trade twin, so the prompt
+    // copy mirrors hudChrome.bank.withdrawQuantity*, its step buttons reuse
+    // hudChrome.bank.quantityStep*Aria, and the cancel reuses
+    // itemUi.vendor.sellQuantityCancel. The hint rides under
+    // itemUi.tooltip.clickTradeOffer on the stacks that get the prompt.
+    offerQuantityHint: 'You will be asked how many to offer',
+    offerQuantityTitle: 'Offer {item}',
+    offerQuantityInput: 'Quantity to offer',
+    offerQuantityConfirm: 'Offer',
+    offerQuantityAll: 'Offer all',
+    // The remove prompt (click an offered row in the trade window): the same
+    // chrome as the offer prompt, counting units to take OFF the line.
+    offerRemoveTitle: 'Remove {item}',
+    offerRemoveInput: 'Quantity to remove',
+    offerRemove: 'Remove',
+    offerRemoveAll: 'Remove all',
     woc: {
       tabGold: 'Gold',
       tabWoc: '$WOC',
@@ -1874,6 +1927,7 @@ export const hudChromeStrings = {
     name_rallycart_rxt: 'Rallycart RXT',
     name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_avian_strider: 'Viridian Valestrider',
     name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
@@ -1897,6 +1951,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_avian_strider:
+      'A towering saddle-bird whose heavy talons and folded wings turn every journey into a thundering sprint.',
     desc_mech_bird:
       'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
@@ -2175,6 +2231,21 @@ export const hudChromeStrings = {
     shaderWarmOn: 'On',
     shaderWarmNote:
       'Pre-warm shader cache in the background to prevent in-game stuttering. Auto: Enabled only when supported by your graphics system. (Recommended). On: Forced everywhere. May worsen performance on some setups. Off: Disabled.',
+    // Graphics System card: the frame rate ceiling. The rate is a divisor of the
+    // measured display refresh, so the status line under the buttons states
+    // the rate actually obtained. Wordy values, M16: the five non-Latin fills
+    // land in this same change.
+    frameRateCap: 'Frame Rate Limit',
+    frameRateCapAuto: 'Auto',
+    frameRateCapDisplay: 'Display',
+    frameRateCapSixty: '60',
+    frameRateCapThirty: '30',
+    frameRateCapNote:
+      'Limits how many images the game draws each second. On a computer that cannot keep up with its display, a lower limit gives a steadier picture and keeps the computer cooler. The limit follows your display, so the real rate can differ a little from the number. Auto lowers the limit only when this computer cannot keep up with its display, then keeps it steady. (Recommended). Display: no limit.',
+    frameRateCapStatusPaced: 'Drawing {fps} images per second on a {hz} Hz display.',
+    frameRateCapStatusUnpaced: 'Limiting to {fps} images per second.',
+    frameRateCapStatusInert:
+      'This display already runs at or under this limit, so the limit changes nothing.',
     gpuBackend: 'Graphics Backend',
     gpuBackendAuto: 'Auto',
     gpuBackendVulkan: 'Vulkan',
@@ -2463,7 +2534,11 @@ export const hudChromeStrings = {
   // the older dev `?perf` trace output, which stays English like console.*. The real-DOM
   // `?diagnostics=1` panel below is localized because its chrome is user-visible.
   perf: {
-    title: 'Performance Overlay',
+    // The sub-view now holds more than the overlay (the desktop shell's System
+    // Report section sits under it), so the view is "Performance" and the
+    // overlay controls carry their own section heading inside it.
+    title: 'Performance',
+    overlaySection: 'Performance Overlay',
     enable: 'Show Performance Overlay',
     description: 'Choose which stats to show, where the overlay sits, and how it looks.',
     sectionPosition: 'Position',
@@ -3418,6 +3493,23 @@ export const hudChromeStrings = {
     tooLarge: 'That report is too large to send. Try again without the screenshot.',
     rateLimited: "You've sent several reports recently. Please wait a bit before sending another.",
     failed: 'Could not send the bug report. Please try again.',
+  },
+  // The System Report section at the foot of Options > Performance
+  // (src/ui/host_diag_section_controller.ts), desktop shell only. Deliberately
+  // small: one sentence, one button, one status line. Nothing is uploaded,
+  // which the sentence says outright, because the section's whole job is asking
+  // a player to hand over a description of their own computer.
+  hostDiag: {
+    title: 'System Report',
+    intro:
+      'Collects details about this computer, including the programs using the most processor and memory, into a file that helps diagnose performance problems. Nothing is sent: the file stays on your computer.',
+    create: 'Generate system report',
+    running: 'Collecting system details...',
+    saved: 'Report saved as {fileName}.',
+    // Defensive twin of the line above, for a shell that saved a file without
+    // naming it back: never expected, and better than an empty file name.
+    savedNoName: 'Report saved.',
+    failed: 'The report could not be created. Please try again.',
   },
   // Character window (paperdoll) controls.
   paperdoll: {
@@ -5153,6 +5245,15 @@ export const hudChromeStrings = {
       // The same success on a full band: the oldest gem was destroyed.
       socketReplaced: 'Socketed a gem into {name}; {gem} was destroyed.',
     },
+  },
+  lootQuality: {
+    ordinary: 'Ordinary',
+    superior: 'Superior',
+    exceptional: 'Exceptional',
+    magnificent: 'Magnificent',
+    transcendent: 'Transcendent',
+    itemName: '{item}, {quality}',
+    tooltip: '{quality}: +{levels} item levels. Retained through upgrades.',
   },
   itemTooltip: {
     requiresLevel: 'Requires Level {level}',

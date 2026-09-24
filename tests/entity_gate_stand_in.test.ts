@@ -268,9 +268,7 @@ describe('entity gate stand-ins actually stand in', () => {
     // the body is the stand-in, so no plate is forced and the entity has a
     // click target and silhouette the whole time.
     const row = ENTITY_GATE_STAND_INS.find(
-      (r) =>
-        r.callSite ===
-        'this.farBakeLane.enqueue((settled) => this.gateSwapFlagOnCompile(target, settled)',
+      (r) => r.callSite === '(settled) => this.gateSwapFlagOnCompile(target, settled),',
     );
     expect(row?.hides).toContain('attachDeferredDecals');
     expect(row?.standIn).toContain('the same body');
