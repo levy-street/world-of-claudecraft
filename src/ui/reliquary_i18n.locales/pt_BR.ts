@@ -156,7 +156,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroico: Crisol da Última Chama',
-    desc: 'Armas exclusivas do modo heroico de Ignivar, Arauto da Última Chama.',
+    desc: 'Armas exclusivas do modo heroico e berloques da raide de Ignivar, Arauto da Última Chama.',
   },
   conquerors_varkhul: {
     name: 'O Crisol Interior',
@@ -164,7 +164,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroico: Crisol Interior',
-    desc: 'Escudos e armas exclusivos do modo heroico de Varkhul, Pai da Forja da Última Chama.',
+    desc: 'Escudos e armas exclusivos do modo heroico e berloques da raide de Varkhul, Pai da Forja da Última Chama.',
   },
   conquerors_set_bramblehide: {
     name: 'Couro de Sarça de Roots',

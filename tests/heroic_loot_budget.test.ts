@@ -23,6 +23,12 @@ import { Sim } from '../src/sim/sim';
 // (scripts/stamina_baseline_codemod.ts, run with --dry) and the generated
 // variants that follow their bases; the one boss whose digest did not move
 // (choirmother_selthe) is the one whose gear def did not change.
+// The trinket slot then added one trinket (content/trinkets.ts) to four
+// final bosses' equipment partitions: morthen (bastion_sigil), vael
+// (stormjar), ysolei (menders_hourglass) and wildheart_high_priest
+// (paired_talons). Those four gearIds gained the trinket and their digests were
+// re-minted; the digest over their PRE-trinket ids was verified unchanged, so no
+// existing def moved.
 const BASELINE = {
   sexton_marrow: {
     gearIds: ['oiled_boots', 'quilted_trousers'],
@@ -31,6 +37,7 @@ const BASELINE = {
   },
   morthen: {
     gearIds: [
+      'bastion_sigil',
       'bonechill_cord',
       'bonechill_striders',
       'cryptbone_greaves',
@@ -46,7 +53,7 @@ const BASELINE = {
       'shadowpulse_slippers',
     ],
     normalDigest: '608ad38c9ea77cb6a20f75c9aac2fc5bf6787ccf9ac41a8a50ae9b9cd7ddef13',
-    gearDigest: 'd47e4919442dff38f8cced88ea753e42a151ddbcde21b69c50704049b9af8b82',
+    gearDigest: '15bfce8c44bf22ca36d68b5315fd10e2ae00662c4f9c0e258487fe598a3c8edb',
   },
   knight_commander_olen: {
     gearIds: [
@@ -75,13 +82,14 @@ const BASELINE = {
       'mistveil_cord',
       'mistveil_grips',
       'sash_of_the_sunken_court',
+      'stormjar',
       'sunken_court_mantle',
       'tidebound_spaulders',
       'tideguard_faceguard',
       'trollhide_leggings',
     ],
     normalDigest: '213a53c89b1da7a01abf0c4ea3849f9390368a6163a358f3fdad2f2007f0bcb1',
-    gearDigest: 'cb4f14361b295142d4e3cff80d5128973ade319912ee149ae013859e22075a6a',
+    gearDigest: '22c9fd554829d688bd6cbc8bb79d99c89c30b250e40ee297452a98197fbb6942',
   },
   choirmother_selthe: {
     gearIds: ['heroic_selthes_seastriders'],
@@ -98,12 +106,13 @@ const BASELINE = {
       'heroic_ysols_pearl_greaves',
       'lunar_choir_leggings',
       'lunar_tide_greatstaff',
+      'menders_hourglass',
       'stormbark_mantle',
       'tideworn_warboots',
       'tidewoven_trousers',
     ],
     normalDigest: 'aa4c9a380d095266e6cd74de3869ac1652f4a896af53c6bdd4cf406fa35ee01c',
-    gearDigest: '9a57395e1bf2c6c01ed41bd56a891a386fa999e4014c23176a5513e9666338b9',
+    gearDigest: 'b8d1423096dfc7c658a939b0ee7145b33e35305782d3884c640e27fd57dcfe65',
   },
   korgath_the_bound: {
     gearIds: [
@@ -183,6 +192,7 @@ const BASELINE = {
       'heroic_wildheart_fangknife',
       'heroic_wildheart_hexwood_staff',
       'heroic_wildheart_tuskblade',
+      'paired_talons',
       'sunbone_oracles_crown',
       'sunbone_ritual_hauberk',
       'sunbone_ritual_sarong',
@@ -190,7 +200,7 @@ const BASELINE = {
       'vineclaw_stalking_breeches',
     ],
     normalDigest: 'dc4c6a27f87b5cd5ab11237b791de5a2707e2b55329f7c1aada4a4fb9cfe34f8',
-    gearDigest: 'b2d1139c6e200d4a6e86302d3761a656b52ec898f341de292da2d5505db57bb5',
+    gearDigest: '62b6f9de2378727e1e5e2c42d127d08705f32fcd284410b4326e7ec950931da8',
   },
 } as const;
 

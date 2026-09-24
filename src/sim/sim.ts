@@ -131,7 +131,6 @@ import {
 import {
   completeVeilboundMarch,
   updateVeilboundMarchMovement,
-  veilboundMarchBlocksAura,
 } from './combat/paladin_veilbound_march';
 import { cleanupPriestState } from './combat/priest/lifecycle';
 import * as resurrectionOfferMod from './combat/resurrection_offer';
@@ -144,6 +143,7 @@ import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spel
 import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { threatMod as threatModImpl } from './combat/threat_modifiers';
+import { onTrinketAvoidance, playerAuraGuarded, restorableCooldown } from './combat/trinket_seams';
 import { warriorMeleeDefense } from './combat/warrior_hit_table';
 import { ensureWarriorStance } from './combat/warrior_stances';
 // A3: the augment/power-up content helpers used by the Fiesta match logic
@@ -3470,7 +3470,7 @@ export class Sim {
       this.time,
       restoredAbilityCharges,
       legacyChargeCaps,
-      (id) => unstuckMod.isUnstuckSystemCooldown(id) || ABILITIES[id] !== undefined,
+      restorableCooldown,
     );
     if (Object.keys(restoredAbilityCharges).length > 0) {
       player.abilityCharges = restoredAbilityCharges;
@@ -7050,7 +7050,7 @@ export class Sim {
 
   private applyAura(target: Entity, aura: Aura): void {
     if (target.kind === 'npc' && isRejectedFriendlyNpcAura(aura)) return;
-    if (veilboundMarchBlocksAura(target, aura)) return;
+    if (playerAuraGuarded(target, aura)) return;
     if (aura.kind === 'slow' && target.auras.some((active) => active.kind === 'slow_immunity')) {
       return;
     }
@@ -7839,6 +7839,7 @@ export class Sim {
         grantDevotionFromBlock(target);
         tryGrantSolarReprisal(this.ctx, target, 'block');
       }
+      onTrinketAvoidance(this.ctx, target);
     }
     const dealt = Math.max(1, Math.round(dmg));
     this.dealDamage(mob, target, dealt, crit, 'physical', null, blocked ? 'block' : 'hit');
@@ -7846,14 +7847,13 @@ export class Sim {
   }
 
   private tryRevengeFree(target: Entity): void {
-    if (target.kind !== 'player') return;
+    onTrinketAvoidance(this.ctx, target); // a dodge or parry heats a worn trinket; no rng
     const meta = this.players.get(target.id);
     if (
       !meta?.known.some((known) => known.def.id === 'revenge') ||
       !this.rng.chance(REVENGE_FREE_CHANCE)
-    ) {
+    )
       return;
-    }
     this.applyAura(target, {
       id: 'revenge_free',
       name: 'Revenge!',

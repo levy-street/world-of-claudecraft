@@ -211,6 +211,10 @@ describe('live graphics profile architecture', () => {
 const UI_PURE_CORES = [
   'src/ui/loot_quality_view.ts',
   'src/ui/item_combat_tooltip_view.ts',
+  'src/ui/trinket_tooltip_view.ts',
+  // The trinket auras' tooltip descriptor and their item-icon art map.
+  'src/ui/trinket_aura_effect.ts',
+  'src/ui/trinket_aura_art.ts',
   // The zone-entry chat line (welcome hint vs the town-done line); the
   // decision is the sim leaf src/sim/town_quests.ts, this maps it to text.
   'src/ui/zone_entry_line_core.ts',
@@ -329,6 +333,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/quest/quest_tracker.ts',
   'src/ui/hud/quest/quest_strip_core.ts',
   'src/ui/hud/action_bar/item_bags_line_core.ts',
+  'src/ui/hud/action_bar/trinket_slot_core.ts',
   'src/ui/hud/quest/prof_intro_hint_core.ts',
   'src/ui/hud/quest/clue_step_row_view.ts',
   'src/ui/hud/pet_bar_core.ts',
@@ -792,6 +797,7 @@ const RENDER_PURE_CORES = [
   'src/render/quest_object_gate_core.ts',
   'src/render/adaptive_link_budget_core.ts',
   'src/render/affliction_familiar_core.ts',
+  'src/render/trinket_relics_core.ts',
   'src/render/arrival_event_core.ts',
   'src/render/build_lane_core.ts',
   'src/render/build_ledger_core.ts',
@@ -1032,6 +1038,8 @@ const RENDER_PURE_CORES = [
 // updating this list) fails the cross-check instead of silently escaping the
 // reverse-completeness guard.
 const BARE_NAMED = [
+  'src/ui/trinket_aura_effect.ts',
+  'src/ui/trinket_aura_art.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/banner_queue.ts',
   'src/ui/item_instance_glyph_mark.ts',
@@ -2212,6 +2220,8 @@ const EXPECTED_BARE_NAMED = [
   'src/ui/target_frame_pos.ts',
   'src/ui/terms_link.ts',
   'src/ui/tool_effect_tooltip.ts',
+  'src/ui/trinket_aura_art.ts',
+  'src/ui/trinket_aura_effect.ts',
   'src/ui/unit_frame.ts',
   'src/ui/unit_portrait.ts',
   'src/ui/usd_text.ts',

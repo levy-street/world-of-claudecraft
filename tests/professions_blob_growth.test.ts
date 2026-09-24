@@ -495,7 +495,13 @@ function enchantCeiling(itemId: string, payload: ItemInstancePayload): ItemInsta
     (a, b) =>
       Buffer.byteLength(JSON.stringify(b), 'utf8') - Buffer.byteLength(JSON.stringify(a), 'utf8'),
   );
-  if (!candidates[0]) throw new Error(`no legal enchant for ${itemId}`);
+  // The trinket slot (PR 4173) admits no enchant: no ENCHANTS row names it, so
+  // its instance carries the bare payload at the ceiling rather than a made-up
+  // roll; every other slot still throws when it finds no legal enchant.
+  if (!candidates[0]) {
+    if (def.slot === 'trinket') return payload;
+    throw new Error(`no legal enchant for ${itemId}`);
+  }
   return candidates[0];
 }
 
@@ -600,7 +606,8 @@ function ceilingSim(nowMs?: number): Sim {
   // The fixture and the settle assertion both read ALL_EQUIP_SLOTS, so the
   // list length itself needs a literal pin: a slot silently dropped from the
   // live list would shrink the fixture and the measured ceiling in lockstep.
-  if (ALL_EQUIP_SLOTS.length !== 12)
+  // 13 with the trinket slot (PR 4173); the ceilings below were re-minted.
+  if (ALL_EQUIP_SLOTS.length !== 13)
     throw new Error('live equip slot list changed; re-mint the ceiling');
   for (const slot of ALL_EQUIP_SLOTS) {
     const ordinary = ALL_RECIPES.map((recipe) => ITEMS[recipe.resultItemId]).find(
@@ -933,7 +940,9 @@ describe('the professions blob growth bound (phase 16)', () => {
     expect(Object.keys(s2.questCadence ?? {})).toHaveLength(
       Object.values(QUESTS).filter((q) => q.repeatCadenceTicks).length,
     );
-    expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length);
+    // Every slot but the trinket (PR 4173): trinkets admit no enchant and no
+    // crafting signer, so the fixture's empty trinket instance prunes on save.
+    expect(Object.keys(s2.equipmentInstance ?? {})).toHaveLength(ALL_EQUIP_SLOTS.length - 1);
     // Content-scaled like the node cooldowns: one row per authored bed, so
     // the field grows with the FARM_PATCHES table, never per player action.
     expect(Object.keys(s2.farmPlots ?? {})).toHaveLength(FARM_BED_IDS.size);
@@ -2193,8 +2202,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // formula ids at their widths plus quotes and commas), equipmentInstance
     // +11 (the worn copy's widest legal enchant marker is now a faction
     // formula id); the professions band above re-measured at 18,975.
+    // The trinket slot (PR 4173) then adds its equipment row (the id-ordered
+    // first trinket a warrior can wear, bastion_sigil): 115 to 141.
     expect(fixtureDelta).toEqual({
-      equipment: 115,
+      equipment: 141,
       equipmentInstance: -6,
       inventory: 16400,
       bank: 36080,
@@ -2386,7 +2397,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // deedStats.itemsDiscovered, 320 characters of ids plus 3 bytes of
         // quoting and comma each. Predicted from the literals BEFORE the run
         // (56,508 to 56,879; the deedStats row below moves by the same 371).
-        371,
+        371 +
+        // Plus 1,136 at the trinket slot (PR 4173) landing on the integration
+        // branch: the 18 trinket ids in the maximal character's
+        // deedStats.itemsDiscovered (270 characters of ids plus 18 x 3 = 324)
+        // and the 17 trinket Reliquary pages in its reliquary rows (+812).
+        // MEASURED on the integration tree (the deedStats row below moves by
+        // the same 324 and reliquary 80 to 892).
+        1136,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2418,12 +2436,15 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     ).toEqual({
       // Faction ladder rework: knownRecipes 30 + 134 (the four learned formula
       // ids), deedStats 518 + 371 (the 17 faction ladder rows), the same two
-      // terms the settled-ceiling equation above names.
+      // terms the settled-ceiling equation above names. deedStats 889 + 324
+      // and reliquary 80 -> 892 at the trinket slot (PR 4173): the 18 trinket
+      // item ids and the 17 trinket Reliquary pages (+324 and +812 of the
+      // +1,136 above).
       questsDone: 100,
       knownRecipes: 164,
       deeds: 672,
-      deedStats: 889,
-      reliquary: 80,
+      deedStats: 1213,
+      reliquary: 892,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
     // pre-field-kit, pre-Bramblehide baseline WITH the hammer content still
@@ -2450,7 +2471,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // rows in deedStats, +371, the four learned formula ids in knownRecipes,
       // +134, and the worn copy's wider enchant marker, +11), all attributed
       // in the growth equation above.
-    ).toBe(211426);
+      // 211,426 -> 212,588 at the trinket slot (PR 4173): the +1,136 of trinket
+      // ids and Reliquary pages attributed above plus the 26-byte trinket
+      // equipment row, both of which this counterfactual keeps.
+    ).toBe(212588);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2473,7 +2497,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // weekly emissary rebase; +105 at the Clue Scroll content.
       // 212,507 -> 213,023 at the faction ladder rework (+516, as above).
       // 213,023 -> 213,045 with the Viridian Valestrider's reins (release/v0.44.0 base merge) (+22).
-    ).toBe(213045);
+      // 213,045 -> 214,207 at the trinket slot (PR 4173): +1,136 of trinket ids
+      // and Reliquary pages plus the 26-byte trinket equipment row.
+    ).toBe(214207);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2549,8 +2575,16 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // attributed in the growth equation above: 213,035 bytes; 213,057 with the Viridian Valestrider's reins (release/v0.44.0 base merge)
     // (+22, the one reins id in deedStats.itemsDiscovered). Floor at
     // measurement minus 380, edge at measurement plus one: 212,677..213,058.
-    expect(bytes, reMint).toBeGreaterThan(212677);
-    expect(bytes, reMint).toBeLessThan(213058);
+    // RE-BASED at the trinket slot (PR 4173) landing on the integration
+    // branch: 214,219 bytes, up 1,162 from 213,057. The movers are the 18
+    // trinket ids in deedStats.itemsDiscovered (+324), the 17 trinket
+    // Reliquary pages in the reliquary rows (+812) and the trinket equipment
+    // row (+26), all attributed in the growth equation above; the trinket's
+    // empty instance prunes on save, so no container or ceiling changed shape.
+    // Floor at measurement minus 380, edge at measurement plus one:
+    // 213,839..214,220.
+    expect(bytes, reMint).toBeGreaterThan(213839);
+    expect(bytes, reMint).toBeLessThan(214220);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

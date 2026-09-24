@@ -13,6 +13,7 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ru_RU: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.paperdoll.trinketSlot': 'Аксессуар',
   "questUi.worldQuest.practiceRewards": "Тренировка: играйте снова без дополнительных монет, опыта и репутации.",
   "questUi.worldQuest.replay": "Играть снова",
   'questUi.worldQuest.glider.replay': 'Лететь снова',
@@ -18126,6 +18127,149 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   "devCommand.actions.town.description": "Телепортируйтесь в центр города по имени.",
   "devCommand.actions.town.label": "Городской центр",
   "devCommand.fields.town": "Город",
+  'entities.items.bastion_sigil.name': 'Печать бастиона',
+  'entities.items.mooring_stone.name': 'Швартовый камень',
+  'entities.items.menders_hourglass.name': 'Песочные часы целителя',
+  'entities.items.wellspring_seed.name': 'Семя родника',
+  'entities.items.paired_talons.name': 'Парные когти',
+  'entities.items.hunters_tally.name': 'Счёт охотника',
+  'entities.items.stormjar.name': 'Грозовой сосуд',
+  'entities.items.echoing_lens.name': 'Отзывающаяся линза',
+  'entities.items.gamblers_die.name': 'Игральная кость игрока',
+  'entities.items.sundered_prism.name': 'Расколотая призма',
+  'entities.items.wayfarers_lodestone.name': 'Магнитный камень странника',
+  'entities.items.medallion_of_defiance.name': 'Медальон непокорности',
+  'entities.items.duelists_brand.name': 'Клеймо дуэлянта',
+  'entities.items.forgefathers_temper.name': 'Закалка Отца Кузни',
+  'entities.items.kindling_orb.name': 'Сфера растопки',
+  'entities.items.molten_fletching.name': 'Расплавленное оперение',
+  'entities.items.last_flame_lantern.name': 'Фонарь последнего пламени',
+  'entities.items.heart_of_the_crucible.name': 'Сердце горнила',
+  'hudChrome.trinkets.equipLine': 'Если на персонаже: {effect}',
+  'hudChrome.trinkets.useLine': 'Использование: {effect} (восстановление {cooldown})',
+  'hudChrome.trinkets.cooldownMinutes': '{minutes} мин.',
+  'hudChrome.trinkets.cooldownSeconds': '{seconds} сек.',
+  'hudChrome.trinkets.gambleResult': '{item}: {fortune}!',
+  'hudChrome.trinkets.snakeEyes': 'Змеиные глаза',
+  'hudChrome.trinkets.equippedLine': 'Надето',
+  'hudChrome.trinkets.equipLockout':
+    'При надевании его использование уходит на восстановление на {seconds} сек. или на оставшееся время восстановления заменяемого аксессуара, если оно дольше.',
+  'hudChrome.trinkets.equip.lastStand':
+    'Получая урон при здоровье ниже {threshold}%, вы получаете щит, поглощающий {absorb} ед. урона ({absorbPct}% от максимального здоровья), на {duration} сек. Срабатывает не чаще раза в {icd} сек.',
+  'hudChrome.trinkets.equip.hourglass':
+    'Избыточное исцеление от ваших прямых исцелений копится в песочных часах, вплоть до {cap} ед. ({capPct}% от максимального здоровья). Накопленное исцеление исчезает через {fade} сек. после последнего пополнения.',
+  'hudChrome.trinkets.equip.twinStrike':
+    'Ваши попадания автоатакой с вероятностью {chance}% вызывают дополнительный удар ближнего боя правой рукой. Срабатывает не чаще раза в {icd} сек.',
+  'hudChrome.trinkets.equip.tally':
+    'Каждый ваш критический удар автоатакой и каждый добивающий удар добавляют метку счета, вплоть до {max}. Метки держатся {duration} сек. и обновляются при получении новой.',
+  'hudChrome.trinkets.equip.storm':
+    'Каждое произнесенное вами заклинание добавляет заряд, вплоть до {max}. Заряды держатся {duration} сек. и обновляются при получении нового.',
+  'hudChrome.trinkets.equip.heat':
+    'Каждое ваше попадание оружием ближнего или дальнего боя добавляет стак жара, вплоть до {max}. Жар держится {duration} сек. и обновляется при получении нового стака.',
+  'hudChrome.trinkets.equip.ignite':
+    'Ваши критические удары оружием ближнего или дальнего боя поджигают цель, нанося {tick} ед. урона от огня каждые {every} сек. в течение {duration} сек. Новый критический удар обновляет эффект. Урон растет с силой атаки или силой атаки дальнего боя, в зависимости от того, что выше.',
+  'hudChrome.trinkets.equip.guardHeat':
+    'Каждая парированная, уклоненная или заблокированная вами атака добавляет стак жара, вплоть до {max}. Жар держится {duration} сек. и обновляется при получении нового стака.',
+  'hudChrome.trinkets.use.retaliate':
+    'В течение {duration} сек. враг, напрямую поразивший вас, получает физический урон, равный {pct}% здоровья, которое у вас отнял этот удар. Периодический урон эффект не вызывает.',
+  'hudChrome.trinkets.use.anchor':
+    'В течение {duration} сек. вы получаете на {reduction}% меньше урона, но двигаетесь со скоростью {speed}%. Снимает с вас оглушение, обездвиживание, замедление, страх, превращение, немоту, ослепление, сглаз, разоружение и эффекты выведения из строя, а пока эффект действует, вы игнорируете новые такие эффекты и отбрасывание.',
+  'hudChrome.trinkets.use.hourglass':
+    'Превращает все накопленное исцеление в щит на члене группы в пределах {range} м с наименьшим процентом здоровья, включая вас. Щит держится {duration} сек. Требуется накопленное исцеление.',
+  'hudChrome.trinkets.use.wellspring':
+    'Исцеляет вас и членов группы в пределах {radius} м на {tick} ед. здоровья каждые {every} сек. в течение {duration} сек. Исцеление растет с силой исцеления.',
+  'hudChrome.trinkets.use.bleedEdge':
+    'В течение {duration} сек. ваши попадания автоатакой накладывают эффект «Рана от когтя», наносящий {tick} ед. физического урона за каждый стак каждые {every} сек. в течение {bleedDuration} сек. и складывающийся до {stacks} раз. Урон растет с силой атаки.',
+  'hudChrome.trinkets.use.tallyStrike':
+    'Тратит все метки счета на удар по цели в пределах {range} м, нанося {perMark} ед. физического урона за метку ({max} ед. при {maxMarks} метках). Урон растет с силой атаки. Требуется метка счета.',
+  'hudChrome.trinkets.use.stormjar':
+    'Высвобождает все заряды молнией в цель в пределах {range} м, которая перескакивает еще на {extra} врагов в пределах {jumpRange} м. Каждый враг получает {perCharge} ед. урона от сил природы за заряд ({max} ед. при {maxCharges} зарядах). Урон растет с силой заклинаний. Требуется заряд.',
+  'hudChrome.trinkets.use.echo':
+    'В течение {duration} сек. ваши следующие {casts} прямых исцеления или прямых нефизических попадания повторяются с силой {pct}% от их величины.',
+  'hudChrome.trinkets.use.gamble':
+    'Бросает одну из четырех удач на {duration} сек.: {keenEdge} (вы наносите на {keenPct}% больше урона), {luckyStreak} (исцеляет {heal} ед. за время действия), {gildedGuard} (щит, поглощающий {absorb} ед. урона) или {snakeEyes} (без эффекта, но это время восстановления сокращается вдвое).',
+  'hudChrome.trinkets.use.blink':
+    'Вы переноситесь на {yards} м вперед, затем {guard} сек. получаете на {reduction}% меньше урона.',
+  'hudChrome.trinkets.use.sprint':
+    'Увеличивает скорость передвижения на {speed}% на {duration} сек. Не суммируется с другими эффектами ускорения.',
+  'hudChrome.trinkets.use.defiance':
+    'Снимает с вас все эффекты оглушения, обездвиживания, замедления, страха, превращения, немоты, ослепления, сглаза, разоружения и выведения из строя. Можно использовать под оглушением.',
+  'hudChrome.trinkets.use.brand':
+    'Клеймит вражеского игрока в пределах {range} м, снижая получаемое им исцеление на {cut}% на {duration} сек.',
+  'hudChrome.trinkets.use.temper':
+    'Тратит все стаки жара, чтобы закалить ваше оружие на {duration} сек. Ваши попадания оружием ближнего или дальнего боя наносят дополнительно {damage} ед. урона от огня, увеличенного на {perHeat}% за каждый потраченный стак жара (до {maxBonus}% при {maxHeat} стаках). Каждый добивающий удар продлевает эффект на {killExtend} сек., всего не более {maxDuration} сек. Урон растет с силой атаки или силой атаки дальнего боя, в зависимости от того, что выше.',
+  'hudChrome.trinkets.use.kindlingOrb':
+    'Призывает рядом с вами тлеющую сферу на {duration} сек. Каждое ваше заклинание, произнесенное на врага, заставляет ее выпустить снаряд в этого врага, нанося {damage} ед. урона от огня. Урон растет с силой заклинаний.',
+  'hudChrome.trinkets.use.pierce':
+    'В течение {duration} сек. ваши автоатаки, выстрелы и физические способности (кроме кровотечений) также поражают ближайшего к вашей цели врага в пределах {reach} м, нанося {share}% от нанесенного урона.',
+  'hudChrome.trinkets.use.lantern':
+    'Ставит у ваших ног фонарь на {duration} сек. Прямое исцеление от кого угодно на вас или члена группы в пределах {radius} м от фонаря также исцеляет самого раненого другого члена группы в его свете на {share}% от объема исцеления.',
+  'hudChrome.trinkets.use.heartNova':
+    'Тратит все стаки жара на огненную вспышку, которая наносит {perHeat} ед. урона от огня за стак ({max} ед. при {maxHeat} стаках) каждому врагу в пределах {radius} м и провоцирует каждое задетое существо. Урон растет с силой атаки. Требуется стак жара.',
+  'hudChrome.auraEffect.trinket.lastStandCooldown':
+    'Щит «Последний бастион» от Печати бастиона уже использован. Пока этот эффект не истечет, падение здоровья ниже {threshold}% не создаст его снова.',
+  'hudChrome.auraEffect.trinket.lastBastion':
+    'Поглощает {value} ед. урона. Печать бастиона создала этот щит, когда вы получили урон при здоровье ниже {threshold}%.',
+  'hudChrome.auraEffect.trinket.retaliate':
+    'Враги, напрямую поражающие вас, получают физический урон, равный {pct}% здоровья, которое у вас отнял этот удар. Периодический урон эффект не вызывает.',
+  'hudChrome.auraEffect.trinket.moored':
+    'Вы получаете на {reduction}% меньше урона, но двигаетесь со скоростью {speed}%. Вы игнорируете оглушение, обездвиживание, замедление, страх, превращение, немоту, ослепление, сглаз, разоружение, эффекты выведения из строя и отбрасывание.',
+  'hudChrome.auraEffect.trinket.hourglassStored':
+    'Хранит {stored} ед. исцеления, накопленного из вашего избыточного исцеления. Используйте Песочные часы целителя, чтобы превратить его в щит на члене группы в пределах {range} м с наименьшим процентом здоровья, включая вас.',
+  'hudChrome.auraEffect.trinket.hourglassShield':
+    'Поглощает {value} ед. урона. Создан из исцеления, накопленного Песочными часами целителя.',
+  'hudChrome.auraEffect.trinket.wellspring':
+    'Восстанавливает {tick} ед. здоровья каждые {every} сек.',
+  'hudChrome.auraEffect.trinket.twinStrikeCooldown':
+    'Парные когти только что нанесли дополнительный удар. Следующий возможен только после окончания этого эффекта.',
+  'hudChrome.auraEffect.trinket.bleedEdge':
+    'Ваши автоатаки накладывают «Рану от когтя»: {tick} ед. физического урона за стак каждые {every} сек. в течение {duration} сек., до {max} стаков.',
+  'hudChrome.auraEffect.trinket.bleedEdgeOther':
+    'Автоатаки накладывают «Рану от когтя», физическое кровотечение до {max} стаков. Урон растет с силой атаки.',
+  'hudChrome.auraEffect.trinket.talonWound':
+    'Наносит {damage} ед. физического урона каждые {every} сек. ({stacks}/{max} стаков). Каждый новый стак добавляет урон и обновляет длительность.',
+  'hudChrome.auraEffect.trinket.tally':
+    'Метки счета: {stacks}/{max}. Используйте Счёт охотника, чтобы потратить их все на удар по цели, наносящий {damage} ед. физического урона ({perMark} ед. за метку).',
+  'hudChrome.auraEffect.trinket.tallyOther':
+    'Метки счета: {stacks}/{max}. Счёт охотника тратит их все на физический удар, урон которого растет с каждой меткой.',
+  'hudChrome.auraEffect.trinket.storm':
+    'Заряды: {stacks}/{max}. Используйте Грозовой сосуд, чтобы высвободить их молнией, которая поражает вашу цель и еще до {extra} врагов в пределах {jumpRange} м друг от друга, нанося каждому {damage} ед. урона от сил природы ({perCharge} ед. за заряд).',
+  'hudChrome.auraEffect.trinket.stormOther':
+    'Заряды: {stacks}/{max}. Грозовой сосуд высвобождает их молнией природы, которая поражает цель и еще до {extra} врагов; урон растет с каждым зарядом.',
+  'hudChrome.auraEffect.trinket.echo':
+    'Ваши следующие {casts} прямых исцеления или прямых нефизических попадания повторяются с силой {pct}% от их величины.',
+  'hudChrome.auraEffect.trinket.keenEdge':
+    'Удача Игральной кости игрока: вы наносите на {pct}% больше урона.',
+  'hudChrome.auraEffect.trinket.luckyStreak':
+    'Удача Игральной кости игрока: восстанавливает {tick} ед. здоровья каждые {every} сек.',
+  'hudChrome.auraEffect.trinket.gildedGuard':
+    'Удача Игральной кости игрока: поглощает {value} ед. урона.',
+  'hudChrome.auraEffect.trinket.riftGuard':
+    'Вы получаете на {pct}% меньше урона.',
+  'hudChrome.auraEffect.trinket.sprint':
+    'Скорость передвижения увеличена на {pct}%. Не суммируется с другими эффектами увеличения скорости.',
+  'hudChrome.auraEffect.trinket.brand':
+    'Получаемое исцеление уменьшено на {pct}%.',
+  'hudChrome.auraEffect.trinket.forgeHeat':
+    'Жар: {stacks}/{max}. Закалка Отца Кузни тратит его весь, и ее огонь оружия наносит на {pct}% больше урона.',
+  'hudChrome.auraEffect.trinket.tempered':
+    'Ваши попадания оружием ближнего и дальнего боя наносят дополнительно {damage} ед. урона от огня (на {pct}% больше за потраченный жар). Каждый добивающий удар продлевает эффект на {killExtend} сек., всего не более {maxDuration} сек.',
+  'hudChrome.auraEffect.trinket.temperedOther':
+    'Попадания оружием ближнего и дальнего боя наносят дополнительный урон от огня, на {pct}% больше за потраченный жар. Урон растет с силой атаки или силой атаки дальнего боя, в зависимости от того, что выше.',
+  'hudChrome.auraEffect.trinket.kindlingOrb':
+    'Каждое ваше заклинание, произнесенное на врага, заставляет сферу выпустить в этого врага снаряд, наносящий {damage} ед. урона от огня. Сфера не стреляет во врага под превращением, выведением из строя или ослеплением.',
+  'hudChrome.auraEffect.trinket.kindlingOrbOther':
+    'Каждое заклинание, произнесенное на врага, заставляет сферу выпустить в него огненный снаряд. Урон растет с силой заклинаний.',
+  'hudChrome.auraEffect.trinket.moltenIgnite':
+    'Наносит {damage} ед. урона от огня каждые {every} сек. Новый критический удар оружием обновляет эффект.',
+  'hudChrome.auraEffect.trinket.pierce':
+    'Ваши автоатаки, выстрелы и физические способности (кроме кровотечений) также поражают ближайшего к вашей цели врага в пределах {reach} м, нанося {pct}% от нанесенного урона.',
+  'hudChrome.auraEffect.trinket.lantern':
+    'Прямое исцеление от кого угодно на вас или члена группы в пределах {radius} м от фонаря также исцеляет самого раненого другого члена группы в его свете на {pct}% от объема исцеления.',
+  'hudChrome.auraEffect.trinket.crucibleHeat':
+    'Жар: {stacks}/{max}. Используйте Сердце горнила, чтобы потратить его весь на огненную вспышку, которая наносит {damage} ед. урона от огня каждому врагу в пределах {radius} м и провоцирует каждое задетое существо.',
+  'hudChrome.auraEffect.trinket.crucibleHeatOther':
+    'Жар: {stacks}/{max}. Сердце горнила тратит его весь на огненную вспышку в пределах {radius} м, урон от огня которой растет с каждым стаком; она провоцирует каждое задетое существо.',
   // The Weekly Vault (PR 4052): the bank's rewards tab, the keeper prompt and the claim flow.
   "hudChrome.weeklyRewards.title": "Еженедельное хранилище",
   "hudChrome.weeklyRewards.tab": "Еженедельные награды",

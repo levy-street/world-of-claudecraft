@@ -21,6 +21,7 @@ import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { Entity, WeaponProc, WeaponProcEffect, WeaponProcTrigger } from '../types';
 import { baseSwingSpeed, isCatForm } from './form_swing';
+import { runTrinketTrigger } from './trinkets';
 
 // Roll every proc on the wielder's equipped mainhand that matches `trigger`, and
 // apply the effects of each that fires. `target` is the primary target of the
@@ -33,6 +34,8 @@ export function runWeaponProcs(
   weaponItemId?: string | null,
   meleeHand?: 'mainhand' | 'offhand',
 ): void {
+  // A worn trinket's on-hit passives ride every weapon hit (combat/trinkets.ts).
+  if (trigger === 'weaponHit') runTrinketTrigger(ctx, wielder, target, 'weaponHit');
   // Which hand's weapon rolled procs. `undefined` = not specified: fall back to
   // the mainhand (back-compat for the spell/heal/ranged call sites and every
   // existing golden). An explicit id rolls THAT hand's weapon; an explicit

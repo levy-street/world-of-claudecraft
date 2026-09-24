@@ -21,6 +21,7 @@ import { DEED_IMAGE_IDS } from './deed_image_ids';
 import { professionImageUrl } from './hud/professions/profession_art';
 import { MOB_AURA_IMAGE_IDS } from './mob_aura_icon_art';
 import { PET_ACTION_IMAGE_IDS } from './pet_action_icons';
+import { TRINKET_AURA_IMAGE_URLS } from './trinket_aura_art';
 import { ITEM_WEAPON_VARIANTS } from './weapon_variants';
 
 export { PROFESSION_IMAGE_IDS, professionImageUrl } from './hud/professions/profession_art';
@@ -5104,6 +5105,8 @@ const EXTERNAL_AURA_IMAGE_URLS: ReadonlyMap<string, string> = new Map([
   ['pow_colossus', '/ui/fiesta/powerups/pow_colossus.webp'],
   ['pow_moon_boots', '/ui/fiesta/powerups/pow_moon_boots.webp'],
   ['pow_speed_demon', '/ui/fiesta/powerups/pow_speed_demon.webp'],
+  // Every trinket aura paints its trinket's item icon (trinket_aura_art.ts).
+  ...TRINKET_AURA_IMAGE_URLS,
 ]);
 
 /** All exact aura-art identities, including assets shared from another UI family. */
@@ -5480,6 +5483,27 @@ export const ITEM_IMAGE_IDS = new Set<string>([
   'reins_thunderstrut_gobbler',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
+  // trinkets (src/sim/content/trinkets.ts; opaque woc-item-icon-v1 paintings from the
+  // trinket-slot-icons-2026-09-23 batch in mapping.json)
+  'bastion_sigil',
+  'mooring_stone',
+  'menders_hourglass',
+  'wellspring_seed',
+  'paired_talons',
+  'hunters_tally',
+  'stormjar',
+  'echoing_lens',
+  'gamblers_die',
+  'sundered_prism',
+  'wayfarers_lodestone',
+  'medallion_of_defiance',
+  'duelists_brand',
+  // raid trinkets (Crucible of the Last Spring), same batch
+  'forgefathers_temper',
+  'kindling_orb',
+  'molten_fletching',
+  'last_flame_lantern',
+  'heart_of_the_crucible',
 ]);
 
 // The grouped literals above preserve the curated catalog's provenance history. Derive the

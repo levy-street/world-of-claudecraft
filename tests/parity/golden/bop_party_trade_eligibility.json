@@ -30,7 +30,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "35c4f813",
+      "state": "2774bab6",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -337,7 +337,7 @@
               },
               {
                 "count": 1,
-                "itemId": "cinderfang_kris"
+                "itemId": "molten_fletching"
               },
               {
                 "count": 1,
@@ -401,7 +401,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "dfa698cb",
+      "state": "3c58254e",
       "events": "31e5d163",
       "rng": {
         "draws": 8,
@@ -730,7 +730,7 @@
               },
               {
                 "count": 1,
-                "itemId": "cinderfang_kris"
+                "itemId": "molten_fletching"
               },
               {
                 "count": 1,
@@ -794,7 +794,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 1013,
-      "state": "dfa698cb",
+      "state": "3c58254e",
       "events": "741638a5",
       "rng": {
         "draws": 8,
@@ -1123,7 +1123,7 @@
               },
               {
                 "count": 1,
-                "itemId": "cinderfang_kris"
+                "itemId": "molten_fletching"
               },
               {
                 "count": 1,

@@ -850,6 +850,23 @@ export const WARFARE_ITEMS: Record<string, ItemDef> = {
 
 export const FURY_STOCK: readonly string[] = Object.keys(WARFARE_ITEMS);
 
+// The two PvP trinkets (content/trinkets.ts), sold beside the WARFARE kit for
+// 800 honor. They carry WARFARE like the rest of the honor gear, on the jewelry
+// rule: one attribute at WARFARE_JEWELRY_STAT_FRACTION of the item-level-31
+// trinket line (10 of 13, no stamina top-up: the trinket slot is exempt from the
+// stamina model) and WARFARE Offense and Defense Rating at
+// WARFARE_RATING_FRACTION of it (13 each). They have no set tag and their defs
+// live in content/trinkets.ts, so they sit outside FURY_STOCK (and outside the
+// kit and set arithmetic, which counts the eleven kit slots); a full kit plus
+// both trinkets reads 208 of each rating before any set tier, and the set
+// capstone still clamps at the cap. Registered at WARFARE_SOURCE_LEVEL by
+// item_level.buildSourceIndex. Soulbound with no gold sell value, like every
+// honor purchase.
+export const WARFARE_TRINKET_STOCK: readonly string[] = ['medallion_of_defiance', 'duelists_brand'];
+
+// What both honor quartermasters actually sell: the WARFARE kit, then the trinkets.
+export const HONOR_VENDOR_STOCK: readonly string[] = [...FURY_STOCK, ...WARFARE_TRINKET_STOCK];
+
 export const FURY_NPC: NpcDef = {
   id: FURY_NPC_ID,
   name: 'FURY',
@@ -858,7 +875,7 @@ export const FURY_NPC: NpcDef = {
   facing: EASTBROOK_NPC_PLACEMENTS_BY_ID.fury.facing,
   color: 0xb52a2a,
   questIds: [],
-  vendorItems: [...FURY_STOCK],
+  vendorItems: [...HONOR_VENDOR_STOCK],
   dynamic: true,
   // The Eastbrook mirror sells the identical stock, so it presents the identical
   // set-divided shop window. One canonical stock, two placements.

@@ -2649,6 +2649,47 @@ export const ja_JP: EnTranslations = {
       "dot": "{name}を植え付け、{school}の継続ダメージで{duration}秒かけて{total}を与える",
       "hot": "{name}を咲かせ、継続回復で{duration}秒かけて{total}を回復する"
     },
+    "trinkets": {
+      "equipLine": "装備時: {effect}",
+      "scaled": "{base} (+{bonus})",
+      "useLine": "使用: {effect}（クールダウン{cooldown}）",
+      "cooldownMinutes": "{minutes}分",
+      "cooldownSeconds": "{seconds}秒",
+      "gambleResult": "{item}: {fortune}！",
+      "snakeEyes": "スネークアイズ",
+      "equippedLine": "装備中",
+      "equipLockout": "装備すると使用効果に{seconds}秒のクールダウンが発生する。置き換えた装飾品の残りクールダウンの方が長い場合はそちらになる。",
+      "equip": {
+        "lastStand": "体力が{threshold}%未満の状態でダメージを受けると、{absorb}ダメージ（最大体力の{absorbPct}%）を吸収するシールドを{duration}秒間得る。{icd}秒に1回まで発動する。",
+        "hourglass": "直接回復による過剰回復は砂時計に蓄えられる（最大{cap}、最大体力の{capPct}%）。蓄えた回復量は最後に増えてから{fade}秒後に消える。",
+        "twinStrike": "自動攻撃が命中すると、{chance}%の確率でメインハンドの近接攻撃をもう1回行う。{icd}秒に1回まで発動する。",
+        "tally": "自動攻撃のクリティカルヒットととどめの一撃ごとに集計の印を1つ得る（最大{max}）。印は{duration}秒持続し、得るたびに更新される。",
+        "storm": "呪文を唱えるたびにチャージを1つ得る（最大{max}）。チャージは{duration}秒持続し、得るたびに更新される。",
+        "heat": "近接および遠隔武器の命中ごとに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。",
+        "ignite": "近接および遠隔武器のクリティカルヒットがターゲットに火をつけ、{every}秒ごとに{tick}の火炎ダメージを{duration}秒間与える。新たなクリティカルヒットで更新される。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
+        "guardHeat": "攻撃を受け流し、回避、またはブロックするたびに熱を1スタック得る（最大{max}）。熱は{duration}秒持続し、スタックを得るたびに更新される。"
+      },
+      "use": {
+        "retaliate": "{duration}秒間、あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。",
+        "anchor": "{duration}秒間、受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果を解除し、効果中は新たなそれらとノックバックを無視する。",
+        "hourglass": "蓄えた回復量をすべて、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。シールドは{duration}秒持続する。蓄えた回復量が必要。",
+        "wellspring": "{duration}秒間、{every}秒ごとに自分と{radius}ヤード以内のパーティメンバーの体力を{tick}回復する。回復量は回復力で増加する。",
+        "bleedEdge": "{duration}秒間、自動攻撃の命中が鉤爪の傷を与える。鉤爪の傷はスタックごとに{every}秒ごと{tick}の物理ダメージを{bleedDuration}秒間与え、最大{stacks}回までスタックする。ダメージは攻撃力で増加する。",
+        "tallyStrike": "集計の印をすべて消費し、{range}ヤード以内のターゲットに印1つにつき{perMark}の物理ダメージを与える（印{maxMarks}つで{max}）。ダメージは攻撃力で増加する。集計の印が必要。",
+        "stormjar": "すべてのチャージを雷として{range}ヤード以内のターゲットに放つ。雷は{jumpRange}ヤード以内の敵に最大{extra}体まで跳ね移る。各敵はチャージ1つにつき{perCharge}の自然ダメージを受ける（チャージ{maxCharges}つで{max}）。ダメージは呪文力で増加する。チャージが必要。",
+        "echo": "{duration}秒間、次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。",
+        "gamble": "4つの運勢のうち1つを{duration}秒間引く: {keenEdge}（与えるダメージが{keenPct}%増加）、{luckyStreak}（効果時間中に{heal}回復）、{gildedGuard}（{absorb}ダメージを吸収するシールド）、{snakeEyes}（効果なし、ただしこのクールダウンが半分になる）。",
+        "blink": "前方に{yards}ヤード移動し、その後{guard}秒間受けるダメージが{reduction}%減少する。",
+        "sprint": "{duration}秒間、移動速度が{speed}%上昇する。他の速度上昇効果とは重複しない。",
+        "defiance": "自身のスタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果をすべて解除する。スタン中でも使用可能。",
+        "brand": "{range}ヤード以内の敵プレイヤー1人に烙印を押し、受ける回復量を{duration}秒間{cut}%減少させる。",
+        "temper": "熱をすべて消費し、{duration}秒間武器に焼き入れをする。近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与え、消費した熱1スタックにつき{perHeat}%増加する（{maxHeat}スタックで最大{maxBonus}%）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
+        "kindlingOrb": "{duration}秒間、残り火のオーブを自分のそばに呼び出す。敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。ダメージは呪文力で増加する。",
+        "pierce": "{duration}秒間、オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{share}%を与える。",
+        "lantern": "{duration}秒間、足元にランタンを置く。ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{share}%回復する。",
+        "heartNova": "熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に熱1スタックにつき{perHeat}の火炎ダメージを与え（{maxHeat}スタックで{max}）、命中したすべてのクリーチャーを挑発する。ダメージは攻撃力で増加する。熱が必要。"
+      }
+    },
     "questShare": {
       "notShareable": "このクエストは共有できません。",
       "notInSharerParty": "{name} のパーティに参加していないと、このクエストを受諾できません。",
@@ -2827,6 +2868,7 @@ export const ja_JP: EnTranslations = {
       "failed": "レポートを作成できませんでした。もう一度お試しください。"
     },
     "paperdoll": {
+      "trinketSlot": "装飾品",
       "unequipAria": "{item}を外す",
       "unequipHint": "× をクリック、右クリック、またはバッグへドラッグで外す",
       "hideHelmAria": "兜を隠す",
@@ -3514,6 +3556,40 @@ export const ja_JP: EnTranslations = {
       "resourceSap": "{interval}秒ごとに現在のリソースを{value}回復する",
       "nextAttackCrit": "次の攻撃が必ずクリティカルになる",
       "healEcho": "体力が{threshold}%未満になると体力を{value}回復する",
+      "trinket": {
+        "lastStandCooldown": "砦の印章の「最後の砦」シールドは使用済み。この効果が切れるまで、体力が{threshold}%を下回っても再び発動しない。",
+        "lastBastion": "{value}のダメージを吸収する。体力が{threshold}%未満でダメージを受けたときに砦の印章が張ったシールド。",
+        "retaliate": "あなたに直接攻撃を命中させた敵は、その攻撃で失った体力の{pct}%に等しい物理ダメージを受ける。継続ダメージでは発動しない。",
+        "moored": "受けるダメージが{reduction}%減少するが、移動速度が{speed}%になる。スタン、移動不能、減速、恐怖、変身、沈黙、盲目、呪術、武装解除、行動不能効果、ノックバックを無視する。",
+        "hourglassStored": "過剰回復から蓄えた回復量{stored}を保持している。癒し手の砂時計を使うと、{range}ヤード以内で体力の割合が最も低いパーティメンバー（自分を含む）へのシールドに変える。",
+        "hourglassShield": "{value}のダメージを吸収する。癒し手の砂時計が蓄えた回復量から作られたシールド。",
+        "wellspring": "{every}秒ごとに体力を{tick}回復する。",
+        "twinStrikeCooldown": "対の鉤爪が追加の攻撃を行ったばかり。この効果が切れるまで次の追加攻撃は行えない。",
+        "bleedEdge": "オートアタックの命中が鉤爪の傷を付与する：スタックごとに{every}秒ごとに{tick}の物理ダメージを{duration}秒間与え、最大{max}回までスタックする。",
+        "bleedEdgeOther": "オートアタックの命中が鉤爪の傷を付与する。最大{max}回までスタックする物理の出血効果。ダメージは攻撃力で増加する。",
+        "talonWound": "{every}秒ごとに{damage}の物理ダメージを与える（{stacks}/{max}スタック）。新たなスタックごとにダメージが増え、持続時間が更新される。",
+        "tally": "集計の印：{stacks}/{max}。狩人の集計を使うと印をすべて消費してターゲットを攻撃し、{damage}の物理ダメージを与える（印1つにつき{perMark}）。",
+        "tallyOther": "集計の印：{stacks}/{max}。狩人の集計は印をすべて消費して物理攻撃を行い、印1つごとにダメージが増える。",
+        "storm": "チャージ：{stacks}/{max}。嵐の壺を使うとチャージを雷として放ち、ターゲットと、互いに{jumpRange}ヤード以内にいる最大{extra}体の敵に命中して、それぞれに{damage}の自然ダメージを与える（チャージ1つにつき{perCharge}）。",
+        "stormOther": "チャージ：{stacks}/{max}。嵐の壺はチャージを自然の雷として放ち、ターゲットと最大{extra}体の敵に命中する。チャージ1つごとにダメージが増える。",
+        "echo": "次の{casts}回の直接回復または物理以外の直接ダメージが、その量の{pct}%で繰り返される。",
+        "keenEdge": "博徒のサイコロの運勢：与えるダメージが{pct}%増加する。",
+        "luckyStreak": "博徒のサイコロの運勢：{every}秒ごとに体力を{tick}回復する。",
+        "gildedGuard": "博徒のサイコロの運勢：{value}のダメージを吸収する。",
+        "riftGuard": "受けるダメージが{pct}%減少する。",
+        "sprint": "移動速度が{pct}%増加する。他の移動速度上昇効果とは重複しない。",
+        "brand": "受ける回復量が{pct}%減少する。",
+        "forgeHeat": "熱：{stacks}/{max}。鍛冶父の焼き入れを使うと熱をすべて消費し、その武器の炎のダメージが{pct}%増加する。",
+        "tempered": "近接および遠隔武器の命中が追加で{damage}の火炎ダメージを与える（消費した熱で{pct}%増加）。とどめの一撃ごとに{killExtend}秒延長され、合計で最大{maxDuration}秒。",
+        "temperedOther": "近接および遠隔武器の命中が追加の火炎ダメージを与え、消費した熱で{pct}%増加する。ダメージは攻撃力と遠隔攻撃力の高い方で増加する。",
+        "kindlingOrb": "敵に呪文を唱えるたびに、オーブがその敵に火の弾を放ち、{damage}の火炎ダメージを与える。変身、行動不能、盲目状態の敵には撃たない。",
+        "kindlingOrbOther": "敵に呪文を唱えるたびに、オーブがその敵に火炎ダメージの弾を放つ。ダメージは呪文力で増加する。",
+        "moltenIgnite": "{every}秒ごとに{damage}の火炎ダメージを与える。新たな武器のクリティカルヒットで更新される。",
+        "pierce": "オートアタック、射撃、物理アビリティ（出血を除く）の命中が、ターゲットから{reach}ヤード以内で最も近い敵にも与えたダメージの{pct}%を与える。",
+        "lantern": "ランタンから{radius}ヤード以内の自分またはパーティメンバーに誰かが直接回復を行うと、その光の中で最も傷ついた別のパーティメンバーもその回復量の{pct}%回復する。",
+        "crucibleHeat": "熱：{stacks}/{max}。るつぼの心臓を使うと熱をすべて消費して炎のノヴァを放ち、{radius}ヤード以内の各敵に{damage}の火炎ダメージを与え、命中したすべてのクリーチャーを挑発する。",
+        "crucibleHeatOther": "熱：{stacks}/{max}。るつぼの心臓は熱をすべて消費して{radius}ヤード以内に炎のノヴァを放ち、スタックごとに火炎ダメージが増え、命中したすべてのクリーチャーを挑発する。"
+      },
       "increase": {
         "ap": "攻撃力を{value}上昇させる",
         "str": "筋力を{value}上昇させる",
@@ -17551,6 +17627,60 @@ export const ja_JP: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "エンバーウォード、ヴァルクールの大盾"
+      },
+      "bastion_sigil": {
+        "name": "砦の印章"
+      },
+      "mooring_stone": {
+        "name": "係留石"
+      },
+      "menders_hourglass": {
+        "name": "癒し手の砂時計"
+      },
+      "wellspring_seed": {
+        "name": "湧き泉の種"
+      },
+      "paired_talons": {
+        "name": "対の鉤爪"
+      },
+      "hunters_tally": {
+        "name": "狩人の集計"
+      },
+      "stormjar": {
+        "name": "嵐の壺"
+      },
+      "echoing_lens": {
+        "name": "反響のレンズ"
+      },
+      "gamblers_die": {
+        "name": "博徒のサイコロ"
+      },
+      "sundered_prism": {
+        "name": "砕けたプリズム"
+      },
+      "wayfarers_lodestone": {
+        "name": "旅人の磁石"
+      },
+      "medallion_of_defiance": {
+        "name": "抵抗のメダリオン"
+      },
+      "duelists_brand": {
+        "name": "決闘者の烙印"
+      },
+      "forgefathers_temper": {
+        "name": "鍛冶父の焼き入れ"
+      },
+      "kindling_orb": {
+        "name": "点火のオーブ"
+      },
+      "molten_fletching": {
+        "name": "溶岩の矢羽"
+      },
+      "last_flame_lantern": {
+        "name": "最後の炎のランタン"
+      },
+      "heart_of_the_crucible": {
+        "name": "るつぼの心臓"
       },
       "rift_watchers_band": {
         "name": "裂け目の監視者の指輪"

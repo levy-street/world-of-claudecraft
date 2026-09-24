@@ -194,7 +194,8 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // (Riftwarden, Dawnkeeper, Forgemaster) take their slots on the same page.
     // 416 at the Clue Scroll casket deeds: the Treasure Hunter title's slot.
     // 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) on the Horizons mounts page.
-    expect(catalogTotal).toBe(417);
+    // 434 with the trinket slot's seventeen character-scoped relics (PR 4173).
+    expect(catalogTotal).toBe(434);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

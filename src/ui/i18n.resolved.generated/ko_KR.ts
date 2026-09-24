@@ -2649,6 +2649,47 @@ export const ko_KR: EnTranslations = {
       "dot": "{name}을 유발하여 {duration}초 동안 {total}의 {school} 지속 피해를 입힙니다",
       "hot": "{name}을 피워 {duration}초 동안 {total}의 생명력을 회복시킵니다"
     },
+    "trinkets": {
+      "equipLine": "착용 효과: {effect}",
+      "scaled": "{base} (+{bonus})",
+      "useLine": "사용 효과: {effect} (재사용 대기시간 {cooldown})",
+      "cooldownMinutes": "{minutes}분",
+      "cooldownSeconds": "{seconds}초",
+      "gambleResult": "{item}: {fortune}!",
+      "snakeEyes": "스네이크 아이즈",
+      "equippedLine": "착용 중",
+      "equipLockout": "착용하면 사용 효과에 {seconds}초의 재사용 대기시간이 시작됩니다. 교체한 장신구의 남은 재사용 대기시간이 더 길면 그 시간이 적용됩니다.",
+      "equip": {
+        "lastStand": "생명력이 {threshold}% 미만일 때 피해를 받으면 {absorb}의 피해(최대 생명력의 {absorbPct}%)를 흡수하는 보호막을 {duration}초 동안 얻습니다. {icd}초마다 한 번만 발동합니다.",
+        "hourglass": "직접 치유로 발생한 초과 치유량이 모래시계에 저장되며, 최대 {cap}(최대 생명력의 {capPct}%)까지 저장됩니다. 저장된 치유량은 마지막으로 늘어난 뒤 {fade}초가 지나면 사라집니다.",
+        "twinStrike": "자동 공격이 적중하면 {chance}% 확률로 주무기 근접 공격을 한 번 더 합니다. {icd}초마다 한 번만 발동합니다.",
+        "tally": "자동 공격 치명타와 결정타마다 집계 표식을 하나씩 얻으며, 최대 {max}개까지 쌓입니다. 표식은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.",
+        "storm": "주문을 시전할 때마다 충전을 하나 얻으며, 최대 {max}개까지 쌓입니다. 충전은 {duration}초 동안 지속되며, 새로 얻을 때마다 갱신됩니다.",
+        "heat": "근접 및 원거리 무기가 적중할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다.",
+        "ignite": "근접 및 원거리 무기의 치명타가 대상에 불을 붙여 {every}초마다 {tick}의 화염 피해를 {duration}초 동안 입힙니다. 새로운 치명타가 효과를 갱신합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
+        "guardHeat": "공격을 무기 막기, 회피 또는 방패 막기할 때마다 열기를 1중첩 얻으며, 최대 {max}중첩까지 쌓입니다. 열기는 {duration}초 동안 지속되며, 중첩을 얻을 때마다 갱신됩니다."
+      },
+      "use": {
+        "retaliate": "{duration}초 동안 당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.",
+        "anchor": "{duration}초 동안 받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 자신에게 걸린 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과를 제거하고, 지속되는 동안 새로운 효과와 밀쳐내기를 무시합니다.",
+        "hourglass": "저장된 치유량을 모두 {range}미터 이내에서 생명력 비율이 가장 낮은 파티원(자신 포함)에게 보호막으로 바꿉니다. 보호막은 {duration}초 동안 지속됩니다. 저장된 치유량이 필요합니다.",
+        "wellspring": "{duration}초 동안 {every}초마다 자신과 {radius}미터 이내의 파티원의 생명력을 {tick} 회복시킵니다. 치유량은 치유 강화로 증가합니다.",
+        "bleedEdge": "{duration}초 동안 자동 공격이 적중하면 발톱 상처를 입힙니다. 발톱 상처는 중첩당 {every}초마다 {tick}의 물리 피해를 {bleedDuration}초 동안 입히며 최대 {stacks}번까지 중첩됩니다. 피해량은 전투력으로 증가합니다.",
+        "tallyStrike": "집계 표식을 모두 소모하여 {range}미터 이내의 대상을 공격하고, 표식당 {perMark}의 물리 피해를 입힙니다(표식 {maxMarks}개일 때 {max}). 피해량은 전투력으로 증가합니다. 집계 표식이 필요합니다.",
+        "stormjar": "충전을 모두 번개로 바꿔 {range}미터 이내의 대상에게 발사하며, 번개는 {jumpRange}미터 이내의 적에게 최대 {extra}번 더 튑니다. 각 적은 충전당 {perCharge}의 자연 피해를 받습니다(충전 {maxCharges}개일 때 {max}). 피해량은 주문력으로 증가합니다. 충전이 필요합니다.",
+        "echo": "{duration}초 동안 다음 {casts}번의 직접 치유 또는 물리가 아닌 직접 피해가 그 양의 {pct}%로 한 번 더 반복됩니다.",
+        "gamble": "{duration}초 동안 네 가지 운세 중 하나를 굴립니다: {keenEdge}(주는 피해 {keenPct}% 증가), {luckyStreak}(지속시간 동안 {heal} 치유), {gildedGuard}({absorb}의 피해를 흡수하는 보호막), {snakeEyes}(효과 없음, 대신 이 재사용 대기시간이 절반이 됨).",
+        "blink": "앞으로 {yards}미터 이동한 뒤 {guard}초 동안 받는 피해가 {reduction}% 감소합니다.",
+        "sprint": "{duration}초 동안 이동 속도가 {speed}% 증가합니다. 다른 속도 증가 효과와 중첩되지 않습니다.",
+        "defiance": "자신에게 걸린 모든 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과를 제거합니다. 기절 중에도 사용할 수 있습니다.",
+        "brand": "{range}미터 이내의 적 플레이어 한 명에게 낙인을 찍어 {duration}초 동안 받는 치유량을 {cut}% 감소시킵니다.",
+        "temper": "열기를 모두 소모하여 {duration}초 동안 무기를 담금질합니다. 근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입히며, 소모한 열기 1중첩당 {perHeat}% 증가합니다({maxHeat}중첩일 때 최대 {maxBonus}%). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
+        "kindlingOrb": "{duration}초 동안 곁에 잉걸불 구슬을 소환합니다. 적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 피해량은 주문력으로 증가합니다.",
+        "pierce": "{duration}초 동안 자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {share}%를 입힙니다.",
+        "lantern": "{duration}초 동안 발밑에 등불을 놓습니다. 누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {share}%만큼 치유됩니다.",
+        "heartNova": "열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 열기 1중첩당 {perHeat}의 화염 피해를 입히고({maxHeat}중첩일 때 {max}), 적중한 모든 생물을 도발합니다. 피해량은 전투력으로 증가합니다. 열기가 필요합니다."
+      }
+    },
     "questShare": {
       "notShareable": "이 퀘스트는 공유할 수 없습니다.",
       "notInSharerParty": "{name}님의 파티에 속해 있어야 이 퀘스트를 수락할 수 있습니다.",
@@ -2827,6 +2868,7 @@ export const ko_KR: EnTranslations = {
       "failed": "보고서를 만들지 못했습니다. 다시 시도해 주세요."
     },
     "paperdoll": {
+      "trinketSlot": "장신구",
       "unequipAria": "{item} 장착 해제",
       "unequipHint": "× 클릭, 우클릭 또는 가방으로 드래그하여 장착 해제",
       "hideHelmAria": "투구 숨기기",
@@ -3514,6 +3556,40 @@ export const ko_KR: EnTranslations = {
       "resourceSap": "{interval}초마다 현재 자원을 {value} 회복합니다",
       "nextAttackCrit": "다음 공격이 반드시 치명타로 적중합니다",
       "healEcho": "생명력이 {threshold}% 미만이 되면 생명력을 {value} 회복합니다",
+      "trinket": {
+        "lastStandCooldown": "보루의 인장의 최후의 보루 보호막을 이미 사용했습니다. 이 효과가 끝날 때까지 생명력이 {threshold}% 미만으로 떨어져도 다시 발동하지 않습니다.",
+        "lastBastion": "{value}의 피해를 흡수합니다. 생명력이 {threshold}% 미만일 때 피해를 받아 보루의 인장이 만들어 낸 보호막입니다.",
+        "retaliate": "당신을 직접 공격한 적은 그 공격으로 잃은 생명력의 {pct}%에 해당하는 물리 피해를 받습니다. 지속 피해로는 발동하지 않습니다.",
+        "moored": "받는 피해가 {reduction}% 감소하지만 이동 속도가 {speed}%가 됩니다. 기절, 이동 불가, 감속, 공포, 변이, 침묵, 실명, 주술, 무장 해제, 행동 불가 효과와 밀쳐내기를 무시합니다.",
+        "hourglassStored": "초과 치유로 저장한 치유량 {stored}을 담고 있습니다. 치유사의 모래시계를 사용하면 {range}미터 이내에서 생명력 비율이 가장 낮은 파티원(자신 포함)에게 보호막으로 바꿔 줍니다.",
+        "hourglassShield": "{value}의 피해를 흡수합니다. 치유사의 모래시계에 저장된 치유량으로 만든 보호막입니다.",
+        "wellspring": "{every}초마다 생명력을 {tick} 회복합니다.",
+        "twinStrikeCooldown": "한 쌍의 발톱이 방금 추가 공격을 했습니다. 이 효과가 끝날 때까지 다시 추가 공격을 할 수 없습니다.",
+        "bleedEdge": "자동 공격이 적중하면 발톱 상처를 겁니다: 중첩당 {every}초마다 {tick}의 물리 피해를 {duration}초 동안 입히며, 최대 {max}번 중첩됩니다.",
+        "bleedEdgeOther": "자동 공격이 적중하면 최대 {max}번 중첩되는 물리 출혈 효과인 발톱 상처를 겁니다. 피해량은 전투력으로 증가합니다.",
+        "talonWound": "{every}초마다 {damage}의 물리 피해를 입힙니다({stacks}/{max}중첩). 새 중첩마다 피해가 늘고 지속 시간이 초기화됩니다.",
+        "tally": "집계 표식: {stacks}/{max}. 사냥꾼의 집계를 사용하면 표식을 모두 소모하여 대상을 공격하고 {damage}의 물리 피해를 입힙니다(표식당 {perMark}).",
+        "tallyOther": "집계 표식: {stacks}/{max}. 사냥꾼의 집계는 표식을 모두 소모하여 물리 공격을 하며, 표식마다 피해가 늘어납니다.",
+        "storm": "충전: {stacks}/{max}. 폭풍 항아리를 사용하면 충전을 번개로 방출하여 대상과, 서로 {jumpRange}미터 이내에 있는 최대 {extra}명의 다른 적을 맞히고 각각 {damage}의 자연 피해를 입힙니다(충전당 {perCharge}).",
+        "stormOther": "충전: {stacks}/{max}. 폭풍 항아리는 충전을 자연 번개로 방출하여 대상과 최대 {extra}명의 다른 적을 맞히며, 충전마다 피해가 늘어납니다.",
+        "echo": "다음 {casts}번의 직접 치유 또는 물리가 아닌 직접 피해가 그 양의 {pct}%로 한 번 더 반복됩니다.",
+        "keenEdge": "도박꾼의 주사위 운세: 입히는 피해가 {pct}% 증가합니다.",
+        "luckyStreak": "도박꾼의 주사위 운세: {every}초마다 생명력을 {tick} 회복합니다.",
+        "gildedGuard": "도박꾼의 주사위 운세: {value}의 피해를 흡수합니다.",
+        "riftGuard": "받는 피해가 {pct}% 감소합니다.",
+        "sprint": "이동 속도가 {pct}% 증가합니다. 다른 이동 속도 증가 효과와 중첩되지 않습니다.",
+        "brand": "받는 치유량이 {pct}% 감소합니다.",
+        "forgeHeat": "열기: {stacks}/{max}. 대장장이 아버지의 담금질을 사용하면 열기를 모두 소모하며, 그 무기 화염 피해가 {pct}% 증가합니다.",
+        "tempered": "근접 및 원거리 무기가 적중하면 {damage}의 화염 피해를 추가로 입힙니다(소모한 열기로 {pct}% 증가). 결정타마다 {killExtend}초 연장되며, 총 최대 {maxDuration}초입니다.",
+        "temperedOther": "근접 및 원거리 무기가 적중하면 화염 피해를 추가로 입히며, 소모한 열기로 {pct}% 증가합니다. 피해량은 전투력과 원거리 전투력 중 높은 쪽으로 증가합니다.",
+        "kindlingOrb": "적에게 주문을 시전할 때마다 구슬이 그 적에게 화염구를 발사하여 {damage}의 화염 피해를 입힙니다. 변이, 행동 불가, 실명 상태인 적에게는 발사하지 않습니다.",
+        "kindlingOrbOther": "적에게 주문을 시전할 때마다 구슬이 그 적에게 화염 피해를 입히는 화염구를 발사합니다. 피해량은 주문력으로 증가합니다.",
+        "moltenIgnite": "{every}초마다 {damage}의 화염 피해를 입힙니다. 새 무기 치명타가 적중하면 초기화됩니다.",
+        "pierce": "자동 공격, 사격, 물리 능력(출혈 제외)이 적중하면 대상에게서 {reach}미터 이내의 가장 가까운 적도 공격하여 입힌 피해의 {pct}%를 입힙니다.",
+        "lantern": "누구든 등불에서 {radius}미터 이내의 자신 또는 파티원에게 직접 치유를 하면, 불빛 안에서 가장 많이 다친 다른 파티원도 그 치유량의 {pct}%만큼 치유됩니다.",
+        "crucibleHeat": "열기: {stacks}/{max}. 도가니의 심장을 사용하면 열기를 모두 소모하여 화염 폭발을 일으켜 {radius}미터 이내의 모든 적에게 {damage}의 화염 피해를 입히고, 적중한 모든 생물을 도발합니다.",
+        "crucibleHeatOther": "열기: {stacks}/{max}. 도가니의 심장은 열기를 모두 소모하여 {radius}미터 이내에 화염 폭발을 일으키며, 중첩마다 화염 피해가 늘고 적중한 모든 생물을 도발합니다."
+      },
       "increase": {
         "ap": "공격력을 {value} 증가시킵니다",
         "str": "힘을 {value} 증가시킵니다",
@@ -17551,6 +17627,60 @@ export const ko_KR: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "잉걸수호자, 바르쿨의 방벽"
+      },
+      "bastion_sigil": {
+        "name": "보루의 인장"
+      },
+      "mooring_stone": {
+        "name": "정박석"
+      },
+      "menders_hourglass": {
+        "name": "치유사의 모래시계"
+      },
+      "wellspring_seed": {
+        "name": "샘물의 씨앗"
+      },
+      "paired_talons": {
+        "name": "한 쌍의 발톱"
+      },
+      "hunters_tally": {
+        "name": "사냥꾼의 집계"
+      },
+      "stormjar": {
+        "name": "폭풍 항아리"
+      },
+      "echoing_lens": {
+        "name": "메아리 렌즈"
+      },
+      "gamblers_die": {
+        "name": "도박꾼의 주사위"
+      },
+      "sundered_prism": {
+        "name": "갈라진 프리즘"
+      },
+      "wayfarers_lodestone": {
+        "name": "방랑자의 자철석"
+      },
+      "medallion_of_defiance": {
+        "name": "저항의 메달"
+      },
+      "duelists_brand": {
+        "name": "결투가의 낙인"
+      },
+      "forgefathers_temper": {
+        "name": "대장장이 아버지의 담금질"
+      },
+      "kindling_orb": {
+        "name": "불씨 구슬"
+      },
+      "molten_fletching": {
+        "name": "용융 화살깃"
+      },
+      "last_flame_lantern": {
+        "name": "마지막 불꽃의 등불"
+      },
+      "heart_of_the_crucible": {
+        "name": "도가니의 심장"
       },
       "rift_watchers_band": {
         "name": "균열 감시자의 반지"

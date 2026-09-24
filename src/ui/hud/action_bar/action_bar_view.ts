@@ -73,6 +73,7 @@ import {
   type Vec3,
 } from '../../../sim/types';
 import type { InterpolationValues, TranslationKey } from '../../i18n';
+import { trinketSlotState } from './trinket_slot_core';
 
 // The four slot kinds (a discriminated tag the painter maps to DOM classes).
 export type ActionBarSlotKind = 'attack' | 'empty' | 'item' | 'ability';
@@ -273,6 +274,9 @@ export interface ActionBarWorldInput {
   player: ActionBarPlayerInput;
   target: ActionBarTargetInput | null;
   inventory: readonly { itemId: string; count: number }[];
+  /** The item id in the player's trinket slot (IWorld equipment.trinket), or
+   *  null/absent when none: a trinket slot is usable only while it is worn. */
+  wornTrinketId?: string | null;
   /** Aura-derived because the online player entity's local cache is not wired. */
   stealthed: boolean;
   /** The committed spec of EVERY class (the HUD hands in `IWorld.talentSpec`,
@@ -579,29 +583,36 @@ export function createActionBarView(
 
         if (item !== null) {
           const count = countRawInSlots(world.inventory, item.id);
+          // A trinket is used where it is worn: its slot reads the equipment and
+          // its own use cooldown instead of the bag count (trinket_slot_core.ts).
+          const trinket = trinketSlotState(item.id, world.wornTrinketId, player.cooldowns);
           // Potions share one global cooldown, so any potion slot paints the same
           // swipe; other items have no cooldown.
-          const potionCd = item.kind === 'potion' ? player.potionCdRemaining : 0;
+          const itemCd = trinket
+            ? trinket.cooldownRemaining
+            : item.kind === 'potion'
+              ? player.potionCdRemaining
+              : 0;
+          const itemCdTotal = trinket ? trinket.cooldownTotal : POTION_COOLDOWN;
           slot.kind = 'item';
           slot.abilityId = null;
           slot.itemId = item.id;
           slot.iconKey = `${ITEM_ICON_PREFIX}${item.id}`;
-          slot.cooldownRemaining = potionCd;
-          slot.cooldownTotal = potionCd > 0 ? POTION_COOLDOWN : 0;
+          slot.cooldownRemaining = itemCd;
+          slot.cooldownTotal = itemCd > 0 ? itemCdTotal : 0;
           slot.cooldownPercent =
-            potionCd > 0
+            itemCd > 0
               ? Math.min(
                   MAX_COOLDOWN_PERCENT,
-                  (potionCd / Math.max(COOLDOWN_DENOM_FLOOR, POTION_COOLDOWN)) *
-                    MAX_COOLDOWN_PERCENT,
+                  (itemCd / Math.max(COOLDOWN_DENOM_FLOOR, itemCdTotal)) * MAX_COOLDOWN_PERCENT,
                 )
               : 0;
-          slot.cdText =
-            potionCd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(potionCd)) : '';
-          slot.count = deps.formatCount(count);
+          slot.cdText = itemCd > COOLDOWN_TEXT_THRESHOLD ? deps.formatCount(Math.ceil(itemCd)) : '';
+          // The worn trinket shows no bag count (a "0" would read as "none left").
+          slot.count = trinket?.worn ? '' : deps.formatCount(count);
           slot.isCharges = false;
           slot.rechargePercent = 0;
-          slot.usable = !(count <= 0 || player.dead);
+          slot.usable = trinket ? trinket.worn && !player.dead : !(count <= 0 || player.dead);
           slot.outOfRange = false;
           slot.queued = false;
           slot.procGlow = false;

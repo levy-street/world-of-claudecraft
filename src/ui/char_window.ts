@@ -36,6 +36,8 @@ import { classDisplayName, itemDisplayName } from './entity_i18n';
 import { draggedCopySlotIndex, dropRequiredLevel, paperdollDropAction } from './equip_drop_core';
 import { esc } from './esc';
 import { focusedWithin, restoreFirstEnabled } from './focus_restore';
+import { writeHotbarDragData } from './hud/action_bar/hotbar';
+import { isUsableTrinketId } from './hud/action_bar/trinket_slot_core';
 import { currenciesTabHtml } from './hud/currencies';
 import { archetypeTitleText, craftNameText } from './hud/professions/craft_name_view';
 import { gatheringProfessionNameKey } from './hud/professions/gathering_profession_name';
@@ -149,8 +151,10 @@ export interface CharWindowDeps extends Omit<PainterHostPresentation, 'itemToolt
   progressionHtml(level: number): string;
   /** Remove the equipped piece in `slot` to bags and repaint bags + the sheet. */
   unequip(slot: EquipSlot): void;
-  /** Stage a drag-to-unequip: record the slot HUD-side and reveal the bags drop. */
-  beginUnequipDrag(slot: EquipSlot): void;
+  /** Stage a drag-to-unequip: record the slot HUD-side and reveal the bags drop.
+   *  `hotbarAction` is set when the worn piece is also placeable on the action
+   *  bar (a usable trinket), so the same drag can drop onto a bar slot. */
+  beginUnequipDrag(slot: EquipSlot, hotbarAction: { type: 'item'; id: string } | null): void;
   /** End a drag-to-unequip: clear the HUD slot and the bags drop-target hint. */
   endUnequipDrag(): void;
   /** Mount the shared 3D turntable into the model panel (HUD-owned lifecycle). */
@@ -663,8 +667,14 @@ export class CharWindow {
       // Drag the piece out onto the bags window to unequip it.
       row.draggable = true;
       row.addEventListener('dragstart', (e) => {
-        this.deps.beginUnequipDrag(slot);
-        if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+        // A usable trinket also drags onto the action bar (it is used where it
+        // is worn): the bar reads the payload, the bags still take the unequip.
+        const hotbarAction = isUsableTrinketId(item.id)
+          ? { type: 'item' as const, id: item.id }
+          : null;
+        this.deps.beginUnequipDrag(slot, hotbarAction);
+        if (hotbarAction) writeHotbarDragData(e.dataTransfer, hotbarAction);
+        if (e.dataTransfer) e.dataTransfer.effectAllowed = hotbarAction ? 'copyMove' : 'move';
         this.deps.hideTooltip();
       });
       row.addEventListener('dragend', () => this.deps.endUnequipDrag());

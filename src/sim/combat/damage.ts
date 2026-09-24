@@ -149,6 +149,7 @@ import { clearSpiritmendCurrents, UNLEASH_WEAPON_GUARD_ID } from './shaman_spiri
 import { clearShamanTalentState, onShamanDamageTaken } from './shaman_talents';
 import { elementalTranceManaFromDamage } from './shaman_warspirit';
 import { onDamageTaken, onShieldConsumed, onSpellCrit, resetProcState } from './talent_procs';
+import { onTrinketDamage } from './trinkets';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 
 // How long a slain mob's corpse persists (seconds) before it is cleared. Sole user
@@ -1096,6 +1097,7 @@ export function dealDamage(
 
   if (source && source.id !== target.id) ctx.enterCombat(source, target);
   onCraftedCollectionDamage(ctx, source, target, craftedHpLoss, school, direct, copiedHit);
+  if (!copiedHit) onTrinketDamage(ctx, source, target, craftedHpLoss, school, direct, ability);
   if (direct) ctx.refreshMobLeashFromAction(source, target);
 
   // classic threat: damage (and the ability's flat bonus) lands on the mob's

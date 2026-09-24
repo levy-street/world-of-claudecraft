@@ -6747,6 +6747,38 @@
       ]
     },
     {
+      "batchId": "trinket-slot-icons-2026-09-23",
+      "source": "Tripo text-to-image (openapi.tripo3d.ai v3 /generation/text-to-image), one text-prompt call per item; square crop to about 72 percent subject fill, 512px sRGB master, 128px opaque WebP (sharp) reviewed locally",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleContract": {
+        "id": "woc-item-icon-v1",
+        "document": "docs/design/item-icon-art-style.md"
+      },
+      "styleReference": "Parent reviewed the painted jewelry and trinket catalog (briny_idol, final_oath_medallion, makers_charm, gleamstag_charm, locket_of_the_last_flame) plus the firebottle glass anchor before writing the prompt; no images were passed as generation inputs.",
+      "commonPrompt": "Digital fantasy painting of one single small trinket object, isolated and floating in the middle of a dark painted background. Object: [per-item subject: the trinket object, its materials and its magic]. The whole object is fully visible, centered, filling about 70 percent of the image, gentle three-quarter view. Background: seamless deep charcoal and dark umber smoky painted vignette that fills the entire image edge to edge, soft contact shadow under the object. Classic fantasy MMORPG hand-painted inventory art, tactile materials, crisp edges, warm top-left key light, cool deep shadow, restrained magical glow. No tile, no plaque, no slab, no stone base, no rounded square, no border, no frame, no people, no figures, no text, no letters, no watermark.",
+      "itemIds": [
+        "bastion_sigil",
+        "mooring_stone",
+        "menders_hourglass",
+        "wellspring_seed",
+        "paired_talons",
+        "hunters_tally",
+        "stormjar",
+        "echoing_lens",
+        "gamblers_die",
+        "sundered_prism",
+        "wayfarers_lodestone",
+        "medallion_of_defiance",
+        "duelists_brand",
+        "forgefathers_temper",
+        "kindling_orb",
+        "molten_fletching",
+        "last_flame_lantern",
+        "heart_of_the_crucible"
+      ]
+    },
+    {
       "batchId": "world-quest-puzzle-activators-2026-09-01",
       "source": "OpenAI built-in image generation",
       "owner": "World of ClaudeCraft",

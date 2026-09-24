@@ -2649,6 +2649,47 @@ export const es: EnTranslations = {
       "dot": "provoca {name}, un daño en el tiempo de {school} que inflige {total} durante {duration} s",
       "hot": "florece {name}, una sanación en el tiempo que restaura {total} durante {duration} s"
     },
+    "trinkets": {
+      "equipLine": "Equipar: {effect}",
+      "scaled": "{base} (+{bonus})",
+      "useLine": "Uso: {effect} (reutilización de {cooldown})",
+      "cooldownMinutes": "{minutes} min",
+      "cooldownSeconds": "{seconds} s",
+      "gambleResult": "{item}: ¡{fortune}!",
+      "snakeEyes": "Ojos de serpiente",
+      "equippedLine": "Equipado",
+      "equipLockout": "Al equiparlo, su uso entra en un tiempo de reutilización de {seconds} s, o el que le quede al abalorio que sustituye si es mayor.",
+      "equip": {
+        "lastStand": "Recibir daño con menos del {threshold}% de salud te otorga un escudo que absorbe {absorb} de daño ({absorbPct}% de tu salud máxima) durante {duration} s. Puede ocurrir una vez cada {icd} s.",
+        "hourglass": "La sanación excesiva de tus sanaciones directas se almacena en el reloj de arena, hasta {cap} ({capPct}% de tu salud máxima). La sanación almacenada se desvanece {fade} s después de su último aumento.",
+        "twinStrike": "Tus golpes de ataque automático tienen un {chance}% de probabilidad de realizar un golpe cuerpo a cuerpo adicional con la mano principal. Puede ocurrir una vez cada {icd} s.",
+        "tally": "Tus golpes críticos de ataque automático y tus golpes de gracia añaden una marca de cuenta cada uno, hasta {max}. Las marcas duran {duration} s y se renuevan cada vez que ganas una.",
+        "storm": "Cada hechizo que lanzas añade una carga, hasta {max}. Las cargas duran {duration} s y se renuevan cada vez que ganas una.",
+        "heat": "Tus golpes de arma cuerpo a cuerpo y a distancia añaden una acumulación de calor cada uno, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación.",
+        "ignite": "Tus golpes críticos de arma cuerpo a cuerpo y a distancia prenden fuego al objetivo, infligiendo {tick} de daño de fuego cada {every} s durante {duration} s. Un nuevo golpe crítico lo renueva. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "guardHeat": "Cada ataque que paras, esquivas o bloqueas añade una acumulación de calor, hasta {max}. El calor dura {duration} s y se renueva cada vez que ganas una acumulación."
+      },
+      "use": {
+        "retaliate": "Durante {duration} s, un enemigo que te golpee directamente recibe daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
+        "anchor": "Durante {duration} s, recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Elimina los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas, e ignoras los nuevos y los derribos mientras dura.",
+        "hourglass": "Convierte toda la sanación almacenada en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido. El escudo dura {duration} s. Requiere sanación almacenada.",
+        "wellspring": "Te sana a ti y a los miembros del grupo a {radius} m o menos {tick} cada {every} s durante {duration} s. La sanación aumenta con el poder de sanación.",
+        "bleedEdge": "Durante {duration} s, tus golpes de ataque automático aplican Herida de garra, que inflige {tick} de daño físico por acumulación cada {every} s durante {bleedDuration} s y se acumula hasta {stacks} veces. El daño aumenta con el poder de ataque.",
+        "tallyStrike": "Gasta todas las marcas de cuenta para golpear a tu objetivo a {range} m o menos, infligiendo {perMark} de daño físico por marca ({max} con {maxMarks} marcas). El daño aumenta con el poder de ataque. Requiere una marca de cuenta.",
+        "stormjar": "Libera todas las cargas como un rayo sobre tu objetivo a {range} m o menos que salta hasta {extra} enemigos más a {jumpRange} m o menos. Cada enemigo recibe {perCharge} de daño de naturaleza por carga ({max} con {maxCharges} cargas). El daño aumenta con el poder con hechizos. Requiere una carga.",
+        "echo": "Durante {duration} s, tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.",
+        "gamble": "Tira una de cuatro fortunas durante {duration} s: {keenEdge} (infliges un {keenPct}% más de daño), {luckyStreak} (te sana {heal} a lo largo de la duración), {gildedGuard} (un escudo que absorbe {absorb} de daño) o {snakeEyes} (sin efecto, pero esta reutilización se reduce a la mitad).",
+        "blink": "Avanza {yards} m y luego recibe un {reduction}% menos de daño durante {guard} s.",
+        "sprint": "Aumenta tu velocidad de movimiento un {speed}% durante {duration} s. No se acumula con otros aumentos de velocidad.",
+        "defiance": "Elimina todos los aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes y efectos incapacitantes que tengas. Se puede usar mientras estás aturdido.",
+        "brand": "Marca a un jugador enemigo a {range} m o menos, reduciendo la sanación que recibe un {cut}% durante {duration} s.",
+        "temper": "Gasta todas las acumulaciones de calor para templar tu arma durante {duration} s. Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional, aumentado un {perHeat}% por cada acumulación de calor gastada (hasta un {maxBonus}% con {maxHeat} acumulaciones). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "kindlingOrb": "Invoca un orbe de brasas a tu lado durante {duration} s. Cada hechizo que lanzas a un enemigo le hace disparar un proyectil a ese enemigo que inflige {damage} de daño de fuego. El daño aumenta con el poder con hechizos.",
+        "pierce": "Durante {duration} s, tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {share}% del daño infligido.",
+        "lantern": "Coloca un farol a tus pies durante {duration} s. Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos de él también sana al otro miembro del grupo más herido bajo su luz por el {share}% de la sanación.",
+        "heartNova": "Gasta todas las acumulaciones de calor en una nova de fuego que inflige {perHeat} de daño de fuego por acumulación ({max} con {maxHeat} acumulaciones) a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza. El daño aumenta con el poder de ataque. Requiere una acumulación de calor."
+      }
+    },
     "questShare": {
       "notShareable": "Esta misión no se puede compartir.",
       "notInSharerParty": "Debes estar en el grupo de {name} para aceptar esa misión.",
@@ -2827,6 +2868,7 @@ export const es: EnTranslations = {
       "failed": "The report could not be created. Please try again."
     },
     "paperdoll": {
+      "trinketSlot": "Abalorio",
       "unequipAria": "Desequipar {item}",
       "unequipHint": "Haz clic en ×, clic derecho o arrastra a las bolsas para desequipar",
       "hideHelmAria": "Ocultar casco",
@@ -3514,6 +3556,40 @@ export const es: EnTranslations = {
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
       "nextAttackCrit": "Tu próximo ataque tiene golpe crítico garantizado",
       "healEcho": "Al bajar del {threshold}% de salud, restaura {value} de salud",
+      "trinket": {
+        "lastStandCooldown": "El escudo Último bastión del Sello del Bastión ya se usó. Bajar del {threshold}% de salud no puede volver a levantarlo hasta que esto expire.",
+        "lastBastion": "Absorbe {value} de daño. El Sello del Bastión lo levantó cuando recibiste daño por debajo del {threshold}% de salud.",
+        "retaliate": "Los enemigos que te golpean directamente reciben daño físico igual al {pct}% de la salud que te quitó ese golpe. El daño periódico no lo activa.",
+        "moored": "Recibes un {reduction}% menos de daño pero te mueves al {speed}% de velocidad. Ignoras aturdimientos, enraizamientos, ralentizaciones, miedos, polimorfias, silencios, cegueras, maleficios, desarmes, efectos incapacitantes y derribos.",
+        "hourglassStored": "Guarda {stored} de sanación almacenada de tu sobresanación. Usa el Reloj de arena del sanador para convertirla en un escudo sobre el miembro del grupo a {range} m o menos con el menor porcentaje de salud, tú incluido.",
+        "hourglassShield": "Absorbe {value} de daño. Hecho con la sanación que almacenó un Reloj de arena del sanador.",
+        "wellspring": "Restaura {tick} de salud cada {every} s.",
+        "twinStrikeCooldown": "Garras gemelas acaba de dar un golpe extra. No puede dar otro hasta que esto expire.",
+        "bleedEdge": "Tus golpes de ataque automático aplican Herida de garra: {tick} de daño físico por acumulación cada {every} s durante {duration} s, acumulable hasta {max} veces.",
+        "bleedEdgeOther": "Los golpes de ataque automático aplican Herida de garra, un sangrado físico acumulable hasta {max} veces. El daño aumenta con el poder de ataque.",
+        "talonWound": "Inflige {damage} de daño físico cada {every} s ({stacks}/{max} acumulaciones). Cada nueva acumulación añade daño y reinicia la duración.",
+        "tally": "Marcas de cuenta: {stacks}/{max}. Usa la Cuenta del cazador para gastarlas todas en un golpe a tu objetivo que inflige {damage} de daño físico ({perMark} por marca).",
+        "tallyOther": "Marcas de cuenta: {stacks}/{max}. La Cuenta del cazador las gasta todas en un golpe físico que inflige más daño por cada marca.",
+        "storm": "Cargas: {stacks}/{max}. Usa la Jarra de tormenta para liberarlas como un rayo que alcanza a tu objetivo y hasta {extra} enemigos más a {jumpRange} m o menos entre sí, infligiendo {damage} de daño de naturaleza a cada uno ({perCharge} por carga).",
+        "stormOther": "Cargas: {stacks}/{max}. La Jarra de tormenta las libera como un rayo de naturaleza que alcanza al objetivo y hasta {extra} enemigos más, con más daño por cada carga.",
+        "echo": "Tus siguientes {casts} sanaciones directas o golpes directos de daño no físico se repiten por el {pct}% de su cantidad.",
+        "keenEdge": "Fortuna del Dado del apostador: infliges un {pct}% más de daño.",
+        "luckyStreak": "Fortuna del Dado del apostador: restaura {tick} de salud cada {every} s.",
+        "gildedGuard": "Fortuna del Dado del apostador: absorbe {value} de daño.",
+        "riftGuard": "Recibes un {pct}% menos de daño.",
+        "sprint": "Velocidad de movimiento aumentada un {pct}%. No se acumula con otros aumentos de velocidad.",
+        "brand": "La sanación recibida se reduce un {pct}%.",
+        "forgeHeat": "Calor: {stacks}/{max}. Usar el Temple del Padre de la Forja lo gasta todo, y su fuego de arma inflige un {pct}% más de daño.",
+        "tempered": "Tus golpes de arma cuerpo a cuerpo y a distancia infligen {damage} de daño de fuego adicional (un {pct}% más por el calor gastado). Cada golpe de gracia añade {killExtend} s, hasta {maxDuration} s en total.",
+        "temperedOther": "Los golpes de arma cuerpo a cuerpo y a distancia infligen daño de fuego adicional, un {pct}% más por el calor gastado. El daño aumenta con el poder de ataque o el poder de ataque a distancia, el que sea mayor.",
+        "kindlingOrb": "Cada hechizo que lanzas a un enemigo hace que el orbe dispare un proyectil a ese enemigo que inflige {damage} de daño de fuego. No dispara a un enemigo polimorfado, incapacitado o cegado.",
+        "kindlingOrbOther": "Cada hechizo lanzado a un enemigo hace que el orbe dispare un proyectil de daño de fuego a ese enemigo. El daño aumenta con el poder con hechizos.",
+        "moltenIgnite": "Inflige {damage} de daño de fuego cada {every} s. Otro golpe crítico de arma lo reinicia.",
+        "pierce": "Tus ataques automáticos, disparos y habilidades físicas (no sangrados) también golpean al enemigo más cercano a tu objetivo a {reach} m o menos por el {pct}% del daño infligido.",
+        "lantern": "Una sanación directa de cualquiera sobre ti o un miembro del grupo a {radius} m o menos del farol también sana al otro miembro del grupo más herido bajo su luz por el {pct}% de la sanación.",
+        "crucibleHeat": "Calor: {stacks}/{max}. Usa el Corazón del Crisol para gastarlo todo en una nova de fuego que inflige {damage} de daño de fuego a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza.",
+        "crucibleHeatOther": "Calor: {stacks}/{max}. El Corazón del Crisol lo gasta todo en una nova de fuego a {radius} m o menos que inflige más daño de fuego por cada acumulación y provoca a cada criatura que alcanza."
+      },
       "increase": {
         "ap": "Aumenta el poder de ataque en {value}",
         "str": "Aumenta la Fuerza en {value}",
@@ -17551,6 +17627,60 @@ export const es: EnTranslations = {
       },
       "varkhul_emberward": {
         "name": "Guardia de Brasas, Baluarte de Varkhul"
+      },
+      "bastion_sigil": {
+        "name": "Sello del Bastión"
+      },
+      "mooring_stone": {
+        "name": "Piedra de amarre"
+      },
+      "menders_hourglass": {
+        "name": "Reloj de arena del sanador"
+      },
+      "wellspring_seed": {
+        "name": "Semilla de manantial"
+      },
+      "paired_talons": {
+        "name": "Garras gemelas"
+      },
+      "hunters_tally": {
+        "name": "Cuenta del cazador"
+      },
+      "stormjar": {
+        "name": "Jarra de tormenta"
+      },
+      "echoing_lens": {
+        "name": "Lente resonante"
+      },
+      "gamblers_die": {
+        "name": "Dado del apostador"
+      },
+      "sundered_prism": {
+        "name": "Prisma fracturado"
+      },
+      "wayfarers_lodestone": {
+        "name": "Piedra imán del caminante"
+      },
+      "medallion_of_defiance": {
+        "name": "Medallón de desafío"
+      },
+      "duelists_brand": {
+        "name": "Marca del duelista"
+      },
+      "forgefathers_temper": {
+        "name": "Temple del Padre de la Forja"
+      },
+      "kindling_orb": {
+        "name": "Orbe de brasas"
+      },
+      "molten_fletching": {
+        "name": "Emplumado fundido"
+      },
+      "last_flame_lantern": {
+        "name": "Farol de la última llama"
+      },
+      "heart_of_the_crucible": {
+        "name": "Corazón del Crisol"
       },
       "rift_watchers_band": {
         "name": "Rift Watcher's Band"

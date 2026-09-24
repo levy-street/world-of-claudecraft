@@ -386,17 +386,16 @@ import {
   assignAttackSlotAction,
   attackDragDisposition,
   clearHotbarSlot,
-  encodeHotbarAction,
   type FreedAttackSlotAbility,
   freedAttackSlotDisplayAbility,
-  HOTBAR_ACTION_MIME,
   type HotbarAction,
   isAbilityActionBarEligible,
   loadoutKnownAbilityIds,
-  parseHotbarAction,
   placeAbilityOnSlot,
   placeItemOnSlot,
+  readHotbarDragData,
   swapHotbarSlots,
+  writeHotbarDragData,
 } from './hud/action_bar/hotbar';
 import { itemInBagsLine } from './hud/action_bar/item_bags_line_core';
 import {
@@ -905,6 +904,7 @@ import { renderTownFocusWindow } from './town_focus_window';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { stageTradeOffer, tradeOfferHeadroom } from './trade_view';
+import { trinketGambleText, trinketTooltipLines } from './trinket_tooltip_view';
 import { TutorialOverlay } from './tutorial';
 import { buildFerryIslandArrivalNote, type TutorialGreetingNote } from './tutorial_greeting_view';
 import { renderTutorialGreetingNote } from './tutorial_greeting_window';
@@ -5695,8 +5695,9 @@ export class Hud {
       this.renderBags();
       this.renderCharIfOpen();
     },
-    beginUnequipDrag: (slot) => {
+    beginUnequipDrag: (slot, action) => {
       this.dragUnequipSlot = slot;
+      this.dragAction = action ? { action, sourceIndex: null } : null;
       // Open the bags window if it's closed so there's a visible drop target,
       // otherwise the drag silently snaps back with no feedback.
       const bags = $('#bags');
@@ -5711,6 +5712,7 @@ export class Hud {
     },
     endUnequipDrag: () => {
       this.dragUnequipSlot = null;
+      this.dragAction = null;
       $('#bags').classList.remove('drop-target');
     },
     renderPreview: () => this.renderCharPreview(),
@@ -6230,7 +6232,7 @@ export class Hud {
   // for current AuraKinds and safely omits an unknown mixed-release kind. Injected so
   // the view never calls t().
   private auraEffectTooltipHtml(a: AuraEffectInput & { id?: string }): string {
-    const effect = auraEffectDescriptor(a);
+    const effect = auraEffectDescriptor(a, this.sim.player);
     if (!effect) return '';
     const values: Record<string, string> = {};
     if (effect.nums) {
@@ -6724,7 +6726,7 @@ export class Hud {
       html += `<div class="tt-sub">${esc(t('itemUi.tooltip.classes', { classes: requiredClasses.map(classDisplayName).join(', ') }))}</div>`;
     }
     html += itemRequiredLevelLine(item, this.sim.player.level);
-    html += this.itemProcBlock(item);
+    html += this.itemProcBlock(item) + trinketTooltipLines(item, this.sim.player);
     html += this.itemSetBlock(item);
     html += materialMakersMarkLines(item, instance, materialSources);
     // Stackables state their per-slot cap (sim/bags.ts stackSizeOf), so a
@@ -7707,24 +7709,9 @@ export class Hud {
     window.setTimeout(() => btn.classList.remove('used'), 180);
   }
 
-  private writeDraggedAction(dt: DataTransfer | null, action: Exclude<HotbarAction, null>): void {
-    if (!dt) return;
-    dt.setData(HOTBAR_ACTION_MIME, encodeHotbarAction(action));
-    dt.setData('text/plain', action.id);
-  }
-
   private readDraggedAction(dt: DataTransfer | null): Exclude<HotbarAction, null> | null {
-    if (!dt) return null;
-    const raw = dt.getData(HOTBAR_ACTION_MIME);
-    if (!raw) return null;
-    let parsed: unknown = null;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      return null;
-    }
-    return parseHotbarAction(
-      parsed,
+    return readHotbarDragData(
+      dt,
       (id) => this.sim.known.some((k) => k.def.id === id),
       (id) => this.isHotbarItemId(id),
     );
@@ -7830,7 +7817,10 @@ export class Hud {
           return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
         const item = this.itemForSlot(slot);
         if (item) {
-          return this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id)) + clearHint;
+          const worn = item.id === this.sim.equipment.trinket;
+          return (
+            this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id), worn) + clearHint
+          );
         }
         return `<div class="tt-sub">${esc(t('abilityUi.actionBar.emptySlot'))}<br>${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
       });
@@ -7858,7 +7848,7 @@ export class Hud {
             return;
           }
           this.dragAction = { action, sourceIndex: slot - 1 };
-          this.writeDraggedAction(e.dataTransfer, action);
+          writeHotbarDragData(e.dataTransfer, action);
           if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
           this.hideTooltip();
         });
@@ -7960,7 +7950,7 @@ export class Hud {
             sourceIndex: null,
             sourceAttackSlot: true,
           };
-          this.writeDraggedAction(e.dataTransfer, action);
+          writeHotbarDragData(e.dataTransfer, action);
           if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
           this.hideTooltip();
         });
@@ -9421,6 +9411,7 @@ export class Hud {
       actionBarWorld.player = p;
       actionBarWorld.target = target ?? null;
       actionBarWorld.inventory = sim.inventory;
+      actionBarWorld.wornTrinketId = sim.equipment.trinket;
       actionBarWorld.stealthed = stealthed;
       actionBarWorld.paladinSpec = sim.talentSpec;
       actionBarWorld.playerClass = sim.cfg.playerClass;
@@ -9432,6 +9423,7 @@ export class Hud {
         player: p,
         target: target ?? null,
         inventory: sim.inventory,
+        wornTrinketId: sim.equipment.trinket,
         stealthed,
         paladinSpec: sim.talentSpec,
         playerClass: sim.cfg.playerClass,
@@ -12380,6 +12372,10 @@ export class Hud {
           this.perfectingWindow.notifyErrorToast();
           break;
         }
+        case 'trinketGamble':
+          this.showBanner(trinketGambleText(ev.fortune));
+          this.log(trinketGambleText(ev.fortune), HUD_LOG.NOTICE);
+          break;
         case 'varkhulCallout':
         case 'nythraxisCallout': {
           const text = t(raidCalloutKey(ev));

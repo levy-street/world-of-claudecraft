@@ -156,7 +156,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroisch: Schmelztiegel der Letzten Quelle',
-    desc: 'Nur heroisch erhältliche Waffen von Ignivar, Herold der Letzten Flamme.',
+    desc: 'Nur heroisch erhältliche Waffen und die Schmuckstücke des Schlachtzugs von Ignivar, Herold der Letzten Flamme.',
   },
   conquerors_varkhul: {
     name: 'Der Innere Schmelztiegel',
@@ -164,7 +164,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroisch: Der Innere Schmelztiegel',
-    desc: 'Nur heroisch erhältliche Schilde und Waffen von Varkhul, Schmiedevater der Letzten Flamme.',
+    desc: 'Nur heroisch erhältliche Schilde und Waffen sowie die Schmuckstücke des Schlachtzugs von Varkhul, Schmiedevater der Letzten Flamme.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Dornenhaut",

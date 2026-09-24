@@ -50,6 +50,9 @@ const BALANCE_LOADOUT = {
   feet: 'heroic_bramblehide_treads',
   ring1: 'circle_of_cinders',
   ring2: 'loop_of_quiet_springs',
+  // The trinket slot (PR 4173): the reference epic kit fills it with the
+  // Varkhul caster trinket; the live-mob bands below held at the same seed.
+  trinket: 'heart_of_the_crucible',
 } as const;
 const FERAL_LOADOUT = {
   mainhand: 'wand_of_quenched_sparks',
@@ -63,6 +66,8 @@ const FERAL_LOADOUT = {
   feet: 'heroic_bramblehide_treads',
   ring1: 'band_of_marked_strikes',
   ring2: 'seal_of_the_forgewall',
+  // The trinket slot (PR 4173): the reference epic kit's physical pick.
+  trinket: 'forgefathers_temper',
 } as const;
 
 // MEASURED 2026-09-08 on the merged release catalog (integration dca7476) at

@@ -11,7 +11,14 @@ import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
 import { type Collider, queryOpenWorldColliders } from '../src/sim/colliders';
 import { STATIONS } from '../src/sim/content/professions';
-import { FURY_ENTITY_ID, FURY_NPC, FURY_NPC_ID, FURY_STOCK } from '../src/sim/content/pvp_honor';
+import {
+  FURY_ENTITY_ID,
+  FURY_NPC,
+  FURY_NPC_ID,
+  FURY_STOCK,
+  HONOR_VENDOR_STOCK,
+  WARFARE_TRINKET_STOCK,
+} from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
 import { BUILTIN_WORLD, ITEMS, NPCS, PROPS, setActiveWorldContent } from '../src/sim/data';
 import { GRAVE_COUNT, GRAVE_RADIUS, graveOffset } from '../src/sim/prop_layout';
@@ -51,8 +58,10 @@ describe('Warmarshal Draven Kole: the definition', () => {
   it('sells the one canonical WARFARE stock rather than a second copy of it', () => {
     // One list, two placements. FURY keeps the identical stock in Eastbrook, so
     // a divergence here means someone forked the item table.
-    expect(KOLE.vendorItems).toEqual([...FURY_STOCK]);
-    expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...FURY_STOCK]);
+    // The shared list is the WARFARE kit followed by the two honor trinkets.
+    expect(HONOR_VENDOR_STOCK).toEqual([...FURY_STOCK, ...WARFARE_TRINKET_STOCK]);
+    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
+    expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
   });
 
@@ -66,7 +75,7 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(FURY_NPC.warfareVendor, 'FURY, the Eastbrook mirror').toBe(true);
     // And the two really do sell the same list, not a copy that can drift.
     expect(KOLE.vendorItems).toEqual(FURY_NPC.vendorItems);
-    expect(KOLE.vendorItems).toEqual([...FURY_STOCK]);
+    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
   });
 
   it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {
@@ -142,7 +151,7 @@ describe('Warmarshal Draven Kole: the world build is untouched', () => {
     expect(kole.spawnPos.x).toBe(KOLE.pos.x);
     expect(kole.spawnPos.z).toBe(KOLE.pos.z);
     expect(kole.facing).toBe(KOLE.facing);
-    expect(kole.vendorItems).toEqual([...FURY_STOCK]);
+    expect(kole.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
   });
 
   it('is idempotent, so a second spawn call cannot mint a duplicate', () => {
