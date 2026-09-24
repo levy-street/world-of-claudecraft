@@ -39,7 +39,6 @@ import { HEROIC_BOSS_LOOT } from '../content/heroic_loot';
 import { ITEMS, MOBS, QUESTS } from '../data';
 import { formatMoney } from '../format_money';
 import { publicInstanceView } from '../item_instance_transfer';
-import { itemLevel } from '../item_level';
 import { effectiveMasterLooter, meetsMasterThreshold } from '../loot_master';
 import { isHarvestableCorpse } from '../professions/gathering';
 import type { PlayerMeta } from '../sim';
