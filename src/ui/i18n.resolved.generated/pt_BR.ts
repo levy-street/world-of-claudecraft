@@ -5062,6 +5062,50 @@ export const pt_BR: EnTranslations = {
       "denyOutOfRange": "Você precisa estar perto de quem solicitou para entregar uma encomenda.",
       "denyNoSpace": "Quem solicitou não tem espaço nas bolsas."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Campos de Thornhollow está pronto",
       "backfillTitle": "Campos de Thornhollow precisa de um lutador",
@@ -7554,6 +7598,9 @@ export const pt_BR: EnTranslations = {
       "comingSoon": "Sem receitas ainda",
       "gatherHubHeading": "Coleta",
       "gatherHubBody": "Quatro ofícios de coleta alimentam o anel a partir do campo: Mineração, Lenharia e Herborismo extraem minério, madeira e ervas da terra com limite de 100 de proficiência, enquanto a Pesca segue seu próprio ritmo de fisgar e puxar até 200. Cada página abaixo traz os mapas exatos de nós, as escadas de ferramentas e as probabilidades.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "A roda e seus arquétipos",
       "archetypesBody": "Os dez ofícios ficam em uma roda fixa, e a geografia dessa roda importa. Cada dois vizinhos formam um par com nome próprio: Ferreiro para Forja de Armas e Forja de Armaduras, Equipador para Couraria e Alfaiataria, Apotecário para Alquimia e Culinária, Bombardeiro para Engenharia e Alquimia, e mais seis ao redor do anel.\n\nSintonizar-se com um par é uma missão, não um clique de menu. Quatro pares podem ser assumidos hoje (Ferreiro, Equipador, Apotecário e Bombardeiro), cada um ancorado por um mestre residente em Eastbrook cuja missão de aceitação declara todo o acordo de antemão, antes de você aceitá-la. Até você se declarar, todo ofício avança livremente em receitas até o nível raro (qualquer receita que peça habilidade 74 ou menos), então você pode experimentar tudo antes de escolher.\n\nUma vez sintonizado, os dois ofícios do seu par viram os seus principais, sem nenhum teto aquém do limite. O resto da roda não apaga: um ofício oposto aos seus principais continua aceso como passatempo e segue subindo até o nível raro (uma missão repetível na forja do Ferreiro Haldren permite trocar qual deles é), e todo ofício restante fica inativo. Um ofício inativo mantém a sua habilidade e as suas receitas comuns, que continuam a ensiná-lo pela curva normal até ficarem cinzas em 75; tudo acima do comum para de pagar de imediato, e um ofício inativo nunca produz uma obra-prima enquanto descansa.",
       "pairFmt": "{a} e {b}",

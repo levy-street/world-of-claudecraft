@@ -2710,6 +2710,16 @@ export const guideStrings = {
     gatherHubHeading: 'Gathering',
     gatherHubBody:
       'The gathering trades feed the ring from the field: Mining, Logging, and Herbalism pull ore, timber, and herbs out of the land and cap at 100 proficiency, Farming raises crops from seed in tended beds and caps at the same 100, while Fishing runs on its own bite-and-reel rhythm all the way to 200. Each page below carries the exact node maps, tool ladders, and odds.',
+    // Profession Schools (rank-gated crafting institutions beyond the craft
+    // ring itself; first shipped: the Enchanters School). Spoiler-safe on
+    // purpose, unlike the rest of this transparency-policy page: no point
+    // thresholds, no task facts, no cooldowns, just the institution's name,
+    // its craft, its anchor, and its rank ladder by name. See the generated
+    // GUIDE_PROF_SCHOOLS comment in scripts/wiki/build_content.mjs.
+    schoolsHeading: 'Profession Schools',
+    schoolsBody:
+      "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+    schoolCraftFmt: 'A rank-gated {craft} institution, anchored at {hub}.',
     archetypesHeading: 'The wheel and its archetypes',
     archetypesBody:
       "The ten crafts sit on a fixed wheel, and geography on that wheel matters. Every two neighbors form a named pair: Smith for Weaponcrafting and Armorcrafting, Outfitter for Leatherworking and Tailoring, Apothecary for Alchemy and Cooking, Bombardier for Engineering and Alchemy, and six more around the ring.\n\nAttuning to a pair is a quest, not a menu click. Four pairs can be joined today (Smith, Outfitter, Apothecary, and Bombardier), each anchored by a resident master in Eastbrook whose acceptance quest states the whole bargain up front before you take it. Until you declare, every craft advances freely on recipes up through the rare tier (any recipe asking skill 74 or less), so you can try everything before you choose.\n\nOnce you attune, your two pair crafts become your majors, with no ceiling short of the cap. The rest of the wheel does not go dark: one craft opposite your majors stays on as a hobby that keeps climbing through the rare tier (a repeatable quest at Smith Haldren's forge lets you swap which one), and every other craft goes dormant. A dormant craft keeps its skill and its common recipes, which keep teaching it on the normal curve until they gray at 75; everything above common stops paying at once, and a dormant craft never turns out a masterwork while it rests.",

@@ -157,6 +157,7 @@ import {
   type OverheadEmoteId,
   type PartyInfo,
   PET_SPECIAL_WIRE_VERSION,
+  type PlayerProfessionSchoolsView,
   type PlayerProfessionsView,
   type PresenceStatus,
   type RaidLockout,
@@ -1506,6 +1507,12 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // Crafting/secondary professions still contribute nothing until later
   // issues (#1120/#1125/#1126/#1140) land.
   professionsState: PlayerProfessionsView = { skills: [] };
+  // Profession Schools (rank-gated crafting institutions; first
+  // implementation: the Enchanters School). Mirrored wholesale from the
+  // server's `schools` self-delta below, the prof/cprof precedent: the
+  // server already builds the full view (professionSchoolsFor), so this
+  // simply stores it rather than recomputing rank math client-side.
+  professionSchools: PlayerProfessionSchoolsView = { memberships: [], tasks: [] };
   // #1143: persistent town focus allocation, mirrored from the self-wire `tfocus`.
   townFocus: Record<string, number> = {};
   // Per-node respawn readiness (#1121, wired #1866): mirrored from the `ncd`
@@ -3841,6 +3848,20 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // trainResult event; the learned set mirrors back via the cprof delta.
   trainRecipe(recipeId: string): void {
     this.cmd({ cmd: 'train_recipe', recipe: recipeId });
+  }
+  // Profession Schools (rank-gated crafting institutions): command only,
+  // never predicted. The server resolves membership/allegiance silently
+  // (professions/schools.ts) and the result mirrors back via the `schools`
+  // self-delta; a task submission additionally answers with the personal,
+  // text-free schoolTaskResult event since it risks the player's materials.
+  joinProfessionSchool(schoolId: string): void {
+    this.cmd({ cmd: 'join_profession_school', school: schoolId });
+  }
+  swearSchoolAllegiance(schoolId: string): void {
+    this.cmd({ cmd: 'swear_school_allegiance', school: schoolId });
+  }
+  submitSchoolTask(taskId: string): void {
+    this.cmd({ cmd: 'submit_school_task', task: taskId });
   }
   // Tool effect slotting: command only, never predicted. The server
   // re-validates the profession id, the effect id, that a real tool for that

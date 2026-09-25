@@ -7664,6 +7664,59 @@ export const hudChromeStrings = {
     denyOutOfRange: 'You must be near the requester to deliver a commission.',
     denyNoSpace: 'The requester has no room in their bags.',
   },
+  // Profession Schools board (rank-gated crafting institutions; first
+  // implementation: the Enchanters School, src/sim/content/
+  // profession_schools.ts). Reached from the crafting window's title bar,
+  // the commission-board precedent above: it earns no rail tile and no
+  // keybind (src/ui/hud/professions/CLAUDE.md, "Openers"). School and rank
+  // display names resolve through profession_school_i18n.ts, not raw
+  // catalog English, so a future second school needs no code change here.
+  school: {
+    openButton: 'School',
+    openButtonAria: 'Open the Profession Schools board',
+    title: 'Profession Schools',
+    close: 'Close Profession Schools',
+    intro: 'Join a profession school and complete its rotating tasks for points toward rank.',
+    name: {
+      enchantersSchool: 'Enchanters School',
+    },
+    rank: {
+      enchantersSchool: {
+        initiate: 'Initiate',
+        apprentice: 'Apprentice',
+        journeyman: 'Journeyman',
+        adept: 'Adept',
+        master: 'Master',
+        grandmaster: 'Grandmaster',
+      },
+    },
+    taskKind: {
+      daily: 'Daily Contract',
+      contract: 'Contract',
+      materials: 'Materials Contract',
+      weeklyGroup: 'Weekly Group Contract',
+    },
+    rankLine: '{rank}, {points} points',
+    nextRankLine: '{points} of {nextPoints} points to the next rank',
+    swearToProgress: 'Swear allegiance to progress further.',
+    qualifyHint: 'Requires {skill} {profession} skill (you have {current}).',
+    joinButton: 'Join',
+    swearButton: 'Swear Allegiance',
+    swornBadge: 'Sworn',
+    taskRequirement: '{item} x{count}',
+    taskPoints: '{points} points',
+    submitButton: 'Submit',
+    readyIn: 'Ready in {duration}',
+    // schoolTaskResult chat lines (school_task_feedback.ts): the trainResult
+    // single-surface rule, one line either way, no toast, no extra sound cue.
+    taskSubmitted: 'You complete a task for the {school} (+{points} points).',
+    denyUnknownTask: 'That task no longer exists.',
+    denyNotAMember: 'You are not a member of the {school}.',
+    denyOutOfRange: 'You must be near the schoolmaster to submit a task.',
+    denyOnCooldown: 'That task is not ready yet.',
+    denyPartyRequired: 'That task requires a party.',
+    denyInsufficientMaterials: 'You do not have the materials for that task.',
+  },
   // Dungeon Finder window (docs/prd/dungeon-finder.md). Dungeon, creature,
   // item, quest, and zone NAMES resolve through tEntity/world_entity_i18n,
   // never through these keys.

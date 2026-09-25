@@ -195,6 +195,19 @@ export interface GuideProfRingCraft {
 
 export interface GuideProfArchetype { pairId: string; crafts: string[]; }
 
+/** A Profession School, spoiler-safe: name, owning craft, anchor hub/master,
+ *  and rank NAMES only, in catalog order. No point thresholds, task facts, or
+ *  cooldowns (see the generator's own comment). */
+export interface GuideProfSchool {
+  id: string;
+  name: string;
+  craftId: string;
+  craftName: string;
+  hub: string;
+  master?: { name: string; title: string };
+  ranks: string[];
+}
+
 export interface GuideProfTool {
   name: string;
   tier: number;
@@ -8050,6 +8063,28 @@ export const GUIDE_PROF_ARCHETYPES: GuideProfArchetype[] = [
     "crafts": [
       "armorcrafting",
       "engineering"
+    ]
+  }
+];
+
+export const GUIDE_PROF_SCHOOLS: GuideProfSchool[] = [
+  {
+    "id": "enchanters_school",
+    "name": "Enchanters School",
+    "craftId": "enchanting",
+    "craftName": "Enchanting",
+    "hub": "Eastbrook",
+    "master": {
+      "name": "Tinker Gizzel",
+      "title": "Master of the Toolworks"
+    },
+    "ranks": [
+      "Initiate",
+      "Apprentice",
+      "Journeyman",
+      "Adept",
+      "Master",
+      "Grandmaster"
     ]
   }
 ];

@@ -5062,6 +5062,50 @@ export const vi_VN: EnTranslations = {
       "denyOutOfRange": "Bạn phải ở gần người yêu cầu để giao đồ ủy thác.",
       "denyNoSpace": "Người yêu cầu không còn chỗ trống trong túi đồ."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Cánh Đồng Trũng Gai đã sẵn sàng",
       "backfillTitle": "Cánh Đồng Trũng Gai cần một chiến binh",
@@ -7554,6 +7598,9 @@ export const vi_VN: EnTranslations = {
       "comingSoon": "Chưa có công thức",
       "gatherHubHeading": "Thu thập",
       "gatherHubBody": "Bốn nghề thu thập nuôi vòng từ thực địa: Khai Khoáng, Đốn Gỗ, và Thảo Dược Học kéo quặng, gỗ, và thảo dược ra khỏi đất và đạt giới hạn 100 thành thạo, trong khi Câu Cá chạy theo nhịp cắn câu và giật cần riêng của nó tất cả đường đến 200. Mỗi trang dưới đây có bản đồ điểm tài nguyên, thang dụng cụ, và tỉ lệ chính xác.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Bánh xe và các hình mẫu",
       "archetypesBody": "Mười nghề thủ công nằm trên một bánh xe cố định, và vị trí trên bánh xe ấy có ý nghĩa. Cứ hai nghề kề nhau lại tạo thành một cặp có tên: Thợ Rèn cho Rèn Vũ Khí và Rèn Giáp, Thợ Trang Phục cho Thuộc Da và May Vá, Dược Sĩ cho Giả Kim và Nấu Ăn, Chuyên Gia Nổ cho Cơ Khí và Giả Kim, cùng sáu cặp nữa quanh vòng.\n\nThụ ngộ với một cặp là một nhiệm vụ, không phải một cú nhấn trong menu. Hôm nay có bốn cặp có thể gia nhập (Thợ Rèn, Thợ Trang Phục, Dược Sĩ, và Chuyên Gia Nổ), mỗi cặp neo vào một bậc thầy thường trú ở Eastbrook mà nhiệm vụ tiếp nhận của họ nêu rõ toàn bộ giao kèo ngay từ đầu trước khi bạn nhận. Cho tới lúc bạn tuyên bố, mọi nghề thủ công đều tiến lên thoải mái trên các công thức tới hết bậc hiếm (bất kỳ công thức nào đòi kỹ năng 74 trở xuống), nên bạn có thể thử mọi thứ trước khi chọn.\n\nMột khi bạn đã thụ ngộ, hai nghề trong cặp trở thành nghề chuyên ngành của bạn, không có trần nào ngoài chính giới hạn tối đa. Phần còn lại của bánh xe không tắt hẳn: một nghề nằm đối diện các nghề chuyên ngành vẫn sáng như một sở thích và tiếp tục leo qua hết bậc hiếm (một nhiệm vụ lặp lại được tại lò rèn của Thợ Rèn Haldren cho phép bạn đổi xem đó là nghề nào), và mọi nghề khác thì ngủ yên. Một nghề đang ngủ vẫn giữ kỹ năng và các công thức phổ thông của nó, những công thức ấy vẫn dạy nó theo đường cong bình thường cho tới khi chúng chuyển xám ở 75; mọi thứ trên bậc phổ thông ngừng trả điểm ngay lập tức, và một nghề đang ngủ không bao giờ cho ra kiệt tác trong lúc nó nghỉ.",
       "pairFmt": "{a} và {b}",

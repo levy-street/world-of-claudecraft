@@ -5316,6 +5316,7 @@ const ALL_DELTA_KEYS = [
   'renown',
   'rxp',
   'salv',
+  'schools',
   'sh',
   'sp',
   'stats',
@@ -5432,6 +5433,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   rtype: 'resourceType',
   rxp: 'restedXp',
   salv: 'lastSalvageResult',
+  schools: 'professionSchools',
   sh: 'spellHaste',
   sp: 'spellPower',
   tfocus: 'townFocus',
@@ -5625,6 +5627,15 @@ function dirtyEveryDeltaField(): {
   // archetype/craftSkills dirtied just above already satisfy.
   meta.knownRecipes.add('recipe_ironbound_warplate_helm');
   sim.trackGatheringRecipe('recipe_ironbound_warplate_helm', 5, lp);
+  // `schools`: a real Profession Schools membership (rank-gated crafting
+  // institutions), not the empty default. Written straight onto meta (the
+  // wire shape under test is the DELTA, not the join/task-submit command
+  // bodies, which have their own coverage in tests/professions_schools.test.ts).
+  meta.professionSchool = {
+    memberships: { enchanters_school: 200 },
+    swornSchoolId: 'enchanters_school',
+    taskReadyAt: {},
+  };
   // An ACTIVE own mobile crafting station (`mst`, the own-station arm of the
   // serving set): set directly on the meta slot (the placement command's
   // specialization gate is pinned in tests/professions_crafting_hub.test.ts;
@@ -6537,7 +6548,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 95 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 96 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -6581,8 +6592,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // full-view key ggoal (its own leaf, gathering_goal_wire.ts, not folded
     // into the gprof/tfocus/tslot/hpref cluster), for 94. The account ledger
     // (src/sim/account_ledger.ts) adds the heavy self key acct, for 95.
-    expect(ALL_DELTA_KEYS).toHaveLength(95);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(95);
+    // Profession Schools (rank-gated crafting institutions) adds the schools
+    // key (the viewer's own membership + task view, professionSchoolsFor),
+    // for 96.
+    expect(ALL_DELTA_KEYS).toHaveLength(96);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(96);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6744,8 +6758,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Gathering PR4's ggoal (emitted from the new gathering_goal_wire.ts
     // sibling, likewise inside the recursive scrape) makes 93.
     // The candidate self in-combat key cbt brings the combined inventory to 94;
-    // the account ledger's acct key (server/deeds_wire.ts) makes it 95.
-    expect(scraped.size).toBe(95);
+    // the account ledger's acct key (server/deeds_wire.ts) makes it 95. Profession
+    // Schools' schools key (the new maybe('schools', ...) line above) makes 96.
+    expect(scraped.size).toBe(96);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

@@ -491,6 +491,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/professions/craft_cast_view.ts',
   'src/ui/hud/professions/profession_event_lines_core.ts',
   'src/ui/hud/professions/profession_identity_view.ts',
+  'src/ui/hud/professions/profession_school_view.ts',
   'src/ui/hud/professions/profession_tutorial_view.ts',
   'src/ui/hud/professions/professions_view.ts',
   'src/ui/tutorial_greeting_view.ts',
@@ -2559,6 +2560,7 @@ const UI_DOM_MODULES = [
   'src/ui/touch_peek.ts',
   'src/ui/hud/professions/crafting_window.ts',
   'src/ui/hud/professions/commission_order_window.ts',
+  'src/ui/hud/professions/profession_school_window.ts',
   // The spin celebration's live element: created, listened to, mounted on
   // document.body and torn down (Bank Storage phase 17). Its markup and geometry
   // are in the pure src/ui/daily_rewards_spin_view.ts. Named `_controller` so the

@@ -5062,6 +5062,50 @@ export const ja_JP: EnTranslations = {
       "denyOutOfRange": "納品するには依頼者の近くにいる必要があります。",
       "denyNoSpace": "依頼者のバッグに空きがありません。"
     },
+    "school": {
+      "openButton": "学派",
+      "openButtonAria": "職業学派ボードを開く",
+      "title": "職業学派",
+      "close": "職業学派を閉じる",
+      "intro": "職業学派に加入し、輪番任務をこなして昇格ポイントを獲得しよう。",
+      "name": {
+        "enchantersSchool": "エンチャント学派"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "見習い",
+          "apprentice": "徒弟",
+          "journeyman": "職人",
+          "adept": "熟練者",
+          "master": "マスター",
+          "grandmaster": "グランドマスター"
+        }
+      },
+      "taskKind": {
+        "daily": "日次依頼",
+        "contract": "依頼",
+        "materials": "素材依頼",
+        "weeklyGroup": "週次パーティー依頼"
+      },
+      "rankLine": "{rank}、{points}ポイント",
+      "nextRankLine": "次の階級まで{points} / {nextPoints}ポイント",
+      "swearToProgress": "さらに昇格するには忠誠を誓おう。",
+      "qualifyHint": "{profession}技能{skill}が必要です（現在{current}）。",
+      "joinButton": "Join",
+      "swearButton": "忠誠を誓う",
+      "swornBadge": "誓約済み",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points}ポイント",
+      "submitButton": "提出",
+      "readyIn": "{duration}後に再挑戦可能",
+      "taskSubmitted": "{school}の任務を完了しました（+{points}ポイント）。",
+      "denyUnknownTask": "その任務はもう存在しません。",
+      "denyNotAMember": "あなたは{school}の一員ではありません。",
+      "denyOutOfRange": "任務を提出するには学派長の近くにいる必要があります。",
+      "denyOnCooldown": "その任務はまだ準備ができていません。",
+      "denyPartyRequired": "その任務にはパーティーが必要です。",
+      "denyInsufficientMaterials": "その任務に必要な素材が足りません。"
+    },
     "bgOffer": {
       "title": "ソーンホロウ平原の準備が整いました",
       "backfillTitle": "ソーンホロウ平原が戦士を求めています",
@@ -7554,6 +7598,9 @@ export const ja_JP: EnTranslations = {
       "comingSoon": "レシピ未実装",
       "gatherHubHeading": "採集",
       "gatherHubBody": "採集職が製作に素材を供給します。採掘・伐採・薬草学の上限は100、農耕は手入れした畑で種から作物を育て上限は同じく100、釣りは200です。",
+      "schoolsHeading": "職業学派",
+      "schoolsBody": "クラフトは輪を越えて独自の機構へと成長することがある。熟練者の作業場に根を下ろした実在の学派であり、技術を証明した者に門戸を開き、学派の継続的な活動を通じて昇っていける階級の梯子を備えている。エンチャントには最初の学派がすでに築かれている。",
+      "schoolCraftFmt": "{hub}を拠点とする、階級制の{craft}機構。",
       "archetypesHeading": "十の生き方",
       "archetypesBody": "隣り合う二つの職に調律すると対の称号を得ます。二つの主専攻は上限まで伸ばせ、反対側の一つは趣味としてレア段階まで残り、その他の職はコモン段階に留まります。",
       "pairFmt": "{a}と{b}",

@@ -111,6 +111,18 @@ export interface ProfessionRecipeRecord {
   // Admission refuses with the 'daily_limit' CraftResult reason; the day
   // stamp lands in resolveCraftForRecipe on successful consumption only.
   oncePerDay?: true;
+  // Profession Schools extensibility point (content/profession_schools.ts):
+  // when present, this recipe is a school-exclusive rare recipe, learnable
+  // and craftable only by a member of `schoolId` at rank index >=
+  // `schoolRankReq` (professions/schools.ts schoolRankIndexFor). INERT today:
+  // no shipped recipe sets these fields, and no training/crafting gate reads
+  // them yet (the Enchanters School's first pass is systems and data only, per
+  // its own scope note); a later content pass wires the gate at
+  // training.ts resolveTrain and crafting.ts's admission check, the same way
+  // teachTierMet/isRecipeKnown do today, in the same change that authors the
+  // first school recipe.
+  schoolId?: string;
+  schoolRankReq?: number;
 }
 
 // One performed craft (a runtime instance of a RecipeRecord being worked),

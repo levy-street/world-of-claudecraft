@@ -5062,6 +5062,50 @@ export const id_ID: EnTranslations = {
       "denyOutOfRange": "Kamu harus berada di dekat peminta untuk menyerahkan komisi.",
       "denyNoSpace": "Peminta tidak memiliki ruang di tasnya."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Medan Thornhollow sudah siap",
       "backfillTitle": "Medan Thornhollow membutuhkan seorang petarung",
@@ -7554,6 +7598,9 @@ export const id_ID: EnTranslations = {
       "comingSoon": "Belum ada resep",
       "gatherHubHeading": "Pengumpulan",
       "gatherHubBody": "Empat perdagangan pengumpulan memberi makan cincin dari lapangan: Penambangan, Penebangan, dan Herbalisme mengambil bijih, kayu, dan herba dari tanah dan mencapai batas pada keahlian 100, sementara Memancing berjalan pada ritme menggigit-dan-menggulung tersendiri hingga 200. Setiap halaman di bawah ini membawa peta simpul, tangga alat, dan peluang yang tepat.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Roda dan arketipenya",
       "archetypesBody": "Sepuluh kerajinan duduk pada roda yang tetap, dan letak geografis pada roda itu penting. Setiap dua tetangga membentuk sebuah pasangan bernama: Pandai Besi untuk Penempaan Senjata dan Penempaan Zirah, Perajut Busana untuk Pengolahan Kulit dan Menjahit, Apoteker untuk Alkimia dan Memasak, Pengebom untuk Rekayasa dan Alkimia, dan enam lagi mengelilingi cincin itu.\n\nMenyelaraskan diri dengan sebuah pasangan adalah misi, bukan klik menu. Empat pasangan bisa dimasuki hari ini (Pandai Besi, Perajut Busana, Apoteker, dan Pengebom), masing-masing berlabuh pada seorang master yang menetap di Eastbrook, yang misi penerimaannya menyatakan seluruh kesepakatan di muka sebelum kamu mengambilnya. Sampai kamu berdeklarasi, setiap kerajinan maju bebas pada resep hingga tingkat langka (resep mana pun yang meminta keahlian 74 atau kurang), sehingga kamu bisa mencoba segalanya sebelum memilih.\n\nBegitu kamu selaras, dua kerajinan pasanganmu menjadi bidang utamamu, tanpa langit-langit selain batas akhir. Sisa roda tidak lantas padam: satu kerajinan di seberang bidang utamamu tetap menyala sebagai hobi yang terus mendaki hingga tingkat langka (misi berulang di tempa Pandai Besi Haldren memungkinkanmu menukar yang mana), dan setiap kerajinan lain menjadi tidak aktif. Kerajinan yang tidak aktif mempertahankan keahlian dan resep biasanya, yang terus mengajarinya pada kurva normal hingga berubah abu-abu di 75; segala sesuatu di atas biasa berhenti membayar seketika, dan kerajinan yang tidak aktif tidak pernah menghasilkan karya master selama ia beristirahat.",
       "pairFmt": "{a} dan {b}",

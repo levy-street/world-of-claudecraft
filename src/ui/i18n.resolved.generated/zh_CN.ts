@@ -5062,6 +5062,50 @@ export const zh_CN: EnTranslations = {
       "denyOutOfRange": "你必须靠近委托人才能交付委托。",
       "denyNoSpace": "委托人的背包空间不足。"
     },
+    "school": {
+      "openButton": "学派",
+      "openButtonAria": "打开职业学派面板",
+      "title": "职业学派",
+      "close": "关闭职业学派",
+      "intro": "加入一个职业学派，完成其轮换任务以获取晋阶点数。",
+      "name": {
+        "enchantersSchool": "附魔师学派"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "初学者",
+          "apprentice": "学徒",
+          "journeyman": "熟练工",
+          "adept": "精通者",
+          "master": "大师",
+          "grandmaster": "宗师"
+        }
+      },
+      "taskKind": {
+        "daily": "每日委托",
+        "contract": "委托",
+        "materials": "材料委托",
+        "weeklyGroup": "每周组队委托"
+      },
+      "rankLine": "{rank}，{points}点",
+      "nextRankLine": "{points} / {nextPoints}点晋升下一阶",
+      "swearToProgress": "宣誓效忠以继续晋升。",
+      "qualifyHint": "需要{skill}点{profession}技能（你目前拥有{current}点）。",
+      "joinButton": "Join",
+      "swearButton": "宣誓效忠",
+      "swornBadge": "已宣誓",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points}点",
+      "submitButton": "提交",
+      "readyIn": "{duration}后可用",
+      "taskSubmitted": "你为{school}完成了一项任务（+{points}点）。",
+      "denyUnknownTask": "该任务已不存在。",
+      "denyNotAMember": "你不是{school}的成员。",
+      "denyOutOfRange": "你必须靠近学派导师才能提交任务。",
+      "denyOnCooldown": "该任务尚未就绪。",
+      "denyPartyRequired": "该任务需要组队。",
+      "denyInsufficientMaterials": "你没有该任务所需的材料。"
+    },
     "bgOffer": {
       "title": "荆谷原野已准备就绪",
       "backfillTitle": "荆谷原野需要一名战士",
@@ -7554,6 +7598,9 @@ export const zh_CN: EnTranslations = {
       "comingSoon": "暂无配方",
       "gatherHubHeading": "采集",
       "gatherHubBody": "采集行业为制作供给材料：采矿、伐木与草药学的上限为100，耕作在照料的田畦中从种子育出作物，上限同为100，钓鱼为200。",
+      "schoolsHeading": "职业学派",
+      "schoolsBody": "一门手艺可以从轮环之上成长为独立的机构：一所实体学派扎根于某位大师的工作站，向证明了自身技艺的人敞开大门，并设有一套可以通过持续参与学派事务来攀登的军衔阶梯。附魔是第一个建成的学派。",
+      "schoolCraftFmt": "一所按军衔分级的{craft}机构，扎根于{hub}。",
       "archetypesHeading": "十大命途",
       "archetypesBody": "调谐到两个相邻行业即可获得一个成对头衔：两门主修可以一路练到最高层级，对侧的一门行业作为爱好保留在精良层级，其余行业则停留在普通层级。",
       "pairFmt": "{a}与{b}",

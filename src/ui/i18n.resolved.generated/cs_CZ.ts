@@ -5062,6 +5062,50 @@ export const cs_CZ: EnTranslations = {
       "denyOutOfRange": "Pro doručení zakázky musíš být poblíž zadavatele.",
       "denyNoSpace": "Zadavatel nemá místo v batozích."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Thornhollowská pole jsou připravena",
       "backfillTitle": "Thornhollowská pole potřebují bojovníka",
@@ -7554,6 +7598,9 @@ export const cs_CZ: EnTranslations = {
       "comingSoon": "Zatím žádné recepty",
       "gatherHubHeading": "Sběr",
       "gatherHubBody": "Čtyři sběratelské živnosti zásobují prsten z terénu: Těžba, Dřevorubectví a Bylinkářství vytahují rudu, dřevo a byliny ze země a mají limit 100 dovednosti, zatímco Rybaření běží svým vlastním rytmem pokusů o záběr a navíjení celou cestu do 200. Každá stránka níže nese přesné mapy nalezišť, žebříčky nástrojů a šance.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Kolo a jeho archetypy",
       "archetypesBody": "Deset řemesel sedí na pevném kole a geografie na tom kole má význam. Každí dva sousedé tvoří pojmenovaný pár: Kovář pro Kovářství zbraní a Zbrojnictví, Krejčovský kožešník pro Kožedělnictví a Krejčovství, Lékárník pro Alchymii a Vaření, Bombardér pro Strojírenství a Alchymii a dalších šest kolem prstence.\n\nNaladění na pár je úkol, ne kliknutí v nabídce. Dnes se lze připojit ke čtyřem párům (Kovář, Krejčovský kožešník, Lékárník a Bombardér), každý je ukotvený u místního mistra v Eastbrooku, jehož přijímací úkol celou dohodu vyloží rovnou, ještě než ji přijmeš. Dokud se neprohlásíš, každé řemeslo postupuje volně na receptech až po vzácnou úroveň (jakýkoli recept žádající dovednost 74 nebo méně), takže si můžeš všechno vyzkoušet, než se rozhodneš.\n\nJakmile se naladíš, obě řemesla tvého páru se stanou tvými hlavními obory, bez jiného stropu než limitu. Zbytek kola nezhasne: jedno řemeslo naproti tvým hlavním oborům zůstane zapnuté jako koníček, který dál stoupá až po vzácnou úroveň (opakovatelný úkol u kovárny Kováře Haldrena ti dovolí prohodit, které to bude), a všechna ostatní řemesla upadnou do nečinnosti. Dočasně neaktivní řemeslo si drží svou dovednost i své běžné recepty, které ho dál učí po normální křivce, dokud nezešednou na 75; všechno nad běžnou úrovní přestane platit naráz a dočasně neaktivní řemeslo po dobu odpočinku nikdy nevydá mistrovské dílo.",
       "pairFmt": "{a} a {b}",

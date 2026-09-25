@@ -17,6 +17,7 @@ import {
   GUIDE_PROF_CURVE,
   GUIDE_PROF_GATHERING,
   GUIDE_PROF_RING,
+  GUIDE_PROF_SCHOOLS,
   GUIDE_PROF_STATIONS,
 } from '../content.generated';
 import { hrefFor } from '../routes';
@@ -103,6 +104,44 @@ function archetypesSection(): string {
     </section>`;
 }
 
+// Profession Schools (rank-gated crafting institutions beyond the craft ring
+// itself, first shipped: the Enchanters School). Renders straight off
+// GUIDE_PROF_SCHOOLS, which is already trimmed to spoiler-safe facts (name,
+// craft, anchor hub/master, rank NAMES only): see that data's own comment in
+// scripts/wiki/build_content.mjs. No new route: one school with no unique
+// loot and no balance numbers to expose fits as a subsection of the existing
+// overview, the same altitude as the archetypes list above it.
+function schoolsSection(): string {
+  if (GUIDE_PROF_SCHOOLS.length === 0) return '';
+  const cards = GUIDE_PROF_SCHOOLS.map((school) => {
+    const ranks = school.ranks.map((r) => `<li>${esc(r)}</li>`).join('');
+    const masterLine = school.master
+      ? `<p class="guide-prof-school-master">${esc(
+          t('guide.professions.masterCellFmt', {
+            name: school.master.name,
+            title: school.master.title,
+          }),
+        )}</p>`
+      : '';
+    return `<div class="guide-prof-school">
+        <h3>${esc(school.name)}</h3>
+        <p class="guide-prof-school-craft">${esc(
+          t('guide.professions.schoolCraftFmt', {
+            craft: craftLabel(school.craftId),
+            hub: school.hub,
+          }),
+        )}</p>
+        ${masterLine}
+        <ol class="guide-prof-school-ranks">${ranks}</ol>
+      </div>`;
+  }).join('');
+  return `<section class="guide-block" id="prof-schools">
+      <h2>${esc(t('guide.professions.schoolsHeading'))}</h2>
+      ${paras('guide.professions.schoolsBody')}
+      <div class="guide-prof-schools">${cards}</div>
+    </section>`;
+}
+
 function stationsSection(): string {
   const rows = GUIDE_PROF_STATIONS.stations
     .map(
@@ -139,6 +178,7 @@ function overviewHtml(): string {
       ${ringSection()}
       ${gatheringSection()}
       ${archetypesSection()}
+      ${schoolsSection()}
       <section class="guide-block" id="prof-letter">
         <h2>${esc(t('guide.professions.archetypeChooseTitle'))}</h2>
         ${paras('guide.professions.archetypeChooseBody')}

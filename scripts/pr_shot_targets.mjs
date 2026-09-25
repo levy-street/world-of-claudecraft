@@ -6772,6 +6772,81 @@ export const TARGETS = [
     },
   },
   {
+    key: 'profession-school-board',
+    label: 'Profession Schools board (rank-gated crafting institutions)',
+    when: [
+      'ui/hud/professions/profession_school_view',
+      'ui/hud/professions/profession_school_window',
+      'ui/hud/professions/profession_school_i18n',
+      'ui/hud/professions/school_task_feedback',
+      'sim/content/profession_schools',
+      'sim/professions/schools',
+    ],
+    // Stages a real join (teleport to the toolworks, the Enchanters School's
+    // anchor station, then the real craft-skill gate and the real
+    // joinProfessionSchool command) rather than a raw membership poke, so the
+    // shot proves the actual join path renders correctly; then dials the
+    // points up to a mid-ladder rank (Apprentice) and grants the daily task's
+    // reagent so one task row reads ready-to-submit, the other three read
+    // their normal requirement lines.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      // Teleporting to the toolworks can re-raise the loading veil (asset
+      // streaming); a clip taken under it shoots the curtain art instead of
+      // the panel (the awaitWorldPainted/awaitVeilSettled precedent above).
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        const sim = window.__game?.sim;
+        if (!sim) return;
+        const pid = sim.primaryId;
+        const meta = sim.players?.get(pid);
+        const station = sim.stationPlacements?.find((s) => s.type === 'toolworks');
+        const p = sim.entities?.get(pid);
+        if (station && p) {
+          p.pos = { ...p.pos, x: station.pos.x, z: station.pos.z };
+          p.prevPos = { ...p.pos };
+          try {
+            sim.rebucket?.(p);
+          } catch {}
+        }
+        if (meta) meta.craftSkills = { ...meta.craftSkills, enchanting: 25 };
+        try {
+          sim.joinProfessionSchool?.('enchanters_school', pid);
+        } catch {}
+        if (meta?.professionSchool) {
+          meta.professionSchool.memberships.enchanters_school = 120;
+        }
+        try {
+          sim.addItem?.('arcane_dust', 10);
+        } catch {}
+      });
+      await awaitVeilSettled(page);
+      await page.evaluate(() => {
+        const el = document.querySelector('#school-board-window');
+        if (el) el.style.display = 'none';
+        window.__game?.hud?.openSchoolBoard?.();
+      });
+      const open = await pollForSize(page, '#school-board-window');
+      // Staging a fresh craft skill (enchanting 25) trips the once-ever
+      // first-tier explainer modal over the window (the crafting target's
+      // fourStates/discount precedent above); poll-dismiss it so the shot
+      // frames the school board, not the tutorial.
+      if (open) {
+        for (let i = 0; i < 10; i++) {
+          const dismissed = await page.evaluate(() => {
+            const ok = document.querySelector('#profession-tutorial .cd-ok');
+            if (ok) ok.click();
+            return Boolean(ok);
+          });
+          if (dismissed) break;
+          await wait(300);
+        }
+        await wait(200);
+      }
+      return open ? { clip: '#school-board-window' } : {};
+    },
+  },
+  {
     key: 'gather-tool-tooltip',
     label: 'Bag tooltip: gathering implement kind/requirement/use/bonus lines (#2343)',
     when: ['ui/gather_tool_tooltip', 'professions/tools'],

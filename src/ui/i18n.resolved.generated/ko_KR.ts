@@ -5062,6 +5062,50 @@ export const ko_KR: EnTranslations = {
       "denyOutOfRange": "의뢰를 전달하려면 의뢰인 근처에 있어야 합니다.",
       "denyNoSpace": "의뢰인의 가방에 공간이 없습니다."
     },
+    "school": {
+      "openButton": "학파",
+      "openButtonAria": "직업 학파 게시판 열기",
+      "title": "직업 학파",
+      "close": "직업 학파 닫기",
+      "intro": "직업 학파에 가입하고 순환 임무를 완료하여 계급 포인트를 획득하세요.",
+      "name": {
+        "enchantersSchool": "마법부여사 학파"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "입문자",
+          "apprentice": "견습생",
+          "journeyman": "숙련공",
+          "adept": "숙달자",
+          "master": "명인",
+          "grandmaster": "대명인"
+        }
+      },
+      "taskKind": {
+        "daily": "일일 의뢰",
+        "contract": "의뢰",
+        "materials": "재료 의뢰",
+        "weeklyGroup": "주간 파티 의뢰"
+      },
+      "rankLine": "{rank}, {points}포인트",
+      "nextRankLine": "다음 계급까지 {points} / {nextPoints}포인트",
+      "swearToProgress": "더 나아가려면 충성을 맹세하세요.",
+      "qualifyHint": "{profession} 숙련도 {skill}이 필요합니다 (현재 {current}).",
+      "joinButton": "Join",
+      "swearButton": "충성 맹세",
+      "swornBadge": "맹세함",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points}포인트",
+      "submitButton": "제출",
+      "readyIn": "{duration} 후 재사용 가능",
+      "taskSubmitted": "{school}의 임무를 완료했습니다 (+{points}포인트).",
+      "denyUnknownTask": "그 임무는 더 이상 존재하지 않습니다.",
+      "denyNotAMember": "당신은 {school}의 일원이 아닙니다.",
+      "denyOutOfRange": "임무를 제출하려면 학파장 근처에 있어야 합니다.",
+      "denyOnCooldown": "그 임무는 아직 준비되지 않았습니다.",
+      "denyPartyRequired": "그 임무는 파티가 필요합니다.",
+      "denyInsufficientMaterials": "그 임무에 필요한 재료가 없습니다."
+    },
     "bgOffer": {
       "title": "쏜할로우 평원이 준비되었습니다",
       "backfillTitle": "쏜할로우 평원에 전사가 필요합니다",
@@ -7554,6 +7598,9 @@ export const ko_KR: EnTranslations = {
       "comingSoon": "제조법 없음",
       "gatherHubHeading": "채집",
       "gatherHubBody": "채집 전문직이 제작에 재료를 공급한다. 채광, 벌목, 약초학은 상한이 100이고, 농사는 가꾼 밭에서 씨앗으로 작물을 길러 상한이 마찬가지로 100이며, 낚시는 200이다.",
+      "schoolsHeading": "직업 학파",
+      "schoolsBody": "하나의 공예는 고리를 넘어 독자적인 기관으로 성장할 수 있다. 마스터의 작업장에 뿌리내린 실재하는 학파로, 실력을 증명한 이들에게 문을 열며, 학파의 지속적인 활동을 통해 오를 수 있는 계급 사다리를 갖추고 있다. 마법부여는 최초로 세워진 학파를 가지고 있다.",
+      "schoolCraftFmt": "{hub}에 자리한, 계급으로 제한되는 {craft} 기관.",
       "archetypesHeading": "열 가지 원형",
       "archetypesBody": "이웃한 두 전문직에 조율하면 짝 칭호를 얻는다. 두 전공은 최고 한계까지 오르고, 반대편 하나는 취미로 남아 희귀 단계까지 오르며, 나머지 전문직은 일반 단계에 머문다.",
       "pairFmt": "{a}와 {b}",

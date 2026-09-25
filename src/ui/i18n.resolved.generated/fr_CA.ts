@@ -5062,6 +5062,50 @@ export const fr_CA: EnTranslations = {
       "denyOutOfRange": "Vous devez être près du demandeur pour livrer une commande.",
       "denyNoSpace": "Le demandeur n'a plus de place dans ses sacs."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Les Champs de Thornhollow sont prêts",
       "backfillTitle": "Les Champs de Thornhollow ont besoin d'un combattant",
@@ -7554,6 +7598,9 @@ export const fr_CA: EnTranslations = {
       "comingSoon": "Pas encore de recettes",
       "gatherHubHeading": "Récolte",
       "gatherHubBody": "Quatre métiers de récolte alimentent la roue depuis le terrain : le Minage, le Bûcheronnage et l'Herboristerie extraient minerai, bois et herbes de la terre et plafonnent à 100 de maîtrise, tandis que la Pêche fonctionne selon son propre rythme de touche et de moulinage jusqu'à 200. Chaque page ci-dessous contient les cartes exactes des noeuds, les échelles d'outils et les probabilités.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "La roue et ses archétypes",
       "archetypesBody": "Les dix métiers occupent une roue fixe, et la géographie sur cette roue compte. Chaque paire de voisins forme une paire nommée : Forgeron pour la Fabrication d'armes et la Fabrication d'armures, Équipementier pour le Travail du cuir et la Couture, Apothicaire pour l'Alchimie et la Cuisine, Bombardier pour l'Ingénierie et l'Alchimie, et six autres autour de l'anneau.\n\nS'harmoniser à une paire est une quête, pas un clic dans un menu. Quatre paires peuvent être rejointes aujourd'hui (Forgeron, Équipementier, Apothicaire et Bombardier), chacune ancrée par un maître résident à Eastbrook dont la quête d'acceptation énonce tout le marché d'emblée, avant que vous ne l'acceptiez. Tant que vous ne vous déclarez pas, chaque métier progresse librement sur les recettes jusqu'au palier rare inclus (toute recette réclamant 74 de compétence ou moins), de sorte que vous pouvez tout essayer avant de choisir.\n\nUne fois harmonisé, vos deux métiers de paire deviennent vos majeures, sans autre plafond que le plafond global. Le reste de la roue ne s'éteint pas pour autant : un métier opposé à vos majeures reste allumé comme passe-temps et continue de grimper jusqu'au palier rare (une quête répétable à la forge du Forgeron Haldren permet d'échanger lequel), et tous les autres métiers deviennent dormants. Un métier dormant conserve sa compétence et ses recettes communes, qui continuent de l'enseigner sur la courbe normale jusqu'à ce qu'elles passent au gris à 75 ; tout ce qui est au-dessus du commun cesse aussitôt de payer, et un métier dormant ne sort jamais de chef-d'oeuvre pendant son repos.",
       "pairFmt": "{a} et {b}",

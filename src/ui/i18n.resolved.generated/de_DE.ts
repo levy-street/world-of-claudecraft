@@ -5062,6 +5062,50 @@ export const de_DE: EnTranslations = {
       "denyOutOfRange": "Du musst in der Nähe des Auftraggebers sein, um einen Auftrag zu liefern.",
       "denyNoSpace": "Der Auftraggeber hat keinen Platz in den Taschen."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Thornhollow-Felder ist bereit",
       "backfillTitle": "Thornhollow-Felder braucht einen Kämpfer",
@@ -7554,6 +7598,9 @@ export const de_DE: EnTranslations = {
       "comingSoon": "Noch keine Rezepte",
       "gatherHubHeading": "Sammeln",
       "gatherHubBody": "Die Sammelberufe versorgen den Ring vom Feld aus: Bergbau, Holzfällen und Kräuterkunde fördern Erz, Holz und Kräuter aus dem Land und erreichen eine Obergrenze von 100 Fertigkeit, Landwirtschaft zieht Feldfrüchte aus Samen in gepflegten Beeten und erreicht ebenfalls 100, während Angeln im eigenen Biss-und-Einhol-Rhythmus bis 200 läuft. Jede Seite unten enthält die genauen Knotenkarten, Werkzeugstufenleitern und Chancen.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Das Rad und seine Archetypen",
       "archetypesBody": "Die zehn Handwerke sitzen auf einem festen Rad, und die Geografie auf diesem Rad zählt. Je zwei Nachbarn bilden ein benanntes Paar: Schmied für Waffenherstellung und Rüstungsherstellung, Ausrüster für Lederverarbeitung und Schneiderei, Apotheker für Alchemie und Kochen, Bombardier für Ingenieurskunst und Alchemie, und sechs weitere rund um den Ring.\n\nSich auf ein Paar abzustimmen ist eine Quest, kein Klick im Menü. Vier Paare lassen sich heute eingehen (Schmied, Ausrüster, Apotheker und Bombardier), jedes verankert bei einem ansässigen Meister in Eastbrook, dessen Aufnahmequest den ganzen Handel vorab benennt, bevor du ihn eingehst. Bis du dich erklärst, steigt jedes Handwerk frei an Rezepten bis hinauf zur Selten-Stufe (jedes Rezept, das Fertigkeit 74 oder weniger verlangt), du kannst also alles ausprobieren, bevor du wählst.\n\nSobald du dich abstimmst, werden deine beiden Paar-Handwerke zu deinen Hauptberufen, ohne jede Decke unterhalb der Obergrenze. Der Rest des Rades erlischt darum nicht: Ein Handwerk gegenüber deinen Hauptberufen bleibt als Hobby bestehen, das weiter bis durch die Selten-Stufe steigt (eine wiederholbare Quest an der Schmiede von Schmied Haldren lässt dich tauschen, welches es ist), und jedes andere Handwerk wird inaktiv. Ein inaktives Handwerk behält seine Fertigkeit und seine gewöhnlichen Rezepte, die es auf der normalen Kurve weiter lehren, bis sie bei 75 grau werden; alles über Gewöhnlich hört auf einen Schlag auf zu zahlen, und ein inaktives Handwerk bringt im Ruhen nie ein Meisterwerk hervor.",
       "pairFmt": "{a} und {b}",

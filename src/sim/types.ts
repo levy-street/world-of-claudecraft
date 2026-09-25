@@ -7351,6 +7351,30 @@ export type SimEvent = { pid?: number } & (
         | 'train_tier_unmet'
         | 'train_cannot_afford';
     }
+  // Profession Schools task-submission outcome: mirrors
+  // professions/schools.ts SchoolTaskOutcome so the online client can reflect
+  // the local result of a submit_school_task command without deciding it
+  // itself. Personal (emitted with pid = the submitter's entity id). Text-free
+  // on purpose (the trainResult precedent): the client derives the task and
+  // school display copy from taskId/schoolId plus static content. Emitted on
+  // EVERY outcome, unlike trainResult's silent-deny arms: a task submission
+  // risks the player's materials, so a refused attempt still owes feedback
+  // that nothing was consumed. `reason` is absent on success;
+  // `pointsAwarded` is present only on success.
+  | {
+      type: 'schoolTaskResult';
+      ok: boolean;
+      schoolId: string;
+      taskId: string;
+      reason?:
+        | 'unknown_task'
+        | 'not_a_member'
+        | 'out_of_range'
+        | 'on_cooldown'
+        | 'party_required'
+        | 'insufficient_materials';
+      pointsAwarded?: number;
+    }
   // Maker's Bond unbind outcome (Professions 2.0): mirrors
   // professions/commission.ts UnbindResult so the online client can reflect
   // the local result of an unbind_item command without deciding it itself.

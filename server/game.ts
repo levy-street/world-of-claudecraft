@@ -6750,6 +6750,25 @@ export class GameServer {
         // of craftingIdentityFor's JSON), so no dirty-marking is needed here.
         if (typeof msg.recipe === 'string') sim.trainRecipe(msg.recipe, pid);
         break;
+      // Profession Schools (rank-gated crafting institutions, first
+      // implementation: the Enchanters School). Membership/allegiance resolve
+      // silently inside the sim (Sim.joinProfessionSchool/
+      // swearSchoolAllegiance -> professions/schools.ts) and ride the per-tick
+      // `schools` self-delta, so no result event and no dirty-marking is
+      // needed here (the joinProfessionSchool/swearSchoolAllegiance
+      // precedent in schools.ts). A task submission DOES answer with the
+      // personal, text-free schoolTaskResult event (queued for the general
+      // event drain like every other sim event), since it risks the
+      // player's materials.
+      case 'join_profession_school':
+        if (typeof msg.school === 'string') sim.joinProfessionSchool(msg.school, pid);
+        break;
+      case 'swear_school_allegiance':
+        if (typeof msg.school === 'string') sim.swearSchoolAllegiance(msg.school, pid);
+        break;
+      case 'submit_school_task':
+        if (typeof msg.task === 'string') sim.submitSchoolTask(msg.task, pid);
+        break;
       case 'slot_tool_effect':
         // UNGATED since the acquisition craft shipped: slotting now consumes
         // a crafted charm from the sender's own bags through
@@ -8769,6 +8788,11 @@ export class GameServer {
     // Craft skills and identity must arrive as one value so the client never
     // evaluates a recipe against a pair from one tick and skills from another.
     maybe('cprof', this.sim.craftingIdentityFor(anchorSession.pid));
+    // Profession Schools (rank-gated crafting institutions): the viewer's own
+    // membership set plus every joined school's rotating tasks. Bounded by
+    // the school catalog (PROFESSION_SCHOOLS, one entry today), the named
+    // bound the self-path rule requires; per-tick like prof/cprof above.
+    maybe('schools', this.sim.professionSchoolsFor(anchorSession.pid));
     // The mobile craft ids whose station serves this viewer (own active
     // station at any distance, plus every active partyShared party station
     // within STATION_RADIUS), sorted and deduped by the sim, joined into one

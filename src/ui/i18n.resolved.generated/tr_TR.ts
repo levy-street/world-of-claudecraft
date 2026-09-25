@@ -5062,6 +5062,50 @@ export const tr_TR: EnTranslations = {
       "denyOutOfRange": "Bir komisyonu teslim etmek için isteyen kişiye yakın olmalısın.",
       "denyNoSpace": "İsteyen kişinin çantalarında yer yok."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Dikenvadi Ovası hazır",
       "backfillTitle": "Dikenvadi Ovası'nın bir savaşçıya ihtiyacı var",
@@ -7554,6 +7598,9 @@ export const tr_TR: EnTranslations = {
       "comingSoon": "Henüz tarif yok",
       "gatherHubHeading": "Toplama",
       "gatherHubBody": "Dört toplama mesleği, sahadan halkayı besler: Madencilik, Odun Kesimi ve Otçuluk topraktan cevher, kereste ve ot çıkarır ve 100 yetkinlikte sınırlanır; Balık Tutma ise kendi balık tutma ve çekme ritmiyle 200'e kadar uzanır. Aşağıdaki her sayfa tam düğüm haritalarını, alet merdivenlerini ve oranları taşır.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Çark ve arketipleri",
       "archetypesBody": "On zanaat sabit bir çark üzerinde oturur ve o çark üzerindeki coğrafya önemlidir. Her iki komşu, adlandırılmış bir çift oluşturur: Silah Yapımı ile Zırh Yapımı için Demirci, Deri İşleme ile Terzilik için Teçhizatçı, Simya ile Aşçılık için Eczacı, Mühendislik ile Simya için Bombacı ve halkanın çevresinde altı tane daha.\n\nBir çifte uyumlanmak bir menü tıklaması değil, bir görevdir. Bugün dört çifte katılınabilir (Demirci, Teçhizatçı, Eczacı ve Bombacı); her biri Doğudere'deki yerleşik bir ustaya bağlıdır ve o ustanın kabul görevi, siz üstlenmeden önce anlaşmanın tamamını baştan açıkça söyler. Siz beyanda bulunana kadar her zanaat, nadir kademeye kadarki tariflerde serbestçe ilerler (beceri 74 ve altını isteyen her tarif), böylece seçim yapmadan önce her şeyi deneyebilirsiniz.\n\nUyumlandığınız anda çiftinizin iki zanaatı ana dallarınız olur ve tavan dışında hiçbir sınırları kalmaz. Çarkın geri kalanı kararmaz: ana dallarınızın karşısındaki bir zanaat, nadir kademe boyunca tırmanmayı sürdüren bir hobi olarak açık kalır (Demirci Haldren'in ocağındaki tekrarlanabilir bir görev hangisi olduğunu değiştirmenizi sağlar) ve diğer her zanaat uykuya geçer. Uykudaki bir zanaat becerisini ve sıradan tariflerini korur; bu tarifler 75'te grileşene kadar normal eğri üzerinde öğretmeyi sürdürür; sıradanın üzerindeki her şey ise bir anda ödemeyi keser ve uykudaki bir zanaat dinlenirken asla şaheser çıkarmaz.",
       "pairFmt": "{a} ve {b}",

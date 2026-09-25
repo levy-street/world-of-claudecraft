@@ -625,6 +625,53 @@ parses at a glance, and the register already offers the cogwheel).
   (recipe_<output item id>, the shipped derived contract; ids are never
   player-visible anyway).
 
+### Profession Schools: the Enchanters School (web-verified 2026-09-25)
+
+Scope: the first Profession Schools institution (content/profession_schools.ts,
+ENCHANTERS_SCHOOL_ID), its display name, and its six rank names. No recipe,
+enchant effect, or balance-number proper noun ships with this pass (see that
+file's own header). Method per the standing bar: quoted exact-phrase search
+against the seven wikis plus a coined-token pass, since "Enchanters School" is
+a two-word compound and the ranks are a closed six-word ladder worth checking
+as a set, not just word by word.
+
+- **Enchanters School** (institution display name, id `enchanters_school`)
+  CLEAR. Exact-phrase search returns no institution, guild hall, or vendor by
+  this name on any of the seven wikis. Nearest neighbours recorded rather than
+  passed over: WoW's "Enchanter's Study" (a Warlords of Draenor garrison
+  building) and "The Schools of Arcane Magic - Enchantment" (a Dalaran lore
+  book tied to the Higher Learning achievement) both use adjacent vocabulary,
+  but neither is this name and neither is a rank-gated membership institution,
+  so the same-role bar is not met. "Enchanters" plus "School" are both
+  ordinary English words describing exactly what the thing is (an institution
+  that teaches enchanting), the Iron Sword class of plain description.
+- **Initiate / Apprentice / Journeyman / Adept / Master / Grandmaster**
+  (ENCHANTERS_SCHOOL_RANKS, the six rank names) GENERIC, with recorded
+  neighbours precisely because the overlap is close. WoW's OWN Classic
+  profession skill tiers are literally Apprentice, Journeyman, Expert,
+  Artisan, Master, Grand Master, in the same functional role (a crafting
+  profession's rank ladder) as this school's ranks: four of our six words
+  (Apprentice, Journeyman, Master, Grandmaster) are shared with that ladder.
+  Two facts keep this GENERIC rather than a collision. First, the words
+  predate every game that uses them: Apprentice-Journeyman-Master is the real
+  medieval craft-guild rank system (see "Master craftsman"), the bar's own
+  "generic words / real-world vocabulary" exemption, not a coinage any game
+  owns. Second, the words are used across many unrelated properties beyond
+  WoW in exactly this crafting-rank role: Ultima Online's tradeskill ladder
+  (Neophyte, Novice, Apprentice, Journeyman, Expert, Adept, Master,
+  Grandmaster) shares five of our six words including the same Adept and
+  Grandmaster rungs, and tabletop RPGs (D&D-adjacent "systems mastery" ladders)
+  use the same words the same way; no exact SET match (our six-word ladder,
+  in our order, under our name) exists on any of the seven wikis. "Initiate"
+  and "Adept" alone are common fantasy-RPG rank/tier vocabulary well outside
+  any one franchise (guild ranks, difficulty tiers, class-progression titles)
+  and clear standalone. No new coinage ships with this ladder; every word is
+  shared fantasy/real-world English under the bar's rule 2.
+- The task ids (`school_task_enchanters_daily_dust` and its three siblings) and
+  the school id (`enchanters_school`) are plain descriptive ids, never
+  player-visible, and mint no display name of their own (SCHOOL_TASKS carries
+  no `name` field in this pass).
+
 ## Recorded for the maintainer (stopping rule: no unilateral rename)
 
 STATUS 2026-08-20, SETTLED BY THE MAINTAINER, and the scope is narrow on purpose.

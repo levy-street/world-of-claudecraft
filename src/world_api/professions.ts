@@ -10,6 +10,11 @@ import type {
   PerfectingSwapInfoView,
   PerfectingSwapRequest,
 } from '../sim/professions/perfecting_swap';
+import type {
+  PlayerProfessionSchoolsView,
+  SchoolMembershipView,
+  SchoolTaskView,
+} from '../sim/professions/schools';
 import type { PlayerProfessionSkill, ProfessionRecipeRecord } from '../sim/professions/types';
 import type { EquipSlot, StationDef } from '../sim/types';
 import type { WorldInteractionOutcome } from './interaction';
@@ -22,6 +27,9 @@ export type {
   PerfectingInfoView,
   PerfectingSwapInfoView,
   PerfectingSwapRequest,
+  PlayerProfessionSchoolsView,
+  SchoolMembershipView,
+  SchoolTaskView,
 };
 
 // Render-safe projection of a player's professions standing. Stub as of
@@ -574,4 +582,43 @@ export interface IWorldProfessions {
   // The authoritative result is personal; neither online method predicts state.
   swapPerfectingRanks(request: PerfectingSwapRequest): void;
   perfectingSwapInfo(request: PerfectingSwapRequest): PerfectingSwapInfoView | null;
+  // Profession Schools (rank-gated crafting institutions, src/sim/professions/
+  // schools.ts; first implementation: the Enchanters School, src/sim/content/
+  // profession_schools.ts). The viewer's own membership set (points per
+  // joined school, the rank each resolves to, and whether the viewer is
+  // sworn to it) plus every rotating task belonging to a school they have
+  // joined, each carrying its own per-viewer cooldown. EMPTY for a viewer who
+  // has never joined a school. Offline this reads the live PlayerMeta state;
+  // online it mirrors the server's `schools` self-delta (the professionsState/
+  // craftingIdentity precedent: fully server-computed, diffed every tick).
+  readonly professionSchools: PlayerProfessionSchoolsView;
+  // Join `schoolId` as an Initiate: requires the flat craft skill in the
+  // school's profession to meet its joinProficiency and standing at the
+  // schoolmaster's station. Server-authoritative: Sim validates via
+  // professions/schools.ts canJoinProfessionSchool and silently no-ops on any
+  // refused precondition (the deeds.ts setActiveTitle/setActiveBorder
+  // precedent: a membership action carries no cost to refund); ClientWorld
+  // sends the join_profession_school command and never decides the outcome.
+  joinProfessionSchool(schoolId: string): void;
+  // Swear allegiance to `schoolId`: the ONE joined school whose swornOnly
+  // ranks become reachable (a plain member caps out at the highest rank
+  // WITHOUT swornOnly, however many points they hold). Requires standing
+  // membership and the same station proximity join does; silent no-op
+  // otherwise, the joinProfessionSchool precedent. Switching to a different
+  // already-joined school never loses either school's points.
+  // Server-authoritative; ClientWorld sends the swear_school_allegiance
+  // command and never decides the outcome.
+  swearSchoolAllegiance(schoolId: string): void;
+  // Submit one rotating school task (a delivery of the task's own
+  // requiredItemId/requiredCount, consumed on success) for its points and a
+  // fresh cooldown. Server-authoritative: Sim re-validates membership,
+  // station proximity, cooldown, party size (weekly_group tasks), and
+  // materials via professions/schools.ts submitSchoolTask, and nothing is
+  // trusted from the client; ClientWorld sends the submit_school_task command
+  // and never decides the outcome. The result surfaces through the personal,
+  // text-free `schoolTaskResult` event, emitted on every outcome (unlike the
+  // membership actions above: a task submission risks the player's
+  // materials, so a refused attempt still owes feedback that nothing was
+  // consumed).
+  submitSchoolTask(taskId: string): void;
 }

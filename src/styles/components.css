@@ -7942,6 +7942,68 @@
     }
   }
 
+  /* ---------- Profession Schools board ---------- */
+  /* Reached from the crafting window's title bar (the commission-board
+     precedent above): the same column-flex shell, the same .prof-empty /
+     .vendor-item / .ui-card family, so this section only carries what the
+     school board adds on top. */
+  #school-board-window {
+    width: 460px;
+    max-height: calc(var(--app-vh, 100vh) * 0.78 / var(--window-scale) - 24px);
+    overflow-y: auto;
+    flex-direction: column;
+  }
+  .school-intro {
+    display: block;
+    padding: 4px 6px 6px;
+    color: var(--color-text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  .school-board-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 6px 6px;
+  }
+  .school-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .school-status {
+    display: block;
+    padding-top: 4px;
+  }
+  .school-actions {
+    display: flex;
+    gap: 6px;
+    padding-top: 8px;
+  }
+  .school-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+  }
+  .school-task-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .school-task-submit-btn {
+    cursor: var(--cursor-point);
+    margin-left: auto;
+  }
+  @media (pointer: coarse) {
+    .school-task-submit-btn {
+      min-height: 40px;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+  }
+
   /* ---------- bags ---------- */
   /* bags, centred in the bottom gap between the action cluster and micro-menu */
   #bags {

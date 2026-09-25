@@ -52,6 +52,7 @@ const entrySource = `
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
   export { RELIQUARY_PAGES } from './src/sim/content/reliquary.ts';
   export { MOUNTS } from './src/sim/content/mounts.ts';
+  export { PROFESSION_SCHOOLS } from './src/sim/content/profession_schools.ts';
   export { WEAPON_SKINS } from './src/sim/content/weapon_skins.ts';
   export { armorySkinStrings } from './src/ui/i18n.catalog/armory.ts';
   export { guideStrings } from './src/ui/i18n.catalog/guide.ts';
@@ -151,6 +152,7 @@ const {
   FINAL_BOSS_DUNGEONS,
   FLAWLESS_TASKS,
   MOUNTS,
+  PROFESSION_SCHOOLS,
   WEAPON_SKINS,
   armorySkinStrings,
   guideStrings,
@@ -972,6 +974,29 @@ const profCrafts = profRing
     };
   });
 
+// Profession Schools (rank-gated crafting institutions, first implementation:
+// the Enchanters School). Spoiler-safe overview facts ONLY: the institution's
+// display name, the craft it belongs to, its anchor station's hub/master (the
+// same profStations record every craft card above already reads), and its
+// rank NAMES in catalog order. Deliberately NOT the Professions 2.0
+// transparency policy above (no point thresholds, no task requirements or
+// cooldowns, no swornOnly flag): those are a member's own discoveries in
+// play, not a wiki fact, the naming-audit header's own scope note.
+const profSchools = PROFESSION_SCHOOLS.map((school) => {
+  const station = profStations.find((s) => s.type === school.stationType);
+  return {
+    id: school.id,
+    name: school.name,
+    craftId: school.professionId,
+    craftName: craftNameById(school.professionId),
+    hub: station?.hub ?? '',
+    ...(station?.master
+      ? { master: { name: station.master.name, title: station.master.title } }
+      : {}),
+    ranks: school.ranks.map((r) => r.name),
+  };
+});
+
 // Gathering tool/rod ladders, straight off the gatherTool ItemDefs, with the
 // live vendor stockists (an entry with no vendor is profession-crafted).
 const toolVendors = (itemId) => {
@@ -1589,6 +1614,19 @@ export interface GuideProfRingCraft {
 
 export interface GuideProfArchetype { pairId: string; crafts: string[]; }
 
+/** A Profession School, spoiler-safe: name, owning craft, anchor hub/master,
+ *  and rank NAMES only, in catalog order. No point thresholds, task facts, or
+ *  cooldowns (see the generator's own comment). */
+export interface GuideProfSchool {
+  id: string;
+  name: string;
+  craftId: string;
+  craftName: string;
+  hub: string;
+  master?: { name: string; title: string };
+  ranks: string[];
+}
+
 export interface GuideProfTool {
   name: string;
   tier: number;
@@ -1769,6 +1807,7 @@ const generated = [
   `\nexport const GUIDE_RELIQUARY: GuideReliquaryPage[] = ${JSON.stringify(reliquary, null, 2)};\n`,
   `\nexport const GUIDE_PROF_RING: GuideProfRingCraft[] = ${JSON.stringify(profRing, null, 2)};\n`,
   `\nexport const GUIDE_PROF_ARCHETYPES: GuideProfArchetype[] = ${JSON.stringify(profArchetypes, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_SCHOOLS: GuideProfSchool[] = ${JSON.stringify(profSchools, null, 2)};\n`,
   `\nexport const GUIDE_PROF_CRAFTS: GuideProfCraft[] = ${JSON.stringify(profCrafts, null, 2)};\n`,
   `\nexport const GUIDE_PROF_GATHERING: GuideProfGathering[] = ${JSON.stringify(profGathering, null, 2)};\n`,
   `\nexport const GUIDE_PROF_CURVE: GuideProfCurve = ${JSON.stringify(profCurve, null, 2)};\n`,

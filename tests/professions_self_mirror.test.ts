@@ -90,6 +90,7 @@ function freshTarget(): ProfessionsSelfMirrors {
       knownRecipes: [],
       cadenceBlockedQuests: [],
     },
+    professionSchools: { memberships: [], tasks: [] },
   };
 }
 

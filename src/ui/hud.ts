@@ -545,10 +545,13 @@ import {
   PROF_LOG_GRANT,
   PROF_LOG_MISS,
 } from './hud/professions/profession_log_tones';
+import { buildProfessionSchoolsModel } from './hud/professions/profession_school_view';
+import { renderProfessionSchoolWindow } from './hud/professions/profession_school_window';
 import { buildProfessionTutorialModel } from './hud/professions/profession_tutorial_view';
 import { renderProfessionTutorial } from './hud/professions/profession_tutorial_window';
 import { ProfessionsWindow } from './hud/professions/professions_window';
 import { recipePatternTooltipLines } from './hud/professions/recipe_pattern_tooltip_view';
+import { schoolTaskResultLine } from './hud/professions/school_task_feedback';
 import {
   advanceSkillLevelObservation,
   buildSkillLevelCelebrationPlan,
@@ -1866,6 +1869,16 @@ export class Hud {
   private commissionBoardOpen = false;
   private readonly commissionBoardFocus = this.windowFocus('#commission-board-window');
   private commissionBoardOpenerFocus: HTMLElement | null = null;
+  // Profession Schools board: the same open/focus/opener trio, the
+  // commission board precedent immediately above. Task submissions currently
+  // in flight (the professions family's pendingSend convention) are keyed by
+  // taskId, since submitSchoolTask always answers naming that same id
+  // (schoolTaskResult); join/swear carry no answering event and so take no
+  // busy state (the deeds.ts setActiveTitle/setActiveBorder precedent).
+  private schoolBoardOpen = false;
+  private readonly schoolBoardFocus = this.windowFocus('#school-board-window');
+  private schoolBoardOpenerFocus: HTMLElement | null = null;
+  private readonly schoolTaskPending = new Set<string>();
   private readonly delveBoard: DelveBoardController;
   private readonly delveTracker: DelveTrackerController;
   private readonly riftTracker: RiftFloorTrackerController;
@@ -3637,6 +3650,9 @@ export class Hud {
         break;
       case 'commission-board-window':
         this.closeCommissionBoard();
+        break;
+      case 'school-board-window':
+        this.closeSchoolBoard();
         break;
       case 'loot-window':
         this.closeLoot();
@@ -11694,6 +11710,17 @@ export class Hud {
           if (ev.action === 'deliver' && $('#bags').style.display !== 'none') this.renderBags();
           break;
         }
+        case 'schoolTaskResult': {
+          // Profession Schools task submission: the school name, chat key,
+          // params and tone are resolved by school_task_feedback.ts. The
+          // answer names its OWN taskId (never id-free), so it is always the
+          // right subject to clear the pendingSend flag it armed on send.
+          this.schoolTaskPending.delete(ev.taskId);
+          const line = schoolTaskResultLine(ev);
+          this.log(t(line.key, line.params), line.tone);
+          this.renderSchoolBoard();
+          break;
+        }
         case 'toolEffectResult': {
           // Slot/recharge outcome for the acquisition craft. The event is
           // text-free: the effect and profession names derive from their ids
@@ -15440,6 +15467,7 @@ export class Hud {
         },
         onClose: () => this.closeCrafting(),
         onOpenOrders: () => this.openCommissionBoard(),
+        onOpenSchool: () => this.openSchoolBoard(),
         onOpenPerfecting: () => this.openPerfecting(),
         commissionChecked: (recipeId) => this.craftCommissionOptIn.has(recipeId),
         onToggleCommission: (recipeId, on) => {
@@ -15606,6 +15634,60 @@ export class Hud {
     this.hideTooltip();
     this.commissionBoardFocus.restoreFocus(this.commissionBoardOpenerFocus);
     this.commissionBoardOpenerFocus = null;
+  }
+
+  // -------------------------------------------------------------------------
+  // Profession Schools board (rank-gated crafting institutions; first
+  // implementation: the Enchanters School). Opened from the crafting
+  // window's header, the commission board shape immediately above.
+  // -------------------------------------------------------------------------
+
+  openSchoolBoard(): void {
+    const wasOpen = this.schoolBoardOpen;
+    this.closeOtherWindows('#school-board-window');
+    this.schoolBoardOpen = true;
+    this.renderSchoolBoard();
+    if (!wasOpen) this.schoolBoardOpenerFocus = this.schoolBoardFocus.captureFocus();
+  }
+
+  private renderSchoolBoard(): void {
+    if (!this.schoolBoardOpen) return;
+    renderProfessionSchoolWindow(
+      $('#school-board-window'),
+      buildProfessionSchoolsModel(
+        this.sim.professionSchools,
+        ITEMS,
+        this.sim.craftingIdentity.craftSkills,
+      ),
+      {
+        ...this.presentationBag,
+        hideTooltip: () => this.hideTooltip(),
+        onJoin: (schoolId) => {
+          this.sim.joinProfessionSchool(schoolId);
+          this.renderSchoolBoard();
+        },
+        onSwear: (schoolId) => {
+          this.sim.swearSchoolAllegiance(schoolId);
+          this.renderSchoolBoard();
+        },
+        onSubmitTask: (taskId) => {
+          this.schoolTaskPending.add(taskId);
+          this.sim.submitSchoolTask(taskId);
+          this.renderSchoolBoard();
+        },
+        taskPending: (taskId) => this.schoolTaskPending.has(taskId),
+        onClose: () => this.closeSchoolBoard(),
+      },
+    );
+  }
+
+  closeSchoolBoard(): void {
+    if (!this.schoolBoardOpen) return;
+    $('#school-board-window').style.display = 'none';
+    this.schoolBoardOpen = false;
+    this.hideTooltip();
+    this.schoolBoardFocus.restoreFocus(this.schoolBoardOpenerFocus);
+    this.schoolBoardOpenerFocus = null;
   }
 
   // -------------------------------------------------------------------------

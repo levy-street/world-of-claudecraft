@@ -5062,6 +5062,50 @@ export const zh_TW: EnTranslations = {
       "denyOutOfRange": "你必須靠近委託人才能交付委託。",
       "denyNoSpace": "委託人的背包空間不足。"
     },
+    "school": {
+      "openButton": "學派",
+      "openButtonAria": "開啟職業學派面板",
+      "title": "職業學派",
+      "close": "關閉職業學派",
+      "intro": "加入一個職業學派，完成其輪換任務以獲取晉階點數。",
+      "name": {
+        "enchantersSchool": "附魔師學派"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "初學者",
+          "apprentice": "學徒",
+          "journeyman": "熟練工",
+          "adept": "精通者",
+          "master": "大師",
+          "grandmaster": "宗師"
+        }
+      },
+      "taskKind": {
+        "daily": "每日委託",
+        "contract": "委託",
+        "materials": "材料委託",
+        "weeklyGroup": "每週組隊委託"
+      },
+      "rankLine": "{rank}，{points}點",
+      "nextRankLine": "{points} / {nextPoints}點晉升下一階",
+      "swearToProgress": "宣誓效忠以繼續晉升。",
+      "qualifyHint": "需要{skill}點{profession}技能（你目前擁有{current}點）。",
+      "joinButton": "Join",
+      "swearButton": "宣誓效忠",
+      "swornBadge": "已宣誓",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points}點",
+      "submitButton": "提交",
+      "readyIn": "{duration}後可用",
+      "taskSubmitted": "你為{school}完成了一項任務（+{points}點）。",
+      "denyUnknownTask": "該任務已不存在。",
+      "denyNotAMember": "你不是{school}的成員。",
+      "denyOutOfRange": "你必須靠近學派導師才能提交任務。",
+      "denyOnCooldown": "該任務尚未就緒。",
+      "denyPartyRequired": "該任務需要組隊。",
+      "denyInsufficientMaterials": "你沒有該任務所需的材料。"
+    },
     "bgOffer": {
       "title": "荊谷原野已準備就緒",
       "backfillTitle": "荊谷原野需要一名戰士",
@@ -7554,6 +7598,9 @@ export const zh_TW: EnTranslations = {
       "comingSoon": "暫無配方",
       "gatherHubHeading": "採集",
       "gatherHubBody": "採集行業為製作供給材料：採礦、伐木與藥草學的上限為100，耕作在照料的田畦中從種子育出作物，上限同為100，釣魚為200。",
+      "schoolsHeading": "職業學派",
+      "schoolsBody": "一門手藝可以從輪環之上成長為獨立的機構：一所實體學派紮根於某位大師的工作站，向證明了自身技藝的人敞開大門，並設有一套可以透過持續參與學派事務來攀登的軍銜階梯。附魔是第一個建成的學派。",
+      "schoolCraftFmt": "一所按軍銜分級的{craft}機構，紮根於{hub}。",
       "archetypesHeading": "十大命途",
       "archetypesBody": "調諧到兩個相鄰行業即可獲得一個成對頭銜：兩門主修可以一路練到最高層級，對側的一門行業作為愛好保留在精良層級，其餘行業則停留在普通層級。",
       "pairFmt": "{a}與{b}",

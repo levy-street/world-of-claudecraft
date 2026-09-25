@@ -1000,6 +1000,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
     reflowAllow: { '.scrollTop': 2 },
     driverAllow: {},
   },
+  // Same scroll pair again: the Profession Schools board (rank-gated
+  // crafting institutions) is the commission board's own shape, opened from
+  // the crafting window's header.
+  {
+    file: 'hud/professions/profession_school_window.ts',
+    reflowAllow: { '.scrollTop': 2 },
+    driverAllow: {},
+  },
   // Two polls that repaint an OPEN window only: a 15s refresh of the reward state and a 30s
   // countdown tick. Page cadence rather than frame cadence, and both no-op while closed.
   // A THIRD cadence reaches this same body and does NOT show up in the `drivers`

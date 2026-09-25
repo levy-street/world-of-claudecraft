@@ -357,6 +357,7 @@ export type {
   DisenchantResultView,
   PerfectingSwapInfoView,
   PerfectingSwapRequest,
+  PlayerProfessionSchoolsView,
   PlayerProfessionsView,
   RecipeDef,
   ToolEffectSlotView,
@@ -840,6 +841,16 @@ export const COMMAND_NAMES = [
   // The Social window's Who tab: ask for the realm roster (answered by the
   // `who` frame, mirrored as IWorldSocialGraph.whoInfo).
   'who',
+  // Profession Schools (rank-gated crafting institutions, IWorldProfessions.
+  // joinProfessionSchool/swearSchoolAllegiance/submitSchoolTask; first
+  // implementation: the Enchanters School). Like harvest_node/craft_item and
+  // the rest of the IWorldProfessions surface, these are deliberately
+  // UNTAGGED in COMMAND_FACETS below (the row-less W6 PARTIAL design; see
+  // FACET_PROFESSIONS in tests/world_api_parity.test.ts). Appended at the END
+  // because wire tokens are never reordered.
+  'join_profession_school',
+  'swear_school_allegiance',
+  'submit_school_task',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

@@ -5062,6 +5062,50 @@ export const sv_SE: EnTranslations = {
       "denyOutOfRange": "Du måste vara nära beställaren för att leverera en beställning.",
       "denyNoSpace": "Beställaren har ingen plats i sina väskor."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Törnhålefälten är redo",
       "backfillTitle": "Törnhålefälten behöver en kämpe",
@@ -7554,6 +7598,9 @@ export const sv_SE: EnTranslations = {
       "comingSoon": "Inga recept ännu",
       "gatherHubHeading": "Insamling",
       "gatherHubBody": "Fyra insamlingsyrken matar ringen från fältet: Gruvdrift, Skogsavverkning och Örtkunskap bryter malm, timmer och örter ur landet och har ett tak på 100 skicklighet, medan Fiske följer sin egna napp-och-rulle-rytm ända till 200. Varje sida nedan bär de exakta nodkartorna, verktygsstegarna och oddsen.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Hjulet och dess arketyper",
       "archetypesBody": "De tio hantverken sitter på ett fast hjul, och geografin på det hjulet spelar roll. Varje två grannar bildar ett namngivet par: Smed för Vapensmide och Rustningssmide, Utrustare för Läderhantverkeri och Skrädderi, Apotekare för Alkemi och Matlagning, Bombbärare för Ingenjörskonst och Alkemi, och sex till runt ringen.\n\nAtt inrikta sig mot ett par är ett uppdrag, inte ett menyklick. Fyra par går att ansluta sig till idag (Smed, Utrustare, Apotekare och Bombbärare), vart och ett förankrat hos en stationerad mästare i Östbäck vars antagningsuppdrag lägger fram hela överenskommelsen innan du tar den. Tills du deklarerar avancerar varje hantverk fritt på recept upp genom den sällsynta nivån (varje recept som ber om skicklighet 74 eller mindre), så du kan pröva allt innan du väljer.\n\nNär du väl inriktat dig blir parets två hantverk dina ämnen, utan något tak under själva skicklighetstaket. Resten av hjulet slocknar inte: ett hantverk mitt emot dina ämnen lever vidare som en hobby som fortsätter klättra genom den sällsynta nivån (ett repeterbart uppdrag vid Smed Haldrens smedja låter dig byta vilket), och varje annat hantverk går i vila. Ett vilande hantverk behåller sin skicklighet och sina vanliga recept, som fortsätter lära ut det på den normala kurvan tills de grånar vid 75; allt ovanför vanligt slutar betala med en gång, och ett vilande hantverk levererar aldrig ett mästerverk medan det vilar.",
       "pairFmt": "{a} och {b}",

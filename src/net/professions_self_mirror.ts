@@ -18,6 +18,7 @@ import type {
   CommissionOrderView,
   DisenchantResultView,
   GatheringGoalView,
+  PlayerProfessionSchoolsView,
   SalvageResultView,
 } from '../world_api/professions';
 import { decodeCraftingIdentity } from './crafting_wire';
@@ -39,6 +40,7 @@ export interface ProfessionsSelfMirrors {
   professionsState: PlayerProfessionsView;
   craftSkills: Record<string, number>;
   craftingIdentity: CraftingIdentityView;
+  professionSchools: PlayerProfessionSchoolsView;
 }
 
 /** Apply the profession self-mirror keys from one snapshot self record, in
@@ -59,6 +61,7 @@ export function applyProfessionsSelfMirror(
     fplot?: readonly FarmPlotView[] | null;
     prof?: PlayerProfessionsView | null;
     cprof?: CraftingIdentityView | null;
+    schools?: PlayerProfessionSchoolsView | null;
   },
 ): void {
   // Commission order board (issue #1298): server-gated on the board
@@ -90,5 +93,10 @@ export function applyProfessionsSelfMirror(
     const decoded = decodeCraftingIdentity(s.cprof);
     target.craftSkills = decoded.craftSkills;
     target.craftingIdentity = decoded.identity;
+  }
+  // Profession Schools: the server already builds the full view
+  // (professionSchoolsFor), so this simply stores it, the prof precedent.
+  if (s.schools !== undefined) {
+    target.professionSchools = s.schools ?? { memberships: [], tasks: [] };
   }
 }

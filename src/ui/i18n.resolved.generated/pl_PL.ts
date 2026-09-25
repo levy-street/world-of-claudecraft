@@ -5062,6 +5062,50 @@ export const pl_PL: EnTranslations = {
       "denyOutOfRange": "Musisz być blisko zleceniodawcy, aby dostarczyć zamówienie.",
       "denyNoSpace": "Zleceniodawca nie ma miejsca w torbach."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Pola Ciernistej Kotliny są gotowe",
       "backfillTitle": "Pola Ciernistej Kotliny potrzebują wojownika",
@@ -7554,6 +7598,9 @@ export const pl_PL: EnTranslations = {
       "comingSoon": "Brak przepisów",
       "gatherHubHeading": "Zbieranie",
       "gatherHubBody": "Cztery zawody zbierackie zasilają pierścień z terenu: górnictwo, drwalstwo i zielarstwo wyciągają rudę, drewno i zioła z ziemi i mają limit 100 biegłości, podczas gdy wędkarstwo biegnie własnym rytmem brania i holowania aż do 200. Każda poniższa strona niesie dokładne mapy węzłów, drabiny narzędzi i szanse.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Koło i jego archetypy",
       "archetypesBody": "Dziesięć rzemiosł siedzi na stałym kole, a geografia tego koła ma znaczenie. Każda dwójka sąsiadów tworzy nazwaną parę: Kowal dla Wytwarzania Broni i Wytwarzania Pancerzy, Krawiec-Wytwórca dla Garbarstwa i Krawiectwa, Aptekarz dla Alchemii i Gotowania, Bombardier dla Inżynierii i Alchemii, oraz sześć kolejnych dookoła pierścienia.\n\nDostrojenie do pary to zadanie, a nie kliknięcie w menu. Dziś można przystąpić do czterech par (Kowal, Krawiec-Wytwórca, Aptekarz i Bombardier), a każdą kotwiczy rezydujący mistrz w Eastbrook, którego zadanie przyjęcia przedstawia całą umowę wprost, zanim ją podejmiesz. Dopóki się nie zadeklarujesz, każde rzemiosło rozwija się swobodnie na przepisach aż po rzadki poziom (dowolny przepis wymagający umiejętności 74 lub mniej), więc możesz spróbować wszystkiego, zanim wybierzesz.\n\nGdy już się dostroisz, dwa rzemiosła twojej pary stają się twoimi kierunkami głównymi, bez żadnego sufitu poza pułapem. Reszta koła nie gaśnie: jedno rzemiosło naprzeciw twoich kierunków głównych zostaje jako zajęcie dodatkowe, które wspina się dalej przez rzadki poziom (powtarzalne zadanie przy kuźni Kowala Haldrena pozwala zmienić, które to), a każde inne rzemiosło zapada w uśpienie. Uśpione rzemiosło zachowuje swoją umiejętność i swoje pospolite przepisy, które uczą go dalej na normalnej krzywej, dopóki nie zszarzeją przy 75; wszystko powyżej pospolitego przestaje płacić od razu, a uśpione rzemiosło, dopóki odpoczywa, nigdy nie wydaje arcydzieła.",
       "pairFmt": "{a} i {b}",

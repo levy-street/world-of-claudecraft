@@ -577,6 +577,16 @@ import {
   type SalvageResult,
   salvageItem as salvageItemImpl,
 } from './professions/salvage';
+import {
+  joinProfessionSchool as joinProfessionSchoolAction,
+  loadProfessionSchoolState,
+  type PlayerProfessionSchoolsView,
+  type ProfessionSchoolPlayerState,
+  professionSchoolSaveFragment,
+  professionSchoolsViewFor,
+  submitSchoolTask as submitSchoolTaskAction,
+  swearAllegiance as swearAllegianceAction,
+} from './professions/schools';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
 import {
   completeSunderCast as completeSunderCastImpl,
@@ -1465,6 +1475,15 @@ export interface PlayerMeta {
   // has never slotted an effect byte-identical to before the field existed.
   // Read at the grant in resolveHarvest; draws nothing.
   toolEffectSlots?: Partial<Record<GatheringProfessionId, ToolEffectSlot>>;
+  // Profession Schools membership (professions/schools.ts, content/
+  // profession_schools.ts): points per joined school, the sworn school id,
+  // and live per-task cooldowns. ABSENT for a character who has never joined
+  // a school (the toolEffectSlots precedent above: an empty object still
+  // serializes, so leaving this absent keeps every other player byte-
+  // identical to before the field existed). Persisted sparsely via
+  // professionSchoolSaveFragment/loadProfessionSchoolState in
+  // CharacterState.professionSchool.
+  professionSchool?: ProfessionSchoolPlayerState;
   // Per-player, per-node gather-node respawn readiness (#1121): nodeId ->
   // sim.time (seconds) at or after which THIS player may harvest that node
   // again. Absent means never harvested (always ready). Never shared across
@@ -3061,6 +3080,15 @@ export class Sim {
       // cast-in-flight crash corner (which rolls back timer and yield
       // together, value-neutral), lives in professions/node_persist.ts.
       meta.nodeHarvestReadyAt = applyNodeReadiness(s.nodeHarvestCooldowns, this.time);
+      // Profession Schools membership resumes the same way: re-anchored to
+      // THIS sim's clock, dropped memberships/allegiance a retired school no
+      // longer resolves (professions/schools.ts loadProfessionSchoolState).
+      // Only assigned when the save carries a real membership, so the field
+      // stays ABSENT for the overwhelming majority of characters.
+      const savedSchoolState = loadProfessionSchoolState(s.professionSchool, this.time);
+      if (Object.keys(savedSchoolState.memberships).length > 0) {
+        meta.professionSchool = savedSchoolState;
+      }
       if (s.unlockedMilestones)
         for (const id of s.unlockedMilestones) meta.unlockedMilestones.add(id);
       meta.copper = s.copper;
@@ -4151,6 +4179,10 @@ export class Sim {
       // Node respawn timers as remaining deltas (D6), absent when every node
       // is ready (zero-default omission; see the CharacterState field doc).
       ...nodeReadinessSaveFragment(meta.nodeHarvestReadyAt, this.time),
+      // Profession Schools membership, absent for a character who has never
+      // joined a school (zero-default omission; see the CharacterState field
+      // doc).
+      ...professionSchoolSaveFragment(meta.professionSchool, this.time),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
       // Absent while no mount skin is worn (zero-default omission; back-compat).
@@ -11739,6 +11771,30 @@ export class Sim {
 
   get professionsState(): PlayerProfessionsView {
     return this.professionsStateFor(this.primaryId);
+  }
+
+  // Profession Schools (professions/schools.ts): thin facade delegates, the
+  // trainRecipe precedent above. Every action resolves the caller's own pid
+  // (IWorld carries no pid parameter; the optional trailing `pid` exists only
+  // for the offline console/tests, the trainRecipe/slotToolEffect idiom).
+  professionSchoolsFor(pid: number): PlayerProfessionSchoolsView {
+    return professionSchoolsViewFor(this.ctx, pid);
+  }
+
+  get professionSchools(): PlayerProfessionSchoolsView {
+    return this.professionSchoolsFor(this.primaryId);
+  }
+
+  joinProfessionSchool(schoolId: string, pid?: number): void {
+    joinProfessionSchoolAction(this.ctx, pid ?? this.primaryId, schoolId);
+  }
+
+  swearSchoolAllegiance(schoolId: string, pid?: number): void {
+    swearAllegianceAction(this.ctx, pid ?? this.primaryId, schoolId);
+  }
+
+  submitSchoolTask(taskId: string, pid?: number): void {
+    submitSchoolTaskAction(this.ctx, pid ?? this.primaryId, taskId);
   }
 }
 

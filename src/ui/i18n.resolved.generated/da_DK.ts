@@ -5062,6 +5062,50 @@ export const da_DK: EnTranslations = {
       "denyOutOfRange": "Du skal være tæt på bestilleren for at aflevere en bestilling.",
       "denyNoSpace": "Bestilleren har ikke plads i sine tasker."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "Tornehulemarkerne er klar",
       "backfillTitle": "Tornehulemarkerne har brug for en kæmper",
@@ -7554,6 +7598,9 @@ export const da_DK: EnTranslations = {
       "comingSoon": "Ingen opskrifter endnu",
       "gatherHubHeading": "Indsamling",
       "gatherHubBody": "Fire indsamlingsfag fodrer ringen fra felten: Minedrift, Skovhugst og Urtesamling trækker malm, tømmer og urter ud af landet og topper ud ved 100 færdighed, mens Fiskeri kører på sin egen bid-og-hiv-rytme hele vejen til 200. Hver side nedenfor bærer de præcise ressourcekildekort, værktøjsstiger og odds.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "Hjulet og dets arketyper",
       "archetypesBody": "De ti håndværk sidder på et fast hjul, og geografien på det hjul betyder noget. Hvert par naboer danner et navngivet par: Smed for Våbensmedning og Rustningssmedning, Udstyrer for Læderbearbejdning og Skrædderkunst, Apoteker for Alkymi og Madlavning, Bombardør for Ingeniørkunst og Alkymi, og seks mere hele vejen rundt om ringen.\n\nAt afstemme sig til et par er en opgave, ikke et menuklik. Fire par kan man slutte sig til i dag (Smed, Udstyrer, Apoteker og Bombardør), hvert forankret af en tilstedeværende mester i Østbæk, hvis optagelsesopgave fremlægger hele aftalen på forhånd, før du tager den. Indtil du erklærer dig, avancerer hvert håndværk frit på opskrifter op til og med det sjældne niveau (enhver opskrift, der beder om færdighed 74 eller mindre), så du kan prøve alt, før du vælger.\n\nNår du først har afstemt dig, bliver dit pars to håndværk dine hovedfag, uden noget loft ud over grænsen. Resten af hjulet slukker ikke: ét håndværk over for dine hovedfag bliver ved som en hobby, der fortsætter med at klatre gennem det sjældne niveau (en gentagelig opgave ved Smed Haldrens smedje lader dig bytte om på hvilket), og hvert andet håndværk går i dvale. Et håndværk i dvale beholder sin færdighed og sine almindelige opskrifter, som bliver ved med at lære det op på den normale kurve, indtil de grånes ved 75; alt over almindelig holder op med at betale med det samme, og et håndværk i dvale frembringer aldrig et mesterværk, mens det hviler.",
       "pairFmt": "{a} og {b}",

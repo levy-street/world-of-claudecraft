@@ -96,6 +96,13 @@ export interface CraftingWindowDeps
    *  apex GEAR recipes. Optional so painter rigs without the window stay
    *  valid; when absent, neither affordance renders. */
   onOpenPerfecting?(): void;
+  /** Opens the Profession Schools board (rank-gated crafting institutions):
+   *  a further sibling title-bar button, the commission-board precedent
+   *  (src/ui/hud/professions/CLAUDE.md, "Openers"): a crafting sub-surface,
+   *  not a standalone destination, so it earns no rail tile and no keybind.
+   *  Optional so painter rigs without the window stay valid, the
+   *  onOpenPerfecting shape; when absent, the button does not render. */
+  onOpenSchool?(): void;
   /** Commission opt-in state (Professions 2.0), held by the HUD so
    *  it survives the window's staleness repaints: whether `recipeId` is
    *  currently opted in, and the toggle callback the per-row checkbox fires.
@@ -161,11 +168,15 @@ export function renderCraftingWindow(
   const perfectingBtn = deps.onOpenPerfecting
     ? `<button type="button" class="crafting-orders-btn crafting-perfecting-btn ui-btn ui-btn--gold" data-open-perfecting data-skip-open-focus data-focus-key="perfecting" aria-label="${esc(t('hudChrome.perfecting.openButtonAria'))}">${esc(t('hudChrome.perfecting.openButton'))}</button>`
     : '';
-  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.crafting.title'))}</span>${perfectingBtn}<button type="button" class="crafting-orders-btn ui-btn ui-btn--gold" data-open-orders data-skip-open-focus data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
+  const schoolBtn = deps.onOpenSchool
+    ? `<button type="button" class="crafting-orders-btn ui-btn ui-btn--gold" data-open-school data-skip-open-focus data-focus-key="school" aria-label="${esc(t('hudChrome.school.openButtonAria'))}">${esc(t('hudChrome.school.openButton'))}</button>`
+    : '';
+  el.innerHTML = `<div class="panel-title ui-win-head"><span class="ui-win-title">${esc(t('hudChrome.crafting.title'))}</span>${perfectingBtn}${schoolBtn}<button type="button" class="crafting-orders-btn ui-btn ui-btn--gold" data-open-orders data-skip-open-focus data-focus-key="orders" aria-label="${esc(t('hudChrome.commissionBoard.openButtonAria'))}">${esc(t('hudChrome.commissionBoard.openButton'))}</button><button type="button" class="x-btn ui-x-btn" data-close data-focus-key="close" aria-label="${esc(t('hudChrome.crafting.close'))}">${svgIcon('close')}</button></div>`;
   el.querySelector('[data-open-orders]')?.addEventListener('click', () => deps.onOpenOrders());
   el.querySelector('[data-open-perfecting]')?.addEventListener('click', () =>
     deps.onOpenPerfecting?.(),
   );
+  el.querySelector('[data-open-school]')?.addEventListener('click', () => deps.onOpenSchool?.());
 
   if (identity) renderProfessionIdentityCard(el, identity);
 

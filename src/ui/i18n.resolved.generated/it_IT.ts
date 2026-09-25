@@ -5062,6 +5062,50 @@ export const it_IT: EnTranslations = {
       "denyOutOfRange": "Devi essere vicino al richiedente per consegnare una commissione.",
       "denyNoSpace": "Il richiedente non ha spazio nelle borse."
     },
+    "school": {
+      "openButton": "School",
+      "openButtonAria": "Open the Profession Schools board",
+      "title": "Profession Schools",
+      "close": "Close Profession Schools",
+      "intro": "Join a profession school and complete its rotating tasks for points toward rank.",
+      "name": {
+        "enchantersSchool": "Enchanters School"
+      },
+      "rank": {
+        "enchantersSchool": {
+          "initiate": "Initiate",
+          "apprentice": "Apprentice",
+          "journeyman": "Journeyman",
+          "adept": "Adept",
+          "master": "Master",
+          "grandmaster": "Grandmaster"
+        }
+      },
+      "taskKind": {
+        "daily": "Daily Contract",
+        "contract": "Contract",
+        "materials": "Materials Contract",
+        "weeklyGroup": "Weekly Group Contract"
+      },
+      "rankLine": "{rank}, {points} points",
+      "nextRankLine": "{points} of {nextPoints} points to the next rank",
+      "swearToProgress": "Swear allegiance to progress further.",
+      "qualifyHint": "Requires {skill} {profession} skill (you have {current}).",
+      "joinButton": "Join",
+      "swearButton": "Swear Allegiance",
+      "swornBadge": "Sworn",
+      "taskRequirement": "{item} x{count}",
+      "taskPoints": "{points} points",
+      "submitButton": "Submit",
+      "readyIn": "Ready in {duration}",
+      "taskSubmitted": "You complete a task for the {school} (+{points} points).",
+      "denyUnknownTask": "That task no longer exists.",
+      "denyNotAMember": "You are not a member of the {school}.",
+      "denyOutOfRange": "You must be near the schoolmaster to submit a task.",
+      "denyOnCooldown": "That task is not ready yet.",
+      "denyPartyRequired": "That task requires a party.",
+      "denyInsufficientMaterials": "You do not have the materials for that task."
+    },
     "bgOffer": {
       "title": "I Campi di Thornhollow sono pronti",
       "backfillTitle": "Ai Campi di Thornhollow serve un combattente",
@@ -7554,6 +7598,9 @@ export const it_IT: EnTranslations = {
       "comingSoon": "Ancora nessuna ricetta",
       "gatherHubHeading": "Raccolta",
       "gatherHubBody": "Quattro professioni di raccolta alimentano l'anello dal campo: Mineria, Boscaiolia e Erboristeria estraggono minerale, legname e erbe dalla terra con un massimo di 100 di competenza, mentre la Pesca segue il proprio ritmo di lenza e mulinello fino a 200. Ogni pagina qui sotto porta le mappe esatte dei nodi, le scale degli strumenti e le probabilita.",
+      "schoolsHeading": "Profession Schools",
+      "schoolsBody": "A craft can grow past the ring into its own institution: a physical school anchored at a master's station, open to those who prove their skill, with a ladder of ranks to climb through the school's own ongoing work. Enchanting has the first one built.",
+      "schoolCraftFmt": "A rank-gated {craft} institution, anchored at {hub}.",
       "archetypesHeading": "La ruota e i suoi archetipi",
       "archetypesBody": "I dieci mestieri stanno su una ruota fissa, e la geografia di quella ruota conta. Ogni due vicini formano una coppia con un nome: Fabbro per Forgiatura di Armi e Forgiatura di Armature, Sarto da Campo per Lavorazione del Cuoio e Sartoria, Speziale per Alchimia e Cucina, Bombardiere per Ingegneria e Alchimia, e altre sei lungo l'anello.\n\nSintonizzarsi con una coppia è una missione, non un clic in un menu. Oggi si possono abbracciare quattro coppie (Fabbro, Sarto da Campo, Speziale e Bombardiere), ognuna ancorata a un maestro residente a Eastbrook la cui missione di accettazione espone l'intero patto prima che tu lo accetti. Finché non ti dichiari, ogni mestiere avanza liberamente sulle ricette fino al livello raro compreso (qualsiasi ricetta che chieda abilità 74 o meno), così puoi provare tutto prima di scegliere.\n\nUna volta sintonizzato, i due mestieri della tua coppia diventano i tuoi principali, senza altro limite che il tetto massimo. Il resto della ruota non si spegne: un mestiere opposto ai tuoi principali resta acceso come passatempo che continua a salire fino al livello raro (una missione ripetibile alla fucina del Fabbro Haldren ti permette di cambiare quale), e ogni altro mestiere diventa dormiente. Un mestiere dormiente conserva la sua abilità e le sue ricette comuni, che continuano a insegnargli sulla curva normale finché non diventano grigie a 75; tutto ciò che sta sopra il comune smette di pagare all'istante, e un mestiere dormiente non sforna mai un capolavoro mentre riposa.",
       "pairFmt": "{a} e {b}",

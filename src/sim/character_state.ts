@@ -14,6 +14,7 @@ import type { SavedMaterialsVaultState } from './materials_vault';
 import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
 import type { SavedGatheringGoal } from './professions/gathering_goal_persist';
+import type { SavedProfessionSchoolState } from './professions/schools';
 import type { ToolEffectSlot } from './professions/tools';
 import type { SavedReliquaryState } from './reliquary';
 import type {
@@ -150,6 +151,15 @@ export interface CharacterState {
   // to the loading sim's clock, filtered to live node ids, clamped to one
   // respawn. Closes the relog exploit that used to reset every node timer.
   nodeHarvestCooldowns?: Record<string, number>;
+  // Profession Schools membership (professions/schools.ts): points per
+  // joined school, the sworn school id, and per-task cooldowns as
+  // remaining-time deltas (the nodeHarvestCooldowns scheme above). Absent
+  // entirely for a character who has never joined a school (zero-default
+  // omission via professionSchoolSaveFragment); loaded through
+  // loadProfessionSchoolState, which re-anchors cooldowns to the loading
+  // sim's clock and drops any membership/allegiance the live catalog no
+  // longer resolves.
+  professionSchool?: SavedProfessionSchoolState;
   // The remembered corpse-harvest material preference (Intentional Gathering
   // PR3; see professions/harvest_preference.ts). Absent is the legacy
   // default, All (loadHarvestPreference(undefined)); a stored material item
