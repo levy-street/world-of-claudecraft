@@ -107,10 +107,11 @@ describe('terrain region index', () => {
     expect(heightBody).toContain('let h = baseHeight(x, z, seed, region);');
     expect(heightBody).toContain('for (const campIndex of region.campIndices)');
     expect(heightBody).not.toContain('for (const camp of CAMPS)');
-    // 37 = the 34 post-Sowfield appliers plus the Proving Shore tutorial
+    // 38 = the 34 post-Sowfield appliers plus the Proving Shore tutorial
     // island's provingCoast and provingMoat, plus the release arm's
-    // gardenwalkWestPass riding the v0.40.0 sync merge.
-    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(37);
+    // gardenwalkWestPass riding the v0.40.0 sync merge, plus the Thornpeak
+    // hillside pocket's thornpeakPocketGrade.
+    expect(heightBody.match(/terrainRegionHas\(region, TERRAIN_APPLIER\./g)).toHaveLength(38);
   });
 
   it('falls back to the full ordered scan for non-finite query coordinates', () => {

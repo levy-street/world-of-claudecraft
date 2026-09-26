@@ -9,6 +9,7 @@ import { type Entity, REALM_BUILDER_MONUMENT_TEMPLATE_ID } from '../sim/types';
 import { investigationObjectLabel } from '../ui/entity_display_core';
 import { dungeonDisplayName, tEntity } from '../ui/entity_i18n';
 import { feastTitleFor } from '../ui/hud/professions/feast_title';
+import { mobileStationTitleFor } from '../ui/hud/professions/mobile_station_title';
 import { t } from '../ui/i18n';
 import { localizeSimText } from '../ui/sim_i18n';
 import { forgeObjectLabel } from '../ui/world_quest_forge_view';
@@ -99,6 +100,10 @@ export function objectDisplayName(entity: Entity): string {
   // also reads, so the world label and the target frame cannot drift.
   const feastTitle = feastTitleFor(entity.templateId, entity.name);
   if (feastTitle !== null) return feastTitle;
+  // A placed mobile crafting station: "{name}'s Grand Cauldron", the same
+  // shared-leaf rule (src/ui/hud/professions/mobile_station_title.ts).
+  const stationTitle = mobileStationTitleFor(entity.templateId, entity.name);
+  if (stationTitle !== null) return stationTitle;
   // These four development-raid records are interactOnly narrative props, not
   // inventory items. Their lore handler returns before generic pickup, so keep
   // them out of ITEMS (and its mandatory icon-art contract) while still giving

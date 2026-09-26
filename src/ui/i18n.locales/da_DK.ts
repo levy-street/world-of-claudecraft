@@ -13198,7 +13198,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'I 8 sek. besvares det næste fjendtlige slag mod dig: op til {buff} skade nægtes og returneres til angriberen som hellig skade, og du får 1 Hengivenhed. Kun ét slag besvares. Ophøjelse hæver den mængde, den kan besvare, med 50%.',
   'entities.abilities.final_edict.description':
-    'Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en hellig eksplosion omkring dig.',
+    'Leverer et knusende våbenslag og genererer 1 Hengivenhed, når det gør skade. Et vellykket træf reducerer Daggryfalds resterende nedkøling med 2 sek. Vellykkede autoangreb og træf med Sidste Påbud har 15% chance for at give Daggryets Vrede i 8 sek. Ophøjelse frigiver desuden en eksplosion omkring dig, der gør fysisk skade.',
   'entities.abilities.grace_devotion.description':
     'Du og gruppemedlemmerne genvinder 15 mana hvert 5. sek. og betaler 3% mindre mana i 30 min. Erstatter din egen Strålende eller Daggryets Hengivenhed, men eksisterer side om side med Hengivenheder fra andre paladiner.',
   'entities.abilities.guardian_covenant.description':
@@ -14933,9 +14933,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Dit Veiled Edge-angreb rammer tredobbelt så hårdt i stedet for dobbelt.',
   'entities.itemSets.ashveil.name': 'Ashveil-dragt',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Seraphic Vigils redning heler 270 i stedet for 180. Modtaget skade forsinker ikke længere din besværgelse.',
+    'Når Hvisket Bøn, Højtidelig Bøn eller Hastende Bøn genopretter helbred, øges helbredelsen fra din næste Korhelbredelse med 10 %, op til 3 stakke. Hver kastning giver højst én stak. Korhelbredelse bruger alle stakke, når kastningen fuldføres. Modtaget skade forsinker ikke længere dine besværgelser.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Når Seraphic Vigil udløses, helbredes dens allierede også for 15 procent af deres maksimale helbred over 10 sek.',
+    'Når Korhelbredelse fuldføres med 3 stakke, bliver din næste Hvisket Bøn inden for 60 sek. øjeblikkelig og helbreder 100 % mere. Effekten kan ikke stables; hvis du opnår den igen, fornyes varigheden.',
   'entities.itemSets.benison_dawnweave.name': 'Benison-daggryvæv',
   'entities.itemSets.chronoweave.bonus2':
     'Temporal Echo omdanner 50 procent af din Arcane-skade mod ét mål til heling. Modtaget skade forsinker ikke længere din besværgelse.',
@@ -17237,4 +17237,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     "Edit Frames løsner også dialogpanelet, som bærer en NPC's talte linje, mens den NPC er ude af dit syn; den bærer sin navnechip, mens den er løs.",
   'guide.settingsPage.keybindsWheelBody':
     'Selve hjulet binder også. Zoom kamera ind og zoom kamera ud er almindelige bindinger, der som standard sidder på det bare hjul, så du kan flytte dem til Ctrl plus hjulet eller til tasterne og derefter rulle det frigjorte hjul for at skyde action bar slots. Et hjulhak har ingen udløsning, så det kan ikke drive en fastholdt handling som at bevæge sig fremad.',
+  'guide.settingsPage.ifColorblindMode':
+    "Omfarver Nythraxis' gulvfarer (træfringen fra Grave Eruption, bassinerne af Grave Flame og Soulfire, Gravefire-linjen og Soul Rend-mærkerne) til en farveblindvenlig palet med tydelige nuancer og lysstyrker, så overlappende cirkler bevarer synlige kanter. Størrelser, timere og positioner ændres ikke.",
+  'hud.options.colorblindMode': 'Farveblindtilstand',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

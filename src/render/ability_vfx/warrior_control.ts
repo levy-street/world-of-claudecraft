@@ -53,6 +53,17 @@ export function drawWarriorControlAttempt(
   return true;
 }
 
+/** The Warrior cast a control aura cue belongs to, or null for any other aura:
+ *  the cues drawWarriorControlAura claims. */
+export function warriorControlAuraCast(
+  abilityId: string | undefined,
+): 'sunder_armor' | 'pummel' | 'hamstring' | null {
+  if (abilityId === 'sunder_armor') return 'sunder_armor';
+  if (abilityId === 'pummel' || abilityId === 'pummel_lockout') return 'pummel';
+  if (abilityId === 'hamstring' || abilityId === 'hamstring_slow') return 'hamstring';
+  return null;
+}
+
 /** Armor Shear has zero damage. Refresh metadata, including a Warrior refresh
  * of an existing shared Rogue armor aura, identifies the successful peel. */
 export function drawWarriorControlAura(
@@ -61,10 +72,10 @@ export function drawWarriorControlAura(
   tier: number,
   auras: readonly { id: string; kind: string; remaining?: number }[] = [],
 ): boolean {
-  const armor = ev.abilityId === 'sunder_armor';
-  const punch = ev.abilityId === 'pummel' || ev.abilityId === 'pummel_lockout';
-  const slow = ev.abilityId === 'hamstring' || ev.abilityId === 'hamstring_slow';
-  if (!armor && !punch && !slow) return false;
+  const cast = warriorControlAuraCast(ev.abilityId);
+  if (!cast) return false;
+  const armor = cast === 'sunder_armor';
+  const slow = cast === 'hamstring';
   const kind =
     ev.auraKind ??
     (armor ? 'sunder' : ev.abilityId === 'pummel_lockout' ? 'lockout' : undefined) ??

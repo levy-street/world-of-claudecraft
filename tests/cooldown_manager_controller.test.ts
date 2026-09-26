@@ -72,7 +72,7 @@ function rig(opts: { inCombat?: boolean; extra?: string[] } = {}) {
       potionCdRemaining: 0,
       queuedOnSwing: null,
       pos: { x: 0, y: 0, z: 0 },
-      auras: [],
+      auras: [{ kind: 'form_cat' }],
     },
     target: null,
     inventory: [],

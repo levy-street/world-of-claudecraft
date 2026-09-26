@@ -235,5 +235,6 @@ export function blankEntity(id: number): Entity {
     guildTier: 0,
     title: null,
     border: null,
+    specId: null,
   };
 }

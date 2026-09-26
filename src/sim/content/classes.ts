@@ -7002,8 +7002,9 @@ export const ABILITIES: Record<string, AbilityDef> = {
     offGcd: true,
     // No form requirement since v0.43: Lunge is pressable from ANY form and
     // from caster form, and shifts the druid into Cat Form on the way in
-    // (combat/druid_form_entry.ts). Entering Cat Form hands over a full 100
-    // energy, so the 40 this costs is always payable on the press that shifts.
+    // (combat/druid_form_entry.ts). The press that shifts is billed against
+    // the energy the shift hands over: a full bar out of combat, the parked
+    // Cat pool mid-fight (combat/cat_form_energy.ts).
     usableInForm: true,
     // The cast only starts the charge route; the 60% weapon strike and the
     // combo point land on ARRIVAL through combat/druid_lunge.ts (the
@@ -9308,7 +9309,13 @@ export function abilitiesKnownAt(
     // on the abilityCharges recharge model. Resolved HERE (the shared known-list
     // builder) so BOTH worlds see it: the offline Sim's meta.known and the
     // ClientWorld's locally recomputed list, which is what the action bar badges.
-    if (id === 'ice_block' && mods?.spec === 'frost') entry.bonusCharges = 1;
+    // Sets the resolved cap (`charges`) with the bonus, like the maxCharges arm
+    // above: normalizeAbilityCharges and the legacy-save caps read `charges`, so a
+    // bonus-only stamp collapsed the pool on every equip swap (refunding a use).
+    if (id === 'ice_block' && mods?.spec === 'frost') {
+      entry.charges = 2;
+      entry.bonusCharges = 1;
+    }
     if (mods) applyTalentMods(entry, mods);
     out.push(entry);
   }

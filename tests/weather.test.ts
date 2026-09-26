@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { materialProgramSignature } from '../src/render/prewarm_policy';
 import { Weather } from '../src/render/weather';
 
 // weather.ts mints its two point textures via document.createElement('canvas')
@@ -159,5 +160,34 @@ describe('weather prewarm slot lifecycle', () => {
     expect(probe.points.visible).toBe(false);
     expect(probe.intensity).toBe(0);
     expect(probe.material.opacity).toBe(0);
+  });
+});
+
+describe('weather prewarm link root', () => {
+  it('is the live precipitation draw the scene renders', () => {
+    installCanvasStub();
+    const scene = new THREE.Scene();
+    const weather = new Weather(scene, false);
+    const probe = weather as unknown as WeatherProbe;
+    const root = weather.prewarmRoot();
+    expect(root).toBe(probe.points);
+    expect(scene.children).toContain(root);
+    expect((root as THREE.Points).material).toBe(probe.material);
+  });
+
+  it('links one program for rain and snow on both tiers', () => {
+    installCanvasStub();
+    const signatures = new Set<string>();
+    for (const lowGfx of [false, true]) {
+      const weather = new Weather(new THREE.Scene(), lowGfx);
+      const styled = weather as unknown as { applyStyle(mode: 'rain' | 'snow'): void };
+      const material = (weather.prewarmRoot() as THREE.Points).material as THREE.PointsMaterial;
+      for (const mode of ['rain', 'snow'] as const) {
+        styled.applyStyle(mode);
+        expect(material.map).not.toBeNull();
+        signatures.add(materialProgramSignature(material));
+      }
+    }
+    expect(signatures.size).toBe(1);
   });
 });

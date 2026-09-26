@@ -47,7 +47,6 @@ export function mountActionBarBindBanner(
 ): HTMLElement {
   const el = document.createElement('div');
   el.id = ACTION_BAR_BIND_BANNER_ID;
-  if (parent) keepBannerInViewport(el, parent);
   // The banner is a plated surface (the library's strong panel), like every
   // other chrome plate the redesign put under the bar.
   el.className = 'ui-panel-strong';
@@ -253,8 +252,25 @@ export function bindActionBarBindBannerDrag(el: HTMLElement, uiRoot: HTMLElement
       return;
     }
     if (!moved) placeActionBarBindBanner(el, uiRoot);
+    else keepBannerInViewport(el, uiRoot);
   };
-  win?.addEventListener('resize', onResize);
+  if (!win) return;
+  const Controller = win.AbortController;
+  const resizeAbort = Controller ? new Controller() : null;
+  win.addEventListener(
+    'resize',
+    onResize,
+    resizeAbort ? { signal: resizeAbort.signal } : undefined,
+  );
+  const Observer = win.MutationObserver;
+  if (!Observer) return;
+  const observer = new Observer(() => {
+    if (el.isConnected) return;
+    if (resizeAbort) resizeAbort.abort();
+    else win.removeEventListener('resize', onResize);
+    observer.disconnect();
+  });
+  observer.observe(uiRoot.ownerDocument, { childList: true, subtree: true });
 }
 
 /** Paint the status line for the mode's current state. */
@@ -277,31 +293,23 @@ export function removeActionBarBindBanner(banner: HTMLElement | null): void {
 
 /** Keep a manually placed banner reachable after a viewport or orientation change. */
 function keepBannerInViewport(el: HTMLElement, uiRoot: HTMLElement): void {
-  const win = uiRoot.ownerDocument.defaultView;
-  const clamp = () => {
-    if (!el.isConnected) {
-      win?.removeEventListener('resize', clamp);
-      return;
-    }
-    const scale = liveScale();
-    const viewport = visibleViewport(uiRoot, scale);
-    const pos = draggedWindowPosition(
-      {
-        pointerX: (Number.parseFloat(el.style.left) || 0) * scale,
-        pointerY: (Number.parseFloat(el.style.top) || 0) * scale,
-        grabOffsetX: 0,
-        grabOffsetY: 0,
-      },
-      {
-        scale,
-        viewportWidth: viewport.width,
-        viewportHeight: viewport.height,
-        windowWidth: el.offsetWidth,
-        windowHeight: el.offsetHeight,
-      },
-    );
-    el.style.left = `${pos.left}px`;
-    el.style.top = `${pos.top}px`;
-  };
-  win?.addEventListener('resize', clamp);
+  const scale = liveScale();
+  const viewport = visibleViewport(uiRoot, scale);
+  const pos = draggedWindowPosition(
+    {
+      pointerX: (Number.parseFloat(el.style.left) || 0) * scale,
+      pointerY: (Number.parseFloat(el.style.top) || 0) * scale,
+      grabOffsetX: 0,
+      grabOffsetY: 0,
+    },
+    {
+      scale,
+      viewportWidth: viewport.width,
+      viewportHeight: viewport.height,
+      windowWidth: el.offsetWidth,
+      windowHeight: el.offsetHeight,
+    },
+  );
+  el.style.left = `${pos.left}px`;
+  el.style.top = `${pos.top}px`;
 }

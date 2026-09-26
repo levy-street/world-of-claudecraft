@@ -25,7 +25,7 @@ import { loadGltf, loadKtx2Texture, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { addRimGlow, EMISSIVE_GLOW, GFX, type GfxSettings } from '../gfx';
-import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
+import { applyRiggedWornDetail, applySurfaceDetail } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
@@ -2164,8 +2164,7 @@ function buildTintedClone(
     // the shared surface-detail layer at LOW strength in OBJECT space (rigs
     // animate; a world projection swims). Class-body/skin atlases and 'Glow'
     // materials never match (riggedWornFamilyFor's allowlist has no fallback).
-    const worn = riggedWornFamilyFor(mat.name);
-    if (worn) applySurfaceDetail(mat, worn.family, { strength: worn.strength, objectSpace: true });
+    applyRiggedWornDetail(mat);
   } else {
     if ((src as THREE.MeshBasicMaterial).isMeshBasicMaterial) {
       // Armour materials are always MeshStandardMaterial (the KayKit atlases),

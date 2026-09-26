@@ -11,10 +11,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as contactAssets from '../src/render/ability_vfx/contact_assets';
 import { FLIPBOOK_STYLES } from '../src/render/ability_vfx/fx_textures';
 import {
+  abilityVfxGateMaterials,
   abilityVfxTexturePrewarmSteps,
   collectAbilityVfxCompileTargets,
 } from '../src/render/ability_vfx/prewarm';
 import * as productionAssets from '../src/render/ability_vfx/production_assets';
+import { tagCastVfxEngine, tagCastVfxKit } from '../src/render/cast_vfx_family';
 
 // The canvas textures are procedurally drawn, so a plain Node run needs a 2D
 // context stub (same shape as the ability-VFX and vfx suites use).
@@ -54,7 +56,7 @@ function vfxMesh(name: string, material: THREE.Material | THREE.Material[]): THR
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), material);
   mesh.name = name;
   mesh.visible = false;
-  mesh.userData.renderCategory = 'vfx';
+  tagCastVfxEngine(mesh);
   return mesh;
 }
 
@@ -64,50 +66,16 @@ afterEach(() => {
 });
 
 describe('abilityVfxTexturePrewarmSteps', () => {
-  it('gives each procedural, contact and production texture its own preparation unit', () => {
+  it('gives each procedural sheet its own preparation unit, plus one for the shared canvases', () => {
     const steps = abilityVfxTexturePrewarmSteps();
-    const ids = steps.map((step) => step.id);
-    for (const style of FLIPBOOK_STYLES) expect(ids).toContain(`flipbook:${style}`);
-    expect(ids).toContain('shared-canvases');
-    expect(ids).toEqual([
+    expect(steps.map((step) => step.id)).toEqual([
       ...FLIPBOOK_STYLES.map((style) => `flipbook:${style}`),
       'shared-canvases',
-      ...contactAssets.CONTACT_SHEETS,
-      'smoke',
-      'shockwave',
-      'shout_dust',
-      'warrior_power',
-      'warrior_fervor',
-      'harvest_impact',
-      'warrior_bite',
-      'warrior_shear',
-      'warrior_crush',
-      'warrior-blood',
-      'warrior-pressure',
-      'warrior-rock',
-      'warrior-steel',
     ]);
-    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it('builds real textures and returns the memoized instances on a second pass', () => {
     installCanvasStub();
-    // Remote assets are loaded by deferred preparation, never by these sync
-    // steps. Supply real loaded textures and prove the units retain identity.
-    const textures = new Map<string, THREE.Texture>();
-    const loaded = (id: string) => {
-      if (!textures.has(id)) textures.set(id, new THREE.Texture());
-      return textures.get(id)!;
-    };
-    vi.spyOn(contactAssets, 'contactTexture').mockImplementation(loaded);
-    vi.spyOn(productionAssets, 'bakedTexture').mockImplementation(loaded);
-    for (const getter of [
-      'warriorBloodTexture',
-      'warriorPressureTexture',
-      'warriorRockTexture',
-      'warriorSteelTexture',
-    ] as const)
-      vi.spyOn(productionAssets, getter).mockImplementation(() => loaded(getter));
     const first = abilityVfxTexturePrewarmSteps().map((step) => step.build());
     for (const textures of first) {
       expect(textures.length).toBeGreaterThan(0);
@@ -119,21 +87,21 @@ describe('abilityVfxTexturePrewarmSteps', () => {
     expect(second).toEqual(first);
   });
 
-  it('keeps deferred asset units empty until their actual loaders finish', () => {
-    vi.spyOn(contactAssets, 'contactTexture').mockReturnValue(null);
-    vi.spyOn(productionAssets, 'bakedTexture').mockReturnValue(null);
-    for (const getter of [
-      'warriorBloodTexture',
-      'warriorPressureTexture',
-      'warriorRockTexture',
-      'warriorSteelTexture',
-    ] as const)
-      vi.spyOn(productionAssets, getter).mockReturnValue(null);
-    const deferred = abilityVfxTexturePrewarmSteps().filter(
-      (step) => !step.id.startsWith('flipbook:') && step.id !== 'shared-canvases',
-    );
-    expect(deferred).toHaveLength(16);
-    for (const step of deferred) expect(step.build()).toEqual([]);
+  it('reads none of the Warrior kit sheets, which only the kit recipe uploads', () => {
+    // The kit's sheets load on demand after boot, so a boot read found null
+    // and uploaded nothing; the kit's own recipe (active_kit_prewarm.ts) owns
+    // every one of them, for a local and a remote Warrior alike.
+    installCanvasStub();
+    const reads = [
+      vi.spyOn(contactAssets, 'contactTexture'),
+      vi.spyOn(productionAssets, 'bakedTexture'),
+      vi.spyOn(productionAssets, 'warriorBloodTexture'),
+      vi.spyOn(productionAssets, 'warriorPressureTexture'),
+      vi.spyOn(productionAssets, 'warriorRockTexture'),
+      vi.spyOn(productionAssets, 'warriorSteelTexture'),
+    ];
+    for (const step of abilityVfxTexturePrewarmSteps()) step.build();
+    for (const read of reads) expect(read).not.toHaveBeenCalled();
   });
 
   it('does not build anything until a unit actually runs', () => {
@@ -144,16 +112,69 @@ describe('abilityVfxTexturePrewarmSteps', () => {
 });
 
 describe('collectAbilityVfxCompileTargets', () => {
-  it('returns one target per distinct pooled material', () => {
+  it('returns one target per distinct pooled program', () => {
     const scene = new THREE.Scene();
     const shared = new THREE.MeshBasicMaterial();
     scene.add(vfxMesh('ring', shared));
     scene.add(vfxMesh('ring-slot-2', shared)); // same material: already covered
-    scene.add(vfxMesh('decal', new THREE.MeshBasicMaterial()));
+    scene.add(vfxMesh('decal', new THREE.MeshBasicMaterial({ transparent: true })));
     const targets = collectAbilityVfxCompileTargets(scene);
     expect(targets).toHaveLength(2);
     expect(targets.map((target) => target.object.name)).toEqual(['ring', 'decal']);
     expect(new Set(targets.map((target) => target.id)).size).toBe(2);
+  });
+
+  it('folds built-in material clones by program, not by material instance', () => {
+    // The warlock verdict pools build one MeshBasicMaterial per part per slot:
+    // hundreds of instances over a handful of programs. Keyed by uuid, each
+    // clone was a compile unit and a gate entry (about 400 on Sentence and
+    // Needle of Fate together); keyed by program, the slots collapse.
+    const scene = new THREE.Scene();
+    const proto = new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false });
+    for (let slot = 0; slot < 8; slot++) {
+      const clone = proto.clone();
+      clone.color.setHex(0x100000 * (slot + 1));
+      clone.opacity = slot / 8;
+      scene.add(vfxMesh(`slot-${slot}`, clone));
+    }
+    // A real second program in the same pool still earns its own unit, and so
+    // does the same material drawn by a Points cloud.
+    scene.add(vfxMesh('opaque', new THREE.MeshBasicMaterial()));
+    const cloud = new THREE.Points(new THREE.BufferGeometry(), proto.clone());
+    cloud.name = 'cloud';
+    tagCastVfxEngine(cloud);
+    scene.add(cloud);
+    const targets = collectAbilityVfxCompileTargets(scene);
+    expect(targets.map((target) => target.object.name)).toEqual(['slot-0', 'opaque', 'cloud']);
+    const gated = abilityVfxGateMaterials(scene);
+    // The gate asks about the SAME representatives the units compile.
+    expect(gated).toEqual(
+      targets.map((target) => (target.object as THREE.Mesh).material as THREE.Material),
+    );
+  });
+
+  it('puts the engine family first, then the kit, and lets a gated draw represent a shared program', () => {
+    // The resume lane is serial in unit order, so the programs the cast gate
+    // waits on must not queue behind a class pool walked ahead of them.
+    const scene = new THREE.Scene();
+    const shared = new THREE.MeshBasicMaterial({ transparent: true });
+    const kitShared = new THREE.MeshBasicMaterial({ wireframe: true });
+    const bespokeTwin = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shared.clone());
+    bespokeTwin.name = 'bespoke-twin';
+    bespokeTwin.userData.renderCategory = 'vfx';
+    const kitTwin = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), kitShared.clone());
+    kitTwin.name = 'kit-twin';
+    kitTwin.userData.renderCategory = 'vfx';
+    const bespoke = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial());
+    bespoke.name = 'bespoke';
+    bespoke.userData.renderCategory = 'vfx';
+    const crest = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), kitShared);
+    crest.name = 'crest';
+    tagCastVfxKit(crest);
+    scene.add(bespokeTwin, kitTwin, bespoke, crest, vfxMesh('ring', shared));
+    const targets = collectAbilityVfxCompileTargets(scene);
+    expect(targets.map((target) => target.object.name)).toEqual(['ring', 'crest', 'bespoke']);
+    expect(abilityVfxGateMaterials(scene)).toEqual([shared, kitShared]);
   });
 
   it('ignores everything that is not a tagged VFX mesh', () => {
@@ -219,7 +240,7 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
     // The program links are the debt arm (cast_vfx_prewarm.ts): the lazy
     // stand-ins' stage + link, then one unit per pooled program.
     expect(entry.slice(programsStart)).toContain(
-      'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
+      'resumeProgramUnits: () => [...castVfxUnits(), ...abilityMaterialSlot.resumeUnits()],',
     );
     expect(renderer).toContain(
       'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);',

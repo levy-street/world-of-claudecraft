@@ -24,12 +24,19 @@ const FORM_AURA_KIND: Record<DruidCombatForm, AuraKind> = {
 
 type FormRequirement = Pick<AbilityDef, 'requiresForm'>;
 
+// Shared read-only results so the per-frame action bar can ask without allocating.
+const NO_FORMS: readonly DruidCombatForm[] = [];
+const SINGLE_FORM: Readonly<Record<DruidCombatForm, readonly DruidCombatForm[]>> = {
+  bear: ['bear'],
+  cat: ['cat'],
+};
+
 /** Every form this ability may be used in, in authored order. Empty when the
  *  ability carries no form requirement at all. */
 export function requiredForms(def: FormRequirement): readonly DruidCombatForm[] {
   const requirement = def.requiresForm;
-  if (requirement === undefined) return [];
-  return typeof requirement === 'string' ? [requirement] : requirement;
+  if (requirement === undefined) return NO_FORMS;
+  return typeof requirement === 'string' ? SINGLE_FORM[requirement] : requirement;
 }
 
 /** Does this ability declare a form requirement? */

@@ -1155,8 +1155,10 @@ What remains accepted:
   and a move-not-rewrite refactor wants its own diff to stay reviewable. TRIGGER: do it in
   the next change that touches the replay path for any other reason.
 - Deferred from the Phase 3 QA database review (recorded, not fixed; escalation
-  triggers named): per-guild autosave serializer if the shared-writer depth warn fires
-  in production; keyset pagination + realm/container filters for scripts/bank_audit.mjs
+  triggers named): ~~per-guild autosave serializer if the shared-writer depth warn fires
+  in production~~ SUPERSEDED: the autosave arm came off the shared writer entirely (Direction
+  B below made it unnecessary; server/game.ts saveCharacter); keyset pagination + realm/
+  container filters for scripts/bank_audit.mjs
   once bank_ledger reaches millions of rows; bank_ledger index calculus (the created_at
   index STILL has no reader under keep-forever; the (container, container_id) deferral
   is RESOLVED as of 2026-08-03, its named trigger having fired: the in-game activity
@@ -1171,8 +1173,8 @@ What remains accepted:
   concurrency stamp, but the escrow write is now a read-modify-write under a
   `SELECT ... FOR UPDATE` row lock, which is what makes it safe across PROCESSES rather
   than only within one. A later commit can no longer discard an earlier one, so book
-  writes no longer NEED the market serial writer; taking the autosave arm off it is
-  recorded as a follow-up (escrow-fix-plan.md section 3.6), not done here.
+  writes no longer NEED the market serial writer; the autosave arm has since come off it
+  (escrow-fix-plan.md section 3.6; server/game.ts saveCharacter, opts.withMarket false).
   PROVEN AGAINST REAL POSTGRES on 2026-08-03, not merely reasoned about: see
   "Real-Postgres verification" below, where deleting the `FOR UPDATE` from the
   statement makes three concurrent writers of one book land 2,000 copper instead of
@@ -1200,9 +1202,10 @@ What remains accepted:
   fired LATER, on 2026-08-03, when the in-game activity log added exactly that reader:
   `(container, container_id, id DESC)` now exists as bank_ledger_container_recent, and
   `bank_ledger_created` still has no reader.
-- Books deliberately share the market serial writer (no second queue): the leave
-  flush writes market, mail, AND books in one transaction, so a separate book queue
-  would reopen the interleaving the single writer exists to prevent.
+- The LEAVE FLUSH deliberately shares the market serial writer with books (no second
+  queue): it writes market, mail, AND books in one transaction, so a separate book
+  queue would reopen the interleaving the single writer exists to prevent. The ordinary
+  autosave arm (books, no market half) no longer shares it: see the NARROWED note above.
 
 ## Real-Postgres verification (2026-08-03)
 

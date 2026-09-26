@@ -60,8 +60,10 @@ export function markProgramsReadyUnder(
 ): number {
   let marked = 0;
   target.traverse((obj) => {
-    const mesh = obj as THREE.Mesh;
-    if (!mesh.isMesh) return;
+    // Every carrier three's compile prepares a material for, not meshes only:
+    // a settled sprite, line or points program is proved the same way.
+    const mesh = obj as THREE.Mesh & { isPoints?: boolean; isLine?: boolean; isSprite?: boolean };
+    if (!(mesh.isMesh || mesh.isPoints || mesh.isLine || mesh.isSprite)) return;
     const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
     for (const material of materials) {
       if (!material) continue;

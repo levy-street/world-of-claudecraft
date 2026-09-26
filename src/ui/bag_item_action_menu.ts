@@ -180,9 +180,13 @@ export class BagItemActionMenu {
    *  plus Sell all when more than one copy is held) instead of the profession
    *  rows and the lock toggle, which a vendor never offers. `target` carries
    *  the clicked slot REFERENCE, so a row that re-resolves it at action time
-   *  (the lock toggle) is proof against a mid-menu bag shift; the destroy rows
-   *  still forward `target.index` alone and lean on confirmDestroy's own
-   *  same-id guard, which a shift that swaps in an id-mate still passes. */
+   *  (the lock toggle) is proof against a mid-menu bag shift; the profession
+   *  destroy rows (disenchant, salvage, sunder) still forward `target.index`
+   *  alone and lean on confirmDestroy's own same-id guard, which a shift that
+   *  swaps in an id-mate still passes.
+   *  `runDestroy`, supplied only on the touch HUD for a destroyable stack
+   *  (bags_window.ts), adds the Destroy row that opens the bags' own destroy
+   *  prompt for this copy, the same prompt the drag-out-to-world gesture opens. */
   open(
     def: ItemDef,
     itemId: string,
@@ -194,6 +198,7 @@ export class BagItemActionMenu {
     vendorSellCount?: number,
     runSellAll?: () => void,
     materialSources?: MaterialComposition,
+    runDestroy?: () => void,
   ): void {
     const materialSelection =
       vendorSellCount === undefined && target.index >= 0
@@ -201,7 +206,14 @@ export class BagItemActionMenu {
         : null;
     const actions =
       vendorSellCount === undefined
-        ? bagItemContextActions(def, itemId, instance, materialSources, true).filter(
+        ? bagItemContextActions(
+            def,
+            itemId,
+            instance,
+            materialSources,
+            true,
+            runDestroy !== undefined,
+          ).filter(
             (action) =>
               this.deps.openMaterialSources !== undefined ||
               (action.id !== 'viewSources' && action.id !== 'takeChosenQuantity'),
@@ -221,7 +233,8 @@ export class BagItemActionMenu {
       if (id === 'default') runDefault();
       else if (id === 'sellAll' && vendorSellCount !== undefined) {
         runSellAll?.();
-      } else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, target.index);
+      } else if (id === 'destroy') runDestroy?.();
+      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, target.index);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId, target.index);
       else if (id === 'sunder') this.confirmDestroy('sunder', itemId, target.index);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);

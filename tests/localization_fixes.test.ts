@@ -1273,6 +1273,9 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rite.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/delves/drowned_litany_rooms.ts'), 'utf8'),
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market.ts'), 'utf8'),
+    // The buy-order board (Wanted tab): place / deliver / withdraw errors and
+    // loot lines, matched by error_text_i18n_core + sim_i18n RULES.
+    fs.readFileSync(path.resolve(process.cwd(), 'src/sim/market_orders.ts'), 'utf8'),
     // Card Duel minigame (Card Master NPC): the queue/match log + error emits.
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/social/card_duel.ts'), 'utf8'),
     // W2: the inventory/vendor command bodies (equip/use/discard + buy/sell/buyback).
@@ -1329,7 +1332,7 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     fs.readFileSync(path.resolve(process.cwd(), 'src/sim/mob/locomotion.ts'), 'utf8'),
     // Professions 2.0: the fishing command bodies moved out of sim.ts.
     // Three literals have their ONLY emitter occurrences here ("No fish are
-    // biting.", "A rare catch! Something gleams on your line.", "You need to
+    // biting.", "Something golden flashes beneath the surface!", "You need to
     // face fishable water."); they are byte-identical after the move so their
     // matchers are unchanged, but a rewording of THIS file's sites was
     // invisible to the guard before this entry. The file's other emits
@@ -1597,10 +1600,12 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     const tern = expr.match(/\?\s*'([^']*)'\s*:\s*'([^']*)'/);
     if (tern) return tern[1] || tern[2];
     if (/\?[^:]*:/.test(expr)) return '';
-    // server/social.ts's guild-rank lines interpolate RANK_LABEL[rank], and their
-    // server_i18n rows accept only the three real labels, so the probe value is
-    // one of them (the numeric class below would otherwise read `rank` as 5).
-    if (/RANK_LABEL/.test(expr)) return 'Officer';
+    // server/social.ts's guild-rank lines interpolate rankLabel(ladder, id)
+    // (formerly RANK_LABEL[rank]): a built-in rank's bare label, or a guild
+    // title in [brackets]. The probe takes the bare built-in arm (the numeric
+    // class below would otherwise read `rank` as 5); the bracketed arm has its
+    // own matcher cases in tests/server_i18n.test.ts.
+    if (/RANK_LABEL|rankLabel\(/.test(expr)) return 'Officer';
     if (
       // The three ready-check tallies are counts whose names say so in words
       // rather than in any of the stems below, so they read as a NAME and the

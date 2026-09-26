@@ -696,6 +696,12 @@ const ENCOUNTER_VFX_FULL_SPECS: Readonly<Record<string, AbilityVfxFullSpec>> = {
   },
 };
 
+/** Every encounter id this overlay authors (the cast gate's requirement pin
+ *  walks them with the spec tables). */
+export const ENCOUNTER_VFX_IDS: readonly string[] = [
+  ...new Set([...Object.keys(ENCOUNTER_VFX_SPECS), ...Object.keys(ENCOUNTER_VFX_FULL_SPECS)]),
+];
+
 // Fall back through the bespoke class registry, never the raw generated
 // tables: class-owned premium identities (destruction, necromancy, warlock
 // pets) must keep routing even when the painter resolves via this overlay.

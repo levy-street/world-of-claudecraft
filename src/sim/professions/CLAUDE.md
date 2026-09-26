@@ -238,6 +238,14 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   tool held now, R39 material identity, R47 price rung floored at the slot's
   own ceiling). The R9 slot policy (`slotToolEffectRefused`) keeps Springback
   and fishing slots refused until their arms have real behavior.
+- `town_focus_pending.ts` + `gathering_settings_persist.ts`: the queued
+  town-focus re-spec as persisted state (remaining seconds, re-anchored on the
+  loading Sim's clock) and as the read view both hosts hand the panel (IWorld
+  `townFocusPending`, self-wire `tfpend`, one strict parse for the save and
+  the wire); the second is the sim.ts addPlayer / serializeCharacter seam for
+  the three gathering settings together (focus allocation, its queue, the
+  harvest preference). `town_focus_commands.ts setTownFocus` keeps a running
+  queue when the same allocation is re-saved (never pushes the clock back).
 - `tool_effect_actions.ts`: the slot and recharge COMMAND BODIES behind the
   seam (`Sim` keeps thin delegates). Everything stateful lives here and, for
   those TWO, every decision in the `tools.ts` leaf above: resolve first, then

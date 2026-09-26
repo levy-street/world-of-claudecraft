@@ -107,6 +107,13 @@ describe('statNameKey', () => {
   it('routes the Warfare label through the HUD-chrome catalog', () => {
     expect(statNameKey('warfare')).toBe('hudChrome.statInfo.names.warfare');
   });
+
+  it('routes the sheet-only Healing Power and Spell Crit labels through the HUD-chrome catalog', () => {
+    expect(statNameKey('healPower')).toBe('hudChrome.statInfo.names.healPower');
+    expect(statNameKey('spellCrit')).toBe('hudChrome.statInfo.names.spellCrit');
+    // The shared item-stat labels are untouched.
+    expect(statNameKey('critChance')).toBe('itemUi.stats.critChance');
+  });
 });
 
 describe('statSourceText', () => {
@@ -143,6 +150,23 @@ describe('statSourceText', () => {
     );
     expect(statSourceText({ kind: 'attributes', value: 1.1, fromStat: 'agi' }, m, deps)).toBe(
       'hudChrome.statInfo.sources.fromAttribute(stat=itemUi.stats.agi,value=+1.1)',
+    );
+  });
+
+  it('spell crit source values keep one decimal, and name Intellect', () => {
+    const m = model({ stat: 'spellCrit' });
+    expect(statSourceText({ kind: 'base', value: 5 }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.base(value=5.0)',
+    );
+    expect(statSourceText({ kind: 'attributes', value: 2.4, fromStat: 'int' }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.fromAttribute(stat=itemUi.stats.int,value=+2.4)',
+    );
+  });
+
+  it('names Spell Power as the source of Healing Power through its HUD-chrome label', () => {
+    const m = model({ stat: 'healPower' });
+    expect(statSourceText({ kind: 'attributes', value: 40, fromStat: 'spellPower' }, m, deps)).toBe(
+      'hudChrome.statInfo.sources.fromAttribute(stat=hudChrome.statInfo.names.spellPower,value=+40)',
     );
   });
 
@@ -328,6 +352,7 @@ describe('statValueText', () => {
     expect(statValueText(model({ stat: 'critChance', statValue: 5.5 }), deps)).toBe('5.5%');
     expect(statValueText(model({ stat: 'dodge', statValue: 5 }), deps)).toBe('5.0%');
     expect(statValueText(model({ stat: 'parry', statValue: 6 }), deps)).toBe('6.0%');
+    expect(statValueText(model({ stat: 'spellCrit', statValue: 7.2 }), deps)).toBe('7.2%');
     expect(
       statValueText(
         model({
@@ -344,6 +369,7 @@ describe('statValueText', () => {
     expect(statValueText(model({ stat: 'dps', statValue: 12.34 }), deps)).toBe('12.3');
     expect(statValueText(model({ stat: 'str', statValue: 22 }), deps)).toBe('22');
     expect(statValueText(model({ stat: 'armor', statValue: 100 }), deps)).toBe('100');
+    expect(statValueText(model({ stat: 'healPower', statValue: 54 }), deps)).toBe('54');
   });
 });
 

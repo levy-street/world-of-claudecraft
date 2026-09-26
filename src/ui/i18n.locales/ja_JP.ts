@@ -883,7 +883,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'Appleでのサインインの有効期限が切れました。もう一度お試しください。',
   'hudChrome.discord.roleTag.coredevs': 'コア開発者',
   'hudChrome.options.version': 'v{version} ({build})',
-  'hudChrome.options.overlays': 'オーバーレイ',
   'auth.emailPlaceholder': 'mail@example.com',
   'auth.recovery.logOut': 'ログアウト',
   'delveRiteUi.easy': '簡単',
@@ -1154,6 +1153,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
   'hudChrome.options.alwaysShowAllBuffs': 'すべてのバフを常に表示',
+  'hudChrome.options.showAuraCaster': 'ツールチップに効果の使用者を表示',
+  'hudChrome.auraTooltip.caster': '使用者：{name}',
   'hud.core.mapCanvasLabel': 'マップ',
   'hud.core.mapSummary': '{zone}のマップ。',
   'hud.core.mapMarkerDescription': '{area}。{markers}',
@@ -1324,6 +1325,48 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.lastkeepMap.story.tower': '見張り塔',
   'hudChrome.dawnholdMap.story.ground': '庭園の階',
   'hudChrome.dawnholdMap.story.solar': '日だまりの間',
+  'hudChrome.guildRanks.tab': 'ランク',
+  'hudChrome.guildRanks.introEdit':
+    'ギルドランクに名前を付け、それぞれが何をできるか選びます。保存すると、そのランクの全員に変更が適用されます。',
+  'hudChrome.guildRanks.introView':
+    '各ランクの名称と権限です。変更できるのはギルドマスターだけです。',
+  'hudChrome.guildRanks.colRank': 'ランク',
+  'hudChrome.guildRanks.colTitle': '名称',
+  'hudChrome.guildRanks.colMembers': 'メンバー',
+  'hudChrome.guildRanks.colActions': '順序',
+  'hudChrome.guildRanks.numbered': 'ランク {n}',
+  'hudChrome.guildRanks.perm.invite': '招待',
+  'hudChrome.guildRanks.perm.remove': '除名',
+  'hudChrome.guildRanks.perm.promote': '昇格',
+  'hudChrome.guildRanks.perm.bank': 'ギルド銀行',
+  'hudChrome.guildRanks.perm.officerChat': '役員チャット',
+  'hudChrome.guildRanks.perm.motd': '掲示板',
+  'hudChrome.guildRanks.perm.events': 'カレンダー',
+  'hudChrome.guildRanks.permHint.invite': 'プレイヤーをギルドに招待し、申請に応答できます。',
+  'hudChrome.guildRanks.permHint.remove': '自分より低いランクのメンバーを除名できます。',
+  'hudChrome.guildRanks.permHint.promote':
+    '自分より低いランクのメンバーを昇格または降格できます。ただし自分の一つ下のランクまでです。',
+  'hudChrome.guildRanks.permHint.bank':
+    'ギルド銀行に銅貨やアイテムを預け入れ、引き出せます。全メンバーが閲覧できます。',
+  'hudChrome.guildRanks.permHint.officerChat': '役員チャットを読み、発言できます。',
+  'hudChrome.guildRanks.permHint.motd': 'ギルド掲示板を編集できます。',
+  'hudChrome.guildRanks.permHint.events': 'ギルドカレンダーの予定を追加、削除できます。',
+  'hudChrome.guildRanks.titleLabel': '{rank} の名称',
+  'hudChrome.guildRanks.permLabel': '{rank} の{perm}',
+  'hudChrome.guildRanks.leaderLocked': 'ギルドマスターは常にすべての権限を持ちます。',
+  'hudChrome.guildRanks.add': 'ランクを追加',
+  'hudChrome.guildRanks.save': 'ランクを保存',
+  'hudChrome.guildRanks.moveUp': '{rank} を上へ',
+  'hudChrome.guildRanks.moveDown': '{rank} を下へ',
+  'hudChrome.guildRanks.remove': '{rank} を削除',
+  'hudChrome.guildRanks.full': 'ギルドのランクは最大 {max} 個です。',
+  'hudChrome.guildRanks.invalidTitle':
+    'ランク名には文字、数字、空白、アポストロフィ、ハイフンを使用でき、最大 {max} 文字です。',
+  'hudChrome.guildRanks.removeConfirm':
+    '{rank} のメンバーは {fallback} になります。このランクを削除しますか？',
+  'hudChrome.guildRanks.removeAccept': 'ランクを削除',
+  'hudChrome.guildRanks.promoteTo': '{name} を {rank} に昇格',
+  'hudChrome.guildRanks.demoteTo': '{name} を {rank} に降格',
   'hudChrome.raidLockout.title': 'レイドロックアウト',
   'hudChrome.raidLockout.allReady': 'すべてのレイドが利用可能',
   'hudChrome.raidLockout.daysHours': '{d}日{h}時間',
@@ -1550,61 +1593,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.honorAmount': '名誉 {amount}',
   'hudChrome.warfare.dualPrice': '{money} + {honor}',
   'hudChrome.warfare.balance': '名誉: {amount}',
-  'hudChrome.worldPvp.tab': 'ワールドPvP',
-  'hudChrome.worldPvp.title': 'ワールドPvP',
-  'hudChrome.worldPvp.blurb':
-    'PvPフラグを立てると、オープンワールドのどこでもフラグを立てた他のプレイヤーと戦えます。倒せば相手の所持金の一部と、PvP装備につながる名誉を得られます。バトルグラウンドとアリーナの報酬はそれより多いままです。',
-  'hudChrome.worldPvp.statusOn':
-    'PvPフラグが立っています。フラグを立てたプレイヤーはあなたを攻撃できます。',
-  'hudChrome.worldPvp.statusOff':
-    'PvPフラグは下りています。オープンワールドでは攻撃も被攻撃もありません。',
-  'hudChrome.worldPvp.statusDisarming':
-    'フラグは {time} 後、または現在の戦闘が終わったときに下ります。',
-  'hudChrome.worldPvp.stakeLine': '敗者は {cap} か所持金の {percent} のうち少ない方を支払います。',
-  'hudChrome.worldPvp.honorLine': '撃破ごとに名誉 {honor} を、貢献した全員で分配します。',
-  'hudChrome.worldPvp.splitLine':
-    '純粋な1対1なら報酬を独占できます。協力者とそのヒーラーは分け合います。',
-  'hudChrome.worldPvp.disarmLine': '解除には {minutes} 分かかり、戦闘が終わるまで待ちます。',
-  'hudChrome.worldPvp.groupLine':
-    'パーティとレイドのメンバー同士が敵対することはありません。グループ外のギルドメンバーとは戦えます。',
-  'hudChrome.worldPvp.greyLine':
-    'あなたより {levels} レベル以上低いプレイヤーからは何も得られません。',
-  'hudChrome.worldPvp.record': '戦績: 撃破 {kills}、死亡 {deaths}',
-  'hudChrome.worldPvp.enable': 'ワールドPvPを有効にする',
-  'hudChrome.worldPvp.disable': 'ワールドPvPを無効にする',
-  'hudChrome.worldPvp.keepUp': 'フラグを維持',
-  'hudChrome.worldPvp.confirmBody':
-    'フラグを立てた他のプレイヤーがどこでもあなたを攻撃でき、勝てば所持金から最大 {cap} を奪えます。再び無効にはできますが、{minutes} 分かかります。',
-  'hudChrome.worldPvp.confirmAccept': 'フラグを立てる',
-  'hudChrome.worldPvp.confirmCancel': 'キャンセル',
-  'hudChrome.worldPvp.levelReq': 'レベル {level} が必要です。',
-  'hudChrome.worldPvp.pending': 'レルムからのPvP状態を待っています。',
-  'hudChrome.worldPvp.commandHint':
-    'チャット: /pvp でフラグを切り替え、/pvp on と /pvp off で直接設定します。',
-  'hudChrome.worldPvp.statusOffFfa':
-    'PvPフラグは下りていますが、無差別戦闘地帯では攻撃することも攻撃されることもあります。',
-  'hudChrome.worldPvp.zoneSanctuary': '聖域: ここではワールドPvPは行われません。',
-  'hudChrome.worldPvp.zoneContested': '係争地: ここで戦えるのはフラグを立てたプレイヤーだけです。',
-  'hudChrome.worldPvp.zoneFfa': '無差別戦闘地帯: ここにいる全員が攻撃対象です。',
-  'hudChrome.worldPvp.realmDisabled': 'このレルムではワールドPvPは無効です。',
-  'hudChrome.worldPvp.groundSanctuary':
-    '修練の浜とイーストブルック渓谷は聖域で、ワールドPvPは一切行われません。',
-  'hudChrome.worldPvp.groundContested':
-    'それ以外の場所はすべて係争地で、フラグを立てた者同士だけが戦えます。',
-  'hudChrome.worldPvp.groundFfa':
-    'ドレイクランド、フロストヴェイルの果て、アンバーフォールは無差別戦闘地帯で、フラグの有無に関わらず誰でも戦えます。',
-  'hudChrome.worldPvp.markLine':
-    'そこでフラグを立てていないプレイヤーを攻撃すると自分のフラグが立ちます。フラグを立てた相手を攻撃しても立ちません。',
-  'hudChrome.worldPvp.aidLine':
-    'ワールドの戦闘中のフラグを立てたプレイヤーを回復、シールド、強化すると自分のフラグが立ちます。',
-  'hudChrome.worldPvp.noStakeLine':
-    '無差別戦闘地帯でフラグを立てていないプレイヤーが倒されても、所持金は失われません。',
-  'hudChrome.worldPvp.noTakeLine':
-    'フラグを立てていない戦闘者もゴールドは得られません。ゴールドはフラグを立てた二人のプレイヤーの間でのみ動きます。',
-  'hudChrome.worldPvp.repeatLine':
-    '同じプレイヤーを繰り返し倒すと報酬は {second}、次に {third}、その後はゼロになります。カウントは最初の撃破から {reset} でリセットされます。',
-  'hudChrome.warfare.reasons.worldKill': 'ワールド撃破',
-  'hudChrome.warfare.reasons.worldAssist': 'ワールド撃破アシスト',
   'hudChrome.warfare.honorFloat': '名誉 +{amount}',
   'hudChrome.warfare.honorFloatReason': '名誉 +{amount}（{reason}）',
   'hudChrome.warfare.honorGain': '名誉を {amount} 獲得しました（{reason}）。',
@@ -1619,34 +1607,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.warfare.reasons.battlegroundComplete': 'ソーンホロウ平原参戦',
   'hudChrome.warfare.reasons.battlegroundKill': '名誉ある撃破',
   'hudChrome.warfare.reasons.battlegroundAssist': '撃破アシスト',
-  'hudChrome.warfare.reasons.hillHold': '丘の占拠',
   'hudChrome.warfare.floatReasons.kill': '撃破',
   'hudChrome.warfare.floatReasons.assist': 'アシスト',
   'hudChrome.warfare.floatReasons.firstWin': '初勝利',
-  'hudChrome.warfare.floatReasons.hill': '丘',
-  'hudChrome.hill.title': '丘の王',
-  'hudChrome.hill.rising': '丘はまだ現れていません',
-  'hudChrome.hill.heldYou': 'あなたのグループが丘を占拠しています',
-  'hudChrome.hill.heldOther': '別のグループが丘を占拠しています',
-  'hudChrome.hill.heldNone': '丘を占拠しているグループはいません',
-  'hudChrome.hill.counts': '円内: あなた側 {yours}、占拠側 {theirs}',
-  'hudChrome.hill.countsUnheld': '円内: あなた側 {yours}、最大の対抗勢力 {theirs}',
-  'hudChrome.hill.countsHolding': '円内: あなた側 {yours}、対抗勢力 {theirs}',
-  'hudChrome.hill.contestYou': '丘を奪取中: {total} 中 {seconds}',
-  'hudChrome.hill.contestOther': '丘を奪われています: {total} 中 {seconds}',
-  'hudChrome.hill.contestNone': '円内で {total} の間、多数を保てば奪取できます',
-  'hudChrome.hill.inside': 'あなたは円の中にいます',
-  'hudChrome.hill.distance': '円まで {yards} ヤード',
-  'hudChrome.hill.rises': '{minutes} 後に出現します',
-  'hudChrome.hill.falls': '{minutes} 後に消えます',
-  'hudChrome.hill.standingRaid':
-    'レイドのメンバーは数えられません。丘を占拠できるのはパーティだけです',
   'hudChrome.warfareShop.gossipOption': 'ウォーフェアセットを見る',
   'hudChrome.warfareShop.gossipOptionAria': '{name}のウォーフェアセット商店を見る',
   'hudChrome.warfareShop.jewelry': 'アクセサリー',
   'hudChrome.warfareShop.weapons': '武器',
-  'hudChrome.warfareShop.groupSeason2': 'ウォーフェア・シーズン2：ヴァンガード',
-  'hudChrome.warfareShop.groupEntry': 'ウォーフェア・シーズン1',
   'hudChrome.warfareShop.owned': '所有済み',
   'hudChrome.warfareShop.buyOwnedAria': '{item}を{honor}で購入、所有済み',
   'hudChrome.warfareShop.buyConfirmBody':
@@ -1836,6 +1803,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'どの試合も、キャラクターに結び付いた戦場レートを勝敗にかかわらず動かし、歴代の表がワールドの勇者たちを順に並べます。',
   'hudChrome.charSheet.offense': '攻撃',
   'hudChrome.charSheet.defense': '防御',
+  'hudChrome.charSheet.spell': '呪文',
+  'hudChrome.charSheet.ratings': 'レーティング',
   'hudChrome.charSheet.playtimeLabel': 'プレイ時間',
   'hudChrome.charSheet.playtimeParts': '{major}{minor}',
   'hudChrome.charSheet.playtimeUnderMinute': '1分未満',
@@ -1863,8 +1832,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '呪文のダメージと回復の効果を高めます。知力1ポイントごとに、装備やバフによる分に加えて、わずかな呪文威力を得られます。',
   'hudChrome.statInfo.desc.warfare':
     'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。',
-  'hudChrome.statInfo.desc.warfareWithHealth':
-    'プレイヤーに与えるダメージが {increase}% 増加し、プレイヤーから受けるダメージが {reduction}% 減少します。さらに、ダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力が {health}% 増加します。',
   'hudChrome.statInfo.sources.header': '内訳:',
   'hudChrome.statInfo.sources.base': '基本: {value}',
   'hudChrome.statInfo.sources.attributes': '能力値から: {value}',
@@ -3755,9 +3722,13 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.buy': '購入',
   'itemUi.market.reclaim': '回収',
   'itemUi.market.buyAria': '{item}を{price}で購入',
+  'itemUi.market.buyQuantityAria': '{item}を何個購入するか（全{total}個中）',
+  'itemUi.market.buyQuantityBtnAria': 'この数だけ{item}を購入',
   'itemUi.market.buyConfirmTitle': '購入の確認',
   'itemUi.market.buyConfirmBody': '{item}を{price}で購入しますか？',
   'itemUi.market.buyConfirmBodyStack': '{item} x{count}を{price}（各 {each}）で購入しますか？',
+  'itemUi.market.buyConfirmBodyPartial':
+    '{item}を{count}個（全{total}個中）、{price}（各 {each}）で購入しますか？',
   'itemUi.market.buyConfirmAccept': '購入',
   'itemUi.market.buyConfirmCancel': 'キャンセル',
   'itemUi.market.buyChanged':
@@ -3779,6 +3750,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'itemUi.market.saleProceeds': '売上',
   'itemUi.market.saleOlder': 'ほかに {count} 件の以前の売却があり、合計に含まれています。',
   'itemUi.market.collectAll': 'すべて受け取る',
+  'itemUi.market.history': '履歴',
+  'itemUi.market.historyEmpty':
+    'まだ売却はありません。ワールドマーケットで売却したアイテムがここに表示されます。',
+  'itemUi.market.historyNote': 'ワールドマーケットでの最近の売却記録です。',
   'itemUi.logs.listedItem': '{item}を{money}でワールドマーケットに出品しました。',
   'itemUi.logs.sellerSold':
     '{buyer}があなたの{item}を{money}で購入しました。商人から{proceeds}を受け取ってください。',
@@ -9148,145 +9123,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.thornpeak_moonhide_cowl.name': 'ソーンピークの月皮のフード',
   'entities.items.stormhymn_chain_grips.name': '嵐の賛歌の鎖の握り',
   'entities.items.stormhymn_chain_treads.name': '嵐の賛歌の鎖の靴',
-  'entities.items.vanguard_warrior_arms_helmet.name': '刃跡の大兜',
-  'entities.items.vanguard_warrior_arms_shoulder.name': '刃跡の肩甲',
-  'entities.items.vanguard_warrior_arms_chest.name': '刃跡のホーバーク',
-  'entities.items.vanguard_warrior_arms_legs.name': '刃跡の脚鎧',
-  'entities.items.vanguard_warrior_arms_gloves.name': '刃跡の粉砕の篭手',
-  'entities.items.vanguard_warrior_fury_helmet.name': '血の行軍の面頬',
-  'entities.items.vanguard_warrior_fury_shoulder.name': '血の行軍の肩当て',
-  'entities.items.vanguard_warrior_fury_chest.name': '血の行軍の鎖帷子',
-  'entities.items.vanguard_warrior_fury_legs.name': '血の行軍のレギンス',
-  'entities.items.vanguard_warrior_fury_gloves.name': '血の行軍のグリップ',
-  'entities.items.vanguard_warrior_prot_helmet.name': '鉄の行軍の兜',
-  'entities.items.vanguard_warrior_prot_shoulder.name': '鉄の行軍の肩鎧',
-  'entities.items.vanguard_warrior_prot_chest.name': '鉄の行軍の胸甲',
-  'entities.items.vanguard_warrior_prot_legs.name': '鉄の行軍の脚甲',
-  'entities.items.vanguard_warrior_prot_gloves.name': '鉄の行軍の手甲',
-  'entities.items.vanguard_paladin_holy_helmet.name': '陽の守夜のサークレット',
-  'entities.items.vanguard_paladin_holy_shoulder.name': '陽の守夜のマントル',
-  'entities.items.vanguard_paladin_holy_chest.name': '陽の守夜のホーバーク',
-  'entities.items.vanguard_paladin_holy_legs.name': '陽の守夜の鎖の脚甲',
-  'entities.items.vanguard_paladin_holy_gloves.name': '陽の守夜の手袋',
-  'entities.items.vanguard_paladin_protection_helmet.name': '盾の誓いの兜',
-  'entities.items.vanguard_paladin_protection_shoulder.name': '盾の誓いの肩甲',
-  'entities.items.vanguard_paladin_protection_chest.name': '盾の誓いの胸当て',
-  'entities.items.vanguard_paladin_protection_legs.name': '盾の誓いの脚鎧',
-  'entities.items.vanguard_paladin_protection_gloves.name': '盾の誓いの篭手',
-  'entities.items.vanguard_paladin_retribution_helmet.name': '光の烙印の冠',
-  'entities.items.vanguard_paladin_retribution_shoulder.name': '光の烙印の肩鎧',
-  'entities.items.vanguard_paladin_retribution_chest.name': '光の烙印の胴鎧',
-  'entities.items.vanguard_paladin_retribution_legs.name': '光の烙印の脚甲',
-  'entities.items.vanguard_paladin_retribution_gloves.name': '光の烙印の篭手',
-  'entities.items.vanguard_hunter_beast_mastery_helmet.name': '群れの守り手の頭巾',
-  'entities.items.vanguard_hunter_beast_mastery_shoulder.name': '群れの守り手の肩鎧',
-  'entities.items.vanguard_hunter_beast_mastery_chest.name': '群れの守り手のジャーキン',
-  'entities.items.vanguard_hunter_beast_mastery_legs.name': '群れの守り手の脚甲',
-  'entities.items.vanguard_hunter_beast_mastery_gloves.name': '群れの守り手の篭手',
-  'entities.items.vanguard_hunter_marksmanship_helmet.name': '遠見の頭巾',
-  'entities.items.vanguard_hunter_marksmanship_shoulder.name': '遠見の肩鎧',
-  'entities.items.vanguard_hunter_marksmanship_chest.name': '遠見のジャーキン',
-  'entities.items.vanguard_hunter_marksmanship_legs.name': '遠見の脚甲',
-  'entities.items.vanguard_hunter_marksmanship_gloves.name': '遠見の篭手',
-  'entities.items.vanguard_hunter_survival_helmet.name': '罠の牙の頭巾',
-  'entities.items.vanguard_hunter_survival_shoulder.name': '罠の牙の肩鎧',
-  'entities.items.vanguard_hunter_survival_chest.name': '罠の牙のジャーキン',
-  'entities.items.vanguard_hunter_survival_legs.name': '罠の牙の脚甲',
-  'entities.items.vanguard_hunter_survival_gloves.name': '罠の牙の篭手',
-  'entities.items.vanguard_rogue_assassination_helmet.name': '夜斬りのフード',
-  'entities.items.vanguard_rogue_assassination_shoulder.name': '夜斬りの肩パッド',
-  'entities.items.vanguard_rogue_assassination_chest.name': '夜斬りのチュニック',
-  'entities.items.vanguard_rogue_assassination_legs.name': '夜斬りの脚衣',
-  'entities.items.vanguard_rogue_assassination_gloves.name': '夜斬りの手袋',
-  'entities.items.vanguard_rogue_combat_helmet.name': '乱闘の印のフード',
-  'entities.items.vanguard_rogue_combat_shoulder.name': '乱闘の印の肩パッド',
-  'entities.items.vanguard_rogue_combat_chest.name': '乱闘の印のチュニック',
-  'entities.items.vanguard_rogue_combat_legs.name': '乱闘の印の脚衣',
-  'entities.items.vanguard_rogue_combat_gloves.name': '乱闘の印の手袋',
-  'entities.items.vanguard_rogue_subtlety_helmet.name': '影歩きのフード',
-  'entities.items.vanguard_rogue_subtlety_shoulder.name': '影歩きの肩パッド',
-  'entities.items.vanguard_rogue_subtlety_chest.name': '影歩きのチュニック',
-  'entities.items.vanguard_rogue_subtlety_legs.name': '影歩きの脚衣',
-  'entities.items.vanguard_rogue_subtlety_gloves.name': '影歩きの手袋',
-  'entities.items.vanguard_priest_discipline_helmet.name': '帳の詩篇のカウル',
-  'entities.items.vanguard_priest_discipline_shoulder.name': '帳の詩篇のマントル',
-  'entities.items.vanguard_priest_discipline_chest.name': '帳の詩篇のローブ',
-  'entities.items.vanguard_priest_discipline_legs.name': '帳の詩篇のレギンス',
-  'entities.items.vanguard_priest_discipline_gloves.name': '帳の詩篇の手巻き布',
-  'entities.items.vanguard_priest_holy_helmet.name': '恩寵の翼のカウル',
-  'entities.items.vanguard_priest_holy_shoulder.name': '恩寵の翼のマントル',
-  'entities.items.vanguard_priest_holy_chest.name': '恩寵の翼のローブ',
-  'entities.items.vanguard_priest_holy_legs.name': '恩寵の翼のレギンス',
-  'entities.items.vanguard_priest_holy_gloves.name': '恩寵の翼の手巻き布',
-  'entities.items.vanguard_priest_shadow_helmet.name': '黄昏の賛歌のカウル',
-  'entities.items.vanguard_priest_shadow_shoulder.name': '黄昏の賛歌のマントル',
-  'entities.items.vanguard_priest_shadow_chest.name': '黄昏の賛歌のローブ',
-  'entities.items.vanguard_priest_shadow_legs.name': '黄昏の賛歌のレギンス',
-  'entities.items.vanguard_priest_shadow_gloves.name': '黄昏の賛歌の手巻き布',
-  'entities.items.vanguard_shaman_elemental_helmet.name': '嵐の書の頭巾',
-  'entities.items.vanguard_shaman_elemental_shoulder.name': '嵐の書の肩甲',
-  'entities.items.vanguard_shaman_elemental_chest.name': '嵐の書のホーバーク',
-  'entities.items.vanguard_shaman_elemental_legs.name': '嵐の書の鎖の脚甲',
-  'entities.items.vanguard_shaman_elemental_gloves.name': '嵐の書の篭手',
-  'entities.items.vanguard_shaman_enhancement_helmet.name': '疾風生まれの兜',
-  'entities.items.vanguard_shaman_enhancement_shoulder.name': '疾風生まれの肩鎧',
-  'entities.items.vanguard_shaman_enhancement_chest.name': '疾風生まれの鎖帷子',
-  'entities.items.vanguard_shaman_enhancement_legs.name': '疾風生まれの脚甲',
-  'entities.items.vanguard_shaman_enhancement_gloves.name': '疾風生まれのグリップ',
-  'entities.items.vanguard_shaman_restoration_helmet.name': '潮の守りのサークレット',
-  'entities.items.vanguard_shaman_restoration_shoulder.name': '潮の守りのマントル',
-  'entities.items.vanguard_shaman_restoration_chest.name': '潮の守りのホーバーク',
-  'entities.items.vanguard_shaman_restoration_legs.name': '潮の守りのキルト',
-  'entities.items.vanguard_shaman_restoration_gloves.name': '潮の守りの手巻き布',
-  'entities.items.vanguard_mage_arcane_helmet.name': '時縛りのフード',
-  'entities.items.vanguard_mage_arcane_shoulder.name': '時縛りの肩衣',
-  'entities.items.vanguard_mage_arcane_chest.name': '時縛りのローブ',
-  'entities.items.vanguard_mage_arcane_legs.name': '時縛りのズボン',
-  'entities.items.vanguard_mage_arcane_gloves.name': '時縛りの手袋',
-  'entities.items.vanguard_mage_fire_helmet.name': '燼の鞭のカウル',
-  'entities.items.vanguard_mage_fire_shoulder.name': '燼の鞭のマントル',
-  'entities.items.vanguard_mage_fire_chest.name': '燼の鞭の法衣',
-  'entities.items.vanguard_mage_fire_legs.name': '燼の鞭のレギンス',
-  'entities.items.vanguard_mage_fire_gloves.name': '燼の鞭の手袋',
-  'entities.items.vanguard_mage_frost_helmet.name': '霜の番人のフード',
-  'entities.items.vanguard_mage_frost_shoulder.name': '霜の番人の肩パッド',
-  'entities.items.vanguard_mage_frost_chest.name': '霜の番人の祭服',
-  'entities.items.vanguard_mage_frost_legs.name': '霜の番人の脚巻き',
-  'entities.items.vanguard_mage_frost_gloves.name': '霜の番人のミトン',
-  'entities.items.vanguard_warlock_affliction_helmet.name': '恐怖の羽ペンのフード',
-  'entities.items.vanguard_warlock_affliction_shoulder.name': '恐怖の羽ペンのマントル',
-  'entities.items.vanguard_warlock_affliction_chest.name': '恐怖の羽ペンのローブ',
-  'entities.items.vanguard_warlock_affliction_legs.name': '恐怖の羽ペンのレギンス',
-  'entities.items.vanguard_warlock_affliction_gloves.name': '恐怖の羽ペンの手巻き布',
-  'entities.items.vanguard_warlock_demonology_helmet.name': '骨髄の縛めのカウル',
-  'entities.items.vanguard_warlock_demonology_shoulder.name': '骨髄の縛めの肩鎧',
-  'entities.items.vanguard_warlock_demonology_chest.name': '骨髄の縛めのローブ',
-  'entities.items.vanguard_warlock_demonology_legs.name': '骨髄の縛めのレギンス',
-  'entities.items.vanguard_warlock_demonology_gloves.name': '骨髄の縛めのグリップ',
-  'entities.items.vanguard_warlock_destruction_helmet.name': '鉱滓の冠のフード',
-  'entities.items.vanguard_warlock_destruction_shoulder.name': '鉱滓の冠のマントル',
-  'entities.items.vanguard_warlock_destruction_chest.name': '鉱滓の冠の法衣',
-  'entities.items.vanguard_warlock_destruction_legs.name': '鉱滓の冠のレギンス',
-  'entities.items.vanguard_warlock_destruction_gloves.name': '鉱滓の冠の手袋',
-  'entities.items.vanguard_druid_balance_helmet.name': '星の番人の頭飾り',
-  'entities.items.vanguard_druid_balance_shoulder.name': '星の番人の肩鎧',
-  'entities.items.vanguard_druid_balance_chest.name': '星の番人のベスト',
-  'entities.items.vanguard_druid_balance_legs.name': '星の番人の脚衣',
-  'entities.items.vanguard_druid_balance_gloves.name': '星の番人の手袋',
-  'entities.items.vanguard_druid_feral_helmet.name': '血のたてがみの兜',
-  'entities.items.vanguard_druid_feral_shoulder.name': '血のたてがみの肩パッド',
-  'entities.items.vanguard_druid_feral_chest.name': '血のたてがみのチュニック',
-  'entities.items.vanguard_druid_feral_legs.name': '血のたてがみの脚甲',
-  'entities.items.vanguard_druid_feral_gloves.name': '血のたてがみのグリップ',
-  'entities.items.vanguard_druid_restoration_helmet.name': '薊の花の冠',
-  'entities.items.vanguard_druid_restoration_shoulder.name': '薊の花のマントル',
-  'entities.items.vanguard_druid_restoration_chest.name': '薊の花のベスト',
-  'entities.items.vanguard_druid_restoration_legs.name': '薊の花のレギンス',
-  'entities.items.vanguard_druid_restoration_gloves.name': '薊の花の手袋',
-  'entities.items.vanguard_verdict_greatsword.name': '先鋒の裁き',
-  'entities.items.vanguard_oath_blade.name': '先鋒の誓い',
-  'entities.items.vanguard_fang_dagger.name': '先鋒の牙',
-  'entities.items.vanguard_warstaff.name': '先鋒の戦杖',
   'entities.itemSets.packlord_emberhide.name': 'パックロードの残火皮鎧',
   'entities.itemSets.packlord_emberhide.bonus2': '群れの指令のクールダウンが3秒に短縮されます。',
   'entities.itemSets.packlord_emberhide.bonus4':
@@ -9318,9 +9154,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '守りの聖歌が完全に消費されると、10秒以内の次の浄めの聖歌が即時発動になります。この効果は15秒に1回まで発動します。',
   'entities.itemSets.benison_dawnweave.name': 'ベニソン・ドーンウィーヴの法衣',
   'entities.itemSets.benison_dawnweave.bonus2':
-    '熾天使の見守りの救援回復量が180から270に上昇します。被ダメージで詠唱が遅れなくなります。',
+    '囁きの祈り、厳かな祈り、緊急の祈りで体力を回復すると、次の聖歌の癒やしの回復量が10%増加し、最大3回まで蓄積します。各詠唱で得られる蓄積は最大1回です。聖歌の癒やしは詠唱完了時にすべての蓄積を消費します。被ダメージで詠唱が遅れなくなります。',
   'entities.itemSets.benison_dawnweave.bonus4':
-    '熾天使の見守りが発動すると、守られた味方はさらに10秒かけて最大体力の15%の回復を得ます。',
+    '3蓄積で聖歌の癒やしを完了すると、60秒以内の次の囁きの祈りが即時発動になり、回復量が100%増加します。この効果は蓄積せず、再度得ると持続時間が更新されます。',
   'entities.itemSets.vesperash.name': 'ヴェスパーアッシュの外套',
   'entities.itemSets.vesperash.bonus2':
     'タイスフィーンド招来のクールダウンが6秒短縮されます。被ダメージで詠唱が遅れなくなります。',
@@ -9328,9 +9164,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'タイスフィーンドを招来すると精神粉砕のクールダウンがリセットされ、タイスフィーンドの攻撃ごとのマナ回復量が2倍になります。',
   'entities.itemSets.stormkindled.name': 'ストームキンドルの礼装',
   'entities.itemSets.stormkindled.bonus2':
-    'アークオーバーロードの発動率が30%になります。被ダメージで詠唱が遅れなくなります。',
-  'entities.itemSets.stormkindled.bonus4':
-    '大地の衝撃の雷鳴ごとのボーナスが30%に上昇し、マグマバーストのダメージが20%増加します。',
+    '火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。',
+  'entities.itemSets.stormkindled.bonus4': '大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。',
   'entities.itemSets.warspirit_emberscale.name': 'ウォースピリットの残火鱗鎧',
   'entities.itemSets.warspirit_emberscale.bonus2': '祖霊の一撃が戦霊の律動を3段階進めます。',
   'entities.itemSets.warspirit_emberscale.bonus4': '祖霊の一撃のダメージが30%増加します。',
@@ -9452,125 +9287,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。',
   'entities.itemSets.vale_arcanist.name': '谷の秘術師の装束',
   'entities.itemSets.vale_arcanist.bonus3': '攻撃速度と詠唱速度が15%上昇します。',
-  'entities.itemSets.vanguard_warrior_arms.name': '刃跡の戦装束',
-  'entities.itemSets.vanguard_warrior_arms.bonus2':
-    '重傷の一撃が突撃の残りクールダウンを1秒短縮します。',
-  'entities.itemSets.vanguard_warrior_arms.bonus4':
-    '突撃は次の重傷の一撃も20%強化します（血染めの手の強化1スタック）。',
-  'entities.itemSets.vanguard_warrior_fury.name': '血の行軍の憤怒の装備',
-  'entities.itemSets.vanguard_warrior_fury.bonus2': '英雄的跳躍のクールダウンが8秒短縮されます。',
-  'entities.itemSets.vanguard_warrior_fury.bonus4': '英雄的跳躍で着地すると激昂します。',
-  'entities.itemSets.vanguard_warrior_prot.name': '鉄の行軍の防壁',
-  'entities.itemSets.vanguard_warrior_prot.bonus2': '断層のクールダウンが5秒短縮されます。',
-  'entities.itemSets.vanguard_warrior_prot.bonus4': '断層は、受けるダメージも6秒間10%軽減します。',
-  'entities.itemSets.vanguard_paladin_holy.name': '陽の守夜の礼装',
-  'entities.itemSets.vanguard_paladin_holy.bonus2': '生命の契約のクールダウンが30秒短縮されます。',
-  'entities.itemSets.vanguard_paladin_holy.bonus4':
-    '生命の契約は、味方にもその最大体力の8%のシールドを6秒間付与します。',
-  'entities.itemSets.vanguard_paladin_protection.name': '盾の誓いの砦',
-  'entities.itemSets.vanguard_paladin_protection.bonus2':
-    '誓いの鎖のクールダウンが2秒短縮されます。',
-  'entities.itemSets.vanguard_paladin_protection.bonus4':
-    '誓いの鎖で引き寄せられた敵は4秒間呪文の詠唱が30%遅くなり、引き寄せられる敵を縛ったときには誓いの鎖があなたに太陽の報復を与えます。',
-  'entities.itemSets.vanguard_paladin_retribution.name': '光の烙印の戦鎧',
-  'entities.itemSets.vanguard_paladin_retribution.bonus2':
-    'ヴァルキュリアの召命のクールダウンが15秒短縮されます。',
-  'entities.itemSets.vanguard_paladin_retribution.bonus4':
-    'ヴァルキュリアの召命は最後の勅令のクールダウンをリセットし、着地から6秒以内の次の最後の勅令は15%多くのダメージを与えます。',
-  'entities.itemSets.vanguard_hunter_beast_mastery.name': '群れの守り手の狩装束',
-  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
-    '動揺の射撃のクールダウンが4秒短縮されます。',
-  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
-    '動揺の射撃が野獣の怒りの残りクールダウンを1秒短縮します。',
-  'entities.itemSets.vanguard_hunter_marksmanship.name': '遠見の狩装束',
-  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
-    '離脱跳躍のクールダウンが4秒短縮されます。',
-  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
-    '離脱跳躍の後6秒以内の次の引き絞りが即時詠唱になります。発動は15秒に1回まで。',
-  'entities.itemSets.vanguard_hunter_survival.name': '罠の牙の狩装束',
-  'entities.itemSets.vanguard_hunter_survival.bonus2': '血鉤のクールダウンが3秒短縮されます。',
-  'entities.itemSets.vanguard_hunter_survival.bonus4': '血鉤が狩猟の勢いを1与えます。',
-  'entities.itemSets.vanguard_rogue_assassination.name': '夜斬りの革鎧',
-  'entities.itemSets.vanguard_rogue_assassination.bonus2':
-    '急所打ちのエネルギーコストが10減少します。',
-  'entities.itemSets.vanguard_rogue_assassination.bonus4':
-    '急所打ちは、6秒以内の次の攻撃も必ずクリティカルにします。',
-  'entities.itemSets.vanguard_rogue_combat.name': '乱闘の印の革鎧',
-  'entities.itemSets.vanguard_rogue_combat.bonus2': '駿足のクールダウンが60秒短縮されます。',
-  'entities.itemSets.vanguard_rogue_combat.bonus4':
-    '駿足の効果中、邪悪な斬撃とヘイメーカーはコンボポイントを1追加で与えます。',
-  'entities.itemSets.vanguard_rogue_subtlety.name': '影歩きの革鎧',
-  'entities.itemSets.vanguard_rogue_subtlety.bonus2': '煙隠れのクールダウンが60秒短縮されます。',
-  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
-    '煙隠れから使ったみぞおち強打は、コンボポイントを2追加で与えます。',
-  'entities.itemSets.vanguard_priest_discipline.name': '帳の詩篇の衣装',
-  'entities.itemSets.vanguard_priest_discipline.bonus2':
-    '精神の絶叫のクールダウンが3秒短縮されます。',
-  'entities.itemSets.vanguard_priest_discipline.bonus4':
-    '守りの聖歌が完全に消費されると、守られていた味方の移動速度が3秒間20%上昇します。発動は8秒に1回まで。',
-  'entities.itemSets.vanguard_priest_holy.name': '恩寵の翼の衣装',
-  'entities.itemSets.vanguard_priest_holy.bonus2':
-    'ヴェイルステップのクールダウンが6秒短縮されます。',
-  'entities.itemSets.vanguard_priest_holy.bonus4':
-    'ヴェイルステップは、あなたにも最大体力の8%のシールドを6秒間付与します。',
-  'entities.itemSets.vanguard_priest_shadow.name': '黄昏の賛歌の礼装',
-  'entities.itemSets.vanguard_priest_shadow.bonus2':
-    '嘆きの連祷は、チャネル中に対象の移動速度も30%低下させます。',
-  'entities.itemSets.vanguard_priest_shadow.bonus4':
-    'タイスフィーンド招来は、あなたにも最大体力の10%のシールドを8秒間付与します。',
-  'entities.itemSets.vanguard_shaman_elemental.name': '嵐の書の戦の鎖鎧',
-  'entities.itemSets.vanguard_shaman_elemental.bonus2': '武器解放のクールダウンが3秒短縮されます。',
-  'entities.itemSets.vanguard_shaman_elemental.bonus4':
-    '武器解放を使うと、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。',
-  'entities.itemSets.vanguard_shaman_enhancement.name': '疾風生まれの戦鎖帷子',
-  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
-    '祖霊の一撃は、対象の移動速度を4秒間30%低下させます。',
-  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
-    '祖霊の一撃がエレメンタルトランスの残りクールダウンを4秒短縮します。',
-  'entities.itemSets.vanguard_shaman_restoration.name': '潮の守りの鎖帷子',
-  'entities.itemSets.vanguard_shaman_restoration.bonus2':
-    '体力が50%未満の味方への癒しの水流の詠唱時間が0.5秒短縮されます。',
-  'entities.itemSets.vanguard_shaman_restoration.bonus4':
-    '潮呼びは、その対象にもあなたの最大体力の5%のシールドを6秒間付与します。',
-  'entities.itemSets.vanguard_mage_arcane.name': '時縛りの祭服',
-  'entities.itemSets.vanguard_mage_arcane.bonus2': '時の障壁のクールダウンが2秒短縮されます。',
-  'entities.itemSets.vanguard_mage_arcane.bonus4':
-    '時の障壁は、守られた対象の移動速度も3秒間20%上昇させます。',
-  'entities.itemSets.vanguard_mage_fire.name': '燼の鞭の礼装',
-  'entities.itemSets.vanguard_mage_fire.bonus2': '灰燼爆ぜのチャージが3秒速く回復します。',
-  'entities.itemSets.vanguard_mage_fire.bonus4':
-    '灰燼爆ぜを詠唱すると、ブレイジングバリアの残りクールダウンが2秒短縮されます。',
-  'entities.itemSets.vanguard_mage_frost.name': '霜の番人の装束',
-  'entities.itemSets.vanguard_mage_frost.bonus2': '氷縛のクールダウンが2秒短縮されます。',
-  'entities.itemSets.vanguard_mage_frost.bonus4':
-    '氷縛を詠唱すると、瞬き歩みの残りクールダウンが5秒短縮されます。',
-  'entities.itemSets.vanguard_warlock_affliction.name': '恐怖の羽ペンの祭服',
-  'entities.itemSets.vanguard_warlock_affliction.bonus2': '責め苦の詠唱時間が0.3秒短縮されます。',
-  'entities.itemSets.vanguard_warlock_affliction.bonus4':
-    '喰らうの回復量が30%増加し、移動しながらチャネルできます。',
-  'entities.itemSets.vanguard_warlock_demonology.name': '骨髄の縛めの礼装',
-  'entities.itemSets.vanguard_warlock_demonology.bonus2':
-    '骨の鎧のクールダウンが10秒短縮されます。',
-  'entities.itemSets.vanguard_warlock_demonology.bonus4':
-    '刈り取りの号令が骨の鎧の残りクールダウンを2秒短縮します。',
-  'entities.itemSets.vanguard_warlock_destruction.name': '鉱滓の冠の祭服',
-  'entities.itemSets.vanguard_warlock_destruction.bonus2': '燼皮のクールダウンが30秒短縮されます。',
-  'entities.itemSets.vanguard_warlock_destruction.bonus4':
-    'コンフラグレートを2回使うごとに、8秒以内の次の破滅の矢が即時詠唱になります。',
-  'entities.itemSets.vanguard_druid_balance.name': '星の番人の衣装',
-  'entities.itemSets.vanguard_druid_balance.bonus2': '締めつける根の詠唱時間が0.5秒短縮されます。',
-  'entities.itemSets.vanguard_druid_balance.bonus4':
-    '締めつける根を詠唱すると、4秒間移動しながら詠唱でき、移動速度が20%上昇します。発動は20秒に1回まで。',
-  'entities.itemSets.vanguard_druid_feral.name': '血のたてがみの毛皮鎧',
-  'entities.itemSets.vanguard_druid_feral.bonus2':
-    'ブルーインラッシュのクールダウンが3秒短縮されます。',
-  'entities.itemSets.vanguard_druid_feral.bonus4':
-    'ブルーインラッシュは、あなたに最大体力の6%のシールドを6秒間付与します。',
-  'entities.itemSets.vanguard_druid_restoration.name': '薊の花の祭服',
-  'entities.itemSets.vanguard_druid_restoration.bonus2':
-    'スウィフトメンドのクールダウンが1秒短縮されます。',
-  'entities.itemSets.vanguard_druid_restoration.bonus4':
-    'スウィフトメンドは、移動速度も3秒間30%上昇させます。',
   'entities.itemSets.warfare_ashstalker.name': 'アッシュストーカーの装備',
   'entities.itemSets.warfare_ashstalker.bonus2': 'ウォーフェア防御レーティングが40上がります。',
   'entities.itemSets.warfare_ashstalker.bonus4':
@@ -11101,6 +10817,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.listingStatusCancelled': '取り下げ済み',
   'hudChrome.wocMarket.listingStatusSuspended': '停止中',
   'hudChrome.wocMarket.listingStatusUnsold': '未売却',
+  'hudChrome.wocMarket.charselectWebLink': '$WOC 取引所のウェブサイトで入札・購入・出品する',
+  'hudChrome.wocMarket.charselectWebNote':
+    '入札、購入、出品するにはキャラクターでゲームに入ってください。',
   'hudChrome.wocMarket.bidBondPayItemAria': '{item} への入札の保証金 {bond} を支払う',
   'hudChrome.wocMarket.strikesTip':
     '確定した取引の支払いをしなかった場合、そのたびに違反が 1 回記録されます。1 回目以降は、違反のたびに取引所の停止期間が長くなります。3 日、次に 14 日、90 日、そして 1 年です。',
@@ -12748,15 +12467,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'devCommand.actions.level.label': 'レベルを設定',
   'devCommand.actions.lfgboard.description': '事前編成の募集掲示シナリオを作成します。',
   'devCommand.actions.lfgboard.label': '募集掲示板を準備',
-  'devCommand.actions.hillend.description': '現在の丘を今すぐ消します。',
-  'devCommand.actions.hillend.label': '丘を終了',
-  'devCommand.actions.hillnow.description': '丘をすぐに出現させ、その上に立ちます。',
-  'devCommand.actions.hillnow.label': '今すぐ丘を出現',
-  'devCommand.actions.hillrise.description': '告知中の丘をすぐに出現させます。',
-  'devCommand.actions.hillrise.label': '丘のカウントダウンを省略',
-  'devCommand.actions.hillwarn.description':
-    '今すぐ丘を告知します。警告の時間が過ぎると出現します。',
-  'devCommand.actions.hillwarn.label': '丘のカウントダウン',
   'devCommand.actions.lfgqueue.description': 'ダンジョンファインダーの待機列シナリオを作成します。',
   'devCommand.actions.lfgqueue.label': 'ファインダー待機列を準備',
   'devCommand.actions.lfgraid.description': 'レイドファインダーのシナリオを作成します。',
@@ -12841,7 +12551,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.combat.floatingBlock': '{amount} ブロック',
   'hud.combat.blockedDone': '{target}は{ability}をブロックし、{amount}のダメージ。',
   'hud.combat.blockedTaken': '{source}の攻撃をブロックし、{amount}のダメージを受けました。',
-  'hudChrome.options.mouseoverCast': 'パーティとフォーカスフレームでマウスオーバーキャスト',
+  'hudChrome.options.mouseoverCast': 'パーティフレームでマウスオーバーキャスト',
   'hudChrome.options.showTargetOfTarget': 'ターゲットのターゲットを表示',
   'hudChrome.options.showTargetSwingTimer': 'ターゲットの攻撃タイマーを表示',
   'hudChrome.options.showPetFrame': '自分のペットを表示',
@@ -14555,6 +14265,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.buffs': 'バフ',
   'hudChrome.targetAuras.unlock': 'ターゲットオーラウィンドウを移動',
   'hudChrome.targetAuras.lock': 'ターゲットオーラウィンドウをロック',
+  'hudChrome.targetAuras.close': 'ターゲットオーラウィンドウを閉じる',
   'hudChrome.targetAuras.configureRows': 'ターゲットオーラを設定',
   'hudChrome.targetAuras.fewerRows': 'オーラ行数を少なくする',
   'hudChrome.targetAuras.moreRows': 'オーラ行数を多くする',
@@ -14563,92 +14274,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.targetAuras.hideSources': 'オーラの使用者名を非表示',
   'hudChrome.targetAuras.ownAura': '自分のオーラ',
   'hudChrome.targetAuras.opacity': 'オーラの不透明度: {percent}',
-  'hudChrome.cooldownManager.title': 'クールダウンマネージャー',
-  'hudChrome.cooldownManager.intro':
-    '選んだ呪文をフローティングボタンで表示します。ボタンはクリックできません。それぞれクールダウンを表示し、使えない間は暗くなり、使用可能になると光ります。',
-  'hudChrome.cooldownManager.generalTitle': '全般',
-  'hudChrome.cooldownManager.enabled': 'クールダウンマネージャーを表示',
-  'hudChrome.cooldownManager.idleOpacity': '準備中の不透明度',
-  'hudChrome.cooldownManager.combatOnly': '戦闘中のみ音を鳴らす',
-  'hudChrome.cooldownManager.dragHint':
-    'このメニューを開いている間はすべてのグループが画面に表示され、ドラッグして移動できます。',
-  'hudChrome.cooldownManager.addSingle': '単体ボタンを追加',
-  'hudChrome.cooldownManager.addGrid': 'ボタングループを追加',
-  'hudChrome.cooldownManager.addLine': '呪文の列を追加',
-  'hudChrome.cooldownManager.groupsFull':
-    'グループ数が上限に達しています。追加するには、いずれかを削除してください。',
-  'hudChrome.cooldownManager.noGroups':
-    '単体ボタン、ボタングループ、呪文の列のいずれかを追加して始めましょう。',
-  'hudChrome.cooldownManager.groupSingle': '単体ボタン {index}',
-  'hudChrome.cooldownManager.groupGrid': 'ボタングループ {index}',
-  'hudChrome.cooldownManager.groupLine': '呪文の列 {index}',
-  'hudChrome.cooldownManager.groupName': 'グループ名',
-  'hudChrome.cooldownManager.spellCount': '{count} / {max} 呪文',
-  'hudChrome.cooldownManager.orientation': '向き',
-  'hudChrome.cooldownManager.horizontal': '横',
-  'hudChrome.cooldownManager.vertical': '縦',
-  'hudChrome.cooldownManager.columns': '列数',
-  'hudChrome.cooldownManager.rows': '行数',
-  'hudChrome.cooldownManager.direction': 'アイコンの方向',
-  'hudChrome.cooldownManager.dirRight': '右',
-  'hudChrome.cooldownManager.dirLeft': '左',
-  'hudChrome.cooldownManager.dirDown': '下',
-  'hudChrome.cooldownManager.dirUp': '上',
-  'hudChrome.cooldownManager.iconSize': 'アイコンのサイズ',
-  'hudChrome.cooldownManager.iconPadding': 'アイコンの間隔',
-  'hudChrome.cooldownManager.opacity': '不透明度',
-  'hudChrome.cooldownManager.visibility': '表示',
-  'hudChrome.cooldownManager.visAlways': '常に表示',
-  'hudChrome.cooldownManager.visCombat': '戦闘中',
-  'hudChrome.cooldownManager.visHidden': '非表示',
-  'hudChrome.cooldownManager.visHiddenHint':
-    '非表示のグループも音を鳴らし、アクションバーを光らせます。',
-  'hudChrome.cooldownManager.showTimer': 'タイマーを表示',
-  'hudChrome.cooldownManager.positionX': '横の位置',
-  'hudChrome.cooldownManager.positionY': '縦の位置',
-  'hudChrome.cooldownManager.resetPosition': '初期位置に戻す',
-  'hudChrome.cooldownManager.deleteGroup': 'グループを削除',
-  'hudChrome.cooldownManager.deleteGroupAria': '{group}を削除',
-  'hudChrome.cooldownManager.trackedTitle': '追跡する呪文',
-  'hudChrome.cooldownManager.trackedHint':
-    '呪文をグループにドラッグするか、選択してグループと通知を選びます。呪文が別の呪文に変化すると、ボタンもそれに合わせて変わり、光ります。',
-  'hudChrome.cooldownManager.search': '呪文を検索',
-  'hudChrome.cooldownManager.searchPlaceholder': '検索',
-  'hudChrome.cooldownManager.otherSpells': 'その他の呪文',
-  'hudChrome.cooldownManager.otherSpellsHint':
-    '他の専門化、タレントの選択、より高いレベルの呪文です。今配置しておくと、習得したときにボタンが表示されます。',
-  'hudChrome.cooldownManager.notKnown': '{spell}（未習得）',
-  'hudChrome.cooldownManager.aurasTitle': '発動・エンジン・強化',
-  'hudChrome.cooldownManager.aurasHint':
-    'エンジン資源とそのスタック、発動効果、そして自分の呪文で得る強化効果です。それ以外に自分にかかったことのある効果もここに表示されます。',
-  'hudChrome.cooldownManager.auraFallback': 'オーラ',
-  'hudChrome.cooldownManager.onlyWhileActive': '発動中のみ表示',
-  'hudChrome.cooldownManager.alertStacks': 'スタック数で通知',
-  'hudChrome.cooldownManager.alertStacksAny': '獲得時',
-  'hudChrome.cooldownManager.alertStacksHint':
-    'オーラがこのスタック数に達すると、ボタンが光って脈打ち、音が鳴ります。「獲得時」は現れた瞬間に通知します。',
-  'hudChrome.cooldownManager.auraSoundHint':
-    'オーラが現れたとき、または設定したスタック数に達したときに鳴ります。',
-  'hudChrome.cooldownManager.notDisplayed': '非表示',
-  'hudChrome.cooldownManager.emptySection': 'ここに呪文をドロップします。',
-  'hudChrome.cooldownManager.spellsEmpty': 'まだ呪文を習得していません。',
-  'hudChrome.cooldownManager.selectSpell': '{spell}を選択',
-  'hudChrome.cooldownManager.group': 'グループ',
-  'hudChrome.cooldownManager.groupFullOption': '{group}（満杯）',
-  'hudChrome.cooldownManager.notInGroupHint':
-    'この呪文をグループに入れると、そのボタンが表示されます。',
-  'hudChrome.cooldownManager.moveEarlier': '{spell}を前へ移動',
-  'hudChrome.cooldownManager.moveLater': '{spell}を後ろへ移動',
-  'hudChrome.cooldownManager.glowWhenReady': '使用可能時に光らせる',
-  'hudChrome.cooldownManager.glowWhenReadyHint':
-    '呪文を使用できる間、ボタンを明るくして縁取りします。',
-  'hudChrome.cooldownManager.hotbarGlow': 'ホットバーの発光',
-  'hudChrome.cooldownManager.hotbarGlowHint':
-    '使用可能な間、アクションバー上のこの呪文も光らせます。',
-  'hudChrome.cooldownManager.onlyWhenReady': '使用可能時のみ表示',
-  'hudChrome.cooldownManager.sound': '準備完了の音',
-  'hudChrome.cooldownManager.soundHint':
-    '呪文が使用可能になったとき、または使用可能なままボタンが別の呪文に変化したときに鳴ります。',
   'hudChrome.auraOverlay.title': 'オーラ',
   'hudChrome.auraOverlay.currentClass': '現在のクラス: {class}',
   'hudChrome.auraOverlay.previewHint':
@@ -14991,6 +14616,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.hideHelmAria': '兜を隠す',
   'hudChrome.paperdoll.showHelmAria': '兜を表示',
   'hudChrome.options.waterRipples': '水面の波紋（航跡）',
+  'hudChrome.options.actionCam': 'アクションカメラ',
+  'hudChrome.options.actionCamShoulder': 'アクションカメラの肩',
+  'hudChrome.options.actionCamShoulderLeft': '左 {pct}',
+  'hudChrome.options.actionCamShoulderRight': '右 {pct}',
+  'hudChrome.options.actionCamShoulderCenter': '中央',
   'hudChrome.breath.label': '息',
   'hudChrome.breath.drowning': '溺れています！',
   'abilityUi.resources.devotion': '献身',
@@ -15311,15 +14941,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.thunder_reservoir.description':
     'パッシブ：アークボルトとスカイブランチで雷鳴を獲得し、最大5。5になると、アースンジョルトは125%、フォールトウェイクは100%追加ダメージを与え、その後すべての雷鳴を消費する。（サンダーコール）',
   'entities.abilities.thunder_reservoir.name': '雷鳴の貯蔵',
-  'entities.abilities.lightning_overload.name': 'アークオーバーロード',
-  'entities.abilities.lightning_overload.description':
-    'パッシブ：電弧の矢と枝分かれの稲妻は20%の確率でオーバーロードし、最初の目標に与えたダメージの50%で再び攻撃し、雷鳴を1獲得する。（サンダーコール）',
-  'entities.abilities.lava_burst.name': 'マグマバースト',
-  'entities.abilities.lava_burst.description':
-    '{damage}の火炎ダメージを与える。あなたの灰燼の衝撃で燃えている目標には必ずクリティカルヒットする。マグマサージ：灰燼の衝撃の継続ダメージごとに20%の確率でこのクールダウンをリセットし、10秒以内の次のマグマバーストを即時詠唱にする。ダメージは呪文威力とともに上がる。（サンダーコール）',
-  'entities.abilities.thunderstorm.name': 'ストームブレイク',
-  'entities.abilities.thunderstorm.description':
-    '雷鳴を呼び、10ヤード以内の敵に{damage}の自然ダメージを与え、5秒間移動速度を50%低下させる。最大マナの8%を回復する。ダメージは呪文威力とともに上がる。（サンダーコール）',
   'entities.abilities.tidecall.description':
     '味方1体の体力を{damage}回復します。回復量はスペルパワーで増加します。オーバーヒール前の回復量を癒しの水流に加えます。上限は対象の最大体力の30%です。',
   'entities.abilities.tidecall.name': '潮呼び',
@@ -16099,6 +15720,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。',
+  'guide.settingsPage.ifShowAuraCaster':
+    'すべてのバフ／デバフのツールチップに「使用者」の行を追加し、誰がかけたかを表示します。複数のパラディンのブレッシングなど、同じバフの使用者を見分けるのに便利です。',
   'guide.settingsPage.ifChatFontScale': 'チャットの文字サイズです。',
   'guide.settingsPage.ifChatIntro':
     'チャットウィンドウの読みやすさに関する設定です。チャットウィンドウそのものをリセットする項目もここにあります。',
@@ -16248,8 +15871,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.stats.parryTitle': 'パリィ',
   'guide.stats.warfareBody':
     'ウォーフェアは、他のプレイヤーに対してのみ効く唯一のステータスです。相手に与えるダメージを高め、相手から受けるダメージを下げ、キャラクターシートにはその両面が一行で表示されます。クリーチャー相手にはまったく働きません。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。',
-  'guide.stats.warfareBodyPets':
-    'ウォーフェアは、プレイヤーと戦うために名誉のギアが持つステータスです。プレイヤー同士の戦いでは、あなたとペットが他のプレイヤーやそのペットに与えるダメージを高め、彼らから受けるダメージを下げます。さらにダンジョン、レイド、デルヴ、リフト以外のすべての場所で最大体力を高めるので、名誉のギアを身につけたプレイヤーは、身につけていないプレイヤーよりはるかに倒されにくくなります。キャラクターシートにはそのすべてが一行で表示されます。名誉で購入するウォーフェアのギアから得られるので、レベリング中に追いかけるものというより、PvPを遊んだことへの報酬です。',
   'guide.stats.warfareTitle': 'ウォーフェア',
   'guide.talentsPage.loadoutNote':
     'ビルドを一つに決めてしまう必要はありません。パネルで名前をつけた構成を保存すると、タレントの選択とアクションバーの両方が記憶されるので、別の構成へ移るのはクリック一回です。条件は振り直しと同じで、戦闘外であること、そしてアリーナの試合の最中でないことです。',
@@ -17612,9 +17233,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'ウォーフェアの品はどれもウォーフェア攻撃レーティングとウォーフェア防御レーティングを備えていますが、この二つはモンスター相手にはまったく働きません。効くのは他のプレイヤーと戦うときだけ、決闘、アリーナ、戦場においてのみで、攻撃は与えるダメージを上乗せし、防御は受けるダメージを削り、それぞれに固有の上限があります。各防具系統はセットでもあり、そのセットボーナスもまた、ウォーフェアのレーティングか、プレイヤーにしか働かない効果です。ですから名誉で揃えた一式のセットボーナスは、ダンジョンのボスの前では何の足しにもなりません。品そのものは、通常のステータス、防御力、武器ダメージを変わらず備えており、それらはどこでも働きます。モンスター相手に黙り込むのは、ウォーフェアのレーティングとセットボーナスのほうなのです。',
   'guide.arenaPage.warfareTradeBodyRatingSpent':
     'それは意図された取り引きです。ウォーフェア装備はプレイヤーと戦うために作られたものであって、ダンジョンの段階を飛び越える近道ではありません。ウォーフェアの品が、同じ部位のダンジョン産エピックほどの戦闘レーティングを備えることは決してなく、その代わりに備えているウォーフェアのレーティングとセットボーナスは、すべて他のプレイヤーに向けて費やされます。アリーナで渡り合いたいなら買いましょう。ヒロイックをより速く駆け抜けたいなら、装備はダンジョンで勝ち取りましょう。',
-  'guide.arenaPage.vanguardHeading': 'ヴァンガード装備：ウォーフェア・シーズン2',
-  'guide.arenaPage.vanguardBody':
-    'ヴァンガード装備はウォーフェア装備の第2シーズンで、同じ2人の補給官が元の装備の上段に並べて売っています。元の装備も引き続き販売されます。すべてのスペックに、頭、肩、胴、脚、手の5部位からなる専用のヴァンガードセットがあり、ショップにはあなたのクラスが装備できる3セットと、扱えるヴァンガード武器だけが表示されます。ヴァンガード装備は元の装備と同じウォーフェア・レーティングを、より高いアイテムレベルで備えています。各セットには2部位と4部位で発動する2つのボーナスがあり、スペックのアビリティの1つを変化させます。元のセットと違い、これらのボーナスはモンスター相手も含めてどこでも有効ですが、対人戦向けに作られているため、レイドの中ではレイドセットの方が優れた選択のままです。',
   'guide.social.calendarBodyDoubleHonor':
     'Iを押すとイベントカレンダーが開きます。予定を立てる価値のあるワールドの日々、毎週のレイド招集、市の日、アリーナ激突、名誉2倍ウィークエンド、フィッシングダービー、それに毎月のデルヴの日と月門の集いを記します。ギルドが予定を管理するのもここです。ギルドマスターとオフィサーがイベントを書き込め、全メンバーが同じページでそれを見られます。ワールドの日々は恩恵ではなく集うための呼びかけですが、一つだけ例外があります。名誉2倍ウィークエンドの間はずっと、ソーンホロウ平原の名誉が2倍支払われ、最後まで戦えば敗北でも勝利と同額が支払われます。それ以外は、日が記されているからといって、キャラクターに何かが変わることはありません。',
   'guide.social.emotesBodyNamedTarget':
@@ -17629,6 +17247,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '「フレーム編集」は、その下に積み重なるトラッカー群(追跡中のクエストとその目標、功績の進み具合、聖遺物庫のページ、製作でピン留めしたレシピ、潜っているデルヴ、参加中のリフト、そして追跡中のレシピまたは依頼)、ペットフレーム脇のペットアクションバー、周囲の敵にかけた継続的なデバフをまとめて表示する「ターゲットデバフ」フレーム、パラディンの「献身」の記章、ウォーロックの「苦痛リソースバー」、スペル発動オーバーレイ、二刀流時のオフハンド用スイングバー、そしてタブ式のダメージメーターウィンドウも緩めます。緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.framesGovernedTalkingHead':
     '「フレームを編集」では会話パネルも動かせるようになります。会話パネルは、話しているNPCが視界の外にいるときにそのセリフを表示するもので、ロック解除中は名前チップを表示します。',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    '「フレーム編集」ではツールチップフレームも動かせるようになります。マウスを合わせた対象のカードが表示される位置で、クリーチャーならレベルと種類、ほかのプレイヤーなら称号、ギルド、レベルとクラス、そして専門化とその役割が表示されます。好きな場所へドラッグすると、カードはそこから画面の近い端を避ける向きに広がります。「フレーム設定」の「フレームの表示・非表示」でツールチップのチェックを外すと、このカードを完全に非表示にできます。',
   'guide.interfacePage.framesGovernedAuraTracks':
     '「フレーム編集」は、同じ「インターフェース」オプションの「戦闘」タブでオンにした任意の6つのオーラトラック、すなわち「自分のバフ」トラック、「防御クールダウン」トラック、「自分のシールド」トラック、「攻撃クールダウン」トラック、「移動とステルス」トラック、「味方へのバフ」トラックも緩めます。どのトラックも初期状態ではオフで、緩んでいる間はそれぞれに名前のチップが付きます。',
   'guide.interfacePage.mapBodyZoneFirst':
@@ -17757,6 +17377,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'バトルグラウンドまたはアリーナのキューが成立したら Discord のダイレクトメッセージで知らせる（Discord アカウントの連携が必要）',
   'hudChrome.interfaceUnlock.frameNames.petBar': 'ペットバー',
   'hudChrome.interfaceUnlock.frameNames.swingBarOffhand': 'オフハンド',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'ツールチップ',
   'hudChrome.keyboardMap.assignOption': '{category}: {action}',
   'hudChrome.keyboardMap.bindingLine': '{key}: {action}',
   'hudChrome.keyboardMap.form60': '60%',
@@ -17834,8 +17455,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.charSidebar.currencies': '通貨',
   'hudChrome.charSidebar.character': 'キャラクター',
   'hudChrome.charSidebar.professions': '専門技能',
-  'hudChrome.mapAtlas.railToggle': 'サイドパネル',
-  'hudChrome.mapAtlas.railToggleAria': '地図のサイドパネルを表示または非表示',
   'questUi.dialog.worldQuestBoard': 'ワールドクエスト掲示板を見せてくれ。',
   'questUi.dialog.worldQuestBoardAria': '地図でワールドクエスト掲示板を開く',
   // Faction quartermaster stock and the faction NPCs (M16 non-Latin fills).
@@ -18563,6 +18182,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.colSaleType': 'タイプ',
   'hudChrome.wocMarket.colSoldAt': '販売済み',
   'hudChrome.wocMarket.saleTypeBuyNow': '今すぐ購入',
+  'hudChrome.loot.rollWon': 'おめでとうございます！ {item} をロール {roll} で獲得しました',
   'devCommand.actions.town.description': '名前を指定して町の中心部にテレポートします。',
   'devCommand.actions.town.label': 'タウンハブ',
   'devCommand.fields.town': '町',
@@ -18825,4 +18445,122 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.assignClickHint': '対象を選択して、{button} をクリックしてください。',
   'hudChrome.focusTargets.ally': '味方',
   'hudChrome.focusTargets.enemy': '敵',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'entities.itemSets.vanguard_warrior_arms.name': 'ヴァンガード：Bladewake Battlegear',
+  'entities.itemSets.vanguard_warrior_arms.bonus2':
+    '2点：Maiming StrikeでOnrushの残りクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_warrior_arms.bonus4': '4点：Onrushが次のMaiming Strikeを20%強化。',
+  'entities.itemSets.vanguard_warrior_fury.name': 'ヴァンガード：Bloodmarch Ragegear',
+  'entities.itemSets.vanguard_warrior_fury.bonus2': '2点：Vaulting Chargeのクールダウンが8秒短縮。',
+  'entities.itemSets.vanguard_warrior_fury.bonus4': '4点：Vaulting Chargeの着地で激怒する。',
+  'entities.itemSets.vanguard_warrior_prot.name': 'ヴァンガード：Ironmarch Bulwark',
+  'entities.itemSets.vanguard_warrior_prot.bonus2': '2点：Faultlineのクールダウンが5秒短縮。',
+  'entities.itemSets.vanguard_warrior_prot.bonus4':
+    '4点：Faultlineで受けるダメージが6秒間10%低下。',
+  'entities.itemSets.vanguard_paladin_holy.name': 'ヴァンガード：Sunvigil Regalia',
+  'entities.itemSets.vanguard_paladin_holy.bonus2': '2点：Life Covenantのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_paladin_holy.bonus4':
+    '4点：Life Covenantが対象に最大体力8%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_paladin_protection.name': 'ヴァンガード：Shieldvow Bastion',
+  'entities.itemSets.vanguard_paladin_protection.bonus2':
+    '2点：Oath Chainのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_paladin_protection.bonus4':
+    '4点：Oath Chainで引き寄せた敵は4秒間30%遅く詠唱し、条件を満たすとSolar Reprisalを得る。',
+  'entities.itemSets.vanguard_paladin_retribution.name': 'ヴァンガード：Lightbrand Warplate',
+  'entities.itemSets.vanguard_paladin_retribution.bonus2':
+    '2点：Valkyr Callingのクールダウンが15秒短縮。',
+  'entities.itemSets.vanguard_paladin_retribution.bonus4':
+    '4点：Valkyr CallingがFinal Edictをリセットし、着地後6秒以内の次のFinal Edictのダメージを15%上げる。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.name': 'ヴァンガード：Packwarden Harness',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus2':
+    '2点：Rattling Shotのクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_hunter_beast_mastery.bonus4':
+    '4点：Rattling ShotでHowling Rageの残りクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_hunter_marksmanship.name': 'ヴァンガード：Farsight Harness',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus2':
+    '2点：Trailbreakのクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_hunter_marksmanship.bonus4':
+    '4点：Trailbreakで6秒以内の次のLong Drawが即時発動。15秒に1回まで。',
+  'entities.itemSets.vanguard_hunter_survival.name': 'ヴァンガード：Snaretooth Harness',
+  'entities.itemSets.vanguard_hunter_survival.bonus2': '2点：Bloodhookのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_hunter_survival.bonus4': '4点：BloodhookでHunting Momentumを1得る。',
+  'entities.itemSets.vanguard_rogue_assassination.name': 'ヴァンガード：Nightcut Leathers',
+  'entities.itemSets.vanguard_rogue_assassination.bonus2':
+    '2点：Low Blowの消費エネルギーが10減少。',
+  'entities.itemSets.vanguard_rogue_assassination.bonus4':
+    '4点：Low Blowで6秒以内の次の攻撃がクリティカルになる。',
+  'entities.itemSets.vanguard_rogue_combat.name': 'ヴァンガード：Brawlmark Leathers',
+  'entities.itemSets.vanguard_rogue_combat.bonus2': '2点：Swift Heelsのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_combat.bonus4':
+    '4点：Swift Heels中、Wicked SlashとHaymakerがコンボポイントを追加で1得る。',
+  'entities.itemSets.vanguard_rogue_subtlety.name': 'ヴァンガード：Shadewalk Leathers',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus2': '2点：Smokefadeのクールダウンが60秒短縮。',
+  'entities.itemSets.vanguard_rogue_subtlety.bonus4':
+    '4点：SmokefadeからのGut Punchがコンボポイントを追加で2得る。',
+  'entities.itemSets.vanguard_priest_discipline.name': 'ヴァンガード：Veilpsalm Raiment',
+  'entities.itemSets.vanguard_priest_discipline.bonus2':
+    '2点：Terror Canticleのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_priest_discipline.bonus4':
+    '4点：Psalm of Warding消費時、守られた味方の移動速度が3秒間20%上昇。8秒に1回まで。',
+  'entities.itemSets.vanguard_priest_holy.name': 'ヴァンガード：Gracewing Raiment',
+  'entities.itemSets.vanguard_priest_holy.bonus2': '2点：Veilstepのクールダウンが6秒短縮。',
+  'entities.itemSets.vanguard_priest_holy.bonus4': '4点：Veilstepが最大体力8%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_priest_shadow.name': 'ヴァンガード：Duskhymn Regalia',
+  'entities.itemSets.vanguard_priest_shadow.bonus2':
+    '2点：Litany of Woeの詠唱中、対象の移動速度も30%低下。',
+  'entities.itemSets.vanguard_priest_shadow.bonus4':
+    '4点：Call Tithefiendが最大体力10%のシールドを8秒付与。',
+  'entities.itemSets.vanguard_shaman_elemental.name': 'ヴァンガード：Tempestwrit Battlemail',
+  'entities.itemSets.vanguard_shaman_elemental.bonus2':
+    '2点：Unleash Weaponのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_shaman_elemental.bonus4':
+    '4点：Unleash Weaponで移動詠唱可能になり、4秒間移動速度20%上昇。20秒に1回まで。',
+  'entities.itemSets.vanguard_shaman_enhancement.name': 'ヴァンガード：Galeborn Warmail',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus2':
+    '2点：Ancestral Strikeで対象の移動速度が4秒間30%低下。',
+  'entities.itemSets.vanguard_shaman_enhancement.bonus4':
+    '4点：Ancestral StrikeでElemental Tranceの残りクールダウンが4秒短縮。',
+  'entities.itemSets.vanguard_shaman_restoration.name': 'ヴァンガード：Brineward Chainmail',
+  'entities.itemSets.vanguard_shaman_restoration.bonus2':
+    '2点：体力50%未満の味方へのMending Watersが0.5秒速くなる。',
+  'entities.itemSets.vanguard_shaman_restoration.bonus4':
+    '4点：Tidecallが対象にあなたの最大体力5%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_mage_arcane.name': 'ヴァンガード：Hourbinder Vestments',
+  'entities.itemSets.vanguard_mage_arcane.bonus2': '2点：Temporal Barrierのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_arcane.bonus4':
+    '4点：Temporal Barrierが守った対象の移動速度を3秒間20%上昇。',
+  'entities.itemSets.vanguard_mage_fire.name': 'ヴァンガード：Emberlash Regalia',
+  'entities.itemSets.vanguard_mage_fire.bonus2': '2点：Cinderfallの再使用が3秒速くなる。',
+  'entities.itemSets.vanguard_mage_fire.bonus4':
+    '4点：Cinderfall詠唱でBlazing Barrierの残りクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.name': 'ヴァンガード：Rimewarden Garb',
+  'entities.itemSets.vanguard_mage_frost.bonus2': '2点：Icebindのクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_mage_frost.bonus4':
+    '4点：Icebind詠唱でFlitstepの残りクールダウンが5秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.name': 'ヴァンガード：Dreadquill Vestments',
+  'entities.itemSets.vanguard_warlock_affliction.bonus2': '2点：Harrowの詠唱時間が0.3秒短縮。',
+  'entities.itemSets.vanguard_warlock_affliction.bonus4':
+    '4点：Consumeの回復量が30%上昇し、移動中にチャネル可能。',
+  'entities.itemSets.vanguard_warlock_demonology.name': 'ヴァンガード：Marrowbound Regalia',
+  'entities.itemSets.vanguard_warlock_demonology.bonus2':
+    '2点：Bone Armorのクールダウンが10秒短縮。',
+  'entities.itemSets.vanguard_warlock_demonology.bonus4':
+    '4点：Reaping CommandでBone Armorの残りクールダウンが2秒短縮。',
+  'entities.itemSets.vanguard_warlock_destruction.name': 'ヴァンガード：Slagcrown Vestments',
+  'entities.itemSets.vanguard_warlock_destruction.bonus2':
+    '2点：Cinderhideのクールダウンが30秒短縮。',
+  'entities.itemSets.vanguard_warlock_destruction.bonus4':
+    '4点：2回ごとのConflagrateで8秒以内の次のRuinboltが即時発動。',
+  'entities.itemSets.vanguard_druid_feral.name': '血たてがみの皮装',
+  'entities.itemSets.vanguard_druid_feral.bonus2': '2点：Bruin Rushのクールダウンが3秒短縮。',
+  'entities.itemSets.vanguard_druid_feral.bonus4':
+    '4点：Bruin Rushが最大体力6%のシールドを6秒付与。',
+  'entities.itemSets.vanguard_druid_restoration.name': 'アザミ花の祭服',
+  'entities.itemSets.vanguard_druid_restoration.bonus2': '2点：Fleetmendのクールダウンが1秒短縮。',
+  'entities.itemSets.vanguard_druid_restoration.bonus4': '4点：Fleetmendで移動速度が3秒間30%上昇。',
+  'entities.itemSets.vanguard_druid_balance.name': '星守りの装束',
+  'entities.itemSets.vanguard_druid_balance.bonus2': '絡み根の詠唱時間が0.5秒短縮される。',
+  'entities.itemSets.vanguard_druid_balance.bonus4':
+    '絡み根を詠唱すると、移動しながら詠唱でき、移動速度が4秒間20%上昇する。20秒に1回しか発生しない。',
 };

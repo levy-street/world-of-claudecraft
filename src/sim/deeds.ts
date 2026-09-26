@@ -32,6 +32,7 @@ import { FARM_CROP_IDS } from './content/farm_crops';
 import { GATHERING_PROFESSION_IDS } from './content/professions';
 import { pointsSpent } from './content/talents';
 import { ITEMS, MOBS, zoneAt } from './data';
+import { canWearDevBadgeTitle, devBadgeTitleTier } from './dev_badge_titles';
 import { LAUNCH_PAPERDOLL_SLOTS } from './launch_paperdoll_slots';
 import {
   accountReliquaryOwnership,
@@ -824,13 +825,28 @@ export function grantDeed(
 /** Select (or clear, with null) the displayed title: the ONE validator both
  *  worlds reach (the Sim method offline, the server dispatch online). A
  *  non-null id is accepted only when the player has EARNED the deed and its
- *  reward is a title; invalid input is a SILENT no-op (defensive against
- *  stale clients: no error event, no player text). On accept the meta field
- *  and the entity wire field are written together, so both read paths agree
- *  within the same tick. */
-export function setActiveTitle(meta: PlayerMeta, e: Entity, deedId: string | null): void {
+ *  reward is a title, or when it is a developer-badge rung title
+ *  (src/sim/dev_badge_titles.ts, not a deed) the entity's resolved badge tier
+ *  reaches; invalid input is a SILENT no-op (defensive against stale clients:
+ *  no error event, no player text). On accept the meta field and the entity
+ *  wire field are written together, so both read paths agree within the same
+ *  tick. `restore` is the join path only: the badge tier resolves AFTER join,
+ *  so a persisted rung title is taken as saved and re-checked by the server
+ *  once the tier lands (reconcileDevBadgeTitle). */
+export function setActiveTitle(
+  meta: PlayerMeta,
+  e: Entity,
+  deedId: string | null,
+  opts?: Readonly<{ restore?: boolean }>,
+): void {
   if (deedId !== null) {
     if (typeof deedId !== 'string') return;
+    if (devBadgeTitleTier(deedId) !== undefined) {
+      if (!opts?.restore && !canWearDevBadgeTitle(deedId, e.devTier)) return;
+      meta.activeTitle = deedId;
+      e.title = deedId;
+      return;
+    }
     // Account-wide: a deed earned by ANY character on the account unlocks its
     // cosmetic for every character (the ledger's display lane).
     if (!meta.deedsEarned.has(deedId) && !meta.accountLedger.deeds.has(deedId)) return;

@@ -134,6 +134,11 @@ function asHtmlEl(el: StubEl, root: StubEl): HTMLElement {
       documentElement: {
         getAttribute: (name: string) => root.attrs[name] ?? null,
       },
+      // The body class carries the target aura strip's side setting
+      // (targetAurasBelowFrame); the key reads it through getAttribute.
+      body: {
+        getAttribute: (name: string) => root.attrs[`body:${name}`] ?? null,
+      },
     },
   } as unknown as HTMLElement;
 }
@@ -177,7 +182,7 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
       },
       { innerWidth: 1600, innerHeight: 900 },
     );
-    return { painter, frame, debuffs, container, rows, moveWheel, moveZone, props };
+    return { painter, root, frame, debuffs, container, rows, moveWheel, moveZone, props };
   }
 
   it('measures once, writes the author-space bottom, and elides steady frames', () => {
@@ -206,6 +211,28 @@ describe('PartyBelowTargetPainter (measure gating + property write)', () => {
     debuffs.rect = { left: 900, right: 1120, bottom: 254 };
     expect(painter.update(true, 5, false)).toBe(false);
     expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('initial');
+  });
+
+  // Flipping Target Auras Below the Frame moves the strip (and so the union
+  // bottom) without touching any element the key read before: the body class
+  // has to be a key input or the party frames keep the pre-toggle bottom until
+  // an unrelated input changes.
+  it('re-measures when the target aura strip side class flips on the body', () => {
+    const { painter, root, frame, debuffs, props } = build();
+    painter.update(true, 5, false);
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('199.0px');
+    // The strip hangs below now: same child count, same frame box, deeper union.
+    root.attrs['body:class'] = 'game-active target-auras-below-frame';
+    debuffs.rect.bottom = 240;
+    expect(painter.update(true, 5, false)).toBe(true);
+    expect(props.get(PARTY_BELOW_TARGET_BOTTOM_PROP)).toBe('240.0px');
+    expect(frame.rectReads).toBe(2);
+    // An unrelated body class is not a key input: the push stands (update
+    // returns the ACTIVE state, not whether it measured) and the unchanged
+    // rect-read count is what proves no layout read happened for it.
+    root.attrs['body:class'] = 'game-active target-auras-below-frame something-else';
+    expect(painter.update(true, 5, false)).toBe(true);
+    expect(frame.rectReads).toBe(2);
   });
 
   it('writes the rows-bound sensors while pushing: pad top on mobile, viewport bottom on desktop', () => {

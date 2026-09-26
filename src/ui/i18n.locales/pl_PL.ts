@@ -13480,7 +13480,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Przez 8 s następny cios wroga wymierzony w ciebie zostaje odpowiedziany: do {buff} obrażeń zostaje odrzucone i zwrócone napastnikowi jako obrażenia Święte, a ty zyskujesz 1 Oddanie. Odpowiedziany zostaje tylko jeden cios. Wzniesienie zwiększa odpowiadaną wartość o 50%.',
   'entities.abilities.final_edict.description':
-    'Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo Świętą eksplozję wokół ciebie.',
+    'Zadaje miażdżący cios bronią i generuje 1 Oddanie, gdy zadaje obrażenia. Udane trafienie skraca pozostałe odnowienie Upadku Świtu o 2 s. Udane automatyczne ataki i trafienia Ostatniego Edyktu mają 15% szans na przyznanie Gniewu Świtu na 8 s. Wzniesienie uwalnia dodatkowo eksplozję wokół ciebie, która zadaje obrażenia Fizyczne.',
   'entities.abilities.grace_devotion.description':
     'Ty i członkowie drużyny odzyskujecie 15 many co 5 s i płacicie o 3% mniej many przez 30 min. Zastępuje twoje własne Promienne Oddanie lub Oddanie Świtu, ale współistnieje z Oddaniami innych paladynów.',
   'entities.abilities.guardian_covenant.description':
@@ -15137,9 +15137,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Cios Ukrytego Ostrza zadaje potrójne obrażenia zamiast podwójnych.',
   'entities.itemSets.ashveil.name': 'Szaty Popiołowej Zasłony',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
+    'Przywrócenie zdrowia zaklęciami Szeptana modlitwa, Uroczysta modlitwa lub Pilna modlitwa zwiększa leczenie następnego zaklęcia Chóralne Uzdrowienie o 10%, do 3 kumulacji. Każde rzucenie przyznaje najwyżej jedną kumulację. Chóralne Uzdrowienie zużywa wszystkie kumulacje po zakończeniu rzucania. Otrzymane obrażenia nie opóźniają już rzucania zaklęć.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek.',
+    'Ukończenie zaklęcia Chóralne Uzdrowienie z 3 kumulacjami sprawia, że następna Szeptana modlitwa użyta w ciągu 60 s staje się natychmiastowa i leczy o 100% więcej. Efekt nie kumuluje się; ponowne uzyskanie odnawia czas jego trwania.',
   'entities.itemSets.benison_dawnweave.name': 'Błogosławiona Tkanina Świtu',
   'entities.itemSets.chronoweave.bonus2':
     'Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.',
@@ -17376,4 +17376,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Edytuj ramki rozluźnia także panel Dialogu, który zawiera wypowiedź NPC, gdy ten NPC jest poza twoim polem widzenia; nosi chip z nazwą, gdy jest luzem.',
   'guide.settingsPage.keybindsWheelBody':
     'Samo koło też wiąże. Powiększ kamerę i pomniejsz kamerę to zwykłe powiązania, które domyślnie znajdują się na gołym kole, więc możesz przesunąć je do Ctrl plus kółko lub do klawiszy, a następnie obrócić uwolnione koło, aby uruchomić szczeliny paska akcji. Nacięcie w kole nie ma zwolnienia, więc nie może napędzać wstrzymanej akcji, takiej jak ruch do przodu.',
+  'guide.settingsPage.ifColorblindMode':
+    'Przekolorowuje zagrożenia na ziemi od Nythraxis (pierścień uderzenia Grobowej erupcji, kałuże Grobowego płomienia i Ognia duszy, linię Grobowego ognia oraz znaki Rozdarcia duszy) na paletę przyjazną daltonistom, z wyraźnie różnymi odcieniami i jasnością, aby nakładające się kręgi zachowały widoczne krawędzie. Rozmiary, liczniki czasu i pozycje się nie zmieniają.',
+  'hud.options.colorblindMode': 'Tryb dla daltonistów',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

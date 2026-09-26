@@ -240,6 +240,19 @@ export class TargetAurasWindow {
       this.unlocked = !this.unlocked;
       this.refreshMoveButton();
     });
+    // The close button ships in the entry markup (so it is localized and
+    // icon-hydrated with the static shell); re-appending it keeps it at the
+    // far end of the title bar, after the buttons minted above.
+    const closeButton = root.querySelector('.ta-close-btn') as HTMLButtonElement | null;
+    if (closeButton) {
+      titleEl.appendChild(closeButton);
+      closeButton.addEventListener('click', () => {
+        if (!this.visible) return;
+        this.visible = false;
+        this.hide();
+        this.persistVisible();
+      });
+    }
     this.refreshMoveButton();
     this.refreshVisibleRowsControl();
     this.refreshOpacityControl();
@@ -350,11 +363,7 @@ export class TargetAurasWindow {
 
   toggle(): boolean {
     if (this.deps.isMobileLayout()) {
-      this.rowsConfigOpen = false;
-      this.unlocked = false;
-      this.refreshMoveButton();
-      this.refreshVisibleRowsControl();
-      this.refreshVisibility();
+      this.hide();
       return false;
     }
     this.visible = !this.visible;
@@ -364,14 +373,19 @@ export class TargetAurasWindow {
       this.cleared = false;
       this.clear();
     } else {
-      this.rowsConfigOpen = false;
-      this.unlocked = false;
-      this.refreshMoveButton();
-      this.refreshVisibleRowsControl();
-      this.refreshVisibility();
+      this.hide();
     }
     this.persistVisible();
     return this.visible;
+  }
+
+  /** Hidden-state chrome reset shared by the keybind toggle and the close button. */
+  private hide(): void {
+    this.rowsConfigOpen = false;
+    this.unlocked = false;
+    this.refreshMoveButton();
+    this.refreshVisibleRowsControl();
+    this.refreshVisibility();
   }
 
   get isVisible(): boolean {

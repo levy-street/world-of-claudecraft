@@ -12512,7 +12512,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     '8 Sek. lang wird der nächste gegnerische Treffer gegen Euch beantwortet: Bis zu {buff} Schaden wird verwehrt und dem Angreifer als Heiligschaden zurückgegeben, und Ihr erhaltet 1 Hingabe. Nur ein Schlag wird beantwortet. Der Aufstieg erhöht die beantwortbare Menge um 50%.',
   'entities.abilities.final_edict.description':
-    'Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine heilige Explosion um Euch aus.',
+    'Führt einen zermalmenden Waffenschlag aus und erzeugt 1 Hingabe, wenn er Schaden verursacht. Ein erfolgreicher Treffer verringert die verbleibende Abklingzeit des Morgensturzes um 2 Sek. Erfolgreiche Autoangriffe und Treffer des Letzten Edikts haben eine Chance von 15%, 8 Sek. lang Zorn der Morgenröte zu gewähren. Der Aufstieg löst zusätzlich eine Explosion um Euch aus, die physischen Schaden verursacht.',
   'entities.abilities.grace_devotion.description':
     'Ihr und Eure Gruppenmitglieder stellt alle 5 Sek. 15 Mana wieder her und zahlt 30 Min. lang 3% weniger Mana. Ersetzt Eure eigene Strahlende Hingabe oder Hingabe der Morgenröte, besteht aber neben den Hingaben anderer Paladine.',
   'entities.abilities.guardian_covenant.description':
@@ -15283,9 +15283,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Dein Schlag mit der Verschleierten Klinge verursacht dreifachen statt doppelten Schaden.',
   'entities.itemSets.ashveil.name': 'Gewand des Aschenschleiers',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Die Rettungsheilung von Seraphischer Wacht steigt von 180 auf 270. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
+    'Wenn Geflüstertes Gebet, Feierliches Gebet oder Dringendes Gebet Gesundheit wiederherstellt, erhöht sich die Heilung deiner nächsten Chorheilung um 10 %, bis zu 3 Stapel. Jeder Zauber gewährt höchstens einen Stapel. Chorheilung verbraucht bei Abschluss des Wirkens alle Stapel. Erlittener Schaden verzögert deine Zauber nicht mehr.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Wenn Seraphische Wacht ausgelöst wird, wird der Verbündete zusätzlich 10 Sek. lang um 15 Prozent seiner maximalen Gesundheit geheilt.',
+    'Wenn du Chorheilung mit 3 Stapeln abschließt, wird dein nächstes Geflüstertes Gebet innerhalb von 60 Sek. sofort gewirkt und heilt 100 % mehr. Dieser Effekt ist nicht stapelbar; erneutes Erhalten erneuert seine Dauer.',
   'entities.itemSets.benison_dawnweave.name': 'Gewand der Morgengewebten Gunst',
   'entities.itemSets.chronoweave.bonus2':
     'Zeitliches Echo wandelt 50 Prozent deines arkanen Einzelzielschadens in Heilung um. Erlittener Schaden verzögert dein Zauberwirken nicht mehr.',
@@ -17614,4 +17614,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Durch Bearbeiten von Frames wird auch das Dialogfenster aufgelockert, das die gesprochene Zeile eines NPCs enthält, während sich dieser NPC außerhalb Ihrer Sicht befindet. Es trägt seinen Namenschip, solange es locker ist.',
   'guide.settingsPage.keybindsWheelBody':
     'Auch das Rad selbst klemmt. „Kamera vergrößern“ und „Kamera verkleinern“ sind gewöhnliche Bindungen, die standardmäßig auf dem bloßen Rad sitzen. Sie können sie also auf Strg plus Rad oder auf Tasten bewegen und dann das freigegebene Rad drehen, um Aktionsleisten-Slots auszulösen. Eine Radkerbe verfügt nicht über eine Auslösefunktion und kann daher keine gehaltene Aktion wie Vorwärtsbewegung ausführen.',
+  'guide.settingsPage.ifColorblindMode':
+    'Färbt die Nythraxis-Bodengefahren (den Trefferring der Graberuption, die Flächen von Grabflamme und Seelenfeuer, die Grabfeuer-Linie und die Markierungen von Seelenriss) in eine farbenblindheitsfreundliche Palette mit klar unterscheidbaren Farbtönen und Helligkeiten um, damit überlappende Kreise sichtbare Ränder behalten. Größen, Timer und Positionen ändern sich nicht.',
+  'hud.options.colorblindMode': 'Farbenblindheitsmodus',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

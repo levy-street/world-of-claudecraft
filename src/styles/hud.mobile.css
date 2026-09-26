@@ -346,7 +346,9 @@
      window beneath it, e.g. an equip socket under the move zone in the
      paired char+bags layout (the fix-round review's blocker). Neutralize
      everything but the ring for exactly the drag window; hit-testing then
-     falls through to the sheet and the paperdoll as before. */
+     falls through to the sheet and the paperdoll as before, and anywhere
+     else to #mobile-window-backdrop, which the hit test counts as the world
+     (a release there only opens the destroy prompt). */
   body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring),
   body.mobile-touch.game-active.touch-item-dragging #mobile-controls > :not(#mobile-action-ring) * {
     pointer-events: none;
@@ -735,7 +737,9 @@
      behind it instead of relying on DOM occlusion order (several windows are
      translucent / don't fully cover the viewport). Hidden by default and on
      desktop (no body.mobile-touch): this pass only blocks touches, it does not
-     close windows on tap.
+     close windows on tap. It stands in for the world under a touch item drag
+     (src/ui/item_drop_hit_test.ts), since it is all of the world a finger can
+     reach while a window is open.
      Stacking: #mobile-controls sits at z-index 60 (game-active, above), and #ui
      (the container every `.window` lives inside) rises to z-index 90 only while
      body.mobile-window-open (see the `#ui` rule above). The backdrop sits at 85:
@@ -3374,6 +3378,15 @@
     transform: scale(calc(var(--mobile-unit-frame-scale) * var(--mobile-chrome-scale, 1)));
     transform-origin: left top;
   }
+  /* The touch seat pins the target frame to the top edge, so the desktop
+     default of hanging the aura strip ABOVE the frame (hud.css, stock seat
+     over the action bar) puts every target debuff timer off screen here. The
+     strip hangs BELOW the frame on touch regardless of targetAurasBelowFrame:
+     actionable information a device may never shed. */
+  body.mobile-touch #target-frame > #tf-debuffs {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
   /* The desktop interface editor's frame-dimension settings
      (playerFrame/targetFrame Width/Height, movable_frame.ts 'dimensions'
      mode) stay desktop: this sheet hand-tunes the compact placements around
@@ -4355,6 +4368,14 @@
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  body.mobile-touch #banner.banner-loot {
+    top: 21%;
+    font-size: calc(18px * var(--mobile-chrome-scale, 1));
+    z-index: 96;
+  }
+  body.mobile-touch #error-msg.held-loot-warning {
+    top: max(28%, calc(21% + 72px));
+  }
   /* The secondary lines scale with the title. Without this they stay at the
      desktop 18px while the verdict drops to 26px, so on a phone a three-line
      battleground result reads as four near-equal lines instead of one headline
@@ -4983,6 +5004,42 @@
   }
   body.mobile-touch #woc-market-window .wm-table tbody tr:first-child td {
     padding-top: 16px;
+  }
+  /* The one-column portrait sheet (~342px, see .wm-browse above) is the ONLY
+     face this costs anything: landscape's two-column .wm-browse leaves the
+     desktop five-column split (components.css, 42/16/18/12/12) plenty of
+     room, so this stays inside the portrait query rather than joining the
+     unconditional rules above. In portrait every money/time column drops to
+     40px or less: under that, an ordinary value ("19 minutes", "$1,234.56")
+     has nowhere to break except mid-word, which the shared
+     overflow-wrap:anywhere rule then does at any character rather than a
+     word boundary. Buy Now is the one column a browsing player can lose
+     without losing information: most rows render it empty already (only a
+     buy-now listing carries a price), and the figure still shows in the
+     row's own detail pane one tap away (wocDetailPaneHtml's buy-now face).
+     Dropping it here, not Seller (the documented "a long name breaks"
+     column) or Item (the primary scan target, and the only cell carrying an
+     icon plus text), gives Item, Current Bid and Time Left the room their
+     values need. Scoped off the Sales History table
+     (wm-sales-table), which keeps its own six-column split and has no
+     per-row detail pane to defer a hidden column into. */
+  @media (orientation: portrait) {
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(4),
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) td:nth-child(4) {
+      display: none;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(1) {
+      width: 40%;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(2) {
+      width: 18%;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(3) {
+      width: 22%;
+    }
+    body.mobile-touch #woc-market-window .wm-table:not(.wm-sales-table) th:nth-child(5) {
+      width: 20%;
+    }
   }
   /* The touch-target floor for the controls the desktop sheet sizes by padding
      alone. The tab strip came out about 30px tall (7px padding on a 13px line),
@@ -5906,8 +5963,12 @@
   body.mobile-touch .mkt-tab,
   body.mobile-touch .mkt-btn,
   body.mobile-touch .mkt-sweep-btn,
+  body.mobile-touch .mkt-buy-partial-btn,
   body.mobile-touch .mkt-sweep-go,
   body.mobile-touch .mkt-sweep-close,
+  body.mobile-touch .mkt-order-go,
+  body.mobile-touch .mkt-order-match,
+  body.mobile-touch .mkt-unlisted-chip,
   body.mobile-touch .mkt-list-btn,
   body.mobile-touch #loot-window .btn,
   body.mobile-touch .loot-roll-btn,
@@ -6282,6 +6343,20 @@
     min-height: 40px;
     font-size: 16px;
     box-sizing: border-box;
+  }
+  body.mobile-touch .mkt-buy-partial-qty {
+    min-height: 40px;
+    width: 44px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  /* The row's grid columns are fixed-width `auto` cells (components.css); a
+     narrow phone has no room for icon + name + price + two/three button
+     clusters on one line, so the row wraps to a second line instead of
+     clipping or forcing horizontal scroll. */
+  body.mobile-touch .mkt-row:has(.mkt-buy-partial) {
+    display: flex;
+    flex-wrap: wrap;
   }
   body.mobile-touch #quest-log-window,
   body.mobile-touch #quest-dialog {
@@ -9826,6 +9901,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+
+  body.mobile-touch #death-recap-dialog {
+    width: min(520px, calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 20px));
+    max-height: 85vh;
   }
 }
 

@@ -46,7 +46,8 @@ export interface ActionBarBindControllerDeps {
   actionName: (actionId: string) => string;
   /** Close the options window: the mode plays out on the live bar, not in a menu. */
   closeOptions: () => void;
-  /** Where the banner mounts (#actionbar-stack). */
+  /** Where the banner mounts: the HUD root (#ui), never #actionbar-stack (a
+   *  moved bar is reparented to #ui and would paint over a stack child). */
   bannerParent: () => HTMLElement | null;
   /** Mark the selected slot (or none) and whether the mode is active at all. */
   syncSlotClasses: (selected: number | null, active: boolean) => void;

@@ -524,7 +524,12 @@ const MONOLITHS: MonolithRow[] = [
     // Manager and the release's later extractions compose with the branch's):
     // exact count measured on the MERGED working tree (wc -l after biome),
     // never reconciled by arithmetic. Zero slack.
-    ceiling: 18112,
+    // Re-pinned at the third release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the 2026-09-26 release batch's
+    // extractions compose with the branch's): exact count measured on the
+    // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
+    // Zero slack.
+    ceiling: 18088,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -952,8 +957,27 @@ const MONOLITHS: MonolithRow[] = [
     // shake math into camera_impact_core.ts (fiestaShakeX/Y); then LOWERED
     // 12790 -> 12789 when the Warrior kit textures moved to demand loading
     // (the boot-time sheet upload loop and its comment went, the kit host
-    // gained its assets line). Exact count.
-    ceiling: 12789,
+    // gained its assets line). LOWERED 12789 -> 12788 by Colorblind Mode: the
+    // setHazardPaletteMode forwarder came in, paid for by moving the travel-form
+    // speed sampling (groundSpeedFromFrame, trackLocalPos, hasTravelFormAura)
+    // into travel_speed_fx.ts and the hazard-painter rebuild into
+    // NythraxisMechanicVisuals.setPaletteMode. Exact count.
+    // LOWERED 12789 -> 12761 when the point-light pads and the bounded prewarm
+    // pad re-pin went: the carriers (src/render/point_light_carriers.ts) pin
+    // the count now; then 12761 -> 12758 when the fx and placed-GLB lights
+    // shared one registration seam object. Measured at 12757 after the
+    // PR #4177 release-line merge kept both the Colorblind Mode extraction and
+    // the packed point-light carrier seam. Exact count.
+    // LOWERED 12789 -> 12771: a started prewarm entry's run, progress and
+    // partial remainder moved into runStartedPrewarmEntry (prewarm_entry.ts),
+    // one fail-soft unit so a throwing progress() cannot end the manifest.
+    // LOWERED 12771 -> 12765: the lazy cast stand-ins' boot slot moved into
+    // castVfxStandInSlot (cast_vfx_prewarm.ts), whose resume link records the
+    // settle the cast gate reads.
+    // Lowered 12765 -> 12696: PR #4220's AoE ring slot builder and cast-gate
+    // predicate wiring landed with the candidate's release-line extractions.
+    // Exact count, zero slack.
+    ceiling: 12696,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1156,7 +1180,12 @@ const MONOLITHS: MonolithRow[] = [
     // Manager and the release's later extractions compose with the branch's):
     // exact count measured on the MERGED working tree (wc -l after biome),
     // never reconciled by arithmetic. Zero slack.
-    ceiling: 11723,
+    // Re-pinned at the third release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the 2026-09-26 release batch's
+    // extractions compose with the branch's): exact count measured on the
+    // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
+    // Zero slack.
+    ceiling: 11647,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1368,8 +1397,19 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    // Frame layout extraction: bank the reduced coordinator size.
-    ceiling: 11260,
+    // LOWERED 11276 -> 11176 at this release-line reconcile: the Discord
+    // OAuth flow and delve self-motion wiring compose with the character-select
+    // lockout extraction below both parent pins. wc -l on the merged tree.
+    // Exact count, zero slack.
+    // LOWERED 11176 -> 11166 after #4158's target-aura placement merge:
+    // the buff/debuff row direction cases moved out to src/ui/aura_bar_side.ts
+    // (with the targetAurasBelowFrame side case riding the same helper), so
+    // the coordinator ends smaller. wc -l on the merged tree. Exact count,
+    // zero slack.
+    // Colorblind Mode's interface body-class extraction also composes with
+    // those release-line extractions. Release reconciliation: measured merged
+    // tree at 11140 lines, preserving both extraction sets.
+    ceiling: 11140,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1597,12 +1637,10 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
     // projection moved to server/equipped_instance_wire.ts, composed with the
     // release extractions above. Exact merged count, zero slack.
-    // LOWERED 9993 -> 9934 at World PvP (the /pvp flag): the per-entity wire
-    // fragment cache shapes and the two JSON splicers moved to
-    // server/entity_wire_cache.ts, paying for the flag's dispatch case, its
-    // entity wire bit and the wpvp self key; the one-use delay() helper was
-    // inlined to pay for the /pvp command-lane claim. Measured with
-    // wc -l < server/game.ts after biome. Exact count, zero slack.
+    // LOWERED 9979 -> 9934 at this release-line reconcile: the guild-bank
+    // autosave stall and release loot-quality reductions compose below both
+    // parent pins. wc -l on the merged tree. Exact count, zero slack.
+    // Release reconciliation: measured merged tree, preserving both extraction sets.
     // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
     // quest/death record arms of the event drain moved to
     // server/event_record_observers.ts (which also hosts the new craftRoll
@@ -1616,7 +1654,12 @@ const MONOLITHS: MonolithRow[] = [
     // Manager and the release's later extractions compose with the branch's):
     // exact count measured on the MERGED working tree (wc -l after biome),
     // never reconciled by arithmetic. Zero slack.
-    ceiling: 9900,
+    // Re-pinned at the third release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the 2026-09-26 release batch's
+    // extractions compose with the branch's): exact count measured on the
+    // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
+    // Zero slack.
+    ceiling: 9832,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1770,6 +1813,8 @@ const MONOLITHS: MonolithRow[] = [
     // decision (the hold, its ack release, the valve) moved to
     // src/net/target_echo.ts, banking the 52 lines of slack the row already
     // carried with it. Measured with wc -l < src/net/online.ts after biome.
+    // RE-CONFIRMED at the v0.44 release-line reconciliation after trimming
+    // duplicated coordinator prose. Exact formatted count remains 5426.
     // Exact count, zero slack.
     // Weekly Vault (PR 4052) integration on the world-quests branch: the
     // guild-bank self-decode moved to src/net/bank_snapshot_wire.ts (ours 5433
@@ -1780,7 +1825,12 @@ const MONOLITHS: MonolithRow[] = [
     // Manager and the release's later extractions compose with the branch's):
     // exact count measured on the MERGED working tree (wc -l after biome),
     // never reconciled by arithmetic. Zero slack.
-    ceiling: 5403,
+    // Re-pinned at the third release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the 2026-09-26 release batch's
+    // extractions compose with the branch's): exact count measured on the
+    // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
+    // Zero slack.
+    ceiling: 5378,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1817,7 +1867,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the castle pad chain and the Last Spring bank left with the castle (keep_site.ts holds the new pad). Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 5216,
+    // LOWERED 5216 -> 5194: the Gardenwalk west pass moved to its Thornpeak
+    // sibling leaf thornpeak_walk_grades.ts, paying for the hillside pocket
+    // grade's region-gated call beside it. Exact count, zero slack.
+    ceiling: 5194,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2227,6 +2280,10 @@ const MONOLITHS: MonolithRow[] = [
     // (That target, the bonus-slots footer, SHIPPED in Bank Storage phase 17
     // alongside ruling 30's controller; the current one is named at the end of
     // this row.)
+    // Re-pinned at the third release/v0.44.0 base merge into
+    // integration/world-quests-v0440: the release's vault search caret restore
+    // (restoreSearchCaret) composes with the branch's tree. wc -l on the merged
+    // tree. Exact count, zero slack.
     file: 'src/ui/bank_window.ts',
     // LOWERED 2127 -> 2124 by Bank Storage phase 16. Making the rung ledger
     // DURABLE needed a line in a file with zero slack, and the wiring paid for
@@ -2300,7 +2357,7 @@ const MONOLITHS: MonolithRow[] = [
     // below both parent pins. Exact merged count, zero slack.
     // Held by extracting the pane tab model and markup to bank_tabs_view.
     // Weekly reward host binding now lives with the weekly pane.
-    ceiling: 1808,
+    ceiling: 1810,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

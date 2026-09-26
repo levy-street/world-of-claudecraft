@@ -12,8 +12,8 @@
 // mob's pull-over rule compares each hate-table ENTRY separately: a combined
 // owner+pet number is measured against a threshold that is never applied to it.
 
-/** The three meters a panel can show. */
-export type MeterTab = 'dmg' | 'heal' | 'threat';
+/** The meters a panel can show. */
+export type MeterTab = 'dmg' | 'heal' | 'dmgTaken' | 'interrupts' | 'deaths' | 'threat';
 
 /** A member's live pets, needed because pet hate folds into the owner column. */
 export interface MeterPet {
@@ -26,13 +26,20 @@ export interface MeterRowTally {
   pid: number;
   name: string;
   cls: string | null;
+  spec?: string | null;
   dmg: number;
   heal: number;
+  dmgTaken?: number;
+  absorbed?: number;
+  interrupts?: number;
+  deaths?: number;
   /** damage per mob entity id, the threat fallback for a finished encounter */
   dmgByMob: Map<number, number>;
 }
 
 export interface MeterRow {
+  /** 1-based rank position in the current tab (#1, #2, etc.) */
+  rank: number;
   tally: MeterRowTally;
   /**
    * Set when this row is a PET's own hate row rather than its owner's; the
@@ -49,6 +56,8 @@ export interface MeterRow {
   value: number;
   /** 0..1 of the biggest row, for the bar width */
   fill: number;
+  /** 0..1 of the total sum across all rows, for the displayed percentage */
+  percent: number;
   /** the engaged mob is swinging at exactly this entity */
   hasAggro: boolean;
 }
@@ -69,6 +78,9 @@ export interface MeterRowsInput {
 function valueFor(tally: MeterRowTally, input: MeterRowsInput): number {
   if (input.tab === 'dmg') return tally.dmg;
   if (input.tab === 'heal') return tally.heal;
+  if (input.tab === 'dmgTaken') return tally.dmgTaken ?? 0;
+  if (input.tab === 'interrupts') return tally.interrupts ?? 0;
+  if (input.tab === 'deaths') return tally.deaths ?? 0;
   // No live hate table (a finished encounter whose mob is gone): fall back to
   // each member's damage on the threat-subject mob. The panel says so; these
   // are damage numbers and must never read as live hate.
@@ -108,13 +120,16 @@ export function buildMeterRows(input: MeterRowsInput): MeterRow[] {
     .filter((row) => row.value > 0)
     .sort((a, b) => b.value - a.value);
   const top = scored[0]?.value ?? 1;
+  const total = scored.reduce((sum, r) => sum + r.value, 0);
   const { aggroPid } = input;
-  return scored.map(({ tally, petName, threatPid, value }) => ({
+  return scored.map(({ tally, petName, threatPid, value }, idx) => ({
+    rank: idx + 1,
     tally,
     petName,
     threatPid,
     value,
-    fill: value / top,
+    fill: top > 0 ? value / top : 0,
+    percent: total > 0 ? value / total : 0,
     // Exactly the entity the mob is swinging at, which is now always a row of
     // its own.
     hasAggro: input.tab === 'threat' && aggroPid !== null && aggroPid === threatPid,

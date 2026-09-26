@@ -13305,7 +13305,7 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Na 8 s je další nepřátelský zásah proti tobě zodpovězen: až {buff} poškození je odepřeno a vráceno útočníkovi jako Svaté poškození a ty získáš 1 Oddanost. Zodpovězen je pouze jeden úder. Vzestup zvýší množství, které dokáže zodpovědět, o 50%.',
   'entities.abilities.final_edict.description':
-    'Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc uvolní Svatou explozi kolem tebe.',
+    'Zasadí drtivý úder zbraní a získá 1 Oddanost, když způsobí poškození. Úspěšný zásah zkrátí zbývající obnovu Pádu úsvitu o 2 s. Úspěšné automatické útoky a zásahy Posledního ediktu mají 15% šanci udělit Hněv úsvitu na 8 s. Vzestup navíc kolem tebe uvolní explozi způsobující fyzické poškození.',
   'entities.abilities.grace_devotion.description':
     'Ty a členové skupiny obnovujete 15 many každých 5 s a platíte o 3% méně many po dobu 30 min. Nahrazuje tvou vlastní Zářivou oddanost nebo Oddanost úsvitu, ale koexistuje s Oddanostmi jiných paladinů.',
   'entities.abilities.guardian_covenant.description':
@@ -14870,9 +14870,9 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Úder Zahaleného ostří způsobuje trojnásobné poškození místo dvojnásobného.',
   'entities.itemSets.ashveil.name': 'Roucho Popelavého závoje',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Záchrana Serafínské bdělosti léčí za 270 místo 180. Utržené poškození již nezpožďuje sesílání kouzel.',
+    'Obnovení zdraví kouzly Šeptaná modlitba, Slavnostní modlitba nebo Naléhavá modlitba zvýší léčení příštího kouzla Sborové zacelení o 10 %, až na 3 vrstvy. Každé seslání přidá nejvýše jednu vrstvu. Sborové zacelení po dokončení sesílání spotřebuje všechny vrstvy. Utrpěné poškození již nezdržuje sesílání kouzel.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Po spuštění Serafínské bdělosti je její spojenec po dobu 10 s léčen za 15 procent svého maximálního zdraví.',
+    'Dokončení kouzla Sborové zacelení se 3 vrstvami způsobí, že příští Šeptaná modlitba použitá do 60 sekund bude okamžitá a vyléčí o 100 % více. Tento účinek se nesčítá; opětovné získání obnoví jeho trvání.',
   'entities.itemSets.benison_dawnweave.name': 'Požehnaná úsvitová tkanina',
   'entities.itemSets.chronoweave.bonus2':
     'Časová ozvěna převádí 50 procent tvého arkánního poškození jediného cíle na léčení. Utržené poškození již nezpožďuje sesílání kouzel.',
@@ -17155,4 +17155,12 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
     'Edit Frames také uvolní panel Dialogue, který nese mluvený řádek NPC, když je NPC mimo váš dohled; nosí svůj jmenný čip, zatímco je uvolněný.',
   'guide.settingsPage.keybindsWheelBody':
     'Samotné kolo také vázne. Zoom Camera In a Zoom Camera Out jsou obyčejná vázání, která ve výchozím nastavení sedí na holém kolečku, takže je můžete přesunout na Ctrl plus kolečko nebo na klávesy a pak otáčením uvolněného kolečka spouštět sloty akční lišty. Zářez kola nemá žádné uvolnění, takže nemůže řídit drženou akci, jako je pohyb vpřed.',
+  'guide.settingsPage.ifColorblindMode':
+    'Přebarví podlahové hrozby Nythraxisu (zásahový kruh Hrobové erupce, kaluže Hrobového plamene a Duševního ohně, linii Hrobového ohně a značky Rozervání duše) na paletu vhodnou pro barvoslepé, s odlišnými odstíny a jasem, aby překrývající se kruhy zachovaly viditelné okraje. Velikosti, časovače ani pozice se nemění.',
+  'hud.options.colorblindMode': 'Režim pro barvoslepé',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -235,28 +235,38 @@ export function moveSpeedMult(e: Entity, extraSpeedPct = 0): number {
   if (e.ghost) return GHOST_RUN_MULT;
   let slow = 1,
     speed = 1,
-    cargo = 1;
+    cargo = 1,
+    formPassive = 1;
   const slowImmune =
     isVeilboundMarchActive(e) || e.auras.some((aura) => aura.kind === 'slow_immunity');
   for (const a of e.auras) {
     if ((!slowImmune && a.kind === 'slow') || a.kind === 'stealth') slow = Math.min(slow, a.value);
     // Speed buffs and travel forms carry a 1+fraction multiplier (1.4 = +40%).
+    // Temporary speed buffs never stack with each other: the strongest applies
+    // (Dash over Loping Stride, never Dash times Loping Stride).
     if (a.kind === 'buff_speed' || a.kind === 'form_travel' || a.kind === 'form_fireball') {
       speed = Math.max(speed, a.value);
     }
     // Fury Enrage: +10% move speed (non-stacking with other speed buffs).
     if (a.kind === 'enrage') speed = Math.max(speed, ENRAGE_MOVE_MULT);
     // Druid Cat Form: +15% passive move speed. form_cat's value is the threat
-    // multiplier, not a speed, so the constant is what rides the max.
-    if (a.kind === 'form_cat') speed = Math.max(speed, CAT_FORM_MOVE_MULT);
+    // multiplier, not a speed, so the constant is what rides here. The form
+    // passive is its own layer that MULTIPLIES the strongest buff (a Cat that
+    // Dashes runs at 1.15 x 1.5), so a Cat-only sprint is never a downgrade
+    // of the form's own bonus.
+    if (a.kind === 'form_cat') formPassive = CAT_FORM_MOVE_MULT;
     if (a.id === WORLD_QUEST_DELIVERY_AURA_ID && a.kind === 'world_quest_cargo') {
       cargo = Math.min(cargo, WORLD_QUEST_DELIVERY_SPEED_MULT);
     }
   }
+  speed *= formPassive;
   // Mounted travel: the active ground mount rides the entity mirror (mountKey,
   // synced over the wire like skin), so the online self-extrapolator predicts
-  // mounted speed in lockstep with the server. Additive with buff_speed like
-  // the Fiesta augment below; slows still bite multiplicatively.
+  // mounted speed in lockstep with the server. Additive on top of the buff
+  // times form-passive product, like the Fiesta augment below (mounting strips
+  // every form, so in play the passive is 1 here). The whole expression is
+  // slow * (max(buffs) * formPassive + mountPct + extraSpeedPct); slows still
+  // bite multiplicatively.
   if (e.mountKey) speed += mountMoveSpeedPct(e.mountKey);
   // Fiesta move-speed augments (only ever non-zero inside a Fiesta bout).
   if (extraSpeedPct) speed += extraSpeedPct;

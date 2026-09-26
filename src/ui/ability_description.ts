@@ -33,6 +33,10 @@ import {
 } from './ability_damage';
 import { formatAbilityImbueDamage } from './ability_imbue_text';
 import type { AuraEffectInput } from './aura_effect';
+import {
+  dawnreaverTooltipValues,
+  primaryDamageTooltipRange,
+} from './dawnreaver_damage_tooltip_core';
 import { type AbilitySpecNoteField, tEntity, tEntityOptional } from './entity_i18n';
 import { formatNumber, type InterpolationValues, t } from './i18n';
 
@@ -54,6 +58,10 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
   };
   const primary = abilityPrimaryEffect(res);
   if (primary) {
+    if ((res.outputScaling?.primaryDamage ?? 1) !== 1) {
+      const combined = primaryDamageTooltipRange(res, primary, scaling);
+      if (combined) return abilityAmountRange(combined.min, combined.max);
+    }
     switch (primary.type) {
       case 'directDamage': {
         const mult = primary.damageMult ?? 1;
@@ -111,7 +119,7 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
         return '';
       case 'weaponDamage':
       case 'weaponStrike':
-        return formatAbilityNumber(primary.bonus);
+        return formatAbilityNumber(primary.bonus * (res.outputScaling?.primaryDamage ?? 1));
       case 'sunder':
         return formatAbilityNumber(
           SUNDER_ARMOR_PCT_PER_STACK *
@@ -295,6 +303,7 @@ export function abilityDisplayDescription(
   // for Ruincaller 2pc wearers and the base 2 for everyone else.
   const charges = res.charges;
   const echoSingle = res.echoConvertSingle ?? TEMPORAL_ECHO_SINGLE_CONVERSION;
+  const dawnreaver = dawnreaverTooltipValues(res, scaling);
   const values: InterpolationValues = {
     damage: damageText,
     overTime: abilityOverTimeText(res, scaling),
@@ -317,6 +326,23 @@ export function abilityDisplayDescription(
     echoDriverPct: formatAbilityNumber(
       echoSingle * TEMPORAL_ECHO_ROTATION_CONVERSION_MULTIPLIER * 100,
     ),
+    weaponPercent:
+      dawnreaver.weaponPercent === undefined ? '' : formatAbilityNumber(dawnreaver.weaponPercent),
+    edictExplosion: dawnreaver.explosion
+      ? ` ${t('abilityUi.tooltip.edictExplosion', {
+          damage: abilityAmountRange(dawnreaver.explosion.min, dawnreaver.explosion.max),
+          radius: formatAbilityNumber(dawnreaver.explosionRadius ?? 0),
+          cap: formatAbilityNumber(dawnreaver.explosionCap ?? 0),
+        })}`
+      : '',
+    verdictSingleDamage: dawnreaver.verdict
+      ? abilityAmountRange(dawnreaver.verdict.singleMin, dawnreaver.verdict.singleMax)
+      : '',
+    verdictAreaDamage: dawnreaver.verdict
+      ? abilityAmountRange(dawnreaver.verdict.areaMin, dawnreaver.verdict.areaMax)
+      : '',
+    verdictAreaRadius: dawnreaver.verdict ? formatAbilityNumber(dawnreaver.verdict.radius) : '',
+    verdictAreaCap: dawnreaver.verdict ? formatAbilityNumber(dawnreaver.verdict.cap) : '',
   };
   // Cheap Trick retires Gut Punch's stealth requirement. When the RESOLVED ability
   // has dropped it, prefer the stealth-free description variant so the prose stops
@@ -334,9 +360,15 @@ export function abilityDisplayDescription(
   // Spec-aware teaching line: a shared button explains its interaction ONLY
   // for the player's current spec, so a new player never reads another
   // spec's rules on their own tooltip.
+  const description =
+    res.def.id === 'final_edict'
+      ? `${text} ${t('abilityUi.tooltip.edictDamage', values)}${values.edictExplosion}`
+      : dawnreaver.verdict
+        ? `${text} ${t('abilityUi.tooltip.verdictDamage', values)}`
+        : text;
   const note = spec ? res.def.specNotes?.[spec] : undefined;
-  if (!note) return text;
-  return `${text} ${tEntity({
+  if (!note) return description;
+  return `${description} ${tEntity({
     kind: 'ability',
     id: res.def.id,
     field: `specNote_${spec}` as AbilitySpecNoteField,

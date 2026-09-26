@@ -183,8 +183,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // weekly_reward_open; PR 4052) on the quests integration branch: 242/256/14.
 // World PvP adds pvp_flag to both sets (sent by ClientWorld.setWorldPvpFlag,
 // dispatched beside bg_flag), at the second release/v0.44.0 base merge: 243/257/14.
-const EXPECTED_SEND_COUNT = 243;
-const EXPECTED_DISPATCH_COUNT = 257;
+// The third release/v0.44.0 base merge adds the market buy orders (three
+// commands) and guild custom ranks (guild_set_ranks): 247/261/14.
+const EXPECTED_SEND_COUNT = 247;
+const EXPECTED_DISPATCH_COUNT = 261;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

@@ -293,19 +293,56 @@ describe('materialStackFit: payload, marker and separation compatibility', () =>
     expect(plan.appended.map((s) => s.count)).toEqual([1, 1, 1]);
   });
 
-  it('keeps a LOCKED payload one per fresh slot and merges it into nothing', () => {
-    const locked = composed(COPPER, [{ source: A, count: 2 }], { instance: { locked: true } });
+  it('never tops up an existing LOCKED stack, but packs a whole locked stack into a fresh slot up to the normal cap', () => {
+    // Locking a stack is one flag over its WHOLE count (item_lock.ts
+    // setItemLocked locks every unit in place, never peeling one off), so a
+    // locked incoming stack is not a bundle of distinct per-unit identities
+    // the way a charged payload is: it still packs a fresh slot up to the
+    // normal stack cap, exactly like an unlocked stack. Two SEPARATE locked
+    // stacks must still never top up into one another (an anti-taint rule,
+    // since merging would launder which one's provenance a unit came from),
+    // which is the `compatibleMaterialStacks` question this case also covers.
+    const locked = composed(COPPER, [{ source: A, count: 25 }], { instance: { locked: true } });
     const lockedTwin: readonly MaterialStackSlot[] = [
       composed(COPPER, [{ source: B, count: 5 }], { instance: { locked: true } }),
     ];
 
+    // No top-up into the existing (differently sourced) locked stack, however
+    // much room it has left.
     expect(fitOf(lockedTwin, locked, 0)).toBe(0);
-    expect(fitOf(lockedTwin, locked, 1)).toBe(1);
+    // One fresh slot holds a full cap's worth, not one unit.
+    expect(fitOf(lockedTwin, locked, 1)).toBe(STACK);
+    expect(fitOf(lockedTwin, locked, 2)).toBe(25);
 
     const plan = planOf(lockedTwin, locked, 2);
     expect(plan.replacements).toEqual([]);
-    expect(plan.appended.map((s) => s.count)).toEqual([1, 1]);
+    expect(plan.appended.map((s) => s.count)).toEqual([STACK, 5]);
     expect(plan.appended[0].instance).toEqual({ locked: true });
+    expect(plan.appended[1].instance).toEqual({ locked: true });
+  });
+
+  it('splits a MIXED-provenance locked stack across its fresh slots, conserving every bucket', () => {
+    // The provenance-conservation twin of the case above: a locked stack can
+    // still carry real per-source buckets (a locked stack of gathered
+    // material, not just a bare payload), and the default spend order must
+    // split them across the two fresh slots exactly like an UNLOCKED mixed
+    // stack would, with the `locked` flag riding every appended slot.
+    const locked = composed(
+      COPPER,
+      [
+        { source: A, count: 15 },
+        { source: B, count: 10 },
+      ],
+      { instance: { locked: true } },
+    );
+
+    const plan = planOf([], locked, 2);
+    expect(plan.replacements).toEqual([]);
+    expect(plan.appended.map((s) => s.count)).toEqual([STACK, 5]);
+    for (const slot of plan.appended) expect(slot.instance).toEqual({ locked: true });
+    expectCountsAgree(plan);
+    expect(plannedUnits(plan, A)).toBe(15);
+    expect(plannedUnits(plan, B)).toBe(10);
   });
 });
 

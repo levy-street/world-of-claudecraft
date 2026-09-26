@@ -113,6 +113,12 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'market_sweep',
   'market_cancel',
   'market_collect',
+  // The buy-order board: a place fills straight into bags and debits the purse,
+  // a fill escrows bags out. Both arm-marked with market_sweep (below): a
+  // frame the dispatch's own guards refuse never marks. Withdraw touches the
+  // purse only (the light self), so it has no entry.
+  'market_order_place',
+  'market_order_fill',
   'mail_send',
   'mail_take',
   'mail_delete',
@@ -174,6 +180,8 @@ export const HEAVY_SELF_ARM_MARKED_CMDS = new Set<string>([
   'convert_husks',
   'place_feast',
   'market_sweep',
+  'market_order_place',
+  'market_order_fill',
 ]);
 
 /** Whether `cmd` marks the heavy self dirty at RECEIPT (the pre-switch line):

@@ -217,6 +217,7 @@ export const ENTITY_EXCLUDE: ReadonlySet<string> = new Set([
   'weaponSkinLoadout', // cosmetic weapon-skin selection; never read for gameplay
   'weaponSkinId', // render-only resolved weapon-skin mirror
   'equippedItems', // render-only mirror for inspect; sim never reads it for gameplay
+  'specId', // render-only mirror of the talents' spec (meta.talents is sampled) for the tooltip
   'equippedInstances', // render-only mirror (Enchanting); the sim reads the SOURCE (meta.equipmentInstance), never this
   'holderTier', // cosmetic wallet flair; sim never reads it
   'holderBalance',

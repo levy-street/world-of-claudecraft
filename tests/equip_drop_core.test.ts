@@ -931,6 +931,11 @@ describe('resolveDropTargetAt (touch release)', () => {
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'world' });
   });
 
+  it('resolves the touch window backdrop as the world (it dims the canvas under an open sheet)', () => {
+    const el = stubEl('<div id="mobile-window-backdrop"></div>');
+    expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'world' });
+  });
+
   it('is inert over any other surface (releasing over the chat box destroys nothing)', () => {
     const el = stubEl('<div id="chatlog"></div>');
     expect(resolveDropTargetAt(10, 10, () => el)).toEqual({ kind: 'none' });

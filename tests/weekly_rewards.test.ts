@@ -397,10 +397,12 @@ describe('weekly vault choices', () => {
     const batch = meta.weeklyRewards!.vaults[0];
     expect(roll).not.toHaveBeenCalled();
     expect(info.state.vaults[0].choices.every((choice) => !choice.itemId)).toBe(true);
-    roll.mockReturnValueOnce('orb_of_the_last_spring');
+    // circle_of_cinders: a Varkhul Normal off-set ring (the Orb of the Last
+    // Spring moved to the Heroic exclusive slot in the 2026-09-07 re-cut).
+    roll.mockReturnValueOnce('circle_of_cinders');
     const opening = prepareWeeklyRewardOpen(sim.ctx, `${batch.resetAtMs}:0`, pid)!;
     expect(roll).toHaveBeenCalledOnce();
-    expect(roll.mock.calls[0][0]).toContain('orb_of_the_last_spring');
+    expect(roll.mock.calls[0][0]).toContain('circle_of_cinders');
     expect(JSON.stringify(weeklyRewardInfoFor(sim.ctx, pid))).not.toContain(opening.itemId);
     const saved = sim.serializeCharacter(pid)!;
     expect(saved.weeklyRewards!.vaults[0].choices[0]).toEqual({
@@ -631,7 +633,7 @@ describe('weekly vault choices', () => {
   it('unlocks raid pools only at the defeated difficulty and fills every pool for a class', () => {
     expect(weeklyLootPool('raid', 'mage', [0, 0, 0])).toEqual([]);
     expect(weeklyLootPool('raid_heroic', 'mage', [1, 1, 1])).toEqual([]);
-    expect(weeklyLootPool('raid', 'mage', [0, 0, 1])).toContain('orb_of_the_last_spring');
+    expect(weeklyLootPool('raid', 'mage', [0, 0, 1])).toContain('circle_of_cinders');
     for (const pool of WEEKLY_POOL_IDS) {
       const ids = weeklyLootPool(pool, 'mage');
       expect(ids.length).toBeGreaterThan(0);
@@ -726,7 +728,14 @@ describe('weekly activity completion hooks', () => {
         expect(sim.players.get(partyIds[1])!.weeklyRewards!.raids).toEqual(
           meta.weeklyRewards!.raids,
         );
-        expect(sim.players.get(partyIds[2])!.weeklyRewards).toBeUndefined();
+        // Since the release's kill-share re-cut (6b52803ae14: inside a claimed
+        // instance the whole claim footprint shares the kill, so the lockout
+        // and the loot rights always land together) a party member who never
+        // entered is credited with the rest of the claim; only the member who
+        // is leaving stays out.
+        expect(sim.players.get(partyIds[2])!.weeklyRewards!.raids).toEqual(
+          meta.weeklyRewards!.raids,
+        );
         expect(sim.players.get(partyIds[3])!.weeklyRewards).toBeUndefined();
       }
     },

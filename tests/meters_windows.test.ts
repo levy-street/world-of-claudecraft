@@ -13,12 +13,16 @@ import { join } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
 import { Meters } from '../src/ui/meters';
+import { MeterFrame } from '../src/ui/meters_frame';
 import type { IWorld } from '../src/world_api';
 
 const detachedMarkup = (id: string) => `
   <div id="${id}" class="panel mt-panel">
     <div class="panel-title">
       <span class="mt-title-label"></span>
+      <button type="button" class="mt-mode-btn"></button>
+      <button type="button" class="mt-new-window"></button>
+      <button type="button" class="mt-reset"></button>
       <button type="button" class="mt-prev"></button>
       <button type="button" class="mt-next"></button>
       <button type="button" class="mt-close"></button>
@@ -39,6 +43,9 @@ const MARKUP = `
         <button type="button" class="mt-tab" data-tab="heal"></button>
         <button type="button" class="mt-tab" data-tab="threat"></button>
       </span>
+      <button type="button" class="mt-mode-btn"></button>
+      <button type="button" class="mt-new-window"></button>
+      <button type="button" class="mt-reset"></button>
       <button type="button" class="mt-prev"></button>
       <button type="button" class="mt-next"></button>
       <button type="button" class="mt-close"></button>
@@ -50,7 +57,7 @@ const MARKUP = `
   </div>`;
 
 function fakeWorld(): IWorld {
-  const entities = new Map<number, any>();
+  const entities = new Map<number, unknown>();
   entities.set(1, { id: 1, kind: 'player', name: 'Hero', templateId: 'warlock' });
   entities.set(2, { id: 2, kind: 'player', name: 'Pal', templateId: 'priest' });
   entities.set(51, {
@@ -139,6 +146,7 @@ function setup(storage: FakeStorage = new FakeStorage(), mobile = false) {
 describe('detachable meter windows', () => {
   beforeEach(() => {
     document.body.innerHTML = '';
+    MeterFrame.clearActiveFrames();
   });
 
   it('starts with only the tabbed damage window, both detached meters closed', () => {
@@ -498,5 +506,172 @@ describe('detachable meter windows', () => {
     menus[1].select('regroup');
     rightClick('threat');
     expect(menus[2].items[0].act).toBe('separate');
+  });
+
+  it('opens segment selection menu when clicking mt-view and switches fight', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+
+    // Trigger two fights
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.data.endEncounter();
+    meters.onEvent(dmg(1, 200, 'Shadow Bolt'));
+    meters.render(true);
+
+    const titleEl = el('meters-window').querySelector('.mt-view') as HTMLElement;
+    expect(titleEl).not.toBeNull();
+    titleEl.click();
+
+    expect(menus).toHaveLength(1);
+    const menu = menus[0];
+    expect(menu.items.length).toBeGreaterThanOrEqual(3); // Current, Fight 1, All-time
+    expect(menu.items[0].act).toBe('0');
+    expect(menu.items[1].act).toBe('1');
+
+    // Select Fight 1
+    menu.select('1');
+    expect(titleEl.textContent).toContain('1');
+  });
+
+  it('offers new window options when pressing mt-new-window button', () => {
+    const { meters, el, menus, shown } = setup();
+    meters.toggle();
+
+    const newBtn = el('meters-window').querySelector('.mt-new-window') as HTMLElement;
+    expect(newBtn).not.toBeNull();
+    newBtn.click();
+
+    expect(menus).toHaveLength(1);
+    expect(menus[0].items.map((i) => i.act)).toEqual(['heal', 'threat']);
+
+    menus[0].select('heal');
+    expect(shown('heal-window')).toBe(true);
+    expect(meters.isDetached('heal')).toBe(true);
+  });
+
+  it('docks and synchronizes resize between detached meter windows', () => {
+    const storage = new FakeStorage();
+    storage.setItem(
+      'woc_meters_frame_heal',
+      JSON.stringify({ left: 100, top: 100, width: 240, height: 160 }),
+    );
+    const { meters, el } = setup(storage);
+    meters.toggle();
+    meters.popOut('heal');
+    meters.popOut('threat');
+
+    const healEl = el('heal-window');
+    const threatEl = el('threat-window');
+
+    const healGrip = healEl.querySelector('.panel-resize-grip') as HTMLElement;
+    expect(healGrip).not.toBeNull();
+    expect(healEl.style.left).toBe('100px');
+    expect(healEl.style.top).toBe('100px');
+
+    // Move threat adjacent to heal right edge (340px)
+    const threatHandle = (
+      threatEl.matches('.mt-move-handle') ? threatEl : threatEl.querySelector('.mt-move-handle')
+    ) as HTMLElement;
+    expect(threatHandle).not.toBeNull();
+    threatHandle.dispatchEvent(
+      new PointerEvent('pointerdown', { button: 0, clientX: 8, clientY: 8 }),
+    );
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: 345, clientY: 105 }));
+    document.dispatchEvent(new PointerEvent('pointerup'));
+
+    // Threat should snap to 340, 100 and match height 160
+    expect(threatEl.style.left).toBe('340px');
+    expect(threatEl.style.top).toBe('100px');
+    expect(threatEl.style.height).toBe('160px');
+
+    // Resize heal: height grows by 90px (from 160px to 250px)
+    healGrip.dispatchEvent(
+      new PointerEvent('pointerdown', { button: 0, clientX: 340, clientY: 260 }),
+    );
+    document.dispatchEvent(new PointerEvent('pointermove', { clientX: 340, clientY: 350 }));
+    document.dispatchEvent(new PointerEvent('pointerup'));
+
+    // Both should now share the new height (250px)
+    expect(healEl.style.height).toBe('250px');
+    expect(threatEl.style.height).toBe('250px');
+  });
+
+  it('opens mode menu via mt-mode-btn or right-clicking the panel and switches mode', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+
+    const panelEl = el('meters-window');
+    const modeBtn = panelEl.querySelector('.mt-mode-btn') as HTMLElement;
+    expect(modeBtn).not.toBeNull();
+
+    // Click mode button to open mode menu
+    modeBtn.click();
+    expect(menus).toHaveLength(1);
+    const menu = menus[0];
+    expect(menu.items.map((i) => i.act)).toEqual([
+      'dmg',
+      'heal',
+      'dmgTaken',
+      'interrupts',
+      'deaths',
+      'threat',
+    ]);
+
+    // Select deaths mode
+    menu.select('deaths');
+    expect(panelEl.querySelector('.mt-view')?.textContent).toContain('Deaths');
+
+    // Right-clicking the panel also opens the mode menu
+    panelEl.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    expect(menus).toHaveLength(2);
+    menus[1].select('dmgTaken');
+    expect(panelEl.querySelector('.mt-view')?.textContent).toContain('Damage Taken');
+  });
+
+  it('clicking a player row drills down into ability breakdown and back button returns', () => {
+    const { meters, el } = setup();
+    meters.toggle();
+    meters.onEvent(dmg(1, 100, 'Shadow Bolt'));
+    meters.onEvent(dmg(1, 50, 'Corruption'));
+    meters.update();
+    meters.render(true);
+
+    const panelEl = el('meters-window');
+    const backBtn = panelEl.querySelector('.mt-back-btn') as HTMLElement;
+    expect(backBtn).not.toBeNull();
+    expect(backBtn.style.display).toBe('none');
+
+    // Find player row for Hero
+    const rows = panelEl.querySelectorAll('.mt-row');
+    const heroRow = rows[0] as HTMLElement;
+    expect(heroRow.querySelector('.mt-label')?.textContent).toBe('Hero');
+
+    // Click row to drill down into player breakdown
+    heroRow.click();
+    expect(backBtn.style.display).not.toBe('none');
+    expect(panelEl.querySelector('.mt-view')?.textContent).toContain('Hero');
+
+    // Breakdown rows show abilities
+    const abilityRows = panelEl.querySelectorAll('.mt-row');
+    const firstAbility = abilityRows[0] as HTMLElement;
+    expect(firstAbility.querySelector('.mt-label')?.textContent).toBe('Shadow Bolt');
+
+    // Click back button to return to player list
+    backBtn.click();
+    expect(backBtn.style.display).toBe('none');
+    expect(heroRow.querySelector('.mt-label')?.textContent).toBe('Hero');
+  });
+
+  it('right-clicking the reset button opens fight and all-time reset options', () => {
+    const { meters, el, menus } = setup();
+    meters.toggle();
+
+    const panelEl = el('meters-window');
+    const resetBtn = panelEl.querySelector('.mt-reset') as HTMLElement;
+    expect(resetBtn).not.toBeNull();
+
+    resetBtn.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    expect(menus).toHaveLength(1);
+    expect(menus[0].items.map((i) => i.act)).toEqual(['current', 'all']);
   });
 });

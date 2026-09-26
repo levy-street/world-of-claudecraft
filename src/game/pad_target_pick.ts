@@ -101,8 +101,10 @@ export function createPadTargetPick(deps: PadTargetPickDeps): PadTargetPick {
         isAttackableEntity(e, world.playerId, activePvpOpponents);
       // A damage press with an ally held takes the selection rather than refusing:
       // a pad has one target, and FFXIV's auto-target does exactly this. Re-select
-      // the ally afterwards, the same as a mouse player would.
-      if (!shouldAutoTarget(ability, !!targeted && attackable(targeted))) return;
+      // the ally afterwards, the same as a mouse player would. A dual-purpose heal
+      // with a living player ally held is a heal on that ally, so it keeps them.
+      const allyHeld = targeted?.kind === 'player' && !targeted.dead && !attackable(targeted);
+      if (!shouldAutoTarget(ability, !!targeted && attackable(targeted), allyHeld)) return;
       const picked = nearestAutoTarget(world.entities.values(), world.player.pos, (e) =>
         attackable(e as Entity),
       );

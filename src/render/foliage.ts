@@ -115,6 +115,7 @@ import {
   buildGroundDecorPrewarmTwins,
   registerGroundDecorPrewarmDraw,
 } from './ground_decor_prewarm';
+import { ghostHideGeometry, withInstancedDitherFade } from './instanced_dither_fade';
 import { InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
   advanceInstanceCountInto,
@@ -985,6 +986,7 @@ function foliageMaterial(
   // (needle/leaf break-up) instead; unknown names no-op inside.
   applyCanopyDetail(mat, src.name);
   if (pol.leaf && std.map) reuseLeafMapSampleForEmissive(mat);
+  if (role === 'tree') withInstancedDitherFade(mat);
   materialCache.set(key, mat);
   return mat;
 }
@@ -1309,7 +1311,6 @@ const up = new THREE.Vector3(0, 1, 0);
 const v = new THREE.Vector3();
 const sv = new THREE.Vector3();
 const c = new THREE.Color();
-const zeroScale = new THREE.Vector3(0, 0, 0);
 
 type MutableShadowVolume = {
   -readonly [K in keyof ShadowVolumeInput]: ShadowVolumeInput[K];
@@ -1611,13 +1612,12 @@ function placeSpecies(
     for (const part of spec.sets[subset[gi]]) {
       const { barkFar } = lodDists();
       for (const group of handlesByLod) {
-        const im = new THREE.InstancedMesh(part.geometry, part.material, group.items.length);
+        const n = group.items.length;
+        const im = new THREE.InstancedMesh(ghostHideGeometry(part.geometry, n), part.material, n);
         group.items.forEach((d, i) => {
           treeInstanceMatrix(d, spec, seed, m);
           im.setMatrixAt(i, m);
-          const visibleMatrix = new THREE.Matrix4().copy(m);
-          const hiddenMatrix = new THREE.Matrix4().copy(m).scale(zeroScale);
-          group.handles[i].parts.push({ mesh: im, index: i, visibleMatrix, hiddenMatrix });
+          group.handles[i].parts.push({ mesh: im, index: i, visibleMatrix: m.clone() });
           if (part.isLeaf) {
             const hex = typeof spec.leafTint === 'number' ? spec.leafTint : spec.leafTint[d.biome];
             im.setColorAt(i, softTint(d.x, d.z, hex, c, leafSoften(d.biome)));
@@ -1643,7 +1643,8 @@ function placeSpecies(
         const maxDist = numericCaps.length > 0 ? Math.min(...numericCaps) : undefined;
         register(im, group.lod, undefined, maxDist, { max: true });
         if (GFX.standardMaterials && !impostorsActive() && !part.isLeaf && spec.farTrunkProxy) {
-          const proxy = cloneInstancedTo(im, farTrunkGeo(part.geometry), part.material);
+          const proxyGeo = ghostHideGeometry(farTrunkGeo(part.geometry), n);
+          const proxy = cloneInstancedTo(im, proxyGeo, part.material);
           proxy.receiveShadow = true;
           for (let i = 0; i < group.items.length; i++) {
             const source = group.handles[i].parts[group.handles[i].parts.length - 1];
@@ -1651,7 +1652,6 @@ function placeSpecies(
               mesh: proxy,
               index: i,
               visibleMatrix: source.visibleMatrix,
-              hiddenMatrix: source.hiddenMatrix,
             });
           }
           parent.add(proxy);

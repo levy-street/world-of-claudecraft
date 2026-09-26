@@ -1049,7 +1049,6 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
       'combineAuraFrames',
       'moveTargetOfTargetIndependently',
       'hideUnusedActionSlots',
-      'mouseoverCast',
       'lockActionBars',
     ]);
   });

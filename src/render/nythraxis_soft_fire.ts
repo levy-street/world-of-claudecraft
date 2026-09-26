@@ -14,8 +14,8 @@
 
 import * as THREE from 'three';
 import { FLAME_ATLAS_FRAMES, FLAME_ATLAS_GLSL, getFlameTex } from './ignivar_fire_vfx';
+import { type HazardPaletteMode, nythraxisSoftFireRamp } from './nythraxis_hazard_palette_core';
 import {
-  NYTHRAXIS_SOFT_FIRE_RAMPS,
   NYTHRAXIS_SOFT_FIRE_SHAPES,
   type NythraxisSoftFireKind,
   nythraxisSoftFireSeed,
@@ -117,10 +117,16 @@ export class NythraxisSoftFire {
   private readonly alongs: THREE.InstancedBufferAttribute;
   private time = 0;
 
-  constructor(kind: NythraxisSoftFireKind, count: number, name: string, renderOrder: number) {
+  constructor(
+    kind: NythraxisSoftFireKind,
+    count: number,
+    name: string,
+    renderOrder: number,
+    paletteMode: HazardPaletteMode = 'classic',
+  ) {
     this.kind = kind;
     this.count = count;
-    const ramp = NYTHRAXIS_SOFT_FIRE_RAMPS[kind];
+    const ramp = nythraxisSoftFireRamp(kind, paletteMode);
     const shape = NYTHRAXIS_SOFT_FIRE_SHAPES[kind];
 
     const geometry = new THREE.InstancedBufferGeometry();

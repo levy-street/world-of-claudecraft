@@ -69,6 +69,7 @@ import {
   marketItemMatches,
 } from './market_filters';
 import { marketNameColor } from './market_name_color';
+import { MarketOrdersPanel } from './market_orders_panel';
 import { marketPriceHtml } from './market_price_view';
 import { localizedMarketSearch } from './market_search_localized_core';
 import { sweepEligibleRow } from './market_sweep_core';
@@ -79,7 +80,8 @@ import {
   COPPER_PER_SILVER,
   type MarketBrowseBody,
   type MarketCollectBody,
-  type MarketCollectSaleRow,
+  type MarketHistoryBody,
+  type MarketSaleRow,
   type MarketSellBody,
   type MarketSellMeta,
   type MarketSubtypeKind,
@@ -92,7 +94,7 @@ import {
   attachMaterialSourcesContextMenu,
   closeMaterialSourcesDialogForOwner,
 } from './material_sources_dialog';
-import { materialSourcesForDisplay } from './material_sources_view';
+import { materialFungibleUnitCount, materialSourcesForDisplay } from './material_sources_view';
 import type { PainterHostPresentation } from './painter_host';
 import { svgIcon } from './ui_icons';
 import { wornItemCellParts } from './worn_item_cell_view';
@@ -194,6 +196,20 @@ export class MarketWindow {
     repaint: () => this.renderContent(),
   });
 
+  // The Wanted tab (market_orders_panel.ts): the buy-order board, its place
+  // card, and the not-on-the-market strip. Same dep shape as the sweep card.
+  private readonly orders = new MarketOrdersPanel({
+    itemIcon: (item, quality) => this.deps.itemIcon(item, quality),
+    moneyHtml: (copper) => this.deps.moneyHtml(copper),
+    itemTooltip: (item, instance, sources) => this.deps.itemTooltip(item, instance, sources),
+    attachTooltip: (el, build) => this.deps.attachTooltip(el, build),
+    world: () => this.deps.world(),
+    showError: (text) => this.deps.showError(text),
+    confirmDialog: (title, body, ok, cancel, onOk) =>
+      this.deps.confirmDialog(title, body, ok, cancel, onOk),
+    fungibleBagCount: (itemId) => this.fungibleBagCount(itemId),
+  });
+
   constructor(private readonly deps: MarketWindowDeps) {}
 
   get isOpen(): boolean {
@@ -245,6 +261,7 @@ export class MarketWindow {
     this.sellInstance = null;
     this.pushSellPriceCheck();
     this.sweep.clear(false);
+    this.orders.reset();
     root.style.display = 'none';
     this.deps.hideTooltip();
     document.body.classList.remove('market-open');
@@ -370,6 +387,7 @@ export class MarketWindow {
       return;
     }
     if (this.tab === 'browse') this.sweep.refresh(this.deps.root());
+    if (this.tab === 'orders') this.orders.refresh();
     const sig = JSON.stringify([
       this.tab,
       this.itemTypeFilter,
@@ -392,6 +410,12 @@ export class MarketWindow {
       // this the open Collect tab would never repaint to show its row.
       info?.collectionSales,
       info?.collectionSalesOmitted,
+      // The Wanted tab's own axes: the board, the viewer's cap use, and the
+      // unlisted strip (bag counts ride the inventory, which the rows read live).
+      info?.orders,
+      info?.myOrderCount,
+      info?.unlistedMaterials,
+      this.tab === 'orders' ? this.deps.world().inventory : null,
     ]);
     if (sig === this.lastSig) return;
     this.lastSig = sig;
@@ -473,6 +497,8 @@ export class MarketWindow {
     const tabLabel = (id: MarketTab): string => {
       if (id === 'browse') return t('itemUi.market.browse');
       if (id === 'sell') return t('itemUi.market.sell');
+      if (id === 'orders') return t('itemUi.market.ordersTab');
+      if (id === 'history') return t('itemUi.market.history');
       const n = marketCollectBadgeCount(info);
       return n > 0
         ? t('itemUi.market.collectWithCount', {
@@ -501,7 +527,9 @@ export class MarketWindow {
       `<div class="mkt-tabs ui-tabs">` +
       tab('browse') +
       tab('sell') +
+      tab('orders') +
       tab('collect') +
+      tab('history') +
       `</div>` +
       `<div class="mkt-layout${this.tab === 'browse' ? '' : ' mkt-layout-wide'}">${controlsHtml}<div id="market-body"></div></div>` +
       (this.tab === 'browse'
@@ -534,6 +562,7 @@ export class MarketWindow {
         // Leaving Browse drops the staged sweep: nothing paints it elsewhere, and
         // a quote nobody reads must not stay staged server-side.
         if (next !== 'browse') this.sweep.clear(false);
+        if (next !== 'orders') this.orders.reset();
         this.tab = next;
         this.browsePage = 0;
         this.lastSig = '';
@@ -755,7 +784,15 @@ export class MarketWindow {
       this.renderSell(body, view.body, view.meta);
       return;
     }
-    this.renderCollect(body, view.body);
+    if (view.kind === 'orders') {
+      this.orders.mount(body);
+      return;
+    }
+    if (view.kind === 'collect') {
+      this.renderCollect(body, view.body);
+      return;
+    }
+    this.renderHistory(body, view.body);
   }
 
   private renderBrowse(body: HTMLElement, view: MarketBrowseBody): void {
@@ -910,6 +947,14 @@ export class MarketWindow {
         else this.promptBuy(l, parts.ariaName);
       });
       row.appendChild(btn);
+      if (!l.mine && l.count > 1) {
+        // A bulk stack need not be bought whole: a small quantity field beside
+        // the Buy button lets the buyer take just a few units instead (defaults
+        // to 1, so leaving it untouched is a one-click "buy one" action). The
+        // sell tab's #mkt-qty field is the precedent; this one is per-row, so it
+        // is selected by class, never a document-wide id.
+        row.appendChild(this.buildPartialBuyControl(l, parts.ariaName));
+      }
       if (sweepEligibleRow(l)) {
         // Market Sweep: buy this item across many sellers' listings at once. Only
         // a plain, fungible, someone-else's row can stage one (the sim planner's
@@ -985,22 +1030,35 @@ export class MarketWindow {
 
   // The Browse tab's buy gate. It captures the row's terms in the pure core and
   // states them in Hud's one modal confirm prompt; nothing is sent until OK.
-  private promptBuy(listing: MarketListingView, itemName: string): void {
-    const pending = marketBuyConfirm(listing);
-    // A stack quotes both the total ask and the per-unit ask the row showed, so the
-    // prompt can never read as the price of a single item.
+  // `requestedCount` names a partial buy of a bulk stack (the row's quantity
+  // field); omitted, it buys the listing whole, unchanged from before.
+  private promptBuy(listing: MarketListingView, itemName: string, requestedCount?: number): void {
+    const pending = marketBuyConfirm(listing, requestedCount);
+    // A partial buy states how many of the stack THIS confirm takes, distinct
+    // from a whole-stack buy's body (which states the stack's own count) so the
+    // prompt never reads as "the whole stack" when it is not. A stack (whole or
+    // partial) quotes both the total ask and the per-unit ask the row showed, so
+    // the prompt can never read as the price of a single item.
     const body =
       pending.unitPrice === null
         ? t('itemUi.market.buyConfirmBody', {
             item: itemName,
             price: formatLocalizedMoney(pending.price),
           })
-        : t('itemUi.market.buyConfirmBodyStack', {
-            item: itemName,
-            count: formatNumber(pending.count, { maximumFractionDigits: 0 }),
-            price: formatLocalizedMoney(pending.price),
-            each: formatLocalizedMoney(pending.unitPrice),
-          });
+        : pending.buyCount < pending.count
+          ? t('itemUi.market.buyConfirmBodyPartial', {
+              item: itemName,
+              count: formatNumber(pending.buyCount, { maximumFractionDigits: 0 }),
+              total: formatNumber(pending.count, { maximumFractionDigits: 0 }),
+              price: formatLocalizedMoney(pending.buyPrice),
+              each: formatLocalizedMoney(pending.unitPrice),
+            })
+          : t('itemUi.market.buyConfirmBodyStack', {
+              item: itemName,
+              count: formatNumber(pending.count, { maximumFractionDigits: 0 }),
+              price: formatLocalizedMoney(pending.price),
+              each: formatLocalizedMoney(pending.unitPrice),
+            });
     this.deps.confirmDialog(
       t('itemUi.market.buyConfirmTitle'),
       body,
@@ -1008,6 +1066,39 @@ export class MarketWindow {
       t('itemUi.market.buyConfirmCancel'),
       () => this.commitBuy(pending),
     );
+  }
+
+  // A per-row quantity field plus its own Buy trigger, for taking fewer than a
+  // bulk listing's whole stack. Defaults to 1 (leaving it untouched buys one
+  // unit), bounded [1, l.count]; at l.count it behaves exactly like the row's
+  // main Buy button (marketBuyConfirm treats a requestedCount at or above the
+  // stack size as a whole-stack buy). Selected by CLASS, never an id: Browse
+  // renders one of these per bulk row, unlike the Sell tab's single #mkt-qty.
+  private buildPartialBuyControl(listing: MarketListingView, itemName: string): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'mkt-buy-partial';
+    const input = document.createElement('input');
+    input.className = 'mkt-buy-partial-qty coininput ui-input';
+    input.type = 'number';
+    input.min = '1';
+    input.max = String(listing.count);
+    input.value = '1';
+    input.setAttribute(
+      'aria-label',
+      t('itemUi.market.buyQuantityAria', { item: itemName, total: listing.count }),
+    );
+    wrap.appendChild(input);
+    const qtyBtn = document.createElement('button');
+    qtyBtn.className = 'mkt-buy-partial-btn ui-btn ui-btn--red';
+    qtyBtn.textContent = t('itemUi.market.buy');
+    qtyBtn.setAttribute('aria-label', t('itemUi.market.buyQuantityBtnAria', { item: itemName }));
+    qtyBtn.addEventListener('click', () => {
+      audio.click();
+      const requested = Math.max(1, Math.min(listing.count, Number.parseInt(input.value, 10) || 1));
+      this.promptBuy(listing, itemName, requested);
+    });
+    wrap.appendChild(qtyBtn);
+    return wrap;
   }
 
   // OK pressed: re-resolve the captured listing against the LIVE snapshot before
@@ -1024,7 +1115,14 @@ export class MarketWindow {
       );
       return;
     }
-    this.deps.world().marketBuy(pending.listingId);
+    // A whole-stack buy sends no count (byte-identical to the pre-partial-buy
+    // wire shape); a partial buy names exactly how many.
+    this.deps
+      .world()
+      .marketBuy(
+        pending.listingId,
+        pending.buyCount < pending.count ? pending.buyCount : undefined,
+      );
     audio.coin();
   }
 
@@ -1162,7 +1260,6 @@ export class MarketWindow {
       row.innerHTML = `<span>${esc(t('itemUi.market.saleProceeds'))}</span><span class="mkt-price ui-money">${this.deps.moneyHtml(view.proceeds)}</span>`;
       body.appendChild(row);
     }
-    this.renderCollectSales(body, view.sales, view.salesOmitted);
     for (const { item, count, instance } of view.rows) {
       // Returned goods keep their copy identity: the name color and the icon
       // rim both read the instance-effective quality (the all-surfaces rule).
@@ -1189,15 +1286,19 @@ export class MarketWindow {
     body.appendChild(btn);
   }
 
-  // The itemized ledger under the proceeds line: what sold, to whom, and for how
-  // much, so the single gold figure above is accountable. Sits between the purse
-  // and the returned-goods rows because it explains the purse, not the goods.
-  private renderCollectSales(
-    body: HTMLElement,
-    sales: MarketCollectSaleRow[],
-    omitted: number,
-  ): void {
-    if (sales.length === 0 && omitted === 0) return;
+  // The History tab: the itemized ledger of what sold, to whom, and for how much
+  // (issue: "Different tab for All sales history"), split out of Collect so a
+  // sale stays visible here after its proceeds are claimed on the Collect tab.
+  private renderHistory(body: HTMLElement, view: MarketHistoryBody): void {
+    if (view.state === 'empty') {
+      body.innerHTML = `<div class="mkt-empty">${esc(t('itemUi.market.historyEmpty'))}</div>`;
+      return;
+    }
+    body.innerHTML = `<div class="mkt-note">${esc(t('itemUi.market.historyNote'))}</div>`;
+    this.renderSalesList(body, view.sales, view.salesOmitted);
+  }
+
+  private renderSalesList(body: HTMLElement, sales: MarketSaleRow[], omitted: number): void {
     const list = document.createElement('div');
     list.className = 'mkt-sale-list';
     for (const { item, itemName, count, proceeds, buyerName } of sales) {
@@ -1238,13 +1339,14 @@ export class MarketWindow {
 
   // Fungible stock only: the plain listing form's quantity cap must match what
   // marketList can actually escrow (an instanced copy is never swept into a
-  // bulk listing), or a qty above the fungible stock just bounces off the
-  // sim's denial. An instanced staging is single-copy and never reads this.
+  // bulk listing, and a material stack's premium/signed buckets never are
+  // either), or a qty above the fungible stock just bounces off the sim's
+  // denial. An instanced staging is single-copy and never reads this.
   private fungibleBagCount(itemId: string): number {
     return this.deps
       .world()
       .inventory.filter((s) => s.itemId === itemId && !s.instance)
-      .reduce((n, s) => n + s.count, 0);
+      .reduce((n, s) => n + materialFungibleUnitCount(s), 0);
   }
 
   // ---- Filter chrome (the browse-tab type/subtype/rarity dropdowns) ----
@@ -1349,10 +1451,12 @@ export class MarketWindow {
         return `<button type="button" class="mkt-select-option ui-chip${selected ? ' sel is-on' : ''}" role="option" tabindex="-1" aria-selected="${selected ? 'true' : 'false'}" data-market-filter-option="${esc(option)}">${esc(optionLabel(option))}</button>`;
       })
       .join('');
+    // The open menu floats over the rows and the other filters, so it wears the strong
+    // panel (the shared gold dropdown's fill), not the translucent in-flow .ui-card plate.
     return (
       `<div class="mkt-filter"><span>${esc(label)}</span><div class="mkt-select" data-market-filter-menu="${menu}">` +
       `<button type="button" class="mkt-select-btn ui-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(t('itemUi.market.filterValueAria', { label, value: current }))}"><span>${esc(current)}</span><span class="mkt-select-chevron" aria-hidden="true"></span></button>` +
-      `<div class="mkt-select-menu ui-card" role="listbox" hidden>${optionHtml}</div>` +
+      `<div class="mkt-select-menu ui-panel-strong" role="listbox" hidden>${optionHtml}</div>` +
       `</div></div>`
     );
   }

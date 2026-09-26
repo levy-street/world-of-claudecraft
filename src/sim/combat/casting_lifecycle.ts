@@ -1,5 +1,7 @@
+import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
 import { gliderActionsLocked } from '../glider_action_lock';
 import { shadowActionsLocked } from '../shadow_action_lock';
+import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
 // This module owns how a cast STARTS (castAbility/castAbilityBySlot: the
@@ -33,15 +35,9 @@ import { isDispellableAura } from '../aura_classify';
 import { nearestAttackerId } from '../auto_acquire_target';
 import { ITEMS, isDelvePos, MOBS, zoneAt } from '../data';
 import { recalcPlayerStats } from '../entity';
-import { isShieldItem } from '../equipment_rules';
 import { instanceInfoAt } from '../instances/dungeons';
 import { forceDismount } from '../mounts';
-import {
-  canActivateDivineAscension,
-  hasDevotion,
-  paladinExecuteWindowActive,
-  spendDevotion,
-} from '../paladin_devotion';
+import { canActivateDivineAscension, hasDevotion, spendDevotion } from '../paladin_devotion';
 import { scalePrimaryHealing } from '../primary_healing';
 import {
   completeCorpseHarvestCast,
@@ -135,8 +131,14 @@ import {
   spendRuin,
 } from './destruction';
 import { extendOwnedDot } from './dot_mutation';
-import { applyDruidFormEntry, druidFormEntryOwed } from './druid_form_entry';
+import {
+  applyDruidFormEntry,
+  druidFormEntryOwed,
+  druidFormEntryPool,
+  druidFormEntryTarget,
+} from './druid_form_entry';
 import { naturesBoonArmedFor, naturesBoonPowerFor } from './druid_natures_boon';
+import { resolveDualPurposeTarget } from './dual_purpose_target';
 import {
   consumeAuraKind,
   consumeFreeCostFor,
@@ -150,6 +152,9 @@ import {
   iceFloesAuraForAbility,
   nextCastCheapMultiplier,
 } from './empower_next';
+import { shieldEquipped } from './equipment_requirement';
+import { executeWindowBlocksCast, executeWindowThreshold } from './execute_threshold';
+import { autoPicksFallenAlly, isFallenGroupMember, pickFallenAlly } from './fallen_ally_target';
 import { meleeReachActor } from './feral_reach';
 import {
   applyAutoUnshift,
@@ -242,6 +247,7 @@ import {
 } from './spell_combat';
 import { resolveHostileSpellResist } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
+import { isToggleBuff, leavingRestrictedToggle } from './toggle_buff';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
   armForbiddenReflection,
@@ -264,21 +270,6 @@ export const COLOSSAL_MIGHT_COOLDOWNS = new Set([
   'mortal_strike',
   'shield_slam',
 ]);
-
-// Forms, stances and stealth are toggles: re-casting cancels the aura, and
-// cancelling is never gated by cost or cooldown (the cooldown gates re-entry).
-function isToggleBuff(ability: AbilityDef): boolean {
-  if (ability.id === 'ghost_wolf') return true;
-  return ability.effects.some(
-    (e) =>
-      e.type === 'selfBuff' &&
-      (isFormAuraKind(e.kind) ||
-        e.kind === 'defensive_stance' ||
-        e.kind === 'stealth' ||
-        e.kind === 'stasis' ||
-        e.healthDrainPctMax !== undefined),
-  );
-}
 
 function isStasisToggle(ability: AbilityDef): boolean {
   return ability.effects.some((effect) => effect.type === 'selfBuff' && effect.kind === 'stasis');
@@ -347,6 +338,18 @@ function chargeState(p: Entity, abilityId: string, bonusCharges: number, cooldow
   state.maxCharges = maxCharges;
   state.rechargeLength = cooldown;
   state.charges = Math.min(Math.max(state.charges, 0), maxCharges);
+  // Keep exactly one running timer per missing use: a grown cap (a pool saved
+  // under a lower cap) would otherwise strand its new slot, because updateTimers
+  // drops the recharge once the timer list empties. A shrunk cap sheds the
+  // longest timers. A legacy pool without timers converts in updateTimers.
+  if (state.recharges) {
+    const missing = maxCharges - state.charges;
+    state.recharges.sort((a, b) => a - b);
+    state.recharges.length = Math.min(state.recharges.length, missing);
+    while (state.recharges.length < missing) state.recharges.push(cooldown);
+    state.recharge = state.recharges[0] ?? 0;
+    if (state.charges <= 0) p.cooldowns.set(abilityId, state.recharge);
+  }
   p.abilityCharges[abilityId] = state;
   return state;
 }
@@ -969,9 +972,7 @@ function resolveDeadAllyTarget(
   const id = overrideId ?? p.targetId;
   if (id === null) return null;
   const t = ctx.entities.get(id);
-  if (!t?.dead || t.kind !== 'player') return null;
-  const party = ctx.partyOf(p.id);
-  return party?.members.includes(t.id) ? t : null;
+  return t && isFallenGroupMember(ctx, p, t) ? t : null;
 }
 
 function vanishedLowBlowFallbackTarget(
@@ -1162,7 +1163,8 @@ export function castAbility(
   // returns the same SHAMAN_SHOCK_COOLDOWN_IDS for those ids), so the shock
   // behavior is unchanged and other shared-cooldown groups ride the same path.
   const sharedCooldown = sharedCooldownIds(ability.id)?.find((id) => p.cooldowns.has(id));
-  const leavingRestrictedToggle = togglingOff && ability.requiresOutsideInstance;
+  // Same predicate the action bar asks, so the exit press never paints greyed.
+  const leavingRestricted = leavingRestrictedToggle(ability, p.auras);
   // Charge-limited abilities (the abilityCharges recharge model, driven by
   // bonusCharges: Double Charge, extra Blink/Frost Nova/Ice Block): a running
   // cooldown is only the RECHARGE timer; the cast is blocked only once every
@@ -1254,40 +1256,45 @@ export function castAbility(
       ? Math.ceil(shamanAdjustedCost * paladinManaCostMultiplier(p))
       : shamanAdjustedCost;
   // A form-entry press (Lunge from Bruin Form) is billed AFTER its shift, so
-  // the live bar here is not the one that pays: entering Cat hands over a full
-  // 100 energy, which always covers Lunge's 40. Weighing it against the rage or
-  // mana it happens to be standing in would refuse a press that is payable.
-  // Only exempt when a shift is actually owed, so a Lunge pressed already in
-  // Cat Form keeps the ordinary energy check.
-  const entersFormOnCast = druidFormEntryOwed(meta, p.auras, ability.id);
+  // the live bar here is not the one that pays: it is weighed against the pool
+  // the shift hands over (a full Cat bar out of combat, the parked energy
+  // mid-fight), never the rage or mana it happens to be standing in. Only when
+  // a shift is actually owed, so a Lunge pressed already in Cat Form keeps the
+  // ordinary energy check.
+  const entryPool = druidFormEntryOwed(meta, p.auras, ability.id)
+    ? druidFormEntryPool(p, ability.id)
+    : null;
   if (
-    castingPool < payableCost &&
+    (entryPool ?? castingPool) < payableCost &&
     (!canCastFree || stormcastArmedForAbility) &&
     !freeBySolarReprisal &&
     !togglingOff &&
-    !entersFormOnCast &&
     !formShiftKind(p, ability)
   ) {
     ctx.error(
       p.id,
       // An auto-unshifting cast was weighed against the parked mana, so it is
-      // mana it is short of, never the rage or energy bar it never touches.
+      // mana it is short of, never the rage or energy bar it never touches; a
+      // form-entry press was weighed against the bar its shift hands over.
       // Every other arm is the ladder this always had.
-      autoUnshift
-        ? 'Not enough mana!'
-        : p.resourceType === 'rage'
-          ? 'Not enough rage!'
-          : p.resourceType === 'energy'
-            ? 'Not enough energy!'
-            : p.resourceType === 'focus'
-              ? 'Not enough Focus!'
-              : 'Not enough mana!',
+      entryPool !== null
+        ? druidFormEntryTarget(ability.id) === 'cat'
+          ? 'Not enough energy!'
+          : 'Not enough rage!'
+        : autoUnshift
+          ? 'Not enough mana!'
+          : p.resourceType === 'rage'
+            ? 'Not enough rage!'
+            : p.resourceType === 'energy'
+              ? 'Not enough energy!'
+              : p.resourceType === 'focus'
+                ? 'Not enough Focus!'
+                : 'Not enough mana!',
     );
     return;
   }
   if (ability.requiresShield) {
-    const offhand = p.equippedItems.offhand;
-    if (!offhand || !isShieldItem(ITEMS[offhand])) {
+    if (!shieldEquipped(p.equippedItems)) {
       ctx.error(p.id, 'You must have a shield equipped.');
       return;
     }
@@ -1394,7 +1401,7 @@ export function castAbility(
     ctx.error(p.id, 'You must be stealthed.');
     return;
   }
-  const restriction = leavingRestrictedToggle ? null : activeCastRestriction(ctx, p, ability);
+  const restriction = leavingRestricted ? null : activeCastRestriction(ctx, p, ability);
   if (restriction) {
     emitActiveCastRestrictionError(ctx, p.id, restriction);
     return;
@@ -1433,10 +1440,19 @@ export function castAbility(
     }
   } else if (ability.requiresTarget && ability.targetsDead) {
     // Combat res: the target must be a DEAD group/raid member (no self-cast fallback),
-    // and their body must be within resurrection reach (range + line of sight).
-    const dead = resolveDeadAllyTarget(ctx, p, castTargetId);
+    // and their body must be within resurrection reach (range + line of sight). An
+    // out-of-combat rez whose press names no fallen ally picks one itself
+    // (fallen_ally_target.ts); the pick is locked in as the cast target below, so
+    // the mid-cast and finish gates re-check the same body.
+    const autoPick = autoPicksFallenAlly(ability);
+    const dead =
+      resolveDeadAllyTarget(ctx, p, castTargetId) ??
+      (autoPick ? pickFallenAlly(ctx, p, resurrectionCastRange(ability.range)) : null);
     if (!dead) {
-      ctx.error(p.id, 'You must target a dead ally in your group.');
+      if (!autoPick) ctx.error(p.id, 'You must target a dead ally in your group.');
+      // The group-rez wording: nothing to raise at all, or nothing within reach.
+      else if (hasDeadGroupMember(ctx, p)) ctx.error(p.id, 'Out of range.');
+      else ctx.error(p.id, 'There are no dead group members to resurrect.');
       return;
     }
     const reach = resurrectionReachError(ctx, p, dead, resurrectionCastRange(ability.range));
@@ -1502,13 +1518,15 @@ export function castAbility(
       }
     }
   } else if (ability.requiresTarget && ability.targetType === 'any') {
-    target = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
-    // Auto-acquire (issue #2787): only when nothing is targeted at all, never
-    // overriding an existing (even stale/invalid) selection.
-    if (!target && p.targetId === null) {
-      target = nearestAttackingMob(ctx, p);
-      if (target) p.targetId = target.id;
-    }
+    // A heal's live friendly party-frame override first, then the current target,
+    // then the auto-acquire below, then self for a heal (dual_purpose_target.ts).
+    target = resolveDualPurposeTarget(ctx, p, castTargetId, ability, () => {
+      // Auto-acquire (issue #2787): only when nothing is targeted at all, never
+      // overriding an existing (even stale/invalid) selection.
+      const attacker = nearestAttackingMob(ctx, p);
+      if (attacker) p.targetId = attacker.id;
+      return attacker;
+    });
     if (
       !target ||
       target.dead ||
@@ -1570,18 +1588,12 @@ export function castAbility(
       ctx.error(p.id, 'You must be facing your target.');
       return;
     }
-    // execute-style gate: only usable while the target is nearly dead
-    const targetHpThreshold = ability.executeThreshold ?? ability.requiresTargetHpBelow;
-    const targetOutsideExecuteWindow =
-      targetHpThreshold !== undefined &&
-      (ability.executeThreshold !== undefined
-        ? target.hp >= target.maxHp * targetHpThreshold
-        : target.hp > target.maxHp * targetHpThreshold);
+    // execute-style gate: only usable while the target is nearly dead. The predicate is
+    // shared with the action bar so the slot greys out exactly when this refuses.
+    const targetHpThreshold = executeWindowThreshold(ability);
     if (
-      targetOutsideExecuteWindow &&
-      !(ability.id === 'execute' && p.auras.some((aura) => aura.kind === 'sudden_death')) &&
-      !paladinExecuteWindowActive(p, ability.id) &&
-      !dawnsWrathHammerActive(p, ability.id)
+      targetHpThreshold !== undefined &&
+      executeWindowBlocksCast(ability, p, target.hp, target.maxHp)
     ) {
       ctx.error(
         p.id,
@@ -2042,7 +2054,22 @@ export function castAbility(
         }
       : null;
   coldsightReserveRead(ctx, p, ability.id);
-  applyAbility(ctx, p, meta, instantResolved, castTargetId, stormcastReservation);
+  const benisonHealMult =
+    consumedInstantAura?.id === BENISON_WHISPER_AURA_ID ? 1 + BENISON_4PC_WHISPER_HEAL_BONUS : 1;
+  // Hand the finish the unit this press resolved, never the raw override: a timed
+  // cast already finishes on the stored p.castTargetId, and the friendly arm
+  // re-resolves an override to the same unit, but the dual-purpose arm reads its
+  // id verbatim, so a stale party-frame override that fell back to the current
+  // target above would otherwise refuse there with "You have no target.".
+  applyAbility(
+    ctx,
+    p,
+    meta,
+    instantResolved,
+    target?.id ?? null,
+    stormcastReservation,
+    benisonHealMult,
+  );
   // instant ground-targeted cast: its effects have consumed the aim point. An
   // interleaved instant instead hands the aim back to the cast still running.
   p.castAim = blinkThrough ? heldCastAim : null;
@@ -2665,6 +2692,7 @@ function applyAbility(
   res: ResolvedAbility,
   castTargetId: number | null = null,
   stormcastReservation: StormcastReservation | null = null,
+  benisonHealMult = 1,
 ): void {
   // Consume the mouseover override: an instant cast passes it directly; a
   // timed cast stored it on the entity at start (updateCasting's finish call
@@ -2998,7 +3026,7 @@ function applyAbility(
             stormcastReservation !== null,
           )
         : 1;
-    ctx.runEffects(p, meta, target, res, false, castHealMult);
+    ctx.runEffects(p, meta, target, res, false, castHealMult * benisonHealMult);
     completeStormcastReservation(ctx, p, stormcastReservation);
     // 'spellCast' means SPELLS: a physical friendly ability never rolls.
     if (p.kind === 'player' && ability.school !== 'physical')

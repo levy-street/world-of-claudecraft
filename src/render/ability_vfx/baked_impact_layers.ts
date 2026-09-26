@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { SUN_DIR } from '../gfx';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL } from '../scene_sampling';
 import { BakedPoolPrewarm } from './baked_pool_prewarm';
@@ -7,6 +13,18 @@ import { type BakedKind, bakedTexture } from './production_assets';
 import { warriorShearPhase } from './warrior_impact_material';
 
 const CAPACITY = 10;
+/** The sheets the active Warrior kit recipe uploads (`active_kit_prewarm.ts`
+ *  `KIT_SHEETS`); a draw before that upload would upload it in a live frame. */
+const KIT_UPLOADED: ReadonlySet<BakedKind> = new Set([
+  'smoke',
+  'shout_dust',
+  'warrior_power',
+  'warrior_fervor',
+  'harvest_impact',
+  'warrior_bite',
+  'warrior_shear',
+  'warrior_crush',
+]);
 interface Slot {
   mesh: THREE.Mesh<THREE.PlaneGeometry, THREE.ShaderMaterial>;
   active: boolean;
@@ -32,6 +50,8 @@ interface Slot {
 /** Authored volume motion with premultiplied temporal blending, straight-alpha
  * output, scene-depth intersection softness and bounded heat refraction. */
 export class BakedImpactLayers {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private readonly point = new THREE.Vector3();
   private readonly cameraInverse = new THREE.Quaternion();
   private readonly slots: Slot[] = [];
@@ -96,7 +116,7 @@ export class BakedImpactLayers {
       const mesh = new THREE.Mesh(geometry.clone(), proto.clone());
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'bakedImpactVolume';
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.visible = false;
       mesh.renderOrder = 5;
       mesh.frustumCulled = false;
@@ -128,11 +148,12 @@ export class BakedImpactLayers {
     geometry.dispose();
   }
   /** Active Warrior preparation opts into strict, per-slot draw readiness.
-   * Other classes keep their existing dependency set and texture-only path. */
+   * Other classes keep their existing dependency set and texture-only path.
+   * Nothing is enumerable before the kit's demand load lands the sheet. */
   units(host: CrestPrewarmHost) {
     if (this.disposed) return [];
     const texture = bakedTexture('harvest_impact');
-    if (!texture) throw new Error('Authored contact texture is not loaded');
+    if (!texture) return [];
     this.preparation ??= new BakedPoolPrewarm(
       this.scene,
       this.slots.map((s) => s.mesh),
@@ -159,16 +180,11 @@ export class BakedImpactLayers {
   ): boolean {
     if (
       this.disposed ||
+      !this.spawnGate.allows(CAST_VFX_KIT) ||
       !bakedTexture(kind) ||
-      // Decoding is not GPU preparation. The new large optional layer stays
+      // Decoding is not GPU preparation. A layer the Warrior kit uploads stays
       // cold until this renderer's explicit upload has completed successfully.
-      ((kind === 'warrior_power' ||
-        kind === 'warrior_fervor' ||
-        kind === 'harvest_impact' ||
-        kind === 'warrior_bite' ||
-        kind === 'warrior_shear' ||
-        kind === 'warrior_crush') &&
-        !this.textureReady?.(bakedTexture(kind)!)) ||
+      (KIT_UPLOADED.has(kind) && !this.textureReady?.(bakedTexture(kind)!)) ||
       ![x, y, z, size, duration, delay, heat, floor, angle, roll, aspect].every(Number.isFinite) ||
       aspect <= 0 ||
       size <= 0 ||

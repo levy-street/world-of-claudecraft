@@ -24,6 +24,20 @@ function fakeStorage() {
   };
 }
 
+/** The rail collapse's settings port (the quest-tracker test's fake, mirrored):
+ *  a real available/collapsed/setCollapsed loop over a local flag, so a test
+ *  can drive the toggle exactly like the real optionsHooks-backed one does. */
+function fakeSettings() {
+  let collapsed = false;
+  return {
+    available: vi.fn(() => true),
+    collapsed: vi.fn(() => collapsed),
+    setCollapsed: vi.fn((next: boolean) => {
+      collapsed = next;
+    }),
+  };
+}
+
 function makeHarness(alsoTracked: readonly string[] = []) {
   const root = document.createElement('aside');
   document.body.appendChild(root);
@@ -44,15 +58,17 @@ function makeHarness(alsoTracked: readonly string[] = []) {
   const onShowRoute = vi.fn();
   const storage = fakeStorage();
   const tracking = new QuestTrackingState(storage);
+  const settings = fakeSettings();
   const controller = new MapSidebarController({
     root: () => root,
     click,
     onRepaintMap,
     onShowRoute,
     tracking,
+    settings,
   });
   controller.update(world, zoneAt(giver.pos.x, giver.pos.z));
-  return { root, controller, click, onRepaintMap, onShowRoute, world, tracking, storage };
+  return { root, controller, click, onRepaintMap, onShowRoute, world, tracking, storage, settings };
 }
 
 describe('map sidebar controller', () => {
@@ -182,6 +198,101 @@ describe('map sidebar controller', () => {
   });
 });
 
+describe('map sidebar controller: rail collapse toggle', () => {
+  beforeEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('renders the toggle expanded by default, with the body it controls present', () => {
+    const test = makeHarness();
+    const toggle = test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]');
+    expect(toggle).not.toBeNull();
+    expect(toggle?.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle?.getAttribute('aria-controls')).toBe('map-atlas-body');
+    expect(test.root.querySelector('#map-atlas-body')).not.toBeNull();
+    expect(test.root.classList.contains('is-collapsed')).toBe(false);
+  });
+
+  it('collapses on click: the root gains is-collapsed, the toggle flips, and the choice persists', () => {
+    const test = makeHarness();
+
+    test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]')?.click();
+
+    expect(test.settings.setCollapsed).toHaveBeenCalledWith(true);
+    expect(test.root.classList.contains('is-collapsed')).toBe(true);
+    const toggle = test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]');
+    expect(toggle?.getAttribute('aria-expanded')).toBe('false');
+    // The body stays in the DOM (CSS hides it): the button's aria-controls
+    // keeps naming a real element instead of an id that vanished.
+    expect(test.root.querySelector('#map-atlas-body')).not.toBeNull();
+  });
+
+  it('expands again on a second click', () => {
+    const test = makeHarness();
+    test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]')?.click();
+
+    test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]')?.click();
+
+    expect(test.settings.setCollapsed).toHaveBeenLastCalledWith(false);
+    expect(test.root.classList.contains('is-collapsed')).toBe(false);
+    expect(
+      test.root.querySelector('[data-map-sidebar-toggle]')?.getAttribute('aria-expanded'),
+    ).toBe('true');
+  });
+
+  it('keeps the toggle focused across the rail swap', () => {
+    const test = makeHarness();
+    const toggle = test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]');
+    toggle?.focus();
+    expect(document.activeElement).toBe(toggle);
+
+    toggle?.click();
+
+    const repainted = test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]');
+    expect(repainted).not.toBe(toggle);
+    expect(document.activeElement).toBe(repainted);
+  });
+
+  it('is a no-op while the settings port is unavailable (before Hud.attachOptions runs)', () => {
+    const test = makeHarness();
+    test.settings.available.mockReturnValue(false);
+
+    test.root.querySelector<HTMLElement>('[data-map-sidebar-toggle]')?.click();
+
+    expect(test.settings.setCollapsed).not.toHaveBeenCalled();
+    expect(test.root.classList.contains('is-collapsed')).toBe(false);
+  });
+
+  it('opens already collapsed when the persisted setting says so', () => {
+    const root = document.createElement('aside');
+    document.body.appendChild(root);
+    const giver = NPCS[QUESTS.q_wolves.giverNpcId];
+    const world = {
+      cfg: { playerClass: 'warrior' },
+      player: { name: 'Adventurer', pos: { x: giver.pos.x, y: 0, z: giver.pos.z } },
+      questLog: new Map<string, QuestProgress>(),
+      questState: () => 'unavailable',
+    } as unknown as IWorld;
+    const settings = fakeSettings();
+    settings.setCollapsed(true);
+    const controller = new MapSidebarController({
+      root: () => root,
+      click: vi.fn(),
+      onRepaintMap: vi.fn(),
+      onShowRoute: vi.fn(),
+      tracking: new QuestTrackingState(fakeStorage()),
+      settings,
+    });
+
+    controller.update(world, zoneAt(giver.pos.x, giver.pos.z));
+
+    expect(root.classList.contains('is-collapsed')).toBe(true);
+    expect(root.querySelector('[data-map-sidebar-toggle]')?.getAttribute('aria-expanded')).toBe(
+      'false',
+    );
+  });
+});
+
 // The headerless map window has exactly ONE drag surface: the --window-pad band
 // around its two panes (Hud.isWindowDragHandle returns true only for
 // `target === win`). Both panes are absolutely positioned, and an absolutely
@@ -219,6 +330,7 @@ describe('map sidebar controller: the world-quest section', () => {
       click: vi.fn(),
       onRepaintMap,
       onShowRoute: vi.fn(),
+      settings: fakeSettings(),
       tracking: new QuestTrackingState(fakeStorage()),
       worldQuests: {
         selectedId: () => selected,
@@ -384,6 +496,7 @@ describe('map sidebar controller: walking cadence', () => {
       onRepaintMap: vi.fn(),
       onShowRoute: vi.fn(),
       tracking: new QuestTrackingState(fakeStorage()),
+      settings: fakeSettings(),
     });
     const zone = zoneAt(giver.pos.x, giver.pos.z);
     const writes = { count: 0 };

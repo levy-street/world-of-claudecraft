@@ -62,6 +62,35 @@ describe('markProgramsReadyUnder', () => {
     expect(isProgramKnownReady(sharedProgram)).toBe(true);
   });
 
+  it('records the sprite, line and points carriers a settled compile linked too', () => {
+    // three's compile prepares a material on every mesh, points, line and
+    // sprite (the carrier set compile_gate_pieces.ts mirrors). A record that
+    // walked meshes only left a settled sprite pending forever: the lazy
+    // cast stand-ins carry three sprites, two line loops and a points cloud.
+    const sprite = new THREE.SpriteMaterial({ name: 'sprite' });
+    const line = new THREE.LineBasicMaterial({ name: 'line' });
+    const points = new THREE.PointsMaterial({ name: 'points' });
+    const spriteProgram = program('sprite');
+    const lineProgram = program('line');
+    const pointsProgram = program('points');
+    const props = propertiesFor(
+      new Map<THREE.Material, { currentProgram?: LinkedProgramLike }>([
+        [sprite, { currentProgram: spriteProgram }],
+        [line, { currentProgram: lineProgram }],
+        [points, { currentProgram: pointsProgram }],
+      ]),
+    );
+    const target = new THREE.Group();
+    target.add(new THREE.Sprite(sprite));
+    target.add(new THREE.LineLoop(new THREE.BufferGeometry(), line));
+    target.add(new THREE.Points(new THREE.BufferGeometry(), points));
+
+    expect(markProgramsReadyUnder(props, target)).toBe(3);
+    expect(isProgramKnownReady(spriteProgram)).toBe(true);
+    expect(isProgramKnownReady(lineProgram)).toBe(true);
+    expect(isProgramKnownReady(pointsProgram)).toBe(true);
+  });
+
   it('walks past a non-mesh, a null material, and a material with no current program', () => {
     const cold = new THREE.MeshBasicMaterial({ name: 'cold' });
     const props = propertiesFor(new Map([[cold, {}]]));

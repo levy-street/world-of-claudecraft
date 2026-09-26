@@ -13414,7 +13414,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Trong 8 giây, đòn đánh tiếp theo của kẻ địch nhắm vào bạn sẽ được đáp trả: tối đa {buff} sát thương bị chặn và trả lại kẻ tấn công dưới dạng sát thương Thánh, và bạn nhận 1 Sùng Tín. Chỉ một đòn được đáp trả. Thăng Thiên nâng lượng có thể đáp trả thêm 50%.',
   'entities.abilities.final_edict.description':
-    'Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ Thánh quanh bạn.',
+    'Tung một đòn vũ khí nghiền nát và tạo 1 Sùng Tín khi gây sát thương. Một đòn trúng thành công giảm 2 giây hồi chiêu còn lại của Bình Minh Rơi. Các đòn đánh thường trúng và các đòn Sắc Lệnh Cuối có 15% cơ hội ban Cơn Thịnh Nộ Bình Minh trong 8 giây. Thăng Thiên còn giải phóng một vụ nổ quanh bạn, gây sát thương Vật lý.',
   'entities.abilities.grace_devotion.description':
     'Bạn và các thành viên nhóm hồi 15 mana mỗi 5 giây và tốn ít hơn 3% mana trong 30 phút. Thay thế Sùng Tín Rực Rỡ hoặc Bình Minh của chính bạn, nhưng cùng tồn tại với Sùng Tín của các thánh kỵ sĩ khác.',
   'entities.abilities.guardian_covenant.description':
@@ -15142,9 +15142,9 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Đòn đánh Lưỡi Kiếm Che Mạng gây sát thương gấp ba thay vì gấp đôi.',
   'entities.itemSets.ashveil.name': 'Trang Phục Tro Mờ',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Lần cứu viện của Cảnh Giác Seraph hồi 270 thay vì 180. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
+    'Hồi phục máu bằng Lời Nguyện Thì Thầm, Lời Nguyện Trang Nghiêm hoặc Lời Nguyện Khẩn Cấp tăng lượng hồi máu của Hồi Phục Hợp Xướng kế tiếp thêm 10%, cộng dồn tối đa 3 lần. Mỗi lần niệm chỉ tạo tối đa một cộng dồn. Hồi Phục Hợp Xướng tiêu hao tất cả cộng dồn khi niệm xong. Sát thương nhận vào không còn làm chậm việc niệm phép.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Khi Cảnh Giác Seraph kích hoạt, đồng minh của bạn cũng được hồi 15% máu tối đa trong 10 giây.',
+    'Hoàn tất Hồi Phục Hợp Xướng với 3 cộng dồn khiến Lời Nguyện Thì Thầm tiếp theo dùng trong vòng 60 giây trở thành tức thì và hồi thêm 100% máu. Hiệu ứng này không cộng dồn; nhận lại hiệu ứng sẽ làm mới thời gian tồn tại.',
   'entities.itemSets.benison_dawnweave.name': 'Phúc Lành Dệt Bình Minh',
   'entities.itemSets.chronoweave.bonus2':
     'Vọng Âm Thời Gian chuyển 50% sát thương Arcane đơn mục tiêu của bạn thành hồi máu. Sát thương nhận vào không còn trì hoãn việc niệm phép.',
@@ -17328,4 +17328,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
     'Chỉnh sửa Khung cũng nới lỏng bảng Đối thoại, bảng này mang lời thoại của NPC trong khi NPC đó nằm ngoài tầm nhìn của bạn; nó đeo chip tên khi nó bị lỏng.',
   'guide.settingsPage.keybindsWheelBody':
     'Bản thân bánh xe cũng bị ràng buộc. Zoom Camera In và Zoom Camera Out là các liên kết thông thường nằm trên bánh xe trần theo mặc định, vì vậy bạn có thể di chuyển chúng đến Ctrl cộng với bánh xe hoặc tới các phím, sau đó cuộn bánh xe tự do để kích hoạt các khe thanh hành động. Một rãnh bánh xe không có cơ cấu nhả nên nó không thể điều khiển một hành động được giữ lại như di chuyển về phía trước.',
+  'guide.settingsPage.ifColorblindMode':
+    'Đổi màu các vùng nguy hiểm trên sàn của Nythraxis (vòng đánh của Phun trào mộ phần, các vũng Lửa mộ phần và Lửa linh hồn, đường Lửa mộ phần, cùng dấu Xé linh hồn) sang bảng màu thân thiện với người mù màu, với sắc độ và độ sáng khác biệt, để các vòng tròn chồng lên nhau vẫn giữ cạnh rõ. Kích thước, bộ đếm thời gian và vị trí không thay đổi.',
+  'hud.options.colorblindMode': 'Chế độ hỗ trợ mù màu',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -1,7 +1,19 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { boundQuadSize, IMPACT_QUAD_MAX_SCREEN_FRACTION } from '../vfx_screen_bounds_core';
 import { type ContactSheet, contactTexture, isContactSheet } from './contact_assets';
-import { FLIPBOOK_GRID, FLIPBOOK_STYLES, type FlipbookStyle, flipbookSheet } from './fx_textures';
+import {
+  builtFlipbookSheet,
+  FLIPBOOK_GRID,
+  FLIPBOOK_STYLES,
+  type FlipbookStyle,
+  flipbookSheet,
+} from './fx_textures';
 import {
   WARRIOR_FLASH_GLSL,
   WARRIOR_IMPACT_REACH,
@@ -22,6 +34,13 @@ const FLIP_SLOTS = 6;
 // hot frame through the measured aftermath window without a third sheet.
 const FLIP_DUR = 0.55;
 const LAST_FRAME = FLIPBOOK_GRID * FLIPBOOK_GRID - 1;
+
+// A contact sheet lands with the Warrior kit's demand load and is uploaded by
+// the kit recipe (`active_kit_prewarm.ts`); until then a contact binds this
+// procedural sheet (its shard burst is the physical one) once the boot warm-up
+// uploaded it on this renderer, and skips otherwise, so a cast never paints or
+// uploads a sheet inside a live frame.
+const CONTACT_FALLBACK: FlipbookStyle = 'shatter';
 
 const easeOutCubic = (t: number): number => 1 - (1 - t) ** 3;
 
@@ -44,6 +63,8 @@ export function asFlipbookStyle(s: string): FlipbookStyle {
 }
 
 export class ImpactFlipbooks {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: FlipSlot[] = [];
   private next = 0;
   private readonly geometry: THREE.PlaneGeometry;
@@ -52,7 +73,10 @@ export class ImpactFlipbooks {
   private readonly projectedStrike = new THREE.Vector3();
   private readonly projectedDown = new THREE.Vector3();
 
-  constructor(scene: THREE.Scene) {
+  constructor(
+    scene: THREE.Scene,
+    private readonly textureReady?: (texture: THREE.Texture) => boolean,
+  ) {
     this.geometry = new THREE.PlaneGeometry(1, 1);
     const proto = new THREE.ShaderMaterial({
       uniforms: {
@@ -138,7 +162,7 @@ export class ImpactFlipbooks {
       // Vertical, additive, depth-tested: outside the floor ladder (the shock rings
       // sit on it), so this order only sets blend arithmetic among the pooled sheets.
       mesh.renderOrder = 8;
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       mesh.onBeforeRender = (renderer, _scene, _camera, _geometry, material) => {
         const target = renderer.getRenderTarget();
         (material as THREE.ShaderMaterial).uniforms.uLowRangeTarget.value =
@@ -176,14 +200,21 @@ export class ImpactFlipbooks {
     groundY = Number.NaN,
     worldFacing = Number.NaN,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const warrior = warriorFlashStyle(style);
-    const texture = warrior
+    const contact = warrior || isContactSheet(style);
+    const kit = warrior
       ? contactTexture('contact_cut')
       : isContactSheet(style)
         ? contactTexture(style)
-        : flipbookSheet(style as FlipbookStyle);
-    if (!texture) return;
+        : null;
+    if (contact && !kit) return;
+    const ready = (sheet: THREE.Texture | null) => !!sheet && !!this.textureReady?.(sheet);
+    const sheet = ready(kit) ? kit : null;
+    const texture = contact
+      ? (sheet ?? builtFlipbookSheet(CONTACT_FALLBACK))
+      : flipbookSheet(style as FlipbookStyle);
+    if (!texture || (contact && !sheet && !ready(texture))) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % FLIP_SLOTS;
     slot.active = true;
@@ -200,10 +231,9 @@ export class ImpactFlipbooks {
     );
     slot.aspect = Number.isFinite(aspect) ? Math.max(0.25, Math.min(4, aspect)) : 1;
     slot.mat.uniforms.uMap.value = texture;
-    slot.mat.uniforms.uInset.value =
-      warrior || isContactSheet(style)
-        ? 4 / Math.max(64, (texture.image as { width?: number })?.width ?? 512)
-        : 0;
+    slot.mat.uniforms.uInset.value = sheet
+      ? 4 / Math.max(64, (texture.image as { width?: number })?.width ?? 512)
+      : 0;
     (slot.mat.uniforms.uTint.value as THREE.Color).setHex(colorHex);
     slot.mat.uniforms.uHdr.value = hdr;
     slot.mat.uniforms.uFrame.value = 0;

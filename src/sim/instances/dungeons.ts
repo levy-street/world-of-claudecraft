@@ -76,6 +76,7 @@ import {
 import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
+import { RAID_REQUIRED_DUNGEON_IDS, resetCooldownApplies } from './reset_cooldown_policy';
 
 const DOOR_TRIGGER_RADIUS = 2.0; // walking this close to a dungeon door teleports you
 const HEROIC_REWARD_WINDOW_MS = 24 * 60 * 60 * 1000;
@@ -84,10 +85,8 @@ const RAID_ALLOWED_DUNGEON_IDS = new Set([
   'nythraxis_boss_arena',
   ...IGNIVAR_RAID_ROOM_IDS,
 ]);
-export const RAID_REQUIRED_DUNGEON_IDS: ReadonlySet<string> = new Set([
-  'nythraxis_boss_arena',
-  ...IGNIVAR_RAID_ROOM_IDS,
-]);
+
+export { RAID_REQUIRED_DUNGEON_IDS };
 // A claim whose final boss is already dead (inst.clearedBy is non-empty) idles
 // this much longer than INSTANCE_EMPTY_TIMEOUT before the reaper frees it: a
 // clean kill that wipes the whole party, with nobody left to resurrect, must
@@ -859,6 +858,11 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
   settleTeleportArrival(p);
+  // Predefined exit facing (door.facing, derived from the authored leaveOffset):
+  // without this the player keeps whatever facing they walked the interior exit
+  // portal with, which reads as staring back at the door they just left.
+  p.facing = door.facing;
+  p.prevFacing = door.facing;
   p.targetId = null;
   p.autoAttack = false;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
@@ -886,8 +890,18 @@ const DUNGEON_DOOR_RETURN_INSET = 4;
  * and needs the door only as the point to set them back down at when the match
  * ends. Sending them back to their raw interior coordinates instead would drop
  * them into an instance claim that may no longer exist by then.
+ *
+ * `facing` is the predefined direction leaving through THIS door points a
+ * player: away from the door along its authored `leaveOffset` (the same
+ * vector that places the drop point), so it always agrees with the door's
+ * real-world orientation without a second authored field. A battleground
+ * queue pop ignores it and keeps the fighter's own facing (match.returns
+ * captures that separately); only `leaveDungeon` applies it.
  */
-export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: number } | null {
+export function detachFromDungeon(
+  ctx: SimContext,
+  p: Entity,
+): { x: number; z: number; facing: number } | null {
   const dungeon = dungeonAt(p.pos.x);
   if (!dungeon) return null;
   const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
@@ -896,7 +910,11 @@ export function detachFromDungeon(ctx: SimContext, p: Entity): { x: number; z: n
   if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
   cancelProfessionSessionOnDisplacement(ctx, p);
   const drop = dungeon.leaveOffset ?? { x: 0, z: -DUNGEON_DOOR_RETURN_INSET };
-  return { x: dungeon.doorPos.x + drop.x, z: dungeon.doorPos.z + drop.z };
+  return {
+    x: dungeon.doorPos.x + drop.x,
+    z: dungeon.doorPos.z + drop.z,
+    facing: Math.atan2(drop.x, drop.z),
+  };
 }
 
 // Drop one departing player (and every entity they own) from the hate tables of
@@ -1221,6 +1239,11 @@ export function resetDungeonInstances(ctx: SimContext, pid?: number): void {
     }
     claimInstance(ctx, inst, key, claimDifficultyForDungeon(inst.dungeonId, selected));
     if (inst.exitId === null) throw new Error('Dungeon reset replacement claim has no identity.');
+    // The raid rooms skip the five-minute cooldown and its per-member locks:
+    // their own daily/weekly lockout (checked above) is the rate limit, and
+    // the cooldown only ever stranded a raid that wanted to switch tier
+    // again (see reset_cooldown_policy.ts).
+    if (!resetCooldownApplies(inst.dungeonId)) continue;
     inst.resetAvailableAt = ctx.time + INSTANCE_EMPTY_TIMEOUT;
     for (const ownerPid of ownerPids) {
       ctx.dungeonResetLocks.set(resetCooldownKey(ctx, ownerPid, inst.dungeonId), {
@@ -1327,13 +1350,14 @@ export function claimedInstanceForMob(ctx: SimContext, mobId: number): InstanceS
 // the reward for anyone who actually ran the dungeon. A recipient already locked
 // for this reset is not paid again. Delivery splits on presence at the corpse: a
 // player in the death-time participation snapshot takes the marks straight to
-// bags (they were there to loot), while one locked from afar who walked through
-// the door this run (a back-line healer, a fallen or released raider) has them
-// posted to the Ravenpost so a distant participant never eats the daily lockout
-// without the reward. A member who never entered (a door-camper, an alt parked
-// in town) takes the lockout with no pay: roster membership alone is not income.
-// An uncredited death (no tap and no killer credit resolves, so the death-time
-// snapshot is empty) pays nobody, bags or mail, while the lockout still strikes.
+// bags (same-claim raid members, including distant back-line players and
+// released ghosts, are widened into that snapshot), while one locked outside
+// that snapshot who still walked through the door this run has them posted to
+// the Ravenpost so a lockout never outruns the reward. A member who never
+// entered (a door-camper, an alt parked in town) takes the lockout with no pay:
+// roster membership alone is not income. An uncredited death (no tap and no
+// killer credit resolves, so the death-time snapshot is empty) pays nobody,
+// bags or mail, while the lockout still strikes.
 export function awardHeroicMarks(
   ctx: SimContext,
   mob: Entity,

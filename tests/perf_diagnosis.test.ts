@@ -136,7 +136,14 @@ function baseSnapshot(): PerfSnapshot {
       renderDiagnostics: {} as never,
       nightAmount: 0,
       prewarm: null,
-      castVfx: { ready: true, refused: 0, pending: 0, forced: false },
+      castVfx: {
+        ready: true,
+        refused: 0,
+        pending: 0,
+        forced: false,
+        requirementMiss: 0,
+        families: [],
+      },
       entryDetailHorizon: {
         active: false,
         cap: 700,

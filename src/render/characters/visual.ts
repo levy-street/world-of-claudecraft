@@ -18,6 +18,11 @@ import { cloneMaterialWithHooks } from '../material_clone_hooks';
 import type { MeleeImpactProfile } from '../melee_impact_core';
 import type { MountRideSpec } from '../mount_visuals';
 import {
+  stoneboundShardMaterialOptions,
+  stoneboundShellMaterialOptions,
+  weaponImbueAuraMaterialOptions,
+} from '../vfx_basic_materials';
+import {
   createWeaponVfx,
   DEFAULT_TUNING,
   WEAPON_VFX,
@@ -75,6 +80,7 @@ import {
   ghostEffectOpacity,
 } from './effect_materials';
 import { farMeshShown, shadowProxyShown } from './far_lod_reveal_core';
+import { FormAdornments } from './form_adornments';
 import { HairSwayDriver } from './hair_sway';
 import { buildHalo } from './halo';
 import { HarvestRecoil } from './harvest_recoil';
@@ -109,6 +115,7 @@ import { configureTightBoneTextures } from './skin_gpu_layout';
 import { applySkinnedCullBounds } from './skinned_cull_bounds';
 import { applySoulRendOverlay } from './soul_rend_overlay';
 import { soulRendPrewarmTargets } from './soul_rend_prewarm_core';
+import { stoneboundShellStyle } from './stonebound_shell_core';
 import { createStowTransition, forceStow, requestStow, tickStow } from './stow_transition';
 import { CharacterSurfaceResponse, SURFACE_RESPONSE_PROGRAM } from './surface_response';
 import { warriorActionBlend } from './warrior_action_blend';
@@ -781,6 +788,9 @@ export class CharacterVisual {
   private soulRend = false;
   private shadowform = false;
   private moonkin = false;
+  /** Moonwing's antlers, crescent and wings; Gloamveil's veil (form_adornments.ts).
+   *  Built on the first form edge, so a rig that never shifts pays nothing. */
+  private formAdornments: FormAdornments | null = null;
   private ferocityStage = 0;
   private presentationScale = 1;
   private ascended = false;
@@ -1034,6 +1044,13 @@ export class CharacterVisual {
     }
     this.hitCooldown = Math.max(0, this.hitCooldown - dt);
     this.updateMetamorphWings(dt, s, reducedMotion);
+    this.formAdornments?.update(
+      dt,
+      s.moving,
+      s.casting,
+      reducedMotion,
+      this.root.visible && !farMeshShown(this.far, this.farMesh !== null, this.farCompilePending),
+    );
     if (this.holdCooldown > 0) this.holdCooldown = Math.max(0, this.holdCooldown - dt);
     // Deferred sheathe swap: lands at the gesture's windup peak (see
     // setWeaponStowed), where the clip is also cut so the chop's downswing never
@@ -2189,6 +2206,7 @@ export class CharacterVisual {
     if (on === this.ghosted && style === this.ghostStyle) return;
     this.ghosted = on;
     this.ghostStyle = style;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
@@ -2299,13 +2317,25 @@ export class CharacterVisual {
   setShadowform(on: boolean): void {
     if (on === this.shadowform) return;
     this.shadowform = on;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
   }
 
   setMoonkin(on: boolean): void {
     if (on === this.moonkin) return;
     this.moonkin = on;
+    this.syncFormAdornments();
     this.applyVisualMaterials();
+  }
+
+  private syncFormAdornments(): void {
+    if (this.disposed || (!this.formAdornments && !this.moonkin && !this.shadowform)) return;
+    this.formAdornments ??= new FormAdornments(
+      this.model,
+      this.look ? 'composed' : this.key === 'player_mech' ? 'replacement' : 'classRig',
+      () => this.farBakeGate,
+    );
+    this.formAdornments.sync(this.moonkin, this.shadowform, this.ghosted);
   }
 
   pulseMetamorphosis(strength = 1): void {
@@ -2932,25 +2962,25 @@ export class CharacterVisual {
       if (o.userData.swapWeaponHolder) weaponHolders.push(o);
     });
 
-    // Structural channel: Stonebound sheathes EVERY held weapon in a wireframe
-    // stone shell and plates the body with shards. Independent of the imbue
-    // color below, whose Sanguine channel also coats an equipped second weapon.
+    // Structural channel: Stonebound sheathes EVERY held weapon in a stone
+    // shell and plates the body with shards. Independent of the imbue color
+    // channel below; Sanguine may also coat an equipped second weapon. The
+    // shell is a wireframe on an antialiased frame and a solid translucent
+    // sheath when no AA pass runs (stonebound_shell_core.ts).
     if (stonebound) {
+      const style = stoneboundShellStyle(GFX);
       for (const holder of weaponHolders) {
         holder?.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
           const aura = new THREE.Mesh(
             mesh.geometry,
-            new THREE.MeshBasicMaterial({
-              color: 0x9a9384,
-              transparent: true,
-              opacity: 0.72,
-              depthWrite: false,
-              blending: THREE.NormalBlending,
-              side: THREE.DoubleSide,
-              wireframe: true,
-            }),
+            new THREE.MeshBasicMaterial(
+              stoneboundShellMaterialOptions({
+                opacity: style.shellOpacity,
+                wireframe: style.wireframe,
+              }),
+            ),
           );
           aura.position.copy(mesh.position);
           aura.quaternion.copy(mesh.quaternion);
@@ -2961,7 +2991,7 @@ export class CharacterVisual {
           this.weaponAuraMeshes.push(aura);
         });
       }
-      this.buildStoneboundArmorShards();
+      this.buildStoneboundArmorShards(style.wireframe, style.shardOpacity);
     }
 
     if (this.weaponAuraColor === null) return;
@@ -2982,20 +3012,13 @@ export class CharacterVisual {
         const mesh = o as THREE.Mesh;
         if (!mesh.isMesh || !mesh.userData.weaponMesh || !mesh.parent) return;
         const tipGeometry = this.weaponAuraTip ? tipFadedWeaponGeometry(mesh, holder) : null;
+        // The option tables are shared with the never-disposed boot stand-ins
+        // (vfx_basic_materials.ts), which hold these programs between rebuilds.
         const aura = new THREE.Mesh(
           tipGeometry ?? mesh.geometry,
-          new THREE.MeshBasicMaterial({
-            // Additive translucent clone of the weapon mesh in the spec-authored
-            // soak color. Brightness class is fixed here; only the hue is data.
-            // Tip scope rides a vertex-alpha ramp baked into the cloned geometry.
-            color: auraColor,
-            transparent: true,
-            opacity: 0.42,
-            depthWrite: false,
-            blending: THREE.AdditiveBlending,
-            side: THREE.DoubleSide,
-            vertexColors: tipGeometry !== null,
-          }),
+          new THREE.MeshBasicMaterial(
+            weaponImbueAuraMaterialOptions(auraColor, tipGeometry !== null),
+          ),
         );
         aura.position.copy(mesh.position);
         aura.quaternion.copy(mesh.quaternion);
@@ -3009,7 +3032,7 @@ export class CharacterVisual {
       });
   }
 
-  private buildStoneboundArmorShards(): void {
+  private buildStoneboundArmorShards(wireframe: boolean, opacity: number): void {
     const placements = [
       { x: -0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: -0.35 },
       { x: 0.42, y: this.height * 0.7, z: 0, sx: 0.2, sy: 0.13, rz: 0.35 },
@@ -3018,13 +3041,7 @@ export class CharacterVisual {
     for (const placement of placements) {
       const shard = new THREE.Mesh(
         STONEBOUND_SHARD_GEOMETRY,
-        new THREE.MeshBasicMaterial({
-          color: 0x777065,
-          transparent: true,
-          opacity: 0.82,
-          wireframe: true,
-          depthWrite: false,
-        }),
+        new THREE.MeshBasicMaterial(stoneboundShardMaterialOptions({ opacity, wireframe })),
       );
       shard.position.set(placement.x, placement.y, placement.z);
       shard.rotation.z = placement.rz;
@@ -3368,6 +3385,7 @@ export class CharacterVisual {
     this.templarsVerdictFx?.dispose();
     this.templarsVerdictFx = null;
     this.templarsVerdictAction = null;
+    this.formAdornments?.dispose();
     this.disposeWeaponAura();
     this.disposeWeaponVfx();
     this.disposeWeaponSkinMaterials();

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { UMBRAL_ANCHOR_ID } from '../sim/combat/warlock_utility';
 import type { Aura, Entity } from '../sim/types';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
+import { tagVfxSubtree } from './renderer_diagnostics';
 import {
   createUmbralAnchorVfxPlan,
   UMBRAL_ANCHOR_PLACE_SECONDS,
@@ -317,6 +318,7 @@ export class UmbralAnchorMarker {
       this.shardLayer,
       this.wisps,
     );
+    tagVfxSubtree(this.group);
   }
 
   private registerDrapedGeometry(geometry: THREE.BufferGeometry): void {

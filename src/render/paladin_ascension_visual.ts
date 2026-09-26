@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { surfaceMat } from './gfx';
 import type { PaladinAscensionVisualPlan } from './paladin_ascension_core';
+import { isSharedMaterial } from './shared_resource';
 
 const REFERENCE_HEIGHT = 1.8;
 const SEAL_GEOMETRY = new THREE.PlaneGeometry(1, 1);
@@ -44,7 +45,7 @@ function buildSunSealTexture(): THREE.DataTexture {
 const SUN_SEAL_TEXTURE = buildSunSealTexture();
 
 function sealMaterial(): THREE.MeshBasicMaterial {
-  return new THREE.MeshBasicMaterial({
+  const material = new THREE.MeshBasicMaterial({
     color: ASCENSION_GOLD,
     map: SUN_SEAL_TEXTURE,
     transparent: true,
@@ -53,6 +54,8 @@ function sealMaterial(): THREE.MeshBasicMaterial {
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
   });
+  material.name = 'paladinAscension:seal';
+  return material;
 }
 
 function crownMaterial(): THREE.Material {
@@ -170,7 +173,9 @@ export class PaladinAscensionVisual {
     this.group.removeFromParent();
     this.crown.removeFromParent();
     this.groundSeal.material.dispose();
-    this.solarCrownMaterial.dispose();
+    // The crown wears the surfaceMat cache's shared instance: every other
+    // crown in view and the boot stand-in draw with it too.
+    if (!isSharedMaterial(this.solarCrownMaterial)) this.solarCrownMaterial.dispose();
   }
 
   private setHoverTarget(target: THREE.Object3D | null): void {
@@ -204,4 +209,47 @@ export function syncPaladinAscensionVisual(
   }
   current?.update(plan, dt, reducedMotion, hoverTarget);
   return current;
+}
+
+/**
+ * The boot manifest's stand-in: one hidden visual, seal and crown, never
+ * disposed, so the programs a live Divine Ascension draws (the two-pass seal,
+ * the crown on a Mesh and on an InstancedMesh) are linked behind the loading
+ * cover and stay referenced for the session. The live visual is built per
+ * character view when the aura first shows, after every prewarm entry ran, so
+ * its first cast used to link the crown inside a live frame. The crown
+ * material is the tier's shared surfaceMat, so the stand-in is rebuilt with
+ * the profile (resetPaladinAscensionProfileCaches). Registered in
+ * ABILITY_MATERIAL_SOURCES.
+ */
+interface PaladinAscensionStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let paladinAscensionStandIn: PaladinAscensionStandIn | null = null;
+
+export function buildPaladinAscensionStandIn(): PaladinAscensionStandIn {
+  if (!paladinAscensionStandIn) {
+    const root = new THREE.Group();
+    root.name = 'paladin-ascension-stand-in';
+    const visual = new PaladinAscensionVisual(REFERENCE_HEIGHT);
+    root.add(visual.group, visual.crown);
+    const materials: THREE.Material[] = [];
+    root.traverse((object) => {
+      const material = (object as THREE.Mesh).material;
+      if (material && !Array.isArray(material) && !materials.includes(material)) {
+        materials.push(material);
+      }
+    });
+    paladinAscensionStandIn = { root, materials };
+  }
+  return paladinAscensionStandIn;
+}
+
+export function paladinAscensionStandInMaterials(): readonly THREE.Material[] {
+  return buildPaladinAscensionStandIn().materials;
+}
+
+export function resetPaladinAscensionProfileCaches(): void {
+  paladinAscensionStandIn = null;
 }

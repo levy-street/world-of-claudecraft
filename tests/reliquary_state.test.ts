@@ -169,7 +169,7 @@ describe('Reliquary first discover of a catalogued relic', () => {
     expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt.clearSource).toEqual({
       kind: 'dungeon',
       dungeonId: 'hollow_crypt',
-      difficulty: 'normal',
+      difficulty: 'any',
     });
     expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
 
@@ -1594,21 +1594,49 @@ describe('Reliquary pure completion + curator rank', () => {
     );
   });
 
-  it('a heroic-only dungeonClears key never leaks into the normal page readout', () => {
+  it('a five-man page whose relics Heroic also pays counts Heroic clears on its meter', () => {
+    // The player report behind this pin: farming the Hollow Crypt on Heroic
+    // drops every one of the page's five relics, yet the page meter (and the
+    // first-find clear stamp) read only the bare Normal key, so "N clears"
+    // sat still run after run. The five-man pages count both difficulties;
+    // the heroic-only epic pages keep the heroic filter.
     const sim = makeSim();
     const { meta } = primary(sim);
     expect(RELIQUARY_PAGES_BY_ID.conquerors_hollow_crypt?.clearSource).toEqual({
       kind: 'dungeon',
       dungeonId: 'hollow_crypt',
-      difficulty: 'normal',
+      difficulty: 'any',
     });
     // ONLY the heroic key exists; the bare normal key stays absent.
     meta.deedStats.dungeonClears['hollow_crypt:heroic'] = 4;
     expect(meta.deedStats.dungeonClears.hollow_crypt).toBeUndefined();
-    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(0);
-    // The heroic page still reads the same key, so the zero above is the
-    // difficulty filter at work, never a dead key.
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(4);
     expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt_heroic')).toBe(4);
+    // Both keys sum on the five-man page; the heroic page still reads its own.
+    meta.deedStats.dungeonClears.hollow_crypt = 2;
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt')).toBe(6);
+    expect(sim.reliquaryPageClearCount('conquerors_hollow_crypt_heroic')).toBe(4);
+    // The first-find stamp reads the same meter, so a relic taken on the
+    // fourth Heroic run is "first found on clear 6", never a sparse entry.
+    markItemDiscovered(sim.ctx, meta, 'cryptbone_helm');
+    expect(meta.reliquary.firstFind.cryptbone_helm).toEqual({ clears: 6 });
+  });
+
+  it('a heroic-only dungeonClears key never leaks into a Normal-filtered raid page readout', () => {
+    // The Crucible's Normal table holds relics Heroic never pays (normalOnly
+    // rows replaced by heroic exclusives), so its base page keeps the
+    // difficulty filter: a Heroic raid clear is not a run at this page's spoils.
+    const sim = makeSim();
+    const { meta } = primary(sim);
+    expect(RELIQUARY_PAGES_BY_ID.conquerors_ignivar?.clearSource).toEqual({
+      kind: 'dungeon',
+      dungeonId: 'ignivar_raid_arena',
+      difficulty: 'normal',
+    });
+    meta.deedStats.dungeonClears['ignivar_raid_arena:heroic'] = 4;
+    expect(meta.deedStats.dungeonClears.ignivar_raid_arena).toBeUndefined();
+    expect(sim.reliquaryPageClearCount('conquerors_ignivar')).toBe(0);
+    expect(sim.reliquaryPageClearCount('conquerors_ignivar_heroic')).toBe(4);
   });
 
   it('illumination scans past an incomplete first page to the completing page', () => {

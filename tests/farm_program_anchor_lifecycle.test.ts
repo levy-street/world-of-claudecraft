@@ -119,7 +119,8 @@ describe('farm program anchor geometry lifecycle (dispose ownership)', () => {
     // construction, before staging attaches them to the scene: a caller that
     // constructs a FarmPatchVisuals and tears it down without ever staging
     // (an early unmount, a failed world entry) must not leak the fallback
-    // geometry either.
+    // geometries either. The fallback catalog owns one deduped crop-stage
+    // program geometry and one feast-table program geometry before GLBs load.
     const disposeSpy = vi.spyOn(THREE.BufferGeometry.prototype, 'dispose');
     const scene = new THREE.Scene();
     const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
@@ -127,7 +128,7 @@ describe('farm program anchor geometry lifecycle (dispose ownership)', () => {
 
     visuals.dispose();
 
-    expect(disposeSpy).toHaveBeenCalledTimes(1);
+    expect(disposeSpy).toHaveBeenCalledTimes(2);
     disposeSpy.mockRestore();
   });
 });

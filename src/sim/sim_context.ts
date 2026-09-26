@@ -997,6 +997,7 @@ export interface SimContextCallbacks {
       cannotBeDodged?: boolean;
       normalizedInstant?: boolean;
       weaponMult?: number;
+      primaryDamageMult?: number;
       threatFlat?: number;
       threatMult?: number;
       forceCrit?: boolean;

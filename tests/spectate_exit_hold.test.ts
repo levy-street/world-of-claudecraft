@@ -8,12 +8,15 @@ import { ClientWorld } from '../src/net/online';
 
 class StubWebSocket {
   static readonly OPEN = 1;
+  static sent: string[] = [];
   onopen: (() => void) | null = null;
   onmessage: ((ev: { data: unknown }) => void) | null = null;
   onclose: (() => void) | null = null;
   readyState = StubWebSocket.OPEN;
   constructor(public readonly url: string) {}
-  send(): void {}
+  send(data: string): void {
+    StubWebSocket.sent.push(data);
+  }
   close(): void {}
 }
 
@@ -42,6 +45,7 @@ function playerWire(id: number, nm: string, tid: string): Record<string, unknown
 }
 
 function makeWorld(): { world: ClientWorld; wire: ClientInternals } {
+  StubWebSocket.sent = [];
   const world = withDomStubs(() => {
     const w = new ClientWorld('spectate-hold-token', 1, 'warrior', 'http://localhost');
     w.close();
@@ -54,6 +58,8 @@ function makeWorld(): { world: ClientWorld; wire: ClientInternals } {
 }
 
 const knownIds = (world: ClientWorld): string[] => world.known.map((k) => k.def.id);
+const sentCommands = (): Record<string, unknown>[] =>
+  StubWebSocket.sent.map((raw) => JSON.parse(raw) as Record<string, unknown>);
 
 describe('ClientWorld spectate exit hold', () => {
   it('enters spectate on the frame itself and mirrors the watched kit from the next snapshot', () => {
@@ -86,6 +92,28 @@ describe('ClientWorld spectate exit hold', () => {
     wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(1, 'Me', 'warrior') });
     expect(world.spectating).toBeNull();
     expect(knownIds(world)).toContain('heroic_strike');
+  });
+
+  it('re-sends session preferences only after the spectate exit hold clears', () => {
+    const { world, wire } = makeWorld();
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: 'Watched' }));
+    wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(2, 'Watched', 'mage') });
+    StubWebSocket.sent = [];
+
+    world.setStopAutoAttackOnTargetSwitch(true);
+    expect(sentCommands()).toEqual([]);
+
+    wire.onMessage(JSON.stringify({ t: 'spectate', name: null }));
+    expect(world.spectating).toBe('Watched');
+    expect(sentCommands()).toEqual([]);
+
+    wire.applySnapshot({ t: 'snap', ents: [], self: playerWire(1, 'Me', 'warrior') });
+    expect(world.spectating).toBeNull();
+    expect(sentCommands()).toContainEqual({
+      t: 'cmd',
+      cmd: 'stopAutoAttackOnTargetSwitch',
+      enabled: true,
+    });
   });
 
   it('a reconnect hello clears the hold with the rest of the spectate swap', () => {

@@ -35,6 +35,7 @@ import {
   COLDSIGHT_READ_FELL_SHOT_MULT,
   COLDSIGHT_READ_LONG_DRAW_MULT,
 } from '../sim/combat/hunter_coldsight_read';
+import { BENISON_WHISPER_AURA_ID } from '../sim/combat/priest/benison_dawnweave';
 import {
   GLOAM_STAGES,
   KNOCKOUT_PER_PIP,
@@ -541,7 +542,15 @@ export function auraEffectDescriptor(
     case 'next_execute_free':
       return { key: `${KEY}.freeExecute` };
     case 'next_cast_instant':
+      if (a.id === BENISON_WHISPER_AURA_ID) {
+        return { key: `${KEY}.benisonWhisper`, nums: { pct: pctFromFrac(a.value) } };
+      }
       return { key: `${KEY}.instantCast`, nums: {} };
+    case 'benison_prayers':
+      return {
+        key: `${KEY}.benisonPrayers`,
+        nums: { pct: pctFromFrac(a.value) },
+      };
     case 'next_cast_cheap':
       return { key: `${KEY}.cheapCast`, nums: { pct: pctFromFrac(a.value) } };
     case 'paladin_radiant_resonance':

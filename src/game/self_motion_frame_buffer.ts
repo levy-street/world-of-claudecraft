@@ -1,7 +1,16 @@
+import type { DelveMotionState } from '../sim/delves/geometry';
 import type { MoveInput } from '../sim/types';
 import type { RiftFloorView } from '../world_api/dungeons';
 
-export interface BufferedSelfMotionFrame {
+/** The two per-frame instanced-region descriptors this buffer carries
+ *  alongside the plain scalar fields, bundled into one trailing param so a
+ *  new one (this is how delve support landed, issue #3480) never grows the
+ *  positional argument list. */
+export interface InstancedMotionState extends DelveMotionState {
+  riftFloor: RiftFloorView | null;
+}
+
+export interface BufferedSelfMotionFrame extends InstancedMotionState {
   enabled: boolean;
   moveInput: MoveInput;
   displayFacing: number;
@@ -11,7 +20,6 @@ export interface BufferedSelfMotionFrame {
   frameDt: number;
   snapAgeMs: number;
   snapIntervalMs: number;
-  riftFloor: RiftFloorView | null;
 }
 
 export class SelfMotionFrameBuffer {
@@ -27,7 +35,7 @@ export class SelfMotionFrameBuffer {
     frameDt: number,
     snapAgeMs: number,
     snapIntervalMs: number,
-    riftFloor: RiftFloorView | null,
+    instanced: InstancedMotionState,
   ): BufferedSelfMotionFrame {
     if (this.frame === null) {
       this.frame = {
@@ -40,7 +48,9 @@ export class SelfMotionFrameBuffer {
         frameDt,
         snapAgeMs,
         snapIntervalMs,
-        riftFloor,
+        riftFloor: instanced.riftFloor,
+        delveRun: instanced.delveRun,
+        delveSolids: instanced.delveSolids,
       };
     } else {
       this.frame.enabled = enabled;
@@ -52,7 +62,9 @@ export class SelfMotionFrameBuffer {
       this.frame.frameDt = frameDt;
       this.frame.snapAgeMs = snapAgeMs;
       this.frame.snapIntervalMs = snapIntervalMs;
-      this.frame.riftFloor = riftFloor;
+      this.frame.riftFloor = instanced.riftFloor;
+      this.frame.delveRun = instanced.delveRun;
+      this.frame.delveSolids = instanced.delveSolids;
     }
     return this.frame;
   }

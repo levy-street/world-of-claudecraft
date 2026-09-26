@@ -13593,7 +13593,7 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Por 8 s, o próximo golpe inimigo contra você recebe resposta: até {buff} de dano é negado e devolvido ao atacante como dano Sagrado, e você ganha 1 de Devoção. Apenas um golpe recebe resposta. A Ascensão aumenta em 50% a quantidade que ela pode responder.',
   'entities.abilities.final_edict.description':
-    'Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão Sagrada ao seu redor.',
+    'Desfere um golpe de arma esmagador e gera 1 de Devoção quando causa dano. Um acerto bem-sucedido reduz em 2 s a recarga restante da Queda da Alvorada. Ataques automáticos bem-sucedidos e acertos do Édito Final têm 15% de chance de conceder Ira da Alvorada por 8 s. A Ascensão também libera uma explosão ao seu redor que causa dano Físico.',
   'entities.abilities.grace_devotion.description':
     'Você e os membros do grupo recuperam 15 de mana a cada 5 s e pagam 3% menos mana por 30 min. Substitui sua própria Devoção Radiante ou da Alvorada, mas coexiste com as Devoções de outros paladinos.',
   'entities.abilities.guardian_covenant.description':
@@ -15762,9 +15762,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Seu golpe de Lâmina Velada causa o triplo do dano, em vez do dobro.',
   'entities.itemSets.ashveil.name': 'Traje do Véu de Cinzas',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'A cura de resgate da Vigilância Seráfica sobe para 270, em vez de 180. Dano sofrido não atrasa mais suas conjurações.',
+    'Restaurar vida com Prece Sussurrada, Prece Solene ou Prece Urgente aumenta a cura da sua próxima Cura do Coro em 10%, até 3 acúmulos. Cada lançamento concede no máximo um acúmulo. Cura do Coro consome todos os acúmulos ao concluir o lançamento. O dano recebido não atrasa mais o lançamento dos seus feitiços.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quando a Vigilância Seráfica é ativada, seu aliado também é curado em 15% da vida máxima dele ao longo de 10 s.',
+    'Concluir Cura do Coro com 3 acúmulos torna sua próxima Prece Sussurrada usada em até 60 s instantânea e aumenta sua cura em 100%. Este benefício não acumula; recebê-lo novamente renova sua duração.',
   'entities.itemSets.benison_dawnweave.name': 'Trama do Alvorecer Benévolo',
   'entities.itemSets.chronoweave.bonus2':
     'Eco Temporal converte 50% do seu dano Arcano de alvo único em cura. Dano sofrido não atrasa mais suas conjurações.',
@@ -17463,4 +17463,12 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.',
   'guide.settingsPage.keybindsWheelBody':
     'A própria roda também se liga. Zoom Camera In e Zoom Camera Out são ligações comuns que ficam na roda nua por padrão, então você pode movê-las para Ctrl mais a roda, ou para teclas, e então rolar a roda liberada para disparar slots da barra de ação. Um entalhe de roda não tem liberação, portanto não pode conduzir uma ação retida, como avançar.',
+  'guide.settingsPage.ifColorblindMode':
+    'Recolore os perigos no solo de Nythraxis (o anel de impacto da Erupção Tumular, as poças de Chama Tumular e Fogo de Alma, a linha de Fogo Tumular e as marcas de Rasgo da Alma) com uma paleta adequada para daltonismo, com tons e brilhos distintos, para que círculos sobrepostos mantenham bordas visíveis. Tamanhos, temporizadores e posições não mudam.',
+  'hud.options.colorblindMode': 'Modo para daltonismo',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

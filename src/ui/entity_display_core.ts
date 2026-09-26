@@ -20,6 +20,7 @@ import type { Entity, PlayerClass } from '../sim/types';
 import { abilityDisplayNameFromSource } from './ability_display_name';
 import { classDisplayName, dungeonDisplayName, itemDisplayName, tEntity } from './entity_i18n';
 import { feastTitleFor } from './hud/professions/feast_title';
+import { mobileStationTitleFor } from './hud/professions/mobile_station_title';
 import { formatNumber, t } from './i18n';
 import { professionTrainerLabel } from './profession_trainer_label_core';
 import { localizeSimAuraName } from './sim_i18n';
@@ -176,6 +177,9 @@ export function entityDisplayName(entity: Entity): string {
     // world label cannot name the same table two different things.
     const feastTitle = feastTitleFor(entity.templateId, entity.name);
     if (feastTitle !== null) return feastTitle;
+    // A placed mobile crafting station, the same leaf rule (mobile_station_title.ts).
+    const stationTitle = mobileStationTitleFor(entity.templateId, entity.name);
+    if (stationTitle !== null) return stationTitle;
   }
   return entity.name;
 }

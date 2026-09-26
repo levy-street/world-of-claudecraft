@@ -370,6 +370,16 @@ for 4x threat), but the Stonebound story changed twice:
   degrades on heroic instead of failing outright; it also now out-threats the bear on
   both difficulties while keeping the highest tank DPS in the game.
 
+## v0.44 tank threat retune (2026-09-22)
+
+Oathward `threatPct` 0.4 to 1.0 and Recompense 0.8 to 1.1, driven by live 0.42 to 0.43.2
+raid parses rather than this harness (the paladin had fallen to 234 generated threat/s
+against the warrior's 330). The same tank Monte Carlo mode, on v0.43.2 with 8 seeds per
+tank, read warrior 344 to 406 threat/s heroic and 397 to 460 normal, paladin 370 to 516 and
+400 to 584, bear and Stonebound unchanged; note the harness raid now dies to Grave Flame at
+23 to 45 s, so those are opener-window rates. Method, tables and follow-ups:
+`docs/design/tank-threat-v044.md`.
+
 ## v0.38 tank threat parity and survivability retune (2026-08-15)
 
 The table above described the tree BEFORE the v0.38 tank balance pass. Live 0.37.1

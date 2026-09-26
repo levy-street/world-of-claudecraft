@@ -76,7 +76,8 @@ export const interfacePage: GuidePage = {
                 t('hudChrome.focusTargets.frame3'),
               ]),
             }) +
-            paras('guide.interfacePage.framesGovernedTalkingHead'),
+            paras('guide.interfacePage.framesGovernedTalkingHead') +
+            paras('guide.interfacePage.framesGovernedUnitTooltip'),
         )}
 
         ${section('guide.interfacePage.barsTitle', paras('guide.interfacePage.barsBody'))}

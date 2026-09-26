@@ -55,6 +55,10 @@ function info(
     sellPriceItemId: null,
     sellLowestPrice: null,
     sweepQuote,
+    orders: [],
+    myOrderCount: 0,
+    maxOrders: 6,
+    unlistedMaterials: [],
   };
 }
 

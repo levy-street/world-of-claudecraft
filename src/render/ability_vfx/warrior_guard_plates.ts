@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { WeaponAnchorSampler } from '../weapon_trail_anchor';
 import type { CrestPrewarmHost } from './crest_prewarm';
@@ -47,6 +53,8 @@ const UP = new THREE.Vector3(0, 1, 0);
  * Up to 64 defenders retain an immediate outline when the solid pool is busy
  * or cold, including the local player, who ranks first. Never guesses initial capacity. */
 export class WarriorGuardPlates {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
   readonly preparation: GuardPrewarm;
   private readonly wearers = new Map<number, Wearer>();
@@ -80,7 +88,7 @@ export class WarriorGuardPlates {
       SOLID_WEARERS * PLATES,
     );
     this.mesh.name = 'warrior-held-guard-plates';
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxKit(this.mesh);
     this.mesh.frustumCulled = false;
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     for (let i = 0; i < SOLID_WEARERS * PLATES; i++) {
@@ -203,7 +211,8 @@ export class WarriorGuardPlates {
     for (let priority = 1; priority >= 0; priority--) {
       for (const wearer of this.wearers.values()) {
         if (Number(wearer.priority) !== priority || !anchor(wearer.id, 0.46, this.at)) continue;
-        const solid = this.preparation.ready() && rank++ < SOLID_WEARERS;
+        const solid =
+          this.preparation.ready() && this.spawnGate.allows(CAST_VFX_KIT) && rank++ < SOLID_WEARERS;
         wearer.retry -= dt;
         let kinds = 0;
         for (const state of wearer.states) if (state.stamp === frame) kinds++;

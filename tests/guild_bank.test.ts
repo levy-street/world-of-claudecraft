@@ -1596,6 +1596,33 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     expect(book(sim).inventory).toEqual([]);
     expect(meta(sim).inventory.find((s) => s.craftedRecipeId === 'r_test')?.count).toBe(2);
   });
+
+  it('round-trips a whole LOCKED material stack as ONE book row, never one per unit', () => {
+    // The guild-bank twin of the personal-bank and vault cases: guildBankDepositFor
+    // reuses bags.ts addStacked for the book write, so the fresh-slot-sizing fix
+    // must hold here too, including through the escrow delta log this op replays.
+    const sim = makeOfficerSim();
+    sim.addItem('wolf_fang', 20);
+    const idx = meta(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang');
+    sim.setItemLocked('wolf_fang', true, sim.playerId, idx);
+    expect(meta(sim).inventory[idx].instance).toEqual({ locked: true });
+
+    sim.guildBankDepositFor(sim.playerId, idx);
+
+    const banked = book(sim).inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(banked).toHaveLength(1);
+    expect(banked[0].count).toBe(20);
+    expect(banked[0].instance).toEqual({ locked: true });
+
+    sim.guildBankWithdrawFor(
+      sim.playerId,
+      book(sim).inventory.findIndex((s) => s.itemId === 'wolf_fang'),
+    );
+    const carried = meta(sim).inventory.filter((s) => s.itemId === 'wolf_fang');
+    expect(carried).toHaveLength(1);
+    expect(carried[0].count).toBe(20);
+    expect(carried[0].instance).toEqual({ locked: true });
+  });
 });
 
 describe('guildBankBuySlotsFor', () => {

@@ -25,6 +25,7 @@ export const SELF_SCALAR_KEYS = [
   'hpw',
   'sh',
   'crit',
+  'scb',
   'dodge',
   'blk',
   'bval',
@@ -53,6 +54,11 @@ export function emitSelfScalarKeys(
   emit('hpw', p.healPower);
   emit('sh', p.spellHaste);
   emit('crit', p.critChance);
+  // The shared crit core (rating + talent/set crit + flat crit auras) the spell
+  // crit pool builds on: with it mirrored, the client's character sheet runs the
+  // sim's own spellCritChance over the self entity instead of a second formula.
+  // Gear/talent-rate like crit above, so the delta elision keeps it quiet.
+  emit('scb', p.sharedCritBonus);
   emit('dodge', p.dodgeChance);
   emit('blk', p.blockChance);
   emit('bval', p.blockValue);

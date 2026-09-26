@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -109,6 +115,8 @@ const colorScratch = new THREE.Color();
 const anchorScratch = new THREE.Vector3();
 
 export class GroundAuras {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: AuraSlot[] = [];
   private disposed = false;
   // center-relative XZ of every disc vertex (all slots share the same base)
@@ -200,7 +208,7 @@ export class GroundAuras {
       const mesh = slot.mesh;
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('player', 1); // over ground decals (step 0), under the shock rings (step 2)
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every re-drape (see drapeInto).
       mesh.frustumCulled = true;
@@ -258,7 +266,7 @@ export class GroundAuras {
   // overflowing onto the outermost ring) blends the band's hue toward the
   // newcomer instead of stealing the slot.
   hold(entityId: number, band: number, colorHex: number, spin: boolean, frame: number): boolean {
-    if (this.disposed) return false;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return false;
     const b = Math.min(GROUND_AURA_BANDS - 1, Math.max(0, band));
     let slot: AuraSlot | undefined;
     for (const s of this.slots) {

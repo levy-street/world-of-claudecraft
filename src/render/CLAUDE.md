@@ -184,6 +184,9 @@ cadence logic of its own. Narrow helpers:
   subtree). Register the module and its band in `tests/floor_vfx_layer.test.ts`,
   or name it there as out of scope with a reason (its completeness sweep fails a
   bare `renderOrder` that is neither); design in `docs/design/vfx-floor-layering.md`.
+  A pooled bespoke subtree calls `tagVfxSubtree` once it is fully built: the
+  warm-up walk selects on each object's OWN tag, so tagging only the root hides
+  its drawables from the prewarm and the cast gate.
 - **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
   image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
   mailbox, delve props, characters, the Eastbrook town kit), loaded via
@@ -516,6 +519,21 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   the Yumi maze walls, the battleground placements) decides through
   `occluderKeepsInstances` before `acquire`. Pinned by
   `tests/occluder_fade_gate.test.ts` and `tests/occluder_fade_core.test.ts`.
+  On the DITHERED style (`occluder_dither_fade.ts` `ditherFadeEnabled`, the
+  `GFX.ditheredGhostFade` setting) none of the above runs: a hideable material
+  stays opaque and drops fragments on one Bayer pattern, so there is no second
+  program, no twin, no gate consult and no ghost prewarm, and the restore is
+  one step. Structures read a uniform; ONE instance of a batch reads a
+  per-instance HIDE attribute (`instanced_dither_fade.ts`, 0 = drawn, so a
+  geometry without the attribute draws fully) that `InstancedOccluderGhosts`
+  writes instead of swapping in a stand-in. The layer is attached where the
+  batch material is MADE (`withInstancedDitherFade` for a material the module
+  owns, `ghostFadeBatchMaterial` for a borrowed one), never at the first
+  occlusion, and each hideable batch draws a geometry SHELL
+  (`ghostHideGeometry`: the source's attribute objects plus its own hide
+  buffer) that leaves only through `disposeGhostHideGeometry`, because three's
+  geometry dispose deletes the buffer of every attribute still attached.
+  Pinned by `tests/instanced_dither_fade.test.ts`.
 - **The Proving Shore coach's guidance is prewarmed AND gated.** The golden
   ribbon, target ring, body aura, objective beam and camp ring
   (`coach_trail.ts`) used to mint their materials and canvas textures on the
@@ -584,7 +602,15 @@ NEW subsystem's warm-up must land as a manifest entry, in the right lane:
   Warm nothing whose cost you have not measured: Brother Aldric was in this
   spec until an A/B from a start zone that had never compiled his model showed
   his spawn linking ZERO programs (the player bodies on screen already carry
-  them).
+  them). Varkhul's rig is the measured opposite (the harvest caught its body
+  programs linking live at the pull), so the Varkhul set stages it first,
+  through the live view's own factory, beside a held Forgestorm warning twin
+  (each storm disposes its warnings, and a program no material uses survives
+  only in the patched three's bounded released-program FIFO). The claim is per
+  staged SET, not per interior
+  (`unclaimedEncounterPrewarmSets`): the Ignivar raid's sets start in the
+  Forge-Lift, its first and quietest room, and every later raid room finds them
+  claimed, so each set is built once per session.
 
 ## GPU work: every new producer is a client of the scheduler
 The sections above are the machinery; this is the contract EVERY new producer of
@@ -619,11 +645,18 @@ GPU work signs. Each rule names its seam and its guard.
   `interior_light_rig.ts` instead. The outdoor hemisphere fill constants live in
   `outdoor_light_rig_core.ts`: the Lambert terrain derives its `uTerrainFillBoost`
   from them (`terrainFillBoostTarget`), so retune them there, never inline.
-  Point lights ride the pad budget
-  (`point_light_budget.ts`). Guards: `tests/render_light_census_pin.test.ts` (the
-  allowlist of every non-point light constructed under `src/render`) and
-  `tests/point_light_budget.test.ts`. There is no exception: the Wildheart
-  caldera rig used to add a fill pair to the world scene at interior build, and
+  Point lights ride the budget
+  (`point_light_budget.ts`) and reach three only through the carriers
+  (`point_light_carriers.ts`): a fixed set of lights, the only ones three gathers
+  in the world scene, packed each render with the live sources first because the
+  lit programs stop their point loop at the first black slot. A new point light in
+  the world scene is a carrier source (marked, and in a listed registry), never a
+  light three gathers itself. Guards: `tests/render_light_census_pin.test.ts` (the
+  allowlist of every non-point light constructed under `src/render`),
+  `tests/point_light_budget.test.ts` and `tests/point_light_carriers.test.ts` (the
+  allowlist of every point-light producer and its route to a carrier). There is
+  no exception: the Wildheart caldera rig used to add a fill pair to the world
+  scene at interior build, and
   because interiors are never removed, every material drawn after a Palm Reach
   visit relinked under the new census (132 programs at one graveyard in the
   2026-09-12 hunt). Its grade is the `wildheartField` state of the rig now.
@@ -700,10 +733,15 @@ GPU work signs. Each rule names its seam and its guard.
   before its first link). The client (`shader_warm_client.ts`, pure policy in
   `shader_warm_client_core.ts`) resolves a MODE from the player's option and the
   backend class (`gpu_backend_class_core.ts`, read off the renderer string): `auto`
-  is `all` where the compile runs off the presenting thread AND there is something to
-  warm AND that was measured (D3D11 only: `WORKER_WORTH_BACKENDS`; Metal reads like
-  Vulkan on its one datapoint and has no in-game measurement, so it stays out until the
-  explicit setting produces one), `off` on every OpenGL and GLES class,
+  is `all` only on a backend a FIELD measurement showed worth the worker, and none is
+  today (`WORKER_WORTH_BACKENDS` is empty, so `auto` is `off` everywhere. The options row is
+  withdrawn meanwhile (`SHADER_WARM_OPTION_OFFERED`): the stored value is kept for the
+  row's return but reads as `auto` for the worker, because a stored On nobody can turn
+  off would run a worker for good, while the character-select corpus still honours a
+  stored Off; only a `?shaderwarm=` pin starts the worker): D3D11 passed on a bench and the 0.43 fleet experiment
+  (half the D3D11 profiles with the worker, half without) found no gain it could detect;
+  Metal reads like Vulkan on its one datapoint and has no in-game measurement; it is
+  `off` on every OpenGL and GLES class,
   where the worker only relocates the stall into the GPU process (measured 2026-08-28
   on Linux NVIDIA, Linux Intel and Android Mali), and `off` on Vulkan, where a cold
   link is already as cheap as a hit and the first draw is free while the worker's own
@@ -808,13 +846,9 @@ GPU work signs. Each rule names its seam and its guard.
   `perfStats().shaderWarmAudit` are the local readout, and of the worker's half only the
   bounded projection `shaderWarmBeaconSummary` builds (`src/game/perf_shader_warm_core.ts`:
   worker state, refusal, mode, setting, backend, counts, hold time summed and as wall
-  time, releases, and the A/B arm) rides the perf beacon, as `rawSummary.shaderWarm`
+  time, releases) rides the perf beacon, as `rawSummary.shaderWarm`
   plus the typed `shaderWarmWorkerActive` and `shaderWarmRefusal` fields; the audit and
-  the adapter string ride none of it. FOR ONE RELEASE `auto` on D3D11 is an A/B
-  experiment (`shaderWarmAbArmFor`, `SHADER_WARM_AB_ACTIVE`): a browser profile draws an
-  arm once (localStorage) and the `off` arm runs the pre-worker path with the refusal
-  token `ab:off`, which is NOT a refusal and a refusal-share reading must exclude; an
-  explicit On or Off is never drawn. The decision PR removes the arm whatever it shows.
+  the adapter string ride none of it.
   The readout also names the first programs the worker failed (`failedPrograms`).
   A capture taken under `?diagnostics` also runs the scene census, whose
   bucket-visibility diffs link programs no live frame asks for: those are charged to
@@ -823,15 +857,41 @@ GPU work signs. Each rule names its seam and its guard.
   task, so without a begin the prologue of a gate that minted between the last present
   and the census is charged to it), so read `unexpected` as the gates' own escapes.
   The cast-VFX gate (`cast_vfx_readiness_core.ts`,
-  `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
-  draws no cast until every cast program is linked (linked means the settle
+  `cast_vfx_prewarm.ts`) is the same idea one level up, PER CAST and per
+  program FAMILY (`cast_vfx_family.ts`: the engine every class draws, the
+  Warrior kit): one ready bit per family, and a cast draws its whole
+  composition or nothing on the mask of the families it draws from
+  (`ability_vfx/cast_requirements.ts`: the engine, plus the kit for a Warrior
+  appearance and no other class), decided at its first entry point and kept
+  for the rest of that cast (`ability_vfx/cast_admission_core.ts`), while a
+  per-frame hold shows the frame its families are ready. A family opens on its
+  programs or on its own deadline, counted from the first consult that asks
+  for it (a diagnostics snapshot starts no clock), and a kit the device
+  declined never holds a cast. Every gated pool re-checks its own family at
+  spawn and skips (`AbilityVfxFx.setCastVfxSpawnGate`), counting a
+  `requirementMiss` a wrong mask would show instead of a live link
+  (`tests/ability_vfx_cast_requirements.test.ts` walks every spec'd id through
+  the real painter). The class pools, lazy stand-ins
+  and generic basics keep their compile units in the same warm-up but never
+  hold a cast, since none of them draws behind the gate (a bespoke visual
+  joins by a row in `CAST_VFX_FAMILIES`, a tag on its drawables and its ids in
+  the resolver); linked means the settle
   record of `linked_program_readiness.ts`, which each cast unit writes once its
-  compile settled; never the presence of `currentProgram`, assigned before the
-  link resolves, and never a driver query from a live frame), and the reads a
+  compile settled, and so does the stand-in slot's own resume link
+  (`castVfxStandInSlot`), the only unit that links the stand-ins after a dropped
+  entry; never the presence of `currentProgram`, assigned before the
+  link resolves, and never a driver query from a live frame. The reads a
   player ACTS on never wait behind it: the
   terrain-draped area ring and a mob's windup clip on the cast path, and on the
   per-frame path the hard-CC band (stun, fear, root), re-held right after the
   sleep that releases the held entity's cosmetic pools (`tests/ability_vfx_cast_gate.test.ts`).
+  Because those two draw through a closed gate, their programs (the band's
+  overlay cloud, the ring) link and are proved in their own deadline-exempt
+  boot entry, `vfx.cast-first-reads` (`castVfxFirstReadsEntry`), with the Vfx
+  particle cloud, ahead of `vfx.ability-primitives`; dropped past the hard
+  deadline or skipped on the minimal manifest, it resumes as program debt ahead
+  of the primitives, whose units run engine, then kit, first
+  (`tests/cast_vfx_first_reads.test.ts`).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

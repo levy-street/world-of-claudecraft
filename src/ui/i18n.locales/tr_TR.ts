@@ -13405,7 +13405,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     '8 sn boyunca sana gelen bir sonraki düşman vuruşu yanıtlanır: {buff} kadar hasar reddedilir ve saldırgana Kutsal hasar olarak döndürülür, sen de 1 Adanmışlık kazanırsın. Yalnızca tek bir darbe yanıtlanır. Yüceliş yanıtlayabildiği miktarı 50% artırır.',
   'entities.abilities.final_edict.description':
-    'Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Kutsal bir patlama salar.',
+    'Ezici bir silah vuruşu indirir ve hasar verdiğinde 1 Adanmışlık üretir. Başarılı bir vuruş Şafak Düşüşünün kalan bekleme süresini 2 sn kısaltır. Başarılı otomatik saldırılar ve Son Ferman vuruşlarının 15% ihtimalle 8 sn boyunca Şafağın Gazabını verme şansı vardır. Yüceliş ayrıca çevrende Fiziksel hasar veren bir patlama salar.',
   'entities.abilities.grace_devotion.description':
     'Sen ve grup üyeleri her 5 sn 15 mana geri kazanır ve 30 dk boyunca 3% daha az mana harcarsınız. Kendi Işıyan veya Şafak Adanmışlığının yerini alır, ancak diğer paladinlerin Adanmışlıklarıyla birlikte var olur.',
   'entities.abilities.guardian_covenant.description':
@@ -15038,9 +15038,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.ashveil.bonus4': 'Örtülü Keskinlik vuruşun iki yerine üç kat hasar verir.',
   'entities.itemSets.ashveil.name': 'Kül Örtüsü Kuşamı',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Serafik Nöbet’in kurtarma iyileştirmesi 180 yerine 270 olur. Alınan hasar artık büyü yapmanı geciktirmez.',
+    'Fısıldanan Dua, Vakur Dua veya Acil Dua ile sağlık yenilemek, sonraki Koro Şifası iyileştirmesini %10 artırır; en fazla 3 kez birikir. Her kullanım en fazla bir birikim kazandırır. Koro Şifası tamamlandığında tüm birikimleri tüketir. Alınan hasar artık büyü yapmayı geciktirmez.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Serafik Nöbet tetiklendiğinde müttefiki de 10 saniye boyunca azami sağlığının %15’i kadar iyileştirilir.',
+    'Koro Şifası 3 birikimle tamamlandığında, 60 saniye içinde kullanılan sonraki Fısıldanan Dua anında gerçekleşir ve %100 daha fazla iyileştirir. Bu etki birikmez; yeniden kazanılması süresini yeniler.',
   'entities.itemSets.benison_dawnweave.name': 'Lütuflu Şafak Dokuması',
   'entities.itemSets.chronoweave.bonus2':
     'Zamansal Yankı, tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.',
@@ -17259,4 +17259,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     "Çerçeveleri Düzenle, NPC görüş alanınızın dışındayken bir NPC'nin konuşulan hattını taşıyan Diyalog panelini de gevşetir; gevşekken isim çipini takar.",
   'guide.settingsPage.keybindsWheelBody':
     'Tekerleğin kendisi de bağlanır. Zoom Camera In ve Zoom Camera Out, varsayılan olarak çıplak tekerleğe oturan sıradan bağlantılardır, böylece bunları Ctrl artı tekerleğe veya tuşlara taşıyabilir ve ardından eylem çubuğu yuvalarını ateşlemek için serbest tekerleği yuvarlayabilirsiniz. Bir tekerlek çentiğinde serbest bırakma yoktur, bu nedenle ileriye doğru hareket etmek gibi tutulan bir hareketi sürdüremez.',
+  'guide.settingsPage.ifColorblindMode':
+    'Nythraxis zemin tehlikelerini (Mezar Patlaması vuruş halkası, Mezar Alevi ve Ruh Ateşi havuzları, Mezar Ateşi çizgisi ve Ruh Yırtığı işaretleri) renk körlüğüne uygun, farklı tonlara ve parlaklıklara sahip bir palete yeniden boyar; böylece üst üste binen dairelerin kenarları görünür kalır. Boyutlar, zamanlayıcılar ve konumlar değişmez.',
+  'hud.options.colorblindMode': 'Renk Körlüğü Modu',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

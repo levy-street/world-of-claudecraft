@@ -46,6 +46,7 @@ import type { SimContext } from '../sim_context';
 import { type Aura, type AuraKind, CAST_COMPLETE_EPS, DT, type Entity } from '../types';
 import { applyWellFedOnMealComplete } from '../wellfed';
 import { tickAfflictionAura, tickHexOfViolence, tickMaledictGaze } from './affliction';
+import { regenParkedCatEnergy } from './cat_form_energy';
 import { isStunned } from './cc';
 import {
   cleanupCraftedCollectionAuras,
@@ -117,6 +118,9 @@ export function updateRegen(ctx: SimContext, p: Entity, meta: PlayerMeta): void 
       }
     }
   }
+  // A druid out of Cat Form keeps regenerating the energy parked on the way out,
+  // at the base tick, so shifting back returns what staying in Cat would have.
+  if (p.resourceType !== 'energy') regenParkedCatEnergy(p);
   if (p.resourceType === 'mana') {
     // Spirit regen: the FULL amount out of combat (past the five-second rule),
     // and COMBAT_SPIRIT_REGEN_FRACTION of it while the rule is active, so Spirit

@@ -63,7 +63,10 @@ export function warriorKitAssetsState(): WarriorKitAssetsState {
 
 /** Start (or join) the one load of the Warrior kit's textures, fragments and
  *  contact sheets. Resolves true once every asset is resident, false when the
- *  device declined them. A failed load resets so a later request can retry. */
+ *  device declined them. A failed load resets so a later request can retry.
+ *  The cast gate latches a decline for good, which holds because its one
+ *  caller passes GFX.constrainedMemory, a device answer no graphics switch
+ *  changes (pinned in tests/gfx_profile.test.ts). */
 export function ensureWarriorKitAssets(constrainedMemory: boolean): Promise<boolean> {
   if (assetsTask) return assetsTask;
   if (constrainedMemory) {

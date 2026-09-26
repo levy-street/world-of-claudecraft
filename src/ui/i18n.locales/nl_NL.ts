@@ -13382,7 +13382,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     '8 sec. lang wordt de volgende vijandelijke treffer tegen jou beantwoord: tot {buff} schade wordt geweigerd en als Heilige schade aan de aanvaller teruggegeven, en je krijgt 1 Toewijding. Slechts één slag wordt beantwoord. Verheffing verhoogt het bedrag dat beantwoord kan worden met 50%.',
   'entities.abilities.final_edict.description':
-    'Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een Heilige explosie om je heen.',
+    'Levert een verpletterende wapenslag en genereert 1 Toewijding wanneer die schade aanricht. Een geslaagde treffer vermindert de resterende afkoeling van Dageraadsval met 2 sec. Geslaagde auto-aanvallen en treffers van het Laatste Edict hebben 15% kans om 8 sec. lang Toorn van de Dageraad te verlenen. Verheffing ontketent bovendien een explosie om je heen die fysieke schade aanricht.',
   'entities.abilities.grace_devotion.description':
     'Jij en je groepsleden herstellen elke 5 sec. 15 mana en betalen 30 min. lang 3% minder mana. Vervangt je eigen Stralende Toewijding of Toewijding van de Dageraad, maar bestaat naast de Toewijdingen van andere paladijnen.',
   'entities.abilities.guardian_covenant.description':
@@ -15146,9 +15146,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Je Veiled Edge-aanval treft driemaal zo hard, in plaats van tweemaal.',
   'entities.itemSets.ashveil.name': 'Ashveil-kledij',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'De redding van Seraphic Vigil geneest 270, in plaats van 180. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
+    'Als Gefluisterd Gebed, Plechtig Gebed of Dringend Gebed gezondheid herstelt, geneest je volgende Koorherstel 10% meer, tot 3 stapels. Elke spreuk levert hoogstens één stapel op. Koorherstel verbruikt alle stapels zodra het uitspreken voltooid is. Ontvangen schade vertraagt je spreuken niet meer.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Wanneer Seraphic Vigil wordt geactiveerd, wordt zijn bondgenoot ook gedurende 10 sec. genezen voor 15 procent van diens maximale gezondheid.',
+    'Als je Koorherstel met 3 stapels voltooit, wordt je volgende Gefluisterd Gebed binnen 60 sec. onmiddellijk uitgesproken en geneest het 100% meer. Dit effect stapelt niet; als je het opnieuw krijgt, wordt de duur vernieuwd.',
   'entities.itemSets.benison_dawnweave.name': 'Benison Dageraadweefsel',
   'entities.itemSets.chronoweave.bonus2':
     'Temporal Echo zet 50 procent van je Arcane-schade tegen één doel om in genezing. Opgelopen schade vertraagt het uitspreken van je spreuken niet meer.',
@@ -17471,4 +17471,12 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Edit Frames maakt ook het dialoogpaneel losser, waarin de gesproken lijn van een NPC wordt weergegeven terwijl die NPC buiten je zicht is; het draagt ​​zijn naamchip terwijl het los zit.',
   'guide.settingsPage.keybindsWheelBody':
     'Het wiel zelf bindt ook. Zoom Camera In en Zoom Camera Out zijn gewone bindingen die standaard op het blote wiel zitten, dus je kunt ze naar Ctrl plus het wiel of naar toetsen verplaatsen en vervolgens aan het vrijgekomen wiel rollen om actiebalkslots af te vuren. Een wielinkeping heeft geen ontgrendeling, dus hij kan geen vastgehouden actie voortzetten, zoals vooruit rijden.',
+  'guide.settingsPage.ifColorblindMode':
+    'Geeft de vloergevaren van Nythraxis (de inslagring van Grafuitbarsting, de poelen van Grafvlam en Zielenvuur, de lijn van Grafvuur en de tekens van Zielenscheur) een kleurenblindvriendelijk palet met duidelijke tinten en helderheden, zodat overlappende cirkels zichtbare randen houden. Afmetingen, timers en posities veranderen niet.',
+  'hud.options.colorblindMode': 'Kleurenblindmodus',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

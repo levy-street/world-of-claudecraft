@@ -181,9 +181,10 @@ describe('owned-class raid-level balance harness (armor and avoidance)', () => {
       }
       // OWNED_DPS_SPECS grew 6 -> 8 with the druid overhaul (moongrove/wildfang).
       // Long-sims lane contention (workers=2, run 31288946173) roughly doubles
-      // the shard-calibrated wall. Diet budget: ~75s measured local at one
-      // scenario; 300s keeps the ~2.5x fast-runner margin plus lane headroom.
+      // the shard-calibrated wall. Diet budget: PR #4112's GitHub lane measured
+      // this case at 311.249s, so 360s keeps the timeout above observed CI
+      // contention while staying well below the nightly full-sweep budget.
     },
-    FULL_SWEEP ? 900_000 : 300_000,
+    FULL_SWEEP ? 900_000 : 360_000,
   );
 });

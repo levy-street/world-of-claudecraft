@@ -27,7 +27,7 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
     p.facing = 0; // facing +Z
     sim.rebucket(p);
     spawnMob(sim, 900001, 0, -6); // behind, near, idle
-    const frontFar = spawnMob(sim, 900002, 0, 25); // in front, far, idle
+    const frontFar = spawnMob(sim, 900002, 0, 18); // in front, farther, idle
 
     sim.tabTarget();
     expect(p.targetId).toBe(frontFar.id);
@@ -48,6 +48,23 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
     // No on-screen / engaged enemy exists, so Tab still targets the only mob.
     sim.tabTarget();
     expect(p.targetId).toBe(behindClose.id);
+  });
+
+  it('does not target an idle enemy beyond Tab reach when it is the only one nearby', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: WORLD_WITHOUT_HUB_YARD });
+    const p = sim.player;
+    p.facing = 0;
+    sim.rebucket(p);
+    const internals = sim as unknown as { dropEntity(id: number): void };
+    for (const id of [...sim.entities.keys()]) {
+      if (id !== sim.playerId) internals.dropEntity(id);
+    }
+    spawnMob(sim, 900004, 0, 25);
+
+    sim.tabTarget();
+    expect(p.targetId).toBeNull();
+    sim.tabTargetPrev();
+    expect(p.targetId).toBeNull();
   });
 
   it('ignores an engaged enemy behind the player and Tabs a fresh mob in front (charge-escape)', () => {
@@ -137,6 +154,34 @@ describe('Sim.tabTarget on-screen / in-combat cycling', () => {
       sim.tabTarget();
       expect(p.targetId).not.toBe(farIdle.id);
     }
+  });
+
+  it('cycles two nearby enemies and admits a third after approaching it', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'warrior', world: WORLD_WITHOUT_HUB_YARD });
+    const p = sim.player;
+    p.facing = 0;
+    sim.rebucket(p);
+    const internals = sim as unknown as { dropEntity(id: number): void };
+    for (const id of [...sim.entities.keys()]) {
+      if (id !== sim.playerId) internals.dropEntity(id);
+    }
+    const nearA = spawnMob(sim, 900071, 0, 8);
+    const nearB = spawnMob(sim, 900072, 0, 12);
+    const distant = spawnMob(sim, 900073, 0, 25);
+
+    sim.tabTarget();
+    expect(p.targetId).toBe(nearA.id);
+    sim.tabTarget();
+    expect(p.targetId).toBe(nearB.id);
+    sim.tabTarget();
+    expect(p.targetId).toBe(nearA.id);
+
+    p.pos.z += 7;
+    sim.rebucket(p);
+    sim.tabTarget();
+    expect(p.targetId).toBe(nearB.id);
+    sim.tabTarget();
+    expect(p.targetId).toBe(distant.id);
   });
 
   it('prioritizes melee attackers around the player over a distant idle mob', () => {

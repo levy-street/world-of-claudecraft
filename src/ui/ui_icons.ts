@@ -59,6 +59,7 @@ export type UiIconName =
   | 'next'
   | 'more'
   | 'meters'
+  | 'gear'
   | 'battleground'
   | 'whisper'
   | 'music'
@@ -188,6 +189,8 @@ const ICONS: Record<UiIconName, string> = {
   next: '<path d="M176 96 376 256 176 416Z"/>',
   more: '<path d="M94 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M222 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0M350 256a34 34 0 1 0 68 0 34 34 0 1 0-68 0Z"/>',
   meters: '<path d="M84 288h72v152H84zM220 184h72v256h-72zM356 96h72v344h-72z"/>',
+  // hand-authored gear / cogwheel: 8-tooth mechanical gear with center cut-out
+  gear: '<path fill-rule="evenodd" d="M411 216l59 10v60l-59 10-17 41 34 49-42 42-49-34-41 17-10 59h-60l-10-59-41-17-49 34-42-42 34-49-17-41-59-10v-60l59-10 17-41-34-49 42-42 49 34 41-17 10-59h60l10 59 41 17 49-34 42 42-34 49 17 41zM256 184a72 72 0 1 0 0 144 72 72 0 1 0 0-144z"/>',
   // hand-authored: a unit nameplate — name bar over a health bar, with a
   // downward pointer aimed at the unit it floats above.
   nameplates: '<path d="M88 132h336v68H88zM88 220h336v56H88zM236 296h40l-20 34z"/>',

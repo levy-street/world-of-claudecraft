@@ -194,20 +194,20 @@ export const zh_TW: EnTranslations = {
         "description": "建立預組隊公告情境。"
       },
       "hillwarn": {
-        "label": "山丘倒數",
-        "description": "立即通告一座山丘；完整的預警結束後它會升起。"
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
       },
       "hillnow": {
-        "label": "立即升起山丘",
-        "description": "立即升起一座山丘並站在上面。"
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
       },
       "hillrise": {
-        "label": "跳過山丘倒數",
-        "description": "讓已通告的山丘立即升起。"
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
       },
       "hillend": {
-        "label": "結束山丘",
-        "description": "讓目前的山丘立即消失。"
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -1559,6 +1559,48 @@ export const zh_TW: EnTranslations = {
       "since": "宣誓於{date}",
       "withdraw": "撤回宣誓"
     },
+    "guildRanks": {
+      "tab": "階級",
+      "introEdit": "命名你的公會階級，並選擇每個階級可以做什麼。儲存後，變更會套用到持有該階級的所有成員。",
+      "introView": "每個階級名稱及其權限。只有公會會長可以變更它們。",
+      "colRank": "階級",
+      "colTitle": "名稱",
+      "colMembers": "成員",
+      "colActions": "順序",
+      "numbered": "階級 {n}",
+      "perm": {
+        "invite": "邀請",
+        "remove": "移除",
+        "promote": "晉升",
+        "bank": "公會銀行",
+        "officerChat": "幹部聊天",
+        "motd": "公告欄",
+        "events": "行事曆"
+      },
+      "permHint": {
+        "invite": "邀請玩家加入公會並處理他們的申請。",
+        "remove": "移除低於自己階級的成員。",
+        "promote": "晉升和降級低於自己階級的成員，最高只能升到比自己低一級。",
+        "bank": "在公會銀行存入和取出銅幣與物品。所有成員都可以查看。",
+        "officerChat": "閱讀並使用幹部聊天。",
+        "motd": "編輯公會公告欄。",
+        "events": "新增和移除公會行事曆事件。"
+      },
+      "titleLabel": "{rank} 的名稱",
+      "permLabel": "{rank} 的{perm}",
+      "leaderLocked": "公會會長始終擁有所有權限。",
+      "add": "新增階級",
+      "save": "儲存階級",
+      "moveUp": "上移 {rank}",
+      "moveDown": "下移 {rank}",
+      "remove": "移除 {rank}",
+      "full": "一個公會最多可有 {max} 個階級。",
+      "invalidTitle": "階級名稱可使用字母、數字、空格、撇號和連字號，最多 {max} 個字元。",
+      "removeConfirm": "持有 {rank} 的成員會變為 {fallback}。要移除此階級嗎？",
+      "removeAccept": "移除階級",
+      "promoteTo": "將 {name} 晉升為 {rank}",
+      "demoteTo": "將 {name} 降為 {rank}"
+    },
     "raidLockout": {
       "title": "團隊副本鎖定",
       "allReady": "所有團隊副本就緒",
@@ -1656,6 +1698,7 @@ export const zh_TW: EnTranslations = {
       "breakdownSummary": "{tab}：{value}",
       "breakdownRow": "{value}（{percent}）",
       "breakdownOther": "其他（{count}）",
+      "targetsHeader": "Targets",
       "percent": "{value}%",
       "petAbility": "{pet}：{ability}",
       "melee": "近戰",
@@ -1663,7 +1706,154 @@ export const zh_TW: EnTranslations = {
       "resize": "拖曳以調整此統計面板大小",
       "dock": "將此統計停靠回統計視窗",
       "separate": "分離{meter}",
-      "regroup": "合併{meter}"
+      "regroup": "合併{meter}",
+      "settingsTitle": "Details / Meter Settings",
+      "optionsEngineBadge": "WoC Details! Engine",
+      "resetDefaults": "Reset to Defaults",
+      "closeSettings": "Close",
+      "densityCompact": "Density: Compact (16px)",
+      "densityStandard": "Density: Standard (20px)",
+      "bgGlass": "Background: Glass (76%)",
+      "bgSolid": "Background: Solid (98%)",
+      "bgMinimal": "Background: Minimal (45%)",
+      "numDetailed": "Numbers: Detailed",
+      "numCompact": "Numbers: Abbreviated (k/M)",
+      "raidTotalsOn": "Header group total: Yes",
+      "raidTotalsOff": "Header group total: No",
+      "tabGeneral": "Window & Background",
+      "tabGeneralDesc": "Opacity, scale, lock",
+      "tabBars": "Bars & Textures",
+      "tabBarsDesc": "Height, spacing, animation",
+      "tabText": "Text & Typography",
+      "tabTextDesc": "Fonts, k/M, DPS, rank",
+      "tabHeader": "Header & Title",
+      "tabHeaderDesc": "Group total, title bar",
+      "tabCombat": "Combat & Limits",
+      "tabCombatDesc": "Max rows, shields",
+      "tabPresets": "Quick Themes",
+      "tabPresetsDesc": "One-click presets",
+      "tabProfiles": "Profiles & Import",
+      "tabProfilesDesc": "Export, import, and profiles",
+      "groupWindow": "Window Appearance & Background",
+      "bgMode": "Background Mode",
+      "bgModeDesc": "Visual styling for the meter panel.",
+      "optGlass": "Glass (Blur)",
+      "optGlassDesc": "Frosted blur effect",
+      "optSolid": "Solid",
+      "optSolidDesc": "Dark high-contrast panel",
+      "optMinimal": "Minimal",
+      "optMinimalDesc": "Faint translucent",
+      "optTransparent": "Transparent",
+      "optTransparentDesc": "No background, bars only",
+      "bgOpacity": "Background Opacity",
+      "bgOpacityDesc": "Opacity percentage for the window background.",
+      "windowScale": "Window Scale",
+      "windowScaleDesc": "Increase or decrease the overall meter scale.",
+      "lockPosition": "Lock Position",
+      "lockPositionDesc": "Lock the window to prevent accidental dragging or resizing in combat.",
+      "groupBars": "Bar Geometry & Texture",
+      "barHeight": "Bar Height",
+      "barHeightDesc": "Vertical thickness of each combat row (14px compact to 26px spacious).",
+      "barSpacing": "Bar Spacing",
+      "barSpacingDesc": "Vertical pixel gap between adjacent rows.",
+      "barTexture": "Bar Texture",
+      "barTextureDesc": "Visual finish and shading over the class color.",
+      "texSpecular": "Glossy (Specular)",
+      "texSpecularDesc": "Top highlight reflection with bevel",
+      "texSmooth": "Smooth (Flat)",
+      "texSmoothDesc": "Clean flat class color",
+      "texGradient": "Gradient",
+      "texGradientDesc": "Smooth horizontal color gradient",
+      "barAnimation": "Smooth Bar Animation",
+      "barAnimationDesc": "Fluidly interpolates bar growth and decay in real time.",
+      "alwaysShowMe": "Always Show Me",
+      "alwaysShowMeDesc": "Pins your player bar to the bottom if ranked outside visible rows.",
+      "groupText": "Text Formatting & Telemetry",
+      "numFormat": "Number Format",
+      "numFormatDesc": "Display style for totals.",
+      "optNumCompact": "Abbreviated (k / M)",
+      "optNumCompactDesc": "Example: 145.2k, 1.2M",
+      "optNumDetailed": "Full Detailed",
+      "optNumDetailedDesc": "Example: 145,200, 1,240,500",
+      "optNumDamageDps": "Damage | DPS",
+      "optNumDamageDpsDesc": "Example: 239.2k | 18.4k (clean telemetry bar)",
+      "showDps": "Show Rate per Second (DPS / HPS)",
+      "showDpsDesc": "Shows damage or healing rate per second on each bar.",
+      "showPercent": "Show Percentage (%)",
+      "showPercentDesc": "Shows percent contribution of total group output.",
+      "showRank": "Show Rank (#1, #2...)",
+      "showRankDesc": "Shows ordinal rank number beside the name.",
+      "showClassIcon": "Show Class Icon",
+      "showClassIconDesc": "Displays class or role icon next to each player.",
+      "groupFont": "Combat Typography (Font Family)",
+      "groupHeader": "Header Customization",
+      "showTitleBar": "Show Title Bar",
+      "showTitleBarDesc": "Displays top bar with combat segment name and controls.",
+      "showRaidTotals": "Group Summary in Subtitle",
+      "showRaidTotalsDesc": "Displays cumulative group DPS/HPS in the header subtitle.",
+      "groupCombat": "Combat Rules & Limits",
+      "maxRows": "Maximum Visible Rows",
+      "maxRowsDesc": "Simultaneous bars (0 = unlimited, auto-fit to window height).",
+      "autoRows": " (Auto)",
+      "barsUnit": " bars",
+      "includeShields": "Count Absorbs as Healing",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
+      "groupPresets": "One-Click Quick Themes",
+      "applyPreset": "Apply Theme",
+      "presetDetailsName": "Modern Glass",
+      "presetDetailsDesc": "Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.",
+      "presetDetailsBadge": "Recommended",
+      "presetClassicName": "Classic Solid",
+      "presetClassicDesc": "Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.",
+      "presetClassicBadge": "Classic",
+      "presetMinimalName": "Pure Minimal",
+      "presetMinimalDesc": "Nearly transparent background, compact 16px bars without gaps, direct text without percentages.",
+      "presetMinimalBadge": "Clean",
+      "presetRaidName": "Raid Focus",
+      "presetRaidDesc": "Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.",
+      "presetRaidBadge": "Raid",
+      "presetProGradientName": "Pro Gradient",
+      "presetProGradientDesc": "Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.",
+      "presetProGradientBadge": "Pro",
+      "groupManageProfiles": "Profile Management",
+      "activeProfile": "Active Profile",
+      "activeProfileDesc": "Select or manage independent profiles for different gameplay scenarios.",
+      "saveAs": "Save As...",
+      "duplicate": "Duplicate",
+      "deleteProfile": "Delete",
+      "cannotDeleteDefault": "The Default profile cannot be deleted",
+      "promptNewProfile": "Name of the new profile:",
+      "profileCopySuffix": " (Copy)",
+      "groupExport": "Export Current Profile",
+      "exportDesc": "Encoded profile string of your current configuration. Copy it to share or backup.",
+      "copyString": "Copy Profile String",
+      "copiedFeedback": "Copied to clipboard!",
+      "groupImport": "Import Profile",
+      "importDesc": "Paste a profile string (!WoC-Details:... or JSON) to apply and save.",
+      "importPlaceholder": "Paste profile string here (!WoC-Details:...)",
+      "importNamePlaceholder": "Profile name (optional)",
+      "importApply": "Import & Apply",
+      "errEmptyProfile": "Please paste a profile string.",
+      "errInvalidProfile": "Error: Invalid or corrupt profile string.",
+      "importSuccess": "Profile \"{name}\" imported successfully!",
+      "reportSent": "Report copied and sent to chat",
+      "reportNoData": "No data recorded.",
+      "noDetailedData": "No detailed data",
+      "noDeathEvents": "No events logged before death",
+      "killedBy": "Killed by {killer} ({ability})",
+      "lethalHit": "Lethal Hit",
+      "recentCombatEvents": "Last {count} combat events",
+      "backComparison": "Comparison",
+      "comparisonNeedTwo": "At least 2 fights are required to compare",
+      "backTimeline": "Timeline",
+      "timelineCombatEvents": "Combat events: {count}",
+      "backDev": "Balance / Dev",
+      "balanceAbilitiesCount": "Logged abilities: {count}",
+      "targetSubtitle": "Target: {target}",
+      "noTargetData": "No player data for this target"
+    },
+    "auraTooltip": {
+      "caster": "施放者：{name}"
     },
     "auraTracks": {
       "defensives": "防禦性冷卻",
@@ -1690,6 +1880,7 @@ export const zh_TW: EnTranslations = {
       "buffs": "增益",
       "unlock": "移動目標光環視窗",
       "lock": "鎖定目標光環視窗",
+      "close": "關閉目標光環視窗",
       "configureRows": "設定目標光環",
       "fewerRows": "減少光環列數",
       "moreRows": "增加光環列數",
@@ -1917,7 +2108,7 @@ export const zh_TW: EnTranslations = {
       "clickMoveLeft": "左鍵",
       "clickMoveRight": "右鍵",
       "version": "v{version}（{build}）",
-      "overlays": "疊加層",
+      "overlays": "Overlays",
       "browserEffects": "瀏覽器特效",
       "browserEffectsAuto": "自動",
       "browserEffectsFull": "完整",
@@ -1947,6 +2138,9 @@ export const zh_TW: EnTranslations = {
       "gfxBloom": "泛光",
       "gfxAntiAliasing": "反鋸齒",
       "gfxDynamicLights": "動態光源",
+      "gfxGhostFade": "Camera Ghost",
+      "gfxGhostFadeDithered": "Dithered",
+      "gfxGhostFadeSmooth": "Smooth",
       "gfxParticleEffects": "粒子特效",
       "gfxHalf": "半",
       "gfxCustomNote": "調整任一細節旋鈕會將畫質預設切換為「進階」：一套基於「高」畫質基礎、以目前預設所示等級為起點的自訂組合。",
@@ -2007,13 +2201,15 @@ export const zh_TW: EnTranslations = {
       "targetHealthText": "目標生命值文字",
       "aurasOnPlayerFrame": "增益顯示在玩家框",
       "auraBarBelowFrame": "增益顯示在玩家框下方",
+      "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "始終顯示所有增益",
+      "showAuraCaster": "在提示中顯示光環施放者",
       "highContrastBackground": "高對比度背景",
       "startAttackOnAbility": "使用技能時自動攻擊",
       "stopAutoAttackOnTargetSwitch": "切換目標時停止自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
-      "mouseoverCast": "滑鼠懸停隊伍與焦點框架施法",
+      "mouseoverCast": "對隊伍框架滑鼠指向施法",
       "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "showReliquaryTracker": "顯示聖物庫追蹤器",
@@ -2042,6 +2238,11 @@ export const zh_TW: EnTranslations = {
       "showFriendlyTrack": "顯示我給隊友的增益",
       "showShieldTrack": "顯示我的護盾",
       "waterRipples": "水面漣漪（尾波）",
+      "actionCam": "動作鏡頭",
+      "actionCamShoulder": "動作鏡頭肩位",
+      "actionCamShoulderLeft": "左 {pct}",
+      "actionCamShoulderRight": "右 {pct}",
+      "actionCamShoulderCenter": "置中",
       "showAttackButton": "顯示攻擊按鈕",
       "showDailyRewardsChest": "顯示每日獎勵寶箱",
       "mobileCameraJoystick": "攝影機搖桿",
@@ -2360,78 +2561,78 @@ export const zh_TW: EnTranslations = {
       }
     },
     "cooldownManager": {
-      "title": "冷卻管理器",
-      "intro": "為你選擇的法術顯示浮動按鈕。按鈕無法點擊：每個按鈕會顯示冷卻時間，無法施放時變暗，就緒時亮起。",
-      "generalTitle": "一般",
-      "enabled": "顯示冷卻管理器",
-      "idleOpacity": "未就緒時的不透明度",
-      "combatOnly": "僅在戰鬥中播放聲音",
-      "dragHint": "此選單開啟時，所有群組都會顯示在畫面上，你可以拖曳它們來移動位置。",
-      "addSingle": "新增單一按鈕",
-      "addGrid": "新增按鈕群組",
-      "addLine": "新增法術列",
-      "groupsFull": "群組數量已達上限。刪除一個群組後才能新增。",
-      "noGroups": "新增一個單一按鈕、一組按鈕或一條法術列來開始。",
-      "groupSingle": "單一按鈕 {index}",
-      "groupGrid": "按鈕群組 {index}",
-      "groupLine": "法術列 {index}",
-      "groupName": "群組名稱",
-      "spellCount": "{count} / {max} 個法術",
-      "orientation": "方向",
-      "horizontal": "水平",
-      "vertical": "垂直",
-      "columns": "欄數",
-      "rows": "列數",
-      "direction": "圖示方向",
-      "dirRight": "向右",
-      "dirLeft": "向左",
-      "dirDown": "向下",
-      "dirUp": "向上",
-      "iconSize": "圖示大小",
-      "iconPadding": "圖示間距",
-      "opacity": "不透明度",
-      "visibility": "可見性",
-      "visAlways": "永遠顯示",
-      "visCombat": "戰鬥中",
-      "visHidden": "隱藏",
-      "visHiddenHint": "隱藏的群組仍會播放聲音並點亮你的快捷列。",
-      "showTimer": "顯示計時",
-      "positionX": "水平位置",
-      "positionY": "垂直位置",
-      "resetPosition": "重設為預設位置",
-      "deleteGroup": "刪除群組",
-      "deleteGroupAria": "刪除{group}",
-      "trackedTitle": "追蹤的法術",
-      "trackedHint": "將法術拖到群組上，或選取它來選擇群組和提醒。當法術變成另一個法術時，按鈕會隨之改變並亮起。",
-      "search": "搜尋法術",
-      "searchPlaceholder": "搜尋",
-      "notDisplayed": "不顯示",
-      "otherSpells": "其他法術",
-      "otherSpellsHint": "來自你的其他專精、天賦選擇和更高等級的法術。現在放置一個，當你學會它時，它的按鈕就會出現。",
-      "notKnown": "{spell}（尚未學會）",
-      "aurasTitle": "觸發、引擎與增益",
-      "aurasHint": "引擎資源及其層數、觸發效果，以及你的法術施加在你身上的增益。其他曾出現在你身上的效果也會顯示在這裡。",
-      "auraFallback": "光環",
-      "onlyWhileActive": "僅在生效時顯示",
-      "alertStacks": "層數提醒",
-      "alertStacksAny": "獲得時",
-      "alertStacksHint": "光環達到此層數時，按鈕會亮起、閃爍並發出提示音。「獲得時」表示一出現就提醒。",
-      "auraSoundHint": "光環出現時，或達到你設定的層數時播放。",
-      "emptySection": "把法術拖到這裡。",
-      "spellsEmpty": "你還不會任何法術。",
-      "selectSpell": "選取{spell}",
-      "group": "群組",
-      "groupFullOption": "{group}（已滿）",
-      "notInGroupHint": "將此法術放入群組以顯示它的按鈕。",
-      "moveEarlier": "將{spell}前移",
-      "moveLater": "將{spell}後移",
-      "glowWhenReady": "就緒時亮起",
-      "glowWhenReadyHint": "法術可以施放時，按鈕會變亮並顯示外框。",
-      "hotbarGlow": "快捷列高亮",
-      "hotbarGlowHint": "法術就緒時，同時點亮它在快捷列上的按鈕。",
-      "onlyWhenReady": "僅在就緒時顯示",
-      "sound": "就緒音效",
-      "soundHint": "法術就緒時，或按鈕在就緒狀態下變成另一個法術時播放。"
+      "title": "Cooldown Manager",
+      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
+      "generalTitle": "General",
+      "enabled": "Show Cooldown Manager",
+      "idleOpacity": "Opacity While Not Ready",
+      "combatOnly": "Sounds Only in Combat",
+      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
+      "addSingle": "Add Single Button",
+      "addGrid": "Add Button Group",
+      "addLine": "Add Line of Spells",
+      "groupsFull": "You have the most groups allowed. Delete one to add another.",
+      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
+      "groupSingle": "Single Button {index}",
+      "groupGrid": "Button Group {index}",
+      "groupLine": "Line of Spells {index}",
+      "groupName": "Group Name",
+      "spellCount": "{count} / {max} spells",
+      "orientation": "Orientation",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "columns": "# Columns",
+      "rows": "# Rows",
+      "direction": "Icon Direction",
+      "dirRight": "Right",
+      "dirLeft": "Left",
+      "dirDown": "Down",
+      "dirUp": "Up",
+      "iconSize": "Icon Size",
+      "iconPadding": "Icon Padding",
+      "opacity": "Opacity",
+      "visibility": "Visibility",
+      "visAlways": "Always Visible",
+      "visCombat": "In Combat",
+      "visHidden": "Hidden",
+      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
+      "showTimer": "Show Timer",
+      "positionX": "Horizontal Position",
+      "positionY": "Vertical Position",
+      "resetPosition": "Reset to Default Position",
+      "deleteGroup": "Delete Group",
+      "deleteGroupAria": "Delete {group}",
+      "trackedTitle": "Tracked Spells",
+      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
+      "search": "Search spells",
+      "searchPlaceholder": "Search",
+      "notDisplayed": "Not Displayed",
+      "otherSpells": "Other Spells",
+      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
+      "notKnown": "{spell} (not known yet)",
+      "aurasTitle": "Procs, Engines and Buffs",
+      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
+      "auraFallback": "Aura",
+      "onlyWhileActive": "Only Show While Active",
+      "alertStacks": "Alert at Stacks",
+      "alertStacksAny": "On gain",
+      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
+      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
+      "emptySection": "Drop a spell here.",
+      "spellsEmpty": "You do not know any spells yet.",
+      "selectSpell": "Select {spell}",
+      "group": "Group",
+      "groupFullOption": "{group} (full)",
+      "notInGroupHint": "Put this spell in a group to show its button.",
+      "moveEarlier": "Move {spell} earlier",
+      "moveLater": "Move {spell} later",
+      "glowWhenReady": "Light Up When Ready",
+      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
+      "hotbarGlow": "Hotbar Glow",
+      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
+      "onlyWhenReady": "Only Show When Ready",
+      "sound": "Ready Sound",
+      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
     },
     "auraOverlay": {
       "title": "光環",
@@ -2557,79 +2758,79 @@ export const zh_TW: EnTranslations = {
         "battlegroundComplete": "荊谷原野參戰",
         "battlegroundKill": "榮譽擊殺",
         "battlegroundAssist": "助攻擊殺",
-        "worldKill": "世界擊殺",
-        "worldAssist": "世界擊殺助攻",
-        "hillHold": "佔據山丘"
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "擊殺",
         "assist": "助攻",
         "firstWin": "首勝",
-        "hill": "山丘"
+        "hill": "Hill"
       }
     },
     "worldPvp": {
-      "tab": "世界 PvP",
-      "title": "世界 PvP",
-      "blurb": "升起你的 PvP 旗幟，即可在開放世界的任何地方與其他已開啟旗幟的玩家作戰。擊敗對方即可分得其錢袋的一部分，並獲得用於兌換 PvP 裝備的榮譽。戰場與競技場的收益仍然更高。",
-      "statusOn": "你的 PvP 旗幟已升起。已開啟旗幟的玩家可以攻擊你。",
-      "statusOff": "你的 PvP 旗幟已降下。你在開放世界中無法攻擊他人，也不會被攻擊。",
-      "statusOffFfa": "你的 PvP 旗幟已降下，但在自由混戰地帶你仍然可以攻擊他人，也會被攻擊。",
-      "statusDisarming": "你的旗幟將在 {time} 後降下，或在目前戰鬥結束時降下。",
-      "zoneSanctuary": "聖域：此處沒有世界 PvP。",
-      "zoneContested": "爭奪地帶：此處只有已開啟旗幟的玩家才能交戰。",
-      "zoneFfa": "自由混戰地帶：此處的每個人都可以被攻擊。",
-      "realmDisabled": "本伺服器已關閉世界 PvP。",
-      "groundSanctuary": "試煉之濱與東溪谷是聖域：完全沒有世界 PvP。",
-      "groundContested": "其餘各處都是爭奪地帶：只有兩名都已開啟旗幟的玩家才能交戰。",
-      "groundFfa": "龍裔荒原、霜幕之境與琥珀秋境是自由混戰地帶：無論是否開啟旗幟，那裡的每個人都能交戰。",
-      "groupLine": "隊伍和團隊成員之間永遠不會互相敵對。隊伍之外的公會成員之間可以交戰。",
-      "markLine": "在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟；攻擊已開啟旗幟的玩家則永遠不會。",
-      "aidLine": "在世界戰鬥中為已開啟旗幟的玩家治療、護盾或增益，會升起你的旗幟。",
-      "stakeLine": "敗者支付 {cap} 或錢袋的 {percent}，以較少者為準。",
-      "noStakeLine": "未開啟旗幟的玩家在自由混戰地帶被擊殺時不會損失金幣。",
-      "noTakeLine": "未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移。",
-      "honorLine": "每次擊殺 {honor} 點榮譽，由所有參與者平分。",
-      "splitLine": "乾淨的 1v1 可獨得全部獎勵；協助者及其治療者共同分享。",
-      "repeatLine": "反覆擊殺同一名玩家，收益為 {second}，隨後為 {third}，之後歸零；計數在首次擊殺後 {reset} 重置。",
-      "greyLine": "比你低 {levels} 級以上的玩家不會帶來任何收益。",
-      "disarmLine": "關閉需要 {minutes} 分鐘，並會等到戰鬥結束。",
-      "record": "戰績：{kills} 次擊殺，{deaths} 次死亡",
-      "enable": "開啟世界 PvP",
-      "disable": "關閉世界 PvP",
-      "keepUp": "保持旗幟",
-      "confirmBody": "其他已開啟旗幟的玩家將可以在任何地方攻擊你，並在獲勝時從你的錢袋中最多拿走 {cap}。你可以再次關閉，但需要 {minutes} 分鐘。",
-      "confirmAccept": "升起旗幟",
-      "confirmCancel": "取消",
-      "levelReq": "需要 {level} 級。",
-      "pending": "正在等待伺服器回傳你的 PvP 狀態。",
-      "commandHint": "聊天：/pvp 切換旗幟，/pvp on 與 /pvp off 直接設定。"
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "zoneSanctuary": "Sanctuary: no world PvP here.",
+      "zoneContested": "Contested ground: only flagged players fight here.",
+      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
+      "realmDisabled": "World PvP is disabled on this realm.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "hill": {
-      "title": "山丘之王",
-      "rising": "山丘尚未升起",
-      "heldYou": "你的隊伍佔據著山丘",
-      "heldOther": "另一支隊伍佔據著山丘",
-      "heldNone": "無人佔據山丘",
-      "counts": "圈內：你方 {yours}，佔據方 {theirs}",
-      "countsUnheld": "圈內：你方 {yours}，最大對手 {theirs}",
-      "countsHolding": "圈內：你方 {yours}，對手 {theirs}",
-      "contestYou": "正在奪取山丘：{total} 中的 {seconds}",
-      "contestOther": "正在失去山丘：{total} 中的 {seconds}",
-      "contestNone": "在圈內保持人數優勢 {total} 即可奪取",
-      "inside": "你在圈內",
-      "distance": "距離圓圈 {yards} 碼",
-      "rises": "{minutes} 後升起",
-      "falls": "{minutes} 後消失",
-      "standingRaid": "團隊成員不計入人數：只有隊伍才能佔據山丘"
+      "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "瀏覽戰爭套裝",
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
-      "groupSeason2": "戰爭第二賽季：先鋒",
-      "groupEntry": "戰爭第一賽季",
+      "groupSeason2": "Warfare Season 2: Vanguard",
+      "groupEntry": "Warfare Season 1",
       "owned": "已擁有",
       "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
@@ -2637,7 +2838,9 @@ export const zh_TW: EnTranslations = {
     },
     "charSheet": {
       "offense": "攻擊",
+      "spell": "法術",
       "defense": "防禦",
+      "ratings": "評分",
       "playtimeLabel": "遊戲時長",
       "playtimeParts": "{major}{minor}",
       "playtimeUnderMinute": "不到一分鐘",
@@ -2751,6 +2954,7 @@ export const zh_TW: EnTranslations = {
       "names": {
         "spellPower": "法術強度",
         "healPower": "治療強度",
+        "spellCrit": "Spell Crit",
         "critRating": "暴擊等級",
         "hasteRating": "急速等級",
         "parry": "招架",
@@ -2767,15 +2971,17 @@ export const zh_TW: EnTranslations = {
         "armor": "減緩受到的物理打擊。對等級較低的攻擊者減免效果更佳，上限為 75%。",
         "attackPower": "強化你的武器攻擊。每 14 點攻擊強度可增加 1 點每秒傷害。",
         "spellPower": "提高你法術造成的傷害與治療的強度。每點智力都會提供少量法術強度，此外還有來自裝備與增益的加成。",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "你的預估武器每秒傷害，由武器的傷害與速度結合你的攻擊強度計算而來。",
         "critChance": "你的攻擊造成暴擊並施加雙倍傷害的機率。",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "你完全閃躲受到的近戰攻擊、不受任何傷害的機率。",
         "critRating": "來自裝備和套裝加成的暴擊等級，提升你的暴擊機率。約每10點等級提供1%暴擊。",
         "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
         "parry": "你招架正面近戰攻擊、完全不受傷害的機率。來自背後的攻擊無法招架。",
         "hitRating": "來自裝備和套裝獎勵的命中等級，降低你的攻擊被閃避和法術被抵抗的機率，對更高等級的敵人尤其有效。約每10點等級提供1%命中。",
         "warfare": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。",
-        "warfareWithHealth": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。此外，在地城、團隊副本、秘探和裂隙以外的所有地方，最大生命值提高 {health}%。"
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} 攻擊強度",
@@ -3235,6 +3441,8 @@ export const zh_TW: EnTranslations = {
       "hint": "專注點會在每種材料的基礎產出上疊加加成。未專注的材料保持基礎產出不變。",
       "tierHint": "每在一種材料上投入{points}點專注，其採集品階就會提升一階，最多提升{steps}階；不足{points}點時仍會提高產出。",
       "townOnlyHint": "專注只能在城鎮中調整。",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "剩餘點數：{remaining} / {budget}",
       "saveButton": "儲存專注",
       "notInTownHint": "你必須在城鎮中才能設定專注。",
@@ -3732,6 +3940,8 @@ export const zh_TW: EnTranslations = {
       "iceFloesCasts": "接下來{n}個有施法時間的法術可在移動中施放",
       "freeCast": "下一次施法不消耗任何資源",
       "instantCast": "下一個有施法時間的法術變為瞬發",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "下一個法術消耗降低{pct}%",
       "radiantResonance": "你的下一次治癒之光將立即施放，或下一次黎明之擁的法力消耗降低 {pct}%，施法時間縮短至 {castTime} 秒",
       "solarReprisal": "你的下一次向陽飛盾不消耗法力、無視冷卻時間且傷害提高 {pct}%；恩典之錘無視冷卻時間並為你恢復相當於傷害量 100% 的生命值；或使治癒之光立即施放",
@@ -3916,6 +4126,7 @@ export const zh_TW: EnTranslations = {
       "resetErrInvalid": "此重設連結無效或已過期。請重新申請一個。"
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "寶箱",
       "takeLootButton": "拾取戰利品",
       "takeLootTooltip": "收取金幣和掉落的物品。不會用掉採集機會。",
@@ -3966,6 +4177,10 @@ export const zh_TW: EnTranslations = {
       "friendly": "友方",
       "elite": "精英",
       "boss": "首領"
+    },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
     },
     "targetFrame": {
       "unlock": "移動目標框",
@@ -4049,7 +4264,8 @@ export const zh_TW: EnTranslations = {
         "deedTracker": "功績追蹤器",
         "delveTracker": "秘探追蹤器",
         "riftTracker": "裂隙追蹤器",
-        "swingBarOffhand": "副手"
+        "swingBarOffhand": "副手",
+        "unitTooltip": "提示框"
       },
       "framesMenu": "框體設定",
       "framesMenuTitle": "顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。",
@@ -4600,6 +4816,8 @@ export const zh_TW: EnTranslations = {
       "vaultTab": "倉庫",
       "vaultCapacityNote": "每種材料最多可存放{cap}個。",
       "vaultEmpty": "你的材料倉庫是空的。點擊背包中的材料即可存入。",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}：已存{count}/{cap}",
       "vaultLockedIntro": "解鎖材料倉庫，在銀行旁囤積製造材料。每種材料都有自己的空間，最多可存{cap}個。",
       "vaultUnlockButton": "解鎖材料倉庫",
@@ -5270,6 +5488,7 @@ export const zh_TW: EnTranslations = {
         "dormantKnowledge": "{craft}知識已保留，但在其組合或嗜好未啟用時處於休眠狀態。"
       },
       "stationRequired": "必須位於{station}才能製作該物品。",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "鍛造坊",
         "kitchens": "廚房",
@@ -5984,8 +6203,6 @@ export const zh_TW: EnTranslations = {
       "level": "等級 {level}",
       "landmarkCount": "{count} 個地標",
       "filtersAria": "地圖圖層",
-      "railToggle": "側邊欄",
-      "railToggleAria": "顯示或隱藏地圖側邊欄",
       "filters": {
         "quests": "任務",
         "gather": "採集",
@@ -6033,7 +6250,9 @@ export const zh_TW: EnTranslations = {
         "herb": "草藥",
         "mail": "信箱",
         "passage": "通道"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "需要等級 {level}"
@@ -6268,7 +6487,9 @@ export const zh_TW: EnTranslations = {
       "listingStatusReturned": "已退回",
       "listingStatusCancelled": "已取消",
       "listingStatusSuspended": "已凍結",
-      "listingStatusUnsold": "未售出"
+      "listingStatusUnsold": "未售出",
+      "charselectWebLink": "在 $WOC 交易所網站上出價、購買或出售",
+      "charselectWebNote": "進入遊戲並選擇角色後才能出價、購買或出售。"
     },
     "lootExplorer": {
       "title": "戰利品瀏覽器",
@@ -7014,6 +7235,7 @@ export const zh_TW: EnTranslations = {
       "ifHudOpacity": "HUD 面板蓋在後方世界之上時有多不透明。",
       "ifTooltipScale": "提示框文字大小，在小螢幕或超大螢幕上都很好用。",
       "ifHighContrastText": "更厚重、對比更高的介面文字。它首先是一項無障礙選項，而且在明亮的螢幕上表現很好。",
+      "ifColorblindMode": "Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.",
       "ifHighContrastBackground": "在起始畫面與角色畫面後方使用較樸素、對比較高的背景。",
       "ifInvertLookY": "反轉滑鼠視角的上下方向。",
       "ifShowItemLevel": "在每個物品提示框上加一行裝備等級。預設關閉，以保留經典的純屬性提示框。",
@@ -7033,7 +7255,9 @@ export const zh_TW: EnTranslations = {
       "ifPartyShowAuras": "隊伍框上是否顯示增益與減益。另有對應的開關管理資源條、吸收護盾、寵物，以及你自己是否出現在自己的隊伍清單裡。",
       "ifAurasOnPlayerFrame": "除了光環列之外，也把你的增益與減益顯示在你自己的單位框上。",
       "ifAuraBarBelowFrame": "把增益列移到你的單位框下方，而不是上方。只有在增益顯示於玩家框時才有效。",
+      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "即使在低畫質預設下也顯示所有生效中的增益，繞過該檔位平時的增益圖示上限。",
+      "ifShowAuraCaster": "在每個增益／減益提示中加上一行「施放者」，說明是誰施加的。便於分辨多名騎士的祝福等同名增益。",
       "ifTargetOfTarget": "顯示你的目標正在攻擊誰，這是判斷坦克有沒有拉穩的經典方式。",
       "ifPetFrame": "為你的寵物顯示一個框。",
       "ifChatFontScale": "聊天文字大小。",
@@ -7112,6 +7336,7 @@ export const zh_TW: EnTranslations = {
       "framesGovernedAuraTracks": "「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。",
       "frameGroups": "{trackers}可合併任務、功績、裂隙、地下探索、採集目標及聖物匣追蹤。{auras}可合併目標持續傷害與六種光環追蹤。在框架設定中分別啟用合併，關閉後可個別移動。{tot}具有資源條。{focus}的三個目標可獨立移動：Shift+F1至F3設定，Ctrl+F1至F3選取。傷害與威脅統計即使在框架鎖定時，也可拖曳按鈕以外的區域移動，拖曳邊緣調整大小。解鎖後，獨立的框架顯示選單依群組控制顯示。右鍵點擊框架可重設大小或開啟相關設定。介面中的框架頁也包含共用設定及可摺疊的隊伍設定。關閉「將目標的目標鎖定至目標」即可獨立移動，重新啟用仍會保留獨立位置。設定焦點後，設定按鈕與說明會隱藏。右鍵選擇「清除焦點」可恢復預設狀態。滑鼠懸停施法同樣適用於焦點框架。",
       "framesGovernedTalkingHead": "「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。",
+      "framesGovernedUnitTooltip": "「編輯框體」也會解鎖提示框框體，也就是滑鼠所停留對象的資訊卡出現的位置：生物的等級與種類，或其他玩家的頭銜、公會、等級與職業，以及專精和對應定位。把它拖到任意位置，資訊卡就會從那裡朝遠離螢幕最近邊緣的方向展開。在「框體設定」的「顯示或隱藏框體」中取消勾選「提示框」，即可完全隱藏這張資訊卡。",
       "barsTitle": "各種條、計時與戰鬥文字",
       "barsBody": "你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。",
       "aurasTitle": "增益與減益",
@@ -7985,8 +8210,8 @@ export const zh_TW: EnTranslations = {
       "warfareBodyStatsStay": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。",
       "warfareTradeBody": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它所帶來的一切都只花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
       "warfareTradeBodyRatingSpent": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
-      "vanguardHeading": "先鋒裝備：戰爭第二賽季",
-      "vanguardBody": "先鋒裝備是戰爭裝備的第二賽季，由同樣的兩位軍需官販售，陳列在原有裝備之上，原有裝備也繼續販售。每個專精都有自己的一套五件先鋒套裝，包括頭部、肩部、胸部、腿部和手部，商店只會列出你的職業能穿的三套，以及你能使用的先鋒武器。先鋒裝備帶有與原有裝備相同的戰爭等級，但物品等級更高；每套都有兩件和四件兩檔獎勵，會改變你專精的一個技能。與原有套裝不同，這些獎勵在任何地方都生效，對怪物也一樣，但它們是為對抗玩家而設計的，所以在團隊副本裡，團隊套裝仍是更好的選擇。"
+      "vanguardHeading": "Vanguard gear: Warfare Season 2",
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
     },
     "worldPvpPage": {
       "heading": "世界 PvP",
@@ -8835,7 +9060,7 @@ export const zh_TW: EnTranslations = {
       "parryBody": "招架是戰士自有的防禦：一個把近戰攻擊完全格開、不受任何傷害的機率，而且它會隨力量成長。只有從你正面襲來的攻擊才能被招架，這也是你該持續面對正在打你的東西的又一個理由。其他職業在角色面板上看到的這一列會停在零。",
       "warfareTitle": "戰爭",
       "warfareBody": "戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。",
-      "warfareBodyPets": "戰爭是榮譽裝備為對抗玩家而帶有的屬性。在玩家之間的戰鬥中，它提高你和你的寵物對其他玩家及其寵物造成的傷害，並降低你和你的寵物從他們身上承受的傷害。它還會在地城、團隊副本、秘探和裂隙以外的所有地方提高你的最大生命值，因此穿著榮譽裝備的玩家遠比沒有穿的玩家難以擊殺。你的角色面板會把這一切顯示在同一行上。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。"
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "每一場戰鬥、每一個任務、每一步北行，都會讓你的英雄更為強大。以下說明升級如何運作，以及當你登上巔峰之後，是什麼讓你持續成長。",
@@ -10889,6 +11114,16 @@ export const zh_TW: EnTranslations = {
       "xpGainRested": "你獲得 {amount} 點經驗值（休息獎勵 {rested} 點）。",
       "deathTitle": "你已經死亡。",
       "releaseSpirit": "釋放靈魂",
+      "deathRecap": "Recap",
+      "deathRecapTitle": "Death Recap",
+      "deathRecapKiller": "Killing blow: {killer} ({ability})",
+      "deathRecapNoKiller": "Combat events leading to death",
+      "deathRecapLethal": "Killing Blow",
+      "deathRecapClose": "Close",
+      "deathRecapNoEvents": "No combat events recorded.",
+      "deathRecapCrit": "Crit",
+      "deathRecapDamage": "Damage",
+      "deathRecapHeal": "Healing",
       "chatTab": "聊天",
       "combatLogTab": "戰鬥紀錄",
       "chatPlaceholder": "說點什麼...（/w 名字 密語，/r 回覆，/p 隊伍，/gu 公會，/o 幹部，/general 綜合，! 顯示社群指令）",
@@ -11100,6 +11335,7 @@ export const zh_TW: EnTranslations = {
       "compactChat": "精簡聊天",
       "frostedPanels": "霧面面板",
       "highContrastText": "高對比文字",
+      "colorblindMode": "Colorblind Mode",
       "reduceMotion": "減少動態效果",
       "showFps": "顯示 FPS",
       "invertLookY": "反轉視角（Y 軸）",
@@ -11161,6 +11397,19 @@ export const zh_TW: EnTranslations = {
       "threat": "仇恨",
       "damageShort": "傷害",
       "healingShort": "治療",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "目前",
       "lastFight": "上一場戰鬥",
       "fightIndex": "戰鬥 -{index}",
@@ -11172,6 +11421,16 @@ export const zh_TW: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "較早片段",
       "newerSegment": "較新片段",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "關閉統計"
     },
     "chat": {
@@ -11654,6 +11913,9 @@ export const zh_TW: EnTranslations = {
       "anyTarget": "敵方或友方目標",
       "selfOnly": "僅對自己",
       "damageRange": "{min} 到 {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} 加每個連擊點 {perCombo}"
     },
     "resources": {
@@ -12365,9 +12627,12 @@ export const zh_TW: EnTranslations = {
       "reclaim": "取回",
       "buyAria": "以 {price} 購買 {item}",
       "reclaimAria": "取回 {item}",
+      "buyQuantityAria": "要購買多少個{item}（共 {total} 個）",
+      "buyQuantityBtnAria": "購買這麼多個{item}",
       "buyConfirmTitle": "確認購買",
       "buyConfirmBody": "以 {price} 購買 {item}？",
       "buyConfirmBodyStack": "以 {price} 購買 {item} x{count}（每個 {each}）？",
+      "buyConfirmBodyPartial": "以 {price} 購買 {count} 個{item}（共上架 {total} 個，每個 {each}）？",
       "buyConfirmAccept": "購買",
       "buyConfirmCancel": "取消",
       "buyChanged": "該上架在你確認前已變更。請核對價格後再試一次。",
@@ -12396,9 +12661,45 @@ export const zh_TW: EnTranslations = {
       "collectEmpty": "沒有待領取內容。銷售收益和過期上架會在這裡領取。",
       "collectNote": "商人為你保管的收益和退回貨物。",
       "saleProceeds": "銷售收益",
+      "collectAll": "全部領取",
+      "history": "歷史記錄",
+      "historyEmpty": "尚無銷售記錄。你在世界市場出售的物品會顯示在這裡。",
+      "historyNote": "你在世界市場的近期銷售記錄。",
       "saleBuyer": "售予 {buyer}",
       "saleOlder": "另有 {count} 筆較早的交易，已計入總額。",
-      "collectAll": "全部領取"
+      "ordersTab": "Wanted",
+      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
+      "ordersListAria": "Open buy orders",
+      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
+      "orderCardTitle": "Place an order",
+      "orderPickLabel": "Item wanted",
+      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
+      "orderSearchPlaceholder": "Search items...",
+      "orderSearchAria": "Search for an item to order",
+      "orderPickNone": "No item matches.",
+      "orderQuantity": "Units wanted",
+      "orderPriceEach": "Price each",
+      "orderEscrowLine": "Gold held at the Merchant: {total}",
+      "orderCannotAfford": "You cannot afford {total} for this order.",
+      "orderAtCap": "You have no free order slots. Withdraw one first.",
+      "orderPlaceButton": "Place Order",
+      "orderConfirmTitle": "Confirm Order",
+      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
+      "orderWanted": "x{count} wanted",
+      "orderBy": "Wanted by {buyer}",
+      "orderMine": "Your order",
+      "orderEach": "each",
+      "orderDeliver": "Deliver",
+      "orderDeliverAria": "Deliver {item} to {buyer}",
+      "orderDeliverNone": "None of this item in your bags.",
+      "orderWithdraw": "Withdraw",
+      "orderWithdrawAria": "Withdraw your order for {item}",
+      "orderDeliverConfirmTitle": "Confirm Delivery",
+      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
+      "unlistedTitle": "Not on the market",
+      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
+      "unlistedNone": "Every material has at least one listing right now.",
+      "unlistedStageAria": "Order {item}"
     },
     "logs": {
       "listedItem": "已將 {item} 以 {money} 上架到世界市場。",
@@ -12407,6 +12708,11 @@ export const zh_TW: EnTranslations = {
       "collectedMoney": "你從商人處領取了 {money}。",
       "reclaimedItem": "已從市場取回 {item}。",
       "expiredListing": "你的 {item} 市場上架已過期，正在商人處等待領取。",
+      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
+      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
+      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
+      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
+      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
       "boughtBackItem": "你以 {money} 買回了 {item}。"
     },
     "errors": {
@@ -12425,7 +12731,12 @@ export const zh_TW: EnTranslations = {
       "notYourListing": "這不是你的上架。",
       "nothingToCollect": "你沒有可領取內容。",
       "sweepNoListings": "沒有可掃貨的該物品上架。",
-      "sweepPriceChanged": "掃貨送達前價格已變更。請核對報價後再試一次。"
+      "sweepPriceChanged": "掃貨送達前價格已變更。請核對報價後再試一次。",
+      "orderCountNeeded": "Name how many you want.",
+      "tooManyOrders": "You may keep at most {count} orders open at once.",
+      "orderClosed": "That order is no longer open.",
+      "orderOwn": "That is your own order. Cancel it to withdraw it.",
+      "orderNotYours": "That is not your order."
     },
     "loot": {
       "takeAll": "全部拾取",
@@ -13158,16 +13469,16 @@ export const zh_TW: EnTranslations = {
         "description": "被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）"
       },
       "lightning_overload": {
-        "name": "電弧超載",
-        "description": "被動：電弧箭與叉狀閃電有20%的機率超載，對其第一個目標再次造成所造成傷害的50%，並獲得1層雷霆。（雷霆召喚）"
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
       },
       "lava_burst": {
-        "name": "熔岩爆裂",
-        "description": "造成{damage}點火焰傷害。對身上帶有你的燼焰震擊燃燒效果的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次跳動有20%的機率重置此技能的冷卻時間，並使你在10秒內的下一次熔岩爆裂變為瞬發。傷害隨法術強度提高。（雷霆召喚）"
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
-        "name": "風暴破擊",
-        "description": "召喚一聲霹靂，對10公尺內的敵人造成{damage}點自然傷害，並使其移動速度降低50%，持續5秒。恢復你最大法力值的8%。傷害隨法術強度提高。（雷霆召喚）"
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "縛石武器",
@@ -17068,421 +17379,421 @@ export const zh_TW: EnTranslations = {
         "name": "風暴頌歌鏈甲之靴"
       },
       "vanguard_warrior_arms_helmet": {
-        "name": "刃痕巨盔"
+        "name": "Bladewake Greathelm"
       },
       "vanguard_warrior_arms_shoulder": {
-        "name": "刃痕肩甲"
+        "name": "Bladewake Pauldrons"
       },
       "vanguard_warrior_arms_chest": {
-        "name": "刃痕鎖甲衫"
+        "name": "Bladewake Hauberk"
       },
       "vanguard_warrior_arms_legs": {
-        "name": "刃痕板腿甲"
+        "name": "Bladewake Legplates"
       },
       "vanguard_warrior_arms_gloves": {
-        "name": "刃痕碎擊護手"
+        "name": "Bladewake Crushers"
       },
       "vanguard_warrior_fury_helmet": {
-        "name": "血征面甲"
+        "name": "Bloodmarch Visage"
       },
       "vanguard_warrior_fury_shoulder": {
-        "name": "血征護肩"
+        "name": "Bloodmarch Shoulderguards"
       },
       "vanguard_warrior_fury_chest": {
-        "name": "血征鏈甲"
+        "name": "Bloodmarch Chainmail"
       },
       "vanguard_warrior_fury_legs": {
-        "name": "血征護腿"
+        "name": "Bloodmarch Leggings"
       },
       "vanguard_warrior_fury_gloves": {
-        "name": "血征握套"
+        "name": "Bloodmarch Grips"
       },
       "vanguard_warrior_prot_helmet": {
-        "name": "鐵征頭盔"
+        "name": "Ironmarch Helm"
       },
       "vanguard_warrior_prot_shoulder": {
-        "name": "鐵征肩鎧"
+        "name": "Ironmarch Spaulders"
       },
       "vanguard_warrior_prot_chest": {
-        "name": "鐵征護胸"
+        "name": "Ironmarch Chestguard"
       },
       "vanguard_warrior_prot_legs": {
-        "name": "鐵征腿甲"
+        "name": "Ironmarch Legguards"
       },
       "vanguard_warrior_prot_gloves": {
-        "name": "鐵征護手甲"
+        "name": "Ironmarch Handguards"
       },
       "vanguard_paladin_holy_helmet": {
-        "name": "日守頭環"
+        "name": "Sunvigil Circlet"
       },
       "vanguard_paladin_holy_shoulder": {
-        "name": "日守肩篷"
+        "name": "Sunvigil Mantle"
       },
       "vanguard_paladin_holy_chest": {
-        "name": "日守鎖甲衫"
+        "name": "Sunvigil Hauberk"
       },
       "vanguard_paladin_holy_legs": {
-        "name": "日守鏈腿甲"
+        "name": "Sunvigil Legmail"
       },
       "vanguard_paladin_holy_gloves": {
-        "name": "日守手套"
+        "name": "Sunvigil Gloves"
       },
       "vanguard_paladin_protection_helmet": {
-        "name": "盾誓頭盔"
+        "name": "Shieldvow Helm"
       },
       "vanguard_paladin_protection_shoulder": {
-        "name": "盾誓肩甲"
+        "name": "Shieldvow Pauldrons"
       },
       "vanguard_paladin_protection_chest": {
-        "name": "盾誓胸甲"
+        "name": "Shieldvow Breastplate"
       },
       "vanguard_paladin_protection_legs": {
-        "name": "盾誓板腿甲"
+        "name": "Shieldvow Legplates"
       },
       "vanguard_paladin_protection_gloves": {
-        "name": "盾誓護手"
+        "name": "Shieldvow Gauntlets"
       },
       "vanguard_paladin_retribution_helmet": {
-        "name": "光印冠冕"
+        "name": "Lightbrand Crown"
       },
       "vanguard_paladin_retribution_shoulder": {
-        "name": "光印肩鎧"
+        "name": "Lightbrand Spaulders"
       },
       "vanguard_paladin_retribution_chest": {
-        "name": "光印胸鎧"
+        "name": "Lightbrand Cuirass"
       },
       "vanguard_paladin_retribution_legs": {
-        "name": "光印腿甲"
+        "name": "Lightbrand Legguards"
       },
       "vanguard_paladin_retribution_gloves": {
-        "name": "光印護手"
+        "name": "Lightbrand Gauntlets"
       },
       "vanguard_hunter_beast_mastery_helmet": {
-        "name": "群守頭巾"
+        "name": "Packwarden Coif"
       },
       "vanguard_hunter_beast_mastery_shoulder": {
-        "name": "群守肩鎧"
+        "name": "Packwarden Spaulders"
       },
       "vanguard_hunter_beast_mastery_chest": {
-        "name": "群守短皮衣"
+        "name": "Packwarden Jerkin"
       },
       "vanguard_hunter_beast_mastery_legs": {
-        "name": "群守腿甲"
+        "name": "Packwarden Legguards"
       },
       "vanguard_hunter_beast_mastery_gloves": {
-        "name": "群守護手"
+        "name": "Packwarden Gauntlets"
       },
       "vanguard_hunter_marksmanship_helmet": {
-        "name": "遠見頭巾"
+        "name": "Farsight Coif"
       },
       "vanguard_hunter_marksmanship_shoulder": {
-        "name": "遠見肩鎧"
+        "name": "Farsight Spaulders"
       },
       "vanguard_hunter_marksmanship_chest": {
-        "name": "遠見短皮衣"
+        "name": "Farsight Jerkin"
       },
       "vanguard_hunter_marksmanship_legs": {
-        "name": "遠見腿甲"
+        "name": "Farsight Legguards"
       },
       "vanguard_hunter_marksmanship_gloves": {
-        "name": "遠見護手"
+        "name": "Farsight Gauntlets"
       },
       "vanguard_hunter_survival_helmet": {
-        "name": "陷牙頭巾"
+        "name": "Snaretooth Coif"
       },
       "vanguard_hunter_survival_shoulder": {
-        "name": "陷牙肩鎧"
+        "name": "Snaretooth Spaulders"
       },
       "vanguard_hunter_survival_chest": {
-        "name": "陷牙短皮衣"
+        "name": "Snaretooth Jerkin"
       },
       "vanguard_hunter_survival_legs": {
-        "name": "陷牙腿甲"
+        "name": "Snaretooth Legguards"
       },
       "vanguard_hunter_survival_gloves": {
-        "name": "陷牙護手"
+        "name": "Snaretooth Gauntlets"
       },
       "vanguard_rogue_assassination_helmet": {
-        "name": "夜斬風帽"
+        "name": "Nightcut Hood"
       },
       "vanguard_rogue_assassination_shoulder": {
-        "name": "夜斬肩墊"
+        "name": "Nightcut Shoulderpads"
       },
       "vanguard_rogue_assassination_chest": {
-        "name": "夜斬外衣"
+        "name": "Nightcut Tunic"
       },
       "vanguard_rogue_assassination_legs": {
-        "name": "夜斬馬褲"
+        "name": "Nightcut Breeches"
       },
       "vanguard_rogue_assassination_gloves": {
-        "name": "夜斬手套"
+        "name": "Nightcut Gloves"
       },
       "vanguard_rogue_combat_helmet": {
-        "name": "鬥印風帽"
+        "name": "Brawlmark Hood"
       },
       "vanguard_rogue_combat_shoulder": {
-        "name": "鬥印肩墊"
+        "name": "Brawlmark Shoulderpads"
       },
       "vanguard_rogue_combat_chest": {
-        "name": "鬥印外衣"
+        "name": "Brawlmark Tunic"
       },
       "vanguard_rogue_combat_legs": {
-        "name": "鬥印馬褲"
+        "name": "Brawlmark Breeches"
       },
       "vanguard_rogue_combat_gloves": {
-        "name": "鬥印手套"
+        "name": "Brawlmark Gloves"
       },
       "vanguard_rogue_subtlety_helmet": {
-        "name": "影行風帽"
+        "name": "Shadewalk Hood"
       },
       "vanguard_rogue_subtlety_shoulder": {
-        "name": "影行肩墊"
+        "name": "Shadewalk Shoulderpads"
       },
       "vanguard_rogue_subtlety_chest": {
-        "name": "影行外衣"
+        "name": "Shadewalk Tunic"
       },
       "vanguard_rogue_subtlety_legs": {
-        "name": "影行馬褲"
+        "name": "Shadewalk Breeches"
       },
       "vanguard_rogue_subtlety_gloves": {
-        "name": "影行手套"
+        "name": "Shadewalk Gloves"
       },
       "vanguard_priest_discipline_helmet": {
-        "name": "幕頌兜帽"
+        "name": "Veilpsalm Cowl"
       },
       "vanguard_priest_discipline_shoulder": {
-        "name": "幕頌肩篷"
+        "name": "Veilpsalm Mantle"
       },
       "vanguard_priest_discipline_chest": {
-        "name": "幕頌長袍"
+        "name": "Veilpsalm Robe"
       },
       "vanguard_priest_discipline_legs": {
-        "name": "幕頌護腿"
+        "name": "Veilpsalm Leggings"
       },
       "vanguard_priest_discipline_gloves": {
-        "name": "幕頌纏手布"
+        "name": "Veilpsalm Handwraps"
       },
       "vanguard_priest_holy_helmet": {
-        "name": "恩翼兜帽"
+        "name": "Gracewing Cowl"
       },
       "vanguard_priest_holy_shoulder": {
-        "name": "恩翼肩篷"
+        "name": "Gracewing Mantle"
       },
       "vanguard_priest_holy_chest": {
-        "name": "恩翼長袍"
+        "name": "Gracewing Robe"
       },
       "vanguard_priest_holy_legs": {
-        "name": "恩翼護腿"
+        "name": "Gracewing Leggings"
       },
       "vanguard_priest_holy_gloves": {
-        "name": "恩翼纏手布"
+        "name": "Gracewing Handwraps"
       },
       "vanguard_priest_shadow_helmet": {
-        "name": "暮頌兜帽"
+        "name": "Duskhymn Cowl"
       },
       "vanguard_priest_shadow_shoulder": {
-        "name": "暮頌肩篷"
+        "name": "Duskhymn Mantle"
       },
       "vanguard_priest_shadow_chest": {
-        "name": "暮頌長袍"
+        "name": "Duskhymn Robe"
       },
       "vanguard_priest_shadow_legs": {
-        "name": "暮頌護腿"
+        "name": "Duskhymn Leggings"
       },
       "vanguard_priest_shadow_gloves": {
-        "name": "暮頌纏手布"
+        "name": "Duskhymn Handwraps"
       },
       "vanguard_shaman_elemental_helmet": {
-        "name": "風暴律令頭巾"
+        "name": "Tempestwrit Coif"
       },
       "vanguard_shaman_elemental_shoulder": {
-        "name": "風暴律令肩甲"
+        "name": "Tempestwrit Pauldrons"
       },
       "vanguard_shaman_elemental_chest": {
-        "name": "風暴律令鎖甲衫"
+        "name": "Tempestwrit Hauberk"
       },
       "vanguard_shaman_elemental_legs": {
-        "name": "風暴律令鏈腿甲"
+        "name": "Tempestwrit Legmail"
       },
       "vanguard_shaman_elemental_gloves": {
-        "name": "風暴律令護手"
+        "name": "Tempestwrit Gauntlets"
       },
       "vanguard_shaman_enhancement_helmet": {
-        "name": "疾風頭盔"
+        "name": "Galeborn Helm"
       },
       "vanguard_shaman_enhancement_shoulder": {
-        "name": "疾風肩鎧"
+        "name": "Galeborn Spaulders"
       },
       "vanguard_shaman_enhancement_chest": {
-        "name": "疾風鏈甲"
+        "name": "Galeborn Chainmail"
       },
       "vanguard_shaman_enhancement_legs": {
-        "name": "疾風腿甲"
+        "name": "Galeborn Legguards"
       },
       "vanguard_shaman_enhancement_gloves": {
-        "name": "疾風握套"
+        "name": "Galeborn Grips"
       },
       "vanguard_shaman_restoration_helmet": {
-        "name": "潮守頭環"
+        "name": "Brineward Circlet"
       },
       "vanguard_shaman_restoration_shoulder": {
-        "name": "潮守肩篷"
+        "name": "Brineward Mantle"
       },
       "vanguard_shaman_restoration_chest": {
-        "name": "潮守鎖甲衫"
+        "name": "Brineward Hauberk"
       },
       "vanguard_shaman_restoration_legs": {
-        "name": "潮守戰裙"
+        "name": "Brineward Kilt"
       },
       "vanguard_shaman_restoration_gloves": {
-        "name": "潮守纏手布"
+        "name": "Brineward Handwraps"
       },
       "vanguard_mage_arcane_helmet": {
-        "name": "縛時者風帽"
+        "name": "Hourbinder's Hood"
       },
       "vanguard_mage_arcane_shoulder": {
-        "name": "縛時者披肩"
+        "name": "Hourbinder's Amice"
       },
       "vanguard_mage_arcane_chest": {
-        "name": "縛時者長袍"
+        "name": "Hourbinder's Robe"
       },
       "vanguard_mage_arcane_legs": {
-        "name": "縛時者長褲"
+        "name": "Hourbinder's Trousers"
       },
       "vanguard_mage_arcane_gloves": {
-        "name": "縛時者手套"
+        "name": "Hourbinder's Gloves"
       },
       "vanguard_mage_fire_helmet": {
-        "name": "燼鞭兜帽"
+        "name": "Emberlash Cowl"
       },
       "vanguard_mage_fire_shoulder": {
-        "name": "燼鞭肩篷"
+        "name": "Emberlash Mantle"
       },
       "vanguard_mage_fire_chest": {
-        "name": "燼鞭法袍"
+        "name": "Emberlash Robes"
       },
       "vanguard_mage_fire_legs": {
-        "name": "燼鞭護腿"
+        "name": "Emberlash Leggings"
       },
       "vanguard_mage_fire_gloves": {
-        "name": "燼鞭手套"
+        "name": "Emberlash Gloves"
       },
       "vanguard_mage_frost_helmet": {
-        "name": "霜衛風帽"
+        "name": "Rimewarden Hood"
       },
       "vanguard_mage_frost_shoulder": {
-        "name": "霜衛肩墊"
+        "name": "Rimewarden Shoulderpads"
       },
       "vanguard_mage_frost_chest": {
-        "name": "霜衛祭袍"
+        "name": "Rimewarden Vestment"
       },
       "vanguard_mage_frost_legs": {
-        "name": "霜衛纏腿布"
+        "name": "Rimewarden Legwraps"
       },
       "vanguard_mage_frost_gloves": {
-        "name": "霜衛連指手套"
+        "name": "Rimewarden Mitts"
       },
       "vanguard_warlock_affliction_helmet": {
-        "name": "恐羽風帽"
+        "name": "Dreadquill Hood"
       },
       "vanguard_warlock_affliction_shoulder": {
-        "name": "恐羽肩篷"
+        "name": "Dreadquill Mantle"
       },
       "vanguard_warlock_affliction_chest": {
-        "name": "恐羽長袍"
+        "name": "Dreadquill Robe"
       },
       "vanguard_warlock_affliction_legs": {
-        "name": "恐羽護腿"
+        "name": "Dreadquill Leggings"
       },
       "vanguard_warlock_affliction_gloves": {
-        "name": "恐羽纏手布"
+        "name": "Dreadquill Handwraps"
       },
       "vanguard_warlock_demonology_helmet": {
-        "name": "髓縛兜帽"
+        "name": "Marrowbound Cowl"
       },
       "vanguard_warlock_demonology_shoulder": {
-        "name": "髓縛肩鎧"
+        "name": "Marrowbound Spaulders"
       },
       "vanguard_warlock_demonology_chest": {
-        "name": "髓縛長袍"
+        "name": "Marrowbound Robe"
       },
       "vanguard_warlock_demonology_legs": {
-        "name": "髓縛護腿"
+        "name": "Marrowbound Leggings"
       },
       "vanguard_warlock_demonology_gloves": {
-        "name": "髓縛握套"
+        "name": "Marrowbound Grips"
       },
       "vanguard_warlock_destruction_helmet": {
-        "name": "渣冕風帽"
+        "name": "Slagcrown Hood"
       },
       "vanguard_warlock_destruction_shoulder": {
-        "name": "渣冕肩篷"
+        "name": "Slagcrown Mantle"
       },
       "vanguard_warlock_destruction_chest": {
-        "name": "渣冕法袍"
+        "name": "Slagcrown Robes"
       },
       "vanguard_warlock_destruction_legs": {
-        "name": "渣冕護腿"
+        "name": "Slagcrown Leggings"
       },
       "vanguard_warlock_destruction_gloves": {
-        "name": "渣冕手套"
+        "name": "Slagcrown Gloves"
       },
       "vanguard_druid_balance_helmet": {
-        "name": "星衛頭飾"
+        "name": "Starwarden Headdress"
       },
       "vanguard_druid_balance_shoulder": {
-        "name": "星衛肩鎧"
+        "name": "Starwarden Spaulders"
       },
       "vanguard_druid_balance_chest": {
-        "name": "星衛背心"
+        "name": "Starwarden Vest"
       },
       "vanguard_druid_balance_legs": {
-        "name": "星衛馬褲"
+        "name": "Starwarden Breeches"
       },
       "vanguard_druid_balance_gloves": {
-        "name": "星衛手套"
+        "name": "Starwarden Gloves"
       },
       "vanguard_druid_feral_helmet": {
-        "name": "血鬃頭盔"
+        "name": "Bloodmane Helm"
       },
       "vanguard_druid_feral_shoulder": {
-        "name": "血鬃肩墊"
+        "name": "Bloodmane Shoulderpads"
       },
       "vanguard_druid_feral_chest": {
-        "name": "血鬃外衣"
+        "name": "Bloodmane Tunic"
       },
       "vanguard_druid_feral_legs": {
-        "name": "血鬃腿甲"
+        "name": "Bloodmane Legguards"
       },
       "vanguard_druid_feral_gloves": {
-        "name": "血鬃握套"
+        "name": "Bloodmane Grips"
       },
       "vanguard_druid_restoration_helmet": {
-        "name": "薊花冠冕"
+        "name": "Thistlebloom Crown"
       },
       "vanguard_druid_restoration_shoulder": {
-        "name": "薊花肩篷"
+        "name": "Thistlebloom Mantle"
       },
       "vanguard_druid_restoration_chest": {
-        "name": "薊花背心"
+        "name": "Thistlebloom Vest"
       },
       "vanguard_druid_restoration_legs": {
-        "name": "薊花護腿"
+        "name": "Thistlebloom Leggings"
       },
       "vanguard_druid_restoration_gloves": {
-        "name": "薊花手套"
+        "name": "Thistlebloom Gloves"
       },
       "vanguard_verdict_greatsword": {
-        "name": "先鋒裁決"
+        "name": "Vanguard's Verdict"
       },
       "vanguard_oath_blade": {
-        "name": "先鋒誓約"
+        "name": "Vanguard's Oath"
       },
       "vanguard_fang_dagger": {
-        "name": "先鋒之牙"
+        "name": "Vanguard's Fang"
       },
       "vanguard_warstaff": {
-        "name": "先鋒戰杖"
+        "name": "Vanguard's Warstaff"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -22931,8 +23242,8 @@ export const zh_TW: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "賜福晨織法衣",
-        "bonus2": "熾天使守望的救援治療量提高至 270（原為 180）。受到傷害不再延遲你的施法。",
-        "bonus4": "熾天使守望觸發時，其守護的盟友還會在 10 秒內獲得相當於其最大生命值 15% 的治療。"
+        "bonus2": "使用低語禱言、莊嚴禱言或緊急禱言恢復生命值，會使你的下一次唱詩癒合的治療量提高 10%，最多疊加 3 層。每次施法最多獲得 1 層。唱詩癒合施法完成時消耗所有層數。受到傷害不再延遲你的施法。",
+        "bonus4": "以 3 層完成唱詩癒合會使你在 60 秒內的下一次低語禱言變為瞬發，並使其治療量提高 100%。此效果不可疊加；再次獲得會刷新持續時間。"
       },
       "boundstone_vanguard": {
         "name": "縛石先鋒",
@@ -23140,147 +23451,147 @@ export const zh_TW: EnTranslations = {
       },
       "stormkindled": {
         "name": "燃暴禮裝",
-        "bonus2": "電弧超載的觸發機率提高至 30%。受到傷害不再延遲你的施法。",
-        "bonus4": "大地震擊的每層雷霆加成提高至 30%，熔岩爆裂造成的傷害提高 20%。"
+        "bonus2": "焰烙狀態下的釋放武器獲得 3 層雷霆。受到傷害不再延遲你的施法。",
+        "bonus4": "大地震擊的每層雷霆加成提高至 30%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法師法衣",
         "bonus3": "攻擊速度和施法速度提高 15%。"
       },
       "vanguard_druid_balance": {
-        "name": "星衛衣裝",
-        "bonus2": "攫纏根鬚的施法時間縮短 0.5 秒。",
-        "bonus4": "施放攫纏根鬚使你可以在移動中施法，並使你的移動速度提高 20%，持續 4 秒。每 20 秒最多觸發一次。"
+        "name": "星衛法衣",
+        "bonus2": "纏縛根鬚的施法時間縮短0.5秒。",
+        "bonus4": "施放纏縛根鬚後，你可以在移動中施法，並使移動速度提高20%，持續4秒。每20秒最多觸發一次。"
       },
       "vanguard_druid_feral": {
-        "name": "血鬃獸皮甲",
-        "bonus2": "巨熊衝鋒的冷卻時間縮短 3 秒。",
-        "bonus4": "巨熊衝鋒為你提供相當於你最大生命值 6% 的護盾，持續 6 秒。"
+        "name": "血鬃獸皮",
+        "bonus2": "2件：Bruin Rush冷卻縮短3秒。",
+        "bonus4": "4件：Bruin Rush提供相當於最大生命值6%的護盾，持續6秒。"
       },
       "vanguard_druid_restoration": {
-        "name": "薊花祭袍",
-        "bonus2": "迅癒的冷卻時間縮短 1 秒。",
-        "bonus4": "迅癒還會使你的移動速度提高 30%，持續 3 秒。"
+        "name": "薊花法衣",
+        "bonus2": "2件：Fleetmend冷卻縮短1秒。",
+        "bonus4": "4件：Fleetmend還會使移動速度提高30%，持續3秒。"
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "群守獵裝",
-        "bonus2": "震顫射擊的冷卻時間縮短 4 秒。",
-        "bonus4": "震顫射擊使狂野怒火的剩餘冷卻時間縮短 1 秒。"
+        "name": "先鋒套裝：Packwarden Harness",
+        "bonus2": "2件：Rattling Shot冷卻縮短4秒。",
+        "bonus4": "4件：Rattling Shot使Howling Rage剩餘冷卻縮短1秒。"
       },
       "vanguard_hunter_marksmanship": {
-        "name": "遠見獵裝",
-        "bonus2": "斷跡的冷卻時間縮短 4 秒。",
-        "bonus4": "斷跡使你在 6 秒內的下一次長弓引射變為瞬發。每 15 秒最多觸發一次。"
+        "name": "先鋒套裝：Farsight Harness",
+        "bonus2": "2件：Trailbreak冷卻縮短4秒。",
+        "bonus4": "4件：Trailbreak使6秒內下一次Long Draw瞬發。每15秒最多一次。"
       },
       "vanguard_hunter_survival": {
-        "name": "陷牙獵裝",
-        "bonus2": "血鉤的冷卻時間縮短 3 秒。",
-        "bonus4": "血鉤提供 1 點狩獵動能。"
+        "name": "先鋒套裝：Snaretooth Harness",
+        "bonus2": "2件：Bloodhook冷卻縮短3秒。",
+        "bonus4": "4件：Bloodhook獲得1點Hunting Momentum。"
       },
       "vanguard_mage_arcane": {
-        "name": "縛時者聖袍",
-        "bonus2": "時光屏障的冷卻時間縮短 2 秒。",
-        "bonus4": "時光屏障還會使受護目標的移動速度提高 20%，持續 3 秒。"
+        "name": "先鋒套裝：Hourbinder Vestments",
+        "bonus2": "2件：Temporal Barrier冷卻縮短2秒。",
+        "bonus4": "4件：Temporal Barrier還會使受護盾目標移動速度提高20%，持續3秒。"
       },
       "vanguard_mage_fire": {
-        "name": "燼鞭華服",
-        "bonus2": "燼焰墜的充能恢復速度加快 3 秒。",
-        "bonus4": "施放燼焰墜會使烈焰屏障的剩餘冷卻時間縮短 2 秒。"
+        "name": "先鋒套裝：Emberlash Regalia",
+        "bonus2": "2件：Cinderfall回復快3秒。",
+        "bonus4": "4件：施放Cinderfall使Blazing Barrier剩餘冷卻縮短2秒。"
       },
       "vanguard_mage_frost": {
-        "name": "霜衛裝束",
-        "bonus2": "縛冰術的冷卻時間縮短 2 秒。",
-        "bonus4": "施放縛冰術會使輕掠步的剩餘冷卻時間縮短 5 秒。"
+        "name": "先鋒套裝：Rimewarden Garb",
+        "bonus2": "2件：Icebind冷卻縮短2秒。",
+        "bonus4": "4件：施放Icebind使Flitstep剩餘冷卻縮短5秒。"
       },
       "vanguard_paladin_holy": {
-        "name": "日守華服",
-        "bonus2": "生命契約的冷卻時間縮短 30 秒。",
-        "bonus4": "生命契約還會為該盟友提供相當於其最大生命值 8% 的護盾，持續 6 秒。"
+        "name": "先鋒套裝：Sunvigil Regalia",
+        "bonus2": "2件：Life Covenant冷卻縮短30秒。",
+        "bonus4": "4件：Life Covenant還會為盟友提供相當於最大生命值8%的護盾，持續6秒。"
       },
       "vanguard_paladin_protection": {
-        "name": "盾誓堡壘",
-        "bonus2": "誓約鎖鏈的冷卻時間縮短 2 秒。",
-        "bonus4": "被誓約鎖鏈拉動的敵人施法速度降低 30%，持續 4 秒；當誓約鎖鏈束縛一個可被拉動的敵人時，還會使你獲得烈陽反擊。"
+        "name": "先鋒套裝：Shieldvow Bastion",
+        "bonus2": "2件：Oath Chain冷卻縮短2秒。",
+        "bonus4": "4件：被Oath Chain拉拽的敵人施法速度降低30%，持續4秒，並可賦予Solar Reprisal。"
       },
       "vanguard_paladin_retribution": {
-        "name": "光印戰甲",
-        "bonus2": "女武神的召喚的冷卻時間縮短 15 秒。",
-        "bonus4": "女武神的召喚會重置終末敕令的冷卻時間，且落地後 6 秒內的下一次終末敕令造成的傷害提高 15%。"
+        "name": "先鋒套裝：Lightbrand Warplate",
+        "bonus2": "2件：Valkyr Calling冷卻縮短15秒。",
+        "bonus4": "4件：Valkyr Calling重置Final Edict冷卻，並使落地後6秒內的下一次Final Edict傷害提高15%。"
       },
       "vanguard_priest_discipline": {
-        "name": "幕頌衣裝",
-        "bonus2": "心靈尖嘯的冷卻時間縮短 3 秒。",
-        "bonus4": "你的守護聖詠被完全消耗時，受護盟友的移動速度提高 20%，持續 3 秒。每 8 秒最多觸發一次。"
+        "name": "先鋒套裝：Veilpsalm Raiment",
+        "bonus2": "2件：Terror Canticle冷卻縮短3秒。",
+        "bonus4": "4件：Psalm of Warding被完全消耗時，受護盾盟友移動速度提高20%，持續3秒。每8秒最多一次。"
       },
       "vanguard_priest_holy": {
-        "name": "恩翼衣裝",
-        "bonus2": "帷幕步的冷卻時間縮短 6 秒。",
-        "bonus4": "帷幕步還會為你提供相當於你最大生命值 8% 的護盾，持續 6 秒。"
+        "name": "先鋒套裝：Gracewing Raiment",
+        "bonus2": "2件：Veilstep冷卻縮短6秒。",
+        "bonus4": "4件：Veilstep還會為你提供相當於最大生命值8%的護盾，持續6秒。"
       },
       "vanguard_priest_shadow": {
-        "name": "暮頌華服",
-        "bonus2": "哀禍連禱在你引導期間還會使目標的移動速度降低 30%。",
-        "bonus4": "召喚什一魔還會為你提供相當於你最大生命值 10% 的護盾，持續 8 秒。"
+        "name": "先鋒套裝：Duskhymn Regalia",
+        "bonus2": "2件：Litany of Woe引導期間還會使目標移動速度降低30%。",
+        "bonus4": "4件：Call Tithefiend還會為你提供相當於最大生命值10%的護盾，持續8秒。"
       },
       "vanguard_rogue_assassination": {
-        "name": "夜斬皮甲",
-        "bonus2": "陰狠一擊的能量消耗降低 10 點。",
-        "bonus4": "陰狠一擊還會使你在 6 秒內的下一次攻擊必定致命一擊。"
+        "name": "先鋒套裝：Nightcut Leathers",
+        "bonus2": "2件：Low Blow能量消耗降低10點。",
+        "bonus4": "4件：Low Blow使6秒內下一次攻擊成為爆擊。"
       },
       "vanguard_rogue_combat": {
-        "name": "鬥印皮甲",
-        "bonus2": "疾風之足的冷卻時間縮短 60 秒。",
-        "bonus4": "疾風之足生效期間，邪惡揮斬和重磅擺拳額外提供 1 個連擊點數。"
+        "name": "先鋒套裝：Brawlmark Leathers",
+        "bonus2": "2件：Swift Heels冷卻縮短60秒。",
+        "bonus4": "4件：Swift Heels期間，Wicked Slash與Haymaker額外給予1個連擊點。"
       },
       "vanguard_rogue_subtlety": {
-        "name": "影行皮甲",
-        "bonus2": "煙遁步的冷卻時間縮短 60 秒。",
-        "bonus4": "在煙遁步狀態下使用掏腹重擊時，額外提供 2 個連擊點數。"
+        "name": "先鋒套裝：Shadewalk Leathers",
+        "bonus2": "2件：Smokefade冷卻縮短60秒。",
+        "bonus4": "4件：從Smokefade使用Gut Punch時額外給予2個連擊點。"
       },
       "vanguard_shaman_elemental": {
-        "name": "風暴律令戰鎖甲",
-        "bonus2": "釋放武器的冷卻時間縮短 3 秒。",
-        "bonus4": "釋放武器使你可以在移動中施法，並使你的移動速度提高 20%，持續 4 秒。每 20 秒最多觸發一次。"
+        "name": "先鋒套裝：Tempestwrit Battlemail",
+        "bonus2": "2件：Unleash Weapon冷卻縮短3秒。",
+        "bonus4": "4件：Unleash Weapon可移動施法並使移動速度提高20%，持續4秒。每20秒最多一次。"
       },
       "vanguard_shaman_enhancement": {
-        "name": "疾風戰鏈甲",
-        "bonus2": "先祖打擊使目標的移動速度降低 30%，持續 4 秒。",
-        "bonus4": "先祖打擊使元素恍惚的剩餘冷卻時間縮短 4 秒。"
+        "name": "先鋒套裝：Galeborn Warmail",
+        "bonus2": "2件：Ancestral Strike使目標移動速度降低30%，持續4秒。",
+        "bonus4": "4件：Ancestral Strike使Elemental Trance剩餘冷卻縮短4秒。"
       },
       "vanguard_shaman_restoration": {
-        "name": "潮守鏈甲",
-        "bonus2": "對生命值低於 50% 的盟友施放療癒之水時，施法時間縮短 0.5 秒。",
-        "bonus4": "潮汐召喚還會為其目標提供相當於你最大生命值 5% 的護盾，持續 6 秒。"
+        "name": "先鋒套裝：Brineward Chainmail",
+        "bonus2": "2件：對生命值低於50%的盟友施放Mending Waters快0.5秒。",
+        "bonus4": "4件：Tidecall還會提供相當於你最大生命值5%的護盾，持續6秒。"
       },
       "vanguard_warlock_affliction": {
-        "name": "恐羽聖袍",
-        "bonus2": "折魂的施法時間縮短 0.3 秒。",
-        "bonus4": "吞噬的治療效果提高 30%，並且可以在移動中引導。"
+        "name": "先鋒套裝：Dreadquill Vestments",
+        "bonus2": "2件：Harrow施法時間縮短0.3秒。",
+        "bonus4": "4件：Consume治療量提高30%，且可移動引導。"
       },
       "vanguard_warlock_demonology": {
-        "name": "髓縛華服",
-        "bonus2": "骸骨護甲的冷卻時間縮短 10 秒。",
-        "bonus4": "收割號令使骸骨護甲的剩餘冷卻時間縮短 2 秒。"
+        "name": "先鋒套裝：Marrowbound Regalia",
+        "bonus2": "2件：Bone Armor冷卻縮短10秒。",
+        "bonus4": "4件：Reaping Command使Bone Armor剩餘冷卻縮短2秒。"
       },
       "vanguard_warlock_destruction": {
-        "name": "渣冕聖袍",
-        "bonus2": "熔渣皮膚的冷卻時間縮短 30 秒。",
-        "bonus4": "每施放兩次燃盡，你在 8 秒內的下一次毀滅箭變為瞬發。"
+        "name": "先鋒套裝：Slagcrown Vestments",
+        "bonus2": "2件：Cinderhide冷卻縮短30秒。",
+        "bonus4": "4件：每第二次Conflagrate使8秒內下一次Ruinbolt瞬發。"
       },
       "vanguard_warrior_arms": {
-        "name": "刃痕戰裝",
-        "bonus2": "致殘打擊使猛衝的剩餘冷卻時間縮短 1 秒。",
-        "bonus4": "猛衝還會使你的下一次致殘打擊強化 20%（1 層血手強化）。"
+        "name": "先鋒套裝：Bladewake Battlegear",
+        "bonus2": "2件：Maiming Strike使Onrush剩餘冷卻縮短1秒。",
+        "bonus4": "4件：Onrush還會使下一次Maiming Strike提高20%。"
       },
       "vanguard_warrior_fury": {
-        "name": "血征怒裝",
-        "bonus2": "英勇飛躍的冷卻時間縮短 8 秒。",
-        "bonus4": "英勇飛躍落地時使你激怒。"
+        "name": "先鋒套裝：Bloodmarch Ragegear",
+        "bonus2": "2件：Vaulting Charge冷卻縮短8秒。",
+        "bonus4": "4件：Vaulting Charge落地時使你激怒。"
       },
       "vanguard_warrior_prot": {
-        "name": "鐵征壁壘",
-        "bonus2": "斷層的冷卻時間縮短 5 秒。",
-        "bonus4": "斷層還會使你受到的傷害降低 10%，持續 6 秒。"
+        "name": "先鋒套裝：Ironmarch Bulwark",
+        "bonus2": "2件：Faultline冷卻縮短5秒。",
+        "bonus4": "4件：Faultline還會使你受到的傷害降低10%，持續6秒。"
       },
       "vesperash": {
         "name": "晚禱燼灰罩袍",

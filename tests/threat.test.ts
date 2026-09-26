@@ -192,8 +192,8 @@ describe('threat from damage', () => {
     const wolf = nearestMob(sim, 'forest_wolf');
     beefUp(wolf);
     hit(sim, sim.player, wolf, 100, 'holy');
-    // Oathward threatPct 0.4 scaled by the level-16 mastery ramp (16/20).
-    const protectionMasteryThreat = 1.32;
+    // Oathward threatPct 1.0 scaled by the level-16 mastery ramp (16/20).
+    const protectionMasteryThreat = 1.8;
     expect(wolf.threat.get(sim.playerId)).toBeCloseTo(
       100 * protectionMasteryThreat * RIGHTEOUS_FURY_THREAT_MULT + 1,
       5,
@@ -265,9 +265,9 @@ describe('threat from damage', () => {
     sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
     const primed = wolf.threat.get(sim.playerId) ?? 0;
     sim.dealDamage(sim.player, wolf, 100, false, 'physical', 'Shieldcrack', 'hit', true, slamOpts);
-    // Recompense grants +80% threat, at full value once the level-20 mastery
+    // Recompense grants +110% threat, at full value once the level-20 mastery
     // ramp (min(1, level / 20)) is complete.
-    const recompense = 1.8;
+    const recompense = 2.1;
     expect((wolf.threat.get(sim.playerId) ?? 0) - primed).toBeCloseTo(
       (100 * 3.5 + 110) * recompense,
       5,

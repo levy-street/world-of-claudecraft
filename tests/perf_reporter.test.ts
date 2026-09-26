@@ -646,7 +646,14 @@ function snapshot(): PerfSnapshot {
       nameplates: { paints: 0, paintsSkipped: 0 },
       renderDiagnostics: renderDiagnostics(),
       prewarm: prewarmStats(),
-      castVfx: { ready: true, refused: 0, pending: 0, forced: false },
+      castVfx: {
+        ready: true,
+        refused: 0,
+        pending: 0,
+        forced: false,
+        requirementMiss: 0,
+        families: [],
+      },
       entryDetailHorizon: {
         active: false,
         cap: 700,
@@ -1383,6 +1390,8 @@ describe('perf reporter frame rate ceiling fields', () => {
   it('reports the chosen ceiling and its effective target as typed fields', () => {
     vi.spyOn(sharedFrameCadence(), 'snapshot').mockReturnValue({
       auto: false,
+      displayRead: true,
+      autoHoldsQuality: false,
       autoPhase: 'off',
       autoConfirmed: false,
       autoFailStreak: 0,
@@ -2147,7 +2156,6 @@ describe('perf reporter world-entry blocks', () => {
       holdMs: 120,
       holdWallMs: 90,
       releases: 0,
-      abArm: 'on',
       workerStats: {
         pending: 2,
         inFlight: 1,
@@ -2191,7 +2199,6 @@ describe('perf reporter world-entry blocks', () => {
       holdMs: 120,
       holdWallMs: 90,
       releases: 0,
-      abArm: 'on',
     });
     // The two typed fields the server stores as columns.
     expect(body.shaderWarmWorkerActive).toBe(true);

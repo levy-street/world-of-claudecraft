@@ -1809,6 +1809,16 @@
     max-width: 100%;
     pointer-events: auto;
   }
+  /* Target Auras Below the Frame (targetAurasBelowFrame, main.ts via
+     src/ui/aura_bar_side.ts): hangs the strip BELOW the frame instead, the
+     classic layout, for a frame the player has moved off the stock seat to
+     somewhere with room beneath it. Keyed on the setting's own body class,
+     NEVER on the frame's move state, so dragging the frame never silently
+     flips the strip (the same rule the player buff row follows). */
+  body.target-auras-below-frame #target-frame > #tf-debuffs {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
   /* Target of Target (showTargetOfTarget option): a smaller twin of the target
      frame, a #target-frame child anchored BESIDE the frame's right edge, top
      aligned, so the whole below-frame band belongs to the #tf-debuffs strip (the
@@ -1834,17 +1844,22 @@
     display: none;
   }
   #totarget-frame.hud-frame-detached {
+    --uf-bar-height: var(--target-frame-height, 15px);
     position: absolute;
     width: calc(var(--unit-frame-w) * 0.74 * var(--target-frame-scale, 1));
-    zoom: 1;
     z-index: 21;
   }
   #totarget-frame.hud-frame-detached > :not(.mf-resize-grip, .tf-frame-label) {
     zoom: calc(0.74 * var(--target-frame-scale, 1));
   }
+  #totarget-frame.hud-frame-detached .portrait-wrap {
+    order: 1;
+  }
   #totarget-frame.hud-frame-detached .uf-bars {
+    order: 2;
     width: 232px;
     margin-left: -14px;
+    margin-right: 0;
   }
   #totarget-frame.tf-unlocked {
     display: flex !important;
@@ -2191,6 +2206,7 @@
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked,
+  #unit-tooltip-anchor.tf-unlocked,
   #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
@@ -2264,6 +2280,7 @@
   #actionbar3.hud-frame-detached,
   #pet-frame.hud-frame-detached,
   #petbar.hud-frame-detached,
+  #totarget-frame.hud-frame-detached,
   #stancebar.hud-frame-detached,
   #xpbar.hud-frame-detached,
   #buff-bar.hud-frame-detached,
@@ -2312,9 +2329,10 @@
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
   #proc-overlay .tf-move-btn,
-  #meters-window .tf-move-btn,
   .hud-frame-group > .tf-move-btn,
-  .focus-target-row > .tf-move-btn {
+  .focus-target-row > .tf-move-btn,
+  #unit-tooltip-anchor .tf-move-btn,
+  #meters-window .tf-move-btn {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -2349,9 +2367,10 @@
   #paladin-devotion-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
   #proc-overlay .tf-move-btn:focus-visible,
-  #meters-window .tf-move-btn:focus-visible,
   .hud-frame-group > .tf-move-btn:focus-visible,
-  .focus-target-row > .tf-move-btn:focus-visible {
+  .focus-target-row > .tf-move-btn:focus-visible,
+  #unit-tooltip-anchor .tf-move-btn:focus-visible,
+  #meters-window .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
@@ -2498,6 +2517,7 @@
      player has switched OFF stays hidden while editing, and the options note
      points at the plus/minus buttons for turning more on. */
   body.interface-unlocked #target-frame.tf-unlocked,
+  body.interface-unlocked #totarget-frame.tf-unlocked,
   body.interface-unlocked #pet-frame.tf-unlocked,
   body.interface-unlocked #petbar.tf-unlocked,
   body.interface-unlocked #stancebar.tf-unlocked,
@@ -2520,6 +2540,18 @@
     display: block !important;
     opacity: 0.55;
     min-height: 48px;
+  }
+  /* The tooltip seat is invisible and click-through in play (visibility, so
+     its box stays measurable), so editing hands both back and dims it like
+     the other placeholders; its name chip says what it seats. Its stock box
+     overlaps the button rail's lower corner (the card always did), so it
+     stacks one above the rail (z-index 19) to keep its corner move button
+     and body grabbable there; the #tooltip card itself stays above both. */
+  body.interface-unlocked #unit-tooltip-anchor.tf-unlocked {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 0.55;
+    z-index: 20;
   }
   /* A resizable unit frame needs a positioned host for its grip; the three
      already carry one (.unitframe and #party-frames are absolute, #player-frame
@@ -2613,8 +2645,16 @@
      themselves with their own id-specific rules (the daily rewards chest's
      pointer-events, the target debuff strip) and each would otherwise stay
      clickable inside an "inert" frame. The frame's own chrome, the move button
-     and the resize grip, is carved back out. */
-  body.interface-unlocked .tf-unlocked :not(.tf-unlocked):not(.tf-move-btn):not(.mf-resize-grip) {
+     and the resize grip, is carved back out.
+     So is #totarget-frame, the one governed frame that is itself a DESCENDANT of
+     another one: the mini lives inside #target-frame until it is moved, so this
+     rule reached it and made it pointer-inert, leaving it the only arrangeable
+     frame a player could never actually grab (its name chip appeared, its drag
+     never started, and the press fell through to the world). Only the mini
+     ITSELF is carved out; its own contents still match through it, so a grab
+     anywhere on it starts the mini's drag rather than pressing its portrait. */
+  body.interface-unlocked .tf-unlocked
+    :not(.tf-move-btn):not(.mf-resize-grip):not(#totarget-frame) {
     pointer-events: none !important;
   }
   /* While unlocked each aura row keeps a graspable minimum box (the dashed
@@ -3187,11 +3227,16 @@
     min-width: 0;
     overflow: hidden;
   }
+  /* The bordered plaque keeps the .ui-ribbon inset on the PORTRAIT side (30px:
+     the medallion overlaps the bar stack by 18px and its joint seal reaches
+     7px past that), so the first letter of the name never renders under the
+     portrait. 14px on the open side clears the header pattern motif. Pinned
+     by tests/browser/unit_frame_name_clearance.browser.test.ts. */
   .uf-name-header[data-border]:not([data-border=""]) {
     width: calc(100% - 2px);
     min-width: 76px;
     margin-left: 2px;
-    padding: 1px 14px 1px 6px;
+    padding: 1px 14px 1px 30px;
     background-color: var(--border-accent-frame, transparent);
     --deed-heraldry-plaque-fill: color-mix(
       in srgb,
@@ -3206,7 +3251,7 @@
   .uf-name-header.deed-heraldry-plaque-mirror[data-border]:not([data-border=""]) {
     margin-right: 2px;
     margin-left: 0;
-    padding-right: 6px;
+    padding-right: 30px;
     padding-left: 14px;
   }
   .uf-name-header[data-border]:not([data-border=""]) .uf-name {
@@ -3412,10 +3457,19 @@
     gap: 4px;
     margin-top: 4px;
     height: 10px;
+    /* The bar stack tucks 14px under the portrait medallion (.uf-bars
+       margin-left), and the 64px disc overhangs the stack by a further 18px.
+       Bars read fine under that edge and the name plaque pads past it, but
+       a 12px pip at the stack's left edge sat FULLY under the disc: five
+       combo points showed as four beside the name. Pay the overhang here so
+       every pip starts clear of the disc on desktop and the touch layout
+       (which inherits the same tuck). */
+    padding-left: 22px;
   }
   .combo-pip {
     width: 12px;
     height: 10px;
+    flex-shrink: 0;
     border-radius: 50%;
     border: 1px solid #5c2020;
     background: #2a0d0d;
@@ -5321,13 +5375,15 @@
   }
 
   /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
-     chrome) that is a #ui-root child, placed by hud.ts against the LIVE primary
-     bar (inline left/top in HUD author px). Never anchored to #actionbar-stack:
+     chrome) that is a #ui-root child, placed by action_bar_bind_banner.ts clear
+     of every LIVE bar (the actionBarBindBannerPlacement core; inline left/top
+     in HUD author px). Never anchored to #actionbar-stack:
      a bar moved with Interface Unlock is reparented to #ui and painted over a
      stack-anchored banner, so its slots ate every Done / Reset click and re-armed
      a capture instead. Sits in the always-above tier (90+, over the 20..89
      window band and the detached frames at 20) so no frame can cover its exit.
-     Built/removed by hud.ts on enter/exit. */
+     The plate itself is a drag handle (its buttons are not), so the player can
+     move it off anything it still covers. Built/removed on enter/exit. */
   #actionbar-bind-banner {
     position: absolute;
     display: flex;
@@ -6500,11 +6556,13 @@
      scrolling column below. */
   .mt-panel {
     width: var(--tracker-w);
-    padding: 8px 10px;
+    padding: 3px 5px 4px;
     display: none;
     align-self: flex-end;
     margin-bottom: 6px;
     text-align: left;
+    container-type: inline-size;
+    font-family: var(--mt-font-family, inherit);
   }
   /* The tabbed damage window's DOCK is an absolute seat beside the action-bar
      row, not a flex slot: #bottom-bar re-centers itself with translateX(-50%),
@@ -6531,11 +6589,19 @@
     left: auto;
     bottom: auto;
   }
+  .mt-panel {
+    width: var(--tracker-w);
+    padding: 3px 5px 4px;
+  }
   .mt-panel .panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     height: 32px;
     min-height: 32px;
-    padding: 0 0 6px;
     margin-bottom: 4px;
+    padding: 0 2px 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
   .mt-panel :is(.ui-disc, .ui-x-btn) {
     width: 24px;
@@ -6615,9 +6681,94 @@
     cursor: default;
     touch-action: auto;
   }
+  .mt-panel {
+    position: relative;
+    background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.92));
+    border: 1px solid rgba(255, 255, 255, calc(0.09 * var(--mt-bg-alpha-ratio, 1)));
+    border-radius: 4px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, calc(0.7 * var(--mt-bg-alpha-ratio, 1)));
+    -webkit-backdrop-filter: blur(calc(10px * var(--mt-bg-alpha-ratio, 1)));
+    backdrop-filter: blur(calc(10px * var(--mt-bg-alpha-ratio, 1)));
+    container-type: inline-size;
+    padding: 3px 5px 4px 5px;
+    outline: none;
+    zoom: var(--mt-scale, 1);
+  }
+  .mt-panel.mt-opacity-solid {
+    background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.98)) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .mt-panel.mt-opacity-glass {
+    background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.76)) !important;
+    -webkit-backdrop-filter: blur(calc(12px * var(--mt-bg-alpha-ratio, 1)));
+    backdrop-filter: blur(calc(12px * var(--mt-bg-alpha-ratio, 1)));
+  }
+  .mt-panel.mt-opacity-minimal {
+    background: rgba(12, 14, 18, var(--mt-bg-alpha, 0.45)) !important;
+    -webkit-backdrop-filter: blur(calc(6px * var(--mt-bg-alpha-ratio, 1)));
+    backdrop-filter: blur(calc(6px * var(--mt-bg-alpha-ratio, 1)));
+  }
+  .mt-panel.mt-opacity-transparent {
+    background: transparent !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+  .mt-panel.mt-opacity-transparent .panel-title {
+    border-bottom-color: rgba(255, 255, 255, 0.04);
+  }
+  .mt-panel.mt-opacity-transparent .mt-row {
+    background: rgba(14, 16, 20, 0.25);
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+  .mt-panel.mt-compact .mt-row {
+    height: 16px;
+    margin-bottom: 1px;
+  }
+  .mt-panel.mt-compact .mt-rank,
+  .mt-panel.mt-compact .mt-label,
+  .mt-panel.mt-compact .mt-num {
+    line-height: 16px;
+    font-size: 9.5px;
+  }
+  .mt-panel.mt-compact .mt-icon {
+    top: 1px;
+    width: 14px;
+    height: 14px;
+  }
+  .mt-panel.mt-compact .mt-row.has-icon .mt-label {
+    left: 33px;
+  }
+  .mt-panel .mt-tabs,
+  .mt-panel .mt-title-label,
+  .mt-panel .mt-sub,
+  .mt-panel .mt-hint,
+  .mt-panel .mt-prev,
+  .mt-panel .mt-next {
+    display: none !important;
+  }
+  .mt-panel .panel-title > span:last-child .mt-mode-btn {
+    display: none !important;
+  }
   .mt-tab {
+    background: #1a1410;
+    border: 1px solid var(--gold-dim);
+    border-radius: 3px;
+    color: var(--color-text-muted);
+    font-size: 10px;
     padding: 1px 7px;
     cursor: var(--cursor-point);
+    transition:
+      background 0.15s,
+      border-color 0.15s,
+      color 0.15s;
+  }
+  .mt-tab:hover {
+    background: #281e14;
+    color: #fff;
+    border-color: var(--gold);
   }
   .mt-sub {
     margin: 1px 0 6px;
@@ -6629,44 +6780,890 @@
     line-height: 1.35;
     margin: 0 0 6px;
   }
+  .mt-tab.on {
+    color: var(--gold);
+    border-color: var(--gold);
+    background: #2a2010;
+    box-shadow: 0 0 3px rgba(218, 165, 32, 0.25);
+  }
+  .mt-view {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 4px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: default;
+    user-select: none;
+    padding: 0;
+  }
+  .mt-view::after {
+    display: none !important;
+  }
+  .mt-mode-trigger,
+  .mt-seg-trigger,
+  .mt-back-btn {
+    background: transparent;
+    border: none;
+    padding: 1px 3px;
+    border-radius: 2px;
+    color: #ded8cb;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-ui);
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition:
+      background 0.12s,
+      color 0.12s;
+  }
+  .mt-mode-trigger,
+  .mt-seg-trigger {
+    text-transform: uppercase;
+  }
+  .mt-seg-trigger {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .mt-back-btn {
+    text-transform: none;
+    font-weight: 600;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .mt-mode-trigger:hover,
+  .mt-seg-trigger:hover,
+  .mt-back-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+  }
+  .mt-mode-trigger .mt-arrow,
+  .mt-seg-trigger .mt-arrow {
+    font-size: 8px;
+    opacity: 0.55;
+    color: #ded8cb;
+  }
+  .mt-back-btn {
+    color: #ded8cb;
+  }
+  .mt-back-arrow {
+    font-size: 12px;
+    line-height: 1;
+    font-weight: bold;
+    color: #e5a93c;
+    flex-shrink: 0;
+  }
+  .mt-panel .panel-title > span:last-child {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: 4px;
+    flex-shrink: 0;
+  }
+  .mt-panel .mt-new-window,
+  .mt-panel .mt-reset,
+  .mt-panel .mt-settings,
+  .mt-panel .mt-close {
+    background: transparent;
+    border: none;
+    color: #8c887e;
+    padding: 0 2px;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.65;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color 0.12s,
+      opacity 0.12s;
+  }
+  .mt-panel .mt-new-window svg,
+  .mt-panel .mt-reset svg,
+  .mt-panel .mt-settings svg,
+  .mt-panel .mt-close svg {
+    width: 10px;
+    height: 10px;
+    display: block;
+    fill: currentColor;
+  }
+  .mt-panel .mt-new-window:hover,
+  .mt-panel .mt-settings:hover {
+    color: #ded8cb;
+    opacity: 1;
+  }
+  .mt-panel .mt-reset:hover {
+    color: #e74c3c;
+    opacity: 1;
+  }
+  .mt-panel .mt-close:hover {
+    color: #ffffff;
+    opacity: 1;
+  }
   .mt-row {
     position: relative;
-    height: 17px;
-    margin-bottom: 3px;
+    height: var(--mt-bar-h, 20px);
+    margin-bottom: var(--mt-bar-gap, 1px);
+    background: rgba(20, 22, 28, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    border-radius: 2px;
     overflow: hidden;
+    cursor: pointer;
+    transition:
+      background 0.1s,
+      border-color 0.1s;
+    font-family: var(
+      --mt-font-family,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif
+    );
+  }
+  .mt-row:hover {
+    background: rgba(36, 40, 50, 0.85);
+    border-color: rgba(255, 255, 255, 0.15);
   }
   .mt-row.aggro {
     border-color: var(--color-danger);
   }
+  .mt-row.mt-row-pinned {
+    margin-top: 4px;
+    border-top: 1px dashed rgba(255, 209, 0, 0.45);
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.5);
+  }
   .mt-fill {
     position: absolute;
     inset: 0;
-    border-radius: 1px;
+    border-radius: 2px;
+    transition: width 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+  }
+  .mt-fill::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 48%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    pointer-events: none;
+  }
+  .mt-panel.mt-tex-smooth .mt-fill::after {
+    display: none !important;
+  }
+  .mt-panel.mt-tex-smooth .mt-fill {
+    box-shadow: none !important;
+  }
+  .mt-panel.mt-tex-gradient .mt-fill::after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.22) 0%, transparent 100%) !important;
+  }
+  .mt-panel.mt-anim-none .mt-fill {
+    transition: none !important;
+  }
+  .mt-panel.mt-no-title .panel-title {
+    display: none !important;
+  }
+  .mt-panel.mt-hide-rank .mt-rank {
+    display: none !important;
+  }
+  .mt-panel.mt-hide-rank .mt-icon {
+    left: 4px !important;
+  }
+  .mt-panel.mt-hide-rank .mt-label {
+    left: 6px !important;
+  }
+  .mt-panel.mt-hide-rank .mt-row.has-icon .mt-label {
+    left: 24px !important;
+  }
+  .mt-panel.mt-compact.mt-hide-rank .mt-icon {
+    left: 3px !important;
+  }
+  .mt-panel.mt-compact.mt-hide-rank .mt-row.has-icon .mt-label {
+    left: 21px !important;
+  }
+  .mt-panel.mt-hide-icons .mt-icon {
+    display: none !important;
+  }
+  .mt-panel.mt-hide-icons .mt-label {
+    left: 20px !important;
+  }
+  .mt-panel.mt-hide-rank.mt-hide-icons .mt-label {
+    left: 6px !important;
+  }
+  .mt-panel.mt-hide-pct .mt-val-pct {
+    display: none !important;
+  }
+  .mt-panel.mt-hide-dps .mt-val-rate,
+  .mt-panel.mt-hide-dps .mt-val-sep {
+    display: none !important;
+  }
+  .mt-val-sep {
+    display: inline-block;
+    opacity: 0.45;
+    margin: 0 3px;
+    font-weight: 300;
+  }
+  .mt-rank {
+    position: absolute;
+    left: 4px;
+    top: 0;
+    line-height: var(--mt-bar-h, 20px);
+    font-size: 10px;
+    color: #ded8cb;
+    text-shadow: 1px 1px 1px #000;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+  }
+  .mt-icon {
+    position: absolute;
+    left: 17px;
+    top: calc((var(--mt-bar-h, 20px) - 16px) / 2);
+    width: 16px;
+    height: 16px;
+    border-radius: 2px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
   }
   .mt-label {
     position: absolute;
-    left: 5px;
+    left: 20px;
+    right: 115px;
     top: 0;
-    line-height: 17px;
+    line-height: var(--mt-bar-h, 20px);
     font-size: 11px;
     color: var(--color-white);
-    text-shadow: 1px 1px 1px var(--color-keyline);
-    font-weight: bold;
+    text-shadow:
+      1px 1px 2px #000,
+      0 0 1px #000;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    pointer-events: none;
+  }
+  .mt-row.has-icon .mt-label {
+    left: 36px;
+    right: 115px;
   }
   .mt-num {
     position: absolute;
     right: 5px;
     top: 0;
-    line-height: 17px;
+    line-height: var(--mt-bar-h, 20px);
+    font-size: 10.5px;
+    color: #f0ede6;
+    text-shadow:
+      1px 1px 2px #000,
+      0 0 1px #000;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    pointer-events: none;
+  }
+  .mt-val-amount {
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .mt-val-rate {
+    font-size: 9.5px;
+    color: #bbb4a4;
+  }
+  .mt-val-pct {
+    font-size: 9.5px;
+    color: #9d9686;
+    min-width: 22px;
+    text-align: right;
+  }
+  .mt-val-hp {
+    font-size: 9.5px;
+    color: #bbb4a4;
+  }
+  .mt-diff-pos {
+    color: #4ade80;
+  }
+  .mt-diff-neg {
+    color: #f87171;
+  }
+  @container (max-width: 215px) {
+    .mt-val-pct {
+      display: none !important;
+    }
+    .mt-label,
+    .mt-row.has-icon .mt-label {
+      right: 75px;
+    }
+  }
+  @container (max-width: 175px) {
+    .mt-val-rate {
+      display: none !important;
+    }
+    .mt-label,
+    .mt-row.has-icon .mt-label {
+      right: 45px;
+    }
+  }
+  .mt-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    font-size: 11px;
+    font-style: italic;
+    color: #ded8cb;
+    opacity: 0.45;
+    user-select: none;
+    pointer-events: none;
+  }
+  .mt-tt-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     font-size: 10px;
     color: var(--color-text-light);
-    text-shadow: 1px 1px 1px var(--color-keyline);
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .mt-tt-stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .mt-tt-stat-val {
+    color: var(--gold);
+    font-weight: bold;
+    font-variant-numeric: tabular-nums;
   }
   /* Each bar is focusable so its hover breakdown is reachable by keyboard, not
      by pointer only (attachTooltip shows on focusin and on a long-press). */
   .mt-row:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 2px;
+  }
+
+  /* ---------- Details! damage meter options dialog ---------- */
+  .mt-opts-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    background: rgba(0, 0, 0, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .mt-opts-dialog {
+    width: min(780px, 94vw);
+    height: min(540px, 90vh);
+    background: #14161c;
+    border: 1px solid #4a3e28;
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.85),
+      inset 0 1px 0 rgba(255, 215, 0, 0.2);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: #ded8cb;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .mt-opts-header {
+    height: 44px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(10, 11, 14, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    flex-shrink: 0;
+  }
+  .mt-opts-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mt-opts-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffd100;
+    letter-spacing: 0.3px;
+  }
+  .mt-opts-badge {
+    font-size: 10px;
+    background: rgba(255, 209, 0, 0.15);
+    color: #ffd100;
+    padding: 2px 7px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 209, 0, 0.3);
+    font-weight: 600;
+  }
+  .mt-opts-close {
+    background: none;
+    border: none;
+    color: #8c887e;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .mt-opts-close:hover {
+    color: #ffffff;
+  }
+  .mt-opts-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    min-height: 0;
+  }
+  .mt-opts-sidebar {
+    width: 200px;
+    background: rgba(12, 14, 18, 0.85);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .mt-opts-tab-btn {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    color: #aaa496;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mt-opts-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+  }
+  .mt-opts-tab-btn.active {
+    background: rgba(255, 209, 0, 0.12);
+    border-color: rgba(255, 209, 0, 0.4);
+    color: #ffd100;
+  }
+  .mt-opts-tab-title {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .mt-opts-tab-desc {
+    font-size: 10px;
+    color: #7a756b;
+    margin-top: 2px;
+  }
+  .mt-opts-content {
+    flex: 1;
+    padding: 18px 24px;
+    overflow-y: auto;
+    background: rgba(18, 20, 26, 0.6);
+    min-height: 0;
+  }
+  .mt-opts-group {
+    margin-bottom: 22px;
+  }
+  .mt-opts-group-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffd100;
+    margin: 0 0 12px 0;
+    border-bottom: 1px solid rgba(255, 209, 0, 0.2);
+    padding-bottom: 4px;
+  }
+  .mt-opts-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 16px;
+  }
+  .mt-opts-row-block {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .mt-opts-row-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .mt-opts-row-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .mt-opts-row-desc {
+    font-size: 11px;
+    color: #8c887e;
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+  .mt-opts-switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .mt-opts-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+  .mt-opts-switch-slider {
+    position: absolute;
+    inset: 0;
+    background-color: #2c303c;
+    border-radius: 20px;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .mt-opts-switch-slider::before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 2px;
+    background-color: #ded8cb;
+    border-radius: 50%;
+    transition:
+      transform 0.2s,
+      background-color 0.2s;
+  }
+  .mt-opts-switch input:checked + .mt-opts-switch-slider {
+    background-color: #ffd100;
+    border-color: #ffd100;
+  }
+  .mt-opts-switch input:checked + .mt-opts-switch-slider::before {
+    transform: translateX(18px);
+    background-color: #14161c;
+  }
+  .mt-opts-slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .mt-opts-slider {
+    accent-color: #ffd100;
+    width: 140px;
+    cursor: pointer;
+  }
+  .mt-opts-slider-val {
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffd100;
+    min-width: 48px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .mt-opts-btn-group {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .mt-opts-choice-btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 10px;
+    background: rgba(30, 34, 44, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #c4beaf;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .mt-opts-choice-btn:hover {
+    background: rgba(45, 50, 65, 0.8);
+    color: #ffffff;
+  }
+  .mt-opts-choice-btn.active {
+    background: rgba(255, 209, 0, 0.15);
+    border-color: #ffd100;
+    color: #ffffff;
+  }
+  .mt-opts-choice-title {
+    font-size: 11.5px;
+    font-weight: 600;
+  }
+  .mt-opts-choice-desc {
+    font-size: 9.5px;
+    color: #8c887e;
+    margin-top: 2px;
+  }
+  .mt-opts-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .mt-opts-preset-card {
+    background: rgba(24, 28, 36, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color 0.15s;
+  }
+  .mt-opts-preset-card.active {
+    border-color: #ffd100;
+    box-shadow: 0 0 10px rgba(255, 209, 0, 0.2);
+  }
+  .mt-opts-preset-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mt-opts-preset-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .mt-opts-preset-badge {
+    font-size: 9.5px;
+    color: #ffd100;
+    background: rgba(255, 209, 0, 0.15);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-weight: 600;
+  }
+  .mt-opts-preset-desc {
+    font-size: 11px;
+    color: #8c887e;
+    margin: 0;
+    line-height: 1.35;
+    flex: 1;
+  }
+  .mt-opts-footer {
+    height: 48px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(10, 11, 14, 0.95);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .mt-opts-btn {
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(40, 44, 56, 0.8);
+    color: #ded8cb;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mt-opts-btn:hover {
+    background: rgba(60, 66, 82, 0.9);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+  .mt-opts-btn-primary {
+    background: #ffd100;
+    color: #14161c;
+    border-color: #ffe04d;
+  }
+  .mt-opts-btn-primary:hover {
+    background: #ffdb33;
+    color: #000000;
+  }
+  .mt-opts-footer-spacer {
+    flex: 1;
+  }
+  .mt-opts-font-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .mt-opts-font-card {
+    background: rgba(24, 28, 36, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .mt-opts-font-card:hover {
+    background: rgba(36, 42, 54, 0.9);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .mt-opts-font-card.active {
+    border-color: #ffd100;
+    box-shadow: 0 0 10px rgba(255, 209, 0, 0.25);
+    background: rgba(40, 46, 60, 0.95);
+  }
+  .mt-opts-font-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .mt-opts-font-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+  }
+  .mt-opts-font-desc {
+    font-size: 10.5px;
+    color: #8c887e;
+    line-height: 1.35;
+  }
+  .mt-opts-font-preview {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #ffd100;
+    background: rgba(10, 12, 16, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 3px;
+    padding: 6px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .mt-opts-btn-danger {
+    background: rgba(180, 40, 40, 0.35);
+    border-color: rgba(220, 60, 60, 0.4);
+    color: #ff9999;
+  }
+  .mt-opts-btn-danger:hover:not(:disabled) {
+    background: rgba(220, 40, 40, 0.6);
+    color: #ffffff;
+    border-color: #ff4d4d;
+  }
+  .mt-opts-btn-danger:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .mt-opts-profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mt-opts-profile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+  .mt-opts-profile-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .mt-opts-profile-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .mt-opts-select {
+    height: 30px;
+    background: rgba(16, 18, 24, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+    color: #ffd100;
+    padding: 0 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    min-width: 140px;
+  }
+  .mt-opts-select:focus {
+    border-color: #ffd100;
+    outline: none;
+  }
+  .mt-opts-text-input {
+    height: 30px;
+    background: rgba(16, 18, 24, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 4px;
+    color: #ffffff;
+    padding: 0 10px;
+    font-size: 11.5px;
+    flex: 1;
+    max-width: 220px;
+  }
+  .mt-opts-text-input:focus {
+    border-color: #ffd100;
+    outline: none;
+  }
+  .mt-opts-textarea {
+    width: 100%;
+    height: 64px;
+    background: rgba(14, 16, 22, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    color: #ded8cb;
+    font-family: ui-monospace, "Cascadia Mono", monospace;
+    font-size: 11px;
+    padding: 8px 10px;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  .mt-opts-textarea:focus {
+    border-color: #ffd100;
+    outline: none;
+  }
+  .mt-opts-feedback {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: rgba(255, 209, 0, 0.15);
+    color: #ffd100;
+  }
+  .mt-opts-feedback-ok {
+    background: rgba(46, 204, 113, 0.18);
+    color: #2ecc71;
+  }
+  .mt-opts-feedback-err {
+    background: rgba(231, 76, 60, 0.18);
+    color: #e74c3c;
   }
 
   /* ---------- target aura window ---------- */
@@ -6712,6 +7709,17 @@
     padding: 0;
     cursor: var(--cursor-point);
     opacity: 0.78;
+  }
+  /* Size and padding come from the .mt-panel .ui-x-btn rule; this only seats it
+     after the title controls and matches their resting opacity. */
+  .ta-close-btn {
+    flex: 0 0 24px;
+    margin-left: 4px;
+    opacity: 0.78;
+  }
+  .ta-close-btn:hover,
+  .ta-close-btn:focus-visible {
+    opacity: 1;
   }
   .ta-rows-config-btn {
     position: relative;
@@ -7134,10 +8142,22 @@
     position: relative;
     display: flex;
     justify-content: space-between;
-    gap: 10px;
-    min-width: 180px;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
     padding: 1px 4px;
     line-height: 1.5;
+  }
+  #tooltip .mt-tip-icon {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    flex-shrink: 0;
   }
   #tooltip .mt-tip-bar {
     position: absolute;
@@ -7149,6 +8169,7 @@
   }
   #tooltip .mt-tip-name {
     position: relative;
+    flex: 1 1 auto;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -7157,6 +8178,8 @@
     position: relative;
     color: var(--color-text-muted);
     white-space: nowrap;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
   /* Contributor subtotal on the damage/healing breakdown: the member, then each
      pet that acted. It reads as a heading over the abilities nested beneath it,
@@ -7180,6 +8203,54 @@
   }
   #tooltip .mt-tip-group .mt-tip-name {
     color: var(--color-text-muted);
+  }
+  /* Targets breakdown section: hostiles damaged, formatted as Amount | DPS with hostile red bars */
+  #tooltip .mt-tip-targets-section {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  #tooltip .mt-tip-targets-hdr {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    padding: 0 4px;
+  }
+  #tooltip .mt-tip-target-row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+    padding: 1px 4px;
+    line-height: 1.5;
+  }
+  #tooltip .mt-tip-target-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(220, 50, 50, 0.28);
+    border-radius: 2px;
+  }
+  #tooltip .mt-tip-target-name {
+    position: relative;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-text);
+  }
+  #tooltip .mt-tip-target-val {
+    position: relative;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
   }
   body.mobile-touch #meters-window .mt-rows {
     max-height: 82px;
@@ -7727,6 +8798,23 @@
     padding: 8px 10px;
     font-size: 12px;
     line-height: 1.5;
+  }
+  /* The mouseover unit tooltip's movable seat (interface_unlock_core.ts
+     'unitTooltip', read by unit_tooltip_seat.ts): an invisible, click-through
+     box whose stock spot is the classic bottom-right slot, MOB_TOOLTIP_MARGIN_RIGHT
+     and MOB_TOOLTIP_MARGIN_BOTTOM in tooltip_clamp_core.ts (the pair is pinned
+     equal by tests/unit_tooltip_seat.test.ts), so an unmoved seat paints the
+     card exactly where it always sat. visibility, not display, hides it: the
+     paint path measures its box. The unlock mode shows it as a dimmed
+     placeholder (below, beside the other force-shown frames). */
+  #unit-tooltip-anchor {
+    position: absolute;
+    right: 56px;
+    bottom: 60px;
+    width: 220px;
+    height: 72px;
+    visibility: hidden;
+    pointer-events: none;
   }
   /* Named per consumer rather than left unscoped: the touch menu and
      consumable captions reuse the tooltip's title metrics, but an unscoped
@@ -8929,6 +10017,10 @@
   /* ---------- center messages ---------- */
   #error-msg {
     position: absolute;
+    width: max-content;
+    max-width: calc(100vw - 48px);
+    text-align: center;
+    overflow-wrap: anywhere;
     left: 50%;
     top: 21%;
     transform: translateX(-50%);
@@ -8974,6 +10066,15 @@
     letter-spacing: 1px;
     white-space: normal;
     overflow-wrap: anywhere;
+  }
+  /* Loot wins carry a sentence and may share the screen with a full-bag warning. */
+  #banner.banner-loot {
+    top: 21%;
+    font-size: clamp(18px, 2.1vw, 30px);
+    z-index: 90;
+  }
+  #error-msg.held-loot-warning {
+    top: max(28%, calc(21% + 72px));
   }
   #banner.has-subtext {
     display: flex;
@@ -9346,6 +10447,311 @@
     width: min(360px, calc(100vw - 32px));
     padding: 24px;
     gap: 12px;
+  }
+  #death-overlay .death-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- death recap dialog (WoW-style) ---------- */
+  #death-recap-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 520px;
+    max-width: calc(100vw - 24px);
+    max-height: min(720px, calc(var(--app-vh, 100vh) - 40px));
+    display: none;
+    flex-direction: column;
+    z-index: 35;
+    padding: 0;
+    overflow: hidden;
+    background: #11141a;
+    border: 1px solid #4a3c28;
+    border-radius: 6px;
+    box-shadow:
+      0 12px 40px #000c,
+      0 0 0 1px #d4af3722,
+      inset 0 1px 0 #ffffff18;
+  }
+  .death-recap-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, #222630 0%, #161a22 100%);
+    border-bottom: 1px solid #3d3222;
+    flex-shrink: 0;
+  }
+  .death-recap-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #e5c158;
+    font-family: var(--title-font);
+    text-shadow: 0 1px 2px #000;
+  }
+  .death-recap-header .x-btn {
+    position: static;
+    margin: 0;
+  }
+  .death-recap-subbar {
+    padding: 8px 14px;
+    background: #151820;
+    border-bottom: 1px solid #28241c;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+  .death-recap-summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ffb8b8;
+    font-weight: 600;
+  }
+  .death-recap-skull-icon {
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    color: #ff4444;
+  }
+  .death-recap-skull-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+  .death-recap-totals {
+    display: flex;
+    gap: 12px;
+    margin-top: 4px;
+    font-size: 11px;
+    color: #a0a6b2;
+  }
+  .recap-total-dmg {
+    color: #ff6b6b;
+  }
+  .recap-total-heal {
+    color: #4ade80;
+  }
+  .death-recap-content {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 10px 14px;
+    min-height: 120px;
+  }
+  .death-recap-empty {
+    text-align: center;
+    padding: 30px 10px;
+    color: #7d8594;
+    font-style: italic;
+    font-size: 13px;
+  }
+  .death-recap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .recap-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #181d26;
+    border: 1px solid #2d3340;
+    border-radius: 4px;
+    transition:
+      background 0.15s,
+      border-color 0.15s;
+    cursor: default;
+  }
+  .recap-card:hover {
+    background: #202733;
+    border-color: #4d576a;
+  }
+  .recap-card-lethal {
+    background: linear-gradient(90deg, #2b1214 0%, #1e1518 100%);
+    border-color: #8a2424;
+    box-shadow: inset 0 0 12px #ff000018;
+  }
+  .recap-card-lethal:hover {
+    background: linear-gradient(90deg, #361719 0%, #261a1e 100%);
+    border-color: #b53232;
+  }
+  .recap-card-heal {
+    border-left: 3px solid #3cd070;
+  }
+  .recap-card-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+  }
+  .recap-icon-frame {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #4a3c28;
+    box-shadow: 0 1px 4px #0008;
+    flex-shrink: 0;
+  }
+  .recap-card-lethal .recap-icon-frame {
+    border-color: #b03030;
+    box-shadow: 0 0 6px #ff202044;
+  }
+  .recap-details {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .recap-name-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .recap-ability {
+    font-weight: 700;
+    font-size: 13px;
+    color: #e2e8f0;
+  }
+  .recap-source {
+    font-size: 11px;
+    color: #8c96a8;
+  }
+  .recap-amount-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+  }
+  .recap-amount {
+    font-weight: 700;
+  }
+  .recap-amount.recap-damage {
+    color: #ff6b6b;
+  }
+  .recap-amount.recap-heal {
+    color: #4ade80;
+  }
+  .recap-amount.recap-absorb {
+    color: #7dd3fc;
+  }
+  .recap-crit {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #ffd166;
+  }
+  .recap-school {
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: #0006;
+    text-transform: capitalize;
+  }
+  .recap-school.school-fire {
+    color: var(--color-debuff-fire, #e8722a);
+  }
+  .recap-school.school-frost {
+    color: var(--color-debuff-frost, #4aa3df);
+  }
+  .recap-school.school-shadow {
+    color: var(--color-debuff-shadow, #9b59d0);
+  }
+  .recap-school.school-holy {
+    color: var(--color-debuff-holy, #d8b56b);
+  }
+  .recap-school.school-nature {
+    color: var(--color-debuff-nature, #35a835);
+  }
+  .recap-school.school-arcane {
+    color: var(--color-debuff-arcane, #3f8cff);
+  }
+  .recap-card-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    margin-left: 12px;
+    flex-shrink: 0;
+  }
+  .recap-hp-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+  .recap-hp-bar {
+    width: 80px;
+    height: 6px;
+    background: #0f1217;
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #282f3d;
+  }
+  .recap-hp-fill {
+    height: 100%;
+    transition: width 0.2s;
+  }
+  .recap-hp-fill.hp-healthy {
+    background: #3cd070;
+  }
+  .recap-hp-fill.hp-warning {
+    background: #eab308;
+  }
+  .recap-hp-fill.hp-danger {
+    background: #ef4444;
+  }
+  .recap-hp-label {
+    font-size: 10px;
+    color: #8c96a8;
+    font-family: var(--ui-font);
+  }
+  .recap-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #8c96a8;
+  }
+  .recap-time-lethal {
+    color: #ff5252;
+    font-weight: 700;
+  }
+  .recap-skull {
+    display: inline-flex;
+    width: 12px;
+    height: 12px;
+  }
+  .recap-skull svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+  .recap-lethal-badge {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .death-recap-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 14px;
+    background: #14171f;
+    border-top: 1px solid #2d261e;
+    flex-shrink: 0;
+  }
+  .death-recap-footer-close {
+    min-width: 80px;
+    padding: 4px 12px;
   }
   /* Ghost resurrect prompt: a small, NON-BLOCKING panel shown only when a spirit is in
      reach of its corpse (the Pale Keeper's raise is a conversation, not a button here).

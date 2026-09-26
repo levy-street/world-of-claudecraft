@@ -2,11 +2,11 @@ import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
 import type { SequencerHost } from '../src/render/ability_vfx/sequencer';
-import { SolidImpactFragments } from '../src/render/ability_vfx/solid_impact_fragments';
 import { drawWarriorAreaContact } from '../src/render/ability_vfx/warrior_area';
 import { warriorImpactFan } from '../src/render/ability_vfx/warrior_impact_fan';
 import { warriorShearPhase } from '../src/render/ability_vfx/warrior_impact_material';
 import { drawWarriorLeapLanding } from '../src/render/ability_vfx/warrior_leap';
+import { preparedFragments } from './helpers/prepared_fragments';
 
 vi.mock('../src/render/ability_vfx/production_assets', async () => {
   const three = await import('three');
@@ -49,9 +49,9 @@ it('keeps steel breakup continuous, forward-only and within the original lifetim
   expect(warriorShearPhase(0.72)).toBeCloseTo(0.72);
 });
 
-it('throws varied metal chips far enough to read while preserving shared pool limits and default fragments', () => {
+it('throws varied metal chips far enough to read while preserving shared pool limits and default fragments', async () => {
   const scene = new THREE.Scene();
-  const pool = new SolidImpactFragments(scene);
+  const pool = await preparedFragments(scene);
   const mesh = scene.children.find(
     (n) => n.name === 'solidImpact:metal_splinter',
   ) as THREE.Mesh<THREE.InstancedBufferGeometry>;
@@ -131,9 +131,9 @@ it('reserves the last available area ribbon for the enemy imprint when the atlas
   expect(host.pathRibbon).toHaveBeenCalledTimes(3);
 });
 
-it('keeps short-lived metal at the impact when distant terrain rises beyond its visible trajectory', () => {
+it('keeps short-lived metal at the impact when distant terrain rises beyond its visible trajectory', async () => {
   const scene = new THREE.Scene();
-  const pool = new SolidImpactFragments(scene);
+  const pool = await preparedFragments(scene);
   const ground = vi.fn((x: number, z: number) => (Math.hypot(x, z) > 6 ? 30 : 0));
   expect(pool.burst('metal_splinter', 0, 2, 0, 0xffffff, 14, 1.6, 0, 1, ground, 0.28, true)).toBe(
     14,
@@ -147,9 +147,9 @@ it('keeps short-lived metal at the impact when distant terrain rises beyond its 
   pool.dispose();
 });
 
-it('admits debris on all four sides of a landing inside the real fixed pool', () => {
+it('admits debris on all four sides of a landing inside the real fixed pool', async () => {
   const scene = new THREE.Scene();
-  const pool = new SolidImpactFragments(scene);
+  const pool = await preparedFragments(scene);
   const host = new Proxy(
     {
       groundYAt: () => 0,

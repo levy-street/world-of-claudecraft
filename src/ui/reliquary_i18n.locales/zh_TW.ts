@@ -197,7 +197,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: '英雄：內環熔爐',
-    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌與武器，以及團隊副本飾品。',
+    desc: '末焰鍛父瓦爾庫爾身上僅限英雄難度掉落的盾牌、副手聖物與武器。',
   },
   professions_forgebreaker: {
     name: '碎爐者',

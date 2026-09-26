@@ -1080,13 +1080,11 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.classPage.formLine.form_travel':
     'La forma de viaje: mucho más rápida por tierra, pero sin otras habilidades hasta que cambies de forma.',
   'guide.classPage.formName.form_bear': 'Forma de Bruin',
-  'guide.classPage.formName.form_cat': 'Forma de gato',
+  'guide.classPage.formName.form_cat': 'Forma de lobo',
   'guide.classPage.formName.form_travel': 'Forma Fleet',
   'guide.classPage.formsHeading': 'Cambio de forma',
   'guide.classPage.formsMoonwing':
     'Un druida de Equilibrio gana una forma más, la Forma de lechúcico lunar, la forma de conjurador en la que lucha un druida de Equilibrio. Es la única forma animal que conserva tus hechizos, y tu varita solo funciona en ella o en tu forma de conjurador normal.',
-  'guide.classPage.formsWolfEngage':
-    'Un lobo abre el combate con Embestida de Bruin, cambia enseguida a Forma de lobo para sujetar al objetivo, cierra la distancia con Embate cuando no está en sigilo y frena a un enemigo con Derribo.',
   'guide.classPage.formsNote':
     'Un druida lucha cambiando de forma. La mayoría de las habilidades de druida pertenecen a una forma concreta, así que la forma en la que estás decide lo que puedes lanzar, y cambiar de forma cuesta un poco de maná. Puedes cambiar de forma dentro o fuera de combate, tantas veces como quieras.',
   'guide.classPage.mageEleHeading': 'Elemental de agua',
@@ -1110,7 +1108,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'El mar no tiene muro. Los cruces que el mundo espera que nades, los estrechos y las lagunas entre un tramo de tierra y el siguiente, y los lagos del interior, son seguros de cruzar por mucho que tarden. Aventúrate más allá de la orilla, en aguas verdaderamente abiertas, y empieza a minar tus fuerzas: aparece un aviso, tienes una ventana real para dar la vuelta, y después de eso el mar inflige un daño cada vez mayor que nada puede evitar hasta que regreses hacia tierra. Ahógate o agótate tan lejos de la orilla y liberas tu espíritu como en cualquier otra muerte, así que trata el horizonte como paisaje, no como destino.',
   'guide.combat.hazardsTitle': 'El agua puede matarte',
   'guide.combat.threatBody':
-    'Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de gato del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.',
+    'Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de lobo del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.',
   'guide.combat.threatTitle': 'A quién golpea el enemigo',
   'guide.combat.unstuckBody':
     'Si el mundo te atrapa en algún sitio del que no puedes salir, escribe /unstuck. Necesitas estar fuera de combate y quieto, sin un aturdimiento ni una raíz encima, y no estar en un duelo ni en un combate de arena: se inicia una breve cuenta atrás, y moverte o recibir daño la cancela. Cuando termina, te deja en el cementerio más cercano. Nunca te mata y no deja cadáver, y si ya habías caído, te revive allí en su lugar. El precio es el Mal de desatasco, un debilitamiento temporal de cuanto eres que ya se ha disipado para cuando puedas volver a usar el comando, y al igual que el Tañido del Guardián, perdona por completo a los personajes recién creados.',
@@ -3085,7 +3083,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Primer uso: ancla tu sombra a tus pies durante 5 min. Vuelve a usarla a un máximo de 40 m para regresar, consumir el ancla e iniciar un tiempo de reutilización de 45 s.',
   'entities.abilities.hex_of_violence.name': 'Maleficio de violencia',
   'entities.abilities.hex_of_violence.description':
-    'Maldice al enemigo durante 8 s, infligiendo daño de las Sombras y generando 2 de Condena cada 2 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras.',
+    'Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras.',
   'entities.abilities.cruel_pact.name': 'Pacto cruel',
   'entities.abilities.cruel_pact.description':
     'Sacrifica un 12% de tu salud máxima para generar 20 de Condena. No se puede usar con un 15% de salud o menos.',
@@ -3553,8 +3551,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.castShield': 'El daño no puede interrumpir ni retrasar tus lanzamientos',
   'hudChrome.auraEffect.cooldownCap':
     'Has usado {used} de {cap} s de reducción de reutilización en esta ventana',
-  'hudChrome.auraEffect.bruinRushWindow':
-    'La Forma de lobo no cuesta maná y sujeta al objetivo de tu Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s',
   'hudChrome.auraEffect.funeralHarvestLock':
     'Cosecha funeraria aún no puede crear otro fragmento de alma',
   'hudChrome.auraEffect.leadenHexLock':
@@ -3861,7 +3857,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.shadow_pulse': 'Pulso de Sombra (dano de area pulsante)',
   'hudChrome.finder.mech.shuddering_stomp': 'Pisada Estremecedora (aturdimiento de area)',
   'hudChrome.finder.mech.soul_rend':
-    'Desgarro de alma (los jugadores marcados se agrupan para repartir el daño)',
+    'Desgarro de alma (los jugadores marcados se agrupan y luego salen del fuego)',
   'hudChrome.finder.mech.summons_adds': 'Invoca refuerzos',
   'hudChrome.finder.mech.wardstones': 'Canalizacion de piedras de guardia (transicion de fase)',
   'hudChrome.finder.needs': 'Necesita {roles}',
@@ -5326,7 +5322,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Incluye un 5% de probabilidad base que comparten todos los aventureros.',
   'hudChrome.statInfo.notes.dpsApprox':
     'Es una estimación, no incluye los golpes críticos ni el daño de habilidades.',
-  'hudChrome.perf.overlaySection': 'Superposición de rendimiento',
+  'hudChrome.perf.title': 'Superposición de rendimiento',
   'hudChrome.perf.enable': 'Mostrar superposición de rendimiento',
   'hudChrome.perf.description':
     'Elige qué estadísticas mostrar, dónde se ubica la superposición y cómo se ve.',
@@ -6273,7 +6269,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hud.errors.requiresCombo': 'Esa habilidad requiere puntos de combo.',
   'hud.errors.requiresForm': 'Debes estar en forma de {form}.',
   'hud.errors.bear': 'Bruin',
-  'hud.errors.cat': 'gato',
+  'hud.errors.cat': 'lobo',
   'hud.errors.travel': 'Fleet',
   'hud.errors.cantInForm': 'No puedes hacer eso en forma de {form}.',
   'hud.errors.shapeshifted': 'No puedes hacer eso transformado.',
@@ -6527,8 +6523,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'abilityUi.resources.mana': 'Maná',
   'abilityUi.resources.rage': 'ira',
   'abilityUi.resources.energy': 'energía',
-  'abilityUi.forms.bear': 'Bruin',
-  'abilityUi.forms.cat': 'gato',
+  'abilityUi.forms.bear': 'oso',
+  'abilityUi.forms.cat': 'lobo',
   'abilityUi.cast.fishing': 'Pesca',
   'abilityUi.cast.gathering': 'Recolectando',
   'abilityUi.cast.thunzharrStormcall': 'Llamada de la tormenta',
@@ -7124,6 +7120,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.power_word_shield.name': 'Salmo de Protección',
   'entities.abilities.power_word_shield.description':
     'Escuda a un objetivo aliado y absorbe {damage} de daño durante 30 s. Disciplina además vincula al objetivo con tu daño Sagrado durante 30 s.',
+  'entities.abilities.lunge.name': 'Embestida felina',
+  'entities.abilities.lunge.description':
+    'Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma.',
   'entities.abilities.renew.name': 'Gracia Persistente',
   'entities.abilities.renew.description':
     'Sana al objetivo en {damage} durante 15 s, una vez cada 3 s. La sanación aumenta con el poder con hechizos.',
@@ -7217,14 +7216,14 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Enraíza al objetivo en el sitio durante hasta 12 s.',
   'entities.abilities.bear_form.name': 'Forma de Bruin',
   'entities.abilities.bear_form.description':
-    'Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento. Lánzala de nuevo para volver a forma de taumaturgo.',
+    'Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo.',
   'entities.abilities.maul.name': 'Rompehuesos',
   'entities.abilities.growl.name': 'Amenazar',
   'entities.abilities.growl.description':
     'Gruñe al objetivo: tu amenaza sube hasta igualar la de su enemigo más odiado y queda obligado a atacarte durante 3 s. Solo en forma de Bruin.',
-  'entities.abilities.cat_form.name': 'Forma de gato',
+  'entities.abilities.cat_form.name': 'Forma de lobo',
   'entities.abilities.cat_form.description':
-    'Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Cambiar a cualquier forma otorga Paso ligero: un 60% de velocidad de movimiento durante 3 s, una vez cada 20 s. Lánzalo de nuevo para volver a la forma de lanzador.',
+    'Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Lánzalo de nuevo para volver a la forma de lanzador.',
   'entities.abilities.claw.name': 'Garra Desgarradora',
   'entities.abilities.ferocious_bite.name': 'Mordisco Sangriento',
   'entities.abilities.swipe.name': 'Zarpas Barredoras',
@@ -7235,7 +7234,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.starfire.name': 'Caída Celeste',
   'entities.abilities.travel_form.name': 'Forma Fleet',
   'entities.abilities.travel_form.description':
-    'Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40% y eliminando las raíces y ralentizaciones que se puedan romper. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento.',
+    'Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40%. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar.',
   'entities.abilities.enrage.name': 'Avivar',
   'entities.abilities.enrage.description':
     'Genera 20 de furia al instante. Solo en forma de Bruin.',
@@ -7247,22 +7246,16 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Sume al objetivo en un sueño profundo de hasta 8 s. Cualquier daño lo despertará.',
   'entities.abilities.dash.name': 'Carrera',
   'entities.abilities.dash.description':
-    'Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de gato.',
+    'Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de lobo.',
   'entities.abilities.pounce.name': 'Golpe Sigiloso',
-  'entities.abilities.lunge.description':
-    'Te abalanzas sobre un enemigo a hasta 12 m, infligiendo un 60% del daño de arma y otorgando 1 punto de combo. Solo en Forma de lobo.',
-  'entities.abilities.lunge.name': 'Embate',
-  'entities.abilities.hamstring_bite.description':
-    'Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s). Solo en Forma de lobo.',
-  'entities.abilities.hamstring_bite.name': 'Derribo',
   'entities.abilities.pounce.description':
-    'Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo. Fuera del sigilo, este botón es Embate.',
+    'Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.insect_swarm.name': 'Enjambre Punzante',
   'entities.abilities.insect_swarm.description':
     'Un enjambre de insectos acosa al enemigo, causando {damage} de daño de Naturaleza durante 12 s.',
-  'entities.abilities.tigers_fury.name': 'Sangre de Lince',
+  'entities.abilities.tigers_fury.name': 'Sangre de Lobo',
   'entities.abilities.tigers_fury.description':
-    'Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de gato.',
+    'Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo.',
   'entities.abilities.rip.name': 'Grieta Sangrienta',
   'entities.abilities.mortal_strike.name': 'Golpe Mutilador',
   'entities.abilities.mortal_strike.description':
@@ -7302,13 +7295,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Somete a un Wraithborn a tu voluntad: un demonio de élite que descarga un fuerte daño de las Sombras desde lejos. Un largo tiempo de reutilización refrena su poder devastador. Invocar un nuevo demonio descarta el actual. Solo puedes tener un demonio a la vez.',
   'entities.abilities.bear_charge.name': 'Embestida de Bruin',
   'entities.abilities.bear_charge.description':
-    'Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Durante los 3 s siguientes, la Forma de lobo es gratuita y sujeta al objetivo, ralentizándolo un 50% durante 4 s. Alcance de 7 a 23 m. Solo en forma de Bruin.',
+    'Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Alcance de 7 a 23 m. Solo en forma de Bruin.',
   'entities.abilities.demoralizing_roar.name': 'Rugido Cobarde',
   'entities.abilities.demoralizing_roar.description':
     'Desmoraliza a los enemigos cercanos, reduciendo su poder de ataque en 20 durante 20 s. Solo en forma de Bruin.',
   'entities.abilities.prowl.name': 'Acechar',
   'entities.abilities.prowl.description':
-    'Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate.',
+    'Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate.',
   'entities.abilities.rake.name': 'Desollar',
   'entities.abilities.revive_pet.name': 'Remendar',
   'entities.abilities.revive_pet.description':
@@ -7358,10 +7351,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Adelanta un pulso futuro de tu Pacto Ardiente y luego enciende al objetivo por {damage} de daño de Fuego. Genera 1 de Devastación y 1 de Ruina. Guarda {charges} cargas. (Distintivo de Destrucción)',
   'entities.abilities.moonkin_form.name': 'Forma de lechúcico lunar',
   'entities.abilities.moonkin_form.description':
-    'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
+    'Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)',
   'entities.abilities.feral_charge.name': 'Oleada primigenia',
   'entities.abilities.feral_charge.description':
-    'Desata una oleada primigenia. En Forma de gato, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)',
+    'Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)',
   'entities.abilities.swiftmend.name': 'Alivio presto',
   'entities.abilities.crusader_strike.description':
     'Golpea al objetivo con daño de arma más {damage} de daño Sagrado. (talento de paladín)',
@@ -8720,11 +8713,175 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.meters.perSecondRow': '{total} ({rate})',
   'hudChrome.meters.seconds': '{s} s',
   'hudChrome.meters.breakdownOther': 'Otros ({count})',
+  'hudChrome.meters.targetsHeader': 'Objetivos',
   'hudChrome.meters.breakdownRow': '{value} ({percent})',
   'hudChrome.meters.breakdownSummary': '{tab}: {value}',
   'hudChrome.meters.melee': 'Cuerpo a cuerpo',
   'hudChrome.meters.percent': '{value}%',
   'hudChrome.meters.petAbility': '{pet}: {ability}',
+  'hudChrome.meters.settingsTitle': 'Ajustes de Details / Medidores',
+  'hudChrome.meters.optionsEngineBadge': 'WoC Details! Engine',
+  'hudChrome.meters.resetDefaults': 'Restablecer por defecto',
+  'hudChrome.meters.closeSettings': 'Cerrar',
+  'hudChrome.meters.densityCompact': 'Densidad: Compacta (16px)',
+  'hudChrome.meters.densityStandard': 'Densidad: Estandar (20px)',
+  'hudChrome.meters.bgGlass': 'Fondo: Cristal (76%)',
+  'hudChrome.meters.bgSolid': 'Fondo: Solido (98%)',
+  'hudChrome.meters.bgMinimal': 'Fondo: Minimo (45%)',
+  'hudChrome.meters.numDetailed': 'Numeros: Detallados',
+  'hudChrome.meters.numCompact': 'Numeros: Abreviados (k/M)',
+  'hudChrome.meters.raidTotalsOn': 'Total de grupo en cabecera: Si',
+  'hudChrome.meters.raidTotalsOff': 'Total de grupo en cabecera: No',
+  'hudChrome.meters.tabGeneral': 'Ventana y Fondo',
+  'hudChrome.meters.tabGeneralDesc': 'Opacidad, escala, bloqueo',
+  'hudChrome.meters.tabBars': 'Barras y Texturas',
+  'hudChrome.meters.tabBarsDesc': 'Altura, espaciado, animacion',
+  'hudChrome.meters.tabText': 'Texto y Tipografia',
+  'hudChrome.meters.tabTextDesc': 'Fuentes, k/M, DPS, clasif.',
+  'hudChrome.meters.tabHeader': 'Cabecera y Titulo',
+  'hudChrome.meters.tabHeaderDesc': 'Total de grupo, botones',
+  'hudChrome.meters.tabCombat': 'Combate y Limites',
+  'hudChrome.meters.tabCombatDesc': 'Filas maximas, escudos',
+  'hudChrome.meters.tabPresets': 'Temas Rapidos',
+  'hudChrome.meters.tabPresetsDesc': 'Presets de 1 clic',
+  'hudChrome.meters.tabProfiles': 'Perfiles e Importar',
+  'hudChrome.meters.tabProfilesDesc': 'Exportar, importar y perfiles',
+  'hudChrome.meters.groupWindow': 'Fondo y Apariencia de Ventana',
+  'hudChrome.meters.bgMode': 'Modo de Fondo',
+  'hudChrome.meters.bgModeDesc': 'Estilo visual del panel del medidor.',
+  'hudChrome.meters.optGlass': 'Cristal (Blur)',
+  'hudChrome.meters.optGlassDesc': 'Efecto esmerilado con desenfoque',
+  'hudChrome.meters.optSolid': 'Solido',
+  'hudChrome.meters.optSolidDesc': 'Panel oscuro de alto contraste',
+  'hudChrome.meters.optMinimal': 'Minimo',
+  'hudChrome.meters.optMinimalDesc': 'Translucido tenue',
+  'hudChrome.meters.optTransparent': 'Transparente',
+  'hudChrome.meters.optTransparentDesc': 'Sin fondo, solo barras',
+  'hudChrome.meters.bgOpacity': 'Opacidad de Fondo',
+  'hudChrome.meters.bgOpacityDesc': 'Porcentaje de opacidad del fondo de la ventana.',
+  'hudChrome.meters.windowScale': 'Escala de la Ventana',
+  'hudChrome.meters.windowScaleDesc': 'Aumenta o reduce el tamaño de escala general del medidor.',
+  'hudChrome.meters.lockPosition': 'Bloquear Posicion',
+  'hudChrome.meters.lockPositionDesc':
+    'Fija la ventana para evitar moverla o redimensionarla accidentalmente en combate.',
+  'hudChrome.meters.groupBars': 'Geometria y Textura de las Barras',
+  'hudChrome.meters.barHeight': 'Altura de Barra',
+  'hudChrome.meters.barHeightDesc':
+    'Grosor vertical de cada fila de daño/sanacion (14px compacto a 26px amplio).',
+  'hudChrome.meters.barSpacing': 'Espaciado entre Barras',
+  'hudChrome.meters.barSpacingDesc': 'Separacion vertical en pixeles entre filas contiguas.',
+  'hudChrome.meters.barTexture': 'Textura de las Barras',
+  'hudChrome.meters.barTextureDesc': 'Acabado visual y sombreado sobre el color de clase.',
+  'hudChrome.meters.texSpecular': 'Especular (Glossy)',
+  'hudChrome.meters.texSpecularDesc': 'Reflejo superior de luz con bisel',
+  'hudChrome.meters.texSmooth': 'Plano (Smooth)',
+  'hudChrome.meters.texSmoothDesc': 'Color limpio plano de clase',
+  'hudChrome.meters.texGradient': 'Degradado',
+  'hudChrome.meters.texGradientDesc': 'Gradiente horizontal suave',
+  'hudChrome.meters.barAnimation': 'Animacion Suave de Barras',
+  'hudChrome.meters.barAnimationDesc':
+    'Interpola fluidamente el crecimiento y descenso de barras en tiempo real.',
+  'hudChrome.meters.alwaysShowMe': 'Mostrarme Siempre (Always Show Me)',
+  'hudChrome.meters.alwaysShowMeDesc':
+    'Fija siempre la barra de tu personaje abajo si quedas fuera de las filas visibles.',
+  'hudChrome.meters.groupText': 'Formato de Texto y Telemetria',
+  'hudChrome.meters.numFormat': 'Formato Numerico',
+  'hudChrome.meters.numFormatDesc': 'Estilo de visualizacion de los totales.',
+  'hudChrome.meters.optNumCompact': 'Abreviado (k / M)',
+  'hudChrome.meters.optNumCompactDesc': 'Ejemplo: 145.2k, 1.2M',
+  'hudChrome.meters.optNumDetailed': 'Detallado Completo',
+  'hudChrome.meters.optNumDetailedDesc': 'Ejemplo: 145,200, 1,240,500',
+  'hudChrome.meters.optNumDamageDps': 'Daño | DPS',
+  'hudChrome.meters.optNumDamageDpsDesc': 'Ejemplo: 239.2k | 18.4k (telemetria limpia)',
+  'hudChrome.meters.showDps': 'Mostrar Tasa por Segundo (DPS / HPS)',
+  'hudChrome.meters.showDpsDesc': 'Muestra la tasa de daño o sanacion por segundo en cada barra.',
+  'hudChrome.meters.showPercent': 'Mostrar Porcentaje (%)',
+  'hudChrome.meters.showPercentDesc':
+    'Muestra la proporcion porcentual de contribucion sobre el total de la banda.',
+  'hudChrome.meters.showRank': 'Mostrar Posicion (#1, #2...)',
+  'hudChrome.meters.showRankDesc':
+    'Muestra el numero ordinal de clasificacion a la izquierda del nombre.',
+  'hudChrome.meters.showClassIcon': 'Mostrar Icono de Clase',
+  'hudChrome.meters.showClassIconDesc':
+    'Muestra el icono de la clase o rol del jugador junto a su nombre.',
+  'hudChrome.meters.groupFont': 'Tipografia de Combate (Fuente de Letra)',
+  'hudChrome.meters.groupHeader': 'Personalizacion de la Cabecera',
+  'hudChrome.meters.showTitleBar': 'Mostrar Barra de Titulo',
+  'hudChrome.meters.showTitleBarDesc':
+    'Muestra la barra superior con el nombre del combate y controles.',
+  'hudChrome.meters.showRaidTotals': 'Resumen de Grupo en Subtitulo',
+  'hudChrome.meters.showRaidTotalsDesc':
+    'Muestra el total acumulado de DPS y HPS del grupo entero en el subtitulo.',
+  'hudChrome.meters.groupCombat': 'Reglas de Combate y Limites',
+  'hudChrome.meters.maxRows': 'Filas Maximas Visibles',
+  'hudChrome.meters.maxRowsDesc':
+    'Numero de barras simultaneas (0 = ilimitadas, ajustadas al alto de ventana).',
+  'hudChrome.meters.autoRows': ' (Auto)',
+  'hudChrome.meters.barsUnit': ' barras',
+  'hudChrome.meters.includeShields': 'Contabilizar Escudos como Sanacion',
+  'hudChrome.meters.includeShieldsDesc':
+    'Suma el daño absorbido por escudos a la columna de Sanacion.',
+  'hudChrome.meters.groupPresets': 'Temas Rapidos de 1 Clic',
+  'hudChrome.meters.applyPreset': 'Aplicar Tema',
+  'hudChrome.meters.presetDetailsName': 'Cristal Moderno',
+  'hudChrome.meters.presetDetailsDesc':
+    'Fondo de cristal esmerilado con desenfoque, barras especulares con brillo, numeros abreviados y telemetria completa.',
+  'hudChrome.meters.presetDetailsBadge': 'Recomendado',
+  'hudChrome.meters.presetClassicName': 'Sólido Clásico',
+  'hudChrome.meters.presetClassicDesc':
+    'Panel solido oscuro de alto contraste, barras planas de clase, numeros detallados sin abreviar estilo clasico.',
+  'hudChrome.meters.presetClassicBadge': 'Clásico',
+  'hudChrome.meters.presetMinimalName': 'Minimalista Puro',
+  'hudChrome.meters.presetMinimalDesc':
+    'Fondo casi transparente, barras compactas de 16px sin espaciado, texto directo sin porcentajes.',
+  'hudChrome.meters.presetMinimalBadge': 'Limpio',
+  'hudChrome.meters.presetRaidName': 'Raid Focus',
+  'hudChrome.meters.presetRaidDesc':
+    'Diseñado para bandas: densidad compacta de 18px, limite de 10 barras, total de grupo visible y fijado personal.',
+  'hudChrome.meters.presetRaidBadge': 'Banda',
+  'hudChrome.meters.presetProGradientName': 'Degradado Pro',
+  'hudChrome.meters.presetProGradientDesc':
+    'Panel transparente flotante, barras con degradado horizontal, iconos de especializacion y telemetria Daño | DPS.',
+  'hudChrome.meters.presetProGradientBadge': 'Pro',
+  'hudChrome.meters.groupManageProfiles': 'Gestion de Perfiles',
+  'hudChrome.meters.activeProfile': 'Perfil Activo',
+  'hudChrome.meters.activeProfileDesc':
+    'Selecciona o administra perfiles independientes para cada situacion de juego.',
+  'hudChrome.meters.saveAs': 'Guardar Como...',
+  'hudChrome.meters.duplicate': 'Duplicar',
+  'hudChrome.meters.deleteProfile': 'Eliminar',
+  'hudChrome.meters.cannotDeleteDefault': 'No se puede eliminar el perfil Default',
+  'hudChrome.meters.promptNewProfile': 'Nombre del nuevo perfil:',
+  'hudChrome.meters.profileCopySuffix': ' (Copia)',
+  'hudChrome.meters.groupExport': 'Exportar Perfil Actual',
+  'hudChrome.meters.exportDesc':
+    'Cadena codificada de tu configuracion actual. Copiala para compartirla o guardarla de respaldo.',
+  'hudChrome.meters.copyString': 'Copiar Cadena de Perfil',
+  'hudChrome.meters.copiedFeedback': 'Copiado al portapapeles!',
+  'hudChrome.meters.groupImport': 'Importar Perfil',
+  'hudChrome.meters.importDesc':
+    'Pega aqui una cadena de perfil (!WoC-Details:... o JSON) para aplicar y guardar la configuracion.',
+  'hudChrome.meters.importPlaceholder': 'Pega la cadena de perfil aqui (!WoC-Details:...)',
+  'hudChrome.meters.importNamePlaceholder': 'Nombre para guardar (opcional)',
+  'hudChrome.meters.importApply': 'Importar y Aplicar',
+  'hudChrome.meters.errEmptyProfile': 'Por favor, pega una cadena de perfil.',
+  'hudChrome.meters.errInvalidProfile': 'Error: Cadena de perfil no valida o corrupta.',
+  'hudChrome.meters.importSuccess': 'Perfil "{name}" importado con exito!',
+  'hudChrome.meters.reportSent': 'Reporte copiado y enviado al chat',
+  'hudChrome.meters.reportNoData': 'Sin datos registrados.',
+  'hudChrome.meters.noDetailedData': 'Sin datos detallados',
+  'hudChrome.meters.noDeathEvents': 'Sin eventos registrados antes de la muerte',
+  'hudChrome.meters.killedBy': 'Asesinado por {killer} ({ability})',
+  'hudChrome.meters.lethalHit': 'Golpe Letal',
+  'hudChrome.meters.recentCombatEvents': 'Ultimos {count} eventos de combate',
+  'hudChrome.meters.backComparison': 'Comparativa',
+  'hudChrome.meters.comparisonNeedTwo': 'Se necesitan al menos 2 combates para comparar',
+  'hudChrome.meters.backTimeline': 'Cronologia',
+  'hudChrome.meters.timelineCombatEvents': 'Eventos del combate: {count}',
+  'hudChrome.meters.backDev': 'Balance / Dev',
+  'hudChrome.meters.balanceAbilitiesCount': 'Habilidades registradas: {count}',
+  'hudChrome.meters.targetSubtitle': 'Objetivo: {target}',
+  'hudChrome.meters.noTargetData': 'Sin datos de jugadores para este objetivo',
   'hudChrome.mobile.haptics': 'Vibración',
   'hudChrome.mobile.hapticsOff': 'Vibración desactivada',
   'hudChrome.mobile.hotbarPage': 'Habilidades',
@@ -10967,7 +11124,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.rowWeather':
     'Ambiente de lluvia y nieve. Sólo la atmósfera, y apagarlo ahorra un poco durante las tormentas.',
   'guide.settingsPage.tableFoot':
-    'La distancia de dibujado es un control propio, Distancia de visión, en la tarjeta Detalle del mundo, y cada ajuste preestablecido la fija por ti hasta que tú la muevas.',
+    '¿Buscas un límite de FPS? No hay nada que buscar: el ritmo de fotogramas sigue a tu pantalla. La distancia de dibujado es un control propio, Distancia de visión, en la tarjeta Detalle del mundo, y cada ajuste preestablecido la fija por ti hasta que tú la muevas.',
   'guide.settingsPage.tableHeading': 'Cada opción de gráficos, explicada',
   'guide.settingsPage.tagReload': 'pulsa Aplicar',
   'guide.settingsPage.value100': '100%',
@@ -11270,7 +11427,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Las proezas son un estante aparte: registros de legado y primicias mundiales, las gestas ligadas a una era pasada o a un momento que solo ocurrirá una vez. No otorgan Renombre y quedan fuera del recuento total, conservadas para siempre como memoria de lo que se hizo.',
   'guide.deedsPage.featsHeading': 'Proezas',
   'guide.deedsPage.howBody':
-    'Las gestas se consiguen personaje a personaje, pero el Libro de Gestas se comparte entre todos los personajes de tu cuenta: una gesta que logre cualquiera de ellos queda conseguida para todos, el Libro indica quién la logró y cuándo, y el título o el borde que otorgue puede lucirlo cualquiera de tus personajes. La Tabla de Clasificación del reino reúne tu Renombre del mismo modo, contando cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.',
+    'Las gestas se consiguen y se guardan personaje a personaje, así que cada héroe que juegues forma su propio Libro; solo la Tabla de Clasificación del reino reúne tu Renombre a lo largo de todos los personajes que juegas, y cuenta cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.',
   'guide.deedsPage.howHeading': 'Cómo funcionan las gestas',
   'guide.deedsPage.intro':
     'El Libro de Gestas es donde el mundo lleva la cuenta de todos tus hechos, desde tus primeros pasos fuera del valle inicial hasta los combates más duros que el reino puede ofrecer. Consigue gestas mientras juegas, luce los títulos que otorgan y mira cómo asciende tu Renombre.',
@@ -12219,7 +12376,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Un jefe con fuerza de banda que se alza en el mundo abierto con un ritmo constante, al que combate quienquiera que se reúna para responder en lugar de un grupo fijo.',
   'guide.glossary.worldBossTerm': 'Jefe del mundo',
   'guide.models.formBear': 'Forma de Bruin',
-  'guide.models.formCat': 'Forma de gato',
+  'guide.models.formCat': 'Forma de lobo',
   'guide.models.formTravel': 'Forma Fleet',
   'guide.models.groupForms': 'Formas de druida',
   'guide.nav.sidebarLabel': 'Temas de la guía',
@@ -12725,7 +12882,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Marca a un aliado con el eco de un momento más sano y repara {damage} de salud al instante. Durante {duration} s, lo sana un {echoSinglePct}% de tu otro daño Arcano a un objetivo y un {echoAreaPct}% de tu daño Arcano de área. Oleada de éter y Dardos de éter lo sanan en su lugar un {echoDriverPct}% del daño que infligen.',
   'entities.abilities.perfect_moment.name': 'Momento perfecto',
   'entities.abilities.perfect_moment.description':
-    'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen e infligen un 20% más de daño. (Cronomancia)',
+    'Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)',
   'entities.abilities.aspect_of_the_wild.description':
     'Inspira a los aliados en un radio de 30 m con fuerza salvaje, aumentando su poder de ataque en 45 y su velocidad de ataque un 5% durante 5 min. (talento de Cazador)',
   'entities.abilities.avatar.name': 'Avatar de Guerra',
@@ -12745,7 +12902,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.chain_lightning.description':
     'Golpea a hasta 3 enemigos en 10 m por {damage} de daño de Naturaleza cada uno. Elemental: un impacto otorga 1 de Trueno. El daño aumenta con el poder con hechizos.',
   'entities.abilities.chaos_bolt.description':
-    'Gasta 3 de Devastación para lanzar un pesado proyectil de fuego caótico que inflige {damage} de daño de Fuego antes de aplicar el daño crítico. Siempre golpea críticamente al impactar. Ruina acorta su lanzamiento un 30%.',
+    'Gasta 3 de Devastación para lanzar un pesado proyectil de fuego caótico que inflige {damage} de daño de Fuego. Ruina acorta su lanzamiento un 30%.',
   'entities.abilities.cloak_of_shadows.description':
     'Te envuelve en sombras y absorbe 420 de daño durante 5 s. (talento de Pícaro)',
   'entities.abilities.cone_of_cold.description':
@@ -13681,6 +13838,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.tierTutorial.dismiss': 'Entendido',
   'hudChrome.crafting.tierTutorial.masters':
     'Los maestros artesanos de los pueblos ofrecen misiones de sintonización. Visita uno para elegir tu camino.',
+  'hudChrome.crafting.tierTutorial.radar':
+    'Tus profesiones forman una rueda. Sintonízate con un par adyacente y esos dos oficios podrán superar el trabajo raro.',
+  'hudChrome.crafting.tierTutorial.tierCap':
+    'Un oficio alcanza su primer nivel con {skill} de habilidad, y cada nivel mejora lo que puede producir.',
   'hudChrome.crafting.tierTutorial.title': 'Tu primer nivel',
   'hudChrome.crafting.trendNudge':
     'Tus manos se inclinan hacia el {archetype}. Su sintonización te espera con {master}.',
@@ -14221,7 +14382,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.moontide':
     'Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta',
   'hudChrome.auraEffect.oldBlood':
-    'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
+    'Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma',
   'hudChrome.auraEffect.verdance':
     'Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración',
   'hudChrome.riftTracker.title': 'Brecha',
@@ -14323,7 +14484,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.cheap_shot.specNote_subtlety':
     'Usada desde el Velo Crepuscular, añade 1 de Penumbra (máx. 3). Con 3 de Penumbra puedes usarla SIN sigilo: ese uso no cuesta nada, gasta toda la Penumbra y activa el Velo de Sombras de 6 s.',
   'entities.abilities.claw.description':
-    'Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de gato.',
+    'Araña al enemigo por daño de arma más {damage}. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.claw.specNote_feral':
     'Cada golpe conectado añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.cold_blood.description':
@@ -14344,7 +14505,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faerie_fire.description':
     'Reduce la armadura del objetivo un {damage}% durante 40 s.',
   'entities.abilities.ferocious_bite.description':
-    'Movimiento final que causa {damage}. Solo en Forma de gato.',
+    'Movimiento final que causa {damage}. Solo en Forma de lobo.',
   'entities.abilities.ferocious_bite.specNote_feral':
     'Cada golpe conectado añade 1 de Sangre Antigua; con 3 de Sangre Antigua este botón se convierte en Cosecha Roja, que consume la Sangre Antigua para un golpe más fuerte que también inflige al instante todo el daño que tus Desollar y Desgarrar aún habrían infligido, y restaura energía.',
   'entities.abilities.garrote.description':
@@ -14369,7 +14530,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Marca a un enemigo durante 15 s y almacena un 20% del daño infligido por ti y tus no-muertos. Vuelve a lanzarla para detonarla. Si el enemigo marcado muere, explota en un radio de 6 yardas y crea 1 fragmento de alma.',
   'entities.abilities.ossuary_mark.name': 'Marca del Osario',
   'entities.abilities.rake.description':
-    'Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de gato.',
+    'Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.',
   'entities.abilities.rake.specNote_feral':
     'Cada golpe conectado añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.regrowth.description':
@@ -14381,10 +14542,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.rejuvenation.specNote_restoration':
     'Plantar una floración NUEVA añade 1 de Verdor (máx. 5). Con 5 de Verdor, Alivio presto se convierte en Sobrefloración.',
   'entities.abilities.rip.description':
-    'Movimiento final que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de gato.',
+    'Movimiento final que hace sangrar al objetivo cada 2 s durante 24 s: 36 de daño más 24 por punto de combo gastado (5 puntos de combo: {damage} en total). Solo en Forma de lobo.',
   'entities.abilities.rip.specNote_feral': 'El golpe conectado añade 1 de Sangre Antigua (máx. 3).',
   'entities.abilities.ruinous_brand.description':
-    'Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo. Los ecos de Descarga de Ruina también cuentan como golpes críticos, sin aplicar otro multiplicador de daño crítico.',
+    'Marca a un enemigo durante 15 s. Tus siguientes 3 hechizos directos resuenan por un 25% de daño contra el enemigo marcado, o copian un 50% del daño hacia él cuando los lanzas contra otro objetivo.',
   'entities.abilities.ruinous_brand.name': 'Marca Ruinosa',
   'entities.abilities.rupture.description':
     'Movimiento final que hiere al objetivo: sangra cada 2 s, durante 6 s más 2 s por punto de combo (5 puntos de combo: 16 s y {damage} de daño total).',
@@ -14464,7 +14625,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Todas las páginas creadas del Relicario y los nombres de las reliquias que contienen. Esta lista solo incluye nombres sin destripes: abre El Relicario en el juego para ver tu propio progreso, tus conquistas y las siluetas.',
   'guide.reliquaryPage.catalogHeading': 'Catálogo de páginas',
   'guide.reliquaryPage.howBody':
-    'Abre El Relicario en el juego (Mayús+X por defecto). Cada estante contiene páginas de reliquias únicas. Una silueta se rellena cuando cualquier personaje de tu cuenta obtiene esa pieza por primera vez, y una página se ilumina cuando todas sus reliquias están rellenas. Unas pocas páginas se marcan como Retirada o Personal: quedan fuera de la compleción, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en vivo lanzan un aviso y refrescan la ventana abierta; el progreso lo comparten todos los personajes de la cuenta, de modo que una reliquia que encuentra un personaje rellena la página para todos.',
+    'Abre El Relicario en el juego (Shift+X por defecto). Cada estante guarda páginas de reliquias únicas. Rellena una silueta cuando obtengas esa pieza por primera vez con el personaje, e ilumina una página cuando todas sus reliquias estén rellenas. Algunas páginas llevan la etiqueta Retirada o Personal: quedan fuera de la finalización, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en directo lanzan un aviso y refrescan la ventana abierta; el progreso es propio de cada personaje, salvo los aspectos de arma, que son cosméticos de la cuenta.',
   'guide.reliquaryPage.howHeading': 'Cómo funciona la colección',
   'guide.reliquaryPage.intro':
     'El Relicario es el museo de botines únicos que has catalogado: las piezas más codiciadas de las mazmorras, trofeos de profesión, monturas, aspectos de arma y títulos. Acompaña al Libro de Gestas igual que una sala de trofeos acompaña a un libro de logros.',
@@ -14836,13 +14997,13 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.controller.crossHotbarEditHelp':
     'Sostenga el parachoques izquierdo y presione el botón de la cara superior para organizar la barra con el controlador.',
   'hudChrome.controller.crossHotbarEditHint':
-    'Organizando · el d-pad mueve · confirmar recoge y coloca · cancelar borra una celda',
+    'Organizar: confirmar recoge de una celda o del libro de hechizos y deja caer en una celda, cancelar borra una.',
   'hudChrome.controller.crossHotbarEnable': 'Habilitar barra de acceso rápido cruzada',
   'hudChrome.controller.crossHotbarExpand': 'Barra caliente de doble cruz',
   'hudChrome.controller.crossHotbarHelp':
     'Mantenga presionado un gatillo para iluminar ocho ranuras de la barra de acción en el d-pad y los botones frontales. Toque el otro disparador para cambiar al segundo conjunto.',
   'hudChrome.controller.crossHotbarOwnsButtons':
-    'Los disparadores modifican la barra de acceso rápido cruzada mientras está activada. Las direcciones del d-pad siguen siendo editables aquí para los menús y el movimiento.',
+    'Los disparadores y el d-pad pertenecen a la barra de acceso rápido cruzada mientras está encendida, por lo que están configurados debajo en lugar de aquí.',
   'hudChrome.controller.crossHotbarPosition': '{trigger} + {button}',
   'hudChrome.controller.crossHotbarResetLayout': 'Restablecer barra de acceso rápido cruzada',
   'hudChrome.controller.cycleHudAction': 'Interfaz de ciclo',
@@ -15337,9 +15498,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
     'Tu golpe de Filo Velado inflige el triple de daño, en lugar del doble.',
   'entities.itemSets.ashveil.name': 'Atuendo del Velo de Ceniza',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'El rescate de Vigilancia Seráfica cura 270, en lugar de 180. El daño recibido ya no retrasa tus hechizos.',
+    'Restaurar salud con Rezo Susurrado, Rezo Solemne o Rezo Urgente aumenta la sanación de tu siguiente Coromendar un 10%, acumulándose hasta 3 veces. Cada lanzamiento otorga como máximo una acumulación. Coromendar consume todas las acumulaciones al terminar de lanzarse. El daño recibido ya no retrasa tus hechizos.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s.',
+    'Terminar Coromendar con 3 acumulaciones hace que tu siguiente Rezo Susurrado en 60 s sea instantáneo y aumenta su sanación un 100%. Este beneficio no se acumula; obtenerlo de nuevo actualiza su duración.',
   'entities.itemSets.benison_dawnweave.name': 'Trama del Alba Benévola',
   'entities.itemSets.chronoweave.bonus2':
     'Eco Temporal convierte un 50% de tu daño Arcano a un solo objetivo en sanación. El daño recibido ya no retrasa tus hechizos.',
@@ -15981,7 +16142,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.binding_sigil':
     'Sigilo vinculante (arrastra al jefe hasta el sigilo o la banda lo pagará)',
   'hudChrome.finder.mech.bone_spike':
-    'Púa ósea (los jugadores empalados pierden vida hasta que alguien rompe la púa con unos pocos golpes)',
+    'Púa ósea (los miembros empalados se desangran hasta que se destruye la púa)',
   'hudChrome.finder.mech.bone_storm':
     'Tormenta ósea (ignora la amenaza, gira y carga contra la banda)',
   'hudChrome.finder.mech.crown_endures':
@@ -16089,26 +16250,26 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.shaderWarmOff': 'Desactivado',
   'hudChrome.options.shaderWarmOn': 'Activado',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilHeroicSummary':
-    'Cada {everyHeroic} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionHeroic} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindHeroic} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunHeroic} s y recibe {vulnerability} más de daño durante {boundHeroic} s. Si no, cada miembro de la banda recibe {unboundHitHeroic} de la salud máxima como daño de las Sombras y él conserva {unboundBonusHeroic} más de daño hasta la siguiente vinculación.',
+    "Every {everyHeroic} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.",
   'hudChrome.raidBossGuide.nythraxis.bindingSigilName': 'Sigilo vinculante',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilResponse':
     'El tanque arrastra a Nythraxis hasta el sigilo de inmediato, atravesando cualquier fuego que haya dejado la banda. Los cuerpo a cuerpo siguen el arrastre y los de distancia se mantienen fuera del nuevo cono de Quebrantatumbas. Todos lo queman mientras está Vinculado.',
   'hudChrome.raidBossGuide.nythraxis.bindingSigilSummary':
-    'Cada {everyNormal} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindNormal} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de la salud máxima como daño de las Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.',
+    "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
   'hudChrome.raidBossGuide.nythraxis.boneSpikeHeroicSummary':
-    'Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsHeroic} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.',
+    'Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeName': 'Púa ósea',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeResponse':
-    'Quien esté más cerca golpea la Púa ósea: unos pocos golpes de cualquiera la rompen, sin importar el daño. Los sanadores mantienen con vida a los empalados mientras caen las púas.',
+    'Los combatientes de daño cambian a las Púas óseas de inmediato y las destruyen para liberar a los empalados. Los sanadores mantienen vivos a los empalados mientras caen las púas.',
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
-    'Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsNormal} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.',
+    'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'A partir de {first} s tras la Ira del rey y cada {everyHeroic} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlHeroic} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamHeroic} de la salud máxima. El primer golpe de cada tormenta inflige {openingSlamHeroic} en su lugar. Quebrantatumbas vuelve a activarse {rearm} s después de que termine.',
+    "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tormenta ósea',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Dispersaos y seguid corriendo para alejaros de Nythraxis. El miembro cargado huye mientras los demás dejan espacio alrededor de la trayectoria de la carga; luego los tanques lo recogen cuando termina la tormenta.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'A partir de {first} s tras la Ira del rey y cada {everyNormal} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlNormal} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamNormal} de la salud máxima. El primer golpe de cada tormenta inflige {openingSlamNormal} en su lugar. Quebrantatumbas vuelve a activarse {rearm} s después de que termine.',
+    "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
   'hudChrome.raidBossGuide.nythraxis.courtName': 'La Corte inmortal',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Los tanques recogen a Aldren y giran su hendidura lejos de la banda. Aturde o silencia a Malric en cuanto empiece Alivio de Malric y mátalo primero; luego enraíza o aturde a Voss lejos de los sanadores, ya que no se le puede provocar, y acábalo después.',
@@ -16151,12 +16312,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.kingsWrathResponse':
     'Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.',
   'hudChrome.raidBossGuide.nythraxis.kingsWrathSummary':
-    'Nythraxis inflige {bonusNormal} más de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral ocurre cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico).',
+    'Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).',
   'hudChrome.raidBossGuide.nythraxis.overview':
     'El sumo sacerdote Malric se negó a dejar morir a su rey, y el rito que alzó a Nythraxis vinculó a toda la corte a la cripta. El encuentro pone a prueba un cambio disciplinado de tanques, cambios rápidos a las Púas óseas, movimiento fuera del suelo ardiente y una canalización coordinada de piedras de resguardo cuando cae el Trono.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': 'La Ira del rey',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary':
-    'Al {health} de salud, Nythraxis ruge en la Ira del rey y gana {bonusNormal} de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral se acelera a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico). Todas las demás mecánicas mantienen su ritmo.',
+    "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': 'El Trono',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary':
     'Nythraxis defiende su sala del trono con una hendidura frontal cargada, el cambio de tanques de Maldición pavorosa, Púas óseas que empalan a miembros de la banda y Erupciones sepulcrales que dejan suelo ardiente.',
@@ -16282,7 +16443,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.crafting.trackGoalButtonAria':
     'Seguir {count} fabricaciones de {name} como objetivo de recolección',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
-    'Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un solo beneficio; cualquier activación lo renueva y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.',
+    'Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Cada mano tiene su propio beneficio; los activadores repetidos renuevan el de esa mano. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.',
   'hudChrome.enchantName.enchant_chest_armor': 'Grabado de pecho: Refuerzo',
   'hudChrome.enchantName.enchant_chest_greater_stamina': 'Grabado de pecho: Aguante superior',
   'hudChrome.enchantName.enchant_chest_lucent_stamina': 'Grabado de pecho: Aguante luminoso',
@@ -17178,7 +17339,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.framesGovernedAuraTracks':
     'Editar marcos también libera las seis pistas de auras opcionales cuando las activas en la pestaña Combate de las mismas opciones de Interfaz: Mis beneficios, Enfriamientos defensivos, Mis escudos, Enfriamientos ofensivos, Movimiento y sigilo, y Mis beneficios sobre aliados. Todas están desactivadas de forma predeterminada y cada una muestra su propia etiqueta cuando está libre.',
   'guide.interfacePage.framesGovernedExtra':
-    'Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.',
+    'Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.',
   'guide.interfacePage.framesMoveBodyEditFrames':
     'Puedes mover tu marco, el marco de objetivo y los marcos de grupo. Cada uno tiene un pequeño botón de mover en una esquina: desbloquéalo, arrastra el marco donde quieras y vuelve a bloquearlo para que un clic perdido no lo desplace. Editar marcos, arriba de la pestaña Marcos en las opciones de Interfaz, libera el resto de la interfaz de una vez junto con esos tres: barras de acción, barra de lanzamiento, barra de golpes, barra de experiencia, minimapa, raíl de botones, marco de mascota, barra de postura, filas de beneficios y perjuicios y etiqueta de recordatorio de deseos. Si algo queda en un lugar que no quieres, Restablecer valores predeterminados, al pie de esa pestaña, devuelve todo a su posición inicial.',
   'guide.interfacePage.gatheringGoalTrackerBody':
@@ -17186,7 +17347,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.interfacePage.hubPracticeTrackerBody':
     'Cerca del centro de Eastbrook se une un rastreador de práctica cuando aceptas allí las lecciones guiadas: mantiene visibles tus mejores intentos contra los muñecos de práctica. Mientras una lección está activa, una franja de entrenamiento te guía por el paso actual, desde abrir los medidores de daño hasta comparar un segundo intento.',
   'guide.interfacePage.mapBodyZoneFirst':
-    'M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.',
+    'M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.',
   'guide.interfacePage.mobileBodyTwoPages':
     'Los controles táctiles aparecen solos y el diseño se adapta a tu pantalla: disposición compacta en un teléfono pequeño, estándar en uno grande y más espaciosa en una tableta.\n\nTus facultades se colocan en un anillo en vez de una fila numérica: el botón de ataque con cuatro botones de acción y un conmutador que alterna el anillo entre sus {pages} páginas, que juntas alcanzan las {slots} ranuras de facultades aunque las barras de escritorio adicionales estén activadas. La quinta posición del arco es el asiento de consumibles: tócala para usar lo que contiene, mantenla pulsada o deslízala hacia dentro para abrir una fila que se llena con lo que llevas. Alrededor del anillo están los botones más usados en táctil: cambiar de objetivo, usar lo que tienes delante y saltar.\n\nUn control de Acciones rápidas ocupa el borde inferior en lugar de una fila de botones. Abre el resto: montura, chat, mapa, bolsas, social, misiones, personaje, grimorio, menú del juego y una entrada Más con las demás ventanas, incluida la búsqueda de mazmorras, PvP, gestos y la wiki. Aquí las ventanas llenan la pantalla en vez de flotar sobre ella.\n\nMover los marcos de unidad es cosa del escritorio: en táctil el diseño los coloca por ti.',
   'guide.interfacePage.winMoreBodyNoValeCup':
@@ -17282,8 +17443,13 @@ Financia la subida mientras avanzas: el pedido de forja de Darva acepta ocho men
 El equipo fabricado normal sostiene el ascenso al final del juego. Las colecciones del Crisol financiadas por incursiones ofrecen también una alternativa a los botines de incursión actuales: los materiales salen de las incursiones y la fabricación los convierte en la armadura y el perfil de función que elijas. Sus tres elecciones de ranura y la bonificación de dos piezas permiten combinarlas con equipo de incursión. Siguen compartiendo el límite global de dos piezas Forjadas por un Maestro, así que la fabricación complementa el conjunto de incursión sin suministrar un reemplazo completo.`,
   'guide.profPages.econ.introRaidCollections':
     'Cómo circulan las monedas: tarifas exactas, sumideros, ventas, reglas del Mercado mundial, pedidos, comisiones y lugar de las colecciones financiadas por bandas junto a la fabricación ordinaria.',
-  'guide.profPages.econ.provenanceBodyUndiscounted':
-    'Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; haz clic derecho en la pila para ver la lista completa (en pantalla táctil, usa su botón Orígenes). Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo que ese reactivo esté marcado como no descontable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.',
+  'guide.profPages.econ.provenanceBodyUndiscounted': `Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.
+
+La recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.
+
+Los objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; abre Orígenes para la lista completa. Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.
+
+Las firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo cuando el reactivo sea indiscountable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.`,
   'guide.profPages.effectFeast': 'Coloca un festín: {servings} raciones durante {minutes} min.',
   'guide.profPages.effectFeastServing':
     'Cada ración restaura {amount} de salud durante {seconds} s.',
@@ -17293,7 +17459,7 @@ El equipo fabricado normal sostiene el ascenso al final del juego. Las coleccion
   'guide.profPages.effectWellFed':
     'Bien alimentado al terminar de comer: +{value} de {stat} durante {minutes} min.',
   'guide.profPages.effectWellFedAura': 'Otorga {aura} durante {minutes} min al terminar de comer.',
-  'guide.profPages.ench.enchantsNoteRaidFormula': `Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a uno cada una (el resto del coste de un talismán es esencia y polvo), la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.
+  'guide.profPages.ench.enchantsNoteRaidFormula': `Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a cinco cada una, la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.
 
 Entre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.
 
@@ -17303,8 +17469,9 @@ El Fervor de la Última Llama es una fórmula de incursión separada, no un enca
   'guide.profPages.ench.formulaRequired': 'Requiere fórmula',
   'guide.profPages.ench.perfectedOnly': 'Solo perfeccionado',
   'guide.profPages.ench.tier.lucent': 'Luminoso',
-  'guide.profPages.faq.a1':
-    'Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.\n\nLos materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; haz clic derecho en la pila para ver la lista completa (en pantalla táctil, usa su botón Orígenes). Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.',
+  'guide.profPages.faq.a1': `Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.
+
+Los materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; abre Orígenes para ver la lista completa. Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.`,
   'guide.profPages.faq.a11Promotion':
     'Fabrica o compra una pieza cumbre de calidad Maestroforjada y después perfecciónala: con 125 de habilidad en el oficio que la creó, cada intento gasta una Brasa del Hacedor, una Esencia Quebrada y un Engaste de Vidriocristal; tiene éxito cuatro veces de cada cinco y nunca daña la pieza cuando falla. El primer intento vincula la pieza contigo y cuatro rangos exitosos la vuelven Perfeccionada. Después gasta una Escritura de creación, un escrito de Inscripción de habilidad 125 que cualquiera puede comprar o encargar, para promocionar la copia Perfeccionada a legendaria con el nombre que elijas. La promoción es determinista: no hay tirada, las estadísticas no cambian y solo cambian el nombre y el color.',
   'guide.profPages.faq.a2': `No. Cada receta se puntúa por cuánto queda bajo tu tramo, con los colores clásicos naranja, amarillo, verde y gris: ganancia completa en el actual o superior, mitad un nivel abajo, cuarto dos niveles abajo y nada tres o más abajo. Los tramos son cada 25 puntos, así que las recetas gratuitas de habilidad 0 dejan de enseñar a 75.
@@ -17327,8 +17494,9 @@ La ganancia de habilidad se desvanece como en fabricación: una veta se vuelve g
 
 Lo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.`,
   'guide.profPages.farm.gainHeading': 'Qué enseña una cosecha',
-  'guide.profPages.farm.rhythmBody':
-    'Plantar es instantáneo, porque la azada abre la tierra en vez de comprar velocidad: no hay lanzamiento que esperar, así que un agricultor que se aleja ha plantado igualmente. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.',
+  'guide.profPages.farm.rhythmBody': `Plantar es instantáneo: la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.
+
+Una cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.`,
   'guide.profPages.farm.rhythmHeading': 'El ritmo de la agricultura',
   'guide.profPages.farm.tableBodyOneMeal': `Las cocinas son donde una temporada da sus frutos. Además de los platos cotidianos de la granja, cada nivel de cultivo tiene un plato más rico que deja el beneficio Bien alimentado: terminas la comida y una mejora duradera permanece contigo, justo la ventaja que un grupo quiere consumir antes de la puerta de la mazmorra. Solo puede haber un efecto Bien alimentado; una comida nueva reemplaza al anterior. El broche de la colección es el Festín de la Cosecha, una bandeja que el cocinero coloca en el propio mundo: cada persona cercana recibe su propia ración, una por persona, y cada comida terminada concede el mismo beneficio Bien alimentado. Así, la temporada de un agricultor puede poner la mesa para todo un grupo. La cima, con los dos platos más ricos y el festín, usa cultivos de montaña y de parterre, cuyas semillas venden los agricultores junto a esos bancales. Las recetas son otra cuestión: los peldaños superiores de la escala agrícola ya no se enseñan en ningún mostrador, sino que se encuentran en el contenido final o se compran con Marcas Heroicas como cualquier otra receta final. La escala de platos pertenece a Cocina; la página de Cocina contiene todos sus peldaños.
 
@@ -17466,10 +17634,6 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Los materiales en su bóveda se extraen automáticamente. Conoce más recetas en la estación.',
   'hudChrome.crafting.reagentOrdinaryHeld':
     '({name} retenido: {count}, pero aquí solo cuenta la calificación fina)',
-  'hudChrome.crafting.tierTutorial.radar':
-    'Tus profesiones forman una rueda. Sintonícese con un par adyacente y esos dos oficios se convierten en especialidades sin límites, un oficio al otro lado de la rueda se convierte en un pasatiempo poco común y el resto permanece inactivo: sus conocimientos se mantienen, pero limitados en común hasta que los retome nuevamente.',
-  'hudChrome.crafting.tierTutorial.tierCap':
-    'Una nave alcanza su primer nivel con la habilidad {skill} y cada nivel mejora lo que puede hacer. Pero un oficio sólo supera los trabajos raros una vez que es una de tus dos especialidades.',
   'hudChrome.finder.lockoutWeekly': 'Bloqueo semanal de cada jefe',
   'hudChrome.finder.mech.ancestral_sap': 'Savia Ancestral (cura a sus aliados)',
   'hudChrome.finder.mech.anvils_decree':
@@ -17824,4 +17988,20 @@ No hay un límite de profesiones que debas temer. Cada personaje puede subir nue
     'Calor: {stacks}/{max}. Usa el Corazón del Crisol para gastarlo todo en una nova de fuego que inflige {damage} de daño de fuego a cada enemigo a {radius} m o menos y provoca a cada criatura que alcanza.',
   'hudChrome.auraEffect.trinket.crucibleHeatOther':
     'Calor: {stacks}/{max}. El Corazón del Crisol lo gasta todo en una nova de fuego a {radius} m o menos que inflige más daño de fuego por cada acumulación y provoca a cada criatura que alcanza.',
+  'hud.meters.damageTaken': 'Daño Recibido',
+  'hud.meters.damageTakenShort': 'Recib.',
+  'hud.meters.interrupts': 'Cortes',
+  'hud.meters.interruptsShort': 'Cortes',
+  'hud.meters.dispels': 'Disipaciones',
+  'hud.meters.dispelsShort': 'Disip.',
+  'hud.meters.deaths': 'Muertes',
+  'hud.meters.deathsShort': 'Bajas',
+  'hud.meters.reset': 'Reiniciar medidores',
+  'hud.meters.resetHint': 'Reiniciar datos de combate',
+  'hud.meters.groupTotal': 'Total: {total} ({rate})',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

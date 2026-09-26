@@ -97,6 +97,19 @@ describe('aura_overflow_priority: selectShedSlots', () => {
     expect(shedKeys(slots, 1)).toEqual(['short_b']);
   });
 
+  it('preserves both Dawnweave states beyond a saturated cap without spending ordinary buff budget', () => {
+    const slots = [
+      slot({ key: 'short_a', shortDuration: true }),
+      slot({ key: 'short_b', shortDuration: true }),
+      slot({ key: 'short_c', shortDuration: true }),
+      slot({ key: 'long_a' }),
+      slot({ key: 'priest_benison_prayers', toggle: true, stacksText: '3' }),
+      slot({ key: 'priest_benison_whisper', shortDuration: true, remaining: 60 }),
+    ];
+    expect(shedKeys(slots, 2)).toEqual(['short_c', 'long_a']);
+    expect(shedKeys(slots, 0)).toEqual(['short_a', 'short_b', 'short_c', 'long_a']);
+  });
+
   it('is deterministic and allocation-stable: repeat calls with a caller-reused array agree', () => {
     const slots = Array.from({ length: 6 }, (_, i) => slot({ key: `b${i}` }));
     const out: boolean[] = [];

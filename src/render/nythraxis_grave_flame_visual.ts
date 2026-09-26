@@ -30,11 +30,11 @@ import {
   NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION,
   type NythraxisGraveFlamePlan,
   type NythraxisGraveFlamePulse,
-  nythraxisFlamePalette,
   nythraxisGraveFlamePlanInto,
   nythraxisGraveFlamePulseInto,
 } from './nythraxis_grave_core';
 import { buildNythraxisGravefirePrewarmVisual } from './nythraxis_gravefire_visual';
+import { type HazardPaletteMode, nythraxisFlamePaletteFor } from './nythraxis_hazard_palette_core';
 import { buildNythraxisBindingSigilPrewarmVisual } from './nythraxis_sigil_visual';
 import { NythraxisSoftFire } from './nythraxis_soft_fire';
 import {
@@ -88,12 +88,14 @@ interface GraveFlameVisual {
 function buildPatchFire(
   kind: ActiveNythraxisGraveFlame['kind'],
   radius: number,
+  paletteMode: HazardPaletteMode,
 ): NythraxisSoftFire {
   const fire = new NythraxisSoftFire(
     kind,
     nythraxisGraveFlameSpriteCount(radius),
     NYTHRAXIS_GRAVE_FLAME_FIRE_NAME,
     floorVfxRenderOrder('encounter', 12),
+    paletteMode,
   );
   for (let index = 0; index < fire.count; index++) {
     const spot = nythraxisSoftFireDiscSpotInto(DISC_SPOT, index, radius);
@@ -111,10 +113,11 @@ function buildPatchFire(
 export function buildNythraxisGraveFlamePatch(
   row: ActiveNythraxisGraveFlame,
   groundY: number,
+  paletteMode: HazardPaletteMode = 'classic',
 ): THREE.Group {
   const plan: NythraxisGraveFlamePlan = { id: '', sourceId: 0, x: 0, y: 0, z: 0, radius: 0 };
   nythraxisGraveFlamePlanInto(plan, row, groundY);
-  const palette = nythraxisFlamePalette(row.kind);
+  const palette = nythraxisFlamePaletteFor(row.kind, paletteMode);
   const group = new THREE.Group();
   group.name = NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME;
   group.position.set(plan.x, plan.y, plan.z);
@@ -163,7 +166,7 @@ export function buildNythraxisGraveFlamePatch(
   embers.renderOrder = floorVfxRenderOrder('encounter', 11);
   group.add(embers);
 
-  const fire = buildPatchFire(row.kind, plan.radius);
+  const fire = buildPatchFire(row.kind, plan.radius, paletteMode);
   group.add(fire.mesh);
 
   group.userData.fillMaterial = fillMaterial;
@@ -196,6 +199,7 @@ export class NythraxisGraveFlameVisuals {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    private readonly paletteMode: HazardPaletteMode = 'classic',
   ) {}
 
   /** Reconciles the authoritative rows by stable id: a new id builds a patch,
@@ -206,7 +210,11 @@ export class NythraxisGraveFlameVisuals {
     for (const row of rows) {
       this.activeIds.add(row.id);
       if (this.visuals.has(row.id)) continue;
-      const group = buildNythraxisGraveFlamePatch(row, this.groundY(row.x, row.z));
+      const group = buildNythraxisGraveFlamePatch(
+        row,
+        this.groundY(row.x, row.z),
+        this.paletteMode,
+      );
       const visual: GraveFlameVisual = {
         group,
         fillMaterial: group.userData.fillMaterial as THREE.MeshBasicMaterial,

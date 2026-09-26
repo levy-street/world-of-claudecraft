@@ -127,6 +127,25 @@ describe('bindTouchItemDrag', () => {
     expect(h.state.get()).not.toBeNull();
   });
 
+  it('an armed drag cancels the touch scroll, so the browser never steals it with pointercancel', () => {
+    // #ui is touch-action pan-x pan-y on the touch HUD, so without this the
+    // first move of an armed drag became a pan and the drop never ran.
+    const h = harness();
+    const touchmove = (): TouchEvent => {
+      const e = new Event('touchmove', { bubbles: true, cancelable: true }) as TouchEvent;
+      h.el.dispatchEvent(e);
+      return e;
+    };
+    h.el.dispatchEvent(pointer('pointerdown', 100, 100));
+    // Before the hold the move stays a scroll (the grid must keep scrolling).
+    expect(touchmove().defaultPrevented).toBe(false);
+    vi.advanceTimersByTime(TOUCH_DRAG_HOLD_MS);
+    expect(touchmove().defaultPrevented).toBe(true);
+    h.el.dispatchEvent(pointer('pointerup', 300, 220));
+    // Once released, touches on the row scroll again.
+    expect(touchmove().defaultPrevented).toBe(false);
+  });
+
   it('a real pointercancel (the system stole the touch) ends the drag with no drop', () => {
     const h = harness();
     h.el.dispatchEvent(pointer('pointerdown', 100, 100));

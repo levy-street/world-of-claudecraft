@@ -519,6 +519,8 @@ export function meleeSwing(
     cannotBeDodged?: boolean;
     weapon?: WeaponInfo;
     weaponMult?: number;
+    /** Scales the complete primary hit before callbacks snapshot copied damage. */
+    primaryDamageMult?: number;
     autoAttackHand?: AutoAttackHand;
     apSwingSpeed?: number;
     threatFlat?: number;
@@ -676,7 +678,7 @@ export function meleeSwing(
     }
     onTrinketAvoidance(ctx, target);
   }
-  const dealtAmount = Math.max(1, Math.round(dmg));
+  const dealtAmount = Math.max(1, Math.round(dmg * (opts.primaryDamageMult ?? 1)));
   const hpBefore = target.hp;
   const resolvedAmount = ctx.dealDamage(
     attacker,

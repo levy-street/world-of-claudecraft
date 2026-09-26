@@ -312,6 +312,7 @@ describe('the confirming probe of a provisional hold', () => {
     play(s, 40, { ...hz, calm: false, lateEvery: 6, untilChange: true });
     expect(s.ceiling).toBe(30);
     expect(s.confirmed).toBe(true);
+    expect(s.probesStarted).toBe(0);
     expect(frameCadenceAutoRecord(s)).toEqual({ ceiling: 30, confirmed: false, failStreak: 0 });
     // The same descent from a genuinely settled hold is a verdict.
     const settled = createFrameCadenceAuto();

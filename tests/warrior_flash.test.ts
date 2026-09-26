@@ -22,6 +22,7 @@ vi.mock('../src/render/ability_vfx/fx_textures', async () => {
     FLIPBOOK_GRID: 8,
     FLIPBOOK_STYLES: ['flame', 'shatter', 'electric', 'void', 'verdant', 'radiance'],
     flipbookSheet: vi.fn(() => texture),
+    builtFlipbookSheet: vi.fn(() => texture),
   };
 });
 
@@ -52,7 +53,8 @@ it.each(styles)('expands %s reach without scaling ordinary contacts on pooled re
 
 function fixture() {
   const scene = new THREE.Scene();
-  const pool = new ImpactFlipbooks(scene);
+  // Every sheet counts as uploaded here: these pins cover the warm carrier.
+  const pool = new ImpactFlipbooks(scene, () => true);
   pools.push(pool);
   const meshes = scene.children as ImpactMesh[];
   return { scene, pool, meshes };

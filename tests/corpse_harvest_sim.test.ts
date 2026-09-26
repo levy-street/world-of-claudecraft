@@ -2854,7 +2854,9 @@ describe('a corpse whose EVERY family is unmapped is never offered a harvest (#2
       sweep([UNMAPPED_TEMPLATE_ID, MIXED_TEMPLATE_ID, MIXED2_TEMPLATE_ID]),
     );
     expect(fixtures).toEqual({ spent: 10, refused: 6 });
-  });
+    // The sweep builds a fresh Sim per harvest (about 280 of them): roughly 15 s
+    // alone, so a loaded CI shard pushed it past the 20 s default.
+  }, 60_000);
 
   // The ten mapped families and their item ids, spelled out. Deriving them
   // from HARVEST_COMPONENT_ITEMS would compare the table with itself and pass

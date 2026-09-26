@@ -214,6 +214,7 @@ describe('parry stat surfacing (stat_tooltip + warrior_hit_table)', () => {
   it('builds the parry tooltip cell as a percent with a Strength source line', async () => {
     const { buildStatTooltip, buildStatSources } = await import('../src/ui/stat_tooltip');
     const { warriorParryChance } = await import('../src/sim/combat/warrior_hit_table');
+    const { spellCritChance } = await import('../src/sim/combat/spell_combat');
     const sim = new Sim({ seed: 1234, playerClass: 'warrior' });
     const p = sim.player;
     const input = {
@@ -222,7 +223,9 @@ describe('parry stat surfacing (stat_tooltip + warrior_hit_table)', () => {
       level: p.level,
       attackPower: p.attackPower,
       spellPower: p.spellPower,
+      healPower: p.healPower,
       critChance: p.critChance,
+      spellCritChance: spellCritChance(p),
       dodgeChance: p.dodgeChance,
       critRating: p.critRating,
       hasteRating: p.hasteRating,

@@ -10,7 +10,12 @@ import {
   updateSelfRenderFallback,
   type Vec3Like,
 } from '../src/render/self_motion';
-import { DUNGEON_FLOOR_Y } from '../src/sim/data';
+import { DELVES, DUNGEON_FLOOR_Y } from '../src/sim/data';
+import {
+  DELVE_DOOR_AISLE_HALF_DEPTH,
+  delveDoorClampSolidsFromEntities,
+} from '../src/sim/delves/geometry';
+import { PLAYER_BODY_RADIUS } from '../src/sim/pathfind';
 import { generateRiftFloor, riftLiftAt } from '../src/sim/rift/rift_gen';
 import { Sim } from '../src/sim/sim';
 import { type Entity, type MoveInput, RUN_SPEED } from '../src/sim/types';
@@ -206,6 +211,13 @@ class Lab {
       // outside a rift, the live descriptor once a rift scenario calls
       // srv.enterRift (see the "rift prediction" describe block below).
       riftFloor: this.srv.riftFloor,
+      // Same idea for delves: null outside one, the live mirrored run plus
+      // this frame's door/prop solids once a scenario calls srv.enterDelve
+      // (see the "delve prediction" describe block below).
+      delveRun: this.srv.delveRun,
+      delveSolids: this.srv.delveRun
+        ? delveDoorClampSolidsFromEntities(this.srv.entities.values())
+        : [],
     };
     const out = this.predictor.step(this.self, frame);
     const a = {
@@ -300,6 +312,8 @@ describe('SelfMotionPredictor', () => {
       snapAgeMs: 0,
       snapIntervalMs: SNAP_MS,
       riftFloor: null,
+      delveRun: null,
+      delveSolids: [],
     };
     const predictive = new SelfMotionPredictor(SEED);
     const ordinary = new SelfMotionPredictor(SEED);
@@ -1199,6 +1213,8 @@ describe('SelfMotionPredictor', () => {
           snapAgeMs,
           snapIntervalMs,
           riftFloor: null,
+          delveRun: null,
+          delveSolids: [],
         });
         if (!out) throw new Error('predictor disabled unexpectedly');
         expect(Number.isFinite(out.x) && Number.isFinite(out.y) && Number.isFinite(out.z)).toBe(
@@ -1565,4 +1581,135 @@ describe('rift prediction (issue #3479)', () => {
     lab.self.riftSliding = false;
     expect(lab.frame().pose).not.toBeNull();
   });
+});
+
+// Issue #3480 (enable self-motion prediction inside delves): mirrors the rift
+// suite above, driven against a REAL delve run (Sim.enterDelve, the same
+// entry point the server uses) so the predictor's module-shell + door clamp
+// chain (src/sim/delves/geometry.ts) is proven against actual spawned
+// content, not a hand-built stand-in.
+describe('delve prediction (issue #3480)', () => {
+  function collapseMirrorToServerPos(lab: Lab): void {
+    lab.self.pos = { ...lab.srv.player.pos };
+    lab.self.prevPos = { ...lab.srv.player.pos };
+  }
+
+  // Force a fixed module (rather than the run's pseudo-random pick) so the
+  // door position is deterministic, the same technique
+  // tests/delves.test.ts's "pressure plate opens linked door" case uses.
+  function enterFixedReliquaryModule(lab: Lab): { door: Entity } {
+    const doorPos = DELVES.collapsed_reliquary.doorPos;
+    lab.srv.setPlayerLevel(DELVES.collapsed_reliquary.minLevel);
+    const p = lab.srv.player;
+    p.pos.x = doorPos.x;
+    p.pos.z = doorPos.z;
+    p.pos.y = terrainHeight(doorPos.x, doorPos.z, lab.srv.cfg.seed);
+    p.prevPos = { ...p.pos };
+    lab.srv.enterDelve('collapsed_reliquary', 'normal', p.id);
+    const run = lab.srv.delveRunForPlayer(p.id);
+    if (!run) throw new Error('delve run did not spawn');
+    run.modules = ['reliquary_sunken_ossuary'];
+    run.moduleIndex = 0;
+    (lab.srv as any).spawnDelveModule(run);
+    // Freeze every pressure plate pre-triggered: the room's plates sit along
+    // the natural walking path to its own door, and a real trigger (the
+    // server's own tick moves the player over one exactly like a live pull)
+    // would open the door mid-approach and make the "closed door" phase
+    // below meaningless. tickDelvePressurePlates skips an already-triggered
+    // plate outright, so the door stays closed until this test opens it.
+    for (const id of run.objectIds) {
+      const state = run.objectState[id];
+      if (state?.kind === 'pressure_plate') state.triggered = true;
+    }
+    const doorEntry = run.objectIds
+      .map((id) => ({ id, state: run.objectState[id] }))
+      .find((o) => o.state?.kind === 'locked_door');
+    if (!doorEntry) throw new Error('module spawned no locked_door');
+    const door = lab.srv.entities.get(doorEntry.id);
+    if (!door) throw new Error('door object entity missing');
+    expect(doorEntry.state.open).toBe(false);
+    return { door };
+  }
+
+  it(
+    'the predicted pose stops at a closed portcullis, never crossing it while ' +
+      'running into it, then passes through once it opens with no backward step',
+    () => {
+      // lagMs 300, the same generous leash budget the rift wall test uses: only
+      // the predictor's own delve door clamp can hold the pose short of the
+      // door (a small leash budget would pass this vacuously).
+      const lab = new Lab(300, FRAME_MS, { facing: 0 }); // facing 0 = +z, toward the door
+      const { door } = enterFixedReliquaryModule(lab);
+      const approachZ = door.pos.z - 20;
+      const p = lab.srv.player;
+      p.pos.x = door.pos.x;
+      p.pos.z = approachZ;
+      p.pos.y = door.pos.y;
+      p.prevPos = { ...p.pos };
+      p.vy = 0;
+      p.onGround = true;
+      p.facing = 0; // face +z, straight at the door
+      lab.srv.tick();
+      collapseMirrorToServerPos(lab);
+      for (let i = 0; i < 10; i++) lab.frame(); // settle the mirror
+
+      lab.setInput(mi({ forward: true }));
+      const blockedFace = door.pos.z - DELVE_DOOR_AISLE_HALF_DEPTH - PLAYER_BODY_RADIUS;
+      let maxLocalZ = Number.NEGATIVE_INFINITY;
+      let sampled = 0;
+      const localZs: number[] = [];
+      // The 20 yd runway takes ~2.9s to cover at run speed; 240 frames (4s at
+      // 60fps) gives the approach room to actually reach and settle at the
+      // block face before the assertions below read the samples.
+      for (let i = 0; i < 240; i++) {
+        const r = lab.frame();
+        if (!r.pose) continue;
+        const localZ = r.pose.z;
+        maxLocalZ = Math.max(maxLocalZ, localZ);
+        localZs.push(localZ);
+        sampled++;
+      }
+      // A pose must actually be produced across most of the run, or the bound
+      // below is satisfied vacuously by prediction being off the whole time.
+      expect(sampled).toBeGreaterThan(100);
+      // Never crosses the door while it is closed.
+      expect(maxLocalZ).toBeLessThan(blockedFace + 1);
+      // Not vacuously held far back either: local resolution really ran the
+      // approach up to the block face, the same lower-bound rigor the rift
+      // wall test applies.
+      expect(maxLocalZ).toBeGreaterThan(blockedFace - 1);
+      // No (visible) backward step while approaching the closed door. Settled
+      // right against the block face, the client's own resolved stop and the
+      // authoritative anchor's differ by a hair (the server's swept multi-step
+      // resolution lands at a very slightly different z than the client
+      // kernel's DT-integrated one), and the divergence servo glides that tiny
+      // gap out frame by frame: allow sub-centimeter settle noise, never a
+      // real rubber-band.
+      const NO_BACKWARD_STEP_TOLERANCE_YD = 0.01;
+      for (let i = 1; i < localZs.length; i++) {
+        expect(localZs[i]).toBeGreaterThanOrEqual(localZs[i - 1] - NO_BACKWARD_STEP_TOLERANCE_YD);
+      }
+
+      // Open the door exactly like the server does (tickDelvePressurePlates,
+      // src/sim/delves/runs.ts): the entity is dropped, so the next frame's
+      // mirrored-entity solids list no longer carries it.
+      lab.srv.entities.delete(door.id);
+      lab.srv.tick();
+
+      const afterOpenZs: number[] = [];
+      for (let i = 0; i < 60; i++) {
+        const r = lab.frame();
+        if (r.pose) afterOpenZs.push(r.pose.z);
+      }
+      expect(afterOpenZs.length).toBeGreaterThan(40);
+      // Passes well beyond the former block face, with no backward step at
+      // the moment the door opens (the issue's own acceptance criterion).
+      expect(afterOpenZs[afterOpenZs.length - 1]).toBeGreaterThan(blockedFace + 1);
+      for (let i = 1; i < afterOpenZs.length; i++) {
+        expect(afterOpenZs[i]).toBeGreaterThanOrEqual(
+          afterOpenZs[i - 1] - NO_BACKWARD_STEP_TOLERANCE_YD,
+        );
+      }
+    },
+  );
 });

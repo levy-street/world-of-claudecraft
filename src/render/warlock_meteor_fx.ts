@@ -130,6 +130,56 @@ interface ActiveShower {
 
 type VfxEndReason = 'expired' | 'disposed' | 'dropped';
 
+const RAIN_ROCK_EMISSIVE = 3.7;
+const INFERNAL_ROCK_EMISSIVE = 5.8;
+
+/** The fel rock of a Rain of Fire fragment or an Infernal, one config for the
+ *  live class fields and the boot stand-in below (the two differ only in the
+ *  emissive intensity, a uniform, so they share one program). */
+function createFelRockMaterial(emissiveIntensity: number): THREE.MeshStandardMaterial {
+  const material = new THREE.MeshStandardMaterial({
+    color: FEL_DEEP,
+    emissive: FEL_FLAME,
+    emissiveIntensity,
+    roughness: 0.72,
+    metalness: 0.08,
+  });
+  material.name = 'warlockMeteor:fel-rock';
+  return material;
+}
+
+/**
+ * The boot manifest's stand-in for the fel rocks: one hidden rock of its own,
+ * never disposed, drawn the way a live fragment draws it (an opaque
+ * MeshStandard on a plain Mesh of the icosahedron), so its program is linked
+ * behind the loading cover and held for the session. The live rocks are
+ * built with this fx but first drawn on the first Rain of Fire or Infernal;
+ * before this, only an unrelated material sharing the key kept that draw from
+ * linking it live. Registered in ABILITY_MATERIAL_SOURCES.
+ */
+interface FelRockStandIn {
+  root: THREE.Group;
+  materials: THREE.Material[];
+}
+let felRockStandIn: FelRockStandIn | null = null;
+
+export function buildFelRockStandIn(): FelRockStandIn {
+  if (!felRockStandIn) {
+    const root = new THREE.Group();
+    root.name = 'warlock-fel-rock-stand-in';
+    const material = createFelRockMaterial(RAIN_ROCK_EMISSIVE);
+    const rock = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), material);
+    rock.name = 'warlock-fel-meteor-rock';
+    root.add(rock);
+    felRockStandIn = { root, materials: [material] };
+  }
+  return felRockStandIn;
+}
+
+export function felRockStandInMaterials(): readonly THREE.Material[] {
+  return buildFelRockStandIn().materials;
+}
+
 function attemptCleanup(cleanup: () => void, errors?: unknown[]): boolean {
   try {
     cleanup();
@@ -179,20 +229,8 @@ export class WarlockMeteorFx {
   private readonly sparkGeometry = new THREE.TetrahedronGeometry(0.11, 0);
   private readonly smokeGeometry = new THREE.SphereGeometry(0.42, 8, 6);
   private readonly ringGeometry = new THREE.RingGeometry(0.72, 1, 48);
-  private readonly rainRockMaterial = new THREE.MeshStandardMaterial({
-    color: FEL_DEEP,
-    emissive: FEL_FLAME,
-    emissiveIntensity: 3.7,
-    roughness: 0.72,
-    metalness: 0.08,
-  });
-  private readonly infernalRockMaterial = new THREE.MeshStandardMaterial({
-    color: FEL_DEEP,
-    emissive: FEL_FLAME,
-    emissiveIntensity: 5.8,
-    roughness: 0.72,
-    metalness: 0.08,
-  });
+  private readonly rainRockMaterial = createFelRockMaterial(RAIN_ROCK_EMISSIVE);
+  private readonly infernalRockMaterial = createFelRockMaterial(INFERNAL_ROCK_EMISSIVE);
   private readonly coreMaterial = new THREE.MeshBasicMaterial({
     color: FEL_CORE,
     transparent: true,

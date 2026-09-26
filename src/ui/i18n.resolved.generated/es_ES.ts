@@ -1559,6 +1559,48 @@ export const es_ES: EnTranslations = {
       "since": "Comprometido el {date}",
       "withdraw": "Retirar compromiso"
     },
+    "guildRanks": {
+      "tab": "Ranks",
+      "introEdit": "Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.",
+      "introView": "Each rank title and what it may do. Only the Guild Master can change them.",
+      "colRank": "Rank",
+      "colTitle": "Title",
+      "colMembers": "Members",
+      "colActions": "Order",
+      "numbered": "Rank {n}",
+      "perm": {
+        "invite": "Invite",
+        "remove": "Remove",
+        "promote": "Promote",
+        "bank": "Guild Bank",
+        "officerChat": "Officer Chat",
+        "motd": "Billboard",
+        "events": "Calendar"
+      },
+      "permHint": {
+        "invite": "Invite players to the guild and answer their pledges.",
+        "remove": "Remove members who hold a lower rank.",
+        "promote": "Promote and demote members who hold a lower rank, up to one rank below their own.",
+        "bank": "Deposit and withdraw copper and items in the guild bank. Every member can view it.",
+        "officerChat": "Read and speak in officer chat.",
+        "motd": "Edit the guild billboard.",
+        "events": "Add and remove guild calendar events."
+      },
+      "titleLabel": "Title for {rank}",
+      "permLabel": "{perm} for {rank}",
+      "leaderLocked": "The Guild Master always holds every permission.",
+      "add": "Add Rank",
+      "save": "Save Ranks",
+      "moveUp": "Move {rank} up",
+      "moveDown": "Move {rank} down",
+      "remove": "Remove {rank}",
+      "full": "A guild can have at most {max} ranks.",
+      "invalidTitle": "Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.",
+      "removeConfirm": "Members holding {rank} will become {fallback}. Remove this rank?",
+      "removeAccept": "Remove Rank",
+      "promoteTo": "Promote {name} to {rank}",
+      "demoteTo": "Demote {name} to {rank}"
+    },
     "raidLockout": {
       "title": "Bloqueos de banda",
       "allReady": "Todas las bandas listas",
@@ -1656,6 +1698,7 @@ export const es_ES: EnTranslations = {
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "Otros ({count})",
+      "targetsHeader": "Objetivos",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
       "melee": "Cuerpo a cuerpo",
@@ -1663,7 +1706,154 @@ export const es_ES: EnTranslations = {
       "resize": "Arrastra para cambiar el tamaño de este medidor",
       "dock": "Devuelve este medidor a la ventana de medidores",
       "separate": "Separar {meter}",
-      "regroup": "Reagrupar {meter}"
+      "regroup": "Reagrupar {meter}",
+      "settingsTitle": "Ajustes de Details / Medidores",
+      "optionsEngineBadge": "WoC Details! Engine",
+      "resetDefaults": "Restablecer por defecto",
+      "closeSettings": "Cerrar",
+      "densityCompact": "Densidad: Compacta (16px)",
+      "densityStandard": "Densidad: Estandar (20px)",
+      "bgGlass": "Fondo: Cristal (76%)",
+      "bgSolid": "Fondo: Solido (98%)",
+      "bgMinimal": "Fondo: Minimo (45%)",
+      "numDetailed": "Numeros: Detallados",
+      "numCompact": "Numeros: Abreviados (k/M)",
+      "raidTotalsOn": "Total de grupo en cabecera: Si",
+      "raidTotalsOff": "Total de grupo en cabecera: No",
+      "tabGeneral": "Ventana y Fondo",
+      "tabGeneralDesc": "Opacidad, escala, bloqueo",
+      "tabBars": "Barras y Texturas",
+      "tabBarsDesc": "Altura, espaciado, animacion",
+      "tabText": "Texto y Tipografia",
+      "tabTextDesc": "Fuentes, k/M, DPS, clasif.",
+      "tabHeader": "Cabecera y Titulo",
+      "tabHeaderDesc": "Total de grupo, botones",
+      "tabCombat": "Combate y Limites",
+      "tabCombatDesc": "Filas maximas, escudos",
+      "tabPresets": "Temas Rapidos",
+      "tabPresetsDesc": "Presets de 1 clic",
+      "tabProfiles": "Perfiles e Importar",
+      "tabProfilesDesc": "Exportar, importar y perfiles",
+      "groupWindow": "Fondo y Apariencia de Ventana",
+      "bgMode": "Modo de Fondo",
+      "bgModeDesc": "Estilo visual del panel del medidor.",
+      "optGlass": "Cristal (Blur)",
+      "optGlassDesc": "Efecto esmerilado con desenfoque",
+      "optSolid": "Solido",
+      "optSolidDesc": "Panel oscuro de alto contraste",
+      "optMinimal": "Minimo",
+      "optMinimalDesc": "Translucido tenue",
+      "optTransparent": "Transparente",
+      "optTransparentDesc": "Sin fondo, solo barras",
+      "bgOpacity": "Opacidad de Fondo",
+      "bgOpacityDesc": "Porcentaje de opacidad del fondo de la ventana.",
+      "windowScale": "Escala de la Ventana",
+      "windowScaleDesc": "Aumenta o reduce el tamaño de escala general del medidor.",
+      "lockPosition": "Bloquear Posicion",
+      "lockPositionDesc": "Fija la ventana para evitar moverla o redimensionarla accidentalmente en combate.",
+      "groupBars": "Geometria y Textura de las Barras",
+      "barHeight": "Altura de Barra",
+      "barHeightDesc": "Grosor vertical de cada fila de daño/sanacion (14px compacto a 26px amplio).",
+      "barSpacing": "Espaciado entre Barras",
+      "barSpacingDesc": "Separacion vertical en pixeles entre filas contiguas.",
+      "barTexture": "Textura de las Barras",
+      "barTextureDesc": "Acabado visual y sombreado sobre el color de clase.",
+      "texSpecular": "Especular (Glossy)",
+      "texSpecularDesc": "Reflejo superior de luz con bisel",
+      "texSmooth": "Plano (Smooth)",
+      "texSmoothDesc": "Color limpio plano de clase",
+      "texGradient": "Degradado",
+      "texGradientDesc": "Gradiente horizontal suave",
+      "barAnimation": "Animacion Suave de Barras",
+      "barAnimationDesc": "Interpola fluidamente el crecimiento y descenso de barras en tiempo real.",
+      "alwaysShowMe": "Mostrarme Siempre (Always Show Me)",
+      "alwaysShowMeDesc": "Fija siempre la barra de tu personaje abajo si quedas fuera de las filas visibles.",
+      "groupText": "Formato de Texto y Telemetria",
+      "numFormat": "Formato Numerico",
+      "numFormatDesc": "Estilo de visualizacion de los totales.",
+      "optNumCompact": "Abreviado (k / M)",
+      "optNumCompactDesc": "Ejemplo: 145.2k, 1.2M",
+      "optNumDetailed": "Detallado Completo",
+      "optNumDetailedDesc": "Ejemplo: 145,200, 1,240,500",
+      "optNumDamageDps": "Daño | DPS",
+      "optNumDamageDpsDesc": "Ejemplo: 239.2k | 18.4k (telemetria limpia)",
+      "showDps": "Mostrar Tasa por Segundo (DPS / HPS)",
+      "showDpsDesc": "Muestra la tasa de daño o sanacion por segundo en cada barra.",
+      "showPercent": "Mostrar Porcentaje (%)",
+      "showPercentDesc": "Muestra la proporcion porcentual de contribucion sobre el total de la banda.",
+      "showRank": "Mostrar Posicion (#1, #2...)",
+      "showRankDesc": "Muestra el numero ordinal de clasificacion a la izquierda del nombre.",
+      "showClassIcon": "Mostrar Icono de Clase",
+      "showClassIconDesc": "Muestra el icono de la clase o rol del jugador junto a su nombre.",
+      "groupFont": "Tipografia de Combate (Fuente de Letra)",
+      "groupHeader": "Personalizacion de la Cabecera",
+      "showTitleBar": "Mostrar Barra de Titulo",
+      "showTitleBarDesc": "Muestra la barra superior con el nombre del combate y controles.",
+      "showRaidTotals": "Resumen de Grupo en Subtitulo",
+      "showRaidTotalsDesc": "Muestra el total acumulado de DPS y HPS del grupo entero en el subtitulo.",
+      "groupCombat": "Reglas de Combate y Limites",
+      "maxRows": "Filas Maximas Visibles",
+      "maxRowsDesc": "Numero de barras simultaneas (0 = ilimitadas, ajustadas al alto de ventana).",
+      "autoRows": " (Auto)",
+      "barsUnit": " barras",
+      "includeShields": "Contabilizar Escudos como Sanacion",
+      "includeShieldsDesc": "Suma el daño absorbido por escudos a la columna de Sanacion.",
+      "groupPresets": "Temas Rapidos de 1 Clic",
+      "applyPreset": "Aplicar Tema",
+      "presetDetailsName": "Cristal Moderno",
+      "presetDetailsDesc": "Fondo de cristal esmerilado con desenfoque, barras especulares con brillo, numeros abreviados y telemetria completa.",
+      "presetDetailsBadge": "Recomendado",
+      "presetClassicName": "Sólido Clásico",
+      "presetClassicDesc": "Panel solido oscuro de alto contraste, barras planas de clase, numeros detallados sin abreviar estilo clasico.",
+      "presetClassicBadge": "Clásico",
+      "presetMinimalName": "Minimalista Puro",
+      "presetMinimalDesc": "Fondo casi transparente, barras compactas de 16px sin espaciado, texto directo sin porcentajes.",
+      "presetMinimalBadge": "Limpio",
+      "presetRaidName": "Raid Focus",
+      "presetRaidDesc": "Diseñado para bandas: densidad compacta de 18px, limite de 10 barras, total de grupo visible y fijado personal.",
+      "presetRaidBadge": "Banda",
+      "presetProGradientName": "Degradado Pro",
+      "presetProGradientDesc": "Panel transparente flotante, barras con degradado horizontal, iconos de especializacion y telemetria Daño | DPS.",
+      "presetProGradientBadge": "Pro",
+      "groupManageProfiles": "Gestion de Perfiles",
+      "activeProfile": "Perfil Activo",
+      "activeProfileDesc": "Selecciona o administra perfiles independientes para cada situacion de juego.",
+      "saveAs": "Guardar Como...",
+      "duplicate": "Duplicar",
+      "deleteProfile": "Eliminar",
+      "cannotDeleteDefault": "No se puede eliminar el perfil Default",
+      "promptNewProfile": "Nombre del nuevo perfil:",
+      "profileCopySuffix": " (Copia)",
+      "groupExport": "Exportar Perfil Actual",
+      "exportDesc": "Cadena codificada de tu configuracion actual. Copiala para compartirla o guardarla de respaldo.",
+      "copyString": "Copiar Cadena de Perfil",
+      "copiedFeedback": "Copiado al portapapeles!",
+      "groupImport": "Importar Perfil",
+      "importDesc": "Pega aqui una cadena de perfil (!WoC-Details:... o JSON) para aplicar y guardar la configuracion.",
+      "importPlaceholder": "Pega la cadena de perfil aqui (!WoC-Details:...)",
+      "importNamePlaceholder": "Nombre para guardar (opcional)",
+      "importApply": "Importar y Aplicar",
+      "errEmptyProfile": "Por favor, pega una cadena de perfil.",
+      "errInvalidProfile": "Error: Cadena de perfil no valida o corrupta.",
+      "importSuccess": "Perfil \"{name}\" importado con exito!",
+      "reportSent": "Reporte copiado y enviado al chat",
+      "reportNoData": "Sin datos registrados.",
+      "noDetailedData": "Sin datos detallados",
+      "noDeathEvents": "Sin eventos registrados antes de la muerte",
+      "killedBy": "Asesinado por {killer} ({ability})",
+      "lethalHit": "Golpe Letal",
+      "recentCombatEvents": "Ultimos {count} eventos de combate",
+      "backComparison": "Comparativa",
+      "comparisonNeedTwo": "Se necesitan al menos 2 combates para comparar",
+      "backTimeline": "Cronologia",
+      "timelineCombatEvents": "Eventos del combate: {count}",
+      "backDev": "Balance / Dev",
+      "balanceAbilitiesCount": "Habilidades registradas: {count}",
+      "targetSubtitle": "Objetivo: {target}",
+      "noTargetData": "Sin datos de jugadores para este objetivo"
+    },
+    "auraTooltip": {
+      "caster": "Cast by {name}"
     },
     "auraTracks": {
       "defensives": "Enfriamientos defensivos",
@@ -1690,6 +1880,7 @@ export const es_ES: EnTranslations = {
       "buffs": "Beneficios",
       "unlock": "Mover la ventana de auras del objetivo",
       "lock": "Bloquear la ventana de auras del objetivo",
+      "close": "Close target aura window",
       "configureRows": "Configurar las auras del objetivo",
       "fewerRows": "Preferir menos filas de auras",
       "moreRows": "Preferir más filas de auras",
@@ -1947,6 +2138,9 @@ export const es_ES: EnTranslations = {
       "gfxBloom": "Resplandor",
       "gfxAntiAliasing": "Suavizado de bordes",
       "gfxDynamicLights": "Luces dinámicas",
+      "gfxGhostFade": "Camera Ghost",
+      "gfxGhostFadeDithered": "Dithered",
+      "gfxGhostFadeSmooth": "Smooth",
       "gfxParticleEffects": "Efectos de partículas",
       "gfxHalf": "Mitad",
       "gfxCustomNote": "Cambiar un ajuste pasa el preset de calidad a Avanzada: una mezcla personalizada basada en el nivel Alto, partiendo de los valores mostrados para tu preset actual.",
@@ -2007,7 +2201,9 @@ export const es_ES: EnTranslations = {
       "targetHealthText": "Texto de salud objetivo",
       "aurasOnPlayerFrame": "Beneficios en el marco del jugador",
       "auraBarBelowFrame": "Beneficios debajo del marco del jugador",
+      "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "Mostrar siempre todos los beneficios",
+      "showAuraCaster": "Show Aura Caster in Tooltips",
       "highContrastBackground": "Fondo de alto contraste",
       "startAttackOnAbility": "Ataque automático al usar habilidad",
       "stopAutoAttackOnTargetSwitch": "Detener ataque automático al cambiar de objetivo",
@@ -2042,6 +2238,11 @@ export const es_ES: EnTranslations = {
       "showFriendlyTrack": "Mostrar mis beneficios sobre aliados",
       "showShieldTrack": "Mostrar mis escudos",
       "waterRipples": "Ondas en el agua (estelas)",
+      "actionCam": "Action Cam",
+      "actionCamShoulder": "Action Cam Shoulder",
+      "actionCamShoulderLeft": "Left {pct}",
+      "actionCamShoulderRight": "Right {pct}",
+      "actionCamShoulderCenter": "Center",
       "showAttackButton": "Mostrar boton de ataque",
       "showDailyRewardsChest": "Mostrar cofre de recompensas diarias",
       "mobileCameraJoystick": "Palanca de mando de la cámara",
@@ -2101,7 +2302,7 @@ export const es_ES: EnTranslations = {
       "crossHotbarHelp": "Mantenga presionado un gatillo para iluminar ocho ranuras de la barra de acción en el d-pad y los botones frontales. Toque el otro disparador para cambiar al segundo conjunto.",
       "crossHotbarResetLayout": "Restablecer barra de acceso rápido cruzada",
       "crossHotbarPosition": "{trigger} + {button}",
-      "crossHotbarOwnsButtons": "Los disparadores modifican la barra de acceso rápido cruzada mientras está activada. Las direcciones del d-pad siguen siendo editables aquí para los menús y el movimiento.",
+      "crossHotbarOwnsButtons": "Los disparadores y el d-pad pertenecen a la barra de acceso rápido cruzada mientras está encendida, por lo que están configurados debajo en lugar de aquí.",
       "cancelAction": "Cancelar / Atrás",
       "subcommandsAction": "Subcomandos / Mapa",
       "cycleHudAction": "Interfaz de ciclo",
@@ -2112,12 +2313,12 @@ export const es_ES: EnTranslations = {
       "crossHotbarDisplayMinimal": "Sólo mientras se mantiene",
       "crossHotbarArrangeChord": "{bumper} + {button}",
       "crossHotbarCarrying": "Llevar {action}: confirmar en una celda para colocarlo, cancelar para volver a colocarlo.",
-      "crossHotbarEditHint": "Organizando · el d-pad mueve · confirmar recoge y coloca · cancelar borra una celda",
+      "crossHotbarEditHint": "Organizar: confirmar recoge de una celda o del libro de hechizos y deja caer en una celda, cancelar borra una.",
       "crossHotbarEditHelp": "Sostenga el parachoques izquierdo y presione el botón de la cara superior para organizar la barra con el controlador."
     },
     "perf": {
-      "title": "Performance",
-      "overlaySection": "Superposición de rendimiento",
+      "title": "Superposición de rendimiento",
+      "overlaySection": "Performance Overlay",
       "enable": "Mostrar superposición de rendimiento",
       "description": "Elige qué estadísticas mostrar, dónde se ubica la superposición y cómo se ve.",
       "sectionPosition": "Posición",
@@ -2637,7 +2838,9 @@ export const es_ES: EnTranslations = {
     },
     "charSheet": {
       "offense": "Ofensiva",
+      "spell": "Spell",
       "defense": "Defensa",
+      "ratings": "Ratings",
       "playtimeLabel": "Tiempo jugado",
       "playtimeParts": "{major}, {minor}",
       "playtimeUnderMinute": "Menos de un minuto",
@@ -2751,6 +2954,7 @@ export const es_ES: EnTranslations = {
       "names": {
         "spellPower": "Poder con hechizos",
         "healPower": "Poder de sanación",
+        "spellCrit": "Spell Crit",
         "critRating": "Índice de golpe crítico",
         "hasteRating": "Índice de celeridad",
         "parry": "Rechazo",
@@ -2767,8 +2971,10 @@ export const es_ES: EnTranslations = {
         "armor": "Amortigua los golpes físicos que recibes. La reducción es mayor contra atacantes de menor nivel y tiene un tope del 75%.",
         "attackPower": "Potencia tus ataques con el arma. Cada 14 de poder de ataque añade 1 de daño por segundo.",
         "spellPower": "Aumenta el daño de tus hechizos y la potencia de tus sanaciones. Cada punto de Intelecto otorga un poco de Poder con hechizos, además del que provenga del equipo o los beneficios.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "El daño por segundo estimado de tu arma, combinando el daño y la velocidad de tu arma con tu poder de ataque.",
         "critChance": "Tu probabilidad de que un ataque aseste un golpe crítico, infligiendo el doble de daño.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "Tu probabilidad de evitar por completo un ataque cuerpo a cuerpo entrante, sin recibir daño.",
         "critRating": "Índice de golpe crítico de tu equipo y bonificaciones de conjunto, que aumenta tu probabilidad de golpe crítico. Unos 10 de índice otorgan un 1% de crítico.",
         "hasteRating": "Índice de celeridad de tu equipo y bonificaciones de conjunto, que acelera tus ataques y lanzamientos de hechizos. Unos 10 de índice otorgan un 1% de celeridad.",
@@ -3235,6 +3441,8 @@ export const es_ES: EnTranslations = {
       "hint": "Los puntos de enfoque añaden una bonificación sobre el rendimiento base de cada componente. Los componentes sin enfoque se mantienen en el nivel base.",
       "tierHint": "Cada {points} puntos en un componente suben su nivel de recolección un paso, hasta {steps} pasos; menos de {points} puntos aún mejoran el rendimiento.",
       "townOnlyHint": "El enfoque solo puede cambiarse mientras estés en el pueblo.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "Puntos restantes: {remaining} / {budget}",
       "saveButton": "Guardar enfoque",
       "notInTownHint": "Debes estar en el pueblo para fijar tu enfoque.",
@@ -3606,7 +3814,7 @@ export const es_ES: EnTranslations = {
         "phaseWardstonesName": "Las piedras de resguardo",
         "phaseWardstonesSummary": "Al {health} de salud, Pisotón estremecedor inmoviliza a la banda mientras el hermano Aldric llega y enciende las piedras de resguardo. Todas las púas se rompen y el suelo deja de arder; luego Desgarro de alma y Rabia inmortal se suman a las mecánicas del Trono.",
         "phaseKingsWrathName": "La Ira del rey",
-        "phaseKingsWrathSummary": "Al {health} de salud, Nythraxis ruge en la Ira del rey y gana {bonusNormal} de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral se acelera a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico). Todas las demás mecánicas mantienen su ritmo.",
+        "phaseKingsWrathSummary": "At {health} health, Nythraxis roars in The King's Wrath and gains {bonusNormal} damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption tightens to every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic). Every other mechanic keeps its cadence.",
         "gravebreakerName": "Quebrantatumbas",
         "gravebreakerSummary": "Cada {seconds} s, Nythraxis carga su siguiente golpe que conecte. Su objetivo solo recibe el golpe, pero todos los demás dentro de {range} yd en el cono frontal de {arc} grados reciben {splash} de ese golpe como daño físico, reducido por su propia armadura.",
         "gravebreakerResponse": "Los tanques mantienen a Nythraxis mirando lejos de la banda. Todos los demás se quedan detrás o a su lado y nunca cruzan el cono.",
@@ -3615,16 +3823,16 @@ export const es_ES: EnTranslations = {
         "dreadCurseHeroicSummary": "Cada {every} s, Nythraxis golpea a su tanque actual con {hitHeroic} de la salud máxima como daño de las Sombras y añade una acumulación de Maldición pavorosa. Durante {duration} s, cada acumulación aumenta el daño que ese tanque recibe de Nythraxis en {perStackHeroic}, hasta {max} acumulaciones.",
         "dreadCurseResponse": "Los tanques cambian a {stacks} acumulaciones: el otro tanque provoca y el tanque maldito permanece fuera del cono de Quebrantatumbas mientras se desvanecen las acumulaciones. Los sanadores preparan al tanque entrante antes del cambio.",
         "boneSpikeName": "Púa ósea",
-        "boneSpikeSummary": "Cada {everyNormal} s, Nythraxis empala en Púas óseas a {victimsNormal} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainNormal} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsNormal} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.",
-        "boneSpikeHeroicSummary": "Cada {everyHeroic} s, Nythraxis empala en Púas óseas a {victimsHeroic} miembros de la banda que no sean su objetivo actual. Un miembro empalado no puede actuar y pierde {drainHeroic} de su salud máxima cada segundo hasta que se destruye su púa. Una púa se rompe tras {hitsHeroic} golpes de cualquiera, sin importar el daño que hagan. Un jugador que ya ha sido empalado no puede volver a ser elegido durante {cooldown} s, de modo que las púas se reparten por toda la banda.",
-        "boneSpikeResponse": "Quien esté más cerca golpea la Púa ósea: unos pocos golpes de cualquiera la rompen, sin importar el daño. Los sanadores mantienen con vida a los empalados mientras caen las púas.",
+        "boneSpikeSummary": "Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
+        "boneSpikeHeroicSummary": "Every {everyHeroic} sec, Nythraxis impales {victimsHeroic} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainHeroic} of maximum health every second until their spike is shattered. A spike shatters after {hitsHeroic} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.",
+        "boneSpikeResponse": "Los combatientes de daño cambian a las Púas óseas de inmediato y las destruyen para liberar a los empalados. Los sanadores mantienen vivos a los empalados mientras caen las púas.",
         "graveEruptionName": "Erupción sepulcral",
         "graveEruptionSummary": "Cada {everyNormal} s, manos esqueléticas marcan {countNormal} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstNormal} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameNormal} s e inflige {tickNormal} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
         "graveEruptionHeroicSummary": "Cada {everyHeroic} s, manos esqueléticas marcan {countHeroic} círculos de {radius} yd bajo miembros de la banda. Tras {warning} s, cada círculo erupciona e inflige {burstHeroic} de la salud máxima como daño de las Sombras; luego arde como Llama sepulcral durante {flameHeroic} s e inflige {tickHeroic} de la salud máxima cada segundo a cualquiera que permanezca dentro.",
         "graveEruptionResponse": "Sal de cada círculo de aviso antes de que erupcione y mantente fuera del suelo ardiente. Los tanques apartan a Nythraxis de las llamas para que los cuerpo a cuerpo tengan espacio.",
         "bindingSigilName": "Sigilo vinculante",
-        "bindingSigilSummary": "Cada {everyNormal} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionNormal} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindNormal} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunNormal} s y recibe {vulnerability} más de daño durante {boundNormal} s. Si no, cada miembro de la banda recibe {unboundHitNormal} de la salud máxima como daño de las Sombras y él conserva {unboundBonusNormal} más de daño hasta la siguiente vinculación.",
-        "bindingSigilHeroicSummary": "Cada {everyHeroic} s, un sigilo de los antiguos resguardos brilla en una de las dos plataformas que flanquean el trono, a {sideOffset} yd a la izquierda o a la derecha (desde la banda) de donde estaba Nythraxis al iniciar el combate, alternando de lado en cada lanzamiento, y él inicia Ascensión inmortal, ganando {ascensionHeroic} de daño y velocidad de ataque cada {ascensionEvery} s. Si se coloca sobre el sigilo en menos de {bindHeroic} s, queda Vinculado: se purga la Ascensión, queda aturdido durante {stunHeroic} s y recibe {vulnerability} más de daño durante {boundHeroic} s. Si no, cada miembro de la banda recibe {unboundHitHeroic} de la salud máxima como daño de las Sombras y él conserva {unboundBonusHeroic} más de daño hasta la siguiente vinculación.",
+        "bindingSigilSummary": "Every {everyNormal} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionNormal} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindNormal} sec he is Bound: the Ascension is purged, he is stunned for {stunNormal} sec, and he takes {vulnerability} more damage for {boundNormal} sec. Otherwise every raider takes {unboundHitNormal} of maximum health as Shadow damage and he keeps {unboundBonusNormal} more damage until the next binding.",
+        "bindingSigilHeroicSummary": "Every {everyHeroic} sec, a sigil of the old wards flares on one of the two platforms flanking the throne, {sideOffset} yd to the raid's left or right of where Nythraxis stood at the pull, switching sides every cast, and he begins Deathless Ascension, gaining {ascensionHeroic} damage and attack speed every {ascensionEvery} sec. If he stands on the sigil within {bindHeroic} sec he is Bound: the Ascension is purged, he is stunned for {stunHeroic} sec, and he takes {vulnerability} more damage for {boundHeroic} sec. Otherwise every raider takes {unboundHitHeroic} of maximum health as Shadow damage and he keeps {unboundBonusHeroic} more damage until the next binding.",
         "bindingSigilResponse": "El tanque arrastra a Nythraxis hasta el sigilo de inmediato, atravesando cualquier fuego que haya dejado la banda. Los cuerpo a cuerpo siguen el arrastre y los de distancia se mantienen fuera del nuevo cono de Quebrantatumbas. Todos lo queman mientras está Vinculado.",
         "raiseFallenName": "Alzar caídos",
         "raiseFallenSummary": "Cada {every} s durante el Trono, Nythraxis alza Guardias reales resucitados detrás de él. Corren hacia su objetivo actual y luchan hasta ser destruidos.",
@@ -3641,11 +3849,11 @@ export const es_ES: EnTranslations = {
         "courtSummary": "En heroico, Nythraxis alza a su corte después de cada Rabia inmortal, interrumpida o no, una vez que haya caído la corte anterior. El Espíritu de Aldren hiende todo lo cercano a su objetivo con Hendidura real. El Espíritu de Malric canaliza Alivio de Malric, sanando cada vez más a Nythraxis con cada lanzamiento. El Espíritu de Voss ignora las provocaciones y caza a la banda.",
         "courtResponse": "Los tanques recogen a Aldren y giran su hendidura lejos de la banda. Aturde o silencia a Malric en cuanto empiece Alivio de Malric y mátalo primero; luego enraíza o aturde a Voss lejos de los sanadores, ya que no se le puede provocar, y acábalo después.",
         "kingsWrathName": "Ira del rey",
-        "kingsWrathSummary": "Nythraxis inflige {bonusNormal} más de daño en normal o {bonusHeroic} en heroico durante el resto del combate. Erupción sepulcral ocurre cada {eruptionEveryNormal} s ({eruptionEveryHeroic} en heroico).",
+        "kingsWrathSummary": "Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).",
         "kingsWrathResponse": "Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.",
         "boneStormName": "Tormenta ósea",
-        "boneStormSummary": "A partir de {first} s tras la Ira del rey y cada {everyNormal} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlNormal} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamNormal} de la salud máxima. El primer golpe de cada tormenta inflige {openingSlamNormal} en su lugar. Quebrantatumbas vuelve a activarse {rearm} s después de que termine.",
-        "boneStormHeroicSummary": "A partir de {first} s tras la Ira del rey y cada {everyHeroic} s después, Nythraxis inicia Tormenta ósea durante {duration} s. Ignora la amenaza, se mueve a {speed} veces la velocidad normal y realiza {charges} cargas de {chargeSeconds} s cada una. Su remolino inflige {whirlHeroic} de la salud máxima cada segundo en un radio de {radius} yd. Cada carga termina con un Golpe óseo en el mismo radio que inflige {slamHeroic} de la salud máxima. El primer golpe de cada tormenta inflige {openingSlamHeroic} en su lugar. Quebrantatumbas vuelve a activarse {rearm} s después de que termine.",
+        "boneStormSummary": "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
+        "boneStormHeroicSummary": "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
         "boneStormResponse": "Dispersaos y seguid corriendo para alejaros de Nythraxis. El miembro cargado huye mientras los demás dejan espacio alrededor de la trayectoria de la carga; luego los tanques lo recogen cuando termina la tormenta.",
         "crownEnduresName": "La Corona perdura",
         "crownEnduresSummary": "A los {enrageNormal} s desde el pull (el reloj se pausa mientras el hermano Aldric entra al 70%), La Corona perdura se activa como un enfurecimiento rígido. Nythraxis gana {damage} más de daño y ataques {haste} más rápidos, y luego otro {rampStep} de daño cada {rampEveryNormal} s. No hay barra de temporizador. Los avisos llegan como gritos cuando quedan {warn60}, {warn30} y {warn10} s.",
@@ -3696,7 +3904,7 @@ export const es_ES: EnTranslations = {
       "elementalConvergencePrimed": "Tu próximo hechizo de la otra escuela elemental otorga Convergencia Elemental",
       "hunterFerocity": "{stacks} de Ferocidad de Manada: tu mascota inflige un {pct}% más de daño",
       "cooldownCap": "Has usado {used} de {cap} s de reducción de reutilización en esta ventana",
-      "bruinRushWindow": "La Forma de lobo no cuesta maná y sujeta al objetivo de tu Embestida de Bruin, ralentizándolo un {pct}% durante {sec} s",
+      "bruinRushWindow": "Cat Form costs no mana and Pins your Bruin Rush target, slowing it by {pct}% for {sec} sec",
       "funeralHarvestLock": "Cosecha funeraria aún no puede crear otro fragmento de alma",
       "leadenHexLock": "Maleficio plomizo aún no puede volver a inmovilizar a este objetivo",
       "forbiddenReflectionReady": "Puedes volver a usar tu próxima facultad de brujo con reutilización que cumpla los requisitos",
@@ -3732,6 +3940,8 @@ export const es_ES: EnTranslations = {
       "iceFloesCasts": "Tus próximos {n} hechizos con tiempo de lanzamiento pueden lanzarse en movimiento",
       "freeCast": "Tu siguiente lanzamiento no cuesta nada",
       "instantCast": "Tu siguiente hechizo con tiempo de lanzamiento es instantáneo",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "Tu siguiente hechizo cuesta un {pct}% menos",
       "radiantResonance": "Tu próxima Luz Reparadora es instantánea, o tu próximo Abrazo del Alba cuesta un {pct}% menos de maná y se lanza en {castTime} s",
       "solarReprisal": "Tu próximo Disco Solar no cuesta maná, ignora su tiempo de reutilización e inflige un {pct}% más de daño; el Martillo de Gracia ignora su tiempo de reutilización y te sana por el 100% del daño infligido; o la Luz Reparadora es instantánea",
@@ -3745,7 +3955,7 @@ export const es_ES: EnTranslations = {
       "coldsightRead": "Tu siguiente Tiro largo inflige un {longDrawPct}% más de daño, o tu siguiente Tiro aciago inflige un {fellShotPct}% más",
       "duskEconomy": "Las habilidades cuestan un {pct}% menos de energía",
       "moontide": "Marea Lunar: fase {stacks} de {max}. Los lanzamientos de Descarga Silvestre, Caída Celeste y Semilla Lunar la llenan en Forma de lechúcico lunar; con {max}, Semilla Lunar se convierte en Oleada Lunar y Caída Celeste en Estela Solar, y cualquiera de las dos la gasta",
-      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de gato y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
+      "oldBlood": "Sangre Antigua: fase {stacks} de {max}. Los golpes conectados de lobo y Bruin comparten este banco; con {max}, Mordisco Sangriento o Rompehuesos se transforma",
       "verdance": "Verdor {stacks}/{max}. Cada Floración Silvestre o Segundo Florecer NUEVO que plantes añade 1. Con {max}, Alivio presto se convierte en Sobrefloración",
       "freeExecute": "Tu próxima facultad de ejecución válida no cuesta recursos",
       "resourceSap": "Restaura {value} de tu recurso actual cada {interval} s",
@@ -3916,6 +4126,7 @@ export const es_ES: EnTranslations = {
       "resetErrInvalid": "Este enlace de restablecimiento no es válido o ha caducado. Solicita uno nuevo."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "Cofre",
       "takeLootButton": "Tomar botín",
       "takeLootTooltip": "Toma las monedas y los objetos caídos. No consume la recolección.",
@@ -3966,6 +4177,10 @@ export const es_ES: EnTranslations = {
       "friendly": "Amistoso",
       "elite": "Élite",
       "boss": "Jefe"
+    },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
     },
     "targetFrame": {
       "unlock": "Mover el marco del objetivo",
@@ -4049,7 +4264,8 @@ export const es_ES: EnTranslations = {
         "deedTracker": "Seguimiento de hazañas",
         "delveTracker": "Seguimiento de exploraciones",
         "riftTracker": "Seguimiento de fallas",
-        "swingBarOffhand": "Mano izquierda"
+        "swingBarOffhand": "Mano izquierda",
+        "unitTooltip": "Tooltip"
       },
       "framesMenu": "Ajustes de marcos",
       "framesMenuTitle": "Muestra u oculta marcos individuales. Un marco sin marcar permanece oculto hasta que vuelvas a marcarlo o restablezcas los valores predeterminados.",
@@ -4600,6 +4816,8 @@ export const es_ES: EnTranslations = {
       "vaultTab": "Bóveda",
       "vaultCapacityNote": "Cada material admite hasta {cap}.",
       "vaultEmpty": "Tu bóveda está vacía. Haz clic en un material de tus bolsas para depositarlo.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count} de {cap} almacenados",
       "vaultLockedIntro": "Desbloquea la Bóveda de Materiales para acumular materiales de elaboración junto a tu banco. Cada material tiene su propio espacio, hasta {cap} de cada uno.",
       "vaultUnlockButton": "Desbloquear la Bóveda de Materiales",
@@ -5074,7 +5292,7 @@ export const es_ES: EnTranslations = {
       "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Ambas manos comparten un solo beneficio; cualquier activación lo renueva y nunca se acumula. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.",
+      "enchant_weapon_lastflame_zeal": "Tus ataques cuerpo a cuerpo que impactan pueden otorgar 50 de Fuerza durante 15 s y curarte 200 de salud. Se aplican los modificadores de curación. Cada golpe tiene una probabilidad del 1 % por cada 0,6 s de velocidad base del arma atacante. No tiene enfriamiento interno. Cada mano tiene su propio beneficio; los activadores repetidos renuevan el de esa mano. Los ataques a distancia no activan este efecto. Forma de lobo usa en su lugar su velocidad de golpe base de 1 s.",
       "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
       "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
       "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
@@ -5270,6 +5488,7 @@ export const es_ES: EnTranslations = {
         "dormantKnowledge": "El conocimiento de {craft} se conserva pero está inactivo hasta que su par o afición estén activos."
       },
       "stationRequired": "Debes estar en {station} para crearlo.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "Forja",
         "kitchens": "Cocinas",
@@ -5311,8 +5530,8 @@ export const es_ES: EnTranslations = {
       "attunedBanner": "Sintonizado: {title}",
       "tierTutorial": {
         "title": "Tu primer nivel",
-        "tierCap": "Una nave alcanza su primer nivel con la habilidad {skill} y cada nivel mejora lo que puede hacer. Pero un oficio sólo supera los trabajos raros una vez que es una de tus dos especialidades.",
-        "radar": "Tus profesiones forman una rueda. Sintonícese con un par adyacente y esos dos oficios se convierten en especialidades sin límites, un oficio al otro lado de la rueda se convierte en un pasatiempo poco común y el resto permanece inactivo: sus conocimientos se mantienen, pero limitados en común hasta que los retome nuevamente.",
+        "tierCap": "Un oficio alcanza su primer nivel con {skill} de habilidad, y cada nivel mejora lo que puede producir.",
+        "radar": "Tus profesiones forman una rueda. Sintonízate con un par adyacente y esos dos oficios podrán superar el trabajo raro.",
         "masters": "Los maestros artesanos de los pueblos ofrecen misiones de sintonización. Visita uno para elegir tu camino.",
         "dismiss": "Entendido"
       },
@@ -5683,11 +5902,11 @@ export const es_ES: EnTranslations = {
         "sealbreak_shockwave": "Onda Rompesello (explosion de area)",
         "gravebreaker": "Rompatumbas (cono frontal, alejarlo de la banda)",
         "raise_fallen": "Despertar a los Caidos (oleadas periodicas de refuerzos)",
-        "soul_rend": "Desgarro de alma (los jugadores marcados se agrupan para repartir el daño)",
+        "soul_rend": "Desgarro de alma (los jugadores marcados se agrupan y luego salen del fuego)",
         "deathless_rage": "Furia Inmortal (se interrumpe en las piedras de guardia)",
         "wardstones": "Canalizacion de piedras de guardia (transicion de fase)",
         "dread_curse": "Maldición pavorosa (perjuicio acumulativo para cambiar de tanque, cambia con 2 acumulaciones)",
-        "bone_spike": "Púa ósea (los jugadores empalados pierden vida hasta que alguien rompe la púa con unos pocos golpes)",
+        "bone_spike": "Púa ósea (los miembros empalados se desangran hasta que se destruye la púa)",
         "grave_eruption": "Erupción sepulcral (círculos de aviso que dejan suelo ardiente)",
         "binding_sigil": "Sigilo vinculante (arrastra al jefe hasta el sigilo o la banda lo pagará)",
         "kings_wrath": "Ira del rey (30%: bonificación de daño permanente, peligros del suelo más rápidos)",
@@ -5984,8 +6203,6 @@ export const es_ES: EnTranslations = {
       "level": "Nivel {level}",
       "landmarkCount": "{count} puntos de referencia",
       "filtersAria": "Capas de mapa",
-      "railToggle": "Side panel",
-      "railToggleAria": "Show or hide the map side panel",
       "filters": {
         "quests": "Misiones",
         "gather": "Recolectar",
@@ -6033,7 +6250,9 @@ export const es_ES: EnTranslations = {
         "herb": "Hierba",
         "mail": "Correo",
         "passage": "Paso"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "Requiere nivel {level}"
@@ -6268,7 +6487,9 @@ export const es_ES: EnTranslations = {
       "listingStatusReturned": "Devuelto",
       "listingStatusCancelled": "Cancelado",
       "listingStatusSuspended": "Suspendido",
-      "listingStatusUnsold": "Sin vender"
+      "listingStatusUnsold": "Sin vender",
+      "charselectWebLink": "Bid, buy, or sell on the $WOC Exchange website",
+      "charselectWebNote": "Enter the game with a character to bid, buy, or sell."
     },
     "lootExplorer": {
       "title": "Explorador de botín",
@@ -6978,7 +7199,7 @@ export const es_ES: EnTranslations = {
       "rowFrostedPanels": "Una mancha de vidrio esmerilado detrás de las ventanas. Bonito y exactamente el tipo de efecto que siente un navegador más débil; déjelo apagado para lograr el clásico aspecto nítido.",
       "rowReduceMotion": "Elimina las animaciones de la interfaz para que las ventanas aparezcan instantáneamente. Primero, una opción de accesibilidad, con una pequeña ventaja de rendimiento.",
       "rowPerfOverlay": "Una lectura en pantalla de FPS, tiempo de cuadro y más. Actívelo mientras sintoniza esta página y luego ocúltelo nuevamente.",
-      "tableFoot": "La distancia de dibujado es un control propio, Distancia de visión, en la tarjeta Detalle del mundo, y cada ajuste preestablecido la fija por ti hasta que tú la muevas.",
+      "tableFoot": "¿Buscas un límite de FPS? No hay nada que buscar: el ritmo de fotogramas sigue a tu pantalla. La distancia de dibujado es un control propio, Distancia de visión, en la tarjeta Detalle del mundo, y cada ajuste preestablecido la fija por ti hasta que tú la muevas.",
       "mobileTitle": "En teléfonos y tabletas",
       "mobileBody": "En un móvil o una tableta el juego te arranca en Low. Todos los dispositivos táctiles aterrizan ahí en su primer arranque, a propósito, para que entres al mundo y juegues; súbelo tú mismo desde el panel de Gráficos cuando quieras. En un navegador Android tienes toda la escala abierta y tu elección se mantiene. En iPhone y iPad aún puedes escoger los ajustes más altos y toman efecto en cuanto pulsas Aplicar, pero el juego te devuelve a High la próxima vez que arranques, porque iOS puede cerrar la pestaña mientras se construye una escena tan grande. La aplicación descargada es aún más estricta: su lista de ajustes termina en High y los controles de sistema individuales quedan ocultos, porque la aplicación los gestiona ella misma.",
       "touchBody": "En una pantalla táctil el panel de Gráficos gana una tarjeta propia de Controles táctiles: tamaño y zona muerta del joystick, tamaño de los botones en pantalla, opacidad de los controles, un stick de cámara opcional, una disposición reflejada para zurdos y mirada táctil invertida, para que la pantalla se adapte a tus manos y no al revés.",
@@ -7014,6 +7235,7 @@ export const es_ES: EnTranslations = {
       "ifHudOpacity": "Qué tan sólidos son los paneles de la interfaz sobre el mundo que hay detrás.",
       "ifTooltipScale": "El tamaño del texto de la información emergente, útil en una pantalla pequeña o en una muy grande.",
       "ifHighContrastText": "Texto de interfaz más grueso y de mayor contraste. Principalmente una opción de accesibilidad, y también útil en una pantalla muy iluminada.",
+      "ifColorblindMode": "Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.",
       "ifHighContrastBackground": "Un fondo más sencillo y de mayor contraste detrás de las pantallas de inicio y de personaje.",
       "ifInvertLookY": "Invierte la dirección vertical de la vista con el ratón.",
       "ifShowItemLevel": "Añade una línea de nivel de objeto a la información emergente de cada objeto. Desactivado de forma predeterminada, lo que conserva la clásica información emergente de solo estadísticas.",
@@ -7033,7 +7255,9 @@ export const es_ES: EnTranslations = {
       "ifPartyShowAuras": "Si los beneficios y perjuicios se muestran en los marcos de grupo. Interruptores equivalentes cubren las barras de recursos, los escudos de absorción, las mascotas y si apareces en tu propia lista de grupo.",
       "ifAurasOnPlayerFrame": "Muestra tus beneficios y perjuicios en tu propio marco de unidad, además de en la barra de auras.",
       "ifAuraBarBelowFrame": "Mueve la fila de beneficios debajo de tu marco de unidad en vez de encima. Solo importa mientras los beneficios estén en el marco del jugador.",
+      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "Muestra todos los beneficios activos incluso con el preajuste gráfico Bajo, ignorando su límite habitual de iconos de beneficios.",
+      "ifShowAuraCaster": "Adds a \"Cast by\" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins' Blessings.",
       "ifTargetOfTarget": "Muestra a quién tiene como objetivo tu objetivo, la forma clásica de saber si el tanque todavía lo controla.",
       "ifPetFrame": "Muestra un marco para tu mascota.",
       "ifChatFontScale": "Tamaño del texto del chat.",
@@ -7076,7 +7300,7 @@ export const es_ES: EnTranslations = {
       "deathTitle": "Cuando caes",
       "deathBody": "Si tu salud llega a cero, caes donde estás y tu cuerpo se queda allí. Libera tu espíritu y te alzas como espíritu en el cementerio más cercano: más veloz que los vivos, fuera del alcance de tus enemigos, pero incapaz de luchar, saquear o hablar con nadie salvo con el Guardián Pálido que flota sobre las lápidas. Desde ahí eliges. Lleva tu espíritu de vuelta a tu cuerpo y revives en el sitio, con parte de tu salud y tu maná restaurados y sin penalización alguna. O acepta del Guardián Pálido un alzamiento instantáneo donde estás, al precio del Tañido del Guardián: un debilitamiento temporal de cuanto eres que dura más cuanto más veterano seas, y que perdona por completo a los personajes recién creados. Cae dentro de una mazmorra y tu espíritu aguarda en el cementerio de fuera; lleva tu espíritu de vuelta a través de la puerta y revives en la entrada. Las expediciones son la excepción: si caes allí, simplemente vuelves a ponerte en pie en la entrada de la expedición, aunque una segunda caída termina la incursión. Por cualquiera de los dos caminos, no pierdes experiencia, equipo ni dinero. Entre combates, siéntate a comer y beber para empezar el siguiente con toda tu fuerza.",
       "threatTitle": "A quién golpea el enemigo",
-      "threatBody": "Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de gato del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.",
+      "threatBody": "Cada enemigo lleva su propia cuenta privada de quién le ha molestado más. El daño se suma a ella, y también la curación: sanar añade amenaza sobre los enemigos que ya luchan contra la persona curada, repartida entre ellos, así que la curación más segura es la que recae sobre alguien que el tanque ya tiene sujeto. Los tanques activan una actitud en guardia o una forma protectora que multiplica cuanto generan, mientras que la Forma de lobo del druida hace justo lo contrario y descarta amenaza, y una provocación eleva al lanzador directo a la cima de la lista y le fija al enemigo encima durante unos segundos. Los enemigos no cambian en el instante en que alguien supera al tanque: hace falta una ventaja clara para arrebatarle uno, y una ventaja mayor a distancia que cuerpo a cuerpo, así que un poco de paciencia al empezar a atraer a un grupo mantiene el combate donde debe estar.",
       "hazardsTitle": "El agua puede matarte",
       "breathBody": "El agua profunda se puede nadar, y puedes bucear bajo ella. Mientras tienes la cabeza sumergida, aparece una barra de Aliento azul cerca de la parte superior de la pantalla y se va vaciando; sal a la superficie y se rellena mucho más rápido de lo que se vació. Deja que se agote por completo mientras sigues sumergido y empiezas a ahogarte, perdiendo un buen trozo de salud cada segundo hasta que llegues al aire, así que vigila la barra en una inmersión larga. La muerte la restablece, de modo que una carrera del cadáver siempre empieza con los pulmones llenos.",
       "fatigueBody": "El mar no tiene muro. Los cruces que el mundo espera que nades, los estrechos y las lagunas entre un tramo de tierra y el siguiente, y los lagos del interior, son seguros de cruzar por mucho que tarden. Aventúrate más allá de la orilla, en aguas verdaderamente abiertas, y empieza a minar tus fuerzas: aparece un aviso, tienes una ventana real para dar la vuelta, y después de eso el mar inflige un daño cada vez mayor que nada puede evitar hasta que regreses hacia tierra. Ahógate o agótate tan lejos de la orilla y liberas tu espíritu como en cualquier otra muerte, así que trata el horizonte como paisaje, no como destino.",
@@ -7108,10 +7332,11 @@ export const es_ES: EnTranslations = {
       "framePetBody": "Los cazadores, los brujos y cualquier otro que tenga una mascota fuera obtienen un pequeño marco para ella junto al suyo propio, con su nombre, nivel y salud. Hacer clic en ese marco selecciona a tu mascota, y Ctrl+6 hace lo mismo desde el teclado.",
       "framesMoveBody": "Tu marco, tu marco de objetivo y tus marcos de grupo se pueden mover todos. Cada uno lleva un pequeño botón de mover en su esquina: desbloquéalo, arrastra el marco adonde quieras y vuelve a bloquearlo para que un clic accidental no pueda desplazarlo. Si terminan en un sitio del que te arrepientes, Restablecer posiciones de marco en las opciones los devuelve a todos a donde empezaron.",
       "framesMoveBodyEditFrames": "Puedes mover tu marco, el marco de objetivo y los marcos de grupo. Cada uno tiene un pequeño botón de mover en una esquina: desbloquéalo, arrastra el marco donde quieras y vuelve a bloquearlo para que un clic perdido no lo desplace. Editar marcos, arriba de la pestaña Marcos en las opciones de Interfaz, libera el resto de la interfaz de una vez junto con esos tres: barras de acción, barra de lanzamiento, barra de golpes, barra de experiencia, minimapa, raíl de botones, marco de mascota, barra de postura, filas de beneficios y perjuicios y etiqueta de recordatorio de deseos. Si algo queda en un lugar que no quieres, Restablecer valores predeterminados, al pie de esa pestaña, devuelve todo a su posición inicial.",
-      "framesGovernedExtra": "Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.",
+      "framesGovernedExtra": "Editar marcos también libera la pila de rastreadores inferior, con tus misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual, cualquier Brecha en la que participes y la receta o comisión que sigas; además de la barra de acción de mascota, los puntos de objetivo para tus perjuicios en enemigos cercanos, el medallón Devoción del paladín, la Barra de aflicción del brujo, la superposición de activaciones de hechizos, el temporizador de mano izquierda para quienes empuñan dos armas y la ventana de medidores de daño con pestañas. Cada elemento lleva su propia etiqueta cuando está libre.",
       "framesGovernedAuraTracks": "Editar marcos también libera las seis pistas de auras opcionales cuando las activas en la pestaña Combate de las mismas opciones de Interfaz: Mis beneficios, Enfriamientos defensivos, Mis escudos, Enfriamientos ofensivos, Movimiento y sigilo, y Mis beneficios sobre aliados. Todas están desactivadas de forma predeterminada y cada una muestra su propia etiqueta cuando está libre.",
       "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Editar fotogramas también afloja el panel de Diálogo, que lleva la línea hablada de un NPC mientras ese NPC está fuera de tu vista; lleva su chip con nombre mientras está suelto.",
+      "framesGovernedUnitTooltip": "Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.",
       "barsTitle": "Barras, temporizadores y texto de combate",
       "barsBody": "Tu barra de lanzamiento aparece en el centro de la pantalla, justo encima de tus barras de acción, cada vez que lanzas o canalizas, y muestra el nombre del hechizo y el tiempo restante. Tu objetivo tiene su propia barra de lanzamiento en su marco, para que puedas ver lo que viene y responder a ello.\n\nUna fina barra de golpe se sitúa bajo tu barra de lanzamiento y se llena entre los golpes de tu arma, para que un atacante cuerpo a cuerpo o a distancia pueda ver cuándo llega el próximo golpe automático.\n\nTu barra de experiencia ocupa el ancho completo bajo tus barras de acción, dividida en segmentos, con un tramo más claro que muestra la experiencia de descanso que tienes acumulada.\n\nNada bajo el agua y aparecerá una barra de aliento azul en la parte superior de la pantalla. Se vacía mientras tienes la cabeza sumergida, parpadea en rojo en cuanto se agota y empiezas a ahogarte, y se rellena rápido en cuanto sales a la superficie. Space te hace nadar hacia arriba, y la tecla Nadar hacia abajo, Ctrl de forma predeterminada, te lleva más profundo.\n\nEl daño y la sanación flotan hacia arriba sobre aquello que los recibió en forma de pequeños números, para que puedas leer un combate sin leer texto. La pestaña Combate de tu caja de chat conserva el registro escrito completo.",
       "aurasTitle": "Beneficios y perjuicios",
@@ -7122,7 +7347,7 @@ export const es_ES: EnTranslations = {
       "minimapBody": "Arriba a la derecha: un minimapa redondo con el nombre de la zona encima y tus coordenadas debajo, rodeado por un dial que pinta la hora del día.\n\nEl disco muestra más que el terreno. Tu propia flecha se sitúa en el centro, apuntando hacia donde miras, con tu grupo a tu alrededor como puntos con el color de su clase y una flecha de borde para quien se haya alejado de él. Los que dan misiones llevan las mismas marcas ahí que en el mundo, y también distinguirás nodos de recolección y estaciones de artesanía, portales de viaje, cadáveres y contenedores saqueables, cualquier hostil que se haya fijado en ti, amigos y compañeros de hermandad que estén cerca, y tu propio cuerpo mientras corres de vuelta como fantasma.\n\nPequeños indicadores aparecen en él cuando tienen algo que decir: un sobre mientras te esperan cartas sin leer, una moneda mientras te esperan en el Mercader ganancias de venta o mercancías devueltas, y un botón con la lista de tus bloqueos de banda.",
       "mapTitle": "El mapa del mundo y tus rastreadores",
       "mapBody": "M abre el mapa del mundo: el continente dibujado, con tu propia flecha en él, las zonas y sus nombres, los puntos de interés a tu alrededor, los portales de viaje y los nodos de recolección que has encontrado. Tu grupo también aparece en él. Dentro de una expedición, el mapa cambia a un esquema de las salas que has explorado hasta el momento.\n\nEn el lado derecho, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales sin necesidad de abrir nada: tus misiones en seguimiento y sus objetivos, tu progreso de gestas, la expedición en la que estás y cualquier brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar la pantalla.",
-      "mapBodyZoneFirst": "M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, las recetas que hayas fijado desde la fabricación, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.",
+      "mapBodyZoneFirst": "M abre el mapa del mundo en la zona donde estás, con tu propia flecha, los puntos de interés cercanos, los emisores de misiones con sus marcas y las áreas de tus objetivos, estaciones de fabricación, buzones, tablones y bancales, entradas de mazmorra y todos los nodos de recolección de la zona, apagados mientras reaparecen y marcados cuando tus herramientas no bastan. Tu grupo también aparece. Haz clic derecho en el mapa o pulsa su botón Mapa del mundo para alejarlo hasta el continente, con cada zona dibujada y nombrada; al hacer clic en una zona se abre su mapa. Entra en una Profundidad, mazmorra, Brecha o fortaleza y el mapa cambia al plano del lugar; el campo de batalla de Campos Espinosos tiene su propio mapa.\n\nA la derecha, bajo el minimapa, una pila de rastreadores mantiene a la vista tus asuntos actuales: misiones y objetivos seguidos, progreso de gestas, páginas del Relicario, la Profundidad actual y cualquier Brecha en la que participes. El rastreador de misiones se contrae cuando quieres recuperar espacio en pantalla.",
       "gatheringGoalTrackerBody": "Un rastreador de objetivos de recolección se une a la pila cuando sigues una receta en la ventana de fabricación o una comisión en el tablón: indica la receta o comisión, cuánto estás reuniendo y cuánto aportan tus materiales guardados y almacenados. Seguir reemplaza el objetivo actual y Borrar lo elimina explícitamente; ninguno cambia tu preferencia de cosecha.",
       "hubPracticeTrackerBody": "Cerca del centro de Eastbrook se une un rastreador de práctica cuando aceptas allí las lecciones guiadas: mantiene visibles tus mejores intentos contra los muñecos de práctica. Mientras una lección está activa, una franja de entrenamiento te guía por el paso actual, desde abrir los medidores de daño hasta comparar un segundo intento.",
       "chatTitle": "La caja de chat",
@@ -7473,7 +7698,7 @@ export const es_ES: EnTranslations = {
       "formsNote": "Un druida lucha cambiando de forma. La mayoría de las habilidades de druida pertenecen a una forma concreta, así que la forma en la que estás decide lo que puedes lanzar, y cambiar de forma cuesta un poco de maná. Puedes cambiar de forma dentro o fuera de combate, tantas veces como quieras.",
       "formsAutoUnshift": "Una sanación o un hechizo de daño lanzado en forma te saca de ella por ti. Salir de una forma así es gratis y no gasta tu tiempo de reutilización global, de modo que un hechizo instantáneo sale en el momento en que lo pulsas. Volver a la forma es una habilidad normal y sigue costando maná y tu tiempo de reutilización global.",
       "formsMoonwing": "Un druida de Equilibrio gana una forma más, la Forma de lechúcico lunar, la forma de conjurador en la que lucha un druida de Equilibrio. Es la única forma animal que conserva tus hechizos, y tu varita solo funciona en ella o en tu forma de conjurador normal.",
-      "formsWolfEngage": "Un lobo abre el combate con Embestida de Bruin, cambia enseguida a Forma de lobo para sujetar al objetivo, cierra la distancia con Embate cuando no está en sigilo y frena a un enemigo con Derribo.",
+      "formsWolfEngage": "A Cat opens a fight with Bruin Rush, shifts straight into Cat Form to Pin the target, closes the gap with Lunge when it is not stalking, and holds an enemy still with Takedown.",
       "formLine": {
         "form_bear": "La forma de tanque: una piel gruesa, ira en lugar de maná, y amenaza extra para que los enemigos sigan golpeándote a ti.",
         "form_cat": "La forma de daño cuerpo a cuerpo: energía y puntos de combo, como un pícaro, y mucha menos amenaza.",
@@ -7482,7 +7707,7 @@ export const es_ES: EnTranslations = {
       "mageEleSummon": "Un hechizo de Escarcha que llama al elemental a tu lado y lo lanza contra tu objetivo.",
       "formName": {
         "form_bear": "Forma de Bruin",
-        "form_cat": "Forma de gato",
+        "form_cat": "Forma de lobo",
         "form_travel": "Forma Fleet"
       }
     },
@@ -8058,7 +8283,7 @@ export const es_ES: EnTranslations = {
     "deedsPage": {
       "intro": "El Libro de Gestas es donde el mundo lleva la cuenta de todos tus hechos, desde tus primeros pasos fuera del valle inicial hasta los combates más duros que el reino puede ofrecer. Consigue gestas mientras juegas, luce los títulos que otorgan y mira cómo asciende tu Renombre.",
       "howHeading": "Cómo funcionan las gestas",
-      "howBody": "Las gestas se consiguen personaje a personaje, pero el Libro de Gestas se comparte entre todos los personajes de tu cuenta: una gesta que logre cualquiera de ellos queda conseguida para todos, el Libro indica quién la logró y cuándo, y el título o el borde que otorgue puede lucirlo cualquiera de tus personajes. La Tabla de Clasificación del reino reúne tu Renombre del mismo modo, contando cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.",
+      "howBody": "Las gestas se consiguen y se guardan personaje a personaje, así que cada héroe que juegues forma su propio Libro; solo la Tabla de Clasificación del reino reúne tu Renombre a lo largo de todos los personajes que juegas, y cuenta cada gesta una sola vez. Cada gesta explica con claridad lo que te pide, allí mismo, en el Libro de Gestas dentro del juego, de modo que siempre sabes qué perseguir, y puedes poner en seguimiento las que buscas para tenerlas a la vista mientras juegas. Unas pocas permanecen secretas y solo se revelan cuando las has conseguido. El Libro también se mantiene honesto consigo mismo: cuanto tu historial pasado pueda demostrar te lo acredita al instante, así que un veterano nunca lo abre en una página en blanco; solo las gestas de recuento empiezan su cuenta desde cero.",
       "renownHeading": "Renombre",
       "renownBody": "El Renombre es la puntuación tras el Libro. Cada gesta que consigues vale una cantidad fija, y tu total solo sube, así que una semana tranquila nunca te cuesta terreno. Un puñado dependen de la suerte más que de la habilidad, otras gestas de colección son su propia recompensa, y las Hazañas son un honor aparte, así que ninguna de esas vale Renombre alguno. Las gestas sin Renombre siguen contando para completar tu Libro; simplemente nunca puntúan. Las Hazañas son la única excepción, mantenidas por completo fuera del recuento.",
       "rewardsHeading": "Títulos y bordes",
@@ -8096,7 +8321,7 @@ export const es_ES: EnTranslations = {
     "reliquaryPage": {
       "intro": "El Relicario es el museo de botines únicos que has catalogado: las piezas más codiciadas de las mazmorras, trofeos de profesión, monturas, aspectos de arma y títulos. Acompaña al Libro de Gestas igual que una sala de trofeos acompaña a un libro de logros.",
       "howHeading": "Cómo funciona la colección",
-      "howBody": "Abre El Relicario en el juego (Mayús+X por defecto). Cada estante contiene páginas de reliquias únicas. Una silueta se rellena cuando cualquier personaje de tu cuenta obtiene esa pieza por primera vez, y una página se ilumina cuando todas sus reliquias están rellenas. Unas pocas páginas se marcan como Retirada o Personal: quedan fuera de la compleción, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en vivo lanzan un aviso y refrescan la ventana abierta; el progreso lo comparten todos los personajes de la cuenta, de modo que una reliquia que encuentra un personaje rellena la página para todos.",
+      "howBody": "Abre El Relicario en el juego (Shift+X por defecto). Cada estante guarda páginas de reliquias únicas. Rellena una silueta cuando obtengas esa pieza por primera vez con el personaje, e ilumina una página cuando todas sus reliquias estén rellenas. Algunas páginas llevan la etiqueta Retirada o Personal: quedan fuera de la finalización, así que nunca bloquean un estante ni el catálogo entero. Los hallazgos en directo lanzan un aviso y refrescan la ventana abierta; el progreso es propio de cada personaje, salvo los aspectos de arma, que son cosméticos de la cuenta.",
       "ranksHeading": "Rangos de Curador",
       "ranksBody": "Los rangos de Curador suben con cada reliquia única catalogada y solo otorgan títulos y bordes cosméticos. Nunca dan poder de combate, probabilidad de botín ni compensación por mala suerte. Los aspectos de arma de cuenta no puntúan para el rango de Curador, de modo que el prestigio sigue siendo propio del personaje, y las reliquias de páginas Retiradas o Personales tampoco puntúan para él.",
       "retiredTag": "Retirada",
@@ -8182,7 +8407,7 @@ export const es_ES: EnTranslations = {
       "groupClasses": "Clases",
       "groupForms": "Formas de druida",
       "formBear": "Forma de Bruin",
-      "formCat": "Forma de gato",
+      "formCat": "Forma de lobo",
       "formTravel": "Forma Fleet",
       "groupCreatures": "Criaturas",
       "groupPets": "Demonios de brujo",
@@ -8506,7 +8731,7 @@ export const es_ES: EnTranslations = {
         "bonusFmt": "+{value} {stat}",
         "enchantsNoteOffhand": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected, and no piece can be yet: it is authored ahead of the Perfecting work it waits on.",
         "enchantsNoteInfusionLive": "Enchants come in four tiers. The base tier runs on Chime Dust (with a little Essence at the high end) and covers the weapon slot, the off hand, and every armor slot, with enough stat-axis options that every build finds something for each slot: shields and held caster off hands take a Stamina enchant of their own, so no equipped slot is enchant dead. The Greater tier costs one Chime Shard plus Essence: stronger bonuses on the highest-impact slots. Shards feed three more sinks besides: the two charm recipes at five apiece, the top rung of tool-effect recharges, and the Lucent tier, where the weapon and chest enchants take one each and the Infusion two, so bank a few before you spend.\n\nBetween them sit the five Runed enchants, one consumer per typed secondary, so nothing you mill is ever a dead end: Runed Edge (weapon, Strength, consumes Resonant Steel), Runed Sigil (weapon, Intellect, Resonant Timber), Runed Weave (chest, Spirit, Resonant Thread), Runed Hide (legs, Agility, Resonant Hide), and Runed Links (helmet, Stamina, Resonant Links). Each also takes two Chime Essence; where a slot and stat have both a base and a Greater enchant, the Runed bonus lands between them, while Runed Weave is the strongest chest Spirit enchant outright and Runed Hide is the only legs Agility enchant at all. The exact bonuses are all in the table below.\n\nAbove them all sits the Lucent tier, the capstone work of the craft and the only enchants that ask for any skill in it at all: Enchanting 100 for the four, 125 for the Infusion, shown in the Skill column below. Each one takes a Lucent Reagent, and each adds one more step on its own slot: the weapon (a Might and a Spellpower option), the chest, and the boots. The last of them, the Lucent Infusion, takes hold only on a piece that has been Perfected: Perfecting is the wearer's own work, not the enchanter's, and the Professions page tells how a piece earns it.",
-        "enchantsNoteRaidFormula": "Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a uno cada una (el resto del coste de un talismán es esencia y polvo), la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.\n\nEntre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.\n\nPor encima de los niveles bajos normales está el nivel Luminoso, el trabajo cumbre normal del oficio: Encantamiento 100 para los cuatro primeros y 125 para la Infusión, como muestra la columna Habilidad. Cada uno usa un Reactivo Luminoso y añade otro paso a su ranura: el arma, con opción de Poderío o Poder de Hechizo, el pecho y las botas. La última, Infusión Luminosa, solo se aplica a una pieza Perfeccionada. Perfeccionar es trabajo del portador, no del encantador; la página Profesiones explica cómo gana una pieza ese estado.\n\nEl Fervor de la Última Llama es una fórmula de incursión separada, no un encantamiento normal gratuito. Aprende su fórmula comerciable a Encantamiento 100 antes de aplicarla. Cada aplicación usa 3 Núcleos de la Última Llama y 2 Fragmentos de Campanilla; la fórmula puede caer en el Crisol o comprarse al intendente por un núcleo. Sus reglas de velocidad de arma y activación cuerpo a cuerpo aparecen completas más abajo.",
+        "enchantsNoteRaidFormula": "Los encantamientos tienen cuatro niveles. El nivel base usa Polvo de Campanilla, con algo de Esencia en la parte alta, y cubre el arma, la mano secundaria y cada ranura de armadura. Hay suficientes ejes de estadísticas para que cada configuración encuentre una opción por ranura; los escudos y las manos secundarias de lanzadores llevan su propio encantamiento de Aguante, así que ninguna ranura equipada queda sin uso. El nivel Superior cuesta un Fragmento de Campanilla y Esencia y ofrece bonificaciones más fuertes en las ranuras de mayor impacto. Los fragmentos también alimentan otros tres consumos: las dos recetas de talismán, a cinco cada una, la recarga superior de efectos de herramienta y el nivel Luminoso, donde arma y pecho usan uno cada uno y la Infusión usa dos. Guarda algunos antes de gastar.\n\nEntre ambos están los cinco encantamientos Rúnicos, uno para cada estadística secundaria, para que nada que muelas sea un callejón sin salida: Filo Rúnico para arma y Fuerza, Sigilo Rúnico para arma e Intelecto, Tejido Rúnico para pecho y Espíritu, Piel Rúnica para piernas y Agilidad y Vínculos Rúnicos para casco y Aguante. Cada uno usa además dos Esencias de Campanilla. Cuando una ranura y estadística tienen encantamiento base y Superior, la bonificación Rúnica cae entre ambos; Tejido Rúnico es directamente el encantamiento de Espíritu de pecho más fuerte y Piel Rúnica es el único de Agilidad para piernas. La tabla siguiente contiene las bonificaciones exactas.\n\nPor encima de los niveles bajos normales está el nivel Luminoso, el trabajo cumbre normal del oficio: Encantamiento 100 para los cuatro primeros y 125 para la Infusión, como muestra la columna Habilidad. Cada uno usa un Reactivo Luminoso y añade otro paso a su ranura: el arma, con opción de Poderío o Poder de Hechizo, el pecho y las botas. La última, Infusión Luminosa, solo se aplica a una pieza Perfeccionada. Perfeccionar es trabajo del portador, no del encantador; la página Profesiones explica cómo gana una pieza ese estado.\n\nEl Fervor de la Última Llama es una fórmula de incursión separada, no un encantamiento normal gratuito. Aprende su fórmula comerciable a Encantamiento 100 antes de aplicarla. Cada aplicación usa 3 Núcleos de la Última Llama y 2 Fragmentos de Campanilla; la fórmula puede caer en el Crisol o comprarse al intendente por un núcleo. Sus reglas de velocidad de arma y activación cuerpo a cuerpo aparecen completas más abajo.",
         "charmsHeading": "Amuletos para las herramientas de un recolector",
         "formulaRequired": "Requiere fórmula",
         "charmsBody": "El Encantamiento es también de donde salen los amuletos de un recolector. Manitas Gizzel enseña ambos en el taller de herramientas de Eastbrook en cuanto tu Encantamiento llega a 25: el Alijo del Recolector, que añade una unidad a una cosecha, y el Ojo del Artesano, que sube el grado de lo que sale. Cada uno se fabrica una sola vez, y luego se coloca en un pico, un hacha o una hoz, donde gasta una carga solo en las cosechas que realmente mejora.\n\nLa recarga es donde el oficio sigue ganando. Las cargas las restablece quien sea dueño de la herramienta, no un encantador de paso, y la recarga cuesta la mitad de los materiales cuando ese dueño es el encantador que firmó el amuleto, y menos aún con una especialización en Encantamiento. Así que un amuleto vendido en el mostrador es una venta única, mientras que los amuletos que llevan tus propias herramientas son los baratos de mantener en marcha. La escalera completa de cargas y materiales está en cualquier página de oficio de recolección, bajo Efectos de herramienta."
@@ -8575,7 +8800,7 @@ export const es_ES: EnTranslations = {
       },
       "farm": {
         "rhythmHeading": "El ritmo de la agricultura",
-        "rhythmBody": "Plantar es instantáneo, porque la azada abre la tierra en vez de comprar velocidad: no hay lanzamiento que esperar, así que un agricultor que se aleja ha plantado igualmente. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.",
+        "rhythmBody": "Plantar es instantáneo: la azada abre la tierra en vez de comprar velocidad. Extraer un cultivo maduro también es instantáneo. No hay lanzamiento que interrumpir ni comprobación de bolsas que lo rechace, y un bancal listo espera todo el tiempo que tardes en volver, así que una bolsa llena solo le cuesta al agricultor el paseo para vaciarla.\n\nUna cosecha paga productos y competencia de Agricultura. A diferencia de una veta, no concede experiencia de personaje, así que los bancales son un oficio para trabajar y no una forma de subir de nivel.",
         "gainHeading": "Qué enseña una cosecha",
         "gainBody": "La ganancia es determinista y depende de tu propio contador, no del cultivo: {g1} de competencia por una cosecha inferior a {p1}, {g2} por debajo de {p2}, {g3} por debajo de {p3} y {g4} durante el resto del camino hasta el límite de {cap}. Nunca hay una tirada de subida, así que la duración de la progresión es exactamente la que dicta la aritmética.\n\nLo que decide el nivel del cultivo es hasta dónde puede llevarte un bancal. Un cultivo de nivel 1 enseña hasta {c1} y se vuelve gris allí; uno de nivel 2 hasta {c2}; y el nivel 3 o superior llega hasta el límite. Subir a bancales mejores es lo que mantiene avanzando el contador.",
         "yieldsHeading": "Qué produce una cosecha",
@@ -8618,7 +8843,7 @@ export const es_ES: EnTranslations = {
         "commissionsBody": "Un encargo es una creación hecha para alguien. Al crear un arma, una pieza de armadura u objeto de mano izquierda (una poción no puede llevar un vínculo), el artesano puede marcar la creación como encargo: la pieza terminada se comporta normalmente en manos del creador, pero en el momento en que cambia de manos en un intercambio queda vinculada a quien la recibió. Ese es el Vínculo del Artesano: el comprador obtiene su pieza, y la pieza no puede pasarse ni revenderse.\n\nLos vínculos no son para siempre, solo son costosos. Cualquier maestro de estación puede desvincular una pieza vinculada mientras estás en su estación (una estación móvil nunca ofrece el servicio), por una tarifa fijada por la calidad del objeto: 25 de plata para poco común, 1 de oro para raro, 4 de oro para épico, con un legendario pagando la tarifa épica y una pieza común de encargo la poco común.\n\nLa tarifa compra un estado limpio, no una cura: la pieza sigue siendo un encargo, así que se vuelve a vincular a quien la reciba en el siguiente intercambio, y todo lo demás sobre ella, firma, obra maestra y encantamientos, permanece intacto.",
         "provenanceHeading": "Trabajo firmado",
         "provenanceBody": "Some items carry a name. A material's source lines say who collected each group of units, while a separate signed-by mark identifies the premium signer when there is one. Those facts are independent: ordinary gathered material records a collector without gaining a signature, and legacy signed stock can name its signer while honestly saying no gatherer was recorded. A finished piece instead says who crafted it. These records travel with the item through trades, the bank, the mail, the World Market, and even a vendor buyback, and never fade.\n\nGathering signs its best work automatically: any harvest that rolls rare or better arrives signed, and rare finds sign their entire five-fold windfall. A corpse harvest's lucky roll signs its yield where the family has no specimen to give, and where it does, keeps the yield plain and mints the signed pristine specimen beside it. Crafting signs along the same line: every copy of a rare or better output mints signed, and a masterwork always signs whatever its quality, so the finest version of any piece always names its maker. An ordinary material's signature rides the units themselves and cannot be lost merely because a compatible stack already contains another collector or signer. A distinct pristine specimen is a separate item and still needs room; if it cannot fit, the ordinary corpse yield remains but the specimen is lost.\n\nFinished items keep one strict identity, so two copies merge only when every mark matches exactly: same item, same signer, same masterwork stats, same enchant, same bond. Compatible materials share a slot across collectors and signers while keeping a count for each source. The hover tooltip summarizes the sources; right-click the stack for the full list (on touch, use its Sources button). Separate by gatherer keeps those stacks apart in your bags, and sorting respects that choice. Transferred material can stack normally with the recipient's materials.\n\nSignatures pay crafters back: holding any signed copy of a needed reagent at the bench, whoever signed it, adds 2 percentage points of masterwork chance, and holding a reagent signed by your own hand cuts that reagent's required quantity by one (never below one). Your own signed rare-or-better work even keeps teaching you, today through crafted potions alone: drink a rare draught you brewed and signed and a small trickle of skill flows back to the craft that made it, as long as that craft is one of your active majors. It really is the potion arm and nothing else, so an elixir, a scroll, or an apex flask teaches you nothing back however finely it was signed.",
-        "provenanceBodyUndiscounted": "Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; haz clic derecho en la pila para ver la lista completa (en pantalla táctil, usa su botón Orígenes). Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo que ese reactivo esté marcado como no descontable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.",
+        "provenanceBodyUndiscounted": "Algunos objetos llevan un nombre. Las líneas de origen de un material dicen quién recogió cada grupo de unidades, mientras que una marca independiente de firmante identifica al artesano premium cuando existe. Son datos independientes: el material recolectado normal registra al recolector sin ganar firma, y las existencias antiguas firmadas pueden nombrar a su firmante diciendo honestamente que no se registró recolector. Una pieza terminada dice quién la fabricó. Estos registros viajan con el objeto por intercambios, banco, correo, Mercado Mundial e incluso recompra de vendedor, y nunca desaparecen.\n\nLa recolección firma automáticamente su mejor trabajo: toda cosecha que resulte rara o superior llega firmada, y los hallazgos raros firman su ganancia completa de cinco unidades. Una tirada afortunada de cosecha de cadáver firma el rendimiento cuando esa familia no tiene espécimen que entregar; cuando sí lo tiene, mantiene el rendimiento normal y crea junto a él el espécimen prístino firmado. La fabricación firma del mismo modo: cada copia de una salida rara o superior crea una versión firmada, y una obra maestra siempre firma cualquiera que sea su calidad. Así, la versión más fina de cada pieza nombra siempre a su creador. La firma de un material normal viaja con las unidades y no se pierde solo porque una acumulación compatible ya contenga otro recolector o firmante. Un espécimen prístino es un objeto separado y necesita espacio; si no cabe, queda el rendimiento normal del cadáver pero se pierde el espécimen.\n\nLos objetos terminados conservan una identidad estricta: dos copias solo se fusionan cuando coinciden exactamente el objeto, el firmante, las estadísticas de obra maestra, el encantamiento y el vínculo. Los materiales compatibles comparten espacio entre recolectores y firmantes mientras conservan un recuento por origen. La ayuda emergente resume los orígenes; abre Orígenes para la lista completa. Separar por recolector mantiene esas acumulaciones aparte en las bolsas y la ordenación respeta la elección. El material transferido puede acumularse normalmente con el del receptor.\n\nLas firmas devuelven algo a los artesanos: si sostienes en el banco una copia firmada de un reactivo necesario, quien la firmó añade 2 puntos porcentuales a la probabilidad de obra maestra. Si el reactivo está firmado por ti, reduce en uno la cantidad exigida, nunca por debajo de uno, salvo cuando el reactivo sea indiscountable. Los núcleos de incursión conservan siempre su coste completo. Tu propia obra rara o superior firmada también puede seguir enseñándote, hoy solo mediante pociones fabricadas: beber un brebaje raro que preparaste y firmaste devuelve un pequeño goteo de habilidad al oficio que lo creó, si ese oficio es una de tus profesiones principales activas. Solo funciona con la rama de pociones: un elixir, un pergamino o un frasco cumbre no enseña nada aunque lleve una firma excelente.",
         "collectorsHeading": "Coleccionistas, trofeos y el precio de una historia",
         "collectorsBody": "Los vendedores son ciegos a la procedencia: un objeto firmado se vende a un PNJ exactamente por su precio base. La prima de una firma existe solo entre jugadores, que es precisamente lo que la hace interesante: una pila de mineral inesperado firmada por un recolector famoso, un Corte Primo de una cosecha afortunada, una hoja de obra maestra que nombra a un artesano que ya se retiró; todo vale lo que la memoria de alguien diga que vale.\n\nEl Libro de Gestas se inclina hacia el mismo instinto: Veta Prístina, Duramen Antiguo, Flor Iluminada por la Luna, Espécimen Perfecto y Destello de Esperanza son marcas de coleccionista con Renombre cero que existen únicamente para demostrar que un momento te sucedió a ti. Conserva el objeto que ganó la gesta y tienes el recibo. Nada de esto da poder; la procedencia no compra estadísticas ni gana combates, es el rastro en papel del juego de los buenos días.",
         "castPaceHeading": "El tiempo de lanzamiento y el drenaje de oro",
@@ -8661,7 +8886,7 @@ export const es_ES: EnTranslations = {
         "title": "Preguntas frecuentes sobre Oficios",
         "intro": "Respuestas rápidas a las preguntas que más hacen los artesanos.",
         "q1": "¿Por qué no se apilan mis objetos firmados?",
-        "a1": "Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.\n\nLos materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; haz clic derecho en la pila para ver la lista completa (en pantalla táctil, usa su botón Orígenes). Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.",
+        "a1": "Los objetos terminados siguen la regla estricta de instancia: dos copias se fusionan solo cuando coinciden exactamente su firmante, sus propiedades aleatorias, sus estadísticas de obra maestra, su encantamiento, su vínculo y cualquier otro dato de identidad. Una hoja firmada, por tanto, permanece separada de una hoja normal.\n\nLos materiales son la excepción. Las acumulaciones compatibles del mismo material pueden fusionarse aunque difieran sus recolectores o firmantes, porque la acumulación conserva un recuento de cada origen. La ayuda emergente resume los orígenes; abre Orígenes para ver la lista completa. Separar por recolector mantiene esas acumulaciones apartadas en tus bolsas y la ordenación respeta esa decisión. El material transferido puede acumularse normalmente con los materiales del receptor.",
         "q2": "¿Las recetas comunes suben mi habilidad para siempre?",
         "a2": "No. Cada receta se puntúa por cuánto queda bajo tu tramo, con los colores clásicos naranja, amarillo, verde y gris: ganancia completa en el actual o superior, mitad un nivel abajo, cuarto dos niveles abajo y nada tres o más abajo. Los tramos son cada 25 puntos, así que las recetas gratuitas de habilidad 0 dejan de enseñar a 75.\n\nLos límites son menores que los 300 clásicos: cada una de las diez profesiones fabricables llega a 125, Minería, Tala y Herboristería llegan a 100 y Pesca llega a 200. Subir significa pasar a recetas de tu propio tramo, no repetir la más barata.",
         "q3": "¿Cuál es la diferencia entre saquear y recolectar un cadáver?",
@@ -10889,6 +11114,16 @@ export const es_ES: EnTranslations = {
       "xpGainRested": "Ganas {amount} de experiencia ({rested} de bonificación por descansar).",
       "deathTitle": "Has muerto.",
       "releaseSpirit": "Liberar espíritu",
+      "deathRecap": "Recap",
+      "deathRecapTitle": "Death Recap",
+      "deathRecapKiller": "Killing blow: {killer} ({ability})",
+      "deathRecapNoKiller": "Combat events leading to death",
+      "deathRecapLethal": "Killing Blow",
+      "deathRecapClose": "Close",
+      "deathRecapNoEvents": "No combat events recorded.",
+      "deathRecapCrit": "Crit",
+      "deathRecapDamage": "Damage",
+      "deathRecapHeal": "Healing",
       "chatTab": "Chat",
       "combatLogTab": "Registro de combate",
       "chatPlaceholder": "Di algo... (/w nombre susurro, /r responder, /p grupo, /gu hermandad, /o oficiales, /general general)",
@@ -11100,6 +11335,7 @@ export const es_ES: EnTranslations = {
       "compactChat": "Chat compacto",
       "frostedPanels": "Paneles esmerilados",
       "highContrastText": "Texto de alto contraste",
+      "colorblindMode": "Colorblind Mode",
       "reduceMotion": "Reducir movimiento",
       "showFps": "Mostrar FPS",
       "invertLookY": "Invertir vista (Y)",
@@ -11161,6 +11397,19 @@ export const es_ES: EnTranslations = {
       "threat": "Amenaza",
       "damageShort": "Daño",
       "healingShort": "Sanar",
+      "damageTaken": "Daño Recibido",
+      "damageTakenShort": "Recib.",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Cortes",
+      "interruptsShort": "Cortes",
+      "dispels": "Disipaciones",
+      "dispelsShort": "Disip.",
+      "deaths": "Muertes",
+      "deathsShort": "Bajas",
+      "reset": "Reiniciar medidores",
+      "resetHint": "Reiniciar datos de combate",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "Actual",
       "lastFight": "Último combate",
       "fightIndex": "Combate -{index}",
@@ -11172,6 +11421,16 @@ export const es_ES: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "Segmento anterior",
       "newerSegment": "Segmento siguiente",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "Cerrar medidores"
     },
     "chat": {
@@ -11332,7 +11591,7 @@ export const es_ES: EnTranslations = {
       "requiresForm": "Debes estar en forma de {form}.",
       "cantInForm": "No puedes hacer eso en forma de {form}.",
       "bear": "Bruin",
-      "cat": "gato",
+      "cat": "lobo",
       "bearOrCat": "Bruin or Cat",
       "travel": "Fleet",
       "shapeshifted": "No puedes hacer eso transformado.",
@@ -11654,6 +11913,9 @@ export const es_ES: EnTranslations = {
       "anyTarget": "Objetivo enemigo o amigo",
       "selfOnly": "Solo en ti mismo",
       "damageRange": "{min} a {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "{base} más {perCombo} por punto de combo"
     },
     "resources": {
@@ -11664,8 +11926,8 @@ export const es_ES: EnTranslations = {
       "devotion": "Devoción"
     },
     "forms": {
-      "bear": "Bruin",
-      "cat": "gato",
+      "bear": "oso",
+      "cat": "lobo",
       "bearOrCat": "Bruin or Cat"
     },
     "cast": {
@@ -12365,9 +12627,12 @@ export const es_ES: EnTranslations = {
       "reclaim": "Recuperar",
       "buyAria": "Comprar {item} por {price}",
       "reclaimAria": "Recuperar {item}",
+      "buyQuantityAria": "How many {item} to buy (of {total})",
+      "buyQuantityBtnAria": "Buy this many {item}",
       "buyConfirmTitle": "Confirmar compra",
       "buyConfirmBody": "¿Comprar {item} por {price}?",
       "buyConfirmBodyStack": "¿Comprar {item} x{count} por {price} ({each} cada uno)?",
+      "buyConfirmBodyPartial": "Buy {count} of {item} (of {total} listed) for {price} ({each} each)?",
       "buyConfirmAccept": "Comprar",
       "buyConfirmCancel": "Cancelar",
       "buyChanged": "Esa publicación cambió antes de que confirmaras. Revisa el precio e inténtalo de nuevo.",
@@ -12396,9 +12661,45 @@ export const es_ES: EnTranslations = {
       "collectEmpty": "No hay nada esperando. Las ganancias y publicaciones vencidas se recogen aquí.",
       "collectNote": "Ganancias y bienes devueltos que el Mercader guarda para ti.",
       "saleProceeds": "Ganancias de venta",
+      "collectAll": "Recoger lote completo",
+      "history": "History",
+      "historyEmpty": "No sales yet. Items you sell on the World Market show up here.",
+      "historyNote": "Your recent sales on the World Market.",
       "saleBuyer": "Vendido a {buyer}",
       "saleOlder": "Más {count} ventas anteriores, incluidas en el total.",
-      "collectAll": "Recoger lote completo"
+      "ordersTab": "Wanted",
+      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
+      "ordersListAria": "Open buy orders",
+      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
+      "orderCardTitle": "Place an order",
+      "orderPickLabel": "Item wanted",
+      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
+      "orderSearchPlaceholder": "Search items...",
+      "orderSearchAria": "Search for an item to order",
+      "orderPickNone": "No item matches.",
+      "orderQuantity": "Units wanted",
+      "orderPriceEach": "Price each",
+      "orderEscrowLine": "Gold held at the Merchant: {total}",
+      "orderCannotAfford": "You cannot afford {total} for this order.",
+      "orderAtCap": "You have no free order slots. Withdraw one first.",
+      "orderPlaceButton": "Place Order",
+      "orderConfirmTitle": "Confirm Order",
+      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
+      "orderWanted": "x{count} wanted",
+      "orderBy": "Wanted by {buyer}",
+      "orderMine": "Your order",
+      "orderEach": "each",
+      "orderDeliver": "Deliver",
+      "orderDeliverAria": "Deliver {item} to {buyer}",
+      "orderDeliverNone": "None of this item in your bags.",
+      "orderWithdraw": "Withdraw",
+      "orderWithdrawAria": "Withdraw your order for {item}",
+      "orderDeliverConfirmTitle": "Confirm Delivery",
+      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
+      "unlistedTitle": "Not on the market",
+      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
+      "unlistedNone": "Every material has at least one listing right now.",
+      "unlistedStageAria": "Order {item}"
     },
     "logs": {
       "listedItem": "{item} publicado en el Mercado Mundial por {money}.",
@@ -12407,6 +12708,11 @@ export const es_ES: EnTranslations = {
       "collectedMoney": "Recoges {money} del Mercader.",
       "reclaimedItem": "Recuperaste {item} del mercado.",
       "expiredListing": "Tu publicación de {item} venció y espera en el Mercader.",
+      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
+      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
+      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
+      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
+      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
       "boughtBackItem": "Recompraste {item} por {money}."
     },
     "errors": {
@@ -12425,7 +12731,12 @@ export const es_ES: EnTranslations = {
       "notYourListing": "Esa publicación no es tuya.",
       "nothingToCollect": "No tienes nada que recoger.",
       "sweepNoListings": "No hay listados de ese artículo disponibles para barrer.",
-      "sweepPriceChanged": "Los precios cambiaron antes de que llegara su barrido. Consulta la cotización y vuelve a intentarlo."
+      "sweepPriceChanged": "Los precios cambiaron antes de que llegara su barrido. Consulta la cotización y vuelve a intentarlo.",
+      "orderCountNeeded": "Name how many you want.",
+      "tooManyOrders": "You may keep at most {count} orders open at once.",
+      "orderClosed": "That order is no longer open.",
+      "orderOwn": "That is your own order. Cancel it to withdraw it.",
+      "orderNotYours": "That is not your order."
     },
     "loot": {
       "takeAll": "Recoger botín",
@@ -13275,7 +13586,7 @@ export const es_ES: EnTranslations = {
       },
       "hex_of_violence": {
         "name": "Maleficio de violencia",
-        "description": "Maldice al enemigo durante 8 s, infligiendo daño de las Sombras y generando 2 de Condena cada 2 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras."
+        "description": "Maldice al enemigo durante 8 s. Sus siguientes 3 acciones dañinas generan 7 de Condena cada una y le infligen 17 de daño de las Sombras."
       },
       "cruel_pact": {
         "name": "Pacto cruel",
@@ -13350,7 +13661,7 @@ export const es_ES: EnTranslations = {
       },
       "bear_form": {
         "name": "Forma de Bruin",
-        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento. Lánzala de nuevo para volver a forma de taumaturgo."
+        "description": "Cambias a forma de oso: armadura +110%, salud máxima +30%, poder de ataque muy aumentado, tus ataques generan ira y un 30% más de amenaza. Lánzala de nuevo para volver a forma de taumaturgo."
       },
       "maul": {
         "name": "Rompehuesos",
@@ -13366,8 +13677,8 @@ export const es_ES: EnTranslations = {
         "description": "Un rugido funesto: todos los enemigos en un radio de 10 m son provocados, su amenaza hacia ti sube hasta igualar la de su enemigo más odiado, y quedan obligados a atacarte durante 3 s. Solo en Forma de Bruin."
       },
       "cat_form": {
-        "name": "Forma de gato",
-        "description": "Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Cambiar a cualquier forma otorga Paso ligero: un 60% de velocidad de movimiento durante 3 s, una vez cada 20 s. Lánzalo de nuevo para volver a la forma de lanzador."
+        "name": "Forma de lobo",
+        "description": "Te transforma en lobo: la agilidad sube con tu nivel, poder de ataque +8 más 2 por nivel, tus ataques usan energía y puntos de combo, y generas un 29% menos de amenaza. Lánzalo de nuevo para volver a la forma de lanzador."
       },
       "claw": {
         "name": "Garra Desgarradora",
@@ -13408,7 +13719,7 @@ export const es_ES: EnTranslations = {
       },
       "travel_form": {
         "name": "Forma Fleet",
-        "description": "Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40% y eliminando las raíces y ralentizaciones que se puedan romper. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento."
+        "description": "Adopta al instante una veloz forma Fleet, aumentando la velocidad de movimiento un 40%. No puedes usar otras habilidades mientras estás transformado, pero puedes transformarte dentro o fuera del combate, ideal para escapar."
       },
       "enrage": {
         "name": "Avivar",
@@ -13428,27 +13739,27 @@ export const es_ES: EnTranslations = {
       },
       "dash": {
         "name": "Carrera",
-        "description": "Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de gato."
+        "description": "Esprinta hacia delante, aumentando la velocidad de movimiento un 50% durante 15 s. Solo en Forma de lobo."
       },
       "pounce": {
         "name": "Golpe Sigiloso",
-        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo. Fuera del sigilo, este botón es Embate."
+        "description": "Apertura desde el sigilo que aturde al objetivo durante 2 s. Otorga 1 punto de combo. Solo en Forma de lobo."
       },
       "lunge": {
-        "name": "Embate",
-        "description": "Te abalanzas sobre un enemigo a hasta 12 m, infligiendo un 60% del daño de arma y otorgando 1 punto de combo. Solo en Forma de lobo."
+        "name": "Embestida felina",
+        "description": "Cambias a Forma felina si aún no lo estás y te lanzas contra un enemigo a un máximo de 25 m. Al llegar, inflige un 60% de daño de arma, otorga 1 punto de combo y, como Colmillo salvaje, añade 1 Sangre antigua (máx. 3); si la embestida se interrumpe antes de llegar, recupera su reutilización. Utilizable en cualquier forma."
       },
       "hamstring_bite": {
-        "name": "Derribo",
-        "description": "Movimiento final que aturde al objetivo durante 1 s más 1 s por punto de combo (5 puntos de combo: 6 s). Solo en Forma de lobo."
+        "name": "Takedown",
+        "description": "Finishing move that stuns the target for 1 sec plus 1 sec per combo point (5 combo points: 6 sec). Cat Form only."
       },
       "insect_swarm": {
         "name": "Enjambre Punzante",
         "description": "Un enjambre de insectos acosa al enemigo, causando {damage} de daño de Naturaleza durante 12 s."
       },
       "tigers_fury": {
-        "name": "Sangre de Lince",
-        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de gato."
+        "name": "Sangre de Lobo",
+        "description": "Genera {rage} de energía y aumenta el poder de ataque en {buff} durante {duration} s. Solo en Forma de lobo."
       },
       "rip": {
         "name": "Grieta Sangrienta",
@@ -13649,11 +13960,11 @@ export const es_ES: EnTranslations = {
       },
       "moonkin_form": {
         "name": "Forma de lechúcico lunar",
-        "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Transformarte en cualquier forma otorga Zancada Trotona, un breve impulso de velocidad de movimiento. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
+        "description": "Adopta Forma de lechúcico lunar, potenciando el lanzamiento de hechizos hasta que vuelvas a cambiar. Lánzalo otra vez para volver a la forma normal. (habilidad distintiva de Equilibrio)"
       },
       "feral_charge": {
         "name": "Oleada primigenia",
-        "description": "Desata una oleada primigenia. En Forma de gato, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
+        "description": "Desata una oleada primigenia. En Forma de lobo, aumenta la regeneración de energía un 100% durante 10 s. En Forma de Bruin, genera 50 p. de ira al instante. (habilidad distintiva de Feral)"
       },
       "swiftmend": {
         "name": "Alivio presto",
@@ -13873,7 +14184,7 @@ export const es_ES: EnTranslations = {
       },
       "chaos_bolt": {
         "name": "Descarga de Ruina",
-        "description": "Gasta 3 de Devastación para lanzar un pesado proyectil de fuego caótico que inflige {damage} de daño de Fuego antes de aplicar el daño crítico. Siempre golpea críticamente al impactar. Ruina acorta su lanzamiento un 30%."
+        "description": "Gasta 3 de Devastación para lanzar un pesado proyectil de fuego caótico que inflige {damage} de daño de Fuego. Ruina acorta su lanzamiento un 30%."
       },
       "dark_pact": {
         "name": "Sanguine Covenant",
@@ -14017,7 +14328,7 @@ export const es_ES: EnTranslations = {
       },
       "perfect_moment": {
         "name": "Momento perfecto",
-        "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen e infligen un 20% más de daño. (Cronomancia)"
+        "description": "Obtienes al instante 4 cargas Arcanas y durante 10 s los Dardos de éter no las consumen. (Cronomancia)"
       },
       "arcane_surge": {
         "name": "Impulso de Éter",
@@ -14154,7 +14465,7 @@ export const es_ES: EnTranslations = {
       },
       "bear_charge": {
         "name": "Embestida de Bruin",
-        "description": "Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Durante los 3 s siguientes, la Forma de lobo es gratuita y sujeta al objetivo, ralentizándolo un 50% durante 4 s. Alcance de 7 a 23 m. Solo en forma de Bruin."
+        "description": "Embiste a un enemigo, generando 9 de furia y aturdiéndolo durante 1 s. Alcance de 7 a 23 m. Solo en forma de Bruin."
       },
       "demoralizing_roar": {
         "name": "Rugido Cobarde",
@@ -14162,11 +14473,11 @@ export const es_ES: EnTranslations = {
       },
       "prowl": {
         "name": "Acechar",
-        "description": "Entra en sigilo mientras estás en Forma de lobo. No puede usarse en combate."
+        "description": "Entra en sigilo mientras estás en Forma de lobo y te mueves un 5% más lento. No puede usarse en combate."
       },
       "rake": {
         "name": "Desollar",
-        "description": "Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de gato.",
+        "description": "Desuella al enemigo por daño de arma más {damage} y causa daño de sangrado durante 18 s. Otorga 1 punto de combo. Solo en Forma de lobo.",
         "specNote_feral": "Cada golpe que conecta añade 1 de Sangre Antigua (máx. 3)."
       },
       "revive_pet": {
@@ -22931,8 +23242,8 @@ export const es_ES: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "Trama del Alba Benévola",
-        "bonus2": "El rescate de Vigilancia Seráfica cura 270, en lugar de 180. El daño recibido ya no retrasa tus hechizos.",
-        "bonus4": "Cuando se activa Vigilancia Seráfica, su aliado también recupera un 15% de su salud máxima durante 10 s."
+        "bonus2": "Restaurar salud con Rezo Susurrado, Rezo Solemne o Rezo Urgente aumenta la sanación de tu siguiente Coromendar un 10%, acumulándose hasta 3 veces. Cada lanzamiento otorga como máximo una acumulación. Coromendar consume todas las acumulaciones al terminar de lanzarse. El daño recibido ya no retrasa tus hechizos.",
+        "bonus4": "Terminar Coromendar con 3 acumulaciones hace que tu siguiente Rezo Susurrado en 60 s sea instantáneo y aumenta su sanación un 100%. Este beneficio no se acumula; obtenerlo de nuevo actualiza su duración."
       },
       "boundstone_vanguard": {
         "name": "Vanguardia Piedravínculo",

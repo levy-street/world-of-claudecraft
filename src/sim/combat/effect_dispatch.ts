@@ -1,3 +1,4 @@
+import { buildBenisonPrayer, consumeBenisonPrayers } from './priest/benison_dawnweave';
 // Effect dispatch (C4b): the per-effect switch that fans a RESOLVED ability's
 // `effects[]` into damage, auras, CC, threat, combo, pets, healing, ground-AoE,
 // charge, and stat-recalc. Lifted verbatim out of the 17.5k-line `Sim` monolith
@@ -22,6 +23,7 @@ import {
   setBonusFlag,
 } from '../content/ignivar_set_bonuses';
 import { ABILITIES, isDelvePos, MOBS } from '../data';
+import { dawnreaverDamageMultiplier } from '../dawnreaver_damage';
 import { logCascadeCast, recordCascadeInitial } from '../dev/cascade_playtest';
 import { recalcPlayerStats } from '../entity';
 import type { GroundAoE } from '../entity_roster';
@@ -475,6 +477,8 @@ export function runEffects(
   facingOverride?: number,
 ): void {
   const ability = res.def;
+  const benisonChoirMult = consumeBenisonPrayers(ctx, p, ability.id);
+  let benisonPrayerBuilt = false;
   // The cast-scoped heal multiplier the heal and hot arms below apply to the
   // WHOLE resolved amount: the caller's mark times the Nature's Boon power the
   // resolved copy carries (combat/druid_natures_boon.ts, stamped in
@@ -496,6 +500,7 @@ export function runEffects(
   const isSpell = ability.school !== 'physical';
   const mods = ctx.playerMods(meta);
   const primaryHealMult = primaryHealingMultiplier(meta.cls, mods.spec);
+  const primaryDamageMult = dawnreaverDamageMultiplier(meta.cls, mods.spec, ability.id);
   // The resolved mastery/talent damage and heal multiplier for this ability
   // (talent_hit_mult.ts): the SAME number applyTalentMods already baked into
   // its authored base magnitudes, reused here to scale the SP/AP rider a
@@ -707,6 +712,7 @@ export function runEffects(
           cannotBeDodged: eff.cannotBeDodged,
           normalizedInstant: eff.normalized,
           weaponMult,
+          primaryDamageMult,
           threatFlat: res.threatFlat,
           threatMult: res.threatMult,
           forceCrit: sureCrit,
@@ -907,7 +913,7 @@ export function runEffects(
         if (ability.id === ARCANE_SURGE_ID) dmg *= aetherSurgeDamageMult(p);
         dmg *= thundercallDamageMultiplier(ctx, p, ability.id);
         dmg *= druidApexPayoffMult(ctx, p, ability.id);
-        const finalDamage = Math.round(dmg);
+        const finalDamage = Math.round(dmg * primaryDamageMult);
         lastDirectDamage = finalDamage;
         const targetHpBefore = target.hp;
         const resolvedDamage = ctx.dealDamage(
@@ -1396,6 +1402,8 @@ export function runEffects(
         // other derived/chained/procced applyHeal call, none of which run
         // through this case) from ever double-crediting a single real cast.
         creditHubHealingDrill(ctx, p, healTarget, healed, ability.id);
+        if (!benisonPrayerBuilt)
+          benisonPrayerBuilt = buildBenisonPrayer(ctx, p, ability.id, healed);
         if (ability.id === 'scouring_mercy') {
           doctrineScouringMercyRescue(ctx, p, meta, healTarget, healed);
         }
@@ -1822,11 +1830,14 @@ export function runEffects(
       case 'clearCooldowns': {
         for (const abilityId of eff.abilities) {
           p.cooldowns.delete(abilityId);
-          // A charge-limited ability resets to a full pool (Preparation).
+          // A charge-limited ability resets to a full pool (Preparation, Winter's
+          // Recall), exactly a fresh one: the spent charges' parallel timers go
+          // too, or each would pay out another charge on top of the refill.
           const chargeState = p.abilityCharges?.[abilityId];
           if (chargeState) {
             chargeState.charges = chargeState.maxCharges;
             chargeState.recharge = 0;
+            delete chargeState.recharges;
           }
         }
         break;
@@ -2555,7 +2566,7 @@ export function runEffects(
           if (!isSpell) dmg *= 1 - armorReduction(ctx.effectiveArmor(m), p.level);
           // Soft-cap scale (Revenge above 5 targets): applied after the roll and
           // armor so the total, not any single hit, is what the cap bounds.
-          dmg *= capScale;
+          dmg *= capScale * primaryDamageMult;
           const hpBefore = m.hp;
           ctx.dealDamage(
             p,
@@ -2812,8 +2823,9 @@ export function runEffects(
         for (const m of friendliesInRadius(ctx, center, eff.radius)) {
           if (eff.playersOnly && m.kind !== 'player') continue;
           if (!ctx.hasLineOfSight(center, m)) continue;
+          const rolledHeal = ctx.rng.range(eff.min, eff.max) + aoeHealBonus;
           const healAmount = scalePrimaryHealing(
-            ctx.rng.range(eff.min, eff.max) + aoeHealBonus,
+            benisonChoirMult === 1 ? rolledHeal : Math.round(rolledHeal * benisonChoirMult),
             primaryHealMult,
           );
           const missingBefore = m.maxHp - m.hp;

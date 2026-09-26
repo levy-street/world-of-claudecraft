@@ -35,6 +35,7 @@ import {
   spawnBossExitPortal,
 } from '../instances/dungeons';
 import { isImmuneInPlace } from '../instances/instance_combat_hold';
+import { isKillParticipant, killParticipationPos } from '../loot/kill_participation';
 import { applyBossCorpseHold } from '../mob/boss_corpse_hold';
 import { spawnWidowHatchlingOnEggDeath } from '../mob/egg_hatchling';
 import { isEvadingWildMob } from '../mob/evade_immunity';
@@ -84,6 +85,7 @@ import {
 import { onWorldBossKilledForWeeklyQuests } from '../weekly_quests';
 import { recordWeeklyBossKill } from '../weekly_rewards';
 import { WORLD_BOSS_CORPSE_SECONDS, worldBossLootContributors } from '../world_boss';
+import { emitAbsorbCredit } from './absorb_credit';
 import {
   afflictionOnDeath,
   clearAfflictionState,
@@ -138,7 +140,6 @@ import { stripPaladinDevotionsFromSource } from './paladin_support';
 import { masteredPaladinAuraValue } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { veilboundMarkDamageMultiplier } from './paladin_veilbound_march';
-import { benisonMendOnVigilTriggered } from './priest/benison';
 import { doctrineConvertDamage } from './priest/doctrine';
 import { cleanupPriestState } from './priest/lifecycle';
 import {
@@ -613,6 +614,7 @@ export function dealDamage(
       if (answer && source) {
         amount -= answer.soaked;
         totalAbsorbed += answer.soaked;
+        emitAbsorbCredit(ctx, armed, target, answer.soaked);
         target.auras.splice(target.auras.indexOf(armed), 1);
         ctx.emit({ type: 'aura', targetId: target.id, name: armed.name, gained: false });
         if (target.kind === 'player') grantAbilityDevotion(target, DEBT_OF_LIGHT_DEVOTION);
@@ -634,6 +636,7 @@ export function dealDamage(
       a.value -= soaked;
       amount -= soaked;
       totalAbsorbed += soaked;
+      emitAbsorbCredit(ctx, a, target, soaked);
       // Unleash Weapon protects against one damage event only. Any unused
       // protection falls away after that hit instead of behaving like a
       // conventional multi-hit absorb shield.
@@ -1082,9 +1085,6 @@ export function dealDamage(
         const healed = ctx.applyHeal(healer, target, aura.value, aura.name);
         if (aura.id === 'seraphic_vigil') {
           priestOnVigilTriggered(ctx, healer, target, healed);
-          // Benison Dawnweave 4pc rides the same trigger POINT (never that
-          // talent-gated function): the set arm is wearer-flag-gated inside.
-          benisonMendOnVigilTriggered(ctx, healer, target);
         }
         ctx.emit({
           type: 'spellfx',
@@ -1743,23 +1743,25 @@ export function handleDeath(
       if (party) {
         for (const mPid of party.members) {
           const mMeta = ctx.players.get(mPid);
-          const mE = ctx.entities.get(mPid);
           // A released player entity stands at the graveyard, but their body is
-          // still where they fell. Use that corpse position for the kill-time
-          // participation snapshot so releasing during the final seconds does
-          // not erase XP, loot-roll, or Heroic Mark rights.
-          const matchingInstanceCorpse =
-            mE?.ghost &&
-            mE.corpsePos &&
-            (!claimedInst || mE.corpseInstanceId === claimedInst.exitId)
-              ? mE.corpsePos
-              : null;
-          const participationPos = matchingInstanceCorpse ?? mE?.pos;
+          // still where they fell: the corpse is their participation position
+          // (loot/kill_participation.ts), so releasing during the final seconds
+          // does not erase XP, loot-roll, or Heroic Mark rights. Inside a
+          // claimed instance the whole claim footprint shares the kill.
+          const participationPos = killParticipationPos(
+            ctx.entities.get(mPid),
+            claimedInst?.exitId ?? null,
+          );
           if (
             mMeta &&
             !mMeta.leaving &&
             participationPos &&
-            dist2d(participationPos, e.pos) <= PARTY_XP_RANGE
+            isKillParticipant(
+              participationPos,
+              e.pos,
+              claimedInst !== null &&
+                ctx.instanceClaimIdAt(participationPos) === claimedInst.exitId,
+            )
           )
             eligible.push(mMeta);
         }

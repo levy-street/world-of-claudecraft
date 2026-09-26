@@ -325,14 +325,23 @@ const itemStringsEn = {
       reclaim: 'Reclaim',
       buyAria: 'Buy {item} for {price}',
       reclaimAria: 'Reclaim {item}',
+      // A bulk stack need not be bought whole: the per-row quantity field beside
+      // Buy (buyQuantityAria/buyQuantityBtnAria) lets a buyer take just a few
+      // units instead, defaulting to 1.
+      buyQuantityAria: 'How many {item} to buy (of {total})',
+      buyQuantityBtnAria: 'Buy this many {item}',
       // Confirm prompt gating a buyout (Reclaim stays one click: it returns your own
       // goods and costs nothing). The stack body quotes the total ask and the
-      // per-unit ask the browse row showed; buyChanged is the confirm-time refusal
-      // when the listing was replaced or re-priced while the prompt was up (a listing
-      // that left entirely reuses itemUi.errors.listingUnavailable).
+      // per-unit ask the browse row showed; buyConfirmBodyPartial is the same
+      // prompt for a partial buy of a bulk stack, stating how many of the total
+      // this purchase takes rather than implying the whole stack; buyChanged is
+      // the confirm-time refusal when the listing was replaced or re-priced while
+      // the prompt was up (a listing that left entirely reuses
+      // itemUi.errors.listingUnavailable).
       buyConfirmTitle: 'Confirm Purchase',
       buyConfirmBody: 'Buy {item} for {price}?',
       buyConfirmBodyStack: 'Buy {item} x{count} for {price} ({each} each)?',
+      buyConfirmBodyPartial: 'Buy {count} of {item} (of {total} listed) for {price} ({each} each)?',
       buyConfirmAccept: 'Buy',
       buyConfirmCancel: 'Cancel',
       buyChanged: 'That listing changed before you confirmed. Check the price and try again.',
@@ -374,11 +383,55 @@ const itemStringsEn = {
       collectEmpty: 'Nothing waiting. Sale proceeds and expired listings collect here.',
       collectNote: 'Earnings and returned goods the Merchant is holding for you.',
       saleProceeds: 'Sale proceeds',
-      // The itemized ledger under the proceeds line. saleOlder covers the rows the
-      // ledger cap dropped, whose gold IS still in the total above.
+      collectAll: 'Collect All',
+      // The History tab: the itemized sale ledger, split out of Collect so a
+      // completed sale stays visible after its proceeds are claimed. saleOlder
+      // covers the rows the ledger cap dropped, whose gold IS still counted in
+      // the Collect tab's proceeds total.
+      history: 'History',
+      historyEmpty: 'No sales yet. Items you sell on the World Market show up here.',
+      historyNote: 'Your recent sales on the World Market.',
       saleBuyer: 'Sold to {buyer}',
       saleOlder: 'Plus {count} earlier sales, included in the total.',
-      collectAll: 'Collect All',
+      // The Wanted tab (src/sim/market_orders.ts): buy orders and the not-on-the-
+      // market strip. Place card, order rows (Deliver / Withdraw), and the strip.
+      ordersTab: 'Wanted',
+      ordersNote:
+        'Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.',
+      ordersListAria: 'Open buy orders',
+      ordersEmpty: 'No open orders yet. Post one and gatherers will see what you need.',
+      orderCardTitle: 'Place an order',
+      orderPickLabel: 'Item wanted',
+      orderPickEmpty: 'Search for an item below, or pick one from the strip at the bottom.',
+      orderSearchPlaceholder: 'Search items...',
+      orderSearchAria: 'Search for an item to order',
+      orderPickNone: 'No item matches.',
+      orderQuantity: 'Units wanted',
+      orderPriceEach: 'Price each',
+      orderEscrowLine: 'Gold held at the Merchant: {total}',
+      orderCannotAfford: 'You cannot afford {total} for this order.',
+      orderAtCap: 'You have no free order slots. Withdraw one first.',
+      orderPlaceButton: 'Place Order',
+      orderConfirmTitle: 'Confirm Order',
+      orderConfirmBody:
+        'Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.',
+      orderWanted: 'x{count} wanted',
+      orderBy: 'Wanted by {buyer}',
+      orderMine: 'Your order',
+      orderEach: 'each',
+      orderDeliver: 'Deliver',
+      orderDeliverAria: 'Deliver {item} to {buyer}',
+      orderDeliverNone: 'None of this item in your bags.',
+      orderWithdraw: 'Withdraw',
+      orderWithdrawAria: 'Withdraw your order for {item}',
+      orderDeliverConfirmTitle: 'Confirm Delivery',
+      orderDeliverConfirmBody:
+        "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
+      unlistedTitle: 'Not on the market',
+      unlistedNote:
+        'Materials with no listing at all. Post an order for one, or gather and list it.',
+      unlistedNone: 'Every material has at least one listing right now.',
+      unlistedStageAria: 'Order {item}',
     },
     logs: {
       listedItem: 'Listed {item} on the World Market for {money}.',
@@ -387,6 +440,14 @@ const itemStringsEn = {
       collectedMoney: 'You collect {money} from the Merchant.',
       reclaimedItem: 'Reclaimed {item} from the market.',
       expiredListing: 'Your market listing of {item} expired and waits at the Merchant.',
+      // The Wanted tab's notices (src/sim/market_orders.ts).
+      orderPlaced: 'Placed an order for {item} x{count} at {each} each.',
+      orderDelivered:
+        'Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.',
+      orderReceived:
+        '{seller} delivered {item} x{count} to your order. Collect it from the Merchant.',
+      orderWithdrawn: 'Withdrew your order for {item}; {money} returned.',
+      orderExpired: 'Your order for {item} expired; {money} waits at the Merchant.',
     },
     errors: {
       notSoldHere: 'That item is not sold here.',
@@ -407,6 +468,12 @@ const itemStringsEn = {
       // the live total moving past the quoted cap between quote and buy.
       sweepNoListings: 'No listings of that item are available to sweep.',
       sweepPriceChanged: 'Prices changed before your sweep landed. Check the quote and try again.',
+      // Buy-order refusals (src/sim/market_orders.ts).
+      orderCountNeeded: 'Name how many you want.',
+      tooManyOrders: 'You may keep at most {count} orders open at once.',
+      orderClosed: 'That order is no longer open.',
+      orderOwn: 'That is your own order. Cancel it to withdraw it.',
+      orderNotYours: 'That is not your order.',
     },
   },
 };

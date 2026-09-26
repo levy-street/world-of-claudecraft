@@ -1,15 +1,15 @@
 // The world trees' camera-occluder fade, lifted out of foliage.ts: the
 // hideable records, the eye-to-camera hit test against a tree's trunk circle,
-// the per-frame swap between instances and pooled ghost stand-ins through the
-// gated fade (occluder_fade_gate.ts), and the ghost sources the boot prewarm
+// the per-frame ghosting of its instances through the pool's arm (pooled
+// stand-ins behind the gated fade, occluder_fade_gate.ts, or the per-instance
+// dither, instanced_dither_fade.ts), and the ghost sources the boot prewarm
 // covers.
 import type * as THREE from 'three';
-import type { InstancedGhostHandle, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
+import type { InstancedGhostHide, InstancedOccluderGhosts } from './instanced_occluder_ghosts';
 import {
   OCCLUDER_FADE_PREFETCH_YD,
   occluderFadeSettled,
   occluderKeepsInstances,
-  stepOccluderFade,
   withinOccluderFadePrefetch,
 } from './occluder_fade_core';
 import { TreeHideIndex } from './tree_hide_index_core';
@@ -18,7 +18,6 @@ export interface TreeHidePart {
   mesh: THREE.InstancedMesh;
   index: number;
   visibleMatrix: THREE.Matrix4;
-  hiddenMatrix: THREE.Matrix4;
 }
 
 export interface TreeHideable {
@@ -31,8 +30,8 @@ export interface TreeHideable {
   hidden: boolean;
   /** Animated fade level (1 = opaque instance, 0.2 = occluding ghost). */
   alpha: number;
-  /** Live ghost stand-ins while the fade is active (empty = instanced). */
-  ghosts: InstancedGhostHandle[];
+  /** One live ghost per part while the fade is active (empty = at rest). */
+  ghosts: InstancedGhostHide[];
   parts: TreeHidePart[];
   /** The ghost programs were asked for ahead of the first occlusion. */
   prefetched: boolean;
@@ -95,8 +94,8 @@ export function* hideableGhostSources(
   for (const t of trees) for (const part of t.parts) yield part.mesh;
 }
 
-/** One tree, one frame: the swap between instances and pooled ghost stand-ins
- *  through the gated fade, given whether the eye-to-camera segment crosses it.
+/** One tree, one frame: its instances ghosted through the pool, given whether
+ *  the eye-to-camera segment crosses it.
  *  Returns whether the tree's fade is in flight after this frame (it holds
  *  ghosts), which is what the index keeps it on the active list for. */
 export function stepTreeHide(
@@ -115,22 +114,13 @@ export function stepTreeHide(
   if (t.ghosts.length === 0) {
     for (let j = 0; j < t.parts.length; j++) {
       const part = t.parts[j];
-      part.mesh.setMatrixAt(part.index, part.hiddenMatrix);
-      part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
-      part.mesh.instanceMatrix.needsUpdate = true;
-      t.ghosts.push(ghosts.acquire(part.mesh, part.index, part.visibleMatrix));
+      t.ghosts.push(ghosts.hide(part.mesh, part.index, part.visibleMatrix));
     }
   }
-  t.alpha = stepOccluderFade(t.alpha, hide, dt, reducedMotion);
-  for (let j = 0; j < t.ghosts.length; j++) ghosts.setAlpha(t.ghosts[j], t.alpha);
+  t.alpha = ghosts.step(t.alpha, hide, dt, reducedMotion);
+  for (let j = 0; j < t.ghosts.length; j++) ghosts.fade(t.ghosts[j], t.alpha);
   if (!hide && occluderFadeSettled(t.alpha, false)) {
-    for (let j = 0; j < t.parts.length; j++) {
-      const part = t.parts[j];
-      part.mesh.setMatrixAt(part.index, part.visibleMatrix);
-      part.mesh.instanceMatrix.addUpdateRange(part.index * 16, 16);
-      part.mesh.instanceMatrix.needsUpdate = true;
-    }
-    for (let j = 0; j < t.ghosts.length; j++) ghosts.release(t.ghosts[j]);
+    for (let j = 0; j < t.ghosts.length; j++) ghosts.show(t.ghosts[j]);
     t.ghosts.length = 0;
   }
   return t.ghosts.length > 0;
@@ -171,7 +161,8 @@ export function updateTreeHides(
   // walk left it: opaque, unfaded, with nothing to update.
   const index = indexFor(trees);
   index.beginFrame();
-  if (index.sweepDue(camX, camZ)) {
+  // The dithered ghost links no second program: nothing to ask ahead for.
+  if (!ghosts.dithered && index.sweepDue(camX, camZ)) {
     index.forEachUnprefetchedWithin(camX, camZ, OCCLUDER_FADE_PREFETCH_YD, (i) => {
       const t = trees[i];
       if (t.prefetched || !withinOccluderFadePrefetch(t.x, t.z, camX, camZ)) return;

@@ -27,10 +27,10 @@ import {
   warmShaderPrograms,
 } from '../src/render/shader_warm_client';
 import {
-  SHADER_WARM_AB_REFUSAL,
   SHADER_WARM_EVIDENCE_LINKS,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_HOLD_WINDOW,
+  SHADER_WARM_OPTION_OFFERED,
   SHADER_WARM_RELEASE_BREAKER,
   SHADER_WARM_TIMEOUT_BREAKER,
 } from '../src/render/shader_warm_client_core';
@@ -131,6 +131,7 @@ interface StartOptions {
   imminent?: boolean;
   armed?: boolean;
   now?: () => number;
+  optionOffered?: boolean;
 }
 
 /** Reset the client onto fake workers and a fake timer, then make the first
@@ -155,6 +156,7 @@ function start(options: StartOptions = {}) {
       };
     },
     now: options.now,
+    optionOffered: options.optionOffered,
   });
   if (options.armed !== false) armShaderWarm();
   const stub = contextStub(options.granted ?? GRANTED);
@@ -1583,7 +1585,7 @@ describe('the cannot-serve rule: giving up on the worker own evidence', () => {
     let stored = 'all';
     setShaderWarmStoredSettingSource(() => stored);
     try {
-      const { worker, ready } = start({ search: '', now: () => clock });
+      const { worker, ready } = start({ search: '', now: () => clock, optionOffered: true });
       ready();
       windowOfFour(worker());
       for (let burst = 0; burst < SHADER_WARM_RELEASE_BREAKER; burst++) {
@@ -1886,7 +1888,6 @@ describe('disposing the shader warm client', () => {
       holdWallMs: 0,
       releases: 0,
       standingDown: false,
-      abArm: null,
       bypassed: {
         'mode-off': 0,
         unavailable: 0,
@@ -1914,26 +1915,6 @@ describe('the auto setting follows the GPU backend', () => {
       getParameter: (name: number) => (name === 0x9246 ? renderer : ''),
     };
   }
-
-  it('is OFF until a context is seen, then the full policy on D3D11', () => {
-    const worker = fakeWorker();
-    resetShaderWarmForTest({ spawn: () => worker, search: '', stored: 'auto' });
-    expect(shaderWarmSnapshot()).toMatchObject({ setting: 'auto', mode: 'off', backend: null });
-    const decision = shaderWarmDecide(
-      backendContext(D3D11),
-      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      false,
-    );
-    expect(shaderWarmSnapshot()).toMatchObject({
-      setting: 'auto',
-      mode: 'all',
-      backend: 'd3d11',
-    });
-    // Not armed yet: the first policy call still bypasses, but the worker
-    // is starting for the arms to come.
-    expect(decision).toEqual({ hold: false, bypass: 'before-reveal' });
-    expect(shaderWarmAvailable()).toBe(true);
-  });
 
   it('stays OFF on an OpenGL backend and never spawns the worker', () => {
     let spawned = 0;
@@ -1974,10 +1955,13 @@ describe('the auto setting follows the GPU backend', () => {
   });
 });
 
-describe('the A/B arm on D3D11 (one release, removed by the decision PR)', () => {
-  const D3D11 =
-    'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504) Direct3D11 vs_5_0 ps_5_0, D3D11)';
-  const OPENGL = 'ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3090/PCIe/SSE2, OpenGL 4.5.0)';
+describe('auto leaves the worker off on every backend', () => {
+  const RENDERERS = {
+    d3d11: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+    vulkan: 'ANGLE (NVIDIA, Vulkan 1.3.277 (NVIDIA NVIDIA GeForce RTX 3060 (0x00002504)), NVIDIA)',
+    metal: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Pro, Unspecified Version)',
+    opengl: 'ANGLE (NVIDIA Corporation, NVIDIA GeForce RTX 3090/PCIe/SSE2, OpenGL 4.5.0)',
+  } as const;
   function backendContext(renderer: string) {
     return {
       getContextAttributes: () => ({ antialias: false }),
@@ -1987,334 +1971,71 @@ describe('the A/B arm on D3D11 (one release, removed by the decision PR)', () =>
     };
   }
 
-  /** A browser profile's storage, as the client reads and writes it. */
-  function profileStore(initial: string | null = null) {
-    const store = {
-      value: initial,
-      writes: 0,
-      get: () => store.value,
-      set: (value: string) => {
-        store.writes++;
-        store.value = value;
-      },
-    };
-    return store;
-  }
+  it('never spawns under auto, D3D11 included, and names no refusal for it', () => {
+    for (const [backend, renderer] of Object.entries(RENDERERS)) {
+      let spawned = 0;
+      resetShaderWarmForTest({
+        spawn: () => {
+          spawned++;
+          return fakeWorker();
+        },
+        search: '',
+        stored: 'auto',
+      });
+      armShaderWarm();
+      const decision = shaderWarmDecide(
+        backendContext(renderer),
+        GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+        false,
+      );
+      expect(decision).toEqual({ hold: false, bypass: 'mode-off' });
+      expect(spawned).toBe(0);
+      expect(shaderWarmSnapshot()).toMatchObject({
+        setting: 'auto',
+        mode: 'off',
+        backend,
+        worker: 'idle',
+        refusal: null,
+      });
+    }
+  });
 
-  function spawnCounter() {
-    const counter = {
-      spawned: 0,
+  it('still starts the worker for a player who stored the option On', () => {
+    let spawned = 0;
+    resetShaderWarmForTest({
       spawn: () => {
-        counter.spawned++;
+        spawned++;
         return fakeWorker();
       },
-    };
-    return counter;
-  }
-
-  it('puts a profile drawn off on the pre-worker path and names the arm as the refusal', () => {
-    const store = profileStore();
-    const counter = spawnCounter();
-    resetShaderWarmForTest({
-      spawn: counter.spawn,
       search: '',
-      stored: 'auto',
-      abStore: store,
-      random: () => 0.2,
+      stored: 'all',
     });
-    const decision = shaderWarmDecide(
-      backendContext(D3D11),
-      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      false,
-    );
-    expect(decision).toEqual({ hold: false, bypass: 'mode-off' });
-    expect(counter.spawned).toBe(0);
-    expect(store.value).toBe('off');
+    shaderWarmDecide(backendContext(RENDERERS.d3d11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    expect(shaderWarmSnapshot()).toMatchObject({ setting: 'all', mode: 'all', backend: 'd3d11' });
+    expect(spawned).toBe(1);
+    expect(shaderWarmAvailable()).toBe(true);
+  });
+
+  it('ignores an extension drift while no worker can run: nothing to retire, no cause named', () => {
+    // Every default session is one of these now. A cause stamped here would
+    // report a dead worker that never existed, and would keep a player who
+    // then turns the option On from getting one for the rest of the session.
+    resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
+    shaderWarmDecide(backendContext(RENDERERS.d3d11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    noteShaderWarmExtensionDrift('EXT_disjoint_timer_query_webgl2');
+    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'off', worker: 'idle', refusal: null });
+  });
+
+  it('still retires a running worker on an extension drift, and names the extension', () => {
+    const worker = fakeWorker();
+    resetShaderWarmForTest({ spawn: () => worker, search: '', stored: 'all' });
+    shaderWarmDecide(backendContext(RENDERERS.d3d11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+    noteShaderWarmExtensionDrift('EXT_disjoint_timer_query_webgl2');
     expect(shaderWarmSnapshot()).toMatchObject({
-      setting: 'auto',
-      mode: 'off',
-      backend: 'd3d11',
-      worker: 'idle',
-      abArm: 'off',
-      refusal: SHADER_WARM_AB_REFUSAL,
+      worker: 'dead',
+      refusal: 'extension-drift:EXT_disjoint_timer_query_webgl2',
     });
-  });
-
-  it('keeps the worker for a profile drawn on, with no refusal', () => {
-    const store = profileStore();
-    const counter = spawnCounter();
-    resetShaderWarmForTest({
-      spawn: counter.spawn,
-      search: '',
-      stored: 'auto',
-      abStore: store,
-      random: () => 0.7,
-    });
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(counter.spawned).toBe(1);
-    expect(store.value).toBe('on');
-    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'all', abArm: 'on', refusal: null });
-  });
-
-  it('reads the stored arm on a later launch without drawing again', () => {
-    const store = profileStore('off');
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '',
-      stored: 'auto',
-      abStore: store,
-      random: () => {
-        throw new Error('drew again');
-      },
-    });
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(store.writes).toBe(0);
-    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'off', abArm: 'off' });
-  });
-
-  it('never draws for an explicit setting or a backend auto leaves off', () => {
-    const explicit = profileStore('off');
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '?shaderwarm=all',
-      stored: 'auto',
-      abStore: explicit,
-      random: () => 0.2,
-    });
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'all', abArm: null, refusal: null });
-    expect(explicit.writes).toBe(0);
-
-    const opengl = profileStore();
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '',
-      stored: 'auto',
-      abStore: opengl,
-      random: () => 0.2,
-    });
-    shaderWarmDecide(backendContext(OPENGL), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ mode: 'off', abArm: null, refusal: null });
-    expect(opengl.writes).toBe(0);
-  });
-
-  it('follows the player out of the experiment and back into the stored arm', () => {
-    let stored = 'auto';
-    setShaderWarmStoredSettingSource(() => stored);
-    try {
-      const store = profileStore();
-      const counter = spawnCounter();
-      resetShaderWarmForTest({
-        spawn: counter.spawn,
-        search: '',
-        abStore: store,
-        random: () => 0.2,
-      });
-      shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-      expect(shaderWarmSnapshot()).toMatchObject({ abArm: 'off', refusal: SHADER_WARM_AB_REFUSAL });
-
-      // An explicit On leaves the experiment: the arm no longer applies.
-      stored = 'all';
-      noteShaderWarmSettingChanged();
-      expect(shaderWarmSnapshot()).toMatchObject({ mode: 'all', abArm: null, refusal: null });
-      shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-      expect(counter.spawned).toBe(1);
-
-      // Back to Auto: the profile's arm, not a new draw.
-      stored = 'auto';
-      noteShaderWarmSettingChanged();
-      expect(shaderWarmSnapshot()).toMatchObject({
-        mode: 'off',
-        abArm: 'off',
-        worker: 'idle',
-        refusal: SHADER_WARM_AB_REFUSAL,
-      });
-      expect(store.writes).toBe(1);
-    } finally {
-      setShaderWarmStoredSettingSource(() => null);
-    }
-  });
-
-  it('keeps the arm token on the refusal column across a renderer swap', () => {
-    // Between a dispose and the next context read the backend is unknown; a
-    // beacon sent then must still name the off arm on the typed column.
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '',
-      stored: 'auto',
-      abStore: profileStore(),
-      random: () => 0.2,
-    });
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    disposeShaderWarm();
-    expect(shaderWarmSnapshot()).toMatchObject({ abArm: 'off', refusal: SHADER_WARM_AB_REFUSAL });
-    // A rebuild that lands on a backend auto leaves off is out of the experiment.
-    shaderWarmDecide(backendContext(OPENGL), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ abArm: null, refusal: null });
-  });
-
-  it('keeps the drawn arm in the profile storage under its key, and reads it back', () => {
-    // The experiment rests on one draw per profile: the page default store
-    // must write the arm where the next launch reads it.
-    const saved = new Map<string, string>();
-    const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      value: {
-        getItem: (key: string) => saved.get(key) ?? null,
-        setItem: (key: string, value: string) => {
-          saved.set(key, value);
-        },
-      },
-    });
-    try {
-      resetShaderWarmForTest({
-        spawn: () => fakeWorker(),
-        search: '',
-        stored: 'auto',
-        abStore: undefined,
-        random: () => 0.2,
-      });
-      shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-      expect(saved.get('woc.shaderWarm.abArm')).toBe('off');
-
-      // The next launch draws the other way, and reads the stored arm instead.
-      resetShaderWarmForTest({
-        spawn: () => fakeWorker(),
-        search: '',
-        stored: 'auto',
-        abStore: undefined,
-        random: () => 0.9,
-      });
-      shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-      expect(shaderWarmSnapshot().abArm).toBe('off');
-    } finally {
-      if (original) Object.defineProperty(globalThis, 'localStorage', original);
-      else delete (globalThis as { localStorage?: unknown }).localStorage;
-    }
-  });
-
-  it('keeps the arm token when the game context later enables an extension', () => {
-    // The worker never ran in the off arm, so there is nothing to retire; the
-    // drift must not overwrite the one token that says which arm this is.
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '',
-      stored: 'auto',
-      abStore: profileStore(),
-      random: () => 0.2,
-    });
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    noteShaderWarmExtensionDrift('webgl_lose_context');
-    expect(shaderWarmSnapshot()).toMatchObject({ abArm: 'off', refusal: SHADER_WARM_AB_REFUSAL });
-  });
-
-  it('never throws out of a gate when the storage property itself throws', () => {
-    // Where site data is blocked, reading `localStorage` off the global throws
-    // before any method call.
-    const original = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
-    Object.defineProperty(globalThis, 'localStorage', {
-      configurable: true,
-      get() {
-        throw new Error('SecurityError');
-      },
-    });
-    try {
-      expect(() => {
-        resetShaderWarmForTest({
-          spawn: () => fakeWorker(),
-          search: '',
-          stored: 'auto',
-          abStore: undefined,
-          random: () => 0.2,
-        });
-        shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-      }).not.toThrow();
-      expect(shaderWarmSnapshot()).toMatchObject({ abArm: 'off', refusal: SHADER_WARM_AB_REFUSAL });
-    } finally {
-      if (original) Object.defineProperty(globalThis, 'localStorage', original);
-      else delete (globalThis as { localStorage?: unknown }).localStorage;
-    }
-  });
-
-  it('keeps the page load draw across renderer rebuilds when storage refuses', () => {
-    // Drawn again at every rebuild, a blocked profile could change arm in the
-    // middle of a session and land in both halves of the comparison.
-    const draws = [0.2, 0.7, 0.7];
-    let calls = 0;
-    const blocked = {
-      get: (): string | null => {
-        throw new Error('blocked');
-      },
-      set: () => {
-        throw new Error('blocked');
-      },
-    };
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '',
-      stored: 'auto',
-      abStore: blocked,
-      random: () => draws[calls++] ?? 0.7,
-    });
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot().abArm).toBe('off');
-    disposeShaderWarm();
-    expect(shaderWarmSnapshot().abArm).toBe('off');
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ abArm: 'off', refusal: SHADER_WARM_AB_REFUSAL });
-    expect(calls).toBe(1);
-  });
-
-  it('reads the profile storage only where a draw can happen', () => {
-    // A masked renderer string reads as an unknown backend at every policy
-    // call, which is every gate: no storage read belongs there.
-    let reads = 0;
-    resetShaderWarmForTest({
-      spawn: () => fakeWorker(),
-      search: '',
-      stored: 'auto',
-      abStore: {
-        get: () => {
-          reads++;
-          return null;
-        },
-        set: () => {},
-      },
-      random: () => 0.7,
-    });
-    for (let gate = 0; gate < 5; gate++) {
-      shaderWarmDecide(backendContext(''), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    }
-    expect(reads).toBe(0);
-    shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(reads).toBe(1);
-  });
-
-  it('still draws when the profile storage refuses, once per page load', () => {
-    const counter = spawnCounter();
-    resetShaderWarmForTest({
-      spawn: counter.spawn,
-      search: '',
-      stored: 'auto',
-      abStore: {
-        get: () => {
-          throw new Error('blocked');
-        },
-        set: () => {
-          throw new Error('blocked');
-        },
-      },
-      random: () => 0.2,
-    });
-    const decision = shaderWarmDecide(
-      backendContext(D3D11),
-      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
-      false,
-    );
-    expect(decision).toEqual({ hold: false, bypass: 'mode-off' });
-    expect(shaderWarmSnapshot()).toMatchObject({ abArm: 'off', refusal: SHADER_WARM_AB_REFUSAL });
-    expect(counter.spawned).toBe(0);
+    expect(shaderWarmAvailable()).toBe(false);
   });
 });
 
@@ -2342,7 +2063,7 @@ describe('what the readout adds up while gates hold', () => {
     worker().emit({ kind: 'warmed', id: 2, linkMs: 500 });
     await flush();
     clock = 2_000;
-    expect(shaderWarmSnapshot()).toMatchObject({ holdWallMs: 500, releases: 0, abArm: null });
+    expect(shaderWarmSnapshot()).toMatchObject({ holdWallMs: 500, releases: 0 });
   });
 });
 
@@ -2359,18 +2080,18 @@ describe('the backend class follows the renderer across rebuilds', () => {
     };
   }
 
-  it('reads again while the class is unknown, so one lost read never latches OFF', () => {
+  it('reads again while the class is unknown, so one lost read never latches', () => {
     resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
     shaderWarmDecide(backendContext(null), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'unknown', mode: 'off' });
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'unknown' });
     shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'all' });
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11' });
   });
 
-  it('forgets the class on dispose, so a rebuilt renderer on software reads OFF', () => {
+  it('forgets the class on dispose, so a rebuilt renderer reads its own', () => {
     resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '', stored: 'auto' });
     shaderWarmDecide(backendContext(D3D11), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
-    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11', mode: 'all' });
+    expect(shaderWarmSnapshot()).toMatchObject({ backend: 'd3d11' });
     disposeShaderWarm();
     expect(shaderWarmSnapshot()).toMatchObject({ backend: null, mode: 'off' });
     shaderWarmDecide(backendContext(WARP), GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
@@ -2456,14 +2177,52 @@ describe('the registered stored-option source', () => {
 });
 
 describe('whether the player is offered a shader warm-up choice at all', () => {
-  it('refuses the platform the mode resolver refuses, and offers it everywhere else', () => {
-    // The options window drops its row on the answer, so the rule has to be
-    // the resolver's own: iOS is off whatever the setting (a second WebGL2
-    // context is a per-process memory ceiling risk on phone-class WebKit),
-    // and Android keeps the explicit arm even though `auto` reads off there.
+  it('offers the row nowhere while the option is withdrawn', () => {
+    // The options window drops its row on the answer.
+    expect(SHADER_WARM_OPTION_OFFERED).toBe(false);
     expect(shaderWarmChoiceAvailable('ios')).toBe(false);
-    expect(shaderWarmChoiceAvailable('android')).toBe(true);
-    expect(shaderWarmChoiceAvailable('other')).toBe(true);
+    expect(shaderWarmChoiceAvailable('android')).toBe(false);
+    expect(shaderWarmChoiceAvailable('other')).toBe(false);
+  });
+
+  it('refuses the platform the mode resolver refuses once the option is offered again', () => {
+    // The rule has to be the resolver's own: iOS is off whatever the setting
+    // (a second WebGL2 context is a per-process memory ceiling risk on
+    // phone-class WebKit), and Android keeps the explicit arm even though
+    // `auto` reads off there.
+    expect(shaderWarmChoiceAvailable('ios', true)).toBe(false);
+    expect(shaderWarmChoiceAvailable('android', true)).toBe(true);
+    expect(shaderWarmChoiceAvailable('other', true)).toBe(true);
+  });
+
+  it('reads a registered store as auto while the row is withdrawn: nobody can undo an On', () => {
+    setShaderWarmStoredSettingSource(() => 'all');
+    try {
+      let spawned = 0;
+      resetShaderWarmForTest({
+        spawn: () => {
+          spawned++;
+          return fakeWorker();
+        },
+        search: '',
+      });
+      armShaderWarm();
+      shaderWarmDecide(contextStub(GRANTED).context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+      expect(shaderWarmSnapshot()).toMatchObject({ setting: 'auto', mode: 'off', worker: 'idle' });
+      expect(spawned).toBe(0);
+      // The corpus arm still sees what the player stored.
+      expect(storedShaderWarmSetting()).toBe('all');
+      // The query pin is the way in.
+      resetShaderWarmForTest({ spawn: () => fakeWorker(), search: '?shaderwarm=all' });
+      expect(shaderWarmSnapshot()).toMatchObject({ setting: 'all', mode: 'all' });
+    } finally {
+      setShaderWarmStoredSettingSource(() => null);
+    }
+  });
+
+  it('keeps an entry that registered no store OFF, never auto', () => {
+    resetShaderWarmForTest({ search: '' });
+    expect(shaderWarmSnapshot().setting).toBe('off');
   });
 });
 

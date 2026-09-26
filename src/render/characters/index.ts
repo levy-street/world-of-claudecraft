@@ -27,7 +27,11 @@ export type { AssembleOptions } from './assets';
 export { type LookPiecesStats, lookPiecesStats } from './look_pieces';
 export { npcLookFor } from './npc_looks';
 export { CharacterPreview } from './preview';
-export type { PreviewAppearance } from './preview_appearance';
+export {
+  type AppearancePreviewRow,
+  type PreviewAppearance,
+  previewAppearanceForRow,
+} from './preview_appearance';
 export type { PreviewFramingName } from './preview_framing';
 export type { AnimState, FarBakeGate } from './visual';
 export { CharacterVisual, setWeaponVfxViewportHeight } from './visual';

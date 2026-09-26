@@ -60,6 +60,7 @@ export const TERRAIN_APPLIER = {
   provingCoast: 34,
   provingMoat: 35,
   gardenwalkWestPass: 36,
+  thornpeakPocketGrade: 37,
 } as const;
 
 function bounds(minX: number, maxX: number, minZ: number, maxZ: number): TerrainRegionBounds {
@@ -120,6 +121,10 @@ export const TERRAIN_APPLIER_BOUNDS: readonly (readonly TerrainRegionBounds[] | 
   // x-falloff (centered ON the border, STRIP_MAX_X 180) are both fully zero
   // outside this box.
   [bounds(122, 238, 748, 852)],
+  // The Thornpeak hillside pocket grade (applyThornpeakPocketGrade): its
+  // rOut 11 disk around (-67.5, 629), exactly THORNPEAK_POCKET_GRADE_BOUNDS
+  // (tests/thornpeak_hillside_pocket.test.ts pins the two against drift).
+  [bounds(-78.5, -56.5, 618, 640)],
 ];
 
 interface MutableCell {

@@ -1,18 +1,34 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
+import type { PrewarmResumeUnit } from '../prewarm_resume';
 import { sceneKeyLightUniform } from '../scene_sampling';
+import type { CrestPrewarmHost } from './crest_prewarm';
+import { GuardPrewarm } from './guard_prewarm';
 import { type FragmentKind, fragmentGeometry } from './production_assets';
 import { warriorFragmentShape } from './warrior_fragment_shape';
 import { warriorMetalEjecta } from './warrior_impact_material';
 
 const PER_KIND = 32;
 const KINDS = ['ice_shard', 'stone_chip', 'metal_splinter'] as const;
+const PREPARATION_STEPS = ['compile', 'touch', 'upload'] as const;
 interface Batch {
   mesh: THREE.Mesh<THREE.InstancedBufferGeometry, THREE.ShaderMaterial>;
   ends: Float64Array;
+  preparation: GuardPrewarm;
 }
 /** Three capped solid draws. Faceted models are prepared offline; trajectories,
- * tumbling, a single damped bounce and shrink-out run entirely on the GPU. */
+ * tumbling, a single damped bounce and shrink-out run entirely on the GPU.
+ * The pool is built at boot, before the Warrior kit's demand load lands the
+ * fragment geometry, so each batch is built and prepared by the kit recipe
+ * (`units`); a kind whose preparation has not uploaded never spawns. */
 export class SolidImpactFragments {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private readonly batches = new Map<FragmentKind, Batch>();
   private readonly color = new THREE.Color();
   private time = 0;
@@ -20,37 +36,68 @@ export class SolidImpactFragments {
   private readonly fracturedShape = { x: 1, y: 1, z: 1, tint: 1, lift: 1 };
   private readonly metalShape = { x: 1, y: 1, z: 1, speed: 1, lift: 1, tint: 1 };
   private disposed = false;
-  constructor(scene: THREE.Scene) {
+  constructor(private readonly scene: THREE.Scene) {}
+  units(host: CrestPrewarmHost): PrewarmResumeUnit[] {
+    if (this.disposed) return [];
+    const units: PrewarmResumeUnit[] = [];
     for (const kind of KINDS) {
-      const source = fragmentGeometry(kind);
-      if (!source) continue;
-      const geometry = new THREE.InstancedBufferGeometry();
-      geometry.setAttribute('position', source.getAttribute('position').clone());
-      geometry.setAttribute('normal', source.getAttribute('normal').clone());
-      if (source.index) geometry.setIndex(source.index.clone());
-      for (const name of ['aOrigin', 'aVelocity', 'aTint'])
-        geometry.setAttribute(
-          name,
-          new THREE.InstancedBufferAttribute(new Float32Array(PER_KIND * 3), 3).setUsage(
-            THREE.DynamicDrawUsage,
-          ),
-        );
-      for (const name of ['aLife', 'aShape'])
-        geometry.setAttribute(
-          name,
-          new THREE.InstancedBufferAttribute(new Float32Array(PER_KIND * 4), 4).setUsage(
-            THREE.DynamicDrawUsage,
-          ),
-        );
-      geometry.instanceCount = PER_KIND;
-      const material = new THREE.ShaderMaterial({
-        uniforms: {
-          uSun: sceneKeyLightUniform(scene),
-          uTime: { value: 0 },
-          uMotion: { value: 1 },
-          uCrystal: { value: kind === 'ice_shard' ? 1 : kind === 'metal_splinter' ? 0.5 : 0 },
-        },
-        vertexShader: `attribute vec3 aOrigin,aVelocity,aTint;attribute vec4 aLife,aShape;uniform float uTime,uMotion;uniform vec3 uSun;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;
+      if (this.batches.get(kind)?.preparation.ready()) continue;
+      units.push({ id: `fragment-build:${kind}`, synchronous: true, run: () => this.build(kind) });
+      for (const step of PREPARATION_STEPS)
+        units.push({
+          id: `fragment-${step}:${kind}`,
+          ...(step === 'compile' ? {} : { synchronous: true }),
+          run: () => this.prepare(kind, step, host),
+        });
+    }
+    return units;
+  }
+  private prepare(
+    kind: FragmentKind,
+    step: (typeof PREPARATION_STEPS)[number],
+    host: CrestPrewarmHost,
+  ): void | Promise<void> {
+    if (this.disposed) return;
+    const batch = this.batches.get(kind);
+    if (!batch) throw new Error(`Solid fragment ${kind} was not built`);
+    if (batch.preparation.ready()) return;
+    const unit = batch.preparation.units(host).find((u) => u.id === `guard-${step}`);
+    // A renamed carrier step must fail the recipe, never leave the kind cold
+    // while its unit reports success.
+    if (!unit) throw new Error(`Solid fragment ${kind} has no guard-${step} preparation unit`);
+    return unit.run();
+  }
+  private build(kind: FragmentKind): void {
+    if (this.disposed || this.batches.has(kind)) return;
+    const source = fragmentGeometry(kind);
+    if (!source) throw new Error(`Warrior fragment geometry has not been loaded: ${kind}`);
+    const geometry = new THREE.InstancedBufferGeometry();
+    geometry.setAttribute('position', source.getAttribute('position').clone());
+    geometry.setAttribute('normal', source.getAttribute('normal').clone());
+    if (source.index) geometry.setIndex(source.index.clone());
+    for (const name of ['aOrigin', 'aVelocity', 'aTint'])
+      geometry.setAttribute(
+        name,
+        new THREE.InstancedBufferAttribute(new Float32Array(PER_KIND * 3), 3).setUsage(
+          THREE.DynamicDrawUsage,
+        ),
+      );
+    for (const name of ['aLife', 'aShape'])
+      geometry.setAttribute(
+        name,
+        new THREE.InstancedBufferAttribute(new Float32Array(PER_KIND * 4), 4).setUsage(
+          THREE.DynamicDrawUsage,
+        ),
+      );
+    geometry.instanceCount = PER_KIND;
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uSun: sceneKeyLightUniform(this.scene),
+        uTime: { value: 0 },
+        uMotion: { value: 1 },
+        uCrystal: { value: kind === 'ice_shard' ? 1 : kind === 'metal_splinter' ? 0.5 : 0 },
+      },
+      vertexShader: `attribute vec3 aOrigin,aVelocity,aTint;attribute vec4 aLife,aShape;uniform float uTime,uMotion;uniform vec3 uSun;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;
         void main(){float age=uTime-aLife.x;float life=aLife.y;float p=clamp(age/max(life,0.001),0.,1.);float live=step(0.,age)*(1.-step(life,age))*step(0.001,life);float t=age*uMotion;
           float gravity=12.;float floorY=aShape.w;float fall=aOrigin.y-floorY;float hit=(aVelocity.y+sqrt(max(0.,aVelocity.y*aVelocity.y+2.*gravity*fall)))/gravity;
           float after=max(0.,t-hit);float bounceV=0.24*max(0.,gravity*hit-aVelocity.y);
@@ -62,22 +109,22 @@ export class SolidImpactFragments {
           vec4 view=modelViewMatrix*vec4(aOrigin+travel+local,1.);vNormal=normalize(normalMatrix*rot*(normal/max(aShape.xyz,vec3(0.001))));vView=-view.xyz;vTint=aTint;vLight=mat3(viewMatrix)*uSun;vFade=live;gl_Position=projectionMatrix*view;
           if(live<0.5)gl_Position=vec4(2.,2.,2.,1.);
         }`,
-        fragmentShader: `uniform float uCrystal;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;void main(){if(vFade<0.5)discard;vec3 n=normalize(vNormal);vec3 light=normalize(vLight);float diffuse=0.24+0.76*max(0.,dot(n,light));float fresnel=pow(max(0.,1.-abs(dot(n,normalize(vView)))),3.);float spec=pow(max(0.,dot(reflect(-light,n),normalize(vView))),38.);vec3 colour=vTint*diffuse+vec3(0.75,0.9,1.)*(spec*(0.22+uCrystal*0.7)+fresnel*uCrystal*0.26);gl_FragColor=vec4(colour,1.);
+      fragmentShader: `uniform float uCrystal;varying vec3 vNormal,vView,vTint,vLight;varying float vFade;void main(){if(vFade<0.5)discard;vec3 n=normalize(vNormal);vec3 light=normalize(vLight);float diffuse=0.24+0.76*max(0.,dot(n,light));float fresnel=pow(max(0.,1.-abs(dot(n,normalize(vView)))),3.);float spec=pow(max(0.,dot(reflect(-light,n),normalize(vView))),38.);vec3 colour=vTint*diffuse+vec3(0.75,0.9,1.)*(spec*(0.22+uCrystal*0.7)+fresnel*uCrystal*0.26);gl_FragColor=vec4(colour,1.);
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
         }`,
-        depthWrite: true,
-        depthTest: true,
-        side: THREE.FrontSide,
-      });
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.name = `solidImpact:${kind}`;
-      mesh.userData.renderCategory = 'vfx';
-      mesh.visible = false;
-      mesh.frustumCulled = false;
-      scene.add(mesh);
-      this.batches.set(kind, { mesh, ends: new Float64Array(PER_KIND) });
-    }
+      depthWrite: true,
+      depthTest: true,
+      side: THREE.FrontSide,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = `solidImpact:${kind}`;
+    tagCastVfxKit(mesh);
+    mesh.visible = false;
+    mesh.frustumCulled = false;
+    this.scene.add(mesh);
+    const preparation = new GuardPrewarm(this.scene, mesh);
+    this.batches.set(kind, { mesh, ends: new Float64Array(PER_KIND), preparation });
   }
   burst(
     kind: FragmentKind,
@@ -95,7 +142,7 @@ export class SolidImpactFragments {
   ): number {
     if (this.disposed || ![x, y, z, count, power, dx, dz].every(Number.isFinite)) return 0;
     const batch = this.batches.get(kind);
-    if (!batch) return 0;
+    if (!batch?.preparation.ready() || !this.spawnGate.allows(CAST_VFX_KIT)) return 0;
     const g = batch.mesh.geometry;
     const origin = g.getAttribute('aOrigin') as THREE.InstancedBufferAttribute,
       velocity = g.getAttribute('aVelocity') as THREE.InstancedBufferAttribute,
@@ -194,11 +241,23 @@ export class SolidImpactFragments {
     if (this.disposed) return;
     this.disposed = true;
     this.clear();
+    // One failing step (a carrier cleanup throws an AggregateError) must not
+    // strand the remaining batches' GPU buffers: finish, then report them all.
+    const errors: unknown[] = [];
+    const release = (work: () => void) => {
+      try {
+        work();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
     for (const b of this.batches.values()) {
-      b.mesh.removeFromParent();
-      b.mesh.geometry.dispose();
-      b.mesh.material.dispose();
+      release(() => b.preparation.dispose());
+      release(() => b.mesh.removeFromParent());
+      release(() => b.mesh.geometry.dispose());
+      release(() => b.mesh.material.dispose());
     }
     this.batches.clear();
+    if (errors.length) throw new AggregateError(errors, 'Solid fragment cleanup failed');
   }
 }

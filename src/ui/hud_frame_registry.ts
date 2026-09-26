@@ -32,6 +32,7 @@ export function registerHudFrames(deps: {
     const mover = new MovableFrame({
       frame,
       storageKey: spec.storageKey,
+      legacyStorageKeys: spec.legacyStorageKeys,
       snapToGrid: deps.snapToGrid,
       unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
       lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
@@ -40,7 +41,7 @@ export function registerHudFrames(deps: {
       draggingBodyClass: 'hud-frame-dragging',
       fallbackSize: spec.fallbackSize,
       isMobileLayout: deps.isMobileLayout,
-      scalable: true,
+      scalable: spec.scalable ?? true,
       resizeMode: dimensions ? 'dimensions' : spec.resizeMode,
       dimensions,
       moveHandle: spec.id === 'damageMeter' ? '#meters-window' : undefined,

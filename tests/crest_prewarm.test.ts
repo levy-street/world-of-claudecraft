@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { expect, it, vi } from 'vitest';
 import { CrestPrewarm } from '../src/render/ability_vfx/crest_prewarm';
 import { buildFuryCutShape } from '../src/render/ability_vfx/fury_shapes';
+import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import * as productionAssets from '../src/render/ability_vfx/production_assets';
 import { SignatureCrests } from '../src/render/ability_vfx/signature_crests';
 
@@ -264,4 +265,105 @@ it('shares an in-flight compile between selected-kit preparation and the ordinar
   prep.dispose();
   geometry.dispose();
   material.dispose();
+});
+
+// The pool is built at boot, before the kit's demand load, so its getters read
+// null there. The kit recipe (the renderer's `geometry` host arm) is what must
+// hand every slot the landed textures, before a carrier draw can call it ready.
+function kitRecipe(crests: SignatureCrests) {
+  const empty = { units: () => [] };
+  const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
+  Object.assign(fx, {
+    crests,
+    guards: empty,
+    powerForms: empty,
+    spiritHammers: empty,
+    furyStates: empty,
+    baked: empty,
+    fragments: empty,
+  });
+  return fx;
+}
+
+function liveSlots(scene: THREE.Scene) {
+  return scene.children.filter((child) => child.name === 'signatureCrest') as THREE.Mesh<
+    THREE.BufferGeometry,
+    THREE.ShaderMaterial
+  >[];
+}
+
+it('binds the demand-loaded Warrior textures to every boot-built slot before a crest is ready', async () => {
+  const scene = new THREE.Scene();
+  const crests = new SignatureCrests(scene);
+  const slots = liveSlots(scene);
+  expect(slots).toHaveLength(8);
+  for (const mesh of slots) {
+    for (const name of ['uPressureMap', 'uBloodMap', 'uSteelMap', 'uRockMap'])
+      expect(mesh.material.uniforms[name].value).toBeNull();
+  }
+  const kit = {
+    uPressureMap: new THREE.Texture(),
+    uBloodMap: new THREE.Texture(),
+    uSteelMap: new THREE.Texture(),
+    uRockMap: new THREE.Texture(),
+  };
+  const sources = [
+    vi.spyOn(productionAssets, 'warriorPressureTexture').mockReturnValue(kit.uPressureMap),
+    vi.spyOn(productionAssets, 'warriorBloodTexture').mockReturnValue(kit.uBloodMap),
+    vi.spyOn(productionAssets, 'warriorSteelTexture').mockReturnValue(kit.uSteelMap),
+    vi.spyOn(productionAssets, 'warriorRockTexture').mockReturnValue(kit.uRockMap),
+  ];
+  const versions = slots.map((mesh) => mesh.material.version);
+  const draw = vi.fn((_group: THREE.Group, child: THREE.Object3D) => {
+    const material = (child as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>).material;
+    for (const [name, texture] of Object.entries(kit))
+      expect(material.uniforms[name].value).toBe(texture);
+  });
+  try {
+    const kinds = ['blood_cut', 'steel_chop', 'iron_quake'] as const;
+    for (const unit of kitRecipe(crests).authoredPrewarmUnits(
+      { properties, compile: async () => {}, draw },
+      kinds,
+    ))
+      await unit.run();
+    expect(draw).toHaveBeenCalledTimes(kinds.length);
+    for (const kind of kinds) expect(crests.preparation.ready(kind)).toBe(true);
+    for (const mesh of slots)
+      for (const [name, texture] of Object.entries(kit))
+        expect(mesh.material.uniforms[name].value).toBe(texture);
+    // Sampler values ride the uniform upload: the one program is never
+    // re-requested, so the bind can link no second variant live.
+    expect(slots.map((mesh) => mesh.material.version)).toEqual(versions);
+    expect(crests.spawn(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'steel_chop')).toBe(true);
+    const spawned = slots.find((mesh) => mesh.visible);
+    expect(spawned?.material.uniforms.uSteelMap.value).toBe(kit.uSteelMap);
+    // Everything is prepared: a later recipe has nothing left to bind.
+    expect(
+      kitRecipe(crests).authoredPrewarmUnits({ properties, compile: async () => {}, draw }, kinds),
+    ).toEqual([]);
+  } finally {
+    for (const source of sources) source.mockRestore();
+    crests.dispose();
+    for (const texture of Object.values(kit)) texture.dispose();
+  }
+});
+
+it('keeps an authored crest cold when the kit textures are still absent at its bind', async () => {
+  const scene = new THREE.Scene();
+  const crests = new SignatureCrests(scene);
+  const draw = vi.fn();
+  try {
+    const units = kitRecipe(crests).authoredPrewarmUnits(
+      { properties, compile: async () => {}, draw },
+      ['steel_chop'],
+    );
+    await expect(async () => {
+      for (const unit of units) await unit.run();
+    }).rejects.toThrow('Warrior crest textures');
+    expect(draw).not.toHaveBeenCalled();
+    expect(crests.preparation.ready('steel_chop')).toBe(false);
+    expect(crests.spawn(0, 0, 0, 1, 1, 0xffffff, 0xffffff, 'steel_chop')).toBe(false);
+  } finally {
+    crests.dispose();
+  }
 });

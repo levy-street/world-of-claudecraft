@@ -334,10 +334,10 @@ mutates the **same global chunk** CSM overwrites:
 `THREE.ShaderChunk.lights_fragment_begin`, via `patchPointLightFragmentChunk`
 in `src/render/point_light_shader_core.ts`. It is invoked from `initGfxTier`
 (`src/render/gfx.ts`) with the comment "install before any scene material
-compiles", because the pinned point-light pad budget
-(`pointLightPadCount` in `src/render/point_light_budget.ts`, and the light-pad
-loop in `src/render/renderer.ts`) keeps `numPointLights` constant by adding
-zero-intensity pads, and the shader guard is what makes those pads cheap.
+compiles", because the point-light carriers (`attachPointLightCarriers` in
+`src/render/point_light_carriers.ts`) keep `numPointLights` constant with a
+fixed set of lights packed live-first, and the shader's point loop stops at
+the first black carrier, which is what makes the idle ones cheap.
 
 Who wins depends on ordering, and both orders are bad:
 
@@ -356,7 +356,7 @@ Who wins depends on ordering, and both orders are bad:
   `getPointLightInfo(...)` and the point-light `RE_Direct(...)` still resolve
   to exactly one occurrence inside their search range, and the patch applies.
   But this arm is fragile by construction: `pinnedAnchor` throws
-  `Three r165 point-light chunk ... anchor changed` and takes the whole boot
+  `pinned three point-light chunk ... anchor changed` and takes the whole boot
   down if the fork ever drifts, and the fork is a hand-copied snapshot of a
   version-specific chunk that no test in this repo pins.
 
@@ -498,9 +498,9 @@ delicate machinery in the renderer.
 ### 5g. Graphics rebuild and light counting
 
 The point-light pinning is unaffected: CSM adds directional lights, and
-`GFX.maxPointLights` (`src/render/gfx.ts`), the pad loop in the renderer, and
-`pointLightPadCount` (`src/render/point_light_budget.ts`) all count point
-lights. The invariant they protect (a constant light count so materials never
+`GFX.maxPointLights` (`src/render/gfx.ts`) and the carriers
+(`attachPointLightCarriers`, `src/render/point_light_carriers.ts`) count point
+lights only. The invariant they protect (a constant light count so materials never
 recompile mid-travel) is intact for point lights.
 
 The directional side is a new instance of that same invariant, and it holds

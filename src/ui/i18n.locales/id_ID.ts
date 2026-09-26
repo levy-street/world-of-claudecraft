@@ -13508,7 +13508,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'Selama 8 dtk, pukulan musuh berikutnya terhadapmu dijawab: hingga {buff} kerusakan ditolak dan dikembalikan kepada penyerang sebagai kerusakan Suci, dan kamu memperoleh 1 Pengabdian. Hanya satu pukulan yang dijawab. Kenaikan menaikkan jumlah yang dapat dijawab sebesar 50%.',
   'entities.abilities.final_edict.description':
-    'Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan Suci di sekitarmu.',
+    'Melancarkan serangan senjata yang menghancurkan dan menghasilkan 1 Pengabdian saat memberi kerusakan. Pukulan yang berhasil memangkas sisa jeda Runtuhnya Fajar sebesar 2 dtk. Serangan otomatis yang berhasil dan pukulan Titah Terakhir berpeluang 15% memberi Murka Fajar selama 8 dtk. Kenaikan juga melepaskan ledakan di sekitarmu yang memberi kerusakan Fisik.',
   'entities.abilities.grace_devotion.description':
     'Kamu dan anggota kelompok memulihkan 15 mana tiap 5 dtk dan membayar 3% lebih sedikit mana selama 30 mnt. Menggantikan Pengabdian Berseri atau Fajarmu sendiri, tetapi berdampingan dengan Pengabdian paladin lain.',
   'entities.abilities.guardian_covenant.description':
@@ -15215,9 +15215,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Serangan Ujung Terselubung Anda menghasilkan tiga kali lipat kerusakan, bukan dua kali lipat.',
   'entities.itemSets.ashveil.name': 'Busana Selubung Abu',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Penyelamatan Kewaspadaan Serafim menyembuhkan 270, naik dari 180. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
+    'Memulihkan kesehatan dengan Doa Berbisik, Doa Khidmat, atau Doa Mendesak meningkatkan penyembuhan Penyembuhan Koor berikutnya sebesar 10%, hingga 3 tumpukan. Setiap perapalan memberikan paling banyak satu tumpukan. Penyembuhan Koor menghabiskan semua tumpukan setelah selesai dirapal. Kerusakan yang diterima tidak lagi menunda perapalan mantra.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Saat Kewaspadaan Serafim terpicu, sekutunya juga dipulihkan sebesar 15 persen dari kesehatan maksimum mereka selama 10 detik.',
+    'Menyelesaikan Penyembuhan Koor dengan 3 tumpukan membuat Doa Berbisik berikutnya yang digunakan dalam 60 detik menjadi instan dan meningkatkan penyembuhannya sebesar 100%. Efek ini tidak dapat ditumpuk; memperolehnya lagi memperbarui durasinya.',
   'entities.itemSets.benison_dawnweave.name': 'Tenunan Fajar Berkah',
   'entities.itemSets.chronoweave.bonus2':
     'Gema Temporal mengubah 50 persen kerusakan Arkana satu target Anda menjadi penyembuhan. Kerusakan yang diterima tidak lagi menunda perapalan mantra Anda.',
@@ -17458,4 +17458,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Edit Frames juga melonggarkan panel Dialog, yang membawa kalimat lisan NPC saat NPC tersebut berada di luar pandangan Anda; ia memakai chip namanya saat longgar.',
   'guide.settingsPage.keybindsWheelBody':
     'Roda itu sendiri juga mengikat. Zoom Camera In dan Zoom Camera Out adalah binding biasa yang diletakkan di roda kosong secara default, jadi Anda dapat memindahkannya ke Ctrl plus roda, atau ke tombol, lalu memutar roda yang dibebaskan untuk mengaktifkan slot bilah tindakan. Takik roda tidak memiliki pelepasan, sehingga tidak dapat menggerakkan tindakan yang ditahan seperti bergerak maju.',
+  'guide.settingsPage.ifColorblindMode':
+    'Mewarnai ulang bahaya lantai Nythraxis (cincin hantaman Erupsi Kubur, genangan Api Kubur dan Api Jiwa, garis Api Kubur, serta tanda Sobekan Jiwa) ke palet ramah buta warna dengan rona dan kecerahan yang berbeda, sehingga lingkaran yang bertumpuk tetap memiliki tepi yang terlihat. Ukuran, penghitung waktu, dan posisi tidak berubah.',
+  'hud.options.colorblindMode': 'Mode Buta Warna',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

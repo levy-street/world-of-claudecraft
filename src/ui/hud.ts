@@ -53,7 +53,6 @@ import {
 } from '../sim/account_flair';
 import { isOwnAura } from '../sim/aura_classify';
 import { bagPools } from '../sim/bags';
-import { warriorParryChance } from '../sim/combat/warrior_hit_table';
 import { DEEDS } from '../sim/content/deeds';
 import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
@@ -165,7 +164,8 @@ import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import type { AuraOverlayController } from './aura_overlay_controller';
 import { auraOverlaySettingsHooks, mountAuraOverlay } from './aura_overlay_wiring';
-import { renderAuraTooltipBodyHtml } from './aura_tooltip';
+import type { AuraTooltipFooterDeps } from './aura_tooltip';
+import { auraTooltipFooterHtml, renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import {
   type AurasDeps,
@@ -194,6 +194,7 @@ import { castDisplayName } from './cast_display_name';
 import { charBagsPaired } from './char_bags_pairing_core';
 import { charSheetRefreshSigFor } from './char_sheet_sig_core';
 import { type CharSkinPainterHost, paintCharSkinPicker } from './char_skin_window';
+import { charStatModel } from './char_stat_model_core';
 import { archetypeTitleText, CharWindow, craftNameText } from './char_window';
 import { activeCharacterAppearancePreview } from './character_appearance';
 import { progressionHtml } from './character_progression_view';
@@ -244,6 +245,7 @@ import { hydrateCrestImageFallbacks } from './crest_image_fallback';
 import { DailyRewardsLauncherPoll } from './daily_rewards_launcher_core';
 import { DailyRewardsWindow, type StoreSpendResult } from './daily_rewards_window';
 import { DayNightDialPainter } from './day_night_dial_painter';
+import { DeathRecapDialog } from './death_recap_dialog';
 import { deathRecapFeedback } from './death_recap_feedback';
 import { decorativeArtImg } from './decorative_art';
 import { deedBorderSlug } from './deed_border_view';
@@ -301,6 +303,7 @@ import {
   type ErrorTextLockoutDeps,
   localizeErrorText as localizeErrorTextCore,
 } from './error_text_i18n_core';
+import { ErrorToastController } from './error_toast_controller';
 import { ERROR_LOG_CHAN, ERROR_LOG_COLOR, shouldMirrorErrorToast } from './error_toast_log';
 import { esc } from './esc';
 import { blockFctAmountText } from './fct_core';
@@ -330,6 +333,7 @@ import {
   shouldFloatHealLanding,
   shouldShowHealLanding,
 } from './heal_landing_feedback_core';
+import { heldLootWarningText } from './held_loot_warning_view';
 import { honorFloatText } from './honor_float_view';
 import { ActionBarBindController } from './hud/action_bar/action_bar_bind_controller';
 import {
@@ -359,10 +363,10 @@ import {
 } from './hud/action_bar/action_bar_view';
 import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
 import {
-  abilityStartsAutoAttack,
   confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
+  pressStartsAutoAttack,
 } from './hud/action_bar/attack_on_ability';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
@@ -659,6 +663,7 @@ import { ReannounceMarker } from './live_region_reannounce';
 import { chatBubbleKind, isCombatFlavorLog } from './log_event_route';
 import { lootQualityReceiptBody } from './loot_quality_receipt';
 import { lootQualityAriaName } from './loot_quality_view';
+import { lootRollWinBanner } from './loot_roll_win_view';
 import { lowHealthVignette } from './low_health';
 import { type LowResourceView, lowResourceViewInto } from './low_resource';
 import { mailIndicatorView } from './mailbox_view';
@@ -763,11 +768,8 @@ import {
   streamerMenuActions,
 } from './player_context_menu';
 import { playerPortraitSubject, portraitUpdateFrames } from './player_portrait_core';
-import {
-  type PlayerTooltipI18n,
-  type PlayerTooltipModel,
-  playerTooltipHtml,
-} from './player_tooltip_view';
+import { playerHoverTooltipHtml } from './player_tooltip';
+import { playerTooltipKey } from './player_tooltip_view';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
 import {
   type PreviewPrewarmHandle,
@@ -858,14 +860,6 @@ import { openSimpleMenu } from './simple_context_menu';
 import { SocialWindow } from './social_window';
 import { SpellbookWindow } from './spellbook_window';
 import { stackSizeTooltipLine } from './stack_size_tooltip_view';
-import {
-  type BuffStatSource,
-  buildStatTooltip,
-  type GearStatSource,
-  type StatId,
-  type StatTooltipModel,
-  weaponDps,
-} from './stat_tooltip';
 import { type StatTooltipI18n, statCellHtml, statTooltipHtml } from './stat_tooltip_view';
 import { clearOpenStoreResult } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
@@ -895,11 +889,13 @@ import {
   paintMobTooltipBottomRight as paintMobTooltipBottomRightCore,
   paintTooltipAt as paintTooltipAtCore,
 } from './tooltip_paint';
+import { installTargetOfTargetControls } from './totarget_frame_controller';
 import { attachTouchFrameDrags, type TouchFrameDrags } from './touch_frame_drag';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
 import { bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
+import { trackerCollapseSettings } from './tracker_collapse_settings';
 import { wireTrackerHeader } from './tracker_header_wiring';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
 import { stageTradeOffer, tradeOfferHeadroom } from './trade_view';
@@ -913,6 +909,7 @@ import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from 
 import { UnitFramePainter } from './unit_frame_painter';
 import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
+import { resolveUnitTooltipSeat } from './unit_tooltip_seat';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
 import { vendorSellConfirmPolicyFrom } from './vendor_sell_confirm_policy';
@@ -1117,10 +1114,6 @@ const STAT_VIEW_DEPS: StatTooltipI18n = {
 };
 // Same i18n + number-formatting surface, handed to the pure mob-hover tooltip view.
 const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
-  t: (key, params) => t(key as TranslationKey, params),
-  fmt: (value, opts) => formatNumber(value, opts),
-};
-const PLAYER_TOOLTIP_VIEW_DEPS: PlayerTooltipI18n = {
   t: (key, params) => t(key as TranslationKey, params),
   fmt: (value, opts) => formatNumber(value, opts),
 };
@@ -1412,12 +1405,14 @@ export class Hud {
   private readonly itemDragState = new ItemDragState();
   private suppressNextActionClick = false;
   private optionsHooks: OptionsHooks | null = null;
+  // The world-quest board opener: opens the map and unfolds the atlas rail on
+  // the release's mapAtlasSidebarCollapsed preference (the toggle lives in
+  // the rail, src/ui/map_sidebar_controller.ts).
   private readonly mapSidebarCollapse = new MapSidebarCollapse({
-    window: $('#map-window'),
-    button: $('#map-sidebar-toggle'),
-    settings: () => this.optionsHooks?.settings ?? null,
-    onChange: () => this.updateMapWindow(),
+    settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
+    mapOpen: () => $('#map-window').style.display === 'block',
     openMap: () => this.toggleMap(),
+    onChange: () => this.updateMapWindow(),
   });
   private reportHooks: ReportHooks | null = null;
   private bugReportHooks: BugReportHooks | null = null;
@@ -1486,7 +1481,7 @@ export class Hud {
   // outside-click closer can defer to that opener's own toggle click. Cleared on
   // every close path (closeContextMenu + item activation).
   private ctxMenuOpener: HTMLElement | null = null;
-  private errorEl = $('#error-msg');
+  private errorToast = new ErrorToastController($('#error-msg'));
   private bannerEl = $('#banner');
   // The WoW-style quest-progress flash (quest_progress_banner.ts): yellow
   // top-center lines fed by the questProgress event, aria-hidden decoration
@@ -1508,7 +1503,6 @@ export class Hud {
   // The world entity whose hover tooltip is currently shown, so main.ts can call
   // its show method every frame without rebuilding unchanged HTML.
   private lastHoverTooltipId: string | null = null;
-  private errorTimer: number | undefined;
   private lastMirroredErrorText: string | undefined;
   private bannerTimer: number | undefined;
   // The hideBannerImmediately re-arm's own handle, kept so repeat hides
@@ -1657,6 +1651,8 @@ export class Hud {
   private partyFramesEl = $('#party-frames');
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
+  private deathRecapBtnEl = $('#death-recap-btn');
+  private deathRecapDialog!: DeathRecapDialog;
   private ghostPromptEl = $('#ghost-prompt');
   private resurrectionPromptEl: HTMLElement | null = null;
   private guildInvitePromptEl: HTMLElement | null = null;
@@ -2141,6 +2137,9 @@ export class Hud {
   private lastTargetFrameId: number | null = null;
   // Target-of-target frame throttle + identity tracking, the non-self cadence twins
   // of the target frame's fields above (see the showTargetOfTarget paint block).
+  // lastTotFrameId doubles as the frame's live SUBJECT for its click / menu /
+  // mouseover routes: a tot swap bypasses the throttle, so it is always whoever
+  // the frame is showing, and null the moment the frame paints hidden.
   private lastTotFramePaintAt = 0;
   private lastTotFrameId: number | null = null;
   // Title resolve elision for the target frame (the lastIcon pattern): the
@@ -2251,6 +2250,7 @@ export class Hud {
       uiScale: getUiScale,
       isMobileLayout: () => this.isMobileLayout(),
       storage: localStorage,
+      sendChat: (line) => this.sim.chat(line),
       // The meters' tab menu paints into the ONE shared #ctx-menu box through
       // the same seat/clamp/bind helpers every other HUD popup uses.
       openMenu: (items, x, y, onSelect) =>
@@ -2277,6 +2277,14 @@ export class Hud {
       tooltipVisibleFor: (el) =>
         this.tooltipOwner.current() === el && this.tooltipEl.style.display !== 'none',
       worldToScreen: (x, y, z) => this.renderer.worldToScreen(x, y, z),
+    });
+    this.deathRecapDialog = new DeathRecapDialog({
+      root: () => $('#death-recap-dialog'),
+      getLatestRecap: () => this.meters.getLatestDeathRecap(this.sim.playerId),
+      attachTooltip: (el, html) => this.attachTooltip(el, html),
+      hideTooltip: () => this.hideTooltip(),
+      previewResolvedAbility: (id) => this.previewResolvedAbility(id),
+      abilityTooltip: (res) => this.abilityTooltip(res),
     });
     this.targetAurasWindow = new TargetAurasWindow({
       root: $('#target-auras-window'),
@@ -2403,6 +2411,7 @@ export class Hud {
           this.confirmDialog(title, body, okText, cancelText, onOk),
         nowMs: () => Date.now(),
       },
+      settings: trackerCollapseSettings(() => this.optionsHooks, 'mapAtlasSidebarCollapsed'),
     });
     this.fiesta = new FiestaController({
       document,
@@ -2425,14 +2434,7 @@ export class Hud {
       element: $('#qt-body'),
       document,
       world: () => this.sim,
-      settings: {
-        available: () => this.optionsHooks !== null,
-        collapsed: () =>
-          (this.optionsHooks?.settings.get('questTrackerCollapsed') ?? false) === true,
-        setCollapsed: (collapsed) => {
-          this.optionsHooks?.settings.set('questTrackerCollapsed', collapsed);
-        },
-      },
+      settings: trackerCollapseSettings(() => this.optionsHooks, 'questTrackerCollapsed'),
       questTitle,
       objectiveLabel: questObjectiveLabel,
       click: () => audio.click(),
@@ -2738,6 +2740,9 @@ export class Hud {
       // Thornhollow Fields releases like the open world: the spirit rises in the keep
       // graveyard and waits for the wave (the sim routes the destination).
       this.sim.releaseSpirit();
+    });
+    bindTouchTap(this.deathRecapBtnEl, () => {
+      this.deathRecapDialog.toggle();
     });
     bindTouchTap(this.resurrectCorpseBtnEl, () => this.sim.resurrectAtCorpse());
     document.addEventListener('pointerdown', (ev) => {
@@ -3584,6 +3589,9 @@ export class Hud {
         // and the modal is removed (the profession-tutorial precedent).
         this.closeTutorialGreeting();
         break;
+      case 'death-recap-dialog':
+        this.deathRecapDialog.close();
+        break;
       case 'options-menu':
         this.closeOptions();
         break;
@@ -3935,6 +3943,20 @@ export class Hud {
           () => this.numericSetting('partyFrameScale') * this.partyFrameGrid().rows,
         ),
       },
+    });
+    // The target-of-target mini frame acts on its own unit like every other unit
+    // frame (select, unit menu, mouseover cast); the wiring lives in its own
+    // module. Its POSITION comes from the interface editor below, not a corner
+    // button of its own, which is why it takes no MovableFrame here.
+    installTargetOfTargetControls(this.totFrameEl, {
+      subjectId: () => this.lastTotFrameId,
+      onTarget: (id) => this.sim.targetEntity(id),
+      onMenu: (id, x, y) => this.openTargetFrameMenuAt(x, y, id),
+      onHover: (resolve) => {
+        this.hoveredCastUnit = resolve;
+      },
+      isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
+      isMobileLayout,
     });
     this.initInterfaceUnlock(isMobileLayout);
     this.touchFrameDrags = attachTouchFrameDrags(document, isMobileLayout);
@@ -4833,10 +4855,12 @@ export class Hud {
   // a pure USER toggle (party HP is actionable info), never influenced by
   // data-fx-level, reduce-motion, or the FPS governor.
   private partyCollapsed = loadPartyCollapsed();
-  // The party member the cursor is over (Clique-style mouseover casts): set by
-  // the party rows' mouseenter/mouseleave, read by castSlot to redirect friendly
-  // abilities to the hovered member. null whenever no frame is hovered.
-  private hoveredPartyPid: number | null = null;
+  // The unit the cursor is over (Clique-style mouseover casts): set by the party
+  // rows' and the target-of-target frame's mouseenter/mouseleave, read by
+  // castSlot to redirect friendly abilities onto it. A RESOLVER rather than an
+  // id, because the target-of-target frame's unit changes under a still cursor.
+  // null whenever no frame is hovered.
+  private hoveredCastUnit: (() => number | null) | null = null;
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -4852,7 +4876,7 @@ export class Hud {
       // Clique-style mouseover casts: castSlot redirects friendly abilities to
       // the hovered member while the cursor is over a party frame.
       onHover: (pid) => {
-        this.hoveredPartyPid = pid;
+        this.hoveredCastUnit = pid === null ? null : () => pid;
       },
       // A party member's pet is an ordinary targetable entity, so selecting it is
       // the same call the row itself makes, just with the pet's id.
@@ -4925,19 +4949,18 @@ export class Hud {
     // the un-prioritized layout instead of misattributing another caster's dot.
     isOwn: (a) => isOwnAura(a, this.sim.playerId),
   };
+  // Tooltip footer (countdown + optional "See who buffs" caster line, feature
+  // request): composed in aura_tooltip.ts over the target-aura window's resolver.
+  private readonly auraTooltipFooterDeps: AuraTooltipFooterDeps = {
+    secondsRemainingText: (s) => esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(s))),
+    showCaster: () => this.boolSetting('showAuraCaster'),
+    caster: (id) => targetAuraSourceName(id, (e) => this.sim.entities.get(e), entityDisplayName),
+    casterLineText: (name) => esc(t('hudChrome.auraTooltip.caster', { name })),
+  };
   private readonly aurasPainterDeps: AurasPainterDeps = {
     resolveIconUrl: resolveHudAuraIconUrl,
-    // A MODE aura (form, stance, stealth, Ghost Wolf, the carried flag) prints NO
-    // seconds-remaining line. The sim backs each with a long finite duration
-    // (3600s, or a whole match) purely so nothing can expire it; surfacing that
-    // number is the same lie the suppressed countdown label already avoids, and
-    // on the carried flag it would read as "the flag leaves me in 12 minutes".
-    renderTooltip: (name, remaining, effectHtml, toggle) =>
-      `<div class="tt-title">${esc(name)}</div>${effectHtml}${
-        toggle
-          ? ''
-          : `<div class="tt-sub">${esc(tPlural('hudChrome.plurals.secondsRemaining', Math.ceil(remaining)))}</div>`
-      }`,
+    renderTooltip: (name, remaining, effectHtml, toggle, sourceId) =>
+      `<div class="tt-title">${esc(name)}</div>${effectHtml}${auraTooltipFooterHtml(toggle, remaining, sourceId, this.auraTooltipFooterDeps)}`,
     attachTooltip: (el, html) => this.attachTooltip(el, html),
   };
   // Player auras split across two rows (classic layout): buffs in #buff-bar, debuffs in
@@ -5591,8 +5614,9 @@ export class Hud {
     hideTooltip: () => this.hideTooltip(),
     ...this.windowFocus('#char-window'),
     slotName: (slot) => itemSlotName(slot),
-    statCellHtml: (stat) => statCellHtml(this.statModel(stat), STAT_VIEW_DEPS, { colon: false }),
-    statTooltipHtml: (stat) => statTooltipHtml(this.statModel(stat), STAT_VIEW_DEPS),
+    statCellHtml: (stat) =>
+      statCellHtml(charStatModel(this.sim, stat), STAT_VIEW_DEPS, { colon: false }),
+    statTooltipHtml: (stat) => statTooltipHtml(charStatModel(this.sim, stat), STAT_VIEW_DEPS),
     progressionHtml: (level) => progressionHtml(this.sim, level),
     unequip: (slot) => {
       this.sim.unequipItem(slot);
@@ -6308,17 +6332,16 @@ export class Hud {
     return { w: window.innerWidth, h: window.innerHeight, scale: getUiScale() };
   }
 
-  // Anchors the mob-hover tooltip to a fixed viewport corner instead of the
-  // cursor. Desktop keeps the WoW default bottom-right slot; touch moves to the
-  // left of the minimap so selected enemy info does not cover the bottom action
-  // controls.
-  // Deliberately NOT tied to the player frame: that frame is player-movable
-  // (MovableFrame), and an anchor riding it wanders wherever the frame was dragged.
+  // Seats the world-hover tooltip on its movable Tooltip frame (desktop; stock
+  // seat the WoW bottom-right slot) or beside the minimap (touch), never the
+  // cursor; unit_tooltip_seat.ts resolves which. A hidden frame paints nothing
+  // and drops only a world card already up, never a cursor tooltip's box.
   private paintMobTooltipBottomRight(html: string): void {
-    const minimapRect = document.body.classList.contains('mobile-touch')
-      ? (document.getElementById('minimap-wrap')?.getBoundingClientRect() ?? null)
-      : null;
-    paintMobTooltipBottomRightCore(this.tooltipEl, html, this.tooltipViewport(), minimapRect);
+    const seat = resolveUnitTooltipSeat(document);
+    if (!seat.hidden) {
+      const view = this.tooltipViewport();
+      paintMobTooltipBottomRightCore(this.tooltipEl, html, view, seat.minimap, seat.readAnchor);
+    } else if (this.tooltipEl.classList.contains('mob-tooltip')) this.hideTooltip();
   }
 
   // Shows the WoW-style mouseover tooltip (name / level / creature type) for a
@@ -6370,20 +6393,13 @@ export class Hud {
     this.paintMobTooltipBottomRight(mobTooltipHtml(model, MOB_TOOLTIP_VIEW_DEPS));
   }
 
+  // The player hover card (title, guild, level and class, spec and role);
+  // player_tooltip_view.ts owns the key and the lines.
   showPlayerHoverTooltip(entity: Entity): void {
-    const playerClass = entity.templateId as PlayerClass;
-    const classLabel = CLASSES[playerClass] ? classDisplayName(playerClass) : entity.templateId;
-    const key = `player:${entity.id}:${entity.name}:${entity.level}:${entity.templateId}:${entity.guild}`;
+    const key = playerTooltipKey(entity);
     if (key === this.lastHoverTooltipId) return;
     this.lastHoverTooltipId = key;
-    const model: PlayerTooltipModel = {
-      name: entity.name,
-      classLabel,
-      classColor: classCss(playerClass),
-      level: entity.level,
-      guild: entity.guild,
-    };
-    this.paintMobTooltipBottomRight(playerTooltipHtml(model, PLAYER_TOOLTIP_VIEW_DEPS));
+    this.paintMobTooltipBottomRight(playerHoverTooltipHtml(entity));
   }
 
   // Clears a world-hover tooltip; a no-op if none is showing, so main.ts can
@@ -6753,53 +6769,6 @@ export class Hud {
     );
   }
 
-  // Build the pure stat-breakdown model for the currently-shown player, the bridge
-  // from the live sim to the host-agnostic stat_tooltip core. The HTML + aria
-  // rendering lives in the unit-tested stat_tooltip_view module; this only feeds
-  // it the current numbers, so the visual tooltip and the screen-reader text read
-  // identical, live values.
-  private statModel(stat: StatId): StatTooltipModel {
-    const sim = this.sim;
-    const p = sim.player;
-    const wpn = sim.equipment.mainhand ? ITEMS[sim.equipment.mainhand] : null;
-    // Equipped items + active auras feed the upstream "Made up of:" source
-    // breakdown; names resolve the same way the buff bar resolves them.
-    const gear: GearStatSource[] = [];
-    for (const id of Object.values(sim.equipment)) {
-      const item = id ? ITEMS[id] : null;
-      if (!item || (!item.stats && !item.spellPower)) continue;
-      gear.push({
-        name: itemDisplayName(item),
-        stats: item.stats,
-        spellPower: item.spellPower,
-      });
-    }
-    const buffs: BuffStatSource[] = p.auras.map((a) => ({
-      kind: a.kind,
-      value: a.value,
-      name: auraDisplayNameForHud(
-        a.name,
-        ABILITIES[a.id] ? abilityDisplayName(ABILITIES[a.id]) : null,
-      ),
-    }));
-    return buildStatTooltip(stat, {
-      cls: sim.cfg.playerClass,
-      stats: p.stats,
-      level: p.level,
-      attackPower: p.attackPower,
-      spellPower: p.spellPower,
-      critChance: p.critChance,
-      dodgeChance: p.dodgeChance,
-      critRating: p.critRating,
-      hasteRating: p.hasteRating,
-      hitRating: p.hitRating,
-      parryChance: sim.cfg.playerClass === 'warrior' ? warriorParryChance(p.stats.str) : 0,
-      dps: weaponDps(wpn?.weapon, p.attackPower),
-      gear,
-      buffs,
-    });
-  }
-
   private questProgressText(label: string, current: number, total: number): string {
     return t('questUi.detail.objectiveProgress', {
       label,
@@ -6902,6 +6871,7 @@ export class Hud {
     refreshHudFrameGroupLabels(document, HUD_FRAME_SPECS);
     this.doomMeter.relocalize();
     this.optionsWindow.relocalize();
+    this.meters.relocalize();
     // The Target dots frame's accessible name is written once in its painter's
     // constructor, so it is the one string in that frame a runtime language
     // switch would otherwise leave in the previous locale (the row text itself
@@ -7500,7 +7470,7 @@ export class Hud {
         } else {
           const mouseoverPid = this.focusTargets.castTarget(
             resolved.def,
-            this.hoveredPartyPid,
+            this.hoveredCastUnit?.() ?? null,
             this.optionsHooks?.settings.get('mouseoverCast') ?? true,
           );
           if (mouseoverPid !== null) {
@@ -7510,15 +7480,15 @@ export class Hud {
           }
           // Optional QoL: also engage auto-attack when the ability is an offensive
           // attack, so white swings start without a separate Attack press. Gated on
-          // the player setting; abilityStartsAutoAttack skips heals/buffs and CC the
-          // swing would shatter. hasAutoAttackTarget keeps requiresTarget:false AOEs
-          // from tripping "Invalid attack target" and covers PvP player targets that
-          // never carry the mob-only `hostile` flag.
+          // the player setting; pressStartsAutoAttack skips heals/buffs, CC the swing
+          // would shatter, and a party-frame redirect. hasAutoAttackTarget keeps
+          // requiresTarget:false AOEs from tripping "Invalid attack target" and covers
+          // PvP player targets that never carry the mob-only `hostile` flag.
           const tid = this.sim.player.targetId;
           const target = tid !== null ? (this.sim.entities.get(tid) ?? null) : null;
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
-            abilityStartsAutoAttack(resolved.effects) &&
+            pressStartsAutoAttack(resolved.effects, mouseoverPid !== null) &&
             hasAutoAttackTarget(target, isPvpHostileTargetId(this.sim, tid))
           ) {
             // A TIMED cast must not engage yet (the aggro-before-damage bug). The
@@ -9019,7 +8989,7 @@ export class Hud {
       ) {
         this.lastTargetFramePaintAt = now;
         this.lastTargetFrameId = target.id;
-        // entity.title is the Book of Deeds deed id on the identity wire
+        // entity.title is the title id (deed or 'dev:<rung>') on the identity wire
         // (players only; always null/absent for mobs and NPCs).
         const titleSig = `${getLanguage()}|${target.title ?? ''}`;
         if (titleSig !== this.lastTargetTitleSig) {
@@ -9406,7 +9376,10 @@ export class Hud {
     // (the wave is the one way back, enforced server-side too).
     const ghostInBgMatch = !!this.sim.bgInfo?.match;
     if (p.dead) syncDeathControllerHints(this.optionsHooks?.gamepad ?? null);
-    if (!p.dead) this.closeResurrectionPrompt();
+    if (!p.dead) {
+      this.closeResurrectionPrompt();
+      if (this.deathRecapDialog.isOpen()) this.deathRecapDialog.close();
+    }
     document.body.classList.toggle('spirit-mode', ghost);
     this.setDisplay(this.deathOverlayEl, p.dead && !ghost && !deadInArena ? 'flex' : 'none');
     this.setDisplay(this.ghostHintEl, ghost && !ghostInBgMatch ? 'block' : 'none');
@@ -10523,7 +10496,6 @@ export class Hud {
     this.mapLevel = defaultMapLevel(mapWindowMode(this.sim)); // own instance plan, else zone
     this.mapHoverZone = null;
     el.style.display = 'block';
-    this.mapSidebarCollapse.sync();
     this.updateMapWindow();
     this.syncAnyWindowOpenState();
   }
@@ -11526,6 +11498,10 @@ export class Hud {
         case 'comboPoint':
           break;
         case 'loot': {
+          const heldWarning = heldLootWarningText(ev.text);
+          if (heldWarning) this.errorToast.show(heldWarning, 7500, true);
+          const wonBanner = lootRollWinBanner(ev.text, sim.player?.name);
+          if (wonBanner) this.showBanner(...wonBanner);
           // callerLogs: a professions grant whose own result event (gatherResult
           // / fishingResult / craftResult / disenchantResult / salvageResult /
           // enchantResult) renders the player-visible line for this same grant,
@@ -14337,12 +14313,7 @@ export class Hud {
     logChannel = ERROR_LOG_CHAN,
     announceWhenFiltered = false,
   ): void {
-    this.errorEl.textContent = localized;
-    this.errorEl.style.opacity = '1';
-    clearTimeout(this.errorTimer);
-    this.errorTimer = window.setTimeout(() => {
-      this.errorEl.style.opacity = '0';
-    }, 1600);
+    this.errorToast.show(localized);
     audio.error();
     // Mirror into the chat log's system channel (the same one loot/level-up/death
     // lines use) so the toast is not lost once it fades: WoW-style error/system
@@ -14481,6 +14452,7 @@ export class Hud {
     // would otherwise inherit the previous one's visual language.
     this.bannerEl.classList.toggle('banner-deed', variant === 'deed');
     this.bannerEl.classList.toggle('banner-skill', variant === 'skill');
+    this.bannerEl.classList.toggle('banner-loot', payload.bannerClass === 'loot');
     // Reduced-motion celebrations (craft plan.motion) show and hide the
     // banner without the fade transition: identical text and duration, no
     // animation. Motion-trimming only; information always survives.
@@ -15127,7 +15099,8 @@ export class Hud {
       return;
     }
     this.closeOtherWindows('#town-focus-window');
-    this.townFocusDraft = { ...this.sim.townFocus };
+    // Open on the QUEUED allocation when one waits: re-saving it never restarts the clock.
+    this.townFocusDraft = { ...(this.sim.townFocusPending?.allocation ?? this.sim.townFocus) };
     this.townFocusRespecTier = 'time';
     this.renderTownFocus();
     // AFTER the first paint, the train / unbind ordering: captureFocus records
@@ -15145,7 +15118,8 @@ export class Hud {
   private renderTownFocus(): void {
     const inTown = this.isInTown();
     const allocation = this.townFocusDraft ?? this.sim.townFocus;
-    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown);
+    const pending = this.sim.townFocusPending;
+    const view = buildTownFocusView(allocation, FOCUS_POINT_BUDGET, inTown, pending);
     // Re-arm the latch on EVERY paint, whatever caused it (the open, a step, a
     // language switch), so the slow-band probe below elides against the state
     // actually on screen rather than against the last thing the probe itself
@@ -15197,6 +15171,7 @@ export class Hud {
         this.townFocusDraft ?? this.sim.townFocus,
         FOCUS_POINT_BUDGET,
         this.isInTown(),
+        this.sim.townFocusPending,
       ),
     );
     if (sig === this.lastTownFocusSig) return;
@@ -17213,8 +17188,9 @@ export class Hud {
   // you) gets the social/party menu; your own pet gets the pet menu; a live wild
   // hostile mob (in a party) gets the raid-marker menu, mirroring Sim.setMarker's
   // markable criteria so the menu never appears where it would be a no-op.
-  private openTargetFrameMenuAt(x: number, y: number): void {
-    const tid = this.sim.player.targetId;
+  // `tid` defaults to the current target (the target frame's own right-click);
+  // the target-of-target frame passes ITS unit through the same menu builder.
+  private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
       this.openContextMenu(t.id, t.name, x, y);

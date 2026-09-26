@@ -219,6 +219,12 @@ describe('frame menus', () => {
         labelKey: 'hudChrome.partyFrames.optionsSection',
         on: true,
       },
+      {
+        control: 'boolToggle',
+        key: 'mouseoverCast',
+        labelKey: 'hudChrome.options.mouseoverCast',
+        on: true,
+      },
     ];
     const sections = new OptionsFrameSections();
     const render = (id: string | null = null) => {
@@ -245,7 +251,10 @@ describe('frame menus', () => {
     expect(body.querySelector('.interface-frame-options')!.contains(party)).toBe(false);
     expect(party.querySelector('[data-setting-key="partyFrameShowPets"]')).toBeTruthy();
     expect(party.querySelector('[data-focus-key="partyFrameColumns"]')).toBeTruthy();
-    expect(party.querySelector('[data-focus-key="mouseoverCast"]')).toBeTruthy();
+    expect(party.querySelector('[data-setting-key="mouseoverCast"]')).toBeNull();
+    expect(
+      body.querySelector('.interface-frame-options [data-setting-key="mouseoverCast"]'),
+    ).toBeTruthy();
     party.open = true;
     render();
     expect(body.querySelector<HTMLDetailsElement>('.interface-party-options')!.open).toBe(true);

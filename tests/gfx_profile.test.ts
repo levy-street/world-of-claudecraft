@@ -42,6 +42,7 @@ const mediumPreferences: GraphicsSettingsSnapshot = {
   characterDetail: 1,
   dynamicLights: 1,
   particleEffects: 1,
+  ghostFade: 1,
 };
 
 describe('GfxProfile resolution and activation', () => {
@@ -112,6 +113,35 @@ describe('GfxProfile resolution and activation', () => {
     expect(forced.settings.tier).toBe('ultra');
     expect(forced.settings.bladeCarpetRadius).toBe(7);
     expect(forced.forcedTier).toBe('ultra');
+  });
+
+  it('answers constrainedMemory from the device alone, whatever preset or forced tier', () => {
+    // The cast gate latches a declined Warrior kit for good
+    // (ensureWarriorKitAssets(GFX.constrainedMemory)): a graphics switch must
+    // never flip it, and the capabilities it rebuilds from are frozen at boot.
+    const phone = Object.freeze({
+      ...desktopCapabilities,
+      deviceMemory: 2,
+      maxTouchPoints: 5,
+      coarsePointer: true,
+      narrowViewport: true,
+    });
+    for (const [capabilities, constrained] of [
+      [desktopCapabilities, false],
+      [phone, true],
+      [Object.freeze({ ...desktopCapabilities, platform: 'ios' as const }), true],
+    ] as const) {
+      for (const graphicsPreset of [1, 2, 3, 4, 5, 6]) {
+        for (const search of ['', '?gfx=low', '?gfx=ultra']) {
+          const profile = resolveGfxProfile(
+            capabilities,
+            { ...mediumPreferences, graphicsPreset },
+            search,
+          );
+          expect(profile.settings.constrainedMemory).toBe(constrained);
+        }
+      }
+    }
   });
 
   it('uses a complete stable settings fingerprint and advances epoch only on change', () => {

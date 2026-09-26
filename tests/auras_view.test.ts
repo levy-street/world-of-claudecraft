@@ -761,6 +761,46 @@ describe('allocation budget (the reused-reference proxy)', () => {
 // ClientWorld mirror (the wire omits stacks/duration/sourceId), because the two
 // hosts must derive the same slot.
 // ---------------------------------------------------------------------------
+describe('auras_view: permanent Benison preparation', () => {
+  it.each([0, Number.POSITIVE_INFINITY])(
+    'omits badge and tooltip countdowns with remaining %s',
+    (remaining) => {
+      const view = createAurasView('buffs', deps());
+      const slot = view.tick(
+        entity([
+          aura({
+            id: 'priest_benison_prayers',
+            kind: 'benison_prayers',
+            name: 'Choirmend',
+            remaining,
+            duration: 0,
+            value: 0.3,
+            stacks: 3,
+          }),
+        ]),
+      ).slots[0];
+      expect(slot.durationText).toBe('');
+      // The painter forwards toggle to renderTooltip to suppress the seconds line.
+      expect(slot.toggle).toBe(true);
+      expect(slot.expiring).toBe(false);
+      expect(slot.stacksText).toBe('3');
+      const whisper = view.tick(
+        entity([
+          aura({
+            id: 'priest_benison_whisper',
+            kind: 'next_cast_instant',
+            remaining: 60,
+            duration: 60,
+            value: 1,
+          }),
+        ]),
+      ).slots[0];
+      expect(whisper.durationText).toBe('1m');
+      expect(whisper.toggle).toBe(false);
+    },
+  );
+});
+
 describe('auras_view: the carried-flag buff', () => {
   // Sim-shaped: every optional field present, exactly as src/sim applies it.
   const simShaped = (): AuraInput => ({

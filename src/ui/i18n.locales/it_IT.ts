@@ -13672,7 +13672,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     "Per 8 s il prossimo colpo nemico contro di te riceve risposta: fino a {buff} danni vengono negati e restituiti all'attaccante come danni Sacri, e ottieni 1 Devozione. Viene risposto a un solo colpo. L'Ascensione aumenta del 50% la quantità a cui può rispondere.",
   'entities.abilities.final_edict.description':
-    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione Sacra attorno a te.",
+    "Assesta un colpo d'arma devastante e genera 1 Devozione quando infligge danni. Un colpo riuscito riduce di 2 s il tempo di recupero rimanente della Caduta dell'Alba. Gli attacchi automatici riusciti e i colpi dell'Editto Finale hanno il 15% di probabilità di concedere Ira dell'Alba per 8 s. L'Ascensione libera inoltre un'esplosione attorno a te che infligge danni fisici.",
   'entities.abilities.grace_devotion.description':
     "Tu e i membri del gruppo recuperate 15 mana ogni 5 s e pagate il 3% di mana in meno per 30 min. Sostituisce la tua Devozione Radiante o dell'Alba, ma coesiste con le Devozioni di altri paladini.",
   'entities.abilities.guardian_covenant.description':
@@ -15862,9 +15862,9 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Il colpo del tuo Bordo Velato infligge il triplo dei danni, invece del doppio.',
   'entities.itemSets.ashveil.name': 'Vesti del Velo Cinereo',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'La cura salvifica della Vigilanza Serafica sale a 270, da 180. I danni subiti non ritardano più il lancio degli incantesimi.',
+    'Ripristinare salute con Preghiera Sussurrata, Preghiera Solenne o Preghiera Urgente aumenta del 10% le cure della tua prossima Cura del Coro, fino a 3 accumuli. Ogni lancio conferisce al massimo un accumulo. Cura del Coro consuma tutti gli accumuli al termine del lancio. I danni subiti non ritardano più il lancio degli incantesimi.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quando si attiva la Vigilanza Serafica, l’alleato viene curato anche del 15 percento della salute massima in 10 s.',
+    'Completare Cura del Coro con 3 accumuli rende istantanea la tua prossima Preghiera Sussurrata usata entro 60 s e ne aumenta le cure del 100%. Questo beneficio non si accumula; ottenerlo di nuovo ne rinnova la durata.',
   'entities.itemSets.benison_dawnweave.name': 'Benedizione della Tessitura dell’Alba',
   'entities.itemSets.chronoweave.bonus2':
     'L’Eco Temporale converte il 50 percento dei danni arcani a bersaglio singolo in cure. I danni subiti non ritardano più il lancio degli incantesimi.',
@@ -17594,4 +17594,12 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     "Modifica fotogrammi allenta anche il pannello Dialogo, che trasporta la linea parlata di un NPC mentre quell'NPC è fuori dalla tua vista; indossa il chip con il nome mentre è sciolto.",
   'guide.settingsPage.keybindsWheelBody':
     "Anche la ruota stessa si lega. Zoom telecamera avanti e Zoom telecamera indietro sono normali collegamenti che si trovano sulla ruota nuda per impostazione predefinita, quindi puoi spostarli su Ctrl più la ruota o sui tasti, quindi ruotare la ruota liberata per attivare gli slot della barra delle azioni. Una tacca della ruota non ha rilascio, quindi non può eseguire un'azione trattenuta come andare avanti.",
+  'guide.settingsPage.ifColorblindMode':
+    "Ricolora i pericoli a terra di Nythraxis (l'anello d'impatto di Eruzione tombale, le pozze di Fiamma tombale e Fuoco dell'anima, la linea di Fuoco tombale e i marchi di Lacerazione dell'anima) con una tavolozza adatta al daltonismo, con tonalità e luminosità distinte, così i cerchi sovrapposti mantengono bordi leggibili. Dimensioni, timer e posizioni non cambiano.",
+  'hud.options.colorblindMode': 'Modalità daltonismo',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -218,6 +218,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'sharedCritBonus', // derived crit core; its inputs (ratings/talents/auras) are sampled
       'skin',
       'skinCatalog',
+      'specId', // render-only mirror of the chosen spec; meta.talents is sampled
       'stealthed',
       'vx',
       'vy',

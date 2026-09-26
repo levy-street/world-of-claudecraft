@@ -20,10 +20,11 @@
 //
 // The modes exist so the policy can be measured rather than believed:
 // the setting is `auto` by default (the mode follows the GPU backend, see
-// shaderWarmModeFor), `off` never asks the worker, `all` holds every gate
-// below the actionable floor (the policy above; `auto` and the stored
-// option On resolve to it), `reveal` is the probe arm that exempts the live
-// view (the arm the step-3 cells ran, kept so a probe can price the
+// shaderWarmModeFor, and today that is off on every backend), `off` never
+// asks the worker, `all` holds every gate below the actionable floor (the
+// policy above; the stored option On resolves to it while the row is offered,
+// SHADER_WARM_OPTION_OFFERED), `reveal` is the probe arm that exempts the
+// live view (the arm the step-3 cells ran, kept so a probe can price the
 // live-view hold on its own); `?shaderwarm=` pins any of them.
 
 import { type GpuBackendClass, workerWorthWarming } from './gpu_backend_class_core';
@@ -86,49 +87,6 @@ export const SHADER_WARM_RELEASE_BREAKER = 3;
  *  enough to tell a source mismatch between the dry assembly and the real
  *  link from the known silent link failures, small enough for a capture. */
 export const SHADER_WARM_FAILED_PROGRAMS_KEPT = 8;
-
-/** The A/B experiment deciding whether `auto` keeps the worker on D3D11, run
- *  for one release and removed by the decision PR whatever it shows. */
-export const SHADER_WARM_AB_ACTIVE = true;
-
-/** The refusal token the `off` arm reports on the typed refusal column, so
- *  the fleet splits the arms without a new column. It is not a refusal: a
- *  refusal-share reading must exclude it while the experiment runs. */
-export const SHADER_WARM_AB_REFUSAL = 'ab:off';
-
-export type ShaderWarmAbArm = 'on' | 'off';
-
-export interface ShaderWarmAbInputs {
-  setting: ShaderWarmSetting;
-  backend: GpuBackendClass | null;
-  platform: ShaderWarmPlatform;
-  /** What the browser profile stored the first time; anything but an arm is
-   *  no draw yet. */
-  stored: string | null;
-  /** A draw in [0, 1). Owes nothing to the GPU: the arm must not depend on
-   *  the machine it measures. */
-  random: () => number;
-}
-
-/** The arm for this launch, and the arm to store when this launch drew it.
- *  Drawn only where `auto` would start the worker: an explicit setting is
- *  never overridden, and a backend `auto` leaves off has nothing to compare.
- *  Once per browser profile, so a machine stays in one arm for the whole
- *  experiment and neither arm runs on caches the other arm's worker warmed. */
-export function shaderWarmAbArmFor(inputs: ShaderWarmAbInputs): {
-  arm: ShaderWarmAbArm | null;
-  store: ShaderWarmAbArm | null;
-} {
-  if (!SHADER_WARM_AB_ACTIVE) return { arm: null, store: null };
-  if (inputs.setting !== 'auto') return { arm: null, store: null };
-  if (shaderWarmModeFor('auto', inputs.backend, inputs.platform) === 'off') {
-    return { arm: null, store: null };
-  }
-  if (inputs.stored === 'on' || inputs.stored === 'off') return { arm: inputs.stored, store: null };
-  const draw = inputs.random();
-  const arm: ShaderWarmAbArm = Number.isFinite(draw) && draw < 0.5 ? 'off' : 'on';
-  return { arm, store: arm };
-}
 
 /** One hold the client is still waiting on, in the order it opened: when its
  *  caller's cap clock started, the cap itself, the priority it asked at and
@@ -380,6 +338,24 @@ export function readShaderWarmReadyDeadline(search: string, fallbackMs: number):
   return Number.isFinite(value) && value > 0 ? value : fallbackMs;
 }
 
+/** Whether the options window offers the Shader Warm-up row. Withdrawn while
+ *  no backend is measured worth the worker: the stored value stays where it
+ *  is, so a player's choice comes back with the row, but it does not drive the
+ *  worker meanwhile (a stored On nobody can turn off again would run a worker
+ *  for good). The `?shaderwarm=` pin stays the way in. */
+export const SHADER_WARM_OPTION_OFFERED = false;
+
+/** What the worker reads of the stored option: the value while the row is
+ *  offered, `auto` while it is withdrawn. No store at all stays none, so an
+ *  entry that never registered one keeps reading OFF. */
+export function shaderWarmStoredForWorker(
+  stored: string | null,
+  offered: boolean = SHADER_WARM_OPTION_OFFERED,
+): string | null {
+  if (stored === null || offered) return stored;
+  return 'auto';
+}
+
 /** `?shaderwarm=auto|off|reveal|all` pins an arm for a probe and wins over
  *  the stored graphics option. No stored option at all (an entry that never
  *  registered the store: the editor, the guide viewer, a test) is OFF, never
@@ -397,14 +373,15 @@ export function readShaderWarmSetting(
 export type ShaderWarmPlatform = 'ios' | 'android' | 'other';
 
 /** `auto` resolves once the backend is known: the worker holds links (the
- *  live view included) only where the backend compiles off the presenting
- *  thread AND has something to warm AND that was measured (D3D11; measured
- *  2026-08-28 and 2026-08-30). On ANGLE's OpenGL backends (Linux and
- *  Android Chrome) the worker only relocates the stall into the GPU process,
- *  on Vulkan a cold link is already as cheap as a hit while the worker's own
- *  links cost three to six times more, and Metal reads like Vulkan on its
- *  one datapoint (11 ms cold) with no in-game measurement, so `auto` is OFF
- *  on all three, and OFF while the backend is still unknown. iOS is OFF whatever the setting: the explicit arm exists to
+ *  live view included) only on a backend a field measurement showed worth it
+ *  (gpu_backend_class_core.ts, WORKER_WORTH_BACKENDS), and none is today. On
+ *  D3D11 the 0.43 fleet experiment found no gain it could detect; on ANGLE's
+ *  OpenGL backends (Linux and Android Chrome) the worker only relocates the
+ *  stall into the GPU process; on Vulkan a cold link is already as cheap as a
+ *  hit while the worker's own links cost three to six times more; Metal reads
+ *  like Vulkan on its one datapoint (11 ms cold) with no in-game measurement.
+ *  So `auto` is OFF on all of them, and OFF while the backend is still
+ *  unknown. iOS is OFF whatever the setting: the explicit arm exists to
  *  measure a backend, never to mint a second context on a phone-class
  *  WebKit; Android keeps the explicit arm (its GLES class already reads
  *  OFF under auto). */

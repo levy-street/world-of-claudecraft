@@ -22,17 +22,19 @@
 //     that also sprinted would break its own pacing.
 //
 // Resource note, and it is why the cast gate consults this module: entering a
-// form SWAPS the bar (entity.ts recalcPlayerStats sets Cat to a full 100 energy
-// and Bruin to 0 rage). A Lunge pressed from caster or Bruin Form is therefore
-// billed against the CAT energy it is about to have, never the mana or rage it
-// is standing in, so the affordability gate must not weigh it against the old
-// bar and refuse a press that would in fact be payable.
+// form SWAPS the bar (entity.ts recalcPlayerStats hands Cat its energy pool and
+// Bruin 0 rage). A Lunge pressed from caster or Bruin Form is therefore billed
+// against the CAT energy it is about to have, never the mana or rage it is
+// standing in, so the affordability gate weighs it against that pool
+// (druidFormEntryPool): a full bar out of combat, the parked pool mid-fight
+// (combat/cat_form_energy.ts), so a Lunge is no back door to a free refill.
 // Draws no rng.
 import { ABILITIES } from '../data';
 import { recalcPlayerStats } from '../entity';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type AuraKind, type Entity, isFormAuraKind } from '../types';
+import { catFormEntryEnergy } from './cat_form_energy';
 import type { DruidCombatForm } from './form_requirement';
 
 /** Which form each button puts you in. The one table; adding a fourth
@@ -68,6 +70,15 @@ export function druidFormEntryOwed(
   const form = druidFormEntryTarget(abilityId);
   if (form === null || meta.cls !== 'druid') return false;
   return !auras.some((aura) => aura.kind === FORM_AURA_KIND[form]);
+}
+
+/** The bar a form-entry press is billed from: what the shift hands over (Cat's
+ *  energy pool, Bruin's empty rage bar). Only meaningful when a shift is owed. */
+export function druidFormEntryPool(
+  p: Pick<Entity, 'inCombat' | 'parkedEnergyDeficit'>,
+  abilityId: string,
+): number {
+  return druidFormEntryTarget(abilityId) === 'cat' ? catFormEntryEnergy(p) : 0;
 }
 
 /** The authored self-buff of a form button, the ONE source of that form's

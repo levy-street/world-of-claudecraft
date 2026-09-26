@@ -185,7 +185,7 @@ await page.screenshot({ path: 'tmp/market_05_listed.png' });
 // 6) another adventurer buys my listing; collect the proceeds (price less the cut)
 await page.evaluate(
   (info) => {
-    window.__game.sim.marketBuy(info.id, info.buyerId);
+    window.__game.sim.marketBuy(info.id, undefined, info.buyerId);
   },
   { id: listed.id, buyerId: scene.buyerId },
 );

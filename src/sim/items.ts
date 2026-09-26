@@ -928,7 +928,7 @@ export function useItem(
   // ONLY that the item is a permanent tool, never spent, so no consumeOneUnit
   // here; it says nothing about gate order.
   if (def.use?.type === 'placeMobileStation') {
-    placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId);
+    placeMobileStationFromItem(ctx, def.use.stationCraftId, def.name, meta.entityId, def.id);
     return;
   }
   // The placeable shared feast (ItemDef.feast, Farming Phase 12): using the

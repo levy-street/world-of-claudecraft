@@ -13,6 +13,7 @@ import {
   MAX_CC_BANDS,
 } from '../ability_vfx_core';
 import type { AbilityAudioKind, AbilityAudioOpts } from '../audio_sink';
+import { CAST_VFX_ENGINE, type CastVfxSpawnGate } from '../cast_vfx_family';
 import { tanHalfVerticalFov } from '../vfx_screen_bounds_core';
 import type { WarriorFuryStateAura, WarriorFuryStateKind } from '../warrior_fury_state_core';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
@@ -571,6 +572,11 @@ export class AbilityVfxFx implements SequencerHost {
   private readonly furyAudio = new FuryAudioQueue();
   private readonly contactBursts = new DeferredContactBursts();
   private disposed = false;
+  private spawnAllows: ((bit: number) => boolean) | null = null;
+  // prewarmSpawn runs behind the loading cover, before any family is ready,
+  // to link the very programs the gate waits on.
+  private prewarming = false;
+  private readonly spawnGate: CastVfxSpawnGate = { allows: (bit) => this.familyOpen(bit) };
   private heldWarriorStorm = new HeldWarriorStorm();
   private readonly warriorAttention = new WarriorAttention();
   private readonly warriorReadiness = new WarriorReadiness();
@@ -702,8 +708,46 @@ export class AbilityVfxFx implements SequencerHost {
     this.pillars = new LightPillars(scene);
     this.shells = new BuffShells(scene);
     this.groundAuras = new GroundAuras(scene, tex);
-    this.flipbooks = new ImpactFlipbooks(scene);
+    this.flipbooks = new ImpactFlipbooks(scene, textureReady);
     this.spirits = new SpiritApparitions(scene, groundY);
+    for (const pool of [
+      this.ribbons,
+      this.rings,
+      this.decals,
+      this.pillars,
+      this.shells,
+      this.groundAuras,
+      this.flipbooks,
+      this.crests,
+      this.guards,
+      this.powerForms,
+      this.spiritHammers,
+      this.furyStates,
+      this.baked,
+      this.fragments,
+    ])
+      pool.spawnGate = this.spawnGate;
+  }
+
+  /** The cast gate's pool-side check (cast_vfx_readiness_core spawnAllowed):
+   *  every gated pool asks it before it spawns, and skips when its family is
+   *  not ready. The overlay cloud asks at the registrations that feed it
+   *  (windups, orbits, transients, the Warrior holds), never at its push,
+   *  because the hard-CC band draws into it through a closed family. The Vfx
+   *  particle cloud answers to none: the generic arm draws it too, and the
+   *  boot links and proves it first. Null (the default) admits everything. */
+  setCastVfxSpawnGate(allows: ((bit: number) => boolean) | null): void {
+    this.spawnAllows = allows;
+  }
+
+  private familyOpen(bit: number): boolean {
+    return this.prewarming || !this.spawnAllows || this.spawnAllows(bit);
+  }
+
+  /** The overlay cloud the hard-CC band draws into, drawn through a closed
+   *  cast gate: the boot links and proves it first (cast_vfx_prewarm.ts). */
+  ccBandDrawable(): THREE.Object3D {
+    return this.overlay.drawable;
   }
 
   // Kick the async GLB loads for every spirit model a sighted player's class
@@ -1321,17 +1365,27 @@ export class AbilityVfxFx implements SequencerHost {
   // The prewarm's finally-block clear() hides everything again.
   authoredPrewarmUnits(host: CrestPrewarmHost, kinds?: readonly CrestKind[]) {
     return [
-      ...this.crests.preparation.units(host, kinds),
+      ...this.crests.units(host, kinds),
       ...this.guards.units(host),
       ...this.powerForms.units(host),
       ...this.spiritHammers.units(host),
       ...this.furyStates.units(host),
       ...(kinds?.includes('harvest_cut') ? this.baked.units(host) : []),
+      ...this.fragments.units(host),
     ];
   }
 
   prewarmSpawn(x: number, y: number, z: number, entityId: number): void {
     if (this.disposed) return;
+    this.prewarming = true;
+    try {
+      this.prewarmPools(x, y, z, entityId);
+    } finally {
+      this.prewarming = false;
+    }
+  }
+
+  private prewarmPools(x: number, y: number, z: number, entityId: number): void {
     const gy = this.groundY(x, z);
 
     this.crests.update(0.05, false);
@@ -1339,10 +1393,7 @@ export class AbilityVfxFx implements SequencerHost {
     this.bakedAt('shockwave', x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
     for (const kind of ['shout_dust', 'warrior_power'] as const)
       this.bakedAt(kind, x, gy + 0.08, z, 1, 0xffffff, 0xffffff, 1, 0, 0);
-    for (const kind of ['stone_chip', 'metal_splinter'] as const)
-      this.fragmentsAt(kind, x, y, z, 0xffffff, 1, 1, 0, 1);
     this.baked.update(0.1, this.camera.quaternion, false);
-    this.fragments.update(0.1, false);
     this.rings.spawn(x, gy + 0.15, z, 2, 0.7, 0xffffff, 1, false);
     this.rings.spawn(x, gy + 1.2, z, 1.6, 0.7, 0xffffff, 1, true);
     this.decals.spawn(x, gy, z, 1.5, 0xffffff, 'ember', 1.2);
@@ -1799,7 +1850,7 @@ export class AbilityVfxFx implements SequencerHost {
     alpha: number,
     brightness: number,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.familyOpen(CAST_VFX_ENGINE)) return;
     this.overlay.push(x, y, z, colorHex, size, cell, alpha, brightness);
   }
 
@@ -1807,7 +1858,7 @@ export class AbilityVfxFx implements SequencerHost {
     return OVERLAY_CELL;
   }
   windupDraw(entityId: number, colorHex: number, progress: number, style: string): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.familyOpen(CAST_VFX_ENGINE)) return;
     const s: WindupStyle = WINDUP_STYLE_SET.has(style) ? (style as WindupStyle) : 'orb';
     if (s === 'none') return;
     // caster anticipation: the body eases back through the ceremony (gallery
@@ -2069,7 +2120,7 @@ export class AbilityVfxFx implements SequencerHost {
     remaining: number,
     priority: boolean,
   ): void {
-    if (!this.disposed)
+    if (!this.disposed && this.familyOpen(CAST_VFX_ENGINE))
       this.warriorAttention.hold(entityId, sourceId, remaining, this.frame, priority);
   }
 
@@ -2116,7 +2167,7 @@ export class AbilityVfxFx implements SequencerHost {
     streams = 1,
     accentHex = colorHex,
   ): boolean {
-    if (this.disposed) return false;
+    if (this.disposed || !this.familyOpen(CAST_VFX_ENGINE)) return false;
     if (style === 'none') return false;
     let w = this.windups.get(entityId);
     let started = false;
@@ -2146,7 +2197,7 @@ export class AbilityVfxFx implements SequencerHost {
   // o is the spec's buff.o DNA (per-buff count/size/rate/radius/... overrides);
   // tier >= 1 halves the band's sprite count while keeping the read.
   orbit(entityId: number, style: OrbitStyle, colorHex: number, o?: OrbitDna, tier = 0): boolean {
-    if (this.disposed) return false;
+    if (this.disposed || !this.familyOpen(CAST_VFX_ENGINE)) return false;
     let bands = this.orbits.get(entityId);
     if (!bands) {
       bands = [];
@@ -2187,7 +2238,7 @@ export class AbilityVfxFx implements SequencerHost {
 
   /** Held readiness shares attack buffers and the same frame cleanup. */
   holdWarriorReadiness(entityId: number, bit: number, local: boolean): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.familyOpen(CAST_VFX_ENGINE)) return;
     this.warriorReadiness.hold(entityId, bit, this.frame, local);
   }
 
@@ -2195,7 +2246,7 @@ export class AbilityVfxFx implements SequencerHost {
     return this.orbit(entityId, 'weaponGlow', colorHex, QUEUED_WEAPON_DNA, tier);
   }
   holdWarriorStorm(entityId: number, elapsed: number): void {
-    if (this.disposed || !Number.isFinite(elapsed)) return;
+    if (this.disposed || !Number.isFinite(elapsed) || !this.familyOpen(CAST_VFX_ENGINE)) return;
     const current = this.warriorStorms.get(entityId);
     if (current) {
       current.stamp = this.frame;

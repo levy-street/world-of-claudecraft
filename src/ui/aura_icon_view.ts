@@ -69,9 +69,6 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['avenging_wrath_buff_haste', 'avenging_wrath'],
   ['avenging_wrath_buff_healing_done', 'avenging_wrath'],
   ['bastion_rite_buff_block', 'bastion_rite'],
-  // Benison Dawnweave 4pc mend (src/sim/combat/priest/benison.ts): same icon
-  // family as the Seraphic Vigil it pays off.
-  ['benison_dawnweave_mend', 'seraphic_vigil'],
   ['bladed_echo', 'whirlwind'],
   ['bloodhook_bleed', 'bloodhook'],
   ['bloodhook_pending', 'bloodhook'],
@@ -142,6 +139,8 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['powerup_pow_speed_demon_buff_speed', 'pow_speed_demon'],
   ['pri_inner_fire', 'martyrs_aegis'],
   ['pri_measured_faith', 'lesser_heal'],
+  ['priest_benison_prayers', 'prayer_of_healing'],
+  ['priest_benison_whisper', 'lesser_heal'],
   ['priest_doctrine', 'power_word_shield'],
   ['priest_effigy', 'mind_blast'],
   ['priest_gloomtithe', 'summon_tithefiend'],

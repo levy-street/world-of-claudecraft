@@ -400,7 +400,12 @@ export const TALENT_ABILITIES_V2_A = {
     learnLevel: 10,
     cost: 130,
     castTime: 3,
-    cooldown: 0,
+    // 12 sec, the same as the holy paladin's Radiant Chorus (the other 30 yd group
+    // heal). With no cooldown Choirmend was cast back to back (3.3 sec between casts
+    // on live raid kills, 67% of holy healing, 79% overheal); the cooldown makes it
+    // the group-recovery spell of the kit rather than the whole kit. Study and
+    // numbers: docs/balance/choirmend-cooldown.md.
+    cooldown: 12,
     range: 0,
     school: 'holy',
     requiresTarget: false,

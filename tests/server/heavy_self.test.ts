@@ -56,6 +56,8 @@ const EXPECTED_CMDS = [
   'market_collect',
   'market_list',
   'market_list_instance',
+  'market_order_fill',
+  'market_order_place',
   'market_sweep',
   // Masterwrought stack-grouping commands: both mutate the carried inventory
   // in place (a combine/separate reshapes existing stacks, never grants a new

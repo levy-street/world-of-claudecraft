@@ -1,59 +1,38 @@
-// The map atlas rail's Side panel toggle: folds the rail (tracked quests, the
-// world-quest board, the layer filters) away so the map takes the whole window,
-// and remembers the choice in the mapSidebarCollapsed preference. The window
-// carries one class (MAP_SIDEBAR_COLLAPSED_CLASS) that the stylesheet turns
-// into the single-pane shape; the button's aria-pressed reads "panel shown".
-//
-// openBoard is the World Quest taskmaster's dialog route: it opens the map when
-// it is closed and always unfolds the rail, since the board lives there.
-import type { Settings } from '../../../game/settings';
-
-export const MAP_SIDEBAR_COLLAPSED_CLASS = 'map-sidebar-collapsed';
+// The world-quest board opener (src/ui/hud/quest/quest_dialog_controller.ts
+// routes the taskmaster's "open the board" line here): open the map when it is
+// closed and unfold the atlas rail if the player had folded it, so the board's
+// world-quest section is on screen. The fold itself is the release's
+// mapAtlasSidebarCollapsed preference (src/ui/map_sidebar_controller.ts, the
+// toggle inside the rail); this module never owns a button of its own.
+import type { MapSidebarSettingsPort } from '../../map_sidebar_controller';
 
 export interface MapSidebarCollapseDeps {
-  window: HTMLElement;
-  button: HTMLButtonElement;
-  /** The persisted preference store; null until the options hooks are wired. */
-  settings: () => Pick<Settings, 'get' | 'set'> | null;
-  /** Repaint the map after the stage changes width. */
-  onChange: () => void;
+  /** The release's collapse preference port (trackerCollapseSettings). */
+  settings: MapSidebarSettingsPort;
+  /** Whether the map window is open right now. */
+  mapOpen: () => boolean;
   /** Open the map window when it is closed (the openBoard route). */
   openMap: () => void;
+  /** Repaint the map after the rail changes width. */
+  onChange: () => void;
 }
 
 export class MapSidebarCollapse {
-  constructor(private readonly deps: MapSidebarCollapseDeps) {
-    deps.button.addEventListener('click', () => this.toggle());
-    this.sync();
-  }
+  constructor(private readonly deps: MapSidebarCollapseDeps) {}
 
   collapsed(): boolean {
-    return (this.deps.settings()?.get('mapSidebarCollapsed') ?? false) === true;
+    return this.deps.settings.available() && this.deps.settings.collapsed();
   }
 
-  /** Apply the persisted preference to the window and the button. */
-  sync(): void {
-    const collapsed = this.collapsed();
-    this.deps.window.classList.toggle(MAP_SIDEBAR_COLLAPSED_CLASS, collapsed);
-    this.deps.button.setAttribute('aria-pressed', String(!collapsed));
-  }
-
-  toggle(): void {
-    this.set(!this.collapsed());
-  }
-
+  /** Unfold the rail when the player had folded it; a no-op otherwise. */
   expand(): void {
-    if (this.collapsed()) this.set(false);
+    if (!this.collapsed()) return;
+    this.deps.settings.setCollapsed(false);
+    this.deps.onChange();
   }
 
   openBoard(): void {
-    if (this.deps.window.style.display !== 'block') this.deps.openMap();
+    if (!this.deps.mapOpen()) this.deps.openMap();
     this.expand();
-  }
-
-  private set(collapsed: boolean): void {
-    this.deps.settings()?.set('mapSidebarCollapsed', collapsed);
-    this.sync();
-    this.deps.onChange();
   }
 }

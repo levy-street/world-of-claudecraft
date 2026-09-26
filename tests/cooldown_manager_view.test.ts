@@ -31,6 +31,8 @@ function feral(): Sim {
   const sim = new Sim({ seed: 29, playerClass: 'druid', autoEquip: true });
   sim.setPlayerLevel(20);
   expect(sim.applyTalents({ spec: 'feral', rows: {} })).toBe(true);
+  sim.player.auras.push(catForm(sim));
+  sim.player.comboPoints = 5;
   sim.player.resource = sim.player.maxResource;
   return sim;
 }
@@ -58,6 +60,19 @@ function oldBlood(sim: Sim, stacks: number): Aura {
     duration: 30,
     value: 0,
     stacks,
+    sourceId: sim.player.id,
+    school: 'physical',
+  } as Aura;
+}
+
+function catForm(sim: Sim): Aura {
+  return {
+    id: 'cat_form',
+    name: 'Cat Form',
+    kind: 'form_cat',
+    remaining: 3600,
+    duration: 3600,
+    value: 0.71,
     sourceId: sim.player.id,
     school: 'physical',
   } as Aura;
@@ -383,7 +398,8 @@ describe('cooldown manager view over a ClientWorld-shaped mirror', () => {
         potionCdRemaining: 0,
         queuedOnSwing: null,
         pos: { x: 0, y: 0, z: 0 },
-        auras: [],
+        auras: [{ kind: 'form_cat' }],
+        comboPoints: 5,
       },
       target: null,
       inventory: [],

@@ -6,6 +6,7 @@ import {
   ensureActiveAbilityKit,
 } from '../src/render/ability_vfx/active_kit_prewarm';
 import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
+import * as contact from '../src/render/ability_vfx/contact_assets';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
 import * as assets from '../src/render/ability_vfx/production_assets';
 import { type BackgroundGpuQueue, GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
@@ -19,7 +20,13 @@ afterEach(() => {
 
 function fixture(cls: string, warriorTextures = true) {
   const scene = new THREE.Scene();
+  // Listed in the recipe's upload order, which the first test compares against.
   const names = [
+    'contact_cut',
+    'contact_crush',
+    'contact_pierce',
+    'smoke',
+    'shout_dust',
     'blood',
     'steel',
     'pressure',
@@ -32,13 +39,14 @@ function fixture(cls: string, warriorTextures = true) {
     'warrior_crush',
   ] as const;
   const textures = new Map<string, THREE.Texture>(names.map((name) => [name, new THREE.Texture()]));
-  const smoke = new THREE.Texture();
+  const smoke = textures.get('smoke') as THREE.Texture;
   const uploaded = new Set<THREE.Texture>();
   const texture = (name: string) => (warriorTextures ? (textures.get(name) ?? null) : null);
   vi.spyOn(assets, 'warriorBloodTexture').mockImplementation(() => texture('blood'));
   vi.spyOn(assets, 'warriorSteelTexture').mockImplementation(() => texture('steel'));
   vi.spyOn(assets, 'warriorPressureTexture').mockImplementation(() => texture('pressure'));
   vi.spyOn(assets, 'warriorRockTexture').mockImplementation(() => texture('rock'));
+  vi.spyOn(contact, 'contactTexture').mockImplementation((kind) => texture(kind));
   const bakedTexture = vi
     .spyOn(assets, 'bakedTexture')
     .mockImplementation((kind) => (kind === 'smoke' ? smoke : texture(kind)));
@@ -50,22 +58,23 @@ function fixture(cls: string, warriorTextures = true) {
   const empty = () => ({ units: vi.fn(() => []) });
   const fx = Object.create(AbilityVfxFx.prototype) as AbilityVfxFx;
   Object.assign(fx, {
-    crests: { preparation: empty() },
+    crests: empty(),
     guards: empty(),
     powerForms: empty(),
     spiritHammers: empty(),
     furyStates: empty(),
     baked: pool,
+    fragments: empty(),
   });
   const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
   const seenSlots = new Set<THREE.BufferGeometry>();
   const host = {
     properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
     compile: vi.fn(async () => {
-      expect(uploaded.size).toBe(10);
+      expect(uploaded.size).toBe(15);
     }),
     draw: vi.fn((_group: THREE.Group, root: THREE.Object3D) => {
-      expect(uploaded.size).toBe(10);
+      expect(uploaded.size).toBe(15);
       const mesh = root as THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
       expect(
         live.some((slot) => slot.geometry === mesh.geometry && slot.material === mesh.material),
@@ -84,7 +93,7 @@ function fixture(cls: string, warriorTextures = true) {
   const labels: string[] = [];
   const queue = {
     run: vi.fn((work: PrewarmResumeUnit['run'], priority: number, label: string) => {
-      expect(priority).toBe(GPU_WORK_PRIORITY.ACTIONABLE_VIEW);
+      expect(priority).toBe(GPU_WORK_PRIORITY.BOOT_DEBT);
       labels.push(label);
       return new Promise<void>((resolve, reject) => jobs.push({ work, resolve, reject, label }));
     }),
@@ -114,7 +123,6 @@ function fixture(cls: string, warriorTextures = true) {
     cancelActiveAbilityKit(scene);
     pool.dispose();
     for (const value of textures.values()) value.dispose();
-    smoke.dispose();
   });
   const spawn = (kind: 'warrior_shear' | 'warrior_crush' | 'warrior_fervor') =>
     pool.spawn(kind, 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
@@ -147,7 +155,7 @@ it.each(['warrior_shear', 'warrior_crush', 'warrior_fervor'] as const)(
     });
     expect(h.poolUnits).toHaveBeenCalled();
     expect(h.spawn(kind)).toBe(false);
-    for (let i = 0; i < 10; i++) await h.next();
+    for (let i = 0; i < 15; i++) await h.next();
     expect(h.upload.mock.calls.map(([value]) => value)).toEqual([...h.textures.values()]);
     expect(h.host.compile).not.toHaveBeenCalled();
     expect(h.host.draw).not.toHaveBeenCalled();
@@ -166,10 +174,10 @@ it.each(['warrior_shear', 'warrior_crush', 'warrior_fervor'] as const)(
     expect(h.seenSlots.size).toBe(10);
     expect(h.spawn(kind)).toBe(true);
     expect(h.spawn(kind)).toBe(false);
-    expect(h.labels).toHaveLength(40);
-    expect(new Set(h.labels).size).toBe(40);
+    expect(h.labels).toHaveLength(45);
+    expect(new Set(h.labels).size).toBe(45);
     await ensureActiveAbilityKit(h.scene, 'warrior');
-    expect(h.labels).toHaveLength(40);
+    expect(h.labels).toHaveLength(45);
   },
 );
 
@@ -185,5 +193,13 @@ it('keeps other classes and generic dispatch independent of missing Warrior text
   expect(h.upload).not.toHaveBeenCalled();
   expect(h.host.compile).not.toHaveBeenCalled();
   expect(h.host.draw).not.toHaveBeenCalled();
-  expect(h.pool.spawn('smoke', 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0)).toBe(true);
+  // Smoke is a kit sheet (it loads only with the Warrior kit), so it waits for
+  // its own upload on this renderer, like the signature layers. That gate reads
+  // the smoke sheet alone: no Warrior texture, recipe or class is consulted.
+  const smoke = h.textures.get('smoke') as THREE.Texture;
+  const spawnSmoke = () => h.pool.spawn('smoke', 0, 1, 0, 4, 0xffffff, 0xffffff, 0.2, 0, 0, 0);
+  expect(spawnSmoke()).toBe(false);
+  h.upload(smoke);
+  expect(spawnSmoke()).toBe(true);
+  expect(h.queue.run).not.toHaveBeenCalled();
 });

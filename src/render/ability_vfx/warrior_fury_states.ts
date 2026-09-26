@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import {
   type WarriorFuryStateAura,
@@ -40,6 +46,7 @@ export class WarriorFuryStates {
   readonly preparation: GuardPrewarm[] = [];
   private readonly wearers = new Map<number, Wearer>();
   private readonly fallback: AbilityVfxRibbons;
+  private gate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private readonly matrix = new THREE.Matrix4();
   private readonly frameMatrix = new THREE.Matrix4();
   private readonly at = new THREE.Vector3();
@@ -63,6 +70,15 @@ export class WarriorFuryStates {
       this.fallback.appendHeld(line.points, line.count, 0.075, line.color, 1.2);
     }
   };
+  /** Set by AbilityVfxFx: the fail-closed family check, for the kit's solid
+   *  pieces and the engine ribbon their fallback draws with. */
+  set spawnGate(gate: CastVfxSpawnGate) {
+    this.gate = gate;
+    this.fallback.spawnGate = gate;
+  }
+  get spawnGate(): CastVfxSpawnGate {
+    return this.gate;
+  }
   constructor(scene: THREE.Scene, anchor: RibbonAnchor, textures: AbilityVfxTextures) {
     this.fallback = new AbilityVfxRibbons(scene, anchor, textures);
     for (let k = 0; k < 3; k++) {
@@ -92,7 +108,7 @@ export class WarriorFuryStates {
         'warrior-mending-stitches',
         'warrior-echo-charges',
       ][k];
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       for (let i = 0; i < WEARERS * COUNTS[kind]; i++) {
@@ -198,7 +214,7 @@ export class WarriorFuryStates {
         const state = wearer.states[k];
         if (state.stamp !== frame || state.count === 0) continue;
         for (let piece = 0; piece < state.count; piece++) {
-          let ready = this.preparation[k].ready();
+          let ready = this.preparation[k].ready() && this.gate.allows(CAST_VFX_KIT);
           if (k === 1) ready = ready && !!body?.(id, 0, this.frameMatrix);
           else {
             const hand = (k === 2 ? 0 : piece) as 0 | 1;

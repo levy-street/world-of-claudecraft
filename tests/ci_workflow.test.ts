@@ -561,7 +561,11 @@ describe('CI workflow parity', () => {
     // v0.43 release batches cannot update workflow files with their current
     // push credentials. Keep discovering this reference, but do not require
     // the sparse cone to grow until a workflow-scoped follow-up can land it.
-    const workflowScopedFollowup = new Set(['charselect-zone', 'nythraxis-dread-curse-swap']);
+    const workflowScopedFollowup = new Set([
+      'charselect-zone',
+      'dash-speed-stack',
+      'nythraxis-dread-curse-swap',
+    ]);
     for (const dir of workflowScopedFollowup) {
       expect(referenced.has(dir), `${dir} remains a real referenced screenshot subtree`).toBe(true);
       expect(coneDirs.has(dir), `${dir} is intentionally absent from the sparse cone`).toBe(false);

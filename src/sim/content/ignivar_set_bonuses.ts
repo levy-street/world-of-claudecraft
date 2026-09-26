@@ -139,17 +139,11 @@ export const EMBERSCREED_2PC_DOCTRINE_CONVERSION_BONUS = 0.1;
 export const EMBERSCREED_4PC_HYMN_WINDOW_SEC = 10;
 /** Emberscreed 4pc: the internal cooldown between empower grants. */
 export const EMBERSCREED_4PC_HYMN_ICD_SEC = 15;
-/** Benison Dawnweave 2pc: Seraphic Vigil's resolved rescue heal (base 180
- *  x the 1.5 buffPct row; heal_echo is in neither the integral nor the
- *  scalable buff-kind sets, so the resolved value is exactly this flat 270). */
-export const BENISON_2PC_VIGIL_RESCUE_HEAL = 270;
-/** Benison Dawnweave 4pc: the mend on the Vigil's ally, as a fraction of the
- *  ALLY'S max health, paid over the duration below. */
-export const BENISON_4PC_MEND_PCT_MAX = 0.15;
-/** Benison Dawnweave 4pc: mend duration in seconds. */
-export const BENISON_4PC_MEND_DURATION_SEC = 10;
-/** Benison Dawnweave 4pc: seconds between mend ticks (5 ticks total). */
-export const BENISON_4PC_MEND_TICK_INTERVAL_SEC = 2;
+/** Benison Dawnweave: direct prayers prepare Choirmend and an instant follow-up. */
+export const BENISON_2PC_HEAL_PER_STACK = 0.1;
+export const BENISON_2PC_MAX_STACKS = 3;
+export const BENISON_4PC_WHISPER_HEAL_BONUS = 1;
+export const BENISON_4PC_WHISPER_WINDOW_SEC = 60;
 /** Vesperash 2pc: seconds cut from Call Tithefiend's cooldown (base 30). */
 export const VESPERASH_2PC_TITHEFIEND_COOLDOWN_CUT_SEC = 6;
 /** Vesperash 4pc: multiplier on the Tithefiend's per-hit mana return (base
@@ -710,32 +704,20 @@ export const SET_ENGINE_BONUSES: Record<string, readonly SetEngineBonusTier[]> =
   benison_dawnweave: [
     {
       pieces: 2,
-      // Seraphic Vigil's rescue 180 -> 270: buffPct 0.5 scales the RESOLVED
-      // buffTarget heal_echo value (heal_echo is in neither the integral nor
-      // the scalable buff-kind sets, so the resolved value is exactly the
-      // flat 270 the tooltip promises). The {buff} description splice
-      // reads the same resolved value, so the printed number stays honest
-      // for wearers and everyone else. Deterministic, no rng involved.
       effect: {
-        ability: [{ ability: 'seraphic_vigil', buffPct: 0.5 }],
         global: { castPushbackReduction: 1 },
-        tuning: { vigilRescueHeal: BENISON_2PC_VIGIL_RESCUE_HEAL },
+        tuning: {
+          prayerHealPerStack: BENISON_2PC_HEAL_PER_STACK,
+          prayerMaxStacks: BENISON_2PC_MAX_STACKS,
+        },
       },
     },
     {
       pieces: 4,
-      // Bespoke: when a Vigil triggers, its ally is also mended for 15
-      // percent of the ALLY'S max health over 10 sec. Hooked at the
-      // vigil-trigger POINT in damage.ts beside priestOnVigilTriggered
-      // (which stays talent-gated for Incarnate Spirit; the set arm is
-      // flag-gated instead, combat/priest/benison.ts). Replaces the killed
-      // cooldown-reset idea: Twin Covenant's charge model deletes the
-      // cooldowns entry, making cooldownRefund a hard no-op. Draws no rng.
       effect: {
         tuning: {
-          mendPctMaxHp: BENISON_4PC_MEND_PCT_MAX,
-          mendDurationSec: BENISON_4PC_MEND_DURATION_SEC,
-          mendTickIntervalSec: BENISON_4PC_MEND_TICK_INTERVAL_SEC,
+          whisperHealBonus: BENISON_4PC_WHISPER_HEAL_BONUS,
+          whisperWindowSec: BENISON_4PC_WHISPER_WINDOW_SEC,
         },
       },
     },

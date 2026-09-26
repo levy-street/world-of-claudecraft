@@ -67,7 +67,6 @@ describe('buildFramesMenuToggles', () => {
       'combineAuraFrames',
       'moveTargetOfTargetIndependently',
       'hideUnusedActionSlots',
-      'mouseoverCast',
       'lockActionBars',
       'buffsLeftToRight',
       'debuffsLeftToRight',

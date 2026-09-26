@@ -1,4 +1,10 @@
 ﻿import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { WarriorPowerAnchor } from '../warrior_power_anchor';
 import {
@@ -38,6 +44,8 @@ const CAPACITY = [SOLIDS, SOLIDS * 6, SOLIDS * 2, SOLIDS * 2] as const;
  * slots. A cold/full pool retains one full shoulder/crown outline per wearer.
  * Actual aura elapsed time prevents camera reentry from replaying assembly. */
 export class WarriorPowerForms {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   readonly meshes: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>[] = [];
   readonly preparation: GuardPrewarm[] = [];
   private readonly wearers = new Map<number, Wearer>();
@@ -96,7 +104,7 @@ export class WarriorPowerForms {
         'warrior-avatar-bracers',
         'warrior-avatar-shins',
       ][kind];
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.frustumCulled = false;
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       for (let i = 0; i < CAPACITY[kind]; i++) {
@@ -216,7 +224,8 @@ export class WarriorPowerForms {
         for (let kind = 0; kind < 2; kind++) {
           const state = wearer.states[kind];
           if (state.stamp !== frame) continue;
-          let solid = solidRank && this.preparation[kind].ready();
+          let solid =
+            solidRank && this.preparation[kind].ready() && this.spawnGate.allows(CAST_VFX_KIT);
           if (solid && kind === 0) {
             solid = !!bodyAnchor && this.preparation[2].ready() && this.preparation[3].ready();
             // A missing joint keeps the complete outline, never partial armor.

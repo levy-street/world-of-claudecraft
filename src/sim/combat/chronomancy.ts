@@ -395,6 +395,19 @@ export function applyTemporalAegis(
  * capped at 20% of the ally's max health.
  * Emits a `heal2` (the number + heal-glow pulse over the ally on both hosts).
  */
+/**
+ * Scaling divisor for Chronomancy Echo conversion from the caster's Healing Power.
+ * With divisor 1200, gear with Healing Power (such as the Aetherweave raid set)
+ * provides gentle scaling on converted Echo healing without inflating enemy damage.
+ */
+export const CHRONOMANCY_ECHO_HEAL_POWER_DIVISOR = 1200;
+
+export function echoHealPowerMultiplier(source: Entity): number {
+  const bonusHealing = Math.max(0, (source.healPower ?? 0) - (source.spellPower ?? 0));
+  if (bonusHealing <= 0) return 1;
+  return 1 + bonusHealing / CHRONOMANCY_ECHO_HEAL_POWER_DIVISOR;
+}
+
 function applyEchoHeal(
   ctx: SimContext,
   source: Entity,
@@ -403,7 +416,8 @@ function applyEchoHeal(
   rate: number,
 ): void {
   if (ally.dead) return;
-  let healed = Math.round(dealt * rate * healingTakenMult(ctx, ally));
+  const hpMult = echoHealPowerMultiplier(source);
+  let healed = Math.round(dealt * rate * hpMult * healingTakenMult(ctx, ally));
   if (healed <= 0) return;
   healed = consumeHealAbsorb(ctx, ally, healed);
   const preClamp = healed;

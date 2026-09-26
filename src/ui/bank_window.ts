@@ -685,7 +685,9 @@ export class BankWindow {
       }
       annotateVaultFocusKeys(el);
       this.restoreScroll(el, prevScroll);
-      if (hadFocus) this.restoreControlFocus(el, focusKey);
+      // The vault's name search shares `.bag-search`: every keystroke
+      // rebuilds the pane, and the caret must land where it was.
+      if (!restoreSearchCaret(el, searchFocus) && hadFocus) this.restoreControlFocus(el, focusKey);
       return;
     }
     if (this.tab === 'guild') {

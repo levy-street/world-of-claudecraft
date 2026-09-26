@@ -10,6 +10,10 @@
 import * as THREE from 'three';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
+  type HazardPaletteMode,
+  nythraxisSoulRendPaletteFor,
+} from './nythraxis_hazard_palette_core';
+import {
   NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT,
   NYTHRAXIS_SOUL_REND_MARKER_RADIUS,
   NYTHRAXIS_SOUL_REND_SIGIL_BOB,
@@ -18,7 +22,6 @@ import {
   type NythraxisSoulRendMarkerPalette,
   nythraxisSoulRendMarkedInto,
   nythraxisSoulRendMarkOf,
-  nythraxisSoulRendPalette,
   nythraxisSoulRendPartners,
   nythraxisSoulRendPulse,
 } from './nythraxis_soul_rend_marker_core';
@@ -82,14 +85,16 @@ interface MarkerVisual {
 }
 
 /** One marker, at the origin, coloured for a raider standing alone. */
-export function buildNythraxisSoulRendMarker(): THREE.Group {
+export function buildNythraxisSoulRendMarker(
+  paletteMode: HazardPaletteMode = 'classic',
+): THREE.Group {
   const group = new THREE.Group();
   group.name = NYTHRAXIS_SOUL_REND_MARKER_NAME;
   group.userData.renderCategory = 'ui3d';
   group.userData.actionable = true;
   group.userData.radius = NYTHRAXIS_SOUL_REND_MARKER_RADIUS;
 
-  const palette = nythraxisSoulRendPalette(0);
+  const palette = nythraxisSoulRendPaletteFor(0, paletteMode);
   const ring = new THREE.Mesh(RING_GEOMETRY, markerMaterial(palette.ring, RING_OPACITY));
   ring.name = NYTHRAXIS_SOUL_REND_RING_NAME;
   ring.position.y = NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT + 0.01;
@@ -134,14 +139,18 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   return group;
 }
 
-function applyPalette(visual: MarkerVisual, palette: NythraxisSoulRendMarkerPalette): void {
+function applyPalette(
+  visual: MarkerVisual,
+  palette: NythraxisSoulRendMarkerPalette,
+  paletteMode: HazardPaletteMode,
+): void {
   if (visual.palette === palette) return;
   visual.palette = palette;
   visual.ring.material.color.setHex(palette.ring);
   visual.fill.material.color.setHex(palette.fill);
   visual.sigilRing.material.color.setHex(palette.sigil);
   visual.sigilBlade.material.color.setHex(palette.sigil);
-  visual.group.userData.stacked = palette !== nythraxisSoulRendPalette(0);
+  visual.group.userData.stacked = palette !== nythraxisSoulRendPaletteFor(0, paletteMode);
 }
 
 function disposeVisual(visual: MarkerVisual): void {
@@ -161,6 +170,7 @@ export class NythraxisSoulRendMarkers {
   constructor(
     private readonly scene: THREE.Scene,
     private readonly groundY: (x: number, z: number) => number,
+    private readonly paletteMode: HazardPaletteMode = 'classic',
   ) {}
 
   /** One marker per marked raider: follows the raider, recolours by who is inside the ring. */
@@ -175,7 +185,7 @@ export class NythraxisSoulRendMarkers {
       this.seen.add(entity.id);
       let visual = this.visuals.get(entity.id);
       if (!visual) {
-        const group = buildNythraxisSoulRendMarker();
+        const group = buildNythraxisSoulRendMarker(this.paletteMode);
         visual = {
           group,
           ring: group.userData.ring as MarkerVisual['ring'],
@@ -206,7 +216,11 @@ export class NythraxisSoulRendMarkers {
       visual.remaining = mark.remaining;
       visual.duration = mark.duration;
       visual.group.userData.partners = visual.partners;
-      applyPalette(visual, nythraxisSoulRendPalette(visual.partners));
+      applyPalette(
+        visual,
+        nythraxisSoulRendPaletteFor(visual.partners, this.paletteMode),
+        this.paletteMode,
+      );
     }
     for (const [id, visual] of this.visuals) {
       if (this.seen.has(id)) continue;

@@ -1002,6 +1002,12 @@
   .town-focus-budget {
     margin-bottom: 8px;
   }
+  /* The queued re-spec line (#1144): the one line on the panel that says
+     Save took, in the same gold the chat notice for it uses. */
+  .town-focus-pending {
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
   .town-focus-row {
     display: flex;
     align-items: center;
@@ -10471,6 +10477,15 @@
   .vault-cap-note {
     text-align: left;
   }
+  /* The vault's name search (vault_window.ts): one `.bag-search` input in the
+     shared .bag-tools row, the personal bank's toolbar shape minus chips and
+     sort, so the family CSS above (and #bank-window's revert-layer rules) carry
+     its look, and BankWindow's search focus carry reaches it. Sits between the
+     cap note and the scroller as a rigid band; the list still scrolls. */
+  .vault-tools {
+    flex: none;
+    margin-bottom: 6px;
+  }
   .vault-list {
     display: flex;
     flex-direction: column;
@@ -13958,6 +13973,85 @@
   .soc-pledge-accept {
     color: var(--color-text-success);
   }
+  /* Guild custom ranks (docs/prd/guild-custom-ranks.md): the Ranks tab's
+     guild-control table (the .soc-billboard family card), one row per rank and
+     one checkbox column per permission. It spans both .soc-body grid columns,
+     and on a narrow window the TABLE scrolls sideways inside its own box
+     rather than widening the window. */
+  .soc-ranks {
+    grid-column: 1 / -1;
+    margin: 0 4px 6px;
+    padding: 7px 9px;
+  }
+  .soc-ranks-intro {
+    margin-bottom: 6px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .soc-ranks-scroll {
+    overflow-x: auto;
+  }
+  .soc-ranks-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    color: var(--color-text-light);
+  }
+  .soc-ranks-table th,
+  .soc-ranks-table td {
+    padding: 3px 4px;
+    text-align: center;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--color-border-showcase);
+    white-space: nowrap;
+  }
+  .soc-ranks-table thead th {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    white-space: normal;
+    vertical-align: bottom;
+  }
+  .soc-ranks-table thead th.soc-ranks-perm {
+    cursor: help;
+  }
+  .soc-ranks-table .soc-ranks-title {
+    min-width: 132px;
+    text-align: left;
+    font-weight: 400;
+  }
+  .soc-ranks-title input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+  .soc-ranks-name {
+    color: var(--color-text-light);
+  }
+  .soc-ranks-idx,
+  .soc-ranks-count {
+    color: var(--color-text-muted);
+  }
+  .soc-ranks-table td.soc-ranks-order {
+    text-align: right;
+  }
+  .soc-ranks-order .soc-x {
+    margin-left: 2px;
+  }
+  .soc-ranks-perm .ui-check:disabled {
+    cursor: default;
+  }
+  .soc-ranks-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .soc-ranks-actions .btn {
+    margin: 0;
+    padding: 5px 12px;
+    font-size: 11px;
+  }
   .soc-my-pledge {
     grid-column: 1 / -1;
     display: flex;
@@ -14166,6 +14260,25 @@
     gap: 10px;
     overflow: hidden;
   }
+  /* The player's own collapse toggle stays outside the body it hides, so its
+     aria-controls names something real (the deed-tracker disclosure
+     convention). It sits at the rail's own top-right corner. */
+  .map-atlas-sidebar-toggle {
+    align-self: flex-end;
+    flex: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .map-atlas-sidebar-toggle .ui-icon {
+      transition: transform 0.15s ease;
+    }
+  }
+  .map-atlas-body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 0;
+    flex: 1 1 auto;
+  }
   .map-atlas-stage {
     position: absolute;
     inset: var(--window-pad) var(--window-pad) var(--window-pad)
@@ -14187,27 +14300,30 @@
   body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar:empty) .map-atlas-stage {
     inset: var(--window-pad);
   }
-  /* The Side panel button folds the rail away by choice (mapSidebarCollapsed,
-     src/ui/hud/map/map_sidebar_collapse.ts): the same single-pane shape as the
-     unfed rail above. The button sits under the map-level toggle. */
-  body:not(.mobile-touch) #map-window.map-sidebar-collapsed {
-    width: 596px;
+  /* The player's OWN collapse choice (mapAtlasSidebarCollapsed), distinct from
+     the :empty auto-collapse above (an unfed rail before Hud wiring runs): the
+     toggle button stays put, the rest of the rail hides behind it, and the
+     window shrinks to the slim rail plus the stage. */
+  body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) {
+    width: 652px;
   }
-  #map-window.map-sidebar-collapsed .map-atlas-sidebar {
+  .map-atlas-sidebar.is-collapsed {
+    width: 44px;
+    padding: 14px 8px;
+    align-items: center;
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-sidebar-toggle {
+    align-self: center;
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-sidebar-toggle .ui-icon {
+    transform: rotate(180deg);
+  }
+  .map-atlas-sidebar.is-collapsed .map-atlas-body {
     display: none;
   }
-  body:not(.mobile-touch) #map-window.map-sidebar-collapsed .map-atlas-stage {
-    inset: var(--window-pad);
-  }
-  #map-sidebar-toggle {
-    position: absolute;
-    left: 8px;
-    top: 40px;
-    z-index: 2;
-    font-size: 13px;
-  }
-  body.mobile-touch #map-sidebar-toggle {
-    display: none;
+  body:not(.mobile-touch) #map-window:has(> .map-atlas-sidebar.is-collapsed) .map-atlas-stage {
+    inset: var(--window-pad) var(--window-pad) var(--window-pad)
+      calc(var(--window-pad) + 44px + 12px);
   }
   /* Touch keeps the shipped single-pane map: the rail and the map-face chrome
      the atlas adds have no room on a 330px sheet (W13 owns the touch rail). */
@@ -16591,6 +16707,33 @@
   .mkt-row:has(.mkt-sweep-btn) {
     grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
   }
+  /* The per-row partial-buy control (a bulk stack need not be bought whole):
+     a narrow quantity field plus its own Buy trigger, so the main Buy button
+     keeps its plain whole-stack meaning. */
+  .mkt-buy-partial {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .mkt-buy-partial-qty {
+    width: 40px;
+    padding: 4px 2px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .mkt-buy-partial-btn {
+    cursor: var(--cursor-point);
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+  /* Same fifth-cell need as Sweep above; a plain bulk stack can be BOTH
+     partial-buyable and sweep-eligible at once, needing a sixth. */
+  .mkt-row:has(.mkt-buy-partial) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+  }
+  .mkt-row:has(.mkt-buy-partial):has(.mkt-sweep-btn) {
+    grid-template-columns: 40px minmax(0, 1fr) auto auto auto auto;
+  }
   .mkt-sell-pick {
     display: flex;
     gap: 10px;
@@ -16603,6 +16746,102 @@
     font-size: 12px;
     justify-content: center;
     font-style: italic;
+  }
+  /* The Wanted tab (market_orders_panel.ts): the place-order card at the head,
+     the open-order rows (the .mkt-row grid), and the not-on-the-market strip. */
+  .mkt-order-card {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    margin-bottom: 8px;
+  }
+  .mkt-order-head,
+  .mkt-unlisted-head {
+    font-family: var(--font-serif);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .mkt-order-card .mkt-sell-pick {
+    margin-bottom: 0;
+  }
+  .mkt-order-search-row .mkt-search {
+    flex: 1 1 auto;
+    max-width: none;
+  }
+  .mkt-order-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mkt-order-matches:empty {
+    display: none;
+  }
+  .mkt-order-match {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+  .mkt-order-match .item-icon,
+  .mkt-order-match img {
+    width: 22px;
+    height: 22px;
+  }
+  .mkt-order-match-none,
+  .mkt-order-total,
+  .mkt-unlisted-none {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: var(--color-text-muted);
+    font-family: var(--font-ui);
+  }
+  .mkt-order-total:empty {
+    display: none;
+  }
+  .mkt-order-go {
+    align-self: flex-start;
+    padding: 4px 14px;
+  }
+  .mkt-order-list {
+    margin-bottom: 10px;
+  }
+  .mkt-order-row .mkt-each {
+    font-size: 10.5px;
+    color: var(--color-text-muted);
+    margin-left: 4px;
+  }
+  .mkt-order-row.mine {
+    box-shadow: inset 2px 0 0 var(--gold-dim);
+  }
+  .mkt-unlisted {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .mkt-unlisted-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .mkt-unlisted-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px 3px 4px;
+    font-size: 11.5px;
+    cursor: var(--cursor-point);
+    min-height: 28px;
+  }
+  .mkt-unlisted-chip .item-icon,
+  .mkt-unlisted-chip img {
+    width: 20px;
+    height: 20px;
   }
   /* Serif name, matching the Browse row headline. */
   .mkt-sell-pick .ps-name {
@@ -20432,6 +20671,23 @@
   }
   .dc-btn-ghost {
     background: transparent;
+  }
+  /* Forces a fresh link pass while already linked (avatar/username resync). */
+  .dc-relink {
+    width: 100%;
+    text-align: center;
+  }
+  /* A link/relink attempt just failed. Shown in the panel itself (never the
+     pre-game #login-error line, which is hidden once the player is in-game). */
+  .dc-link-error {
+    margin: 0 0 4px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-border-invalid);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--color-text-error) 12%, transparent);
+    color: var(--color-text-error);
+    font-size: 12px;
+    line-height: 1.35;
   }
   .dc-account {
     display: flex;

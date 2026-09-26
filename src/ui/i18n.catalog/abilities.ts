@@ -55,6 +55,12 @@ const abilityStringsEn = {
       anyTarget: 'Enemy or friendly target',
       selfOnly: 'Self only',
       damageRange: '{min} to {max}',
+      edictExplosion:
+        'While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.',
+      edictDamage:
+        'Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.',
+      verdictDamage:
+        'Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.',
       finisherDamage: '{base} plus {perCombo} per combo point',
     },
     resources: {
@@ -681,7 +687,7 @@ const classAbilityNamesEn = {
       [
         'final_edict',
         'Final Edict',
-        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Holy explosion around you.",
+        "Deliver a crushing weapon strike and generate 1 Devotion when it deals damage. A successful hit reduces Dawnfall's remaining cooldown by 2 sec. Successful auto-attacks and Final Edict hits have a 15% chance to grant Dawn's Wrath for 8 sec. Ascension also releases a Physical explosion around you.",
       ],
       [
         'dawnfall',

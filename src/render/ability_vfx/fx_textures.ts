@@ -431,6 +431,11 @@ const flipbookCache = new Map<FlipbookStyle, THREE.CanvasTexture>();
 const FLIP_AUTHOR_CELL_PX = 128;
 const FLIP_CELL_PX = 64;
 
+/** The cached sheet, or null when nothing built it yet; never paints one. */
+export function builtFlipbookSheet(style: FlipbookStyle): THREE.CanvasTexture | null {
+  return flipbookCache.get(style) ?? null;
+}
+
 export function flipbookSheet(style: FlipbookStyle): THREE.CanvasTexture {
   let tex = flipbookCache.get(style);
   if (!tex) {

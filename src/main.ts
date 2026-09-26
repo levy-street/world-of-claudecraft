@@ -41,6 +41,8 @@ import {
   updateFollowCameraYaw,
   wrapAngle,
 } from './game/camera_follow';
+import { applyCameraViewSetting, applyCameraViewSettings } from './game/camera_view_settings';
+import { initCharselectWocMarket } from './game/charselect_woc_market_wiring';
 import { shouldRecoverOnComposerBlur } from './game/chat_keyboard_dismiss';
 import {
   clickMoveBrokenByTeleport,
@@ -136,6 +138,10 @@ import {
   shouldApproachPickedEntity,
   shouldDeferPickedCorpseToGatherNode,
 } from './game/interactions';
+import {
+  applyInterfaceBodyClass,
+  isInterfaceBodyClassSetting,
+} from './game/interface_body_classes';
 import { createIntroLogoOverlay } from './game/intro_logo_overlay';
 import { Keybinds } from './game/keybinds';
 import {
@@ -261,6 +267,15 @@ import {
   desktopWalletManagerView,
   disconnectDesktopWalletSession,
 } from './net/desktop_wallet_manager';
+import {
+  DISCORD_ONBOARD_KEY,
+  type DiscordOAuthFlowDeps,
+  discordLinkErrorActive,
+  handleNativeDiscordResult,
+  installDiscordPopupListener,
+  showLoginDiscordError,
+  startDiscordOAuth,
+} from './net/discord_oauth_flow';
 import { shouldEnterDiscordOnboarding } from './net/discord_onboarding_gate';
 import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
 import { watchWorldEntry } from './net/entry_watch';
@@ -275,13 +290,7 @@ import {
 } from './net/native_apple_auth';
 import { createNativeAttestationProof } from './net/native_attestation';
 import { primeNativeDeviceMemoryHint } from './net/native_device_info';
-import {
-  createNativeDiscordProof,
-  installNativeDiscordUrlHandler,
-  type NativeDiscordResult,
-  openNativeDiscordOAuth,
-  takeNativeDiscordVerifier,
-} from './net/native_discord';
+import { installNativeDiscordUrlHandler } from './net/native_discord';
 import { notifyOtaAppReady } from './net/native_ota';
 import {
   createNativeSolanaWalletClient,
@@ -332,6 +341,7 @@ import {
   CharacterPreview,
   npcLookFor,
   type PreviewAppearance,
+  previewAppearanceForRow,
   setModularLookProvider,
 } from './render/characters';
 import {
@@ -375,6 +385,7 @@ import {
   resolveGfxProfile,
 } from './render/gfx';
 import { setNameplateDotScale } from './render/nameplate_dot_scale';
+import { hazardPaletteModeOf } from './render/nythraxis_hazard_palette_core';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import type { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
@@ -399,6 +410,7 @@ import {
   setActiveWorldContent,
   ZONES,
 } from './sim/data';
+import { refreshDelveMotionState, refreshInstancedMotionState } from './sim/delves/geometry';
 import { canEquipItem } from './sim/equipment_rules';
 import { MARKET_HOUSE_STOCK } from './sim/market';
 import { bagOwnedMounts } from './sim/mounts';
@@ -441,7 +453,7 @@ import {
   relocalizeAppearancePanels,
 } from './ui/appearance_panel_locale';
 import { setThornhollowPrewarmHooks } from './ui/arena_window';
-import { applyAuraBarSide } from './ui/aura_bar_side';
+import { applyAuraBarDirection, applyAuraBarSide } from './ui/aura_bar_side';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -2407,28 +2419,12 @@ async function startGame(
       uiEffectsApplier.applyNow();
       return;
     }
-    if (key === 'highContrastText') {
-      document.body.classList.toggle(
-        'high-contrast-text',
-        settings.set('highContrastText', !!value),
-      );
-      return;
-    }
-    if (key === 'frostedPanels') {
-      document.body.classList.toggle('frosted-panels', settings.set('frostedPanels', !!value));
-      return;
-    }
-    if (key === 'compactChat') {
-      document.body.classList.toggle('compact-chat', settings.set('compactChat', !!value));
-      return;
-    }
-    if (key === 'hideUnusedActionSlots') {
-      // Purely presentational (issue 2429): a body class the action-bar CSS reads
-      // to strip the empty-slot chrome. No live subsystem to update.
-      document.body.classList.toggle(
-        'hide-unused-action-slots',
-        settings.set('hideUnusedActionSlots', !!value),
-      );
+    if (isInterfaceBodyClassSetting(key)) {
+      // Interface & Comfort body-class hooks (interface_body_classes.ts owns the
+      // table). Colorblind Mode also drives the renderer's hazard palette.
+      const on = settings.set(key, !!value);
+      applyInterfaceBodyClass(document.body, key, on);
+      if (key === 'colorblindMode') renderer.setHazardPaletteMode(hazardPaletteModeOf(on));
       return;
     }
     if (key === 'showSecondaryActionBar' || key === 'showThirdActionBar') {
@@ -2521,6 +2517,7 @@ async function startGame(
     }
     if (applyPadSetting(key, value)) return;
     if (crossHotbar.applySetting(gamepad, settings, key, value)) return;
+    if (applyCameraViewSetting(renderer, settings, key, value, input)) return;
     if (key === 'voiceEnabled') {
       voice.setEnabled(settings.set('voiceEnabled', !!value));
       return;
@@ -2561,9 +2558,6 @@ async function startGame(
         break;
       case 'brightness':
         renderer.setBrightness(v);
-        break;
-      case 'cameraFov':
-        renderer.setCameraFov(v);
         break;
       case 'cameraZoom':
         // Restore the remembered zoom on boot (via the startup apply-all loop) and on Reset.
@@ -2660,27 +2654,17 @@ async function startGame(
         hud.setAurasOnPlayerFrame(!!v);
         break;
       case 'auraBarBelowFrame':
-        applyAuraBarSide(document.body, !!v);
+      case 'targetAurasBelowFrame':
+        applyAuraBarSide(document.body, key, !!v);
         break;
       case 'alwaysShowAllBuffs':
         hud.setAlwaysShowAllBuffs(!!v);
         break;
       // Icon flow of the standalone buff/debuff rows (Frames Settings menu):
-      // the stock layout grows right-to-left from its anchor beside the
-      // minimap; 'row' flips a row to read left to right. Vars rather than
-      // classes so the stylesheet's aurasOnPlayerFrame override (a docked
-      // buff row always reads left to right) keeps winning by specificity.
+      // a CSS var per row, owned by src/ui/aura_bar_side.ts.
       case 'buffsLeftToRight':
-        document.documentElement.style.setProperty(
-          '--buff-bar-direction',
-          v ? 'row' : 'row-reverse',
-        );
-        break;
       case 'debuffsLeftToRight':
-        document.documentElement.style.setProperty(
-          '--debuff-bar-direction',
-          v ? 'row' : 'row-reverse',
-        );
+        applyAuraBarDirection(document.documentElement, key, !!v);
         break;
       case 'lockPlayerFrameToActionBar':
         hud.setLockPlayerFrameToActionBar(!!v);
@@ -2729,8 +2713,9 @@ async function startGame(
     next.showPlayerNameplates = settings.get('showPlayerNameplates');
     setNameplateDotScale(settings.nameplateDotRenderScale());
     next.reduceMotionSetting = settings.get('reduceMotion');
+    next.setHazardPaletteMode(hazardPaletteModeOf(settings.get('colorblindMode')));
     next.setBrightness(settings.get('brightness'));
-    next.setCameraFov(settings.get('cameraFov'));
+    applyCameraViewSettings(next, settings);
     next.setRenderScale(settings.get('renderScale'));
     next.setWeatherEnabled(settings.get('weather') >= 0.5);
     next.camYaw = input.camYaw;
@@ -4199,6 +4184,8 @@ async function startGame(
     world.cfg.seed,
     world.riftCollisionToken,
   );
+  const frameDelveMotionState = { delveRun: null, delveSolids: [] };
+  const frameInstancedMotionState = { riftFloor: null, delveRun: null, delveSolids: [] };
   if (online) movementPrediction.connect(online);
   // Reused across frames: the rAF hot path must not allocate (the frame
   // allocation guard polices the loop body), and the gate reads it
@@ -4544,7 +4531,8 @@ async function startGame(
     selfMotionGateArgs.riftFloor = net.riftFloor;
     const selfPredictionEnabled =
       !SELF_MOTION_DISABLED && selfMotionPredictionEnabled(selfMotionGateArgs);
-    movementPrediction.prepare(net, pe, selfPredictionEnabled);
+    refreshDelveMotionState(frameDelveMotionState, net);
+    movementPrediction.prepare(net, pe, selfPredictionEnabled, frameDelveMotionState);
     const movementFrameEmitted = sendOnlineMovementFrame(
       net,
       movementPrediction,
@@ -4641,7 +4629,11 @@ async function startGame(
               frameDt,
               Math.max(0, cameraLastSnapAge),
               net.snapInterval,
-              net.riftFloor,
+              refreshInstancedMotionState(
+                frameInstancedMotionState,
+                net.riftFloor,
+                frameDelveMotionState,
+              ),
             );
     traceStart = perf.startTrace();
     try {
@@ -7017,11 +7009,14 @@ function showCharselectCharacter(c: CharacterSummary): void {
   if (!characterPreview) return;
   const look = charselectLook(c);
   if (!look) {
-    characterPreview.setAppearance(charselectAppearance(c));
+    // Same on-demand weapon-skin warmup the composed path below performs
+    // (mech lazy-load: iOS WebKit streams Armory skins after world entry).
+    ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
+    characterPreview.setAppearance(previewAppearanceForRow(c));
     return;
   }
-  // Same on-demand weapon-skin warmup the legacy path performs (see
-  // charselectAppearance): the composed turntable holds the skinned weapon too.
+  // Same on-demand weapon-skin warmup the plain-appearance arm above
+  // performs: the composed turntable holds the skinned weapon too.
   ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
   characterPreview.setModular(
     look.app,
@@ -7054,24 +7049,15 @@ const redesignEditor = new CharselectRedesignEditor({
   errorText: userFacingApiError,
 });
 
-// The char-select roster row's real, in-world appearance for the 3D preview.
-function charselectAppearance(c: CharacterSummary): PreviewAppearance {
-  // Every iOS WebKit host streams the Armory weapon-skin GLBs after world
-  // entry instead of holding all of them at the launcher, so the preview of a
-  // character wearing one needs ITS skin fetched on demand (the mech lazy-load
-  // pattern). Memoized and a no-op when resident or on eager platforms; a
-  // preview built in the race window shows the base weapon and picks the skin
-  // up on the next selection change.
-  ensureCharacterUrl(weaponSkinModelUrl(c.weaponSkinId ?? null));
-  return {
-    cls: c.class,
-    skin: c.skin ?? 0,
-    skinCatalog: c.skinCatalog ?? 'class',
-    mainhandItemId: c.mainhandItemId ?? null,
-    offhandItemId: c.offhandItemId ?? null,
-    weaponSkinId: c.weaponSkinId ?? null,
-  };
-}
+// Char-select read-only $WOC Exchange: the whole composition lives in
+// charselect_woc_market_wiring.ts, independent of enterWorld's own attach.
+initCharselectWocMarket({
+  root: () => document.getElementById('charselect-woc-market'),
+  newsHost: () => document.getElementById('charselect-news'),
+  launcherButton: () => document.getElementById('btn-charselect-woc-market'),
+  closeRedesignIfOpen: () => (redesignEditor.isOpen ? redesignEditor.close(false) : undefined),
+  api,
+});
 
 function renderClassDetails(
   panelId: string,
@@ -8335,145 +8321,33 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // server-fed value is not known yet (logged out, offline), so every caller
 // gets the fail-open behavior for free.
 const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
-const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
-let discordPopup: Window | null = null;
 
-function flashDiscordError(): void {
-  const el = document.getElementById('login-error');
-  if (el) el.textContent = t('hudChrome.discord.link.error');
-}
-
-function startDiscordOAuth(mode: 'login' | 'link'): void {
-  // Mark a Discord LOGIN so the next boot drops the user straight into online play.
-  if (mode === 'login') {
-    try {
-      localStorage.setItem(DISCORD_ONBOARD_KEY, '1');
-    } catch {
-      /* storage disabled */
-    }
-    if (NATIVE_APP) {
-      void createNativeDiscordProof()
-        .then(async ({ verifier, challenge }) => {
-          const attestation = await createNativeAttestationProof(api.base, 'discord');
-          const { url } = await api.discordStart('login', true, challenge, attestation);
-          await openNativeDiscordOAuth(url, verifier);
-        })
-        .catch((err) => {
-          console.error('[discord] could not start native oauth', err);
-          flashDiscordError();
-        });
-      return;
-    }
-    // LOGIN from the auth screen: a FULL-PAGE redirect, not a popup. The popup's
-    // window.opener is severed by the cross-origin hop to Discord (COOP), so the
-    // result never returns; a same-tab redirect always lands the callback, which
-    // writes the session + onboard flag and reloads us into play. The desktop shell
-    // opens THIS login screen at /desktop-login in the OS browser (electron/main.cjs
-    // openDesktopLogin, via shell.openExternal), never inside Electron itself, so
-    // NATIVE_APP/DESKTOP_APP are both false here: the signal that this is a desktop
-    // handoff is the page we are ON, not the runtime. Pass it through so the callback
-    // bounces back to /desktop-login (which mints the worldofclaudecraft:// deep-link
-    // code, see completeDesktopBrowserLogin) instead of the plain web '/'.
-    void api
-      .discordStart('login', false, '', undefined, isDesktopLoginPage())
-      .then(({ url }) => {
-        window.location.href = url;
-      })
-      .catch((err) => {
-        console.error('[discord] could not start oauth', err);
-        flashDiscordError();
-      });
-    return;
-  }
-  if (NATIVE_APP) {
-    void createNativeDiscordProof()
-      .then(async ({ verifier, challenge }) => {
-        const attestation = await createNativeAttestationProof(api.base, 'discord');
-        const { url } = await api.discordStart('link', true, challenge, attestation);
-        await openNativeDiscordOAuth(url, verifier);
-      })
-      .catch((err) => {
-        console.error('[discord] could not start native oauth', err);
-        flashDiscordError();
-      });
-    return;
-  }
-  // LINK (in-game): keep a popup so we never navigate away from a running game.
-  const popup = window.open('about:blank', 'woc-discord', 'width=520,height=720');
-  discordPopup = popup;
-  void api
-    .discordStart('link')
-    .then(({ url }) => {
-      if (popup) popup.location.href = url;
-      else flashDiscordError();
-    })
-    .catch((err) => {
-      console.error('[discord] could not start oauth', err);
-      popup?.close();
-      flashDiscordError();
-    });
-}
-
-async function handleNativeDiscordResult(result: NativeDiscordResult): Promise<void> {
-  if (!result.ok) {
-    flashDiscordError();
-    return;
-  }
-  if (result.mode === 'link') {
-    takeNativeDiscordVerifier();
-    await refreshDiscordStatus();
-    return;
-  }
-  if (!result.code) {
-    flashDiscordError();
-    return;
-  }
-  const verifier = takeNativeDiscordVerifier();
-  if (!verifier) {
-    flashDiscordError();
-    return;
-  }
-  try {
-    const exchange = await api.exchangeNativeDiscordCode(result.code, verifier);
-    if (exchange.choose && exchange.linkToken) {
-      localStorage.setItem(
-        DISCORD_CHOICE_KEY,
-        JSON.stringify({
-          linkToken: exchange.linkToken,
-          username: exchange.username,
-          ts: Date.now(),
-        }),
-      );
-    } else {
-      api.saveSession();
-    }
-    window.location.reload();
-  } catch (err) {
-    console.error('[discord] could not exchange native login code', err);
-    flashDiscordError();
-  }
-}
+// The OAuth flow itself (web popup, native handoff, and the in-game link-error
+// notice a failed relink now surfaces) lives in src/net/discord_oauth_flow.ts;
+// this is its deps bag plus the one-time wiring main.ts owns.
+const discordFlowDeps: DiscordOAuthFlowDeps = {
+  api,
+  isDesktopLoginPage,
+  onLinkSuccess: () => refreshDiscordStatus(),
+  onLinkPanelUpdate: () => {
+    if (discordPanelOpen) renderDiscordPanel();
+  },
+  onNativeChoosePending: (linkToken, username) => {
+    localStorage.setItem(
+      DISCORD_CHOICE_KEY,
+      JSON.stringify({ linkToken, username, ts: Date.now() }),
+    );
+  },
+};
 
 if (NATIVE_APP && DISCORD_BUILD_ENABLED) {
-  void installNativeDiscordUrlHandler(handleNativeDiscordResult).catch((err) => {
+  void installNativeDiscordUrlHandler((result) =>
+    handleNativeDiscordResult(result, discordFlowDeps),
+  ).catch((err) => {
     console.error('[discord] could not install native url handler', err);
   });
 }
-
-// Popup bounce-page result (link mode; login uses a full redirect). Same-origin only.
-window.addEventListener('message', (e: MessageEvent) => {
-  if (e.origin !== location.origin) return;
-  const d = e.data as { source?: string; ok?: boolean; mode?: string } | null;
-  if (d?.source !== 'woc-discord') return;
-  discordPopup?.close();
-  discordPopup = null;
-  if (!d.ok) {
-    flashDiscordError();
-    return;
-  }
-  if (d.mode === 'login') window.location.reload();
-  else void refreshDiscordStatus(); // link succeeded: refresh the in-game panel
-});
+installDiscordPopupListener(discordFlowDeps);
 
 // ── GitHub link (developer badge) on the character-select screen ───────────────
 // Link-only OAuth (the player is already logged in), mirroring the wallet link
@@ -8675,7 +8549,7 @@ function openDiscordEntry(): void {
 
 function wireDiscordCtaBanner(): void {
   document.getElementById('discord-cta-link')?.addEventListener('click', () => {
-    startDiscordOAuth('link');
+    startDiscordOAuth('link', discordFlowDeps);
   });
   document.getElementById('discord-cta-close')?.addEventListener('click', () => {
     try {
@@ -8701,11 +8575,12 @@ function renderDiscordPanel(): void {
       presence: discordPresence(),
       inviteUrl: discordInviteUrl(),
       characterName: null,
+      linkError: discordLinkErrorActive(),
     },
     {
       attachTooltip: () => {},
       hideTooltip: () => {},
-      onLink: () => startDiscordOAuth('link'),
+      onLink: () => startDiscordOAuth('link', discordFlowDeps),
       onUnlink: () => {
         // A Discord-provisioned account (no real password) must set one first, or
         // unlinking would strand it. Collect it via the keep-account modal.
@@ -10532,14 +10407,14 @@ function wireStartScreens(): void {
       startDiscordLogin({
         desktopApp: DESKTOP_APP,
         bridge: DESKTOP_APP ? desktopBridge() : null,
-        startWebOAuth: () => startDiscordOAuth('login'),
+        startWebOAuth: () => startDiscordOAuth('login', discordFlowDeps),
         openBrowserFailed: (error) => {
           console.error('[discord] could not open browser login', error);
-          flashDiscordError();
+          showLoginDiscordError();
         },
         bridgeUnavailable: () => {
           console.error('[discord] desktop login bridge unavailable');
-          flashDiscordError();
+          showLoginDiscordError();
         },
       });
     });

@@ -108,6 +108,7 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.activeWorldBossIds = new Set();
   c.pendingQuestCommands = new Map();
   c.partyInfo = null;
+  c.townFocusPending = null;
   c.selectedDungeonDifficulty = 'normal';
   c.tradeInfo = null;
   c.duelInfo = null;

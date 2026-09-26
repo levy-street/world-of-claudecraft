@@ -120,10 +120,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": ONE
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (legging + helm), slot two the Normal-only
-    // feet / held / ring partition; a heroic claim skips slot two
-    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
-    // its place, so Heroic pays the same count at the same ilvl 35 (this raid
-    // has NO heroic item-level layer) and differs only in WHICH items drop.
+    // feet / ring partition; a heroic claim skips slot two (LootEntry.normalOnly)
+    // and the HEROIC_BOSS_LOOT exclusive slot (weapons, shields, and held
+    // offhands only) pays in its place, plus ONE guaranteed Robe sigil from its
+    // own heroic group (2026-09-11 re-cut), all at the same ilvl 35 (this raid
+    // has NO heroic item-level layer).
     // Copper rides the raid-finale base on the Ignivar wiring. Re-cut
     // 2026-09-02 from the launch tables' four groups; draw order is
     // parity-sensitive from here: entries APPEND, never reorder.
@@ -140,33 +141,33 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'sigil_anvil_helmet', chance: 0.17, rollGroup: 'varkhul_sigils' },
       { itemId: 'sigil_ember_helmet', chance: 0.16, rollGroup: 'varkhul_sigils' },
       { itemId: 'sigil_tempest_helmet', chance: 0.17, rollGroup: 'varkhul_sigils' },
-      // The two raid trinkets take a quarter of this slot (1/8 each, at the
-      // tail); the rest keeps the old 50 / 31.25 / 18.75 shape scaled by 3/4:
-      // rings 0.375, feet 0.234375, held offhands 0.140625. Every weight is a
-      // binary fraction (1/8, 3/32, 3/128, 9/128) so the partition sums to
-      // EXACTLY 1.00 in floating point: the roller's
+      // The rings keep half of what is left after the two raid trinkets take a
+      // quarter of this slot (1/8 each, at the tail): rings 0.08984375, the ten
+      // feet 0.0390625. Both held offhands moved to the Heroic exclusive partition
+      // in the 2026-09-07 redistribution (neither carries hit, so the Normal hit
+      // lane is untouched). Every weight is a binary fraction (5/128, 23/256,
+      // 1/8) so the partition sums to EXACTLY 1.00 in floating point in this row
+      // order (tests/ignivar_loot.test.ts pins the sum with toBe(1)): the roller's
       // `roll < cumulative` walk and the at-or-below-100% guard in
       // tests/loot_roll.test.ts both read the float sum, and decimal weights
       // like 0.035 drift past 1 by an ulp.
-      normalOnlyRow('varkhul_offset', 'cindersoaked_slippers', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'steps_of_quiet_water', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'ashenbark_treads', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'ashrunner_boots', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'scorchgrove_striders', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'dewfall_moccasins', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'anvilstance_sabatons', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'furnace_march_greaves', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'thundershock_treads', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'springwarden_sabatons', 0.0234375),
-      normalOnlyRow('varkhul_offset', 'orb_of_the_last_spring', 0.0703125),
-      normalOnlyRow('varkhul_offset', 'cinder_of_the_first_design', 0.0703125),
+      normalOnlyRow('varkhul_offset', 'cindersoaked_slippers', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'steps_of_quiet_water', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'ashenbark_treads', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'ashrunner_boots', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'scorchgrove_striders', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'dewfall_moccasins', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'anvilstance_sabatons', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'furnace_march_greaves', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'thundershock_treads', 0.0390625),
+      normalOnlyRow('varkhul_offset', 'springwarden_sabatons', 0.0390625),
       // Neither legendary drops on Normal. Emberward's 3 percent roll lives
       // in Varkhul's heroic-only exclusive group; Forgebreaker's one-time
       // quest shaping belongs to Weaponcrafting, never a boss loot row.
-      normalOnlyRow('varkhul_offset', 'seal_of_the_forgewall', 0.09375),
-      normalOnlyRow('varkhul_offset', 'band_of_marked_strikes', 0.09375),
-      normalOnlyRow('varkhul_offset', 'circle_of_cinders', 0.09375),
-      normalOnlyRow('varkhul_offset', 'loop_of_quiet_springs', 0.09375),
+      normalOnlyRow('varkhul_offset', 'seal_of_the_forgewall', 0.08984375),
+      normalOnlyRow('varkhul_offset', 'band_of_marked_strikes', 0.08984375),
+      normalOnlyRow('varkhul_offset', 'circle_of_cinders', 0.08984375),
+      normalOnlyRow('varkhul_offset', 'loop_of_quiet_springs', 0.08984375),
       // The Crucible raid trinkets (content/trinkets.ts), appended at the
       // group's tail, inside this slot rather than as an extra drop. They
       // also sit in the boss's Heroic exclusive group (HEROIC_BOSS_LOOT).
@@ -316,10 +317,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // Ilvl-35 loot per docs/prd/ignivar-raid-loot.md "Boss loot tables": ONE
     // item per five raiders per kill (two on the 10-player raid). Slot one is
     // the merged sigil partition (mantle + grip), slot two the Normal-only
-    // neck / waist / smaller-weapon partition; a heroic claim skips slot two
-    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot pays in
-    // its place, so Heroic pays the same count at the same ilvl 35 (this raid
-    // has NO heroic item-level layer) and differs only in WHICH items drop.
+    // neck / waist / melee-hit-weapon partition; a heroic claim skips slot two
+    // (LootEntry.normalOnly) and the HEROIC_BOSS_LOOT exclusive slot (weapons
+    // only for Ignivar) pays in its place, plus ONE guaranteed Robe sigil from
+    // its own heroic group (2026-09-11 re-cut), all at the same ilvl 35 (this
+    // raid has NO heroic item-level layer).
     // Re-cut 2026-09-02 from the launch tables' four groups; draw order is
     // parity-sensitive from here: entries APPEND, never reorder.
     loot: [
@@ -332,11 +334,15 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'sigil_anvil_gloves', chance: 0.17, rollGroup: 'ignivar_sigils' },
       { itemId: 'sigil_ember_gloves', chance: 0.16, rollGroup: 'ignivar_sigils' },
       { itemId: 'sigil_tempest_gloves', chance: 0.17, rollGroup: 'ignivar_sigils' },
-      // The three raid trinkets take three eighths of this slot (1/8 each, at
-      // the tail); the rest keeps the old 50 / 31.25 / 18.75 shape scaled by
-      // 5/8: necks 0.3125, waists 0.1953125, the three smaller weapons
-      // 0.1171875. Every weight is a binary fraction (1/8, 5/64, 5/256, 5/128)
-      // so the partition sums to EXACTLY 1.00 in floating point:
+      // The necks keep half of what is left after the three raid trinkets take
+      // three eighths of this slot (1/8 each, at the tail): necks 0.078125, the
+      // waists 0.01953125 and the two melee hit weapons 0.05859375. The Wand of
+      // Quenched Sparks moved to the Heroic exclusive partition in the 2026-09-07
+      // redistribution: casters reach the spell hit cap from a waist plus two
+      // rings alone, while the melee cap needs a weapon, so the Kris and the
+      // Cleaver stay as the Normal melee hit lane (tests/ignivar_loot.test.ts).
+      // Every weight is a binary fraction (5/64, 5/256, 15/256, 1/8) so the
+      // partition sums to EXACTLY 1.00 in floating point:
       // the roller's `roll < cumulative` walk and the at-or-below-100% guard in
       // tests/loot_roll.test.ts both read the float sum, and decimal weights
       // like 0.035 drift past 1 by an ulp.
@@ -354,9 +360,8 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       normalOnlyRow('ignivar_offset', 'warforged_waistguard', 0.01953125),
       normalOnlyRow('ignivar_offset', 'stormkindled_chain', 0.01953125),
       normalOnlyRow('ignivar_offset', 'tidebinder_links', 0.01953125),
-      normalOnlyRow('ignivar_offset', 'cinderfang_kris', 0.0390625),
-      normalOnlyRow('ignivar_offset', 'slagrender_cleaver', 0.0390625),
-      normalOnlyRow('ignivar_offset', 'wand_of_quenched_sparks', 0.0390625),
+      normalOnlyRow('ignivar_offset', 'cinderfang_kris', 0.05859375),
+      normalOnlyRow('ignivar_offset', 'slagrender_cleaver', 0.05859375),
       // The Crucible raid trinkets (content/trinkets.ts), appended at the
       // group's tail, inside this slot rather than as an extra drop. They
       // also sit in the boss's Heroic exclusive group (HEROIC_BOSS_LOOT).

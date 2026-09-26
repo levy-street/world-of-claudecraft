@@ -1124,6 +1124,37 @@ describe('actionBarView: ability cooldown / usable / range / queued math', () =>
   });
 });
 
+describe('actionBarView: Benison Dawnweave', () => {
+  it('highlights only Whispered Prayer until its scoped instant proc disappears', () => {
+    const view = createActionBarView(
+      descriptor(
+        slot(0, { ability: { def: ABILITIES.lesser_heal, cost: 20 } }),
+        slot(1, { ability: { def: ABILITIES.heal, cost: 20 } }),
+        slot(2, { ability: { def: ABILITIES.prayer_of_healing, cost: 20 } }),
+      ),
+      fakeDeps(),
+    );
+    const auras: ActionBarAuraInput[] = [
+      {
+        id: 'priest_benison_whisper',
+        kind: 'next_cast_instant',
+        value: 1,
+        empowerAbilities: ['lesser_heal'],
+      },
+    ];
+    expect(view.tick(world({ auras })).slots.map((entry) => entry.empowered)).toEqual([
+      true,
+      false,
+      false,
+    ]);
+    expect(view.tick(world({ auras: [] })).slots.map((entry) => entry.empowered)).toEqual([
+      false,
+      false,
+      false,
+    ]);
+  });
+});
+
 describe('actionBarView: free-cost proc glow + kill-window (procGlow / usable)', () => {
   it('glows Aether Darts only at four Arcane Charges', () => {
     const view = createActionBarView(

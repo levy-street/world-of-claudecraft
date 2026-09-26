@@ -697,7 +697,7 @@ async function refreshLeaderboard(scope: 'realm' | 'global'): Promise<Leaderboar
     virtualLevel: virtualLevel(r.lifetimeXp),
     lifetimeXp: r.lifetimeXp,
     prestigeRank: r.prestigeRank,
-    // a deed id (never display text); the client localizes via deed_i18n
+    // a title id (deed or 'dev:<rung>', never display text); localized via deed_i18n
     title: r.activeTitle,
     // The guild tag shown beside the name. Omitted (not null) for an unguilded
     // character, the `realm` treatment below, so an unguilded row is byte-unchanged

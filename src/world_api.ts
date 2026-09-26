@@ -432,6 +432,7 @@ export type {
   GuildPledgeInfo,
   GuildPledgeSettings,
   GuildRank,
+  GuildRankDef,
   MyPledgeInfo,
   PresenceStatus,
   SocialInfo,
@@ -628,6 +629,9 @@ export const COMMAND_NAMES = [
   'market_sweep',
   'market_cancel',
   'market_collect',
+  'market_order_place',
+  'market_order_fill',
+  'market_order_cancel',
   'dev_level',
   'dev_teleport',
   'dev_give',
@@ -919,6 +923,9 @@ export const COMMAND_NAMES = [
   // World PvP: raise or lower the /pvp flag (IWorldWorldPvp.setWorldPvpFlag;
   // the bare /pvp chat line toggles through the sim's own chat router).
   'pvp_flag',
+  // Guild custom ranks (docs/prd/guild-custom-ranks.md): the Guild Master
+  // replaces the guild's rank ladder (titles, order, permissions).
+  'guild_set_ranks',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -1176,6 +1183,7 @@ export const COMMAND_FACETS = {
   guild_set_motd: 'IWorldSocialGraph',
   guild_buy_roster_page: 'IWorldSocialGraph',
   who: 'IWorldSocialGraph',
+  guild_set_ranks: 'IWorldSocialGraph',
   // IWorldMarket: World Market browse/list/buy/cancel/collect (snake_case wire
   // strings, by design). marketInfo is a snapshot read (no send, untagged).
   market_search: 'IWorldMarket',
@@ -1188,6 +1196,9 @@ export const COMMAND_FACETS = {
   market_sweep: 'IWorldMarket',
   market_cancel: 'IWorldMarket',
   market_collect: 'IWorldMarket',
+  market_order_place: 'IWorldMarket',
+  market_order_fill: 'IWorldMarket',
+  market_order_cancel: 'IWorldMarket',
   // IWorldMail: Ravenpost letters (snake_case wire strings, by design). mailInfo /
   // mailUnread are snapshot reads (no send, untagged).
   mail_send: 'IWorldMail',

@@ -14,6 +14,7 @@ import {
   HUD_FRAME_SPECS,
   HUD_FRAME_STORAGE_KEYS,
   interfaceUnlockLabelKey,
+  UNIT_TOOLTIP_ANCHOR_ELEMENT_ID,
   type UnlockCandidate,
 } from '../src/ui/interface_unlock_core';
 
@@ -31,7 +32,6 @@ describe('HUD_FRAME_SPECS', () => {
       'practiceTracker',
       'trackerGroup',
       'auraGroup',
-      'targetOfTarget',
       'actionBar1',
       'actionBar2',
       'actionBar3',
@@ -43,6 +43,7 @@ describe('HUD_FRAME_SPECS', () => {
       'minimap',
       'petFrame',
       'petBar',
+      'targetOfTarget',
       'stanceBar',
       'xpBar',
       'buffBar',
@@ -68,6 +69,8 @@ describe('HUD_FRAME_SPECS', () => {
       'auraTrack_utility',
       'auraTrack_friendly',
       'auraTrack_shields',
+      // The mouseover tooltip's movable seat, appended after the tracks.
+      'unitTooltip',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
       'focus-target-1',
@@ -76,7 +79,6 @@ describe('HUD_FRAME_SPECS', () => {
       'practice-tracker',
       'tracker-group',
       'aura-track-group',
-      'totarget-frame',
       'actionbar',
       'actionbar2',
       'actionbar3',
@@ -88,6 +90,7 @@ describe('HUD_FRAME_SPECS', () => {
       'minimap-wrap',
       'pet-frame',
       'petbar',
+      'totarget-frame',
       'stancebar',
       'xpbar',
       'buff-bar',
@@ -112,6 +115,7 @@ describe('HUD_FRAME_SPECS', () => {
       'aura-track-utility',
       'aura-track-friendly',
       'aura-track-shields',
+      'unit-tooltip-anchor',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
@@ -132,9 +136,9 @@ describe('HUD_FRAME_SPECS', () => {
       xpBar: { w: 596, h: 14 },
     });
     // The FULL key list, pinned as literals in spec order: these are persisted
-    // player data (localStorage), so renaming any one of them orphans every
-    // player's saved layout for that frame with no other test failing. A new
-    // frame appends a new key here; an existing key never changes.
+    // player data (localStorage), so renaming any one of them needs a legacy
+    // fallback or it orphans every player's saved layout for that frame with no
+    // other test failing. A new frame appends a new key here.
     expect(HUD_FRAME_STORAGE_KEYS).toEqual([
       'woc_hud_frame_focus_target_1',
       'woc_hud_frame_focus_target_2',
@@ -142,7 +146,6 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_practice_tracker',
       'woc_hud_frame_tracker_group',
       'woc_hud_frame_aura_group',
-      'woc_hud_frame_target_of_target',
       'woc_hud_frame_actionbar',
       'woc_hud_frame_actionbar2',
       'woc_hud_frame_actionbar3',
@@ -154,6 +157,7 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_minimap',
       'woc_hud_frame_pet',
       'woc_hud_frame_petbar',
+      'woc_hud_frame_target_of_target',
       'woc_hud_frame_stancebar',
       'woc_hud_frame_xpbar',
       'woc_hud_frame_buffbar',
@@ -181,6 +185,10 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_track_utility',
       'woc_hud_frame_track_friendly',
       'woc_hud_frame_track_shields',
+      'woc_hud_frame_unit_tooltip',
+    ]);
+    expect(HUD_FRAME_SPECS.find((s) => s.id === 'targetOfTarget')?.legacyStorageKeys).toEqual([
+      'woc_hud_frame_totarget',
     ]);
   });
 
@@ -199,13 +207,13 @@ describe('HUD_FRAME_SPECS', () => {
     expect(detaching).toEqual([
       'practiceTracker',
       'trackerGroup',
-      'targetOfTarget',
       'actionBar1',
       'actionBar2',
       'actionBar3',
       'actionBarGroup',
       'petFrame',
       'petBar',
+      'targetOfTarget',
       'stanceBar',
       'xpBar',
       'buffBar',
@@ -243,6 +251,24 @@ describe('HUD_FRAME_SPECS', () => {
       'damageMeter',
       ...AURA_TRACKS.map((t) => `auraTrack_${t.id}`),
     ]);
+  });
+
+  it('makes exactly the tooltip seat move-only', () => {
+    // The seat's box is a placement proxy for the transient #tooltip card, so a
+    // grip or edge resize would change nothing the player sees; every other row
+    // stays scalable (absent means scalable at the Hud wiring site).
+    const moveOnly = HUD_FRAME_SPECS.filter((s) => s.scalable === false).map((s) => s.id);
+    expect(moveOnly).toEqual(['unitTooltip']);
+    const seat = HUD_FRAME_SPECS.find((s) => s.id === 'unitTooltip');
+    expect(seat?.elementId).toBe(UNIT_TOOLTIP_ANCHOR_ELEMENT_ID);
+    expect(seat?.detachToUiRoot).toBe(false);
+    // The flag is inert unless the Hud wiring forwards it to MovableFrame, which
+    // builds the grip and the edge resizes only for a scalable config.
+    const registry = readFileSync(
+      join(import.meta.dirname, '..', 'src', 'ui', 'hud_frame_registry.ts'),
+      'utf8',
+    );
+    expect(registry).toContain('scalable: spec.scalable ?? true,');
   });
 
   it('lifts the zoom ceiling for exactly the wishlist chip', () => {

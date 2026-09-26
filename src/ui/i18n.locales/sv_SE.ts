@@ -13378,7 +13378,7 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     'I 8 sek besvaras nästa fiendeträff mot dig: upp till {buff} skada nekas och återförs till angriparen som helig skada, och du får 1 hängivenhet. Endast ett slag besvaras. Upphöjelse höjer mängden den kan besvara med 50%.',
   'entities.abilities.final_edict.description':
-    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en helig explosion runt dig.',
+    'Levererar ett krossande vapenslag och genererar 1 hängivenhet när det gör skada. En lyckad träff minskar Gryningsfalls återstående nedkylning med 2 sek. Lyckade autoattacker och träffar med Sista påbudet har 15% chans att ge Gryningens vrede i 8 sek. Upphöjelse frigör dessutom en explosion runt dig som gör fysisk skada.',
   'entities.abilities.grace_devotion.description':
     'Du och gruppmedlemmarna återfår 15 mana var 5:e sek och betalar 3% mindre mana i 30 min. Ersätter din egen Strålande eller Gryningens hängivenhet, men samexisterar med hängivenheter från andra paladiner.',
   'entities.abilities.guardian_covenant.description':
@@ -15014,9 +15014,9 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Ditt Slöjade egg träffar tre gånger så hårt i stället för dubbelt.',
   'entities.itemSets.ashveil.name': 'Askslöjans dräkt',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Serafisk vaksamhets räddning helar 270 i stället för 180. Skada du tar fördröjer inte längre dina besvärjelser.',
+    'När Viskad bön, Högtidlig bön eller Brådskande bön återställer hälsa ökar läkningen från nästa Körläkning med 10 %, upp till 3 staplar. Varje kast ger högst en stapel. Körläkning förbrukar alla staplar när kastet slutförs. Skada du tar fördröjer inte längre dina besvärjelser.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'När Serafisk vaksamhet utlöses helas dess allierade också med 15 procent av sin maximala hälsa under 10 sek.',
+    'Om Körläkning slutförs med 3 staplar blir nästa Viskad bön som används inom 60 sek. omedelbar och läker 100 % mer. Effekten staplas inte; om du får den igen förnyas varaktigheten.',
   'entities.itemSets.benison_dawnweave.name': 'Välsignelsens gryningsväv',
   'entities.itemSets.chronoweave.bonus2':
     'Tidsmässigt eko omvandlar 50 procent av din mystiska skada mot ett mål till läkning. Skada du tar fördröjer inte längre dina besvärjelser.',
@@ -17248,4 +17248,12 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
     'Redigera ramar lossar också dialogpanelen, som bär en NPC: s talade linje medan den NPC är utom synhåll; den bär sitt namnchip medan den är lös.',
   'guide.settingsPage.keybindsWheelBody':
     'Själva hjulet binder också. Zoom Camera In och Zoom Camera Out är vanliga bindningar som sitter på det nakna hjulet som standard, så att du kan flytta dem till Ctrl plus hjulet, eller till tangenterna, och sedan rulla det frigjorda hjulet för att skjuta action bar slots. Ett hjulspår har ingen frigöring, så det kan inte driva en hållen åtgärd som att gå framåt.',
+  'guide.settingsPage.ifColorblindMode':
+    'Färgar om Nythraxis golvfaror (träffringen från Gravutbrott, pölarna av Gravflamma och Själseld, Graveldslinjen och Själsklyvningsmärkena) till en färgblindvänlig palett med tydliga nyanser och ljusstyrkor, så att överlappande cirklar behåller synliga kanter. Storlekar, timers och positioner ändras inte.',
+  'hud.options.colorblindMode': 'Färgblindläge',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

@@ -11,6 +11,7 @@ import {
 import {
   buildMarketBrowse,
   buildMarketCollect,
+  buildMarketHistory,
   buildMarketSell,
   buildMarketView,
   COPPER_PER_GOLD,
@@ -58,6 +59,10 @@ function info(over: Partial<MarketInfo> = {}): MarketInfo {
     sellPriceItemId: null,
     sellLowestPrice: null,
     sweepQuote: null,
+    orders: [],
+    myOrderCount: 0,
+    maxOrders: 6,
+    unlistedMaterials: [],
     ...over,
   };
 }
@@ -89,6 +94,15 @@ describe('market_view: top-level state union', () => {
       buildMarketView({
         info: null,
         tab: 'collect',
+        filters: ALL,
+        sellItemId: null,
+        sellHave: 0,
+      }).kind,
+    ).toBe('no-data');
+    expect(
+      buildMarketView({
+        info: null,
+        tab: 'history',
         filters: ALL,
         sellItemId: null,
         sellHave: 0,
@@ -126,6 +140,15 @@ describe('market_view: top-level state union', () => {
         sellHave: 0,
       }).kind,
     ).toBe('collect');
+    expect(
+      buildMarketView({
+        info: i,
+        tab: 'history',
+        filters: ALL,
+        sellItemId: null,
+        sellHave: 0,
+      }).kind,
+    ).toBe('history');
   });
 });
 
@@ -402,88 +425,9 @@ describe('market_view: collect states', () => {
     expect(body.rows[0].count).toBe(3);
   });
 
-  it('itemizes the sales behind the proceeds line', () => {
-    const body = buildMarketCollect(
-      info({
-        collectionCopper: 1140,
-        collectionSales: [
-          { itemId: 'bone_fragments', count: 3, price: 200, proceeds: 190, buyerName: 'Buyer' },
-          { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Someone' },
-        ],
-      }),
-    );
-    expect(body.state).toBe('items');
-    if (body.state !== 'items') return;
-    expect(body.sales.map((s) => [s.item.id, s.count, s.proceeds, s.buyerName])).toEqual([
-      ['bone_fragments', 3, 190, 'Buyer'],
-      ['wolf_fang', 1, 950, 'Someone'],
-    ]);
-    expect(body.salesOmitted).toBe(0);
-    expect(body.rows).toEqual([]);
-  });
-
-  it('carries the sold copy CHOSEN name onto its row, and omits it for a plain copy', () => {
-    // A ledger row describes a past transaction: the copy is gone, so nothing
-    // downstream can recover what it was called. Two listings of one id used to
-    // read as two identical rows.
-    const body = buildMarketCollect(
-      info({
-        collectionCopper: 2000,
-        collectionSales: [
-          {
-            itemId: 'wolf_fang',
-            itemName: 'Dawn Oath',
-            count: 1,
-            price: 1000,
-            proceeds: 950,
-            buyerName: 'Buyer',
-          },
-          { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Other' },
-        ],
-      }),
-    );
-    expect(body.state).toBe('items');
-    if (body.state !== 'items') return;
-    expect(body.sales.map((row) => row.itemName)).toEqual(['Dawn Oath', undefined]);
-    // The two rows are the SAME item id, so the name is the only thing telling
-    // them apart, which is the point.
-    expect(body.sales.map((row) => row.item.id)).toEqual(['wolf_fang', 'wolf_fang']);
-  });
-
-  it('carries the sim ledger cap through as an omitted count', () => {
-    const body = buildMarketCollect(
-      info({
-        collectionCopper: 500,
-        collectionSales: [
-          { itemId: 'wolf_fang', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
-        ],
-        collectionSalesOmitted: 4,
-      }),
-    );
-    if (body.state !== 'items') throw new Error('expected an items body');
-    expect(body.sales.length).toBe(1);
-    expect(body.salesOmitted).toBe(4);
-  });
-
-  it('counts a sale of a retired item id as omitted rather than dropping it silently', () => {
-    const body = buildMarketCollect(
-      info({
-        collectionCopper: 500,
-        collectionSales: [
-          { itemId: 'gone', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
-          { itemId: 'wolf_fang', count: 1, price: 400, proceeds: 380, buyerName: 'Buyer' },
-        ],
-        collectionSalesOmitted: 1,
-      }),
-    );
-    if (body.state !== 'items') throw new Error('expected an items body');
-    expect(body.sales.map((s) => s.item.id)).toEqual(['wolf_fang']);
-    // 1 dropped by the sim's cap plus the 1 this view could not name.
-    expect(body.salesOmitted).toBe(2);
-  });
-
   // A 1-copper listing nets 0 after the Merchant's cut: gold-only emptiness would
-  // hide the row entirely, and the tab would claim nothing is waiting.
+  // hide the ledger row entirely, and the tab would never offer "Collect All" to
+  // clear it, even though its rows are shown on the History tab, not here.
   it('is NOT empty when a zero-proceeds sale is the only thing waiting', () => {
     const body = buildMarketCollect(
       info({
@@ -495,7 +439,7 @@ describe('market_view: collect states', () => {
     expect(body.state).toBe('items');
     if (body.state !== 'items') return;
     expect(body.proceeds).toBe(0);
-    expect(body.sales.length).toBe(1);
+    expect(body.rows).toEqual([]);
   });
 
   it('counts the collect badge: a proceeds purse plus each returned stack', () => {
@@ -537,6 +481,102 @@ describe('market_view: collect states', () => {
   });
 });
 
+describe('market_view: history states (issue: separate tab for sales history)', () => {
+  it('is empty with no sales', () => {
+    expect(buildMarketHistory(info())).toEqual({ state: 'empty' });
+  });
+
+  it('itemizes the sales ledger', () => {
+    const body = buildMarketHistory(
+      info({
+        collectionSales: [
+          { itemId: 'bone_fragments', count: 3, price: 200, proceeds: 190, buyerName: 'Buyer' },
+          { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Someone' },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.sales.map((s) => [s.item.id, s.count, s.proceeds, s.buyerName])).toEqual([
+      ['bone_fragments', 3, 190, 'Buyer'],
+      ['wolf_fang', 1, 950, 'Someone'],
+    ]);
+    expect(body.salesOmitted).toBe(0);
+  });
+
+  it('carries the sold copy CHOSEN name onto its row, and omits it for a plain copy', () => {
+    // A ledger row describes a past transaction: the copy is gone, so nothing
+    // downstream can recover what it was called. Two listings of one id used to
+    // read as two identical rows.
+    const body = buildMarketHistory(
+      info({
+        collectionSales: [
+          {
+            itemId: 'wolf_fang',
+            itemName: 'Dawn Oath',
+            count: 1,
+            price: 1000,
+            proceeds: 950,
+            buyerName: 'Buyer',
+          },
+          { itemId: 'wolf_fang', count: 1, price: 1000, proceeds: 950, buyerName: 'Other' },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.sales.map((row) => row.itemName)).toEqual(['Dawn Oath', undefined]);
+    // The two rows are the SAME item id, so the name is the only thing telling
+    // them apart, which is the point.
+    expect(body.sales.map((row) => row.item.id)).toEqual(['wolf_fang', 'wolf_fang']);
+  });
+
+  it('carries the sim ledger cap through as an omitted count', () => {
+    const body = buildMarketHistory(
+      info({
+        collectionSales: [
+          { itemId: 'wolf_fang', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
+        ],
+        collectionSalesOmitted: 4,
+      }),
+    );
+    if (body.state !== 'items') throw new Error('expected an items body');
+    expect(body.sales.length).toBe(1);
+    expect(body.salesOmitted).toBe(4);
+  });
+
+  it('counts a sale of a retired item id as omitted rather than dropping it silently', () => {
+    const body = buildMarketHistory(
+      info({
+        collectionSales: [
+          { itemId: 'gone', count: 1, price: 200, proceeds: 190, buyerName: 'Buyer' },
+          { itemId: 'wolf_fang', count: 1, price: 400, proceeds: 380, buyerName: 'Buyer' },
+        ],
+        collectionSalesOmitted: 1,
+      }),
+    );
+    if (body.state !== 'items') throw new Error('expected an items body');
+    expect(body.sales.map((s) => s.item.id)).toEqual(['wolf_fang']);
+    // 1 dropped by the sim's cap plus the 1 this view could not name.
+    expect(body.salesOmitted).toBe(2);
+  });
+
+  // A 1-copper listing nets 0 after the Merchant's cut: the History tab must not
+  // read as empty (nothing sold) when a real, just-unprofitable sale happened.
+  it('is NOT empty when a zero-proceeds sale is the only thing waiting', () => {
+    const body = buildMarketHistory(
+      info({
+        collectionSales: [
+          { itemId: 'wolf_fang', count: 1, price: 1, proceeds: 0, buyerName: 'Buyer' },
+        ],
+      }),
+    );
+    expect(body.state).toBe('items');
+    if (body.state !== 'items') return;
+    expect(body.sales.length).toBe(1);
+  });
+});
+
 describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
   it('is a pure function: same input yields an equal view-model', () => {
     const input = {
@@ -567,7 +607,7 @@ describe('market_view: determinism + ClientWorld-vs-Sim parity', () => {
     ) as MarketInfo;
     const mirrorInfo = JSON.parse(JSON.stringify(simInfo)) as MarketInfo;
 
-    for (const tab of ['browse', 'sell', 'collect'] as const) {
+    for (const tab of ['browse', 'sell', 'collect', 'history'] as const) {
       const sim = buildMarketView({
         info: simInfo,
         tab,

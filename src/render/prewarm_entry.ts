@@ -2,7 +2,7 @@ import type {
   RendererPrewarmCategory,
   RendererPrewarmManifestEntryStats,
 } from './prewarm_compile_lifecycle';
-import type { PrewarmEntryProgress } from './prewarm_policy';
+import { type PrewarmEntryProgress, resolvePrewarmEntryStatus } from './prewarm_policy';
 import type { PrewarmResumeUnit } from './prewarm_resume';
 
 export interface PrewarmManifestEntry {
@@ -27,4 +27,58 @@ export interface PrewarmManifestEntry {
   progress?: () => PrewarmEntryProgress | null;
   budgetVariants?: () => NonNullable<RendererPrewarmManifestEntryStats['budgetVariants']>;
   detail?: () => string;
+}
+
+export interface StartedPrewarmEntryOutcome {
+  status: 'completed' | 'partial' | 'failed';
+  progress: PrewarmEntryProgress | null;
+  /** The explicit remainder of a partial or failed entry, for the resume lane. */
+  partialUnits: readonly PrewarmResumeUnit[];
+}
+
+function warnFailed(entry: PrewarmManifestEntry, err: unknown): void {
+  console.warn(`Renderer prewarm entry failed: ${entry.id}`, err);
+}
+
+/** Runs one entry the deadline admitted. run(), progress() and
+ * resumePartialUnits() are one fail-soft unit: a throw from any of them marks
+ * the entry failed and never escapes, so none of them can end the manifest
+ * and strand the resume lane behind it. */
+export async function runStartedPrewarmEntry(
+  entry: PrewarmManifestEntry,
+  onStart?: () => void,
+): Promise<StartedPrewarmEntryOutcome> {
+  let status: StartedPrewarmEntryOutcome['status'] = 'completed';
+  try {
+    try {
+      onStart?.();
+    } catch {
+      // Diagnostics must never change whether a prewarm entry runs.
+    }
+    await entry.run();
+  } catch (err) {
+    status = 'failed';
+    warnFailed(entry, err);
+  }
+  // Deadline-limited work with planned units remaining reports 'partial',
+  // never 'completed'.
+  let progress: PrewarmEntryProgress | null = null;
+  try {
+    progress = entry.progress?.() ?? null;
+  } catch (err) {
+    status = 'failed';
+    warnFailed(entry, err);
+  }
+  if (status === 'completed') status = resolvePrewarmEntryStatus(progress);
+  // Explicit partial resumes may also recover failed indivisible units.
+  let partialUnits: readonly PrewarmResumeUnit[] = [];
+  if (status === 'partial' || status === 'failed') {
+    try {
+      partialUnits = entry.resumePartialUnits?.() ?? [];
+    } catch (err) {
+      status = 'failed';
+      warnFailed(entry, err);
+    }
+  }
+  return { status, progress, partialUnits };
 }

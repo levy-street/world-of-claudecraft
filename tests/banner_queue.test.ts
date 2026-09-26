@@ -8,6 +8,18 @@ import { describe, expect, it } from 'vitest';
 import { BANNER_QUEUE_LIMIT, BannerQueue, bannerSubtextLines } from '../src/ui/banner_queue';
 
 describe('BannerQueue', () => {
+  it('keeps successive loot wins and prevents a zone message from replacing a win', () => {
+    const q = new BannerQueue<string>();
+    expect(q.enqueue('ambient', 'Zone A')).toBe('show');
+    expect(q.enqueue('loot', 'Boots won')).toBe('queued');
+    expect(q.advance()).toBe('Boots won');
+    expect(q.enqueue('ambient', 'Zone B')).toBe('queued');
+    expect(q.enqueue('loot', 'Sword won')).toBe('queued');
+    expect(q.advance()).toBe('Sword won');
+    expect(q.advance()).toBe('Zone B');
+    expect(q.advance()).toBeNull();
+  });
+
   it('the R38 collision: a deed landing behind a live level-up queues instead of replacing', () => {
     const q = new BannerQueue<string>();
     expect(q.enqueue('levelup', 'Level 2!')).toBe('show');

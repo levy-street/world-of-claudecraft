@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
-import { AbilityVfxFx } from '../src/render/ability_vfx';
+import { type AbilityVfx, AbilityVfxFx } from '../src/render/ability_vfx';
 import { Renderer } from '../src/render/renderer';
 import type { Entity, SimEvent } from '../src/sim/types';
 
@@ -27,7 +27,7 @@ interface LifecycleView {
 
 interface LifecycleHarness {
   sim: { entities: Map<number, Entity> };
-  abilityVfxFx: Pick<AbilityVfxFx, 'warriorRecovery'>;
+  abilityVfx: Pick<AbilityVfx, 'warriorRecovery'>;
   views: Map<number, LifecycleView>;
   healGlowAt: Map<number, number>;
   scene: { remove(object: THREE.Object3D): void };
@@ -69,7 +69,10 @@ function harness(views: Map<number, LifecycleView>, healGlowAt: Map<number, numb
   // real recovery discriminator so ordinary heals still exercise the actual
   // fallthrough path; its unrelated GPU pools are never needed by this event.
   renderer.sim = { entities: new Map() };
-  renderer.abilityVfxFx = Object.assign(Object.create(AbilityVfxFx.prototype), { disposed: false });
+  const fx: AbilityVfxFx = Object.assign(Object.create(AbilityVfxFx.prototype), {
+    disposed: false,
+  });
+  renderer.abilityVfx = { warriorRecovery: (ev, maxHp) => fx.warriorRecovery(ev, maxHp) };
   renderer.views = views;
   renderer.healGlowAt = healGlowAt;
   renderer.scene = { remove: vi.fn() };

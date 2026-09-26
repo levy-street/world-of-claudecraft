@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_ENGINE,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxEngine,
+} from '../cast_vfx_family';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
 import { floorVfxRenderOrder } from '../floor_vfx_layer';
@@ -55,6 +61,8 @@ interface DecalSlot {
 }
 
 export class GroundDecals {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   private slots: DecalSlot[] = [];
   private next = 0;
   private disposed = false;
@@ -175,7 +183,7 @@ export class GroundDecals {
       const mesh = slot.mesh;
       mesh.visible = false;
       mesh.renderOrder = floorVfxRenderOrder('player', 0); // over terrain decals, under the shock rings
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxEngine(mesh);
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every spawn (see spawn).
       mesh.frustumCulled = true;
@@ -201,7 +209,7 @@ export class GroundDecals {
     stoneCarrier.name = 'warrior-leap-fracture-prewarm';
     stoneCarrier.visible = false;
     stoneCarrier.renderOrder = floorVfxRenderOrder('player', 0); // the slots' rung
-    stoneCarrier.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(stoneCarrier);
     this.slots[0].mesh.add(stoneCarrier);
   }
 
@@ -221,7 +229,7 @@ export class GroundDecals {
     style: DecalStyle,
     dur: number,
   ): void {
-    if (this.disposed) return;
+    if (this.disposed || !this.spawnGate.allows(CAST_VFX_ENGINE)) return;
     const slot = this.slots[this.next];
     this.next = (this.next + 1) % DECAL_SLOTS;
     slot.active = true;

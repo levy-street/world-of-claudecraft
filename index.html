@@ -278,11 +278,11 @@
       <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
            who the current target is targeting. A #target-frame child that hides with the
            whole frame when there is no target; hud.css anchors it BESIDE the frame's
-           right edge (the below-frame band belongs to the #tf-debuffs strip) and
+           right edge (the below-frame band is kept for the #tf-debuffs strip) and
            compounds the target frame scale into its own mini zoom. Its own unit_frame
            painter toggles it flex/none when the target-of-target is known/unknown.
            Portrait + name + hp bar only (no resource/cast/debuffs). -->
-      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Target of Target">
+      <div id="totarget-frame" class="unitframe totarget" role="button" tabindex="0" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Target of Target" style="display: none">
         <div class="portrait-wrap ui-portrait-wrap">
           <div class="portrait ui-portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
           <div class="level-chip ui-medal" id="totf-level"></div>
@@ -453,6 +453,7 @@
         <div id="target-auras-window" class="panel mt-panel ta-panel ui-window" role="region" aria-labelledby="target-auras-title" style="display: none">
           <div class="panel-title ui-win-head">
             <span id="target-auras-title" class="mt-title-label ta-title ui-win-title" data-i18n="hudChrome.targetAuras.title">Target Auras</span>
+            <button type="button" class="x-btn ta-close-btn ui-x-btn" data-i18n-title="hudChrome.targetAuras.close" data-i18n-aria="hudChrome.targetAuras.close" title="Close target aura window" aria-label="Close target aura window" data-icon="close"></button>
           </div>
           <div class="ta-target ui-meta ui-muted"></div>
           <div class="ta-filters ui-seg">
@@ -481,6 +482,10 @@
           <div class="panel-title">
             <span class="mt-title-label ui-cin" data-i18n="hud.meters.healing">Healing</span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
@@ -495,6 +500,10 @@
           <div class="panel-title">
             <span class="mt-title-label ui-cin" data-i18n="hud.meters.threat">Threat</span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hudChrome.meters.dock" data-i18n-aria="hudChrome.meters.dock" title="Dock back into the meters window" aria-label="Dock back into the meters window" data-icon="close"></button>
@@ -510,9 +519,15 @@
             <span class="mt-tabs ui-seg">
               <button type="button" class="mt-tab on ui-seg-tab is-on" data-tab="dmg" data-i18n="hud.meters.damageShort">Dmg</button>
               <button type="button" class="mt-tab ui-seg-tab" data-tab="heal" data-i18n="hud.meters.healingShort">Heal</button>
+              <button type="button" class="mt-tab ui-seg-tab" data-tab="dmgTaken" data-i18n="hud.meters.damageTakenShort">Taken</button>
+              <button type="button" class="mt-tab ui-seg-tab" data-tab="interrupts" data-i18n="hud.meters.interruptsShort">Int</button>
               <button type="button" class="mt-tab ui-seg-tab" data-tab="threat" data-i18n="hud.meters.threat">Threat</button>
             </span>
             <span>
+              <button type="button" class="x-btn mt-mode-btn ui-disc" data-i18n-title="hud.meters.selectMode" title="Select mode" data-icon="menu"></button>
+              <button type="button" class="x-btn mt-new-window ui-disc" data-i18n-title="hud.meters.newWindow" title="New window">+</button>
+              <button type="button" class="x-btn mt-reset ui-disc" data-i18n-title="hud.meters.resetHint" title="Reset fight (right-click: reset all)" data-icon="trash"></button>
+              <button type="button" class="x-btn mt-settings ui-disc" data-i18n-title="hudChrome.meters.settingsTitle" data-i18n-aria="hudChrome.meters.settingsTitle" title="Details / Meters Settings" aria-label="Details / Meters Settings" data-icon="gear"></button>
               <button type="button" class="x-btn mt-prev ui-disc" data-i18n-title="hud.meters.olderSegment" title="Older segment" data-icon="prev"></button>
               <button type="button" class="x-btn mt-next ui-disc" data-i18n-title="hud.meters.newerSegment" title="Newer segment" data-icon="next"></button>
               <button type="button" class="x-btn mt-close ui-x-btn" data-i18n-title="hud.meters.close" data-i18n-aria="hud.meters.close" title="Close meters" aria-label="Close meters" data-icon="close"></button>
@@ -569,7 +584,6 @@
       <div class="map-atlas-stage">
         <button type="button" class="x-btn ui-x-btn" id="map-close" data-i18n-title="hud.core.closeMap" data-i18n-aria="hud.core.closeMap" title="Close map" aria-label="Close map" data-icon="close"></button>
         <button type="button" class="ui-btn" id="map-level-toggle" data-i18n="hudChrome.continentMap.toWorld" data-i18n-title="hudChrome.continentMap.toggleAria" data-i18n-aria="hudChrome.continentMap.toggleAria" title="Switch between the world map and the zone map" aria-label="Switch between the world map and the zone map">World map</button>
-        <button type="button" class="ui-btn" id="map-sidebar-toggle" data-i18n="hudChrome.mapAtlas.railToggle" data-i18n-title="hudChrome.mapAtlas.railToggleAria" data-i18n-aria="hudChrome.mapAtlas.railToggleAria" title="Show or hide the map side panel" aria-label="Show or hide the map side panel" aria-pressed="true">Side panel</button>
         <div id="map-zoom">
           <button type="button" class="map-zoom-btn ui-disc" id="map-zoom-in" data-i18n-title="hud.core.zoomIn" data-i18n-aria="hud.core.zoomIn" title="Zoom in" aria-label="Zoom in">+</button>
           <button type="button" class="map-zoom-btn ui-disc" id="map-zoom-out" data-i18n-title="hud.core.zoomOut" data-i18n-aria="hud.core.zoomOut" title="Zoom out" aria-label="Zoom out">&minus;</button>
@@ -644,6 +658,7 @@
       </div>
     </div>
     <div id="tooltip" class="panel"></div>
+    <div id="unit-tooltip-anchor" class="panel"></div>
 
     <div id="error-msg"></div>
     <div id="quest-banner" aria-hidden="true"></div>
@@ -663,9 +678,13 @@
     <div id="death-overlay" data-pad-nav-root data-pad-nav-required>
       <div class="death-panel ui-panel-strong">
         <h2 class="ui-cin" data-i18n="hud.core.deathTitle">You have died.</h2>
-        <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+        <div class="death-actions">
+          <button type="button" class="btn ui-btn ui-btn--red ui-btn--lg" id="release-btn" data-i18n="hud.core.releaseSpirit">Release Spirit</button>
+          <button type="button" class="btn ui-btn ui-btn--lg" id="death-recap-btn" data-i18n="hud.core.deathRecap">Recap</button>
+        </div>
       </div>
     </div>
+    <div id="death-recap-dialog" class="window panel" role="dialog" aria-modal="true" aria-labelledby="death-recap-title" style="display: none"></div>
     <!-- Ghost (spirit released): runs freely; this small non-blocking prompt appears
          only when in reach of the corpse. The Pale Keeper's raise has no button here:
          the ghost talks to the Keeper (world click or the interact key), and both
@@ -1277,6 +1296,9 @@
                 <button type="button" class="btn btn-primary" id="btn-charselect-enter" data-i18n="auth.enterWorld">Enter World</button>
                 <button type="button" class="btn btn-secondary" id="btn-charselect-back" data-i18n="auth.back">Back</button>
                 <button type="button" class="btn btn-primary cs-new-btn" id="btn-new-character" data-i18n="auth.newCharacter">New Character</button>
+                <!-- Read-only $WOC Exchange browsing: no character needed, revealed once
+                     src/game/charselect_woc_market_wiring.ts confirms the platform allows it. -->
+                <button type="button" class="btn btn-secondary" id="btn-charselect-woc-market" data-i18n="hudChrome.wocMarket.launcherLabel" hidden>$WOC Exchange</button>
               </div>
             </div>
             <!-- Right: selected character showcase -->
@@ -1306,6 +1328,10 @@
               </div>
               <div id="charselect-reroll-error" class="auth-error" aria-live="polite"></div>
             </div>
+            <!-- Read-only $WOC Exchange browsing, docked where the news panel sits
+                 (src/ui/charselect_woc_market_panel.ts). Painter-built: hidden by
+                 default, replaces the news panel's spot while open. -->
+            <div id="charselect-woc-market" class="cs-news-panel cs-woc-market-panel" role="region" aria-labelledby="charselect-woc-market-title" hidden></div>
           </div>
         </div>
 

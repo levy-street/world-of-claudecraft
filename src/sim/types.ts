@@ -508,6 +508,8 @@ export type AuraKind =
   // Vespers Priest: source-owned self resource built by Mindfracture and
   // Effigy-bound Dirge ticks, consumed whole by Call Tithefiend.
   | 'gloomtithe'
+  // Benison Dawnweave: up to three direct-prayer stacks, consumed by Choirmend.
+  | 'benison_prayers'
   // Destruction warlock secondary-resource and cast-shaping state.
   | 'destruction_ruin'
   | 'desolation'
@@ -1999,8 +2001,6 @@ export interface MobTemplate {
   /** Optional mandatory encounter threshold. Damage cannot move the mob below
    * this max-HP fraction until encounter logic clears its runtime floor. */
   damageFloorPct?: number;
-  /** Optional resting HP fraction for friendly practice targets that should stay healable. */
-  restHpFraction?: number;
   loot: LootEntry[];
   scale: number; // render hint
   color: number; // render hint
@@ -2067,6 +2067,8 @@ export interface MobTemplate {
   // (mob/practice_dummies.ts) so a healer always has something real to heal and
   // the target resets itself for the next player.
   friendlyPracticeTarget?: boolean;
+  // Custom resting health fraction for friendly practice targets (default: 0.35).
+  restHpFraction?: number;
   // Take PASSIVE idle draws off the shared world stream (Entity.offStreamRng).
   // CampDef.offStream covers a wholly new camp; this covers a template that
   // REPLACED shipped content in an existing camp slot, where the spawn draws
@@ -4115,7 +4117,10 @@ export interface DungeonDef {
   index: number; // x-band for instance origins; must be unique
   doorPos: { x: number; z: number }; // overworld entrance portal
   /** where leaving drops the player, relative to doorPos (default 0,-4);
-   *  doors flush against a building face need a FORWARD drop instead */
+   *  doors flush against a building face need a FORWARD drop instead. Also the
+   *  predefined exit facing: leaveDungeon points the player away from the door
+   *  along this vector, instead of leaving them facing whatever way they were
+   *  walking inside the instance. */
   leaveOffset?: { x: number; z: number };
   /** render the entrance membrane still (no swirl spin): for doors that
    *  read as a building's own doorway rather than a magic portal */
@@ -5204,8 +5209,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // from the guild's (or pledged guild's) collective lifetime XP. 0 for the
   // base look and for the unguilded. Server-set display only.
   guildTier: number;
-  // Book of Deeds display title: a deed id (never display text), null/absent
-  // for untitled players and every mob/npc. Written by the sim title setter
+  // Display title: a title-deed id or a developer-badge rung title id
+  // ('dev:<rung>', not a deed), never display text; null/absent for untitled
+  // players and every mob/npc. Written by the sim title setter
   // (src/sim/deeds.ts setActiveTitle) and player spawn from persisted state;
   // rides the identity wire only when non-null.
   title?: string | null;
@@ -5214,6 +5220,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // the sim border setter (src/sim/deeds.ts setActiveBorder) and player spawn
   // from persisted state; rides the identity wire only when non-null.
   border?: string | null;
+  // The chosen talent specialization (a spec id such as 'holy', never display
+  // text), null for a character with no spec yet and for every mob/npc.
+  // Render-only mirror of PlayerMeta.talentMods.spec, stamped by
+  // recalcPlayerStats beside the other worn-state mirrors so every spec,
+  // respec, loadout, level, and load path refreshes it. The sim never reads
+  // it; it rides the identity wire for the mouseover tooltip's spec line.
+  specId?: string | null;
   pos: Vec3;
   prevPos: Vec3; // for render interpolation
   facing: number; // radians, 0 = +Z
@@ -5513,6 +5526,9 @@ export interface Entity extends ClientMirroredEntityFields {
   climb?: LedgeClimb | null;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
+  // Druid Cat Form: how far the parked energy pool sits below full while out of
+  // the form (0 or absent = full). See combat/cat_form_energy.ts.
+  parkedEnergyDeficit?: number;
   sitting: boolean;
   eating: Consuming | null;
   drinking: Consuming | null;
@@ -6763,6 +6779,20 @@ export type SimEvent = { pid?: number } & (
       expiresAt: number;
       candidates: { pid: number; name: string }[];
     }
+  // A party loot roll GRANTED its item: fired once per roll, at resolution
+  // (a need/greed win or a direct master-loot assignment), pid-scoped to the
+  // winner. Distinct from the `lootRoll` PROMPT above, which fans one copy out
+  // per candidate before anyone has rolled and so never names a recipient; a
+  // consumer that wants "who received the drop" (the Discord rare-drop card)
+  // reads this event, never the prompt. Never fired when everyone passes or
+  // the winner is gone (the item returns to the corpse instead).
+  | {
+      type: 'lootRollAwarded';
+      rollId: number;
+      itemId: string;
+      itemName: string;
+      quality: ItemDef['quality'];
+    }
   | {
       type: 'error';
       text: string;
@@ -7310,6 +7340,19 @@ export type SimEvent = { pid?: number } & (
       // clamped heal2 emit site; a tick whose heal fully overheals without
       // draining a heal-absorb shield still emits nothing.
       overheal?: number;
+    }
+  // One absorb shield soaking part of one hit. Emitted per shield drained
+  // (combat/absorb_credit.ts) so the Healing meter and the parse recorder can
+  // credit the SHIELDER: the damage event's aggregate `absorbed` total names
+  // nobody. `sourceId` is the shield aura's caster, `ability` its display
+  // name, `abilityId` its aura id. Never emitted for a zero soak.
+  | {
+      type: 'absorb';
+      sourceId: number;
+      targetId: number;
+      amount: number;
+      ability: string;
+      abilityId: string;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
   // ticks, aoe novas, and the ranged-mob windup telegraph ('windup' fires at

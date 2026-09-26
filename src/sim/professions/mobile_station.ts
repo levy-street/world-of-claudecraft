@@ -25,6 +25,7 @@ import { MOBILE_CRAFTING_STATION_DURATION_TICKS, STATION_RADIUS } from '../conte
 import { refusedWhileDead } from '../dead_gate';
 import type { SimContext } from '../sim_context';
 import type { StationType } from '../types';
+import { dropMobileStationObject, spawnMobileStationObject } from './mobile_station_object';
 import { stationTypeForCraft } from './stations';
 import { type CraftSkillState, isSpecialized } from './wheel';
 
@@ -42,6 +43,11 @@ export interface MobileCraftingStation {
    *  stays valid: absent reads as false, owner-only, which is what every
    *  specialization placement sets explicitly. */
   partyShared?: boolean;
+  /** The placed station's WORLD OBJECT entity id (mobile_station_object.ts):
+   *  set at placement, cleared when the object is dropped. Optional so the
+   *  bare literal the tests plant stays valid; undefined reads as "no object
+   *  stands", which is what a room teardown leaves behind. */
+  entityId?: number;
   pos: { x: number; z: number };
   /** Sim tick this station was placed at. */
   placedAtTick: number;
@@ -114,7 +120,12 @@ export function placeMobileStationForPlayer(
     r.meta.craftSkills,
     ctx.tickCount,
   );
-  if (station) r.meta.mobileStation = station;
+  if (station) {
+    // One slot per player: the outgoing station's object leaves with it.
+    dropMobileStationObject(ctx, r.meta.mobileStation);
+    r.meta.mobileStation = station;
+    spawnMobileStationObject(ctx, station, r.e, craftId);
+  }
   return station;
 }
 
@@ -145,6 +156,7 @@ export function placeMobileStationFromItem(
   stationCraftId: string,
   name: string,
   pid?: number,
+  itemId?: string,
 ): MobileCraftingStation | undefined {
   if (refusedWhileDead(ctx, pid)) return undefined;
   const r = ctx.resolve(pid);
@@ -157,7 +169,11 @@ export function placeMobileStationFromItem(
     placedAtTick: ctx.tickCount,
     expiresAtTick: ctx.tickCount + MOBILE_CRAFTING_STATION_DURATION_TICKS,
   };
+  dropMobileStationObject(ctx, r.meta.mobileStation);
   r.meta.mobileStation = station;
+  // The object's templateId names the placing item when the caller passes
+  // it (the useItem arm), else the craft (a test or a future itemless path).
+  spawnMobileStationObject(ctx, station, r.e, itemId ?? stationCraftId);
   if (nameCarriesOwnArticle(name)) {
     ctx.emit({ type: 'log', text: `You set up ${name}.`, color: '#c9f', pid: r.meta.entityId });
   } else {

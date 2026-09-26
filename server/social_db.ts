@@ -4,6 +4,13 @@
 // stored now so cross-realm friends/guilds need no migration later).
 
 import type { Pool } from 'pg';
+import {
+  GUILD_RANK_LEADER_ID,
+  GUILD_RANK_MEMBER_ID,
+  type GuildRankDef,
+  type GuildRankId,
+  resolveGuildRankLadder,
+} from '../src/sim/guild_ranks';
 import { guildRosterCap, guildRosterPagesBought } from '../src/sim/guild_roster';
 import type { GuildPledgeSettings } from '../src/world_api/social_graph';
 import { bustAdminGuildListReads } from './admin_guilds_read';
@@ -15,12 +22,12 @@ import {
 import type { GuildPledgeSettingsInput } from './guild_pledge_settings_cmd';
 import { GuildRosterCache } from './guild_roster_cache';
 import { REALM } from './realm';
-import type { CharInfo, CharRef, GuildEventRow, GuildRank, SocialDb } from './social';
+import type { CharInfo, CharRef, GuildEventRow, SocialDb } from './social';
 
 // The exact element type SocialDb.guildMembers() promises, named once so the
 // cache and the raw reader below can share it without repeating the shape.
 type GuildMemberRow = CharInfo & {
-  rank: GuildRank;
+  rank: GuildRankId;
   lastLogin: string | null;
   activeTitle: string | null;
   joinedAt: number | null;
@@ -157,6 +164,16 @@ ALTER TABLE guilds ADD COLUMN IF NOT EXISTS new_player_friendly BOOLEAN NOT NULL
 -- next page's price always indexes the ladder by pages actually paid for.
 -- Additive and idempotent; 0 keeps every existing guild at the base roster.
 ALTER TABLE guilds ADD COLUMN IF NOT EXISTS roster_pages INT NOT NULL DEFAULT 0;
+
+-- Guild custom ranks (docs/prd/guild-custom-ranks.md): the guild's rank LADDER,
+-- an ordered JSONB array of { id, name, perms } (src/sim/guild_ranks.ts owns
+-- the shape and its one sanitizer). NULL is the default ladder (Guild Master,
+-- Officer, Member with the pre-ladder permissions), so every existing guild
+-- keeps its rules without a backfill, and guild_members.rank already holds
+-- valid rank ids ('leader' | 'officer' | 'member'). Bounded by construction
+-- (at most GUILD_RANK_MAX short entries per guild row, gone with the guild),
+-- so no retention story is needed. Additive and idempotent.
+ALTER TABLE guilds ADD COLUMN IF NOT EXISTS ranks JSONB;
 
 -- One receipt per bought roster page, written in the SAME transaction as the
 -- page and the buyer's charged purse (server/guild_roster_page_db.ts). Its
@@ -465,13 +482,18 @@ export class PgSocialDb implements SocialDb {
     bustAdminGuildListReads();
   }
 
-  async guildMembership(
-    charId: number,
-  ): Promise<{ guildId: number; guildName: string; rank: GuildRank; rosterPages: number } | null> {
-    // roster_pages rides the same JOIN the membership read already pays for,
-    // so the roster cap costs the snapshot and the invite gate no extra query.
+  async guildMembership(charId: number): Promise<{
+    guildId: number;
+    guildName: string;
+    rank: GuildRankId;
+    rosterPages: number;
+    ranks: GuildRankDef[];
+  } | null> {
+    // roster_pages and the rank ladder ride the same JOIN the membership read
+    // already pays for, so the roster cap and every rank-permission gate cost
+    // the snapshot and the op gates no extra query.
     const res = await this.pool.query(
-      `SELECT gm.guild_id, g.name AS guild_name, gm.rank, g.roster_pages
+      `SELECT gm.guild_id, g.name AS guild_name, gm.rank, g.roster_pages, g.ranks
        FROM guild_members gm JOIN guilds g ON g.id = gm.guild_id
        WHERE gm.character_id = $1`,
       [charId],
@@ -483,14 +505,65 @@ export class PgSocialDb implements SocialDb {
           guildName: row.guild_name,
           rank: row.rank,
           rosterPages: guildRosterPagesBought(row.roster_pages),
+          ranks: resolveGuildRankLadder(row.ranks),
         }
       : null;
+  }
+
+  async guildRanks(guildId: number): Promise<GuildRankDef[]> {
+    const res = await this.pool.query('SELECT ranks FROM guilds WHERE id = $1', [guildId]);
+    return resolveGuildRankLadder(res.rows[0]?.ranks);
+  }
+
+  async setGuildRankLadder(
+    guildId: number,
+    leaderCharId: number,
+    ladder: readonly GuildRankDef[],
+  ): Promise<boolean> {
+    const client = await this.pool.connect();
+    try {
+      await client.query('BEGIN');
+      // Compare-and-set on leadership (the roster-page CAS idiom): the write
+      // lands only while the caller is STILL this guild's Guild Master, so a
+      // leadership transfer racing the service's gate cannot let the former
+      // leader rewrite the ranks. The guild row lock it takes also serializes
+      // two racing ladder saves.
+      const res = await client.query(
+        `UPDATE guilds SET ranks = $2::jsonb
+         WHERE id = $1 AND EXISTS (
+           SELECT 1 FROM guild_members
+           WHERE guild_id = $1 AND character_id = $3 AND rank = '${GUILD_RANK_LEADER_ID}'
+         )`,
+        [guildId, JSON.stringify(ladder), leaderCharId],
+      );
+      if ((res.rowCount ?? 0) === 0) {
+        await client.query('ROLLBACK');
+        return false;
+      }
+      // A deleted rank's holders fall back to the joining rank IN THE SAME
+      // transaction, so no committed state ever names a rank the ladder lacks
+      // (the resolver would read it as the joining rank anyway: fail closed).
+      await client.query(
+        `UPDATE guild_members SET rank = '${GUILD_RANK_MEMBER_ID}'
+         WHERE guild_id = $1 AND NOT (rank = ANY($2::text[]))`,
+        [guildId, ladder.map((r) => r.id)],
+      );
+      await client.query('COMMIT');
+      this.guildRoster.bust(guildId);
+      bustAdminGuildListReads();
+      return true;
+    } catch (err) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw err;
+    } finally {
+      client.release();
+    }
   }
 
   async addGuildMemberAtomic(
     guildId: number,
     charId: number,
-    rank: GuildRank,
+    rank: GuildRankId,
     requirePledge = false,
   ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     const client = await this.pool.connect();
@@ -574,7 +647,7 @@ export class PgSocialDb implements SocialDb {
     bustAdminGuildListReads();
   }
 
-  async setGuildRank(charId: number, guildId: number, rank: GuildRank): Promise<boolean> {
+  async setGuildRank(charId: number, guildId: number, rank: GuildRankId): Promise<boolean> {
     // Both predicates matter: the guild_id guard means a rank change decided
     // against guild A can never rewrite a row the target has since moved to
     // guild B, and the checked rowcount tells the caller whether the UPDATE
@@ -597,6 +670,7 @@ export class PgSocialDb implements SocialDb {
     guildId: number,
     fromCharId: number,
     toCharId: number,
+    stepDownRank: GuildRankId,
   ): Promise<'ok' | 'not_leader' | 'not_member' | 'no_guild'> {
     const client = await this.pool.connect();
     try {
@@ -628,8 +702,11 @@ export class PgSocialDb implements SocialDb {
       await client.query("UPDATE guild_members SET rank = 'leader' WHERE character_id = $1", [
         toCharId,
       ]);
-      await client.query("UPDATE guild_members SET rank = 'officer' WHERE character_id = $1", [
+      // The former leader steps down to the ladder's most senior non-leader
+      // rank (the default ladder's Officer), resolved by the caller.
+      await client.query('UPDATE guild_members SET rank = $2 WHERE character_id = $1', [
         fromCharId,
+        stepDownRank,
       ]);
       await client.query('COMMIT');
       this.guildRoster.bust(guildId);

@@ -114,6 +114,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'You cannot remove the Guild Master.',
     'guild.onlyGmRemoveOfficer': 'Only the Guild Master may remove an officer.',
     'guild.onlyGmChangeRanks': 'Only the Guild Master may change ranks.',
+    'guild.belowRankOnly': 'You can only do that to members below your own rank.',
+    'guild.titleNotAllowed': 'That rank title is not allowed.',
+    'guild.ladderUpdated': 'The guild ranks have been updated.',
+    'guild.rankNumbered': 'Rank {n}',
     'guild.useTransfer': 'Use a guild transfer to hand over leadership.',
     'guild.alreadyRank': '{name} is already {rank}.',
     'guild.onlyOfficersChat': 'Only officers and the Guild Master can use officer chat.',
@@ -272,6 +276,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'You cannot remove the Guild Master.',
     'guild.onlyGmRemoveOfficer': 'Only the Guild Master may remove an officer.',
     'guild.onlyGmChangeRanks': 'Only the Guild Master may change ranks.',
+    'guild.belowRankOnly': 'You can only do that to members below your own rank.',
+    'guild.titleNotAllowed': 'That rank title is not allowed.',
+    'guild.ladderUpdated': 'The guild ranks have been updated.',
+    'guild.rankNumbered': 'Rank {n}',
     'guild.useTransfer': 'Use a guild transfer to hand over leadership.',
     'guild.alreadyRank': '{name} is already {rank}.',
     'guild.onlyOfficersChat': 'Only officers and the Guild Master can use officer chat.',
@@ -421,6 +429,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'No puedes expulsar al Maestro de hermandad.',
     'guild.onlyGmRemoveOfficer': 'Solo el Maestro de hermandad puede expulsar a un oficial.',
     'guild.onlyGmChangeRanks': 'Solo el Maestro de hermandad puede cambiar los rangos.',
+    'guild.belowRankOnly': 'Solo puedes hacer eso con miembros de rango inferior al tuyo.',
+    'guild.titleNotAllowed': 'Ese título de rango no está permitido.',
+    'guild.ladderUpdated': 'Se han actualizado los rangos de la hermandad.',
+    'guild.rankNumbered': 'Rango {n}',
     'guild.useTransfer': 'Usa una transferencia de hermandad para ceder el liderazgo.',
     'guild.alreadyRank': '{name} ya es {rank}.',
     'guild.onlyOfficersChat':
@@ -573,6 +585,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'No puedes expulsar al Maestro de hermandad.',
     'guild.onlyGmRemoveOfficer': 'Solo el Maestro de hermandad puede expulsar a un oficial.',
     'guild.onlyGmChangeRanks': 'Solo el Maestro de hermandad puede cambiar los rangos.',
+    'guild.belowRankOnly': 'Solo puedes hacer eso con miembros de rango inferior al tuyo.',
+    'guild.titleNotAllowed': 'Ese título de rango no está permitido.',
+    'guild.ladderUpdated': 'Se han actualizado los rangos de la hermandad.',
+    'guild.rankNumbered': 'Rango {n}',
     'guild.useTransfer': 'Usa una transferencia de hermandad para ceder el liderazgo.',
     'guild.alreadyRank': '{name} ya es {rank}.',
     'guild.onlyOfficersChat':
@@ -725,6 +741,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'Vous ne pouvez pas renvoyer le maître de guilde.',
     'guild.onlyGmRemoveOfficer': 'Seul le maître de guilde peut renvoyer un officier.',
     'guild.onlyGmChangeRanks': 'Seul le maître de guilde peut modifier les rangs.',
+    'guild.belowRankOnly': "Vous ne pouvez faire cela qu'aux membres de rang inférieur au vôtre.",
+    'guild.titleNotAllowed': "Ce titre de rang n'est pas autorisé.",
+    'guild.ladderUpdated': 'Les rangs de la guilde ont été mis à jour.',
+    'guild.rankNumbered': 'Rang {n}',
     'guild.useTransfer': 'Utilisez un transfert de guilde pour céder le commandement.',
     'guild.alreadyRank': '{name} est déjà {rank}.',
     'guild.onlyOfficersChat':
@@ -877,6 +897,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'Vous ne pouvez pas retirer le maître de guilde.',
     'guild.onlyGmRemoveOfficer': 'Seul le maître de guilde peut retirer un officier.',
     'guild.onlyGmChangeRanks': 'Seul le maître de guilde peut modifier les rangs.',
+    'guild.belowRankOnly': "Vous ne pouvez faire cela qu'aux membres de rang inférieur au vôtre.",
+    'guild.titleNotAllowed': "Ce titre de rang n'est pas autorisé.",
+    'guild.ladderUpdated': 'Les rangs de la guilde ont été mis à jour.',
+    'guild.rankNumbered': 'Rang {n}',
     'guild.useTransfer': 'Utilisez un transfert de guilde pour céder le commandement.',
     'guild.alreadyRank': '{name} est déjà {rank}.',
     'guild.onlyOfficersChat':
@@ -1024,6 +1048,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'Non puoi rimuovere il Maestro di Gilda.',
     'guild.onlyGmRemoveOfficer': 'Solo il Maestro di Gilda può rimuovere un ufficiale.',
     'guild.onlyGmChangeRanks': 'Solo il Maestro di Gilda può cambiare i gradi.',
+    'guild.belowRankOnly': 'Puoi farlo solo con i membri di grado inferiore al tuo.',
+    'guild.titleNotAllowed': 'Quel titolo di grado non è consentito.',
+    'guild.ladderUpdated': 'I gradi della gilda sono stati aggiornati.',
+    'guild.rankNumbered': 'Grado {n}',
     'guild.useTransfer': 'Usa un trasferimento di gilda per cedere il comando.',
     'guild.alreadyRank': '{name} è già {rank}.',
     'guild.onlyOfficersChat':
@@ -1175,6 +1203,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'Ihr könnt den Gildenmeister nicht entfernen.',
     'guild.onlyGmRemoveOfficer': 'Nur der Gildenmeister kann einen Offizier entfernen.',
     'guild.onlyGmChangeRanks': 'Nur der Gildenmeister kann Ränge ändern.',
+    'guild.belowRankOnly': 'Ihr könnt das nur bei Mitgliedern unter Eurem eigenen Rang tun.',
+    'guild.titleNotAllowed': 'Dieser Rangtitel ist nicht erlaubt.',
+    'guild.ladderUpdated': 'Die Gildenränge wurden aktualisiert.',
+    'guild.rankNumbered': 'Rang {n}',
     'guild.useTransfer': 'Benutzt eine Gildenübertragung, um die Führung abzugeben.',
     'guild.alreadyRank': '{name} ist bereits {rank}.',
     'guild.onlyOfficersChat':
@@ -1317,6 +1349,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': '你无法移除会长。',
     'guild.onlyGmRemoveOfficer': '只有会长才能移除官员。',
     'guild.onlyGmChangeRanks': '只有会长才能更改职位。',
+    'guild.belowRankOnly': '你只能对职位低于你的成员这样做。',
+    'guild.titleNotAllowed': '该职位名称不被允许。',
+    'guild.ladderUpdated': '公会职位已更新。',
+    'guild.rankNumbered': '职位 {n}',
     'guild.useTransfer': '请使用公会转让来移交会长职位。',
     'guild.alreadyRank': '{name}已经是{rank}。',
     'guild.onlyOfficersChat': '只有官员和会长才能使用官员频道。',
@@ -1456,6 +1492,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': '你無法移除會長。',
     'guild.onlyGmRemoveOfficer': '只有會長才能移除幹部。',
     'guild.onlyGmChangeRanks': '只有會長才能變更階級。',
+    'guild.belowRankOnly': '你只能對階級低於你的成員這麼做。',
+    'guild.titleNotAllowed': '該階級名稱不被允許。',
+    'guild.ladderUpdated': '公會階級已更新。',
+    'guild.rankNumbered': '階級 {n}',
     'guild.useTransfer': '請使用公會轉讓來移交領導權。',
     'guild.alreadyRank': '{name} 已經是{rank}。',
     'guild.onlyOfficersChat': '只有幹部和會長才能使用幹部頻道。',
@@ -1598,6 +1638,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': '길드장은 추방할 수 없습니다.',
     'guild.onlyGmRemoveOfficer': '길드장만 장교를 추방할 수 있습니다.',
     'guild.onlyGmChangeRanks': '길드장만 등급을 변경할 수 있습니다.',
+    'guild.belowRankOnly': '자신보다 낮은 등급의 길드원에게만 할 수 있습니다.',
+    'guild.titleNotAllowed': '허용되지 않는 등급 이름입니다.',
+    'guild.ladderUpdated': '길드 등급이 변경되었습니다.',
+    'guild.rankNumbered': '{n}등급',
     'guild.useTransfer': '길드 양도를 사용하여 길드장을 넘기십시오.',
     'guild.alreadyRank': '{name}님은 이미 {rank}입니다.',
     'guild.onlyOfficersChat': '장교와 길드장만 장교 대화를 사용할 수 있습니다.',
@@ -1740,6 +1784,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'ギルドマスターを除名することはできません。',
     'guild.onlyGmRemoveOfficer': 'オフィサーを除名できるのはギルドマスターのみです。',
     'guild.onlyGmChangeRanks': 'ランクを変更できるのはギルドマスターのみです。',
+    'guild.belowRankOnly': 'それができるのは自分より下のランクのメンバーだけです。',
+    'guild.titleNotAllowed': 'そのランク名は使用できません。',
+    'guild.ladderUpdated': 'ギルドのランクが更新されました。',
+    'guild.rankNumbered': 'ランク{n}',
     'guild.useTransfer': 'リーダーシップを引き継ぐにはギルド移譲を使用してください。',
     'guild.alreadyRank': '{name}はすでに{rank}です。',
     'guild.onlyOfficersChat':
@@ -1890,6 +1938,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'Você não pode remover o Mestre da Guilda.',
     'guild.onlyGmRemoveOfficer': 'Apenas o Mestre da Guilda pode remover um oficial.',
     'guild.onlyGmChangeRanks': 'Apenas o Mestre da Guilda pode alterar os cargos.',
+    'guild.belowRankOnly': 'Você só pode fazer isso com membros de cargo inferior ao seu.',
+    'guild.titleNotAllowed': 'Esse título de cargo não é permitido.',
+    'guild.ladderUpdated': 'Os cargos da guilda foram atualizados.',
+    'guild.rankNumbered': 'Cargo {n}',
     'guild.useTransfer': 'Use uma transferência de guilda para passar a liderança.',
     'guild.alreadyRank': '{name} já é {rank}.',
     'guild.onlyOfficersChat': 'Apenas oficiais e o Mestre da Guilda podem usar o chat de oficiais.',
@@ -2036,6 +2088,10 @@ export const DICT: Record<string, Record<string, string>> = {
     'guild.cannotRemoveGm': 'Вы не можете исключить главу гильдии.',
     'guild.onlyGmRemoveOfficer': 'Только глава гильдии может исключить офицера.',
     'guild.onlyGmChangeRanks': 'Только глава гильдии может изменять звания.',
+    'guild.belowRankOnly': 'Это можно сделать только с участниками ниже вашего звания.',
+    'guild.titleNotAllowed': 'Такое название звания недопустимо.',
+    'guild.ladderUpdated': 'Звания гильдии обновлены.',
+    'guild.rankNumbered': 'Звание {n}',
     'guild.useTransfer': 'Чтобы передать лидерство, воспользуйтесь передачей гильдии.',
     'guild.alreadyRank': '{name} уже {rank}.',
     'guild.onlyOfficersChat': 'Использовать чат офицеров могут только офицеры и глава гильдии.',
@@ -2131,6 +2187,13 @@ const LEAVE_REASON_KEY: Record<string, string> = {
 function localizeRank(r: string): string {
   const k = RANK_KEY[r];
   return k ? tServer(k) : r;
+}
+// A bracketed custom rank from a rank-change line (server/social.ts rankLabel):
+// an untitled custom rank's 'Rank N' re-localizes; a guild's own title is
+// player text and splices through verbatim, like a name.
+function localizeRankTitle(title: string): string {
+  const numbered = /^Rank (\d+)$/.exec(title);
+  return numbered ? tServer('guild.rankNumbered', { n: numbered[1] }) : title;
 }
 function localizeReason(r: string): string {
   const k = LEAVE_REASON_KEY[r];
@@ -2499,6 +2562,16 @@ const RULES: Rule[] = [
   {
     re: /^(.+) is now (Guild Master|Officer|Member)\.$/,
     build: (m) => tServer('guild.nowRank', { name: m[1], rank: localizeRank(m[2]) }),
+  },
+  // Guild custom ranks (docs/prd/guild-custom-ranks.md): the same two lines
+  // naming a guild-titled or untitled custom rank, which the server brackets.
+  {
+    re: /^(.+) is already \[([^\]]+)\]\.$/,
+    build: (m) => tServer('guild.alreadyRank', { name: m[1], rank: localizeRankTitle(m[2]) }),
+  },
+  {
+    re: /^(.+) is now \[([^\]]+)\]\.$/,
+    build: (m) => tServer('guild.nowRank', { name: m[1], rank: localizeRankTitle(m[2]) }),
   },
   {
     re: /^No character named '(.+)' exists\.$/,

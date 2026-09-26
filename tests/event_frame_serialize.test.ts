@@ -639,6 +639,20 @@ describe('event_frame pure assembly', () => {
     expect(filterRoutableEvents([])).toEqual([]);
   });
 
+  it('filterRoutableEvents drops the server-only lootRollAwarded (its consumer is the Discord card, never a client)', () => {
+    const award = {
+      type: 'lootRollAwarded',
+      rollId: 3,
+      itemId: 'greyjaw_hide_boots',
+      itemName: 'Greyjaw Hide Boots',
+      quality: 'uncommon',
+      pid: 7,
+    };
+    const loot = { type: 'loot', text: 'Aaa wins [[i:greyjaw_hide_boots]] (88)', pid: 7 };
+    const events = [loot, award] as unknown as SimEvent[];
+    expect(filterRoutableEvents(events)).toEqual([loot]);
+  });
+
   it('serializeEventFragments stringifies each event once, index-aligned', () => {
     const events = [
       { type: 'chat', fromPid: 7, from: 'A', channel: 'general', text: 'hi' },

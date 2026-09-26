@@ -121,11 +121,16 @@ export function removeUnlockedFromSlots(inventory: InvSlot[], itemId: string, co
  *  always knows its own index).
  *
  *  Toggling the lock never changes `count` or the slot count, so it needs no
- *  bag-space check either way: a locked payload is never mergeable
- *  (item_instance_merge.ts isMergeableInstancePayload), which simply keeps a
- *  freshly picked-up unlocked unit of the same item from silently merging
- *  into (and inheriting the lock of) an already-locked stack; it starts its
- *  own separate slot instead, same as any other non-mergeable payload. */
+ *  bag-space check either way: a locked payload never tops up an EXISTING
+ *  slot (item_instance_merge.ts isMergeableInstancePayload), which keeps a
+ *  freshly picked-up plain unit of the same item from silently merging into
+ *  (and inheriting the lock of) an already-locked stack, and keeps two
+ *  separately-locked stacks from merging into each other; it starts its own
+ *  separate slot instead. That anti-taint rule is about TOPPING UP, never
+ *  about how big a NEW slot may be: a locked stack still packs a fresh slot
+ *  up to the item's normal cap (item_instance_merge.ts
+ *  isChargeBearingPayload), since locking is one flag over the WHOLE stack
+ *  this function mutates in place, not a per-unit identity. */
 export function setItemLocked(
   ctx: SimContext,
   itemId: string,

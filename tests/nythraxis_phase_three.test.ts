@@ -17,7 +17,11 @@ import {
   NYTHRAXIS_BONE_STORM_SECONDS,
   nythraxisBoneStormCadence,
 } from '../src/sim/nythraxis_bone_storm';
-import { NYTHRAXIS_DREAD_CURSE_AURA_ID } from '../src/sim/nythraxis_dread_curse';
+import {
+  castNythraxisDreadCurse,
+  NYTHRAXIS_DREAD_CURSE_AURA_ID,
+  nythraxisDreadCurseStacks,
+} from '../src/sim/nythraxis_dread_curse';
 import {
   NYTHRAXIS_CROWN_ENDURES_AURA_ID,
   NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
@@ -439,6 +443,32 @@ describe('Nythraxis Bone Storm', () => {
     nythraxis.updateNythraxisEncounter(ctx2, boss2);
     expect(st2.boneStorm).toBeNull();
     expect(st2.boneStormTimer).toBe(3);
+  });
+
+  it('strips a live Dread Curse stack the instant the storm begins (issue: unhealable Curse + Bone Storm overlap)', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { sim, ctx, boss, st, tank } = setup({ difficulty });
+      teleport(sim, tank, boss.pos.x + 3, boss.pos.z, boss.pos.y);
+      // Two stacks up, exactly the state a raid is in mid tank-swap when Bone
+      // Storm's cadence lands right behind Dread Curse's.
+      castNythraxisDreadCurse(ctx, boss, tank, difficulty);
+      castNythraxisDreadCurse(ctx, boss, tank, difficulty);
+      tank.hp = tank.maxHp;
+      expect(nythraxisDreadCurseStacks(tank, boss.id), difficulty).toBe(2);
+      st.dreadCurseHolderId = tank.id;
+      st.boneStormTimer = DT / 2;
+      nythraxis.updateNythraxisEncounter(ctx, boss);
+      expect(st.boneStorm, difficulty).not.toBeNull();
+      // The storm already holds new Curse applications; a stack landed just
+      // before it began must not ride along either, or its vuln_source
+      // amplifier would double onto the storm's own whirl/slam damage the
+      // moment the hash-ranked charge reaches the same raider.
+      expect(
+        tank.auras.some((a: { id: string }) => a.id === NYTHRAXIS_DREAD_CURSE_AURA_ID),
+        difficulty,
+      ).toBe(false);
+      expect(st.dreadCurseHolderId, difficulty).toBeNull();
+    }
   });
 
   it('is dropped by a reset and by the kill', () => {

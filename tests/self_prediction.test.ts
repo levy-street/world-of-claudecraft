@@ -3,9 +3,12 @@ import type { InputTickFrame } from '../src/game/input_tick_sampler';
 import { MovementWireGlue } from '../src/game/movement_wire_glue';
 import { MovementPredictionPipeline, type SelfPredictionWire } from '../src/render/self_prediction';
 import { SELF_PREDICTION_RING_CAPACITY } from '../src/render/self_prediction_core';
+import { DELVE_X_MIN } from '../src/sim/data';
+import { DELVE_DOOR_AISLE_HALF_DEPTH, type DelveDoorClampSolid } from '../src/sim/delves/geometry';
 import { createPlayer } from '../src/sim/entity';
 import { emptyMoveInput, type MoveInput } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
+import type { DelveRunInfo } from '../src/world_api/delves';
 
 const SEED = 17;
 
@@ -198,6 +201,66 @@ describe('MovementPredictionPipeline', () => {
     drivePredictionFrame(pipeline, 9);
 
     expect(pipeline.display()?.position).toEqual(authoritative);
+  });
+
+  // Issue #3480 (enable self-motion prediction inside delves): prepare()'s
+  // delveRun/delveSolids parameters must reach the deps.resolveMove closure
+  // createClientPlayerMotionDeps builds (the geometry itself is proven
+  // separately: tests/delve_geometry.test.ts for the pure clamp + the
+  // server/client derivation parity, tests/player_motion.test.ts for the same
+  // clamp chain run tick-for-tick against a live Sim). The synthetic door
+  // sits well short of this module's own real wall, so only the door clamp
+  // this test targets can be what stops the approach.
+  // The player really must sit at a real delve-band x: stepPlayerMotion only
+  // routes through deps.resolveMove at all inside isInstancedRegion(x)
+  // (src/sim/player_motion.ts), which delve x-coordinates satisfy and an
+  // arbitrary open-world x (the other fixtures in this file all use x near 0)
+  // does not, so a wrong x here would run the open-world physics solver and
+  // pass vacuously with the clamp never invoked.
+  it('threads delveRun/delveSolids from prepare() into the predicted kernel step', () => {
+    const wire = new FakeSelfPredictionWire();
+    wire.reconAuthoritativeX = DELVE_X_MIN;
+    wire.reconAuthoritativeY = groundHeight(DELVE_X_MIN, 0, SEED);
+    wire.reconAuthoritativeZ = 0;
+    wire.reconAuthoritativeFacing = 0; // face +z, straight at the door
+    const self = createPlayer(1, 'warrior', { x: DELVE_X_MIN, y: 0, z: 0 }, 'Tester');
+    const pipeline = new MovementPredictionPipeline(SEED);
+    pipeline.connect(wire, 0);
+    const delveRun: DelveRunInfo = {
+      delveId: 'test_delve',
+      tierId: 'normal',
+      slot: 0,
+      origin: { x: DELVE_X_MIN, z: 0 },
+      moduleIndex: 0,
+      moduleCount: 1,
+      // A real module id (its own real wall bounds apply too, well clear of
+      // the synthetic door below): resolveMovement's swept sub-steps build
+      // real colliders from DELVE_MODULE_LAYOUTS[moduleId], which crashes on
+      // an id with no matching layout.
+      modules: ['reliquary_sunken_ossuary'],
+      objective: { kind: 'kill_boss', counts: [0], complete: false },
+      affixes: [],
+      completed: false,
+      exitPortalOpen: false,
+      bountiful: false,
+      rite: null,
+    };
+    const doorZ = 10;
+    const solids: DelveDoorClampSolid[] = [
+      { kind: 'locked_door', x: DELVE_X_MIN, z: doorZ, hp: 1 },
+    ];
+    pipeline.prepare(wire, self, true, { delveRun, delveSolids: solids });
+
+    for (let ct = 0; ct < 80; ct++) {
+      drivePredictionFrame(pipeline, ct, { ...emptyMoveInput(), forward: true });
+    }
+    const predictedZ = (pipeline as unknown as { predicted: { pos: { z: number } } }).predicted.pos
+      .z;
+    const blockedFace = doorZ - DELVE_DOOR_AISLE_HALF_DEPTH - 0.5; // PLAYER_BODY_RADIUS
+    // Blocked well short of the door (80 forward frames at run speed would
+    // otherwise cover far more than doorZ if the clamp never ran).
+    expect(predictedZ).toBeLessThan(blockedFace + 0.5);
+    expect(predictedZ).toBeGreaterThan(0); // and not vacuously stuck at the start either
   });
 });
 

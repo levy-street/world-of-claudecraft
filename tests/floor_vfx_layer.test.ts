@@ -179,6 +179,8 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/ability_vfx/signature_crests.ts',
   // vertical or body-anchored class VFX
   'src/render/burning_pact_markers.ts',
+  'src/render/characters/gloamveil_veil.ts',
+  'src/render/characters/moonwing_adornment.ts',
   'src/render/characters/paladin_templars_verdict_fx.ts',
   'src/render/characters/visual.ts',
   'src/render/drain_life_vfx.ts',

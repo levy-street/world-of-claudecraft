@@ -179,6 +179,10 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'No listings of that item are available to sweep.': 'itemUi.errors.sweepNoListings',
     'Prices changed before your sweep landed. Check the quote and try again.':
       'itemUi.errors.sweepPriceChanged',
+    'Name how many you want.': 'itemUi.errors.orderCountNeeded',
+    'That order is no longer open.': 'itemUi.errors.orderClosed',
+    'That is your own order - cancel it to withdraw it.': 'itemUi.errors.orderOwn',
+    'That is not your order.': 'itemUi.errors.orderNotYours',
     "You can't assist yourself.": 'hud.errors.assistSelf',
     'Assist whom? Target a player or use /assist <name>.': 'hud.errors.assistWhom',
     'Invite whom? Usage: /invite <name>.': 'hudChrome.party.inviteUsage',
@@ -245,6 +249,11 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   match = /^You may keep at most (\d+) goods on the market at once\.$/.exec(text);
   if (match)
     return t('itemUi.errors.tooManyListings', {
+      count: formatNumber(Number(match[1]), { maximumFractionDigits: 0 }),
+    });
+  match = /^You may keep at most (\d+) orders open at once\.$/.exec(text);
+  if (match)
+    return t('itemUi.errors.tooManyOrders', {
       count: formatNumber(Number(match[1]), { maximumFractionDigits: 0 }),
     });
   match = /^That is your own listing (?:\u2014|-) cancel it to reclaim it\.$/.exec(text);

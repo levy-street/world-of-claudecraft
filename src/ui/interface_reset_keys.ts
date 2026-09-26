@@ -42,7 +42,6 @@ export const INTERFACE_OFF_MENU_KEYS: Record<InterfaceTab, readonly (keyof GameS
     'combineAuraFrames',
     'moveTargetOfTargetIndependently',
     'hideUnusedActionSlots',
-    'mouseoverCast',
     'lockActionBars',
   ],
   chat: [],

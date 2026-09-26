@@ -1,8 +1,15 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
+import type { PrewarmResumeUnit } from '../prewarm_resume';
 import { bindSceneSamples, SCENE_SAMPLE_GLSL, sceneKeyLightUniform } from '../scene_sampling';
 import { BLOOD_FILM_GLSL } from './blood_film_material';
 import { BLOODLETTING_FRAGMENT, BLOODLETTING_VERTEX } from './bloodletting_shape';
-import { CrestPrewarm } from './crest_prewarm';
+import { CrestPrewarm, type CrestPrewarmHost } from './crest_prewarm';
 import { HARVEST_FRAGMENT, HARVEST_VERTEX } from './harvest_material';
 import { WARRIOR_STORM_TURN_RATE } from './held_warrior_storm';
 import {
@@ -23,6 +30,8 @@ import { WARRIOR_VOICE_FRAGMENT, WARRIOR_VOICE_VERTEX } from './warrior_voice_ma
 /** Prepared crystalline fans, curling water sheets, flame ribbons and torn
  * spectral fins. Eight slots share cached geometry families and one program. */
 export class SignatureCrests {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   readonly preparation: CrestPrewarm;
   private readonly shapes = buildSignatureShapes();
   private readonly slots: {
@@ -271,7 +280,7 @@ export class SignatureCrests {
       this.unbind.push(bindSceneSamples(scene, mesh));
       mesh.name = 'signatureCrest';
       mesh.visible = false;
-      mesh.userData.renderCategory = 'vfx';
+      tagCastVfxKit(mesh);
       mesh.renderOrder = 4;
       // Shader animation can move the surface beyond its prepared bounds.
       mesh.frustumCulled = false;
@@ -290,6 +299,31 @@ export class SignatureCrests {
     this.preparation = new CrestPrewarm(scene, this.shapes, this.slots[0].mesh.material);
     proto.dispose();
   }
+  /** The pool is built at boot, before the kit's demand load lands, so the
+   * recipe binds the landed textures to every slot (the carriers share slot
+   * 0's material) ahead of the first compile. A sampler value never enters
+   * the program key: the bind requests no relink. */
+  units(host: CrestPrewarmHost, kinds?: readonly CrestKind[]): PrewarmResumeUnit[] {
+    const units = this.preparation.units(host, kinds);
+    if (!units.length) return units;
+    return [{ id: 'crest-bind-kit', synchronous: true, run: () => this.bindKit() }, ...units];
+  }
+  private bindKit(): void {
+    if (this.disposed) return;
+    const pressure = warriorPressureTexture(),
+      blood = warriorBloodTexture(),
+      steel = warriorSteelTexture(),
+      rock = warriorRockTexture();
+    if (!pressure || !blood || !steel || !rock)
+      throw new Error('Warrior crest textures have not been prepared');
+    for (const s of this.slots) {
+      const u = s.mesh.material.uniforms;
+      u.uPressureMap.value = pressure;
+      u.uBloodMap.value = blood;
+      u.uSteelMap.value = steel;
+      u.uRockMap.value = rock;
+    }
+  }
   spawn(
     x: number,
     y: number,
@@ -305,6 +339,7 @@ export class SignatureCrests {
   ): boolean {
     if (
       this.disposed ||
+      !this.spawnGate.allows(CAST_VFX_KIT) ||
       ![x, y, z, radius, height, angle, pitch].every(Number.isFinite) ||
       radius <= 0 ||
       height <= 0

@@ -43,8 +43,8 @@ const CHAT_BURST = 8; // messages a player may send back-to-back...
 const CHAT_REFILL = 2; // ...then this many more per second (caps spam amplifiers)
 const OVERHEAD_EMOTE_DURATION = 3.2;
 
-// The speaker's selected Book of Deeds title, spread into every PLAYER-sourced
-// chat emit as the optional `fromTitle` field: a deed id the client localizes
+// The speaker's selected title, spread into every PLAYER-sourced chat emit as
+// the optional `fromTitle` field: a title id (deed or 'dev:<rung>') localized
 // through deed_i18n, never display text. Untitled players omit the key
 // entirely (the event stays byte-identical to the pre-title shape), and the
 // mob/boss yell emitters (mob/yells.ts, encounters/*) never call this.

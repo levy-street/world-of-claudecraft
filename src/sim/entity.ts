@@ -1,4 +1,6 @@
+import { parkCatEnergy, takeCatFormEntryEnergy } from './combat/cat_form_energy';
 import { resetCraftedCollectionState } from './combat/crafted_collection_effects';
+import { clearUnequippedBenisonPrayers } from './combat/priest/benison_dawnweave';
 import { BATTLE_STANCE, buildStanceAura } from './combat/warrior_stances';
 import { crucibleCollectionFamilyForSet } from './content/crucible_collections';
 import type { TalentModifiers } from './content/talents';
@@ -251,6 +253,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
     guildTier: 0,
     title: null,
     border: null,
+    specId: null,
   };
 }
 
@@ -398,6 +401,7 @@ export function recalcPlayerStats(
   // totals so they feed every derivation below; AP/crit/pushback fold in at
   // their own steps (bonusAp, critChance, castPushbackReduction, knockbackResistance).
   const setEff = aggregateSetBonuses(setCounts);
+  clearUnequippedBenisonPrayers(e, setCounts.get('benison_dawnweave') ?? 0);
   resetCraftedCollectionState(
     e,
     [...setCounts].find(([id, count]) => count >= 2 && crucibleCollectionFamilyForSet(id))?.[0],
@@ -636,6 +640,9 @@ export function recalcPlayerStats(
   // owning PlayerMeta.equipment never aliases into the entity. Synced in the
   // identity wire (terse `eq`) for the inspect-another-player window.
   e.equippedItems = { ...equipment };
+  // Render-only mirror of the chosen spec (Entity.specId): every path that
+  // re-bakes talent mods re-runs this stats pass, so the mirror cannot go stale.
+  e.specId = mods?.spec ?? null;
   // Render-only mirror of PlayerMeta.equipmentInstance, same copy-not-alias
   // reasoning as equippedItems above. Deep-cloned via cloneItemInstancePayload
   // (not a shallow spread) since a payload's own rolled.stats map must not be
@@ -746,12 +753,20 @@ export function recalcPlayerStats(
   if (e.kind === 'player') e.scale = scaleMul;
 
   // Druid forms swap the resource bar, classic-style: bear runs on rage
-  // (starts empty, fills from combat), cat on energy (starts full — friendlier
-  // than the classic-era 0). Mana is parked in savedMana and restored on shift-out.
+  // (starts empty, fills from combat), cat on energy. Mana is parked in savedMana
+  // and restored on shift-out. Cat energy is parked too, as it is left: out of
+  // combat a shift into Cat still starts full (friendlier than the classic-era
+  // 0), but mid-fight it returns the parked pool, so leaving Cat and coming back
+  // is never a refill (combat/cat_form_energy.ts).
   const formResource: 'rage' | 'energy' | null = bearForm ? 'rage' : catForm ? 'energy' : null;
+  if (e.resourceType === 'energy' && formResource !== 'energy' && def.resourceType === 'mana') {
+    parkCatEnergy(e, e.resource);
+  }
   if (formResource) {
     if (e.resourceType === 'mana') e.savedMana = e.resource;
-    if (e.resourceType !== formResource) e.resource = formResource === 'energy' ? 100 : 0;
+    if (e.resourceType !== formResource) {
+      e.resource = formResource === 'energy' ? takeCatFormEntryEnergy(e) : 0;
+    }
     e.resourceType = formResource;
     e.maxResource = 100;
   } else if (def.resourceType === 'mana') {

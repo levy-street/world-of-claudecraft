@@ -74,6 +74,12 @@ vi.mock('../src/sim/data', () => ({
   },
 }));
 
+// The familiar stand-in has its own suite (affliction_familiar_prewarm.test.ts);
+// its module reaches the real sim data this suite mocks, so it is stubbed out.
+vi.mock('../src/render/affliction_familiar', () => ({
+  buildAfflictionFamiliarPrewarmStandIn: () => null,
+}));
+
 // Only the object builder reaches quest objects; the impl is test-injected so
 // importing the module under test never touches the asset pipeline.
 vi.mock('../src/render/quest_objects', () => ({
@@ -90,7 +96,7 @@ const ZONE = { id: 'test_zone' } as ZoneDef;
 const NO_DEADLINE = Number.MAX_SAFE_INTEGER;
 
 const makeHost = (npcIds: string[]): ZonePrewarmGroupHost => ({
-  sim: { player: { pos: { x: 3, y: 1, z: -2 } } },
+  sim: { player: { pos: { x: 3, y: 1, z: -2 } }, cfg: { playerClass: 'warlock' } },
   prewarmEntity: (kind, templateId, color, scale, skin = 0, id = -10_000) =>
     ({ kind, templateId, color, scale, skin, id }) as unknown as Entity,
   storePooledObject: () => {},

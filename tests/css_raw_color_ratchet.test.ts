@@ -149,7 +149,10 @@ const CEILINGS: Record<string, number> = {
   // treatment) arrive carrying literals the redesign has not migrated yet.
   // Re-counted on the merged sheet, never reconciled by arithmetic.
   'components.css': 471,
-  'hud.css': 447,
+  // 447 -> 663 on the v0.44.0 release line: the merged HUD surface adds
+  // detailed meter settings, death-recap styling and cooldown-manager chrome.
+  // Re-counted on the merged sheet; token migration is tracked separately.
+  'hud.css': 663,
   // New sheet from the release arm (the gathering goal tracker), tokenized as
   // authored: it joins the ratchet pinned at zero.
   'hud.gathering-goal.css': 0,

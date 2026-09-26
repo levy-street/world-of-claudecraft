@@ -1,8 +1,19 @@
+import { CAST_VFX_ENGINE } from '../cast_vfx_family';
 import type { AbilityVfxFx } from './fx';
 import { OVERLAY_CELL } from './fx_textures';
 import type { OverlaySprites } from './overlay_sprites';
 
 const STACKS = [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }, { n: 5 }] as const;
+
+/** The families a held control mark draws from: an orbit band of the engine's
+ *  overlay and nothing of the kit, so a Rogue's shared armor mark never makes
+ *  a session without a Warrior wait on the kit. */
+export const WARRIOR_CONTROL_MARK_REQUIREMENT = CAST_VFX_ENGINE;
+
+/** Whether this aura is one of the Warrior control marks the painter holds. */
+export function isWarriorControlMark(aura: { id: string; kind?: string }): boolean {
+  return aura.kind === 'sunder' || (aura.id === 'hamstring_slow' && aura.kind === 'slow');
+}
 
 /** Sunder is a shared armor status: a Warrior can refresh a Rogue-created
  * instance without changing its stored id. The real kind/stacks stay truthful. */
@@ -12,8 +23,8 @@ export function holdWarriorControlMark(
   aura: { id: string; kind?: string; remaining?: number; stacks?: number },
   alive: boolean,
 ): boolean {
+  if (!isWarriorControlMark(aura)) return false;
   const armor = aura.kind === 'sunder';
-  if (!armor && !(aura.id === 'hamstring_slow' && aura.kind === 'slow')) return false;
   if (!alive || (aura.remaining ?? 0) <= 0) return true;
   const stack = Math.min(5, Math.max(1, Math.floor(aura.stacks ?? 1)));
   fx.orbit(

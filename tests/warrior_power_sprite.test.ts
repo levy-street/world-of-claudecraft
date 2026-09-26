@@ -98,7 +98,8 @@ it.each(['warrior_power', 'warrior_fervor'] as const)(
     expect(cast(replacement)).toBe(false);
     const unprepared = new BakedImpactLayers(new THREE.Scene());
     expect(cast(unprepared)).toBe(false);
-    expect(unprepared.spawn('smoke', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0)).toBe(true);
+    // Smoke is a kit-uploaded sheet too, so a host with no readiness keeps it cold.
+    expect(unprepared.spawn('smoke', 0, 1, 0, 5, 0xffffff, 0xffffff, 0.3, 0, 1, 0)).toBe(false);
     pool.dispose();
     replacement.dispose();
     unprepared.dispose();

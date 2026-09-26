@@ -550,6 +550,8 @@ export const guideStrings = {
     ifTooltipScale: 'Tooltip text size, handy on a small screen or a very large one.',
     ifHighContrastText:
       'Heavier, higher-contrast interface text. An accessibility option first, and a good one on a bright screen.',
+    ifColorblindMode:
+      'Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.',
     ifHighContrastBackground:
       'A plainer, higher-contrast background behind the start and character screens.',
     ifInvertLookY: 'Flips the up and down direction of mouse look.',
@@ -583,8 +585,12 @@ export const guideStrings = {
       'Puts your buffs and debuffs on your own unit frame as well as the aura bar.',
     ifAuraBarBelowFrame:
       'Moves the buff row below your unit frame instead of above it. Only matters while buffs are on the player frame.',
+    ifTargetAurasBelowFrame:
+      "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
     ifAlwaysShowAllBuffs:
       'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
+    ifShowAuraCaster:
+      'Adds a "Cast by" line to every buff/debuff tooltip, naming who applied it. Handy for telling apart several casters of the same buff, like two paladins\' Blessings.',
     ifTargetOfTarget:
       'Shows who your target is targeting, the classic way to tell whether the tank still has it.',
     ifPetFrame: 'Shows a frame for your pet.',
@@ -602,7 +608,7 @@ export const guideStrings = {
     ifWalkByAutoloot: 'Scoops the loot from your own kills as you walk past them. Off by default.',
     ifGroundReticle: 'Shows the ground circle while you are aiming a placed spell.',
     ifMouseoverCast:
-      'Lets a heal or a friendly spell land on the party frame you are hovering, without changing your target.',
+      'Lets a heal or a friendly spell land on the unit frame you are hovering, a party or raid row or the target-of-target frame, without changing your target.',
     ifStickyTarget:
       'Keeps your current target when you click on empty ground, instead of clearing it.',
     ifFctScale: 'The size of the damage and healing numbers that float off your target.',
@@ -758,6 +764,14 @@ export const guideStrings = {
     // for the same reason as the aura tracks. Wordy (M16): non-Latin fills ride along.
     framesGovernedTalkingHead:
       "Edit Frames also loosens the Dialogue panel, which carries an NPC's spoken line while that NPC is out of your view; it wears its name chip while it is loose.",
+    // The mouseover tooltip's movable seat (interface_unlock_core.ts
+    // 'unitTooltip', unit_tooltip_seat.ts) joined HUD_FRAME_SPECS with the
+    // player card's title, guild, and spec lines (player_tooltip_view.ts).
+    // Own key for the same reason as the aura tracks; the menu names are the
+    // live hudChrome.interfaceUnlock values. Wordy (M16): non-Latin fills ride
+    // along.
+    framesGovernedUnitTooltip:
+      "Edit Frames also loosens the Tooltip frame, the spot where the card for whatever your mouse rests on appears: a creature's level and kind, or another player's title, guild, level and class, and specialization with its role. Drag it anywhere and the card grows from there, away from the nearest edges of the screen. Untick Tooltip under Show or Hide Frames in Frames Settings to hide that card altogether.",
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:
@@ -2005,7 +2019,7 @@ export const guideStrings = {
     // cooldown or timer lengths in the prose.
     resetTitle: 'Resetting your instances',
     resetBody:
-      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top.',
+      'Switch difficulty while your group still holds claimed runs and the old claims linger for a while before clearing on their own. The party leader can let them go at once instead: choose Reset All Instances on their own portrait menu, or type /dungeon reset. A reset works only after the difficulty has actually been changed, only while nobody, living or fallen, remains inside, only once every corpse in there has been looted clean, and a short cooldown separates one reset from the next. Arrive at the door on the wrong difficulty and the game says so before the run starts. The raid resets the same way, its own lockout and corpse-return rules still standing on top, but it skips the cooldown between resets: a raid that picked the wrong tier, or bounced off Heroic, can switch back at once, since its own lockout is what limits repeat runs.',
 
     // Standalone, spoiler-safe lore for the Drowned Temple card (the goddess twist and any
     // boss names are withheld).

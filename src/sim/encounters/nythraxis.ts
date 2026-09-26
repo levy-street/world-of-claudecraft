@@ -116,6 +116,7 @@ import {
 } from '../nythraxis_bone_storm';
 import {
   castNythraxisDreadCurse,
+  clearNythraxisDreadCurse,
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_EVERY,
   nythraxisDreadCurseStacks,
@@ -2041,6 +2042,14 @@ export function startNythraxisBoneStorm(
   boss.castRemaining = 0;
   boss.castTotal = 0;
   boss.castTargetId = null;
+  // The storm already holds new Dread Curse applications for as long as it
+  // runs; a stack landed just before it began must not ride along either, or
+  // its vuln_source amplifier doubles onto the storm's own whirl/slam
+  // damage (the "Curse and Bone Storm land together" wipes players cannot
+  // heal through or play around). Clearing it here, not merely pausing the
+  // cadence, is what makes the two majors independent instead of stacking.
+  clearNythraxisDreadCurse(ctx, boss, playersInNythraxisRoom(ctx, boss));
+  ms.dreadCurseHolderId = null;
   ctx.applyAura(boss, {
     id: NYTHRAXIS_BONE_STORM_AURA_ID,
     name: NYTHRAXIS_BONE_STORM_AURA_NAME,

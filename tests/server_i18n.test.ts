@@ -44,6 +44,16 @@ describe('server-sent message localization', () => {
     'Bob has joined the guild.',
     'Bob is now Officer.',
     'Bob is already Guild Master.',
+    // Guild custom ranks (server/social.ts rankLabel): a guild-titled or
+    // untitled custom rank rides in [brackets], plus the three new refusals /
+    // notices, all emitted from server/social.ts (an S3 blind spot for the
+    // bracketed arm, so pinned here byte for byte).
+    'Bob is now [Veteran].',
+    'Bob is now [Rank 3].',
+    'Bob is already [Rank 2].',
+    'You can only do that to members below your own rank.',
+    'That rank title is not allowed.',
+    'The guild ranks have been updated.',
     'You found the guild <Knights>! You are its Guild Master.',
     // Guild Bank Phase 3 refusals, emitted from server/game.ts (the creation
     // fee gate) and server/social.ts (the disband guard): byte-bound pins,
@@ -402,5 +412,32 @@ describe('guild bank op coordinator notices stay matchable', () => {
       }
     }
     setLanguage('en');
+  });
+});
+
+describe('guild custom rank lines (docs/prd/guild-custom-ranks.md)', () => {
+  it('splices a guild title verbatim and re-localizes an untitled Rank N', async () => {
+    setLanguage('en');
+    expect(localizeServerText('Bob is now [Veteran].')).toBe('Bob is now Veteran.');
+    expect(localizeServerText('Bob is now [Rank 3].')).toBe('Bob is now Rank 3.');
+    await ensureLocaleLoaded('es');
+    setLanguage('es');
+    expect(localizeServerText('Bob is now [Veteran].')).toBe('Bob ahora es Veteran.');
+    expect(localizeServerText('Bob is already [Rank 2].')).toBe('Bob ya es Rango 2.');
+    setLanguage('en');
+  });
+
+  it('never captures the sim lines that share the "is now / is already" shape', () => {
+    setLanguage('en');
+    // These belong to sim_i18n (it runs AFTER this matcher): a catch-all rank
+    // rule here would swallow them, which is why custom titles are bracketed.
+    for (const simLine of [
+      'Your group listing is now full.',
+      'Master Looter is now Bob.',
+      'Your pet is already alive.',
+      'The door is already open.',
+    ]) {
+      expect(localizeServerText(simLine), simLine).toBeNull();
+    }
   });
 });

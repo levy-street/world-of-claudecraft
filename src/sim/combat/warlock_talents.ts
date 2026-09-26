@@ -134,6 +134,10 @@ function removeAura(ctx: SimContext, owner: Entity, aura: Aura): void {
   });
 }
 
+// Runs from onCastCompleted, i.e. on cast, not on impact: for a spell that
+// fires a projectile the bolt is still in flight here. Never call
+// ctx.enterCombat from this function (it would aggro an idle mob before the
+// bolt lands); dealDamage already engages combat correctly at impact.
 export function applyLeadenHex(
   ctx: SimContext,
   player: Entity,
@@ -163,7 +167,6 @@ export function applyLeadenHex(
       sourceId: player.id,
       school: 'shadow',
     });
-    ctx.enterCombat(player, target);
     return;
   }
 
@@ -188,7 +191,6 @@ export function applyLeadenHex(
       school: 'shadow',
     });
   }
-  ctx.enterCombat(player, target);
 }
 
 export function grantShadowCredit(

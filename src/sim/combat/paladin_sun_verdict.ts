@@ -1,3 +1,4 @@
+import { dawnreaverDamageMultiplier } from '../dawnreaver_damage';
 import type { SimContext } from '../sim_context';
 import { stunDrCategory } from '../stun_dr';
 import type { AbilityEffect, Aura, Entity } from '../types';
@@ -74,6 +75,7 @@ function detonateSingleTarget(
   target: Entity,
   effect: SunGodVerdictEffect,
   abilityName: string,
+  damageMult: number,
 ): void {
   ctx.emit({
     type: 'spellfx',
@@ -88,7 +90,7 @@ function detonateSingleTarget(
   ctx.dealDamage(
     caster,
     target,
-    Math.round(ctx.rng.range(effect.singleTargetMin, effect.singleTargetMax)),
+    Math.round(ctx.rng.range(effect.singleTargetMin, effect.singleTargetMax) * damageMult),
     false,
     'holy',
     abilityName,
@@ -108,6 +110,7 @@ function detonateArea(
   target: Entity,
   effect: SunGodVerdictEffect,
   abilityName: string,
+  damageMult: number,
 ): void {
   ctx.emit({
     type: 'spellfx',
@@ -132,7 +135,9 @@ function detonateArea(
     .filter((victim) => ctx.hasLineOfSight(caster, victim));
   const capScale = victims.length > effect.areaSoftCap ? effect.areaSoftCap / victims.length : 1;
   for (const victim of victims) {
-    const amount = Math.round(ctx.rng.range(effect.areaMin, effect.areaMax) * capScale);
+    const amount = Math.round(
+      ctx.rng.range(effect.areaMin, effect.areaMax) * capScale * damageMult,
+    );
     ctx.dealDamage(
       caster,
       victim,
@@ -212,11 +217,17 @@ export function advanceSunGodVerdict(
     mark.remaining = Math.min(mark.remaining, DETONATION_FLASH_DURATION);
     ctx.emit({ type: 'aura', targetId: target.id, name: mark.name, gained: true });
   }
+  const meta = caster.kind === 'player' ? ctx.players.get(caster.id) : undefined;
+  const damageMult = dawnreaverDamageMultiplier(
+    meta?.cls ?? null,
+    meta ? ctx.playerMods(meta).spec : null,
+    PALADIN_SUN_GOD_VERDICT_ID,
+  );
   if (triggeringAbilityId === FINAL_EDICT_ID) {
-    detonateSingleTarget(ctx, caster, target, effect, abilityName);
+    detonateSingleTarget(ctx, caster, target, effect, abilityName, damageMult);
     return 'singleTarget';
   }
-  detonateArea(ctx, caster, target, effect, abilityName);
+  detonateArea(ctx, caster, target, effect, abilityName, damageMult);
   return 'area';
 }
 

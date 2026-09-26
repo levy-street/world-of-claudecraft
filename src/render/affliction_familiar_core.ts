@@ -18,6 +18,12 @@ const BASE_X = AFFLICTION_FAMILIAR_LOCAL_X;
 const BASE_Y = 1.72;
 const BASE_Z = AFFLICTION_FAMILIAR_LOCAL_Z;
 
+/** Whether a local player of this class can ever show the familiar: a warlock of
+ *  any spec, since a talent switch into Affliction can come mid-session. */
+export function afflictionFamiliarClass(localClass: string): boolean {
+  return localClass === 'warlock';
+}
+
 /** The client only owns a trustworthy specialization value for its local player. */
 export function shouldShowAfflictionFamiliar(
   entity: FamiliarOwner,
@@ -27,7 +33,7 @@ export function shouldShowAfflictionFamiliar(
   return (
     entity.id === localPlayerId &&
     entity.kind === 'player' &&
-    entity.templateId === 'warlock' &&
+    afflictionFamiliarClass(entity.templateId) &&
     !entity.dead &&
     talentSpec === 'affliction'
   );

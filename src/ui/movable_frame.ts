@@ -52,6 +52,8 @@ export interface MovableFrameConfig {
   frame: HTMLElement;
   /** localStorage key the chosen top-left persists under. */
   storageKey: string;
+  /** Older keys to read once when a frame's durable key is renamed. */
+  legacyStorageKeys?: readonly string[];
   /** aria-label / title while LOCKED (aria-pressed=false): press to move it. */
   unlockLabelKey: TranslationKey;
   /** aria-label / title while UNLOCKED (aria-pressed=true): press to fix it. */
@@ -141,6 +143,23 @@ export const FRAME_USER_HIDDEN_CLASS = 'tf-user-hidden';
 /** Appended to storageKey for the persisted hidden flag, so the choice rides
  *  the same per-frame key family as the saved box. */
 const HIDDEN_STORAGE_SUFFIX = '_hidden';
+
+function readFrameStorage(
+  storageKey: string,
+  legacyStorageKeys: readonly string[] = [],
+): { value: string | null; key: string | null } {
+  try {
+    const value = localStorage.getItem(storageKey);
+    if (value !== null) return { value, key: storageKey };
+    for (const legacyKey of legacyStorageKeys) {
+      const legacy = localStorage.getItem(legacyKey);
+      if (legacy !== null) return { value: legacy, key: legacyKey };
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  return { value: null, key: null };
+}
 /** Delay for the trailing post-resize re-derive, long enough for a fullscreen
  *  transition's window metrics to settle. */
 const RESIZE_SETTLE_MS = 200;
@@ -408,13 +427,8 @@ export class MovableFrame {
     this.entry = MovableFrame.registryFor(document);
     this.entry.frames.add(this);
 
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(cfg.storageKey);
-    } catch {
-      /* storage unavailable */
-    }
-    const parsedSaved = parseTargetFramePos(saved, this.maxScale());
+    const saved = readFrameStorage(cfg.storageKey, cfg.legacyStorageKeys);
+    const parsedSaved = parseTargetFramePos(saved.value, this.maxScale());
     const adopted = this.adoptPos(parsedSaved);
     this.pos = adopted;
     if (this.pos) {
@@ -423,7 +437,11 @@ export class MovableFrame {
       const stripped = adopted !== parsedSaved;
       this.applyPos();
       // Upgrade the durable intent, never the temporary startup clamp.
-      if ((legacy || stripped) && adopted && !(cfg.preserveSavedSize && stripped)) {
+      if (
+        (legacy || stripped || saved.key !== cfg.storageKey) &&
+        adopted &&
+        !(cfg.preserveSavedSize && stripped)
+      ) {
         try {
           localStorage.setItem(
             cfg.storageKey,
@@ -453,7 +471,11 @@ export class MovableFrame {
     // hidden frame never flashes on load.
     let hidden = false;
     try {
-      hidden = localStorage.getItem(cfg.storageKey + HIDDEN_STORAGE_SUFFIX) === '1';
+      hidden =
+        readFrameStorage(
+          cfg.storageKey + HIDDEN_STORAGE_SUFFIX,
+          cfg.legacyStorageKeys?.map((key) => key + HIDDEN_STORAGE_SUFFIX),
+        ).value === '1';
     } catch {
       /* storage unavailable */
     }
@@ -578,20 +600,19 @@ export class MovableFrame {
    *  (the combined group when combining turns on, the three bars when it turns
    *  off). A frame with no saved spot stays on its stylesheet position. */
   restoreSavedPosition(): void {
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(this.cfg.storageKey);
-    } catch {
-      /* storage unavailable */
-    }
-    this.pos = this.adoptPos(parseTargetFramePos(saved, this.maxScale()));
+    const saved = readFrameStorage(this.cfg.storageKey, this.cfg.legacyStorageKeys);
+    this.pos = this.adoptPos(parseTargetFramePos(saved.value, this.maxScale()));
     if (this.pos) this.applyPos();
   }
 
   /** Reload the hidden flag and stored spot without saving or changing structural docking. */
   restoreSavedState(positioned: boolean): void {
     try {
-      this.userHidden = localStorage.getItem(this.cfg.storageKey + HIDDEN_STORAGE_SUFFIX) === '1';
+      this.userHidden =
+        readFrameStorage(
+          this.cfg.storageKey + HIDDEN_STORAGE_SUFFIX,
+          this.cfg.legacyStorageKeys?.map((key) => key + HIDDEN_STORAGE_SUFFIX),
+        ).value === '1';
     } catch {
       this.userHidden = false;
     }
@@ -1113,13 +1134,8 @@ export class MovableFrame {
   // resize listener.
   private rederiveFromSaved(): void {
     if (this.gesture || !this.pos) return;
-    let savedNow: string | null = null;
-    try {
-      savedNow = localStorage.getItem(this.cfg.storageKey);
-    } catch {
-      /* storage unavailable */
-    }
-    const parsed = this.adoptPos(parseTargetFramePos(savedNow, this.maxScale()));
+    const savedNow = readFrameStorage(this.cfg.storageKey, this.cfg.legacyStorageKeys);
+    const parsed = this.adoptPos(parseTargetFramePos(savedNow.value, this.maxScale()));
     // A payload without the viewport stamp cannot re-anchor honestly; the
     // in-memory pos carries the stamp of the viewport it was last applied
     // under (the pre-change one), so it is the better basis then.

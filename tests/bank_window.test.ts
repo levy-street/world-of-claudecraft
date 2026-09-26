@@ -605,9 +605,10 @@ describe('bank_window: search / sort / deposit-all', () => {
     );
     // The carry itself lives in bank_search_focus.ts (captureSearchCaret /
     // restoreSearchCaret, unit-tested there); render() must capture before the
-    // wipe and restore on BOTH pane arms (the guild history has a search box too).
+    // wipe and restore on EVERY pane arm (the guild history and the vault have
+    // search boxes too).
     expect(body).toContain('const searchFocus = captureSearchCaret(el, active);');
-    expect(body.split('restoreSearchCaret(el, searchFocus)').length).toBe(3);
+    expect(body.split('restoreSearchCaret(el, searchFocus)').length).toBe(4);
     // Non-search focus re-lands via the key ladder (the focused control by its
     // data-focus-key, else [data-close]), never a blanket close-button yank.
     expect(body).toContain('} else if (hadFocus) {');

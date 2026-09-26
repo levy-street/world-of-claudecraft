@@ -30,8 +30,11 @@ vi.mock('../src/render/assets/loader', async () => {
 
 import {
   activeKitPrewarmEntry,
+  cancelActiveAbilityKit,
   ensureActiveAbilityKit,
+  resumeActiveAbilityKit,
 } from '../src/render/ability_vfx/active_kit_prewarm';
+import { BakedImpactLayers } from '../src/render/ability_vfx/baked_impact_layers';
 import {
   contactAssetInternalsForTest,
   contactTexture,
@@ -204,6 +207,96 @@ describe('the active kit waits for its assets', () => {
     expect(assets).toHaveBeenCalledTimes(2);
     expect(h.texture).not.toHaveBeenCalled();
   });
+});
+
+// The production shape the tests above never had: the kit's textures are NOT
+// injected, the host's assets() is the real demand loader and resolves late,
+// and the geometry host enumerates the real baked pool, whose units need the
+// resident Red Harvest sheet. The recipe used to be built before the load was
+// requested, so it threw and the kit never loaded for any Warrior.
+describe('the active kit loads its own assets before its recipe', () => {
+  function lateKit(localClass: string) {
+    const scene = new THREE.Scene();
+    const pool = new BakedImpactLayers(scene);
+    const program = { isReady: () => true, getUniforms: vi.fn(), getAttributes: vi.fn() };
+    const gpu = {
+      properties: { get: () => ({ programs: new Map([['flat', program]]) }) },
+      compile: vi.fn(async () => {}),
+      draw: vi.fn(),
+    };
+    let arrive!: () => void;
+    const arrived = new Promise<void>((resolve) => {
+      arrive = resolve;
+    });
+    const assets = vi.fn(async () => {
+      await arrived;
+      return ensureWarriorKitAssets(false);
+    });
+    const texture = vi.fn();
+    const entry = activeKitPrewarmEntry(scene, localClass, {
+      queue: { run: async (fn: () => unknown) => fn() },
+      geometry: (kinds: readonly string[]) =>
+        kinds.includes('harvest_cut') ? pool.units(gpu) : [],
+      texture,
+      assets,
+    } as never);
+    const close = () => {
+      cancelActiveAbilityKit(scene);
+      pool.dispose();
+    };
+    return { scene, gpu, assets, arrive, texture, entry, close };
+  }
+  const flush = async () => {
+    for (let i = 0; i < 20; i++) await Promise.resolve();
+  };
+
+  it('reports cold progress without throwing, then waits for the load before the first unit', async () => {
+    const k = lateKit('warrior');
+    try {
+      // The boot manifest reads progress() while the sheets are still cold:
+      // the fifteen uploads are planned, the pool's units are not enumerable yet.
+      expect(k.entry.progress()).toEqual({ done: 0, planned: 15, trimmed: true });
+      const task = ensureActiveAbilityKit(k.scene);
+      expect(k.assets).toHaveBeenCalledTimes(1);
+      await flush();
+      expect(k.texture).not.toHaveBeenCalled();
+      expect(k.gpu.compile).not.toHaveBeenCalled();
+      k.arrive();
+      await task;
+      expect(warriorKitAssetsState()).toBe('ready');
+      expect(k.texture).toHaveBeenCalledTimes(15);
+      expect(k.texture).toHaveBeenCalledWith(bakedTexture('harvest_impact'));
+      // One compile and one upload draw per baked pool slot.
+      expect(k.gpu.compile).toHaveBeenCalledTimes(10);
+      expect(k.gpu.draw).toHaveBeenCalledTimes(10);
+      expect(k.entry.progress()).toEqual({ done: 45, planned: 45, trimmed: false });
+    } finally {
+      k.close();
+    }
+  });
+
+  it.each(['warrior', 'mage'])(
+    'loads the Warrior kit through the resume path for a %s local player',
+    async (localClass) => {
+      const k = lateKit(localClass);
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      try {
+        resumeActiveAbilityKit(k.scene, undefined, 'warrior');
+        await flush();
+        expect(k.assets).toHaveBeenCalledTimes(1);
+        expect(k.texture).not.toHaveBeenCalled();
+        k.arrive();
+        await flush();
+        await ensureActiveAbilityKit(k.scene, 'warrior');
+        expect(warn).not.toHaveBeenCalled();
+        expect(warriorKitAssetsState()).toBe('ready');
+        expect(k.texture).toHaveBeenCalledTimes(15);
+        expect(k.gpu.draw).toHaveBeenCalledTimes(10);
+      } finally {
+        k.close();
+      }
+    },
+  );
 });
 
 describe('the painter requests a class kit on first sighting', () => {

@@ -1579,6 +1579,60 @@ export const hudChromeStrings = {
     since: 'Pledged {date}',
     withdraw: 'Withdraw pledge',
   },
+  // Guild-rank editor (social window): the ranks tab, editable/viewer intro,
+  // table headers, permission column labels and their hover help, row controls,
+  // validation notices, remove confirmation, and the roster's promote/demote
+  // hovers, which name the rank a click moves the member to. Wordy values (M16)
+  // ship their five non-Latin fills in the same change.
+  guildRanks: {
+    tab: 'Ranks',
+    introEdit:
+      'Name your guild ranks and choose what each one may do. Changes apply to everyone holding the rank once you save.',
+    introView: 'Each rank title and what it may do. Only the Guild Master can change them.',
+    colRank: 'Rank',
+    colTitle: 'Title',
+    colMembers: 'Members',
+    colActions: 'Order',
+    // An untitled custom rank reads as its ladder position (the Guild Master
+    // is rank 0), the way a guild ledger numbers its seats.
+    numbered: 'Rank {n}',
+    perm: {
+      invite: 'Invite',
+      remove: 'Remove',
+      promote: 'Promote',
+      bank: 'Guild Bank',
+      officerChat: 'Officer Chat',
+      motd: 'Billboard',
+      events: 'Calendar',
+    },
+    // Column-header hovers: what each permission lets a rank do.
+    permHint: {
+      invite: 'Invite players to the guild and answer their pledges.',
+      remove: 'Remove members who hold a lower rank.',
+      promote: 'Promote and demote members who hold a lower rank, up to one rank below their own.',
+      bank: 'Deposit and withdraw copper and items in the guild bank. Every member can view it.',
+      officerChat: 'Read and speak in officer chat.',
+      motd: 'Edit the guild billboard.',
+      events: 'Add and remove guild calendar events.',
+    },
+    // Accessible names for the per-row controls ({rank} is the row's label).
+    titleLabel: 'Title for {rank}',
+    permLabel: '{perm} for {rank}',
+    leaderLocked: 'The Guild Master always holds every permission.',
+    add: 'Add Rank',
+    save: 'Save Ranks',
+    moveUp: 'Move {rank} up',
+    moveDown: 'Move {rank} down',
+    remove: 'Remove {rank}',
+    full: 'A guild can have at most {max} ranks.',
+    invalidTitle:
+      'Rank titles use letters, numbers, spaces, apostrophes, and hyphens, up to {max} characters.',
+    removeConfirm: 'Members holding {rank} will become {fallback}. Remove this rank?',
+    removeAccept: 'Remove Rank',
+    // Roster row hovers for the promote / demote buttons.
+    promoteTo: 'Promote {name} to {rank}',
+    demoteTo: 'Demote {name} to {rank}',
+  },
   // Raid-lockout badge on the minimap rim + its hover/tap panel: the title, the
   // accessible label, the "all ready" line, and the unlock-countdown templates
   // (digits run through formatNumber; the units reorder per locale).
@@ -1757,6 +1811,7 @@ export const hudChromeStrings = {
     breakdownSummary: '{tab}: {value}',
     breakdownRow: '{value} ({percent})',
     breakdownOther: 'Other ({count})',
+    targetsHeader: 'Targets',
     percent: '{value}%',
     petAbility: '{pet}: {ability}',
     melee: 'Melee',
@@ -1770,6 +1825,179 @@ export const hudChromeStrings = {
     // ("Healing", "Threat"), so the row reads as the action on that meter.
     separate: 'Separate {meter}',
     regroup: 'Regroup {meter}',
+
+    // Settings button & quick menu
+    settingsTitle: 'Details / Meter Settings',
+    optionsEngineBadge: 'WoC Details! Engine',
+    resetDefaults: 'Reset to Defaults',
+    closeSettings: 'Close',
+    densityCompact: 'Density: Compact (16px)',
+    densityStandard: 'Density: Standard (20px)',
+    bgGlass: 'Background: Glass (76%)',
+    bgSolid: 'Background: Solid (98%)',
+    bgMinimal: 'Background: Minimal (45%)',
+    numDetailed: 'Numbers: Detailed',
+    numCompact: 'Numbers: Abbreviated (k/M)',
+    raidTotalsOn: 'Header group total: Yes',
+    raidTotalsOff: 'Header group total: No',
+
+    // Options dialog sidebar tabs
+    tabGeneral: 'Window & Background',
+    tabGeneralDesc: 'Opacity, scale, lock',
+    tabBars: 'Bars & Textures',
+    tabBarsDesc: 'Height, spacing, animation',
+    tabText: 'Text & Typography',
+    tabTextDesc: 'Fonts, k/M, DPS, rank',
+    tabHeader: 'Header & Title',
+    tabHeaderDesc: 'Group total, title bar',
+    tabCombat: 'Combat & Limits',
+    tabCombatDesc: 'Max rows, shields',
+    tabPresets: 'Quick Themes',
+    tabPresetsDesc: 'One-click presets',
+    tabProfiles: 'Profiles & Import',
+    tabProfilesDesc: 'Export, import, and profiles',
+
+    // Tab 1: General (Window & Background)
+    groupWindow: 'Window Appearance & Background',
+    bgMode: 'Background Mode',
+    bgModeDesc: 'Visual styling for the meter panel.',
+    optGlass: 'Glass (Blur)',
+    optGlassDesc: 'Frosted blur effect',
+    optSolid: 'Solid',
+    optSolidDesc: 'Dark high-contrast panel',
+    optMinimal: 'Minimal',
+    optMinimalDesc: 'Faint translucent',
+    optTransparent: 'Transparent',
+    optTransparentDesc: 'No background, bars only',
+    bgOpacity: 'Background Opacity',
+    bgOpacityDesc: 'Opacity percentage for the window background.',
+    windowScale: 'Window Scale',
+    windowScaleDesc: 'Increase or decrease the overall meter scale.',
+    lockPosition: 'Lock Position',
+    lockPositionDesc: 'Lock the window to prevent accidental dragging or resizing in combat.',
+
+    // Tab 2: Bars & Textures
+    groupBars: 'Bar Geometry & Texture',
+    barHeight: 'Bar Height',
+    barHeightDesc: 'Vertical thickness of each combat row (14px compact to 26px spacious).',
+    barSpacing: 'Bar Spacing',
+    barSpacingDesc: 'Vertical pixel gap between adjacent rows.',
+    barTexture: 'Bar Texture',
+    barTextureDesc: 'Visual finish and shading over the class color.',
+    texSpecular: 'Glossy (Specular)',
+    texSpecularDesc: 'Top highlight reflection with bevel',
+    texSmooth: 'Smooth (Flat)',
+    texSmoothDesc: 'Clean flat class color',
+    texGradient: 'Gradient',
+    texGradientDesc: 'Smooth horizontal color gradient',
+    barAnimation: 'Smooth Bar Animation',
+    barAnimationDesc: 'Fluidly interpolates bar growth and decay in real time.',
+    alwaysShowMe: 'Always Show Me',
+    alwaysShowMeDesc: 'Pins your player bar to the bottom if ranked outside visible rows.',
+
+    // Tab 3: Text & Typography
+    groupText: 'Text Formatting & Telemetry',
+    numFormat: 'Number Format',
+    numFormatDesc: 'Display style for totals.',
+    optNumCompact: 'Abbreviated (k / M)',
+    optNumCompactDesc: 'Example: 145.2k, 1.2M',
+    optNumDetailed: 'Full Detailed',
+    optNumDetailedDesc: 'Example: 145,200, 1,240,500',
+    optNumDamageDps: 'Damage | DPS',
+    optNumDamageDpsDesc: 'Example: 239.2k | 18.4k (clean telemetry bar)',
+    showDps: 'Show Rate per Second (DPS / HPS)',
+    showDpsDesc: 'Shows damage or healing rate per second on each bar.',
+    showPercent: 'Show Percentage (%)',
+    showPercentDesc: 'Shows percent contribution of total group output.',
+    showRank: 'Show Rank (#1, #2...)',
+    showRankDesc: 'Shows ordinal rank number beside the name.',
+    showClassIcon: 'Show Class Icon',
+    showClassIconDesc: 'Displays class or role icon next to each player.',
+    groupFont: 'Combat Typography (Font Family)',
+
+    // Tab 4: Header & Title
+    groupHeader: 'Header Customization',
+    showTitleBar: 'Show Title Bar',
+    showTitleBarDesc: 'Displays top bar with combat segment name and controls.',
+    showRaidTotals: 'Group Summary in Subtitle',
+    showRaidTotalsDesc: 'Displays cumulative group DPS/HPS in the header subtitle.',
+
+    // Tab 5: Combat & Limits
+    groupCombat: 'Combat Rules & Limits',
+    maxRows: 'Maximum Visible Rows',
+    maxRowsDesc: 'Simultaneous bars (0 = unlimited, auto-fit to window height).',
+    autoRows: ' (Auto)',
+    barsUnit: ' bars',
+    includeShields: 'Count Absorbs as Healing',
+    includeShieldsDesc: 'Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.',
+
+    // Tab 6: Presets
+    groupPresets: 'One-Click Quick Themes',
+    applyPreset: 'Apply Theme',
+    presetDetailsName: 'Modern Glass',
+    presetDetailsDesc:
+      'Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.',
+    presetDetailsBadge: 'Recommended',
+    presetClassicName: 'Classic Solid',
+    presetClassicDesc:
+      'Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.',
+    presetClassicBadge: 'Classic',
+    presetMinimalName: 'Pure Minimal',
+    presetMinimalDesc:
+      'Nearly transparent background, compact 16px bars without gaps, direct text without percentages.',
+    presetMinimalBadge: 'Clean',
+    presetRaidName: 'Raid Focus',
+    presetRaidDesc:
+      'Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.',
+    presetRaidBadge: 'Raid',
+    presetProGradientName: 'Pro Gradient',
+    presetProGradientDesc:
+      'Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.',
+    presetProGradientBadge: 'Pro',
+
+    // Tab 7: Profiles & Import/Export
+    groupManageProfiles: 'Profile Management',
+    activeProfile: 'Active Profile',
+    activeProfileDesc: 'Select or manage independent profiles for different gameplay scenarios.',
+    saveAs: 'Save As...',
+    duplicate: 'Duplicate',
+    deleteProfile: 'Delete',
+    cannotDeleteDefault: 'The Default profile cannot be deleted',
+    promptNewProfile: 'Name of the new profile:',
+    profileCopySuffix: ' (Copy)',
+    groupExport: 'Export Current Profile',
+    exportDesc: 'Encoded profile string of your current configuration. Copy it to share or backup.',
+    copyString: 'Copy Profile String',
+    copiedFeedback: 'Copied to clipboard!',
+    groupImport: 'Import Profile',
+    importDesc: 'Paste a profile string (!WoC-Details:... or JSON) to apply and save.',
+    importPlaceholder: 'Paste profile string here (!WoC-Details:...)',
+    importNamePlaceholder: 'Profile name (optional)',
+    importApply: 'Import & Apply',
+    errEmptyProfile: 'Please paste a profile string.',
+    errInvalidProfile: 'Error: Invalid or corrupt profile string.',
+    importSuccess: 'Profile "{name}" imported successfully!',
+    reportSent: 'Report copied and sent to chat',
+    reportNoData: 'No data recorded.',
+    noDetailedData: 'No detailed data',
+    noDeathEvents: 'No events logged before death',
+    killedBy: 'Killed by {killer} ({ability})',
+    lethalHit: 'Lethal Hit',
+    recentCombatEvents: 'Last {count} combat events',
+    backComparison: 'Comparison',
+    comparisonNeedTwo: 'At least 2 fights are required to compare',
+    backTimeline: 'Timeline',
+    timelineCombatEvents: 'Combat events: {count}',
+    backDev: 'Balance / Dev',
+    balanceAbilitiesCount: 'Logged abilities: {count}',
+    targetSubtitle: 'Target: {target}',
+    noTargetData: 'No player data for this target',
+  },
+  // The optional "who applied this" tooltip line (showAuraCaster setting), shared
+  // by the buff bar, debuff bar, and target strip so all three read identically.
+  // Wordy (M16): the five non-Latin fills land in this same change.
+  auraTooltip: {
+    caster: 'Cast by {name}',
   },
   // The six aura tracks (src/ui/hud/aura_tracks/): bars of the auras YOU have
   // out, one frame per question. All wordy (M16): the five non-Latin fills land
@@ -1812,6 +2040,7 @@ export const hudChromeStrings = {
     buffs: 'Buffs',
     unlock: 'Move target aura window',
     lock: 'Lock target aura window',
+    close: 'Close target aura window',
     configureRows: 'Configure target auras',
     fewerRows: 'Prefer fewer aura rows',
     moreRows: 'Prefer more aura rows',
@@ -2220,6 +2449,9 @@ export const hudChromeStrings = {
     gfxBloom: 'Bloom',
     gfxAntiAliasing: 'Anti-Aliasing',
     gfxDynamicLights: 'Dynamic Lights',
+    gfxGhostFade: 'Camera Ghost',
+    gfxGhostFadeDithered: 'Dithered',
+    gfxGhostFadeSmooth: 'Smooth',
     gfxParticleEffects: 'Particle Effects',
     gfxHalf: 'Half',
     gfxCustomNote:
@@ -2358,10 +2590,19 @@ export const hudChromeStrings = {
     // the anchored buff row to the other side of the player frame (wordy, M16:
     // the five non-Latin fills land in this same change).
     auraBarBelowFrame: 'Buffs Below the Player Frame',
+    // Interface panel toggle: hangs the target frame's buff/debuff strip below
+    // the frame instead of above it (wordy, M16: the five non-Latin fills land
+    // in this same change).
+    targetAurasBelowFrame: 'Target Auras Below the Frame',
     // Interface panel toggle: bypass the Low graphics preset's buff-icon cap so
     // every active buff always renders, at the cap's per-frame cost (wordy,
     // M16: the five non-Latin fills land in this same change).
     alwaysShowAllBuffs: 'Always Show All Buffs',
+    // Interface panel toggle: append a "Cast by <name>" line to every buff/debuff
+    // tooltip, so several casters' copies of the same aura (two paladins'
+    // Blessings, two druids' Briarguards) are told apart at a glance. Off by
+    // default (wordy, M16: the five non-Latin fills land in this same change).
+    showAuraCaster: 'Show Aura Caster in Tooltips',
     highContrastBackground: 'High-Contrast Background',
     // Interface panel toggle: also engage auto-attack when using an offensive
     // ability, so white swings start without a separate Attack press (on by default).
@@ -2374,8 +2615,9 @@ export const hudChromeStrings = {
     walkByAutoloot: 'Walk-by Autoloot',
     groundReticle: 'Ground-Targeting Reticle',
     // Interface panel toggle: Clique-style mouseover casting of friendly abilities
-    // on the hovered party frame (on by default).
-    mouseoverCast: 'Mouseover Cast on Party and Focus Frames',
+    // on the hovered unit frame, the party/raid rows and the target-of-target
+    // frame alike (on by default).
+    mouseoverCast: 'Mouseover Cast on Unit Frames',
     // Combat-tab toggle (off by default: ground left-clicks clear the target,
     // the classic behavior). On keeps the target on a ground left-click so
     // click-to-move repositioning does not deselect.
@@ -2457,6 +2699,14 @@ export const hudChromeStrings = {
     // off it. It sits in the Display card beside Weather because it costs
     // GPU passes, not because it is a comfort toggle.
     waterRipples: 'Water Ripples (Wakes)',
+    // Camera card opt-in (default off): the over-the-shoulder Action Cam, plus
+    // the shoulder slider (full left .. center .. full right) that only shows
+    // while it is on. The slider readout: {pct} is a formatted percent.
+    actionCam: 'Action Cam',
+    actionCamShoulder: 'Action Cam Shoulder',
+    actionCamShoulderLeft: 'Left {pct}',
+    actionCamShoulderRight: 'Right {pct}',
+    actionCamShoulderCenter: 'Center',
     // Interface panel toggle for the fixed Attack button in the first action-bar
     // slot (on by default). Off frees that slot for a normal action (drag one in;
     // its key then casts it). Right-clicking the Attack button flips this off too.
@@ -3195,12 +3445,17 @@ export const hudChromeStrings = {
     // cancel labels are currency-neutral and reused verbatim.
     buyConfirmBody: 'Buy {item} for {honor}? Honor purchases cannot be refunded.',
   },
-  // Character sheet showcase layout: the two titled stat-panel headings under the
-  // primary attribute tiles. Stat NAMES themselves reuse itemUi.stats.* / the
-  // statInfo.names.* labels below; only these two group headings are new here.
+  // Character sheet showcase layout: the four titled stat-panel headings under
+  // the primary attribute tiles (a 2x2 block: Offense beside Spell, Defense
+  // beside Ratings). Stat NAMES themselves reuse itemUi.stats.* / the
+  // statInfo.names.* labels below; only these group headings are new here.
+  // Spell holds the caster stats (Spell Power, Healing Power, Spell Crit);
+  // Ratings holds the gear ratings that feed both the weapon and spell sides.
   charSheet: {
     offense: 'Offense',
+    spell: 'Spell',
     defense: 'Defense',
+    ratings: 'Ratings',
     // The lifetime "Time Played" line at the foot of the sheet (the same
     // running total the /playtime chat command reports). The value composes
     // the two coarsest units from the plurals.playtime* fragments through
@@ -3345,6 +3600,8 @@ export const hudChromeStrings = {
     names: {
       spellPower: 'Spell Power',
       healPower: 'Healing Power',
+      // The spell and heal crit pool, shown beside the weapon Crit Chance.
+      spellCrit: 'Spell Crit',
       critRating: 'Crit Rating',
       hasteRating: 'Haste Rating',
       parry: 'Parry',
@@ -3363,8 +3620,12 @@ export const hudChromeStrings = {
       attackPower: 'Powers your weapon attacks. Every 14 attack power adds 1 damage per second.',
       spellPower:
         'Increases the damage of your spells and the strength of your heals. Each point of Intellect grants a little Spell Power, on top of any from gear or buffs.',
+      healPower:
+        'Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.',
       dps: "Your estimated weapon damage per second, combining your weapon's damage and speed with your attack power.",
       critChance: 'Your chance for an attack to strike critically, dealing double damage.',
+      spellCrit:
+        'Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.',
       dodge: 'Your chance to completely avoid an incoming melee attack, taking no damage.',
       critRating:
         'Crit rating from your gear and set bonuses, raising the critical strike chance of both your attacks and your spells. Every 20 rating grants exactly 1% crit.',
@@ -4069,6 +4330,13 @@ export const hudChromeStrings = {
     tierHint:
       'Every {points} points on a component raise its harvest tier one step, up to {steps} steps; fewer than {points} points still boost the yield.',
     townOnlyHint: 'Focus can only be changed while you are in town.',
+    // Focus is a bonus, never a selector (docs/design/professions.md): the
+    // panel says where the selector lives so a silk focus is not read as
+    // "harvest silk only".
+    preferenceHint:
+      'Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.',
+    // The queued re-spec (#1144). {time} is pre-formatted (formatDuration).
+    pendingLine: 'Saved. Your re-spec to this allocation completes in {time}.',
     budgetLabel: 'Points remaining: {remaining} / {budget}',
     saveButton: 'Save Focus',
     notInTownHint: 'You must be in town to set your focus.',
@@ -4898,6 +5166,9 @@ export const hudChromeStrings = {
     iceFloesCasts: 'Your next {n} spells with a cast time can be cast while moving',
     freeCast: 'Your next cast costs nothing',
     instantCast: 'Your next spell with a cast time is instant',
+    benisonPrayers: 'Your next Choirmend heals for {pct}% more and consumes all stacks.',
+    benisonWhisper:
+      'Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.',
     cheapCast: 'Your next spell costs {pct}% less',
     radiantResonance:
       "Your next Mending Light is instant, or your next Dawn's Embrace costs {pct}% less mana and casts in {castTime} sec",
@@ -5115,7 +5386,7 @@ export const hudChromeStrings = {
     duskfireClaim: 'Death grants {value} Wrack',
     pyreGuardian:
       'Generates {ruin} Wrack every {ruinInterval} sec and deals {damage} Fire damage within {radius} yd every {damageInterval} sec',
-    perfectMoment: 'Aether Darts does not consume Arcane Charges',
+    perfectMoment: 'Aether Darts does not consume Arcane Charges and deals 20% increased damage',
     scale: 'Size increased by {pct}%',
     jump: 'Jump height increased by {pct}%',
     // Localized damage-school names spliced into {school} above.
@@ -5164,6 +5435,7 @@ export const hudChromeStrings = {
   // Loot window title shown only when the chest entity is missing (the normal path
   // uses the chest's localized entity name); replaces a former hard-coded 'Chest'.
   loot: {
+    rollWon: 'Congratulations! You won {item} with a roll of {roll}',
     chestTitle: 'Chest',
     // Loot-window legibility reword: the corpse arm's button is
     // "Take Loot" (the old "Take All" label promised the harvest too); the
@@ -5277,6 +5549,16 @@ export const hudChromeStrings = {
     // "lite" run); "Boss" is not.
     elite: 'Elite',
     boss: 'Boss',
+  },
+  // The player mouseover tooltip (player_tooltip_view.ts): the classic
+  // <Guild> line and the chosen specialization with its role, both slots
+  // resolved client-side (the spec from its talent name, the role from the
+  // shared talent role labels). Neither is wordy (no four-letter lowercase run
+  // outside the tokens), so no M16 fills are needed; a locale that brackets or
+  // orders them differently owns its punctuation in the overlay.
+  playerTooltip: {
+    guild: '<{guild}>',
+    specRole: '{spec} ({role})',
   },
   // Movable target frame: the small corner toggle that unlocks the frame for
   // dragging and locks it back in place (target_frame_pos.ts + hud.ts wiring).
@@ -5433,6 +5715,10 @@ export const hudChromeStrings = {
       delveTracker: 'Delve Tracker',
       riftTracker: 'Rift Tracker',
       swingBarOffhand: 'Off Hand',
+      // The mouseover unit tooltip's movable seat (#unit-tooltip-anchor), an
+      // invisible box in play, so its chip is what names the placeholder.
+      // Wordy (M16): the five non-Latin fills land in this same change.
+      unitTooltip: 'Tooltip',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live
@@ -6359,6 +6645,11 @@ export const hudChromeStrings = {
     vaultTab: 'Vault',
     vaultCapacityNote: 'Each material holds up to {cap}.',
     vaultEmpty: 'Your vault is empty. Click a material in your bags to deposit it.',
+    // The Materials Vault tab's name search (vault_window.ts): the box reuses
+    // the bags' searchPlaceholder, so only its own aria and the filtered-out
+    // line are minted here. (The five non-Latin fills land in this change.)
+    vaultSearchAria: 'Search vault materials by name',
+    vaultSearchNoMatch: 'No material in your vault matches your search.',
     vaultRowAria: '{item}: {count} of {cap} stored',
     vaultLockedIntro:
       'Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.',
@@ -7621,6 +7912,15 @@ export const hudChromeStrings = {
     // because the recipe is station-bound and the player is not at a station
     // of its type. {station} is the localized stationName.* value below.
     stationRequired: 'You must be at the {station} to craft that.',
+    // THE PLACED MOBILE-STATION TITLE (professions/mobile_station_object.ts),
+    // composed client-side off the entity's templateId by
+    // src/ui/hud/professions/mobile_station_title.ts, the ONE leaf both the
+    // target frame and the floating world label read. {name} is the PLACER'S
+    // raw player name, a VALUE never translated (the feastTitle precedent);
+    // {station} is the localized noun of what stands there: the placing item
+    // (Grand Cauldron, Laden Hearth, Master's Field Forge) or, for a
+    // specialization placement with no item, the stationName.* type noun.
+    mobileStationTitle: "{name}'s {station}",
     // The six station display names (stations.ts StationType), resolved via
     // crafting_window.ts stationNameText, the craftName-table idiom.
     stationName: {
@@ -8778,9 +9078,6 @@ export const hudChromeStrings = {
     level: 'Level {level}',
     landmarkCount: '{count} landmarks',
     filtersAria: 'Map layers',
-    // The Side panel button folds the rail away (mapSidebarCollapsed).
-    railToggle: 'Side panel',
-    railToggleAria: 'Show or hide the map side panel',
     filters: {
       quests: 'Quests',
       gather: 'Gather',
@@ -8837,6 +9134,11 @@ export const hudChromeStrings = {
       mail: 'Mail',
       passage: 'Passage',
     },
+    // The rail's own collapse toggle (map_sidebar_controller.ts): the accessible
+    // name/title pair, following the tracker collapse convention (e.g.
+    // hudChrome.deeds.collapseHint / expandHint).
+    collapseHint: 'Collapse map sidebar',
+    expandHint: 'Expand map sidebar',
   },
   // Ranked Arena's minimum-level queue gate (src/sim/social/arena.ts
   // arenaQueueJoin, 1v1/2v2 only): the arena window's disabled-queue note
@@ -9237,6 +9539,14 @@ export const hudChromeStrings = {
     listingStatusCancelled: 'Cancelled',
     listingStatusSuspended: 'Suspended',
     listingStatusUnsold: 'Unsold',
+    // The character-select read-only Exchange panel (docs/prd/woc/marketplace.md
+    // "Character-select browsing"): a browse/sales-history-only view reachable
+    // before any character enters the world, with no bid/buy/sell controls. It
+    // reuses every other wocMarket.* string above (title, tabs, columns,
+    // detail fields, empty/error/loading faces); these two are the only
+    // strings unique to that screen.
+    charselectWebLink: 'Bid, buy, or sell on the $WOC Exchange website',
+    charselectWebNote: 'Enter the game with a character to bid, buy, or sell.',
   },
   // Loot Explorer: a searchable, filterable catalog of every item the game
   // can hand a player and where to get it, grouped by encounter and

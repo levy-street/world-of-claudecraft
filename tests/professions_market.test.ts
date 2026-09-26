@@ -70,7 +70,7 @@ describe('World Market integration: profession items (#1146)', () => {
     expect(listing.count).toBe(5);
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
 
     expect(errorsSince(sim)).toEqual([]);
     expect(copperOf(sim, buyer)).toBe(800);
@@ -106,7 +106,7 @@ describe('World Market integration: profession items (#1146)', () => {
     )!;
     sim.events.length = 0;
 
-    sim.marketBuy(listing.id, buyer);
+    sim.marketBuy(listing.id, undefined, buyer);
 
     expect(errorsSince(sim)).toEqual([]);
     expect(copperOf(sim, buyer)).toBe(410);
@@ -154,6 +154,7 @@ describe('World Market integration: profession items (#1146)', () => {
       sim.marketListings.find(
         (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'bone_fragments',
       )!.id,
+      undefined,
       buyer,
     );
 

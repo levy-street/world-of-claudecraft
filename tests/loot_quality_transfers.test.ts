@@ -124,7 +124,7 @@ describe('loot quality survives real item custody commands', () => {
     standAt(restored, buyer, npc(restored, 'the_merchant'));
     const listings = restored.marketListings.filter((l) => !l.house);
     expect(listings.map((l) => l.instance)).toEqual([first, second]);
-    restored.marketBuy(listings[1].id, buyer);
+    restored.marketBuy(listings[1].id, undefined, buyer);
     expect(copies(restored, buyer).map((s) => s.instance)).toEqual([second]);
     expect(restored.marketListings.filter((l) => !l.house).map((l) => l.instance)).toEqual([first]);
     restored.marketCancel(listings[0].id, seller);

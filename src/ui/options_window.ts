@@ -119,6 +119,7 @@ import {
 } from './options_interface_rows';
 import { buildOptionsMenuList, type OptionsMenuRoutedAction } from './options_main_menu_controller';
 import { OptionsOverlayPanels } from './options_overlay_panels';
+import { sliderFormatter } from './options_slider_format';
 import { optionsText } from './options_text_values';
 import {
   type BoolToggleControl,
@@ -143,7 +144,6 @@ import {
   type OptionsSettingsSource,
   optionsControlKeys,
   type SliderControl,
-  type SliderFmt,
   sliderDispatchValue,
   type ToggleControl,
   toggleIsOn,
@@ -757,13 +757,6 @@ export class OptionsWindow {
     return dropdown;
   }
 
-  private sliderFormatter(fmt: SliderFmt): (v: number) => string {
-    if (fmt === 'degrees')
-      return (v) => `${formatNumber(Math.round(v), { maximumFractionDigits: 0 })}°`;
-    if (fmt === 'oneDecimal') return (v) => formatNumber(v, { maximumFractionDigits: 1 });
-    return (v) => formatNumber(v, { style: 'percent', maximumFractionDigits: 0 });
-  }
-
   private applyControls(
     parent: HTMLElement,
     controls: OptionsControl[],
@@ -819,7 +812,7 @@ export class OptionsWindow {
     slider.dataset.focusKey = key;
     const val = document.createElement('span');
     val.className = 'set-val';
-    const fmt = this.sliderFormatter(c.fmt);
+    const fmt = sliderFormatter(c.fmt);
     // Mirror the formatted readout into the visible value AND aria-valuetext, so a
     // screen reader announces the human-meaningful value (50%, 90 degrees) instead
     // of the raw stored number. The native range already exposes role=slider plus
@@ -1404,9 +1397,9 @@ export class OptionsWindow {
               // The shell refused the last write: the row says what the next
               // start will really use, over the rung this one is on.
               desktopGpuBackendWriteFailed: desktopGpuBackendWriteFailed(),
-              // The shader warm-up worker is forced off on iOS whatever the
-              // setting, so that host gets no row. The client's resolver owns
-              // that rule; asking it is what keeps the two from drifting.
+              // The row is withdrawn on every host today, and refused on iOS
+              // whenever it is offered. The client's resolver owns both rules;
+              // asking it is what keeps the two from drifting.
               shaderWarmChoice: shaderWarmChoiceAvailable(),
               frameRateCapReadingFor: frameRateCapRowReading,
             },
@@ -1766,7 +1759,8 @@ export class OptionsWindow {
     // and must stay resettable, or a player who set one before the rows moved
     // would be stranded on it. General owns the retired UI Scale slider;
     // Frames owns the retired frame-scale sliders and the Frames Settings
-    // dropdown's toggles, and its reset also restores the whole stock LAYOUT
+    // dropdown's toggles (the visible mouseover switch is covered by the
+    // rendered controls), and its reset also restores the whole stock LAYOUT
     // (every movable frame, the chat box, the meter panels, the target-aura
     // panel): arranging frames is what that tab is about, and a reset that
     // left them strewn about read as a broken button.

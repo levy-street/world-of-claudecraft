@@ -139,6 +139,19 @@ describe('painter hygiene', () => {
     expect(painter).toContain('statsDigest: deedStatsDigest(world.deedStats),');
     expect(painter).not.toMatch(/private statsDigest\(/);
   });
+
+  it('feeds the viewer resolved badge tier to both the model and the repaint signature', () => {
+    // The developer-badge rung titles (src/sim/dev_badge_titles.ts, not deeds)
+    // join the picker from world.player.devTier: the view input lists them, and
+    // the signature repaints an open Book when the tier lands after join.
+    const matches = painter.match(/devTier: world\.player\.devTier \?\? 0,/g) ?? [];
+    expect(matches).toHaveLength(2);
+    const sigStart = painter.indexOf('private currentSig(');
+    expect(sigStart).toBeGreaterThan(-1);
+    expect(painter.slice(sigStart, sigStart + 900)).toContain(
+      'devTier: world.player.devTier ?? 0,',
+    );
+  });
 });
 
 describe('hud wiring', () => {

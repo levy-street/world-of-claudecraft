@@ -5,6 +5,7 @@ import {
   RADIANT_RESONANCE_DAWN_COST_MULTIPLIER,
   RADIANT_RESONANCE_KIND,
 } from './paladin_radiant_resonance';
+import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 
 function matches(aura: { empowerAbilities?: readonly string[] }, abilityId?: string): boolean {
   if (!aura.empowerAbilities) return true;
@@ -35,7 +36,14 @@ export function consumeAuraKind(
   kind: AuraKind,
   abilityId?: string,
 ): Aura | null {
-  const idx = e.auras.findIndex((aura) => aura.kind === kind && matches(aura, abilityId));
+  const benisonIndex =
+    kind === 'next_cast_instant' && abilityId === 'lesser_heal'
+      ? e.auras.findIndex((aura) => aura.id === BENISON_WHISPER_AURA_ID && aura.remaining > 0)
+      : -1;
+  const idx =
+    benisonIndex >= 0
+      ? benisonIndex
+      : e.auras.findIndex((aura) => aura.kind === kind && matches(aura, abilityId));
   if (idx < 0) return null;
   if (EMPOWER_CAST_KINDS.has(kind)) e.castConsumedEmpower = true;
   const aura = e.auras[idx];

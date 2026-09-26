@@ -11,9 +11,24 @@
 // core's radial curves: the wash is clear at the centre and thickens toward
 // the edge, and the rim is a soft additive glow that feathers in and out of the
 // true radius instead of a hard band.
+//
+// The ring is actionable (the capture zone and its holder), so it is never
+// gated or hidden. Instead, the first hill a session sees also builds a small
+// twin with the same builder, never added to the scene and never disposed, and
+// hands it to the renderer's compile gate: the ring's two programs (both
+// meshes are transparent and DoubleSide, so three draws each in a back pass
+// and a front pass, keys differing by the flipSided bit) link off the draw
+// path, and the twin keeps them in use, so every later ring of the session
+// (the next hill comes hours later, likely past the retained-program FIFO)
+// finds them linked. A player who draws the ring before the twin's gate
+// settles (looking at the spot at the first announcement) still sees the live
+// ring link them: that residual is accepted. A rejected twin is disposed and
+// the next hill tries again; the same hill never does, since sync runs every
+// frame.
 
 import * as THREE from 'three';
 import type { HillInfo } from '../world_api/world_pvp';
+import { isGpuQueueShutdown } from './background_gpu_queue';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   HILL_RADIAL_STEP_YARDS,
@@ -32,6 +47,12 @@ import {
 const SEGMENTS = 160;
 /** Lift over the sampled ground; the materials' polygon offset does the rest. */
 const GROUND_LIFT = 0.12;
+/** The twin's radius: no program key input reads the size, so a few yards do. */
+const TWIN_RADIUS = 3;
+
+/** The renderer's live compile gate (`worldCompileGate`), absent where the
+ *  parallel compile is not supported. */
+export type HillRingCompileGate = (target: THREE.Object3D) => Promise<unknown>;
 
 interface RingVisual {
   group: THREE.Group;
@@ -46,9 +67,12 @@ interface RingVisual {
 
 export class HillRingVisuals {
   private visual: { key: string; ring: RingVisual } | null = null;
+  private twin: THREE.Group | null = null;
+  private failedTwinKey: string | null = null;
 
   constructor(
     private readonly scene: THREE.Scene,
+    private readonly compileGate: HillRingCompileGate | undefined,
     private readonly groundY: (x: number, z: number) => number,
   ) {}
 
@@ -59,8 +83,15 @@ export class HillRingVisuals {
       return;
     }
     const key = hillRingKey(info);
+    if (!this.twin && this.compileGate && key !== this.failedTwinKey) {
+      this.warmTwin(info, key, this.compileGate);
+    }
     if (this.visual && this.visual.key !== key) this.clear();
-    if (!this.visual) this.visual = { key, ring: this.create(info) };
+    if (!this.visual) {
+      const ring = this.create(info);
+      this.scene.add(ring.group);
+      this.visual = { key, ring };
+    }
     this.visual.ring.hillPhase = info.phase;
     this.visual.ring.holder = info.holder;
     this.visual.ring.challenger = info.challenger;
@@ -87,14 +118,30 @@ export class HillRingVisuals {
     if (!this.visual) return;
     const ring = this.visual.ring;
     this.scene.remove(ring.group);
-    ring.rimMat.dispose();
-    ring.fillMat.dispose();
-    for (const geo of ring.ownedGeometries) geo.dispose();
+    disposeRing(ring);
     this.visual = null;
+  }
+
+  private warmTwin(info: HillInfo, key: string, gate: HillRingCompileGate): void {
+    const ring = this.create({ ...info, radius: TWIN_RADIUS });
+    const twin = ring.group;
+    twin.name = 'hill-ring-twin';
+    twin.visible = false;
+    this.twin = twin;
+    gate(twin).catch((error) => {
+      if (this.twin !== twin) return;
+      this.twin = null;
+      this.failedTwinKey = key;
+      disposeRing(ring);
+      // A renderer shutdown rejects its queued work on purpose.
+      if (isGpuQueueShutdown(error)) return;
+      console.warn('Hill ring warm twin compile failed, retrying at the next hill', error);
+    });
   }
 
   private material(color: number, opacity: number, additive: boolean): THREE.MeshBasicMaterial {
     return new THREE.MeshBasicMaterial({
+      name: additive ? 'hill-ring:rim' : 'hill-ring:fill',
       color,
       transparent: true,
       opacity,
@@ -130,7 +177,6 @@ export class HillRingVisuals {
     const rim = new THREE.Mesh(rimGeo, rimMat);
     rim.renderOrder = floorVfxRenderOrder('ground', 6);
     group.add(fill, rim);
-    this.scene.add(group);
     return {
       group,
       rimMat,
@@ -179,4 +225,10 @@ export class HillRingVisuals {
     geo.setIndex(indices);
     return geo;
   }
+}
+
+function disposeRing(ring: RingVisual): void {
+  ring.rimMat.dispose();
+  ring.fillMat.dispose();
+  for (const geo of ring.ownedGeometries) geo.dispose();
 }

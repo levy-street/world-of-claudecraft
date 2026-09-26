@@ -707,12 +707,12 @@ export const ITEM_SETS: Record<string, ItemSet> = {
       {
         pieces: 2,
         effect: {},
-        text: "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
+        text: "Restoring health with Whispered Prayer, Solemn Prayer, or Urgent Prayer increases your next Choirmend's healing by 10%, stacking up to 3 times. Each cast grants at most one stack. Choirmend consumes all stacks when it finishes casting. Damage taken no longer delays your spellcasting.",
       },
       {
         pieces: 4,
         effect: {},
-        text: 'When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec.',
+        text: 'Finishing Choirmend with 3 stacks makes your next Whispered Prayer within 60 sec instant and increases its healing by 100%. This benefit does not stack; earning it again refreshes its duration.',
       },
     ],
   },

@@ -27,13 +27,22 @@
 // here is the one the live cast will draw with.
 
 import * as THREE from 'three';
+import { buildGloamveilStandIn, gloamveilMaterials } from './characters/gloamveil_veil';
+import { buildMoonwingStandIn, moonwingMaterials } from './characters/moonwing_adornment';
 import { buildCoachTrailStandIn, coachTrailMaterials } from './coach_trail_materials';
 import { FireballTravelVisual, fireballMaterials } from './fireball_travel_visual';
 import { FrostNovaRootVisual, frostRootMaterials } from './frost_nova_root_visual';
+import { buildFrozenOrbStandIn, frozenOrbStandInMaterials } from './frozen_orb_fx';
 import { IceBlockVisual, iceMaterials } from './ice_block_visual';
 import { buildGroundFireAoeStandIn, groundFireAoeMaterials } from './ignivar_fire_vfx';
+import { buildMeteorRockStandIn, meteorRockStandInMaterials } from './mage_ground_fx';
+import {
+  buildPaladinAscensionStandIn,
+  paladinAscensionStandInMaterials,
+} from './paladin_ascension_visual';
 import { buildRingOfFrostStandIn, ringOfFrostStandInMaterials } from './ring_of_frost_visual';
 import { TemporalHourglassVisual, temporalHourglassMaterials } from './temporal_hourglass_visual';
+import { buildFelRockStandIn, felRockStandInMaterials } from './warlock_meteor_fx';
 import {
   buildWorldQuestTraceStandIn,
   worldQuestTraceMaterials,
@@ -126,6 +135,41 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     build: () => buildRingOfFrostStandIn().root,
   },
   {
+    // Divine Ascension's seal and solar crown, built per character view when
+    // the aura first shows: the first cast linked the crown (a Mesh and an
+    // InstancedMesh draw) inside a live frame, for the caster and every
+    // observer. The crown is the tier's shared surfaceMat instance, so the
+    // stand-in follows the graphics profile.
+    id: 'paladin-ascension',
+    module: 'paladin_ascension_visual.ts',
+    materials: () => [...paladinAscensionStandInMaterials()],
+    build: () => buildPaladinAscensionStandIn().root,
+  },
+  {
+    // The Frostglobe: per-instance pooled materials like the Ring of Frost,
+    // MeshStandard on every tier, so on Low nothing held the shell and shard
+    // program and the first orb linked it live.
+    id: 'frozen-orb',
+    module: 'frozen_orb_fx.ts',
+    materials: () => [...frozenOrbStandInMaterials()],
+    build: () => buildFrozenOrbStandIn().root,
+  },
+  {
+    // The Meteor rock (mage) and the fel rocks (Rain of Fire, Infernal):
+    // each kept from a live link only by another module's material that
+    // happened to share its key, so each holds its own now.
+    id: 'mage-meteor-rock',
+    module: 'mage_ground_fx.ts',
+    materials: () => [...meteorRockStandInMaterials()],
+    build: () => buildMeteorRockStandIn().root,
+  },
+  {
+    id: 'warlock-fel-rock',
+    module: 'warlock_meteor_fx.ts',
+    materials: () => [...felRockStandInMaterials()],
+    build: () => buildFelRockStandIn().root,
+  },
+  {
     // Not a spell: the Proving Shore coach's guidance (ribbon, ring, aura,
     // beam, area ring), the same lazy-cache idiom on the same manifest lane.
     // Its first quest accepted on the island used to link three programs
@@ -134,6 +178,23 @@ export const ABILITY_MATERIAL_SOURCES: readonly AbilityMaterialSource[] = [
     module: 'coach_trail_materials.ts',
     materials: () => Object.values(coachTrailMaterials()),
     build: () => buildCoachTrailStandIn(),
+  },
+  {
+    // Not a cast visual but a form's: Moonwing Form's antlers, crescent and
+    // wings mount on the druid's rig at the shift (characters/form_adornments.ts),
+    // so the first Moonwing in view would otherwise link the glow program and
+    // the antler props program inside a live frame.
+    id: 'moonwing-adornment',
+    module: 'moonwing_adornment.ts',
+    materials: () => moonwingMaterials(),
+    build: () => buildMoonwingStandIn(),
+  },
+  {
+    // Gloamveil's veil and burning eyes, the same rig-mounted idiom as Moonwing.
+    id: 'gloamveil-veil',
+    module: 'gloamveil_veil.ts',
+    materials: () => gloamveilMaterials(),
+    build: () => buildGloamveilStandIn(),
   },
 ];
 

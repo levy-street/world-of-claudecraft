@@ -6,6 +6,8 @@ import { resumeActiveAbilityKit } from './ability_vfx/active_kit_prewarm';
 import type { AbilityVfxDeps } from './ability_vfx/painter';
 import { isLivingWarriorAttentionSource } from './ability_vfx/warrior_attention_core';
 import { preparedAbilityAudio, type SpatialAudioSink } from './audio_sink';
+import { CAST_VFX_ENGINE } from './cast_vfx_family';
+import type { CastVfxReadiness } from './cast_vfx_readiness_core';
 import type { CharacterVisual } from './characters/visual';
 import { createOnrushArrivalHandler } from './characters/warrior_rush_pose';
 import { impactContact } from './impact_contact';
@@ -35,16 +37,10 @@ interface PresentationHost {
   spiritBuild: Parameters<AbilityVfxFx['setSpiritBuildScheduler']>[0];
   compile: Parameters<AbilityVfxFx['setSpiritCompileGate']>[0];
   light: LightPulses;
+  castGate: Pick<CastVfxReadiness, 'admit' | 'ready' | 'spawnAllowed'>;
   painter: Pick<
     AbilityVfxDeps,
-    | 'castVfxAdmit'
-    | 'castVfxReady'
-    | 'spawnAoeRing'
-    | 'triggerAttack'
-    | 'lightPulse'
-    | 'addShake'
-    | 'screenFlash'
-    | 'screenImpact'
+    'spawnAoeRing' | 'triggerAttack' | 'lightPulse' | 'addShake' | 'screenFlash' | 'screenImpact'
   >;
 }
 
@@ -83,6 +79,7 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
   fx.setViewportScale(h.height() * h.pixelRatio(), 60, h.height());
   fx.setSpiritBuildScheduler(h.spiritBuild);
   fx.setSpiritCompileGate(h.compile);
+  fx.setCastVfxSpawnGate((bit) => h.castGate.spawnAllowed(bit));
   fx.onRushArrival = createOnrushArrivalHandler(() => h.world().entities, h.views, h.visual);
   fx.setWorldLightDelegate((at, school, intensity, duration, range) =>
     h.light.pulse(at, school, intensity, duration, range),
@@ -97,12 +94,16 @@ export function createRendererAbilityPresentation(h: PresentationHost) {
     ground: (x, z) => h.ground(x, z),
     vfx: h.vfx,
     time: () => h.time(),
-    ready: () => h.painter.castVfxReady?.() ?? h.painter.castVfxAdmit?.() ?? true,
+    // The relics are engine-family programs: ready once the cast gate has
+    // linked that family (the release's per-family cast admission).
+    ready: () => h.castGate.ready(CAST_VFX_ENGINE),
   });
   const painter = new AbilityVfx(
     {
       ...h.painter,
       trinketRelics,
+      castVfxAdmit: (mask) => h.castGate.admit(mask),
+      castVfxReady: (mask) => h.castGate.ready(mask),
       vfx: h.vfx,
       fx,
       anchor: h.anchor,

@@ -164,20 +164,17 @@ rider "Damage taken no longer delays your spellcasting."; marked [rider].
   every 15 sec." [shieldConsumed trigger at damage.ts:574-577; icd is
   NEW LOGIC there (castNth-shaped machinery does not cover it), scoped
   small.]
-- Benison 2pc [rider]: "Seraphic Vigil's rescue heals for 270, up from
-  180." [buffPct 0.5 reaches buffTarget value; heal_echo is in neither
-  the integral nor scalable kind sets, so 270 exact and flat.
-  Same-change: the printed "180" in the ability description + catalog +
-  locales (R3 catch).]
-- Benison 4pc (final-round CONFIRMED): "When Seraphic Vigil triggers, its ally is
-  also mended for 15 percent of their maximum health over 10 sec."
-  [Bespoke HoT at the vigil-trigger site in damage.ts (the
-  priestOnVigilTriggered hook is talent-gated for Incarnate Spirit; the
-  set arm hooks the same trigger point, not that function). Replaces
-  the cooldown-reset idea (round 3: Twin Covenant's charge model
-  deletes the cooldowns entry, making cooldownRefund a hard no-op).
-  Verify: the trigger point, HoT application shape, no row overlap,
-  Twin Covenant coexistence.]
+- Benison 2pc [rider]: Restoring health with Whispered Prayer, Solemn Prayer,
+  or Urgent Prayer builds one stack per cast, up to three. Each stack adds
+  10% to the next Choirmend's whole heal, including its Healing Power contribution.
+  Choirmend consumes all stacks on completion; interrupted casts retain them.
+- Benison 4pc: Finishing Choirmend with three stacks grants an instant
+  Whispered Prayer with 100% increased healing. It must be used within 60 sec.
+  Re-earning the benefit refreshes the window without banking another use.
+  Both effects clear on death or talent changes; losing the required piece
+  threshold clears that tier's benefit. The normal spell mana cost still applies.
+  Implemented by `combat/priest/benison_dawnweave.ts`, replacing the Vigil
+  rescue increase and follow-up mend. The common cast-pushback rider remains.
 - Vesperash 2pc [rider]: "Call Tithefiend's cooldown is reduced by 6
   sec." [Sink acceleration; the bank still saturates ~13s of every 24
   (honest); +25 percent full-strength fiend windows.]

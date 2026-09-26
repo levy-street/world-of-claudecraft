@@ -139,7 +139,7 @@ import { applySetProcs as applySetProcsImpl } from './combat/set_procs';
 import { clearSpiritmendCurrents } from './combat/shaman_spiritmend';
 import { clearShamanTalentState, onGhostWolfExited } from './combat/shaman_talents';
 import { blockedMeleeDamage } from './combat/shield_block';
-import { spellCritBonusFromAuras, spellDamageMultFromAuras } from './combat/spell_combat';
+import { spellCritChance, spellDamageMultFromAuras } from './combat/spell_combat';
 import { isMobSpellResisted } from './combat/spell_resist';
 import { isCritImmuneTank } from './combat/tank_crit_immunity';
 import { threatMod as threatModImpl } from './combat/threat_modifiers';
@@ -239,6 +239,7 @@ import { DEV_SANDBOX_CFG, DEV_SANDBOX_CLASSES } from './dev/dev_sandbox_config';
 import { despawnMobsForDev } from './dev_commands';
 import { projectOutsideDungeonDoors } from './dungeon_door_clearance';
 import { arenaMapForSlot } from './dungeon_layout';
+import { effectiveArmorOf, effectiveAttackPowerOf } from './effective_stats';
 import * as nythraxis from './encounters/nythraxis';
 // A3: ARENA_SPAWNS_A_2v2/B_2v2 (read only by the moved fiestaRevive) now live with
 // social/fiesta.ts. The dungeon-wall consts (DUNGEON_WALL_HW/X) are now read only by
@@ -286,7 +287,8 @@ import {
   sanitizeSlotInstanceOnLoad,
   warnDroppedInstanceKeys,
 } from './item_instance_load';
-import { isMergeableInstancePayload } from './item_instance_merge';
+import { isChargeBearingPayload } from './item_instance_merge';
+import { meetsLevelRequirement } from './item_level_req';
 import { countRawInSlots, setItemLocked as setItemLockedCmd } from './item_lock';
 import * as items from './items';
 import { applyKnockback as applyKnockbackImpl } from './knockback';
@@ -306,6 +308,7 @@ import { entityLineOfSightClear } from './line_of_sight_elevation';
 import type { Ante, PickAction } from './lockpick';
 import { retirePartyTradeOnLoad, retirePartyTradeOnSave } from './loot/bop_trade_persistence';
 import { withoutPartyTradeMarker } from './loot/bop_trade_window';
+import { replacementTapperForLeave } from './loot/kill_participation';
 // L1: the loot-distribution layer (party-loot strategy, the rollLoot roller, copper
 // split, need-greed roll lifecycle, corpse-loot helpers) moved to ./loot/loot_roll.ts;
 // Sim keeps thin same-named delegates that call these.
@@ -357,6 +360,7 @@ import {
 import { updateDragonkinBrood } from './mob/dragonkin_brood';
 import { aggroDungeonPackmates } from './mob/dungeon_pack_aggro';
 import { canFlee } from './mob/flee_rules';
+import { forgetLeavingPlayer } from './mob/forget_leaver';
 import { wanderPause } from './mob/idle_rng';
 import * as lifecycle from './mob/lifecycle';
 import {
@@ -503,7 +507,6 @@ import {
 import { consumeFeastAction, type FeastState, placeFeastAction } from './professions/feast';
 import * as fishing from './professions/fishing';
 import type { RespecPaymentTier } from './professions/focus';
-import * as professionsFocus from './professions/focus';
 import {
   completeGatherCast as completeGatherCastImpl,
   drainGatheringGrants,
@@ -530,13 +533,12 @@ import {
   gatheringGoalFor as gatheringGoalForImpl,
 } from './professions/gathering_goal_projection';
 import type { GatheringGoalView } from './professions/gathering_goal_types';
-import { updateGuildTrendLetters } from './professions/guild_letter';
 import {
-  applyHarvestPreferenceOnLoad,
-  HARVEST_PREFERENCE_ALL,
-  type HarvestPreference,
-  serializeHarvestPreference,
-} from './professions/harvest_preference';
+  loadGatheringSettings,
+  serializeGatheringSettings,
+} from './professions/gathering_settings_persist';
+import { updateGuildTrendLetters } from './professions/guild_letter';
+import { HARVEST_PREFERENCE_ALL, type HarvestPreference } from './professions/harvest_preference';
 import {
   harvestPreferenceFor as harvestPreferenceForImpl,
   setHarvestPreference as setHarvestPreferenceImpl,
@@ -553,6 +555,7 @@ import {
   type MobileCraftingStation,
   placeMobileStationForPlayer,
 } from './professions/mobile_station';
+import { dropMobileStationObject } from './professions/mobile_station_object';
 import {
   applyNodeReadiness,
   isLiveGatherNodeId,
@@ -597,6 +600,7 @@ import {
   type ToolEffectSlot,
 } from './professions/tools';
 import * as townFocusCommands from './professions/town_focus_commands';
+import type { PendingTownFocus, TownFocusPendingView } from './professions/town_focus_pending';
 import {
   grandfatherKnownRecipes,
   resolveTrain,
@@ -767,6 +771,7 @@ import {
   updateRiftTriggers as updateRiftTriggersImpl,
 } from './rift/runs';
 import type { RiftEvent, RiftInstance } from './rift/types';
+import { updateSpiritRunTriggers } from './spirit_run_triggers';
 import * as weeklyQuestMod from './weekly_quests';
 import * as questActivity from './world_quest_activity';
 import { worldQuestCreditBindings } from './world_quest_context';
@@ -849,7 +854,6 @@ import {
   type ErrorReason,
   type EscortRunState,
   emptyMoveInput,
-  FAERIE_FIRE_ARMOR_PCT,
   GCD,
   type HonorArenaDailyState,
   type InventoryUnit,
@@ -876,7 +880,6 @@ import {
   mobArmorReduction,
   type NoticeboardDef,
   type OverheadEmoteId,
-  PARTY_XP_RANGE,
   type PendingResurrection,
   type PetMode,
   type PlayerClass,
@@ -893,7 +896,6 @@ import {
   type SimEvent,
   type SkinCatalog,
   type SkinRank,
-  SUNDER_ARMOR_PCT_PER_STACK,
   steadyAngleTo,
   swingMissChance,
   type Vec3,
@@ -1740,15 +1742,9 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   townFocus: Record<string, number>;
   // #1144: a re-spec queued on the 'time' or 'timeAndPartial' payment tier,
   // pending the tier's duration before it commits onto `townFocus` above.
-  // TRANSIENT (never serialized): a logout before it resolves simply drops the
-  // request (nothing was charged for it yet, see setTownFocus), the same way
-  // an unstarted timer costs nothing to abandon.
-  pendingTownFocus?: {
-    allocation: Record<string, number>;
-    readyAtTime: number;
-    coin: number;
-    materials: number;
-  };
+  // Persisted (professions/town_focus_pending.ts, remaining seconds), so a
+  // logout or an instance handoff no longer drops it; charged at resolution.
+  pendingTownFocus?: PendingTownFocus;
   // Heroic reset-window circuit progress for the Book of Deeds. Reward eligibility
   // is gated only by raidLockouts; this persisted field records which distinct
   // heroic clears contributed to one authoritative reset window without gating rewards.
@@ -3172,7 +3168,7 @@ export class Sim {
         if (
           !preservesMaterialCountOnLoad(slot) &&
           slot.instance &&
-          !isMergeableInstancePayload(slot.instance)
+          isChargeBearingPayload(slot.instance)
         )
           slot.count = 1;
         return normalizeLoadedMaterialSlot(slot);
@@ -3373,14 +3369,7 @@ export class Sim {
       meta.delveMarks = s.delveMarks ?? 0;
       meta.delveClears = { ...(s.delveClears ?? {}) };
       meta.companionUpgrades = { ...(s.companionUpgrades ?? {}) };
-      // Known component families at positive integer points only: a save that
-      // predates the #2511 key check (or a corrupt one) self-heals here rather
-      // than riding back out through the panel into a request the command
-      // boundary now rejects.
-      meta.townFocus = professionsFocus.normalizeTownFocusOnLoad(s.townFocus);
-      // Corpse-harvest preference (Intentional Gathering PR3); see
-      // PlayerMeta.harvestPreference / harvest_preference.ts applyHarvestPreferenceOnLoad.
-      meta.harvestPreference = applyHarvestPreferenceOnLoad(s.harvestPreference);
+      loadGatheringSettings(meta, s, this.time);
       // Intentional Gathering PR4: absent/undefined stays absent (no goal); a
       // valid saved goal is restored verbatim; a malformed one loads the
       // 'invalid' sentinel rather than silently becoming no goal. Never
@@ -3756,6 +3745,8 @@ export class Sim {
     const leaving = this.entities.get(pid);
     if (leaving) clearShamanTalentState(this.ctx, leaving);
     despawnMobsForDev(this.ctx, pid, 'spawned');
+    // The slot dies with the meta; its world object must not outlive it.
+    dropMobileStationObject(this.ctx, meta.mobileStation);
     // leave social systems cleanly. removeFromParty lives on the PartyMachine now
     // (A1); reach it through the seam, keeping this call in its load-bearing
     // teardown position (must run while the leaver is still in players/entities).
@@ -3791,23 +3782,7 @@ export class Sim {
     clearAfflictionState(this.ctx, pid);
     const pet = this.petOf(pid, true);
     if (pet) this.despawnPersistentPet(pet);
-    for (const m of this.entities.values()) {
-      if (m.kind !== 'mob') continue;
-      m.threat.delete(pid);
-      if (m.forcedTargetId === pid) {
-        m.forcedTargetId = null;
-        m.forcedTargetTimer = 0;
-      }
-      if (m.aggroTargetId === pid) {
-        m.aggroTargetId = null;
-        if (!m.dead && m.aiState !== 'dead' && m.ownerId === null) this.retargetMob(m);
-      }
-      if (m.tappedById === pid && !m.dead) m.tappedById = null;
-    }
-    for (const other of this.players.values()) {
-      const e = this.entities.get(other.entityId);
-      if (e && e.targetId === pid) e.targetId = null;
-    }
+    forgetLeavingPlayer(this.ctx, pid);
     resurrectionOfferMod.dropResurrectionOffer(this.ctx, pid);
     this.dropEntity(pid);
     this.players.delete(pid);
@@ -3873,41 +3848,9 @@ export class Sim {
     // member, clearing the tap mirrors immediate removal.
     for (const entity of this.entities.values()) {
       if (entity.kind === 'mob' && entity.tappedById === pid) {
-        entity.tappedById = this.replacementTapperForLeave(entity, pid, party?.members ?? []);
+        entity.tappedById = replacementTapperForLeave(this.ctx, entity, pid, party?.members ?? []);
       }
     }
-  }
-
-  private replacementTapperForLeave(
-    mob: Entity,
-    leavingPid: number,
-    partyPids: number[],
-  ): number | null {
-    const instance = this.instances.find(
-      (slot) => slot.partyKey !== null && slot.mobIds.includes(mob.id),
-    );
-    for (const candidatePid of partyPids) {
-      if (candidatePid === leavingPid) continue;
-      const candidate = this.players.get(candidatePid);
-      const entity = this.entities.get(candidatePid);
-      if (!candidate || candidate.leaving || !entity) continue;
-      // A corpse already owns an authoritative death-time recipient snapshot.
-      // Re-anchor only to someone in that snapshot, irrespective of where they
-      // moved after the kill.
-      if (mob.lootRecipientIds && mob.lootRecipientIds.length > 0) {
-        if (mob.lootRecipientIds.includes(candidatePid)) return candidatePid;
-        continue;
-      }
-      const matchingInstanceCorpse =
-        entity.ghost &&
-        entity.corpsePos &&
-        (!instance || entity.corpseInstanceId === instance.exitId)
-          ? entity.corpsePos
-          : null;
-      const participationPos = matchingInstanceCorpse ?? entity.pos;
-      if (dist2d(participationPos, mob.pos) <= PARTY_XP_RANGE) return candidatePid;
-    }
-    return null;
   }
 
   serializeCharacter(pid: number): CharacterState | null {
@@ -4138,10 +4081,7 @@ export class Sim {
       // side (professions/farm_persist.ts).
       ...farmPlotsSaveFragment(meta.farmPlots),
       ...(meta.tutorialGreetingSent ? { tutorialGreetingSent: true } : {}),
-      townFocus: { ...meta.townFocus },
-      // Corpse-harvest preference; see PlayerMeta.harvestPreference /
-      // harvest_preference.ts serializeHarvestPreference for the encoding.
-      ...serializeHarvestPreference(meta.harvestPreference),
+      ...serializeGatheringSettings(meta, this.time),
       // Intentional Gathering PR4: sparse (absent while no goal is tracked).
       // Never serializes the derived projection/cache or the live order
       // binding (gatheringGoalOrder), only the compact selection.
@@ -6091,7 +6031,7 @@ export class Sim {
         // #1144: resolves a queued time-tier town-focus re-spec once its
         // duration elapses. Draws no rng, so the tick-phase draw order is
         // unchanged.
-        if (meta.pendingTownFocus) this.updateTownFocusRespec(meta);
+        if (meta.pendingTownFocus) townFocusCommands.updateTownFocusRespec(this.ctx, meta);
         // Mount summon/dismount transition: decrement the timer, cancel a summon
         // on combat/swim, complete a mount/dismount, and force-dismount a mounted
         // swimmer. Live players only (a dead player is already force-dismounted by
@@ -6100,12 +6040,10 @@ export class Sim {
         lap?.('p.regen');
       } else if (p.ghost) {
         // A released spirit only runs (boosted speed via moveSpeedMult); it does not
-        // fight, cast, or regen. It CAN walk into a dungeon/raid door to re-enter its
-        // instance and resurrect at the entrance (the corpse run under the instance
-        // death model), or resurrect at its corpse / an overworld Spirit Healer.
+        // fight, cast, or regen. It CAN cross every door, rift, and overworld passage
+        // a living player can (spirit_run_triggers.ts) on its way back to its corpse.
         this.updatePlayerMovement(p, meta);
-        this.updateDoorTriggers(p);
-        this.updateRiftTriggers(p);
+        updateSpiritRunTriggers(this.ctx, p);
         lap?.('p.move');
       }
       // Breath runs for DEAD players too, and must: updateBreath's own reset
@@ -6428,47 +6366,15 @@ export class Sim {
   // jumpMult moved to player_motion.ts (MV1; read only by the movement kernel).
 
   // Sunder Armor stacks shave flat armor off the defender for physical hits.
+  // Both are pure reads of an entity's stats + auras, extracted to
+  // effective_stats.ts (the monolith ratchet); the SimContext bindings above and
+  // the swing math keep resolving through these thin delegates.
   private effectiveArmor(e: Entity): number {
-    let armor = e.stats.armor;
-    // Player/rogue armor debuffs are PERCENTAGES that do NOT stack with each other:
-    // Sunder Armor (2% per stack, up to 10% at 5 stacks) and Faerie Fire (a flat 10%)
-    // max-combine, so a fully-stacked Sunder and a Faerie Fire are redundant rather
-    // than additive. Mob corrosion (kind 'corrode') is a separate FLAT shred that
-    // subtracts value*stacks before the percent debuffs apply.
-    let reductionPct = 0;
-    const baseArmor = e.stats.armor;
-    for (const a of e.auras) {
-      if (e.kind !== 'player' && a.kind === 'buff_armor') armor += a.value;
-      // Percent armor raid buff (Devotion Aura) on a controlled pet; players fold it
-      // in recalcPlayerStats.
-      else if (e.kind !== 'player' && a.kind === 'buff_armor_pct')
-        armor += (baseArmor * a.value) / 100;
-      // Mob corrosion: flat, stacking armor shred (value per stack).
-      if (a.kind === 'corrode') armor -= a.value * (a.stacks ?? 1);
-      else if (a.kind === 'sunder')
-        reductionPct = Math.max(reductionPct, SUNDER_ARMOR_PCT_PER_STACK * (a.stacks ?? 1));
-      else if (a.kind === 'faerie_fire')
-        reductionPct = Math.max(reductionPct, FAERIE_FIRE_ARMOR_PCT);
-      // Melting Acid carries its own fraction on the aura (0.05), so a future
-      // rank or talent scales the value rather than a constant here.
-      else if (a.kind === 'melting_acid') reductionPct = Math.max(reductionPct, a.value);
-    }
-    return Math.max(0, armor * (1 - reductionPct));
+    return effectiveArmorOf(e);
   }
 
   private effectiveAttackPower(e: Entity): number {
-    let attackPower = e.attackPower;
-    if (e.kind !== 'player') {
-      const base = e.attackPower;
-      for (const a of e.auras) {
-        if (a.kind === 'buff_ap') attackPower += a.value;
-        else if (a.kind === 'debuff_ap') attackPower -= a.value;
-        // Percent attack-power raid buffs (Blessing of Might / Battle Shout) on a
-        // controlled pet: percent of the pet's base AP. Players fold this in recalc.
-        else if (a.kind === 'buff_ap_pct') attackPower += (base * a.value) / 100;
-      }
-    }
-    return Math.max(0, attackPower);
+    return effectiveAttackPowerOf(e);
   }
 
   private petDamageMult(e: Entity): number {
@@ -6946,9 +6852,8 @@ export class Sim {
   }
 
   private spellCrit(p: Entity): number {
-    // Base + Intellect + the shared crit core (crit rating, talent/set crit,
-    // flat crit auras; recalcPlayerStats) + spell-crit-specific auras.
-    return 0.05 + p.stats.int * 0.0008 + (p.sharedCritBonus ?? 0) + spellCritBonusFromAuras(p);
+    // The spell crit pool lives in combat/spell_combat.ts (the sheet reads it too).
+    return spellCritChance(p);
   }
 
   // Heal core, heal multipliers, heal-absorb soak, crit-vuln bonus, and the
@@ -7434,16 +7339,7 @@ export class Sim {
     target: Entity,
     bonus: number,
     abilityName: string | null,
-    opts: {
-      cannotBeDodged?: boolean;
-      weaponMult?: number;
-      threatFlat?: number;
-      threatMult?: number;
-      forceCrit?: boolean;
-      critBonus?: number;
-      onDealt?: (amount: number) => void;
-      onEffectiveDamage?: (amount: number) => void;
-    },
+    opts: Parameters<typeof meleeSwingImpl>[5],
   ): boolean {
     return meleeSwingImpl(this.ctx, attacker, target, bonus, abilityName, opts);
   }
@@ -8997,12 +8893,16 @@ export class Sim {
     return this.townFocusFor(this.primaryId);
   }
 
-  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
-    townFocusCommands.setTownFocus(this.ctx, allocation, tier, pid);
+  townFocusPendingFor(pid: number): TownFocusPendingView | null {
+    return townFocusCommands.townFocusPendingFor(this.ctx, pid);
   }
 
-  private updateTownFocusRespec(meta: PlayerMeta): void {
-    townFocusCommands.updateTownFocusRespec(this.ctx, meta);
+  get townFocusPending(): TownFocusPendingView | null {
+    return this.townFocusPendingFor(this.primaryId);
+  }
+
+  setTownFocus(allocation: Record<string, number>, tier: RespecPaymentTier, pid?: number): void {
+    townFocusCommands.setTownFocus(this.ctx, allocation, tier, pid);
   }
   interact(pid?: number): void {
     interaction.interact(this.ctx, pid, this.noticeboardDefinitions);
@@ -9606,6 +9506,7 @@ export class Sim {
   guildEventRemove(_eventId: number): void {}
   guildSetMotd(_text: string): void {}
   guildBuyRosterPage(): void {}
+  guildSetRanks(_ranks: readonly import('./guild_ranks').GuildRankDef[]): void {}
   // The Guild Bank is a guild feature, and guilds live in the server social DB,
   // so offline play never has one: the read is null and the commands are inert
   // (the socialInfo idiom), forever. The online path is live: ClientWorld sends
@@ -10456,8 +10357,8 @@ export class Sim {
     this.market.marketListInstance(itemId, price, instance, pid);
   }
 
-  marketBuy(listingId: number, pid?: number): void {
-    this.market.marketBuy(listingId, pid);
+  marketBuy(listingId: number, count?: number, pid?: number): void {
+    this.market.marketBuy(listingId, count, pid);
   }
 
   marketSweepQuote(itemId: string, count: number, pid?: number): void {
@@ -10470,6 +10371,29 @@ export class Sim {
 
   marketCancel(listingId: number, pid?: number): void {
     this.market.marketCancel(listingId, pid);
+  }
+
+  // The buy-order board (market_orders.ts): the server's sold-volume observer
+  // reads the settled rows / units the place and fill arms return.
+  marketOrderPlace(
+    itemId: string,
+    count: number,
+    unitPrice: number,
+    pid?: number,
+  ): MarketListing[] {
+    return this.market.marketOrderPlace(itemId, count, unitPrice, pid);
+  }
+
+  marketOrderFill(orderId: number, count: number, pid?: number): { units: number; copper: number } {
+    return this.market.marketOrderFill(orderId, count, pid);
+  }
+
+  marketOrderCancel(orderId: number, pid?: number): void {
+    this.market.marketOrderCancel(orderId, pid);
+  }
+
+  get marketOrders() {
+    return this.market.marketOrders;
   }
 
   marketCollect(pid?: number): void {

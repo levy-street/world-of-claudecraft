@@ -826,6 +826,17 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'removes the resurrection prompt node once the player is alive',
   },
   {
+    call: 'this.deathRecapDialog.close',
+    band: 'frame',
+    gate: '!p.dead && this.deathRecapDialog.isOpen()',
+    surface: 'window',
+    guard: {
+      kind: 'none',
+      why: 'one-way close row; the call is itself gated on the window being open and performs no steady repaint',
+    },
+    why: 'closes the death recap modal once the player is alive again',
+  },
+  {
     call: 'document.body.classList.toggle',
     band: 'frame',
     gate: '',
@@ -1850,8 +1861,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 91 -> 92 and none 17 -> 18 on the World Quests branch: its
       // vehicle bar chrome row and its minigame music override. Then the
       // release's Cooldown Manager per-frame paint and King of the Hill's hill
-      // bar strip (chrome 92 -> 96, 96 measured on the merged tree).
-    ).toEqual({ window: 50, chrome: 96, none: 18 });
+      // bar strip (chrome 92 -> 96), and the release batch's one more window
+      // surface (51 / 96 measured on the merged tree).
+    ).toEqual({ window: 51, chrome: 96, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1885,7 +1897,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Up one more on the release arm's own callsite-guarded row, beside the
       // crucible vendor close counted above; counted off the merged table.
       callsite: 13,
-      none: 3,
+      // Death recap close joins this bucket as a one-way dismissal: it has no
+      // invalidation latch because there is no steady repaint path to guard.
+      none: 4,
     });
     // ...and the honest-exception list by NAME, because that is the one that should never
     // grow quietly: every entry is a window this repo knows has no invalidation guard.
@@ -1894,6 +1908,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         .map((r) => r.call)
         .sort(),
     ).toEqual([
+      'this.deathRecapDialog.close',
       'this.lootRolls.update',
       'this.questDialog.updateProximity',
       'this.updateMapWindow',

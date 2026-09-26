@@ -15,6 +15,7 @@ import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
 import type { SavedGatheringGoal } from './professions/gathering_goal_persist';
 import type { ToolEffectSlot } from './professions/tools';
+import type { SavedPendingTownFocus } from './professions/town_focus_pending';
 import type { WorldPvpSavedState } from './pvp/world_pvp';
 import type { SavedReliquaryState } from './reliquary';
 import type {
@@ -335,6 +336,10 @@ export interface CharacterState {
   // re-fire on the floored post-fix display.
   proficiencyDisplayHealApplied?: boolean;
   townFocus?: Record<string, number>;
+  // #1144: a queued 'time'/'timeAndPartial' re-spec (JSONB, sparse: absent
+  // while nothing is waiting). Remaining seconds, never an absolute sim time;
+  // encoding and the strict load live in professions/town_focus_pending.ts.
+  pendingTownFocus?: SavedPendingTownFocus;
   // Active-archetype state (#1129, superseded scope; JSONB, back-compat: absent on
   // older saves loads as emptyArchetypeState, see normalizeArchetypeState).
   archetype?: Partial<ArchetypeState>;

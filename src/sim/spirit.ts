@@ -60,6 +60,7 @@ import {
   UNSTUCK_SICKNESS_STAT_MULT,
   unstuckSicknessDuration,
 } from './resurrection';
+import { reviveFacing } from './revive_facing';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import type { BgMatch } from './social/battleground';
@@ -462,12 +463,15 @@ function reviveAt(
   // revivePlayerAt teleports even a LIVE target (wasDead only gates the
   // respawn event), so a running gather/fishing session must end here too.
   cancelProfessionSessionOnDisplacement(ctx, p);
+  // A revive in place (corpse, Spirit Healer, instance re-entry) keeps the ghost's
+  // heading; only a revive that moves the body resets it to 0, paired with prevFacing
+  // as on every forced-facing site (see releasePlayerSpirit above and revive_facing.ts).
+  const heading = reviveFacing(p, p.pos, pos);
   p.pos = ctx.groundPos(pos.x, pos.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
-  // See releasePlayerSpirit above: pair prevFacing with the forced facing reset.
-  p.facing = 0;
-  p.prevFacing = 0;
+  p.facing = heading.facing;
+  p.prevFacing = heading.prevFacing;
   // As with the release above: a held movement key at the moment the revive lands must
   // not carry over, or the freshly-revived body immediately walks off in whatever
   // direction was last held (this is what made revived players drift with no input).
@@ -479,6 +483,8 @@ function reviveAt(
   recalcPlayerStats(p, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   p.hp = Math.max(1, Math.round(p.maxHp * hpFrac));
   p.resource = p.resourceType === 'mana' ? Math.round(p.maxResource * hpFrac) : 0;
+  // A new life starts with a full parked Cat Form pool, whatever the death left.
+  p.parkedEnergyDeficit = 0;
   p.targetId = null;
   p.autoAttack = false;
   p.queuedOnSwing = null;

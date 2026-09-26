@@ -2,97 +2,137 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4672,
+    "files": 4780,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
-        "ms": 2999,
+        "ms": 1954,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          2999
+          1954
         ]
       },
       "tests/ability_line_of_sight.test.ts": {
-        "ms": 4,
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          7
+        ]
+      },
+      "tests/ability_material_live_draw_parity.test.ts": {
+        "ms": 71,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          4
+          71
+        ]
+      },
+      "tests/ability_vfx_cast_all_or_nothing.test.ts": {
+        "ms": 360,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          364,
+          360,
+          356
+        ]
+      },
+      "tests/ability_vfx_cast_requirements.test.ts": {
+        "ms": 4517,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          4516,
+          4577,
+          4517
         ]
       },
       "tests/ability_vfx_draped_pools.test.ts": {
+        "ms": 24,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          24
+        ]
+      },
+      "tests/ability_vfx_idle_visibility.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          9
+        ]
+      },
+      "tests/ability_vfx_instanced_pools.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          18
+        ]
+      },
+      "tests/absorb_credit.test.ts": {
+        "ms": 2821,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          2821
+        ]
+      },
+      "tests/absorb_overlay_gate.test.ts": {
         "ms": 11,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
           11
         ]
       },
-      "tests/ability_vfx_idle_visibility.test.ts": {
-        "ms": 6,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          6
-        ]
-      },
-      "tests/ability_vfx_instanced_pools.test.ts": {
-        "ms": 8,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          8
-        ]
-      },
-      "tests/absorb_overlay_gate.test.ts": {
-        "ms": 41,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          41
-        ]
-      },
       "tests/account_ledger.test.ts": {
-        "ms": 6,
+        "ms": 14,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          6
+          14
         ]
       },
       "tests/account_ledger_sim.test.ts": {
-        "ms": 1778,
+        "ms": 3670,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          1778
+          3670
         ]
       },
       "tests/account_ledger_ui.test.ts": {
-        "ms": 29,
+        "ms": 14,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          29
+          14
         ]
       },
       "tests/account_ledger_wire.test.ts": {
-        "ms": 1547,
+        "ms": 3181,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          1547
+          3181
         ]
       },
       "tests/account_mount_cosmetics_pg_integration.test.ts": {
@@ -105,39 +145,48 @@
         ]
       },
       "tests/action_bar_bind_banner.test.ts": {
-        "ms": 39,
+        "ms": 178,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          39
+          178
         ]
       },
       "tests/action_bar_bind_banner_placement.test.ts": {
-        "ms": 103,
+        "ms": 175,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          103
+          175
         ]
       },
       "tests/action_bar_icon_bg.test.ts": {
         "ms": 8,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
           8
         ]
       },
       "tests/action_bar_restore.test.ts": {
-        "ms": 52,
+        "ms": 30,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          52
+          30
+        ]
+      },
+      "tests/action_bar_secondary_requirements.test.ts": {
+        "ms": 1989,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1989
         ]
       },
       "tests/action_bar_spectate.test.ts": {
@@ -145,6 +194,15 @@
         "method": "local-median",
         "measured": "2026-09-24",
         "reason": "Frame layout review validation measured locally; current full CI run found coverage just below its floor while the next green full harvest is pending.",
+        "runs": [
+          14
+        ]
+      },
+      "tests/action_cam_core.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
           14
         ]
@@ -158,106 +216,16 @@
           69
         ]
       },
-      "tests/ambient_quest_markers.test.ts": {
-        "ms": 11,
+      "tests/affliction_familiar_prewarm.test.ts": {
+        "ms": 17,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          11
+          17
         ]
       },
-      "tests/aura_bar_side.test.ts": {
-        "ms": 3,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          3
-        ]
-      },
-      "tests/aura_cue_catalog.test.ts": {
-        "ms": 6,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          6
-        ]
-      },
-      "tests/aura_ids.test.ts": {
-        "ms": 4,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          4
-        ]
-      },
-      "tests/aura_track_catalog.test.ts": {
-        "ms": 3228,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          3228
-        ]
-      },
-      "tests/aura_track_host.test.ts": {
-        "ms": 79,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          79
-        ]
-      },
-      "tests/aura_track_painter.test.ts": {
-        "ms": 33,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          33
-        ]
-      },
-      "tests/aura_track_view.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          7
-        ]
-      },
-      "tests/aura_watchlist_core.test.ts": {
-        "ms": 7,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          7
-        ]
-      },
-      "tests/awarded_loot_hold.test.ts": {
-        "ms": 9098,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          9098
-        ]
-      },
-      "tests/bags_pool_honest_refusal.test.ts": {
-        "ms": 825,
-        "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
-        "runs": [
-          825
-        ]
-      },
-      "tests/bags_window_materials_only_cells.test.ts": {
+      "tests/ambience_state_core.test.ts": {
         "ms": 27,
         "method": "local-median",
         "measured": "2026-09-26",
@@ -266,22 +234,148 @@
           27
         ]
       },
-      "tests/bags_window_party_trade.test.ts": {
+      "tests/ambient_quest_markers.test.ts": {
         "ms": 25,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
           25
         ]
       },
-      "tests/bags_window_trade_quantity.test.ts": {
-        "ms": 41,
+      "tests/aura_bar_side.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          18
+        ]
+      },
+      "tests/aura_cue_catalog.test.ts": {
+        "ms": 12,
         "method": "local-median",
         "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
         "runs": [
-          41
+          12
+        ]
+      },
+      "tests/aura_ids.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          10
+        ]
+      },
+      "tests/aura_track_catalog.test.ts": {
+        "ms": 5403,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          5403
+        ]
+      },
+      "tests/aura_track_host.test.ts": {
+        "ms": 144,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          144
+        ]
+      },
+      "tests/aura_track_painter.test.ts": {
+        "ms": 86,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          86
+        ]
+      },
+      "tests/aura_track_view.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/aura_watchlist_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/awarded_loot_hold.test.ts": {
+        "ms": 18599,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          18599
+        ]
+      },
+      "tests/bag_item_action_menu_destroy.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          21
+        ]
+      },
+      "tests/bags_pool_honest_refusal.test.ts": {
+        "ms": 1800,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          1800
+        ]
+      },
+      "tests/bags_window_materials_only_cells.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          44
+        ]
+      },
+      "tests/bags_window_party_trade.test.ts": {
+        "ms": 31,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          31
+        ]
+      },
+      "tests/bags_window_touch_destroy_menu.test.ts": {
+        "ms": 48,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          48
+        ]
+      },
+      "tests/bags_window_trade_quantity.test.ts": {
+        "ms": 88,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local release v0.44 candidate measurement pending full CI harvest",
+        "runs": [
+          88
         ]
       },
       "tests/baked_pool_prewarm.test.ts": {
@@ -309,6 +403,24 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           11
+        ]
+      },
+      "tests/benison_dawnweave.test.ts": {
+        "ms": 2520,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2520
+        ]
+      },
+      "tests/benison_prayer_tooltip.test.ts": {
+        "ms": 2304,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2304
         ]
       },
       "tests/blade_grass_pool_core.test.ts": {
@@ -357,12 +469,12 @@
         ]
       },
       "tests/bug_report_error_text.test.ts": {
-        "ms": 4,
+        "ms": 5,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          4
+          5
         ]
       },
       "tests/camera_impact_core.test.ts": {
@@ -372,6 +484,15 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           12
+        ]
+      },
+      "tests/camera_view_settings.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          14
         ]
       },
       "tests/cannon_emplacement.test.ts": {
@@ -482,6 +603,77 @@
           6
         ]
       },
+      "tests/cast_admission_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          3,
+          4,
+          4
+        ]
+      },
+      "tests/cast_vfx_engine_family.test.ts": {
+        "ms": 158,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          159,
+          157,
+          158
+        ]
+      },
+      "tests/cast_vfx_first_reads.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          23,
+          22,
+          22
+        ]
+      },
+      "tests/cast_vfx_spawn_gate.test.ts": {
+        "ms": 497,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          499,
+          493,
+          497
+        ]
+      },
+      "tests/cat_form_energy.test.ts": {
+        "ms": 10179,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          10179
+        ]
+      },
+      "tests/char_stat_model_core.test.ts": {
+        "ms": 187,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          187
+        ]
+      },
+      "tests/char_window_drag_render_defer.test.ts": {
+        "ms": 35,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          35
+        ]
+      },
       "tests/character_cull_core.test.ts": {
         "ms": 41,
         "method": "local-median",
@@ -489,6 +681,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           41
+        ]
+      },
+      "tests/character_form_adornments.test.ts": {
+        "ms": 1745,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1745
         ]
       },
       "tests/character_preview_loop_parking.test.ts": {
@@ -518,6 +719,33 @@
           16
         ]
       },
+      "tests/charselect_woc_market_panel.test.ts": {
+        "ms": 75,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          75
+        ]
+      },
+      "tests/charselect_woc_market_wiring.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          6
+        ]
+      },
+      "tests/chat_rate_limit.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "runs": [
+          3
+        ]
+      },
       "tests/chat_scroll_follow.test.ts": {
         "ms": 4,
         "method": "local-median",
@@ -537,12 +765,12 @@
         ]
       },
       "tests/chrome_profile_dir.test.ts": {
-        "ms": 11,
+        "ms": 10,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          11
+          10
         ]
       },
       "tests/chronomancy_cascade_relief.test.ts": {
@@ -564,39 +792,57 @@
         ]
       },
       "tests/class_health_table.test.ts": {
-        "ms": 1051,
+        "ms": 2280,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          2280
+        ]
+      },
+      "tests/class_vfx_prewarm_homes.test.ts": {
+        "ms": 192,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          192
+        ]
+      },
+      "tests/clear_cooldowns_charge_pool.test.ts": {
+        "ms": 1406,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          1051
+          1406
         ]
       },
       "tests/click_claimed_focus.test.ts": {
-        "ms": 4,
+        "ms": 8,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          4
+          8
         ]
       },
       "tests/client_api_origin.test.ts": {
-        "ms": 8062,
+        "ms": 1229,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          8062
+          1229
         ]
       },
       "tests/clock_memo.test.ts": {
-        "ms": 43,
+        "ms": 55,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          43
+          55
         ]
       },
       "tests/clue_hunts_content.test.ts": {
@@ -644,13 +890,31 @@
           4
         ]
       },
-      "tests/combat_res_released_ghost.test.ts": {
-        "ms": 2894,
+      "tests/colorblind_mode_render.test.ts": {
+        "ms": 21,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          2894
+          21
+        ]
+      },
+      "tests/combat_res_released_ghost.test.ts": {
+        "ms": 5729,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          5729
+        ]
+      },
+      "tests/combo_row_portrait_inset.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
         ]
       },
       "tests/context_loss_recovery.test.ts": {
@@ -663,12 +927,12 @@
         ]
       },
       "tests/controller_options_view.test.ts": {
-        "ms": 4,
+        "ms": 13,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          4
+          13
         ]
       },
       "tests/cooldown_manager_auras.test.ts": {
@@ -754,12 +1018,12 @@
         ]
       },
       "tests/craft_row_text.test.ts": {
-        "ms": 15,
+        "ms": 16,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          15
+          16
         ]
       },
       "tests/crafting_window_pin_chip.test.ts": {
@@ -817,12 +1081,12 @@
         ]
       },
       "tests/css_root_anchored_has.test.ts": {
-        "ms": 1424,
+        "ms": 1153,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          1424
+          1153
         ]
       },
       "tests/currencies_tab_html.test.ts": {
@@ -852,6 +1116,24 @@
           7
         ]
       },
+      "tests/dawnreaver_damage.test.ts": {
+        "ms": 6400,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          6400
+        ]
+      },
+      "tests/dawnreaver_damage_tooltip.test.ts": {
+        "ms": 1651,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1651
+        ]
+      },
       "tests/day_night_dial_painter.test.ts": {
         "ms": 11,
         "method": "local-median",
@@ -861,13 +1143,22 @@
           11
         ]
       },
-      "tests/deck_floor.test.ts": {
-        "ms": 8,
+      "tests/death_recap.test.ts": {
+        "ms": 28,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          8
+          28
+        ]
+      },
+      "tests/deck_floor.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          9
         ]
       },
       "tests/decoration_exclusions.test.ts": {
@@ -889,12 +1180,12 @@
         ]
       },
       "tests/deeds_restore.test.ts": {
-        "ms": 1202,
+        "ms": 1806,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          1202
+          1806
         ]
       },
       "tests/deferred_contact_bursts.test.ts": {
@@ -906,22 +1197,40 @@
           9
         ]
       },
-      "tests/deposit_all_status_text.test.ts": {
-        "ms": 6,
+      "tests/deferred_drag_render.test.ts": {
+        "ms": 4,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          6
+          4
+        ]
+      },
+      "tests/delve_geometry.test.ts": {
+        "ms": 769,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          769
+        ]
+      },
+      "tests/deposit_all_status_text.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          7
         ]
       },
       "tests/desktop_host_diag.test.ts": {
-        "ms": 6,
+        "ms": 13,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          6
+          13
         ]
       },
       "tests/desktop_host_essentials.test.ts": {
@@ -933,13 +1242,22 @@
           6
         ]
       },
-      "tests/dev_town_teleport.test.ts": {
-        "ms": 319,
+      "tests/dev_badge_titles.test.ts": {
+        "ms": 787,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          319
+          787
+        ]
+      },
+      "tests/dev_town_teleport.test.ts": {
+        "ms": 429,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          429
         ]
       },
       "tests/dev_world_quest_cannon.test.ts": {
@@ -987,6 +1305,15 @@
           1237
         ]
       },
+      "tests/discord_oauth_flow.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          21
+        ]
+      },
       "tests/discord_queue_ping_row.test.ts": {
         "ms": 17,
         "method": "local-median",
@@ -1014,6 +1341,17 @@
           5
         ]
       },
+      "tests/draw_program_signature_core.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
       "tests/druid_cat_animation.test.ts": {
         "ms": 2416,
         "method": "local-median",
@@ -1032,6 +1370,24 @@
           1601
         ]
       },
+      "tests/druid_form_speed_stack.test.ts": {
+        "ms": 899,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          899
+        ]
+      },
+      "tests/druid_rush_window.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
+        ]
+      },
       "tests/druid_wildfang_kit.test.ts": {
         "ms": 3670,
         "method": "local-median",
@@ -1039,6 +1395,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           3670
+        ]
+      },
+      "tests/dual_purpose_target.test.ts": {
+        "ms": 738,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          738
         ]
       },
       "tests/eastbrook_combat_giver_visibility.test.ts": {
@@ -1095,13 +1460,22 @@
           899
         ]
       },
+      "tests/effective_stats.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          6
+        ]
+      },
       "tests/electron_host_diag.test.ts": {
-        "ms": 35,
+        "ms": 29,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          35
+          29
         ]
       },
       "tests/electron_host_essentials.test.ts": {
@@ -1168,12 +1542,12 @@
         ]
       },
       "tests/entity_ground_sample_core.test.ts": {
-        "ms": 9,
+        "ms": 11,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          9
+          11
         ]
       },
       "tests/entity_reanchor.test.ts": {
@@ -1194,6 +1568,15 @@
           960
         ]
       },
+      "tests/entity_spec_mirror.test.ts": {
+        "ms": 1545,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1545
+        ]
+      },
       "tests/equip_trinket.test.ts": {
         "ms": 942,
         "method": "local-median",
@@ -1201,6 +1584,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           942
+        ]
+      },
+      "tests/error_toast_controller.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          44
         ]
       },
       "tests/escort_story.test.ts": {
@@ -1275,13 +1667,22 @@
           796
         ]
       },
-      "tests/far_bake_group_key.test.ts": {
-        "ms": 22,
+      "tests/fallen_ally_target.test.ts": {
+        "ms": 865,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          22
+          865
+        ]
+      },
+      "tests/far_bake_group_key.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
         ]
       },
       "tests/far_bake_groups_core.test.ts": {
@@ -1294,12 +1695,12 @@
         ]
       },
       "tests/far_bake_uv_pad.test.ts": {
-        "ms": 1351,
+        "ms": 1589,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          1351
+          1589
         ]
       },
       "tests/farshore_shipwreck.test.ts": {
@@ -1336,6 +1737,15 @@
         "reason": "PR 4139 review-fix round adds four suites (area telegraph, harvest detonation staging, Onrush cue, beat-staged combat text) absent from the last green full CI harvest; actual local single-worker Vitest json-reporter run, pending green full-mode CI refresh.",
         "runs": [
           15
+        ]
+      },
+      "tests/feast_named_slot_item.test.ts": {
+        "ms": 1410,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1410
         ]
       },
       "tests/fen_features_cells.test.ts": {
@@ -1509,6 +1919,24 @@
           1679
         ]
       },
+      "tests/form_adornment_core.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
+        ]
+      },
+      "tests/form_adornments.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          15
+        ]
+      },
       "tests/frame_cadence.test.ts": {
         "ms": 180,
         "method": "local-median",
@@ -1591,12 +2019,12 @@
         ]
       },
       "tests/frame_rate_cap_setting.test.ts": {
-        "ms": 5,
+        "ms": 10,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          5
+          10
         ]
       },
       "tests/friendly_nameplate_keybind.test.ts": {
@@ -1636,12 +2064,12 @@
         ]
       },
       "tests/game_renderer.test.ts": {
-        "ms": 5,
+        "ms": 8,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          5
+          8
         ]
       },
       "tests/gather_batch_reach_core.test.ts": {
@@ -1651,6 +2079,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/glb_punctual_lights.test.ts": {
+        "ms": 509,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          509
         ]
       },
       "tests/glider_action_bar_view.test.ts": {
@@ -1770,6 +2207,15 @@
           17
         ]
       },
+      "tests/goblin_rocket_sled_fx.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          14
+        ]
+      },
       "tests/goblin_rocket_sled_fx_core.test.ts": {
         "ms": 7,
         "method": "local-median",
@@ -1798,12 +2244,12 @@
         ]
       },
       "tests/gpu_timer_probe_core.test.ts": {
-        "ms": 6,
+        "ms": 24,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
         "runs": [
-          6
+          24
         ]
       },
       "tests/grass_tuft_cards_core.test.ts": {
@@ -1885,6 +2331,42 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           6
+        ]
+      },
+      "tests/guild_rank_cmd.test.ts": {
+        "ms": 830,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          830
+        ]
+      },
+      "tests/guild_ranks.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          8
+        ]
+      },
+      "tests/guild_ranks_view.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
+        ]
+      },
+      "tests/guild_roster_wire.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
         ]
       },
       "tests/harvest_choreography.test.ts": {
@@ -1984,6 +2466,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           27
+        ]
+      },
+      "tests/hill_ring_twin.test.ts": {
+        "ms": 37,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          37
         ]
       },
       "tests/hill_rules.test.ts": {
@@ -2147,21 +2638,21 @@
         ]
       },
       "tests/hunter_trailbreak_arc.test.ts": {
-        "ms": 6,
+        "ms": 10,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          6
+          10
         ]
       },
       "tests/hunter_trailbreak_terrain.test.ts": {
-        "ms": 1317,
+        "ms": 2800,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          1317
+          2800
         ]
       },
       "tests/ignivar_lift_car_walls.test.ts": {
@@ -2171,6 +2662,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           1116
+        ]
+      },
+      "tests/immobile_mob_evade.test.ts": {
+        "ms": 4855,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4855
         ]
       },
       "tests/impact_contact.test.ts": {
@@ -2183,12 +2683,12 @@
         ]
       },
       "tests/input_seq_fold.test.ts": {
-        "ms": 5,
+        "ms": 7,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          5
+          7
         ]
       },
       "tests/instance_combat_hold.test.ts": {
@@ -2198,6 +2698,17 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           798
+        ]
+      },
+      "tests/instanced_dither_fade.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          12,
+          14,
+          15
         ]
       },
       "tests/interact_key_gather.test.ts": {
@@ -2210,12 +2721,21 @@
         ]
       },
       "tests/interaction_input.test.ts": {
-        "ms": 4,
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          16
+        ]
+      },
+      "tests/interface_body_classes.test.ts": {
+        "ms": 5,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          4
+          5
         ]
       },
       "tests/interface_visibility_core.test.ts": {
@@ -2225,6 +2745,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/interior_encounter_prewarm_rig_key.test.ts": {
+        "ms": 805,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          805
         ]
       },
       "tests/inventory_receipt.test.ts": {
@@ -2306,6 +2835,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           4
+        ]
+      },
+      "tests/kill_participation.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          6
         ]
       },
       "tests/last_keep_graveyard.test.ts": {
@@ -2479,6 +3017,24 @@
           2511
         ]
       },
+      "tests/loot_roll_awarded_event.test.ts": {
+        "ms": 961,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          961
+        ]
+      },
+      "tests/loot_roll_win_view.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          16
+        ]
+      },
       "tests/mailbox_instanced_stacking.test.ts": {
         "ms": 30,
         "method": "local-median",
@@ -2504,6 +3060,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/map_poi_label_clearance.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          14
         ]
       },
       "tests/map_sidebar_collapse.test.ts": {
@@ -2549,6 +3114,33 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           3
+        ]
+      },
+      "tests/market_orders.test.ts": {
+        "ms": 1428,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1428
+        ]
+      },
+      "tests/market_orders_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          12
+        ]
+      },
+      "tests/market_orders_plan.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          15
         ]
       },
       "tests/market_sweep.test.ts": {
@@ -2623,6 +3215,24 @@
           652
         ]
       },
+      "tests/meters_advanced.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          13
+        ]
+      },
+      "tests/meters_customization.test.ts": {
+        "ms": 68,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          68
+        ]
+      },
       "tests/meters_frame.test.ts": {
         "ms": 6,
         "method": "local-median",
@@ -2678,6 +3288,42 @@
         ]
       },
       "tests/mobile_preflight.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
+        ]
+      },
+      "tests/mobile_station_object.test.ts": {
+        "ms": 661,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          661
+        ]
+      },
+      "tests/mobile_station_title.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
+        ]
+      },
+      "tests/mobile_stations.test.ts": {
+        "ms": 58,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          58
+        ]
+      },
+      "tests/mobile_stations_core.test.ts": {
         "ms": 5,
         "method": "local-median",
         "measured": "2026-09-26",
@@ -2812,6 +3458,15 @@
           5
         ]
       },
+      "tests/mouseover_cast_wiring.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
+        ]
+      },
       "tests/music_notes.test.ts": {
         "ms": 8,
         "method": "local-median",
@@ -2893,6 +3548,15 @@
           6
         ]
       },
+      "tests/nythraxis_hazard_palette_core.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
+        ]
+      },
       "tests/nythraxis_loot_budget.test.ts": {
         "ms": 753,
         "method": "local-median",
@@ -2917,6 +3581,17 @@
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
+          7
+        ]
+      },
+      "tests/occluder_dither_fade.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "dithered camera ghost suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          6,
+          8,
           7
         ]
       },
@@ -2945,6 +3620,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/options_slider_format.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
         ]
       },
       "tests/options_text_values.test.ts": {
@@ -3046,6 +3730,15 @@
           5
         ]
       },
+      "tests/placed_assets_point_lights.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          20
+        ]
+      },
       "tests/player_card_render.test.ts": {
         "ms": 21,
         "method": "local-median",
@@ -3053,6 +3746,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           21
+        ]
+      },
+      "tests/player_identity_wire.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
         ]
       },
       "tests/player_movement_modes.test.ts": {
@@ -3065,12 +3767,30 @@
         ]
       },
       "tests/player_portrait_core.test.ts": {
-        "ms": 4,
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
+        "runs": [
+          7
+        ]
+      },
+      "tests/player_tooltip.test.ts": {
+        "ms": 10,
         "method": "local-median",
         "measured": "2026-09-26",
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
-          4
+          10
+        ]
+      },
+      "tests/point_light_carriers.test.ts": {
+        "ms": 4119,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4119
         ]
       },
       "tests/poison_coating_parse.test.ts": {
@@ -3083,12 +3803,12 @@
         ]
       },
       "tests/portrait_chip_composed_hydrate.test.ts": {
-        "ms": 15,
+        "ms": 51,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          15
+          51
         ]
       },
       "tests/post_finite_guard_glsl.test.ts": {
@@ -3165,6 +3885,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           25
+        ]
+      },
+      "tests/prewarm_entry.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
         ]
       },
       "tests/proc_signal_cores.test.ts": {
@@ -3304,6 +4033,15 @@
           2532
         ]
       },
+      "tests/raid_released_ghost_loot.test.ts": {
+        "ms": 1582,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          1582
+        ]
+      },
       "tests/raid_telegraph_rig_walk.test.ts": {
         "ms": 17,
         "method": "local-median",
@@ -3320,6 +4058,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           6
+        ]
+      },
+      "tests/raid_wipe_entrant_reset.test.ts": {
+        "ms": 843,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          843
         ]
       },
       "tests/rallycart_exhaust_ports.test.ts": {
@@ -3430,6 +4177,17 @@
           26
         ]
       },
+      "tests/renderer_ability_presentation.test.ts": {
+        "ms": 73,
+        "method": "local-median",
+        "measured": "2026-09-25",
+        "reason": "Per-cast gate branch (fix/cast-gate-engine-family) adds nine suites absent from the last green full CI harvest; actual local single-worker Vitest json-reporter runs (endTime minus startTime), pending green full-mode CI refresh.",
+        "runs": [
+          71,
+          73,
+          75
+        ]
+      },
       "tests/renderer_build_diag.test.ts": {
         "ms": 5,
         "method": "local-median",
@@ -3466,6 +4224,15 @@
           5
         ]
       },
+      "tests/reset_cooldown_policy.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
+        ]
+      },
       "tests/resize_coalesce_core.test.ts": {
         "ms": 6,
         "method": "local-median",
@@ -3482,6 +4249,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           8
+        ]
+      },
+      "tests/revive_facing.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
         ]
       },
       "tests/ribbon_contact_admission.test.ts": {
@@ -3700,6 +4476,15 @@
           5
         ]
       },
+      "tests/server/activity_detect_rareloot.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
+        ]
+      },
       "tests/server/admin_kick.test.ts": {
         "ms": 10,
         "method": "local-median",
@@ -3844,6 +4629,15 @@
           4
         ]
       },
+      "tests/server/market_commands.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
+        ]
+      },
       "tests/server/mount_skin_reconcile.test.ts": {
         "ms": 4,
         "method": "local-median",
@@ -3961,6 +4755,17 @@
           12
         ]
       },
+      "tests/shader_ablation_transforms.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          8,
+          9,
+          9
+        ]
+      },
       "tests/shader_corpus_slices.test.ts": {
         "ms": 23,
         "method": "local-median",
@@ -3968,6 +4773,28 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           23
+        ]
+      },
+      "tests/shader_harvest_corpus.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/shader_link_bench_report.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-22",
+        "reason": "shader harvest and link bench suites, local carry pending the branch's first full-mode harvest",
+        "runs": [
+          4,
+          4,
+          5
         ]
       },
       "tests/shadow_controls.test.ts": {
@@ -4042,6 +4869,15 @@
           1516
         ]
       },
+      "tests/social_db_guild_ranks.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
+        ]
+      },
       "tests/social_db_pledge_settings.test.ts": {
         "ms": 4,
         "method": "local-median",
@@ -4069,6 +4905,24 @@
           52
         ]
       },
+      "tests/solid_impact_fragments_prewarm.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          11
+        ]
+      },
+      "tests/spec_identity_snapshot.test.ts": {
+        "ms": 891,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          891
+        ]
+      },
       "tests/spectate_exit_hold.test.ts": {
         "ms": 24,
         "method": "local-median",
@@ -4087,6 +4941,15 @@
           22
         ]
       },
+      "tests/spellbook_window_drag_render_defer.test.ts": {
+        "ms": 62,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          62
+        ]
+      },
       "tests/spirit_grade.test.ts": {
         "ms": 11,
         "method": "local-median",
@@ -4094,6 +4957,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           11
+        ]
+      },
+      "tests/spirit_run_triggers.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
         ]
       },
       "tests/static_merge_shadow_core.test.ts": {
@@ -4112,6 +4984,15 @@
         "reason": "Warrior PR 4139 adds 100 suites absent from the last green full CI harvest; actual local single-worker Vitest default-reporter run on 2026-09-21, pending green full-mode CI refresh (run 35567302759 failed and was not harvested).",
         "runs": [
           28
+        ]
+      },
+      "tests/stonebound_shell_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          4
         ]
       },
       "tests/store_inspect_deps.test.ts": {
@@ -4141,6 +5022,15 @@
           11
         ]
       },
+      "tests/talent_swap_auras.test.ts": {
+        "ms": 3988,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          3988
+        ]
+      },
       "tests/talking_head.test.ts": {
         "ms": 13,
         "method": "local-median",
@@ -4160,21 +5050,21 @@
         ]
       },
       "tests/target_echo_core.test.ts": {
-        "ms": 5,
+        "ms": 11,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          5
+          11
         ]
       },
       "tests/target_frame_descriptor.test.ts": {
-        "ms": 11,
+        "ms": 15,
         "method": "local-median",
-        "measured": "2026-09-26",
-        "reason": "local carry pending the next full-mode harvest",
+        "measured": "2026-09-21",
+        "reason": "v0.44 release-line reconcile added these tests after the latest full shard-weight harvest",
         "runs": [
-          11
+          15
         ]
       },
       "tests/terrain_detail_shed_core.test.ts": {
@@ -4204,6 +5094,15 @@
           47
         ]
       },
+      "tests/thornpeak_hillside_pocket.test.ts": {
+        "ms": 1463,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          1463
+        ]
+      },
       "tests/threat_drop_range.test.ts": {
         "ms": 563,
         "method": "local-median",
@@ -4231,6 +5130,15 @@
           4
         ]
       },
+      "tests/totarget_frame_controller.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          5
+        ]
+      },
       "tests/touch_frame_drag.test.ts": {
         "ms": 9,
         "method": "local-median",
@@ -4249,6 +5157,15 @@
           5
         ]
       },
+      "tests/town_focus_pending.test.ts": {
+        "ms": 4276,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "runs": [
+          4276
+        ]
+      },
       "tests/town_quests.test.ts": {
         "ms": 817,
         "method": "local-median",
@@ -4256,6 +5173,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           817
+        ]
+      },
+      "tests/tracker_collapse_settings.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "Release reconciliation combines new suites from both parents; measured locally pending the next green full-mode CI harvest.",
+        "runs": [
+          2
         ]
       },
       "tests/tracker_header_wiring.test.ts": {
@@ -4375,6 +5301,33 @@
           23
         ]
       },
+      "tests/underwater_compile_gate.test.ts": {
+        "ms": 11050,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          11050
+        ]
+      },
+      "tests/underwater_view.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          7
+        ]
+      },
+      "tests/unit_tooltip_seat.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          13
+        ]
+      },
       "tests/vanguard_set_bonus_a.test.ts": {
         "ms": 2661,
         "method": "local-median",
@@ -4400,6 +5353,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           25
+        ]
+      },
+      "tests/vault_search.test.ts": {
+        "ms": 44,
+        "method": "local-median",
+        "measured": "2026-09-23",
+        "reason": "v0.44 release candidate added or carried these suites after the latest full shard-weight harvest; measured locally during release verification pending the next green full-mode CI harvest.",
+        "runs": [
+          44
         ]
       },
       "tests/vault_wire_ledger_rows.test.ts": {
@@ -5023,6 +5985,15 @@
           22
         ]
       },
+      "tests/warrior_kit_sheet_readiness.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          9
+        ]
+      },
       "tests/warrior_leap_effects.test.ts": {
         "ms": 117,
         "method": "local-median",
@@ -5320,6 +6291,24 @@
           10
         ]
       },
+      "tests/water_approach_core.test.ts": {
+        "ms": 2660,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          2660
+        ]
+      },
+      "tests/weapon_aura_prewarm_parity.test.ts": {
+        "ms": 101,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          101
+        ]
+      },
       "tests/weapon_skin_optimistic.test.ts": {
         "ms": 5,
         "method": "local-median",
@@ -5327,6 +6316,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/weapon_skin_prewarm_host.test.ts": {
+        "ms": 368,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          368
         ]
       },
       "tests/weapon_stow_mount_overlay.test.ts": {
@@ -6557,8 +7555,8 @@
     "removed": {
       "tests/server/store_mount_grants.test.ts": "Replaced by store_mount_skin_grants.test.ts in PR3941; new suite uses the existing heuristic until measured."
     },
-    "mergedLocal": "2026-09-21",
-    "mergedFiles": 5
+    "mergedLocal": "2026-09-22",
+    "mergedFiles": 129
   },
   "tests/abilities_command.test.ts": 2213,
   "tests/ability_audio_defers_to_recordings.test.ts": 66,
@@ -6567,8 +7565,9 @@
   "tests/ability_description.test.ts": 23,
   "tests/ability_drill.test.ts": 8416,
   "tests/ability_icons.test.ts": 177,
-  "tests/ability_imbue_text.test.ts": 2999,
-  "tests/ability_line_of_sight.test.ts": 4,
+  "tests/ability_imbue_text.test.ts": 1954,
+  "tests/ability_line_of_sight.test.ts": 7,
+  "tests/ability_material_live_draw_parity.test.ts": 71,
   "tests/ability_material_prewarm_sweep.test.ts": 124,
   "tests/ability_requirement_keys.test.ts": 13,
   "tests/ability_self_only.test.ts": 10,
@@ -6576,15 +7575,17 @@
   "tests/ability_tooltip_consistency.test.ts": 49,
   "tests/ability_tooltip_lines.test.ts": 16,
   "tests/ability_tooltip_talents.test.ts": 7,
+  "tests/ability_vfx_cast_all_or_nothing.test.ts": 360,
   "tests/ability_vfx_cast_gate.test.ts": 26,
+  "tests/ability_vfx_cast_requirements.test.ts": 4517,
   "tests/ability_vfx_cc_bands.test.ts": 164,
   "tests/ability_vfx_core.test.ts": 533,
-  "tests/ability_vfx_draped_pools.test.ts": 11,
+  "tests/ability_vfx_draped_pools.test.ts": 24,
   "tests/ability_vfx_frame_cost.test.ts": 59,
   "tests/ability_vfx_fx_sleep.test.ts": 78,
   "tests/ability_vfx_gesture_release.test.ts": 13,
-  "tests/ability_vfx_idle_visibility.test.ts": 6,
-  "tests/ability_vfx_instanced_pools.test.ts": 8,
+  "tests/ability_vfx_idle_visibility.test.ts": 9,
+  "tests/ability_vfx_instanced_pools.test.ts": 18,
   "tests/ability_vfx_longbuff_core.test.ts": 9,
   "tests/ability_vfx_longbuff_painter.test.ts": 35,
   "tests/ability_vfx_offscreen.test.ts": 13,
@@ -6592,7 +7593,8 @@
   "tests/ability_vfx_selfcast_fallthrough.test.ts": 5,
   "tests/ability_vfx_spectacle.test.ts": 25,
   "tests/absorb_bar.test.ts": 7,
-  "tests/absorb_overlay_gate.test.ts": 41,
+  "tests/absorb_credit.test.ts": 2821,
+  "tests/absorb_overlay_gate.test.ts": 11,
   "tests/abyssal_rift_fx.test.ts": 42,
   "tests/abyssal_rift_vfx.test.ts": 12,
   "tests/account_2fa.test.ts": 323,
@@ -6600,10 +7602,10 @@
   "tests/account_export_state.test.ts": 16,
   "tests/account_flair.test.ts": 15,
   "tests/account_flair_client.test.ts": 1390,
-  "tests/account_ledger.test.ts": 6,
-  "tests/account_ledger_sim.test.ts": 1778,
-  "tests/account_ledger_ui.test.ts": 29,
-  "tests/account_ledger_wire.test.ts": 1547,
+  "tests/account_ledger.test.ts": 14,
+  "tests/account_ledger_sim.test.ts": 3670,
+  "tests/account_ledger_ui.test.ts": 14,
+  "tests/account_ledger_wire.test.ts": 3181,
   "tests/account_mount_cosmetics_pg_integration.test.ts": 100,
   "tests/account_portal.test.ts": 8,
   "tests/account_server.test.ts": 2306,
@@ -6611,8 +7613,8 @@
   "tests/account_wealth_db.pg.test.ts": 8976,
   "tests/account_wealth_db.test.ts": 21,
   "tests/account_wealth_pg_integration.test.ts": 2330,
-  "tests/action_bar_bind_banner.test.ts": 39,
-  "tests/action_bar_bind_banner_placement.test.ts": 103,
+  "tests/action_bar_bind_banner.test.ts": 178,
+  "tests/action_bar_bind_banner_placement.test.ts": 175,
   "tests/action_bar_bind_controller.test.ts": 25,
   "tests/action_bar_bind_core.test.ts": 7,
   "tests/action_bar_clear.test.ts": 8,
@@ -6625,11 +7627,13 @@
   "tests/action_bar_layout_sync.test.ts": 16,
   "tests/action_bar_lock.test.ts": 5,
   "tests/action_bar_painter.test.ts": 18,
-  "tests/action_bar_restore.test.ts": 52,
+  "tests/action_bar_restore.test.ts": 30,
+  "tests/action_bar_secondary_requirements.test.ts": 1989,
   "tests/action_bar_spectate.test.ts": 14,
   "tests/action_bar_toggle.test.ts": 16,
   "tests/action_bar_view.test.ts": 42,
   "tests/action_bar_visibility_core.test.ts": 5,
+  "tests/action_cam_core.test.ts": 14,
   "tests/action_replacement.test.ts": 16,
   "tests/active_animation_timer.test.ts": 8,
   "tests/active_kit_prewarm.test.ts": 69,
@@ -6732,12 +7736,14 @@
   "tests/affliction.test.ts": 31408,
   "tests/affliction_familiar.test.ts": 16,
   "tests/affliction_familiar_core.test.ts": 7,
+  "tests/affliction_familiar_prewarm.test.ts": 17,
   "tests/affliction_sentence_queue.test.ts": 4,
   "tests/afk_wire.test.ts": 2715,
   "tests/aldric_meteor_quest.test.ts": 1627,
   "tests/alloc_probe.test.ts": 11,
+  "tests/ambience_state_core.test.ts": 27,
   "tests/ambient_critters_removed.test.ts": 7,
-  "tests/ambient_quest_markers.test.ts": 11,
+  "tests/ambient_quest_markers.test.ts": 25,
   "tests/android_seeker_distribution.test.ts": 11,
   "tests/anim_pipeline_batch1.test.ts": 12,
   "tests/anim_pipeline_bear.test.ts": 5,
@@ -6827,16 +7833,16 @@
   "tests/audit_conservation_property.test.ts": 66896,
   "tests/audit_conservation_vault.test.ts": 4584,
   "tests/audit_cur_conservation.test.ts": 3104,
-  "tests/aura_bar_side.test.ts": 3,
+  "tests/aura_bar_side.test.ts": 18,
   "tests/aura_cancel.test.ts": 12,
   "tests/aura_classify.test.ts": 11,
-  "tests/aura_cue_catalog.test.ts": 6,
+  "tests/aura_cue_catalog.test.ts": 12,
   "tests/aura_effect.test.ts": 24,
   "tests/aura_gain_log.test.ts": 10,
   "tests/aura_icon_runtime.test.ts": 4,
   "tests/aura_icon_view.test.ts": 61,
   "tests/aura_icons.test.ts": 13,
-  "tests/aura_ids.test.ts": 4,
+  "tests/aura_ids.test.ts": 10,
   "tests/aura_image_art.test.ts": 164,
   "tests/aura_overflow_priority.test.ts": 9,
   "tests/aura_overlay_config.test.ts": 11,
@@ -6847,11 +7853,11 @@
   "tests/aura_preview_direction_css.test.ts": 4,
   "tests/aura_strip_order_core.test.ts": 9,
   "tests/aura_tooltip.test.ts": 6,
-  "tests/aura_track_catalog.test.ts": 3228,
-  "tests/aura_track_host.test.ts": 79,
-  "tests/aura_track_painter.test.ts": 33,
-  "tests/aura_track_view.test.ts": 7,
-  "tests/aura_watchlist_core.test.ts": 7,
+  "tests/aura_track_catalog.test.ts": 5403,
+  "tests/aura_track_host.test.ts": 144,
+  "tests/aura_track_painter.test.ts": 86,
+  "tests/aura_track_view.test.ts": 12,
+  "tests/aura_watchlist_core.test.ts": 12,
   "tests/aura_wire_decode.test.ts": 11,
   "tests/auras_painter.test.ts": 23,
   "tests/auras_view.test.ts": 40,
@@ -6865,7 +7871,7 @@
   "tests/avatar.test.ts": 19,
   "tests/avatar_break_control.test.ts": 3699,
   "tests/avatar_fallback.test.ts": 4,
-  "tests/awarded_loot_hold.test.ts": 9098,
+  "tests/awarded_loot_hold.test.ts": 18599,
   "tests/away_state.test.ts": 9,
   "tests/back_grips.test.ts": 13,
   "tests/backdrop_filter_survival.test.ts": 12,
@@ -6875,6 +7881,7 @@
   "tests/bag_corner_mark_view.test.ts": 4,
   "tests/bag_filter.test.ts": 27,
   "tests/bag_fine_mark_view.test.ts": 9,
+  "tests/bag_item_action_menu_destroy.test.ts": 21,
   "tests/bag_item_action_menu_paint.test.ts": 494,
   "tests/bag_item_action_menu_vendor_sell.test.ts": 26,
   "tests/bag_item_context_menu.test.ts": 16,
@@ -6886,7 +7893,7 @@
   "tests/bags_guild_deposit_routing.test.ts": 201,
   "tests/bags_money_refresh.test.ts": 2891,
   "tests/bags_money_row_paint.test.ts": 97,
-  "tests/bags_pool_honest_refusal.test.ts": 825,
+  "tests/bags_pool_honest_refusal.test.ts": 1800,
   "tests/bags_stale_click_refusal.test.ts": 57,
   "tests/bags_vendor_sell_confirm.test.ts": 292,
   "tests/bags_view.test.ts": 39,
@@ -6895,11 +7902,12 @@
   "tests/bags_window_drag_render_defer.test.ts": 62,
   "tests/bags_window_focus_restore.test.ts": 91,
   "tests/bags_window_instance_marker.test.ts": 183,
-  "tests/bags_window_materials_only_cells.test.ts": 27,
-  "tests/bags_window_party_trade.test.ts": 25,
+  "tests/bags_window_materials_only_cells.test.ts": 44,
+  "tests/bags_window_party_trade.test.ts": 31,
   "tests/bags_window_sort_button.test.ts": 162,
   "tests/bags_window_space_jump.test.ts": 49,
-  "tests/bags_window_trade_quantity.test.ts": 41,
+  "tests/bags_window_touch_destroy_menu.test.ts": 48,
+  "tests/bags_window_trade_quantity.test.ts": 88,
   "tests/bags_window_unknown_cell.test.ts": 63,
   "tests/bags_window_use_routing.test.ts": 74,
   "tests/bags_window_vendor_sell_menu.test.ts": 48,
@@ -6968,6 +7976,8 @@
   "tests/beacon_spiral.test.ts": 3423,
   "tests/beacon_stair_base.test.ts": 2357,
   "tests/bench_gate.test.ts": 38,
+  "tests/benison_dawnweave.test.ts": 2520,
+  "tests/benison_prayer_tooltip.test.ts": 2304,
   "tests/bg_field_relief_core.test.ts": 146,
   "tests/bg_flag_interact.test.ts": 10,
   "tests/biome_haze_field.test.ts": 110,
@@ -7006,7 +8016,7 @@
   "tests/buffs_command.test.ts": 2597,
   "tests/bug_report.test.ts": 7,
   "tests/bug_report_db.test.ts": 16,
-  "tests/bug_report_error_text.test.ts": 4,
+  "tests/bug_report_error_text.test.ts": 5,
   "tests/build_assets_cli.test.ts": 754,
   "tests/build_bundle_pregen.test.ts": 458,
   "tests/build_lane_core.test.ts": 17,
@@ -7023,6 +8033,7 @@
   "tests/camera_feel_core.test.ts": 12,
   "tests/camera_follow.test.ts": 9,
   "tests/camera_impact_core.test.ts": 12,
+  "tests/camera_view_settings.test.ts": 14,
   "tests/camp_brazier_placement_core.test.ts": 14,
   "tests/camp_braziers.test.ts": 2314,
   "tests/camp_density.test.ts": 47,
@@ -7050,14 +8061,19 @@
   "tests/card_duel_view.test.ts": 8,
   "tests/card_hand.test.ts": 11,
   "tests/cascade_playtest_dev.test.ts": 3331,
+  "tests/cast_admission_core.test.ts": 4,
   "tests/cast_bar.test.ts": 8,
   "tests/cast_bar_painter.test.ts": 36,
   "tests/cast_display_name.test.ts": 7,
+  "tests/cast_vfx_engine_family.test.ts": 158,
+  "tests/cast_vfx_first_reads.test.ts": 22,
   "tests/cast_vfx_prewarm.test.ts": 13,
   "tests/cast_vfx_readiness_core.test.ts": 12,
+  "tests/cast_vfx_spawn_gate.test.ts": 497,
   "tests/caster_set_bonus.test.ts": 2441,
   "tests/casting_command.test.ts": 3207,
   "tests/castle_plan_core.test.ts": 13,
+  "tests/cat_form_energy.test.ts": 10179,
   "tests/cauterize.test.ts": 1890,
   "tests/celestial_sprites.test.ts": 6,
   "tests/chain_heal.test.ts": 5989,
@@ -7068,9 +8084,11 @@
   "tests/char_sheet_sig_core.test.ts": 15,
   "tests/char_skin_window.test.ts": 38,
   "tests/char_sort.test.ts": 16,
+  "tests/char_stat_model_core.test.ts": 187,
   "tests/char_stats_view.test.ts": 10,
   "tests/char_view.test.ts": 6,
   "tests/char_window.test.ts": 284,
+  "tests/char_window_drag_render_defer.test.ts": 35,
   "tests/character_anim_state.test.ts": 14,
   "tests/character_appearance.test.ts": 10,
   "tests/character_asset_ready.test.ts": 560,
@@ -7088,6 +8106,7 @@
   "tests/character_far_compile_gate.test.ts": 18,
   "tests/character_far_mesh_skin.test.ts": 638,
   "tests/character_far_skin_compile_gate.test.ts": 415,
+  "tests/character_form_adornments.test.ts": 1745,
   "tests/character_halo.test.ts": 263,
   "tests/character_lease.test.ts": 26,
   "tests/character_lease_game.test.ts": 2939,
@@ -7126,6 +8145,8 @@
   "tests/charselect_news.test.ts": 32,
   "tests/charselect_redesign.test.ts": 1356,
   "tests/charselect_sort_parity.test.ts": 9,
+  "tests/charselect_woc_market_panel.test.ts": 75,
+  "tests/charselect_woc_market_wiring.test.ts": 6,
   "tests/charter_fit_memory.test.ts": 9,
   "tests/charter_store_view.test.ts": 30,
   "tests/chat.test.ts": 4263,
@@ -7150,6 +8171,7 @@
   "tests/chat_line.test.ts": 31,
   "tests/chat_log.test.ts": 3072,
   "tests/chat_mod_live.test.ts": 13,
+  "tests/chat_rate_limit.test.ts": 3,
   "tests/chat_scroll_follow.test.ts": 4,
   "tests/chat_sender_flair.test.ts": 7,
   "tests/chat_tab_strip.test.ts": 4,
@@ -7169,7 +8191,7 @@
   "tests/chosen_cadence.test.ts": 4,
   "tests/chrome_focus_wiring.test.ts": 20,
   "tests/chrome_icons.test.ts": 21,
-  "tests/chrome_profile_dir.test.ts": 11,
+  "tests/chrome_profile_dir.test.ts": 10,
   "tests/chronomancy.test.ts": 3950,
   "tests/chronomancy_balance_targets.test.ts": 8306,
   "tests/chronomancy_buffs.test.ts": 3104,
@@ -7200,18 +8222,20 @@
   "tests/civic_service_placements.test.ts": 11,
   "tests/clamp.test.ts": 4,
   "tests/class_colors.test.ts": 11,
-  "tests/class_health_table.test.ts": 1051,
+  "tests/class_health_table.test.ts": 2280,
   "tests/class_icons.test.ts": 11,
   "tests/class_spec_kits.test.ts": 4747,
+  "tests/class_vfx_prewarm_homes.test.ts": 192,
   "tests/claudium_latency_proxy_target.test.ts": 125,
   "tests/claudium_launcher_balance.test.ts": 16,
   "tests/claudium_purchase_bridge.test.ts": 11,
   "tests/claudium_view.test.ts": 14,
   "tests/claudium_window.test.ts": 42,
-  "tests/click_claimed_focus.test.ts": 4,
+  "tests/clear_cooldowns_charge_pool.test.ts": 1406,
+  "tests/click_claimed_focus.test.ts": 8,
   "tests/click_marker.test.ts": 12,
   "tests/click_move.test.ts": 11,
-  "tests/client_api_origin.test.ts": 8062,
+  "tests/client_api_origin.test.ts": 1229,
   "tests/client_challenge.test.ts": 2727,
   "tests/client_env.test.ts": 8,
   "tests/client_frame_allocations.test.ts": 118,
@@ -7224,7 +8248,7 @@
   "tests/climb.test.ts": 3269,
   "tests/climb_slope.test.ts": 3379,
   "tests/clock_format.test.ts": 23,
-  "tests/clock_memo.test.ts": 43,
+  "tests/clock_memo.test.ts": 55,
   "tests/clock_seconds_core.test.ts": 23,
   "tests/clue_hunts_content.test.ts": 24,
   "tests/clue_scrolls.test.ts": 3182,
@@ -7238,6 +8262,7 @@
   "tests/collection_manuals.test.ts": 627,
   "tests/collective_reversal.test.ts": 5086,
   "tests/collective_reversal_online.test.ts": 2885,
+  "tests/colorblind_mode_render.test.ts": 21,
   "tests/colossal_might_v026.test.ts": 2615,
   "tests/combat_announcer.test.ts": 9,
   "tests/combat_auras.test.ts": 5704,
@@ -7250,7 +8275,7 @@
   "tests/combat_event_fidelity.test.ts": 4834,
   "tests/combat_log_event_route_online.test.ts": 3165,
   "tests/combat_rating.test.ts": 1340,
-  "tests/combat_res_released_ghost.test.ts": 2894,
+  "tests/combat_res_released_ghost.test.ts": 5729,
   "tests/combat_scalar_wire.test.ts": 8,
   "tests/combat_sfx.test.ts": 18,
   "tests/combat_threat_modifiers.test.ts": 3360,
@@ -7258,6 +8283,7 @@
   "tests/combo_command.test.ts": 2736,
   "tests/combo_eligibility.test.ts": 8,
   "tests/combo_points.test.ts": 1785,
+  "tests/combo_row_portrait_inset.test.ts": 4,
   "tests/command_facets.test.ts": 19,
   "tests/command_outcome_transport.test.ts": 22,
   "tests/command_outcomes.test.ts": 28,
@@ -7297,7 +8323,7 @@
   "tests/continent_land_mask_core.test.ts": 18,
   "tests/continent_map_painter.test.ts": 226,
   "tests/continent_map_view.test.ts": 19,
-  "tests/controller_options_view.test.ts": 4,
+  "tests/controller_options_view.test.ts": 13,
   "tests/cooking_catch_hint_view.test.ts": 31,
   "tests/cooldown_manager_auras.test.ts": 20,
   "tests/cooldown_manager_catalog.test.ts": 2255,
@@ -7341,7 +8367,7 @@
   "tests/craft_from_vault.test.ts": 5496,
   "tests/craft_name_view.test.ts": 10,
   "tests/craft_roll_events.test.ts": 3664,
-  "tests/craft_row_text.test.ts": 15,
+  "tests/craft_row_text.test.ts": 16,
   "tests/crafted_collection_effects.test.ts": 2971,
   "tests/crafted_item_tooltip_coverage.test.ts": 28,
   "tests/crafted_wearability.test.ts": 21,
@@ -7391,7 +8417,7 @@
   "tests/css_corpus.test.ts": 58,
   "tests/css_layer_containment.test.ts": 82,
   "tests/css_raw_color_ratchet.test.ts": 28,
-  "tests/css_root_anchored_has.test.ts": 1424,
+  "tests/css_root_anchored_has.test.ts": 1153,
   "tests/css_token_resolution.test.ts": 18,
   "tests/css_value_validity.test.ts": 20,
   "tests/ctx_menu_mobile_stacking.test.ts": 6,
@@ -7426,6 +8452,8 @@
   "tests/dawnhold_grounds.test.ts": 10275,
   "tests/dawnhold_map_baked.test.ts": 12,
   "tests/dawnhold_map_view.test.ts": 2137,
+  "tests/dawnreaver_damage.test.ts": 6400,
+  "tests/dawnreaver_damage_tooltip.test.ts": 1651,
   "tests/day_night.test.ts": 46,
   "tests/day_night_dial_painter.test.ts": 11,
   "tests/db_retention_prune.test.ts": 8,
@@ -7435,9 +8463,10 @@
   "tests/death_controller_hint.test.ts": 7,
   "tests/death_input_reset.test.ts": 3,
   "tests/death_lesson.test.ts": 3358,
+  "tests/death_recap.test.ts": 28,
   "tests/death_recap_feedback.test.ts": 9,
   "tests/death_target_prevalidation.test.ts": 9,
-  "tests/deck_floor.test.ts": 8,
+  "tests/deck_floor.test.ts": 9,
   "tests/deck_railings.test.ts": 256,
   "tests/decor_prop_colliders.test.ts": 48,
   "tests/decoration_dims.test.ts": 1580,
@@ -7468,7 +8497,7 @@
   "tests/deeds_leaderboard_view.test.ts": 10,
   "tests/deeds_rarity_client.test.ts": 14,
   "tests/deeds_reconcile.test.ts": 3312,
-  "tests/deeds_restore.test.ts": 1202,
+  "tests/deeds_restore.test.ts": 1806,
   "tests/deeds_sites_pin.test.ts": 9196,
   "tests/deeds_view.test.ts": 33,
   "tests/deeds_window.test.ts": 115,
@@ -7476,11 +8505,13 @@
   "tests/deeds_window_jump.test.ts": 1282,
   "tests/defer_launcher_preloads.test.ts": 266,
   "tests/deferred_contact_bursts.test.ts": 9,
+  "tests/deferred_drag_render.test.ts": 4,
   "tests/deferred_face_decals.test.ts": 1518,
   "tests/delve_affix_art.test.ts": 14,
   "tests/delve_board_controller.test.ts": 96,
   "tests/delve_colliders.test.ts": 6,
   "tests/delve_companion.test.ts": 2408,
+  "tests/delve_geometry.test.ts": 769,
   "tests/delve_interior_cache_core.test.ts": 8,
   "tests/delve_interior_tracker.test.ts": 12,
   "tests/delve_map.test.ts": 43,
@@ -7507,7 +8538,7 @@
   "tests/deploy_rift_forge_switch.test.ts": 4,
   "tests/deploy_wallet_connect.test.ts": 10,
   "tests/deploy_watchdog.test.ts": 3103,
-  "tests/deposit_all_status_text.test.ts": 6,
+  "tests/deposit_all_status_text.test.ts": 7,
   "tests/derelict_bomber.test.ts": 2163,
   "tests/design_code.test.ts": 47,
   "tests/desktop_discord_presence.test.ts": 27,
@@ -7520,7 +8551,7 @@
   "tests/desktop_gpu_pref_sync.test.ts": 18,
   "tests/desktop_gpu_report.test.ts": 9,
   "tests/desktop_gpu_status.test.ts": 2688,
-  "tests/desktop_host_diag.test.ts": 6,
+  "tests/desktop_host_diag.test.ts": 13,
   "tests/desktop_host_essentials.test.ts": 6,
   "tests/desktop_login_exit.test.ts": 12,
   "tests/desktop_next_launch_settings.test.ts": 14,
@@ -7542,6 +8573,7 @@
   "tests/detail_horizon_core.test.ts": 6,
   "tests/detail_normals.test.ts": 73,
   "tests/dev_badge_refresh.test.ts": 1712,
+  "tests/dev_badge_titles.test.ts": 787,
   "tests/dev_bis_gear.test.ts": 4690,
   "tests/dev_broadcast.test.ts": 1875,
   "tests/dev_chat_hooks.test.ts": 6,
@@ -7559,7 +8591,7 @@
   "tests/dev_quest_commands.test.ts": 1700,
   "tests/dev_tier.test.ts": 21,
   "tests/dev_tier_ui.test.ts": 9,
-  "tests/dev_town_teleport.test.ts": 319,
+  "tests/dev_town_teleport.test.ts": 429,
   "tests/dev_world_quest_cannon.test.ts": 1554,
   "tests/dev_world_quest_daily.test.ts": 1921,
   "tests/dev_world_quest_wisp_selector.test.ts": 1583,
@@ -7596,6 +8628,7 @@
   "tests/discord_login_choice.test.ts": 8,
   "tests/discord_login_start.test.ts": 8,
   "tests/discord_oauth.test.ts": 19,
+  "tests/discord_oauth_flow.test.ts": 21,
   "tests/discord_onboarding_gate.test.ts": 5,
   "tests/discord_queue_ping_row.test.ts": 17,
   "tests/discord_relay.test.ts": 7,
@@ -7628,6 +8661,7 @@
   "tests/drakelands_kit_grade.test.ts": 88,
   "tests/drape_lod_core.test.ts": 1680,
   "tests/draped_bounds_core.test.ts": 5,
+  "tests/draw_program_signature_core.test.ts": 9,
   "tests/draw_stats_core.test.ts": 17,
   "tests/dropdown_nav.test.ts": 7,
   "tests/dropdown_position.test.ts": 7,
@@ -7639,9 +8673,12 @@
   "tests/druid_engines.test.ts": 7751,
   "tests/druid_form_auto_unshift.test.ts": 6736,
   "tests/druid_form_auto_unshift_online.test.ts": 2907,
+  "tests/druid_form_speed_stack.test.ts": 899,
+  "tests/druid_rush_window.test.ts": 5,
   "tests/druid_spell_pack.test.ts": 6662,
   "tests/druid_wand.test.ts": 3533,
   "tests/druid_wildfang_kit.test.ts": 3670,
+  "tests/dual_purpose_target.test.ts": 738,
   "tests/duel.test.ts": 2700,
   "tests/duel_aftermath.test.ts": 4451,
   "tests/duel_module.test.ts": 2489,
@@ -7724,6 +8761,7 @@
   "tests/editor_undo_core.test.ts": 8,
   "tests/editor_user_assets.test.ts": 8,
   "tests/editor_view.test.ts": 13,
+  "tests/effective_stats.test.ts": 6,
   "tests/egg_hatchling.test.ts": 8,
   "tests/electron_builder_config.test.ts": 52,
   "tests/electron_desktop_config.test.ts": 14,
@@ -7739,7 +8777,7 @@
   "tests/electron_gpu_preference.test.ts": 48,
   "tests/electron_gpu_push.test.ts": 6,
   "tests/electron_gpu_status_events.test.ts": 8,
-  "tests/electron_host_diag.test.ts": 35,
+  "tests/electron_host_diag.test.ts": 29,
   "tests/electron_host_essentials.test.ts": 8,
   "tests/electron_ipc_channels.test.ts": 25,
   "tests/electron_launch_settings.test.ts": 12,
@@ -7786,13 +8824,14 @@
   "tests/entity_flair_wire.test.ts": 5,
   "tests/entity_gate_stand_in.test.ts": 288,
   "tests/entity_ground_sample.test.ts": 680,
-  "tests/entity_ground_sample_core.test.ts": 9,
+  "tests/entity_ground_sample_core.test.ts": 11,
   "tests/entity_i18n.test.ts": 7,
   "tests/entity_i18n_guards.test.ts": 9,
   "tests/entity_labels_feast.test.ts": 6,
   "tests/entity_reanchor.test.ts": 5,
   "tests/entity_roster.test.ts": 4344,
   "tests/entity_roster_version.test.ts": 960,
+  "tests/entity_spec_mirror.test.ts": 1545,
   "tests/entity_update_cadence.test.ts": 7,
   "tests/entity_view_policy_core.test.ts": 13,
   "tests/entry_crash_guard.test.ts": 18,
@@ -7818,6 +8857,7 @@
   "tests/equipment_instances_wire.test.ts": 7,
   "tests/equipment_proficiency.test.ts": 4407,
   "tests/error_text_i18n_core.test.ts": 24,
+  "tests/error_toast_controller.test.ts": 44,
   "tests/error_toast_log.test.ts": 14,
   "tests/escort_ambush_convoy.test.ts": 4347,
   "tests/escort_interact.test.ts": 18,
@@ -7843,10 +8883,11 @@
   "tests/faction_tier_celebration_view.test.ts": 5,
   "tests/faction_vendors.test.ts": 778,
   "tests/factions.test.ts": 796,
+  "tests/fallen_ally_target.test.ts": 865,
   "tests/falling_command.test.ts": 2743,
-  "tests/far_bake_group_key.test.ts": 22,
+  "tests/far_bake_group_key.test.ts": 8,
   "tests/far_bake_groups_core.test.ts": 4,
-  "tests/far_bake_uv_pad.test.ts": 1351,
+  "tests/far_bake_uv_pad.test.ts": 1589,
   "tests/far_lod_reveal_core.test.ts": 8,
   "tests/far_surface_core.test.ts": 4757,
   "tests/far_terrain_core.test.ts": 3904,
@@ -7899,6 +8940,7 @@
   "tests/fear_wall_guard.test.ts": 2355,
   "tests/feast_interact.test.ts": 9,
   "tests/feast_lifecycle.test.ts": 1148,
+  "tests/feast_named_slot_item.test.ts": 1410,
   "tests/feast_object_lifecycle.test.ts": 608,
   "tests/feast_online.test.ts": 2085,
   "tests/feast_placement.test.ts": 2079,
@@ -7986,6 +9028,8 @@
   "tests/forgefather_fortress.test.ts": 2976,
   "tests/forgefather_fortress_route.test.ts": 30006,
   "tests/forgefather_fortress_walkability.test.ts": 1282,
+  "tests/form_adornment_core.test.ts": 8,
+  "tests/form_adornments.test.ts": 15,
   "tests/form_auto_unshift_core.test.ts": 9,
   "tests/form_command.test.ts": 3280,
   "tests/form_cross_shift_billing.test.ts": 1412,
@@ -8003,7 +9047,7 @@
   "tests/frame_present.test.ts": 10,
   "tests/frame_presets.test.ts": 162,
   "tests/frame_presets_live.test.ts": 46,
-  "tests/frame_rate_cap_setting.test.ts": 5,
+  "tests/frame_rate_cap_setting.test.ts": 10,
   "tests/friendly_nameplate_keybind.test.ts": 30,
   "tests/frost_ice_fields.test.ts": 236,
   "tests/frost_ice_fields_core.test.ts": 9,
@@ -8021,7 +9065,7 @@
   "tests/gale_harbor.test.ts": 2326,
   "tests/galecrest.test.ts": 428,
   "tests/game_audio.test.ts": 35,
-  "tests/game_renderer.test.ts": 5,
+  "tests/game_renderer.test.ts": 8,
   "tests/game_sessions.test.ts": 6665,
   "tests/game_state_metrics.test.ts": 6731,
   "tests/gamepad.test.ts": 133,
@@ -8108,6 +9152,7 @@
   "tests/glacial_spike.test.ts": 10302,
   "tests/glb_assets.test.ts": 37,
   "tests/glb_instanced_props.test.ts": 18,
+  "tests/glb_punctual_lights.test.ts": 509,
   "tests/glb_texture_compression.test.ts": 254,
   "tests/glider_action_bar_view.test.ts": 10,
   "tests/glider_approach_path.test.ts": 380,
@@ -8125,6 +9170,7 @@
   "tests/global_invite.test.ts": 1758,
   "tests/gloom_bolt_vfx.test.ts": 20,
   "tests/gltf_decoder_csp.test.ts": 12,
+  "tests/goblin_rocket_sled_fx.test.ts": 14,
   "tests/goblin_rocket_sled_fx_core.test.ts": 7,
   "tests/gold_command.test.ts": 1717,
   "tests/gossip_menu.test.ts": 5,
@@ -8138,7 +9184,7 @@
   "tests/gpu_prep_events.test.ts": 11,
   "tests/gpu_queue_window_core.test.ts": 6,
   "tests/gpu_timer_probe.test.ts": 9,
-  "tests/gpu_timer_probe_core.test.ts": 6,
+  "tests/gpu_timer_probe_core.test.ts": 24,
   "tests/grant_line_view.test.ts": 17,
   "tests/graphics_overhaul_integration.test.ts": 17,
   "tests/graphics_profile_assets.test.ts": 13,
@@ -8218,11 +9264,15 @@
   "tests/guild_letter_online.test.ts": 3491,
   "tests/guild_motd_login.test.ts": 12,
   "tests/guild_motd_plaintext.test.ts": 38,
+  "tests/guild_rank_cmd.test.ts": 830,
+  "tests/guild_ranks.test.ts": 8,
+  "tests/guild_ranks_view.test.ts": 7,
   "tests/guild_roster.test.ts": 2801,
   "tests/guild_roster_page_db.test.ts": 1785,
   "tests/guild_roster_page_pg_integration.test.ts": 4307,
   "tests/guild_roster_transport.test.ts": 3962,
   "tests/guild_roster_view.test.ts": 7,
+  "tests/guild_roster_wire.test.ts": 4,
   "tests/guild_stamp_fence.test.ts": 3160,
   "tests/hallowed_wall_bounce.test.ts": 2173,
   "tests/harvest_admission.test.ts": 14,
@@ -8291,6 +9341,7 @@
   "tests/highscore_board.test.ts": 25,
   "tests/hill.test.ts": 6063,
   "tests/hill_bar_view.test.ts": 27,
+  "tests/hill_ring_twin.test.ts": 37,
   "tests/hill_rules.test.ts": 5,
   "tests/hitch_forensics.test.ts": 10,
   "tests/hitch_frame_align_core.test.ts": 10,
@@ -8339,8 +9390,8 @@
   "tests/hunter_quivers.test.ts": 2658,
   "tests/hunter_spec_loops.test.ts": 13117,
   "tests/hunter_talents.test.ts": 19344,
-  "tests/hunter_trailbreak_arc.test.ts": 6,
-  "tests/hunter_trailbreak_terrain.test.ts": 1317,
+  "tests/hunter_trailbreak_arc.test.ts": 10,
+  "tests/hunter_trailbreak_terrain.test.ts": 2800,
   "tests/hunter_trap.test.ts": 3458,
   "tests/hybrid_gpu_detect.test.ts": 10,
   "tests/i18n_admin_catalog.test.ts": 1054,
@@ -8434,6 +9485,7 @@
   "tests/ignivar_weekly_lockout.test.ts": 4312,
   "tests/ignore_chat.test.ts": 4105,
   "tests/imbue_exclusive.test.ts": 3455,
+  "tests/immobile_mob_evade.test.ts": 4855,
   "tests/impact_contact.test.ts": 7,
   "tests/impact_site.test.ts": 74,
   "tests/inert_instance_corpse.test.ts": 1675,
@@ -8446,7 +9498,7 @@
   "tests/input_controller.test.ts": 49,
   "tests/input_echo_tracker.test.ts": 7,
   "tests/input_hint_mode.test.ts": 3,
-  "tests/input_seq_fold.test.ts": 5,
+  "tests/input_seq_fold.test.ts": 7,
   "tests/input_tick_sampler.test.ts": 14,
   "tests/inscription_catalog.test.ts": 80,
   "tests/inscription_flow.test.ts": 3934,
@@ -8460,17 +9512,19 @@
   "tests/instance_combat_hold.test.ts": 798,
   "tests/instance_music.test.ts": 8,
   "tests/instance_provenance_boundaries.test.ts": 13372,
+  "tests/instanced_dither_fade.test.ts": 14,
   "tests/instanced_occluder_ghosts.test.ts": 11,
   "tests/interact_key_gather.test.ts": 5,
   "tests/interact_loot_only.test.ts": 2278,
   "tests/interact_object_credit.test.ts": 2378,
   "tests/interaction.test.ts": 5615,
   "tests/interaction_autorun.test.ts": 10,
-  "tests/interaction_input.test.ts": 4,
+  "tests/interaction_input.test.ts": 16,
   "tests/interactions.test.ts": 27,
   "tests/interest.test.ts": 5302,
   "tests/interest_candidates.test.ts": 2344,
   "tests/interest_policy.test.ts": 7,
+  "tests/interface_body_classes.test.ts": 5,
   "tests/interface_mode_viewport_wiring.test.ts": 5,
   "tests/interface_reset.test.ts": 16,
   "tests/interface_unlock.test.ts": 25,
@@ -8480,6 +9534,7 @@
   "tests/interface_visibility_core.test.ts": 5,
   "tests/interior_encounter_prewarm.test.ts": 29,
   "tests/interior_encounter_prewarm_pass.test.ts": 7370,
+  "tests/interior_encounter_prewarm_rig_key.test.ts": 805,
   "tests/interior_light_rig.test.ts": 4,
   "tests/interior_map_controller.test.ts": 9,
   "tests/interior_resource_lifecycle.test.ts": 35,
@@ -8553,6 +9608,7 @@
   "tests/keyboard_map_window.test.ts": 257,
   "tests/keyboard_turn_facing.test.ts": 26,
   "tests/keyboard_viewport.test.ts": 6,
+  "tests/kill_participation.test.ts": 6,
   "tests/kit_buildings.test.ts": 13,
   "tests/kit_uv_surface_core.test.ts": 34,
   "tests/kit_window_panes_core.test.ts": 28,
@@ -8661,9 +9717,11 @@
   "tests/loot_quality_ui.test.ts": 29,
   "tests/loot_quality_wire.test.ts": 2511,
   "tests/loot_roll.test.ts": 17439,
+  "tests/loot_roll_awarded_event.test.ts": 961,
   "tests/loot_roll_controller.test.ts": 45,
   "tests/loot_roll_reconcile.test.ts": 4378,
   "tests/loot_roll_status_view.test.ts": 8,
+  "tests/loot_roll_win_view.test.ts": 16,
   "tests/loot_roll_wire.test.ts": 2061,
   "tests/loot_settings_select_theme.test.ts": 8,
   "tests/loot_settings_view.test.ts": 8,
@@ -8724,6 +9782,7 @@
   "tests/map_pan_core.test.ts": 5,
   "tests/map_pinch_zoom.test.ts": 10,
   "tests/map_pinch_zoom_core.test.ts": 14,
+  "tests/map_poi_label_clearance.test.ts": 14,
   "tests/map_quest_list_view.test.ts": 3,
   "tests/map_semantic_accessibility_core.test.ts": 34,
   "tests/map_show_on_map_core.test.ts": 7,
@@ -8750,6 +9809,9 @@
   "tests/market_instance.test.ts": 5285,
   "tests/market_listing_ids.test.ts": 14,
   "tests/market_name_color.test.ts": 7,
+  "tests/market_orders.test.ts": 1428,
+  "tests/market_orders_core.test.ts": 12,
+  "tests/market_orders_plan.test.ts": 15,
   "tests/market_price_sort.test.ts": 2787,
   "tests/market_price_view.test.ts": 24,
   "tests/market_query_client.test.ts": 3,
@@ -8858,7 +9920,9 @@
   "tests/metamorph_wing_motion_core.test.ts": 5,
   "tests/metamorphosis_asset.test.ts": 77,
   "tests/meters.test.ts": 15,
+  "tests/meters_advanced.test.ts": 13,
   "tests/meters_breakdown_view.test.ts": 26,
+  "tests/meters_customization.test.ts": 68,
   "tests/meters_frame.test.ts": 6,
   "tests/meters_frame_core.test.ts": 13,
   "tests/meters_menu_view.test.ts": 4,
@@ -8978,9 +10042,13 @@
   "tests/mobile_more_dialog.test.ts": 12,
   "tests/mobile_pad_chrome_css.test.ts": 7,
   "tests/mobile_preflight.test.ts": 5,
+  "tests/mobile_station_object.test.ts": 661,
   "tests/mobile_station_party.test.ts": 3565,
+  "tests/mobile_station_title.test.ts": 5,
   "tests/mobile_station_tooltip.test.ts": 16,
   "tests/mobile_station_walk.test.ts": 921,
+  "tests/mobile_stations.test.ts": 58,
+  "tests/mobile_stations_core.test.ts": 5,
   "tests/mobile_swing_cast_anchor.test.ts": 12,
   "tests/mobile_touch_xhb_exclusivity.test.ts": 11,
   "tests/mobile_wallet_deeplink.test.ts": 44,
@@ -9029,6 +10097,7 @@
   "tests/mouse_binds.test.ts": 11,
   "tests/mouselook_release_facing.test.ts": 6,
   "tests/mouseover_cast_core.test.ts": 5,
+  "tests/mouseover_cast_wiring.test.ts": 7,
   "tests/movable_frame.test.ts": 1407,
   "tests/move_input.test.ts": 9,
   "tests/movement_ground_truth.test.ts": 3298,
@@ -9141,6 +10210,7 @@
   "tests/nythraxis_ground_telegraph_wire.test.ts": 20,
   "tests/nythraxis_guide_prose.test.ts": 7,
   "tests/nythraxis_hazard_palette.test.ts": 11,
+  "tests/nythraxis_hazard_palette_core.test.ts": 5,
   "tests/nythraxis_kings_wrath.test.ts": 5,
   "tests/nythraxis_loot_budget.test.ts": 753,
   "tests/nythraxis_matrix.test.ts": 49932,
@@ -9161,6 +10231,7 @@
   "tests/oauth.test.ts": 28,
   "tests/objective_glow_view.test.ts": 8,
   "tests/obs_interaction.test.ts": 3746,
+  "tests/occluder_dither_fade.test.ts": 7,
   "tests/occluder_fade.test.ts": 4,
   "tests/occluder_fade_core.test.ts": 10,
   "tests/occluder_fade_gate.test.ts": 83,
@@ -9181,6 +10252,7 @@
   "tests/options_interface_rows.test.ts": 11,
   "tests/options_main_menu_controller.test.ts": 15,
   "tests/options_menu_row_badges.test.ts": 5,
+  "tests/options_slider_format.test.ts": 7,
   "tests/options_text_values.test.ts": 12,
   "tests/options_theme_dropdown_direction.test.ts": 5,
   "tests/options_view.test.ts": 47,
@@ -9395,6 +10467,7 @@
   "tests/physics_audit_zonewalls.test.ts": 2977,
   "tests/physics_character.test.ts": 9770,
   "tests/pick_resolution.test.ts": 7,
+  "tests/placed_assets_point_lights.test.ts": 20,
   "tests/placeholder_art_completion.test.ts": 1771,
   "tests/placement_integrity.test.ts": 14432,
   "tests/play_online_only.test.ts": 14,
@@ -9415,18 +10488,21 @@
   "tests/player_frame_bar_lock.test.ts": 8,
   "tests/player_frame_box_scale.test.ts": 6,
   "tests/player_frame_css.test.ts": 8,
+  "tests/player_identity_wire.test.ts": 4,
   "tests/player_look_core.test.ts": 17,
   "tests/player_metrics_db.test.ts": 95,
   "tests/player_metrics_db_integration.test.ts": 3080,
   "tests/player_motion.test.ts": 4851,
   "tests/player_movement_modes.test.ts": 5,
-  "tests/player_portrait_core.test.ts": 4,
+  "tests/player_portrait_core.test.ts": 7,
   "tests/player_stealthed.test.ts": 5,
+  "tests/player_tooltip.test.ts": 10,
   "tests/player_tooltip_view.test.ts": 6,
   "tests/playtime.test.ts": 3975,
   "tests/playtime_grant.test.ts": 1890,
   "tests/playtime_view.test.ts": 6,
   "tests/point_light_budget.test.ts": 51,
+  "tests/point_light_carriers.test.ts": 4119,
   "tests/point_light_shader_core.test.ts": 9,
   "tests/pointer_blur.test.ts": 9,
   "tests/pointer_lock.test.ts": 11,
@@ -9440,7 +10516,7 @@
   "tests/portrait_atlas_readiness.test.ts": 55,
   "tests/portrait_bitmap_encode.test.ts": 24,
   "tests/portrait_capture_lane_core.test.ts": 69,
-  "tests/portrait_chip_composed_hydrate.test.ts": 15,
+  "tests/portrait_chip_composed_hydrate.test.ts": 51,
   "tests/portrait_chip_defer.test.ts": 5,
   "tests/portrait_encode_worker.test.ts": 13,
   "tests/portrait_framing.test.ts": 8,
@@ -9487,6 +10563,7 @@
   "tests/prewarm_compile_lifecycle.test.ts": 9,
   "tests/prewarm_compile_submission_core.test.ts": 11,
   "tests/prewarm_depth_material.test.ts": 22,
+  "tests/prewarm_entry.test.ts": 7,
   "tests/prewarm_pass.test.ts": 19,
   "tests/prewarm_policy.test.ts": 56,
   "tests/prewarm_program_key_contract.test.ts": 24,
@@ -9726,10 +10803,12 @@
   "tests/raid_lockout_world.test.ts": 2420,
   "tests/raid_music_themes.test.ts": 7,
   "tests/raid_readout_scope.test.ts": 2532,
+  "tests/raid_released_ghost_loot.test.ts": 1582,
   "tests/raid_reset.test.ts": 76,
   "tests/raid_telegraph_rig_walk.test.ts": 17,
   "tests/raid_warning_banner.test.ts": 6,
   "tests/raid_wipe_cooldowns.test.ts": 1454,
+  "tests/raid_wipe_entrant_reset.test.ts": 843,
   "tests/rallycart_exhaust_ports.test.ts": 12,
   "tests/rallycart_headlights.test.ts": 13,
   "tests/rallycart_steer_lock.test.ts": 98,
@@ -9804,6 +10883,7 @@
   "tests/render_diagnostics.test.ts": 10,
   "tests/render_glb_replacement_assets.test.ts": 1364,
   "tests/render_light_census_pin.test.ts": 999,
+  "tests/renderer_ability_presentation.test.ts": 73,
   "tests/renderer_build_diag.test.ts": 5,
   "tests/renderer_build_ledger_wiring.test.ts": 10,
   "tests/renderer_compile_gate.test.ts": 340,
@@ -9821,6 +10901,7 @@
   "tests/report_window.test.ts": 153,
   "tests/reputation_tab_html.test.ts": 11,
   "tests/reputation_view.test.ts": 5,
+  "tests/reset_cooldown_policy.test.ts": 4,
   "tests/reset_day_guard.test.ts": 2092,
   "tests/resident_scenery_core.test.ts": 7,
   "tests/resize_coalesce_core.test.ts": 6,
@@ -9839,6 +10920,7 @@
   "tests/reveal_gate.test.ts": 68,
   "tests/reveal_gate_core.test.ts": 31,
   "tests/reveal_gate_wiring.test.ts": 22,
+  "tests/revive_facing.test.ts": 4,
   "tests/reward_counters.test.ts": 2192,
   "tests/rewind.test.ts": 4890,
   "tests/ribbon_contact_admission.test.ts": 35,
@@ -9978,6 +11060,7 @@
   "tests/server/account_ledger_keys_cache.test.ts": 6,
   "tests/server/account_ledger_records.test.ts": 5,
   "tests/server/account_ledger_service.test.ts": 5,
+  "tests/server/activity_detect_rareloot.test.ts": 5,
   "tests/server/ad_spend.test.ts": 26,
   "tests/server/admin.test.ts": 807,
   "tests/server/admin_activity_cache.test.ts": 8,
@@ -10168,6 +11251,7 @@
   "tests/server/main_retention_wiring.test.ts": 16,
   "tests/server/maps_routes.test.ts": 31,
   "tests/server/market_backfill.test.ts": 24,
+  "tests/server/market_commands.test.ts": 7,
   "tests/server/market_realm_isolation.test.ts": 1438,
   "tests/server/market_sold_volume.test.ts": 1378,
   "tests/server/material_source_connection.test.ts": 9,
@@ -10305,9 +11389,12 @@
   "tests/sfx_runtime_pack.test.ts": 191,
   "tests/sfx_studio.test.ts": 3330,
   "tests/sfx_studio_server_security.test.ts": 24286,
+  "tests/shader_ablation_transforms.test.ts": 9,
   "tests/shader_cache_warmup.test.ts": 120,
   "tests/shader_corpus_slices.test.ts": 23,
   "tests/shader_debug_flag.test.ts": 16,
+  "tests/shader_harvest_corpus.test.ts": 7,
+  "tests/shader_link_bench_report.test.ts": 4,
   "tests/shader_pow_domain.test.ts": 14,
   "tests/shader_warm_audit.test.ts": 93,
   "tests/shader_warm_audit_core.test.ts": 22,
@@ -10393,6 +11480,7 @@
   "tests/social_aggro.test.ts": 3063,
   "tests/social_classes.test.ts": 14319,
   "tests/social_db_guild_names.test.ts": 11,
+  "tests/social_db_guild_ranks.test.ts": 7,
   "tests/social_db_guild_roster.test.ts": 7,
   "tests/social_db_pledge_settings.test.ts": 4,
   "tests/social_db_seat_pledge.test.ts": 9,
@@ -10406,6 +11494,7 @@
   "tests/social_window.test.ts": 23,
   "tests/software_render_notice.test.ts": 9,
   "tests/software_renderer.test.ts": 11,
+  "tests/solid_impact_fragments_prewarm.test.ts": 11,
   "tests/soul_rend_overlay.test.ts": 8,
   "tests/soul_rend_prewarm_core.test.ts": 8,
   "tests/soulwell.test.ts": 4539,
@@ -10415,6 +11504,7 @@
   "tests/spawn_intro_seen.test.ts": 7,
   "tests/spec_baselines.test.ts": 2886,
   "tests/spec_icons.test.ts": 3982,
+  "tests/spec_identity_snapshot.test.ts": 891,
   "tests/spec_masteries.test.ts": 12124,
   "tests/spec_output_tuning.test.ts": 11,
   "tests/spec_signatures.test.ts": 4584,
@@ -10430,11 +11520,13 @@
   "tests/spellbook_tick_repaint.test.ts": 482,
   "tests/spellbook_view.test.ts": 14,
   "tests/spellbook_window.test.ts": 14,
+  "tests/spellbook_window_drag_render_defer.test.ts": 62,
   "tests/spirit.test.ts": 3705,
   "tests/spirit_grade.test.ts": 11,
   "tests/spirit_models.test.ts": 18,
   "tests/spirit_puppet_build.test.ts": 161,
   "tests/spirit_puppet_compile_gate.test.ts": 741,
+  "tests/spirit_run_triggers.test.ts": 4,
   "tests/stable_yard.test.ts": 4997,
   "tests/stack_size_tooltip_view.test.ts": 52,
   "tests/staff_db.test.ts": 15,
@@ -10463,6 +11555,7 @@
   "tests/steel_sweep.test.ts": 28,
   "tests/steep_ground_freeze.test.ts": 2005,
   "tests/step_smooth_core.test.ts": 16,
+  "tests/stonebound_shell_core.test.ts": 4,
   "tests/storage_charters.test.ts": 6236,
   "tests/storage_grant_monotonic.test.ts": 8,
   "tests/storage_price_guard.test.ts": 1404,
@@ -10540,6 +11633,7 @@
   "tests/talent_rows_core.test.ts": 15,
   "tests/talent_save_migration_v026.test.ts": 1493,
   "tests/talent_server_parity_v2.test.ts": 2479,
+  "tests/talent_swap_auras.test.ts": 3988,
   "tests/talent_tooltip_accuracy.test.ts": 579,
   "tests/talent_tree_fit.test.ts": 5,
   "tests/talents.test.ts": 4519,
@@ -10566,10 +11660,10 @@
   "tests/target_dots_refresh.test.ts": 13009,
   "tests/target_dots_view.test.ts": 18,
   "tests/target_echo_client.test.ts": 50,
-  "tests/target_echo_core.test.ts": 5,
+  "tests/target_echo_core.test.ts": 11,
   "tests/target_flair_line_view.test.ts": 12,
   "tests/target_frame.test.ts": 14,
-  "tests/target_frame_descriptor.test.ts": 11,
+  "tests/target_frame_descriptor.test.ts": 15,
   "tests/target_frame_pos.test.ts": 30,
   "tests/target_portrait_view.test.ts": 814,
   "tests/target_rank_view.test.ts": 17,
@@ -10617,6 +11711,7 @@
   "tests/texture_upload.test.ts": 12,
   "tests/theme.test.ts": 9,
   "tests/thornpeak_dedupe_objectives.test.ts": 11,
+  "tests/thornpeak_hillside_pocket.test.ts": 1463,
   "tests/thorns_charge.test.ts": 5,
   "tests/threat.test.ts": 5375,
   "tests/threat_command.test.ts": 2615,
@@ -10640,6 +11735,7 @@
   "tests/tooltip_line_core.test.ts": 479,
   "tests/tooltip_owner.test.ts": 6,
   "tests/tooltip_paint.test.ts": 4,
+  "tests/totarget_frame_controller.test.ts": 5,
   "tests/totarget_frame_css.test.ts": 9,
   "tests/totp.test.ts": 17,
   "tests/touch_frame_drag.test.ts": 9,
@@ -10651,11 +11747,13 @@
   "tests/town_collision.test.ts": 1178,
   "tests/town_focus_i18n.test.ts": 10,
   "tests/town_focus_number_format.test.ts": 131,
+  "tests/town_focus_pending.test.ts": 4276,
   "tests/town_focus_repaint_gate.test.ts": 213,
   "tests/town_focus_sim.test.ts": 7490,
   "tests/town_quests.test.ts": 817,
   "tests/town_reveal_core.test.ts": 45,
   "tests/tracker_body_ids.test.ts": 11,
+  "tests/tracker_collapse_settings.test.ts": 2,
   "tests/tracker_header_wiring.test.ts": 11,
   "tests/tracker_stack_anchor.test.ts": 26,
   "tests/trade.test.ts": 49,
@@ -10706,12 +11804,15 @@
   "tests/umbral_anchor_vfx_core.test.ts": 9,
   "tests/unbind_window_cells.test.ts": 22,
   "tests/unbind_window_hud.test.ts": 17,
+  "tests/underwater_compile_gate.test.ts": 11050,
+  "tests/underwater_view.test.ts": 7,
   "tests/unequip_item.test.ts": 2208,
   "tests/unique_equipped.test.ts": 18120,
   "tests/unit_frame.test.ts": 18,
   "tests/unit_frame_painter.test.ts": 14,
   "tests/unit_portrait.test.ts": 12,
   "tests/unit_portrait_painter.test.ts": 11,
+  "tests/unit_tooltip_seat.test.ts": 13,
   "tests/unknown_item_icon.test.ts": 10,
   "tests/unstuck.test.ts": 6603,
   "tests/unstuck_db.test.ts": 20,
@@ -10782,6 +11883,7 @@
   "tests/vault_consumption_admission.test.ts": 341,
   "tests/vault_craft_gate.test.ts": 1242,
   "tests/vault_ledger_row_bound_property.test.ts": 25,
+  "tests/vault_search.test.ts": 44,
   "tests/vault_snapshot_wire.test.ts": 18,
   "tests/vault_view.test.ts": 21,
   "tests/vault_window.test.ts": 860,
@@ -10940,6 +12042,7 @@
   "tests/warrior_intervene.test.ts": 1436,
   "tests/warrior_intervene_visual.test.ts": 10,
   "tests/warrior_kit_assets.test.ts": 22,
+  "tests/warrior_kit_sheet_readiness.test.ts": 9,
   "tests/warrior_leap_effects.test.ts": 117,
   "tests/warrior_leap_performance.test.ts": 123,
   "tests/warrior_leap_phases.test.ts": 76,
@@ -10977,6 +12080,7 @@
   "tests/warrior_storm_anchor.test.ts": 11,
   "tests/warrior_utility_audio.test.ts": 8,
   "tests/warrior_widening_arc.test.ts": 10,
+  "tests/water_approach_core.test.ts": 2660,
   "tests/water_apron_bathymetry.test.ts": 7025,
   "tests/water_coverage_core.test.ts": 121,
   "tests/water_elemental_audio.test.ts": 30,
@@ -10993,11 +12097,13 @@
   "tests/water_tile_cull.test.ts": 34,
   "tests/water_wave_field.test.ts": 23,
   "tests/weakening_hex.test.ts": 2755,
+  "tests/weapon_aura_prewarm_parity.test.ts": 101,
   "tests/weapon_icons.test.ts": 492,
   "tests/weapon_proc_view.test.ts": 11,
   "tests/weapon_skin_materials.test.ts": 7,
   "tests/weapon_skin_optimistic.test.ts": 5,
   "tests/weapon_skin_point_lights.test.ts": 6,
+  "tests/weapon_skin_prewarm_host.test.ts": 368,
   "tests/weapon_skin_sim.test.ts": 3089,
   "tests/weapon_skins.test.ts": 539,
   "tests/weapon_stow.test.ts": 2888,

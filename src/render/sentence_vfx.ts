@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { type AbilityVfxTextures, abilityVfxTextures } from './ability_vfx/fx_textures';
 import { AbilityVfxRibbons } from './ability_vfx/ribbons';
 import { floorVfxRenderOrder } from './floor_vfx_layer';
+import { tagVfxSubtree } from './renderer_diagnostics';
 import {
   createSentenceBurstPlan,
   createSentenceInvocationPlan,
@@ -213,7 +214,6 @@ export class SentenceVfx {
     injectedTextures?: AbilityVfxTextures,
   ) {
     this.group.name = 'sentence-vfx';
-    this.group.userData.renderCategory = 'vfx';
     scene.add(this.group);
 
     const eyeOuter = new THREE.RingGeometry(0.72, 0.9, 64);
@@ -269,6 +269,7 @@ export class SentenceVfx {
         ),
       );
     }
+    tagVfxSubtree(this.group);
   }
 
   private ribbonAnchor(entityId: number, heightFraction: number): THREE.Vector3 | null {

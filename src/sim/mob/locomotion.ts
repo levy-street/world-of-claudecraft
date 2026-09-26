@@ -112,6 +112,7 @@ import { applyBroodBurn } from './dragonkin_brood';
 import { resetDungeonMinibossStomp, updateDungeonMinibossStomp } from './dungeon_miniboss_stomp';
 import { idleRng, wanderPause } from './idle_rng';
 import { resetIgnivarTrashAutomaton, updateIgnivarTrashAutomaton } from './ignivar_trash_automata';
+import { immobileEvadeSnapsHome } from './immobile_evade';
 import {
   claimMechanicSpacing,
   mechanicSlotHeld,
@@ -742,6 +743,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
       break;
     }
     case 'evade': {
+      // An immobile mob (moveSpeed 0) cannot walk home and a zero step never
+      // arrives: snap it onto its spawn point instead (mob/immobile_evade.ts)
+      // and run the same reset, so a shoved egg is never immune forever.
+      if (immobileEvadeSnapsHome(mob)) {
+        resetEvadingMob(ctx, mob);
+        break;
+      }
       // moveToward has no pathfinding: a straight line home that crosses a prop
       // (the camp tent/crate/campfire) or deep water makes no progress, so the
       // mob stays evading — and therefore immune — forever. Walk home normally,

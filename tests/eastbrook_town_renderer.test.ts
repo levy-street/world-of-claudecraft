@@ -5,7 +5,7 @@ import { ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { MeshoptDecoder } from 'meshoptimizer';
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
   EASTBROOK_TOWN_ASSET_INSTANCE_COUNTS,
   EASTBROOK_TOWN_ASSET_URLS,
@@ -28,12 +28,17 @@ import {
 } from '../src/render/eastbrook_town_visibility_core';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import { setGpuPrepClockForTest } from '../src/render/gpu_prep_events';
+import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { createRevealGateCore } from '../src/render/reveal_gate_core';
 import { vertexColorEmissiveInternalsForTest } from '../src/render/vertex_color_emissive';
 import { BUILDING_TERRAIN_SAMPLE_STEP } from '../src/sim/building_layout';
 import { BUILTIN_WORLD } from '../src/sim/data';
 import { EASTBROOK_LAYOUT, localToWorld } from '../src/sim/eastbrook_layout';
 import { terrainHeight } from '../src/sim/world';
+
+// This suite pins the BLENDED camera ghost (the transparent flip and its gate);
+// the dithered arm is pinned by tests/occluder_dither_fade.test.ts.
+beforeEach(() => setDitherFadeEnabledForTest(false));
 
 let restoreGfx: (() => void) | null = null;
 

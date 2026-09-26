@@ -115,9 +115,11 @@ export class Targeting {
         dz: c.e.pos.z - p.pos.z,
         d: c.d,
         engaged: this.isEnemyEngagedWith(c.e, p),
+        isPlayer: c.e.kind === 'player',
       })),
       p.facing,
     );
+    if (order.ids.length === 0) return;
     const nextId = stepTabTarget(order, order.ids.indexOf(p.targetId ?? -1), step);
     if (this.stopsAutoAttackOnSwitch(r.meta, p, nextId)) p.autoAttack = false;
     p.targetId = nextId;

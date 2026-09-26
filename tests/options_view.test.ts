@@ -1,11 +1,15 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   GRAPHICS_REBUILD_KEYS,
   normalizeGraphicsSettingsSnapshot,
 } from '../src/game/graphics_rebuild_core';
 import { BOOL_SETTINGS, SETTING_RANGES } from '../src/game/settings';
+import { shaderWarmChoiceAvailable } from '../src/render/shader_warm_client';
 import { AURA_TRACKS } from '../src/ui/hud/aura_tracks';
 import {
+  actionCamShoulderReadout,
   boolToggleNextValue,
   buildAudioControls,
   buildBugReportInfo,
@@ -90,6 +94,47 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
     expect(boolToggleNextValue(false)).toBe(true);
   });
 
+  it('Action Cam shows its shoulder slider only while it is on', () => {
+    const env: OptionsEnv = { touch: false, nativeShell: false };
+    const off = buildGraphicsControls(makeSource(), env);
+    expect(find(off, 'actionCam')).toMatchObject({
+      control: 'boolToggle',
+      on: false,
+      rerender: true,
+    });
+    expect(find(off, 'actionCamShoulder')).toBeUndefined();
+
+    const src = makeSource({ actionCamShoulder: -0.4 }, { actionCam: true });
+    const on = keysOf(buildGraphicsControls(src, env));
+    expect(on[on.indexOf('actionCam') + 1]).toBe('actionCamShoulder');
+    // Full left through center to full right, on the shoulder readout.
+    expect(find(buildGraphicsControls(src, env), 'actionCamShoulder')).toMatchObject({
+      control: 'slider',
+      min: -1,
+      max: 1,
+      value: -0.4,
+      fmt: 'shoulder',
+    });
+    expect(SETTING_RANGES.actionCamShoulder).toMatchObject({ min: -1, max: 1, def: 1 });
+    expect(BOOL_SETTINGS.actionCam.def).toBe(false);
+  });
+
+  it('the shoulder readout names the side and its strength, or Center', () => {
+    expect(actionCamShoulderReadout(-1)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderLeft',
+      pct: 1,
+    });
+    expect(actionCamShoulderReadout(0.6)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderRight',
+      pct: 0.6,
+    });
+    expect(actionCamShoulderReadout(0)).toEqual({
+      key: 'hudChrome.options.actionCamShoulderCenter',
+      pct: 0,
+    });
+    expect(actionCamShoulderReadout(0.01).key).toBe('hudChrome.options.actionCamShoulderCenter');
+  });
+
   it('a slider descriptor carries the live value, range, step and format', () => {
     const controls = buildGraphicsControls(makeSource({ cameraSpeed: 0.9, cameraFov: 75 }), {
       touch: false,
@@ -111,7 +156,7 @@ describe('options_view: control primitive dispatch (cluster 1)', () => {
 // native-shell gating preserved; the preset + interfaceMode choices re-render.
 // ---------------------------------------------------------------------------
 describe('options_view: graphics dispatch matrix (cluster 3)', () => {
-  it('stages exactly the twelve renderer-bound settings over the live projection', () => {
+  it('stages exactly the renderer-bound settings over the live projection', () => {
     expect(GRAPHICS_REBUILD_KEYS).toEqual([
       'graphicsPreset',
       'terrainDetail',
@@ -127,6 +172,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'characterDetail',
       'dynamicLights',
       'particleEffects',
+      'ghostFade',
     ]);
     const live = makeSource({ graphicsPreset: 2, terrainDetail: 0, renderScale: 0.75 });
     const draft = normalizeGraphicsSettingsSnapshot({ graphicsPreset: 5, terrainDetail: 2 });
@@ -178,6 +224,7 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'viewDistance',
       'waterQuality',
       'characterDetail',
+      'ghostFade',
       // Lighting & Effects card: the light and post passes.
       'effectsQuality',
       'shadowQuality',
@@ -187,8 +234,10 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       'dynamicLights',
       'particleEffects',
       'note:hudChrome.options.gfxEffectsNote',
-      // Camera card (column 2 under Lighting).
+      // Camera card (column 2 under Lighting). The Action Cam shoulder picker
+      // only joins while Action Cam is on (off in this source).
       'cameraSpeed',
+      'actionCam',
       // Display card (full width).
       'renderScale',
       'brightness',
@@ -508,6 +557,16 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
     expect(settled?.control === 'choice' && settled.statusAlert).toBeUndefined();
   });
 
+  it('asks the worker client whether the row is offered, at the one place the window builds it', () => {
+    // The view shows the row when the flag is absent, so the window's call
+    // site is what withdraws it: a dropped or hard-coded prop would bring the
+    // row back with every other suite green.
+    const source = readFileSync(join(__dirname, '../src/ui/options_window.ts'), 'utf8');
+    expect(source.match(/shaderWarmChoice:/g)).toHaveLength(1);
+    expect(source).toContain('shaderWarmChoice: shaderWarmChoiceAvailable(),');
+    expect(shaderWarmChoiceAvailable()).toBe(false);
+  });
+
   it('drops the shader warm-up worker row and its note where the worker is forced off', () => {
     // iOS resolves the worker to off whatever the setting says
     // (shaderWarmModeFor), so the row would change nothing under a note
@@ -806,6 +865,7 @@ const GENERAL_KEYS = [
   'tooltipScale',
   'frostedPanels',
   'highContrastText',
+  'colorblindMode',
   'reduceMotion',
   'invertLookY',
   'landingHighContrast',
@@ -824,6 +884,7 @@ const GENERAL_KEYS = [
   'note:hudChrome.options.confirmVendorSellMinQualityNote',
 ];
 const FRAMES_KEYS = [
+  'mouseoverCast',
   'partyFrameStyle',
   'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
@@ -838,7 +899,9 @@ const FRAMES_KEYS = [
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
+  'targetAurasBelowFrame',
   'alwaysShowAllBuffs',
+  'showAuraCaster',
   'showTargetOfTarget',
   'showTargetSwingTimer',
 ];
@@ -935,6 +998,28 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
       });
     }
     expect(BOOL_SETTINGS.showUtilityModes).toEqual({ def: true });
+  });
+
+  it('shows the live mouseover-cast switch in Interface > Frames', () => {
+    const controls = buildInterfaceControls(makeSource({}, { mouseoverCast: true }));
+    const frames = interfaceControlsForTab(controls, 'frames');
+    expect(find(frames, 'mouseoverCast')).toMatchObject({
+      control: 'boolToggle',
+      category: 'frames',
+      labelKey: 'hudChrome.options.mouseoverCast',
+      on: true,
+    });
+    expect(optionsControlKeys(frames)).toContain('mouseoverCast');
+    expect(
+      find(
+        interfaceControlsForTab(
+          buildInterfaceControls(makeSource({}, { mouseoverCast: false })),
+          'frames',
+        ),
+        'mouseoverCast',
+      ),
+    ).toMatchObject({ control: 'boolToggle', on: false });
+    expect(find(interfaceControlsForTab(controls, 'combat'), 'mouseoverCast')).toBeUndefined();
   });
 
   it('renders NO menu rows for the optional action bars (the on-bar toggle owns them)', () => {
@@ -1152,11 +1237,23 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
+  // The target strip's side is the player's own choice, ungated (the strip is
+  // always anchored to the target frame, unlike the player buff row).
+  it('offers the target-auras-below toggle ungated and reads the stored choice through', () => {
+    expect(find(buildInterfaceControls(makeSource()), 'targetAurasBelowFrame')).toMatchObject({
+      control: 'boolToggle',
+      on: false,
+    });
+    expect(find(buildInterfaceControls(makeSource()), 'targetAurasBelowFrame')).not.toHaveProperty(
+      'disabled',
+      true,
+    );
+    const on = buildInterfaceControls(makeSource({}, { targetAurasBelowFrame: true }));
+    expect(find(on, 'targetAurasBelowFrame')).toMatchObject({ control: 'boolToggle', on: true });
+  });
+
   it('offers global scale from 75 to 200 percent, committing on release', () => {
     const controls = buildInterfaceControls(makeSource());
-    // The UI Scale slider is retired from the menu: the stored setting still
-    // applies at boot and the General tab's Reset to Defaults still clears it
-    // (renderInterface's off-menu key list).
     expect(find(controls, 'uiScale')).toMatchObject({
       control: 'slider',
       min: 0.75,
@@ -1258,8 +1355,8 @@ describe('options_view: interface tab taxonomy', () => {
   });
 
   it('renders NO menu rows for the settings the Frames Settings dropdown owns', () => {
-    // combineActionBars / hideUnusedActionSlots / mouseoverCast /
-    // lockActionBars moved into the edit mode's Frames Settings dropdown
+    // combineActionBars / hideUnusedActionSlots / lockActionBars
+    // live in the edit mode's Frames Settings dropdown
     // (interface_unlock.ts settingToggles); a duplicate row here would drift
     // out of sync with it. The frame-scale sliders are likewise gone: Edit
     // Frames resizes each frame directly. The settings keys all remain.
@@ -1267,7 +1364,6 @@ describe('options_view: interface tab taxonomy', () => {
     for (const key of [
       'combineActionBars',
       'hideUnusedActionSlots',
-      'mouseoverCast',
       'lockActionBars',
       'playerFrameScale',
       'targetFrameScale',

@@ -194,20 +194,20 @@ export const ko_KR: EnTranslations = {
         "description": "사전 구성 파티 모집 시나리오를 만듭니다."
       },
       "hillwarn": {
-        "label": "언덕 카운트다운",
-        "description": "지금 언덕을 알립니다. 전체 경고 시간이 지나면 솟아오릅니다."
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
       },
       "hillnow": {
-        "label": "지금 언덕 솟아오르기",
-        "description": "언덕을 즉시 솟아오르게 하고 그 위에 섭니다."
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
       },
       "hillrise": {
-        "label": "언덕 카운트다운 건너뛰기",
-        "description": "알린 언덕을 바로 솟아오르게 합니다."
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
       },
       "hillend": {
-        "label": "언덕 종료",
-        "description": "지금 있는 언덕을 바로 사라지게 합니다."
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -1559,6 +1559,48 @@ export const ko_KR: EnTranslations = {
       "since": "{date}에 서약",
       "withdraw": "서약 철회"
     },
+    "guildRanks": {
+      "tab": "등급",
+      "introEdit": "길드 등급의 이름을 정하고 각 등급이 무엇을 할 수 있는지 선택합니다. 저장하면 해당 등급을 가진 모든 구성원에게 변경 사항이 적용됩니다.",
+      "introView": "각 등급 이름과 권한입니다. 길드장만 변경할 수 있습니다.",
+      "colRank": "등급",
+      "colTitle": "이름",
+      "colMembers": "구성원",
+      "colActions": "순서",
+      "numbered": "등급 {n}",
+      "perm": {
+        "invite": "초대",
+        "remove": "제거",
+        "promote": "승급",
+        "bank": "길드 은행",
+        "officerChat": "간부 대화",
+        "motd": "게시판",
+        "events": "달력"
+      },
+      "permHint": {
+        "invite": "플레이어를 길드에 초대하고 가입 신청에 응답합니다.",
+        "remove": "자신보다 낮은 등급의 구성원을 제거합니다.",
+        "promote": "자신보다 낮은 등급의 구성원을 승급하거나 강등하되, 자신의 바로 아래 등급까지만 올릴 수 있습니다.",
+        "bank": "길드 은행에 동전과 아이템을 넣고 꺼냅니다. 모든 구성원이 볼 수 있습니다.",
+        "officerChat": "간부 대화를 읽고 말합니다.",
+        "motd": "길드 게시판을 편집합니다.",
+        "events": "길드 달력 일정을 추가하고 제거합니다."
+      },
+      "titleLabel": "{rank} 이름",
+      "permLabel": "{rank}의 {perm}",
+      "leaderLocked": "길드장은 항상 모든 권한을 가집니다.",
+      "add": "등급 추가",
+      "save": "등급 저장",
+      "moveUp": "{rank} 위로 이동",
+      "moveDown": "{rank} 아래로 이동",
+      "remove": "{rank} 제거",
+      "full": "길드는 최대 {max}개의 등급을 가질 수 있습니다.",
+      "invalidTitle": "등급 이름은 글자, 숫자, 공백, 아포스트로피, 하이픈을 사용할 수 있으며 최대 {max}자입니다.",
+      "removeConfirm": "{rank} 구성원은 {fallback} 등급이 됩니다. 이 등급을 제거할까요?",
+      "removeAccept": "등급 제거",
+      "promoteTo": "{name}님을 {rank}(으)로 승급",
+      "demoteTo": "{name}님을 {rank}(으)로 강등"
+    },
     "raidLockout": {
       "title": "공격대 잠금",
       "allReady": "모든 공격대 준비됨",
@@ -1656,6 +1698,7 @@ export const ko_KR: EnTranslations = {
       "breakdownSummary": "{tab}: {value}",
       "breakdownRow": "{value} ({percent})",
       "breakdownOther": "기타 ({count})",
+      "targetsHeader": "Targets",
       "percent": "{value}%",
       "petAbility": "{pet}: {ability}",
       "melee": "근접 공격",
@@ -1663,7 +1706,154 @@ export const ko_KR: EnTranslations = {
       "resize": "드래그하여 이 미터의 크기 조절",
       "dock": "이 미터를 미터 창으로 되돌리기",
       "separate": "{meter} 분리",
-      "regroup": "{meter} 통합"
+      "regroup": "{meter} 통합",
+      "settingsTitle": "Details / Meter Settings",
+      "optionsEngineBadge": "WoC Details! Engine",
+      "resetDefaults": "Reset to Defaults",
+      "closeSettings": "Close",
+      "densityCompact": "Density: Compact (16px)",
+      "densityStandard": "Density: Standard (20px)",
+      "bgGlass": "Background: Glass (76%)",
+      "bgSolid": "Background: Solid (98%)",
+      "bgMinimal": "Background: Minimal (45%)",
+      "numDetailed": "Numbers: Detailed",
+      "numCompact": "Numbers: Abbreviated (k/M)",
+      "raidTotalsOn": "Header group total: Yes",
+      "raidTotalsOff": "Header group total: No",
+      "tabGeneral": "Window & Background",
+      "tabGeneralDesc": "Opacity, scale, lock",
+      "tabBars": "Bars & Textures",
+      "tabBarsDesc": "Height, spacing, animation",
+      "tabText": "Text & Typography",
+      "tabTextDesc": "Fonts, k/M, DPS, rank",
+      "tabHeader": "Header & Title",
+      "tabHeaderDesc": "Group total, title bar",
+      "tabCombat": "Combat & Limits",
+      "tabCombatDesc": "Max rows, shields",
+      "tabPresets": "Quick Themes",
+      "tabPresetsDesc": "One-click presets",
+      "tabProfiles": "Profiles & Import",
+      "tabProfilesDesc": "Export, import, and profiles",
+      "groupWindow": "Window Appearance & Background",
+      "bgMode": "Background Mode",
+      "bgModeDesc": "Visual styling for the meter panel.",
+      "optGlass": "Glass (Blur)",
+      "optGlassDesc": "Frosted blur effect",
+      "optSolid": "Solid",
+      "optSolidDesc": "Dark high-contrast panel",
+      "optMinimal": "Minimal",
+      "optMinimalDesc": "Faint translucent",
+      "optTransparent": "Transparent",
+      "optTransparentDesc": "No background, bars only",
+      "bgOpacity": "Background Opacity",
+      "bgOpacityDesc": "Opacity percentage for the window background.",
+      "windowScale": "Window Scale",
+      "windowScaleDesc": "Increase or decrease the overall meter scale.",
+      "lockPosition": "Lock Position",
+      "lockPositionDesc": "Lock the window to prevent accidental dragging or resizing in combat.",
+      "groupBars": "Bar Geometry & Texture",
+      "barHeight": "Bar Height",
+      "barHeightDesc": "Vertical thickness of each combat row (14px compact to 26px spacious).",
+      "barSpacing": "Bar Spacing",
+      "barSpacingDesc": "Vertical pixel gap between adjacent rows.",
+      "barTexture": "Bar Texture",
+      "barTextureDesc": "Visual finish and shading over the class color.",
+      "texSpecular": "Glossy (Specular)",
+      "texSpecularDesc": "Top highlight reflection with bevel",
+      "texSmooth": "Smooth (Flat)",
+      "texSmoothDesc": "Clean flat class color",
+      "texGradient": "Gradient",
+      "texGradientDesc": "Smooth horizontal color gradient",
+      "barAnimation": "Smooth Bar Animation",
+      "barAnimationDesc": "Fluidly interpolates bar growth and decay in real time.",
+      "alwaysShowMe": "Always Show Me",
+      "alwaysShowMeDesc": "Pins your player bar to the bottom if ranked outside visible rows.",
+      "groupText": "Text Formatting & Telemetry",
+      "numFormat": "Number Format",
+      "numFormatDesc": "Display style for totals.",
+      "optNumCompact": "Abbreviated (k / M)",
+      "optNumCompactDesc": "Example: 145.2k, 1.2M",
+      "optNumDetailed": "Full Detailed",
+      "optNumDetailedDesc": "Example: 145,200, 1,240,500",
+      "optNumDamageDps": "Damage | DPS",
+      "optNumDamageDpsDesc": "Example: 239.2k | 18.4k (clean telemetry bar)",
+      "showDps": "Show Rate per Second (DPS / HPS)",
+      "showDpsDesc": "Shows damage or healing rate per second on each bar.",
+      "showPercent": "Show Percentage (%)",
+      "showPercentDesc": "Shows percent contribution of total group output.",
+      "showRank": "Show Rank (#1, #2...)",
+      "showRankDesc": "Shows ordinal rank number beside the name.",
+      "showClassIcon": "Show Class Icon",
+      "showClassIconDesc": "Displays class or role icon next to each player.",
+      "groupFont": "Combat Typography (Font Family)",
+      "groupHeader": "Header Customization",
+      "showTitleBar": "Show Title Bar",
+      "showTitleBarDesc": "Displays top bar with combat segment name and controls.",
+      "showRaidTotals": "Group Summary in Subtitle",
+      "showRaidTotalsDesc": "Displays cumulative group DPS/HPS in the header subtitle.",
+      "groupCombat": "Combat Rules & Limits",
+      "maxRows": "Maximum Visible Rows",
+      "maxRowsDesc": "Simultaneous bars (0 = unlimited, auto-fit to window height).",
+      "autoRows": " (Auto)",
+      "barsUnit": " bars",
+      "includeShields": "Count Absorbs as Healing",
+      "includeShieldsDesc": "Adds absorbed shield damage (Psalm of Warding, etc.) to Healing meter.",
+      "groupPresets": "One-Click Quick Themes",
+      "applyPreset": "Apply Theme",
+      "presetDetailsName": "Modern Glass",
+      "presetDetailsDesc": "Frosted blur background, specular glossy bars, abbreviated numbers, and full telemetry.",
+      "presetDetailsBadge": "Recommended",
+      "presetClassicName": "Classic Solid",
+      "presetClassicDesc": "Dark high-contrast solid panel, flat class bars, uncompressed detailed numbers in classic layout.",
+      "presetClassicBadge": "Classic",
+      "presetMinimalName": "Pure Minimal",
+      "presetMinimalDesc": "Nearly transparent background, compact 16px bars without gaps, direct text without percentages.",
+      "presetMinimalBadge": "Clean",
+      "presetRaidName": "Raid Focus",
+      "presetRaidDesc": "Designed for raids: compact 18px density, 10-bar limit, visible group total, and pinned player bar.",
+      "presetRaidBadge": "Raid",
+      "presetProGradientName": "Pro Gradient",
+      "presetProGradientDesc": "Floating transparent panel, horizontal gradient bars, spec icons, and Damage | DPS telemetry.",
+      "presetProGradientBadge": "Pro",
+      "groupManageProfiles": "Profile Management",
+      "activeProfile": "Active Profile",
+      "activeProfileDesc": "Select or manage independent profiles for different gameplay scenarios.",
+      "saveAs": "Save As...",
+      "duplicate": "Duplicate",
+      "deleteProfile": "Delete",
+      "cannotDeleteDefault": "The Default profile cannot be deleted",
+      "promptNewProfile": "Name of the new profile:",
+      "profileCopySuffix": " (Copy)",
+      "groupExport": "Export Current Profile",
+      "exportDesc": "Encoded profile string of your current configuration. Copy it to share or backup.",
+      "copyString": "Copy Profile String",
+      "copiedFeedback": "Copied to clipboard!",
+      "groupImport": "Import Profile",
+      "importDesc": "Paste a profile string (!WoC-Details:... or JSON) to apply and save.",
+      "importPlaceholder": "Paste profile string here (!WoC-Details:...)",
+      "importNamePlaceholder": "Profile name (optional)",
+      "importApply": "Import & Apply",
+      "errEmptyProfile": "Please paste a profile string.",
+      "errInvalidProfile": "Error: Invalid or corrupt profile string.",
+      "importSuccess": "Profile \"{name}\" imported successfully!",
+      "reportSent": "Report copied and sent to chat",
+      "reportNoData": "No data recorded.",
+      "noDetailedData": "No detailed data",
+      "noDeathEvents": "No events logged before death",
+      "killedBy": "Killed by {killer} ({ability})",
+      "lethalHit": "Lethal Hit",
+      "recentCombatEvents": "Last {count} combat events",
+      "backComparison": "Comparison",
+      "comparisonNeedTwo": "At least 2 fights are required to compare",
+      "backTimeline": "Timeline",
+      "timelineCombatEvents": "Combat events: {count}",
+      "backDev": "Balance / Dev",
+      "balanceAbilitiesCount": "Logged abilities: {count}",
+      "targetSubtitle": "Target: {target}",
+      "noTargetData": "No player data for this target"
+    },
+    "auraTooltip": {
+      "caster": "시전자: {name}"
     },
     "auraTracks": {
       "defensives": "방어 재사용 대기시간",
@@ -1690,6 +1880,7 @@ export const ko_KR: EnTranslations = {
       "buffs": "강화 효과",
       "unlock": "대상 오라 창 이동",
       "lock": "대상 오라 창 잠금",
+      "close": "대상 오라 창 닫기",
       "configureRows": "대상 오라 설정",
       "fewerRows": "오라 행 수 줄이기",
       "moreRows": "오라 행 수 늘리기",
@@ -1917,7 +2108,7 @@ export const ko_KR: EnTranslations = {
       "clickMoveLeft": "왼쪽 클릭",
       "clickMoveRight": "오른쪽 클릭",
       "version": "v{version} ({build})",
-      "overlays": "오버레이",
+      "overlays": "Overlays",
       "browserEffects": "브라우저 효과",
       "browserEffectsAuto": "자동",
       "browserEffectsFull": "전체",
@@ -1947,6 +2138,9 @@ export const ko_KR: EnTranslations = {
       "gfxBloom": "블룸",
       "gfxAntiAliasing": "안티앨리어싱",
       "gfxDynamicLights": "동적 광원",
+      "gfxGhostFade": "Camera Ghost",
+      "gfxGhostFadeDithered": "Dithered",
+      "gfxGhostFadeSmooth": "Smooth",
       "gfxParticleEffects": "입자 효과",
       "gfxHalf": "절반",
       "gfxCustomNote": "다이얼을 조정하면 품질 프리셋이 고급으로 전환됩니다. \"높음\" 품질 기반 위에 현재 프리셋에 표시된 수준에서 시작하는 사용자 지정 조합입니다.",
@@ -2007,13 +2201,15 @@ export const ko_KR: EnTranslations = {
       "targetHealthText": "대상 생명력 텍스트",
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
       "auraBarBelowFrame": "버프를 플레이어 프레임 아래에 표시",
+      "targetAurasBelowFrame": "Target Auras Below the Frame",
       "alwaysShowAllBuffs": "모든 버프를 항상 표시",
+      "showAuraCaster": "툴팁에 효과 시전자 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "stopAutoAttackOnTargetSwitch": "대상 전환 시 자동 공격 중지",
       "walkByAutoloot": "지나가며 자동 획득",
       "groundReticle": "지면 조준 표시기",
-      "mouseoverCast": "파티 및 주시 프레임에 마우스오버 시전",
+      "mouseoverCast": "파티 창에서 마우스오버 시전",
       "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
       "showReliquaryTracker": "성물고 추적기 표시",
@@ -2042,6 +2238,11 @@ export const ko_KR: EnTranslations = {
       "showFriendlyTrack": "아군에게 건 내 버프 표시",
       "showShieldTrack": "내 보호막 표시",
       "waterRipples": "수면 물결 (물살)",
+      "actionCam": "액션 카메라",
+      "actionCamShoulder": "액션 카메라 어깨",
+      "actionCamShoulderLeft": "왼쪽 {pct}",
+      "actionCamShoulderRight": "오른쪽 {pct}",
+      "actionCamShoulderCenter": "중앙",
       "showAttackButton": "공격 버튼 표시",
       "showDailyRewardsChest": "일일 보상 보물상자 표시",
       "mobileCameraJoystick": "카메라 조이스틱",
@@ -2360,78 +2561,78 @@ export const ko_KR: EnTranslations = {
       }
     },
     "cooldownManager": {
-      "title": "재사용 대기시간 관리자",
-      "intro": "선택한 주문을 떠 있는 버튼으로 표시합니다. 버튼은 클릭할 수 없습니다. 각 버튼은 재사용 대기시간을 보여 주고, 시전할 수 없을 때는 어두워지며, 준비되면 빛납니다.",
-      "generalTitle": "일반",
-      "enabled": "재사용 대기시간 관리자 표시",
-      "idleOpacity": "준비되지 않았을 때 불투명도",
-      "combatOnly": "전투 중에만 소리 재생",
-      "dragHint": "이 메뉴가 열려 있는 동안 모든 그룹이 화면에 표시되며, 끌어서 옮길 수 있습니다.",
-      "addSingle": "단일 버튼 추가",
-      "addGrid": "버튼 그룹 추가",
-      "addLine": "주문 줄 추가",
-      "groupsFull": "그룹 수가 최대입니다. 그룹을 하나 삭제해야 새로 추가할 수 있습니다.",
-      "noGroups": "단일 버튼, 버튼 그룹 또는 주문 줄을 추가해 시작하세요.",
-      "groupSingle": "단일 버튼 {index}",
-      "groupGrid": "버튼 그룹 {index}",
-      "groupLine": "주문 줄 {index}",
-      "groupName": "그룹 이름",
-      "spellCount": "주문 {count} / {max}",
-      "orientation": "방향",
-      "horizontal": "가로",
-      "vertical": "세로",
-      "columns": "열 수",
-      "rows": "행 수",
-      "direction": "아이콘 방향",
-      "dirRight": "오른쪽",
-      "dirLeft": "왼쪽",
-      "dirDown": "아래",
-      "dirUp": "위",
-      "iconSize": "아이콘 크기",
-      "iconPadding": "아이콘 간격",
-      "opacity": "불투명도",
-      "visibility": "표시",
-      "visAlways": "항상 표시",
-      "visCombat": "전투 중",
-      "visHidden": "숨김",
-      "visHiddenHint": "숨긴 그룹도 소리를 재생하고 행동 단축바를 빛나게 합니다.",
-      "showTimer": "타이머 표시",
-      "positionX": "가로 위치",
-      "positionY": "세로 위치",
-      "resetPosition": "기본 위치로 초기화",
-      "deleteGroup": "그룹 삭제",
-      "deleteGroupAria": "{group} 삭제",
-      "trackedTitle": "추적 중인 주문",
-      "trackedHint": "주문을 그룹으로 끌어 놓거나, 선택해서 그룹과 알림을 고르세요. 주문이 다른 주문으로 바뀌면 버튼도 따라 바뀌고 빛납니다.",
-      "search": "주문 검색",
-      "searchPlaceholder": "검색",
-      "notDisplayed": "표시 안 함",
-      "otherSpells": "기타 주문",
-      "otherSpellsHint": "다른 전문화, 특성 선택, 더 높은 레벨의 주문입니다. 지금 배치해 두면 배웠을 때 버튼이 나타납니다.",
-      "notKnown": "{spell} (아직 배우지 않음)",
-      "aurasTitle": "발동, 엔진, 강화 효과",
-      "aurasHint": "엔진 자원과 그 중첩, 발동 효과, 그리고 내 주문이 나에게 거는 강화 효과입니다. 그 밖에 나에게 걸렸던 효과도 여기에 표시됩니다.",
-      "auraFallback": "오라",
-      "onlyWhileActive": "활성 중에만 표시",
-      "alertStacks": "중첩 알림",
-      "alertStacksAny": "획득 시",
-      "alertStacksHint": "오라가 이 중첩 수에 도달하면 버튼이 빛나고 깜박이며 소리가 납니다. 획득 시는 나타나는 즉시 알립니다.",
-      "auraSoundHint": "오라가 나타날 때, 또는 설정한 중첩 수에 도달할 때 재생됩니다.",
-      "emptySection": "여기에 주문을 놓으세요.",
-      "spellsEmpty": "아직 배운 주문이 없습니다.",
-      "selectSpell": "{spell} 선택",
-      "group": "그룹",
-      "groupFullOption": "{group} (가득 참)",
-      "notInGroupHint": "이 주문을 그룹에 넣으면 버튼이 표시됩니다.",
-      "moveEarlier": "{spell} 앞으로 이동",
-      "moveLater": "{spell} 뒤로 이동",
-      "glowWhenReady": "준비되면 빛내기",
-      "glowWhenReadyHint": "주문을 시전할 수 있는 동안 버튼을 밝게 하고 테두리를 표시합니다.",
-      "hotbarGlow": "단축바 강조",
-      "hotbarGlowHint": "준비된 동안 행동 단축바의 이 주문도 빛나게 합니다.",
-      "onlyWhenReady": "준비되었을 때만 표시",
-      "sound": "준비 알림음",
-      "soundHint": "주문이 준비되었을 때, 또는 준비된 상태에서 버튼이 다른 주문으로 바뀔 때 재생됩니다."
+      "title": "Cooldown Manager",
+      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
+      "generalTitle": "General",
+      "enabled": "Show Cooldown Manager",
+      "idleOpacity": "Opacity While Not Ready",
+      "combatOnly": "Sounds Only in Combat",
+      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
+      "addSingle": "Add Single Button",
+      "addGrid": "Add Button Group",
+      "addLine": "Add Line of Spells",
+      "groupsFull": "You have the most groups allowed. Delete one to add another.",
+      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
+      "groupSingle": "Single Button {index}",
+      "groupGrid": "Button Group {index}",
+      "groupLine": "Line of Spells {index}",
+      "groupName": "Group Name",
+      "spellCount": "{count} / {max} spells",
+      "orientation": "Orientation",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "columns": "# Columns",
+      "rows": "# Rows",
+      "direction": "Icon Direction",
+      "dirRight": "Right",
+      "dirLeft": "Left",
+      "dirDown": "Down",
+      "dirUp": "Up",
+      "iconSize": "Icon Size",
+      "iconPadding": "Icon Padding",
+      "opacity": "Opacity",
+      "visibility": "Visibility",
+      "visAlways": "Always Visible",
+      "visCombat": "In Combat",
+      "visHidden": "Hidden",
+      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
+      "showTimer": "Show Timer",
+      "positionX": "Horizontal Position",
+      "positionY": "Vertical Position",
+      "resetPosition": "Reset to Default Position",
+      "deleteGroup": "Delete Group",
+      "deleteGroupAria": "Delete {group}",
+      "trackedTitle": "Tracked Spells",
+      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
+      "search": "Search spells",
+      "searchPlaceholder": "Search",
+      "notDisplayed": "Not Displayed",
+      "otherSpells": "Other Spells",
+      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
+      "notKnown": "{spell} (not known yet)",
+      "aurasTitle": "Procs, Engines and Buffs",
+      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
+      "auraFallback": "Aura",
+      "onlyWhileActive": "Only Show While Active",
+      "alertStacks": "Alert at Stacks",
+      "alertStacksAny": "On gain",
+      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
+      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
+      "emptySection": "Drop a spell here.",
+      "spellsEmpty": "You do not know any spells yet.",
+      "selectSpell": "Select {spell}",
+      "group": "Group",
+      "groupFullOption": "{group} (full)",
+      "notInGroupHint": "Put this spell in a group to show its button.",
+      "moveEarlier": "Move {spell} earlier",
+      "moveLater": "Move {spell} later",
+      "glowWhenReady": "Light Up When Ready",
+      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
+      "hotbarGlow": "Hotbar Glow",
+      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
+      "onlyWhenReady": "Only Show When Ready",
+      "sound": "Ready Sound",
+      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
     },
     "auraOverlay": {
       "title": "오라",
@@ -2557,79 +2758,79 @@ export const ko_KR: EnTranslations = {
         "battlegroundComplete": "쏜할로우 평원 참전",
         "battlegroundKill": "명예로운 처치",
         "battlegroundAssist": "처치 도움",
-        "worldKill": "월드 처치",
-        "worldAssist": "월드 처치 지원",
-        "hillHold": "언덕 점령"
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "처치",
         "assist": "도움",
         "firstWin": "첫 승리",
-        "hill": "언덕"
+        "hill": "Hill"
       }
     },
     "worldPvp": {
-      "tab": "월드 PvP",
-      "title": "월드 PvP",
-      "blurb": "PvP 깃발을 올리면 열린 세계 어디서든 깃발을 올린 다른 플레이어와 싸울 수 있습니다. 상대를 쓰러뜨리면 상대 지갑의 일부와 PvP 장비를 위한 명예를 얻습니다. 전장과 투기장의 보상은 여전히 더 많습니다.",
-      "statusOn": "PvP 깃발이 올라가 있습니다. 깃발을 올린 플레이어가 당신을 공격할 수 있습니다.",
-      "statusOff": "PvP 깃발이 내려가 있습니다. 열린 세계에서는 공격할 수도, 공격받을 수도 없습니다.",
-      "statusOffFfa": "PvP 깃발이 내려가 있지만, 자유 전투 지역에서는 여전히 공격할 수도, 공격받을 수도 있습니다.",
-      "statusDisarming": "깃발은 {time} 후 또는 현재 전투가 끝나면 내려갑니다.",
-      "zoneSanctuary": "성역: 이곳에서는 월드 PvP가 일어나지 않습니다.",
-      "zoneContested": "분쟁 지역: 이곳에서는 깃발을 올린 플레이어끼리만 싸웁니다.",
-      "zoneFfa": "자유 전투 지역: 이곳의 모두가 공격 대상입니다.",
-      "realmDisabled": "이 서버에서는 월드 PvP가 꺼져 있습니다.",
-      "groundSanctuary": "수련의 해안과 이스트브룩 골짜기는 성역이라 월드 PvP가 전혀 없습니다.",
-      "groundContested": "그 밖의 모든 곳은 분쟁 지역이라 깃발을 올린 두 플레이어만 싸울 수 있습니다.",
-      "groundFfa": "드레이크랜드, 서리장막 봉우리, 호박빛 가을터은 자유 전투 지역이라 깃발과 상관없이 그곳의 모두가 싸울 수 있습니다.",
-      "groupLine": "파티원과 공격대원끼리는 절대 적대하지 않습니다. 그룹 밖의 길드원과는 싸울 수 있습니다.",
-      "markLine": "그곳에서 깃발을 올리지 않은 플레이어를 공격하면 자신의 깃발이 올라갑니다. 이미 깃발을 올린 상대를 공격할 때는 올라가지 않습니다.",
-      "aidLine": "월드 전투 중인 깃발 올린 플레이어를 치유하거나 보호막을 주거나 강화하면 자신의 깃발이 올라갑니다.",
-      "stakeLine": "패자는 {cap} 또는 지갑의 {percent} 중 더 적은 쪽을 지불합니다.",
-      "noStakeLine": "깃발을 올리지 않은 플레이어는 자유 전투 지역에서 쓰러져도 금화를 잃지 않습니다.",
-      "noTakeLine": "깃발을 올리지 않은 전투원도 골드를 얻지 못합니다. 골드는 깃발을 올린 두 플레이어 사이에서만 움직입니다.",
-      "honorLine": "처치당 명예 {honor}, 기여한 모두가 나눕니다.",
-      "splitLine": "순수한 1대1은 전부를 가져가고, 조력자와 그 치유사는 나눠 가집니다.",
-      "repeatLine": "같은 플레이어를 거듭 처치하면 {second}, 그다음 {third}, 이후로는 아무것도 주지 않으며, 계수는 첫 처치로부터 {reset} 후에 초기화됩니다.",
-      "greyLine": "당신보다 {levels}레벨 넘게 낮은 플레이어는 아무것도 주지 않습니다.",
-      "disarmLine": "끄는 데 {minutes}분이 걸리며 전투가 끝날 때까지 기다립니다.",
-      "record": "전적: 처치 {kills}, 사망 {deaths}",
-      "enable": "월드 PvP 켜기",
-      "disable": "월드 PvP 끄기",
-      "keepUp": "깃발 유지",
-      "confirmBody": "깃발을 올린 다른 플레이어가 어디서든 당신을 공격할 수 있고, 이기면 지갑에서 최대 {cap}을 가져갑니다. 다시 끌 수 있지만 {minutes}분이 걸립니다.",
-      "confirmAccept": "깃발 올리기",
-      "confirmCancel": "취소",
-      "levelReq": "{level}레벨이 필요합니다.",
-      "pending": "서버에서 PvP 상태를 기다리는 중입니다.",
-      "commandHint": "채팅: /pvp 로 깃발을 전환하고, /pvp on 과 /pvp off 로 직접 설정합니다."
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "zoneSanctuary": "Sanctuary: no world PvP here.",
+      "zoneContested": "Contested ground: only flagged players fight here.",
+      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
+      "realmDisabled": "World PvP is disabled on this realm.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
     },
     "hill": {
-      "title": "언덕의 왕",
-      "rising": "언덕이 아직 솟아오르지 않았습니다",
-      "heldYou": "당신의 그룹이 언덕을 점령했습니다",
-      "heldOther": "다른 그룹이 언덕을 점령했습니다",
-      "heldNone": "언덕을 점령한 그룹이 없습니다",
-      "counts": "원 안: 아군 {yours}, 점령 측 {theirs}",
-      "countsUnheld": "원 안: 아군 {yours}, 최대 경쟁 그룹 {theirs}",
-      "countsHolding": "원 안: 아군 {yours}, 경쟁 그룹 {theirs}",
-      "contestYou": "언덕 점령 중: {total} 중 {seconds}",
-      "contestOther": "언덕을 빼앗기는 중: {total} 중 {seconds}",
-      "contestNone": "{total} 동안 원 안에서 다수를 유지하면 점령합니다",
-      "inside": "당신은 원 안에 있습니다",
-      "distance": "원까지 {yards}야드",
-      "rises": "{minutes} 후 솟아오릅니다",
-      "falls": "{minutes} 후 사라집니다",
-      "standingRaid": "공격대원은 인원에 포함되지 않습니다. 언덕은 파티만 점령할 수 있습니다"
+      "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "워페어 세트 둘러보기",
       "gossipOptionAria": "{name}이(가) 운영하는 워페어 세트 상점 둘러보기",
       "jewelry": "장신구",
       "weapons": "무기",
-      "groupSeason2": "워페어 시즌 2: 선봉대",
-      "groupEntry": "워페어 시즌 1",
+      "groupSeason2": "Warfare Season 2: Vanguard",
+      "groupEntry": "Warfare Season 1",
       "owned": "보유 중",
       "buyAria": "{honor}에 {item} 구매",
       "buyOwnedAria": "{honor}에 {item} 구매, 이미 보유 중",
@@ -2637,7 +2838,9 @@ export const ko_KR: EnTranslations = {
     },
     "charSheet": {
       "offense": "공격",
+      "spell": "주문",
       "defense": "방어",
+      "ratings": "등급",
       "playtimeLabel": "플레이 시간",
       "playtimeParts": "{major} {minor}",
       "playtimeUnderMinute": "1분 미만",
@@ -2751,6 +2954,7 @@ export const ko_KR: EnTranslations = {
       "names": {
         "spellPower": "주문력",
         "healPower": "치유력",
+        "spellCrit": "Spell Crit",
         "critRating": "치명타 등급",
         "hasteRating": "가속 등급",
         "parry": "무기 막기",
@@ -2767,15 +2971,17 @@ export const ko_KR: EnTranslations = {
         "armor": "들어오는 물리 공격을 완화합니다. 낮은 레벨의 공격자에게 더 큰 효과를 발휘하며, 최대 75%까지 적용됩니다.",
         "attackPower": "무기 공격을 강화합니다. 전투력 14당 초당 피해 1이 추가됩니다.",
         "spellPower": "주문의 피해량과 치유량을 증가시킵니다. 지능 1당 장비나 버프로 얻는 양에 더해 약간의 주문력을 부여합니다.",
+        "healPower": "Increases the healing of your heals and heal-over-time effects, and the size of your absorb shields. It is your Spell Power plus the Healing Power from your gear and set bonuses, which adds to healing but never to damage.",
         "dps": "무기의 피해와 속도, 전투력을 종합한 예상 무기 초당 피해입니다.",
         "critChance": "공격이 치명적으로 적중하여 두 배의 피해를 입힐 확률입니다.",
+        "spellCrit": "Your chance for a spell or heal to strike critically, dealing 150% damage or healing. Spells and heals roll this instead of Crit Chance: Intellect raises only this chance, while crit rating, talents, and set bonuses raise both.",
         "dodge": "들어오는 근접 공격을 완전히 피해 피해를 전혀 입지 않을 확률입니다.",
         "critRating": "장비와 세트 보너스에서 얻는 치명타 등급으로 치명타 확률이 증가합니다. 약 10등급당 1% 치명타.",
         "hasteRating": "장비와 세트 보너스에서 얻는 가속 등급으로 공격과 시전 속도가 빨라집니다. 약 10등급당 1% 가속.",
         "parry": "전방 근접 공격을 완전히 무기로 막아 피해를 입지 않을 확률입니다. 뒤에서 오는 공격은 막을 수 없습니다.",
         "hitRating": "장비와 세트 보너스에서 얻는 명중 등급으로 공격이 빗나가거나 주문이 저항되는 빈도를 줄이며, 특히 더 높은 레벨의 적에게 효과적입니다. 약 10등급당 1% 명중.",
         "warfare": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다.",
-        "warfareWithHealth": "플레이어에게 주는 피해가 {increase}% 증가하고 플레이어에게 받는 피해가 {reduction}% 감소합니다. 또한 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력이 {health}% 증가합니다."
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} 전투력",
@@ -3235,6 +3441,8 @@ export const ko_KR: EnTranslations = {
       "hint": "집중 포인트는 각 재료의 기본 산출량에 보너스를 더합니다. 집중하지 않은 재료는 기본 산출량 그대로 유지됩니다.",
       "tierHint": "재료 하나에 집중 {points}포인트를 투자할 때마다 채집 등급이 한 단계 오릅니다(최대 {steps}단계). {points}포인트 미만이라도 산출량은 늘어납니다.",
       "townOnlyHint": "집중은 마을 안에서만 변경할 수 있습니다.",
+      "preferenceHint": "Focus raises the grade and amount of what you harvest. To harvest only one material, set a Harvest Preference from your Field Kit or the Professions window.",
+      "pendingLine": "Saved. Your re-spec to this allocation completes in {time}.",
       "budgetLabel": "남은 포인트: {remaining} / {budget}",
       "saveButton": "집중 저장",
       "notInTownHint": "집중을 설정하려면 마을에 있어야 합니다.",
@@ -3732,6 +3940,8 @@ export const ko_KR: EnTranslations = {
       "iceFloesCasts": "다음 {n}개의 시전 주문을 이동하면서 시전할 수 있습니다",
       "freeCast": "다음 시전에 자원이 들지 않습니다",
       "instantCast": "시전 시간이 있는 다음 주문이 즉시 시전됩니다",
+      "benisonPrayers": "Your next Choirmend heals for {pct}% more and consumes all stacks.",
+      "benisonWhisper": "Your next Whispered Prayer is instant and heals for {pct}% more. Use it before this effect expires.",
       "cheapCast": "다음 주문의 소모량이 {pct}% 감소합니다",
       "radiantResonance": "다음 치유의 빛이 즉시 시전되거나, 다음 여명의 포옹의 마나 소모량이 {pct}% 감소하고 시전 시간이 {castTime}초가 됩니다",
       "solarReprisal": "다음 태양 수호 원반은 마나를 소모하지 않고 재사용 대기시간을 무시하며 피해가 {pct}% 증가합니다. 은총의 망치는 재사용 대기시간을 무시하고 준 피해의 100%만큼 생명력을 회복합니다. 또는 치유의 빛이 즉시 시전됩니다",
@@ -3916,6 +4126,7 @@ export const ko_KR: EnTranslations = {
       "resetErrInvalid": "이 재설정 링크가 유효하지 않거나 만료되었습니다. 새 링크를 요청하세요."
     },
     "loot": {
+      "rollWon": "Congratulations! You won {item} with a roll of {roll}",
       "chestTitle": "상자",
       "takeLootButton": "전리품 가져가기",
       "takeLootTooltip": "돈과 떨어진 아이템을 가져갑니다. 채집 기회는 소모되지 않습니다.",
@@ -3966,6 +4177,10 @@ export const ko_KR: EnTranslations = {
       "friendly": "아군",
       "elite": "정예",
       "boss": "우두머리"
+    },
+    "playerTooltip": {
+      "guild": "<{guild}>",
+      "specRole": "{spec} ({role})"
     },
     "targetFrame": {
       "unlock": "대상 프레임 이동",
@@ -4049,7 +4264,8 @@ export const ko_KR: EnTranslations = {
         "deedTracker": "업적 추적기",
         "delveTracker": "탐굴 추적기",
         "riftTracker": "균열 추적기",
-        "swingBarOffhand": "보조 장비"
+        "swingBarOffhand": "보조 장비",
+        "unitTooltip": "툴팁"
       },
       "framesMenu": "프레임 설정",
       "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",
@@ -4600,6 +4816,8 @@ export const ko_KR: EnTranslations = {
       "vaultTab": "보관소",
       "vaultCapacityNote": "각 재료는 최대 {cap}개까지 보관할 수 있습니다.",
       "vaultEmpty": "재료 보관소가 비어 있습니다. 가방의 재료를 클릭하면 보관할 수 있습니다.",
+      "vaultSearchAria": "Search vault materials by name",
+      "vaultSearchNoMatch": "No material in your vault matches your search.",
       "vaultRowAria": "{item}: {count}/{cap}개 보관 중",
       "vaultLockedIntro": "재료 보관소를 개방하면 은행 옆에 제작 재료를 쌓아 둘 수 있습니다. 재료마다 전용 공간이 있으며 각각 최대 {cap}개까지 보관됩니다.",
       "vaultUnlockButton": "재료 보관소 개방",
@@ -5270,6 +5488,7 @@ export const ko_KR: EnTranslations = {
         "dormantKnowledge": "{craft} 지식은 유지되지만 해당 조합이나 취미가 활성화될 때까지 비활성 상태입니다."
       },
       "stationRequired": "그것을 제작하려면 {station}에 있어야 합니다.",
+      "mobileStationTitle": "{name}'s {station}",
       "stationName": {
         "forge": "대장간",
         "kitchens": "주방",
@@ -5984,8 +6203,6 @@ export const ko_KR: EnTranslations = {
       "level": "레벨 {level}",
       "landmarkCount": "랜드마크 {count}개",
       "filtersAria": "지도 레이어",
-      "railToggle": "사이드 패널",
-      "railToggleAria": "지도 사이드 패널 표시 또는 숨기기",
       "filters": {
         "quests": "퀘스트",
         "gather": "채집",
@@ -6033,7 +6250,9 @@ export const ko_KR: EnTranslations = {
         "herb": "약초",
         "mail": "우편",
         "passage": "통로"
-      }
+      },
+      "collapseHint": "Collapse map sidebar",
+      "expandHint": "Expand map sidebar"
     },
     "arenaGate": {
       "minLevelNote": "레벨 {level} 필요"
@@ -6268,7 +6487,9 @@ export const ko_KR: EnTranslations = {
       "listingStatusReturned": "반환됨",
       "listingStatusCancelled": "취소됨",
       "listingStatusSuspended": "정지됨",
-      "listingStatusUnsold": "유찰"
+      "listingStatusUnsold": "유찰",
+      "charselectWebLink": "$WOC 거래소 웹사이트에서 입찰, 구매 또는 판매하기",
+      "charselectWebNote": "입찰, 구매 또는 판매하려면 캐릭터로 게임에 입장하세요."
     },
     "lootExplorer": {
       "title": "전리품 탐색기",
@@ -7014,6 +7235,7 @@ export const ko_KR: EnTranslations = {
       "ifHudOpacity": "뒤편의 세계 위에서 HUD 패널이 얼마나 불투명한지 정합니다.",
       "ifTooltipScale": "툴팁 글자 크기입니다. 작은 화면이나 아주 큰 화면에서 요긴합니다.",
       "ifHighContrastText": "인터페이스 글자를 더 굵고 대비 높게 표시합니다. 무엇보다 접근성 옵션이며, 밝은 화면에서도 아주 요긴합니다.",
+      "ifColorblindMode": "Recolors the Nythraxis floor hazards (the Grave Eruption strike ring, the Grave Flame and Soulfire pools, the Gravefire line, and the Soul Rend marks) onto a colorblind-safe palette with distinct hues and brightness, so overlapping circles keep their edges. Sizes, timers, and positions never change.",
       "ifHighContrastBackground": "시작 화면과 캐릭터 화면 뒤에 더 단순하고 대비가 높은 배경을 씁니다.",
       "ifInvertLookY": "마우스 시점의 위아래 방향을 뒤집습니다.",
       "ifShowItemLevel": "모든 아이템 툴팁에 아이템 레벨 줄을 더합니다. 기본값은 꺼짐이며, 그러면 능력치만 보여 주는 클래식 툴팁이 유지됩니다.",
@@ -7033,7 +7255,9 @@ export const ko_KR: EnTranslations = {
       "ifPartyShowAuras": "파티 프레임에 강화 효과와 약화 효과를 표시할지 정합니다. 자원 막대, 보호막, 소환수, 그리고 내 파티 목록에 나 자신이 나타날지에 대해서도 같은 방식의 스위치가 마련되어 있습니다.",
       "ifAurasOnPlayerFrame": "내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.",
       "ifAuraBarBelowFrame": "강화 효과 줄을 유닛 프레임 위가 아니라 아래로 옮깁니다. 강화 효과가 플레이어 프레임에 표시되어 있을 때만 적용됩니다.",
+      "ifTargetAurasBelowFrame": "Hangs the target frame's buff and debuff strip below the frame instead of above it, the classic layout. Off by default, since the stock target frame sits directly above the action bar; turn it on once you have moved the frame somewhere with room beneath it.",
       "ifAlwaysShowAllBuffs": "낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.",
+      "ifShowAuraCaster": "모든 버프/디버프 툴팁에 \"시전자\" 줄을 추가하여 누가 걸었는지 표시합니다. 여러 성기사의 축복처럼 같은 버프를 건 사람을 구분할 때 유용합니다.",
       "ifTargetOfTarget": "내 대상이 누구를 노리고 있는지 보여 줍니다. 탱커가 아직 붙잡고 있는지 확인하는 클래식한 방법입니다.",
       "ifPetFrame": "소환수의 프레임을 표시합니다.",
       "ifChatFontScale": "채팅 글자 크기입니다.",
@@ -7112,6 +7336,7 @@ export const ko_KR: EnTranslations = {
       "framesGovernedAuraTracks": "\"프레임 편집\"은 같은 인터페이스 옵션의 전투 탭에서 켠 선택형 오라 트랙 여섯 개, 곧 \"내 버프\" 트랙, \"방어 재사용 대기시간\" 트랙, \"내 보호막\" 트랙, \"공격 재사용 대기시간\" 트랙, \"이동 및 은신\" 트랙, \"아군에게 건 내 버프\" 트랙도 함께 풀어 줍니다. 모든 트랙은 기본적으로 꺼져 있으며, 풀려 있는 동안에는 저마다 이름 칩을 달고 있습니다.",
       "frameGroups": "{trackers}는 퀘스트, 업적, 균열, 탐험, 채집 목표, 성유물 추적을 합칠 수 있습니다. {auras}는 대상 지속 피해와 여섯 오라 추적을 합칠 수 있습니다. 프레임 설정에서 각각 활성화하거나 꺼서 개별 이동하세요. {tot}에는 자원 막대가 있습니다. {focus}의 세 대상은 개별 이동하며 Shift+F1~F3으로 지정하고 Ctrl+F1~F3으로 선택합니다. 피해 및 위협 미터는 잠긴 상태에서도 버튼 이외의 영역을 끌어 이동하고 가장자리를 끌어 크기를 조절할 수 있습니다. 잠금 해제 시 프레임 표시 메뉴에서 그룹별로 표시를 바꾸고, 프레임을 우클릭해 크기를 초기화하거나 관련 설정을 열 수 있습니다. 인터페이스의 프레임 탭에는 공통 설정과 접을 수 있는 파티 설정도 있습니다. 대상의 대상을 대상에 고정하는 옵션을 끄면 따로 이동할 수 있고, 다시 켜도 개별 위치는 보관됩니다. 주시 대상을 지정하면 설정 버튼과 안내가 숨겨집니다. 우클릭하여 주시 해제를 선택하면 기본 상태로 돌아갑니다. 마우스오버 시전은 주시 프레임에서도 작동합니다.",
       "framesGovernedTalkingHead": "프레임 편집은 대화 패널도 해제합니다. 대화 패널은 말하는 NPC가 시야 밖에 있을 때 그 NPC의 대사를 담으며, 해제된 동안에는 자신의 이름 칩을 표시합니다.",
+      "framesGovernedUnitTooltip": "\"프레임 편집\"은 툴팁 프레임도 풀어 줍니다. 마우스를 올린 대상의 카드가 나타나는 자리로, 생물이면 레벨과 종류, 다른 플레이어면 칭호, 길드, 레벨과 직업, 그리고 전문화와 그 역할이 표시됩니다. 원하는 곳으로 끌어 놓으면 카드는 그 자리에서 가장 가까운 화면 가장자리를 피하는 방향으로 펼쳐집니다. \"프레임 설정\"의 \"프레임 표시 및 숨기기\"에서 툴팁 체크를 해제하면 이 카드를 완전히 숨길 수 있습니다.",
       "barsTitle": "바와 시간 표시, 전투 문자",
       "barsBody": "주문을 시전하거나 정신을 집중할 때마다 화면 한가운데, 행동 단축바 바로 위에 시전 바가 나타나 주문 이름과 남은 시간을 알려 줍니다. 대상도 자기 프레임에 시전 바를 가지므로, 무엇이 날아오는지 보고 답할 수 있습니다.\n\n시전 바 아래에는 가느다란 공격 속도 바가 있어 무기를 휘두르는 사이를 채웁니다. 근접이나 원거리 공격자는 다음 자동 공격이 언제 들어가는지 볼 수 있습니다.\n\n경험치 바는 행동 단축바 아래를 가로질러 화면 전체 폭으로 이어지며 눈금으로 나뉘어 있고, 밝게 표시된 구간이 쌓아 둔 휴식 경험치를 보여 줍니다.\n\n물속으로 헤엄쳐 들어가면 화면 위쪽에 파란 호흡 바가 나타납니다. 머리가 잠겨 있는 동안 줄어들고, 다 떨어져 익사가 시작되면 붉게 깜빡이며, 물 위로 올라오는 순간 빠르게 다시 찹니다. 스페이스로 위로 헤엄치고, 기본값이 Ctrl인 아래로 헤엄치기 키로 더 깊이 내려갑니다.\n\n피해와 치유는 맞은 대상 위로 작은 숫자가 되어 떠오르므로, 글을 읽지 않고도 전투를 읽어 낼 수 있습니다. 채팅창의 전투 탭에는 온전한 기록이 글로 남습니다.",
       "aurasTitle": "강화 효과와 약화 효과",
@@ -7985,8 +8210,8 @@ export const ko_KR: EnTranslations = {
       "warfareBodyStatsStay": "모든 워페어 장비에는 워페어 공격 등급과 워페어 방어 등급이 붙어 있는데, 이 두 등급은 몬스터에게는 아무런 효과가 없습니다. 오직 다른 플레이어와 싸울 때, 즉 결투와 투기장, 전장에서만 작동해 공격 등급은 주는 피해를 올리고 방어 등급은 받는 피해를 깎아 주며, 각각 자체 상한이 있습니다. 방어구 계열은 저마다 세트이기도 한데, 세트 효과 역시 워페어 등급이거나 플레이어에게만 통하는 효과입니다. 그러니 명예로 맞춘 한 벌의 세트 효과는 던전 우두머리 앞에서는 아무 값어치가 없습니다. 장비 자체는 여전히 보통의 능력치와 방어도, 무기 피해를 지니고 있고 그것들은 어디서나 통합니다. 몬스터 앞에서 잠잠해지는 것은 워페어 등급과 세트 효과입니다.",
       "warfareTradeBody": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 능력치를 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 모든 것은 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.",
       "warfareTradeBodyRatingSpent": "이는 의도된 맞바꿈입니다. 워페어 장비는 플레이어와 싸우기 위한 것이지, 던전 등급을 건너뛰는 지름길이 아닙니다. 같은 부위의 던전 영웅 장비가 지닌 전투 등급을 워페어 장비는 결코 갖지 못하며, 그 대신 지닌 워페어 등급과 세트 효과는 온전히 다른 플레이어를 상대로 쓰입니다. 투기장에서 제 몫을 하고 싶다면 사세요. 영웅 던전을 더 빨리 밀고 싶다면 던전에서 장비를 구하세요.",
-      "vanguardHeading": "선봉대 장비: 워페어 시즌 2",
-      "vanguardBody": "선봉대 장비는 워페어 장비의 두 번째 시즌으로, 같은 두 병참장교가 기존 장비 위에 진열해 판매하며 기존 장비도 계속 판매됩니다. 모든 전문화에는 머리, 어깨, 가슴, 다리, 손의 다섯 부위로 이루어진 전용 선봉대 세트가 있고, 상점에는 당신의 직업이 착용할 수 있는 세 세트와 다룰 수 있는 선봉대 무기만 표시됩니다. 선봉대 장비는 기존 장비와 같은 워페어 등급을 더 높은 아이템 레벨로 지니며, 각 세트에는 2부위와 4부위에서 발동하는 두 가지 보너스가 있어 전문화 능력 하나를 바꿉니다. 기존 세트와 달리 이 보너스는 몬스터를 상대할 때를 포함해 어디서나 작동하지만, 플레이어와의 전투를 위해 만들어졌기 때문에 공격대 안에서는 여전히 공격대 세트가 더 나은 선택입니다."
+      "vanguardHeading": "Vanguard gear: Warfare Season 2",
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
     },
     "worldPvpPage": {
       "heading": "월드 PvP",
@@ -8835,7 +9060,7 @@ export const ko_KR: EnTranslations = {
       "parryBody": "무기 막기는 전사만의 방어 수단입니다. 근접 일격을 통째로 흘려보내 피해를 전혀 받지 않는 확률이며, 힘과 함께 자랍니다. 정면에서 들어오는 공격만 막아 낼 수 있으니, 나를 때리는 대상을 계속 마주 보아야 할 이유가 하나 더 늘어납니다. 다른 직업의 캐릭터 정보에서는 이 항목이 0으로 남아 있습니다.",
       "warfareTitle": "워페어",
       "warfareBody": "워페어는 오직 다른 플레이어를 상대로만 셈해지는 유일한 능력치입니다. 그들에게 주는 피해를 올리고 그들에게서 받는 피해를 낮추며, 캐릭터 정보에는 두 값이 한 줄에 함께 표시됩니다. 생명체를 상대로는 아무 일도 하지 않습니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다.",
-      "warfareBodyPets": "워페어는 명예 장비가 플레이어와 싸우기 위해 지닌 능력치입니다. 플레이어끼리의 싸움에서 당신과 소환수가 다른 플레이어와 그 소환수에게 주는 피해를 올리고, 그들에게서 받는 피해를 낮춥니다. 또한 던전, 공격대, 탐굴, 균열을 제외한 모든 곳에서 최대 생명력을 높여 주므로, 명예 장비를 입은 플레이어는 입지 않은 플레이어보다 훨씬 쓰러뜨리기 어렵습니다. 캐릭터 정보에는 이 모두가 한 줄에 표시됩니다. 명예로 사는 워페어 장비에서 나오므로, 레벨을 올리는 동안 좇을 것이 아니라 PvP를 즐긴 대가로 주어지는 보상입니다."
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "모든 전투와 퀘스트, 북쪽으로 내딛는 한 걸음 한 걸음이 당신의 영웅을 강하게 만듭니다. 레벨업이 어떻게 돌아가는지, 그리고 정점에 이른 뒤에도 무엇이 당신을 계속 성장하게 하는지 정리했습니다.",
@@ -10889,6 +11114,16 @@ export const ko_KR: EnTranslations = {
       "xpGainRested": "경험치 {amount}을 획득했습니다 (휴식 보너스 {rested}).",
       "deathTitle": "사망했습니다.",
       "releaseSpirit": "영혼 풀어주기",
+      "deathRecap": "Recap",
+      "deathRecapTitle": "Death Recap",
+      "deathRecapKiller": "Killing blow: {killer} ({ability})",
+      "deathRecapNoKiller": "Combat events leading to death",
+      "deathRecapLethal": "Killing Blow",
+      "deathRecapClose": "Close",
+      "deathRecapNoEvents": "No combat events recorded.",
+      "deathRecapCrit": "Crit",
+      "deathRecapDamage": "Damage",
+      "deathRecapHeal": "Healing",
       "chatTab": "채팅",
       "combatLogTab": "전투 기록",
       "chatPlaceholder": "메시지 입력... (/w 이름 귓속말, /r 답장, /p 파티, /gu 길드, /o 장교, /general 일반, ! 커뮤니티 명령어)",
@@ -11100,6 +11335,7 @@ export const ko_KR: EnTranslations = {
       "compactChat": "간결한 채팅",
       "frostedPanels": "반투명 패널",
       "highContrastText": "고대비 문자",
+      "colorblindMode": "Colorblind Mode",
       "reduceMotion": "움직임 줄이기",
       "showFps": "FPS 표시",
       "invertLookY": "시점 반전 (Y)",
@@ -11161,6 +11397,19 @@ export const ko_KR: EnTranslations = {
       "threat": "위협",
       "damageShort": "피해",
       "healingShort": "치유",
+      "damageTaken": "Damage Taken",
+      "damageTakenShort": "Taken",
+      "avoidableDmg": "Avoidable Damage",
+      "avoidableDmgShort": "Avoid.",
+      "interrupts": "Interrupts",
+      "interruptsShort": "Int",
+      "dispels": "Dispels",
+      "dispelsShort": "Disp",
+      "deaths": "Deaths",
+      "deathsShort": "Dead",
+      "reset": "Reset meters",
+      "resetHint": "Reset combat data",
+      "groupTotal": "Total: {total} ({rate})",
       "current": "현재",
       "lastFight": "지난 전투",
       "fightIndex": "전투 -{index}",
@@ -11172,6 +11421,16 @@ export const ko_KR: EnTranslations = {
       "segmentSummary": "{label} - {duration}",
       "olderSegment": "이전 구간",
       "newerSegment": "다음 구간",
+      "selectSegment": "Select fight segment",
+      "selectMode": "Select meter mode",
+      "back": "Back",
+      "resetFight": "Reset current fight",
+      "resetAll": "Reset all data",
+      "criticals": "Criticals: {count}",
+      "hits": "Hits: {count}",
+      "topAbility": "Top: {name}",
+      "activity": "Activity: {pct}",
+      "newWindow": "New window",
       "close": "미터 닫기"
     },
     "chat": {
@@ -11654,6 +11913,9 @@ export const ko_KR: EnTranslations = {
       "anyTarget": "적 또는 아군 대상",
       "selfOnly": "자신에게만",
       "damageRange": "{min}에서 {max}",
+      "edictExplosion": "While Ascension is active, the explosion deals {damage} Physical damage within {radius} m, reduced beyond {cap} targets. This damage increases with Attack Power.",
+      "edictDamage": "Strike for {weaponPercent}% weapon damage plus {damage} Physical damage. Weapon damage includes Attack Power.",
+      "verdictDamage": "Final Edict detonates for {verdictSingleDamage} Holy damage. Dawnfall detonates for {verdictAreaDamage} Holy damage within {verdictAreaRadius} m, reduced beyond {verdictAreaCap} targets. Neither detonation scales with Spell Power. Only one enemy can bear your mark.",
       "finisherDamage": "기본 {base}, 연계 점수당 {perCombo}"
     },
     "resources": {
@@ -12365,9 +12627,12 @@ export const ko_KR: EnTranslations = {
       "reclaim": "회수",
       "buyAria": "{price}에 {item} 구매",
       "reclaimAria": "{item} 회수",
+      "buyQuantityAria": "{item} 몇 개를 구매할지 선택 (전체 {total}개 중)",
+      "buyQuantityBtnAria": "이만큼 {item} 구매",
       "buyConfirmTitle": "구매 확인",
       "buyConfirmBody": "{price}에 {item}을(를) 구매할까요?",
       "buyConfirmBodyStack": "{price}에 {item} x{count}(개당 {each})를 구매할까요?",
+      "buyConfirmBodyPartial": "{price}에 {item} {count}개(전체 {total}개 중, 개당 {each})를 구매할까요?",
       "buyConfirmAccept": "구매",
       "buyConfirmCancel": "취소",
       "buyChanged": "확인하기 전에 등록이 변경되었습니다. 가격을 확인한 후 다시 시도하세요.",
@@ -12396,9 +12661,45 @@ export const ko_KR: EnTranslations = {
       "collectEmpty": "기다리는 물건이 없습니다. 판매 대금과 만료된 등록품은 여기에서 받습니다.",
       "collectNote": "상인이 보관 중인 수익과 반환된 상품입니다.",
       "saleProceeds": "판매 대금",
+      "collectAll": "모두 수령",
+      "history": "내역",
+      "historyEmpty": "아직 판매 내역이 없습니다. 세계 시장에서 판매한 아이템이 여기에 표시됩니다.",
+      "historyNote": "세계 시장에서의 최근 판매 내역입니다.",
       "saleBuyer": "{buyer}에게 판매",
       "saleOlder": "이전 판매 {count}건이 더 있으며, 합계에 포함되어 있습니다.",
-      "collectAll": "모두 수령"
+      "ordersTab": "Wanted",
+      "ordersNote": "Post what you want and the gold is held at the Merchant. Listings at or under your price fill at once; the rest waits for a seller. The Merchant takes a {cut}% cut from whoever delivers. You have {used}/{max} orders open.",
+      "ordersListAria": "Open buy orders",
+      "ordersEmpty": "No open orders yet. Post one and gatherers will see what you need.",
+      "orderCardTitle": "Place an order",
+      "orderPickLabel": "Item wanted",
+      "orderPickEmpty": "Search for an item below, or pick one from the strip at the bottom.",
+      "orderSearchPlaceholder": "Search items...",
+      "orderSearchAria": "Search for an item to order",
+      "orderPickNone": "No item matches.",
+      "orderQuantity": "Units wanted",
+      "orderPriceEach": "Price each",
+      "orderEscrowLine": "Gold held at the Merchant: {total}",
+      "orderCannotAfford": "You cannot afford {total} for this order.",
+      "orderAtCap": "You have no free order slots. Withdraw one first.",
+      "orderPlaceButton": "Place Order",
+      "orderConfirmTitle": "Confirm Order",
+      "orderConfirmBody": "Order {item} x{count} at {each} each? {total} is held at the Merchant until the order is filled or withdrawn.",
+      "orderWanted": "x{count} wanted",
+      "orderBy": "Wanted by {buyer}",
+      "orderMine": "Your order",
+      "orderEach": "each",
+      "orderDeliver": "Deliver",
+      "orderDeliverAria": "Deliver {item} to {buyer}",
+      "orderDeliverNone": "None of this item in your bags.",
+      "orderWithdraw": "Withdraw",
+      "orderWithdrawAria": "Withdraw your order for {item}",
+      "orderDeliverConfirmTitle": "Confirm Delivery",
+      "orderDeliverConfirmBody": "Deliver {item} x{count} to {buyer} for {total} ({each} each)? You collect {proceeds} after the Merchant's cut.",
+      "unlistedTitle": "Not on the market",
+      "unlistedNote": "Materials with no listing at all. Post an order for one, or gather and list it.",
+      "unlistedNone": "Every material has at least one listing right now.",
+      "unlistedStageAria": "Order {item}"
     },
     "logs": {
       "listedItem": "{item}을(를) {money}에 세계 시장에 등록했습니다.",
@@ -12407,6 +12708,11 @@ export const ko_KR: EnTranslations = {
       "collectedMoney": "상인에게서 {money}을(를) 수령합니다.",
       "reclaimedItem": "시장에서 {item}을(를) 회수했습니다.",
       "expiredListing": "{item} 시장 등록이 만료되어 상인에게 보관되었습니다.",
+      "orderPlaced": "Placed an order for {item} x{count} at {each} each.",
+      "orderDelivered": "Delivered {item} x{count} to {buyer} for {money}. Collect {proceeds} from the Merchant.",
+      "orderReceived": "{seller} delivered {item} x{count} to your order. Collect it from the Merchant.",
+      "orderWithdrawn": "Withdrew your order for {item}; {money} returned.",
+      "orderExpired": "Your order for {item} expired; {money} waits at the Merchant.",
       "boughtBackItem": "{item}을(를) {money}에 되샀습니다."
     },
     "errors": {
@@ -12425,7 +12731,12 @@ export const ko_KR: EnTranslations = {
       "notYourListing": "당신의 등록이 아닙니다.",
       "nothingToCollect": "수령할 것이 없습니다.",
       "sweepNoListings": "이 아이템에 일괄 구매할 등록 물품이 없습니다.",
-      "sweepPriceChanged": "일괄 구매가 처리되기 전에 가격이 변경되었습니다. 견적을 확인하고 다시 시도하세요."
+      "sweepPriceChanged": "일괄 구매가 처리되기 전에 가격이 변경되었습니다. 견적을 확인하고 다시 시도하세요.",
+      "orderCountNeeded": "Name how many you want.",
+      "tooManyOrders": "You may keep at most {count} orders open at once.",
+      "orderClosed": "That order is no longer open.",
+      "orderOwn": "That is your own order. Cancel it to withdraw it.",
+      "orderNotYours": "That is not your order."
     },
     "loot": {
       "takeAll": "모두 가져가기",
@@ -13158,16 +13469,16 @@ export const ko_KR: EnTranslations = {
         "description": "지속 효과: 비전 화살과 하늘가지가 천둥을 최대 5까지 부여합니다. 천둥이 5일 때 대지 충격은 125%, 단층각성은 100%의 추가 피해를 주고 모든 천둥을 소모합니다. (천둥소환)"
       },
       "lightning_overload": {
-        "name": "전격 과부하",
-        "description": "지속 효과: 전격 화살과 갈래 번개가 20% 확률로 과부하되어 첫 번째 대상에게 입힌 피해의 50%로 다시 공격하고 천둥을 1 부여합니다. (천둥소환)"
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
       },
       "lava_burst": {
-        "name": "용암 폭발",
-        "description": "{damage}의 화염 피해를 입힙니다. 당신의 잉걸 충격으로 불타는 대상에게는 항상 치명타가 적중합니다. 용암 쇄도: 잉걸 충격의 지속 피해가 들어갈 때마다 20% 확률로 이 재사용 대기시간이 초기화되고 10초 안에 사용하는 다음 용암 폭발이 즉시 시전됩니다. 피해는 주문력에 따라 증가합니다. (천둥소환)"
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
       },
       "thunderstorm": {
-        "name": "폭풍 파쇄",
-        "description": "벼락을 내려 10미터 내의 적에게 {damage}의 자연 피해를 입히고 5초 동안 이동 속도를 50% 감소시킵니다. 최대 마나의 8%를 회복합니다. 피해는 주문력에 따라 증가합니다. (천둥소환)"
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
       },
       "rockbiter_weapon": {
         "name": "바위결속 무기",
@@ -17068,421 +17379,421 @@ export const ko_KR: EnTranslations = {
         "name": "폭풍찬가 사슬 장화"
       },
       "vanguard_warrior_arms_helmet": {
-        "name": "칼날자국 대투구"
+        "name": "Bladewake Greathelm"
       },
       "vanguard_warrior_arms_shoulder": {
-        "name": "칼날자국 견갑"
+        "name": "Bladewake Pauldrons"
       },
       "vanguard_warrior_arms_chest": {
-        "name": "칼날자국 사슬 갑주"
+        "name": "Bladewake Hauberk"
       },
       "vanguard_warrior_arms_legs": {
-        "name": "칼날자국 판금 다리갑옷"
+        "name": "Bladewake Legplates"
       },
       "vanguard_warrior_arms_gloves": {
-        "name": "칼날자국 분쇄 건틀릿"
+        "name": "Bladewake Crushers"
       },
       "vanguard_warrior_fury_helmet": {
-        "name": "피의 행군 면갑"
+        "name": "Bloodmarch Visage"
       },
       "vanguard_warrior_fury_shoulder": {
-        "name": "피의 행군 어깨보호대"
+        "name": "Bloodmarch Shoulderguards"
       },
       "vanguard_warrior_fury_chest": {
-        "name": "피의 행군 사슬갑옷"
+        "name": "Bloodmarch Chainmail"
       },
       "vanguard_warrior_fury_legs": {
-        "name": "피의 행군 레깅스"
+        "name": "Bloodmarch Leggings"
       },
       "vanguard_warrior_fury_gloves": {
-        "name": "피의 행군 그립"
+        "name": "Bloodmarch Grips"
       },
       "vanguard_warrior_prot_helmet": {
-        "name": "강철 행군 투구"
+        "name": "Ironmarch Helm"
       },
       "vanguard_warrior_prot_shoulder": {
-        "name": "강철 행군 어깨갑옷"
+        "name": "Ironmarch Spaulders"
       },
       "vanguard_warrior_prot_chest": {
-        "name": "강철 행군 가슴보호대"
+        "name": "Ironmarch Chestguard"
       },
       "vanguard_warrior_prot_legs": {
-        "name": "강철 행군 다리보호구"
+        "name": "Ironmarch Legguards"
       },
       "vanguard_warrior_prot_gloves": {
-        "name": "강철 행군 손보호대"
+        "name": "Ironmarch Handguards"
       },
       "vanguard_paladin_holy_helmet": {
-        "name": "태양 파수 머리띠"
+        "name": "Sunvigil Circlet"
       },
       "vanguard_paladin_holy_shoulder": {
-        "name": "태양 파수 망토"
+        "name": "Sunvigil Mantle"
       },
       "vanguard_paladin_holy_chest": {
-        "name": "태양 파수 사슬 갑주"
+        "name": "Sunvigil Hauberk"
       },
       "vanguard_paladin_holy_legs": {
-        "name": "태양 파수 사슬 다리갑옷"
+        "name": "Sunvigil Legmail"
       },
       "vanguard_paladin_holy_gloves": {
-        "name": "태양 파수 장갑"
+        "name": "Sunvigil Gloves"
       },
       "vanguard_paladin_protection_helmet": {
-        "name": "방패 서약 투구"
+        "name": "Shieldvow Helm"
       },
       "vanguard_paladin_protection_shoulder": {
-        "name": "방패 서약 견갑"
+        "name": "Shieldvow Pauldrons"
       },
       "vanguard_paladin_protection_chest": {
-        "name": "방패 서약 흉갑"
+        "name": "Shieldvow Breastplate"
       },
       "vanguard_paladin_protection_legs": {
-        "name": "방패 서약 판금 다리갑옷"
+        "name": "Shieldvow Legplates"
       },
       "vanguard_paladin_protection_gloves": {
-        "name": "방패 서약 건틀릿"
+        "name": "Shieldvow Gauntlets"
       },
       "vanguard_paladin_retribution_helmet": {
-        "name": "빛의 낙인 왕관"
+        "name": "Lightbrand Crown"
       },
       "vanguard_paladin_retribution_shoulder": {
-        "name": "빛의 낙인 어깨갑옷"
+        "name": "Lightbrand Spaulders"
       },
       "vanguard_paladin_retribution_chest": {
-        "name": "빛의 낙인 몸통갑옷"
+        "name": "Lightbrand Cuirass"
       },
       "vanguard_paladin_retribution_legs": {
-        "name": "빛의 낙인 다리보호구"
+        "name": "Lightbrand Legguards"
       },
       "vanguard_paladin_retribution_gloves": {
-        "name": "빛의 낙인 건틀릿"
+        "name": "Lightbrand Gauntlets"
       },
       "vanguard_hunter_beast_mastery_helmet": {
-        "name": "무리 수호자 두건"
+        "name": "Packwarden Coif"
       },
       "vanguard_hunter_beast_mastery_shoulder": {
-        "name": "무리 수호자 어깨갑옷"
+        "name": "Packwarden Spaulders"
       },
       "vanguard_hunter_beast_mastery_chest": {
-        "name": "무리 수호자 가죽 조끼"
+        "name": "Packwarden Jerkin"
       },
       "vanguard_hunter_beast_mastery_legs": {
-        "name": "무리 수호자 다리보호구"
+        "name": "Packwarden Legguards"
       },
       "vanguard_hunter_beast_mastery_gloves": {
-        "name": "무리 수호자 건틀릿"
+        "name": "Packwarden Gauntlets"
       },
       "vanguard_hunter_marksmanship_helmet": {
-        "name": "천리안 두건"
+        "name": "Farsight Coif"
       },
       "vanguard_hunter_marksmanship_shoulder": {
-        "name": "천리안 어깨갑옷"
+        "name": "Farsight Spaulders"
       },
       "vanguard_hunter_marksmanship_chest": {
-        "name": "천리안 가죽 조끼"
+        "name": "Farsight Jerkin"
       },
       "vanguard_hunter_marksmanship_legs": {
-        "name": "천리안 다리보호구"
+        "name": "Farsight Legguards"
       },
       "vanguard_hunter_marksmanship_gloves": {
-        "name": "천리안 건틀릿"
+        "name": "Farsight Gauntlets"
       },
       "vanguard_hunter_survival_helmet": {
-        "name": "올가미 송곳니 두건"
+        "name": "Snaretooth Coif"
       },
       "vanguard_hunter_survival_shoulder": {
-        "name": "올가미 송곳니 어깨갑옷"
+        "name": "Snaretooth Spaulders"
       },
       "vanguard_hunter_survival_chest": {
-        "name": "올가미 송곳니 가죽 조끼"
+        "name": "Snaretooth Jerkin"
       },
       "vanguard_hunter_survival_legs": {
-        "name": "올가미 송곳니 다리보호구"
+        "name": "Snaretooth Legguards"
       },
       "vanguard_hunter_survival_gloves": {
-        "name": "올가미 송곳니 건틀릿"
+        "name": "Snaretooth Gauntlets"
       },
       "vanguard_rogue_assassination_helmet": {
-        "name": "밤의 칼날 후드"
+        "name": "Nightcut Hood"
       },
       "vanguard_rogue_assassination_shoulder": {
-        "name": "밤의 칼날 어깨덧대"
+        "name": "Nightcut Shoulderpads"
       },
       "vanguard_rogue_assassination_chest": {
-        "name": "밤의 칼날 튜닉"
+        "name": "Nightcut Tunic"
       },
       "vanguard_rogue_assassination_legs": {
-        "name": "밤의 칼날 반바지"
+        "name": "Nightcut Breeches"
       },
       "vanguard_rogue_assassination_gloves": {
-        "name": "밤의 칼날 장갑"
+        "name": "Nightcut Gloves"
       },
       "vanguard_rogue_combat_helmet": {
-        "name": "난투의 표식 후드"
+        "name": "Brawlmark Hood"
       },
       "vanguard_rogue_combat_shoulder": {
-        "name": "난투의 표식 어깨덧대"
+        "name": "Brawlmark Shoulderpads"
       },
       "vanguard_rogue_combat_chest": {
-        "name": "난투의 표식 튜닉"
+        "name": "Brawlmark Tunic"
       },
       "vanguard_rogue_combat_legs": {
-        "name": "난투의 표식 반바지"
+        "name": "Brawlmark Breeches"
       },
       "vanguard_rogue_combat_gloves": {
-        "name": "난투의 표식 장갑"
+        "name": "Brawlmark Gloves"
       },
       "vanguard_rogue_subtlety_helmet": {
-        "name": "그늘걸음 후드"
+        "name": "Shadewalk Hood"
       },
       "vanguard_rogue_subtlety_shoulder": {
-        "name": "그늘걸음 어깨덧대"
+        "name": "Shadewalk Shoulderpads"
       },
       "vanguard_rogue_subtlety_chest": {
-        "name": "그늘걸음 튜닉"
+        "name": "Shadewalk Tunic"
       },
       "vanguard_rogue_subtlety_legs": {
-        "name": "그늘걸음 반바지"
+        "name": "Shadewalk Breeches"
       },
       "vanguard_rogue_subtlety_gloves": {
-        "name": "그늘걸음 장갑"
+        "name": "Shadewalk Gloves"
       },
       "vanguard_priest_discipline_helmet": {
-        "name": "장막 성가 고깔"
+        "name": "Veilpsalm Cowl"
       },
       "vanguard_priest_discipline_shoulder": {
-        "name": "장막 성가 망토"
+        "name": "Veilpsalm Mantle"
       },
       "vanguard_priest_discipline_chest": {
-        "name": "장막 성가 로브"
+        "name": "Veilpsalm Robe"
       },
       "vanguard_priest_discipline_legs": {
-        "name": "장막 성가 레깅스"
+        "name": "Veilpsalm Leggings"
       },
       "vanguard_priest_discipline_gloves": {
-        "name": "장막 성가 손싸개"
+        "name": "Veilpsalm Handwraps"
       },
       "vanguard_priest_holy_helmet": {
-        "name": "은총의 날개 고깔"
+        "name": "Gracewing Cowl"
       },
       "vanguard_priest_holy_shoulder": {
-        "name": "은총의 날개 망토"
+        "name": "Gracewing Mantle"
       },
       "vanguard_priest_holy_chest": {
-        "name": "은총의 날개 로브"
+        "name": "Gracewing Robe"
       },
       "vanguard_priest_holy_legs": {
-        "name": "은총의 날개 레깅스"
+        "name": "Gracewing Leggings"
       },
       "vanguard_priest_holy_gloves": {
-        "name": "은총의 날개 손싸개"
+        "name": "Gracewing Handwraps"
       },
       "vanguard_priest_shadow_helmet": {
-        "name": "황혼 찬가 고깔"
+        "name": "Duskhymn Cowl"
       },
       "vanguard_priest_shadow_shoulder": {
-        "name": "황혼 찬가 망토"
+        "name": "Duskhymn Mantle"
       },
       "vanguard_priest_shadow_chest": {
-        "name": "황혼 찬가 로브"
+        "name": "Duskhymn Robe"
       },
       "vanguard_priest_shadow_legs": {
-        "name": "황혼 찬가 레깅스"
+        "name": "Duskhymn Leggings"
       },
       "vanguard_priest_shadow_gloves": {
-        "name": "황혼 찬가 손싸개"
+        "name": "Duskhymn Handwraps"
       },
       "vanguard_shaman_elemental_helmet": {
-        "name": "폭풍 율법 두건"
+        "name": "Tempestwrit Coif"
       },
       "vanguard_shaman_elemental_shoulder": {
-        "name": "폭풍 율법 견갑"
+        "name": "Tempestwrit Pauldrons"
       },
       "vanguard_shaman_elemental_chest": {
-        "name": "폭풍 율법 사슬 갑주"
+        "name": "Tempestwrit Hauberk"
       },
       "vanguard_shaman_elemental_legs": {
-        "name": "폭풍 율법 사슬 다리갑옷"
+        "name": "Tempestwrit Legmail"
       },
       "vanguard_shaman_elemental_gloves": {
-        "name": "폭풍 율법 건틀릿"
+        "name": "Tempestwrit Gauntlets"
       },
       "vanguard_shaman_enhancement_helmet": {
-        "name": "돌풍태생 투구"
+        "name": "Galeborn Helm"
       },
       "vanguard_shaman_enhancement_shoulder": {
-        "name": "돌풍태생 어깨갑옷"
+        "name": "Galeborn Spaulders"
       },
       "vanguard_shaman_enhancement_chest": {
-        "name": "돌풍태생 사슬갑옷"
+        "name": "Galeborn Chainmail"
       },
       "vanguard_shaman_enhancement_legs": {
-        "name": "돌풍태생 다리보호구"
+        "name": "Galeborn Legguards"
       },
       "vanguard_shaman_enhancement_gloves": {
-        "name": "돌풍태생 그립"
+        "name": "Galeborn Grips"
       },
       "vanguard_shaman_restoration_helmet": {
-        "name": "바닷물 수호 머리띠"
+        "name": "Brineward Circlet"
       },
       "vanguard_shaman_restoration_shoulder": {
-        "name": "바닷물 수호 망토"
+        "name": "Brineward Mantle"
       },
       "vanguard_shaman_restoration_chest": {
-        "name": "바닷물 수호 사슬 갑주"
+        "name": "Brineward Hauberk"
       },
       "vanguard_shaman_restoration_legs": {
-        "name": "바닷물 수호 킬트"
+        "name": "Brineward Kilt"
       },
       "vanguard_shaman_restoration_gloves": {
-        "name": "바닷물 수호 손싸개"
+        "name": "Brineward Handwraps"
       },
       "vanguard_mage_arcane_helmet": {
-        "name": "시간결속자의 후드"
+        "name": "Hourbinder's Hood"
       },
       "vanguard_mage_arcane_shoulder": {
-        "name": "시간결속자의 어깨망토"
+        "name": "Hourbinder's Amice"
       },
       "vanguard_mage_arcane_chest": {
-        "name": "시간결속자의 로브"
+        "name": "Hourbinder's Robe"
       },
       "vanguard_mage_arcane_legs": {
-        "name": "시간결속자의 바지"
+        "name": "Hourbinder's Trousers"
       },
       "vanguard_mage_arcane_gloves": {
-        "name": "시간결속자의 장갑"
+        "name": "Hourbinder's Gloves"
       },
       "vanguard_mage_fire_helmet": {
-        "name": "잿불 채찍 고깔"
+        "name": "Emberlash Cowl"
       },
       "vanguard_mage_fire_shoulder": {
-        "name": "잿불 채찍 망토"
+        "name": "Emberlash Mantle"
       },
       "vanguard_mage_fire_chest": {
-        "name": "잿불 채찍 법복"
+        "name": "Emberlash Robes"
       },
       "vanguard_mage_fire_legs": {
-        "name": "잿불 채찍 레깅스"
+        "name": "Emberlash Leggings"
       },
       "vanguard_mage_fire_gloves": {
-        "name": "잿불 채찍 장갑"
+        "name": "Emberlash Gloves"
       },
       "vanguard_mage_frost_helmet": {
-        "name": "서리 파수꾼 후드"
+        "name": "Rimewarden Hood"
       },
       "vanguard_mage_frost_shoulder": {
-        "name": "서리 파수꾼 어깨덧대"
+        "name": "Rimewarden Shoulderpads"
       },
       "vanguard_mage_frost_chest": {
-        "name": "서리 파수꾼 제의"
+        "name": "Rimewarden Vestment"
       },
       "vanguard_mage_frost_legs": {
-        "name": "서리 파수꾼 다리싸개"
+        "name": "Rimewarden Legwraps"
       },
       "vanguard_mage_frost_gloves": {
-        "name": "서리 파수꾼 벙어리장갑"
+        "name": "Rimewarden Mitts"
       },
       "vanguard_warlock_affliction_helmet": {
-        "name": "공포의 깃펜 후드"
+        "name": "Dreadquill Hood"
       },
       "vanguard_warlock_affliction_shoulder": {
-        "name": "공포의 깃펜 망토"
+        "name": "Dreadquill Mantle"
       },
       "vanguard_warlock_affliction_chest": {
-        "name": "공포의 깃펜 로브"
+        "name": "Dreadquill Robe"
       },
       "vanguard_warlock_affliction_legs": {
-        "name": "공포의 깃펜 레깅스"
+        "name": "Dreadquill Leggings"
       },
       "vanguard_warlock_affliction_gloves": {
-        "name": "공포의 깃펜 손싸개"
+        "name": "Dreadquill Handwraps"
       },
       "vanguard_warlock_demonology_helmet": {
-        "name": "골수 결속 고깔"
+        "name": "Marrowbound Cowl"
       },
       "vanguard_warlock_demonology_shoulder": {
-        "name": "골수 결속 어깨갑옷"
+        "name": "Marrowbound Spaulders"
       },
       "vanguard_warlock_demonology_chest": {
-        "name": "골수 결속 로브"
+        "name": "Marrowbound Robe"
       },
       "vanguard_warlock_demonology_legs": {
-        "name": "골수 결속 레깅스"
+        "name": "Marrowbound Leggings"
       },
       "vanguard_warlock_demonology_gloves": {
-        "name": "골수 결속 그립"
+        "name": "Marrowbound Grips"
       },
       "vanguard_warlock_destruction_helmet": {
-        "name": "광재 왕관 후드"
+        "name": "Slagcrown Hood"
       },
       "vanguard_warlock_destruction_shoulder": {
-        "name": "광재 왕관 망토"
+        "name": "Slagcrown Mantle"
       },
       "vanguard_warlock_destruction_chest": {
-        "name": "광재 왕관 법복"
+        "name": "Slagcrown Robes"
       },
       "vanguard_warlock_destruction_legs": {
-        "name": "광재 왕관 레깅스"
+        "name": "Slagcrown Leggings"
       },
       "vanguard_warlock_destruction_gloves": {
-        "name": "광재 왕관 장갑"
+        "name": "Slagcrown Gloves"
       },
       "vanguard_druid_balance_helmet": {
-        "name": "별 파수꾼 머리장식"
+        "name": "Starwarden Headdress"
       },
       "vanguard_druid_balance_shoulder": {
-        "name": "별 파수꾼 어깨갑옷"
+        "name": "Starwarden Spaulders"
       },
       "vanguard_druid_balance_chest": {
-        "name": "별 파수꾼 조끼"
+        "name": "Starwarden Vest"
       },
       "vanguard_druid_balance_legs": {
-        "name": "별 파수꾼 반바지"
+        "name": "Starwarden Breeches"
       },
       "vanguard_druid_balance_gloves": {
-        "name": "별 파수꾼 장갑"
+        "name": "Starwarden Gloves"
       },
       "vanguard_druid_feral_helmet": {
-        "name": "피갈기 투구"
+        "name": "Bloodmane Helm"
       },
       "vanguard_druid_feral_shoulder": {
-        "name": "피갈기 어깨덧대"
+        "name": "Bloodmane Shoulderpads"
       },
       "vanguard_druid_feral_chest": {
-        "name": "피갈기 튜닉"
+        "name": "Bloodmane Tunic"
       },
       "vanguard_druid_feral_legs": {
-        "name": "피갈기 다리보호구"
+        "name": "Bloodmane Legguards"
       },
       "vanguard_druid_feral_gloves": {
-        "name": "피갈기 그립"
+        "name": "Bloodmane Grips"
       },
       "vanguard_druid_restoration_helmet": {
-        "name": "엉겅퀴꽃 왕관"
+        "name": "Thistlebloom Crown"
       },
       "vanguard_druid_restoration_shoulder": {
-        "name": "엉겅퀴꽃 망토"
+        "name": "Thistlebloom Mantle"
       },
       "vanguard_druid_restoration_chest": {
-        "name": "엉겅퀴꽃 조끼"
+        "name": "Thistlebloom Vest"
       },
       "vanguard_druid_restoration_legs": {
-        "name": "엉겅퀴꽃 레깅스"
+        "name": "Thistlebloom Leggings"
       },
       "vanguard_druid_restoration_gloves": {
-        "name": "엉겅퀴꽃 장갑"
+        "name": "Thistlebloom Gloves"
       },
       "vanguard_verdict_greatsword": {
-        "name": "선봉대의 심판"
+        "name": "Vanguard's Verdict"
       },
       "vanguard_oath_blade": {
-        "name": "선봉대의 맹세"
+        "name": "Vanguard's Oath"
       },
       "vanguard_fang_dagger": {
-        "name": "선봉대의 송곳니"
+        "name": "Vanguard's Fang"
       },
       "vanguard_warstaff": {
-        "name": "선봉대의 전투 지팡이"
+        "name": "Vanguard's Warstaff"
       },
       "conjured_water4": {
         "name": "창조된 샘물"
@@ -22931,8 +23242,8 @@ export const ko_KR: EnTranslations = {
       },
       "benison_dawnweave": {
         "name": "축복의 새벽직조 예복",
-        "bonus2": "치천사의 수호의 구원 치유량이 180에서 270으로 증가합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
-        "bonus4": "치천사의 수호가 발동하면 보호받은 아군이 10초에 걸쳐 최대 생명력의 15%만큼 추가로 치유됩니다."
+        "bonus2": "속삭이는 기도, 엄숙한 기도 또는 긴급한 기도로 생명력을 회복하면 다음 합창 치유의 치유량이 10% 증가하며 최대 3회 중첩됩니다. 시전 한 번당 최대 한 중첩만 얻습니다. 합창 치유는 시전 완료 시 모든 중첩을 소모합니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "3중첩으로 합창 치유 시전을 완료하면 60초 안에 사용하는 다음 속삭이는 기도가 즉시 시전되고 치유량이 100% 증가합니다. 이 효과는 중첩되지 않으며 다시 얻으면 지속시간이 갱신됩니다."
       },
       "boundstone_vanguard": {
         "name": "속박석 선봉대",
@@ -23140,147 +23451,147 @@ export const ko_KR: EnTranslations = {
       },
       "stormkindled": {
         "name": "폭풍점화 예장",
-        "bonus2": "전격 과부하의 발동 확률이 30%가 됩니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
-        "bonus4": "대지의 충격의 천둥당 보너스가 30%로 증가하고, 용암 폭발의 피해가 20% 증가합니다."
+        "bonus2": "화염낙인 상태에서 무기 해방 사용 시 천둥을 3 얻습니다. 피해를 입어도 주문 시전이 더 이상 지연되지 않습니다.",
+        "bonus4": "대지의 충격의 천둥당 보너스가 30%로 증가합니다."
       },
       "vale_arcanist": {
         "name": "계곡 비전술사의 예복",
         "bonus3": "공격 속도와 시전 속도가 15% 증가합니다."
       },
       "vanguard_druid_balance": {
-        "name": "별 파수꾼 의복",
-        "bonus2": "옥죄는 뿌리의 시전 시간이 0.5초 감소합니다.",
-        "bonus4": "옥죄는 뿌리를 시전하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
+        "name": "별수호자 예복",
+        "bonus2": "옭아매는 뿌리의 시전 시간이 0.5초 감소합니다.",
+        "bonus4": "옭아매는 뿌리를 시전하면 이동 중에도 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다."
       },
       "vanguard_druid_feral": {
         "name": "피갈기 가죽",
-        "bonus2": "큰곰 돌진의 재사용 대기시간이 3초 감소합니다.",
-        "bonus4": "큰곰 돌진이 최대 생명력의 6%만큼 보호막을 6초 동안 씌워 줍니다."
+        "bonus2": "2세트: Bruin Rush의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Bruin Rush가 최대 생명력 6%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_druid_restoration": {
-        "name": "엉겅퀴꽃 제의",
-        "bonus2": "신속한 치유의 재사용 대기시간이 1초 감소합니다.",
-        "bonus4": "신속한 치유가 이동 속도도 3초 동안 30% 증가시킵니다."
+        "name": "엉겅꽃 의복",
+        "bonus2": "2세트: Fleetmend의 재사용 대기시간이 1초 감소합니다.",
+        "bonus4": "4세트: Fleetmend가 이동 속도를 3초 동안 30% 증가시킵니다."
       },
       "vanguard_hunter_beast_mastery": {
-        "name": "무리 수호자 사냥 장비",
-        "bonus2": "뒤흔드는 사격의 재사용 대기시간이 4초 감소합니다.",
-        "bonus4": "뒤흔드는 사격이 야수의 격노의 남은 재사용 대기시간을 1초 감소시킵니다."
+        "name": "선봉대: Packwarden Harness",
+        "bonus2": "2세트: Rattling Shot의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "4세트: Rattling Shot이 Howling Rage의 남은 재사용 대기시간을 1초 줄입니다."
       },
       "vanguard_hunter_marksmanship": {
-        "name": "천리안 사냥 장비",
-        "bonus2": "흔적 끊기의 재사용 대기시간이 4초 감소합니다.",
-        "bonus4": "흔적 끊기 후 6초 안에 사용하는 다음 긴 시위가 즉시 시전됩니다. 15초에 한 번만 발동합니다."
+        "name": "선봉대: Farsight Harness",
+        "bonus2": "2세트: Trailbreak의 재사용 대기시간이 4초 감소합니다.",
+        "bonus4": "4세트: Trailbreak가 6초 안의 다음 Long Draw를 즉시 시전하게 합니다. 15초에 한 번만 발동합니다."
       },
       "vanguard_hunter_survival": {
-        "name": "올가미 송곳니 사냥 장비",
-        "bonus2": "피갈고리의 재사용 대기시간이 3초 감소합니다.",
-        "bonus4": "피갈고리가 사냥의 기세를 1 부여합니다."
+        "name": "선봉대: Snaretooth Harness",
+        "bonus2": "2세트: Bloodhook의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Bloodhook이 Hunting Momentum 1을 부여합니다."
       },
       "vanguard_mage_arcane": {
-        "name": "시간결속자의 성의",
-        "bonus2": "시간의 방벽의 재사용 대기시간이 2초 감소합니다.",
-        "bonus4": "시간의 방벽이 보호받는 대상의 이동 속도도 3초 동안 20% 증가시킵니다."
+        "name": "선봉대: Hourbinder Vestments",
+        "bonus2": "2세트: Temporal Barrier의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "4세트: Temporal Barrier가 보호한 대상의 이동 속도를 3초 동안 20% 증가시킵니다."
       },
       "vanguard_mage_fire": {
-        "name": "잿불 채찍 예복",
-        "bonus2": "잉걸 작렬의 충전이 3초 더 빨리 회복됩니다.",
-        "bonus4": "잉걸 작렬을 시전하면 이글거리는 방벽의 남은 재사용 대기시간이 2초 감소합니다."
+        "name": "선봉대: Emberlash Regalia",
+        "bonus2": "2세트: Cinderfall이 3초 더 빠르게 충전됩니다.",
+        "bonus4": "4세트: Cinderfall 시전 시 Blazing Barrier의 남은 재사용 대기시간이 2초 감소합니다."
       },
       "vanguard_mage_frost": {
-        "name": "서리 파수꾼 차림",
-        "bonus2": "얼음 속박의 재사용 대기시간이 2초 감소합니다.",
-        "bonus4": "얼음 속박을 시전하면 날쌘걸음의 남은 재사용 대기시간이 5초 감소합니다."
+        "name": "선봉대: Rimewarden Garb",
+        "bonus2": "2세트: Icebind의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "4세트: Icebind 시전 시 Flitstep의 남은 재사용 대기시간이 5초 감소합니다."
       },
       "vanguard_paladin_holy": {
-        "name": "태양 파수 예복",
-        "bonus2": "생명의 서약의 재사용 대기시간이 30초 감소합니다.",
-        "bonus4": "생명의 서약이 아군에게 그 대상 최대 생명력의 8%만큼 보호막도 6초 동안 씌웁니다."
+        "name": "선봉대: Sunvigil Regalia",
+        "bonus2": "2세트: Life Covenant의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "4세트: Life Covenant가 대상에게 최대 생명력 8%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_paladin_protection": {
-        "name": "방패 서약 요새",
-        "bonus2": "맹세의 사슬의 재사용 대기시간이 2초 감소합니다.",
-        "bonus4": "맹세의 사슬에 끌려온 적은 4초 동안 주문 시전이 30% 느려지며, 맹세의 사슬이 끌어올 수 있는 적을 속박하면 태양의 응보를 얻습니다."
+        "name": "선봉대: Shieldvow Bastion",
+        "bonus2": "2세트: Oath Chain의 재사용 대기시간이 2초 감소합니다.",
+        "bonus4": "4세트: Oath Chain에 끌린 적의 주문 시전이 4초 동안 30% 느려지고 Solar Reprisal을 얻을 수 있습니다."
       },
       "vanguard_paladin_retribution": {
-        "name": "빛의 낙인 전투 판금",
-        "bonus2": "발키리의 부름의 재사용 대기시간이 15초 감소합니다.",
-        "bonus4": "발키리의 부름이 최후의 칙령의 재사용 대기시간을 초기화하며, 착지 후 6초 안에 사용하는 다음 최후의 칙령은 15% 더 많은 피해를 줍니다."
+        "name": "선봉대: Lightbrand Warplate",
+        "bonus2": "2세트: Valkyr Calling의 재사용 대기시간이 15초 감소합니다.",
+        "bonus4": "4세트: Valkyr Calling이 Final Edict을 초기화하고 착지 후 6초 안의 다음 Final Edict 피해를 15% 높입니다."
       },
       "vanguard_priest_discipline": {
-        "name": "장막 성가 의복",
-        "bonus2": "정신의 절규의 재사용 대기시간이 3초 감소합니다.",
-        "bonus4": "수호의 성가가 완전히 소모되면 보호받던 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다."
+        "name": "선봉대: Veilpsalm Raiment",
+        "bonus2": "2세트: Terror Canticle의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Psalm of Warding이 완전히 소모되면 보호막을 받은 아군의 이동 속도가 3초 동안 20% 증가합니다. 8초에 한 번만 발동합니다."
       },
       "vanguard_priest_holy": {
-        "name": "은총의 날개 의복",
-        "bonus2": "장막걸음의 재사용 대기시간이 6초 감소합니다.",
-        "bonus4": "장막걸음이 최대 생명력의 8%만큼 보호막도 6초 동안 씌워 줍니다."
+        "name": "선봉대: Gracewing Raiment",
+        "bonus2": "2세트: Veilstep의 재사용 대기시간이 6초 감소합니다.",
+        "bonus4": "4세트: Veilstep이 최대 생명력 8%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_priest_shadow": {
-        "name": "황혼 찬가 예복",
-        "bonus2": "비탄의 연도를 정신 집중하는 동안 대상의 이동 속도도 30% 감소시킵니다.",
-        "bonus4": "십일조 악마 소환이 최대 생명력의 10%만큼 보호막도 8초 동안 씌워 줍니다."
+        "name": "선봉대: Duskhymn Regalia",
+        "bonus2": "2세트: Litany of Woe를 정신 집중하는 동안 대상의 이동 속도도 30% 감소합니다.",
+        "bonus4": "4세트: Call Tithefiend가 최대 생명력 10%의 보호막을 8초 동안 부여합니다."
       },
       "vanguard_rogue_assassination": {
-        "name": "밤의 칼날 가죽 갑옷",
-        "bonus2": "반칙 가격의 에너지 소모량이 10 감소합니다.",
-        "bonus4": "반칙 가격이 6초 안에 가하는 다음 공격도 반드시 치명타가 되게 합니다."
+        "name": "선봉대: Nightcut Leathers",
+        "bonus2": "2세트: Low Blow의 에너지 비용이 10 감소합니다.",
+        "bonus4": "4세트: Low Blow가 6초 안의 다음 공격을 치명타로 만듭니다."
       },
       "vanguard_rogue_combat": {
-        "name": "난투의 표식 가죽 갑옷",
-        "bonus2": "날쌘 발의 재사용 대기시간이 60초 감소합니다.",
-        "bonus4": "날쌘 발이 활성화된 동안 사악한 베기와 헤이메이커가 연계 점수를 1 추가로 줍니다."
+        "name": "선봉대: Brawlmark Leathers",
+        "bonus2": "2세트: Swift Heels의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "4세트: Swift Heels 중 Wicked Slash와 Haymaker가 연계 점수 1을 추가로 부여합니다."
       },
       "vanguard_rogue_subtlety": {
-        "name": "그늘걸음 가죽 갑옷",
-        "bonus2": "연막 걸음의 재사용 대기시간이 60초 감소합니다.",
-        "bonus4": "연막 걸음 상태에서 사용한 명치 가격이 연계 점수를 2 추가로 줍니다."
+        "name": "선봉대: Shadewalk Leathers",
+        "bonus2": "2세트: Smokefade의 재사용 대기시간이 60초 감소합니다.",
+        "bonus4": "4세트: Smokefade에서 사용한 Gut Punch가 연계 점수 2를 추가로 부여합니다."
       },
       "vanguard_shaman_elemental": {
-        "name": "폭풍 율법 전투 사슬",
-        "bonus2": "무기 해방의 재사용 대기시간이 3초 감소합니다.",
-        "bonus4": "무기 해방을 사용하면 4초 동안 이동 중에 시전할 수 있고 이동 속도가 20% 증가합니다. 20초에 한 번만 발동합니다."
+        "name": "선봉대: Tempestwrit Battlemail",
+        "bonus2": "2세트: Unleash Weapon의 재사용 대기시간이 3초 감소합니다.",
+        "bonus4": "4세트: Unleash Weapon으로 이동 중 시전할 수 있고 이동 속도가 4초 동안 20% 증가합니다. 20초에 한 번만 발동합니다."
       },
       "vanguard_shaman_enhancement": {
-        "name": "돌풍태생 전쟁 사슬",
-        "bonus2": "선조의 일격이 대상의 이동 속도를 4초 동안 30% 감소시킵니다.",
-        "bonus4": "선조의 일격이 정령의 무아지경의 남은 재사용 대기시간을 4초 감소시킵니다."
+        "name": "선봉대: Galeborn Warmail",
+        "bonus2": "2세트: Ancestral Strike가 대상의 이동 속도를 4초 동안 30% 감소시킵니다.",
+        "bonus4": "4세트: Ancestral Strike가 Elemental Trance의 남은 재사용 대기시간을 4초 줄입니다."
       },
       "vanguard_shaman_restoration": {
-        "name": "바닷물 수호 사슬갑옷",
-        "bonus2": "생명력이 50% 미만인 아군에게 시전하는 치유의 물결의 시전 시간이 0.5초 감소합니다.",
-        "bonus4": "해일 부름이 대상에게 당신의 최대 생명력의 5%만큼 보호막도 6초 동안 씌웁니다."
+        "name": "선봉대: Brineward Chainmail",
+        "bonus2": "2세트: 생명력 50% 미만의 아군에게 Mending Waters를 0.5초 더 빠르게 시전합니다.",
+        "bonus4": "4세트: Tidecall이 대상에게 자신의 최대 생명력 5%의 보호막을 6초 동안 부여합니다."
       },
       "vanguard_warlock_affliction": {
-        "name": "공포의 깃펜 성의",
-        "bonus2": "번민의 시전 시간이 0.3초 감소합니다.",
-        "bonus4": "집어삼키기의 치유량이 30% 증가하며, 이동 중에도 정신 집중할 수 있습니다."
+        "name": "선봉대: Dreadquill Vestments",
+        "bonus2": "2세트: Harrow의 시전 시간이 0.3초 감소합니다.",
+        "bonus4": "4세트: Consume의 치유량이 30% 증가하고 이동 중에도 정신 집중할 수 있습니다."
       },
       "vanguard_warlock_demonology": {
-        "name": "골수 결속 예복",
-        "bonus2": "뼈 갑옷의 재사용 대기시간이 10초 감소합니다.",
-        "bonus4": "수확의 명령이 뼈 갑옷의 남은 재사용 대기시간을 2초 감소시킵니다."
+        "name": "선봉대: Marrowbound Regalia",
+        "bonus2": "2세트: Bone Armor의 재사용 대기시간이 10초 감소합니다.",
+        "bonus4": "4세트: Reaping Command가 Bone Armor의 남은 재사용 대기시간을 2초 줄입니다."
       },
       "vanguard_warlock_destruction": {
-        "name": "광재 왕관 성의",
-        "bonus2": "잿가죽의 재사용 대기시간이 30초 감소합니다.",
-        "bonus4": "점화를 두 번 사용할 때마다 8초 안에 사용하는 다음 파멸 화살이 즉시 시전됩니다."
+        "name": "선봉대: Slagcrown Vestments",
+        "bonus2": "2세트: Cinderhide의 재사용 대기시간이 30초 감소합니다.",
+        "bonus4": "4세트: 두 번째 Conflagrate마다 8초 안의 다음 Ruinbolt를 즉시 시전하게 합니다."
       },
       "vanguard_warrior_arms": {
-        "name": "칼날자국 전투 장비",
-        "bonus2": "불구의 일격이 쇄도의 남은 재사용 대기시간을 1초 감소시킵니다.",
-        "bonus4": "쇄도가 다음 불구의 일격도 20% 강화합니다(붉은 손 강화 1중첩)."
+        "name": "선봉대: Bladewake Battlegear",
+        "bonus2": "2세트: Maiming Strike가 Onrush의 남은 재사용 대기시간을 1초 줄입니다.",
+        "bonus4": "4세트: Onrush가 다음 Maiming Strike를 20% 강화합니다."
       },
       "vanguard_warrior_fury": {
-        "name": "피의 행군 분노 장비",
-        "bonus2": "영웅의 도약의 재사용 대기시간이 8초 감소합니다.",
-        "bonus4": "영웅의 도약으로 착지하면 격노합니다."
+        "name": "선봉대: Bloodmarch Ragegear",
+        "bonus2": "2세트: Vaulting Charge의 재사용 대기시간이 8초 감소합니다.",
+        "bonus4": "4세트: Vaulting Charge 착지 시 격노합니다."
       },
       "vanguard_warrior_prot": {
-        "name": "강철 행군 보루",
-        "bonus2": "단층선의 재사용 대기시간이 5초 감소합니다.",
-        "bonus4": "단층선이 받는 피해도 6초 동안 10% 감소시킵니다."
+        "name": "선봉대: Ironmarch Bulwark",
+        "bonus2": "2세트: Faultline의 재사용 대기시간이 5초 감소합니다.",
+        "bonus4": "4세트: Faultline이 6초 동안 받는 피해를 10% 줄입니다."
       },
       "vesperash": {
         "name": "만과의 잿가루 장막",

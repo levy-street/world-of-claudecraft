@@ -78,8 +78,9 @@ export interface IWorldDeeds {
   // The self player's current Renown total, exactly the denormalized sum the
   // evaluator maintains.
   renown: number;
-  // The selected display title: a deed id (never display text), null when
-  // untitled.
+  // The selected display title: a title-deed id or a developer-badge rung
+  // title id ('dev:<rung>', src/sim/dev_badge_titles.ts; never display text),
+  // null when untitled.
   activeTitle: string | null;
   // Request a title change (null clears). No optimistic local write online:
   // the mirror updates from the snapshot echo once the sim accepts.

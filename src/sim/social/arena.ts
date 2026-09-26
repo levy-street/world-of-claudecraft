@@ -75,7 +75,13 @@ export function cloneAbilityCharges(
   src: Entity['abilityCharges'],
 ): ArenaReturnPools['abilityCharges'] {
   const out: ArenaReturnPools['abilityCharges'] = {};
-  if (src) for (const [id, state] of Object.entries(src)) out[id] = { ...state };
+  // The per-charge timers are copied too: spends push onto recharges[] in place,
+  // so a shared array would let the live pool rewrite the snapshot's timers.
+  if (src) {
+    for (const [id, state] of Object.entries(src)) {
+      out[id] = state.recharges ? { ...state, recharges: [...state.recharges] } : { ...state };
+    }
+  }
   return out;
 }
 
@@ -1088,6 +1094,9 @@ export function readyArenaFighter(
       : e.resourceType === 'energy' || e.resourceType === 'focus'
         ? 100
         : 0;
+  // The top-off covers the druid's parked Cat Form energy too, so a fighter who
+  // walked in drained is not short on the first shift (combat/cat_form_energy.ts).
+  e.parkedEnergyDeficit = 0;
   // Target retention is a separate concern from clearPrep (clean slate vs
   // fight-start top-off): only the countdown-end call site passes
   // keepValidTargetPids, so a selection made during prep survives the gates

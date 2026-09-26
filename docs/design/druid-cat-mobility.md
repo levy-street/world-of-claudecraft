@@ -17,9 +17,14 @@ choice for the rest of the game.
    the `form_cat` aura as a speed aura at the fixed `CAT_FORM_MOVE_MULT` constant
    (`src/sim/types.ts`, beside `ENRAGE_MOVE_MULT`). The `form_cat` aura's value is the
    threat multiplier, not a speed, so the branch reads the constant and never `a.value`.
-   It rides the same `Math.max` path as Dash, Loping Stride, Fleet Form, and Enrage, so it
-   never stacks with another speed buff. Mount speed stays additive and slows still bite
-   multiplicatively, exactly as before.
+   The form passive is its own layer: it MULTIPLIES the strongest temporary speed buff
+   (Dash in Cat Form is 1.15 x 1.5, the Loping Stride shift sprint is 1.15 x 1.6), while
+   the temporary buffs themselves (Dash, Loping Stride, Fleet Form, Enrage) keep the
+   classic-era rule among each other: the strongest applies, they never stack. The
+   original pass folded the passive into that same `Math.max`, so any sprint replaced the
+   form bonus instead of adding to it (a Cat that Dashed ran at a flat 150%, not 172.5%);
+   `tests/druid_form_speed_stack.test.ts` pins the layered rule. Mount speed stays
+   additive and slows still bite multiplicatively, exactly as before.
 2. **Fleet Form breaks breakable roots and slows on cast, baseline.** `druidEngineOnCast`
    (`src/sim/combat/druid_engines.ts`) runs the shared `breakMovementControl` helper on
    every Fleet Form cast, with no talent required. Cat, Bruin, and Moonwing keep the
@@ -46,9 +51,12 @@ states the speed the way the Fleet Form and Ember Form lines already state their
   (cast while moving) are untouched. Wildshift loses only the Fleet Form case, the case a
   feral used least, since shifting to Fleet already means leaving the fight. It keeps its
   value as the in-combat option: break a root without leaving your damage form.
-- **Nothing is made redundant.** The 15% passive sits under Loping Stride (60%), Dash
-  (50%), and every mount (60% and up), so neither the talent, the cooldown, nor a mount is
-  replaced by walking around in Cat Form.
+- **Nothing is made redundant.** The 15% passive multiplies whatever temporary speed buff
+  the Cat wears (Loping Stride to 184%, Dash to 172.5%, and party-sourced buffs such as
+  Pack Rally the same way), so each sprint keeps its full stated value over the form and
+  none of them is replaced by walking around in Cat Form. Mounting strips every form, so a
+  mount (175% and up) is still the travel answer; Dash is a 15 sec combat sprint on a
+  60 sec cooldown, not a mount.
 - **Fleet Form's escape is a trade, not a free button.** 30 mana, no cooldown, and no
   abilities while shifted: the druid is moving at +40% with nothing to press, which is the
   classic era rule scoped to one form.
@@ -74,9 +82,15 @@ the engage and control follow up below.
   stripped control, and does so through the real cast path; Cat Form strips nothing
   without Wildshift and both with it; Bruin and Moonwing keep the gate.
 - `tests/player_motion.test.ts`: `form_cat` alone yields 1.15 from the constant (not the
-  aura value); plus Dash yields 1.5, not 1.65; plus a 0.5 slow yields 0.575; plus a +60%
-  mount yields 1.75; and the client dep shape agrees with the live Sim, which is what
-  keeps the online self extrapolator in lockstep with the server.
+  aura value); plus Dash yields 1.725 (the product, never 1.5 flat or 1.65 additive), and
+  two speed buffs together still read as the strongest one times the passive; a
+  party-sourced buff gets the same layer; plus a 0.5 slow yields 0.575; plus a +60%
+  mount yields 1.75; and the client dep shape agrees with the live Sim on both the bare
+  and the stacked case, which is what keeps the online self extrapolator in lockstep
+  with the server.
+- `tests/druid_form_speed_stack.test.ts`: the reported cases through the real cast path
+  (Loping Stride on the shift, Dash in Cat Form, Dash plus Loping Stride, a slow on top,
+  Fleet Form untouched).
 - `tests/choice_rows_redesign.test.ts`: the Wildshift wording, with Loping Stride and
   Skylark pinned unchanged.
 - `tests/ability_tooltip_talents.test.ts`: Dash at 12 with every other number unchanged,

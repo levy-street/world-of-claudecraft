@@ -17,12 +17,14 @@ import { resetFireballTravelProfileCaches } from '../fireball_travel_visual';
 import { prepareFoliageProfileAssets, resetFoliageProfileCaches } from '../foliage';
 import { resetFrostNovaRootProfileCaches } from '../frost_nova_root_visual';
 import { type GfxSettings, resetSurfaceMaterialProfileCache } from '../gfx';
+import { resetGoblinRocketSledProfileCaches } from '../goblin_rocket_sled_fx';
 import { prepareGreatTreeProfileAssets } from '../great_tree_prewarm';
 import { clearGroundDecorPrewarmDraws } from '../ground_decor_prewarm';
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
 import { prepareNoticeboardProfileAssets, resetNoticeboardProfileCaches } from '../noticeboard';
+import { resetPaladinAscensionProfileCaches } from '../paladin_ascension_visual';
 import { preparePropProfileAssets, resetPropProfileCaches } from '../props';
 import { resetQuestObjectProfileCaches } from '../quest_objects';
 import { ensureSkyAssetsAt } from '../sky';
@@ -84,6 +86,9 @@ const RESETTERS = [
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],
   ['temporal_hourglass_visual', resetTemporalHourglassProfileCaches],
+  ['paladin_ascension_visual', resetPaladinAscensionProfileCaches],
+  // The shared plume pair bakes the composer's HDR colour gain at build.
+  ['goblin_rocket_sled_fx', resetGoblinRocketSledProfileCaches],
   // The boot twin manifest for the lazy ground-decor pools holds the LIVE
   // materials of the retiring profile: a rebuild mints new ones, and a twin
   // wearing a retired material links a program nothing will ever draw.

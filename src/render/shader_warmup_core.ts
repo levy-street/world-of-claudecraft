@@ -325,9 +325,10 @@ export function warmupApplies(inputs: WarmupAppliesInputs): WarmupAppliesDecisio
  *  both arms, so `off` and `0` silence both and `all`, `reveal`, `auto` and
  *  `1` force this one), then the stored Shader Warm-up option, where only an
  *  explicit Off counts. `auto` keeps the corpus ON whatever the backend: the
- *  worker's backend rule (off on OpenGL, where it relocates the stall) is
- *  about a second context linking DURING play, while this arm links before
- *  the world exists and was measured on exactly those OpenGL desktops. No
+ *  worker's backend rule (off on every backend today) is about a second
+ *  context linking DURING play, while this arm links before the world exists
+ *  and was measured on the OpenGL desktops where the worker only relocates
+ *  the stall. No
  *  stored option at all (a test, another entry) is ON, the arm's original
  *  default. */
 /** Whether the URL asks for the GPU timer probe, read from the same `search`

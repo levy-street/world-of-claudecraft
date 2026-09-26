@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { loadTexture, releaseTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { tagCastVfxEngine } from './cast_vfx_family';
 import {
   type DrainLifeParticleKind,
   type DrainLifeParticleSink,
@@ -511,7 +512,7 @@ export class Vfx {
       `,
     });
     this.points = new THREE.Points(geo, mat);
-    this.points.userData.renderCategory = 'vfx';
+    tagCastVfxEngine(this.points);
     this.points.frustumCulled = false;
     this.points.renderOrder = 5;
     // The first zero-count submit still compiles the exact shader and uploads
@@ -750,6 +751,11 @@ export class Vfx {
     this.points.geometry.dispose();
     material.dispose();
     if (atlas instanceof THREE.Texture) atlas.dispose();
+  }
+
+  /** The particle cloud, which the boot links ahead of the cast pools. */
+  cloudDrawable(): THREE.Points {
+    return this.points;
   }
 
   onContextRestored(): void {

@@ -1872,6 +1872,10 @@ function entityRoster(): Scenario {
       p.dead = true;
       sim.releaseSpirit();
       rec.snapshot('ghost-release');
+      // Turn the ghost first so the golden can see the in-place revive keep its heading
+      // (revive_facing.ts); with facing 0 throughout, old and new code trace the same.
+      p.facing = Math.PI / 2;
+      p.prevFacing = Math.PI / 2;
       sim.resurrectAtSpiritHealer();
       rec.snapshot('healer-resurrect');
       rec.tick(2);
@@ -4519,7 +4523,7 @@ function marketRoundTrip(): Scenario {
         sim.marketListings.find((l) => !l.house && l.sellerName === 'Seller'),
         'parity scenario market listing',
       );
-      sim.marketBuy(sale.id, buyer);
+      sim.marketBuy(sale.id, undefined, buyer);
       rec.snapshot('bought');
 
       // 4) list a second stack then reclaim it -> the escrow returns to the bags.

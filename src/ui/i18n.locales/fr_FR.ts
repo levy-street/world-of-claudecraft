@@ -14004,7 +14004,7 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.faithforged_guard.description':
     "Pendant 8 s, le prochain coup ennemi porté contre vous reçoit une réponse : jusqu'à {buff} points de dégâts sont annulés et renvoyés à l'attaquant en dégâts Sacrés, et vous gagnez 1 Dévotion. Un seul coup reçoit une réponse. L'Ascension augmente de 50% le montant auquel elle peut répondre.",
   'entities.abilities.final_edict.description':
-    "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion Sacrée autour de vous.",
+    "Assène une frappe d'arme dévastatrice et génère 1 Dévotion lorsqu'elle inflige des dégâts. Un coup réussi réduit de 2 s le temps de recharge restant de la Chute de l'aube. Les attaques automatiques réussies et les coups de l'Édit final ont 15% de chances d'octroyer le Courroux de l'aube pendant 8 s. L'Ascension libère en outre une explosion autour de vous qui inflige des dégâts physiques.",
   'entities.abilities.grace_devotion.description':
     "Vous et les membres du groupe récupérez 15 mana toutes les 5 s et payez 3% de mana en moins pendant 30 min. Remplace votre propre Dévotion radiante ou de l'aube, mais coexiste avec les Dévotions des autres paladins.",
   'entities.abilities.guardian_covenant.description':
@@ -15400,9 +15400,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     'Votre coup de Lame voilée inflige trois fois plus de dégâts au lieu de deux fois.',
   'entities.itemSets.ashveil.name': 'Tenue du Voile cendré',
   'entities.itemSets.benison_dawnweave.bonus2':
-    'Le sauvetage de Vigilance séraphique rend 270 points de vie au lieu de 180. Les dégâts subis ne retardent plus vos incantations.',
+    'Restaurer des points de vie avec Prière murmurée, Prière solennelle ou Prière urgente augmente les soins de votre prochain Soin du chœur de 10 %, jusqu’à 3 cumuls. Chaque incantation accorde au maximum un cumul. Soin du chœur consomme tous les cumuls à la fin de son incantation. Les dégâts subis ne retardent plus vos incantations.',
   'entities.itemSets.benison_dawnweave.bonus4':
-    'Quand Vigilance séraphique se déclenche, son allié récupère aussi 15 % de ses points de vie maximum en 10 s.',
+    'Terminer Soin du chœur avec 3 cumuls rend votre prochaine Prière murmurée utilisée dans les 60 s instantanée et augmente ses soins de 100 %. Cet effet ne se cumule pas ; l’obtenir à nouveau renouvelle sa durée.',
   'entities.itemSets.benison_dawnweave.name': 'Bénédiction tissée d’aurore',
   'entities.itemSets.chronoweave.bonus2':
     'Écho temporel convertit 50 % de vos dégâts des Arcanes à cible unique en soins. Les dégâts subis ne retardent plus vos incantations.',
@@ -17672,4 +17672,12 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Modifier les cadres desserre également le panneau de dialogue, qui diffuse la ligne parlée d'un PNJ lorsque ce PNJ est hors de votre vue; il porte sa puce nominative lorsqu'il est en vrac.",
   'guide.settingsPage.keybindsWheelBody':
     "La roue elle-même se lie également. Zoom Camera In et Zoom Camera Out sont des liaisons ordinaires qui se trouvent par défaut sur la roue nue, vous pouvez donc les déplacer vers Ctrl plus la roue, ou vers les touches, puis faire rouler la roue libérée pour déclencher les emplacements de la barre d'action. Une encoche de roue n'a pas de dégagement, elle ne peut donc pas conduire une action maintenue comme avancer.",
+  'guide.settingsPage.ifColorblindMode':
+    "Recolore les dangers au sol de Nythraxis (l'anneau d'impact d'Eruption funéraire, les flaques de Flamme funéraire et de Feu d'âme, la ligne de Feu funéraire et les marques de Déchirure d'âme) avec une palette adaptée aux daltoniens, aux teintes et luminosités distinctes, afin que les cercles superposés gardent des bords visibles. Les tailles, minuteries et positions ne changent pas.",
+  'hud.options.colorblindMode': 'Mode daltonien',
+  'hudChrome.playerTooltip.guild': '<{guild}>',
+  'hudChrome.playerTooltip.specRole': '{spec} ({role})',
+  'hudChrome.interfaceUnlock.frameNames.unitTooltip': 'Tooltip',
+  'guide.interfacePage.framesGovernedUnitTooltip':
+    'Edit Frames also unlocks the Tooltip frame: the position where the hover card for a creature or another player appears. Drag it where you want the card to grow from, or hide it from Frames Settings if you do not want hover cards.',
 };

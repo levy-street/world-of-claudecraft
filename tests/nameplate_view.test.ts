@@ -451,6 +451,9 @@ describe('nameplate_view - import absence (two-controller + purity, source scan)
       // three/painter/gfx; imported so the discriminator cannot drift from
       // the sim's own id (the frontend-seam review's ask).
       '../sim/professions/feast',
+      // The placed mobile-station template-id predicate: the same kind of sim
+      // leaf, so the plate's near-rule shares the feast's pad for a station.
+      '../sim/professions/mobile_station_object',
       '../sim/types',
       './nameplate_combo',
       './nameplate_threat',

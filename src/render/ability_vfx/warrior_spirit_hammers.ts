@@ -1,4 +1,10 @@
 import * as THREE from 'three';
+import {
+  CAST_VFX_KIT,
+  type CastVfxSpawnGate,
+  OPEN_CAST_VFX_SPAWN_GATE,
+  tagCastVfxKit,
+} from '../cast_vfx_family';
 import { modulateEmissiveByVertexColor } from '../vertex_color_emissive';
 import type { CrestPrewarmHost } from './crest_prewarm';
 import { GuardPrewarm } from './guard_prewarm';
@@ -9,6 +15,8 @@ const CAPACITY = 8;
 /** Immediate-mode solid heads borrow the live ribbon's position and lifetime.
  * Cold/full capacity keeps the atlas fallback. No second projectile clock. */
 export class WarriorSpiritHammers {
+  /** Set by AbilityVfxFx: the fail-closed family check at spawn. */
+  spawnGate: CastVfxSpawnGate = OPEN_CAST_VFX_SPAWN_GATE;
   readonly mesh: THREE.InstancedMesh<THREE.BufferGeometry, THREE.MeshStandardMaterial>;
   readonly preparation: GuardPrewarm;
   private readonly position = new THREE.Vector3();
@@ -31,7 +39,7 @@ export class WarriorSpiritHammers {
     );
     this.mesh = new THREE.InstancedMesh(warriorSpiritHammerShape(), material, CAPACITY);
     this.mesh.name = 'warrior-spirit-hammers';
-    this.mesh.userData.renderCategory = 'vfx';
+    tagCastVfxKit(this.mesh);
     this.mesh.frustumCulled = false;
     this.mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
     const white = new THREE.Color(0xffffff);
@@ -65,6 +73,7 @@ export class WarriorSpiritHammers {
     reduced: boolean,
   ): boolean {
     if (this.disposed || !this.preparation.ready() || this.mesh.count >= CAPACITY) return false;
+    if (!this.spawnGate.allows(CAST_VFX_KIT)) return false;
     this.position.set(x, y, z);
     this.scale.setScalar(size);
     this.euler.set(reduced ? 0.5 : time * Math.PI * 6, yaw, -0.12);

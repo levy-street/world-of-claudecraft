@@ -16,8 +16,10 @@ import {
   TOOLTIP_EDGE_GAP,
   TOOLTIP_POINTER_DX,
   TOOLTIP_POINTER_DY,
+  type TooltipAnchorRect,
   tooltipMaxHeight,
   tooltipPlacementAt,
+  unitTooltipAnchorPlacement,
 } from '../src/ui/tooltip_clamp_core';
 
 const VIEW = { w: 1366, h: 768, scale: 1 };
@@ -184,6 +186,100 @@ describe('mobTooltipCornerPlacement', () => {
   });
 });
 
+describe('unitTooltipAnchorPlacement', () => {
+  // The movable Tooltip frame's seat. Rects arrive in VISUAL space (the
+  // anchor's getBoundingClientRect), the box and the result in author space.
+  const BOX = { w: 260, h: 120 };
+  // The seat's stock spot: right MOB_TOOLTIP_MARGIN_RIGHT and bottom
+  // MOB_TOOLTIP_MARGIN_BOTTOM inside #ui (author px, so visual px times the
+  // scale), 220 x 72 author px (hud.css #unit-tooltip-anchor).
+  const stockSeat = (view: { w: number; h: number; scale: number }): TooltipAnchorRect => {
+    const right = view.w - MOB_TOOLTIP_MARGIN_RIGHT * view.scale;
+    const bottom = view.h - MOB_TOOLTIP_MARGIN_BOTTOM * view.scale;
+    return { left: right - 220 * view.scale, top: bottom - 72 * view.scale, right, bottom };
+  };
+
+  it('an unmoved seat lands the card exactly on the old fixed corner, at any size and scale', () => {
+    // The whole back-compat promise: a player who never touches the frame sees
+    // the card where it always was, including the edge-gap floors for a card
+    // too large for the slot.
+    for (const view of [VIEW, { w: 1366, h: 768, scale: 2 }, { w: 1920, h: 1080, scale: 1.25 }]) {
+      for (const box of [BOX, { w: 40, h: 30 }, { w: 1400, h: 120 }, { w: 260, h: 900 }]) {
+        expect(
+          unitTooltipAnchorPlacement(box, view, stockSeat(view)),
+          JSON.stringify({ view, box }),
+        ).toEqual(mobTooltipCornerPlacement(box, view, null));
+      }
+    }
+  });
+
+  it('grows away from the nearest screen edges: one arm per quadrant', () => {
+    // Top-left quadrant: the card hangs down and right from the seat's top-left.
+    expect(
+      unitTooltipAnchorPlacement(BOX, VIEW, { left: 100, top: 80, right: 320, bottom: 152 }),
+    ).toEqual({ left: 100, top: 80 });
+    // Top-right: right edges meet, the card hangs down.
+    expect(
+      unitTooltipAnchorPlacement(BOX, VIEW, { left: 1000, top: 80, right: 1220, bottom: 152 }),
+    ).toEqual({ left: 1220 - 260, top: 80 });
+    // Bottom-left: left edges meet, the card grows up from the seat's bottom.
+    expect(
+      unitTooltipAnchorPlacement(BOX, VIEW, { left: 100, top: 600, right: 320, bottom: 672 }),
+    ).toEqual({ left: 100, top: 672 - 120 });
+    // Bottom-right: both far edges meet (the stock corner's arm).
+    expect(
+      unitTooltipAnchorPlacement(BOX, VIEW, { left: 1000, top: 600, right: 1220, bottom: 672 }),
+    ).toEqual({ left: 1220 - 260, top: 672 - 120 });
+  });
+
+  it('decides the side from the seat CENTER, so a seat straddling the midline still picks one', () => {
+    // Centered at x = 683 (exactly half of 1366): the right-half arm owns ties.
+    const straddle = { left: 573, top: 80, right: 793, bottom: 152 };
+    expect(unitTooltipAnchorPlacement(BOX, VIEW, straddle).left).toBe(793 - 260);
+    const leftOfMid = { left: 572, top: 80, right: 792, bottom: 152 };
+    expect(unitTooltipAnchorPlacement(BOX, VIEW, leftOfMid).left).toBe(572);
+  });
+
+  it('clamps inside the edge gap, floor-last, so a card never leaves the screen', () => {
+    // A seat dragged flush to the right edge: the card's right edge keeps the gap.
+    const hugRight = { left: 1146, top: 80, right: 1366, bottom: 152 };
+    expect(unitTooltipAnchorPlacement({ w: 40, h: 30 }, VIEW, hugRight).left).toBe(
+      1366 - 40 - TOOLTIP_EDGE_GAP,
+    );
+    // A top-left seat half off screen (a saved spot from a larger monitor):
+    // the floor pulls it back on.
+    expect(
+      unitTooltipAnchorPlacement(BOX, VIEW, { left: -50, top: -20, right: 170, bottom: 52 }),
+    ).toEqual({ left: TOOLTIP_EDGE_GAP, top: TOOLTIP_EDGE_GAP });
+    // Growing down from a low top-half seat, a tall card is pulled up to fit.
+    expect(
+      unitTooltipAnchorPlacement({ w: 260, h: 500 }, VIEW, {
+        left: 100,
+        top: 300,
+        right: 320,
+        bottom: 372,
+      }).top,
+    ).toBe(768 - 500 - TOOLTIP_EDGE_GAP);
+    // A card taller than the viewport: the top floor wins (the height cap does the rest).
+    expect(
+      unitTooltipAnchorPlacement({ w: 260, h: 900 }, VIEW, {
+        left: 100,
+        top: 300,
+        right: 320,
+        bottom: 372,
+      }).top,
+    ).toBe(TOOLTIP_EDGE_GAP);
+  });
+
+  it('maps the visual seat into author space under a UI scale', () => {
+    const scaled = { w: 1366, h: 768, scale: 2 };
+    // Top-left quadrant seat at visual (100, 80): author (50, 40).
+    expect(
+      unitTooltipAnchorPlacement(BOX, scaled, { left: 100, top: 80, right: 540, bottom: 224 }),
+    ).toEqual({ left: 50, top: 40 });
+  });
+});
+
 describe('tooltip_paint.ts consumes the core (source pins)', () => {
   // Hud.paintTooltipAt / paintMobTooltipBottomRight are now thin wrappers that
   // delegate to src/ui/tooltip_paint.ts (mechanical extraction, hud.ts monolith
@@ -227,6 +323,7 @@ describe('tooltip_paint.ts consumes the core (source pins)', () => {
     expect(measure).toBeGreaterThan(cap);
     // And the corner math is the core's, not a second hand-rolled clamp.
     expect(body).toContain('mobTooltipCornerPlacement(box, viewport, minimapRect)');
+    expect(body).toContain('unitTooltipAnchorPlacement(box, viewport, anchorRect)');
     expect(body).not.toContain('Math.max(8,');
     expect(body).not.toContain('window.innerWidth');
     expect(body).not.toContain('window.innerHeight');

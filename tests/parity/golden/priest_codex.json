@@ -1142,7 +1142,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1019,
-      "state": "4ae21517",
+      "state": "eb0fb548",
       "events": "fd16c83f",
       "rng": {
         "draws": 728,
@@ -1153,7 +1153,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1019,
-      "state": "ad3b0a42",
+      "state": "68f6840c",
       "events": "9e6a32fb",
       "rng": {
         "draws": 946,
@@ -1164,7 +1164,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1019,
-      "state": "68645008",
+      "state": "3d8cdf04",
       "events": "7fae8f5b",
       "rng": {
         "draws": 1174,
@@ -1175,7 +1175,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1019,
-      "state": "7ba2cb16",
+      "state": "94b50247",
       "events": "741638a5",
       "rng": {
         "draws": 1406,
@@ -1186,7 +1186,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 1019,
-      "state": "7d350b68",
+      "state": "22886532",
       "events": "cf6b4cc5",
       "rng": {
         "draws": 1709,
@@ -1197,7 +1197,7 @@
       "tick": 220,
       "time": 11,
       "nextId": 1019,
-      "state": "e4d5752e",
+      "state": "959802d9",
       "events": "6398b035",
       "rng": {
         "draws": 1859,
@@ -1208,7 +1208,7 @@
       "tick": 240,
       "time": 12,
       "nextId": 1019,
-      "state": "f78c4e30",
+      "state": "ec72eab8",
       "events": "741638a5",
       "rng": {
         "draws": 2001,
@@ -1219,7 +1219,7 @@
       "tick": 260,
       "time": 13,
       "nextId": 1019,
-      "state": "b29685c4",
+      "state": "957ba6e5",
       "events": "504367be",
       "rng": {
         "draws": 2186,
@@ -1230,7 +1230,7 @@
       "tick": 280,
       "time": 14,
       "nextId": 1019,
-      "state": "e3ed5d5d",
+      "state": "c5910307",
       "events": "cd9b8ee9",
       "rng": {
         "draws": 2320,
@@ -1241,7 +1241,7 @@
       "tick": 300,
       "time": 15,
       "nextId": 1019,
-      "state": "a1a22b5a",
+      "state": "7f3667e7",
       "events": "741638a5",
       "rng": {
         "draws": 2493,
@@ -1252,7 +1252,7 @@
       "tick": 301,
       "time": 15.05,
       "nextId": 1019,
-      "state": "169af286",
+      "state": "4897df82",
       "events": "741638a5",
       "rng": {
         "draws": 2501,
@@ -1995,6 +1995,10 @@
           "comboUntil": -1,
           "cooldowns": [
             [
+              "prayer_of_healing",
+              2.6
+            ],
+            [
               "seraphic_vigil",
               7.55
             ]
@@ -2464,7 +2468,7 @@
       "tick": 320,
       "time": 16,
       "nextId": 1020,
-      "state": "c8953d81",
+      "state": "2e1cfa23",
       "events": "850a4a21",
       "rng": {
         "draws": 2699,
@@ -2475,7 +2479,7 @@
       "tick": 340,
       "time": 17,
       "nextId": 1020,
-      "state": "310ab4db",
+      "state": "495245ac",
       "events": "bbbb0c6a",
       "rng": {
         "draws": 2912,

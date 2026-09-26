@@ -40,7 +40,21 @@ layers behind the `index.ts` barrel:
 - `prewarm.ts`: the warm-up work that is SAFE to run in a live frame, as
   explicit units (`abilityVfxTexturePrewarmSteps`, one per impact sheet plus the
   shared canvases; `collectAbilityVfxCompileTargets`, one program link per
-  distinct pooled material). `AbilityVfxFx.prewarmSpawn` stays boot-window only,
+  distinct pooled PROGRAM, keyed by `../draw_program_signature_core.ts`, so a
+  pool's per-slot material clones are one unit, never one per clone). The cast
+  gate keeps one ready bit per family (`../cast_vfx_family.ts`), one entry per
+  program: the ENGINE (the pooled primitive families above except the spirits,
+  plus the `../vfx.ts` particle cloud) and the KIT (the Warrior kit's pools
+  `fx.ts` builds with the engine, because several of their pieces draw with no
+  readiness check of their own). The painter admits each cast on its own mask
+  (`cast_requirements.ts`) at its first entry point and latches a refusal for
+  the rest of that cast (`cast_admission_core.ts`); spirits keep their own
+  gate and sit in neither family. A new pool tags every drawable it builds with
+  `tagCastVfxEngine` or `tagCastVfxKit`, carries the `spawnGate` `fx.ts` hands
+  it and checks its family before every spawn, the units link engine, then
+  kit, then every other pool, and `tests/cast_vfx_engine_family.test.ts` fails
+  a pool `fx.ts` builds that sits in none of its tables.
+  `AbilityVfxFx.prewarmSpawn` stays boot-window only,
   because it spawns VISIBLE primitives; these units are what the renderer's
   `vfx.ability-primitives` manifest entry retains when the entry deadline drops
   it, and what constrained (phone-class) devices run in the background instead
@@ -152,7 +166,31 @@ selected by ability id only:
   (`requestClassKit`), keeps a mip chain on the WebP sheets, and DECLINES them
   on constrained-memory devices, where the kit stays cold and the generic
   presentation runs (`tests/warrior_kit_assets.test.ts`,
-  `tests/active_kit_prewarm.test.ts`). Generic sheets (smoke, dust,
+  `tests/active_kit_prewarm.test.ts`). Every sheet a live cast draws is
+  uploaded by its own unit of the kit recipe (`KIT_SHEETS` in
+  `active_kit_prewarm.ts`), the contact sheets and the generic smoke and dust
+  layers included, since the kit is their only consumer (the loaded shockwave
+  sheet has no live consumer, only the boot-window `prewarmSpawn`); the boot
+  warm-up (`abilityVfxTexturePrewarmSteps`) reads none of them, so the recipe is
+  their one upload home on every renderer, a recycled one included. A sheet is
+  stored as soon as it decodes, so every drawer also waits for this renderer's
+  upload (`textureReady`): the baked layers skip, a contact flipbook binds the
+  procedural shard sheet meanwhile when this renderer uploaded it and skips
+  otherwise (`tests/warrior_kit_sheet_readiness.test.ts`). A rebuilt renderer
+  therefore draws none of them until its own recipe runs, which for another
+  class waits for the next Warrior sighting.
+  A pool built at boot never relies on those getters in its constructor, since
+  the load lands after it: it binds them in
+  a unit of its own preparation recipe, ahead of its compile (the crests'
+  `crest-bind-kit`, the guards' `guard-bind-steel`; `tests/crest_prewarm.test.ts`).
+  A pool whose GEOMETRY comes from the kit builds its meshes in that recipe
+  too, and spawns nothing until their upload unit ran (the solid fragments'
+  `fragment-build`; `tests/solid_impact_fragments_prewarm.test.ts`).
+  Its preparation rides
+  `ACTIVE_KIT_PRIORITY` (the boot-debt lane) under the per-frame budget, never
+  the actionable floor, and it waits out a loading cover: the kit is cosmetic
+  and gated by its own readiness, and the floor once admitted all ten sheets
+  into one frame (about 0.6 s on an Intel HD 530). Generic sheets (smoke, dust,
   shockwave, the harvest splash) ship at 1024px; only signature sheets earn
   2048px, and a new sheet needs the same justification.
 - **Cost rules still apply.** The shared families it extends (`ribbons.ts`

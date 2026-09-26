@@ -860,20 +860,21 @@ For off-box safety, sync the directory to S3 occasionally:
   `shader_warm_refusal` carries the cause when it was not (`none` when there is
   none, one `extension-drift` series for the whole family, `other` for a cause
   this server's vocabulary does not know). One value is NOT a refusal: `ab:off`
-  marks the `off` arm of the one-release D3D11 A/B experiment on the `auto`
-  setting (`shaderWarmAbArmFor` in `src/render/shader_warm_client_core.ts`), so a
-  refusal-share reading must exclude it while the experiment runs, or the d3d11
-  refusal share roughly doubles. Its cardinality is the two active
+  marked the `off` arm of the D3D11 A/B experiment the 0.43 clients ran on the
+  `auto` setting. No client mints it from 0.44.0 on, where `auto` leaves the
+  worker off on every backend; exclude it from a refusal-share reading over a
+  window that still holds 0.43 rows. Its cardinality is the two active
   values times that fixed vocabulary, pre-registered at zero like the rest of
   the family. The SQL drill-down is the two client_perf_reports columns behind
   it (`shader_warm_worker_active`, `shader_warm_refusal`, both bounded at
   ingest), plus `raw_summary.shaderWarm` for the per-session detail (mode,
   setting, backend, the warmed / held counts, the summed and wall hold time,
-  the cannot-serve releases, and `abArm`, the only field that names the `on`
-  arm). The `held` and `heldReleased` counts include holds a gate asked for
+  the cannot-serve releases, and on 0.43 rows only `abArm`, the one field that
+  names that experiment's `on` arm). The `held` and `heldReleased` counts include holds a gate asked for
   while the worker was standing down after a release, which were refused at
-  once and hid nothing. For D3D11 `auto` sessions `raw_summary.shaderWarm.mode`
-  also shifts during the experiment: the `off` arm resolves to `off`.
+  once and hid nothing. From 0.44.0 on an `auto` session reads `mode` `off` on
+  every backend, and the options row is withdrawn (a stored On reads as `auto`), so
+  `shader_warm_active` is true only on a session that pinned `?shaderwarm=`.
   `woc_client_cadence_reports_total` (same module, same stored gameplay reports)
   is the frame rate ceiling cut: `frame_cap` is the ceiling the player chose
   (`none`, `30`, `60`) and `cadence` is `reduced` when the client renders fewer

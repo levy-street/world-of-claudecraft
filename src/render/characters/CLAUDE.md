@@ -147,6 +147,11 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `registerWeapon` returns the held-model decision as a follow-up action);
   `tests/authored_surfaces.test.ts` scans the shipped GLBs and fails any
   authored atlas that is neither flagged nor on its explicit legacy list.
+- `stonebound_shell_core.ts`: the Stonebound weapon-shell style. Wireframe on any
+  antialiased frame; a solid translucent sheath when NO AA pass runs (Low, and the
+  memory-constrained WebKit profiles), because a one-pixel GPU wireframe crawls
+  over the dense weapon mesh without AA. Keyed on the `GfxSettings` AA facts
+  (`smaa`/`fxaa`/`msaaSamples`), never on a tier name; cosmetic only.
 - Perf cores: `skeleton_update_cache.ts`/`skeleton_update_core.ts` (skeleton
   palette update elision), `skin_gpu_layout.ts` (bone-texture compaction
   without changing weights, matrices, draws, or shader math),
@@ -178,6 +183,18 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `paladin_templars_verdict_fx.ts` twins): procedural `AnimationClip`s built in
   code and registered per ability; the template future ability-animation work
   follows.
+- Form adornments: `form_adornments.ts`, the per-rig owner `CharacterVisual`
+  holds and drives from the `setMoonkin`/`setShadowform` edges the renderer
+  already sends, over the pure `form_adornment_core.ts` (what a rig wears, the
+  pose math) and two painters, `moonwing_adornment.ts` (antlers, crescent,
+  wings) and `gloamveil_veil.ts` (the face veil), with their canvas art in
+  `form_adornment_textures.ts` and the shared marker and glow recipe in
+  `rig_fx.ts`. Pieces ride the rig's `head`/`chest` bones, carry the
+  `weaponVfxMesh` marker so no overlay swap, prewarm twin or caster sweep
+  touches them, hide under a ghost or stealth body, and their shared kits are
+  prewarmed through `ABILITY_MATERIAL_SOURCES`; a rig's first mount of a set
+  still waits hidden behind the injected compile gate
+  (`tests/form_adornments.test.ts`, `tests/character_form_adornments.test.ts`).
 - Pure selection cores: `modular.ts` (composed bodies, below),
   `player_look_core.ts`, `form_visual_selection_core.ts`,
   `far_lod_reveal_core.ts` (the rig/far-mesh/shadow-proxy handoff rule: the

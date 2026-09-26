@@ -40,7 +40,6 @@ const BOOL_TOGGLE_ROWS = [
   ['combineAuraFrames', 'hudChrome.interfaceUnlock.combineAuras'],
   ['moveTargetOfTargetIndependently', 'hudChrome.frameMenus.independentTarget'],
   ['hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'],
-  ['mouseoverCast', 'hudChrome.options.mouseoverCast'],
   ['lockActionBars', 'hudChrome.options.lockActionBars'],
   ['buffsLeftToRight', 'hudChrome.interfaceUnlock.buffsLeftToRight'],
   ['debuffsLeftToRight', 'hudChrome.interfaceUnlock.debuffsLeftToRight'],
