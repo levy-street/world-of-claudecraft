@@ -64,7 +64,6 @@ interface FakeGl {
   VERTEX_SHADER: number;
   FRAGMENT_SHADER: number;
   RENDERER: number;
-  SHADER_TYPE: number;
   LINK_STATUS: number;
   ACTIVE_ATTRIBUTES: number;
   linked: { vertex: string; fragment: string; index0Attribute: string }[];
@@ -75,6 +74,7 @@ interface FakeGl {
   parallelCompile: boolean;
   missingExtensions: string[];
   attributes: string[];
+  /** The shader pair `linkedEntry` hands a recorded program entry. */
   attached: FakeShader[];
 }
 
@@ -85,7 +85,6 @@ function fakeGl(
     VERTEX_SHADER: 1,
     FRAGMENT_SHADER: 2,
     RENDERER: 3,
-    SHADER_TYPE: 4,
     LINK_STATUS: 5,
     ACTIVE_ATTRIBUTES: 6,
     linked: [] as { vertex: string; fragment: string; index0Attribute: string }[],
@@ -149,9 +148,19 @@ function fakeGl(
       return null;
     },
     getParameter: (pname: number) => (pname === UNMASKED_RENDERER_WEBGL ? ADAPTER : 'fallback'),
-    getAttachedShaders: () => gl.attached,
-    getShaderParameter: (shader: FakeShader) => shader.type,
     getShaderSource: (shader: FakeShader) => shader.source,
+    // The record reads the stages off three's handles: it no longer lists the
+    // attached shaders, and a stage query or an error read waits on the GPU
+    // process for every command already submitted.
+    getAttachedShaders: () => {
+      throw new Error('getAttachedShaders is no longer part of the record');
+    },
+    getShaderParameter: () => {
+      throw new Error('getShaderParameter waits on the GPU process');
+    },
+    getError: () => {
+      throw new Error('getError waits on the GPU process');
+    },
     getContextAttributes: () => ({ antialias: false, alpha: true }),
   };
   return gl as unknown as FakeGl & WarmupGl;
@@ -179,6 +188,14 @@ const program = (n: number) => ({
   vertex: `void vertex${n}(){}`,
   fragment: `void frag${n}(){}`,
   index0Attribute: 'position',
+});
+
+/** One of three's program entries: the linked program and the two shader
+ *  handles three keeps on it, taken from the fake's attached pair. */
+const linkedEntry = (gl: FakeGl) => ({
+  program: {},
+  vertexShader: gl.attached.find((s) => s.type === gl.VERTEX_SHADER),
+  fragmentShader: gl.attached.find((s) => s.type === gl.FRAGMENT_SHADER),
 });
 
 async function storeWith(
@@ -653,7 +670,7 @@ describe('recordShaderCorpus', () => {
     ];
     const values = new Map<string, unknown>();
     const store = createMemoryStore(values);
-    const count = await recordShaderCorpus(renderer(gl, [{ program: {} }, { program: {} }]), {
+    const count = await recordShaderCorpus(renderer(gl, [linkedEntry(gl), linkedEntry(gl)]), {
       store,
       buildId: BUILD,
       tier: TIER,
@@ -681,7 +698,7 @@ describe('recordShaderCorpus', () => {
       { type: gl.FRAGMENT_SHADER, source: 'void frag1(){}' },
     ];
     const values = new Map<string, unknown>();
-    await recordShaderCorpus(renderer(gl, [{ program: {} }]), {
+    await recordShaderCorpus(renderer(gl, [linkedEntry(gl)]), {
       store: createMemoryStore(values),
       buildId: BUILD,
       tier: TIER,
@@ -712,7 +729,7 @@ describe('recordShaderCorpus', () => {
     ];
     let contextReads = 0;
     const counted = (): ShaderCorpusRenderer => ({
-      info: { programs: [{ program: {} }] },
+      info: { programs: [linkedEntry(gl)] },
       getContext: () => {
         contextReads += 1;
         return gl;
@@ -760,7 +777,7 @@ describe('recordShaderCorpus', () => {
     ];
     const values = new Map<string, unknown>();
     let scheduledDelay = 0;
-    finishShaderWarmup(renderer(gl, [{ program: {} }]), {
+    finishShaderWarmup(renderer(gl, [linkedEntry(gl)]), {
       store: createMemoryStore(values),
       buildId: BUILD,
       tier: TIER,
@@ -856,23 +873,12 @@ describe('recordShaderCorpus as background queue units', () => {
   });
 
   function attachedPrograms(gl: ReturnType<typeof fakeGl>, count: number): unknown[] {
-    // Each entry carries its own attached pair, so the record keeps every one.
-    const entries = Array.from({ length: count }, (_, i) => ({
+    // Each entry carries its own shader pair, so the record keeps every one.
+    return Array.from({ length: count }, (_, i) => ({
       program: {},
-      shaders: [
-        { type: gl.VERTEX_SHADER, source: `void vertex${i}(){}` },
-        { type: gl.FRAGMENT_SHADER, source: `void frag${i}(){}` },
-      ],
+      vertexShader: { type: gl.VERTEX_SHADER, source: `void vertex${i}(){}` },
+      fragmentShader: { type: gl.FRAGMENT_SHADER, source: `void frag${i}(){}` },
     }));
-    (gl as unknown as { getAttachedShaders: (p: unknown) => unknown[] }).getAttachedShaders = (
-      program,
-    ) =>
-      (
-        entries.find((e) => (e as { program: unknown }).program === program) as {
-          shaders: unknown[];
-        }
-      ).shaders;
-    return entries;
   }
 
   function recordingQueue(): CorpusRecordQueue & { labels: string[]; priorities: number[] } {
@@ -943,7 +949,7 @@ describe('recordShaderCorpus as background queue units', () => {
       { type: gl.FRAGMENT_SHADER, source: 'void frag1(){}' },
     ];
     const getParameter = vi.spyOn(gl, 'getParameter');
-    const target = renderer(gl, [{ program: {} }]);
+    const target = renderer(gl, [linkedEntry(gl)]);
     // A string the context itself would never answer, so the identity says
     // which source was read.
     const remembered = 'Remembered HD 530 (boot capture)';
@@ -968,7 +974,7 @@ describe('recordShaderCorpus as background queue units', () => {
     // A renderer the capture never saw, or one whose capture read nothing, is
     // still queried, and its identity is the context's.
     for (const seen of [null, '']) {
-      const fresh = renderer(gl, [{ program: {} }]);
+      const fresh = renderer(gl, [linkedEntry(gl)]);
       if (seen !== null) rememberGpuRendererName(fresh, seen);
       const freshValues = new Map<string, unknown>();
       await recordShaderCorpus(fresh, {
@@ -1025,17 +1031,14 @@ describe('recordShaderCorpus as background queue units', () => {
   it('leaves the stored corpus alone when the context is lost during the read', async () => {
     const gl = fakeGl();
     const entries = attachedPrograms(gl, 3);
-    // Lost while the batch reads: a partial set must not replace the stored one.
+    // Lost at the second program's read: a partial set must not replace the stored one.
     let reads = 0;
-    const attached = (gl as unknown as { getAttachedShaders: (p: unknown) => unknown[] })
-      .getAttachedShaders;
-    (gl as unknown as { getAttachedShaders: (p: unknown) => unknown[] }).getAttachedShaders = (
-      program,
-    ) => {
+    const source = (gl as unknown as { getShaderSource: (s: unknown) => string }).getShaderSource;
+    (gl as unknown as { getShaderSource: (s: unknown) => string }).getShaderSource = (shader) => {
       reads++;
-      return attached(program);
+      return source(shader);
     };
-    (gl as unknown as { isContextLost: () => boolean }).isContextLost = () => reads >= 2;
+    (gl as unknown as { isContextLost: () => boolean }).isContextLost = () => reads >= 3;
     const values = new Map<string, unknown>([[shaderWarmupInternalsForTest.corpusKey, 'kept']]);
     const count = await recordShaderCorpus(renderer(gl, entries), {
       store: createMemoryStore(values),

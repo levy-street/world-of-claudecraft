@@ -765,11 +765,19 @@ GPU work signs. Each rule names its seam and its guard.
   IS a client: `main.ts` hands it the renderer's queue
   (`finishShaderWarmup(renderer.webgl, { queue: renderer.backgroundGpuWork })`) and
   `src/game/shader_corpus_slices.ts` runs one BACKGROUND unit per BATCH of
-  program reads (`CORPUS_READ_BATCH`; a read is a synchronous driver round trip
-  that waits for the GPU frame in flight, paid once per batch), per chunk
-  encoded and per chunk fed to the gzip stream (the deflate runs on the main
-  thread inside the write, so the gzip unit holds its tail), under the `corpus-read`,
-  `corpus-encode` and `corpus-gzip` label kinds the budget prices separately. It
+  program reads (`CORPUS_READ_BATCH`), per chunk encoded and per chunk fed to the
+  gzip stream (the deflate runs on the main thread inside the write, so the gzip
+  unit holds its tail), under the `corpus-read`, `corpus-encode` and `corpus-gzip`
+  label kinds the budget prices separately. A read takes each program's sources
+  off the shader handles three keeps on its program entry (`vertexShader`,
+  `fragmentShader`; `programSourcesOfEntry`) with `getShaderSource`, plus the
+  attribute walk, answered inside the page once the program's link has resolved
+  (only a link still pending is waited on). It never asks the driver for a
+  shader's stage (`getShaderParameter(SHADER_TYPE)`): that query goes to the GPU
+  process, which answers only after executing every command already submitted, so
+  a renderer that outruns its GPU process makes each unit pay the whole backlog
+  (pinned by `tests/shader_corpus_slices.test.ts` and
+  `tests/browser/shader_corpus_handles.browser.test.ts`). It
   reads the same stored option and the same pin as the worker (`readWarmupQuery`):
   Off silences it, `auto` and On keep it (the backend rule is the worker's: a
   second context linking DURING play; this arm was measured on the OpenGL desktops
