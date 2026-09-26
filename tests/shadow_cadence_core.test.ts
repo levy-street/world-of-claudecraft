@@ -151,6 +151,41 @@ describe('shadow cadence core', () => {
       overSeconds: 0,
       calmSeconds: 0,
       phase: 0,
+      held: false,
     });
+  });
+
+  // A ship under way close by (ship_shadow_hold.ts): a stale map every other
+  // frame shows its own shadows a frame behind the hull, so a hold renders
+  // every frame while the plan and its dwell clocks run on untouched.
+  it('a hold renders every frame under a half-rate plan, and the plan survives it', () => {
+    const state = createShadowCadenceState();
+    run(state, SHADOW_CADENCE_ENTER_SECONDS + DT * 2, 1.5);
+    expect(state.halfRate).toBe(true);
+    for (let i = 0; i < 30; i++) {
+      updateShadowCadence(state, DT, 1.5, true, true);
+      expect(state.renderThisFrame).toBe(true);
+      expect(state.held).toBe(true);
+      expect(state.halfRate).toBe(true);
+    }
+    // released: the first frame renders, then strict alternation resumes
+    updateShadowCadence(state, DT, 1.5, true, false);
+    expect(state.held).toBe(false);
+    expect(state.renderThisFrame).toBe(true);
+    updateShadowCadence(state, DT, 1.5, true, false);
+    expect(state.renderThisFrame).toBe(false);
+  });
+
+  it('a hold at full rate is no hold at all (nothing is shed to override)', () => {
+    const state = createShadowCadenceState();
+    updateShadowCadence(state, DT, 0.2, true, true);
+    expect(state.halfRate).toBe(false);
+    expect(state.held).toBe(false);
+    expect(state.renderThisFrame).toBe(true);
+    // ...and the hold never starts or stops the dwell clocks
+    run(state, SHADOW_CADENCE_ENTER_SECONDS / 2, 1.5);
+    const over = state.overSeconds;
+    updateShadowCadence(state, DT, 1.5, true, true);
+    expect(state.overSeconds).toBeCloseTo(over + DT, 9);
   });
 });

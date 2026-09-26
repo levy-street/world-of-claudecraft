@@ -10,4 +10,5 @@ export {
   physicsStats,
   resetPhysicsStats,
 } from './character';
+export { platformGlueAt, platformSupportAt } from './platform';
 export { overlapCollider, SKIN_WIDTH, type SweepHit, sweepCollider } from './sweep';

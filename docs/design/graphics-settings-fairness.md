@@ -53,7 +53,10 @@ COSMETIC (may be tiered down on lower presets):
   every frame; shadows are never removed, and a one-frame-stale shadow (50 ms at 20 FPS)
   conveys nothing a player acts on. This is a GOVERNOR-driven shed by design, like the
   weapon-VFX `vfx` bucket arm below: a perf-governor output, not a UI tier knob, so the
-  static-preset rule at the bottom of this doc does not apply to it.
+  static-preset rule at the bottom of this doc does not apply to it. One hold overrides it:
+  while a ship under way is close by (`src/render/ship_shadow_hold.ts`) every frame renders,
+  because a stale map shows the moving ship's own shadows a frame behind its hull on
+  alternate frames, a flicker across its sails and deck.
 - Sun-shadow ortho EXTENT under the same pressure (`src/render/shadow_extent_core.ts`), the
   deeper step below that cadence. The one orthographic box the sun renders shrinks from its
   105 yd half-extent to 78.75 and then 67 (the third step's 0.6 multiplier would give 63, and

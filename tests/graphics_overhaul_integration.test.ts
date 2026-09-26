@@ -77,6 +77,8 @@ describe('graphics-overhaul integration', () => {
       'src/render/eastbrook_town.ts',
       'src/render/yumi_maze.ts',
       'src/render/battleground_placements.ts',
+      // the Harbormaster's House walk-in cutaway (the shell's per-part fade)
+      'src/render/wyrmwatch_harbor_house.ts',
     ];
     for (const file of consumers) {
       const text = source(file);

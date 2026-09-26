@@ -401,6 +401,13 @@ export const id_ID: EnTranslations = {
       "hobby": "Pelatih Hobi",
       "nameplate": "<{title}>"
     },
+    "ferry": {
+      "regionLabel": "Ferry timetable",
+      "departsIn": "The ferry to {dest} departs in {time}",
+      "castingOff": "The ferry to {dest} is casting off",
+      "boardHint": "Stand on its deck when it sails. The crossing is free.",
+      "sailing": "Sailing to {dest}"
+    },
     "materialStackSelectionUnavailable": "Pilihan material itu tidak lagi tersedia.",
     "warlock": {
       "doomLabel": "Kecaman",
@@ -18688,6 +18695,11 @@ export const id_ID: EnTranslations = {
         "name": "Perintis Yerrin",
         "title": "Pengawas Gumuk Pasir Jauh",
         "greeting": "Tetap merunduk. Suara merambat aneh dari kaca itu, dan gerbang di bawah sana punya telinga."
+      },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
       },
       "reeve_ottoline": {
         "name": "Demang Ottoline",

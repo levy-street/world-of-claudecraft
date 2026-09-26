@@ -694,7 +694,8 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
   // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
   // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
-  '986760b00669122f42c84ec204036e153b3d0c8c61937ad028f692732b1314ec';
+  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch (PR 4225). No capture was retaken.
+  'f9e044219a5f89ec5451d4f41fc2032946fe12355136d9241b9f06dbb173d4db';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

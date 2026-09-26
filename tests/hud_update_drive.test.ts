@@ -1044,6 +1044,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the arena match strip, facet-routed',
   },
   {
+    call: 'this.ferryHud.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the scheduled ferry countdown panel and the sailing line, facet-routed',
+  },
+  {
     call: 'this.updateMapWindow',
     band: 'medium',
     gate: "$('#map-window').style.display === 'block'",
@@ -1838,7 +1845,9 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // chrome 93 -> 94: the Cooldown Manager's per-frame paint
       // (src/ui/hud/cooldown_manager/), facet-routed chrome. King of the Hill: the
       // hill bar strip (hud/hill/) is one more chrome surface, 95.
-    ).toEqual({ window: 50, chrome: 95, none: 17 });
+      // The Eastbrook ferry's countdown panel (hud ferryHud) is one more
+      // chrome surface, composed at the release/v0.44.0 merge: 96.
+    ).toEqual({ window: 50, chrome: 96, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

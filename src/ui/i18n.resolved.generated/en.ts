@@ -401,6 +401,13 @@ export const en: EnTranslations = {
       "hobby": "Hobby Trainer",
       "nameplate": "<{title}>"
     },
+    "ferry": {
+      "regionLabel": "Ferry timetable",
+      "departsIn": "The ferry to {dest} departs in {time}",
+      "castingOff": "The ferry to {dest} is casting off",
+      "boardHint": "Stand on its deck when it sails. The crossing is free.",
+      "sailing": "Sailing to {dest}"
+    },
     "materialStackSelectionUnavailable": "That material selection is no longer available.",
     "warlock": {
       "doomLabel": "Condemnation",
@@ -18688,6 +18695,11 @@ export const en: EnTranslations = {
         "name": "Scout Yerrin",
         "title": "Far-Dune Watcher",
         "greeting": "Keep low. Sound carries strangely off the glass, and the gate below has ears."
+      },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
       },
       "reeve_ottoline": {
         "name": "Reeve Ottoline",

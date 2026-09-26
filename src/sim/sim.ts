@@ -52,6 +52,7 @@ import type { ItemCopyAnchor } from './item_copy_anchor';
 export type { CharacterState, PetState } from './character_state';
 
 import { type AccountEarner, type AccountLedger, freshAccountLedger } from './account_ledger';
+import { campPrivateRng } from './camp_private_rng';
 import { buildCivicServicePlacements } from './civic_service_placements';
 import { advanceClimb, tryStartClimb } from './climb';
 import {
@@ -692,6 +693,8 @@ import {
   CURRENT_CHARACTER_CONTENT_REVISION,
   migrateCharacterTalentsV2,
 } from './talent_save_migration';
+import * as ferryMod from './transport_ferry';
+import type { TransportFerryView } from './transport_schedule';
 import { updateAbilityDrill } from './tutorial/ability_drill';
 import { updateGauntletRuns } from './tutorial/gauntlet_run';
 import { updateTutorialGreeting } from './tutorial/greeting';
@@ -702,6 +705,7 @@ import {
   WORLD_BOSSES,
   type WorldBossDef,
 } from './world_boss';
+import { spawnHarborHouseKeeper } from './wyrmwatch_harbor_house';
 
 // Same pattern for the Ravenpost mail book (server/db.ts persists it as a
 // per-realm world_state row alongside the market).
@@ -829,7 +833,6 @@ import {
   type AuraKind,
   angleTo,
   assertCanonicalEastbrookNoticeboardDef,
-  type CampDef,
   CORPSE_HARVEST_CAST_ID,
   type CrowdControlDrCategory,
   type CrowdControlDrState,
@@ -2009,6 +2012,7 @@ export class Sim {
   // Placement-failure backoff gate only; per-zone cadence lives in the event
   // history (rift/portals.ts riftZoneNextOpenAt).
   riftPortalNextAt = 0;
+  transportClockOffset = 0; // dev-only ferry timetable skip (transport_ferry.ts, /dev ferry)
   // Escort quest runs (src/sim/escort.ts), keyed by EscortDef id. Live
   // SimContext view; the module owns every mutation.
   escortRuns = new Map<string, EscortRunState>();
@@ -2227,6 +2231,7 @@ export class Sim {
     // once here (the rng now exists); a live view + bound callbacks, it draws no rng
     // and mutates nothing, so it cannot perturb the construction draws below.
     this.ctx = this.buildSimContext(cfg.vaultConsumptionAdmission);
+    ferryMod.syncFerryGates(this.ctx); // this world's own deck gates before any placement query
     // Movement-kernel deps (MV1): pure binding, no rng draws, no construction effects.
     this.playerMotionDeps = {
       seed: this.cfg.seed,
@@ -2234,6 +2239,7 @@ export class Sim {
       resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
         this.resolveMove(fromX, fromZ, nx, nz, r, e, ignoreFences),
       resolvedAbility: (abilityId, pid) => this.resolvedAbility(abilityId, pid),
+      platform: (p) => ferryMod.ferryDeckPlatform(this.ctx, p), // a sailing ship's deck
       cancelCast: (p) => this.cancelCast(p),
       standUp: (p) => this.standUp(p),
       dealDamage: (source, target, amount, crit, school, ability, kind, noRage) => {
@@ -2326,7 +2332,7 @@ export class Sim {
         // Seeded from the world seed plus the camp's AUTHORED identity (never
         // its array index, so reordering the list cannot move it), and never
         // from wall-clock, so all three hosts agree.
-        const campRng = camp.offStream ? this.campPrivateRng(camp, i) : this.rng;
+        const campRng = camp.offStream ? campPrivateRng(this.cfg.seed, camp, i) : this.rng;
         // Spread the camp's mobs with even nearest-neighbor spacing (a sunflower
         // spiral) instead of independent uniform sampling, which let mobs stack.
         // The two draws below feed campSpawnOffset as jitter and are consumed in the
@@ -2601,12 +2607,11 @@ export class Sim {
       }
     }
 
-    // Escort NPCs (escort.ts) and the hub practice yard (hub_practice.ts) last
-    // on purpose: rng-free, trailing ids only, so everything above is byte-
-    // identical to a world without them.
+    // Escorts, the practice yards, the harbormaster: rng-free, trailing or reserved ids.
     initEscortsImpl(this.ctx);
     spawnHubPractice(this.ctx, worldContent);
     spawnHealingTrainingGround(this.ctx, worldContent);
+    spawnHarborHouseKeeper(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {
@@ -3947,7 +3952,7 @@ export class Sim {
         e.resource,
         e.savedMana,
       ),
-      pos: { x: e.pos.x, z: e.pos.z },
+      pos: ferryMod.ferrySavePosition(e), // never the sea: a ride saves the destination pier
       facing: e.facing,
       // Death state: a released spirit resumes its corpse run on relog, and a
       // dead-but-unreleased corpse auto-releases on load (see addPlayer).
@@ -4193,6 +4198,11 @@ export class Sim {
   ownedMountsFor(pid: number): MountKey[] {
     const meta = this.players.get(pid);
     return meta ? ownedMountsImpl(meta) : [DEFAULT_MOUNT];
+  }
+
+  // --- IWorldTransport ---
+  ferryView(): TransportFerryView | null {
+    return ferryMod.transportFerryView(this.ctx, this.entities.get(this.primaryId));
   }
 
   // --- IWorldMounts ---
@@ -4827,28 +4837,6 @@ export class Sim {
     return { x, y: placementFloorHeight(this.cfg.seed, x, z), z };
   }
 
-  /** The private scatter stream for an `offStream` camp (see CampDef.offStream).
-   *  Seeded from the world seed plus the camp's AUTHORED identity (mob id,
-   *  centre, radius, count) and the index WITHIN that camp, never the camp's
-   *  position in the CAMPS array, so reordering or inserting camps cannot move
-   *  an existing one. Pure and wall-clock-free, so offline, server and headless
-   *  all place these spawns identically. */
-  private campPrivateRng(camp: CampDef, index: number): Rng {
-    let h = 0x811c9dc5 ^ (this.cfg.seed >>> 0);
-    const mix = (n: number): void => {
-      h = (h ^ (n >>> 0)) >>> 0;
-      h = Math.imul(h, 0x01000193) >>> 0;
-    };
-    for (let i = 0; i < camp.mobId.length; i++) mix(camp.mobId.charCodeAt(i));
-    // Quantized so a float re-authored to the same place cannot drift the seed.
-    mix(Math.round(camp.center.x * 100));
-    mix(Math.round(camp.center.z * 100));
-    mix(Math.round(camp.radius * 100));
-    mix(camp.count);
-    mix(index);
-    return new Rng(h >>> 0);
-  }
-
   // Deterministic outward spiral to the nearest spot that is on dry-enough
   // ground and not inside a building/prop. Keeps NPCs out of houses and lakes.
   findSafePos(x: number, z: number, minHeight: number, bodyRadius = 0.6): { x: number; z: number } {
@@ -5025,6 +5013,12 @@ export class Sim {
       },
       set riftPortalNextAt(v: number) {
         sim.riftPortalNextAt = v;
+      },
+      get transportClockOffset() {
+        return sim.transportClockOffset;
+      },
+      set transportClockOffset(v: number) {
+        sim.transportClockOffset = v;
       },
       get riftPortalIds() {
         return sim.riftPortalIds;
@@ -5967,6 +5961,7 @@ export class Sim {
     lap?.('respawns');
     this.updateWorldBosses();
     lap?.('worldBosses');
+    ferryMod.updateTransportFerries(this.ctx); // the ferry timetable: board, carry, set down
     tickGroundAoEs(this.ctx);
     lap?.('groundAoEs');
     tickFrozenOrbs(this.ctx);
@@ -6619,6 +6614,7 @@ export class Sim {
       clearAfkOnMove(this.ctx, meta, p);
     }
     if (advanceValkyrsCalling(this.ctx, p)) return;
+    if (p.ferryRide && ferryMod.stepPassenger(this.playerMotionDeps, p, meta.moveInput)) return;
     // The race countdown is a real start lock, not just a client animation.
     // Hold every forced/manual locomotion mode until the authoritative GO tick.
     if (meta.mountRace?.phase === 'countdown') return;

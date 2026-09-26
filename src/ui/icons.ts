@@ -5547,6 +5547,8 @@ export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
   'dgn_varkhul_flawless',
   // Hidden self-craft celebration; 512px RGBA commission brief in docs/achievements/icon-brief.md.
   'hid_forgebreaker',
+  // The ferry round trip (exp_harbor_to_harbor): procedural exploration crest until commissioned.
+  'exp_harbor_to_harbor',
 ]);
 /** Static URL of a deed crest's painted art, or null when the crest id has no committed image. */
 export function deedImageUrl(crestId: string): string | null {

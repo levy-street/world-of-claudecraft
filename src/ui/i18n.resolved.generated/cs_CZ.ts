@@ -401,6 +401,13 @@ export const cs_CZ: EnTranslations = {
       "hobby": "Trenér koníčku",
       "nameplate": "<{title}>"
     },
+    "ferry": {
+      "regionLabel": "Ferry timetable",
+      "departsIn": "The ferry to {dest} departs in {time}",
+      "castingOff": "The ferry to {dest} is casting off",
+      "boardHint": "Stand on its deck when it sails. The crossing is free.",
+      "sailing": "Sailing to {dest}"
+    },
     "materialStackSelectionUnavailable": "Tento výběr materiálu už není dostupný.",
     "warlock": {
       "doomLabel": "Odsouzení",
@@ -18688,6 +18695,11 @@ export const cs_CZ: EnTranslations = {
         "name": "Zvěd Yerrin",
         "title": "Hlídač Vzdálených dun",
         "greeting": "Drž se při zemi. Zvuk se od skla nese podivně, a brána dole má uši."
+      },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
       },
       "reeve_ottoline": {
         "name": "Rychtářka Ottoline",

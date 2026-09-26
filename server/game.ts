@@ -43,7 +43,6 @@ import {
   jailCageSpawn,
   jailGateTeleport,
 } from '../src/sim/jail';
-import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import type { MarketQuery } from '../src/sim/market_query';
 import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
@@ -339,6 +338,7 @@ import {
   type ListReadGuardState,
 } from './list_read_guard';
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
+import { isPickAction } from './lockpick_action';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
 import { dispatchMarketCommand, marketWirePromptCommand } from './market_commands';
@@ -463,6 +463,7 @@ import {
 import { createTickSaveObserver, TickProfiler, type TickProfilerSample } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { applyTownFocusCommand } from './town_focus_command';
+import { ferryDeckWire, transportHeadJson } from './transport_head';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
 import { recordUnstuckEvent } from './unstuck_records';
 import { buildVarkhulPortalReplayBatch, varkhulPortalReplayFrame } from './varkhul_portal_replay';
@@ -500,9 +501,6 @@ const SPECTATE_LIMBO_X = -10_000;
 const SPECTATE_LIMBO_Z = -10_000;
 const AUTOSAVE_SECONDS = 30;
 const SAVE_CONCURRENCY = 4;
-// Valid lockpicking action enums accepted from the client (anti-cheat: reject
-// anything else before it reaches the Sim).
-const LOCKPICK_ACTIONS = new Set<PickAction>(['hardSet', 'set', 'steady', 'ease', 'drop', 'abort']);
 const LEAVE_SAVE_MAX_ATTEMPTS = 5;
 const LEAVE_SAVE_RETRY_BASE_MS = 250;
 const LEAVE_SAVE_RETRY_MAX_MS = 4000;
@@ -824,10 +822,6 @@ type ClientMessage = Record<string, unknown> & {
   x?: number;
   z?: number;
 };
-
-function isPickAction(value: unknown): value is PickAction {
-  return typeof value === 'string' && LOCKPICK_ACTIONS.has(value as PickAction);
-}
 
 // Heavy, rarely-changing self fields (inventory, equipment, stats, talents,
 // quests, milestones, cosmetics) are re-serialized into a snapshot only when a
@@ -1416,6 +1410,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
     out.cl = Math.max(1, Math.min(99, Math.round(t * 100)));
   }
   if (e.leap) out.lp = 1; // Vaulting Charge: server-owned movement arc
+  if (e.ferryRide) out.fry = ferryDeckWire(e); // a passenger's deck spot (transport_head.ts)
   if (e.weaponStowed) out.ws = 1; // Z-key sheathe: weapons render on the back
   if (e.helmHidden) out.hh = 1; // paperdoll eye toggle: kit helm left off the composed body
   if (e.aggroTargetId !== null) out.aggro = e.aggroTargetId;
@@ -7924,7 +7919,7 @@ export class GameServer {
         this.lastTickHzHeadTime = now;
       }
     }
-    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}`;
+    const head = `{"t":"snap","tick":${tick},"time":${round2(this.sim.time)}${tickHzJson}${transportHeadJson(this.sim)}`;
     const telegraphWorld = groundTelegraphWorld(this.sim, INTEREST_QUERY_RADIUS, EVENT_RADIUS);
     const varkhulPortalReplay = buildVarkhulPortalReplayBatch(
       this.clients.values(),

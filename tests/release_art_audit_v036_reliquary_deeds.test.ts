@@ -220,12 +220,17 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul_flawless',
       // The personal hammer quest ships with the explicit category-crest fallback.
       'hid_forgebreaker',
+      // The Eastbrook ferry's round trip rides the deed_cat_exploration crest
+      // until its commissioned art lands (docs/design/deeds.md, Icons).
+      'exp_harbor_to_harbor',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
     // DEEDS table, matching the same pin in tests/deed_icons.test.ts and
     // tests/deed_i18n.test.ts) - 11 explicitly pending = 289 painted.
-    expect(DEED_ORDER).toHaveLength(300);
+    // 301 live with the Eastbrook ferry's exp_harbor_to_harbor, the twelfth
+    // pending row, so the painted count holds at 289.
+    expect(DEED_ORDER).toHaveLength(301);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

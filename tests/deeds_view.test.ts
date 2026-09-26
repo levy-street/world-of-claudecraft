@@ -869,12 +869,13 @@ describe('real catalog integration', () => {
     // (src/sim/content/deeds.ts) with a standalone probe calling
     // buildDeedsView + countsTowardCompletion directly (tsx, no full
     // compile), since the tree does not compile yet:
-    // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character.
-    expect(view.summary.visibleTotal).toBe(268);
+    // 300 deeds - 22 feats - 10 hidden = 268 visible to a fresh character;
+    // 269 with the Eastbrook ferry's exp_harbor_to_harbor.
+    expect(view.summary.visibleTotal).toBe(269);
     // The bucket sum adds the feat-flagged rows back on top (hidden-unearned
     // deeds never enter a bucket at all, so only the 22 feats separate this
-    // from visibleTotal): 268 + 22 = 290.
-    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(290);
+    // from visibleTotal): 269 + 22 = 291.
+    expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(291);
   });
 
   it('offers exactly the live catalog border deeds once they are earned', () => {

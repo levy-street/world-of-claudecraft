@@ -47,6 +47,7 @@ import {
   modularSignature,
   morphInfluences,
   NEUTRAL_FACE,
+  NPC_MATERIAL_COLORWAY_IDS,
   normalizeAppearance,
   OUTFIT_COLORWAY_IDS,
   OUTFIT_COLORWAYS,
@@ -740,6 +741,29 @@ describe('outfit colorways', () => {
       expect(OUTFIT_COLORWAY_IDS).toContain(id);
       expect(normalizeAppearance({ outfit: id }).outfit).toBe(id);
     }
+  });
+
+  // Harbormaster Tamsin's sea coat (npc_looks.ts): an NPC-only material colorway. Navy
+  // broadcloth, brass where the coat's pale steel buttons and cuffs were, dark leather.
+  it('compiles the NPC-only admiralty colorway to navy cloth, brass steel and dark leather', () => {
+    expect(NPC_MATERIAL_COLORWAY_IDS).toEqual(['admiralty']);
+    expect(OUTFIT_COLORWAY_IDS as readonly string[]).not.toContain('admiralty');
+    const dye = outfitDye('mage', 'admiralty')!;
+    expect(dye.rules).toHaveLength(3);
+    const cloth = dye.rules.find((r) => r.ref === ARMOR_DYE_BANDS.mage.ref)!;
+    expect(cloth).toMatchObject({ hueMode: 'abs', hue: 222 });
+    expect(cloth.valMul).toBeLessThan(0.6); // navy, not the customizer's bright azure
+    const steel = dye.rules.find((r) => r.band >= 400 && r.sat[0] < 0.1)!;
+    expect(steel).toMatchObject({ hueMode: 'abs', hue: 41 });
+    expect(steel.satAdd).toBeGreaterThan(0.3); // gray steel gains real brass saturation
+    // the low tier multiplies by the COAT colour (blue-dominant), never the brass chip
+    const fallback = outfitDyeFallbackHex('mage', 'admiralty');
+    expect(fallback & 0xff).toBe(255);
+    expect((fallback >> 16) & 0xff).toBeLessThan(fallback & 0xff);
+    // the modular variant cache sees it (a different signature from classic)
+    const a = app({});
+    const b = { ...app({}), outfit: 'admiralty' as const };
+    expect(modularSignature(a, KNIGHT_FULL)).not.toBe(modularSignature(b, KNIGHT_FULL));
   });
 
   it('reaches the signature without touching the geometry key', () => {

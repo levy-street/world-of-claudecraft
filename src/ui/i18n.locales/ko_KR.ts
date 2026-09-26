@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const ko_KR: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.ferry.regionLabel': '여객선 시간표',
+  'hudChrome.ferry.departsIn': '{dest}행 여객선이 {time} 후에 출항합니다',
+  'hudChrome.ferry.castingOff': '{dest}행 여객선이 출항하고 있습니다',
+  'hudChrome.ferry.boardHint': '출항할 때 갑판 위에 서 있으면 함께 떠납니다. 운임은 무료입니다.',
+  'hudChrome.ferry.sailing': '{dest}(으)로 항해 중',
   'hudChrome.noticeboard.officerEntry': '{name}({rank})',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -12377,6 +12382,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '잔디밭에서는 걸음을 조심하게. 정원이 직접 다듬는 곳이라, 말끔한 걸 좋아하거든.',
   'entities.npcs.harbormaster_odile.name': '항만장 오딜',
   'entities.npcs.harbormaster_odile.title': '윅하버의 항만장',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    '부두에서 들어와 손 좀 녹이세요. 우리 부두의 배는 긴 동쪽 해안을 따라 윅하버까지 올라갔다가 다시 돌아옵니다. 저 멀리 서쪽에서는 다른 나룻배가 이스트브룩과 밤꽃 평원 사이를 오가지요. 벽에 걸린 지도에 두 항로가 모두 그려져 있습니다. 와이름 감시탑으로 오르기 전에 불가에서 좀 쉬어 가세요.',
+  'entities.npcs.harbormaster_tamsin.name': '항만장 탐신',
+  'entities.npcs.harbormaster_tamsin.title': '와이름 감시탑 부두지기',
   'entities.npcs.harbormaster_odile.greeting':
     '이 후미의 배는 죄다 올드 비컨에 제 용골을 빚졌지. 빨리 말하게, 조수는 기다려 주지 않으니.',
   'entities.npcs.head_gardener_amaranth.name': '수석 정원사 아마란스',

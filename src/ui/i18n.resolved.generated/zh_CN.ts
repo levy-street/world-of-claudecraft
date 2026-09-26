@@ -401,6 +401,13 @@ export const zh_CN: EnTranslations = {
       "hobby": "爱好训练师",
       "nameplate": "＜{title}＞"
     },
+    "ferry": {
+      "regionLabel": "渡船时刻表",
+      "departsIn": "前往{dest}的渡船将在{time}后起航",
+      "castingOff": "前往{dest}的渡船正在起航",
+      "boardHint": "起航时站在甲板上即可随船出发。渡船免费。",
+      "sailing": "正在驶往{dest}"
+    },
     "materialStackSelectionUnavailable": "该素材选择已失效。",
     "warlock": {
       "doomLabel": "谴罪",
@@ -18688,6 +18695,11 @@ export const zh_CN: EnTranslations = {
         "name": "斥候耶琳",
         "title": "远丘瞭望者",
         "greeting": "压低身子。声音在血玻璃上传得很怪，而下面那道门长着耳朵。"
+      },
+      "harbormaster_tamsin": {
+        "name": "港务长塔姆辛",
+        "title": "望龙哨码头看守",
+        "greeting": "从码头进来暖暖手吧。停在我们码头的船沿着漫长的东岸北上驶往烛港，再原路返回。在遥远的西边，另一艘渡船往返于东溪与夜绽花野之间。墙上的地图画着这两条航线。攀登望龙哨之前，先在火边歇一歇吧。"
       },
       "reeve_ottoline": {
         "name": "镇务官奥托琳",

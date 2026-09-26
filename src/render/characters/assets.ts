@@ -1964,6 +1964,11 @@ function applyLowReadabilityLift(
     // polish (and its cream lift) is skipped outright: deliberate, the tiers
     // trade colour accuracy for readability in different places.
     if (authored && lambert.map) lambert.emissiveMap = lambert.map;
+    // An authored VERTEX-coloured held prop (the harbormaster's gear) has no map to scale
+    // the floor through, and three never multiplies emissive by vertex colour: the uniform
+    // floor would film its dark felt grey. Its albedo lives in the vertices, so it takes no
+    // floor. Held props only: an authoredAtlas body keeps the floor it always had.
+    else if (authored && role === 'weapon' && lambert.vertexColors) lambert.emissive.setScalar(0);
   }
 }
 

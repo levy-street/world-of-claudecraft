@@ -401,6 +401,13 @@ export const pt_BR: EnTranslations = {
       "hobby": "Instrutor de Passatempo",
       "nameplate": "<{title}>"
     },
+    "ferry": {
+      "regionLabel": "Ferry timetable",
+      "departsIn": "The ferry to {dest} departs in {time}",
+      "castingOff": "The ferry to {dest} is casting off",
+      "boardHint": "Stand on its deck when it sails. The crossing is free.",
+      "sailing": "Sailing to {dest}"
+    },
     "materialStackSelectionUnavailable": "Essa seleção de material não está mais disponível.",
     "warlock": {
       "doomLabel": "Condenação",
@@ -18688,6 +18695,11 @@ export const pt_BR: EnTranslations = {
         "name": "Batedor Yerrin",
         "title": "Vigia das Dunas Distantes",
         "greeting": "Fique abaixado. O som se propaga de forma estranha no vidro, e o portão lá embaixo tem ouvidos."
+      },
+      "harbormaster_tamsin": {
+        "name": "Harbormaster Tamsin",
+        "title": "Keeper of the Wyrmwatch Quays",
+        "greeting": "Come in off the quay and warm your hands. The ship at our pier sails up the long east coast to Wickharbor and back again. Far to the west, the other ferry runs between Eastbrook and the Nightbloom. The map on the wall shows both crossings. Rest by the fire before the climb to Wyrmwatch."
       },
       "reeve_ottoline": {
         "name": "Prefeita Ottoline",

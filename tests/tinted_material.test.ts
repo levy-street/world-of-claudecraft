@@ -321,6 +321,45 @@ describe('tinted character materials', () => {
     }
   });
 
+  it('drops the low-tier floor from an authored VERTEX-coloured prop, which has no map to scale it', () => {
+    // The harbormaster's gear (scripts/assets/harbormaster_gear/) carries its albedo in its
+    // vertices; three never multiplies emissive by vertex colour, so the uniform floor would
+    // film the dark navy felt grey. Only the authored tag drops it: a kit prop keeps it.
+    const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
+    try {
+      const derive = (authored: boolean) => {
+        const src = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true });
+        const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+        mesh.userData.weaponMesh = true;
+        if (authored) mesh.userData.authoredSurface = true;
+        const root = new THREE.Group();
+        root.add(mesh);
+        applyMaterials(root, {} as VisualDef, 0xffffff);
+        const out = mesh.material as unknown as THREE.MeshLambertMaterial;
+        expect(out.isMeshLambertMaterial).toBe(true);
+        expect(out.vertexColors).toBe(true);
+        return out;
+      };
+      const gear = derive(true);
+      expect(gear.emissive.getHex()).toBe(0x000000);
+      expect(gear.emissiveMap).toBeNull();
+      const kit = derive(false);
+      expect(kit.emissive.getHex()).not.toBe(0x000000);
+      // an authoredAtlas BODY with untextured vertex-coloured parts (the rocket sled mount)
+      // keeps the uniform floor: the drop is for authored held props only
+      const src = new THREE.MeshStandardMaterial({ color: 0xffffff, vertexColors: true });
+      const mesh = new THREE.Mesh(new THREE.BufferGeometry(), src);
+      const root = new THREE.Group();
+      root.add(mesh);
+      applyMaterials(root, { authoredAtlas: true } as VisualDef, 0xffffff);
+      const body = mesh.material as unknown as THREE.MeshLambertMaterial;
+      expect(body.isMeshLambertMaterial).toBe(true);
+      expect(body.emissive.getHex()).not.toBe(0x000000);
+    } finally {
+      restoreGfx();
+    }
+  });
+
   it('partitions the cache so a flagged def never hands its clone to a player form on the same GLB', () => {
     // mob_wolf (authoredAtlas) and form_ghost_wolf share wolf_basic.glb, so
     // both reach tintedMaterial with the SAME source material. The flag must

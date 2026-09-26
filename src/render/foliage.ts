@@ -12,6 +12,7 @@ import {
 } from '../sim/data';
 import { inDawnholdBailey } from '../sim/dawnhold_layout';
 import { ROCK_SINK_UNITS, rockHeightOf } from '../sim/decoration_dims';
+import { onFerryPier } from '../sim/ferry_piers';
 import { galeDeckSurface } from '../sim/gale_harbor';
 import type { BiomeId } from '../sim/types';
 import type { Decoration } from '../sim/world';
@@ -2220,9 +2221,11 @@ function stableMeadowBand(x: number, z: number): boolean {
   return dist > 1.5 && dist <= 18;
 }
 
-// nothing sprouts up through Wickharbor's boardwalk and pier planks
+// nothing sprouts up through Wickharbor's boardwalk and pier planks, nor the
+// far ferry piers' roots
 function onHarborDeck(x: number, z: number, seed: number): boolean {
-  return galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity;
+  const at = (sx: number, sz: number) => terrainHeight(sx, sz, seed);
+  return galeDeckSurface(x, z, at, WATER_LEVEL) !== -Infinity || onFerryPier(x, z, at);
 }
 
 function tooSteep(x: number, z: number, seed: number): boolean {

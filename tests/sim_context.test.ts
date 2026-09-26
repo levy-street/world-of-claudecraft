@@ -285,6 +285,7 @@ function makeFakeHost() {
     riftEvents: [],
     nextRiftInstanceId: 1,
     riftPortalNextAt: 120,
+    transportClockOffset: 0,
     riftPortalSpawnCount: 0,
     get rng() {
       return rng;

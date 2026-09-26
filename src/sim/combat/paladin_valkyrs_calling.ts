@@ -128,6 +128,15 @@ export function armValkyrsCalling(
   });
 }
 
+/** End a flight in progress without landing it (its aura cleared): a ferry
+ *  passenger's deck moves under it (src/sim/transport_ferry.ts). */
+export function cancelValkyrsCalling(ctx: SimContext, entity: Entity): void {
+  if (!entity.valkyrsCalling) return;
+  entity.valkyrsCalling = null;
+  entity.jumping = false;
+  clearFlightAura(ctx, entity);
+}
+
 export function advanceValkyrsCalling(ctx: SimContext, entity: Entity): boolean {
   const flight = entity.valkyrsCalling;
   if (!flight) return false;

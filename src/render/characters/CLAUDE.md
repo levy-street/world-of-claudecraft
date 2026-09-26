@@ -147,6 +147,12 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `registerWeapon` returns the held-model decision as a follow-up action);
   `tests/authored_surfaces.test.ts` scans the shipped GLBs and fails any
   authored atlas that is neither flagged nor on its explicit legacy list.
+- Worn NPC gear: an `NPC_MODULAR_PROP_ATTACH` entry need not be a hand prop. The
+  `harbormaster` set parents GLBs to the `head` and `hips` bones with an identity
+  transform, so each is authored in that bone's BIND frame
+  (`scripts/assets/harbormaster_gear/`, fitted with its `extract_reference.mjs`); it rides
+  the authored arm (`AUTHORED_HELD_MODELS`) and, like every prop, is left out of the
+  composed far bake. Pinned by `tests/harbormaster_gear_asset.test.ts`.
 - `stonebound_shell_core.ts`: the Stonebound weapon-shell style. Wireframe on any
   antialiased frame; a solid translucent sheath when NO AA pass runs (Low, and the
   memory-constrained WebKit profiles), because a one-pixel GPU wireframe crawls

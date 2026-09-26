@@ -5865,6 +5865,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 0,
     "feat": false,
     "crest": "/ui/deeds/col_set_bramblehide.webp"
+  },
+  {
+    "id": "exp_harbor_to_harbor",
+    "name": "Harbor to Harbor",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 
