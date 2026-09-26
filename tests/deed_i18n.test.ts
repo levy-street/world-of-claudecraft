@@ -89,9 +89,11 @@ describe('deed_i18n English resolution', () => {
     // set collection (col_set_bramblehide, no title reward; the release's own
     // chain read 282 * 2 + 43), so the title count stays at 46.
     // Retired Vale Cup and Fiesta deeds keep names but drop 19 descriptions.
-    expect(manifest.filter((row) => row.field === 'name').length).toBe(300);
-    expect(manifest.filter((row) => row.field === 'desc').length).toBe(281);
-    expect(manifest.length).toBe(627);
+    // 301 with the Eastbrook ferry's round trip (exp_harbor_to_harbor: a name
+    // and a desc, no title reward).
+    expect(manifest.filter((row) => row.field === 'name').length).toBe(301);
+    expect(manifest.filter((row) => row.field === 'desc').length).toBe(282);
+    expect(manifest.length).toBe(629);
     expect(manifest.filter((row) => row.field === 'title').length).toBe(46);
     expect(manifest.filter((row) => row.id === 'hid_forgebreaker')).toEqual([
       { id: 'hid_forgebreaker', field: 'name', source: 'A Spring Unchained' },

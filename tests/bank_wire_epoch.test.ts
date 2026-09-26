@@ -89,7 +89,7 @@ type _PerfectingKeysAreNew = AssertNever<
 >;
 
 describe('wire compatibility epoch', () => {
-  it('fences older item formats out at the epoch-29 handshake', () => {
+  it('fences older item formats out at the epoch-30 handshake', () => {
     // The runtime epoch pin: the world handshake version that fences older
     // snapshot shapes out before any snapshot is admitted. The three frozen
     // fixtures above carry the per-epoch rationale: bank storage (10) added
@@ -111,10 +111,13 @@ describe('wire compatibility epoch', () => {
     // its roads rebuilt), so an epoch-28 client would stand in rings and
     // fire it cannot see and would render geography the server no longer
     // stands anywhere near; it must be fenced out alongside every earlier
-    // incompatible epoch.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(29);
+    // incompatible epoch. Epoch 30 made the Eastbrook ferry a scheduled ship
+    // whose deck exists only where it lies docked, so an epoch-29 client
+    // (which draws it moored forever) is fenced out too.
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(30);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-29');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-30');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-29');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-28');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-27');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-26');

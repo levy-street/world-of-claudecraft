@@ -3393,6 +3393,26 @@ export const DEEDS: Record<string, DeedDef> = {
     trigger: { kind: 'quest', questId: 'q_requiem_at_the_forge' },
     hidden: true,
   },
+  // The scheduled ferries (sim/transport_ferry.ts): one crossing in each
+  // direction on every route, the visit marks written when a living passenger
+  // steps off at the far pier. Cosmetic exploration at the castle-visit value
+  // (renown 5); appended at the END per the append-only contract.
+  exp_harbor_to_harbor: {
+    id: 'exp_harbor_to_harbor',
+    name: 'Harbor to Harbor',
+    desc: 'Sail both ferries there and back: Eastbrook to Moonrest, and Wickharbor to Wyrmwatch.',
+    category: 'exploration',
+    renown: 5,
+    trigger: {
+      kind: 'visits',
+      markIds: [
+        'ferry:eastbrook_nightbloom',
+        'ferry:nightbloom_eastbrook',
+        'ferry:wickharbor_drakelands',
+        'ferry:drakelands_wickharbor',
+      ],
+    },
+  },
 };
 
 for (const def of Object.values(DEEDS)) {

@@ -7,6 +7,8 @@ export interface PredictionPose {
   y: number;
   z: number;
   facing: number;
+  /** The frame the pose is in: a sailing ship's route index, or world. */
+  deck?: number | null;
 }
 
 export type PredictionResidual = Pick<PredictionPose, 'x' | 'y' | 'z'>;
@@ -17,7 +19,10 @@ export interface PredictionFrame {
   facing: number | null;
 }
 
-export type MotionState = Pick<
+/** The predicted body. `deck` set (a route index) means the pose is kept in
+ *  that sailing ship's frame (render/deck_prediction.ts): position x port and
+ *  z bow (height stays world yards); heading and velocity off the bow. */
+export type MotionState = { deck?: number | null } & Pick<
   Entity,
   | 'id'
   | 'pos'
@@ -81,6 +86,7 @@ function stepFrom(state: MotionState, frame: PredictionFrame, stepFn: Prediction
 }
 
 function applyAuthoritativePose(state: MotionState, authoritative: PredictionPose): void {
+  state.deck = authoritative.deck ?? null;
   state.pos.x = authoritative.x;
   state.pos.y = authoritative.y;
   state.pos.z = authoritative.z;
@@ -177,6 +183,7 @@ export function reconcile(
   if (!acknowledged) return { mode: 'stale' };
 
   if (
+    (acknowledged.pose.deck ?? null) === (authoritative.deck ?? null) &&
     acknowledged.pose.pos.x === authoritative.x &&
     acknowledged.pose.pos.y === authoritative.y &&
     acknowledged.pose.pos.z === authoritative.z
@@ -195,6 +202,12 @@ export function reconcile(
   }
   const newHead = replayed[replayed.length - 1]?.pose ?? acknowledged.pose;
   ring.dropThrough(ackCt);
+  // A replay that changed frames (boarding or leaving a sailing ship's deck,
+  // render/deck_prediction.ts) has no residual to glide: the two heads are in
+  // different coordinates, and the display rebases across the switch itself.
+  if (oldHead && (oldHead.deck ?? null) !== (newHead.deck ?? null)) {
+    return { mode: 'replayed', residual: { x: 0, y: 0, z: 0 } };
+  }
   return {
     mode: 'replayed',
     residual: {

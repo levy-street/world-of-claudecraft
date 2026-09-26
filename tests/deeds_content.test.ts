@@ -138,8 +138,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // MEASURED on the merged tree, which is the value that wins per this
     // file's own convention: the id COUNT stays 300 (a pure append), only the
     // Renown SUM moves.
-    expect(DEED_ORDER.length).toBe(300);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3310);
+    // The Eastbrook ferry's Phase 2 appends exp_harbor_to_harbor at renown 5:
+    // 301 / 3315.
+    expect(DEED_ORDER.length).toBe(301);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3315);
   });
 
   it('ships the audited per-category counts', () => {
@@ -174,7 +176,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // +2 bank socket ladder deeds (soc_strongbox_outfitter,
       // soc_four_bags_deep; Bank Storage phase 06).
       social: 20,
-      exploration: 11,
+      // +1 the ferry round trip (exp_harbor_to_harbor).
+      exploration: 12,
       feat: 3,
       hidden: 10,
     });
@@ -369,6 +372,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // first here rather than appending it behind the branch's tail).
       'col_set_bramblehide',
       'hid_forgebreaker',
+      // The Eastbrook ferry's round trip (Phase 2 of the ferry), appended last.
+      'exp_harbor_to_harbor',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -978,7 +983,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // reproduces a prior hash); the frozen literal below is MEASURED directly
   // off the merged DEED_ORDER/DEEDS table instead. No shipped TRIGGER changed
   // on either side; only those eighteen renown values moved.
-  const FROZEN_CATALOG_SHA256 = '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  // Re-baselined for the Eastbrook ferry's exp_harbor_to_harbor (a pure tail append,
+  // proven by the pre-append digest below), then again when the ferry grew to
+  // two routes and that same unshipped tail deed's visit marks became the four
+  // crossings (still a tail row: the proof below strips it and reproduces the
+  // previous digest).
+  const FROZEN_CATALOG_SHA256 = '7a9557182e647b4d298edc146c3f381d1c9cd4667a6a3b3191d2b54c9bcdc596';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1026,9 +1036,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // merged table with the two new ids removed, folding the eighteen-value
   // retune into the new checkpoint; every append AFTER this merge is once
   // again provable the auditable way against it.
+  //
+  // The Eastbrook ferry's Phase 2 appends exp_harbor_to_harbor: the previous
+  // frozen literal (931a0593...) rotates down here and the proof strips only
+  // the one new id, so no older row moved.
   const PRE_APPEND_CATALOG_SHA256 =
-    '516adb010bf37c91076b9a16bdf0e4dc22c72506fcb64e237468d1ee197d1358';
-  const APPENDED_SINCE: readonly string[] = ['col_set_bramblehide', 'hid_forgebreaker'];
+    '931a05935481f4014b21a20357f363bcaf52c4025c0d88512e2d60895b5cb2ef';
+  const APPENDED_SINCE: readonly string[] = ['exp_harbor_to_harbor'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
@@ -1039,8 +1053,8 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
     // Pin its two predecessors too: this is an append into a known seat,
     // never a scattered insert or a retro-edit (the digest below proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'dgn_varkhul_heroic',
-      'dgn_varkhul_flawless',
+      'col_set_bramblehide',
+      'hid_forgebreaker',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1257,8 +1271,9 @@ describe('table shape', () => {
     // that (appended behind the branch's rows; the flawless task is its
     // final entry). The Roots' Bramblehide set collection appends behind the
     // raid block (whose flawless task was the previous final entry).
-    // The one-time Forgebreaker quest's hidden celebration appends after it.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('hid_forgebreaker');
+    // The one-time Forgebreaker quest's hidden celebration appends after it,
+    // and the Eastbrook ferry's round trip after that.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

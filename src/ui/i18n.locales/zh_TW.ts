@@ -13,6 +13,11 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const zh_TW: Partial<Record<TranslationKey, string>> = {
+  'hudChrome.ferry.regionLabel': '渡船時刻表',
+  'hudChrome.ferry.departsIn': '前往{dest}的渡船將在{time}後啟航',
+  'hudChrome.ferry.castingOff': '前往{dest}的渡船正在啟航',
+  'hudChrome.ferry.boardHint': '啟航時站在甲板上即可隨船出發。渡船免費。',
+  'hudChrome.ferry.sailing': '正在駛往{dest}',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '《{title}》',
   'guide.professions.endgameBodyRaidCollections':
@@ -11790,6 +11795,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '在草坪上走路當心點。花園親自修剪它們，而且喜歡它們整整齊齊。',
   'entities.npcs.harbormaster_odile.name': '港務長奧蒂爾',
   'entities.npcs.harbormaster_odile.title': '燭港港務長',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    '從碼頭進來暖暖手吧。停在我們碼頭的船沿著漫長的東岸北上駛往燭港，再原路返回。在遙遠的西邊，另一艘渡船往返於東溪與夜綻花野之間。牆上的地圖畫著這兩條航線。攀登望龍哨之前，先在火邊歇一歇吧。',
+  'entities.npcs.harbormaster_tamsin.name': '港務長塔姆辛',
+  'entities.npcs.harbormaster_tamsin.title': '望龍哨碼頭看守',
   'entities.npcs.harbormaster_odile.greeting':
     '這座海灣裡的每條船，龍骨都欠老燈塔一份情。有話快說，潮水可不等人。',
   'entities.npcs.head_gardener_amaranth.name': '首席園丁艾瑪蘭',

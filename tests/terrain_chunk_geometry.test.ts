@@ -381,7 +381,12 @@ describe('generated chunk geometry is stable', () => {
     // pads into spaced town-square positions; the terrain generator is unchanged.
     // Desktop/mobile captures and the rendered wolf-route collision checks
     // were reviewed before refreshing this intentional layout fingerprint.
-    expect(digestOf(inRect)).toBe('6750fb67ee25f0addbea3cf2b350775d');
+    // Re-minted for the Eastbrook ferry: its Phase 1 berth moved the cove's
+    // floating-prop calm pads (the retired and moved hulls, the ferry's own
+    // pad), which reshapes seabed vertices under the ferry pier; Phase 2 keeps
+    // that seabed byte-identical (the route berth carries the same pad).
+    // Measured on the Phase 1 commit and again on Phase 2: the same digest.
+    expect(digestOf(inRect)).toBe('bb7ae116e2805c586658643204e84c7a');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

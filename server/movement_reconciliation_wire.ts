@@ -1,4 +1,5 @@
 import type { Entity } from '../src/sim/types';
+import { ferryDeckReconWire } from './transport_head';
 
 export interface MovementReconciliationSessionWireState {
   movementWireVersion: 1 | 2;
@@ -13,7 +14,7 @@ export { updateMovementOverrideEpochs as updateOverrideEpochs } from './movement
 export function reconciliationSelfWire(
   session: MovementReconciliationSessionWireState,
   entity: Entity,
-): Record<string, number> {
+): Record<string, number | number[]> {
   if (session.movementWireVersion !== 2) return {};
   // Full precision for rpx/rpy/rpz/rpf is LOAD-BEARING for exact-match reconciliation.
   // Rounding makes every acknowledged pose mismatch and forces a replay.
@@ -27,5 +28,8 @@ export function reconciliationSelfWire(
     ovE: session.movementOverrideEpoch,
     ...(session.movementOverrideActive ? { ovA: 1 } : {}),
     ...(session.movementMoveSpeedMult !== 1 ? { msm: session.movementMoveSpeedMult } : {}),
+    // aboard a sailing ship: the same pose in the hull's frame, full precision
+    // (the deck-aware prediction replays in it: src/render/deck_prediction.ts)
+    ...(entity.ferryRide ? { rdk: ferryDeckReconWire(entity) } : {}),
   };
 }

@@ -681,7 +681,9 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // 300 at THIS release/v0.42.0 merge: the Roots' Bramblehide set collection
     // (col_set_bramblehide, 281 to 282 on the release's own arm) joins the
     // same pending side.
-    expect(DEED_ORDER).toHaveLength(300);
+    // 301 with the Eastbrook ferry's exp_harbor_to_harbor, which joins the
+    // pending side on the deed_cat_exploration crest until commissioned.
+    expect(DEED_ORDER).toHaveLength(301);
     expect(DEED_ART_PENDING.has('hid_forgebreaker')).toBe(true);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');

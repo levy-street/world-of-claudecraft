@@ -56,6 +56,18 @@ export const hudChromeStrings = {
     target: 'Target focus {slot}',
   },
   professionTrainers: professionTrainerStrings,
+  // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
+  // src/ui/hud/transport/):
+  // the timetable panel near the docked ship and the sailing line aboard.
+  // {dest} is the destination town's localized POI label; {time} a m:ss
+  // countdown.
+  ferry: {
+    regionLabel: 'Ferry timetable',
+    departsIn: 'The ferry to {dest} departs in {time}',
+    castingOff: 'The ferry to {dest} is casting off',
+    boardHint: 'Stand on its deck when it sails. The crossing is free.',
+    sailing: 'Sailing to {dest}',
+  },
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
   warlock: {
     doomLabel: 'Condemnation',

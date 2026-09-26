@@ -203,6 +203,8 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/props.ts',
   'src/render/realm_builder_monument_fx.ts',
   'src/render/rift_decor.ts',
+  // the ferry's foam wake: open-sea points trailing a ship, never over a raid floor
+  'src/render/ship_wake.ts',
   'src/render/underwater.ts',
   'src/render/weather.ts',
   'src/render/wildheart_props.ts',

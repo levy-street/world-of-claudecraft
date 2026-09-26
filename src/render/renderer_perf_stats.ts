@@ -121,6 +121,8 @@ export interface RendererPerfStats {
   renderScale: number;
   effectiveRenderScale: number;
   renderBudget: RenderBudgetState;
+  /** The shadow map actually renders every other frame: the half-rate plan
+   *  minus any ship hold (shadow_cadence_core.ts). */
   shadowCadenceHalfRate: boolean;
   /** The budget-governed sun-shadow EXTENT shed (shadow_extent_core.ts), the
    *  render knob a capture most easily forgets it was taken under: the ladder

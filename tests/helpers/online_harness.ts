@@ -13,11 +13,13 @@
 //   - The client's fixed-tick v2 sampler and the legacy timer, both registered
 //     against the VirtualClock, so each negotiated wire follows its real lane.
 //   - The client frame pipeline: the four extracted seams (snapshotAlpha,
-//     InputEchoTracker, selfMotionPredictionEnabled, updateSelfRenderPosition)
+//     InputEchoTracker, selfMotionPredictionEnabled, updateSelfRenderOnDeck)
 //     driven in the ORDER src/main.ts's online arm drives them, which is
 //     load-bearing: alpha is read before this frame's echo samples are folded,
 //     the fold happens before the SelfMotionFrame is built, and the drawn pose
-//     comes out of the same updateSelfRenderPosition call renderer.ts makes.
+//     comes out of the same updateSelfRenderOnDeck call renderer.ts makes
+//     (updateSelfRenderPosition, run in a sailing ship's frame while the
+//     player rides one: render/deck_frame.ts).
 //
 // The ground-truth convention, stated once because every measurement rests on
 // it: the reference trajectory is what the server would do RECEIVING EACH WIRE
@@ -61,17 +63,19 @@ import {
 import { InputEchoTracker } from '../../src/net/input_echo_tracker';
 import { ClientWorld } from '../../src/net/online';
 import { snapshotAlpha } from '../../src/net/snapshot_alpha';
+import { deckFrameFor, updateSelfRenderOnDeck } from '../../src/render/deck_frame';
 import { advanceSelfFacing, releaseSelfFacing } from '../../src/render/facing_smooth';
 import { hasAuthoritativeSelfPositionDiscontinuity } from '../../src/render/self_motion';
 import { MovementPredictionPipeline } from '../../src/render/self_prediction';
 import {
   createSelfRenderPositionState,
   noteSelfIdentity,
-  updateSelfRenderPosition,
 } from '../../src/render/self_render_position_core';
 import { delveMotionState } from '../../src/sim/delves/geometry';
 import { parseMoveInputFrame } from '../../src/sim/move_input';
+import { worldToDeck } from '../../src/sim/transport_deck';
 import { type Entity, emptyMoveInput, type MoveInput, type PlayerClass } from '../../src/sim/types';
+import { WATER_LEVEL } from '../../src/sim/world';
 import { ONLINE_WORLD_AUTH_TYPE } from '../../src/world_api';
 import type { LatencyLinkConfig } from './latency_link';
 import { LatencyLink } from './latency_link';
@@ -153,6 +157,9 @@ export interface FrameRecord {
   cameraFacing: number;
   reconcileMode: ReconcileMode | null;
   residualYd: number;
+  /** The drawn pose in the frame of the ship as drawn this frame, while the
+   *  player rides one (render/deck_frame.ts), else null. */
+  deckDrawn: { x: number; y: number; z: number } | null;
 }
 
 /** The authoritative pose after one server tick. */
@@ -603,16 +610,25 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       inputEcho.jitterMs,
       client.snapInterval,
     );
-    const drawn = updateSelfRenderPosition(
+    updateSelfRenderOnDeck(
+      client,
       selfRender,
       pe,
-      client.cfg.seed,
       alpha,
       frameDt,
       selfAlphaLead,
       selfMotion,
       discontinuity,
     );
+    const drawn = selfRender.position;
+    const df = deckFrameFor(client);
+    const ship = df.selfRoute >= 0 ? df.ships[df.selfRoute] : null;
+    const deckDrawn = ship
+      ? {
+          ...worldToDeck(ship.drawn, drawn.x, drawn.z, { x: 0, z: 0 }),
+          y: drawn.y - WATER_LEVEL,
+        }
+      : null;
 
     if (recordingFromMs === null) return;
     const tMs = now - recordingFromMs;
@@ -644,6 +660,7 @@ export function createOnlineHarness(opts: OnlineHarnessOptions): OnlineHarness {
       cameraFacing,
       reconcileMode: reconciled ? 'replayed' : null,
       residualYd,
+      deckDrawn,
     });
   }
 

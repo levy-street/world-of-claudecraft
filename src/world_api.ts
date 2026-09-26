@@ -52,6 +52,7 @@
 //   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
 //                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
+//   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
 //   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
@@ -98,6 +99,7 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldTransport } from './world_api/transport';
 import type { IWorldWorldPvp } from './world_api/world_pvp';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
@@ -212,7 +214,12 @@ export type {
 // there. A bump moves this constant, scripts/lib/world_auth.mjs and its
 // .d.mts, tests/bank_wire_epoch.test.ts, and tests/world_auth_scripts.test.ts
 // together.
-export const ONLINE_WORLD_LAYOUT_VERSION = 29 as const;
+// 30 = The Eastbrook ferry sails a timetable (src/sim/transport_ferry.ts): its
+// deck now exists only at the berth where it lies docked, a second berth and a
+// boarding stage stand at Wickharbor, and the snapshot carries the ferry
+// passenger bit. An epoch-29 client would draw the ship moored at Eastbrook
+// and predict a deck the server has sailed away, so it must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 30 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -396,6 +403,7 @@ export type {
   WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type { TransportFerryView } from './world_api/transport';
 export type {
   HillInfo,
   HillPhaseInfo,
@@ -442,6 +450,7 @@ export interface IWorld
     IWorldReliquary,
     IWorldMounts,
     IWorldFarming,
+    IWorldTransport,
     IWorldWorldPvp {}
 
 // ---------------------------------------------------------------------------

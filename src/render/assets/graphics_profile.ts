@@ -20,6 +20,10 @@ import { type GfxSettings, resetSurfaceMaterialProfileCache } from '../gfx';
 import { resetGoblinRocketSledProfileCaches } from '../goblin_rocket_sled_fx';
 import { prepareGreatTreeProfileAssets } from '../great_tree_prewarm';
 import { clearGroundDecorPrewarmDraws } from '../ground_decor_prewarm';
+import {
+  prepareHarborRouteMarkerAssets,
+  resetHarborRouteMarkerCaches,
+} from '../harbor_route_markers';
 import { resetIceBlockProfileCaches } from '../ice_block_visual';
 import { resetJailSceneProfileCaches } from '../jail_scene';
 import { prepareMailboxProfileAssets, resetMailboxProfileCaches } from '../mailbox';
@@ -31,9 +35,13 @@ import { ensureSkyAssetsAt } from '../sky';
 import { resetStationProfileCaches } from '../stations';
 import { resetTemporalHourglassProfileCaches } from '../temporal_hourglass_visual';
 import { prepareTerrainProfileAssets } from '../terrain';
+import { prepareTransportShipAssets, resetTransportShipCaches } from '../transport_ship';
 import { prepareWaterProfileAssets } from '../water';
+import { prepareWickharborHarborAssets, resetWickharborHarborCaches } from '../wickharbor_harbor';
+import { prepareWickharborWharfAssets, resetWickharborWharfCaches } from '../wickharbor_wharf';
 import { resetWildheartTerrainProfileCaches } from '../wildheart_terrain';
 import { prepareSurfaceDetailProfileAssets, resetSurfaceDetailProfileCaches } from '../worn_stone';
+import { prepareWyrmwatchHarborAssets, resetWyrmwatchHarborCaches } from '../wyrmwatch_harbor';
 
 export type GraphicsProfilePosition = Readonly<{ x: number; z: number }>;
 export type GraphicsProfileAssetProgress = (done: number, total: number) => void;
@@ -61,6 +69,11 @@ const PREPARERS: readonly GraphicsProfileAssetPreparer[] = [
       prepareEastbrookGrandArmouryProfileAssets(),
       prepareMailboxProfileAssets(),
       prepareNoticeboardProfileAssets(),
+      prepareTransportShipAssets(),
+      prepareHarborRouteMarkerAssets(),
+      prepareWyrmwatchHarborAssets(),
+      prepareWickharborWharfAssets(),
+      prepareWickharborHarborAssets(),
     ]).then(() => undefined),
 ];
 
@@ -86,6 +99,11 @@ const RESETTERS = [
   ['frost_nova_root_visual', resetFrostNovaRootProfileCaches],
   ['ice_block_visual', resetIceBlockProfileCaches],
   ['temporal_hourglass_visual', resetTemporalHourglassProfileCaches],
+  ['transport_ship', resetTransportShipCaches],
+  ['harbor_route_markers', resetHarborRouteMarkerCaches],
+  ['wyrmwatch_harbor', resetWyrmwatchHarborCaches],
+  ['wickharbor_wharf', resetWickharborWharfCaches],
+  ['wickharbor_harbor', resetWickharborHarborCaches],
   ['paladin_ascension_visual', resetPaladinAscensionProfileCaches],
   // The shared plume pair bakes the composer's HDR colour gain at build.
   ['goblin_rocket_sled_fx', resetGoblinRocketSledProfileCaches],

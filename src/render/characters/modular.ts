@@ -1267,10 +1267,12 @@ export type OutfitColorway =
   | 'bonewrought'
   | 'obsidian'
   | 'verdigris'
-  | 'bloodforged';
+  | 'bloodforged'
+  // NPC-only (NPC_MATERIAL_COLORWAY_IDS): never on the player list, the wire or a design code
+  | 'admiralty';
 
 export interface OutfitColorwayDef {
-  id: OutfitColorway;
+  id: PlayerOutfitColorway;
   /** target hue the set's cloth band rotates to; null keeps the native hue
    *  (the sat/light scales still apply, which is what makes onyx and ivory). */
   hue: number | null;
@@ -1433,7 +1435,13 @@ interface DyeOut {
 
 /** A material colorway names one treatment per zone; omitting a zone leaves
  *  that material as authored. */
-type MaterialColorwayId = 'gilded' | 'bonewrought' | 'obsidian' | 'verdigris' | 'bloodforged';
+type PlayerMaterialColorwayId = 'gilded' | 'bonewrought' | 'obsidian' | 'verdigris' | 'bloodforged';
+/** Material colorways only an authored NPC look wears (npc_looks.ts). They are NOT in
+ *  OUTFIT_COLORWAY_IDS, so normalizeAppearance clamps one away from any player save, and the
+ *  customizer, the design codes and the appearance wire (all driven by that list) never see
+ *  them: an NPC look is static data every host resolves locally, never serialized. */
+type NpcMaterialColorwayId = 'admiralty';
+type MaterialColorwayId = PlayerMaterialColorwayId | NpcMaterialColorwayId;
 const MATERIAL_COLORWAY_DEFS: Record<
   MaterialColorwayId,
   Partial<Record<keyof SetDyeZones, DyeOut>>
@@ -1482,12 +1490,35 @@ const MATERIAL_COLORWAY_DEFS: Record<
     leather: { hueMode: 'abs', hue: 358, satMul: 1.15, valMul: 0.72 },
     cloth: { hueMode: 'abs', hue: 352, satMul: 1.1, satAdd: 0.12, valMul: 0.8 },
   },
+  // NPC-only: a harbormaster's sea coat, the ferry's palette. Navy broadcloth (the mage
+  // coat's slate cloth and its cape both land in the mage band), the pale steel of its
+  // buttons, collar and turned-back cuffs polished to brass, the straps and boots darkened
+  // to old salt-stained leather.
+  admiralty: {
+    steel: { hueMode: 'abs', hue: 41, satMul: 0.5, satAdd: 0.42, valMul: 0.88, valAdd: 0.08 },
+    leather: { hueMode: 'keep', satMul: 0.85, valMul: 0.58 },
+    cloth: { hueMode: 'abs', hue: 222, satMul: 0.7, satAdd: 0.2, valMul: 0.52 },
+  },
 };
-export const MATERIAL_COLORWAY_IDS = Object.keys(
-  MATERIAL_COLORWAY_DEFS,
-) as readonly MaterialColorwayId[];
+/** The material colorways a player can pick (the customizer, design codes, the wire). */
+export const MATERIAL_COLORWAY_IDS: readonly PlayerMaterialColorwayId[] = [
+  'gilded',
+  'bonewrought',
+  'obsidian',
+  'verdigris',
+  'bloodforged',
+];
+/** The NPC-only material colorways (see NpcMaterialColorwayId). */
+export const NPC_MATERIAL_COLORWAY_IDS: readonly NpcMaterialColorwayId[] = ['admiralty'];
 
-export const OUTFIT_COLORWAY_IDS: readonly OutfitColorway[] = [
+function isMaterialColorway(id: string): id is MaterialColorwayId {
+  return Object.hasOwn(MATERIAL_COLORWAY_DEFS, id);
+}
+
+/** A colorway a player can wear: every one but the NPC-only material colorways. */
+export type PlayerOutfitColorway = Exclude<OutfitColorway, NpcMaterialColorwayId>;
+
+export const OUTFIT_COLORWAY_IDS: readonly PlayerOutfitColorway[] = [
   ...OUTFIT_COLORWAYS.map((c) => c.id),
   ...MATERIAL_COLORWAY_IDS,
 ];
@@ -1532,8 +1563,8 @@ export function outfitDye(
 ): { rules: DyeRule[] } | null {
   const set = armorMaterialSet(materialName);
   if (!set || !outfit || outfit === 'classic') return null;
-  if ((MATERIAL_COLORWAY_IDS as readonly string[]).includes(outfit)) {
-    return { rules: materialColorwayRules(set, outfit as MaterialColorwayId) };
+  if (isMaterialColorway(outfit)) {
+    return { rules: materialColorwayRules(set, outfit) };
   }
   const def = OUTFIT_COLORWAYS.find((c) => c.id === outfit);
   if (!def) return null;
@@ -1607,7 +1638,7 @@ function hsvToHex(h: number, s: number, v: number): number {
 /** The chip colour the customizer draws for a colorway on a given set: the
  *  set's own band centre under `classic`, the dye target otherwise. */
 export function outfitSwatchHex(set: ArmorSetId, id: OutfitColorway): number {
-  if ((MATERIAL_COLORWAY_IDS as readonly string[]).includes(id)) {
+  if (isMaterialColorway(id)) {
     return outfitSwatchHexes(set, id)[0];
   }
   const def = OUTFIT_COLORWAYS.find((c) => c.id === id) ?? OUTFIT_COLORWAYS[0];
@@ -1628,7 +1659,11 @@ export function outfitSwatchHex(set: ArmorSetId, id: OutfitColorway): number {
  *  relative saturation while multiplying the atlas back toward its own
  *  brightness instead of away from it. */
 export function outfitDyeFallbackHex(set: ArmorSetId, id: OutfitColorway): number {
-  const hex = outfitSwatchHex(set, id);
+  // An NPC colorway is read by its CLOTH (the coat), not the steel chip the customizer leads
+  // with: multiplied over the whole low-tier atlas, a brass factor would gild the navy coat.
+  const hex = (NPC_MATERIAL_COLORWAY_IDS as readonly string[]).includes(id)
+    ? outfitSwatchHexes(set, id)[2]
+    : outfitSwatchHex(set, id);
   const r = (hex >> 16) & 0xff;
   const g = (hex >> 8) & 0xff;
   const b = hex & 0xff;
@@ -1645,10 +1680,10 @@ export function outfitDyeFallbackHex(set: ArmorSetId, id: OutfitColorway): numbe
  *  material colorway shows what its rules do to the set's measured steel,
  *  bright-plate and cloth anchors, so the chip is an honest three-material preview. */
 export function outfitSwatchHexes(set: ArmorSetId, id: OutfitColorway): number[] {
-  if (!(MATERIAL_COLORWAY_IDS as readonly string[]).includes(id)) {
+  if (!isMaterialColorway(id)) {
     return [outfitSwatchHex(set, id)];
   }
-  const rules = materialColorwayRules(set, id as MaterialColorwayId);
+  const rules = materialColorwayRules(set, id);
   const accent = zonesFor(set).cloth;
   const anchors: [number, number, number][] = [
     [30, 0.05, 0.8], // steel plate

@@ -39,7 +39,9 @@ import {
   isFenbridgeRebuildStall,
   isFenbridgeRebuildWell,
 } from './fenbridge_town';
+import { buildFerryPiers } from './ferry_piers';
 import { EMISSIVE_LIGHT, GFX, type GfxSettings, sharedUniforms, surfaceMat } from './gfx';
+import { buildHarborRouteMarkers, harborRouteMarkerPrewarmParts } from './harbor_route_markers';
 import {
   type KitSurfaceFamily,
   kitHasUvSurfaceRouting,
@@ -63,8 +65,28 @@ import {
   updatePropCullables,
 } from './prop_cull_core';
 import type { RevealGateCore } from './reveal_gate_core';
+import { shipWakePrewarmParts } from './ship_wake';
 import { mergeBandDepth, mergeStaticMeshes, normalizedStaticGeometry } from './static_merge';
+import { buildScheduledShips, type FerryViewSource } from './transport_ferry_ships';
+import {
+  buildTransportShipView,
+  isTransportShipKey,
+  type TransportShipView,
+  transportShipPrewarmParts,
+} from './transport_ship';
+import { buildWickharborHarbor, wickharborHarborPrewarmParts } from './wickharbor_harbor';
+import { buildWickharborWharf, wickharborWharfPrewarmParts } from './wickharbor_wharf';
 import { applySurfaceDetail, type WornFamilyPick, wornFamilyFor } from './worn_stone';
+import {
+  buildWyrmwatchHarbor,
+  wyrmwatchHarborHouseLights,
+  wyrmwatchHarborPrewarmParts,
+} from './wyrmwatch_harbor';
+import {
+  clearHarborHouseShell,
+  harborHouseShellMeshes,
+  updateHarborHouseShell,
+} from './wyrmwatch_harbor_house';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -1006,6 +1028,25 @@ export function buildPropMaterialPrewarmGroup(): THREE.Group {
       place(tinted);
     }
   }
+  // moored transport ships draw their own merged, vertex-coloured meshes
+  // (transport_ship.ts), and so do the berths' route markers
+  // (harbor_route_markers.ts), the Wyrmwatch cliff harbor (wyrmwatch_harbor.ts), the
+  // Wickharbor ferry wharf (wickharbor_wharf.ts) and the rest of Wickharbor's harbor
+  // (wickharbor_harbor.ts): one twin per distinct program, shadow variant included
+  for (const part of [
+    ...transportShipPrewarmParts(),
+    ...harborRouteMarkerPrewarmParts(),
+    ...wyrmwatchHarborPrewarmParts(),
+    ...wickharborWharfPrewarmParts(),
+    ...wickharborHarborPrewarmParts(),
+  ]) {
+    const mesh = new THREE.Mesh(part.geometry, part.material);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    place(mesh);
+  }
+  // ...and a sailing ship's wake and bow splash (ship_wake.ts): one points program
+  for (const points of shipWakePrewarmParts()) place(points);
   return group;
 }
 
@@ -1314,7 +1355,17 @@ function buildDelveEmbers(
 // `delveLabel` resolves a delve id to its localized display name for the carved
 // entrance sign. Passed in by renderer.ts (the only render-side i18n surface) so
 // props.ts itself stays string-table-free; falls back to the id if absent.
-export function buildProps(seed: number, delveLabel?: (delveId: string) => string): PropsResult {
+/** What buildProps reads from the world: its seed, and the ferry timetable the
+ *  scheduled ships follow (an IWorld satisfies it). */
+export interface PropsWorld extends FerryViewSource {
+  cfg: { seed: number };
+}
+
+export function buildProps(
+  world: PropsWorld,
+  delveLabel?: (delveId: string) => string,
+): PropsResult {
+  const seed = world.cfg.seed;
   const group = new THREE.Group();
   const flames: THREE.Mesh[] = [];
   // Meshes the far-cell bake must never absorb because the renderer animates
@@ -1324,6 +1375,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   const keepLiveMeshes = new Set<THREE.Mesh>();
   const windmillFans: THREE.Object3D[] = [];
   const fireLights: THREE.PointLight[] = [];
+  // moored transport ships (render/transport_ship.ts): live, idle-animated,
+  // their own LODs; ticked from update() below, never merged or ghosted
+  const transportShips: TransportShipView[] = [];
   const activeContent = getActiveWorldContent();
   const builtInWorld = activeContent === BUILTIN_WORLD;
 
@@ -1567,6 +1621,26 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
   // r > 0 entries mirror the circle collider in colliders.ts and camera-ghost;
   // r 0 dressing stays always-visible (small silhouettes, nothing to hide).
   for (const d of getActiveWorldContent().props.decorProps ?? []) {
+    if (isTransportShipKey(d.key)) {
+      const ship = buildTransportShipView({
+        key: d.key,
+        x: d.x,
+        z: d.z,
+        rot: d.rot ?? 0,
+        baseY:
+          d.float !== undefined
+            ? Math.max(ground(d.x, d.z), WATER_LEVEL - d.float)
+            : ground(d.x, d.z),
+      });
+      if (ship) {
+        group.add(ship.group);
+        ship.group.traverse((o) => {
+          if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o);
+        });
+        transportShips.push(ship);
+      }
+      continue;
+    }
     if (!(d.key in PROP_ASSET_DEFS)) {
       console.warn(`decorProps: unknown prop key "${d.key}" skipped`);
       continue;
@@ -1605,6 +1679,41 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     if (d.r) {
       registerHideable(g, circleFootprint(d.x, d.z, d.r, baseY + (d.h ?? 4)));
     }
+  }
+  // The scheduled ferry (render/transport_ferry_ships.ts): the same ship model,
+  // posed every frame from the world's timetable; built-in world only.
+  const scheduledShips = builtInWorld
+    ? buildScheduledShips(world, (ship, wake) => {
+        group.add(ship.group);
+        ship.group.traverse((o) => {
+          if ((o as THREE.Mesh).isMesh) keepFromMerge.add(o);
+        });
+        transportShips.push(ship);
+        if (wake) group.add(wake.points);
+      })
+    : null;
+  if (builtInWorld) group.add(buildFerryPiers(seed)); // their piers (render/ferry_piers.ts)
+  // ...and the route marker at every berth (render/harbor_route_markers.ts)
+  if (builtInWorld) group.add(buildHarborRouteMarkers(seed));
+  // ...and the Wyrmwatch cliff harbor at the Drakelands berth (render/wyrmwatch_harbor.ts),
+  // its Harbormaster's House walls and roof kept out of the merge (they fade one by one for
+  // the camera, render/wyrmwatch_harbor_house.ts) and its hearth and lanterns lit like a
+  // campfire (root-level, world-positioned, in the fire-light budget)
+  if (builtInWorld) {
+    group.add(buildWyrmwatchHarbor(seed));
+    for (const m of harborHouseShellMeshes()) keepFromMerge.add(m);
+    for (const light of wyrmwatchHarborHouseLights()) {
+      group.add(light);
+      fireLights.push(light);
+    }
+  } else {
+    clearHarborHouseShell();
+  }
+  // ...and the Wickharbor ferry wharf at the Wickharbor berth (render/wickharbor_wharf.ts),
+  // with the rest of the town's wooden harbor in the same wood (render/wickharbor_harbor.ts)
+  if (builtInWorld) {
+    group.add(buildWickharborWharf());
+    group.add(buildWickharborHarbor());
   }
 
   // ---- market stalls (smith/armorer stalls get anvil + weapon stand) ------
@@ -2521,6 +2630,11 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
       reducedMotion = false,
     ): void {
       const fogFarSq = fogFar * fogFar;
+      scheduledShips?.sync(dt);
+      for (let i = 0; i < transportShips.length; i++) {
+        transportShips[i].update(camX, camY, camZ, eyeX, eyeY, eyeZ, fogFar, dt, reducedMotion);
+      }
+      updateHarborHouseShell(camX, camY, camZ, eyeX, eyeY, eyeZ, dt, reducedMotion, fogFar);
       // Band fog cull (prop_cull_core): a band's first reveal on a walking
       // approach holds until the gate has linked its programs, and an arrival
       // among the bands holds too, with its compiles submitted at the imminent

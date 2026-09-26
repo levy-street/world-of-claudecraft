@@ -6,8 +6,17 @@ import {
   overrideActive,
   updateMovementOverrideEpochs,
 } from '../../server/movement_override_epoch';
+import {
+  EASTBROOK_FERRY_HULL,
+  EASTBROOK_NIGHTBLOOM_FERRY,
+} from '../../src/sim/content/transport_ships';
 import { Sim } from '../../src/sim/sim';
+import { deckToWorld } from '../../src/sim/transport_deck';
+import { carryPassengersAcrossClockJump, transportClock } from '../../src/sim/transport_ferry';
+import { transportShipPoseAt, transportVoyageSeconds } from '../../src/sim/transport_schedule';
 import { type Aura, DT, RUN_SPEED } from '../../src/sim/types';
+import { WATER_LEVEL } from '../../src/sim/world';
+import { WORLD_SEED } from '../../src/sim/world_seed';
 
 function fixture(): { sim: Sim; session: MovementOverrideSessionState } {
   const sim = new Sim({ seed: 42, playerClass: 'warrior' });
@@ -193,5 +202,64 @@ describe('updateMovementOverrideEpochs', () => {
 
     expect(session.movementOverrideSignature).toBe(signature);
     expect(session.movementAuthoritativePosition).toBe(position);
+  });
+});
+
+describe('a ferry passenger (server/transport_head.ts ferryMovementFrame)', () => {
+  // A passenger is measured in the sailing hull's frame, so the ship's way (19 yd/s, far
+  // past a runner's step) never reads as a teleport and restarts their prediction each
+  // tick; the one bump is the frame change itself, at cast-off and at mooring.
+  it('bumps once at cast-off and once at mooring, never while the deck carries them', () => {
+    const route = EASTBROOK_NIGHTBLOOM_FERRY;
+    const sim = new Sim({ seed: WORLD_SEED, playerClass: 'warrior' });
+    const e = sim.player;
+    const session: MovementOverrideSessionState = {
+      pid: sim.playerId,
+      movementWireVersion: 2,
+      ...createMovementOverrideSessionState(),
+    };
+    const over = (ticks: number): { bumps: number; riding: number } => {
+      let bumps = 0;
+      let riding = 0;
+      for (let i = 0; i < ticks; i++) {
+        const before = session.movementOverrideEpoch;
+        sim.tick();
+        updateMovementOverrideEpochs(sim, [session]);
+        if (session.movementOverrideEpoch !== before) bumps++;
+        if (e.ferryRide) riding++;
+      }
+      return { bumps, riding };
+    };
+    updateMovementOverrideEpochs(sim, [session]);
+    expect(over(40), 'on foot ashore').toEqual({ bumps: 0, riding: 0 });
+
+    // aboard a second before cast-off, then well into the voyage
+    sim.transportClockOffset = route.timings.docked - 1 - sim.time;
+    const pose = transportShipPoseAt(route, transportClock(sim.ctx), { x: 0, z: 0, rot: 0 });
+    const at = deckToWorld(pose, 0.5, -3, { x: 0, z: 0 });
+    e.pos = { x: at.x, y: WATER_LEVEL + EASTBROOK_FERRY_HULL.mainDeckY, z: at.z };
+    e.prevPos = { ...e.pos };
+    e.onGround = true;
+    sim.ctx.rebucket(e);
+    updateMovementOverrideEpochs(sim, [session]); // the placement's own jump, uncounted
+    const start = { x: e.pos.x, z: e.pos.z };
+    const sail = over(400);
+    expect(sail.bumps, 'cast-off, then a still epoch under way').toBe(1);
+    expect(sail.riding).toBeGreaterThan(300);
+    expect(Math.hypot(e.pos.x - start.x, e.pos.z - start.z)).toBeGreaterThan(40);
+
+    // on to a second before mooring (the dev skip's carry), then through it
+    const from = transportClock(sim.ctx);
+    const mooring = route.timings.docked + transportVoyageSeconds(route, 0) - 1.5;
+    sim.transportClockOffset += mooring - from;
+    carryPassengersAcrossClockJump(sim.ctx, from);
+    // the skip's own jump, uncounted: the ride's recorded pose catches up on the next tick
+    updateMovementOverrideEpochs(sim, [session]);
+    sim.tick();
+    updateMovementOverrideEpochs(sim, [session]);
+    expect(e.ferryRide, 'still under way after the skip').toBeTruthy();
+    const moor = over(60);
+    expect(moor.bumps, 'the frame change back to the world at mooring').toBe(1);
+    expect(e.ferryRide ?? null).toBeNull();
   });
 });

@@ -20,6 +20,11 @@ const mocks = vi.hoisted(() => {
     armoury: prepare(),
     mailbox: prepare(),
     noticeboard: prepare(),
+    ship: prepare(),
+    harborMarker: prepare(),
+    wyrmwatchHarbor: prepare(),
+    wickharborWharf: prepare(),
+    wickharborHarbor: prepare(),
     reset: vi.fn(),
     sledReset: vi.fn(),
   };
@@ -66,6 +71,26 @@ vi.mock('../src/render/cliff_scree', () => ({
 vi.mock('../src/render/eastbrook_town', () => ({
   prepareEastbrookTownProfileAssets: mocks.town,
   resetEastbrookTownProfileCaches: mocks.reset,
+}));
+vi.mock('../src/render/transport_ship', () => ({
+  prepareTransportShipAssets: mocks.ship,
+  resetTransportShipCaches: mocks.reset,
+}));
+vi.mock('../src/render/harbor_route_markers', () => ({
+  prepareHarborRouteMarkerAssets: mocks.harborMarker,
+  resetHarborRouteMarkerCaches: mocks.reset,
+}));
+vi.mock('../src/render/wyrmwatch_harbor', () => ({
+  prepareWyrmwatchHarborAssets: mocks.wyrmwatchHarbor,
+  resetWyrmwatchHarborCaches: mocks.reset,
+}));
+vi.mock('../src/render/wickharbor_wharf', () => ({
+  prepareWickharborWharfAssets: mocks.wickharborWharf,
+  resetWickharborWharfCaches: mocks.reset,
+}));
+vi.mock('../src/render/wickharbor_harbor', () => ({
+  prepareWickharborHarborAssets: mocks.wickharborHarbor,
+  resetWickharborHarborCaches: mocks.reset,
 }));
 vi.mock('../src/render/eastbrook_grand_armoury', () => ({
   prepareEastbrookGrandArmouryProfileAssets: mocks.armoury,
@@ -148,6 +173,11 @@ const prepareSpies = [
   mocks.armoury,
   mocks.mailbox,
   mocks.noticeboard,
+  mocks.ship,
+  mocks.harborMarker,
+  mocks.wyrmwatchHarbor,
+  mocks.wickharborWharf,
+  mocks.wickharborHarbor,
 ];
 
 beforeEach(() => {
@@ -170,7 +200,17 @@ describe('graphics profile asset preparation', () => {
     for (const prepare of prepareSpies.slice(0, 9)) expect(prepare).toHaveBeenCalledWith(target);
     expect(mocks.sky).toHaveBeenCalledWith(position.x, position.z, target);
     expect(mocks.cliff).toHaveBeenCalledWith(target);
-    for (const prepare of [mocks.town, mocks.armoury, mocks.mailbox, mocks.noticeboard]) {
+    for (const prepare of [
+      mocks.town,
+      mocks.armoury,
+      mocks.mailbox,
+      mocks.noticeboard,
+      mocks.ship,
+      mocks.harborMarker,
+      mocks.wyrmwatchHarbor,
+      mocks.wickharborWharf,
+      mocks.wickharborHarbor,
+    ]) {
       expect(prepare).toHaveBeenCalledWith();
     }
     expect(progress).toHaveLength(graphicsProfileAssetsInternalsForTest.channelCount);
@@ -219,6 +259,11 @@ describe('graphics profile derived-cache reset', () => {
       'frost_nova_root_visual',
       'ice_block_visual',
       'temporal_hourglass_visual',
+      'transport_ship',
+      'harbor_route_markers',
+      'wyrmwatch_harbor',
+      'wickharbor_wharf',
+      'wickharbor_harbor',
       'paladin_ascension_visual',
       'goblin_rocket_sled_fx',
       'ground_decor_prewarm',

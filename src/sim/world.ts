@@ -29,10 +29,9 @@ import {
   zoneAt,
 } from './data';
 import { dawnholdPadTarget, dawnholdPadWeight } from './dawnhold_layout';
-import { dockSurfaceHeight } from './deck_surfaces';
+import { dockSurfaceHeight, onHarborPlanks } from './deck_surfaces';
 import { dungeonFloorLift } from './dungeon_floor';
 import { dawnholdKeepLiftAt, lastKeepLiftAt } from './dungeon_layout';
-import { eastbrookDeckSurface } from './eastbrook_harbor';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -40,10 +39,11 @@ import {
   emberLinkDistanceNorm,
   emberNearestOnLink,
 } from './ember_lava_layout';
-import { GALE_DECK_FREEBOARD, galeDeckSurface } from './gale_harbor';
+import { GALE_DECK_FREEBOARD } from './gale_harbor';
 import { KEEP_SITE, keepSitePadWeight } from './keep_site';
 import { reachDeckClear, reachDeckSurface } from './reach_decks';
 import { fbm2, hash2, noise2 } from './rng';
+import { carveSeaChannels } from './sea_channels';
 import {
   CALM_SKIRT_MAX_WIDTH,
   type CalmProbe,
@@ -3471,7 +3471,8 @@ function baseHeight(
       }
     }
   }
-  return h;
+  // ...and the sea-channel bowls under the ferry lanes (sea_channels.ts)
+  return carveSeaChannels(x, z, h, WATER_LEVEL);
 }
 
 // ---------------------------------------------------------------------------
@@ -5069,15 +5070,8 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     return null;
   }
   // No rock or stunted tree grows up through Wickharbor's boardwalk planks,
-  // nor New Eastbrook's quay and piers.
-  if (galeDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity) {
-    return null;
-  }
-  if (
-    eastbrookDeckSurface(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL) !== -Infinity
-  ) {
-    return null;
-  }
+  // New Eastbrook's quay and piers, or a far ferry pier (deck_surfaces.ts).
+  if (onHarborPlanks(x, z, (sx, sz) => terrainHeight(sx, sz, seed), WATER_LEVEL)) return null;
   if (!reachDeckClear(x, z, 1)) return null;
   // The Old Beacon's lawn stays clear (nothing crowds the lighthouse stair),
   // and the raider encampments keep trees and rocks off their level pads.

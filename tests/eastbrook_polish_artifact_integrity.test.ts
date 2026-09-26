@@ -1388,7 +1388,8 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
   // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
   // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
-  '779036db025ad0dbf91daaa3199f9814045d7e26beeb9171efe585ae49098877';
+  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch (PR 4225). No capture was retaken.
+  '596bcac971739fa0f93fdf936751cd5b5745a69b0210d6a13c6646612a101490';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Frame Rate Limit: the renderer leaf gained the chosen-cadence feeds (frame load readings, governor signals). No capture was retaken.
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
@@ -1405,7 +1406,8 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for PR #4199's shader prewarm merge: the renderer leaf and cast-VFX stand-ins compose in one tree. No capture was retaken.
   // Re-minted for the v0.44.0 release-line renderer merge. No capture was retaken.
   // Re-minted for PR #4220 release integration: the candidate stand-in slot and per-family cast gate compose in one tree. No capture was retaken.
-  '986760b00669122f42c84ec204036e153b3d0c8c61937ad028f692732b1314ec';
+  // Re-minted for the merge of release/v0.44.0 into the Eastbrook ferry branch (PR 4225). No capture was retaken.
+  'f9e044219a5f89ec5451d4f41fc2032946fe12355136d9241b9f06dbb173d4db';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2790,7 +2792,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // re-swept evidence. No capture was retaken.
       // PR #4220 release integration: recomputed LAST again over the
       // re-swept evidence. No capture was retaken.
-    ).toBe('ca9ab4f8d6a03473681cdc27851b48f5492799e9a63d9928f7f351662aa16c14');
+      // release/v0.44.0 merge into the Eastbrook ferry branch (PR 4225): recomputed LAST
+      // again over the re-swept evidence. No capture was retaken.
+    ).toBe('1a25757013e55e76d9307c9529f94a228532cbf3ea1070a4c31db46e19f31ffe');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
