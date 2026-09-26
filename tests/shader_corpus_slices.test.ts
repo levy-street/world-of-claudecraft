@@ -1,6 +1,7 @@
 // The queued shader corpus record (shader_corpus_slices.ts): one background
-// queue unit per program read, per chunk encoded and per chunk fed to the
-// compressor, and stored bytes identical to the single-shot record.
+// queue unit per batch of program reads, per chunk encoded and per chunk fed to
+// the compressor, reads that never wait on the GPU process, and stored bytes
+// identical to the single-shot record.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { type CorpusGl, encodeCorpus } from '../src/game/shader_cache_warmup';
 import {
@@ -15,6 +16,7 @@ import {
   corpusJsonChunks,
   encodeCorpusQueued,
   frameFallbackQueue,
+  programSourcesOfEntry,
   readProgramSourcesQueued,
 } from '../src/game/shader_corpus_slices';
 import { GPU_WORK_PRIORITY } from '../src/render/background_gpu_queue';
@@ -49,42 +51,76 @@ function recordingQueue(): CorpusRecordQueue & { units: Unit[] } {
 }
 
 interface FakeShader {
-  type: number;
   source: string;
+  /** Freed with its program by three's destroy(): the browser refuses to read it. */
+  deleted?: boolean;
 }
 
-function fakeGl(programCount: number): CorpusGl & { queries: number; lost: boolean } {
-  const programs = Array.from({ length: programCount }, (_, i) => ({
-    id: i,
-    shaders: [
-      { type: 1, source: `void v${i}(){ float a = ${i}.0; }\n"quoted" µ é\n` },
-      { type: 2, source: `void f${i}(){ /* ${'x'.repeat(i * 3)} */ }` },
-    ] as FakeShader[],
-  }));
-  const gl = {
-    queries: 0,
+interface FakeEntry {
+  program: { id: number } | null | undefined;
+  vertexShader?: FakeShader;
+  fragmentShader?: FakeShader;
+}
+
+/** The calls the record may make: the browser answers them inside the page
+ *  (its WebGL wrappers and the command buffer client's cached program tables).
+ *  Any other GL call goes to the GPU process and waits for every command
+ *  already submitted, which is what the fake refuses. */
+const PAGE_SERVED = new Set([
+  'getShaderSource',
+  'getProgramParameter',
+  'getActiveAttrib',
+  'getAttribLocation',
+  'isContextLost',
+]);
+
+type FakeGl = CorpusGl & { lost: boolean; calls: string[]; sourceReads: () => number };
+
+function fakeGl(): FakeGl {
+  const target = {
     lost: false,
+    calls: [] as string[],
+    sourceReads: () => target.calls.filter((name) => name === 'getShaderSource').length,
     VERTEX_SHADER: 1,
     FRAGMENT_SHADER: 2,
     SHADER_TYPE: 4,
     ACTIVE_ATTRIBUTES: 6,
-    isContextLost: () => gl.lost,
-    getProgramParameter: () => 2,
+    isContextLost: () => target.lost,
+    getProgramParameter: (_p: unknown, pname: number) => {
+      if (pname !== target.ACTIVE_ATTRIBUTES) throw new Error(`program parameter ${pname}`);
+      return 2;
+    },
     getActiveAttrib: (_p: unknown, index: number) => ({ name: index === 0 ? 'uv' : 'position' }),
     getAttribLocation: (_p: unknown, name: string) => (name === 'position' ? 0 : 1),
-    getAttachedShaders: (program: { shaders: FakeShader[] | null }) => {
-      gl.queries++;
-      return program.shaders;
+    getShaderSource: (shader: FakeShader | undefined) => {
+      if (!shader || shader.deleted) throw new Error('INVALID_VALUE: a deleted or missing shader');
+      return shader.source;
     },
-    getShaderParameter: (shader: FakeShader) => shader.type,
-    getShaderSource: (shader: FakeShader) => shader.source,
-    programs,
+    // The old stage walk, answered correctly so only the guard below can fail it.
+    getAttachedShaders: () => [],
+    getShaderParameter: () => 1,
+    getError: () => 0,
   };
-  return gl as unknown as CorpusGl & { queries: number; lost: boolean };
+  return new Proxy(target, {
+    get(t, key, receiver) {
+      const value = Reflect.get(t, key, receiver);
+      if (typeof key !== 'string' || typeof value !== 'function' || key === 'sourceReads') {
+        return value;
+      }
+      t.calls.push(key);
+      if (!PAGE_SERVED.has(key)) throw new Error(`${key} waits on the GPU process`);
+      return value;
+    },
+  }) as unknown as FakeGl;
 }
 
-const entriesOf = (gl: ReturnType<typeof fakeGl>) =>
-  (gl as unknown as { programs: unknown[] }).programs.map((program) => ({ program }));
+function linkedEntries(count: number): FakeEntry[] {
+  return Array.from({ length: count }, (_, i) => ({
+    program: { id: i },
+    vertexShader: { source: `void v${i}(){ float a = ${i}.0; }\n"quoted" µ é\n` },
+    fragmentShader: { source: `void f${i}(){ /* ${'x'.repeat(i * 3)} */ }` },
+  }));
+}
 
 function record(programs: ShaderCorpusRecord['programs']): ShaderCorpusRecord {
   return createShaderCorpusRecord({
@@ -107,13 +143,13 @@ afterEach(() => {
 
 describe('readProgramSourcesQueued', () => {
   it('reads every program in entry order, one BACKGROUND unit per batch', async () => {
-    const gl = fakeGl(21);
+    const gl = fakeGl();
     const q = recordingQueue();
-    const sources = await readProgramSourcesQueued(gl, entriesOf(gl), q);
+    const sources = await readProgramSourcesQueued(gl, linkedEntries(21), q);
     expect(sources).toHaveLength(21);
     for (const [i, p] of sources.entries()) expect(p.vertex.startsWith(`void v${i}(`)).toBe(true);
     expect(sources[0].index0Attribute).toBe('position');
-    expect(gl.queries).toBe(21);
+    expect(gl.sourceReads()).toBe(42);
     // 21 programs in batches of 8: three units, the last one short.
     expect(CORPUS_READ_BATCH).toBe(8);
     expect(q.units).toHaveLength(3);
@@ -125,21 +161,38 @@ describe('readProgramSourcesQueued', () => {
     expect(CORPUS_RECORD_PRIORITY).toBe(GPU_WORK_PRIORITY.BACKGROUND);
   });
 
+  it('makes only calls the page answers, never one that waits on the GPU process', async () => {
+    const gl = fakeGl();
+    const sources = await readProgramSourcesQueued(gl, linkedEntries(9), recordingQueue());
+    expect(sources).toHaveLength(9);
+    expect(gl.calls.length).toBeGreaterThan(0);
+    expect(gl.calls.filter((name) => !PAGE_SERVED.has(name))).toEqual([]);
+    expect(gl.calls).not.toContain('getShaderParameter');
+    expect(gl.calls).not.toContain('getAttachedShaders');
+    // The refusal is live: a call outside the set throws at the caller.
+    expect(() => (gl as unknown as { getError(): number }).getError()).toThrow(
+      'waits on the GPU process',
+    );
+  });
+
   it('skips entries with no linked program, no attached shaders, or a missing stage', async () => {
-    const gl = fakeGl(2);
-    const entries = [
+    const gl = fakeGl();
+    const [first, second] = linkedEntries(2);
+    const entries: FakeEntry[] = [
       { program: null },
-      ...entriesOf(gl),
-      { program: { id: 9, shaders: [{ type: 1, source: 'lonely' }] } },
-      { program: { id: 10, shaders: null } },
+      first,
+      second,
+      { program: { id: 9 }, vertexShader: { source: 'lonely' } },
+      { program: { id: 10 }, fragmentShader: { source: 'lonely' } },
+      { program: { id: 11 }, vertexShader: { source: 'v' }, fragmentShader: { source: '' } },
     ];
     const sources = await readProgramSourcesQueued(gl, entries, recordingQueue());
     expect(sources.map((p) => p.vertex.slice(0, 7))).toEqual(['void v0', 'void v1']);
   });
 
   it('walks a snapshot, so a program removed from the live list mid-walk is still read', async () => {
-    const gl = fakeGl(20);
-    const live = entriesOf(gl);
+    const gl = fakeGl();
+    const live = linkedEntries(20);
     const q = recordingQueue();
     let removed = false;
     const swapRemoving: CorpusRecordQueue = {
@@ -159,7 +212,7 @@ describe('readProgramSourcesQueued', () => {
   });
 
   it('stops walking once the context is lost, keeping what it read', async () => {
-    const gl = fakeGl(20);
+    const gl = fakeGl();
     const q = recordingQueue();
     const losing: CorpusRecordQueue = {
       run: async (work, priority, label) => {
@@ -168,9 +221,40 @@ describe('readProgramSourcesQueued', () => {
         return result;
       },
     };
-    const sources = await readProgramSourcesQueued(gl, entriesOf(gl), losing);
+    const sources = await readProgramSourcesQueued(gl, linkedEntries(20), losing);
     expect(sources).toHaveLength(8);
-    expect(gl.queries).toBe(8);
+    expect(gl.sourceReads()).toBe(16);
+  });
+});
+
+describe('programSourcesOfEntry', () => {
+  it("takes each stage from three's own handle, whatever the order they were made in", () => {
+    const gl = fakeGl();
+    const entry: FakeEntry = {
+      program: { id: 1 },
+      fragmentShader: { source: 'void fragmentMain(){}' },
+      vertexShader: { source: 'void vertexMain(){}' },
+    };
+    expect(programSourcesOfEntry(gl, entry)).toEqual({
+      vertex: 'void vertexMain(){}',
+      fragment: 'void fragmentMain(){}',
+      index0Attribute: 'position',
+    });
+  });
+
+  it('skips a disposed entry before touching its freed shaders', () => {
+    // three's destroy() deletes the program and nulls `.program` but keeps the
+    // shader handles; reading one would be refused by the browser.
+    const gl = fakeGl();
+    const [disposed] = linkedEntries(1);
+    disposed.program = undefined;
+    for (const shader of [disposed.vertexShader, disposed.fragmentShader]) {
+      if (shader) shader.deleted = true;
+    }
+    expect(programSourcesOfEntry(gl, disposed)).toBeNull();
+    expect(programSourcesOfEntry(gl, null)).toBeNull();
+    expect(programSourcesOfEntry(gl, { program: { id: 2 }, vertexShader: undefined })).toBeNull();
+    expect(gl.sourceReads()).toBe(0);
   });
 });
 
@@ -195,8 +279,8 @@ describe('corpusJsonChunk', () => {
 
 describe('encodeCorpusQueued', () => {
   it('stores byte for byte what the single-shot encoder stores, one gzip unit per chunk', async () => {
-    const gl = fakeGl(12);
-    const programs = await readProgramSourcesQueued(gl, entriesOf(gl), recordingQueue());
+    const gl = fakeGl();
+    const programs = await readProgramSourcesQueued(gl, linkedEntries(12), recordingQueue());
     const rec = record(programs);
     const single = await encodeCorpus(rec);
     const q = recordingQueue();

@@ -20,9 +20,9 @@
 //   its cached translations with it), then record the session's own program
 //   set for the next boot, about 25 s later on an idle callback so the corpus
 //   covers the first minutes of play. The record itself runs as background
-//   GPU queue units (shader_corpus_slices.ts): reading a program's sources
-//   back is a synchronous driver round trip, and reading every program at
-//   once was a 1.1 s stall on an Intel HD 530.
+//   GPU queue units (shader_corpus_slices.ts) and reads each program's
+//   sources off the shader handles three keeps on its program entry, so no
+//   call of the walk waits on the GPU process.
 //
 // The corpus is stored gzipped (about 35 MB of GLSL for a full ultra set,
 // a few MB compressed) under one key in one IndexedDB store.
@@ -95,8 +95,7 @@ const DB_NAME = 'woc-shader-warmup';
 const STORE_NAME = 'corpus';
 const CORPUS_KEY = 'corpus';
 const WARMUP_CANVAS_PX = 8;
-/** The world has been playable for a while by then, so reading every program's
- *  source costs the player nothing, and the set covers the first minutes. */
+/** Late enough that the recorded set covers the first minutes of play. */
 const RECORD_DELAY_MS = 25_000;
 /** Completion polls per frame once the submission is done: a poll is one cheap
  *  GPU-process round trip, and 32 keeps the frame short. */
@@ -108,12 +107,9 @@ export type { WarmupGl } from '../render/shader_warmup_gl_core';
 
 /** The extra surface the RECORDING side reads off the world context. */
 export interface CorpusGl extends WarmupGl {
-  SHADER_TYPE: number;
   ACTIVE_ATTRIBUTES: number;
   getActiveAttrib(program: WebGLProgram, index: number): { name: string } | null;
   getAttribLocation(program: WebGLProgram, name: string): number;
-  getAttachedShaders(program: WebGLProgram): WebGLShader[] | null;
-  getShaderParameter(shader: WebGLShader, pname: number): unknown;
   getShaderSource(shader: WebGLShader): string | null;
   getContextAttributes(): Record<string, unknown> | null;
 }
