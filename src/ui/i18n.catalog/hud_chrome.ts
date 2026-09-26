@@ -7026,10 +7026,23 @@ export const hudChromeStrings = {
     enchant_chest_lucent_stamina: 'Chest Etching: Lucent Stamina',
     enchant_feet_lucent_agility: 'Boot Etching: Lucent Agility',
     enchant_lucent_infusion: 'Lucent Infusion',
+    // The four learned faction formulas (docs/design/factions.md).
+    enchant_weapon_riftwalkers_grace: "Riftwalker's Grace",
+    enchant_weapon_dawnfire_etching: 'Weapon Etching: Dawnfire',
+    enchant_weapon_dawns_benediction: "Weapon Etching: Dawn's Benediction",
+    enchant_weapon_piston_drive: 'Weapon Etching: Piston Drive',
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
       "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+    enchant_weapon_riftwalkers_grace:
+      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+    enchant_weapon_dawnfire_etching:
+      'Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.',
+    enchant_weapon_dawns_benediction:
+      'Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.',
+    enchant_weapon_piston_drive:
+      'Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale.',
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair

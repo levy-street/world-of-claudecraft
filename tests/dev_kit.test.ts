@@ -226,10 +226,10 @@ describe('kit construction', () => {
     // The ids are pinned as literals rather than recomputed from roleItemScore, so a
     // retune of the role weights has to be admitted here instead of quietly moving
     // what every preset wears.
-    // The three uncommon faction quartermaster pieces (Recognized standing)
-    // score as fresh-20 candidates too.
+    // The faction quartermasters' standing ladder (content/faction_vendors.ts)
+    // is excluded by isFreshTwentyItem outright: a fresh 20 holds no standing,
+    // so its rare Recognized necks and Trusted rings are never candidates.
     const FRESH_TWENTY_JEWELRY = [
-      'automaton_cog_ring',
       'burnished_thorium_amulet',
       'coiled_copper_torc',
       'etched_iron_loop',
@@ -237,9 +237,7 @@ describe('kit construction', () => {
       'hammered_copper_band',
       'iron_link_choker',
       'mother_of_pearl',
-      'order_prayer_beads',
       'polished_copper_loop',
-      'rift_watchers_band',
       'riveted_iron_signet',
       'weighted_thorium_band',
     ];
@@ -259,9 +257,10 @@ describe('kit construction', () => {
     //
     // Neck is archetype-blind: burnished_thorium_amulet (agi 5, sta 3) outscores
     // iron_link_choker (agi 3, sta 1) on stamina alone, so even a pure-intellect
-    // caster scoring its agility at zero still takes it. The Recognized-standing
-    // faction jewelry (content/faction_vendors.ts, 1/1 lines) sits below every
-    // pick here by design: standing stock must not displace the crafted rungs.
+    // caster scoring its agility at zero still takes it. The faction
+    // quartermasters' standing ladder (content/faction_vendors.ts) is out of
+    // the fresh-20 pool by construction (no standing on day one), so standing
+    // stock can never displace the crafted rungs here.
     const NECK = 'burnished_thorium_amulet';
     // Strength roles: the rung-50 str ring, then the rung-25 str ring, an
     // outright win for ring2 (str 3 at full weight clears the int loop's 3

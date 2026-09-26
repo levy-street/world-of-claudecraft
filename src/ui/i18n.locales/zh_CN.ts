@@ -141,9 +141,25 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.itemSets.crucible_healer_cloth.bonus2':
     '治疗处于战斗中的友方时，你的过量治疗的20%会转化为该友方身上持续6秒的护盾。包括持续治疗和由伤害转化的治疗。战斗中治疗自己也可生效。所有穿戴者提供的此类护盾总量不超过受保护者最大生命值的5%。后续过量治疗会补充护盾，但不会延长持续时间。此护盾不会触发其他治疗效果。当受护盾保护的友方脱离战斗、你死亡或你不再穿戴本套装中的两件装备时，你提供的护盾消失。',
   'entities.items.formula_lastflame_zeal.name': '配方：末焰热忱',
+  'entities.items.formula_riftwalkers_grace.name': '配方：裂隙行者之优雅',
+  'entities.items.formula_dawnfire_etching.name': '配方：黎明之火蚀刻',
+  'entities.items.formula_dawns_benediction.name': '配方：黎明祝福',
+  'entities.items.formula_piston_drive.name': '配方：活塞驱动',
   'hudChrome.enchantName.enchant_weapon_lastflame_zeal': '末焰热忱',
   'hudChrome.enchantDescription.enchant_weapon_lastflame_zeal':
     '命中的近战攻击有几率使你获得50点力量，持续15秒，并为你恢复200点生命值。治疗加成与减益生效。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。狼形态改用其1秒的基础挥击速度。',
+  'hudChrome.enchantName.enchant_weapon_riftwalkers_grace': '裂隙行者之优雅',
+  'hudChrome.enchantDescription.enchant_weapon_riftwalkers_grace':
+    '命中的近战攻击有几率使你获得60点敏捷，并使你的近战攻击速度提高2%，持续15秒。每次命中的触发几率为攻击武器基础速度每0.6秒对应1%。没有内置冷却时间。双手共享同一个增益；任一只手触发都会刷新该增益，且永不叠加。远程攻击不会触发此效果。豹形态改用其1秒的基础挥击速度。',
+  'hudChrome.enchantName.enchant_weapon_dawnfire_etching': '武器蚀刻：黎明之火',
+  'hudChrome.enchantDescription.enchant_weapon_dawnfire_etching':
+    '为一把武器永久蚀刻18点法术强度。法术强度同样计入治疗强度。固定加成，不会随任何属性缩放。',
+  'hudChrome.enchantName.enchant_weapon_dawns_benediction': '武器蚀刻：黎明祝福',
+  'hudChrome.enchantDescription.enchant_weapon_dawns_benediction':
+    '为一把武器永久蚀刻34点治疗强度。治疗强度只提高治疗效果，从不提高法术伤害。固定加成，不会随任何属性缩放。',
+  'hudChrome.enchantName.enchant_weapon_piston_drive': '武器蚀刻：活塞驱动',
+  'hudChrome.enchantDescription.enchant_weapon_piston_drive':
+    '为一把双手武器永久蚀刻12点力量和25点暴击等级。无法施加于单手武器。固定加成，不会随任何属性缩放。',
   'hudChrome.enchanting.recipeNotLearned': '施加此附魔前，请先学习配方。',
   'hudChrome.pattern.teachesEnchant': '使用：教你如何施加{enchant}。',
   'hudChrome.barEditor.pageTab': '第{page}页',
@@ -16458,6 +16474,19 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.artificers_welding_cowl.name': '工匠焊接兜帽',
   'entities.items.forgemaster_crag_cleaver.name': '锻造大师峭壁劈砍斧',
   'entities.items.champion_forged_loop.name': '勇士锻造指环',
+  'entities.items.tidewatchers_locket.name': '守潮者挂坠盒',
+  'entities.items.riftwalkers_cord.name': '裂隙行者束带',
+  'entities.items.riftwalkers_treads.name': '裂隙行者踏靴',
+  'entities.items.riftwardens_pendant.name': '裂隙守卫者坠饰',
+  'entities.items.acolytes_signet.name': '侍僧印戒',
+  'entities.items.cord_of_the_dawn.name': '黎明束带',
+  'entities.items.dawnlit_slippers.name': '黎明之光便鞋',
+  'entities.items.champions_dawn_loop.name': '勇士黎明指环',
+  'entities.items.dawnkeepers_circle.name': '黎明守护者之环',
+  'entities.items.cogwork_choker.name': '齿轮项圈',
+  'entities.items.forgemasters_girdle.name': '锻造大师腰带',
+  'entities.items.forgemasters_sabatons.name': '锻造大师铁靴',
+  'entities.items.forgewall_gorget.name': '锻炉壁垒护喉',
   // Clue Scrolls: the scroll and the casket (M16 non-Latin fills).
   'entities.items.clue_scroll.name': '线索卷轴',
   'entities.items.treasure_casket.name': '宝藏匣',

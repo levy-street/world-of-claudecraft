@@ -1,9 +1,20 @@
+// The faction quartermaster ladder (content/faction_vendors.ts,
+// docs/design/factions.md "What standing unlocks"): three quartermasters, one
+// ladder per faction covering every standing tier, every row gated on the
+// exact tier threshold, and every budget COPIED from the raid or heroic row it
+// mirrors rather than invented. Faction stock is untiered in item_level.ts,
+// so the mirror pins here are the only budget guard it has.
+
 import { describe, expect, it } from 'vitest';
+import { ENCHANTS } from '../src/sim/content/enchants';
 import {
   FACTION_VENDOR_GATES,
   FACTION_VENDOR_ITEMS,
+  FACTION_VENDOR_NPCS,
+  FACTION_VENDOR_STOCK,
   resolveFactionVendorRowGate,
 } from '../src/sim/content/faction_vendors';
+import { FIVE_MAN_WEAPON_RATING } from '../src/sim/content/heroic_loot';
 import { ITEMS, NPCS } from '../src/sim/data';
 import {
   FACTION_IDS,
@@ -11,8 +22,17 @@ import {
   STANDING_THRESHOLDS,
   STANDING_TIERS,
 } from '../src/sim/factions';
+import { meetsLevelRequirement, requiredLevelFor } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
 import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
+
+const LADDER_TIERS = ['recognized', 'trusted', 'proven', 'vanguard', 'champion'] as const;
+const FORMULA_IDS = [
+  'formula_riftwalkers_grace',
+  'formula_dawnfire_etching',
+  'formula_dawns_benediction',
+  'formula_piston_drive',
+] as const;
 
 describe('Faction Vendors & Reroll NPC content', () => {
   it('registers all three faction quartermasters and the taskmaster in NPCS', () => {
@@ -20,50 +40,110 @@ describe('Faction Vendors & Reroll NPC content', () => {
     expect(qmRift).toBeDefined();
     expect(qmRift.name).toBe('Quartermaster Vaelen');
     expect(qmRift.title).toBe('Rift Watch Provisioner');
-    expect(qmRift.vendorItems?.length).toBe(5);
+    expect(qmRift.vendorItems).toEqual([...FACTION_VENDOR_STOCK.rift_watch]);
 
     const qmChurch = NPCS.npc_church_order_quartermaster;
     expect(qmChurch).toBeDefined();
     expect(qmChurch.name).toBe('Templar Althea');
     expect(qmChurch.title).toBe('Church Order Quartermaster');
-    expect(qmChurch.vendorItems?.length).toBe(5);
+    expect(qmChurch.vendorItems).toEqual([...FACTION_VENDOR_STOCK.church_order]);
 
     const qmAuto = NPCS.npc_automaton_quartermaster;
     expect(qmAuto).toBeDefined();
     expect(qmAuto.name).toBe('Artificer Tobrin');
     expect(qmAuto.title).toBe('Automaton Requisitioner');
-    expect(qmAuto.vendorItems?.length).toBe(5);
+    expect(qmAuto.vendorItems).toEqual([...FACTION_VENDOR_STOCK.automatons]);
 
     const taskmaster = NPCS.npc_wq_taskmaster;
     expect(taskmaster).toBeDefined();
     expect(taskmaster.name).toBe('Taskmaster Kaelen');
     expect(taskmaster.title).toBe('World Quest Taskmaster');
     expect(taskmaster.greeting).toContain('assignments');
+    expect(Object.keys(FACTION_VENDOR_NPCS)).toHaveLength(4);
   });
 
-  it('authors exactly 15 faction vendor items (5 tiers × 3 factions)', () => {
-    const itemIds = Object.keys(FACTION_VENDOR_ITEMS);
-    expect(itemIds.length).toBe(15);
-
+  it('the stock lists and the gate table name the same 33 rows; the item table authors all but the reins', () => {
+    const stockIds = FACTION_IDS.flatMap((f) => [...FACTION_VENDOR_STOCK[f]]);
+    expect(stockIds).toHaveLength(33);
+    expect(new Set(stockIds).size).toBe(33);
+    expect([...stockIds].sort()).toEqual(Object.keys(FACTION_VENDOR_GATES).sort());
+    // The Valestrider reins def lives with the other reins in content/items.ts.
+    expect([...stockIds].filter((id) => id !== 'reins_avian_strider').sort()).toEqual(
+      Object.keys(FACTION_VENDOR_ITEMS).sort(),
+    );
     for (const factionId of FACTION_IDS) {
-      const itemsForFaction = itemIds.filter(
-        (id) => FACTION_VENDOR_GATES[id]?.factionId === factionId,
-      );
-      expect(itemsForFaction.length).toBe(5);
+      for (const id of FACTION_VENDOR_STOCK[factionId]) {
+        expect(FACTION_VENDOR_GATES[id].factionId, id).toBe(factionId);
+        expect(ITEMS[id], id).toBeDefined();
+        expect(ITEMS[id].buyValue, id).toBeGreaterThan(0);
+        // Formulas are bind-on-pickup knowledge and mount reins never vendor
+        // back (the mount contract in tests/mounts.test.ts); every other row sells.
+        if (ITEMS[id].kind === 'recipe' || ITEMS[id].kind === 'mount') {
+          expect(ITEMS[id].sellValue, id).toBe(0);
+        } else expect(ITEMS[id].sellValue, id).toBeGreaterThan(0);
+      }
+    }
+  });
 
-      // Verify one item per tier
-      const tiersCovered = itemsForFaction.map((id) => FACTION_VENDOR_GATES[id]?.standingTier);
-      expect(tiersCovered).toEqual(
-        expect.arrayContaining(['recognized', 'trusted', 'proven', 'vanguard', 'champion']),
+  it('every gear and bag row binds, and every equipment row gates at level 20 like the rows it mirrors', () => {
+    // Standing sits on the BUYER (resolveFactionVendorRowGate), so an unbound
+    // row would let a Champion hand the whole ladder to an alt with no
+    // standing at all. And faction stock is untiered (no source registers it),
+    // so without an explicit requiredLevel the gate falls to the quality floor
+    // (rare 12, epic 18) while every mirrored raid and heroic row requires 20.
+    // Two rows stay transferable by contract: the reins (the mount contract
+    // in tests/mounts.test.ts) and the formulas (patterns are
+    // bind-by-consumption and deliberately listable,
+    // tests/recipe_pattern_items.test.ts: learning spends the copy).
+    for (const [id, def] of Object.entries(FACTION_VENDOR_ITEMS)) {
+      if (def.kind === 'recipe') expect(def.soulbound, `${id} is a pattern`).toBeFalsy();
+      else expect(def.soulbound, `${id} binds`).toBe(true);
+      if (def.kind === 'armor' || def.kind === 'weapon') {
+        expect(def.requiredLevel, `${id} pins its level`).toBe(20);
+        expect(requiredLevelFor(def), `${id} gates at 20`).toBe(20);
+        expect(meetsLevelRequirement(19, def), `${id} refuses a 19`).toBe(false);
+        expect(meetsLevelRequirement(20, def), `${id} admits a 20`).toBe(true);
+      } else {
+        expect(def.requiredLevel, `${id} (a ${def.kind}) carries no level pin`).toBeUndefined();
+      }
+    }
+    expect(ITEMS.reins_avian_strider.soulbound).toBeFalsy();
+  });
+
+  it('every faction ladder covers all five standing tiers, in ladder order', () => {
+    for (const factionId of FACTION_IDS) {
+      const tiers = FACTION_VENDOR_STOCK[factionId].map(
+        (id) => FACTION_VENDOR_GATES[id].standingTier,
+      );
+      expect(new Set(tiers), factionId).toEqual(new Set(LADDER_TIERS));
+      // Monotone: a row never sits below the tier of the row before it.
+      const ranks = tiers.map((t) => STANDING_TIERS.indexOf(t));
+      for (let i = 1; i < ranks.length; i++)
+        expect(ranks[i], factionId).toBeGreaterThanOrEqual(ranks[i - 1]);
+    }
+  });
+
+  it('every tier sells the lane the design names: neck, ring + bag, periphery + formula, weapon, jewels', () => {
+    const slotsAt = (factionId: (typeof FACTION_IDS)[number], tier: string) =>
+      FACTION_VENDOR_STOCK[factionId]
+        .filter((id) => FACTION_VENDOR_GATES[id].standingTier === tier)
+        .map((id) => (ITEMS[id].kind === 'recipe' ? 'formula' : (ITEMS[id].slot ?? ITEMS[id].kind)))
+        .sort();
+    for (const factionId of FACTION_IDS) {
+      expect(slotsAt(factionId, 'recognized'), factionId).toEqual(['neck']);
+      expect(slotsAt(factionId, 'trusted'), factionId).toContain('ring');
+      expect(slotsAt(factionId, 'proven'), factionId).toEqual(
+        expect.arrayContaining(['waist', 'feet', 'formula']),
+      );
+      expect(slotsAt(factionId, 'vanguard'), factionId).toContain('mainhand');
+      expect(slotsAt(factionId, 'champion'), factionId).toEqual(
+        expect.arrayContaining(['neck', 'ring']),
       );
     }
-
-    // Every item is also in the global ITEMS dictionary
-    for (const id of itemIds) {
-      expect(ITEMS[id]).toBeDefined();
-      expect(ITEMS[id].buyValue).toBeGreaterThan(0);
-      expect(ITEMS[id].sellValue).toBeGreaterThan(0);
-    }
+    // The one mount a faction sells: the Rift Watch's Champion reward.
+    expect(slotsAt('rift_watch', 'champion')).toEqual(['mount', 'neck', 'ring']);
+    expect(slotsAt('rift_watch', 'trusted')).toEqual(['bag', 'ring']);
+    expect(slotsAt('automatons', 'trusted')).toEqual(['bag', 'ring']);
   });
 
   it('correctly maps FACTION_VENDOR_GATES to the exact standing thresholds', () => {
@@ -74,16 +154,37 @@ describe('Faction Vendors & Reroll NPC content', () => {
     }
   });
 
+  it('prices climb the tier ladder and sell back at a quarter (formulas and the mount excepted)', () => {
+    const PRICE = {
+      recognized: 5_000,
+      trusted: 15_000,
+      proven: 35_000,
+      vanguard: 80_000,
+      champion: 150_000,
+    };
+    for (const [id, gate] of Object.entries(FACTION_VENDOR_GATES)) {
+      if (id === 'reins_avian_strider') continue;
+      const tier = gate.standingTier as keyof typeof PRICE;
+      expect(ITEMS[id].buyValue, id).toBe(PRICE[tier]);
+      if (ITEMS[id].kind !== 'recipe') expect(ITEMS[id].sellValue, id).toBe(PRICE[tier] / 4);
+    }
+    // The mount: ten times the Valorsteed's 10 gold (the classic epic-mount
+    // ratio), an ordinary player reins that never vendor-sells back.
+    const reins = ITEMS.reins_avian_strider;
+    expect(reins.buyValue).toBe((ITEMS.reins_valorsteed.buyValue ?? 0) * 10);
+    expect(reins.sellValue).toBe(0);
+    expect(reins.noVendorSell).toBe(true);
+    expect(reins.soulbound).toBeFalsy();
+  });
+
   it('evaluates resolveFactionVendorRowGate accurately', () => {
     const factions = freshFactionReputation();
     factions.rift_watch = 2_500; // Above Recognized (1,000), below Trusted (3,000)
 
-    // Tier 1 Rift Watch (Recognized - 1,000) -> Unlocked
-    const t1 = resolveFactionVendorRowGate('rift_watchers_band', factions);
+    const t1 = resolveFactionVendorRowGate('tidewatchers_locket', factions);
     expect(t1.locked).toBe(false);
     expect(t1.currentStanding).toBe(2_500);
 
-    // Tier 2 Rift Watch (Trusted - 3,000) -> Locked
     const t2 = resolveFactionVendorRowGate('rift_surveyors_satchel', factions);
     expect(t2.locked).toBe(true);
     expect(t2.requirement?.standingTier).toBe('trusted');
@@ -96,6 +197,182 @@ describe('Faction Vendors & Reroll NPC content', () => {
     const nonFaction = resolveFactionVendorRowGate('linen_cloth', factions);
     expect(nonFaction.locked).toBe(false);
     expect(nonFaction.requirement).toBeUndefined();
+  });
+});
+
+// Every budget is a copy of a live row. The right-hand side of each pin is the
+// row it mirrors, read off the merged catalog, so a retune of the raid or
+// heroic table is a red here rather than silent drift between the two.
+describe('faction ladder budgets mirror the raid and heroic tables', () => {
+  const stats = (id: string) => ITEMS[id].stats ?? {};
+  const ratings = (id: string) => {
+    const it = ITEMS[id] as unknown as Record<string, unknown>;
+    const out: Record<string, number> = {};
+    for (const k of ['critRating', 'hitRating', 'hasteRating', 'spellPower', 'healPower']) {
+      if (typeof it[k] === 'number') out[k] = it[k] as number;
+    }
+    return out;
+  };
+  const ratingSum = (id: string) => Object.values(ratings(id)).reduce((a, b) => a + b, 0);
+  const line = (id: string) => {
+    const s = stats(id);
+    return (s.str ?? 0) + (s.agi ?? 0) + (s.int ?? 0) + (s.spi ?? 0) + (s.sta ?? 0);
+  };
+
+  it('Recognized necks and Trusted rings carry the heroic vendor jewel budget: one 25 rating, its line', () => {
+    const pairs: Array<[string, string]> = [
+      ['tidewatchers_locket', 'yumis_keepsake_locket'],
+      ['rift_watchers_band', 'sutils_gambit'],
+      ['order_prayer_beads', 'architects_cornerstone'],
+      ['acolytes_signet', 'zense_meridian'],
+      ['cogwork_choker', 'medallion_of_endless_profit'],
+      ['automaton_cog_ring', 'seal_of_the_nine_oaths'],
+    ];
+    for (const [id, mirror] of pairs) {
+      expect(ITEMS[id].quality, id).toBe('rare');
+      expect(line(id), `${id} line vs ${mirror}`).toBe(line(mirror));
+      expect(ratingSum(id), `${id} rating vs ${mirror}`).toBe(25);
+      expect(Object.keys(ratings(id)), id).toHaveLength(1);
+    }
+  });
+
+  it('Champion jewels carry the raid jewel rating with their line one point under the raid mirror', () => {
+    const pairs: Array<[string, string]> = [
+      ['riftwardens_pendant', 'pendant_of_the_first_tempering'],
+      ['champion_rift_band', 'seal_of_the_forgewall'],
+      ['champion_dawn_medallion', 'locket_of_the_last_flame'],
+      ['champions_dawn_loop', 'circle_of_cinders'],
+      ['dawnkeepers_circle', 'loop_of_quiet_springs'],
+      ['forgewall_gorget', 'pendant_of_the_first_tempering'],
+      ['champion_forged_loop', 'seal_of_the_forgewall'],
+    ];
+    for (const [id, mirror] of pairs) {
+      expect(ITEMS[id].quality, id).toBe('epic');
+      expect(line(id), `${id} line vs ${mirror}`).toBe(line(mirror) - 1);
+      const mirrorRatings = ratings(mirror);
+      const ownRatings = ratings(id);
+      // The raid jewel's one 25 rating, plus the same power line where the
+      // mirror carries one (spellPower 4 / healPower 8).
+      expect(
+        Object.values(ownRatings).filter((v) => v === 25),
+        id,
+      ).toHaveLength(1);
+      expect(ownRatings.spellPower, id).toBe(mirrorRatings.spellPower);
+      expect(ownRatings.healPower, id).toBe(mirrorRatings.healPower);
+    }
+    // The two tank jewels are Stamina-first: the raid never sells that line.
+    expect(stats('forgewall_gorget').sta).toBeGreaterThan(stats('forgewall_gorget').str ?? 0);
+    expect(stats('champion_forged_loop').sta).toBeGreaterThan(
+      stats('champion_forged_loop').str ?? 0,
+    );
+    for (const id of ['forgewall_gorget', 'champion_forged_loop']) {
+      expect(stats(id).armor, `${id} carries no armor (bis picker)`).toBeUndefined();
+      expect((ITEMS[id] as { blockValue?: number }).blockValue, id).toBeUndefined();
+    }
+  });
+
+  it('Proven waist and feet carry the raid offset ratings and armor with the line one point under', () => {
+    // One under on BOTH axes the pickers score, never a tie: dev/bis_gear.ts
+    // scores armor plus the class line and the max-armor tank kit
+    // (tests/heroic_difficulty_floors.test.ts) breaks an armor tie by id, so
+    // an exact mirror would hand the faction row every /dev bis kit and the
+    // tank reference pools (both moved by that tie before this rule).
+    const pairs: Array<[string, string]> = [
+      ['riftwalkers_cord', 'slagstalker_belt'],
+      ['riftwalkers_treads', 'ashrunner_boots'],
+      ['cord_of_the_dawn', 'cord_of_the_last_flame'],
+      ['dawnlit_slippers', 'steps_of_quiet_water'],
+      ['forgemasters_girdle', 'warforged_waistguard'],
+      ['forgemasters_sabatons', 'furnace_march_greaves'],
+    ];
+    for (const [id, mirror] of pairs) {
+      expect(ITEMS[id].quality, id).toBe('epic');
+      expect(ITEMS[id].slot, id).toBe(ITEMS[mirror].slot);
+      expect(ITEMS[id].armorType, id).toBe(ITEMS[mirror].armorType);
+      expect(stats(id).armor, `${id} armor vs ${mirror}`).toBe((stats(mirror).armor ?? 0) - 1);
+      expect(line(id), `${id} line vs ${mirror}`).toBe(line(mirror) - 1);
+      expect(ratings(id), `${id} ratings vs ${mirror}`).toEqual(ratings(mirror));
+    }
+  });
+
+  it('Proven set-slot pieces mirror a heroic five-man drop', () => {
+    const pairs: Array<[string, string]> = [
+      ['riftwalkers_tunic', 'basin_stalkers_tunic'],
+      ['vestments_of_the_acolyte', 'shroud_of_the_gravewyrm'],
+      ['artificers_welding_cowl', 'cryptplate_helm'],
+    ];
+    for (const [id, mirror] of pairs) {
+      expect(ITEMS[id].quality, id).toBe('rare');
+      expect(ITEMS[id].slot, id).toBe(ITEMS[mirror].slot);
+      expect(ITEMS[id].armorType, id).toBe(ITEMS[mirror].armorType);
+      expect(stats(id), `${id} vs ${mirror}`).toEqual(stats(mirror));
+      expect(ratingSum(id), id).toBe(40);
+    }
+  });
+
+  it('Vanguard weapons sit on the heroic five-man weapon bar and each carries one proc', () => {
+    const dps = (id: string) => {
+      const w = ITEMS[id].weapon!;
+      return (w.min + w.max) / 2 / w.speed;
+    };
+    const heroicBar = ['gravewyrm_cleaver', 'deathless_greatblade'].map(dps);
+    const [low, high] = [Math.min(...heroicBar), Math.max(...heroicBar)];
+    for (const id of [
+      'riftwarden_voidblade',
+      'dawnkeeper_consecrated_mace',
+      'forgemaster_crag_cleaver',
+    ]) {
+      const def = ITEMS[id];
+      if (def.kind !== 'weapon') throw new Error(`${id} is not a weapon`);
+      expect(def.quality, id).toBe('epic');
+      expect(dps(id), `${id} dps within the heroic bar`).toBeGreaterThanOrEqual(low - 0.05);
+      expect(dps(id), `${id} dps within the heroic bar`).toBeLessThanOrEqual(high + 0.05);
+      expect(def.weaponProcs, id).toHaveLength(1);
+      expect(ratingSum(id) - (def.healPower ?? 0), id).toBe(FIVE_MAN_WEAPON_RATING);
+    }
+    // The Voidblade is the game's first fast non-dagger one-hander.
+    const weapon = (id: string) => {
+      const def = ITEMS[id];
+      if (def.kind !== 'weapon') throw new Error(`${id} is not a weapon`);
+      return def;
+    };
+    expect(weapon('riftwarden_voidblade').weapon.speed).toBe(1.6);
+    expect(weapon('riftwarden_voidblade').weapon.dagger).toBeUndefined();
+    expect(weapon('riftwarden_voidblade').weaponProcs?.[0].effects).toEqual([
+      { kind: 'attackSlow', name: 'Rift Drag', mult: 1.2, duration: 6 },
+    ]);
+    // The Crag Cleaver is two-handed, the home of the faction's Piston Drive.
+    expect(weapon('forgemaster_crag_cleaver').hand).toBe('twohand');
+    expect(weapon('forgemaster_crag_cleaver').weaponProcs?.[0].trigger).toBe('weaponHit');
+    // The healer mace procs on heals, never on swings.
+    expect(weapon('dawnkeeper_consecrated_mace').weaponProcs?.[0].trigger).toBe('heal');
+    expect(weapon('dawnkeeper_consecrated_mace').weaponProcs?.[0].effects[0].kind).toBe('hot');
+    expect(weapon('dawnkeeper_consecrated_mace').healPower).toBe(32);
+  });
+
+  it('the four formulas teach the four learned faction enchants, at Proven', () => {
+    const taught = FORMULA_IDS.map((id) => {
+      const def = ITEMS[id];
+      expect(def.kind, id).toBe('recipe');
+      expect(FACTION_VENDOR_GATES[id].standingTier, id).toBe('proven');
+      if (def.kind !== 'recipe') throw new Error('narrowed above');
+      expect(def.teachesEnchantId, id).toBe(def.teachesRecipeId);
+      expect(ENCHANTS[def.teachesEnchantId ?? ''].acquisition, id).toBe('drop');
+      return def.teachesEnchantId;
+    });
+    expect(taught).toEqual([
+      'enchant_weapon_riftwalkers_grace',
+      'enchant_weapon_dawnfire_etching',
+      'enchant_weapon_dawns_benediction',
+      'enchant_weapon_piston_drive',
+    ]);
+  });
+
+  it('the bags are 14 slots, one step over the 12-slot uncommon line', () => {
+    for (const id of ['rift_surveyors_satchel', 'clockwork_tinkers_pack']) {
+      expect(ITEMS[id].kind, id).toBe('bag');
+      expect(ITEMS[id].bagSlots, id).toBe(14);
+    }
   });
 });
 
@@ -133,15 +410,80 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     expect(sim.countItem('order_prayer_beads')).toBe(1);
     expect(meta.copper).toBe(95_000); // 100,000 - 5,000 buyValue
 
-    // Attempting to buy Tier 2 (Trusted - 3,000) still fails
-    sim.buyItem(qm.id, 'vestments_of_the_acolyte');
-    expect(sim.countItem('vestments_of_the_acolyte')).toBe(0);
+    // Attempting to buy Trusted (3,000) still fails
+    sim.buyItem(qm.id, 'acolytes_signet');
+    expect(sim.countItem('acolytes_signet')).toBe(0);
 
     // Elevate to Trusted (3,000)
     meta.factions.church_order = 3_000;
-    sim.buyItem(qm.id, 'vestments_of_the_acolyte');
-    expect(sim.countItem('vestments_of_the_acolyte')).toBe(1);
+    sim.buyItem(qm.id, 'acolytes_signet');
+    expect(sim.countItem('acolytes_signet')).toBe(1);
     expect(meta.copper).toBe(80_000); // 95,000 - 15,000 buyValue
+
+    // A Proven formula is refused at Trusted and sold at Proven.
+    sim.buyItem(qm.id, 'formula_dawnfire_etching');
+    expect(sim.countItem('formula_dawnfire_etching')).toBe(0);
+    meta.factions.church_order = 7_000;
+    sim.buyItem(qm.id, 'formula_dawnfire_etching');
+    expect(sim.countItem('formula_dawnfire_etching')).toBe(1);
+    expect(meta.copper).toBe(45_000); // 80,000 - 35,000 buyValue
+  });
+
+  it('sells the Valestrider reins at Champion behind the riding and one-per-account gates', () => {
+    const sim = new Sim({ seed: 779, playerClass: 'rogue', autoEquip: false });
+    sim.setPlayerLevel(20);
+    const pid = sim.playerId;
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('fixture player missing');
+    meta.copper = 2_500_000;
+    meta.ridingTrained = true;
+    const qm = [...sim.entities.values()].find(
+      (e) => e.templateId === 'npc_rift_watch_quartermaster',
+    );
+    if (!qm) throw new Error('quartermaster missing');
+    sim.player.pos.x = qm.pos.x;
+    sim.player.pos.z = qm.pos.z;
+    // Vanguard is not enough.
+    meta.factions.rift_watch = 13_000;
+    sim.drainEvents();
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text.includes('Requires Champion')),
+    ).toBe(true);
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
+    // Champion, but the riding skill gate comes first.
+    meta.factions.rift_watch = 20_000;
+    meta.ridingTrained = false;
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(0);
+    meta.ridingTrained = true;
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
+    expect(meta.copper).toBe(1_500_000);
+    // One per account: owning the reins IS owning the mount.
+    sim.drainEvents();
+    sim.buyItem(qm.id, 'reins_avian_strider');
+    expect(
+      sim.drainEvents().some((e) => e.type === 'error' && e.text.includes('already own')),
+    ).toBe(true);
+    expect(sim.countItem('reins_avian_strider', pid)).toBe(1);
+    expect(meta.copper).toBe(1_500_000);
+  });
+
+  it('a bought formula teaches its enchant once the buyer holds Enchanting 100', () => {
+    const sim = new Sim({ seed: 778, playerClass: 'warrior', autoEquip: false });
+    const pid = sim.playerId;
+    const meta = sim.meta(pid);
+    if (!meta) throw new Error('fixture player missing');
+    sim.addItem('formula_piston_drive', 1, pid);
+    meta.craftSkills.enchanting = 99;
+    sim.useItem('formula_piston_drive');
+    expect(meta.knownRecipes.has('enchant_weapon_piston_drive')).toBe(false);
+    expect(sim.countItem('formula_piston_drive', pid)).toBe(1);
+    meta.craftSkills.enchanting = 100;
+    sim.useItem('formula_piston_drive');
+    expect(meta.knownRecipes.has('enchant_weapon_piston_drive')).toBe(true);
+    expect(sim.countItem('formula_piston_drive', pid)).toBe(0);
   });
 
   it('marks locked rows and supplies requirement metadata in buildVendorView', () => {
@@ -157,17 +499,17 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     };
 
     const vendorStock = [
-      'rift_watchers_band', // Recognized (1,000) -> Unlocked
+      'tidewatchers_locket', // Recognized (1,000) -> Unlocked
       'rift_surveyors_satchel', // Trusted (3,000) -> Locked
-      'automaton_cog_ring', // Recognized (1,000) -> Unlocked
-      'artificers_welding_cowl', // Proven (7,000) -> Unlocked
+      'cogwork_choker', // Recognized (1,000) -> Unlocked
+      'formula_piston_drive', // Proven (7,000) -> Unlocked
       'forgemaster_crag_cleaver', // Vanguard (13,000) -> Locked
     ];
 
     const view = buildVendorView(vendorStock, [], ITEMS, balances);
     expect(view.goods.length).toBe(5);
 
-    const r1 = view.goods.find((g) => g.itemId === 'rift_watchers_band');
+    const r1 = view.goods.find((g) => g.itemId === 'tidewatchers_locket');
     expect(r1).toBeDefined();
     expect(r1?.requirementUnmet).toBe(false);
 
@@ -176,11 +518,11 @@ describe('Faction vendor purchase authoritative simulation & UI', () => {
     expect(r2?.requirementUnmet).toBe(true);
     expect(r2?.factionRequirement?.standingTier).toBe('trusted');
 
-    const a1 = view.goods.find((g) => g.itemId === 'automaton_cog_ring');
+    const a1 = view.goods.find((g) => g.itemId === 'cogwork_choker');
     expect(a1).toBeDefined();
     expect(a1?.requirementUnmet).toBe(false);
 
-    const a3 = view.goods.find((g) => g.itemId === 'artificers_welding_cowl');
+    const a3 = view.goods.find((g) => g.itemId === 'formula_piston_drive');
     expect(a3).toBeDefined();
     expect(a3?.requirementUnmet).toBe(false);
 

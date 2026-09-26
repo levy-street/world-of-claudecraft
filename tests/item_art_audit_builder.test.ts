@@ -855,15 +855,15 @@ describe('item-art audit builder', () => {
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
       // faction quartermaster owners, the Emissary's Cache chest and the two
-      // Clue Scroll items (1305 / 1323).
-      // With the trinket slot's 18 trinkets (PR 4173, trinket-slot-icons-2026-09-23)
-      // landed against the integration branch: 1324 / 1342, a 26th group and a
-      // 32nd sheet page, re-measured with `--verify-only` on the merged tree.
-      catalogSha256: '504bb47b91b21682d28e82c38470d005609a6ba13bc674ac8e8a15d6ece358b4',
-      catalogBytes: 721492,
+      // Clue Scroll items (1305 / 1323). Re-minted again with the faction
+      // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
+      // 1340, sha and bytes straight from `--verify-only` on this tree; 1323 / 1341
+      // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way. 1341 / 1359 with the trinket slot's 18 trinkets (PR 4173) landed on the integration branch (a 26th group and a 32nd sheet page), sha and bytes re-measured with `--verify-only` on the merged tree.
+      catalogSha256: '0e578c2eafa1a86281d8f79928716f74bccb70cc29f35b226894e6b356101a09',
+      catalogBytes: 730443,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1324,
-      liveItemCount: 1342,
+      catalogCount: 1341,
+      liveItemCount: 1359,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -881,7 +881,7 @@ describe('item-art audit builder', () => {
         identity: 32,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: 'c4cba93efb0b8d8b617a60ca85cff2c187b06a8ffd048c0f81ef3e4f969d71c5',
+      shippingCatalogSha256: '872966412016b29a6c8797577cc760e8c2f3548b1d5414aa2554eb5757557d26',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -427,17 +427,22 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
-  // Developer-only working mount. It has no acquisition path outside the
-  // explicit dev grant while rider fit and locomotion are being tuned.
+  // The Rift Watch's Champion mount: sold by Quartermaster Vaelen in
+  // Drifthaven behind Champion standing (content/faction_vendors.ts,
+  // docs/design/factions.md). Priced at the classic epic-mount ratio, ten
+  // times the Valorsteed's 10 gold, with the 80 gold riding lesson already
+  // paid. An ordinary player reins: transferable like every other, never
+  // vendor-sold back, and the standing gate sits on the PURCHASE.
   reins_avian_strider: {
     id: 'reins_avian_strider',
     name: 'Reins of the Viridian Valestrider',
     kind: 'mount',
     mount: 'avian_strider',
     quality: 'epic',
-    soulbound: true,
+    noVendorSell: true,
     noDiscard: true,
     sellValue: 0,
+    buyValue: 1_000_000, // 100 gold in copper
   },
   // Legacy cosmetic reins; same inert, discardable treatment as mech_bird.
   reins_rallycart_rxt: {

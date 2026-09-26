@@ -1,5 +1,6 @@
 // scripts/generate_faction_vendor_icons.mjs
-// Generates shipping 128x128 WebP item icons for the 15 Faction Vendor items.
+// Generates shipping 128x128 WebP item icons for the 32 Faction Vendor / Faction
+// Ladder items (the original 15 plus the 17-item faction ladder batch).
 // Meets the woc-item-icon-v1 contract: opaque dark background vignette,
 // tactile lighting with top-left warm key and bottom-right cool shadow,
 // centered silhouette with safe padding, and distinct art for every item.
@@ -14,7 +15,7 @@ const mappingPath = path.join(itemsDir, 'mapping.json');
 const OUT_PX = 128;
 
 /**
- * Visual specifications for each of the 15 faction vendor items.
+ * Visual specifications for each of the 32 faction vendor / faction ladder items.
  */
 const ITEMS_TO_GENERATE = [
   // --- Rift Watch (Cosmic / Void / Teal / Deep Navy) ---
@@ -353,10 +354,393 @@ const ITEMS_TO_GENERATE = [
       <circle cx="64" cy="42" r="3" fill="#ffffff" />
     `,
   },
+
+  // --- Faction Ladder batch 2026-09-23 (Rift Watch / Church Order / Automatons) ---
+
+  // Rift Watch (Cosmic / Void / Teal / Deep Navy)
+  {
+    id: 'tidewatchers_locket',
+    name: "Tidewatcher's Locket",
+    bgDark: '#070714',
+    bgMid: '#111327',
+    bgGlow: '#192242',
+    svgArt: `
+      <!-- Silver chain looping down to a teal tide-glass teardrop pendant -->
+      <path d="M 26 30 Q 64 54 102 30" fill="none" stroke="#7c8a99" stroke-width="3" stroke-dasharray="5 4" />
+      <circle cx="26" cy="30" r="3" fill="#9fb0bf" />
+      <circle cx="102" cy="30" r="3" fill="#9fb0bf" />
+      <!-- Bail -->
+      <rect x="59" y="46" width="10" height="10" rx="3" fill="none" stroke="url(#silverGrad)" stroke-width="3" />
+      <!-- Silver cap -->
+      <path d="M 58 58 L 64 52 L 70 58 Z" fill="url(#silverGrad)" stroke="#37474f" stroke-width="1.5" />
+      <!-- Teardrop tide-glass gem -->
+      <path d="M 64 56 C 76 68 80 84 64 100 C 48 84 52 68 64 56 Z" fill="#00b8d4" stroke="#0a4c66" stroke-width="2" filter="url(#glow)" />
+      <path d="M 64 62 C 72 72 74 84 64 94 C 54 84 56 72 64 62 Z" fill="#84ffff" opacity="0.85" />
+      <circle cx="64" cy="72" r="3" fill="#ffffff" opacity="0.9" />
+    `,
+  },
+  {
+    id: 'riftwalkers_cord',
+    name: "Riftwalker's Cord",
+    bgDark: '#090c1a',
+    bgMid: '#131a30',
+    bgGlow: '#1c2a4e',
+    svgArt: `
+      <!-- Dark leather belt strap with a glowing teal rift-crystal buckle -->
+      <rect x="18" y="56" width="92" height="18" rx="4" fill="#1c130c" stroke="#0a0603" stroke-width="3" />
+      <rect x="18" y="56" width="92" height="4" fill="#2c1e12" opacity="0.6" />
+      <line x1="22" y1="70" x2="106" y2="70" stroke="#3a281a" stroke-width="1" stroke-dasharray="3 3" />
+      <!-- Buckle plate -->
+      <rect x="50" y="48" width="28" height="34" rx="6" fill="#232b3a" stroke="#0c1018" stroke-width="2.5" />
+      <!-- Rift crystal -->
+      <polygon points="64,54 74,65 64,76 54,65" fill="#00e5ff" filter="url(#glow)" />
+      <polygon points="64,58 70,65 64,72 58,65" fill="#e0ffff" />
+      <!-- Belt holes -->
+      <circle cx="30" cy="65" r="2" fill="#0a0603" />
+      <circle cx="40" cy="65" r="2" fill="#0a0603" />
+      <circle cx="88" cy="65" r="2" fill="#0a0603" />
+      <circle cx="98" cy="65" r="2" fill="#0a0603" />
+    `,
+  },
+  {
+    id: 'riftwalkers_treads',
+    name: "Riftwalker's Treads",
+    bgDark: '#080a1c',
+    bgMid: '#121631',
+    bgGlow: '#1a2450',
+    svgArt: `
+      <!-- Paired leather riftwalker boots with teal cuff trim -->
+      <path d="M 26 34 L 54 34 L 54 78 Q 54 90 44 92 L 20 92 L 20 44 Q 20 34 26 34 Z" fill="#141a2a" stroke="#080a14" stroke-width="3" />
+      <path d="M 20 92 L 44 92 Q 54 90 58 92 L 58 98 L 16 98 Z" fill="#0a0d18" stroke="#080a14" stroke-width="2" />
+      <path d="M 74 34 L 102 34 Q 108 34 108 44 L 108 92 L 84 92 Q 74 90 74 78 Z" fill="#141a2a" stroke="#080a14" stroke-width="3" />
+      <path d="M 74 92 L 108 92 L 108 98 L 70 98 Q 70 90 74 92 Z" fill="#0a0d18" stroke="#080a14" stroke-width="2" />
+      <!-- Teal cuff trim -->
+      <rect x="20" y="34" width="34" height="6" rx="2" fill="#00acc1" opacity="0.85" />
+      <rect x="74" y="34" width="34" height="6" rx="2" fill="#00acc1" opacity="0.85" />
+      <!-- Buckle straps -->
+      <rect x="20" y="58" width="34" height="7" rx="2" fill="#1e2438" stroke="#080a14" stroke-width="1.5" />
+      <rect x="74" y="58" width="34" height="7" rx="2" fill="#1e2438" stroke="#080a14" stroke-width="1.5" />
+      <circle cx="42" cy="61.5" r="2.5" fill="#00e5ff" filter="url(#glow)" />
+      <circle cx="86" cy="61.5" r="2.5" fill="#00e5ff" filter="url(#glow)" />
+    `,
+  },
+  {
+    id: 'formula_riftwalkers_grace',
+    name: "Formula: Riftwalker's Grace",
+    bgDark: '#0b0620',
+    bgMid: '#161038',
+    bgGlow: '#221a58',
+    svgArt: `
+      <!-- Rolled parchment scroll bound with a ribbon and a teal wax seal -->
+      <rect x="26" y="46" width="76" height="40" rx="18" fill="#d8c08a" stroke="#6b4a20" stroke-width="3" />
+      <rect x="26" y="46" width="76" height="40" rx="18" fill="none" stroke="#8a6a34" stroke-width="1.5" opacity="0.6" />
+      <!-- Rolled ends -->
+      <ellipse cx="30" cy="66" rx="10" ry="20" fill="#c8a862" stroke="#5c3e18" stroke-width="3" />
+      <ellipse cx="98" cy="66" rx="10" ry="20" fill="#c8a862" stroke="#5c3e18" stroke-width="3" />
+      <!-- Ribbon wrap -->
+      <rect x="56" y="42" width="16" height="48" fill="#0d5c66" opacity="0.9" />
+      <rect x="56" y="42" width="16" height="48" fill="none" stroke="#083c44" stroke-width="1.5" />
+      <!-- Wax seal -->
+      <circle cx="64" cy="66" r="12" fill="#00acc1" stroke="#00e5ff" stroke-width="2" filter="url(#glow)" />
+      <circle cx="64" cy="66" r="6" fill="#84ffff" opacity="0.8" />
+      <!-- Ribbon tails -->
+      <path d="M 58 88 L 54 100 L 62 94 Z" fill="#0d5c66" stroke="#083c44" stroke-width="1" />
+      <path d="M 70 88 L 74 100 L 66 94 Z" fill="#0d5c66" stroke="#083c44" stroke-width="1" />
+    `,
+  },
+  {
+    id: 'riftwardens_pendant',
+    name: "Riftwarden's Pendant",
+    bgDark: '#08081c',
+    bgMid: '#141232',
+    bgGlow: '#241c54',
+    svgArt: `
+      <!-- Ornate silver setting holding a jagged void shard, chained at the neck -->
+      <path d="M 24 26 Q 64 48 104 26" fill="none" stroke="#9fa8b4" stroke-width="3" stroke-dasharray="5 4" />
+      <circle cx="24" cy="26" r="3" fill="#c8d0d8" />
+      <circle cx="104" cy="26" r="3" fill="#c8d0d8" />
+      <!-- Silver prong setting -->
+      <path d="M 48 44 L 64 36 L 80 44 L 76 54 L 52 54 Z" fill="url(#silverGrad)" stroke="#263238" stroke-width="2" />
+      <path d="M 48 44 L 42 50 M 80 44 L 86 50 M 64 36 L 64 28" stroke="#cfd8dc" stroke-width="3" stroke-linecap="round" />
+      <!-- Void shard -->
+      <polygon points="64,50 82,66 70,98 58,84 46,66" fill="#2a0a4c" stroke="#1a0630" stroke-width="2" filter="url(#glow)" />
+      <polygon points="64,56 74,68 66,90 58,76 52,68" fill="#7c4dff" opacity="0.85" />
+      <polygon points="64,60 70,68 65,82 60,72" fill="#e0ccff" opacity="0.9" />
+    `,
+  },
+
+  // Church Order (Holy Light / Amber / Cathedral Gold / Radiant)
+  {
+    id: 'acolytes_signet',
+    name: "Acolyte's Signet",
+    bgDark: '#130e08',
+    bgMid: '#261e10',
+    bgGlow: '#48381a',
+    svgArt: `
+      <!-- Gold signet ring with a flat engraved sun-sigil bezel -->
+      <ellipse cx="64" cy="70" rx="34" ry="22" fill="none" stroke="#2c2214" stroke-width="14" />
+      <ellipse cx="64" cy="70" rx="34" ry="22" fill="none" stroke="#ffc107" stroke-width="9" />
+      <ellipse cx="64" cy="70" rx="34" ry="22" fill="none" stroke="#ffe082" stroke-width="2" opacity="0.7" />
+      <!-- Flat signet bezel -->
+      <rect x="46" y="32" width="36" height="26" rx="6" fill="#ffca28" stroke="#8d6e10" stroke-width="2.5" filter="url(#glow)" />
+      <!-- Engraved sun sigil -->
+      <circle cx="64" cy="45" r="7" fill="#fff8e1" stroke="#b78103" stroke-width="1.5" />
+      <g stroke="#b78103" stroke-width="1.5" stroke-linecap="round">
+        <line x1="64" y1="34" x2="64" y2="37" />
+        <line x1="64" y1="53" x2="64" y2="56" />
+        <line x1="53" y1="45" x2="56" y2="45" />
+        <line x1="72" y1="45" x2="75" y2="45" />
+      </g>
+    `,
+  },
+  {
+    id: 'cord_of_the_dawn',
+    name: 'Cord of the Dawn',
+    bgDark: '#150f07',
+    bgMid: '#2a2010',
+    bgGlow: '#4e3a18',
+    svgArt: `
+      <!-- Ivory cloth sash belt with a gold dawn clasp -->
+      <path d="M 20 58 Q 64 46 108 58 L 108 74 Q 64 62 20 74 Z" fill="#ede7f6" stroke="#8d6e10" stroke-width="2.5" />
+      <path d="M 20 58 Q 64 46 108 58" fill="none" stroke="#ffc107" stroke-width="2" opacity="0.8" />
+      <!-- Gold clasp -->
+      <circle cx="64" cy="65" r="13" fill="#ffca28" stroke="#8d6e10" stroke-width="2.5" filter="url(#glow)" />
+      <circle cx="64" cy="65" r="7" fill="#fff8e1" />
+      <path d="M 64 57 L 64 73 M 56 65 L 72 65" stroke="#ffa000" stroke-width="2" stroke-linecap="round" />
+      <!-- Sash fringe -->
+      <path d="M 20 74 L 16 86 L 24 82 Z" fill="#ede7f6" stroke="#8d6e10" stroke-width="1" />
+      <path d="M 108 74 L 112 86 L 104 82 Z" fill="#ede7f6" stroke="#8d6e10" stroke-width="1" />
+    `,
+  },
+  {
+    id: 'dawnlit_slippers',
+    name: 'Dawnlit Slippers',
+    bgDark: '#170f08',
+    bgMid: '#2e2010',
+    bgGlow: '#523a18',
+    svgArt: `
+      <!-- Paired soft ivory cloth slippers with gold dawn trim -->
+      <path d="M 18 84 Q 16 66 34 62 Q 54 60 58 78 Q 60 92 46 94 L 22 94 Q 16 92 18 84 Z" fill="#ede7f6" stroke="#8d6e10" stroke-width="2.5" />
+      <path d="M 70 84 Q 68 66 86 62 Q 106 60 110 78 Q 112 92 98 94 L 74 94 Q 68 92 70 84 Z" fill="#ede7f6" stroke="#8d6e10" stroke-width="2.5" />
+      <!-- Gold dawn trim on the vamp -->
+      <path d="M 24 78 Q 38 68 52 76" fill="none" stroke="#ffc107" stroke-width="3" filter="url(#glow)" />
+      <path d="M 76 78 Q 90 68 104 76" fill="none" stroke="#ffc107" stroke-width="3" filter="url(#glow)" />
+      <!-- Soft sole line -->
+      <path d="M 22 94 L 46 94" stroke="#c0a060" stroke-width="2" opacity="0.8" />
+      <path d="M 74 94 L 98 94" stroke="#c0a060" stroke-width="2" opacity="0.8" />
+    `,
+  },
+  {
+    id: 'formula_dawnfire_etching',
+    name: 'Formula: Dawnfire Etching',
+    bgDark: '#110c05',
+    bgMid: '#221808',
+    bgGlow: '#402c10',
+    svgArt: `
+      <!-- Rolled parchment scroll bound with ribbon and a gold-red dawnfire seal -->
+      <rect x="24" y="48" width="78" height="38" rx="17" fill="#d8c08a" stroke="#6b4a20" stroke-width="3" />
+      <ellipse cx="28" cy="67" rx="9" ry="19" fill="#c8a862" stroke="#5c3e18" stroke-width="3" />
+      <ellipse cx="98" cy="67" rx="9" ry="19" fill="#c8a862" stroke="#5c3e18" stroke-width="3" />
+      <!-- Ribbon wrap -->
+      <rect x="54" y="44" width="16" height="46" fill="#a12a1e" opacity="0.9" />
+      <rect x="54" y="44" width="16" height="46" fill="none" stroke="#6e1810" stroke-width="1.5" />
+      <!-- Wax seal -->
+      <circle cx="62" cy="67" r="12" fill="#ffb300" stroke="#8d6e10" stroke-width="2" filter="url(#glow)" />
+      <circle cx="62" cy="67" r="6" fill="#ff6f00" opacity="0.85" />
+      <path d="M 56 88 L 52 100 L 60 94 Z" fill="#a12a1e" stroke="#6e1810" stroke-width="1" />
+      <path d="M 68 88 L 72 100 L 64 94 Z" fill="#a12a1e" stroke="#6e1810" stroke-width="1" />
+    `,
+  },
+  {
+    id: 'formula_dawns_benediction',
+    name: "Formula: Dawn's Benediction",
+    bgDark: '#130d05',
+    bgMid: '#261a08',
+    bgGlow: '#463010',
+    svgArt: `
+      <!-- Diagonally rolled parchment scroll bound with ribbon and a gold-white benediction seal -->
+      <g transform="rotate(-12 64 66)">
+        <rect x="22" y="48" width="80" height="36" rx="16" fill="#e8dcb8" stroke="#8d6e10" stroke-width="3" />
+        <ellipse cx="26" cy="66" rx="9" ry="18" fill="#d8c080" stroke="#5c3e18" stroke-width="3" />
+        <ellipse cx="98" cy="66" rx="9" ry="18" fill="#d8c080" stroke="#5c3e18" stroke-width="3" />
+        <!-- Ribbon wrap -->
+        <rect x="58" y="44" width="15" height="44" fill="#fff8e1" opacity="0.95" stroke="#c0a060" stroke-width="1.5" />
+        <!-- Wax seal -->
+        <circle cx="65" cy="66" r="11" fill="#fff9c4" stroke="#ffc107" stroke-width="2.5" filter="url(#glow)" />
+        <circle cx="65" cy="66" r="5" fill="#ffffff" />
+        <path d="M 60 86 L 56 98 L 64 92 Z" fill="#fff8e1" stroke="#c0a060" stroke-width="1" />
+        <path d="M 72 86 L 76 98 L 68 92 Z" fill="#fff8e1" stroke="#c0a060" stroke-width="1" />
+      </g>
+    `,
+  },
+  {
+    id: 'champions_dawn_loop',
+    name: "Champion's Dawn Loop",
+    bgDark: '#160f09',
+    bgMid: '#2c1e10',
+    bgGlow: '#503618',
+    svgArt: `
+      <!-- Heavy gold champion's ring set with a radiant amber sunstone -->
+      <ellipse cx="64" cy="72" rx="40" ry="25" fill="none" stroke="#2c2214" stroke-width="15" />
+      <ellipse cx="64" cy="72" rx="40" ry="25" fill="none" stroke="#ffca28" stroke-width="10" />
+      <ellipse cx="64" cy="72" rx="40" ry="25" fill="none" stroke="#fff3c4" stroke-width="2" opacity="0.7" />
+      <!-- Claws -->
+      <polygon points="64,30 78,44 64,58 50,44" fill="#ffb300" stroke="#8d6e10" stroke-width="2" filter="url(#glow)" />
+      <polygon points="64,34 72,44 64,54 56,44" fill="#ff8f00" />
+      <circle cx="64" cy="44" r="4" fill="#fff9c4" filter="url(#glow)" />
+      <circle cx="50" cy="44" r="3" fill="#fff9c4" />
+      <circle cx="78" cy="44" r="3" fill="#fff9c4" />
+      <circle cx="64" cy="30" r="3" fill="#fff9c4" />
+    `,
+  },
+  {
+    id: 'dawnkeepers_circle',
+    name: "Dawnkeeper's Circle",
+    bgDark: '#120c06',
+    bgMid: '#241a0c',
+    bgGlow: '#443014',
+    svgArt: `
+      <!-- Slender white-gold ring set with a glowing dawn opal cabochon -->
+      <ellipse cx="64" cy="74" rx="36" ry="23" fill="none" stroke="#2c2820" stroke-width="12" />
+      <ellipse cx="64" cy="74" rx="36" ry="23" fill="none" stroke="#f5f0e0" stroke-width="7" />
+      <ellipse cx="64" cy="74" rx="36" ry="23" fill="none" stroke="#ffe082" stroke-width="1.5" opacity="0.7" />
+      <!-- Prong basket -->
+      <path d="M 50 42 L 64 32 L 78 42" fill="none" stroke="#e8e0c8" stroke-width="3" stroke-linecap="round" />
+      <!-- Opal cabochon -->
+      <circle cx="64" cy="44" r="14" fill="#fff3e0" stroke="#c0a060" stroke-width="2" filter="url(#glow)" />
+      <circle cx="64" cy="44" r="9" fill="#ffe0b2" opacity="0.85" />
+      <circle cx="60" cy="40" r="3" fill="#ffffff" opacity="0.9" />
+      <circle cx="68" cy="48" r="2.5" fill="#b3e5fc" opacity="0.7" />
+    `,
+  },
+
+  // Automatons (Brass / Bronze / Industrial Steel / Heat / Copper)
+  {
+    id: 'cogwork_choker',
+    name: 'Cogwork Choker',
+    bgDark: '#100c08',
+    bgMid: '#221610',
+    bgGlow: '#40281a',
+    svgArt: `
+      <!-- Brass choker collar of interlocking cogs -->
+      <path d="M 24 52 Q 64 20 104 52" fill="none" stroke="#8c6d48" stroke-width="14" stroke-linecap="round" />
+      <path d="M 24 52 Q 64 20 104 52" fill="none" stroke="#d4a373" stroke-width="8" stroke-linecap="round" />
+      <!-- Cog teeth studs along the collar -->
+      <circle cx="34" cy="44" r="7" fill="#b08d57" stroke="#442816" stroke-width="1.5" />
+      <circle cx="34" cy="44" r="3" fill="#2d2218" />
+      <circle cx="56" cy="26" r="7" fill="#b08d57" stroke="#442816" stroke-width="1.5" />
+      <circle cx="56" cy="26" r="3" fill="#2d2218" />
+      <circle cx="72" cy="26" r="7" fill="#b08d57" stroke="#442816" stroke-width="1.5" />
+      <circle cx="72" cy="26" r="3" fill="#2d2218" />
+      <circle cx="94" cy="44" r="7" fill="#b08d57" stroke="#442816" stroke-width="1.5" />
+      <circle cx="94" cy="44" r="3" fill="#2d2218" />
+      <!-- Central pendant cog with glowing core -->
+      <circle cx="64" cy="58" r="14" fill="#8c6d48" stroke="#442816" stroke-width="2" />
+      <circle cx="64" cy="58" r="8" fill="#2d2218" />
+      <circle cx="64" cy="58" r="4" fill="#ff9100" filter="url(#glow)" />
+    `,
+  },
+  {
+    id: 'forgemasters_girdle',
+    name: "Forgemaster's Girdle",
+    bgDark: '#120a06',
+    bgMid: '#241610',
+    bgGlow: '#44281a',
+    svgArt: `
+      <!-- Heavy riveted steel girdle with a brass gear buckle -->
+      <rect x="16" y="56" width="96" height="20" rx="3" fill="#263238" stroke="#0c1214" stroke-width="3" />
+      <rect x="16" y="56" width="96" height="5" fill="#37474f" opacity="0.7" />
+      <circle cx="26" cy="66" r="2" fill="#8c6d48" />
+      <circle cx="40" cy="66" r="2" fill="#8c6d48" />
+      <circle cx="88" cy="66" r="2" fill="#8c6d48" />
+      <circle cx="102" cy="66" r="2" fill="#8c6d48" />
+      <!-- Buckle plate -->
+      <rect x="48" y="46" width="32" height="38" rx="5" fill="#37474f" stroke="#0c1214" stroke-width="2.5" />
+      <!-- Gear buckle -->
+      <circle cx="64" cy="65" r="13" fill="#b08d57" stroke="#442816" stroke-width="2" filter="url(#glow)" />
+      <circle cx="64" cy="65" r="7" fill="#2d2218" />
+      <g stroke="#d4a373" stroke-width="3" stroke-linecap="square">
+        <line x1="64" y1="50" x2="64" y2="54" />
+        <line x1="64" y1="76" x2="64" y2="80" />
+        <line x1="49" y1="65" x2="53" y2="65" />
+        <line x1="75" y1="65" x2="79" y2="65" />
+      </g>
+    `,
+  },
+  {
+    id: 'forgemasters_sabatons',
+    name: "Forgemaster's Sabatons",
+    bgDark: '#0f0b07',
+    bgMid: '#20140e',
+    bgGlow: '#3c241a',
+    svgArt: `
+      <!-- Paired heavy steel-plated mail sabatons with brass rivet trim -->
+      <path d="M 24 36 L 54 36 L 54 80 Q 54 92 42 94 L 18 94 L 18 46 Q 18 36 24 36 Z" fill="#37474f" stroke="#101416" stroke-width="3" />
+      <path d="M 18 94 L 42 94 Q 54 92 58 96 L 58 100 L 14 100 Z" fill="#263238" stroke="#101416" stroke-width="2" />
+      <path d="M 74 36 L 104 36 Q 110 36 110 46 L 110 94 L 86 94 Q 74 92 74 80 Z" fill="#37474f" stroke="#101416" stroke-width="3" />
+      <path d="M 74 94 L 110 94 L 114 100 L 70 100 Q 70 92 74 94 Z" fill="#263238" stroke="#101416" stroke-width="2" />
+      <!-- Plate seams -->
+      <path d="M 18 58 L 54 58 M 74 58 L 110 58" stroke="#101416" stroke-width="2" />
+      <!-- Brass rivets -->
+      <circle cx="24" cy="46" r="2" fill="#d4a373" />
+      <circle cx="48" cy="46" r="2" fill="#d4a373" />
+      <circle cx="80" cy="46" r="2" fill="#d4a373" />
+      <circle cx="104" cy="46" r="2" fill="#d4a373" />
+      <!-- Ember heat vents at the toe -->
+      <polygon points="30,84 42,80 40,92 28,92" fill="#ff3d00" filter="url(#glow)" opacity="0.9" />
+      <polygon points="86,84 98,80 100,92 88,92" fill="#ff3d00" filter="url(#glow)" opacity="0.9" />
+    `,
+  },
+  {
+    id: 'formula_piston_drive',
+    name: 'Formula: Piston Drive',
+    bgDark: '#130c07',
+    bgMid: '#261810',
+    bgGlow: '#48281a',
+    svgArt: `
+      <!-- Rolled parchment scroll bound with ribbon and a copper piston-stamped seal -->
+      <rect x="24" y="50" width="78" height="36" rx="16" fill="#d8c08a" stroke="#6b4a20" stroke-width="3" />
+      <ellipse cx="28" cy="68" rx="9" ry="18" fill="#c8a862" stroke="#5c3e18" stroke-width="3" />
+      <ellipse cx="98" cy="68" rx="9" ry="18" fill="#c8a862" stroke="#5c3e18" stroke-width="3" />
+      <!-- Ribbon wrap -->
+      <rect x="60" y="46" width="16" height="44" fill="#8a4a20" opacity="0.9" stroke="#502c10" stroke-width="1.5" />
+      <!-- Wax seal -->
+      <circle cx="68" cy="68" r="12" fill="#b87333" stroke="#5d2a18" stroke-width="2" filter="url(#glow)" />
+      <!-- Piston stamp -->
+      <rect x="63" y="62" width="6" height="10" rx="1" fill="#3e2412" />
+      <circle cx="66" cy="60" r="3" fill="#ffab40" />
+      <path d="M 62 90 L 58 102 L 66 96 Z" fill="#8a4a20" stroke="#502c10" stroke-width="1" />
+      <path d="M 74 90 L 78 102 L 70 96 Z" fill="#8a4a20" stroke="#502c10" stroke-width="1" />
+    `,
+  },
+  {
+    id: 'forgewall_gorget',
+    name: 'Forgewall Gorget',
+    bgDark: '#110d09',
+    bgMid: '#221c12',
+    bgGlow: '#3e321c',
+    svgArt: `
+      <!-- Solid steel gorget collar plate with a glowing ember rune -->
+      <path d="M 30 30 Q 64 18 98 30 L 92 56 Q 64 68 36 56 Z" fill="#37474f" stroke="#101416" stroke-width="3" />
+      <path d="M 34 32 Q 64 22 94 32 L 90 52 Q 64 62 38 52 Z" fill="#546e7a" opacity="0.5" />
+      <!-- Rivets along the collar rim -->
+      <circle cx="38" cy="34" r="2" fill="#d4a373" />
+      <circle cx="52" cy="26" r="2" fill="#d4a373" />
+      <circle cx="76" cy="26" r="2" fill="#d4a373" />
+      <circle cx="90" cy="34" r="2" fill="#d4a373" />
+      <!-- Ember rune plate -->
+      <circle cx="64" cy="42" r="13" fill="#263238" stroke="#0c1214" stroke-width="2" />
+      <path d="M 64 33 L 70 42 L 64 51 L 58 42 Z" fill="#ff3d00" filter="url(#glow)" />
+      <path d="M 64 37 L 67 42 L 64 47 L 61 42 Z" fill="#ffab40" />
+      <!-- Hanging tassets -->
+      <rect x="42" y="56" width="10" height="16" rx="2" fill="#263238" stroke="#101416" stroke-width="1.5" />
+      <rect x="76" y="56" width="10" height="16" rx="2" fill="#263238" stroke="#101416" stroke-width="1.5" />
+    `,
+  },
 ];
 
 async function main() {
-  console.log('Generating 15 faction vendor WebP icons...');
+  console.log('Generating 32 faction vendor WebP icons...');
 
   const mappingData = JSON.parse(readFileSync(mappingPath, 'utf8'));
 
@@ -395,18 +779,8 @@ async function main() {
 
     console.log(`Generated: ${item.id}.webp`);
 
-    // Ensure mapping entry exists
-    const existing = mappingData.entries.find((e) => e.itemId === item.id);
-    if (!existing) {
-      mappingData.entries.push({
-        itemId: item.id,
-        name: item.name,
-        sourcePack: 'woc_faction_vendors_art',
-        sourceFile: `faction_vendors/masters/${item.id}.png`,
-        confidence: 'high',
-        license: 'World of ClaudeCraft original art (project-owned, created for this game)',
-      });
-    }
+    // Provenance is owned by the generatedBatches record in mapping.json
+    // (one owner per icon, tests/item_icons.test.ts F); no per-item entry.
   }
 
   // Sort entries by itemId to keep mapping.json tidy

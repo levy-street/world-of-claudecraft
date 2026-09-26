@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4640,
+    "files": 4641,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -1128,6 +1128,15 @@
         "reason": "release/v0.44.0 base merge into integration/world-quests-v0440: the branch's own measured rows (its table, CI run 34168361798) re-carried onto the release table",
         "runs": [
           2184
+        ]
+      },
+      "tests/faction_enchants.test.ts": {
+        "ms": 358,
+        "method": "local-median",
+        "measured": "2026-09-24",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          358
         ]
       },
       "tests/faction_snapshot_wire.test.ts": {
@@ -7530,6 +7539,7 @@
   "tests/extension_drift_sentinel.test.ts": 12,
   "tests/facing_smooth.test.ts": 11,
   "tests/facing_stability.test.ts": 3271,
+  "tests/faction_enchants.test.ts": 358,
   "tests/faction_snapshot_wire.test.ts": 770,
   "tests/faction_tier_celebration_drain.test.ts": 13,
   "tests/faction_tier_celebration_painter.test.ts": 9,

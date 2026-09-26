@@ -3468,7 +3468,18 @@ describe('Guide professions enchanting and economy accuracy', () => {
     expect(e.enchants.filter((row) => row.tier === 'greater' && !row.requiresFormula)).toHaveLength(
       6,
     );
-    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(7);
+    // 7 with Zeal; 11 with the four learned faction formulas
+    // (content/faction_vendors.ts), shard-derived and formula-gated like Zeal.
+    expect(e.enchants.filter((row) => row.tier === 'greater')).toHaveLength(11);
+    expect(
+      e.enchants.filter((row) => row.tier === 'greater' && row.requiresFormula).map((r) => r.id),
+    ).toEqual([
+      'enchant_weapon_lastflame_zeal',
+      'enchant_weapon_riftwalkers_grace',
+      'enchant_weapon_dawnfire_etching',
+      'enchant_weapon_dawns_benediction',
+      'enchant_weapon_piston_drive',
+    ]);
     // The five Lucent (apex) enchants: the phase 10 quartet plus the weapon
     // int twin the phase 10 QA D10-D1 ruling added at the head of phase 11.
     expect(

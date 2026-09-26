@@ -376,6 +376,8 @@ export function recalcPlayerStats(
       s.spi += Number.isFinite(rolled.spi) ? rolled.spi : 0;
       s.armor += Number.isFinite(rolled.armor) ? rolled.armor : 0;
       bonusSp += Number.isFinite(rolled.spellPower) ? rolled.spellPower : 0;
+      // healingPower: the permanent loot quality bake (loot_quality/core.ts)
+      // and Dawn's Benediction (content/enchants.ts) both write this key.
       bonusHealPower += Number.isFinite(rolled.healingPower) ? rolled.healingPower : 0;
       bonusPvpOffenseRating += Number.isFinite(rolled.pvpOffenseRating)
         ? rolled.pvpOffenseRating

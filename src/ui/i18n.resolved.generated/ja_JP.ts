@@ -4867,10 +4867,18 @@ export const ja_JP: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "武器銘刻：光輝の呪文威力",
       "enchant_chest_lucent_stamina": "胸銘刻：光輝のスタミナ",
       "enchant_feet_lucent_agility": "足銘刻：光輝の敏捷性",
-      "enchant_lucent_infusion": "光輝の注入"
+      "enchant_lucent_infusion": "光輝の注入",
+      "enchant_weapon_riftwalkers_grace": "裂け目歩きの優雅",
+      "enchant_weapon_dawnfire_etching": "武器銘刻：暁火",
+      "enchant_weapon_dawns_benediction": "武器銘刻：暁の祝福",
+      "enchant_weapon_piston_drive": "武器銘刻：ピストン駆動"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。"
+      "enchant_weapon_lastflame_zeal": "命中した近接攻撃は、確率で15秒間筋力を50増加させ、自分の体力を200回復する。回復量の補正が適用される。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。狼形態では代わりに1秒の基本攻撃速度を使う。",
+      "enchant_weapon_riftwalkers_grace": "命中した近接攻撃は、確率で15秒間敏捷性を60増加させ、近接攻撃速度を2%上昇させる。命中ごとの発動率は、攻撃した武器の基本速度0.6秒につき1%。内部クールダウンはない。強化は両手で共有され、どちらの手で発動しても持続時間が更新される。重複して積み重なることはない。遠隔攻撃では発動しない。キャットフォームでは代わりに1秒の基本攻撃速度を使う。",
+      "enchant_weapon_dawnfire_etching": "武器に呪文威力18を永続的に銘刻する。呪文威力は治癒力にも加算される。固定値のボーナスで、他の能力値によって増減しない。",
+      "enchant_weapon_dawns_benediction": "武器に治癒力34を永続的に銘刻する。治癒力は回復のみを高め、呪文ダメージは高めない。固定値のボーナスで、他の能力値によって増減しない。",
+      "enchant_weapon_piston_drive": "両手武器に筋力12とクリティカルレーティング25を永続的に銘刻する。片手武器には施せない。固定値のボーナスで、他の能力値によって増減しない。"
     },
     "professions": {
       "title": "専門技能",
@@ -17718,6 +17726,57 @@ export const ja_JP: EnTranslations = {
       },
       "champion_forged_loop": {
         "name": "勇者の鍛造の指輪"
+      },
+      "tidewatchers_locket": {
+        "name": "潮見のロケット"
+      },
+      "riftwalkers_cord": {
+        "name": "裂け目歩きの腰紐"
+      },
+      "riftwalkers_treads": {
+        "name": "裂け目歩きのブーツ"
+      },
+      "formula_riftwalkers_grace": {
+        "name": "製法書：裂け目歩きの優雅"
+      },
+      "riftwardens_pendant": {
+        "name": "裂け目の守護者のペンダント"
+      },
+      "acolytes_signet": {
+        "name": "侍祭の印章指輪"
+      },
+      "cord_of_the_dawn": {
+        "name": "暁の腰紐"
+      },
+      "dawnlit_slippers": {
+        "name": "暁光のスリッパ"
+      },
+      "formula_dawnfire_etching": {
+        "name": "製法書：暁火の銘刻"
+      },
+      "formula_dawns_benediction": {
+        "name": "製法書：暁の祝福"
+      },
+      "champions_dawn_loop": {
+        "name": "勇者の暁の指輪"
+      },
+      "dawnkeepers_circle": {
+        "name": "暁の守り手の環"
+      },
+      "cogwork_choker": {
+        "name": "歯車仕掛けのチョーカー"
+      },
+      "forgemasters_girdle": {
+        "name": "鍛冶頭の腰帯"
+      },
+      "forgemasters_sabatons": {
+        "name": "鍛冶頭のサバトン"
+      },
+      "formula_piston_drive": {
+        "name": "製法書：ピストン駆動"
+      },
+      "forgewall_gorget": {
+        "name": "鍛冶壁の喉当て"
       }
     },
     "mobs": {

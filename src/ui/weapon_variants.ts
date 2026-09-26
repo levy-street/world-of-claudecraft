@@ -143,7 +143,7 @@ export const ITEM_WEAPON_VARIANTS: Record<string, string> = {
   arcanite_war_axe: 'axe_d', // crafted (weaponcrafting tier 3)
   gorraks_cleaver: 'adv_axe_1handed',
   tradesman_hatchet: 'adv_axe_1handed',
-  forgemaster_crag_cleaver: 'adv_axe_1handed', // Faction vendor epic axe
+  forgemaster_crag_cleaver: 'adv_axe_2handed', // Faction vendor epic two-handed axe
   gravewyrm_cleaver: 'adv_axe_1handed', // EPIC: Heroic Korzul axe
   // Nythraxis gap-fill one-handers (content/zone3.ts): the violet-gem KayKit
   // set, the Deathless Court's bone-and-violet palette in hand (purple_dagger

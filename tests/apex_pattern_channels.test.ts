@@ -39,6 +39,7 @@ import { DELVE_SHOPS } from '../src/sim/content/delves';
 import { drownedLitanyChestItemsForTier } from '../src/sim/content/delves/drowned_litany_loot';
 import { delveChestItemsForTier } from '../src/sim/content/delves/lockpick_tiers';
 import { ENCHANTS } from '../src/sim/content/enchants';
+import { FACTION_VENDOR_NPCS } from '../src/sim/content/faction_vendors';
 import { FARM_HEROIC_PATTERN_GROUP, HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_NPC_ID, HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_NPC_ID, CRUCIBLE_VENDOR_STOCK } from '../src/sim/content/ignivar_loot';
@@ -471,17 +472,40 @@ describe('the no-fourth-channel sweep (masterwrought R8: three pillars, no fourt
   it('no NPC vendorItems list carries a pattern id', () => {
     // The quartermaster's marks stock is NOT a vendorItems list (he carries
     // none); a pattern in any coin vendorItems row would be a fourth channel.
+    // The one sanctioned exception is the faction REPUTATION channel: the four
+    // faction formulas (content/faction_vendors.ts FACTION_VENDOR_STOCK) teach
+    // learned enchants and sell for coin behind a Proven standing gate, the
+    // classic faction-formula shape (docs/design/factions.md). They are not
+    // apex patterns and never leave the three quartermasters' lists.
+    const FACTION_FORMULA_IDS = new Set([
+      'formula_dawnfire_etching',
+      'formula_dawns_benediction',
+      'formula_piston_drive',
+      'formula_riftwalkers_grace',
+    ]);
+    const factionQuartermasters = new Set(
+      Object.values(FACTION_VENDOR_NPCS)
+        .filter((npc) => (npc.vendorItems?.length ?? 0) > 0)
+        .map((npc) => npc.id),
+    );
     const vendors = Object.values(NPCS).filter((npc) => (npc.vendorItems?.length ?? 0) > 0);
     expect(vendors.length).toBeGreaterThanOrEqual(17);
     let idsWalked = 0;
+    let formulasWalked = 0;
     const leaks: string[] = [];
     for (const npc of vendors) {
       for (const itemId of npc.vendorItems ?? []) {
         idsWalked++;
+        if (FACTION_FORMULA_IDS.has(itemId)) {
+          expect(factionQuartermasters.has(npc.id), `${itemId} outside a quartermaster`).toBe(true);
+          formulasWalked++;
+          continue;
+        }
         if (isPatternId(itemId)) leaks.push(`NPCS.${npc.id}: ${itemId}`);
       }
     }
     expect(idsWalked).toBeGreaterThanOrEqual(205);
+    expect(formulasWalked).toBe(4);
     expect(leaks).toEqual([]);
   });
 
@@ -662,15 +686,25 @@ describe('the phase 02 sweep floor', () => {
     const recipeDefs = Object.values(ITEMS).filter((def) => def.kind === 'recipe');
     // 38 since masterwrought Phase 11i (the angler's endgame block), 40 since
     // Phase 11k (three apex feast recipes in, 11i's capstone feast out).
-    expect(recipeDefs).toHaveLength(52);
-    expect(recipeDefs.filter((def) => !CRUCIBLE_SCROLL_IDS.includes(def.id))).toHaveLength(40);
+    // 56 with the four faction formulas (the reputation channel, see the
+    // vendorItems sweep above); they teach learned enchants like Zeal does.
+    expect(recipeDefs).toHaveLength(56);
+    expect(recipeDefs.filter((def) => !CRUCIBLE_SCROLL_IDS.includes(def.id))).toHaveLength(44);
+    const ENCHANT_FORMULAS: Record<string, string> = {
+      formula_lastflame_zeal: 'enchant_weapon_lastflame_zeal',
+      formula_riftwalkers_grace: 'enchant_weapon_riftwalkers_grace',
+      formula_dawnfire_etching: 'enchant_weapon_dawnfire_etching',
+      formula_dawns_benediction: 'enchant_weapon_dawns_benediction',
+      formula_piston_drive: 'enchant_weapon_piston_drive',
+    };
     let recipesTaught = 0;
     let enchantsTaught = 0;
     for (const def of recipeDefs) {
       if (def.kind !== 'recipe') continue; // narrow for teachesRecipeId
       if (def.teachesEnchantId !== undefined) {
-        expect(def.id).toBe('formula_lastflame_zeal');
-        expect(def.teachesEnchantId).toBe('enchant_weapon_lastflame_zeal');
+        expect(ENCHANT_FORMULAS[def.id], `${def.id} is a known enchant formula`).toBe(
+          def.teachesEnchantId,
+        );
         expect(ENCHANTS[def.teachesEnchantId]?.acquisition).toBe('drop');
         enchantsTaught++;
         continue;
@@ -683,7 +717,7 @@ describe('the phase 02 sweep floor', () => {
       }
     }
     expect(recipesTaught).toBe(73);
-    expect(enchantsTaught).toBe(1);
+    expect(enchantsTaught).toBe(5);
   });
 });
 

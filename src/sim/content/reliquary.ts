@@ -284,9 +284,10 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// Drakemaw Raptor, Viridian Valestrider, Lanternback Troll and Dreadspark
-// Groundshaker have no player acquisition path. Paid mount skins are
-// deliberately absent here.
+// Drakemaw Raptor, Lanternback Troll and Dreadspark Groundshaker have no
+// player acquisition path. The Viridian Valestrider is the Rift Watch
+// quartermaster's Champion row (content/faction_vendors.ts). Paid mount skins
+// are deliberately absent here.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -298,6 +299,7 @@ const MOUNT_SOURCES: Readonly<
   // convention (a one-element list would mean the same thing; the catalog
   // never encodes meaning in the shape).
   valorsteed: fromVendor('stablemaster_marla'),
+  avian_strider: fromVendor('npc_rift_watch_quartermaster'),
   stormfeather_griffin: [
     fromBoss('morthen'),
     fromBoss('nythraxis_scourge_of_thornpeak'),

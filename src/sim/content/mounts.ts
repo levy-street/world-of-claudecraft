@@ -110,11 +110,10 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
-  // Developer mount while its acquisition path is art-directed; the display
-  // name is final. The internal key stays `avian_strider` because the shipped
-  // GLB, icon, asset spec, and KTX2 seals are all named from it. The soulbound
-  // reins live in content/items.ts so /dev mounts can exercise the complete
-  // ownership/summon path in-world.
+  // The Rift Watch's Champion standing mount (content/faction_vendors.ts):
+  // Quartermaster Vaelen sells the reins in Drifthaven. The internal key stays
+  // `avian_strider` because the shipped GLB, icon, asset spec, and KTX2 seals
+  // are all named from it; the reins def lives in content/items.ts.
   avian_strider: {
     key: 'avian_strider',
     name: 'Viridian Valestrider',
@@ -152,7 +151,7 @@ export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
  *  the single source of truth: the catalog, the item table, and the acquisition
  *  tests all read it, so a fourth place can never disagree about which mounts
  *  are still under development. */
-export const DEVELOPER_MOUNTS: readonly MountKey[] = ['avian_strider', 'terrorspark_groundshaker'];
+export const DEVELOPER_MOUNTS: readonly MountKey[] = ['terrorspark_groundshaker'];
 
 /** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
 export function isDeveloperMount(key: string): boolean {

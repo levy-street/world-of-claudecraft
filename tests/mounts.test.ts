@@ -218,11 +218,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(granted.sort()).toEqual(MOUNT_KEYS.map((key) => mountItemId(key)).sort());
   });
 
-  it('only the horse reins is purchasable, for 10 gold', () => {
+  it('two reins are purchasable: the horse for 10 gold, the Valestrider for 100 at Champion standing', () => {
     const horse = reinsFor('valorsteed')[0];
     expect(horse.id).toBe('reins_valorsteed');
     expect(horse.buyValue).toBe(100_000); // 10 gold in copper (ridingTrained gated)
-    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
+    // The Rift Watch quartermaster's Champion row (content/faction_vendors.ts):
+    // the classic epic-mount ratio, ten times the basic mount, on top of the
+    // same riding gate.
+    const strider = reinsFor('avian_strider')[0];
+    expect(strider.id).toBe('reins_avian_strider');
+    expect(strider.buyValue).toBe(1_000_000);
+    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed' && k !== 'avian_strider')) {
       expect(reinsFor(key)[0].buyValue).toBeUndefined();
     }
   });
@@ -268,6 +274,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
+      if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;

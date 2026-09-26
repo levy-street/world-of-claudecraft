@@ -56,13 +56,54 @@ and the character sheet shows the current title.
 
 ## What standing unlocks
 
-- **Quartermaster stock.** Each quartermaster sells one gated row per tier
-  (`FACTION_VENDOR_GATES`, one item per gate), refused with the
-  `hudChrome.reputation.vendorGate` line until the buyer's standing meets it.
-  Faction jewelry is tuned to sit BELOW the crafted rungs and the raid pieces on
-  every line: standing stock is a convenience for the leveling character, never
-  a best-in-slot path (the dev kit, practice dummy, rogue and druid probes pin
-  that they keep their release loadouts).
+- **Quartermaster stock: the ladder.** Each quartermaster sells a standing
+  ladder (`FACTION_VENDOR_STOCK`, gated row by row through
+  `FACTION_VENDOR_GATES`), refused with the `hudChrome.reputation.vendorGate`
+  line until the buyer's standing meets the row's tier. Factions own the
+  PERIPHERY the raid never fills, the classic reputation-gear shape: the five
+  set slots and the top weapons stay raid prestige, and every tier sells
+  something a player uses the day it opens. Each faction serves one role family
+  across its ladder (Rift Watch: Agility; Church Order: casters and healers;
+  Automatons: Strength and the stamina line), and every budget is COPIED from a
+  live raid or heroic row (`tests/faction_vendors.test.ts` pins each mirror):
+  - Recognized: a neck at the heroic five-man vendor's budget.
+  - Trusted: a ring at the same budget, plus the faction's bag.
+  - Proven: waist and feet at the raid offset budget, a pre-raid set-slot
+    piece at the heroic five-man budget, and the faction's enchant formulas.
+  - Vanguard: a proc weapon on the heroic five-man weapon bar (the Rift
+    Watch's 1.6-speed blade is the first fast non-dagger one-hander).
+  - Champion: the jewelry gaps: Agility jewels, stamina-line tank jewels, a
+    second caster and healer ring, each carrying the raid jewel's rating with
+    its line one point under the raid row it mirrors (a rival, never a tie).
+    The Rift Watch's Champion row also sells the Viridian Valestrider's reins
+    (the faction mount: a teal coast-runner on the Agility line; the reins def
+    stays with the other reins in `content/items.ts`) at the classic epic-mount
+    ratio, ten times the Valorsteed, behind the same riding and
+    one-per-account gates every reins purchase carries. The Reliquary hints the
+    mount at the quartermaster and it leaves the pending-ruling list. The
+    Church Order and the Automatons get their own mounts when their assets
+    land (Terrid's Dawn Strider is the Church Order's).
+  Every gear and bag row binds on purchase (`soulbound`), because the standing
+  gate sits on the buyer and an unbound row would let a Champion hand the
+  ladder to an alt with no standing. Two rows stay transferable by contract:
+  the Valestrider's reins (the mount contract) and the formulas (patterns are
+  bind-by-consumption and deliberately listable; learning spends the copy). Every equipment row also pins `requiredLevel: 20`
+  explicitly: the stock is untiered, so without the pin the level gate would
+  fall to the quality floor (rare 12, epic 18) while every mirrored raid and
+  heroic row requires 20. `tests/faction_vendors.test.ts` pins both.
+  A fresh 20 holds no standing, so the dev kit excludes the ladder outright
+  (`isFreshTwentyItem`); the epic BiS picker sees the Champion jewels but the
+  one-point margin keeps every dev kit and DPS fixture on its release loadout.
+- **Enchant formulas.** At Proven each quartermaster sells bind-on-pickup
+  formulas that teach a LEARNED enchant at Enchanting 100, the way Zeal is
+  learned: Riftwalker's Grace (the Agility sibling of Zeal, Mongoose to
+  Crusader ratio, with the classic 2% haste), Dawnfire Etching (flat Spell
+  Power) and Dawn's Benediction (flat Healing Power), and Piston Drive (a
+  two-hander-only Strength and crit line, refused on a one-hander). Standing
+  gates the formula; the enchant itself is tradeable labour, so enchanters
+  have a reason to hold standing and everyone else buys the etching. Figures
+  and their derivations are pinned in `tests/enchants_magnitude_invariants.test.ts`
+  (the learned block) and the runtime in `tests/faction_enchants.test.ts`.
 - **Deeds.** Reaching Trusted with a faction and Champion with a faction each
   record a Book of Deeds entry, and Champion with all three is its own capstone
   deed; the Champion deeds grant a title. They read standing through the

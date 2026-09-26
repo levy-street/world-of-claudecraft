@@ -4867,10 +4867,18 @@ export const id_ID: EnTranslations = {
       "enchant_weapon_lucent_spellpower": "Ukiran Senjata: Kekuatan Mantra Bercahaya",
       "enchant_chest_lucent_stamina": "Ukiran Dada: Stamina Bercahaya",
       "enchant_feet_lucent_agility": "Ukiran Sepatu: Kelincahan Bercahaya",
-      "enchant_lucent_infusion": "Infusi Bercahaya"
+      "enchant_lucent_infusion": "Infusi Bercahaya",
+      "enchant_weapon_riftwalkers_grace": "Riftwalker's Grace",
+      "enchant_weapon_dawnfire_etching": "Weapon Etching: Dawnfire",
+      "enchant_weapon_dawns_benediction": "Weapon Etching: Dawn's Benediction",
+      "enchant_weapon_piston_drive": "Weapon Etching: Piston Drive"
     },
     "enchantDescription": {
-      "enchant_weapon_lastflame_zeal": "Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Kedua tangan berbagi satu buff; setiap pemicu menyegarkannya dan buff ini tidak pernah bertumpuk. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya."
+      "enchant_weapon_lastflame_zeal": "Serangan jarak dekatmu yang mengenai target dapat memberi 50 Kekuatan selama 15 dtk dan memulihkan 200 kesehatanmu. Pengubah penyembuhan berlaku. Setiap serangan memiliki peluang 1% per 0,6 dtk kecepatan dasar senjata yang menyerang. Tanpa cooldown internal. Kedua tangan berbagi satu buff; setiap pemicu menyegarkannya dan buff ini tidak pernah bertumpuk. Serangan jarak jauh tidak memicu efek ini. Bentuk Serigala menggunakan kecepatan ayunan dasar 1 dtk sebagai gantinya.",
+      "enchant_weapon_riftwalkers_grace": "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+      "enchant_weapon_dawnfire_etching": "Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.",
+      "enchant_weapon_dawns_benediction": "Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.",
+      "enchant_weapon_piston_drive": "Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale."
     },
     "professions": {
       "title": "Profesi",
@@ -17718,6 +17726,57 @@ export const id_ID: EnTranslations = {
       },
       "champion_forged_loop": {
         "name": "Champion's Forged Loop"
+      },
+      "tidewatchers_locket": {
+        "name": "Tidewatcher's Locket"
+      },
+      "riftwalkers_cord": {
+        "name": "Riftwalker's Cord"
+      },
+      "riftwalkers_treads": {
+        "name": "Riftwalker's Treads"
+      },
+      "formula_riftwalkers_grace": {
+        "name": "Formula: Riftwalker's Grace"
+      },
+      "riftwardens_pendant": {
+        "name": "Riftwarden's Pendant"
+      },
+      "acolytes_signet": {
+        "name": "Acolyte's Signet"
+      },
+      "cord_of_the_dawn": {
+        "name": "Cord of the Dawn"
+      },
+      "dawnlit_slippers": {
+        "name": "Dawnlit Slippers"
+      },
+      "formula_dawnfire_etching": {
+        "name": "Formula: Dawnfire Etching"
+      },
+      "formula_dawns_benediction": {
+        "name": "Formula: Dawn's Benediction"
+      },
+      "champions_dawn_loop": {
+        "name": "Champion's Dawn Loop"
+      },
+      "dawnkeepers_circle": {
+        "name": "Dawnkeeper's Circle"
+      },
+      "cogwork_choker": {
+        "name": "Cogwork Choker"
+      },
+      "forgemasters_girdle": {
+        "name": "Forgemaster's Girdle"
+      },
+      "forgemasters_sabatons": {
+        "name": "Forgemaster's Sabatons"
+      },
+      "formula_piston_drive": {
+        "name": "Formula: Piston Drive"
+      },
+      "forgewall_gorget": {
+        "name": "Forgewall Gorget"
       }
     },
     "mobs": {
