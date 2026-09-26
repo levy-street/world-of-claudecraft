@@ -5990,6 +5990,13 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "renown": 25,
     "feat": false,
     "rewardTitle": "Treasure Hunter"
+  },
+  {
+    "id": "exp_harbor_to_harbor",
+    "name": "Harbor to Harbor",
+    "category": "exploration",
+    "renown": 5,
+    "feat": false
   }
 ];
 

@@ -24,7 +24,10 @@ import { FARSHORE_HULL_FRAGMENT_PLACEMENT } from './content/farshore_shipwreck_l
 import { OVERWORLD_GRAVEYARDS } from './content/graveyards';
 import { MAILBOXES } from './content/mailboxes';
 import { MUSTER_BOARDS, NOTICEBOARDS } from './content/noticeboards';
+import { TRANSPORT_ROUTES } from './content/transport_ships';
 import { TUNNELS } from './content/tunnels';
+import { WICKHARBOR_HARBOR_MOVED_DECOR } from './content/wickharbor_harbor';
+import { WICKHARBOR_WHARF_CALM_ANCHORS } from './content/wickharbor_wharf';
 import { WORLD_QUEST_CALLIGRAPHY_NPCS } from './content/world_quest_calligraphy';
 import { FARSHORE_SALVAGE_ENTITY_ID_START } from './content/world_quests';
 import {
@@ -259,6 +262,9 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
       pad('deckRoot', deck.ax2, deck.az2, 5, 12);
     }
   }
+  // ...and the Wickharbor ferry wharf keeps the shore root its predecessors were seated
+  // on (content/wickharbor_wharf.ts), so the bluff it stands against is unchanged
+  for (const [x, z] of WICKHARBOR_WHARF_CALM_ANCHORS) pad('deckRoot', x, z, 5, 12);
   // Structural props: anything with a modeled footprint a player walks up
   // to. Foliage-like dressing (marshReeds, greatTrees) and hub-internal
   // line work (fences, walls) are deliberately absent: a tree or a fence
@@ -289,7 +295,18 @@ export function collectCalmAnchorPads(): CalmPadRow[] {
     // the VISUAL footprint tracks scale, so a scale-9 landmark gets a
     // landmark-sized pad, not a crate-sized one.
     const foot = Math.max(decor.r ?? 1.5, (decor.scale ?? 1) * 1.2);
-    pad('decorProp', decor.x, decor.z, foot + 2, foot + 8);
+    // a row moved off Wickharbor's rebuilt harbor keeps the pad it first had
+    const moved = WICKHARBOR_HARBOR_MOVED_DECOR.find(
+      (m) => m.key === decor.key && m.to.x === decor.x && m.to.z === decor.z,
+    );
+    const at = moved ? moved.from : decor;
+    pad('decorProp', at.x, at.z, foot + 2, foot + 8);
+  }
+  // Scheduled transport berths (content/transport_ships.ts): each keeps the
+  // pad its ship had as a moored decorProps row (the default 1.5 footprint),
+  // so the Eastbrook berth's seabed is exactly the Phase 1 one.
+  for (const route of TRANSPORT_ROUTES) {
+    for (const berth of route.berths) pad('decorProp', berth.x, berth.z, 3.5, 9.5);
   }
   if (PROPS.raceCourse) {
     const course = PROPS.raceCourse;

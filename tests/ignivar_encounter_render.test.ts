@@ -1392,7 +1392,7 @@ describe('Ignivar encounter renderer', () => {
     expect(renderer).toMatch(
       /this\.gateViewOnCompile\(\s*view,\s*group,\s*e\.templateId === IGNIVAR_BOSS_ID && view\.visual \? view\.visual\.root : group,\s*requiredForEntry,\s*\)/,
     );
-    expect(renderer).toContain('v.group.visible = raidEncounterViewVisibleDuringCompile(');
+    expect(renderer).toMatch(/v\.group\.visible =\s*raidEncounterViewVisibleDuringCompile\(/);
     // The rig-attached sync rides the extracted wrapper with the real cull and
     // presentation verdicts, in that order, and the wrapper owns the
     // still-visible-telegraph escape for culled bodies.

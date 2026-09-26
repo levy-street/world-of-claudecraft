@@ -3,14 +3,13 @@
 // cap, with a slowly turning light, the realm's landmark from anywhere on
 // the downs, plus the grey stone stair the sim's beaconSpiralLift makes
 // walkable, hugging the column up to the C balcony, on the masonry plinth
-// that fills the volume the same lift field walls off), the stilt piers and
-// boardwalk of Wickharbor's harbor (drawn from the SAME sim/gale_harbor.ts
-// decks the player walks, with steep ramps drawn as stepped stairs), and
-// the ribs of old hulls half-buried on the Wreckfields. Same contract as the sibling
-// realm modules: build once, update(time) turns the beacon.
+// that fills the volume the same lift field walls off), and the ribs of old
+// hulls half-buried on the Wreckfields. Wickharbor's wooden harbor is its own
+// Blender model (render/wickharbor_harbor.ts, with the ferry wharf,
+// render/wickharbor_wharf.ts). Same contract as the sibling realm modules:
+// build once, update(time) turns the beacon.
 import * as THREE from 'three';
 import { BEACON_SPIRAL, beaconSpiralLift } from '../sim/beacon_spiral';
-import { GALE_HARBOR_DECKS } from '../sim/gale_harbor';
 import { GLIDER_WHARF, GLIDER_WHARF_DECKS } from '../sim/glider_wharf_layout';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
@@ -273,23 +272,6 @@ export function buildGaleFeatures(seed: number): GaleFeaturesView {
     light.userData.baseIntensity = 5;
     glowLights.push(light);
     group.add(light);
-  }
-
-  // --- Wickharbor's harbor: plank decks on stilts over the bay ---
-  // Drawn from the same GALE_HARBOR_DECKS rectangles groundHeight walks, so
-  // the plank plane underfoot is exactly the plank plane on screen (the
-  // shared walkway builder in deck_render.ts).
-  {
-    const wood = mat(0x8a6a4a, 0.9);
-    const postWood = mat(0x6b523d, 0.92);
-    const { planks, posts } = buildDeckWood(
-      GALE_HARBOR_DECKS,
-      (x, z) => terrainHeight(x, z, seed),
-      WATER_LEVEL,
-      { bollards: true },
-    );
-    group.add(mergeBoxes(planks, wood));
-    group.add(mergeBoxes(posts, postWood));
   }
 
   // --- the Wreckfields: hull ribs arcing out of the shingle ---

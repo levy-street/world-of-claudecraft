@@ -144,8 +144,10 @@ describe('audited launch totals (literals: update deliberately with the catalog)
     // three Champion at 25, and the all-factions meta at 50: +140).
     // 317 / 3530 with the two Clue Scroll casket deeds (the first casket at
     // 10 and the tenth at 25: +35).
-    expect(DEED_ORDER.length).toBe(317);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3530);
+    // 318 / 3535 with the release's Eastbrook ferry round trip
+    // (exp_harbor_to_harbor at renown 5) at the fourth release/v0.44.0 base merge.
+    expect(DEED_ORDER.length).toBe(318);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3535);
   });
 
   it('ships the audited per-category counts', () => {
@@ -184,7 +186,8 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       social: 20,
       // +2 the Clue Scroll casket pair (exp_clue_first_casket and
       // exp_clue_ten_caskets, both on the clueCasketsOpened meter).
-      exploration: 21,
+      // +1 the release's ferry round trip (exp_harbor_to_harbor).
+      exploration: 22,
       feat: 3,
       hidden: 10,
     });
@@ -400,6 +403,9 @@ describe('audited launch totals (literals: update deliberately with the catalog)
       // (the first casket and the tenth, which grants Treasure Hunter).
       'exp_clue_first_casket',
       'exp_clue_ten_caskets',
+      // The release's Eastbrook ferry round trip, appended last at the fourth
+      // release/v0.44.0 base merge.
+      'exp_harbor_to_harbor',
     ]);
     expect(DEEDS.dgn_wildheart_basin.renown).toBe(10);
     expect(DEEDS.dgn_wildheart_basin_heroic.renown).toBe(10);
@@ -1023,7 +1029,13 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // clueCasketsOpened meter), re-minted THE AUDITABLE WAY: the 2b8d9d03...
   // literal rotated down into PRE_APPEND_CATALOG_SHA256 and the proof below
   // reproduces it exactly. No shipped trigger or renown value was touched.
-  const FROZEN_CATALOG_SHA256 = '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
+  // Re-baselined for the release's appended Eastbrook ferry round trip
+  // (exp_harbor_to_harbor, a visits deed on the four ferry crossings) at the
+  // fourth release/v0.44.0 base merge into integration/world-quests-v0440,
+  // re-minted THE AUDITABLE WAY: the 0d91bc68... literal rotated down into
+  // PRE_APPEND_CATALOG_SHA256 and the proof below reproduces it exactly. No
+  // shipped trigger or renown value was touched.
+  const FROZEN_CATALOG_SHA256 = '8749b988a2135b7b3c0dee2065b54e6491660e86ce51bf7880924ff763ae1a25';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -1085,22 +1097,27 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // prog_faction_champion_all; the previous mint is the faction ladder's
   // 2b8d9d03... literal (rotated down here), and stripping the two must
   // reproduce it exactly.
+  //
+  // The release's Eastbrook ferry round trip appends exp_harbor_to_harbor
+  // after exp_clue_ten_caskets at the fourth release/v0.44.0 base merge; the
+  // previous mint is the clue pair's 0d91bc68... literal (rotated down here),
+  // and stripping the one id must reproduce it exactly.
   const PRE_APPEND_CATALOG_SHA256 =
-    '2b8d9d03740487fde602cfb2c610880747113a59c98539eab242e498840c422a';
-  const APPENDED_SINCE: readonly string[] = ['exp_clue_first_casket', 'exp_clue_ten_caskets'];
+    '0d91bc68e18b88a6b0c4dc7088c118d556b3bbec0be1617506b36b8172123eb6';
+  const APPENDED_SINCE: readonly string[] = ['exp_harbor_to_harbor'];
 
   it('the catalog minus the ids appended since the previous mint reproduces the previous digest', () => {
     const appended = new Set(APPENDED_SINCE);
     for (const id of APPENDED_SINCE) {
       expect(DEED_ORDER.includes(id), `${id} is in the live catalog`).toBe(true);
     }
-    // The Clue Scroll casket pair sits at the true tail after the faction
-    // standing ladder. Pin its two predecessors too: this is an append into a
+    // The ferry round trip sits at the true tail after the Clue Scroll casket
+    // pair. Pin its two predecessors too: this is an append into a
     // known seat, never a scattered insert or a retro-edit (the digest below
     // proves it).
     expect(DEED_ORDER.slice(-2 - APPENDED_SINCE.length)).toEqual([
-      'prog_automatons_champion',
-      'prog_faction_champion_all',
+      'exp_clue_first_casket',
+      'exp_clue_ten_caskets',
       ...APPENDED_SINCE,
     ]);
     const priorRows = DEED_ORDER.filter((id) => !appended.has(id)).map((id) => {
@@ -1319,8 +1336,9 @@ describe('table shape', () => {
     // raid block (whose flawless task was the previous final entry).
     // The one-time Forgebreaker quest's hidden celebration appends after it,
     // then the world-quest block, then the faction standing ladder, then the
-    // Clue Scroll casket pair whose tenth casket title deed is the final entry.
-    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_clue_ten_caskets');
+    // Clue Scroll casket pair, then the release's ferry round trip as the
+    // final entry.
+    expect(DEED_ORDER[DEED_ORDER.length - 1]).toBe('exp_harbor_to_harbor');
   });
 
   it('every entry key matches its id and its prefix matches its category', () => {

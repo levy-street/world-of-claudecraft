@@ -53,6 +53,7 @@
 //   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
 //                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
+//   transport.ts        IWorldTransport      the scheduled ferry's phase, ship pose, passenger bit
 //   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
@@ -102,6 +103,7 @@ import type { IWorldTalents } from './world_api/talents';
 import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
+import type { IWorldTransport } from './world_api/transport';
 import type { IWorldVehicles } from './world_api/vehicles';
 import type { IWorldWorldPvp } from './world_api/world_pvp';
 
@@ -256,7 +258,14 @@ export type { VehicleSession } from './world_api/vehicles';
 // not interpret the new stable IDs through the previous visual/layout tables.
 // 44 = The hull is permanent scenery, not pickup 2147100100. Older clients
 // would omit it with a new server; older servers would spawn a duplicate pickup.
-export const ONLINE_WORLD_LAYOUT_VERSION = 44 as const;
+// 45 = The fourth release/v0.44.0 base merge into integration/world-quests-v0440
+// brings the release's epoch 30 (the scheduled Eastbrook ferry: its deck exists
+// only at the berth where it lies docked, a second berth and boarding stage at
+// Wickharbor, the ferry passenger bit in the snapshot) onto the branch's 44.
+// Above both parents: an epoch-44 client would draw the ship moored and predict
+// a deck the server has sailed away; an epoch-30 client lacks the world-quest
+// wire. Both must fail closed.
+export const ONLINE_WORLD_LAYOUT_VERSION = 45 as const;
 export const ONLINE_WORLD_AUTH_TYPE = `auth-world-${ONLINE_WORLD_LAYOUT_VERSION}` as const;
 // The one wire literal both sides emit for a layout-epoch mismatch. The server
 // rejects with it, the client synthesizes it for pre-epoch servers, and the UI
@@ -440,6 +449,7 @@ export type {
   WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type { TransportFerryView } from './world_api/transport';
 export type {
   HillInfo,
   HillPhaseInfo,
@@ -487,6 +497,7 @@ export interface IWorld
     IWorldMounts,
     IWorldFarming,
     IWorldVehicles,
+    IWorldTransport,
     IWorldWorldPvp {}
 
 // ---------------------------------------------------------------------------

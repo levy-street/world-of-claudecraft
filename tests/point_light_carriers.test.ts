@@ -517,6 +517,8 @@ const POINT_LIGHT_PRODUCERS: Readonly<Record<string, string>> = {
     'weapon-skin light: in the world a hidden view light marked on reconcile; in a preview canvas the only point lights of that scene, all driven live together',
   'render/wildheart_props.ts':
     'the Wildheart fire light, pushed through the fireLights adopter sink the interiors are handed',
+  'render/wyrmwatch_harbor_house.ts':
+    'the Harbormaster House hearth and lantern lights, pushed into the props fireLights by buildProps and mass hidden with them',
   'render/yumi_maze.ts': 'maze brazier lights pushed through the fireLights adopter sink',
 };
 

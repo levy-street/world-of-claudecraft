@@ -276,7 +276,9 @@ Two things could reclaim it, neither free:
 The budget-governed half-rate shadow cadence lands on this same branch
 (`src/render/shadow_cadence_core.ts`, applied from the renderer right after
 the budget governor each frame): under sustained over-budget pressure the one
-shadow map updates every other frame.
+shadow map updates every other frame, except while a ship under way is close by
+(`src/render/ship_shadow_hold.ts`: a moving hull's own shadows flicker on a stale
+frame).
 
 Its savings stack differently under CSM, and mostly in CSM's favor. With one
 map, half-rate is a binary: full shadow pass or none, and the skipped frame's

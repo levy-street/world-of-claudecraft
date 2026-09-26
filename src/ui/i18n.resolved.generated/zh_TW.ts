@@ -505,6 +505,13 @@ export const zh_TW: EnTranslations = {
         "pvp": "戰爭裝備"
       }
     },
+    "ferry": {
+      "regionLabel": "渡船時刻表",
+      "departsIn": "前往{dest}的渡船將在{time}後啟航",
+      "castingOff": "前往{dest}的渡船正在啟航",
+      "boardHint": "啟航時站在甲板上即可隨船出發。渡船免費。",
+      "sailing": "正在駛往{dest}"
+    },
     "materialStackSelectionUnavailable": "此素材選擇已失效。",
     "vehicle": {
       "title": "北方哨站砲台",
@@ -19886,6 +19893,11 @@ export const zh_TW: EnTranslations = {
         "name": "斥候耶林",
         "title": "遠沙丘守望者",
         "greeting": "壓低身子。聲音在血玻璃上傳得很怪，而下面那道門長著耳朵。"
+      },
+      "harbormaster_tamsin": {
+        "name": "港務長塔姆辛",
+        "title": "望龍哨碼頭看守",
+        "greeting": "從碼頭進來暖暖手吧。停在我們碼頭的船沿著漫長的東岸北上駛往燭港，再原路返回。在遙遠的西邊，另一艘渡船往返於東溪與夜綻花野之間。牆上的地圖畫著這兩條航線。攀登望龍哨之前，先在火邊歇一歇吧。"
       },
       "reeve_ottoline": {
         "name": "鎮長奧托琳",

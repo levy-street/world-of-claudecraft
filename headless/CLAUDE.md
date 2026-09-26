@@ -39,6 +39,16 @@ them structural:
 The one-sim-three-hosts claim is intact: the sim CODE is identical here;
 what this host does not do is expose those commands as actions.
 
+The scheduled Eastbrook ferry (`src/sim/transport_ferry.ts`) runs here too, and
+nothing in obs or reward exposes it: an agent standing on its deck at a
+departure becomes a passenger, carried by the moving deck for the whole
+voyage (just under two minutes each way, `transport_deck.ts`). Its movement
+actions keep working relative to the deck (it can walk, jump, and walk off
+the port gangway opening into the sea), but obs reports only world positions,
+which change with the ship's way. A deliberate non-feature for now; exposing
+the ride (the deck frame, the timetable) is an `obs.ts` design change, never
+a flag here.
+
 ## Wire protocol: NDJSON over stdin/stdout
 **IMPORTANT:** transport is line-delimited JSON on **stdin/stdout** (one object
 per line via `node:readline`). Not a socket / WS / HTTP. The Python client in

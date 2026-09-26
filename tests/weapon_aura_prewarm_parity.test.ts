@@ -58,7 +58,13 @@ afterAll(gfxProfileRestorer());
 function mainhandModelUrls(): string[] {
   const urls = new Set<string>([...itemWeaponModelUrls(), ...weaponSkinModelUrls()]);
   for (const def of Object.values(VISUALS))
-    for (const attach of def.attach ?? []) urls.add(attach.url);
+    for (const attach of def.attach ?? []) {
+      // Worn NPC gear (models/chars/npc_gear/: the harbormaster's tricorne on the head
+      // bone, her spyglass on the hips) rides an npc_modular visual that declares no
+      // weaponSlots, so it is never a swapWeaponHolder and no imbue can coat it.
+      if (attach.url.startsWith('models/chars/npc_gear/')) continue;
+      urls.add(attach.url);
+    }
   return [...urls].sort();
 }
 

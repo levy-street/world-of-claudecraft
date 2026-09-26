@@ -10,11 +10,12 @@ import {
   buildingContainsRestPoint,
   buildingRestPadding,
 } from '../building_layout';
-import { getActiveWorldContent } from '../data';
+import { getActiveWorldContent, isBuiltinWorldActive } from '../data';
 import { KIT_BUILDINGS } from '../kit_buildings';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type BuildingDef, canPrestige, DT, type Entity, MAX_LEVEL, xpForLevel } from '../types';
+import { harborHouseRestsAt } from '../wyrmwatch_harbor_house';
 
 // Rested-XP tuning. Consumed only by updateRested / isResting below.
 const RESTED_SECONDS_PER_GAME_HOUR = 60; // 1 in-game hour = 60 sim seconds
@@ -27,13 +28,17 @@ const RESTED_CAP_LEVELS = 1.5; // pool clamps to 1.5 levels of XP, the classic-e
 // placed-kit inns derived from the fortress table (kit_buildings.ts: the
 // Drakelands rebuild's tavern, which draws and blocks through the kit
 // pipeline and never appears in props.buildings). The kit footprint is the
-// kit collider's own OBB, so it takes the collider-correct point test.
+// kit collider's own OBB, so it takes the collider-correct point test. The
+// Harbormaster's House at the Wyrmwatch cliff harbor rests a body on its floor
+// the same way (wyrmwatch_harbor_house.ts), on the built-in world only.
 export function isResting(
   p: Entity,
   buildings: readonly BuildingDef[] = getActiveWorldContent().props.buildings,
   kitBuildings: readonly BuildingDef[] = KIT_BUILDINGS,
+  harborHouse: boolean = isBuiltinWorldActive(),
 ): boolean {
   if (p.inCombat) return false;
+  if (harborHouse && harborHouseRestsAt(p.pos.x, p.pos.y, p.pos.z)) return true;
   for (const b of buildings) {
     if (b.kind !== 'inn') continue;
     if (buildingContainsRestPoint(b, p.pos.x, p.pos.z, buildingRestPadding(b))) return true;

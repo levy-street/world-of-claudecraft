@@ -9,6 +9,7 @@
 import * as THREE from 'three';
 import { BUILTIN_WORLD, getActiveWorldContent } from '../sim/data';
 import { EASTBROOK_HARBOR_DECKS } from '../sim/eastbrook_harbor';
+import type { GaleDeckDef } from '../sim/gale_harbor';
 import { terrainHeight, WATER_LEVEL } from '../sim/world';
 import { buildDeckWood } from './deck_render';
 
@@ -35,17 +36,28 @@ function mergeBoxes(parts: THREE.BufferGeometry[], material: THREE.Material): TH
 }
 
 export function buildEastbrookHarbor(seed: number): THREE.Group {
+  return buildHarborWood('eastbrookHarbor', EASTBROOK_HARBOR_DECKS, seed);
+}
+
+/**
+ * Planks and stilts for a list of harbor decks in New Eastbrook's harbor
+ * wood (the same two materials, so no new program): the Eastbrook
+ * waterfront, and the ferry piers at the far berths (render/ferry_piers.ts).
+ * Empty on non-built-in worlds.
+ */
+export function buildHarborWood(
+  name: string,
+  decks: readonly GaleDeckDef[],
+  seed: number,
+): THREE.Group {
   const group = new THREE.Group();
-  group.name = 'eastbrookHarbor';
+  group.name = name;
   if (getActiveWorldContent() !== BUILTIN_WORLD) return group;
   const wood = new THREE.MeshStandardMaterial({ color: 0x8a6a4a, roughness: 0.9 });
   const postWood = new THREE.MeshStandardMaterial({ color: 0x6b523d, roughness: 0.92 });
-  const { planks, posts } = buildDeckWood(
-    EASTBROOK_HARBOR_DECKS,
-    (x, z) => terrainHeight(x, z, seed),
-    WATER_LEVEL,
-    { bollards: true },
-  );
+  const { planks, posts } = buildDeckWood(decks, (x, z) => terrainHeight(x, z, seed), WATER_LEVEL, {
+    bollards: true,
+  });
   group.add(mergeBoxes(planks, wood));
   group.add(mergeBoxes(posts, postWood));
   return group;

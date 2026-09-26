@@ -4456,7 +4456,8 @@ export interface ZonePropsDef {
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
     /** A standable top (crate/rock family, see `colliders.ts`): this many yd
-     * above ground, a mover may land and stand on it instead of the piece
+     * above the rendered base, ground for ordinary props and the waterline
+     * draft for floating props. A mover may land and stand on it instead of the piece
      * colliding as a full-height wall. Requires `r` (or `hw`/`hd`) for the
      * footprint; omit for ordinary full-height or walk-through decor. */
     standableTop?: number;
@@ -5029,6 +5030,31 @@ export function isConsuming(e: { eating: Consuming | null; drinking: Consuming |
   return e.eating !== null || e.drinking !== null;
 }
 
+/** A ferry passenger's voyage (src/sim/transport_ferry.ts): which route,
+ *  and the berths it sails from and to (the ferry deed and a save taken
+ *  aboard read them). Where they stand is their ordinary position: the
+ *  moving deck carries it (src/sim/transport_deck.ts). */
+export interface FerryRide {
+  /** route id (content/transport_ships.ts TRANSPORT_ROUTES) */
+  route: string;
+  /** departure and destination berth indexes */
+  from: number;
+  to: number;
+  /** the ship's pose this tick (the frame the wire's deck spot is taken in) */
+  ship: { x: number; z: number; rot: number };
+}
+
+/** An online entity's spot on a sailing ship's deck, as the snapshot sends it
+ *  (src/net/transport_wire.ts): the route index, the spot in the hull's frame
+ *  (x port, y above the waterline, z bow) and the heading off the bow. */
+export interface FerryDeckMirror {
+  route: number;
+  x: number;
+  y: number;
+  z: number;
+  f: number;
+}
+
 /**
  * An in-progress ledge climb (see `src/sim/climb.ts`). While present it OWNS
  * the body's position: the destination was validated as a surface the body
@@ -5122,6 +5148,13 @@ export interface ClientMirroredEntityFields {
   climbProgress?: number;
   /** Mirror of an in-flight Vaulting Charge: a bare server-owned movement bit. */
   leaping?: boolean;
+  /** Mirror of a ferry ride (`ferryRide`): aboard a sailing ship, with the
+   *  deck spot of the newest snapshot and the one being interpolated from, so
+   *  the renderer draws deck-bound bodies in the ship's frame (no slide
+   *  against the deck while it moves). */
+  ferryRiding?: boolean;
+  ferryDeck?: FerryDeckMirror | null;
+  ferryDeckPrev?: FerryDeckMirror | null;
 }
 
 export interface Entity extends ClientMirroredEntityFields {
@@ -5524,6 +5557,13 @@ export interface Entity extends ClientMirroredEntityFields {
   // Authoritative ledge-climb pull-up. Like `leap`, it owns movement while it
   // runs; see `src/sim/climb.ts`.
   climb?: LedgeClimb | null;
+  // A scheduled ferry passenger (src/sim/transport_ferry.ts): aboard while the
+  // ship sails, carried by its moving deck. Session-only and absent until a
+  // first voyage; the wire carries the deck spot (`fry`, see ferryDeck).
+  ferryRide?: FerryRide | null;
+  // The ferry parked this player's pet for a crossing (the delve pet stash);
+  // it comes back once the owner is off the ship and alive.
+  ferryPetParked?: boolean;
   followTargetId: number | null; // /follow: auto-walk after another player until interrupted
   savedMana: number; // druid forms: mana put aside while running on rage/energy
   // Druid Cat Form: how far the parked energy pool sits below full while out of
@@ -8627,8 +8667,8 @@ export const EASTBROOK_NOTICEBOARD_NATIVE_DIMENSIONS = Object.freeze({
 export const EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS = 4 as const;
 // Static world services use their own namespace above the sequential allocator
 // and reserved 1_000_000_x singleton ids (the Vale Cup groundskeeper, FURY in
-// Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, and
-// authored practice dummies). A singleton NPC takes a reserved id AND
+// Eastbrook, Warmarshal Draven Kole in Highwatch, the Crucible vendor, the
+// Wyrmwatch harbormaster, practice dummies). A singleton NPC takes a reserved id AND
 // `dynamic: true` so the generic world-init loop skips it: that loop allocates
 // ids by iterating the merged NPC table in insertion order, so a plain
 // insertion would shift the id of every NPC, camp mob and object created after

@@ -505,6 +505,13 @@ export const ja_JP: EnTranslations = {
         "pvp": "ウォーフェア装備"
       }
     },
+    "ferry": {
+      "regionLabel": "渡し船の時刻表",
+      "departsIn": "{dest}行きの渡し船は{time}後に出航します",
+      "castingOff": "{dest}行きの渡し船が出航します",
+      "boardHint": "出航の時に甲板に立っていれば一緒に出発できます。運賃は無料です。",
+      "sailing": "{dest}へ航行中"
+    },
     "materialStackSelectionUnavailable": "この素材の選択は利用できなくなりました。",
     "vehicle": {
       "title": "北の見張りの大砲",
@@ -19886,6 +19893,11 @@ export const ja_JP: EnTranslations = {
         "name": "斥候イェリン",
         "title": "遠砂丘の見張り",
         "greeting": "身を低くしろ。硝子の上では音が妙に運ばれる。それに、下の門には耳がある。"
+      },
+      "harbormaster_tamsin": {
+        "name": "港務長タムシン",
+        "title": "ワームウォッチ波止場の番人",
+        "greeting": "波止場から中へどうぞ、手を温めていきなさい。うちの桟橋の船は長い東の海岸を北へ上ってウィックハーバーへ向かい、また戻ってきます。はるか西では、もう一隻の渡し船がイーストブルックとナイトブルームの間を行き来しています。壁の地図に二つの航路が描いてありますよ。ワームウォッチへ登る前に、火のそばでひと休みしていきなさい。"
       },
       "reeve_ottoline": {
         "name": "代官オトリーヌ",

@@ -73,6 +73,7 @@ import {
   clampDelveModuleBounds,
   type DelveDoorClampSolid,
 } from '../sim/delves/geometry';
+import { isFerryPassenger } from '../sim/ferry_passenger';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
 import type { DelveRunInfo } from '../world_api/delves';
@@ -396,7 +397,16 @@ export class SelfMotionPredictor {
     // input): only the boolean rides the wire, never a direction to mirror, so
     // predicting it would invent a heading. Suspend like a ledge climb; the
     // slide's own authoritative interpolation carries the display instead.
-    if (!frame.enabled || hasValkyrsCallingFlightAura(self) || self.riftSliding) {
+    // A ferry passenger rides a moving deck this world-frame extrapolator
+    // does not carry: stand down and let the deck-framed authoritative pose
+    // (render/deck_frame.ts) draw them (the reconciling pipeline predicts
+    // aboard; this legacy one does not).
+    if (
+      !frame.enabled ||
+      hasValkyrsCallingFlightAura(self) ||
+      self.riftSliding ||
+      isFerryPassenger(self)
+    ) {
       this.reset();
       return null;
     }

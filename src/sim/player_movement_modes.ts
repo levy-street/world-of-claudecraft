@@ -5,15 +5,22 @@
 import { advanceClimb, tryStartClimb } from './climb';
 import { advanceHeroicLeap } from './combat/heroic_leap';
 import { advanceValkyrsCalling } from './combat/paladin_valkyrs_calling';
+import type { PlayerMotionDeps } from './player_motion';
 import { riftPlayerLift } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { clearAfkOnMove } from './social/away';
+import { stepPassenger } from './transport_ferry';
 import type { Entity } from './types';
 import { advanceGliderMovement } from './world_quest_glider';
 import { advanceWispMazeMovement } from './world_quest_wisp_maze';
 
-export function advanceExclusiveMovement(ctx: SimContext, p: Entity, meta: PlayerMeta): boolean {
+export function advanceExclusiveMovement(
+  ctx: SimContext,
+  p: Entity,
+  meta: PlayerMeta,
+  motionDeps: PlayerMotionDeps,
+): boolean {
   if (meta.vehicle) return true;
   if (advanceWispMazeMovement(ctx, p, meta)) return true;
   if (advanceGliderMovement(ctx, p, meta)) return true;
@@ -36,6 +43,8 @@ export function advanceExclusiveMovement(ctx: SimContext, p: Entity, meta: Playe
     clearAfkOnMove(ctx, meta, p);
   }
   if (advanceValkyrsCalling(ctx, p)) return true;
+  // A ferry passenger walks the sailing deck (transport_ferry.ts stepPassenger).
+  if (p.ferryRide && stepPassenger(motionDeps, p, meta.moveInput)) return true;
   if (meta.mountRace?.phase === 'countdown') return true;
   if (advanceHeroicLeap(ctx, p)) return true;
   // A running climb owns the body; airborne descending movement may grab a

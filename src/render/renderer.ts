@@ -269,6 +269,7 @@ import {
   usesLiveDayNightLighting,
   warmDuskGrade,
 } from './day_night_core';
+import { deckCameraTurn, entityRenderPose, updateSelfRenderOnDeck } from './deck_frame';
 import { buildDecorTorchFx, type DecorTorchFxView } from './decor_torch_fx';
 import { shouldPlayDeedFirework } from './deed_fx_gate';
 import { DelveInteriorTracker } from './delve_interior_tracker';
@@ -316,7 +317,7 @@ import {
 } from './environment_transition_core';
 import { EvilEyeMarkers } from './evil_eye_markers';
 import { enableAndWatchRendererExtensions } from './extension_drift_sentinel';
-import { advanceSelfFacing, releaseSelfFacing, wrapAngle } from './facing_smooth';
+import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import {
   buildFarTerrain,
   FAR_VISTA_ENTRY_MAX_WAIT_MS,
@@ -498,7 +499,7 @@ import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
 import { isNeedleOfFateProjectile } from './needle_of_fate_vfx_core';
-import { facingAlpha, POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
+import { POS_EXTRAPOLATION_CAP, remoteEntityAlpha } from './net_interp_core';
 import { buildNightAccents, type NightAccentsView } from './night_accents';
 import { buildNightFeatures, type NightFeaturesView } from './night_features';
 import {
@@ -680,6 +681,7 @@ import {
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
 import { createRendererGlContext } from './renderer_gl_context';
+import { collectCasters, sleep } from './renderer_helpers';
 import type {
   RendererFrameStats,
   RendererPerfStats,
@@ -719,7 +721,6 @@ import {
   createSelfRenderPositionState,
   noteSelfIdentity,
   type SelfRenderPrediction,
-  updateSelfRenderPosition,
 } from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { warmSelfSpiritPrograms } from './self_spirit_warm';
@@ -745,6 +746,7 @@ import {
   snapShadowAnchor,
 } from './shadow_texel_snap_core';
 import { disposeUnsharedMeshResources, markSharedMaterial } from './shared_resource';
+import { shipShadowHold } from './ship_shadow_hold';
 import {
   buildSky,
   ensureSkyAssetsAt,
@@ -1282,16 +1284,6 @@ export interface EntityView extends RickshawMountViewState, WorldQuestCarryViewS
   tiltSampleT: number;
   tiltSample: EntityGroundSample;
   groundSample: EntityGroundSample;
-}
-
-function collectCasters(root: THREE.Object3D, into: THREE.Object3D[]): void {
-  root.traverse((o) => {
-    if ((o as THREE.Mesh).isMesh && (o as THREE.Mesh).castShadow) into.push(o);
-  });
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, Math.max(0, ms)));
 }
 
 export interface RendererCreateOptions extends QuestObjectGateOptions, QuestGuidanceOptions {
@@ -2535,7 +2527,7 @@ export class Renderer {
     setRenderCategory(this.impactSite.group, 'props');
     this.scene.add(this.impactSite.group);
     this.scene.add(this.impactSite.light);
-    const props = buildProps(this.sim.cfg.seed, (delveId) =>
+    const props = buildProps(this.sim, (delveId) =>
       tEntity({ kind: 'delve', id: delveId, field: 'name' }),
     );
     setRenderCategory(props.group, 'props');
@@ -4344,7 +4336,7 @@ export class Renderer {
       // Whether the budget-governed shadow cadence is currently shedding to
       // every-other-frame updates: surfaced so the ?perf overlay and capture
       // artifacts can tell a half-rate sample from a full-rate one.
-      shadowCadenceHalfRate: this.shadowCadence.halfRate,
+      shadowCadenceHalfRate: this.shadowCadence.halfRate && !this.shadowCadence.held,
       // The live extent shed: a capture must state its step to be comparable.
       shadowExtentStep: this.shadowExtent.step,
       shadowExtentScale: this.shadowExtent.scale,
@@ -4601,7 +4593,8 @@ export class Renderer {
     this.stableFrameTime = state.stableSeconds;
     if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
-    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
+    const held = shipShadowHold(this.sim, this.sun); // a ship under way close by
+    updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled, held);
     updateShadowExtent(this.shadowExtent, dt, state.pressure, state.enabled);
     this.applyShadowShed();
   }
@@ -4610,8 +4603,7 @@ export class Renderer {
    *  prewarm's and census probe's save/restore of the shadowMap flags heals
    *  itself (shadow_cadence_core.ts / shadow_extent_core.ts own the rules). */
   private applyShadowShed(): void {
-    // The live ortho box: consumers read it back off the camera, so this write
-    // is the whole wiring.
+    // The live ortho box: consumers read it back off the camera (the whole wiring).
     const cam = this.sun.shadow.camera;
     const extent = shadowExtentHalf(this.shadowBaseExtent, this.shadowExtent.scale);
     if (cam.top !== extent) {
@@ -4624,7 +4616,7 @@ export class Renderer {
     }
     if (!this.sun.castShadow) return;
     const shadowMap = this.webgl.shadowMap;
-    const autoUpdate = !this.shadowCadence.halfRate;
+    const autoUpdate = !this.shadowCadence.halfRate || this.shadowCadence.held;
     if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
     // Under half rate three skips the pass when both flags are false and clears
     // needsUpdate after each pass, so the every-other-frame arm is this write.
@@ -9795,16 +9787,15 @@ export class Renderer {
     }
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
-    updateSelfRenderPosition(
+    updateSelfRenderOnDeck(
+      sim,
       this.selfRender,
       p,
-      sim.cfg.seed,
       alpha,
       dt,
       selfAlphaLead,
       selfMotion,
       selfAuthoritativeDiscontinuity,
-      sim.riftCollisionToken,
     );
     const selfPos = this.selfRenderPosition;
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
@@ -10060,11 +10051,10 @@ export class Renderer {
       // turn stream, mouselook, click-move via the sent facing). Remote
       // entities interpolate on their own measured cadence via
       // remoteEntityAlpha (unknown-cadence fallback).
-      const x = isSelf ? selfPos.x : e.prevPos.x + (e.pos.x - e.prevPos.x) * ea;
-      const y = isSelf ? selfPos.y : e.prevPos.y + (e.pos.y - e.prevPos.y) * ea;
-      const z = isSelf ? selfPos.z : e.prevPos.z + (e.pos.z - e.prevPos.z) * ea;
+      const rp = entityRenderPose(sim, e, ea, isSelf ? selfPos : null, v);
+      const { x, y, z, deck } = rp; // a passenger rides the drawn deck (deck_frame.ts)
       v.group.position.set(x, y, z);
-      let facing = e.prevFacing + wrapAngle(e.facing - e.prevFacing) * facingAlpha(ea);
+      let facing = rp.facing;
       if (ignivarBossFacingLocked(e)) facing = e.facing;
       if (id === p.id && renderFacingOverride !== null) {
         // Follow the camera-driven heading, easing in the one-time engage gap
@@ -10603,10 +10593,9 @@ export class Renderer {
       // hitches (bursty snapshots at world entry) it stays smooth while the
       // authoritative interp stair-steps, which used to feed the cadence
       // erratic velocities and reset the walk clip. On the lead-smoothing
-      // fallback path the plain interpolated sim motion is still sampled
-      // instead (that path's smoothed selfPos stutters within a snapshot
-      // interval). Offline, all of these are the same value.
-      const animFromDisplay = isSelf && this.selfRender.active;
+      // fallback the interpolated sim motion is sampled (its smoothed selfPos
+      // stutters); a deck passenger always reads the deck-framed display pose.
+      const animFromDisplay = isSelf && (this.selfRender.active || deck === true);
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;
@@ -11592,6 +11581,7 @@ export class Renderer {
     this.afflictionFamiliar.update(this.sim, this.views, this.reducedMotion(), this.time);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'vfx', worldStart);
 
+    this.camYaw += deckCameraTurn(sim, this.camBoom, this.lastLocalPos, this.camMirror);
     this.updateCamera(selfPos, dt);
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'camera', worldStart);
     // Terrain chunks / tree buckets past the detail horizon are dropped

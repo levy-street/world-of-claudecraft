@@ -586,6 +586,7 @@ import { RiftForgeWindow, riftForgeInReach } from './hud/rift_forge';
 import { StanceBarController } from './hud/stance';
 import { closeOpenTouchMenu } from './hud/tap_menu';
 import { createTargetDotsView, type TargetDotsInput, TargetDotsPainter } from './hud/target_dots';
+import { FerryHudPainter } from './hud/transport';
 import { createHudVehicleBar, VehicleActionBarController } from './hud/vehicle';
 import { dismissBuyQuantityPrompts } from './hud/vendor/buy_quantity_prompt_window';
 import { buildCrucibleVendorView } from './hud/vendor/crucible_vendor_view';
@@ -801,6 +802,7 @@ import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_g
 import { raidCalloutKey } from './raid_callout';
 import { formatLockoutDuration, raidLockoutDisplayName } from './raid_lockout_format';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
+import { RAID_MARKER_LABEL_KEYS, raidMarkerDisplayName } from './raid_marker_labels_view';
 import { presentRealmBuilder, RealmBuilderPopup } from './realm_builder_popup';
 import { RecipePinStore } from './recipe_pins_store';
 import { RecipeTrackerPainter } from './recipe_tracker_painter';
@@ -1123,16 +1125,6 @@ const MOB_TOOLTIP_VIEW_DEPS: MobTooltipI18n = {
 // above); the Thornhollow Fields finish-line log colors live in hud_tones.ts
 // (BG_END_LOG_COLORS, also imported above), and the remaining-time call's own
 // gold folded into HUD_LOG.CALL.
-const RAID_MARKER_LABEL_KEYS = [
-  'hud.markers.names.star',
-  'hud.markers.names.circle',
-  'hud.markers.names.diamond',
-  'hud.markers.names.triangle',
-  'hud.markers.names.moon',
-  'hud.markers.names.square',
-  'hud.markers.names.cross',
-  'hud.markers.names.skull',
-] as const satisfies readonly TranslationKey[];
 const PET_MODE_LABEL_KEYS: Record<PetMode, TranslationKey> = {
   passive: 'hud.pet.passive',
   defensive: 'hud.pet.defensive',
@@ -4585,6 +4577,10 @@ export class Hud {
   // yumiStatus/yumiDown events fed in handleEvents. Runs on the mediumHud
   // band next to the fiesta HUD (values change at 1Hz).
   private readonly yumiPainter = new YumiMatchPainter(this.writerFacet, () =>
+    document.getElementById('ui'),
+  );
+  // The scheduled ferry's timetable panel + sea card (hud/transport/), medium band.
+  private readonly ferryHud = new FerryHudPainter(this.writerFacet, () =>
     document.getElementById('ui'),
   );
   // Per-frame XP + swing painters. Each caches its element refs once and
@@ -9467,6 +9463,7 @@ export class Hud {
       this.hillBar.update(buildHillBarView(this.sim.hillInfo, this.sim.player.pos));
       this.bgKillFeed.update(performance.now() / 1000);
       this.yumiPainter.update(this.sim.arenaInfo);
+      this.ferryHud.update(this.sim.ferryView(), this.sim.player);
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
       if ($('#arena-window').style.display === 'block') this.arenaWindow.render();
       if ($('#dungeon-finder-window').style.display === 'flex') this.dungeonFinderWindow.render();
@@ -18082,7 +18079,3 @@ export class Hud {
 // headroom extraction, so a Vitest can pin the tooltip lines directly.
 
 // require2dContext moved to ./canvas_context (imported above).
-
-function raidMarkerDisplayName(index: number): string {
-  return t(RAID_MARKER_LABEL_KEYS[index] ?? RAID_MARKER_LABEL_KEYS[0]);
-}

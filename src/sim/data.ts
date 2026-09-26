@@ -353,6 +353,7 @@ import { PROFESSION_ITEMS } from './content/profession_items';
 import { FURY_NPC, WARFARE_ITEMS } from './content/pvp_honor';
 import { SEASON2_ITEMS } from './content/pvp_honor_season2';
 import { TRINKET_ITEMS } from './content/trinkets';
+import { WYRMWATCH_HARBOR_NPCS } from './content/wyrmwatch_harbor_house';
 import { DELVE_MODULE_LAYOUTS, type DelveModuleId, delveModuleSpan } from './delve_layout';
 
 function mergeItems(...parts: Record<string, ItemDef>[]): Record<string, ItemDef> {
@@ -511,6 +512,10 @@ export const NPCS: Record<string, NpcDef> = {
   [GLIDER_APPRENTICE_NPC_DEF.id]: GLIDER_APPRENTICE_NPC_DEF,
   ...Object.fromEntries(INVESTIGATION_NPCS.map((npc) => [npc.id, npc])),
   ...FACTION_VENDOR_NPCS,
+  // The Harbormaster's House keeper at the Wyrmwatch cliff harbor
+  // (content/wyrmwatch_harbor_house.ts), appended last so every NPC placed
+  // before her keeps its entity id.
+  ...WYRMWATCH_HARBOR_NPCS,
 };
 
 // Graveyards + the Spirit Healer: re-exported so the Sim and spirit.ts import the

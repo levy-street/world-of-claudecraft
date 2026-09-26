@@ -6,6 +6,7 @@ import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, getActiveWorldContent, ITEMS, MOBS, NPCS, WORLD_QUESTS_BY_ID } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { displacePlayerForDev } from './dev/dev_displace';
+import { handleFerryDevChat } from './dev/ferry_dev';
 import { devTownList, resolveDevTown } from './dev/town_teleport';
 import { prepareWeeklyVaultPlaytest } from './dev/weekly_vault_playtest';
 import { handleDevClueCommand } from './dev_clue_scrolls';
@@ -172,6 +173,7 @@ export function handleDevChat(
     prepareWeeklyVaultPlaytest(ctx, pid, !!weeklyVaultMatch[1]);
     return null;
   }
+  if (handleFerryDevChat(ctx, raw, pid)) return null; // /dev ferry (dev/ferry_dev.ts)
   const levelMatch = /^\/(?:dev\s+level|devlevel)\s+(\d+)\s*$/i.exec(raw);
   if (levelMatch) {
     const level = Number(levelMatch[1]);

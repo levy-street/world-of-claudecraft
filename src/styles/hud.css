@@ -15025,6 +15025,36 @@
     display: none;
   }
 
+  /* ---------- ferry timetable ---------- */
+  /* The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
+     src/ui/hud/transport/ferry_hud_painter.ts): a small status panel under the
+     top of the screen near the docked ship (the countdown to the next departure
+     and the boarding hint) or aboard (the quiet sailing line). The panel
+     composes .ui-panel; this section sets geometry only. */
+  .ferry-hud {
+    position: absolute;
+    top: 172px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 14px;
+    max-width: min(92%, 520px);
+    pointer-events: none;
+    z-index: 30;
+    text-align: center;
+  }
+  .ferry-hud-line {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  .ferry-hud-hint {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
   /* ---------- Hide Interface (Alt+Z, interface_visibility_core.ts) ---------- */
   /* One body class hides every HUD surface for a clean screenshot or video:
      each #ui child except the visually-hidden a11y live regions (screen readers

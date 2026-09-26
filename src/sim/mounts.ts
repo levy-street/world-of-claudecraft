@@ -32,6 +32,7 @@ import { normalizeMountSkinId } from './content/mount_skins';
 import { MOUNT_KEYS, type MountKey, mountDef, TRAINING_MOUNT_KEY } from './content/mounts';
 import { ITEMS } from './data';
 import { recalcPlayerStats } from './entity';
+import { onShipDeck } from './ship_deck_presence';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
 import { bgInMatch } from './social/battleground';
@@ -170,6 +171,11 @@ export function forceTrainingMount(ctx: SimContext, e: Entity): boolean {
 // narrower "while carrying the flag" refusal: one rule for the whole match is
 // what a player can actually learn, and the carrier case is a subset of it.
 const IN_BATTLEGROUND_MSG = "You can't ride in a battleground.";
+// Scheduled ships are ridden on foot: no mount is summoned (or swapped) on a
+// ship's deck, moored or under way, and a rider who boards on horseback is
+// dismounted as it casts off (transport_ferry.ts). A mount on a moving deck
+// would jump its rails (the mounted jump clears them).
+const ABOARD_SHIP_MSG = "You can't mount while aboard a ship.";
 const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding trainer.';
 const CARRYING_FREIGHT_MSG = "You can't ride while carrying freight.";
 
@@ -289,6 +295,10 @@ export function summonMountItem(ctx: SimContext, pid: number, key: string): bool
     ctx.error(pid, "You can't do that while in combat.");
     return false;
   }
+  if (onShipDeck(ctx, e)) {
+    ctx.error(pid, ABOARD_SHIP_MSG);
+    return false;
+  }
   // Swapping between mounts is instant: the player is already mounted, so there
   // is nothing to summon, only a model to change.
   if (e.mountKey) {
@@ -358,6 +368,10 @@ export function toggleMount(ctx: SimContext, pid: number): boolean {
     if (e.dead || e.ghost) return false;
     if (e.inCombat) {
       ctx.error(pid, "You can't do that while in combat.");
+      return false;
+    }
+    if (onShipDeck(ctx, e)) {
+      ctx.error(pid, ABOARD_SHIP_MSG);
       return false;
     }
     // The profession-cast interlock's third route: the lesson summon is the
@@ -430,7 +444,10 @@ export function updateMountTransition(ctx: SimContext, e: Entity, swimming: bool
       } else if (
         mountDef(target) &&
         meta &&
-        (mountOwned(meta, target) || trainingSummon(meta, target))
+        (mountOwned(meta, target) || trainingSummon(meta, target)) &&
+        // a channel that ends on a ship's deck lapses (the summon was refused
+        // aboard; this covers one finished standing on the gangway's lip)
+        !onShipDeck(ctx, e)
       ) {
         // Strip any form that slipped through during the channel (e.g. instant
         // shapeshifts cast while channeling), so the player is never

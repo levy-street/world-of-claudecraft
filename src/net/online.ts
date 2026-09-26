@@ -171,6 +171,7 @@ import {
   type SocialInfo,
   type ToolEffectSlotView,
   type TradeInfo,
+  type TransportFerryView,
   type VaultInfo,
   type WhoRosterInfo,
 } from '../world_api';
@@ -262,6 +263,7 @@ import {
 import { socialInfoFromFrame } from './social_frame_wire';
 import { applySocialSelfWire } from './social_self_wire';
 import { armTargetEcho, type PendingTargetEcho, resolveSelfTarget } from './target_echo';
+import { applyFerryWire, applyTransportSnapshot, clientFerryView } from './transport_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
 import { optimisticWeaponSkinChange } from './weapon_skin_optimistic';
 import { whoRosterFromFrame } from './who_frame_wire';
@@ -306,61 +308,29 @@ export {
   NATIVE_APP,
 } from '../client_origin';
 
-export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
+// The REST payload shapes (realms, releases, account, wallet proofs), moved to
+// their own module (monolith ratchet) and re-exported so importers are unchanged.
+export type {
+  AccountInfo,
+  RealmDirectory,
+  RealmEntry,
+  RealmType,
+  ReleaseEntry,
+  SeekerEntitlementStatus,
+  WalletReauthProof,
+} from './rest_types';
 
-export interface RealmEntry {
-  name: string;
-  url: string;
-  type: RealmType;
-}
-
-export interface RealmDirectory {
-  current: string;
-  realms: RealmEntry[];
-  characters: Record<string, number>; // realm name -> how many characters you have
-}
-
-// A published GitHub release, as surfaced by the server's /api/releases proxy
-// for the home-page "News & Updates" view. Body is raw release-note markdown.
-export interface ReleaseEntry {
-  id: number;
-  tag: string;
-  name: string;
-  body: string;
-  url: string;
-  prerelease: boolean;
-  publishedAt: string; // ISO 8601
-}
-
-export interface AccountInfo {
-  username: string;
-  email: string;
-  // True when the account has no recovery email yet (mandatory-email capture).
-  emailMissing?: boolean;
-  createdAt: string;
-  characterCount: number;
-  twoFactorEnabled: boolean;
-  // False for an account provisioned by Apple or Discord sign-in that never got
-  // a real, owner-chosen password (see setInitialPassword below).
-  passwordSet: boolean;
-}
+import type {
+  AccountInfo,
+  RealmDirectory,
+  ReleaseEntry,
+  SeekerEntitlementStatus,
+  WalletReauthProof,
+} from './rest_types';
 
 // The shared REST error value lives in its own module (the ratchet payment
 // for the wallet re-auth params below); re-exported so importers are unchanged.
 export { ApiError, apiErrorFromBody, isAuthError } from './api_error';
-
-export interface SeekerEntitlementStatus {
-  entitled: boolean;
-  mint: string | null;
-}
-
-/** Account proof for a wallet-link CHANGE (the R11 relink gate): the password
- *  arm, plus the second factor when the account has one enrolled. */
-export interface WalletReauthProof {
-  password: string;
-  totp?: string;
-  recoveryCode?: string;
-}
 
 export class Api {
   private static readonly SESSION_KEY = 'woc_session';
@@ -2671,6 +2641,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.serverTickHz = snap.tickHz;
     }
     applyGroundTelegraphSnapshot(this, snap);
+    applyTransportSnapshot(this, snap); // the ferry clock + its berth gates
 
     // lazy init (not the field initializer alone): tests build bare instances
     // via Object.create(ClientWorld.prototype), which skips field initializers
@@ -2915,6 +2886,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
       // Quantized 1..99 pull progress; undefined when idle so the visual falls back to its own clock.
       e.climbProgress = typeof w.cl === 'number' && w.cl > 0 ? w.cl / 100 : undefined;
       e.leaping = !!w.lp;
+      applyFerryWire(e, w.fry, snap ? -1 : entAlpha); // a passenger's deck spot
       e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.pvpFlag = !!w.pvp; // /pvp flag bit: nameplate + target-frame hostility colour
       e.weaponStowed = !!w.ws;
@@ -3963,6 +3935,10 @@ export class ClientWorld extends ReconWireState implements IWorld {
   claimEventSkin(skin: number): void {
     const idx = Math.max(0, Math.floor(skin));
     this.cmd({ cmd: 'claim_event_skin', skin: idx });
+  }
+  // --- IWorldTransport: derived from the snapshot clock (transport_wire.ts) ---
+  ferryView(): TransportFerryView | null {
+    return clientFerryView(this);
   }
   // --- IWorldMounts: collection + dismount. Summoning a specific mount is an
   // item use, not a mount command, so nothing here sends one. The toggle stays

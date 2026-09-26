@@ -89,7 +89,7 @@ type _PerfectingKeysAreNew = AssertNever<
 >;
 
 describe('wire compatibility epoch', () => {
-  it('fences older item formats out at the epoch-44 handshake', () => {
+  it('fences older item formats out at the epoch-45 handshake', () => {
     // The runtime epoch pin: the world handshake version that fences older
     // snapshot shapes out before any snapshot is admitted. The three frozen
     // fixtures above carry the per-epoch rationale: bank storage (10) added
@@ -116,12 +116,18 @@ describe('wire compatibility epoch', () => {
     // both parents (release 29, the world-quest branch 41), because the merged
     // snapshot carries the world-quest wire on top of the release geography.
     // Epoch 43 replaces the Farshore salvage roster, area and compiled visuals.
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(44);
+    // Epoch 45 at the fourth release/v0.44.0 base merge: the release's epoch 30
+    // (the scheduled ferry whose deck exists only where it lies docked) composed
+    // with the branch's 44, so an epoch-44 client (which draws the ship moored
+    // forever) and an epoch-30 client (no world-quest wire) are both fenced out.
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(45);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-44');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-45');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-44');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-42');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-43');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-41');
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-30');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-29');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-28');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-27');

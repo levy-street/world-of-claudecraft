@@ -551,6 +551,20 @@ female.
 
 **Voice test:** *"Keep low. Sound carries strangely off the glass, and the gate below has ears."*
 
+### Harbormaster Tamsin: *Keeper of the Wyrmwatch Quays*
+**Visual:** ranger kit on a harbor-blue coat (#3a5a8a), a salt-grey braid, the chart
+table in the Harbormaster's House at the cliff harbor below Wyrmwatch.
+
+Warm, weathered alto with a sailor's economy: she welcomes before she informs, and
+names the routes like old friends. A little rasp from years of calling across the
+quay, the hearth's ease under it. Age 50s, female. **No designed voice of her own
+yet:** she borrows Harbormaster Odile's through `VOICE_ALIAS` (a role match: the
+same trade at the other end of her route), so her lines ship in that voice until a
+key is available. Promote her to her own `VOICE_PROMPTS` entry then, warmer and
+older than Odile's.
+
+**Voice test:** *"Come in off the quay and warm your hands. The map on the wall shows both crossings."*
+
 ---
 
 ## The Wraithwood (Gibbetmere)

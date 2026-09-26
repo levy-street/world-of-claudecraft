@@ -1391,7 +1391,9 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No Eastbrook capture or measured value changed.
   // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  'e0e8204bbfe7598b77ab1194915fc49b316c9dd3eddb99773bc3ec95e8112239';
+  // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
+  // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '00201cf03ba0a8a0ca6c93ba817d42ffff94aa95ed2035cbfe361de800fc08ab';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1411,7 +1413,9 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No Eastbrook capture or measured value changed.
   // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '62b1380f9d1682466999d45986aa9376fef7103e195f9343333cd4327eb52608';
+  // Re-minted at the fourth release/v0.44.0 base merge into integration/world-quests-v0440
+  // (the Eastbrook ferry, PR 4225; remint_polish_provenance.mjs on the merged tree; no capture was retaken).
+  '5ddb792c3802ffe88ab74b1942985c015e2769083a5e20fa88dadb75229ac2cc';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2790,7 +2794,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
       // Re-minted for the shipwreck salvage landing over the re-sealed
       // provenance. No capture or measured value changed.
-    ).toBe('828c088c511e8ff600db1e766c7433771c53fdd342be8abbc236aa08f40a307e');
+      // Fourth release/v0.44.0 base merge (the Eastbrook ferry, PR 4225): recomputed
+      // LAST again over the re-swept evidence. No capture was retaken.
+    ).toBe('b5008bdc6d79e6ee7754d02533b4e181505d32a60318a2bf4491af6c0cbd3da7');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

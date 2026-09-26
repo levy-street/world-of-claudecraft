@@ -2254,4 +2254,9 @@ export const VISITED_MARK_NAMESPACES = [
   // logs out after the craft. tests/deeds_content.test.ts pins the round trip
   // rather than trusting this comment.
   'apex_feast',
+  // Scheduled ferry crossings (transport_ferry.ts), one mark per direction,
+  // ferry:<from berth>_<to berth>, written when a living passenger steps off
+  // at the destination. Registered so a save keeps a one-way crossing until
+  // the return trip completes the deed.
+  'ferry',
 ] as const;

@@ -214,6 +214,10 @@ export interface SimContextPrimitives {
   riftPortalSpawnCount: number;
   // Deterministically sampled next scheduler deadline (sim seconds).
   riftPortalNextAt: number;
+  // Dev-only skip for the ferry timetable (transport_ferry.ts transportClock):
+  // seconds added to `time` for the schedule. 0 in play; only /dev ferry
+  // writes it (dev/ferry_dev.ts).
+  transportClockOffset: number;
   // live arena bouts keyed by every participant pid (A2); release-spirit early-bails
   // when the dead player is mid-bout.
   readonly arenaMatches: Map<number, ArenaMatch>;
@@ -1362,6 +1366,12 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     set riftPortalNextAt(v) {
       host.riftPortalNextAt = v;
+    },
+    get transportClockOffset() {
+      return host.transportClockOffset;
+    },
+    set transportClockOffset(v) {
+      host.transportClockOffset = v;
     },
     get arenaMatches() {
       return host.arenaMatches;

@@ -2376,6 +2376,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // characters of ids plus 2 x 3 = 32). Predicted from the literals BEFORE
     // the run (56,241 to 56,346; the deeds row below moves 599 to 672 and
     // deedStats 469 to 501).
+    // Plus 154 at the fourth release/v0.44.0 base merge: the release's
+    // Eastbrook ferry round-trip deed (exp_harbor_to_harbor, +36 in the deeds
+    // row) and its four ferry:<from>_<to> visit marks (+118 in deedStats), earned
+    // in this maximal fixture (the release's own attribution).
     // Plus 13,496 for the Warfare Season 2 honor stock (139 item ids across the
     // maximal fixture's discovered-item and reliquary fields). MEASURED on the
     // release: the settled blob grew by exactly this much when the stock landed.
@@ -2412,7 +2416,10 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
         // Plus 13,496 at the second release/v0.44.0 base merge: Warfare Season 2's
         // 139 honor item ids (deedStats.itemsDiscovered +4,648 and the reliquary
         // rows +8,848, the release's own attribution).
-        13496,
+        13496 +
+        // Plus 154 at the fourth release/v0.44.0 base merge (the ferry deed and
+        // its four visit marks, attributed above).
+        154,
     );
     const forgeBaseline = {
       questsDone: 4606,
@@ -2450,10 +2457,13 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // +1,136 above).
       questsDone: 100,
       knownRecipes: 164,
-      deeds: 672,
+      // deeds 672 -> 708 and deedStats 5,861 -> 5,979 at the fourth
+      // release/v0.44.0 base merge: the ferry deed and its four visit marks
+      // (the +154 above).
+      deeds: 708,
       // deedStats +4,648 and reliquary +8,848 at the second release/v0.44.0 base
       // merge: Warfare Season 2's 139 item ids (the 13,496 attributed above).
-      deedStats: 5861,
+      deedStats: 5979,
       reliquary: 9740,
     });
     // Removing field_kit AND the Bramblehide release content reproduces the
@@ -2487,7 +2497,9 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // equipment row, both of which this counterfactual keeps.
       // 212,588 -> 226,084 at the second release/v0.44.0 base merge (+13,496,
       // the Warfare Season 2 stock this counterfactual keeps).
-    ).toBe(226084);
+      // 226,084 -> 226,238 at the fourth release/v0.44.0 base merge (+154, the
+      // ferry deed and its visit marks, which this counterfactual keeps).
+    ).toBe(226238);
     // Removing ONLY field_kit (the Bramblehide release content and the two
     // dev-mount reins items still present, current staged tree) reproduces
     // 209,524 plus the 1,548-byte Bramblehide delta plus the 71-byte
@@ -2514,7 +2526,8 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
       // 213,045 -> 214,207 at the trinket slot (PR 4173): +1,136 of trinket ids
       // and Reliquary pages plus the 26-byte trinket equipment row.
       // 214,207 -> 227,703 at the second release/v0.44.0 base merge (+13,496).
-    ).toBe(227703);
+      // 227,703 -> 227,857 at the fourth release/v0.44.0 base merge (+154).
+    ).toBe(227857);
     const priorContent = withoutCrucibleContent(s2);
     const contentDelta = Object.fromEntries(
       (['knownRecipes', 'deedStats', 'reliquary'] as const).map((key) => [
@@ -2603,8 +2616,14 @@ describe('the whole-character gear-heavy maximal blob (Phase 18 U-MEASURE)', () 
     // deedStats.itemsDiscovered and the reliquary firstFind rows (the release's
     // own attribution); no container or ceiling changed shape. Floor at
     // measurement minus 380, edge at measurement plus one: 227,335..227,716.
-    expect(bytes, reMint).toBeGreaterThan(227335);
-    expect(bytes, reMint).toBeLessThan(227716);
+    // RE-BASED at the fourth release/v0.44.0 base merge: 227,869 bytes,
+    // up 154 from 227,715: the release's Eastbrook ferry round-trip deed in the
+    // deeds row (+36) and its four visit marks in deedStats (+118), the
+    // release's own attribution; no container or ceiling changed shape. Floor
+    // at measurement minus 380, edge at measurement plus one:
+    // 227489..227870.
+    expect(bytes, reMint).toBeGreaterThan(227489);
+    expect(bytes, reMint).toBeLessThan(227870);
 
     // The Crucible database review approved 229,376 bytes (224 KiB), the first
     // 32-KiB step above the corrected 209,261-byte pre-field-kit fixture it was

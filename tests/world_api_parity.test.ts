@@ -78,6 +78,7 @@ import type { IWorldTalents } from '../src/world_api/talents';
 import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
+import type { IWorldTransport } from '../src/world_api/transport';
 import type { IWorldVehicles } from '../src/world_api/vehicles';
 import type { IWorldWorldPvp } from '../src/world_api/world_pvp';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
@@ -580,6 +581,9 @@ export const IWORLD_MEMBERS = [
   // data member exists for it.
   { name: 'placeFeast', kind: 'method' },
   { name: 'consumeFeast', kind: 'method' },
+  // --- the scheduled ferry (IWorldTransport): one read-returning method, the
+  // live timetable view both worlds derive from their schedule clock ---
+  { name: 'ferryView', kind: 'method' },
   // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower.
   { name: 'worldPvpInfo', kind: 'data' },
   { name: 'setWorldPvpFlag', kind: 'method' },
@@ -928,9 +932,11 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // Plus the release batch's townFocusPending data read, its three
     // market-order methods and guildSetRanks at the third release/v0.44.0 base
     // merge: 420/124/296.
-    expect(IWORLD_MEMBERS.length).toBe(420);
+    // Plus the release's transport facet (the Eastbrook ferry's ferryView
+    // method) at the fourth release/v0.44.0 base merge: 421/124/297.
+    expect(IWORLD_MEMBERS.length).toBe(421);
     expect(DATA_MEMBERS.length).toBe(124);
-    expect(METHOD_MEMBERS.length).toBe(296);
+    expect(METHOD_MEMBERS.length).toBe(297);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -1092,6 +1098,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'farmNowMs',
       'farmPatches',
       'feedPet',
+      'ferryView',
       'forfeitCardDuel',
       'friendAdd',
       'friendRemove',
@@ -1593,6 +1600,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'extractEssence',
       'farmNowMs',
       'feedPet',
+      'ferryView',
       'forfeitCardDuel',
       'friendAdd',
       'friendRemove',
@@ -2452,6 +2460,11 @@ const FACET_FARMING = [
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
 
+const FACET_TRANSPORT = ['ferryView'] as const satisfies readonly (keyof IWorldTransport)[];
+type _ExhaustTransport = AssertNever<
+  Exclude<keyof IWorldTransport, (typeof FACET_TRANSPORT)[number]>
+>;
+
 const FACET_WORLD_PVP = [
   'worldPvpInfo',
   'setWorldPvpFlag',
@@ -2497,6 +2510,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
   farming: FACET_FARMING,
+  transport: FACET_TRANSPORT,
   worldPvp: FACET_WORLD_PVP,
 };
 
@@ -2513,7 +2527,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // 34 at the release/v0.43.0 merge: the release's 33 plus this branch's
     // vehicles facet.
     // 35 at the second release/v0.44.0 base merge: plus the release's world_pvp.ts.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(35);
+    // 36 at the fourth release/v0.44.0 base merge: plus the release's transport.ts.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(36);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2594,8 +2609,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(420);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(420);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(421);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(421);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

@@ -7,11 +7,18 @@
 
 import { describe, expect, it } from 'vitest';
 import { VISUALS, visualKeyFor } from '../src/render/characters/manifest';
-import { ARMOR_SETS, ARMOR_SLOTS, normalizeAppearance } from '../src/render/characters/modular';
+import {
+  ARMOR_SETS,
+  ARMOR_SLOTS,
+  NPC_MATERIAL_COLORWAY_IDS,
+  normalizeAppearance,
+  OUTFIT_COLORWAY_IDS,
+} from '../src/render/characters/modular';
 import {
   aldricKeepsHisRig,
   NPC_LOOKS,
   NPC_PROP_SET_IDS,
+  normalizeNpcAppearance,
   npcLookFor,
   npcModularKeyFor,
 } from '../src/render/characters/npc_looks';
@@ -76,7 +83,7 @@ describe('npc looks roster', () => {
 
   it('every authored appearance value survives normalization unchanged', () => {
     for (const [id, def] of Object.entries(NPC_LOOKS)) {
-      const normalized = normalizeAppearance(def.app) as unknown as Record<string, unknown>;
+      const normalized = normalizeNpcAppearance(def.app) as unknown as Record<string, unknown>;
       for (const [key, value] of Object.entries(def.app)) {
         expect(normalized[key], `${id}.${key}`).toEqual(value);
       }
@@ -86,7 +93,7 @@ describe('npc looks roster', () => {
   it('no two NPCs share an authored appearance', () => {
     const seen = new Map<string, string>();
     for (const [id, def] of Object.entries(NPC_LOOKS)) {
-      const sig = JSON.stringify(normalizeAppearance(def.app));
+      const sig = JSON.stringify(normalizeNpcAppearance(def.app));
       const prior = seen.get(sig);
       expect(prior, `${id} duplicates ${prior}`).toBeUndefined();
       seen.set(sig, id);
@@ -118,5 +125,55 @@ describe('npc looks roster', () => {
       .filter(([, def]) => !NPC_PROP_SET_IDS.includes(def.props))
       .map(([id]) => id);
     expect(unknownPropSets).toEqual([]);
+  });
+
+  // The owner's "old sea wolf" brief for the Wyrmwatch harbormaster: a navy tricorne and
+  // a pipe, the long navy coat with brass buttons and cuffs, a spyglass on her hip, a grey
+  // braid and a weathered face. Every piece of it is pinned to what resolves at runtime.
+  it('dresses Harbormaster Tamsin as a sea captain', () => {
+    const look = npcLookFor('harbormaster_tamsin');
+    expect(look).not.toBeNull();
+    if (!look) return;
+    // the long buttoned coat (the mage kit), dyed the NPC-only admiralty navy and brass
+    expect(look.worn).toEqual({
+      head: null,
+      chest: 'mage',
+      arms: 'mage',
+      hands: 'rogue',
+      legs: 'mage',
+      feet: 'mage',
+      back: 'mage',
+    });
+    expect(look.app.outfit).toBe('admiralty');
+    // salt-grey braid, weathered: a squint and wind-burnt cheeks
+    expect(look.app.gender).toBe('female');
+    expect(look.app.hair).toBe('warriorbraid');
+    expect(look.app.hairSat).toBeLessThanOrEqual(0.12);
+    expect(look.app.hairLight).toBeGreaterThan(0.55);
+    expect(look.app.eyeShape).toBe('narrow');
+    expect(look.app.blush).toBe('warm');
+    // the tricorne and pipe ride the head bone, the spyglass the hips bone
+    const key = npcModularKeyFor('harbormaster_tamsin');
+    expect(key).toBe('npc_modular_harbormaster');
+    expect(VISUALS[key].attach).toEqual([
+      { url: 'models/chars/npc_gear/harbormaster_tricorne.glb', bone: 'head' },
+      { url: 'models/chars/npc_gear/harbormaster_spyglass.glb', bone: 'hips' },
+    ]);
+    expect(VISUALS[key].weaponSlots).toBeUndefined();
+  });
+
+  it('keeps NPC-only colorways off every player path', () => {
+    for (const id of NPC_MATERIAL_COLORWAY_IDS) {
+      expect(OUTFIT_COLORWAY_IDS as readonly string[]).not.toContain(id);
+      // a player save carrying one is clamped to the default...
+      expect(normalizeAppearance({ outfit: id } as never).outfit).toBe('classic');
+      // ...while an authored NPC look keeps it
+      expect(normalizeNpcAppearance({ outfit: id } as never).outfit).toBe(id);
+    }
+    // and the NPC normalizer is otherwise the player one, clamps included
+    expect(normalizeNpcAppearance({ outfit: 'nonsense' } as never).outfit).toBe('classic');
+    expect(normalizeNpcAppearance({ hair: 'nonsense' } as never)).toEqual(
+      normalizeAppearance({ hair: 'nonsense' } as never),
+    );
   });
 });

@@ -36,12 +36,17 @@ import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
 import { gliderCourseVisualPreloadInternalsForTest } from '../src/render/glider_course_visual';
+import { harborRouteMarkerInternalsForTest } from '../src/render/harbor_route_markers';
 import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
 import { propPreloadInternalsForTest } from '../src/render/props';
 import { questObjectPreloadInternalsForTest } from '../src/render/quest_objects';
 import { stationsPreloadInternalsForTest } from '../src/render/stations';
+import { transportShipInternalsForTest } from '../src/render/transport_ship';
+import { wickharborHarborInternalsForTest } from '../src/render/wickharbor_harbor';
+import { wickharborWharfInternalsForTest } from '../src/render/wickharbor_wharf';
 import { wildheartPropsPreloadInternalsForTest } from '../src/render/wildheart_props';
+import { wyrmwatchHarborInternalsForTest } from '../src/render/wyrmwatch_harbor';
 import { yumiMazePreloadInternalsForTest } from '../src/render/yumi_maze';
 import { EASTBROOK_GRAND_ARMOURY } from '../src/sim/building_layout';
 import type { BuildingDef } from '../src/sim/types';
@@ -494,6 +499,28 @@ async function expectArmouryGlbContract(
 describe('GLB-replacement asset preload sets resolve to real, manifested files', () => {
   it('leaping fish asset', () => {
     expectAssetExistsAndManifested(fishPreloadInternalsForTest.fishAssetUrl);
+  });
+
+  it('transport ship assets', () => {
+    for (const url of Object.values(transportShipInternalsForTest.models)) {
+      expectAssetExistsAndManifested(url);
+    }
+  });
+
+  it('harbor route marker asset', () => {
+    expectAssetExistsAndManifested(harborRouteMarkerInternalsForTest.assetUrl);
+  });
+
+  it('wyrmwatch cliff harbor asset', () => {
+    expectAssetExistsAndManifested(wyrmwatchHarborInternalsForTest.assetUrl);
+  });
+
+  it('wickharbor ferry wharf asset', () => {
+    expectAssetExistsAndManifested(wickharborWharfInternalsForTest.assetUrl);
+  });
+
+  it('wickharbor harbor asset', () => {
+    expectAssetExistsAndManifested(wickharborHarborInternalsForTest.assetUrl);
   });
 
   it('gather node assets', () => {

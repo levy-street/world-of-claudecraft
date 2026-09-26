@@ -245,6 +245,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // category crest the same way.
       'exp_clue_first_casket',
       'exp_clue_ten_caskets',
+      // The release's Eastbrook ferry round trip rides the deed_cat_exploration crest
+      // until its commissioned art lands (docs/design/deeds.md, Icons).
+      'exp_harbor_to_harbor',
     ]);
     // RE-PINNED at this merge of release/v0.42.0 into feature/masterwrought:
     // 300 live (counted directly off the resolved src/sim/content/deeds.ts
@@ -254,7 +257,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     // 317 on the quests integration branch: plus the seven faction standing
     // deeds and the two Clue Scroll casket deeds, all nine on the pending
     // ledger above, so the painted count holds at 289.
-    expect(DEED_ORDER).toHaveLength(317);
+    // 318 with the release's ferry round trip, the pending ledger's last row,
+    // so the painted count still holds at 289.
+    expect(DEED_ORDER).toHaveLength(318);
     expect(DEED_IMAGE_IDS.size).toBe(289);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(

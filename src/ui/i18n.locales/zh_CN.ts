@@ -78,6 +78,11 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.focusTargets.target': '选中焦点 {slot}',
   'hudChrome.interfaceUnlock.frameNames.trackerGroup': '任务追踪器',
   'hudChrome.interfaceUnlock.frameNames.auraGroup': '光环与目标效果',
+  'hudChrome.ferry.regionLabel': '渡船时刻表',
+  'hudChrome.ferry.departsIn': '前往{dest}的渡船将在{time}后起航',
+  'hudChrome.ferry.castingOff': '前往{dest}的渡船正在起航',
+  'hudChrome.ferry.boardHint': '起航时站在甲板上即可随船出发。渡船免费。',
+  'hudChrome.ferry.sailing': '正在驶往{dest}',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
   'guide.professions.endgameBodyRaidCollections':
@@ -12050,6 +12055,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '这湾里每一条船的龙骨都欠着老灯塔的情。有话快说，潮水可不等人。',
   'entities.npcs.harbormaster_odile.name': '港务长奥黛尔',
   'entities.npcs.harbormaster_odile.title': '烛港港务长',
+  'entities.npcs.harbormaster_tamsin.greeting':
+    '从码头进来暖暖手吧。停在我们码头的船沿着漫长的东岸北上驶往烛港，再原路返回。在遥远的西边，另一艘渡船往返于东溪与夜绽花野之间。墙上的地图画着这两条航线。攀登望龙哨之前，先在火边歇一歇吧。',
+  'entities.npcs.harbormaster_tamsin.name': '港务长塔姆辛',
+  'entities.npcs.harbormaster_tamsin.title': '望龙哨码头看守',
   'entities.npcs.head_gardener_amaranth.greeting':
     '别在意我眼下的阴影。花园做梦的时候，总得有人醒着。',
   'entities.npcs.head_gardener_amaranth.name': '园丁长阿玛兰丝',

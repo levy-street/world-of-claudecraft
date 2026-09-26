@@ -110,9 +110,9 @@ function withUsernameBanlist(env: { inline?: string; file?: string }, test: () =
 
 describe('websocket authentication', () => {
   it('pins the strict world-layout auth epoch for symmetric mixed-release rejection', () => {
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(44);
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(45);
     expect(ONLINE_WORLD_AUTH_TYPE).toBe(`auth-world-${ONLINE_WORLD_LAYOUT_VERSION}`);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-44');
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-45');
     // The release/v0.41.0 server this branch merged accepts only `auth-world-25`
     // (the Ignivar raid ladder's tip), and the previous layout-gated servers
     // before it only `auth-world-11` and `auth-world-10`, so the new client
@@ -123,6 +123,9 @@ describe('websocket authentication', () => {
     // already carries that source-aware/harvest preference, but it predates
     // the Nythraxis/Drakelands wire additions the v0.42.0 release merge
     // folds into this combined epoch, so it must also stay unrecognizable.
+    // `auth-world-29` predates the scheduled Eastbrook ferry (a deck that
+    // exists only where the ship lies docked) and must stay unrecognizable.
+    expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-29');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-28');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-27');
     expect(ONLINE_WORLD_AUTH_TYPE).not.toBe('auth-world-26');

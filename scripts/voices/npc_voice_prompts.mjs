@@ -1171,6 +1171,12 @@ export const VOICE_ALIAS = {
   // precedent above). Promote him to his own VOICE_PROMPTS entry, with the
   // forge-warden weight his greeting carries, when a key is available.
   crucible_quartermaster: 'heroic_quartermaster',
+  // Harbormaster Tamsin, who keeps the Harbormaster's House at the Wyrmwatch cliff
+  // harbor: the same trade as Harbormaster Odile at the far end of her route, so she
+  // borrows Odile's designed voice as a ROLE match (the Draven Kole precedent above).
+  // Promote her to her own VOICE_PROMPTS entry, warmer and more weathered than
+  // Odile's, once an ElevenLabs key is available to design and render it.
+  harbormaster_tamsin: 'harbormaster_odile',
   // The Proving Shore four (src/sim/content/proving_shore.ts, the tutorial
   // island). Like Warmarshal Draven Kole above, these are ROLE matches rather
   // than the same character recurring under a suffixed id: each borrows the

@@ -41,6 +41,7 @@ import {
 } from '../colliders';
 import { rideSteepnessAt, shoreStepOut, stepWaterLevel, walkedSteepnessAt } from '../ride_height';
 import { groundHeight, terrainDownhill } from '../world';
+import { platformSupportAt } from './platform';
 import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
 
 /**
@@ -91,6 +92,9 @@ export interface CharacterMoveParams {
   swimming: boolean;
   /** Jump arcs clear low fence rails (the long-standing fence rule). */
   ignoreFences: boolean;
+  /** A kinematic platform's colliders at this tick's pose (a sailing ship's
+   *  deck, physics/platform.ts): solved alongside the grid's, never in it. */
+  platform?: readonly Collider[] | null;
 }
 
 export interface CharacterMoveResult {
@@ -305,6 +309,8 @@ export function moveCharacter(
     Math.max(z, z + dz) + pad,
     candidates,
   );
+  const platform = params.platform;
+  if (platform) for (let i = 0; i < platform.length; i++) candidates.push(platform[i]);
   pruneCandidates(x, z, dx, dz, params.radius + STEP_COMMIT_DISTANCE + SKIN_WIDTH);
   physicsStats.solves++;
   physicsStats.candidates += candidates.length;
@@ -528,8 +534,8 @@ export function moveCharacter(
 
 /**
  * The surface the body rests on at (x, z): the terrain, or the highest
- * standable prop top no higher than `maxY`. This is the floor query the
- * vertical pass lands and snaps against.
+ * standable prop top (or kinematic platform top) no higher than `maxY`. This
+ * is the floor query the vertical pass lands and snaps against.
  */
 export function floorHeightAt(
   seed: number,
@@ -537,6 +543,8 @@ export function floorHeightAt(
   z: number,
   radius: number,
   maxY: number,
+  platform?: readonly Collider[] | null,
 ): number {
-  return Math.max(groundHeight(x, z, seed), supportHeightAt(seed, x, z, radius, maxY));
+  const floor = Math.max(groundHeight(x, z, seed), supportHeightAt(seed, x, z, radius, maxY));
+  return platform ? Math.max(floor, platformSupportAt(platform, x, z, radius, maxY)) : floor;
 }

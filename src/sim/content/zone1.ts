@@ -2072,10 +2072,21 @@ export const ZONE1_PROPS: ZonePropsDef = {
     // is already below the sea. These berths were measured against the cove
     // bathymetry so every hull is wet across its whole footprint, and each lies
     // alongside a pier in the gap the round 6 respacing opened.
-    { key: 'hexShipBlue', x: -115, z: -45, rot: -1.6, scale: 7, r: 4.6, h: 11, float: 0.55 },
-    { key: 'hexShipBlue', x: -115, z: -63, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
-    // a smaller fishing hull riding the fairway west of the ferry berth
-    { key: 'seaBoatFishing', x: -122, z: -54, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
+    // The Eastbrook ferry berths broadside across the ferry pier's T-head,
+    // but it is no longer a decorProps row: it sails a timetable to Moonrest
+    // in the Nightbloom and back (content/transport_ships.ts
+    // EASTBROOK_NIGHTBLOOM_FERRY), its deck placed at both berths and gated
+    // by the schedule. To make its berth (Phase 1), the blue hull that lay in
+    // the gap north of the ferry pier (x -115, z -45) was retired, the second
+    // blue hull (x -115, z -63, whose stern reached under the ferry's
+    // quarter) moved out to ride at anchor offshore, north west of the cove
+    // mouth, where its calm pad reshapes no shore, and the fishing hull
+    // (x -122, z -54, under the ferry) moved into the freed gap north of the
+    // pier.
+    { key: 'hexShipBlue', x: -170, z: -22, rot: 1.55, scale: 7, r: 4.6, h: 11, float: 0.55 },
+    // a smaller fishing hull riding the gap between the ferry pier and the
+    // north working pier
+    { key: 'seaBoatFishing', x: -113, z: -46, rot: 0, scale: 2.5, r: 2.4, h: 7, float: 0.5 },
     // dinghies riding the water in the pier gaps, Wickharbor-style
     // the two dinghies pulled off the pad and into real water beside the piers
     { key: 'hexBoat', x: -107.5, z: -47, rot: 0.7, scale: 6, float: 0.1 },
@@ -2104,9 +2115,14 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { key: 'shrubFlowering', x: 8.6, z: -82.6, rot: -1.2, scale: 0.95 },
     { key: 'shrubFlowering', x: -30, z: -96.4, rot: 0.2, scale: 1.05 },
     { key: 'shrubFlowering', x: -7.2, z: -124, rot: 2.7, scale: 0.95 },
-    // fairway buoys marking the channel to the ferry berth
-    { key: 'seaBuoy', x: -126, z: -46, rot: 0.4, scale: 3, float: 0.15 },
-    { key: 'seaBuoyFlag', x: -124, z: -62, rot: -0.8, scale: 3, float: 0.15 },
+    // fairway buoys marking the channel to the ferry berth (both moved clear
+    // of the Eastbrook ferry's hull when it took the berth: they stood at
+    // (-126, -46) and (-124, -62), inside its footprint; then out to the
+    // western fairway when the ferry began sailing, since a hull swinging out
+    // of the cove sweeps the water where they stood at (-134, -44) and
+    // (-134, -64): tests/transport_lanes.test.ts keeps them clear)
+    { key: 'seaBuoy', x: -160, z: -58, rot: 0.4, scale: 3, float: 0.15 },
+    { key: 'seaBuoyFlag', x: -160, z: -90, rot: -0.8, scale: 3, float: 0.15 },
     // round 4: the KayKit barracks takes the armoury's lot as the Wolf Run
     // garrison. r 5.2 stays the clearance radius scatter and keep-outs read
     // (the dawnhold_layout.ts pattern); hw/hd collide the model's real wall

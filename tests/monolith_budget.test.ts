@@ -529,7 +529,11 @@ const MONOLITHS: MonolithRow[] = [
     // extractions compose with the branch's): exact count measured on the
     // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
     // Zero slack.
-    ceiling: 18088,
+    // Re-pinned at the fourth release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
+    // with the branch's): exact count measured on the MERGED working tree
+    // (wc -l after biome), never reconciled by arithmetic. Zero slack.
+    ceiling: 18081,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -977,7 +981,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered 12765 -> 12696: PR #4220's AoE ring slot builder and cast-gate
     // predicate wiring landed with the candidate's release-line extractions.
     // Exact count, zero slack.
-    ceiling: 12696,
+    // LOWERED 12696 -> 12684 at the merge of release/v0.44.0 into the
+    // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
+    // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
+    ceiling: 12684,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -1185,7 +1192,11 @@ const MONOLITHS: MonolithRow[] = [
     // extractions compose with the branch's): exact count measured on the
     // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
     // Zero slack.
-    ceiling: 11647,
+    // Re-pinned at the fourth release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
+    // with the branch's): exact count measured on the MERGED working tree
+    // (wc -l after biome), never reconciled by arithmetic. Zero slack.
+    ceiling: 11642,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1659,7 +1670,11 @@ const MONOLITHS: MonolithRow[] = [
     // extractions compose with the branch's): exact count measured on the
     // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
     // Zero slack.
-    ceiling: 9832,
+    // Re-pinned at the fourth release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
+    // with the branch's): exact count measured on the MERGED working tree
+    // (wc -l after biome), never reconciled by arithmetic. Zero slack.
+    ceiling: 9827,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1830,7 +1845,11 @@ const MONOLITHS: MonolithRow[] = [
     // extractions compose with the branch's): exact count measured on the
     // MERGED working tree (wc -l after biome), never reconciled by arithmetic.
     // Zero slack.
-    ceiling: 5378,
+    // Re-pinned at the fourth release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (the Eastbrook ferry, PR 4225, composes
+    // with the branch's): exact count measured on the MERGED working tree
+    // (wc -l after biome), never reconciled by arithmetic. Zero slack.
+    ceiling: 5354,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1870,7 +1889,10 @@ const MONOLITHS: MonolithRow[] = [
     // LOWERED 5216 -> 5194: the Gardenwalk west pass moved to its Thornpeak
     // sibling leaf thornpeak_walk_grades.ts, paying for the hillside pocket
     // grade's region-gated call beside it. Exact count, zero slack.
-    ceiling: 5194,
+    // LOWERED 5194 -> 5188 at the merge of release/v0.44.0 into the
+    // Eastbrook ferry branch (PR 4225): the release's own extractions plus the
+    // ferry's wiring, measured with wc -l on the merged tree. Exact count, zero slack.
+    ceiling: 5188,
     seam: 'zone/terrain data as content records; logic as sim sibling modules',
   },
   {
@@ -2136,7 +2158,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the 2026-09-07 release/v0.42.0 sync of the Drakelands
     // map-improvements epic (PR #3746): the keep wall-ledge and parapet loops retired and the Wildheart static set moved beside its field data. Measured with wc -l on the
     // merged tree. Exact merged count, zero headroom.
-    ceiling: 2548,
+    // LOWERED 2548 -> 2513 at the Eastbrook ferry's Phase 2, though the FILE grew from
+    // 2486 to 2513 into the row's slack: the berth gate bookkeeping (setColliderGateOpen,
+    // gridIndex-ordered reopen, lazy wishes) needs the grid's private state, net of the
+    // decoration collider builder moving out to decoration_collider.ts. wc -l. Exact count.
+    ceiling: 2513,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {

@@ -395,7 +395,11 @@ describe('generated chunk geometry is stable', () => {
     // inside x 0..64, z -148..-20 (up to 1.7 yd at the hall footprint, under
     // 0.02 yd along the re-threaded road), nothing moves outside the town.
     // Measured on the merged tree; CI shard 1 read the same digest.
-    expect(digestOf(inRect)).toBe('1e7016bd350ee0bdf0e26b87c8029b0a');
+    // Re-minted at the fourth release/v0.44.0 base merge: the release's Eastbrook
+    // ferry berth moved the cove's floating-prop calm pads (the retired and moved
+    // hulls, the ferry's own pad) under the seabed this rectangle covers, composed
+    // with the branch's vault hall and emissary pads. Measured on the merged tree.
+    expect(digestOf(inRect)).toBe('7872140edd9ed66524f2d242aaf823a5');
     // The gap super-chunk digest pin is gone with the gap chunks themselves
     // (the island claims the old vale gap cells); gapFill.length above pins
     // their absence.

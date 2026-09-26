@@ -331,6 +331,7 @@ const NPC_IDS = [
   'gatecaptain_brannoc',
   'quartermaster_sela',
   'scout_yerrin',
+  'harbormaster_tamsin', // the Harbormaster's House at the Wyrmwatch cliff harbor
   // Lanternmere, the Amberfall
   'reeve_ottoline',
   'waywatcher_sorrel',

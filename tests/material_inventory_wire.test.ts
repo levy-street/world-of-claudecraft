@@ -9,8 +9,8 @@ describe('mixed material inventory wire', () => {
   it('requires the combined material-source and expanded-ability client and server epoch', () => {
     // Epoch 42 at the release/v0.43.0 merge into feature/world-quests (past both
     // parents; tests/bank_wire_epoch.test.ts holds the history).
-    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(44);
-    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-44');
+    expect(ONLINE_WORLD_LAYOUT_VERSION).toBe(45);
+    expect(ONLINE_WORLD_AUTH_TYPE).toBe('auth-world-45');
   });
   it('retains both mirrors for omitted and malformed source frames', () => {
     const mirror = { inventory: [row], vendorBuyback: [row] };
