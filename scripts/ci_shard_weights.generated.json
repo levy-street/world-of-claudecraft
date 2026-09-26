@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "34168361798",
     "harvested": "2026-09-08",
-    "files": 4816,
+    "files": 4817,
     "harvestedFiles": 3948,
     "carried": {
       "tests/ability_imbue_text.test.ts": {
@@ -4339,6 +4339,15 @@
         "reason": "local carry pending the next full-mode harvest",
         "runs": [
           5
+        ]
+      },
+      "tests/reserved_singleton_entity_ids.test.ts": {
+        "ms": 761,
+        "method": "local-median",
+        "measured": "2026-09-26",
+        "reason": "local carry pending the next full-mode harvest",
+        "runs": [
+          761
         ]
       },
       "tests/reset_cooldown_policy.test.ts": {
@@ -11238,6 +11247,7 @@
   "tests/report_window.test.ts": 153,
   "tests/reputation_tab_html.test.ts": 11,
   "tests/reputation_view.test.ts": 5,
+  "tests/reserved_singleton_entity_ids.test.ts": 761,
   "tests/reset_cooldown_policy.test.ts": 4,
   "tests/reset_day_guard.test.ts": 2092,
   "tests/resident_scenery_core.test.ts": 7,

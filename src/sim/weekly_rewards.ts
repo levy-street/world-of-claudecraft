@@ -34,9 +34,12 @@ import {
 } from './weekly_reward_tables';
 
 // Reserved singleton id (the 1_000_000_x band; see STATIC_WORLD_SERVICE_ENTITY_ID_MIN
-// in types.ts): 1_000_000_004 went to the Last Keep spirit healer while this branch was
-// in flight, so the keeper takes the next free slot. The healing dummies start at _010.
-export const WEEKLY_KEEPER_ENTITY_ID = 1_000_000_005;
+// in types.ts): 1_000_000_004 went to the Last Keep spirit healer and 1_000_000_005 to
+// the Wyrmwatch harbormaster while this branch was in flight (the harbormaster's spawn
+// skips an occupied id, so sharing _005 silently dropped her at the fourth
+// release/v0.44.0 base merge), so the keeper takes the next free slot. The healing
+// dummies start at _010.
+export const WEEKLY_KEEPER_ENTITY_ID = 1_000_000_006;
 export const WEEKLY_KEEPER_ID = 'eastbrook_vault_keeper';
 export const WEEKLY_POOL_IDS = [
   'raid',
