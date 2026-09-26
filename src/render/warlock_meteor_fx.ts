@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   felMeteorHash01 as hash01,
   planRainMeteorShower,
@@ -785,6 +786,7 @@ export class WarlockMeteorFx {
     });
     const telegraph = new THREE.LineLoop(geometry, material);
     telegraph.name = name;
+    telegraph.renderOrder = floorVfxRenderOrder('player', 0);
     return telegraph;
   }
 

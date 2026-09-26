@@ -131,6 +131,8 @@ export type ActionBarLayoutRestore =
   | { source: 'noop' };
 
 export interface IWorldActionBar {
+  /** Watching another character, or waiting for the owner's return snapshot. */
+  readonly actionBarReadOnly: boolean;
   // Persist one profile's full action-bar layout for this character. Offline: a
   // no-op (localStorage, written by the controller, is the store). Online: a
   // debounced wire save naming the profile; the localStorage mirror is written

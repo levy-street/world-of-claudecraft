@@ -165,6 +165,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Арсенал Боевой мощи',
     desc: 'Украшения и оружие Войны, купленные за тяжело добытую честь.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Галерея Авангарда',
+    desc: 'Комплекты специализаций и оружие второго сезона Боевой мощи, покупаются за честь.',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads Хранитель Сокровищницы).
   horizons_vault_of_ages: {

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import type { VfxAnchorResolver } from '../vfx_anchor';
 import { DRAPE_AXIS_Y, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
@@ -198,7 +199,7 @@ export class GroundAuras {
       };
       const mesh = slot.mesh;
       mesh.visible = false;
-      mesh.renderOrder = 4; // over ground decals (3), under the shock rings (5)
+      mesh.renderOrder = floorVfxRenderOrder('player', 1); // over ground decals (step 0), under the shock rings (step 2)
       mesh.userData.renderCategory = 'vfx';
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every re-drape (see drapeInto).

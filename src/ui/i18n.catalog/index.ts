@@ -223,6 +223,16 @@ export const en = {
         label: 'Seed listing board',
         description: 'Create a premade listing scenario.',
       },
+      hillwarn: {
+        label: 'Hill countdown',
+        description: 'Announce a hill now; it rises after the full warning.',
+      },
+      hillnow: { label: 'Raise hill now', description: 'Raise a hill at once and stand on it.' },
+      hillrise: {
+        label: 'Skip hill countdown',
+        description: 'Raise the announced hill right away.',
+      },
+      hillend: { label: 'End hill', description: 'Make the current hill fall now.' },
     },
   },
   game: gameStrings,

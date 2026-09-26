@@ -192,6 +192,22 @@ export const pt_BR: EnTranslations = {
       "lfgboard": {
         "label": "Preparar quadro de grupos",
         "description": "Cria um cenário de anúncio de grupo predefinido."
+      },
+      "hillwarn": {
+        "label": "Hill countdown",
+        "description": "Announce a hill now; it rises after the full warning."
+      },
+      "hillnow": {
+        "label": "Raise hill now",
+        "description": "Raise a hill at once and stand on it."
+      },
+      "hillrise": {
+        "label": "Skip hill countdown",
+        "description": "Raise the announced hill right away."
+      },
+      "hillend": {
+        "label": "End hill",
+        "description": "Make the current hill fall now."
       }
     }
   },
@@ -331,6 +347,48 @@ export const pt_BR: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "Apply",
+      "pickerLabel": "Frame Presets: {name}",
+      "overwrite": "Overwrite Preset",
+      "overwriteBody": "Replace the saved preset \"{name}\" with your current layout?",
+      "current": "Current Layout",
+      "new": "New Preset",
+      "empty": "No saved presets",
+      "deleteNamed": "Delete {name}",
+      "deleteBody": "Delete the frame preset \"{name}\"?",
+      "title": "Frame Presets",
+      "name": "Preset Name",
+      "slot": "Preset {slot}",
+      "remove": "Delete",
+      "saved": "Done.",
+      "failed": "Could not save or load the preset."
+    },
+    "frameMenus": {
+      "hide": "Hide Frame",
+      "units": "Unit Frames",
+      "bars": "Action Bars",
+      "trackers": "Trackers",
+      "auras": "Auras",
+      "combat": "Combat Displays",
+      "other": "Other HUD Elements",
+      "options": "Frame Options",
+      "allOptions": "All Frame Options",
+      "independentTarget": "Lock Target of Target to Target"
+    },
+    "focusTargets": {
+      "showEmpty": "Show Empty Focus Frames",
+      "assignHint": "Select a target. Press {key} or click {button}.",
+      "assignClickHint": "Select a target. Click {button}.",
+      "ally": "Ally",
+      "enemy": "Enemy",
+      "unset": "Unset Focus",
+      "frame1": "Focus 1",
+      "frame2": "Focus 2",
+      "frame3": "Focus 3",
+      "assign": "Set focus {slot}",
+      "target": "Target focus {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "Instrutor de Ferraria",
       "cooking": "Instrutor de Culinária",
@@ -1859,6 +1917,7 @@ export const pt_BR: EnTranslations = {
       "clickMoveLeft": "Clique esquerdo",
       "clickMoveRight": "Clique direito",
       "version": "v{version} ({build})",
+      "overlays": "Overlays",
       "browserEffects": "Efeitos do navegador",
       "browserEffectsAuto": "Auto",
       "browserEffectsFull": "Completos",
@@ -2300,6 +2359,80 @@ export const pt_BR: EnTranslations = {
         }
       }
     },
+    "cooldownManager": {
+      "title": "Cooldown Manager",
+      "intro": "Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.",
+      "generalTitle": "General",
+      "enabled": "Show Cooldown Manager",
+      "idleOpacity": "Opacity While Not Ready",
+      "combatOnly": "Sounds Only in Combat",
+      "dragHint": "While this menu is open, every group shows on screen and you can drag it to move it.",
+      "addSingle": "Add Single Button",
+      "addGrid": "Add Button Group",
+      "addLine": "Add Line of Spells",
+      "groupsFull": "You have the most groups allowed. Delete one to add another.",
+      "noGroups": "Add a single button, a group of buttons or a line of spells to get started.",
+      "groupSingle": "Single Button {index}",
+      "groupGrid": "Button Group {index}",
+      "groupLine": "Line of Spells {index}",
+      "groupName": "Group Name",
+      "spellCount": "{count} / {max} spells",
+      "orientation": "Orientation",
+      "horizontal": "Horizontal",
+      "vertical": "Vertical",
+      "columns": "# Columns",
+      "rows": "# Rows",
+      "direction": "Icon Direction",
+      "dirRight": "Right",
+      "dirLeft": "Left",
+      "dirDown": "Down",
+      "dirUp": "Up",
+      "iconSize": "Icon Size",
+      "iconPadding": "Icon Padding",
+      "opacity": "Opacity",
+      "visibility": "Visibility",
+      "visAlways": "Always Visible",
+      "visCombat": "In Combat",
+      "visHidden": "Hidden",
+      "visHiddenHint": "A hidden group still plays its sounds and lights your action bar.",
+      "showTimer": "Show Timer",
+      "positionX": "Horizontal Position",
+      "positionY": "Vertical Position",
+      "resetPosition": "Reset to Default Position",
+      "deleteGroup": "Delete Group",
+      "deleteGroupAria": "Delete {group}",
+      "trackedTitle": "Tracked Spells",
+      "trackedHint": "Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.",
+      "search": "Search spells",
+      "searchPlaceholder": "Search",
+      "notDisplayed": "Not Displayed",
+      "otherSpells": "Other Spells",
+      "otherSpellsHint": "Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.",
+      "notKnown": "{spell} (not known yet)",
+      "aurasTitle": "Procs, Engines and Buffs",
+      "aurasHint": "Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.",
+      "auraFallback": "Aura",
+      "onlyWhileActive": "Only Show While Active",
+      "alertStacks": "Alert at Stacks",
+      "alertStacksAny": "On gain",
+      "alertStacksHint": "The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.",
+      "auraSoundHint": "Plays when the aura comes up, or when it reaches your stack goal.",
+      "emptySection": "Drop a spell here.",
+      "spellsEmpty": "You do not know any spells yet.",
+      "selectSpell": "Select {spell}",
+      "group": "Group",
+      "groupFullOption": "{group} (full)",
+      "notInGroupHint": "Put this spell in a group to show its button.",
+      "moveEarlier": "Move {spell} earlier",
+      "moveLater": "Move {spell} later",
+      "glowWhenReady": "Light Up When Ready",
+      "glowWhenReadyHint": "Brightens and outlines the button while the spell can be cast.",
+      "hotbarGlow": "Hotbar Glow",
+      "hotbarGlowHint": "Also lights this spell on your action bar while it is ready.",
+      "onlyWhenReady": "Only Show When Ready",
+      "sound": "Ready Sound",
+      "soundHint": "Plays when the spell becomes ready, or when its button changes into another spell while ready."
+    },
     "auraOverlay": {
       "title": "Auras",
       "currentClass": "Classe atual: {class}",
@@ -2423,19 +2556,80 @@ export const pt_BR: EnTranslations = {
         "battlegroundFirstWin": "primeira vitória em Campos de Thornhollow hoje",
         "battlegroundComplete": "batalha de Campos de Thornhollow disputada",
         "battlegroundKill": "abate honroso",
-        "battlegroundAssist": "assistência em abate"
+        "battlegroundAssist": "assistência em abate",
+        "worldKill": "world kill",
+        "worldAssist": "world kill assisted",
+        "hillHold": "holding the hill"
       },
       "floatReasons": {
         "kill": "Abate",
         "assist": "Assistência",
-        "firstWin": "Primeira Vitória"
+        "firstWin": "Primeira Vitória",
+        "hill": "Hill"
       }
+    },
+    "worldPvp": {
+      "tab": "World PvP",
+      "title": "World PvP",
+      "blurb": "Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.",
+      "statusOn": "Your PvP flag is up. Flagged players can attack you.",
+      "statusOff": "Your PvP flag is down. You cannot attack or be attacked in the open world.",
+      "statusOffFfa": "Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.",
+      "statusDisarming": "Your flag drops in {time}, or when your current fight ends.",
+      "zoneSanctuary": "Sanctuary: no world PvP here.",
+      "zoneContested": "Contested ground: only flagged players fight here.",
+      "zoneFfa": "Free-for-all ground: everyone here is fair game.",
+      "realmDisabled": "World PvP is disabled on this realm.",
+      "groundSanctuary": "The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.",
+      "groundContested": "Everywhere else is contested: only two flagged players can fight.",
+      "groundFfa": "The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.",
+      "groupLine": "Party and raid members are never hostile to each other. Guildmates outside your group can fight.",
+      "markLine": "Attacking an unflagged player there raises your own flag; attacking a flagged one never does.",
+      "aidLine": "Healing, shielding or buffing a flagged player in a world fight raises your flag.",
+      "stakeLine": "The loser pays {cap} or {percent} of their purse, whichever is less.",
+      "noStakeLine": "An unflagged player killed on free-for-all ground loses no gold.",
+      "noTakeLine": "An unflagged fighter takes no gold either: it only moves between two flagged players.",
+      "honorLine": "{honor} Honor per kill, split between everyone who helped.",
+      "splitLine": "A clean 1v1 pays the whole pot; helpers and their healers share it.",
+      "repeatLine": "Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.",
+      "greyLine": "Players more than {levels} levels below you pay nothing.",
+      "disarmLine": "Switching off takes {minutes} minutes and waits for combat to end.",
+      "record": "Record: {kills} kills, {deaths} deaths",
+      "enable": "Enable World PvP",
+      "disable": "Disable World PvP",
+      "keepUp": "Keep Flag Up",
+      "confirmBody": "Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.",
+      "confirmAccept": "Raise Flag",
+      "confirmCancel": "Cancel",
+      "levelReq": "Requires level {level}.",
+      "pending": "Waiting for your PvP status from the realm.",
+      "commandHint": "Chat: /pvp toggles the flag, /pvp on and /pvp off set it."
+    },
+    "hill": {
+      "title": "King of the Hill",
+      "rising": "The hill has not risen yet",
+      "heldYou": "Your group holds the hill",
+      "heldOther": "Another group holds the hill",
+      "heldNone": "Nobody holds the hill",
+      "counts": "Inside: you {yours}, holder {theirs}",
+      "countsUnheld": "Inside: you {yours}, largest rival {theirs}",
+      "countsHolding": "Inside: you {yours}, rival {theirs}",
+      "contestYou": "Taking the hill: {seconds} of {total}",
+      "contestOther": "Losing the hill: {seconds} of {total}",
+      "contestNone": "Hold a majority inside for {total} to take it",
+      "inside": "You are inside the circle",
+      "distance": "{yards} yd to the circle",
+      "rises": "Rises in {minutes}",
+      "falls": "Falls in {minutes}",
+      "standingRaid": "Raid members do not count: only parties can hold the hill"
     },
     "warfareShop": {
       "gossipOption": "Ver Conjuntos de Guerra",
       "gossipOptionAria": "Ver a loja de conjuntos de Guerra oferecida por {name}",
       "jewelry": "Joalheria",
       "weapons": "Armas",
+      "groupSeason2": "Warfare Season 2: Vanguard",
+      "groupEntry": "Warfare Season 1",
       "owned": "Possuído",
       "buyAria": "Comprar {item} por {honor}",
       "buyOwnedAria": "Comprar {item} por {honor}, já possuído",
@@ -2580,7 +2774,8 @@ export const pt_BR: EnTranslations = {
         "hasteRating": "Índice de aceleração dos seus equipamentos e benefícios de conjunto, acelerando seus ataques e conjurações. Cerca de 10 de índice concede 1% de aceleração.",
         "parry": "Sua chance de aparar completamente um ataque corpo a corpo frontal, sem sofrer dano. Um golpe pelas costas não pode ser aparado.",
         "hitRating": "Classificação de acerto proveniente de seu equipamento e bônus de conjuntos, reduzindo a frequência com que seus ataques erram e suas magias são resistidas, especialmente contra inimigos de nível superior. Cerca de 10 pontos de classificação concedem 1% de acerto.",
-        "warfare": "Aumenta o dano causado aos jogadores em {increase}% e reduz o dano recebido dos jogadores em {reduction}%."
+        "warfare": "Aumenta o dano causado aos jogadores em {increase}% e reduz o dano recebido dos jogadores em {reduction}%.",
+        "warfareWithHealth": "Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts."
       },
       "effects": {
         "attackPower": "+{value} de Poder de ataque",
@@ -3737,6 +3932,7 @@ export const pt_BR: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "AFK",
+      "pvpTag": "PvP",
       "cheaterTag": "< Trapaceiro >",
       "pledgeTag": "Promessa a {guild}",
       "npcRoleTag": "<{role}>",
@@ -3815,6 +4011,8 @@ export const pt_BR: EnTranslations = {
       "label": "Redefinir Posições dos Quadros"
     },
     "interfaceUnlock": {
+      "combineTrackers": "Combine Tracker Frames",
+      "combineAuras": "Combine Aura Frames",
       "label": "Editar Quadros",
       "unlock": "Desbloquear interface",
       "lock": "Bloquear interface",
@@ -3825,6 +4023,8 @@ export const pt_BR: EnTranslations = {
       "lockFrame": "Bloquear este quadro",
       "resizeFrame": "Redimensionar este quadro",
       "frameNames": {
+        "trackerGroup": "Trackers",
+        "auraGroup": "Aura trackers",
         "actionBar1": "Barra de Ação",
         "actionBar2": "Barra de Ação 2",
         "actionBar3": "Barra de Ação 3",
@@ -6473,6 +6673,7 @@ export const pt_BR: EnTranslations = {
       "talents": "Talentos",
       "arena": "Arena e JcJ",
       "thornhollow": "Campos de Thornhollow",
+      "worldPvp": "World PvP",
       "deeds": "Livro dos Feitos",
       "reliquary": "O Relicário",
       "glossary": "Glossário",
@@ -6909,6 +7110,7 @@ export const pt_BR: EnTranslations = {
       "framesMoveBodyEditFrames": "Seu quadro, o quadro do alvo e os quadros do grupo podem ser movidos. Cada um traz um pequeno botão de mover no canto: desbloqueie-o, arraste o quadro para onde quiser e bloqueie-o outra vez para que um clique perdido não o desloque. Editar Quadros, no alto da aba Quadros nas opções de Interface, libera o restante da interface de uma vez, junto com esses três quadros: barras de ação, barra de lançamento, barra de golpe, barra de experiência, minimapa, trilho de botões, quadro do mascote, barra de postura, linhas de benefícios e debilitações e chip de Lembrete da Lista de Desejos, cada um usando um chip de nome enquanto está liberado. Se eles acabarem em um lugar que você não queira, Restaurar Padrões, no rodapé da mesma aba Quadros, devolve todos ao ponto inicial.",
       "framesGovernedExtra": "Editar Quadros também libera a pilha de rastreadores abaixo, seus atributos e objetivos de missões rastreadas, seu progresso de feitos, suas páginas do Relicário, as receitas que você fixou na criação, a incursão em que você está, qualquer fenda da qual participa e a receita ou encomenda que rastreia, além da barra de ação do mascote ao lado do quadro dele, o quadro de pontos do Alvo para suas debilitações em inimigos próximos, o medalhão de Devoção do paladino, a Barra de Aflição do bruxo, a sobreposição de ativações de feitiço, o cronômetro do golpe da mão secundária para quem usa duas armas e a janela de medidores de dano com abas, cada um usando seu próprio chip de nome quando está liberado.",
       "framesGovernedAuraTracks": "Editar Quadros também libera as seis trilhas de aura opcionais depois que você as ativa na aba Combate das mesmas opções de Interface: trilha Meus Benefícios, trilha Recargas Defensivas, trilha Meus Escudos, trilha Recargas Ofensivas, trilha Movimento e Furtividade e trilha Meus Benefícios nos Aliados. Todas as trilhas começam desligadas, e cada uma usa seu próprio chip de nome quando está liberada.",
+      "frameGroups": "{trackers} can combine quests, deeds, rifts, delves, gathering goals, and Reliquary tracking. {auras} can combine Target dots and the six aura tracks. Enable either group in Frames Settings, or leave it off to move each frame separately. {tot} includes a resource bar. {focus} has three independently movable targets: Shift+F1 through Shift+F3 assigns them; Ctrl+F1 through Ctrl+F3 selects them. Drag the damage or threat meter anywhere outside its buttons to move it, and drag its edges to resize it, even while frames are locked. While frames are unlocked, Show or Hide Frames has its own grouped menu. Right-click an unlocked frame for Reset size or Frame Options. Interface > Frames also contains Frame Settings and collapsible Party Frame Options. Lock Target of Target to Target keeps those frames together. Turn it off to move Target of Target separately; turning it back on preserves the separate position for later. Assigned focus frames hide their setup controls; right-click and choose Unset Focus to restore them. Mouseover casting also works on focus frames.",
       "framesGovernedTalkingHead": "Editar quadros também afrouxa o painel Diálogo, que carrega a linha falada de um NPC enquanto esse NPC está fora de sua vista; ele usa seu chip de nome enquanto está solto.",
       "barsTitle": "Barras, temporizadores e texto de combate",
       "barsBody": "Sua barra de conjuração aparece no meio da tela, logo acima das suas barras de ação, sempre que você conjura ou canaliza, e mostra o nome do feitiço e o tempo restante. Seu alvo tem sua própria barra de conjuração no quadro dele, para que você veja o que está por vir e possa reagir.\n\nUma fina barra de ataque fica sob sua barra de conjuração e se enche entre os golpes da sua arma, para que um combatente corpo a corpo ou à distância veja quando o próximo acerto automático vai acontecer.\n\nSua barra de experiência ocupa toda a largura sob suas barras de ação, dividida em segmentos, com um trecho mais claro mostrando a experiência de descanso que você acumulou.\n\nNade debaixo d'água e uma barra azul de fôlego aparece no topo da tela. Ela se esvazia enquanto sua cabeça estiver submersa, pisca em vermelho quando se esgota e você começa a se afogar, e se enche rapidamente assim que você emerge à superfície. Espaço faz você nadar para cima, e a tecla Nadar para Baixo, Ctrl por padrão, leva você mais fundo.\n\nO dano e a cura sobem, em forma de pequenos números, sobre quem os recebeu, para que você acompanhe uma luta sem precisar ler texto. A aba Combate na sua janela de chat mantém o registro escrito completo.",
@@ -7020,6 +7222,8 @@ export const pt_BR: EnTranslations = {
       "completed": "As missões que você já entregou, na ordem em que as concluiu.",
       "session": "O que você fez desde que entrou no jogo: abates, mortes, dano e experiência.",
       "arena": "Sua posição no Coliseu das Cinzas em ambas as categorias: classificação, vitórias, derrotas e taxa de vitórias para 1v1 e 2v2.",
+      "pvp": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other anywhere; switching off takes 5 minutes.",
+      "pvpZones": "World PvP flag: /pvp toggles it, /pvp on and /pvp off set it. Flagged players can fight each other on contested ground, sanctuaries allow no world fighting at all, and the free-for-all zones allow it with or without a flag; switching off takes 5 minutes.",
       "listings": "Suas próprias listagens no Mercado Mundial, com o preço pedido, o tempo restante de cada uma, e quanto espaço você ainda tem para mais.",
       "buyback": "O que você vendeu recentemente para um vendedor e ainda pode recomprar.",
       "groupState": "Como você está agora",
@@ -7780,7 +7984,30 @@ export const pt_BR: EnTranslations = {
       "warfareBody": "Toda peça de Guerra carrega Índice de Ataque de Guerra e Índice de Defesa de Guerra, e esses dois índices não fazem nada contra monstros. Eles só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde o Ataque soma ao dano que você causa e a Defesa reduz o dano que você sofre, cada um até seu próprio teto. Cada família de armadura também é um conjunto, e seus bônus de conjunto são igualmente índice de Guerra ou efeitos que só funcionam contra jogadores, então um kit de honra completo não vale nada contra um chefe de masmorra.",
       "warfareBodyStatsStay": "Cada peça de Guerra traz Classificação de Ofensiva de Guerra e Classificação de Defesa de Guerra, e essas duas classificações não fazem absolutamente nada contra monstros. Elas só se aplicam quando você luta contra outro jogador, em um duelo, na arena ou no campo de batalha, onde a Ofensiva aumenta o dano causado e a Defesa reduz o dano recebido, cada uma até seu próprio limite. Cada família de armadura também é um conjunto, e seus bônus igualmente são classificações de Guerra ou efeitos que só funcionam contra jogadores, então os bônus de conjunto de um traje completo de Honra não contam contra um chefe de masmorra. As próprias peças ainda trazem atributos comuns, armadura e dano de arma, que funcionam em qualquer lugar; são as classificações de Guerra e os bônus de conjunto que ficam inativos contra monstros.",
       "warfareTradeBody": "Essa é a troca deliberada. O equipamento de Guerra é feito para lutar contra jogadores, não como um atalho para pular os níveis de masmorra: uma peça de Guerra nunca carrega os índices de combate que um Épico de masmorra no mesmo encaixe carrega, e tudo o que ela realmente traz é gasto contra outros jogadores. Se você quer se sair bem na arena, compre-o. Se você quer concluir os heroicos mais rápido, conquiste seu equipamento nas masmorras.",
-      "warfareTradeBodyRatingSpent": "Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras."
+      "warfareTradeBodyRatingSpent": "Essa é a troca deliberada. O equipamento de Guerra foi feito para lutar contra jogadores, não para pular os níveis das masmorras: uma peça de Guerra nunca traz as classificações de combate que um épico de masmorra no mesmo espaço traz, e as classificações de Guerra e os bônus de conjunto que ela traz são gastos inteiramente contra outros jogadores. Se quiser se garantir na arena, compre-o. Se quiser limpar heroicas mais rápido, conquiste seu equipamento nas masmorras.",
+      "vanguardHeading": "Vanguard gear: Warfare Season 2",
+      "vanguardBody": "Vanguard gear is the second season of Warfare gear, sold by the same two quartermasters above the original tier, which stays on sale. Every spec has its own Vanguard set of five pieces, for the head, shoulders, chest, legs and hands, and the shop lists only the three sets your class can wear, followed by the Vanguard weapons you can wield. A Vanguard piece carries the same Warfare ratings as the original tier at a higher item level, and each set has two bonuses, at two and four pieces, that change one of your spec's abilities. Unlike the original sets, those bonuses work everywhere, monsters included, but they are built for fighting players, so a raid set stays the better choice inside a raid."
+    },
+    "worldPvpPage": {
+      "heading": "World PvP",
+      "intro": "Open-world player-versus-player is opt-in. Raise your PvP flag and every other flagged player who is not in your party, raid or guild becomes an enemy anywhere in the open world; lower it and, after a short delay, you are a bystander again. Nobody who has not raised the flag can attack or be attacked.",
+      "flagHeading": "Raising and lowering the flag",
+      "flagBody": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing a flagged player who is in a fight raises your own flag.",
+      "stakesHeading": "What a kill is worth",
+      "stakesBody": "When flagged players defeat a flagged player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "limitsHeading": "Fair play rules",
+      "limitsBody": "Defeating the same player again and again pays less each time and soon nothing, and the counter resets with the daily reset. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "introZones": "Open-world player-versus-player is opt-in, and the ground you are standing on decides what that means. Raise your PvP flag and every other flagged player who is not in your party or raid becomes an enemy on contested ground; lower it and, after a short delay, you are a bystander again. Two zones are sanctuaries where no world fighting happens at all, and the three northernmost zones are free-for-all ground where everyone present is fair game, flag or no flag. Party and raid mates are never enemies of yours anywhere; guildmates outside your group are fair game like anyone else.",
+      "zonesHeading": "Where world PvP happens",
+      "zonesBody": "The world has three kinds of ground. The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP happens there at all, flagged or not, so a new character can never be fought before they know what the flag is. Most of the world is contested, where the flag rule above is the whole story. The Drakelands, the Frostveil Reach and the Amberfall, the three northernmost zones, are free-for-all ground: everyone standing in them can attack everyone else standing in them, with or without a flag, and you are told as you cross in and again as you leave. Attacking a player who is not flagged there raises your own flag, so an aggressor always ends up carrying the risk. Hitting a player who is already flagged never raises it, which means defending yourself, or defending somebody who is not flagged, costs you nothing.",
+      "flagBodyAid": "Type /pvp in chat, or open the PvP window on G and use the World PvP tab, which also shows your record and the stakes. Raising the flag is instant once you are past the starting levels. Lowering it starts a countdown of a few minutes, and the flag will not drop while you are still fighting, so switching off is never an escape from a fight you started. Healing, shielding or buffing a flagged player who is in a fight raises your own flag as well, so nobody sustains a fighter from behind a flag they do not wear; aiding a player who is not flagged raises nothing.",
+      "stakesUnflaggedTake": "Nor does an unflagged fighter take any: gold only changes hands between two flagged players, though everyone who helped still earns the Honor.",
+      "stakesBodyFlagged": "When a flagged player is defeated by another player, the loser pays a small share of the gold in their purse, capped at a modest amount, and the winners earn Honor toward Warfare gear. A player who was not flagged pays no gold at all, even when they fall in a free-for-all zone. Everyone who helped shares both: the killing blow, anyone who damaged the target shortly before, and the healers who kept those fighters standing. A clean one-on-one pays the whole pot; a group splits it.",
+      "hillHeading": "King of the Hill",
+      "hillBody": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns a little Honor every minute, so a full party holding an uncontested hill for its whole stand earns a little less than one battleground win pays. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyHour": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor.",
+      "hillBodyRamp": "Once every three hours, at a moment nobody can predict, the whole realm is told that a hill will rise in one of the free-for-all zones in fifteen minutes, and the circle where it will stand is marked on open ground. When it rises it stands for forty-five minutes, then falls. The party with the most players standing inside contests the hill, and after a minute of unbroken majority the hill is theirs; a lone player counts as a party of one, but raid members do not count at all. While a party holds the hill, each of its members standing inside earns Honor every minute, and the longer the same party holds it, the more each minute pays: a full party holding an uncontested hill for its whole stand earns about as much as three battleground wins. When the hill changes hands, the new holders start the count from the beginning. A bar over the field shows who holds it, your numbers against theirs, and the contest clock; /hill in chat says where it stands.",
+      "limitsBodyRaids": "Defeating the same player again and again pays less each time and soon nothing, and your count against that player only starts over about an hour after the first of those kills, so camping one victim is never worth the wait. A target far below your level pays nothing at all. Battlegrounds and Arenas run their own rules while you are inside them, and they pay more Honor than the open world, so world PvP is the slower road to the same vendor. Raids earn nothing from world kills: a raid member takes no Honor or gold and does not shrink anyone else's share, so fight as a party to be paid."
     },
     "thornhollowPage": {
       "heading": "Campos de Thornhollow",
@@ -8607,7 +8834,8 @@ export const pt_BR: EnTranslations = {
       "parryTitle": "Aparar",
       "parryBody": "Aparar é a defesa própria do guerreiro: a chance de desviar completamente um golpe corpo a corpo e não sofrer dano nenhum, e ela cresce com a Força. Só um ataque vindo de frente pode ser aparado, mais um motivo para manter de frente o que estiver batendo em você. As outras classes veem essa linha zerada na própria ficha.",
       "warfareTitle": "Guerra",
-      "warfareBody": "Guerra é o único atributo que só conta contra outros jogadores: ele aumenta o dano que você causa a eles e reduz o dano que você recebe deles, e sua ficha mostra as duas metades numa única linha. Contra criaturas ele não faz nada. Ele vem do equipamento de Guerra que você compra com Honra, então é uma recompensa por jogar JcJ, não algo para perseguir enquanto sobe de nível."
+      "warfareBody": "Guerra é o único atributo que só conta contra outros jogadores: ele aumenta o dano que você causa a eles e reduz o dano que você recebe deles, e sua ficha mostra as duas metades numa única linha. Contra criaturas ele não faz nada. Ele vem do equipamento de Guerra que você compra com Honra, então é uma recompensa por jogar JcJ, não algo para perseguir enquanto sobe de nível.",
+      "warfareBodyPets": "Warfare is the stat honor gear carries for fighting players. In fights between players it raises the damage you and your pet deal to other players and their pets, and lowers the damage you and your pet take from them. It also raises your maximum health everywhere except dungeons, raids, delves and rifts, so a player in honor gear is far harder to kill than one without it. Your sheet shows all of it on one line. It comes from the Warfare gear you buy with honor, so it is a reward for playing PvP rather than something to chase while leveling."
     },
     "progression": {
       "intro": "Toda luta, missão e passo ao norte deixa seu herói mais forte. Veja como a progressão de nível funciona e o que mantém você crescendo depois de chegar ao topo.",
@@ -12929,6 +13157,18 @@ export const pt_BR: EnTranslations = {
         "name": "Reservatório de Trovão",
         "description": "Passiva: o Raio em Arco e o Relâmpago Bifurcado concedem Trovão, até 5. Com 5 de Trovão, o Abalo Terreno causa 125% mais dano ou o Terremoto causa 100% mais, e então consome todo o Trovão. (Chamado do Trovão)"
       },
+      "lightning_overload": {
+        "name": "Arc Overload",
+        "description": "Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)"
+      },
+      "lava_burst": {
+        "name": "Magma Burst",
+        "description": "Deal {damage} Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)"
+      },
+      "thunderstorm": {
+        "name": "Stormbreak",
+        "description": "Call down a thunderclap, dealing {damage} Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)"
+      },
       "rockbiter_weapon": {
         "name": "Arma Pétrea",
         "description": "Impregna vossa arma por 30 min. Cada golpe causa {damage} de dano adicional. Aprimoramento ganha ainda 40% de armadura e 20% de Vigor, sofre 15% menos dano e é imune a acertos críticos de criaturas e gera 2,75 vezes mais ameaça. Abalo Terreno força seu alvo a vos atacar por 3 s, e Salvaguarda do Trovão concede 10% de redução de dano por 3 s."
@@ -16826,6 +17066,423 @@ export const pt_BR: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "Botas de malha Hino da tempestade"
+      },
+      "vanguard_warrior_arms_helmet": {
+        "name": "Bladewake Greathelm"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "Bladewake Pauldrons"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "Bladewake Hauberk"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "Bladewake Legplates"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "Bladewake Crushers"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "Bloodmarch Visage"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "Bloodmarch Shoulderguards"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "Bloodmarch Chainmail"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "Bloodmarch Leggings"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "Bloodmarch Grips"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "Ironmarch Helm"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "Ironmarch Spaulders"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "Ironmarch Chestguard"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "Ironmarch Legguards"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "Ironmarch Handguards"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "Sunvigil Circlet"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "Sunvigil Mantle"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "Sunvigil Hauberk"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "Sunvigil Legmail"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "Sunvigil Gloves"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "Shieldvow Helm"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "Shieldvow Pauldrons"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "Shieldvow Breastplate"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "Shieldvow Legplates"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "Shieldvow Gauntlets"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "Lightbrand Crown"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "Lightbrand Spaulders"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "Lightbrand Cuirass"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "Lightbrand Legguards"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "Lightbrand Gauntlets"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "Packwarden Coif"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "Packwarden Spaulders"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "Packwarden Jerkin"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "Packwarden Legguards"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "Packwarden Gauntlets"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "Farsight Coif"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "Farsight Spaulders"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "Farsight Jerkin"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "Farsight Legguards"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "Farsight Gauntlets"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "Snaretooth Coif"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "Snaretooth Spaulders"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "Snaretooth Jerkin"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "Snaretooth Legguards"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "Snaretooth Gauntlets"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "Nightcut Hood"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "Nightcut Shoulderpads"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "Nightcut Tunic"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "Nightcut Breeches"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "Nightcut Gloves"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "Brawlmark Hood"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "Brawlmark Shoulderpads"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "Brawlmark Tunic"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "Brawlmark Breeches"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "Brawlmark Gloves"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "Shadewalk Hood"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "Shadewalk Shoulderpads"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "Shadewalk Tunic"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "Shadewalk Breeches"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "Shadewalk Gloves"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "Veilpsalm Cowl"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "Veilpsalm Mantle"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "Veilpsalm Robe"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "Veilpsalm Leggings"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "Veilpsalm Handwraps"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "Gracewing Cowl"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "Gracewing Mantle"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "Gracewing Robe"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "Gracewing Leggings"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "Gracewing Handwraps"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "Duskhymn Cowl"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "Duskhymn Mantle"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "Duskhymn Robe"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "Duskhymn Leggings"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "Duskhymn Handwraps"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "Tempestwrit Coif"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "Tempestwrit Pauldrons"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "Tempestwrit Hauberk"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "Tempestwrit Legmail"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "Tempestwrit Gauntlets"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "Galeborn Helm"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "Galeborn Spaulders"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "Galeborn Chainmail"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "Galeborn Legguards"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "Galeborn Grips"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "Brineward Circlet"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "Brineward Mantle"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "Brineward Hauberk"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "Brineward Kilt"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "Brineward Handwraps"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "Hourbinder's Hood"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "Hourbinder's Amice"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "Hourbinder's Robe"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "Hourbinder's Trousers"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "Hourbinder's Gloves"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "Emberlash Cowl"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "Emberlash Mantle"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "Emberlash Robes"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "Emberlash Leggings"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "Emberlash Gloves"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "Rimewarden Hood"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "Rimewarden Shoulderpads"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "Rimewarden Vestment"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "Rimewarden Legwraps"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "Rimewarden Mitts"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "Dreadquill Hood"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "Dreadquill Mantle"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "Dreadquill Robe"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "Dreadquill Leggings"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "Dreadquill Handwraps"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "Marrowbound Cowl"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "Marrowbound Spaulders"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "Marrowbound Robe"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "Marrowbound Leggings"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "Marrowbound Grips"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "Slagcrown Hood"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "Slagcrown Mantle"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "Slagcrown Robes"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "Slagcrown Leggings"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "Slagcrown Gloves"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "Starwarden Headdress"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "Starwarden Spaulders"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "Starwarden Vest"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "Starwarden Breeches"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "Starwarden Gloves"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "Bloodmane Helm"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "Bloodmane Shoulderpads"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "Bloodmane Tunic"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "Bloodmane Legguards"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "Bloodmane Grips"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "Thistlebloom Crown"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "Thistlebloom Mantle"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "Thistlebloom Vest"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "Thistlebloom Leggings"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "Thistlebloom Gloves"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "Vanguard's Verdict"
+      },
+      "vanguard_oath_blade": {
+        "name": "Vanguard's Oath"
+      },
+      "vanguard_fang_dagger": {
+        "name": "Vanguard's Fang"
+      },
+      "vanguard_warstaff": {
+        "name": "Vanguard's Warstaff"
       },
       "conjured_water4": {
         "name": "Água de Nascente Conjurada"
@@ -22489,6 +23146,141 @@ export const pt_BR: EnTranslations = {
       "vale_arcanist": {
         "name": "Vestes do Arcanista do Vale",
         "bonus3": "Aumenta a velocidade de ataque e de lançamento em 15%."
+      },
+      "vanguard_druid_balance": {
+        "name": "Starwarden Raiment",
+        "bonus2": "Gripping Roots' cast time is reduced by 0.5 sec.",
+        "bonus4": "Casting Gripping Roots lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+      },
+      "vanguard_druid_feral": {
+        "name": "Bloodmane Hide",
+        "bonus2": "Bruin Rush's cooldown is reduced by 3 sec.",
+        "bonus4": "Bruin Rush shields you for 6 percent of your maximum health for 6 sec."
+      },
+      "vanguard_druid_restoration": {
+        "name": "Thistlebloom Vestment",
+        "bonus2": "Fleetmend's cooldown is reduced by 1 sec.",
+        "bonus4": "Fleetmend also increases your movement speed by 30 percent for 3 sec."
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "Packwarden Harness",
+        "bonus2": "Rattling Shot's cooldown is reduced by 4 sec.",
+        "bonus4": "Rattling Shot reduces Howling Rage's remaining cooldown by 1 sec."
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "Farsight Harness",
+        "bonus2": "Trailbreak's cooldown is reduced by 4 sec.",
+        "bonus4": "Trailbreak makes your next Long Draw within 6 sec instant. Cannot occur more than once every 15 sec."
+      },
+      "vanguard_hunter_survival": {
+        "name": "Snaretooth Harness",
+        "bonus2": "Bloodhook's cooldown is reduced by 3 sec.",
+        "bonus4": "Bloodhook grants 1 Hunting Momentum."
+      },
+      "vanguard_mage_arcane": {
+        "name": "Hourbinder's Vestments",
+        "bonus2": "Temporal Barrier's cooldown is reduced by 2 sec.",
+        "bonus4": "Temporal Barrier also increases the shielded target's movement speed by 20 percent for 3 sec."
+      },
+      "vanguard_mage_fire": {
+        "name": "Emberlash Regalia",
+        "bonus2": "Cinderfall recharges 3 sec faster.",
+        "bonus4": "Casting Cinderfall reduces the remaining cooldown of Blazing Barrier by 2 sec."
+      },
+      "vanguard_mage_frost": {
+        "name": "Rimewarden Garb",
+        "bonus2": "Icebind's cooldown is reduced by 2 sec.",
+        "bonus4": "Casting Icebind reduces the remaining cooldown of Flitstep by 5 sec."
+      },
+      "vanguard_paladin_holy": {
+        "name": "Sunvigil Regalia",
+        "bonus2": "Life Covenant's cooldown is reduced by 30 sec.",
+        "bonus4": "Life Covenant also shields the ally for 8 percent of their maximum health for 6 sec."
+      },
+      "vanguard_paladin_protection": {
+        "name": "Shieldvow Bastion",
+        "bonus2": "Oath Chain's cooldown is reduced by 2 sec.",
+        "bonus4": "Enemies pulled by Oath Chain cast spells 30 percent slower for 4 sec, and Oath Chain grants you Solar Reprisal when it binds an enemy that can be pulled."
+      },
+      "vanguard_paladin_retribution": {
+        "name": "Lightbrand Warplate",
+        "bonus2": "Valkyr's Calling's cooldown is reduced by 15 sec.",
+        "bonus4": "Valkyr's Calling resets Final Edict's cooldown, and your next Final Edict within 6 sec of landing deals 15 percent more damage."
+      },
+      "vanguard_priest_discipline": {
+        "name": "Veilpsalm Raiment",
+        "bonus2": "Terror Canticle's cooldown is reduced by 3 sec.",
+        "bonus4": "When your Psalm of Warding is fully consumed, the shielded ally gains 20 percent movement speed for 3 sec. Cannot occur more than once every 8 sec."
+      },
+      "vanguard_priest_holy": {
+        "name": "Gracewing Raiment",
+        "bonus2": "Veilstep's cooldown is reduced by 6 sec.",
+        "bonus4": "Veilstep also shields you for 8 percent of your maximum health for 6 sec."
+      },
+      "vanguard_priest_shadow": {
+        "name": "Duskhymn Regalia",
+        "bonus2": "Litany of Woe also slows the target's movement by 30 percent while you channel it.",
+        "bonus4": "Call Tithefiend also shields you for 10 percent of your maximum health for 8 sec."
+      },
+      "vanguard_rogue_assassination": {
+        "name": "Nightcut Leathers",
+        "bonus2": "Low Blow costs 10 less Energy.",
+        "bonus4": "Low Blow also makes your next attack within 6 sec a critical strike."
+      },
+      "vanguard_rogue_combat": {
+        "name": "Brawlmark Leathers",
+        "bonus2": "Swift Heels' cooldown is reduced by 60 sec.",
+        "bonus4": "While Swift Heels is active, Wicked Slash and Haymaker award 1 additional combo point."
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "Shadewalk Leathers",
+        "bonus2": "Smokefade's cooldown is reduced by 60 sec.",
+        "bonus4": "Gut Punch awards 2 additional combo points when used from Smokefade."
+      },
+      "vanguard_shaman_elemental": {
+        "name": "Tempestwrit Battlemail",
+        "bonus2": "Unleash Weapon's cooldown is reduced by 3 sec.",
+        "bonus4": "Unleash Weapon lets you cast while moving and increases your movement speed by 20 percent for 4 sec. Cannot occur more than once every 20 sec."
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "Galeborn Warmail",
+        "bonus2": "Ancestral Strike slows the target's movement speed by 30 percent for 4 sec.",
+        "bonus4": "Ancestral Strike reduces the remaining cooldown of Elemental Trance by 4 sec."
+      },
+      "vanguard_shaman_restoration": {
+        "name": "Brineward Chainmail",
+        "bonus2": "Mending Waters casts 0.5 sec faster on an ally below 50 percent health.",
+        "bonus4": "Tidecall also shields its target for 5 percent of your maximum health for 6 sec."
+      },
+      "vanguard_warlock_affliction": {
+        "name": "Dreadquill Vestments",
+        "bonus2": "Harrow's cast time is reduced by 0.3 sec.",
+        "bonus4": "Consume heals you for 30 percent more and can be channeled while moving."
+      },
+      "vanguard_warlock_demonology": {
+        "name": "Marrowbound Regalia",
+        "bonus2": "Bone Armor's cooldown is reduced by 10 sec.",
+        "bonus4": "Reaping Command reduces the remaining cooldown of Bone Armor by 2 sec."
+      },
+      "vanguard_warlock_destruction": {
+        "name": "Slagcrown Vestments",
+        "bonus2": "Cinderhide's cooldown is reduced by 30 sec.",
+        "bonus4": "Every second Conflagrate makes your next Ruinbolt within 8 sec instant."
+      },
+      "vanguard_warrior_arms": {
+        "name": "Bladewake Battlegear",
+        "bonus2": "Maiming Strike reduces Onrush's remaining cooldown by 1 sec.",
+        "bonus4": "Onrush also empowers your next Maiming Strike by 20 percent (one stack of Redhand's empower)."
+      },
+      "vanguard_warrior_fury": {
+        "name": "Bloodmarch Ragegear",
+        "bonus2": "Vaulting Charge's cooldown is reduced by 8 sec.",
+        "bonus4": "Landing Vaulting Charge Enrages you."
+      },
+      "vanguard_warrior_prot": {
+        "name": "Ironmarch Bulwark",
+        "bonus2": "Faultline's cooldown is reduced by 5 sec.",
+        "bonus4": "Faultline also reduces damage you take by 10 percent for 6 sec."
       },
       "vesperash": {
         "name": "Sudário Vesperash",

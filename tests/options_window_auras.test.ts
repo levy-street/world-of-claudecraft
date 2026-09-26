@@ -49,7 +49,11 @@ describe('OptionsWindow Auras view', () => {
       restoreFocus: vi.fn(),
     } as never);
 
-    (window as unknown as { renderAuras(): void }).renderAuras();
+    // The Auras view renders through the window's overlay-panels module
+    // (src/ui/options_overlay_panels.ts), which also wires its title-bar X.
+    (window as unknown as { overlayPanels: { render(view: 'auras'): void } }).overlayPanels.render(
+      'auras',
+    );
     root.querySelector<HTMLButtonElement>('[data-close]')?.click();
 
     expect(root.style.display).toBe('none');

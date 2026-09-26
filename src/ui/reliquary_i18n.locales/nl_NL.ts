@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Oorlogsvoeringwapenkamer',
     desc: 'Sieraden en wapens van Oorlogsvoering, gekocht met zwaarbevochten eer.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Voorhoedegalerij',
+    desc: 'De specialisatiesets en wapens van Oorlogsvoering seizoen 2, gekocht met eer.',
+  },
   horizons_vault_of_ages: {
     name: 'Schatkamer der Eeuwen',
     desc: 'Vervallen schatten uit een vervlogen tijd. Deze relieken zijn niet langer te winnen; de schatkamer eert de veteranen die ze bewaren.',

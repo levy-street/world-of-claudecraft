@@ -83,6 +83,16 @@ describe('damage-over-time final ticks', () => {
     const targetId = sim.addPlayer('warrior', 'Target');
     const source = sim.entities.get(sourceId)!;
     const target = sim.entities.get(targetId)!;
+    // A player's periodic harm on another player re-asks isHostileTo before every
+    // tick (src/sim/combat/periodic_harm.ts) and a refused tick expires the aura,
+    // so the pair has to be hostile for the aura's whole life: a live duel, the
+    // tests/duel.test.ts recipe (the 3 s countdown runs out before the aura lands).
+    sim.duelRequest(targetId, sourceId);
+    sim.duelAccept(targetId);
+    for (let i = 0; i < TICKS_PER_SECOND * 4 && sim.duelFor(sourceId)?.state !== 'active'; i++) {
+      sim.tick();
+    }
+    expect(sim.duelFor(sourceId)?.state).toBe('active');
     target.maxHp = 100000;
     target.hp = target.maxHp;
 

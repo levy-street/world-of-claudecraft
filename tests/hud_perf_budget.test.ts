@@ -587,6 +587,7 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'swing_timer_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'proc_overlay_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'aura_overlay_painter.ts', allow: {}, reflowAllow: {} },
+  { file: 'hud/cooldown_manager/cooldown_manager_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'cast_bar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'unit_frame_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'paladin_devotion_painter.ts', allow: {}, reflowAllow: {} },
@@ -748,6 +749,15 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.innerHTML': 1, '.setAttribute': 4 },
     reflowAllow: {},
   },
+  // The King of the Hill bar (hud/hill/) rebuilds its skeleton in ONE innerHTML
+  // write when the STRUCTURAL sig changes (a new hill, a holder or challenger
+  // change, crossing the circle); every per-second value rides the elided
+  // writers. The two setAttribute calls are the build-time role + aria-live.
+  {
+    file: 'hud/hill/hill_bar_painter.ts',
+    allow: { '.innerHTML': 1, '.setAttribute': 2 },
+    reflowAllow: {},
+  },
   // The bg kill feed rebuilds its tiny stack in ONE innerHTML write, on a
   // death or an expiry only (the per-frame update elides on the pure core's
   // reference equality); the setAttribute runs once at mount.
@@ -902,6 +912,14 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // clock and performs no layout read during ordinary combat painting.
   {
     file: 'aura_overlay_controller.ts',
+    reflowAllow: { '.getBoundingClientRect': 1 },
+    driverAllow: {},
+  },
+  // The Cooldown Manager's twin of the above: one app-viewport rect when the player
+  // starts dragging the row while its Options sub-view is open. Pointer moves reuse
+  // it; the per-frame paint path makes no layout read.
+  {
+    file: 'hud/cooldown_manager/cooldown_manager_controller.ts',
     reflowAllow: { '.getBoundingClientRect': 1 },
     driverAllow: {},
   },
@@ -1209,10 +1227,11 @@ const COLD_PAINTER_ALLOWANCES: ReadonlyArray<ColdPainter> = [
   // The arrange-mode border hit test (edgeAt) reads a CACHED wrap box derived
   // from the applied placement (refilled by apply()/ensureGeometry, nulled on
   // viewport resize), so hovering the unlocked chat box costs no layout read
-  // per pointermove; the five reads are the drag/resize measures.
+  // per pointermove; five reads are drag/resize measures. Two more measure the
+  // CSS default box once after the explicit Reset Size action clears custom dimensions.
   {
     file: 'hud/chat/chat_geometry_controller.ts',
-    reflowAllow: { '.getBoundingClientRect': 5 },
+    reflowAllow: { '.getBoundingClientRect': 7 },
     driverAllow: {},
   },
   {

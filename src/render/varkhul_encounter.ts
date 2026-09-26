@@ -4,6 +4,7 @@ import {
   VARKHUL_SHARED_PYRE_RADIUS,
   VARKHUL_SHARED_PYRE_REQUIRED_HEROIC,
 } from '../sim/varkhul_shared_pyre';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { buildIgnivarSoakTelegraph, syncIgnivarSoakTelegraph } from './ignivar_soak_telegraph';
 import {
   buildVarkhulCinderFire,
@@ -76,6 +77,7 @@ export function buildVarkhulCinderOrbsTelegraph(): THREE.Group {
   );
   ring.name = 'varkhulCinderOrbsRing';
   ring.position.y = 0.09;
+  ring.renderOrder = floorVfxRenderOrder('encounter', 0);
   group.add(ring);
 
   const coreMaterial = warningMaterial(0xffcf55, 0.96);
@@ -113,6 +115,7 @@ export function buildVarkhulMakersBrandTelegraph(): THREE.Group {
     );
     ring.name = `varkhulMakersBrandStack${stack + 1}`;
     ring.position.y = 0.08 + stack * 0.012;
+    ring.renderOrder = floorVfxRenderOrder('encounter', 0);
     ring.visible = false;
     group.add(ring);
   }

@@ -31,6 +31,7 @@ import type { IWorld } from '../world_api';
 import type { AbilityVfxSpellfxEvent } from './ability_vfx/painter';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { surfaceMat } from './gfx';
 import {
   createHammerPose,
@@ -279,7 +280,10 @@ export class TrinketRelics {
       });
       const light = new THREE.Mesh(discGeometry.clone(), lightMat);
       light.name = 'lantern-light';
-      light.renderOrder = 2;
+      // A worn trinket's ground glow rides the bottom of the player band
+      // (docs/design/vfx-floor-layering.md): above the world's own marks, under
+      // every encounter telegraph.
+      light.renderOrder = floorVfxRenderOrder('player', 0);
       this.root.add(light);
       tagVfx(light);
       light.visible = false;

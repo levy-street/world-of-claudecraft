@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { DUNGEON_X_THRESHOLD } from '../sim/data';
 import { hash2 } from '../sim/rng';
 import { MIREFEN_IMPACT_CRATER, terrainHeight } from '../sim/world';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { GFX } from './gfx';
 import { applySurfaceDetail } from './worn_stone';
 
@@ -284,7 +285,7 @@ function buildCrack(seed: number, crackIndex: number, angle: number, length: num
   }
   const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 8, 0.024, 6, false);
   const mesh = new THREE.Mesh(geo, glowMaterial(0.42));
-  mesh.renderOrder = 3;
+  mesh.renderOrder = floorVfxRenderOrder('ground', 2);
   return mesh;
 }
 
@@ -372,7 +373,7 @@ function buildEmbers(seed: number): { points: THREE.Points; material: THREE.Poin
     vertexColors: true,
   });
   const points = new THREE.Points(geo, material);
-  points.renderOrder = 4;
+  points.renderOrder = floorVfxRenderOrder('ground', 3);
   return { points, material };
 }
 
@@ -382,7 +383,7 @@ export function buildImpactSite(seed: number): ImpactSiteView {
 
   const scorch = new THREE.Mesh(buildScorchGeometry(seed), craterDecalMaterial());
   scorch.name = 'mirefen-impact-scorch';
-  scorch.renderOrder = 2;
+  scorch.renderOrder = floorVfxRenderOrder('ground', 1);
   group.add(scorch);
 
   const rim = new THREE.Mesh(buildRimGeometry(seed), rimMaterial());
@@ -416,7 +417,7 @@ export function buildImpactSite(seed: number): ImpactSiteView {
     impactSiteVisualY(MIREFEN_IMPACT_SITE.meteor.x, MIREFEN_IMPACT_SITE.meteor.z, seed) + 0.04,
     MIREFEN_IMPACT_SITE.meteor.z,
   );
-  glow.renderOrder = 5;
+  glow.renderOrder = floorVfxRenderOrder('ground', 4);
   group.add(glow);
 
   // NOT added to `group`: the group cull-toggles its visibility by distance, which

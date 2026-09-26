@@ -822,8 +822,9 @@ describe('Masterwrought art completion evidence', () => {
     // cache chest (feature/weekly-quests). The Clue Scroll items add their two
     // (clue-scroll-icons-2026-09-17): 1,305. The faction ladder rework adds its
     // 17 (faction-ladder-icons-2026-09-23): 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323.
-    // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341.
-    expect(currentOwnerIds).toHaveLength(1341);
+    // + the trinket slot's 18 (trinket-slot-icons-2026-09-23, PR 4173): 1,341. Warfare Season 2's four painted
+    // weapons (warfare-season2-weapons-2026-09-25): 1,345, likewise outside it.
+    expect(currentOwnerIds).toHaveLength(1345);
     for (const id of datedIds) {
       expect(currentOwnerIds.includes(id), `${id} still has a current mapping owner`).toBe(true);
     }
@@ -931,6 +932,16 @@ describe('Masterwrought art completion evidence', () => {
     expect(datedIds).not.toContain('reins_avian_strider');
     expect(currentOwnerIds).toContain('reins_avian_strider');
 
+    // The Warfare Season 2 painted weapons are additive the same way.
+    const season2WeaponIds = new Set([
+      'vanguard_verdict_greatsword',
+      'vanguard_oath_blade',
+      'vanguard_fang_dagger',
+      'vanguard_warstaff',
+    ]);
+    expect(datedIds.filter((id) => season2WeaponIds.has(id))).toEqual([]);
+    expect(currentOwnerIds.filter((id) => season2WeaponIds.has(id))).toHaveLength(4);
+
     // Strip all six later additive waves (Crucible professions, the Field Kit, the
     // Nythraxis gap-fill weapon renders, Roots' Bramblehide/gap-fill paintings,
     // the OSSBrain mount reins, and the Valestrider's reins)
@@ -953,7 +964,8 @@ describe('Masterwrought art completion evidence', () => {
         // The weekly emissary's cache chest (feature/weekly-quests) is additive
         // beyond the dated completion union, like the Field Kit.
         id !== 'emissary_cache' &&
-        id !== 'reins_avian_strider',
+        id !== 'reins_avian_strider' &&
+        !season2WeaponIds.has(id),
     );
     expect(completionOwnerIds).toHaveLength(1209);
     expect(sorted(completionOwnerIds)).toEqual(completionDatedIds);

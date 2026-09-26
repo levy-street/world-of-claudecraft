@@ -1326,6 +1326,18 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
         "name": "Thunder Reservoir"
       },
       {
+        "id": "lightning_overload",
+        "name": "Arc Overload"
+      },
+      {
+        "id": "lava_burst",
+        "name": "Magma Burst"
+      },
+      {
+        "id": "thunderstorm",
+        "name": "Stormbreak"
+      },
+      {
         "id": "chain_lightning",
         "name": "Skybranch"
       },
@@ -8084,6 +8096,570 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "item",
         "name": "Forgebreaker, Engine of Varkhul"
+      }
+    ]
+  },
+  {
+    "id": "conquerors_vanguard_gallery",
+    "shelf": "conquerors",
+    "name": "Vanguard Gallery",
+    "excludeFromCompletion": "personal",
+    "relics": [
+      {
+        "kind": "item",
+        "name": "Bladewake Greathelm"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Legplates"
+      },
+      {
+        "kind": "item",
+        "name": "Bladewake Crushers"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Visage"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Shoulderguards"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Chainmail"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmarch Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Chestguard"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Ironmarch Handguards"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Circlet"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Sunvigil Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Breastplate"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Legplates"
+      },
+      {
+        "kind": "item",
+        "name": "Shieldvow Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Cuirass"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Lightbrand Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Packwarden Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Farsight Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Jerkin"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Snaretooth Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Nightcut Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Brawlmark Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Shadewalk Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Veilpsalm Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Gracewing Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Duskhymn Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Coif"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Pauldrons"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Legmail"
+      },
+      {
+        "kind": "item",
+        "name": "Tempestwrit Gauntlets"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Chainmail"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Galeborn Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Circlet"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Hauberk"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Kilt"
+      },
+      {
+        "kind": "item",
+        "name": "Brineward Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Amice"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Trousers"
+      },
+      {
+        "kind": "item",
+        "name": "Hourbinder's Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Robes"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Emberlash Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Vestment"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Legwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Rimewarden Mitts"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Dreadquill Handwraps"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Cowl"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Robe"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Marrowbound Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Hood"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Robes"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Slagcrown Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Headdress"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Spaulders"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Vest"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Breeches"
+      },
+      {
+        "kind": "item",
+        "name": "Starwarden Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Helm"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Shoulderpads"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Tunic"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Legguards"
+      },
+      {
+        "kind": "item",
+        "name": "Bloodmane Grips"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Crown"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Mantle"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Vest"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Leggings"
+      },
+      {
+        "kind": "item",
+        "name": "Thistlebloom Gloves"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Verdict"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Oath"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Fang"
+      },
+      {
+        "kind": "item",
+        "name": "Vanguard's Warstaff"
       }
     ]
   }

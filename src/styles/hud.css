@@ -1691,6 +1691,9 @@
      takes no width or centring of its own (the cluster row owns the layout) and no
      extra zoom, so it scales with the player frame rather than drifting from it. */
   #pet-frame {
+    --uf-bar-height: var(--pet-frame-height, 15px);
+    --bar-h-res: var(--uf-bar-height);
+    width: calc(var(--pet-frame-width, var(--unit-frame-w)) * 0.8 * var(--player-frame-scale, 1));
     position: relative;
     top: auto;
     left: auto;
@@ -1712,7 +1715,7 @@
   }
   #pet-frame .uf-bars {
     flex: none;
-    width: 232px;
+    width: calc(var(--pet-frame-width, var(--unit-frame-w)) - 46px);
   }
   #pet-frame:hover {
     outline: 1px solid var(--gold-dim);
@@ -1829,6 +1832,206 @@
     z-index: 7;
     zoom: calc(0.74 * var(--target-frame-scale, 1));
     display: none;
+  }
+  #totarget-frame.hud-frame-detached {
+    position: absolute;
+    width: calc(var(--unit-frame-w) * 0.74 * var(--target-frame-scale, 1));
+    zoom: 1;
+    z-index: 21;
+  }
+  #totarget-frame.hud-frame-detached > :not(.mf-resize-grip, .tf-frame-label) {
+    zoom: calc(0.74 * var(--target-frame-scale, 1));
+  }
+  #totarget-frame.hud-frame-detached .uf-bars {
+    width: 232px;
+    margin-left: -14px;
+  }
+  #totarget-frame.tf-unlocked {
+    display: flex !important;
+  }
+  .hud-frame-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: var(--tracker-w);
+    pointer-events: none;
+  }
+  #focus-targets {
+    display: contents;
+  }
+  .focus-target-row {
+    position: absolute;
+    left: 24px;
+    width: var(--focus-frame-width, 240px);
+    --uf-bar-height: var(--focus-frame-height, 15px);
+    --bar-h-res: var(--uf-bar-height);
+    padding: 22px 4px 4px;
+    pointer-events: auto;
+  }
+  #focus-target-1 {
+    --focus-frame-width: var(--focus-target-1-width, 240px);
+    --focus-frame-height: var(--focus-target-1-height, 15px);
+    top: 360px;
+  }
+  #focus-target-2 {
+    --focus-frame-width: var(--focus-target-2-width, 240px);
+    --focus-frame-height: var(--focus-target-2-height, 15px);
+    top: 510px;
+  }
+  #focus-target-3 {
+    --focus-frame-width: var(--focus-target-3-width, 240px);
+    --focus-frame-height: var(--focus-target-3-height, 15px);
+    top: 660px;
+  }
+  @media (max-height: 820px) {
+    #focus-targets .focus-target-row:not(.hud-frame-detached) {
+      top: 110px;
+      width: calc((100% - 64px) / 3);
+      max-width: 240px;
+    }
+    #focus-target-2:not(.hud-frame-detached) {
+      left: calc(33.333% + 8px);
+    }
+    #focus-target-3:not(.hud-frame-detached) {
+      left: calc(66.666% - 8px);
+    }
+  }
+  .focus-target-row.focus-empty.focus-hide-empty:not(.tf-unlocked) {
+    display: none;
+  }
+  .focus-target-key {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    pointer-events: none;
+    font-size: 10px;
+    line-height: 14px;
+    min-height: 0;
+    padding: 0 3px;
+  }
+  .focus-target-reaction {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 11px;
+    line-height: 16px;
+    pointer-events: none;
+  }
+  .focus-target-row.focus-hostile {
+    border-color: var(--color-hostile);
+  }
+  .focus-target-row.focus-friendly {
+    border-color: var(--color-friendly);
+  }
+  .focus-hostile :is(.focus-target-reaction, .uf-name) {
+    color: var(--color-hostile);
+  }
+  .focus-friendly :is(.focus-target-reaction, .uf-name) {
+    color: var(--color-friendly);
+  }
+  .focus-target-hint {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+  }
+  .focus-target-row.focus-empty > .ui-x-btn {
+    display: none;
+  }
+  .focus-target-row.tf-unlocked.focus-empty {
+    display: block;
+  }
+  .focus-target-row.tf-unlocked {
+    min-height: 40px;
+    outline: 1px dashed var(--gold);
+  }
+  .focus-target-row > .ui-x-btn {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+  }
+  .focus-unit {
+    position: relative;
+    inset: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+  }
+  .focus-unit .uf-bars {
+    width: 100%;
+    margin: 0;
+    flex: 1;
+  }
+  .focus-unit:focus-visible,
+  .tf-unlocked:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .focus-unit .bar {
+    width: 100%;
+  }
+  body.mobile-touch #focus-targets {
+    position: absolute;
+    display: flex;
+    gap: 6px;
+    left: max(12px, env(safe-area-inset-left));
+    right: max(12px, env(safe-area-inset-right));
+    top: max(100px, env(safe-area-inset-top));
+    pointer-events: none;
+  }
+  body.mobile-touch #focus-targets .focus-target-row {
+    position: relative;
+    inset: auto;
+    flex: 1;
+    min-width: 0;
+    max-width: 180px;
+  }
+  body.mobile-touch .focus-target-row :is(.focus-assign, .ui-x-btn, .focus-unit) {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .hud-frame-group.hud-frame-detached {
+    position: absolute;
+  }
+  .hud-frame-group[hidden] {
+    display: none !important;
+  }
+  #aura-track-group {
+    position: absolute;
+    left: 24px;
+    top: 180px;
+    width: 236px;
+  }
+  body:not(.mobile-touch) #ui .hud-frame-group > .hud-group-member {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    transform: none;
+  }
+  .hud-frame-group.tf-unlocked {
+    min-height: 40px;
+    pointer-events: auto;
+    outline: 1px dashed var(--gold);
+    touch-action: none;
+  }
+  #ui .hud-frame-group.tf-unlocked > .hud-group-member:not(.tf-user-hidden) {
+    display: block !important;
+    min-height: 32px;
+  }
+  .hud-frame-group.tf-unlocked > .hud-group-member::before {
+    content: attr(data-group-label);
+    display: block;
+    color: var(--gold);
+    font-size: 12px;
+  }
+  body.mobile-touch .hud-frame-group {
+    display: contents;
   }
   /* Boss-ranked target: the boss chrome moves the move button further outside
      the corner (top: -18px; right: -30px, below) and the dragon emblem
@@ -1982,6 +2185,7 @@
   #reliquary-tracker.tf-unlocked,
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
+  #practice-tracker.tf-unlocked,
   .gathering-goal-panel.tf-unlocked,
   #swingbar-offhand.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
@@ -2002,6 +2206,7 @@
   #reliquary-tracker.tf-unlocked,
   #delve-tracker.tf-unlocked,
   #rift-tracker.tf-unlocked,
+  #practice-tracker.tf-unlocked,
   #paladin-devotion-frame.tf-unlocked,
   #proc-overlay.tf-unlocked,
   #talking-head.tf-unlocked {
@@ -2068,6 +2273,7 @@
   #reliquary-tracker.hud-frame-detached,
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
+  #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     position: absolute;
     margin: 0;
@@ -2081,6 +2287,7 @@
   #reliquary-tracker.hud-frame-detached,
   #delve-tracker.hud-frame-detached,
   #rift-tracker.hud-frame-detached,
+  #practice-tracker.hud-frame-detached,
   .gathering-goal-panel.hud-frame-detached {
     width: var(--tracker-w);
   }
@@ -2105,7 +2312,9 @@
   #swingbar-offhand .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
   #proc-overlay .tf-move-btn,
-  #meters-window .tf-move-btn {
+  #meters-window .tf-move-btn,
+  .hud-frame-group > .tf-move-btn,
+  .focus-target-row > .tf-move-btn {
     position: absolute;
     top: -10px;
     right: -10px;
@@ -2140,7 +2349,9 @@
   #paladin-devotion-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
   #proc-overlay .tf-move-btn:focus-visible,
-  #meters-window .tf-move-btn:focus-visible {
+  #meters-window .tf-move-btn:focus-visible,
+  .hud-frame-group > .tf-move-btn:focus-visible,
+  .focus-target-row > .tf-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
   }
@@ -2180,8 +2391,13 @@
     padding: 0;
     border: 0;
   }
-  .tf-unlocked > .mf-resize-grip {
+  .tf-unlocked > .mf-resize-grip,
+  .mf-always-resizable > .mf-resize-grip {
     display: block;
+  }
+  .mf-always-interactive {
+    cursor: var(--cursor-move, move);
+    touch-action: none;
   }
   /* While a frame is unlocked its grip is a primary affordance, not passive
      chrome: the full 24px target at raised opacity and the game-styled
@@ -2266,7 +2482,7 @@
      this, so it never suppresses live cast information. */
   body.interface-unlocked #castbar,
   body.interface-unlocked #swingbar,
-  body.interface-unlocked #swingbar-offhand {
+  body.interface-unlocked #swingbar-offhand.tf-unlocked {
     display: block !important;
     opacity: 0.55;
   }
@@ -2299,6 +2515,7 @@
   body.interface-unlocked #reliquary-tracker.tf-unlocked,
   body.interface-unlocked #delve-tracker.tf-unlocked,
   body.interface-unlocked #rift-tracker.tf-unlocked,
+  body.interface-unlocked #practice-tracker.tf-unlocked,
   body.interface-unlocked .gathering-goal-panel.tf-unlocked {
     display: block !important;
     opacity: 0.55;
@@ -2397,7 +2614,7 @@
      pointer-events, the target debuff strip) and each would otherwise stay
      clickable inside an "inert" frame. The frame's own chrome, the move button
      and the resize grip, is carved back out. */
-  body.interface-unlocked .tf-unlocked :not(.tf-move-btn):not(.mf-resize-grip) {
+  body.interface-unlocked .tf-unlocked :not(.tf-unlocked):not(.tf-move-btn):not(.mf-resize-grip) {
     pointer-events: none !important;
   }
   /* While unlocked each aura row keeps a graspable minimum box (the dashed
@@ -2583,6 +2800,38 @@
     top: calc(50% - 1px / var(--ui-scale, 1));
     height: calc(2px / var(--ui-scale, 1));
   }
+  .frame-context-menu {
+    position: absolute;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px;
+    max-width: calc(100% - 16px);
+    pointer-events: auto;
+  }
+  .frame-context-menu > button {
+    min-height: 32px;
+    text-align: start;
+  }
+  .interface-frame-options,
+  .interface-party-options {
+    margin-top: 12px;
+    padding: 8px;
+    border: 1px solid var(--color-border-default);
+  }
+  .interface-frame-options > summary,
+  .interface-party-options > summary {
+    cursor: pointer;
+    color: var(--gold);
+    padding: 8px;
+  }
+  .interface-frame-options > summary:focus-visible,
+  .interface-party-options > summary:focus-visible,
+  .frames-menu-sub > summary:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
   #interface-edit-controls {
     position: absolute;
     left: 50%;
@@ -2600,20 +2849,23 @@
   /* The dropdown beside the exit: a .panel anchored under the buttons, one
      checkbox row per live frame. [hidden] must be restated because the flex
      display above would otherwise defeat the attribute. */
-  #interface-frames-menu {
+  #interface-frames-menu,
+  #interface-visibility-menu {
     position: absolute;
     top: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
     min-width: 200px;
-    max-height: 60vh;
+    max-height: calc(var(--app-vh, 100vh) / var(--ui-scale, 1) - 110px);
+    max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 24px);
     overflow-y: auto;
     padding: 8px;
     display: flex;
     flex-direction: column;
     gap: 2px;
   }
-  #interface-frames-menu[hidden] {
+  #interface-frames-menu[hidden],
+  #interface-visibility-menu[hidden] {
     display: none;
   }
   .frames-menu-row {
@@ -2624,6 +2876,17 @@
     cursor: var(--cursor-point);
     white-space: nowrap;
     font-size: 13px;
+  }
+  #options-menu .frames-menu-row {
+    white-space: normal;
+    min-height: 40px;
+  }
+  #options-menu .frames-menu-select select {
+    min-height: 40px;
+  }
+  .interface-frame-options > summary,
+  .interface-party-options > summary {
+    min-height: 40px;
   }
   .frames-menu-row:hover {
     background: #ffffff14;
@@ -2709,7 +2972,8 @@
     user-select: none;
   }
   body.mobile-touch .tf-move-btn,
-  body.mobile-touch .tf-unlocked > .mf-resize-grip {
+  body.mobile-touch .tf-unlocked > .mf-resize-grip,
+  body.mobile-touch .mf-always-resizable > .mf-resize-grip {
     display: none;
   }
   .portrait-wrap {
@@ -4838,7 +5102,7 @@
     }
   }
   .action-btn:not(.empty)[draggable="true"] {
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
   }
   .action-btn.drop-target {
     border-color: var(--color-action-drop-target);
@@ -5075,6 +5339,9 @@
     padding: 8px 14px;
     text-align: center;
     z-index: 90;
+    cursor: var(--cursor-move, move);
+    touch-action: none;
+    user-select: none;
   }
   #actionbar-bind-banner .btn.ui-btn {
     all: revert-layer;
@@ -5211,7 +5478,7 @@
     bottom: 0;
     width: 24px;
     height: 24px;
-    cursor: nwse-resize;
+    cursor: var(--cursor-resize-nwse, nwse-resize);
     z-index: 3;
     opacity: 0.45;
     padding: 0;
@@ -6110,6 +6377,8 @@
     color: var(--gold);
     text-shadow: 1px 1px 2px var(--color-keyline);
     pointer-events: none;
+  }
+  #practice-tracker:has(> #practice-body:empty) {
     display: none;
   }
   #practice-tracker .pt-header {
@@ -6255,7 +6524,7 @@
   #meters-window {
     position: absolute;
     left: min(calc(100% + 8px), calc(var(--app-vw, 100vw) / var(--ui-scale, 1) / 2 + 66px));
-    bottom: 6px;
+    bottom: calc(var(--socket-size, 46px) + var(--socket-row-gap, 6px) + 32px);
     margin-bottom: 0;
   }
   #meters-window.hud-frame-detached {
@@ -6263,9 +6532,9 @@
     bottom: auto;
   }
   .mt-panel .panel-title {
-    height: 18px;
-    min-height: 18px;
-    padding: 0;
+    height: 32px;
+    min-height: 32px;
+    padding: 0 0 6px;
     margin-bottom: 4px;
   }
   .mt-panel :is(.ui-disc, .ui-x-btn) {
@@ -6296,12 +6565,14 @@
     overflow-y: auto;
     overflow-x: hidden;
   }
-  /* The title bar is the move handle. Buttons inside keep their own cursor and
+  /* The detached panel is the move handle. Buttons inside keep their own cursor and
      their own pointerdown (meters_frame.ts ignores a press that lands on one). */
+  .mt-panel.mt-move-handle,
   .mt-panel .mt-move-handle {
-    cursor: var(--cursor-point);
+    cursor: var(--cursor-move, move);
     touch-action: none;
   }
+  .mt-panel.mt-move-handle button,
   .mt-panel .mt-move-handle button {
     touch-action: auto;
   }
@@ -6316,7 +6587,7 @@
     bottom: 0;
     width: 16px;
     height: 16px;
-    cursor: nwse-resize;
+    cursor: var(--cursor-resize-nwse, nwse-resize);
     z-index: 3;
     opacity: 0.45;
     background: linear-gradient(
@@ -6339,6 +6610,7 @@
   body.mobile-touch .panel-resize-grip {
     display: none;
   }
+  body.mobile-touch .mt-panel.mt-move-handle,
   body.mobile-touch .mt-panel .mt-move-handle {
     cursor: default;
     touch-action: auto;
@@ -8117,7 +8389,7 @@
      touch-action:none keeps a touch-drag from panning/scrolling the page. */
   #perf-overlay.placing {
     pointer-events: auto;
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
     z-index: 96;
     touch-action: none;
     outline: 1px dashed var(--perf-fg);
@@ -8127,7 +8399,7 @@
       0 4px 22px #000b;
   }
   #perf-overlay.placing.dragging {
-    cursor: grabbing;
+    cursor: var(--cursor-grab, grabbing);
   }
   body.reduce-motion #perf-overlay {
     transition: none;
@@ -9497,12 +9769,12 @@
     width: 100%;
     height: 100%;
     opacity: 0;
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
     touch-action: pan-y;
     z-index: 2;
   }
   #raid-boss-guide-window .rbg-model-stage > canvas:active {
-    cursor: grabbing;
+    cursor: var(--cursor-grab, grabbing);
   }
   #raid-boss-guide-window .rbg-model-viewer[data-state="ready"] .rbg-model-poster {
     visibility: hidden;
@@ -11358,7 +11630,7 @@
     touch-action: none;
   }
   #aura-overlays.placement .aura-overlay-frame.placement-target.placement-icon .aura-overlay-icon {
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
   }
   #aura-overlays.placement
     .aura-overlay-frame.placement-target.placement-arcs
@@ -11367,7 +11639,7 @@
   }
   #aura-overlays.placement
     :is(.aura-overlay-arcs-shell, .aura-overlay-icon, .aura-overlay-move-handle).dragging {
-    cursor: grabbing;
+    cursor: var(--cursor-grab, grabbing);
     filter: brightness(1.25);
   }
   .aura-overlay-arc {
@@ -11541,6 +11813,75 @@
   @media (prefers-reduced-motion: reduce) {
     .aura-overlay-frame {
       transition: none;
+    }
+  }
+  /* Cooldown Manager (src/ui/hud/cooldown_manager/): floating groups (a single
+   button, a grid, a line) of non-clickable socket buttons for the spells the
+   player picks. The cold controller writes each group's placement vars and each
+   button's grid cell; the hot painter only toggles the socket state classes
+   (is-ready, is-on glow, is-proc transform) and visibility. */
+  #cooldown-manager {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: var(--app-vw, 100vw);
+    height: var(--app-vh, 100vh);
+    z-index: 30;
+    pointer-events: none;
+  }
+  #cooldown-manager.placement {
+    z-index: 34;
+  }
+  .cdm-group {
+    position: absolute;
+    left: var(--cdm-x, 50%);
+    top: var(--cdm-y, 50%);
+    display: grid;
+    grid-auto-columns: var(--socket-size);
+    grid-auto-rows: var(--socket-size);
+    gap: var(--cdm-gap, 4px);
+    translate: -50% -50%;
+    scale: var(--cdm-scale, 1);
+    opacity: var(--cdm-opacity, 1);
+    pointer-events: none;
+  }
+  .cdm-group.hide-timer .ui-socket-cd-text {
+    display: none;
+  }
+  #cooldown-manager.placement .cdm-group {
+    min-width: var(--socket-size);
+    min-height: var(--socket-size);
+    pointer-events: auto;
+    cursor: grab;
+    outline: 1px dashed var(--gold);
+    outline-offset: 6px;
+    touch-action: none;
+  }
+  #cooldown-manager.placement .cdm-group.dragging {
+    cursor: grabbing;
+  }
+  .cdm-btn {
+    flex: none;
+    opacity: var(--cdm-idle-opacity, 0.55);
+    transition: opacity 0.16s ease;
+  }
+  .cdm-btn.is-ready,
+  .cdm-btn.is-proc {
+    opacity: 1;
+  }
+  /* A transformed button (Gorebite armed as Redharvest) or a class proc pulses
+     with the action bar's own proc rim. Actionable: never tier-gated; only the
+     pulse stops under reduced motion, the steady glow stays. */
+  .cdm-btn.is-proc {
+    animation: abtn-proc-pulse 1.1s ease-in-out infinite alternate;
+  }
+  body.reduce-motion .cdm-btn {
+    transition: none;
+    animation: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cdm-btn {
+      transition: none;
+      animation: none;
     }
   }
   /* The login preview: for a few seconds after entering the world the whole
@@ -13294,6 +13635,7 @@
   body.interface-hidden #ui > :not(.visually-hidden),
   body.interface-hidden #nameplates,
   body.interface-hidden #aura-overlays,
+  body.interface-hidden #cooldown-manager,
   body.interface-hidden #discord-window,
   body.interface-hidden #discord-cta-banner,
   body.interface-hidden #mobile-controls,
@@ -13301,5 +13643,11 @@
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+  }
+}
+
+@layer components {
+  #chatlog-wrap.frame-user-hidden {
+    display: none !important;
   }
 }

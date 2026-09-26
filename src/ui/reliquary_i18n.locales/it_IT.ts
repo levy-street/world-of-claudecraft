@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Armeria di Guerra',
     desc: 'Gioielli e armi di Guerra acquistati con onore sudato.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galleria dell’Avanguardia',
+    desc: 'I set di specializzazione e le armi della stagione 2 di Guerra, acquistati con l’onore.',
+  },
   horizons_vault_of_ages: {
     name: 'Camera del Tesoro delle Ere',
     desc: "Tesori ritirati di un'epoca passata. Queste reliquie non si possono più conquistare; la camera rende onore ai veterani che le conservano.",

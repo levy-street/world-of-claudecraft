@@ -192,6 +192,22 @@ export const zh_TW: EnTranslations = {
       "lfgboard": {
         "label": "填入組隊公告板",
         "description": "建立預組隊公告情境。"
+      },
+      "hillwarn": {
+        "label": "山丘倒數",
+        "description": "立即通告一座山丘；完整的預警結束後它會升起。"
+      },
+      "hillnow": {
+        "label": "立即升起山丘",
+        "description": "立即升起一座山丘並站在上面。"
+      },
+      "hillrise": {
+        "label": "跳過山丘倒數",
+        "description": "讓已通告的山丘立即升起。"
+      },
+      "hillend": {
+        "label": "結束山丘",
+        "description": "讓目前的山丘立即消失。"
       }
     }
   },
@@ -331,6 +347,48 @@ export const zh_TW: EnTranslations = {
     }
   },
   "hudChrome": {
+    "framePresets": {
+      "apply": "套用",
+      "pickerLabel": "框架預設：{name}",
+      "overwrite": "覆寫預設",
+      "overwriteBody": "以目前配置取代已儲存的預設「{name}」？",
+      "current": "目前配置",
+      "new": "新增預設",
+      "empty": "沒有已儲存的預設",
+      "deleteNamed": "刪除 {name}",
+      "deleteBody": "刪除框架預設「{name}」？",
+      "title": "框架預設",
+      "name": "預設名稱",
+      "slot": "預設 {slot}",
+      "remove": "刪除",
+      "saved": "完成。",
+      "failed": "無法儲存或載入預設。"
+    },
+    "frameMenus": {
+      "hide": "隱藏框架",
+      "units": "單位框架",
+      "bars": "動作列",
+      "trackers": "追蹤器",
+      "auras": "光環",
+      "combat": "戰鬥顯示",
+      "other": "其他介面元素",
+      "options": "框架選項",
+      "allOptions": "所有框架選項",
+      "independentTarget": "將目標的目標鎖定到目標"
+    },
+    "focusTargets": {
+      "showEmpty": "顯示空的焦點框架",
+      "assignHint": "選擇一個目標。按 {key} 或點擊 {button}。",
+      "assignClickHint": "選擇一個目標。點擊 {button}。",
+      "ally": "盟友",
+      "enemy": "敵人",
+      "unset": "清除焦點",
+      "frame1": "焦點 1",
+      "frame2": "焦點 2",
+      "frame3": "焦點 3",
+      "assign": "設定焦點 {slot}",
+      "target": "選取焦點 {slot}"
+    },
     "professionTrainers": {
       "blacksmithing": "鍛造訓練師",
       "cooking": "烹飪訓練師",
@@ -1859,6 +1917,7 @@ export const zh_TW: EnTranslations = {
       "clickMoveLeft": "左鍵",
       "clickMoveRight": "右鍵",
       "version": "v{version}（{build}）",
+      "overlays": "疊加層",
       "browserEffects": "瀏覽器特效",
       "browserEffectsAuto": "自動",
       "browserEffectsFull": "完整",
@@ -1954,7 +2013,7 @@ export const zh_TW: EnTranslations = {
       "stopAutoAttackOnTargetSwitch": "切換目標時停止自動攻擊",
       "walkByAutoloot": "路過自動拾取",
       "groundReticle": "地面瞄準指示圈",
-      "mouseoverCast": "對隊伍框架滑鼠指向施法",
+      "mouseoverCast": "滑鼠懸停隊伍與焦點框架施法",
       "stickyTarget": "點擊地面時保留目標",
       "showItemLevel": "顯示物品等級",
       "showReliquaryTracker": "顯示聖物庫追蹤器",
@@ -2300,6 +2359,80 @@ export const zh_TW: EnTranslations = {
         }
       }
     },
+    "cooldownManager": {
+      "title": "冷卻管理器",
+      "intro": "為你選擇的法術顯示浮動按鈕。按鈕無法點擊：每個按鈕會顯示冷卻時間，無法施放時變暗，就緒時亮起。",
+      "generalTitle": "一般",
+      "enabled": "顯示冷卻管理器",
+      "idleOpacity": "未就緒時的不透明度",
+      "combatOnly": "僅在戰鬥中播放聲音",
+      "dragHint": "此選單開啟時，所有群組都會顯示在畫面上，你可以拖曳它們來移動位置。",
+      "addSingle": "新增單一按鈕",
+      "addGrid": "新增按鈕群組",
+      "addLine": "新增法術列",
+      "groupsFull": "群組數量已達上限。刪除一個群組後才能新增。",
+      "noGroups": "新增一個單一按鈕、一組按鈕或一條法術列來開始。",
+      "groupSingle": "單一按鈕 {index}",
+      "groupGrid": "按鈕群組 {index}",
+      "groupLine": "法術列 {index}",
+      "groupName": "群組名稱",
+      "spellCount": "{count} / {max} 個法術",
+      "orientation": "方向",
+      "horizontal": "水平",
+      "vertical": "垂直",
+      "columns": "欄數",
+      "rows": "列數",
+      "direction": "圖示方向",
+      "dirRight": "向右",
+      "dirLeft": "向左",
+      "dirDown": "向下",
+      "dirUp": "向上",
+      "iconSize": "圖示大小",
+      "iconPadding": "圖示間距",
+      "opacity": "不透明度",
+      "visibility": "可見性",
+      "visAlways": "永遠顯示",
+      "visCombat": "戰鬥中",
+      "visHidden": "隱藏",
+      "visHiddenHint": "隱藏的群組仍會播放聲音並點亮你的快捷列。",
+      "showTimer": "顯示計時",
+      "positionX": "水平位置",
+      "positionY": "垂直位置",
+      "resetPosition": "重設為預設位置",
+      "deleteGroup": "刪除群組",
+      "deleteGroupAria": "刪除{group}",
+      "trackedTitle": "追蹤的法術",
+      "trackedHint": "將法術拖到群組上，或選取它來選擇群組和提醒。當法術變成另一個法術時，按鈕會隨之改變並亮起。",
+      "search": "搜尋法術",
+      "searchPlaceholder": "搜尋",
+      "notDisplayed": "不顯示",
+      "otherSpells": "其他法術",
+      "otherSpellsHint": "來自你的其他專精、天賦選擇和更高等級的法術。現在放置一個，當你學會它時，它的按鈕就會出現。",
+      "notKnown": "{spell}（尚未學會）",
+      "aurasTitle": "觸發、引擎與增益",
+      "aurasHint": "引擎資源及其層數、觸發效果，以及你的法術施加在你身上的增益。其他曾出現在你身上的效果也會顯示在這裡。",
+      "auraFallback": "光環",
+      "onlyWhileActive": "僅在生效時顯示",
+      "alertStacks": "層數提醒",
+      "alertStacksAny": "獲得時",
+      "alertStacksHint": "光環達到此層數時，按鈕會亮起、閃爍並發出提示音。「獲得時」表示一出現就提醒。",
+      "auraSoundHint": "光環出現時，或達到你設定的層數時播放。",
+      "emptySection": "把法術拖到這裡。",
+      "spellsEmpty": "你還不會任何法術。",
+      "selectSpell": "選取{spell}",
+      "group": "群組",
+      "groupFullOption": "{group}（已滿）",
+      "notInGroupHint": "將此法術放入群組以顯示它的按鈕。",
+      "moveEarlier": "將{spell}前移",
+      "moveLater": "將{spell}後移",
+      "glowWhenReady": "就緒時亮起",
+      "glowWhenReadyHint": "法術可以施放時，按鈕會變亮並顯示外框。",
+      "hotbarGlow": "快捷列高亮",
+      "hotbarGlowHint": "法術就緒時，同時點亮它在快捷列上的按鈕。",
+      "onlyWhenReady": "僅在就緒時顯示",
+      "sound": "就緒音效",
+      "soundHint": "法術就緒時，或按鈕在就緒狀態下變成另一個法術時播放。"
+    },
     "auraOverlay": {
       "title": "光環",
       "currentClass": "目前職業：{class}",
@@ -2423,19 +2556,80 @@ export const zh_TW: EnTranslations = {
         "battlegroundFirstWin": "荊谷原野每日首勝",
         "battlegroundComplete": "荊谷原野參戰",
         "battlegroundKill": "榮譽擊殺",
-        "battlegroundAssist": "助攻擊殺"
+        "battlegroundAssist": "助攻擊殺",
+        "worldKill": "世界擊殺",
+        "worldAssist": "世界擊殺助攻",
+        "hillHold": "佔據山丘"
       },
       "floatReasons": {
         "kill": "擊殺",
         "assist": "助攻",
-        "firstWin": "首勝"
+        "firstWin": "首勝",
+        "hill": "山丘"
       }
+    },
+    "worldPvp": {
+      "tab": "世界 PvP",
+      "title": "世界 PvP",
+      "blurb": "升起你的 PvP 旗幟，即可在開放世界的任何地方與其他已開啟旗幟的玩家作戰。擊敗對方即可分得其錢袋的一部分，並獲得用於兌換 PvP 裝備的榮譽。戰場與競技場的收益仍然更高。",
+      "statusOn": "你的 PvP 旗幟已升起。已開啟旗幟的玩家可以攻擊你。",
+      "statusOff": "你的 PvP 旗幟已降下。你在開放世界中無法攻擊他人，也不會被攻擊。",
+      "statusOffFfa": "你的 PvP 旗幟已降下，但在自由混戰地帶你仍然可以攻擊他人，也會被攻擊。",
+      "statusDisarming": "你的旗幟將在 {time} 後降下，或在目前戰鬥結束時降下。",
+      "zoneSanctuary": "聖域：此處沒有世界 PvP。",
+      "zoneContested": "爭奪地帶：此處只有已開啟旗幟的玩家才能交戰。",
+      "zoneFfa": "自由混戰地帶：此處的每個人都可以被攻擊。",
+      "realmDisabled": "本伺服器已關閉世界 PvP。",
+      "groundSanctuary": "試煉之濱與東溪谷是聖域：完全沒有世界 PvP。",
+      "groundContested": "其餘各處都是爭奪地帶：只有兩名都已開啟旗幟的玩家才能交戰。",
+      "groundFfa": "龍裔荒原、霜幕之境與琥珀秋境是自由混戰地帶：無論是否開啟旗幟，那裡的每個人都能交戰。",
+      "groupLine": "隊伍和團隊成員之間永遠不會互相敵對。隊伍之外的公會成員之間可以交戰。",
+      "markLine": "在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟；攻擊已開啟旗幟的玩家則永遠不會。",
+      "aidLine": "在世界戰鬥中為已開啟旗幟的玩家治療、護盾或增益，會升起你的旗幟。",
+      "stakeLine": "敗者支付 {cap} 或錢袋的 {percent}，以較少者為準。",
+      "noStakeLine": "未開啟旗幟的玩家在自由混戰地帶被擊殺時不會損失金幣。",
+      "noTakeLine": "未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移。",
+      "honorLine": "每次擊殺 {honor} 點榮譽，由所有參與者平分。",
+      "splitLine": "乾淨的 1v1 可獨得全部獎勵；協助者及其治療者共同分享。",
+      "repeatLine": "反覆擊殺同一名玩家，收益為 {second}，隨後為 {third}，之後歸零；計數在首次擊殺後 {reset} 重置。",
+      "greyLine": "比你低 {levels} 級以上的玩家不會帶來任何收益。",
+      "disarmLine": "關閉需要 {minutes} 分鐘，並會等到戰鬥結束。",
+      "record": "戰績：{kills} 次擊殺，{deaths} 次死亡",
+      "enable": "開啟世界 PvP",
+      "disable": "關閉世界 PvP",
+      "keepUp": "保持旗幟",
+      "confirmBody": "其他已開啟旗幟的玩家將可以在任何地方攻擊你，並在獲勝時從你的錢袋中最多拿走 {cap}。你可以再次關閉，但需要 {minutes} 分鐘。",
+      "confirmAccept": "升起旗幟",
+      "confirmCancel": "取消",
+      "levelReq": "需要 {level} 級。",
+      "pending": "正在等待伺服器回傳你的 PvP 狀態。",
+      "commandHint": "聊天：/pvp 切換旗幟，/pvp on 與 /pvp off 直接設定。"
+    },
+    "hill": {
+      "title": "山丘之王",
+      "rising": "山丘尚未升起",
+      "heldYou": "你的隊伍佔據著山丘",
+      "heldOther": "另一支隊伍佔據著山丘",
+      "heldNone": "無人佔據山丘",
+      "counts": "圈內：你方 {yours}，佔據方 {theirs}",
+      "countsUnheld": "圈內：你方 {yours}，最大對手 {theirs}",
+      "countsHolding": "圈內：你方 {yours}，對手 {theirs}",
+      "contestYou": "正在奪取山丘：{total} 中的 {seconds}",
+      "contestOther": "正在失去山丘：{total} 中的 {seconds}",
+      "contestNone": "在圈內保持人數優勢 {total} 即可奪取",
+      "inside": "你在圈內",
+      "distance": "距離圓圈 {yards} 碼",
+      "rises": "{minutes} 後升起",
+      "falls": "{minutes} 後消失",
+      "standingRaid": "團隊成員不計入人數：只有隊伍才能佔據山丘"
     },
     "warfareShop": {
       "gossipOption": "瀏覽戰爭套裝",
       "gossipOptionAria": "瀏覽 {name} 提供的戰爭套裝商店",
       "jewelry": "飾品",
       "weapons": "武器",
+      "groupSeason2": "戰爭第二賽季：先鋒",
+      "groupEntry": "戰爭第一賽季",
       "owned": "已擁有",
       "buyAria": "以 {honor} 購買 {item}",
       "buyOwnedAria": "以 {honor} 購買 {item}，已擁有",
@@ -2580,7 +2774,8 @@ export const zh_TW: EnTranslations = {
         "hasteRating": "來自裝備和套裝加成的急速等級，加快你的攻擊和施法速度。約每10點等級提供1%急速。",
         "parry": "你招架正面近戰攻擊、完全不受傷害的機率。來自背後的攻擊無法招架。",
         "hitRating": "來自裝備和套裝獎勵的命中等級，降低你的攻擊被閃避和法術被抵抗的機率，對更高等級的敵人尤其有效。約每10點等級提供1%命中。",
-        "warfare": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。"
+        "warfare": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。",
+        "warfareWithHealth": "對玩家造成的傷害提高 {increase}%，受到玩家造成的傷害降低 {reduction}%。此外，在地城、團隊副本、秘探和裂隙以外的所有地方，最大生命值提高 {health}%。"
       },
       "effects": {
         "attackPower": "+{value} 攻擊強度",
@@ -3737,6 +3932,7 @@ export const zh_TW: EnTranslations = {
       "mobLevel": "{level}",
       "mobEliteLevel": "{level}+",
       "afkTag": "暫離",
+      "pvpTag": "PvP",
       "cheaterTag": "< 作弊者 >",
       "pledgeTag": "{guild}的宣誓者",
       "npcRoleTag": "<{role}>",
@@ -3815,6 +4011,8 @@ export const zh_TW: EnTranslations = {
       "label": "重置框體位置"
     },
     "interfaceUnlock": {
+      "combineTrackers": "合併追蹤框架",
+      "combineAuras": "合併光環框架",
       "label": "編輯框體",
       "unlock": "解鎖介面",
       "lock": "鎖定介面",
@@ -3825,6 +4023,8 @@ export const zh_TW: EnTranslations = {
       "lockFrame": "鎖定此框體",
       "resizeFrame": "調整此框體大小",
       "frameNames": {
+        "trackerGroup": "任務追蹤器",
+        "auraGroup": "光環與目標效果",
         "actionBar1": "動作條",
         "actionBar2": "動作條 2",
         "actionBar3": "動作條 3",
@@ -6473,6 +6673,7 @@ export const zh_TW: EnTranslations = {
       "talents": "天賦",
       "arena": "競技場與PvP",
       "thornhollow": "荊谷原野",
+      "worldPvp": "世界 PvP",
       "deeds": "功績之書",
       "reliquary": "聖物庫",
       "glossary": "詞彙表",
@@ -6909,6 +7110,7 @@ export const zh_TW: EnTranslations = {
       "framesMoveBodyEditFrames": "你自己的框架、目標框架與隊伍框架全都可以移動。每個框架的角落都帶著一顆小小的移動按鈕：解除鎖定，把框架拖到你要的位置，再重新鎖上，這樣一次失手的點擊就無法把它挪走。「介面」選項中「頭像框」分頁最上方的「編輯框體」，則會一口氣鬆開其餘的整個介面，連同這三個框架一起：動作列、施法條、揮擊條、經驗條、小地圖、按鈕列、寵物框架、姿態列、增益與減益列，以及「願望清單提醒」小標籤，每一個在鬆開期間都掛著一枚名稱標籤。萬一它們跑到你會後悔的地方，同一個「頭像框」分頁底部的「恢復預設」會把它們全部彈回原本的位置。",
       "framesGovernedExtra": "「編輯框體」也會一併鬆開下方那疊追蹤面板(你追蹤中的任務與它們的目標、你的功績進度、你的聖物庫頁面、你從製作中釘選的配方、你所在的秘探、你正參與的任何裂隙，以及你正在追蹤的配方或委託)、寵物框架旁的寵物動作列、顯示你對附近敵人所施減益的「目標減益」框架、聖騎士的「虔誠」勳章、術士的「痛苦資源條」、法術觸發浮層、雙持武器時的副手揮擊條，以及附分頁的傷害統計視窗，每一個在鬆開期間都掛著一枚名稱標籤。",
       "framesGovernedAuraTracks": "「編輯框體」也會鬆開六條可選的光環軌道，前提是你已在同一「介面」選項的「戰鬥」分頁中開啟它們：「我的增益」軌道、「防禦性冷卻」軌道、「我的護盾」軌道、「攻擊性冷卻」軌道、「移動與潛行」軌道，以及「我給隊友的增益」軌道。所有軌道預設關閉，每一條在鬆開期間都掛著一枚名稱標籤。",
+      "frameGroups": "{trackers}可合併任務、功績、裂隙、地下探索、採集目標及聖物匣追蹤。{auras}可合併目標持續傷害與六種光環追蹤。在框架設定中分別啟用合併，關閉後可個別移動。{tot}具有資源條。{focus}的三個目標可獨立移動：Shift+F1至F3設定，Ctrl+F1至F3選取。傷害與威脅統計即使在框架鎖定時，也可拖曳按鈕以外的區域移動，拖曳邊緣調整大小。解鎖後，獨立的框架顯示選單依群組控制顯示。右鍵點擊框架可重設大小或開啟相關設定。介面中的框架頁也包含共用設定及可摺疊的隊伍設定。關閉「將目標的目標鎖定至目標」即可獨立移動，重新啟用仍會保留獨立位置。設定焦點後，設定按鈕與說明會隱藏。右鍵選擇「清除焦點」可恢復預設狀態。滑鼠懸停施法同樣適用於焦點框架。",
       "framesGovernedTalkingHead": "「編輯框體」也會解鎖對話面板：當某個 NPC 不在你的視野內時，它承載該 NPC 說出的台詞；處於解鎖狀態時它會顯示自己的名稱標籤。",
       "barsTitle": "各種條、計時與戰鬥文字",
       "barsBody": "你的施法條會在你施法或引導時出現在畫面中央、動作列的正上方，上頭帶著法術的名稱與剩餘時間。你的目標在自己的框架上也有一條施法條，讓你看清接下來要來的是什麼，並做出回應。\n\n施法條下方還有一條細細的揮擊條，會在兩次武器揮擊之間逐漸填滿，讓近戰或遠程攻擊者看出下一次自動攻擊何時落下。\n\n你的經驗條橫貫動作列下方的整個寬度，切分成一段一段，其中較亮的一段顯示你已經存下的充分休息經驗。\n\n潛到水面下時，畫面上方會出現一條藍色的呼吸條。頭部沒入水中時它會逐漸消耗，耗盡並開始溺水時會閃成紅色，而你一浮出水面便會迅速回滿。空白鍵讓你往上游，下潛鍵（預設是 Ctrl）則帶你潛得更深。\n\n傷害與治療會化作小小的數字，從它們落下之處往上浮起，讓你不必讀文字也能看懂一場戰鬥。聊天框中的「戰鬥」分頁則保留完整的文字紀錄。",
@@ -7020,6 +7222,8 @@ export const zh_TW: EnTranslations = {
       "completed": "你已經繳交的任務，依你完成的先後順序排列。",
       "session": "你自登入以來做了什麼：擊殺、死亡、傷害與經驗。",
       "arena": "你在灰燼鬥獸場兩個級別中的成績：一對一與二對二的評分、勝場、敗場與勝率。",
+      "pvp": "世界 PvP 旗幟：/pvp 切換，/pvp on 與 /pvp off 直接設定。已開啟旗幟的玩家可以在任何地方互相作戰；關閉需要 5 分鐘。",
+      "pvpZones": "世界 PvP 旗幟：/pvp 切換，/pvp on 與 /pvp off 直接設定。已開啟旗幟的玩家可以在爭奪地帶互相作戰，聖域完全不允許世界戰鬥，而自由混戰地帶無論是否開啟旗幟都允許作戰；關閉需要 5 分鐘。",
       "listings": "你自己在世界市場上的上架商品，附上開價、各自剩餘的時間，以及你還有多少上架空間。",
       "buyback": "你近期賣給商人、目前仍能買回的東西。",
       "groupState": "你此刻的狀態",
@@ -7780,7 +7984,30 @@ export const zh_TW: EnTranslations = {
       "warfareBody": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備打起地城首領來一文不值。",
       "warfareBodyStatsStay": "每一件戰爭裝備都帶有戰爭攻擊等級與戰爭防禦等級，而這兩項數值對怪物完全沒有作用。它們只在你與其他玩家交手時生效，無論是決鬥、競技場，還是戰場：攻擊等級會增加你造成的傷害，防禦等級則削減你承受的傷害，兩者各有自己的上限。每個護甲系列同時也是一套套裝，而它的套裝效果同樣是戰爭等級，或是只對玩家生效的效果，因此一身榮譽裝備的套裝效果打起地城首領來一文不值。裝備本身仍帶有一般的屬性、護甲值與武器傷害，而這些在任何地方都有效；面對怪物時沉寂下來的，是戰爭等級與套裝效果。",
       "warfareTradeBody": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它所帶來的一切都只花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
-      "warfareTradeBodyRatingSpent": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。"
+      "warfareTradeBodyRatingSpent": "這正是刻意設下的取捨。戰爭套裝是為了與玩家作戰而打造的，並不是繞過地城品級的捷徑：同一個部位的戰爭裝備，永遠不會帶有地城史詩裝的那些戰鬥屬性，而它轉而帶有的戰爭等級與套裝效果，則全都花在其他玩家身上。若你想在競技場裡站得住腳，就去買它。若你想更快清完英雄地城，那就到地城裡去掙你的裝備。",
+      "vanguardHeading": "先鋒裝備：戰爭第二賽季",
+      "vanguardBody": "先鋒裝備是戰爭裝備的第二賽季，由同樣的兩位軍需官販售，陳列在原有裝備之上，原有裝備也繼續販售。每個專精都有自己的一套五件先鋒套裝，包括頭部、肩部、胸部、腿部和手部，商店只會列出你的職業能穿的三套，以及你能使用的先鋒武器。先鋒裝備帶有與原有裝備相同的戰爭等級，但物品等級更高；每套都有兩件和四件兩檔獎勵，會改變你專精的一個技能。與原有套裝不同，這些獎勵在任何地方都生效，對怪物也一樣，但它們是為對抗玩家而設計的，所以在團隊副本裡，團隊套裝仍是更好的選擇。"
+    },
+    "worldPvpPage": {
+      "heading": "世界 PvP",
+      "intro": "開放世界的玩家對戰需要主動開啟。升起你的 PvP 旗幟後，所有不在你的隊伍、團隊或公會中且同樣開啟了旗幟的玩家都會在開放世界的任何地方成為敵人；降下旗幟後，稍作等待你就會重新成為旁觀者。沒有升起旗幟的人既不能攻擊別人，也不會被攻擊。",
+      "flagHeading": "升起與降下旗幟",
+      "flagBody": "在聊天中輸入 /pvp，或按 G 開啟 PvP 視窗並使用世界 PvP 分頁，那裡還會顯示你的戰績和賭注。度過起始等級後，升起旗幟是即時的。降下旗幟會開始幾分鐘的倒數，而且在你仍在戰鬥時旗幟不會降下，所以關閉永遠不是逃離你挑起的戰鬥的手段。治療正在戰鬥的已開啟旗幟的玩家會升起你自己的旗幟。",
+      "stakesHeading": "一次擊殺的價值",
+      "stakesBody": "當已開啟旗幟的玩家擊敗另一名已開啟旗幟的玩家時，敗者會支付錢袋中一小部分金幣（有一個不高的上限），而勝者獲得用於兌換 PvP 裝備的榮譽。所有出過力的人共同分享這兩者：最後一擊者、不久前對目標造成過傷害的人，以及讓這些戰士站穩腳跟的治療者。乾淨的一對一可獨得全部獎勵；團隊則平分。",
+      "limitsHeading": "公平規則",
+      "limitsBody": "反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，計數會隨每日重置而重置。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。",
+      "introZones": "開放世界的玩家對戰需要主動開啟，而你腳下的土地決定了這意味著什麼。升起你的 PvP 旗幟後，所有不在你的隊伍或團隊中且同樣開啟了旗幟的玩家都會在爭奪地帶成為敵人；降下旗幟後，稍作等待你就會重新成為旁觀者。有兩座區域是完全不會發生世界戰鬥的聖域，而最北端的三座區域是自由混戰地帶，無論是否開啟旗幟，身處其中的每個人都可以被攻擊。隊伍和團隊的夥伴在任何地方都不會成為你的敵人；隊伍之外的公會成員與其他人一樣可以被攻擊。",
+      "zonesHeading": "世界 PvP 發生在哪裡",
+      "zonesBody": "世界上的土地分為三種。試煉之濱與東溪谷是聖域：無論是否開啟旗幟，那裡都完全不會發生世界 PvP，所以新角色絕不會在弄清旗幟是什麼之前就被人挑戰。世界的大部分是爭奪地帶，上面那條旗幟規則就是全部。龍裔荒原、霜幕之境與琥珀秋境是自由混戰地帶：站在其中的每個人都可以攻擊站在其中的其他任何人，無論是否開啟旗幟，而且你跨入時會收到提示，離開時同樣會。在那裡攻擊未開啟旗幟的玩家會升起你自己的旗幟，所以挑起戰鬥的一方始終承擔風險。攻擊已經開啟旗幟的玩家則永遠不會升起你的旗幟，這意味著自衛，或是保護未開啟旗幟的人，都不會讓你付出任何代價。",
+      "flagBodyAid": "在聊天中輸入 /pvp，或按 G 開啟 PvP 視窗並使用世界 PvP 分頁，那裡還會顯示你的戰績和賭注。度過起始等級後，升起旗幟是即時的。降下旗幟會開始幾分鐘的倒數，而且在你仍在戰鬥時旗幟不會降下，所以關閉永遠不是逃離你挑起的戰鬥的手段。為正在戰鬥的已開啟旗幟的玩家治療、護盾或增益，同樣會升起你自己的旗幟，所以沒有人能不掛旗幟就在背後支撐一名戰鬥者；而援助未開啟旗幟的玩家不會升起任何旗幟。",
+      "stakesUnflaggedTake": "未開啟旗幟的戰鬥者同樣拿不到金幣：金幣只在兩名開啟旗幟的玩家之間轉移，但所有出過力的人仍能獲得榮譽。",
+      "stakesBodyFlagged": "當一名已開啟旗幟的玩家被另一名玩家擊敗時，敗者會支付錢袋中一小部分金幣（有一個不高的上限），而勝者獲得用於兌換 PvP 裝備的榮譽。未開啟旗幟的玩家則完全不必支付金幣，即便是在自由混戰區域中倒下也一樣。所有出過力的人共同分享這兩者：最後一擊者、不久前對目標造成過傷害的人，以及讓這些戰士站穩腳跟的治療者。乾淨的一對一可獨得全部獎勵；團隊則平分。",
+      "hillHeading": "山丘之王",
+      "hillBody": "每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得少量榮譽，因此一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽略少於一場戰場勝利。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。",
+      "limitsBodyHour": "反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。",
+      "hillBodyRamp": "每三小時，會在無法預料的時刻向全伺服器發出通告：十五分鐘後，某個自由混戰地帶將升起一座山丘，它所在的圓圈會預先在開闊地上標出。山丘升起後會屹立四十五分鐘，然後消失。圈內站著玩家最多的隊伍爭奪這座山丘，連續保持人數優勢一分鐘後，山丘便歸他們所有；單獨一人算作一支一人隊伍，但團隊成員完全不計入人數。一支隊伍佔據山丘期間，站在圈內的每名成員每分鐘都會獲得榮譽，同一支隊伍佔據得越久，每分鐘獲得的榮譽就越多。一支滿員隊伍在山丘屹立的全程不受爭奪地佔據它，所獲榮譽約相當於三場戰場勝利。山丘易手時，新的佔據者從頭開始累積。場地上方的橫條會顯示誰在佔據、你方與對方的人數以及爭奪計時；在聊天中輸入 /hill 可以得知它的位置。",
+      "limitsBodyRaids": "反覆擊敗同一名玩家，每次的收益都會減少並很快歸零，而你對那名玩家的計數要在首次擊殺約一小時之後才會重新開始，所以蹲守同一個目標永遠不值得等待。遠低於你等級的目標不會帶來任何收益。在戰場和競技場內部適用它們自己的規則，而且它們提供的榮譽比開放世界更多，因此世界 PvP 是通往同一位商人的較慢道路。團隊無法從世界擊殺中獲得任何收益：團隊成員既得不到榮譽也得不到金幣，也不會減少其他人的份額，所以想獲得報酬就以隊伍身分作戰。"
     },
     "thornhollowPage": {
       "heading": "荊谷原野",
@@ -8607,7 +8834,8 @@ export const zh_TW: EnTranslations = {
       "parryTitle": "招架",
       "parryBody": "招架是戰士自有的防禦：一個把近戰攻擊完全格開、不受任何傷害的機率，而且它會隨力量成長。只有從你正面襲來的攻擊才能被招架，這也是你該持續面對正在打你的東西的又一個理由。其他職業在角色面板上看到的這一列會停在零。",
       "warfareTitle": "戰爭",
-      "warfareBody": "戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。"
+      "warfareBody": "戰爭是唯一一項只對其他玩家生效的屬性：它提高你對他們造成的傷害，並降低你從他們身上承受的傷害，而你的角色面板會把這兩半顯示在同一行上。面對生物時，它完全沒有作用。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。",
+      "warfareBodyPets": "戰爭是榮譽裝備為對抗玩家而帶有的屬性。在玩家之間的戰鬥中，它提高你和你的寵物對其他玩家及其寵物造成的傷害，並降低你和你的寵物從他們身上承受的傷害。它還會在地城、團隊副本、秘探和裂隙以外的所有地方提高你的最大生命值，因此穿著榮譽裝備的玩家遠比沒有穿的玩家難以擊殺。你的角色面板會把這一切顯示在同一行上。它來自你用榮譽購買的戰爭裝備，因此它是投入 PvP 的回報，而不是升級途中該去追逐的東西。"
     },
     "progression": {
       "intro": "每一場戰鬥、每一個任務、每一步北行，都會讓你的英雄更為強大。以下說明升級如何運作，以及當你登上巔峰之後，是什麼讓你持續成長。",
@@ -12929,6 +13157,18 @@ export const zh_TW: EnTranslations = {
         "name": "雷霆蓄能",
         "description": "被動：奧術閃電與天穹連鎖會獲得雷霆，最多5層。達到5層時，大地震擊造成的傷害提高125%，或裂地震波造成的傷害提高100%，隨後消耗全部雷霆。（雷霆召喚）"
       },
+      "lightning_overload": {
+        "name": "電弧超載",
+        "description": "被動：電弧箭與叉狀閃電有20%的機率超載，對其第一個目標再次造成所造成傷害的50%，並獲得1層雷霆。（雷霆召喚）"
+      },
+      "lava_burst": {
+        "name": "熔岩爆裂",
+        "description": "造成{damage}點火焰傷害。對身上帶有你的燼焰震擊燃燒效果的目標必定造成致命一擊。熔岩湧動：燼焰震擊每次跳動有20%的機率重置此技能的冷卻時間，並使你在10秒內的下一次熔岩爆裂變為瞬發。傷害隨法術強度提高。（雷霆召喚）"
+      },
+      "thunderstorm": {
+        "name": "風暴破擊",
+        "description": "召喚一聲霹靂，對10公尺內的敵人造成{damage}點自然傷害，並使其移動速度降低50%，持續5秒。恢復你最大法力值的8%。傷害隨法術強度提高。（雷霆召喚）"
+      },
       "rockbiter_weapon": {
         "name": "縛石武器",
         "description": "為你的武器附魔 30 分鐘。每次揮擊額外造成 {damage} 點傷害。強化還會獲得 40% 護甲和 20% 耐力，受到的傷害降低 15%，免疫生物的致命一擊，並產生 2.75 倍的威脅。大地震擊迫使其目標攻擊你 3 秒，而雷霆守護則給予 3 秒 10% 的傷害減免。"
@@ -16826,6 +17066,423 @@ export const zh_TW: EnTranslations = {
       },
       "stormhymn_chain_treads": {
         "name": "風暴頌歌鏈甲之靴"
+      },
+      "vanguard_warrior_arms_helmet": {
+        "name": "刃痕巨盔"
+      },
+      "vanguard_warrior_arms_shoulder": {
+        "name": "刃痕肩甲"
+      },
+      "vanguard_warrior_arms_chest": {
+        "name": "刃痕鎖甲衫"
+      },
+      "vanguard_warrior_arms_legs": {
+        "name": "刃痕板腿甲"
+      },
+      "vanguard_warrior_arms_gloves": {
+        "name": "刃痕碎擊護手"
+      },
+      "vanguard_warrior_fury_helmet": {
+        "name": "血征面甲"
+      },
+      "vanguard_warrior_fury_shoulder": {
+        "name": "血征護肩"
+      },
+      "vanguard_warrior_fury_chest": {
+        "name": "血征鏈甲"
+      },
+      "vanguard_warrior_fury_legs": {
+        "name": "血征護腿"
+      },
+      "vanguard_warrior_fury_gloves": {
+        "name": "血征握套"
+      },
+      "vanguard_warrior_prot_helmet": {
+        "name": "鐵征頭盔"
+      },
+      "vanguard_warrior_prot_shoulder": {
+        "name": "鐵征肩鎧"
+      },
+      "vanguard_warrior_prot_chest": {
+        "name": "鐵征護胸"
+      },
+      "vanguard_warrior_prot_legs": {
+        "name": "鐵征腿甲"
+      },
+      "vanguard_warrior_prot_gloves": {
+        "name": "鐵征護手甲"
+      },
+      "vanguard_paladin_holy_helmet": {
+        "name": "日守頭環"
+      },
+      "vanguard_paladin_holy_shoulder": {
+        "name": "日守肩篷"
+      },
+      "vanguard_paladin_holy_chest": {
+        "name": "日守鎖甲衫"
+      },
+      "vanguard_paladin_holy_legs": {
+        "name": "日守鏈腿甲"
+      },
+      "vanguard_paladin_holy_gloves": {
+        "name": "日守手套"
+      },
+      "vanguard_paladin_protection_helmet": {
+        "name": "盾誓頭盔"
+      },
+      "vanguard_paladin_protection_shoulder": {
+        "name": "盾誓肩甲"
+      },
+      "vanguard_paladin_protection_chest": {
+        "name": "盾誓胸甲"
+      },
+      "vanguard_paladin_protection_legs": {
+        "name": "盾誓板腿甲"
+      },
+      "vanguard_paladin_protection_gloves": {
+        "name": "盾誓護手"
+      },
+      "vanguard_paladin_retribution_helmet": {
+        "name": "光印冠冕"
+      },
+      "vanguard_paladin_retribution_shoulder": {
+        "name": "光印肩鎧"
+      },
+      "vanguard_paladin_retribution_chest": {
+        "name": "光印胸鎧"
+      },
+      "vanguard_paladin_retribution_legs": {
+        "name": "光印腿甲"
+      },
+      "vanguard_paladin_retribution_gloves": {
+        "name": "光印護手"
+      },
+      "vanguard_hunter_beast_mastery_helmet": {
+        "name": "群守頭巾"
+      },
+      "vanguard_hunter_beast_mastery_shoulder": {
+        "name": "群守肩鎧"
+      },
+      "vanguard_hunter_beast_mastery_chest": {
+        "name": "群守短皮衣"
+      },
+      "vanguard_hunter_beast_mastery_legs": {
+        "name": "群守腿甲"
+      },
+      "vanguard_hunter_beast_mastery_gloves": {
+        "name": "群守護手"
+      },
+      "vanguard_hunter_marksmanship_helmet": {
+        "name": "遠見頭巾"
+      },
+      "vanguard_hunter_marksmanship_shoulder": {
+        "name": "遠見肩鎧"
+      },
+      "vanguard_hunter_marksmanship_chest": {
+        "name": "遠見短皮衣"
+      },
+      "vanguard_hunter_marksmanship_legs": {
+        "name": "遠見腿甲"
+      },
+      "vanguard_hunter_marksmanship_gloves": {
+        "name": "遠見護手"
+      },
+      "vanguard_hunter_survival_helmet": {
+        "name": "陷牙頭巾"
+      },
+      "vanguard_hunter_survival_shoulder": {
+        "name": "陷牙肩鎧"
+      },
+      "vanguard_hunter_survival_chest": {
+        "name": "陷牙短皮衣"
+      },
+      "vanguard_hunter_survival_legs": {
+        "name": "陷牙腿甲"
+      },
+      "vanguard_hunter_survival_gloves": {
+        "name": "陷牙護手"
+      },
+      "vanguard_rogue_assassination_helmet": {
+        "name": "夜斬風帽"
+      },
+      "vanguard_rogue_assassination_shoulder": {
+        "name": "夜斬肩墊"
+      },
+      "vanguard_rogue_assassination_chest": {
+        "name": "夜斬外衣"
+      },
+      "vanguard_rogue_assassination_legs": {
+        "name": "夜斬馬褲"
+      },
+      "vanguard_rogue_assassination_gloves": {
+        "name": "夜斬手套"
+      },
+      "vanguard_rogue_combat_helmet": {
+        "name": "鬥印風帽"
+      },
+      "vanguard_rogue_combat_shoulder": {
+        "name": "鬥印肩墊"
+      },
+      "vanguard_rogue_combat_chest": {
+        "name": "鬥印外衣"
+      },
+      "vanguard_rogue_combat_legs": {
+        "name": "鬥印馬褲"
+      },
+      "vanguard_rogue_combat_gloves": {
+        "name": "鬥印手套"
+      },
+      "vanguard_rogue_subtlety_helmet": {
+        "name": "影行風帽"
+      },
+      "vanguard_rogue_subtlety_shoulder": {
+        "name": "影行肩墊"
+      },
+      "vanguard_rogue_subtlety_chest": {
+        "name": "影行外衣"
+      },
+      "vanguard_rogue_subtlety_legs": {
+        "name": "影行馬褲"
+      },
+      "vanguard_rogue_subtlety_gloves": {
+        "name": "影行手套"
+      },
+      "vanguard_priest_discipline_helmet": {
+        "name": "幕頌兜帽"
+      },
+      "vanguard_priest_discipline_shoulder": {
+        "name": "幕頌肩篷"
+      },
+      "vanguard_priest_discipline_chest": {
+        "name": "幕頌長袍"
+      },
+      "vanguard_priest_discipline_legs": {
+        "name": "幕頌護腿"
+      },
+      "vanguard_priest_discipline_gloves": {
+        "name": "幕頌纏手布"
+      },
+      "vanguard_priest_holy_helmet": {
+        "name": "恩翼兜帽"
+      },
+      "vanguard_priest_holy_shoulder": {
+        "name": "恩翼肩篷"
+      },
+      "vanguard_priest_holy_chest": {
+        "name": "恩翼長袍"
+      },
+      "vanguard_priest_holy_legs": {
+        "name": "恩翼護腿"
+      },
+      "vanguard_priest_holy_gloves": {
+        "name": "恩翼纏手布"
+      },
+      "vanguard_priest_shadow_helmet": {
+        "name": "暮頌兜帽"
+      },
+      "vanguard_priest_shadow_shoulder": {
+        "name": "暮頌肩篷"
+      },
+      "vanguard_priest_shadow_chest": {
+        "name": "暮頌長袍"
+      },
+      "vanguard_priest_shadow_legs": {
+        "name": "暮頌護腿"
+      },
+      "vanguard_priest_shadow_gloves": {
+        "name": "暮頌纏手布"
+      },
+      "vanguard_shaman_elemental_helmet": {
+        "name": "風暴律令頭巾"
+      },
+      "vanguard_shaman_elemental_shoulder": {
+        "name": "風暴律令肩甲"
+      },
+      "vanguard_shaman_elemental_chest": {
+        "name": "風暴律令鎖甲衫"
+      },
+      "vanguard_shaman_elemental_legs": {
+        "name": "風暴律令鏈腿甲"
+      },
+      "vanguard_shaman_elemental_gloves": {
+        "name": "風暴律令護手"
+      },
+      "vanguard_shaman_enhancement_helmet": {
+        "name": "疾風頭盔"
+      },
+      "vanguard_shaman_enhancement_shoulder": {
+        "name": "疾風肩鎧"
+      },
+      "vanguard_shaman_enhancement_chest": {
+        "name": "疾風鏈甲"
+      },
+      "vanguard_shaman_enhancement_legs": {
+        "name": "疾風腿甲"
+      },
+      "vanguard_shaman_enhancement_gloves": {
+        "name": "疾風握套"
+      },
+      "vanguard_shaman_restoration_helmet": {
+        "name": "潮守頭環"
+      },
+      "vanguard_shaman_restoration_shoulder": {
+        "name": "潮守肩篷"
+      },
+      "vanguard_shaman_restoration_chest": {
+        "name": "潮守鎖甲衫"
+      },
+      "vanguard_shaman_restoration_legs": {
+        "name": "潮守戰裙"
+      },
+      "vanguard_shaman_restoration_gloves": {
+        "name": "潮守纏手布"
+      },
+      "vanguard_mage_arcane_helmet": {
+        "name": "縛時者風帽"
+      },
+      "vanguard_mage_arcane_shoulder": {
+        "name": "縛時者披肩"
+      },
+      "vanguard_mage_arcane_chest": {
+        "name": "縛時者長袍"
+      },
+      "vanguard_mage_arcane_legs": {
+        "name": "縛時者長褲"
+      },
+      "vanguard_mage_arcane_gloves": {
+        "name": "縛時者手套"
+      },
+      "vanguard_mage_fire_helmet": {
+        "name": "燼鞭兜帽"
+      },
+      "vanguard_mage_fire_shoulder": {
+        "name": "燼鞭肩篷"
+      },
+      "vanguard_mage_fire_chest": {
+        "name": "燼鞭法袍"
+      },
+      "vanguard_mage_fire_legs": {
+        "name": "燼鞭護腿"
+      },
+      "vanguard_mage_fire_gloves": {
+        "name": "燼鞭手套"
+      },
+      "vanguard_mage_frost_helmet": {
+        "name": "霜衛風帽"
+      },
+      "vanguard_mage_frost_shoulder": {
+        "name": "霜衛肩墊"
+      },
+      "vanguard_mage_frost_chest": {
+        "name": "霜衛祭袍"
+      },
+      "vanguard_mage_frost_legs": {
+        "name": "霜衛纏腿布"
+      },
+      "vanguard_mage_frost_gloves": {
+        "name": "霜衛連指手套"
+      },
+      "vanguard_warlock_affliction_helmet": {
+        "name": "恐羽風帽"
+      },
+      "vanguard_warlock_affliction_shoulder": {
+        "name": "恐羽肩篷"
+      },
+      "vanguard_warlock_affliction_chest": {
+        "name": "恐羽長袍"
+      },
+      "vanguard_warlock_affliction_legs": {
+        "name": "恐羽護腿"
+      },
+      "vanguard_warlock_affliction_gloves": {
+        "name": "恐羽纏手布"
+      },
+      "vanguard_warlock_demonology_helmet": {
+        "name": "髓縛兜帽"
+      },
+      "vanguard_warlock_demonology_shoulder": {
+        "name": "髓縛肩鎧"
+      },
+      "vanguard_warlock_demonology_chest": {
+        "name": "髓縛長袍"
+      },
+      "vanguard_warlock_demonology_legs": {
+        "name": "髓縛護腿"
+      },
+      "vanguard_warlock_demonology_gloves": {
+        "name": "髓縛握套"
+      },
+      "vanguard_warlock_destruction_helmet": {
+        "name": "渣冕風帽"
+      },
+      "vanguard_warlock_destruction_shoulder": {
+        "name": "渣冕肩篷"
+      },
+      "vanguard_warlock_destruction_chest": {
+        "name": "渣冕法袍"
+      },
+      "vanguard_warlock_destruction_legs": {
+        "name": "渣冕護腿"
+      },
+      "vanguard_warlock_destruction_gloves": {
+        "name": "渣冕手套"
+      },
+      "vanguard_druid_balance_helmet": {
+        "name": "星衛頭飾"
+      },
+      "vanguard_druid_balance_shoulder": {
+        "name": "星衛肩鎧"
+      },
+      "vanguard_druid_balance_chest": {
+        "name": "星衛背心"
+      },
+      "vanguard_druid_balance_legs": {
+        "name": "星衛馬褲"
+      },
+      "vanguard_druid_balance_gloves": {
+        "name": "星衛手套"
+      },
+      "vanguard_druid_feral_helmet": {
+        "name": "血鬃頭盔"
+      },
+      "vanguard_druid_feral_shoulder": {
+        "name": "血鬃肩墊"
+      },
+      "vanguard_druid_feral_chest": {
+        "name": "血鬃外衣"
+      },
+      "vanguard_druid_feral_legs": {
+        "name": "血鬃腿甲"
+      },
+      "vanguard_druid_feral_gloves": {
+        "name": "血鬃握套"
+      },
+      "vanguard_druid_restoration_helmet": {
+        "name": "薊花冠冕"
+      },
+      "vanguard_druid_restoration_shoulder": {
+        "name": "薊花肩篷"
+      },
+      "vanguard_druid_restoration_chest": {
+        "name": "薊花背心"
+      },
+      "vanguard_druid_restoration_legs": {
+        "name": "薊花護腿"
+      },
+      "vanguard_druid_restoration_gloves": {
+        "name": "薊花手套"
+      },
+      "vanguard_verdict_greatsword": {
+        "name": "先鋒裁決"
+      },
+      "vanguard_oath_blade": {
+        "name": "先鋒誓約"
+      },
+      "vanguard_fang_dagger": {
+        "name": "先鋒之牙"
+      },
+      "vanguard_warstaff": {
+        "name": "先鋒戰杖"
       },
       "conjured_water4": {
         "name": "魔法泉水"
@@ -22483,12 +23140,147 @@ export const zh_TW: EnTranslations = {
       },
       "stormkindled": {
         "name": "燃暴禮裝",
-        "bonus2": "焰烙狀態下的釋放武器獲得 3 層雷霆。受到傷害不再延遲你的施法。",
-        "bonus4": "大地震擊的每層雷霆加成提高至 30%。"
+        "bonus2": "電弧超載的觸發機率提高至 30%。受到傷害不再延遲你的施法。",
+        "bonus4": "大地震擊的每層雷霆加成提高至 30%，熔岩爆裂造成的傷害提高 20%。"
       },
       "vale_arcanist": {
         "name": "谷地秘法師法衣",
         "bonus3": "攻擊速度和施法速度提高 15%。"
+      },
+      "vanguard_druid_balance": {
+        "name": "星衛衣裝",
+        "bonus2": "攫纏根鬚的施法時間縮短 0.5 秒。",
+        "bonus4": "施放攫纏根鬚使你可以在移動中施法，並使你的移動速度提高 20%，持續 4 秒。每 20 秒最多觸發一次。"
+      },
+      "vanguard_druid_feral": {
+        "name": "血鬃獸皮甲",
+        "bonus2": "巨熊衝鋒的冷卻時間縮短 3 秒。",
+        "bonus4": "巨熊衝鋒為你提供相當於你最大生命值 6% 的護盾，持續 6 秒。"
+      },
+      "vanguard_druid_restoration": {
+        "name": "薊花祭袍",
+        "bonus2": "迅癒的冷卻時間縮短 1 秒。",
+        "bonus4": "迅癒還會使你的移動速度提高 30%，持續 3 秒。"
+      },
+      "vanguard_hunter_beast_mastery": {
+        "name": "群守獵裝",
+        "bonus2": "震顫射擊的冷卻時間縮短 4 秒。",
+        "bonus4": "震顫射擊使狂野怒火的剩餘冷卻時間縮短 1 秒。"
+      },
+      "vanguard_hunter_marksmanship": {
+        "name": "遠見獵裝",
+        "bonus2": "斷跡的冷卻時間縮短 4 秒。",
+        "bonus4": "斷跡使你在 6 秒內的下一次長弓引射變為瞬發。每 15 秒最多觸發一次。"
+      },
+      "vanguard_hunter_survival": {
+        "name": "陷牙獵裝",
+        "bonus2": "血鉤的冷卻時間縮短 3 秒。",
+        "bonus4": "血鉤提供 1 點狩獵動能。"
+      },
+      "vanguard_mage_arcane": {
+        "name": "縛時者聖袍",
+        "bonus2": "時光屏障的冷卻時間縮短 2 秒。",
+        "bonus4": "時光屏障還會使受護目標的移動速度提高 20%，持續 3 秒。"
+      },
+      "vanguard_mage_fire": {
+        "name": "燼鞭華服",
+        "bonus2": "燼焰墜的充能恢復速度加快 3 秒。",
+        "bonus4": "施放燼焰墜會使烈焰屏障的剩餘冷卻時間縮短 2 秒。"
+      },
+      "vanguard_mage_frost": {
+        "name": "霜衛裝束",
+        "bonus2": "縛冰術的冷卻時間縮短 2 秒。",
+        "bonus4": "施放縛冰術會使輕掠步的剩餘冷卻時間縮短 5 秒。"
+      },
+      "vanguard_paladin_holy": {
+        "name": "日守華服",
+        "bonus2": "生命契約的冷卻時間縮短 30 秒。",
+        "bonus4": "生命契約還會為該盟友提供相當於其最大生命值 8% 的護盾，持續 6 秒。"
+      },
+      "vanguard_paladin_protection": {
+        "name": "盾誓堡壘",
+        "bonus2": "誓約鎖鏈的冷卻時間縮短 2 秒。",
+        "bonus4": "被誓約鎖鏈拉動的敵人施法速度降低 30%，持續 4 秒；當誓約鎖鏈束縛一個可被拉動的敵人時，還會使你獲得烈陽反擊。"
+      },
+      "vanguard_paladin_retribution": {
+        "name": "光印戰甲",
+        "bonus2": "女武神的召喚的冷卻時間縮短 15 秒。",
+        "bonus4": "女武神的召喚會重置終末敕令的冷卻時間，且落地後 6 秒內的下一次終末敕令造成的傷害提高 15%。"
+      },
+      "vanguard_priest_discipline": {
+        "name": "幕頌衣裝",
+        "bonus2": "心靈尖嘯的冷卻時間縮短 3 秒。",
+        "bonus4": "你的守護聖詠被完全消耗時，受護盟友的移動速度提高 20%，持續 3 秒。每 8 秒最多觸發一次。"
+      },
+      "vanguard_priest_holy": {
+        "name": "恩翼衣裝",
+        "bonus2": "帷幕步的冷卻時間縮短 6 秒。",
+        "bonus4": "帷幕步還會為你提供相當於你最大生命值 8% 的護盾，持續 6 秒。"
+      },
+      "vanguard_priest_shadow": {
+        "name": "暮頌華服",
+        "bonus2": "哀禍連禱在你引導期間還會使目標的移動速度降低 30%。",
+        "bonus4": "召喚什一魔還會為你提供相當於你最大生命值 10% 的護盾，持續 8 秒。"
+      },
+      "vanguard_rogue_assassination": {
+        "name": "夜斬皮甲",
+        "bonus2": "陰狠一擊的能量消耗降低 10 點。",
+        "bonus4": "陰狠一擊還會使你在 6 秒內的下一次攻擊必定致命一擊。"
+      },
+      "vanguard_rogue_combat": {
+        "name": "鬥印皮甲",
+        "bonus2": "疾風之足的冷卻時間縮短 60 秒。",
+        "bonus4": "疾風之足生效期間，邪惡揮斬和重磅擺拳額外提供 1 個連擊點數。"
+      },
+      "vanguard_rogue_subtlety": {
+        "name": "影行皮甲",
+        "bonus2": "煙遁步的冷卻時間縮短 60 秒。",
+        "bonus4": "在煙遁步狀態下使用掏腹重擊時，額外提供 2 個連擊點數。"
+      },
+      "vanguard_shaman_elemental": {
+        "name": "風暴律令戰鎖甲",
+        "bonus2": "釋放武器的冷卻時間縮短 3 秒。",
+        "bonus4": "釋放武器使你可以在移動中施法，並使你的移動速度提高 20%，持續 4 秒。每 20 秒最多觸發一次。"
+      },
+      "vanguard_shaman_enhancement": {
+        "name": "疾風戰鏈甲",
+        "bonus2": "先祖打擊使目標的移動速度降低 30%，持續 4 秒。",
+        "bonus4": "先祖打擊使元素恍惚的剩餘冷卻時間縮短 4 秒。"
+      },
+      "vanguard_shaman_restoration": {
+        "name": "潮守鏈甲",
+        "bonus2": "對生命值低於 50% 的盟友施放療癒之水時，施法時間縮短 0.5 秒。",
+        "bonus4": "潮汐召喚還會為其目標提供相當於你最大生命值 5% 的護盾，持續 6 秒。"
+      },
+      "vanguard_warlock_affliction": {
+        "name": "恐羽聖袍",
+        "bonus2": "折魂的施法時間縮短 0.3 秒。",
+        "bonus4": "吞噬的治療效果提高 30%，並且可以在移動中引導。"
+      },
+      "vanguard_warlock_demonology": {
+        "name": "髓縛華服",
+        "bonus2": "骸骨護甲的冷卻時間縮短 10 秒。",
+        "bonus4": "收割號令使骸骨護甲的剩餘冷卻時間縮短 2 秒。"
+      },
+      "vanguard_warlock_destruction": {
+        "name": "渣冕聖袍",
+        "bonus2": "熔渣皮膚的冷卻時間縮短 30 秒。",
+        "bonus4": "每施放兩次燃盡，你在 8 秒內的下一次毀滅箭變為瞬發。"
+      },
+      "vanguard_warrior_arms": {
+        "name": "刃痕戰裝",
+        "bonus2": "致殘打擊使猛衝的剩餘冷卻時間縮短 1 秒。",
+        "bonus4": "猛衝還會使你的下一次致殘打擊強化 20%（1 層血手強化）。"
+      },
+      "vanguard_warrior_fury": {
+        "name": "血征怒裝",
+        "bonus2": "英勇飛躍的冷卻時間縮短 8 秒。",
+        "bonus4": "英勇飛躍落地時使你激怒。"
+      },
+      "vanguard_warrior_prot": {
+        "name": "鐵征壁壘",
+        "bonus2": "斷層的冷卻時間縮短 5 秒。",
+        "bonus4": "斷層還會使你受到的傷害降低 10%，持續 6 秒。"
       },
       "vesperash": {
         "name": "晚禱燼灰罩袍",

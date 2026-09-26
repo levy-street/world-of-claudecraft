@@ -7,8 +7,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { handleDeath } from '../src/sim/combat/damage';
 import { applySetProcs } from '../src/sim/combat/set_procs';
 import { aggregateSetBonuses, ITEM_SETS } from '../src/sim/content/item_sets';
-import { ITEMS } from '../src/sim/data';
-import { createPlayer, recalcPlayerStats } from '../src/sim/entity';
+import { ITEMS, MOBS } from '../src/sim/data';
+import { createMob, createPlayer, recalcPlayerStats } from '../src/sim/entity';
 import { PVP_DEFENSE_CAP, PVP_OFFENSE_CAP, pvpFractionsFromRatings } from '../src/sim/pvp';
 import { Sim } from '../src/sim/sim';
 import type { CrowdControlDrCategory, Entity, EquipSlot, ItemSet, SetProc } from '../src/sim/types';
@@ -325,6 +325,28 @@ describe('pvpOnly set procs', () => {
     // stream and the parity goldens move.
     const chance = vi.spyOn(sim.rng, 'chance');
     applySetProcs(sim.ctx, a, mob, 'kill');
+    expect(chance).not.toHaveBeenCalled();
+    expect(a.auras.some((aura) => aura.id === ABSORB_PROC.id)).toBe(false);
+  });
+
+  it("fires against a hostile player's pet (all PvP combat), never a wild mob's", () => {
+    const { sim, a, b } = world();
+    const pet = createMob(sim.nextId++, MOBS.forest_wolf, b.level, { ...b.pos });
+    pet.ownerId = b.id;
+    pet.hostile = false;
+    sim.addEntity(pet);
+    a.setProcs = [ABSORB_PROC];
+    applySetProcs(sim.ctx, a, pet, 'kill');
+    expect(a.auras.some((aura) => aura.id === ABSORB_PROC.id)).toBe(true);
+    // The wearer's OWN pet is not an enemy: no proc, no draw.
+    const own = createMob(sim.nextId++, MOBS.forest_wolf, a.level, { ...a.pos });
+    own.ownerId = a.id;
+    own.hostile = false;
+    sim.addEntity(own);
+    a.auras = a.auras.filter((aura) => aura.id !== ABSORB_PROC.id);
+    a.procReadyAt = {};
+    const chance = vi.spyOn(sim.rng, 'chance');
+    applySetProcs(sim.ctx, a, own, 'kill');
     expect(chance).not.toHaveBeenCalled();
     expect(a.auras.some((aura) => aura.id === ABSORB_PROC.id)).toBe(false);
   });

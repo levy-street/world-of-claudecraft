@@ -80,6 +80,7 @@ import { createCannonEncounter } from '../src/sim/minigames/cannon_encounter';
 import { MOUNT_RACE_COUNTDOWN_TICKS } from '../src/sim/mount_race';
 import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
+import { spawnHillNow } from '../src/sim/pvp';
 import { interactObjectCreditKey } from '../src/sim/quests/interact_object_credit';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
@@ -565,11 +566,32 @@ describe('spectate client POV', () => {
     expect(client.consumeSpectateFacing()).toBeNull();
 
     internals.onMessage(JSON.stringify({ t: 'spectate', name: null }));
-    expect(client.spectating).toBeNull();
+    // Identity restores on the exit frame itself, but `spectating` (the HUD's
+    // "this self view is mine" signal) is held until the next own self-decode
+    // rebuilds the moderator's presentation (tests/spectate_exit_hold.test.ts).
+    expect(client.spectating).toBe('Suspect');
     expect(client.playerId).toBe(1);
     expect(client.player.name).toBe('Moderator');
     expect(client.cfg.playerClass).toBe('warrior');
     expect(client.consumeSpectateFacing()).toBeNull();
+    internals.applySnapshot({
+      t: 'snap',
+      ents: [],
+      self: {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Moderator',
+        lv: 10,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+      },
+    });
+    expect(client.spectating).toBeNull();
   });
 });
 
@@ -5652,6 +5674,7 @@ const ALL_DELTA_KEYS = [
   'gprof',
   'guildBank',
   'hbl',
+  'hill',
   'hirat',
   'honor',
   'hpref',
@@ -5701,6 +5724,7 @@ const ALL_DELTA_KEYS = [
   'weeklyRewards',
   'wkexp',
   'wkq',
+  'wpvp',
   'wqday',
   'wqexp',
   'wqlog',
@@ -5783,6 +5807,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   ggoal: 'gatheringGoal',
   gprof: 'gatheringProficiency',
   guildBank: 'guildBankInfo',
+  hill: 'hillInfo',
   hirat: 'hitRating',
   hpref: 'harvestPreference',
   hrat: 'hasteRating',
@@ -5824,6 +5849,7 @@ const TERSE_TO_IWORLD: Record<string, string> = {
   weeklyRewards: 'weeklyRewardInfo',
   wkexp: 'weeklyQuestResetAtMs',
   wkq: 'weeklyQuest',
+  wpvp: 'worldPvpInfo',
   wqday: 'worldQuestCycle',
   wqexp: 'worldQuestExpiresAtMs',
   wqlog: 'worldQuestLog',
@@ -5969,6 +5995,12 @@ function dirtyEveryDeltaField(): {
   meta.lifetimeXp = 555;
   meta.honor = 321;
   meta.lifetimeHonor = 654;
+  // World PvP: the wpvp self readout (meta) and the pvp entity bit (entity).
+  meta.worldPvp = { flagged: true, disarmAt: null, kills: 2, deaths: 1 };
+  sim.entities.get(lp)!.pvpFlag = true;
+  // King of the Hill: a hill stands (in a free-for-all zone the leader is not
+  // in), so the hill self readout rides the snapshot.
+  spawnHillNow(sim.ctx);
   meta.restedXp = 222;
   meta.prestigeRank = 3;
   meta.delveMarks = 7;
@@ -6434,6 +6466,29 @@ describe('full self-state snapshot delta fixture', () => {
     expect(client.lifetimeXp).toBe(555); // lxp -> lifetimeXp
     expect(client.honor).toBe(321); // honor
     expect(client.lifetimeHonor).toBe(654); // lhonor -> lifetimeHonor
+    // wpvp -> worldPvpInfo (social_self_wire.ts), and the entity-record pvp bit
+    // -> e.pvpFlag on the self record (a full record) for the flagged leader.
+    expect(client.worldPvpInfo).toMatchObject({
+      flagged: true,
+      kills: 2,
+      deaths: 1,
+      zone: 'contested', // the fixture leader stands on contested ground
+      enabled: true,
+    });
+    expect(client.player.pvpFlag).toBe(true);
+    // hill -> hillInfo (social_self_wire.ts): the standing hill from the
+    // leader's seat (outside its zone, so the live fields are zero; the
+    // fixture leader is ungrouped, so counts as a group of one).
+    expect(client.hillInfo).toMatchObject({
+      radius: 50,
+      phase: 'active',
+      standing: 'counted',
+      holder: 'none',
+      inZone: false,
+      inside: false,
+      minutesLeft: 45,
+    });
+    expect(['drakelands', 'frostveil', 'amberfall']).toContain(client.hillInfo?.zoneId);
     expect(client.restedXp).toBe(222); // rxp -> restedXp
     expect(client.prestigeRank).toBe(3); // prk -> prestigeRank
 
@@ -7016,7 +7071,8 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 107 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 109 unique keys in sorted order', () => {
+    // 107 plus the World PvP readout wpvp and the King of the Hill readout hill.
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -7067,8 +7123,11 @@ describe('delta-key contract pins (anti-drift)', () => {
     // The weekly emissary's wkq and wkexp self keys, for 105, and the Clue
     // Scrolls active-hunt key cluh, for 106.
     // The Weekly Vault's weeklyRewards self key (PR 4052), for 107.
-    expect(ALL_DELTA_KEYS).toHaveLength(107);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(107);
+    // The World PvP flag readout wpvp (src/sim/pvp/world_pvp.ts) and the King of
+    // the Hill readout hill (src/sim/pvp/hill.ts), at the second release/v0.44.0
+    // base merge, for 109.
+    expect(ALL_DELTA_KEYS).toHaveLength(109);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(109);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -7236,7 +7295,8 @@ describe('delta-key contract pins (anti-drift)', () => {
     // weekly emissary's wkq and wkexp self keys make 105, and the Clue Scrolls
     // active-hunt key cluh 106.
     // The Weekly Vault's weeklyRewards self key (PR 4052) makes 107.
-    expect(scraped.size).toBe(107);
+    // The World PvP readout wpvp and the King of the Hill readout hill make 109.
+    expect(scraped.size).toBe(109);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

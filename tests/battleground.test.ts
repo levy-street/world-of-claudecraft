@@ -2531,8 +2531,9 @@ describe('Thornhollow Fields: runes, hostility, and the match clock', () => {
     expect(BG_WAVE_PERIOD).toBe(10);
     expect(BG_WAVE_OFFSET).toBe(5);
     expect(BG_POWER_RUNE_VALUE).toBeCloseTo(0.15, 10);
-    expect(BATTLEGROUND_WIN_HONOR).toBe(60);
-    expect(BATTLEGROUND_LOSS_HONOR).toBe(20);
+    // Doubled 2026-09-25 (owner tuning, with King of the Hill).
+    expect(BATTLEGROUND_WIN_HONOR).toBe(120);
+    expect(BATTLEGROUND_LOSS_HONOR).toBe(40);
     // the one deliberate zero-sum exception: the loser-side rating floor
     expect(BG_MIN_RATING).toBe(100);
   });
@@ -3233,11 +3234,11 @@ describe('Thornhollow Fields: the first win of the day pays a bonus', () => {
     // paid "log in, win once, log off" better than it paid playing a session.
     // A flat 20 is a judgment about what a daily hook is worth, so asserting it
     // against BATTLEGROUND_WIN_HONOR would restate the shape that was removed.
-    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(20);
+    expect(BATTLEGROUND_FIRST_WIN_BONUS_HONOR).toBe(40);
     // The property that actually matters: first win to repeat win is 1.33x, in
     // line with the delve daily's ~1.6x rather than the old 3x.
     const firstWin = BATTLEGROUND_WIN_HONOR + BATTLEGROUND_FIRST_WIN_BONUS_HONOR;
-    expect(firstWin).toBe(80);
+    expect(firstWin).toBe(160);
     expect(firstWin / BATTLEGROUND_WIN_HONOR).toBeLessThan(1.5);
   });
 

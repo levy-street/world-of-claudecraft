@@ -254,15 +254,15 @@ describe('WARFARE balance re-check (merge blocker)', () => {
     ]) {
       const ratio = armorAdvantage(honorArmor, pveArmor, weapon);
       const label = `${weapon}: armor-only PvE advantage was ${ratio.toFixed(3)}x`;
-      // Below 1.00 means the WARFARE-armored character wins. Ahead on every
-      // weapon and by a margin that does not run away. Pre-retune this
-      // measured 0.930, 0.856 and 0.844 with a 0.8 floor; the lineage retune
-      // (docs/prd/ignivar-raid-loot.md) halved the incumbent set stack, so the
-      // OLD reference kit measures down to 0.701. INTERIM floor: the raid-loot
-      // phase re-anchors this harness to the ilvl-35 kits as the best PvE
-      // armor and the 0.8 floor returns with them.
-      expect(ratio, label).toBeLessThan(1);
-      expect(ratio, label).toBeGreaterThan(0.65);
+      // Below 1.00 means the WARFARE-armored character wins. Pre-retune this
+      // measured 0.930, 0.856 and 0.844; the lineage retune took it to about
+      // 0.70. WARFARE Vitality (owner rule, 2026-09-24: PvP gear gives players
+      // far more health than players without it) multiplies the honor side's
+      // health by 1.5 in PvP, so it now measures 0.484, 0.447 and 0.444: honor
+      // armor wins a PvP duel by about two to one, by design. The floor still
+      // catches a runaway (a bonus stacking twice, a cap lost).
+      expect(ratio, label).toBeLessThan(0.6);
+      expect(ratio, label).toBeGreaterThan(0.4);
     }
   });
 
@@ -282,9 +282,11 @@ describe('WARFARE balance re-check (merge blocker)', () => {
     // matches WARFARE armor to the same-slot item-level-31 PvE epic curve (2,198
     // against the 2,021 it assumed). Every other stat line reproduced exactly.
     // The band is wide because this row carries two variables, not one.
+    // With WARFARE Vitality (owner rule, 2026-09-24) the honor side carries 1.5x
+    // health in PvP, so this measures 0.504 (was 0.756): the intended gap.
     const label = `full-kit PvE advantage vs T1+T2 was ${ratio.toFixed(3)}x`;
-    expect(ratio, label).toBeGreaterThan(0.7);
-    expect(ratio, label).toBeLessThan(1.08);
+    expect(ratio, label).toBeGreaterThan(0.45);
+    expect(ratio, label).toBeLessThan(0.6);
   });
 
   it('pins the four stat lines the ratio is computed from', () => {
@@ -296,7 +298,18 @@ describe('WARFARE balance re-check (merge blocker)', () => {
     const honor = geared(WARFARE_KIT);
     const pve = geared(PVE_T1_T2);
     expect(honor.attackPower, 'honor kit attack power').toBe(260);
-    expect(honor.maxHp, 'honor kit health').toBe(1722);
+    // In PvP the kit's WARFARE Vitality (302 rating, about +50%) applies;
+    // inside a PvE instance the Sim clears it and the kit reads its plain 1,722,
+    // below the PvE reference's 1,772, so honor gear is never the raid pick.
+    expect(honor.stats.pvpVitality, 'honor kit vitality').toBeCloseTo(302 / 600, 10);
+    // 2,583 -> 2,589 when the Vitality cap rose to +80% (Warfare Season 2): the
+    // kit's 302 rating now reads +50.3% instead of stopping at +50%.
+    expect(honor.maxHp, 'honor kit health in PvP').toBe(2589);
+    const inInstance = createPlayer(0, 'warrior', { x: 0, y: 0, z: 0 }, '');
+    inInstance.level = 20;
+    inInstance.pvpVitalityActive = false;
+    recalcPlayerStats(inInstance, 'warrior', WARFARE_KIT as never, undefined, {});
+    expect(inInstance.maxHp, 'honor kit health in a PvE instance').toBe(1722);
     expect(honor.critChance * 100, 'honor kit crit').toBeCloseTo(6.95, 1);
     // Post-retune figures: the lineage ladder pays 25 flat AP (was 80 across
     // two 2-piece tiers) and 10 Sta (was 30), while the Hit-program seed flips
@@ -310,18 +323,18 @@ describe('WARFARE balance re-check (merge blocker)', () => {
     expect(pve.stats.armor, 'PvE reference armor').toBe(1906);
   });
 
-  it('still loses to a rift legendary weapon, which is the point of a legendary', () => {
+  it('stays bounded against a full best-in-slot kit with a rift legendary, in PvP', () => {
     const ratio = pveAdvantage(WARFARE_KIT, PVE_BIS);
-    // Bounded on BOTH sides: a legendary must stay ahead, but a drift to a
-    // blowout would mean the tier stopped functioning against the best gear,
-    // which an open-ended greater-than would happily pass. INTERIM band: the
-    // retuned incumbent stack measures 0.824 (was above 1); the greater-than-1
-    // intent returns when the raid-loot phase re-anchors PVE_BIS to the
-    // ilvl-35 kit plus the legendary.
+    // Bounded on BOTH sides. Before WARFARE Vitality this measured 0.824 and
+    // the intent was that a legendary stays ahead in PvP. The owner rule of
+    // 2026-09-24 reverses that deliberately: in PvP, honor gear's 1.5x health
+    // beats raid gear with a legendary (now 0.569), while in raids Vitality is
+    // off and the raid kit stays the stronger one (the health pin above). The
+    // band still catches a blowout or a lost cap.
     expect(ratio, `measured PvE advantage vs full BiS was ${ratio.toFixed(3)}x`).toBeGreaterThan(
-      0.78,
+      0.5,
     );
-    expect(ratio, `measured PvE advantage vs full BiS was ${ratio.toFixed(3)}x`).toBeLessThan(1.2);
+    expect(ratio, `measured PvE advantage vs full BiS was ${ratio.toFixed(3)}x`).toBeLessThan(0.65);
   });
 
   it('makes abandoning the chest measurably WORSE, which is what the 7-of-7 capstone buys', () => {

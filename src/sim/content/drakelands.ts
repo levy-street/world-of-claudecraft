@@ -22,6 +22,7 @@ import { FORGE_WORKSHOP_DRESSING } from './forge_workshop_dressing';
 
 export const DRAKELANDS_ZONE: ZoneDef = {
   id: 'drakelands',
+  worldPvp: 'ffa',
   name: 'The Drakelands',
   riftPortalEligible: true,
   riftTierWeights: { B: 0.45, A: 0.4, S: 0.15 },

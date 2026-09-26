@@ -18,6 +18,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { talentsFor } from '../src/sim/content/talents';
 import type { ItemDef } from '../src/sim/types';
 import { FocusManager } from '../src/ui/focus_manager';
 import type {
@@ -29,6 +30,7 @@ import {
   renderWarfareVendorWindow,
   type WarfareVendorWindowDeps,
 } from '../src/ui/hud/vendor/warfare_vendor_window';
+import { tTalent } from '../src/ui/talent_i18n';
 
 const hud = readFileSync(join(__dirname, '../src/ui/hud.ts'), 'utf8');
 const painterSource = readFileSync(
@@ -71,6 +73,7 @@ function offer(
 function section(key: string, offers: WarfareShopOffer[]): WarfareShopSection {
   return {
     kind: 'set',
+    group: 'entry',
     key,
     setId: key,
     offers,
@@ -486,5 +489,54 @@ describe('#warfare-window traps Tab (WCAG 2.4.3 / 2.1.2)', () => {
     } finally {
       Element.prototype.getClientRects = realRects;
     }
+  });
+});
+
+describe('renderWarfareVendorWindow: the Season 2 and entry-tier groups', () => {
+  it('heads each group once, in section order, and never repeats a heading', () => {
+    const el = mount();
+    const seasonSection = {
+      ...section(SET_A, [offer('s2_one', 'helmet')]),
+      group: 'season2' as const,
+    };
+    renderWarfareVendorWindow(
+      el,
+      'Draven',
+      view([seasonSection, section(SET_B, [offer('b_one', 'legs'), offer('b_two', 'gloves')])]),
+      deps(),
+    );
+    const headings = [...el.querySelectorAll<HTMLElement>('.warfare-group-title')].map(
+      (h) => h.textContent,
+    );
+    expect(headings).toEqual(['Warfare Season 2: Vanguard', 'Warfare Season 1']);
+    // The group heading sits directly before its first section's own title.
+    const titles = [...el.querySelectorAll<HTMLElement>('.vendor-section-title')];
+    expect(titles[0].classList.contains('warfare-group-title')).toBe(true);
+    expect(titles[1].classList.contains('warfare-group-title')).toBe(false);
+  });
+});
+
+describe('renderWarfareVendorWindow: the spec beside a Season 2 set name', () => {
+  it('appends the translated spec name to a Season 2 set title, and none to the entry tier', () => {
+    const el = mount();
+    const seasonSection = {
+      ...section(SET_A, [offer('s2_one', 'helmet')]),
+      group: 'season2' as const,
+      spec: { cls: 'warrior', spec: 'arms' },
+    };
+    renderWarfareVendorWindow(
+      el,
+      'Draven',
+      view([seasonSection, section(SET_B, [offer('b_one', 'legs')])]),
+      deps(),
+    );
+    const specs = [...el.querySelectorAll<HTMLElement>('.warfare-set-spec')];
+    expect(specs).toHaveLength(1);
+    const arms = talentsFor('warrior')?.specs.find((s) => s.id === 'arms');
+    expect(arms).toBeDefined();
+    expect(specs[0].textContent).toBe(
+      tTalent({ kind: 'talentSpec', spec: arms as NonNullable<typeof arms>, field: 'name' }),
+    );
+    expect(specs[0].textContent?.length).toBeGreaterThan(0);
   });
 });

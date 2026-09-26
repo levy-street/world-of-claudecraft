@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import { surfaceMat } from './gfx';
 
 const REVEAL_SECONDS = 0.12;
@@ -85,13 +86,13 @@ export class FrostNovaRootVisual {
     // Keep the lowest facet microscopically above y=0 to avoid z-fighting with terrain.
     base.position.y = 0.105;
     base.scale.z = 0.72;
-    base.renderOrder = 8;
+    base.renderOrder = floorVfxRenderOrder('player', 0);
     content.add(base);
 
     const shards = new THREE.InstancedMesh(SHARD_GEOMETRY, material.shards, 7);
     this.shards = shards;
     shards.name = 'frost-nova-root-shards';
-    shards.renderOrder = 9;
+    shards.renderOrder = floorVfxRenderOrder('player', 1);
 
     const dummy = new THREE.Object3D();
     const placements = [

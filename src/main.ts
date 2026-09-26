@@ -1,3 +1,4 @@
+import { applyFrameGeometrySetting } from './game/frame_geometry_settings';
 import { formatAbilityImbueDamage } from './ui/ability_imbue_text';
 import { bindChatComposerFocusState, resetChatComposer } from './ui/chat_composer_focus_controller';
 import { dispatchCollectionAction } from './ui/collection_actions_core';
@@ -2540,6 +2541,7 @@ async function startGame(
       return;
     }
     const v = settings.set(key as keyof typeof SETTING_RANGES, value as number);
+    if (applyFrameGeometrySetting(document.documentElement.style, key, v)) return;
     switch (key) {
       case 'cameraSpeed':
         input.setCameraSpeed(v);
@@ -2630,24 +2632,6 @@ async function startGame(
       case 'uiScale':
         document.documentElement.style.setProperty('--ui-scale', String(v));
         hud.reapplySavedGeometry();
-        break;
-      case 'playerFrameScale':
-        document.documentElement.style.setProperty('--player-frame-scale', String(v));
-        break;
-      case 'targetFrameScale':
-        document.documentElement.style.setProperty('--target-frame-scale', String(v));
-        break;
-      case 'playerFrameWidth':
-        document.documentElement.style.setProperty('--player-frame-width', `${v}px`);
-        break;
-      case 'playerFrameHeight':
-        document.documentElement.style.setProperty('--player-frame-height', `${v}px`);
-        break;
-      case 'targetFrameWidth':
-        document.documentElement.style.setProperty('--target-frame-width', `${v}px`);
-        break;
-      case 'targetFrameHeight':
-        document.documentElement.style.setProperty('--target-frame-height', `${v}px`);
         break;
       case 'partyFrameScale':
         document.documentElement.style.setProperty('--party-frame-scale', String(v));

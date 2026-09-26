@@ -272,13 +272,11 @@ describe('detachable meter windows', () => {
     expect(panel.style.width).toBe('');
   });
 
-  it('gives the two detached windows a resize grip and two move handles each', () => {
+  it('gives each detached window a resize grip and makes the whole panel draggable', () => {
     const { el } = setup();
     for (const id of ['heal-window', 'threat-window']) {
       expect(el(id).querySelector('.panel-resize-grip')).not.toBeNull();
-      // The title bar, plus the summary line under it.
-      expect(el(id).querySelector('.panel-title')?.classList.contains('mt-move-handle')).toBe(true);
-      expect(el(id).querySelector('.mt-view')?.classList.contains('mt-move-handle')).toBe(true);
+      expect(el(id).classList.contains('mt-move-handle')).toBe(true);
     }
     // The tabbed damage window carries NO MeterFrame chrome of its own: its
     // move/resize come from the Unlock Interface registry mover, which mints
@@ -353,11 +351,22 @@ describe('detachable meter windows', () => {
     expect(seatRule).toContain(
       'left: min(calc(100% + 8px), calc(var(--app-vw, 100vw) / var(--ui-scale, 1) / 2 + 66px))',
     );
-    expect(seatRule).toContain('bottom: 6px');
+    expect(seatRule).toContain(
+      'bottom: calc(var(--socket-size, 46px) + var(--socket-row-gap, 6px) + 32px)',
+    );
     // And the detached state clears the seat so the mover's inline box wins.
     const detachedRule = css.match(/#meters-window\.hud-frame-detached\s*\{([^}]*)\}/)?.[1] ?? '';
     expect(detachedRule).toContain('left: auto');
     expect(detachedRule).toContain('bottom: auto');
+  });
+
+  it('uses the game move cursor on the whole detached panel', () => {
+    const css = readFileSync(join(import.meta.dirname, '..', 'src', 'styles', 'hud.css'), 'utf8');
+    const rule =
+      css.match(/\.mt-panel\.mt-move-handle,\s*\.mt-panel \.mt-move-handle\s*\{([^}]*)\}/)?.[1] ??
+      '';
+    expect(rule).toContain('cursor: var(--cursor-move, move)');
+    expect(rule).toContain('touch-action: none');
   });
 
   it('keeps compact meter controls at a minimum 24px pointer target', () => {
@@ -416,9 +425,10 @@ describe('detachable meter windows', () => {
     // The detached windows keep their MeterFrame drag, so their handles carry
     // the move tooltip.
     const heal = el('heal-window');
+    expect(heal.hasAttribute('title')).toBe(false);
     const move = heal.querySelector('.panel-title')?.getAttribute('title') ?? '';
     expect(move).not.toBe('');
-    expect(heal.querySelector('.mt-view')?.getAttribute('title')).toBe(move);
+    expect(heal.classList.contains('mt-move-handle')).toBe(true);
     // The tabbed damage window's movement is the Unlock Interface registry's,
     // so its title bar advertises no drag of its own, and the tabs stay bare
     // (a container title would be inherited by every descendant without one).

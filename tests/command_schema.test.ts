@@ -181,8 +181,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // integration branch (weekly + clue scrolls together): 240/254/14.
 // +2 send / +2 dispatch for the Weekly Vault (weekly_reward_claim,
 // weekly_reward_open; PR 4052) on the quests integration branch: 242/256/14.
-const EXPECTED_SEND_COUNT = 242;
-const EXPECTED_DISPATCH_COUNT = 256;
+// World PvP adds pvp_flag to both sets (sent by ClientWorld.setWorldPvpFlag,
+// dispatched beside bg_flag), at the second release/v0.44.0 base merge: 243/257/14.
+const EXPECTED_SEND_COUNT = 243;
+const EXPECTED_DISPATCH_COUNT = 257;
 const EXPECTED_DISPATCH_ONLY_COUNT = 14;
 
 // The chat sub-channel routing switch (server/game.ts `switch

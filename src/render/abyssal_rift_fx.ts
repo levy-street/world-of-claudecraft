@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 const MAX_RIFTS = 4;
 const SEGMENTS = 64;
@@ -100,7 +101,7 @@ export class AbyssalRiftFx {
     const column = new THREE.Mesh(columnGeometry, columnMaterial);
     column.name = 'abyssal-rift-column';
     column.position.set(opts.x, centerY + 2.9, opts.z);
-    column.renderOrder = 9;
+    column.renderOrder = floorVfxRenderOrder('player', 3);
 
     const coreGeometry = new THREE.SphereGeometry(radius * 0.14, 24, 14);
     const coreMaterial = new THREE.MeshBasicMaterial({
@@ -113,7 +114,7 @@ export class AbyssalRiftFx {
     const core = new THREE.Mesh(coreGeometry, coreMaterial);
     core.name = 'abyssal-rift-core';
     core.position.set(opts.x, centerY + 0.72, opts.z);
-    core.renderOrder = 10;
+    core.renderOrder = floorVfxRenderOrder('player', 4);
 
     const haloGeometry = new THREE.TorusGeometry(radius * 0.28, 0.1, 8, 48);
     const haloMaterial = new THREE.MeshBasicMaterial({
@@ -127,7 +128,7 @@ export class AbyssalRiftFx {
     halo.name = 'abyssal-rift-halo';
     halo.position.set(opts.x, centerY + 0.32, opts.z);
     halo.rotation.x = Math.PI / 2;
-    halo.renderOrder = 10;
+    halo.renderOrder = floorVfxRenderOrder('player', 4);
 
     const wisps = this.buildWisps(opts.x, opts.z, radius);
     group.add(field, rim, spiral.lines, column, core, halo, wisps.points);
@@ -205,7 +206,7 @@ export class AbyssalRiftFx {
     });
     const field = new THREE.Mesh(geometry, material);
     field.name = 'abyssal-rift-field';
-    field.renderOrder = 6;
+    field.renderOrder = floorVfxRenderOrder('player', 0);
     return field;
   }
 
@@ -241,7 +242,7 @@ export class AbyssalRiftFx {
     });
     const rim = new THREE.Mesh(geometry, material);
     rim.name = 'abyssal-rift-rim';
-    rim.renderOrder = 8;
+    rim.renderOrder = floorVfxRenderOrder('player', 2);
     return rim;
   }
 
@@ -283,7 +284,7 @@ export class AbyssalRiftFx {
     });
     const lines = new THREE.LineSegments(geometry, material);
     lines.name = 'abyssal-rift-spiral';
-    lines.renderOrder = 9;
+    lines.renderOrder = floorVfxRenderOrder('player', 3);
     return { lines, positions, angles, radii };
   }
 
@@ -323,7 +324,7 @@ export class AbyssalRiftFx {
     const points = new THREE.Points(geometry, material);
     points.name = 'abyssal-rift-inward-wisps';
     points.frustumCulled = false;
-    points.renderOrder = 10;
+    points.renderOrder = floorVfxRenderOrder('player', 4);
     return { points, positions, angles, phases };
   }
 

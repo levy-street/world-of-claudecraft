@@ -2333,7 +2333,7 @@
     flex: 1;
   }
   .spell-row[draggable="true"] {
-    cursor: grab;
+    cursor: var(--cursor-grab, grab);
   }
   .spell-row .spell-name {
     font-size: 13px;
@@ -8426,6 +8426,25 @@
   }
   .vendor-item.warfare-owned .vi-sub {
     color: var(--gold);
+  }
+  /* A group heading (Warfare Season 2 above the entry tier) reads a level
+     above the set titles under it: larger, spaced caps, and a heavier rule,
+     so the Season 2 banner never reads as one more set. */
+  #warfare-window .warfare-group-title {
+    margin-top: 14px;
+    padding-top: 9px;
+    border-top: 2px solid var(--gold);
+    font-size: 15px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  /* The spec a Season 2 set is built for, beside its name. */
+  #warfare-window .warfare-set-spec {
+    margin-left: 8px;
+    color: var(--color-text-light);
+    font-family: inherit;
+    font-size: 11px;
+    opacity: 0.85;
   }
 
   /* ---------- tutorial and ferry notes ---------- */
@@ -15867,6 +15886,146 @@
     transform: none;
   }
 
+  /* ---------- World PvP (the merged PvP window's flag tab) ---------- */
+  /* src/ui/hud/world_pvp/: the flag status card and the stakes list. Same
+     card / note families as the Thornhollow Fields panel above. */
+  .wpvp-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 10px;
+    border-left: 3px solid var(--color-border-showcase);
+  }
+  .wpvp-status.is-on {
+    border-left-color: var(--color-hostile);
+  }
+  .wpvp-status.is-disarming {
+    border-left-color: var(--color-warning);
+  }
+  .wpvp-status.is-off {
+    border-left-color: var(--color-friendly);
+  }
+  /* The card carries two lines beside its icon: the flag sentence and the
+     ground under the player. Grid so a long localized line wraps inside the
+     card instead of pushing the icon around. */
+  .wpvp-status-text {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+  }
+  /* The ground line. Free-for-all is the one state that reads hostile: the
+     flag is not what decides a fight there, so it must not read as calm. */
+  .wpvp-zone {
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+  .wpvp-zone.is-ffa {
+    color: var(--color-hostile);
+  }
+  /* Two cards (record, honor), so the shared three-column stat grid would leave
+     a hole; the tab's own column count keeps the cards full width. */
+  .wpvp-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .wpvp-stakes {
+    margin: 6px 0 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  /* ---------- King of the Hill (the in-zone bar over the standing hill) ---------- */
+  /* Self-mounted by src/ui/hud/hill/hill_bar_painter.ts, top centre below the
+     Thornhollow Fields scoreboard's slot; shown only while the player stands in
+     the hill's zone. The tone classes are chosen by the painter from the
+     readout's union; the state is carried by text too, so colour is never the
+     only channel. */
+  #hill-bar {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    z-index: 17;
+    min-width: 280px;
+    max-width: min(360px, calc(100vw - 24px));
+    pointer-events: none;
+    text-align: center;
+    background: var(--panel-bg-strong);
+    border: 1px solid var(--color-bg-field-edge);
+    border-radius: 9px;
+    padding: 6px 14px 8px;
+    box-shadow: 0 2px 16px color-mix(in srgb, var(--color-keyline) 63%, transparent);
+    font-size: 12px;
+    color: var(--color-text);
+  }
+  #hill-bar .hill-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13px;
+  }
+  #hill-bar .hill-title {
+    font-weight: 700;
+    color: var(--color-gold);
+  }
+  #hill-bar .hill-zone {
+    color: var(--color-text-muted);
+  }
+  #hill-bar .hill-held {
+    margin-top: 2px;
+    font-weight: 600;
+  }
+  #hill-bar.is-you .hill-held {
+    color: var(--color-friendly);
+  }
+  #hill-bar.is-other .hill-held {
+    color: var(--color-hostile);
+  }
+  #hill-bar .hill-note {
+    margin-top: 2px;
+    color: var(--color-warning);
+  }
+  #hill-bar .hill-counts {
+    color: var(--color-text-muted);
+  }
+  #hill-bar .hill-track {
+    position: relative;
+    margin-top: 4px;
+    height: 14px;
+    border-radius: 7px;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--color-keyline) 40%, transparent);
+  }
+  #hill-bar .hill-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    background: var(--color-gold);
+  }
+  #hill-bar.is-contested .hill-fill {
+    background: var(--color-hostile);
+  }
+  #hill-bar.is-you-contesting .hill-fill {
+    background: var(--color-friendly);
+  }
+  #hill-bar .hill-contest {
+    position: relative;
+    line-height: 14px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+  #hill-bar .hill-foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 3px;
+    color: var(--color-text-muted);
+  }
   /* ---------- The Vale Cup pre-match briefing overlay ---------- */
   /* Full-screen festival card (rules + role kit + team sheet + Ready button)
      shown while phase === 'briefing'. Self-mounted into #ui by the painter,
@@ -18041,6 +18200,112 @@
     .aura-settings-grid {
       grid-template-columns: 1fr;
     }
+  }
+  /* Options > Cooldown Manager (src/ui/hud/cooldown_manager/cooldown_manager_settings.ts):
+     reuses the Auras panel's cards and grid above, plus the Tracked Spells
+     sorter (search, one drop section per group, Not Displayed). */
+  .cdm-add-bar {
+    flex-wrap: wrap;
+  }
+  .cdm-group-card:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cdm-capacity {
+    margin: 0 0 6px;
+  }
+  .cdm-select {
+    min-height: 32px;
+  }
+  .cdm-name {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 220px;
+    min-height: 32px;
+  }
+  .cdm-group-actions,
+  .cdm-order-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .cdm-group-actions > .btn,
+  .cdm-order-row > .btn {
+    flex: 1 1 0;
+    width: auto;
+    min-height: 40px;
+    margin-top: 0;
+  }
+  .cdm-tracked {
+    margin-top: 14px;
+  }
+  .cdm-search {
+    width: 100%;
+    max-width: 320px;
+    min-height: 32px;
+    margin: 0 0 10px;
+  }
+  .cdm-detail-card {
+    margin: 0 0 10px;
+  }
+  .cdm-spell-section {
+    margin: 0 0 10px;
+    padding: 6px 8px 8px;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-cell);
+  }
+  .cdm-spell-section.drop-target {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+  }
+  .cdm-spell-section-title {
+    margin-bottom: 6px;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .cdm-spell-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--socket-gap);
+    min-height: 40px;
+  }
+  .cdm-spell-chip {
+    --ui-socket-size: 40px;
+    flex: none;
+    padding: 0;
+    cursor: grab;
+  }
+  .cdm-spell-chip.is-unknown img {
+    filter: grayscale(0.85) brightness(0.6);
+  }
+  .cdm-other-hint {
+    margin: 0 0 6px;
+  }
+  .cdm-spell-chip[aria-pressed="true"] {
+    border-color: var(--gold);
+    box-shadow: var(--glow-gold);
+  }
+  .cdm-spell-chip:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+  .cdm-spell-list .cdm-empty {
+    margin: 0;
+    align-self: center;
+  }
+  /* Touch: the selects, the name boxes and the search box meet the 40px target floor. */
+  @media (pointer: coarse) {
+    .cdm-select,
+    .cdm-name,
+    .cdm-search {
+      min-height: 40px;
+    }
+  }
+  body.mobile-touch .cdm-select,
+  body.mobile-touch .cdm-name,
+  body.mobile-touch .cdm-search {
+    min-height: 40px;
   }
   /* Streamlined title bar for the perf panel (less bulky than the default chrome). */
   #options-menu.perf-wide > .panel-title {
@@ -25606,5 +25871,42 @@
     .ley-beam .wql-return:focus-visible {
       outline-color: Highlight;
     }
+  }
+}
+
+@layer components {
+  .frame-preset-loadouts .tal-foot {
+    flex-wrap: wrap;
+  }
+  .frame-preset-picker {
+    position: relative;
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+  .frame-preset-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-xs);
+    max-width: 100%;
+  }
+  .frame-preset-actions > button.ui-btn,
+  #options-menu .frame-preset-actions > button.ui-btn {
+    min-height: 40px;
+    padding: 6px 8px;
+  }
+  .frame-preset-loadouts .tal-loadout-menu {
+    bottom: auto;
+    top: calc(100% + 6px);
+    width: min(320px, 100%);
+    min-width: 0;
+    max-height: calc(var(--app-vh, 100vh) * 0.35 / var(--ui-scale, 1));
+    overflow-y: auto;
+  }
+  .frame-preset-loadouts .tal-loadout-caret {
+    transform: rotate(180deg);
+  }
+  .frame-preset-loadouts .tal-lo-item {
+    min-height: 40px;
   }
 }

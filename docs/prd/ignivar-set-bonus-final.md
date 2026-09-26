@@ -188,14 +188,18 @@ rider "Damage taken no longer delays your spellcasting."; marked [rider].
 
 ## Shaman
 
-- Stormkindled 2pc [rider]: "Unleash Weapon on Pyrebrand grants 3
-  Thunder." [Constant bend; probe never presses Unleash (probe gap,
-  gains a press); 3+ banked overcap partial waste disclosed.
-  Same-change: "gain 2 Thunder" copy + locales.]
+- Stormkindled 2pc [rider] (reworked with the v0.44.0 Thundercall rework):
+  "Arc Overload triggers 30 percent of the time." [Threshold bend at the one
+  roll site, 0.2 to 0.3; same single draw for everyone. Replaced "Unleash
+  Weapon on Pyrebrand grants 3 Thunder", which measured at zero on the bench
+  and was pressed at a fraction of its availability live.]
 - Stormkindled 4pc: "Earthen Jolt's bonus per Thunder rises to 30
-  percent." [Full vent 2.25x to 2.5x; multiplies with Primal Mastery
-  (3.125x in-window, disclosed). Same-change: two "125 percent" totals
-  + locales.]
+  percent, and Magma Burst deals 20 percent more damage." [Full vent 2.25x
+  to 2.5x; multiplies with Primal Mastery (3.125x in-window, disclosed).
+  The Magma Burst row (v0.44.0) is 20 percent delivered (0.24 against the
+  1.2 elemental baseline). Measured in Ignivar best in slot on the 120 sec
+  level-20 boss: the reworked set is worth about +23 DPS (about 10 percent),
+  up from +6.4, beside Moonscorch's +17.7.]
 - Warspirit 2pc: "Ancestral Strike advances your cadence 3 steps."
   [Round-2 CONFIRMED; steps widened + call-site; Exaltation clamp and
   Deep Reservoir currency-sharing disclosed. Same-change: two stale

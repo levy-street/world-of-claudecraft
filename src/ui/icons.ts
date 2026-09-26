@@ -10,6 +10,7 @@
 
 import { IGNIVAR_ART_PENDING_ITEM_IDS } from '../sim/content/ignivar_loot';
 import { isRawCookingCatch } from '../sim/content/items';
+import { SEASON2_SETS } from '../sim/content/pvp_honor_season2';
 import {
   BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
@@ -2947,6 +2948,10 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   tidecall: r('nature', 'sky', ['sunburst', { p: 'droplet', ...BR }], ['arcs']),
   stoneward: r('earth', 'earthBrown', ['shield', { p: 'gem', ...TR }], ['crack', 'glow']),
   primal_exaltation: r('storm', 'gold', ['sunburst', { p: 'lightning', ...BR }], ['glow', 'arcs']),
+  // v0.44 Thundercall rework kit.
+  lava_burst: r('fire', 'ember', ['flame', { p: 'sunburst', ...BR }], ['glow']),
+  lightning_overload: r('storm', 'sky', ['lightning', { p: 'lightning', ...BR }], ['arcs']),
+  thunderstorm: r('storm', 'sky', ['sunburst', { p: 'lightning', ...BR }], ['arcs', 'glow']),
   // warlock
   shadow_bolt: r('shadow', 'shadowPurple', ['bolt'], ['glow']),
   demon_skin: r('shadow', 'venom', [{ p: 'chestplate', pal: 'venom' }]),
@@ -4829,6 +4834,10 @@ export const ABILITY_IMAGE_IDS = new Set<string>([
   'stoneward',
   'primal_exaltation',
   'ancestor_return',
+  // v0.44 Thundercall rework (project-generated, style-referenced).
+  'lava_burst',
+  'lightning_overload',
+  'thunderstorm',
   // cross-class fills from the two generic CraftPix "100 RPG/skill icon" packs — abilities
   // their own class pack couldn't cover but a generic icon fit. (warrior taunt completes warrior.)
   'aspect_of_the_hawk',
@@ -5528,6 +5537,10 @@ export const ITEM_ART_PENDING = new Set<string>([
   ...IGNIVAR_ART_PENDING_ITEM_IDS,
   ...BRAMBLEHIDE_ART_PENDING_ITEM_IDS,
   ...NYTHRAXIS_GAP_ART_PENDING_ITEM_IDS,
+  // Warfare Season 2 armor: painted icons owned by a follow-up art pass; the
+  // procedural icon stands in until then. The season weapons never park here:
+  // an unpainted weapon already draws its procedural icon.
+  ...SEASON2_SETS.flatMap((set) => set.itemIds),
 ]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */

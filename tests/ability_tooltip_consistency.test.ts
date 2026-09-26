@@ -129,7 +129,7 @@ const NUMBER_ALLOWLIST: Record<string, number[]> = {
   // Thundercall and Stonebound values live in their spec runtime modules.
   lightning_bolt: [1, 5],
   rockbiter_weapon: [3, 10, 15, 20, 40],
-  earth_shock: [3, 5, 125],
+  earth_shock: [3, 5, 25, 125],
   // Spiritmend deposits are calculated after the direct heal resolves.
   healing_wave: [12, 30, 50],
   // Unleash Weapon dispatches to four spec enchant implementations. Their

@@ -21,6 +21,7 @@ import { emptyZoneProps } from '../types';
 
 export const FROSTVEIL_ZONE: ZoneDef = {
   id: 'frostveil',
+  worldPvp: 'ffa',
   name: 'The Frostveil Reach',
   riftPortalEligible: true,
   riftTierWeights: { B: 0.45, A: 0.4, S: 0.15 },

@@ -1,4 +1,5 @@
 import { HEXTHREAD_4PC_SENTENCE_DOOM_REFUND } from '../content/ignivar_set_bonuses';
+import { VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT } from '../content/vanguard_set_bonuses_b';
 import { MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -922,6 +923,20 @@ export function hasAfflictionConsumePushbackImmunity(entity: Entity): boolean {
   return entity.auras.some(
     (aura) => aura.kind === 'affliction_consume_threads' && (aura.stacks ?? 0) >= FATE_THREAD_MAX,
   );
+}
+
+/** Dreadquill Vestments 4pc (Warfare Season 2): Consume's health transfer
+ *  multiplier, read at the channel's drainTick heal. 1 for every other
+ *  ability and for any caster below the tier. No rng. */
+export function afflictionConsumeHealMult(
+  ctx: SimContext,
+  warlock: Entity,
+  abilityId: string,
+): number {
+  if (abilityId !== 'drain_life') return 1;
+  return wearsSetBonus(ctx, warlock, 'vanguard_warlock_affliction', 4)
+    ? VANGUARD_AFFLICTION_4PC_CONSUME_HEAL_MULT
+    : 1;
 }
 
 export function afflictionConsumeThreadDoomBonus(warlock: Entity): number {

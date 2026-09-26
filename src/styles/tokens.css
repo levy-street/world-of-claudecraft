@@ -966,8 +966,8 @@
     --color-player-card-chip-ink: #1c1407;
 
     /* action bars */
-    /* Compact pet commands keep their own socket species without shrinking combat actions. */
-    --socket-size-pet: 36px;
+    /* Pet commands match the default action buttons and share their size token. */
+    --socket-size-pet: var(--socket-size);
     /* Desktop XP fill paint stays separate from the driven mobile progress fraction. */
     --xp-rail-fill: linear-gradient(180deg, var(--color-xp), var(--color-xp-deep));
     /* Rested XP keeps a blue halo while its actionable segment stays fully saturated. */

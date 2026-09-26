@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { UMBRAL_ANCHOR_ID } from '../sim/combat/warlock_utility';
 import type { Aura, Entity } from '../sim/types';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   createUmbralAnchorVfxPlan,
   UMBRAL_ANCHOR_PLACE_SECONDS,
@@ -233,21 +234,21 @@ export class UmbralAnchorMarker {
     const voidDisc = new THREE.Mesh(voidGeometry, this.voidMaterial);
     voidDisc.name = 'umbral-anchor-void-disc';
     voidDisc.position.y = 0.026;
-    voidDisc.renderOrder = 5;
+    voidDisc.renderOrder = floorVfxRenderOrder('player', 0);
 
     const sigilGeometry = new THREE.PlaneGeometry(3.25, 3.25, 8, 8).rotateX(-Math.PI / 2);
     this.registerDrapedGeometry(sigilGeometry);
     const groundSigil = new THREE.Mesh(sigilGeometry, this.groundMaterial);
     groundSigil.name = 'umbral-anchor-sigil';
     groundSigil.position.y = 0.055;
-    groundSigil.renderOrder = 7;
+    groundSigil.renderOrder = floorVfxRenderOrder('player', 2);
     this.groundLayer.add(voidDisc, groundSigil);
 
     const runeGeometry = buildRuneGeometry();
     this.registerDrapedGeometry(runeGeometry);
     const runes = new THREE.LineSegments(runeGeometry, this.runeMaterial);
     runes.name = 'umbral-anchor-runes';
-    runes.renderOrder = 8;
+    runes.renderOrder = floorVfxRenderOrder('player', 3);
     this.runeLayer.add(runes);
 
     for (const [radius, tube, y] of [
@@ -258,7 +259,7 @@ export class UmbralAnchorMarker {
       this.registerDrapedGeometry(ringGeometry);
       const ring = new THREE.Mesh(ringGeometry, this.haloMaterial);
       ring.position.y = y;
-      ring.renderOrder = 8;
+      ring.renderOrder = floorVfxRenderOrder('player', 3);
       this.runeLayer.add(ring);
     }
 
@@ -268,7 +269,7 @@ export class UmbralAnchorMarker {
     );
     this.column.name = 'umbral-anchor-column';
     this.column.position.y = 1.35;
-    this.column.renderOrder = 6;
+    this.column.renderOrder = floorVfxRenderOrder('player', 1);
     this.verticalLayer.add(this.column);
 
     for (let index = 0; index < 2; index++) {
@@ -277,7 +278,7 @@ export class UmbralAnchorMarker {
       halo.position.y = 1.08;
       halo.rotation.y = index * Math.PI * 0.5;
       halo.scale.set(1, 1.45, 1);
-      halo.renderOrder = 9;
+      halo.renderOrder = floorVfxRenderOrder('player', 4);
       this.verticalLayer.add(halo);
       this.verticalHalos.push(halo);
     }
@@ -289,7 +290,7 @@ export class UmbralAnchorMarker {
       shard.name = `umbral-anchor-shard-${index}`;
       shard.position.set(Math.cos(angle) * 0.88, 0, Math.sin(angle) * 0.88);
       shard.rotation.set((index % 2 ? -1 : 1) * 0.22, -angle, ((index % 3) - 1) * 0.18);
-      shard.renderOrder = 9;
+      shard.renderOrder = floorVfxRenderOrder('player', 4);
       this.shardBaseY[index] = 0.18 + (index % 3) * 0.13;
       this.shardLayer.add(shard);
       this.shards.push(shard);
@@ -307,7 +308,7 @@ export class UmbralAnchorMarker {
     this.wisps = new THREE.Points(wispGeometry, this.wispMaterial);
     this.wisps.name = 'umbral-anchor-wisps';
     this.wisps.frustumCulled = false;
-    this.wisps.renderOrder = 10;
+    this.wisps.renderOrder = floorVfxRenderOrder('player', 5);
 
     this.group.add(
       this.groundLayer,

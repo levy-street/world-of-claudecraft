@@ -16,7 +16,7 @@ import {
   FURY_NPC,
   FURY_NPC_ID,
   FURY_STOCK,
-  HONOR_VENDOR_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
   WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import { ZONE3_NPCS, ZONE3_ZONE } from '../src/sim/content/zone3';
@@ -58,10 +58,16 @@ describe('Warmarshal Draven Kole: the definition', () => {
   it('sells the one canonical WARFARE stock rather than a second copy of it', () => {
     // One list, two placements. FURY keeps the identical stock in Eastbrook, so
     // a divergence here means someone forked the item table.
-    // The shared list is the WARFARE kit followed by the two honor trinkets.
-    expect(HONOR_VENDOR_STOCK).toEqual([...FURY_STOCK, ...WARFARE_TRINKET_STOCK]);
-    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
-    expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
+    // Both sell the one canonical honor stock: the entry tier then Warfare Season 2.
+    expect(KOLE.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
+    expect(NPCS[FURY_NPC_ID].vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
+    expect(HONOR_QUARTERMASTER_STOCK.slice(0, FURY_STOCK.length)).toEqual([...FURY_STOCK]);
+    expect(
+      HONOR_QUARTERMASTER_STOCK.slice(
+        FURY_STOCK.length,
+        FURY_STOCK.length + WARFARE_TRINKET_STOCK.length,
+      ),
+    ).toEqual([...WARFARE_TRINKET_STOCK]);
     expect(FURY_STOCK.length).toBeGreaterThan(0);
   });
 
@@ -75,7 +81,7 @@ describe('Warmarshal Draven Kole: the definition', () => {
     expect(FURY_NPC.warfareVendor, 'FURY, the Eastbrook mirror').toBe(true);
     // And the two really do sell the same list, not a copy that can drift.
     expect(KOLE.vendorItems).toEqual(FURY_NPC.vendorItems);
-    expect(KOLE.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
+    expect(KOLE.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
   });
 
   it('is an honor vendor purely by virtue of its priced stock, not by a flag', () => {
@@ -151,7 +157,7 @@ describe('Warmarshal Draven Kole: the world build is untouched', () => {
     expect(kole.spawnPos.x).toBe(KOLE.pos.x);
     expect(kole.spawnPos.z).toBe(KOLE.pos.z);
     expect(kole.facing).toBe(KOLE.facing);
-    expect(kole.vendorItems).toEqual([...HONOR_VENDOR_STOCK]);
+    expect(kole.vendorItems).toEqual([...HONOR_QUARTERMASTER_STOCK]);
   });
 
   it('is idempotent, so a second spawn call cannot mint a duplicate', () => {

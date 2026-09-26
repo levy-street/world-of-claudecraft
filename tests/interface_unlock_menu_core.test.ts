@@ -39,11 +39,33 @@ const makeHooks = (initial: Partial<GameSettings> = {}) => {
 };
 
 describe('buildFramesMenuToggles', () => {
-  it('lists the eight behavior rows then three per-bar toggles while split', () => {
+  it('locks Target of Target by default and preserves the stored independent position mode', () => {
+    const { hooks, values, applied } = makeHooks({ moveTargetOfTargetIndependently: false });
+    const toggle = () =>
+      buildFramesMenuToggles(hooks, false).find(
+        (row) => row.id === 'moveTargetOfTargetIndependently',
+      )!;
+    expect(toggle().value).toBe(true);
+    toggle().set(false);
+    expect(values.moveTargetOfTargetIndependently).toBe(true);
+    expect(toggle().value).toBe(false);
+    toggle().set(true);
+    expect(values.moveTargetOfTargetIndependently).toBe(false);
+    expect(applied).toEqual([
+      ['moveTargetOfTargetIndependently', true],
+      ['moveTargetOfTargetIndependently', false],
+    ]);
+  });
+
+  it('lists frame behavior rows then three per-bar toggles while split', () => {
     const { hooks } = makeHooks();
     const ids = buildFramesMenuToggles(hooks, false).map((row) => row.id);
     expect(ids).toEqual([
+      'showEmptyFocusFrames',
       'combineActionBars',
+      'combineTrackerFrames',
+      'combineAuraFrames',
+      'moveTargetOfTargetIndependently',
       'hideUnusedActionSlots',
       'mouseoverCast',
       'lockActionBars',
@@ -134,11 +156,15 @@ describe('buildFramesMenuSelects', () => {
 });
 
 describe('FRAME_SIZE_RESET_KEYS', () => {
-  it('maps exactly the three settings-sized frames to scale plus dimensions', () => {
+  it('maps unit frames to their settings-backed scale and dimensions', () => {
     expect(Object.keys(FRAME_SIZE_RESET_KEYS)).toEqual([
       'playerFrame',
       'targetFrame',
       'partyFrames',
+      'petFrame',
+      'focusTarget1',
+      'focusTarget2',
+      'focusTarget3',
     ]);
     expect(FRAME_SIZE_RESET_KEYS.playerFrame).toEqual([
       'playerFrameScale',

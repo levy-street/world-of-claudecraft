@@ -520,14 +520,14 @@
     align-items: center;
   }
   .window .panel-title {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     touch-action: none;
   }
   .window .panel-title .x-btn {
     cursor: var(--cursor-point);
   }
   .window.window-dragging {
-    cursor: move;
+    cursor: var(--cursor-move, move);
     user-select: none;
     will-change: transform;
   }

@@ -197,7 +197,7 @@ export const SETTING_RANGES = {
   // Scales the ENTIRE in-game HUD layer (#ui) up or down via CSS zoom, so every
   // fixed-px frame/label/button grows together — the global "fonts too small"
   // remedy that the per-element tooltip/chat/fct scales can't cover. 1.0 = stock.
-  uiScale: { min: 0.85, max: 1.4, def: 1 },
+  uiScale: { min: 0.75, max: 2, def: 1 },
   // Scales just the player unit frame (portrait, name, hp/resource bars, combo
   // pips) via --player-frame-scale, so it can shrink toward the target frame's
   // compact read without touching the rest of the HUD. Pairs with the frame's
@@ -221,6 +221,14 @@ export const SETTING_RANGES = {
   playerFrameHeight: { min: 8, max: 30, def: 15 },
   targetFrameWidth: { min: 200, max: 460, def: UNIT_FRAME_STOCK_WIDTH },
   targetFrameHeight: { min: 8, max: 30, def: 15 },
+  petFrameWidth: { min: 200, max: 460, def: UNIT_FRAME_STOCK_WIDTH },
+  petFrameHeight: { min: 8, max: 30, def: 15 },
+  focusTarget1Width: { min: 120, max: 460, def: 240 },
+  focusTarget1Height: { min: 8, max: 30, def: 15 },
+  focusTarget2Width: { min: 120, max: 460, def: 240 },
+  focusTarget2Height: { min: 8, max: 30, def: 15 },
+  focusTarget3Width: { min: 120, max: 460, def: 240 },
+  focusTarget3Height: { min: 8, max: 30, def: 15 },
   // Health text on the player frame and on the target (plus target-of-target)
   // frame, same mode table as partyFrameHealthText below; both default to the
   // historical always-on "current / max".
@@ -560,6 +568,8 @@ export const BOOL_SETTINGS = {
   // block is placed as a single piece under the "Unlock interface" option.
   // Purely a layout preference; every slot keeps its keybind either way.
   combineActionBars: { def: false },
+  combineTrackerFrames: { def: false },
+  combineAuraFrames: { def: false },
   // off by default (the classic look, unchanged out of the box): strips the black
   // background, border, and keybind label from desktop action-bar slots that hold
   // no ability or item, via a body class main.ts toggles (issue 2429). The fixed
@@ -581,6 +591,7 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's target-frame update; the id it reads already rides
   // the wire, and the frame hides itself when the target-of-target is unknown.
   showTargetOfTarget: { def: false },
+  moveTargetOfTargetIndependently: { def: false },
   // off by default: the target and target-of-target's own melee/ranged swing
   // timer bars, under the target frame. Purely a display preference read by
   // the HUD's per-frame update; the swingTimer/autoAttack data already rides
@@ -593,6 +604,7 @@ export const BOOL_SETTINGS = {
   // preference read by the HUD's pet-frame update; the pet already rides the wire
   // as an ordinary owned mob entity.
   showPetFrame: { def: true },
+  showEmptyFocusFrames: { def: false },
   // on by default: keep the Daily Rewards chest launcher visible on the HUD. Hiding
   // it only removes the shortcut; rewards, eligibility, and the panel remain available.
   showDailyRewardsChest: { def: true },

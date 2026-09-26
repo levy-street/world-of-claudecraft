@@ -11,6 +11,7 @@ import type {
   ActiveVarkhulCinderOrbProjectile,
 } from '../sim/varkhul_cinder_orbs';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   type VarkhulAssemblyViewerFocus,
   varkhulAssemblyViewerFocusInto,
@@ -73,7 +74,7 @@ export function buildVarkhulForgestormTelegraph(
     rimMaterial,
   );
   rim.name = 'varkhul-forgestorm-rim';
-  rim.renderOrder = 11;
+  rim.renderOrder = floorVfxRenderOrder('encounter', 10);
   group.add(rim);
 
   const fillMaterial = new THREE.MeshBasicMaterial({
@@ -89,7 +90,7 @@ export function buildVarkhulForgestormTelegraph(
   );
   fill.name = 'varkhul-forgestorm-fill';
   fill.position.y = 0.01;
-  fill.renderOrder = 10;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 9);
   group.add(fill);
 
   const countdownMaterial = new THREE.MeshBasicMaterial({
@@ -107,7 +108,7 @@ export function buildVarkhulForgestormTelegraph(
   countdown.name = 'varkhul-forgestorm-countdown';
   countdown.position.y = 0.025;
   countdown.scale.set(0.001, 1, 0.001);
-  countdown.renderOrder = 12;
+  countdown.renderOrder = floorVfxRenderOrder('encounter', 11);
   group.add(countdown);
 
   const meteorMaterial = new THREE.MeshBasicMaterial({
@@ -121,7 +122,7 @@ export function buildVarkhulForgestormTelegraph(
   const meteor = new THREE.Mesh(new THREE.IcosahedronGeometry(0.72, 1), meteorMaterial);
   meteor.name = 'varkhul-forgestorm-meteor';
   meteor.position.y = METEOR_START_HEIGHT;
-  meteor.renderOrder = 14;
+  meteor.renderOrder = floorVfxRenderOrder('encounter', 13);
   group.add(meteor);
 
   const trailMaterial = new THREE.MeshBasicMaterial({
@@ -137,7 +138,7 @@ export function buildVarkhulForgestormTelegraph(
   const trail = new THREE.Mesh(new THREE.ConeGeometry(0.62, 6.2, 9, 1, true), trailMaterial);
   trail.name = 'varkhul-forgestorm-meteor-trail';
   trail.position.y = METEOR_START_HEIGHT + METEOR_TRAIL_OFFSET;
-  trail.renderOrder = 13;
+  trail.renderOrder = floorVfxRenderOrder('encounter', 12);
   group.add(trail);
 
   group.userData.rimMaterial = rimMaterial;

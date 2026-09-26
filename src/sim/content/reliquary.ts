@@ -19,6 +19,7 @@
 // would double-count completion.
 
 import { FURY_STOCK, WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from './pvp_honor';
+import { SEASON2_STOCK } from './pvp_honor_season2';
 import {
   RIFT_EPIC_ITEM_IDS,
   RIFT_GEAR_ITEM_IDS,
@@ -931,7 +932,7 @@ const REALM_RARE_ZONES = [
 // Both quartermasters front the SAME canonical honor stock: FURY at the
 // Eastbrook arena (FURY_NPC in content/pvp_honor.ts) and Warmarshal Draven
 // Kole at the Highwatch hub (content/zone3.ts, spawned under a reserved id by
-// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_VENDOR_STOCK.
+// src/sim/pvp/warfare_quartermaster.ts), each with vendorItems = HONOR_QUARTERMASTER_STOCK.
 // Every slot therefore names both counters through one shared tuple. Honor
 // purchases flow through the ordinary buyItem discovery path
 // (markItemDiscovered + noteRelicObtain), so ownership needs no new state.
@@ -952,6 +953,10 @@ const WARFARE_ARMORY_ITEM_IDS = [
   ...FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined),
   ...WARFARE_TRINKET_STOCK,
 ];
+// Warfare Season 2 ("Vanguard", content/pvp_honor_season2.ts) is sold by the same
+// two quartermasters: its 27 spec sets and four weapons fill one page, in stock
+// order (class, then spec, each helmet to gloves, then the weapons).
+const VANGUARD_GALLERY_ITEM_IDS = [...SEASON2_STOCK];
 
 /**
  * Freeze the whole page table at its one construction site: the top-level
@@ -1895,6 +1900,21 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     excludeFromCompletion: 'personal',
     sourceDefault: fromProfession('weaponcrafting'),
     relics: items('varkhul_forgebreaker'),
+  },
+  // Warfare Season 2 (content/pvp_honor_season2.ts): appended per the
+  // append-only page table; it files under the Conquerors shelf by its shelf id.
+  {
+    id: 'conquerors_vanguard_gallery',
+    shelf: 'conquerors',
+    name: 'Vanguard Gallery',
+    desc: 'The Warfare Season 2 spec sets and weapons, bought with honor.',
+    clearSource: { kind: 'none' },
+    // Class-personal stock (each set is class-locked and the shop lists only the
+    // viewer's own class), so no single character can fill it: outside both
+    // completion pairs, the Riftbound precedent, so the Conquerors capstone never
+    // needs a character of every class.
+    excludeFromCompletion: 'personal',
+    relics: items(...VANGUARD_GALLERY_ITEM_IDS.map((id) => [id, WARFARE_VENDOR_HINTS] as const)),
   },
 ]);
 

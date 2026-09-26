@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Kriegsführungsarsenal',
     desc: 'Kriegsführungsschmuck und -waffen, gekauft mit hart erkämpfter Ehre.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Vorhutgalerie',
+    desc: 'Die Spezialisierungssets und Waffen der Kriegsführung, Saison 2, mit Ehre erworben.',
+  },
   horizons_vault_of_ages: {
     name: 'Gewölbe der Zeitalter',
     desc: 'Ausgemusterte Schätze einer vergangenen Zeit. Diese Reliquien lassen sich nicht mehr erringen; das Gewölbe ehrt die Veteranen, die sie bewahren.',

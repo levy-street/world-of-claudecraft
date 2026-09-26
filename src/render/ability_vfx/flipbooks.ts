@@ -135,7 +135,9 @@ export class ImpactFlipbooks {
       const mat = proto.clone();
       const mesh = new THREE.Mesh(this.geometry, mat);
       mesh.visible = false;
-      mesh.renderOrder = 8; // over the shock rings: the sheet IS the impact
+      // Vertical, additive, depth-tested: outside the floor ladder (the shock rings
+      // sit on it), so this order only sets blend arithmetic among the pooled sheets.
+      mesh.renderOrder = 8;
       mesh.userData.renderCategory = 'vfx';
       mesh.onBeforeRender = (renderer, _scene, _camera, _geometry, material) => {
         const target = renderer.getRenderTarget();

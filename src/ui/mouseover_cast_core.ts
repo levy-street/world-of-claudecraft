@@ -39,8 +39,8 @@ export interface MouseoverCastInputs {
  * The pid a mouseover cast should be redirected to, or null to leave the press on
  * the classic current-target-else-self path.
  *
- * Only friendly targeted abilities redirect (a hostile cast never rides a party
- * frame), and only to a hovered unit this client can still vouch for: one it holds
+ * Party and focus frames redirect friendly targeted abilities.
+ * The hovered unit must be one this client can vouch for: one it holds
  * an entity for, or one the party wire still lists as a member.
  */
 export function mouseoverCastTargetPid(

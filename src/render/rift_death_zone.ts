@@ -17,6 +17,7 @@
 
 import * as THREE from 'three';
 import type { RiftBossDeathZoneView } from '../world_api/dungeons';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   deathZonePlan,
   deathZonePulseSpeed,
@@ -128,7 +129,7 @@ export class RiftDeathZoneVisuals {
     const rimGeo = this.terrainRing(zone.x, zone.z, zone.radius * RIM_INNER_FRACTION, zone.radius);
     ownedGeometries.push(rimGeo);
     const rim = new THREE.Mesh(rimGeo, rimMat);
-    rim.renderOrder = 10; // above terrain, below entities
+    rim.renderOrder = floorVfxRenderOrder('encounter', 9); // above terrain, below entities
     group.add(rim);
 
     // Fill and sweep blend NORMALLY (not additively) on purpose: an S-rank
@@ -148,7 +149,7 @@ export class RiftDeathZoneVisuals {
     const fillGeo = this.terrainDisc(zone.x, zone.z, zone.radius * RIM_INNER_FRACTION);
     ownedGeometries.push(fillGeo);
     const fill = new THREE.Mesh(fillGeo, fillMat);
-    fill.renderOrder = 9;
+    fill.renderOrder = floorVfxRenderOrder('encounter', 8);
     group.add(fill);
 
     // The timer sweep: a flat disc at the zone center's ground height, scaled
@@ -169,7 +170,7 @@ export class RiftDeathZoneVisuals {
     sweep.position.set(zone.x, this.groundY(zone.x, zone.z) + SWEEP_LIFT, zone.z);
     const [sx, sy, sz] = deathZoneSweepScale(0);
     sweep.scale.set(sx, sy, sz);
-    sweep.renderOrder = 11;
+    sweep.renderOrder = floorVfxRenderOrder('encounter', 10);
     group.add(sweep);
 
     this.scene.add(group);

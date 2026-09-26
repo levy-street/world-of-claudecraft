@@ -851,6 +851,7 @@ describe('item-art audit builder', () => {
     // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
     // the sha/bytes straight from `--verify-only` on this tree.
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
+    // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
       // Re-minted on the quests integration branch: the catalog carries the 15
@@ -859,11 +860,13 @@ describe('item-art audit builder', () => {
       // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
       // 1340, sha and bytes straight from `--verify-only` on this tree; 1323 / 1341
       // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way. 1341 / 1359 with the trinket slot's 18 trinkets (PR 4173) landed on the integration branch (a 26th group and a 32nd sheet page), sha and bytes re-measured with `--verify-only` on the merged tree.
-      catalogSha256: '0e578c2eafa1a86281d8f79928716f74bccb70cc29f35b226894e6b356101a09',
-      catalogBytes: 730443,
+      // 1345 / 1498 with Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four
+      // painted weapons, re-measured with `--verify-only` on the merged tree.
+      catalogSha256: 'c8684228613b25ee179809c6ee8ff1cd4927b1c8095345d065f76cacbe984e25',
+      catalogBytes: 732562,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1341,
-      liveItemCount: 1359,
+      catalogCount: 1345,
+      liveItemCount: 1363,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
@@ -881,7 +884,7 @@ describe('item-art audit builder', () => {
         identity: 32,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '872966412016b29a6c8797577cc760e8c2f3548b1d5414aa2554eb5757557d26',
+      shippingCatalogSha256: '1170e76dfd06331e3c77020777a55ac5608f587e2e8f852dc2a9c3e7a3907c7e',
       machineChecksPassed: true,
       verdict: null,
     });

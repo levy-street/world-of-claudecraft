@@ -282,7 +282,7 @@
            compounds the target frame scale into its own mini zoom. Its own unit_frame
            painter toggles it flex/none when the target-of-target is known/unknown.
            Portrait + name + hp bar only (no resource/cast/debuffs). -->
-      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Mark's Mark">
+      <div id="totarget-frame" class="unitframe totarget" role="group" data-i18n-aria="hudChrome.unitFrame.targetOfTargetLabel" aria-label="Target of Target">
         <div class="portrait-wrap ui-portrait-wrap">
           <div class="portrait ui-portrait"><canvas id="totf-portrait" width="54" height="54"></canvas></div>
           <div class="level-chip ui-medal" id="totf-level"></div>
@@ -290,6 +290,7 @@
         <div class="uf-bars">
           <div class="uf-name ui-ribbon" id="totf-name"></div>
           <div class="bar hp ui-bevel"><div class="bar-fill ui-bevel-fill" id="totf-hp"></div><div class="ui-bevel-ticks" aria-hidden="true"><span></span><span></span><span></span><span></span></div><div class="ui-bevel-edge" aria-hidden="true"></div><div class="bar-text ui-bevel-text" id="totf-hp-text"></div></div>
+          <div class="bar resource ui-bevel" id="totf-resource"><div class="bar-fill ui-bevel-fill" id="totf-res"></div><div class="bar-text ui-bevel-text" id="totf-res-text"></div></div>
         </div>
       </div>
     </div>
@@ -382,7 +383,7 @@
       <div id="recipe-tracker"></div>
       <div id="delve-tracker"><div id="delve-body"></div></div>
       <div id="rift-tracker"><div id="rift-body"></div></div>
-      <div id="practice-tracker"></div>
+      <div id="practice-tracker"><div id="practice-body"></div></div>
       <div id="hub-lesson-coach"></div>
       <div id="gathering-goal-tracker" class="gathering-goal-panel">
         <div id="gathering-goal-body"></div>

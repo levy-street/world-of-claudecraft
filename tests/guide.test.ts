@@ -81,6 +81,7 @@ import {
   STATIONS,
 } from '../src/sim/content/professions';
 import { WARFARE_ITEMS, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
+import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import {
   ALL_RECIPES,
   COMBO_RECIPES,
@@ -1025,7 +1026,7 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     }
   });
 
-  it('labels all three outside-completion pages, and renders tag plus note for each', () => {
+  it('labels all four outside-completion pages, and renders tag plus note for each', () => {
     // The generated blob carries the flag for exactly the live flagged set
     // (a third flagged page must surface here the moment it is authored)...
     expect(
@@ -1037,13 +1038,15 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      // Class-locked Warfare Season 2 stock.
+      ['conquerors_vanguard_gallery', 'personal'],
     ]);
     // ...and the rendered catalog SHOWS the label: the tag beside the page
     // heading and the explanatory note, one pair per flagged page, resolved
     // through t() (never hardcoded English), with none on ordinary pages.
     const html = reliquaryCatalogSections(GUIDE_RELIQUARY);
-    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(3);
-    expect(html.match(/guide-reliquary-note/g)?.length).toBe(3);
+    expect(html.match(/guide-reliquary-flag/g)?.length).toBe(4);
+    expect(html.match(/guide-reliquary-note/g)?.length).toBe(4);
     expect(html).toContain(`(${t('guide.reliquaryPage.retiredTag')})`);
     expect(html).toContain(`(${t('guide.reliquaryPage.personalTag')})`);
     expect(html).toContain(t('guide.reliquaryPage.retiredNote'));
@@ -5918,7 +5921,11 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // outside WARFARE_ITEMS (defs in content/trinkets.ts), with the same
     // soulbound, no-sell-value shape.
     for (const id of honorRows) {
-      expect(id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id), id).toBe(true);
+      // The Warfare tier: the entry tier, the two honor trinkets and Warfare Season 2.
+      expect(
+        id in WARFARE_ITEMS || WARFARE_TRINKET_STOCK.includes(id) || SEASON2_STOCK.includes(id),
+        id,
+      ).toBe(true);
       expect(ITEMS[id].soulbound, id).toBe(true);
       expect(ITEMS[id].sellValue, id).toBe(0);
     }
@@ -6519,6 +6526,13 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
     // Every frame the toggle governs has a phrase, and every phrase renders: a
     // new HUD_FRAME_SPECS row with no phrase here reds.
     const phraseFor: Record<string, string> = {
+      trackerGroup: t('hudChrome.interfaceUnlock.frameNames.trackerGroup'),
+      auraGroup: t('hudChrome.interfaceUnlock.frameNames.auraGroup'),
+      targetOfTarget: t('hudChrome.unitFrame.targetOfTargetLabel'),
+      focusTarget1: t('hudChrome.focusTargets.frame1'),
+      focusTarget2: t('hudChrome.focusTargets.frame2'),
+      focusTarget3: t('hudChrome.focusTargets.frame3'),
+      practiceTracker: 'a practice tracker',
       actionBar1: 'the action bars',
       actionBar2: 'the action bars',
       actionBar3: 'the action bars',

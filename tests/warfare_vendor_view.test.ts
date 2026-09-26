@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
-import { FURY_STOCK } from '../src/sim/content/pvp_honor';
+import { FURY_STOCK, HONOR_QUARTERMASTER_STOCK } from '../src/sim/content/pvp_honor';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { InvSlot, ItemDef, ItemSet } from '../src/sim/types';
@@ -17,6 +17,7 @@ import {
   buildWarfareVendorView,
   isWarfareVendorNpc,
   WARFARE_SHOP_JEWELRY_KEY,
+  WARFARE_SHOP_SEASON2_WEAPONS_KEY,
   WARFARE_SHOP_SET_ORDER,
   WARFARE_SHOP_WEAPONS_KEY,
   type WarfareShopSetSection,
@@ -510,5 +511,97 @@ describe('buildWarfareVendorView over the shipped WARFARE stock', () => {
     const section = setSection(view, 'warfare_furyforged');
     expect(section.tiers.every((tier) => tier.met)).toBe(true);
     expect(section.nextTier).toBeNull();
+  });
+});
+
+describe('buildWarfareVendorView over the full honor stock (Warfare Season 2 first)', () => {
+  it("lists the viewer's three Season 2 spec sets and usable weapons, then the entry tier", () => {
+    const view = buildWarfareVendorView(
+      HONOR_QUARTERMASTER_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ viewerClass: 'mage' }),
+    );
+    const season = view.sections.filter((s) => s.group === 'season2');
+    expect(season.map((s) => s.key)).toEqual([
+      'vanguard_mage_arcane',
+      'vanguard_mage_fire',
+      'vanguard_mage_frost',
+      WARFARE_SHOP_SEASON2_WEAPONS_KEY,
+    ]);
+    for (const setId of ['vanguard_mage_arcane', 'vanguard_mage_fire', 'vanguard_mage_frost']) {
+      const section = setSection(view, setId);
+      expect(section.offers, setId).toHaveLength(5);
+      expect(
+        section.tiers.map((tier) => tier.pieces),
+        setId,
+      ).toEqual([2, 4]);
+    }
+    // A mage can wield only the Season 2 staff.
+    expect(
+      view.sections
+        .find((s) => s.key === WARFARE_SHOP_SEASON2_WEAPONS_KEY)
+        ?.offers.map((o) => o.itemId),
+    ).toEqual(['vanguard_warstaff']);
+    // Season 2 comes first; the entry tier follows, unfiltered and unchanged.
+    const firstEntry = view.sections.findIndex((s) => s.group === 'entry');
+    expect(firstEntry).toBe(season.length);
+    expect(view.sections.slice(firstEntry).map((s) => s.key)).toEqual([
+      ...WARFARE_SHOP_SET_ORDER,
+      WARFARE_SHOP_JEWELRY_KEY,
+      WARFARE_SHOP_WEAPONS_KEY,
+    ]);
+  });
+
+  it('shows every class exactly its own three Season 2 sets', () => {
+    const classes = [
+      'warrior',
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ];
+    for (const cls of classes) {
+      const view = buildWarfareVendorView(
+        HONOR_QUARTERMASTER_STOCK,
+        ITEMS,
+        ITEM_SETS,
+        viewer({ viewerClass: cls }),
+      );
+      const sets = view.sections.filter((s) => s.group === 'season2' && s.kind === 'set');
+      expect(sets, cls).toHaveLength(3);
+      for (const s of sets) expect(s.key.startsWith(`vanguard_${cls}_`), s.key).toBe(true);
+    }
+  });
+
+  it('filters nothing when the class is unknown', () => {
+    const view = buildWarfareVendorView(HONOR_QUARTERMASTER_STOCK, ITEMS, ITEM_SETS, viewer());
+    expect(view.sections.filter((s) => s.group === 'season2' && s.kind === 'set')).toHaveLength(27);
+  });
+});
+
+describe('buildWarfareVendorView names the spec of each Season 2 set', () => {
+  it('carries the class and spec on Season 2 sets and nothing on the entry tier', () => {
+    const view = buildWarfareVendorView(
+      HONOR_QUARTERMASTER_STOCK,
+      ITEMS,
+      ITEM_SETS,
+      viewer({ viewerClass: 'warrior' }),
+    );
+    const specs = view.sections
+      .filter((s) => s.kind === 'set' && s.group === 'season2')
+      .map((s) => (s.kind === 'set' ? s.spec : undefined));
+    expect(specs).toEqual([
+      { cls: 'warrior', spec: 'arms' },
+      { cls: 'warrior', spec: 'fury' },
+      { cls: 'warrior', spec: 'prot' },
+    ]);
+    for (const s of view.sections) {
+      if (s.kind === 'set' && s.group === 'entry') expect(s.spec, s.key).toBeUndefined();
+    }
   });
 });

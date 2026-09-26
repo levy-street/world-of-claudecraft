@@ -48,7 +48,12 @@ import {
   recordCorpseHarvestDeath,
   releaseCorpseHarvest,
 } from '../professions/corpse_harvest_session';
-import { pvpDamageMultiplier } from '../pvp';
+import {
+  pvpDamageMultiplier,
+  worldPvpOnOwnedPetDamaged,
+  worldPvpOnPlayerDamaged,
+  worldPvpOnPlayerDeath,
+} from '../pvp';
 import { resolveRespawnSeconds } from '../respawn_policy';
 import { aurasSurvivingDeath } from '../resurrection';
 import { computeCharacterModifiers } from '../set_bonus_mods';
@@ -141,7 +146,7 @@ import {
   priestOnShieldConsumed,
   priestOnVigilTriggered,
 } from './priest/talents';
-import { vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
+import { duskhymnChannelStopped, vespersEchoDamage, vespersOnEntityDeath } from './priest/vespers';
 import { questGateBlocksDamage } from './quest_damage_gate';
 import { foulPlayGuardsBreak } from './rogue_talents';
 import { applySetProcs } from './set_procs';
@@ -550,20 +555,25 @@ export function dealDamage(
   }
 
   const sourcePlayer = ctx.pvpController(source);
+  const targetPlayer = ctx.pvpController(target);
 
-  // WARFARE is a hostile player-vs-player modifier only. Pets, self-damage,
-  // friendly effects, player-vs-mob, and mob-vs-player damage stay byte-identical.
-  // dealDamage receives post-mitigation damage, so this deterministic step sits
-  // after the upstream armor/resist roll and before absorb shields.
+  // WARFARE applies to ALL hostile player-vs-player combat and never to PvE
+  // (owner rule). Both sides resolve to the player who controls them, so a pet,
+  // guardian or totem fights with its owner's Offense and takes hits with its
+  // owner's Defense. Self-damage, friendly effects, and anything touching a mob
+  // no player controls stay byte-identical. dealDamage receives post-mitigation
+  // damage, so this deterministic step sits after the upstream armor/resist roll
+  // and before absorb shields.
   if (
     !resolvedHpLoss &&
     amount > 0 &&
-    source?.kind === 'player' &&
-    target.kind === 'player' &&
-    source.id !== target.id &&
+    source &&
+    sourcePlayer &&
+    targetPlayer &&
+    sourcePlayer.id !== targetPlayer.id &&
     ctx.isHostileTo(source, target)
   ) {
-    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(source, target)));
+    amount = Math.max(0, Math.round(amount * pvpDamageMultiplier(sourcePlayer, targetPlayer)));
   }
 
   if (
@@ -1171,6 +1181,12 @@ export function dealDamage(
   // assist window); this hub only reports the hit.
   if (source && amount > 0 && target.kind === 'player' && !target.dead) {
     ctx.bgOnPlayerDamaged(target, source);
+    // World PvP assists: the same idea for a flagged victim in the open world
+    // (src/sim/pvp/world_pvp.ts owns the flag, the pair, and the window rules).
+    worldPvpOnPlayerDamaged(ctx, target, source);
+  } else if (source && amount > 0 && target.kind === 'mob' && target.ownerId !== null) {
+    // A hit on a player's PET marks an aggressor as a hit on the owner would.
+    worldPvpOnOwnedPetDamaged(ctx, target, source);
   }
 
   if (source && source.kind === 'player' && source.id !== target.id) {
@@ -1421,6 +1437,9 @@ export function handleDeath(
   // called explicitly here too, before the field it reads is cleared.
   // Idempotent: a no-op for every death that was never mid-harvest.
   releaseCorpseHarvest(ctx, e.id);
+  // The Duskhymn 2pc channel slow (Warfare Season 2) likewise leaves the
+  // target with the channel; a no-op unless mid-Litany of Woe.
+  duskhymnChannelStopped(ctx, e);
   e.castingAbility = null;
   e.castTargetId = null;
   // Death is a cast cancel: mirror cancelCast's teardown of the channel and
@@ -1563,6 +1582,11 @@ export function handleDeath(
     // lies where it fell and the player's own Release press sends the spirit to
     // the warded keep graveyard, where the team wave clock raises it.
     ctx.bgOnPlayerDeath(e, killer);
+    // World PvP: a flagged player's death in the open world moves the gold
+    // stake and pays the honor pool to everyone who worked for the kill. Pure
+    // ledger arithmetic on the sim clock, zero rng; a no-op for every death
+    // that was not a flagged player's at a flagged player's hands.
+    worldPvpOnPlayerDeath(ctx, e, killer);
     for (const m of ctx.entities.values()) {
       if (m.kind === 'mob' && !m.dead && m.aggroTargetId === e.id && m.aiState !== 'dead') {
         // turn on the next nearby attacker; go home only if nobody is left

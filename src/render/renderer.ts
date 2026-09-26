@@ -45,6 +45,7 @@ import {
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import type { ChatBubbleStyle } from '../ui/chat_bubble_style';
 import { tEntity } from '../ui/entity_i18n';
+import { isPvpHostilePlayer } from '../ui/pvp_hostile_core';
 import type { IWorld } from '../world_api';
 import {
   abilityMaterialPrewarmMaterials,
@@ -346,6 +347,7 @@ import {
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
 import { FishingBobberVisual } from './fishing_bobber';
+import { applyFloorVfxLayer, floorVfxRenderOrder } from './floor_vfx_layer';
 import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
@@ -401,6 +403,7 @@ import { emitGroundPuff } from './ground_puff';
 import { createGroundTilt, type GroundTiltState, stepGroundTilt } from './ground_tilt_core';
 import { buildHauntFeatures, type HauntFeaturesView } from './haunt_features';
 import { usedJsHeapMb } from './heap_sample';
+import { HillRingVisuals } from './hill_ring';
 import { createHitchFrameAligner } from './hitch_frame_align_core';
 import { buildHollowGates, type HollowGatesView } from './hollow_gates';
 import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
@@ -1912,6 +1915,8 @@ export class Renderer {
   private abyssalRiftFx!: AbyssalRiftFx;
   private ringOfFrostVisuals!: RingOfFrostVisuals;
   private riftDeathZoneVisuals!: import('./rift_death_zone').RiftDeathZoneVisuals;
+  // King of the Hill: the standing hill's circle (hill_ring.ts, IWorld.hillInfo).
+  private hillRingVisuals!: HillRingVisuals;
   // The viewer's OWN farm plots. Seats are sampled once with the static beds;
   // the visuals wait for the Vfx, which is built later in the same lifecycle.
   private farmBedSeats: ReadonlyMap<string, FarmBedSeat> = new Map();
@@ -2860,11 +2865,7 @@ export class Renderer {
         depthTest: false,
       });
       const ring = new THREE.Mesh(cmRingGeo, ringMat);
-      const crossMat = new THREE.MeshBasicMaterial({
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-      });
+      const crossMat = ringMat.clone();
       const cross = new THREE.Group();
       for (const rot of [Math.PI / 4, -Math.PI / 4]) {
         const bar = new THREE.Mesh(cmBarGeo, crossMat);
@@ -2873,7 +2874,10 @@ export class Renderer {
       }
       group.add(ring, cross);
       group.visible = false;
-      group.renderOrder = 3; // draw over terrain decals (depthTest off above)
+      // Player feedback, normal-blended with depthTest off: the top of the player band, so
+      // it reads over every player floor effect and never covers a telegraph. Leaves carry
+      // the order; a Group renderOrder would become groupOrder and outrank the ladder.
+      applyFloorVfxLayer(group, 'player', 9);
       setRenderCategory(group, 'ui3d');
       this.scene.add(group);
       this.clickMarkers.push({
@@ -2904,7 +2908,7 @@ export class Renderer {
       });
       const ring = new THREE.Mesh(aoeRingGeo, mat);
       ring.visible = false;
-      ring.renderOrder = 3; // over terrain decals, like the click marker
+      ring.renderOrder = floorVfxRenderOrder('player', 9); // like the click marker
       setRenderCategory(ring, 'ui3d');
       this.scene.add(ring);
       this.aoeRings.push({ ring, mat, radius: 1, elapsed: AOE_RING_LIFETIME });
@@ -3003,6 +3007,9 @@ export class Renderer {
         return base;
       });
     });
+    this.hillRingVisuals = new HillRingVisuals(this.scene, (x, z) =>
+      groundHeight(x, z, this.sim.cfg.seed),
+    );
     this.temporalHourglassGroundVisuals = new TemporalHourglassGroundVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
@@ -4988,6 +4995,8 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.hillRingVisuals.sync(this.sim.hillInfo);
+    this.hillRingVisuals.update(dt);
     this.farmPatchVisuals?.drive(this.sim, dt, this.sim.entities.has(this.sim.playerId));
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);
@@ -8667,21 +8676,10 @@ export class Renderer {
     return this.isHostilePlayer(target);
   }
 
+  // The shared client verdict (src/ui/pvp_hostile_core.ts): duel, ranked
+  // arena, Thornhollow Fields, and the open-world /pvp flag pair rule.
   private isHostilePlayer(target: Entity): boolean {
-    if (target.kind !== 'player' || target.dead || target.id === this.sim.playerId) return false;
-    if (this.sim.duelInfo?.state === 'active' && this.sim.duelInfo.otherPid === target.id)
-      return true;
-    // Thornhollow Fields: the opposing TEAM is hostile for the whole live match.
-    const bg = this.sim.bgInfo?.match;
-    if (bg?.state === 'active') {
-      const row = bg.players.find((p) => p.pid === target.id);
-      if (row && row.team !== bg.myTeam) return true;
-    }
-    const match = this.sim.arenaInfo?.match;
-    return (
-      match?.state === 'active' &&
-      (match.oppPid === target.id || match.enemies.some((e) => e.pid === target.id))
-    );
+    return isPvpHostilePlayer(this.sim, target);
   }
 
   // -------------------------------------------------------------------------
@@ -11611,6 +11609,8 @@ export class Renderer {
       this.riftDeathZoneVisuals.sync(this.sim.riftBossDeathZones());
       this.riftDeathZoneVisuals.update(dt);
     }
+    this.hillRingVisuals.sync(this.sim.hillInfo);
+    this.hillRingVisuals.update(dt);
     this.farmPatchVisuals?.drive(this.sim, dt);
     this.temporalHourglassGroundVisuals.sync(this.sim.activeTemporalHourglasses);
     this.temporalHourglassGroundVisuals.update(dt);

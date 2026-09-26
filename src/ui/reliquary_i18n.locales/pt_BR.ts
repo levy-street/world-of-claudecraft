@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Arsenal de Guerra',
     desc: 'Joias e armas de Guerra compradas com honra suada.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galeria da Vanguarda',
+    desc: 'Os conjuntos de especialização e as armas da temporada 2 de Guerra, comprados com honra.',
+  },
   horizons_vault_of_ages: {
     name: 'Câmara das Eras',
     desc: 'Tesouros retirados de uma era passada. Estas relíquias não podem mais ser conquistadas; a câmara honra os veteranos que as guardam.',

@@ -13,7 +13,7 @@ import {
   MOBILE_ACTION_PAGE_COUNT,
   MOBILE_ACTION_SOURCE_SLOT_COUNT,
 } from '../../ui/hud/action_bar/mobile_action_page_view';
-import { formatNumber } from '../../ui/i18n';
+import { formatList, formatNumber, t } from '../../ui/i18n';
 import { hrefFor } from '../routes';
 import type { GuidePage } from './types';
 import { callout, loreBeat, p, pageHeader, paras, related, section } from './ui';
@@ -66,6 +66,16 @@ export const interfacePage: GuidePage = {
             paras('guide.interfacePage.framesMoveBodyEditFrames') +
             paras('guide.interfacePage.framesGovernedExtra') +
             paras('guide.interfacePage.framesGovernedAuraTracks') +
+            paras('guide.interfacePage.frameGroups', {
+              trackers: t('hudChrome.interfaceUnlock.frameNames.trackerGroup'),
+              auras: t('hudChrome.interfaceUnlock.frameNames.auraGroup'),
+              tot: t('hudChrome.unitFrame.targetOfTargetLabel'),
+              focus: formatList([
+                t('hudChrome.focusTargets.frame1'),
+                t('hudChrome.focusTargets.frame2'),
+                t('hudChrome.focusTargets.frame3'),
+              ]),
+            }) +
             paras('guide.interfacePage.framesGovernedTalkingHead'),
         )}
 

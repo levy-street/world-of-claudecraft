@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
 import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
+import { floorVfxRenderOrder } from '../floor_vfx_layer';
 import { DRAPE_AXIS_Y, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
 
@@ -173,7 +174,7 @@ export class GroundDecals {
       };
       const mesh = slot.mesh;
       mesh.visible = false;
-      mesh.renderOrder = 3; // over terrain decals, under the shock rings
+      mesh.renderOrder = floorVfxRenderOrder('player', 0); // over terrain decals, under the shock rings
       mesh.userData.renderCategory = 'vfx';
       // Culled again: the flat disc is permanent now, and the sphere is
       // refreshed from the drape extent at every spawn (see spawn).
@@ -199,6 +200,7 @@ export class GroundDecals {
     const stoneCarrier = new THREE.Mesh(this.slots[0].mesh.geometry, this.stoneMaterial);
     stoneCarrier.name = 'warrior-leap-fracture-prewarm';
     stoneCarrier.visible = false;
+    stoneCarrier.renderOrder = floorVfxRenderOrder('player', 0); // the slots' rung
     stoneCarrier.userData.renderCategory = 'vfx';
     this.slots[0].mesh.add(stoneCarrier);
   }

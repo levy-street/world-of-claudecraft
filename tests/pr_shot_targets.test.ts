@@ -400,6 +400,7 @@ describe('classifyDiff', () => {
       'src/sim/combat/auto_attack.ts',
       'src/sim/combat/poison_coating.ts',
       'src/ui/ability_imbue_text.ts',
+      'src/sim/combat/shaman_thundercall_kit.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -420,6 +421,11 @@ describe('classifyDiff', () => {
       'eye-jab',
       'shadeslip',
       'shadeslip-mobile',
+      'thundercall-magma-burst',
+      'thundercall-arc-overload',
+      'thundercall-stormbreak',
+      'thundercall-earthen-jolt',
+      'thundercall-magma-burst-mobile',
     ]);
     // The tooltip is the point, so the recipe must hover the row and prove the
     // shared #tooltip actually painted rather than shooting the row alone.

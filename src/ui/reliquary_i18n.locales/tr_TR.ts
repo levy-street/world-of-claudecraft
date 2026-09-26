@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Savaş Cephaneliği',
     desc: 'Zorlukla kazanılmış şerefle satın alınan Savaş takıları ve silahları.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Öncü Galerisi',
+    desc: 'Savaş 2. sezonun uzmanlık setleri ve silahları, onurla satın alınır.',
+  },
   horizons_vault_of_ages: {
     name: 'Çağlar Hazinesi',
     desc: 'Geçmiş bir çağdan kaldırılmış hazineler. Bu yadigârlar artık kazanılamaz; hazine, onları saklayan kıdemlileri onurlandırır.',

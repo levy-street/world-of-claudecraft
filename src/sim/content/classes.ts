@@ -457,6 +457,9 @@ export const CLASSES: Record<PlayerClass, ClassDef> = {
     abilities: [
       'lightning_bolt',
       'thunder_reservoir',
+      'lightning_overload',
+      'lava_burst',
+      'thunderstorm',
       'chain_lightning',
       'rockbiter_weapon',
       'galeheart_weapon',
@@ -2324,7 +2327,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 100% more damage and consume all Thunder.',
+      'Shake an 8-yard area for 6 sec, dealing $d Nature damage every 1.5 sec. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 20% more damage per Thunder (100% at 5).',
   },
   scorch: {
     id: 'scorch',
@@ -4655,7 +4658,76 @@ export const ABILITIES: Record<string, AbilityDef> = {
     requiresTarget: false,
     effects: [],
     description:
-      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. At 5 Thunder, Earthen Jolt deals 125% more damage or Faultwake deals 100% more damage, then consumes all Thunder. (Thundercall)',
+      'Passive: Arc Bolt and Skybranch grant Thunder, up to 5. Earthen Jolt consumes all Thunder and deals 25% more damage per Thunder (125% at 5). Faultwake consumes all Thunder and deals 20% more damage per Thunder (100% at 5). (Thundercall)',
+  },
+  // Thundercall v0.44 rework (docs/prd/shaman-thundercall-elemental-v028.md,
+  // "v0.44.0 rework"): the classic Lightning Overload talent at its 5/5 value,
+  // baseline for the spec. Runtime: combat/shaman_thundercall_kit.ts.
+  lightning_overload: {
+    id: 'lightning_overload',
+    name: 'Arc Overload',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 10,
+    passive: true,
+    cost: 0,
+    castTime: 0,
+    cooldown: 0,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [],
+    description:
+      'Passive: Arc Bolt and Skybranch have a 20% chance to Overload, striking their first target again for 50% of the damage dealt and granting 1 Thunder. (Thundercall)',
+  },
+  // The Wrath-era Lava Burst: a fire nuke that always crits on a target
+  // burning with the caster's own Cinder Jolt, reset by Magma Surge.
+  lava_burst: {
+    id: 'lava_burst',
+    name: 'Magma Burst',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 12,
+    cost: 45,
+    castTime: 2.0,
+    cooldown: 8,
+    range: 30,
+    school: 'fire',
+    requiresTarget: true,
+    projectileFx: 'heavyBolt',
+    effects: [{ type: 'directDamage', min: 63, max: 71 }],
+    ranks: [
+      {
+        rank: 2,
+        level: 20,
+        cost: 70,
+        effects: [{ type: 'directDamage', min: 105, max: 119 }],
+      },
+    ],
+    description:
+      'Deal $d Fire damage. Always critically strikes a target burning with your Cinder Jolt. Magma Surge: each Cinder Jolt tick has a 20% chance to reset this cooldown and make your next Magma Burst within 10 sec instant. Damage increases with Spell Power. (Thundercall)',
+  },
+  // The Wrath-era Thunderstorm: the spec's panic button. The 8% mana return
+  // is applied by combat/shaman_thundercall_kit.ts; the knockback is not
+  // modelled (no mob displacement primitive), so it slows instead.
+  thunderstorm: {
+    id: 'thunderstorm',
+    name: 'Stormbreak',
+    class: 'shaman',
+    specs: ['elemental'],
+    learnLevel: 16,
+    cost: 0,
+    castTime: 0,
+    cooldown: 45,
+    range: 0,
+    school: 'nature',
+    requiresTarget: false,
+    effects: [
+      { type: 'aoeDamage', min: 55, max: 63, radius: 10 },
+      { type: 'aoeSlow', mult: 0.5, duration: 5, radius: 10 },
+    ],
+    description:
+      'Call down a thunderclap, dealing $d Nature damage to enemies within 10 yards and slowing them by 50% for 5 sec. Restores 8% of your maximum Mana. Damage increases with Spell Power. (Thundercall)',
   },
   rockbiter_weapon: {
     id: 'rockbiter_weapon',
@@ -4918,7 +4990,7 @@ export const ABILITIES: Record<string, AbilityDef> = {
       },
     ],
     description:
-      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: at 5 Thunder, deal 125% more damage and consume all Thunder. Stonebound: force the target to attack you for 3 sec.',
+      'Deal $d Nature damage. Damage increases with Spell Power. Thundercall: consume all Thunder, dealing 25% more damage per Thunder (125% at 5). Stonebound: force the target to attack you for 3 sec.',
   },
   lightning_shield: {
     id: 'lightning_shield',

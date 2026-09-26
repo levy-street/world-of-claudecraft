@@ -1,3 +1,4 @@
+import { canDualWield } from '../sim/equipment_rules';
 // Pure, host-agnostic core for the "Unlock interface" option: the declarative
 // table of which HUD frames the toggle governs, and the two decisions the
 // coordinator makes on every flip (which label the option row shows, and which
@@ -75,6 +76,49 @@ export interface HudFrameSpec {
  * storage keys and labels already live in frame_pos_reset.ts.
  */
 export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
+  ...([1, 2, 3] as const).map((slot) => ({
+    id: `focusTarget${slot}`,
+    elementId: `focus-target-${slot}`,
+    storageKey: `woc_hud_frame_focus_target_${slot}`,
+    labelKey: `hudChrome.focusTargets.frame${slot}` as TranslationKey,
+    fallbackSize: { w: 240, h: 140 },
+    detachToUiRoot: false,
+  })),
+  {
+    id: 'practiceTracker',
+    elementId: 'practice-tracker',
+    storageKey: 'woc_hud_frame_practice_tracker',
+    labelKey: 'hudChrome.practiceDps.title',
+    fallbackSize: { w: 240, h: 160 },
+    detachToUiRoot: true,
+  },
+  {
+    id: 'trackerGroup',
+    elementId: 'tracker-group',
+    storageKey: 'woc_hud_frame_tracker_group',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.trackerGroup',
+    fallbackSize: { w: 240, h: 240 },
+    detachToUiRoot: true,
+    resizeMode: 'box',
+  },
+  {
+    id: 'auraGroup',
+    elementId: 'aura-track-group',
+    storageKey: 'woc_hud_frame_aura_group',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.auraGroup',
+    fallbackSize: { w: 236, h: 240 },
+    detachToUiRoot: false,
+    resizeMode: 'box',
+  },
+  {
+    id: 'targetOfTarget',
+    elementId: 'totarget-frame',
+    storageKey: 'woc_hud_frame_target_of_target',
+    labelKey: 'hudChrome.unitFrame.targetOfTargetLabel',
+    fallbackSize: { w: 240, h: 64 },
+    detachToUiRoot: true,
+    stockHome: { parentId: 'target-frame', slot: 'last' },
+  },
   {
     id: 'actionBar1',
     elementId: 'actionbar',
@@ -460,6 +504,8 @@ export function frameRowSettingKey(
   | 'showThirdActionBar'
   | 'showReliquaryTracker'
   | 'showTargetDots'
+  | 'showTargetOfTarget'
+  | 'showPetFrame'
   | AuraTrackSettingKey
   | null {
   if (id === 'actionBar2') return 'showSecondaryActionBar';
@@ -470,6 +516,8 @@ export function frameRowSettingKey(
   // switch for the same reason: two checkboxes over one tracker must be one
   // state.
   if (id === 'targetDots') return 'showTargetDots';
+  if (id === 'petFrame') return 'showPetFrame';
+  if (id === 'targetOfTarget') return 'showTargetOfTarget';
   // Each aura track has its own master switch as well (all six ship off), so
   // the same rule holds: the row is generated from the descriptor table and
   // resolves back to it here, which is why a seventh track needs no arm.
@@ -540,4 +588,27 @@ export function framesToLock(
   unlocked: boolean,
 ): { id: string; unlocked: boolean }[] {
   return candidates.map((c) => ({ id: c.id, unlocked: unlocked && c.isActive() }));
+}
+
+/** Whether a registered frame can participate in the editor for the current character. */
+export function hudFrameActive(
+  id: string,
+  state: {
+    playerClass: PlayerClass;
+    talentSpec?: string | null;
+    combined: boolean;
+    bar2: boolean;
+    bar3: boolean;
+    enabled(key: NonNullable<ReturnType<typeof frameRowSettingKey>>): boolean;
+  },
+): boolean {
+  if (id === 'swingBarOffhand') return canDualWield(state.playerClass, state.talentSpec);
+  if (id === 'actionBarGroup') return state.combined;
+  if (id === 'actionBar1') return !state.combined;
+  if (id === 'actionBar2') return !state.combined && state.bar2;
+  if (id === 'actionBar3') return !state.combined && state.bar3;
+  const classGate = classGatedFrameActive(id, state.playerClass);
+  if (classGate !== null) return classGate;
+  const setting = frameRowSettingKey(id);
+  return setting ? state.enabled(setting) : true;
 }

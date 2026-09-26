@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import type { ActiveFrostRing } from '../world_api';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 const RING_SEGMENTS = 80;
 const SHARD_COUNT = 30;
@@ -107,17 +108,17 @@ export class RingOfFrostVisuals {
     const innerMat = this.acquireEdgeMat(this.innerPool, 0.7);
     const outer = new THREE.LineLoop(outerGeometry, outerMat);
     outer.name = 'ring-of-frost-outer-edge';
-    outer.renderOrder = 9;
+    outer.renderOrder = floorVfxRenderOrder('player', 2);
     const inner = new THREE.LineLoop(innerGeometry, innerMat);
     inner.name = 'ring-of-frost-inner-edge';
-    inner.renderOrder = 9;
+    inner.renderOrder = floorVfxRenderOrder('player', 2);
     root.add(outer, inner);
 
     const bandGeometry = this.buildBandGeometry(opts.x, opts.z, innerRadius, radius);
     const bandMat = this.acquireBandMat();
     const band = new THREE.Mesh(bandGeometry, bandMat);
     band.name = 'ring-of-frost-band';
-    band.renderOrder = 7;
+    band.renderOrder = floorVfxRenderOrder('player', 0);
     root.add(band);
 
     this.shardGeometry ??= new THREE.ConeGeometry(0.3, 1.4, 5, 1);
@@ -129,7 +130,7 @@ export class RingOfFrostVisuals {
       new THREE.Vector3(opts.x, this.groundY(opts.x, opts.z) + 0.8, opts.z),
       radius + 2,
     );
-    shards.renderOrder = 8;
+    shards.renderOrder = floorVfxRenderOrder('player', 1);
     const shardBases: ShardBase[] = [];
     for (let i = 0; i < SHARD_COUNT; i++) {
       const angle = (i / SHARD_COUNT) * Math.PI * 2;
@@ -165,7 +166,7 @@ export class RingOfFrostVisuals {
     const moteMat = this.acquireMoteMat();
     const motes = new THREE.Points(moteGeometry, moteMat);
     motes.name = 'ring-of-frost-motes';
-    motes.renderOrder = 10;
+    motes.renderOrder = floorVfxRenderOrder('player', 3);
     root.add(motes);
 
     const visual: RingVisual = {

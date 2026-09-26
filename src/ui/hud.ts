@@ -1,8 +1,5 @@
 import { audio } from '../game/audio';
-import {
-  corpseLootAvailabilityInWorld,
-  localPartyMemberIds,
-} from '../game/corpse_loot_availability';
+import { corpseLootAvailabilityInWorld } from '../game/corpse_loot_availability';
 import { CROSS_HOTBAR_ATTACK_ID } from '../game/cross_hotbar';
 import { syncDeathControllerHints } from '../game/death_controller_hint';
 import { farmPressTarget } from '../game/farm_press_target_core';
@@ -167,7 +164,7 @@ import {
 import { auraGainLogKeyFor, findAuraForGainEvent } from './aura_gain_log';
 import { resolveHudAuraIconId, resolveHudAuraIconUrl } from './aura_icon_runtime';
 import type { AuraOverlayController } from './aura_overlay_controller';
-import { auraOverlaySettingsHooks, createAuraOverlayController } from './aura_overlay_wiring';
+import { auraOverlaySettingsHooks, mountAuraOverlay } from './aura_overlay_wiring';
 import { renderAuraTooltipBodyHtml } from './aura_tooltip';
 import { AurasPainter, type AurasPainterDeps } from './auras_painter';
 import {
@@ -312,12 +309,16 @@ import { FctPainter } from './fct_painter';
 import { ferryBellHomeNoteToOpen, writeEastbrookGuidanceChoice } from './ferry_bell_home_note';
 import { FocusManager, type FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { FocusTargetsController } from './focus_targets_controller';
+import { frameDimension } from './frame_dimensions';
+import { chatFrameContextTargets, frameEditorMenuDeps } from './frame_editor_deps';
 import {
   PARTY_FRAME_POS_KEY,
   PLAYER_FRAME_POS_KEY,
   resetFramePositionsOnce,
   TARGET_FRAME_POS_KEY,
 } from './frame_pos_reset';
+import { applySavedFrameLayout } from './frame_presets_live';
 import { gatherRareEventFeedback } from './gather_rare_event_feedback';
 import { gatherToolTooltipLines } from './gather_tool_tooltip';
 import { generalChatQuotaView } from './general_chat_quota_view';
@@ -362,7 +363,6 @@ import {
   confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
-  isPvpHostileTarget,
 } from './hud/action_bar/attack_on_ability';
 import { BarEditorWindow } from './hud/action_bar/bar_editor';
 import {
@@ -412,7 +412,7 @@ import { buildMobileActionRing } from './hud/action_bar/mobile_action_ring_contr
 import type { MobileActionRingPainter } from './hud/action_bar/mobile_action_ring_painter';
 import { playerStealthed } from './hud/action_bar/player_stealthed';
 import { RADIAL_DIRECTIONS, type RadialDirection } from './hud/action_bar/radial_action_core';
-import { AuraTrackFamily, auraTrackForFrameId } from './hud/aura_tracks';
+import { AuraTrackFamily } from './hud/aura_tracks';
 import {
   BattlegroundKillFeed,
   BattlegroundMapPainter,
@@ -439,6 +439,7 @@ import { ChatWindowController } from './hud/chat/chat_window_controller';
 import { DEED_NAME_TOKEN, deedChatLinkEl, deedLineNodes } from './hud/chat/deed_chat_line';
 import { RaidWarningBanner } from './hud/chat/raid_warning_banner';
 import { ReadyCheckLeaderWindow } from './hud/chat/ready_check_leader_window';
+import { type CooldownManagerController, mountCooldowns } from './hud/cooldown_manager';
 import { CosmeticsWindow } from './hud/cosmetics';
 import { SkinEventController } from './hud/cosmetics/skin_event_controller';
 import {
@@ -456,6 +457,7 @@ import { LockpickController } from './hud/delve/lockpick_controller';
 import { RiteController } from './hud/delve/rite_controller';
 import { FiestaController } from './hud/fiesta/fiesta_controller';
 import { GuildBoardWindow } from './hud/guild_board';
+import { buildHillBarView, HillBar } from './hud/hill';
 import { LootRollController } from './hud/loot/loot_roll_controller';
 import { lootSettingsView } from './hud/loot/loot_settings_view';
 import { renderLootSettingsWindow } from './hud/loot/loot_settings_window';
@@ -601,6 +603,8 @@ import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
+import { HudFrameGroups, refreshHudFrameGroupLabels } from './hud_frame_groups';
+import { partyFrameGrid, registerHudFrames } from './hud_frame_registry';
 import { healthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
 import { BG_END_LOG_COLORS, CHROME_TONE, HUD_LOG, MAP_TONE } from './hud_tones';
 import { availableMobVoiceCue, sfxHasCue, yellVoiceKey } from './hud_voice_cues';
@@ -617,19 +621,9 @@ import {
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { type InputDialogOpts, showInputDialog } from './input_controller';
 import { InspectWindow } from './inspect_window';
-import { InterfaceUnlock, makeUiRootDetacher, restoreFrameHome } from './interface_unlock';
-import {
-  classGatedFrameActive,
-  frameRowLabelKey,
-  frameRowSettingKey,
-  HUD_FRAME_SPECS,
-} from './interface_unlock_core';
-import {
-  buildFramesMenuSelects,
-  buildFramesMenuToggles,
-  buildPartySampleMembers,
-  FRAME_SIZE_RESET_KEYS,
-} from './interface_unlock_menu_core';
+import { InterfaceUnlock, restoreFrameHome } from './interface_unlock';
+import { frameRowLabelKey, HUD_FRAME_SPECS, hudFrameActive } from './interface_unlock_core';
+import { buildPartySampleMembers } from './interface_unlock_menu_core';
 import { InterfaceUnlockPreview } from './interface_unlock_preview';
 import { InteriorMapController } from './interior_map_controller';
 import { itemArmorTypeLabelKey } from './item_armor_type';
@@ -728,7 +722,6 @@ import { moneyHtml } from './money_html';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
-import { mouseoverCastTargetPid } from './mouseover_cast_core';
 import { type FrameDimension, MovableFrame } from './movable_frame';
 import { presentNoticeboardEvent } from './noticeboard_event';
 import { NoticeboardPopup } from './noticeboard_popup';
@@ -759,6 +752,7 @@ import {
   petSpecialButtonState,
 } from './pet_action_icons';
 import { isControllableOwnedPet, ownedCombatSourceOwnerId } from './pet_entity';
+import { bindPetFrameInput } from './pet_frame_input';
 import { findOwnPet, findPetsByOwner, petFrameDescriptorInto } from './pet_frame_view';
 import {
   chatPlayerContextActions,
@@ -794,6 +788,7 @@ import {
 } from './proc_overlay_view';
 import { maskProfanity } from './profanity';
 import { createPromptTimeoutBar, PROMPT_TIMEOUT_MS } from './prompt_dialog';
+import { isPvpHostilePlayer, isPvpHostileTargetId } from './pvp_hostile_core';
 import {
   QUEST_ITEM_TOOLTIP_COLOR,
   type QuestItemTooltipModel,
@@ -881,7 +876,11 @@ import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
 import { TargetDiscordController } from './target_discord_controller';
-import { fillTargetFrameDescriptor, targetPortraitKey } from './target_frame_descriptor';
+import {
+  fillTargetFrameDescriptor,
+  fillTargetOfTargetDescriptor,
+  targetPortraitKey,
+} from './target_frame_descriptor';
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
@@ -1314,7 +1313,7 @@ export class Hud {
     actionName: (id) =>
       bindActionDisplayName(id, bindActionLabel(id), (slot) => this.slotActionName(slot)),
     closeOptions: () => this.optionsWindow.close(),
-    bannerParent: () => $('#actionbar-stack'),
+    bannerParent: () => $('#ui'),
     syncSlotClasses: (s, active) => {
       this.abilityButtons.forEach(
         ({ btn }, i) => void btn.classList.toggle('bind-selected', i === s),
@@ -1575,14 +1574,21 @@ export class Hud {
   private targetResTextEl = $('#tf-res-text');
   private targetDebuffsEl = $('#tf-debuffs');
   private targetDotsEl = $('#target-dots');
-  // Target of Target (showTargetOfTarget option): element refs for the #totarget-frame
-  // mini-frame, resolved ONCE like the target refs above (never per-frame queried). The
-  // frame is a THIRD instance of the unit_frame family (totFramePainter below).
+  // Target of Target refs are resolved once, like the target refs above.
+  // The mini-frame shares the unit_frame painter family with the other unit frames.
   private totFrameEl = $('#totarget-frame');
+  private focusTargets!: FocusTargetsController;
+
+  focusTarget(slot: number, assign: boolean): void {
+    this.focusTargets.action(slot, assign);
+  }
   private totNameEl = $('#totf-name');
   private totLevelEl = $('#totf-level');
   private totHpEl = $('#totf-hp');
   private totHpTextEl = $('#totf-hp-text');
+  private totResourceEl = $('#totf-resource');
+  private totResEl = $('#totf-res');
+  private totResTextEl = $('#totf-res-text');
   private totPortraitEl = $('#totf-portrait') as unknown as HTMLCanvasElement;
   // The subject the tot painter's portrait gate redraws this frame (mirrors
   // targetPortraitSubject); set just before the paint() call that fires the gate.
@@ -2093,36 +2099,17 @@ export class Hud {
       this.procOverlayEl.classList.toggle('preview', previewBird);
       this.procOverlayPainter.setEditing(unlocked);
     },
-    lockAllLabel: () => t('hudChrome.interfaceUnlock.lockAll'),
-    lockAllTitle: () => t('hudChrome.interfaceUnlock.frozenNote'),
-    framesMenuLabel: () => t('hudChrome.interfaceUnlock.framesMenu'),
-    framesMenuTitle: () => t('hudChrome.interfaceUnlock.framesMenuTitle'),
-    framesSubmenuLabel: () => t('hudChrome.interfaceUnlock.showHideFrames'),
-    // The menu's toggle/select tables and the reset-key table are the pure
-    // core interface_unlock_menu_core.ts (a Vitest drives the real tables,
-    // both orientation arms included); this stays the live-hooks supplier.
-    settingToggles: () => buildFramesMenuToggles(this.optionsHooks, this.combineActionBars),
-    settingSelects: () =>
-      buildFramesMenuSelects(this.optionsHooks, {
-        partyFrameColumns: SETTING_RANGES.partyFrameColumns,
-        partyFrameSpacing: SETTING_RANGES.partyFrameSpacing,
-      }),
-    // Per-frame size reset on every show/hide row (owner request; replaces
-    // the earlier single Reset Frame Sizes action): the coordinator already
-    // ran mover.resetSize(); frames whose sizes live in real SETTINGS (the
-    // dimension drags, the scale factors) reset those here through the same
-    // persist-and-apply pair the sliders use.
-    snapGridActive: () => this.frameSnapToGridActive(),
-    resetSizeLabel: () => t('hudChrome.interfaceUnlock.resetFrameSize'),
-    resetSizeLabelFor: (name) => t('hudChrome.interfaceUnlock.resetFrameSizeFor', { name }),
-    onSizeReset: (id) => {
-      const hooks = this.optionsHooks;
-      if (!hooks) return;
-      const keys = FRAME_SIZE_RESET_KEYS[id] as readonly NumericSettingKey[] | undefined;
-      if (!keys) return;
-      hooks.settings.reset([...keys]);
-      for (const key of keys) hooks.onSettingChange(key, hooks.settings.get(key));
-    },
+    frameActions: (id) => this.focusTargets.contextActions(id),
+    ...frameEditorMenuDeps(
+      () => this.optionsHooks,
+      (id) => this.optionsWindow.openFrameOptions(id),
+      () =>
+        chatFrameContextTargets(
+          document,
+          () => this.chatGeometry.resetSize(),
+          () => !this.isMobileLayout(),
+        ),
+    ),
   });
   /** The arrange-mode Snap to Grid read every mover (and the chat
    *  controller, the doom meter, the grid overlay) shares: one bound
@@ -2244,16 +2231,10 @@ export class Hud {
       clearMemo: () => this.mapMarkerTooltipContent.clearMemo(),
     });
     this.mapMarkerArt.preload();
-    this.auraOverlayController = createAuraOverlayController({
-      writers: this.writerFacet,
-      playerClass: this.sim.cfg.playerClass,
-      playerName: this.sim.player.name,
-      known: () => this.sim.known,
-      talents: () => this.sim.talents,
-      iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
-      paintGroundRings: (rings) => this.renderer.setPlayerAuraRings(rings),
-      playCue: (cueId, volume) => audio.auraCue(cueId, volume),
-    });
+    this.auraOverlayController = mountAuraOverlay(this.sim, this.writerFacet, (rings) =>
+      this.renderer.setPlayerAuraRings(rings),
+    );
+    this.cooldownManager = mountCooldowns(this.sim, this.writerFacet, this.auraOverlayController);
     this.farmPressAffordance = new FarmPressAffordanceController({
       root: $('#interact-affordance'),
       writers: this.writerFacet,
@@ -2325,7 +2306,15 @@ export class Hud {
       ownAuraLabel: () => t('hudChrome.targetAuras.ownAura'),
       opacityLabel: (percent) => t('hudChrome.targetAuras.opacity', { percent }),
     });
+    this.focusTargets = new FocusTargetsController({
+      document,
+      world: () => this.sim,
+      writers: this.writerFacet,
+      keybinds: this.keybinds,
+      showEmpty: () => this.optionsHooks?.settings.get('showEmptyFocusFrames') ?? false,
+    });
     this.actionBarController = new ActionBarController({
+      readOnly: () => this.sim.actionBarReadOnly,
       storage: localStorage,
       playerClass: this.sim.cfg.playerClass,
       playerName: this.sim.player.name,
@@ -2341,6 +2330,8 @@ export class Hud {
       // save; offline, Sim.saveActionBarLayout is a no-op (localStorage is the
       // store). The controller always writes the localStorage mirror itself.
       persistLayout: (profile, layout) => this.sim.saveActionBarLayout(profile, layout),
+      // A /spectate view remaps every live dep above to the watched character.
+      spectating: () => typeof this.sim.spectating === 'string',
     });
     this.delveTracker = new DelveTrackerController({
       element: $('#delve-body'), // never the frame root: rebuilds wipe chrome
@@ -2988,7 +2979,7 @@ export class Hud {
       this.mapCenter = { ...base };
       this.mapDrag = { px: ev.clientX, py: ev.clientY, cx: base.x, cz: base.z };
       mapCanvas.setPointerCapture(ev.pointerId);
-      mapCanvas.style.cursor = 'grabbing';
+      mapCanvas.style.cursor = 'var(--cursor-grab, grabbing)';
     });
     mapCanvas.addEventListener('pointermove', (ev) => {
       if (mapPinch.isPinching() || !this.mapDrag || !this.mapView) return;
@@ -3846,6 +3837,7 @@ export class Hud {
     window.addEventListener('resize', () => this.applyAuraAnchor());
     if (this.targetFrameEl) {
       this.targetFrameMover = new MovableFrame({
+        globalLockOnly: true,
         frame: this.targetFrameEl,
         storageKey: TARGET_FRAME_POS_KEY,
         snapToGrid: this.frameSnapToGridActive,
@@ -3880,6 +3872,7 @@ export class Hud {
         this.sim.targetEntity(this.sim.playerId);
       });
       this.playerFrameMover = new MovableFrame({
+        globalLockOnly: true,
         frame: this.playerFrameEl,
         storageKey: PLAYER_FRAME_POS_KEY,
         snapToGrid: this.frameSnapToGridActive,
@@ -3905,24 +3898,18 @@ export class Hud {
       });
     }
     if (this.petFrameEl) {
-      // The pet frame is a select button (role=button, tabindex=0 in the markup):
-      // clicking or keying it selects your pet, the same action the targetPet
-      // keybind performs. Pets are ordinary targetable entities, and your own pet
-      // stays selectable while DEAD (src/sim/dead_target.ts) so the Revive action on
-      // the pet bar below stays reachable from here.
-      // While the interface is unlocked the frame is a drag handle, not a
-      // select button: a completed drag would otherwise also select the pet.
-      this.petFrameEl.addEventListener('click', () => {
-        if (!this.interfaceUnlock.isUnlocked) this.targetOwnPet();
+      const openPet = bindPetFrameInput(this.petFrameEl, {
+        editing: () => this.interfaceUnlock.isUnlocked,
+        mobile: isMobileLayout,
+        pet: () => this.ownPet(),
+        select: () => this.targetOwnPet(),
+        menu: (id, name, dead, x, y) => this.openPetMenu(id, name, dead, x, y),
       });
-      this.petFrameEl.addEventListener('keydown', (ev: KeyboardEvent) => {
-        if (ev.key !== 'Enter' && ev.key !== ' ') return;
-        if (this.interfaceUnlock.isUnlocked) return;
-        ev.preventDefault();
-        this.targetOwnPet();
-      });
+      this.bindMobileFrameLongPress(this.petFrameEl, openPet);
     }
     this.partyFrameMover = new MovableFrame({
+      observeSizeChanges: true,
+      globalLockOnly: true,
       frame: this.partyFramesEl,
       storageKey: PARTY_FRAME_POS_KEY,
       snapToGrid: this.frameSnapToGridActive,
@@ -3959,17 +3946,7 @@ export class Hud {
   // editor drags, the sliders, and the CSS vars stay one source of truth.
   // Bounds come from SETTING_RANGES, the sliders' own clamp table.
   private frameDimension(key: NumericSettingKey, factor?: () => number): FrameDimension {
-    const range = SETTING_RANGES[key];
-    return {
-      get: () => Number(this.optionsHooks?.settings.get(key) ?? range.def),
-      set: (value: number) => {
-        const hooks = this.optionsHooks;
-        if (hooks) hooks.onSettingChange(key, hooks.settings.set(key, value));
-      },
-      min: range.min,
-      max: range.max,
-      factor,
-    };
+    return frameDimension(() => this.optionsHooks, key, factor);
   }
 
   private numericSetting(key: NumericSettingKey): number {
@@ -3980,73 +3957,49 @@ export class Hud {
   // rendered rows (the edit-mode preview's sample rows included, since those
   // are what the drag is sized against) and caps columns at the row count.
   private partyFrameGrid(): { cols: number; rows: number } {
-    // While the edit preview is mounted its sample roster IS the visible
-    // stack (the interface-unlocked CSS folds the live rows wrapper away),
-    // so the drag factors count the preview's rows; the container fallback
-    // covers a gesture with no preview mounted.
-    const scope = this.partyFramesEl.querySelector('.tf-preview-party') ?? this.partyFramesEl;
-    const count = scope.querySelectorAll('.party-frame').length || 1;
-    const cols = Math.max(1, Math.min(count, Math.round(this.numericSetting('partyFrameColumns'))));
-    return { cols, rows: Math.ceil(count / cols) };
+    return partyFrameGrid(this.partyFramesEl, this.numericSetting('partyFrameColumns'));
   }
 
-  // The frames the "Unlock interface" option governs. Each row of the pure table
-  // becomes a MovableFrame with no permanent chrome (buttonOnlyWhenUnlocked) and
-  // the shared SE grip, plus the `isActive` probe that decides whether unlocking
-  // may loosen it (no pet out, optional bars off: no frame there to move). The
-  // unit frames keep their own corner buttons and simply join the registry.
+  // Table-driven movers and the unit frames share the global editor registry.
+  private frameGroups: HudFrameGroups | null = null;
+  private syncTargetFrameLayout: (force?: boolean) => void = () => {};
+
+  private syncFrameGroups(): void {
+    this.syncTargetFrameLayout();
+    this.frameGroups?.sync((key) => this.boolSetting(key, false), this.interfaceUnlock);
+  }
+
   private initInterfaceUnlock(isMobileLayout: () => boolean): void {
-    for (const spec of HUD_FRAME_SPECS) {
-      const frame = document.getElementById(spec.elementId);
-      if (!frame) continue;
-      const detach = makeUiRootDetacher(document, spec, frame);
-      // The combined group is the anchor lockPlayerFrameToActionBar rides:
-      // every position apply (drag move, resolution re-anchor, detach and
-      // re-dock) re-evaluates whether the player frame sits inside it.
-      const onPositioned = (active: boolean) => {
-        detach(active);
-        if (spec.id === 'actionBarGroup') this.applyPlayerFrameBarLock();
-        if (spec.id === 'damageMeter') this.meters.mainFramed(active);
-      };
-      const mover = new MovableFrame({
-        frame,
-        storageKey: spec.storageKey,
-        snapToGrid: this.frameSnapToGridActive,
-        unlockLabelKey: 'hudChrome.interfaceUnlock.unlockFrame',
-        lockLabelKey: 'hudChrome.interfaceUnlock.lockFrame',
-        resizeLabelKey: 'hudChrome.interfaceUnlock.resizeFrame',
-        frameLabelKey: () => frameRowLabelKey(spec, this.sim.cfg.playerClass, this.sim.talentSpec),
-        draggingBodyClass: 'hud-frame-dragging',
-        fallbackSize: spec.fallbackSize,
-        isMobileLayout,
-        scalable: true,
-        resizeMode: spec.resizeMode,
-        maxScale: spec.maxScale,
-        buttonOnlyWhenUnlocked: true,
-        onPositioned,
-      });
-      // Rows whose checkbox drives a real SETTING (see frameRowSettingKey).
-      const optionalBarKey = frameRowSettingKey(spec.id);
-      this.interfaceUnlock.register({
-        id: spec.id,
-        mover,
-        isActive: () => this.isHudFrameActive(spec.id, frame),
-        ...(optionalBarKey
-          ? {
-              rowOverride: {
-                listed: () => true,
-                value: () => !!this.optionsHooks?.settings.get(optionalBarKey),
-                set: (checked: boolean) => {
-                  // Re-showing via the menu also clears a stale menu-hide, so
-                  // the ticked bar actually appears.
-                  if (checked) mover.setUserHidden(false);
-                  this.optionsHooks?.onSettingChange(optionalBarKey, checked);
-                },
-              },
-            }
-          : {}),
-      });
-    }
+    this.frameGroups = new HudFrameGroups(document, HUD_FRAME_SPECS);
+    window.addEventListener('woc:settingschange', () => {
+      if (!this.optionsHooks) return;
+      this.syncFrameGroups();
+      this.interfaceUnlock.refreshSettings();
+      this.updateReliquaryTracker();
+    });
+    this.syncTargetFrameLayout = registerHudFrames({
+      document,
+      registry: this.interfaceUnlock,
+      groups: this.frameGroups!,
+      isMobileLayout,
+      snapToGrid: this.frameSnapToGridActive,
+      labelKey: (spec) => frameRowLabelKey(spec, this.sim.cfg.playerClass, this.sim.talentSpec),
+      isActive: (id) =>
+        hudFrameActive(id, {
+          playerClass: this.sim.cfg.playerClass,
+          talentSpec: this.sim.talentSpec,
+          combined: this.combineActionBars,
+          bar2: document.body.classList.contains('show-actionbar2'),
+          bar3: document.body.classList.contains('show-actionbar3'),
+          enabled: (key) => this.boolSetting(key, true),
+        }),
+      onPositioned: (id, active) => {
+        if (id === 'actionBarGroup') this.applyPlayerFrameBarLock();
+        if (id === 'damageMeter') this.meters.mainFramed(active);
+      },
+      options: () => this.optionsHooks,
+    });
+    this.syncFrameGroups();
     // Like the table rows, the unit frames answer "possible", not "visible":
     // every class can gain a target and a party, so unlocking always shows their
     // placeholders (the stylesheet forces an empty/hidden frame visible while
@@ -4061,7 +4014,7 @@ export class Hud {
       ['partyFrames', this.partyFrameMover, () => true],
     ];
     for (const [id, mover, isActive] of unitFrames) {
-      if (mover) this.interfaceUnlock.register({ id, mover, isActive });
+      if (mover) this.interfaceUnlock.register({ id, mover, isActive, geometryActive: isActive });
     }
     // Every mover applied its saved spot at construction, including the one
     // action-bar shape that is NOT active right now (combining defaults off
@@ -4071,55 +4024,6 @@ export class Hud {
     // ticking Combine Action Bars later snapped it to a stale spot, and a
     // saved group position warped the bars out of the stack at load.
     this.interfaceUnlock.clearAppliedGeometry('actionBarGroup');
-  }
-
-  // Could this frame EVER appear for this character? Unlocking shows every
-  // possible frame at once (hidden ones as dimmed placeholders the stylesheet
-  // forces visible off .tf-unlocked), so the whole layout is arrangeable in one
-  // session: the cast bar while not casting, the optional action bars while
-  // switched off (they also arrive already unlocked when enabled mid-unlock),
-  // an empty target/party/buff frame. The one class-conditional row is the pet
-  // frame: only a pet class can ever have one, so only a pet class gets its
-  // placeholder.
-  private isHudFrameActive(id: string, _frame: HTMLElement): boolean {
-    // Exactly one action-bar shape is movable at a time: the combined group, or
-    // the rows on their own. Anything else would leave two frames writing the
-    // same block's position. The OPTIONAL rows are movable only while actually
-    // turned on: a switched-off bar stays hidden even while editing (the
-    // options note points players at the plus/minus buttons), and
-    // setActionBarVisibility refreshes the unlock decision when a bar flips.
-    if (id === 'actionBarGroup') return this.combineActionBars;
-    if (id === 'actionBar1') return !this.combineActionBars;
-    if (id === 'actionBar2') {
-      return !this.combineActionBars && document.body.classList.contains('show-actionbar2');
-    }
-    if (id === 'actionBar3') {
-      return !this.combineActionBars && document.body.classList.contains('show-actionbar3');
-    }
-    // The class-conditional rows (pet frame and bar, stance bar, the class
-    // resource bars, the proc overlay) share one pure table.
-    const classGate = classGatedFrameActive(id, this.sim.cfg.playerClass);
-    if (classGate !== null) return classGate;
-    // The Reliquary tracker follows the optional-bar rule (switched off stays
-    // hidden; its menu row stays listed through the rowOverride above).
-    if (id === 'reliquaryTracker') {
-      return (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true;
-    }
-    // An aura track follows the same rule: switched off stays hidden, and its
-    // menu row drives that setting through frameRowSettingKey so the two
-    // checkboxes are one state. Switched on, it answers "possible" like the
-    // Target dots below: every class has some trackable aura, so unlocking
-    // shows the placeholder even while the track itself is empty.
-    const auraTrack = auraTrackForFrameId(id);
-    if (auraTrack) return this.boolSetting(auraTrack.settingKey);
-    // The Target dots tracker answers "possible", not "visible", like the unit
-    // frames: every class applies debuffs, so unlocking always shows its
-    // placeholder even though the frame itself is hidden whenever no dots are
-    // out. Its own setting is what genuinely removes it.
-    if (id === 'targetDots') {
-      return (this.optionsHooks?.settings.get('showTargetDots') ?? true) === true;
-    }
-    return true;
   }
 
   /** Toggle every movable HUD frame between locked and unlocked. Returns the new
@@ -4137,16 +4041,10 @@ export class Hud {
     return this.interfaceUnlock.isUnlocked;
   }
 
-  // Public: "put the interface back the way the base game ships". Wired to
-  // the "Reset Frame Positions" interface option: resetAll() locks first,
-  // then resets EVERY registered mover (unit frames, bars, trackers, class
-  // resource bars included).
+  /** Restore stock frame geometry while retaining visibility preferences. */
   resetUnitFrames(): void {
-    // Then re-dock the panels with their own geometry (chat, meters, target
-    // auras). Combined action bars split back apart through the settings
-    // seam; show/hide settings keep the player's choice. The buff row's
-    // reset can seat it in the aura column: re-anchor.
     this.interfaceUnlock.resetAll();
+    this.interfaceUnlock.refreshSettings();
     this.touchFrameDrags?.resetAll();
     this.applyAuraAnchor();
     this.chatGeometry.reset();
@@ -4155,19 +4053,25 @@ export class Hud {
     if (this.combineActionBars) this.optionsHooks?.onSettingChange('combineActionBars', false);
   }
 
-  /** Repaint persisted visual-space geometry after a live UI Scale change. */
-  reapplySavedGeometry(): void {
-    this.chatGeometry.reapply();
-    this.interfaceUnlock.reapplyAll();
+  /** Reload a preset, or reclamp existing frame geometry after a UI Scale change. */
+  reapplySavedGeometry(replace = false): void {
+    applySavedFrameLayout(this.optionsHooks, replace, {
+      frames: this.interfaceUnlock,
+      chat: this.chatGeometry,
+      meters: this.meters,
+      auras: this.targetAurasWindow,
+      settle: () => {
+        this.syncTargetFrameLayout(true);
+        this.applyPlayerFrameBarLock();
+        this.applyAuraAnchor();
+        this.partyCollapsed = loadPartyCollapsed();
+        this.updatePartyFrames();
+      },
+    });
   }
 
-  // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
-  // carries a centering transform, and a transformed ancestor hijacks any
-  // fixed/absolute positioning (it becomes the containing block). Detaching
-  // therefore REPARENTS the frame to #ui, the target frame's own parent, so the
-  // saved left/top resolve in the same HUD coordinates the target frame uses;
-  // re-docking (the mobile layout) puts it back at the head of the stack. The
-  // painters' element refs (pf-hp etc.) are live nodes, so they survive the move.
+  // Reparent into #ui so saved viewport coordinates escape the dock's centering transform.
+  // Existing painter references survive reparenting; mobile restores the stock dock.
   private setPlayerFrameDetached(active: boolean): void {
     const frame = this.playerFrameEl;
     frame.classList.toggle('pf-detached', active);
@@ -4696,6 +4600,7 @@ export class Hud {
   // spell icon plus two side crescents once; its painter only toggles active
   // state on the hot path. Options > Auras owns preview and placement mode.
   private readonly auraOverlayController: AuraOverlayController;
+  private readonly cooldownManager: CooldownManagerController;
   private readonly farmPressAffordance: FarmPressAffordanceController;
   // One-shot login preview gate for the phoenix (see update()).
   private procOverlayPreviewed = false;
@@ -4863,6 +4768,7 @@ export class Hud {
       level: this.totLevelEl,
       hpFill: this.totHpEl,
       hpText: this.totHpTextEl,
+      resource: { container: this.totResourceEl, fill: this.totResEl, text: this.totResTextEl },
     },
     {
       shownDisplay: 'flex',
@@ -5647,11 +5553,8 @@ export class Hud {
   });
   // Card Duel window painter (card_duel_view.ts model + card_duel_window.ts
   // painter, the ValeCupWindow shape scaled down). The Card Master NPC's gossip
-  // menu AND the persistent #mm-cardduel micromenu button (the sim allows
-  // playing a card once matched without proximity, so the window must stay
-  // reachable away from the NPC too) both
-  // toggle it; Hud drives render() from the mediumHud band while open, and
-  // auto-opens it the moment a match starts (see the mediumHud band below).
+  // menu AND the persistent #mm-cardduel micromenu button both toggle it (a card
+  // plays without proximity once matched); rendered from the mediumHud band, auto-opened on match start.
   private readonly cardDuelWindow = new CardDuelWindow({
     root: () => $('#card-duel-window'),
     world: () => this.sim,
@@ -5659,8 +5562,7 @@ export class Hud {
     ...this.windowFocus('#card-duel-window'),
   });
 
-  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting,
-  // elided writers; hud/battleground/).
+  // Thornhollow Fields in-match scoreboard strip + wave-respawn overlay (self-mounting, elided writers).
   private readonly bgMapPainter = new BattlegroundMapPainter();
   private readonly bgScoreboard = new BattlegroundScoreboard({
     layer: () => document.getElementById('ui'),
@@ -5669,6 +5571,10 @@ export class Hud {
   // Top-right kill feed: event-pushed lines, expiry-pruned per frame.
   private readonly bgKillFeed = new BattlegroundKillFeed({
     layer: () => document.getElementById('ui'),
+  });
+  private readonly hillBar = new HillBar({
+    layer: () => document.getElementById('ui'),
+    writers: this.writerFacet,
   });
   // Character window painter (char_view.ts core + char_window.ts painter). It composes
   // presentation helpers with HUD-built stats/progression plus the unequip + drag
@@ -5778,6 +5684,8 @@ export class Hud {
   // the keybind store, the shared dropdown, focus management, and the chat-timestamp
   // state through these lazy closures.
   private readonly optionsWindow = new OptionsWindow({
+    inputDialog: (opts) => this.inputDialog(opts),
+    applyFramePreset: () => this.reapplySavedGeometry(true),
     root: () => $('#options-menu'),
     world: () => this.sim,
     options: () => this.optionsHooks,
@@ -5786,6 +5694,7 @@ export class Hud {
         playerClass: () => this.sim.cfg.playerClass,
         previewCue: (cueId, volume) => audio.auraCue(cueId, volume),
       }),
+    cooldownManager: () => this.cooldownManager.settingsHooks(),
     bugReport: () => this.bugReportHooks,
     openWiki: () => this.openWiki(),
     keybinds: () => this.keybinds,
@@ -6989,6 +6898,8 @@ export class Hud {
 
   private refreshLocalizedDynamicUi(): void {
     this.auraTracks.relocalize();
+    this.focusTargets.relocalize();
+    refreshHudFrameGroupLabels(document, HUD_FRAME_SPECS);
     this.doomMeter.relocalize();
     this.optionsWindow.relocalize();
     // The Target dots frame's accessible name is written once in its painter's
@@ -7084,11 +6995,9 @@ export class Hud {
     this.updateReliquaryTracker();
     this.updateRecipeTracker();
     this.charWindow.renderIfOpen();
-    // The arena window's render-skip signature is text-independent (offline sentinel or a
-    // JSON of ids/numbers), so a language switch alone never moves it; relocalize() forces
-    // one rebuild with fresh t() (self-gated on isOpen).
     this.arenaWindow.relocalize();
     this.bgScoreboard.relocalize();
+    this.hillBar.relocalize();
     this.dungeonFinderWindow.relocalize();
     this.dungeonFinderProposalPopup.relocalize();
     this.bgProposalPopup.relocalize();
@@ -7306,11 +7215,13 @@ export class Hud {
   }
 
   private syncSlotMap(): void {
+    if (typeof this.sim.spectating === 'string') return; // a foreign kit must not reseed any bar
     this.actionBarController.syncKnownAbilities();
     // The pad's bar gets the same offer minus passives, and stances ride along
     // because pad mode hides the stance bar: a stance learned after the seed
     // (Defensive Stance, the druid forms) is otherwise unreachable without the
     // arrange chord. Seeded ids are already marked seen, so this never re-offers.
+    if (this.sim.actionBarReadOnly) return;
     this.optionsHooks?.gamepad.syncCrossHotbarKnown(
       this.sim.known.filter((k) => isAbilityActionBarEligible(k.def)).map((k) => k.def.id),
     );
@@ -7587,18 +7498,11 @@ export class Hud {
         if (resolved.def.targetMode === 'position' && !resolved.def.selfCentered) {
           this.castPositionAbility(action.id, resolved, barSlot);
         } else {
-          // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
-          // while hovering a party frame lands on the hovered member instead of
-          // the current target; the sim validates and falls back if it went stale.
-          // Gated on the Interface option (mouseoverCast, on by default). A member
-          // outside this client's interest scope (a RELEASED ghost waits at the
-          // graveyard) still redirects on the party roster alone: see
-          // mouseover_cast_core.ts.
-          const mouseoverPid = mouseoverCastTargetPid(this.hoveredPartyPid, resolved.def, {
-            enabled: this.optionsHooks?.settings.get('mouseoverCast') ?? true,
-            hasEntity: (pid) => this.sim.entities.has(pid),
-            partyMemberPids: () => localPartyMemberIds(this.sim.partyInfo),
-          });
+          const mouseoverPid = this.focusTargets.castTarget(
+            resolved.def,
+            this.hoveredPartyPid,
+            this.optionsHooks?.settings.get('mouseoverCast') ?? true,
+          );
           if (mouseoverPid !== null) {
             this.sim.castAbilityOn(action.id, mouseoverPid);
           } else {
@@ -7615,10 +7519,7 @@ export class Hud {
           if (
             this.optionsHooks?.settings.get('startAttackOnAbilityUse') &&
             abilityStartsAutoAttack(resolved.effects) &&
-            hasAutoAttackTarget(
-              target,
-              isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
-            )
+            hasAutoAttackTarget(target, isPvpHostileTargetId(this.sim, tid))
           ) {
             // A TIMED cast must not engage yet (the aggro-before-damage bug). The
             // recorded id only ARMS once castStart below confirms this exact cast
@@ -8044,7 +7945,7 @@ export class Hud {
         itemName: itemDisplayName,
         slotLabel: (i) => formatAbilityNumber(i + 1),
         formatCount: (n) => formatNumber(n, { maximumFractionDigits: 0 }),
-        watchedGlowAbilityIds: () => this.auraOverlayController.readyGlowAbilityIds(),
+        watchedGlowAbilityIds: () => this.cooldownManager.readyGlowAbilityIds(),
       },
     );
     this.actionBarPainter = new ActionBarPainter(
@@ -8902,6 +8803,7 @@ export class Hud {
     this.resolvePendingLoadoutBar();
     this.syncActiveHotbarForm();
     this.syncSlotMap(); // picks up newly learned abilities mid-session
+    this.focusTargets.update(now, targetFrameNonSelfIntervalMs(fxTier));
 
     // talent buttons glow while the player has unspent points (and a tree exists)
     const tp = sim.talentPoints();
@@ -9151,10 +9053,13 @@ export class Hud {
       // Linked-Discord players get their staff-role name color (else friendly/hostile),
       // plus a Discord info line (nickname + rank + role chips) under the healthbar.
       const tfRoleColor = target.kind === 'player' ? specialRoleColor(target.discordRole) : null;
+      // A mob's template flag, or a player the sim would let us hit (duel, arena,
+      // battleground, or the /pvp flag): one shared verdict (pvp_hostile_core.ts).
+      const tfHostile = target.hostile || isPvpHostilePlayer(this.sim, target);
       this.setStyleProp(
         this.targetNameEl,
         'color',
-        tfRoleColor ?? (target.hostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
+        tfRoleColor ?? (tfHostile ? 'var(--color-hostile)' : 'var(--color-friendly)'),
       );
       this.targetDiscord.update(target);
       // Redundant non-color cue for forced-colors (high-contrast) mode, where the OS
@@ -9162,7 +9067,7 @@ export class Hud {
       // The base.css forced-colors block underlines #tf-name.hostile; routed through the
       // elided toggleClass writer so the per-frame hot path stays write-elided. Normal
       // mode is unaffected (the rule lives only inside @media (forced-colors: active)).
-      this.toggleClass(this.targetNameEl, 'hostile', target.hostile);
+      this.toggleClass(this.targetNameEl, 'hostile', tfHostile);
       // Every target aura is actionable: hostile buffs can be purged, allied buffs
       // can be maintained, and foreign debuffs coordinate a group. Keep this strip
       // complete and full-rate on every graphics tier; the painter and window both
@@ -9213,27 +9118,11 @@ export class Hud {
           this.lastTotFramePaintAt = now;
           this.lastTotFrameId = tot.id;
           const totFrame = this.totFrameDescriptor;
-          totFrame.present = true;
-          totFrame.hpFrac = tot.hp / Math.max(1, tot.maxHp);
-          totFrame.hpText = tot.dead
-            ? t('hud.core.dead')
-            : unitFrameHealthText(
-                tot.hp,
-                tot.maxHp,
-                healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3),
-              );
-          totFrame.showAbsorbText = false;
-          totFrame.resourceKind = 'none';
-          totFrame.resFrac = 0;
-          totFrame.resText = '';
-          totFrame.levelText = null;
-          totFrame.name = entityDisplayName(tot);
-          totFrame.titlePre = '';
-          totFrame.titlePost = '';
-          totFrame.portraitKey = targetPortraitKey(tot);
-          totFrame.absorb = null;
-          totFrame.dead = false;
-          totFrame.outOfRange = false;
+          fillTargetOfTargetDescriptor(
+            totFrame,
+            tot,
+            healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3),
+          );
           this.totFramePainter.paint(unitFrameViewInto(this.totFrameBuffer, totFrame));
         }
       } else {
@@ -9433,6 +9322,7 @@ export class Hud {
       };
       this.actionBarWorldInput = actionBarWorld;
     }
+    this.cooldownManager.paint(actionBarWorld);
     this.renderPetBar(pet);
     this.renderStanceBar();
     this.flushPendingProcAuraNotes();
@@ -9601,6 +9491,7 @@ export class Hud {
       this.updateArenaStatus();
       this.updateFiestaHud();
       this.bgScoreboard.update(buildBgScoreboardView(this.sim.bgInfo, this.sim.playerId));
+      this.hillBar.update(buildHillBarView(this.sim.hillInfo, this.sim.player.pos));
       this.bgKillFeed.update(performance.now() / 1000);
       this.yumiPainter.update(this.sim.arenaInfo);
       if ($('#map-window').style.display === 'block') this.updateMapWindow();
@@ -10865,7 +10756,8 @@ export class Hud {
     });
     this.mapView = result.view;
     this.mapMarkerInteraction.setOverworld(result);
-    if (!this.mapDrag) canvas.style.cursor = result.cursor;
+    if (!this.mapDrag)
+      canvas.style.cursor = result.cursor === 'grab' ? 'var(--cursor-grab, grab)' : result.cursor;
     const zoneLabel = zoneDisplayName(zone.id);
     this.setText(summaryEl, t('hud.core.mapSummary', { zone: zoneLabel }));
     this.setText(
@@ -13429,12 +13321,7 @@ export class Hud {
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;
-              const castPvpHostile = isPvpHostileTarget(
-                castTid,
-                sim.duelInfo,
-                sim.arenaInfo,
-                sim.bgInfo,
-              );
+              const castPvpHostile = isPvpHostileTargetId(sim, castTid);
               if (hasAutoAttackTarget(castTarget, castPvpHostile)) this.sim.startAutoAttack();
             }
           }
@@ -15734,6 +15621,7 @@ export class Hud {
   // unconfirmed Perfecting exchange without replaying its mutation.
   resyncAfterReconnect(): void {
     this.marketWindow.onReconnected();
+    this.focusTargets.reset();
     this.perfectingWindow?.onReconnected();
   }
 
@@ -18026,6 +17914,9 @@ export class Hud {
 
   attachOptions(hooks: OptionsHooks): void {
     this.optionsHooks = hooks;
+    this.syncFrameGroups();
+    this.interfaceUnlock.refreshSettings();
+    this.reapplySavedGeometry();
   }
 
   refreshMapMarkerArtPalette(): void {
@@ -18121,12 +18012,19 @@ export class Hud {
   /** What an untouched cross hotbar is filled from: this character's action bar,
    *  plus stance-style abilities, known but unbound and so unreachable on a pad. */
   crossHotbarSeed(): { bar: CrossHotbarOverlayAction[]; extras: string[] } {
-    return crossHotbarSeedActions(this.hotbarActions, this.sim.known);
+    // A spectated kit never seeds the pad bar (same freeze as syncSlotMap).
+    const known = typeof this.sim.spectating === 'string' ? [] : this.sim.known;
+    return crossHotbarSeedActions(this.hotbarActions, known);
   }
 
   /** The bar's own arrange surface, whole rather than proxied method by method. */
   crossHotbarEdit(): CrossHotbarController | null {
     return this.crossHotbar ?? null;
+  }
+
+  /** The owner kit is still rebuilding during a reconnect. */
+  crossHotbarReadOnly(): boolean {
+    return this.sim.actionBarReadOnly;
   }
 
   /** Open or close the controller cross hotbar (the pad's held-trigger bar). */

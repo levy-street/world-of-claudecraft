@@ -1634,3 +1634,15 @@ describe('STORAGE_PRICES env parsing (server/storage_prices.ts)', () => {
     expect(codeOnly(read('server/game.ts'))).toMatch(/new Sim\(\s*buildRealmSimConfig\(/);
   });
 });
+
+describe('WORLD_PVP_DISABLED (the World PvP realm kill switch)', () => {
+  it('is read from the environment at sim boot and documented for operators', () => {
+    // The realm switch refuses every raise and loads every saved flag down
+    // (src/sim/pvp/world_pvp.ts); the env read is the only way to set it.
+    expect(codeOnly(read('server/sim_boot_config.ts'))).toContain(
+      "process.env.WORLD_PVP_DISABLED === '1'",
+    );
+    // Documented for operators, commented out so the built-in default (open) applies.
+    expect(read('.env.example')).toContain('#WORLD_PVP_DISABLED=0');
+  });
+});

@@ -1502,7 +1502,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_bloodlust',
           name: 'Deep Reservoir',
           description:
-            'After Earthen Jolt or Faultwake consumes all Thunder, retain 2 Thunder. After a spell consumes Stormcast, retain 1 Warspirit Cadence step. After Cascading Mend consumes Mending Current, restore 25% of the amount consumed.',
+            'After Earthen Jolt or Faultwake consumes a full Thunder bank, retain 2 Thunder. After a spell consumes Stormcast, retain 1 Warspirit Cadence step. After Cascading Mend consumes Mending Current, restore 25% of the amount consumed.',
           icon: 'lightning_bolt',
           effect: { runtime: { thunderCharges: 2, cadenceSteps: 1, reseedPercent: 25 } },
         },
@@ -1510,7 +1510,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_elemental_fury',
           name: 'Echoing Elements',
           description:
-            'After Earthen Jolt or Faultwake consumes all Thunder, repeat 40% of its damage after 1 sec. A spell that consumes Stormcast repeats at 40% strength. Healing from consumed Mending Current repeats at 40% strength after 2 sec. These repeats cannot trigger other effects.',
+            'After Earthen Jolt or Faultwake consumes a full Thunder bank, repeat 40% of its damage after 1 sec. A spell that consumes Stormcast repeats at 40% strength. Healing from consumed Mending Current repeats at 40% strength after 2 sec. These repeats cannot trigger other effects.',
           icon: 'chain_lightning',
           effect: { runtime: { echoPercent: 40, damageDelay: 1, healingDelay: 2 } },
         },
@@ -1518,7 +1518,7 @@ export const SHAMAN_CHOICE_ROWS: ClassChoiceRows = {
           id: 'sha_r20_tidal_waves',
           name: 'Living Weapon',
           description:
-            "After Earthen Jolt or Faultwake consumes all Thunder, Pyrebrand makes the next Arc Bolt instant. Galeheart's echoes each deal 40% damage to up to 2 enemies within 8 yards. A Stonebound spell that consumes Stormcast grants an absorb equal to 8% of your maximum health. With Lifespring active, Tidecall also adds 50% of its full heal to the most injured ally within 10 yards.",
+            "After Earthen Jolt or Faultwake consumes a full Thunder bank, Pyrebrand makes the next Arc Bolt instant. Galeheart's echoes each deal 40% damage to up to 2 enemies within 8 yards. A Stonebound spell that consumes Stormcast grants an absorb equal to 8% of your maximum health. With Lifespring active, Tidecall also adds 50% of its full heal to the most injured ally within 10 yards.",
           icon: 'rockbiter_weapon',
           effect: {
             runtime: {

@@ -166,6 +166,10 @@ export const table: ReliquaryLocaleTable = {
     name: '战争兵器库',
     desc: '以来之不易的荣誉购得的战争饰品与武器。',
   },
+  conquerors_vanguard_gallery: {
+    name: '先锋展厅',
+    desc: '战争第二赛季的专精套装与武器，用荣誉购买。',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 宝库策展人).
   horizons_vault_of_ages: {

@@ -216,6 +216,22 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['F1'],
   },
+  ...[1, 2, 3].flatMap((n): BindAction[] => [
+    {
+      id: `targetFocus${n}`,
+      label: `Target Focus ${n}`,
+      category: 'Targeting',
+      kind: 'edge',
+      defaults: [`Ctrl+F${n}`],
+    },
+    {
+      id: `setFocus${n}`,
+      label: `Set Focus ${n}`,
+      category: 'Targeting',
+      kind: 'edge',
+      defaults: [`Shift+F${n}`],
+    },
+  ]),
   ...[1, 2, 3, 4, 5, 6, 7, 8, 9].map(
     (n): BindAction => ({
       id: `targetParty${n}`,

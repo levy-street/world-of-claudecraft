@@ -15,6 +15,7 @@ import type { ArchetypeState } from './professions/archetype';
 import type { PersistedFarmPlot } from './professions/farm_persist';
 import type { SavedGatheringGoal } from './professions/gathering_goal_persist';
 import type { ToolEffectSlot } from './professions/tools';
+import type { WorldPvpSavedState } from './pvp/world_pvp';
 import type { SavedReliquaryState } from './reliquary';
 import type {
   EquipSlot,
@@ -47,6 +48,10 @@ export interface CharacterState {
   honor?: number;
   lifetimeHonor?: number;
   honorArenaDaily?: HonorArenaDailyState;
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the flag, a disarm
+  // countdown stored as remaining seconds, and the career kill/death tally.
+  // Absent for every character who never raised the flag.
+  worldPvp?: WorldPvpSavedState;
   prestigeRank?: number;
   unlockedMilestones?: string[];
   // Rested XP pool. Optional so pre-rested-XP saves load cleanly (defaults to 0).

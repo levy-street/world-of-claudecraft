@@ -36,6 +36,7 @@ import {
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName } from './entity_i18n';
 import { esc } from './esc';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import {
   type BgAllTimeEntry,
   type BgAllTimeRow,
@@ -44,6 +45,12 @@ import {
   type BgWindowView,
   buildBgWindowView,
 } from './hud/battleground';
+import {
+  buildWorldPvpWindowView,
+  WORLD_PVP_ACTION_FOCUS_KEY,
+  wireWorldPvpPanel,
+  worldPvpBodyHtml,
+} from './hud/world_pvp';
 import { formatNumber, t } from './i18n';
 import { formatPvpRecord } from './pvp_record_core';
 import { buildPvpTabs, type PvpTabId, type PvpTabsModel } from './pvp_tabs_view';
@@ -104,6 +111,9 @@ export class ArenaWindow {
   private lbFetchedAt: Partial<Record<ArenaFormat, number>> = {};
   private bgAllTime: BgAllTimeEntry[] | null = null;
   private bgLbFetchedAt = 0;
+  // The World PvP tab's raise-confirm step (hud/world_pvp/): window state so
+  // a tab switch or a close clears it; the view signature carries it.
+  private worldConfirming = false;
 
   constructor(private readonly deps: ArenaWindowDeps) {}
 
@@ -138,6 +148,7 @@ export class ArenaWindow {
   /** Open on (or switch to) a specific tab; a second call on that tab closes.
    *  The Thornhollow Fields deep entry (the shot harness, legacy callers) rides this. */
   openTab(tab: PvpTabId): void {
+    this.worldConfirming = false;
     if (!this.isOpen) {
       this.tab = tab;
       this.toggle();
@@ -156,6 +167,7 @@ export class ArenaWindow {
 
   close(): void {
     const el = this.deps.root();
+    this.worldConfirming = false;
     if (el.style.display !== 'block') {
       this.openerFocus = null;
       return;
@@ -181,7 +193,7 @@ export class ArenaWindow {
   // server) so the panel still shows the live online ladder either way.
   private fetchLeaderboardFor(tab: PvpTabId): void {
     if (tab === 'ravenrift') this.fetchBgLeaderboard();
-    else this.fetchArenaLeaderboard(tab);
+    else if (tab !== 'world') this.fetchArenaLeaderboard(tab);
   }
 
   private fetchArenaLeaderboard(format: ArenaFormat): void {
@@ -237,6 +249,10 @@ export class ArenaWindow {
       return;
     }
     thornhollowPrewarm?.pausePreview();
+    if (this.tab === 'world') {
+      this.renderWorldPvp(el, world, strip);
+      return;
+    }
     this.renderArena(el, world, strip, this.tab);
   }
 
@@ -276,6 +292,42 @@ export class ArenaWindow {
     el.querySelector('[data-act="leave"]')?.addEventListener('click', () => {
       this.deps.world().bgQueueLeave();
       audio.click();
+    });
+  }
+
+  /** The World PvP flag tab (hud/world_pvp/): the pure view decides the status,
+   *  the action and the stakes copy inputs; the sibling painter renders and wires
+   *  them. Signature-gated like the other arms; no ladder fetch (there is no
+   *  world ladder yet). */
+  private renderWorldPvp(el: HTMLElement, world: IWorld, strip: PvpTabsModel): void {
+    const view = buildWorldPvpWindowView({
+      info: world.worldPvpInfo,
+      honor: world.honor,
+      confirming: this.worldConfirming,
+    });
+    const sig = `${view.sig}|${strip.tabs.map((s2) => (s2.locked ? 1 : 0)).join('')}`;
+    if (sig === this.lastSig) return;
+    this.lastSig = sig;
+    // The disarm countdown rebuilds this panel once a second: a keyboard user
+    // on the action button must land back on it (or its successor) after the
+    // innerHTML swap, never on the body (the bags window precedent).
+    const focusKey = captureFocusKey(el);
+    el.innerHTML = this.worldTitleHtml() + this.stripHtml(strip) + worldPvpBodyHtml(view);
+    this.wireChrome(el);
+    if (focusKey !== null) {
+      restoreFirstEnabled([
+        findFocusKey(el, focusKey),
+        findFocusKey(el, WORLD_PVP_ACTION_FOCUS_KEY),
+        el.querySelector<HTMLElement>('[data-close]'),
+      ]);
+    }
+    wireWorldPvpPanel(el, {
+      world: () => this.deps.world(),
+      setConfirming: (confirming) => {
+        this.worldConfirming = confirming;
+        this.lastSig = '';
+        this.render();
+      },
     });
   }
 
@@ -334,6 +386,7 @@ export class ArenaWindow {
       btn.addEventListener('click', () => {
         if (btn.getAttribute('aria-disabled') === 'true') return;
         this.tab = (btn as HTMLElement).dataset.bracket as PvpTabId;
+        this.worldConfirming = false;
         this.lastSig = '';
         this.fetchLeaderboardFor(this.tab);
         this.render();
@@ -350,6 +403,10 @@ export class ArenaWindow {
       ? ` <span class="arena-bracket-tag">${esc(this.tabLabel(bracket))}</span>`
       : '';
     return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(t('hud.arena.title'))}${tag}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
+  }
+
+  private worldTitleHtml(): string {
+    return `<div class="panel-title ui-win-head"><span id="arena-title" class="ui-win-title">${esc(t('hudChrome.worldPvp.title'))}</span><button type="button" class="x-btn ui-x-btn" data-close aria-label="${esc(t('hud.arena.close'))}">${svgIcon('close')}</button></div>`;
   }
 
   private bgTitleHtml(): string {
@@ -644,6 +701,7 @@ export class ArenaWindow {
 
   private tabLabel(tab: PvpTabId | ArenaFormat): string {
     if (tab === 'ravenrift') return t('hudChrome.bg.title');
+    if (tab === 'world') return t('hudChrome.worldPvp.tab');
     if (tab === '1v1') return t('hudChrome.pvp.bracket1v1');
     if (tab === '2v2') return t('hudChrome.pvp.bracket2v2');
     // Retired brackets stay renderable (a dev-started bout commits them into

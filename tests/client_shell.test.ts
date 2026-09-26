@@ -876,8 +876,13 @@ describe('client HTML shell', () => {
     expect(hudTs).toContain("this.toggleClass(pips[i] as HTMLElement, 'on', i < p.comboPoints);");
     // The forced-colors hostile cue is a non-color redundant marker on the target
     // name, routed through the same elided toggleClass writer (no raw class write on the
-    // per-frame hot path) so it stays write-elided.
-    expect(hudTs).toContain("this.toggleClass(this.targetNameEl, 'hostile', target.hostile);");
+    // per-frame hot path) so it stays write-elided. The operand is the ONE shared
+    // hostile verdict (a mob's flag OR the client PvP verdict, pvp_hostile_core.ts),
+    // so a duel, battleground or /pvp opponent gets the cue too.
+    expect(hudTs).toContain(
+      'const tfHostile = target.hostile || isPvpHostilePlayer(this.sim, target);',
+    );
+    expect(hudTs).toContain("this.toggleClass(this.targetNameEl, 'hostile', tfHostile);");
     expect(hudTs).not.toContain("this.targetNameEl.classList.toggle('hostile'");
     expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('elite'");
     expect(hudTs).not.toContain("this.targetFrameEl.classList.toggle('boss'");
@@ -2356,7 +2361,7 @@ describe('client HTML shell', () => {
     expect(drawerTitleBody).toContain('min-height: 48px;');
     expect(drawerTitleBody).toContain('margin-bottom: 8px;');
     expect(drawerTitleBody).toContain('padding-bottom: 6px;');
-    expect(drawerTitleBody).toContain('cursor: move;');
+    expect(drawerTitleBody).toContain('cursor: var(--cursor-move, move);');
     // Smaller than the old 560px cap: the More tray only holds short pill
     // buttons now, not a wide desktop-style panel.
     expect(hudMobileCss).toContain(

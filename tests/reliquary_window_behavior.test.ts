@@ -2162,6 +2162,9 @@ function shelfAggregate(shelf: string, state: WorldState): { owned: number; tota
   let total = 0;
   for (const page of RELIQUARY_PAGES) {
     if (page.shelf !== shelf) continue;
+    // Outside-completion pages (retired, personal) drop out of every shelf pair,
+    // as the production aggregate does (the Conquerors shelf's Vanguard Gallery).
+    if (page.excludeFromCompletion !== undefined) continue;
     for (const relic of page.relics) {
       total += 1;
       if (ownsSlot(state, relic)) owned += 1;

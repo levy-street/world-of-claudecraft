@@ -53,6 +53,7 @@
 //   farming.ts          IWorldFarming        the static garden-bed geography + the caller's own
 //                                            plot rows (reads only in the patches-and-plots phase)
 //   reliquary.ts        IWorldReliquary      sparse firstFind / marks / recent + pure completion
+//   world_pvp.ts        IWorldWorldPvp       the /pvp flag: self readout + raise/lower command
 //
 // THREE GATES pin this seam (run before any facet edit; the literal counts are
 // pinned THERE and re-stale here, so this prose stays count-free):
@@ -102,6 +103,7 @@ import type { IWorldTargeting } from './world_api/targeting';
 import type { IWorldTelemetry } from './world_api/telemetry';
 import type { IWorldTrade } from './world_api/trade';
 import type { IWorldVehicles } from './world_api/vehicles';
+import type { IWorldWorldPvp } from './world_api/world_pvp';
 
 // --- pass-through sim re-exports: downstream imports these FROM world_api ---
 // Account flair is defined in the host-agnostic sim core (src/sim/account_flair.ts)
@@ -437,6 +439,14 @@ export type {
   WhoRosterInfo,
 } from './world_api/social_graph';
 export type { TradeInfo, TradeOffer } from './world_api/trade';
+export type {
+  HillInfo,
+  HillPhaseInfo,
+  HillSide,
+  HillStandingInfo,
+  WorldPvpInfo,
+  WorldPvpZone,
+} from './world_api/world_pvp';
 
 // The aggregate seam. Empty body: every member lives on exactly one facet above,
 // so `IWorld` is byte-identical to the pre-split flat interface and both the
@@ -475,7 +485,8 @@ export interface IWorld
     IWorldReliquary,
     IWorldMounts,
     IWorldFarming,
-    IWorldVehicles {}
+    IWorldVehicles,
+    IWorldWorldPvp {}
 
 // ---------------------------------------------------------------------------
 // Command schema (W0b): the shared wire-token vocabulary.
@@ -905,6 +916,9 @@ export const COMMAND_NAMES = [
   'clue_hunt_abandon',
   'weekly_reward_claim',
   'weekly_reward_open',
+  // World PvP: raise or lower the /pvp flag (IWorldWorldPvp.setWorldPvpFlag;
+  // the bare /pvp chat line toggles through the sim's own chat router).
+  'pvp_flag',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch
@@ -994,7 +1008,8 @@ export type WorldFacet =
   | 'IWorldReliquary'
   | 'IWorldMounts'
   | 'IWorldFarming'
-  | 'IWorldVehicles';
+  | 'IWorldVehicles'
+  | 'IWorldWorldPvp';
 
 export const COMMAND_FACETS = {
   weekly_reward_claim: 'IWorldBank',
@@ -1276,4 +1291,7 @@ export const COMMAND_FACETS = {
   vehicle_enter: 'IWorldVehicles',
   vehicle_action: 'IWorldVehicles',
   vehicle_leave: 'IWorldVehicles',
+  // IWorldWorldPvp: the /pvp flag raise/lower. worldPvpInfo (the `wpvp`
+  // self-delta mirror) carries no wire command and stays untagged.
+  pvp_flag: 'IWorldWorldPvp',
 } as const satisfies Partial<Record<ClientCommand, WorldFacet>>;

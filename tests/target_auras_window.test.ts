@@ -178,6 +178,32 @@ function setup(
 describe('TargetAurasWindow', () => {
   beforeEach(() => window.localStorage.clear());
 
+  it('keeps a filtered panel custom width after login and reapplies visual geometry after UI scaling', () => {
+    const geometry = {
+      left: 400,
+      top: 80,
+      width: 500,
+      height: 240,
+      vw: window.innerWidth,
+      vh: window.innerHeight,
+    };
+    localStorage.setItem('woc_target_auras_filter', 'debuffs');
+    localStorage.setItem('woc_target_auras_frame', JSON.stringify(geometry));
+    let scale = 1;
+    const { panel, root } = setup(
+      undefined,
+      () => false,
+      () => scale,
+    );
+    expect(root.style.width).toBe('500px');
+    expect(JSON.parse(localStorage.getItem('woc_target_auras_frame')!)).toEqual(geometry);
+    scale = 2;
+    panel.reapplyFrame();
+    expect(root.style.width).toBe('250px');
+    expect(root.style.left).toBe('200px');
+    expect(JSON.parse(localStorage.getItem('woc_target_auras_frame')!)).toEqual(geometry);
+  });
+
   it('starts disabled and hidden until the player enables it', () => {
     const { panel, root } = setup();
 
@@ -887,4 +913,22 @@ describe('TargetAurasWindow', () => {
     expect(active?.querySelector('.ta-stacks')?.classList.contains('empty')).toBe(true);
     expect(recycled.style.display).toBe('none');
   });
+});
+
+it('reloads aura window visibility, filters and custom width without reloading the page', () => {
+  const { panel, root } = setup();
+  localStorage.setItem('woc_target_auras_visible', '1');
+  localStorage.setItem('woc_target_auras_filter', 'buffs');
+  localStorage.setItem('woc_target_auras_frame', '{"left":80,"top":100,"width":500,"height":240}');
+  panel.restoreSavedLayout();
+  expect(root.style.display).not.toBe('none');
+  expect(root.style.width).toBe('500px');
+  expect(root.querySelector('[data-aura-filter="buffs"]')?.getAttribute('aria-pressed')).toBe(
+    'true',
+  );
+  localStorage.removeItem('woc_target_auras_visible');
+  localStorage.removeItem('woc_target_auras_frame');
+  panel.restoreSavedLayout();
+  expect(root.style.display).toBe('none');
+  expect(root.style.width).not.toBe('500px');
 });

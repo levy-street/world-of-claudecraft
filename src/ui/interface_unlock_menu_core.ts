@@ -34,7 +34,11 @@ export interface FramesMenuSelectRange {
 }
 
 const BOOL_TOGGLE_ROWS = [
+  ['showEmptyFocusFrames', 'hudChrome.focusTargets.showEmpty'],
   ['combineActionBars', 'hudChrome.options.combineActionBars'],
+  ['combineTrackerFrames', 'hudChrome.interfaceUnlock.combineTrackers'],
+  ['combineAuraFrames', 'hudChrome.interfaceUnlock.combineAuras'],
+  ['moveTargetOfTargetIndependently', 'hudChrome.frameMenus.independentTarget'],
   ['hideUnusedActionSlots', 'hudChrome.options.hideUnusedActionSlots'],
   ['mouseoverCast', 'hudChrome.options.mouseoverCast'],
   ['lockActionBars', 'hudChrome.options.lockActionBars'],
@@ -57,8 +61,8 @@ const BAR_ORIENTATION_LABELS = [
   'hudChrome.interfaceUnlock.actionBar3Vertical',
 ] as const;
 
-/** The frame-behavior settings the editor dropdown owns (their options-window
- * rows are gone; see buildInterfaceControls). `set` persists AND applies.
+/** Shared frame-behavior settings for the editor dropdown and Interface options.
+ * `set` persists AND applies.
  * Bar orientation is PER BAR while split (owner request), and one toggle
  * driving all three while combined, since the block moves and flips as a
  * single shape then. */
@@ -70,8 +74,15 @@ export function buildFramesMenuToggles(
   const toggles: FramesMenuToggle[] = BOOL_TOGGLE_ROWS.map(([key, labelKey]) => ({
     id: key as string,
     label: t(labelKey),
-    value: !!hooks.settings.get(key),
-    set: (value: boolean) => hooks.onSettingChange(key, hooks.settings.set(key, value)),
+    value:
+      key === 'moveTargetOfTargetIndependently'
+        ? !hooks.settings.get(key)
+        : !!hooks.settings.get(key),
+    set: (value: boolean) =>
+      hooks.onSettingChange(
+        key,
+        hooks.settings.set(key, key === 'moveTargetOfTargetIndependently' ? !value : value),
+      ),
   }));
   if (combinedBars) {
     toggles.push({
@@ -96,10 +107,7 @@ export function buildFramesMenuToggles(
   return toggles;
 }
 
-/** The discrete party layout knobs live in the editor menu rather than the
- * options window (owner request: the sizing sliders left the Frames tab once
- * the editor gained real-dimension drags; columns and the row spacing join
- * the editor's own menu as whole-px pickers). */
+/** Party columns and spacing use the same whole-pixel pickers in both menus. */
 export function buildFramesMenuSelects(
   hooks: FramesMenuSettingsHooks | null,
   ranges: Record<'partyFrameColumns' | 'partyFrameSpacing', FramesMenuSelectRange>,
@@ -134,6 +142,10 @@ export const FRAME_SIZE_RESET_KEYS: Partial<Record<string, readonly string[]>> =
   playerFrame: ['playerFrameScale', 'playerFrameWidth', 'playerFrameHeight'],
   targetFrame: ['targetFrameScale', 'targetFrameWidth', 'targetFrameHeight'],
   partyFrames: ['partyFrameScale', 'partyFrameWidth', 'partyFrameHeight'],
+  petFrame: ['petFrameWidth', 'petFrameHeight'],
+  focusTarget1: ['focusTarget1Width', 'focusTarget1Height'],
+  focusTarget2: ['focusTarget2Width', 'focusTarget2Height'],
+  focusTarget3: ['focusTarget3Width', 'focusTarget3Height'],
 };
 
 /** The edit preview's roster is always this deep (owner request), so

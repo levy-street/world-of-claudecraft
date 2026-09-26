@@ -95,10 +95,18 @@ export function statNameKey(stat: StatTooltipModel['stat']): string {
 
 function statDescriptionText(model: StatTooltipModel, deps: StatTooltipI18n): string {
   if (model.stat !== 'warfare') return deps.t(`hudChrome.statInfo.desc.${model.stat}`);
-  return deps.t('hudChrome.statInfo.desc.warfare', {
-    increase: dec1(deps, model.warfareDamageIncrease ?? model.statValue),
-    reduction: dec1(deps, model.warfareDamageReduction ?? model.statValue),
-  });
+  const increase = dec1(deps, model.warfareDamageIncrease ?? model.statValue);
+  const reduction = dec1(deps, model.warfareDamageReduction ?? model.statValue);
+  // With honor gear worn, the description also states the WARFARE Vitality
+  // health bonus and where it stops applying (pvp/vitality.ts).
+  if ((model.warfareHealthIncrease ?? 0) > 0) {
+    return deps.t('hudChrome.statInfo.desc.warfareWithHealth', {
+      increase,
+      reduction,
+      health: dec1(deps, model.warfareHealthIncrease ?? 0),
+    });
+  }
+  return deps.t('hudChrome.statInfo.desc.warfare', { increase, reduction });
 }
 
 /** The localized text of one upstream source line: "Base: 40", "From Agility:

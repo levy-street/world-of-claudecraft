@@ -1,12 +1,20 @@
+import {
+  VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC,
+  VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT,
+} from '../content/vanguard_set_bonuses_a';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { addThreat } from '../threat';
 import { DT, type Entity } from '../types';
 import { relocateSwept } from './heroic_leap';
+import { grantSolarReprisal } from './paladin_solar_reprisal';
 import { isVeilboundMarchActive } from './paladin_veilbound_state';
 import { isPullEligible } from './pull_eligibility';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 const OATH_CHAIN_PULL_SUFFIX = '_pull';
+/** The Shieldvow Bastion 4pc cast-slow aura id on a chained enemy. */
+export const SHIELDVOW_CAST_SLOW_AURA_ID = 'oath_chain_tongues';
 
 function finishOathChainPull(ctx: SimContext, target: Entity, aura: Entity['auras'][number]): void {
   const slowDuration = aura.pullSlowDuration ?? 0;
@@ -144,6 +152,33 @@ export function pullPaladinTargets(
       abilityName,
     );
   }
+  // Shieldvow Bastion 4pc (Warfare Season 2): every pullable enemy the chain
+  // binds casts spells slower for a few seconds (the tongues aura tonguesMult
+  // reads at cast start), and an Oath Chain that binds a pullable primary
+  // grants Solar Reprisal outright. grantSolarReprisal is the roll-free arm
+  // (tryGrantSolarReprisal is the rolled one), so no rng draw is added;
+  // bosses are not pullable, so neither half lands on them.
+  if (abilityId !== 'oath_chain') return;
+  if (!wearsSetBonus(ctx, source, 'vanguard_paladin_protection', 4)) return;
+  for (const target of targets) {
+    if (!target.dead && isPullEligible(target)) applyShieldvowCastSlow(ctx, source, target);
+  }
+  if (isPullEligible(primary)) grantSolarReprisal(ctx, source);
+}
+
+/** The Shieldvow Bastion 4pc cast slow: one tongues aura per chained enemy,
+ *  refreshed by id (never stacks), shown under Oath Chain's name. */
+function applyShieldvowCastSlow(ctx: SimContext, source: Entity, target: Entity): void {
+  ctx.applyAura(target, {
+    id: SHIELDVOW_CAST_SLOW_AURA_ID,
+    name: 'Oath Chain',
+    kind: 'tongues',
+    value: VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_MULT,
+    remaining: VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC,
+    duration: VANGUARD_PROT_PALADIN_4PC_CAST_SLOW_DURATION_SEC,
+    sourceId: source.id,
+    school: 'holy',
+  });
 }
 
 export function pulsePaladinThreat(

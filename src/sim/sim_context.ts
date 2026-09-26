@@ -26,6 +26,9 @@ import type { MobScanCounters } from './mob/scan_counters';
 import type { CommissionOrder } from './professions/commission_order';
 import type { FeastState } from './professions/feast';
 import type { PendingProjectile } from './projectile_travel';
+import type { HillState } from './pvp/hill';
+import type { HillSpotProbe } from './pvp/hill_rules';
+import type { WorldPvpBooks } from './pvp/world_pvp';
 import type { NaturalRiftPortal } from './rift/portals';
 import type { RiftEvent, RiftInstance } from './rift/types';
 import type { Rng } from './rng';
@@ -264,6 +267,15 @@ export interface SimContextPrimitives {
   readonly bgMatches: Map<number, BgMatch>;
   readonly bgBusySlots: Set<number>;
   nextBgMatchId: number;
+  // World PvP (pvp/world_pvp.ts): the assist recency books and the per-pair
+  // diminishing-returns rows behind the /pvp flag's kill resolution, mutated
+  // in place by that module only. Backing field stays on Sim.
+  readonly worldPvpBooks: WorldPvpBooks;
+  // King of the Hill (pvp/hill.ts): the standing hill, the schedule and the
+  // hour's accruals, one live view like the books above (session-only).
+  readonly hillState: HillState;
+  // The hill's spot probe, bound by the Sim (pvp/hill_probe.ts); tests bind fakes.
+  readonly hillProbe: HillSpotProbe;
   // Resolved-match records the authoritative host drains post-tick
   // (social/battleground_outcomes.ts). Observability only: no gameplay branch
   // reads it and nothing here draws rng. Live view; the array stays on Sim.
@@ -342,6 +354,9 @@ export interface SimContextPrimitives {
   // backing field stays Sim-owned (the Market instance owns it), exposed here as a live
   // read-only view (never reassigned by the readout).
   readonly devCommands: boolean;
+  // World PvP realm kill switch (server env WORLD_PVP_DISABLED=1, pvp/world_pvp.ts):
+  // raising the /pvp flag is refused and a saved flag loads down. Exactly the Sim field.
+  readonly worldPvpDisabled: boolean;
   // The compulsory-tutorial host opt-in (SimConfig.compulsoryTutorial): the
   // greeting sweep only force-ferries fresh characters where a live world
   // turned it on; tests, parity traces, and the RL env keep it off.
@@ -1422,6 +1437,15 @@ export function createSimContext(host: SimContextHost): SimContext {
     get bgBusySlots() {
       return host.bgBusySlots;
     },
+    get hillState() {
+      return host.hillState;
+    },
+    get hillProbe() {
+      return host.hillProbe;
+    },
+    get worldPvpBooks() {
+      return host.worldPvpBooks;
+    },
     get bgProposals() {
       return host.bgProposals;
     },
@@ -1502,6 +1526,9 @@ export function createSimContext(host: SimContextHost): SimContext {
     },
     get devCommands() {
       return host.devCommands;
+    },
+    get worldPvpDisabled() {
+      return host.worldPvpDisabled;
     },
     get compulsoryTutorial() {
       return host.compulsoryTutorial;

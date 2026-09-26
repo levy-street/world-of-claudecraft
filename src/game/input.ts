@@ -6,6 +6,7 @@
 
 import { sanitizeMoveFacing, sanitizeMoveInput } from '../sim/move_input';
 import type { MoveInput } from '../sim/types';
+import { focusTargetAction } from '../ui/focus_targets_core';
 import { detectBrowserEngine } from './browser_env';
 import { clickClaimedModalFocus } from './click_claimed_focus';
 import { cursorForHover, type HoverCursorKind } from './cursors';
@@ -83,6 +84,7 @@ export interface InputCallbacks {
   // A party target hotkey (F1..F10 by default): slot 0 is yourself, 1..9 the
   // party frame rows top to bottom (src/ui/party_target_hotkeys_core.ts).
   onTargetParty(slot: number): void;
+  onFocusTarget?(slot: number, assign: boolean): void;
   onAbility(slot: number): void;
   // Action-bar slot key DOWN / UP, so a slot can HOLD to charge (the Vale Cup
   // shoot) and release to fire. A tap is a down immediately followed by an up.
@@ -1212,6 +1214,11 @@ export class Input {
   }
 
   private dispatchEdge(action: string): void {
+    const focus = focusTargetAction(action);
+    if (focus) {
+      this.cb.onFocusTarget?.(focus.slot, focus.assign);
+      return;
+    }
     if (action.startsWith('slot')) {
       this.cb.onAbility(Number(action.slice(4)));
       return;

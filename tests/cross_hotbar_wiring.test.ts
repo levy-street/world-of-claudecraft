@@ -177,6 +177,20 @@ describe('crossHotbarHold', () => {
 });
 
 describe('pad mode', () => {
+  it('keeps a watched stance out of a newly connected pad during the reconnect hold', () => {
+    const host = {
+      ...fakeHost([{ type: 'ability', id: 'heroic_strike' }], ['bear_form']),
+      crossHotbarReadOnly: () => true,
+    };
+    const wiring = createCrossHotbar(() => host, SCOPE, PAD_LAYOUT);
+    wiring.bindings.reset();
+    wiring.syncPadMode(fakePad(true));
+    const persisted = new CrossHotbarBindings(SCOPE).all().flat();
+    expect(persisted).toContainEqual({ type: 'ability', id: 'heroic_strike' });
+    expect(persisted).not.toContainEqual({ type: 'ability', id: 'bear_form' });
+    wiring.hooks.syncCrossHotbarKnown(['battle_stance']);
+    expect(wiring.bindings.all().flat()).toContainEqual({ type: 'ability', id: 'battle_stance' });
+  });
   it('takes over the hotbar only when the cross hotbar is on AND a pad is present', () => {
     const host = fakeHost();
     const wiring = createCrossHotbar(() => host, SCOPE, PAD_LAYOUT);

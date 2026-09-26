@@ -111,7 +111,10 @@ const EXPECTED_BASELINES: Record<string, BaselineSnapshot> = {
   'shaman/elemental': {
     stats: { int: 8 },
     abilities: {
-      lightning_bolt: { dmgPct: 0.18, costPct: -0.35, castPct: -0.2 },
+      // v0.44.0 Thundercall rework: classic 5/5 Lightning Mastery (1.0 sec off
+      // a 3.0 sec cast) on Arc Bolt and Skybranch.
+      lightning_bolt: { dmgPct: 0.18, costPct: -0.35, castPct: -0.333333 },
+      chain_lightning: { castPct: -0.333333 },
       earth_shock: { dmgPct: 0.18, costPct: -0.15 },
       flame_shock: { costPct: -0.2 },
     },

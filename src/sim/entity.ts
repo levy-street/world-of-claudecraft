@@ -8,7 +8,7 @@ import { canDualWield, isShieldItem } from './equipment_rules';
 import { activeItemInstanceStats } from './item_instance_stats';
 import { meetsLevelRequirement } from './item_level_req';
 import { lootQualityWeapon } from './loot_quality';
-import { pvpFractionsFromRatings } from './pvp';
+import { pvpFractionsFromRatings, pvpVitalityFromRating } from './pvp';
 import type {
   Entity,
   EquipSlot,
@@ -70,6 +70,7 @@ function baseEntity(id: number, pos: Vec3): Entity {
       armor: 0,
       pvpOffense: 0,
       pvpDefense: 0,
+      pvpVitality: 0,
     },
     weapon: { min: 1, max: 2, speed: 2 },
     offhandWeapon: null,
@@ -325,6 +326,7 @@ export function recalcPlayerStats(
     armor: def.baseStats.armor + def.statsPerLevel.armor * (lvl - 1),
     pvpOffense: 0,
     pvpDefense: 0,
+    pvpVitality: 0,
   };
   const setCounts = new Map<string, number>();
   let bonusSp = 0; // flat Spell Power from gear affixes + buff_spellpower auras
@@ -565,6 +567,9 @@ export function recalcPlayerStats(
   );
   e.stats.pvpOffense = warfare.offense;
   e.stats.pvpDefense = warfare.defense;
+  // WARFARE Vitality rides the same combined Defense Rating (pvp/power.ts); it
+  // reaches maxHp below only while the Sim says it applies (pvp/vitality.ts).
+  e.stats.pvpVitality = pvpVitalityFromRating(bonusPvpDefenseRating + setEff.pvpDefenseRating);
   // An over-level mainhand is inert like any other gear: fall back to unarmed
   // damage (and drop the weapon-type flags, e.g. dagger, that gate abilities)
   // until the wearer is high enough level. The mainhand still stays worn (see
@@ -729,6 +734,12 @@ export function recalcPlayerStats(
   if (maxHpPctAura !== 0) e.maxHp = Math.max(1, Math.round(e.maxHp * (1 + maxHpPctAura)));
   // Fiesta "Colossus"-style buffs: growing bigger also makes you tankier.
   if (scaleMul > 1) e.maxHp = Math.round(e.maxHp * scaleMul);
+  // WARFARE Vitality: honor gear's health bonus, off inside PvE instances (the
+  // Sim clears pvpVitalityActive there; absent means the open world, where it
+  // applies). The preserved hpFrac keeps a switch from gaining or losing health.
+  if (e.pvpVitalityActive !== false && e.stats.pvpVitality > 0) {
+    e.maxHp = Math.round(e.maxHp * (1 + e.stats.pvpVitality));
+  }
   e.hp = Math.max(1, Math.round(e.maxHp * hpFrac));
   if (e.dead) e.hp = 0;
   // Body size: players default to 1; a buff_scale aura grows/shrinks them live.

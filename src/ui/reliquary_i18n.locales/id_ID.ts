@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Gudang Senjata Peperangan',
     desc: 'Perhiasan dan senjata Peperangan yang dibeli dengan kehormatan hasil jerih payah.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galeri Garda Depan',
+    desc: 'Set spesialisasi dan senjata Peperangan Musim 2, dibeli dengan kehormatan.',
+  },
   horizons_vault_of_ages: {
     name: 'Ruang Simpan Zaman',
     desc: 'Pusaka yang ditarik dari zaman yang telah lewat. Relik ini tidak bisa lagi diraih; ruang simpan ini menghormati para veteran yang menyimpannya.',

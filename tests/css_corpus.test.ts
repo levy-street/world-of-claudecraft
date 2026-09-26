@@ -213,6 +213,10 @@ const INDEX_SECTIONS = [
   // The set-divided WARFARE quartermaster shop (components.css); loads in both
   // entries, so it is not a PLAY_OMITS row.
   'WARFARE quartermaster shop',
+  // World PvP: the merged PvP window's flag tab body and the King of the Hill
+  // bar (components.css); both load in both entries.
+  "World PvP (the merged PvP window's flag tab)",
+  'King of the Hill (the in-zone bar over the standing hill)',
   'ui library (shared primitives)',
 ];
 
@@ -225,12 +229,15 @@ const PLAY_SECTIONS = INDEX_SECTIONS.filter((name) => !PLAY_OMITS.includes(name)
 const MANIFEST = INDEX_SECTIONS;
 
 describe('css_corpus section manifest', () => {
-  it('pins a non-vacuous manifest: 71 index + 69 play sections, no duplicate names', () => {
-    expect(INDEX_SECTIONS.length).toBe(72);
-    expect(PLAY_SECTIONS.length).toBe(70);
-    expect(MANIFEST.length).toBe(72);
-    expect(new Set(INDEX_SECTIONS).size).toBe(72);
-    expect(new Set(PLAY_SECTIONS).size).toBe(70);
+  it('pins a non-vacuous manifest: 74 index + 72 play sections, no duplicate names', () => {
+    // The World Quests branch's vehicle bar and music override sections (72 / 70)
+    // plus World PvP (the flag tab) and King of the Hill (src/ui/hud/hill/), one
+    // components.css section each in both entries: 74 / 72.
+    expect(INDEX_SECTIONS.length).toBe(74);
+    expect(PLAY_SECTIONS.length).toBe(72);
+    expect(MANIFEST.length).toBe(74);
+    expect(new Set(INDEX_SECTIONS).size).toBe(74);
+    expect(new Set(PLAY_SECTIONS).size).toBe(72);
   });
 
   it('captures the live corpus markers (the marker regex is non-vacuous, not a zero match)', () => {

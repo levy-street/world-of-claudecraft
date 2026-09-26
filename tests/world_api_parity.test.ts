@@ -79,6 +79,7 @@ import type { IWorldTargeting } from '../src/world_api/targeting';
 import type { IWorldTelemetry } from '../src/world_api/telemetry';
 import type { IWorldTrade } from '../src/world_api/trade';
 import type { IWorldVehicles } from '../src/world_api/vehicles';
+import type { IWorldWorldPvp } from '../src/world_api/world_pvp';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
@@ -552,6 +553,7 @@ export const IWORLD_MEMBERS = [
   { name: 'reliquaryRarity', kind: 'method' },
   // IWorldActionBar: per-character action-bar layout persistence + login restore.
   { name: 'saveActionBarLayout', kind: 'method' },
+  { name: 'actionBarReadOnly', kind: 'data' },
   { name: 'takeActionBarLayoutRestore', kind: 'method' },
   // IWorldFarming: the static garden-bed geography plus the viewer's own plot
   // rows (both data), the growth phase's two plot mutations, and the knobs
@@ -573,6 +575,10 @@ export const IWORLD_MEMBERS = [
   // data member exists for it.
   { name: 'placeFeast', kind: 'method' },
   { name: 'consumeFeast', kind: 'method' },
+  // IWorldWorldPvp (world_pvp.ts): the /pvp flag readout + raise/lower.
+  { name: 'worldPvpInfo', kind: 'data' },
+  { name: 'setWorldPvpFlag', kind: 'method' },
+  { name: 'hillInfo', kind: 'data' },
 ] as const satisfies readonly IWorldMember[];
 
 const DATA_MEMBERS = IWORLD_MEMBERS.filter((m) => m.kind === 'data');
@@ -911,9 +917,12 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // 408/119/289.
     // Plus the Weekly Vault's weeklyRewardInfo (+1 data), claimWeeklyReward and
     // openWeeklyReward (+2 methods; PR 4052): 411/120/291.
-    expect(IWORLD_MEMBERS.length).toBe(411);
-    expect(DATA_MEMBERS.length).toBe(120);
-    expect(METHOD_MEMBERS.length).toBe(291);
+    // Plus the release's World PvP facet (worldPvpInfo data, setWorldPvpFlag
+    // method) and King of the Hill's hillInfo (data) at the second release/v0.44.0
+    // base merge, with spectate's actionBarReadOnly (data): 415/123/292.
+    expect(IWORLD_MEMBERS.length).toBe(415);
+    expect(DATA_MEMBERS.length).toBe(123);
+    expect(METHOD_MEMBERS.length).toBe(292);
   });
   it('has no duplicate member names', () => {
     const names = IWORLD_MEMBERS.map((m) => m.name);
@@ -935,6 +944,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountDeeds',
       'accountFlair',
       'accuseWorldQuestSuspect',
+      'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -1113,6 +1123,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'harvestNode',
       'harvestPreference',
       'healPet',
+      'hillInfo',
       'hobbyCraft',
       'honor',
       'ignoreAdd',
@@ -1266,6 +1277,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
       'socialInfo',
@@ -1327,6 +1339,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'whoInfo',
       'whoRequest',
       'worldBossActive',
+      'worldPvpInfo',
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
       'worldQuestLeaderboard',
@@ -1343,6 +1356,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'accountAdmin',
       'accountCosmetics',
       'accountDeeds',
+      'actionBarReadOnly',
       'activeBorder',
       'activeConsecrations',
       'activeFrostRings',
@@ -1396,6 +1410,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'gatheringProficiency',
       'guildBankInfo',
       'harvestPreference',
+      'hillInfo',
       'hobbyCraft',
       'honor',
       'inventory',
@@ -1453,6 +1468,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'weeklyQuestResetAtMs',
       'weeklyRewardInfo',
       'whoInfo',
+      'worldPvpInfo',
       'worldQuestCycle',
       'worldQuestExpiresAtMs',
       'worldQuestLog',
@@ -1711,6 +1727,7 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
       'setSpec',
       'setStopAutoAttackOnTargetSwitch',
       'setTownFocus',
+      'setWorldPvpFlag',
       'shadowWorldQuestAction',
       'slotToolEffect',
       'socketRiftGem',
@@ -2392,6 +2409,7 @@ type _ExhaustReliquary = AssertNever<
 >;
 
 const FACET_ACTION_BAR = [
+  'actionBarReadOnly',
   'saveActionBarLayout',
   'takeActionBarLayoutRestore',
 ] as const satisfies readonly (keyof IWorldActionBar)[];
@@ -2410,6 +2428,15 @@ const FACET_FARMING = [
   'consumeFeast',
 ] as const satisfies readonly (keyof IWorldFarming)[];
 type _ExhaustFarming = AssertNever<Exclude<keyof IWorldFarming, (typeof FACET_FARMING)[number]>>;
+
+const FACET_WORLD_PVP = [
+  'worldPvpInfo',
+  'setWorldPvpFlag',
+  'hillInfo',
+] as const satisfies readonly (keyof IWorldWorldPvp)[];
+type _ExhaustWorldPvp = AssertNever<
+  Exclude<keyof IWorldWorldPvp, (typeof FACET_WORLD_PVP)[number]>
+>;
 
 // The facet partition, keyed by facet for legible failure messages.
 const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
@@ -2447,6 +2474,7 @@ const FACET_MEMBER_ARRAYS: Readonly<Record<string, readonly string[]>> = {
   reliquary: FACET_RELIQUARY,
   actionBar: FACET_ACTION_BAR,
   farming: FACET_FARMING,
+  worldPvp: FACET_WORLD_PVP,
 };
 
 describe('W1: aggregate IWorld member set equals the disjoint union of the facets', () => {
@@ -2461,7 +2489,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     // on disk minus appearance.ts (the sweep below).
     // 34 at the release/v0.43.0 merge: the release's 33 plus this branch's
     // vehicles facet.
-    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(34);
+    // 35 at the second release/v0.44.0 base merge: plus the release's world_pvp.ts.
+    expect(Object.keys(FACET_MEMBER_ARRAYS).length).toBe(35);
   });
 
   it('every facet FILE on disk is a FACET_MEMBER_ARRAYS key (none can go silently unpartitioned)', () => {
@@ -2542,8 +2571,8 @@ describe('W1: aggregate IWorld member set equals the disjoint union of the facet
     const union = Object.values(FACET_MEMBER_ARRAYS).flatMap((arr) => [...arr]);
     // Mirrors the IWORLD_MEMBERS.length pin above (411); this pin and the one above
     // must always agree.
-    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(411);
-    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(411);
+    expect(union.length, 'union size before dedup (catches a duplicated member)').toBe(415);
+    expect(new Set(union).size, 'union size after dedup (catches a duplicated member)').toBe(415);
     const sortedUnion = [...union].sort();
     const pinned = IWORLD_MEMBERS.map((m) => m.name).sort();
     expect(sortedUnion).toEqual(pinned);

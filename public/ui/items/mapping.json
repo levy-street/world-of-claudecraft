@@ -6936,6 +6936,26 @@
         "clue_scroll",
         "treasure_casket"
       ]
+    },
+    {
+      "batchId": "warfare-season2-weapons-2026-09-25",
+      "source": "OpenAI built-in image generation (gpt-image-1)",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "styleReference": "existing painted WebP catalog in public/ui/items/",
+      "commonPrompt": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, tactile painted material rendering, atmospheric opaque dark background, top-left key light, complete subject fully in frame, no text, no watermark, no frame, no transparency",
+      "itemPrompts": {
+        "vanguard_verdict_greatsword": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, tactile painted material rendering, atmospheric opaque dark background, top-left key light, complete subject fully in frame, no text, no watermark, no frame, no transparency. A massive two-handed greatsword, broad straight blade shown diagonally from lower left to upper right, long grip, heavy winged crossguard. Honor-earned PvP vanguard regalia: blackened steel with polished crimson enamel and burnished gold trim, a small stylized banner or laurel motif.",
+        "vanguard_oath_blade": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, tactile painted material rendering, atmospheric opaque dark background, top-left key light, complete subject fully in frame, no text, no watermark, no frame, no transparency. A one-handed arming sword with a straight double-edged blade shown diagonally, a disc pommel and a short crossguard wrapped in crimson leather. Honor-earned PvP vanguard regalia: blackened steel with polished crimson enamel and burnished gold trim, a small stylized banner or laurel motif.",
+        "vanguard_fang_dagger": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, tactile painted material rendering, atmospheric opaque dark background, top-left key light, complete subject fully in frame, no text, no watermark, no frame, no transparency. A curved fang-shaped dagger shown diagonally, a single wicked hooked blade, a compact grip and a small guard. Honor-earned PvP vanguard regalia: blackened steel with polished crimson enamel and burnished gold trim, a small stylized banner or laurel motif.",
+        "vanguard_warstaff": "Painted dark-fantasy MMORPG inventory icon, one centered item, clear silhouette, tactile painted material rendering, atmospheric opaque dark background, top-left key light, complete subject fully in frame, no text, no watermark, no frame, no transparency. A tall caster war staff shown diagonally, a dark wooden haft bound in gold bands, topped by a crimson crystal cradled in gold laurel prongs, faint arcane glow. Honor-earned PvP vanguard regalia: blackened steel with polished crimson enamel and burnished gold trim, a small stylized banner or laurel motif."
+      },
+      "itemIds": [
+        "vanguard_verdict_greatsword",
+        "vanguard_oath_blade",
+        "vanguard_fang_dagger",
+        "vanguard_warstaff"
+      ]
     }
   ]
 }

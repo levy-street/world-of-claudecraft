@@ -17,7 +17,7 @@ import type {
 import { FERAL, HUNTER_ONLY } from './items';
 import { MOUNT_RACE_COURSE, STABLE_HORSE_TEMPLATE_ID, STABLE_PADDOCK } from './mounts';
 import { PRACTICE_ROW_CAMPFIRE } from './practice_dummies';
-import { HONOR_VENDOR_STOCK } from './pvp_honor';
+import { HONOR_QUARTERMASTER_STOCK } from './pvp_honor';
 
 export const ZONE3_ZONE: ZoneDef = {
   id: 'thornpeak_heights',
@@ -1354,7 +1354,7 @@ export const ZONE3_NPCS: Record<string, NpcDef> = {
     facing: 2.26, // atan2(dx, dz) toward the square at (0, 660)
     color: 0x7d2f3f, // deep war-crimson steel, off every tint the visual manifest reserves
     questIds: [],
-    vendorItems: [...HONOR_VENDOR_STOCK],
+    vendorItems: [...HONOR_QUARTERMASTER_STOCK],
     dynamic: true,
     warfareVendor: true,
     greeting:

@@ -37,7 +37,7 @@ import {
 import {
   FURY_NPC_ID,
   FURY_STOCK,
-  HONOR_VENDOR_STOCK,
+  HONOR_QUARTERMASTER_STOCK,
   WARFARE_ITEMS,
   WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
@@ -380,11 +380,12 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 27 + the four Crucible raid pages (per-boss N+H, the obligations
     // closeout of docs/prd/ignivar-raid-loot.md) + the Roots' Bramblehide
     // set page (the eighth epic armor family).
-    expect(CONQUEROR_PAGES.length).toBe(32);
+    // +1: conquerors_vanguard_gallery (Warfare Season 2).
+    expect(CONQUEROR_PAGES.length).toBe(33);
     expect(PROFESSION_PAGES.length).toBe(5);
     expect(HORIZON_PAGES.length).toBe(5);
     // Literal: update when product adds a page.
-    expect(RELIQUARY_PAGES.length).toBe(42);
+    expect(RELIQUARY_PAGES.length).toBe(43);
     expect(
       RELIQUARY_PAGES.every(
         (p) => p.shelf === 'conquerors' || p.shelf === 'professions' || p.shelf === 'horizons',
@@ -470,6 +471,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
     // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
     expect(full).toEqual({ owned: 463, total: 463 });
+    // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
+    // is class-personal and sits outside completion, so it moves neither pair.
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -501,6 +504,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // 415 with the three faction standing Champion title slots. 416 with the
     // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
     expect(character).toEqual({ owned: 434, total: 434 });
+    // The Warfare Season 2 page is class-personal, outside completion.
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -557,7 +561,8 @@ describe('Reliquary Conqueror catalog structure', () => {
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
       // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
-    ).toBe(511);
+      // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
+    ).toBe(650);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -716,12 +721,13 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     }
     expect(vendorOffenders).toEqual([]);
     // The exemption's own premises: it really covers the two Warfare counters
-    // (47 stock ids on both NPCS rows) and nothing rides it that could also
+    // (the entry stock plus Warfare Season 2 on both NPCS rows) and nothing rides it that could also
     // be bought for copper (a dual-priced row would fall back into the sweep
     // above by construction; this pins the classifier's copper half live).
-    // The two honor trinkets ride the same exemption on both counters.
-    expect(honorExempt).toBe(HONOR_VENDOR_STOCK.length * 2);
-    expect(HONOR_VENDOR_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
+    // The Warfare Season 2 stock and the two honor trinkets ride the same
+    // exemption on both counters.
+    expect(honorExempt).toBe(HONOR_QUARTERMASTER_STOCK.length * 2);
+    expect(HONOR_QUARTERMASTER_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
     expect(honorOnly(priceOf('deacon_reliquary_helm'))).toBe(false);
     // The DUAL-PRICED arm, which the live catalog exhibits nowhere today: an
     // item purchasable with BOTH honor and copper is not exempt, because the
@@ -790,7 +796,8 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the twelve trinkets (content/trinkets.ts), one page each: 345.
     // Plus the five Crucible raid trinkets (each on its boss's Normal and
     // Heroic page, one id each): 350.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(350);
+    // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(489);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1282,7 +1289,7 @@ describe('Reliquary Riftbound page (class-personal, outside completion)', () => 
 });
 
 describe('Reliquary outside-completion pages (the flagged set)', () => {
-  it('flags exactly the three pages, in catalog order, each with its reason', () => {
+  it('flags exactly the four pages, in catalog order, each with its reason', () => {
     // Catalog-wide companion to the per-page pins: the flag is the one lever
     // that removes a page from every completion pair, so its whole membership
     // is pinned in one place. Forgebreaker's approved one-time, class-restricted
@@ -1296,6 +1303,8 @@ describe('Reliquary outside-completion pages (the flagged set)', () => {
       ['horizons_vault_of_ages', 'retired'],
       ['horizons_riftbound', 'personal'],
       ['professions_forgebreaker', 'personal'],
+      // Class-locked Warfare Season 2 stock: no single character can fill it.
+      ['conquerors_vanguard_gallery', 'personal'],
     ]);
     // Both reasons are live, so neither arm of the reason-driven chrome
     // (window chip, styles) is pinned against an empty set. Sorting keeps
@@ -1455,8 +1464,10 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     const setless = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
     expect(itemRelicIds(gallery)).toEqual(setTagged);
     expect(itemRelicIds(armory)).toEqual([...setless, ...WARFARE_TRINKET_STOCK]);
+    // Warfare Season 2 has its own Vanguard gallery page, so the two Warfare
+    // pages partition the entry tier plus the trinkets, not the whole counter.
     expect([...itemRelicIds(gallery), ...itemRelicIds(armory)].sort()).toEqual(
-      [...HONOR_VENDOR_STOCK].sort(),
+      [...FURY_STOCK, ...WARFARE_TRINKET_STOCK].sort(),
     );
     // Snug vacuity floors (a defs edit that dropped the set tags would
     // otherwise drain the gallery into the armory with the union still green).
@@ -1494,7 +1505,7 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // The quality arm: epic-only is vacuous as a page filter today (the whole
     // stock is epic), so it is asserted as a STOCK fact instead; a sub-epic
     // honor row would red here and force the museum-in-or-out decision.
-    for (const id of FURY_STOCK) expect(ITEMS[id]?.quality, id).toBe('epic');
+    for (const id of HONOR_QUARTERMASTER_STOCK) expect(ITEMS[id]?.quality, id).toBe('epic');
   });
 
   it('both hinted quartermasters really sell every slot (and every slot names both)', () => {
@@ -1506,8 +1517,10 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     expect(FURY_NPC_ID).toBe('fury');
     for (const npcId of ['fury', 'warmarshal_draven_kole']) {
       const stock = new Set(NPCS[npcId]?.vendorItems ?? []);
-      expect(stock.size, npcId).toBe(HONOR_VENDOR_STOCK.length);
-      for (const id of HONOR_VENDOR_STOCK) expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
+      expect(stock.size, npcId).toBe(HONOR_QUARTERMASTER_STOCK.length);
+      for (const id of HONOR_QUARTERMASTER_STOCK) {
+        expect(stock.has(id), `${npcId} sells ${id}`).toBe(true);
+      }
     }
     for (const page of [gallery, armory]) {
       for (const relic of page.relics) {
@@ -3103,6 +3116,7 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // The two honor quartermasters, on every slot of both pages (Phase 21).
   conquerors_warfare_gallery: 2,
   conquerors_warfare_armory: 2,
+  conquerors_vanguard_gallery: 2,
   // The retired vault is deliberately sourceless (excludeFromCompletion:
   // retired relics have no door to name), so it resolves to zero sources.
   horizons_vault_of_ages: 0,

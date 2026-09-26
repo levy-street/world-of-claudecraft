@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
+import { floorVfxRenderOrder } from '../src/render/floor_vfx_layer';
 import {
   buildIgnivarWaterConduit,
   IGNIVAR_CONDUIT_ACTIVATION_RUNE_NAME,
@@ -157,9 +158,9 @@ describe('Ignivar water conduit renderer', () => {
     expect(outer.position.y).toBeGreaterThan(3);
     expect(core.position.y).toBeGreaterThan(3);
     expect(crown.position.y).toBeGreaterThan(6);
-    expect(outer.renderOrder).toBe(6);
-    expect(core.renderOrder).toBe(7);
-    expect(crown.renderOrder).toBe(7);
+    expect(outer.renderOrder).toBe(floorVfxRenderOrder('encounter', 5));
+    expect(core.renderOrder).toBe(floorVfxRenderOrder('encounter', 6));
+    expect(crown.renderOrder).toBe(floorVfxRenderOrder('encounter', 6));
     expect(outer.renderOrder).toBeGreaterThanOrEqual(highestFrontalOrder);
     expect(core.renderOrder).toBeGreaterThan(highestFrontalOrder);
     expect(crown.renderOrder).toBeGreaterThan(highestFrontalOrder);

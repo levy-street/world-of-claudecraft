@@ -140,8 +140,9 @@ repo's anchor rule):
   its primary, so The Rift shows lifetime clears and S-rank clears together.
 - **Kill-proof mark pages.** The realm-rares page fills from `slain:*` marks
   rather than item ids, one mark per authored rare.
-- **Honor-stock pages.** The warfare pages list purchasable honor gear, which
-  has no class gate and no drop roll.
+- **Honor-stock pages.** The warfare pages list purchasable honor gear with no
+  drop roll. The entry-tier Warfare stock has no class gate; the Warfare Season 2
+  Vanguard Gallery is class-locked, so it sits outside completion ('personal').
 - **Outside-completion pages.** Rule 7's `excludeFromCompletion` pages
   (retired and personal) render their own local pair and drop out of both
   sides of every completion pair.
@@ -662,8 +663,9 @@ None of these is a defect. Each is a product decision with no ruling yet.
 - **The Conquerors capstone grew a long tail**, and the Book completion feat
   behind it with it: the honor stock, the realm-rare drops, and the two
   S-rank-only Rift legendaries at a very low roll per clear. Everything is
-  verified reachable (the heroic pool draws class-agnostically and the honor
-  stock has no class gate), so this is a difficulty escalation to accept or
+  verified reachable (the heroic pool draws class-agnostically and the
+  entry-tier honor stock has no class gate; the class-locked Season 2 Vanguard
+  Gallery sits outside completion), so this is a difficulty escalation to accept or
   soften deliberately, not a defect.
 - **The unfillable-slot nudge.** Because the two pages holding the three
   unfillable slots are not `excludeFromCompletion`, they permanently satisfy the

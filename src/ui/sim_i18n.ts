@@ -21,8 +21,10 @@ import {
 } from '../sim/factions';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
+import { durationText } from './duration_text';
 import { tEntity } from './entity_i18n';
 import {
+  formatMoney,
   formatNumber,
   getLanguage,
   type InterpolationValues,
@@ -618,6 +620,53 @@ const baseEnTable = {
   'presence.noLongerAway': 'You are no longer marked as away.',
   'presence.afkDefault': 'Away From Keyboard',
   'presence.dndDefault': 'Do Not Disturb',
+  // World PvP (/pvp flag, src/sim/pvp/world_pvp.ts): the flag notices and the
+  // kill/defeat lines. Money goes through the client money formatter.
+  'worldPvp.enabled': 'World PvP enabled: other flagged players can attack you.',
+  'worldPvp.enabledAiding': 'World PvP enabled: you aided a flagged player in combat.',
+  // The free-for-all marking notice and the two zone-crossing notices
+  // (src/sim/pvp/world_pvp.ts WORLD_PVP_MARKED_LINE, WORLD_PVP_FFA_ENTER_LINE,
+  // WORLD_PVP_FFA_LEAVE_LINE, WORLD_PVP_SANCTUARY_LINE; the ground policy is
+  // src/sim/pvp/world_pvp_zones.ts). All four are placeholder-free, so the
+  // auto-built EXACT map below registers them from these rows and they need no
+  // RULES entry of their own.
+  'worldPvp.enabledMarked': 'World PvP enabled: you attacked an unflagged player.',
+  'worldPvp.ffaEntered': 'You have entered a free-for-all PvP zone: anyone here can attack you.',
+  'worldPvp.ffaLeft': 'You have left the free-for-all PvP zone.',
+  'worldPvp.sanctuary': 'This is a sanctuary: World PvP is off here.',
+  'hill.warning': 'A hill will rise in {zone} in {minutes}.',
+  'hill.risen': 'A hill has risen in {zone}: hold it to earn Honor.',
+  'hill.fallen': 'The hill in {zone} has fallen.',
+  'hill.taken': 'Your group holds the hill.',
+  'hill.lost': 'Another group has taken the hill.',
+  'hill.readoutNone': 'No hill stands right now.',
+  'hill.readoutYou': 'The hill stands in {zone}: your group holds it. It falls in {minutes}.',
+  'hill.readoutOther': 'The hill stands in {zone}: another group holds it. It falls in {minutes}.',
+  'hill.readoutUnheld': 'The hill stands in {zone}: nobody holds it. It falls in {minutes}.',
+  // The aid refusal (WORLD_PVP_AID_REFUSED_LINE, voiced by
+  // src/sim/combat/casting_lifecycle.ts): placeholder-free, EXACT-mapped too.
+  'worldPvp.aidRefused': 'You cannot aid a World PvP enemy: invite them to your party first.',
+  'worldPvp.realmDisabled': 'World PvP is disabled on this realm.',
+  'worldPvp.tooSoon': 'World PvP: wait a moment before switching again.',
+  'worldPvp.disabled': 'World PvP disabled.',
+  'worldPvp.staysEnabled': 'World PvP stays enabled.',
+  'worldPvp.disablingIn': 'World PvP will be disabled in {minutes} minutes.',
+  'worldPvp.alreadyEnabled': 'World PvP is already enabled.',
+  'worldPvp.alreadyDisabled': 'World PvP is already disabled.',
+  'worldPvp.alreadySwitchingOff': 'World PvP is already switching off.',
+  'worldPvp.minLevel': 'You must be at least level {level} to enable World PvP.',
+  'worldPvp.usage': 'Usage: /pvp, /pvp on, or /pvp off.',
+  'worldPvp.killPlain': 'You defeat {victim}.',
+  'worldPvp.killTake': 'You defeat {victim} and take {money} from their purse.',
+  'worldPvp.killTakeSplit':
+    'You defeat {victim} and take {money} from their purse (split {count} ways).',
+  'worldPvp.defeatedPlain': '{killer} defeats you.',
+  'worldPvp.defeatedTake': '{killer} defeats you and takes {money} from your purse.',
+  'worldPvp.defeatedPairPlain': '{killer} and 1 other defeat you.',
+  'worldPvp.defeatedPairTake': '{killer} and 1 other defeat you and take {money} from your purse.',
+  'worldPvp.defeatedGroupPlain': '{killer} and {others} others defeat you.',
+  'worldPvp.defeatedGroupTake':
+    '{killer} and {others} others defeat you and take {money} from your purse.',
   'log.channelJoined': 'Joined the {channel} channel. Type /{channel} <message> to talk.',
   'log.channelLeft': 'Left the {channel} channel.',
   'log.dungeonDifficultyHeroic': 'Dungeon difficulty set to Heroic.',
@@ -14215,6 +14264,10 @@ function locZone(name: string): string {
   const id = zoneNameToId.get(name);
   return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
 }
+/** A hill countdown's whole minutes as the locale's own duration phrase. */
+function hillMinutes(minutes: string): string {
+  return durationText(Number(minutes) * 60);
+}
 function locDelve(name: string): string {
   const id = delveNameToId.get(name);
   return id ? tEntity({ kind: 'delve', id, field: 'name' }) : name;
@@ -14661,6 +14714,8 @@ const WARLOCK_TALENT_AURA_NAMES: ReadonlySet<string> = new Set([
 const ABILITY_NAMED_AURA_IDS: Readonly<Record<string, string>> = {
   'Bruin Rush': 'bear_charge',
   Lunge: 'lunge',
+  // Thundercall's Magma Surge proc aura carries its ability's name.
+  'Magma Burst': 'lava_burst',
 };
 
 /** Aura and damage-label names the sim takes from the trinket's own item name. */
@@ -16920,6 +16975,16 @@ function locTalentTail(s: string): string {
 }
 
 type Rule = { re: RegExp; build: (m: RegExpExecArray) => string };
+// The sim's language-agnostic money text ('3g 5s 7c', src/sim/format_money.ts)
+// re-rendered through the locale money formatter; unparseable text passes
+// through untouched so a matcher never eats a value it did not understand.
+function localizeSimMoneyText(text: string): string {
+  const m = /^(?:(\d+)g)?\s*(?:(\d+)s)?\s*(?:(\d+)c)?$/.exec(text.trim());
+  if (!m || (m[1] === undefined && m[2] === undefined && m[3] === undefined)) return text;
+  const copper = Number(m[1] ?? 0) * 10_000 + Number(m[2] ?? 0) * 100 + Number(m[3] ?? 0);
+  return formatMoney(copper);
+}
+
 const RULES: Rule[] = [
   // Standing-gated vendor row (src/sim/items.ts buyItem): the sim names the
   // tier and the faction by their English identifiers; resolve both back to
@@ -18152,6 +18217,96 @@ const RULES: Rule[] = [
   {
     re: /^You withdraw (.+) from the guild bank\.$/,
     build: (m) => tSim('log.guildBankWithdrawItem', { item: locItem(m[1]) }),
+  },
+  // World PvP (/pvp flag): the parametrized notices and kill/defeat lines
+  // (src/sim/pvp/world_pvp.ts). Player names splice through verbatim; the
+  // sim's 'Ng Ns Nc' money re-formats through the locale money formatter.
+  // LAST on purpose: the two broadest shapes here ('You defeat X.' and
+  // 'X defeats you.') must never shadow a more specific rule above.
+  {
+    re: /^World PvP will be disabled in (\d+) minutes\.$/,
+    build: (m) => tSim('worldPvp.disablingIn', { minutes: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You must be at least level (\d+) to enable World PvP\.$/,
+    build: (m) => tSim('worldPvp.minLevel', { level: formatNumber(Number(m[1])) }),
+  },
+  {
+    re: /^You defeat (.+) and take (.+) from their purse \(split (\d+) ways\)\.$/,
+    build: (m) =>
+      tSim('worldPvp.killTakeSplit', {
+        victim: m[1],
+        money: localizeSimMoneyText(m[2]),
+        count: formatNumber(Number(m[3])),
+      }),
+  },
+  {
+    re: /^You defeat (.+) and take (.+) from their purse\.$/,
+    build: (m) => tSim('worldPvp.killTake', { victim: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^You defeat (.+)\.$/,
+    build: (m) => tSim('worldPvp.killPlain', { victim: m[1] }),
+  },
+  {
+    re: /^(.+) and 1 other defeat you and take (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedPairTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^(.+) and 1 other defeat you\.$/,
+    build: (m) => tSim('worldPvp.defeatedPairPlain', { killer: m[1] }),
+  },
+  {
+    re: /^(.+) and (\d+) others defeat you and take (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedGroupTake', {
+        killer: m[1],
+        others: formatNumber(Number(m[2])),
+        money: localizeSimMoneyText(m[3]),
+      }),
+  },
+  {
+    re: /^(.+) and (\d+) others defeat you\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedGroupPlain', { killer: m[1], others: formatNumber(Number(m[2])) }),
+  },
+  {
+    re: /^(.+) defeats you and takes (.+) from your purse\.$/,
+    build: (m) =>
+      tSim('worldPvp.defeatedTake', { killer: m[1], money: localizeSimMoneyText(m[2]) }),
+  },
+  {
+    re: /^(.+) defeats you\.$/,
+    build: (m) => tSim('worldPvp.defeatedPlain', { killer: m[1] }),
+  },
+  // King of the Hill (src/sim/pvp/hill.ts): the warning, rise and fall
+  // announcements and the /hill readout carry the zone's English name, and
+  // the countdowns an English "N minute(s)" the locale re-renders through
+  // durationText (its own plural rules); appended LAST like every rule.
+  {
+    re: /^A hill will rise in (.+) in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.warning', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  {
+    re: /^A hill has risen in (.+): hold it to earn Honor\.$/,
+    build: (m) => tSim('hill.risen', { zone: locZone(m[1]) }),
+  },
+  {
+    re: /^The hill in (.+) has fallen\.$/,
+    build: (m) => tSim('hill.fallen', { zone: locZone(m[1]) }),
+  },
+  {
+    re: /^The hill stands in (.+): your group holds it\. It falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.readoutYou', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  {
+    re: /^The hill stands in (.+): another group holds it\. It falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.readoutOther', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
+  },
+  {
+    re: /^The hill stands in (.+): nobody holds it\. It falls in (\d+) minutes?\.$/,
+    build: (m) => tSim('hill.readoutUnheld', { zone: locZone(m[1]), minutes: hillMinutes(m[2]) }),
   },
 ];
 

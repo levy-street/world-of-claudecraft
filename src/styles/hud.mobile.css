@@ -199,7 +199,7 @@
     /* Socket species that sit under the 40x40 coarse-pointer floor on desktop are
        re-pinned to it here. The TOKEN moves, not the class, so each socket's art,
        key chip and count all scale with the cell instead of overflowing it.
-       W1 companion: pet commands are 36px on desktop.
+       Pet commands retain their compact 40px touch row independently of desktop.
        The bank/vault cell is 32px on desktop, and the library socket recipe now
        outranks the older .bag-socket 40px rule, so it needs the same re-pin. */
     --socket-size-pet: 40px;
@@ -2292,7 +2292,7 @@
     min-height: 48px;
     margin-bottom: 8px;
     padding-bottom: 6px;
-    cursor: move;
+    cursor: var(--cursor-move, move);
     touch-action: none;
   }
   body.mobile-touch #mobile-extra-controls .panel-title .x-btn {
@@ -3058,7 +3058,7 @@
     height: 30px;
     z-index: 300;
     touch-action: none;
-    cursor: ns-resize;
+    cursor: var(--cursor-resize-ns, ns-resize);
     pointer-events: auto;
     border-radius: 0 0 8px 8px;
     background: color-mix(in srgb, var(--panel-base) 82%, transparent);

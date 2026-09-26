@@ -177,6 +177,7 @@ export const RUNTIME_AURA_ICON_SOURCE_IDS: ReadonlyMap<string, string> = new Map
   ['shaman_gathering_winds_icd', 'galeheart_weapon'],
   ['shaman_living_weapon_absorb', 'rockbiter_weapon'],
   ['shaman_living_weapon_bolt', 'rockbiter_weapon'],
+  ['shaman_magma_surge', 'lava_burst'],
   ['shaman_primal_exaltation', 'elemental_mastery'],
   ['shaman_pyrebrand_mastery', 'rockbiter_weapon'],
   ['shaman_stonebound_armor', 'rockbiter_weapon'],

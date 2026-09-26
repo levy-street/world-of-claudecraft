@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Krigföringens vapenkammare',
     desc: 'Smycken och vapen för Krigföring, köpta för hårt vunnen ära.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Förtruppsgalleri',
+    desc: 'Krigföringens säsong 2-set för varje specialisering och vapen, köpta för ära.',
+  },
   horizons_vault_of_ages: {
     name: 'Tidsåldrarnas valv',
     desc: 'Utgångna skatter från en svunnen tid. Dessa reliker går inte längre att vinna; valvet hedrar de veteraner som behållit dem.',

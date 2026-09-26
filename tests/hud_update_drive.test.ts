@@ -186,6 +186,13 @@ const VIEW_SIG_BLOCK = 'if (view.sig !== this.lastSig) {';
  */
 const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
   {
+    call: 'this.focusTargets.update',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'three reusable unit frames: chrome signature, non-self tier cadence and shared writer elision',
+  },
+  {
     call: 'this.fxTier',
     band: 'frame',
     gate: '',
@@ -606,6 +613,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the target/boss cast bar (a raid mechanic indicator, deliberately untiered)',
   },
   {
+    call: 'fillTargetOfTargetDescriptor',
+    band: 'frame',
+    gate: "target && target.kind !== 'object' && tot && tot.kind !== 'object' && nonSelfRepaintDue(totChanged, this.lastTotFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
+    surface: 'chrome',
+    why: 'fills target-of-target health and resource',
+  },
+  {
     call: 'this.totFramePainter.paint',
     band: 'frame',
     gate: "target && target.kind !== 'object' && tot && tot.kind !== 'object' && nonSelfRepaintDue(totChanged, this.lastTotFramePaintAt, now, targetFrameNonSelfIntervalMs(fxTier))",
@@ -707,6 +721,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the configured Warrior proc frames; writer-facet toggles elide unchanged states',
+  },
+  {
+    call: 'this.cooldownManager.paint',
+    band: 'frame',
+    gate: '',
+    surface: 'chrome',
+    why: 'the Cooldown Manager groups, facet-routed: its pure core ticks the action bar view over the tracked spells (reusing the same world snapshot), then the painter writes through the elided writers, so a steady frame writes nothing; must run every frame for the ready-cue edges even when the groups are hidden',
   },
   {
     call: 'this.renderPetBar',
@@ -1003,6 +1024,13 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     gate: '',
     surface: 'chrome',
     why: 'the Thornhollow Fields in-match strip, the wave-respawn overlay and the spawn-protection line; the view core short-circuits an inactive match',
+  },
+  {
+    call: 'this.hillBar.update',
+    band: 'medium',
+    gate: '',
+    surface: 'chrome',
+    why: 'the King of the Hill strip while the player stands in the hill zone; the view core short-circuits to hidden with no hill or out of the zone, and the painter elides every repeat',
   },
   {
     call: 'this.bgKillFeed.update',
@@ -1820,8 +1848,10 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // (recipe_tracker_view.ts + recipe_tracker_painter.ts), the Reliquary
       // tracker's exact slow-band row shape.
       // chrome 91 -> 92 and none 17 -> 18 on the World Quests branch: its
-      // vehicle bar chrome row and its minigame music override.
-    ).toEqual({ window: 50, chrome: 92, none: 18 });
+      // vehicle bar chrome row and its minigame music override. Then the
+      // release's Cooldown Manager per-frame paint and King of the Hill's hill
+      // bar strip (chrome 92 -> 96, 96 measured on the merged tree).
+    ).toEqual({ window: 50, chrome: 96, none: 18 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');

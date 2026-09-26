@@ -2701,6 +2701,8 @@ describe('Reliquary catalog index memo', () => {
     // personal-Forgebreaker flags), so 39 scoring pages, matching the
     // arithmetic reconciliation (base 39 + ours' delta +2 + theirs' delta +1
     // = 42; flagged base 2 + ours' delta +1 + theirs' delta +0 = 3).
+    // The Warfare Season 2 Vanguard Gallery, appended after the reconciliation
+    // above, is flagged personal, so the scoring set stays at 39.
     expect(first?.length).toBe(39);
     expect(first?.some((p) => p.excludeFromCompletion !== undefined)).toBe(false);
 

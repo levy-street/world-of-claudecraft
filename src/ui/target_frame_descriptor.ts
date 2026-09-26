@@ -17,7 +17,7 @@ import { cheaterTagLabel } from './cheater_tag';
 import { deedTargetBorderSlug } from './deed_border_view';
 import type { TitledNameDecoration } from './deed_i18n';
 import { entityDisplayName } from './entity_display_core';
-import { unitFrameCurrentMaxText } from './hud_frames';
+import { type HealthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
 import { t } from './i18n';
 import type { UnitFrameDescriptor } from './unit_frame';
 
@@ -34,6 +34,24 @@ import type { UnitFrameDescriptor } from './unit_frame';
  */
 export function targetPortraitKey(target: Entity): string {
   return target.kind === 'player' && target.helmHidden ? `${target.id}:helm` : String(target.id);
+}
+
+const NO_TITLE = { pre: '', post: '' };
+
+/** The compact frame shares the target's health and resource rules. */
+export function fillTargetOfTargetDescriptor(
+  d: UnitFrameDescriptor,
+  target: Entity,
+  healthMode: HealthTextMode,
+): UnitFrameDescriptor {
+  fillTargetFrameDescriptor(d, target, NO_TITLE, null);
+  d.hpText = target.dead
+    ? t('hud.core.dead')
+    : unitFrameHealthText(target.hp, target.maxHp, healthMode);
+  d.levelText = null;
+  d.absorb = null;
+  d.showAbsorbText = false;
+  return d;
 }
 
 /**

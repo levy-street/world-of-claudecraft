@@ -35,6 +35,17 @@ function installStorage(): void {
 
 beforeEach(() => installStorage());
 
+describe('focus target default hotkeys', () => {
+  it('keeps modified focus keys separate from the existing party F keys', () => {
+    const keys = new Keybinds();
+    for (let slot = 1; slot <= 3; slot++) {
+      expect(keys.edgeActionForCombo(`Shift+F${slot}`)).toBe(`setFocus${slot}`);
+      expect(keys.edgeActionForCombo(`Ctrl+F${slot}`)).toBe(`targetFocus${slot}`);
+      expect(keys.edgeActionForCombo(`F${slot}`)).not.toBe(`targetFocus${slot}`);
+    }
+  });
+});
+
 describe('keyLabel', () => {
   it('maps codes to short keycaps', () => {
     expect(keyLabel('Digit1')).toBe('1');

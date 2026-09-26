@@ -724,6 +724,10 @@
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
+    "lava_burst": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
     "lay_on_hands": {
       "spec": "5d6c9352ebc61d80de4074af4f1d03b71ae52704e4ba4b486933d383ad52d0dd",
       "full": "4e027d6dfde0768eab2c5076196c87cab0ce0521e5900808e109615707da98eb"
@@ -747,6 +751,10 @@
     "lightning_bolt": {
       "spec": "6d9be376c5fb8ee17acd3cd6863ba99559487f8000e75245a3dbb994eb9cb1b4",
       "full": "accae84272725d6a14ccc04c873ab2e193a76ee971672d6c7a82ad2c972b3696"
+    },
+    "lightning_overload": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },
     "lightning_shield": {
       "spec": "08bad9d480d4f223bd514d079f0310f3f94516711409ccd3b44855e374edbdfe",
@@ -1305,6 +1313,10 @@
       "full": "9e4c19609607eb26ab31ed901cbf18d8365fb172a28667ad6f6f953370f21ff2"
     },
     "thunder_reservoir": {
+      "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
+      "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
+    },
+    "thunderstorm": {
       "spec": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c",
       "full": "eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c"
     },

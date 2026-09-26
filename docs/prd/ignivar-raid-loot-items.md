@@ -219,7 +219,7 @@ design targets for the tuning pass.
 
 ### Shaman
 
-**Stormkindled Regalia** (`stormkindled`), elemental (Thundercall), mail. 2 pieces: Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting. 4 pieces: Earthen Jolt's bonus per Thunder rises to 30 percent.
+**Stormkindled Regalia** (`stormkindled`), elemental (Thundercall), mail. 2 pieces: Arc Overload triggers 30 percent of the time (v0.44.0; was Unleash Weapon on Pyrebrand grants 3 Thunder). Damage taken no longer delays your spellcasting. 4 pieces: Earthen Jolt's bonus per Thunder rises to 30 percent, and Magma Burst deals 20 percent more damage (the Magma Burst clause added in v0.44.0).
 
 | Piece | Slot | Armor | Stats | Affix | Ratings |
 |---|---|---|---|---|---|

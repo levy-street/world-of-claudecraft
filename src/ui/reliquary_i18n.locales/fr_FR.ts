@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Armurerie de Guerre',
     desc: 'Bijoux et armes de Guerre achetés avec un honneur durement gagné.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galerie de l’Avant-garde',
+    desc: 'Les ensembles de spécialisation et les armes de la saison 2 de Guerre, achetés avec l’honneur.',
+  },
   horizons_vault_of_ages: {
     name: 'Chambre forte des âges',
     desc: "Trésors retirés d'une époque révolue. Ces reliques ne peuvent plus être gagnées ; la chambre forte rend hommage aux vétérans qui les conservent.",

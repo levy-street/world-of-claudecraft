@@ -6,6 +6,7 @@
 // docs/design/gear-stamina-baseline-2026-09-10.md.
 import { describe, expect, it } from 'vitest';
 import { FURY_STOCK, WARFARE_TRINKET_STOCK } from '../src/sim/content/pvp_honor';
+import { SEASON2_STOCK } from '../src/sim/content/pvp_honor_season2';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import {
@@ -36,7 +37,9 @@ import type { ItemDef } from '../src/sim/types';
 // (content/pvp_honor.ts, tests/pvp_honor_gear.test.ts): off its line by design,
 // permanently, and exempt from the exact-line check here. It still meets the
 // stamina floor like everything else.
-const FRACTIONAL_BY_DESIGN: ReadonlySet<string> = new Set(FURY_STOCK);
+// Warfare Season 2 (content/pvp_honor_season2.ts) is priced by the same
+// fraction rule at item level 35, so it joins the exemption on the same terms.
+const FRACTIONAL_BY_DESIGN: ReadonlySet<string> = new Set([...FURY_STOCK, ...SEASON2_STOCK]);
 
 // Items whose primary total was off their budget BEFORE the stamina model landed
 // (the 2026-09-10 inventory: the level-18 crafted set 1 to 3 over, leveling drift
@@ -161,6 +164,7 @@ const STAT_DRIFT_ALLOWLIST_CEILING = 103;
 const UNTIERED_WITH_PROXY_FLOOR = 77;
 const GENERATED_ITEM_COUNT = 111;
 const WARFARE_STOCK_COUNT = 47;
+const SEASON2_STOCK_COUNT = 139;
 const HEROIC_VARIANT_COUNT = 78;
 
 // Items with no derivable source (vendor, starter and quest oddities) have no
@@ -373,7 +377,7 @@ describe('stamina baseline model: the merged catalog', () => {
 
   it('the WARFARE exemption is real: every honor piece is off its line and not on the drift list', () => {
     // Pinned exactly: a new honor piece must not join the exemption unseen.
-    expect(FRACTIONAL_BY_DESIGN.size).toBe(WARFARE_STOCK_COUNT);
+    expect(FRACTIONAL_BY_DESIGN.size).toBe(WARFARE_STOCK_COUNT + SEASON2_STOCK_COUNT);
     for (const id of FRACTIONAL_BY_DESIGN) {
       expect(STAT_DRIFT_ALLOWLIST.has(id), `${id} is on both lists`).toBe(false);
       const item = ITEMS[id];

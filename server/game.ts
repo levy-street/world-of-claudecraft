@@ -404,6 +404,14 @@ import { dispatchWeeklyRewardCommand } from './weekly_reward_open';
 
 export type { PerfCaptureResult, PerfCaptureStatus } from './perf_capture_types';
 
+import {
+  type EntityWireCache,
+  type EntityWireVariantCache,
+  type EntityWireView,
+  emptyWireVariant,
+  fullEntityJson,
+  liteEntityJson,
+} from './entity_wire_cache';
 import { observeEventRecords } from './event_record_observers';
 import { parseGuildPledgeSettingsCommand } from './guild_pledge_settings_cmd';
 import { recordLevelUp } from './progress_events';
@@ -608,21 +616,21 @@ export const SIM_LAP_PHASES = [
   'delves',
   'valecup',
   'battleground',
+  'worldPvp',
+  'hill',
   'dfinder',
   'market',
   'postOffice',
   'delayedEv',
-  // Farming's per-tick sweep (src/sim/professions/farming.ts updateFarming),
-  // appended in Sim.tick between delayedEv and deeds. Registered here in the
-  // SAME order the tick runs them: without the marker the profiler silently
-  // drops the phase's timing instead of erroring, so a regression in it would
-  // be invisible in the capture.
+  // Farming's per-tick sweep (professions/farming.ts updateFarming), appended in
+  // Sim.tick between delayedEv and deeds. Registered in the SAME order the tick
+  // runs them: an unregistered lap is silently dropped by the profiler, not an
+  // error, so a regression in it would be invisible in the capture.
   'farming',
   'deeds',
   'gridRefresh',
-  // Per-family mob.update buckets, appended after the base lap names so those
-  // stay byte-identical and first. The `sim.${n}` map turns each into the registered
-  // `sim.mob.update|<family>` the perfLap probe adds to.
+  // Per-family mob.update buckets, appended after the base lap names so those stay
+  // byte-identical and first; the `sim.${n}` map yields the registered `sim.mob.update|<family>`.
   ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
@@ -701,16 +709,17 @@ const BG_RESPAWN_EVENT = 'respawn';
 // the same cadence and only re-sends when a listing actually changes.
 const DF_WIRE_HZ = 2;
 const DF_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * DF_WIRE_HZ)));
-// World Market browse readout cadence. The browse view is a filter + page over
-// the whole listing book, the single most expensive per-viewer read in
-// selfWireJson on a grown book, and nothing in it carries a sub-second clock,
-// so 4 Hz keeps the window feeling live while capping the rebuild rate. The
-// viewer's OWN market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS) so
-// their search/buy/cancel feedback still lands on the next snapshot. On top of
-// the cadence, a rebuild-only-on-change gate (sim.marketBrowseRevFor plus the
-// query object identity) skips the rebuild entirely while nothing changed;
-// MARKET_BROWSE_REFRESH_TICKS is its staleness backstop, the heavy-gate
-// refresh idea applied here.
+// World PvP `wpvp` self key (and the King of the Hill `hill` key, whose 60 s
+// contest bar and whole-minute clock tolerate half-second steps): 2 Hz; the
+// viewer's own pvp_flag command re-arms the gate so a press answers at once.
+const WPVP_WIRE_HZ = 2;
+const WPVP_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * WPVP_WIRE_HZ)));
+// World Market browse readout cadence: the browse view (a filter + page over the
+// whole listing book) is the most expensive per-viewer read in selfWireJson and
+// carries no sub-second clock, so 4 Hz caps the rebuild rate; the viewer's OWN
+// market commands re-arm the gate (MARKET_WIRE_PROMPT_CMDS). On top, a
+// rebuild-only-on-change gate (sim.marketBrowseRevFor + query identity) skips
+// unchanged rebuilds; MARKET_BROWSE_REFRESH_TICKS is its staleness backstop.
 const MARKET_WIRE_HZ = 4;
 const MARKET_WIRE_INTERVAL_TICKS = Math.max(1, Math.round(1 / (DT * MARKET_WIRE_HZ)));
 const MARKET_BROWSE_REFRESH_TICKS = 40;
@@ -745,15 +754,11 @@ const CORDER_WIRE_PROMPT_CMDS = new Set<string>([
 ]);
 // Known residual, named on purpose: the board revision is realm-global and
 // corder has no proximity gate, so ONE board mutation anywhere re-triggers an
-// O(board) rebuild for every online session at its next due tick. Under
-// sustained churn (~4 mutations per second) the change gate degenerates to
-// the plain 5x cadence win. If that rate ever materializes, the next lever is
-// the bg readout's sharedMatchView memo shape: build the viewer-identical
-// open-scope subset once per board revision and splice the per-viewer rows.
-// The mail gate below shares the realm-global-revision half of this residual
-// (any letter booked anywhere rebuilds every at-pillar viewer's inbox at up
-// to 4 Hz); cheap now that mailInfoFor is bucket-based, and the
-// per-recipient buckets make a per-recipient revision the natural follow-up.
+// O(board) rebuild for every online session at its next due tick; under
+// sustained churn (~4 mutations/s) the change gate degenerates to the plain 5x
+// cadence win. Next lever if that materializes: the bg readout's sharedMatchView
+// memo shape (open-scope subset once per revision, per-viewer rows spliced). The
+// mail gate below shares the realm-global-revision half (bucket-based, cheap).
 
 // Ravenpost mailbox readout cadence, the market gate applied to `mail`: the
 // view is a full projection of the viewer's delivered letters (bodies
@@ -859,17 +864,13 @@ function isPickAction(value: unknown): value is PickAction {
 // a steady source of GC pressure, when a crowd gathers. The small/dynamic fields
 // (position, resource, target, party HP, cooldowns, ...) still diff every tick.
 const HEAVY_SELF_REFRESH_TICKS = 40; // ~2 s backstop; staggered per session so refreshes don't synchronize into a spike
-// Commands a jailed session may not send: everything that queues into or
-// enters instanced content (ranked arena in all formats: 1v1, 2v2, fiesta,
-// yumi3, yumi5; the Vale Cup; dungeons; delves) plus starting or accepting a
-// duel. The dungeon/delve entries are door-proximity-gated anyway (a prisoner
-// can never stand at a door), listed here as explicit policy. Leave/abort
-// commands stay allowed.
+// Commands a jailed session may not send: everything that queues into or enters
+// instanced content (ranked arena in every format, the Vale Cup, dungeons,
+// delves) plus starting or accepting a duel; leave/abort commands stay allowed
+// and the door-gated dungeon/delve entries are listed as explicit policy.
 // Runtime membership for the dispatched command vocabulary (the CommandName
-// union as data). The command-lane check consults it so a KNOWN command draws
-// its lane token before the switch, while an unknown cmd draws in the default
-// arm AFTER its protocol-anomaly observation (R5: lane drops must never mute
-// the anomaly channel).
+// union as data): a KNOWN command draws its lane token before the switch; an
+// unknown cmd draws in the default arm AFTER its protocol-anomaly observation (R5).
 const KNOWN_COMMANDS: ReadonlySet<string> = new Set(COMMAND_NAMES);
 // Lane-drop cause labels (R8): the map keeps the counter's cause vocabulary
 // closed at the seam's fixed WS_DROP_CAUSES set, never a raw lane string.
@@ -1025,6 +1026,8 @@ export interface ClientSession extends MovementInputSessionState, HotbarLayoutSt
   lastBgWireTick: number;
   // Dungeon Finder readout, same idea at its own cadence (DF_WIRE_HZ)
   lastDfWireTick: number;
+  // World PvP readout, same idea at its own cadence (WPVP_WIRE_HZ)
+  lastWpvpWireTick: number;
   // World Market browse readout, same idea at its own cadence (MARKET_WIRE_HZ),
   // plus the rebuild-only-on-change state: the sim browse revision and the
   // query object last built for, and the tick of the last rebuild (the
@@ -1399,6 +1402,7 @@ function dynamicFields(e: Entity, includeAuras = true): Record<string, unknown> 
   if (e.lootable) out.loot = 1;
   if (e.hostile) out.h = 1;
   if (e.afk) out.ak = 1; // /afk display bit: other clients tag the nameplate + presence dot
+  if (e.pvpFlag) out.pvp = 1; // /pvp flag bit: nameplate + target-frame hostility colour
   // The target frame's resource bar: type + current/max, sent only for entities
   // that HAVE a resource (players and caster mobs; a resource-less wolf omits all
   // three and the frame hides its bar). The rounded res keeps an idle entity's
@@ -1503,53 +1507,6 @@ export function wireEntity(e: Entity, includeAuras = true): Record<string, unkno
   return { id: e.id, ...identityFields(e), ...dynamicFields(e, includeAuras) };
 }
 
-// Per-entity wire fragments, refreshed lazily at most once per tick and
-// shared by every recipient. The version counters bump only when the
-// serialized form actually changes, making per-session diffing O(1).
-interface EntityWireVariantCache {
-  tick: number;
-  idVer: number;
-  dynJson: string;
-  dynVer: number;
-  auraVer: number;
-  builtIdVer: number;
-  builtDynVer: number;
-  builtAuraVer: number;
-  fullJson: string;
-  liteJson: string;
-  fullAuraJson: string;
-  liteAuraJson: string;
-}
-
-interface EntityWireCache {
-  tick: number;
-  /** identityFields() as JSON, WITHOUT the authored look: the string actually
-   *  diffed for identity changes. Kept beside idJson so the appearance splice
-   *  below only re-runs when the rest of the identity moves. */
-  baseIdJson: string;
-  idJson: string;
-  /** The authored modular look, serialized ONCE for this entity (null when it
-   *  has none). Immutable for the session, so it is minted on first use and
-   *  spliced, never re-stringified. */
-  appJson: string | null;
-  baseDynJson: string;
-  idVer: number;
-  baseDynVer: number;
-  auraCache: StableAuraWireCache;
-  legacy: EntityWireVariantCache;
-  stable: EntityWireVariantCache;
-}
-
-interface EntityWireView {
-  idVer: number;
-  dynVer: number;
-  auraVer: number;
-  fullJson: string;
-  liteJson: string;
-  fullAuraJson: string;
-  liteAuraJson: string;
-}
-
 // One session's resolved interest anchor for a broadcast pass: the entity whose
 // position seeds the interest scan (self, or the spectated target), plus the
 // meta/session the self payload is built from. Resolved once up front so a
@@ -1565,37 +1522,8 @@ interface SnapshotAnchor {
   stableTimerWire: boolean;
 }
 
-function emptyWireVariant(): EntityWireVariantCache {
-  return {
-    tick: -1,
-    idVer: 0,
-    dynJson: '',
-    dynVer: 0,
-    auraVer: 0,
-    builtIdVer: -1,
-    builtDynVer: -1,
-    builtAuraVer: -1,
-    fullJson: '',
-    liteJson: '',
-    fullAuraJson: '',
-    liteAuraJson: '',
-  };
-}
-
-function fullEntityJson(id: number, idJson: string, dynJson: string): string {
-  return `{"id":${id},${idJson.slice(1, -1)},${dynJson.slice(1, -1)}}`;
-}
-
-function liteEntityJson(id: number, dynJson: string): string {
-  return `{"id":${id},${dynJson.slice(1, -1)}}`;
-}
-
 function logSocialErr(err: unknown): void {
   console.error('social command failed:', err);
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export class GameServer {
@@ -3539,6 +3467,7 @@ export class GameServer {
       lastArenaWireTick: -ARENA_WIRE_INTERVAL_TICKS,
       lastBgWireTick: -BG_WIRE_INTERVAL_TICKS,
       lastDfWireTick: -DF_WIRE_INTERVAL_TICKS,
+      lastWpvpWireTick: -WPVP_WIRE_INTERVAL_TICKS,
       lastMarketWireTick: -MARKET_WIRE_INTERVAL_TICKS,
       lastMarketBrowseRev: null,
       lastMarketQueryRef: null,
@@ -4065,7 +3994,7 @@ export class GameServer {
           LEAVE_SAVE_RETRY_MAX_MS,
         );
         console.error(`save on leave failed for ${session.name}; retrying in ${retryMs}ms:`, err);
-        await delay(retryMs);
+        await new Promise<void>((resolve) => setTimeout(resolve, retryMs));
       }
     }
   }
@@ -6961,17 +6890,19 @@ export class GameServer {
           this.moderation.handleChatCommand(session, text);
           break;
         }
-        // Recovery is a gameplay command, not broadcast chat. Keep it usable
-        // while muted and outside the chat token bucket, then route through the
-        // same authoritative system as the dedicated Settings action. It still
-        // pays the COMMAND lane the dedicated action pays: riding the chat
-        // case skipped the top-of-dispatch draw (classifyMsgLane says 'chat'),
-        // so without this a /unstuck chat frame reached the sim with zero
-        // tokens drawn on any lane and never tallied toward the flood-kick
-        // verdict (the release-merge audit's finding).
-        if (/^\/unstuck\s*$/i.test(text)) {
+        // Recovery (/unstuck) and the World PvP flag (/pvp) are gameplay
+        // commands, not broadcast chat. Keep them usable while muted and outside
+        // the chat token bucket, then route through the same authoritative
+        // systems as the dedicated actions. They still pay the COMMAND lane the
+        // dedicated actions pay: riding the chat case skipped the top-of-dispatch
+        // draw (classifyMsgLane says 'chat'), so without this a /unstuck chat
+        // frame reached the sim with zero tokens drawn on any lane and never
+        // tallied toward the flood-kick verdict (the release-merge audit's finding).
+        const flagCommand = /^\/pvp(?:\s+\S+)?\s*$/i.test(text);
+        if (flagCommand || /^\/unstuck\s*$/i.test(text)) {
           if (!this.consumeLane(session, 'command', receivedAtMs / 1000)) break;
-          sim.unstuck(pid);
+          if (flagCommand) sim.chat(text, pid);
+          else sim.unstuck(pid);
           break;
         }
         // The player's own ignore/block commands. Deliberately BEFORE isChatMuted
@@ -7422,6 +7353,12 @@ export class GameServer {
       case 'bg_flag':
         sim.bgFlagAction(pid);
         session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
+        break;
+      // World PvP: raise or lower the /pvp flag (src/sim/pvp/world_pvp.ts owns
+      // every rule; a non-boolean payload is a malformed frame and is ignored).
+      case 'pvp_flag':
+        if (typeof msg.on === 'boolean') sim.setWorldPvpFlag(msg.on, pid);
+        session.lastWpvpWireTick = -WPVP_WIRE_INTERVAL_TICKS;
         break;
       case 'dev_bg_start': {
         if (process.env.ALLOW_DEV_COMMANDS === '1') sim.devStartBg();
@@ -8628,10 +8565,14 @@ export class GameServer {
     maybe('trade', tradeWire(this.sim, anchorSession.pid));
     maybe('duel', duelWire(this.sim, anchorSession.pid));
     maybe('cardDuel', this.sim.cardMinigameInfoFor(anchorSession.pid));
-    // Small PvP-ledger scalars. Delta-guarded like delve marks: a fresh
-    // session receives both, then they ride only on earn/spend changes.
+    // Small PvP-ledger scalars, delta-guarded like delve marks (a fresh session gets both).
     maybe('honor', meta.honor);
     maybe('lhonor', meta.lifetimeHonor);
+    if (this.sim.tickCount - session.lastWpvpWireTick >= WPVP_WIRE_INTERVAL_TICKS) {
+      session.lastWpvpWireTick = this.sim.tickCount;
+      maybe('wpvp', this.sim.worldPvpInfoFor(anchorSession.pid));
+      maybe('hill', this.sim.hillInfoFor(anchorSession.pid));
+    }
     if (this.sim.tickCount - session.lastArenaWireTick >= ARENA_WIRE_INTERVAL_TICKS) {
       session.lastArenaWireTick = this.sim.tickCount;
       maybe('arena', this.sim.arenaInfoFor(anchorSession.pid));

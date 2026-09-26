@@ -244,12 +244,15 @@ describe('approved Thundercall Chain Lightning follow-up', () => {
     // spec_output_tuning.ts) stacks on the v0.36 Earthen Fury mastery scaling
     // (legacyDmgMult 1.15 -> dmgMult 1.28), raising the zero-power band from
     // 60 to 69 to 67 to 77 (52 * 1.28 = 66.56 -> 67, 60 * 1.28 = 76.8 -> 77).
+    // v0.44.0 Thundercall rework: the spec bonus drops 0.13 -> 0.05 to pay for
+    // Lightning Mastery, Arc Overload and Magma Burst (dmgMult 1.20), so the
+    // band is 62 to 72 (52 * 1.2 = 62.4 -> 62, 60 * 1.2 = 72).
     expect(
       abilityEffectText(chain, { spellPower: 0, healPower: 0, rangedPower: 0, attackPower: 0 }),
-    ).toBe('67 to 77');
+    ).toBe('62 to 72');
     expect(
       abilityEffectText(chain, { spellPower: 100, healPower: 100, rangedPower: 0, attackPower: 0 }),
-    ).not.toBe('67 to 77');
+    ).not.toBe('62 to 72');
 
     const sim = new Sim({ seed: 2920, playerClass: 'shaman' });
     sim.setPlayerLevel(20);

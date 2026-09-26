@@ -1391,7 +1391,7 @@ const ACCEPTED_POLISH_V2_METADATA_SHA256 =
   // No Eastbrook capture or measured value changed.
   // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '814a04bb238f0f48ac08f56790c58095b32d2ba6fb26ddcab0a035debc60b588';
+  'c817fb441a978a356e250d7f548ddd07bcf0985ef2492090b136d664a2f65e3c';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // Re-minted for the Eastbrook handoff merge with release/v0.43.0: the merged renderer leaf and the moved NPC layout match neither parent. No capture was retaken.
   // Re-minted for the v0.43.0 batch base merge (ossbrain-release/v0.43.0 taking
@@ -1411,7 +1411,7 @@ const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
   // No Eastbrook capture or measured value changed.
   // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '709de6097154d9e6956f90f47dbd103283399f6550bedd0046a84ade79c24ed0';
+  'ff6ccac7adb9e9cf65cd77d4e22d3b372f8c8b979405d1e63a7817cd079af62c';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2790,7 +2790,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // recomputed LAST again over the re-swept evidence. No capture was retaken.
       // Re-minted for the shipwreck salvage landing over the re-sealed
       // provenance. No capture or measured value changed.
-    ).toBe('907a1754c2c67ab2f0e35f07c9400ebb8072a2acb7a7f567657144baf690fc9f');
+    ).toBe('fb58b00772d5024deb48b1da6f7c12fb24da2652537488aacb09752d59c30646');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

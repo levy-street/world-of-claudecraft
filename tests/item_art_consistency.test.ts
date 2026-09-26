@@ -851,8 +851,8 @@ describe('item-art consistency accepted-art provenance', () => {
     // The wq-reputation merge's 15 faction quartermaster items: 1,320.
     // The Emissary's Cache chest: 1,322. The Clue Scroll items (clue_scroll,
     // treasure_casket): 1,323. The faction ladder rework's 17 new rows
-    // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359.
-    expect(Object.keys(ITEMS)).toHaveLength(1359);
+    // (13 periphery pieces + 4 formulas): 1,340. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,341. the trinket slot's 18 trinkets (PR 4173): 1,359. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s 139 honor items: 1,498.
+    expect(Object.keys(ITEMS)).toHaveLength(1498);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
       1255,
     );
@@ -1014,10 +1014,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // The Emissary's Cache chest (feature/weekly-quests): 1,303. The Clue
     // Scroll icons (clue-scroll-icons-2026-09-17, two SVG compositions) join:
     // 1,305. The faction ladder icons (faction-ladder-icons-2026-09-23, 17 SVG
-    // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341.
-    expect(new Set(currentOwnerIds).size).toBe(1341);
-    expect(shippingIds).toHaveLength(1341);
-    expect(Object.keys(ITEMS)).toHaveLength(1359);
+    // compositions) join: 1,322. the Viridian Valestrider's reins (release/v0.44.0 base merge): 1,323. the trinket slot's 18 trinkets (PR 4173): 1,341. Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four painted weapons: 1,345.
+    expect(new Set(currentOwnerIds).size).toBe(1345);
+    expect(shippingIds).toHaveLength(1345);
+    expect(Object.keys(ITEMS)).toHaveLength(1498);
 
     const datedVerdict = readJson<FinalAuditVerdict>(CURRENT_VERDICT_PATH);
     const oldPassIds = sorted(datedVerdict.visualVerdict.passIds);
@@ -1127,6 +1127,11 @@ describe('item-art consistency accepted-art provenance', () => {
         // The weekly emissary's cache chest, additive the same way.
         'emissary_cache',
         'reins_avian_strider',
+        // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
+        'vanguard_verdict_greatsword',
+        'vanguard_oath_blade',
+        'vanguard_fang_dagger',
+        'vanguard_warstaff',
       ]),
     ).toEqual(sorted(currentOwnerIds));
 
@@ -1293,8 +1298,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // (faction-vendor-icons-2026-09-16) = 34. The Clue Scroll items add their
     // batch (clue-scroll-icons-2026-09-17) = 35. The faction ladder rework adds
     // its batch (faction-ladder-icons-2026-09-23) = 36. The trinket slot's icon batch
-    // (trinket-slot-icons-2026-09-23) = 37.
-    expect(mapping.generatedBatches).toHaveLength(37);
+    // (trinket-slot-icons-2026-09-23) = 37. Warfare Season 2's weapon
+    // batch (warfare-season2-weapons-2026-09-25) = 38.
+    expect(mapping.generatedBatches).toHaveLength(38);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1360,14 +1366,15 @@ describe('item-art consistency accepted-art provenance', () => {
     // merge: 759. The faction quartermaster batch adds 15 at the
     // wq-reputation merge: 774. The Clue Scroll batch adds 2: 776. The faction
     // ladder batch (faction-ladder-icons-2026-09-23) adds 17: 793. The
-    // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 811.
-    expect(priorGeneratedIds).toHaveLength(811);
+    // trinket-slot-icons-2026-09-23 batch adds its 18 trinkets: 811. Warfare
+    // Season 2's weapon batch adds 4: 815.
+    expect(priorGeneratedIds).toHaveLength(815);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1341);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1341);
+    expect(allCurrentOwnerIds).toHaveLength(1345);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1345);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1382,7 +1389,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // + the 15 faction quartermaster ids (wq-reputation merge) = 774
       // + the 2 Clue Scroll ids = 776 + the 17 faction ladder ids = 793.
       // + the 18 trinkets (trinket-slot-icons-2026-09-23) = 811.
-      priorGenerated: 811,
+      // + the 4 Warfare Season 2 weapons = 815.
+      priorGenerated: 815,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
       crucibleProfessions: 46,
@@ -1468,6 +1476,11 @@ describe('item-art consistency accepted-art provenance', () => {
         // beyond the historical chain like the Field Kit.
         'emissary_cache',
         'reins_avian_strider',
+        // Warfare Season 2's painted weapons (warfare-season2-weapons-2026-09-25).
+        'vanguard_verdict_greatsword',
+        'vanguard_oath_blade',
+        'vanguard_fang_dagger',
+        'vanguard_warstaff',
       ]),
       'the dated catalog plus the release batches, the world-quest, faction-vendor, faction-ladder and clue-scroll batches, the Field Kit, the OSSBrain reins icons and the Emissary Cache and the trinket icons is the full current catalog',
     ).toEqual(sorted(allCurrentOwnerIds));
@@ -1601,10 +1614,10 @@ describe('item-art consistency accepted-art provenance', () => {
     // Plus the world-quest branch's four quest-item owners at the release/v0.43.0
     // merge = 1302. Plus the weekly emissary's cache chest = 1303. Plus the two
     // Clue Scroll owners = 1305. Plus the 17 faction ladder owners
-    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341.
-    if (ownerIds.length !== 1341)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1341`);
-    if (fileIds.length !== 1341) violations.push(`shipping WebP count: ${fileIds.length} != 1341`);
+    // (faction-ladder-icons-2026-09-23) = 1322. Plus the Viridian Valestrider's reins (release/v0.44.0 base merge) = 1323. Plus the 18 trinkets = 1341. Plus the 4 Warfare Season 2 weapons = 1345.
+    if (ownerIds.length !== 1345)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1345`);
+    if (fileIds.length !== 1345) violations.push(`shipping WebP count: ${fileIds.length} != 1345`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

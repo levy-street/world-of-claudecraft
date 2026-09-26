@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Zbrojownia Wojny',
     desc: 'Biżuteria i bronie Wojny kupione za ciężko wywalczony honor.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Galeria Awangardy',
+    desc: 'Zestawy specjalizacji i bronie Wojny z 2. sezonu, kupowane za honor.',
+  },
   horizons_vault_of_ages: {
     name: 'Skarbiec Wieków',
     desc: 'Wycofane skarby minionej epoki. Tych relikwii nie da się już zdobyć; skarbiec czci weteranów, którzy je zachowali.',

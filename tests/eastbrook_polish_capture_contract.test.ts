@@ -697,7 +697,7 @@ const PINNED_POLISH_COMPOSITE_FINGERPRINT =
   // No Eastbrook capture or measured value changed.
   // Re-minted at the release/v0.44.0 base merge into integration/world-quests-v0440
   // (remint_polish_provenance.mjs on the merged tree; no capture was retaken).
-  '709de6097154d9e6956f90f47dbd103283399f6550bedd0046a84ade79c24ed0';
+  'ff6ccac7adb9e9cf65cd77d4e22d3b372f8c8b979405d1e63a7817cd079af62c';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

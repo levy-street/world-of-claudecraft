@@ -129,7 +129,10 @@ const FANOUT_ARMS: readonly string[] = [
   // what replaced the blanket hud.ts exemption: every memo it clears carries
   // its own row below (masterwrought qr-19-hud-coordinator-fanout-exemption).
   'this.relocalizeCoordinatorMemos|',
+  'this.focusTargets.relocalize|',
+  'refreshHudFrameGroupLabels|',
   'this.bgScoreboard.relocalize|',
+  'this.hillBar.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
   'this.weeklyQuestsWindow.relocalize|',
@@ -349,6 +352,12 @@ const ANSWERED: readonly AnsweredSurface[] = [
     memos: ['lastSignature'],
     answer: 'this.worldQuestPuzzleWindow.relocalize',
     why: 'the active puzzle id and its progress payload, neither of which changes when the locale does, so the open puzzle prompt and status text otherwise remain in the previous language',
+  },
+  {
+    file: 'hud/hill/hill_bar_painter.ts',
+    memos: ['lastSig'],
+    answer: 'this.hillBar.relocalize',
+    why: 'one structural signature over the King of the Hill strip (zone, holder, challenger, inside), so the localized held/zone labels would sit in the old locale until a holder change moved it',
   },
   {
     file: 'hud/battleground/battleground_scoreboard_painter.ts',

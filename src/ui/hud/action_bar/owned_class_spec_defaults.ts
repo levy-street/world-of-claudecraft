@@ -70,12 +70,14 @@ const OWNED_CLASS_SPEC_DEFAULTS: Readonly<
   shaman: {
     elemental: [
       'lightning_bolt',
+      'lava_burst',
       'chain_lightning',
       'earth_shock',
       'flame_shock',
       'earthquake',
       'frost_shock',
       'elemental_mastery',
+      'thunderstorm',
       'unleash_weapon',
       'lightning_shield',
       'healing_wave',

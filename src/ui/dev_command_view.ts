@@ -307,6 +307,35 @@ export const DEV_COMMAND_ACTIONS: readonly DevCommandAction[] = [
     descriptionKey: 'devCommand.actions.lfgboard.description',
     command: fixed('/dev lfg board'),
   },
+  // King of the Hill test levers (src/sim/pvp/hill_dev.ts has the grammar).
+  {
+    id: 'hillwarn',
+    category: 'scenarios',
+    labelKey: 'devCommand.actions.hillwarn.label',
+    descriptionKey: 'devCommand.actions.hillwarn.description',
+    command: fixed('/dev hill warn'),
+  },
+  {
+    id: 'hillnow',
+    category: 'scenarios',
+    labelKey: 'devCommand.actions.hillnow.label',
+    descriptionKey: 'devCommand.actions.hillnow.description',
+    command: fixed('/dev hill'),
+  },
+  {
+    id: 'hillrise',
+    category: 'scenarios',
+    labelKey: 'devCommand.actions.hillrise.label',
+    descriptionKey: 'devCommand.actions.hillrise.description',
+    command: fixed('/dev hill rise'),
+  },
+  {
+    id: 'hillend',
+    category: 'scenarios',
+    labelKey: 'devCommand.actions.hillend.label',
+    descriptionKey: 'devCommand.actions.hillend.description',
+    command: fixed('/dev hill end'),
+  },
 ];
 
 // The Spawns tab is staff-only: conjuring or deleting mobs reshapes the shared

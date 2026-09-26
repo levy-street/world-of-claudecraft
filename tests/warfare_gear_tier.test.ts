@@ -29,6 +29,7 @@ import { canEquipItem } from '../src/sim/equipment_rules';
 import { itemLevel, itemStaminaModel, primaryStatSum } from '../src/sim/item_level';
 import { PVP_DEFENSE_CAP, PVP_OFFENSE_CAP, pvpFractionsFromRatings } from '../src/sim/pvp';
 import type { Entity, EquipSlot, PlayerClass, SetBonusEffect } from '../src/sim/types';
+import { expectedWarfareStamina } from './helpers/warfare_stamina';
 
 // DERIVED from the live catalog, never a hand-listed set of ids. The hand-listed
 // version silently excluded Thornhide, the family added last, from every sweep
@@ -201,13 +202,13 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   furyforged_legguards: [8, 10],
   furyforged_gauntlets: [5, 9],
   furyforged_sabatons: [7, 6],
-  stormbound_crown: [11, 6],
-  stormbound_spaulders: [9, 5],
-  stormbound_hauberk: [13, 7],
-  stormbound_waistguard: [9, 5],
-  stormbound_legmail: [11, 7],
-  stormbound_handguards: [9, 5],
-  stormbound_greaves: [10, 5],
+  stormbound_crown: [11, 8],
+  stormbound_spaulders: [9, 7],
+  stormbound_hauberk: [13, 10],
+  stormbound_waistguard: [9, 7],
+  stormbound_legmail: [11, 9],
+  stormbound_handguards: [9, 7],
+  stormbound_greaves: [10, 6],
   ashstalker_cowl: [8, 8],
   ashstalker_shoulderguards: [6, 8],
   ashstalker_harness: [8, 12],
@@ -215,20 +216,20 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   ashstalker_legguards: [8, 10],
   ashstalker_grips: [5, 9],
   ashstalker_treads: [7, 6],
-  cinderweave_cowl: [11, 6],
-  cinderweave_mantle: [9, 5],
-  cinderweave_raiment: [13, 7],
-  cinderweave_cord: [9, 5],
-  cinderweave_legwraps: [11, 7],
-  cinderweave_handwraps: [9, 5],
-  cinderweave_slippers: [10, 5],
-  thornhide_headdress: [11, 6],
-  thornhide_mantle: [9, 5],
-  thornhide_vestment: [13, 7],
-  thornhide_cinch: [9, 5],
-  thornhide_leggings: [11, 7],
-  thornhide_gloves: [9, 5],
-  thornhide_boots: [10, 5],
+  cinderweave_cowl: [11, 8],
+  cinderweave_mantle: [9, 7],
+  cinderweave_raiment: [13, 10],
+  cinderweave_cord: [9, 7],
+  cinderweave_legwraps: [11, 9],
+  cinderweave_handwraps: [9, 7],
+  cinderweave_slippers: [10, 6],
+  thornhide_headdress: [11, 8],
+  thornhide_mantle: [9, 7],
+  thornhide_vestment: [13, 10],
+  thornhide_cinch: [9, 7],
+  thornhide_leggings: [11, 9],
+  thornhide_gloves: [9, 7],
+  thornhide_boots: [10, 6],
   final_oath_medallion: [6, 5],
   razorwind_torque: [6, 5],
   cinder_sigil_pendant: [7, 5],
@@ -240,7 +241,7 @@ const WARFARE_LINES: Record<string, [number, number]> = {
   spellbreakers_seal: [7, 4],
   final_argument_greatblade: [8, 12],
   first_blood_razor: [8, 12],
-  emberglass_warstaff: [13, 7],
+  emberglass_warstaff: [13, 10],
 };
 
 describe('the WARFARE tier is authored from named fractions', () => {
@@ -280,7 +281,7 @@ describe('the WARFARE tier is authored from named fractions', () => {
       const impliedSta = fractionTotal - line;
       expect(line, `${id} line within the WARFARE fraction`).toBeLessThanOrEqual(fractionTotal);
       expect([line, model?.sta ?? 0], `${id} line and stamina`).toEqual(WARFARE_LINES[id]);
-      expect(primaryStatSum(item), id).toBe(line + Math.max(impliedSta, floor));
+      expect(primaryStatSum(item), id).toBe(line + expectedWarfareStamina(item, impliedSta, floor));
       expect(item.pvpOffenseRating, id).toBe(Math.round(budget * WARFARE_RATING_FRACTION));
       expect(item.pvpDefenseRating, id).toBe(Math.round(budget * WARFARE_RATING_FRACTION));
     }

@@ -13,6 +13,49 @@ import { professionTrainerStrings } from './profession_trainers';
 import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
+  framePresets: {
+    apply: 'Apply',
+    pickerLabel: 'Frame Presets: {name}',
+    overwrite: 'Overwrite Preset',
+    overwriteBody: 'Replace the saved preset "{name}" with your current layout?',
+    current: 'Current Layout',
+    new: 'New Preset',
+    empty: 'No saved presets',
+    deleteNamed: 'Delete {name}',
+    deleteBody: 'Delete the frame preset "{name}"?',
+
+    title: 'Frame Presets',
+    name: 'Preset Name',
+    slot: 'Preset {slot}',
+    remove: 'Delete',
+    saved: 'Done.',
+    failed: 'Could not save or load the preset.',
+  },
+  frameMenus: {
+    hide: 'Hide Frame',
+    units: 'Unit Frames',
+    bars: 'Action Bars',
+    trackers: 'Trackers',
+    auras: 'Auras',
+    combat: 'Combat Displays',
+    other: 'Other HUD Elements',
+    options: 'Frame Options',
+    allOptions: 'All Frame Options',
+    independentTarget: 'Lock Target of Target to Target',
+  },
+  focusTargets: {
+    showEmpty: 'Show Empty Focus Frames',
+    assignHint: 'Select a target. Press {key} or click {button}.',
+    assignClickHint: 'Select a target. Click {button}.',
+    ally: 'Ally',
+    enemy: 'Enemy',
+    unset: 'Unset Focus',
+    frame1: 'Focus 1',
+    frame2: 'Focus 2',
+    frame3: 'Focus 3',
+    assign: 'Set focus {slot}',
+    target: 'Target focus {slot}',
+  },
   professionTrainers: professionTrainerStrings,
   weeklyRewards: weeklyRewardStrings,
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
@@ -793,12 +836,8 @@ export const hudChromeStrings = {
     // is a five-letter run), so this reuses the frame's own term for the target ("Mark", from
     // targetLabel above), which a screen-reader user already hears as the target frame's name.
     targetAnnounce: 'Mark {name}',
-    // targetOfTargetLabel names the optional #totarget-frame region (the classic
-    // "target of target": who your current target is targeting). Kept NON-WORDY (no
-    // run of four+ lowercase after stripping tokens) so an English-filled non-Latin
-    // locale does not trip the M16 untranslated-leak guard, reusing the frame's own
-    // term for the target ("Mark", from targetLabel): your mark's mark.
-    targetOfTargetLabel: "Mark's Mark",
+    // Names the optional region showing who the current target is targeting.
+    targetOfTargetLabel: 'Target of Target',
     // partyLabel names the #party-frames region (a group of tappable / focusable
     // party member buttons, each named by its visible member name). Kept short and
     // non-wordy (no run of four+ lowercase) so an English-filled non-Latin locale
@@ -2142,6 +2181,9 @@ export const hudChromeStrings = {
     // Running client version + build id, shown as small secondary text at the foot
     // of the settings menu so players can confirm their build without closing it.
     version: 'v{version} ({build})',
+    // The Game Menu row (and its sub-view title) that holds the three on-screen
+    // overlay panels: Auras, Cooldown Manager and Performance Overlay.
+    overlays: 'Overlays',
     // Adaptive browser-effects tier control (Graphics panel). Auto detects the
     // browser engine/version + device; the rest pin the CSS-effects tier.
     browserEffects: 'Browser Effects',
@@ -2333,7 +2375,7 @@ export const hudChromeStrings = {
     groundReticle: 'Ground-Targeting Reticle',
     // Interface panel toggle: Clique-style mouseover casting of friendly abilities
     // on the hovered party frame (on by default).
-    mouseoverCast: 'Mouseover Cast on Party Frames',
+    mouseoverCast: 'Mouseover Cast on Party and Focus Frames',
     // Combat-tab toggle (off by default: ground left-clicks clear the target,
     // the classic behavior). On keeps the target on a ground left-click so
     // click-to-move repositioning does not deselect.
@@ -2806,6 +2848,89 @@ export const hudChromeStrings = {
       },
     },
   },
+  // Options > Cooldown Manager (src/ui/hud/cooldown_manager/): floating,
+  // non-clickable buttons for the spells the player picks, in groups.
+  cooldownManager: {
+    title: 'Cooldown Manager',
+    intro:
+      'Floating buttons for the spells you pick. They cannot be clicked: each one shows its cooldown, dims while you cannot cast it, and lights up when it is ready.',
+    generalTitle: 'General',
+    enabled: 'Show Cooldown Manager',
+    idleOpacity: 'Opacity While Not Ready',
+    combatOnly: 'Sounds Only in Combat',
+    dragHint:
+      'While this menu is open, every group shows on screen and you can drag it to move it.',
+    addSingle: 'Add Single Button',
+    addGrid: 'Add Button Group',
+    addLine: 'Add Line of Spells',
+    groupsFull: 'You have the most groups allowed. Delete one to add another.',
+    noGroups: 'Add a single button, a group of buttons or a line of spells to get started.',
+    groupSingle: 'Single Button {index}',
+    groupGrid: 'Button Group {index}',
+    groupLine: 'Line of Spells {index}',
+    groupName: 'Group Name',
+    spellCount: '{count} / {max} spells',
+    orientation: 'Orientation',
+    horizontal: 'Horizontal',
+    vertical: 'Vertical',
+    columns: '# Columns',
+    rows: '# Rows',
+    direction: 'Icon Direction',
+    dirRight: 'Right',
+    dirLeft: 'Left',
+    dirDown: 'Down',
+    dirUp: 'Up',
+    iconSize: 'Icon Size',
+    iconPadding: 'Icon Padding',
+    opacity: 'Opacity',
+    visibility: 'Visibility',
+    visAlways: 'Always Visible',
+    visCombat: 'In Combat',
+    visHidden: 'Hidden',
+    visHiddenHint: 'A hidden group still plays its sounds and lights your action bar.',
+    showTimer: 'Show Timer',
+    positionX: 'Horizontal Position',
+    positionY: 'Vertical Position',
+    resetPosition: 'Reset to Default Position',
+    deleteGroup: 'Delete Group',
+    deleteGroupAria: 'Delete {group}',
+    trackedTitle: 'Tracked Spells',
+    trackedHint:
+      'Drag a spell onto a group, or select it to choose its group and alerts. A button follows its spell when it changes into another one, and lights up when it does.',
+    search: 'Search spells',
+    searchPlaceholder: 'Search',
+    notDisplayed: 'Not Displayed',
+    otherSpells: 'Other Spells',
+    otherSpellsHint:
+      'Spells from your other specializations, talent choices and higher levels. Place one now and its button appears once you know it.',
+    notKnown: '{spell} (not known yet)',
+    aurasTitle: 'Procs, Engines and Buffs',
+    aurasHint:
+      'Engine resources and their stacks, procs, and the buffs your spells put on you. Anything else that has been on you shows up here too.',
+    auraFallback: 'Aura',
+    onlyWhileActive: 'Only Show While Active',
+    alertStacks: 'Alert at Stacks',
+    alertStacksAny: 'On gain',
+    alertStacksHint:
+      'The button lights, pulses and chimes once the aura reaches this many stacks. On gain means as soon as it appears.',
+    auraSoundHint: 'Plays when the aura comes up, or when it reaches your stack goal.',
+    emptySection: 'Drop a spell here.',
+    spellsEmpty: 'You do not know any spells yet.',
+    selectSpell: 'Select {spell}',
+    group: 'Group',
+    groupFullOption: '{group} (full)',
+    notInGroupHint: 'Put this spell in a group to show its button.',
+    moveEarlier: 'Move {spell} earlier',
+    moveLater: 'Move {spell} later',
+    glowWhenReady: 'Light Up When Ready',
+    glowWhenReadyHint: 'Brightens and outlines the button while the spell can be cast.',
+    hotbarGlow: 'Hotbar Glow',
+    hotbarGlowHint: 'Also lights this spell on your action bar while it is ready.',
+    onlyWhenReady: 'Only Show When Ready',
+    sound: 'Ready Sound',
+    soundHint:
+      'Plays when the spell becomes ready, or when its button changes into another spell while ready.',
+  },
   auraOverlay: {
     title: 'Auras',
     currentClass: 'Current class: {class}',
@@ -2950,6 +3075,9 @@ export const hudChromeStrings = {
       battlegroundComplete: 'Thornhollow Fields battle fought',
       battlegroundKill: 'honorable kill',
       battlegroundAssist: 'killing blow assisted',
+      worldKill: 'world kill',
+      worldAssist: 'world kill assisted',
+      hillHold: 'holding the hill',
     },
     // Short labels for the floating text over your own character. Kept apart from
     // `reasons` above, which are mid-sentence fragments for the chat line.
@@ -2957,7 +3085,84 @@ export const hudChromeStrings = {
       kill: 'Kill',
       assist: 'Assist',
       firstWin: 'First Win',
+      hill: 'Hill',
     },
+  },
+  // The World PvP tab of the merged PvP window (src/ui/hud/world_pvp/): the
+  // /pvp flag toggle, its stakes, and the character's world record. Every
+  // number is a resolved value from src/sim/pvp/world_pvp_rules.ts, never a
+  // literal in the copy, so a retune never strands the text.
+  worldPvp: {
+    tab: 'World PvP',
+    title: 'World PvP',
+    blurb:
+      'Raise your flag to fight other flagged players anywhere in the open world. Defeat one and take a share of their purse, plus Honor toward Warfare gear. Battlegrounds and Arenas still pay more.',
+    statusOn: 'Your PvP flag is up. Flagged players can attack you.',
+    statusOff: 'Your PvP flag is down. You cannot attack or be attacked in the open world.',
+    // The flag-down line is only true where the flag decides fights, so
+    // free-for-all ground gets its own: standing there is the consent.
+    statusOffFfa:
+      'Your PvP flag is down, but on free-for-all ground you can still attack and be attacked.',
+    statusDisarming: 'Your flag drops in {time}, or when your current fight ends.',
+    // The second line of the status card: what the ground under the player says
+    // (src/sim/pvp/world_pvp_zones.ts), or the realm line when the kill switch
+    // is set, which outranks every zone.
+    zoneSanctuary: 'Sanctuary: no world PvP here.',
+    zoneContested: 'Contested ground: only flagged players fight here.',
+    zoneFfa: 'Free-for-all ground: everyone here is fair game.',
+    realmDisabled: 'World PvP is disabled on this realm.',
+    // The stakes list, in reading order: where you can fight, what raises your
+    // flag for you, what a kill moves, and how to put the flag back down.
+    groundSanctuary: 'The Proving Shore and Eastbrook Vale are sanctuaries: no world PvP at all.',
+    groundContested: 'Everywhere else is contested: only two flagged players can fight.',
+    groundFfa:
+      'The Drakelands, the Frostveil Reach and the Amberfall are free-for-all: everyone there can fight, flag or not.',
+    groupLine:
+      'Party and raid members are never hostile to each other. Guildmates outside your group can fight.',
+    markLine:
+      'Attacking an unflagged player there raises your own flag; attacking a flagged one never does.',
+    aidLine: 'Healing, shielding or buffing a flagged player in a world fight raises your flag.',
+    stakeLine: 'The loser pays {cap} or {percent} of their purse, whichever is less.',
+    noStakeLine: 'An unflagged player killed on free-for-all ground loses no gold.',
+    noTakeLine:
+      'An unflagged fighter takes no gold either: it only moves between two flagged players.',
+    honorLine: '{honor} Honor per kill, split between everyone who helped.',
+    splitLine: 'A clean 1v1 pays the whole pot; helpers and their healers share it.',
+    repeatLine:
+      'Repeat kills of one player pay {second}, then {third}, then nothing; the count clears {reset} after the first kill.',
+    greyLine: 'Players more than {levels} levels below you pay nothing.',
+    disarmLine: 'Switching off takes {minutes} minutes and waits for combat to end.',
+    record: 'Record: {kills} kills, {deaths} deaths',
+    enable: 'Enable World PvP',
+    disable: 'Disable World PvP',
+    keepUp: 'Keep Flag Up',
+    confirmBody:
+      'Other flagged players will be able to attack you anywhere and take up to {cap} from your purse when they win. You can switch off again, but it takes {minutes} minutes.',
+    confirmAccept: 'Raise Flag',
+    confirmCancel: 'Cancel',
+    levelReq: 'Requires level {level}.',
+    pending: 'Waiting for your PvP status from the realm.',
+    commandHint: 'Chat: /pvp toggles the flag, /pvp on and /pvp off set it.',
+  },
+  // King of the Hill (src/ui/hud/hill/): the in-zone bar over the announced or
+  // standing hill. Every number is a resolved value from src/sim/pvp/hill_rules.ts.
+  hill: {
+    title: 'King of the Hill',
+    rising: 'The hill has not risen yet',
+    heldYou: 'Your group holds the hill',
+    heldOther: 'Another group holds the hill',
+    heldNone: 'Nobody holds the hill',
+    counts: 'Inside: you {yours}, holder {theirs}',
+    countsUnheld: 'Inside: you {yours}, largest rival {theirs}',
+    countsHolding: 'Inside: you {yours}, rival {theirs}',
+    contestYou: 'Taking the hill: {seconds} of {total}',
+    contestOther: 'Losing the hill: {seconds} of {total}',
+    contestNone: 'Hold a majority inside for {total} to take it',
+    inside: 'You are inside the circle',
+    distance: '{yards} yd to the circle',
+    rises: 'Rises in {minutes}',
+    falls: 'Falls in {minutes}',
+    standingRaid: 'Raid members do not count: only parties can hold the hill',
   },
   // The WARFARE quartermaster's sectioned honor shop (#warfare-window,
   // src/ui/hud/vendor/warfare_vendor_window.ts). Only the SECTIONING strings
@@ -2973,6 +3178,10 @@ export const hudChromeStrings = {
     gossipOptionAria: 'Browse the Warfare set shop offered by {name}',
     jewelry: 'Jewelry',
     weapons: 'Weapons',
+    // Group headings: Warfare Season 2 (the viewer's class sets and weapons)
+    // listed above the Season 1 entry tier (warfare_vendor_window.ts).
+    groupSeason2: 'Warfare Season 2: Vanguard',
+    groupEntry: 'Warfare Season 1',
     // Marks a piece the viewer already wears or carries. The tile still sells.
     owned: 'Owned',
     // The buy tile's accessible name, as ONE key per arm rather than a base name
@@ -3167,6 +3376,10 @@ export const hudChromeStrings = {
         'Hit rating from your gear and set bonuses, reducing how often your attacks miss and your spells are resisted, especially against higher-level enemies. Every 10 rating grants exactly 1% hit.',
       warfare:
         'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%.',
+      // The same line once honor gear grants WARFARE Vitality (a sibling key, not a
+      // new placeholder on the translated one above).
+      warfareWithHealth:
+        'Increases damage dealt to players by {increase}% and reduces damage taken from players by {reduction}%. Also raises your maximum health by {health}% everywhere except dungeons, raids, delves and rifts.',
     },
     // One line per derived effect a stat contributes. {value} is a live number.
     effects: {
@@ -4563,9 +4776,9 @@ export const hudChromeStrings = {
         'Use remaining defensive cooldowns for unavoidable damage. Keep every earlier mechanic clean while the raid finishes the fight.',
       boneStormName: 'Bone Storm',
       boneStormSummary:
-        "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Gravebreaker re-arms {rearm} sec after the storm ends.",
+        "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
       boneStormHeroicSummary:
-        "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Gravebreaker re-arms {rearm} sec after the storm ends.",
+        "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
       boneStormResponse:
         'Spread out and keep running from Nythraxis. The charged raider runs away while everyone else leaves room around the charge path, then tanks pick him up when the storm ends.',
       crownEnduresName: 'The Crown Endures',
@@ -4999,6 +5212,8 @@ export const hudChromeStrings = {
     // /afk tag prefixed to a player's overhead name (nameplate_painter.ts wraps
     // it in angle brackets: "<AFK> Name"). Short label, not a sentence.
     afkTag: 'AFK',
+    // The World PvP flag tag, same bracket convention as afkTag.
+    pvpTag: 'PvP',
     // The operator-applied Cheater sanction (src/sim/moderation/), resolved for
     // the nameplate and the target frame through src/ui/cheater_tag.ts. Unlike
     // afkTag the brackets are part of the VALUE, so a locale that punctuates a
@@ -5142,6 +5357,8 @@ export const hudChromeStrings = {
   // not be told to drag something a keyboard player operates with arrows.
   // All wordy (M16), so the five non-Latin fills land in this same change.
   interfaceUnlock: {
+    combineTrackers: 'Combine Tracker Frames',
+    combineAuras: 'Combine Aura Frames',
     label: 'Edit Frames',
     unlock: 'Unlock interface',
     lock: 'Lock interface',
@@ -5164,6 +5381,8 @@ export const hudChromeStrings = {
     // Action Bar / Minimap / Stance Bar are wordy (M16), so their five
     // non-Latin fills land in this same change; Menu / XP Bar / Chat are not.
     frameNames: {
+      trackerGroup: 'Trackers',
+      auraGroup: 'Aura trackers',
       actionBar1: 'Action Bar',
       actionBar2: 'Action Bar 2',
       actionBar3: 'Action Bar 3',

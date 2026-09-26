@@ -2,7 +2,6 @@ import type {
   AccountCosmetics,
   ActionBarLayout,
   ActionBarLayoutProfile,
-  ActionBarLayoutRestore,
   ActiveConsecration,
   ActiveFrostRing,
   ActiveTemporalHourglass,
@@ -24,6 +23,7 @@ import type {
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
 import { abilityNeedsLineOfSight } from './ability_line_of_sight';
+import { offlineActionBarRestore } from './action_bar_restore';
 import { maybeAutoEquip } from './auto_equip';
 import * as bagsMod from './bags';
 import {
@@ -624,11 +624,16 @@ import {
 import { prestige as prestigeImpl, updateRested } from './progression/xp';
 import { advancePendingProjectiles, type PendingProjectile } from './projectile_travel';
 import * as honorMod from './pvp';
+import * as hillMod from './pvp/hill';
+import { type HillSpotProbe, hillProbeFor } from './pvp/hill_probe';
+import { savedHonorState } from './pvp/honor_persist';
 // By path, not through the pvp barrel: see the comment in src/sim/pvp/index.ts.
 import {
   spawnWarfareQuartermaster,
   WARFARE_QUARTERMASTER_NPC_ID,
 } from './pvp/warfare_quartermaster';
+import * as worldPvpMod from './pvp/world_pvp';
+import { savedWorldPvpFields } from './pvp/world_pvp';
 import { sanitizeCreditedObjects } from './quests/interact_object_credit';
 import { spawnRealmBuilderMonument } from './realm_builder_monument_spawn';
 import {
@@ -944,24 +949,13 @@ export { FALL_SAFE_DISTANCE } from './player_motion';
  *  flag; it only reaches the Reliquary's first-find provenance stamp. */
 const MOVEMENT_GRANT = { movement: true } as const;
 
-// OBJECT_RESPAWN moved to types.ts (shared with the extracted Nythraxis crypt-relic
-// respawn). The NYTHRAXIS_* encounter consts (relic summons, Aldric id, wardstone /
-// gravebreaker / soul-rend / deathless / transition tuning, room radius, lockout ms,
-// party-interact + vision delays) moved to encounters/nythraxis.ts (N1), the only
-// code that reads them. NYTHRAXIS_BOSS_ID / NYTHRAXIS_ADD_ID stay in types.ts.
-// PARTY_MAX / RAID_MIN / RAID_MAX / RAID_GROUP_MAX moved to social/party.ts (A1),
-// the only code that reads them, except RAID_MAX, which server/game.ts now imports
-// as the upper length bound on the masterAssign wire case (#2524).
-// RAID_ALLOWED_DUNGEON_IDS / RAID_REQUIRED_DUNGEON_IDS moved to instances/dungeons.ts
-// (I1: read only by enterDungeon's raid gate).
-// DAMAGE_IDLE_DESPAWN_SECONDS / DAMAGE_IDLE_DESPAWN_MOB_IDS moved to entity_roster.ts
-// (the despawn prologue's home); imported above for the damage-path timer reset.
-// RESTED_* rested-XP tuning + isResting/updateRested moved to progression/xp.ts (G1b),
-// the only code that reads them.
-// A2: DUEL_COUNTDOWN/DUEL_FORFEIT_DISTANCE moved to social/duel.ts; the Ashen
-// Coliseum 1v1 arena tuning (ARENA_COUNTDOWN/RETURN_DELAY/MAX_DURATION/BASE_RATING/
-// MIN_RATING/K_FACTOR) + eloDelta moved to social/arena.ts (ARENA_BASE_RATING is
-// imported back via arenaMod for the PlayerMeta ctor default).
+// Tuning consts that once lived here moved to the modules that read them (the
+// git history of each extraction names the phase): OBJECT_RESPAWN to types.ts,
+// NYTHRAXIS_* to encounters/nythraxis.ts, PARTY_MAX/RAID_* to social/party.ts (RAID_MAX
+// is also the masterAssign wire bound in server/game.ts, #2524), RAID_*_DUNGEON_IDS to
+// instances/dungeons.ts, DAMAGE_IDLE_DESPAWN_* to entity_roster.ts, RESTED_* to
+// progression/xp.ts, DUEL_* to social/duel.ts, the ARENA_* tuning + eloDelta to
+// social/arena.ts (ARENA_BASE_RATING comes back via arenaMod for the PlayerMeta default).
 const ARENA_LADDER_SIZE = 10; // live online standings shipped to clients
 // A3: the 2v2 Fiesta tuning consts (score limit, augment waves, respawn growth,
 // hazard ring, power-ups, standard level) moved to social/fiesta.ts with the match
@@ -987,22 +981,13 @@ export const SAY_RANGE = 25;
 // Authoritative cap: enforced here in the deterministic core so every host agrees;
 // the client maxlength + server chat-log slices mirror it.
 export const MAX_CHAT_MESSAGE_LEN = 255;
-// A2: DUEL_FORFEIT_DISTANCE moved to social/duel.ts.
-// G2: TRADE_RANGE moved to social/trade.ts with the trade methods.
-// The World Market (the Merchant's auction house) moved to market.ts (L2); the
-// MARKET_* consts live there now (MARKET_MAX_LISTINGS moved with the /listings readout
-// to social/chat_readouts.ts in W5, which imports it from market.ts directly).
-// VENDOR_BUYBACK_LIMIT moved to items.ts (W2) with the vendor sell/buyback methods.
-// INSTANCE_EMPTY_TIMEOUT relocated to types.ts (I1); no longer referenced in sim.ts.
-// Delve run-lifecycle consts moved to src/sim/delves/runs.ts (I2a): the solid-prop
-// radii (DELVE_CHEST/GRAVE/WALL_SOLID_R), DELVE_INTERACT_RANGE, DELVE_BAD_AIR_INTERVAL,
-// DELVE_RAISE_DEAD_CHANNEL, DELVE_EXIT_PORTAL_RADIUS, DELVE_LORE_ORDER, and (re-exported
-// below) DELVE_MODULE_NAMES + DELVE_IMPLEMENTED_AFFIXES. DELVE_PLATE_RADIUS +
-// DELVE_COMPANION_MAX_RANK + DELVE_COMPANION_HEAL_INTERVAL relocated to types.ts
-// (consumed by the I2a run module + I2c companion AI; of these sim.ts still reads only
-// DELVE_COMPANION_HEAL_INTERVAL, in the delve-companion path).
-// The companion (I2c) AI tuning consts (HEAL_RANGE/FOLLOW/HEAL_PCT) now live with the
-// per-tick brain in src/sim/delves/companion.ts; only LEVEL_PCT (spawn-only) stays.
+// More relocated tuning (git history names each phase): DUEL_FORFEIT_DISTANCE to
+// social/duel.ts, TRADE_RANGE to social/trade.ts, the MARKET_* consts to market.ts
+// (MARKET_MAX_LISTINGS on to social/chat_readouts.ts), VENDOR_BUYBACK_LIMIT to items.ts,
+// INSTANCE_EMPTY_TIMEOUT to types.ts, the delve run-lifecycle consts to delves/runs.ts
+// (DELVE_MODULE_NAMES + DELVE_IMPLEMENTED_AFFIXES re-exported below), DELVE_PLATE_RADIUS +
+// the companion rank/heal-interval consts to types.ts, and the companion AI tuning to
+// delves/companion.ts; only LEVEL_PCT (spawn-only) stays here.
 // Tessa's combat level as a fraction of the owner's, indexed by rank (1-3): she
 // arrives a junior aide and grows into a true peer as you invest Marks. Pairs with
 // DELVE_COMPANION_HEAL_PCT so a rank-up lifts both her survivability and her healing.
@@ -1443,6 +1428,8 @@ export interface PlayerMeta extends worldQuestState.WorldQuestPlayerState {
   lifetimeHonor: number;
   // Persisted per-day, per-opponent ranked-win accounting for honor DR.
   honorArenaDaily?: HonorArenaDailyState;
+  // World PvP flag state (pvp/world_pvp.ts): absent until first raised.
+  worldPvp?: worldPvpMod.WorldPvpMetaState;
   prestigeRank: number;
   unlockedMilestones: Set<string>;
   // Classic Rested XP pool (copper-less XP units). Accrues while resting in an
@@ -2000,6 +1987,9 @@ export class Sim {
   // the behavior; these are its ctx live views.
   bgQueue: bgMod.BgQueueGroup[] = [];
   bgMatches = new Map<number, bgMod.BgMatch>(); // pid -> shared match (all members)
+  worldPvpBooks = worldPvpMod.newWorldPvpBooks(); // /pvp assist + DR books (live ctx view)
+  hillState = hillMod.newHillState(); // King of the Hill: the standing hill (live ctx view)
+  readonly hillProbe: HillSpotProbe; // the hill's spot probe, bound in the ctor (pvp/hill_probe.ts)
   private bgBusySlots = new Set<number>();
   private nextBgMatchId = 1;
   // Resolved rated-match records, drained post-tick by the authoritative host
@@ -2119,6 +2109,7 @@ export class Sim {
   devMobsFrozen = false;
   /** When true, /dev level|tp|give chat commands are accepted (local dev only). */
   readonly devCommands: boolean;
+  readonly worldPvpDisabled: boolean;
   // Entities spawned by the last /dev sandbox (dummy + practice bots), so re-running
   // the command clears the previous scenario instead of piling more on. Dev only.
   private devSandboxIds: number[] = [];
@@ -2196,10 +2187,7 @@ export class Sim {
   // the sim runs at 20 Hz wall speed, so the interval is real hours.
   private worldBossNextAt: number[] = WORLD_BOSSES.map((b) => b.intervalSeconds);
   private worldBossEntityIds: (number | null)[] = WORLD_BOSSES.map(() => null);
-  // One-shot gate for takeActionBarLayoutRestore (IWorldActionBar): mirrors
-  // ClientWorld's null-out pattern so the offline arm honors the same
-  // consumed-once contract instead of returning the 'noop' value forever.
-  private actionBarLayoutRestoreServed = false;
+  private readonly actionBarRestore = offlineActionBarRestore();
 
   // Per-world key for the rift collision registry in colliders.ts. Allocated per
   // Sim INSTANCE (not per seed): two same-seed Sims in one process must never
@@ -2208,6 +2196,8 @@ export class Sim {
 
   constructor(cfg: SimConfig) {
     this.devCommands = cfg.devCommands ?? false;
+    this.worldPvpDisabled = cfg.worldPvpDisabled ?? false;
+    this.hillProbe = hillProbeFor(cfg.seed);
     this.cfg = {
       seed: cfg.seed,
       playerClass: cfg.playerClass,
@@ -2217,6 +2207,7 @@ export class Sim {
       autoEquip: cfg.autoEquip ?? false,
       playerName: cfg.playerName ?? 'Adventurer',
       devCommands: this.devCommands,
+      worldPvpDisabled: this.worldPvpDisabled,
       worldBossAtBoot: cfg.worldBossAtBoot ?? false,
       riftPortals: cfg.riftPortals ?? false,
       compulsoryTutorial: cfg.compulsoryTutorial ?? false,
@@ -2995,12 +2986,8 @@ export class Sim {
       // plus their current bar progress, so the leaderboard is meaningful for
       // existing characters from day one.
       meta.lifetimeXp = s.lifetimeXp ?? xpToReachLevel(player.level) + Math.max(0, s.xp);
-      meta.honor = honorMod.normalizeHonorCounter(s.honor);
-      meta.lifetimeHonor = Math.max(
-        meta.honor,
-        honorMod.normalizeHonorCounter(s.lifetimeHonor ?? meta.honor),
-      );
-      meta.honorArenaDaily = honorMod.normalizeHonorDailyState(s.honorArenaDaily);
+      honorMod.loadHonorState(meta, s);
+      worldPvpMod.loadWorldPvpState(this.ctx, meta, player, s.worldPvp);
       meta.prestigeRank = s.prestigeRank ?? 0;
       meta.restedXp = Math.max(0, s.restedXp ?? 0);
       // `s.professions` is the legacy pre-rename field (#1119); `s.gatheringProficiency`
@@ -3946,38 +3933,8 @@ export class Sim {
       level: restore ? restore.level : e.level,
       xp: restore ? restore.xp : meta.xp,
       lifetimeXp: meta.lifetimeXp,
-      ...(meta.honor || meta.lifetimeHonor
-        ? { honor: meta.honor, lifetimeHonor: meta.lifetimeHonor }
-        : {}),
-      ...(meta.honorArenaDaily
-        ? {
-            honorArenaDaily: {
-              date: meta.honorArenaDaily.date,
-              winsByOpponent: { ...meta.honorArenaDaily.winsByOpponent },
-              // Optional ranked-loss DR window, on the same absent-when-empty
-              // rule as the battleground one below: a day with no paying loss
-              // writes nothing, so pre-loss-award saves stay byte-equal.
-              ...(meta.honorArenaDaily.lossesByOpponent &&
-              Object.keys(meta.honorArenaDaily.lossesByOpponent).length > 0
-                ? { lossesByOpponent: { ...meta.honorArenaDaily.lossesByOpponent } }
-                : {}),
-              fiestaCompletionsByOpponent: {
-                ...meta.honorArenaDaily.fiestaCompletionsByOpponent,
-              },
-              // Optional Thornhollow Fields DR window: omitted when empty so pre-Thornhollow Fields
-              // saves stay byte-equal (mirrors normalizeHonorDailyState).
-              ...(meta.honorArenaDaily.bgResultsByOpponent &&
-              Object.keys(meta.honorArenaDaily.bgResultsByOpponent).length > 0
-                ? { bgResultsByOpponent: { ...meta.honorArenaDaily.bgResultsByOpponent } }
-                : {}),
-              // Same absent-until-claimed rule as the DR window above: a day that
-              // has not paid the first-win bonus writes nothing (back-compat +
-              // parity-stable saves).
-              ...(meta.honorArenaDaily.bgFirstWinClaimed ? { bgFirstWinClaimed: true } : {}),
-              totalWins: meta.honorArenaDaily.totalWins,
-            },
-          }
-        : {}),
+      ...savedHonorState(meta),
+      ...savedWorldPvpFields(meta, this.time),
       prestigeRank: meta.prestigeRank,
       unlockedMilestones: [...meta.unlockedMilestones],
       restedXp: meta.restedXp,
@@ -4433,10 +4390,8 @@ export class Sim {
     // Offline: the controller already wrote localStorage; nothing else to do.
   }
 
-  takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
-    if (this.actionBarLayoutRestoreServed) return undefined;
-    this.actionBarLayoutRestoreServed = true;
-    return { source: 'noop' };
+  takeActionBarLayoutRestore() {
+    return this.actionBarRestore();
   }
 
   /** Z-key sheathe toggle (IWorld.toggleWeaponStow; server `stow_weapon` command).
@@ -5234,6 +5189,15 @@ export class Sim {
       get bgMatches() {
         return sim.bgMatches;
       },
+      get hillState() {
+        return sim.hillState;
+      },
+      get hillProbe() {
+        return sim.hillProbe;
+      },
+      get worldPvpBooks() {
+        return sim.worldPvpBooks;
+      },
       get bgBusySlots() {
         return sim.bgBusySlots;
       },
@@ -5316,6 +5280,9 @@ export class Sim {
       // instance is constructed after this host literal, so the getter reads it lazily).
       get devCommands() {
         return sim.devCommands;
+      },
+      get worldPvpDisabled() {
+        return sim.worldPvpDisabled;
       },
       get compulsoryTutorial() {
         return sim.cfg.compulsoryTutorial;
@@ -6256,11 +6223,14 @@ export class Sim {
     this.updateDelveRuns();
     lap?.('delves');
     // Thornhollow Fields' ACTIVE phase draws ZERO rng (queue-order matchmaking,
-    // tick-math wave and rune clocks; the one seeded draw is the power-rune
-    // face at match START), so its tick position cannot fork the draw order
-    // mid-match.
+    // tick-math wave and rune clocks; the one seeded draw is the power-rune face
+    // at match START), so its tick position cannot fork the draw order mid-match.
     bgMod.updateBattleground(this.ctx);
     lap?.('battleground');
+    worldPvpMod.updateWorldPvp(this.ctx); // the /pvp clock, zone pass + books sweep; zero rng
+    lap?.('worldPvp');
+    hillMod.updateHill(this.ctx); // King of the Hill (pvp/hill.ts): spawns draw a PRIVATE rng
+    lap?.('hill');
     // The Dungeon Finder phase draws ZERO rng (queue bookkeeping + role
     // matching on the sim clock), so appending it here cannot fork the draw order.
     this.updateDungeonFinder();
@@ -9281,6 +9251,7 @@ export class Sim {
       if (bg && bg.state === 'active' && this.bgMatches.get(target.id) === bg) {
         return bgMod.bgTeamOf(bg, attackerPlayer.id) !== bgMod.bgTeamOf(bg, target.id);
       }
+      if (worldPvpMod.isWorldPvpHostile(this.ctx, attackerPlayer, target)) return true;
       // The jail brawl: prisoners are hostile to each other, always (pets
       // resolve to their owner via pvpController above, so a prisoner's pet
       // fights too). A visiting moderator is never jailed, so no prisoner
@@ -9609,6 +9580,7 @@ export class Sim {
   accountAdmin = true;
   // Offline play never spectates: this session is always its own viewer.
   readonly spectating: string | null = null;
+  readonly actionBarReadOnly = false;
   socialInfo: null = null;
   friendAdd(_name: string): void {}
   friendRemove(_name: string): void {}
@@ -10823,6 +10795,24 @@ export class Sim {
 
   get lifetimeHonor(): number {
     return this.primaryId === -1 ? 0 : (this.players.get(this.primaryId)?.lifetimeHonor ?? 0);
+  }
+  get worldPvpInfo(): import('../world_api').WorldPvpInfo | null {
+    return this.primaryId === -1 ? null : worldPvpMod.worldPvpInfoFor(this.ctx, this.primaryId);
+  }
+
+  setWorldPvpFlag(enabled: boolean, pid = this.primaryId): void {
+    worldPvpMod.setWorldPvpFlag(this.ctx, pid, enabled);
+  }
+
+  get hillInfo(): import('../world_api').HillInfo | null {
+    return this.primaryId === -1 ? null : hillMod.hillInfoFor(this.ctx, this.primaryId);
+  }
+
+  hillInfoFor(pid: number): import('../world_api').HillInfo | null {
+    return hillMod.hillInfoFor(this.ctx, pid);
+  }
+  worldPvpInfoFor(pid: number): import('../world_api').WorldPvpInfo | null {
+    return worldPvpMod.worldPvpInfoFor(this.ctx, pid);
   }
 
   get marketInfo(): import('../world_api').MarketInfo | null {

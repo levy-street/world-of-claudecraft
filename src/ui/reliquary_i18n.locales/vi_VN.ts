@@ -142,6 +142,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'Kho Vũ Khí Chiến Tranh',
     desc: 'Trang sức và vũ khí Chiến Tranh mua bằng danh dự khó nhọc mới có.',
   },
+  conquerors_vanguard_gallery: {
+    name: 'Phòng Trưng Bày Tiên Phong',
+    desc: 'Các bộ trang bị chuyên môn và vũ khí Chiến Tranh mùa 2, mua bằng danh dự.',
+  },
   horizons_vault_of_ages: {
     name: 'Kho Báu Ngàn Năm',
     desc: 'Những báu vật đã ngừng lưu hành của một thời đã qua. Các kỳ trân này không còn giành được nữa; kho báu tôn vinh các kỳ cựu còn giữ chúng.',

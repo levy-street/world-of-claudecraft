@@ -519,7 +519,12 @@ const MONOLITHS: MonolithRow[] = [
     // Then the usable trinkets (PR 4173): the action-bar drag payload moved to
     // hotbar.ts, paying for the trinket tooltip, slot-state and fortune-notice
     // wiring (ours 18231 against the base 18235). wc -l on the merged tree.
-    ceiling: 18214,
+    // Re-pinned at the second release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (World PvP, King of the Hill, the Cooldown
+    // Manager and the release's later extractions compose with the branch's):
+    // exact count measured on the MERGED working tree (wc -l after biome),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 18112,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -549,7 +554,16 @@ const MONOLITHS: MonolithRow[] = [
     // (src/ui/host_diag_section_controller.ts over the pure
     // src/ui/host_diag_view.ts), not a sub-view of this window. Exact count,
     // zero slack.
-    ceiling: 2821,
+    // LOWERED 2830 -> 2829 by extracting shared frame settings and reset-key scope.
+    // LOWERED 2829 -> 2827 by extracting menu placement into OptionsWindowLayout.
+
+    // Release/v0.44.0 sync at ee8883fa4f: compose parent pins 2827 / 2821.
+    // Exact merged line count, preserving both extraction sets.
+    // LOWERED 2818 -> 2813 when Options > Cooldown Manager and the Overlays
+    // sub-view landed: the Auras render method and its placement/teardown lines
+    // moved out with them to src/ui/options_overlay_panels.ts. Measured with
+    // wc -l on the tree merged with release/v0.44.0. Exact count, zero slack.
+    ceiling: 2813,
     seam: 'a pure view model (src/ui/options_view.ts) painted with the shared settings_controls.ts builders; sub-panels as sibling modules',
   },
   {
@@ -1137,7 +1151,12 @@ const MONOLITHS: MonolithRow[] = [
     // character storage load/save moved to src/sim/character_storage.ts and
     // isQuestInteractionEntity to interaction.ts (ours 11805 against the base
     // 11822), composed at the release/v0.44.0 base merge. Exact merged count.
-    ceiling: 11733,
+    // Re-pinned at the second release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (World PvP, King of the Hill, the Cooldown
+    // Manager and the release's later extractions compose with the branch's):
+    // exact count measured on the MERGED working tree (wc -l after biome),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 11723,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1349,7 +1368,8 @@ const MONOLITHS: MonolithRow[] = [
     // click / Enter-Space / double-click wiring moved into wireCharselectRow
     // (src/ui/charselect_hints.ts), which skips activations from inside the
     // lockout disclosure instead of stopping propagation there.
-    ceiling: 11276,
+    // Frame layout extraction: bank the reduced coordinator size.
+    ceiling: 11260,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
@@ -1577,6 +1597,12 @@ const MONOLITHS: MonolithRow[] = [
     // Permanent loot quality (PR 4054) base merge: the equipped-instance wire
     // projection moved to server/equipped_instance_wire.ts, composed with the
     // release extractions above. Exact merged count, zero slack.
+    // LOWERED 9993 -> 9934 at World PvP (the /pvp flag): the per-entity wire
+    // fragment cache shapes and the two JSON splicers moved to
+    // server/entity_wire_cache.ts, paying for the flag's dispatch case, its
+    // entity wire bit and the wpvp self key; the one-use delay() helper was
+    // inlined to pay for the /pvp command-lane claim. Measured with
+    // wc -l < server/game.ts after biome. Exact count, zero slack.
     // LOWERED 9979 -> 9965 by the craft_roll_events change: the ftue_events
     // quest/death record arms of the event drain moved to
     // server/event_record_observers.ts (which also hosts the new craftRoll
@@ -1585,7 +1611,12 @@ const MONOLITHS: MonolithRow[] = [
     // guild/weekly bank snapshot emitter moved to its own module (ours 9990
     // against the base 10076), composed at the release/v0.44.0 base merge.
     // Exact merged count, zero slack.
-    ceiling: 9959,
+    // Re-pinned at the second release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (World PvP, King of the Hill, the Cooldown
+    // Manager and the release's later extractions compose with the branch's):
+    // exact count measured on the MERGED working tree (wc -l after biome),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 9900,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1744,7 +1775,12 @@ const MONOLITHS: MonolithRow[] = [
     // guild-bank self-decode moved to src/net/bank_snapshot_wire.ts (ours 5433
     // against the base 5498), composed at the release/v0.44.0 base merge.
     // Exact merged count, zero slack.
-    ceiling: 5413,
+    // Re-pinned at the second release/v0.44.0 base merge into
+    // integration/world-quests-v0440 (World PvP, King of the Hill, the Cooldown
+    // Manager and the release's later extractions compose with the branch's):
+    // exact count measured on the MERGED working tree (wc -l after biome),
+    // never reconciled by arithmetic. Zero slack.
+    ceiling: 5403,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -2023,7 +2059,10 @@ const MONOLITHS: MonolithRow[] = [
     // merged count, zero slack: any further growth reds again.
     // OSSBrain integration: canvas drawing primitives moved to nameplate_paint_primitives.ts.
     // Measured after formatting; lower the ratchet with the extraction.
-    ceiling: 827,
+    // LOWERED 827 -> 826 at World PvP (PR 4146 review): the state gained the pvpFlag
+    // the name row was built with, paid for by three comment trims. Exact count
+    // (wc -l < src/render/nameplate_canvas.ts), zero slack.
+    ceiling: 826,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

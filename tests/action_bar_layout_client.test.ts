@@ -133,16 +133,22 @@ describe('ClientWorld.saveActionBarLayout routes through the uploader', () => {
     expect(sent).toEqual([{ cmd: 'save_hotbar_layout', profile: 'touch', layout: A }]);
   });
 
-  it('flushActionBarLayoutSave sends a pending save at once and never twice', () => {
+  it('closing the client sends a pending save before closing the socket and never twice', () => {
     const { client, sent } = bareClient();
+    client.ws = {
+      onclose: null,
+      close: vi.fn(() => {
+        expect(sent).toEqual([{ cmd: 'save_hotbar_layout', profile: 'desktop', layout: B }]);
+      }),
+    };
     client.saveActionBarLayout('desktop', B);
-    client.flushActionBarLayoutSave();
+    client.close();
     expect(sent).toHaveLength(1);
     expect(sent[0].cmd).toBe('save_hotbar_layout');
     expect(sent[0].profile).toBe('desktop');
     vi.advanceTimersByTime(AFTER_DEBOUNCE);
     expect(sent).toHaveLength(1);
-    client.flushActionBarLayoutSave(); // nothing pending: no-op
+    client.close(); // nothing pending: no duplicate upload
     expect(sent).toHaveLength(1);
   });
 });

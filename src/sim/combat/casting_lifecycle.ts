@@ -51,6 +51,7 @@ import {
 import { effectiveFishingBand, fishReelWindowSecFor } from '../professions/fishing';
 import { bestOwnedGatherToolFor } from '../professions/tools';
 import { scheduleProjectile } from '../projectile_travel';
+import { isWorldPvpHostile, WORLD_PVP_AID_REFUSED_LINE } from '../pvp/world_pvp';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import { primaryHealingMultiplier } from '../spec_output_tuning';
@@ -91,6 +92,7 @@ import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   afflictionAdjustedCastTime,
   afflictionCastError,
+  afflictionConsumeHealMult,
   afflictionConsumeThreadDoomBonus,
   afflictionDrainCompletionDoom,
   afflictionDrainTickDoom,
@@ -206,7 +208,11 @@ import {
 import { paladinManaCostMultiplier } from './paladin_support';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
-import { hasTithefiendTarget } from './priest/vespers';
+import {
+  duskhymnChannelStart,
+  duskhymnChannelStopped,
+  hasTithefiendTarget,
+} from './priest/vespers';
 import { swingReadyForQueuedCast } from './queued_cast_swing_yield';
 import { resurrectionCastRange, resurrectionReachError } from './resurrection_reach';
 import {
@@ -215,6 +221,7 @@ import {
   veilAllowsStealthAbilities,
 } from './rogue_engines';
 import { combineCostMultipliers, duskCostMultiplier } from './rogue_talents';
+import { brinewardMendingCastTime } from './shaman_spiritmend';
 import {
   stonehearthStormcastMendingActive,
   stonehearthStormcastMendingHealMult,
@@ -618,6 +625,7 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       completeAfflictionDrain(ctx, p, channelTarget, p.castingAbility ?? '');
       clearAfflictionConsumeThreads(ctx, p);
       coldsightFeveredDrawCompleted(ctx, p, p.castingAbility, channelTarget);
+      duskhymnChannelStopped(ctx, p);
       p.castingAbility = null;
       p.channeling = false;
       // completed ground-targeted channels drop their aim like every other
@@ -843,6 +851,7 @@ export function cancelCast(ctx: SimContext, p: Entity): void {
   if (p.castingAbility) cleanupPaladinAegis(ctx, p.id);
   if (p.castingAbility === CORPSE_HARVEST_CAST_ID) releaseCorpseHarvest(ctx, p.id);
   if (p.castingAbility) coldsightVoidReservationOnCancel(ctx, p, p.castingAbility);
+  duskhymnChannelStopped(ctx, p);
   stopChannelVisual(ctx, p);
   clearAfflictionConsumeThreads(ctx, p);
   emitRainOfFireStop(ctx, p);
@@ -924,13 +933,29 @@ export function castAbilityBySlot(
 // entity's stored castTargetId at a timed cast's finish) wins while valid;
 // a stale/invalid override falls back to the classic current-friendly-target-
 // else-self rule, byte-identical to the pre-override behavior when null.
-function resolveFriendlyTarget(ctx: SimContext, p: Entity, overrideId: number | null): Entity {
+//
+// One refusal, returned as null for the caller to voice (WORLD_PVP_AID_REFUSED_LINE):
+// a live PLAYER the open world has made an enemy (src/sim/pvp/world_pvp.ts
+// isWorldPvpHostile). The aid rule flags a helper who keeps a flagged stranger
+// standing, and from that moment the two are flagged strangers whom the self
+// fallback would otherwise lock apart in silence: every later heal, shield or
+// buff would land on the helper instead, with no word about why. Only the WORLD
+// arm refuses: a duel, arena or battleground opponent on the target still self-casts,
+// the classic habit those modes' healers rely on.
+function resolveFriendlyTarget(
+  ctx: SimContext,
+  p: Entity,
+  overrideId: number | null,
+): Entity | null {
   if (overrideId !== null) {
     const o = ctx.entities.get(overrideId);
     if (o && !o.dead && ctx.isFriendlyTo(p, o)) return o;
+    if (o && !o.dead && o.kind === 'player' && isWorldPvpHostile(ctx, p, o)) return null;
   }
   const cur = p.targetId !== null ? (ctx.entities.get(p.targetId) ?? null) : null;
-  return cur && !cur.dead && ctx.isFriendlyTo(p, cur) ? cur : p;
+  if (cur && !cur.dead && ctx.isFriendlyTo(p, cur)) return cur;
+  if (cur && !cur.dead && cur.kind === 'player' && isWorldPvpHostile(ctx, p, cur)) return null;
+  return p;
 }
 
 // Combat-resurrection target (Temporal Reversal): the mouseover override or current
@@ -1426,8 +1451,13 @@ export function castAbility(
     target = dead;
   } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // heals/buffs: the mouseover override when given, else the current
-    // friendly target, else yourself
-    target = resolveFriendlyTarget(ctx, p, castTargetId);
+    // friendly target, else yourself; a World PvP enemy on the target refuses
+    const friendly = resolveFriendlyTarget(ctx, p, castTargetId);
+    if (!friendly) {
+      ctx.error(p.id, WORLD_PVP_AID_REFUSED_LINE);
+      return;
+    }
+    target = friendly;
     // A RUSH has no meaning against yourself, and the self fallback above is
     // reached by an ordinary miss: no target at all, or an ENEMY targeted. Without
     // this gate Intervene resolved onto the caster and became an off-GCD personal
@@ -1765,10 +1795,17 @@ export function castAbility(
   }
   const instantBaseCastTime =
     consumedInstantAura !== null ? 0 : res.castTime * shamanCastTimeMultiplier(p, ability.id);
-  const castTime =
+  // Brineward 2pc (Warfare Season 2) reads the resolved friendly target's
+  // health; a pass-through for every other ability and caster.
+  const castTime = brinewardMendingCastTime(
+    ctx,
+    p,
+    ability.id,
+    target,
     afflictionAdjustedCastTime(p, ability.id, instantBaseCastTime) *
-    destructionCastTimeMult(p, ability.id) *
-    ashenFocusCastTimeMult(ctx, p, meta, ability.id);
+      destructionCastTimeMult(p, ability.id) *
+      ashenFocusCastTimeMult(ctx, p, meta, ability.id),
+  );
   // A press that cannot survive movement (abilityCastSurvivesMovement) is denied
   // OUTRIGHT here, before the GCD arms or any cast-commit body state is changed,
   // when the player's held movement input would actually move this tick. A root,
@@ -1929,6 +1966,8 @@ export function castAbility(
     p.channelTickTimer = ability.id === 'drain_life' ? DT : p.channelTickEvery;
     p.channelTicksLeft = channelTicks;
     coldsightFeveredDrawChannelStart(ctx, p, ability.id);
+    // Duskhymn Regalia 2pc: the Litany of Woe channel slow (priest/vespers.ts).
+    duskhymnChannelStart(ctx, p, ability.id, target, channelDuration);
     if (ability.id === 'drain_life') {
       consumeFateThreadsForDrain(ctx, p, target, channelDuration);
     }
@@ -2531,7 +2570,9 @@ function applyChannelTick(
         ctx.dealDamage(src, tgt, dmg, false, res.def.school, res.def.name, 'hit');
         if (doom > 0) gainDoom(ctx, src, doom);
         if (!src.dead) {
-          const intended = Math.round(dmg * eff.healFrac);
+          const intended = Math.round(
+            dmg * eff.healFrac * afflictionConsumeHealMult(ctx, src, res.def.id),
+          );
           const healed = Math.min(intended, src.maxHp - src.hp);
           onCraftedCollectionHeal(ctx, src, src, intended - healed);
           if (healed > 0) {
@@ -2769,8 +2810,14 @@ function applyAbility(
     target = dead;
   } else if (ability.requiresTarget && ability.targetType === 'friendly') {
     // Keep the branch's mouseover-cast resolution (Clique-style): the explicit
-    // override wins while valid, else current-friendly-target-else-self.
-    target = resolveFriendlyTarget(ctx, p, castTarget);
+    // override wins while valid, else current-friendly-target-else-self; a
+    // target the open world made an enemy during the cast refuses the finish.
+    const friendly = resolveFriendlyTarget(ctx, p, castTarget);
+    if (!friendly) {
+      ctx.error(p.id, WORLD_PVP_AID_REFUSED_LINE);
+      return;
+    }
+    target = friendly;
     const d = dist2d(p.pos, target.pos);
     if (d > Math.max(ability.range, 5) + 2) {
       ctx.error(p.id, 'Out of range.');

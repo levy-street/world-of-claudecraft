@@ -25,6 +25,13 @@ const candidate = (id: string, active: boolean): UnlockCandidate => ({
 describe('HUD_FRAME_SPECS', () => {
   it('covers exactly the frames the option promises, each with a unique id, element and key', () => {
     expect(HUD_FRAME_SPECS.map((s) => s.id)).toEqual([
+      'focusTarget1',
+      'focusTarget2',
+      'focusTarget3',
+      'practiceTracker',
+      'trackerGroup',
+      'auraGroup',
+      'targetOfTarget',
       'actionBar1',
       'actionBar2',
       'actionBar3',
@@ -63,6 +70,13 @@ describe('HUD_FRAME_SPECS', () => {
       'auraTrack_shields',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
+      'focus-target-1',
+      'focus-target-2',
+      'focus-target-3',
+      'practice-tracker',
+      'tracker-group',
+      'aura-track-group',
+      'totarget-frame',
       'actionbar',
       'actionbar2',
       'actionbar3',
@@ -122,6 +136,13 @@ describe('HUD_FRAME_SPECS', () => {
     // player's saved layout for that frame with no other test failing. A new
     // frame appends a new key here; an existing key never changes.
     expect(HUD_FRAME_STORAGE_KEYS).toEqual([
+      'woc_hud_frame_focus_target_1',
+      'woc_hud_frame_focus_target_2',
+      'woc_hud_frame_focus_target_3',
+      'woc_hud_frame_practice_tracker',
+      'woc_hud_frame_tracker_group',
+      'woc_hud_frame_aura_group',
+      'woc_hud_frame_target_of_target',
       'woc_hud_frame_actionbar',
       'woc_hud_frame_actionbar2',
       'woc_hud_frame_actionbar3',
@@ -176,6 +197,9 @@ describe('HUD_FRAME_SPECS', () => {
     // children, and the detacher is a no-op for a frame already homed there.
     const detaching = HUD_FRAME_SPECS.filter((s) => s.detachToUiRoot).map((s) => s.id);
     expect(detaching).toEqual([
+      'practiceTracker',
+      'trackerGroup',
+      'targetOfTarget',
       'actionBar1',
       'actionBar2',
       'actionBar3',
@@ -211,6 +235,8 @@ describe('HUD_FRAME_SPECS', () => {
     // kept the mode.
     const box = HUD_FRAME_SPECS.filter((s) => s.resizeMode === 'box').map((s) => s.id);
     expect(box).toEqual([
+      'trackerGroup',
+      'auraGroup',
       'buffBar',
       'debuffBar',
       'targetDots',
@@ -241,6 +267,7 @@ describe('HUD_FRAME_SPECS', () => {
     // before-sibling slot is the upgrade path if that drift ever matters.
     const declared = HUD_FRAME_SPECS.filter((s) => s.stockHome).map((s) => [s.id, s.stockHome]);
     expect(declared).toEqual([
+      ['targetOfTarget', { parentId: 'target-frame', slot: 'last' }],
       ['buffBar', { parentId: 'aura-stack', slot: 'first' }],
       ['debuffBar', { parentId: 'aura-stack', slot: 'last' }],
     ]);
@@ -264,7 +291,9 @@ describe('HUD_FRAME_SPECS', () => {
         expect(rowAt, `${entry}: ${spec.id} row inside its stock parent`).toBeGreaterThan(parentAt);
       }
       const first = declared.find((s) => s.stockHome?.slot === 'first');
-      const last = declared.find((s) => s.stockHome?.slot === 'last');
+      const last = declared.find(
+        (s) => s.stockHome?.slot === 'last' && s.stockHome.parentId === first?.stockHome?.parentId,
+      );
       expect(html.indexOf(`id="${first?.elementId}"`)).toBeLessThan(
         html.indexOf(`id="${last?.elementId}"`),
       );
@@ -338,7 +367,9 @@ describe('frameRowSettingKey', () => {
     expect(frameRowSettingKey('actionBar3')).toBe('showThirdActionBar');
     expect(frameRowSettingKey('reliquaryTracker')).toBe('showReliquaryTracker');
     expect(frameRowSettingKey('targetDots')).toBe('showTargetDots');
-    for (const id of ['actionBar1', 'questTracker', 'damageMeter', 'petFrame', 'minimap']) {
+    expect(frameRowSettingKey('petFrame')).toBe('showPetFrame');
+    expect(frameRowSettingKey('targetOfTarget')).toBe('showTargetOfTarget');
+    for (const id of ['actionBar1', 'questTracker', 'damageMeter', 'minimap']) {
       expect(frameRowSettingKey(id), `${id} has no master switch`).toBeNull();
     }
   });
@@ -410,7 +441,7 @@ describe('frameRowLabelKey', () => {
     // show up as every proc chip reading "Spell Procs" again.
     const hud = readFileSync(join(import.meta.dirname, '..', 'src', 'ui', 'hud.ts'), 'utf8');
     expect(hud).toContain(
-      'frameLabelKey: () => frameRowLabelKey(spec, this.sim.cfg.playerClass, this.sim.talentSpec)',
+      'labelKey: (spec) => frameRowLabelKey(spec, this.sim.cfg.playerClass, this.sim.talentSpec)',
     );
   });
 });

@@ -1,9 +1,11 @@
 import { MANTLE_REACH, resolvePosition, seatGroundedAt } from '../colliders';
+import { VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC } from '../content/vanguard_set_bonuses_a';
 import { PLAYER_BODY_RADIUS, PLAYER_MAX_CLIMB_SLOPE, PLAYER_SWIM_DEPTH } from '../pathfind';
 import type { SimContext } from '../sim_context';
-import { type AbilityDef, DT, type Entity, type Vec3 } from '../types';
+import { type AbilityDef, DT, ENRAGE_DMG_DONE, type Entity, type Vec3 } from '../types';
 import { groundHeight, terrainSteepnessAt, waterLevelAt } from '../world';
 import { hasUnbreakableMovementLock } from './cc';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 const SWEEP_STEP = 0.5;
 const FLIGHT_DURATION = 0.6;
@@ -249,5 +251,26 @@ export function advanceHeroicLeap(ctx: SimContext, entity: Entity): boolean {
     const damage = Math.round(ctx.rng.range(flight.landingAoe.min, flight.landingAoe.max));
     ctx.dealDamage(entity, target, damage, false, flight.school, flight.abilityName, 'hit');
   }
+  enrageOnVaultingLanding(ctx, entity, flight.abilityId);
   return true;
+}
+
+/** Bloodmarch Ragegear 4pc (Warfare Season 2): landing Vaulting Charge
+ *  Enrages the wearer. The SAME fury_enrage aura Bloodletting and Red Harvest
+ *  apply (effect_dispatch's enrageChance case), so it refreshes the one
+ *  Enrage rather than stacking a second. Runs after the landing damage, draws
+ *  no rng. */
+function enrageOnVaultingLanding(ctx: SimContext, entity: Entity, abilityId: string): void {
+  if (abilityId !== 'heroic_leap' || entity.dead) return;
+  if (!wearsSetBonus(ctx, entity, 'vanguard_warrior_fury', 4)) return;
+  ctx.applyAura(entity, {
+    id: 'fury_enrage',
+    name: 'Enraged',
+    kind: 'enrage',
+    remaining: VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC,
+    duration: VANGUARD_FURY_4PC_ENRAGE_DURATION_SEC,
+    value: ENRAGE_DMG_DONE,
+    sourceId: entity.id,
+    school: 'physical',
+  });
 }

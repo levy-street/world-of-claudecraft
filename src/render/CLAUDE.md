@@ -172,6 +172,18 @@ cadence logic of its own. Narrow helpers:
   `warlock_meteor_fx.ts`, `necromancy_*_fx.ts`, the frost/mage modules) is for
   effects that need scene objects the pooled primitive families cannot
   express; even then the pure math lands in a registered `_core`.
+- **Every floor-anchored VFX takes its `renderOrder` from the floor ladder**
+  (`floor_vfx_layer_core.ts` policy, `floor_vfx_layer.ts` the Three-side twin):
+  `floorVfxRenderOrder(layer, step)` with a band of `ground` (the world's own
+  marks), `player` (class ability ground VFX, plus the normal-blended click and
+  AoE feedback on its top rung), `encounter` (boss telegraphs, soaks, hazards,
+  death zones) or `reticle` (the additive aim guide), bottom to top, so a
+  mechanic a player must react to always paints over what a player emits. Never
+  a bare integer; never on a Group (three promotes a Group's renderOrder to
+  `groupOrder`, which outranks the whole ladder; use `applyFloorVfxLayer` for a
+  subtree). Register the module and its band in `tests/floor_vfx_layer.test.ts`,
+  or name it there as out of scope with a reason (its completeness sweep fails a
+  bare `renderOrder` that is neither); design in `docs/design/vfx-floor-layering.md`.
 - **Models are real GLB assets** (CC0 kits, Tripo-generated models, and the
   image-to-GLB procedural exporters: props, foliage, dungeon, fish, gather nodes,
   mailbox, delve props, characters, the Eastbrook town kit), loaded via

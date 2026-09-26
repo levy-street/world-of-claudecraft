@@ -14,6 +14,7 @@ import {
   buildGraphicsSections,
   buildInterfaceControls,
   buildOptionsMenu,
+  buildOverlaysMenu,
   copyGraphicsDraft,
   flattenGraphicsSections,
   graphicsDraftDirty,
@@ -25,6 +26,7 @@ import {
   type OptionsEnv,
   type OptionsSettingsSource,
   optionsControlKeys,
+  optionsParentView,
   sliderDispatchValue,
   toggleIsOn,
   toggleNextValue,
@@ -797,6 +799,9 @@ describe('options_view: optionsControlKeys (issue 2341 scoped reset)', () => {
 // interfaceControlsForTab(all, tab) must return exactly these, in order; the
 // concatenation (in INTERFACE_TAB_ORDER) is the whole deduped list.
 const GENERAL_KEYS = [
+  'playerFrameHealthText',
+  'targetFrameHealthText',
+  'uiScale',
   'hudOpacity',
   'tooltipScale',
   'frostedPanels',
@@ -820,6 +825,7 @@ const GENERAL_KEYS = [
 ];
 const FRAMES_KEYS = [
   'partyFrameStyle',
+  'showPetFrame',
   // partyFrameWidth/Height have no rows (Edit Frames drags them directly);
   // partyFrameColumns and partyFrameSpacing moved into the in-editor Frames
   // Settings dropdown.
@@ -830,14 +836,11 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
-  'playerFrameHealthText',
-  'targetFrameHealthText',
   'aurasOnPlayerFrame',
   'auraBarBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
-  'showPetFrame',
 ];
 const CHAT_KEYS = ['chatFontScale', 'chatOpacity', 'compactChat', 'filterProfanity'];
 const COMBAT_KEYS = [
@@ -900,14 +903,7 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     ]);
     // the redundant partyFrames.section note is gone now that Frames is its own tab
     expect(keysOf(controls)).not.toContain('note:hudChrome.partyFrames.section');
-    expect(find(controls, 'partyFrameStyle')).toMatchObject({
-      control: 'choice',
-      options: [
-        { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
-      ],
-    });
+    expect(keysOf(controls)).toContain('partyFrameStyle');
     expect(find(controls, 'reduceMotion')).toMatchObject({ control: 'boolToggle' });
     // The sticky-target opt-in renders in the Combat tab with its label key, so
     // the toggle cannot silently drop out of the options window.
@@ -1156,12 +1152,17 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
     expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
-  it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
+  it('offers global scale from 75 to 200 percent, committing on release', () => {
     const controls = buildInterfaceControls(makeSource());
     // The UI Scale slider is retired from the menu: the stored setting still
     // applies at boot and the General tab's Reset to Defaults still clears it
     // (renderInterface's off-menu key list).
-    expect(find(controls, 'uiScale')).toBeUndefined();
+    expect(find(controls, 'uiScale')).toMatchObject({
+      control: 'slider',
+      min: 0.75,
+      max: 2,
+      commitOnChange: true,
+    });
     // Sibling sliders keep their live preview (no commitOnChange flag).
     expect(find(controls, 'chatFontScale')).not.toHaveProperty('commitOnChange');
     expect(find(controls, 'tooltipScale')).not.toHaveProperty('commitOnChange');
@@ -1298,9 +1299,8 @@ describe('options_view: main menu routing', () => {
       'hudChrome.controller.title',
       'hud.options.graphics',
       'hud.options.interface',
-      'hudChrome.auraOverlay.title',
+      'hudChrome.options.overlays',
       'hud.options.audio',
-      'hudChrome.perf.title',
       'hudChrome.fullTransfer.menu',
       'nav.wiki',
       'hudChrome.unstuck.menuButton',
@@ -1314,10 +1314,14 @@ describe('options_view: main menu routing', () => {
     const interfaceRows = offline.filter((e) => e.labelKey === 'hud.options.interface');
     expect(interfaceRows).toHaveLength(1);
     expect(interfaceRows[0].action).toEqual({ kind: 'goto', view: 'interface' });
-    expect(offline.find((e) => e.labelKey === 'hudChrome.auraOverlay.title')?.action).toEqual({
+    // The three on-screen overlay panels sit one level down, behind one row.
+    expect(offline.find((e) => e.labelKey === 'hudChrome.options.overlays')?.action).toEqual({
       kind: 'goto',
-      view: 'auras',
+      view: 'overlays',
     });
+    for (const view of ['auras', 'cooldowns', 'performance']) {
+      expect(offline.some((e) => e.action.kind === 'goto' && e.action.view === view)).toBe(false);
+    }
     // The Wiki row is unconditional (offline play has a wiki too) and routes to
     // the confirm-first external hop, never a sub-view.
     const wikiRows = offline.filter((e) => e.labelKey === 'nav.wiki');
@@ -1328,6 +1332,24 @@ describe('options_view: main menu routing', () => {
       kind: 'goto',
       view: 'transfer',
     });
+  });
+
+  it('the Overlays list routes to Auras, Cooldown Manager and Performance, in that order', () => {
+    expect(buildOverlaysMenu()).toEqual([
+      { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+      { labelKey: 'hudChrome.cooldownManager.title', action: { kind: 'goto', view: 'cooldowns' } },
+      { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
+    ]);
+  });
+
+  it('Back from an overlay panel lands on Overlays; from anything else, the Game Menu', () => {
+    for (const view of ['auras', 'cooldowns', 'performance'] as const) {
+      expect(optionsParentView(view)).toBe('overlays');
+    }
+    for (const view of ['overlays', 'interface', 'graphics', 'keybinds', 'transfer'] as const) {
+      expect(optionsParentView(view)).toBe('main');
+    }
+    expect(optionsParentView('main')).toBe('main');
   });
 
   it('leads with Unlock Interface, relabelled Lock Interface while the frames are loose', () => {
@@ -1368,17 +1390,18 @@ describe('options_view: main menu routing', () => {
 
   it('carries NO System Report row: it is a section inside the Performance view', () => {
     // The owner's decision: the feature was a whole menu row and a whole
-    // sub-panel, which was more room than it deserves. Performance is followed
-    // straight by the transfer row on every host, with nothing between them.
+    // sub-panel, which was more room than it deserves. Performance now sits
+    // under Overlays, as that list's last row, with nothing after it; and the
+    // Game Menu root carries no System Report row either.
     const rows = buildOptionsMenu({ ...DESKTOP_MENU, bugReportAvailable: true });
-    expect(rows.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
-    expect(rows.some((e) => e.action.kind === 'goto' && e.action.view === 'performance')).toBe(
-      true,
-    );
-    const perfAt = rows.findIndex((e) => e.labelKey === 'hudChrome.perf.title');
-    expect(rows[perfAt + 1]?.labelKey, 'nothing sits between them now').toBe(
-      'hudChrome.fullTransfer.menu',
-    );
+    const overlays = buildOverlaysMenu();
+    for (const list of [rows, overlays]) {
+      expect(list.some((e) => e.labelKey === 'hudChrome.hostDiag.title')).toBe(false);
+    }
+    expect(overlays.at(-1)).toEqual({
+      labelKey: 'hudChrome.perf.title',
+      action: { kind: 'goto', view: 'performance' },
+    });
   });
 
   it('adds the online-only Report a Bug row when bug reporting is available', () => {

@@ -167,6 +167,10 @@ export const table: ReliquaryLocaleTable = {
     name: '워페어 무기고',
     desc: '힘겹게 모은 명예로 구입하는 전쟁 장신구와 무기.',
   },
+  conquerors_vanguard_gallery: {
+    name: '선봉대 갤러리',
+    desc: '명예로 구입하는 워페어 시즌 2 전문화 세트와 무기.',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 보물고의 큐레이터).
   horizons_vault_of_ages: {

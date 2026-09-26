@@ -106,7 +106,8 @@ export class MeterFrame {
 
     for (const handle of handles) {
       handle.classList.add('mt-move-handle');
-      handle.setAttribute('title', t('hudChrome.meters.move'));
+      const title = handle === el ? handle.querySelector<HTMLElement>('.panel-title') : handle;
+      title?.setAttribute('title', t('hudChrome.meters.move'));
       // A container's title is inherited by every descendant that has none of
       // its own, so on the tabbed window "Dmg" / "Heal" / "Threat" would each
       // advertise a drag that pressing them does NOT perform. An empty title is
@@ -209,6 +210,18 @@ export class MeterFrame {
     this.persist();
   }
 
+  restoreSavedLayout(): void {
+    this.gesture = null;
+    this.deps.document.body.classList.remove(DRAGGING_BODY_CLASS);
+    this.clearAppliedGeometry();
+    try {
+      this.geo = parseMeterFrame(this.deps.storage.getItem(this.cfg.storageKey));
+    } catch {
+      this.geo = null;
+    }
+    this.apply();
+  }
+
   /** Drop the custom box and return the panel to its stylesheet anchor. */
   reset(): void {
     this.geo = null;
@@ -217,6 +230,10 @@ export class MeterFrame {
     } catch {
       // Storage can be unavailable in private browsing modes.
     }
+    this.clearAppliedGeometry();
+  }
+
+  private clearAppliedGeometry(): void {
     const el = this.cfg.el;
     const wasOpen = el.style.display === 'block' || el.style.display === 'flex';
     const { style } = el;
@@ -226,7 +243,10 @@ export class MeterFrame {
     el.classList.remove('mt-framed');
     // Back into the HUD stack it came from, at its original slot.
     if (this.home && el.parentNode !== this.home.parent) {
-      this.home.parent.insertBefore(el, this.home.next);
+      this.home.parent.insertBefore(
+        el,
+        this.home.next?.parentNode === this.home.parent ? this.home.next : null,
+      );
     }
     if (wasOpen) style.display = 'block';
   }

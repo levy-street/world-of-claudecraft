@@ -10,6 +10,7 @@
 // Date.now (enforced by tests/architecture.test.ts).
 
 import { DEV_KIT_ROLES, devKitRole } from '../content/dev_kit_roles';
+import { SEASON2_STOCK } from '../content/pvp_honor_season2';
 import { RIFT_GEAR_ITEM_ID_SET } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
@@ -26,6 +27,8 @@ import type { EquipSlot, ItemDef, PlayerClass } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
 import { collectionFitsRole, collectionRoleForSpec } from './gear_selection';
 import { parseBisGearFor } from './parse_bis_loadouts';
+
+const SEASON2_STOCK_IDS: ReadonlySet<string> = new Set(SEASON2_STOCK);
 
 // The primary stats a class scores: its own line plus stamina. Under the stamina
 // baseline model (item_budget.ts) a caster piece totals a third more than the
@@ -79,6 +82,9 @@ export function bestEpicGearFor(
     (item) =>
       item.quality === 'epic' &&
       (item.kind === 'armor' || item.kind === 'weapon') &&
+      // Raid best-in-slot: Warfare Season 2 honor gear is never a pick, so the
+      // tank and weapon guards that compare it against this stay honest.
+      !SEASON2_STOCK_IDS.has(item.id) &&
       collectionFitsRole(item, cls as PlayerClass, collectionRole),
   );
   const picks: Partial<Record<EquipSlot, string>> = {};

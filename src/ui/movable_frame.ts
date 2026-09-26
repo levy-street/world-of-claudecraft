@@ -112,6 +112,14 @@ export interface MovableFrameConfig {
    *  row passes Infinity). The floor stays shared: FRAME_SCALE_MIN is what
    *  keeps every frame grabbable. */
   maxScale?: number;
+  /** A panel header that stays draggable during normal play. */
+  moveHandle?: string;
+  resizeWhileLocked?: boolean;
+  globalLockOnly?: boolean;
+  /** Only frames whose startup footprint settles later need observation. */
+  observeSizeChanges?: boolean;
+  /** Keep legacy size fields durable until the owner migrates them to settings. */
+  preserveSavedSize?: boolean;
 }
 
 /** One settings-backed axis for resizeMode 'dimensions'. `factor` converts one
@@ -208,6 +216,7 @@ const DIMENSION_KEY_STEP_H = 2;
 
 export class MovableFrame {
   private pos: TargetFramePos | null = null;
+  private sizeObserver?: ResizeObserver;
   private unlocked = false;
   private userHidden = false;
   private gestureState: MoveGesture | ScaleGesture | StretchGesture | DimensionGesture | null =
@@ -231,6 +240,7 @@ export class MovableFrame {
   dispose(): void {
     this.gesture = null;
     this.entry.frames.delete(this);
+    this.sizeObserver?.disconnect();
   }
 
   private readonly entry: FrameDispatchEntry;
@@ -284,26 +294,42 @@ export class MovableFrame {
   }
   /** Bottom edge (visual px) at the last applyPos, for reanchorBottom(). */
   private lastBottom: number | null = null;
-  private readonly btn: HTMLButtonElement;
+  private readonly btn: HTMLButtonElement | null;
   private grip: HTMLButtonElement | null = null;
   private label: HTMLElement | null = null;
 
+  private readonly originalTabIndex: string | null;
+  private readonly originalAriaLabel: string | null;
+  private readonly originalRole: string | null;
+
   constructor(private readonly cfg: MovableFrameConfig) {
+    this.originalTabIndex = cfg.frame.getAttribute('tabindex');
+    this.originalAriaLabel = cfg.frame.getAttribute('aria-label');
+    this.originalRole = cfg.frame.getAttribute('role');
+    cfg.frame.classList.toggle('mf-always-interactive', !!cfg.moveHandle);
+    cfg.frame.classList.toggle('mf-always-resizable', !!cfg.resizeWhileLocked);
     // The corner toggle. Built here (like the chat resize grip) so index.html
     // stays untouched; its glyph + position are styled in hud.css.
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'tf-move-btn';
-    btn.setAttribute('aria-pressed', 'false');
-    btn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
-    cfg.frame.appendChild(btn);
-    this.btn = btn;
-    btn.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      this.setUnlocked(!this.unlocked);
-    });
-    btn.addEventListener('keydown', (ev) => this.onKeyMove(ev));
+    this.btn = null;
+    if (cfg.globalLockOnly) {
+      cfg.frame.addEventListener('keydown', (ev) => {
+        if (ev.target === cfg.frame) this.onKeyMove(ev);
+      });
+    } else {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'tf-move-btn';
+      btn.setAttribute('aria-pressed', 'false');
+      btn.setAttribute('aria-keyshortcuts', 'ArrowUp ArrowDown ArrowLeft ArrowRight');
+      cfg.frame.appendChild(btn);
+      this.btn = btn;
+      btn.addEventListener('click', (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        this.setUnlocked(!this.unlocked);
+      });
+      btn.addEventListener('keydown', (ev) => this.onKeyMove(ev));
+    }
 
     // The SE-corner grip, built here like the button (and like the chat box's own
     // grip) so index.html stays untouched. CSS keeps it out of the way while the
@@ -331,7 +357,7 @@ export class MovableFrame {
         // Through setHoverCursor so the hover MEMO tracks the grip's 'se'
         // stamp (the grip carries its own CSS cursor, so the frame's inline
         // cursor is simply released to the stylesheet here).
-        if (this.unlocked && !this.cfg.isMobileLayout()) this.setHoverCursor('', 'se');
+        if (this.canResize && !this.cfg.isMobileLayout()) this.setHoverCursor('', 'se');
       });
       grip.addEventListener('pointerleave', () => {
         // Through setHoverCursor so the hover elision MEMO clears too:
@@ -396,14 +422,31 @@ export class MovableFrame {
       // Captured BEFORE applyPos, which always rebuilds this.pos.
       const stripped = adopted !== parsedSaved;
       this.applyPos();
-      // One-time migration: a payload saved before the viewport stamp existed
-      // cannot re-anchor across a resolution change (pre-stamp saves kept
-      // drifting between fullscreen and windowed). The apply above stamped
-      // the CURRENT viewport, adopting "where the frame renders right now"
-      // as the anchor basis; persisting it upgrades the save in place. A
-      // payload adoptPos stripped a legacy stretch from is upgraded the same
-      // way, so the retired scaleX/scaleY never outlive the mode switch.
-      if (legacy || stripped) this.persistPos();
+      // Upgrade the durable intent, never the temporary startup clamp.
+      if ((legacy || stripped) && adopted && !(cfg.preserveSavedSize && stripped)) {
+        try {
+          localStorage.setItem(
+            cfg.storageKey,
+            serializeTargetFramePos(
+              {
+                ...adopted,
+                vw: adopted.vw ?? window.innerWidth,
+                vh: adopted.vh ?? window.innerHeight,
+              },
+              this.maxScale(),
+            ),
+          );
+        } catch {
+          /* storage unavailable */
+        }
+      }
+    }
+
+    // Party rows, orientation and saved dimensions can settle after construction.
+    // Re-clamp from durable intent when the actual footprint becomes available.
+    if (cfg.observeSizeChanges && typeof ResizeObserver !== 'undefined') {
+      this.sizeObserver = new ResizeObserver(() => this.rederiveFromSaved());
+      this.sizeObserver.observe(cfg.frame);
     }
 
     // The persisted hidden choice (the frames menu), reapplied class-first so a
@@ -464,6 +507,10 @@ export class MovableFrame {
     return this.unlocked;
   }
 
+  get frameElement(): HTMLElement {
+    return this.cfg.frame;
+  }
+
   /** Drive the lock state from outside the corner button, which is what the
    *  global "Unlock interface" toggle does. Kept a plain setter (no toggle) so
    *  the coordinator decides the state for every frame at once and one frame can
@@ -474,7 +521,7 @@ export class MovableFrame {
 
   /** Repaint the saved visual-space position against the live UI Scale. */
   reapplyPosition(): void {
-    if (this.pos) this.applyPos();
+    this.rederiveFromSaved();
   }
 
   /**
@@ -507,6 +554,8 @@ export class MovableFrame {
    *  change) and position a frame that is not supposed to be positioned.
    *  reset() is the destructive sibling that also forgets the store. */
   clearAppliedGeometry(): void {
+    this.gesture = null;
+    document.body.classList.remove(this.cfg.draggingBodyClass);
     this.setUnlocked(false);
     this.pos = null;
     this.lastBottom = null;
@@ -537,6 +586,26 @@ export class MovableFrame {
     }
     this.pos = this.adoptPos(parseTargetFramePos(saved, this.maxScale()));
     if (this.pos) this.applyPos();
+  }
+
+  /** Reload the hidden flag and stored spot without saving or changing structural docking. */
+  restoreSavedState(positioned: boolean): void {
+    try {
+      this.userHidden = localStorage.getItem(this.cfg.storageKey + HIDDEN_STORAGE_SUFFIX) === '1';
+    } catch {
+      this.userHidden = false;
+    }
+    this.cfg.frame.classList.toggle(FRAME_USER_HIDDEN_CLASS, this.userHidden);
+    if (positioned) this.restoreSavedPosition();
+  }
+
+  /** Give a newly independent child a reachable seat even before its first drag. */
+  detachAtCurrentPosition(fallback: { left: number; top: number }): void {
+    if (this.pos) return;
+    const rect = this.cfg.frame.getBoundingClientRect();
+    this.pos = rect.width > 0 && rect.height > 0 ? { left: rect.left, top: rect.top } : fallback;
+    this.applyPos();
+    this.persistPos();
   }
 
   /** Drop the frame's SIZE adjustments only (the grip and corner zoom, a side
@@ -592,18 +661,33 @@ export class MovableFrame {
   // frame is unlocked; the frame gets a class so the cursor + drag affordance show.
   private refreshChrome(): void {
     const label = this.unlocked ? t(this.cfg.lockLabelKey) : t(this.cfg.unlockLabelKey);
-    this.btn.setAttribute('aria-pressed', this.unlocked ? 'true' : 'false');
-    this.btn.setAttribute('aria-label', label);
-    this.btn.title = label;
-    this.btn.classList.toggle('active', this.unlocked);
-    // A frame driven only by the global toggle keeps no permanent chrome: its
-    // button is hidden (and taken out of the tab order) until the interface is
-    // unlocked, so the stock HUD looks exactly as it did.
-    if (this.cfg.buttonOnlyWhenUnlocked) {
-      this.btn.classList.toggle('tf-move-btn-hidden', !this.unlocked);
-      this.btn.hidden = !this.unlocked;
+    if (this.btn) {
+      this.btn.setAttribute('aria-pressed', this.unlocked ? 'true' : 'false');
+      this.btn.setAttribute('aria-label', label);
+      this.btn.title = label;
+      this.btn.classList.toggle('active', this.unlocked);
+      // A frame driven only by the global toggle keeps no permanent chrome: its
+      // button is hidden (and taken out of the tab order) until the interface is
+      // unlocked, so the stock HUD looks exactly as it did.
+      if (this.cfg.buttonOnlyWhenUnlocked) {
+        this.btn.classList.toggle('tf-move-btn-hidden', !this.unlocked);
+        this.btn.hidden = !this.unlocked;
+      }
     }
     this.cfg.frame.classList.toggle('tf-unlocked', this.unlocked);
+    if (this.cfg.globalLockOnly) {
+      const frameName = this.frameLabelKey();
+      if (this.originalRole === null && ['DIV', 'SPAN'].includes(this.cfg.frame.tagName)) {
+        if (this.unlocked) this.cfg.frame.setAttribute('role', 'group');
+        else this.cfg.frame.removeAttribute('role');
+      }
+      if (this.unlocked && frameName) this.cfg.frame.setAttribute('aria-label', t(frameName));
+      else if (this.originalAriaLabel === null) this.cfg.frame.removeAttribute('aria-label');
+      else this.cfg.frame.setAttribute('aria-label', this.originalAriaLabel);
+      if (this.unlocked) this.cfg.frame.tabIndex = 0;
+      else if (this.originalTabIndex === null) this.cfg.frame.removeAttribute('tabindex');
+      else this.cfg.frame.setAttribute('tabindex', this.originalTabIndex);
+    }
     // The grip is a real control too, so it follows the button out of the tab
     // order while the frame is locked. CSS already hides it (it is styled off a
     // .tf-unlocked parent), but `hidden` is what keeps a locked frame's grip
@@ -614,7 +698,7 @@ export class MovableFrame {
         this.grip.setAttribute('aria-label', resizeLabel);
         this.grip.title = resizeLabel;
       }
-      this.grip.hidden = !this.unlocked;
+      this.grip.hidden = !this.canResize;
     }
     // Re-resolved here so the chip rides the same relocalize() path as the
     // button and grip (and a function-form key re-reads its live state);
@@ -651,11 +735,20 @@ export class MovableFrame {
     if (this.pos) return;
     const rect = this.cfg.frame.getBoundingClientRect();
     this.pos = { left: rect.left, top: rect.top };
+    // Keep an always-draggable panel's live box when detaching changes its CSS.
+    if (this.cfg.moveHandle && this.cfg.resizeMode === 'box') {
+      this.pos.w = rect.width / getUiScale();
+      this.pos.h = rect.height / getUiScale();
+    }
   }
 
   private onMoveStart(ev: PointerEvent): void {
-    if (ev.button !== 0 || this.cfg.isMobileLayout() || !this.unlocked) return;
+    if (ev.button !== 0 || this.cfg.isMobileLayout()) return;
     const target = ev.target as HTMLElement | null;
+    if (!this.unlocked) {
+      if (!this.cfg.moveHandle) return;
+      if (!target?.closest(this.cfg.moveHandle)) return;
+    }
     // The move button (and any icon buttons inside the frame) keep their own
     // behaviour; only the frame body area initiates a drag.
     if (!target || target.closest('button')) return;
@@ -669,7 +762,8 @@ export class MovableFrame {
     // The border band starts a resize instead of a move on a scalable frame,
     // the desktop-window contract: the outline resizes (corners zoom the whole
     // frame, sides stretch one axis), the interior drags.
-    const edge = this.cfg.scalable ? frameEdgeAtPoint(rect, ev.clientX, ev.clientY) : null;
+    const edge =
+      this.canResize && this.cfg.scalable ? frameEdgeAtPoint(rect, ev.clientX, ev.clientY) : null;
     if (edge) {
       // In dimensions mode every border band walks the real settings: a side
       // its own axis, a corner both at once. Otherwise corners always zoom
@@ -680,7 +774,8 @@ export class MovableFrame {
         this.beginDimensionGesture(ev, edge, rect);
         return;
       }
-      const stretches = edge.length === 1 && this.cfg.resizeMode === 'box';
+      const stretches =
+        this.cfg.resizeMode === 'box' && (edge.length === 1 || !!this.cfg.moveHandle);
       if (stretches) this.beginStretchGesture(ev, edge, rect);
       else this.beginScaleGesture(ev, edge, rect);
       return;
@@ -698,12 +793,14 @@ export class MovableFrame {
   // pointerdown would otherwise also start a move: stopping propagation here is
   // what keeps the two gestures apart (the frame listener runs on the bubble).
   private onScaleStart(ev: PointerEvent): void {
-    if (ev.button !== 0 || this.cfg.isMobileLayout() || !this.unlocked) return;
+    if (ev.button !== 0 || this.cfg.isMobileLayout() || !this.canResize) return;
     ev.stopPropagation();
     this.ensurePos();
     this.applyPos();
     const rect = this.cfg.frame.getBoundingClientRect();
     if (this.cfg.resizeMode === 'dimensions') this.beginDimensionGesture(ev, 'se', rect);
+    else if (this.cfg.resizeMode === 'box' && this.cfg.moveHandle)
+      this.beginStretchGesture(ev, 'se', rect);
     else this.beginScaleGesture(ev, 'se', rect);
   }
 
@@ -793,6 +890,8 @@ export class MovableFrame {
 
   private beginGesture(ev: PointerEvent): void {
     ev.preventDefault();
+    // A nested frame owns this gesture, even if it detaches during pointerdown.
+    ev.stopPropagation();
     document.body.classList.add(this.cfg.draggingBodyClass);
     try {
       this.cfg.frame.setPointerCapture?.(ev.pointerId);
@@ -929,8 +1028,10 @@ export class MovableFrame {
       // cross axis is not part of this gesture (the pos write below drops
       // it anyway, so snapping it was dead math at best).
       if (snap && g.factor > 0) {
-        if (g.edge === 'e' || g.edge === 'w') box.w = snapFrameSize(box.w * g.factor) / g.factor;
-        else box.h = snapFrameSize(box.h * g.factor) / g.factor;
+        if (g.edge.includes('e') || g.edge.includes('w'))
+          box.w = snapFrameSize(box.w * g.factor) / g.factor;
+        if (g.edge.includes('n') || g.edge.includes('s'))
+          box.h = snapFrameSize(box.h * g.factor) / g.factor;
       }
       const anchored = posFromEdgeResize(
         g.edge,
@@ -939,13 +1040,14 @@ export class MovableFrame {
       );
       // Only the axis this edge owns is persisted; the other stays whatever it
       // was (usually absent), so a width stretch never pins the height inline.
-      const horizontal = g.edge === 'e' || g.edge === 'w';
+      const horizontal = g.edge.includes('e') || g.edge.includes('w');
+      const vertical = g.edge.includes('n') || g.edge.includes('s');
       this.pos = {
         ...this.pos,
         left: anchored.left,
         top: anchored.top,
         w: horizontal ? box.w : this.pos?.w,
-        h: horizontal ? this.pos?.h : box.h,
+        h: vertical ? box.h : this.pos?.h,
       };
     }
     this.applyPos();
@@ -966,13 +1068,17 @@ export class MovableFrame {
   // body keeps the stylesheet's move cursor. Inline so it can vary per edge,
   // elided through lastHoverCursor so an unmoved hover writes nothing, and
   // left alone mid-gesture so the grabbed edge's cursor sticks.
+  private get canResize(): boolean {
+    return this.unlocked || !!this.cfg.resizeWhileLocked;
+  }
+
   private onEdgeHover(ev: PointerEvent): void {
     if (this.gesture) return;
     // A move over the grip bubbles through here with the pointer INSIDE the
     // border band's dead zone, which would clear the 'se' pair the grip's
     // own pointerenter just stamped; the grip owns its hover entirely.
     if (this.grip && ev.target === this.grip) return;
-    if (!this.unlocked || this.cfg.isMobileLayout()) {
+    if (!this.canResize || this.cfg.isMobileLayout()) {
       this.setHoverCursor('');
       return;
     }
@@ -1065,7 +1171,7 @@ export class MovableFrame {
   // shrink, matching which way the SE grip travels for the same change; a
   // stretched box rides along untouched, so keyboard zoom never distorts it.
   private onKeyScale(ev: KeyboardEvent): void {
-    if (!this.unlocked || this.cfg.isMobileLayout()) return;
+    if (!this.canResize || this.cfg.isMobileLayout()) return;
     if (this.cfg.resizeMode === 'dimensions') {
       this.onKeyDimension(ev);
       return;
@@ -1086,6 +1192,31 @@ export class MovableFrame {
     // its overall size, since each axis takes the same additive step.
     const { sx, sy } = frameScales(this.pos, this.maxScale());
     const snap = !ev.shiftKey && (this.cfg.snapToGrid?.() ?? false);
+    if (this.cfg.resizeMode === 'box' && this.cfg.moveHandle) {
+      const horizontal = ev.key === 'ArrowLeft' || ev.key === 'ArrowRight';
+      const rect = this.cfg.frame.getBoundingClientRect();
+      const factor = sx * getUiScale();
+      const current = horizontal ? rect.width : rect.height;
+      const visual = snap
+        ? stepCoordToGridLine(current, direction as 1 | -1)
+        : current + direction * (ev.shiftKey ? 1 : 10);
+      const box = boxFromEdgeDrag(
+        horizontal ? 'e' : 's',
+        { w: rect.width / factor, h: rect.height / factor },
+        horizontal ? visual - current : 0,
+        horizontal ? 0 : visual - current,
+        factor,
+      );
+      this.pos = {
+        ...this.pos,
+        left: this.pos?.left ?? 0,
+        top: this.pos?.top ?? 0,
+        ...(horizontal ? { w: box.w } : { h: box.h }),
+      };
+      this.applyPos();
+      this.persistPos();
+      return;
+    }
     if (snap) {
       // Step the frame's VISUAL width to the next grid line and give both
       // axes the shared ratio, so the keyboard reaches exactly the sizes a

@@ -262,7 +262,7 @@ export class TargetAurasWindow {
       },
     );
     this.frame.init();
-    if (this.filter !== 'all') this.applyFilterWidth();
+    if (this.filter !== 'all' && this.frame.currentWidth === null) this.applyFilterWidth();
     this.clear();
   }
 
@@ -318,6 +318,25 @@ export class TargetAurasWindow {
     this.deps.writers.setText(this.buffCountEl, this.deps.formatCount(0));
     this.paintRows(this.debuffRows, this.debuffRowsEl, [], 0, true);
     this.paintRows(this.buffRows, this.buffRowsEl, [], 0, false);
+  }
+
+  restoreSavedLayout(): void {
+    this.filter = this.loadFilter();
+    this.visible = this.loadVisible();
+    this.visibleRows = this.loadVisibleRows();
+    this.showSources = this.loadShowSources();
+    this.opacity = this.loadOpacity();
+    this.rowsConfigOpen = false;
+    this.frame.restoreSavedLayout();
+    if (this.frame.currentWidth === null) this.applyFilterWidth();
+    this.refreshFilterButtons();
+    this.refreshVisibleRowsControl();
+    this.refreshOpacityControl();
+    this.refreshVisibility();
+  }
+
+  reapplyFrame(): void {
+    this.frame.refresh();
   }
 
   resetFrame(): void {

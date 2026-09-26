@@ -125,7 +125,7 @@ describe('v0.42.0 offense-only package: real combat-path packets', () => {
     // rng lockstep up to the roll and the ratio is exactly the mult ratio.
     // Total: 1 (no legacy global) + 0.15 (Earthen Fury mastery global
     // spellDmgPct) + 0.18 (earth_shock's own ability dmgPct, spec_baselines.ts)
-    // + 0.13 (offense-only) = 1.46.
+    // + 0.05 (offense-only, 0.13 before the v0.44 Thundercall rework) = 1.38.
     function castEarthenJoltNoCharge(
       spec: 'elemental' | null,
       spellPower: number,
@@ -148,16 +148,16 @@ describe('v0.42.0 offense-only package: real combat-path packets', () => {
       return amount;
     }
 
-    it('a low-Spell-Power Earthen Jolt (authored base dominates) scales by the literal 1.46 elemental total (mastery 0.15 + ability 0.18 + offense-only 0.13)', () => {
+    it('a low-Spell-Power Earthen Jolt (authored base dominates) scales by the literal 1.38 elemental total (mastery 0.15 + ability 0.18 + offense-only 0.05, lowered from 0.13 by the v0.44 Thundercall rework)', () => {
       const base = castEarthenJoltNoCharge(null, 0, 10);
       const boosted = castEarthenJoltNoCharge('elemental', 0, 10);
-      expect(boosted / base).toBeCloseTo(1.46, 1);
+      expect(boosted / base).toBeCloseTo(1.38, 1);
     });
 
-    it('a high-Spell-Power Earthen Jolt (the SP rider dominates) ALSO scales by 1.46, proving the rider moved with the base', () => {
+    it('a high-Spell-Power Earthen Jolt (the SP rider dominates) ALSO scales by 1.38, proving the rider moved with the base', () => {
       const base = castEarthenJoltNoCharge(null, 1200, 10);
       const boosted = castEarthenJoltNoCharge('elemental', 1200, 10);
-      expect(boosted / base).toBeCloseTo(1.46, 1);
+      expect(boosted / base).toBeCloseTo(1.38, 1);
     });
 
     function castEarthenJolt(chargeStacks: number, seed: number): number {

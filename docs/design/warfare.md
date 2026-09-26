@@ -9,9 +9,13 @@ be tuned independently, but those are internal mechanics rather than separate
 player-facing stats. Every current FURY item grants the same Warfare rating to
 both sides.
 
-Both are inert outside hostile player-versus-player combat. Friendly damage,
-self-damage, pets, player-versus-mob damage, and mob-versus-player damage do not
-read Warfare.
+Warfare applies to ALL hostile player-versus-player combat and never to PvE
+(owner rule, 2026-09-24). Both sides of a hit resolve to the player who controls
+them (`pvpController`), so a pet, guardian or totem deals damage with its owner's
+Offense and takes it with its owner's Defense, and a WARFARE signature fires
+against a hostile player's pet as it does against the player. Friendly damage,
+self-damage, and anything touching a mob no player controls (player-versus-mob
+and mob-versus-player) do not read Warfare.
 
 ## Rating curve and cap
 
@@ -69,6 +73,39 @@ The combat API receives damage after the caller's armor or resist calculation, s
 Warfare multiplies that resolved amount before absorb shields. Keeping it as a
 single, isolated multiplier makes the interaction explicit; mathematically it is
 independent of mitigation apart from the engine's integer-rounding boundary.
+
+## Vitality: honor gear's health bonus
+
+Owner rule (2026-09-24): PvP gear gives players significantly more health than
+players without it, and it never works in dungeons or raids. The same combined
+Warfare Defense Rating (gear plus set) also grants maximum health
+(`pvpVitalityFromRating` in `src/sim/pvp/power.ts`): six rating per percent,
+capped at +80 percent (`PVP_VITALITY_RATING_PER_PCT`, `PVP_VITALITY_CAP`; raised from
++50 for Warfare Season 2, which alone carries the rating past a Season 1 kit). A full
+11-slot kit alone (182 rating) gives about +30 percent and the seven-piece set
+(+120) lands at about +50 percent.
+
+Where it applies (`src/sim/pvp/vitality.ts`, safest-first): anywhere on the
+instance plane (dungeons, raids, delves, rift floors, any instance added later)
+it is OFF, unless the player is in a battleground or arena match; everywhere else
+(the open world) it is ON. It is decided on the world PvP pass twice a second,
+also on a realm whose world PvP switch is off, and a player whose state flips is
+recalculated once with the health fraction preserved, so a switch never gains or
+loses health.
+
+What it does to the numbers, level 20, full honor kit, measured on the Sim
+(`tmp_pvp_stamina/` probes, 2026-09-24): a fire mage 1,265 to about 2,100 health
+in PvP, an arms warrior 1,732 to 2,598. In a mirror duel against the same spec in
+raid best-in-slot, the honor kit wins 1.13x (arms) to 2.27x (destruction), where
+without Vitality arms (0.76x) and elemental (0.94x) lost and combat and fire were
+even. Inside an instance every tank's honor kit stays below raid best-in-slot on
+effective health (health over the share of a level-22 boss hit that survives
+armor), pinned in `tests/honor.test.ts`.
+
+Caster honor armor and weapons also carry half the stamina premium the physical
+piece in the same slot carries (`WARFARE_CASTER_STAMINA_PREMIUM_SHARE`), which
+closes most of the cloth gap in honor gear; jewelry is excluded so it stays below
+the badge jewelry.
 
 ## Stat budgets, and why honor gear is not a PvE shortcut
 
@@ -182,10 +219,11 @@ Breakpoints are 2, 4 and 7 of the seven armor pieces, the same in every family:
 | 4 pieces | +40 Warfare Offense Rating, and crowd control cast on you by hostile players lasts 15 percent less |
 | 7 pieces | +80 Warfare Offense and Defense Rating, plus the family signature |
 
-The 4-piece wording is deliberate. Crowd control applied by a player's **pet** is
-entity kind `mob` and takes the non-hostile-pair early return in
-`Sim.diminishedCrowdControlDuration`, so it is not reduced: "cast on you by
-hostile players" is true where "from hostile players" would not be.
+The 4-piece wording is deliberate: no pet applies hard crowd control today (pet
+abilities apply slows, damage over time and a spell-vulnerability mark, none of
+which pass through `Sim.diminishedCrowdControlDuration`), so "cast on you by
+hostile players" is exact. A future pet stun or fear must route through that
+funnel and resolve its caster with `pvpController` so the reduction covers it.
 
 Signatures, all `pvpOnly` and therefore inert in PvE by construction (the gate in
 `src/sim/combat/set_procs.ts` sits before the chance roll, so a signature draws
@@ -290,13 +328,20 @@ Phase 1 starts with these owner-selected values:
 - Fiesta takedown: 20 Honor.
 - Completed Fiesta match: 20 Honor.
 - Fiesta win bonus: 40 Honor.
-- Thornhollow Fields battleground win: 60 Honor per winning player
+- Thornhollow Fields battleground win: 120 Honor per winning player
   (`BATTLEGROUND_WIN_HONOR`).
-- Thornhollow Fields battleground loss, played out to a result: 20 Honor
+- Thornhollow Fields battleground loss, played out to a result: 40 Honor
   (`BATTLEGROUND_LOSS_HONOR`); a draw pays the loss amount to both sides.
-- First Thornhollow Fields WIN of each UTC day: a flat 20 Honor on top of the win
-  award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 80
-  against a routine 60, a ratio of 1.33x.
+- First Thornhollow Fields WIN of each UTC day: a flat 40 Honor on top of the win
+  award (`BATTLEGROUND_FIRST_WIN_BONUS_HONOR`), so the day's first win pays 160
+  against a routine 120, a ratio of 1.33x.
+- Killing blow 10, assist 4 (`BATTLEGROUND_KILL_HONOR`,
+  `BATTLEGROUND_ASSIST_HONOR`).
+
+Every Thornhollow Fields award above was DOUBLED on 2026-09-25 (owner tuning,
+alongside King of the Hill's ramp) so Warfare Season 2 gear is a goal of weeks,
+not a season: the figures further down that quote 60/20 and a 900-a-day session
+are the pre-doubling record.
 
 Every weekend is the Double Honor Weekend: every Thornhollow Fields Honor
 award (the result, the kill and assist drip, and the first-win bonus) pays
@@ -377,6 +422,244 @@ zero-sum by the arena's Elo over team-average ratings; a draw applies the 0.5
 draw score. The queue is rated but NOT rating-matched: matchmaking fills
 first-come from the queue, and strict banding is an explicitly deferred
 follow-up.
+
+## World PvP income
+
+The `/pvp` flag (`src/sim/pvp/world_pvp.ts`, rules in `world_pvp_rules.ts`, the
+ground policy in `world_pvp_zones.ts`) is the open road to the same Warfare
+vendor: no queue, no rating, no match clock. The verdict for a pair of players is
+`worldPvpPairHostile`, and it reads the two flags AND the ground under each of
+them. A flag takes `WORLD_PVP_DISARM_SECONDS` (300, the classic five minutes) to
+come down and the drop waits for combat to end, so switching off can never fizzle
+the blow already on its way. Raising it needs `WORLD_PVP_MIN_LEVEL` (10).
+
+Three kinds of ground, declared per zone as `ZoneDef.worldPvp` (data-as-code in
+`src/sim/content/`) and resolved by `worldPvpZonePolicyAt` through the strict
+rectangle containment, so the instance plane reads as contested rather than as
+whichever overworld zone a clamping lookup would misreport:
+
+- `'sanctuary'`: no world PvP at all, flagged or not, under EITHER player. The
+  Proving Shore (`content/proving_shore.ts`) and Eastbrook Vale
+  (`content/zone1.ts`), so a new character can never be fought before they know
+  what the flag is.
+- `'ffa'`: free-for-all. Everyone standing there is hostile to everyone else
+  standing there, flag or no flag, whatever their levels (owner spec,
+  2026-09-24: anyone on free-for-all ground is fair game), and every level
+  hears the crossing notices. The flag's level gate still holds for the flag
+  itself: an under-level character cannot raise one, so their hits there mark
+  nobody and they stake no gold; the grey rule keeps their deaths worthless to
+  a far higher killer. The
+  Drakelands, the Frostveil Reach and the Amberfall (`content/drakelands.ts`,
+  `content/frostveil.ts`, `content/amberfall.ts`): the three northernmost zones,
+  the top row of the map (owner pick, 2026-09-24), the far edge of the world and
+  its richest ground carrying the most risk.
+- `'contested'`: everywhere else, and the default for a zone record with no
+  `worldPvp` field. Two flagged players and nothing more.
+
+The one exemption cuts through all three (`worldPvpPairExempt`): the same
+player and two members of one party or raid are never hostile, in a
+free-for-all zone as much as anywhere. A shared guild is not an exemption
+(owner spec, 2026-09-24): guildmates outside one group fight like strangers,
+and a guild that wants to stand together forms a party. Outside a
+free-for-all zone every unflagged character is exactly as safe as before (the
+#96 griefing invariant), and a flagged player can never touch an unflagged one.
+
+Marking (`worldPvpHitMarksAttacker`): landing a hostile hit that needed NO flag
+raises the attacker's own flag, which is only ever the free-for-all arm, an
+unflagged attacker on an unflagged victim (`WORLD_PVP_MARKED_LINE`). Hitting a
+player who is already flagged never marks anyone, so the victim, and anyone
+defending them or defending a third party who is not marked, fights for free
+while the aggressor ends up carrying the stake. A hit on a player's PET is
+judged against the pet's owner (`worldPvpOnOwnedPetDamaged`, marking only: the
+assist books key on the owner being hit), so opening on a stranger's pet marks
+you exactly as opening on the stranger would. Crossing into and out of a
+free-for-all zone is announced, and a FLAGGED player entering a sanctuary is told
+the flag is idle there (`WORLD_PVP_FFA_ENTER_LINE`, `WORLD_PVP_FFA_LEAVE_LINE`,
+`WORLD_PVP_SANCTUARY_LINE`; the zone pass in `updateWorldPvp`, on the dueness
+form like the books sweep, never a modulo of the tick count).
+
+The verdict is live, not fixed at application time: periodic harm between two
+players (a bleed, a curse, a Maledict Gaze) re-asks `isHostileTo` before every
+damaging tick (`src/sim/combat/periodic_harm.ts`), and a tick the verdict
+refuses is skipped while the aura expires on the spot. An unflagged victim who
+walks out of a free-for-all zone, or anyone who reaches a sanctuary, sheds the
+bleed at the line instead of dying to it on ground where they could not be hit;
+a source who has died keeps their ticks landing, the classic rule.
+
+Two players mid-duel with each other are the duel's business, never the
+world's: `isWorldPvpHostile` steps aside for that pair, so a duel fought on
+free-for-all ground marks neither duelist and books no blow as a world kill; a
+live battleground or arena does the same for everyone inside it.
+
+A world kill moves a GOLD stake and pays an HONOR pool, both split across every
+contributor: the killing blow, everyone who damaged the victim inside
+`WORLD_PVP_ASSIST_WINDOW` (10 s, the battleground's window), and every flagged
+healer who kept one of those damagers standing. The split is equal, with the
+integer remainder going to the blow, so a clean 1v1 pays the whole of both and a
+five-player gank pays each of them a fifth: more honor and more gold for fighting
+alone is the owner's stated shape.
+
+- Gold: the smaller of `WORLD_PVP_STAKE_CAP_COPPER` (5 gold) and
+  `WORLD_PVP_STAKE_FRACTION` (10 percent) of the victim's purse, staked by a
+  FLAGGED victim only. An unflagged player killed in a free-for-all zone loses
+  nothing: they never opted in, so the ground may cost them a corpse run but
+  never their purse. The victim is charged exactly what was paid out, never more.
+  Only a FLAGGED contributor takes gold: an unflagged player who opens on
+  flagged strangers in a free-for-all zone earns the honor and nothing else, so
+  gold only ever moves between two players who both carry the stake, and
+  hunting flags from behind no flag is never the best play.
+- Honor: `WORLD_PVP_KILL_HONOR` (10) per kill, the whole pool, split as above.
+  Deliberately BELOW the instanced faucets: a Thornhollow Fields win pays 120 plus
+  its drip and a ranked 1v1 win pays 25, so a player who wants Warfare gear
+  fastest still queues. Battleground and arena pay more; world PvP pays for
+  being out in the world. The Double Honor Weekend does not apply to it (that
+  event is battleground-only by design).
+- Raids earn nothing (`worldPvpGroupEarns`, owner rule 2026-09-25, the King of
+  the Hill raid rule carried to kills): a contributor in a raid group takes no
+  honor and no gold and is left out of the split, so a zerg pays nobody and never
+  dilutes a party's share; a kill by a raid alone stakes nothing from the victim.
+- Anti-farm: the per-PAIR diminishing returns ride `HONOR_REPEAT_DR` (100, 50,
+  25, then 0 percent) for honor AND gold alike, counted by `worldPvpPairRepeats`
+  on a rolling `WORLD_PVP_DR_WINDOW_SECONDS` (one hour) window that opens at the
+  FIRST kill of that victim by that contributor, not on a calendar day. The book
+  is the session one (`WorldPvpBooks.killsByPair`, keyed by both characters'
+  rename-proof identities), so a relog cannot reset it and a realm restart does:
+  camping one player pays three times an hour and then nothing, a fully decayed
+  kill is not counted, and the victim is not charged for a fully decayed
+  contributor. The old persisted UTC-day counter is gone.
+- The aid rule: an unflagged player who heals, shields or buffs a FLAGGED player
+  who is in a world fight (hit by an enemy, or hitting one, inside the assist
+  window) raises their own flag first, the classic rule, so nobody sustains a
+  killer from behind a flag they do not wear. One shared hook,
+  `worldPvpOnPlayerAided`, carries all three: `combat/heal.ts` for heals and
+  `combat/effect_dispatch.ts` at the `absorb` and `buffTarget` sites. Aid to an
+  UNFLAGGED player marks nobody, so keeping a bystander alive stays free. Under
+  `WORLD_PVP_MIN_LEVEL` the raise is refused like every other and the aid earns
+  nothing. The rule's consequence is deliberate and said out loud: once the
+  helper is flagged, they and the stranger they were keeping up are two flagged
+  strangers, enemies under the pair rule, and the next heal, shield or buff on
+  that stranger is REFUSED with `WORLD_PVP_AID_REFUSED_LINE` (the friendly
+  target resolution in `combat/casting_lifecycle.ts`) rather than self-cast in
+  silence. The way to keep aiding a flagged fighter is the exemption: a party.
+  Only the open-world arm refuses; a duel, arena or battleground opponent on
+  the target still self-casts, the habit those modes' healers rely on.
+- The flag cannot be flapped: accepted changes are `WORLD_PVP_TOGGLE_COOLDOWN`
+  (2 s) apart, refused with a notice in between.
+- Operator kill switch: `WORLD_PVP_DISABLED=1` on the realm refuses every raise
+  and loads every saved flag down (`SimConfig.worldPvpDisabled`); flags already
+  up keep their ordinary disarm.
+- Grey rule: a victim more than `WORLD_PVP_GREY_LEVEL_GAP` (5) levels below a
+  contributor pays that contributor nothing (neither honor nor gold), the
+  classic grey-kill rule and the reason a capped character cannot farm flagged
+  low-level purses.
+
+Deaths to a mob or the environment stake nothing, whatever the flag or the
+ground says. A flagged player inside a live battleground or arena is under that
+mode's rules, never the open world's, and the jail has its own brawl rule. Every
+amount is integer copper and integer honor, the arithmetic is on the sim clock,
+and nothing here draws rng, so the offline Sim, the server and the headless env
+resolve every kill identically (`tests/world_pvp.test.ts`,
+`tests/world_pvp_rules.test.ts`, `tests/world_pvp_zones.test.ts`).
+
+## King of the Hill
+
+Once every `HILL_WINDOW_SECONDS` (three hours) a hill rises somewhere in one of
+the free-for-all zones (`src/sim/pvp/hill.ts`, rules in `hill_rules.ts`, the
+zone set from `worldPvpFfaZones`). The moment is random: the warning's offset
+inside the window is drawn by a private rng derived from the seed and the
+window's ordinal (`hillPlanFor`, the natural rift portal precedent, so the
+world's own rng stream never moves for a hill and every host resolves the same
+time and spot), anywhere from the window's opening to
+`HILL_LATEST_WARN_OFFSET_SECONDS` into it, so on schedule the whole hill fits
+inside its own window. Only one hill stands at a time. A hill whose warning
+sounds late (a spot retry, a `/dev hill` still standing, a realm switched back
+on) slides whole (`hillTimesFrom`), so every hill keeps its full warning and
+its full stand; the next window waits for it. The first window opens
+`HILL_FIRST_WINDOW_AT_SECONDS` after boot.
+
+A hill has three moments, each announced to the whole realm:
+
+1. **The warning** (`hillWarningLine`): the zone and the minutes to the rise.
+   The spot is chosen now, a `HILL_RADIUS` (50 yd) circle on dry, open ground,
+   clear of the hub settlement and every collider, wholly inside its zone, and
+   it is drawn on the ground as a still, faint outline, so parties can form and
+   travel. Nothing counts yet. A failed spot search retries a minute on with the
+   attempt number salted into the spot rng (so a retry searches new ground); a
+   window whose planned stand passes before any spot is found is skipped.
+2. **The rise** (`hillRiseLine`), `HILL_WARNING_SECONDS` (15 minutes) after the
+   warning. The contest and the payouts run from here.
+3. **The fall** (`hillFallenLine`), `HILL_DURATION_SECONDS` (45 minutes) after
+   the rise. Banked seconds short of a payout are lost with it.
+
+The realm's `WORLD_PVP_DISABLED` switch turns the hill off with the rest of
+world PvP. A realm that slept through whole windows plans the current one.
+
+Control is by headcount inside the circle, by PARTY (owner spec, 2026-09-24:
+parties only). A party is one group and a lone player a group of one
+(`hillGroupKey`); a raid member does not count at all (`hillStanding`). Any
+level counts, since anyone on free-for-all ground is fair game. The
+largest group that beats the holder's present members by a strict majority
+(`hillChallengeStands`; a tie never moves the hill, an absent holder is beaten
+by anyone) is the challenger, and after `HILL_CAPTURE_SECONDS` (60) of
+unbroken majority it takes the hill (`hillContestStep`: a lapsed challenge
+starts over, a new challenger starts its own clock). The dead do not count.
+Everyone standing in the zone is already hostile to every stranger there (the
+free-for-all arm, and guildmates outside one party are strangers), so the hill
+needs no flag of its own.
+
+Honor RAMPS with the hold (owner tuning 2026-09-25, replacing a flat 1 a minute
+that paid 45 for a whole stand): each counted holder standing inside banks a
+second per pass, and every `HILL_ACCRUAL_SECONDS` (60) pays `hillHonorPerPayout`
+of the seconds the current holder has held the hill, `HILL_RAMP_STEP_HONOR` (2) a
+minute for the first `HILL_RAMP_STEP_SECONDS` (five minutes), 2 more each further
+five minutes, capped at `HILL_RAMP_MAX_HONOR` (12). The streak belongs to the
+holding party and restarts when the hill changes hands, so a long hold is the
+thing worth taking. A party's size (five) is the payee cap. A holder who steps
+out banks nothing but keeps what they banked; leaving the party or the realm
+forfeits it, and a capture clears the books. A full party holding an uncontested
+hill for its whole stand earns about 380 each, about three Thornhollow Fields wins
+at the doubled award; two held hills a day is about 760, so 10,000 Honor is about
+13 days, level with a committed battleground day at the live result floor. No
+diminishing returns: the cap and the pace are the limit.
+
+The readout (`IWorld.hillInfo`, the `hill` self key) carries the geometry, the
+phase, the holder from the viewer's seat, whether the viewer counts
+(`standing`) and the minutes to the next phase change for everyone, and the
+live counts and contest clock only for a viewer standing in the hill's zone
+while it is risen, so the self wire elides it for everyone else between holder
+changes. The HUD bar (`src/ui/hud/hill/`) shows in that zone: while announced,
+the rise countdown and the distance to the marked circle; once risen, who holds
+it, you against them, the contest fill, the distance and the fall countdown;
+and in both, a note when the viewer does not count. The renderer draws the
+circle (`src/render/hill_ring.ts`) in the holder's colour; `/hill` in chat says
+where it stands or will rise. The state is session-only and never persisted.
+
+Test levers (dev realms only, `ALLOW_DEV_COMMANDS`; also buttons in the dev
+command window's Scenarios tab): `/dev hill [zone]` raises a hill at once and
+stands you on its rim; `/dev hill warn [zone] [seconds]` starts a countdown (the
+full warning, or a shorter one for a quick test); `/dev hill rise` skips the
+countdown; `/dev hill end` makes the hill fall; `/dev hill next` runs the real
+schedule's next hill now (its own zone and spot, the window spent).
+
+## Season 2 (Vanguard)
+
+A second, top tier of honor gear sells beside the five entry-tier sets above, which stay on
+sale unchanged. Full design, the 54 set bonuses and their PvE ceilings:
+`docs/design/warfare-season-2.md`.
+
+- **27 spec sets**, one per spec, class-locked, each the five raid-set slots (helmet,
+  shoulder, chest, legs, gloves) with a 2-piece and a 4-piece bonus that work everywhere.
+- **Four season weapons:** a strength two-hander, a strength one-hander, an agility dagger and
+  a caster staff.
+- **Item level 35**, level with the Ignivar raid tier, on the honor discount: 0.9 of the line
+  budget, the full-budget stamina floor, no hit, crit or haste rating, and 0.9 of raid armor.
+  The Warfare ratings are 2.2x (Offense) and 3.4x (Defense) the slot budget, so a Season 2
+  kit reaches the 30 percent caps and the +80 percent Vitality cap where a full entry-tier
+  kit stops at about +50: about 10 percent more health in PvP (14 for casters), and nothing
+  in dungeons or raids.
+- **Prices:** 1.5 times the entry tier per slot, 6,600 Honor for a full set, 1,800 per weapon.
+- **Pins:** `tests/warfare_season2.test.ts` (stock shape, stat, armor and weapon rules, set
+  rows, and the tank effective-health guard).
 
 ## FURY prices
 

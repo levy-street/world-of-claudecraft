@@ -549,7 +549,7 @@ export class MetersPanel {
       this.frame = new MeterFrame(
         {
           el: this.root,
-          handles: [title, this.titleEl],
+          handles: [this.root],
           storageKey: spec.frameStorageKey,
           fallbackSize: { w: METERS_DEFAULT_WIDTH, h: METERS_DEFAULT_HEIGHT },
           // Only detached windows reach here, and they carry little chrome.
@@ -576,6 +576,14 @@ export class MetersPanel {
     // either value means open, and only 'none' / '' mean closed.
     const { display } = this.root.style;
     return display === 'block' || display === 'flex';
+  }
+
+  restoreSavedLayout(): void {
+    this.frame?.restoreSavedLayout();
+  }
+
+  reapplyFrame(): void {
+    this.frame?.refresh();
   }
 
   setOpen(on: boolean): void {
@@ -995,7 +1003,7 @@ export class Meters {
     private deps?: MetersDeps,
   ) {
     this.data = new MeterData(performance.now());
-    const practiceEl = document.getElementById('practice-tracker');
+    const practiceEl = document.getElementById('practice-body');
     this.practice = practiceEl
       ? new PracticeDpsController({
           element: practiceEl,
@@ -1197,6 +1205,19 @@ export class Meters {
   /** Return every panel to its stylesheet anchor (the layout reset path).
    *  The tabbed window's box is the registry's (interfaceUnlock.resetAll
    *  covers it); this resets the two detached windows' own MeterFrames. */
+  restoreSavedLayout(): void {
+    this.reopenDetached = [];
+    for (const panel of this.detached.values()) {
+      panel.setOpen(false);
+      panel.restoreSavedLayout();
+    }
+    this.restoreDetached();
+  }
+
+  reapplyFrames(): void {
+    for (const panel of this.detached.values()) panel.reapplyFrame();
+  }
+
   resetFrames(): void {
     this.main.resetFrame();
     for (const panel of this.detached.values()) panel.resetFrame();

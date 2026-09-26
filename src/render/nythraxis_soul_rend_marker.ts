@@ -8,6 +8,7 @@
 // and spin are the only cosmetics and reduced motion holds them.
 
 import * as THREE from 'three';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 import {
   NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT,
   NYTHRAXIS_SOUL_REND_MARKER_RADIUS,
@@ -92,7 +93,7 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   const ring = new THREE.Mesh(RING_GEOMETRY, markerMaterial(palette.ring, RING_OPACITY));
   ring.name = NYTHRAXIS_SOUL_REND_RING_NAME;
   ring.position.y = NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT + 0.01;
-  ring.renderOrder = 16;
+  ring.renderOrder = floorVfxRenderOrder('encounter', 15);
   ring.userData.actionable = true;
   group.add(ring);
 
@@ -102,7 +103,7 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   );
   fill.name = NYTHRAXIS_SOUL_REND_FILL_NAME;
   fill.position.y = NYTHRAXIS_SOUL_REND_MARKER_GROUND_LIFT;
-  fill.renderOrder = 15;
+  fill.renderOrder = floorVfxRenderOrder('encounter', 14);
   group.add(fill);
 
   const sigil = new THREE.Group();
@@ -114,14 +115,14 @@ export function buildNythraxisSoulRendMarker(): THREE.Group {
   );
   sigilRing.name = NYTHRAXIS_SOUL_REND_SIGIL_RING_NAME;
   sigilRing.rotation.x = Math.PI / 2;
-  sigilRing.renderOrder = 17;
+  sigilRing.renderOrder = floorVfxRenderOrder('encounter', 16);
   const sigilBlade = new THREE.Mesh(
     SIGIL_BLADE_GEOMETRY,
     markerMaterial(palette.sigil, SIGIL_OPACITY),
   );
   sigilBlade.name = NYTHRAXIS_SOUL_REND_SIGIL_BLADE_NAME;
   sigilBlade.scale.set(0.55, 1.35, 0.55);
-  sigilBlade.renderOrder = 17;
+  sigilBlade.renderOrder = floorVfxRenderOrder('encounter', 16);
   sigil.add(sigilRing, sigilBlade);
   group.add(sigil);
 

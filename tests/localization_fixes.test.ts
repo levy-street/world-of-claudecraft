@@ -6,6 +6,22 @@ import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
 import { ABILITIES, DUNGEON_LIST, ITEMS } from '../src/sim/data';
+import {
+  HILL_LOST_LINE,
+  HILL_READOUT_NONE_LINE,
+  HILL_TAKEN_LINE,
+  hillRiseLine,
+} from '../src/sim/pvp/hill';
+import {
+  WORLD_PVP_AID_REFUSED_LINE,
+  WORLD_PVP_AIDED_LINE,
+  WORLD_PVP_FFA_ENTER_LINE,
+  WORLD_PVP_FFA_LEAVE_LINE,
+  WORLD_PVP_MARKED_LINE,
+  WORLD_PVP_SANCTUARY_LINE,
+  worldPvpDefeatLine,
+  worldPvpKillLine,
+} from '../src/sim/pvp/world_pvp';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
@@ -614,6 +630,41 @@ describe('S1: sim event-text pipeline is localized in every locale', () => {
         if (lang !== 'en' && lang !== 'en_CA') {
           expect(out, `${lang}: sim text "${s}" stayed English`).not.toBe(s);
         }
+      }
+    }
+    setLanguage('en');
+  });
+
+  it('binds the World PvP and hill notice constants and line builders to the matcher (a reword must move its row)', () => {
+    // The sim emits these through exported constants and builders
+    // (src/sim/pvp/world_pvp.ts), so the emit scanner never sees the literal:
+    // the pin reads the constants themselves, and a reworded constant whose
+    // matcher row did not move fails here as "not recognized".
+    const lines = [
+      WORLD_PVP_MARKED_LINE,
+      WORLD_PVP_AIDED_LINE,
+      WORLD_PVP_FFA_ENTER_LINE,
+      WORLD_PVP_FFA_LEAVE_LINE,
+      WORLD_PVP_SANCTUARY_LINE,
+      WORLD_PVP_AID_REFUSED_LINE,
+      worldPvpKillLine('Aki', 0, 1),
+      worldPvpKillLine('Aki', 1_234, 1),
+      worldPvpKillLine('Aki', 1_234, 3),
+      worldPvpDefeatLine('Aki', 0, 1),
+      worldPvpDefeatLine('Aki', 1_234, 1),
+      worldPvpDefeatLine('Aki', 1_234, 2),
+      worldPvpDefeatLine('Aki', 1_234, 4),
+      // King of the Hill (src/sim/pvp/hill.ts): the rise announce and the
+      // hold notices, emitted through the same constant-and-builder shape.
+      hillRiseLine('Wraithwood'),
+      HILL_TAKEN_LINE,
+      HILL_LOST_LINE,
+      HILL_READOUT_NONE_LINE,
+    ];
+    for (const lang of supportedLanguages) {
+      setLanguage(lang);
+      for (const s of lines) {
+        expect(localizeSimText(s), `${lang}: World PvP line "${s}" not recognized`).not.toBeNull();
       }
     }
     setLanguage('en');

@@ -5,6 +5,7 @@
 // slice input.ts fires). Both take injected IWorld-shaped bags, never the
 // concrete worlds. Tests: tests/party_target_hotkeys_core.test.ts.
 
+import { focusTargetAction } from '../ui/focus_targets_core';
 import { type PartyFrameSettingKey, readPartyFrameDisplayConfig } from '../ui/party_frames';
 import { partyHotkeyTargetId } from '../ui/party_target_hotkeys_core';
 import type { IWorld } from '../world_api';
@@ -26,6 +27,7 @@ export type TargetingWorld = Pick<
 /** The one Hud call targeting needs: Pet: Mark selects the pet the frame shows. */
 export interface TargetingHud {
   targetOwnPet(): void;
+  focusTarget?(slot: number, assign: boolean): void;
 }
 
 /** The party frame display settings (sort mode, Show Self) the F-row reads so
@@ -62,6 +64,11 @@ export function dispatchTargetingAction(
   hud: TargetingHud,
   settings: PartyFrameSettingsReader,
 ): boolean {
+  const focus = focusTargetAction(id);
+  if (focus) {
+    hud.focusTarget?.(focus.slot, focus.assign);
+    return true;
+  }
   switch (id) {
     case 'target':
       world.tabTarget();
@@ -93,9 +100,16 @@ export function targetingInputCallbacks(
   settings: PartyFrameSettingsReader,
 ): Pick<
   InputCallbacks,
-  'onTab' | 'onTabPrev' | 'onTargetFriendly' | 'onCycleFriendly' | 'onTargetPet' | 'onTargetParty'
+  | 'onTab'
+  | 'onTabPrev'
+  | 'onTargetFriendly'
+  | 'onCycleFriendly'
+  | 'onTargetPet'
+  | 'onTargetParty'
+  | 'onFocusTarget'
 > {
   return {
+    onFocusTarget: (slot, assign) => hud.focusTarget?.(slot, assign),
     onTab: () => world.tabTarget(),
     onTabPrev: () => world.tabTargetPrev(),
     onTargetFriendly: () => world.targetNearestFriendly(),

@@ -10,6 +10,10 @@
 //   createAuraOverlayController  mounts the reticle tick ring and builds the
 //     controller with its OUTPUT channels attached (rumble and reticle here,
 //     ground rings and cue audio passed through from the Hud).
+//   mountAuraOverlay  the Hud's one call: reads the player's identity and
+//     readers off the live world, and attaches the shared sfx engine and the
+//     ability icon source, so the coordinator passes only what it alone owns
+//     (the world, its writer facet, the renderer's ground-ring sink).
 //   auraOverlaySettingsHooks     projects that controller into the
 //     `AuraOverlayHooks` surface the Options window consumes.
 //
@@ -18,10 +22,13 @@
 // haptic_pulse_core) and is unit-tested there, so there is deliberately no
 // behavior here for a test to pin that those tests do not already cover.
 
+import { audio } from '../game/audio';
 import { playAuraHaptic } from '../game/haptics';
 import type { PlayerClass } from '../sim/types';
 import { AuraOverlayController, type AuraOverlayControllerDeps } from './aura_overlay_controller';
 import type { AuraOverlayHooks } from './aura_overlay_settings';
+import { iconDataUrl } from './icons';
+import type { PainterHostWriters } from './painter_host';
 import { ReticleTicksPainter } from './reticle_ticks_painter';
 
 /** What the Hud alone can supply. The channels this module owns are omitted. */
@@ -47,6 +54,33 @@ export function createAuraOverlayController(
     ...deps,
     playHaptic: (shape) => playAuraHaptic(shape),
     paintReticleTicks: (state) => reticleTicks.paint(state),
+  });
+}
+
+/** The slice of the live world the overlay reads: the player's identity at
+ *  mount, and the known spells and talents on each frame. */
+export interface AuraOverlayWorld {
+  readonly cfg: { readonly playerClass: PlayerClass };
+  readonly player: { readonly name: string };
+  readonly known: ReturnType<AuraOverlayControllerDeps['known']>;
+  readonly talents: NonNullable<ReturnType<NonNullable<AuraOverlayControllerDeps['talents']>>>;
+}
+
+/** Stand the overlay up for the Hud over the live world (see the header). */
+export function mountAuraOverlay(
+  world: AuraOverlayWorld,
+  writers: PainterHostWriters,
+  paintGroundRings: NonNullable<AuraOverlayControllerDeps['paintGroundRings']>,
+): AuraOverlayController {
+  return createAuraOverlayController({
+    writers,
+    playerClass: world.cfg.playerClass,
+    playerName: world.player.name,
+    known: () => world.known,
+    talents: () => world.talents,
+    iconUrl: (abilityId) => iconDataUrl('ability', abilityId),
+    paintGroundRings,
+    playCue: (cueId, volume) => audio.auraCue(cueId, volume),
   });
 }
 

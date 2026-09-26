@@ -1,7 +1,8 @@
 // Pins for the merged PvP window's tab-strip model (src/ui/pvp_tabs_view.ts):
 // display order with Thornhollow Fields primary, busy-state derivation from BOTH world
 // shapes (offline Sim and ClientWorld mirror), pinning and locking, and the
-// dev-only edge where a retired bracket is live.
+// dev-only edge where a retired bracket is live. The World PvP flag tab is a
+// fourth, non-queue tab: never pinned, never locked.
 import { describe, expect, it } from 'vitest';
 import { buildPvpTabs, PVP_TABS, type PvpTabsInput } from '../src/ui/pvp_tabs_view';
 
@@ -12,10 +13,29 @@ const idle = (selected: PvpTabsInput['selected'] = 'ravenrift'): PvpTabsInput =>
 });
 
 describe('pvp tabs: order, pinning, locking', () => {
-  it('offers exactly Thornhollow Fields, 1v1, 2v2, in that order, Thornhollow Fields primary', () => {
-    expect(PVP_TABS).toEqual(['ravenrift', '1v1', '2v2']);
+  it('offers exactly Thornhollow Fields, 1v1, 2v2, World PvP, in that order, Thornhollow Fields primary', () => {
+    expect(PVP_TABS).toEqual(['ravenrift', '1v1', '2v2', 'world']);
     const m = buildPvpTabs(idle());
-    expect(m.tabs.map((tab) => tab.id)).toEqual(['ravenrift', '1v1', '2v2']);
+    expect(m.tabs.map((tab) => tab.id)).toEqual(['ravenrift', '1v1', '2v2', 'world']);
+  });
+
+  it('the World PvP tab never locks while a queue or match pins another tab', () => {
+    const queued = buildPvpTabs({ ...idle('world'), bg: { queued: true, match: null } });
+    expect(queued.active).toBe('ravenrift');
+    expect(queued.tabs.find((tab) => tab.id === 'world')?.locked).toBe(false);
+    const arena = buildPvpTabs({
+      ...idle('world'),
+      arena: { queued: true, format: '1v1', match: null },
+    });
+    expect(arena.active).toBe('1v1');
+    expect(arena.tabs.find((tab) => tab.id === 'world')?.locked).toBe(false);
+    expect(arena.tabs.find((tab) => tab.id === '2v2')?.locked).toBe(true);
+  });
+
+  it('selecting World PvP while idle is honoured and pins nothing', () => {
+    const m = buildPvpTabs(idle('world'));
+    expect(m.active).toBe('world');
+    expect(m.commit).toBe(false);
   });
 
   it('idle: the selection is active, nothing is locked, nothing commits', () => {

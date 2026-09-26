@@ -167,6 +167,10 @@ export const table: ReliquaryLocaleTable = {
     name: 'ウォーフェア武器庫',
     desc: '苦労して得た名誉で購入する戦争の装飾品と武器。',
   },
+  conquerors_vanguard_gallery: {
+    name: 'ヴァンガードギャラリー',
+    desc: 'ウォーフェア・シーズン2の専門化セットと武器。名誉で購入します。',
+  },
   // Vault of Ages (Phase 21): composed from the shipped vault noun (the
   // col_reliquary_complete title reads 宝物庫のキュレーター).
   horizons_vault_of_ages: {

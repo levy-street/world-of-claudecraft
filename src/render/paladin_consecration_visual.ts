@@ -3,6 +3,7 @@
 
 import * as THREE from 'three';
 import type { ActiveConsecration } from '../world_api';
+import { floorVfxRenderOrder } from './floor_vfx_layer';
 
 const SEGMENTS = 72;
 const GROUND_LIFT = 0.055;
@@ -112,12 +113,12 @@ export class PaladinConsecrationVisuals {
       name: string,
       color: number,
       opacity: number,
-      renderOrder: number,
+      step: number,
     ): THREE.Mesh => {
       const material = this.material(color, opacity);
       const mesh = new THREE.Mesh(geometry, material);
       mesh.name = name;
-      mesh.renderOrder = renderOrder;
+      mesh.renderOrder = floorVfxRenderOrder('player', step);
       root.add(mesh);
       geometries.push(geometry);
       materials.push(material);
@@ -130,7 +131,7 @@ export class PaladinConsecrationVisuals {
       'paladin-consecration-base-glow',
       0xffd86a,
       0.1,
-      5,
+      0,
     );
     qualityObjects.push({
       object: addTerrainMesh(
@@ -138,7 +139,7 @@ export class PaladinConsecrationVisuals {
         'paladin-consecration-white-hot-center',
         0xffffdc,
         0.09,
-        6,
+        1,
       ),
       minQuality: 0.2,
     });
@@ -148,7 +149,7 @@ export class PaladinConsecrationVisuals {
         'paladin-consecration-inner-ring',
         0xffffcf,
         0.48,
-        8,
+        3,
       ),
       minQuality: 0.25,
     });
@@ -158,7 +159,7 @@ export class PaladinConsecrationVisuals {
         'paladin-consecration-middle-ring',
         0xffe78b,
         0.32,
-        8,
+        3,
       ),
       minQuality: 0.65,
     });
@@ -168,7 +169,7 @@ export class PaladinConsecrationVisuals {
         'paladin-consecration-outer-ring',
         0xffdb68,
         0.25,
-        8,
+        3,
       ),
       minQuality: 0.45,
     });
@@ -177,14 +178,14 @@ export class PaladinConsecrationVisuals {
       'paladin-consecration-perimeter',
       0xffffb5,
       0.42,
-      9,
+      4,
     );
     const runeField = addTerrainMesh(
       this.createTerrainRuneField(state.x, state.z, radius),
       'paladin-consecration-sun-rune-field',
       0xffffd1,
       0.5,
-      8,
+      3,
     );
     runeField.userData.runeSegmentCount = 24;
 
@@ -194,7 +195,7 @@ export class PaladinConsecrationVisuals {
     pulseRing.name = 'paladin-consecration-pulse-ring';
     pulseRing.rotation.x = -Math.PI / 2;
     pulseRing.position.set(state.x, centerY + GROUND_LIFT * 2.2, state.z);
-    pulseRing.renderOrder = 10;
+    pulseRing.renderOrder = floorVfxRenderOrder('player', 5);
     root.add(pulseRing);
     geometries.push(pulseGeometry);
     materials.push(pulseMaterial);
@@ -212,7 +213,7 @@ export class PaladinConsecrationVisuals {
     const shimmer = new THREE.Mesh(shimmerGeometry, shimmerMaterial);
     shimmer.name = 'paladin-consecration-shimmer';
     shimmer.position.set(state.x, centerY + 0.23, state.z);
-    shimmer.renderOrder = 7;
+    shimmer.renderOrder = floorVfxRenderOrder('player', 2);
     root.add(shimmer);
     qualityObjects.push({ object: shimmer, minQuality: 0.7 });
     geometries.push(shimmerGeometry);
@@ -224,7 +225,7 @@ export class PaladinConsecrationVisuals {
     const motes = new THREE.InstancedMesh(moteGeometry, moteMaterial, MOTE_COUNT);
     motes.name = 'paladin-consecration-motes';
     motes.position.set(state.x, centerY, state.z);
-    motes.renderOrder = 11;
+    motes.renderOrder = floorVfxRenderOrder('player', 6);
     root.add(motes);
     qualityObjects.push({ object: motes, minQuality: 0.25 });
     geometries.push(moteGeometry);
@@ -236,7 +237,7 @@ export class PaladinConsecrationVisuals {
     const edgeWisps = new THREE.InstancedMesh(edgeGeometry, edgeMaterial, EDGE_WISP_COUNT);
     edgeWisps.name = 'paladin-consecration-edge-wisps';
     edgeWisps.position.set(state.x, centerY, state.z);
-    edgeWisps.renderOrder = 11;
+    edgeWisps.renderOrder = floorVfxRenderOrder('player', 6);
     root.add(edgeWisps);
     qualityObjects.push({ object: edgeWisps, minQuality: 0.55 });
     geometries.push(edgeGeometry);

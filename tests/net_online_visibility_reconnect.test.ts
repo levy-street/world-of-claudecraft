@@ -139,6 +139,53 @@ function withDomStubs<T>(fn: (doc: FakeDocument, harness: TimerHarness) => T): T
 }
 
 describe('ClientWorld visibilitychange reconnect (mobile background/foreground)', () => {
+  it('keeps action bars read-only through spectate exit and reconnect until the owner snapshot', () => {
+    withDomStubs((_doc, harness) => {
+      const world = new ClientWorld('t', 1, PROBE_CLASS, 'http://localhost');
+      const wire = world as unknown as {
+        onMessage(raw: string): void;
+        applySnapshot(value: unknown): void;
+      };
+      const message = (value: unknown) => wire.onMessage(JSON.stringify(value));
+      const self = {
+        id: 1,
+        k: 'player',
+        tid: 'warrior',
+        nm: 'Owner',
+        lv: 20,
+        x: 0,
+        y: 0,
+        z: 0,
+        f: 0,
+        hp: 100,
+        mhp: 100,
+        res: 0,
+        mres: 100,
+        rtype: 'rage',
+      };
+      const ownerSnapshot = () => wire.applySnapshot({ t: 'snap', tick: 1, ents: [], self });
+      message({ t: 'hello', pid: 1, seed: 42 });
+      ownerSnapshot();
+      expect(world.actionBarReadOnly).toBe(false);
+      message({ t: 'spectate', name: 'Watched' });
+      expect(world.actionBarReadOnly).toBe(true);
+      message({ t: 'spectate', name: null });
+      expect(world.actionBarReadOnly).toBe(true);
+      ownerSnapshot();
+      expect(world.actionBarReadOnly).toBe(false);
+      message({ t: 'spectate', name: 'Watched' });
+      const socket = StubWebSocket.instances[0];
+      socket.readyState = StubWebSocket.CLOSED;
+      socket.onclose?.();
+      harness.fire(harness.timers[0].id);
+      message({ t: 'hello', pid: 1, seed: 42 });
+      expect(world.spectating).toBeNull();
+      expect(world.actionBarReadOnly).toBe(true);
+      ownerSnapshot();
+      expect(world.actionBarReadOnly).toBe(false);
+      world.close();
+    });
+  });
   afterEach(() => {
     StubWebSocket.instances = [];
     vi.restoreAllMocks();

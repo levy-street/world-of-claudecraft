@@ -126,6 +126,8 @@ export interface StatTooltipModel {
   /** The two live effects summarized by the single player-facing Warfare stat. */
   warfareDamageIncrease?: number;
   warfareDamageReduction?: number;
+  /** WARFARE Vitality, percent of maximum health (0 without honor gear). */
+  warfareHealthIncrease?: number;
   effects: StatEffect[];
   /** Show "Of little benefit to your class." (Int/Spi on a non-mana class). */
   minorForClass: boolean;
@@ -267,6 +269,7 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
   let statValue = 0;
   let warfareDamageIncrease: number | undefined;
   let warfareDamageReduction: number | undefined;
+  let warfareHealthIncrease: number | undefined;
 
   switch (stat) {
     case 'str': {
@@ -382,6 +385,7 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
       statValue = stats.pvpOffense * 100;
       warfareDamageIncrease = stats.pvpOffense * 100;
       warfareDamageReduction = stats.pvpDefense * 100;
+      warfareHealthIncrease = (stats.pvpVitality ?? 0) * 100;
       break;
     }
   }
@@ -392,6 +396,7 @@ export function buildStatTooltip(stat: StatId, input: StatTooltipInput): StatToo
     statValue,
     warfareDamageIncrease,
     warfareDamageReduction,
+    warfareHealthIncrease,
     effects,
     minorForClass,
     baseChanceNote,

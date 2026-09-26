@@ -153,6 +153,7 @@ export const LAKE = { x: -92, z: 88, radius: 30 };
 
 export const ZONE1_ZONE: ZoneDef = {
   id: 'eastbrook_vale',
+  worldPvp: 'sanctuary',
   name: 'Eastbrook Vale',
   zMin: -180,
   zMax: 180,

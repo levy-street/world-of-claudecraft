@@ -471,7 +471,9 @@ export type OptionsPanelId =
   | 'controller'
   | 'graphics'
   | 'interface'
+  | 'overlays'
   | 'auras'
+  | 'cooldowns'
   | 'audio'
   | 'performance'
   | 'transfer'
@@ -523,9 +525,10 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
     { labelKey: 'hudChrome.controller.title', action: { kind: 'goto', view: 'controller' } },
     { labelKey: 'hud.options.graphics', action: { kind: 'goto', view: 'graphics' } },
     { labelKey: 'hud.options.interface', action: { kind: 'goto', view: 'interface' } },
-    { labelKey: 'hudChrome.auraOverlay.title', action: { kind: 'goto', view: 'auras' } },
+    // Auras, Cooldown Manager and Performance Overlay share one row: each is a
+    // floating on-screen overlay, so they sit together one level down.
+    { labelKey: 'hudChrome.options.overlays', action: { kind: 'goto', view: 'overlays' } },
     { labelKey: 'hud.options.audio', action: { kind: 'goto', view: 'audio' } },
-    { labelKey: 'hudChrome.perf.title', action: { kind: 'goto', view: 'performance' } },
     // Full settings export/import: its own sub-panel, since the code it carries
     // spans every family (the Interface tab's rows carry only their own).
     { labelKey: 'hudChrome.fullTransfer.menu', action: { kind: 'goto', view: 'transfer' } },
@@ -542,6 +545,30 @@ export function buildOptionsMenu(opts: OptionsMenuOpts): OptionsMenuEntry[] {
   entries.push({ labelKey: 'hud.options.logout', action: { kind: 'logout' } });
   entries.push({ labelKey: 'hud.options.returnToGame', action: { kind: 'close' } });
   return entries;
+}
+
+/** The sub-views the Overlays row opens onto, in menu order. */
+export const OVERLAY_PANEL_IDS = ['auras', 'cooldowns', 'performance'] as const;
+export type OverlayPanelId = (typeof OVERLAY_PANEL_IDS)[number];
+
+const OVERLAY_LABEL_KEYS: Readonly<Record<OverlayPanelId, TranslationKey>> = {
+  auras: 'hudChrome.auraOverlay.title',
+  cooldowns: 'hudChrome.cooldownManager.title',
+  performance: 'hudChrome.perf.title',
+};
+
+/** The Overlays sub-view's button list: one routing row per overlay panel. */
+export function buildOverlaysMenu(): OptionsMenuEntry[] {
+  return OVERLAY_PANEL_IDS.map((view) => ({
+    labelKey: OVERLAY_LABEL_KEYS[view],
+    action: { kind: 'goto', view },
+  }));
+}
+
+/** Where a sub-view's Back control lands: an overlay panel returns to the
+ *  Overlays list it was opened from, everything else to the Game Menu root. */
+export function optionsParentView(view: 'main' | OptionsPanelId): 'main' | 'overlays' {
+  return (OVERLAY_PANEL_IDS as readonly string[]).includes(view) ? 'overlays' : 'main';
 }
 
 // ---------------------------------------------------------------------------
@@ -913,9 +940,9 @@ export function buildInterfaceControls(
   env?: OptionsEnv,
 ): OptionsControl[] {
   const general: OptionsControl[] = [
-    // The UI Scale slider deliberately has NO menu row (owner request): the
-    // stored uiScale setting stays applied and the General tab's Reset to
-    // Defaults still clears a saved value (renderInterface's footer).
+    choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
+    choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
+    { ...slider(s, 'uiScale', 'hudChrome.options.uiScale'), commitOnChange: true },
     slider(s, 'hudOpacity', 'hud.options.hudOpacity'),
     slider(s, 'tooltipScale', 'hud.options.tooltipScale'),
     boolToggle(s, 'frostedPanels', 'hud.options.frostedPanels'),
@@ -974,16 +1001,14 @@ export function buildInterfaceControls(
       // slider row beside it would fight that gesture. The settings keys stay
       // (saved values still apply; the Frames tab's Reset to Defaults clears
       // them, see renderInterface's footer).
+      // Dimensions are adjusted directly in Edit Frames. Party columns and spacing
+      // are rendered by the separate Party Frame Options section.
       choice(s, 'partyFrameStyle', 'hudChrome.partyFrames.style', [
         { value: 0, labelKey: 'hudChrome.partyFrames.styleAutomatic' },
         { value: 1, labelKey: 'hudChrome.partyFrames.styleClassic' },
         { value: 2, labelKey: 'hudChrome.partyFrames.styleRaid' },
       ]),
-      // partyFrameWidth/partyFrameHeight likewise have NO rows here (Edit
-      // Frames drags them directly), and partyFrameColumns +
-      // partyFrameSpacing moved into the in-editor Frames Settings dropdown
-      // beside the other frame knobs; the keys stay live and this tab's
-      // Reset to Defaults still clears them.
+      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
       choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
@@ -995,8 +1020,6 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-      choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
-      choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame', {
         rerender: true,
       }),
@@ -1006,7 +1029,6 @@ export function buildInterfaceControls(
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
-      boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
     ]),
     ...tag('chat', [
       slider(s, 'chatFontScale', 'hud.options.chatFontScale'),

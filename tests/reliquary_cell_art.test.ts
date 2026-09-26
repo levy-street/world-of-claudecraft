@@ -25,6 +25,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DEEDS } from '../src/sim/content/deeds';
 import { MOUNTS } from '../src/sim/content/mounts';
+import { SEASON2_SETS } from '../src/sim/content/pvp_honor_season2';
 import {
   FIELD_NOTE_PROFESSIONS,
   RELIQUARY_HORIZON_TITLES,
@@ -557,13 +558,16 @@ describe('unknown ids fall through to the caller fallback', () => {
         `${itemId} has only procedural art and is not an enumerated ITEM_ART_PENDING member`,
       ).toBe(true);
     }
-    // The completion wave leaves no catalogued relic on procedural art. Any
+    // The completion wave left no catalogued relic on procedural art. Any
     // future growth is a deliberate exact-set edit here and in the debt ledger.
+    // Open wave: the 135 Warfare Season 2 armor pieces (Vanguard Gallery),
+    // parked on ITEM_ART_PENDING for the follow-up art pass.
+    const season2Armor = SEASON2_SETS.flatMap((set) => set.itemIds);
     expect(
-      procedural,
+      [...procedural].sort(),
       `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
-    ).toEqual([]);
-    expect(procedural).toHaveLength(0);
+    ).toEqual([...season2Armor].sort());
+    expect(procedural).toHaveLength(135);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

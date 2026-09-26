@@ -39,6 +39,8 @@ import {
 } from './nythraxis_dev_raid';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
+import { endHillNow, riseHillNow, spawnHillNow, warnNextHillNow } from './pvp/hill';
+import { HILL_DEV_USAGE, isHillDevCommand, parseHillDevCommand } from './pvp/hill_dev';
 import { completeAllQuestsForDev } from './quests/dev_quest_commands';
 import { riftFx } from './rift/fx';
 import { RIFT_RANK_BASE_LEVEL, riftRankForBaseLevel } from './rift/ranks';
@@ -333,6 +335,55 @@ export function handleDevChat(
       listWorldQuestsForDev(ctx, pid);
     } else {
       armWorldQuestForDev(ctx, pid, questKey);
+    }
+    return null;
+  }
+
+  // King of the Hill test levers (grammar in pvp/hill_dev.ts): stage a risen
+  // hill or a countdown and stand the caller on its rim, skip a countdown, end
+  // the hill, or run the real schedule's next hill now.
+  if (isHillDevCommand(raw)) {
+    const cmd = parseHillDevCommand(raw);
+    if (!cmd) {
+      emitDevLog(ctx, pid, HILL_DEV_USAGE);
+      return null;
+    }
+    if (cmd.kind === 'rise' || cmd.kind === 'end') {
+      const hill = cmd.kind === 'rise' ? riseHillNow(ctx) : endHillNow(ctx);
+      emitDevLog(
+        ctx,
+        pid,
+        hill
+          ? `[dev] Hill in ${hill.zoneId} ${cmd.kind === 'rise' ? 'risen' : 'ended'}.`
+          : `[dev] No ${cmd.kind === 'rise' ? 'hill is counting down' : 'hill stands'}.`,
+      );
+      return null;
+    }
+    const hill =
+      cmd.kind === 'next'
+        ? warnNextHillNow(ctx)
+        : spawnHillNow(ctx, cmd.zoneId, {
+            warn: cmd.kind === 'warn',
+            warningSeconds: cmd.kind === 'warn' ? cmd.seconds : undefined,
+          });
+    const entity = ctx.entities.get(pid);
+    if (!hill) {
+      emitDevLog(
+        ctx,
+        pid,
+        '[dev] No hill could rise there (no free-for-all zone, or no open ground).',
+      );
+    } else if (entity) {
+      const pos = displacePlayerForDev(ctx, entity, hill.x + hill.radius - 5, hill.z);
+      const what =
+        hill.phase === 'warning'
+          ? `announced (rises in ${Math.ceil(hill.risesAt - ctx.time)} s)`
+          : 'risen';
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Hill ${what} in ${hill.zoneId} at ${hill.x.toFixed(1)}, ${hill.z.toFixed(1)}; you stand at ${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}.`,
+      );
     }
     return null;
   }
@@ -1299,7 +1350,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev town, /dev wq [name], /dev salvage, /dev clue [hunt <huntId>|solve|casket], /dev caravan, /dev calligraphy, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev freezemobs, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill, /dev hill [zone] | warn [zone] [seconds] | rise | end | next',
     );
     return null;
   }
