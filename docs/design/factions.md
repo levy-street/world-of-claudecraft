@@ -83,6 +83,14 @@ and the character sheet shows the current title.
     mount at the quartermaster and it leaves the pending-ruling list. The
     Church Order and the Automatons get their own mounts when their assets
     land (Terrid's Dawn Strider is the Church Order's).
+  Every gear and bag row binds on purchase (`soulbound`), because the standing
+  gate sits on the buyer and an unbound row would let a Champion hand the
+  ladder to an alt with no standing. Two rows stay transferable by contract:
+  the Valestrider's reins (the mount contract) and the formulas (patterns are
+  bind-by-consumption and deliberately listable; learning spends the copy). Every equipment row also pins `requiredLevel: 20`
+  explicitly: the stock is untiered, so without the pin the level gate would
+  fall to the quality floor (rare 12, epic 18) while every mirrored raid and
+  heroic row requires 20. `tests/faction_vendors.test.ts` pins both.
   A fresh 20 holds no standing, so the dev kit excludes the ladder outright
   (`isFreshTwentyItem`); the epic BiS picker sees the Champion jewels but the
   one-point margin keeps every dev kit and DPS fixture on its release loadout.

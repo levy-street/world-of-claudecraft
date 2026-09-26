@@ -22,6 +22,7 @@ import {
   STANDING_THRESHOLDS,
   STANDING_TIERS,
 } from '../src/sim/factions';
+import { meetsLevelRequirement, requiredLevelFor } from '../src/sim/item_level_req';
 import { Sim } from '../src/sim/sim';
 import { buildVendorView } from '../src/ui/hud/vendor/vendor_view';
 
@@ -82,6 +83,31 @@ describe('Faction Vendors & Reroll NPC content', () => {
         } else expect(ITEMS[id].sellValue, id).toBeGreaterThan(0);
       }
     }
+  });
+
+  it('every gear and bag row binds, and every equipment row gates at level 20 like the rows it mirrors', () => {
+    // Standing sits on the BUYER (resolveFactionVendorRowGate), so an unbound
+    // row would let a Champion hand the whole ladder to an alt with no
+    // standing at all. And faction stock is untiered (no source registers it),
+    // so without an explicit requiredLevel the gate falls to the quality floor
+    // (rare 12, epic 18) while every mirrored raid and heroic row requires 20.
+    // Two rows stay transferable by contract: the reins (the mount contract
+    // in tests/mounts.test.ts) and the formulas (patterns are
+    // bind-by-consumption and deliberately listable,
+    // tests/recipe_pattern_items.test.ts: learning spends the copy).
+    for (const [id, def] of Object.entries(FACTION_VENDOR_ITEMS)) {
+      if (def.kind === 'recipe') expect(def.soulbound, `${id} is a pattern`).toBeFalsy();
+      else expect(def.soulbound, `${id} binds`).toBe(true);
+      if (def.kind === 'armor' || def.kind === 'weapon') {
+        expect(def.requiredLevel, `${id} pins its level`).toBe(20);
+        expect(requiredLevelFor(def), `${id} gates at 20`).toBe(20);
+        expect(meetsLevelRequirement(19, def), `${id} refuses a 19`).toBe(false);
+        expect(meetsLevelRequirement(20, def), `${id} admits a 20`).toBe(true);
+      } else {
+        expect(def.requiredLevel, `${id} (a ${def.kind}) carries no level pin`).toBeUndefined();
+      }
+    }
+    expect(ITEMS.reins_avian_strider.soulbound).toBeFalsy();
   });
 
   it('every faction ladder covers all five standing tiers, in ladder order', () => {
