@@ -62,10 +62,11 @@ interface FakeEntry {
   fragmentShader?: FakeShader;
 }
 
-/** The calls the record may make: the browser answers them inside the page
- *  (its WebGL wrappers and the command buffer client's cached program tables).
- *  Any other GL call goes to the GPU process and waits for every command
- *  already submitted, which is what the fake refuses. */
+/** The calls the record may make: for a linked program the browser answers them
+ *  inside the page (its WebGL wrappers and the command buffer client's program
+ *  tables). The fake refuses every other call, the stage query and the error
+ *  read among them, which go to the GPU process and wait for every command
+ *  already submitted. */
 const PAGE_SERVED = new Set([
   'getShaderSource',
   'getProgramParameter',
@@ -185,6 +186,7 @@ describe('readProgramSourcesQueued', () => {
       { program: { id: 9 }, vertexShader: { source: 'lonely' } },
       { program: { id: 10 }, fragmentShader: { source: 'lonely' } },
       { program: { id: 11 }, vertexShader: { source: 'v' }, fragmentShader: { source: '' } },
+      { program: { id: 12 }, vertexShader: { source: '' }, fragmentShader: { source: 'f' } },
     ];
     const sources = await readProgramSourcesQueued(gl, entries, recordingQueue());
     expect(sources.map((p) => p.vertex.slice(0, 7))).toEqual(['void v0', 'void v1']);

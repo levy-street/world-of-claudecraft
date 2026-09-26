@@ -771,7 +771,8 @@ GPU work signs. Each rule names its seam and its guard.
   label kinds the budget prices separately. A read takes each program's sources
   off the shader handles three keeps on its program entry (`vertexShader`,
   `fragmentShader`; `programSourcesOfEntry`) with `getShaderSource`, plus the
-  attribute walk, all answered inside the page. It never asks the driver for a
+  attribute walk, answered inside the page once the program's link has resolved
+  (only a link still pending is waited on). It never asks the driver for a
   shader's stage (`getShaderParameter(SHADER_TYPE)`): that query goes to the GPU
   process, which answers only after executing every command already submitted, so
   a renderer that outruns its GPU process makes each unit pay the whole backlog

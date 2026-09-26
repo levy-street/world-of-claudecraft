@@ -149,10 +149,11 @@ function fakeGl(
     },
     getParameter: (pname: number) => (pname === UNMASKED_RENDERER_WEBGL ? ADAPTER : 'fallback'),
     getShaderSource: (shader: FakeShader) => shader.source,
-    // Answered only by the GPU process, after every command already submitted:
-    // the record reads the stages off three's handles instead.
+    // The record reads the stages off three's handles: it no longer lists the
+    // attached shaders, and a stage query or an error read waits on the GPU
+    // process for every command already submitted.
     getAttachedShaders: () => {
-      throw new Error('getAttachedShaders waits on the GPU process');
+      throw new Error('getAttachedShaders is no longer part of the record');
     },
     getShaderParameter: () => {
       throw new Error('getShaderParameter waits on the GPU process');
@@ -1030,14 +1031,14 @@ describe('recordShaderCorpus as background queue units', () => {
   it('leaves the stored corpus alone when the context is lost during the read', async () => {
     const gl = fakeGl();
     const entries = attachedPrograms(gl, 3);
-    // Lost while the batch reads: a partial set must not replace the stored one.
+    // Lost at the second program's read: a partial set must not replace the stored one.
     let reads = 0;
     const source = (gl as unknown as { getShaderSource: (s: unknown) => string }).getShaderSource;
     (gl as unknown as { getShaderSource: (s: unknown) => string }).getShaderSource = (shader) => {
       reads++;
       return source(shader);
     };
-    (gl as unknown as { isContextLost: () => boolean }).isContextLost = () => reads >= 2;
+    (gl as unknown as { isContextLost: () => boolean }).isContextLost = () => reads >= 3;
     const values = new Map<string, unknown>([[shaderWarmupInternalsForTest.corpusKey, 'kept']]);
     const count = await recordShaderCorpus(renderer(gl, entries), {
       store: createMemoryStore(values),

@@ -21,8 +21,9 @@
 //   set for the next boot, about 25 s later on an idle callback so the corpus
 //   covers the first minutes of play. The record itself runs as background
 //   GPU queue units (shader_corpus_slices.ts) and reads each program's
-//   sources off the shader handles three keeps on its program entry, so no
-//   call of the walk waits on the GPU process.
+//   sources off the shader handles three keeps on its program entry, never
+//   asking the driver for a shader's stage (a query that waits on the GPU
+//   process).
 //
 // The corpus is stored gzipped (about 35 MB of GLSL for a full ultra set,
 // a few MB compressed) under one key in one IndexedDB store.

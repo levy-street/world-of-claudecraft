@@ -1,17 +1,17 @@
 // The shader corpus record, as background GPU work. Each program's sources
 // are read off the shader handles three keeps on its program entry
 // (`vertexShader`, `fragmentShader`) with getShaderSource, plus the attribute
-// walk for the location-0 bind: every one of those calls is answered inside
-// the page (the browser's WebGL wrappers and the command buffer client's
-// cached program tables), so the record never waits on the GPU process.
+// walk for the location-0 bind: once a program's link has resolved, every one
+// of those calls is answered inside the page (the browser's WebGL wrappers and
+// the command buffer client's program tables), measured so on Chromium even
+// for programs three has linked but not used yet. A link still pending when
+// the walk reaches it is the one wait left.
 // History: the first queued version found the stages with getAttachedShaders
 // and getShaderParameter(SHADER_TYPE), and that query IS a round trip: it
 // waits until the GPU process has executed every command already submitted.
-// On an Intel HD 530 whose renderer outran its GPU process (2026-09-26, an
-// unpaced display at Low) each read unit paid that whole backlog, about
-// 440 ms, 25 times over the record; the handle read costs about 0.1 ms per
-// unit there and returns the same sources for every live program. Before
-// that, the whole record ran in one idle callback: about 1.1 s of main
+// On an Intel HD 530 whose renderer outran its GPU process each read unit paid
+// that whole backlog, about 440 ms; the handle read returns the same sources.
+// Before that, the whole record ran in one idle callback: about 1.1 s of main
 // thread on the HD 530. The record stays a client of the renderer's
 // background GPU queue (src/render/CLAUDE.md, "GPU work: every new producer
 // is a client of the scheduler"): one unit per BATCH of program reads, one
@@ -44,8 +44,8 @@ export interface CorpusRecordQueue {
 
 /** Cosmetic, deferred work: below every prewarm debt and every live gate. */
 export const CORPUS_RECORD_PRIORITY = GPU_WORK_PRIORITY.BACKGROUND;
-/** Programs read per queue unit. No read waits on the GPU process, so the
- *  batch only bounds how many units the record takes. */
+/** Programs read per queue unit: bounds how many units the record takes, and
+ *  what one unit can pay if a program's link is still pending. */
 export const CORPUS_READ_BATCH = 8;
 /** Three label KINDS (the part before the colon), so the budget prices a
  *  source read, a JSON encode and a gzip feed separately; the instance

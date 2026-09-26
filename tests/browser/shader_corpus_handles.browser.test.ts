@@ -164,8 +164,10 @@ describe('the corpus program read off three handles', () => {
       const [first] = liveEntries();
       if (!first.program) throw new Error('no linked program');
       driverRead(gl, first.program);
+      gl.getError();
       expect(stageQueries.length).toBe(2);
       expect(calls.getAttachedShaders).toBe(1);
+      expect(calls.getError).toBe(1);
       for (const name of counted) calls[name] = 0;
       stageQueries.length = 0;
       sources = await readProgramSourcesQueued(
