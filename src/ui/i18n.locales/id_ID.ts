@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const id_ID: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Bertualang bersama teman.',
+  'landing.contribute': 'Berkontribusi untuk game ini',
+  'landing.tools': 'Alat',
+  'landing.records': 'Rekor WoC',
+  'landing.scout': 'Pengintai WoC',
+  'landing.parseService': 'Layanan Parse WoC',
   'hud.errors.cannotCastWhileMoving': 'Kamu tidak bisa merapal sambil bergerak.',
   'hudChrome.auraEffect.wolfForm':
     'Wujud Kucing: kerusakan jarak dekat dan energi; kecepatan gerak meningkat {pct}%',
@@ -5386,8 +5392,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'Modul {current} dari {total}',
   'delveUi.tracker.objective': 'Sasaran',
   'delveUi.tracker.title': 'Delve',
-  'download.desc': 'Dapatkan peluncur mandiri untuk performa optimal dan permainan layar penuh.',
-  'download.title': 'Unduh Peluncur Desktop',
+  'download.desc': 'Main di Windows, macOS, atau Linux dengan akun dan karakter yang sama.',
+  'download.title': 'Unduh aplikasi desktop',
   'download.macCta': 'Unduh untuk macOS',
   'download.windowsPending': 'Build Windows tertunda.',
   'entities.abilities.adrenaline_rush.description':
@@ -8583,8 +8589,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'Raidnya',
   'guide.home.group.sub':
     'Dunia ini bisa ditempuh sendiri, tetapi jarahan terbaik menanti di balik party yang baik.',
-  'guide.home.subtitle':
-    'Berpetualang, bersatu, dan jelajahi dunia rakitan tangan, gratis di browser-mu.',
+  'guide.home.subtitle': 'Jelajahi dunia, selesaikan quest, dan taklukkan dungeon bersama teman.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'MMO klasik, dibuat agar mudah dimainkan',
   'guide.home.what.pillarClassesBody':
@@ -10428,8 +10433,7 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'mode.serverOffline': 'Offline',
   'mode.serverOfflineSub': 'Dunia lokal seketika',
   'mode.serverOnline': 'Online',
-  'mode.tipText':
-    'Untuk pengalaman paling lancar, matikan ekstensi pemblokir iklan di situs ini. Laporan komunitas menemukan beberapa pemblokir dapat menyebabkan lag.',
+  'mode.tipText': 'Game terasa lambat? Coba nonaktifkan pemblokir iklan untuk situs ini.',
   'mode.tipTitle': 'TIPS:',
   'nav.about': 'Tentang',
   'nav.account': 'Akun',
@@ -10583,10 +10587,10 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'realmTypes.rpPvp': 'RP-PvP',
   'seo.applicationCategory': 'Permainan',
   'seo.description':
-    'Mulailah petualangan epik di World of ClaudeCraft, micro-MMO bergaya klasik yang dapat dimainkan langsung di peramban. Bergabunglah dengan dunia bersama yang persisten, naikkan level kelas, dan kalahkan musuh!',
+    'Mainkan World of ClaudeCraft, MMO peramban gratis. Jelajahi dunia, selesaikan quest, dan taklukkan dungeon bersama teman. Tanpa perlu mengunduh.',
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    'worldofclaudecraft.com adalah MMO peramban gratis resmi untuk dunia Claudemoon. Bermain daring dengan karakter yang persisten, jelajahi solo secara luring, baca wiki, dan ikuti tautan komunitas terverifikasi dari situs ini.',
+    'Situs resmi World of ClaudeCraft. Main daring, baca wiki, dan temukan tautan komunitas di sini.',
   'seo.officialLabel': 'Situs resmi World of ClaudeCraft',
   'seo.operatingSystem': 'Peramban web',
   'seo.playMode': 'Multipemain',
@@ -15932,12 +15936,12 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Setiap {everyNormal} dtk, Nythraxis menusuk {victimsNormal} raider selain targetnya saat ini pada Pancang Tulang. Raider yang tertusuk tidak dapat bertindak dan kehilangan {drainNormal} kesehatan maksimum setiap detik sampai pancangnya dihancurkan. Pancang hancur setelah {hitsNormal} serangan dari siapa pun, berapa pun kerusakannya. Pemain yang sudah pernah dipancang tidak dapat dipilih lagi selama {cooldown} detik, sehingga pancang tersebar ke seluruh raid.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Mulai {first} dtk setelah Murka Raja dan setiap {everyHeroic} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlHeroic} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamHeroic} kesehatan maksimum. Hantaman pertama setiap badai sebesar {openingSlamHeroic} sebagai gantinya. Penghancur Makam siap lagi {rearm} dtk setelah berakhir.',
+    'Mulai {first} dtk setelah Murka Raja dan setiap {everyHeroic} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlHeroic} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamHeroic} kesehatan maksimum. Penghancur Makam siap lagi {rearm} dtk setelah berakhir.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Badai Tulang',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Menyebarlah dan terus lari dari Nythraxis. Raider yang diterjang berlari menjauh sementara semua orang memberi ruang di sekitar jalur terjangan, lalu tank mengambilnya kembali saat badai berakhir.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Mulai {first} dtk setelah Murka Raja dan setiap {everyNormal} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlNormal} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamNormal} kesehatan maksimum. Hantaman pertama setiap badai sebesar {openingSlamNormal} sebagai gantinya. Penghancur Makam siap lagi {rearm} dtk setelah berakhir.',
+    'Mulai {first} dtk setelah Murka Raja dan setiap {everyNormal} dtk sesudahnya, Nythraxis memulai Badai Tulang selama {duration} dtk. Ia mengabaikan ancaman, bergerak {speed} kali kecepatan normal, dan melakukan {charges} terjangan masing-masing selama {chargeSeconds} dtk. Pusarannya menghasilkan {whirlNormal} kesehatan maksimum setiap detik dalam {radius} yd. Setiap terjangan berakhir dengan Hantaman Tulang dalam radius yang sama sebesar {slamNormal} kesehatan maksimum. Penghancur Makam siap lagi {rearm} dtk setelah berakhir.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Istana Tanpa Kematian',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tank mengambil Aldren dan memutar cleave-nya menjauh dari raid. Stun atau silence Malric begitu Penyembuhan Malric dimulai dan bunuh dia dulu, lalu root atau stun Voss jauh dari penyembuh karena ia tidak dapat ditaunt, dan habisi dia berikutnya.',

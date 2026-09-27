@@ -6236,7 +6236,6 @@ export interface NythraxisEncounterState {
     chargeIndex: number;
     chargeTargetId: number | null;
     slammed: boolean;
-    openingSlamSpent: boolean;
     whirlTickTimer: number;
     chargedIds: number[];
   } | null;

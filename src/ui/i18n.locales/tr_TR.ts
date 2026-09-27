@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const tr_TR: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Arkadaşlarınla maceraya atıl.',
+  'landing.contribute': 'Oyuna katkıda bulun',
+  'landing.tools': 'Araçlar',
+  'landing.records': 'WoC Rekorlar',
+  'landing.scout': 'WoC Keşif',
+  'landing.parseService': 'WoC Parse Servisi',
   'hud.errors.cannotCastWhileMoving': 'Hareket ederken büyü yapamazsın.',
   'hudChrome.auraEffect.wolfForm':
     'Kedi Formu: yakın dövüş hasarı ve enerji; hareket hızı %{pct} artar',
@@ -5335,9 +5341,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'Bölüm {current} / {total}',
   'delveUi.tracker.objective': 'Hedef',
   'delveUi.tracker.title': 'Mağara',
-  'download.desc':
-    'Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.',
-  'download.title': 'Masaüstü Başlatıcısını İndir',
+  'download.desc': "Aynı hesap ve karakterlerle Windows, macOS veya Linux'ta oyna.",
+  'download.title': 'Masaüstü uygulamasını indir',
   'download.macCta': 'macOS için indir',
   'download.windowsPending': 'Windows derlemesi beklemede.',
   'entities.abilities.adrenaline_rush.description':
@@ -8473,8 +8478,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'Akın',
   'guide.home.group.sub':
     'Dünya tek başına aşılabilir, ama en iyi ganimet iyi bir grubun ardında bekler.',
-  'guide.home.subtitle':
-    'Görev yap, grup kur ve elle kurulmuş bir dünyayı keşfet; tarayıcında ücretsiz.',
+  'guide.home.subtitle': 'Dünyayı keşfet, görevler üstlen ve arkadaşlarınla zindanlara gir.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Klasik bir MMO, hemen başlanacak biçimde',
   'guide.home.what.pillarClassesBody':
@@ -10291,8 +10295,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'mode.serverOffline': 'Çevrimdışı',
   'mode.serverOfflineSub': 'Anında yerel dünya',
   'mode.serverOnline': 'Çevrimiçi',
-  'mode.tipText':
-    'En akıcı deneyim için bu sitedeki reklam engelleyici eklentileri kapat. Topluluk bildirimlerine göre bazı engelleyiciler takılmaya yol açabiliyor.',
+  'mode.tipText': 'Oyun yavaş mı çalışıyor? Bu site için reklam engelleyicini kapatmayı dene.',
   'mode.tipTitle': 'İPUCU:',
   'nav.about': 'Hakkında',
   'nav.account': 'Hesap',
@@ -10444,10 +10447,10 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'realmTypes.rpPvp': 'RP-PvP',
   'seo.applicationCategory': 'Oyun',
   'seo.description':
-    "Doğrudan tarayıcında oynanabilen klasik tarzı bir mikro MMO olan World of ClaudeCraft'ta destansı bir maceraya atıl. Kalıcı bir ortak dünyaya katıl, sınıfları geliştir ve düşmanları alt et!",
+    "Ücretsiz bir tarayıcı MMO'su olan World of ClaudeCraft'ı oyna. Keşfet, görevleri tamamla ve arkadaşlarınla zindanlara gir. İndirmeye gerek yok.",
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    "worldofclaudecraft.com, Claudemoon dünyasının resmi ücretsiz tarayıcı MMO'sudur. Kalıcı bir karakterle çevrimiçi oyna, çevrimdışı tek başına keşfet, wiki'yi oku ve bu siteden doğrulanmış topluluk bağlantılarını takip et.",
+    "World of ClaudeCraft'ın resmi sitesi. Çevrimiçi oyna, wiki'yi oku ve topluluk bağlantılarını burada bul.",
   'seo.officialLabel': 'Resmi World of ClaudeCraft web sitesi',
   'seo.operatingSystem': 'Web tarayıcısı',
   'seo.playMode': 'Çok Oyunculu',
@@ -15748,12 +15751,12 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Her {everyNormal} sn, Nythraxis mevcut hedefi dışındaki {victimsNormal} akıncıyı Kemik Dikenlerine saplar. Saplanan akıncı hareket edemez ve dikeni yok edilene kadar her saniye azami canının {drainNormal} kadarını kaybeder. Bir diken, kimden gelirse gelsin {hitsNormal} vuruştan sonra parçalanır; verilen hasar fark etmez. Zaten şişlenmiş bir oyuncu {cooldown} saniye boyunca yeniden seçilemez, böylece dikenler tüm baskına yayılır.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyHeroic} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlHeroic} kadarını verir. Her hücum aynı yarıçapta azami canın {slamHeroic} kadarıyla Kemik Çarpmasıyla biter. Her fırtınanın ilk çarpması bunun yerine {openingSlamHeroic} kadar vurur. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.',
+    'Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyHeroic} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlHeroic} kadarını verir. Her hücum aynı yarıçapta azami canın {slamHeroic} kadarıyla Kemik Çarpmasıyla biter. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kemik Fırtınası',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Dağılın ve Nythraxis’ten koşmayı sürdürün. Hedef alınan akıncı kaçar, diğer herkes hücum yolunun çevresinde boşluk bırakır; fırtına bitince tanklar onu geri alır.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyNormal} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlNormal} kadarını verir. Her hücum aynı yarıçapta azami canın {slamNormal} kadarıyla Kemik Çarpmasıyla biter. Her fırtınanın ilk çarpması bunun yerine {openingSlamNormal} kadar vurur. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.',
+    'Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyNormal} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlNormal} kadarını verir. Her hücum aynı yarıçapta azami canın {slamNormal} kadarıyla Kemik Çarpmasıyla biter. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Ölümsüz Saray',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tanklar Aldren’i alır ve yarma saldırısını akından uzağa çevirir. Malric’in İyileştirmesi başlar başlamaz Malric’i sersemletin veya susturun ve önce onu öldürün; sonra kışkırtılamadığı için Voss’u şifacılardan uzakta kökleyin veya sersemletin ve ardından onu bitirin.',

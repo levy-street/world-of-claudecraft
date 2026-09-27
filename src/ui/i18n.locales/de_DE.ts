@@ -13,6 +13,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const de_DE: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Abenteuer mit Freunden.',
+  'landing.contribute': 'Zum Spiel beitragen',
+  'landing.tools': 'Werkzeuge',
+  'landing.records': 'WoC Rekorde',
+  'landing.scout': 'WoC Späher',
+  'landing.parseService': 'WoC Parse-Service',
   'hud.errors.cannotCastWhileMoving': 'Ihr könnt nicht zaubern, während Ihr Euch bewegt.',
   'hudChrome.auraEffect.wolfForm':
     'Katzengestalt: Nahkampfschaden und Energie; Lauftempo um {pct}% erhöht',
@@ -5177,7 +5183,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Euer Ziel',
   'seo.officialLabel': 'Offizielle Website von World of ClaudeCraft',
   'seo.officialBody':
-    'worldofclaudecraft.com ist das offizielle kostenlose Browser-MMO für die Welt Claudemoon. Spiele online mit einem dauerhaften Charakter, erkunde solo offline, lies das Wiki und folge den verifizierten Community-Links auf dieser Website.',
+    'Die offizielle Website von World of ClaudeCraft. Spiele online, lies das Wiki und finde hier die Community-Links.',
   'hudChrome.questShare.notShareable': 'Diese Quest kann nicht geteilt werden.',
   'hudChrome.questShare.notInSharerParty':
     'Ihr müsst in der Gruppe von {name} sein, um diese Quest anzunehmen.',
@@ -5551,10 +5557,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'wiki.desc': 'Entdecke die Geheimnisse des Realms, Klassenguides und Strategien.',
   'news.title': 'Neuigkeiten und Updates',
   'news.desc': 'Lies die neuesten Patchnotes, Events und Community-Updates.',
-  'download.title': 'Desktop-Launcher herunterladen',
+  'download.title': 'Desktop-App herunterladen',
   'download.macCta': 'Download fuer macOS',
   'download.windowsPending': 'Windows-Build ausstehend.',
-  'download.desc': 'Hol dir den eigenständigen Launcher für optimierte Leistung und Vollbildspiel.',
+  'download.desc':
+    'Spiele auf Windows, macOS oder Linux mit demselben Konto und denselben Charakteren.',
   'comingSoon.placeholder': 'Demnächst...',
   'comingSoon.featureComingSoon': 'Diese Funktion ist demnächst in der Welt verfügbar.',
   'mode.onlineTitle': 'Online spielen',
@@ -5567,7 +5574,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'mode.offlineAria': 'Offline spielen: Starte eine sofortige lokale Einzelspielersitzung',
   'mode.tipTitle': 'TIPP:',
   'mode.tipText':
-    'Deaktiviere für das flüssigste Spielerlebnis Adblocker-Erweiterungen auf dieser Website. Community-Berichte zeigen, dass einige Blocker zu Verzögerungen führen können.',
+    'Läuft das Spiel langsam? Deaktiviere testweise deinen Werbeblocker für diese Website.',
   'auth.enterRealm': 'Welt betreten',
   'auth.username': 'Benutzername',
   'auth.usernameError': 'Bitte gib deinen Benutzernamen ein.',
@@ -5800,7 +5807,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'Chat öffnen',
   'seo.title': 'World of ClaudeCraft: Klassisches Web-MMO',
   'seo.description':
-    'Begib dich in World of ClaudeCraft auf ein episches Abenteuer, ein Micro-MMO im klassischen Stil direkt im Browser. Tritt einer dauerhaften, gemeinsamen Welt bei, steigere Klassen und besiege Gegner.',
+    'Spiele World of ClaudeCraft, ein kostenloses Browser-MMO. Erkunde die Welt, erfülle Quests und bestreite Dungeons mit Freunden. Kein Download nötig.',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'Mehrspieler',
   'seo.applicationCategory': 'Spiel',
@@ -9044,8 +9051,7 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'Der Schlachtzug',
   'guide.home.group.sub':
     'Die Welt ist im Alleingang spielbar, doch die beste Beute wartet hinter einer guten Gruppe.',
-  'guide.home.subtitle':
-    'Erfülle Quests, schließe dich mit anderen zusammen und erkunde eine handgebaute Welt, kostenlos in deinem Browser.',
+  'guide.home.subtitle': 'Erkunde die Welt, nimm Quests an und meistere Dungeons mit Freunden.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Ein klassisches MMO, gemacht zum Loslegen',
   'guide.home.what.pillarClassesBody':
@@ -16049,12 +16055,12 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Alle {everyNormal} Sek. spießt Nythraxis {victimsNormal} Schlachtzügler außer seinem aktuellen Ziel auf Knochenspieße. Ein aufgespießter Schlachtzügler kann nicht handeln und verliert jede Sekunde {drainNormal} der maximalen Gesundheit, bis sein Spieß zerstört ist. Ein Spieß zerbricht nach {hitsNormal} Treffern von irgendjemandem, egal wie viel Schaden sie anrichten. Ein bereits aufgespießter Schlachtzügler kann {cooldown} Sek. lang nicht erneut gewählt werden, sodass sich die Spieße über den ganzen Schlachtzug verteilen.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Der erste Schlag jedes Sturms trifft stattdessen für {openingSlamHeroic}. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.',
+    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knochensturm',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Verteilt Euch und lauft weiter vor Nythraxis weg. Der anvisierte Schlachtzügler läuft davon, während alle anderen Platz um die Ansturmroute lassen. Danach nehmen die Tanks ihn wieder auf.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyNormal} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlNormal} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamNormal} der maximalen Gesundheit. Der erste Schlag jedes Sturms trifft stattdessen für {openingSlamNormal}. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.',
+    'Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyNormal} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlNormal} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamNormal} der maximalen Gesundheit. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Der Todlose Hof',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tanks nehmen Aldren auf und drehen seinen Spaltangriff vom Schlachtzug weg. Betäubt oder unterbrecht Malric, sobald Malrics Heilung beginnt, und tötet ihn zuerst. Verwurzelt oder betäubt danach Voss weg von den Heilern, da er nicht verspottet werden kann, und erledigt ihn als Nächstes.',

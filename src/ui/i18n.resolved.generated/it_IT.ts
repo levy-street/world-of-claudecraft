@@ -3859,8 +3859,8 @@ export const it_IT: EnTranslations = {
         "kingsWrathSummary": "Nythraxis infligge {bonusNormal} danni in più in normale o {bonusHeroic} in eroica per il resto del combattimento. Eruzione sepolcrale si verifica ogni {eruptionEveryNormal} s ({eruptionEveryHeroic} in eroica).",
         "kingsWrathResponse": "Usa i tempi di recupero difensivi rimasti per i danni inevitabili. Mantieni pulita ogni meccanica precedente mentre l'incursione conclude lo scontro.",
         "boneStormName": "Tempesta d'ossa",
-        "boneStormSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyNormal} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlNormal} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamNormal} della salute massima. Il primo schianto di ogni tempesta colpisce invece per {openingSlamNormal}. Spezzatombe si riattiva {rearm} s dopo la fine.",
-        "boneStormHeroicSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Il primo schianto di ogni tempesta colpisce invece per {openingSlamHeroic}. Spezzatombe si riattiva {rearm} s dopo la fine.",
+        "boneStormSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyNormal} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlNormal} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamNormal} della salute massima. Spezzatombe si riattiva {rearm} s dopo la fine.",
+        "boneStormHeroicSummary": "A partire da {first} s dopo l'Ira del re e poi ogni {everyHeroic} s, Nythraxis inizia Tempesta d'ossa per {duration} s. Ignora la minaccia, si muove a {speed} volte la velocità normale ed effettua {charges} cariche da {chargeSeconds} s ciascuna. Il suo vortice infligge {whirlHeroic} della salute massima ogni secondo entro {radius} yd. Ogni carica termina con uno Schianto d'ossa nello stesso raggio per {slamHeroic} della salute massima. Spezzatombe si riattiva {rearm} s dopo la fine.",
         "boneStormResponse": "Disperdetevi e continuate a correre lontano da Nythraxis. Il membro caricato scappa mentre tutti gli altri lasciano spazio lungo la traiettoria della carica, poi i tank lo riprendono quando la tempesta finisce.",
         "crownEnduresName": "La Corona perdura",
         "crownEnduresSummary": "A {enrageNormal} s dal pull (il timer si ferma mentre Fratello Aldric entra al 70%), La Corona perdura si attiva come enrage rigido. Nythraxis guadagna {damage} danni in più e attacchi {haste} più rapidi, poi altri {rampStep} danni ogni {rampEveryNormal} s. Non c'è barra del timer. Gli avvisi arrivano come grida a {warn60}, {warn30} e {warn10} s rimanenti.",
@@ -6969,7 +6969,7 @@ export const it_IT: EnTranslations = {
     "home": {
       "eyebrow": "MMO da browser in stile classico",
       "title": "World of ClaudeCraft",
-      "subtitle": "Affronta missioni, raggruppati ed esplora un mondo costruito a mano, gratis nel tuo browser.",
+      "subtitle": "Esplora il mondo, affronta missioni e supera i dungeon con gli amici.",
       "ctaPlay": "Gioca Ora",
       "ctaLearn": "Come si gioca",
       "what": {
@@ -9610,8 +9610,8 @@ export const it_IT: EnTranslations = {
     "viewAll": "Vedi tutti gli aggiornamenti su GitHub"
   },
   "download": {
-    "title": "Scarica il launcher per desktop",
-    "desc": "Ottieni il launcher autonomo per prestazioni ottimizzate e gioco a schermo intero.",
+    "title": "Scarica l'app per desktop",
+    "desc": "Gioca su Windows, macOS o Linux con lo stesso account e gli stessi personaggi.",
     "macCta": "Scarica per macOS",
     "windowsCta": "Scarica per Windows",
     "linuxCta": "Scarica per Linux",
@@ -9630,7 +9630,7 @@ export const it_IT: EnTranslations = {
     "offlineDesc": "Un mondo a giocatore singolo istantaneo nel tuo browser. Nulla viene salvato: perfetto per un combattimento rapido o per testare.",
     "offlineAria": "Gioca offline: avvia una sessione locale a giocatore singolo istantanea",
     "tipTitle": "SUGGERIMENTO:",
-    "tipText": "Per un'esperienza ottimale, disattiva le estensioni di blocco della pubblicità su questo sito. Alcuni utenti segnalano che i blocchi possono causare rallentamenti.",
+    "tipText": "Il gioco è lento? Prova a disattivare il blocco della pubblicità su questo sito.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Gioca",
@@ -10798,15 +10798,23 @@ export const it_IT: EnTranslations = {
       "dodge": "SCHIVATA!"
     }
   },
+  "landing": {
+    "headline": "All'avventura con gli amici.",
+    "contribute": "Contribuisci al gioco",
+    "tools": "Strumenti",
+    "records": "WoC Record",
+    "scout": "WoC Esploratore",
+    "parseService": "Servizio parse WoC"
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web in stile classico",
-    "description": "Parti per un'avventura epica in World of ClaudeCraft, un micro-MMO in stile classico giocabile direttamente dal browser. Entra in un mondo condiviso persistente, fai crescere le classi e sconfiggi i nemici!",
+    "description": "Gioca a World of ClaudeCraft, un MMO gratuito da browser. Esplora, completa missioni e affronta i dungeon con gli amici. Nessun download richiesto.",
     "genre": "MMORPG",
     "playMode": "Multigiocatore",
     "applicationCategory": "Gioco",
     "operatingSystem": "Browser web",
     "officialLabel": "Sito ufficiale di World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com è l'MMO gratuito ufficiale da browser del mondo Claudemoon. Gioca online con un personaggio persistente, esplora offline in solitaria, leggi il wiki e segui i link della community verificati da questo sito."
+    "officialBody": "Il sito ufficiale di World of ClaudeCraft. Gioca online, leggi il wiki e trova qui i link della community."
   },
   "a11y": {
     "goHome": "Vai alla pagina iniziale",

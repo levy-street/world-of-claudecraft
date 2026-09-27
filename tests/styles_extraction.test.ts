@@ -104,6 +104,8 @@ describe('CSS extraction: barrel + seam wiring', () => {
       'components.css',
       'shell.css',
       'hud.mobile.css',
+      'shell.website.css',
+      'shell.website-pages.css',
     ]) {
       const imp = `@import "./${m}";`;
       expect(barrel, `barrel must @import ${m}`).toContain(imp);
@@ -127,6 +129,8 @@ describe('CSS extraction: barrel + seam wiring', () => {
       'components.css',
       'shell.css',
       'hud.mobile.css',
+      'shell.website.css',
+      'shell.website-pages.css',
     ];
     for (let i = 1; i < order.length; i++) {
       expect(at(order[i]), `${order[i]} must be imported after ${order[i - 1]}`).toBeGreaterThan(

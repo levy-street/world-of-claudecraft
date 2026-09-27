@@ -3859,8 +3859,8 @@ export const nl_NL: EnTranslations = {
         "kingsWrathSummary": "Nythraxis richt op Normal {bonusNormal} meer schade aan of {bonusHeroic} op Heroic voor de rest van het gevecht. Grafuitbarsting gebeurt elke {eruptionEveryNormal} sec ({eruptionEveryHeroic} op Heroic).",
         "kingsWrathResponse": "Gebruik resterende defensieve cooldowns voor onvermijdbare schade. Houd elke eerdere mechaniek schoon terwijl de raid het gevecht afrondt.",
         "boneStormName": "Beenderstorm",
-        "boneStormSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyNormal} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlNormal} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamNormal} van maximale gezondheid. De eerste slag van elke storm raakt in plaats daarvan voor {openingSlamNormal}. Grafbreker wordt {rearm} sec na het einde opnieuw geactiveerd.",
-        "boneStormHeroicSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyHeroic} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlHeroic} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamHeroic} van maximale gezondheid. De eerste slag van elke storm raakt in plaats daarvan voor {openingSlamHeroic}. Grafbreker wordt {rearm} sec na het einde opnieuw geactiveerd.",
+        "boneStormSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyNormal} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlNormal} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamNormal} van maximale gezondheid. Grafbreker wordt {rearm} sec na het einde opnieuw geactiveerd.",
+        "boneStormHeroicSummary": "Vanaf {first} sec in Koningswoede en daarna elke {everyHeroic} sec begint Nythraxis {duration} sec lang Beenderstorm. Hij negeert dreiging, beweegt {speed} keer zo snel als normaal en doet {charges} charges van elk {chargeSeconds} sec. Zijn werveling richt elke seconde binnen {radius} yd {whirlHeroic} van maximale gezondheid aan. Elke charge eindigt in een Beenderslag binnen dezelfde straal voor {slamHeroic} van maximale gezondheid. Grafbreker wordt {rearm} sec na het einde opnieuw geactiveerd.",
         "boneStormResponse": "Verspreid je en blijf wegrennen van Nythraxis. De gechargede raider rent weg terwijl iedereen ruimte vrijlaat rond het chargepad, daarna pakken de tanks hem op wanneer de storm eindigt.",
         "crownEnduresName": "De Kroon houdt stand",
         "crownEnduresSummary": "Op {enrageNormal} sec vanaf de pull (de klok pauzeert terwijl Broeder Aldric bij 70% binnenkomt) activeert De Kroon houdt stand als harde razernij. Nythraxis krijgt {damage} meer schade en {haste} snellere aanvallen, daarna elke {rampEveryNormal} sec nog eens {rampStep} schade. Er is geen timerbalk. Waarschuwingen komen als kreten bij {warn60}, {warn30} en {warn10} sec resterend.",
@@ -6969,7 +6969,7 @@ export const nl_NL: EnTranslations = {
     "home": {
       "eyebrow": "Klassieke MMO in je browser",
       "title": "World of ClaudeCraft",
-      "subtitle": "Quest, sluit je aaneen en verken een handgebouwde wereld, gratis in je browser.",
+      "subtitle": "Verken de wereld, voltooi quests en trotseer dungeons met vrienden.",
       "ctaPlay": "Speel nu",
       "ctaLearn": "Hoe te spelen",
       "what": {
@@ -9610,8 +9610,8 @@ export const nl_NL: EnTranslations = {
     "viewAll": "Bekijk alle updates op GitHub"
   },
   "download": {
-    "title": "Desktop-launcher downloaden",
-    "desc": "Download de losse launcher voor optimale prestaties en schermvullend spelen.",
+    "title": "Download de desktop-app",
+    "desc": "Speel op Windows, macOS of Linux met hetzelfde account en dezelfde personages.",
     "macCta": "Download voor macOS",
     "windowsCta": "Downloaden voor Windows",
     "linuxCta": "Downloaden voor Linux",
@@ -9630,7 +9630,7 @@ export const nl_NL: EnTranslations = {
     "offlineDesc": "Direct een singleplayer-wereld in je browser. Er wordt niets opgeslagen: perfect voor een snel gevecht of om te testen.",
     "offlineAria": "Offline Spelen: start direct een lokale singleplayer-sessie",
     "tipTitle": "TIP:",
-    "tipText": "Voor de soepelste ervaring kun je adblocker-extensies op deze site uitschakelen. Volgens meldingen uit de community kunnen sommige blockers vertraging veroorzaken.",
+    "tipText": "Loopt het spel traag? Probeer je adblocker voor deze site uit te schakelen.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Spelen",
@@ -10798,15 +10798,23 @@ export const nl_NL: EnTranslations = {
       "dodge": "ONTWEKEN!"
     }
   },
+  "landing": {
+    "headline": "Op avontuur met vrienden.",
+    "contribute": "Draag bij aan het spel",
+    "tools": "Hulpmiddelen",
+    "records": "WoC-records",
+    "scout": "WoC-verkenner",
+    "parseService": "WoC-parseservice"
+  },
   "seo": {
     "title": "World of ClaudeCraft: Web-MMO in Klassieke Stijl",
-    "description": "Begin aan een episch avontuur in World of ClaudeCraft, een micro-MMO in klassieke stijl die je rechtstreeks in je browser kunt spelen. Sluit je aan bij een blijvende gedeelde wereld, level je klassen op en versla vijanden!",
+    "description": "Speel World of ClaudeCraft, een gratis browser-MMO. Verken de wereld, voltooi quests en trotseer dungeons met vrienden. Geen download nodig.",
     "genre": "MMORPG",
     "playMode": "Multiplayer",
     "applicationCategory": "Spel",
     "operatingSystem": "Webbrowser",
     "officialLabel": "Officiële website van World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com is de officiële gratis browser-MMO voor de Claudemoon-wereld. Speel online met een blijvend personage, verken solo offline, lees de wiki en volg geverifieerde communitylinks vanaf deze site."
+    "officialBody": "De officiële website van World of ClaudeCraft. Speel online, lees de wiki en vind hier de communitylinks."
   },
   "a11y": {
     "goHome": "Ga naar de startpagina",

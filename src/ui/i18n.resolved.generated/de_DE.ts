@@ -3859,8 +3859,8 @@ export const de_DE: EnTranslations = {
         "kingsWrathSummary": "Nythraxis verursacht auf Normal {bonusNormal} mehr Schaden oder auf Heroisch {bonusHeroic} für den Rest des Kampfes. Graberuption tritt alle {eruptionEveryNormal} Sek. auf ({eruptionEveryHeroic} auf Heroisch).",
         "kingsWrathResponse": "Nutzt verbleibende defensive Abklingzeiten für unvermeidbaren Schaden. Haltet jede frühere Mechanik sauber, während der Schlachtzug den Kampf beendet.",
         "boneStormName": "Knochensturm",
-        "boneStormSummary": "Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyNormal} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlNormal} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamNormal} der maximalen Gesundheit. Der erste Schlag jedes Sturms trifft stattdessen für {openingSlamNormal}. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.",
-        "boneStormHeroicSummary": "Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Der erste Schlag jedes Sturms trifft stattdessen für {openingSlamHeroic}. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.",
+        "boneStormSummary": "Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyNormal} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlNormal} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamNormal} der maximalen Gesundheit. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.",
+        "boneStormHeroicSummary": "Ab {first} Sek. nach Beginn von Zorn des Königs und danach alle {everyHeroic} Sek. beginnt Nythraxis {duration} Sek. lang Knochensturm. Er ignoriert Bedrohung, bewegt sich {speed}-mal so schnell wie normal und führt {charges} Anstürme aus, die jeweils {chargeSeconds} Sek. dauern. Sein Wirbel verursacht jede Sekunde innerhalb von {radius} yd {whirlHeroic} der maximalen Gesundheit. Jeder Ansturm endet mit einem Knochenschlag im selben Radius für {slamHeroic} der maximalen Gesundheit. Grabbrecher wird {rearm} Sek. nach seinem Ende wieder bereit.",
         "boneStormResponse": "Verteilt Euch und lauft weiter vor Nythraxis weg. Der anvisierte Schlachtzügler läuft davon, während alle anderen Platz um die Ansturmroute lassen. Danach nehmen die Tanks ihn wieder auf.",
         "crownEnduresName": "Die Krone hält stand",
         "crownEnduresSummary": "Bei {enrageNormal} Sek. nach Kampfbeginn (die Uhr pausiert, während Bruder Aldric bei 70% eintritt) löst Die Krone hält stand eine harte Raserei aus. Nythraxis erhält {damage} mehr Schaden und {haste} schnellere Angriffe, danach alle {rampEveryNormal} Sek. weitere {rampStep} Schaden. Es gibt keine Timerleiste. Warnungen kommen als Rufe bei {warn60}, {warn30} und {warn10} Sek. verbleibend.",
@@ -6969,7 +6969,7 @@ export const de_DE: EnTranslations = {
     "home": {
       "eyebrow": "Browser-MMO im klassischen Stil",
       "title": "World of ClaudeCraft",
-      "subtitle": "Erfülle Quests, schließe dich mit anderen zusammen und erkunde eine handgebaute Welt, kostenlos in deinem Browser.",
+      "subtitle": "Erkunde die Welt, nimm Quests an und meistere Dungeons mit Freunden.",
       "ctaPlay": "Jetzt spielen",
       "ctaLearn": "So wird gespielt",
       "what": {
@@ -9610,8 +9610,8 @@ export const de_DE: EnTranslations = {
     "viewAll": "Alle Updates auf GitHub ansehen"
   },
   "download": {
-    "title": "Desktop-Launcher herunterladen",
-    "desc": "Hol dir den eigenständigen Launcher für optimierte Leistung und Vollbildspiel.",
+    "title": "Desktop-App herunterladen",
+    "desc": "Spiele auf Windows, macOS oder Linux mit demselben Konto und denselben Charakteren.",
     "macCta": "Download fuer macOS",
     "windowsCta": "Für Windows herunterladen",
     "linuxCta": "Für Linux herunterladen",
@@ -9630,7 +9630,7 @@ export const de_DE: EnTranslations = {
     "offlineDesc": "Sofortige Einzelspielerwelt in deinem Browser. Es wird nichts gespeichert: perfekt für einen schnellen Kampf oder zum Testen.",
     "offlineAria": "Offline spielen: Starte eine sofortige lokale Einzelspielersitzung",
     "tipTitle": "TIPP:",
-    "tipText": "Deaktiviere für das flüssigste Spielerlebnis Adblocker-Erweiterungen auf dieser Website. Community-Berichte zeigen, dass einige Blocker zu Verzögerungen führen können.",
+    "tipText": "Läuft das Spiel langsam? Deaktiviere testweise deinen Werbeblocker für diese Website.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Spielen",
@@ -10798,15 +10798,23 @@ export const de_DE: EnTranslations = {
       "dodge": "AUSGEWICHEN!"
     }
   },
+  "landing": {
+    "headline": "Abenteuer mit Freunden.",
+    "contribute": "Zum Spiel beitragen",
+    "tools": "Werkzeuge",
+    "records": "WoC Rekorde",
+    "scout": "WoC Späher",
+    "parseService": "WoC Parse-Service"
+  },
   "seo": {
     "title": "World of ClaudeCraft: Klassisches Web-MMO",
-    "description": "Begib dich in World of ClaudeCraft auf ein episches Abenteuer, ein Micro-MMO im klassischen Stil direkt im Browser. Tritt einer dauerhaften, gemeinsamen Welt bei, steigere Klassen und besiege Gegner.",
+    "description": "Spiele World of ClaudeCraft, ein kostenloses Browser-MMO. Erkunde die Welt, erfülle Quests und bestreite Dungeons mit Freunden. Kein Download nötig.",
     "genre": "MMORPG",
     "playMode": "Mehrspieler",
     "applicationCategory": "Spiel",
     "operatingSystem": "Webbrowser",
     "officialLabel": "Offizielle Website von World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com ist das offizielle kostenlose Browser-MMO für die Welt Claudemoon. Spiele online mit einem dauerhaften Charakter, erkunde solo offline, lies das Wiki und folge den verifizierten Community-Links auf dieser Website."
+    "officialBody": "Die offizielle Website von World of ClaudeCraft. Spiele online, lies das Wiki und finde hier die Community-Links."
   },
   "a11y": {
     "goHome": "Zur Startseite",

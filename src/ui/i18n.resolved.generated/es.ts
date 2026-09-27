@@ -3859,8 +3859,8 @@ export const es: EnTranslations = {
         "kingsWrathSummary": "Nythraxis deals {bonusNormal} more damage on Normal or {bonusHeroic} on Heroic for the rest of the fight. Grave Eruption occurs every {eruptionEveryNormal} sec ({eruptionEveryHeroic} on Heroic).",
         "kingsWrathResponse": "Usa los tiempos de reutilización defensivos restantes para el daño inevitable. Mantén limpias todas las mecánicas anteriores mientras la banda termina el combate.",
         "boneStormName": "Tormenta ósea",
-        "boneStormSummary": "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
-        "boneStormHeroicSummary": "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
+        "boneStormSummary": "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
+        "boneStormHeroicSummary": "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
         "boneStormResponse": "Dispersaos y seguid corriendo para alejaros de Nythraxis. El miembro cargado huye mientras los demás dejan espacio alrededor de la trayectoria de la carga; luego los tanques lo recogen cuando termina la tormenta.",
         "crownEnduresName": "La Corona perdura",
         "crownEnduresSummary": "A los {enrageNormal} s desde el pull (el reloj se pausa mientras el hermano Aldric entra al 70%), La Corona perdura se activa como un enfurecimiento rígido. Nythraxis gana {damage} más de daño y ataques {haste} más rápidos, y luego otro {rampStep} de daño cada {rampEveryNormal} s. No hay barra de temporizador. Los avisos llegan como gritos cuando quedan {warn60}, {warn30} y {warn10} s.",
@@ -6969,7 +6969,7 @@ export const es: EnTranslations = {
     "home": {
       "eyebrow": "MMO de navegador de estilo clásico",
       "title": "World of ClaudeCraft",
-      "subtitle": "Haz misiones, forma grupo y explora un mundo hecho a mano, gratis en tu navegador.",
+      "subtitle": "Explora el mundo, acepta misiones y supera mazmorras con amigos.",
       "ctaPlay": "Jugar ahora",
       "ctaLearn": "Cómo jugar",
       "what": {
@@ -9610,8 +9610,8 @@ export const es: EnTranslations = {
     "viewAll": "Ver todas las actualizaciones en GitHub"
   },
   "download": {
-    "title": "Descargar Lanzador de Escritorio",
-    "desc": "Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa.",
+    "title": "Descarga la app de escritorio",
+    "desc": "Juega en Windows, macOS o Linux con la misma cuenta y los mismos personajes.",
     "macCta": "Descargar para macOS",
     "windowsCta": "Descargar para Windows",
     "linuxCta": "Descargar para Linux",
@@ -9630,7 +9630,7 @@ export const es: EnTranslations = {
     "offlineDesc": "Mundo instantáneo en solitario en tu navegador. Nada se guarda: perfecto para una pelea rápida o pruebas.",
     "offlineAria": "Jugar en Solitario: inicia una sesión local instantánea de un jugador",
     "tipTitle": "CONSEJO:",
-    "tipText": "Para la mejor experiencia, desactiva las extensiones de bloqueo de publicidad en este sitio. Reportes de la comunidad encontraron que algunos bloqueadores pueden causar retrasos.",
+    "tipText": "¿El juego va lento? Prueba a desactivar tu bloqueador de anuncios en este sitio.",
     "serverOnline": "En Línea",
     "serverOffline": "Desconectado",
     "play": "Jugar",
@@ -10798,15 +10798,23 @@ export const es: EnTranslations = {
       "dodge": "¡ESQUIVA!"
     }
   },
+  "landing": {
+    "headline": "Vive la aventura con amigos.",
+    "contribute": "Contribuye al juego",
+    "tools": "Herramientas",
+    "records": "WoC Récords",
+    "scout": "WoC Explorador",
+    "parseService": "Servicio de parses de WoC"
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web de estilo clásico",
-    "description": "Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico que se juega directamente en el navegador. Entra a un mundo compartido, sube de nivel y derrota enemigos.",
+    "description": "Juega a World of ClaudeCraft, un MMO de navegador gratuito. Explora, completa misiones y recorre mazmorras con amigos. Sin descargas.",
     "genre": "MMORPG",
     "playMode": "Multijugador",
     "applicationCategory": "Juego",
     "operatingSystem": "Navegador web",
     "officialLabel": "Sitio web oficial de World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com es el MMO de navegador gratuito oficial del mundo Claudemoon. Juega en línea con un personaje persistente, explora en solitario sin conexión, lee la wiki y sigue los enlaces comunitarios verificados desde este sitio."
+    "officialBody": "El sitio oficial de World of ClaudeCraft. Juega en línea, lee la wiki y encuentra aquí los enlaces de la comunidad."
   },
   "a11y": {
     "goHome": "Ir a la página principal",

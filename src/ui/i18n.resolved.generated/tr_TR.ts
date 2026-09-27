@@ -3859,8 +3859,8 @@ export const tr_TR: EnTranslations = {
         "kingsWrathSummary": "Nythraxis savaşın kalanı boyunca Normal’de {bonusNormal}, Heroic’te {bonusHeroic} daha fazla hasar verir. Mezar Patlaması her {eruptionEveryNormal} sn ({eruptionEveryHeroic} Heroic’te) olur.",
         "kingsWrathResponse": "Kaçınılmaz hasar için kalan savunma bekleme sürelerini kullanın. Akın savaşı bitirirken önceki her mekaniği temiz tutun.",
         "boneStormName": "Kemik Fırtınası",
-        "boneStormSummary": "Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyNormal} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlNormal} kadarını verir. Her hücum aynı yarıçapta azami canın {slamNormal} kadarıyla Kemik Çarpmasıyla biter. Her fırtınanın ilk çarpması bunun yerine {openingSlamNormal} kadar vurur. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.",
-        "boneStormHeroicSummary": "Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyHeroic} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlHeroic} kadarını verir. Her hücum aynı yarıçapta azami canın {slamHeroic} kadarıyla Kemik Çarpmasıyla biter. Her fırtınanın ilk çarpması bunun yerine {openingSlamHeroic} kadar vurur. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.",
+        "boneStormSummary": "Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyNormal} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlNormal} kadarını verir. Her hücum aynı yarıçapta azami canın {slamNormal} kadarıyla Kemik Çarpmasıyla biter. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.",
+        "boneStormHeroicSummary": "Kralın Gazabı başladıktan {first} sn sonra ve ardından her {everyHeroic} sn, Nythraxis {duration} sn süren Kemik Fırtınası başlatır. Tehdidi yok sayar, normal hızın {speed} katıyla hareket eder ve her biri {chargeSeconds} sn süren {charges} hücum yapar. Girdabı {radius} yd içinde her saniye azami canın {whirlHeroic} kadarını verir. Her hücum aynı yarıçapta azami canın {slamHeroic} kadarıyla Kemik Çarpmasıyla biter. Fırtına bittikten {rearm} sn sonra Mezarparçalayan yeniden hazır olur.",
         "boneStormResponse": "Dağılın ve Nythraxis’ten koşmayı sürdürün. Hedef alınan akıncı kaçar, diğer herkes hücum yolunun çevresinde boşluk bırakır; fırtına bitince tanklar onu geri alır.",
         "crownEnduresName": "Taç Dayanır",
         "crownEnduresSummary": "Çekişten {enrageNormal} sn sonra (Birader Aldric 70%’te girerken saat durur), Taç Dayanır sert öfke olarak tetiklenir. Nythraxis {damage} daha fazla hasar ve %{haste} daha hızlı saldırılar kazanır, sonra her {rampEveryNormal} sn ek {rampStep} hasar alır. Zamanlayıcı çubuğu yoktur. Uyarılar kalan {warn60}, {warn30} ve {warn10} sn’de bağırış olarak gelir.",
@@ -6969,7 +6969,7 @@ export const tr_TR: EnTranslations = {
     "home": {
       "eyebrow": "Klasik tarz tarayıcı MMO'su",
       "title": "World of ClaudeCraft",
-      "subtitle": "Görev yap, grup kur ve elle kurulmuş bir dünyayı keşfet; tarayıcında ücretsiz.",
+      "subtitle": "Dünyayı keşfet, görevler üstlen ve arkadaşlarınla zindanlara gir.",
       "ctaPlay": "Şimdi Oyna",
       "ctaLearn": "Nasıl Oynanır",
       "what": {
@@ -9610,8 +9610,8 @@ export const tr_TR: EnTranslations = {
     "viewAll": "GitHub'daki tüm güncellemeleri görüntüle"
   },
   "download": {
-    "title": "Masaüstü Başlatıcısını İndir",
-    "desc": "Optimize edilmiş performans ve tam ekran oyun için bağımsız başlatıcıyı edinin.",
+    "title": "Masaüstü uygulamasını indir",
+    "desc": "Aynı hesap ve karakterlerle Windows, macOS veya Linux'ta oyna.",
     "macCta": "macOS için indir",
     "windowsCta": "Windows için indirin",
     "linuxCta": "Linux için indirin",
@@ -9630,7 +9630,7 @@ export const tr_TR: EnTranslations = {
     "offlineDesc": "Tarayıcınızda anında tek oyunculu dünya. Hiçbir şey kaydedilmez: hızlı bir kapışma veya test için ideal.",
     "offlineAria": "Çevrimdışı Oyna: anında yerel tek oyunculu oturum başlat",
     "tipTitle": "İPUCU:",
-    "tipText": "En akıcı deneyim için bu sitedeki reklam engelleyici eklentileri kapat. Topluluk bildirimlerine göre bazı engelleyiciler takılmaya yol açabiliyor.",
+    "tipText": "Oyun yavaş mı çalışıyor? Bu site için reklam engelleyicini kapatmayı dene.",
     "serverOnline": "Çevrimiçi",
     "serverOffline": "Çevrimdışı",
     "play": "Oyna",
@@ -10798,15 +10798,23 @@ export const tr_TR: EnTranslations = {
       "dodge": "SAVUŞTURMA!"
     }
   },
+  "landing": {
+    "headline": "Arkadaşlarınla maceraya atıl.",
+    "contribute": "Oyuna katkıda bulun",
+    "tools": "Araçlar",
+    "records": "WoC Rekorlar",
+    "scout": "WoC Keşif",
+    "parseService": "WoC Parse Servisi"
+  },
   "seo": {
     "title": "World of ClaudeCraft: Klasik Tarzı Web MMO'su",
-    "description": "Doğrudan tarayıcında oynanabilen klasik tarzı bir mikro MMO olan World of ClaudeCraft'ta destansı bir maceraya atıl. Kalıcı bir ortak dünyaya katıl, sınıfları geliştir ve düşmanları alt et!",
+    "description": "Ücretsiz bir tarayıcı MMO'su olan World of ClaudeCraft'ı oyna. Keşfet, görevleri tamamla ve arkadaşlarınla zindanlara gir. İndirmeye gerek yok.",
     "genre": "MMORPG",
     "playMode": "Çok Oyunculu",
     "applicationCategory": "Oyun",
     "operatingSystem": "Web tarayıcısı",
     "officialLabel": "Resmi World of ClaudeCraft web sitesi",
-    "officialBody": "worldofclaudecraft.com, Claudemoon dünyasının resmi ücretsiz tarayıcı MMO'sudur. Kalıcı bir karakterle çevrimiçi oyna, çevrimdışı tek başına keşfet, wiki'yi oku ve bu siteden doğrulanmış topluluk bağlantılarını takip et."
+    "officialBody": "World of ClaudeCraft'ın resmi sitesi. Çevrimiçi oyna, wiki'yi oku ve topluluk bağlantılarını burada bul."
   },
   "a11y": {
     "goHome": "Ana sayfaya git",

@@ -85,6 +85,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.ferry.sailing': '正在驶往{dest}',
   'hudChrome.noticeboard.officerEntry': '{name}（{rank}）',
   'hudChrome.professionTrainers.nameplate': '＜{title}＞',
+  'landing.contribute': '参与游戏开发',
+  'landing.headline': '与好友一起冒险。',
+  'landing.tools': '工具',
+  'landing.records': 'WoC 记录',
+  'landing.scout': 'WoC 侦察',
+  'landing.parseService': 'WoC 战斗日志',
   'guide.professions.endgameBodyRaidCollections':
     '大师锻造是带有“唯一装备：大师锻造”标记的共同装备家族。旧有的巅峰制作路线仍需寻找图样、制作每日限次的中间材料，并消耗共同的终局材料。熔炉套装则是由团队副本材料支持的独立路线，并非在旧路线之上再加一套费用。两条路线共用最多穿戴两件的限制，因此会竞争配装中的同两个位置。成品在臻至完美或委托绑定该件物品之前都可自由交易。',
   'guide.professions.endgamePatternsBodyCollections':
@@ -1243,8 +1249,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetAnnounce': '目标：{name}',
   'hudChrome.unitFrame.targetLabel': '你的目标',
   'seo.officialLabel': 'World of ClaudeCraft 官方网站',
-  'seo.officialBody':
-    'worldofclaudecraft.com 是 Claudemoon 世界的官方免费浏览器 MMO。你可以用持久角色在线游玩，也可以离线单人探索，阅读 wiki，并从本站访问已验证的社区链接。',
+  'seo.officialBody': 'World of ClaudeCraft 官方网站。在线游玩、阅读 wiki，并在此找到社区链接。',
   'hudChrome.questShare.notShareable': '该任务无法分享。',
   'hudChrome.questShare.notInSharerParty': '你必须在 {name} 的队伍中才能接受该任务。',
   'hudChrome.questShare.accepted': '{name} 接受了你分享的任务。',
@@ -2179,13 +2184,13 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'wiki.desc': '探索世界的秘密、职业指南以及战术策略。',
   'news.title': '新闻与更新说明',
   'news.desc': '阅读最新补丁说明、游戏内事件和社区动态。',
-  'download.title': '下载电脑版启动器',
+  'download.title': '下载电脑版应用',
   'download.macCta': '下载 macOS 版',
   'download.linuxCta': '下载 Linux 版',
   'download.linuxHint': 'AppImage 格式：赋予可执行权限后直接运行，无需安装。',
   'download.windowsCta': '下载 Windows 版',
   'download.windowsPending': 'Windows 版本即将推出。',
-  'download.desc': '获取独立启动器，以获得更优化的性能和全屏游戏体验。',
+  'download.desc': '使用同一账号和角色，在 Windows、macOS 或 Linux 上游玩。',
   'comingSoon.placeholder': '敬请期待...',
   'comingSoon.featureComingSoon': '该功能即将上线，敬请期待。',
   'mode.onlineTitle': '在线游玩',
@@ -2195,8 +2200,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'mode.offlineDesc': '在浏览器中直接开启单人世界。所有数据均不保存：非常适合快速试玩或功能测试。',
   'mode.offlineAria': '单机试玩：直接开始本地单人游戏会话',
   'mode.tipTitle': '提示：',
-  'mode.tipText':
-    '为了获得最流畅的游玩体验，请在此网站上关闭广告拦截插件。根据社区反馈，部分拦截器可能会导致游戏卡顿。',
+  'mode.tipText': '游戏运行缓慢？试试为本站关闭广告拦截器。',
   'auth.enterRealm': '进入服务器',
   'auth.username': '用户名',
   'auth.usernameError': '请输入用户名。',
@@ -2457,7 +2461,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'controls.chat': '打开聊天框',
   'seo.title': 'World of ClaudeCraft：经典风格网页 MMO',
   'seo.description':
-    '在 World of ClaudeCraft 展开史诗冒险。这是一款可直接在浏览器中游玩的经典风格微型 MMO。加入持续共享的世界，提升职业等级，击败敌人！',
+    '畅玩 World of ClaudeCraft，一款免费的浏览器 MMO。探索世界、完成任务，与好友一起挑战地下城。无需下载。',
   'seo.genre': 'MMORPG',
   'seo.playMode': '多人游戏',
   'seo.applicationCategory': '游戏',
@@ -6967,7 +6971,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.language.select': '选择语言',
   'guide.home.eyebrow': '经典风格浏览器 MMO',
   'guide.home.title': 'World of ClaudeCraft',
-  'guide.home.subtitle': '在你的浏览器中免费接受任务、组队、探索一个纯手工打造的世界。',
+  'guide.home.subtitle': '探索世界、接受任务，与好友一起挑战地下城。',
   'guide.home.ctaPlay': '立即游玩',
   'guide.home.ctaLearn': '游戏入门',
   'guide.home.what.heading': '易于上手的经典 MMO',
@@ -8651,9 +8655,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '使用剩余的防御技能应对无法躲避的伤害。在团队结束战斗前，继续干净地应对此前的所有机制。',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': '白骨风暴',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    '国王之怒开始后 {first} 秒，以及此后每隔 {everyNormal} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlNormal} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamNormal} 最大生命值的伤害。每场风暴的第一次重击改为造成 {openingSlamNormal}。碎墓打击会在风暴结束 {rearm} 秒后重新启用。',
+    '国王之怒开始后 {first} 秒，以及此后每隔 {everyNormal} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlNormal} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamNormal} 最大生命值的伤害。碎墓打击会在风暴结束 {rearm} 秒后重新启用。',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    '国王之怒开始后 {first} 秒，以及此后每隔 {everyHeroic} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlHeroic} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamHeroic} 最大生命值的伤害。每场风暴的第一次重击改为造成 {openingSlamHeroic}。碎墓打击会在风暴结束 {rearm} 秒后重新启用。',
+    '国王之怒开始后 {first} 秒，以及此后每隔 {everyHeroic} 秒，尼思拉克西斯都会开始持续 {duration} 秒的白骨风暴。此时他无视仇恨，以 {speed} 倍常速移动，并发起 {charges} 次冲锋，每次持续 {chargeSeconds} 秒。他的旋转攻击会在 {radius} 码内每秒造成 {whirlHeroic} 最大生命值的伤害。每次冲锋都会以一次白骨重击结束，在相同范围内造成 {slamHeroic} 最大生命值的伤害。碎墓打击会在风暴结束 {rearm} 秒后重新启用。',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     '分散站位并持续远离尼思拉克西斯。被冲锋锁定的队员应逃离，其他人则为冲锋路径留出空间，风暴结束后由坦克重新接回仇恨。',
   'hudChrome.raidBossGuide.nythraxis.crownEnduresName': '王冠不朽',

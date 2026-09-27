@@ -3859,8 +3859,8 @@ export const zh_TW: EnTranslations = {
         "kingsWrathSummary": "尼思拉克西斯此後在普通難度造成{bonusNormal}更多傷害，英雄難度則為{bonusHeroic}，直到戰鬥結束。墓穴爆發每{eruptionEveryNormal}秒發生一次（英雄難度{eruptionEveryHeroic}秒）。",
         "kingsWrathResponse": "為無法避免的傷害使用剩餘的防禦技能冷卻。在團隊結束這場戰鬥前，持續乾淨地應對先前所有機制。",
         "boneStormName": "骨風暴",
-        "boneStormSummary": "自國王之怒開始後{first}秒，以及此後每{everyNormal}秒，尼思拉克西斯都會展開持續{duration}秒的骨風暴。他會無視仇恨，以{speed}倍的正常速度移動，並進行{charges}次各持續{chargeSeconds}秒的衝撞。他的橫掃每秒對{radius}碼內造成相當於最大生命值{whirlNormal}的傷害。每次衝撞結束時都會在同樣範圍內施展骨擊，造成相當於最大生命值{slamNormal}的傷害。每場風暴的第一次骨擊改為造成{openingSlamNormal}。他會在風暴結束{rearm}秒後重新啟用碎墓打擊。",
-        "boneStormHeroicSummary": "自國王之怒開始後{first}秒，以及此後每{everyHeroic}秒，尼思拉克西斯都會展開持續{duration}秒的骨風暴。他會無視仇恨，以{speed}倍的正常速度移動，並進行{charges}次各持續{chargeSeconds}秒的衝撞。他的橫掃每秒對{radius}碼內造成相當於最大生命值{whirlHeroic}的傷害。每次衝撞結束時都會在同樣範圍內施展骨擊，造成相當於最大生命值{slamHeroic}的傷害。每場風暴的第一次骨擊改為造成{openingSlamHeroic}。他會在風暴結束{rearm}秒後重新啟用碎墓打擊。",
+        "boneStormSummary": "自國王之怒開始後{first}秒，以及此後每{everyNormal}秒，尼思拉克西斯都會展開持續{duration}秒的骨風暴。他會無視仇恨，以{speed}倍的正常速度移動，並進行{charges}次各持續{chargeSeconds}秒的衝撞。他的橫掃每秒對{radius}碼內造成相當於最大生命值{whirlNormal}的傷害。每次衝撞結束時都會在同樣範圍內施展骨擊，造成相當於最大生命值{slamNormal}的傷害。他會在風暴結束{rearm}秒後重新啟用碎墓打擊。",
+        "boneStormHeroicSummary": "自國王之怒開始後{first}秒，以及此後每{everyHeroic}秒，尼思拉克西斯都會展開持續{duration}秒的骨風暴。他會無視仇恨，以{speed}倍的正常速度移動，並進行{charges}次各持續{chargeSeconds}秒的衝撞。他的橫掃每秒對{radius}碼內造成相當於最大生命值{whirlHeroic}的傷害。每次衝撞結束時都會在同樣範圍內施展骨擊，造成相當於最大生命值{slamHeroic}的傷害。他會在風暴結束{rearm}秒後重新啟用碎墓打擊。",
         "boneStormResponse": "分散站位並持續遠離尼思拉克西斯。被鎖定衝撞的團員應遠離逃跑，其餘人則在衝撞路徑周圍留出空間，風暴結束後由坦克接回仇恨。",
         "crownEnduresName": "王冠永存",
         "crownEnduresSummary": "從開戰起算{enrageNormal}秒後（在奧德里克修士於70%生命值進場期間，計時會暫停），王冠永存會觸發成硬狂暴。尼思拉克西斯獲得{damage}更多傷害與{haste}更快的攻擊速度，此後每{rampEveryNormal}秒再增加{rampStep}傷害。畫面上沒有計時條，警告會以喊話形式在剩餘{warn60}、{warn30}與{warn10}秒時發出。",
@@ -6969,7 +6969,7 @@ export const zh_TW: EnTranslations = {
     "home": {
       "eyebrow": "經典風格的瀏覽器MMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "在你的瀏覽器中免費進行任務、組隊並探索一個精心打造的世界。",
+      "subtitle": "探索世界、接受任務，與好友一起挑戰地下城。",
       "ctaPlay": "立即遊玩",
       "ctaLearn": "如何遊玩",
       "what": {
@@ -9610,8 +9610,8 @@ export const zh_TW: EnTranslations = {
     "viewAll": "在 GitHub 上查看全部更新"
   },
   "download": {
-    "title": "下載電腦版啟動器",
-    "desc": "獲取獨立啟動器，以獲得更優化的效能和全螢幕遊戲體驗。",
+    "title": "下載電腦版應用程式",
+    "desc": "使用同一個帳號和角色，在 Windows、macOS 或 Linux 上遊玩。",
     "macCta": "下載 macOS 版",
     "windowsCta": "下載 Windows 版",
     "linuxCta": "下載 Linux 版",
@@ -9630,7 +9630,7 @@ export const zh_TW: EnTranslations = {
     "offlineDesc": "在瀏覽器中直接開啟單人世界。所有數據均不保存：非常適合快速試玩或功能測試。",
     "offlineAria": "單機試玩：直接開始本地單人遊戲會話",
     "tipTitle": "提示：",
-    "tipText": "為了獲得最流暢的遊玩體驗，請在此網站上關閉廣告攔截外掛。根據社群回饋，部分攔截器可能會導致遊戲延遲。",
+    "tipText": "遊戲執行緩慢？試試為本站關閉廣告攔截器。",
     "serverOnline": "線上",
     "serverOffline": "離線",
     "play": "開始遊戲",
@@ -10798,15 +10798,23 @@ export const zh_TW: EnTranslations = {
       "dodge": "閃躲！"
     }
   },
+  "landing": {
+    "headline": "與好友一起冒險。",
+    "contribute": "參與遊戲開發",
+    "tools": "工具",
+    "records": "WoC 紀錄",
+    "scout": "WoC 偵察",
+    "parseService": "WoC 戰鬥紀錄"
+  },
   "seo": {
     "title": "World of ClaudeCraft：經典風格網頁 MMO",
-    "description": "在 World of ClaudeCraft 展開史詩冒險。這是一款可直接在瀏覽器中遊玩的經典風格微型 MMO。加入持續共享的世界，提升職業等級並擊敗敵人！",
+    "description": "暢玩 World of ClaudeCraft，一款免費的瀏覽器 MMO。探索世界、完成任務，與好友一起挑戰地下城。無需下載。",
     "genre": "MMORPG",
     "playMode": "多人遊戲",
     "applicationCategory": "遊戲",
     "operatingSystem": "網頁瀏覽器",
     "officialLabel": "World of ClaudeCraft 官方網站",
-    "officialBody": "worldofclaudecraft.com 是 Claudemoon 世界的官方免費瀏覽器 MMO。你可以用持久角色線上遊玩，也可以離線單人探索、閱讀 wiki，並從本站前往已驗證的社群連結。"
+    "officialBody": "World of ClaudeCraft 官方網站。線上遊玩、閱讀 wiki，並在此找到社群連結。"
   },
   "a11y": {
     "goHome": "前往首頁",

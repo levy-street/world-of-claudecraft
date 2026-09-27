@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { STORE_PROMPT_HOST_ID } from '../src/ui/store_prompt_host';
 
 // Guard for the "deny toast / prompt renders behind an open window" bug class.
 //
@@ -70,7 +71,9 @@ describe('#error-msg always paints above any open window', () => {
 
 describe('#prompt-stack always paints above any open window', () => {
   it('the desktop base moved off the 80 mid-band value, above the 50-89 focus band', () => {
-    const z = zIndexOf(HUD_CSS, /#prompt-stack\s*\{[^}]*\}/);
+    // Anchored: "#store-prompt-stack {" (below) contains "#prompt-stack {" as a
+    // substring, and String.match takes the first hit in file order.
+    const z = zIndexOf(HUD_CSS, /(?<![-\w])#prompt-stack\s*\{[^}]*\}/);
     expect(z).toBe(90);
     expect(z).toBeGreaterThan(89);
   });
@@ -78,6 +81,72 @@ describe('#prompt-stack always paints above any open window', () => {
   it('the mobile override already clears every known tier (unchanged by this fix)', () => {
     const mobilePromptZ = zIndexOf(HUD_MOBILE_CSS, /body\.mobile-touch #prompt-stack\s*\{[^}]*\}/);
     expect(mobilePromptZ).toBe(120);
+  });
+});
+
+// The store purchase confirm's own stacking bug: #prompt-stack lives INSIDE
+// #ui, a position:fixed z-index:10 stacking context (base.css), while the
+// Armory and mount inspect overlays mount on <body> at 90. A z-index inside
+// #ui ranks against other #ui children only, so the store decision (96 in
+// #prompt-stack) painted UNDER the body-level inspector: the player clicked
+// Purchase and saw nothing, while the hidden prompt's focused Confirm still
+// took Enter. src/ui/store_prompt_host.ts moves that decision to a body-level
+// host, #store-prompt-stack, which must itself clear the inspector.
+const COMPONENTS_CSS = readFileSync(
+  fileURLToPath(new URL('../src/styles/components.css', import.meta.url)),
+  'utf8',
+);
+
+// Every selector below is built from the TS constant, so renaming the host id
+// cannot leave the CSS orphaned with green Node suites.
+const HOST = `#${STORE_PROMPT_HOST_ID}`;
+const HOST_BLOCK_RE = new RegExp(`${HOST}\\s*\\{[^}]*\\}`);
+const MOBILE_HOST_BLOCK_RE = new RegExp(`body\\.mobile-touch ${HOST}\\s*\\{[^}]*\\}`);
+const INSPECTOR_BLOCK_RE = /\.armory-inspect-overlay\s*\{[^}]*\}/;
+
+describe(`${HOST} paints above the body-level inspect overlays`, () => {
+  it('the desktop host is fixed against the viewport and outranks .armory-inspect-overlay (90)', () => {
+    const hostBlock = HUD_CSS.match(HOST_BLOCK_RE);
+    expect(hostBlock).not.toBeNull();
+    expect(hostBlock?.[0]).toMatch(/position:\s*fixed;/);
+    const hostZ = zIndexOf(HUD_CSS, HOST_BLOCK_RE);
+    const inspectorZ = zIndexOf(COMPONENTS_CSS, INSPECTOR_BLOCK_RE);
+    const uiZ = zIndexOf(BASE_CSS, /#ui\s*\{[^}]*\}/);
+    expect(inspectorZ).toBe(90);
+    // The premise: a #prompt-stack z-index cannot help, because #ui as a whole
+    // sits below the inspector.
+    expect(uiZ).toBeLessThan(inspectorZ);
+    expect(hostZ).toBeGreaterThan(inspectorZ);
+  });
+
+  it('the mobile host clears the inspector and the raised mobile-controls tiers (96)', () => {
+    const mobileHostZ = zIndexOf(HUD_MOBILE_CSS, MOBILE_HOST_BLOCK_RE);
+    // The inspector carries no mobile z-index override (hud.mobile.css only
+    // re-pads it), so its desktop 90 is the value in force on touch too; read
+    // it rather than assume it, and pin that no override has appeared.
+    const inspectorZ = zIndexOf(COMPONENTS_CSS, INSPECTOR_BLOCK_RE);
+    const mobileInspector = HUD_MOBILE_CSS.match(
+      /body\.mobile-touch \.armory-inspect-overlay\s*\{[^}]*\}/,
+    );
+    expect(mobileInspector).not.toBeNull();
+    expect(mobileInspector?.[0]).not.toMatch(/z-index/);
+    expect(mobileHostZ).toBeGreaterThan(inspectorZ);
+    // The raised mobile-controls tiers (the open menu strip, a touch item drag).
+    const raisedControls = HUD_MOBILE_CSS.match(/#mobile-controls[^{]*\{[^}]*z-index:\s*96/);
+    expect(raisedControls).not.toBeNull();
+    expect(mobileHostZ).toBeGreaterThan(96);
+  });
+
+  it('the store prompt geometry reset and the mobile result hit shield apply in either host', () => {
+    const either = `:is\\(#prompt-stack, ${HOST}\\)`;
+    expect(COMPONENTS_CSS).toMatch(
+      new RegExp(`${either} \\.woc-store-prompt\\s*\\{[^}]*position:\\s*relative;`),
+    );
+    expect(COMPONENTS_CSS).toMatch(
+      new RegExp(
+        `body\\.mobile-touch ${either} \\.woc-store-global-result\\s*\\{[^}]*pointer-events:\\s*auto;`,
+      ),
+    );
   });
 });
 

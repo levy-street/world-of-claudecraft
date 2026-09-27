@@ -142,7 +142,7 @@ export const guideStrings = {
   home: {
     eyebrow: 'Classic-style browser MMO',
     title: 'World of ClaudeCraft',
-    subtitle: 'Quest, group up, and explore a hand-built world, free in your browser.',
+    subtitle: 'Explore the world, take on quests, and tackle dungeons with friends.',
     ctaPlay: 'Play Now',
     ctaLearn: 'How to Play',
 

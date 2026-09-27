@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const pl_PL: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Przygoda z przyjaciółmi.',
+  'landing.contribute': 'Współtwórz grę',
+  'landing.tools': 'Narzędzia',
+  'landing.records': 'WoC Rekordy',
+  'landing.scout': 'WoC Zwiadowca',
+  'landing.parseService': 'Serwis parsów WoC',
   'hud.errors.cannotCastWhileMoving': 'Nie możesz rzucać zaklęć podczas ruchu.',
   'hudChrome.auraEffect.wolfForm':
     'Postać kota: obrażenia w zwarciu i energia; prędkość ruchu zwiększona o {pct}%',
@@ -5399,8 +5405,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.objective': 'Cel',
   'delveUi.tracker.title': 'Wyprawa',
   'download.desc':
-    'Pobierz samodzielny launcher dla zoptymalizowanej wydajności i gry na pełnym ekranie.',
-  'download.title': 'Pobierz launcher na komputer',
+    'Graj na Windowsie, macOS lub Linuksie z tym samym kontem i tymi samymi postaciami.',
+  'download.title': 'Pobierz aplikację na komputer',
   'download.macCta': 'Pobierz dla macOS',
   'download.windowsPending': 'Build Windows w przygotowaniu.',
   'entities.abilities.adrenaline_rush.description':
@@ -7910,8 +7916,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'Rajd',
   'guide.home.group.sub':
     'Świat da się przejść w pojedynkę, ale najlepszy łup czeka na dobrą drużynę.',
-  'guide.home.subtitle':
-    'Wykonuj zadania, zbieraj drużynę i odkrywaj ręcznie tworzony świat, za darmo w przeglądarce.',
+  'guide.home.subtitle': 'Odkrywaj świat, wykonuj zadania i pokonuj lochy razem z przyjaciółmi.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Klasyczne MMO, stworzone, by od razu w nie zagrać',
   'guide.home.what.pillarClassesBody':
@@ -9777,8 +9782,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'mode.serverOffline': 'Offline',
   'mode.serverOfflineSub': 'Natychmiastowy lokalny świat',
   'mode.serverOnline': 'Online',
-  'mode.tipText':
-    'Aby zapewnić najpłynniejszą rozgrywkę, wyłącz rozszerzenia blokujące reklamy na tej stronie. Według zgłoszeń społeczności niektóre blokery mogą powodować opóźnienia.',
+  'mode.tipText': 'Gra działa wolno? Spróbuj wyłączyć blokowanie reklam na tej stronie.',
   'mode.tipTitle': 'WSKAZÓWKA:',
   'nav.about': 'O grze',
   'nav.account': 'Konto',
@@ -9932,10 +9936,10 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'realmTypes.rpPvp': 'RP-PvP',
   'seo.applicationCategory': 'Gra',
   'seo.description':
-    'Wyrusz na epicką przygodę w World of ClaudeCraft, klasycznym mikro-MMO grywalnym bezpośrednio w przeglądarce. Dołącz do trwałego wspólnego świata, rozwijaj klasy postaci i pokonuj wrogów!',
+    'Graj w World of ClaudeCraft, darmowe MMO w przeglądarce. Odkrywaj świat, wykonuj zadania i przemierzaj lochy z przyjaciółmi. Bez pobierania.',
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    'worldofclaudecraft.com to oficjalne, darmowe przeglądarkowe MMO dla świata Claudemoon. Graj online z trwałą postacią, eksploruj solo w trybie offline, czytaj wiki i śledź zweryfikowane linki społeczności z tej strony.',
+    'Oficjalna strona World of ClaudeCraft. Graj online, czytaj wiki i znajdź tu linki społeczności.',
   'seo.officialLabel': 'Oficjalna strona World of ClaudeCraft',
   'seo.operatingSystem': 'Przeglądarka internetowa',
   'seo.playMode': 'Wieloosobowy',
@@ -15836,12 +15840,12 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Co {everyNormal} sek. Nythraxis nadziewa {victimsNormal} rajderów innych niż jego obecny cel na Kościane Kolce. Nadziany rajder nie może działać i traci {drainNormal} maksymalnego zdrowia co sekundę, dopóki jego kolec nie zostanie zniszczony. Kolec rozpada się po {hitsNormal} trafieniach od kogokolwiek, niezależnie od zadanych obrażeń. Gracz, który został już nabity, nie może zostać wybrany ponownie przez {cooldown} s, dzięki czemu kolce rozkładają się na całą grupę rajdową.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyHeroic} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlHeroic} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamHeroic} maksymalnego zdrowia. Pierwsze uderzenie każdej burzy zadaje zamiast tego {openingSlamHeroic}. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
+    'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyHeroic} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlHeroic} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamHeroic} maksymalnego zdrowia. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Kościana Burza',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Rozproszcie się i stale uciekajcie przed Nythraxis. Szarżowany rajder ucieka, a wszyscy inni zostawiają miejsce wokół trasy szarży; potem tankowie przejmują go, gdy burza się skończy.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyNormal} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlNormal} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamNormal} maksymalnego zdrowia. Pierwsze uderzenie każdej burzy zadaje zamiast tego {openingSlamNormal}. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
+    'Zaczynając {first} sek. po wejściu Gniewu Króla, a potem co {everyNormal} sek., Nythraxis rozpoczyna Kościaną Burzę na {duration} sek. Ignoruje zagrożenie, porusza się {speed} razy szybciej niż normalnie i wykonuje {charges} szarż trwających po {chargeSeconds} sek. Jego wir zadaje {whirlNormal} maksymalnego zdrowia co sekundę w promieniu {radius} jardów. Każda szarża kończy się Kościanym Uderzeniem w tym samym promieniu za {slamNormal} maksymalnego zdrowia. Grobołamacz uzbraja się ponownie {rearm} sek. po jej końcu.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Nieśmiertelny Dwór',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tankowie przejmują Aldrena i odwracają jego rozłupanie od rajdu. Ogłuszcie lub uciszcie Malrica, gdy tylko zacznie Leczenie Malrica, i zabijcie go jako pierwszego; potem unieruchomcie lub ogłuszcie Vossa z dala od uzdrowicieli, bo nie można go sprowokować, i wykończcie go następnego.',

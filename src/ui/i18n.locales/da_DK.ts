@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const da_DK: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Eventyr med venner.',
+  'landing.contribute': 'Bidrag til spillet',
+  'landing.tools': 'Værktøjer',
+  'landing.records': 'WoC Rekorder',
+  'landing.scout': 'WoC Spejder',
+  'landing.parseService': 'WoC Parse-tjeneste',
   'hud.errors.cannotCastWhileMoving': 'Du kan ikke kaste, mens du bevæger dig.',
   'hudChrome.auraEffect.wolfForm':
     'Katteform: nærkampsskade og energi; bevægelseshastighed øget med {pct}%',
@@ -5216,8 +5222,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'Modul {current} af {total}',
   'delveUi.tracker.objective': 'Mål',
   'delveUi.tracker.title': 'Delve',
-  'download.desc': 'Hent den selvstændige launcher for optimeret ydeevne og fuldskærmsspil.',
-  'download.title': 'Download Desktop-launcher',
+  'download.desc': 'Spil på Windows, macOS eller Linux med samme konto og samme karakterer.',
+  'download.title': 'Download desktop-appen',
   'download.macCta': 'Download til macOS',
   'download.windowsPending': 'Windows-build afventer.',
   'entities.abilities.adrenaline_rush.description':
@@ -7645,8 +7651,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidBody': 'En afslutning for ti spillere til dem, der når toppen af verden.',
   'guide.home.group.raidTitle': 'Raidet',
   'guide.home.group.sub': 'Verden kan klares solo, men det bedste bytte venter bag en god gruppe.',
-  'guide.home.subtitle':
-    'Tag på quest, slå jer sammen, og udforsk en håndbygget verden, gratis i din browser.',
+  'guide.home.subtitle': 'Udforsk verdenen, tag på quests, og kæmp dig gennem dungeons med venner.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'En klassisk MMO, lavet til at gå til',
   'guide.home.what.pillarClassesBody':
@@ -9573,8 +9578,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'mode.serverOffline': 'Offline',
   'mode.serverOfflineSub': 'Øjeblikkelig lokal verden',
   'mode.serverOnline': 'Online',
-  'mode.tipText':
-    'For den jævneste oplevelse bør du slå annonceblokerings-udvidelser fra på denne side. Fællesskabet har rapporteret, at nogle blokerere kan forårsage hak.',
+  'mode.tipText': 'Kører spillet langsomt? Prøv at slå din annonceblokering fra for denne side.',
   'mode.tipTitle': 'TIP:',
   'nav.about': 'Om',
   'nav.account': 'Konto',
@@ -9727,10 +9731,10 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'realmTypes.rpPvp': 'RP-PvP',
   'seo.applicationCategory': 'Spil',
   'seo.description':
-    'Begiv dig ud på et episk eventyr i World of ClaudeCraft, en klassisk-inspireret micro-MMO, der kan spilles direkte i din browser. Slut dig til en vedvarende delt verden, lev op dine klasser, og besejr fjender!',
+    'Spil World of ClaudeCraft, en gratis browser-MMO. Udforsk, løs quests, og gå i dungeons med venner. Ingen download nødvendig.',
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    'worldofclaudecraft.com er den officielle gratis browser-MMO for Claudemoon-verdenen. Spil online med en vedvarende karakter, udforsk solo offline, læs wikien, og følg verificerede fællesskabslinks fra denne side.',
+    'Den officielle side for World of ClaudeCraft. Spil online, læs wikien, og find fællesskabslinks her.',
   'seo.officialLabel': 'Officiel World of ClaudeCraft-hjemmeside',
   'seo.operatingSystem': 'Webbrowser',
   'seo.playMode': 'Flerspiller',
@@ -15681,12 +15685,12 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Hvert {everyNormal} sek spidder Nythraxis {victimsNormal} raiddeltagere ud over sit nuværende mål på Knoglespyd. En spiddet raiddeltager kan ikke handle og mister {drainNormal} af maksimal sundhed hvert sekund, indtil spyddet ødelægges. Et spyd splintres efter {hitsNormal} træffere fra hvem som helst, uanset hvor meget de gør. En spiller, der allerede er blevet spiddet, kan ikke vælges igen i {cooldown} sek., så spyddene fordeles over hele raidet.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Fra {first} sek inde i Kongens vrede og hvert {everyHeroic} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlHeroic} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamHeroic} af maksimal sundhed. Det første slag i hver storm rammer i stedet for {openingSlamHeroic}. Gravbryder genaktiveres {rearm} sek efter den slutter.',
+    'Fra {first} sek inde i Kongens vrede og hvert {everyHeroic} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlHeroic} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamHeroic} af maksimal sundhed. Gravbryder genaktiveres {rearm} sek efter den slutter.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Knoglestorm',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Spred jer og bliv ved med at løbe fra Nythraxis. Den jagede raiddeltager løber væk, mens alle andre giver plads omkring stormløbsvejen, og tanks samler ham op, når stormen slutter.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Fra {first} sek inde i Kongens vrede og hvert {everyNormal} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlNormal} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamNormal} af maksimal sundhed. Det første slag i hver storm rammer i stedet for {openingSlamNormal}. Gravbryder genaktiveres {rearm} sek efter den slutter.',
+    'Fra {first} sek inde i Kongens vrede og hvert {everyNormal} sek derefter begynder Nythraxis Knoglestorm i {duration} sek. Han ignorerer trussel, bevæger sig {speed} gange normal hastighed og laver {charges} stormløb, der varer {chargeSeconds} sek hver. Hans hvirvel giver {whirlNormal} af maksimal sundhed hvert sekund inden for {radius} yd. Hvert stormløb ender i et Knogleslag inden for samme radius for {slamNormal} af maksimal sundhed. Gravbryder genaktiveres {rearm} sek efter den slutter.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Det Dødsløse Hof',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tanks samler Aldren op og vender hans kløvning væk fra raidet. Bedøv eller tavsgør Malric i det øjeblik Malrics Heling begynder, og dræb ham først. Rodfæst eller bedøv derefter Voss væk fra helbrederne, da han ikke kan hånes, og gør ham færdig bagefter.',

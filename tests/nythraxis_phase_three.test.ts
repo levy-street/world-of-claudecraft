@@ -212,7 +212,7 @@ describe('Nythraxis Bone Storm', () => {
     expect(charged[0].pid).toBe(st.boneStorm!.chargeTargetId);
   });
 
-  it('opens with a softened slam on arrival (no Gravefire line since v0.42.2) and whirls 10% (heroic 20%) inside 9 yd', () => {
+  it('slams on arrival (no Gravefire line since v0.42.2) and whirls 10% (heroic 20%) inside 9 yd', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, raiders, damageBy } = setup({ difficulty });
       // A storm already running with the tank as its charge, 3 yd away (reached
@@ -232,8 +232,8 @@ describe('Nythraxis Bone Storm', () => {
       const tankHp = tank.hp;
       const outsideHp = raiders[0].hp;
       nythraxis.updateNythraxisEncounter(ctx, boss);
-      // Bone Slam on arrival on everyone in 9 yd. This is the storm's opening
-      // window, so it lands at the softened opening fraction.
+      // Bone Slam on arrival on everyone in 9 yd, at the one fraction every
+      // window of the storm shares (the softer opening slam became the slam).
       const slams = damageBy(NYTHRAXIS_BONE_SLAM_CAST_ID) as { targetId: number; amount: number }[];
       expect(
         slams.map((e) => e.targetId),
@@ -265,12 +265,12 @@ describe('Nythraxis Bone Storm', () => {
     }
   });
 
-  it('softens only the first landed slam of a storm, whichever window lands it', () => {
+  it('lands every slam of a storm at the same fraction, whichever window lands it', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, damageBy } = setup({ difficulty });
       teleport(sim, tank, boss.pos.x + 3, boss.pos.z, boss.pos.y);
       // The second window opens with no slam landed yet (the first charge never
-      // reached anyone): its slam is still the storm's first, so it is softened.
+      // reached anyone): its slam lands at the one fraction every window shares.
       const storm = beginNythraxisBoneStorm(7);
       storm.chargeIndex = 1;
       storm.elapsed = 3;
@@ -287,9 +287,9 @@ describe('Nythraxis Bone Storm', () => {
       expect(slams()[0].amount, difficulty).toBe(
         Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.37 : 0.23)),
       );
-      expect(storm.openingSlamSpent, difficulty).toBe(true);
-      // The next landing of the same storm hits for the full fraction (the
-      // tank is topped up so the second slam lands on a living target).
+      // The next landing of the same storm hits for the same fraction: no
+      // slam of a storm is harder than another (the tank is topped up so the
+      // second slam lands on a living target).
       tank.hp = tank.maxHp;
       storm.chargeIndex = 2;
       storm.elapsed = 6;
@@ -298,7 +298,7 @@ describe('Nythraxis Bone Storm', () => {
       nythraxis.updateNythraxisEncounter(ctx, boss);
       expect(slams().length, difficulty).toBe(2);
       expect(slams()[1].amount, difficulty).toBe(
-        Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.55 : 0.35)),
+        Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.37 : 0.23)),
       );
     }
   });

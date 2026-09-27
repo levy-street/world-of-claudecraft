@@ -3859,8 +3859,8 @@ export const pt_BR: EnTranslations = {
         "kingsWrathSummary": "Nythraxis causa {bonusNormal} a mais de dano no normal ou {bonusHeroic} no heroico pelo resto da luta. Erupção sepulcral ocorre a cada {eruptionEveryNormal} s ({eruptionEveryHeroic} no heroico).",
         "kingsWrathResponse": "Use recargas defensivas restantes para dano inevitável. Mantenha todas as mecânicas anteriores limpas enquanto a raide termina a luta.",
         "boneStormName": "Tempestade óssea",
-        "boneStormSummary": "Começando {first} s depois da Ira do rei e a cada {everyNormal} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlNormal} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamNormal} da vida máxima. O primeiro impacto de cada tempestade causa {openingSlamNormal} em vez disso. Quebra-túmulos rearma {rearm} s após ela terminar.",
-        "boneStormHeroicSummary": "Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. O primeiro impacto de cada tempestade causa {openingSlamHeroic} em vez disso. Quebra-túmulos rearma {rearm} s após ela terminar.",
+        "boneStormSummary": "Começando {first} s depois da Ira do rei e a cada {everyNormal} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlNormal} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamNormal} da vida máxima. Quebra-túmulos rearma {rearm} s após ela terminar.",
+        "boneStormHeroicSummary": "Começando {first} s depois da Ira do rei e a cada {everyHeroic} s depois, Nythraxis inicia Tempestade óssea por {duration} s. Ele ignora ameaça, move-se a {speed} vezes a velocidade normal e faz {charges} avanços de {chargeSeconds} s cada. Seu redemoinho causa {whirlHeroic} da vida máxima por segundo em até {radius} yd. Cada avanço termina em um Impacto ósseo no mesmo raio, causando {slamHeroic} da vida máxima. Quebra-túmulos rearma {rearm} s após ela terminar.",
         "boneStormResponse": "Espalhem-se e continuem correndo de Nythraxis. O raider marcado pelo avanço foge enquanto todos os outros deixam espaço ao redor da trajetória; depois os tanks pegam o chefe quando a tempestade termina.",
         "crownEnduresName": "A Coroa perdura",
         "crownEnduresSummary": "Aos {enrageNormal} s do pull (o relógio pausa enquanto Irmão Aldric entra aos 70%), A Coroa perdura dispara como um enraivecimento rígido. Nythraxis ganha {damage} a mais de dano e ataques {haste} mais rápidos, depois mais {rampStep} de dano a cada {rampEveryNormal} s. Não há barra de temporizador. Os avisos vêm como gritos quando restam {warn60}, {warn30} e {warn10} s.",
@@ -6969,7 +6969,7 @@ export const pt_BR: EnTranslations = {
     "home": {
       "eyebrow": "MMO de navegador estilo clássico",
       "title": "World of ClaudeCraft",
-      "subtitle": "Cumpra missões, forme grupo e explore um mundo feito à mão, de graça no seu navegador.",
+      "subtitle": "Explore o mundo, cumpra missões e encare masmorras com amigos.",
       "ctaPlay": "Jogar Agora",
       "ctaLearn": "Como Jogar",
       "what": {
@@ -9610,8 +9610,8 @@ export const pt_BR: EnTranslations = {
     "viewAll": "Ver todas as atualizações no GitHub"
   },
   "download": {
-    "title": "Baixar launcher para desktop",
-    "desc": "Obtenha o launcher independente para desempenho otimizado e jogo em tela cheia.",
+    "title": "Baixe o app para desktop",
+    "desc": "Jogue no Windows, macOS ou Linux com a mesma conta e os mesmos personagens.",
     "macCta": "Baixar para macOS",
     "windowsCta": "Baixar para Windows",
     "linuxCta": "Baixar para Linux",
@@ -9630,7 +9630,7 @@ export const pt_BR: EnTranslations = {
     "offlineDesc": "Mundo solo instantâneo no seu navegador. Nada é salvo: perfeito para uma luta rápida ou testes.",
     "offlineAria": "Jogar offline: inicie uma sessão local de um jogador instantânea",
     "tipTitle": "DICA:",
-    "tipText": "Para uma experiência mais suave, desative os bloqueadores de anúncios neste site. Relatos da comunidade indicam que alguns bloqueadores podem causar lag.",
+    "tipText": "O jogo está lento? Tente desativar o bloqueador de anúncios neste site.",
     "serverOnline": "Online",
     "serverOffline": "Offline",
     "play": "Jogar",
@@ -10798,15 +10798,23 @@ export const pt_BR: EnTranslations = {
       "dodge": "ESQUIVA!"
     }
   },
+  "landing": {
+    "headline": "Aventure-se com amigos.",
+    "contribute": "Contribua com o jogo",
+    "tools": "Ferramentas",
+    "records": "WoC Recordes",
+    "scout": "WoC Batedor",
+    "parseService": "Serviço de parses WoC"
+  },
   "seo": {
     "title": "World of ClaudeCraft: MMO web em estilo clássico",
-    "description": "Embarque em uma aventura épica em World of ClaudeCraft, um micro-MMO de estilo clássico jogável diretamente no navegador. Entre em um mundo compartilhado persistente, evolua classes e derrote inimigos!",
+    "description": "Jogue World of ClaudeCraft, um MMO de navegador gratuito. Explore, complete missões e encare masmorras com amigos. Sem precisar baixar nada.",
     "genre": "MMORPG",
     "playMode": "Multijogador",
     "applicationCategory": "Jogo",
     "operatingSystem": "Navegador web",
     "officialLabel": "Site oficial de World of ClaudeCraft",
-    "officialBody": "worldofclaudecraft.com é o MMO de navegador gratuito oficial do mundo Claudemoon. Jogue online com um personagem persistente, explore solo offline, leia a wiki e siga os links verificados da comunidade a partir deste site."
+    "officialBody": "O site oficial de World of ClaudeCraft. Jogue online, leia a wiki e encontre aqui os links da comunidade."
   },
   "a11y": {
     "goHome": "Ir para a página inicial",

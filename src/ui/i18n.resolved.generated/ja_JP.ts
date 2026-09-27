@@ -3859,8 +3859,8 @@ export const ja_JP: EnTranslations = {
         "kingsWrathSummary": "ナイスラクシスは以後戦闘終了まで、通常で{bonusNormal}、英雄で{bonusHeroic}多いダメージを与える。墓所の噴出は{eruptionEveryNormal}秒ごと（英雄は{eruptionEveryHeroic}秒ごと）に発生する。",
         "kingsWrathResponse": "回避できないダメージには残っている防御クールダウンを使う。戦闘を終えるまで、それまでのメカニクスを引き続き丁寧に処理する。",
         "boneStormName": "骨の嵐",
-        "boneStormSummary": "王の怒りの開始から{first}秒後、以降{everyNormal}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlNormal}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamNormal}を与える。各嵐の最初の一撃は代わりに{openingSlamNormal}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。",
-        "boneStormHeroicSummary": "王の怒りの開始から{first}秒後、以降{everyHeroic}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlHeroic}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamHeroic}を与える。各嵐の最初の一撃は代わりに{openingSlamHeroic}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。",
+        "boneStormSummary": "王の怒りの開始から{first}秒後、以降{everyNormal}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlNormal}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamNormal}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。",
+        "boneStormHeroicSummary": "王の怒りの開始から{first}秒後、以降{everyHeroic}秒ごとに、ナイスラクシスは{duration}秒間骨の嵐を始める。彼はヘイトを無視し、通常の{speed}倍の速度で移動し、それぞれ{chargeSeconds}秒続く突進を{charges}回行う。彼の旋風は{radius}ヤード以内へ毎秒最大体力の{whirlHeroic}を与える。各突進の終わりには同じ範囲内で骨の一撃が発生し、最大体力の{slamHeroic}を与える。嵐が終わってから{rearm}秒後にグレイブブレイカーが再び使用可能になる。",
         "boneStormResponse": "散開し、ナイスラクシスから走って逃げ続ける。突進の対象になったレイドメンバーは走って逃げ、他の全員は突進経路の周囲に空間を空ける。嵐が終わったらタンクが確保する。",
         "crownEnduresName": "王冠不滅",
         "crownEnduresSummary": "開始から{enrageNormal}秒で（体力70%でアルドリック修道士が登場する間は時間が止まる）、王冠不滅がハードエンレイジとして発動する。ナイスラクシスは{damage}多いダメージと{haste}速い攻撃速度を得て、その後は{rampEveryNormal}秒ごとにさらに{rampStep}のダメージを得ていく。タイマーバーは表示されない。警告は残り{warn60}秒、{warn30}秒、{warn10}秒の時点で叫びとして発せられる。",
@@ -6969,7 +6969,7 @@ export const ja_JP: EnTranslations = {
     "home": {
       "eyebrow": "クラシックスタイルのブラウザMMO",
       "title": "World of ClaudeCraft",
-      "subtitle": "クエストをこなし、仲間と組み、手作りのワールドを冒険しよう。ブラウザで無料。",
+      "subtitle": "世界を探索し、クエストに挑み、仲間とダンジョンを攻略しよう。",
       "ctaPlay": "今すぐプレイ",
       "ctaLearn": "遊び方",
       "what": {
@@ -9610,8 +9610,8 @@ export const ja_JP: EnTranslations = {
     "viewAll": "GitHubですべての更新を見る"
   },
   "download": {
-    "title": "デスクトップランチャーのダウンロード",
-    "desc": "最適化されたパフォーマンスと全画面表示でのプレイのために、スタンドアロン版ランチャーを入手してください。",
+    "title": "デスクトップアプリをダウンロード",
+    "desc": "同じアカウントとキャラクターで、Windows、macOS、Linux でプレイできます。",
     "macCta": "macOS版をダウンロード",
     "windowsCta": "Windows版をダウンロード",
     "linuxCta": "Linux版をダウンロード",
@@ -9630,7 +9630,7 @@ export const ja_JP: EnTranslations = {
     "offlineDesc": "ブラウザ上で即座にシングルプレイヤーの世界を起動します。保存は一切されず、小規模な対戦やテストに最適です。",
     "offlineAria": "オフラインでプレイ：即座にローカルシングルプレイヤーセッションを開始します",
     "tipTitle": "ヒント：",
-    "tipText": "よりスムーズな体験のために、本サイトでの広告ブロック拡張機能を無効にしてください。コミュニティの報告によると、一部のブロック機能がラグの原因になる場合があります。",
+    "tipText": "ゲームの動作が重いですか？このサイトで広告ブロッカーを無効にしてみてください。",
     "serverOnline": "オンライン",
     "serverOffline": "オフライン",
     "play": "プレイ",
@@ -10798,15 +10798,23 @@ export const ja_JP: EnTranslations = {
       "dodge": "回避！"
     }
   },
+  "landing": {
+    "headline": "仲間と冒険しよう。",
+    "contribute": "ゲーム開発に参加する",
+    "tools": "ツール",
+    "records": "WoC 記録",
+    "scout": "WoC スカウト",
+    "parseService": "WoC 戦闘ログ"
+  },
   "seo": {
     "title": "World of ClaudeCraft: クラシック風Web MMO",
-    "description": "ブラウザで直接遊べるクラシック風マイクロMMO、World of ClaudeCraft で壮大な冒険に出ましょう。永続的な共有ワールドに参加し、クラスを育て、敵を倒してください。",
+    "description": "無料のブラウザMMO、World of ClaudeCraft をプレイしよう。世界を探索し、クエストをこなし、仲間とダンジョンに挑もう。ダウンロード不要。",
     "genre": "MMORPG",
     "playMode": "マルチプレイヤー",
     "applicationCategory": "ゲーム",
     "operatingSystem": "Webブラウザ",
     "officialLabel": "World of ClaudeCraft 公式サイト",
-    "officialBody": "worldofclaudecraft.com は Claudemoon ワールドの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。"
+    "officialBody": "World of ClaudeCraft の公式サイト。オンラインでプレイし、wiki を読み、コミュニティリンクを見つけよう。"
   },
   "a11y": {
     "goHome": "ホームへ移動",

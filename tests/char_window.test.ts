@@ -1294,6 +1294,16 @@ describe('char_window: the model is the stage and the sockets overlay it (W24)',
     );
   });
 
+  it('confines the preview to the stage so the left column stays clickable', () => {
+    // v0.43.0 hotfix: the preview's own z-index 1 tied with the overlays, and the
+    // left column precedes the stage in the DOM, so the canvas swallowed its hover
+    // and unequip presses. The browser suite hit-tests it; this pins the mechanism.
+    const stage =
+      /body:not\(\.mobile-touch\) #char-window \.char-model-panel \{([^}]*)\}/.exec(css)?.[1] ?? '';
+    expect(stage).toContain('z-index: 0;');
+    expect(css).toMatch(/body:not\(\.mobile-touch\) #char-window \.equip-col \{[^}]*z-index: 1;/);
+  });
+
   it('floats both socket columns over the stage, one on each outer edge', () => {
     expect(css).toContain(
       'body:not(.mobile-touch) #char-window .equip-col {\n    position: absolute;\n    top: var(--spacing-sm);',

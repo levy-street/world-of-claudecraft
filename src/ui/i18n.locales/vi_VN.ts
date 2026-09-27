@@ -2,6 +2,12 @@
 import type { TranslationKey } from '../i18n.catalog';
 
 export const vi_VN: Partial<Record<TranslationKey, string>> = {
+  'landing.headline': 'Phiêu lưu cùng bạn bè.',
+  'landing.contribute': 'Đóng góp cho trò chơi',
+  'landing.tools': 'Công cụ',
+  'landing.records': 'Kỷ lục WoC',
+  'landing.scout': 'Trinh sát WoC',
+  'landing.parseService': 'Dịch vụ parse WoC',
   'hud.errors.cannotCastWhileMoving': 'Không thể thi triển khi đang di chuyển.',
   'hudChrome.auraEffect.wolfForm':
     'Hình Mèo: sát thương cận chiến và năng lượng; tăng tốc độ di chuyển {pct}%',
@@ -5413,8 +5419,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'delveUi.tracker.module': 'Khu {current} trên {total}',
   'delveUi.tracker.objective': 'Mục Tiêu',
   'delveUi.tracker.title': 'Hang Sâu',
-  'download.desc': 'Tải trình khởi chạy độc lập để có hiệu năng tối ưu và chơi toàn màn hình.',
-  'download.title': 'Tải Trình Khởi Chạy Trên Máy Tính',
+  'download.desc': 'Chơi trên Windows, macOS hoặc Linux với cùng tài khoản và nhân vật của bạn.',
+  'download.title': 'Tải ứng dụng máy tính',
   'download.macCta': 'Tải xuống cho macOS',
   'download.windowsPending': 'Bản dựng Windows đang chờ.',
   'entities.abilities.adrenaline_rush.description':
@@ -8584,8 +8590,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'Raid',
   'guide.home.group.sub':
     'Thế giới có thể chơi đơn, nhưng chiến lợi phẩm tốt nhất chờ đợi sau một tổ đội ăn ý.',
-  'guide.home.subtitle':
-    'Làm nhiệm vụ, hợp sức và khám phá một thế giới được dựng thủ công, miễn phí ngay trong trình duyệt của bạn.',
+  'guide.home.subtitle': 'Khám phá thế giới, nhận nhiệm vụ và chinh phục hầm ngục cùng bạn bè.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Một MMO cổ điển, được làm ra để dễ bắt nhịp',
   'guide.home.what.pillarClassesBody':
@@ -10403,8 +10408,7 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'mode.serverOffline': 'Ngoại Tuyến',
   'mode.serverOfflineSub': 'Thế giới cục bộ tức thì',
   'mode.serverOnline': 'Trực Tuyến',
-  'mode.tipText':
-    'Để có trải nghiệm mượt mà nhất, hãy tắt các tiện ích chặn quảng cáo trên trang này. Cộng đồng phản ánh rằng một số trình chặn có thể gây giật lag.',
+  'mode.tipText': 'Trò chơi chạy chậm? Hãy thử tắt trình chặn quảng cáo cho trang này.',
   'mode.tipTitle': 'MẸO:',
   'nav.about': 'Giới Thiệu',
   'nav.account': 'Tài Khoản',
@@ -10556,10 +10560,10 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'realmTypes.rpPvp': 'RP-PvP',
   'seo.applicationCategory': 'Trò chơi',
   'seo.description':
-    'Bắt đầu cuộc phiêu lưu hoành tráng trong World of ClaudeCraft, một micro-MMO phong cách cổ điển chơi trực tiếp trên trình duyệt của bạn. Tham gia một thế giới chung bền vững, lên cấp các lớp nhân vật và đánh bại kẻ thù!',
+    'Chơi World of ClaudeCraft, MMO miễn phí trên trình duyệt. Khám phá, hoàn thành nhiệm vụ và chinh phục hầm ngục cùng bạn bè. Không cần tải về.',
   'seo.genre': 'MMORPG',
   'seo.officialBody':
-    'worldofclaudecraft.com là trang MMO trên trình duyệt miễn phí chính thức cho thế giới Claudemoon. Chơi trực tuyến với một nhân vật bền vững, khám phá đơn lẻ ngoại tuyến, đọc wiki và theo dõi các liên kết cộng đồng đã được xác minh từ trang này.',
+    'Trang chủ chính thức của World of ClaudeCraft. Chơi trực tuyến, đọc wiki và tìm các liên kết cộng đồng tại đây.',
   'seo.officialLabel': 'Trang web World of ClaudeCraft chính thức',
   'seo.operatingSystem': 'Trình duyệt web',
   'seo.playMode': 'Nhiều người chơi',
@@ -15815,12 +15819,12 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Mỗi {everyNormal} giây, Nythraxis xuyên {victimsNormal} raider không phải mục tiêu hiện tại của hắn lên Cọc Xương. Raider bị xuyên không thể hành động và mất {drainNormal} máu tối đa mỗi giây cho đến khi cọc của họ bị phá hủy. Một cọc sẽ vỡ sau {hitsNormal} đòn đánh từ bất kỳ ai, bất kể sát thương gây ra. Người chơi đã bị đâm xuyên sẽ không bị chọn lại trong {cooldown} giây, nhờ đó cọc được phân bổ đều khắp cả đội.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    'Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyHeroic} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlHeroic} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamHeroic} máu tối đa. Cú nện đầu tiên của mỗi cơn bão chỉ gây {openingSlamHeroic} thay vào đó. Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.',
+    'Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyHeroic} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlHeroic} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamHeroic} máu tối đa. Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.',
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Bão Xương',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Tản ra và tiếp tục chạy khỏi Nythraxis. Raider bị lao vào chạy đi xa trong khi những người khác chừa chỗ quanh đường lao, rồi tank kéo hắn lại khi bão kết thúc.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    'Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyNormal} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlNormal} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamNormal} máu tối đa. Cú nện đầu tiên của mỗi cơn bão chỉ gây {openingSlamNormal} thay vào đó. Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.',
+    'Bắt đầu {first} giây sau Cơn Thịnh Nộ Của Vua và mỗi {everyNormal} giây sau đó, Nythraxis bắt đầu Bão Xương trong {duration} giây. Hắn bỏ qua thù hận, di chuyển nhanh gấp {speed} lần tốc độ thường, và thực hiện {charges} lần lao, mỗi lần kéo dài {chargeSeconds} giây. Vòng xoáy của hắn gây {whirlNormal} máu tối đa mỗi giây trong phạm vi {radius} yd. Mỗi lần lao kết thúc bằng Cú Nện Xương trong cùng phạm vi, gây {slamNormal} máu tối đa. Phá Mộ tái kích hoạt {rearm} giây sau khi bão kết thúc.',
   'hudChrome.raidBossGuide.nythraxis.courtName': 'Triều Đình Bất Tử',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Tank kéo Aldren và xoay đòn chém lan của hắn khỏi raid. Làm choáng hoặc câm lặng Malric ngay khi Hồi Phục Của Malric bắt đầu và giết hắn trước, rồi trói chân hoặc làm choáng Voss xa khỏi người hồi máu, vì hắn không thể bị khiêu khích, và kết liễu hắn tiếp theo.',

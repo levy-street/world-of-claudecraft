@@ -14,6 +14,12 @@ import type { TranslationKey } from '../i18n.catalog';
 
 export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.paperdoll.trinketSlot': 'Abalorio',
+  'landing.headline': 'Vive la aventura con amigos.',
+  'landing.contribute': 'Contribuye al juego',
+  'landing.tools': 'Herramientas',
+  'landing.records': 'WoC Récords',
+  'landing.scout': 'WoC Explorador',
+  'landing.parseService': 'Servicio de parses de WoC',
   'hud.errors.cannotCastWhileMoving': 'No puedes lanzar hechizos mientras te mueves.',
   'hudChrome.auraEffect.wolfForm':
     'Forma de gato: daño cuerpo a cuerpo y energía; velocidad de movimiento aumentada un {pct}%',
@@ -5191,7 +5197,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Tu objetivo',
   'seo.officialLabel': 'Sitio web oficial de World of ClaudeCraft',
   'seo.officialBody':
-    'worldofclaudecraft.com es el MMO de navegador gratuito oficial del mundo Claudemoon. Juega en línea con un personaje persistente, explora en solitario sin conexión, lee la wiki y sigue los enlaces comunitarios verificados desde este sitio.',
+    'El sitio oficial de World of ClaudeCraft. Juega en línea, lee la wiki y encuentra aquí los enlaces de la comunidad.',
   'hudChrome.questShare.notShareable': 'Esta misión no se puede compartir.',
   'hudChrome.questShare.notInSharerParty':
     'Debes estar en el grupo de {name} para aceptar esa misión.',
@@ -5568,11 +5574,10 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'wiki.desc': 'Descubre los secretos del reino, guías de clase y estrategias.',
   'news.title': 'Noticias y Actualizaciones',
   'news.desc': 'Lee las últimas notas del parche, eventos y noticias de la comunidad.',
-  'download.title': 'Descargar Lanzador de Escritorio',
+  'download.title': 'Descarga la app de escritorio',
   'download.macCta': 'Descargar para macOS',
   'download.windowsPending': 'Compilacion para Windows pendiente.',
-  'download.desc':
-    'Consigue el lanzador independiente para un rendimiento optimizado y juego a pantalla completa.',
+  'download.desc': 'Juega en Windows, macOS o Linux con la misma cuenta y los mismos personajes.',
   'comingSoon.placeholder': 'Próximamente...',
   'comingSoon.featureComingSoon': 'Esta característica llegará pronto al mundo.',
   'mode.onlineTitle': 'Jugar en Línea',
@@ -5585,7 +5590,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'mode.offlineAria': 'Jugar en Solitario: inicia una sesión local instantánea de un jugador',
   'mode.tipTitle': 'CONSEJO:',
   'mode.tipText':
-    'Para la mejor experiencia, desactiva las extensiones de bloqueo de publicidad en este sitio. Reportes de la comunidad encontraron que algunos bloqueadores pueden causar retrasos.',
+    '¿El juego va lento? Prueba a desactivar tu bloqueador de anuncios en este sitio.',
   'auth.enterRealm': 'Entrar al Mundo',
   'auth.username': 'Usuario',
   'auth.usernameError': 'Por favor, introduce tu nombre de usuario.',
@@ -5821,7 +5826,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'controls.chat': 'Abrir Chat',
   'seo.title': 'World of ClaudeCraft: MMO web de estilo clásico',
   'seo.description':
-    'Emprende una aventura épica en World of ClaudeCraft, un micro-MMO de estilo clásico que se juega directamente en el navegador. Entra a un mundo compartido, sube de nivel y derrota enemigos.',
+    'Juega a World of ClaudeCraft, un MMO de navegador gratuito. Explora, completa misiones y recorre mazmorras con amigos. Sin descargas.',
   'seo.genre': 'MMORPG',
   'seo.playMode': 'Multijugador',
   'seo.applicationCategory': 'Juego',
@@ -9370,8 +9375,7 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'guide.home.group.raidTitle': 'La banda',
   'guide.home.group.sub':
     'El mundo se puede recorrer en solitario, pero el mejor botín aguarda tras un buen grupo.',
-  'guide.home.subtitle':
-    'Haz misiones, forma grupo y explora un mundo hecho a mano, gratis en tu navegador.',
+  'guide.home.subtitle': 'Explora el mundo, acepta misiones y supera mazmorras con amigos.',
   'guide.home.title': 'World of ClaudeCraft',
   'guide.home.what.heading': 'Un MMO clásico, hecho para empezar a jugar enseguida',
   'guide.home.what.pillarClassesBody':
@@ -16264,12 +16268,12 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.raidBossGuide.nythraxis.boneSpikeSummary':
     'Every {everyNormal} sec, Nythraxis impales {victimsNormal} raiders other than his current target on Bone Spikes. An impaled raider cannot act and loses {drainNormal} of maximum health every second until their spike is shattered. A spike shatters after {hitsNormal} hits from anyone, whatever the hits deal. A raider who has been impaled cannot be chosen again for {cooldown} sec, so the spikes spread across the raid.',
   'hudChrome.raidBossGuide.nythraxis.boneStormHeroicSummary':
-    "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. The first slam of each storm hits for {openingSlamHeroic} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
+    "Starting {first} sec into The King's Wrath and every {everyHeroic} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlHeroic} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamHeroic} of maximum health. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
   'hudChrome.raidBossGuide.nythraxis.boneStormName': 'Tormenta ósea',
   'hudChrome.raidBossGuide.nythraxis.boneStormResponse':
     'Dispersaos y seguid corriendo para alejaros de Nythraxis. El miembro cargado huye mientras los demás dejan espacio alrededor de la trayectoria de la carga; luego los tanques lo recogen cuando termina la tormenta.',
   'hudChrome.raidBossGuide.nythraxis.boneStormSummary':
-    "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. The first slam of each storm hits for {openingSlamNormal} instead. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
+    "Starting {first} sec into The King's Wrath and every {everyNormal} sec after, Nythraxis begins Bone Storm for {duration} sec. He ignores threat, moves at {speed} times normal speed, and makes {charges} charges lasting {chargeSeconds} sec each. His whirl deals {whirlNormal} of maximum health every second within {radius} yd. Each charge ends in a Bone Slam within the same radius for {slamNormal} of maximum health. Any live Soul Rend marks are released unresolved the instant the storm begins, and a storm never begins right after a Soul Rend detonation. Gravebreaker re-arms {rearm} sec after the storm ends.",
   'hudChrome.raidBossGuide.nythraxis.courtName': 'La Corte inmortal',
   'hudChrome.raidBossGuide.nythraxis.courtResponse':
     'Los tanques recogen a Aldren y giran su hendidura lejos de la banda. Aturde o silencia a Malric en cuanto empiece Alivio de Malric y mátalo primero; luego enraíza o aturde a Voss lejos de los sanadores, ya que no se le puede provocar, y acábalo después.',
