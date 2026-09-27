@@ -21,8 +21,12 @@ function slotRow(slot: string): string {
 function mountSheet(): HTMLElement {
   const ui = document.createElement('div');
   ui.id = 'ui';
+  // The release's character sheet wraps the body in .char-sheet (the height
+  // provider) and marks the Character tab's body .char-body--sheet, mirroring
+  // src/ui/char_window.ts; without the wrapper the paperdoll has no height and
+  // the weapons row seats outside the window.
   ui.innerHTML = `<div id="char-window" class="window panel ui-window" style="display:block">
-    <div class="char-body"><section class="char-equipment-pane"><div class="paperdoll">
+    <div class="char-sheet"><div class="char-body char-body--sheet"><section class="char-equipment-pane"><div class="paperdoll">
       <div class="equip-col" id="equip-col-left">${SLOTS.left.map(slotRow).join('')}</div>
       <div class="char-model-panel ui-card">
         <div id="char-model-preview" class="char-model-preview"><canvas style="width:100%;height:100%;display:block"></canvas></div>
@@ -30,7 +34,7 @@ function mountSheet(): HTMLElement {
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right">${SLOTS.right.map(slotRow).join('')}</div>
       <div class="equip-row-weapons" id="equip-row-weapons">${SLOTS.weapons.map(slotRow).join('')}</div>
-    </div></section></div>
+    </div></section></div></div>
   </div>`;
   document.body.appendChild(ui);
   return ui;
