@@ -327,6 +327,11 @@ const RIFT_GATE_URL = '/models/props/rift_portal.glb';
 const RIFT_GATE_HEIGHT = 6.0;
 let riftGateGltf: GLTF | null = null;
 
+/** Test-only: stand in for the rift gate GLB the boot preload loads (Node has no fetch path). */
+export function setRiftGateGltfForTest(gltf: GLTF | null): void {
+  riftGateGltf = gltf;
+}
+
 // The rift boulder / rolling boulder reuse a real detailed rock mesh (a shipped
 // KayKit-style prop) instead of a bare dodecahedron, so they read as proper craggy
 // stone; the procedural glow veins layer on top. Zero-cost asset reuse (the

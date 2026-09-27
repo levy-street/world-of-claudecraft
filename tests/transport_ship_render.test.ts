@@ -4,7 +4,7 @@ import { MeshoptDecoder } from 'meshoptimizer';
 import type * as THREE from 'three';
 import { type GLTF, GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
+import { ditherFadeUniform, setDitherFadeEnabledForTest } from '../src/render/occluder_dither_fade';
 import { OCCLUDER_FADE_ALPHA } from '../src/render/occluder_fade_core';
 import type { ShipWake } from '../src/render/ship_wake';
 import { freezeStaticMatrices } from '../src/render/static_matrix';
@@ -257,6 +257,107 @@ describe('transport ship view', () => {
     view2.update(X + 20, BASE_Y + 10, Z, X, BASE_Y + 8, Z, 2000, 0.05, false);
     for (const m of meshesUnder(mast2))
       expect((m.material as THREE.Material).transparent).toBe(false);
+  });
+});
+
+describe('the props prewarm covers the fading clones (transport_ship.ts)', () => {
+  const FADE_NODES = [...internals.sailNames, ...internals.mastNames, ...internals.flagFadeNames];
+
+  function layout(geometry: THREE.BufferGeometry): string {
+    return Object.keys(geometry.attributes)
+      .sort()
+      .map((n) => `${n}${geometry.getAttribute(n).itemSize}`)
+      .join(',');
+  }
+
+  /** What three keys the drawn program on, minus the lights and fog every
+   *  prewarm twin shares with the live scene. */
+  function programOf(material: THREE.Material, geometry: THREE.BufferGeometry): string {
+    return [
+      material.type,
+      material.customProgramCacheKey(),
+      material.side,
+      material.vertexColors,
+      material.transparent,
+      layout(geometry),
+    ].join('|');
+  }
+
+  /** Every mesh under a fading node, with the node it fades with. */
+  function fadeMeshes(view: TransportShipView): { node: string; mesh: THREE.Mesh }[] {
+    const out: { node: string; mesh: THREE.Mesh }[] = [];
+    for (const node of FADE_NODES) {
+      const root = view.group.getObjectByName(node);
+      if (root) for (const mesh of meshesUnder(root)) out.push({ node, mesh });
+    }
+    return out;
+  }
+
+  async function freshTemplate(dither: boolean): Promise<void> {
+    setDitherFadeEnabledForTest(dither);
+    resetTransportShipCaches();
+    internals.setLoadedGltfForTest(URL, await loadGlb());
+  }
+
+  afterEach(async () => {
+    setDitherFadeEnabledForTest(false);
+    resetTransportShipCaches();
+    internals.setLoadedGltfForTest(URL, await loadGlb());
+  });
+
+  it('on the dithered ghost, stages the program every live sail, mast and flag clone draws', async () => {
+    await freshTemplate(true);
+    build(); // the moored ship buildProps places first
+    const staged = new Set(
+      transportShipPrewarmParts().map((p) => programOf(p.material, p.geometry)),
+    );
+    const live = fadeMeshes(build()); // a later view: the scheduled ferry
+    const kinds = new Set<string>();
+    for (const { node, mesh } of live) {
+      const material = mesh.material as THREE.Material;
+      expect(ditherFadeUniform(material), node).not.toBeNull();
+      expect(staged.has(programOf(material, mesh.geometry)), `${node}/${mesh.name}`).toBe(true);
+      if (internals.sailNames.includes(node)) kinds.add('sail');
+      if (internals.mastNames.includes(node)) kinds.add('mast');
+      if (internals.flagFadeNames.includes(node)) kinds.add('flag');
+    }
+    expect([...kinds].sort()).toEqual(['flag', 'mast', 'sail']);
+  });
+
+  it('adds one twin per cloned cloth or wood material, not one per sail', async () => {
+    await freshTemplate(true);
+    const view = build();
+    const parts = transportShipPrewarmParts();
+    const meshes = fadeMeshes(view);
+    const worn = new Set(meshes.map(({ mesh }) => mesh.material as THREE.Material));
+    const fadeTwins = parts.filter((p) => worn.has(p.material));
+    expect(fadeTwins.length).toBeGreaterThan(0);
+    expect(fadeTwins.length).toBeLessThan(worn.size);
+    expect(new Set(fadeTwins.map((p) => p.material)).size).toBe(fadeTwins.length);
+    // the twins stage exactly the programs the fading clones draw, nothing else
+    expect(new Set(fadeTwins.map((p) => programOf(p.material, p.geometry)))).toEqual(
+      new Set(meshes.map(({ mesh }) => programOf(mesh.material as THREE.Material, mesh.geometry))),
+    );
+    // later views add nothing: the first view's clones already cover them
+    build();
+    expect(transportShipPrewarmParts()).toHaveLength(parts.length);
+  });
+
+  it('on the blended ghost (High and up), the clones share the template programs: nothing is added', async () => {
+    await freshTemplate(false);
+    const view = build();
+    const parts = transportShipPrewarmParts();
+    const worn = new Set(fadeMeshes(view).map(({ mesh }) => mesh.material as THREE.Material));
+    expect(worn.size).toBeGreaterThan(0);
+    for (const p of parts) {
+      expect(worn.has(p.material)).toBe(false);
+      expect(ditherFadeUniform(p.material)).toBeNull();
+    }
+    const staged = new Set(parts.map((p) => programOf(p.material, p.geometry)));
+    for (const { node, mesh } of fadeMeshes(build())) {
+      const material = mesh.material as THREE.Material;
+      expect(staged.has(programOf(material, mesh.geometry)), node).toBe(true);
+    }
   });
 });
 
