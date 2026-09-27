@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroico: Crisol de la Última Fuente',
-    desc: 'Armas exclusivas del modo heroico de Ignivar, Heraldo de la Última Llama.',
+    desc: 'Armas exclusivas del modo heroico y los abalorios de la banda de Ignivar, Heraldo de la Última Llama.',
   },
   conquerors_varkhul: {
     name: 'El Crisol Interior',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroico: El Crisol Interior',
-    desc: 'Escudos y armas exclusivos del modo heroico de Varkhul, Padre de la Forja de la Última Llama.',
+    desc: 'Escudos y armas exclusivos del modo heroico y los abalorios de la banda de Varkhul, Padre de la Forja de la Última Llama.',
   },
   conquerors_set_bramblehide: {
     name: 'Piel de Zarza de Roots',

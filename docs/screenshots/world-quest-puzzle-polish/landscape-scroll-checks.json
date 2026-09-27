@@ -1,0 +1,16 @@
+[
+  {
+    "board": "candy",
+    "top": 136.5,
+    "bottom": 196.5,
+    "height": 60,
+    "visible": true
+  },
+  {
+    "board": "ley",
+    "top": 120.828125,
+    "bottom": 212.828125,
+    "height": 92,
+    "visible": true
+  }
+]

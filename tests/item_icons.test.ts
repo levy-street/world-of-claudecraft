@@ -59,6 +59,7 @@ function walk(dir: string): string[] {
 // bank-storage-painted-bags batch; the literal remains the complete current bag inventory.
 const BAG_IDS = [
   'burlap_reagent_pouch',
+  'clockwork_tinkers_pack',
   'duskweave_bag',
   'foragers_haversack',
   'gravewoven_bag',
@@ -67,6 +68,7 @@ const BAG_IDS = [
   'mistcallers_duffel',
   'necromancers_reagent_satchel',
   'resonant_weave_bag',
+  'rift_surveyors_satchel',
   'silkspun_satchel',
   'sunspun_haversack',
   'travelers_knapsack',
@@ -318,11 +320,10 @@ describe('item webp icons', () => {
     // brought the ten Ignivar raid weapons. Release's own lineage separately grew the
     // shared 133-weapon base by three with the Nythraxis gap-fill one-handers
     // (nythraxis-gap-weapon-renders-2026-09-04) to 136. This merge unions both waves
-    // plus this branch's own Crucible professions weapon additions; re-counted directly
-    // off the merged src/ui/weapon_variants.ts (Object.keys(ITEM_WEAPON_VARIANTS).size).
-    // 138 -> 142: the four Warfare Season 2 honor weapons
-    // (warfare-season2-weapons-2026-09-25).
-    expect(WEAPON_IMAGE_IDS.size).toBe(142);
+    // plus the three faction vendor weapons (riftwarden_voidblade,
+    // dawnkeeper_consecrated_mace, forgemaster_crag_cleaver): 138 -> 141, plus the four Warfare Season 2 honor weapons
+    // (warfare-season2-weapons-2026-09-25): 145.
+    expect(WEAPON_IMAGE_IDS.size).toBe(145);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -462,6 +463,7 @@ describe('item webp icons', () => {
     // satchels among them); their tracked generated batch now owns the accepted paintings.
     expect(bagIds).toEqual([
       'burlap_reagent_pouch',
+      'clockwork_tinkers_pack',
       'duskweave_bag',
       'foragers_haversack',
       'gravewoven_bag',
@@ -470,6 +472,7 @@ describe('item webp icons', () => {
       'mistcallers_duffel',
       'necromancers_reagent_satchel',
       'resonant_weave_bag',
+      'rift_surveyors_satchel',
       'silkspun_satchel',
       'sunspun_haversack',
       'travelers_knapsack',
@@ -525,6 +528,9 @@ describe('item webp icons', () => {
       ...BANK_STORAGE_PAINTED_BAG_IDS,
       'silkspun_satchel',
       'sunspun_haversack',
+      // The two faction quartermaster bags (faction-vendor-icons-2026-09-16).
+      'clockwork_tinkers_pack',
+      'rift_surveyors_satchel',
     ]);
     for (const id of [...BAG_IDS.filter((bagId) => !generatedBagIds.has(bagId)), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);

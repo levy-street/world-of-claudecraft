@@ -10,7 +10,12 @@
 // DOM-free and i18n-free so tests/vendor_view.test.ts can drive it directly.
 
 import { stackSizeOf } from '../../../sim/bags';
+import {
+  type FactionVendorGate,
+  resolveFactionVendorRowGate,
+} from '../../../sim/content/faction_vendors';
 import { resolveVendorRowGate, type VendorRowGate } from '../../../sim/content/vendor_row_gates';
+import type { FactionId } from '../../../sim/factions';
 import { junkSellableSlot } from '../../../sim/items';
 import type { InvSlot, ItemDef, ItemInstancePayload } from '../../../sim/types';
 import { bulkBuyQuantity, vendorCountForced } from '../../../sim/vendor_buy_stack';
@@ -45,6 +50,8 @@ export interface VendorGoodsRow {
   /** The row's gate when it carries one, met or not, so the painter can name
    *  the requirement. Ids and numbers only; this core stays i18n-free. */
   requirement?: VendorRowGate;
+  /** Faction standing requirement when the row carries one. */
+  factionRequirement?: FactionVendorGate;
   /** Present when a bulk ("Buy Stack") purchase is offered for this row: as many
    *  units as the buyer can currently afford in one purchase, capped at the
    *  item's real bag stack size (bulkBuyQuantity, the same helper buyItem uses
@@ -95,6 +102,8 @@ export interface VendorBalances {
    *  tool they earned, with nothing red anywhere. Required turns that into a
    *  compile error naming every call site. */
   gatheringProficiency: Readonly<Record<string, number>>;
+  /** Persistent faction standing across allied factions. */
+  factions?: Readonly<Record<FactionId, number>>;
 }
 
 export interface VendorBuybackRow {
@@ -161,6 +170,7 @@ export function buildVendorView(
     // with the requirement the tool will actually ask. The buy path itself
     // runs no proficiency check any more (R22: counters sell ahead freely).
     const gate = resolveVendorRowGate(itemId, balances.gatheringProficiency);
+    const factionGate = resolveFactionVendorRowGate(itemId, balances.factions);
     // Bulk eligibility mirrors buyItem's server-side gate exactly (items.ts):
     // plain copper price, no Honor component, never a mount (buying several
     // copies of the same reins would only waste gold), never soulbound (the
@@ -197,8 +207,9 @@ export function buildVendorView(
       price,
       quantity,
       affordable: balances.copper >= price.copper && balances.honor >= price.honor,
-      requirementUnmet: gate.locked,
+      requirementUnmet: gate.locked || factionGate.locked,
       ...(gate.requirement ? { requirement: gate.requirement } : {}),
+      ...(factionGate.requirement ? { factionRequirement: factionGate.requirement } : {}),
       ...(bulkQuantity !== undefined && {
         bulkQuantity,
         bulkAffordable: balances.copper >= unitCopper * bulkQuantity,

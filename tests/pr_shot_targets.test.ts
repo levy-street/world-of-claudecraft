@@ -28,7 +28,10 @@ describe('classifyDiff', () => {
       4,
     );
     expect(script).toContain('localStorage.removeItem(key)');
-    expect(script).toContain("waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0'");
+    // The weekly-vault target (PR 4052) overrides the wait with navigationWaitUntil;
+    // the landing default stays the fallback.
+    expect(script).toContain('variant.navigationWaitUntil ??');
+    expect(script).toContain("(variant.landing ? 'domcontentloaded' : 'networkidle0')");
 
     const sliceBetween = (start: string, end: string, from = 0) => {
       const startIndex = script.indexOf(start, from);

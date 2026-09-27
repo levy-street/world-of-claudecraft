@@ -189,7 +189,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '英雄：最后泉源熔炉',
-    desc: '伊格尼瓦，末焰使者身上仅限英雄难度掉落的武器。',
+    desc: '伊格尼瓦，末焰使者身上仅限英雄难度掉落的武器，以及团队副本饰品。',
   },
   conquerors_varkhul: {
     name: '内环熔炉',

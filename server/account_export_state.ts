@@ -40,6 +40,35 @@ function publicPlot(row: unknown): unknown {
  *  stay as saved, and the account export does not compute a live plot status. */
 export function projectAccountExportState(state: unknown): unknown {
   if (!isRecord(state)) return state;
+  if (isRecord(state.weeklyRewards)) {
+    const weekly = state.weeklyRewards;
+    state = {
+      ...state,
+      weeklyRewards: {
+        ...weekly,
+        vaults: Array.isArray(weekly.vaults)
+          ? weekly.vaults.map((batch) => {
+              if (!isRecord(batch)) return null;
+              return {
+                resetAtMs: batch.resetAtMs,
+                choices: Array.isArray(batch.choices)
+                  ? batch.choices.map((choice) => {
+                      if (!isRecord(choice)) return null;
+                      return {
+                        pool: choice.pool,
+                        ...(choice.opened === true && typeof choice.itemId === 'string'
+                          ? { itemId: choice.itemId, opened: true }
+                          : {}),
+                      };
+                    })
+                  : [],
+              };
+            })
+          : [],
+      },
+    };
+  }
+  if (!isRecord(state)) return state;
   const plots = state.farmPlots;
   if (Array.isArray(plots)) return { ...state, farmPlots: plots.map(publicPlot) };
   if (!isRecord(plots)) return state;

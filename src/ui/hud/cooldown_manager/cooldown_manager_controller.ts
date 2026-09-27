@@ -94,6 +94,9 @@ export const COOLDOWN_WORLD_FIELDS = [
   'playerClass',
   'fateThreads',
   'activeAimSlot',
+  // The worn trinket (PR 4173's trinket slot): its action-bar state is per
+  // frame like the aim slot, so the manager's own view mirrors it too.
+  'wornTrinketId',
 ] as const satisfies readonly Exclude<keyof ActionBarWorldInput, 'entities'>[];
 
 function copyWorldField<K extends keyof ActionBarWorldInput>(

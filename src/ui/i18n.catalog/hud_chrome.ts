@@ -10,6 +10,7 @@
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
 import { cosmeticsStrings } from './cosmetics';
 import { professionTrainerStrings } from './profession_trainers';
+import { weeklyRewardStrings } from './weekly_rewards';
 
 export const hudChromeStrings = {
   framePresets: {
@@ -56,6 +57,7 @@ export const hudChromeStrings = {
     target: 'Target focus {slot}',
   },
   professionTrainers: professionTrainerStrings,
+  weeklyRewards: weeklyRewardStrings,
   // The scheduled ferries (Eastbrook to Moonrest, Wickharbor to Wyrmwatch;
   // src/ui/hud/transport/):
   // the timetable panel near the docked ship and the sailing line aboard.
@@ -69,6 +71,49 @@ export const hudChromeStrings = {
     sailing: 'Sailing to {dest}',
   },
   materialStackSelectionUnavailable: 'That material selection is no longer available.',
+  vehicle: {
+    title: 'North Watch Cannon',
+    objective: 'Defend the north watch',
+    lastKeepTitle: 'The Last Keep Cannon',
+    lastKeepObjective: 'Defend the approach to The Last Keep',
+    cannonball: 'Cannonball',
+    grapeshot: 'Grapeshot',
+    incendiary: 'Incendiary Shot',
+    integrity: 'Cannon integrity',
+    exit: 'Leave cannon',
+    wave: 'Wave {wave}/{total}',
+    endlessWave: 'Endless wave {wave} (round {round})',
+    resultWaves: 'Waves held: {waves}.',
+    enemies: 'Enemies remaining: {count}',
+    countdown: 'Prepare: {seconds}',
+    hint: 'Choose a shot, then click the ground to fire.',
+    aim: 'Click to fire. Right click or Escape cancels aiming.',
+    sapperWarning: 'Sapper incoming! Stop the explosive carrier before it reaches the line.',
+    chargeWarning: 'Commander orders a charge! All surviving enemies move faster.',
+    armorHint: 'Break the silver shields with Cannonball, then use Incendiary Shot.',
+    exposedHint: 'Broken armor: Incendiary Shot deals double damage.',
+    barrelHint: 'Shoot the marked powder barrels when enemies gather around them.',
+    barrelRules:
+      'Direct hits ignite powder barrels: {damage} damage within {radius} yards, with chain explosions.',
+    armorRules:
+      'Armored troops take {reduction} less damage until Cannonball breaks their armor. Broken armor takes {bonus} more fire damage.',
+    shake: 'Camera shake',
+    gold: 'Gold medal',
+    silver: 'Silver medal',
+    bronze: 'Bronze medal',
+    failed: 'Defense failed',
+    result: '{medal}: integrity {integrity}, accuracy {accuracy}.',
+    medalRules:
+      'Gold: at least {goldIntegrity} integrity and {goldAccuracy} accuracy. Silver: {silverIntegrity} and {silverAccuracy}. Any other victory earns Bronze. Enemy or barrel hits count; each shot counts once. Medals grant no extra money.',
+    shotDamage: 'Deal {damage} damage to each enemy within {radius} yards of the impact.',
+    shotSlow: 'Slow enemies hit by {amount} for {seconds} sec.',
+    shotBurn:
+      'Leave fire for {seconds} sec, dealing {damage} damage each second to enemies standing in it.',
+    shotTiming:
+      'Cooldown: {cooldown} sec. Impact after {flight} sec. All shots share {recovery} sec recovery.',
+    shotRules:
+      'Aim inside the marked field. No mana cost. Damage does not scale with gear or talents.',
+  },
   warlock: {
     doomLabel: 'Condemnation',
     fateThreadsLabel: 'Fate Threads',
@@ -1443,6 +1488,32 @@ export const hudChromeStrings = {
     devTierCol: 'Badge',
     mergedPrs: 'Merged PRs',
     devEmpty: 'No ranked contributors yet.',
+    // World Quests tab: the medal world quests' public ladders (best attempt
+    // per character). One chip per scoreboard, then rank / name / medal and
+    // the board's own number (waves held, seconds, or points).
+    tabWorldQuests: 'World Quests',
+    wqBoardsLabel: 'World quest scoreboards',
+    wqMedal: 'Medal',
+    wqWaves: 'Waves held',
+    wqTime: 'Time',
+    gliderCourseNames: {
+      downs: 'Coastal Circuit',
+      valleys: 'Valley Circuit',
+      switchbacks: 'Ridge Switchbacks',
+    },
+    gliderDaily: '{course}: Today',
+    gliderLifetime: '{course}: All time',
+    gliderStart: 'Fly this course',
+    gliderRankings: 'Glider course records',
+    gliderPersonalRules:
+      'Your offline records, saved with this character. Pass every ring in order. Daily records reset each day.',
+    gliderRules:
+      'Fastest complete flight wins. Pass every ring. Daily records reset with the realm. Records refresh within 30 seconds.',
+    wqPoints: 'Score',
+    wqSeconds: '{seconds}s',
+    wqNoMedal: 'None',
+    wqMedals: { gold: 'Gold', silver: 'Silver', bronze: 'Bronze' },
+    wqEmpty: 'No scores on this board yet. Finish the world quest to claim a spot.',
     // The top-three podium every tab shows on its first page: its list label and
     // the stand-in name on a place nobody holds yet.
     podiumLabel: 'Top three',
@@ -1450,6 +1521,32 @@ export const hudChromeStrings = {
     // The prestige star's tooltip on a ladder row and on a podium card: one key
     // with the rank interpolated, never a translated word glued to a number.
     prestigeTitle: 'Prestige {rank}',
+  },
+  // The World Quest rankings window (world_quest_leaderboard_window.ts): a
+  // card per medal world quest, the top-three podium, the rest of the ladder,
+  // and the viewer's own best pinned at the bottom. Column headers, the
+  // loading / error / empty lines, and the medal names reuse the leaderboard keys.
+  wqLadder: {
+    title: 'World Quest Rankings',
+    subtitle: 'The best attempt of every hero, one ladder per medal world quest.',
+    close: 'Close World Quest Rankings',
+    rankedBy: {
+      waves: 'Ranked by waves held',
+      seconds: 'Ranked by fastest time',
+      points: 'Ranked by highest score',
+    },
+    rankedByMedal: {
+      waves: 'Ranked by medal, then waves held',
+      seconds: 'Ranked by medal, then fastest time',
+      points: 'Ranked by medal, then highest score',
+    },
+    podiumLabel: 'Top three',
+    unclaimed: 'Unclaimed',
+    totalOne: 'One hero ranked',
+    totalMany: '{count} heroes ranked',
+    selfLabel: 'Your best',
+    selfRank: 'Rank {rank}',
+    selfNone: 'You have no score on this board yet. Finish the world quest to join the ladder.',
   },
   // Guild pledge board (docs/prd/guild-pledge-board.md): shared strings for the
   // guild high-score tab's pledge affordances AND the social window's Pledges
@@ -3392,9 +3489,108 @@ export const hudChromeStrings = {
     stats: 'Stats',
     progression: 'Progression',
     skills: 'Skills',
+    reputation: 'Reputation',
+    currencies: 'Currencies',
+    // The sheet's bottom tab strip: the paperdoll tab and the skills tab read
+    // as Character and Professions there (stats/skills keep their ids).
+    character: 'Character',
+    professions: 'Professions',
     gathering: 'Gathering',
     crafting: 'Crafting',
     openProfessions: 'Open Professions',
+  },
+  // The Currencies tab (src/ui/hud/currencies/): every spendable balance that
+  // is not coin. The faction rows stay pending until the World Quests scope's
+  // Stage 2 chooses the currency model.
+  currencies: {
+    intro: 'None of these take bag space. Coin stays in your bag as always.',
+    activities: 'Activities',
+    factions: 'Factions',
+    honor: 'Honor',
+    delveMark: 'Delve Mark',
+    wocToken: 'WoC Token',
+    heroicMarkNote: 'Heroic dungeons . spend at the heroic quartermaster',
+    honorNote: 'Battlegrounds and the arena',
+    delveMarkNote: 'Delves completed',
+    wocTokenNote: 'Linked wallet balance',
+    walletNotLinked: 'No wallet linked',
+    wocPreview: 'Preview balance, not yet verified',
+    lifetime: 'Lifetime {amount}',
+    factionPending: 'Faction currency: pending Stage 2',
+  },
+  // The Reputation tab (src/ui/hud/reputation/). Faction and tier names are
+  // PROVISIONAL: the World Quests scope leaves the final names to narrative.
+  reputation: {
+    intro:
+      'All three factions progress at once: every world quest counts toward the faction of its zone.',
+    faction: {
+      rift_watch: 'Rift Watch',
+      church_order: 'Church Order',
+      automatons: 'Automatons',
+    },
+    hub: {
+      rift_watch: 'Drifthaven',
+      church_order: 'Brother Aldric',
+      automatons: 'Wyrmwatch',
+    },
+    hubLine: '{hub} . {zone}',
+    tier: {
+      unknown: 'Unknown',
+      recognized: 'Recognized',
+      trusted: 'Trusted',
+      proven: 'Proven',
+      vanguard: 'Vanguard',
+      champion: 'Champion',
+    },
+    factionTitle: {
+      rift_watch: {
+        unknown: 'Outsider',
+        recognized: 'Watcher',
+        trusted: 'Riftwalker',
+        proven: 'Warden',
+        vanguard: 'Riftwarden',
+        champion: 'Champion',
+      },
+      church_order: {
+        unknown: 'Outsider',
+        recognized: 'Acolyte',
+        trusted: 'Keeper',
+        proven: 'Templar',
+        vanguard: 'Dawnkeeper',
+        champion: 'Champion',
+      },
+      automatons: {
+        unknown: 'Outsider',
+        recognized: 'Operator',
+        trusted: 'Mechanist',
+        proven: 'Artificer',
+        vanguard: 'Forgemaster',
+        champion: 'Champion',
+      },
+    },
+    progress: '{current} / {next}',
+    next: 'Next: {tier}',
+    maxed: 'Highest standing reached',
+    cappedByLevel: 'Standing pauses at {tier} until level 16',
+    today: 'Today',
+    questsDone: 'World quests completed',
+    questsDoneValue: '{done} / {total}',
+    resetsIn: 'Board',
+    resetsUnknown: 'No board today',
+    title: 'Faction title',
+    titleLine: '{faction} . {tier}',
+    legend: 'Standing tiers',
+    // The authoritative purchase refusal on a standing-gated vendor row
+    // (src/sim/items.ts buyItem), re-localized by identity in sim_i18n.ts.
+    vendorGate: 'Requires {tier} with {faction}.',
+    // The standing receipt a world quest turn-in or a finished clue hunt logs
+    // (src/sim/world_quests.ts, src/sim/clue_scrolls.ts), re-localized in sim_i18n.ts.
+    standingGained: '+{amount} {faction} Standing.',
+    // The tier-reached celebration (src/ui/hud/reputation/): the plate, its
+    // faction-title subtext, and the durable gold chat line.
+    tierReachedBanner: 'Now {tier} with the {faction}',
+    tierReachedSubtext: 'Faction title: {title}',
+    tierReachedLine: 'You are now {tier} with the {faction}. Your faction title is now {title}.',
   },
   questLog: {
     completed: 'Completed',
@@ -3574,6 +3770,83 @@ export const hudChromeStrings = {
     attackSlow: 'and slows the target attack speed by {pct}% for {duration} sec',
     dot: 'festers {name}, a {school} damage-over-time dealing {total} over {duration} sec',
     hot: 'blooms {name}, a heal-over-time restoring {total} over {duration} sec',
+  },
+  // Trinkets (src/sim/content/trinkets.ts, src/sim/combat/trinkets.ts): the item
+  // tooltip's green Equip and Use lines (src/ui/trinket_tooltip_view.ts) and the
+  // Gambler's Die fortune notice. Every number is a resolved value for the viewer;
+  // {cooldown} is cooldownMinutes or cooldownSeconds.
+  trinkets: {
+    equipLine: 'Equip: {effect}',
+    // A power-scaled amount: its base, then what the viewer's power adds.
+    scaled: '{base} (+{bonus})',
+    useLine: 'Use: {effect} ({cooldown} cooldown)',
+    cooldownMinutes: '{minutes} min',
+    cooldownSeconds: '{seconds} sec',
+    // The Gambler's Die notice: {item} is the die's name, {fortune} the rolled
+    // fortune (an aura name, or snakeEyes below).
+    gambleResult: '{item}: {fortune}!',
+    snakeEyes: 'Snake Eyes',
+    // The action-bar hover's sub-line for the worn trinket, in place of the
+    // bag count (item_bags_line_core.ts): it is used where it is worn.
+    equippedLine: 'Equipped',
+    // The item tooltip's note under the Use line (combat/trinkets.ts
+    // onTrinketEquipped); {seconds} is TRINKET_EQUIP_LOCKOUT. Wordy (M16):
+    // filled in es and the five non-Latin locales in this change.
+    equipLockout:
+      'Equipping it starts a {seconds} sec cooldown on its use, or the cooldown left on the trinket it replaces if that is longer.',
+    equip: {
+      lastStand:
+        'Taking damage while below {threshold}% health grants a shield that absorbs {absorb} damage ({absorbPct}% of your maximum health) for {duration} sec. Can occur once every {icd} sec.',
+      hourglass:
+        'Overhealing from your direct heals is stored in the hourglass, up to {cap} ({capPct}% of your maximum health). Stored healing fades {fade} sec after it last grew.',
+      twinStrike:
+        'Your auto-attack hits have a {chance}% chance to make an extra main-hand melee swing. Can occur once every {icd} sec.',
+      tally:
+        'Your auto-attack critical hits and your killing blows each add a tally mark, up to {max}. Marks last {duration} sec, refreshed whenever you gain one.',
+      storm:
+        'Each spell you cast adds a charge, up to {max}. Charges last {duration} sec, refreshed whenever you gain one.',
+      heat: 'Your melee and ranged weapon hits each add a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.',
+      ignite:
+        'Your melee and ranged weapon critical hits set the target alight, dealing {tick} Fire damage every {every} sec for {duration} sec. A new critical hit refreshes it. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+      guardHeat:
+        'Each attack you parry, dodge or block adds a heat stack, up to {max}. Heat lasts {duration} sec, refreshed whenever you gain a stack.',
+    },
+    use: {
+      retaliate:
+        'For {duration} sec, an enemy that hits you directly takes Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.',
+      anchor:
+        'For {duration} sec, take {reduction}% less damage but move at {speed}% speed. Removes stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you, and you ignore new ones and knockbacks while it lasts.',
+      hourglass:
+        'Turn all stored healing into a shield on the party member within {range} yd with the lowest health percentage, you included. The shield lasts {duration} sec. Requires stored healing.',
+      wellspring:
+        'Heal you and party members within {radius} yd for {tick} every {every} sec for {duration} sec. Healing increases with Healing Power.',
+      bleedEdge:
+        'For {duration} sec, your auto-attack hits apply Talon Wound, which deals {tick} Physical damage per stack every {every} sec for {bleedDuration} sec and stacks up to {stacks} times. Damage increases with Attack Power.',
+      tallyStrike:
+        'Spend all tally marks to strike your target within {range} yd for {perMark} Physical damage per mark ({max} at {maxMarks} marks). Damage increases with Attack Power. Requires a tally mark.',
+      stormjar:
+        'Release all charges as a bolt at your target within {range} yd that jumps to up to {extra} more enemies within {jumpRange} yd. Each enemy takes {perCharge} Nature damage per charge ({max} at {maxCharges} charges). Damage increases with Spell Power. Requires a charge.',
+      echo: 'For {duration} sec, your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.',
+      gamble:
+        'Roll one of four fortunes for {duration} sec: {keenEdge} (deal {keenPct}% more damage), {luckyStreak} (heal {heal} over the duration), {gildedGuard} (a shield that absorbs {absorb} damage), or {snakeEyes} (no effect, but this cooldown is halved).',
+      blink: 'Step {yards} yd forward, then take {reduction}% less damage for {guard} sec.',
+      sprint:
+        'Increase your movement speed by {speed}% for {duration} sec. Does not stack with other speed increases.',
+      defiance:
+        'Remove all stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms and incapacitating effects on you. Usable while stunned.',
+      brand:
+        'Brand an enemy player within {range} yd, reducing the healing they receive by {cut}% for {duration} sec.',
+      temper:
+        'Spend all heat stacks to temper your weapon for {duration} sec. Your melee and ranged weapon hits deal {damage} extra Fire damage, increased by {perHeat}% for each heat stack spent (up to {maxBonus}% at {maxHeat} stacks). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+      kindlingOrb:
+        'Summon an ember orb beside you for {duration} sec. Each spell you cast at an enemy makes it fire a bolt at that enemy for {damage} Fire damage. Damage increases with Spell Power.',
+      pierce:
+        'For {duration} sec, your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {share}% of the damage dealt.',
+      lantern:
+        'Set a lantern at your feet for {duration} sec. A direct heal from anyone on you or a party member within {radius} yd of it also heals the most wounded other party member in its light for {share}% of the heal.',
+      heartNova:
+        'Spend all heat stacks on a fire nova that deals {perHeat} Fire damage per stack ({max} at {maxHeat} stacks) to each enemy within {radius} yd and taunts every creature it hits. Damage increases with Attack Power. Requires a heat stack.',
+    },
   },
   // Quest-link sharing: the chat-link affordance and its sim-emitted notices
   // (re-localized through the hud-local localizeErrorText/localizeSystemText arms).
@@ -3803,6 +4076,7 @@ export const hudChromeStrings = {
   },
   // Character window (paperdoll) controls.
   paperdoll: {
+    trinketSlot: 'Trinket',
     unequipAria: 'Unequip {item}',
     unequipHint: 'Click ×, right-click, or drag to bags to unequip',
     // The helmet-visibility eye on the head socket: each string is the action
@@ -4868,6 +5142,7 @@ export const hudChromeStrings = {
     // The carried-flag buff's tooltip: the ONLY place the voluntary-drop
     // affordance is spelled out, so the player can find it without folklore.
     carriedFlag: 'You are carrying the enemy flag. Cancel this buff to drop it.',
+    carryingFreight: 'You are carrying freight. Movement speed is reduced by {pct}%.',
     battleStance: 'Battle Stance: 10% more rage generation',
     berserkerStance: 'Berserker Stance: crits 3% more often and hit 3% harder',
     crit: 'Increases critical strike chance by {pct}%',
@@ -4943,6 +5218,68 @@ export const hudChromeStrings = {
     resourceSap: 'Restores {value} of your current resource every {interval} sec',
     nextAttackCrit: 'Your next attack is guaranteed to critically strike',
     healEcho: 'Falling below {threshold}% health restores {value} health',
+    // Trinket auras (src/ui/trinket_aura_effect.ts): what each buff, counter and
+    // debuff a trinket applies does, with the live amounts. The *Other variants
+    // are another player's aura, whose power-scaled amount the viewer cannot
+    // resolve. Wordy (M16): filled in es and the five non-Latin locales in this
+    // change, each using its locale's trinket and aura names.
+    trinket: {
+      lastStandCooldown:
+        "Bastion Sigil's Last Bastion shield was used. Falling below {threshold}% health cannot raise it again until this expires.",
+      lastBastion:
+        'Absorbs {value} damage. Bastion Sigil raised it when you took damage below {threshold}% health.',
+      retaliate:
+        'Enemies that hit you directly take Physical damage equal to {pct}% of the health that hit took from you. Periodic damage does not trigger it.',
+      moored:
+        'You take {reduction}% less damage but move at {speed}% speed. You ignore stuns, roots, slows, fears, polymorphs, silences, blinds, hexes, disarms, incapacitating effects and knockbacks.',
+      hourglassStored:
+        "Holds {stored} healing stored from your overhealing. Use Mender's Hourglass to turn it into a shield on the party member within {range} yd with the lowest health percentage, you included.",
+      hourglassShield: "Absorbs {value} damage. Made from the healing a Mender's Hourglass stored.",
+      wellspring: 'Restores {tick} health every {every} sec.',
+      twinStrikeCooldown:
+        'Paired Talons just made an extra swing. It cannot make another until this expires.',
+      bleedEdge:
+        'Your auto-attack hits apply Talon Wound: {tick} Physical damage per stack every {every} sec for {duration} sec, stacking up to {max} times.',
+      bleedEdgeOther:
+        'Auto-attack hits apply Talon Wound, a Physical bleed that stacks up to {max} times. Damage increases with Attack Power.',
+      talonWound:
+        'Deals {damage} Physical damage every {every} sec ({stacks}/{max} stacks). Each new stack adds damage and refreshes the duration.',
+      tally:
+        "Tally marks: {stacks}/{max}. Use Hunter's Tally to spend them all on a strike at your target for {damage} Physical damage ({perMark} per mark).",
+      tallyOther:
+        "Tally marks: {stacks}/{max}. Hunter's Tally spends them all on a Physical strike that deals more damage for each mark.",
+      storm:
+        'Charges: {stacks}/{max}. Use Stormjar to release them as a bolt that hits your target and up to {extra} more enemies within {jumpRange} yd of each other for {damage} Nature damage each ({perCharge} per charge).',
+      stormOther:
+        'Charges: {stacks}/{max}. Stormjar releases them as a Nature bolt that hits the target and up to {extra} more enemies, dealing more damage for each charge.',
+      echo: 'Your next {casts} direct heals or direct non-Physical damage hits repeat for {pct}% of their amount.',
+      keenEdge: "Gambler's Die fortune: you deal {pct}% more damage.",
+      luckyStreak: "Gambler's Die fortune: restores {tick} health every {every} sec.",
+      gildedGuard: "Gambler's Die fortune: absorbs {value} damage.",
+      riftGuard: 'You take {pct}% less damage.',
+      sprint: 'Movement speed increased by {pct}%. Does not stack with other speed increases.',
+      brand: 'Healing received is reduced by {pct}%.',
+      forgeHeat:
+        "Heat: {stacks}/{max}. Using Forgefather's Temper spends it all, and its weapon fire deals {pct}% more damage.",
+      tempered:
+        'Your melee and ranged weapon hits deal {damage} extra Fire damage ({pct}% more from the heat spent). Each killing blow adds {killExtend} sec, up to {maxDuration} sec in total.',
+      temperedOther:
+        'Melee and ranged weapon hits deal extra Fire damage, {pct}% more from the heat spent. Damage increases with Attack Power or Ranged Attack Power, whichever is higher.',
+      kindlingOrb:
+        'Each spell you cast at an enemy makes the orb fire a bolt at that enemy for {damage} Fire damage. It holds its fire at a polymorphed, incapacitated or blinded enemy.',
+      kindlingOrbOther:
+        'Each spell cast at an enemy makes the orb fire a bolt of Fire damage at that enemy. Damage increases with Spell Power.',
+      moltenIgnite:
+        'Deals {damage} Fire damage every {every} sec. Another weapon critical hit refreshes it.',
+      pierce:
+        'Your auto-attacks, shots and physical abilities (not bleeds) also strike the enemy nearest your target within {reach} yd for {pct}% of the damage dealt.',
+      lantern:
+        'A direct heal from anyone on you or a party member within {radius} yd of the lantern also heals the most wounded other party member in its light for {pct}% of the heal.',
+      crucibleHeat:
+        'Heat: {stacks}/{max}. Use Heart of the Crucible to spend it all on a fire nova that deals {damage} Fire damage to each enemy within {radius} yd and taunts every creature it hits.',
+      crucibleHeatOther:
+        'Heat: {stacks}/{max}. Heart of the Crucible spends it all on a fire nova within {radius} yd that deals more Fire damage for each stack and taunts every creature it hits.',
+    },
     increase: {
       ap: 'Increases attack power by {value}',
       str: 'Increases Strength by {value}',
@@ -5937,11 +6274,23 @@ export const hudChromeStrings = {
     // and cross-posts to Discord (looking-for-group, trade, recruiting, events).
     relay: {
       tooFast: 'You are posting too fast. Wait a moment and try again.',
-      lfg: { label: 'Looking for Group', hint: 'Find players for a dungeon or quest' },
-      wts: { label: 'Want to Sell', hint: 'Advertise an item or service for sale' },
+      lfg: {
+        label: 'Looking for Group',
+        hint: 'Find players for a dungeon or quest',
+      },
+      wts: {
+        label: 'Want to Sell',
+        hint: 'Advertise an item or service for sale',
+      },
       wtb: { label: 'Want to Buy', hint: 'Request an item you want to buy' },
-      recruit: { label: 'Guild Recruiting', hint: 'Recruit players for your guild' },
-      event: { label: 'Event / Raid', hint: 'Announce a raid, meetup or event' },
+      recruit: {
+        label: 'Guild Recruiting',
+        hint: 'Recruit players for your guild',
+      },
+      event: {
+        label: 'Event / Raid',
+        hint: 'Announce a raid, meetup or event',
+      },
       help: { label: 'Need Help', hint: 'Ask the community for help' },
     },
   },
@@ -7199,10 +7548,23 @@ export const hudChromeStrings = {
     enchant_chest_lucent_stamina: 'Chest Etching: Lucent Stamina',
     enchant_feet_lucent_agility: 'Boot Etching: Lucent Agility',
     enchant_lucent_infusion: 'Lucent Infusion',
+    // The four learned faction formulas (docs/design/factions.md).
+    enchant_weapon_riftwalkers_grace: "Riftwalker's Grace",
+    enchant_weapon_dawnfire_etching: 'Weapon Etching: Dawnfire',
+    enchant_weapon_dawns_benediction: "Weapon Etching: Dawn's Benediction",
+    enchant_weapon_piston_drive: 'Weapon Etching: Piston Drive',
   },
   enchantDescription: {
     enchant_weapon_lastflame_zeal:
       "Your landed melee attacks can grant 50 Strength for 15 sec and heal you for 200 health. Healing modifiers apply. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+    enchant_weapon_riftwalkers_grace:
+      "Your landed melee attacks can grant 60 Agility and 2% faster melee attacks for 15 sec. Each hit rolls 1% per 0.6 sec of the striking weapon's base speed. No internal cooldown. Both hands share one buff; any trigger refreshes it, and it never stacks. Ranged attacks do not trigger this effect. Cat Form uses its 1 sec base swing speed instead.",
+    enchant_weapon_dawnfire_etching:
+      'Permanently etches a weapon with 18 Spell Power. Spell Power also counts toward Healing Power. A flat bonus; it does not scale.',
+    enchant_weapon_dawns_benediction:
+      'Permanently etches a weapon with 34 Healing Power. Healing Power raises heals only, never spell damage. A flat bonus; it does not scale.',
+    enchant_weapon_piston_drive:
+      'Permanently etches a two-handed weapon with 12 Strength and 25 Critical Strike Rating. Cannot be applied to a one-handed weapon. A flat bonus; it does not scale.',
   },
   // Professions window (Professions 2.0): the read-only craft-wheel
   // window. Craft and pair NAMES resolve through craftName / archetypePair
@@ -8746,6 +9108,37 @@ export const hudChromeStrings = {
     // the quest log's per-quest toggle, which is the way back from untracked.
     untrack: 'Untrack',
     track: 'Track',
+    // The rail's world-quest section (src/ui/hud/map/world_quest_rail_*): the
+    // day's board, the shared marker selection, and the one daily replacement,
+    // which always confirms before it reaches the world. The refusal reasons
+    // re-localize the sim's canRerollWorldQuest texts by identity.
+    worldQuests: {
+      heading: 'World quests today',
+      count: '{done} / {total}',
+      empty: 'No world quests today',
+      replacement: 'Replacement',
+      state: {
+        active: 'In progress',
+        completed: 'Done',
+      },
+      reroll: 'Replace quest',
+      rerollNote: 'One replacement available today',
+      rerollUsed: 'Replacement used today',
+      rerollReason: {
+        noCycle: 'No board today',
+        usedToday: 'Replacement used today',
+        completed: 'A completed quest cannot be replaced',
+        inProgress: 'A quest in progress cannot be replaced',
+        notActive: 'This quest is not on your board',
+        noAlternative: 'No other quest is available in that zone today',
+        unknown: 'This quest cannot be replaced today',
+      },
+      confirmTitle: 'Replace this world quest?',
+      confirmBody:
+        'You can replace only one world quest a day, and it cannot be undone. {quest} will be swapped for another quest in its zone.',
+      confirmOk: 'Replace',
+      confirmCancel: 'Cancel',
+    },
     legend: {
       dungeon: 'Dungeon',
       ore: 'Ore',
@@ -9207,5 +9600,66 @@ export const hudChromeStrings = {
     gatedByQuest: 'While questing: {quest}',
     empty: 'No loot matches these filters.',
     resultCount: '{count} results',
+  },
+  // The weekly emissary's window (src/ui/weekly_quests_window.ts): four
+  // charges, one pick a week, the confirm dialog and the reward line.
+  weekly: {
+    title: 'Weekly Quests',
+    close: 'Close weekly quests',
+    subtitle: 'Pick one of the four charges. It',
+    resetsIn: 'resets in {time}.',
+    anyDifficulty: 'Any difficulty',
+    choose: 'Choose quest',
+    inProgress: 'In progress ({count}/{required})',
+    completed: 'Completed this week',
+    lockedThisWeek: 'Locked this week',
+    footerPick: 'You may hold one weekly charge at a time. Pick a card to read its terms.',
+    footerHeld: 'Your charge for the week is set. The other three unlock at the reset.',
+    dialogHeading: 'Weekly quest: {category}',
+    objectives: 'Quest objectives',
+    rewards: 'Rewards',
+    alsoReceive: 'You will also receive:',
+    tally: '{count} / {required}',
+    cacheDesc:
+      'Opens into one Normal raid piece for your class (never a tier-set piece), plus {count} x {item}.',
+    dialogNote: 'Only one weekly charge can be active. It {reset}',
+    accept: 'Accept',
+    decline: 'Decline',
+    kinds: {
+      dungeons: {
+        category: 'Dungeons',
+        lore: 'The depths of the realm never rest: the Derelict Mech stirs again and the Hollow Crypt wakes. Gather your allies and cleanse the dungeons of their corruption.',
+        goal: 'Complete {count} dungeons on any difficulty.',
+        goalLabel: 'Dungeons completed',
+      },
+      raid: {
+        category: 'Raid',
+        lore: 'Ancient powers wake in the Crucible of the Last Flame and on the heights of Thornpeak. Face Ignivar or Nythraxis and bring down the enemy commander.',
+        goal: 'Take part in {count} raid on any difficulty.',
+        goalLabel: 'Raids completed',
+      },
+      battlegrounds: {
+        category: 'Battlegrounds',
+        lore: 'War banners fly over Thornhollow Fields. Fight beside your faction, hold the flag and prove your worth in battle; every match counts, won or lost.',
+        goal: 'Complete {count} battlegrounds.',
+        goalLabel: 'Battlegrounds completed',
+      },
+      worldboss: {
+        category: 'World boss',
+        lore: 'Mighty foes roam the wild lands, each strong enough to defy whole armies. Join whoever is near and bring down one colossal aberration.',
+        goal: 'Defeat {count} world boss in the wild lands.',
+        goalLabel: 'World bosses defeated',
+      },
+    },
+    // The commendation: standing with one faction of the owner's choice,
+    // claimed from the window once the charge is finished.
+    commendHeading: "Emissary's commendation",
+    commendNote: '{amount} standing to one faction of your choice, once a week.',
+    commendClaimed: "This week's commendation went to the {faction}.",
+    commendRewardLine: '{amount} standing with a faction of your choice',
+    // Chat and banner lines for the emissary's events.
+    chosen: 'Weekly quest taken: {category}',
+    progress: '{label}: {count}/{required}',
+    done: 'Weekly quest complete: {category}',
   },
 };

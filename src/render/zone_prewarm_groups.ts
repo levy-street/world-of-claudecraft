@@ -13,7 +13,7 @@ import { type CharacterVisual, createCharacterVisual } from './characters';
 import { skinCount, visualKeyFor } from './characters/manifest';
 import { characterVisualPoolKey } from './characters/visual_pool';
 import type { PooledObjectView } from './ground_object_pool';
-import { buildGroundQuestObject } from './quest_objects';
+import { buildGroundQuestObject, prewarmFarshoreSalvageObjects } from './quest_objects';
 import { setRenderCategory } from './renderer_diagnostics';
 
 const PREWARM_MOB_TEMPLATE_IDS = [
@@ -309,6 +309,15 @@ export function buildObjectPrewarmGroup(host: object): THREE.Group {
       });
       place(built.group);
     }
+  }
+  // The Farshore salvage world quest's rotating wreckage props share the object
+  // pool, so their first appearance in a cycle does not compile or build live.
+  for (const { group: object } of prewarmFarshoreSalvageObjects(
+    buildGroundQuestObject,
+    (poolKey, built) => h.storePooledObject(poolKey, built),
+  )) {
+    object.visible = true;
+    place(object);
   }
   return group;
 }

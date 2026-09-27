@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroïsch: Smeltkroes van de Laatste Bron',
-    desc: 'Alleen heroïsche wapens van Ignivar, Heraut van de Laatste Vlam.',
+    desc: 'Alleen heroïsche wapens en de raidtrinkets van Ignivar, Heraut van de Laatste Vlam.',
   },
   conquerors_varkhul: {
     name: 'De Binnenste Smeltkroes',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroïsch: De Binnenste Smeltkroes',
-    desc: 'Alleen heroïsche schilden en wapens van Varkhul, Smidvader van de Laatste Vlam.',
+    desc: 'Alleen heroïsche schilden en wapens en de raidtrinkets van Varkhul, Smidvader van de Laatste Vlam.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Doornhuid",

@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroisk: Den Sidste Kildes Digel',
-    desc: 'Våben kun fra heroisk tilstand, fra Ignivar, den Sidste Flammes Herold.',
+    desc: 'Våben kun fra heroisk tilstand samt raidets trinkets, fra Ignivar, den Sidste Flammes Herold.',
   },
   conquerors_varkhul: {
     name: 'Den Indre Digel',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroisk: Den Indre Digel',
-    desc: 'Skjolde og våben kun fra heroisk tilstand, fra Varkhul, den Sidste Flammes Smedefader.',
+    desc: 'Skjolde og våben kun fra heroisk tilstand samt raidets trinkets, fra Varkhul, den Sidste Flammes Smedefader.',
   },
   conquerors_set_bramblehide: {
     name: "Roots' Tornehud",

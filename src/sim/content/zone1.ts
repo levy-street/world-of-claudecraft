@@ -828,6 +828,18 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: ['q_prof_intro', 'q_mine'],
     greeting: "Whole dig's crawling with those dirt-caked vermin!",
   },
+  eastbrook_vault_keeper: {
+    id: 'eastbrook_vault_keeper',
+    name: 'Vault Keeper',
+    title: 'Weekly Rewards',
+    pos: { ...EASTBROOK_LAYOUT.weeklyVault.keeper },
+    facing: EASTBROOK_LAYOUT.weeklyVault.rot,
+    color: 0xc9a227,
+    questIds: [],
+    dynamic: true,
+    greeting:
+      'Your weekly rewards await. Choose one item from your earned choices after the Crucible reset.',
+  },
   bursar_fernando: {
     id: 'bursar_fernando',
     name: 'Bursar Fernando',
@@ -1985,6 +1997,10 @@ export const ZONE1_ROADS: { x: number; z: number }[][] = [
     { x: -4, z: -123.5 },
     { x: 4, z: -123 },
     { x: 12, z: -126 },
+    // Keep the coast track clear of the vault hall and its western entrance.
+    { x: 10, z: -122 },
+    { x: 11, z: -113 },
+    { x: 14, z: -108 },
     { x: 30, z: -30 },
     { x: 50, z: -50 },
     { x: 65, z: -65 },
@@ -2014,6 +2030,7 @@ export const ZONE1_PROPS: ZonePropsDef = {
       rot: building.rotation,
       height: building.nativeDimensions.height,
     })),
+    { ...EASTBROOK_LAYOUT.weeklyVault },
   ],
   wells: [
     {

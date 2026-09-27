@@ -39,6 +39,7 @@ import {
   FURY_STOCK,
   HONOR_QUARTERMASTER_STOCK,
   WARFARE_ITEMS,
+  WARFARE_TRINKET_STOCK,
 } from '../src/sim/content/pvp_honor';
 import {
   isCataloguedRelicItem,
@@ -463,9 +464,15 @@ describe('Reliquary Conqueror catalog structure', () => {
     // horizons_mounts rows (goblin_rocket_sled, rallycart_rxt): 445, MEASURED
     // on the merged tree. UNION MERGE: base plus both deltas, the professions
     // and release branches content is disjoint.
+    // The world-quest branch's Arcane Calligraphy gold title joins the titles
+    // page at the release/v0.43.0 merge: 441. The three faction standing
+    // Champion titles (Riftwarden, Dawnkeeper, Forgemaster) join it: 444. The
+    // Clue Scroll Treasure Hunter title joins it: 445.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge) takes a horizons_mounts slot: 446.
+    // the trinket slot's 18 trinkets (PR 4173): twelve item relics plus the five Crucible raid trinkets: 463.
+    expect(full).toEqual({ owned: 463, total: 463 });
     // The Warfare Season 2 Vanguard Gallery (135 set pieces and four weapons)
     // is class-personal and sits outside completion, so it moves neither pair.
-    expect(full).toEqual({ owned: 441, total: 441 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -493,8 +500,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // (goblin_rocket_sled, rallycart_rxt), the same +2 as the overview pair
     // above: 416, MEASURED on the merged tree. UNION MERGE: base plus both
     // deltas, see the overview pair's note above.
+    // 412 at the release/v0.43.0 merge: the Arcane Calligraphy gold title slot.
+    // 415 with the three faction standing Champion title slots. 416 with the
+    // Clue Scroll Treasure Hunter title slot. 417 with the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge). 434 with the trinket slot's 18 trinkets (PR 4173).
+    expect(character).toEqual({ owned: 434, total: 434 });
     // The Warfare Season 2 page is class-personal, outside completion.
-    expect(character).toEqual({ owned: 412, total: 412 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -545,11 +555,16 @@ describe('Reliquary Conqueror catalog structure', () => {
     // OSSBrain candidate side of THIS merge independently adds its own two
     // horizons_mounts slots (goblin_rocket_sled, rallycart_rxt): 488,
     // MEASURED on the merged tree. UNION MERGE: base plus both deltas, see
-    // the completion pair note above.
+    // the completion pair note above. The Arcane Calligraphy gold title adds
+    // one titles-page slot at the release/v0.43.0 merge into feature/world-quests:
+    // 484. The three faction standing Champion titles add three more: 487.
+    // The Clue Scroll Treasure Hunter title adds one more: 488.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(623); // +139: the Warfare Season 2 page.
+      // the trinket slot's 18 trinkets (PR 4173): twelve slots plus two per Crucible raid trinket: 511.
+      // +139 at the second release/v0.44.0 base merge: the Warfare Season 2 page: 650.
+    ).toBe(650);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -711,8 +726,10 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // (the entry stock plus Warfare Season 2 on both NPCS rows) and nothing rides it that could also
     // be bought for copper (a dual-priced row would fall back into the sweep
     // above by construction; this pins the classifier's copper half live).
+    // The Warfare Season 2 stock and the two honor trinkets ride the same
+    // exemption on both counters.
     expect(honorExempt).toBe(HONOR_QUARTERMASTER_STOCK.length * 2);
-    expect(FURY_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
+    expect(HONOR_QUARTERMASTER_STOCK.every((id) => honorOnly(priceOf(id)))).toBe(true);
     expect(honorOnly(priceOf('deacon_reliquary_helm'))).toBe(false);
     // The DUAL-PRICED arm, which the live catalog exhibits nowhere today: an
     // item purchasable with BOTH honor and copper is not exempt, because the
@@ -778,7 +795,11 @@ describe('Reliquary relic item ids resolve in ITEMS', () => {
     // Plus the seven Roots Bramblehide pieces and the seven Nythraxis
     // gap-fill drops: 333. UNION MERGE: base plus both deltas, see the
     // completion pair note above.
-    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(472); // +139: the Warfare Season 2 page.
+    // Plus the twelve trinkets (content/trinkets.ts), one page each: 345.
+    // Plus the five Crucible raid trinkets (each on its boss's Normal and
+    // Heroic page, one id each): 350.
+    // +139: the Warfare Season 2 page (second release/v0.44.0 base merge): 489.
+    expect(RELIQUARY_ITEM_TO_PAGES.size).toBe(489);
     for (const [id, pages] of RELIQUARY_ITEM_TO_PAGES) {
       expect(pages.length, `catalogued id ${id} maps to an empty page list`).toBeGreaterThan(0);
     }
@@ -1224,7 +1245,8 @@ describe('Reliquary Rift page pins against live rift content', () => {
       ...RIFT_EPIC_ITEM_IDS,
       ...RIFT_LEGENDARY_ITEM_IDS,
     ]);
-    expect(page.relics.length).toBe(17);
+    // 17 plus the two rift trinkets (sundered_prism, gamblers_die): 19.
+    expect(page.relics.length).toBe(19);
     // Band absence stated directly, so a re-added band reds on the claim it
     // breaks rather than only on the ordered equality above. The floor keeps
     // the loop from running zero times on an emptied source array (the
@@ -1526,17 +1548,21 @@ describe('Reliquary Warfare pages pin against the live honor stock', () => {
     // ashstalker, cinderweave, thornhide, helmet to feet within each), NOT
     // the shop window's armor-class re-sort (WARFARE_SHOP_SET_ORDER stays a
     // display concern).
+    // The two honor trinkets (WARFARE_TRINKET_STOCK) close the armory: they
+    // are set-less honor purchases from the same counters, outside FURY_STOCK.
     const setTagged = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set !== undefined);
     const setless = FURY_STOCK.filter((id) => WARFARE_ITEMS[id].set === undefined);
     expect(itemRelicIds(gallery)).toEqual(setTagged);
-    expect(itemRelicIds(armory)).toEqual(setless);
+    expect(itemRelicIds(armory)).toEqual([...setless, ...WARFARE_TRINKET_STOCK]);
+    // Warfare Season 2 has its own Vanguard gallery page, so the two Warfare
+    // pages partition the entry tier plus the trinkets, not the whole counter.
     expect([...itemRelicIds(gallery), ...itemRelicIds(armory)].sort()).toEqual(
-      [...FURY_STOCK].sort(),
+      [...FURY_STOCK, ...WARFARE_TRINKET_STOCK].sort(),
     );
     // Snug vacuity floors (a defs edit that dropped the set tags would
     // otherwise drain the gallery into the armory with the union still green).
     expect(itemRelicIds(gallery).length).toBe(35);
-    expect(itemRelicIds(armory).length).toBe(12);
+    expect(itemRelicIds(armory).length).toBe(14);
     // The kit half really is the five Warfare families at seven pieces each,
     // pinned against the item_sets.ts set ids (the partition's other axis).
     const byKit = new Map<string, number>();
@@ -1861,10 +1887,11 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   // The Crucible raid rooms (per-boss pages). The derivation excludes the
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
-  // Floors lowered 2026-09-07 when the wand and both held offhands moved to
-  // the heroic pages with their drops (the Heroic redistribution).
-  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 16 },
-  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 14 },
+  // The floors count the raid trinkets (three on Ignivar, two on Varkhul) over
+  // the 2026-09-07 redistribution's floors (16 / 14: the wand and both held
+  // offhands moved to the heroic pages with their drops).
+  ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 19 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 16 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
@@ -3029,12 +3056,9 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: [
-    'drakemaw_raptor',
-    'avian_strider',
-    'lanternback_troll',
-    'terrorspark_groundshaker',
-  ],
+  // avian_strider left this list when the Rift Watch quartermaster's Champion
+  // row gave it a route (content/faction_vendors.ts; MOUNT_SOURCES hints it).
+  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3155,13 +3179,16 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // 11 = the four heroic bosses + the raid + Marla + rift A/B/S + the two
   // pending-ruling absences resolve to nothing. The storefront door left with
   // the Mech Bird: a paid mount is a mount SKIN now, never a relic.
-  horizons_mounts: 10,
+  // 11 with the Rift Watch quartermaster's door: the Viridian Valestrider's
+  // Champion-standing reins (content/faction_vendors.ts).
+  horizons_mounts: 11,
   horizons_weapon_skins: 1,
   // Every title relic's source is its own deed, so the count tracks the page
   // rows: 36 + the four Phase 18 completion-ladder titles + the Grandmaster
   // Jewelcrafting and Inscription titles + the farming Harvestmaster + the
-  // Crucible raid's flawless title.
-  horizons_titles: 44,
+  // Crucible raid's flawless title + the three faction standing Champion
+  // titles + the Clue Scroll Treasure Hunter title.
+  horizons_titles: 49,
   // 29 = 27 distinct rift mobs across the ten rare multi-hints (eight theme
   // bosses + both citadel bosses + 17 trash carriers), plus the B and S rank
   // doors. The rift_first_clear activity left with the bands.
@@ -4114,7 +4141,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the four mounts content awards no route at all', () => {
+  it('the surviving pending rows are the three mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -4126,7 +4153,6 @@ describe('Reliquary source hint coverage', () => {
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
-      'avian_strider',
       'lanternback_troll',
       'terrorspark_groundshaker',
     ]);
@@ -4589,16 +4615,26 @@ describe('Reliquary source hint coverage', () => {
     // ids (essence + the three gems) stay outside the catalog. Equality in
     // both directions: a new RIFT_ITEMS id cannot quietly join a page, nor
     // sit unwatched, without a decision landing here.
+    // The two rift trinkets ride RIFT_EPIC_ITEM_IDS but their defs live in
+    // TRINKET_ITEMS (content/trinkets.ts), not RIFT_ITEMS: they are pinned
+    // catalogued directly below instead.
     const riftItemIds = Object.keys(RIFT_ITEMS);
     expect(riftItemIds.length).toBeGreaterThanOrEqual(23);
     const cataloguedRift = riftItemIds.filter((id) => watchedAwardIds.has(id)).sort();
+    const RIFT_TRINKETS = ['sundered_prism', 'gamblers_die'];
+    expect((RIFT_EPIC_ITEM_IDS as readonly string[]).filter((id) => !(id in RIFT_ITEMS))).toEqual(
+      RIFT_TRINKETS,
+    );
+    for (const id of RIFT_TRINKETS) expect(watchedAwardIds.has(id), id).toBe(true);
     expect(cataloguedRift).toEqual(
       [
         ...RIFT_RARE_ITEM_IDS,
         ...RIFT_GEAR_ITEM_IDS,
         ...RIFT_EPIC_ITEM_IDS,
         ...RIFT_LEGENDARY_ITEM_IDS,
-      ].sort(),
+      ]
+        .filter((id) => !RIFT_TRINKETS.includes(id))
+        .sort(),
     );
   });
 

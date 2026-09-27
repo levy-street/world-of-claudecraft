@@ -9,6 +9,7 @@
 // the wreck ribs live in render/gale_features.ts; the wooden harbor is
 // content/wickharbor_harbor.ts and content/wickharbor_wharf.ts.
 
+import { GLIDER_APPROACH_PATH } from '../glider_approach_path';
 import type {
   CampDef,
   GroundObjectDef,
@@ -69,13 +70,28 @@ export const GALECREST_ROADS: { x: number; z: number }[][] = [
   ], // Wickharbor -> the Old Beacon
   [
     { x: 420, z: 360 },
+    // The extra point on the shelf keeps the smoothed line straight past the
+    // cove-side ore vein at (430, 379), which the band pin in
+    // tests/gather_node_placement.test.ts keeps off the road.
+    { x: 424, z: 400 },
     { x: 432, z: 440 },
-    { x: 446, z: 512 },
-    { x: 438, z: 552 },
+    // Around the coastal hollows and along
+    // the paddock's north fence, back onto the old line east of the stables.
+    { x: 418, z: 446 },
+    { x: 372, z: 488 },
+    // South of the wet hollow at (390, 536) (tests/galecrest.test.ts keeps
+    // every road above the water line), as a lane along the paddock's north
+    // fence.
+    { x: 360, z: 520 },
+    { x: 368, z: 542 },
+    { x: 400, z: 543 },
+    { x: 420, z: 541 },
+    { x: 438, z: 556 },
     { x: 434, z: 610 },
     { x: 390, z: 634 },
     { x: 352, z: 636 },
-  ], // Wickharbor -> above the Shear -> past the stables' east fence -> the Wreckfields
+  ], // Wickharbor -> around the Shear -> past the stables' east fence -> the Wreckfields
+  GLIDER_APPROACH_PATH.map(({ x, z }) => ({ x, z })), // western mountain launch trail
   [
     { x: 420, z: 360 },
     { x: 352, z: 342 },

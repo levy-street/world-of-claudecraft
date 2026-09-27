@@ -1,4 +1,6 @@
 import { BENISON_4PC_WHISPER_HEAL_BONUS } from '../content/ignivar_set_bonuses';
+import { gliderActionsLocked } from '../glider_action_lock';
+import { shadowActionsLocked } from '../shadow_action_lock';
 import { BENISON_WHISPER_AURA_ID } from './priest/benison_dawnweave';
 // Player cast lifecycle, extracted from the Sim monolith (C4a).
 //
@@ -81,6 +83,7 @@ import {
   TOOL_RECHARGE_CAST_ID,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
+import { wispMazeActionsLocked } from '../wisp_maze_action_lock';
 import { sharedCooldownIds } from './ability_cooldown_groups';
 import {
   afflictionAdjustedCastTime,
@@ -1024,6 +1027,13 @@ export function castAbility(
   const r = ctx.resolve(pid);
   if (!r) return;
   const { meta, e: p } = r;
+  if (
+    meta.vehicle ||
+    wispMazeActionsLocked(meta.worldQuestLog) ||
+    shadowActionsLocked(meta.worldQuestLog) ||
+    gliderActionsLocked(meta.worldQuestLog)
+  )
+    return;
   let res = ctx.resolvedAbility(abilityId, p.id);
   if (!res) {
     ctx.error(p.id, 'You do not know that ability.');

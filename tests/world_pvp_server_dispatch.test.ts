@@ -27,6 +27,23 @@ vi.mock('../server/db', () => ({
     weaponSkinIds: [],
     weaponSkinLoadout: {},
   })),
+  // The branch's db surface (integration/world-quests-v0440): every export
+  // server/game.ts imports, so a future arm of this file never trips
+  // "No X export is defined on the mock" (the canonical shape is
+  // tests/character_lease_game.test.ts).
+  grantAccountMountSkins: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  grantAccountWeaponSkins: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
+  saveMarketState: vi.fn(async () => {}),
+  loadMarketState: vi.fn(async () => null),
+  loadMailState: vi.fn(async () => null),
+  loadRiftState: vi.fn(async () => null),
+  saveRiftState: vi.fn(async () => {}),
+  loadGuildBankRow: vi.fn(async () => null),
+  loadGuildBankRows: vi.fn(async () => []),
+  saveCharacterAndGuildBankState: vi.fn(async () => {}),
+  GUILD_BANK_ROW_MAX_BYTES: 262144,
+  releaseCharacterLease: vi.fn(async () => {}),
+  heartbeatCharacterLeases: vi.fn(async () => {}),
 }));
 
 import { GameServer } from '../server/game';

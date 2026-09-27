@@ -1,0 +1,50 @@
+[
+  {
+    "source": "/Users/demihenderson/.codex/generated_images/01a0755a-4bc1-7141-94b0-39009ed6a4b8/exec-e549eaf0-3ee0-4ad8-a210-0ffab3c3b62e.png",
+    "sourceHash": "32933440c06524de37be69ae05dbc598723269589acc85ca51c6d3b85147fae0",
+    "dest": "public/ui/minigames/confection-jewels-v7.webp",
+    "hash": "fe811f7b6768d4f76a36c73368648bcf6d0bb12b7445eba5449eab38a1b892b4",
+    "bytes": 99744,
+    "metadata": {
+      "format": "webp",
+      "mediaType": "image/webp",
+      "width": 768,
+      "height": 256,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "isProgressive": false,
+      "isPalette": false,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 768,
+        "height": 256
+      }
+    }
+  },
+  {
+    "source": "/Users/demihenderson/.codex/generated_images/01a0755a-4bc1-7141-94b0-39009ed6a4b8/exec-ed58270f-5cd8-4215-8496-8bdfa56a53a4.png",
+    "sourceHash": "468b20b6eff37171517c62a34af99209caf0b3290dd6fb74da2b435b3a675949",
+    "dest": "public/ui/minigames/confection-lock-v7.webp",
+    "hash": "d63b1345169e5432489611bf3282462aeea83d37d87d068f393b39cdc773aac4",
+    "bytes": 141928,
+    "metadata": {
+      "format": "webp",
+      "mediaType": "image/webp",
+      "width": 768,
+      "height": 384,
+      "space": "srgb",
+      "channels": 3,
+      "depth": "uchar",
+      "isProgressive": false,
+      "isPalette": false,
+      "hasProfile": false,
+      "hasAlpha": false,
+      "autoOrient": {
+        "width": 768,
+        "height": 384
+      }
+    }
+  }
+]

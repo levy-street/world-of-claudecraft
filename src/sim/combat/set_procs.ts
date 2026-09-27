@@ -1,6 +1,7 @@
 import type { SimContext } from '../sim_context';
 import { duelJustEndedBetween } from '../social/duel';
 import type { Aura, AuraKind, Entity, SetProc } from '../types';
+import { runTrinketTrigger } from './trinkets';
 
 export function applySetProcs(
   ctx: SimContext,
@@ -8,6 +9,8 @@ export function applySetProcs(
   target: Entity | null,
   trigger: SetProc['trigger'],
 ): void {
+  // The worn trinket's passives ride the same moments (combat/trinkets.ts).
+  if (trigger !== 'spellCrit') runTrinketTrigger(ctx, source, target, trigger);
   const matching = source.setProcs.filter((proc) => proc.trigger === trigger);
   if (matching.length === 0) return;
   source.procReadyAt ??= {};

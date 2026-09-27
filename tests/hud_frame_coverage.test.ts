@@ -192,6 +192,16 @@ const UI_ROOT_TOUCHERS: Record<string, string> = {
   'src/ui/hud/loot/loot_roll_controller.ts': 'transient loot roll stack',
   'src/ui/hud/practice/hub_lesson_controller.ts':
     'world-anchored "target the dummy" coachmark bubble, transient (the bootcamp.ts pattern)',
+  'src/ui/hud/quest/wisp_maze_hud_controller.ts':
+    'the wisp maze trial HUD, shown only while the player is inside the maze (transient, activity-scoped)',
+  'src/ui/hud/vehicle/forge_action_bar_controller.ts':
+    'the forge minigame action bar, shown only while a forging attempt runs (transient, activity-scoped)',
+  'src/ui/hud/vehicle/shadow_action_bar_controller.ts':
+    'the shadow infiltration action bar, shown only while the cloak is active (transient, activity-scoped)',
+  'src/ui/world_quest_puzzle_window.ts':
+    'the world-quest puzzle window (a .window, window_drag governs it; closeManagedWindow closes it), minted at runtime like perfecting_window.ts',
+  'src/ui/hud/vehicle/vehicle_action_bar_controller.ts':
+    'the cannon vehicle action bar, shown only while the player mans a cannon (transient, activity-scoped)',
 };
 
 /** Registry frames whose elements are minted at runtime rather than written

@@ -36,7 +36,7 @@ function harness(
     known: player.known ?? [],
     targetEntity,
   };
-  return { pick: createPadTargetPick({ world, interactKey }), targetEntity, interactKey };
+  return { pick: createPadTargetPick({ world, interactKey }), targetEntity, interactKey, world };
 }
 
 // A learned action whose button transforms into a targeted one while an aura is up.
@@ -193,4 +193,29 @@ describe('padTargetPick.autoTarget', () => {
     pick.autoTarget({ type: 'ability', id: CROSS_HOTBAR_ATTACK_ID });
     expect(targetEntity).not.toHaveBeenCalled();
   });
+});
+
+it('ignores a selected disguise after reveal and talks to a visible guard', () => {
+  const { pick, targetEntity, interactKey, world } = harness(
+    [entity(2146900022, 'npc', 1), entity(2146900021, 'npc', 2)],
+    2146900022,
+  );
+  Object.assign(world, {
+    // A cycle whose story names Orin (2146900022): variant 0 of the rotation.
+    worldQuestCycle: 'wq3_0',
+    worldQuestLog: new Map([
+      [
+        'wq_mirefen_infiltrator',
+        {
+          questId: 'wq_mirefen_infiltrator',
+          state: 'active',
+          count: 0,
+          investigation: { heard: 15, clues: 3, cleared: 0, mobId: 90 },
+        },
+      ],
+    ]),
+  });
+  pick.interact();
+  expect(targetEntity).toHaveBeenCalledWith(2146900021);
+  expect(interactKey).toHaveBeenCalledWith(2146900021);
 });

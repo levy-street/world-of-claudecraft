@@ -97,6 +97,9 @@ const FLOOR_VFX_LAYERED_MODULES: readonly FloorVfxModule[] = [
   { file: 'src/render/decor_torch_fx.ts', layer: 'ground', strict: true },
   { file: 'src/render/impact_site.ts', layer: 'ground', strict: true },
   { file: 'src/render/hill_ring.ts', layer: 'ground', strict: true },
+  // A worn trinket's ground glow (the Last Flame Lantern): a player-band floor
+  // effect that every encounter telegraph must still paint over.
+  { file: 'src/render/trinket_relics.ts', layer: 'player', strict: true },
   // player class ability ground VFX
   { file: 'src/render/ability_vfx/decals.ts', layer: 'player', strict: true },
   { file: 'src/render/ability_vfx/ground_auras.ts', layer: 'player', strict: true },
@@ -219,6 +222,13 @@ const FLOOR_VFX_OUT_OF_SCOPE: readonly string[] = [
   'src/render/mount_beacon.ts',
   'src/render/mount_glow.ts',
   'src/render/race_line.ts',
+  // World-quest minigame and stealth visuals (integration/world-quests-v0440):
+  // the Arcane Calligraphy tracing ribbons (ui3d, drawn on a quest floor far
+  // from any raid) and the infiltration guards' vision cones (flat quest-zone
+  // markers, like the battleground objective marks above).
+  'src/render/world_quest_trace_visual.ts',
+  'src/render/world_quest_public_trace_visual.ts',
+  'src/render/shadow_infiltration_visual.ts',
 ];
 
 /**

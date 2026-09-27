@@ -560,6 +560,9 @@ export const BOOL_SETTINGS = {
   // to just its "Quests (N)" header. Toggled by clicking the tracker header; kept
   // here so the choice persists across sessions like the other HUD preferences.
   questTrackerCollapsed: { def: false },
+  // off by default (shown): when on, the map window's side rail (tracked
+  // quests, the world-quest board, the layer filters) is folded away and the
+  // map takes the whole window. Toggled by the map's Side panel button
   // off by default (expanded): when on, the on-screen Book of Deeds watchlist
   // tracker is collapsed to just its header. Toggled by clicking the tracker
   // header (the quest-tracker convention); kept here so the choice persists.

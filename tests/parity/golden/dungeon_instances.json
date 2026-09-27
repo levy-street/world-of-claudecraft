@@ -16,7 +16,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -30,9 +30,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1022,
-      "state": "9911a301",
-      "events": "97ddbb0c",
+      "nextId": 1026,
+      "state": "2be94688",
+      "events": "b65f80d4",
       "rng": {
         "draws": 39,
         "digest": "fc384baa"
@@ -84,14 +84,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -117,6 +119,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -164,13 +167,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -200,6 +205,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -215,7 +221,7 @@
               "name": "Battle Stance",
               "remaining": 3599.9,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -228,7 +234,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 5,
           "hp": 50000,
-          "id": 1006,
+          "id": 1010,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -277,7 +283,7 @@
           "fiveSecondRule": 99.1,
           "healPower": 13,
           "hp": 50000,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -326,7 +332,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 1008,
+          "id": 1012,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -370,7 +376,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 1009,
+          "id": 1013,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -414,7 +420,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1010,
+          "id": 1014,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -458,7 +464,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -502,7 +508,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 1012,
+          "id": 1016,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -546,7 +552,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1013,
+          "id": 1017,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -590,7 +596,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 1014,
+          "id": 1018,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -634,7 +640,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 1015,
+          "id": 1019,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -678,7 +684,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 1016,
+          "id": 1020,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -722,7 +728,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1017,
+          "id": 1021,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -768,7 +774,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 1018,
+          "id": 1022,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -817,7 +823,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1019,
+          "id": 1023,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -865,7 +871,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1020,
+          "id": 1024,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -911,7 +917,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1021,
+          "id": 1025,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -943,9 +949,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1022,
-      "state": "9c1395de",
-      "events": "86847b02",
+      "nextId": 1026,
+      "state": "78231e0f",
+      "events": "eb3dd672",
       "rng": {
         "draws": 39,
         "digest": "fc384baa"
@@ -997,14 +1003,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1030,6 +1038,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -1077,13 +1086,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1113,6 +1124,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -1128,7 +1140,7 @@
               "name": "Battle Stance",
               "remaining": 3599.8,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -1143,7 +1155,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 5,
           "hp": 50000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1196,7 +1208,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 13,
           "hp": 50000,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1246,7 +1258,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 1008,
+          "id": 1012,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1290,7 +1302,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 1009,
+          "id": 1013,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1334,7 +1346,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1010,
+          "id": 1014,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1378,7 +1390,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1011,
+          "id": 1015,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1422,7 +1434,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 437,
-          "id": 1012,
+          "id": 1016,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1466,7 +1478,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1013,
+          "id": 1017,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1510,7 +1522,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 1014,
+          "id": 1018,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1554,7 +1566,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 416,
-          "id": 1015,
+          "id": 1019,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1598,7 +1610,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 695,
-          "id": 1016,
+          "id": 1020,
           "kind": "mob",
           "level": 9,
           "lootFfaTimer": "Infinity",
@@ -1642,7 +1654,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1017,
+          "id": 1021,
           "kind": "mob",
           "level": 8,
           "lootFfaTimer": "Infinity",
@@ -1688,7 +1700,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 1191,
-          "id": 1018,
+          "id": 1022,
           "kind": "mob",
           "level": 10,
           "lootFfaTimer": "Infinity",
@@ -1737,7 +1749,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1019,
+          "id": 1023,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1785,7 +1797,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 391,
-          "id": 1020,
+          "id": 1024,
           "kind": "mob",
           "level": 7,
           "lootFfaTimer": "Infinity",
@@ -1831,7 +1843,7 @@
           "dungeonId": "hollow_crypt",
           "fiveSecondRule": 99,
           "hp": 1,
-          "id": 1021,
+          "id": 1025,
           "kind": "object",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -1863,8 +1875,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1022,
-      "state": "e2f2e911",
+      "nextId": 1026,
+      "state": "210fe9ca",
       "events": "741638a5",
       "rng": {
         "draws": 39,
@@ -1874,8 +1886,8 @@
     {
       "tick": 10,
       "time": 0.5,
-      "nextId": 1022,
-      "state": "be87d204",
+      "nextId": 1026,
+      "state": "fab4b5cf",
       "events": "741638a5",
       "rng": {
         "draws": 39,
@@ -1885,8 +1897,8 @@
     {
       "tick": 15,
       "time": 0.75,
-      "nextId": 1022,
-      "state": "7e3d8c9c",
+      "nextId": 1026,
+      "state": "a959979f",
       "events": "741638a5",
       "rng": {
         "draws": 39,
@@ -1896,9 +1908,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1022,
-      "state": "60837e10",
-      "events": "84a9176e",
+      "nextId": 1026,
+      "state": "22bf649d",
+      "events": "cd1db2b2",
       "rng": {
         "draws": 41,
         "digest": "ed59696c"
@@ -1907,8 +1919,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 1022,
-      "state": "5dd51865",
+      "nextId": 1026,
+      "state": "5df85afc",
       "events": "741638a5",
       "rng": {
         "draws": 41,
@@ -1964,14 +1976,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -1997,6 +2011,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2047,13 +2062,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2083,6 +2100,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -2098,7 +2116,7 @@
               "name": "Battle Stance",
               "remaining": 3598.8,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2113,7 +2131,7 @@
           "fiveSecondRule": 100.2,
           "healPower": 5,
           "hp": 50000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2166,7 +2184,7 @@
           "fiveSecondRule": 100.2,
           "healPower": 13,
           "hp": 50000,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -2210,8 +2228,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 1022,
-      "state": "5dd51865",
+      "nextId": 1026,
+      "state": "5df85afc",
       "events": "741638a5",
       "rng": {
         "draws": 41,
@@ -2267,14 +2285,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2300,6 +2320,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         },
         {
@@ -2350,13 +2371,15 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1007,
+          "entityId": 1011,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -2386,6 +2409,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {}
         }
       ],
@@ -2401,7 +2425,7 @@
               "name": "Battle Stance",
               "remaining": 3598.8,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -2416,7 +2440,7 @@
           "fiveSecondRule": 100.2,
           "healPower": 5,
           "hp": 50000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2469,7 +2493,7 @@
           "fiveSecondRule": 100.2,
           "healPower": 13,
           "hp": 50000,
-          "id": 1007,
+          "id": 1011,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",

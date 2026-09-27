@@ -19,6 +19,348 @@
      @layer components would let the unlayered base win and invert the cascade, so they
      stay inline beside their bases and relocate later. */
 @layer components {
+  .wisp-maze-hud {
+    position: absolute;
+    left: max(24px, env(safe-area-inset-left));
+    top: calc(max(12px, env(safe-area-inset-top)) + 100px);
+    width: min(250px, calc(100% - 48px));
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 7px 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--gold);
+    border-radius: 8px;
+    background: var(--panel-bg);
+    color: var(--color-vehicle-text);
+    font-size: 13px;
+    pointer-events: none;
+  }
+  .wisp-maze-title,
+  .wisp-maze-power-label,
+  .wisp-maze-power,
+  .wisp-maze-cue {
+    grid-column: 1 / -1;
+  }
+  .wisp-maze-title {
+    font-family: var(--title-font);
+    color: var(--gold);
+  }
+  .wisp-maze-cue {
+    line-height: 1.3;
+  }
+  .wisp-maze-leave {
+    grid-column: 1 / -1;
+    justify-self: end;
+    min-height: 40px;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--panel-base);
+    color: var(--gold);
+    font: inherit;
+    pointer-events: auto;
+  }
+  .wisp-maze-leave:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+  .wisp-maze-power {
+    height: 12px;
+    border: 1px solid var(--border);
+    background: var(--panel-base);
+    overflow: hidden;
+  }
+  .wisp-maze-power-fill {
+    display: block;
+    height: 100%;
+    background: var(--color-vehicle-integrity);
+  }
+  body.playing-wisp-maze
+    :is(
+      #actionbar,
+      #actionbar2,
+      #actionbar3,
+      #cross-hotbar,
+      #stancebar,
+      #petbar,
+      #mobile-action-ring,
+      #mobile-action-radial,
+      #mobile-consumable-strip,
+      #mobile-stance-radial,
+      #mobile-combat-controls
+    ) {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  @media (forced-colors: active) {
+    .wisp-maze-power {
+      forced-color-adjust: none;
+      border-color: CanvasText;
+      background: Canvas;
+    }
+    .wisp-maze-power-fill {
+      background: Highlight;
+    }
+  }
+  body.wearing-shadow-cloak
+    :is(
+      #actionbar,
+      #actionbar2,
+      #actionbar3,
+      #cross-hotbar,
+      #stancebar,
+      #petbar,
+      #mobile-action-ring,
+      #mobile-action-radial,
+      #mobile-consumable-strip,
+      #mobile-stance-radial,
+      #mobile-combat-controls
+    ) {
+    display: none !important;
+  }
+  .vehicle-bar.shadow-action-bar {
+    grid-template-columns: 1fr;
+    width: min(420px, calc(100% - 24px));
+  }
+  .vehicle-bar.shadow-action-bar > * {
+    grid-column: 1 / -1;
+  }
+  .vehicle-bar.shadow-action-bar .vehicle-integrity {
+    min-height: 22px;
+    height: 22px;
+    border-radius: 4px;
+  }
+  .vehicle-bar.shadow-action-bar .vehicle-integrity-fill {
+    transform: scaleX(var(--vehicle-integrity));
+    transform-origin: left;
+  }
+  .vehicle-bar.shadow-action-bar .vehicle-bar-hint {
+    grid-column: 1 / -1;
+  }
+  .shadow-action-bar .vehicle-action-slots {
+    justify-content: center;
+  }
+
+  /* The forge workshop panel: timing meter over a heat gauge over Strike / Stoke.
+     A `.panel` overlay centred in the upper third above the HUD bars (the
+     .window shell's placement, restated here), NOT a .vehicle-bar: the
+     bottom-pinned vehicle family sat it on the unit frames and the action bar.
+     And NOT a `.window` either: that family is scanned by Escape / closeAll and
+     the touch chrome's menu mode, which must never hide or interrupt a running
+     workshop session (forge_action_bar_controller.ts). The controller toggles
+     display between none and grid with the session. */
+  .forge-action-bar {
+    position: absolute;
+    left: 50%;
+    /* The app-box height over the #ui zoom, the .window shell's own clamp
+       (never a bare vh: #ui zooms every length in its subtree). */
+    top: calc(var(--app-vh, 100dvh) * 0.1 / var(--ui-scale, 1));
+    transform: translateX(-50%);
+    z-index: 20;
+    /* The controller toggles display between none and grid; the grid is
+       declared here too so the stylesheet alone describes the layout. */
+    display: grid;
+    padding: 16px;
+    max-width: calc(var(--app-vw, 100vw) / var(--ui-scale, 1) - 16px);
+    grid-template-columns: 1fr;
+    gap: 8px 16px;
+    width: min(440px, calc(100% - 24px));
+    color: var(--gold);
+  }
+  .forge-action-bar > * {
+    grid-column: 1 / -1;
+  }
+  .forge-action-bar .vehicle-action-slots {
+    justify-content: center;
+  }
+  .forge-action-bar .forge-heat {
+    min-height: 18px;
+    height: 18px;
+    border-radius: 4px;
+  }
+  .forge-action-bar .forge-heat .vehicle-integrity-fill {
+    transform: scaleX(var(--vehicle-integrity));
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--color-forge-heat-cold), var(--color-forge-heat-hot));
+  }
+  .forge-meter {
+    position: relative;
+    height: 26px;
+    border: 2px ridge var(--border);
+    border-radius: 6px;
+    background: linear-gradient(
+      90deg,
+      var(--color-forge-meter-iron),
+      var(--color-forge-meter-iron-light) 50%,
+      var(--color-forge-meter-iron)
+    );
+    overflow: hidden;
+  }
+  .forge-meter-band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--forge-band-start, 0.4) * 100%);
+    width: calc((var(--forge-band-end, 0.6) - var(--forge-band-start, 0.4)) * 100%);
+    background: var(--color-forge-band);
+    border-left: 1px solid var(--color-forge-band-edge);
+    border-right: 1px solid var(--color-forge-band-edge);
+  }
+  .forge-meter.in-band .forge-meter-band {
+    background: var(--color-forge-band-hot);
+    box-shadow: inset 0 0 8px var(--color-forge-band-glow);
+  }
+  .forge-meter-needle {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    left: calc(var(--forge-needle, 0) * 100%);
+    width: 4px;
+    margin-left: -2px;
+    background: var(--color-forge-needle);
+    box-shadow: 0 0 6px var(--color-forge-needle-glow);
+  }
+  .forge-meter:not(.working) .forge-meter-needle {
+    opacity: 0.35;
+  }
+
+  /* ---------- vehicle action bar ---------- */
+  body.operating-vehicle
+  :is(
+    #actionbar,
+    #actionbar2,
+    #actionbar3,
+    #cross-hotbar,
+    #stancebar,
+    #petbar,
+    #mobile-action-ring,
+    #mobile-action-radial
+  ) {
+    display: none !important;
+  }
+  /* Temporary layout only: the saved unit-frame position and action bindings stay intact. */
+  body.operating-vehicle #player-frame:not(.pf-detached) {
+    margin-bottom: 250px;
+  }
+  .vehicle-bar {
+    position: absolute;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    box-sizing: border-box;
+    width: min(540px, calc(100% - 24px));
+    grid-template-columns: 46px 1fr 90px;
+    gap: 8px 16px;
+    padding: 14px 18px;
+    border: 3px ridge var(--border);
+    border-radius: 22px 22px 10px 10px;
+    background: var(--panel-bg);
+    color: var(--gold);
+    pointer-events: auto;
+  }
+  .vehicle-bar-title,
+  .vehicle-bar-status,
+  .vehicle-bar-hint {
+    grid-column: 1 / -1;
+    text-align: center;
+  }
+  /* Flight keeps three slots (boost, climb, dive) centred in one column, the
+     status line centred beneath them, so the bar reads as one block. */
+  .vehicle-bar.glider-action-bar {
+    width: min(420px, calc(100% - 24px));
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    align-items: center;
+    gap: 6px 14px;
+    padding: 10px 14px;
+  }
+  .glider-action-bar .vehicle-action-slots {
+    grid-column: 1;
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+  .glider-action-bar .vehicle-bar-status {
+    grid-column: 1;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+  .glider-action-bar .vehicle-action .keybind {
+    top: 2px;
+    right: auto;
+    left: 2px;
+    z-index: 2;
+    min-width: 20px;
+    height: auto;
+    padding: 1px 4px;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.2;
+    text-align: center;
+  }
+  .vehicle-bar-title {
+    font-family: var(--title-font);
+    font-size: 16px;
+  }
+  .vehicle-bar-status,
+  .vehicle-bar-hint {
+    font-size: 14px;
+  }
+  .vehicle-integrity {
+    --vehicle-integrity: 1;
+    position: relative;
+    min-height: 72px;
+    overflow: hidden;
+    border: 2px ridge var(--border);
+    border-radius: 8px;
+  }
+  .vehicle-integrity-fill {
+    position: absolute;
+    inset: 0;
+    background: var(--color-vehicle-integrity);
+    transform: scaleY(var(--vehicle-integrity));
+    transform-origin: bottom;
+  }
+  .vehicle-integrity.low-integrity .vehicle-integrity-fill {
+    background: var(--color-vehicle-danger);
+  }
+  .vehicle-integrity-text {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-weight: bold;
+    color: var(--color-vehicle-text);
+    text-shadow: 0 1px 3px var(--panel-base);
+  }
+  .vehicle-action-slots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .vehicle-bar .vehicle-action {
+    width: 64px;
+    height: 64px;
+    flex: 0 0 64px;
+  }
+  .vehicle-exit {
+    align-self: center;
+    min-height: 48px;
+    border: 2px ridge var(--border);
+    border-radius: 8px;
+    color: var(--gold);
+    background: var(--panel-base);
+  }
+  .vehicle-bar button:focus-visible,
+  .vehicle-integrity:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+  .vehicle-bar-hint {
+    min-height: 2.4em;
+  }
   /* ---------- nameplates ---------- */
   .nameplate {
     position: absolute;
@@ -5609,8 +5951,12 @@
     cursor: pointer;
     pointer-events: auto;
   }
-  #quest-tracker .qt-header:hover {
+  #quest-tracker .qt-header:not(:disabled):hover {
     color: var(--color-text-light);
+  }
+  #quest-tracker .qt-header:disabled {
+    cursor: default;
+    opacity: 1;
   }
   #quest-tracker .qt-header:focus-visible {
     outline: 2px solid var(--color-border-focus);

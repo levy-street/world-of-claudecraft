@@ -30,6 +30,7 @@
 // A road curve is authored content, not an rng draw: nothing here touches `Rng`,
 // so a given world and seed always lay the same posts in the same places and
 // every host agrees on where they are.
+import { isExcludedStreetlamp } from './decoration_exclusions';
 import { resolveStreetlampStyle, type StreetlampStyleId } from './streetlamp_style';
 import type { BiomeId } from './types';
 
@@ -350,19 +351,23 @@ export interface LampStyleZone {
  * blocks a post and the mesh that draws it are sized from the same row of
  * `STREETLAMP_COLLIDER_RADIUS`. Split out from the plan because style depends
  * on authored zone data the pure layout above deliberately knows nothing about.
+ * Authored clearings (decoration_exclusions.ts) drop their post here, before
+ * styling, so the one list colliders and the renderer share never carries it.
  */
 export function styleStreetlampSites(
   sites: readonly LampSite[],
   zones: readonly LampStyleZone[],
 ): PlacedStreetlamp[] {
   const biomeById = new Map(zones.map((zone) => [zone.id, zone.biome]));
-  return sites.map((site) => ({
-    ...site,
-    style: resolveStreetlampStyle(
-      site.areaId,
-      site.areaId ? (biomeById.get(site.areaId) ?? null) : null,
-    ),
-  }));
+  return sites
+    .filter((site) => !isExcludedStreetlamp(site.x, site.z))
+    .map((site) => ({
+      ...site,
+      style: resolveStreetlampStyle(
+        site.areaId,
+        site.areaId ? (biomeById.get(site.areaId) ?? null) : null,
+      ),
+    }));
 }
 
 /**

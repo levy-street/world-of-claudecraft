@@ -190,7 +190,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: '英雄: 最後の泉のるつぼ',
-    desc: 'イグニヴァル、最後の炎の先触れからヒロイックでのみ得られる武器。',
+    desc: 'イグニヴァル、最後の炎の先触れからヒロイックでのみ得られる武器と、レイドのトリンケット。',
   },
   conquerors_varkhul: {
     name: '内部るつぼ',

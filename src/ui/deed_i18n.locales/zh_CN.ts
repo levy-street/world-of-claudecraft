@@ -7,6 +7,15 @@
 import type { DeedLocaleTable } from '../deed_i18n';
 
 export const table: DeedLocaleTable = {
+  exp_arcane_calligraphy: {
+    name: '稳健的笔触',
+    desc: '在东溪谷完成奥术书法。',
+  },
+  exp_arcane_calligraphy_gold: {
+    name: '星光写就',
+    desc: '在“奥术书法”中获得黄金评级。',
+    title: '符文召唤者',
+  },
   exp_dawnhold_castle: {
     name: '花园中敞开的门',
     desc: '造访晨曦堡，漫步于它洒满阳光的花园厅堂。',

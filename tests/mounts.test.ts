@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
+import { CASKET_MOUNT_CHANCE, CASKET_MOUNT_REINS_ITEM_ID } from '../src/sim/clue_casket';
 
 // Mock the db layer so importing server/game (for wireEntity) needs no Postgres,
 // mirroring tests/snapshots.test.ts.
@@ -217,11 +218,17 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(granted.sort()).toEqual(MOUNT_KEYS.map((key) => mountItemId(key)).sort());
   });
 
-  it('only the horse reins is purchasable, for 10 gold', () => {
+  it('two reins are purchasable: the horse for 10 gold, the Valestrider for 100 at Champion standing', () => {
     const horse = reinsFor('valorsteed')[0];
     expect(horse.id).toBe('reins_valorsteed');
     expect(horse.buyValue).toBe(100_000); // 10 gold in copper (ridingTrained gated)
-    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed')) {
+    // The Rift Watch quartermaster's Champion row (content/faction_vendors.ts):
+    // the classic epic-mount ratio, ten times the basic mount, on top of the
+    // same riding gate.
+    const strider = reinsFor('avian_strider')[0];
+    expect(strider.id).toBe('reins_avian_strider');
+    expect(strider.buyValue).toBe(1_000_000);
+    for (const key of MOUNT_KEYS.filter((k) => k !== 'valorsteed' && k !== 'avian_strider')) {
       expect(reinsFor(key)[0].buyValue).toBeUndefined();
     }
   });
@@ -267,6 +274,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
+      if (key === 'avian_strider') continue; // the Rift Watch Champion purchase, pinned above
       if (isDeveloperMount(key)) continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
@@ -291,6 +299,19 @@ describe('mount reins items (the collection: owning the item is owning the mount
         // purpose. Either way it stays out of every heroic table, so the heroic
         // tier's mount supply is unchanged.
         expect(heroicEntries, `${itemId} (epic) must not be heroic-reachable`).toEqual([]);
+        if (itemId === CASKET_MOUNT_REINS_ITEM_ID) {
+          // The Treasure Casket's rare mount: the casket is its sole source,
+          // so it stays out of every Rift pool as well.
+          expect(CASKET_MOUNT_CHANCE).toBeGreaterThan(0);
+          for (const pool of [
+            RIFT_EPIC_MOUNT_REINS,
+            RIFT_BLUE_MOUNT_REINS,
+            RIFT_GREEN_MOUNT_REINS,
+          ]) {
+            expect(pool as readonly string[]).not.toContain(itemId);
+          }
+          continue;
+        }
         if (NO_SOURCE_YET.includes(itemId)) {
           // The mob-table sweep above already proved it drops off nothing. Pin
           // the remaining three pools too, so "no path" means no path: the day

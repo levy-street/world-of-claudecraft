@@ -35,6 +35,7 @@ import { fishPreloadInternalsForTest } from '../src/render/fish';
 import { galeFeaturesPreloadInternalsForTest } from '../src/render/gale_features';
 import { gardenFeaturesPreloadInternalsForTest } from '../src/render/garden_features';
 import { gatherNodePreloadInternalsForTest } from '../src/render/gather_nodes';
+import { gliderCourseVisualPreloadInternalsForTest } from '../src/render/glider_course_visual';
 import { harborRouteMarkerInternalsForTest } from '../src/render/harbor_route_markers';
 import { ignivarEnvPropsInternalsForTest } from '../src/render/ignivar_env_props';
 import { mailboxPreloadInternalsForTest } from '../src/render/mailbox';
@@ -775,6 +776,10 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
     for (const url of galeFeaturesPreloadInternalsForTest.towerAssetUrl) {
       expectAssetExistsAndManifested(url);
     }
+  });
+
+  it('Windrider glider apparatus (world quests round 2)', () => {
+    expectAssetExistsAndManifested(gliderCourseVisualPreloadInternalsForTest.apparatusAssetUrl);
   });
 
   it('every decor prop asset (the full PROP_ASSET_DEFS catalog)', () => {

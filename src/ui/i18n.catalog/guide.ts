@@ -36,6 +36,7 @@ export const guideStrings = {
     progression: 'Leveling & Progression',
     world: 'World',
     quests: 'Quests',
+    factions: 'Factions & Standing',
     dungeons: 'Dungeons & Raids',
     delves: 'Delves',
     rifts: 'Rifts',
@@ -1917,6 +1918,20 @@ export const guideStrings = {
     sideCryptTitle: 'The forgotten king',
     sideCryptBody:
       "High on the peaks runs a quieter mystery: old graves marked with a crown no record remembers. Read the dead, gather what they guarded, and unseal a tomb that was meant to stay shut. It is a detective's trail that opens the way to the realm's ten-player endgame raid.",
+    // Clue Scrolls (world quests, Stage 3): the treasure hunts the daily board can
+    // earn in the far zones. Spoiler-safe: no coordinates, no answers, no odds.
+    cluesTitle: 'Clue Scrolls',
+    cluesBody:
+      'Out in the far zones, the daily world-quest board hides one more reward for anyone who clears the whole slate: a Clue Scroll, and the treasure hunt written on it.',
+    cluesEarnTitle: 'Earning a scroll',
+    cluesEarnBody:
+      "Once your character is far enough along, completing every zone slot on the day's world-quest board hands you a Clue Scroll on top of the usual rewards. A rerolled slot counts once it is done; the always-open dailies are not required. You can hold a few scrolls at a time, so there is no need to spend one the day you earn it.",
+    cluesHuntTitle: 'Following the clues',
+    cluesHuntBody:
+      'Using a scroll starts a hunt: a short chain of riddles that shows in your quest tracker one step at a time. Each riddle points at something real in the world, a landmark to stand at, a person to talk to, an emote to perform somewhere, or a small errand to run, and the last one always asks you to dig. Only one hunt runs at a time, and it keeps your place across the daily reset and between sessions, so take your time.',
+    cluesCasketTitle: 'The casket',
+    cluesCasketBody:
+      'Solve the last clue and use the scroll on the spot it names to dig up a Treasure Casket; finishing the hunt also earns standing with the faction whose land hid it. Open the casket for coin and a stack of fine gathering materials. Now and then it holds a piece of gear or a few Heroic Marks, and very rarely Grumbol the Lanternback, a mount found nowhere else. Your first casket and your tenth are recorded in the Book of Deeds.',
     sideTempleTitle: 'The drowned temple',
     sideTempleBody:
       'A gate of pale light on a high tarn in the peaks opens onto a sunken shrine where a drowned cult still sings. Its short chain stands apart from the main story, a self-contained mystery for anyone who climbs to the shore, reads the warnings carved on the rocks, and goes down to see what they were for.',
@@ -2351,6 +2366,49 @@ export const guideStrings = {
     rewardsHeading: 'What a match pays',
     rewardsBody:
       "Every finished match pays Honor: more for a win, a consolation for a loss or a draw, plus a small amount for every killing blow you land and every one you help with, so fighting away from the flags is still worth doing. Your first win of each day pays a bonus on top, and the panel tells you while that bonus is still waiting for you. That day is Honor's own, and it rolls over on its own clock rather than with the realm's instance reset. Meeting the same team over and over pays less for the match itself after the first, quickly settling at a floor instead of falling away to nothing, and a forfeited match pays nothing at all. Spend what you earn at either Warfare quartermaster.",
+  },
+  // The Factions and Standing page (src/guide/pages/factions.ts). Spoiler-safe: faction
+  // names, roles, hubs, the six tier names and each faction's titles, the quartermasters,
+  // and where standing is read; no thresholds, per-quest amounts, item stats, prices, or
+  // level numbers (src/sim/factions.ts, src/sim/content/faction_vendors.ts).
+  factionsPage: {
+    heading: 'Factions and Standing',
+    intro:
+      'Three allied factions each keep watch over their own corner of the realm, and every world quest you finish in their lands raises your standing with them. Standing climbs through six tiers, each with a title of its own, and opens a quartermaster stock piece by piece along the way.',
+    whoHeading: 'The three factions',
+    whoBody:
+      'Each faction is tied to a group of zones, so where you are doing world quests decides which faction the credit goes to. You never pick a side: all three keep their own tally, and none of them ever asks you to turn on another.',
+    riftWatchBody:
+      'The Rift Watch guards the shore and watches the deep tears. Their lands are the coast: the Farshore, the Palmreach, the Galecrest, the Willowfen and the Veiled Hollow. Their hub is Drifthaven, on the Palmreach.',
+    churchOrderBody:
+      'The Church Order holds the heartland of the realm: Eastbrook Vale, Mirefen Marsh, Thornpeak Heights, the Nightbloom and the Wraithwood. Brother Aldric speaks for them from Eastbrook Vale.',
+    automatonsBody:
+      'The Automatons keep the forges of the far reaches: the Drakelands, the Frostveil Reach, the Amberfall and the Evergarden. Their hub is Wyrmwatch, in the Drakelands.',
+    earningHeading: 'Earning standing',
+    earningBody:
+      "Standing comes from world quests. Every world quest counts toward the faction of the zone it is set in, and because the three factions cover different zones, all three progress at once as you work your way across the map. Taskmaster Kaelen in Eastbrook opens the World Quests board on the map, and the board is also where you may replace one world quest each day if the day's assignment does not suit you.",
+    weeklyBody:
+      "The weekly emissary in Eastbrook Vale adds a second road: finish the week's charge and you may name one faction to receive his commendation of standing, once a week, at the window where you took the charge.",
+    lowLevelNote:
+      'Standing pauses at a tier for lower-level characters and resumes as you level, so a young character can start earning early without running out of road.',
+    tiersHeading: 'Standing tiers',
+    tiersBody:
+      'Every faction climbs the same six tiers: Unknown, Recognized, Trusted, Proven, Vanguard and Champion. Each faction gives its own name to each rung, and that name becomes your title with them.',
+    riftWatchTitles:
+      'With the Rift Watch you are an Outsider, then a Watcher, a Riftwalker, a Warden, a Riftwarden and at last a Champion.',
+    churchOrderTitles:
+      'With the Church Order you are an Outsider, then an Acolyte, a Keeper, a Templar, a Dawnkeeper and at last a Champion.',
+    automatonsTitles:
+      'With the Automatons you are an Outsider, then an Operator, a Mechanist, an Artificer, a Forgemaster and at last a Champion.',
+    quartermastersHeading: 'Quartermasters',
+    quartermastersBody:
+      'Each faction keeps a quartermaster at its hub: Quartermaster Vaelen for the Rift Watch in Drifthaven, Templar Althea for the Church Order at the Eastbrook chapel, and Artificer Tobrin for the Automatons in Wyrmwatch. Each sells a small stock of jewelry, armor, weapons and bags, unlocked tier by tier as your standing with that faction grows, and paid for in ordinary coin.',
+    readingHeading: 'Where to read it',
+    readingBody:
+      'The Reputation tab of the character sheet (C) shows each faction with its current standing, a bar toward the next tier, and the title that standing has earned you. The chat log reports every standing gain as it lands, and reaching a new tier shows a celebration banner on screen.',
+    deedsHeading: 'Deeds',
+    deedsBody:
+      'The Book of Deeds keeps score of your standing too: reaching Trusted with a faction and reaching Champion with a faction each record a deed, and reaching Champion with all three is a deed of its own. Like every deed these are cosmetic, never power, and the Champion deeds grant a title you can wear.',
   },
   deedsPage: {
     intro:

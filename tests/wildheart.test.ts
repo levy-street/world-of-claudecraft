@@ -455,7 +455,9 @@ describe('Wildheart Basin Tier-2 loot pass', () => {
     const gear = entries.filter(
       (entry) => entry.itemId && ITEMS[entry.itemId]?.slot && ITEMS[entry.itemId]?.kind !== 'bag',
     );
-    expect(gear).toHaveLength(12);
+    // Twelve former acquisitions plus the Paired Talons trinket (content/trinkets.ts).
+    expect(gear).toHaveLength(13);
+    expect(gear.some((entry) => entry.itemId === 'paired_talons')).toBe(true);
     expect(gear.every((entry) => entry.rollGroup === 'wildheart_heroic')).toBe(true);
     expect(gear.reduce((sum, entry) => sum + entry.chance, 0)).toBe(1);
     expect(new Set(entries.map((entry) => entry.itemId)).size).toBe(entries.length);

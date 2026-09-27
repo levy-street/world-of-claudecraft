@@ -1,3 +1,7 @@
+import { FORGE_INTERACT_RANGE, FORGE_STATIONS } from '../sim/content/world_quest_forging';
+import { isInvestigationNpc } from '../sim/content/world_quest_investigation';
+import { isShadowNpc, SHADOW_NPC_ID } from '../sim/content/world_quest_shadow';
+import { ESCORTS } from '../sim/data';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
 import {
   dist2d,
@@ -8,6 +12,8 @@ import {
   REALM_BUILDER_MONUMENT_INTERACT_RADIUS,
   REALM_BUILDER_MONUMENT_TEMPLATE_ID,
 } from '../sim/types';
+import { investigationDisguiseHidden } from '../sim/world_quest_investigation_visibility';
+import { shadowGuardHidden } from '../sim/world_quest_shadow_visibility';
 import { t } from '../ui/i18n';
 import { tSim } from '../ui/sim_i18n';
 import type { IWorld } from '../world_api';
@@ -29,6 +35,8 @@ export interface PickInteractionWorld {
   // Required for the escort arm below (see escort_interact.ts): a right-click is
   // the other half of an escort run's only client entry point.
   questLog: IWorld['questLog'];
+  worldQuestLog?: IWorld['worldQuestLog'];
+  worldQuestCycle?: IWorld['worldQuestCycle'];
   targetEntity(id: number | null): void;
   interact(): void;
   enterDungeon(dungeonId: string): InteractionOutcome;
@@ -163,6 +171,8 @@ export function hoverCursorKind(
 
 /** Resolve the client-side range for a lootable object before dispatch or approach. */
 export function objectInteractionRange(entity: Pick<Entity, 'templateId'>): number {
+  if (FORGE_STATIONS.some((station) => `ground_${station.objectItemId}` === entity.templateId))
+    return FORGE_INTERACT_RANGE;
   if (entity.templateId === EASTBROOK_NOTICEBOARD_TEMPLATE_ID) {
     return EASTBROOK_NOTICEBOARD_INTERACTION_RADIUS;
   }
@@ -229,9 +239,15 @@ export function handlePickedEntity(
 
   // Quest-gated mobs (Broodmother eggs) are inert scenery to a player not on the
   // gating quest: not targetable or interactable until they take the quest.
-  if (isQuestGatedEntityHidden(e, world.questLog)) return false;
+  if (
+    isQuestGatedEntityHidden(e, world.questLog) ||
+    investigationDisguiseHidden(e, world) ||
+    shadowGuardHidden(e, world)
+  )
+    return false;
 
   if (e.kind !== 'object') world.targetEntity(id);
+  if (e.kind === 'npc' && isShadowNpc(e.templateId) && e.id !== SHADOW_NPC_ID) return true;
 
   if (button === 2) {
     const d = dist2d(world.player.pos, e.pos);
@@ -292,9 +308,13 @@ export function handlePickedEntity(
           // command too); do not open the quest dialog client-side.
           hud.showError(tSim('error.cantWhileDead'));
           return false;
-        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+        } else if (isInvestigationNpc(e.templateId)) {
+          world.interact();
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh') {
           hud.openDelveBoard(id);
-        else hud.openQuestDialog(id);
+        } else {
+          hud.openQuestDialog(id);
+        }
         return true;
       }
       hud.showError(t('questUi.errors.tooFar'));
@@ -311,8 +331,22 @@ export function handlePickedEntity(
         hud.showError(t('questUi.errors.tooFar'));
         return false;
       }
-      const verdict = decideEscortPress(world.player.pos, world.entities, world.questLog);
+      const verdict = decideEscortPress(
+        world.player.pos,
+        world.entities,
+        world.questLog,
+        world.worldQuestLog,
+      );
       if (verdict.kind === 'none') return false;
+      if (verdict.kind === 'start') {
+        const escortDef = Object.values(ESCORTS).find(
+          (entry) => entry.npcMobId === e.templateId && entry.worldQuestId !== undefined,
+        );
+        if (escortDef) {
+          hud.openQuestDialog(verdict.entityId);
+          return true;
+        }
+      }
       return handleEscortPress(world, hud, verdict, t('questUi.errors.escortAway'));
     } else if (
       isAttackableEntity(e, world.playerId ?? world.player.id, activePvpOpponentIds(world))
@@ -374,9 +408,13 @@ export function handlePickedEntity(
       // No quest dialog while dead (the server refuses quest talk too); the
       // Keeper above is the one conversation a ghost has.
       if (d <= INTERACT_RANGE + 2 && !world.player.dead) {
-        if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh')
+        if (isInvestigationNpc(e.templateId)) {
+          world.interact();
+        } else if (e.templateId === 'brother_halven' || e.templateId === 'brother_halven_marsh') {
           hud.openDelveBoard(id);
-        else hud.openQuestDialog(id);
+        } else {
+          hud.openQuestDialog(id);
+        }
         return true;
       }
     }

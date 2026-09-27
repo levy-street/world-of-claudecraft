@@ -846,33 +846,45 @@ describe('item-art audit builder', () => {
     // from `node scripts/item_art_audit.mjs --verify-only` run on the merged
     // tree, not invented or derived from either parent.
     // PR3941: measured again after retiring the five premium reins.
-    // Viridian Valestrider: measured again with its reins icon, 1284 / 1302.
-    // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306.
+    // Clue Scrolls (2026-09-17): measured again on the tree carrying the 15
+    // faction quartermaster items (which landed without moving this block)
+    // plus the two clue items (clue_scroll, treasure_casket): 1304 / 1322,
+    // the sha/bytes straight from `--verify-only` on this tree.
+    // the Viridian Valestrider's reins (PR 4175, release/v0.44.0 base merge): 1306 / 1324, re-minted on the merged tree.
+    // Warfare Season 2: measured again with its four painted weapons, 1288 / 1306 on the release.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      catalogSha256: '06b4a88dc7e0f64c16ca5d598ab0e40835991c49f949e173eb7e674c2a0ff45f',
-      catalogBytes: 701788,
+      // Re-minted on the quests integration branch: the catalog carries the 15
+      // faction quartermaster owners, the Emissary's Cache chest and the two
+      // Clue Scroll items (1305 / 1323). Re-minted again with the faction
+      // ladder rework's 17 rows (faction-ladder-icons-2026-09-23): 1322 /
+      // 1340, sha and bytes straight from `--verify-only` on this tree; 1323 / 1341
+      // with the Viridian Valestrider's reins (release/v0.44.0 base merge), re-measured the same way. 1341 / 1359 with the trinket slot's 18 trinkets (PR 4173) landed on the integration branch (a 26th group and a 32nd sheet page), sha and bytes re-measured with `--verify-only` on the merged tree.
+      // 1345 / 1498 with Warfare Season 2 (release/v0.44.0, second base merge 2026-09-26)'s four
+      // painted weapons, re-measured with `--verify-only` on the merged tree.
+      catalogSha256: 'c8684228613b25ee179809c6ee8ff1cd4927b1c8095345d065f76cacbe984e25',
+      catalogBytes: 732562,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1288,
-      liveItemCount: 1306,
+      catalogCount: 1345,
+      liveItemCount: 1363,
       generatedHeroicDefinitions: 78,
       heroicDefinitionsWithOwnWebp: 59,
       heroicWeaponArtAliases: 19,
-      groupCount: 25,
-      sheetPageCount: 31,
-      sheetCount: 248,
+      groupCount: 26,
+      sheetPageCount: 32,
+      sheetCount: 256,
       sheetModeCounts: {
-        '128-color': 31,
-        '40-color': 31,
-        '28-color': 31,
-        '22-color': 31,
-        '28-grayscale': 31,
-        '64-circle': 31,
-        'small-multiview': 31,
-        identity: 31,
+        '128-color': 32,
+        '40-color': 32,
+        '28-color': 32,
+        '22-color': 32,
+        '28-grayscale': 32,
+        '64-circle': 32,
+        'small-multiview': 32,
+        identity: 32,
       },
       sheetSetSha256: null,
-      shippingCatalogSha256: '5c4b91dab3af09a08ab7f48abf56ab964c95c7125c30fd4431d5f68b3fd5ba45',
+      shippingCatalogSha256: '1170e76dfd06331e3c77020777a55ac5608f587e2e8f852dc2a9c3e7a3907c7e',
       machineChecksPassed: true,
       verdict: null,
     });

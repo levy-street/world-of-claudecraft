@@ -47,6 +47,28 @@ async function exportedStates(): Promise<unknown[]> {
 }
 
 describe('account export farming state', () => {
+  it('redacts unopened weekly rewards without changing the saved ledger', () => {
+    const state = {
+      weeklyRewards: {
+        resetAtMs: 3000,
+        vaults: [
+          {
+            resetAtMs: 1000,
+            choices: [
+              { pool: 'raid', itemId: 'hidden-legacy-reward' },
+              { pool: 'dungeon' },
+              { pool: 'pvp', itemId: 'saved-revealed-reward', opened: true },
+            ],
+          },
+        ],
+      },
+    };
+    const before = structuredClone(state);
+    const output = projectAccountExportState(state);
+    expect(JSON.stringify(output)).not.toContain('hidden-legacy-reward');
+    expect(JSON.stringify(output)).toContain('saved-revealed-reward');
+    expect(state).toEqual(before);
+  });
   beforeEach(() => vi.clearAllMocks());
 
   it('exports public plot data across realms without hidden outcomes or changing the saved state', async () => {

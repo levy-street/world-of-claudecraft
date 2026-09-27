@@ -732,7 +732,6 @@ describe('axe: character window', () => {
           }) as never,
         statCellHtml: () => '',
         statTooltipHtml: () => '',
-        talentSummaryHtml: () => '',
         progressionHtml: () => '',
         slotName: (s: string) => s,
         // The 3D turntable + skin picker are HUD-owned (rendered by callback). The skin

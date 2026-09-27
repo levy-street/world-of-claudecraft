@@ -1638,14 +1638,31 @@ describe('dungeons: heroic boss drops', () => {
     // The table now also carries the two blue mount reins as independent
     // sub-1% draws (the mount drop matrix); the weapon contract applies to the
     // roll-grouped entries only.
-    const weaponEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
+    // The trinket slot added the four raid trinkets (content/trinkets.ts) to
+    // the same group: weapons share half the group, trinkets the other half,
+    // and a kill still pays exactly one heroic-only exclusive.
+    const exclusiveEntries = heroicTable.filter((e) => e.rollGroup !== undefined);
     const mountEntries = heroicTable.filter((e) => e.rollGroup === undefined);
-    const weaponIds = weaponEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
-    const groups = new Set(weaponEntries.map((e) => e.rollGroup));
+    const exclusiveIds = exclusiveEntries.flatMap((e) => (e.itemId ? [e.itemId] : []));
+    const weaponIds = exclusiveIds.filter((id) => ITEMS[id]?.kind === 'weapon');
+    const trinketIds = exclusiveIds.filter((id) => ITEMS[id]?.slot === 'trinket');
+    const groups = new Set(exclusiveEntries.map((e) => e.rollGroup));
     expect(groups.size).toBe(1);
+    expect(new Set(exclusiveIds).size).toBe(7);
     expect(new Set(weaponIds).size).toBe(3);
-    expect(weaponEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
-    for (const id of weaponIds) expect(ITEMS[id]?.kind, id).toBe('weapon');
+    expect(trinketIds.sort()).toEqual([
+      'echoing_lens',
+      'hunters_tally',
+      'mooring_stone',
+      'wellspring_seed',
+    ]);
+    expect(exclusiveEntries.reduce((sum, e) => sum + e.chance, 0)).toBeCloseTo(1, 10);
+    const groupShare = (ids: string[]) =>
+      exclusiveEntries
+        .filter((e) => e.itemId && ids.includes(e.itemId))
+        .reduce((sum, e) => sum + e.chance, 0);
+    expect(groupShare(weaponIds)).toBeCloseTo(0.5, 10);
+    expect(groupShare(trinketIds)).toBeCloseTo(0.5, 10);
     // The heroic raid carries the two RARE mounts and the two UNCOMMON ones. The
     // hover-cycle is deliberately absent: it is epic now, and epic mounts are rift
     // S-clear exclusive, so the raid must not be a back door to one.
@@ -1662,7 +1679,7 @@ describe('dungeons: heroic boss drops', () => {
       expect(e.chance, `${e.itemId} (${quality}) chance`).toBe(quality === 'rare' ? 0.001 : 0.005);
     }
 
-    const droppedWeapons = new Set<string>();
+    const droppedExclusives = new Set<string>();
     const droppedVariants = new Set<string>();
     for (let seed = 1; seed <= 8; seed++) {
       const sim = makeSim(seed);
@@ -1688,16 +1705,17 @@ describe('dungeons: heroic boss drops', () => {
         'hit',
       );
       const items = (boss.loot?.items ?? []) as any[];
-      // Exactly one heroic-only weapon per kill (one roll group summing to 1.0).
-      const weapons = items.filter((s) => weaponIds.includes(s.itemId));
-      expect(weapons.length, `seed ${seed} weapons`).toBe(1);
-      for (const s of weapons) droppedWeapons.add(s.itemId);
+      // Exactly one heroic-only exclusive per kill (one roll group summing to 1.0).
+      const exclusives = items.filter((s) => exclusiveIds.includes(s.itemId));
+      expect(exclusives.length, `seed ${seed} exclusives`).toBe(1);
+      for (const s of exclusives) droppedExclusives.add(s.itemId);
       // The set-piece / legendary drops are upgraded to their heroic variants.
       for (const s of items)
         if (String(s.itemId).startsWith('heroic_')) droppedVariants.add(s.itemId);
     }
-    // Over eight kills all three weapons show up, and the set-piece swap is live.
-    expect(droppedWeapons.size).toBe(3);
+    // Over eight kills both halves of the group show up, and the set-piece swap is live.
+    expect([...droppedExclusives].some((id) => weaponIds.includes(id))).toBe(true);
+    expect([...droppedExclusives].some((id) => trinketIds.includes(id))).toBe(true);
     expect(droppedVariants.size).toBeGreaterThan(2);
   });
 });

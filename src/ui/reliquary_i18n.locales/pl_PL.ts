@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroiczny: Tygiel Ostatniego Źródła',
-    desc: 'Bronie dostępne wyłącznie heroicznie od Ignivara, Herolda Ostatniego Płomienia.',
+    desc: 'Bronie dostępne wyłącznie heroicznie oraz błyskotki rajdu od Ignivara, Herolda Ostatniego Płomienia.',
   },
   conquerors_varkhul: {
     name: 'Wewnętrzny Tygiel',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroiczny: Wewnętrzny Tygiel',
-    desc: 'Tarcze i bronie dostępne wyłącznie heroicznie od Varkhula, Ojca Kuźni Ostatniego Płomienia.',
+    desc: 'Tarcze i bronie dostępne wyłącznie heroicznie oraz błyskotki rajdu od Varkhula, Ojca Kuźni Ostatniego Płomienia.',
   },
   conquerors_set_bramblehide: {
     name: 'Cierniowa Skóra Rootsa',

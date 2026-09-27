@@ -1,0 +1,153 @@
+{
+  "baseCommit": "16028d3aaa11c62b3366bcd9f7003734216486ff",
+  "date": "2026-09-10",
+  "fullGate": {
+    "command": "GATE_SELECT_BASE=upstream/release/v0.42.0 npm run gate",
+    "exitCode": 1,
+    "failedStep": "vitest (full suite)",
+    "durationSeconds": 2738.6,
+    "suites": {
+      "passed": 3548,
+      "failed": 19,
+      "skipped": 30
+    },
+    "tests": {
+      "passed": 51156,
+      "failed": 27,
+      "expectedFail": 2,
+      "skipped": 449
+    }
+  },
+  "fixedRerun": {
+    "command": "vitest run tests/ci_workflow.test.ts tests/localization_coverage.test.ts --maxWorkers=2",
+    "passed": 82,
+    "skipped": 3,
+    "exitCode": 0
+  },
+  "failedSuites": [
+    {
+      "suite": "tests/reliquary_content.test.ts",
+      "testCount": 115,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/ci_workflow.test.ts",
+      "testCount": 26,
+      "failuresObserved": 1,
+      "status": "fixed; targeted rerun passed"
+    },
+    {
+      "suite": "tests/localization_coverage.test.ts",
+      "testCount": 59,
+      "failuresObserved": 1,
+      "status": "fixed; targeted rerun passed"
+    },
+    {
+      "suite": "tests/eastbrook_polish_capture_contract.test.ts",
+      "testCount": 16,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/gathering.test.ts",
+      "testCount": 45,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/mob_portrait_source_manifest.test.ts",
+      "testCount": 18,
+      "failuresObserved": 7,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/i18n_completeness.test.ts",
+      "testCount": 14,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/storage_price_guard.test.ts",
+      "testCount": 19,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/terrain_chunk_geometry.test.ts",
+      "testCount": 1,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/terrain_height_parity.test.ts",
+      "testCount": 1,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/banker_chest.test.ts",
+      "testCount": 9,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/ci_shard_partition.test.ts",
+      "testCount": 13,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/target_portrait_view.test.ts",
+      "testCount": 6,
+      "failuresObserved": 2,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/mob_aura_icon_art.test.ts",
+      "testCount": 4,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/ground_object_placement.test.ts",
+      "testCount": 5,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/npc_voice_coverage.test.ts",
+      "testCount": 9,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/move_input.test.ts",
+      "testCount": 8,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/npc_looks.test.ts",
+      "testCount": 10,
+      "failuresObserved": 1,
+      "status": "unresolved outside puzzle presentation changes"
+    },
+    {
+      "suite": "tests/world_guidance.test.ts",
+      "testCount": 4,
+      "failuresObserved": 2,
+      "status": "unresolved outside puzzle presentation changes"
+    }
+  ],
+  "browserSuite": {
+    "passed": 326,
+    "failed": 1,
+    "failingSuite": "tests/browser/quest_strip.browser.test.ts",
+    "baselineStylesReplay": "same Calligraphy landscape clipping failure"
+  },
+  "puzzleBrowserChecks": {
+    "passed": 21,
+    "javascriptErrors": 0
+  }
+}

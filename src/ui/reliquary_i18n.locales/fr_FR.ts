@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Héroïque : Creuset de la Dernière Source',
-    desc: 'Armes exclusives au mode héroïque d’Ignivar, Héraut de la Dernière Flamme.',
+    desc: 'Armes exclusives au mode héroïque et bijoux du raid d’Ignivar, Héraut de la Dernière Flamme.',
   },
   conquerors_varkhul: {
     name: 'Le Creuset intérieur',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Héroïque : le Creuset intérieur',
-    desc: 'Boucliers et armes exclusifs au mode héroïque de Varkhul, Père de la Forge de la Dernière Flamme.',
+    desc: 'Boucliers et armes exclusifs au mode héroïque et bijoux du raid de Varkhul, Père de la Forge de la Dernière Flamme.',
   },
   conquerors_set_bramblehide: {
     name: 'Peau de Ronces de Roots',

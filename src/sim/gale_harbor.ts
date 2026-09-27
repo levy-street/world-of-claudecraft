@@ -103,8 +103,24 @@ export function galeDeckSurface(
   waterLevel: number,
 ): number {
   if (x < DECKS_X1 || x > DECKS_X2 || z < DECKS_Z1 || z > DECKS_Z2) return -Infinity;
+  return deckListSurface(GALE_HARBOR_DECKS, x, z, terrainAt, waterLevel);
+}
+
+/**
+ * The highest plank plane underfoot across a list of decks, or -Infinity off
+ * every footprint. The harbor's own query above wraps it in a bounding-box
+ * early-out; other deck runs in the same idiom (Zephyr's launch wharf,
+ * glider_wharf_layout.ts) pass their own list.
+ */
+export function deckListSurface(
+  decks: readonly GaleDeckDef[],
+  x: number,
+  z: number,
+  terrainAt: (x: number, z: number) => number,
+  waterLevel: number,
+): number {
   let surface = -Infinity;
-  for (const deck of GALE_HARBOR_DECKS) {
+  for (const deck of decks) {
     const along = galeDeckAlong(deck, x, z, 0);
     if (along === null) continue;
     surface = Math.max(surface, galeDeckSurfaceAt(deck, along, terrainAt, waterLevel));

@@ -1,0 +1,9 @@
+{
+  "verified": [
+    "frontage",
+    "desktop",
+    "mobile"
+  ],
+  "checks": "Talk opens menu; bags mutually exclusive; exact-item claim; viewport sizing; card bounds; focus containment",
+  "date": "2026-09-14T06:01:13.246Z"
+}

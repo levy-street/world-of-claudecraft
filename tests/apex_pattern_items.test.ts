@@ -75,6 +75,16 @@ const CRUCIBLE_SCROLL_IDS = [
   ...CRUCIBLE_COLLECTIONS.map((collection) => `pattern_${collection.id}`),
   'formula_lastflame_zeal',
 ];
+// The four faction formulas (content/faction_vendors.ts, docs/design/factions.md):
+// recipe-kind items that teach a LEARNED enchant, sold for coin behind a
+// standing gate rather than dropped. They are the reputation channel, not the
+// apex pattern universe, so they are named here and subtracted from the union.
+const FACTION_FORMULA_IDS = [
+  'formula_dawnfire_etching',
+  'formula_dawns_benediction',
+  'formula_piston_drive',
+  'formula_riftwalkers_grace',
+];
 
 describe('apex pattern defs (the drop-taught pattern universe)', () => {
   it('covers every drop-taught apex recipe, one pattern_<output> def per recipe, and no strays', () => {
@@ -105,9 +115,12 @@ describe('apex pattern defs (the drop-taught pattern universe)', () => {
     // what keeps the pin non-vacuous as the universe spans more content
     // modules.
     const shippedRecipeKind = Object.values(ITEMS)
-      .filter((def) => def.kind === 'recipe')
+      .filter((def) => def.kind === 'recipe' && !FACTION_FORMULA_IDS.includes(def.id))
       .map((def) => def.id)
       .sort();
+    expect(Object.values(ITEMS).filter((def) => FACTION_FORMULA_IDS.includes(def.id))).toHaveLength(
+      4,
+    );
     expect(shippedRecipeKind).toEqual([...EVERY_PATTERN_ID, ...CRUCIBLE_SCROLL_IDS].sort());
     expect(EVERY_PATTERN_ID).toHaveLength(40);
     expect(CRUCIBLE_SCROLL_IDS).toHaveLength(12);

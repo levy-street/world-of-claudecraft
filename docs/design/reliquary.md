@@ -152,6 +152,14 @@ lowers the live read for players who had finished it, so a completed page
 shows as incomplete again until they find the new relic. This is inherent to
 a growing catalog (earned deeds stay sticky, live page reads do not) and will
 repeat at every growth. It owes a release-note line whenever a growth ships.
+The trinket wave (`src/sim/content/trinkets.ts`) is one such growth: every
+dropped or honor-sold trinket is catalogued on the page of the place it comes
+from (its five-man heroic boss page, the Heroic Nythraxis page, The Rift, the
+Warfare Armory, or for the raid trinkets both the Normal and the Heroic page
+of their Crucible boss, since they drop on both difficulties and rule 5 fills
+every page that lists an id), pinned in `tests/reliquary_content.test.ts`. The
+one marks-priced trinket (the Heroic Quartermaster's Wayfarer's Lodestone) has
+no page, like the rest of that vendor's stock.
 
 ## Adding a page (the recipe)
 

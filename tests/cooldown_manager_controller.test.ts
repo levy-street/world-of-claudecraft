@@ -267,6 +267,7 @@ describe('CooldownManagerController', () => {
       fateThreads: 0,
       entities: [],
       activeAimSlot: null,
+      wornTrinketId: null,
     };
     const refreshed = Object.keys(sample).filter((key) => key !== 'entities');
     expect([...COOLDOWN_WORLD_FIELDS].sort()).toEqual(refreshed.sort());

@@ -381,7 +381,12 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     // difficulty floors themselves are not retuned here, which is the same
     // maintainer decision the 1672 -> 1582 re-pin recorded: REF_ARMOR and the
     // packet's Phase 19 table stay the calibration constants.
-    expect(a.maxHp, 'and its pool').toBe(1922);
+    // Re-pinned 1922 -> 2052 with the trinket slot (PR 4173): the max-armor
+    // picker fills the thirteenth slot, and every trinket carries armor 0, so
+    // the id-ordered tie lands on the first trinket the warrior can wear and
+    // its stamina line (+13, 130 HP) joins the pool. The armor pin above did
+    // not move; the floors are not retuned here, the same maintainer decision.
+    expect(a.maxHp, 'and its pool').toBe(2052);
   });
 
   it('REF_ARMOR provenance: the readings the comments quote are derived, not hand-carried', () => {

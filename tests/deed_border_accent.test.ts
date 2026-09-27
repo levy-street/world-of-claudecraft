@@ -1150,9 +1150,14 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     // readable at every preset (the fairness rule the loop above enforces).
     expect(
       allTierShadowDeclarations,
-      // Shipped uses plus the four library glow composites in tokens.css.
-      'the style graph owns 101 reviewed tier-shadow uses',
-    ).toHaveLength(101);
+      // Shipped uses plus the four library glow composites in tokens.css. The
+      // weekly vault opening (components.css, weekly rewards) owns its halo,
+      // ring, streak, star and wide-ray blooms here, all box-shadow or
+      // drop-shadow scaled by the tier, never a blur. Base 97; the release's
+      // two extra library composites (+4) and the world-quests branch's vault
+      // blooms (+11) compose to 112 at the release/v0.44.0 base merge.
+      'the style graph owns 112 reviewed tier-shadow uses',
+    ).toHaveLength(112);
 
     for (const [name, body] of [
       [

@@ -160,7 +160,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_ignivar_heroic: {
     name: 'Heroik: Tungku Mata Air Terakhir',
-    desc: 'Senjata khusus mode heroik dari Ignivar, Utusan Api Terakhir.',
+    desc: 'Senjata khusus mode heroik dan trinket raid dari Ignivar, Utusan Api Terakhir.',
   },
   conquerors_varkhul: {
     name: 'Tungku Dalam',
@@ -168,7 +168,7 @@ export const table: ReliquaryLocaleTable = {
   },
   conquerors_varkhul_heroic: {
     name: 'Heroik: Tungku Dalam',
-    desc: 'Perisai dan senjata khusus mode heroik dari Varkhul, Bapak Penempa Api Terakhir.',
+    desc: 'Perisai dan senjata khusus mode heroik serta trinket raid dari Varkhul, Bapak Penempa Api Terakhir.',
   },
   conquerors_set_bramblehide: {
     name: 'Kulit Semak Duri',

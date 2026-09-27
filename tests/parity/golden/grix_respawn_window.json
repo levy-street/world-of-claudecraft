@@ -13,7 +13,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1006,
+      "nextId": 1010,
       "state": "5bc471b0",
       "events": "741638a5",
       "rng": {
@@ -27,9 +27,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1008,
-      "state": "e784c5f0",
-      "events": "18f1007e",
+      "nextId": 1012,
+      "state": "b95f6293",
+      "events": "f3233964",
       "rng": {
         "draws": 10,
         "digest": "3c49d817"
@@ -89,14 +89,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -129,6 +131,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 192
         }
@@ -145,7 +148,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -158,7 +161,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -201,13 +204,13 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            1006
+            1010
           ],
           "comboUntil": -1,
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006"
+              "entity:1010"
             ],
             "token": {}
           },
@@ -219,7 +222,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -251,7 +254,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            1006
+            1010
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -275,7 +278,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 1006,
+          "tappedById": 1010,
           "templateId": "grix_the_tunnelking",
           "weapon": {
             "max": 58,
@@ -288,9 +291,9 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1008,
-      "state": "b00a872a",
-      "events": "a062dcbe",
+      "nextId": 1012,
+      "state": "35caa755",
+      "events": "10bc9a8d",
       "rng": {
         "draws": 21,
         "digest": "fec75e4e"
@@ -350,14 +353,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -390,6 +395,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 384
         }
@@ -406,7 +412,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -419,7 +425,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -462,13 +468,13 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            1006
+            1010
           ],
           "comboUntil": -1,
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006"
+              "entity:1010"
             ],
             "token": {}
           },
@@ -480,7 +486,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -512,7 +518,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            1006
+            1010
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -536,7 +542,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 1006,
+          "tappedById": 1010,
           "templateId": "grix_the_tunnelking",
           "wanderTimer": 7.872608,
           "weapon": {
@@ -550,8 +556,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1008,
-      "state": "b00a872a",
+      "nextId": 1012,
+      "state": "35caa755",
       "events": "741638a5",
       "rng": {
         "draws": 21,
@@ -612,14 +618,16 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1006,
+          "entityId": 1010,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
             "offhand": "eastbrook_buckler"
           },
           "equipmentInstance": {},
+          "factions": {},
           "gatheringProficiency": {},
+          "gliderRecords": {},
           "harvestPreference": {
             "kind": "all"
           },
@@ -652,6 +660,7 @@
           "vault": {
             "stock": {}
           },
+          "worldQuestReplacements": {},
           "wyrmfallDaily": {},
           "xp": 384
         }
@@ -668,7 +677,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 1006
+              "sourceId": 1010
             }
           ],
           "blockChance": 0.05,
@@ -681,7 +690,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 1000000,
-          "id": 1006,
+          "id": 1010,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -724,13 +733,13 @@
         {
           "aiState": "dead",
           "bossDamagers": [
-            1006
+            1010
           ],
           "comboUntil": -1,
           "corpseHarvestState": {
             "priorityEndsAt": 10,
             "priorityMemberKeys": [
-              "entity:1006"
+              "entity:1010"
             ],
             "token": {}
           },
@@ -742,7 +751,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1007,
+          "id": 1011,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -774,7 +783,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            1006
+            1010
           ],
           "lootable": true,
           "maxHp": 1362,
@@ -798,7 +807,7 @@
           "stats": {
             "armor": 144
           },
-          "tappedById": 1006,
+          "tappedById": 1010,
           "templateId": "grix_the_tunnelking",
           "wanderTimer": 7.872608,
           "weapon": {
